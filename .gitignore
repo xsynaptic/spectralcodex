@@ -39,3 +39,10 @@ media/
 
 # example content
 example/
+
+# ignore some files temporarily
+.dockerignore
+Dockerfile
+config/nginx/
+public/icons/
+public/og*.jpg
