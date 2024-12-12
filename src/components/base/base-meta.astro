@@ -6,7 +6,8 @@ import type { MetaProps } from '@/types/components';
 import type { SEOProps } from 'astro-seo';
 
 import {
-	IMAGE_FORMAT_QUALITY,
+	IMAGE_FORMAT,
+	IMAGE_QUALITY,
 	OPEN_GRAPH_IMAGE_DENSITY,
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
@@ -61,7 +62,8 @@ const imageDynamic =
 				src: imageObject.data.src,
 				height: 1800,
 				width: 1200,
-				...IMAGE_FORMAT_QUALITY,
+				format: IMAGE_FORMAT,
+				quality: IMAGE_QUALITY,
 			})
 		: undefined;
 

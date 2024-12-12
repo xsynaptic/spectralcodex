@@ -1,0 +1,57 @@
+---
+import { render } from 'astro:content';
+
+import type { CollectionEntry } from 'astro:content';
+
+import ContentDescription from '@/components/content/content-description.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import ListColumn from '@/components/parts/list-column.astro';
+import ListColumnItem from '@/components/parts/list-column-item.astro';
+import { getSeriesByIdFunction } from '@/lib/collections/series/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+
+const t = getTranslations();
+
+interface Props {
+	entry: CollectionEntry<'locations' | 'posts'>;
+}
+
+const { entry } = Astro.props;
+
+const getSeriesById = await getSeriesByIdFunction();
+
+const seriesData = getSeriesById({ collection: entry.collection, id: entry.id });
+---
+
+{
+	seriesData.length > 0
+		? seriesData.map(async ({ entry, metadataItems }) => {
+				const { Content } = await render(entry);
+
+				return metadataItems.length > 0 ? (
+					<ContentSection>
+						<Fragment slot="section-title">
+							{t('collection.series.labelPlural')}: {entry.data.title}
+						</Fragment>
+						<ContentDescription showCompact={true}>
+							<Content />
+						</ContentDescription>
+						<ListColumn class="mt-small font-serif text-xs md:text-sm">
+							{metadataItems.map(({ url, title, titleAlt }) => (
+								<ListColumnItem>
+									<Link href={url}>{title}</Link>
+									{titleAlt ? (
+										<span>
+											<FormatCjk>({titleAlt})</FormatCjk>
+										</span>
+									) : undefined}
+								</ListColumnItem>
+							))}
+						</ListColumn>
+					</ContentSection>
+				) : undefined;
+			})
+		: undefined
+}

@@ -1,0 +1,55 @@
+---
+import * as R from 'remeda';
+
+import type { CollectionEntry, CollectionKey } from 'astro:content';
+
+import ContentSection from '@/components/content/content-section.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import ListColumn from '@/components/parts/list-column.astro';
+import ListColumnItem from '@/components/parts/list-column-item.astro';
+import { getContentBacklinks } from '@/lib/metadata/metadata-backlinks';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	entry: CollectionEntry<CollectionKey>;
+}
+
+const { entry } = Astro.props;
+
+const backlinkItems = await getContentBacklinks({ id: entry.id });
+
+const backlinks = backlinkItems
+	? R.pipe(
+			backlinkItems,
+			R.filter((backlinkItem) =>
+				['ephemera', 'posts', 'locations'].includes(backlinkItem.collection)
+			),
+			R.sort(sortContentMetadataByDate),
+			R.take(10)
+		)
+	: undefined;
+
+const t = getTranslations();
+---
+
+{
+	backlinks && backlinks.length > 0 ? (
+		<ContentSection>
+			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
+			<ListColumn class="font-serif text-xs sm:text-sm">
+				{backlinks.map(({ url, title, titleAlt }) => (
+					<ListColumnItem>
+						<Link href={url}>{title}</Link>
+						{titleAlt ? (
+							<span>
+								<FormatCjk>({titleAlt})</FormatCjk>
+							</span>
+						) : undefined}
+					</ListColumnItem>
+				))}
+			</ListColumn>
+		</ContentSection>
+	) : undefined
+}

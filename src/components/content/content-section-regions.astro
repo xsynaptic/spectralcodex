@@ -1,0 +1,27 @@
+---
+import ContentSection from '@/components/content/content-section.astro';
+import RegionsList from '@/components/regions/regions-list.astro';
+import { getRegionsByIdsFunction } from '@/lib/collections/regions/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	regionIds: string[] | undefined;
+}
+
+const { regionIds } = Astro.props;
+
+const getRegionsByIds = await getRegionsByIdsFunction();
+
+const regions = regionIds ? getRegionsByIds(regionIds) : undefined;
+
+const t = getTranslations();
+---
+
+{
+	regions && regions.length > 0 ? (
+		<ContentSection>
+			<Fragment slot="section-title">{t('collection.regions.labelPlural')}</Fragment>
+			<RegionsList terms={regions} dividerContent="chevron" showSingleRegionAncestors={true} />
+		</ContentSection>
+	) : undefined
+}

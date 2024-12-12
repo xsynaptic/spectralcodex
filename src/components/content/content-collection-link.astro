@@ -1,0 +1,23 @@
+---
+import type { CollectionKey } from 'astro:content';
+
+import Link from '@/components/parts/link.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	collection: CollectionKey;
+	showFeatured?: boolean;
+}
+const { collection, showFeatured } = Astro.props;
+
+const collectionUrl = getSiteUrl(collection);
+
+const t = getTranslations();
+---
+
+<Link
+	href={collectionUrl}
+	linkColor={showFeatured ? 'highlight-featured' : 'highlight'}
+	class="font-semibold">{t(`collection.${collection}.labelPlural`)}</Link
+>

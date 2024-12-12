@@ -97,6 +97,7 @@
 		"viewbox",
 		"zustand"
 	],
+	"cSpell.ignorePaths": [".vscode", "pnpm*.yaml", "node_modules", "tsconfig.json"],
 	"cssVariables.blacklistFolders": [
 		"**/.git",
 		"**/.svn",
@@ -108,7 +109,6 @@
 		"**/tmp",
 		"**/dist",
 		"**/tests",
-		"src/content",
 		"content"
 	],
 	"eslint.validate": [

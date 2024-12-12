@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+	showCompact?: boolean | undefined;
+}
+
+const { class: className, showCompact, ...props } = Astro.props;
+---
+
+<div
+	class:list={[
+		'prose prose-primary max-w-none font-serif',
+		'prose-a:text-accent-500 prose-a:decoration-accent-200 prose-a:underline-offset-2 prose-a:transition-colors prose-a:duration-150 prose-a:ease-in hover:prose-a:text-accent-300 hover:prose-a:decoration-accent-100',
+		'prose-h2:mb-small',
+		showCompact ? 'prose-xs lg:prose-sm' : 'prose-base lg:prose-lg',
+		className,
+	]}
+	{...props}
+>
+	<slot />
+</div>

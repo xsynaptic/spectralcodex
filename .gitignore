@@ -34,8 +34,8 @@ temp
 public/fonts
 
 # ignore content and media
-content/
-media/
+/content/
+/media/
 
 # example content
 example/

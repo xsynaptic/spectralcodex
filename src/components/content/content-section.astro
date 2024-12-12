@@ -1,0 +1,63 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import ContentDescription from '@/components/content/content-description.astro';
+import TextGradient from '@/components/parts/text-gradient.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+	fillViewport?: boolean | undefined;
+	titleLarge?: boolean | undefined;
+}
+
+const { class: className, fillViewport, titleLarge, ...props } = Astro.props;
+
+const title = await Astro.slots.render('section-title');
+const subtitle = await Astro.slots.render('section-subtitle');
+const description = await Astro.slots.render('section-description');
+const children = (await Astro.slots.render('default')) as string | undefined;
+---
+
+{
+	description || children?.trim() ? (
+		<div
+			class:list={[
+				'mb-medium',
+				'mx-auto max-w-content md:px-medium',
+				fillViewport ? 'sm:px-small' : 'px-small',
+				className,
+			]}
+			{...props}
+		>
+			<header
+				class:list={[
+					description ? undefined : 'mb-2',
+					fillViewport ? 'px-small sm:px-0' : undefined,
+				]}
+			>
+				{title ? (
+					<TextGradient
+						as="h2"
+						class:list={[
+							'mb-1 font-semibold',
+							titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
+						]}
+					>
+						<Fragment set:html={title} />
+					</TextGradient>
+				) : undefined}
+				{subtitle ? (
+					<h3 class:list={['mb-1 text-xs font-medium text-primary-400 md:text-sm']}>
+						<Fragment set:html={subtitle} />
+					</h3>
+				) : undefined}
+				{description ? (
+					<ContentDescription class:list={['mb-small']}>
+						<Fragment set:html={description} />
+					</ContentDescription>
+				) : undefined}
+			</header>
+			<Fragment set:html={children} />
+		</div>
+	) : undefined
+}

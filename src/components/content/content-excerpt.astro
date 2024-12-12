@@ -1,0 +1,62 @@
+---
+import ContentDescription from '@/components/content/content-description.astro';
+import ContentProse from '@/components/content/content-prose.astro';
+import Container from '@/components/parts/container.astro';
+import Link from '@/components/parts/link.astro';
+import { CONTENT_EXCERPT_IDENTIFIER } from '@/constants';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	class?: string | undefined;
+	entryUrl: string;
+}
+
+const { class: className, entryUrl } = Astro.props;
+
+const subtitle = await Astro.slots.render('excerpt-subtitle');
+const description = await Astro.slots.render('excerpt-description');
+const content = (await Astro.slots.render('default')) as string | undefined;
+
+// Generate the excerpt
+const excerpt = content?.split(`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`) ?? [];
+const excerptContent = excerpt[0];
+const hasExcerpt = excerpt.length > 1;
+
+const t = getTranslations();
+---
+
+<article class={className}>
+	<Container as="header" class:list={[description ? undefined : 'mb-2']}>
+		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
+			<a href={entryUrl} class="text-primary-700 transition-colors ease-in hover:text-accent-500">
+				<slot name="excerpt-title" />
+			</a>
+		</h2>
+		{
+			subtitle ? (
+				<h3 class:list={['mb-1 text-xs font-medium text-primary-400 md:text-sm']}>
+					<Fragment set:html={subtitle} />
+				</h3>
+			) : undefined
+		}
+		{
+			description ? (
+				<ContentDescription>
+					<Fragment set:html={description} />
+				</ContentDescription>
+			) : undefined
+		}
+	</Container>
+	<ContentProse class="pb-small"><Fragment set:html={excerptContent} /></ContentProse>
+	{
+		hasExcerpt ? (
+			<Container as="div">
+				<slot name="excerpt-more-link">
+					<div class="text-right font-serif font-medium italic">
+						<Link href={entryUrl}>{t('content.more.label')}</Link>&nbsp;&raquo;
+					</div>
+				</slot>
+			</Container>
+		) : undefined
+	}
+</article>

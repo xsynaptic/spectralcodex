@@ -1,0 +1,38 @@
+---
+import type { DatePreset } from '@/types/components';
+import type { HTMLAttributes } from 'astro/types';
+
+import DateDisplay from '@/components/parts/date-display.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props extends HTMLAttributes<'div'> {
+	date: string | Date | undefined;
+	dateUpdated?: string | Date | undefined;
+	datePreset: DatePreset;
+}
+
+const { date, datePreset, dateUpdated, ...props } = Astro.props;
+
+const t = getTranslations();
+---
+
+{
+	date ? (
+		<div {...props}>
+			{dateUpdated ? (
+				<div class="flex flex-wrap gap-1">
+					<span>
+						<DateDisplay date={date} datePreset={datePreset} />
+						{'; '}
+					</span>
+					<span>{t('content.meta.dateUpdated.label')}</span>
+					<span>
+						<DateDisplay date={dateUpdated} />
+					</span>
+				</div>
+			) : (
+				<DateDisplay date={date} datePreset={datePreset} />
+			)}
+		</div>
+	) : undefined
+}

@@ -1,0 +1,130 @@
+---
+import type { ContentPreviewItemProps } from '@/types/components';
+import type { ContentMetadataItem } from '@/types/metadata';
+
+import ContentDate from '@/components/content/content-date.astro';
+import ContentDescription from '@/components/content/content-description.astro';
+import ContentPreview from '@/components/content/content-preview.astro';
+import DividedItem from '@/components/parts/divided-item.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import FormatNumber from '@/components/parts/format/format-number.astro';
+import Link from '@/components/parts/link.astro';
+import { getRegionAncestorsByIdFunction } from '@/lib/collections/regions/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
+
+interface Props extends ContentPreviewItemProps {
+	item: ContentMetadataItem;
+}
+
+const {
+	item: {
+		collection,
+		title,
+		titleAlt,
+		url,
+		description,
+		date,
+		imageId,
+		regionPrimaryId,
+		postCount,
+		locationCount,
+		wordCount,
+	},
+	showCollection,
+	showLocations,
+	showDate,
+	showDescription,
+	showDescriptionCompact = true,
+	showRegion,
+	showPosts,
+	showTitleAlt,
+	showWordCount,
+} = Astro.props;
+
+const indexUrl = getSiteUrl(collection);
+
+const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
+
+const regions =
+	showRegion && regionPrimaryId
+		? getRegionAncestorsById(regionPrimaryId).slice(0, 2).reverse()
+		: undefined;
+
+const t = getTranslations();
+---
+
+<ContentPreview imageId={imageId} linkUrl={url} alt={title}>
+	<Fragment slot="preview-title">{title}</Fragment>
+	{
+		showTitleAlt && titleAlt ? (
+			<Fragment slot="preview-title-alt">
+				<FormatCjk>{titleAlt}</FormatCjk>
+			</Fragment>
+		) : undefined
+	}
+	<Fragment slot="preview-subtitle"
+		>{
+			showCollection ? (
+				<DividedItem>
+					{indexUrl ? (
+						<Link href={indexUrl} class="font-semibold">
+							{t(`collection.${collection}.labelSingular`)}
+						</Link>
+					) : (
+						<div class="font-semibold">{t(`collection.${collection}.labelSingular`)}</div>
+					)}
+				</DividedItem>
+			) : undefined
+		}
+		{
+			showRegion && regions && regions.length > 0 ? (
+				<DividedItem>
+					{regions.map((region) => (
+						<DividedItem dividerContent="chevron">
+							<Link href={getContentUrl('regions', region.id)}>{region.data.title.trim()}</Link>
+						</DividedItem>
+					))}
+				</DividedItem>
+			) : undefined
+		}
+		{
+			showLocations && locationCount && locationCount > 0 ? (
+				<DividedItem>
+					<span>
+						{t('collection.locations.labelPlural')}: <FormatNumber>{locationCount}</FormatNumber>
+					</span>
+				</DividedItem>
+			) : undefined
+		}
+		{
+			showPosts && postCount && postCount > 0 ? (
+				<DividedItem>
+					<span>
+						{t('collection.posts.labelPlural')}: <FormatNumber>{postCount}</FormatNumber>
+					</span>
+				</DividedItem>
+			) : undefined
+		}
+		{
+			showWordCount && wordCount && wordCount > 0 ? (
+				<DividedItem>
+					<span>
+						{t('content.meta.wordCount.label')}: <FormatNumber>{wordCount}</FormatNumber>
+					</span>
+				</DividedItem>
+			) : undefined
+		}
+		{showDate ? <ContentDate date={date} datePreset="medium" /> : undefined}</Fragment
+	>
+	{
+		showDescription ? (
+			<Fragment slot="preview-description">
+				<ContentDescription class="mt-1" showCompact={showDescriptionCompact}>
+					<FormatMarkdown>{description}</FormatMarkdown>
+				</ContentDescription>
+			</Fragment>
+		) : undefined
+	}
+</ContentPreview>

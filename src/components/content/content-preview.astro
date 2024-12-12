@@ -1,0 +1,103 @@
+---
+import { tailwindConfig } from '@spectralcodex/tailwind/config';
+import { Image } from 'astro:assets';
+
+import type { HTMLAttributes } from 'astro/types';
+import type { LocalImageProps } from 'astro:assets';
+
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
+import { getImageById } from '@/lib/collections/images/utils';
+import { getImageSrcsetWidths } from '@/lib/image/image-layout';
+import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
+import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+interface Props extends HTMLAttributes<'div'> {
+	imageId?: string | undefined;
+	isImageSquare?: boolean;
+	linkUrl: string;
+	alt: string;
+}
+
+const { imageId, isImageSquare, linkUrl, alt, ...props } = Astro.props;
+
+const image = imageId ? await getImageById(imageId) : undefined;
+
+// Dimensions chosen for a two-column grid
+const imageProps = image
+	? ({
+			src: image.data.src,
+			width: 450,
+			height: 300,
+			alt: sanitizeAltAttribute(alt),
+			widths: getImageSrcsetWidths({
+				maxWidth: image.data.src.width,
+				widths: [450, 600, 900, 1200],
+			}),
+			sizes: `(max-width: ${tailwindConfig.theme.screens.lg}) 100vw, 450px`,
+			format: IMAGE_FORMAT,
+			quality: IMAGE_QUALITY,
+			...getImagePlaceholderProps({ placeholder: image.data.placeholder }),
+		} satisfies LocalImageProps)
+	: undefined;
+
+const titleAlt = await Astro.slots.render('preview-title-alt');
+const subtitle = await Astro.slots.render('preview-subtitle');
+const description = await Astro.slots.render('preview-description');
+---
+
+<div class="rounded-md border border-primary-300 bg-primary-200 p-2 shadow-inner" {...props}>
+	{
+		imageProps ? (
+			<a href={linkUrl}>
+				<Image
+					class:list={[
+						'bg-fallback',
+						'w-full rounded-sm object-cover object-center text-sm text-transparent',
+						isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
+					]}
+					loading="lazy"
+					{...imageProps}
+				/>
+			</a>
+		) : (
+			<div
+				class:list={[
+					'bg-fallback',
+					'w-full rounded-sm text-sm text-transparent shadow-inner',
+					isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
+				]}
+			/>
+		)
+	}
+	<h2 class="mt-1 flex flex-wrap gap-x-1 text-xl">
+		<a
+			href={linkUrl}
+			class="font-display font-bold text-primary-700 transition-colors ease-in hover:text-accent-500"
+		>
+			<slot name="preview-title" />
+		</a>
+		{
+			titleAlt ? (
+				<div class="inline-flex font-semibold text-primary-400">
+					<span class="font-light">(</span>
+					<Fragment set:html={titleAlt} />
+					<span class="font-light">)</span>
+				</div>
+			) : undefined
+		}
+	</h2>
+	{
+		subtitle ? (
+			<div class="mt-1 flex flex-wrap gap-1 text-sm font-medium text-primary-500">
+				<Fragment set:html={subtitle} />
+			</div>
+		) : undefined
+	}
+	{
+		description ? (
+			<div class="prose prose-sm">
+				<Fragment set:html={description} />
+			</div>
+		) : undefined
+	}
+</div>

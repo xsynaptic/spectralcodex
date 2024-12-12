@@ -1,0 +1,84 @@
+---
+import Container from '@/components/parts/container.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import TextGradient from '@/components/parts/text-gradient.astro';
+
+interface Props {
+	class?: string | undefined;
+	showFeatured?: boolean | undefined;
+}
+
+const { class: className, showFeatured } = Astro.props;
+
+const titleAlt = await Astro.slots.render('header-title-alt');
+const titleInfo = await Astro.slots.render('header-title-info');
+const subtitle = await Astro.slots.render('header-subtitle');
+const caption = await Astro.slots.render('header-caption');
+---
+
+<Container
+	as="div"
+	class:list={[
+		className,
+		showFeatured
+			? 'flex flex-col justify-end pt-2 sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-30 sm:mb-0 sm:pt-0'
+			: 'mb-2 pt-small',
+	]}
+>
+	{
+		titleAlt ? (
+			<TextGradient
+				as="h2"
+				gradientColor={showFeatured ? 'accent-featured' : 'accent'}
+				class:list={[
+					'ml-[-0.125rem] pb-1 font-heiti text-base font-medium leading-snug sm:font-semibold',
+					showFeatured
+						? 'text-lg sm:-mb-1 sm:drop-shadow-sm md:text-xl lg:text-2xl'
+						: 'text-lg md:text-xl lg:text-2xl',
+				]}
+			>
+				<FormatCjk>
+					<Fragment set:html={titleAlt} />
+				</FormatCjk>
+			</TextGradient>
+		) : undefined
+	}
+	<div class="flex-wrap items-start justify-between gap-1 bg-clip-padding pb-0 sm:flex sm:pb-2">
+		<TextGradient
+			as="h1"
+			gradientColor={showFeatured ? 'primary-featured' : 'primary'}
+			class:list={[
+				'ml-[-0.125rem] pb-2 font-display text-2xl font-semibold leading-[1.125]',
+				showFeatured
+					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow md:text-4xl lg:text-5xl'
+					: '-mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
+			]}
+		>
+			<slot name="header-title" />
+		</TextGradient>
+		{
+			titleInfo ? (
+				<div class="self-end pb-0 sm:pb-2">
+					<Fragment set:html={titleInfo} />
+				</div>
+			) : undefined
+		}
+	</div>
+	{
+		subtitle || caption ? (
+			<div
+				class:list={[
+					'flex flex-wrap items-start gap-1 pb-2 text-sm',
+					showFeatured ? 'text-primary-500 sm:text-primary-300' : 'text-primary-500',
+				]}
+			>
+				{subtitle ? <Fragment set:html={subtitle} /> : undefined}
+				{caption ? (
+					<div class="flex flex-1 flex-nowrap items-end justify-end gap-1">
+						<Fragment set:html={caption} />
+					</div>
+				) : undefined}
+			</div>
+		) : undefined
+	}
+</Container>
