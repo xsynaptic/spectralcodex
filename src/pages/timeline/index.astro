@@ -1,0 +1,26 @@
+---
+import { FEATURE_DATE_ARCHIVES } from 'astro:env/server';
+import * as R from 'remeda';
+
+import type { TimelineYearlyData } from '@/lib/timeline/timeline-types';
+
+import { getTimelineYearlyMap } from '@/lib/timeline/timeline-items';
+import TimelineYearlyIndex from '@/pages-layouts/timeline-yearly-index.astro';
+
+const timelineYearlyMap = await getTimelineYearlyMap();
+
+const timelineYearlyData = R.pipe(
+	[...timelineYearlyMap.entries()],
+	R.map(([timelineSlug]) => ({
+		id: timelineSlug,
+		date: new Date(timelineSlug),
+		title: timelineSlug,
+	}))
+) satisfies TimelineYearlyData[];
+---
+
+{
+	FEATURE_DATE_ARCHIVES ? (
+		<TimelineYearlyIndex timelineYearlyData={timelineYearlyData} />
+	) : undefined
+}

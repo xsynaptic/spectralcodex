@@ -1,0 +1,8 @@
+---
+import { stylizeText } from '@spectralcodex/unified';
+
+const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const output = stylizeText(slotContents ?? '');
+---
+
+{output ? <Fragment set:html={output} /> : undefined}

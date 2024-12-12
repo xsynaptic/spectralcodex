@@ -1,0 +1,22 @@
+---
+import * as R from 'remeda';
+
+import { getObjectiveLocations } from '@/lib/collections/locations/utils';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getBasePath } from '@/lib/utils/routing';
+import ObjectivesLayout from '@/pages-layouts/objectives.astro';
+
+const objectiveLocations = await getObjectiveLocations();
+
+const mapData = getMapData({
+	featureCollection: R.pipe(objectiveLocations, (locations) =>
+		getLocationsFeatureCollection(locations, { showHiddenLocations: true })
+	),
+	apiEndpointUrl: getBasePath('api/v1/map/objectives'),
+	boundsBufferMax: 400,
+	showObjectiveFilter: true,
+});
+---
+
+<ObjectivesLayout {...mapData} />

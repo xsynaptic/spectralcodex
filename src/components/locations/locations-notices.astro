@@ -1,0 +1,40 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import ContentSection from '@/components/content/content-section.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import StatusBox from '@/components/parts/status-box.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	entry: CollectionEntry<'locations'>;
+}
+
+const { entry } = Astro.props;
+
+const showDangerNotice = entry.data.safety
+	? entry.data.safety <= 2
+	: ['abandoned', 'idle', 'remnants'].includes(entry.data.status);
+const showDemolishedNotice = entry.data.status === 'demolished';
+
+const t = getTranslations();
+---
+
+{
+	showDangerNotice && !showDemolishedNotice ? (
+		<ContentSection>
+			<StatusBox status="warning" class="mb-small">
+				<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
+			</StatusBox>
+		</ContentSection>
+	) : undefined
+}
+{
+	showDemolishedNotice ? (
+		<ContentSection>
+			<StatusBox status="error" class="mb-small">
+				<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
+			</StatusBox>
+		</ContentSection>
+	) : undefined
+}

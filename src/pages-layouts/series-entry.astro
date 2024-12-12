@@ -1,0 +1,96 @@
+---
+import { render } from 'astro:content';
+
+import type { MapComponentData } from '@/lib/map/map-types';
+import type { ContentMetadataItem } from '@/types/metadata';
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentCollectionLink from '@/components/content/content-collection-link.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
+import ContentProse from '@/components/content/content-prose.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import ImageHeroCarousel from '@/components/image/image-hero-carousel.astro';
+import MapComponent from '@/components/parts/map-component.astro';
+import Pagination from '@/components/parts/pagination.astro';
+import { getFeaturedItemsMetadata } from '@/lib/image/image-featured';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSeoImageProps } from '@/lib/utils/seo';
+
+interface Props {
+	entry: CollectionEntry<'series'>;
+	mapData: MapComponentData;
+	page: Page<ContentMetadataItem>;
+}
+
+const {
+	entry,
+	mapData: { hasGeodata, ...mapComponentProps },
+	page,
+} = Astro.props;
+
+const {
+	data: { title, titleAlt, description, images },
+} = entry;
+
+const featuredItems = await getFeaturedItemsMetadata({ images, shuffle: true });
+
+const hasHeroImage = !!featuredItems && featuredItems.length > 0;
+
+const { Content } = await render(entry);
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title: titleAlt ? `${title} (${titleAlt})` : title,
+		description: description ?? entry.body ?? undefined,
+		image: getSeoImageProps({
+			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
+			alt: title,
+		}),
+		prefetchUrls: mapComponentProps.prefetchUrls,
+	}}
+	hasHeroImage={hasHeroImage}
+>
+	<article>
+		{
+			hasHeroImage ? (
+				<ImageHeroCarousel images={featuredItems} class="sm:mb-small">
+					<ContentHeader showFeatured={true}>
+						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-subtitle">
+							<ContentCollectionLink collection={entry.collection} showFeatured={true} />
+						</Fragment>
+					</ContentHeader>
+				</ImageHeroCarousel>
+			) : (
+				<ContentHeader>
+					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-subtitle">
+						<ContentCollectionLink collection={entry.collection} />
+					</Fragment>
+				</ContentHeader>
+			)
+		}
+		<ContentProse class="pb-small"><Content /></ContentProse>
+		<ContentSection>
+			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
+			<ContentPreviewGrid items={page.data} showDate={true} showRegion={true} />
+			<Pagination class="mt-small md:mt-medium" page={page} />
+		</ContentSection>
+		{
+			hasGeodata ? (
+				<ContentSection fillViewport={true}>
+					<Fragment slot="section-title">{t('content.section.map')}</Fragment>
+					<MapComponent {...mapComponentProps} />
+				</ContentSection>
+			) : undefined
+		}
+	</article>
+</BaseSite>

@@ -1,0 +1,16 @@
+---
+import ProgressBarBase from '@/components/parts/progress-bar/progress-bar-base.astro';
+---
+
+<ProgressBarBase
+	id="loading-bar"
+	class="z-50 bg-gradient-to-r from-highlight-400 to-highlight-300 text-highlight-200"
+/>
+
+<script>
+	import { loadingBar } from '@/components/parts/progress-bar/progress-bar-loading';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		loadingBar('#loading-bar');
+	});
+</script>

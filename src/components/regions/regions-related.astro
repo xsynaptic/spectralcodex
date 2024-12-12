@@ -1,0 +1,75 @@
+---
+import * as R from 'remeda';
+
+import type { CollectionEntry } from 'astro:content';
+
+import Container from '@/components/parts/container.astro';
+import RegionsList from '@/components/regions/regions-list.astro';
+import { filterRegionsWithContent } from '@/lib/collections/regions/utils';
+import {
+	getRegionAncestorsFunction,
+	getRegionsByIdsFunction,
+	sortRegionsByContentCount,
+} from '@/lib/collections/regions/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	entry: CollectionEntry<'regions'>;
+	limit?: number | undefined;
+}
+
+const { entry, limit = 12 } = Astro.props;
+
+// Only show alternate titles above this depth; saves space for top-level regions
+const SHOW_TITLE_ALT_DEPTH = 2;
+
+const getRegionsByIds = await getRegionsByIdsFunction();
+const getRegionAncestors = await getRegionAncestorsFunction();
+
+const depth = getRegionAncestors(entry).length;
+
+const regionChildren = entry.data.children
+	? R.pipe(
+			entry.data.children,
+			getRegionsByIds,
+			R.filter(filterRegionsWithContent),
+			R.sort(sortRegionsByContentCount),
+			R.take(limit)
+		)
+	: [];
+
+const regionSiblings = entry.data.siblings
+	? R.pipe(
+			entry.data.siblings,
+			getRegionsByIds,
+			R.filter(filterRegionsWithContent),
+			R.sort(sortRegionsByContentCount),
+			R.take(limit)
+		)
+	: [];
+
+const t = getTranslations();
+---
+
+{
+	regionChildren.length > 0 || regionSiblings.length > 0 ? (
+		<Container as="div" class="mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6">
+			{regionChildren.length > 0 ? (
+				<div class="flex-1">
+					<h3 class="mb-1 text-xs font-semibold uppercase">
+						<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
+					</h3>
+					<RegionsList terms={regionChildren} showTitleAlt={depth >= SHOW_TITLE_ALT_DEPTH} />
+				</div>
+			) : undefined}
+			{regionSiblings.length > 0 ? (
+				<div class="flex-1">
+					<h3 class="mb-1 text-xs font-semibold uppercase">
+						<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
+					</h3>
+					<RegionsList terms={regionSiblings} showTitleAlt={depth >= SHOW_TITLE_ALT_DEPTH} />
+				</div>
+			) : undefined}
+		</Container>
+	) : undefined
+}

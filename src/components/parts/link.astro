@@ -1,0 +1,64 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type LinkColor =
+	| 'primary'
+	| 'primary-bright'
+	| 'primary-featured'
+	| 'highlight'
+	| 'highlight-bright'
+	| 'highlight-featured'
+	| 'accent'
+	| 'accent-bright'
+	| 'accent-featured';
+
+interface Props extends HTMLAttributes<'a'> {
+	linkColor?: LinkColor | undefined;
+}
+
+const { class: className, href, linkColor = 'accent', ...props } = Astro.props;
+
+const children = (await Astro.slots.render('default')) as string | undefined;
+
+const getColorScheme = () => {
+	switch (linkColor) {
+		case 'primary': {
+			return 'text-primary-800 hover:text-primary-600';
+		}
+		case 'primary-bright': {
+			return 'text-primary-300 hover:text-primary-100';
+		}
+		case 'primary-featured': {
+			return 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50';
+		}
+		case 'highlight': {
+			return 'text-highlight-500 hover:text-highlight-300';
+		}
+		case 'highlight-bright': {
+			return 'text-highlight-300 hover:text-highlight-200';
+		}
+		case 'highlight-featured': {
+			return 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200';
+		}
+		case 'accent': {
+			return 'text-accent-500 hover:text-accent-300';
+		}
+		case 'accent-bright': {
+			return 'text-accent-300 hover:text-accent-200';
+		}
+		case 'accent-featured': {
+			return 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200';
+		}
+		default: {
+			linkColor satisfies never;
+			return;
+		}
+	}
+};
+---
+
+<a
+	href={href}
+	class:list={['cursor-pointer transition-colors ease-linear', getColorScheme(), className]}
+	{...props}><Fragment set:html={children?.trim()} /></a
+>

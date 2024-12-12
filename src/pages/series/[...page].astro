@@ -1,0 +1,33 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getSeriesCollection } from '@/lib/collections/series/data';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import SeriesIndex from '@/pages-layouts/series-index.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { series } = await getSeriesCollection();
+
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const metadataItems = R.pipe(
+		series,
+		R.filter(getFilterEntryQualityFunction(2)),
+		R.sort((a, b) =>
+			a.data.seriesItems && b.data.seriesItems
+				? b.data.seriesItems.length - a.data.seriesItems.length
+				: 0
+		),
+		getContentMetadata
+	);
+
+	return paginate(metadataItems, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<SeriesIndex {...Astro.props} />

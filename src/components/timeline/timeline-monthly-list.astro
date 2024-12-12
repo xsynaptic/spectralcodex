@@ -1,0 +1,28 @@
+---
+import type { TimelineMonthlyData } from '@/lib/timeline/timeline-types';
+
+import Link from '@/components/parts/link.astro';
+import TimelineList from '@/components/timeline/timeline-list.astro';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	timelineMonthlyData: TimelineMonthlyData[];
+}
+
+const { timelineMonthlyData } = Astro.props;
+---
+
+<ul class="mb-medium">
+	{
+		timelineMonthlyData.map(({ id, title, timelineItems }) => (
+			<li class="mb-1">
+				<h2 class="mb-1 border-b border-primary-200 pb-1 text-sm font-semibold uppercase">
+					<Link href={getSiteUrl('timeline', id)} linkColor="primary">
+						{title}
+					</Link>
+				</h2>
+				<TimelineList timelineItems={timelineItems} />
+			</li>
+		))
+	}
+</ul>

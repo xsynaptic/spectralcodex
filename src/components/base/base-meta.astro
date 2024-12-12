@@ -1,0 +1,127 @@
+---
+import { getImage } from 'astro:assets';
+import { SEO } from 'astro-seo';
+
+import type { MetaProps } from '@/types/components';
+import type { SEOProps } from 'astro-seo';
+
+import {
+	IMAGE_FORMAT_QUALITY,
+	OPEN_GRAPH_IMAGE_DENSITY,
+	OPEN_GRAPH_IMAGE_HEIGHT,
+	OPEN_GRAPH_IMAGE_WIDTH,
+	OPEN_GRAPH_TWITTER_USERNAME,
+} from '@/constants';
+import { getImageById } from '@/lib/collections/images/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+import { getSeoDescription, getSeoImageFallback } from '@/lib/utils/seo';
+import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+interface Props {
+	meta?: MetaProps | undefined;
+}
+
+const { meta } = Astro.props;
+
+const t = getTranslations();
+
+const {
+	title: contentTitle,
+	description: descriptionRaw,
+	ogType,
+	image,
+	imageId,
+	imageAlt,
+	article,
+	prefetchUrls,
+} = meta ?? {
+	title: undefined,
+	description: undefined,
+	ogType: undefined,
+	image: undefined,
+	imageId: undefined,
+	imageAlt: undefined,
+	article: undefined,
+	prefetchUrls: undefined,
+};
+
+const siteTitle = t('site.title');
+const siteDescription = t('site.description');
+
+const description = getSeoDescription(descriptionRaw) ?? siteDescription;
+
+const imageLocalUrl = image?.url ? new URL(image.url, Astro.site).href : undefined;
+
+const imageObject = imageId ? await getImageById(imageId) : undefined;
+
+const imageDynamic =
+	!imageLocalUrl && imageObject
+		? await getImage({
+				src: imageObject.data.src,
+				height: 1800,
+				width: 1200,
+				...IMAGE_FORMAT_QUALITY,
+			})
+		: undefined;
+
+const openGraphImage = {
+	url: imageLocalUrl ?? imageDynamic?.src ?? getSeoImageFallback(),
+	...(imageDynamic
+		? {
+				height: imageDynamic.options.height ?? 1200,
+				width: imageDynamic.options.width ?? 1800,
+				type: `image/${String(imageDynamic.options.format === 'jpg' ? 'jpeg' : imageDynamic.options.format)}`,
+			}
+		: {
+				height: OPEN_GRAPH_IMAGE_HEIGHT * OPEN_GRAPH_IMAGE_DENSITY,
+				width: OPEN_GRAPH_IMAGE_WIDTH * OPEN_GRAPH_IMAGE_DENSITY,
+				type: 'image/jpeg', // Needs to be changed if we no longer use JPG format for OG images
+			}),
+	alt: sanitizeAltAttribute(image?.alt ?? imageAlt ?? description ?? contentTitle ?? siteTitle),
+} satisfies NonNullable<SEOProps['openGraph']>['image'];
+---
+
+<SEO
+	title={contentTitle ?? siteTitle}
+	titleTemplate={!!contentTitle && contentTitle !== siteTitle ? `%s - ${siteTitle}` : '%s'}
+	titleDefault={siteTitle}
+	description={description}
+	openGraph={{
+		basic: {
+			title: contentTitle ? `${String(contentTitle)} - ${siteTitle}` : siteTitle,
+			type: ogType ?? 'website',
+			image: openGraphImage.url,
+		},
+		optional: {
+			description,
+		},
+		image: openGraphImage,
+		...(ogType === 'article' && article !== undefined ? { article } : {}),
+	}}
+	twitter={{
+		card: imageDynamic ? 'summary_large_image' : 'summary',
+		site: OPEN_GRAPH_TWITTER_USERNAME,
+		title: contentTitle ?? siteTitle,
+		description,
+		...(openGraphImage.url
+			? {
+					image: openGraphImage.url,
+					imageAlt: openGraphImage.alt,
+				}
+			: {}),
+	}}
+	extend={{
+		...(prefetchUrls && prefetchUrls.length > 0
+			? { link: prefetchUrls.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl })) }
+			: {}),
+		meta: [{ name: 'generator', content: Astro.generator }],
+	}}
+/>
+<link
+	rel="alternate"
+	type="application/rss+xml"
+	title={siteTitle}
+	href={`${getSiteUrl()}rss.xml`}
+/>
+<link rel="sitemap" href={`${getSiteUrl()}sitemap-index.xml`} />

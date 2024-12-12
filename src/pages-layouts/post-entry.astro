@@ -1,0 +1,107 @@
+---
+import { render } from 'astro:content';
+
+import type { MapComponentData } from '@/lib/map/map-types';
+import type { CollectionEntry } from 'astro:content';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentCollectionLink from '@/components/content/content-collection-link.astro';
+import ContentDate from '@/components/content/content-date.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentProse from '@/components/content/content-prose.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import ContentSectionBacklinks from '@/components/content/content-section-backlinks.astro';
+import ContentSectionLinks from '@/components/content/content-section-links.astro';
+import ContentSectionRegions from '@/components/content/content-section-regions.astro';
+import ContentSectionSeries from '@/components/content/content-section-series.astro';
+import ContentSectionThemes from '@/components/content/content-section-themes.astro';
+import ImageHero from '@/components/image/image-hero.astro';
+import DividedItem from '@/components/parts/divided-item.astro';
+import MapComponent from '@/components/parts/map-component.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSeoArticleProps, getSeoImageProps } from '@/lib/utils/seo';
+
+interface Props {
+	entry: CollectionEntry<'posts'>;
+	mapData: MapComponentData;
+}
+
+const {
+	entry,
+	mapData: { hasGeodata, ...mapComponentProps },
+} = Astro.props;
+
+const {
+	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
+} = entry;
+
+const { Content } = await render(entry);
+
+const regionIds = entry.data.regions?.map(({ id }) => id);
+const themeIds = entry.data.themes?.map(({ id }) => id);
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title: titleAlt ? `${title} (${titleAlt})` : title,
+		description: description ?? entry.body ?? undefined,
+		image: getSeoImageProps({
+			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-post' }),
+			alt: title,
+		}),
+		...getSeoArticleProps({ dateCreated, dateUpdated }),
+		prefetchUrls: mapComponentProps.prefetchUrls,
+	}}
+	hasHeroImage={!!imageHero}
+	hasReadingBar={true}
+>
+	<article>
+		{
+			imageHero ? (
+				<ImageHero imageId={imageHero.id} alt={title} class="sm:mb-small">
+					<ContentHeader showFeatured={true}>
+						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-subtitle">
+							<DividedItem dividerColor="hero">
+								<ContentCollectionLink collection="posts" showFeatured={true} />
+							</DividedItem>
+							<DividedItem dividerColor="hero">
+								<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+							</DividedItem>
+						</Fragment>
+					</ContentHeader>
+				</ImageHero>
+			) : (
+				<ContentHeader>
+					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-subtitle">
+						<DividedItem>
+							<ContentCollectionLink collection="posts" />
+						</DividedItem>
+						<DividedItem>
+							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+						</DividedItem>
+					</Fragment>
+				</ContentHeader>
+			)
+		}
+		<ContentProse class="pb-small" data-reading-frame><Content /></ContentProse>
+		<ContentSectionLinks entry={entry} />
+		<ContentSectionThemes themeIds={themeIds} />
+		<ContentSectionRegions regionIds={regionIds} />
+		<ContentSectionBacklinks entry={entry} />
+		<ContentSectionSeries entry={entry} />
+		{
+			hasGeodata ? (
+				<ContentSection fillViewport={true}>
+					<Fragment slot="section-title">{t('content.section.map')}</Fragment>
+					<MapComponent {...mapComponentProps} />
+				</ContentSection>
+			) : undefined
+		}
+	</article>
+</BaseSite>

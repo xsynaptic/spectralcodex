@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import ContentSection from '@/components/content/content-section.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import ListColumn from '@/components/parts/list-column.astro';
+import ListColumnItem from '@/components/parts/list-column-item.astro';
+import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getContentUrl } from '@/lib/utils/routing';
+
+interface Props {
+	entry: CollectionEntry<'locations'>;
+}
+
+const { entry } = Astro.props;
+
+const { locationsMap } = await getLocationsCollection();
+
+const t = getTranslations();
+---
+
+{
+	entry.data.nearby && entry.data.nearby.length > 0 ? (
+		<ContentSection>
+			<Fragment slot="section-title">{t('content.section.locationsNearby')}</Fragment>
+			<ListColumn class="font-serif text-xs sm:text-sm">
+				{entry.data.nearby.map(({ locationId, distanceDisplay }) => {
+					const location = locationsMap.get(locationId);
+
+					return location ? (
+						<ListColumnItem>
+							<Link href={getContentUrl('locations', location.id)}>{location.data.title}</Link>
+							{location.data.titleAlt ? (
+								<span>
+									<FormatCjk>({location.data.titleAlt})</FormatCjk>
+								</span>
+							) : undefined}
+							{distanceDisplay ? (
+								<span class="break-keep text-primary-500">
+									{distanceDisplay}&nbsp;{t('locations.unit.km')}
+								</span>
+							) : undefined}
+							{location.data.status === 'demolished' ? (
+								<span class="select-none text-primary-300">&#x2717;</span>
+							) : undefined}
+							{location.data.entryQuality > 2 ? (
+								<span class="select-none text-primary-300">&#10042;</span>
+							) : undefined}
+						</ListColumnItem>
+					) : undefined;
+				})}
+			</ListColumn>
+		</ContentSection>
+	) : undefined
+}

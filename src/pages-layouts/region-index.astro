@@ -1,0 +1,47 @@
+---
+import type { ContentMetadataItem } from '@/types/metadata';
+import type { Page } from 'astro';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import Pagination from '@/components/parts/pagination.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	page: Page<ContentMetadataItem>;
+}
+
+const { page } = Astro.props;
+
+const t = getTranslations();
+
+const title = t(`collection.regions.labelPlural`);
+const description = t(`collection.regions.description`);
+---
+
+<BaseSite meta={{ title, description }}>
+	<ContentHeader>
+		<Fragment slot="header-title">{title}</Fragment>
+	</ContentHeader>
+	<ContentSection>
+		<Fragment slot="section-description">
+			{page.currentPage === 1 ? <FormatMarkdown>{description}</FormatMarkdown> : undefined}
+		</Fragment>
+		{
+			page.data.length > 0 ? (
+				<>
+					<ContentPreviewGrid
+						items={page.data}
+						showLocations={true}
+						showPosts={true}
+						showTitleAlt={true}
+					/>
+					<Pagination class="mt-small md:mt-medium" page={page} />
+				</>
+			) : undefined
+		}
+	</ContentSection>
+</BaseSite>

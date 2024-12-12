@@ -1,0 +1,21 @@
+---
+interface Props {
+	class?: string | undefined;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={[className, 'sm:relative sm:bg-primary-300']}>
+	<div
+		class:list={[
+			'pointer-events-none left-0 right-0 top-0 z-20 block h-0 w-full select-none text-transparent sm:absolute sm:h-[15vh] sm:bg-featured-a md:h-[20vh] lg:h-[25vh]',
+		]}
+	>
+	</div><slot /><div
+		class:list={[
+			'pointer-events-none bottom-0 left-0 right-0 z-20 block h-0 w-full select-none sm:absolute sm:min-h-[20vh] sm:bg-featured-b md:h-[25vh] lg:h-[30vh]',
+		]}
+	>
+	</div>
+</div>

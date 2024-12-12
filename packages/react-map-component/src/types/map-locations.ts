@@ -1,0 +1,113 @@
+export const LocationCategoryEnum = {
+	/** Civic */
+	Civic: 'civic',
+	Cemetery: 'cemetery',
+	Government: 'government',
+	Health: 'health',
+	Library: 'library',
+	Museum: 'museum',
+	Park: 'park',
+	Police: 'police',
+	Prison: 'prison',
+	PublicArt: 'public-art',
+	School: 'school',
+	Viewpoint: 'viewpoint',
+	Water: 'water', // Should relate to water supply technology
+	/** Commercial */
+	Attraction: 'attraction',
+	Commercial: 'commercial',
+	Hotel: 'hotel',
+	Market: 'market',
+	NightMarket: 'night-market',
+	Shophouse: 'shophouse',
+	Theater: 'theater',
+	ThemePark: 'theme-park',
+	/** Food and drink  */
+	Cafe: 'cafe',
+	Restaurant: 'restaurant',
+	/** Historic */
+	Historic: 'historic',
+	Memorial: 'memorial',
+	Monument: 'monument',
+	Site: 'site',
+	Statue: 'statue',
+	Tomb: 'tomb',
+	/** Industrial */
+	Industrial: 'industrial',
+	Factory: 'factory',
+	Forestry: 'forestry',
+	Granary: 'granary',
+	Kiln: 'kiln',
+	Mining: 'mining',
+	Power: 'power',
+	Salt: 'salt',
+	Tobacco: 'tobacco',
+	Warehouse: 'warehouse',
+	/** Infrastructure */
+	Infrastructure: 'infrastructure',
+	Dam: 'dam',
+	Lighthouse: 'lighthouse',
+	Reservoir: 'reservoir',
+	/** Military */
+	Military: 'military',
+	Base: 'base',
+	Bunker: 'bunker',
+	Fortification: 'fortification',
+	/** Natural */
+	Natural: 'natural',
+	Beach: 'beach',
+	Cave: 'cave',
+	Forest: 'forest',
+	HotSpring: 'hot-spring',
+	Lake: 'lake',
+	Rock: 'rock',
+	Tree: 'tree',
+	WaterFall: 'waterfall',
+	/** Religious */
+	Religious: 'religious',
+	AncestralHall: 'ancestral-hall',
+	Buddhist: 'buddhist',
+	Christian: 'christian',
+	Indigenous: 'indigenous',
+	Jewish: 'jewish',
+	Muslim: 'muslim',
+	Shinto: 'shinto',
+	Temple: 'temple',
+	/** Transportation */
+	Transportation: 'transportation',
+	Airport: 'airport',
+	Bridge: 'bridge',
+	Railway: 'railway',
+	Road: 'road',
+	Seaport: 'seaport',
+	Tunnel: 'tunnel',
+	/** Various */
+	Building: 'building',
+	Community: 'community',
+	Residence: 'residence',
+	Other: 'other',
+	Unknown: 'unknown',
+} as const satisfies Record<string, string>;
+
+export type LocationCategory = (typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum];
+
+export const LocationStatusEnum = {
+	Operational: 'operational',
+	Public: 'public',
+	Private: 'private',
+	Restored: 'restored',
+	Converted: 'converted',
+	Idle: 'idle',
+	Abandoned: 'abandoned',
+	Remnants: 'remnants',
+	Demolished: 'demolished',
+	Unknown: 'unknown',
+} as const satisfies Record<string, string>;
+
+export type LocationStatus = (typeof LocationStatusEnum)[keyof typeof LocationStatusEnum];
+
+export interface LocationStatusMetadata {
+	title: string;
+	titleAlt: string;
+	description: string;
+}

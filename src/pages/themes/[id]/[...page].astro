@@ -1,0 +1,69 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getThemesCollection } from '@/lib/collections/themes/data';
+import { getPostsByThemeFunction } from '@/lib/collections/themes/utils';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import { getBasePath } from '@/lib/utils/routing';
+import ThemeEntry from '@/pages-layouts/theme-entry.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { locations } = await getLocationsCollection();
+	const { themes } = await getThemesCollection();
+
+	const getPostsByTerm = await getPostsByThemeFunction();
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const results = [];
+
+	for (const entry of themes) {
+		const showChineseInterface = entry.id.startsWith('taiwan');
+
+		// Note: the need to get location data async means we should filter this first!
+		const locationsFiltered = R.pipe(
+			locations,
+			R.filter(({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false)
+		);
+
+		const metadataItems = R.pipe(
+			[
+				...R.pipe(
+					locationsFiltered,
+					R.filter(getFilterEntryQualityFunction(2)), // Quality filter last!
+					getContentMetadata
+				),
+				...R.pipe(entry, getPostsByTerm, getContentMetadata),
+			],
+			R.filter((item) => !!item.imageId),
+			R.sort(sortContentMetadataByDate)
+		);
+
+		const mapData = getMapData({
+			featureCollection: getLocationsFeatureCollection(locationsFiltered),
+			apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+			boundsBufferMax: 400,
+			...(showChineseInterface ? { languages: ['en', 'zh'] } : {}),
+		});
+
+		results.push(
+			...paginate(metadataItems, {
+				params: { id: entry.id },
+				props: { entry, mapData },
+				pageSize: 20,
+			})
+		);
+	}
+	return results;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<ThemeEntry {...Astro.props} />

@@ -1,0 +1,34 @@
+---
+import type { ContentMetadataItem } from '@/types/metadata';
+
+import ContentDescription from '@/components/content/content-description.astro';
+import DateDisplay from '@/components/parts/date-display.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import Link from '@/components/parts/link.astro';
+
+interface Props {
+	timelineItems: ContentMetadataItem[];
+}
+
+const { timelineItems } = Astro.props;
+---
+
+<ul class="mb-small">
+	{
+		timelineItems.map(({ title, url, date, description }) => (
+			<li class="mb-small">
+				<h2 class="font-medium">
+					<Link href={url}>{title}</Link>
+				</h2>
+				<div class="text-xs sm:text-sm">
+					<DateDisplay date={date} />
+				</div>
+				{description ? (
+					<ContentDescription class="mt-2" showCompact={true}>
+						<FormatMarkdown>{description}</FormatMarkdown>
+					</ContentDescription>
+				) : undefined}
+			</li>
+		))
+	}
+</ul>

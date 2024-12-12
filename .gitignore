@@ -1,0 +1,41 @@
+# build output
+dist/
+
+# dependencies
+node_modules/
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# custom logs for this project
+astro-build.log*
+astro-error.log*
+
+# generated types and files
+.astro/
+
+# custom error logs
+temp
+
+# open graph fonts
+public/fonts
+
+# ignore content and media
+content/
+media/
+
+# example content
+example/

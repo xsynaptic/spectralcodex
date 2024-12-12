@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+
+import type { FeaturedItemMetadata } from '@/lib/image/image-featured';
+import type { LocalImageProps } from 'astro:assets';
+
+import ImageHeroCarouselCaption from '@/components/image/image-hero-carousel-caption.astro';
+import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { getImageById } from '@/lib/collections/images/utils';
+import { getImageSrcsetWidths } from '@/lib/image/image-layout';
+import {
+	getImagePlaceholderDataUrlHq,
+	getImagePlaceholderProps,
+} from '@/lib/image/image-placeholder';
+import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+interface Props extends FeaturedItemMetadata {
+	loading: 'lazy' | 'eager' | null | undefined;
+}
+
+const {
+	src: { id: imageId },
+	title: alt = '',
+	contentMetadata,
+	loading,
+} = Astro.props;
+
+const image = await getImageById(imageId);
+
+const placeholder = await getImagePlaceholderDataUrlHq(image.data.src.src);
+
+const imageProps = {
+	src: image.data.src,
+	alt: sanitizeAltAttribute(alt),
+	width: image.data.src.width,
+	height: image.data.src.height,
+	widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
+	sizes: '100vw',
+	...IMAGE_FORMAT_QUALITY,
+	...getImagePlaceholderProps({ placeholder }),
+} satisfies LocalImageProps;
+---
+
+<div class="carousel-item relative">
+	<Image
+		class:list={[
+			'bg-fallback',
+			'z-10 max-h-screen min-h-[400px] w-[100vw] object-cover object-center text-sm text-transparent xl:min-h-screen',
+		]}
+		loading={loading}
+		{...loading === 'lazy'
+			? {
+					decoding: 'async',
+					fetchpriority: 'low',
+				}
+			: {}}
+		{...imageProps}
+	/>
+	{contentMetadata ? <ImageHeroCarouselCaption {...contentMetadata} /> : undefined}
+</div>

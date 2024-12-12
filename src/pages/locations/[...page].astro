@@ -1,0 +1,31 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import LocationIndex from '@/pages-layouts/location-index.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { locations } = await getLocationsCollection();
+
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const metadataItems = R.pipe(
+		locations,
+		R.filter(getFilterEntryQualityFunction(2)),
+		R.filter((item) => !!item.data.imageFeatured),
+		getContentMetadata,
+		R.sort(sortContentMetadataByDate)
+	);
+
+	return paginate(metadataItems, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<LocationIndex {...Astro.props} />

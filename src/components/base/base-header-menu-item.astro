@@ -1,0 +1,34 @@
+---
+import type { MenuItem } from '@/lib/menu/menu-types';
+
+import Link from '@/components/parts/link.astro';
+
+interface Props {
+	menuItem: MenuItem;
+}
+
+const { menuItem } = Astro.props;
+
+const { pathname } = Astro.url;
+
+const isActive = menuItem.url === pathname || menuItem.url === pathname.replace(/\/$/, '');
+---
+
+<li>
+	<Link
+		href={menuItem.url}
+		class:list={['text-sm font-medium sm:text-base', isActive ? 'font-semibold' : undefined]}
+		linkColor="accent"
+	>
+		{menuItem.title}
+	</Link>
+	{
+		menuItem.children ? (
+			<ul class="flex flex-wrap gap-x-2">
+				{menuItem.children.map((menuChild) => (
+					<Astro.self menuItem={menuChild} />
+				))}
+			</ul>
+		) : undefined
+	}
+</li>

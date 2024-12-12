@@ -1,0 +1,45 @@
+---
+import BaseHeaderMenuItem from '@/components/base/base-header-menu-item.astro';
+import Container from '@/components/parts/container.astro';
+import Link from '@/components/parts/link.astro';
+import { menuHeaderItems } from '@/lib/menu/menu-header';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	hasHeroImage: boolean;
+}
+
+const { hasHeroImage } = Astro.props;
+
+const siteUrl = getSiteUrl();
+
+const t = getTranslations();
+---
+
+<header
+	class:list={[
+		hasHeroImage
+			? 'z-50 bg-header-fade sm:absolute sm:left-0 sm:right-0 sm:top-0'
+			: 'bg-primary-100',
+	]}
+>
+	<a href="#content" class="sr-only focus:not-sr-only">{t('site.skip.label')}</a>
+	<Container as="div" class="flex flex-wrap pt-2 sm:pb-1"
+		><h2 class="flex flex-grow items-center gap-1">
+			<Link href={siteUrl} class="text-xl font-semibold md:text-2xl lg:text-3xl" linkColor="primary"
+				>{t('site.title')}</Link
+			>
+		</h2></Container
+	>
+	<Container as="nav">
+		<ul
+			class:list={[
+				'flex flex-wrap justify-between gap-x-4 gap-y-2 py-2 md:gap-x-2',
+				hasHeroImage ? undefined : 'border-b border-primary-200',
+			]}
+		>
+			{menuHeaderItems.map((menuItem) => <BaseHeaderMenuItem menuItem={menuItem} />)}
+		</ul>
+	</Container>
+</header>

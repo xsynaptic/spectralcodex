@@ -1,0 +1,53 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getPostsByIdsFunction } from '@/lib/collections/posts/utils';
+import { getPrimaryRegionByLocationFunction } from '@/lib/collections/regions/utils';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getBasePath } from '@/lib/utils/routing';
+import LocationEntry from '@/pages-layouts/location-entry.astro';
+
+export const getStaticPaths = (async () => {
+	const { locations } = await getLocationsCollection();
+
+	const getPrimaryRegionByLocation = await getPrimaryRegionByLocationFunction();
+	const getPostsByIds = await getPostsByIdsFunction();
+	const getContentMetadata = await getContentMetadataFunction();
+
+	return await Promise.all(
+		R.pipe(
+			locations,
+			R.map((entry) => ({
+				params: { location: entry.id },
+				props: {
+					entry,
+					mapData: getMapData({
+						featureCollection: getLocationsFeatureCollection([entry]),
+						apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+						targetId: entry.id, // Center on the main location
+						boundsBuffer: 2,
+						boundsBufferMax: 25,
+					}),
+					metadataItems: R.pipe(
+						entry.data.posts ?? [],
+						getPostsByIds,
+						getContentMetadata,
+						R.sort(sortContentMetadataByDate)
+					),
+					regionPrimary: getPrimaryRegionByLocation(entry),
+				},
+			}))
+		)
+	);
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<LocationEntry {...Astro.props} />

@@ -1,0 +1,25 @@
+---
+import DividedItem from '@/components/parts/divided-item.astro';
+import Link from '@/components/parts/link.astro';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	dateNavAllYears: string[];
+}
+
+const { dateNavAllYears } = Astro.props;
+---
+
+{
+	dateNavAllYears.length > 0 ? (
+		<div class="flex flex-wrap gap-1">
+			{dateNavAllYears.map((year) => (
+				<DividedItem>
+					<Link class="text-sm" href={getSiteUrl('timeline', year)}>
+						{year}
+					</Link>
+				</DividedItem>
+			))}
+		</div>
+	) : undefined
+}

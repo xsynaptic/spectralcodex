@@ -1,0 +1,49 @@
+---
+import { ClientRouter } from 'astro:transitions';
+
+import type { MetaProps } from '@/types/components';
+
+import '@fontsource-variable/commissioner';
+import '@fontsource-variable/geologica';
+import '@fontsource-variable/lora';
+
+import '@fontsource-variable/lora/wght-italic.css';
+import '@/styles/global.css';
+
+import BaseFooter from '@/components/base/base-footer.astro';
+import BaseHeader from '@/components/base/base-header.astro';
+import BaseMeta from '@/components/base/base-meta.astro';
+import LoadingBar from '@/components/parts/progress-bar/progress-bar-loading.astro';
+import ReadingBar from '@/components/parts/progress-bar/progress-bar-reading.astro';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	meta?: MetaProps | undefined;
+	hasHeroImage?: boolean;
+	hasReadingBar?: boolean;
+}
+
+const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
+---
+
+<!doctype html>
+<html lang={Astro.currentLocale}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href={`${getSiteUrl()}favicon.svg`} />
+		<BaseMeta meta={meta} />
+		<ClientRouter />
+	</head>
+	<body
+		class="flex min-h-screen min-w-[350px] flex-col overscroll-contain bg-primary-100 text-primary-700"
+	>
+		<BaseHeader hasHeroImage={hasHeroImage} />
+		<main id="content" class="flex-1">
+			<slot />
+		</main>
+		<BaseFooter />
+		<LoadingBar />
+		{hasReadingBar ? <ReadingBar /> : undefined}
+	</body>
+</html>

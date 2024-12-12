@@ -1,0 +1,83 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getLocationsByIdsFunction } from '@/lib/collections/locations/utils';
+import { getPostsByIdsFunction } from '@/lib/collections/posts/utils';
+import { getRegionsCollection } from '@/lib/collections/regions/data';
+import { getRegionsOptions } from '@/lib/collections/regions/options';
+import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import { getBasePath } from '@/lib/utils/routing';
+import RegionEntry from '@/pages-layouts/region-entry.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { regions } = await getRegionsCollection();
+
+	const getRegionAncestors = await getRegionAncestorsFunction();
+	const getPostsByIds = await getPostsByIdsFunction();
+	const getLocationsByIds = await getLocationsByIdsFunction();
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const results = [];
+
+	for (const entry of regions) {
+		// Note: this is temporary code to limit map display to Taiwan and subregions
+		// TODO: whitelist additional regions as content is populated
+		const ancestors = getRegionAncestors(entry);
+		const showRegionMap =
+			['taiwan'].includes(entry.id) ||
+			ancestors.some((ancestor) => ['taiwan'].includes(ancestor.id));
+		const showChineseInterface =
+			['taiwan', 'china', 'hong-kong'].includes(entry.id) ||
+			ancestors.some((ancestor) => ['taiwan', 'china', 'hong-kong'].includes(ancestor.id));
+
+		const entryLocations = entry.data.locations ? getLocationsByIds(entry.data.locations) : [];
+
+		const metadataItems = R.pipe(
+			[
+				...R.pipe(entryLocations, R.filter(getFilterEntryQualityFunction(2)), getContentMetadata),
+				...R.pipe(entry.data.posts ?? [], getPostsByIds, getContentMetadata),
+			],
+			R.filter((item) => !!item.imageId),
+			R.sort(sortContentMetadataByDate)
+		);
+
+		const regionsOption = R.pipe(
+			entry,
+			(entry) => getRegionAncestors(entry).length, // Depth
+			getRegionsOptions
+		);
+
+		const mapData = getMapData({
+			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
+			apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+			boundsBuffer: regionsOption.mapBoundsBuffer,
+			boundsBufferMax: regionsOption.mapBoundsBufferMax,
+			...(showChineseInterface ? { languages: ['en', 'zh'] } : {}),
+		});
+
+		results.push(
+			...paginate(metadataItems, {
+				params: { id: entry.id },
+				props: {
+					entry,
+					mapData,
+					regionsOption,
+				},
+				pageSize: 20,
+			})
+		);
+	}
+	return results;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<RegionEntry {...Astro.props} />

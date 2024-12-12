@@ -1,0 +1,29 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getThemesCollection } from '@/lib/collections/themes/data';
+import { filterThemesContent, sortThemesByContentCount } from '@/lib/collections/themes/utils';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import ThemeIndex from '@/pages-layouts/theme-index.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { themes } = await getThemesCollection();
+
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const metadataItems = R.pipe(
+		themes,
+		R.filter(filterThemesContent),
+		R.sort(sortThemesByContentCount),
+		getContentMetadata
+	);
+
+	return paginate(metadataItems, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<ThemeIndex {...Astro.props} />

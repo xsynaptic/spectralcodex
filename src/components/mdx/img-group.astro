@@ -1,0 +1,53 @@
+---
+interface Props {
+	layout?: 'medium' | 'wide';
+	columns?: number | string;
+}
+
+const { layout, columns: columnsProp } = Astro.props;
+
+// This conditional controls whether slot contents are just passed through
+const { isRss } = Astro.locals;
+
+// This outputs MDX components already transformed into HTML
+const slotContents = (await Astro.slots.render('default')) as string | undefined;
+
+// TODO: should we also reject text nodes and other such things?
+const imageCount = slotContents?.match(new RegExp('<img', 'g'))?.length ?? 0;
+
+if (imageCount === 0) {
+	throw new Error('ImgGroup components require at least one image!');
+}
+
+const getGridColumnCount = (itemCount: number): number => {
+	if (itemCount % 5 === 0) return 5;
+	if (itemCount % 4 === 0) return 4;
+	if (itemCount % 3 === 0) return 3;
+	if (itemCount % 2 === 0) return 2;
+	return 1;
+};
+
+const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCount);
+---
+
+{
+	isRss ? (
+		<Fragment set:html={slotContents} />
+	) : (
+		<div
+			class:list={[
+				'figure-group',
+				'not-prose',
+				'mb-2 sm:px-small md:mb-4 md:px-medium',
+				layout === 'wide' ? 'w-full' : 'mx-auto max-w-content',
+				columns > 1 ? 'grid grid-cols-1 gap-2 md:gap-4' : undefined,
+				columns === 2 ? 'sm:grid-cols-2' : undefined,
+				columns === 3 ? 'md:grid-cols-3' : undefined,
+				columns === 4 ? 'md:grid-cols-4' : undefined,
+				columns === 5 ? 'md:grid-cols-5' : undefined,
+			]}
+		>
+			<Fragment set:html={slotContents} />
+		</div>
+	)
+}

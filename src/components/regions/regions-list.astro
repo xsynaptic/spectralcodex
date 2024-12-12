@@ -1,0 +1,63 @@
+---
+import type { DividerContent } from '@/types/components';
+import type { CollectionEntry } from 'astro:content';
+
+import DividedItem from '@/components/parts/divided-item.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import ListRow from '@/components/parts/list-row.astro';
+import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
+import { getContentUrl } from '@/lib/utils/routing';
+
+interface Props {
+	terms: CollectionEntry<'regions'>[] | undefined;
+	dividerContent?: DividerContent | undefined;
+	showSingleRegionAncestors?: boolean;
+	showTitleAlt?: boolean;
+}
+
+const {
+	terms,
+	dividerContent = 'dot',
+	showSingleRegionAncestors,
+	showTitleAlt = true,
+} = Astro.props;
+
+// Optionally expand the list of regions to include ancestors
+const getRegions = async () => {
+	const getRegionAncestors = await getRegionAncestorsFunction();
+
+	const ancestors =
+		terms && terms.length === 1 && terms[0] ? getRegionAncestors(terms[0]) : undefined;
+
+	return ancestors ?? terms;
+};
+
+const regions = showSingleRegionAncestors ? await getRegions() : terms;
+---
+
+{
+	regions && regions.length > 0 ? (
+		<ListRow class="font-serif text-sm">
+			{regions.map((entry) => (
+				<DividedItem dividerContent={dividerContent}>
+					<span>
+						{entry.data.title ? (
+							<Link href={getContentUrl(entry.collection, entry.id)}>
+								<Fragment set:html={entry.data.title.trim()} />
+							</Link>
+						) : undefined}
+						{showTitleAlt && entry.data.titleAlt ? (
+							<>
+								{' '}
+								<span>
+									<FormatCjk>({entry.data.titleAlt})</FormatCjk>
+								</span>
+							</>
+						) : undefined}
+					</span>
+				</DividedItem>
+			))}
+		</ListRow>
+	) : undefined
+}

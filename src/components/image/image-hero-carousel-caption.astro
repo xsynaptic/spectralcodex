@@ -1,0 +1,49 @@
+---
+import type { ContentMetadataItem } from '@/types/metadata';
+
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+
+type Props = ContentMetadataItem;
+
+const { title, titleAlt, url } = Astro.props;
+
+const t = getTranslations();
+
+// Note: captions are relative to the full-width image, not including a scrollbar
+---
+
+{
+	title ? (
+		<div
+			class:list={[
+				'sm:min-h-none pointer-events-none absolute bottom-0 left-0 right-0 z-40 mx-auto flex min-h-[80px] max-w-content flex-col justify-end bg-featured-b sm:bg-none',
+			]}
+		>
+			<div
+				class:list={[
+					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 pr-small text-sm text-primary-300 sm:max-w-[70%] md:pr-medium',
+				]}
+			>
+				<span>{t('content.meta.imageFeatured.label')}</span>
+				{url ? (
+					<Link
+						href={url}
+						linkColor="primary-bright"
+						class="max-w-[75vw] truncate font-medium sm:max-w-[60vw] sm:font-semibold"
+					>
+						{title}
+					</Link>
+				) : (
+					<span>{title}</span>
+				)}
+				{titleAlt ? (
+					<span class="hidden sm:block">
+						<FormatCjk>{`(${titleAlt})`}</FormatCjk>
+					</span>
+				) : undefined}
+			</div>
+		</div>
+	) : undefined
+}

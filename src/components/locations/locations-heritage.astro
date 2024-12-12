@@ -1,0 +1,30 @@
+---
+import type { LocationTwHeritage } from '@/lib/collections/locations/schemas';
+
+import ContentSection from '@/components/content/content-section.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import { LocationTwHeritageRecords } from '@/lib/collections/locations/schemas';
+import { getTranslations } from '@/lib/utils/i18n';
+
+interface Props {
+	heritage: LocationTwHeritage | undefined;
+}
+
+const { heritage } = Astro.props;
+
+const t = getTranslations();
+---
+
+<ContentSection>
+	<Fragment slot="section-title">{t('content.section.heritage')}</Fragment>
+	{
+		heritage ? (
+			<div class="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
+				<span>{LocationTwHeritageRecords[heritage].title}</span>
+				<span>
+					<FormatCjk>({LocationTwHeritageRecords[heritage].titleAlt})</FormatCjk>
+				</span>
+			</div>
+		) : undefined
+	}
+</ContentSection>

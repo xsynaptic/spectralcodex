@@ -1,0 +1,70 @@
+---
+import type { TimelineYearlyData } from '@/lib/timeline/timeline-types';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import Link from '@/components/parts/link.astro';
+import ListColumn from '@/components/parts/list-column.astro';
+import ListColumnItem from '@/components/parts/list-column-item.astro';
+import { getContentStats } from '@/lib/metadata/metadata-stats';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	timelineYearlyData?: TimelineYearlyData[];
+}
+
+const { timelineYearlyData } = Astro.props;
+
+const contentStats = await getContentStats();
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title: t('timeline.title'),
+		description: t('timeline.overview.description'),
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title">{t('timeline.title')}</Fragment>
+	</ContentHeader>
+	<ContentSection>
+		{
+			timelineYearlyData && timelineYearlyData.length > 0 ? (
+				<ListColumn class="text-xs sm:text-sm">
+					{timelineYearlyData.map((item) => (
+						<ListColumnItem>
+							<Link href={getSiteUrl('timeline', item.id)} linkColor="accent">
+								{item.title}
+							</Link>
+						</ListColumnItem>
+					))}
+				</ListColumn>
+			) : undefined
+		}
+	</ContentSection>
+	<ContentSection titleLarge={true}>
+		<Fragment slot="section-title">{t('timeline.stats.title')}</Fragment>
+		<div>
+			{t('collection.locations.labelPlural')}: {contentStats.locations}
+		</div>
+		<div>
+			{t('collection.posts.labelPlural')}: {contentStats.posts.itemCount}
+		</div>
+		<div>
+			{t('collection.regions.labelPlural')}: {contentStats.regions}
+		</div>
+		<div>
+			{t('collection.themes.labelPlural')}: {contentStats.themes}
+		</div>
+		<div>
+			{t('collection.ephemera.labelPlural')}: {contentStats.ephemera}
+		</div>
+		<div>
+			{t('timeline.stats.images.label')}: {contentStats.images.itemCount}
+		</div>
+	</ContentSection>
+</BaseSite>

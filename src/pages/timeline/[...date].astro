@@ -1,0 +1,38 @@
+---
+import { FEATURE_DATE_ARCHIVES } from 'astro:env/server';
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getTimelineItemsMap } from '@/lib/timeline/timeline-items';
+import { getTimelineProps } from '@/lib/timeline/timeline-props';
+import TimelineMonthlyIndex from '@/pages-layouts/timeline-monthly-index.astro';
+
+export const getStaticPaths = (async () => {
+	if (!FEATURE_DATE_ARCHIVES) return [];
+
+	const timelineItemsMap = await getTimelineItemsMap();
+
+	const timelineItems = R.pipe(
+		[...timelineItemsMap.entries()],
+		R.map(([timelineSlug, timelineItems]) => ({
+			params: { date: timelineSlug },
+			props: getTimelineProps({
+				timelineItems,
+				timelineSlug,
+				timelineSlugs: [...timelineItemsMap.keys()],
+			}),
+		})),
+		R.sort((a, b) => a.params.date.localeCompare(b.params.date))
+	);
+
+	// TODO: pagination
+	return timelineItems;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+// TODO: date navigation elements
+---
+
+<TimelineMonthlyIndex {...Astro.props} />

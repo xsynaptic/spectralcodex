@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+}
+
+const { class: className, ...props } = Astro.props;
+
+const children = (await Astro.slots.render('default')) as string | undefined;
+---
+
+{
+	children?.trim() ? (
+		<div
+			class:list={[
+				'grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-2 lg:grid-cols-2 lg:gap-5',
+				className,
+			]}
+			{...props}
+		>
+			<Fragment set:html={children} />
+		</div>
+	) : undefined
+}

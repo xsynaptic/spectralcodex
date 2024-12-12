@@ -1,0 +1,26 @@
+---
+// Wrap card carousel items in this component to fix widths
+---
+
+<li class="flex flex-shrink-0 snap-start">
+	<slot />
+</li>
+
+<style>
+	li {
+		width: calc(
+			(100% / var(--carousel-items)) -
+				(((var(--carousel-items) - 1) / var(--carousel-items)) * var(--carousel-gap))
+		);
+	}
+	@media screen(sm) {
+		li {
+			--carousel-items: 2;
+		}
+	}
+	@media screen(md) {
+		li {
+			--carousel-items: 3;
+		}
+	}
+</style>

@@ -1,0 +1,38 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getLocationsByPostsFunction } from '@/lib/collections/locations/utils';
+import { getPostsCollection } from '@/lib/collections/posts/data';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getBasePath } from '@/lib/utils/routing';
+import PostEntry from '@/pages-layouts/post-entry.astro';
+
+export const getStaticPaths = (async () => {
+	const { posts } = await getPostsCollection();
+
+	const getLocationsByPosts = await getLocationsByPostsFunction();
+
+	return R.pipe(
+		posts,
+		R.map((entry) => ({
+			params: { post: entry.id },
+			props: {
+				entry,
+				mapData: getMapData({
+					featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
+					apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+					// TODO: bounds buffer should probably be proportionate to the number of items
+					boundsBufferMax: 50,
+				}),
+			},
+		}))
+	);
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<PostEntry {...Astro.props} />

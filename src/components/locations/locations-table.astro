@@ -1,0 +1,84 @@
+---
+import * as R from 'remeda';
+
+import type { CollectionEntry } from 'astro:content';
+
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import Link from '@/components/parts/link.astro';
+import { getPrimaryRegionByLocationFunction } from '@/lib/collections/regions/utils';
+import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	locations: CollectionEntry<'locations'>[];
+}
+
+const { locations } = Astro.props;
+
+const getPrimaryRegionByLocation = await getPrimaryRegionByLocationFunction();
+
+const columns = {
+	title: 'Title',
+	region: 'Region',
+	status: 'Status',
+	precision: 'P',
+} as const;
+---
+
+{
+	locations.length > 0 ? (
+		<div class="not-prose">
+			<div class="overflow-hidden rounded-md border border-primary-300">
+				<table class="min-w-full table-auto bg-primary-50">
+					<thead>
+						<tr>
+							{R.entries(columns).map(([id, title], index) => (
+								<th
+									id={`column-${id}`}
+									class:list={[
+										'border-b bg-primary-100 px-2 py-1 text-left align-text-top font-display text-sm font-medium uppercase',
+										index === 0 ? 'rounded-tl-lg' : undefined,
+										index === Object.keys(columns).length - 1 ? 'rounded-tr-lg' : undefined,
+									]}
+									scope="col"
+								>
+									{title}
+								</th>
+							))}
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-primary-200">
+						{locations.map((item) => {
+							const regionPrimary = getPrimaryRegionByLocation(item);
+
+							return (
+								<tr class="font-sans text-sm">
+									<td class="w-full px-2 py-1 align-text-top">
+										<div class="flex flex-wrap items-center gap-1">
+											<Link href={getSiteUrl(item.id)}>{item.data.title}</Link>
+											{item.data.titleAlt ? (
+												<span>
+													<FormatCjk>({item.data.titleAlt})</FormatCjk>
+												</span>
+											) : undefined}
+										</div>
+									</td>
+									<td class="text-nowrap px-2 py-1 align-text-top">
+										{regionPrimary ? (
+											<Link href={getContentUrl('regions', regionPrimary.id)}>
+												{regionPrimary.data.title}
+											</Link>
+										) : (
+											'unknown'
+										)}
+									</td>
+									<td class="px-2 py-1 align-text-top">{item.data.status}</td>
+									<td class="px-2 py-1 text-right align-text-top">{item.data.precision}</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	) : undefined
+}

@@ -1,0 +1,26 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import { sortByDateReverseChronological } from '@/lib/utils/date';
+import EphemeraIndex from '@/pages-layouts/ephemera-index.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { ephemera } = await getEphemeraCollection();
+
+	const entries = R.pipe(
+		ephemera,
+		R.filter(getFilterEntryQualityFunction(2)),
+		R.sort(sortByDateReverseChronological)
+	);
+
+	return paginate(entries, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<EphemeraIndex {...Astro.props} />

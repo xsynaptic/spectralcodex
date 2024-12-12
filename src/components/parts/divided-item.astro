@@ -1,0 +1,76 @@
+---
+import type { DividerColor, DividerContent } from '@/types/components';
+import type { HTMLTag, Polymorphic } from 'astro/types';
+
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
+	as: Tag;
+	class?: string | undefined;
+	dividerColor?: DividerColor | undefined;
+	dividerContent?: DividerContent | undefined;
+}>;
+
+const {
+	as: Tag = 'div',
+	class: className,
+	dividerColor = 'default',
+	dividerContent = 'slash',
+	...props
+} = Astro.props;
+
+const getColorScheme = () => {
+	switch (dividerColor) {
+		case 'default': {
+			return 'after:text-primary-400';
+		}
+		case 'darker': {
+			return 'after:text-primary-500';
+		}
+		case 'lighter': {
+			return 'after:text-primary-300';
+		}
+		case 'hero': {
+			return 'after:text-primary-500 sm:after:text-primary-300 sm:after:opacity-80';
+		}
+		default: {
+			dividerColor satisfies never;
+			return;
+		}
+	}
+};
+
+const getDividerContent = () => {
+	switch (dividerContent) {
+		case 'bar': {
+			return 'after:content-bar';
+		}
+		case 'bullet': {
+			return 'after:content-bullet';
+		}
+		case 'chevron': {
+			return 'after:content-chevron';
+		}
+		case 'dot': {
+			return 'after:content-dot';
+		}
+		case 'slash': {
+			return 'after:content-slash';
+		}
+		default: {
+			dividerContent satisfies never;
+			return;
+		}
+	}
+};
+---
+
+<Tag
+	class:list={[
+		'divider-after inline-flex gap-1 last:after:content-none',
+		getColorScheme(),
+		getDividerContent(),
+		className,
+	]}
+	{...props}
+>
+	<slot />
+</Tag>

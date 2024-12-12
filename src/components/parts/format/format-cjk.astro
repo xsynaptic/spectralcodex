@@ -1,0 +1,8 @@
+---
+import { wrapCjk } from '@spectralcodex/unified';
+
+const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const output = wrapCjk(slotContents ?? '');
+---
+
+{output ? <Fragment set:html={output} /> : undefined}

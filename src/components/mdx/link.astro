@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { getContentMetadataById } from '@/lib/metadata/metadata-utils';
+
+interface Props extends HTMLAttributes<'a'> {
+	id?: string | undefined;
+}
+
+const { id, ...props } = Astro.props;
+
+const content = (await Astro.slots.render('default')) as string | undefined;
+
+const contentMetadata = await getContentMetadataById(id ?? content?.toLowerCase());
+---
+
+{
+	contentMetadata?.url ? (
+		<a href={contentMetadata.url} {...props}>
+			<Fragment set:html={content} />
+		</a>
+	) : (
+		<Fragment set:html={content} />
+	)
+}

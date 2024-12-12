@@ -1,0 +1,94 @@
+---
+import type { ContentMetadataItem } from '@/types/metadata';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import ImageHeroCarousel from '@/components/image/image-hero-carousel.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import Link from '@/components/parts/link.astro';
+import { getFeaturedItemsFromContentMetadata } from '@/lib/image/image-featured';
+import { getContentStats } from '@/lib/metadata/metadata-stats';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	featuredMetadataItems: ContentMetadataItem[];
+	recentMetadataItems: ContentMetadataItem[];
+	themesMetadataItems: ContentMetadataItem[];
+	seriesMetadataItems: ContentMetadataItem[];
+}
+
+const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =
+	Astro.props;
+
+const featuredItems = getFeaturedItemsFromContentMetadata({
+	items: featuredMetadataItems,
+	shuffle: true,
+});
+
+const hasHeroImage = !!featuredItems && featuredItems.length > 0;
+
+const contentStats = await getContentStats();
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		...(hasHeroImage
+			? {
+					imageId: featuredItems.at(0)?.src.id,
+					imageAlt: featuredItems.at(0)?.title,
+				}
+			: {}),
+	}}
+	hasHeroImage={hasHeroImage}
+>
+	{hasHeroImage ? <ImageHeroCarousel images={featuredItems} /> : undefined}
+	<ContentSection class="mt-small">
+		<Fragment slot="section-description"
+			><FormatMarkdown
+				>{
+					`Welcome to the latest incarnation of **Spectral Codex**, a geoexploration resource, travel journal, photography portfolio, and personal blog. This site is completely ad-free, but I welcome your support via [Patreon](https://www.patreon.com/spectralcodex) if you'd like to support my adventures. Read a little more about my background and motivations [here](/about), or start browsing the collection! Currently there are ${String(contentStats.locations)} [locations](/locations), ${String(contentStats.posts.itemCount)} [posts](/posts), ${String(contentStats.regions)} [regions](/regions), ${String(contentStats.themes)} [themes](/themes), and ${String(contentStats.images.itemCount)} images in the database, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the higher ranking and more recent links from around the site to get you started...`
+				}</FormatMarkdown
+			></Fragment
+		>
+	</ContentSection>
+	<ContentSection>
+		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
+		<ContentPreviewGrid
+			items={recentMetadataItems}
+			showDate={true}
+			showRegion={true}
+			showTitleAlt={true}
+		/>
+	</ContentSection>
+	<ContentSection>
+		<Fragment slot="section-title"
+			><Link href={getSiteUrl('themes')} linkColor="primary"
+				>{t('collection.themes.labelPlural')}</Link
+			></Fragment
+		>
+		<Fragment slot="section-description"
+			><FormatMarkdown>{t('index.themes')}</FormatMarkdown></Fragment
+		>
+		<ContentPreviewGrid
+			items={themesMetadataItems}
+			showLocations={true}
+			showPosts={true}
+			showTitleAlt={true}
+		/>
+	</ContentSection>
+	<ContentSection>
+		<Fragment slot="section-title"
+			><Link href={getSiteUrl('series')} linkColor="primary"
+				>{t('collection.series.labelPlural')}</Link
+			></Fragment
+		>
+		<Fragment slot="section-description"
+			><FormatMarkdown>{t('index.series')}</FormatMarkdown></Fragment
+		>
+		<ContentPreviewGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
+	</ContentSection>
+</BaseSite>

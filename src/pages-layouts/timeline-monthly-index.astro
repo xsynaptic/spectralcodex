@@ -1,0 +1,56 @@
+---
+import type { TimelineMonthlyData, TimelineSpan } from '@/lib/timeline/timeline-types';
+import type { ContentMetadataItem } from '@/types/metadata';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import Link from '@/components/parts/link.astro';
+import TimelineList from '@/components/timeline/timeline-list.astro';
+import TimelineMonthlyList from '@/components/timeline/timeline-monthly-list.astro';
+import TimelineNavigation from '@/components/timeline/timeline-navigation.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+interface Props {
+	title: string;
+	dateNavAllYears: string[];
+	timelineSpan: TimelineSpan;
+	timelineItems: ContentMetadataItem[];
+	timelineMonthlyData?: TimelineMonthlyData[] | undefined;
+}
+
+const { title, dateNavAllYears, timelineSpan, timelineItems, timelineMonthlyData } = Astro.props;
+
+const isYearlyData =
+	timelineSpan === 'year' && timelineMonthlyData && timelineMonthlyData.length > 0;
+const isMonthlyData = timelineSpan !== 'year' && timelineItems.length > 0;
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title: t('timeline.title'),
+		description: isYearlyData
+			? t('timeline.yearly.description').replace('%s', title)
+			: t('timeline.monthly.description').replace('%s', title),
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title"
+			><div class="inline-flex font-normal">
+				<Link href={getSiteUrl('timeline')}>{t('timeline.title')}</Link>
+				:&nbsp;
+				<div class="inline font-medium">{title}</div>
+			</div></Fragment
+		>
+		<Fragment slot="header-subtitle"
+			><TimelineNavigation dateNavAllYears={dateNavAllYears} /></Fragment
+		>
+	</ContentHeader>
+	<ContentSection>
+		{isYearlyData ? <TimelineMonthlyList timelineMonthlyData={timelineMonthlyData} /> : undefined}
+		{isMonthlyData ? <TimelineList timelineItems={timelineItems} /> : undefined}
+	</ContentSection>
+</BaseSite>

@@ -1,0 +1,16 @@
+---
+import ProgressBarBase from '@/components/parts/progress-bar/progress-bar-base.astro';
+---
+
+<ProgressBarBase
+	id="reading-bar"
+	class="z-40 bg-accent-400 bg-gradient-to-r from-accent-500 to-accent-300 text-accent-200"
+/>
+
+<script>
+	import { readingBar } from '@/components/parts/progress-bar/progress-bar-reading';
+
+	document.addEventListener('DOMContentLoaded', () => {
+		readingBar('#reading-bar');
+	});
+</script>

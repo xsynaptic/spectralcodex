@@ -1,0 +1,24 @@
+---
+import type { FeaturedItemMetadata } from '@/lib/image/image-featured';
+
+import ImageHeroCarouselItem from '@/components/image/image-hero-carousel-item.astro';
+import ImageHeroFrame from '@/components/image/image-hero-frame.astro';
+
+interface Props {
+	images: FeaturedItemMetadata[];
+	class?: string | undefined;
+}
+
+const { images, class: className } = Astro.props;
+---
+
+<ImageHeroFrame class={className}>
+	<div class="carousel">
+		{
+			images.map((image, index) => (
+				<ImageHeroCarouselItem loading={index === 0 ? 'eager' : 'lazy'} {...image} />
+			))
+		}
+	</div>
+	<slot />
+</ImageHeroFrame>

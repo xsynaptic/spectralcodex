@@ -1,0 +1,60 @@
+---
+import * as R from 'remeda';
+
+import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getPostsCollection } from '@/lib/collections/posts/data';
+import { getSeriesCollection } from '@/lib/collections/series/data';
+import { getThemesCollection } from '@/lib/collections/themes/data';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { filterHasImageId, sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import IndexLayout from '@/pages-layouts/index.astro';
+
+const { locations } = await getLocationsCollection();
+const { posts } = await getPostsCollection();
+const { series } = await getSeriesCollection();
+const { themes } = await getThemesCollection();
+
+const getContentMetadata = await getContentMetadataFunction();
+
+const metadataItems = {
+	featuredMetadataItems: R.pipe(
+		[
+			...R.pipe(locations, R.filter(getFilterEntryQualityFunction(4)), getContentMetadata),
+			...R.pipe(posts, R.filter(getFilterEntryQualityFunction(4)), getContentMetadata),
+		],
+		R.filter(filterHasImageId),
+		R.shuffle(),
+		R.take(5)
+	),
+	recentMetadataItems: R.pipe(
+		[
+			...R.pipe(locations, R.filter(getFilterEntryQualityFunction(3)), getContentMetadata),
+			...R.pipe(posts, R.filter(getFilterEntryQualityFunction(3)), getContentMetadata),
+		],
+		R.filter(filterHasImageId),
+		R.sort(sortContentMetadataByDate),
+		R.take(16)
+	),
+	seriesMetadataItems: R.pipe(
+		series,
+		R.filter(getFilterEntryQualityFunction(3)),
+		R.shuffle(),
+		R.sortBy(({ data }) => data.entryQuality),
+		getContentMetadata,
+		R.filter(filterHasImageId),
+		R.take(4)
+	),
+	themesMetadataItems: R.pipe(
+		themes,
+		R.filter(getFilterEntryQualityFunction(3)),
+		R.shuffle(),
+		R.sortBy(({ data }) => data.entryQuality),
+		getContentMetadata,
+		R.filter(filterHasImageId),
+		R.take(8)
+	),
+};
+---
+
+<IndexLayout {...metadataItems} />

@@ -1,0 +1,17 @@
+---
+interface Props {
+	sprites?: string[];
+}
+
+const { sprites } = Astro.props;
+---
+
+{
+	sprites && sprites.length > 0 ? (
+		<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+			{sprites.map((sprite) => (
+				<Fragment set:html={sprite} />
+			))}
+		</svg>
+	) : undefined
+}

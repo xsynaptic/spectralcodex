@@ -1,0 +1,42 @@
+---
+import { Icon } from 'astro-icon/components';
+---
+
+<card-carousel>
+	<div class="-ml-10 -mr-10 flex items-center lg:-ml-12 lg:-mr-12">
+		<div class:list={['carousel-prev', 'mb-2 w-10 lg:w-12']}>
+			<Icon
+				name="mdi:chevron-left"
+				title="Previous"
+				class="select-none overflow-hidden text-4xl text-accent-400 transition-colors ease-in-out hover:text-accent-200 lg:text-6xl"
+				is:inline
+			/>
+		</div>
+		<ul
+			class:list={[
+				'carousel-container',
+				'flex touch-pan-x snap-x snap-mandatory flex-nowrap overflow-auto scroll-smooth bg-primary-100 pb-2',
+			]}
+		>
+			<slot />
+		</ul>
+		<div class:list={['carousel-next', 'mb-2 w-10 lg:w-12']}>
+			<Icon
+				name="mdi:chevron-right"
+				title="Next"
+				class="select-none overflow-hidden text-4xl text-accent-400 transition-colors ease-in-out hover:text-accent-200 lg:text-6xl"
+				is:inline
+			/>
+		</div>
+	</div>
+</card-carousel>
+
+<style>
+	ul {
+		--carousel-gap: theme(spacing.4);
+		--carousel-items: 1;
+		gap: var(--carousel-gap);
+	}
+</style>
+
+<script src="./card-carousel/card-carousel-element.js"></script>

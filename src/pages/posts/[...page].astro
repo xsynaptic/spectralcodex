@@ -1,0 +1,30 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getPostsCollection } from '@/lib/collections/posts/data';
+import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import PostArchive from '@/pages-layouts/post-index.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { posts } = await getPostsCollection();
+
+	const getContentMetadata = await getContentMetadataFunction();
+
+	const metadataItems = R.pipe(
+		posts,
+		R.filter(getFilterEntryQualityFunction(2)),
+		getContentMetadata,
+		R.sort(sortContentMetadataByDate)
+	);
+
+	return paginate(metadataItems, { pageSize: 20 });
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<PostArchive {...Astro.props} />

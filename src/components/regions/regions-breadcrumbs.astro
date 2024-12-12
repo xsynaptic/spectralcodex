@@ -1,0 +1,52 @@
+---
+import type { DividerColor } from '@/types/components';
+import type { CollectionEntry } from 'astro:content';
+
+import DividedItem from '@/components/parts/divided-item.astro';
+import Link from '@/components/parts/link.astro';
+import ListRow from '@/components/parts/list-row.astro';
+import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getContentUrl } from '@/lib/utils/routing';
+
+interface Props {
+	entry: CollectionEntry<'regions'>;
+	showFeatured?: boolean;
+	dividerColor?: DividerColor;
+}
+
+const { entry, showFeatured = false, dividerColor } = Astro.props;
+
+const getRegionAncestors = await getRegionAncestorsFunction();
+
+const termAncestors = getRegionAncestors(entry).reverse();
+
+const t = getTranslations();
+---
+
+{
+	termAncestors.length > 0 ? (
+		<nav class="flex" aria-label={t('site.breadcrumbs.aria.label')}>
+			<ListRow as="ol" class="text-sm">
+				{termAncestors.map((termAncestor) => (
+					<DividedItem
+						dividerColor={dividerColor}
+						dividerContent="chevron"
+						aria-current={termAncestor.id === entry.id ? 'page' : undefined}
+					>
+						{termAncestor.id === entry.id ? (
+							termAncestor.data.title
+						) : (
+							<Link
+								href={getContentUrl('regions', termAncestor.id)}
+								linkColor={showFeatured ? 'accent-featured' : 'accent'}
+							>
+								{termAncestor.data.title}
+							</Link>
+						)}
+					</DividedItem>
+				))}
+			</ListRow>
+		</nav>
+	) : undefined
+}

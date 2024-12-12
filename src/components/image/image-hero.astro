@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+
+import type { LocalImageProps } from 'astro:assets';
+
+import ImageHeroFrame from '@/components/image/image-hero-frame.astro';
+import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { getImageById } from '@/lib/collections/images/utils';
+import { getImageSrcsetWidths } from '@/lib/image/image-layout';
+import {
+	getImagePlaceholderDataUrlHq,
+	getImagePlaceholderProps,
+} from '@/lib/image/image-placeholder';
+import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+interface Props {
+	imageId: string;
+	alt: string;
+	class?: string | undefined;
+}
+
+const { imageId, alt, class: className } = Astro.props;
+
+const image = await getImageById(imageId);
+
+const placeholder = await getImagePlaceholderDataUrlHq(image.data.src.src);
+
+const imageProps = {
+	src: image.data.src,
+	alt: sanitizeAltAttribute(alt),
+	width: image.data.src.width,
+	height: image.data.src.height,
+	widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
+	sizes: '100vw',
+	...IMAGE_FORMAT_QUALITY,
+	...getImagePlaceholderProps({ placeholder }),
+} satisfies LocalImageProps;
+---
+
+<ImageHeroFrame class:list={[className, 'overflow-hidden']}>
+	<Image
+		class:list={[
+			'bg-fallback',
+			'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+			'aspect-[3/2] sm:aspect-[5/4] md:aspect-[3/2] lg:aspect-[16/9] xl:aspect-auto',
+		]}
+		loading="eager"
+		{...imageProps}
+	/>
+	<slot />
+</ImageHeroFrame>

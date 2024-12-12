@@ -1,0 +1,24 @@
+---
+import * as R from 'remeda';
+
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
+import EphemeraEntry from '@/pages-layouts/ephemera-entry.astro';
+
+export const getStaticPaths = (async () => {
+	const { ephemera } = await getEphemeraCollection();
+
+	return R.pipe(
+		ephemera,
+		R.map((entry) => ({
+			params: { ephemera: entry.id },
+			props: { entry },
+		}))
+	);
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<EphemeraEntry {...Astro.props} />

@@ -1,0 +1,20 @@
+---
+import { formatNumber } from '@/lib/utils/text';
+
+interface Props {
+	locales?: Intl.LocalesArgument | undefined;
+	options?: Intl.NumberFormatOptions | undefined;
+}
+
+const { locales, options } = Astro.props;
+
+const slotContents = (await Astro.slots.render('default')) as string | undefined;
+---
+
+{
+	formatNumber({
+		number: Number(slotContents),
+		locales: locales ?? Astro.currentLocale ?? 'en',
+		options,
+	})
+}

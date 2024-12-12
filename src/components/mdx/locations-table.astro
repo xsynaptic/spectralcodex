@@ -1,0 +1,23 @@
+---
+import * as R from 'remeda';
+
+import LocationsTableComponent from '@/components/locations/locations-table.astro';
+import { getTheaterLocations } from '@/lib/collections/locations/utils';
+
+interface Props {
+	id?: string;
+}
+
+const { id } = Astro.props;
+
+const theaterLocations = await getTheaterLocations();
+
+const isIdValid = (id: unknown): id is keyof typeof theaterLocations =>
+	!!id && typeof id === 'string' && R.isIncludedIn(id, R.keys(theaterLocations));
+
+if (!isIdValid(id)) {
+	throw new Error(`[Locations Table] Invalid location query id: ${String(id)}`);
+}
+---
+
+<LocationsTableComponent locations={theaterLocations[id]} />

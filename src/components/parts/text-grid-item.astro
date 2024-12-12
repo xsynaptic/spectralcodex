@@ -1,0 +1,14 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+}
+
+const { class: className, ...props } = Astro.props;
+---
+
+<div class:list={[className]} {...props}>
+	<h3 class="font-semibold"><slot name="grid-item-title" /></h3>
+	<div class="text-sm"><slot /></div>
+</div>

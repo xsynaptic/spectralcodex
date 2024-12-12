@@ -1,0 +1,20 @@
+{
+	"name": "@spectralcodex/image-loader",
+	"version": "1.0.0",
+	"description": "Image loader for Spectral Codex",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"dependencies": {
+		"fast-glob": "^3.3.2",
+		"micromatch": "^4.0.8"
+	},
+	"devDependencies": {
+		"@types/micromatch": "^4.0.9"
+	},
+	"peerDependencies": {
+		"astro": "^5.0.3",
+		"p-limit": "^6.1.0"
+	}
+}

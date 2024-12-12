@@ -1,0 +1,54 @@
+---
+import type { DatePreset } from '@/types/components';
+import type { HTMLAttributes } from 'astro/types';
+
+import { parseContentDate } from '@/lib/utils/date';
+
+interface Props extends HTMLAttributes<'time'> {
+	date: string | Date;
+	datePreset?: DatePreset;
+	dateOptions?: Intl.DateTimeFormatOptions | undefined;
+}
+
+const datePresets = {
+	short: {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+		hour12: false,
+		timeZone: 'UTC',
+	},
+	medium: {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		hour12: false,
+		timeZone: 'UTC',
+	},
+	long: {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		hour12: false,
+		timeZone: 'UTC',
+		timeZoneName: 'short',
+	},
+} satisfies Record<DatePreset, Intl.DateTimeFormatOptions>;
+
+const { date, datePreset = 'medium', dateOptions, ...props } = Astro.props;
+
+const dateRaw = parseContentDate(date);
+
+if (!dateRaw) throw new Error(`Invalid date: "${JSON.stringify(date)}"`);
+
+const dateTimeAttribute = dateRaw.toISOString();
+
+const dateDisplay = dateRaw.toLocaleDateString('en-US', {
+	...datePresets[datePreset],
+	...dateOptions,
+});
+---
+
+<time datetime={dateTimeAttribute} {...props}>{dateDisplay}</time>

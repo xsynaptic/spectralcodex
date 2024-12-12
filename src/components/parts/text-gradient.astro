@@ -1,0 +1,57 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+
+type GradientColor =
+	| 'primary'
+	| 'primary-bright'
+	| 'primary-featured'
+	| 'highlight'
+	| 'highlight-bright'
+	| 'accent'
+	| 'accent-bright'
+	| 'accent-featured';
+
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
+	as: Tag;
+	gradientColor?: GradientColor;
+}>;
+
+const { as: Tag = 'div', class: className, gradientColor = 'primary' } = Astro.props;
+
+const getColorScheme = () => {
+	switch (gradientColor) {
+		case 'primary': {
+			return 'from-primary-800 to-primary-600 text-primary-300';
+		}
+		case 'primary-bright': {
+			return 'from-primary-50 to-primary-200 text-primary-500';
+		}
+		case 'primary-featured': {
+			return 'from-primary-800 to-primary-600 sm:from-primary-50 sm:to-primary-200 text-primary-300';
+		}
+		case 'highlight': {
+			return 'from-highlight-600 to-highlight-800 text-primary-300';
+		}
+		case 'highlight-bright': {
+			return 'from-highlight-50 to-highlight-200 text-primary-500';
+		}
+		case 'accent': {
+			return 'from-accent-500 to-accent-600 text-primary-300';
+		}
+		case 'accent-bright': {
+			return 'from-accent-100 to-accent-300 text-primary-500';
+		}
+		case 'accent-featured': {
+			return 'from-accent-500 to-accent-600 sm:from-accent-100 sm:to-accent-300 text-primary-300';
+		}
+		default: {
+			gradientColor satisfies never;
+			return;
+		}
+	}
+};
+---
+
+<Tag class:list={['bg-gradient-to-b bg-clip-text text-transparent', getColorScheme(), className]}
+	><slot /></Tag
+>

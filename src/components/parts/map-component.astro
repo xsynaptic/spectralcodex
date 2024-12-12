@@ -1,0 +1,58 @@
+---
+import { ReactMapComponent } from '@spectralcodex/react-map-component';
+import { MapSpritesEnum } from '@spectralcodex/react-map-component';
+
+import type { MapComponentProps } from '@spectralcodex/react-map-component';
+
+import SpriteSheet from '@/components/parts/sprite-sheet.astro';
+import { getSprites } from '@/lib/icons/icons-utils';
+
+type Props = MapComponentProps;
+
+const props = Astro.props;
+
+// TODO: this is really slow
+const mapSprites = await getSprites('map-sprites', MapSpritesEnum);
+---
+
+<SpriteSheet sprites={mapSprites} />
+
+<div
+	class="bg-fallback relative flex h-full max-h-[100vh] min-h-[min(600px,100vh)] overflow-hidden sm:rounded-sm lg:rounded-md"
+>
+	<ReactMapComponent style={{ zIndex: 20 }} {...props} client:visible />
+	<div class="absolute z-10 flex h-full w-full justify-center">
+		<div class="loading w-[20%]"></div>
+	</div>
+</div>
+
+<style is:global>
+	div.maplibregl-popup-content {
+		overflow: auto;
+		padding: 0;
+	}
+	div.maplibregl-popup-content a:focus {
+		outline: none;
+	}
+	button.maplibregl-popup-close-button {
+		border-bottom-left-radius: 3px;
+		color: white;
+		mix-blend-mode: difference;
+		font-size: 16px;
+		width: 20px;
+	}
+	@media (max-width: 639px) {
+		button.maplibregl-popup-close-button {
+			font-size: 18px;
+			height: 25px;
+			width: 25px;
+		}
+	}
+	button.maplibregl-popup-close-button:focus {
+		outline: none;
+	}
+	.maplibregl-ctrl-attrib,
+	.maplibregl-ctrl-scale {
+		user-select: none;
+	}
+</style>

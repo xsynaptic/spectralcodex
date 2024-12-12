@@ -1,0 +1,189 @@
+---
+import { render } from 'astro:content';
+
+import type { MapComponentData } from '@/lib/map/map-types';
+import type { ContentMetadataItem } from '@/types/metadata';
+import type { CollectionEntry } from 'astro:content';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentCollectionLink from '@/components/content/content-collection-link.astro';
+import ContentDate from '@/components/content/content-date.astro';
+import ContentDescription from '@/components/content/content-description.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentImage from '@/components/content/content-image.astro';
+import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
+import ContentProse from '@/components/content/content-prose.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import ContentSectionBacklinks from '@/components/content/content-section-backlinks.astro';
+import ContentSectionLinks from '@/components/content/content-section-links.astro';
+import ContentSectionSeries from '@/components/content/content-section-series.astro';
+import ContentSectionThemes from '@/components/content/content-section-themes.astro';
+import ImageHero from '@/components/image/image-hero.astro';
+import LocationsHeritage from '@/components/locations/locations-heritage.astro';
+import LocationsNearbyList from '@/components/locations/locations-nearby-list.astro';
+import LocationsNotices from '@/components/locations/locations-notices.astro';
+import DividedItem from '@/components/parts/divided-item.astro';
+import FormatCjk from '@/components/parts/format/format-cjk.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import MapComponent from '@/components/parts/map-component.astro';
+import StatusBox from '@/components/parts/status-box.astro';
+import RegionsBreadcrumbs from '@/components/regions/regions-breadcrumbs.astro';
+import { getLocationHasContent } from '@/lib/collections/locations/utils';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSeoImageProps } from '@/lib/utils/seo';
+
+interface Props {
+	entry: CollectionEntry<'locations'>;
+	mapData: MapComponentData;
+	metadataItems: ContentMetadataItem[];
+	regionPrimary: CollectionEntry<'regions'> | undefined;
+}
+
+const {
+	entry,
+	mapData: { hasGeodata, ...mapComponentProps },
+	metadataItems,
+	regionPrimary,
+} = Astro.props;
+
+const {
+	data: {
+		title,
+		titleAlt,
+		description,
+		dateCreated,
+		dateUpdated,
+		imageFeatured,
+		imageHero,
+		heritage,
+		address,
+	},
+} = entry;
+
+const { Content } = await render(entry);
+
+const themeIds = entry.data.themes?.map(({ id }) => id);
+
+const hasContent = getLocationHasContent(entry);
+
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title: titleAlt ? `${title} (${titleAlt})` : title,
+		description,
+		image: getSeoImageProps({
+			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
+			alt: title,
+		}),
+	}}
+	hasHeroImage={!!imageHero}
+	hasReadingBar={true}
+>
+	<article>
+		{
+			imageHero ? (
+				<ImageHero imageId={imageHero.id} alt={title} class="sm:mb-small">
+					<ContentHeader showFeatured={true}>
+						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-subtitle">
+							<DividedItem dividerColor="hero">
+								<ContentCollectionLink collection="locations" showFeatured={true} />
+							</DividedItem>
+							{regionPrimary ? (
+								<DividedItem dividerColor="hero">
+									<RegionsBreadcrumbs
+										entry={regionPrimary}
+										showFeatured={true}
+										dividerColor="hero"
+									/>
+								</DividedItem>
+							) : undefined}
+							<DividedItem dividerColor="hero">
+								<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="medium" />
+							</DividedItem>
+						</Fragment>
+					</ContentHeader>
+				</ImageHero>
+			) : (
+				<ContentHeader>
+					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-subtitle">
+						<DividedItem>
+							<ContentCollectionLink collection="locations" />
+						</DividedItem>
+						{regionPrimary ? (
+							<DividedItem>
+								<RegionsBreadcrumbs entry={regionPrimary} />
+							</DividedItem>
+						) : undefined}
+						<DividedItem>
+							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="medium" />
+						</DividedItem>
+					</Fragment>
+				</ContentHeader>
+			)
+		}
+		{
+			hasContent ? (
+				<ContentProse class="pb-small" data-reading-frame>
+					<Content />
+				</ContentProse>
+			) : (
+				<>
+					{imageFeatured ? (
+						<ContentImage imageId={imageFeatured.id} layout="medium" alt={title} />
+					) : undefined}
+					<ContentSection>
+						<Fragment slot="section-description">
+							<ContentDescription>
+								<FormatMarkdown>{description}</FormatMarkdown>
+							</ContentDescription>
+						</Fragment>
+					</ContentSection>
+				</>
+			)
+		}
+		{
+			entry.data.entryQuality === 1 ? (
+				<ContentSection>
+					<StatusBox status="warning">
+						<FormatMarkdown>{t('notice.quality')}</FormatMarkdown>
+					</StatusBox>
+				</ContentSection>
+			) : undefined
+		}
+		<LocationsHeritage heritage={heritage} />
+		<ContentSectionLinks entry={entry} />
+		<ContentSectionThemes themeIds={themeIds} />
+		<ContentSectionBacklinks entry={entry} />
+		<ContentSectionSeries entry={entry} />
+		<ContentSection>
+			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
+			<ContentPreviewGrid items={metadataItems} showDate={true} showRegion={true} />
+		</ContentSection>
+		<LocationsNotices entry={entry} />
+		{
+			hasGeodata ? (
+				<>
+					<ContentSection fillViewport={true}>
+						<Fragment slot="section-title">{t('content.section.map')}</Fragment>
+						<MapComponent {...mapComponentProps} />
+						{address ? (
+							<address class="mt-1 px-small text-xs not-italic text-primary-400 sm:px-0">
+								{t('locations.address.label')}:{' '}
+								<span>
+									<FormatCjk>{address}</FormatCjk>
+								</span>
+							</address>
+						) : undefined}
+					</ContentSection>
+				</>
+			) : undefined
+		}
+		<LocationsNearbyList entry={entry} />
+	</article>
+</BaseSite>

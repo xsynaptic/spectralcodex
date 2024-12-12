@@ -1,0 +1,23 @@
+{
+	"name": "@spectralcodex/unified",
+	"version": "1.0.0",
+	"description": "Unified ecosystem tools for Spectral Codex",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"dependencies": {
+		"rehype-parse": "^9.0.1",
+		"rehype-stringify": "^10.0.1",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.1",
+		"retext": "^9.0.0",
+		"retext-smartypants": "^6.2.0"
+	},
+	"peerDependencies": {
+		"rehype-sanitize": "^6.0.0",
+		"rehype-wrap-cjk": "^0.1.1",
+		"remark-smartypants": "^3.0.2",
+		"unified": "^11.0.5"
+	}
+}

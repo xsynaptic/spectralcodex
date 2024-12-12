@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components';
+
+import DateDisplay from '@/components/parts/date-display.astro';
+import DividedItem from '@/components/parts/divided-item.astro';
+import Link from '@/components/parts/link.astro';
+import { SITE_YEAR_FOUNDED } from '@/constants';
+import { getTranslations } from '@/lib/utils/i18n';
+import { getSiteUrl } from '@/lib/utils/routing';
+
+const yearCurrent = new Date().getFullYear();
+const siteUrl = getSiteUrl();
+
+const t = getTranslations();
+---
+
+<nav class="flex flex-wrap gap-x-1 gap-y-2 font-sans text-xs text-primary-500">
+	<DividedItem dividerColor="lighter"
+		><span class="text-primary-400">※</span>
+		<span>{t('site.footer.updated.label')} <DateDisplay date={new Date()} /></span></DividedItem
+	>
+	<DividedItem>
+		<span
+			>{t('site.footer.powered.label')}
+			<Link href="https://astro.build" linkColor="accent">Astro</Link></span
+		>
+	</DividedItem>
+	<DividedItem dividerColor="lighter"
+		><span>
+			&copy;{SITE_YEAR_FOUNDED}&ndash;{yearCurrent}
+			<Link href={siteUrl} class="font-semibold">{t('site.title')}</Link></span
+		>
+	</DividedItem>
+	<DividedItem dividerColor="lighter">
+		<Link
+			href={`${getSiteUrl()}rss.xml`}
+			linkColor="accent"
+			class="group flex flex-nowrap items-center gap-1"
+			><span>{t('menu.feed.label')}</span>
+			<Icon
+				name="mdi:rss-box"
+				class="text-sm text-orange-400 transition-colors duration-300 hover:text-orange-300 group-hover:text-orange-300"
+			/>
+		</Link>
+	</DividedItem>
+</nav>

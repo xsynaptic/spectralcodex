@@ -1,0 +1,161 @@
+---
+import { Image } from 'astro:assets';
+
+import type { LocalImageProps } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentDate from '@/components/content/content-date.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import Container from '@/components/parts/container.astro';
+import DateDisplay from '@/components/parts/date-display.astro';
+import DividedItem from '@/components/parts/divided-item.astro';
+import TextGridItem from '@/components/parts/text-grid-item.astro';
+import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { getImageLayoutProps } from '@/lib/image/image-layout';
+import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
+import { getTranslations } from '@/lib/utils/i18n';
+import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+interface Props {
+	image: CollectionEntry<'images'>;
+}
+
+const { image } = Astro.props;
+
+const { src: imageMetadata, title, titleAlt, dateCaptured, placeholder } = image.data;
+
+const alt = sanitizeAltAttribute(title ?? '');
+
+const imageProps = {
+	src: imageMetadata,
+	alt,
+	...getImageLayoutProps({ imageMetadata, layout: 'medium' }),
+	...IMAGE_FORMAT_QUALITY,
+	...getImagePlaceholderProps({ placeholder }),
+} satisfies LocalImageProps;
+
+// TODO: offer direct image downloads at various sizes
+// TODO: image licensing statement
+// TODO: image backlinks
+const t = getTranslations();
+---
+
+<BaseSite
+	meta={{
+		title,
+		description: `Image page for "${image.id}".`,
+		imageId: image.id,
+		imageAlt: alt,
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title">{title}</Fragment>
+		<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+		<Fragment slot="header-subtitle">
+			<DividedItem>
+				<ContentDate date={dateCaptured} datePreset="long" />
+			</DividedItem>
+		</Fragment>
+	</ContentHeader>
+	<Container as="div">
+		<Image
+			class:list={['bg-fallback', 'rounded-sm object-cover object-center text-sm text-transparent']}
+			loading="lazy"
+			{...imageProps}
+		/>
+	</Container>
+	<ContentSection class="mt-small">
+		<Fragment slot="section-title">{t('collection.images.metadata.title')}</Fragment>
+		<div class="grid grid-cols-1 gap-2 md:grid-cols-3 md:gap-4">
+			{
+				image.data.dateCaptured ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.dateCaptured.label')}
+						</Fragment>
+						<DateDisplay date={image.data.dateCaptured} datePreset="long" />
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.camera ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.cameraModel.label')}
+						</Fragment>
+						{image.data.camera}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.lens ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.lensModel.label')}
+						</Fragment>
+						{image.data.lens}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.aperture ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.aperture.label')}
+						</Fragment>
+						<em>&#402;</em>&#8202;/&#8202;{image.data.aperture}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.shutterSpeed ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.shutterSpeed.label')}
+						</Fragment>
+						{`${image.data.shutterSpeed} sec`}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.focalLength ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.focalLength.label')}
+						</Fragment>
+						{image.data.focalLength}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.iso ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">{t('collection.images.metadata.iso.label')}</Fragment>
+						{image.data.iso}
+					</TextGridItem>
+				) : undefined
+			}
+			{
+				image.data.exposureValue ? (
+					<TextGridItem>
+						<Fragment slot="grid-item-title">
+							{t('collection.images.metadata.exposureValue.label')}
+						</Fragment>
+						{Number(image.data.exposureValue).toFixed(1)}&nbsp;
+						{t('collection.images.metadata.ev.label')}
+					</TextGridItem>
+				) : undefined
+			}
+			<TextGridItem>
+				<Fragment slot="grid-item-title"
+					>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
+				>
+				<Fragment
+					set:html={`${String(imageMetadata.width)}&#8202;&#215;&#8202;${String(imageMetadata.height)}`}
+				/>
+			</TextGridItem>
+		</div>
+	</ContentSection>
+</BaseSite>

@@ -1,0 +1,21 @@
+---
+import type { ImageLayoutOption } from '@/lib/image/image-layout';
+
+import ContentImage from '@/components/content/content-image.astro';
+
+interface Props {
+	src: string;
+	alt?: string;
+	layout?: ImageLayoutOption;
+}
+
+const { src: imageId, ...props } = Astro.props;
+---
+
+{
+	imageId ? (
+		<ContentImage imageId={imageId} {...props}>
+			<slot />
+		</ContentImage>
+	) : undefined
+}

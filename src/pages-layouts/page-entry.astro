@@ -1,0 +1,59 @@
+---
+import { render } from 'astro:content';
+
+import type { CollectionEntry } from 'astro:content';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentDate from '@/components/content/content-date.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentProse from '@/components/content/content-prose.astro';
+import ImageHero from '@/components/image/image-hero.astro';
+import { getSeoImageProps } from '@/lib/utils/seo';
+
+interface Props {
+	entry: CollectionEntry<'pages'>;
+}
+
+const { entry } = Astro.props;
+
+const {
+	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
+} = entry;
+
+const { Content } = await render(entry);
+---
+
+<BaseSite
+	meta={{
+		title,
+		description,
+		image: getSeoImageProps({ ...(imageFeatured ? { id: entry.id } : {}), alt: title }),
+	}}
+	hasHeroImage={!!imageHero}
+	hasReadingBar={true}
+>
+	<article>
+		{
+			imageHero ? (
+				<ImageHero imageId={imageHero.id} alt={title} class="sm:mb-small">
+					<ContentHeader showFeatured={true}>
+						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-subtitle">
+							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+						</Fragment>
+					</ContentHeader>
+				</ImageHero>
+			) : (
+				<ContentHeader>
+					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-subtitle">
+						<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+					</Fragment>
+				</ContentHeader>
+			)
+		}
+		<ContentProse class="pb-small" data-reading-frame><Content /></ContentProse>
+	</article>
+</BaseSite>

@@ -1,0 +1,34 @@
+---
+import type { MapComponentData } from '@/lib/map/map-types';
+
+import BaseSite from '@/components/base/base-site.astro';
+import ContentHeader from '@/components/content/content-header.astro';
+import ContentSection from '@/components/content/content-section.astro';
+import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import MapComponent from '@/components/parts/map-component.astro';
+import { getTranslations } from '@/lib/utils/i18n';
+
+type Props = MapComponentData;
+
+const { hasGeodata, ...mapComponentProps } = Astro.props;
+
+const t = getTranslations();
+
+const title = 'Objectives';
+const description = 'Points in the database that still require visitation and documentation.';
+---
+
+<BaseSite meta={{ title, description }}>
+	<ContentHeader><Fragment slot="header-title">{title}</Fragment></ContentHeader>
+	<ContentSection>
+		<Fragment slot="section-description"><FormatMarkdown>{description}</FormatMarkdown></Fragment>
+	</ContentSection>
+	{
+		hasGeodata ? (
+			<ContentSection fillViewport={true}>
+				<Fragment slot="section-title">{t('content.section.map')}</Fragment>
+				<MapComponent {...mapComponentProps} />
+			</ContentSection>
+		) : undefined
+	}
+</BaseSite>

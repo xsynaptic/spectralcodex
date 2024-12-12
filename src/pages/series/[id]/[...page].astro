@@ -1,0 +1,49 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { getSeriesCollection } from '@/lib/collections/series/data';
+import {
+	getLocationsBySeriesFunction,
+	getSeriesContentMetadataItemsFunction,
+} from '@/lib/collections/series/utils';
+import { getMapData } from '@/lib/map/map-data';
+import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
+import { getBasePath } from '@/lib/utils/routing';
+import SeriesEntry from '@/pages-layouts/series-entry.astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { series } = await getSeriesCollection();
+
+	const getSeriesContentMetadataItems = await getSeriesContentMetadataItemsFunction();
+	const getSeriesLocations = await getLocationsBySeriesFunction();
+
+	const results = [];
+
+	for (const entry of series) {
+		const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);
+
+		if (!metadataItems) continue;
+
+		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
+
+		const mapData = getMapData({
+			featureCollection: getLocationsFeatureCollection(seriesLocations),
+			apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+			boundsBufferMax: 300,
+		});
+
+		results.push(
+			...paginate(metadataItems, {
+				params: { id: entry.id },
+				props: { entry, mapData },
+				pageSize: 20,
+			})
+		);
+	}
+	return results;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<SeriesEntry {...Astro.props} />
