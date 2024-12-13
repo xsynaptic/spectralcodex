@@ -1,0 +1,16 @@
+{
+	"name": "@spectralcodex/image-open-graph",
+	"version": "1.0.0",
+	"description": "Open Graph image generator for Spectral Codex",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"dependencies": {
+		"satori": "^0.12.0"
+	},
+	"peerDependencies": {
+		"@spectralcodex/tailwind/config": "workspace:*",
+		"sharp": "^0.33.5"
+	}
+}

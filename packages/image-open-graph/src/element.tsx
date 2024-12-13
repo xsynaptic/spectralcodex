@@ -2,24 +2,16 @@ import { tailwindConfig } from '@spectralcodex/tailwind/config';
 
 import type { ContentMetadataItem } from '@/types/metadata';
 
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getImageObject } from '@/lib/image/image-file-handling';
-import { getOpenGraphImageDataUrl } from '@/lib/open-graph/open-graph-image-utils';
-
 const colors = tailwindConfig.theme.colors;
 
-export const getOpenGraphImageElement = async (entry: ContentMetadataItem) => {
-	const image = entry.imageId ? await getImageById(entry.imageId) : undefined;
-	const imageObject = image ? await getImageObject(image.data.src.src) : undefined;
-	const imageEncoded = imageObject
-		? await getOpenGraphImageDataUrl({
-				imageObject,
-				targetHeight: OPEN_GRAPH_IMAGE_HEIGHT,
-				targetWidth: OPEN_GRAPH_IMAGE_WIDTH,
-			})
-		: '';
-
+export function getOpenGraphImageElement(
+	entry: ContentMetadataItem,
+	image?: {
+		src: string;
+		height: number;
+		width: number;
+	},
+) {
 	return (
 		<div
 			style={{
@@ -30,11 +22,11 @@ export const getOpenGraphImageElement = async (entry: ContentMetadataItem) => {
 				height: '100%',
 			}}
 		>
-			{imageEncoded && imageEncoded.length > 0 ? (
+			{image && image.src.length > 0 ? (
 				<img
-					src={imageEncoded}
-					height={OPEN_GRAPH_IMAGE_HEIGHT}
-					width={OPEN_GRAPH_IMAGE_WIDTH}
+					src={image.src}
+					height={image.height}
+					width={image.width}
 					style={{
 						position: 'absolute',
 						maskImage: 'linear-gradient(to top, rgb(0, 0, 0, 0.3) 10%, black)',
@@ -76,4 +68,4 @@ export const getOpenGraphImageElement = async (entry: ContentMetadataItem) => {
 			</div>
 		</div>
 	);
-};
+}

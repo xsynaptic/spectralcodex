@@ -29,7 +29,6 @@
 ### SEO
 
 - [favicon generation](https://kremalicious.com/favicon-generation-with-astro/); see also [astro-favicons](https://github.com/ACP-CODE/astro-favicons) and [astro-webmanifest](https://github.com/alextim/astro-lib/tree/main/packages/astro-webmanifest)
-- open graph images still need work; check out [this](https://snorre.io/blog/2023-09-08-generating-opengraph-images-for-astro-copy/) for a plugin-based approach; [this](https://techsquidtv.com/blog/generating-open-graph-images-for-astro/) for some discussion of build time image path issues; [this playground](https://og-playground.vercel.app/) for further developing our image style; [this repo](https://github.com/delucis/astro-og-canvas/tree/latest/packages/astro-og-canvas) for some direction on image caching
 - add a more accurate `lastmod` to sitemap
 
 ### Search
@@ -42,7 +41,7 @@
 ### Extras
 
 - basic analytics with [umami](https://github.com/umami-software/umami); see also [awesome analytics](https://github.com/newTendermint/awesome-analytics)
-- [astro-i18next](https://github.com/yassinedoghri/astro-i18next)
+- [astro-i18next](https://github.com/yassinedoghri/astro-i18next) or some other i18n solution; currently this project only sketches things out
 - link-rot prevention: scan all official links in content to identify sources that have disappeared from the web
 - auto-archiver: maintain a backup copy of all official links and swap that in by including the archived webpage in the public folder
 - reading stats/word count (without it being a frontmatter thing, the performance issues are too much)

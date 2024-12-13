@@ -10,7 +10,7 @@ import { getSeriesCollection } from '@/lib/collections/series/data';
 import { getThemesCollection } from '@/lib/collections/themes/data';
 import { getSingleFeaturedItem } from '@/lib/image/image-featured';
 import { getImageObject } from '@/lib/image/image-file-handling';
-import { getOpenGraphImageStandard } from '@/lib/open-graph/open-graph-image-utils';
+import { getOpenGraphImage } from '@/lib/image/image-open-graph';
 
 export const getStaticPaths = (async () => {
 	const { regions } = await getRegionsCollection();
@@ -41,7 +41,7 @@ export const getStaticPaths = (async () => {
 							ext: OPEN_GRAPH_IMAGE_FORMAT,
 						},
 						props: {
-							imageOpenGraph: await getOpenGraphImageStandard({
+							imageOpenGraph: await getOpenGraphImage({
 								imageObject,
 								format: OPEN_GRAPH_IMAGE_FORMAT,
 								formatOptions: { quality: 85 },

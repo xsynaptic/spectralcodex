@@ -10,7 +10,7 @@ import { getLocationsCollection } from '@/lib/collections/locations/data';
 import { getPagesCollection } from '@/lib/collections/pages/data';
 import { getPostsCollection } from '@/lib/collections/posts/data';
 import { getImageObject } from '@/lib/image/image-file-handling';
-import { getOpenGraphImageStandard } from '@/lib/open-graph/open-graph-image-utils';
+import { getOpenGraphImage } from '@/lib/image/image-open-graph';
 
 export const getStaticPaths = (async () => {
 	const { ephemera } = await getEphemeraCollection();
@@ -38,7 +38,7 @@ export const getStaticPaths = (async () => {
 							ext: OPEN_GRAPH_IMAGE_FORMAT,
 						},
 						props: {
-							imageOpenGraph: await getOpenGraphImageStandard({
+							imageOpenGraph: await getOpenGraphImage({
 								imageObject,
 								format: OPEN_GRAPH_IMAGE_FORMAT,
 								formatOptions: { quality: 85 },
