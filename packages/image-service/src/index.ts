@@ -1,5 +1,4 @@
 import sharpDefaultService from 'astro/assets/services/sharp';
-import { VALID_OUTPUT_FORMATS } from 'node_modules/astro/dist/assets/consts';
 import sharp from 'sharp';
 
 import type { ImageMetadata, ImageTransform, LocalImageService } from 'astro';
@@ -18,6 +17,12 @@ interface UnresolvedSrcSetValue {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	attributes?: Record<string, any>;
 }
+
+// Valid image formats supported by Astro; note that SVGs will not be processed
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const VALID_IMAGE_FORMATS = ['jpeg', 'jpg', 'png', 'tiff', 'webp', 'gif', 'svg', 'avif'] as const;
+
+type ValidImageFormat = (typeof VALID_IMAGE_FORMATS)[number];
 
 const DEFAULT_OUTPUT_FORMAT = 'jpg';
 
@@ -78,7 +83,7 @@ const service = {
 	// This function will not run if the cache has already been seeded
 	async transform(inputBuffer, transformOptions, config) {
 		const transform = transformOptions as ImageTransform & {
-			format?: (typeof VALID_OUTPUT_FORMATS)[number] | undefined; // Avoid arbitrary strings
+			format?: ValidImageFormat | undefined; // Avoid arbitrary strings
 		};
 
 		// Do not transform SVG

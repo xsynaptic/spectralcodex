@@ -2,9 +2,11 @@
 
 This is a draft version of an image loader integration for Astro. Currently it works well enough for personal use, but the watcher requires improvement before any public release.
 
-The idea, in short: treat individual images as content items and allow for a callback function specified in content collection definitions to fill out user-defined schemas with image metadata.
+The concept: treat individual images as content! Images are loaded and a callback function allows for file operations to collect metadata that is then validated against a user-defined schema.
 
-For this project I use this for two purposes:
+Currently I generate two kinds of image metadata with this loader:
 
-1. Generating and caching the data URI used to display image placeholders, part of the LQIP technique implemented on the main site.
-2. Extracting EXIF data from images to populate fields with some basic info like image title, camera model, ISO, etc.
+1. Low-quality image placeholders (LQIP) encoded in data URIs and stored with the collection, which makes outputting the markup a breeze.
+2. EXIF data read by the excellent [exiftool-vendored](https://github.com/photostructure/exiftool-vendored.js) library; this includes fields like image title, camera model, ISO, etc.
+
+That said, the scope of this package is limited to providing the scaffolding for this kind of use case; the actual implementation of placeholders and EXIF data reading is handled in the callback function in the main Astro project.

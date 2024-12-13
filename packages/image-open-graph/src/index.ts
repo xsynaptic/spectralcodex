@@ -17,7 +17,7 @@ async function getOpenGraphImageDataUrl({
 	width: number;
 	density: number;
 }) {
-	const placeholderBuffer = await imageObject
+	const imageBuffer = await imageObject
 		.resize({
 			fit: 'cover',
 			position: 'top',
@@ -26,9 +26,7 @@ async function getOpenGraphImageDataUrl({
 		})
 		.toBuffer({ resolveWithObject: true });
 
-	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString(
-		'base64',
-	)}`;
+	return `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
 }
 
 export function getGenerateOpenGraphImageFunction({
