@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import type { LocalImageProps } from 'astro:assets';
 
 import ImageHeroFrame from '@/components/image/image-hero-frame.astro';
-import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageById } from '@/lib/collections/images/utils';
 import { getImageSrcsetWidths } from '@/lib/image/image-layout';
 import {
@@ -32,7 +32,8 @@ const imageProps = {
 	height: image.data.src.height,
 	widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
 	sizes: '100vw',
-	...IMAGE_FORMAT_QUALITY,
+	format: IMAGE_FORMAT,
+	quality: IMAGE_QUALITY,
 	...getImagePlaceholderProps({ placeholder }),
 } satisfies LocalImageProps;
 ---

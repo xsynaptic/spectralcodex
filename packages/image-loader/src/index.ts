@@ -73,7 +73,7 @@ export function imageLoader(options: {
 	 * Run once after loading all images; can be used to invoke a clean-up function.
 	 */
 	afterLoad?: () => void;
-}): Loader {
+}) {
 	const generateId = options.generateId ?? defaultGenerateId;
 
 	// Limit the concurrency of files processed to reduce memory usage
@@ -260,5 +260,5 @@ export function imageLoader(options: {
 				store.delete(id);
 			});
 		},
-	};
+	} satisfies Loader;
 }

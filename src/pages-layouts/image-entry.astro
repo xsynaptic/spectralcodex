@@ -12,7 +12,7 @@ import Container from '@/components/parts/container.astro';
 import DateDisplay from '@/components/parts/date-display.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
 import TextGridItem from '@/components/parts/text-grid-item.astro';
-import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageLayoutProps } from '@/lib/image/image-layout';
 import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
 import { getTranslations } from '@/lib/utils/i18n';
@@ -31,8 +31,9 @@ const alt = sanitizeAltAttribute(title ?? '');
 const imageProps = {
 	src: imageMetadata,
 	alt,
+	format: IMAGE_FORMAT,
+	quality: IMAGE_QUALITY,
 	...getImageLayoutProps({ imageMetadata, layout: 'medium' }),
-	...IMAGE_FORMAT_QUALITY,
 	...getImagePlaceholderProps({ placeholder }),
 } satisfies LocalImageProps;
 
