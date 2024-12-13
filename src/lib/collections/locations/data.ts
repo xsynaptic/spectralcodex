@@ -23,22 +23,24 @@ interface CollectionData {
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
-const LOCATIONS_NEARBY_COUNT_LIMIT = 25;
+const LOCATIONS_NEARBY_COUNT_LIMIT = 25; // Max number of locations returned
 const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // Everything within 10 km
 const LOCATIONS_NEARBY_DISTANCE_UNITS: Units = 'kilometers';
 
 let collection: Promise<CollectionData> | undefined;
 
-// A simple function for creating reliable IDs for distance calculations
+// A simple function for creating reliable IDs for distance pair calculations
 function getDistanceId(idA: string, idB: string) {
 	return [idA, idB].sort().join('-');
 }
 
-// Currently we only calculate nearby locations for Point geometry
-// This operation also simplifies the data structure to just the essentials
 function getGenerateNearbyItemsFunction(locations: CollectionEntry<'locations'>[]) {
+	// In-memory cache of distances; this way we can do half the number of operations
+	// Because for single points, A<->B is the same as B<->A
 	const distances = new Map<string, number>();
 
+	// Currently we only calculate nearby locations for Point geometry
+	// This operation also simplifies the data structure to just the essentials
 	const points = locations.map((entry) => {
 		if (entry.data.geometry.type !== 'Point') return;
 
@@ -54,6 +56,8 @@ function getGenerateNearbyItemsFunction(locations: CollectionEntry<'locations'>[
 
 		if (!entryA) continue;
 
+		// This buffer allows us to simplify operations and only consider points within a certain range
+		// This is a little expensive but for large number of points actually saves us time
 		const buffer = getBuffer(getPoint(entryA.coordinates), LOCATIONS_NEARBY_DISTANCE_LIMIT, {
 			units: LOCATIONS_NEARBY_DISTANCE_UNITS,
 		});
@@ -80,6 +84,7 @@ function getGenerateNearbyItemsFunction(locations: CollectionEntry<'locations'>[
 		}
 	}
 
+	// Now return the function that handles the calculation for a specific location
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
 		if (entry.data.geometry.type !== 'Point') return;
 
@@ -91,22 +96,20 @@ function getGenerateNearbyItemsFunction(locations: CollectionEntry<'locations'>[
 				const distanceId = getDistanceId(entry.id, point.id);
 				const distance = distances.get(distanceId);
 
-				if (distance) {
-					return distance
-						? {
-								locationId: point.id,
-								distance,
-								distanceDisplay: distance.toFixed(2),
-							}
-						: undefined;
-				}
-				return;
+				return distance && distance > 0
+					? {
+							locationId: point.id,
+							distance,
+							distanceDisplay: distance.toFixed(2),
+						}
+					: undefined;
 			}),
 			R.filter((item) => !!item),
 			R.sort((a, b) => a.distance - b.distance),
 			R.take(LOCATIONS_NEARBY_COUNT_LIMIT),
 		) satisfies CollectionEntry<'locations'>['data']['nearby'];
 
+		// If we have nearby points let's add data to the actual location entry
 		if (nearby.length > 0) {
 			entry.data.nearby = nearby;
 		}
@@ -147,6 +150,7 @@ async function generateLocationImageData(locations: CollectionEntry<'locations'>
 							quality: IMAGE_QUALITY,
 						});
 
+						// Directly add some basic image data to the location entry
 						entry.data.imageThumbnail = {
 							src: imageObject.src,
 							srcSet: imageObject.srcSet.attribute,
