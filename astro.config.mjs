@@ -23,8 +23,7 @@ const {
 // TODO: base path handling is an overcomplicated mess
 const BASE_PATH = isProduction ? BASE_PATH_PROD : '';
 
-// TODO: more accurate last modified date for the sitemap
-const lastMod = new Date();
+const currentDate = new Date();
 
 /**
  * @link https://astro.build/config
@@ -73,6 +72,11 @@ export default defineConfig({
 				access: 'public',
 				default: './example/media',
 			}),
+			SITE_YEAR_FOUNDED: envField.string({
+				context: 'client',
+				access: 'public',
+				default: String(currentDate.getFullYear()),
+			}),
 			FEATURE_DATE_ARCHIVES: envField.boolean({
 				context: 'server',
 				access: 'public',
@@ -101,9 +105,6 @@ export default defineConfig({
 		define: {
 			'import.meta.env.BUILD_ID': JSON.stringify(nanoid()),
 		},
-	},
-	security: {
-		checkOrigin: false, // Temporary fix for a bug in 5.0.0-beta.2, can be removed later
 	},
 	markdown: {
 		rehypePlugins: [rehypeWrapCjk],
@@ -139,7 +140,8 @@ export default defineConfig({
 			filter: (page) =>
 				!['/_', '/objectives/', '/planning/', '/taiwan-theater-project/'].includes(page),
 			serialize(item) {
-				return { ...item, lastMod };
+				// TODO: more accurate last modified date for the sitemap
+				return { ...item, lastMod: currentDate };
 			},
 		}),
 	],

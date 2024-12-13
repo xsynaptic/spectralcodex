@@ -1,12 +1,13 @@
 import { stripTags, transformMarkdown } from '@spectralcodex/unified';
 import { countWords } from 'alfaaz';
+import { SITE_YEAR_FOUNDED } from 'astro:env/client';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
 import type { ContentMetadataIndex, ContentMetadataItem } from '@/types/metadata';
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '@/constants';
+import { MDX_COMPONENTS_TO_STRIP } from '@/constants';
 import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
 import { getLocationsCollection } from '@/lib/collections/locations/data';
 import { getPagesCollection } from '@/lib/collections/pages/data';
@@ -97,7 +98,7 @@ async function populateContentMetadataIndex(): Promise<ContentMetadataIndex> {
 				date:
 					parseContentDate(entry.data.dateUpdated) ??
 					parseContentDate(entry.data.dateCreated) ??
-					new Date(SITE_YEAR_FOUNDED),
+					new Date(String(SITE_YEAR_FOUNDED)),
 				url: getContentUrl(entry.collection, entry.id),
 				imageId: getContentMetadataImageId(entry),
 				regionPrimaryId: getPrimaryRegionIdFromEntry(entry),

@@ -14,7 +14,7 @@ import * as R from 'remeda';
 import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
 
-import { IMAGE_FORMAT_QUALITY } from '@/constants';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageByIdFunction } from '@/lib/collections/images/utils';
 import { getContentUrl } from '@/lib/utils/routing';
 
@@ -143,7 +143,8 @@ async function generateLocationImageData(locations: CollectionEntry<'locations'>
 							width: 450,
 							height: 300,
 							widths: [450, 600, 900],
-							...IMAGE_FORMAT_QUALITY,
+							format: IMAGE_FORMAT,
+							quality: IMAGE_QUALITY,
 						});
 
 						entry.data.imageThumbnail = {
