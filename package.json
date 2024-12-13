@@ -45,6 +45,7 @@
 		"@iconify/utils": "^2.2.0",
 		"@sindresorhus/slugify": "^2.2.1",
 		"@spectralcodex/image-loader": "workspace:*",
+		"@spectralcodex/image-service": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/tailwind": "workspace:*",
 		"@spectralcodex/unified": "workspace:*",

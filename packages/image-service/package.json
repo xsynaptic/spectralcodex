@@ -1,0 +1,13 @@
+{
+	"name": "@spectralcodex/image-service",
+	"version": "1.0.0",
+	"description": "Image service for Spectral Codex",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"peerDependencies": {
+		"astro": "^5.0.3",
+		"sharp": "^0.33.5"
+	}
+}

@@ -148,7 +148,7 @@ export default defineConfig({
 	image: {
 		service: {
 			// For reference, the original entrypoint: 'astro/assets/services/sharp',
-			entrypoint: './config/image/image-service',
+			entrypoint: '@spectralcodex/image-service',
 			config: {
 				limitInputPixels: false,
 			},
