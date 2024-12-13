@@ -6,8 +6,8 @@ import { getLocationsCollection } from '@/lib/collections/locations/data';
 import {
 	getLocationsByIdsFunction,
 	getLocationsByPostsFunction,
-	getObjectiveLocations,
 } from '@/lib/collections/locations/utils';
+import { getObjectiveLocations } from '@/lib/collections/locations/utils-objectives';
 import { getPostsCollection } from '@/lib/collections/posts/data';
 import { getRegionsCollection } from '@/lib/collections/regions/data';
 import { getSeriesCollection } from '@/lib/collections/series/data';
