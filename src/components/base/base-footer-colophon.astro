@@ -1,6 +1,5 @@
 ---
 import { SITE_YEAR_FOUNDED } from 'astro:env/client';
-import { Icon } from 'astro-icon/components';
 
 import DateDisplay from '@/components/parts/date-display.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
@@ -37,10 +36,17 @@ const t = getTranslations();
 			linkColor="accent"
 			class="group flex flex-nowrap items-center gap-1"
 			><span>{t('menu.feed.label')}</span>
-			<Icon
-				name="mdi:rss-box"
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="1em"
+				height="1em"
+				viewBox="0 0 24 24"
 				class="text-sm text-orange-400 transition-colors duration-300 hover:text-orange-300 group-hover:text-orange-300"
-			/>
+				><path
+					fill="currentColor"
+					d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2.5 12A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 18A1.5 1.5 0 0 0 9 16.5A1.5 1.5 0 0 0 7.5 15M6 10v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8m0-4v2a10 10 0 0 1 10 10h2A12 12 0 0 0 6 6"
+				></path><title>{t('menu.feed.label')}</title></svg
+			>
 		</Link>
 	</DividedItem>
 </nav>

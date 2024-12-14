@@ -110,7 +110,7 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 		u: feature.properties.url,
 		d: feature.properties.description,
 		s: feature.properties.safety,
-		g: feature.properties.googleMapsUrl, // TODO: only pass on custom Google links
+		g: feature.properties.googleMapsUrl,
 		w: feature.properties.wikipediaUrl,
 		m: feature.properties.image, // TODO: compress `srcSet` field; this can still be optimized
 	})) satisfies MapPopupDataRaw;

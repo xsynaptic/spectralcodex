@@ -18,6 +18,7 @@ import { getLocationsByThemeFunction } from '@/lib/collections/themes/utils';
 import { getLocationsMapApiData } from '@/lib/map/map-locations';
 import { generateApiResponse } from '@/lib/utils/api';
 
+// Note: API versioning is accomplished through the use of a build ID
 const build = import.meta.env.BUILD_ID;
 
 // Split the API into source and popup data

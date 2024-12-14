@@ -5,7 +5,6 @@ import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig, envField } from 'astro/config';
 import AutoImport from 'astro-auto-import';
-import icon from 'astro-icon';
 import { nanoid } from 'nanoid';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
@@ -103,7 +102,7 @@ export default defineConfig({
 	},
 	vite: {
 		define: {
-			'import.meta.env.BUILD_ID': JSON.stringify(nanoid()),
+			'import.meta.env.BUILD_ID': JSON.stringify(isProduction ? nanoid() : 'dev'),
 		},
 	},
 	markdown: {
@@ -113,12 +112,6 @@ export default defineConfig({
 		tailwind(),
 		react({
 			include: ['packages/react**/*'],
-		}),
-		// Note: ensure the manifest includes all icons in use
-		icon({
-			include: {
-				mdi: ['chevron-left', 'chevron-right', 'rss-box'],
-			},
 		}),
 		// AutoImport *must* appear before the MDX integration
 		AutoImport({
