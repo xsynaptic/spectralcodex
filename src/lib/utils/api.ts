@@ -5,7 +5,7 @@ export function generateApiResponse(data: string): Response {
 	return new Response(data);
 }
 
-// This is not yet working properly in production
+// This is not yet working properly in production; TODO: debug why
 export function generateGzipApiResponse(data: string): Response {
 	// Create a Readable stream from the JSON string
 	const inputStream = Readable.from(data);

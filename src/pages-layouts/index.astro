@@ -2,11 +2,11 @@
 import type { ContentMetadataItem } from '@/types/metadata';
 
 import BaseSite from '@/components/base/base-site.astro';
-import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
 import ContentSection from '@/components/content/content-section.astro';
-import ImageHeroCarousel from '@/components/image/image-hero-carousel.astro';
-import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
+import FormatMarkdown from '@/components/format/format-markdown.astro';
+import ImageHeroCarousel from '@/components/image-hero/image-hero-carousel.astro';
 import Link from '@/components/parts/link.astro';
+import PreviewGrid from '@/components/preview/preview-grid.astro';
 import { getFeaturedItemsFromContentMetadata } from '@/lib/image/image-featured';
 import { getContentStats } from '@/lib/metadata/metadata-stats';
 import { getTranslations } from '@/lib/utils/i18n';
@@ -57,7 +57,7 @@ const t = getTranslations();
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
-		<ContentPreviewGrid
+		<PreviewGrid
 			items={recentMetadataItems}
 			showDate={true}
 			showRegion={true}
@@ -73,7 +73,7 @@ const t = getTranslations();
 		<Fragment slot="section-description"
 			><FormatMarkdown>{t('index.themes')}</FormatMarkdown></Fragment
 		>
-		<ContentPreviewGrid
+		<PreviewGrid
 			items={themesMetadataItems}
 			showLocations={true}
 			showPosts={true}
@@ -89,6 +89,6 @@ const t = getTranslations();
 		<Fragment slot="section-description"
 			><FormatMarkdown>{t('index.series')}</FormatMarkdown></Fragment
 		>
-		<ContentPreviewGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
+		<PreviewGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 </BaseSite>

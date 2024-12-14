@@ -7,11 +7,11 @@ import BaseSite from '@/components/base/base-site.astro';
 import ContentCollectionLink from '@/components/content/content-collection-link.astro';
 import ContentDate from '@/components/content/content-date.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentProse from '@/components/content/content-prose.astro';
 import ContentSectionRegions from '@/components/content/content-section-regions.astro';
 import ContentSectionThemes from '@/components/content/content-section-themes.astro';
-import ImageHero from '@/components/image/image-hero.astro';
+import ImageHero from '@/components/image-hero/image-hero.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
+import ProseBody from '@/components/parts/prose-body.astro';
 import { getSeoArticleProps, getSeoImageProps } from '@/lib/utils/seo';
 
 interface Props {
@@ -77,7 +77,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 				</ContentHeader>
 			)
 		}
-		<ContentProse class="pb-small" data-reading-frame><Content /></ContentProse>
+		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 	</article>

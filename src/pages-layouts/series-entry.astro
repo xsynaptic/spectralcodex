@@ -9,12 +9,12 @@ import type { CollectionEntry } from 'astro:content';
 import BaseSite from '@/components/base/base-site.astro';
 import ContentCollectionLink from '@/components/content/content-collection-link.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
-import ContentProse from '@/components/content/content-prose.astro';
 import ContentSection from '@/components/content/content-section.astro';
-import ImageHeroCarousel from '@/components/image/image-hero-carousel.astro';
+import ImageHeroCarousel from '@/components/image-hero/image-hero-carousel.astro';
+import Pagination from '@/components/pagination/pagination.astro';
 import MapComponent from '@/components/parts/map-component.astro';
-import Pagination from '@/components/parts/pagination.astro';
+import ProseBody from '@/components/parts/prose-body.astro';
+import PreviewGrid from '@/components/preview/preview-grid.astro';
 import { getFeaturedItemsMetadata } from '@/lib/image/image-featured';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getSeoImageProps } from '@/lib/utils/seo';
@@ -78,10 +78,10 @@ const t = getTranslations();
 				</ContentHeader>
 			)
 		}
-		<ContentProse class="pb-small"><Content /></ContentProse>
+		<ProseBody class="pb-small"><Content /></ProseBody>
 		<ContentSection>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
-			<ContentPreviewGrid items={page.data} showDate={true} showRegion={true} />
+			<PreviewGrid items={page.data} showDate={true} showRegion={true} />
 			<Pagination class="mt-small md:mt-medium" page={page} />
 		</ContentSection>
 		{

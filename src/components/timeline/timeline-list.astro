@@ -1,10 +1,10 @@
 ---
 import type { ContentMetadataItem } from '@/types/metadata';
 
-import ContentDescription from '@/components/content/content-description.astro';
+import FormatMarkdown from '@/components/format/format-markdown.astro';
 import DateDisplay from '@/components/parts/date-display.astro';
-import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
 import Link from '@/components/parts/link.astro';
+import ProseDescription from '@/components/parts/prose-description.astro';
 
 interface Props {
 	timelineItems: ContentMetadataItem[];
@@ -24,9 +24,9 @@ const { timelineItems } = Astro.props;
 					<DateDisplay date={date} />
 				</div>
 				{description ? (
-					<ContentDescription class="mt-2" showCompact={true}>
+					<ProseDescription class="mt-2" showCompact={true}>
 						<FormatMarkdown>{description}</FormatMarkdown>
-					</ContentDescription>
+					</ProseDescription>
 				) : undefined}
 			</li>
 		))

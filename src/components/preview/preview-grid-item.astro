@@ -1,20 +1,20 @@
 ---
-import type { ContentPreviewItemProps } from '@/types/components';
+import type { PreviewItemProps } from '@/types/components';
 import type { ContentMetadataItem } from '@/types/metadata';
 
 import ContentDate from '@/components/content/content-date.astro';
-import ContentDescription from '@/components/content/content-description.astro';
-import ContentPreview from '@/components/content/content-preview.astro';
+import FormatCjk from '@/components/format/format-cjk.astro';
+import FormatMarkdown from '@/components/format/format-markdown.astro';
+import FormatNumber from '@/components/format/format-number.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
-import FormatCjk from '@/components/parts/format/format-cjk.astro';
-import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
-import FormatNumber from '@/components/parts/format/format-number.astro';
 import Link from '@/components/parts/link.astro';
+import ProseDescription from '@/components/parts/prose-description.astro';
+import Preview from '@/components/preview/preview.astro';
 import { getRegionAncestorsByIdFunction } from '@/lib/collections/regions/utils';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
 
-interface Props extends ContentPreviewItemProps {
+interface Props extends PreviewItemProps {
 	item: ContentMetadataItem;
 }
 
@@ -55,7 +55,7 @@ const regions =
 const t = getTranslations();
 ---
 
-<ContentPreview imageId={imageId} linkUrl={url} alt={title}>
+<Preview imageId={imageId} linkUrl={url} alt={title}>
 	<Fragment slot="preview-title">{title}</Fragment>
 	{
 		showTitleAlt && titleAlt ? (
@@ -121,10 +121,10 @@ const t = getTranslations();
 	{
 		showDescription ? (
 			<Fragment slot="preview-description">
-				<ContentDescription class="mt-1" showCompact={showDescriptionCompact}>
+				<ProseDescription class="mt-1" showCompact={showDescriptionCompact}>
 					<FormatMarkdown>{description}</FormatMarkdown>
-				</ContentDescription>
+				</ProseDescription>
 			</Fragment>
 		) : undefined
 	}
-</ContentPreview>
+</Preview>

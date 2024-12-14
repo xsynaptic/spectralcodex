@@ -6,8 +6,8 @@ import type { CollectionEntry } from 'astro:content';
 import BaseSite from '@/components/base/base-site.astro';
 import ContentDate from '@/components/content/content-date.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentProse from '@/components/content/content-prose.astro';
-import ImageHero from '@/components/image/image-hero.astro';
+import ImageHero from '@/components/image-hero/image-hero.astro';
+import ProseBody from '@/components/parts/prose-body.astro';
 import { getSeoImageProps } from '@/lib/utils/seo';
 
 interface Props {
@@ -54,6 +54,6 @@ const { Content } = await render(entry);
 				</ContentHeader>
 			)
 		}
-		<ContentProse class="pb-small" data-reading-frame><Content /></ContentProse>
+		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
 	</article>
 </BaseSite>

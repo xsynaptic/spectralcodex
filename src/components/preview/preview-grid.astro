@@ -1,11 +1,11 @@
 ---
-import type { ContentPreviewItemProps } from '@/types/components';
+import type { PreviewItemProps } from '@/types/components';
 import type { ContentMetadataItem } from '@/types/metadata';
 
-import ContentPreviewGridItem from '@/components/content/content-preview-grid-item.astro';
 import Grid from '@/components/parts/grid.astro';
+import PreviewGridItem from '@/components/preview/preview-grid-item.astro';
 
-interface Props extends ContentPreviewItemProps {
+interface Props extends PreviewItemProps {
 	class?: string | undefined;
 	items: ContentMetadataItem[];
 }
@@ -17,7 +17,7 @@ const { class: className, items, ...contentPreviewGridOptions } = Astro.props;
 	items.length > 0 ? (
 		<Grid class={className}>
 			{items.map((item) => (
-				<ContentPreviewGridItem item={item} {...contentPreviewGridOptions} />
+				<PreviewGridItem item={item} {...contentPreviewGridOptions} />
 			))}
 		</Grid>
 	) : undefined

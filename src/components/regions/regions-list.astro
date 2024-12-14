@@ -2,10 +2,10 @@
 import type { DividerContent } from '@/types/components';
 import type { CollectionEntry } from 'astro:content';
 
+import FormatCjk from '@/components/format/format-cjk.astro';
+import ListRow from '@/components/list/list-row.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
-import FormatCjk from '@/components/parts/format/format-cjk.astro';
 import Link from '@/components/parts/link.astro';
-import ListRow from '@/components/parts/list-row.astro';
 import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
 import { getContentUrl } from '@/lib/utils/routing';
 

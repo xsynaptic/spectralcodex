@@ -38,7 +38,7 @@ export type DividerContent = 'bar' | 'bullet' | 'chevron' | 'dot' | 'slash';
 /**
  * Content preview items
  */
-export interface ContentPreviewItemProps {
+export interface PreviewItemProps {
 	showCollection?: boolean | undefined;
 	showDate?: boolean | undefined;
 	showDescription?: boolean | undefined;

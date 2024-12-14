@@ -8,26 +8,26 @@ import type { CollectionEntry } from 'astro:content';
 import BaseSite from '@/components/base/base-site.astro';
 import ContentCollectionLink from '@/components/content/content-collection-link.astro';
 import ContentDate from '@/components/content/content-date.astro';
-import ContentDescription from '@/components/content/content-description.astro';
 import ContentHeader from '@/components/content/content-header.astro';
 import ContentImage from '@/components/content/content-image.astro';
-import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
-import ContentProse from '@/components/content/content-prose.astro';
 import ContentSection from '@/components/content/content-section.astro';
 import ContentSectionBacklinks from '@/components/content/content-section-backlinks.astro';
 import ContentSectionDateVisited from '@/components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '@/components/content/content-section-links.astro';
 import ContentSectionSeries from '@/components/content/content-section-series.astro';
 import ContentSectionThemes from '@/components/content/content-section-themes.astro';
-import ImageHero from '@/components/image/image-hero.astro';
+import FormatCjk from '@/components/format/format-cjk.astro';
+import FormatMarkdown from '@/components/format/format-markdown.astro';
+import ImageHero from '@/components/image-hero/image-hero.astro';
 import LocationsHeritage from '@/components/locations/locations-heritage.astro';
 import LocationsNearbyList from '@/components/locations/locations-nearby-list.astro';
 import LocationsNotices from '@/components/locations/locations-notices.astro';
+import StatusBox from '@/components/parts/alert-box.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
-import FormatCjk from '@/components/parts/format/format-cjk.astro';
-import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
 import MapComponent from '@/components/parts/map-component.astro';
-import StatusBox from '@/components/parts/status-box.astro';
+import ProseBody from '@/components/parts/prose-body.astro';
+import ProseDescription from '@/components/parts/prose-description.astro';
+import PreviewGrid from '@/components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '@/components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '@/lib/collections/locations/utils';
 import { getTranslations } from '@/lib/utils/i18n';
@@ -130,9 +130,9 @@ const t = getTranslations();
 		}
 		{
 			hasContent ? (
-				<ContentProse class="pb-small" data-reading-frame>
+				<ProseBody class="pb-small" data-reading-frame>
 					<Content />
-				</ContentProse>
+				</ProseBody>
 			) : (
 				<>
 					{imageFeatured ? (
@@ -140,9 +140,9 @@ const t = getTranslations();
 					) : undefined}
 					<ContentSection>
 						<Fragment slot="section-description">
-							<ContentDescription>
+							<ProseDescription>
 								<FormatMarkdown>{description}</FormatMarkdown>
-							</ContentDescription>
+							</ProseDescription>
 						</Fragment>
 					</ContentSection>
 				</>
@@ -165,7 +165,7 @@ const t = getTranslations();
 		<ContentSectionSeries entry={entry} />
 		<ContentSection>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
-			<ContentPreviewGrid items={metadataItems} showDate={true} showRegion={true} />
+			<PreviewGrid items={metadataItems} showDate={true} showRegion={true} />
 		</ContentSection>
 		<LocationsNotices entry={entry} />
 		{

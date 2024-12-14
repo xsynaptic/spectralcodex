@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import ContentDescription from '@/components/content/content-description.astro';
+import ProseDescription from '@/components/parts/prose-description.astro';
 import TextGradient from '@/components/parts/text-gradient.astro';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -52,9 +52,9 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 					</h3>
 				) : undefined}
 				{description ? (
-					<ContentDescription class:list={['mb-small']}>
+					<ProseDescription class:list={['mb-small']}>
 						<Fragment set:html={description} />
-					</ContentDescription>
+					</ProseDescription>
 				) : undefined}
 			</header>
 			<Fragment set:html={children} />

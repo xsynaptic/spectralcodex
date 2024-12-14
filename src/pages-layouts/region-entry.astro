@@ -10,14 +10,14 @@ import type { CollectionEntry } from 'astro:content';
 import BaseSite from '@/components/base/base-site.astro';
 import ContentCollectionLink from '@/components/content/content-collection-link.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
-import ContentProse from '@/components/content/content-prose.astro';
 import ContentSection from '@/components/content/content-section.astro';
 import ContentSectionLinks from '@/components/content/content-section-links.astro';
-import ImageHeroCarousel from '@/components/image/image-hero-carousel.astro';
+import ImageHeroCarousel from '@/components/image-hero/image-hero-carousel.astro';
+import Pagination from '@/components/pagination/pagination.astro';
 import DividedItem from '@/components/parts/divided-item.astro';
 import MapComponent from '@/components/parts/map-component.astro';
-import Pagination from '@/components/parts/pagination.astro';
+import ProseBody from '@/components/parts/prose-body.astro';
+import PreviewGrid from '@/components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '@/components/regions/regions-breadcrumbs.astro';
 import RegionsRelated from '@/components/regions/regions-related.astro';
 import { getFeaturedItemsMetadata } from '@/lib/image/image-featured';
@@ -99,7 +99,7 @@ const t = getTranslations();
 				</ContentHeader>
 			)
 		}
-		<ContentProse class="pb-medium"><Content /></ContentProse>
+		<ProseBody class="pb-medium"><Content /></ProseBody>
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 			{
 				regionsOption?.termsChildrenLabel ? (
@@ -122,7 +122,7 @@ const t = getTranslations();
 		}
 		<ContentSection>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
-			<ContentPreviewGrid items={page.data} showDate={true} showCollection={true} />
+			<PreviewGrid items={page.data} showDate={true} showCollection={true} />
 			<Pagination class="mt-small md:mt-medium" page={page} />
 		</ContentSection>
 		<ContentSectionLinks entry={entry} />

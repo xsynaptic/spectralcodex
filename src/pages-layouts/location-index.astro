@@ -4,11 +4,11 @@ import type { Page } from 'astro';
 
 import BaseSite from '@/components/base/base-site.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentPreviewGrid from '@/components/content/content-preview-grid.astro';
 import ContentSection from '@/components/content/content-section.astro';
-import FormatMarkdown from '@/components/parts/format/format-markdown.astro';
-import Pagination from '@/components/parts/pagination.astro';
-import PaginationCounter from '@/components/parts/pagination-counter.astro';
+import FormatMarkdown from '@/components/format/format-markdown.astro';
+import Pagination from '@/components/pagination/pagination.astro';
+import PaginationCounter from '@/components/pagination/pagination-counter.astro';
+import PreviewGrid from '@/components/preview/preview-grid.astro';
 import { getTranslations } from '@/lib/utils/i18n';
 
 interface Props {
@@ -33,7 +33,7 @@ const description = t('collection.locations.description');
 		<Fragment slot="section-description">
 			{page.currentPage === 1 ? <FormatMarkdown>{description}</FormatMarkdown> : undefined}
 		</Fragment>
-		<ContentPreviewGrid items={page.data} showDate={true} showRegion={true} showTitleAlt={true} />
+		<PreviewGrid items={page.data} showDate={true} showRegion={true} showTitleAlt={true} />
 		<Pagination class="mt-small md:mt-medium" page={page} />
 	</ContentSection>
 </BaseSite>
