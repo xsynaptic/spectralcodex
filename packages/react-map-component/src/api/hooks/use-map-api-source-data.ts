@@ -8,19 +8,20 @@ import type { MapSourceDataRaw } from '../../types';
 import { useMapStoreActions } from '../../store/hooks/use-map-store';
 import { MapSourceDataSchema } from '../../types/map-schemas';
 
-// Dev server can timeout when regenerating huge amounts of content
-const isDev = import.meta.env.DEV;
-
-export function useMapApiSourceData({ apiEndpointUrl }: Pick<MapComponentProps, 'apiEndpointUrl'>) {
+// Note: dev server can timeout when regenerating large amounts of content
+export function useMapApiSourceData({
+	apiSourceUrl,
+	isDev,
+}: Pick<MapComponentProps, 'apiSourceUrl' | 'isDev'>) {
 	const { setSourceData, setSourceDataLoading } = useMapStoreActions();
 
 	const mapSourceDataQuery = useQuery({
-		queryKey: ['canvas-data', apiEndpointUrl],
+		queryKey: ['canvas-data', apiSourceUrl],
 		queryFn: async () => {
-			if (apiEndpointUrl) {
+			if (apiSourceUrl) {
 				try {
 					return await ky
-						.get<MapSourceDataRaw>(`${apiEndpointUrl}/1`, { timeout: isDev ? false : 10_000 })
+						.get<MapSourceDataRaw>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
 						.json();
 				} catch (error) {
 					console.error(error);
@@ -32,7 +33,7 @@ export function useMapApiSourceData({ apiEndpointUrl }: Pick<MapComponentProps, 
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		staleTime: 100_000,
-		enabled: !!apiEndpointUrl,
+		enabled: !!apiSourceUrl,
 	});
 
 	useEffect(

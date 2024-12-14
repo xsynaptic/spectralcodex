@@ -1,4 +1,3 @@
-import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 import maplibregl from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 import layers from 'protomaps-themes-base';
@@ -10,7 +9,13 @@ import type { StyleSpecification } from 'maplibre-gl';
 
 import { useMapLanguages } from '../../store/hooks/use-map-store';
 
-export function useProtomaps({ baseMapTheme }: { baseMapTheme: ProtomapsBaseMapTheme }) {
+export function useProtomaps({
+	protomapsApiKey,
+	baseMapTheme,
+}: {
+	protomapsApiKey: string;
+	baseMapTheme: ProtomapsBaseMapTheme;
+}) {
 	const languages = useMapLanguages();
 
 	useEffect(function loadProtomapsProtocol() {
@@ -43,7 +48,7 @@ export function useProtomaps({ baseMapTheme }: { baseMapTheme: ProtomapsBaseMapT
 				sources: {
 					protomaps: {
 						type: 'vector',
-						url: `https://api.protomaps.com/tiles/v4.json?key=${MAP_PROTOMAPS_API_KEY}`,
+						url: `https://api.protomaps.com/tiles/v4.json?key=${protomapsApiKey}`,
 						attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
 					},
 				},

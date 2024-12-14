@@ -1,9 +1,3 @@
-export const IMAGE_FORMAT = 'jpg';
-export const IMAGE_QUALITY = 88;
-
-export const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
-export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
-
 // Strip these MDX components from SEO descriptions and when generating word counts
 export const MDX_COMPONENTS_TO_STRIP = ['Img', 'ImgGroup', 'Map', 'More'];
 
@@ -16,6 +10,21 @@ export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
 // TODO: increase this value after all original images have been validated
 export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 100;
+
+/**
+ * Image processing
+ */
+export const IMAGE_FORMAT = 'jpg';
+export const IMAGE_QUALITY = 88;
+
+export const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
+export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
+
+/**
+ * Map configuration
+ */
+export const MAP_API_SOURCE_ID = 's';
+export const MAP_API_POPUP_ID = 'p';
 
 /**
  * Open Graph config

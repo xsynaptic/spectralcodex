@@ -15,6 +15,7 @@
 	},
 	"peerDependencies": {
 		"@types/geojson": "^7946.0.15",
+		"astro": "^5.0.5",
 		"geojson": "^0.5.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",

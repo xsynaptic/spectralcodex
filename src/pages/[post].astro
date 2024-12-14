@@ -7,7 +7,7 @@ import { getLocationsByPostsFunction } from '@/lib/collections/locations/utils';
 import { getPostsCollection } from '@/lib/collections/posts/data';
 import { getMapData } from '@/lib/map/map-data';
 import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
-import { getBasePath } from '@/lib/utils/routing';
+import { getMapApiBaseUrl } from '@/lib/utils/routing';
 import PostEntry from '@/pages-layouts/post-entry.astro';
 
 export const getStaticPaths = (async () => {
@@ -23,7 +23,7 @@ export const getStaticPaths = (async () => {
 				entry,
 				mapData: getMapData({
 					featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
-					apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 					// TODO: bounds buffer should probably be proportionate to the number of items
 					boundsBufferMax: 50,
 				}),

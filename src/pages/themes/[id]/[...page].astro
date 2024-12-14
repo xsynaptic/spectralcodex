@@ -11,7 +11,7 @@ import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
 import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
 import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
 import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import { getBasePath } from '@/lib/utils/routing';
+import { getMapApiBaseUrl } from '@/lib/utils/routing';
 import ThemeEntry from '@/pages-layouts/theme-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -47,7 +47,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		const mapData = getMapData({
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
-			apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 			boundsBufferMax: 400,
 			...(showChineseInterface ? { languages: ['en', 'zh'] } : {}),
 		});

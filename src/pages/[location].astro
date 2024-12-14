@@ -10,7 +10,7 @@ import { getMapData } from '@/lib/map/map-data';
 import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
 import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
 import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
-import { getBasePath } from '@/lib/utils/routing';
+import { getMapApiBaseUrl } from '@/lib/utils/routing';
 import LocationEntry from '@/pages-layouts/location-entry.astro';
 
 export const getStaticPaths = (async () => {
@@ -29,7 +29,7 @@ export const getStaticPaths = (async () => {
 					entry,
 					mapData: getMapData({
 						featureCollection: getLocationsFeatureCollection([entry]),
-						apiEndpointUrl: getBasePath(`api/v1/map/${entry.collection}/${entry.id}`),
+						mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 						targetId: entry.id, // Center on the main location
 						boundsBuffer: 2,
 						boundsBufferMax: 25,

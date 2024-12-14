@@ -26,7 +26,7 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
 		getLocationsFeatureCollection(locations, { showHiddenLocations: showHidden })
 	),
-	apiEndpointUrl: undefined,
+	mapApiBaseUrl: undefined,
 	languages,
 });
 ---

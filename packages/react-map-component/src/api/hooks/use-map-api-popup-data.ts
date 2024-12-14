@@ -8,19 +8,20 @@ import type { MapPopupDataRaw } from '../../types';
 import { useMapStoreActions } from '../../store/hooks/use-map-store';
 import { MapPopupDataSchema } from '../../types/map-schemas';
 
-// Dev server can timeout when regenerating huge amounts of content
-const isDev = import.meta.env.DEV;
-
-export function useMapApiPopupData({ apiEndpointUrl }: Pick<MapComponentProps, 'apiEndpointUrl'>) {
+// Note: dev server can timeout when regenerating large amounts of content
+export function useMapApiPopupData({
+	apiPopupUrl,
+	isDev,
+}: Pick<MapComponentProps, 'apiPopupUrl' | 'isDev'>) {
 	const { setPopupData, setPopupDataLoading } = useMapStoreActions();
 
 	const mapPopupDataQuery = useQuery({
-		queryKey: ['popup-data', apiEndpointUrl],
+		queryKey: ['popup-data', apiPopupUrl],
 		queryFn: async () => {
-			if (apiEndpointUrl) {
+			if (apiPopupUrl) {
 				try {
 					return await ky
-						.get<MapPopupDataRaw>(`${apiEndpointUrl}/2`, { timeout: isDev ? false : 10_000 })
+						.get<MapPopupDataRaw>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
 						.json();
 				} catch (error) {
 					console.error(error);
@@ -32,7 +33,7 @@ export function useMapApiPopupData({ apiEndpointUrl }: Pick<MapComponentProps, '
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 		staleTime: 100_000,
-		enabled: !!apiEndpointUrl,
+		enabled: !!apiPopupUrl,
 	});
 
 	useEffect(

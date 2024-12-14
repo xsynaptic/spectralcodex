@@ -1,4 +1,5 @@
 import { bbox, buffer, center as getCenter, truncate } from '@turf/turf';
+import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
 import type {
 	MapComponentData,
@@ -6,18 +7,27 @@ import type {
 	MapFeatureCollection,
 } from '@/lib/map/map-types';
 
+import { MAP_API_POPUP_ID, MAP_API_SOURCE_ID } from '@/constants';
 import { getLocationsMapPopupData, getLocationsMapSourceData } from '@/lib/map/map-locations';
 import { isLngLatBoundsLike } from '@/lib/map/map-type-guards';
 import { getTruncatedLngLat } from '@/lib/map/map-utils';
 
-interface MapDataBoundsArgs {
+interface MapDataBoundsProps {
 	boundsBuffer?: number | undefined;
 	boundsBufferMax?: number | undefined;
 	featureCollection: MapFeatureCollection | undefined;
 	targetId?: string | undefined; // Optional: use for centering on a specific point
 }
 
-const buildId = import.meta.env.BUILD_ID;
+interface MapDataProps extends MapDataBoundsProps {
+	mapApiBaseUrl?: string | undefined;
+}
+
+const buildProps = {
+	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
+	buildId: import.meta.env.BUILD_ID,
+	isDev: import.meta.env.DEV,
+};
 
 // Calculate map bounds based on geodata and some parameters; should not include outliers
 const getMapBounds = ({
@@ -25,7 +35,7 @@ const getMapBounds = ({
 	targetId,
 	boundsBuffer,
 	boundsBufferMax,
-}: MapDataBoundsArgs) => {
+}: MapDataBoundsProps) => {
 	if (!featureCollection) return;
 
 	const featureCollectionFiltered = {
@@ -71,20 +81,28 @@ export const getMapData = ({
 	targetId,
 	boundsBuffer = 5,
 	boundsBufferMax = 300,
-	apiEndpointUrl,
+	mapApiBaseUrl,
 	...restProps
-}: MapDataBoundsArgs & Omit<MapComponentProps, 'bounds' | 'maxBounds' | 'center'>) => {
+}: MapDataProps &
+	Omit<
+		MapComponentProps,
+		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+	>) => {
 	const mapBounds = getMapBounds({ featureCollection, targetId, boundsBuffer, boundsBufferMax });
 
 	if (featureCollection && mapBounds) {
-		if (apiEndpointUrl) {
+		if (mapApiBaseUrl) {
+			const apiSourceUrl = `${mapApiBaseUrl}/${MAP_API_SOURCE_ID}`;
+			const apiPopupUrl = `${mapApiBaseUrl}/${MAP_API_POPUP_ID}`;
+
 			return {
 				hasGeodata: true,
-				apiEndpointUrl,
-				prefetchUrls: [`${apiEndpointUrl}/1`, `${apiEndpointUrl}/2`], // Note the two part API
+				apiSourceUrl,
+				apiPopupUrl,
+				prefetchUrls: [apiSourceUrl, apiPopupUrl],
 				featureCount: featureCollection.features.length,
-				buildId,
 				...mapBounds,
+				...buildProps,
 				...restProps,
 			};
 		} else {
@@ -93,23 +111,25 @@ export const getMapData = ({
 
 			return {
 				hasGeodata: true,
-				apiEndpointUrl: undefined,
+				apiSourceUrl: undefined,
+				apiPopupUrl: undefined,
 				sourceData,
 				popupData,
 				featureCount: featureCollection.features.length,
-				buildId,
 				...mapBounds,
+				...buildProps,
 				...restProps,
 			} satisfies MapComponentData;
 		}
 	}
 	return {
 		hasGeodata: false,
-		apiEndpointUrl: undefined,
+		apiSourceUrl: undefined,
+		apiPopupUrl: undefined,
 		sourceData: undefined,
 		popupData: undefined,
 		featureCount: 0,
-		buildId,
+		...buildProps,
 		...restProps,
 	} satisfies MapComponentData;
 };

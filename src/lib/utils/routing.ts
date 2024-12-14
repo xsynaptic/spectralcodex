@@ -4,7 +4,10 @@ import type { CollectionKey } from 'astro:content';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 
-export const getBasePath = (...routeParts: string[]): string => urlJoin(BASE_URL, ...routeParts);
+export const getBaseUrl = (...routeParts: string[]): string => urlJoin(BASE_URL, ...routeParts);
+
+export const getMapApiBaseUrl = (...routeParts: string[]): string =>
+	urlJoin(BASE_URL, `api/map/${import.meta.env.BUILD_ID}`, ...routeParts);
 
 // Example: /base/{routeParts}
 export const getSiteUrl = (...routeParts: string[]): string =>

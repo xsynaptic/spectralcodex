@@ -29,7 +29,8 @@ const interactiveLayerIds = [
 ] as const;
 
 export const MapCanvas = ({
-	apiEndpointUrl,
+	apiSourceUrl,
+	apiPopupUrl,
 	baseMapTheme = 'light',
 	bounds,
 	maxBounds,
@@ -37,18 +38,20 @@ export const MapCanvas = ({
 	hash = false,
 	zoom = 12,
 	style,
+	protomapsApiKey,
+	isDev,
 }: Omit<MapComponentProps, 'geodata' | 'cluster' | 'buildId'> & {
 	style?: CSSProperties | undefined;
 }) => {
-	const mapStyle = useProtomaps({ baseMapTheme });
+	const mapStyle = useProtomaps({ protomapsApiKey, baseMapTheme });
 	const mapCanvasEvents = useMapCanvasEvents();
 	const canvasCursor = useMapCanvasCursor();
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
 
-	const { isLoading: sourceDataQueryLoading } = useMapApiSourceData({ apiEndpointUrl });
+	const { isLoading: sourceDataQueryLoading } = useMapApiSourceData({ apiSourceUrl, isDev });
 
-	useMapApiPopupData({ apiEndpointUrl });
+	useMapApiPopupData({ apiPopupUrl, isDev });
 
 	return (
 		<ReactMapGlMap

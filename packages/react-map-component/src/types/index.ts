@@ -42,7 +42,8 @@ export type ProtomapsBaseMapTheme = 'light' | 'dark' | 'white' | 'grayscale' | '
  * Map component
  */
 export interface MapComponentProps {
-	apiEndpointUrl: string | undefined;
+	apiSourceUrl?: string | undefined;
+	apiPopupUrl?: string | undefined;
 	sourceData?: MapSourceDataRaw | undefined;
 	popupData?: MapPopupDataRaw | undefined;
 	baseMapTheme?: ProtomapsBaseMapTheme;
@@ -55,7 +56,9 @@ export interface MapComponentProps {
 	zoom?: number | undefined;
 	showObjectiveFilter?: boolean | undefined;
 	languages?: string[] | undefined;
+	protomapsApiKey: string;
 	buildId?: string | undefined;
+	isDev?: boolean | undefined;
 }
 
 // Used within Astro to determine whether a map should be rendered
