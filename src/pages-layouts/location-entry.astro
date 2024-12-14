@@ -15,6 +15,7 @@ import ContentPreviewGrid from '@/components/content/content-preview-grid.astro'
 import ContentProse from '@/components/content/content-prose.astro';
 import ContentSection from '@/components/content/content-section.astro';
 import ContentSectionBacklinks from '@/components/content/content-section-backlinks.astro';
+import ContentSectionDateVisited from '@/components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '@/components/content/content-section-links.astro';
 import ContentSectionSeries from '@/components/content/content-section-series.astro';
 import ContentSectionThemes from '@/components/content/content-section-themes.astro';
@@ -158,6 +159,7 @@ const t = getTranslations();
 		}
 		<LocationsHeritage heritage={heritage} />
 		<ContentSectionLinks entry={entry} />
+		<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />

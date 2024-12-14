@@ -87,6 +87,7 @@ export const translations = {
 		'content.section.map': 'Map',
 		'content.section.locationsNearby': 'Nearby Locations',
 		'content.section.backlinks': 'Connections',
+		'content.section.dateVisited': 'Visit Log',
 
 		// Locations
 		'locations.status.demolished': 'Demolished',
