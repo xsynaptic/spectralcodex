@@ -299,6 +299,11 @@ export const linksMap = [
 		match: 'smiletaiwan.cw.com.tw',
 	},
 	{
+		title: 'Wilhelm Chang',
+		titleAlt: '張威廉',
+		match: 'wilhelmchang.com',
+	},
+	{
 		title: 'Commonwealth Magazine',
 		titleAlt: '天下雜誌',
 		match: 'www.cw.com.tw',
@@ -350,7 +355,7 @@ export const linksMap = [
 		match: 'commons.wikimedia.org',
 	},
 	{
-		title: 'Google Maps',
+		title: 'Google Maps', // Note: this is used when generating map data for locations
 		match: 'maps.app.goo.gl',
 	},
 	{
