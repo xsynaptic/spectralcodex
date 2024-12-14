@@ -10,7 +10,7 @@
 		"satori": "^0.12.0"
 	},
 	"peerDependencies": {
-		"@spectralcodex/tailwind/config": "workspace:*",
+		"@spectralcodex/tailwind": "workspace:*",
 		"sharp": "^0.33.5"
 	}
 }

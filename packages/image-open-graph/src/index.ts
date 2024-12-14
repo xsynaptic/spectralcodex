@@ -1,7 +1,7 @@
 import satori from 'satori';
 import sharp from 'sharp';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { OpenGraphMetadataItem } from './types';
 import type { SatoriOptions } from 'satori';
 
 import { getOpenGraphImageElement } from './element';
@@ -37,7 +37,7 @@ export function getGenerateOpenGraphImageFunction({
 	const width = 'width' in satoriOptions ? satoriOptions.width : 900;
 
 	return async function generateOpenGraphImage(
-		entry: ContentMetadataItem,
+		entry: OpenGraphMetadataItem,
 		imageObject?: sharp.Sharp,
 	): Promise<Buffer> {
 		const imageEncoded = imageObject

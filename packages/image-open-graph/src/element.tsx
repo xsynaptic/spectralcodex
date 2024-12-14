@@ -1,11 +1,11 @@
 import { tailwindConfig } from '@spectralcodex/tailwind/config';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { OpenGraphMetadataItem } from './types';
 
 const colors = tailwindConfig.theme.colors;
 
 export function getOpenGraphImageElement(
-	entry: ContentMetadataItem,
+	entry: OpenGraphMetadataItem,
 	image?: {
 		src: string;
 		height: number;

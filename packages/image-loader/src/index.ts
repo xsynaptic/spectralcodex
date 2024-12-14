@@ -81,7 +81,6 @@ function getSyncDataFunction({
 			filePath,
 			mtime: modifiedTime,
 			options,
-			env: import.meta.env.MODE,
 		});
 
 		// Does this entry already exist?
