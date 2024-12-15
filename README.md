@@ -15,13 +15,19 @@ If your deployment needs are simple you can use the built-in rsync-based deploym
 ## Project Structure
 
 - `./astro`: automatically generated types and schemas
-- `./config`: custom image service and Tailwind config only used by the build system
 - `./dist`: output folder, automatically generated; delete this anytime
-- `./example`: some example content and media for testing purposes
+- `./packages/content-example`: example content for testing and demonstration purposes
+- `./packages/image-loader`: an experimental image loader
+- `./packages/image-open-graph`: an experimental OpenGraph image generator using Satori
+- `./packages/image-service`: a slightly customized version of the default image service
+- `./packages/react-map-component`: interactive map component used across this project
+- `./packages/tailwind`: Tailwind CSS configuration files and a utility that returns a resolved configuration
+- `./packages/unified`: bits and bobs from the unified ecosystem
 - `./public`: contains a favicon and some fallback Open Graph images for general use
-- `./public/fonts`: required for generating Open Graph images using Satori
+- `./public/fonts`: required for generating OpenGraph images using Satori; generated with a script
 - `./public/icons`: icons for use with the map component; still a work in progress
 - `./scripts`: various scripts for deployment, cleaning unused images out of builds, etc.
+- `./src`: primary project source files
 - `./temp`: temporary storage, delete anytime
 
 ## Notes

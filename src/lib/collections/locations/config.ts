@@ -1,7 +1,7 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/react-map-component';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
-import { CONTENT_PATH } from 'astro:env/server';
+import { COLLECTIONS_PATH } from 'astro:env/server';
 
 import { LocationTwHeritageSchema } from '@/lib/collections/locations/schemas';
 import {
@@ -16,7 +16,7 @@ import { LinkSchema } from '@/lib/schemas/links';
 import { SourceSchema } from '@/lib/schemas/sources';
 
 export const locations = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_PATH}/locations` }),
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${COLLECTIONS_PATH}/locations` }),
 	schema: z
 		.object({
 			slug: z.string(),

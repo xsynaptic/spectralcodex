@@ -34,11 +34,10 @@ temp
 public/fonts
 
 # ignore content and media
-/content/
-/media/
+packages/content/
 
-# example content
-example/
+# example content, still under development
+packages/content-example/
 
 # ignore some files temporarily
 .dockerignore

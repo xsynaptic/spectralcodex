@@ -61,15 +61,15 @@ export default defineConfig({
 				// This should match `outDir` and may need `server` added when using the Node adapter
 				default: './dist',
 			}),
-			CONTENT_PATH: envField.string({
+			COLLECTIONS_PATH: envField.string({
 				context: 'server',
 				access: 'public',
-				default: './example/content',
+				default: './packages/content-example/collections',
 			}),
 			MEDIA_PATH: envField.string({
 				context: 'server',
 				access: 'public',
-				default: './example/media',
+				default: './packages/content-example/media',
 			}),
 			SITE_YEAR_FOUNDED: envField.string({
 				context: 'client',

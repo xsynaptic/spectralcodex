@@ -1,12 +1,12 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
-import { CONTENT_PATH } from 'astro:env/server';
+import { COLLECTIONS_PATH } from 'astro:env/server';
 
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
 import { getFeaturedImagesSchema } from '@/lib/schemas/image';
 
 export const series = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_PATH}/series` }),
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${COLLECTIONS_PATH}/series` }),
 	schema: z
 		.object({
 			title: TitleSchema,

@@ -8,7 +8,7 @@
 		"build": "astro check && astro build --max-old-space-size=4096",
 		"preview": "astro preview",
 		"lint": "eslint",
-		"lint-content": "eslint ./content --config ./content/eslint.config.mjs",
+		"lint-content": "eslint ./packages/content --config ./packages/content/eslint.config.mjs",
 		"test": "vitest",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"copy-public-fonts": "tsx ./scripts/copy-public-fonts.ts",
