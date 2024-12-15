@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint';
 
 const config = tseslint.config(
 	{
-		ignores: ['**/node_modules', '**/dist', 'dist/**/*', '**/node_modules', '**/.astro'],
+		ignores: ['**/node_modules', '**/dist', 'dist/**/*', '**/.astro', 'content/**/*'],
 	},
 	eslint.configs.recommended,
 	...tseslint.configs.strictTypeChecked,

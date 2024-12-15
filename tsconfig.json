@@ -12,12 +12,6 @@
 			"@/*": ["src/*"]
 		}
 	},
-	"include": [".astro/types.d.ts", "**/*", "**/*.astro", "./.remarkrc.js"],
-	"exclude": [".vscode", "dist"],
-	// Note 1: MDXProvidedComponents needs to be globally defined in a file with an `export {}`
-	// Note 2: MDX server crashes when plugins are not installed directly in this repo
-	"mdx": {
-		"checkMdx": true,
-		"plugins": [["remark-frontmatter", ["yaml"]], "remark-gfm", "remark-smartypants"]
-	}
+	"include": [".astro/types.d.ts", "**/*", "**/*.astro"],
+	"exclude": [".vscode", "dist"]
 }
