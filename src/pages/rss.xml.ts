@@ -1,11 +1,10 @@
 import mdxRenderer from '@astrojs/mdx/server.js';
 import rss from '@astrojs/rss';
-import { sanitizeHtml, stripTags, transformMarkdown } from '@spectralcodex/unified';
+import { defaultSchema, sanitizeHtml, stripTags, transformMarkdown } from '@spectralcodex/unified';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pLimit from 'p-limit';
-import { defaultSchema } from 'rehype-sanitize';
 import * as R from 'remeda';
 
 import type { RSSFeedItem } from '@astrojs/rss';
