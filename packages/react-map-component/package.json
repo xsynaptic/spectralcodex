@@ -7,7 +7,7 @@
 	"dependencies": {
 		"@tanstack/react-query": "^5.62.7",
 		"maplibre-gl": "^4.7.1",
-		"pmtiles": "^4.0.1",
+		"pmtiles": "^4.1.0",
 		"protomaps-themes-base": "^4.3.0",
 		"react-map-gl": "^7.2.0-beta.1",
 		"zod": "^3.24.1",

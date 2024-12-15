@@ -128,7 +128,7 @@ const MapFilterStatusShowHideMenu = () => {
 						</span>
 					</>
 				) : (
-					translations.showAll
+					translations.hideAll
 				)}
 			</MapFilterStatusShowHideMenuItem>
 		</>
