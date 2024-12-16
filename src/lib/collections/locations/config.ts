@@ -5,7 +5,6 @@ import { COLLECTIONS_PATH } from 'astro:env/server';
 
 import { LocationTwHeritageSchema } from '@/lib/collections/locations/schemas';
 import {
-	DateStringOrArraySchema,
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
@@ -37,7 +36,7 @@ export const locations = defineCollection({
 			precision: NumericScaleSchema,
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			dateVisited: DateStringOrArraySchema.optional(),
+			dateVisited: DateStringSchema.array().optional(),
 			imageFeatured: reference('images').optional(),
 			imageHero: reference('images').optional(),
 			rating: NumericScaleSchema,

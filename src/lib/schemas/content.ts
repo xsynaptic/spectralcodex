@@ -15,8 +15,6 @@ export const DescriptionSchema = z.string().min(DESCRIPTION_CHARACTER_LENGTH, {
 // Date schema
 export const DateStringSchema = z.string().transform((value) => new Date(value));
 
-export const DateStringOrArraySchema = DateStringSchema.or(DateStringSchema.array());
-
 // Numeric scale schema, from 1 to 5; used by locations and timelines
 export const NumericScaleSchema = z.number().int().min(1).max(5);
 
