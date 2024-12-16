@@ -4,12 +4,9 @@ export const MDX_COMPONENTS_TO_STRIP = ['Img', 'ImgGroup', 'Map', 'More'];
 /**
  * Content schemas
  */
-export const CONTENT_IMAGE_DEFAULT_PATH = '@/assets/';
-
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
-// TODO: increase this value after all original images have been validated
-export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 100;
+export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
 
 /**
  * Image processing
