@@ -11,11 +11,12 @@ import { getContentUrl } from '@/lib/utils/routing';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;
+	showCurrentLink?: boolean;
 	showFeatured?: boolean;
 	dividerColor?: DividerColor;
 }
 
-const { entry, showFeatured = false, dividerColor } = Astro.props;
+const { entry, showCurrentLink = false, showFeatured = false, dividerColor } = Astro.props;
 
 const getRegionAncestors = await getRegionAncestorsFunction();
 
@@ -34,7 +35,7 @@ const t = getTranslations();
 						dividerContent="chevron"
 						aria-current={termAncestor.id === entry.id ? 'page' : undefined}
 					>
-						{termAncestor.id === entry.id ? (
+						{!showCurrentLink && termAncestor.id === entry.id ? (
 							termAncestor.data.title
 						) : (
 							<Link
