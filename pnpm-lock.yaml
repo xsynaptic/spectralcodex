@@ -53,6 +53,9 @@ importers:
       '@sindresorhus/slugify':
         specifier: ^2.2.1
         version: 2.2.1
+      '@spectralcodex/content-demo':
+        specifier: workspace:*
+        version: link:packages/content-demo
       '@spectralcodex/image-loader':
         specifier: workspace:*
         version: link:packages/image-loader
@@ -254,7 +257,7 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
 
-  packages/content-example:
+  packages/content-demo:
     dependencies:
       astro:
         specifier: ^5.0.5

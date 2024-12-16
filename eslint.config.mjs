@@ -2,7 +2,6 @@
 import eslint from '@eslint/js';
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import astroPlugin from 'eslint-plugin-astro';
-// import mdxPlugin from 'eslint-plugin-mdx';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
 import globals from 'globals';
@@ -150,26 +149,6 @@ const config = tseslint.config(
 				...globals.browser,
 			},
 		},
-	},
-
-	/**
-	 * MDX; not ready for prime time
-	 */
-	{
-		// ...mdxPlugin.flat,
-		// files: ['./*.md', '**/*/*.md', '**/*/*.mdx'],
-		/*
-		languageOptions: {
-			globals: {
-				Img: 'readonly',
-				ImgGroup: 'readonly',
-				Link: 'readonly',
-				Map: 'readonly',
-				More: 'readonly',
-			},
-		},
-		*/
-		// ...tseslint.configs.disableTypeChecked,
 	},
 );
 

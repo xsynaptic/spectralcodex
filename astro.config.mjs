@@ -64,12 +64,12 @@ export default defineConfig({
 			COLLECTIONS_PATH: envField.string({
 				context: 'server',
 				access: 'public',
-				default: './packages/content-example/collections',
+				default: './packages/content-demo/collections',
 			}),
 			MEDIA_PATH: envField.string({
 				context: 'server',
 				access: 'public',
-				default: './packages/content-example/media',
+				default: './packages/content-demo/media',
 			}),
 			SITE_YEAR_FOUNDED: envField.string({
 				context: 'client',
