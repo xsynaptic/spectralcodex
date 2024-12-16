@@ -18,9 +18,6 @@ import { getLocationsByThemeFunction } from '@/lib/collections/themes/utils';
 import { getLocationsMapApiData } from '@/lib/map/map-locations';
 import { generateApiResponse } from '@/lib/utils/api';
 
-// Note: API versioning is accomplished through the use of a build ID
-const build = import.meta.env.BUILD_ID;
-
 // Split the API into source and popup data
 function getMapApiId(index: number) {
 	return index === 0 ? MAP_API_SOURCE_ID : MAP_API_POPUP_ID;
@@ -55,7 +52,6 @@ export const getStaticPaths = (async () => {
 				R.map((data, index) => ({
 					params: {
 						id: `${entry.collection}/${entry.id}/${getMapApiId(index)}`,
-						build,
 					},
 					props: { data },
 				})),
@@ -72,7 +68,7 @@ export const getStaticPaths = (async () => {
 				getLocationsByPosts,
 				getLocationsMapApiData,
 				R.map((data, index) => ({
-					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}`, build },
+					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}` },
 					props: { data },
 				})),
 			),
@@ -88,7 +84,7 @@ export const getStaticPaths = (async () => {
 				getLocationsByIds,
 				getLocationsMapApiData,
 				R.map((data, index) => ({
-					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}`, build },
+					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}` },
 					props: { data },
 				})),
 			),
@@ -105,7 +101,7 @@ export const getStaticPaths = (async () => {
 				R.filter((item) => !!item),
 				getLocationsMapApiData,
 				R.map((data, index) => ({
-					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}`, build },
+					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}` },
 					props: { data },
 				})),
 			),
@@ -121,7 +117,7 @@ export const getStaticPaths = (async () => {
 				getLocationsByTheme,
 				getLocationsMapApiData,
 				R.map((data, index) => ({
-					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}`, build },
+					params: { id: `${entry.collection}/${entry.id}/${getMapApiId(index)}` },
 					props: { data },
 				})),
 			),
@@ -134,7 +130,7 @@ export const getStaticPaths = (async () => {
 		objectiveLocations,
 		(locations) => getLocationsMapApiData(locations, { showHiddenLocations: true }),
 		R.map((data, index) => ({
-			params: { id: `objectives/${getMapApiId(index)}`, build },
+			params: { id: `objectives/${getMapApiId(index)}` },
 			props: { data },
 		})),
 	);
