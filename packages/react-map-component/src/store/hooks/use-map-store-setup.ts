@@ -45,6 +45,7 @@ export const useMapStoreSetup = ({
 		[initialStatePartial],
 	);
 
+	// TODO: persistent storage with the build ID as key
 	const [mapStore] = useState(() =>
 		createStore<MapDataStore>()((set, get) => ({
 			...initialState,

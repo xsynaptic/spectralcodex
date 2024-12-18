@@ -35,7 +35,7 @@ let exiftool: ExifTool;
 export const images = defineCollection({
 	loader: imageLoader({
 		base: MEDIA_PATH,
-		concurrency: 40,
+		concurrency: 80,
 		dataHandler: async ({ filePathRelative, fileUrl, logger }) => {
 			const placeholder = await getImagePlaceholder({ fileUrl, logger });
 

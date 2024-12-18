@@ -64,7 +64,7 @@ function getSyncDataFunction({
 	'store' | 'parseData' | 'generateDigest' | 'logger'
 >) {
 	// Limit the concurrency of files processed to reduce memory usage
-	const limit = pLimit(options.concurrency ?? 20);
+	const limit = pLimit(options.concurrency ?? 50);
 
 	return async function syncData({
 		id,
