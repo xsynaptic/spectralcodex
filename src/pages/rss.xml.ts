@@ -3,8 +3,8 @@ import rss from '@astrojs/rss';
 import { defaultSchema, sanitizeHtml, stripTags, transformMarkdown } from '@spectralcodex/unified';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
+import { DEBUG_RSS_FEED } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
-import pLimit from 'p-limit';
 import * as R from 'remeda';
 
 import type { RSSFeedItem } from '@astrojs/rss';
@@ -23,7 +23,6 @@ const container = await AstroContainer.create();
 
 container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
 
-// TODO: remove script tag from feed header?
 const getRssItem = async (
 	item: CollectionEntry<'ephemera' | 'posts'> | CollectionEntry<'locations'>,
 ) => {
@@ -54,9 +53,11 @@ const getRssItem = async (
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 
-	console.log(
-		`[RSS] Generated entry for "${title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
-	);
+	if (DEBUG_RSS_FEED) {
+		console.log(
+			`[RSS] Generated entry for "${title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		);
+	}
 
 	return rssFeedItem;
 };
@@ -67,15 +68,13 @@ const getRssItem = async (
 export async function GET(context: APIContext): Promise<Response> {
 	const startTime = performance.now();
 
-	console.log(`[RSS] Initializing feed...`);
+	if (DEBUG_RSS_FEED) console.log(`[RSS] Initializing feed...`);
 
 	const { ephemera } = await getEphemeraCollection();
 	const { locations } = await getLocationsCollection();
 	const { posts } = await getPostsCollection();
 
 	const t = getTranslations();
-
-	const limit = pLimit(20);
 
 	const items = R.pipe(
 		await R.pipe(
@@ -86,7 +85,7 @@ export async function GET(context: APIContext): Promise<Response> {
 			],
 			R.sort(sortByDateReverseChronological),
 			R.take(20),
-			(items) => Promise.all(items.map((item) => limit(() => getRssItem(item)))),
+			(items) => Promise.all(items.map((item) => getRssItem(item))),
 		),
 		R.sort((a, b) => (a.pubDate && b.pubDate ? b.pubDate.getTime() - a.pubDate.getTime() : -1)),
 		R.take(20),
@@ -100,12 +99,14 @@ export async function GET(context: APIContext): Promise<Response> {
 		items,
 	});
 
-	console.log(`[RSS] Generated in ${Number(performance.now() - startTime).toFixed(5)}ms`);
+	if (DEBUG_RSS_FEED) {
+		console.log(`[RSS] Generated in ${Number(performance.now() - startTime).toFixed(5)}ms`);
 
-	if (items.length > 0) {
-		console.log(`[RSS] Feed contains ${String(items.length)} items:`);
-		for (const item of items) {
-			console.log(`- ${item.title}`);
+		if (items.length > 0) {
+			console.log(`[RSS] Feed contains ${String(items.length)} items:`);
+			for (const item of items) {
+				console.log(`- ${item.title}`);
+			}
 		}
 	}
 

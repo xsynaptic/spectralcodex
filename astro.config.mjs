@@ -66,6 +66,11 @@ export default defineConfig({
 				access: 'public',
 				default: './packages/content-demo/collections',
 			}),
+			DEBUG_RSS_FEED: envField.boolean({
+				context: 'server',
+				access: 'public',
+				default: false,
+			}),
 			MEDIA_PATH: envField.string({
 				context: 'server',
 				access: 'public',
