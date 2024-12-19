@@ -1,7 +1,11 @@
-/* eslint-disable unicorn/no-process-exit */
+#!/usr/bin/env tsx
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
+/**
+ * This script is designed for use with Satori and OpenGraph image generation
+ * There's no need to use it if you haven't fully implemented this feature
+ */
 // Note: these should match whatever is being used in the Satori config
 const filesToCopy = [
 	'node_modules/@fontsource/geologica/files/geologica-latin-300-normal.woff',
