@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { MAP_GEOMETRY_COORDINATES_PRECISION } from '@/constants';
+
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
 export const validateLocations = (locations: CollectionEntry<'locations'>[]) => {
@@ -66,7 +68,7 @@ export const validateLocations = (locations: CollectionEntry<'locations'>[]) => 
 			}
 			default: {
 				const coordinatesString = location.data.geometry.coordinates
-					.map((coordinate) => coordinate.toString().slice(0, -1))
+					.map((coordinate) => coordinate.toFixed(MAP_GEOMETRY_COORDINATES_PRECISION - 1))
 					.join('x');
 
 				if (locationCoordinates.has(coordinatesString)) {

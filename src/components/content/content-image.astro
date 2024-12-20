@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
-import { FEATURE_IMAGE_PAGES } from 'astro:env/server';
 
 import type { ImageLayoutOption } from '@/lib/image/image-layout';
 import type { LocalImageProps } from 'astro:assets';
 
+import { FEATURE_IMAGE_PAGES } from '@/constants';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageById } from '@/lib/collections/images/utils';
 import { getImageLayoutProps } from '@/lib/image/image-layout';
