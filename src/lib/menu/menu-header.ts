@@ -1,7 +1,6 @@
-import { FEATURE_DATE_ARCHIVES } from 'astro:env/server';
-
 import type { MenuItem } from '@/lib/menu/menu-types';
 
+import { FEATURE_DATE_ARCHIVES } from '@/constants';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getSiteUrl } from '@/lib/utils/routing';
 

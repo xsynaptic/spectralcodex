@@ -1,8 +1,7 @@
 ---
-import { FEATURE_IMAGE_PAGES } from 'astro:env/server';
-
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
+import { FEATURE_IMAGE_PAGES } from '@/constants';
 import { getImagesCollection } from '@/lib/collections/images/data';
 import ImageEntry from '@/pages-layouts/image-entry.astro';
 

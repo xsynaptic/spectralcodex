@@ -1,3 +1,4 @@
+// Not covered by astro:env but sometimes used in the application
 interface ImportMetaEnv {
 	readonly BUILD_ID: string;
 	readonly BUILD_OUTPUT_PATH: string;

@@ -1,12 +1,12 @@
 import { stripTags, transformMarkdown } from '@spectralcodex/unified';
 import { countWords } from 'alfaaz';
-import { SITE_YEAR_FOUNDED } from 'astro:env/client';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
 import type { ContentMetadataIndex, ContentMetadataItem } from '@/types/metadata';
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
+import { SITE_YEAR_FOUNDED } from '@/constants';
 import { MDX_COMPONENTS_TO_STRIP } from '@/constants';
 import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
 import { getLocationsCollection } from '@/lib/collections/locations/data';

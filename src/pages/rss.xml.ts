@@ -3,7 +3,6 @@ import rss from '@astrojs/rss';
 import { defaultSchema, sanitizeHtml, stripTags, transformMarkdown } from '@spectralcodex/unified';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
-import { DEBUG_RSS_FEED } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
@@ -18,6 +17,9 @@ import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
 import { parseContentDate, sortByDateReverseChronological } from '@/lib/utils/date';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getContentUrl } from '@/lib/utils/routing';
+
+// Provide some helpful info while debugging RSS feed generation
+const DEBUG_RSS_FEED = true as boolean;
 
 const container = await AstroContainer.create();
 

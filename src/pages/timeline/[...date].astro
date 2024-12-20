@@ -1,9 +1,9 @@
 ---
-import { FEATURE_DATE_ARCHIVES } from 'astro:env/server';
 import * as R from 'remeda';
 
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
+import { FEATURE_DATE_ARCHIVES } from '@/constants';
 import { getTimelineItemsMap } from '@/lib/timeline/timeline-items';
 import { getTimelineProps } from '@/lib/timeline/timeline-props';
 import TimelineMonthlyIndex from '@/pages-layouts/timeline-monthly-index.astro';

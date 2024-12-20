@@ -1,9 +1,9 @@
 import slugify from '@sindresorhus/slugify';
-import { FEATURE_SHORTCODES_ERROR_LOG } from 'astro:env/server';
 
 import type { ContentMetadataItem } from '@/types/metadata';
 import type { CollectionKey } from 'astro:content';
 
+import { FEATURE_SHORTCODES_ERROR_LOG } from '@/constants';
 import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
 import { logError } from '@/lib/utils/logging';
 

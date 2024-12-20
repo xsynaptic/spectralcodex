@@ -1,9 +1,9 @@
 ---
-import { FEATURE_DATE_ARCHIVES } from 'astro:env/server';
 import * as R from 'remeda';
 
 import type { TimelineYearlyData } from '@/lib/timeline/timeline-types';
 
+import { FEATURE_DATE_ARCHIVES } from '@/constants';
 import { getTimelineYearlyMap } from '@/lib/timeline/timeline-items';
 import TimelineYearlyIndex from '@/pages-layouts/timeline-yearly-index.astro';
 
