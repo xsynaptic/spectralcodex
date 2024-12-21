@@ -1,13 +1,13 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
-import { COLLECTIONS_PATH } from 'astro:env/server';
 
+import { CONTENT_COLLECTIONS_PATH } from '@/constants';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
 import { getFeaturedImagesSchema } from '@/lib/schemas/image';
 import { LinkSchema } from '@/lib/schemas/links';
 
 export const regions = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${COLLECTIONS_PATH}/regions` }),
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/regions` }),
 	schema: z
 		.object({
 			slug: z.string(),

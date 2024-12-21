@@ -1,7 +1,7 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
-import { COLLECTIONS_PATH } from 'astro:env/server';
 
+import { CONTENT_COLLECTIONS_PATH } from '@/constants';
 import {
 	DateStringSchema,
 	DescriptionSchema,
@@ -12,7 +12,7 @@ import { LinkSchema } from '@/lib/schemas/links';
 
 // Note: pages do not have a flat structure; the URL will reflect the location on the file system
 export const pages = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${COLLECTIONS_PATH}/pages` }),
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/pages` }),
 	schema: z
 		.object({
 			title: TitleSchema,

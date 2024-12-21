@@ -1,8 +1,8 @@
 import { imageLoader } from '@spectralcodex/image-loader';
 import { defineCollection, z } from 'astro:content';
-import { MEDIA_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 
+import { CONTENT_MEDIA_PATH } from '@/constants';
 import {
 	getImageExposureValue,
 	getImagePlaceholder,
@@ -34,7 +34,7 @@ let exiftool: ExifTool;
 
 export const images = defineCollection({
 	loader: imageLoader({
-		base: MEDIA_PATH,
+		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
 		dataHandler: async ({ filePathRelative, fileUrl, logger }) => {
 			const placeholder = await getImagePlaceholder({ fileUrl, logger });

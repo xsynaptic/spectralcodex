@@ -1,12 +1,12 @@
 /**
- * Site configuration
+ * Content collections and schemas
  */
-// A string representing the year the site was founded; will default to the current year
-export const SITE_YEAR_FOUNDED = 2009;
+// Path to content from the root; defaults *e.g.* `./packages/content-demo/collections`
+export const CONTENT_COLLECTIONS_PATH = './packages/content-demo/collections';
 
-/**
- * Content schemas
- */
+// Path to image assets from the root; *e.g.* `./packages/content-demo/media`
+export const CONTENT_MEDIA_PATH = './packages/content-demo/media';
+
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
 export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
@@ -55,6 +55,12 @@ export const OPEN_GRAPH_IMAGE_DENSITY = 2;
 
 // Not sure how useful this is nowadays
 export const OPEN_GRAPH_TWITTER_USERNAME = '@spectralcodex';
+
+/**
+ * Various settings
+ */
+// A string representing the year the site was founded; will default to the current year
+export const SITE_YEAR_FOUNDED = 2009;
 
 /**
  * Feature flags
