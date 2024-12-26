@@ -1,10 +1,39 @@
-# TODO
+# Notes
+
+## MDX Configuration
+
+- `tsconfig` should also specify the remark plugin toolchain Astro uses (and the user may modify) to lint Markdown and MDX files
+- ESLint should be used to lint and format MDX files; Prettier support for MDX is not comprehensive and errors will be introduced when using it as the MDX formatter
+
+## Image Assets
+
+Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom. Be sure to clean unreferenced original images out of your builds; they take up a lot of space without providing any benefit!
+
+## Metadata Improvements
+
+In cases where you'd like to find properties _not_ present in frontmatter, run this from the `content` folder (exchanging "rating:" for whatever you want to find):
+
+```sh
+find . -name "*.mdx" -print0 | xargs -0 grep -L "rating:" | sort
+```
+
+## Build Profiling
+
+This worked pretty well to debug some major issues with `getCollection` calls:
+
+```sh
+npx 0x -- node ./node_modules/astro/astro.js build
+```
+
+## Map Icons
+
+Experimental: This site uses custom map icons. To regenerate icons run `pnpm export-map-icons`. This requires [spreet](https://github.com/flother/spreet) to be installed separately (and globally).
 
 ## Bugs
 
 - API endpoints are returning scrambled CJK characters in production; the issue might be at the level of Cloudflare, as Astro is generating correct data
 
-## Features
+## Todo
 
 - new content collection for commercial establishments (restaurants, cafes, etc.)... gastronomy?
 - [remark-oembed](https://github.com/sergioramos/remark-oembed), [mdx-embed](https://mdx-embed.netlify.app/), or [astro embed](https://astro-embed.netlify.app/)
