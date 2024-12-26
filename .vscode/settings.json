@@ -134,7 +134,8 @@
 		"strings": true
 	},
 	"files.associations": {
-		"*.css": "tailwindcss"
+		"*.css": "tailwindcss",
+		"*.conf.template": "nginx"
 	},
 	"workbench.editor.labelFormat": "short",
 	"[astro]": {

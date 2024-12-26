@@ -1,5 +1,6 @@
 // @ts-check
 import mdx from '@astrojs/mdx';
+import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwind from '@astrojs/tailwind';
@@ -48,59 +49,16 @@ export default defineConfig({
 			fallback: `/${BASE_PATH ?? ''}`, // Used by all other assets
 		},
 	},
-	/* TODO: implement SSR
 	adapter: node({
 		mode: 'standalone',
 	}),
-	*/
 	env: {
 		schema: {
 			BUILD_OUTPUT_PATH: envField.string({
 				context: 'server',
 				access: 'secret',
 				// This should match `outDir` and may need `server` added when using the Node adapter
-				default: './dist',
-			}),
-			COLLECTIONS_PATH: envField.string({
-				context: 'server',
-				access: 'public',
-				default: './packages/content-demo/collections',
-			}),
-			DEBUG_RSS_FEED: envField.boolean({
-				context: 'server',
-				access: 'public',
-				default: false,
-			}),
-			MEDIA_PATH: envField.string({
-				context: 'server',
-				access: 'public',
-				default: './packages/content-demo/media',
-			}),
-			SITE_YEAR_FOUNDED: envField.string({
-				context: 'client',
-				access: 'public',
-				default: String(currentDate.getFullYear()),
-			}),
-			FEATURE_DATE_ARCHIVES: envField.boolean({
-				context: 'server',
-				access: 'public',
-				default: false,
-			}),
-			FEATURE_IMAGE_PAGES: envField.boolean({
-				context: 'server',
-				access: 'public',
-				default: false,
-			}),
-			FEATURE_OPEN_GRAPH_IMAGES: envField.boolean({
-				context: 'server',
-				access: 'public',
-				default: false,
-			}),
-			FEATURE_SEARCH: envField.boolean({ context: 'server', access: 'public', default: false }),
-			FEATURE_SHORTCODES_ERROR_LOG: envField.boolean({
-				context: 'server',
-				access: 'public',
-				default: false,
+				default: './dist/server',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({ context: 'client', access: 'public' }),
 		},

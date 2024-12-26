@@ -41,8 +41,6 @@ packages/content-demo/collections
 packages/content-demo/media
 
 # ignore some files temporarily
-.dockerignore
-Dockerfile
-config/nginx/
+config/
 public/icons/
 public/og*.jpg
