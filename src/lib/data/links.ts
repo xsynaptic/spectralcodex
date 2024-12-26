@@ -367,6 +367,11 @@ export const linksMap = [
 		match: 'opengovtw.com',
 	},
 	{
+		title: 'Lanyang Museum',
+		titleAlt: '宜蘭縣立蘭陽博物館',
+		match: 'lym.gov.tw',
+	},
+	{
 		title: 'POW Taiwan',
 		match: 'powtaiwan.org',
 	},
