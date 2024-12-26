@@ -4,8 +4,8 @@
 	"description": "React map component for Spectral Codex",
 	"exports": "./src/index.tsx",
 	"private": true,
-	"dependencies": {
-		"@tanstack/react-query": "^5.62.8",
+	"devDependencies": {
+		"@tanstack/react-query": "^5.62.10",
 		"maplibre-gl": "^4.7.1",
 		"pmtiles": "^4.1.0",
 		"protomaps-themes-base": "^4.3.0",

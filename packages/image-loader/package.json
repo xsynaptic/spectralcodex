@@ -6,12 +6,10 @@
 		".": "./src/index.ts"
 	},
 	"private": true,
-	"dependencies": {
+	"devDependencies": {
+		"@types/micromatch": "^4.0.9",
 		"fast-glob": "^3.3.2",
 		"micromatch": "^4.0.8"
-	},
-	"devDependencies": {
-		"@types/micromatch": "^4.0.9"
 	},
 	"peerDependencies": {
 		"astro": "^5.0.5",
