@@ -2,10 +2,10 @@
  * Content collections and schemas
  */
 // Path to content from the root; defaults *e.g.* `./packages/content-demo/collections`
-export const CONTENT_COLLECTIONS_PATH = './packages/content-demo/collections';
+export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 
 // Path to image assets from the root; *e.g.* `./packages/content-demo/media`
-export const CONTENT_MEDIA_PATH = './packages/content-demo/media';
+export const CONTENT_MEDIA_PATH = './packages/content/media';
 
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
