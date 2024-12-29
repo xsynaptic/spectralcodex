@@ -11,7 +11,7 @@ import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
 
 const isProduction = process.env.NODE_ENV === 'production';
-const isSsr = process.env.SSR === 'true';
+const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
 const {
 	DEV_SERVER_URL = 'http://localhost:4321/',
@@ -63,7 +63,7 @@ export default defineConfig({
 			BUILD_OUTPUT_PATH: envField.string({
 				context: 'server',
 				access: 'secret',
-				// This should match `outDir` and may need `server` added when using the Node adapter
+				// This should match `outDir`; `server` must be added to the path when using the Node adapter
 				default: isSsr ? './dist/server' : './dist',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({ context: 'client', access: 'public' }),
