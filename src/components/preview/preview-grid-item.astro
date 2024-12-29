@@ -19,19 +19,7 @@ interface Props extends PreviewItemProps {
 }
 
 const {
-	item: {
-		collection,
-		title,
-		titleAlt,
-		url,
-		description,
-		date,
-		imageId,
-		regionPrimaryId,
-		postCount,
-		locationCount,
-		wordCount,
-	},
+	item,
 	showCollection,
 	showLocations,
 	showDate,
@@ -43,24 +31,24 @@ const {
 	showWordCount,
 } = Astro.props;
 
-const indexUrl = getSiteUrl(collection);
+const indexUrl = getSiteUrl(item.collection);
 
 const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
 
 const regions =
-	showRegion && regionPrimaryId
-		? getRegionAncestorsById(regionPrimaryId).slice(0, 2).reverse()
+	showRegion && item.regionPrimaryId
+		? getRegionAncestorsById(item.regionPrimaryId).slice(0, 2).reverse()
 		: undefined;
 
 const t = getTranslations();
 ---
 
-<Preview imageId={imageId} linkUrl={url} alt={title}>
-	<Fragment slot="preview-title">{title}</Fragment>
+<Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
+	<Fragment slot="preview-title">{item.title}</Fragment>
 	{
-		showTitleAlt && titleAlt ? (
+		showTitleAlt && item.titleAlt ? (
 			<Fragment slot="preview-title-alt">
-				<FormatCjk>{titleAlt}</FormatCjk>
+				<FormatCjk>{item.titleAlt}</FormatCjk>
 			</Fragment>
 		) : undefined
 	}
@@ -70,10 +58,10 @@ const t = getTranslations();
 				<DividedItem>
 					{indexUrl ? (
 						<Link href={indexUrl} class="font-semibold">
-							{t(`collection.${collection}.labelSingular`)}
+							{t(`collection.${item.collection}.labelSingular`)}
 						</Link>
 					) : (
-						<div class="font-semibold">{t(`collection.${collection}.labelSingular`)}</div>
+						<div class="font-semibold">{t(`collection.${item.collection}.labelSingular`)}</div>
 					)}
 				</DividedItem>
 			) : undefined
@@ -90,39 +78,40 @@ const t = getTranslations();
 			) : undefined
 		}
 		{
-			showLocations && locationCount && locationCount > 0 ? (
+			showLocations && item.locationCount && item.locationCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('collection.locations.labelPlural')}: <FormatNumber>{locationCount}</FormatNumber>
+						{t('collection.locations.labelPlural')}:{' '}
+						<FormatNumber>{item.locationCount}</FormatNumber>
 					</span>
 				</DividedItem>
 			) : undefined
 		}
 		{
-			showPosts && postCount && postCount > 0 ? (
+			showPosts && item.postCount && item.postCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('collection.posts.labelPlural')}: <FormatNumber>{postCount}</FormatNumber>
+						{t('collection.posts.labelPlural')}: <FormatNumber>{item.postCount}</FormatNumber>
 					</span>
 				</DividedItem>
 			) : undefined
 		}
 		{
-			showWordCount && wordCount && wordCount > 0 ? (
+			showWordCount && item.wordCount && item.wordCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('content.meta.wordCount.label')}: <FormatNumber>{wordCount}</FormatNumber>
+						{t('content.meta.wordCount.label')}: <FormatNumber>{item.wordCount}</FormatNumber>
 					</span>
 				</DividedItem>
 			) : undefined
 		}
-		{showDate ? <ContentDate date={date} datePreset="medium" /> : undefined}</Fragment
+		{showDate ? <ContentDate date={item.date} datePreset="medium" /> : undefined}</Fragment
 	>
 	{
 		showDescription ? (
 			<Fragment slot="preview-description">
 				<ProseDescription class="mt-1" showCompact={showDescriptionCompact}>
-					<FormatMarkdown>{description}</FormatMarkdown>
+					<FormatMarkdown>{item.description}</FormatMarkdown>
 				</ProseDescription>
 			</Fragment>
 		) : undefined
