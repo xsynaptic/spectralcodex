@@ -16,7 +16,8 @@ export async function getSeriesContentMetadataItemsFunction() {
 
 		return ids
 			.map((id) => (contentMetadataIndex.has(id) ? contentMetadataIndex.get(id) : undefined))
-			.filter((entry): entry is ContentMetadataItem => !!entry) satisfies ContentMetadataItem[];
+			.filter((entry): entry is ContentMetadataItem => !!entry)
+			.filter((item) => !!item.imageId) satisfies ContentMetadataItem[];
 	};
 }
 

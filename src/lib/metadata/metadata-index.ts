@@ -25,15 +25,9 @@ import { stripMdxComponents } from '@/lib/utils/text';
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
-function isCollectionEntryWithImagesField(
-	entry: CollectionEntry<CollectionKey>,
-): entry is CollectionEntry<'regions' | 'series' | 'themes'> {
-	return R.isIncludedIn(entry.collection, ['regions', 'series', 'themes']);
-}
-
 // Note: we could get all featured images but prefer to just grab one for simplicity
 function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): string | undefined {
-	if (isCollectionEntryWithImagesField(entry) && 'images' in entry.data) {
+	if ('images' in entry.data) {
 		const featuredImage = getSingleFeaturedItem({
 			images: entry.data.images,
 			shuffle: false,
@@ -41,7 +35,7 @@ function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): strin
 
 		return featuredImage?.src.id;
 	}
-	return;
+	return 'imageFeatured' in entry.data ? entry.data.imageFeatured?.id : undefined;
 }
 
 // Generate a word count from a crude rendering of the body without transforming MDX
