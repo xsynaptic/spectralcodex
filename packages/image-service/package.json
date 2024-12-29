@@ -6,8 +6,8 @@
 		".": "./src/index.ts"
 	},
 	"private": true,
-	"peerDependencies": {
-		"astro": "^5.0.5",
+	"devDependencies": {
+		"astro": "^5.1.1",
 		"sharp": "^0.33.5"
 	}
 }

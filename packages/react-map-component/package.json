@@ -6,21 +6,19 @@
 	"private": true,
 	"devDependencies": {
 		"@tanstack/react-query": "^5.62.11",
-		"maplibre-gl": "^4.7.1",
-		"pmtiles": "^4.1.0",
-		"protomaps-themes-base": "^4.3.0",
-		"react-map-gl": "^7.2.0-beta.1",
-		"zod": "^3.24.1",
-		"zustand": "^5.0.2"
-	},
-	"peerDependencies": {
 		"@types/geojson": "^7946.0.15",
 		"@types/react": "^18.3.16",
 		"@types/react-dom": "^18.3.5",
-		"astro": "^5.0.5",
+		"astro": "^5.1.1",
 		"geojson": "^0.5.0",
+		"maplibre-gl": "^4.7.1",
+		"pmtiles": "^4.1.0",
+		"protomaps-themes-base": "^4.3.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"remeda": "^2.17.4"
+		"react-map-gl": "^7.2.0-beta.1",
+		"remeda": "^2.19.0",
+		"zod": "^3.24.1",
+		"zustand": "^5.0.2"
 	}
 }

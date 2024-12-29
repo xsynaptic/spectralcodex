@@ -8,11 +8,9 @@
 	"private": true,
 	"devDependencies": {
 		"@types/micromatch": "^4.0.9",
+		"astro": "^5.1.1",
 		"fast-glob": "^3.3.2",
-		"micromatch": "^4.0.8"
-	},
-	"peerDependencies": {
-		"astro": "^5.0.5",
-		"p-limit": "^6.1.0"
+		"micromatch": "^4.0.8",
+		"p-limit": "^6.2.0"
 	}
 }

@@ -7,10 +7,8 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"satori": "^0.12.0"
-	},
-	"peerDependencies": {
 		"@spectralcodex/tailwind": "workspace:*",
+		"satori": "^0.12.0",
 		"sharp": "^0.33.5"
 	}
 }
