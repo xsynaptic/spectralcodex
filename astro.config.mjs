@@ -11,6 +11,7 @@ import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
 
 const isProduction = process.env.NODE_ENV === 'production';
+const isSsr = process.env.SSR === 'true';
 
 const {
 	DEV_SERVER_URL = 'http://localhost:4321/',
@@ -49,16 +50,21 @@ export default defineConfig({
 			fallback: `/${BASE_PATH ?? ''}`, // Used by all other assets
 		},
 	},
-	adapter: node({
-		mode: 'standalone',
-	}),
+	// Still having some trouble getting this working as expected due to memory issues
+	...(isSsr
+		? {
+				adapter: node({
+					mode: 'standalone',
+				}),
+			}
+		: {}),
 	env: {
 		schema: {
 			BUILD_OUTPUT_PATH: envField.string({
 				context: 'server',
 				access: 'secret',
 				// This should match `outDir` and may need `server` added when using the Node adapter
-				default: './dist/server',
+				default: isSsr ? './dist/server' : './dist',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({ context: 'client', access: 'public' }),
 		},
