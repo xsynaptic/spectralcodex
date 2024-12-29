@@ -1,6 +1,17 @@
+import * as R from 'remeda';
+
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import { getRegionsCollection } from '@/lib/collections/regions/data';
+
+/**
+ * Type guard to ensure this collection entry is configured for regions
+ */
+function isCollectionEntryWithRegions(
+	entry: CollectionEntry<CollectionKey>,
+): entry is CollectionEntry<'ephemera' | 'locations' | 'pages' | 'posts' | 'regions'> {
+	return R.isIncludedIn(entry.collection, ['ephemera', 'locations', 'pages', 'posts', 'regions']);
+}
 
 /**
  * Transform an array of strings into collection entries
@@ -99,7 +110,12 @@ export async function getPrimaryRegionIdFromEntryFunction() {
 	const getRegionCommonAncestor = await getRegionCommonAncestorFunction();
 
 	return function getPrimaryRegionIdFromEntry<T extends CollectionKey>(entry: CollectionEntry<T>) {
-		if ('regions' in entry.data && entry.data.regions && entry.data.regions.length > 0) {
+		if (
+			isCollectionEntryWithRegions(entry) &&
+			'regions' in entry.data &&
+			entry.data.regions &&
+			entry.data.regions.length > 0
+		) {
 			return entry.data.regions.length > 1
 				? getRegionCommonAncestor(entry.data.regions.map(({ id }) => id))
 				: entry.data.regions.at(0)?.id;

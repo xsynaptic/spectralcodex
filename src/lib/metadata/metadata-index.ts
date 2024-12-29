@@ -25,11 +25,15 @@ import { stripMdxComponents } from '@/lib/utils/text';
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
+function isCollectionEntryWithImagesField(
+	entry: CollectionEntry<CollectionKey>,
+): entry is CollectionEntry<'regions' | 'series' | 'themes'> {
+	return R.isIncludedIn(entry.collection, ['regions', 'series', 'themes']);
+}
+
 // Note: we could get all featured images but prefer to just grab one for simplicity
-const getContentMetadataImageId = <T extends CollectionKey>(
-	entry: CollectionEntry<T>,
-): string | undefined => {
-	if ('images' in entry.data) {
+function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): string | undefined {
+	if (isCollectionEntryWithImagesField(entry) && 'images' in entry.data) {
 		const featuredImage = getSingleFeaturedItem({
 			images: entry.data.images,
 			shuffle: false,
@@ -37,15 +41,13 @@ const getContentMetadataImageId = <T extends CollectionKey>(
 
 		return featuredImage?.src.id;
 	}
-	return 'imageFeatured' in entry.data ? entry.data.imageFeatured?.id : undefined;
-};
+	return;
+}
 
 // Generate a word count from a crude rendering of the body without transforming MDX
 // This method won't work if your MDX components introduce text from outside sources
 // But for this project MDX mainly adds decorative classes so we can get away with this
-const getContentMetadataWordCount = <T extends CollectionKey>(
-	entry: CollectionEntry<T>,
-): number | undefined => {
+function getContentMetadataWordCount(entry: CollectionEntry<CollectionKey>): number | undefined {
 	if (['series'].includes(entry.collection)) {
 		return undefined; // We will set this after individual posts and locations have a word count
 	}
@@ -59,7 +61,7 @@ const getContentMetadataWordCount = <T extends CollectionKey>(
 		);
 	}
 	return undefined;
-};
+}
 
 // This function does all the heavy lifting and should only run once
 async function populateContentMetadataIndex(): Promise<ContentMetadataIndex> {

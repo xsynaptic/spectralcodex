@@ -13,7 +13,7 @@ export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	regionPrimaryId: string | undefined;
 	postCount: number | undefined;
 	locationCount: number | undefined;
-	wordCount: number | undefined; // TODO: currently unused
+	wordCount: number | undefined;
 	backlinks: Set<string>;
 	entryQuality: number;
 }
