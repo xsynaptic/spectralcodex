@@ -5,7 +5,7 @@
 	"exports": "./src/index.tsx",
 	"private": true,
 	"devDependencies": {
-		"@tanstack/react-query": "^5.62.10",
+		"@tanstack/react-query": "^5.62.11",
 		"maplibre-gl": "^4.7.1",
 		"pmtiles": "^4.1.0",
 		"protomaps-themes-base": "^4.3.0",
