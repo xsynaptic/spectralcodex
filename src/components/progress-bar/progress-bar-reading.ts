@@ -1,4 +1,4 @@
-import { debounce } from 'remeda';
+import { funnel } from 'remeda';
 
 const animationDuration = 300;
 
@@ -27,7 +27,7 @@ export const readingBar = (selector: string) => {
 	// Initialize opacity value
 	setOpacity(0);
 
-	const onScrollHandler = debounce(
+	const onScrollHandler = funnel(
 		() => {
 			const readingFrameRect = readingFrame.getBoundingClientRect();
 			const readingProgress = Math.min(
@@ -46,7 +46,7 @@ export const readingBar = (selector: string) => {
 				setProgress(readingProgress);
 			}
 		},
-		{ waitMs: 100 },
+		{ triggerAt: 'both', minGapMs: 200 },
 	);
 
 	const observer = new IntersectionObserver(

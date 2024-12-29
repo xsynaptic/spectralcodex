@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-null */
 /* eslint-disable unicorn/no-array-reduce */
-import { debounce } from 'remeda';
+import { funnel } from 'remeda';
 
 // Force a value to be within bounds (0 < x < total); allows for values to "wrap around"
 export const boundedValue = (value: number, total: number): number =>
@@ -60,7 +60,7 @@ customElements.define(
 				() =>
 					this.resizeHandler === null
 						? undefined
-						: debounce<EventListener>(this.resizeHandler, { waitMs: 500 }),
+						: funnel(this.resizeHandler, { minQuietPeriodMs: 500 }),
 				true,
 			);
 		}

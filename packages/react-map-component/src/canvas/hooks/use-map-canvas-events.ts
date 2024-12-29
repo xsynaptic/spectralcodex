@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { debounce } from 'remeda';
+import { funnel } from 'remeda';
 
 import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
@@ -140,9 +140,13 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const measureFilterPosition = useCallback(
-		({ target: mapInstance }: MapEvent) => {
-			const container = mapInstance.getContainer();
+	const debouncedOnLoad = funnel<MapEvent[], HTMLElement | undefined>(
+		(container) => {
+			if (!container) {
+				console.warn('[Map] Map instance not found!');
+				return;
+			}
+
 			const filterControl = container.querySelector<HTMLButtonElement>(`#${MAP_FILTER_CONTROL_ID}`);
 
 			if (!filterControl) {
@@ -163,10 +167,15 @@ export function useMapCanvasEvents() {
 				y: controlY - containerY + controlHeight / 2,
 			});
 		},
-		[setFilterPosition],
-	);
+		{
+			reducer: (_, ...args: MapEvent[]) => {
+				if (args.length === 0) return;
 
-	const debouncedOnLoad = debounce(measureFilterPosition, { waitMs: 300 });
+				return args[0]?.target.getContainer();
+			},
+			minQuietPeriodMs: 300,
+		},
+	);
 
 	return {
 		onLoad: (event: MapEvent) => {
@@ -175,7 +184,7 @@ export function useMapCanvasEvents() {
 				debouncedOnLoad.call(event); // Initialize the position of the filter control
 			}
 		},
-		onResize: (event: MapEvent) => debouncedOnLoad.call(event),
+		onResize: debouncedOnLoad.call,
 		...(interactive
 			? {
 					onClick,
