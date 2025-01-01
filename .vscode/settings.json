@@ -118,8 +118,8 @@
 	"eslint.validate": [
 		"javascript",
 		"javascriptreact",
-		"typescript", // Enable .ts
-		"typescriptreact", // Enable .tsx
+		"typescript",
+		"typescriptreact",
 		"astro",
 		"markdown",
 		"mdx"
@@ -148,12 +148,11 @@
 	"[mdx]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
 		"files.autoSave": "afterDelay",
-		"files.autoSaveDelay": 10000, // Prevent some weird issues with Astro 5's new Content Layer API
+		"files.autoSaveDelay": 5000, // Prevent some weird issues with Astro 5's new Content Layer API
 		"typescript.suggest.enabled": false // Too noisy when we're mostly working with plain text
 	},
 	"mdx.validate.validateReferences": "ignore",
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"eslint.lintTask.enable": false
+	}
 }
