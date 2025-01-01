@@ -50,6 +50,7 @@ export default defineConfig({
 			fallback: `/${BASE_PATH ?? ''}`, // Used by all other assets
 		},
 	},
+	cacheDir: './.astro-cache',
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {

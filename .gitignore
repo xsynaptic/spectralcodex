@@ -26,8 +26,7 @@ astro-error.log*
 
 # generated types and files
 .astro/
-
-# custom error logs
+.astro-cache/
 temp
 
 # open graph fonts

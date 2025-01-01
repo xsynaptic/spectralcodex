@@ -13,5 +13,5 @@
 		}
 	},
 	"include": [".astro/types.d.ts", "**/*", "**/*.astro"],
-	"exclude": [".vscode", "dist"]
+	"exclude": [".astro-cache", ".vscode", "dist"]
 }

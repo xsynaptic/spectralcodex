@@ -6,6 +6,7 @@ import type { Config } from 'tailwindcss';
 export default {
 	content: [
 		'./(packages|src)/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
+		'!./**/.astro-cache/**',
 		'!./**/node_modules/**',
 	],
 	theme: {
