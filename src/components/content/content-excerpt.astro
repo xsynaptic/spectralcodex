@@ -28,13 +28,20 @@ const t = getTranslations();
 <article class={className}>
 	<Container as="header" class:list={[description ? undefined : 'mb-2']}>
 		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
-			<a href={entryUrl} class="text-primary-700 transition-colors ease-in hover:text-accent-500">
+			<a
+				href={entryUrl}
+				class="text-primary-700 transition-colors ease-in hover:text-accent-500 dark:text-primary-300 dark:hover:text-accent-300"
+			>
 				<slot name="excerpt-title" />
 			</a>
 		</h2>
 		{
 			subtitle ? (
-				<h3 class:list={['mb-1 text-xs font-medium text-primary-400 md:text-sm']}>
+				<h3
+					class:list={[
+						'mb-1 text-xs font-medium text-primary-400 md:text-sm dark:text-primary-700',
+					]}
+				>
 					<Fragment set:html={subtitle} />
 				</h3>
 			) : undefined

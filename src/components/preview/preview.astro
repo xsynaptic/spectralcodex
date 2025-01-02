@@ -95,7 +95,7 @@ const description = await Astro.slots.render('preview-description');
 	}
 	{
 		description ? (
-			<div class="prose prose-sm">
+			<div class="prose prose-sm dark:prose-invert">
 				<Fragment set:html={description} />
 			</div>
 		) : undefined

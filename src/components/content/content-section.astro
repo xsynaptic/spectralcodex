@@ -47,7 +47,11 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 					</TextGradient>
 				) : undefined}
 				{subtitle ? (
-					<h3 class:list={['mb-1 text-xs font-medium text-primary-400 md:text-sm']}>
+					<h3
+						class:list={[
+							'mb-1 text-xs font-medium text-primary-400 md:text-sm dark:text-primary-700',
+						]}
+					>
 						<Fragment set:html={subtitle} />
 					</h3>
 				) : undefined}
