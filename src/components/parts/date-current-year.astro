@@ -1,0 +1,21 @@
+---
+/**
+ * A simple hack to always update the year in the event of my untimely demise
+ * @link - https://astro-tips.dev/recipes/dynamic-footer-date-for-static-websites/
+ */
+const currentYear = new Date().getFullYear();
+---
+
+<span id="colophon-current-year">{currentYear}</span>
+
+<script is:inline>
+	const currentYearElement = document.querySelector('#colophon-current-year');
+	const currentYear = String(new Date().getFullYear());
+
+	if (
+		currentYearElement instanceof HTMLSpanElement &&
+		currentYearElement.textContent !== currentYear
+	) {
+		currentYearElement.textContent = currentYear;
+	}
+</script>
