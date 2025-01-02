@@ -9,6 +9,7 @@ export default {
 		'!./**/.astro-cache/**',
 		'!./**/node_modules/**',
 	],
+	darkMode: ['selector', '[data-theme="dark"]'],
 	theme: {
 		extend: {
 			backgroundImage,

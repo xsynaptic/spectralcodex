@@ -1,0 +1,33 @@
+---
+import type { ThemeType } from '@/components/theme/theme-manager';
+
+import { ThemeTypeEnum } from '@/components/theme/theme-manager';
+
+interface Props {
+	defaultTheme?: ThemeType | undefined;
+}
+
+const { defaultTheme = ThemeTypeEnum.Auto } = Astro.props;
+---
+
+<script id="theme-default" is:inline data-default-theme={defaultTheme}></script>
+
+<script>
+	import { themeManager } from '@/components/theme/theme-manager';
+
+	const defaultTheme =
+		document.querySelector<HTMLScriptElement>('#theme-default')?.dataset.defaultTheme;
+
+	// eslint-disable-next-line unicorn/prefer-global-this
+	window.theme ??= themeManager(defaultTheme);
+	// eslint-disable-next-line unicorn/prefer-global-this
+	window.theme.setTheme(window.theme.getTheme());
+</script>
+<script>
+	document.addEventListener('astro:after-swap', () => {
+		// eslint-disable-next-line unicorn/prefer-global-this
+		console.log('swapping in...', window.theme.getTheme());
+		// eslint-disable-next-line unicorn/prefer-global-this
+		window.theme.setTheme(window.theme.getTheme());
+	});
+</script>

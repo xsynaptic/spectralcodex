@@ -32,6 +32,7 @@ const config = tseslint.config(
 			globals: {
 				...globals.builtin,
 				...globals.nodeBuiltin,
+				theme: 'readonly',
 			},
 		},
 		plugins: {

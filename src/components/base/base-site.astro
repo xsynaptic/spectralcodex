@@ -15,6 +15,7 @@ import BaseHeader from '@/components/base/base-header.astro';
 import BaseMeta from '@/components/base/base-meta.astro';
 import LoadingBar from '@/components/progress-bar/progress-bar-loading.astro';
 import ReadingBar from '@/components/progress-bar/progress-bar-reading.astro';
+import ThemeManager from '@/components/theme/theme-manager.astro';
 import { getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
@@ -33,6 +34,7 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href={`${getSiteUrl()}favicon.svg`} />
 		<BaseMeta meta={meta} />
+		<ThemeManager defaultTheme="auto" />
 		<ClientRouter />
 	</head>
 	<body
