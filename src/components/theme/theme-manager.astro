@@ -1,32 +1,32 @@
 ---
-import type { ThemeType } from '@/components/theme/theme-manager';
+import type { ThemeGeneralType } from '@/components/theme/theme-types';
 
-import { ThemeTypeEnum } from '@/components/theme/theme-manager';
+import { ThemeTypeEnum } from '@/components/theme/theme-types';
 
 interface Props {
-	defaultTheme?: ThemeType | undefined;
+	defaultTheme?: ThemeGeneralType | undefined;
 }
 
 const { defaultTheme = ThemeTypeEnum.Auto } = Astro.props;
 ---
 
-<script id="theme-default" is:inline data-default-theme={defaultTheme}></script>
+{
+	defaultTheme === ThemeTypeEnum.Auto ? undefined : (
+		<script id="theme-default" is:inline data-default-theme={defaultTheme} />
+	)
+}
 
 <script>
 	import { themeManager } from '@/components/theme/theme-manager';
 
-	const defaultTheme =
-		document.querySelector<HTMLScriptElement>('#theme-default')?.dataset.defaultTheme;
+	// eslint-disable-next-line unicorn/prefer-global-this
+	if (!window.theme) window.theme = themeManager('#theme-default');
 
 	// eslint-disable-next-line unicorn/prefer-global-this
-	window.theme ??= themeManager(defaultTheme);
-	// eslint-disable-next-line unicorn/prefer-global-this
 	window.theme.setTheme(window.theme.getTheme());
-</script>
-<script>
+
+	// Handle view transitions
 	document.addEventListener('astro:after-swap', () => {
-		// eslint-disable-next-line unicorn/prefer-global-this
-		console.log('swapping in...', window.theme.getTheme());
 		// eslint-disable-next-line unicorn/prefer-global-this
 		window.theme.setTheme(window.theme.getTheme());
 	});

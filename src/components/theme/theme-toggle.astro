@@ -1,0 +1,21 @@
+---
+
+---
+
+<div>
+	<button
+		id="theme-toggle"
+		class="ml-5 flex h-10 w-20 items-center justify-center rounded-full border border-primary-300 bg-primary-100 text-primary-800 transition-all dark:border-primary-600 dark:bg-primary-800 dark:text-primary-100"
+		aria-label="Toggle theme"
+		title="Toggle theme"
+	>
+		<div class="hidden text-primary-400 dark:inline">Light</div>
+		<div class="inline text-primary-600 dark:hidden">Dark</div>
+	</button>
+</div>
+
+<script>
+	import { activateThemeToggle } from '@/components/theme/theme-toggle';
+
+	activateThemeToggle('#theme-toggle');
+</script>

@@ -1,34 +1,28 @@
 /* eslint-disable unicorn/prefer-global-this */
-export const ThemeTypeEnum = {
-	Auto: 'auto',
-	Dark: 'dark',
-	Light: 'light',
-} as const;
+import type {
+	ThemeChangedEvent,
+	ThemeGeneralType,
+	ThemeSystemType,
+} from '@/components/theme/theme-types';
 
-export type ThemeType = (typeof ThemeTypeEnum)[keyof typeof ThemeTypeEnum];
+import { isThemeTypeValid, ThemeTypeEnum } from '@/components/theme/theme-types';
 
-export type ThemeChangedEvent = CustomEvent<{
-	theme: ThemeType;
-	systemTheme: Extract<ThemeType, 'light' | 'dark'>;
-	defaultTheme: ThemeType;
-}>;
-
-export function isThemeTypeValid(theme: string | undefined): theme is ThemeType {
-	return (
-		(theme !== undefined && theme === ThemeTypeEnum.Auto) ||
-		theme === ThemeTypeEnum.Dark ||
-		theme === ThemeTypeEnum.Light
-	);
-}
-
-export function themeManager(defaultThemeRaw: string | undefined) {
+/**
+ * Adapted from Astro Tips!
+ * @link - https://astro-tips.dev/recipes/dark-mode/
+ */
+export function themeManager(defaultThemeId: string | undefined) {
 	const storageKey = 'theme';
 	const store =
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		typeof localStorage === 'undefined' ? { getItem: () => {}, setItem: () => {} } : localStorage;
+
+	const defaultThemeRaw = defaultThemeId
+		? document.querySelector<HTMLScriptElement>(defaultThemeId)?.dataset.defaultTheme
+		: undefined;
 	const defaultTheme = isThemeTypeValid(defaultThemeRaw) ? defaultThemeRaw : ThemeTypeEnum.Auto;
 
-	const mediaMatcher = window.matchMedia('(prefers-color-scheme: light)');
+	const mediaMatcher = window.matchMedia(`(prefers-color-scheme: ${ThemeTypeEnum.Light})`);
 
 	let systemTheme = mediaMatcher.matches ? ThemeTypeEnum.Light : ThemeTypeEnum.Dark;
 
@@ -37,30 +31,30 @@ export function themeManager(defaultThemeRaw: string | undefined) {
 		applyTheme(window.theme.getTheme());
 	});
 
-	function applyTheme(theme: ThemeType) {
+	function applyTheme(theme: ThemeGeneralType) {
 		const resolvedTheme = theme === ThemeTypeEnum.Auto ? systemTheme : theme;
 
 		document.documentElement.dataset.theme = resolvedTheme;
 		document.documentElement.style.colorScheme = resolvedTheme;
 		document.dispatchEvent(
 			new CustomEvent('theme-changed', {
-				detail: { theme, systemTheme, defaultTheme },
+				detail: { theme, systemTheme, defaultTheme, resolvedTheme },
 			}) satisfies ThemeChangedEvent,
 		);
 	}
 
-	function setTheme(theme: ThemeType = defaultTheme) {
+	function setTheme(theme: ThemeGeneralType = defaultTheme) {
 		store.setItem(storageKey, theme);
 		applyTheme(theme);
 	}
 
-	function getTheme(): ThemeType {
+	function getTheme(): ThemeGeneralType {
 		const themeStored = store.getItem(storageKey);
 
 		return themeStored && isThemeTypeValid(themeStored) ? themeStored : defaultTheme;
 	}
 
-	function getSystemTheme(): Extract<ThemeType, 'light' | 'dark'> {
+	function getSystemTheme(): ThemeSystemType {
 		return systemTheme;
 	}
 
