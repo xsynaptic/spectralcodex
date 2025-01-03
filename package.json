@@ -27,7 +27,7 @@
 		"not dead"
 	],
 	"dependencies": {
-		"astro": "^5.1.1",
+		"astro": "^5.1.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"
 	},
@@ -36,7 +36,7 @@
 		"@astrojs/mdx": "^4.0.3",
 		"@astrojs/node": "^9.0.0",
 		"@astrojs/react": "^4.1.2",
-		"@astrojs/rss": "^4.0.10",
+		"@astrojs/rss": "^4.0.11",
 		"@astrojs/sitemap": "^3.2.1",
 		"@astrojs/tailwind": "^5.1.4",
 		"@eslint/js": "^9.17.0",
@@ -44,7 +44,7 @@
 		"@fontsource-variable/geologica": "^5.1.1",
 		"@fontsource-variable/lora": "^5.1.1",
 		"@fontsource/geologica": "^5.1.1",
-		"@iconify/json": "^2.2.290",
+		"@iconify/json": "^2.2.291",
 		"@iconify/tools": "^4.1.1",
 		"@iconify/utils": "^2.2.1",
 		"@sindresorhus/slugify": "^2.2.1",
@@ -97,7 +97,7 @@
 		"typescript-eslint": "^8.19.0",
 		"unified": "^11.0.5",
 		"url-join": "^5.0.0",
-		"vite": "^6.0.6",
+		"vite": "^6.0.7",
 		"vitest": "^2.1.8",
 		"zx": "^8.3.0"
 	},
