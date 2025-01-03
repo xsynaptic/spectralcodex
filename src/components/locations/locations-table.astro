@@ -27,15 +27,21 @@ const columns = {
 {
 	locations.length > 0 ? (
 		<div class="not-prose">
-			<div class="overflow-hidden rounded-md border border-primary-300">
-				<table class="min-w-full table-auto bg-primary-50">
+			<div
+				class:list={[
+					'overflow-hidden rounded-md border',
+					'border-primary-300 dark:border-primary-600',
+				]}
+			>
+				<table class:list={['min-w-full table-auto', 'bg-primary-50 dark:bg-primary-900']}>
 					<thead>
 						<tr>
 							{R.entries(columns).map(([id, title], index) => (
 								<th
 									id={`column-${id}`}
 									class:list={[
-										'border-b bg-primary-100 px-2 py-1 text-left align-text-top font-display text-sm font-medium uppercase',
+										'border-b px-2 py-1 text-left align-text-top font-display text-sm font-medium uppercase',
+										'bg-primary-100 dark:bg-primary-600',
 										index === 0 ? 'rounded-tl-lg' : undefined,
 										index === Object.keys(columns).length - 1 ? 'rounded-tr-lg' : undefined,
 									]}
@@ -46,7 +52,7 @@ const columns = {
 							))}
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-primary-200">
+					<tbody class:list={['divide-y', 'divide-primary-200 dark:divide-primary-700']}>
 						{locations.map((item) => {
 							const regionPrimary = getPrimaryRegionByLocation(item);
 

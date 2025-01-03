@@ -13,10 +13,13 @@ const t = getTranslations();
 ---
 
 <nav
-	class="flex flex-wrap gap-x-1 gap-y-2 font-sans text-xs text-primary-500 dark:text-primary-400"
+	class:list={[
+		'flex flex-wrap gap-x-1 gap-y-2 font-sans text-xs',
+		'text-primary-500 dark:text-primary-400',
+	]}
 >
 	<DividedItem dividerColor="lighter"
-		><span class="text-primary-400 dark:text-primary-600">※</span>
+		><span class="text-primary-400 dark:text-primary-500">※</span>
 		<span>{t('site.footer.updated.label')} <DateDisplay date={new Date()} /></span></DividedItem
 	>
 	<DividedItem dividerColor="lighter">

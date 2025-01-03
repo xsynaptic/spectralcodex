@@ -2,7 +2,6 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import ProseDescription from '@/components/parts/prose-description.astro';
-import TextGradient from '@/components/parts/text-gradient.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
@@ -36,20 +35,21 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 				]}
 			>
 				{title ? (
-					<TextGradient
-						as="h2"
+					<h2
 						class:list={[
 							'mb-1 font-semibold',
+							'text-primary-700 dark:text-primary-200',
 							titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
 						]}
 					>
 						<Fragment set:html={title} />
-					</TextGradient>
+					</h2>
 				) : undefined}
 				{subtitle ? (
 					<h3
 						class:list={[
-							'mb-1 text-xs font-medium text-primary-400 md:text-sm dark:text-primary-700',
+							'mb-1 text-xs font-medium md:text-sm',
+							'text-primary-400 dark:text-primary-600',
 						]}
 					>
 						<Fragment set:html={subtitle} />

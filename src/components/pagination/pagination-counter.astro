@@ -12,7 +12,7 @@ const { class: className, page } = Astro.props;
 {
 	page.currentPage > 1 ? (
 		<div
-			class:list={['text-sm text-primary-500', className]}
+			class:list={['text-sm', 'text-primary-500 dark:text-primary-600', className]}
 		>{`Page ${String(page.currentPage)} of ${String(page.lastPage)}`}</div>
 	) : undefined
 }

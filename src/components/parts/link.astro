@@ -19,46 +19,40 @@ interface Props extends HTMLAttributes<'a'> {
 const { class: className, href, linkColor = 'accent', ...props } = Astro.props;
 
 const children = (await Astro.slots.render('default')) as string | undefined;
-
-const getColorScheme = () => {
-	switch (linkColor) {
-		case 'primary': {
-			return 'text-primary-800 hover:text-primary-600 dark:text-primary-200 dark:hover:text-primary-50';
-		}
-		case 'primary-bright': {
-			return 'text-primary-300 hover:text-primary-100 dark:text-primary-600 dark:hover:text-primary-300';
-		}
-		case 'primary-featured': {
-			return 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50 dark:text-primary-200 dark:hover:text-primary-50 dark:sm:text-primary-700 dark:sm:hover:text-primary-900';
-		}
-		case 'highlight': {
-			return 'text-highlight-500 hover:text-highlight-300 dark:text-highlight-400 dark:hover:text-highlight-700';
-		}
-		case 'highlight-bright': {
-			return 'text-highlight-300 hover:text-highlight-200 dark:text-highlight-600 dark:hover:text-highlight-800';
-		}
-		case 'highlight-featured': {
-			return 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200 dark:text-highlight-400 dark:hover:text-highlight-700 dark:sm:text-highlight-700 dark:sm:hover:text-highlight-900';
-		}
-		case 'accent': {
-			return 'text-accent-500 hover:text-accent-300 dark:text-accent-500 dark:hover:text-accent-300';
-		}
-		case 'accent-bright': {
-			return 'text-accent-300 hover:text-accent-200 dark:text-accent-600 dark:hover:text-accent-800';
-		}
-		case 'accent-featured': {
-			return 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200 dark:text-accent-400 dark:hover:text-accent-700 dark:sm:text-accent-700 dark:sm:hover:text-accent-900';
-		}
-		default: {
-			linkColor satisfies never;
-			return;
-		}
-	}
-};
 ---
 
 <a
 	href={href}
-	class:list={['cursor-pointer transition-colors ease-linear', getColorScheme(), className]}
+	class:list={[
+		'cursor-pointer transition-colors ease-linear',
+		linkColor === 'primary'
+			? 'text-primary-800 hover:text-primary-600 dark:text-primary-200 dark:hover:text-primary-50'
+			: undefined,
+		linkColor === 'primary-bright'
+			? 'text-primary-300 hover:text-primary-100 dark:text-primary-600 dark:hover:text-primary-300'
+			: undefined,
+		linkColor === 'primary-featured'
+			? 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50 dark:text-primary-200 dark:hover:text-primary-50 dark:sm:text-primary-700 dark:sm:hover:text-primary-900'
+			: undefined,
+		linkColor === 'highlight'
+			? 'text-highlight-500 hover:text-highlight-300 dark:text-highlight-400 dark:hover:text-highlight-700'
+			: undefined,
+		linkColor === 'highlight-bright'
+			? 'text-highlight-300 hover:text-highlight-200 dark:text-highlight-600 dark:hover:text-highlight-800'
+			: undefined,
+		linkColor === 'highlight-featured'
+			? 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200 dark:text-highlight-400 dark:hover:text-highlight-700 dark:sm:text-highlight-700 dark:sm:hover:text-highlight-900'
+			: undefined,
+		linkColor === 'accent'
+			? 'text-accent-500 hover:text-accent-300 dark:text-accent-300 dark:hover:text-accent-200'
+			: undefined,
+		linkColor === 'accent-bright'
+			? 'text-accent-300 hover:text-accent-200 dark:text-accent-200 dark:hover:text-accent-100'
+			: undefined,
+		linkColor === 'accent-featured'
+			? 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200 dark:text-accent-400 dark:hover:text-accent-700 dark:sm:text-accent-700 dark:sm:hover:text-accent-900'
+			: undefined,
+		className,
+	]}
 	{...props}><Fragment set:html={children?.trim()} /></a
 >

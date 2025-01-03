@@ -2,6 +2,8 @@
 import BaseHeaderMenuItem from '@/components/base/base-header-menu-item.astro';
 import Container from '@/components/parts/container.astro';
 import Link from '@/components/parts/link.astro';
+import ThemeToggle from '@/components/theme/theme-toggle.astro';
+import { FEATURE_DARK_MODE } from '@/constants';
 import { menuHeaderItems } from '@/lib/menu/menu-header';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getSiteUrl } from '@/lib/utils/routing';
@@ -30,7 +32,7 @@ const t = getTranslations();
 			<Link href={siteUrl} class="text-xl font-semibold md:text-2xl lg:text-3xl" linkColor="primary"
 				>{t('site.title')}</Link
 			>
-		</h2></Container
+		</h2>{FEATURE_DARK_MODE ? <ThemeToggle /> : undefined}</Container
 	>
 	<Container as="nav">
 		<ul

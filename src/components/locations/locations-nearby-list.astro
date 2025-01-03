@@ -38,15 +38,19 @@ const t = getTranslations();
 								</span>
 							) : undefined}
 							{distanceDisplay ? (
-								<span class="break-keep text-primary-500">
+								<span class:list={['break-keep', 'text-primary-500 dark:text-primary-600']}>
 									{distanceDisplay}&nbsp;{t('locations.unit.km')}
 								</span>
 							) : undefined}
 							{location.data.status === 'demolished' ? (
-								<span class="select-none text-primary-300">&#x2717;</span>
+								<span class:list={['select-none', 'text-primary-300 dark:text-primary-500']}>
+									&#x2717;
+								</span>
 							) : undefined}
 							{location.data.entryQuality > 2 ? (
-								<span class="select-none text-primary-300">&#10042;</span>
+								<span class:list={['select-none', 'text-primary-300 dark:text-primary-500']}>
+									&#10042;
+								</span>
 							) : undefined}
 						</ListColumnItem>
 					) : undefined;

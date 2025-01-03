@@ -10,8 +10,14 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 
 {
 	children?.trim() ? (
-		<li class="marker:text-accent-200">
-			<div class:list={['flex flex-wrap items-center gap-1 text-primary-700', className]}>
+		<li class="marker:text-accent-200 dark:marker:text-accent-500">
+			<div
+				class:list={[
+					'flex flex-wrap items-center gap-1',
+					'text-primary-700 dark:text-primary-500',
+					className,
+				]}
+			>
 				<Fragment set:html={children} />
 			</div>
 		</li>

@@ -75,7 +75,7 @@ html:not([lang^='zh']) span[lang^='zh'] {
 .content [data-footnote-ref]::after {
 	@apply font-light text-accent-300;
 	[data-theme='dark'] & {
-		@apply text-accent-500;
+		@apply text-accent-400;
 	}
 }
 .content [data-footnote-ref]::before {
