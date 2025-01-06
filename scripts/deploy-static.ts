@@ -33,6 +33,7 @@ async function buildProject() {
 	try {
 		await $`pnpm astro build`;
 		console.log(chalk.green('Build completed.'));
+		if (assetsPath.includes('temp')) await $`rm -rf ${assetsPath}`;
 	} catch (error) {
 		console.error(chalk.red('Error during build:'), error);
 		process.exit(1);
