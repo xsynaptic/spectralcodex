@@ -55,7 +55,7 @@
 		"@spectralcodex/tailwind": "workspace:*",
 		"@spectralcodex/unified": "workspace:*",
 		"@tailwindcss/typography": "^0.5.15",
-		"@tanstack/eslint-plugin-query": "^5.62.9",
+		"@tanstack/eslint-plugin-query": "^5.62.15",
 		"@turf/helpers": "^7.2.0",
 		"@turf/turf": "^7.2.0",
 		"@types/eslint__js": "^8.42.3",

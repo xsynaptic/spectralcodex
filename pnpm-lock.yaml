@@ -88,8 +88,8 @@ importers:
         specifier: ^0.5.15
         version: 0.5.15(tailwindcss@3.4.17)
       '@tanstack/eslint-plugin-query':
-        specifier: ^5.62.9
-        version: 5.62.9(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)
+        specifier: ^5.62.15
+        version: 5.62.15(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)
       '@turf/helpers':
         specifier: ^7.2.0
         version: 7.2.0
@@ -343,8 +343,8 @@ importers:
   packages/react-map-component:
     devDependencies:
       '@tanstack/react-query':
-        specifier: ^5.62.11
-        version: 5.62.11(react@18.3.1)
+        specifier: ^5.62.15
+        version: 5.62.15(react@18.3.1)
       '@types/geojson':
         specifier: ^7946.0.15
         version: 7946.0.15
@@ -367,8 +367,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       protomaps-themes-base:
-        specifier: ^4.3.0
-        version: 4.3.0
+        specifier: ^4.3.1
+        version: 4.3.1
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1605,16 +1605,16 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
 
-  '@tanstack/eslint-plugin-query@5.62.9':
-    resolution: {integrity: sha512-F3onhTcpBj7zQDo0NVtZwZQKRFx8BwpSabMJybl9no3+dFHUurvNMrH5M/6KNpkdDCf3zyHWadruZL6636B8Fw==}
+  '@tanstack/eslint-plugin-query@5.62.15':
+    resolution: {integrity: sha512-24BHoF3LIzyptjrZXc1IpaISno+fhVD3zWWso/HPSB+ZVOyOXoiQSQc2K362T13JKJ07EInhHi1+KyNoRzCCfQ==}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
 
-  '@tanstack/query-core@5.62.9':
-    resolution: {integrity: sha512-lwePd8hNYhyQ4nM/iRQ+Wz2cDtspGeZZHFZmCzHJ7mfKXt+9S301fULiY2IR2byJYY6Z03T427E5PoVfMexHjw==}
+  '@tanstack/query-core@5.62.15':
+    resolution: {integrity: sha512-wT20X14CxcWY8YLJ/1pnsXn/y1Q2uRJZYWW93PWRtZt+3/JlGZyiyTcO4pGnqycnP7CokCROAyatsraosqZsDA==}
 
-  '@tanstack/react-query@5.62.11':
-    resolution: {integrity: sha512-Xb1nw0cYMdtFmwkvH9+y5yYFhXvLRCnXoqlzSw7UkqtCVFq3cG8q+rHZ2Yz1XrC+/ysUaTqbLKJqk95mCgC1oQ==}
+  '@tanstack/react-query@5.62.15':
+    resolution: {integrity: sha512-Ny3xxsOWmEQCFyHiV3CF7t6+QAV+LpBEREiXyllKR4+tStyd8smOAa98ZHmEx0ZNy36M31K8enifB5wTSYAKJw==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -5071,8 +5071,8 @@ packages:
   protocol-buffers-schema@3.6.0:
     resolution: {integrity: sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==}
 
-  protomaps-themes-base@4.3.0:
-    resolution: {integrity: sha512-XNLs3zamw/XucflU0qBXgiPN72/YEo6h01ClsVrfUUQCDzA4r8Eu23hG/fqYqFuocciwu0doCxGBBpE8xGMtoA==}
+  protomaps-themes-base@4.3.1:
+    resolution: {integrity: sha512-g3ne0iBxMcFExxstvXyC0xCJaZF9iLfIUQcxx86+cuzQ4KiZ4v5moxqDvHEZDa8xrTYY2iwm6VV5UGOHnpWYhg==}
 
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
@@ -7607,7 +7607,7 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.17
 
-  '@tanstack/eslint-plugin-query@5.62.9(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)':
+  '@tanstack/eslint-plugin-query@5.62.15(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)':
     dependencies:
       '@typescript-eslint/utils': 8.18.2(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)
       eslint: 9.17.0(jiti@2.4.2)
@@ -7615,11 +7615,11 @@ snapshots:
       - supports-color
       - typescript
 
-  '@tanstack/query-core@5.62.9': {}
+  '@tanstack/query-core@5.62.15': {}
 
-  '@tanstack/react-query@5.62.11(react@18.3.1)':
+  '@tanstack/react-query@5.62.15(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.62.9
+      '@tanstack/query-core': 5.62.15
       react: 18.3.1
 
   '@trysound/sax@0.2.0': {}
@@ -12789,7 +12789,7 @@ snapshots:
 
   protocol-buffers-schema@3.6.0: {}
 
-  protomaps-themes-base@4.3.0: {}
+  protomaps-themes-base@4.3.1: {}
 
   proxy-from-env@1.1.0: {}
 
