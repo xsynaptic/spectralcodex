@@ -18,7 +18,8 @@ const t = getTranslations();
 	title ? (
 		<div
 			class:list={[
-				'sm:min-h-none pointer-events-none absolute bottom-0 left-0 right-0 z-40 mx-auto flex min-h-[80px] max-w-content flex-col justify-end bg-featured-b sm:bg-none',
+				'sm:min-h-none pointer-events-none absolute bottom-0 left-0 right-0 z-40 mx-auto flex min-h-[80px] max-w-content flex-col justify-end sm:bg-none',
+				'bg-featured-b',
 			]}
 		>
 			<div
@@ -32,6 +33,7 @@ const t = getTranslations();
 					<Link
 						href={url}
 						linkColor="primary-bright"
+						darkMode={false}
 						class="max-w-[75vw] truncate font-medium sm:max-w-[60vw] sm:font-semibold"
 					>
 						{title}

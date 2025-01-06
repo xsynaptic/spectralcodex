@@ -14,36 +14,68 @@ type GradientColor =
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	gradientColor?: GradientColor;
+	darkMode?: boolean | undefined;
 }>;
 
-const { as: Tag = 'div', class: className, gradientColor = 'primary' } = Astro.props;
+const {
+	as: Tag = 'div',
+	class: className,
+	gradientColor = 'primary',
+	darkMode = true,
+} = Astro.props;
 ---
 
 <Tag
 	class:list={[
 		'bg-gradient-to-b bg-clip-text text-transparent',
-		gradientColor === 'primary'
-			? 'from-primary-800 to-primary-600 dark:from-primary-100 dark:to-primary-300'
-			: undefined,
-		gradientColor === 'primary-bright'
-			? 'from-primary-50 to-primary-200 text-primary-500'
-			: undefined,
-		gradientColor === 'primary-featured'
-			? 'from-primary-800 to-primary-600 text-primary-300 sm:from-primary-50 sm:to-primary-200'
-			: undefined,
-		gradientColor === 'highlight'
-			? 'from-highlight-600 to-highlight-800 text-primary-300'
-			: undefined,
-		gradientColor === 'highlight-bright'
-			? 'from-highlight-50 to-highlight-200 text-primary-500'
-			: undefined,
-		gradientColor === 'accent' ? 'from-accent-500 to-accent-600 text-primary-300' : undefined,
-		gradientColor === 'accent-bright'
-			? 'from-accent-100 to-accent-300 text-primary-500'
-			: undefined,
-		gradientColor === 'accent-featured'
-			? 'from-accent-500 to-accent-600 text-primary-300 sm:from-accent-100 sm:to-accent-300'
-			: undefined,
+		(() => {
+			switch (gradientColor) {
+				case 'primary': {
+					return darkMode
+						? 'from-primary-800 to-primary-600 dark:from-primary-100 dark:to-primary-300'
+						: 'from-primary-800 to-primary-600';
+				}
+				case 'primary-bright': {
+					return darkMode
+						? 'from-primary-50 to-primary-200 text-primary-500'
+						: 'from-primary-50 to-primary-200';
+				}
+				case 'primary-featured': {
+					return darkMode
+						? 'from-primary-800 to-primary-600 text-primary-300 sm:from-primary-50 sm:to-primary-200'
+						: 'from-primary-800 to-primary-600 text-primary-300 sm:from-primary-50 sm:to-primary-200';
+				}
+				case 'highlight': {
+					return darkMode
+						? 'from-highlight-600 to-highlight-800 text-primary-300'
+						: 'from-highlight-600 to-highlight-800 text-primary-300';
+				}
+				case 'highlight-bright': {
+					return darkMode
+						? 'from-highlight-50 to-highlight-200 text-primary-500'
+						: 'from-highlight-50 to-highlight-200 text-primary-500';
+				}
+				case 'accent': {
+					return darkMode
+						? 'from-accent-500 to-accent-600 dark:from-accent-300 dark:to-accent-500'
+						: 'from-accent-500 to-accent-600';
+				}
+				case 'accent-bright': {
+					return darkMode
+						? 'from-accent-100 to-accent-300 text-primary-500'
+						: 'from-accent-100 to-accent-300 text-primary-500';
+				}
+				case 'accent-featured': {
+					return darkMode
+						? 'from-accent-500 to-accent-600 text-primary-300 sm:from-accent-100 sm:to-accent-300'
+						: 'from-accent-500 to-accent-600 text-primary-300 sm:from-accent-100 sm:to-accent-300';
+				}
+				default: {
+					gradientColor satisfies never;
+					return '';
+				}
+			}
+		})(),
 		className,
 	]}><slot /></Tag
 >

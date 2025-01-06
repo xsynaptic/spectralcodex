@@ -18,7 +18,10 @@ const mapSprites = await getSprites('map-sprites', MapSpritesEnum);
 <SpriteSheet sprites={mapSprites} />
 
 <div
-	class="bg-fallback relative flex h-full max-h-[100vh] min-h-[min(600px,100vh)] overflow-hidden sm:rounded-sm lg:rounded-md"
+	class:list={[
+		'relative flex h-full max-h-[100vh] min-h-[min(600px,100vh)] overflow-hidden sm:rounded-sm lg:rounded-md',
+		'bg-fallback',
+	]}
 >
 	<ReactMapComponent style={{ zIndex: 20 }} {...props} client:visible />
 	<div class="absolute z-10 flex h-full w-full justify-center">
