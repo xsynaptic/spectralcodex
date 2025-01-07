@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       astro:
-        specifier: ^5.1.3
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -23,10 +23,10 @@ importers:
         version: 6.0.1
       '@astrojs/mdx':
         specifier: ^4.0.3
-        version: 4.0.3(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
+        version: 4.0.3(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
       '@astrojs/node':
         specifier: ^9.0.0
-        version: 9.0.0(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
+        version: 9.0.0(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
       '@astrojs/react':
         specifier: ^4.1.2
         version: 4.1.2(@types/node@22.2.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(jiti@2.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tsx@4.19.2)
@@ -38,7 +38,7 @@ importers:
         version: 3.2.1
       '@astrojs/tailwind':
         specifier: ^5.1.4
-        version: 5.1.4(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))(tailwindcss@3.4.17)
+        version: 5.1.4(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))(tailwindcss@3.4.17)
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.17.0
@@ -116,7 +116,7 @@ importers:
         version: 1.1.0
       astro-auto-import:
         specifier: ^0.4.4
-        version: 0.4.4(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
+        version: 0.4.4(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))
       astro-seo:
         specifier: ^0.8.4
         version: 0.8.4(prettier-plugin-astro@0.14.1)(prettier@3.4.2)(typescript@5.7.2)
@@ -225,9 +225,6 @@ importers:
 
   packages/content:
     devDependencies:
-      astro:
-        specifier: ^5.1.2
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       eslint:
         specifier: ^9.17.0
         version: 9.17.0(jiti@2.4.2)
@@ -265,8 +262,8 @@ importers:
   packages/content-demo:
     devDependencies:
       astro:
-        specifier: ^5.1.3
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       eslint:
         specifier: ^9.17.0
         version: 9.17.0(jiti@2.4.2)
@@ -307,8 +304,8 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       astro:
-        specifier: ^5.1.3
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -334,8 +331,8 @@ importers:
   packages/image-service:
     devDependencies:
       astro:
-        specifier: ^5.1.3
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
@@ -355,8 +352,8 @@ importers:
         specifier: ^18.3.5
         version: 18.3.5(@types/react@18.3.18)
       astro:
-        specifier: ^5.1.3
-        version: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -2457,8 +2454,8 @@ packages:
   astro-seo@0.8.4:
     resolution: {integrity: sha512-Ou1vzQSXAxa0K8rtNtXNvSpYqOGEgMhh0immMxJeXmbVZac3UKCNWAoXWyOQDFYsZvBugCRSg0N1phBqPMVgCw==}
 
-  astro@5.1.3:
-    resolution: {integrity: sha512-Zl/B4hmueJmlI5FJQcwbBRhHbRvbTWaTJzimkbH+jYczR5blt4uSh0DheyAt/+NwcnGfiC11z/XXJYIBR4LPUw==}
+  astro@5.1.0:
+    resolution: {integrity: sha512-g/cqwGK84Ozp5jyW45c3+2KQ4BeJtigbfwO8EA3lr7AC+XjE6/5dMvX4/bBaWf3gJVghd0L6cdqwlWikq+/Rrw==}
     engines: {node: ^18.17.1 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -6637,12 +6634,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.0.3(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))':
+  '@astrojs/mdx@4.0.3(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))':
     dependencies:
       '@astrojs/markdown-remark': 6.0.1
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
       acorn: 8.14.0
-      astro: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+      astro: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       es-module-lexer: 1.5.4
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.3
@@ -6656,9 +6653,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@9.0.0(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))':
+  '@astrojs/node@9.0.0(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))':
     dependencies:
-      astro: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+      astro: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       send: 1.1.0
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -6702,9 +6699,9 @@ snapshots:
       stream-replace-string: 2.0.0
       zod: 3.24.0
 
-  '@astrojs/tailwind@5.1.4(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))(tailwindcss@3.4.17)':
+  '@astrojs/tailwind@5.1.4(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2))(tailwindcss@3.4.17)':
     dependencies:
-      astro: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+      astro: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
       autoprefixer: 10.4.20(postcss@8.4.49)
       postcss: 8.4.49
       postcss-load-config: 4.0.2(postcss@8.4.49)
@@ -9353,11 +9350,11 @@ snapshots:
 
   astring@1.8.6: {}
 
-  astro-auto-import@0.4.4(astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)):
+  astro-auto-import@0.4.4(astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)):
     dependencies:
       '@types/node': 18.19.10
       acorn: 8.12.1
-      astro: 5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
+      astro: 5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2)
 
   astro-eslint-parser@1.0.2(typescript@5.7.2):
     dependencies:
@@ -9386,7 +9383,7 @@ snapshots:
       - prettier-plugin-astro
       - typescript
 
-  astro@5.1.3(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2):
+  astro@5.1.0(@types/node@22.2.0)(jiti@2.4.2)(rollup@4.28.0)(tsx@4.19.2)(typescript@5.7.2):
     dependencies:
       '@astrojs/compiler': 2.10.3
       '@astrojs/internal-helpers': 0.4.2
@@ -9854,7 +9851,7 @@ snapshots:
   css-tree@2.2.1:
     dependencies:
       mdn-data: 2.0.28
-      source-map-js: 1.2.0
+      source-map-js: 1.2.1
 
   css-tree@2.3.1:
     dependencies:
@@ -10677,7 +10674,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.6
 
   esutils@2.0.3: {}
 
