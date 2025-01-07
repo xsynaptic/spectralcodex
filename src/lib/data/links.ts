@@ -466,4 +466,19 @@ export const linksMap = [
 		titleAlt: '慢遊嘉義',
 		match: 'chiayicamera.tw',
 	},
+	{
+		title: 'Vivid Memory',
+		titleAlt: '記憶鮮明',
+		match: 'kudos12.wordpress.',
+	},
+	{
+		title: "Blair and Kate's Tourism and Food",
+		titleAlt: "Blair and Kate's 旅遊與美食",
+		match: 'blair-kate.blogspot.',
+	},
+	{
+		title: "Blair's Railway Photography",
+		titleAlt: "Blair's 鐵道攝影",
+		match: 'blair-train.blogspot.',
+	},
 ] as const satisfies LinksMapItem[];
