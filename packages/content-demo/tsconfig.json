@@ -7,7 +7,7 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react"
 	},
-	"include": ["../.astro/types.d.ts", "**/*", "../**/*.astro", "./.remarkrc.js"],
+	"include": ["../../.astro/types.d.ts", "../../**/*.astro", "./.remarkrc.mjs", "collections/**/*"],
 	"exclude": [".vscode"],
 	// Note 1: MDXProvidedComponents needs to be globally defined in a file with an `export {}`
 	// Note 2: MDX server crashes when plugins are not installed directly in this repo
