@@ -10,7 +10,7 @@ import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
 import { getTimelineSlugs, getTimelineYearlySlug } from '@/lib/timeline/timeline-utils';
 import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
 
-const getTimelineMetadata = async (): Promise<Array<ContentMetadataItem>> => {
+async function getTimelineMetadata(): Promise<Array<ContentMetadataItem>> {
 	const { ephemera } = await getEphemeraCollection();
 	const { locations } = await getLocationsCollection();
 	const { posts } = await getPostsCollection();
@@ -30,7 +30,7 @@ const getTimelineMetadata = async (): Promise<Array<ContentMetadataItem>> => {
 	);
 
 	return timelineMetadata;
-};
+}
 
 // Generate date routes from an arbitrary timeline collection
 export async function getTimelineItemsMap() {

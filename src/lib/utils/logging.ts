@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 // Super simple file logging to debug Astro builds
-export const logError = (message: string) => {
+export function logError(message: string) {
 	if (typeof import.meta.env.PWD !== 'string') {
 		throw new TypeError('import.meta.env.PWD not set!');
 	}
@@ -18,4 +18,4 @@ export const logError = (message: string) => {
 			console.error('Error writing to log file:', err);
 		}
 	});
-};
+}

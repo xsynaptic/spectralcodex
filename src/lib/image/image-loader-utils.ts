@@ -8,7 +8,7 @@ import { IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '@/constants';
 import { getImagePlaceholderDataUrl } from '@/lib/image/image-placeholder';
 
 // Split raw titles in the format `English Title (中文)`
-export const getImageTitle = (titleRaw: string | undefined) => {
+export function getImageTitle(titleRaw: string | undefined) {
 	const titleWrapped = titleRaw ? wrapCjk(titleRaw) : undefined;
 
 	if (titleWrapped) {
@@ -26,15 +26,15 @@ export const getImageTitle = (titleRaw: string | undefined) => {
 		title: undefined,
 		titleAlt: undefined,
 	};
-};
+}
 
-export const getImageExposureValue = ({
+export function getImageExposureValue({
 	aperture,
 	shutterSpeed,
 }: {
 	aperture: string | undefined;
 	shutterSpeed: string | undefined;
-}) => {
+}) {
 	if (!aperture || !shutterSpeed) return;
 
 	let shutterTime: number;
@@ -51,7 +51,7 @@ export const getImageExposureValue = ({
 
 	// Calculate EV using the formula EV = log2(N^2 / t)
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
-};
+}
 
 export async function getImagePlaceholder({
 	fileUrl,

@@ -22,22 +22,24 @@ type ImageOrientation = 'landscape' | 'portrait' | 'square';
 const imageSrcsetWidthsDefault = [450, 600, 900, 1200, 1800, 2400, 3600];
 
 // A simple check for image orientation
-const getImageOrientation = ({ height, width }: ImageMetadata): ImageOrientation => {
+function getImageOrientation({ height, width }: ImageMetadata): ImageOrientation {
 	if (height === width) return 'square';
 	if (height > width) return 'portrait';
 	return 'landscape';
-};
+}
 
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
-export const getImageSrcsetWidths = ({
+export function getImageSrcsetWidths({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
 }: {
 	maxWidth: number;
 	widths?: Array<number>;
-}) => [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
+}) {
+	return [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
+}
 
 // Currently we have no way to know the sizing of images in figure groups
 // Astro processes MDX from inside to out, meaning figures are interpreted first
@@ -45,13 +47,13 @@ export const getImageSrcsetWidths = ({
 // This creates a blind spot for specifying sizes attributes
 // One solution would be to explicitly require layout props in grouped images
 // But this would require a lot of rework to existing content, so maybe later
-export const getImageLayoutProps = ({
+export function getImageLayoutProps({
 	imageMetadata,
 	layout,
 }: {
 	imageMetadata: ImageMetadata;
 	layout?: ImageLayoutOption | undefined;
-}) => {
+}) {
 	const imageOrientation = getImageOrientation(imageMetadata);
 
 	switch (layout) {
@@ -101,4 +103,4 @@ export const getImageLayoutProps = ({
 			};
 		}
 	}
-};
+}

@@ -5,7 +5,7 @@ import { getImageObject } from '@/lib/image/image-file-handling';
 
 // Math to convert image dimensions into a constrained version for use with the placeholders
 // Note: `pixelCount` is the overall number of pixels in the placeholder
-export const getImagePlaceholderDimensions = ({
+export function getImagePlaceholderDimensions({
 	width,
 	height,
 	pixelCount,
@@ -13,13 +13,13 @@ export const getImagePlaceholderDimensions = ({
 	width: number;
 	height: number;
 	pixelCount: number;
-}): { width: number; height: number } => {
+}): { width: number; height: number } {
 	const aspectRatio = width / height;
 	const heightTarget = Math.sqrt(pixelCount / aspectRatio);
 	const widthTarget = pixelCount / heightTarget;
 
 	return { width: Math.round(widthTarget), height: Math.round(heightTarget) };
-};
+}
 
 /**
  * Low-quality image placeholder (LQIP) code originally adapted from Erika Florist
@@ -67,7 +67,7 @@ export async function getImagePlaceholderDataUrlHq(src: string) {
 }
 
 // Generate placeholder props for use with the Image component
-export const getImagePlaceholderProps = ({ placeholder }: { placeholder: string | undefined }) => {
+export function getImagePlaceholderProps({ placeholder }: { placeholder: string | undefined }) {
 	return {
 		...(placeholder
 			? {
@@ -82,4 +82,4 @@ export const getImagePlaceholderProps = ({ placeholder }: { placeholder: string 
 				}
 			: {}),
 	};
-};
+}

@@ -20,26 +20,26 @@ export interface FeaturedItemMetadata extends FeaturedItemBaseMetadata {
 }
 
 // This function returns a featured image from an array of images
-export const getSingleFeaturedItem = ({
+export function getSingleFeaturedItem({
 	images,
 	shuffle = false,
 }: {
 	images: Array<FeaturedItemBaseMetadata> | undefined;
 	shuffle?: boolean;
-}) => {
+}) {
 	if (!images) return;
 
 	return R.pipe(images, (items) => (shuffle ? R.shuffle(items) : items), R.first());
-};
+}
 
 // Same as above but all featured items are processed (and optionally shuffled)
-export const getFeaturedItemsMetadata = async ({
+export async function getFeaturedItemsMetadata({
 	images,
 	shuffle = false,
 }: {
 	images: Array<FeaturedItemBaseMetadata> | undefined;
 	shuffle?: boolean;
-}): Promise<Array<FeaturedItemMetadata> | undefined> => {
+}): Promise<Array<FeaturedItemMetadata> | undefined> {
 	if (!images) return undefined;
 
 	const contentMetadataIndex = await getContentMetadataIndex();
@@ -63,16 +63,16 @@ export const getFeaturedItemsMetadata = async ({
 		}),
 		(items) => (shuffle ? R.shuffle(items) : items),
 	);
-};
+}
 
 // Rather than accepting featured images directly from frontmatter this handles content metadata
-export const getFeaturedItemsFromContentMetadata = ({
+export function getFeaturedItemsFromContentMetadata({
 	items,
 	shuffle = false,
 }: {
 	items: Array<ContentMetadataItem> | undefined;
 	shuffle?: boolean;
-}): Array<FeaturedItemMetadata> | undefined => {
+}): Array<FeaturedItemMetadata> | undefined {
 	if (!items || items.length === 0) return;
 
 	return R.pipe(
@@ -88,4 +88,4 @@ export const getFeaturedItemsFromContentMetadata = ({
 		})),
 		(items) => (shuffle ? R.shuffle(items) : items),
 	);
-};
+}

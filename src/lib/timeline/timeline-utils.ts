@@ -11,27 +11,27 @@ const getDateParts = (date: Date): { year: string; month: string; day: string } 
 });
 
 // Generate slugs for different combinations of year, month, and day
-export const getTimelineSlugs = (date: Date): Array<string> => {
+export function getTimelineSlugs(date: Date): Array<string> {
 	const { year, month, day } = getDateParts(date);
 
 	return [year, `${year}/${month}`, `${year}/${month}/${day}`];
-};
+}
 
 // Generate a slug representing the year and month for a given date
-export const getTimelineMonthlySlug = (date: Date): string => {
+export function getTimelineMonthlySlug(date: Date): string {
 	const { year, month } = getDateParts(date);
 
 	return `${year}/${month}`;
-};
+}
 
 // Generate a slug only for the year of a give date
-export const getTimelineYearlySlug = (date: Date): string => {
+export function getTimelineYearlySlug(date: Date): string {
 	const { year } = getDateParts(date);
 
 	return year;
-};
+}
 
-export const getTimelineSpan = (slug: string): TimelineSpan => {
+export function getTimelineSpan(slug: string): TimelineSpan {
 	const depth = slug.split('/').length - 1;
 
 	switch (depth) {
@@ -45,4 +45,4 @@ export const getTimelineSpan = (slug: string): TimelineSpan => {
 			return 'year';
 		}
 	}
-};
+}

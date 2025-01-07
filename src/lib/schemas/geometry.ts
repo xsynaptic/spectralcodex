@@ -26,7 +26,7 @@ const GeometryLineStringSchema = z.object({
 	coordinates: z.tuple([z.number(), z.number()]).array().nonempty().min(2),
 });
 
-const validateCoordinates = (coordinates: [number, number]): z.IssueData | undefined => {
+function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {
 	if (!coordinates[0] || !coordinates[1]) {
 		return {
 			code: z.ZodIssueCode.custom,
@@ -52,7 +52,7 @@ const validateCoordinates = (coordinates: [number, number]): z.IssueData | undef
 		};
 	}
 	return;
-};
+}
 
 // GeoJSON geometry; currently we only support Point
 export const GeometrySchema = z

@@ -1,8 +1,8 @@
-export const parseContentDate = (date: string | Date | undefined) => {
+export function parseContentDate(date: string | Date | undefined) {
 	if (!date) return;
 	if (date instanceof Date) return date;
 	return new Date(date);
-};
+}
 
 interface CollectionEntryWithStandardDates {
 	data: {
@@ -12,10 +12,10 @@ interface CollectionEntryWithStandardDates {
 }
 
 // Intended to be a generic sort function for any collection entry with these standard date values
-export const sortByDateReverseChronological = (
+export function sortByDateReverseChronological(
 	a: CollectionEntryWithStandardDates,
 	b: CollectionEntryWithStandardDates,
-) => {
+) {
 	const aDate = parseContentDate(a.data.dateUpdated) ?? parseContentDate(a.data.dateCreated);
 	const bDate = parseContentDate(b.data.dateUpdated) ?? parseContentDate(b.data.dateCreated);
 
@@ -23,4 +23,4 @@ export const sortByDateReverseChronological = (
 		return bDate.getTime() - aDate.getTime();
 	}
 	return -1;
-};
+}

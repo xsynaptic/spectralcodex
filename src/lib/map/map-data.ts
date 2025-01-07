@@ -30,12 +30,12 @@ const buildProps = {
 };
 
 // Calculate map bounds based on geodata and some parameters; should not include outliers
-const getMapBounds = ({
+function getMapBounds({
 	featureCollection,
 	targetId,
 	boundsBuffer,
 	boundsBufferMax,
-}: MapDataBoundsProps) => {
+}: MapDataBoundsProps) {
 	if (!featureCollection) return;
 
 	const featureCollectionFiltered = {
@@ -73,10 +73,10 @@ const getMapBounds = ({
 		}
 	}
 	return;
-};
+}
 
 // Prepare most of the necessary props and data for the map component
-export const getMapData = ({
+export function getMapData({
 	featureCollection,
 	targetId,
 	boundsBuffer = 5,
@@ -87,7 +87,7 @@ export const getMapData = ({
 	Omit<
 		MapComponentProps,
 		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
-	>) => {
+	>) {
 	const mapBounds = getMapBounds({ featureCollection, targetId, boundsBuffer, boundsBufferMax });
 
 	if (featureCollection && mapBounds) {
@@ -132,4 +132,4 @@ export const getMapData = ({
 		...buildProps,
 		...restProps,
 	} satisfies MapComponentData;
-};
+}

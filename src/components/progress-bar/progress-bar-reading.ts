@@ -2,27 +2,31 @@ import { funnel } from 'remeda';
 
 const animationDuration = 300;
 
-export const readingBar = (selector: string) => {
+export function readingBar(selector: string) {
 	const element = document.querySelector<HTMLDivElement>(selector);
 	const readingFrame = document.querySelector('[data-reading-frame]');
 
-	if (!element || !readingFrame) return;
+	if (!readingFrame) return;
 
-	const setProgress = (progressValue: number) => {
-		element.style.setProperty('--progress-bar', String(progressValue));
-	};
+	function setProgress(progressValue: number) {
+		if (element) {
+			element.style.setProperty('--progress-bar', String(progressValue));
+		}
+	}
 
-	const setOpacity = (opacityValue: number) => {
-		element.style.setProperty('opacity', String(opacityValue));
-		element.ariaHidden = opacityValue === 0 ? 'true' : 'false';
-	};
+	function setOpacity(opacityValue: number) {
+		if (element) {
+			element.style.setProperty('opacity', String(opacityValue));
+			element.ariaHidden = opacityValue === 0 ? 'true' : 'false';
+		}
+	}
 
-	const setFinished = () => {
+	function setFinished() {
 		setProgress(1);
 		globalThis.window.setTimeout(() => {
 			setOpacity(0);
 		}, animationDuration / 2);
-	};
+	}
 
 	// Initialize opacity value
 	setOpacity(0);
@@ -68,4 +72,4 @@ export const readingBar = (selector: string) => {
 	);
 
 	observer.observe(readingFrame);
-};
+}

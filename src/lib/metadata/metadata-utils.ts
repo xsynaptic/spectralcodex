@@ -7,7 +7,7 @@ import { FEATURE_SHORTCODES_ERROR_LOG } from '@/constants';
 import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
 import { logError } from '@/lib/utils/logging';
 
-export const getContentMetadataById = async (id: string | undefined) => {
+export async function getContentMetadataById(id: string | undefined) {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const slug = slugify(id ?? `test-${String(Math.random())}`);
@@ -18,7 +18,7 @@ export const getContentMetadataById = async (id: string | undefined) => {
 		logError(`Missing content metadata specified in shortcode: "${slug}"`);
 	}
 	return contentMetadata;
-};
+}
 
 // Filter content metadata by featured images
 export function filterHasImageId<T extends CollectionKey = CollectionKey>(

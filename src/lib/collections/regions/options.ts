@@ -8,7 +8,7 @@ export interface RegionsOption {
 	termsSiblingsLabel?: string;
 }
 
-export const getRegionsOptions = (depth: number): RegionsOption => {
+export function getRegionsOptions(depth: number): RegionsOption {
 	const t = getTranslations();
 
 	switch (depth) {
@@ -40,4 +40,4 @@ export const getRegionsOptions = (depth: number): RegionsOption => {
 			};
 		}
 	}
-};
+}

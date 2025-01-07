@@ -4,26 +4,26 @@ const animationDuration = 300;
 
 // Extracted from the ProgressBar component to allow the use of TypeScript
 // Code adapted from astro-loading-indicator: https://github.com/florian-lefebvre/astro-loading-indicator
-export const loadingBar = (selector: string) => {
+export function loadingBar(selector: string) {
 	let element = document.querySelector<HTMLDivElement>(selector);
 
 	if (!element) return;
 
 	let progress = 0.2;
 
-	const setProgress = (progressValue: number) => {
+	function setProgress(progressValue: number) {
 		if (!element) return;
 		progress = progressValue;
 		element.style.setProperty('--progress-bar', String(progress));
-	};
+	}
 
-	const setOpacity = (opacityValue: number) => {
+	function setOpacity(opacityValue: number) {
 		if (!element) return;
 		element.style.setProperty('opacity', String(opacityValue));
 		element.ariaHidden = opacityValue === 0 ? 'true' : 'false';
-	};
+	}
 
-	const setFinished = () => {
+	function setFinished() {
 		setProgress(1);
 
 		globalThis.window.setTimeout(() => {
@@ -33,7 +33,7 @@ export const loadingBar = (selector: string) => {
 		globalThis.window.setTimeout(() => {
 			setProgress(0.2);
 		}, animationDuration * 2);
-	};
+	}
 
 	// Initialize opacity value
 	setOpacity(0);
@@ -66,4 +66,4 @@ export const loadingBar = (selector: string) => {
 
 		setFinished();
 	});
-};
+}

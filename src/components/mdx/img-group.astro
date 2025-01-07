@@ -19,13 +19,13 @@ if (imageCount === 0) {
 	throw new Error('ImgGroup components require at least one image!');
 }
 
-const getGridColumnCount = (itemCount: number): number => {
+function getGridColumnCount(itemCount: number) {
 	if (itemCount % 5 === 0) return 5;
 	if (itemCount % 4 === 0) return 4;
 	if (itemCount % 3 === 0) return 3;
 	if (itemCount % 2 === 0) return 2;
 	return 1;
-};
+}
 
 const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCount);
 ---

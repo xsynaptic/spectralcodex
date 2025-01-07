@@ -14,11 +14,11 @@ type GetImageTransformExtendedParams = GetImageTransformBaseParams & {
 };
 
 // This function handles image size validation and adds a default path to the image `src` where needed
-export const getImageTransformFunction = ({
+export function getImageTransformFunction({
 	image,
 	minWidth = CONTENT_IMAGE_FEATURED_MIN_WIDTH,
-}: GetImageTransformExtendedParams) =>
-	z.string().pipe(
+}: GetImageTransformExtendedParams) {
+	return z.string().pipe(
 		image().transform((img, ctx) => {
 			if (img.width <= minWidth)
 				ctx.addIssue({
@@ -29,10 +29,12 @@ export const getImageTransformFunction = ({
 			return img;
 		}),
 	);
+}
 
-export const getFeaturedImagesSchema = () =>
-	z.object({
+export function getFeaturedImagesSchema() {
+	return z.object({
 		src: reference('images'),
 		title: z.string().optional(),
 		contentId: z.string().optional(), // Optional reference to the content associated with an image
 	});
+}

@@ -24,14 +24,14 @@ const {
 } = Astro.props;
 
 // Optionally expand the list of regions to include ancestors
-const getRegions = async () => {
+async function getRegions() {
 	const getRegionAncestors = await getRegionAncestorsFunction();
 
 	const ancestors =
 		terms && terms.length === 1 && terms[0] ? getRegionAncestors(terms[0]) : undefined;
 
 	return ancestors ?? terms;
-};
+}
 
 const regions = showSingleRegionAncestors ? await getRegions() : terms;
 ---

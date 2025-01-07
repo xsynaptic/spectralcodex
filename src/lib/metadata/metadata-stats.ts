@@ -4,7 +4,7 @@ import { getImagesCollection } from '@/lib/collections/images/data';
 import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
 import { formatNumber } from '@/lib/utils/text';
 
-export const getContentStats = async () => {
+export async function getContentStats() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const contentMetadataArray = [...contentMetadataIndex.values()];
@@ -37,4 +37,4 @@ export const getContentStats = async () => {
 			itemCount: formatNumber({ number: images.length }),
 		},
 	};
-};
+}

@@ -5,7 +5,7 @@ import { getRegionsByIdsFunction } from '@/lib/collections/regions/utils';
 
 // Saved queries for use in MDX and other places
 // TODO: this should eventually be handled via user authentication
-export const getObjectiveLocations = async () => {
+export async function getObjectiveLocations() {
 	const { locations } = await getLocationsCollection();
 
 	const getRegionsByIds = await getRegionsByIdsFunction();
@@ -19,4 +19,4 @@ export const getObjectiveLocations = async () => {
 			),
 		),
 	);
-};
+}

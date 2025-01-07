@@ -8,7 +8,7 @@ import sharp from 'sharp';
 const { ASSETS_PREFIX, BASE_URL, PROD, SITE } = import.meta.env;
 
 // Astro images often have a bunch of query parameters crammed onto the end, let's parse it right
-const getImageFileExtension = (src?: string): string => {
+function getImageFileExtension(src?: string): string {
 	if (src) {
 		const imageFilePath = src.split('?')[0] ?? '';
 		const extensionIndex = imageFilePath.lastIndexOf('.');
@@ -16,12 +16,14 @@ const getImageFileExtension = (src?: string): string => {
 		if (extensionIndex !== -1) return imageFilePath.slice(extensionIndex + 1);
 	}
 	return '';
-};
+}
 
 // Type guard until types are improved in Astro
-const isAssetsPrefixObject = (
+function isAssetsPrefixObject(
 	assetsPrefix: string | Record<string, string>,
-): assetsPrefix is Record<string, string> => typeof assetsPrefix === 'object';
+): assetsPrefix is Record<string, string> {
+	return typeof assetsPrefix === 'object';
+}
 
 // Note 1: the base URL needs to be stripped from the local path when building for production
 // Note 2: this function can overwhelm localhost, hence using `ky` with retry support

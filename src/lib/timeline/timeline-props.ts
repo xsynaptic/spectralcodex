@@ -3,7 +3,9 @@ import type { ContentMetadataItem } from '@/types/metadata';
 
 import { getTimelineMonthlySlug, getTimelineSpan } from '@/lib/timeline/timeline-utils';
 
-const getTimelineMonthlyItems = (timelineItems: Array<ContentMetadataItem>): Array<TimelineMonthlyData> => {
+function getTimelineMonthlyItems(
+	timelineItems: Array<ContentMetadataItem>,
+): Array<TimelineMonthlyData> {
 	const timelineItemsMap = new Map<string, TimelineMonthlyData>();
 
 	if (timelineItems.length > 0) {
@@ -25,9 +27,9 @@ const getTimelineMonthlyItems = (timelineItems: Array<ContentMetadataItem>): Arr
 		}
 	}
 	return [...timelineItemsMap.values()];
-};
+}
 
-export const getTimelineProps = ({
+export function getTimelineProps({
 	timelineSlug,
 	timelineSlugs,
 	timelineItems,
@@ -42,7 +44,7 @@ export const getTimelineProps = ({
 	timelineSpan: TimelineSpan;
 	timelineItems: Array<ContentMetadataItem>;
 	timelineMonthlyData?: Array<TimelineMonthlyData>;
-} => {
+} {
 	const timelineSpan = getTimelineSpan(timelineSlug);
 
 	const currentDate = new Date(timelineSlug);
@@ -82,4 +84,4 @@ export const getTimelineProps = ({
 			};
 		}
 	}
-};
+}
