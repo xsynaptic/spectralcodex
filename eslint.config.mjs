@@ -39,6 +39,7 @@ const config = tseslint.config(
 			'@typescript-eslint': tseslint.plugin,
 		},
 		rules: {
+			'@typescript-eslint/array-type': ['warn', { default: 'generic' }],
 			'@typescript-eslint/no-unused-vars': [
 				'error',
 				{
@@ -67,7 +68,7 @@ const config = tseslint.config(
 					groups: [
 						[String.raw`^@?\w`], // External packages
 						[String.raw`^.*\u0000$`], // Type imports
-						['^(components|components-react|data|lib|pages|pages-layouts|styles|types)(/.*|$)'], // Internal packages inside `src` folder
+						['^(components|lib|pages|pages-layouts|styles|types)(/.*|$)'], // Internal packages inside `src` folder
 						[String.raw`^\u0000`], // Side effect imports
 						[String.raw`^\.\.(?!/?$)`, String.raw`^\.\./?$`], // Parent imports; put `..` last
 						[String.raw`^\./(?=.*/)(?!/?$)`, String.raw`^\.(?!/?$)`, String.raw`^\./?$`], // Other relative imports; put same folder imports and `.` last

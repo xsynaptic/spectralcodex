@@ -14,10 +14,10 @@ import { getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
 	title: string;
-	dateNavAllYears: string[];
+	dateNavAllYears: Array<string>;
 	timelineSpan: TimelineSpan;
-	timelineItems: ContentMetadataItem[];
-	timelineMonthlyData?: TimelineMonthlyData[] | undefined;
+	timelineItems: Array<ContentMetadataItem>;
+	timelineMonthlyData?: Array<TimelineMonthlyData> | undefined;
 }
 
 const { title, dateNavAllYears, timelineSpan, timelineItems, timelineMonthlyData } = Astro.props;

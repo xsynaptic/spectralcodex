@@ -8,7 +8,7 @@ import { getThemesCollection } from '@/lib/collections/themes/data';
 export async function getThemesByIdsFunction() {
 	const { themesMap } = await getThemesCollection();
 
-	return function getThemesById(ids: string[]) {
+	return function getThemesById(ids: Array<string>) {
 		return ids
 			.map((id) => {
 				const entry = themesMap.get(id);
@@ -18,7 +18,7 @@ export async function getThemesByIdsFunction() {
 				}
 				return entry;
 			})
-			.filter((item) => !!item) satisfies CollectionEntry<'themes'>[];
+			.filter((item) => !!item) satisfies Array<CollectionEntry<'themes'>>;
 	};
 }
 
@@ -29,7 +29,7 @@ export async function getPostsByThemeFunction() {
 	return function getPostsByTheme(entry: CollectionEntry<'themes'>) {
 		return posts.filter(({ data }) =>
 			data.themes?.find(({ id }) => id === entry.id),
-		) satisfies CollectionEntry<'posts'>[];
+		) satisfies Array<CollectionEntry<'posts'>>;
 	};
 }
 
@@ -40,7 +40,7 @@ export async function getLocationsByThemeFunction() {
 	return function getLocationsByTheme(entry: CollectionEntry<'themes'>) {
 		return locations.filter(({ data }) =>
 			data.themes?.find(({ id }) => id === entry.id),
-		) satisfies CollectionEntry<'locations'>[];
+		) satisfies Array<CollectionEntry<'locations'>>;
 	};
 }
 

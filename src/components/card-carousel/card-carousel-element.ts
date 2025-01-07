@@ -7,7 +7,7 @@ export const boundedValue = (value: number, total: number): number =>
 	((value % total) + total) % total;
 
 // Get the closest match from a numeric array
-export const closestArrayValue = (value: number, sourceArray: number[]): number =>
+export const closestArrayValue = (value: number, sourceArray: Array<number>): number =>
 	sourceArray.reduce((previous: number, current: number) => {
 		if (Math.abs(current - value) < Math.abs(previous - value)) {
 			return current;
@@ -71,7 +71,7 @@ customElements.define(
 			const slidesDimensions = this.container.getBoundingClientRect();
 			const slidesTotalWidth = this.container.scrollWidth - fuzzyPixels;
 			const slidesVisibleWidth = slidesDimensions.width;
-			const slidesOffsets: number[] = [];
+			const slidesOffsets: Array<number> = [];
 
 			let targetRaw = this.container.scrollLeft;
 

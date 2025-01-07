@@ -12,7 +12,7 @@ interface StyleIdentifiers {
 }
 
 // MapLibre expects some style properties to have at least two items
-const isDoubleStringArray = (array: string[]): array is [string, string, ...string[]] =>
+const isDoubleStringArray = (array: Array<string>): array is [string, string, ...Array<string>] =>
 	array.length >= 2;
 
 const getColorMap = (

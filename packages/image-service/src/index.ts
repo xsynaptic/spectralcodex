@@ -122,7 +122,7 @@ const service = {
 		};
 	},
 	getSrcSet({ src, height, width, widths, densities, quality, format }) {
-		const srcSet: UnresolvedSrcSetValue[] = [];
+		const srcSet: Array<UnresolvedSrcSetValue> = [];
 		const { targetWidth } = getTargetDimensions({ src, height, width });
 		const targetFormat = format ?? DEFAULT_OUTPUT_FORMAT;
 
@@ -138,7 +138,8 @@ const service = {
 		}
 
 		// Collect widths to generate from specified densities or widths
-		const allWidths: { maxTargetWidth: number; descriptor: `${number}x` | `${number}w` }[] = [];
+		const allWidths: Array<{ maxTargetWidth: number; descriptor: `${number}x` | `${number}w` }> =
+			[];
 
 		if (densities) {
 			// Densities can either be specified as numbers, or descriptors (ex: '1x'), we'll convert them all to numbers

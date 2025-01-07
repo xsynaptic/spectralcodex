@@ -16,11 +16,11 @@ export interface MetaProps {
 		publishedTime?: string;
 		modifiedTime?: string;
 		expirationTime?: string;
-		authors?: string[];
+		authors?: Array<string>;
 		section?: string;
-		tags?: string[];
+		tags?: Array<string>;
 	};
-	prefetchUrls?: string[] | undefined;
+	prefetchUrls?: Array<string> | undefined;
 }
 
 /**

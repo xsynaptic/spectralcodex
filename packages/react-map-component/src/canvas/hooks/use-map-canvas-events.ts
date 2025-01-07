@@ -140,7 +140,7 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const debouncedOnLoad = funnel<MapEvent[], HTMLElement | undefined>(
+	const debouncedOnLoad = funnel<Array<MapEvent>, HTMLElement | undefined>(
 		(container) => {
 			if (!container) {
 				console.warn('[Map] Map instance not found!');
@@ -168,7 +168,7 @@ export function useMapCanvasEvents() {
 			});
 		},
 		{
-			reducer: (_, ...args: MapEvent[]) => {
+			reducer: (_, ...args: Array<MapEvent>) => {
 				if (args.length === 0) return;
 
 				return args[0]?.target.getContainer();

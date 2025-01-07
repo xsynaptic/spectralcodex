@@ -4,7 +4,7 @@ import { performance } from 'node:perf_hooks';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	ephemera: CollectionEntry<'ephemera'>[];
+	ephemera: Array<CollectionEntry<'ephemera'>>;
 }
 
 let collection: Promise<CollectionData> | undefined;

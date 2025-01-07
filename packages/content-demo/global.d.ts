@@ -22,7 +22,10 @@ declare global {
 		}) => React.JSX.Element;
 		Link: (props: { id?: string; children: string | React.JSX.Element }) => React.JSX.Element;
 		LocationsTable: (props: { id: string }) => React.JSX.Element;
-		Map: (props: { locations: string[]; showHidden?: boolean | undefined }) => React.JSX.Element;
+		Map: (props: {
+			locations: Array<string>;
+			showHidden?: boolean | undefined;
+		}) => React.JSX.Element;
 		More: (props: { children?: never }) => React.JSX.Element;
 	}
 }

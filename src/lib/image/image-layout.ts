@@ -36,7 +36,7 @@ export const getImageSrcsetWidths = ({
 	widths = imageSrcsetWidthsDefault,
 }: {
 	maxWidth: number;
-	widths?: number[];
+	widths?: Array<number>;
 }) => [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
 
 // Currently we have no way to know the sizing of images in figure groups

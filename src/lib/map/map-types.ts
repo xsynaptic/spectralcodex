@@ -38,7 +38,7 @@ export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProp
 export interface MapComponentData extends MapComponentProps {
 	hasGeodata: boolean;
 	featureCount: number;
-	prefetchUrls?: string[] | undefined;
+	prefetchUrls?: Array<string> | undefined;
 }
 
 export type {

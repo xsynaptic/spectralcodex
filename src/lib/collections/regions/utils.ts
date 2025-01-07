@@ -19,7 +19,7 @@ function isCollectionEntryWithRegions(
 export async function getRegionsByIdsFunction() {
 	const { regionsMap } = await getRegionsCollection();
 
-	return function getRegionsById(ids: string[]) {
+	return function getRegionsById(ids: Array<string>) {
 		return ids
 			.map((id) => {
 				const entry = regionsMap.get(id);
@@ -31,7 +31,7 @@ export async function getRegionsByIdsFunction() {
 			})
 			.filter(
 				(entry): entry is CollectionEntry<'regions'> => !!entry,
-			) satisfies CollectionEntry<'regions'>[];
+			) satisfies Array<CollectionEntry<'regions'>>;
 	};
 }
 
@@ -45,7 +45,7 @@ export async function getRegionAncestorsFunction() {
 	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
 		const ancestors = region.data.ancestors ? getRegionsById(region.data.ancestors) : [];
 
-		return [region, ...ancestors] satisfies CollectionEntry<'regions'>[];
+		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
 	};
 }
 
@@ -60,7 +60,7 @@ export async function getRegionAncestorsByIdFunction() {
 		if (!region)
 			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
 
-		return getRegionAncestors(region) satisfies CollectionEntry<'regions'>[];
+		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
 	};
 }
 
@@ -71,7 +71,7 @@ export async function getRegionCommonAncestorFunction() {
 	const getRegionsById = await getRegionsByIdsFunction();
 	const getRegionAncestors = await getRegionAncestorsFunction();
 
-	return function getRegionCommonAncestor(regionIds: string[]): string | undefined {
+	return function getRegionCommonAncestor(regionIds: Array<string>): string | undefined {
 		const regions = getRegionsById(regionIds);
 
 		if (regions.length === 0) return;

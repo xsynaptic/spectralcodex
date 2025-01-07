@@ -7,7 +7,7 @@ import Link from '@/components/parts/link.astro';
 import ProseDescription from '@/components/parts/prose-description.astro';
 
 interface Props {
-	timelineItems: ContentMetadataItem[];
+	timelineItems: Array<ContentMetadataItem>;
 }
 
 const { timelineItems } = Astro.props;

@@ -55,7 +55,7 @@ export interface MapComponentProps {
 	interactive?: boolean;
 	zoom?: number | undefined;
 	showObjectiveFilter?: boolean | undefined;
-	languages?: string[] | undefined;
+	languages?: Array<string> | undefined;
 	protomapsApiKey: string;
 	buildId?: string | undefined;
 	isDev?: boolean | undefined;
@@ -65,5 +65,5 @@ export interface MapComponentProps {
 export interface MapComponentData extends MapComponentProps {
 	hasGeodata: boolean;
 	featureCount: number;
-	prefetchUrls?: string[] | undefined;
+	prefetchUrls?: Array<string> | undefined;
 }

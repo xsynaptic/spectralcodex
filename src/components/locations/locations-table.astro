@@ -9,7 +9,7 @@ import { getPrimaryRegionByLocationFunction } from '@/lib/collections/regions/ut
 import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
-	locations: CollectionEntry<'locations'>[];
+	locations: Array<CollectionEntry<'locations'>>;
 }
 
 const { locations } = Astro.props;

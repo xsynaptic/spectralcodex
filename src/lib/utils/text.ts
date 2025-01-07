@@ -17,7 +17,7 @@ export const textClipper = (
 };
 
 // Function to remove specified MDX components from text
-export const stripMdxComponents = (string: string, componentNames: string[]): string => {
+export const stripMdxComponents = (string: string, componentNames: Array<string>): string => {
 	const regex = new RegExp(
 		componentNames.map((name) => `<${name}(?:[^>.]*)>|</${name}>`).join('|'),
 		'gm',

@@ -24,7 +24,7 @@ export const getSingleFeaturedItem = ({
 	images,
 	shuffle = false,
 }: {
-	images: FeaturedItemBaseMetadata[] | undefined;
+	images: Array<FeaturedItemBaseMetadata> | undefined;
 	shuffle?: boolean;
 }) => {
 	if (!images) return;
@@ -37,9 +37,9 @@ export const getFeaturedItemsMetadata = async ({
 	images,
 	shuffle = false,
 }: {
-	images: FeaturedItemBaseMetadata[] | undefined;
+	images: Array<FeaturedItemBaseMetadata> | undefined;
 	shuffle?: boolean;
-}): Promise<FeaturedItemMetadata[] | undefined> => {
+}): Promise<Array<FeaturedItemMetadata> | undefined> => {
 	if (!images) return undefined;
 
 	const contentMetadataIndex = await getContentMetadataIndex();
@@ -70,9 +70,9 @@ export const getFeaturedItemsFromContentMetadata = ({
 	items,
 	shuffle = false,
 }: {
-	items: ContentMetadataItem[] | undefined;
+	items: Array<ContentMetadataItem> | undefined;
 	shuffle?: boolean;
-}): FeaturedItemMetadata[] | undefined => {
+}): Array<FeaturedItemMetadata> | undefined => {
 	if (!items || items.length === 0) return;
 
 	return R.pipe(

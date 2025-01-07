@@ -11,7 +11,7 @@ import {
 } from '../../store/hooks/use-map-store';
 
 // Reconstitute a valid GeoJSON object at the point of use
-function getGeojsonData(sourceItems: MapSourceItem[]) {
+function getGeojsonData(sourceItems: Array<MapSourceItem>) {
 	return sourceItems.length > 0
 		? ({
 				type: 'FeatureCollection' as const,

@@ -8,8 +8,8 @@ import { getMapData } from '@/lib/map/map-data';
 import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
 
 interface Props {
-	locations: string[];
-	languages?: string[] | undefined; // For controlling interface language
+	locations: Array<string>;
+	languages?: Array<string> | undefined; // For controlling interface language
 	showHidden: boolean;
 }
 

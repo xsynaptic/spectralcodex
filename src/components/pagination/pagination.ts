@@ -9,7 +9,7 @@ interface PaginationData {
 	getPageNumberLink: (pageNumber: number) => string;
 	pagePrevLink: string | undefined;
 	pageNextLink: string | undefined;
-	pageArray: number[];
+	pageArray: Array<number>;
 }
 
 /**
@@ -64,7 +64,7 @@ function getPageNumberArray({
 		pages = R.range(pageCount - delta, pageCount + 1);
 	}
 
-	const withDots = (value: number, pair: number[]) =>
+	const withDots = (value: number, pair: Array<number>) =>
 		pages.length + 1 === pageCount ? [value] : pair;
 
 	const lastPage = pages.at(-1);

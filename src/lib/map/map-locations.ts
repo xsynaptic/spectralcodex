@@ -29,7 +29,7 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 				t: MapGeometryTypeMap[geometry.type],
 				x: geometry.coordinates.map((position) =>
 					position.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))),
-				) as [number, number][],
+				) as Array<[number, number]>,
 			};
 		}
 	}
@@ -37,7 +37,7 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 
 // Generate canonical map feature data for a set of locations
 export function getLocationsFeatureCollection(
-	locations: CollectionEntry<'locations'>[] | undefined,
+	locations: Array<CollectionEntry<'locations'>> | undefined,
 	options?: {
 		showHiddenLocations?: boolean | undefined;
 	},
@@ -118,7 +118,7 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 
 // A specialized function for returning data for API endpoints
 export function getLocationsMapApiData(
-	locations: CollectionEntry<'locations'>[] | undefined,
+	locations: Array<CollectionEntry<'locations'>> | undefined,
 	options?: {
 		showHiddenLocations?: boolean | undefined;
 	},

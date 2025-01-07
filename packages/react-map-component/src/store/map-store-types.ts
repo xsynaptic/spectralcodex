@@ -23,13 +23,13 @@ export interface MapDataState {
 	/** Filter */
 	filterPosition: DOMCoordinates | undefined;
 	filterOpen: boolean;
-	statusFilter: LocationStatus[];
+	statusFilter: Array<LocationStatus>;
 	qualityFilter: number;
 	ratingFilter: number;
 	objectiveFilter: number;
 	showObjectiveFilter: boolean;
 	/** Other */
-	languages?: string[] | undefined;
+	languages?: Array<string> | undefined;
 }
 
 export type MapDataConfigurableState = Pick<
@@ -62,13 +62,13 @@ export interface MapDataStore extends MapDataState {
 		setPopupDataLoading: (popupDataLoading: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
 		setFilterOpen: (filterOpen: boolean) => void;
-		setStatusFilter: (statusFilter: LocationStatus[]) => void;
+		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
 		toggleStatusFilter: (status: LocationStatus) => void;
 		showAllStatusFilter: () => void;
 		hideAllStatusFilter: () => void;
 		setQualityFilter: (qualityFilter: number) => void;
 		setRatingFilter: (ratingFilter: number) => void;
 		setObjectiveFilter: (objectiveFilter: number) => void;
-		setLanguages: (languages: string[]) => void;
+		setLanguages: (languages: Array<string>) => void;
 	};
 }

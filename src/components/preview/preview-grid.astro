@@ -7,7 +7,7 @@ import PreviewGridItem from '@/components/preview/preview-grid-item.astro';
 
 interface Props extends PreviewItemProps {
 	class?: string | undefined;
-	items: ContentMetadataItem[];
+	items: Array<ContentMetadataItem>;
 }
 
 const { class: className, items, ...contentPreviewGridOptions } = Astro.props;

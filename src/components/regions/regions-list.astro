@@ -10,7 +10,7 @@ import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
 import { getContentUrl } from '@/lib/utils/routing';
 
 interface Props {
-	terms: CollectionEntry<'regions'>[] | undefined;
+	terms: Array<CollectionEntry<'regions'>> | undefined;
 	dividerContent?: DividerContent | undefined;
 	showSingleRegionAncestors?: boolean;
 	showTitleAlt?: boolean;

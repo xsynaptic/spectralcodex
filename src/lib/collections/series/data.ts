@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	series: CollectionEntry<'series'>[];
+	series: Array<CollectionEntry<'series'>>;
 }
 
 let collection: Promise<CollectionData> | undefined;

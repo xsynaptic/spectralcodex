@@ -6,7 +6,7 @@ export interface TimelineMonthlyData {
 	id: string;
 	date: Date;
 	title: string;
-	timelineItems: ContentMetadataItem[];
+	timelineItems: Array<ContentMetadataItem>;
 }
 
 export interface TimelineYearlyData {

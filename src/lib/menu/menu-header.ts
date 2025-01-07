@@ -43,4 +43,4 @@ export const menuHeaderItems = [
 		title: t('menu.about.label'),
 		url: getSiteUrl('about'),
 	},
-] satisfies MenuItem[];
+] satisfies Array<MenuItem>;

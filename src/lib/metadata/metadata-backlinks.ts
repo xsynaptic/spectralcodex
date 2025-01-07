@@ -10,7 +10,7 @@ export async function getContentBacklinks({ id }: { id: string }) {
 
 	if (!contentMetadataItem || contentMetadataItem.backlinks.size === 0) return;
 
-	const backlinkItems: ContentMetadataItem[] = [];
+	const backlinkItems: Array<ContentMetadataItem> = [];
 
 	for (const backlinkId of contentMetadataItem.backlinks) {
 		const backlinkItem = contentMetadataIndex.get(backlinkId);

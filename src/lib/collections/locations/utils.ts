@@ -10,7 +10,7 @@ export const getLocationHasContent = (entry: CollectionEntry<'locations'>) =>
 export async function getLocationsByIdsFunction() {
 	const { locationsMap } = await getLocationsCollection();
 
-	return function getLocationsById(ids: string[]) {
+	return function getLocationsById(ids: Array<string>) {
 		return ids
 			.map((id) => {
 				const entry = locationsMap.get(id);
@@ -22,7 +22,7 @@ export async function getLocationsByIdsFunction() {
 			})
 			.filter(
 				(entry): entry is CollectionEntry<'locations'> => !!entry,
-			) satisfies CollectionEntry<'locations'>[];
+			) satisfies Array<CollectionEntry<'locations'>>;
 	};
 }
 
@@ -30,7 +30,7 @@ export async function getLocationsByIdsFunction() {
 export async function getLocationsByPostsFunction() {
 	const { locationsMap } = await getLocationsCollection();
 
-	return function getLocationsByPosts(...posts: CollectionEntry<'posts'>[]) {
+	return function getLocationsByPosts(...posts: Array<CollectionEntry<'posts'>>) {
 		const ids = [
 			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
 		];
@@ -39,6 +39,6 @@ export async function getLocationsByPostsFunction() {
 			.map((id) => locationsMap.get(id))
 			.filter(
 				(entry): entry is CollectionEntry<'locations'> => !!entry,
-			) satisfies CollectionEntry<'locations'>[];
+			) satisfies Array<CollectionEntry<'locations'>>;
 	};
 }

@@ -8,8 +8,8 @@ import type { StoredDataNoRaw } from 'keyv';
 import { iconsCache } from '@/lib/icons/icons-cache';
 
 // Parse icon requests to generate a map of unique icon sets and corresponding names
-function getIconMap(iconRecord: Record<string, string>): Map<string, string[]> {
-	const iconMap = new Map<string, string[]>();
+function getIconMap(iconRecord: Record<string, string>): Map<string, Array<string>> {
+	const iconMap = new Map<string, Array<string>>();
 
 	for (const iconRequest of R.values(iconRecord)) {
 		const [iconCollectionId, iconName] = iconRequest.split(':');
@@ -32,10 +32,10 @@ function getIconMap(iconRecord: Record<string, string>): Map<string, string[]> {
 export async function getSprites<T extends string>(
 	key: string,
 	iconRecord: Record<T, string>,
-): Promise<string[]> {
+): Promise<Array<string>> {
 	const startTime = performance.now();
 
-	let sprites: StoredDataNoRaw<string[]> = await iconsCache.get<string[]>(key);
+	let sprites: StoredDataNoRaw<Array<string>> = await iconsCache.get<Array<string>>(key);
 
 	if (!sprites) {
 		const spritesMap = new Map<string, string>();

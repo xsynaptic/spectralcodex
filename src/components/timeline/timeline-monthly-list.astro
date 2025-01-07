@@ -6,7 +6,7 @@ import TimelineList from '@/components/timeline/timeline-list.astro';
 import { getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
-	timelineMonthlyData: TimelineMonthlyData[];
+	timelineMonthlyData: Array<TimelineMonthlyData>;
 }
 
 const { timelineMonthlyData } = Astro.props;

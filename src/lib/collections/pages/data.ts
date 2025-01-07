@@ -4,7 +4,7 @@ import { performance } from 'node:perf_hooks';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	pages: CollectionEntry<'pages'>[];
+	pages: Array<CollectionEntry<'pages'>>;
 }
 
 let collection: Promise<CollectionData> | undefined;

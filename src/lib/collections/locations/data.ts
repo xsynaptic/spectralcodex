@@ -19,7 +19,7 @@ import { getImageByIdFunction } from '@/lib/collections/images/utils';
 import { getContentUrl } from '@/lib/utils/routing';
 
 interface CollectionData {
-	locations: CollectionEntry<'locations'>[];
+	locations: Array<CollectionEntry<'locations'>>;
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
@@ -34,7 +34,7 @@ function getDistanceId(idA: string, idB: string) {
 	return [idA, idB].sort().join('-');
 }
 
-function getGenerateNearbyItemsFunction(locations: CollectionEntry<'locations'>[]) {
+function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
 	// In-memory cache of distances; this way we can do half the number of operations
 	// Because for single points, A<->B is the same as B<->A
 	const distances = new Map<string, number>();
@@ -127,7 +127,7 @@ async function generateLocationPostDataFunction() {
 	};
 }
 
-async function generateLocationImageData(locations: CollectionEntry<'locations'>[]) {
+async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
 	const limit = pLimit(50);

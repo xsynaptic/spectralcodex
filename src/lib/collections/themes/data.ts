@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	themes: CollectionEntry<'themes'>[];
+	themes: Array<CollectionEntry<'themes'>>;
 	themesMap: Map<string, CollectionEntry<'themes'>>;
 }
 

@@ -4,7 +4,7 @@ import { MAP_GEOMETRY_COORDINATES_PRECISION } from '@/constants';
 
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
-export const validateLocations = (locations: CollectionEntry<'locations'>[]) => {
+export const validateLocations = (locations: Array<CollectionEntry<'locations'>>) => {
 	const locationTitle = new Set<string>();
 	const locationTitleAlt = new Set<string>();
 	const locationAddress = new Set<string>();

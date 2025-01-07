@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	images: CollectionEntry<'images'>[];
+	images: Array<CollectionEntry<'images'>>;
 	imagesMap: Map<string, CollectionEntry<'images'>>;
 }
 

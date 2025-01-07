@@ -11,7 +11,7 @@ const getDateParts = (date: Date): { year: string; month: string; day: string } 
 });
 
 // Generate slugs for different combinations of year, month, and day
-export const getTimelineSlugs = (date: Date): string[] => {
+export const getTimelineSlugs = (date: Date): Array<string> => {
 	const { year, month, day } = getDateParts(date);
 
 	return [year, `${year}/${month}`, `${year}/${month}/${day}`];

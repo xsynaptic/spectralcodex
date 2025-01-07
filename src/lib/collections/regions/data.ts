@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
-	regions: CollectionEntry<'regions'>[];
+	regions: Array<CollectionEntry<'regions'>>;
 	regionsMap: Map<string, CollectionEntry<'regions'>>;
 }
 
@@ -76,7 +76,7 @@ async function generateCollection() {
 	});
 
 	// Generate locations and posts by region maps; this will make subsequent calculations faster
-	const locationsByRegionMap = new Map<string, string[]>();
+	const locationsByRegionMap = new Map<string, Array<string>>();
 
 	R.forEach(locations, (entry) => {
 		for (const { id: regionId } of entry.data.regions) {
@@ -87,7 +87,7 @@ async function generateCollection() {
 		}
 	});
 
-	const postsByRegionMap = new Map<string, string[]>();
+	const postsByRegionMap = new Map<string, Array<string>>();
 
 	R.forEach(posts, (entry) => {
 		if (entry.data.regions) {

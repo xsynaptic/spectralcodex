@@ -11,13 +11,13 @@ import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
 export async function getSeriesContentMetadataItemsFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	return function getSeriesContentMetadataItems(ids: string[] | undefined) {
+	return function getSeriesContentMetadataItems(ids: Array<string> | undefined) {
 		if (!ids || ids.length === 0) return;
 
 		return ids
 			.map((id) => (contentMetadataIndex.has(id) ? contentMetadataIndex.get(id) : undefined))
 			.filter((entry): entry is ContentMetadataItem => !!entry)
-			.filter((item) => !!item.imageId) satisfies ContentMetadataItem[];
+			.filter((item) => !!item.imageId) satisfies Array<ContentMetadataItem>;
 	};
 }
 
@@ -28,7 +28,7 @@ export async function getLocationsBySeriesFunction() {
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();
 
-	return function getLocationsBySeries(seriesItemIds: string[] | undefined) {
+	return function getLocationsBySeries(seriesItemIds: Array<string> | undefined) {
 		if (!seriesItemIds || seriesItemIds.length === 0) return [];
 
 		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
@@ -81,10 +81,10 @@ export async function getSeriesByIdFunction() {
 			entry.data.seriesItems?.includes(id),
 		);
 
-		const results: {
+		const results: Array<{
 			entry: CollectionEntry<'series'>;
-			metadataItems: ContentMetadataItem[];
-		}[] = [];
+			metadataItems: Array<ContentMetadataItem>;
+		}> = [];
 
 		for (const entry of entries) {
 			const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);

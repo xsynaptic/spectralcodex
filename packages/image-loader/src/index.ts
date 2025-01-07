@@ -29,7 +29,7 @@ interface ImageLoaderOptions {
 	/** The base directory to resolve images from. Relative to the root directory, or an absolute file URL. Defaults to `.` */
 	base?: string;
 	/** Valid image extensions to scan for. Defaults to the Astro defaults. */
-	extensions?: (typeof VALID_IMAGE_FORMATS)[number][];
+	extensions?: Array<(typeof VALID_IMAGE_FORMATS)[number]>;
 	/** How many images to process at a time. */
 	concurrency?: number;
 	/**

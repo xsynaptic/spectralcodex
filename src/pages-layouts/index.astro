@@ -13,10 +13,10 @@ import { getTranslations } from '@/lib/utils/i18n';
 import { getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
-	featuredMetadataItems: ContentMetadataItem[];
-	recentMetadataItems: ContentMetadataItem[];
-	themesMetadataItems: ContentMetadataItem[];
-	seriesMetadataItems: ContentMetadataItem[];
+	featuredMetadataItems: Array<ContentMetadataItem>;
+	recentMetadataItems: Array<ContentMetadataItem>;
+	themesMetadataItems: Array<ContentMetadataItem>;
+	seriesMetadataItems: Array<ContentMetadataItem>;
 }
 
 const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =

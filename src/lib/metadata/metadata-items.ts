@@ -8,7 +8,7 @@ export async function getContentMetadataFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	return function getContentMetadata<T extends CollectionKey = CollectionKey>(
-		entries: CollectionEntry<T>[],
+		entries: Array<CollectionEntry<T>>,
 	) {
 		return entries.map(({ id, collection }) => {
 			const contentMetadata = contentMetadataIndex.get(id);
@@ -19,6 +19,6 @@ export async function getContentMetadataFunction() {
 				);
 			}
 			return contentMetadata as ContentMetadataItem<T>;
-		}) satisfies ContentMetadataItem<T>[];
+		}) satisfies Array<ContentMetadataItem<T>>;
 	};
 }

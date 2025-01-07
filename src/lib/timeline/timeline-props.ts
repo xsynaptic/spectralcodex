@@ -3,7 +3,7 @@ import type { ContentMetadataItem } from '@/types/metadata';
 
 import { getTimelineMonthlySlug, getTimelineSpan } from '@/lib/timeline/timeline-utils';
 
-const getTimelineMonthlyItems = (timelineItems: ContentMetadataItem[]): TimelineMonthlyData[] => {
+const getTimelineMonthlyItems = (timelineItems: Array<ContentMetadataItem>): Array<TimelineMonthlyData> => {
 	const timelineItemsMap = new Map<string, TimelineMonthlyData>();
 
 	if (timelineItems.length > 0) {
@@ -33,15 +33,15 @@ export const getTimelineProps = ({
 	timelineItems,
 }: {
 	timelineSlug: string;
-	timelineSlugs: string[];
-	timelineItems: ContentMetadataItem[];
+	timelineSlugs: Array<string>;
+	timelineItems: Array<ContentMetadataItem>;
 }): {
 	title: string;
-	dateNavCurrentYear: string[];
-	dateNavAllYears: string[];
+	dateNavCurrentYear: Array<string>;
+	dateNavAllYears: Array<string>;
 	timelineSpan: TimelineSpan;
-	timelineItems: ContentMetadataItem[];
-	timelineMonthlyData?: TimelineMonthlyData[];
+	timelineItems: Array<ContentMetadataItem>;
+	timelineMonthlyData?: Array<TimelineMonthlyData>;
 } => {
 	const timelineSpan = getTimelineSpan(timelineSlug);
 

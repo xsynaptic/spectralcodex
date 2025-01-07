@@ -6,7 +6,7 @@ import { getPostsCollection } from '@/lib/collections/posts/data';
 export async function getPostsByIdsFunction() {
 	const { postsMap } = await getPostsCollection();
 
-	return function getPostsById(ids: string[]) {
+	return function getPostsById(ids: Array<string>) {
 		return ids
 			.map((id) => {
 				const entry = postsMap.get(id);
@@ -18,6 +18,6 @@ export async function getPostsByIdsFunction() {
 			})
 			.filter(
 				(entry): entry is CollectionEntry<'posts'> => !!entry,
-			) satisfies CollectionEntry<'posts'>[];
+			) satisfies Array<CollectionEntry<'posts'>>;
 	};
 }
