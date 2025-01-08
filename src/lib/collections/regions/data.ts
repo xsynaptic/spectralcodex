@@ -1,6 +1,5 @@
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-import * as R from 'remeda';
 
 import type { CollectionEntry } from 'astro:content';
 
@@ -19,7 +18,7 @@ async function generateCollection() {
 	const regions = await getCollection('regions');
 
 	// Calculate ancestors
-	R.forEach(regions, (entry) => {
+	for (const entry of regions) {
 		if (entry.data.parent) {
 			let current = entry;
 
@@ -36,10 +35,10 @@ async function generateCollection() {
 				current = parent;
 			}
 		}
-	});
+	}
 
 	// Calculate children, siblings, and descendants
-	R.forEach(regions, (entry) => {
+	for (const entry of regions) {
 		const children = regions.filter(({ data }) => data.parent?.id === entry.id);
 
 		if (children.length > 0) {
@@ -73,23 +72,23 @@ async function generateCollection() {
 				}
 			}
 		}
-	});
+	}
 
 	// Generate locations and posts by region maps; this will make subsequent calculations faster
 	const locationsByRegionMap = new Map<string, Array<string>>();
 
-	R.forEach(locations, (entry) => {
+	for (const entry of locations) {
 		for (const { id: regionId } of entry.data.regions) {
 			if (!locationsByRegionMap.has(regionId)) {
 				locationsByRegionMap.set(regionId, []);
 			}
 			locationsByRegionMap.get(regionId)!.push(entry.id);
 		}
-	});
+	}
 
 	const postsByRegionMap = new Map<string, Array<string>>();
 
-	R.forEach(posts, (entry) => {
+	for (const entry of posts) {
 		if (entry.data.regions) {
 			for (const { id: regionId } of entry.data.regions) {
 				if (!postsByRegionMap.has(regionId)) {
@@ -98,10 +97,10 @@ async function generateCollection() {
 				postsByRegionMap.get(regionId)!.push(entry.id);
 			}
 		}
-	});
+	}
 
 	// Calculate cumulative post and location count
-	R.forEach(regions, (entry) => {
+	for (const entry of regions) {
 		const entries = entry.data.descendants ? [entry.id, ...entry.data.descendants] : [entry.id];
 
 		entry.data.locations = [
@@ -112,11 +111,13 @@ async function generateCollection() {
 			(item): item is string => !!item,
 		);
 		entry.data.postCount = entry.data.posts.length;
-	});
+	}
 
 	const regionsMap = new Map<string, CollectionEntry<'regions'>>();
 
-	R.forEach(regions, (entry) => regionsMap.set(entry.id, entry));
+	for (const entry of regions) {
+		regionsMap.set(entry.id, entry);
+	}
 
 	console.log(
 		`[Regions] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,

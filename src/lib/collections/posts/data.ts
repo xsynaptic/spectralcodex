@@ -1,6 +1,5 @@
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-import * as R from 'remeda';
 
 import type { CollectionEntry } from 'astro:content';
 
@@ -18,7 +17,9 @@ async function generateCollection() {
 
 	const postsMap = new Map<string, CollectionEntry<'posts'>>();
 
-	R.forEach(posts, (entry) => postsMap.set(entry.id, entry));
+	for (const entry of posts) {
+		postsMap.set(entry.id, entry);
+	}
 
 	console.log(
 		`[Posts] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,

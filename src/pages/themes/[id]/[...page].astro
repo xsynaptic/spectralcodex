@@ -27,9 +27,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const showChineseInterface = entry.id.startsWith('taiwan');
 
 		// Note: the need to get location data async means we should filter this first!
-		const locationsFiltered = R.pipe(
-			locations,
-			R.filter(({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false)
+		const locationsFiltered = locations.filter(
+			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false
 		);
 
 		const metadataItems = R.pipe(

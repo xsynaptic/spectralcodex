@@ -11,7 +11,7 @@ import { iconsCache } from '@/lib/icons/icons-cache';
 function getIconMap(iconRecord: Record<string, string>): Map<string, Array<string>> {
 	const iconMap = new Map<string, Array<string>>();
 
-	for (const iconRequest of R.values(iconRecord)) {
+	for (const iconRequest of Object.values(iconRecord)) {
 		const [iconCollectionId, iconName] = iconRequest.split(':');
 
 		if (iconCollectionId && iconName) {

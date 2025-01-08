@@ -1,6 +1,4 @@
 ---
-import * as R from 'remeda';
-
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { getPagesCollection } from '@/lib/collections/pages/data';
@@ -9,13 +7,10 @@ import PageEntry from '@/pages-layouts/page-entry.astro';
 export const getStaticPaths = (async () => {
 	const { pages } = await getPagesCollection();
 
-	return R.pipe(
-		pages,
-		R.map((entry) => ({
-			params: { id: entry.id },
-			props: { entry },
-		}))
-	);
+	return pages.map((entry) => ({
+		params: { id: entry.id },
+		props: { entry },
+	}));
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

@@ -9,7 +9,6 @@ import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
-import * as R from 'remeda';
 
 import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
@@ -88,9 +87,8 @@ function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locati
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
 		if (entry.data.geometry.type !== 'Point') return;
 
-		const nearby = R.pipe(
-			points,
-			R.map((point) => {
+		const nearby = points
+			.map((point) => {
 				if (!point || entry.id === point.id) return;
 
 				const distanceId = getDistanceId(entry.id, point.id);
@@ -103,11 +101,13 @@ function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locati
 							distanceDisplay: distance.toFixed(2),
 						}
 					: undefined;
-			}),
-			R.filter((item) => !!item),
-			R.sort((a, b) => a.distance - b.distance),
-			R.take(LOCATIONS_NEARBY_COUNT_LIMIT),
-		) satisfies CollectionEntry<'locations'>['data']['nearby'];
+			})
+			.filter((item) => !!item)
+			.sort((a, b) => a.distance - b.distance)
+			.slice(
+				0,
+				LOCATIONS_NEARBY_COUNT_LIMIT,
+			) satisfies CollectionEntry<'locations'>['data']['nearby'];
 
 		// If we have nearby points let's add data to the actual location entry
 		if (nearby.length > 0) {
@@ -130,7 +130,7 @@ async function generateLocationPostDataFunction() {
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
-	const limit = pLimit(50);
+	const limit = pLimit(100);
 
 	// Add image data to locations; for use with the mapping system
 	await Promise.all(
@@ -186,17 +186,19 @@ async function generateCollection() {
 	const generateNearbyItems = getGenerateNearbyItemsFunction(locations);
 
 	// Loop through every item in the collection and add metadata
-	R.forEach(locations, (entry) => {
+	for (const entry of locations) {
 		generateLocationPostData(entry);
 		generateNearbyItems(entry);
 		generateLocationMapData(entry);
-	});
+	}
 
 	await generateLocationImageData(locations);
 
 	const locationsMap = new Map<string, CollectionEntry<'locations'>>();
 
-	R.forEach(locations, (entry) => locationsMap.set(entry.id, entry));
+	for (const entry of locations) {
+		locationsMap.set(entry.id, entry);
+	}
 
 	console.log(
 		`[Locations] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,

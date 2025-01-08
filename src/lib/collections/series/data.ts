@@ -1,11 +1,11 @@
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-import * as R from 'remeda';
 
 import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
 	series: Array<CollectionEntry<'series'>>;
+	seriesMap: Map<string, CollectionEntry<'series'>>;
 }
 
 let collection: Promise<CollectionData> | undefined;
@@ -18,18 +18,22 @@ async function generateCollection() {
 	const locations = await getCollection('locations');
 	const posts = await getCollection('posts');
 
-	R.forEach(series, (entry) => {
+	const seriesMap = new Map<string, CollectionEntry<'series'>>();
+
+	for (const entry of series) {
 		entry.data.locationCount = locations.filter((location) =>
 			entry.data.seriesItems?.includes(location.id),
 		).length;
 		entry.data.postCount = posts.filter((post) => entry.data.seriesItems?.includes(post.id)).length;
-	});
+
+		seriesMap.set(entry.id, entry);
+	}
 
 	console.log(
 		`[Series] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
-	return { series };
+	return { series, seriesMap };
 }
 
 export async function getSeriesCollection() {

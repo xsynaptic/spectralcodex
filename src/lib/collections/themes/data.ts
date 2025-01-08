@@ -1,6 +1,5 @@
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-import * as R from 'remeda';
 
 import type { CollectionEntry } from 'astro:content';
 
@@ -19,18 +18,20 @@ async function generateCollection() {
 	const locations = await getCollection('locations');
 	const posts = await getCollection('posts');
 
-	R.forEach(themes, (entry) => {
+	for (const entry of themes) {
 		entry.data.locationCount = locations.filter((location) =>
 			location.data.themes?.some(({ id }) => id === entry.id),
 		).length;
 		entry.data.postCount = posts.filter((post) =>
 			post.data.themes?.some(({ id }) => id === entry.id),
 		).length;
-	});
+	}
 
 	const themesMap = new Map<string, CollectionEntry<'themes'>>();
 
-	R.forEach(themes, (entry) => themesMap.set(entry.id, entry));
+	for (const entry of themes) {
+		themesMap.set(entry.id, entry);
+	}
 
 	console.log(
 		`[Themes] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,

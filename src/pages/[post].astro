@@ -15,21 +15,18 @@ export const getStaticPaths = (async () => {
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();
 
-	return R.pipe(
-		posts,
-		R.map((entry) => ({
-			params: { post: entry.id },
-			props: {
-				entry,
-				mapData: getMapData({
-					featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
-					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-					// TODO: bounds buffer should probably be proportionate to the number of items
-					boundsBufferMax: 50,
-				}),
-			},
-		}))
-	);
+	return posts.map((entry) => ({
+		params: { post: entry.id },
+		props: {
+			entry,
+			mapData: getMapData({
+				featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
+				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+				// TODO: bounds buffer should probably be proportionate to the number of items
+				boundsBufferMax: 50,
+			}),
+		},
+	}));
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
