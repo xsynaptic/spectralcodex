@@ -1,21 +1,16 @@
 ---
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
-import { MapSpritesEnum } from '@spectralcodex/react-map-component';
 
 import type { MapComponentProps } from '@spectralcodex/react-map-component';
 
-import SpriteSheet from '@/components/parts/sprite-sheet.astro';
-import { getSprites } from '@/lib/icons/icons-utils';
+import MapComponentSprites from '@/components/map/map-component-sprites.astro';
 
 type Props = MapComponentProps;
 
 const props = Astro.props;
-
-// TODO: this is really slow
-const mapSprites = await getSprites('map-sprites', MapSpritesEnum);
 ---
 
-<SpriteSheet sprites={mapSprites} />
+<MapComponentSprites />
 
 <div
 	class:list={[

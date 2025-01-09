@@ -142,7 +142,7 @@ const MapFilterRatingMenuItem = () => {
 
 	return (
 		<li>
-			<div className="flex h-[20px] w-full select-none items-center justify-center gap-1 md:h-[24px]">
+			<div className="flex h-[20px] w-full select-none items-center justify-center gap-2 px-1 md:h-[24px]">
 				{R.range(1, 6).map((value) => (
 					<svg
 						key={`rating-${String(value)}`}
@@ -174,7 +174,7 @@ const MapFilterObjectiveMenuItem = () => {
 			<div className="flex w-full cursor-pointer select-none items-center gap-1">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
-						className={`flex-1 rounded-full border font-display text-xs text-primary-700 sm:text-sm ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
+						className={`flex-1 rounded-full border font-display text-xs text-primary-700 ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
 						onClick={() => {
 							setObjectiveFilter(value);
 						}}
