@@ -26,8 +26,8 @@ export const ReactMapComponent = memo(function ReactMapComponent({
 		<ReactQueryProvider>
 			<MapStoreProvider
 				initialState={{
-					...(sourceDataParsed ? { sourceData: sourceDataParsed } : {}),
-					...(popupDataParsed ? { popupData: popupDataParsed } : {}),
+					...(sourceDataParsed ? { sourceData: sourceDataParsed, sourceDataLoading: false } : {}),
+					...(popupDataParsed ? { popupData: popupDataParsed, popupDataLoading: false } : {}),
 					...(cluster ? { canvasClusters: cluster } : {}),
 					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
 					...(props.interactive === false ? { canvasInteractive: false } : {}),
