@@ -9,6 +9,8 @@ import { getSiteUrl } from '@/lib/utils/routing';
 
 const siteUrl = getSiteUrl();
 
+const dateBuild = new Date();
+
 const t = getTranslations();
 ---
 
@@ -20,7 +22,7 @@ const t = getTranslations();
 >
 	<DividedItem dividerColor="lighter"
 		><span class="text-primary-400 dark:text-primary-500">※</span>
-		<span>{t('site.footer.updated.label')} <DateDisplay date={new Date()} /></span></DividedItem
+		<span>{t('site.footer.updated.label')} <DateDisplay date={dateBuild} /></span></DividedItem
 	>
 	<DividedItem dividerColor="lighter">
 		<span

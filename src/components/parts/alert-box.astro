@@ -12,9 +12,15 @@ const { status, class: className, ...props } = Astro.props;
 <div
 	class:list={[
 		'rounded border px-2 py-1 text-sm',
-		status === 'notice' ? 'border-primary-300 bg-primary-100 text-primary-600' : undefined,
-		status === 'warning' ? 'border-amber-300 bg-amber-100 text-amber-600' : undefined,
-		status === 'error' ? 'border-orange-300 bg-orange-100 text-orange-600' : undefined,
+		status === 'notice'
+			? 'border-primary-300 bg-primary-100 text-primary-600 dark:border-primary-300 dark:bg-primary-100 dark:text-primary-600'
+			: undefined,
+		status === 'warning'
+			? 'border-amber-300 bg-amber-100 text-amber-600 dark:border-amber-300 dark:bg-amber-100 dark:text-amber-600'
+			: undefined,
+		status === 'error'
+			? 'border-orange-300 bg-orange-100 text-orange-600 dark:border-orange-300 dark:bg-orange-100 dark:text-orange-600'
+			: undefined,
 		className,
 	]}
 	{...props}
