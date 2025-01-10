@@ -71,6 +71,9 @@ export const FEATURE_DATE_ARCHIVES = false as boolean;
 // Image metadata page functionality is disabled by default; set to "true" to enable
 export const FEATURE_IMAGE_PAGES = false as boolean;
 
+// Nearby items are the single most expensive data generated in this project
+export const FEATURE_LOCATION_NEARBY_ITEMS = false as boolean;
+
 //Generate open graph images
 export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;
 

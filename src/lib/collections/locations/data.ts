@@ -13,7 +13,7 @@ import pLimit from 'p-limit';
 import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
+import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageByIdFunction } from '@/lib/collections/images/utils';
 import { getContentUrl } from '@/lib/utils/routing';
 
@@ -33,7 +33,7 @@ function getDistanceId(idA: string, idB: string) {
 	return [idA, idB].sort().join('-');
 }
 
-function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
+function getLocationNearbyDistances(locations: Array<CollectionEntry<'locations'>>) {
 	// In-memory cache of distances; this way we can do half the number of operations
 	// Because for single points, A<->B is the same as B<->A
 	const distances = new Map<string, number>();
@@ -82,6 +82,15 @@ function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locati
 			}
 		}
 	}
+
+	return { distances, points };
+}
+
+// This calculation is expensive; disable it with a feature flag if needed
+function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
+	if (!FEATURE_LOCATION_NEARBY_ITEMS) return;
+
+	const { distances, points } = getLocationNearbyDistances(locations);
 
 	// Now return the function that handles the calculation for a specific location
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
@@ -188,8 +197,8 @@ async function generateCollection() {
 	// Loop through every item in the collection and add metadata
 	for (const entry of locations) {
 		generateLocationPostData(entry);
-		generateNearbyItems(entry);
 		generateLocationMapData(entry);
+		generateNearbyItems?.(entry);
 	}
 
 	await generateLocationImageData(locations);
