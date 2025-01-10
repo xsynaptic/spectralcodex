@@ -7,9 +7,9 @@ import type {
 	MapFeatureCollection,
 } from '@/lib/map/map-types';
 
-import { MAP_API_POPUP_ID, MAP_API_SOURCE_ID } from '@/constants';
 import { getLocationsMapPopupData, getLocationsMapSourceData } from '@/lib/map/map-locations';
 import { isLngLatBoundsLike } from '@/lib/map/map-type-guards';
+import { MapApiDataEnum } from '@/lib/map/map-types';
 import { getTruncatedLngLat } from '@/lib/map/map-utils';
 
 interface MapDataBoundsProps {
@@ -92,8 +92,8 @@ export function getMapData({
 
 	if (featureCollection && mapBounds) {
 		if (mapApiBaseUrl) {
-			const apiSourceUrl = `${mapApiBaseUrl}/${MAP_API_SOURCE_ID}`;
-			const apiPopupUrl = `${mapApiBaseUrl}/${MAP_API_POPUP_ID}`;
+			const apiSourceUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Source}`;
+			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}`;
 
 			return {
 				hasGeodata: true,

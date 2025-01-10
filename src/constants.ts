@@ -23,9 +23,6 @@ export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 /**
  * Map configuration
  */
-export const MAP_API_SOURCE_ID = 's';
-export const MAP_API_POPUP_ID = 'p';
-
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
 export const MAP_GEOMETRY_COORDINATES_PRECISION = 6;
 

@@ -7,6 +7,7 @@ import type {
 import type { CollectionEntry } from 'astro:content';
 
 import {
+	MapApiDataEnum,
 	MapGeometryTypeMap,
 	MapLocationCategoryMap,
 	MapLocationStatusMap,
@@ -35,12 +36,14 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 	}
 }
 
+interface LocationsFeatureCollectionOptions {
+	showHiddenLocations?: boolean | undefined;
+}
+
 // Generate canonical map feature data for a set of locations
 export function getLocationsFeatureCollection(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
-	options?: {
-		showHiddenLocations?: boolean | undefined;
-	},
+	options?: LocationsFeatureCollectionOptions,
 ) {
 	if (!locations || locations.length === 0) return;
 
@@ -119,13 +122,17 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 // A specialized function for returning data for API endpoints
 export function getLocationsMapApiData(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
-	options?: {
-		showHiddenLocations?: boolean | undefined;
-	},
+	basePath: string,
+	options?: LocationsFeatureCollectionOptions,
 ) {
 	const featureCollection = getLocationsFeatureCollection(locations, options);
 	const sourceData = getLocationsMapSourceData(featureCollection);
 	const popupData = getLocationsMapPopupData(featureCollection);
 
-	return [sourceData, popupData];
+	return [MapApiDataEnum.Source, MapApiDataEnum.Popup].map((key) => ({
+		params: {
+			id: `${basePath}/${key}`,
+		},
+		props: { data: key === MapApiDataEnum.Source ? sourceData : popupData },
+	}));
 }

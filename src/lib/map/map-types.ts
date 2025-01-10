@@ -6,6 +6,12 @@ import type { FeatureCollection } from 'geojson';
 
 import { NumericScaleSchema } from '@/lib/schemas/content';
 
+// This is used to form map API endpoint URLs
+export const MapApiDataEnum = {
+	Source: 's',
+	Popup: 'p',
+} as const;
+
 export const MapFeaturePropertiesSchema = z.object({
 	title: z.string(),
 	titleAlt: z.string().optional(),

@@ -4,9 +4,9 @@ import { MapSpritesEnum } from '@spectralcodex/react-map-component';
 import SpriteSheet from '@/components/parts/sprite-sheet.astro';
 import { getSprites } from '@/lib/icons/icons-utils';
 
-type Props = {
+interface Props {
 	showPrebuiltSprites?: boolean;
-};
+}
 
 const { showPrebuiltSprites = true } = Astro.props;
 
