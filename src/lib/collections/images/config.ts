@@ -2,7 +2,7 @@ import { imageLoader } from '@spectralcodex/image-loader';
 import { defineCollection, z } from 'astro:content';
 import { ExifTool } from 'exiftool-vendored';
 
-import { CONTENT_MEDIA_PATH } from '@/constants';
+import { CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '@/constants';
 import {
 	getImageExposureValue,
 	getImagePlaceholder,
@@ -39,49 +39,57 @@ export const images = defineCollection({
 		dataHandler: async ({ filePathRelative, fileUrl, logger }) => {
 			const placeholder = await getImagePlaceholder({ fileUrl, logger });
 
-			const tags = await exiftool.read(filePathRelative);
+			const metadata = FEATURE_IMAGE_METADATA
+				? await (async () => {
+						const tags = await exiftool.read(filePathRelative);
 
-			const dateCaptured = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+						const dateCaptured = tags.DateCreated ? tags.DateCreated.toString() : undefined;
 
-			const metadata = {
-				...getImageTitle(tags.Title),
-				titleRaw: String(tags.Title),
-				dateCaptured: dateCaptured ? new Date(dateCaptured) : undefined,
-				brand: String(tags.Make),
-				camera: String(tags.Model),
-				lens: tags.LensID ? String(tags.LensID) : String(tags.LensModel),
-				aperture: String(tags.FNumber),
-				shutterSpeed: String(tags.ShutterSpeed),
-				focalLength: String(tags.FocalLength),
-				iso: String(tags.ISO),
-				exposureValue: getImageExposureValue({
-					aperture: String(tags.FNumber),
-					shutterSpeed: String(tags.ShutterSpeed),
-				}),
-				...(tags.GPSLatitude && tags.GPSLongitude
-					? {
-							geometry: {
-								type: 'Point' as const,
-								coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)] as [
-									number,
-									number,
-								],
-							},
-						}
-					: {}),
-			};
+						return {
+							...getImageTitle(tags.Title),
+							titleRaw: String(tags.Title),
+							dateCaptured: dateCaptured ? new Date(dateCaptured) : undefined,
+							brand: String(tags.Make),
+							camera: String(tags.Model),
+							lens: tags.LensID ? String(tags.LensID) : String(tags.LensModel),
+							aperture: String(tags.FNumber),
+							shutterSpeed: String(tags.ShutterSpeed),
+							focalLength: String(tags.FocalLength),
+							iso: String(tags.ISO),
+							exposureValue: getImageExposureValue({
+								aperture: String(tags.FNumber),
+								shutterSpeed: String(tags.ShutterSpeed),
+							}),
+							...(tags.GPSLatitude && tags.GPSLongitude
+								? {
+										geometry: {
+											type: 'Point' as const,
+											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)] as [
+												number,
+												number,
+											],
+										},
+									}
+								: {}),
+						};
+					})()
+				: {};
 
 			return {
 				placeholder,
 				...metadata,
 			} satisfies ImageMetadataInput;
 		},
-		beforeLoad: () => {
-			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
-		},
-		afterLoad: () => {
-			void exiftool.end();
-		},
+		...(FEATURE_IMAGE_METADATA
+			? {
+					beforeLoad: () => {
+						exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
+					},
+					afterLoad: () => {
+						void exiftool.end();
+					},
+				}
+			: {}),
 	}),
 	schema: ({ image }) =>
 		ImageMetadataSchema.extend({

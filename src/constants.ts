@@ -65,6 +65,9 @@ export const SITE_YEAR_FOUNDED = 2009;
 // Date-based post archives; set to "true" to enable
 export const FEATURE_DATE_ARCHIVES = false as boolean;
 
+// Image metadata generation
+export const FEATURE_IMAGE_METADATA = false as boolean;
+
 // Image metadata page functionality is disabled by default; set to "true" to enable
 export const FEATURE_IMAGE_PAGES = false as boolean;
 
