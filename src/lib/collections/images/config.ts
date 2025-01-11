@@ -9,7 +9,7 @@ import {
 	getImageTitle,
 } from '@/lib/image/image-loader-utils';
 import { GeometrySchema } from '@/lib/schemas/geometry';
-import { getImageTransformFunction } from '@/lib/schemas/image';
+import { getLocalImageTransformFunction } from '@/lib/schemas/image';
 
 const ImageMetadataSchema = z.object({
 	title: z.string().optional(),
@@ -93,7 +93,7 @@ export const images = defineCollection({
 	}),
 	schema: ({ image }) =>
 		ImageMetadataSchema.extend({
-			src: getImageTransformFunction({ image, defaultPath: '' }),
+			src: getLocalImageTransformFunction({ image, defaultPath: '' }),
 			modifiedTime: z.date().optional(),
 		}).strict(),
 });

@@ -33,9 +33,9 @@ function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): strin
 			shuffle: false,
 		});
 
-		return featuredImage?.src.id;
+		return featuredImage?.src;
 	}
-	return 'imageFeatured' in entry.data ? entry.data.imageFeatured?.id : undefined;
+	return 'imageFeatured' in entry.data ? entry.data.imageFeatured : undefined;
 }
 
 // Generate a word count from a crude rendering of the body without transforming MDX

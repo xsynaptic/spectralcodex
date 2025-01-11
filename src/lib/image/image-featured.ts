@@ -7,10 +7,7 @@ import { logError } from '@/lib/utils/logging';
 
 // This should match the output of `getImageArrayItemSchema`, which we can't seem to get directly
 export interface FeaturedItemBaseMetadata {
-	src: {
-		collection: 'images';
-		id: string;
-	};
+	src?: string | undefined;
 	title?: string | undefined;
 	contentId?: string | undefined;
 }
@@ -79,10 +76,7 @@ export function getFeaturedItemsFromContentMetadata({
 		items,
 		R.filter((item) => !!item.imageId),
 		R.map((item) => ({
-			src: {
-				collection: 'images' as const,
-				id: item.imageId!,
-			},
+			src: item.imageId,
 			title: item.title,
 			contentMetadata: item,
 		})),

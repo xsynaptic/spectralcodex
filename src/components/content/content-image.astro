@@ -22,67 +22,77 @@ const { imageId, alt: altProp, layout } = Astro.props;
 
 const image = await getImageById(imageId);
 
-const { src: imageMetadata, placeholder } = image.data;
-
 // This controls how the component is rendered; RSS requires a less complex output
 const { isRss } = Astro.locals;
 
 const slotContents = (await Astro.slots.render('default')) as string | undefined;
 
-const imageLinkUrl = FEATURE_IMAGE_PAGES ? getSiteUrl('image', image.id) : undefined;
+const imageLinkUrl = FEATURE_IMAGE_PAGES && image?.id ? getSiteUrl('image', image.id) : undefined;
 
-const imageProps = (
-	isRss
-		? {
-				src: imageMetadata,
-				alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-				width: imageMetadata.height > imageMetadata.width ? 900 : 1200,
-				format: IMAGE_FORMAT,
-				quality: IMAGE_QUALITY,
-			}
-		: {
-				src: imageMetadata,
-				alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-				format: IMAGE_FORMAT,
-				quality: IMAGE_QUALITY,
-				...getImageLayoutProps({ imageMetadata, layout }),
-				...getImagePlaceholderProps({ placeholder }),
-			}
-) satisfies LocalImageProps;
+const imageProps = image
+	? ((isRss
+			? {
+					src: image.data.src,
+					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
+					width: image.data.src.height > image.data.src.width ? 900 : 1200,
+					format: IMAGE_FORMAT,
+					quality: IMAGE_QUALITY,
+				}
+			: {
+					src: image.data.src,
+					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
+					format: IMAGE_FORMAT,
+					quality: IMAGE_QUALITY,
+					...getImageLayoutProps({ imageMetadata: image.data.src, layout }),
+					...getImagePlaceholderProps({ placeholder: image.data.placeholder }),
+				}) satisfies LocalImageProps)
+	: undefined;
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 ---
 
 {
-	isRss ? (
-		<figure>
-			{imageLinkUrl ? (
-				<a href={imageLinkUrl}>
+	imageProps ? (
+		isRss ? (
+			<figure>
+				{imageLinkUrl ? (
+					<a href={imageLinkUrl}>
+						<Image loading="lazy" {...imageProps} />
+					</a>
+				) : (
 					<Image loading="lazy" {...imageProps} />
-				</a>
-			) : (
-				<Image loading="lazy" {...imageProps} />
-			)}
-			{caption ? (
-				<figcaption>
-					<Fragment set:html={caption} />
-				</figcaption>
-			) : undefined}
-		</figure>
-	) : (
-		<figure
-			class:list={[
-				'content-image',
-				'not-prose',
-				layout === 'medium'
-					? 'mx-auto mb-2 max-w-content sm:px-small md:mb-4 md:px-medium'
-					: undefined,
-				layout === 'wide' ? 'mb-2 w-full sm:px-small md:px-medium' : undefined,
-				layout === 'full' ? 'mb-2 w-full' : undefined,
-			]}
-		>
-			{imageLinkUrl ? (
-				<a href={imageLinkUrl}>
+				)}
+				{caption ? (
+					<figcaption>
+						<Fragment set:html={caption} />
+					</figcaption>
+				) : undefined}
+			</figure>
+		) : (
+			<figure
+				class:list={[
+					'content-image',
+					'not-prose',
+					layout === 'medium'
+						? 'mx-auto mb-2 max-w-content sm:px-small md:mb-4 md:px-medium'
+						: undefined,
+					layout === 'wide' ? 'mb-2 w-full sm:px-small md:px-medium' : undefined,
+					layout === 'full' ? 'mb-2 w-full' : undefined,
+				]}
+			>
+				{imageLinkUrl ? (
+					<a href={imageLinkUrl}>
+						<Image
+							class:list={[
+								'bg-fallback',
+								'm-0 object-cover object-center text-sm text-transparent',
+								layout === 'full' ? undefined : 'sm:rounded-sm',
+							]}
+							loading="lazy"
+							{...imageProps}
+						/>
+					</a>
+				) : (
 					<Image
 						class:list={[
 							'bg-fallback',
@@ -92,30 +102,20 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 						loading="lazy"
 						{...imageProps}
 					/>
-				</a>
-			) : (
-				<Image
-					class:list={[
-						'bg-fallback',
-						'm-0 object-cover object-center text-sm text-transparent',
-						layout === 'full' ? undefined : 'sm:rounded-sm',
-					]}
-					loading="lazy"
-					{...imageProps}
-				/>
-			)}
-			{caption ? (
-				<figcaption
-					class:list={[
-						'content-image-caption',
-						'px-small py-1 text-sm italic leading-relaxed',
-						'text-primary-500 dark:text-primary-400',
-						layout === 'full' ? 'mx-auto max-w-content px-small md:px-medium' : 'sm:px-0',
-					]}
-				>
-					<Fragment set:html={caption} />
-				</figcaption>
-			) : undefined}
-		</figure>
-	)
+				)}
+				{caption ? (
+					<figcaption
+						class:list={[
+							'content-image-caption',
+							'px-small py-1 text-sm italic leading-relaxed',
+							'text-primary-500 dark:text-primary-400',
+							layout === 'full' ? 'mx-auto max-w-content px-small md:px-medium' : 'sm:px-0',
+						]}
+					>
+						<Fragment set:html={caption} />
+					</figcaption>
+				) : undefined}
+			</figure>
+		)
+	) : undefined
 }

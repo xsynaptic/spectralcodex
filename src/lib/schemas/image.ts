@@ -1,4 +1,4 @@
-import { reference, z } from 'astro:content';
+import { z } from 'astro:content';
 
 import type { ImageFunction } from 'astro:content';
 
@@ -14,7 +14,7 @@ type GetImageTransformExtendedParams = GetImageTransformBaseParams & {
 };
 
 // This function handles image size validation and adds a default path to the image `src` where needed
-export function getImageTransformFunction({
+export function getLocalImageTransformFunction({
 	image,
 	minWidth = CONTENT_IMAGE_FEATURED_MIN_WIDTH,
 }: GetImageTransformExtendedParams) {
@@ -33,7 +33,7 @@ export function getImageTransformFunction({
 
 export function getFeaturedImagesSchema() {
 	return z.object({
-		src: reference('images'),
+		src: z.string().optional(),
 		title: z.string().optional(),
 		contentId: z.string().optional(), // Optional reference to the content associated with an image
 	});

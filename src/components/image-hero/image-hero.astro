@@ -23,30 +23,36 @@ const { imageId, alt, class: className } = Astro.props;
 
 const image = await getImageById(imageId);
 
-const placeholder = await getImagePlaceholderDataUrlHq(image.data.src.src);
-
-const imageProps = {
-	src: image.data.src,
-	alt: sanitizeAltAttribute(alt),
-	width: image.data.src.width,
-	height: image.data.src.height,
-	widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
-	sizes: '100vw',
-	format: IMAGE_FORMAT,
-	quality: IMAGE_QUALITY,
-	...getImagePlaceholderProps({ placeholder }),
-} satisfies LocalImageProps;
+const imageProps = image
+	? ({
+			src: image.data.src,
+			alt: sanitizeAltAttribute(alt),
+			width: image.data.src.width,
+			height: image.data.src.height,
+			widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
+			sizes: '100vw',
+			format: IMAGE_FORMAT,
+			quality: IMAGE_QUALITY,
+			...getImagePlaceholderProps({
+				placeholder: await getImagePlaceholderDataUrlHq(image.data.src.src),
+			}),
+		} satisfies LocalImageProps)
+	: undefined;
 ---
 
-<ImageHeroFrame class:list={[className, 'overflow-hidden']}>
-	<Image
-		class:list={[
-			'bg-fallback',
-			'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
-			'aspect-[3/2] sm:aspect-[5/4] md:aspect-[3/2] lg:aspect-[16/9] xl:aspect-auto',
-		]}
-		loading="eager"
-		{...imageProps}
-	/>
-	<slot />
-</ImageHeroFrame>
+{
+	imageProps ? (
+		<ImageHeroFrame class:list={[className, 'overflow-hidden']}>
+			<Image
+				class:list={[
+					'bg-fallback',
+					'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+					'aspect-[3/2] sm:aspect-[5/4] md:aspect-[3/2] lg:aspect-[16/9] xl:aspect-auto',
+				]}
+				loading="eager"
+				{...imageProps}
+			/>
+			<slot />
+		</ImageHeroFrame>
+	) : undefined
+}

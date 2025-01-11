@@ -18,8 +18,8 @@ export const postSchema = z
 		sources: SourceSchema.array().optional(),
 		dateCreated: DateStringSchema,
 		dateUpdated: DateStringSchema.optional(),
-		imageFeatured: reference('images').optional(),
-		imageHero: reference('images').optional(),
+		imageFeatured: z.string().optional(),
+		imageHero: z.string().optional(),
 		entryQuality: NumericScaleSchema,
 	})
 	.strict();
