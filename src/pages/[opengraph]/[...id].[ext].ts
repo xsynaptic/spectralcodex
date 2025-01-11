@@ -28,8 +28,8 @@ export const getStaticPaths = (async () => {
 			R.filter(({ data }) => !!data.imageFeatured),
 			R.map((entry) =>
 				limit(async () => {
-					const image = getImageById(entry.data.imageFeatured!.id);
-					const imageObject = await getImageObject(image.data.src.src);
+					const image = getImageById(entry.data.imageFeatured);
+					const imageObject = image ? await getImageObject(image.data.src.src) : undefined;
 
 					return {
 						params: {
@@ -38,11 +38,13 @@ export const getStaticPaths = (async () => {
 							ext: OPEN_GRAPH_IMAGE_FORMAT,
 						},
 						props: {
-							imageOpenGraph: await getOpenGraphImage({
-								imageObject,
-								format: OPEN_GRAPH_IMAGE_FORMAT,
-								formatOptions: { quality: 85 },
-							}),
+							imageOpenGraph: imageObject
+								? await getOpenGraphImage({
+										imageObject,
+										format: OPEN_GRAPH_IMAGE_FORMAT,
+										formatOptions: { quality: 85 },
+									})
+								: undefined,
 						},
 					};
 				}),
@@ -51,15 +53,13 @@ export const getStaticPaths = (async () => {
 	);
 }) satisfies GetStaticPaths;
 
-export const GET = (({
-	props: {
-		imageOpenGraph: { data, info },
-	},
-}) => {
-	return new Response(data, {
+export const GET = (({ props: { imageOpenGraph } }) => {
+	if (!imageOpenGraph) return new Response(undefined, { status: 404 });
+
+	return new Response(imageOpenGraph.data, {
 		status: 200,
 		headers: {
-			'Content-Type': `image/${info.format === 'jpg' ? 'jpeg' : info.format}`,
+			'Content-Type': `image/${imageOpenGraph.info.format === 'jpg' ? 'jpeg' : imageOpenGraph.info.format}`,
 		},
 	});
 }) satisfies APIRoute<InferGetStaticPropsType<typeof getStaticPaths>>;
