@@ -85,7 +85,7 @@ const t = getTranslations();
 	<article>
 		{
 			imageHero ? (
-				<ImageHero imageId={imageHero.id} alt={title} class="sm:mb-small">
+				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
@@ -137,7 +137,7 @@ const t = getTranslations();
 			) : (
 				<>
 					{imageFeatured ? (
-						<ContentImage imageId={imageFeatured.id} layout="medium" alt={title} />
+						<ContentImage imageId={imageFeatured} layout="medium" alt={title} />
 					) : undefined}
 					<ContentSection>
 						<Fragment slot="section-description">

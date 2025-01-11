@@ -35,7 +35,7 @@ const { Content } = await render(entry);
 	<article>
 		{
 			imageHero ? (
-				<ImageHero imageId={imageHero.id} alt={title} class="sm:mb-small">
+				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
