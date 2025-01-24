@@ -1,29 +1,28 @@
-import { stripTags } from '@spectralcodex/unified';
-import * as R from 'remeda';
+import { stripTags } from '@xsynaptic/unified-tools';
 
 export function textClipper(
-	text: string,
+	input: string,
 	options: { wordCount: number; trailer?: string | undefined },
 ): string {
-	const words = text.split(' ');
+	const words = input.split(' ');
 
 	if (words.length <= options.wordCount) {
-		return text;
+		return input;
 	}
 
 	const trailer = options.trailer ?? '...';
 
-	return R.pipe(words, R.take(options.wordCount), R.join(' ')) + trailer;
+	return words.slice(0, options.wordCount).join(' ') + trailer;
 }
 
 // Function to remove specified MDX components from text
-export function stripMdxComponents(string: string, componentNames: Array<string>): string {
+export function stripMdxComponents(input: string, componentNames: Array<string>): string {
 	const regex = new RegExp(
 		componentNames.map((name) => `<${name}(?:[^>.]*)>|</${name}>`).join('|'),
 		'gm',
 	);
 
-	return string.replace(regex, '').trim();
+	return input.replace(regex, '').trim();
 }
 
 export function formatNumber({
@@ -39,8 +38,8 @@ export function formatNumber({
 }
 
 // Another rough function to do 80% of what is needed here
-function encodeHtmlEntities(text: string): string {
-	return text
+function encodeHtmlEntities(input: string): string {
+	return input
 		.replaceAll('<', '&lt;')
 		.replaceAll('>', '&gt;')
 		.replaceAll('&', '&amp;')
@@ -48,11 +47,11 @@ function encodeHtmlEntities(text: string): string {
 }
 
 // Sanitize image captions before returning them for display
-export function sanitizeCaption(string: string): string {
-	return string.replaceAll('<p>', '').replaceAll('</p>', '');
+export function sanitizeCaption(input: string): string {
+	return input.replaceAll('<p>', '').replaceAll('</p>', '');
 }
 
 // Sanitize alt attributes before returning them for display
-export function sanitizeAltAttribute(string: string): string {
-	return encodeHtmlEntities(stripTags(string));
+export function sanitizeAltAttribute(input: string): string {
+	return encodeHtmlEntities(stripTags(input));
 }

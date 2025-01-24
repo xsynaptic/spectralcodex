@@ -1,4 +1,4 @@
-import { stripTags, transformMarkdown } from '@spectralcodex/unified';
+import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 

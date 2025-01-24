@@ -1,4 +1,4 @@
-import { stripTags, transformMarkdown } from '@spectralcodex/unified';
+import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';

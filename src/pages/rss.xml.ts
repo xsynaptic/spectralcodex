@@ -1,6 +1,11 @@
 import mdxRenderer from '@astrojs/mdx/server.js';
 import rss from '@astrojs/rss';
-import { defaultSchema, sanitizeHtml, stripTags, transformMarkdown } from '@spectralcodex/unified';
+import {
+	defaultSchema,
+	sanitizeHtml,
+	stripTags,
+	transformMarkdown,
+} from '@xsynaptic/unified-tools';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';

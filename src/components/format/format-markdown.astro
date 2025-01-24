@@ -1,5 +1,5 @@
 ---
-import { transformMarkdown } from '@spectralcodex/unified';
+import { transformMarkdown } from '@xsynaptic/unified-tools';
 
 const slotContents = (await Astro.slots.render('default')) as string | undefined;
 const output = transformMarkdown(slotContents ?? '');

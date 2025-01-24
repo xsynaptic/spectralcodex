@@ -1,10 +1,10 @@
-import { transformMarkdown } from '@spectralcodex/unified';
 import {
 	booleanIntersects,
 	buffer as getBuffer,
 	distance as getDistance,
 	point as getPoint,
 } from '@turf/turf';
+import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';

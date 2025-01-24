@@ -1,4 +1,4 @@
-import { wrapCjk } from '@spectralcodex/unified';
+import { wrapCjk } from '@xsynaptic/unified-tools';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 

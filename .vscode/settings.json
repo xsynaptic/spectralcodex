@@ -99,6 +99,7 @@
 		"upslope",
 		"urbex",
 		"viewbox",
+		"xsynaptic",
 		"zustand"
 	],
 	"cSpell.ignorePaths": [".vscode", "pnpm*.yaml", "node_modules", "tsconfig.json"],
