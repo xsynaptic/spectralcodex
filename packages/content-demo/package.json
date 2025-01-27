@@ -8,15 +8,15 @@
 	},
 	"devDependencies": {
 		"astro": "5.1.2",
-		"eslint": "^9.18.0",
+		"eslint": "^9.19.0",
 		"eslint-plugin-mdx": "^3.1.5",
 		"remark": "^15.0.1",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.0",
-		"remark-lint-list-item-indent": "^4.0.0",
+		"remark-lint-list-item-indent": "^4.0.1",
 		"remark-mdx": "^3.1.0",
-		"remark-preset-lint-consistent": "^6.0.0",
-		"remark-preset-lint-recommended": "^7.0.0",
+		"remark-preset-lint-consistent": "^6.0.1",
+		"remark-preset-lint-recommended": "^7.0.1",
 		"remark-smartypants": "^3.0.2",
 		"unified": "^11.0.5"
 	}
