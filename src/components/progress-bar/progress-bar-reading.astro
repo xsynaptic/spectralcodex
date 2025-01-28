@@ -1,8 +1,8 @@
 ---
-import ProgressBarBase from '@xsynaptic/astro-components/progress-bar/progress-bar.astro';
+import ProgressBar from '@/components/progress-bar/progress-bar.astro';
 ---
 
-<ProgressBarBase
+<ProgressBar
 	id="reading-bar"
 	class:list={[
 		'z-40 h-[2.5px] rounded-br-md shadow-lg shadow-current',
@@ -11,7 +11,7 @@ import ProgressBarBase from '@xsynaptic/astro-components/progress-bar/progress-b
 />
 
 <script>
-	import { initialize } from '@xsynaptic/astro-components/progress-bar/progress-bar-reading.js';
+	import { initialize } from '@/components/progress-bar/progress-bar-reading.js';
 
 	initialize('#reading-bar');
 </script>

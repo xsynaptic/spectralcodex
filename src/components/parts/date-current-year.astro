@@ -1,15 +1,19 @@
 ---
+import { nanoid } from 'nanoid';
+
 /**
  * A simple hack to always update the year in the event of my untimely demise
  * @link - https://astro-tips.dev/recipes/dynamic-footer-date-for-static-websites/
  */
 const currentYear = new Date().getFullYear();
+
+const elementId = nanoid();
 ---
 
-<span id="colophon-current-year">{currentYear}</span>
+<span id={elementId}>{currentYear}</span>
 
-<script is:inline>
-	const currentYearElement = document.querySelector('#colophon-current-year');
+<script is:inline define:vars={{ elementId }}>
+	const currentYearElement = document.querySelector(`#${elementId}`);
 	const currentYear = String(new Date().getFullYear());
 
 	if (

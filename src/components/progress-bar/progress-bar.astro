@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+}
+
+const { class: className, ...props } = Astro.props;
+
+// Note 1: make sure to set a sensible z-index value for this component
+// Note 2: set a text color to add a bit of a glow to the bar
+---
+
+<div
+	class:list={[className, 'progress-bar', 'pointer-events-none fixed left-0 top-0 h-1 w-full']}
+	aria-hidden="true"
+	{...props}
+>
+</div>
+
+<style>
+	.progress-bar {
+		transition:
+			background-color 100ms 100ms ease-in-out,
+			opacity 150ms 150ms ease-in,
+			transform 300ms ease-out;
+		transform: translate3d(0, 0, 0) scaleX(var(--progress-bar, 0));
+		transform-origin: 0;
+	}
+</style>
