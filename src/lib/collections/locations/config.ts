@@ -1,4 +1,3 @@
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/react-map-component';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
@@ -13,6 +12,7 @@ import {
 import { GeometrySchema } from '@/lib/schemas/geometry';
 import { LinkSchema } from '@/lib/schemas/links';
 import { SourceSchema } from '@/lib/schemas/sources';
+import { LocationCategoryEnum, LocationStatusEnum } from '@/types/map-locations';
 
 export const locations = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/locations` }),
@@ -22,6 +22,10 @@ export const locations = defineCollection({
 			title: TitleSchema,
 			titleAlt: z.string().optional(),
 			description: DescriptionSchema,
+			/**
+			 * Note: these enums are duplicated; they appear in this project and the React map component
+			 * This seems to be the only way around an Astro/Vite bug which causes content collections to fail
+			 */
 			category: z.nativeEnum(LocationCategoryEnum),
 			status: z.nativeEnum(LocationStatusEnum),
 			heritage: LocationTwHeritageSchema.optional(),
