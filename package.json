@@ -75,7 +75,7 @@
 		"globals": "^15.14.0",
 		"keyv": "^5.2.3",
 		"ky": "^1.7.4",
-		"maplibre-gl": "^4.7.1",
+		"maplibre-gl": "^5.1.0",
 		"nanoid": "^5.0.9",
 		"p-limit": "^6.2.0",
 		"postcss-inline-svg": "^6.0.0",

@@ -148,8 +148,8 @@ importers:
         specifier: ^1.7.4
         version: 1.7.4
       maplibre-gl:
-        specifier: ^4.7.1
-        version: 4.7.1
+        specifier: ^5.1.0
+        version: 5.1.0
       nanoid:
         specifier: ^5.0.9
         version: 5.0.9
@@ -1249,10 +1249,6 @@ packages:
 
   '@maplibre/maplibre-gl-style-spec@19.3.3':
     resolution: {integrity: sha512-cOZZOVhDSulgK0meTsTkmNXb1ahVvmTmWmfx9gRBwc6hq98wS9JP35ESIoNq3xqEan+UN+gn8187Z6E4NKhLsw==}
-    hasBin: true
-
-  '@maplibre/maplibre-gl-style-spec@20.3.1':
-    resolution: {integrity: sha512-5ueL4UDitzVtceQ8J4kY+Px3WK+eZTsmGwha3MBKHKqiHvKrjWWwBCIl1K8BuJSc5OFh83uI8IFNoFvQxX2uUw==}
     hasBin: true
 
   '@maplibre/maplibre-gl-style-spec@23.1.0':
@@ -2690,9 +2686,6 @@ packages:
   earcut@2.2.4:
     resolution: {integrity: sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ==}
 
-  earcut@3.0.0:
-    resolution: {integrity: sha512-41Fs7Q/PLq1SDbqjsgcY7GA42T0jvaCNGXgGtsNdvg+Yv8eIu06bxv4/PoREkZ9nMDNwnUSG9OFB9+yv8eKhDg==}
-
   earcut@3.0.1:
     resolution: {integrity: sha512-0l1/0gOjESMeQyYaK5IDiPNvFeu93Z/cO0TjZh9eZ1vyCtZnA7KMZ8rQggpsJHIbGSdrqYq9OhuveadOVHCshw==}
 
@@ -3784,10 +3777,6 @@ packages:
 
   magicast@0.3.5:
     resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
-
-  maplibre-gl@4.7.1:
-    resolution: {integrity: sha512-lgL7XpIwsgICiL82ITplfS7IGwrB1OJIw/pCvprDp2dhmSSEBgmPzYRvwYYYvJGJD7fxUv1Tvpih4nZ6VrLuaA==}
-    engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   maplibre-gl@5.1.0:
     resolution: {integrity: sha512-6lbf7qAnqAVm1T/vJBMmRtP+g8G/O/Z52IBtWX31SbFj7sEdlrk4YugxJen8IdV/pFjLFnDOw7HiHZl5nYdVjg==}
@@ -6747,17 +6736,6 @@ snapshots:
       rw: 1.3.3
       sort-object: 3.0.3
 
-  '@maplibre/maplibre-gl-style-spec@20.3.1':
-    dependencies:
-      '@mapbox/jsonlint-lines-primitives': 2.0.2
-      '@mapbox/unitbezier': 0.0.1
-      json-stringify-pretty-compact: 4.0.0
-      minimist: 1.2.8
-      quickselect: 2.0.0
-      rw: 1.3.3
-      sort-object: 3.0.3
-      tinyqueue: 3.0.0
-
   '@maplibre/maplibre-gl-style-spec@23.1.0':
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
@@ -9194,8 +9172,6 @@ snapshots:
 
   earcut@2.2.4: {}
 
-  earcut@3.0.0: {}
-
   earcut@3.0.1: {}
 
   eastasianwidth@0.2.0: {}
@@ -10586,35 +10562,6 @@ snapshots:
       '@babel/parser': 7.26.7
       '@babel/types': 7.26.7
       source-map-js: 1.2.1
-
-  maplibre-gl@4.7.1:
-    dependencies:
-      '@mapbox/geojson-rewind': 0.5.2
-      '@mapbox/jsonlint-lines-primitives': 2.0.2
-      '@mapbox/point-geometry': 0.1.0
-      '@mapbox/tiny-sdf': 2.0.6
-      '@mapbox/unitbezier': 0.0.1
-      '@mapbox/vector-tile': 1.3.1
-      '@mapbox/whoots-js': 3.1.0
-      '@maplibre/maplibre-gl-style-spec': 20.3.1
-      '@types/geojson': 7946.0.16
-      '@types/geojson-vt': 3.2.5
-      '@types/mapbox__point-geometry': 0.1.4
-      '@types/mapbox__vector-tile': 1.3.4
-      '@types/pbf': 3.0.5
-      '@types/supercluster': 7.1.3
-      earcut: 3.0.0
-      geojson-vt: 4.0.2
-      gl-matrix: 3.4.3
-      global-prefix: 4.0.0
-      kdbush: 4.0.2
-      murmurhash-js: 1.0.0
-      pbf: 3.3.0
-      potpack: 2.0.0
-      quickselect: 3.0.0
-      supercluster: 8.0.1
-      tinyqueue: 3.0.0
-      vt-pbf: 3.1.3
 
   maplibre-gl@5.1.0:
     dependencies:
