@@ -1,6 +1,10 @@
 import * as R from 'remeda';
 
-import type { CircleLayer, LineLayer, SymbolLayer } from 'react-map-gl/maplibre';
+import type {
+	CircleLayerSpecification,
+	LineLayerSpecification,
+	SymbolLayerSpecification,
+} from 'react-map-gl/maplibre';
 
 import { getMapClusterStyle, locationStatusStyle } from './colors';
 import { mapLayerIds } from './layer';
@@ -82,7 +86,7 @@ const getClusterCircleLayerStyle = (identifiers: StyleIdentifiers) =>
 				mapClusterStyle.circleXlStroke,
 			],
 		},
-	}) satisfies CircleLayer;
+	}) satisfies CircleLayerSpecification;
 
 // Add numeric labels to clusters
 const getClusterSymbolLayerStyle = (identifiers: StyleIdentifiers) =>
@@ -101,7 +105,7 @@ const getClusterSymbolLayerStyle = (identifiers: StyleIdentifiers) =>
 			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
 			'text-halo-width': 1,
 		},
-	}) satisfies SymbolLayer;
+	}) satisfies SymbolLayerSpecification;
 
 // Visually obscured tap targets for all visible points; this makes the mobile experience better
 // Note: this has to be instantiated first to be underneath the main point
@@ -133,7 +137,7 @@ const getPointsTargetLayerStyle = (identifiers: StyleIdentifiers) =>
 				20,
 			],
 		},
-	}) satisfies CircleLayer;
+	}) satisfies CircleLayerSpecification;
 
 // Visual points for unfiltered (i.e. zoomed-in) points
 const getPointsLayerStyle = (identifiers: StyleIdentifiers) =>
@@ -174,7 +178,7 @@ const getPointsLayerStyle = (identifiers: StyleIdentifiers) =>
 					}
 				: {}),
 		},
-	}) satisfies CircleLayer;
+	}) satisfies CircleLayerSpecification;
 
 // Experimental line drawing style
 const getLineStringStyle = (identifiers: StyleIdentifiers) =>
@@ -207,7 +211,7 @@ const getLineStringStyle = (identifiers: StyleIdentifiers) =>
 				10,
 			],
 		},
-	}) satisfies LineLayer;
+	}) satisfies LineLayerSpecification;
 
 export const layerStyles = {
 	clusterCircle: getClusterCircleLayerStyle({
