@@ -27,6 +27,7 @@
 		"not dead"
 	],
 	"dependencies": {
+		"@tailwindcss/vite": "^4.0.4",
 		"astro": "^5.2.5",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"
@@ -38,7 +39,6 @@
 		"@astrojs/react": "^4.2.0",
 		"@astrojs/rss": "^4.0.11",
 		"@astrojs/sitemap": "^3.2.1",
-		"@astrojs/tailwind": "^5.1.5",
 		"@fontsource-variable/commissioner": "^5.1.1",
 		"@fontsource-variable/geologica": "^5.1.1",
 		"@fontsource-variable/lora": "^5.1.1",
@@ -86,7 +86,7 @@
 		"rehype-wrap-cjk": "^0.2.3",
 		"remeda": "^2.20.1",
 		"sharp": "^0.33.5",
-		"tailwindcss": "^3.4.17",
+		"tailwindcss": "^4.0.4",
 		"tsx": "^4.19.2",
 		"typescript": "^5.7.3",
 		"unified": "^11.0.5",

@@ -3,7 +3,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
 import AutoImport from 'astro-auto-import';
 import { nanoid } from 'nanoid';
@@ -68,6 +68,7 @@ export default defineConfig({
 		},
 	},
 	vite: {
+		plugins: [tailwindcss()],
 		define: {
 			'import.meta.env.BUILD_ID': JSON.stringify(isProduction ? nanoid() : 'dev'),
 		},
@@ -76,7 +77,6 @@ export default defineConfig({
 		rehypePlugins: [rehypeWrapCjk],
 	},
 	integrations: [
-		tailwind(),
 		react({
 			include: ['packages/react**/*'],
 		}),
