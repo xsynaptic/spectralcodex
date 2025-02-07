@@ -43,3 +43,4 @@ packages/content-demo/media
 config/
 public/icons/
 public/og*.jpg
+docker-compose*
