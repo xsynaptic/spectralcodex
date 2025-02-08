@@ -1,67 +1,67 @@
-import { tailwindConfig } from '@spectralcodex/tailwind/config';
-
 import type { LocationStatus } from '../types/map-locations';
 
-const { colors } = tailwindConfig.theme;
-
-type TailwindDeprecatedColors = 'lightBlue' | 'warmGray' | 'trueGray' | 'coolGray' | 'blueGray';
-
-type TailwindSchemeKey = keyof Omit<
-	typeof tailwindConfig.theme.colors,
-	'inherit' | 'current' | 'transparent' | 'black' | 'white' | TailwindDeprecatedColors
->;
-
-export const getMapClusterStyle = (scheme: TailwindSchemeKey) => ({
-	circleSmFill: colors[scheme][600],
-	circleSmStroke: colors[scheme][700],
-	circleMdFill: colors[scheme][500],
-	circleMdStroke: colors[scheme][600],
-	circleLgFill: colors[scheme][400],
-	circleLgStroke: colors[scheme][500],
-	circleXlFill: colors[scheme][300],
-	circleXlStroke: colors[scheme][400],
-	countTextColor: colors[scheme][50],
-});
+/** Sky blue colors from Tailwind */
+export const mapClusterStyle = {
+	circleSmFill: '#0284c7',
+	circleSmStroke: '#0369a1',
+	circleMdFill: '#0ea5e9',
+	circleMdStroke: '#0284c7',
+	circleLgFill: '#38bdf8',
+	circleLgStroke: '#0ea5e9',
+	circleXlFill: '#7dd3fc',
+	circleXlStroke: '#38bdf8',
+	countTextColor: '#f0f9ff',
+};
 
 export const locationStatusStyle: Record<LocationStatus, { color: string; stroke: string }> = {
+	/** Emerald */
 	operational: {
-		color: colors.emerald[500],
-		stroke: colors.emerald[600],
+		color: '#10b981',
+		stroke: '#059669',
 	},
+	/** Green */
 	public: {
-		color: colors.green[500],
-		stroke: colors.green[600],
+		color: '#22c55e',
+		stroke: '#16a34a',
 	},
+	/** Lime */
 	restored: {
-		color: colors.lime[500],
-		stroke: colors.lime[600],
+		color: '#84cc16',
+		stroke: '#65a30d',
 	},
+	/** Yellow */
 	converted: {
-		color: colors.yellow[500],
-		stroke: colors.yellow[600],
+		color: '#eab308',
+		stroke: '#ca8a04',
 	},
+	/** Amber */
 	private: {
-		color: colors.amber[500],
-		stroke: colors.amber[600],
+		color: '#f59e0b',
+		stroke: '#d97706',
 	},
+	/** Orange */
 	idle: {
-		color: colors.orange[500],
-		stroke: colors.orange[600],
+		color: '#f97316',
+		stroke: '#ea580c',
 	},
+	/** Red */
 	abandoned: {
-		color: colors.red[600],
-		stroke: colors.red[700],
+		color: '#dc2626',
+		stroke: '#b91c1c',
 	},
+	/** Red (darker) */
 	remnants: {
-		color: colors.red[800],
-		stroke: colors.red[900],
+		color: '#991b1b',
+		stroke: '#7f1d1d',
 	},
+	/** Zinc */
 	demolished: {
-		color: colors.primary[600],
-		stroke: colors.primary[200],
+		color: '#52525b',
+		stroke: '#e4e4e7',
 	},
+	/** Zinc (darker) */
 	unknown: {
-		color: colors.primary[800],
-		stroke: colors.primary[300],
+		color: '#27272a',
+		stroke: '#d4d4d8',
 	},
 };

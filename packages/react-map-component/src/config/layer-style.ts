@@ -1,12 +1,10 @@
-import * as R from 'remeda';
-
 import type {
 	CircleLayerSpecification,
 	LineLayerSpecification,
 	SymbolLayerSpecification,
 } from 'react-map-gl/maplibre';
 
-import { getMapClusterStyle, locationStatusStyle } from './colors';
+import { locationStatusStyle, mapClusterStyle } from './colors';
 import { mapLayerIds } from './layer';
 import { MapSourceIdEnum } from './source';
 
@@ -23,10 +21,10 @@ const getColorMap = (
 	styleRecord: typeof locationStatusStyle,
 	prop: keyof (typeof locationStatusStyle)[keyof typeof locationStatusStyle],
 ) => {
-	const colorMap = R.pipe(
-		R.entries(styleRecord),
-		R.flatMap(([status, values]) => [status, values[prop]]),
-	);
+	const colorMap = Object.entries(styleRecord).flatMap(([status, values]) => [
+		status,
+		values[prop],
+	]);
 
 	return isDoubleStringArray(colorMap) ? colorMap : undefined;
 };
@@ -35,8 +33,6 @@ const getColorMap = (
 const statusColorMap = getColorMap(locationStatusStyle, 'color');
 
 const statusStrokeColorMap = getColorMap(locationStatusStyle, 'stroke');
-
-const mapClusterStyle = getMapClusterStyle('sky');
 
 const getClusterCircleLayerStyle = (identifiers: StyleIdentifiers) =>
 	({

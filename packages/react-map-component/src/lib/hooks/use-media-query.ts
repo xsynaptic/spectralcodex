@@ -1,24 +1,23 @@
-import { tailwindConfig } from '@spectralcodex/tailwind/config';
 import { useEffect, useMemo, useState } from 'react';
-
-type ScreenValue = keyof typeof tailwindConfig.theme.screens;
-
-interface MediaQueryArgs {
-	above?: ScreenValue;
-	below?: ScreenValue;
-	query?: string;
-}
 
 // A flexible custom hook to handle media queries
 // This allows for different operations depending on the width of the viewport
 // It can be useful for optimizing UX on mobile
-export function useMediaQuery({ query, above, below }: MediaQueryArgs): boolean {
+export function useMediaQuery({
+	query,
+	above,
+	below,
+}: {
+	above?: string;
+	below?: string;
+	query?: string;
+}): boolean {
 	const mediaQuery = useMemo(() => {
 		if (above) {
-			return `(min-width: ${tailwindConfig.theme.screens[above]})`;
+			return `(min-width: ${above})`;
 		}
 		if (below) {
-			return `(max-width: ${tailwindConfig.theme.screens[below]})`;
+			return `(max-width: ${below})`;
 		}
 		return query ?? '';
 	}, [above, below, query]);
@@ -48,6 +47,7 @@ export function useMediaQuery({ query, above, below }: MediaQueryArgs): boolean 
 	return matches;
 }
 
+/** Unfortunately passing `var(--breakpoint-sm)` is not working here */
 export function useMediaQueryMobile(): boolean {
-	return useMediaQuery({ below: 'sm' });
+	return useMediaQuery({ below: '40rem' });
 }
