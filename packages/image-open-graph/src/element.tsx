@@ -1,8 +1,4 @@
-import { tailwindConfig } from '@spectralcodex/tailwind/config';
-
 import type { OpenGraphMetadataItem } from './types';
-
-const colors = tailwindConfig.theme.colors;
 
 export function getOpenGraphImageElement(
 	entry: OpenGraphMetadataItem,
@@ -15,7 +11,7 @@ export function getOpenGraphImageElement(
 	return (
 		<div
 			style={{
-				background: colors.primary['900'],
+				background: '#18181b',
 				display: 'flex',
 				fontFamily: '"Geologica"',
 				fontWeight: 500,
@@ -29,7 +25,7 @@ export function getOpenGraphImageElement(
 					width={image.width}
 					style={{
 						position: 'absolute',
-						maskImage: 'linear-gradient(to top, rgb(0, 0, 0, 0.3) 10%, black)',
+						maskImage: 'linear-gradient(to top, rgb(0, 0, 0, 0.3) 10%, #18181b)',
 					}}
 				/>
 			) : undefined}
@@ -44,7 +40,7 @@ export function getOpenGraphImageElement(
 			>
 				<div
 					style={{
-						color: colors.highlight['200'],
+						color: '#f4da93',
 						fontSize: '24px',
 						padding: '0 24px',
 						textShadow: `0 0 3px rgb(0, 0, 0, 0.4)`,
@@ -54,7 +50,7 @@ export function getOpenGraphImageElement(
 				</div>
 				<div
 					style={{
-						color: colors.highlight['50'],
+						color: '#fef9ec',
 						display: 'block', // Necessary for line clamp
 						fontSize: '72px',
 						fontWeight: 700,
