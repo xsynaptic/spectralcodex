@@ -15,9 +15,9 @@ const { class: className, showCompact, darkMode = true, ...props } = Astro.props
 		'prose prose-primary max-w-none font-serif',
 		darkMode ? 'dark:prose-invert' : undefined,
 		'prose-a:underline-offset-2 prose-a:transition-colors prose-a:duration-150 prose-a:ease-in',
-		'prose-a:text-accent-500 prose-a:decoration-accent-200 hover:prose-a:text-accent-300 hover:prose-a:decoration-accent-100',
+		'prose-a:text-accent-500 prose-a:decoration-accent-200 prose-a:hover:text-accent-300 prose-a:hover:decoration-accent-100',
 		darkMode
-			? 'dark:prose-a:text-accent-300 dark:prose-a:decoration-accent-500 dark:hover:prose-a:text-accent-200 dark:hover:prose-a:decoration-accent-400'
+			? 'dark:prose-a:text-accent-300 dark:prose-a:decoration-accent-500 dark:prose-a:hover:text-accent-200 dark:prose-a:hover:decoration-accent-400'
 			: undefined,
 		'prose-h2:mb-small',
 		showCompact ? 'prose-xs lg:prose-sm' : 'prose-base lg:prose-lg',
