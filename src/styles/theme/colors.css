@@ -1,0 +1,138 @@
+@theme {
+	/* Custom colors */
+	--color-calypso-50: #f1f8fa;
+	--color-calypso-100: #dceef1;
+	--color-calypso-200: #bddee4;
+	--color-calypso-300: #8fc6d1;
+	--color-calypso-400: #59a4b7;
+	--color-calypso-500: #3e889c;
+	--color-calypso-600: #346c7f;
+	--color-calypso-700: #315c6d;
+	--color-calypso-800: #2f4d5b;
+	--color-calypso-900: #2b434e;
+	--color-calypso-950: #182a34;
+
+	--color-hoki-50: #f3f6f8;
+	--color-hoki-100: #e2e9eb;
+	--color-hoki-200: #c7d3da;
+	--color-hoki-300: #a1b4bf;
+	--color-hoki-400: #728c9e;
+	--color-hoki-500: #627f93;
+	--color-hoki-600: #4b5f6f;
+	--color-hoki-700: #41505d;
+	--color-hoki-800: #3b454f;
+	--color-hoki-900: #343c45;
+	--color-hoki-950: #20262c;
+
+	--color-lilacBush-50: #f7f6fc;
+	--color-lilacBush-100: #f1eef9;
+	--color-lilacBush-200: #e4dff5;
+	--color-lilacBush-300: #d0c5ed;
+	--color-lilacBush-400: #b7a3e2;
+	--color-lilacBush-500: #9d7dd4;
+	--color-lilacBush-600: #8c61c6;
+	--color-lilacBush-700: #7c4fb2;
+	--color-lilacBush-800: #674295;
+	--color-lilacBush-900: #56377b;
+	--color-lilacBush-950: #362352;
+
+	--color-amethyst-50: #f8f7fb;
+	--color-amethyst-100: #f2f1f6;
+	--color-amethyst-200: #e6e4f0;
+	--color-amethyst-300: #d3cfe3;
+	--color-amethyst-400: #bbb3d2;
+	--color-amethyst-500: #a093be;
+	--color-amethyst-600: #8d7bac;
+	--color-amethyst-700: #7b6899;
+	--color-amethyst-800: #675780;
+	--color-amethyst-900: #55486a;
+	--color-amethyst-950: #372f46;
+
+	--color-geebung-50: #faf7ec;
+	--color-geebung-100: #f3ebce;
+	--color-geebung-200: #e9d59f;
+	--color-geebung-300: #dcb968;
+	--color-geebung-400: #d19f3e;
+	--color-geebung-500: #c88e32;
+	--color-geebung-600: #a76b27;
+	--color-geebung-700: #854f23;
+	--color-geebung-800: #704123;
+	--color-geebung-900: #603723;
+	--color-geebung-950: #371c11;
+
+	--color-cumin-50: #fef9ec;
+	--color-cumin-100: #faeecb;
+	--color-cumin-200: #f4da93;
+	--color-cumin-300: #efc15a;
+	--color-cumin-400: #ebab34;
+	--color-cumin-500: #e48b1c;
+	--color-cumin-600: #c96916;
+	--color-cumin-700: #a74a16;
+	--color-cumin-800: #8f3d19;
+	--color-cumin-900: #703017;
+	--color-cumin-950: #401708;
+
+	--color-lima-50: #f5fee7;
+	--color-lima-100: #e8fccb;
+	--color-lima-200: #d2fa9c;
+	--color-lima-300: #b3f363;
+	--color-lima-400: #95e734;
+	--color-lima-500: #72c614;
+	--color-lima-600: #59a40c;
+	--color-lima-700: #457d0e;
+	--color-lima-800: #396311;
+	--color-lima-900: #315314;
+	--color-lima-950: #172e05;
+
+	/* Primary colors */
+	--color-primary-50: var(--color-zinc-50);
+	--color-primary-100: var(--color-zinc-100);
+	--color-primary-200: var(--color-zinc-200);
+	--color-primary-300: var(--color-zinc-300);
+	--color-primary-400: var(--color-zinc-400);
+	--color-primary-500: var(--color-zinc-500);
+	--color-primary-600: var(--color-zinc-600);
+	--color-primary-700: var(--color-zinc-700);
+	--color-primary-800: var(--color-zinc-800);
+	--color-primary-900: var(--color-zinc-900);
+	--color-primary-950: var(--color-zinc-950);
+
+	/* Accent colors */
+	--color-accent-50: var(--color-calypso-50);
+	--color-accent-100: var(--color-calypso-100);
+	--color-accent-200: var(--color-calypso-200);
+	--color-accent-300: var(--color-calypso-300);
+	--color-accent-400: var(--color-calypso-400);
+	--color-accent-500: var(--color-calypso-500);
+	--color-accent-600: var(--color-calypso-600);
+	--color-accent-700: var(--color-calypso-700);
+	--color-accent-800: var(--color-calypso-800);
+	--color-accent-900: var(--color-calypso-900);
+	--color-accent-950: var(--color-calypso-950);
+
+	/* Highlight colors */
+	--color-highlight-50: var(--color-cumin-50);
+	--color-highlight-100: var(--color-cumin-100);
+	--color-highlight-200: var(--color-cumin-200);
+	--color-highlight-300: var(--color-cumin-300);
+	--color-highlight-400: var(--color-cumin-400);
+	--color-highlight-500: var(--color-cumin-500);
+	--color-highlight-600: var(--color-cumin-600);
+	--color-highlight-700: var(--color-cumin-700);
+	--color-highlight-800: var(--color-cumin-800);
+	--color-highlight-900: var(--color-cumin-900);
+	--color-highlight-950: var(--color-cumin-950);
+
+	/* Alternate colors */
+	--color-alternate-50: var(--color-lima-50);
+	--color-alternate-100: var(--color-lima-100);
+	--color-alternate-200: var(--color-lima-200);
+	--color-alternate-300: var(--color-lima-300);
+	--color-alternate-400: var(--color-lima-400);
+	--color-alternate-500: var(--color-lima-500);
+	--color-alternate-600: var(--color-lima-600);
+	--color-alternate-700: var(--color-lima-700);
+	--color-alternate-800: var(--color-lima-800);
+	--color-alternate-900: var(--color-lima-900);
+	--color-alternate-950: var(--color-lima-950);
+}

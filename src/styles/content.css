@@ -1,0 +1,70 @@
+/* Note: the text shadow should match the background for the page */
+.content a {
+	text-shadow:
+		1px 1px 0 #f5f5f5,
+		-1px 1px 0 #f5f5f5,
+		2px 0 1px #f5f5f5,
+		-2px 0 1px #f5f5f5;
+	[data-theme='dark'] & {
+		text-shadow:
+			1px 1px 0 #27272a,
+			-1px 1px 0 #27272a,
+			2px 0 1px #27272a,
+			-2px 0 1px #27272a;
+	}
+}
+
+/* Content image styling; these are labelled "not-prose" and require extra rules */
+.content > *:not(.content-image):not(.figure-group) {
+	@apply max-w-content px-small md:px-medium mx-auto;
+}
+.content > .content-image {
+	@apply mt-0;
+}
+.content > .content-image + p {
+	@apply mt-0;
+}
+.content-image-caption a {
+	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 underline underline-offset-2 transition-colors duration-150 ease-in;
+	[data-theme='dark'] & {
+		@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
+	}
+}
+.content-image-caption em {
+	@apply not-italic;
+}
+
+/* Footnotes */
+.content > .footnotes ol {
+	@apply prose-sm max-w-content;
+}
+.content > .footnotes ol li::marker {
+	@apply text-xs italic;
+	margin-top: -5px;
+}
+.content .footnotes li p {
+	margin: 0;
+}
+.content [data-footnote-ref]::before,
+.content [data-footnote-ref]::after {
+	@apply text-accent-300 font-light;
+	[data-theme='dark'] & {
+		@apply text-accent-400;
+	}
+}
+.content [data-footnote-ref]::before {
+	content: '[';
+	margin-inline-start: 1px;
+}
+.content [data-footnote-ref]::after {
+	content: ']';
+}
+.content [data-footnote-ref],
+.content [data-footnote-backref] {
+	@apply font-medium no-underline select-none;
+}
+
+/** Inserted by remark-rehype for use with the footnotes label */
+.sr-only {
+	@apply sr-only;
+}
