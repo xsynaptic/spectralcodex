@@ -1,17 +1,17 @@
 /* Note: the text shadow should match the background for the page */
 .content a {
 	text-shadow:
-		1px 1px 0 #f5f5f5,
-		-1px 1px 0 #f5f5f5,
-		2px 0 1px #f5f5f5,
-		-2px 0 1px #f5f5f5;
-	[data-theme='dark'] & {
-		text-shadow:
-			1px 1px 0 #27272a,
-			-1px 1px 0 #27272a,
-			2px 0 1px #27272a,
-			-2px 0 1px #27272a;
-	}
+		1px 1px 0 var(--color-primary-100),
+		-1px 1px 0 var(--color-primary-100),
+		2px 0 1px var(--color-primary-100),
+		-2px 0 1px var(--color-primary-100);
+}
+[data-theme='dark'] .content a {
+	text-shadow:
+		1px 1px 0 var(--color-primary-800),
+		-1px 1px 0 var(--color-primary-800),
+		2px 0 1px var(--color-primary-800),
+		-2px 0 1px var(--color-primary-800);
 }
 
 /* Content image styling; these are labelled "not-prose" and require extra rules */
@@ -26,10 +26,11 @@
 }
 .content-image-caption a {
 	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 underline underline-offset-2 transition-colors duration-150 ease-in;
-	[data-theme='dark'] & {
-		@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
-	}
 }
+[data-theme='dark'] .content-image-caption a {
+	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
+}
+
 .content-image-caption em {
 	@apply not-italic;
 }
@@ -48,10 +49,12 @@
 .content [data-footnote-ref]::before,
 .content [data-footnote-ref]::after {
 	@apply text-accent-300 font-light;
-	[data-theme='dark'] & {
-		@apply text-accent-400;
-	}
 }
+[data-theme='dark'] .content [data-footnote-ref]::before,
+[data-theme='dark'] .content [data-footnote-ref]::after {
+	@apply text-accent-400;
+}
+
 .content [data-footnote-ref]::before {
 	content: '[';
 	margin-inline-start: 1px;
