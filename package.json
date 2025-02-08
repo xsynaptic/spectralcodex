@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "3.2.1",
+	"version": "4.0.0",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -51,7 +51,6 @@
 		"@spectralcodex/image-open-graph": "workspace:*",
 		"@spectralcodex/image-service": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
-		"@spectralcodex/tailwind": "workspace:*",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tanstack/eslint-plugin-query": "^5.66.0",
 		"@turf/helpers": "^7.2.0",
