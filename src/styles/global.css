@@ -1,7 +1,10 @@
 @import 'tailwindcss';
 
+/** Enable dark mode with a custom selector */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Spacing */
 @theme {
-	/* Spacing */
 	--spacing-small: 1rem;
 	--spacing-medium: 2rem;
 	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
@@ -11,6 +14,16 @@
 @import './theme/fonts.css';
 @import './theme/typography.css';
 
+/** 2025Q1 there seems to be a bug with Astro where Tailwind won't detect all classes in client code */
+/** Currently the workaround is to explicitly name the path as a source */
+@source '../../packages/react-map-component';
+
+@import './background.css';
+@import './content.css';
+@import './carousel.css';
+@import './loading.css';
+
+/** These custom properties are defined outside Tailwind's system */
 :root {
 	--content-bar: '|';
 	--content-bullet: '\2022';
@@ -18,13 +31,6 @@
 	--content-dot: '\00B7';
 	--content-slash: '/';
 }
-
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
-@import './background.css';
-@import './content.css';
-@import './carousel.css';
-@import './loading.css';
 
 html {
 	scrollbar-gutter: stable;

@@ -16,7 +16,7 @@ const { timelineMonthlyData } = Astro.props;
 	{
 		timelineMonthlyData.map(({ id, title, timelineItems }) => (
 			<li class="mb-1">
-				<h2 class="mb-1 border-b border-primary-200 pb-1 text-sm font-semibold uppercase">
+				<h2 class="border-primary-200 mb-1 border-b pb-1 text-sm font-semibold uppercase">
 					<Link href={getSiteUrl('timeline', id)} linkColor="primary">
 						{title}
 					</Link>

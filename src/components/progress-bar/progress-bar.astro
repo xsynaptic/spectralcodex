@@ -12,7 +12,7 @@ const { class: className, ...props } = Astro.props;
 ---
 
 <div
-	class:list={[className, 'progress-bar', 'pointer-events-none fixed left-0 top-0 h-1 w-full']}
+	class:list={[className, 'progress-bar', 'pointer-events-none fixed top-0 left-0 h-1 w-full']}
 	aria-hidden="true"
 	{...props}
 >

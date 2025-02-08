@@ -38,8 +38,8 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 			class:list={[
 				'figure-group',
 				'not-prose',
-				'mb-2 sm:px-small md:mb-4 md:px-medium',
-				layout === 'wide' ? 'w-full' : 'mx-auto max-w-content',
+				'sm:px-small md:px-medium mb-2 md:mb-4',
+				layout === 'wide' ? 'w-full' : 'max-w-content mx-auto',
 				columns > 1 ? 'grid grid-cols-1 gap-2 md:gap-4' : undefined,
 				columns === 2 ? 'sm:grid-cols-2' : undefined,
 				columns === 3 ? 'md:grid-cols-3' : undefined,

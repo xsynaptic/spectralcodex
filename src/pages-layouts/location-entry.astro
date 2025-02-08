@@ -176,7 +176,7 @@ const t = getTranslations();
 						<Fragment slot="section-title">{t('content.section.map')}</Fragment>
 						<MapComponent {...mapComponentProps} />
 						{address ? (
-							<address class="mt-1 px-small text-xs not-italic text-primary-400 sm:px-0">
+							<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
 								{t('locations.address.label')}:{' '}
 								<span>
 									<FormatCjk>{address}</FormatCjk>

@@ -12,7 +12,7 @@ const { as: Tag = 'div', class: className, fillViewport, ...props } = Astro.prop
 
 <Tag
 	class:list={[
-		'mx-auto max-w-content md:px-medium',
+		'max-w-content md:px-medium mx-auto',
 		fillViewport ? 'sm:px-small' : 'px-small',
 		className,
 	]}

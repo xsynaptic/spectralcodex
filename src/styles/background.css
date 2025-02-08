@@ -1,5 +1,5 @@
 /** Fade from the top */
-.bg-featured-a {
+@utility bg-featured-a {
 	background-image: linear-gradient(
 		180deg,
 		rgba(38, 38, 38, 0.4),
@@ -19,7 +19,7 @@
 }
 
 /* Fade from the bottom */
-.bg-featured-b {
+@utility bg-featured-b {
 	background-image: linear-gradient(
 		0deg,
 		rgba(38, 38, 38, 0.6),
@@ -39,7 +39,7 @@
 }
 
 /* A little texture for the header */
-.bg-header-fade {
+@utility bg-header-fade {
 	background-image: linear-gradient(
 		180deg,
 		hsla(0, 0%, 96%, 0.9),
@@ -57,7 +57,7 @@
 		hsla(0, 0%, 96%, 0.7)
 	);
 }
-.bg-header-fade-dark {
+@utility bg-header-fade-dark {
 	background-image: linear-gradient(
 		180deg,
 		hsla(0, 0%, 18%, 0.9),
@@ -77,7 +77,7 @@
 }
 
 /* This fallback pattern is a seamless seigaiha (青海波) pattern */
-.bg-fallback {
+@utility bg-fallback {
 	@apply bg-primary-200;
 	background-image: svg-load('seigaiha.svg', fill=#dbdbdf);
 	background-repeat: repeat;

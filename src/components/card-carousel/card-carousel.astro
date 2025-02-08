@@ -3,14 +3,14 @@
 ---
 
 <card-carousel>
-	<div class="-ml-10 -mr-10 flex items-center lg:-ml-12 lg:-mr-12">
+	<div class="-mr-10 -ml-10 flex items-center lg:-mr-12 lg:-ml-12">
 		<div class:list={['carousel-prev', 'mb-2 w-10 lg:w-12']}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="1em"
 				height="1em"
 				viewBox="0 0 24 24"
-				class="select-none overflow-hidden text-4xl text-accent-400 transition-colors ease-in-out hover:text-accent-200 lg:text-6xl"
+				class="text-accent-400 hover:text-accent-200 overflow-hidden text-4xl transition-colors ease-in-out select-none lg:text-6xl"
 				><path fill="currentColor" d="M15.41 16.58L10.83 12l4.58-4.59L14 6l-6 6l6 6z"></path><title>
 					Previous
 				</title></svg
@@ -19,7 +19,7 @@
 		<ul
 			class:list={[
 				'carousel-container',
-				'flex touch-pan-x snap-x snap-mandatory flex-nowrap overflow-auto scroll-smooth bg-primary-100 pb-2',
+				'bg-primary-100 flex touch-pan-x snap-x snap-mandatory flex-nowrap overflow-auto scroll-smooth pb-2',
 			]}
 		>
 			<slot />
@@ -30,7 +30,7 @@
 				width="1em"
 				height="1em"
 				viewBox="0 0 24 24"
-				class="select-none overflow-hidden text-4xl text-accent-400 transition-colors ease-in-out hover:text-accent-200 lg:text-6xl"
+				class="text-accent-400 hover:text-accent-200 overflow-hidden text-4xl transition-colors ease-in-out select-none lg:text-6xl"
 				><path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z"></path><title>
 					Next
 				</title></svg

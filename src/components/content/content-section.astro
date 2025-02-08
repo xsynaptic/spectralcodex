@@ -22,7 +22,7 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 		<div
 			class:list={[
 				'mb-medium',
-				'mx-auto max-w-content md:px-medium',
+				'max-w-content md:px-medium mx-auto',
 				fillViewport ? 'sm:px-small' : 'px-small',
 				className,
 			]}
