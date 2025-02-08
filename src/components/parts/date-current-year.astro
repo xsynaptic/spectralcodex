@@ -13,6 +13,7 @@ const elementId = nanoid();
 <span id={elementId}>{currentYear}</span>
 
 <script is:inline define:vars={{ elementId }}>
+	// @ts-expect-error -- elementId exists and is passed properly
 	const currentYearElement = document.querySelector(`#${elementId}`);
 	const currentYear = String(new Date().getFullYear());
 
