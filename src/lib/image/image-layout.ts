@@ -1,8 +1,4 @@
-import { tailwindConfig } from '@spectralcodex/tailwind/config';
-
 import type { ImageMetadata } from 'astro';
-
-const { screens, spacing } = tailwindConfig.theme;
 
 // Note that only the first three are currently in use
 export type ImageLayoutOption =
@@ -62,7 +58,7 @@ export function getImageLayoutProps({
 				width: 900,
 				height: 600,
 				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
-				sizes: `(max-width: ${screens.sm}) 100vw, (max-width: ${screens.md}) calc(100vw - 32px), (max-width: ${spacing.content}) calc(100vw - 64px), ${spacing.content}`,
+				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--breakpoint-md)) calc(100vw - 32px), (max-width: var(--spacing-content)) calc(100vw - 64px), var(--spacing-content)`,
 			};
 		}
 		case 'wide': {
@@ -99,7 +95,7 @@ export function getImageLayoutProps({
 					}
 				})(),
 				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
-				sizes: `(max-width: ${screens.sm}) 100vw, (max-width: ${spacing.content}) 50vw`,
+				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--spacing-content)) 50vw`,
 			};
 		}
 	}

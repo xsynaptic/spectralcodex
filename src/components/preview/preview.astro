@@ -1,5 +1,4 @@
 ---
-import { tailwindConfig } from '@spectralcodex/tailwind/config';
 import { Image } from 'astro:assets';
 
 import type { HTMLAttributes } from 'astro/types';
@@ -33,7 +32,7 @@ const imageProps = image
 				maxWidth: image.data.src.width,
 				widths: [450, 600, 900, 1200],
 			}),
-			sizes: `(max-width: ${tailwindConfig.theme.screens.lg}) 100vw, 450px`,
+			sizes: `(max-width: var(--breakpoint-lg)) 100vw, 450px`,
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
 			...getImagePlaceholderProps({ placeholder: image.data.placeholder }),
@@ -55,7 +54,7 @@ const description = await Astro.slots.render('preview-description');
 				<Image
 					class:list={[
 						'bg-fallback',
-						'w-full rounded-sm object-cover object-center text-sm text-transparent',
+						'w-full rounded-xs object-cover object-center text-sm text-transparent',
 						isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
 					]}
 					loading="lazy"
@@ -66,7 +65,7 @@ const description = await Astro.slots.render('preview-description');
 			<div
 				class:list={[
 					'bg-fallback',
-					'w-full rounded-sm text-sm text-transparent shadow-inner',
+					'w-full rounded-xs text-sm text-transparent shadow-inner',
 					isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
 				]}
 			/>

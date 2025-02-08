@@ -21,8 +21,8 @@ const caption = await Astro.slots.render('header-caption');
 	class:list={[
 		className,
 		showFeatured
-			? 'flex flex-col justify-end pt-2 sm:absolute sm:bottom-0 sm:left-0 sm:right-0 sm:z-30 sm:mb-0 sm:pt-0'
-			: 'mb-2 pt-small',
+			? 'flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:z-30 sm:mb-0 sm:pt-0'
+			: 'pt-small mb-2',
 	]}
 >
 	{
@@ -31,9 +31,9 @@ const caption = await Astro.slots.render('header-caption');
 				as="h2"
 				gradientColor={showFeatured ? 'accent-featured' : 'accent'}
 				class:list={[
-					'ml-[-0.125rem] pb-1 font-heiti text-base font-medium leading-snug sm:font-semibold',
+					'font-heiti ml-[-0.125rem] pb-1 text-base leading-snug font-medium sm:font-semibold',
 					showFeatured
-						? 'text-lg sm:-mb-1 sm:drop-shadow-sm md:text-xl lg:text-2xl'
+						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 						: 'text-lg md:text-xl lg:text-2xl',
 				]}
 			>
@@ -48,9 +48,9 @@ const caption = await Astro.slots.render('header-caption');
 			as="h1"
 			gradientColor={showFeatured ? 'primary-featured' : 'primary'}
 			class:list={[
-				'ml-[-0.125rem] pb-2 font-display text-2xl font-semibold leading-[1.125]',
+				'font-display ml-[-0.125rem] pb-2 text-2xl leading-[1.125] font-semibold',
 				showFeatured
-					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow md:text-4xl lg:text-5xl'
+					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: '-mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
 		>
