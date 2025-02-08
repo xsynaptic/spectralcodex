@@ -48,19 +48,19 @@ const {
 		(() => {
 			switch (dividerContent) {
 				case 'bar': {
-					return 'after:content-bar';
+					return 'after:content-(--content-bar)';
 				}
 				case 'bullet': {
-					return 'after:content-bullet';
+					return 'after:content-(--content-bullet)';
 				}
 				case 'chevron': {
-					return 'after:content-chevron';
+					return 'after:content-(--content-chevron)';
 				}
 				case 'dot': {
-					return 'after:content-dot';
+					return 'after:content-(--content-dot)';
 				}
 				case 'slash': {
-					return 'after:content-slash';
+					return 'after:content-(--content-slash)';
 				}
 				default: {
 					dividerContent satisfies never;
