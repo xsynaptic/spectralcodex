@@ -22,6 +22,12 @@ type LocalImageLoaderDataHandler = (args: {
 	logger: LoaderContext['logger'];
 }) => Record<string, unknown> | Promise<Record<string, unknown>>;
 
+interface FileChangeQueueItem {
+	filePath: string;
+	id: string;
+	type: 'change' | 'add' | 'unlink';
+}
+
 // Valid image formats supported by Astro; note that SVGs will not be processed
 const VALID_IMAGE_FORMATS = ['jpeg', 'jpg', 'png', 'tiff', 'webp', 'gif', 'svg', 'avif'] as const;
 
@@ -178,14 +184,9 @@ export function imageLoader(options: ImageLoaderOptions) {
 
 	return {
 		name: 'local-image-loader',
-		load: async function load({
-			config,
-			store,
-			parseData,
-			generateDigest,
-			logger,
-			watcher,
-		}: LoaderContext): Promise<void> {
+		load: async function load(context: LoaderContext): Promise<void> {
+			const { config, store, parseData, generateDigest, logger, watcher } = context;
+
 			const pattern =
 				options.extensions && options.extensions.length > 0
 					? `**/[^_]*.(${options.extensions.join('|')})`
@@ -240,49 +241,68 @@ export function imageLoader(options: ImageLoaderOptions) {
 				store.delete(id);
 			}
 
-			// TODO: implement watcher; currently this does not work as expected
 			if (!watcher) return;
 
 			const filePathMatches = getFilePathMatchesFunction(pattern, baseDir);
 
-			// TODO: this is not picking up multiple file changes, probably something to do with promises
-			async function watcherOnChange(changedPath: string) {
+			// Create a debounced queue for file changes
+			const changeQueue = new Map<string, FileChangeQueueItem>();
+
+			let changeTimeout: NodeJS.Timeout | undefined = undefined;
+
+			function queueChange(changedPath: string, type: 'change' | 'add' | 'unlink') {
 				const filePath = filePathMatches(changedPath);
 
 				if (!filePath) return;
 
 				const id = generateId({ filePath, base: baseDir });
 
-				options.beforeLoad?.();
+				changeQueue.set(filePath, { filePath, id, type });
 
-				// TODO: modified time? Not sure how much this matters
-				try {
-					await syncData({ id, filePath, modifiedTime: new Date() });
-				} catch (error) {
-					console.error(error);
-				}
-				options.afterLoad?.();
+				// Debounce processing changes
+				if (changeTimeout) clearTimeout(changeTimeout);
+
+				// eslint-disable-next-line @typescript-eslint/no-misused-promises
+				changeTimeout = setTimeout(async () => {
+					options.beforeLoad?.();
+
+					// Process all queued changes
+					for (const change of changeQueue.values()) {
+						try {
+							if (change.type === 'unlink') {
+								store.delete(change.id);
+								logger.info(`Deleted from store: ${change.filePath}`);
+							} else {
+								await syncData({
+									id: change.id,
+									filePath: change.filePath,
+									modifiedTime: new Date(),
+								});
+							}
+						} catch (error) {
+							logger.error(
+								`Error processing ${change.type} for ${change.filePath}: ${JSON.stringify(error)}`,
+							);
+						}
+					}
+
+					changeQueue.clear();
+
+					options.afterLoad?.();
+				}, 300);
 			}
 
 			watcher.on('change', (changedPath) => {
-				void watcherOnChange(changedPath);
+				queueChange(changedPath, 'change');
 			});
 
 			watcher.on('add', (changedPath) => {
-				void watcherOnChange(changedPath);
+				queueChange(changedPath, 'add');
 			});
 
 			// Unlink is triggered when a file is deleted
 			watcher.on('unlink', (changedPath) => {
-				const filePath = filePathMatches(changedPath);
-
-				if (!filePath) return;
-
-				const id = generateId({ filePath, base: baseDir });
-
-				store.delete(id);
-
-				logger.info(`Deleted from store: ${filePath}`);
+				queueChange(changedPath, 'unlink');
 			});
 		},
 	} satisfies Loader;
