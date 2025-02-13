@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-global-this */
 import type {
 	ThemeChangedEvent,
 	ThemeGeneralType,
@@ -14,8 +13,14 @@ import { isThemeTypeValid, ThemeTypeEnum } from '@/components/theme/theme-types'
 export function themeManager(defaultThemeId: string | undefined) {
 	const storageKey = 'theme';
 	const store =
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		typeof localStorage === 'undefined' ? { getItem: () => {}, setItem: () => {} } : localStorage;
+		typeof localStorage === 'undefined'
+			? {
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					getItem: () => {},
+					// eslint-disable-next-line @typescript-eslint/no-empty-function
+					setItem: () => {},
+				}
+			: localStorage;
 
 	const defaultThemeRaw = defaultThemeId
 		? document.querySelector<HTMLScriptElement>(defaultThemeId)?.dataset.defaultTheme
@@ -24,43 +29,54 @@ export function themeManager(defaultThemeId: string | undefined) {
 
 	const mediaMatcher = window.matchMedia(`(prefers-color-scheme: ${ThemeTypeEnum.Light})`);
 
-	let systemTheme = mediaMatcher.matches ? ThemeTypeEnum.Light : ThemeTypeEnum.Dark;
+	let systemTheme: ThemeSystemType = mediaMatcher.matches
+		? ThemeTypeEnum.Light
+		: ThemeTypeEnum.Dark;
 
-	mediaMatcher.addEventListener('change', (event) => {
-		systemTheme = event.matches ? ThemeTypeEnum.Light : ThemeTypeEnum.Dark;
-		applyTheme(window.theme.getTheme());
-	});
+	function getTheme(): ThemeGeneralType {
+		const stored = store.getItem(storageKey);
+
+		return stored && isThemeTypeValid(stored) ? stored : defaultTheme;
+	}
 
 	function applyTheme(theme: ThemeGeneralType) {
 		const resolvedTheme = theme === ThemeTypeEnum.Auto ? systemTheme : theme;
 
 		document.documentElement.dataset.theme = resolvedTheme;
 		document.documentElement.style.colorScheme = resolvedTheme;
-		document.dispatchEvent(
-			new CustomEvent('theme-changed', {
-				detail: { theme, systemTheme, defaultTheme, resolvedTheme },
-			}) satisfies ThemeChangedEvent,
-		);
+
+		// Dispatch event after DOM is updated
+		queueMicrotask(() => {
+			document.dispatchEvent(
+				new CustomEvent('theme-changed', {
+					detail: { theme, systemTheme, defaultTheme, resolvedTheme },
+				}) satisfies ThemeChangedEvent,
+			);
+		});
 	}
 
 	function setTheme(theme: ThemeGeneralType = defaultTheme) {
+		if (!isThemeTypeValid(theme)) return;
 		store.setItem(storageKey, theme);
 		applyTheme(theme);
 	}
 
-	function getTheme(): ThemeGeneralType {
-		const themeStored = store.getItem(storageKey);
-
-		return themeStored && isThemeTypeValid(themeStored) ? themeStored : defaultTheme;
+	function handleMediaChange(event: MediaQueryListEvent) {
+		systemTheme = event.matches ? ThemeTypeEnum.Light : ThemeTypeEnum.Dark;
+		applyTheme(getTheme());
 	}
 
-	function getSystemTheme(): ThemeSystemType {
-		return systemTheme;
+	mediaMatcher.addEventListener('change', handleMediaChange);
+
+	function cleanup() {
+		mediaMatcher.removeEventListener('change', handleMediaChange);
 	}
 
-	function getDefaultTheme() {
-		return defaultTheme;
-	}
-
-	return { setTheme, getTheme, getSystemTheme, getDefaultTheme };
+	return {
+		setTheme,
+		getTheme,
+		getSystemTheme: () => systemTheme,
+		getDefaultTheme: () => defaultTheme,
+		cleanup,
+	};
 }

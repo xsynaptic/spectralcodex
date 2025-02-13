@@ -129,6 +129,9 @@ export const translations = {
 		'site.footer.powered.label': 'Human-generated and powered by',
 		'site.footer.updated.label': 'Site updated on',
 		'site.breadcrumbs.aria.label': 'Breadcrumb Navigation',
+		'site.theme.toggle.label': 'Toggle theme',
+		'site.theme.mode.dark': 'Dark mode',
+		'site.theme.mode.light': 'Light mode',
 
 		// Menu items
 		'menu.timeline.label': 'Timeline',

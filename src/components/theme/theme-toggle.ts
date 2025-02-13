@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-global-this */
 import { ThemeTypeEnum } from '@/components/theme/theme-types';
 
 export function activateThemeToggle(toggleElementId: string) {
@@ -7,6 +6,8 @@ export function activateThemeToggle(toggleElementId: string) {
 	if (!toggleElement) return;
 
 	toggleElement.addEventListener('click', () => {
+		if (!window.theme) return;
+
 		const currentTheme = window.theme.getTheme();
 
 		switch (currentTheme) {

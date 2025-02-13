@@ -1,19 +1,52 @@
 ---
+import { getTranslations } from '@/lib/utils/i18n';
 
+const t = getTranslations();
+
+// Icons from Lucide; lucide:moon and lucide:sun-medium
 ---
 
 <div>
 	<button
 		id="theme-toggle"
 		class:list={[
-			'ml-5 flex h-10 w-20 items-center justify-center rounded-full border transition-all',
-			'border-primary-300 bg-primary-100 text-primary-800 dark:border-primary-600 dark:bg-primary-800 dark:text-primary-100',
+			'ml-5 flex cursor-pointer items-center justify-center rounded-full border transition-all',
+			'border-primary-200 bg-primary-100 text-primary-800 dark:border-primary-700 dark:bg-primary-800 dark:text-primary-100',
 		]}
-		aria-label="Toggle theme"
-		title="Toggle theme"
+		aria-label={t('site.theme.toggle.label')}
+		title={t('site.theme.toggle.label')}
 	>
-		<div class:list={['hidden dark:inline', 'text-primary-400']}>Light</div>
-		<div class:list={['inline dark:hidden', 'text-primary-600']}>Dark</div>
+		<div
+			class:list={['hidden dark:inline', 'text-primary-300']}
+			aria-label={t('site.theme.mode.light')}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+				><g
+					fill="none"
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					><circle cx="12" cy="12" r="4"></circle><path
+						d="M12 3v1m0 16v1m-9-9h1m16 0h1m-2.636-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707"
+					></path></g
+				></svg
+			>
+		</div>
+		<div
+			class:list={['inline dark:hidden', 'text-primary-700']}
+			aria-label={t('site.theme.mode.dark')}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+				><path
+					fill="none"
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M12 3a6 6 0 0 0 9 9a9 9 0 1 1-9-9"></path></svg
+			>
+		</div>
 	</button>
 </div>
 
@@ -21,4 +54,8 @@
 	import { activateThemeToggle } from '@/components/theme/theme-toggle';
 
 	activateThemeToggle('#theme-toggle');
+
+	document.addEventListener('astro:after-swap', () => {
+		activateThemeToggle('#theme-toggle');
+	});
 </script>

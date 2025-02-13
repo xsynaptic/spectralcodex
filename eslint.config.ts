@@ -26,12 +26,16 @@ export default getConfig(
 		},
 		// Those files run in the browser and need the browser globals
 		{
-			files: ['src/components/*'],
+			files: ['src/components/**/*', 'src/components/**/*/*.ts'],
 			languageOptions: {
 				globals: {
 					...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, 'off'])),
 					...globals.browser,
 				},
+			},
+			rules: {
+				// This conflicts with how some client-side code is handled
+				'unicorn/prefer-global-this': 'off',
 			},
 		},
 	],

@@ -19,15 +19,21 @@ const { defaultTheme = ThemeTypeEnum.Auto } = Astro.props;
 <script>
 	import { themeManager } from '@/components/theme/theme-manager';
 
-	// eslint-disable-next-line unicorn/prefer-global-this
-	if (!window.theme) window.theme = themeManager('#theme-default');
+	function initializeTheme() {
+		if (!window.theme) {
+			window.theme = themeManager('#theme-default');
+			window.theme.setTheme(window.theme.getTheme());
+		}
+	}
 
-	// eslint-disable-next-line unicorn/prefer-global-this
-	window.theme.setTheme(window.theme.getTheme());
+	initializeTheme();
 
-	// Handle view transitions
 	document.addEventListener('astro:after-swap', () => {
-		// eslint-disable-next-line unicorn/prefer-global-this
-		window.theme.setTheme(window.theme.getTheme());
+		initializeTheme();
+		if (window.theme) window.theme.setTheme(window.theme.getTheme());
+	});
+
+	window.addEventListener('unload', () => {
+		if (window.theme) window.theme.cleanup();
 	});
 </script>

@@ -11,13 +11,16 @@ interface ImportMeta {
 
 type ThemeType = 'auto' | 'dark' | 'light';
 
+interface ThemeManager {
+	setTheme: (theme: ThemeType) => void;
+	getTheme: () => ThemeType;
+	getSystemTheme: () => Extract<ThemeType, 'light' | 'dark'>;
+	getDefaultTheme: () => ThemeType;
+	cleanup: () => void;
+}
+
 interface Window {
-	theme: {
-		setTheme: (theme: ThemeType) => void;
-		getTheme: () => ThemeType;
-		getSystemTheme: () => Extract<ThemeType, 'light' | 'dark'>;
-		getDefaultTheme: () => ThemeType;
-	};
+	theme: ThemeManager | undefined;
 }
 
 // Astro.locals typing; must be namespaced "App" and in this file
