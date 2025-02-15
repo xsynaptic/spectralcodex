@@ -34,7 +34,7 @@ const imageProps = {
 	format: IMAGE_FORMAT,
 	quality: IMAGE_QUALITY,
 	...getImageLayoutProps({ imageMetadata, layout: 'medium' }),
-	...getImagePlaceholderProps({ placeholder }),
+	...getImagePlaceholderProps(placeholder),
 } satisfies LocalImageProps;
 
 // TODO: offer direct image downloads at various sizes

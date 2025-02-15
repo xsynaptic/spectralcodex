@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-import { IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ } from '@/constants';
+import { IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ, IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '@/constants';
 import { getImageObject } from '@/lib/image/image-file-handling';
 
 // Math to convert image dimensions into a constrained version for use with the placeholders
@@ -27,10 +27,10 @@ export function getImagePlaceholderDimensions({
  */
 export async function getImagePlaceholderDataUrl({
 	imageObject,
-	pixelCount,
+	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
 }: {
 	imageObject: sharp.Sharp;
-	pixelCount: number;
+	pixelCount?: number;
 }) {
 	const metadata = await imageObject.metadata();
 
@@ -67,7 +67,7 @@ export async function getImagePlaceholderDataUrlHq(src: string) {
 }
 
 // Generate placeholder props for use with the Image component
-export function getImagePlaceholderProps({ placeholder }: { placeholder: string | undefined }) {
+export function getImagePlaceholderProps(placeholder: string | undefined) {
 	return {
 		...(placeholder
 			? {
@@ -82,4 +82,14 @@ export function getImagePlaceholderProps({ placeholder }: { placeholder: string 
 				}
 			: {}),
 	};
+}
+
+export async function getImageMetadataPlaceholderProps(imageMetadata: ImageMetadata) {
+	const imageObject = await getImageObject(imageMetadata.src);
+	const placeholder = await getImagePlaceholderDataUrl({
+		imageObject,
+		pixelCount: IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+	});
+
+	return getImagePlaceholderProps(placeholder);
 }

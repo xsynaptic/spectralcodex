@@ -5,7 +5,7 @@ import { ExifTool } from 'exiftool-vendored';
 import { CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '@/constants';
 import {
 	getImageExposureValue,
-	getImagePlaceholder,
+	getImageFileUrlPlaceholder,
 	getImageTitle,
 } from '@/lib/image/image-loader-utils';
 import { GeometrySchema } from '@/lib/schemas/geometry';
@@ -37,7 +37,15 @@ export const images = defineCollection({
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
 		dataHandler: async ({ filePathRelative, fileUrl, logger }) => {
-			const placeholder = await getImagePlaceholder({ fileUrl, logger });
+			const placeholder = await getImageFileUrlPlaceholder({
+				fileUrl,
+				onError: (errorMessage) => {
+					logger.error(errorMessage);
+				},
+				onNotFound: (errorMessage) => {
+					logger.warn(errorMessage);
+				},
+			});
 
 			const metadata = FEATURE_IMAGE_METADATA
 				? await (async () => {
@@ -91,9 +99,9 @@ export const images = defineCollection({
 				}
 			: {}),
 	}),
-	schema: ({ image }) =>
+	schema: ({ image: imageFunction }) =>
 		ImageMetadataSchema.extend({
-			src: getLocalImageTransformFunction({ image, defaultPath: '' }),
+			src: getLocalImageTransformFunction({ imageFunction, defaultPath: '' }),
 			modifiedTime: z.date().optional(),
 		}).strict(),
 });

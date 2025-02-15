@@ -2,8 +2,6 @@ import { wrapCjk } from '@xsynaptic/unified-tools';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 
-import type { LoaderContext } from 'astro/loaders';
-
 import { IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '@/constants';
 import { getImagePlaceholderDataUrl } from '@/lib/image/image-placeholder';
 
@@ -53,20 +51,22 @@ export function getImageExposureValue({
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
-export async function getImagePlaceholder({
+export async function getImageFileUrlPlaceholder({
 	fileUrl,
-	logger,
+	onError,
+	onNotFound,
 }: {
 	fileUrl: URL;
-	logger: LoaderContext['logger'];
+	onError?: (errorMessage: string) => void;
+	onNotFound?: (errorMessage: string) => void;
 }) {
 	const imageFileBuffer = await fs.readFile(fileUrl).catch(() => {
-		logger.error(`Error reading image at ${fileUrl.href}!`);
+		onError?.(`Error reading image at ${fileUrl.href}!`);
 		return;
 	});
 
 	if (!imageFileBuffer) {
-		logger.warn(`No valid image found at ${fileUrl.href}!`);
+		onNotFound?.(`No valid image found at ${fileUrl.href}!`);
 		return;
 	}
 
