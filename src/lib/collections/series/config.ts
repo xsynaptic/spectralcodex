@@ -3,7 +3,7 @@ import { defineCollection, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '@/constants';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
-import { getFeaturedImagesSchema } from '@/lib/schemas/image';
+import { FeaturedImagesSchema } from '@/lib/schemas/image';
 
 export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
@@ -16,7 +16,7 @@ export const series = defineCollection({
 			seriesItems: z.string().array().optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			images: getFeaturedImagesSchema().array().optional(),
+			images: FeaturedImagesSchema.array().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
 			locationCount: z.number().int().optional(),

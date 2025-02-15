@@ -3,7 +3,7 @@ import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '@/constants';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
-import { getFeaturedImagesSchema } from '@/lib/schemas/image';
+import { FeaturedImagesSchema } from '@/lib/schemas/image';
 import { LinkSchema } from '@/lib/schemas/links';
 
 export const regions = defineCollection({
@@ -18,7 +18,7 @@ export const regions = defineCollection({
 			links: LinkSchema.array().optional(),
 			dateCreated: DateStringSchema.optional(),
 			dateUpdated: DateStringSchema.optional(),
-			images: getFeaturedImagesSchema().array().optional(),
+			images: FeaturedImagesSchema.array().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
 			ancestors: z.string().array().optional(),

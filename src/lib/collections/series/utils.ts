@@ -6,6 +6,7 @@ import { getLocationsByPostsFunction } from '@/lib/collections/locations/utils';
 import { getPostsCollection } from '@/lib/collections/posts/data';
 import { getSeriesCollection } from '@/lib/collections/series/data';
 import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
+import { filterHasFeaturedImage } from '@/lib/metadata/metadata-utils';
 
 // Filter the content metadata index for series items by ID
 export async function getSeriesContentMetadataItemsFunction() {
@@ -17,7 +18,7 @@ export async function getSeriesContentMetadataItemsFunction() {
 		return ids
 			.map((id) => (contentMetadataIndex.has(id) ? contentMetadataIndex.get(id) : undefined))
 			.filter((entry): entry is ContentMetadataItem => !!entry)
-			.filter((item) => !!item.imageId) satisfies Array<ContentMetadataItem>;
+			.filter(filterHasFeaturedImage) satisfies Array<ContentMetadataItem>;
 	};
 }
 
