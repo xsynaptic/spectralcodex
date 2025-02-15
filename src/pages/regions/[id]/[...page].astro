@@ -11,7 +11,7 @@ import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
 import { getMapData } from '@/lib/map/map-data';
 import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
 import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
+import { filterHasFeaturedImage, sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
 import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
 import { getMapApiBaseUrl } from '@/lib/utils/routing';
 import RegionEntry from '@/pages-layouts/region-entry.astro';
@@ -44,7 +44,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				...R.pipe(entryLocations, R.filter(getFilterEntryQualityFunction(2)), getContentMetadata),
 				...R.pipe(entry.data.posts ?? [], getPostsByIds, getContentMetadata),
 			],
-			R.filter((item) => !!item.imageId),
+			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate)
 		);
 

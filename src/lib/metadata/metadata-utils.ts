@@ -21,7 +21,7 @@ export async function getContentMetadataById(id: string | undefined) {
 }
 
 // Filter content metadata by featured images
-export function filterHasImageId<T extends CollectionKey = CollectionKey>(
+export function filterHasFeaturedImage<T extends CollectionKey = CollectionKey>(
 	item: ContentMetadataItem<T>,
 ) {
 	return !!item.imageId;
