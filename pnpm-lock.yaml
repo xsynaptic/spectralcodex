@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -23,10 +23,10 @@ importers:
         version: 6.1.0
       '@astrojs/mdx':
         specifier: ^4.0.8
-        version: 4.0.8(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
+        version: 4.0.8(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       '@astrojs/node':
-        specifier: ^9.0.2
-        version: 9.0.2(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
+        specifier: ^9.1.0
+        version: 9.1.0(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       '@astrojs/react':
         specifier: ^4.2.0
         version: 4.2.0(@types/node@22.13.0)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(jiti@2.4.2)(lightningcss@1.29.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tsx@4.19.2)(yaml@2.7.0)
@@ -49,8 +49,8 @@ importers:
         specifier: ^5.1.1
         version: 5.1.1
       '@iconify/json':
-        specifier: ^2.2.305
-        version: 2.2.305
+        specifier: ^2.2.306
+        version: 2.2.306
       '@iconify/tools':
         specifier: ^4.1.1
         version: 4.1.1
@@ -110,10 +110,10 @@ importers:
         version: 1.1.0
       astro-auto-import:
         specifier: ^0.4.4
-        version: 0.4.4(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
+        version: 0.4.4(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))
       astro-seo:
         specifier: ^0.8.4
-        version: 0.8.4(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3)
+        version: 0.8.4(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
@@ -136,8 +136,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       globals:
-        specifier: ^15.14.0
-        version: 15.14.0
+        specifier: ^15.15.0
+        version: 15.15.0
       keyv:
         specifier: ^5.2.3
         version: 5.2.3
@@ -157,20 +157,20 @@ importers:
         specifier: ^6.0.0
         version: 6.0.0(postcss@8.5.1)
       prettier:
-        specifier: ^3.5.0
-        version: 3.5.0
+        specifier: ^3.5.1
+        version: 3.5.1
       prettier-plugin-astro:
         specifier: ^0.14.1
         version: 0.14.1
       prettier-plugin-tailwindcss:
         specifier: ^0.6.11
-        version: 0.6.11(prettier-plugin-astro@0.14.1)(prettier@3.5.0)
+        version: 0.6.11(prettier-plugin-astro@0.14.1)(prettier@3.5.1)
       react-compiler-runtime:
         specifier: 19.0.0-beta-decd7b8-20250118
         version: 19.0.0-beta-decd7b8-20250118(react@18.3.1)
       rehype-wrap-cjk:
-        specifier: ^0.2.3
-        version: 0.2.3
+        specifier: ^0.2.4
+        version: 0.2.4
       remeda:
         specifier: ^2.20.1
         version: 2.20.1
@@ -202,8 +202,8 @@ importers:
   packages/content:
     devDependencies:
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       eslint:
         specifier: ^9.20.1
         version: 9.20.1(jiti@2.4.2)
@@ -241,8 +241,8 @@ importers:
   packages/content-demo:
     devDependencies:
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       eslint:
         specifier: ^9.20.1
         version: 9.20.1(jiti@2.4.2)
@@ -283,8 +283,8 @@ importers:
         specifier: ^4.0.9
         version: 4.0.9
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -307,8 +307,8 @@ importers:
   packages/image-service:
     devDependencies:
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       sharp:
         specifier: ^0.33.5
         version: 0.33.5
@@ -328,8 +328,8 @@ importers:
         specifier: ^18.3.5
         version: 18.3.5(@types/react@18.3.18)
       astro:
-        specifier: ^5.2.5
-        version: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -406,10 +406,10 @@ packages:
     peerDependencies:
       astro: ^5.0.0
 
-  '@astrojs/node@9.0.2':
-    resolution: {integrity: sha512-MFFYRa5yQEBegKrSUPMeKnjDMB4okTrkVRA40/mU3ADKrKY5VV3af0LS+NYkH9pFOvj/OsPbdeQVxQ0jI3f6aQ==}
+  '@astrojs/node@9.1.0':
+    resolution: {integrity: sha512-7fDsawWci/j4prDVVwOFGuArG+YK+io54/5ksKL+lbSZ8xA4h6TB36RA4INmNatralEOKlgCxmbZdwewYcsFWA==}
     peerDependencies:
-      astro: ^5.0.0
+      astro: ^5.3.0
 
   '@astrojs/prism@3.2.0':
     resolution: {integrity: sha512-GilTHKGCW6HMq7y3BUv9Ac7GMe/MO9gi9GW62GzKtth0SwukCu/qp2wLiGpEujhY+VVhaG9v7kv/5vFzvf4NYw==}
@@ -908,8 +908,8 @@ packages:
     resolution: {integrity: sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.305':
-    resolution: {integrity: sha512-hUBioJfu3xiCIRS/+RN1jV4eobOnROWnGCtGxc1f+m1xzhJoxQqso6zqhe0xcWygbgVzwiNggC2W6Hew0m8jXg==}
+  '@iconify/json@2.2.306':
+    resolution: {integrity: sha512-TjpGQt8zrfA7ezi3CjbFzcm1C+6uvK94kCT3mcDC2y6u1E+7Oe0cvtN+hd+YzP1/YJe1ohe6HSR5TrHwZ0MXDw==}
 
   '@iconify/tools@4.1.1':
     resolution: {integrity: sha512-Hybu/HGhv6T8nLQhiG9rKx+ekF7NNpPOEQAy7JRSKht3s3dcFSsPccYzk24Znc9MTxrR6Gak3cg6CPP5dyvS2Q==}
@@ -2115,8 +2115,8 @@ packages:
   astro-seo@0.8.4:
     resolution: {integrity: sha512-Ou1vzQSXAxa0K8rtNtXNvSpYqOGEgMhh0immMxJeXmbVZac3UKCNWAoXWyOQDFYsZvBugCRSg0N1phBqPMVgCw==}
 
-  astro@5.2.5:
-    resolution: {integrity: sha512-AYXyYkc+c5xbKTm48FyQA91y81nXyNPAaoyafR0LUugE4lAwuvIUcXDBfMzmbuP1lGRvsE33G2oypv6gbGaPFg==}
+  astro@5.3.0:
+    resolution: {integrity: sha512-e88l/Yk/6enR/ZDddLbqtM+oblBFk5mneNSmNesyVYGL/6Dj4UA67GPAZOk79VxT5dbLlclZSyyw/wlxN1aj3A==}
     engines: {node: ^18.17.1 || ^20.3.0 || >=22.0.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
@@ -3105,8 +3105,8 @@ packages:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
     engines: {node: '>=18'}
 
-  globals@15.14.0:
-    resolution: {integrity: sha512-OkToC372DtlQeje9/zHIo5CT8lRP/FUgEOKBEhU4e0abL7J7CD24fD9ohiLN5hagG/kWCYj4K5oaxxtj2Z0Dig==}
+  globals@15.15.0:
+    resolution: {integrity: sha512-7ACyT3wmyp3I61S4fG682L0VA2RGD9otkqGJIwNUMF1SWUombIIk+af1unuDYgMm082aHYwD+mzJvv9Iu8dsgg==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -4421,8 +4421,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.5.0:
-    resolution: {integrity: sha512-quyMrVt6svPS7CjQ9gKb3GLEX/rl3BCL2oa/QkNcXv4YNVBC9olt3s+H7ukto06q7B1Qz46PbrKLO34PR6vXcA==}
+  prettier@3.5.1:
+    resolution: {integrity: sha512-hPpFQvHwL3Qv5AdRvBFMhnKo4tYxp0ReXiPn2bxkiohEX6mBeBwEpBSQTkD458RaaDKQMYSp4hX4UtfUTA5wDw==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4591,8 +4591,8 @@ packages:
   rehype-stringify@10.0.1:
     resolution: {integrity: sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA==}
 
-  rehype-wrap-cjk@0.2.3:
-    resolution: {integrity: sha512-f7TTNpdFDXMS4td3FDrt22T/06WdDiQBAlCvLVvdcsPf17Q1k1QMGwlJpM1JIoq+BFTVvNtfs0bZp2PWEHQTOg==}
+  rehype-wrap-cjk@0.2.4:
+    resolution: {integrity: sha512-3vpTZIVM52M2OHv+g22NELey5yox0f8yYhf2lI61EkWCRtIYdyllifJy4mxXcW/8uzEhrP48KBDznWrZ5uUJcA==}
 
   rehype@13.0.2:
     resolution: {integrity: sha512-j31mdaRFrwFRUIlxGeuPXXKWQxet52RBQRvCmzl5eCefn/KGbomK5GMHNMsOJf55fgo3qw5tST5neDuarDYR2A==}
@@ -5810,9 +5810,9 @@ snapshots:
 
   '@antfu/utils@8.1.0': {}
 
-  '@astrojs/check@0.5.10(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3)':
+  '@astrojs/check@0.5.10(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)':
     dependencies:
-      '@astrojs/language-server': 2.15.4(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3)
+      '@astrojs/language-server': 2.15.4(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)
       chokidar: 3.6.0
       fast-glob: 3.3.3
       kleur: 4.1.5
@@ -5826,7 +5826,7 @@ snapshots:
 
   '@astrojs/internal-helpers@0.5.1': {}
 
-  '@astrojs/language-server@2.15.4(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3)':
+  '@astrojs/language-server@2.15.4(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)':
     dependencies:
       '@astrojs/compiler': 2.10.3
       '@astrojs/yaml2ts': 0.2.2
@@ -5840,14 +5840,14 @@ snapshots:
       volar-service-css: 0.0.62(@volar/language-service@2.4.11)
       volar-service-emmet: 0.0.62(@volar/language-service@2.4.11)
       volar-service-html: 0.0.62(@volar/language-service@2.4.11)
-      volar-service-prettier: 0.0.62(@volar/language-service@2.4.11)(prettier@3.5.0)
+      volar-service-prettier: 0.0.62(@volar/language-service@2.4.11)(prettier@3.5.1)
       volar-service-typescript: 0.0.62(@volar/language-service@2.4.11)
       volar-service-typescript-twoslash-queries: 0.0.62(@volar/language-service@2.4.11)
       volar-service-yaml: 0.0.62(@volar/language-service@2.4.11)
       vscode-html-languageservice: 5.3.1
       vscode-uri: 3.0.8
     optionalDependencies:
-      prettier: 3.5.0
+      prettier: 3.5.1
       prettier-plugin-astro: 0.14.1
     transitivePeerDependencies:
       - typescript
@@ -5863,7 +5863,7 @@ snapshots:
       mdast-util-definitions: 6.0.0
       rehype-raw: 7.0.0
       rehype-stringify: 10.0.1
-      remark-gfm: 4.0.0
+      remark-gfm: 4.0.1
       remark-parse: 11.0.0
       remark-rehype: 11.1.1
       remark-smartypants: 3.0.2
@@ -5877,12 +5877,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@4.0.8(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))':
+  '@astrojs/mdx@4.0.8(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))':
     dependencies:
       '@astrojs/markdown-remark': 6.1.0
       '@mdx-js/mdx': 3.1.0(acorn@8.14.0)
       acorn: 8.14.0
-      astro: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      astro: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       es-module-lexer: 1.6.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.4
@@ -5896,9 +5896,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@9.0.2(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))':
+  '@astrojs/node@9.1.0(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0))':
     dependencies:
-      astro: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      '@astrojs/internal-helpers': 0.5.1
+      astro: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
       send: 1.1.0
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -6312,7 +6313,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.1': {}
 
-  '@iconify/json@2.2.305':
+  '@iconify/json@2.2.306':
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 1.1.2
@@ -6342,7 +6343,7 @@ snapshots:
       '@antfu/utils': 8.1.0
       '@iconify/types': 2.0.0
       debug: 4.4.0
-      globals: 15.14.0
+      globals: 15.15.0
       kolorist: 1.8.0
       local-pkg: 1.0.0
       mlly: 1.7.4
@@ -8238,7 +8239,7 @@ snapshots:
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.20.1(jiti@2.4.2))
       eslint-plugin-simple-import-sort: 12.1.1(eslint@9.20.1(jiti@2.4.2))
       eslint-plugin-unicorn: 56.0.1(eslint@9.20.1(jiti@2.4.2))
-      globals: 15.14.0
+      globals: 15.15.0
       typescript-eslint: 8.22.0(eslint@9.20.1(jiti@2.4.2))(typescript@5.7.3)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
@@ -8253,7 +8254,7 @@ snapshots:
       rehype-parse: 9.0.1
       rehype-sanitize: 6.0.0
       rehype-stringify: 10.0.1
-      rehype-wrap-cjk: 0.2.3
+      rehype-wrap-cjk: 0.2.4
       remark-parse: 11.0.0
       remark-rehype: 11.1.1
       remark-smartypants: 3.0.2
@@ -8392,11 +8393,11 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-auto-import@0.4.4(astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
+  astro-auto-import@0.4.4(astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)):
     dependencies:
       '@types/node': 18.19.74
       acorn: 8.14.0
-      astro: 5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      astro: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
 
   astro-eslint-parser@1.2.1:
     dependencies:
@@ -8415,15 +8416,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-seo@0.8.4(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3):
+  astro-seo@0.8.4(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3):
     dependencies:
-      '@astrojs/check': 0.5.10(prettier-plugin-astro@0.14.1)(prettier@3.5.0)(typescript@5.7.3)
+      '@astrojs/check': 0.5.10(prettier-plugin-astro@0.14.1)(prettier@3.5.1)(typescript@5.7.3)
     transitivePeerDependencies:
       - prettier
       - prettier-plugin-astro
       - typescript
 
-  astro@5.2.5(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0):
+  astro@5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0):
     dependencies:
       '@astrojs/compiler': 2.10.3
       '@astrojs/internal-helpers': 0.5.1
@@ -9240,7 +9241,7 @@ snapshots:
       astro-eslint-parser: 1.2.1
       eslint: 9.20.1(jiti@2.4.2)
       eslint-compat-utils: 0.6.4(eslint@9.20.1(jiti@2.4.2))
-      globals: 15.14.0
+      globals: 15.15.0
       postcss: 8.5.1
       postcss-selector-parser: 7.0.0
     transitivePeerDependencies:
@@ -9354,7 +9355,7 @@ snapshots:
       core-js-compat: 3.40.0
       eslint: 9.20.1(jiti@2.4.2)
       esquery: 1.6.0
-      globals: 15.14.0
+      globals: 15.15.0
       indent-string: 4.0.0
       is-builtin-module: 3.2.1
       jsesc: 3.1.0
@@ -9715,7 +9716,7 @@ snapshots:
 
   globals@14.0.0: {}
 
-  globals@15.14.0: {}
+  globals@15.15.0: {}
 
   globalthis@1.0.4:
     dependencies:
@@ -11474,19 +11475,19 @@ snapshots:
   prettier-plugin-astro@0.14.1:
     dependencies:
       '@astrojs/compiler': 2.10.3
-      prettier: 3.5.0
+      prettier: 3.5.1
       sass-formatter: 0.7.9
 
-  prettier-plugin-tailwindcss@0.6.11(prettier-plugin-astro@0.14.1)(prettier@3.5.0):
+  prettier-plugin-tailwindcss@0.6.11(prettier-plugin-astro@0.14.1)(prettier@3.5.1):
     dependencies:
-      prettier: 3.5.0
+      prettier: 3.5.1
     optionalDependencies:
       prettier-plugin-astro: 0.14.1
 
   prettier@2.8.7:
     optional: true
 
-  prettier@3.5.0: {}
+  prettier@3.5.1: {}
 
   prismjs@1.29.0: {}
 
@@ -11691,7 +11692,7 @@ snapshots:
       hast-util-to-html: 9.0.4
       unified: 11.0.5
 
-  rehype-wrap-cjk@0.2.3:
+  rehype-wrap-cjk@0.2.4:
     dependencies:
       hast-util-is-element: 3.0.0
       hastscript: 9.0.0
@@ -13032,12 +13033,12 @@ snapshots:
     optionalDependencies:
       '@volar/language-service': 2.4.11
 
-  volar-service-prettier@0.0.62(@volar/language-service@2.4.11)(prettier@3.5.0):
+  volar-service-prettier@0.0.62(@volar/language-service@2.4.11)(prettier@3.5.1):
     dependencies:
       vscode-uri: 3.0.8
     optionalDependencies:
       '@volar/language-service': 2.4.11
-      prettier: 3.5.0
+      prettier: 3.5.1
 
   volar-service-typescript-twoslash-queries@0.0.62(@volar/language-service@2.4.11):
     dependencies:
