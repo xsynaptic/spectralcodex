@@ -20,28 +20,26 @@ export const getStaticPaths = (async () => {
 	const getPostsByIds = await getPostsByIdsFunction();
 	const getContentMetadata = await getContentMetadataFunction();
 
-	return await Promise.all(
-		locations.map((entry) => ({
-			params: { location: entry.id },
-			props: {
-				entry,
-				mapData: getMapData({
-					featureCollection: getLocationsFeatureCollection([entry]),
-					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-					targetId: entry.id, // Center on the main location
-					boundsBuffer: 2,
-					boundsBufferMax: 25,
-				}),
-				metadataItems: R.pipe(
-					entry.data.posts ?? [],
-					getPostsByIds,
-					getContentMetadata,
-					R.sort(sortContentMetadataByDate)
-				),
-				regionPrimary: getPrimaryRegionByLocation(entry),
-			},
-		}))
-	);
+	return locations.map((entry) => ({
+		params: { location: entry.id },
+		props: {
+			entry,
+			mapData: getMapData({
+				featureCollection: getLocationsFeatureCollection([entry]),
+				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+				targetId: entry.id, // Center on the main location
+				boundsBuffer: 2,
+				boundsBufferMax: 25,
+			}),
+			metadataItems: R.pipe(
+				entry.data.posts ?? [],
+				getPostsByIds,
+				getContentMetadata,
+				R.sort(sortContentMetadataByDate)
+			),
+			regionPrimary: getPrimaryRegionByLocation(entry),
+		},
+	}));
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

@@ -122,6 +122,7 @@ export function getMapData({
 			} satisfies MapComponentData;
 		}
 	}
+
 	return {
 		hasGeodata: false,
 		apiSourceUrl: undefined,
