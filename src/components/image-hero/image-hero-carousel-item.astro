@@ -32,9 +32,7 @@ const imageProps = image
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps({
-				placeholder: await getImagePlaceholderDataUrlHq(image.data.src.src),
-			}),
+			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(image.data.src.src)),
 		} satisfies LocalImageProps)
 	: undefined;
 ---

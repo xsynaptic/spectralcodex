@@ -1,5 +1,3 @@
-import type { ImageMetadata } from 'astro';
-
 // Note that only the first three are currently in use
 export type ImageLayoutOption =
 	| 'medium'
@@ -18,9 +16,15 @@ type ImageOrientation = 'landscape' | 'portrait' | 'square';
 const imageSrcsetWidthsDefault = [450, 600, 900, 1200, 1800, 2400, 3600];
 
 // A simple check for image orientation
-function getImageOrientation({ height, width }: ImageMetadata): ImageOrientation {
+function getImageOrientation({
+	width,
+	height,
+}: {
+	width: number;
+	height?: number | undefined;
+}): ImageOrientation {
 	if (height === width) return 'square';
-	if (height > width) return 'portrait';
+	if (height && height > width) return 'portrait';
 	return 'landscape';
 }
 
@@ -44,20 +48,22 @@ export function getImageSrcsetWidths({
 // One solution would be to explicitly require layout props in grouped images
 // But this would require a lot of rework to existing content, so maybe later
 export function getImageLayoutProps({
-	imageMetadata,
+	width,
+	height,
 	layout,
 }: {
-	imageMetadata: ImageMetadata;
+	width: number;
+	height?: number | undefined;
 	layout?: ImageLayoutOption | undefined;
 }) {
-	const imageOrientation = getImageOrientation(imageMetadata);
+	const imageOrientation = getImageOrientation({ width, height });
 
 	switch (layout) {
 		case 'medium': {
 			return {
 				width: 900,
 				height: 600,
-				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
+				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--breakpoint-md)) calc(100vw - 32px), (max-width: var(--spacing-content)) calc(100vw - 64px), var(--spacing-content)`,
 			};
 		}
@@ -65,7 +71,7 @@ export function getImageLayoutProps({
 			return {
 				width: 1800,
 				height: 1200,
-				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
+				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `calc(100vw - 64px)`,
 			};
 		}
@@ -73,7 +79,7 @@ export function getImageLayoutProps({
 			return {
 				width: 1800,
 				height: 1200,
-				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
+				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: '100vw',
 			};
 		}
@@ -94,7 +100,7 @@ export function getImageLayoutProps({
 						}
 					}
 				})(),
-				widths: getImageSrcsetWidths({ maxWidth: imageMetadata.width }),
+				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--spacing-content)) 50vw`,
 			};
 		}

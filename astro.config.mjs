@@ -106,6 +106,7 @@ export default defineConfig({
 		}),
 	],
 	image: {
+		domains: ['localhost'],
 		service: {
 			// For reference, the original entrypoint: 'astro/assets/services/sharp',
 			entrypoint: '@spectralcodex/image-service',

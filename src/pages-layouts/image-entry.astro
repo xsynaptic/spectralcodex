@@ -33,7 +33,11 @@ const imageProps = {
 	alt,
 	format: IMAGE_FORMAT,
 	quality: IMAGE_QUALITY,
-	...getImageLayoutProps({ imageMetadata, layout: 'medium' }),
+	...getImageLayoutProps({
+		width: imageMetadata.width,
+		height: imageMetadata.height,
+		layout: 'medium',
+	}),
 	...getImagePlaceholderProps(placeholder),
 } satisfies LocalImageProps;
 
