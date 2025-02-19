@@ -31,7 +31,7 @@ export const getStaticPaths = (async () => {
 						images: entry.data.images,
 					})!;
 					const image = getImageById(featuredImage.src);
-					const imageObject = image ? await getImageObject(image.data.src.src) : undefined;
+					const imageObject = image ? await getImageObject(image.data.src) : undefined;
 
 					return {
 						params: {

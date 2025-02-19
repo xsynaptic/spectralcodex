@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 
-import type { LocalImageProps } from 'astro:assets';
+import type { RemoteImageProps } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 
 import BaseSite from '@/components/base/base-site.astro';
@@ -39,7 +39,7 @@ const imageProps = {
 		layout: 'medium',
 	}),
 	...getImagePlaceholderProps(placeholder),
-} satisfies LocalImageProps;
+} satisfies RemoteImageProps;
 
 // TODO: offer direct image downloads at various sizes
 // TODO: image licensing statement

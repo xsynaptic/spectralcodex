@@ -54,12 +54,12 @@ const description = getSeoDescription(descriptionRaw) ?? siteDescription;
 
 const imageLocalUrl = image?.url ? new URL(image.url, Astro.site).href : undefined;
 
-const imageObject = imageId ? await getImageById(imageId) : undefined;
+const imageEntry = imageId ? await getImageById(imageId) : undefined;
 
 const imageDynamic =
-	!imageLocalUrl && imageObject
+	!imageLocalUrl && imageEntry
 		? await getImage({
-				src: imageObject.data.src,
+				src: imageEntry.data.src,
 				height: 1800,
 				width: 1200,
 				format: IMAGE_FORMAT,

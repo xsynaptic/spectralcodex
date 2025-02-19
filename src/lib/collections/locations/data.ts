@@ -148,20 +148,19 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			.map((entry) =>
 				limit(async () => {
 					if (entry.data.imageFeatured) {
-						const image = getImageById(entry.data.imageFeatured);
-						const imageObject = image
-							? await getImage({
-									src: image.data.src,
-									width: 450,
-									height: 300,
-									widths: [450, 600, 900],
-									format: IMAGE_FORMAT,
-									quality: IMAGE_QUALITY,
-								})
-							: undefined;
+						const imageEntry = getImageById(entry.data.imageFeatured);
 
-						// Directly add some basic image data to the location entry
-						if (imageObject) {
+						if (imageEntry) {
+							const imageObject = await getImage({
+								src: imageEntry.data.src,
+								width: 450,
+								height: 300,
+								widths: [450, 600, 900],
+								format: IMAGE_FORMAT,
+								quality: IMAGE_QUALITY,
+							});
+
+							// Directly add some basic image data to the location entry
 							entry.data.imageThumbnail = {
 								src: imageObject.src,
 								srcSet: imageObject.srcSet.attribute,

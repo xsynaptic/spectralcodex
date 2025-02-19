@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 
 import type { HTMLAttributes } from 'astro/types';
-import type { LocalImageProps } from 'astro:assets';
+import type { RemoteImageProps } from 'astro:assets';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageById } from '@/lib/collections/images/utils';
@@ -29,14 +29,14 @@ const imageProps = image
 			height: 300,
 			alt: sanitizeAltAttribute(alt),
 			widths: getImageSrcsetWidths({
-				maxWidth: image.data.src.width,
+				maxWidth: image.data.width,
 				widths: [450, 600, 900, 1200],
 			}),
 			sizes: `(max-width: var(--breakpoint-lg)) 100vw, 450px`,
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps({ placeholder: image.data.placeholder }),
-		} satisfies LocalImageProps)
+			...getImagePlaceholderProps(image.data.placeholder),
+		} satisfies RemoteImageProps)
 	: undefined;
 
 const titleAlt = await Astro.slots.render('preview-title-alt');

@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 
 import type { FeaturedItemMetadata } from '@/lib/image/image-featured';
-import type { LocalImageProps } from 'astro:assets';
+import type { RemoteImageProps } from 'astro:assets';
 
 import ImageHeroCarouselCaption from '@/components/image-hero/image-hero-carousel-caption.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
@@ -26,14 +26,14 @@ const imageProps = image
 	? ({
 			src: image.data.src,
 			alt: sanitizeAltAttribute(alt),
-			width: image.data.src.width,
-			height: image.data.src.height,
-			widths: getImageSrcsetWidths({ maxWidth: image.data.src.width }),
+			width: image.data.width,
+			height: image.data.height,
+			widths: getImageSrcsetWidths({ maxWidth: image.data.width }),
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(image.data.src.src)),
-		} satisfies LocalImageProps)
+			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(image.data.src)),
+		} satisfies RemoteImageProps)
 	: undefined;
 ---
 

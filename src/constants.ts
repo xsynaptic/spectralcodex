@@ -7,6 +7,9 @@ export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 // Path to image assets from the root; *e.g.* `./packages/content-demo/media`
 export const CONTENT_MEDIA_PATH = './packages/content/media';
 
+// Remote host for media assets; mainly used to offset memory usage from direct imports
+export const CONTENT_MEDIA_HOST = 'http://localhost:3000';
+
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
 export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
@@ -82,3 +85,6 @@ export const FEATURE_SHORTCODES_ERROR_LOG = true as boolean;
 
 // Set to "true" to activate the experimental theme toggle
 export const FEATURE_DARK_MODE = true as boolean;
+
+// Feature flag for local image collections
+export const FEATURE_IMAGE_COLLECTION = false as boolean;

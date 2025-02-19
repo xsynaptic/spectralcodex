@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 
 import type { ImageLayoutOption } from '@/lib/image/image-layout';
-import type { LocalImageProps } from 'astro:assets';
+import type { RemoteImageProps } from 'astro:assets';
 
 import { FEATURE_IMAGE_PAGES } from '@/constants';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
@@ -20,32 +20,38 @@ interface Props {
 
 const { imageId, alt: altProp, layout } = Astro.props;
 
-const image = await getImageById(imageId);
-
 // This controls how the component is rendered; RSS requires a less complex output
 const { isRss } = Astro.locals;
 
 const slotContents = (await Astro.slots.render('default')) as string | undefined;
 
-const imageLinkUrl = FEATURE_IMAGE_PAGES && image?.id ? getSiteUrl('image', image.id) : undefined;
+const imageEntry = await getImageById(imageId);
 
-const imageProps = image
+const imageLinkUrl =
+	FEATURE_IMAGE_PAGES && imageEntry?.id ? getSiteUrl('image', imageEntry.id) : undefined;
+
+const imageProps = imageEntry
 	? ((isRss
 			? {
-					src: image.data.src,
+					src: imageEntry.data.src,
 					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-					width: image.data.src.height > image.data.src.width ? 900 : 1200,
+					width: imageEntry.data.height > imageEntry.data.width ? 900 : 1200,
+					height: imageEntry.data.height > imageEntry.data.width ? 120 : 900,
 					format: IMAGE_FORMAT,
 					quality: IMAGE_QUALITY,
 				}
 			: {
-					src: image.data.src,
+					src: imageEntry.data.src,
 					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
 					format: IMAGE_FORMAT,
 					quality: IMAGE_QUALITY,
-					...getImageLayoutProps({ imageMetadata: image.data.src, layout }),
-					...getImagePlaceholderProps({ placeholder: image.data.placeholder }),
-				}) satisfies LocalImageProps)
+					...getImageLayoutProps({
+						width: imageEntry.data.width,
+						height: imageEntry.data.height,
+						layout,
+					}),
+					...getImagePlaceholderProps(imageEntry.data.placeholder),
+				}) satisfies RemoteImageProps)
 	: undefined;
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
