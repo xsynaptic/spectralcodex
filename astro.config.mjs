@@ -8,15 +8,19 @@ import { defineConfig, envField } from 'astro/config';
 import AutoImport from 'astro-auto-import';
 import { nanoid } from 'nanoid';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
+import { loadEnv } from 'vite';
+
+// Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
+const {
+	DEV_SERVER_URL = 'http://localhost:4321/',
+	PROD_SERVER_URL,
+	BASE_PATH_PROD,
+	BUILD_ASSETS_PATH,
+	PROD_ASSETS_URL,
+} = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
-
-const DEV_SERVER_URL = process.env.DEV_SERVER_URL ?? 'http://localhost:4321/';
-const PROD_SERVER_URL = process.env.PROD_SERVER_URL;
-const BASE_PATH_PROD = process.env.BASE_PATH;
-const BUILD_ASSETS_PATH = process.env.BUILD_ASSETS_PATH;
-const PROD_ASSETS_URL = process.env.PROD_ASSETS_URL;
 
 // TODO: base path handling is an overcomplicated mess
 const BASE_PATH = isProduction ? BASE_PATH_PROD : '';
