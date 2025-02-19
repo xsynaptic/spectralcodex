@@ -14,10 +14,17 @@ const remoteHostImages =
 	process.env.DEPLOY_REMOTE_HOST_IMAGES ?? 'user@remote-server:/path/to/images';
 const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
 
+// A flag for whether we're using the remote image strategy, which affects the build output
+const imageRemote = true as boolean;
+
+const allImagePattern = /^[\w#$%+=@~-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
 const originalImagePattern = /^[\w#$%+=@~-]+\.[\w-]{8}\.(avif|gif|jpg|jpeg|png|webp)$/i;
-const processedImagePattern = /^[\w#$%+=@~-]+\.[\w-]{8}_[\w-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
+const processedImagePattern = imageRemote
+	? /^[\w#$%+=@~-]+_[\w-]{1,8}\.(avif|gif|jpg|jpeg|png|webp)$/i
+	: /^[\w#$%+=@~-]+\.[\w-]{8}_[\w-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
 
 const dryRun = process.argv.includes('--dry-run');
+const verbose = process.argv.includes('--verbose');
 const skipBuild = process.argv.includes('--skip-build');
 
 // Output shell command results
@@ -40,6 +47,7 @@ async function buildProject() {
 	}
 }
 
+// With the remote image strategy original images are no longer copied to the output path
 async function removeOriginalImages() {
 	console.log(chalk.blue('Removing original built images...'));
 
@@ -54,7 +62,9 @@ async function removeOriginalImages() {
 						if (originalImagePattern.test(file)) {
 							await fs.unlink(path.join(assetsPath, file));
 
-							console.log(chalk.yellow(`Removed: ${file}`));
+							if (verbose) console.log(chalk.yellow(`Removed: ${file}`));
+						} else {
+							console.log(chalk.red(`File did not match original image pattern: ${file}`));
 						}
 					}),
 				),
@@ -84,7 +94,9 @@ async function moveHashedImages() {
 						if (processedImagePattern.test(file)) {
 							await fs.rename(path.join(assetsPath, file), path.join(imagesPath, file));
 
-							console.log(chalk.yellow(`Relocated: ${file}`));
+							if (verbose) console.log(chalk.yellow(`Relocated: ${file}`));
+						} else if (allImagePattern.test(file)) {
+							console.log(chalk.red(`Failed to relocate image: ${file}`));
 						}
 					}),
 				),
@@ -125,7 +137,7 @@ async function transferApp() {
 
 async function deploy() {
 	await buildProject();
-	await removeOriginalImages();
+	if (!imageRemote) await removeOriginalImages();
 	await moveHashedImages();
 	await transferHashedImages();
 	await transferApp();
@@ -141,7 +153,7 @@ switch (step) {
 		break;
 	}
 	case 'remove-original-images': {
-		await removeOriginalImages();
+		if (!imageRemote) await removeOriginalImages();
 		break;
 	}
 	case 'move-images': {
