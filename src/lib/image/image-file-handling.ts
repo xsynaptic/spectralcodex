@@ -28,7 +28,8 @@ function isAssetsPrefixObject(
 // Note 1: the base URL needs to be stripped from the local path when building for production
 // Note 2: this function can overwhelm localhost, hence using `ky` with retry support
 // TODO: a persistent cache for this function may improve build times
-export async function getImageFileBufferAsync(src: string): Promise<Buffer | undefined> {
+// TODO: remove this function if it is no longer needed
+export async function getLocalImageFileBufferAsync(src: string): Promise<Buffer | undefined> {
 	if (!src) return undefined;
 
 	if (PROD) {
@@ -56,6 +57,27 @@ export async function getImageFileBufferAsync(src: string): Promise<Buffer | und
 		} catch (error) {
 			console.warn(`[Image] Error fetching image from ${imageUrl.toString()}`, error);
 		}
+	}
+	return undefined;
+}
+
+// Note 1: this function can overwhelm the image host, hence using `ky` with retry support
+export async function getImageFileBufferAsync(src: string): Promise<Buffer | undefined> {
+	if (!src) return undefined;
+
+	const imageUrl = new URL(src, SITE);
+
+	try {
+		const response = await ky.get(imageUrl, {
+			retry: { backoffLimit: 300 },
+			timeout: false,
+		});
+		const responseBuffer = await response.arrayBuffer();
+		const imageFileBuffer = Buffer.from(responseBuffer);
+
+		return imageFileBuffer;
+	} catch (error) {
+		console.warn(`[Image] Error fetching image from ${imageUrl.toString()}`, error);
 	}
 	return undefined;
 }
