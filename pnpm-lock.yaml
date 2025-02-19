@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  vite: 6.0.11
+
 importers:
 
   .:
@@ -66,9 +69,6 @@ importers:
       '@spectralcodex/image-open-graph':
         specifier: workspace:*
         version: link:packages/image-open-graph
-      '@spectralcodex/image-service':
-        specifier: workspace:*
-        version: link:packages/image-service
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
@@ -158,7 +158,7 @@ importers:
         version: 6.2.0
       postcss-inline-svg:
         specifier: ^6.0.0
-        version: 6.0.0(postcss@8.5.1)
+        version: 6.0.0(postcss@8.5.2)
       prettier:
         specifier: ^3.5.1
         version: 3.5.1
@@ -195,6 +195,9 @@ importers:
       url-join:
         specifier: ^5.0.0
         version: 5.0.0
+      vite:
+        specifier: 6.0.11
+        version: 6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(tsx@4.19.3)(yaml@2.7.0)
       vitest:
         specifier: ^3.0.6
         version: 3.0.6(@types/debug@4.1.12)(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(tsx@4.19.3)(yaml@2.7.0)
@@ -307,17 +310,11 @@ importers:
         specifier: ^0.33.5
         version: 0.33.5
 
-  packages/image-service:
-    devDependencies:
-      astro:
-        specifier: ^5.3.0
-        version: 5.3.0(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(rollup@4.34.0)(tsx@4.19.3)(typescript@5.7.3)(yaml@2.7.0)
-      sharp:
-        specifier: ^0.33.5
-        version: 0.33.5
-
   packages/react-map-component:
     devDependencies:
+      '@protomaps/basemaps':
+        specifier: 5.0.0
+        version: 5.0.0
       '@tanstack/react-query':
         specifier: ^5.66.7
         version: 5.66.7(react@18.3.1)
@@ -342,9 +339,6 @@ importers:
       pmtiles:
         specifier: ^4.2.1
         version: 4.2.1
-      protomaps-themes-base:
-        specifier: ^4.5.0
-        version: 4.5.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -1132,6 +1126,9 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
+  '@protomaps/basemaps@5.0.0':
+    resolution: {integrity: sha512-lp+2ktb9gC9jZ/2L2AKvuQt36MNV1lJPOxDHA3IgD09roloxgp6QwXcMyE36ijGKMuKUiYKnmUuT9ouVhNgdLA==}
+
   '@rollup/pluginutils@5.1.4':
     resolution: {integrity: sha512-USm05zrsFxYLPdWWq+K3STlWiT/3ELn3RcV5hJMghpeAIhxfsUIg6mt12CBJBInWMV4VneoV7SfGv8xIwo2qNQ==}
     engines: {node: '>=14.0.0'}
@@ -1354,7 +1351,7 @@ packages:
   '@tailwindcss/vite@4.0.7':
     resolution: {integrity: sha512-GYx5sxArfIMtdZCsxfya3S/efMmf4RvfqdiLUozkhmSFBNUFnYVodatpoO/en4/BsOIGvq/RB6HwcTLn9prFnQ==}
     peerDependencies:
-      vite: ^5.2.0 || ^6
+      vite: 6.0.11
 
   '@tanstack/eslint-plugin-query@5.66.1':
     resolution: {integrity: sha512-pYMVTGgJ7yPk9Rm6UWEmbY6TX0EmMmxJqYkthgeDCwEznToy2m+W928nUODFirtZBZlhBsqHy33LO0kyTlgf0w==}
@@ -1952,7 +1949,7 @@ packages:
     resolution: {integrity: sha512-SCCPBJtYLdE8PX/7ZQAs1QAZ8Jqwih+0VBLum1EGqmCCQal+MIUqLCzj3ZUy8ufbC0cAM4LRlSTm7IQJwWT4ug==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
-      vite: ^4.2.0 || ^5.0.0 || ^6.0.0
+      vite: 6.0.11
 
   '@vitest/expect@3.0.6':
     resolution: {integrity: sha512-zBduHf/ja7/QRX4HdP1DSq5XrPgdN+jzLOwaTq/0qZjYfgETNFCKf9nOAp2j3hmom3oTbczuUzrzg9Hafh7hNg==}
@@ -1961,7 +1958,7 @@ packages:
     resolution: {integrity: sha512-KPztr4/tn7qDGZfqlSPQoF2VgJcKxnDNhmfR3VgZ6Fy1bO8T9Fc1stUiTXtqz0yG24VpD00pZP5f8EOFknjNuQ==}
     peerDependencies:
       msw: ^2.4.9
-      vite: ^5.0.0 || ^6.0.0
+      vite: 6.0.11
     peerDependenciesMeta:
       msw:
         optional: true
@@ -4385,6 +4382,10 @@ packages:
     resolution: {integrity: sha512-6oz2beyjc5VMn/KV1pPw8fliQkhBXrVn1Z3TVyqZxU8kZpzEKhBdmCFqI6ZbmGtamQvQGuU1sgPTk8ZrXDD7jQ==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.2:
+    resolution: {integrity: sha512-MjOadfU3Ys9KYoX0AdkBlFEF1Vx37uCCeN4ZHnmwm9FfpbsGWMZeBLMmmpY+6Ocqod7mkdZ0DT31OlbsFrLlkA==}
+    engines: {node: ^10 || ^12 || >=14}
+
   potpack@2.0.0:
     resolution: {integrity: sha512-Q+/tYsFU9r7xoOJ+y/ZTtdVQwTWfzjbiXBDMM/JKUux3+QPP02iUuIoeBQ+Ot6oEDlC+/PGjB/5A3K7KKb7hcw==}
 
@@ -4485,10 +4486,6 @@ packages:
 
   protocol-buffers-schema@3.6.0:
     resolution: {integrity: sha512-TdDRD+/QNdrCGCE7v8340QyuXd4kIWIgapsE2+n/SaGiSSbomYl4TjHlvIoCWRpE7wFt02EpB35VVA2ImcBVqw==}
-
-  protomaps-themes-base@4.5.0:
-    resolution: {integrity: sha512-z5A6oXAXNi/CHEIbCfzZ/6uVDgnv3pO4C3LFvomxjUFXwyqWZ7HJdfPoNJSIlsvaQubqsaxCbamEzqBr/W7vkg==}
-    deprecated: This package has been migrated to @protomaps/basemaps with a new major version. See the CHANGELOG at https://github.com/protomaps/basemaps/blob/main/CHANGELOG.md for how to migrate.
 
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
@@ -5522,7 +5519,7 @@ packages:
   vitefu@1.0.5:
     resolution: {integrity: sha512-h4Vflt9gxODPFNGPwp4zAMZRpZR7eslzwH2c5hn5kNZ5rhnKyRJ50U+yGCdc2IRaBs8O4haIgLNGrV5CrpMsCA==}
     peerDependencies:
-      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+      vite: 6.0.11
     peerDependenciesMeta:
       vite:
         optional: true
@@ -6609,6 +6606,8 @@ snapshots:
     optional: true
 
   '@pkgr/core@0.1.1': {}
+
+  '@protomaps/basemaps@5.0.0': {}
 
   '@rollup/pluginutils@5.1.4(rollup@4.34.0)':
     dependencies:
@@ -11517,12 +11516,12 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-inline-svg@6.0.0(postcss@8.5.1):
+  postcss-inline-svg@6.0.0(postcss@8.5.2):
     dependencies:
       css-select: 5.1.0
       dom-serializer: 2.0.0
       htmlparser2: 8.0.2
-      postcss: 8.5.1
+      postcss: 8.5.2
       postcss-value-parser: 4.2.0
 
   postcss-selector-parser@6.0.10:
@@ -11538,6 +11537,12 @@ snapshots:
   postcss-value-parser@4.2.0: {}
 
   postcss@8.5.1:
+    dependencies:
+      nanoid: 3.3.8
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
+  postcss@8.5.2:
     dependencies:
       nanoid: 3.3.8
       picocolors: 1.1.1
@@ -11588,8 +11593,6 @@ snapshots:
   property-information@6.5.0: {}
 
   protocol-buffers-schema@3.6.0: {}
-
-  protomaps-themes-base@4.5.0: {}
 
   proxy-from-env@1.1.0: {}
 
@@ -13038,7 +13041,7 @@ snapshots:
   vite@6.0.11(@types/node@22.13.0)(jiti@2.4.2)(lightningcss@1.29.1)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
       esbuild: 0.24.2
-      postcss: 8.5.1
+      postcss: 8.5.2
       rollup: 4.34.0
     optionalDependencies:
       '@types/node': 22.13.0
