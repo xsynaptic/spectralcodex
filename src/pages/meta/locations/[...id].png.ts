@@ -30,13 +30,13 @@ export const getStaticPaths = (async () => {
 		R.pipe(
 			locations,
 			getContentMetadata,
-			R.map(async (entry) => {
-				const image = entry.imageId ? await getImageById(entry.imageId) : undefined;
-				const imageObject = image ? await getImageObject(image.data.src.src) : undefined;
+			R.map(async (item) => {
+				const image = item.imageId ? await getImageById(item.imageId) : undefined;
+				const imageObject = image ? await getImageObject(image.data.src) : undefined;
 
 				return {
-					params: { id: entry.id },
-					props: { imageOpenGraph: await generateOpenGraphImage(entry, imageObject) },
+					params: { id: item.id },
+					props: { imageOpenGraph: await generateOpenGraphImage(item, imageObject) },
 				};
 			}),
 		),
