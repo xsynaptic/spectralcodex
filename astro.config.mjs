@@ -106,10 +106,15 @@ export default defineConfig({
 		}),
 	],
 	image: {
-		domains: ['localhost'],
+		// Serve media assets locally to avoid hitting Rollup memory limits from importing everything
+		remotePatterns: [
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+			},
+		],
 		service: {
-			// For reference, the original entrypoint: 'astro/assets/services/sharp',
-			entrypoint: '@spectralcodex/image-service',
+			entrypoint: './src/lib/image/image-service',
 			config: {
 				limitInputPixels: false,
 			},

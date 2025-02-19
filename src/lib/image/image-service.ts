@@ -3,6 +3,10 @@ import sharp from 'sharp';
 
 import type { ImageMetadata, ImageTransform, LocalImageService } from 'astro';
 import type { SharpImageServiceConfig } from 'astro/assets/services/sharp';
+import type { CollectionEntry } from 'astro:content';
+
+import { CONTENT_MEDIA_HOST } from '@/constants';
+import { getImageById } from '@/lib/collections/images/utils';
 
 /**
  * This custom image service adapts code from Astro core to accomplish several goals:
@@ -46,12 +50,22 @@ function isESMImportedImage(src: ImageMetadata | string): src is ImageMetadata {
  * For remote images:
  * - Widths and heights are always required, so we'll use the user's specified width and height.
  */
-function getTargetDimensions({ src, width, height }: ImageTransform) {
+function getTargetDimensions({
+	src,
+	width,
+	height,
+	imageEntry,
+}: ImageTransform & { imageEntry: CollectionEntry<'images'> | undefined }) {
 	let targetWidth = width;
 	let targetHeight = height;
 
+	// For remote images, we don't know the original image's dimensions, so we cannot know the maximum width
+	// It is ultimately the user's responsibility to make sure they don't request images larger than the original
+	let maxWidth = Infinity;
+
 	if (isESMImportedImage(src)) {
 		const aspectRatio = src.width / src.height;
+
 		if (targetHeight && !targetWidth) {
 			// If we have a height but no width, use height to calculate the width
 			targetWidth = Math.round(targetHeight * aspectRatio);
@@ -63,12 +77,30 @@ function getTargetDimensions({ src, width, height }: ImageTransform) {
 			targetWidth = src.width;
 			targetHeight = height;
 		}
+		// If it's an imported image, we can use the original image's width as a maximum width
+		maxWidth = src.width;
+	} else if (imageEntry) {
+		const aspectRatio = imageEntry.data.width / imageEntry.data.height;
+
+		if (targetHeight && !targetWidth) {
+			// If we have a height but no width, use height to calculate the width
+			targetWidth = Math.round(targetHeight * aspectRatio);
+		} else if (targetWidth && !targetHeight) {
+			// If we have a width but no height, use width to calculate the height
+			targetHeight = Math.round(targetWidth / aspectRatio);
+		} else if (!targetWidth && !targetHeight) {
+			// If we have neither width or height, use the original image's dimensions
+			targetWidth = imageEntry.data.width;
+			targetHeight = height;
+		}
+		maxWidth = imageEntry.data.width;
 	}
 
 	// TypeScript doesn't know this, but because of previous hooks we always know that targetWidth and targetHeight are defined
 	return {
 		targetWidth: targetWidth!,
 		targetHeight: targetHeight!,
+		maxWidth,
 	};
 }
 
@@ -78,7 +110,7 @@ function getTargetDimensions({ src, width, height }: ImageTransform) {
  * By necessity, some additional code was copied from Astro to match existing functionality
  * If this turns out to be useful it might be cool to contribute this back to core
  */
-const service = {
+const localImageService = {
 	...sharpDefaultService,
 	// This function will not run if the cache has already been seeded
 	async transform(inputBuffer, transformOptions, config) {
@@ -121,21 +153,15 @@ const service = {
 			format: info.format,
 		};
 	},
-	getSrcSet({ src, height, width, widths, densities, quality, format }) {
+	async getSrcSet({ src, height, width, widths, densities, quality, format }) {
 		const srcSet: Array<UnresolvedSrcSetValue> = [];
-		const { targetWidth } = getTargetDimensions({ src, height, width });
-		const targetFormat = format ?? DEFAULT_OUTPUT_FORMAT;
 
-		// For remote images, we don't know the original image's dimensions, so we cannot know the maximum width
-		// It is ultimately the user's responsibility to make sure they don't request images larger than the original
-		let imageWidth = width;
-		let maxWidth = Infinity;
+		const imageEntry =
+			typeof src === 'string'
+				? await getImageById(src.replace(`${CONTENT_MEDIA_HOST}/`, ''))
+				: undefined;
 
-		// However, if it's an imported image, we can use the original image's width as a maximum width
-		if (isESMImportedImage(src)) {
-			imageWidth = src.width;
-			maxWidth = imageWidth;
-		}
+		const { targetWidth, maxWidth } = getTargetDimensions({ src, height, width, imageEntry });
 
 		// Collect widths to generate from specified densities or widths
 		const allWidths: Array<{ maxTargetWidth: number; descriptor: `${number}x` | `${number}w` }> =
@@ -189,6 +215,10 @@ const service = {
 				if (maxTargetWidth !== targetWidth || targetWidth !== src.width || format !== src.format) {
 					srcSetTransform.width = maxTargetWidth;
 				}
+			} else if (imageEntry) {
+				if (maxTargetWidth !== targetWidth || targetWidth !== imageEntry.data.width) {
+					srcSetTransform.width = maxTargetWidth;
+				}
 			} else {
 				// Remote images use dimensions passed to this function to avoid regenerating the original
 				if (width && height) {
@@ -201,7 +231,7 @@ const service = {
 				transform: srcSetTransform,
 				descriptor,
 				attributes: {
-					type: `image/${targetFormat}`,
+					type: `image/${format ?? DEFAULT_OUTPUT_FORMAT}`,
 				},
 			});
 		}
@@ -210,4 +240,4 @@ const service = {
 	},
 } satisfies LocalImageService<SharpImageServiceConfig>;
 
-export default service;
+export default localImageService;
