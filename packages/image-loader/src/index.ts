@@ -47,7 +47,7 @@ interface ImageLoaderOptions {
 	 * Function that processes file and EXIF metadata for an image. This should match whatever custom metadata schema is defined for use with this loader as a record type.
 	 * @returns Image metadata ready to be parsed.
 	 **/
-	dataHandler: LocalImageLoaderDataHandler;
+	dataHandler?: LocalImageLoaderDataHandler;
 	/**
 	 * Run once after loading all images; can be used to invoke a setup function.
 	 */
@@ -123,13 +123,15 @@ function getSyncDataFunction({
 					data: {
 						src: filePathRelative,
 						modifiedTime,
-						...(await options.dataHandler({
-							id,
-							filePath,
-							filePathRelative,
-							fileUrl,
-							logger,
-						})),
+						...(options.dataHandler
+							? await options.dataHandler({
+									id,
+									filePath,
+									filePathRelative,
+									fileUrl,
+									logger,
+								})
+							: {}),
 					},
 				});
 
@@ -141,9 +143,9 @@ function getSyncDataFunction({
 				});
 
 				logger.info(`Updated store: ${filePath}`);
-			} catch {
+			} catch (error) {
 				// TODO: better error handling; this block likely catches an AstroError
-				throw new Error(`Error adding to store: ${filePath}`);
+				throw new Error(`Error adding to store: ${filePath}: ${JSON.stringify(error)}`);
 			}
 		});
 	};
