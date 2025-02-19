@@ -1,10 +1,11 @@
 {
 	"name": "@spectralcodex/react-map-component",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "React map component for Spectral Codex",
 	"exports": "./src/index.tsx",
 	"private": true,
 	"devDependencies": {
+		"@protomaps/basemaps": "5.0.0",
 		"@tanstack/react-query": "^5.66.7",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^18.3.16",
@@ -13,7 +14,6 @@
 		"geojson": "^0.5.0",
 		"maplibre-gl": "^5.1.0",
 		"pmtiles": "^4.2.1",
-		"protomaps-themes-base": "^4.5.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-map-gl": "^8.0.1",

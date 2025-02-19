@@ -1,10 +1,9 @@
+import { type Flavor, layers } from '@protomaps/basemaps';
 import maplibregl from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
-import layers from 'protomaps-themes-base';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
 
-import type { ProtomapsBaseMapTheme } from '../../types';
 import type { StyleSpecification } from 'maplibre-gl';
 
 import { useMapLanguages } from '../../store/hooks/use-map-store';
@@ -14,7 +13,7 @@ export function useProtomaps({
 	baseMapTheme,
 }: {
 	protomapsApiKey: string;
-	baseMapTheme: ProtomapsBaseMapTheme;
+	baseMapTheme: Flavor;
 }) {
 	const languages = useMapLanguages();
 
@@ -52,7 +51,7 @@ export function useProtomaps({
 						attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
 					},
 				},
-				layers: layers('protomaps', baseMapTheme, languages?.at(0) ?? 'en'),
+				layers: layers('protomaps', baseMapTheme, { lang: languages?.at(0) ?? 'en' }),
 			}) satisfies StyleSpecification,
 		[baseMapTheme, languages],
 	);

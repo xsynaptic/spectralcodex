@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { MapPopupDataSchema, MapSourceDataSchema } from './map-schemas';
+import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, MultiPoint, Point } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 
@@ -34,11 +35,6 @@ export type MapPopupItem = MapPopupData[number] & {
 };
 
 /**
- * Protomaps
- */
-export type ProtomapsBaseMapTheme = 'light' | 'dark' | 'white' | 'grayscale' | 'black';
-
-/**
  * Map component
  */
 export interface MapComponentProps {
@@ -46,7 +42,7 @@ export interface MapComponentProps {
 	apiPopupUrl?: string | undefined;
 	sourceData?: MapSourceDataRaw | undefined;
 	popupData?: MapPopupDataRaw | undefined;
-	baseMapTheme?: ProtomapsBaseMapTheme;
+	baseMapTheme?: Flavor;
 	bounds?: LngLatBoundsLike;
 	maxBounds?: LngLatBoundsLike;
 	center?: [number, number];
