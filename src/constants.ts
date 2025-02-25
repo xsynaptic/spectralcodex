@@ -8,7 +8,7 @@ export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 export const CONTENT_MEDIA_PATH = './packages/content/media';
 
 // Remote host for media assets; mainly used to offset memory usage from direct imports
-export const CONTENT_MEDIA_HOST = 'http://localhost:3000';
+export const CONTENT_MEDIA_HOST = 'http://localhost:4321/media';
 
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 

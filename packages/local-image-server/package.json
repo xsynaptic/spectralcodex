@@ -1,0 +1,14 @@
+{
+	"name": "@spectralcodex/local-image-server",
+	"version": "1.0.0",
+	"description": "Local image server for Spectral Codex",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"devDependencies": {
+		"astro": "^5.3.1",
+		"remeda": "^2.20.2",
+		"sirv": "^3.0.1"
+	}
+}

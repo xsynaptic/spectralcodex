@@ -3,6 +3,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import localImageServer from '@spectralcodex/local-image-server';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField } from 'astro/config';
 import AutoImport from 'astro-auto-import';
@@ -107,6 +108,11 @@ export default defineConfig({
 				// TODO: more accurate last modified date for the sitemap
 				return { ...item, lastMod: currentDate };
 			},
+		}),
+		localImageServer({
+			mediaPath: 'packages/content/media',
+			mediaBaseUrl: '/media',
+			dev: !isProduction,
 		}),
 	],
 	image: {
