@@ -1,0 +1,33 @@
+---
+description: Astro coding standards
+globs: *.astro
+---
+# Astro component development
+
+- Tailwind-First Approach: Use Tailwind CSS V4 for all styling, keeping the utility-first approach in mind. Optimize class usage to avoid excessive nesting or redundant styles.
+- Where necessary update [global.css](mdc:src/styles/global.css) (and its auxiliary files) when developing common patterns with Tailwind CSS V4.
+- Ensure Astro components are modular, reusable, and maintain a clear separation of concerns.
+- Pure Astro components should all go in `./src/components`; utilities should be organized into `./src/utils`, but be sure to use existing functionality where possible.
+- Craft components so they leave no HTML output if no data is passed to them (usually with a conditional check on key props).
+- Ensure server-side rendering (SSR) compatibility for all components. Currently this project is static site generated (SSG) but it may become SSR in the future.
+
+# Pages
+
+- All Astro pages can be found in `./src/pages`; this includes several API endpoints.
+- Note that with Astro V5 we are using the Content Layer API and `id` instead of `slug` for determining most paths.
+- Rather than use `layouts` we use `pages-layouts` for the actual templates attached to different pages.
+
+# Coding standards
+
+- Enforce strict TypeScript settings, ensuring type safety across the project. All generated code must adhere to strictest Astro TypeScript rules. 
+- No use of any, implicit any, or // @ts-ignore unless explicitly justified.
+- Consistent ESLint and Prettier Formatting: Adhere to the project's ESLint rules (based on the latest flat config). Ensure generated code is formatted with Prettier and follows linting guidelines.
+- Maintain a clear directory structure that aligns with project conventions.
+- Avoid Unnecessary Dependencies: Prioritize built-in Astro, React, and Tailwind functionality before suggesting third-party libraries. No redundant dependencies; keep the dependency tree minimal and well-documented.
+- Use descriptive variable names and follow Astro's naming conventions.
+- Organize files using Astro's file-based routing system; all files should use kebab case (like-this.astro).
+- Use interactive client-side JavaScript sparingly, and for more complex implementations prefer React or native Web Components.
+
+# Documentation
+
+Refer to the latest Astro documentation (only version 5 and above) at: https://docs.astro.build/

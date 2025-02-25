@@ -1,0 +1,26 @@
+---
+description: React coding standards
+globs: *.ts, *.tsx
+---
+# React coding standards
+
+Note that not every matched file contains React code! This rule set *only* applies to TypeScript and TSX files with actual React components inside.
+
+# React coding standards
+
+- Use React 18 standards.
+- Use functional components and TypeScript interfaces.
+- Use declarative JSX.
+- Use function, not const, for components.
+- Use Tailwind CSS V4 for components and all styling wherever possible.
+- Implement responsive design with Tailwind CSS.
+- Use mobile-first approach for responsive design.
+- Use content variables for static content outside render functions.
+- Minimize 'useEffect', and 'setState'.
+- Use React Hook Form and Zod for form validation.
+- Use Zustand V5 for non-trivial state management.
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Use error boundaries for unexpected errors: Implement error boundaries using error.tsx and global-error.tsx files to handle unexpected errors and provide a fallback UI.
+- Define data input schemas using Zod for robust type checking and validation.
+- Handle errors gracefully and return appropriate responses.

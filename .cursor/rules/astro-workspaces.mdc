@@ -1,0 +1,15 @@
+---
+description: Astro workspace standards
+globs: packages/**/*, *.ts, *.tsx
+---
+# Astro workspace standards
+
+- This Astro project uses pnpm workspaces mainly for keeping code clean and isolating some specialized functionality that might rely on many dependencies
+- New dependencies should almost certainly be `devDependencies`
+
+# Package isolation standards
+
+- Do not import anything from the main Astro project when modifying code under `packages`; due to the way the Astro build process works (via Vite/Rollup) this can cause errors later on
+- Duplicate necessary types locally in workspace packages
+- Document the duplication with a comment explaining the source
+- Keep duplicated code minimal and focused
