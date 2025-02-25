@@ -44,5 +44,3 @@ config/
 public/icons/
 public/og*.jpg
 docker-compose*
-.cursorrules
-.cursor/

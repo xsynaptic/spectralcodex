@@ -3,7 +3,7 @@ import { blankIconSet, exportToDirectory, IconSet } from '@iconify/tools';
 import { getIcons, validateIconSet } from '@iconify/utils';
 import path from 'node:path';
 
-import { mapMarkerIcons } from '@/lib/map/map-marker-icons';
+import { mapMarkerIcons } from '../src/lib/map/map-marker-icons';
 
 /**
  * Populate a custom icon set with whatever we might use in maps

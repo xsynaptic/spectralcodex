@@ -9,3 +9,6 @@ docker-data/*
 dist
 node_modules
 scripts
+temp
+packages/content
+.astro-cache
