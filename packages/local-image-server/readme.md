@@ -4,7 +4,7 @@ This is a simple Astro integration designed to serve local images in development
 
 ## Configuration
 
-Add the integration to your Astro config file and be sure to allow image optimization from `localhost`:
+Add the integration to your Astro config file:
 
 ```ts
 import { defineConfig } from 'astro/config';
@@ -14,17 +14,8 @@ export default defineConfig({
 		localImageServer({
 			mediaPath: 'packages/content/media', // Relative to the project root
 			mediaBaseUrl: '/media', // The base URL for the media path; this is added to avoid conflicts with other routes
-			dev: process.env.NODE_ENV === 'development',
 		}),
 	],
-	image: {
-		remotePatterns: [
-			{
-				protocol: 'http',
-				hostname: 'localhost',
-			},
-		],
-	},
 });
 ```
 
