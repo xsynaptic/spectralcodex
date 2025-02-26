@@ -3,16 +3,12 @@ import sirv from 'sirv';
 
 import type { AstroIntegration } from 'astro';
 
-interface CacheControlOptions {
-	maxAge?: number;
-	immutable?: boolean;
-}
-
 interface LocalImageServerOptions {
 	mediaPath: string;
 	mediaBaseUrl: string;
 	buildPort: number;
-	cacheControl?: CacheControlOptions;
+	maxAge?: number;
+	immutable?: boolean;
 	dev?: boolean;
 }
 
@@ -20,10 +16,8 @@ const DEFAULT_OPTIONS: Required<LocalImageServerOptions> = {
 	mediaPath: 'media',
 	mediaBaseUrl: '/media',
 	buildPort: 4321,
-	cacheControl: {
-		maxAge: 31_536_000, // 1 year in seconds
-		immutable: false,
-	},
+	maxAge: 31_536_000, // 1 year in seconds
+	immutable: false,
 	dev: false,
 };
 
@@ -35,12 +29,8 @@ export default function localImageServer(
 	const imageRequestHandler = sirv(integrationConfig.mediaPath, {
 		dev: integrationConfig.dev,
 		etag: true,
-		...(integrationConfig.cacheControl.maxAge === undefined
-			? {}
-			: { maxAge: integrationConfig.cacheControl.maxAge }),
-		...(integrationConfig.cacheControl.immutable === undefined
-			? {}
-			: { immutable: integrationConfig.cacheControl.immutable }),
+		maxAge: integrationConfig.maxAge,
+		immutable: integrationConfig.immutable,
 		brotli: false,
 		gzip: false,
 		dotfiles: false,
