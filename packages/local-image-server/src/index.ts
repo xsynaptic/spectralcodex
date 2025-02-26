@@ -1,5 +1,5 @@
 import { createServer, Server } from 'node:http';
-import sirv from 'sirv';
+import sirv, { type RequestHandler } from 'sirv';
 
 import type { AstroIntegration } from 'astro';
 
@@ -7,18 +7,16 @@ interface LocalImageServerOptions {
 	mediaPath: string;
 	mediaBaseUrl: string;
 	buildPort: number;
-	maxAge?: number;
-	immutable?: boolean;
-	dev?: boolean;
+	maxAge: number;
+	immutable: boolean;
 }
 
-const DEFAULT_OPTIONS: Required<LocalImageServerOptions> = {
+const DEFAULT_OPTIONS: LocalImageServerOptions = {
 	mediaPath: 'media',
 	mediaBaseUrl: '/media',
 	buildPort: 4321,
 	maxAge: 31_536_000, // 1 year in seconds
 	immutable: false,
-	dev: false,
 };
 
 export default function localImageServer(
@@ -26,24 +24,37 @@ export default function localImageServer(
 ): AstroIntegration {
 	const integrationConfig = { ...DEFAULT_OPTIONS, ...options };
 
-	const imageRequestHandler = sirv(integrationConfig.mediaPath, {
-		dev: integrationConfig.dev,
-		etag: true,
-		maxAge: integrationConfig.maxAge,
-		immutable: integrationConfig.immutable,
-		brotli: false,
-		gzip: false,
-		dotfiles: false,
-	});
-
+	let imageRequestHandler: RequestHandler;
 	let server: Server | undefined = undefined;
 
 	// This integration handles both dev mode and the build process (via `astro:build` hooks)
 	return {
 		name: 'local-image-server',
 		hooks: {
-			'astro:config:setup': ({ config, addWatchFile }) => {
+			'astro:config:setup': ({ command, config, addWatchFile, updateConfig }) => {
+				// TODO: does not work for directories, investigate using https://astro-integration-kit.netlify.app/utilities/watch-directory/
 				addWatchFile(new URL(integrationConfig.mediaPath, config.root));
+
+				imageRequestHandler = sirv(integrationConfig.mediaPath, {
+					dev: command === 'dev',
+					etag: true,
+					maxAge: integrationConfig.maxAge,
+					immutable: integrationConfig.immutable,
+					brotli: false,
+					gzip: false,
+					dotfiles: false,
+				});
+
+				updateConfig({
+					image: {
+						remotePatterns: [
+							{
+								protocol: 'http',
+								hostname: 'localhost',
+							},
+						],
+					},
+				});
 			},
 			'astro:server:setup': ({ server, logger }) => {
 				logger.info(
