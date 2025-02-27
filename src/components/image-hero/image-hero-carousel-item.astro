@@ -20,19 +20,19 @@ interface Props extends FeaturedItemMetadata {
 
 const { src: imageId, title: alt = '', contentMetadata, loading } = Astro.props;
 
-const image = await getImageById(imageId);
+const imageEntry = await getImageById(imageId);
 
-const imageProps = image
+const imageProps = imageEntry
 	? ({
-			src: image.data.src,
+			src: imageEntry.data.src,
 			alt: sanitizeAltAttribute(alt),
-			width: image.data.width,
-			height: image.data.height,
-			widths: getImageSrcsetWidths({ maxWidth: image.data.width }),
+			width: imageEntry.data.width,
+			height: imageEntry.data.height,
+			widths: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(image.data.src)),
+			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(imageEntry.data.src)),
 		} satisfies RemoteImageProps)
 	: undefined;
 ---

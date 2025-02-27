@@ -31,8 +31,8 @@ export const getStaticPaths = (async () => {
 			locations,
 			getContentMetadata,
 			R.map(async (item) => {
-				const image = item.imageId ? await getImageById(item.imageId) : undefined;
-				const imageObject = image ? await getImageObject(image.data.src) : undefined;
+				const imageEntry = item.imageId ? await getImageById(item.imageId) : undefined;
+				const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
 
 				return {
 					params: { id: item.id },

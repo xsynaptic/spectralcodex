@@ -28,8 +28,8 @@ export const getStaticPaths = (async () => {
 			R.filter(({ data }) => !!data.imageFeatured),
 			R.map((entry) =>
 				limit(async () => {
-					const image = getImageById(entry.data.imageFeatured);
-					const imageObject = image ? await getImageObject(image.data.src) : undefined;
+					const imageEntry = getImageById(entry.data.imageFeatured);
+					const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
 
 					return {
 						params: {

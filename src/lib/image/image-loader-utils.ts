@@ -26,6 +26,7 @@ export function getImageTitle(titleRaw: string | undefined) {
 	};
 }
 
+// Calculate EV using the formula EV = log2(N^2 / t)
 export function getImageExposureValue({
 	aperture,
 	shutterSpeed,
@@ -47,10 +48,10 @@ export function getImageExposureValue({
 		shutterTime = Number(shutterSpeed);
 	}
 
-	// Calculate EV using the formula EV = log2(N^2 / t)
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
+// Generate an image placeholder for use as an in-line data URL
 export async function getImageFileUrlPlaceholder({
 	fileUrl,
 	onError,

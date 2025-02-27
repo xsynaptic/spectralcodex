@@ -112,7 +112,6 @@ export default defineConfig({
 		localImageServer({
 			mediaPath: 'packages/content/media',
 			mediaBaseUrl: '/media',
-			dev: !isProduction,
 		}),
 	],
 	image: {

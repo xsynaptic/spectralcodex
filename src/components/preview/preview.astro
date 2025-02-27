@@ -19,23 +19,23 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { imageId, isImageSquare, linkUrl, alt, ...props } = Astro.props;
 
-const image = imageId ? await getImageById(imageId) : undefined;
+const imageEntry = imageId ? await getImageById(imageId) : undefined;
 
 // Dimensions chosen for a two-column grid
-const imageProps = image
+const imageProps = imageEntry
 	? ({
-			src: image.data.src,
+			src: imageEntry.data.src,
 			width: 450,
 			height: 300,
 			alt: sanitizeAltAttribute(alt),
 			widths: getImageSrcsetWidths({
-				maxWidth: image.data.width,
+				maxWidth: imageEntry.data.width,
 				widths: [450, 600, 900, 1200],
 			}),
 			sizes: `(max-width: var(--breakpoint-lg)) 100vw, 450px`,
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps(image.data.placeholder),
+			...getImagePlaceholderProps(imageEntry.data.placeholder),
 		} satisfies RemoteImageProps)
 	: undefined;
 
