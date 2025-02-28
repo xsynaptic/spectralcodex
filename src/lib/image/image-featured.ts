@@ -26,7 +26,9 @@ export function getSingleFeaturedItem({
 }) {
 	if (!images) return;
 
-	return R.pipe(images, (items) => (shuffle ? R.shuffle(items) : items), R.first());
+	const items = shuffle ? R.shuffle(images) : images;
+
+	return R.first(items);
 }
 
 // Same as above but all featured items are processed (and optionally shuffled)
@@ -41,25 +43,23 @@ export async function getFeaturedItemsMetadata({
 
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	return R.pipe(
-		images,
-		R.map((item) => {
-			const contentMetadata = item.contentId ? contentMetadataIndex.get(item.contentId) : undefined;
+	const items = images.map((item) => {
+		const contentMetadata = item.contentId ? contentMetadataIndex.get(item.contentId) : undefined;
 
-			// Throw a warning to catch typos and whatever else
-			if (import.meta.env.DEV && item.contentId && contentMetadata === undefined) {
-				logError(
-					`Warning: requested contentId "${item.contentId}" could not be matched to any content in the system!`,
-				);
-			}
+		// Throw a warning to catch typos and whatever else
+		if (import.meta.env.DEV && item.contentId && contentMetadata === undefined) {
+			logError(
+				`Warning: requested contentId "${item.contentId}" could not be matched to any content in the system!`,
+			);
+		}
 
-			return {
-				...item,
-				...(contentMetadata ? { contentMetadata } : {}),
-			};
-		}),
-		(items) => (shuffle ? R.shuffle(items) : items),
-	);
+		return {
+			...item,
+			...(contentMetadata ? { contentMetadata } : {}),
+		};
+	});
+
+	return shuffle ? R.shuffle(items) : items;
 }
 
 // Rather than accepting featured images directly from frontmatter this handles content metadata
@@ -72,14 +72,13 @@ export function getFeaturedItemsFromContentMetadata({
 }): Array<FeaturedItemMetadata> | undefined {
 	if (!items || items.length === 0) return;
 
-	return R.pipe(
-		items,
-		R.filter((item) => !!item.imageId),
-		R.map((item) => ({
+	const itemsWithImages = items
+		.filter((item) => !!item.imageId)
+		.map((item) => ({
 			src: item.imageId,
 			title: item.title,
 			contentMetadata: item,
-		})),
-		(items) => (shuffle ? R.shuffle(items) : items),
-	);
+		}));
+
+	return shuffle ? R.shuffle(itemsWithImages) : itemsWithImages;
 }
