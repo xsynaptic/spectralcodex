@@ -46,8 +46,3 @@ export function useMediaQuery({
 
 	return matches;
 }
-
-/** Unfortunately passing `var(--breakpoint-sm)` is not working here */
-export function useMediaQueryMobile(): boolean {
-	return useMediaQuery({ below: '40rem' });
-}

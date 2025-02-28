@@ -57,6 +57,14 @@ export const OPEN_GRAPH_IMAGE_DENSITY = 2;
 export const OPEN_GRAPH_TWITTER_USERNAME = '@spectralcodex';
 
 /**
+ * Tailwind CSS V4 breakpoints
+ */
+export const TAILWIND_BREAKPOINT_SM = '40rem';
+export const TAILWIND_BREAKPOINT_MD = '48rem';
+export const TAILWIND_BREAKPOINT_LG = '64rem';
+export const TAILWIND_BREAKPOINT_CONTENT = '60.25rem'; // This is a custom setting
+
+/**
  * Various settings
  */
 // A string representing the year the site was founded; will default to the current year

@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import type { HTMLAttributes } from 'astro/types';
 import type { RemoteImageProps } from 'astro:assets';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
+import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '@/constants';
 import { getImageById } from '@/lib/collections/images/utils';
 import { getImageSrcsetWidths } from '@/lib/image/image-layout';
 import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
@@ -32,7 +32,7 @@ const imageProps = imageEntry
 				maxWidth: imageEntry.data.width,
 				widths: [450, 600, 900, 1200],
 			}),
-			sizes: `(max-width: var(--breakpoint-lg)) 100vw, 450px`,
+			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 450px`,
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
 			...getImagePlaceholderProps(imageEntry.data.placeholder),

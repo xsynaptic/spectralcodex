@@ -5,7 +5,8 @@ import type { MapPopupItem } from '../types';
 
 import { MapSpritesEnum } from '../config/sprites';
 import { translations } from '../config/translations';
-import { useMediaQueryMobile } from '../lib/hooks/use-media-query';
+import { MEDIA_QUERY_MOBILE } from '../constants';
+import { useMediaQuery } from '../lib/hooks/use-media-query';
 import {
 	useMapPopupDataLoading,
 	useMapPopupItem,
@@ -52,8 +53,7 @@ function getGoogleMapsUrlFromGeometry(coordinates: PopupCoordinates) {
 export const MapPopup = memo(function MapPopup() {
 	const popupDataLoading = useMapPopupDataLoading();
 	const popupItem = useMapPopupItem();
-
-	const isMobile = useMediaQueryMobile();
+	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
 	const { setSelectedId } = useMapStoreActions();
 
@@ -88,7 +88,7 @@ export const MapPopup = memo(function MapPopup() {
 			}}
 		>
 			<div className="relative flex min-h-[80px] min-w-[200px] flex-col">
-				<div className="pointer-events-none absolute flex h-full w-full justify-center p-small">
+				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
 					<div
 						className="loading max-w-[100%] transition-opacity duration-500"
 						style={{ opacity: popupDataLoading ? 1 : 0 }}
@@ -100,7 +100,7 @@ export const MapPopup = memo(function MapPopup() {
 						{image ? (
 							<div>
 								<img
-									className="bg-fallback aspect-[3/2] w-full select-none object-cover"
+									className="bg-fallback aspect-[3/2] w-full object-cover select-none"
 									src={image.src}
 									srcSet={image.srcSet}
 									sizes={
@@ -111,13 +111,13 @@ export const MapPopup = memo(function MapPopup() {
 								/>
 							</div>
 						) : undefined}
-						<div className="flex flex-col px-2 pb-2 pt-1">
+						<div className="flex flex-col px-2 pt-1 pb-2">
 							{titleAlt ? (
-								<div className="bg-gradient-to-b from-accent-500 to-accent-600 bg-clip-text text-sm font-medium leading-snug text-primary-300 text-transparent">
+								<div className="from-accent-500 to-accent-600 text-primary-300 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium">
 									{titleAlt}
 								</div>
 							) : undefined}
-							<div className="border-b border-b-primary-300 pb-1 text-base font-semibold leading-snug text-primary-800">
+							<div className="border-b-primary-300 text-primary-800 border-b pb-1 text-base leading-snug font-semibold">
 								<a href={url}>{title}</a>
 							</div>
 							{precision <= 2 ? (
@@ -125,22 +125,22 @@ export const MapPopup = memo(function MapPopup() {
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 36 36"
-										className="w-[20px] text-highlight-500 md:w-[20px]"
+										className="text-highlight-500 w-[20px] md:w-[20px]"
 									>
 										<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
 									</svg>
-									<span className="italic text-highlight-400">
+									<span className="text-highlight-400 italic">
 										{precision === 2 ? translations.precisionWarning : translations.precisionError}
 									</span>
 								</div>
 							) : undefined}
 							{description ? (
 								<div
-									className="mb-2 mt-1 max-h-[126px] overflow-x-auto text-sm"
+									className="mt-1 mb-2 max-h-[126px] overflow-x-auto text-sm"
 									dangerouslySetInnerHTML={{ __html: description }}
 								/>
 							) : undefined}
-							<div className="m-0 flex select-none justify-between text-xs text-primary-700">
+							<div className="text-primary-700 m-0 flex justify-between text-xs select-none">
 								<div
 									className="group flex cursor-pointer items-center gap-1"
 									onClick={() => {
@@ -148,18 +148,18 @@ export const MapPopup = memo(function MapPopup() {
 										void navigator.clipboard.writeText(coordinatesString);
 									}}
 								>
-									<div className="text-primary-400 transition-colors duration-300 group-hover:text-highlight-300">
+									<div className="text-primary-400 group-hover:text-highlight-300 transition-colors duration-300">
 										{coordinatesString}
 									</div>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
-										className="h-[14px] text-primary-500 transition-colors duration-300 group-hover:text-highlight-400"
+										className="text-primary-500 group-hover:text-highlight-400 h-[14px] transition-colors duration-300"
 										viewBox="0 0 24 24"
 									>
 										<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>
 									</svg>
 								</div>
-								<div className="flex select-none gap-2">
+								<div className="flex gap-2 select-none">
 									{wikipediaUrl ? (
 										<a className="cursor-pointer" href={wikipediaUrl} target="_blank">
 											<svg

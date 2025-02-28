@@ -1,3 +1,9 @@
+import {
+	TAILWIND_BREAKPOINT_CONTENT,
+	TAILWIND_BREAKPOINT_MD,
+	TAILWIND_BREAKPOINT_SM,
+} from '@/constants';
+
 // Note that only the first three are currently in use
 export type ImageLayoutOption =
 	| 'medium'
@@ -64,7 +70,7 @@ export function getImageLayoutProps({
 				width: 900,
 				height: 600,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--breakpoint-md)) calc(100vw - 32px), (max-width: var(--spacing-content)) calc(100vw - 64px), var(--spacing-content)`,
+				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - 32px), (max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - 64px), ${TAILWIND_BREAKPOINT_CONTENT}`,
 			};
 		}
 		case 'wide': {
@@ -101,7 +107,7 @@ export function getImageLayoutProps({
 					}
 				})(),
 				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `(max-width: var(--breakpoint-sm)) 100vw, (max-width: var(--spacing-content)) 50vw`,
+				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width:${TAILWIND_BREAKPOINT_CONTENT}) 50vw`,
 			};
 		}
 	}

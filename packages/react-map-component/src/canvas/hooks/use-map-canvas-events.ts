@@ -5,14 +5,14 @@ import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import { mapLayerIds } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
-import { MAP_FILTER_CONTROL_ID } from '../../constants';
-import { useMediaQueryMobile } from '../../lib/hooks/use-media-query';
+import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
+import { useMediaQuery } from '../../lib/hooks/use-media-query';
 import { useMapCanvasInteractive, useMapStoreActions } from '../../store/hooks/use-map-store';
 import { isMapCoordinates, isMapGeojsonSource } from '../../types/map-type-guards';
 
 export function useMapCanvasEvents() {
 	const interactive = useMapCanvasInteractive();
-	const isMobile = useMediaQueryMobile();
+	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 	const { setCanvasLoading } = useMapStoreActions();
 
 	const { setCanvasCursor, setSelectedId, setFilterPosition, setFilterOpen } = useMapStoreActions();
