@@ -17,5 +17,3 @@ export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	backlinks: Set<string>;
 	entryQuality: number;
 }
-
-export type ContentMetadataIndex = Map<string, ContentMetadataItem>;

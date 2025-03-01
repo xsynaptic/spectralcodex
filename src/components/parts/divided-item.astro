@@ -1,6 +1,9 @@
 ---
-import type { DividerColor, DividerContent } from '@/types/components';
 import type { HTMLTag, Polymorphic } from 'astro/types';
+
+export type DividerColor = 'default' | 'lighter' | 'darker' | 'hero';
+
+export type DividerContent = 'bar' | 'bullet' | 'chevron' | 'dot' | 'slash';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;

@@ -3,11 +3,10 @@ import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import type { ContentMetadataIndex, ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '@/types/metadata';
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { SITE_YEAR_FOUNDED } from '@/constants';
-import { MDX_COMPONENTS_TO_STRIP } from '@/constants';
+import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '@/constants';
 import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
 import { getLocationsCollection } from '@/lib/collections/locations/data';
 import { getPagesCollection } from '@/lib/collections/pages/data';
@@ -58,7 +57,7 @@ function getContentMetadataWordCount(entry: CollectionEntry<CollectionKey>): num
 }
 
 // This function does all the heavy lifting and should only run once
-async function populateContentMetadataIndex(): Promise<ContentMetadataIndex> {
+async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	const startTime = performance.now();
 
 	const { ephemera } = await getEphemeraCollection();
@@ -147,7 +146,7 @@ async function populateContentMetadataIndex(): Promise<ContentMetadataIndex> {
 }
 
 // Initialize the content metadata index and return on demand
-let contentMetadataIndex: Promise<ContentMetadataIndex> | undefined;
+let contentMetadataIndex: ReturnType<typeof populateContentMetadataIndex> | undefined;
 
 export async function getContentMetadataIndex() {
 	if (!contentMetadataIndex) {

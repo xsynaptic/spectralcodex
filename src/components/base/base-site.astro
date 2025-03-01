@@ -1,7 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 
-import type { MetaProps } from '@/types/components';
+import type { MetaProps } from '@/components/base/base-meta.astro';
 
 import '@fontsource-variable/commissioner';
 import '@fontsource-variable/geologica';
@@ -19,7 +19,7 @@ import ThemeManager from '@/components/theme/theme-manager.astro';
 import { getSiteUrl } from '@/lib/utils/routing';
 
 interface Props {
-	meta?: MetaProps | undefined;
+	meta?: MetaProps;
 	hasHeroImage?: boolean;
 	hasReadingBar?: boolean;
 }

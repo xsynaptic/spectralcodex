@@ -2,7 +2,6 @@
 import { getImage } from 'astro:assets';
 import { SEO } from 'astro-seo';
 
-import type { MetaProps } from '@/types/components';
 import type { SEOProps } from 'astro-seo';
 
 import {
@@ -18,6 +17,24 @@ import { getTranslations } from '@/lib/utils/i18n';
 import { getSiteUrl } from '@/lib/utils/routing';
 import { getSeoDescription, getSeoImageFallback } from '@/lib/utils/seo';
 import { sanitizeAltAttribute } from '@/lib/utils/text';
+
+export interface MetaProps {
+	title?: string | undefined;
+	description?: string | undefined;
+	ogType?: 'article' | 'website' | undefined;
+	image?: NonNullable<SEOProps['openGraph']>['image'];
+	imageId?: string | undefined;
+	imageAlt?: string | undefined;
+	article?: {
+		publishedTime?: string;
+		modifiedTime?: string;
+		expirationTime?: string;
+		authors?: Array<string>;
+		section?: string;
+		tags?: Array<string>;
+	};
+	prefetchUrls?: Array<string> | undefined;
+}
 
 interface Props {
 	meta?: MetaProps | undefined;

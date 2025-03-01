@@ -1,5 +1,4 @@
 ---
-import type { PreviewItemProps } from '@/types/components';
 import type { ContentMetadataItem } from '@/types/metadata';
 
 import ContentDate from '@/components/content/content-date.astro';
@@ -13,6 +12,18 @@ import Preview from '@/components/preview/preview.astro';
 import { getRegionAncestorsByIdFunction } from '@/lib/collections/regions/utils';
 import { getTranslations } from '@/lib/utils/i18n';
 import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
+
+export interface PreviewItemProps {
+	showCollection?: boolean | undefined;
+	showDate?: boolean | undefined;
+	showDescription?: boolean | undefined;
+	showDescriptionCompact?: boolean | undefined;
+	showLocations?: boolean | undefined;
+	showRegion?: boolean | undefined;
+	showPosts?: boolean | undefined;
+	showTitleAlt?: boolean | undefined;
+	showWordCount?: boolean | undefined;
+}
 
 interface Props extends PreviewItemProps {
 	item: ContentMetadataItem;
