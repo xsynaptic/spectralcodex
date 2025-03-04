@@ -1,8 +1,9 @@
+import type { SatoriOptions } from 'satori';
+
 import satori from 'satori';
 import sharp from 'sharp';
 
 import type { OpenGraphMetadataItem } from './types';
-import type { SatoriOptions } from 'satori';
 
 import { getOpenGraphImageElement } from './element';
 
@@ -32,7 +33,7 @@ async function getOpenGraphImageDataUrl({
 export function getGenerateOpenGraphImageFunction({
 	density,
 	...satoriOptions
-}: { density?: number } & SatoriOptions) {
+}: SatoriOptions & { density?: number }) {
 	const height = 'height' in satoriOptions ? satoriOptions.height : 600;
 	const width = 'width' in satoriOptions ? satoriOptions.width : 900;
 

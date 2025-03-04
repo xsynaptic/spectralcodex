@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/unbound-method -- Temporary fix for some type issues */
+import type { Loader, LoaderContext } from 'astro/loaders';
+
 import fastGlob from 'fast-glob';
 import micromatch from 'micromatch';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
-
-import type { Loader, LoaderContext } from 'astro/loaders';
 
 interface LocalImageLoaderGenerateIdOptions {
 	/** The path to the entry file, relative to the base directory. */
@@ -65,10 +65,10 @@ function getSyncDataFunction({
 	parseData,
 	generateDigest,
 	logger,
-}: { baseDir: URL; options: ImageLoaderOptions } & Pick<
+}: Pick<
 	LoaderContext,
 	'store' | 'parseData' | 'generateDigest' | 'logger'
->) {
+> & { baseDir: URL; options: ImageLoaderOptions }) {
 	// Limit the concurrency of files processed to reduce memory usage
 	const limit = pLimit(options.concurrency ?? 50);
 

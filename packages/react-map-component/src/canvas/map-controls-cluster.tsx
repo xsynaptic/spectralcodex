@@ -3,7 +3,6 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 import { MapSpritesEnum } from '../config/sprites';
 import { MAP_CLUSTER_CONTROL_ID } from '../constants';
 import { useMapCanvasClusters, useMapStoreActions } from '../store/hooks/use-map-store';
-
 import { CustomControlPortal } from './map-controls-custom';
 
 // TODO: still under development!

@@ -113,7 +113,7 @@ export const MapPopup = memo(function MapPopup() {
 						) : undefined}
 						<div className="flex flex-col px-2 pt-1 pb-2">
 							{titleAlt ? (
-								<div className="from-accent-500 to-accent-600 text-primary-300 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium">
+								<div className="from-accent-500 to-accent-600 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
 									{titleAlt}
 								</div>
 							) : undefined}

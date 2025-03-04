@@ -8,7 +8,6 @@ import {
 	useMapSourceDataLoading,
 	useMapStoreActions,
 } from '../store/hooks/use-map-store';
-
 import { CustomControlPortal } from './map-controls-custom';
 
 export const FilterControl = ({ position }: { position: ControlPosition }) => {

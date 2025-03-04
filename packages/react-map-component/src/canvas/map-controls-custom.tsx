@@ -1,10 +1,10 @@
 /* eslint-disable unicorn/no-null */
+import type { ReactElement } from 'react';
+import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
+
 import { cloneElement, memo } from 'react';
 import { createPortal } from 'react-dom';
 import { useControl } from 'react-map-gl/maplibre';
-
-import type { ReactElement } from 'react';
-import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
 
 interface CustomControlConfig {
 	map: MapInstance;
@@ -18,9 +18,9 @@ type CustomControlProps = Pick<CustomControlConfig, 'position' | 'className'> & 
 };
 
 class CustomControl implements IControl {
-	_map: MapInstance | null = null;
-	_container: HTMLElement | null = null;
 	_className = 'maplibregl-ctrl maplibregl-ctrl-group';
+	_container: HTMLElement | null = null;
+	_map: MapInstance | null = null;
 	_position: ControlPosition = 'top-left';
 	_redraw?: () => void;
 
@@ -29,6 +29,18 @@ class CustomControl implements IControl {
 		this._position = position;
 		if (className !== undefined) this._className = className;
 		if (redraw !== undefined) this._redraw = redraw;
+	}
+
+	getDefaultPosition?() {
+		return this._position;
+	}
+
+	getElement() {
+		return this._container;
+	}
+
+	getMap() {
+		return this._map;
 	}
 
 	onAdd(map: MapInstance) {
@@ -47,18 +59,6 @@ class CustomControl implements IControl {
 		this._container.remove();
 		if (this._redraw !== undefined) this._map.off('move', this._redraw);
 		this._map = null;
-	}
-
-	getDefaultPosition?() {
-		return this._position;
-	}
-
-	getMap() {
-		return this._map;
-	}
-
-	getElement() {
-		return this._container;
 	}
 }
 

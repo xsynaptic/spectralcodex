@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react';
+
 import { createContext } from 'react';
 
 import type { MapDataConfigurableState } from './map-store-types';
-import type { ReactNode } from 'react';
 
 import { useMapStoreSetup } from './hooks/use-map-store-setup';
 

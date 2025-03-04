@@ -1,7 +1,8 @@
+import type { CSSProperties } from 'react';
+
 import { memo } from 'react';
 
 import type { MapComponentProps } from './types';
-import type { CSSProperties } from 'react';
 
 import { parsePopupData, parseSourceData } from './api/map-api-utils';
 import { MapCanvas } from './canvas/map-canvas';

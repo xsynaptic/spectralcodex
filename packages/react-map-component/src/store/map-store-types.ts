@@ -1,6 +1,7 @@
+import type { CSSProperties } from 'react';
+
 import type { MapPopupData, MapPopupItem, MapSourceData } from '../types';
 import type { LocationStatus } from '../types/map-locations';
-import type { CSSProperties } from 'react';
 
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 

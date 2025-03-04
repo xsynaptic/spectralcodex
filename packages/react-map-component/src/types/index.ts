@@ -1,9 +1,10 @@
-import { z } from 'zod';
-
-import type { MapPopupDataSchema, MapSourceDataSchema } from './map-schemas';
 import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, MultiPoint, Point } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
+
+import { z } from 'zod';
+
+import type { MapPopupDataSchema, MapSourceDataSchema } from './map-schemas';
 
 // Supported geometry for use with this component
 export type MapGeometry = Point | MultiPoint | LineString;

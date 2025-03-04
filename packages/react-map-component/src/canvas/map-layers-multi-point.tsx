@@ -6,7 +6,6 @@ import type { MapSourceFeatureCollection } from '../types';
 import { layerStyles } from '../config/layer-style';
 import { MapSourceIdEnum } from '../config/source';
 import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
-
 import { useMapCanvasData } from './hooks/use-map-canvas-data';
 
 const MapMultiPointLayerContent = memo(function MapMultiPointLayerContents({

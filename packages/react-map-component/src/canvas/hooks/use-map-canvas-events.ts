@@ -1,7 +1,7 @@
+import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
+
 import { useCallback } from 'react';
 import { funnel } from 'remeda';
-
-import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import { mapLayerIds } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';

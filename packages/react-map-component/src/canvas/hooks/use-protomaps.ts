@@ -1,10 +1,10 @@
+import type { StyleSpecification } from 'maplibre-gl';
+
 import { type Flavor, layers } from '@protomaps/basemaps';
 import maplibregl from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
-
-import type { StyleSpecification } from 'maplibre-gl';
 
 import { useMapLanguages } from '../../store/hooks/use-map-store';
 

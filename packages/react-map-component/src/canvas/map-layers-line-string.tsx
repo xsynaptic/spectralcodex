@@ -5,7 +5,6 @@ import type { MapSourceFeatureCollection } from '../types';
 
 import { layerStyles } from '../config/layer-style';
 import { MapSourceIdEnum } from '../config/source';
-
 import { useMapCanvasData } from './hooks/use-map-canvas-data';
 
 const MapLineStringLayerContent = memo(function MapLineStringLayerContent({

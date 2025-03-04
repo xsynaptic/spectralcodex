@@ -1,8 +1,9 @@
+import type { CSSProperties } from 'react';
+
 import { namedFlavor } from '@protomaps/basemaps';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
-import type { CSSProperties } from 'react';
 
 import { useMapApiPopupData } from '../api/hooks/use-map-api-popup-data';
 import { useMapApiSourceData } from '../api/hooks/use-map-api-source-data';
@@ -13,7 +14,6 @@ import {
 	useMapCanvasInteractive,
 	useMapCanvasLoading,
 } from '../store/hooks/use-map-store';
-
 import { useProtomaps } from './hooks/use-protomaps';
 import { useThemeMode } from './hooks/use-theme-mode';
 import { MapControls } from './map-controls';

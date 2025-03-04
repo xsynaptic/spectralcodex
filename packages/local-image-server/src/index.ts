@@ -1,9 +1,9 @@
-import { z } from 'astro/zod';
+import type { RequestHandler } from 'sirv';
+
 import { createResolver, defineIntegration, watchDirectory } from 'astro-integration-kit';
+import { z } from 'astro/zod';
 import { createServer, Server } from 'node:http';
 import sirv from 'sirv';
-
-import type { RequestHandler } from 'sirv';
 
 export default defineIntegration({
 	name: 'local-image-server',
