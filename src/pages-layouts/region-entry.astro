@@ -1,17 +1,18 @@
 ---
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+
 import { render } from 'astro:content';
 
 import type { RegionsOption } from '@/lib/collections/regions/options';
 import type { MapComponentData } from '@/lib/map/map-types';
 import type { ContentMetadataItem } from '@/types/metadata';
-import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import BaseSite from '@/components/base/base-site.astro';
 import ContentCollectionLink from '@/components/content/content-collection-link.astro';
 import ContentHeader from '@/components/content/content-header.astro';
-import ContentSection from '@/components/content/content-section.astro';
 import ContentSectionLinks from '@/components/content/content-section-links.astro';
+import ContentSection from '@/components/content/content-section.astro';
 import ImageHeroCarousel from '@/components/image-hero/image-hero-carousel.astro';
 import MapComponent from '@/components/map/map-component.astro';
 import Pagination from '@/components/pagination/pagination.astro';

@@ -1,7 +1,7 @@
+import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
 import pLimit from 'p-limit';
 import * as R from 'remeda';
-
-import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '@/constants';
 import { getImageByIdFunction } from '@/lib/collections/images/utils';

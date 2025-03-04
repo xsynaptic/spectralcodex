@@ -1,7 +1,8 @@
+import type { CollectionKey } from 'astro:content';
+
 import slugify from '@sindresorhus/slugify';
 
 import type { ContentMetadataItem } from '@/types/metadata';
-import type { CollectionKey } from 'astro:content';
 
 import { FEATURE_SHORTCODES_ERROR_LOG } from '@/constants';
 import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';

@@ -1,7 +1,7 @@
 ---
-import * as R from 'remeda';
-
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import * as R from 'remeda';
 
 import { getLocationsByIdsFunction } from '@/lib/collections/locations/utils';
 import { getPostsByIdsFunction } from '@/lib/collections/posts/utils';
@@ -34,8 +34,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 			['taiwan'].includes(entry.id) ||
 			ancestors.some((ancestor) => ['taiwan'].includes(ancestor.id));
 		const showChineseInterface =
-			['taiwan', 'china', 'hong-kong'].includes(entry.id) ||
-			ancestors.some((ancestor) => ['taiwan', 'china', 'hong-kong'].includes(ancestor.id));
+			['china', 'hong-kong', 'taiwan'].includes(entry.id) ||
+			ancestors.some((ancestor) => ['china', 'hong-kong', 'taiwan'].includes(ancestor.id));
 
 		const entryLocations = entry.data.locations ? getLocationsByIds(entry.data.locations) : [];
 

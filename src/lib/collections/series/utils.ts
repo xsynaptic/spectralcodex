@@ -1,5 +1,6 @@
-import type { ContentMetadataItem } from '@/types/metadata';
 import type { CollectionEntry, CollectionKey } from 'astro:content';
+
+import type { ContentMetadataItem } from '@/types/metadata';
 
 import { getLocationsCollection } from '@/lib/collections/locations/data';
 import { getLocationsByPostsFunction } from '@/lib/collections/locations/utils';

@@ -1,3 +1,6 @@
+import type { Units } from '@turf/helpers';
+import type { CollectionEntry } from 'astro:content';
+
 import {
 	booleanIntersects,
 	buffer as getBuffer,
@@ -9,9 +12,6 @@ import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
-
-import type { Units } from '@turf/helpers';
-import type { CollectionEntry } from 'astro:content';
 
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
 import { getImageByIdFunction } from '@/lib/collections/images/utils';

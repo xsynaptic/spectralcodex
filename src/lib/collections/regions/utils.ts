@@ -1,6 +1,6 @@
-import * as R from 'remeda';
-
 import type { CollectionEntry, CollectionKey } from 'astro:content';
+
+import * as R from 'remeda';
 
 import { getRegionsCollection } from '@/lib/collections/regions/data';
 

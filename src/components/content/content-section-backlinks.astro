@@ -1,12 +1,12 @@
 ---
-import * as R from 'remeda';
-
 import type { CollectionEntry, CollectionKey } from 'astro:content';
+
+import * as R from 'remeda';
 
 import ContentSection from '@/components/content/content-section.astro';
 import FormatCjk from '@/components/format/format-cjk.astro';
-import ListColumn from '@/components/list/list-column.astro';
 import ListColumnItem from '@/components/list/list-column-item.astro';
+import ListColumn from '@/components/list/list-column.astro';
 import Link from '@/components/parts/link.astro';
 import { getContentBacklinks } from '@/lib/metadata/metadata-backlinks';
 import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
@@ -24,7 +24,7 @@ const backlinks = backlinkItems
 	? R.pipe(
 			backlinkItems,
 			R.filter((backlinkItem) =>
-				['ephemera', 'posts', 'locations'].includes(backlinkItem.collection)
+				['ephemera', 'locations', 'posts'].includes(backlinkItem.collection)
 			),
 			R.sort(sortContentMetadataByDate),
 			R.take(10)

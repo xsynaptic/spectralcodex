@@ -1,6 +1,6 @@
-import * as R from 'remeda';
-
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import * as R from 'remeda';
 
 import { getLocationsCollection } from '@/lib/collections/locations/data';
 import {

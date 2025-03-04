@@ -1,7 +1,7 @@
+import type { LineString, MultiPoint, Point } from 'geojson';
+
 import { z } from 'astro:content';
 import * as R from 'remeda';
-
-import type { LineString, MultiPoint, Point } from 'geojson';
 
 import { getTruncatedLngLat } from '@/lib/map/map-utils';
 

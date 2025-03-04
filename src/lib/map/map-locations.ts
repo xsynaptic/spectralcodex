@@ -1,10 +1,11 @@
+import type { CollectionEntry } from 'astro:content';
+
 import type {
 	MapFeatureCollection,
 	MapGeometry,
 	MapPopupDataRaw,
 	MapSourceDataRaw,
 } from '@/lib/map/map-types';
-import type { CollectionEntry } from 'astro:content';
 
 import {
 	MapApiDataEnum,

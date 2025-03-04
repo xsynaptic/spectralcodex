@@ -1,7 +1,7 @@
+import type { Page } from 'astro';
+
 import * as R from 'remeda';
 import urlJoin from 'url-join';
-
-import type { Page } from 'astro';
 
 import { getSiteUrl } from '@/lib/utils/routing';
 

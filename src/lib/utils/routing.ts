@@ -1,6 +1,6 @@
-import urlJoin from 'url-join';
-
 import type { CollectionKey } from 'astro:content';
+
+import urlJoin from 'url-join';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 

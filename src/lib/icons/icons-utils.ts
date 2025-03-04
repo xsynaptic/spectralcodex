@@ -1,9 +1,9 @@
+import type { StoredDataNoRaw } from 'keyv';
+
 import { lookupCollection } from '@iconify/json';
 import { getIcons, iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
-
-import type { StoredDataNoRaw } from 'keyv';
 
 import { iconsCache } from '@/lib/icons/icons-cache';
 

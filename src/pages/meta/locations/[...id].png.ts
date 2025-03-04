@@ -1,7 +1,7 @@
+import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
 import { getGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
 import * as R from 'remeda';
-
-import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { FEATURE_OPEN_GRAPH_IMAGES } from '@/constants';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@/constants';

@@ -1,9 +1,9 @@
-import sharpDefaultService from 'astro/assets/services/sharp';
-import sharp from 'sharp';
-
 import type { ImageMetadata, ImageTransform, LocalImageService } from 'astro';
 import type { SharpImageServiceConfig } from 'astro/assets/services/sharp';
 import type { CollectionEntry } from 'astro:content';
+
+import sharpDefaultService from 'astro/assets/services/sharp';
+import sharp from 'sharp';
 
 import { CONTENT_MEDIA_HOST } from '@/constants';
 import { getImageById } from '@/lib/collections/images/utils';

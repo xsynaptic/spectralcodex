@@ -1,7 +1,7 @@
+import type { CollectionEntry } from 'astro:content';
+
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-
-import type { CollectionEntry } from 'astro:content';
 
 interface CollectionData {
 	ephemera: Array<CollectionEntry<'ephemera'>>;

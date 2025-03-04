@@ -1,10 +1,11 @@
+import type { CollectionEntry, CollectionKey } from 'astro:content';
+
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
 import type { ContentMetadataItem } from '@/types/metadata';
-import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '@/constants';
 import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
