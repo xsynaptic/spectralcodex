@@ -114,7 +114,9 @@ async function transferHashedImages() {
 	console.log(chalk.blue('Transferring hashed images...'));
 
 	try {
-		await $`rsync -avz -e "ssh -i ${sshKeyPath}" --delete-after --checksum ${imagesPath}/ ${remoteHostImages}/ ${dryRun ? '--dry-run' : ''}`;
+		await (dryRun
+			? $`rsync -avz -e "ssh -i ${sshKeyPath}" --delete-after --checksum ${imagesPath}/ ${remoteHostImages}/ --dry-run`
+			: $`rsync -avz -e "ssh -i ${sshKeyPath}" --delete-after --checksum ${imagesPath}/ ${remoteHostImages}/`);
 
 		console.log(chalk.green('Hashed images transferred.'));
 	} catch (error) {
@@ -127,7 +129,9 @@ async function transferApp() {
 	console.log(chalk.blue('Transferring app files...'));
 
 	try {
-		await $`rsync -avz -e "ssh -i ${sshKeyPath}" ${distPath}/ ${remoteHostApp}/ --delete-after ${dryRun ? '--dry-run' : ''}`;
+		await (dryRun
+			? $`rsync -avz -e "ssh -i ${sshKeyPath}" ${distPath}/ ${remoteHostApp}/ --delete-after --dry-run`
+			: $`rsync -avz -e "ssh -i ${sshKeyPath}" ${distPath}/ ${remoteHostApp}/ --delete-after`);
 		console.log(chalk.green('App files transferred.'));
 	} catch (error) {
 		console.error(chalk.red('Error transferring app files:'), error);
