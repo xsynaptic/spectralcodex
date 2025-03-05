@@ -117,7 +117,7 @@ export const MapPopup = memo(function MapPopup() {
 									{titleAlt}
 								</div>
 							) : undefined}
-							<div className="border-b-primary-300 text-primary-800 border-b pb-1 text-base leading-snug font-semibold">
+							<div className="border-b-primary-300 text-primary-800 dark:text-primary-300 dark:border-b-primary-700 border-b pb-1 text-base leading-snug font-semibold">
 								<a href={url}>{title}</a>
 							</div>
 							{precision <= 2 ? (
@@ -140,7 +140,7 @@ export const MapPopup = memo(function MapPopup() {
 									dangerouslySetInnerHTML={{ __html: description }}
 								/>
 							) : undefined}
-							<div className="text-primary-700 m-0 flex justify-between text-xs select-none">
+							<div className="text-primary-700 dark:text-primary-600 m-0 flex justify-between text-xs select-none">
 								<div
 									className="group flex cursor-pointer items-center gap-1"
 									onClick={() => {
@@ -165,7 +165,7 @@ export const MapPopup = memo(function MapPopup() {
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 24 24"
-												className="h-[20px] md:h-[16px]"
+												className="dark:text-primary-400 h-[20px] md:h-[16px]"
 											>
 												<use xlinkHref={`#${MapSpritesEnum.Wikipedia}`}></use>
 											</svg>

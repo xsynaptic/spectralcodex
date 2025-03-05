@@ -31,7 +31,7 @@ const t = getTranslations();
 			>
 				{pagePrevLink ? (
 					<li class="flex flex-wrap gap-1 pr-2">
-						<span class:list={['select-none', 'text-accent-300 dark:text-accent-200']}>
+						<span class:list={['select-none', 'text-accent-300 dark:text-accent-400']}>
 							&lsaquo;
 						</span>
 						<Link href={pagePrevLink}>{t('pagination.previous')}</Link>
@@ -79,7 +79,7 @@ const t = getTranslations();
 				{pageNextLink ? (
 					<li class="flex flex-wrap gap-1 pl-2">
 						<Link href={pageNextLink}>{t('pagination.next')}</Link>
-						<span class:list={['select-none', 'text-accent-300 dark:text-accent-200']}>
+						<span class:list={['select-none', 'text-accent-300 dark:text-accent-500']}>
 							&rsaquo;
 						</span>
 					</li>

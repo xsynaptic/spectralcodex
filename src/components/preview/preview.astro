@@ -45,7 +45,10 @@ const description = await Astro.slots.render('preview-description');
 ---
 
 <div
-	class:list={['rounded-md border p-2 shadow-inner', 'border-primary-300 bg-primary-200']}
+	class:list={[
+		'rounded-md border p-2 shadow-inner',
+		'border-primary-300 bg-primary-200 dark:border-primary-700 dark:bg-primary-900',
+	]}
 	{...props}
 >
 	{
@@ -76,14 +79,14 @@ const description = await Astro.slots.render('preview-description');
 			href={linkUrl}
 			class:list={[
 				'font-display font-bold transition-colors ease-in',
-				'text-primary-700 hover:text-accent-500',
+				'text-primary-700 hover:text-accent-500 dark:text-primary-300 dark:hover:text-accent-400',
 			]}
 		>
 			<slot name="preview-title" />
 		</a>
 		{
 			titleAlt ? (
-				<div class:list={['inline-flex font-semibold', 'text-primary-400']}>
+				<div class:list={['inline-flex font-semibold', 'text-primary-500 dark:text-primary-400']}>
 					<span class="font-light">(</span>
 					<Fragment set:html={titleAlt} />
 					<span class="font-light">)</span>
@@ -93,7 +96,9 @@ const description = await Astro.slots.render('preview-description');
 	</h2>
 	{
 		subtitle ? (
-			<div class:list={['mt-1 flex flex-wrap gap-1 text-sm font-medium', 'text-primary-500']}>
+			<div
+				class:list={['mt-1 flex flex-wrap gap-1 text-sm', 'text-primary-500 dark:text-primary-400']}
+			>
 				<Fragment set:html={subtitle} />
 			</div>
 		) : undefined
