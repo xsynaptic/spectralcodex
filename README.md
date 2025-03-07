@@ -4,7 +4,7 @@ This repository contains the working Astro project used to generate the [Spectra
 
 ## Usage
 
-Standard Astro commands apply; use `pnpm astro dev` to fire up the development server and `pnpm astro build` to generate a build. Deployment is handled by custom scripts invoked by `pnpm astro deploy-static` (but you'd need to modify this script for your own needs; it won't work out of the box).
+Standard Astro commands apply; use `pnpm astro dev` to fire up the development server and `pnpm astro build` to generate a build. Deployment is handled by custom scripts invoked by `pnpm deploy-static` (but you'd need to modify this script for your own needs; it won't work out of the box).
 
 ## Project Structure
 

@@ -481,4 +481,8 @@ export const linksMap = [
 		titleAlt: "Blair's 鐵道攝影",
 		match: 'blair-train.blogspot.',
 	},
+	{
+		title: 'Micromosa',
+		match: 'micromosa.com',
+	},
 ] as const satisfies Array<LinksMapItem>;
