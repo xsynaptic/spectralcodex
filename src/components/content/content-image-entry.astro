@@ -3,15 +3,15 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import type { ImageLayoutOption } from '@/lib/image/image-layout';
+import type { ImageLayoutOption } from '#lib/image/image-layout.ts';
 
-import { FEATURE_IMAGE_PAGES } from '@/constants';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getImageLayoutProps } from '@/lib/image/image-layout';
-import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
-import { getSiteUrl } from '@/lib/utils/routing';
-import { sanitizeAltAttribute, sanitizeCaption } from '@/lib/utils/text';
+import { FEATURE_IMAGE_PAGES } from '#constants.ts';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageLayoutProps } from '#lib/image/image-layout.ts';
+import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
 interface Props {
 	imageId: string;

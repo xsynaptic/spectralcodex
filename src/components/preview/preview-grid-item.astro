@@ -1,17 +1,17 @@
 ---
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import ContentDate from '@/components/content/content-date.astro';
-import FormatCjk from '@/components/format/format-cjk.astro';
-import FormatMarkdown from '@/components/format/format-markdown.astro';
-import FormatNumber from '@/components/format/format-number.astro';
-import DividedItem from '@/components/parts/divided-item.astro';
-import Link from '@/components/parts/link.astro';
-import ProseDescription from '@/components/parts/prose-description.astro';
-import Preview from '@/components/preview/preview.astro';
-import { getRegionAncestorsByIdFunction } from '@/lib/collections/regions/utils';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getContentUrl, getSiteUrl } from '@/lib/utils/routing';
+import ContentDate from '#components/content/content-date.astro';
+import FormatCjk from '#components/format/format-cjk.astro';
+import FormatMarkdown from '#components/format/format-markdown.astro';
+import FormatNumber from '#components/format/format-number.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Link from '#components/parts/link.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import Preview from '#components/preview/preview.astro';
+import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
 export interface PreviewItemProps {
 	showCollection?: boolean | undefined;

@@ -3,7 +3,7 @@ import type { LineString, MultiPoint, Point } from 'geojson';
 import { z } from 'astro:content';
 import * as R from 'remeda';
 
-import { getTruncatedLngLat } from '@/lib/map/map-utils';
+import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
 const GeometryTypeEnum = {
 	Point: 'Point',

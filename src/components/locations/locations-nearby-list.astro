@@ -1,14 +1,14 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import ContentSection from '@/components/content/content-section.astro';
-import FormatCjk from '@/components/format/format-cjk.astro';
-import ListColumnItem from '@/components/list/list-column-item.astro';
-import ListColumn from '@/components/list/list-column.astro';
-import Link from '@/components/parts/link.astro';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getContentUrl } from '@/lib/utils/routing';
+import ContentSection from '#components/content/content-section.astro';
+import FormatCjk from '#components/format/format-cjk.astro';
+import ListColumnItem from '#components/list/list-column-item.astro';
+import ListColumn from '#components/list/list-column.astro';
+import Link from '#components/parts/link.astro';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;

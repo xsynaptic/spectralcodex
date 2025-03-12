@@ -2,7 +2,7 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import * as R from 'remeda';
 
-import { getRegionsCollection } from '@/lib/collections/regions/data';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 
 /**
  * Type guard to ensure this collection entry is configured for regions
@@ -29,9 +29,9 @@ export async function getRegionsByIdsFunction() {
 				}
 				return entry;
 			})
-			.filter(
-				(entry): entry is CollectionEntry<'regions'> => !!entry,
-			) satisfies Array<CollectionEntry<'regions'>>;
+			.filter((entry): entry is CollectionEntry<'regions'> => !!entry) satisfies Array<
+			CollectionEntry<'regions'>
+		>;
 	};
 }
 

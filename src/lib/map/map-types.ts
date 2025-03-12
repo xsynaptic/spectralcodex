@@ -4,7 +4,7 @@ import type { FeatureCollection } from 'geojson';
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/react-map-component';
 import { z } from 'astro:content';
 
-import { NumericScaleSchema } from '@/lib/schemas/content';
+import { NumericScaleSchema } from '#lib/schemas/content.ts';
 
 // This is used to form map API endpoint URLs
 export const MapApiDataEnum = {

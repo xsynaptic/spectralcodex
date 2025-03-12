@@ -1,6 +1,6 @@
 import { funnel } from 'remeda';
 
-import { ThemeTypeEnum } from '@/components/theme/theme-types';
+import { ThemeTypeEnum } from '#components/theme/theme-types.ts';
 
 export function activateThemeToggle(toggleElementId: string) {
 	const toggleElement = document.querySelector<HTMLButtonElement>(toggleElementId);

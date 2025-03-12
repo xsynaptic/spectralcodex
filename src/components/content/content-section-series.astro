@@ -3,14 +3,14 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import ContentSection from '@/components/content/content-section.astro';
-import FormatCjk from '@/components/format/format-cjk.astro';
-import ListColumnItem from '@/components/list/list-column-item.astro';
-import ListColumn from '@/components/list/list-column.astro';
-import Link from '@/components/parts/link.astro';
-import ProseDescription from '@/components/parts/prose-description.astro';
-import { getSeriesByIdFunction } from '@/lib/collections/series/utils';
-import { getTranslations } from '@/lib/utils/i18n';
+import ContentSection from '#components/content/content-section.astro';
+import FormatCjk from '#components/format/format-cjk.astro';
+import ListColumnItem from '#components/list/list-column-item.astro';
+import ListColumn from '#components/list/list-column.astro';
+import Link from '#components/parts/link.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import { getSeriesByIdFunction } from '#lib/collections/series/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 const t = getTranslations();
 

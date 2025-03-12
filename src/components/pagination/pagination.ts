@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 
-import { getSiteUrl } from '@/lib/utils/routing';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface PaginationData {
 	getPageNumberLink: (pageNumber: number) => string;

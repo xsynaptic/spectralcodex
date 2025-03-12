@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { MAP_GEOMETRY_COORDINATES_PRECISION } from '@/constants';
+import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
 
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context

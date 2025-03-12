@@ -1,9 +1,9 @@
 ---
 import type { CollectionKey } from 'astro:content';
 
-import Link from '@/components/parts/link.astro';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getSiteUrl } from '@/lib/utils/routing';
+import Link from '#components/parts/link.astro';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	collection: CollectionKey;

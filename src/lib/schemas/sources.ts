@@ -1,7 +1,7 @@
 import { z } from 'astro:content';
 
-import { sourcesMap } from '@/lib/data/sources';
-import { LinkSchema } from '@/lib/schemas/links';
+import { sourcesMap } from '#lib/data/sources.ts';
+import { LinkSchema } from '#lib/schemas/links.ts';
 
 const SourceItemSchema = z.object({
 	title: z.string(),

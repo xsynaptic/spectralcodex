@@ -3,11 +3,11 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getRegionsCollection } from '@/lib/collections/regions/data';
-import { filterRegionsWithContent } from '@/lib/collections/regions/utils';
-import { sortRegionsByContentCount } from '@/lib/collections/regions/utils';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import RegionIndex from '@/pages-layouts/region-index.astro';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { filterRegionsWithContent } from '#lib/collections/regions/utils.ts';
+import { sortRegionsByContentCount } from '#lib/collections/regions/utils.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import RegionIndex from '#pages-layouts/region-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();

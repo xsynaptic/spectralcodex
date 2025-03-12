@@ -1,4 +1,4 @@
-import type { SourceItemInput } from '@/lib/schemas/sources';
+import type { SourceItemInput } from '#lib/schemas/sources.ts';
 
 // Commonly cited sources
 export const sourcesMap = {

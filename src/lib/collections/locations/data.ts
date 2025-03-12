@@ -13,9 +13,9 @@ import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
 
-import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
-import { getImageByIdFunction } from '@/lib/collections/images/utils';
-import { getContentUrl } from '@/lib/utils/routing';
+import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface CollectionData {
 	locations: Array<CollectionEntry<'locations'>>;

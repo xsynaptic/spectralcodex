@@ -5,14 +5,14 @@ import type {
 	MapGeometry,
 	MapPopupDataRaw,
 	MapSourceDataRaw,
-} from '@/lib/map/map-types';
+} from '#lib/map/map-types.ts';
 
 import {
 	MapApiDataEnum,
 	MapGeometryTypeMap,
 	MapLocationCategoryMap,
 	MapLocationStatusMap,
-} from '@/lib/map/map-types';
+} from '#lib/map/map-types.ts';
 
 // An alternative to using Turf's truncate function
 function getMapGeometryOptimized(geometry: MapGeometry) {

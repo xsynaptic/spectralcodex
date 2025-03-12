@@ -8,9 +8,9 @@ import {
 	OPEN_GRAPH_IMAGE_FALLBACK_COUNT,
 	OPEN_GRAPH_IMAGE_FALLBACK_PREFIX,
 	OPEN_GRAPH_IMAGE_FORMAT,
-} from '@/constants';
-import { parseContentDate } from '@/lib/utils/date';
-import { stripMdxComponents, textClipper } from '@/lib/utils/text';
+} from '#constants.ts';
+import { parseContentDate } from '#lib/utils/date.ts';
+import { stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 

@@ -11,12 +11,12 @@ import {
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
 	OPEN_GRAPH_TWITTER_USERNAME,
-} from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getSiteUrl } from '@/lib/utils/routing';
-import { getSeoDescription, getSeoImageFallback } from '@/lib/utils/seo';
-import { sanitizeAltAttribute } from '@/lib/utils/text';
+} from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoDescription, getSeoImageFallback } from '#lib/utils/seo.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 export interface MetaProps {
 	title?: string | undefined;

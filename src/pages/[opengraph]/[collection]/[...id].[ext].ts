@@ -3,14 +3,14 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import pLimit from 'p-limit';
 import * as R from 'remeda';
 
-import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '@/constants';
-import { getImageByIdFunction } from '@/lib/collections/images/utils';
-import { getRegionsCollection } from '@/lib/collections/regions/data';
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getThemesCollection } from '@/lib/collections/themes/data';
-import { getSingleFeaturedItem } from '@/lib/image/image-featured';
-import { getImageObject } from '@/lib/image/image-file-handling';
-import { getOpenGraphImage } from '@/lib/image/image-open-graph';
+import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getSingleFeaturedItem } from '#lib/image/image-featured.ts';
+import { getImageObject } from '#lib/image/image-file-handling.ts';
+import { getOpenGraphImage } from '#lib/image/image-open-graph.ts';
 
 export const getStaticPaths = (async () => {
 	const { regions } = await getRegionsCollection();

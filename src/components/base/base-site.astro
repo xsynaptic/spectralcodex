@@ -1,21 +1,21 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 
-import type { MetaProps } from '@/components/base/base-meta.astro';
+import type { MetaProps } from '#components/base/base-meta.astro';
 
 import '@fontsource-variable/commissioner';
 import '@fontsource-variable/geologica';
 import '@fontsource-variable/lora';
 import '@fontsource-variable/lora/wght-italic.css';
 
-import '@/styles/global.css';
-import BaseFooter from '@/components/base/base-footer.astro';
-import BaseHeader from '@/components/base/base-header.astro';
-import BaseMeta from '@/components/base/base-meta.astro';
-import LoadingBar from '@/components/progress-bar/progress-bar-loading.astro';
-import ReadingBar from '@/components/progress-bar/progress-bar-reading.astro';
-import ThemeManager from '@/components/theme/theme-manager.astro';
-import { getSiteUrl } from '@/lib/utils/routing';
+import '#styles/global.css';
+import BaseFooter from '#components/base/base-footer.astro';
+import BaseHeader from '#components/base/base-header.astro';
+import BaseMeta from '#components/base/base-meta.astro';
+import LoadingBar from '#components/progress-bar/progress-bar-loading.astro';
+import ReadingBar from '#components/progress-bar/progress-bar-reading.astro';
+import ThemeManager from '#components/theme/theme-manager.astro';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	meta?: MetaProps;

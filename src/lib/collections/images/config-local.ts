@@ -2,14 +2,14 @@ import { imageLoader } from '@spectralcodex/image-loader';
 import { defineCollection, z } from 'astro:content';
 import { ExifTool } from 'exiftool-vendored';
 
-import { CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '@/constants';
+import { CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
 import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholder,
 	getImageTitle,
-} from '@/lib/image/image-loader-utils';
-import { GeometrySchema } from '@/lib/schemas/geometry';
-import { getLocalImageTransformFunction } from '@/lib/schemas/image';
+} from '#lib/image/image-loader-utils.ts';
+import { GeometrySchema } from '#lib/schemas/geometry.ts';
+import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
 
 // Note: this file contains a more full-fledged image loader example
 // Because we are not using EXIF data in this project it is not currently in use

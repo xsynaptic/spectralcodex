@@ -1,11 +1,11 @@
 ---
 import * as R from 'remeda';
 
-import type { TimelineYearlyData } from '@/lib/timeline/timeline-types';
+import type { TimelineYearlyData } from '#lib/timeline/timeline-types.ts';
 
-import { FEATURE_DATE_ARCHIVES } from '@/constants';
-import { getTimelineYearlyMap } from '@/lib/timeline/timeline-items';
-import TimelineYearlyIndex from '@/pages-layouts/timeline-yearly-index.astro';
+import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
+import { getTimelineYearlyMap } from '#lib/timeline/timeline-items.ts';
+import TimelineYearlyIndex from '#pages-layouts/timeline-yearly-index.astro';
 
 const timelineYearlyMap = await getTimelineYearlyMap();
 

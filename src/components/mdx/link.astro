@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { getContentMetadataById } from '@/lib/metadata/metadata-utils';
+import { getContentMetadataById } from '#lib/metadata/metadata-utils.ts';
 
 interface Props extends HTMLAttributes<'a'> {
 	id?: string | undefined;

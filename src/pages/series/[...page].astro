@@ -3,10 +3,10 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import SeriesIndex from '@/pages-layouts/series-index.astro';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import SeriesIndex from '#pages-layouts/series-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { series } = await getSeriesCollection();

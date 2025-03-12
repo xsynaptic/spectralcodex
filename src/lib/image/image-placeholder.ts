@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 
-import { IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ, IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '@/constants';
-import { getImageObject } from '@/lib/image/image-file-handling';
+import { IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ, IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '#constants.ts';
+import { getImageObject } from '#lib/image/image-file-handling.ts';
 
 // Math to convert image dimensions into a constrained version for use with the placeholders
 // Note: `pixelCount` is the overall number of pixels in the placeholder

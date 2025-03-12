@@ -2,7 +2,7 @@ import {
 	TAILWIND_BREAKPOINT_CONTENT,
 	TAILWIND_BREAKPOINT_MD,
 	TAILWIND_BREAKPOINT_SM,
-} from '@/constants';
+} from '#constants.ts';
 
 // Note that only the first three are currently in use
 export type ImageLayoutOption =

@@ -1,8 +1,8 @@
 ---
-import ContentSection from '@/components/content/content-section.astro';
-import RegionsList from '@/components/regions/regions-list.astro';
-import { getRegionsByIdsFunction } from '@/lib/collections/regions/utils';
-import { getTranslations } from '@/lib/utils/i18n';
+import ContentSection from '#components/content/content-section.astro';
+import RegionsList from '#components/regions/regions-list.astro';
+import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
 	regionIds: Array<string> | undefined;

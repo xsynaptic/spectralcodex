@@ -3,18 +3,18 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getLocationsByIdsFunction } from '@/lib/collections/locations/utils';
-import { getPostsByIdsFunction } from '@/lib/collections/posts/utils';
-import { getRegionsCollection } from '@/lib/collections/regions/data';
-import { getRegionsOptions } from '@/lib/collections/regions/options';
-import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
-import { getMapData } from '@/lib/map/map-data';
-import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { filterHasFeaturedImage, sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import { getMapApiBaseUrl } from '@/lib/utils/routing';
-import RegionEntry from '@/pages-layouts/region-entry.astro';
+import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
+import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getRegionsOptions } from '#lib/collections/regions/options.ts';
+import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { getMapData } from '#lib/map/map-data.ts';
+import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
+import RegionEntry from '#pages-layouts/region-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();

@@ -1,14 +1,14 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
-import { CONTENT_COLLECTIONS_PATH } from '@/constants';
+import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
-} from '@/lib/schemas/content';
-import { LinkSchema } from '@/lib/schemas/links';
+} from '#lib/schemas/content.ts';
+import { LinkSchema } from '#lib/schemas/links.ts';
 
 // Note: pages do not have a flat structure; the URL will reflect the location on the file system
 export const pages = defineCollection({

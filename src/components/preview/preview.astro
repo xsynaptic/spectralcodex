@@ -4,11 +4,11 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getImageSrcsetWidths } from '@/lib/image/image-layout';
-import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
-import { sanitizeAltAttribute } from '@/lib/utils/text';
+import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;

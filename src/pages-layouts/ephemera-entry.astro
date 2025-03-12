@@ -3,16 +3,16 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import BaseSite from '@/components/base/base-site.astro';
-import ContentCollectionLink from '@/components/content/content-collection-link.astro';
-import ContentDate from '@/components/content/content-date.astro';
-import ContentHeader from '@/components/content/content-header.astro';
-import ContentSectionRegions from '@/components/content/content-section-regions.astro';
-import ContentSectionThemes from '@/components/content/content-section-themes.astro';
-import ImageHero from '@/components/image-hero/image-hero.astro';
-import DividedItem from '@/components/parts/divided-item.astro';
-import ProseBody from '@/components/parts/prose-body.astro';
-import { getSeoArticleProps, getSeoImageProps } from '@/lib/utils/seo';
+import BaseSite from '#components/base/base-site.astro';
+import ContentCollectionLink from '#components/content/content-collection-link.astro';
+import ContentDate from '#components/content/content-date.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSectionRegions from '#components/content/content-section-regions.astro';
+import ContentSectionThemes from '#components/content/content-section-themes.astro';
+import ImageHero from '#components/image-hero/image-hero.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ProseBody from '#components/parts/prose-body.astro';
+import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'ephemera'>;

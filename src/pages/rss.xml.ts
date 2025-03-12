@@ -15,13 +15,13 @@ import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import { parseContentDate, sortByDateReverseChronological } from '@/lib/utils/date';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getContentUrl } from '@/lib/utils/routing';
+import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Provide some helpful info while debugging RSS feed generation
 const DEBUG_RSS_FEED = true as boolean;

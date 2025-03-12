@@ -1,5 +1,5 @@
-import { FEATURE_IMAGE_COLLECTION } from '@/constants';
-import { getImagesCollection } from '@/lib/collections/images/data';
+import { FEATURE_IMAGE_COLLECTION } from '#constants.ts';
+import { getImagesCollection } from '#lib/collections/images/data.ts';
 
 export async function getImageCount() {
 	if (FEATURE_IMAGE_COLLECTION) {

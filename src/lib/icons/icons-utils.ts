@@ -5,7 +5,7 @@ import { getIcons, iconToSVG, parseIconSet, validateIconSet } from '@iconify/uti
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import { iconsCache } from '@/lib/icons/icons-cache';
+import { iconsCache } from '#lib/icons/icons-cache.ts';
 
 // Parse icon requests to generate a map of unique icon sets and corresponding names
 function getIconMap(iconRecord: Record<string, string>): Map<string, Array<string>> {

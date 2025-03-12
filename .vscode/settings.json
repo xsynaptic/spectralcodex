@@ -140,6 +140,7 @@
 		"*.css": "tailwindcss",
 		"*.conf.template": "nginx"
 	},
+	"typescript.preferences.importModuleSpecifier": "non-relative",
 	"workbench.editor.labelFormat": "short",
 	"[astro]": {
 		"editor.defaultFormatter": "astro-build.astro-vscode"

@@ -1,18 +1,18 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
-import { CONTENT_COLLECTIONS_PATH } from '@/constants';
-import { LocationTwHeritageSchema } from '@/lib/collections/locations/schemas';
+import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { LocationTwHeritageSchema } from '#lib/collections/locations/schemas.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
-} from '@/lib/schemas/content';
-import { GeometrySchema } from '@/lib/schemas/geometry';
-import { LinkSchema } from '@/lib/schemas/links';
-import { SourceSchema } from '@/lib/schemas/sources';
-import { LocationCategoryEnum, LocationStatusEnum } from '@/types/map-locations';
+} from '#lib/schemas/content.ts';
+import { GeometrySchema } from '#lib/schemas/geometry.ts';
+import { LinkSchema } from '#lib/schemas/links.ts';
+import { SourceSchema } from '#lib/schemas/sources.ts';
+import { LocationCategoryEnum, LocationStatusEnum } from '#types/map-locations.ts';
 
 export const locations = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/locations` }),

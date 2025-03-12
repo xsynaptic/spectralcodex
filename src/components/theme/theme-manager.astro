@@ -1,7 +1,7 @@
 ---
-import type { ThemeGeneralType } from '@/components/theme/theme-types';
+import type { ThemeGeneralType } from '#components/theme/theme-types.ts';
 
-import { ThemeTypeEnum } from '@/components/theme/theme-types';
+import { ThemeTypeEnum } from '#components/theme/theme-types.ts';
 
 interface Props {
 	defaultTheme?: ThemeGeneralType | undefined;
@@ -17,7 +17,7 @@ const { defaultTheme = ThemeTypeEnum.Auto } = Astro.props;
 }
 
 <script>
-	import { themeManager } from '@/components/theme/theme-manager';
+	import { themeManager } from '#components/theme/theme-manager.ts';
 
 	function initializeTheme() {
 		if (!window.theme) {

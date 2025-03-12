@@ -1,9 +1,9 @@
 ---
-import type { TimelineMonthlyData } from '@/lib/timeline/timeline-types';
+import type { TimelineMonthlyData } from '#lib/timeline/timeline-types.ts';
 
-import Link from '@/components/parts/link.astro';
-import TimelineList from '@/components/timeline/timeline-list.astro';
-import { getSiteUrl } from '@/lib/utils/routing';
+import Link from '#components/parts/link.astro';
+import TimelineList from '#components/timeline/timeline-list.astro';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	timelineMonthlyData: Array<TimelineMonthlyData>;

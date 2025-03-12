@@ -5,22 +5,22 @@ import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '@/constants';
-import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getPagesCollection } from '@/lib/collections/pages/data';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getRegionsCollection } from '@/lib/collections/regions/data';
-import { getPrimaryRegionIdFromEntryFunction } from '@/lib/collections/regions/utils';
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getThemesCollection } from '@/lib/collections/themes/data';
-import { getSingleFeaturedItem } from '@/lib/image/image-featured';
-import { validateLocations } from '@/lib/metadata/metadata-validate';
-import { parseContentDate } from '@/lib/utils/date';
-import { getContentUrl } from '@/lib/utils/routing';
-import { stripMdxComponents } from '@/lib/utils/text';
+import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '#constants.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getPagesCollection } from '#lib/collections/pages/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getPrimaryRegionIdFromEntryFunction } from '#lib/collections/regions/utils.ts';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getSingleFeaturedItem } from '#lib/image/image-featured.ts';
+import { validateLocations } from '#lib/metadata/metadata-validate.ts';
+import { parseContentDate } from '#lib/utils/date.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
+import { stripMdxComponents } from '#lib/utils/text.ts';
 
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();

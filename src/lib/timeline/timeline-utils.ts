@@ -1,4 +1,4 @@
-import type { TimelineSpan } from '@/lib/timeline/timeline-types';
+import type { TimelineSpan } from '#lib/timeline/timeline-types.ts';
 
 const getPaddedDate = (number: number): string => number.toString().padStart(2, '0');
 

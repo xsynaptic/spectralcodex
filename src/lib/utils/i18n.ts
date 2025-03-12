@@ -1,4 +1,4 @@
-import { defaultLanguage, translations } from '@/lib/data/translations';
+import { defaultLanguage, translations } from '#lib/data/translations.ts';
 
 // Boilerplate code from: https://docs.astro.build/en/recipes/i18n/#translate-ui-strings
 export function getLangFromUrl(url: URL) {

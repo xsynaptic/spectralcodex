@@ -1,7 +1,7 @@
-import type { TimelineMonthlyData, TimelineSpan } from '@/lib/timeline/timeline-types';
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { TimelineMonthlyData, TimelineSpan } from '#lib/timeline/timeline-types.ts';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { getTimelineMonthlySlug, getTimelineSpan } from '@/lib/timeline/timeline-utils';
+import { getTimelineMonthlySlug, getTimelineSpan } from '#lib/timeline/timeline-utils.ts';
 
 function getTimelineMonthlyItems(
 	timelineItems: Array<ContentMetadataItem>,

@@ -3,15 +3,15 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import Container from '@/components/parts/container.astro';
-import RegionsList from '@/components/regions/regions-list.astro';
-import { filterRegionsWithContent } from '@/lib/collections/regions/utils';
+import Container from '#components/parts/container.astro';
+import RegionsList from '#components/regions/regions-list.astro';
+import { filterRegionsWithContent } from '#lib/collections/regions/utils.ts';
 import {
 	getRegionAncestorsFunction,
 	getRegionsByIdsFunction,
 	sortRegionsByContentCount,
-} from '@/lib/collections/regions/utils';
-import { getTranslations } from '@/lib/utils/i18n';
+} from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;

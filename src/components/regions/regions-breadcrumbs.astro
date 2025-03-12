@@ -1,14 +1,14 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import type { DividerColor } from '@/components/parts/divided-item.astro';
+import type { DividerColor } from '#components/parts/divided-item.astro';
 
-import ListRow from '@/components/list/list-row.astro';
-import DividedItem from '@/components/parts/divided-item.astro';
-import Link from '@/components/parts/link.astro';
-import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getContentUrl } from '@/lib/utils/routing';
+import ListRow from '#components/list/list-row.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Link from '#components/parts/link.astro';
+import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;

@@ -1,8 +1,8 @@
-import type { MenuItem } from '@/lib/menu/menu-types';
+import type { MenuItem } from '#lib/menu/menu-types.ts';
 
-import { FEATURE_DATE_ARCHIVES } from '@/constants';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getSiteUrl } from '@/lib/utils/routing';
+import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
 

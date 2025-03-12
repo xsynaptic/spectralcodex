@@ -1,15 +1,15 @@
 ---
 import type { Page } from 'astro';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '@/components/base/base-site.astro';
-import ContentHeader from '@/components/content/content-header.astro';
-import ContentSection from '@/components/content/content-section.astro';
-import FormatMarkdown from '@/components/format/format-markdown.astro';
-import Pagination from '@/components/pagination/pagination.astro';
-import PreviewGrid from '@/components/preview/preview-grid.astro';
-import { getTranslations } from '@/lib/utils/i18n';
+import BaseSite from '#components/base/base-site.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import FormatMarkdown from '#components/format/format-markdown.astro';
+import Pagination from '#components/pagination/pagination.astro';
+import PreviewGrid from '#components/preview/preview-grid.astro';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
 	page: Page<ContentMetadataItem>;

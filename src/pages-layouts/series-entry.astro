@@ -4,21 +4,21 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import type { MapComponentData } from '@/lib/map/map-types';
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '@/components/base/base-site.astro';
-import ContentCollectionLink from '@/components/content/content-collection-link.astro';
-import ContentHeader from '@/components/content/content-header.astro';
-import ContentSection from '@/components/content/content-section.astro';
-import ImageHeroCarousel from '@/components/image-hero/image-hero-carousel.astro';
-import MapComponent from '@/components/map/map-component.astro';
-import Pagination from '@/components/pagination/pagination.astro';
-import ProseBody from '@/components/parts/prose-body.astro';
-import PreviewGrid from '@/components/preview/preview-grid.astro';
-import { getFeaturedItemsMetadata } from '@/lib/image/image-featured';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getSeoImageProps } from '@/lib/utils/seo';
+import BaseSite from '#components/base/base-site.astro';
+import ContentCollectionLink from '#components/content/content-collection-link.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
+import MapComponent from '#components/map/map-component.astro';
+import Pagination from '#components/pagination/pagination.astro';
+import ProseBody from '#components/parts/prose-body.astro';
+import PreviewGrid from '#components/preview/preview-grid.astro';
+import { getFeaturedItemsMetadata } from '#lib/image/image-featured.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'series'>;

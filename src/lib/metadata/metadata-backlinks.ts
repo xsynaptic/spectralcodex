@@ -1,6 +1,6 @@
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 // A specialized function for fetching backlink metadata
 export async function getContentBacklinks({ id }: { id: string }) {

@@ -1,8 +1,8 @@
 import { reference, z } from 'astro:content';
 
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
-import { LinkSchema } from '@/lib/schemas/links';
-import { SourceSchema } from '@/lib/schemas/sources';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { LinkSchema } from '#lib/schemas/links.ts';
+import { SourceSchema } from '#lib/schemas/sources.ts';
 
 // Used by ephemera and posts
 export const postSchema = z

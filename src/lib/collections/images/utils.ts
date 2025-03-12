@@ -1,4 +1,4 @@
-import { getImagesCollection } from '@/lib/collections/images/data';
+import { getImagesCollection } from '#lib/collections/images/data.ts';
 
 // Common utility function for converting an image ID into actual content
 export async function getImageById(id: string | undefined) {

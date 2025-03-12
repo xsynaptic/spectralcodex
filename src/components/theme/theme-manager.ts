@@ -2,9 +2,9 @@ import type {
 	ThemeChangedEvent,
 	ThemeGeneralType,
 	ThemeSystemType,
-} from '@/components/theme/theme-types';
+} from '#components/theme/theme-types.ts';
 
-import { isThemeTypeValid, ThemeTypeEnum } from '@/components/theme/theme-types';
+import { isThemeTypeValid, ThemeTypeEnum } from '#components/theme/theme-types.ts';
 
 /**
  * Adapted from Astro Tips!

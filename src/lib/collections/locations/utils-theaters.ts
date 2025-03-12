@@ -1,6 +1,6 @@
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 
 // Saved queries for use in MDX and other places
 // TODO: this should eventually end up in a database or something

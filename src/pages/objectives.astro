@@ -1,11 +1,11 @@
 ---
 import * as R from 'remeda';
 
-import { getObjectiveLocations } from '@/lib/collections/locations/utils-objectives';
-import { getMapData } from '@/lib/map/map-data';
-import { getLocationsFeatureCollection } from '@/lib/map/map-locations';
-import { getMapApiBaseUrl } from '@/lib/utils/routing';
-import ObjectivesLayout from '@/pages-layouts/objectives.astro';
+import { getObjectiveLocations } from '#lib/collections/locations/utils-objectives.ts';
+import { getMapData } from '#lib/map/map-data.ts';
+import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
+import ObjectivesLayout from '#pages-layouts/objectives.astro';
 
 const objectiveLocations = await getObjectiveLocations();
 

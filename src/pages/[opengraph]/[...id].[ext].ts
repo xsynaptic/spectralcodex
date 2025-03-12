@@ -3,14 +3,14 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import pLimit from 'p-limit';
 import * as R from 'remeda';
 
-import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '@/constants';
-import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
-import { getImageByIdFunction } from '@/lib/collections/images/utils';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getPagesCollection } from '@/lib/collections/pages/data';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getImageObject } from '@/lib/image/image-file-handling';
-import { getOpenGraphImage } from '@/lib/image/image-open-graph';
+import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getPagesCollection } from '#lib/collections/pages/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getImageObject } from '#lib/image/image-file-handling.ts';
+import { getOpenGraphImage } from '#lib/image/image-open-graph.ts';
 
 export const getStaticPaths = (async () => {
 	const { ephemera } = await getEphemeraCollection();

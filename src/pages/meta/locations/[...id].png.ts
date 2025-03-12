@@ -3,13 +3,13 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import { getGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
 import * as R from 'remeda';
 
-import { FEATURE_OPEN_GRAPH_IMAGES } from '@/constants';
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getImageObject } from '@/lib/image/image-file-handling';
-import { openGraphImageFonts } from '@/lib/image/image-open-graph-fonts';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
+import { FEATURE_OPEN_GRAPH_IMAGES } from '#constants.ts';
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getImageObject } from '#lib/image/image-file-handling.ts';
+import { openGraphImageFonts } from '#lib/image/image-open-graph-fonts.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 
 // TODO: this feature is currently under development
 export const getStaticPaths = (async () => {

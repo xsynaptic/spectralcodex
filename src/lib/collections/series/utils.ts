@@ -1,13 +1,13 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getLocationsByPostsFunction } from '@/lib/collections/locations/utils';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
-import { filterHasFeaturedImage } from '@/lib/metadata/metadata-utils';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getLocationsByPostsFunction } from '#lib/collections/locations/utils.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { filterHasFeaturedImage } from '#lib/metadata/metadata-utils.ts';
 
 // Filter the content metadata index for series items by ID
 export async function getSeriesContentMetadataItemsFunction() {

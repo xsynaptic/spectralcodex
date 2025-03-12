@@ -1,6 +1,6 @@
 import { z } from 'astro:content';
 
-import { linksMap } from '@/lib/data/links';
+import { linksMap } from '#lib/data/links.ts';
 
 const LinkItemSchema = z.object({
 	title: z.string(),

@@ -1,9 +1,9 @@
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
-import { logError } from '@/lib/utils/logging';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { logError } from '#lib/utils/logging.ts';
 
 // This should match the output of `getImageArrayItemSchema`, which we can't seem to get directly
 export interface FeaturedItemBaseMetadata {

@@ -1,14 +1,14 @@
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { getEphemeraCollection } from '@/lib/collections/ephemera/data';
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
-import { getTimelineSlugs, getTimelineYearlySlug } from '@/lib/timeline/timeline-utils';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
+import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import { getTimelineSlugs, getTimelineYearlySlug } from '#lib/timeline/timeline-utils.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 async function getTimelineMetadata(): Promise<Array<ContentMetadataItem>> {
 	const { ephemera } = await getEphemeraCollection();

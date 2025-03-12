@@ -1,9 +1,9 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
 
-import { CONTENT_COLLECTIONS_PATH } from '@/constants';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '@/lib/schemas/content';
-import { FeaturedImagesSchema } from '@/lib/schemas/image';
+import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { FeaturedImagesSchema } from '#lib/schemas/image.ts';
 
 export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),

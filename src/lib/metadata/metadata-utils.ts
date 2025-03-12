@@ -2,11 +2,11 @@ import type { CollectionKey } from 'astro:content';
 
 import slugify from '@sindresorhus/slugify';
 
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import { FEATURE_SHORTCODES_ERROR_LOG } from '@/constants';
-import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
-import { logError } from '@/lib/utils/logging';
+import { FEATURE_SHORTCODES_ERROR_LOG } from '#constants.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { logError } from '#lib/utils/logging.ts';
 
 export async function getContentMetadataById(id: string | undefined) {
 	const contentMetadataIndex = await getContentMetadataIndex();

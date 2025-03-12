@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 
 // Used to conditionally render descriptions or body contents of an entry
 export const getLocationHasContent = (entry: CollectionEntry<'locations'>) =>
@@ -20,9 +20,9 @@ export async function getLocationsByIdsFunction() {
 				}
 				return entry;
 			})
-			.filter(
-				(entry): entry is CollectionEntry<'locations'> => !!entry,
-			) satisfies Array<CollectionEntry<'locations'>>;
+			.filter((entry): entry is CollectionEntry<'locations'> => !!entry) satisfies Array<
+			CollectionEntry<'locations'>
+		>;
 	};
 }
 
@@ -37,8 +37,8 @@ export async function getLocationsByPostsFunction() {
 
 		return ids
 			.map((id) => locationsMap.get(id))
-			.filter(
-				(entry): entry is CollectionEntry<'locations'> => !!entry,
-			) satisfies Array<CollectionEntry<'locations'>>;
+			.filter((entry): entry is CollectionEntry<'locations'> => !!entry) satisfies Array<
+			CollectionEntry<'locations'>
+		>;
 	};
 }

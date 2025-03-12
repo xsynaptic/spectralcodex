@@ -3,17 +3,17 @@ import type { Page } from 'astro';
 
 import { render } from 'astro:content';
 
-import BaseSite from '@/components/base/base-site.astro';
-import ContentDate from '@/components/content/content-date.astro';
-import ContentExcerpt from '@/components/content/content-excerpt.astro';
-import ContentHeader from '@/components/content/content-header.astro';
-import ContentSection from '@/components/content/content-section.astro';
-import FormatMarkdown from '@/components/format/format-markdown.astro';
-import PaginationCounter from '@/components/pagination/pagination-counter.astro';
-import Pagination from '@/components/pagination/pagination.astro';
-import Container from '@/components/parts/container.astro';
-import { getTranslations } from '@/lib/utils/i18n';
-import { getContentUrl } from '@/lib/utils/routing';
+import BaseSite from '#components/base/base-site.astro';
+import ContentDate from '#components/content/content-date.astro';
+import ContentExcerpt from '#components/content/content-excerpt.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import FormatMarkdown from '#components/format/format-markdown.astro';
+import PaginationCounter from '#components/pagination/pagination-counter.astro';
+import Pagination from '#components/pagination/pagination.astro';
+import Container from '#components/parts/container.astro';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	page: Page;

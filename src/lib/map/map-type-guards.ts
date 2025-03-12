@@ -1,7 +1,7 @@
 import type { Feature, FeatureCollection } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 
-import type { MapGeometry } from '@/lib/map/map-types';
+import type { MapGeometry } from '#lib/map/map-types.ts';
 
 export const isGeojsonFeature = <T extends MapGeometry, P>(
 	input: Feature<T, P> | FeatureCollection | undefined,

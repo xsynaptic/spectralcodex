@@ -4,19 +4,19 @@ import type { CollectionEntry } from 'astro:content';
 
 import { Image } from 'astro:assets';
 
-import BaseSite from '@/components/base/base-site.astro';
-import ContentDate from '@/components/content/content-date.astro';
-import ContentHeader from '@/components/content/content-header.astro';
-import ContentSection from '@/components/content/content-section.astro';
-import Container from '@/components/parts/container.astro';
-import DateDisplay from '@/components/parts/date-display.astro';
-import DividedItem from '@/components/parts/divided-item.astro';
-import TextGridItem from '@/components/parts/text-grid-item.astro';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
-import { getImageLayoutProps } from '@/lib/image/image-layout';
-import { getImagePlaceholderProps } from '@/lib/image/image-placeholder';
-import { getTranslations } from '@/lib/utils/i18n';
-import { sanitizeAltAttribute } from '@/lib/utils/text';
+import BaseSite from '#components/base/base-site.astro';
+import ContentDate from '#components/content/content-date.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import Container from '#components/parts/container.astro';
+import DateDisplay from '#components/parts/date-display.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import TextGridItem from '#components/parts/text-grid-item.astro';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { getImageLayoutProps } from '#lib/image/image-layout.ts';
+import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
 	image: CollectionEntry<'images'>;
@@ -24,21 +24,21 @@ interface Props {
 
 const { image } = Astro.props;
 
-const { src: imageMetadata, title, titleAlt, dateCaptured, placeholder } = image.data;
+// const { title, titleAlt, dateCaptured } = image.data;
 
-const alt = sanitizeAltAttribute(title ?? '');
+const alt = sanitizeAltAttribute(image.data.title ?? '');
 
 const imageProps = {
-	src: imageMetadata,
+	src: image.data.src,
 	alt,
 	format: IMAGE_FORMAT,
 	quality: IMAGE_QUALITY,
 	...getImageLayoutProps({
-		width: imageMetadata.width,
-		height: imageMetadata.height,
+		width: image.data.width,
+		height: image.data.height,
 		layout: 'medium',
 	}),
-	...getImagePlaceholderProps(placeholder),
+	...getImagePlaceholderProps(image.data.placeholder),
 } satisfies RemoteImageProps;
 
 // TODO: offer direct image downloads at various sizes
@@ -49,18 +49,18 @@ const t = getTranslations();
 
 <BaseSite
 	meta={{
-		title,
+		title: image.data.title,
 		description: `Image page for "${image.id}".`,
 		imageId: image.id,
 		imageAlt: alt,
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{title}</Fragment>
-		<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+		<Fragment slot="header-title">{image.data.title}</Fragment>
+		<Fragment slot="header-title-alt">{image.data.titleAlt}</Fragment>
 		<Fragment slot="header-subtitle">
 			<DividedItem>
-				<ContentDate date={dateCaptured} datePreset="long" />
+				<ContentDate date={image.data.dateCaptured} datePreset="long" />
 			</DividedItem>
 		</Fragment>
 	</ContentHeader>
@@ -120,7 +120,7 @@ const t = getTranslations();
 						<Fragment slot="grid-item-title">
 							{t('collection.images.metadata.shutterSpeed.label')}
 						</Fragment>
-						{`${image.data.shutterSpeed} sec`}
+						{`${String(image.data.shutterSpeed)} sec`}
 					</TextGridItem>
 				) : undefined
 			}
@@ -158,7 +158,7 @@ const t = getTranslations();
 					>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
 				>
 				<Fragment
-					set:html={`${String(imageMetadata.width)}&#8202;&#215;&#8202;${String(imageMetadata.height)}`}
+					set:html={`${String(image.data.width)}&#8202;&#215;&#8202;${String(image.data.height)}`}
 				/>
 			</TextGridItem>
 		</div>

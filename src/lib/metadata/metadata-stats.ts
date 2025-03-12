@@ -1,8 +1,8 @@
 import * as R from 'remeda';
 
-import { getImageCount } from '@/lib/image/image-stats';
-import { getContentMetadataIndex } from '@/lib/metadata/metadata-index';
-import { formatNumber } from '@/lib/utils/text';
+import { getImageCount } from '#lib/image/image-stats.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 export async function getContentStats() {
 	const contentMetadataIndex = await getContentMetadataIndex();

@@ -1,9 +1,9 @@
 ---
-import type { ContentMetadataItem } from '@/types/metadata';
+import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import FormatCjk from '@/components/format/format-cjk.astro';
-import Link from '@/components/parts/link.astro';
-import { getTranslations } from '@/lib/utils/i18n';
+import FormatCjk from '#components/format/format-cjk.astro';
+import Link from '#components/parts/link.astro';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 type Props = ContentMetadataItem;
 
@@ -18,13 +18,13 @@ const t = getTranslations();
 	title ? (
 		<div
 			class:list={[
-				'sm:min-h-none pointer-events-none absolute bottom-0 left-0 right-0 z-40 mx-auto flex min-h-[80px] max-w-content flex-col justify-end sm:bg-none',
+				'sm:min-h-none max-w-content pointer-events-none absolute right-0 bottom-0 left-0 z-40 mx-auto flex min-h-[80px] flex-col justify-end sm:bg-none',
 				'bg-featured-b',
 			]}
 		>
 			<div
 				class:list={[
-					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 pr-small text-sm sm:max-w-[70%] md:pr-medium',
+					'pr-small md:pr-medium pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm sm:max-w-[70%]',
 					'text-primary-300',
 				]}
 			>

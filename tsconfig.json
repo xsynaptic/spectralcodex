@@ -2,15 +2,14 @@
 	"extends": "astro/tsconfigs/strictest",
 	"compilerOptions": {
 		"baseUrl": ".",
+		"rootDir": ".",
 		"outDir": "dist",
 		"strictNullChecks": true,
+		"erasableSyntaxOnly": true,
 		"checkJs": true, // `allowJs` already set upstream
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
-		"types": ["vitest/globals"],
-		"paths": {
-			"@/*": ["src/*"]
-		}
+		"types": ["vitest/globals"]
 	},
 	"include": [
 		".astro/types.d.ts",

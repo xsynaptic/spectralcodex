@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { getSiteUrl } from '@/lib/utils/routing';
+import { getSiteUrl } from '#lib/utils/routing.ts';
 
 export const GET = (() => {
 	const sitemapUrl = `${getSiteUrl()}sitemap-index.xml`;

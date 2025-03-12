@@ -3,17 +3,17 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import type { FeaturedItemMetadata } from '@/lib/image/image-featured';
+import type { FeaturedItemMetadata } from '#lib/image/image-featured.ts';
 
-import ImageHeroCarouselCaption from '@/components/image-hero/image-hero-carousel-caption.astro';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
-import { getImageSrcsetWidths } from '@/lib/image/image-layout';
+import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import {
 	getImagePlaceholderDataUrlHq,
 	getImagePlaceholderProps,
-} from '@/lib/image/image-placeholder';
-import { sanitizeAltAttribute } from '@/lib/utils/text';
+} from '#lib/image/image-placeholder.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends FeaturedItemMetadata {
 	loading: 'lazy' | 'eager' | null | undefined;

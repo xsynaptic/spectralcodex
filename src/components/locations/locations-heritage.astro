@@ -1,10 +1,10 @@
 ---
-import type { LocationTwHeritage } from '@/lib/collections/locations/schemas';
+import type { LocationTwHeritage } from '#lib/collections/locations/schemas.ts';
 
-import ContentSection from '@/components/content/content-section.astro';
-import FormatCjk from '@/components/format/format-cjk.astro';
-import { LocationTwHeritageRecords } from '@/lib/collections/locations/schemas';
-import { getTranslations } from '@/lib/utils/i18n';
+import ContentSection from '#components/content/content-section.astro';
+import FormatCjk from '#components/format/format-cjk.astro';
+import { LocationTwHeritageRecords } from '#lib/collections/locations/schemas.ts';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
 	heritage: LocationTwHeritage | undefined;

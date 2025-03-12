@@ -3,11 +3,11 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import PostArchive from '@/pages-layouts/post-index.astro';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import PostIndex from '#pages-layouts/post-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { posts } = await getPostsCollection();
@@ -27,4 +27,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<PostArchive {...Astro.props} />
+<PostIndex {...Astro.props} />

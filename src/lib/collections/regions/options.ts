@@ -1,4 +1,4 @@
-import { getTranslations } from '@/lib/utils/i18n';
+import { getTranslations } from '#lib/utils/i18n.ts';
 
 export interface RegionsOption {
 	mapBoundsBuffer?: number;

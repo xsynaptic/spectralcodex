@@ -5,12 +5,12 @@ import type {
 	MapComponentData,
 	MapComponentProps,
 	MapFeatureCollection,
-} from '@/lib/map/map-types';
+} from '#lib/map/map-types.ts';
 
-import { getLocationsMapPopupData, getLocationsMapSourceData } from '@/lib/map/map-locations';
-import { isLngLatBoundsLike } from '@/lib/map/map-type-guards';
-import { MapApiDataEnum } from '@/lib/map/map-types';
-import { getTruncatedLngLat } from '@/lib/map/map-utils';
+import { getLocationsMapPopupData, getLocationsMapSourceData } from '#lib/map/map-locations.ts';
+import { isLngLatBoundsLike } from '#lib/map/map-type-guards.ts';
+import { MapApiDataEnum } from '#lib/map/map-types.ts';
+import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
 interface MapDataBoundsProps {
 	boundsBuffer?: number | undefined;

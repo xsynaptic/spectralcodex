@@ -2,8 +2,8 @@ import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
 import sharp from 'sharp';
 
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@/constants';
-import { OPEN_GRAPH_IMAGE_DENSITY } from '@/constants';
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
+import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 
 // A basic OpenGraph image function; nothing fancy, just returns a featured image
 export async function getOpenGraphImage({

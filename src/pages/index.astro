@@ -1,14 +1,14 @@
 ---
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '@/lib/collections/locations/data';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getThemesCollection } from '@/lib/collections/themes/data';
-import { getContentMetadataFunction } from '@/lib/metadata/metadata-items';
-import { filterHasFeaturedImage, sortContentMetadataByDate } from '@/lib/metadata/metadata-utils';
-import { getFilterEntryQualityFunction } from '@/lib/utils/collections';
-import IndexLayout from '@/pages-layouts/index.astro';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import IndexLayout from '#pages-layouts/index.astro';
 
 const { locations } = await getLocationsCollection();
 const { posts } = await getPostsCollection();

@@ -2,8 +2,8 @@ import { wrapCjk } from '@xsynaptic/unified-tools';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 
-import { IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '@/constants';
-import { getImagePlaceholderDataUrl } from '@/lib/image/image-placeholder';
+import { IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '#constants.ts';
+import { getImagePlaceholderDataUrl } from '#lib/image/image-placeholder.ts';
 
 // Split raw titles in the format `English Title (中文)`
 export function getImageTitle(titleRaw: string | undefined) {

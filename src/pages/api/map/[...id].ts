@@ -2,20 +2,20 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '@/lib/collections/locations/data';
+import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getObjectiveLocations } from '#lib/collections/locations/utils-objectives.ts';
 import {
 	getLocationsByIdsFunction,
 	getLocationsByPostsFunction,
-} from '@/lib/collections/locations/utils';
-import { getObjectiveLocations } from '@/lib/collections/locations/utils-objectives';
-import { getPostsCollection } from '@/lib/collections/posts/data';
-import { getRegionsCollection } from '@/lib/collections/regions/data';
-import { getSeriesCollection } from '@/lib/collections/series/data';
-import { getLocationsBySeriesFunction } from '@/lib/collections/series/utils';
-import { getThemesCollection } from '@/lib/collections/themes/data';
-import { getLocationsByThemeFunction } from '@/lib/collections/themes/utils';
-import { getLocationsMapApiData } from '@/lib/map/map-locations';
-import { generateApiResponse } from '@/lib/utils/api';
+} from '#lib/collections/locations/utils.ts';
+import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getLocationsBySeriesFunction } from '#lib/collections/series/utils.ts';
+import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getLocationsByThemeFunction } from '#lib/collections/themes/utils.ts';
+import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
+import { generateApiResponse } from '#lib/utils/api.ts';
 
 // Note: map API is served in two parts, suffixed to the endpoint URL:
 // 1) a highly optimized endpoint with only essential point data
