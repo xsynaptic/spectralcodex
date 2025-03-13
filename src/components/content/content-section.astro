@@ -1,7 +1,8 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import ProseDescription from '@/components/parts/prose-description.astro';
+import Container from '#components/parts/container.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
@@ -19,15 +20,7 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 
 {
 	description || children?.trim() ? (
-		<div
-			class:list={[
-				'mb-medium',
-				'max-w-content md:px-medium mx-auto',
-				fillViewport ? 'sm:px-small' : 'px-small',
-				className,
-			]}
-			{...props}
-		>
+		<Container class:list={['mb-medium', className]} fillViewport={fillViewport} {...props}>
 			<header
 				class:list={[
 					description ? undefined : 'mb-2',
@@ -62,6 +55,6 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 				) : undefined}
 			</header>
 			<Fragment set:html={children} />
-		</div>
+		</Container>
 	) : undefined
 }

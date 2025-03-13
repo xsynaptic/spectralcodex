@@ -485,4 +485,9 @@ export const linksMap = [
 		title: 'Micromosa',
 		match: 'micromosa.com',
 	},
+	{
+		title: 'Kinmen Daily News',
+		titleAlt: '金門日報',
+		match: 'kmdn.gov.tw',
+	},
 ] as const satisfies Array<LinksMapItem>;

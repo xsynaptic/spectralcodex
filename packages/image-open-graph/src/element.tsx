@@ -13,7 +13,7 @@ export function getOpenGraphImageElement(
 			style={{
 				background: '#18181b',
 				display: 'flex',
-				fontFamily: '"Geologica"',
+				fontFamily: '"Geologica Variable"',
 				fontWeight: 500,
 				height: '100%',
 			}}

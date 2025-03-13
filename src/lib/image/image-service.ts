@@ -1,12 +1,13 @@
-import type { ImageMetadata, ImageTransform, LocalImageService } from 'astro';
+import type { ImageTransform, LocalImageService } from 'astro';
 import type { SharpImageServiceConfig } from 'astro/assets/services/sharp';
 import type { CollectionEntry } from 'astro:content';
 
 import sharpDefaultService from 'astro/assets/services/sharp';
+import { isESMImportedImage } from 'astro/assets/utils';
 import sharp from 'sharp';
 
-import { CONTENT_MEDIA_HOST } from '@/constants';
-import { getImageById } from '@/lib/collections/images/utils';
+import { CONTENT_MEDIA_HOST } from '#constants.ts';
+import { getImageById } from '#lib/collections/images/utils.ts';
 
 /**
  * This custom image service adapts code from Astro core to accomplish several goals:
@@ -29,15 +30,6 @@ const VALID_IMAGE_FORMATS = ['jpeg', 'jpg', 'png', 'tiff', 'webp', 'gif', 'svg',
 type ValidImageFormat = (typeof VALID_IMAGE_FORMATS)[number];
 
 const DEFAULT_OUTPUT_FORMAT = 'jpg';
-
-function isESMImportedImage(src: ImageMetadata | string): src is ImageMetadata {
-	return (
-		typeof src === 'object' &&
-		typeof src.src === 'string' &&
-		typeof src.width === 'number' &&
-		typeof src.height === 'number'
-	);
-}
 
 /**
  * Returns the final dimensions of an image based on the user's options.
