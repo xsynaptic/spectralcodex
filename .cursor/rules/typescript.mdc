@@ -1,6 +1,7 @@
 ---
-description: JavaScript/TypeScript Standards
-globs: *.ts, *.tsx, *.astro
+description: TypeScript standards; these rules and guidelines should always be consulted since the entire project is in TypeScript!
+globs: ["*.ts", "*.tsx", "*.astro"]
+alwaysApply: true
 ---
 # TypeScript coding standards
 

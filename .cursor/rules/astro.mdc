@@ -1,13 +1,14 @@
 ---
-description: Astro coding standards
-globs: *.astro
+description: Astro coding standards; consult this anytime Astro files are being created or modified
+globs: ["*.astro"]
+alwaysApply: false
 ---
 # Astro component development
 
 - Tailwind-First Approach: Use Tailwind CSS V4 for all styling, keeping the utility-first approach in mind. Optimize class usage to avoid excessive nesting or redundant styles.
 - Where necessary update [global.css](mdc:src/styles/global.css) (and its auxiliary files) when developing common patterns with Tailwind CSS V4.
 - Ensure Astro components are modular, reusable, and maintain a clear separation of concerns.
-- Pure Astro components should all go in `./src/components`; utilities should be organized into `./src/utils`, but be sure to use existing functionality where possible.
+- Pure Astro components should all go in `./src/components`; utilities should be organized into `./src/lib/utils`, but be sure to use existing functionality where possible.
 - Craft components so they leave no HTML output if no data is passed to them (usually with a conditional check on key props).
 - Ensure server-side rendering (SSR) compatibility for all components. Currently this project is static site generated (SSG) but it may become SSR in the future.
 
@@ -15,7 +16,6 @@ globs: *.astro
 
 - All Astro pages can be found in `./src/pages`; this includes several API endpoints.
 - Note that with Astro V5 we are using the Content Layer API and `id` instead of `slug` for determining most paths.
-- Rather than use `layouts` we use `pages-layouts` for the actual templates attached to different pages.
 
 # Coding standards
 
