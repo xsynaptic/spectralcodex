@@ -7,7 +7,7 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
-import LocationIndex from '#pages-layouts/location-index.astro';
+import LocationIndex from '#layouts/location-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { locations } = await getLocationsCollection();

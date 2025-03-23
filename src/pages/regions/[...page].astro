@@ -7,7 +7,7 @@ import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { filterRegionsWithContent } from '#lib/collections/regions/utils.ts';
 import { sortRegionsByContentCount } from '#lib/collections/regions/utils.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
-import RegionIndex from '#pages-layouts/region-index.astro';
+import RegionIndex from '#layouts/region-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();

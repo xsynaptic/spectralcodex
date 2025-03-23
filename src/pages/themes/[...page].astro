@@ -6,7 +6,7 @@ import * as R from 'remeda';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { filterThemesContent, sortThemesByContentCount } from '#lib/collections/themes/utils.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
-import ThemeIndex from '#pages-layouts/theme-index.astro';
+import ThemeIndex from '#layouts/theme-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { themes } = await getThemesCollection();

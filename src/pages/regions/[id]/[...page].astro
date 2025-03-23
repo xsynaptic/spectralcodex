@@ -14,7 +14,7 @@ import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import RegionEntry from '#pages-layouts/region-entry.astro';
+import RegionEntry from '#layouts/region-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();

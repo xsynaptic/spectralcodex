@@ -7,7 +7,7 @@ import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
-import PostIndex from '#pages-layouts/post-index.astro';
+import PostIndex from '#layouts/post-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { posts } = await getPostsCollection();

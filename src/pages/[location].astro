@@ -11,7 +11,7 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import LocationEntry from '#pages-layouts/location-entry.astro';
+import LocationEntry from '#layouts/location-entry.astro';
 
 export const getStaticPaths = (async () => {
 	const { locations } = await getLocationsCollection();

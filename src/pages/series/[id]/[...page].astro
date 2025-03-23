@@ -9,7 +9,7 @@ import {
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import SeriesEntry from '#pages-layouts/series-entry.astro';
+import SeriesEntry from '#layouts/series-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { series } = await getSeriesCollection();

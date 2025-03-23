@@ -6,7 +6,7 @@ import * as R from 'remeda';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
-import SeriesIndex from '#pages-layouts/series-index.astro';
+import SeriesIndex from '#layouts/series-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { series } = await getSeriesCollection();
