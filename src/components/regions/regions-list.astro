@@ -1,18 +1,18 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import type { DividerContent } from '@/types/components';
+import type { DividerContent } from '#components/parts/divided-item.astro';
 
-import FormatCjk from '@/components/format/format-cjk.astro';
-import ListRow from '@/components/list/list-row.astro';
-import DividedItem from '@/components/parts/divided-item.astro';
-import Link from '@/components/parts/link.astro';
-import { getRegionAncestorsFunction } from '@/lib/collections/regions/utils';
-import { getContentUrl } from '@/lib/utils/routing';
+import FormatCjk from '#components/format/format-cjk.astro';
+import ListRow from '#components/list/list-row.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Link from '#components/parts/link.astro';
+import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	terms: Array<CollectionEntry<'regions'>> | undefined;
-	dividerContent?: DividerContent | undefined;
+	dividerContent?: DividerContent;
 	showSingleRegionAncestors?: boolean;
 	showTitleAlt?: boolean;
 }

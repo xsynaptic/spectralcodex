@@ -490,4 +490,8 @@ export const linksMap = [
 		titleAlt: '金門日報',
 		match: 'kmdn.gov.tw',
 	},
+	{
+		title: 'Dax Ward',
+		match: 'daxward.com',
+	},
 ] as const satisfies Array<LinksMapItem>;

@@ -7,7 +7,7 @@
 
 ## Image Assets
 
-Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom. Be sure to clean unreferenced original images out of your builds; they take up a lot of space without providing any benefit!
+Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom. Be sure to clean unreferenced original images out of your builds when using the local image strategy; they take up a lot of space without providing any benefit!
 
 ## Metadata Improvements
 
@@ -41,8 +41,6 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm exp
 
 - new content collection for commercial establishments (restaurants, cafes, etc.)... gastronomy?
 - [remark-oembed](https://github.com/sergioramos/remark-oembed), [mdx-embed](https://mdx-embed.netlify.app/), or [astro embed](https://astro-embed.netlify.app/)
-- images: [unpic](https://unpic.pics/), if we ever use a CDN that is
-- images: explore new responsive images features
 - multiple featured images for post-like content
 - carousel buttons (or some other hint to indicate that some images can be swiped)
 - better pagination (_e.g._ [here](https://github.com/philnash/astro-pagination))
