@@ -28,6 +28,12 @@ alwaysApply: false
 - Organize files using Astro's file-based routing system; all files should use kebab case (like-this.astro).
 - Use interactive client-side JavaScript sparingly, and for more complex implementations prefer React or native Web Components.
 
+# Conditional Rendering
+
+- Always use ternary expressions for conditional rendering
+- Always explicitly return `undefined` for the false case
+- Never use logical operators (`&&`) for conditional rendering 
+
 # Documentation
 
 Refer to the latest Astro documentation (only version 5 and above) at: https://docs.astro.build/

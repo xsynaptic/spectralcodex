@@ -25,3 +25,18 @@ Note that not every matched file contains React code! This rule set *only* appli
 - Use error boundaries for unexpected errors: Implement error boundaries using error.tsx and global-error.tsx files to handle unexpected errors and provide a fallback UI.
 - Define data input schemas using Zod for robust type checking and validation.
 - Handle errors gracefully and return appropriate responses.
+
+# Conditional Rendering
+
+- Always use ternary expressions for conditional rendering
+- Always explicitly return `undefined` for the false case
+- Never use logical operators (`&&`) for conditional rendering
+
+Example:
+```astro
+// ❌ Bad
+{condition && <Component />}
+
+// ✅ Good
+{condition ? <Component /> : undefined}
+```
