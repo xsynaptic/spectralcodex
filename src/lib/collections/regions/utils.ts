@@ -123,24 +123,3 @@ export async function getPrimaryRegionIdFromEntryFunction() {
 		return;
 	};
 }
-
-/**
- * Sorting and filtering functions
- */
-// Sort a collection of regions by post and location count, from most to least
-export function sortRegionsByContentCount(
-	entryA: CollectionEntry<'regions'>,
-	entryB: CollectionEntry<'regions'>,
-) {
-	const aTotal = (entryA.data.locationCount ?? 0) + (entryA.data.postCount ?? 0);
-	const bTotal = (entryB.data.locationCount ?? 0) + (entryB.data.postCount ?? 0);
-
-	return bTotal - aTotal;
-}
-
-// Filter out regions that do *not* have any public content
-export function filterRegionsWithContent(entry: CollectionEntry<'regions'>) {
-	if (entry.data.posts && entry.data.posts.length > 0) return true;
-	if (entry.data.locations && entry.data.locations.length > 0) return true;
-	return false;
-}

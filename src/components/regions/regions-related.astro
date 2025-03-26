@@ -5,12 +5,11 @@ import * as R from 'remeda';
 
 import Container from '#components/parts/container.astro';
 import RegionsList from '#components/regions/regions-list.astro';
-import { filterRegionsWithContent } from '#lib/collections/regions/utils.ts';
 import {
 	getRegionAncestorsFunction,
 	getRegionsByIdsFunction,
-	sortRegionsByContentCount,
 } from '#lib/collections/regions/utils.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
@@ -26,27 +25,22 @@ const SHOW_TITLE_ALT_DEPTH = 2;
 const getRegionsByIds = await getRegionsByIdsFunction();
 const getRegionAncestors = await getRegionAncestorsFunction();
 
+function getRegionsRelatedByIds(ids: Array<string> | undefined, limit: number) {
+	return ids
+		? R.pipe(
+				ids,
+				getRegionsByIds,
+				R.filter(filterWithContent),
+				R.sort(sortByContentCount),
+				R.take(limit)
+			)
+		: [];
+}
+
+const regionChildren = getRegionsRelatedByIds(entry.data.children, limit);
+const regionSiblings = getRegionsRelatedByIds(entry.data.siblings, limit);
+
 const depth = getRegionAncestors(entry).length;
-
-const regionChildren = entry.data.children
-	? R.pipe(
-			entry.data.children,
-			getRegionsByIds,
-			R.filter(filterRegionsWithContent),
-			R.sort(sortRegionsByContentCount),
-			R.take(limit)
-		)
-	: [];
-
-const regionSiblings = entry.data.siblings
-	? R.pipe(
-			entry.data.siblings,
-			getRegionsByIds,
-			R.filter(filterRegionsWithContent),
-			R.sort(sortRegionsByContentCount),
-			R.take(limit)
-		)
-	: [];
 
 const t = getTranslations();
 ---

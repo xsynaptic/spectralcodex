@@ -3,10 +3,10 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
-import { filterThemesContent, sortThemesByContentCount } from '#lib/collections/themes/utils.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import ThemeIndex from '#layouts/theme-index.astro';
+import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { themes } = await getThemesCollection();
@@ -15,8 +15,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	const metadataItems = R.pipe(
 		themes,
-		R.filter(filterThemesContent),
-		R.sort(sortThemesByContentCount),
+		R.filter(filterWithContent),
+		R.sort(sortByContentCount),
 		getContentMetadata
 	);
 

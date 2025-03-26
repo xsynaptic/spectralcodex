@@ -3,11 +3,10 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-import { filterRegionsWithContent } from '#lib/collections/regions/utils.ts';
-import { sortRegionsByContentCount } from '#lib/collections/regions/utils.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import RegionIndex from '#layouts/region-index.astro';
+import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();
@@ -17,8 +16,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const metadataItems = R.pipe(
 		regions,
 		R.filter(({ data }) => data.parent === undefined), // Only ancestral terms
-		R.filter(filterRegionsWithContent),
-		R.sort(sortRegionsByContentCount),
+		R.filter(filterWithContent),
+		R.sort(sortByContentCount),
 		getContentMetadata
 	);
 

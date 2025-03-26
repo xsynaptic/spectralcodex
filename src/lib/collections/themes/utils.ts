@@ -52,21 +52,3 @@ export async function getFilterTermsPostsFunction() {
 		return getPostsByTerm(term).length > 0;
 	};
 }
-
-// Filter out terms that do *not* have any associated posts or locations
-export function filterThemesContent(entry: CollectionEntry<'themes'>) {
-	if (entry.data.locationCount && entry.data.locationCount > 0) return true;
-	if (entry.data.postCount && entry.data.postCount > 0) return true;
-	return false;
-}
-
-// Sort a collection of terms by post and location count, from most to least
-export function sortThemesByContentCount(
-	entryA: CollectionEntry<'themes'>,
-	entryB: CollectionEntry<'themes'>,
-) {
-	const totalA = (entryA.data.postCount ?? 0) + (entryA.data.locationCount ?? 0);
-	const totalB = (entryB.data.postCount ?? 0) + (entryB.data.locationCount ?? 0);
-
-	return totalB - totalA;
-}

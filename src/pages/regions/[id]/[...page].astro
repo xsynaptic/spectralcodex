@@ -3,6 +3,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
+import RegionEntry from '#layouts/region-entry.astro';
 import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
 import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
@@ -14,7 +15,6 @@ import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import RegionEntry from '#layouts/region-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { regions } = await getRegionsCollection();
