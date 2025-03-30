@@ -66,7 +66,7 @@
 		"@types/postcss-inline-svg": "^5.0.4",
 		"@types/react": "^18.3.20",
 		"@types/react-dom": "^18.3.5",
-		"@xsynaptic/eslint-config": "^0.0.5",
+		"@xsynaptic/eslint-config": "^1.0.1",
 		"@xsynaptic/unified-tools": "^0.0.3",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.4",

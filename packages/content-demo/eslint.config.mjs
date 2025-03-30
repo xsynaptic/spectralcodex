@@ -1,6 +1,6 @@
 // @ts-check -- ESLint still lacks support for config files in native TypeScript
-import eslintMdx from 'eslint-mdx';
-import mdxPlugin from 'eslint-plugin-mdx';
+import * as eslintMdx from 'eslint-mdx';
+import * as eslintPluginMdx from 'eslint-plugin-mdx';
 
 export default [
 	{
@@ -8,7 +8,7 @@ export default [
 	},
 	{
 		files: ['**/*.mdx'],
-		...mdxPlugin.flat,
+		...eslintPluginMdx.flat,
 		languageOptions: {
 			sourceType: 'module',
 			ecmaVersion: 'latest',
@@ -23,7 +23,7 @@ export default [
 			},
 		},
 		plugins: {
-			mdx: mdxPlugin,
+			mdx: eslintPluginMdx,
 		},
 	},
 ];
