@@ -299,14 +299,14 @@ export const linksMap = [
 		match: 'smiletaiwan.cw.com.tw',
 	},
 	{
+		title: 'Commonwealth Magazine',
+		titleAlt: '天下雜誌',
+		match: 'cw.com.tw',
+	},
+	{
 		title: 'Wilhelm Chang',
 		titleAlt: '張威廉',
 		match: 'wilhelmchang.com',
-	},
-	{
-		title: 'Commonwealth Magazine',
-		titleAlt: '天下雜誌',
-		match: 'www.cw.com.tw',
 	},
 	{
 		title: 'XinMedia',
