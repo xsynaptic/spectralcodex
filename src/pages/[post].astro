@@ -3,12 +3,12 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
+import PostEntry from '#layouts/post-entry.astro';
 import { getLocationsByPostsFunction } from '#lib/collections/locations/utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import PostEntry from '#layouts/post-entry.astro';
 
 export const getStaticPaths = (async () => {
 	const { posts } = await getPostsCollection();

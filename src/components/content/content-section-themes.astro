@@ -7,9 +7,9 @@ import ListRow from '#components/list/list-row.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getThemesByIdsFunction } from '#lib/collections/themes/utils.ts';
+import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-import { sortByContentCount } from '#lib/utils/collections.ts';
 
 interface Props {
 	themeIds: Array<string> | undefined;
@@ -19,9 +19,7 @@ const { themeIds } = Astro.props;
 
 const getThemesByIds = await getThemesByIdsFunction();
 
-const themes = themeIds
-	? R.pipe(themeIds, getThemesByIds, R.sort(sortByContentCount))
-	: undefined;
+const themes = themeIds ? R.pipe(themeIds, getThemesByIds, R.sort(sortByContentCount)) : undefined;
 
 const t = getTranslations();
 ---

@@ -3,10 +3,10 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
+import EphemeraIndex from '#layouts/ephemera-index.astro';
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
-import EphemeraIndex from '#layouts/ephemera-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { ephemera } = await getEphemeraCollection();

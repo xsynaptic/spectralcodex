@@ -4,9 +4,9 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
+import TimelineMonthlyIndex from '#layouts/timeline-monthly-index.astro';
 import { getTimelineItemsMap } from '#lib/timeline/timeline-items.ts';
 import { getTimelineProps } from '#lib/timeline/timeline-props.ts';
-import TimelineMonthlyIndex from '#layouts/timeline-monthly-index.astro';
 
 export const getStaticPaths = (async () => {
 	if (!FEATURE_DATE_ARCHIVES) return [];

@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
+import SeriesEntry from '#layouts/series-entry.astro';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import {
 	getLocationsBySeriesFunction,
@@ -9,7 +10,6 @@ import {
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
-import SeriesEntry from '#layouts/series-entry.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { series } = await getSeriesCollection();

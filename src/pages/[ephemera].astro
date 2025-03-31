@@ -1,8 +1,8 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import EphemeraEntry from '#layouts/ephemera-entry.astro';
+import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 
 export const getStaticPaths = (async () => {
 	const { ephemera } = await getEphemeraCollection();

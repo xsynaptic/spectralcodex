@@ -3,11 +3,11 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
+import PostIndex from '#layouts/post-index.astro';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
-import PostIndex from '#layouts/post-index.astro';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { posts } = await getPostsCollection();

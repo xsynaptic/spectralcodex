@@ -4,8 +4,8 @@ import * as R from 'remeda';
 import type { TimelineYearlyData } from '#lib/timeline/timeline-types.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
-import { getTimelineYearlyMap } from '#lib/timeline/timeline-items.ts';
 import TimelineYearlyIndex from '#layouts/timeline-yearly-index.astro';
+import { getTimelineYearlyMap } from '#lib/timeline/timeline-items.ts';
 
 const timelineYearlyMap = await getTimelineYearlyMap();
 
