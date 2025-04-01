@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 
 import { render } from 'astro:content';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -27,7 +27,7 @@ const title = t('collection.ephemera.labelPlural');
 const description = t('collection.ephemera.description');
 ---
 
-<BaseSite meta={{ title, description }}>
+<MainSite meta={{ title, description }}>
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-title-info"><PaginationCounter page={page} /></Fragment>
@@ -71,4 +71,4 @@ const description = t('collection.ephemera.description');
 	<ContentSection>
 		<Pagination class="mt-small md:mt-medium" page={page} />
 	</ContentSection>
-</BaseSite>
+</MainSite>

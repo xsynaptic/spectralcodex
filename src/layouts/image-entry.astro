@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { Image } from 'astro:assets';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -47,7 +47,7 @@ const imageProps = {
 const t = getTranslations();
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		title: image.data.title,
 		description: `Image page for "${image.id}".`,
@@ -163,4 +163,4 @@ const t = getTranslations();
 			</TextGridItem>
 		</div>
 	</ContentSection>
-</BaseSite>
+</MainSite>

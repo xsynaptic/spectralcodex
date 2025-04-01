@@ -1,7 +1,7 @@
 ---
 import type { TimelineYearlyData } from '#lib/timeline/timeline-types.ts';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
@@ -22,7 +22,7 @@ const contentStats = await getContentStats();
 const t = getTranslations();
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		title: t('timeline.title'),
 		description: t('timeline.overview.description'),
@@ -67,4 +67,4 @@ const t = getTranslations();
 			{t('timeline.stats.images.label')}: {contentStats.images.itemCount}
 		</div>
 	</ContentSection>
-</BaseSite>
+</MainSite>

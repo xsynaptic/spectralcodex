@@ -1,7 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions';
 
-import type { MetaProps } from '#components/base/base-meta.astro';
+import type { MetaProps } from '#components/main/main-meta.astro';
 
 import '@fontsource-variable/commissioner';
 import '@fontsource-variable/geologica';
@@ -9,9 +9,9 @@ import '@fontsource-variable/lora';
 import '@fontsource-variable/lora/wght-italic.css';
 
 import '#styles/global.css';
-import BaseFooter from '#components/base/base-footer.astro';
-import BaseHeader from '#components/base/base-header.astro';
-import BaseMeta from '#components/base/base-meta.astro';
+import MainFooter from '#components/main/main-footer.astro';
+import MainHeader from '#components/main/main-header.astro';
+import MainMeta from '#components/main/main-meta.astro';
 import LoadingBar from '#components/progress-bar/progress-bar-loading.astro';
 import ReadingBar from '#components/progress-bar/progress-bar-reading.astro';
 import ThemeManager from '#components/theme/theme-manager.astro';
@@ -43,7 +43,7 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 			href={`${getSiteUrl()}favicon.svg`}
 			media="(prefers-color-scheme: dark)"
 		/>
-		<BaseMeta meta={meta} />
+		<MainMeta meta={meta} />
 		<ThemeManager defaultTheme="auto" />
 		<ClientRouter />
 	</head>
@@ -53,11 +53,11 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 			'bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-400',
 		]}
 	>
-		<BaseHeader hasHeroImage={hasHeroImage} />
+		<MainHeader hasHeroImage={hasHeroImage} />
 		<main id="content" class="flex-1">
 			<slot />
 		</main>
-		<BaseFooter />
+		<MainFooter />
 		<LoadingBar />
 		{hasReadingBar ? <ReadingBar /> : undefined}
 	</body>

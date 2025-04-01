@@ -7,7 +7,7 @@ import { render } from 'astro:content';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -45,7 +45,7 @@ const { Content } = await render(entry);
 const t = getTranslations();
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		title: titleAlt ? `${title} (${titleAlt})` : title,
 		description: description ?? entry.body ?? undefined,
@@ -94,4 +94,4 @@ const t = getTranslations();
 			) : undefined
 		}
 	</article>
-</BaseSite>
+</MainSite>

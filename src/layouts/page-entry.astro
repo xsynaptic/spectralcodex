@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
@@ -23,7 +23,7 @@ const {
 const { Content } = await render(entry);
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		title,
 		description,
@@ -56,4 +56,4 @@ const { Content } = await render(entry);
 		}
 		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
 	</article>
-</BaseSite>
+</MainSite>

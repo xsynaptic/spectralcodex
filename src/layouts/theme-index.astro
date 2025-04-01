@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 
 import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
@@ -23,7 +23,7 @@ const title = t(`collection.themes.labelPlural`);
 const description = t(`collection.themes.description`);
 ---
 
-<BaseSite meta={{ title, description }}>
+<MainSite meta={{ title, description }}>
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
@@ -45,4 +45,4 @@ const description = t(`collection.themes.description`);
 			) : undefined
 		}
 	</ContentSection>
-</BaseSite>
+</MainSite>

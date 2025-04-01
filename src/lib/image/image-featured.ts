@@ -6,13 +6,13 @@ import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
 
 // This should match the output of `getImageArrayItemSchema`, which we can't seem to get directly
-export interface FeaturedItemBaseMetadata {
+export interface FeaturedItemMainMetadata {
 	src?: string | undefined;
 	title?: string | undefined;
 	contentId?: string | undefined;
 }
 
-export interface FeaturedItemMetadata extends FeaturedItemBaseMetadata {
+export interface FeaturedItemMetadata extends FeaturedItemMainMetadata {
 	contentMetadata?: ContentMetadataItem;
 }
 
@@ -21,7 +21,7 @@ export function getSingleFeaturedItem({
 	images,
 	shuffle = false,
 }: {
-	images: Array<FeaturedItemBaseMetadata> | undefined;
+	images: Array<FeaturedItemMainMetadata> | undefined;
 	shuffle?: boolean;
 }) {
 	if (!images) return;
@@ -36,7 +36,7 @@ export async function getFeaturedItemsMetadata({
 	images,
 	shuffle = false,
 }: {
-	images: Array<FeaturedItemBaseMetadata> | undefined;
+	images: Array<FeaturedItemMainMetadata> | undefined;
 	shuffle?: boolean;
 }): Promise<Array<FeaturedItemMetadata> | undefined> {
 	if (!images) return undefined;

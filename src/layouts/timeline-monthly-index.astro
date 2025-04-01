@@ -2,7 +2,7 @@
 import type { TimelineMonthlyData, TimelineSpan } from '#lib/timeline/timeline-types.ts';
 import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import Link from '#components/parts/link.astro';
@@ -29,7 +29,7 @@ const isMonthlyData = timelineSpan !== 'year' && timelineItems.length > 0;
 const t = getTranslations();
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		title: t('timeline.title'),
 		description: isYearlyData
@@ -53,4 +53,4 @@ const t = getTranslations();
 		{isYearlyData ? <TimelineMonthlyList timelineMonthlyData={timelineMonthlyData} /> : undefined}
 		{isMonthlyData ? <TimelineList timelineItems={timelineItems} /> : undefined}
 	</ContentSection>
-</BaseSite>
+</MainSite>

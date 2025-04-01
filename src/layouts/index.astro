@@ -1,7 +1,7 @@
 ---
 import type { ContentMetadataItem } from '#types/metadata.ts';
 
-import BaseSite from '#components/base/base-site.astro';
+import MainSite from '#components/main/main-site.astro';
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
@@ -34,7 +34,7 @@ const contentStats = await getContentStats();
 const t = getTranslations();
 ---
 
-<BaseSite
+<MainSite
 	meta={{
 		...(hasHeroImage
 			? {
@@ -91,4 +91,4 @@ const t = getTranslations();
 		>
 		<PreviewGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
 	</ContentSection>
-</BaseSite>
+</MainSite>
