@@ -39,5 +39,6 @@ export default getConfig(
 			},
 		},
 	],
-	{ customGlobals: { theme: 'readonly' }, withAstro: true },
+	// TODO: Astro TypeScript support became buggy around March 2025; disabling this until a fix is found
+	{ customGlobals: { theme: 'readonly' }, withAstro: false },
 );
