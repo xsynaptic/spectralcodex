@@ -1,10 +1,9 @@
 ---
-import BaseHeaderMenuItem from '#components/base/base-header-menu-item.astro';
+import MenuHeader from '#components/menu/menu-header.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import ThemeToggle from '#components/theme/theme-toggle.astro';
 import { FEATURE_DARK_MODE } from '#constants.ts';
-import { menuHeaderItems } from '#lib/menu/menu-header.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -35,13 +34,6 @@ const t = getTranslations();
 		</h2>{FEATURE_DARK_MODE ? <ThemeToggle /> : undefined}</Container
 	>
 	<Container as="nav">
-		<ul
-			class:list={[
-				'flex flex-wrap justify-between gap-x-4 gap-y-2 py-2 md:gap-x-2',
-				hasHeroImage ? undefined : 'border-primary-200 dark:border-primary-700 border-b',
-			]}
-		>
-			{menuHeaderItems.map((menuItem) => <BaseHeaderMenuItem menuItem={menuItem} />)}
-		</ul>
+		<MenuHeader hasHeroImage={hasHeroImage} />
 	</Container>
 </header>

@@ -1,0 +1,93 @@
+---
+import type { MenuItem } from '#lib/menu/menu-types.ts';
+
+import Link from '#components/parts/link.astro';
+import { getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
+
+interface Props {
+	hasHeroImage: boolean;
+	menuItems: Array<MenuItem>;
+	depth: number;
+}
+
+const { hasHeroImage, menuItems, depth } = Astro.props;
+
+const { pathname } = Astro.url;
+---
+
+<ul
+	class:list={[
+		'invisible absolute w-full max-w-full min-w-48 divide-y-1 opacity-0 transition-all transition-discrete duration-200 sm:max-w-64 md:max-w-80',
+		(() => {
+			switch (depth) {
+				case 1: {
+					return [
+						hasHeroImage
+							? 'bg-primary-100 divide-primary-200 dark:divide-primary-900 dark:bg-primary-800'
+							: 'bg-primary-100 divide-primary-200 dark:divide-primary-900 dark:bg-primary-800 mt-[1px]',
+						'group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100',
+						'top-full mb-[-1px] rounded-bl-md shadow-md sm:left-0',
+					];
+				}
+				case 2: {
+					return [
+						hasHeroImage
+							? 'bg-primary-200 divide-primary-300 dark:divide-primary-800 dark:bg-primary-700'
+							: 'bg-primary-200 divide-primary-300 dark:divide-primary-800 dark:bg-primary-700',
+						'sm:group-focus-within/d2:visible sm:group-focus-within/d2:opacity-100 sm:group-hover/d2:visible sm:group-hover/d2:opacity-100',
+						'top-0 rounded-r-md shadow-md sm:left-[100%]',
+					];
+				}
+				default: {
+					return [
+						hasHeroImage
+							? 'bg-primary-300 divide-primary-400 dark:divide-primary-700 dark:bg-primary-600'
+							: 'bg-primary-300 divide-primary-400 dark:divide-primary-700 dark:bg-primary-600',
+						'sm:group-focus-within/d3:visible sm:group-focus-within/d3:opacity-100 sm:group-hover/d3:visible sm:group-hover/d3:opacity-100',
+						'top-0 sm:left-[100%]',
+					];
+				}
+			}
+		})(),
+	]}
+>
+	{
+		menuItems.map((item) => {
+			return (
+				<li
+					id={getMenuItemId(item)}
+					class:list={['relative', depth === 1 ? 'group/d2' : 'group/d3']}
+				>
+					<button class="flex w-full items-center justify-between gap-x-1 px-2 py-1 text-sm">
+						<Link
+							href={item.url}
+							class:list={[
+								'w-full text-left',
+								isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
+							]}
+							linkColor="accent"
+						>
+							{item.title}
+						</Link>
+						{item.children ? (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								class:list={['text-primary-400 invisible h-full w-[14px] sm:visible']}
+								aria-labelledby="menu-chevron-right"
+							>
+								<title id="menu-chevron-right">A right-facing chevron</title>
+								<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z" />
+							</svg>
+						) : undefined}
+					</button>
+					{item.children ? (
+						<Astro.self hasHeroImage={hasHeroImage} menuItems={item.children} depth={depth + 1} />
+					) : undefined}
+				</li>
+			);
+		})
+	}
+</ul>
