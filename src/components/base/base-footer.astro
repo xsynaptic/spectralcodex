@@ -1,10 +1,7 @@
 ---
 import BaseFooterColophon from '#components/base/base-footer-colophon.astro';
+import MenuFooter from '#components/menu/menu-footer.astro';
 import Container from '#components/parts/container.astro';
-import Link from '#components/parts/link.astro';
-import { menuFooterItems } from '#lib/menu/menu-footer.ts';
-
-const { pathname } = Astro.url;
 ---
 
 <Container as="footer" class="mb-medium mt-medium w-full pt-4">
@@ -15,25 +12,7 @@ const { pathname } = Astro.url;
 		]}
 	>
 		<nav class="pb-small text-sm">
-			<ul class="flex flex-wrap gap-x-4 gap-y-2">
-				{
-					menuFooterItems.map(({ title, url }) => {
-						const isActive = url === pathname || url === pathname.replace(/\/$/, '');
-
-						return (
-							<li class="text-xs font-medium sm:text-sm">
-								<Link
-									href={url}
-									class:list={[isActive ? 'font-semibold' : undefined]}
-									linkColor="primary"
-								>
-									{title}
-								</Link>
-							</li>
-						);
-					})
-				}
-			</ul>
+			<MenuFooter />
 		</nav>
 		<BaseFooterColophon />
 	</div>
