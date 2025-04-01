@@ -1,6 +1,6 @@
 import * as R from 'remeda';
 
-import { getImageCount } from '#lib/image/image-stats.ts';
+import { getImagesCollection } from '#lib/collections/images/data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -11,7 +11,7 @@ export async function getContentStats() {
 
 	const contentMetadataGroups = R.groupBy(contentMetadataArray, (item) => item.collection);
 
-	const imageCount = await getImageCount();
+	const { images } = await getImagesCollection();
 
 	return {
 		ephemera: formatNumber({ number: contentMetadataGroups.ephemera?.length ?? 0 }),
@@ -34,7 +34,7 @@ export async function getContentStats() {
 		series: formatNumber({ number: contentMetadataGroups.series?.length ?? 0 }),
 		themes: formatNumber({ number: contentMetadataGroups.themes?.length ?? 0 }),
 		images: {
-			itemCount: formatNumber({ number: imageCount }),
+			itemCount: formatNumber({ number: images.length }),
 		},
 	};
 }
