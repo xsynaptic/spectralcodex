@@ -6,11 +6,11 @@
 	"private": true,
 	"devDependencies": {
 		"@protomaps/basemaps": "^5.1.0",
-		"@tanstack/react-query": "^5.71.0",
+		"@tanstack/react-query": "^5.71.1",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^18.3.20",
 		"@types/react-dom": "^18.3.5",
-		"astro": "^5.5.5",
+		"astro": "^5.5.6",
 		"geojson": "^0.5.0",
 		"maplibre-gl": "^5.3.0",
 		"pmtiles": "^4.3.0",
