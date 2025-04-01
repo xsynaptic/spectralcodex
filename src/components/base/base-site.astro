@@ -31,7 +31,18 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<link rel="icon" type="image/svg+xml" href={`${getSiteUrl()}favicon.svg`} />
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href={`${getSiteUrl()}favicon.svg`}
+			media="(prefers-color-scheme: light)"
+		/>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href={`${getSiteUrl()}favicon.svg`}
+			media="(prefers-color-scheme: dark)"
+		/>
 		<BaseMeta meta={meta} />
 		<ThemeManager defaultTheme="auto" />
 		<ClientRouter />
