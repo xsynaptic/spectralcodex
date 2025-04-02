@@ -3,7 +3,7 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import type { FeaturedItemMetadata } from '#lib/image/image-featured.ts';
+import type { ImageSetWithMetadata } from '#lib/image/image-set.ts';
 
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
@@ -15,11 +15,11 @@ import {
 } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
-interface Props extends FeaturedItemMetadata {
+interface Props extends ImageSetWithMetadata {
 	loading: 'lazy' | 'eager' | null | undefined;
 }
 
-const { src: imageId, title: alt = '', contentMetadata, loading } = Astro.props;
+const { id: imageId, title: alt = '', contentMetadata, loading } = Astro.props;
 
 const imageEntry = await getImageById(imageId);
 

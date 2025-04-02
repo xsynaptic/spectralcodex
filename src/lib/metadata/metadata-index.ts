@@ -16,7 +16,7 @@ import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getPrimaryRegionIdFromEntryFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
-import { getSingleFeaturedItem } from '#lib/image/image-featured.ts';
+import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
 import { validateLocations } from '#lib/metadata/metadata-validate.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -27,13 +27,13 @@ const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
 // Note: we could get all featured images but prefer to just grab one for simplicity
 function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): string | undefined {
-	if ('images' in entry.data) {
-		const featuredImage = getSingleFeaturedItem({
-			images: entry.data.images,
+	if ('imageSet' in entry.data) {
+		const featuredImage = getImageSetPrimaryImage({
+			imageSet: entry.data.imageSet,
 			shuffle: false,
 		});
 
-		return featuredImage?.src;
+		return featuredImage?.id;
 	}
 	return 'imageFeatured' in entry.data ? entry.data.imageFeatured : undefined;
 }

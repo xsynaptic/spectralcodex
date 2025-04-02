@@ -1,21 +1,21 @@
 ---
-import type { FeaturedItemMetadata } from '#lib/image/image-featured.ts';
+import type { ImageSetWithMetadata } from '#lib/image/image-set.ts';
 
 import ImageHeroCarouselItem from '#components/image-hero/image-hero-carousel-item.astro';
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 
 interface Props {
-	images: Array<FeaturedItemMetadata>;
+	imageSet: Array<ImageSetWithMetadata>;
 	class?: string | undefined;
 }
 
-const { images, class: className } = Astro.props;
+const { imageSet, class: className } = Astro.props;
 ---
 
 <ImageHeroFrame class={className}>
 	<div class="carousel">
 		{
-			images.map((image, index) => (
+			imageSet.map((image, index) => (
 				<ImageHeroCarouselItem loading={index === 0 ? 'eager' : 'lazy'} {...image} />
 			))
 		}

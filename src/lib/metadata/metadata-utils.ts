@@ -16,7 +16,7 @@ export async function getContentMetadataById(id: string | undefined) {
 	const contentMetadata = contentMetadataIndex.get(slug);
 
 	if (!contentMetadata && FEATURE_SHORTCODES_ERROR_LOG) {
-		logError(`Missing content metadata specified in shortcode: "${slug}"`);
+		logError(`Missing content metadata specified in Link component: "${slug}"`);
 	}
 	return contentMetadata;
 }

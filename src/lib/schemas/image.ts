@@ -31,8 +31,11 @@ export function getLocalImageTransformFunction({
 	);
 }
 
-export const FeaturedImagesSchema = z.object({
-	src: z.string().optional(),
+// For use in regions, series, and themes
+export const ImageSetSchema = z.object({
+	id: z.string(),
 	title: z.string().optional(),
-	contentId: z.string().optional(), // Optional reference to the content associated with an image
+	link: z.string().optional(), // Functions just like a Link component in MDX content
 });
+
+export type ImageSet = z.infer<typeof ImageSetSchema>;

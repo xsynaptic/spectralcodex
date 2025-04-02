@@ -8,9 +8,9 @@ import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
-import { getSingleFeaturedItem } from '#lib/image/image-featured.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { getOpenGraphImage } from '#lib/image/image-open-graph.ts';
+import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
 
 export const getStaticPaths = (async () => {
 	const { regions } = await getRegionsCollection();
@@ -24,13 +24,13 @@ export const getStaticPaths = (async () => {
 	return await Promise.all(
 		R.pipe(
 			[...regions, ...series, ...themes] as const,
-			R.filter(({ data }) => !!data.images),
+			R.filter(({ data }) => !!data.imageSet),
 			R.map((entry) =>
 				limit(async () => {
-					const featuredImage = getSingleFeaturedItem({
-						images: entry.data.images,
+					const featuredImage = getImageSetPrimaryImage({
+						imageSet: entry.data.imageSet,
 					})!;
-					const imageEntry = getImageById(featuredImage.src);
+					const imageEntry = getImageById(featuredImage.id);
 					const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
 
 					return {

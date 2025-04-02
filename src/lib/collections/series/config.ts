@@ -1,9 +1,9 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
-import { FeaturedImagesSchema } from '#lib/schemas/image.ts';
+import { ImageSetSchema } from '#lib/schemas/image.ts';
 
 export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
@@ -16,7 +16,9 @@ export const series = defineCollection({
 			seriesItems: z.string().array().optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			images: FeaturedImagesSchema.array().optional(),
+			regions: reference('regions').array().optional(),
+			themes: reference('themes').array().optional(),
+			imageSet: ImageSetSchema.array().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
 			locationCount: z.number().int().optional(),

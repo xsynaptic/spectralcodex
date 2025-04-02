@@ -16,7 +16,7 @@ import MapComponent from '#components/map/map-component.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
-import { getFeaturedItemsMetadata } from '#lib/image/image-featured.ts';
+import { getImageSetMetadata } from '#lib/image/image-set.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -33,12 +33,12 @@ const {
 } = Astro.props;
 
 const {
-	data: { title, titleAlt, description, images },
+	data: { title, titleAlt, description, imageSet },
 } = entry;
 
-const featuredItems = await getFeaturedItemsMetadata({ images, shuffle: true });
+const imageSetMetadata = await getImageSetMetadata({ imageSet, shuffle: true });
 
-const hasHeroImage = !!featuredItems && featuredItems.length > 0;
+const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 
 const { Content } = await render(entry);
 
@@ -60,7 +60,7 @@ const t = getTranslations();
 	<article>
 		{
 			hasHeroImage ? (
-				<ImageHeroCarousel images={featuredItems} class="sm:mb-small">
+				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
