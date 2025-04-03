@@ -24,8 +24,14 @@ import { getTranslations } from '#lib/utils/i18n.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Provide some helpful info while debugging RSS feed generation
-const DEBUG_RSS_FEED = true as boolean;
+const RSS_FEED_DEBUG = true as boolean;
 
+// How many items should be included in the RSS feed?
+const RSS_FEED_ITEM_COUNT = 20;
+
+/**
+ * @link https://docs.astro.build/en/reference/container-reference/
+ */
 const container = await AstroContainer.create();
 
 container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
@@ -60,7 +66,7 @@ const getRssItem = async (
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 
-	if (DEBUG_RSS_FEED) {
+	if (RSS_FEED_DEBUG) {
 		console.log(
 			`[RSS] Generated entry for "${title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
 		);
@@ -75,27 +81,29 @@ const getRssItem = async (
 export async function GET(context: APIContext): Promise<Response> {
 	const startTime = performance.now();
 
-	if (DEBUG_RSS_FEED) console.log(`[RSS] Initializing feed...`);
+	if (RSS_FEED_DEBUG) console.log(`[RSS] Initializing feed...`);
 
 	const { ephemera } = await getEphemeraCollection();
 	const { locations } = await getLocationsCollection();
 	const { posts } = await getPostsCollection();
+
+	const filterEntryQuality = getFilterEntryQualityFunction(3);
 
 	const t = getTranslations();
 
 	const items = R.pipe(
 		await R.pipe(
 			[
-				...R.pipe(ephemera, R.filter(getFilterEntryQualityFunction(3))),
-				...R.pipe(posts, R.filter(getFilterEntryQualityFunction(3))),
-				...R.pipe(locations, R.filter(getFilterEntryQualityFunction(3))),
+				...ephemera.filter(filterEntryQuality),
+				...posts.filter(filterEntryQuality),
+				...locations.filter(filterEntryQuality),
 			],
 			R.sort(sortByDateReverseChronological),
-			R.take(20),
-			(items) => Promise.all(items.map((item) => getRssItem(item))),
+			R.take(RSS_FEED_ITEM_COUNT),
+			(items) => Promise.all(items.map(getRssItem)),
 		),
 		R.sort((a, b) => (a.pubDate && b.pubDate ? b.pubDate.getTime() - a.pubDate.getTime() : -1)),
-		R.take(20),
+		R.take(RSS_FEED_ITEM_COUNT),
 	);
 
 	const rssFeed = rss({
@@ -106,7 +114,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		items,
 	});
 
-	if (DEBUG_RSS_FEED) {
+	if (RSS_FEED_DEBUG) {
 		console.log(`[RSS] Generated in ${Number(performance.now() - startTime).toFixed(5)}ms`);
 
 		if (items.length > 0) {
