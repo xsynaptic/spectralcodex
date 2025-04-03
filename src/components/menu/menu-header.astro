@@ -1,6 +1,7 @@
 ---
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
 import Link from '#components/parts/link.astro';
+import Container from '#components/parts/container.astro';
 import { getMenuHeaderItems } from '#lib/menu/menu-header.ts';
 import { getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
@@ -15,46 +16,48 @@ const { pathname } = Astro.url;
 const menuItems = await getMenuHeaderItems();
 ---
 
-<ul
-	class:list={[
-		'flex flex-wrap justify-between gap-x-4 gap-y-2 md:gap-x-2',
-		hasHeroImage ? undefined : 'border-primary-200 dark:border-primary-700 border-b',
-	]}
->
-	{
-		menuItems.map((item) => (
-			<li id={getMenuItemId(item)} class="group relative py-2">
-				<button class="flex items-center gap-x-1">
-					<Link
-						href={item.url}
-						class:list={[
-							'text-sm font-medium sm:text-base',
-							isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
-						]}
-						linkColor="accent"
-					>
-						{item.title}
-					</Link>
-					{item.children ? (
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
+<Container as="nav" class="relative">
+	<ul
+		class:list={[
+			'flex flex-wrap justify-between gap-x-4 gap-y-2 md:gap-x-2',
+			hasHeroImage ? undefined : 'border-primary-200 dark:border-primary-700 border-b',
+		]}
+	>
+		{
+			menuItems.map((item) => (
+				<li id={getMenuItemId(item)} class="group py-2 sm:relative">
+					<button class="flex items-center gap-x-1">
+						<Link
+							href={item.url}
 							class:list={[
-								'text-primary-500 h-full w-[18px] opacity-100 transition-transform transition-discrete duration-100 group-focus-within:scale-y-[-1] group-hover:scale-y-[-1]',
+								'text-sm font-medium sm:text-base',
+								isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
 							]}
-							aria-labelledby="menu-chevron-down"
+							linkColor="accent"
 						>
-							<title id="menu-chevron-down">A downward-facing chevron</title>
-							<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z" />
-						</svg>
+							{item.title}
+						</Link>
+						{item.children ? (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+								class:list={[
+									'text-primary-500 h-full w-[18px] opacity-100 transition-transform transition-discrete duration-100 group-focus-within:scale-y-[-1] group-hover:scale-y-[-1]',
+								]}
+								aria-labelledby="menu-chevron-down"
+							>
+								<title id="menu-chevron-down">A downward-facing chevron</title>
+								<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z" />
+							</svg>
+						) : undefined}
+					</button>
+					{item.children ? (
+						<MenuHeaderSubmenu hasHeroImage={hasHeroImage} menuItems={item.children} depth={1} />
 					) : undefined}
-				</button>
-				{item.children ? (
-					<MenuHeaderSubmenu hasHeroImage={hasHeroImage} menuItems={item.children} depth={1} />
-				) : undefined}
-			</li>
-		))
-	}
-</ul>
+				</li>
+			))
+		}
+	</ul>
+</Container>
