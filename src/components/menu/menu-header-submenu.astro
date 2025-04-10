@@ -17,7 +17,7 @@ const { pathname } = Astro.url;
 
 <ul
 	class:list={[
-		'invisible absolute z-10 w-full max-w-full divide-y-1 opacity-0 transition-all transition-discrete duration-200 sm:max-w-64 sm:min-w-48 md:max-w-80',
+		'invisible absolute w-full max-w-full divide-y-1 opacity-0 transition-all transition-discrete duration-200 sm:max-w-64 sm:min-w-48 md:max-w-80',
 		(() => {
 			switch (depth) {
 				case 1: {
@@ -26,7 +26,7 @@ const { pathname } = Astro.url;
 							? 'bg-primary-100 divide-primary-200 dark:divide-primary-700 dark:bg-primary-800'
 							: 'bg-primary-100 divide-primary-200 dark:divide-primary-700 dark:bg-primary-800 mt-[1px]',
 						'group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100',
-						'left-0 mb-[-1px] shadow-md sm:top-full sm:rounded-bl-md',
+						'left-0 z-60 mb-[-1px] shadow-md sm:top-full sm:rounded-bl-md',
 					];
 				}
 				case 2: {
@@ -35,7 +35,7 @@ const { pathname } = Astro.url;
 							? 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700'
 							: 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700',
 						'sm:group-focus-within/d2:visible sm:group-focus-within/d2:opacity-100 sm:group-hover/d2:visible sm:group-hover/d2:opacity-100',
-						'left-0 shadow-md sm:top-0 sm:left-[100%] sm:rounded-r-md',
+						'left-0 z-70 shadow-md sm:top-0 sm:left-[100%] sm:rounded-r-md',
 					];
 				}
 				default: {
@@ -44,7 +44,7 @@ const { pathname } = Astro.url;
 							? 'bg-primary-300 divide-primary-400 dark:divide-primary-500 dark:bg-primary-600'
 							: 'bg-primary-300 divide-primary-400 dark:divide-primary-500 dark:bg-primary-600',
 						'sm:group-focus-within/d3:visible sm:group-focus-within/d3:opacity-100 sm:group-hover/d3:visible sm:group-hover/d3:opacity-100',
-						'left-0 sm:top-0 sm:left-[100%]',
+						'left-0 z-80 sm:top-0 sm:left-[100%]',
 					];
 				}
 			}
