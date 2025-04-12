@@ -1,0 +1,45 @@
+@reference "./global.css";
+
+div.maplibregl-popup-content {
+	overflow: auto;
+	padding: 0;
+}
+div.maplibregl-popup-content a:focus {
+	outline: none;
+}
+button.maplibregl-popup-close-button {
+	border-bottom-left-radius: 3px;
+	color: white;
+	mix-blend-mode: difference;
+	font-size: 16px;
+	width: 20px;
+}
+@media (max-width: 639px) {
+	button.maplibregl-popup-close-button {
+		font-size: 18px;
+		height: 25px;
+		width: 25px;
+	}
+}
+button.maplibregl-popup-close-button:focus {
+	outline: none;
+}
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-scale {
+	user-select: none;
+}
+[data-theme='dark'] .maplibregl-popup-content {
+	@apply bg-primary-950;
+}
+[data-theme='dark'] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+	@apply border-r-primary-950;
+}
+[data-theme='dark'] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+	@apply border-l-primary-950;
+}
+[data-theme='dark'] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+	@apply border-b-primary-950;
+}
+[data-theme='dark'] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+	@apply border-t-primary-950;
+}
