@@ -70,6 +70,7 @@
 		"@xsynaptic/unified-tools": "^0.0.4",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.4",
+		"astro-pagefind": "^1.8.3",
 		"astro-seo": "^0.8.4",
 		"chalk": "^5.4.1",
 		"eslint": "^9.24.0",

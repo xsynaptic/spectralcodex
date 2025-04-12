@@ -36,7 +36,7 @@ const t = getTranslations();
 
 {
 	backlinks && backlinks.length > 0 ? (
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{backlinks.map(({ url, title, titleAlt }) => (

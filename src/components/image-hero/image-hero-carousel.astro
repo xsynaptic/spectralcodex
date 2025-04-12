@@ -15,8 +15,8 @@ const { imageSet, class: className } = Astro.props;
 <ImageHeroFrame class={className}>
 	<div class="carousel">
 		{
-			imageSet.map((image, index) => (
-				<ImageHeroCarouselItem loading={index === 0 ? 'eager' : 'lazy'} {...image} />
+			imageSet.map((imageSetItem, index) => (
+				<ImageHeroCarouselItem index={index} {...imageSetItem} />
 			))
 		}
 	</div>

@@ -1,0 +1,19 @@
+---
+import Search from 'astro-pagefind/components/Search';
+
+import '#styles/pagefind.css';
+---
+
+<div>
+	<Search
+		id="search"
+		className="pagefind-ui"
+		uiOptions={{
+			pageSize: 10,
+			showImages: false,
+			resetStyles: false,
+			showEmptyFilters: false,
+			showSubResults: true,
+		}}
+	/>
+</div>

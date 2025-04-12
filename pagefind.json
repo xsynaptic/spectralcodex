@@ -9,9 +9,6 @@
 	"exclude_selectors": [
 		"[id='footnote-label']",
 		"[id^='user-content-fnref']",
-		"[data-footnote-backref]",
-		".section-links",
-		".section-locations-nearby",
-		".section-map"
+		"[data-footnote-backref]"
 	]
 }

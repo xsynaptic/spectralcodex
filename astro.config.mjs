@@ -6,6 +6,7 @@ import sitemap from '@astrojs/sitemap';
 import localImageServer from '@spectralcodex/local-image-server';
 import tailwindcss from '@tailwindcss/vite';
 import AutoImport from 'astro-auto-import';
+import pagefind from 'astro-pagefind';
 import { defineConfig, envField } from 'astro/config';
 import { nanoid } from 'nanoid';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
@@ -115,6 +116,7 @@ export default defineConfig({
 			mediaPath: CONTENT_MEDIA_PATH,
 			mediaBaseUrl: CONTENT_MEDIA_BASE_URL,
 		}),
+		pagefind(),
 	],
 	image: {
 		service: {

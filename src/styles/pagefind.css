@@ -1,0 +1,119 @@
+@reference "./global.css";
+
+.pagefind-ui {
+	--pagefind-ui-scale: 0.666;
+	--pagefind-ui-primary: var(--color-primary-400);
+	--pagefind-ui-text: var(--color-primary-600);
+	--pagefind-ui-background: var(--color-primary-100);
+	--pagefind-ui-border: var(--color-primary-200);
+	--pagefind-ui-border-width: 1px;
+	--pagefind-ui-border-radius: var(--radius-sm);
+	--pagefind-ui-tag: var(--color-accent-600);
+	--pagefind-ui-image-border-radius: var(--radius-sm);
+	--pagefind-ui-image-box-ratio: 3 / 2;
+	--pagefind-ui-font: var(--font-sans);
+}
+[data-theme='dark'] .pagefind-ui {
+	--pagefind-ui-primary: var(--color-primary-300);
+	--pagefind-ui-text: var(--color-primary-400);
+	--pagefind-ui-background: var(--color-primary-800);
+	--pagefind-ui-border: var(--color-primary-600);
+	--pagefind-ui-tag: var(--color-accent-600);
+}
+
+/* Inline search result highlights */
+.pagefind-ui mark {
+	@apply bg-highlight-100 text-highlight-600 rounded-sm px-0.5 py-0.5;
+	[data-theme='dark'] & {
+		@apply bg-primary-600 text-primary-300;
+	}
+}
+
+/* Adjust the sizing and positioning of the search result drawer */
+.pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
+	@apply px-small py-small absolute z-[97] mt-0 max-h-[85vh] w-full min-w-64 overflow-y-auto rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[450px];
+	background-color: var(--pagefind-ui-background);
+}
+
+/* Hide "clear" text for visual users but keep it for screen readers */
+.pagefind-ui__search-clear {
+	@apply invisible;
+}
+
+/* Create visible icon with pseudo-element */
+.pagefind-ui__search-clear::before {
+	--svg-cancel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.59-13L12 10.59L8.41 7L7 8.41L10.59 12L7 15.59L8.41 17L12 13.41L15.59 17L17 15.59L13.41 12L17 8.41z'/%3E%3C/svg%3E");
+	@apply text-primary-400 visible absolute top-1/2 aspect-square w-[16px] -translate-y-1/2 cursor-pointer bg-current;
+	@apply mask-size-[100%] mask-center mask-no-repeat;
+	content: '';
+	mask-image: var(--svg-cancel);
+	[data-theme='dark'] & {
+		@apply text-primary-600;
+	}
+}
+.pagefind-ui__search-clear:hover::before {
+	@apply text-accent-300;
+	[data-theme='dark'] & {
+		@apply text-accent-500;
+	}
+}
+
+.pagefind-ui__message,
+.pagefind-ui__result-title {
+	@apply font-display;
+}
+
+.pagefind-ui__result-link {
+	@apply transition-colors;
+	--pagefind-ui-text: var(--color-accent-500);
+	&:hover {
+		--pagefind-ui-text: var(--color-accent-300);
+	}
+}
+
+.pagefind-ui__result-nested .pagefind-ui__result-link {
+	--pagefind-ui-text: var(--color-primary-600);
+	&:hover {
+		--pagefind-ui-text: var(--color-primary-500);
+	}
+	[data-theme='dark'] & {
+		--pagefind-ui-text: var(--color-primary-500);
+		&:hover {
+			--pagefind-ui-text: var(--color-primary-400);
+		}
+	}
+}
+
+.pagefind-ui__result-nested .pagefind-ui__result-link::before {
+	@apply text-primary-400;
+	[data-theme='dark'] & {
+		@apply text-primary-500;
+	}
+}
+
+/* Spacing is not easily configurable so let's override some things */
+.pagefind-ui__search-input,
+.pagefind-ui__search-clear {
+	height: 36px !important;
+}
+.pagefind-ui__search-clear {
+	top: 0 !important;
+}
+/* This element contains the search icon*/
+.pagefind-ui__form::before {
+	height: 12px !important;
+	top: 12px !important;
+}
+.pagefind-ui__result {
+	padding-top: calc(10px * var(--pagefind-ui-scale)) !important;
+}
+.pagefind-ui__result-nested {
+	padding-top: 5px !important;
+}
+.pagefind-ui__filter-panel,
+.pagefind-ui__results-area {
+	margin-top: 0 !important;
+}
+.pagefind-ui__drawer {
+	gap: 10px !important;
+}

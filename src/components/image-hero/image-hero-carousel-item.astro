@@ -16,10 +16,10 @@ import {
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageSetWithMetadata {
-	loading: 'lazy' | 'eager' | null | undefined;
+	index: number;
 }
 
-const { id: imageId, title: alt = '', contentMetadata, loading } = Astro.props;
+const { index, id: imageId, title: alt = '', contentMetadata } = Astro.props;
 
 const imageEntry = await getImageById(imageId);
 
@@ -36,6 +36,8 @@ const imageProps = imageEntry
 			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(imageEntry.data.src)),
 		} satisfies RemoteImageProps)
 	: undefined;
+
+const loading = index === 0 ? 'eager' : 'lazy';
 ---
 
 {
@@ -53,6 +55,7 @@ const imageProps = imageEntry
 							fetchpriority: 'low',
 						}
 					: {})}
+				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}
 			/>
 			{contentMetadata ? <ImageHeroCarouselCaption {...contentMetadata} /> : undefined}

@@ -57,7 +57,7 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article>
+	<article data-pagefind-body>
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
@@ -80,7 +80,7 @@ const t = getTranslations();
 			)
 		}
 		<ProseBody class="pb-small"><Content /></ProseBody>
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={page.data} showDate={true} showRegion={true} />
 			<Pagination class="mt-small md:mt-medium" page={page} />

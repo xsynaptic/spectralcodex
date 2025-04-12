@@ -1,4 +1,5 @@
 ---
+import MainSearch from '#components/main/main-search.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
@@ -21,17 +22,21 @@ const t = getTranslations();
 <header
 	class:list={[
 		hasHeroImage
-			? 'bg-header-fade dark:bg-header-fade-dark z-50 sm:absolute sm:top-0 sm:right-0 sm:left-0'
+			? 'bg-header-fade dark:bg-header-fade-dark z-40 sm:absolute sm:top-0 sm:right-0 sm:left-0'
 			: 'bg-primary-100 dark:bg-primary-800',
 	]}
 >
 	<a href="#content" class="sr-only focus:not-sr-only">{t('site.skip.label')}</a>
-	<Container as="div" class="flex flex-wrap items-center pt-2 sm:pb-1"
+	<Container
+		as="div"
+		class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"
 		><h2 class="flex flex-grow items-center gap-1">
 			<Link href={siteUrl} class="text-xl font-semibold md:text-2xl lg:text-3xl" linkColor="primary"
 				>{t('site.title')}</Link
 			>
-		</h2>{FEATURE_DARK_MODE ? <ThemeToggle /> : undefined}</Container
+		</h2>
+		<MainSearch />
+		{FEATURE_DARK_MODE ? <ThemeToggle /> : undefined}</Container
 	>
 	<MenuHeader hasHeroImage={hasHeroImage} />
 </header>

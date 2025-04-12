@@ -83,7 +83,7 @@ const t = getTranslations();
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article>
+	<article data-pagefind-body>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
@@ -165,7 +165,7 @@ const t = getTranslations();
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={metadataItems} showDate={true} showRegion={true} />
 		</ContentSection>

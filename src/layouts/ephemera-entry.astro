@@ -45,7 +45,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article>
+	<article data-pagefind-body>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">

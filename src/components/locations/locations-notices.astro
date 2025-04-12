@@ -22,7 +22,7 @@ const t = getTranslations();
 
 {
 	showDangerNotice && !showDemolishedNotice ? (
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<StatusBox status="warning" class="mb-small">
 				<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
 			</StatusBox>
@@ -31,7 +31,7 @@ const t = getTranslations();
 }
 {
 	showDemolishedNotice ? (
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<StatusBox status="error" class="mb-small">
 				<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
 			</StatusBox>

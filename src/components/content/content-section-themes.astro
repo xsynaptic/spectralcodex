@@ -26,12 +26,12 @@ const t = getTranslations();
 
 {
 	themes && themes.length > 0 ? (
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
 				{themes.map((item) => (
 					<DividedItem as="li" class="font-serif text-sm after:text-sm after:font-light">
-						<span>
+						<span data-pagefind-filter="theme">
 							{item.data.title ? (
 								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title.trim()}</Link>
 							) : undefined}

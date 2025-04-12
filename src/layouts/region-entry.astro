@@ -64,7 +64,7 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article>
+	<article data-pagefind-body>
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
@@ -101,7 +101,7 @@ const t = getTranslations();
 			)
 		}
 		<ProseBody class="pb-medium"><Content /></ProseBody>
-		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
+		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit} data-pagefind-ignore>
 			{
 				regionsOption?.termsChildrenLabel ? (
 					<Fragment slot="regions-children-title">{regionsOption.termsChildrenLabel}</Fragment>
@@ -121,7 +121,7 @@ const t = getTranslations();
 				</ContentSection>
 			) : undefined
 		}
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={page.data} showDate={true} showCollection={true} showTitleAlt={true} />
 			<Pagination class="mt-small md:mt-medium" page={page} />

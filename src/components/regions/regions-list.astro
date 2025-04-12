@@ -42,7 +42,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 		<ListRow class="font-serif text-sm">
 			{regions.map((entry) => (
 				<DividedItem dividerContent={dividerContent}>
-					<span>
+					<span data-pagefind-filter="region">
 						{entry.data.title ? (
 							<Link href={getContentUrl(entry.collection, entry.id)}>
 								<Fragment set:html={entry.data.title.trim()} />

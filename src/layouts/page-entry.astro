@@ -32,7 +32,7 @@ const { Content } = await render(entry);
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article>
+	<article data-pagefind-body>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">

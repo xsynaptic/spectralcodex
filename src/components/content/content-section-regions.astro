@@ -19,7 +19,7 @@ const t = getTranslations();
 
 {
 	regions && regions.length > 0 ? (
-		<ContentSection>
+		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('collection.regions.labelPlural')}</Fragment>
 			<RegionsList terms={regions} dividerContent="chevron" showSingleRegionAncestors={true} />
 		</ContentSection>
