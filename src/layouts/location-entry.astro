@@ -5,7 +5,7 @@ import { render } from 'astro:content';
 
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#types/metadata.ts';
-
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import MainSite from '#components/main/main-site.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
@@ -83,7 +83,7 @@ const t = getTranslations();
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article data-pagefind-body>
+	<article {...getPagefindBodyProp(entry)}>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">

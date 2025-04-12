@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
-
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#types/metadata.ts';
 
@@ -59,7 +59,7 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article data-pagefind-body>
+	<article {...getPagefindBodyProp(entry)}>
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">

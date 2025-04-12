@@ -33,8 +33,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 				return metadataItems.length > 0 ? (
 					<ContentSection data-pagefind-ignore>
 						<Fragment slot="section-title">
-							{t('collection.series.labelPlural')}:{' '}
-							<span data-pagefind-filter="series">{entry.data.title}</span>
+							{t('collection.series.labelPlural')}: <span>{entry.data.title}</span>
 						</Fragment>
 						<ProseDescription showCompact={true}>
 							<Content />

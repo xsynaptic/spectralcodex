@@ -75,6 +75,7 @@ export const locations = defineCollection({
 			url: z.string().url().optional(),
 			googleMapsUrl: z.string().url().optional(),
 			wikipediaUrl: z.string().url().optional(),
+			hideSearch: z.boolean().optional(),
 		})
 		.strict(),
 });

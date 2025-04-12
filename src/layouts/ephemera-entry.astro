@@ -13,6 +13,7 @@ import ImageHero from '#components/image-hero/image-hero.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 
 interface Props {
 	entry: CollectionEntry<'ephemera'>;
@@ -45,7 +46,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article data-pagefind-body>
+	<article {...getPagefindBodyProp(entry)}>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">

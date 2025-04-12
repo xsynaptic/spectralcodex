@@ -25,6 +25,7 @@ export const themes = defineCollection({
 			/** Derived properties, for internal use only! */
 			locationCount: z.number().int().optional(),
 			postCount: z.number().int().optional(),
+			hideSearch: z.boolean().optional(),
 		})
 		.strict(),
 });

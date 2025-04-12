@@ -25,6 +25,7 @@ export const pages = defineCollection({
 			imageFeatured: z.string().optional(),
 			imageHero: z.string().optional(),
 			entryQuality: NumericScaleSchema,
+			hideSearch: z.boolean().optional(),
 		})
 		.strict(),
 });

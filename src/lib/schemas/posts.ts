@@ -20,6 +20,7 @@ export const postSchema = z
 		dateUpdated: DateStringSchema.optional(),
 		imageFeatured: z.string().optional(),
 		imageHero: z.string().optional(),
+		hideSearch: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
 	})
 	.strict();
