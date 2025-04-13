@@ -78,9 +78,9 @@
 	}
 	[data-theme='dark'] & {
 		--pagefind-ui-text: var(--color-primary-500);
-		&:hover {
-			--pagefind-ui-text: var(--color-primary-400);
-		}
+	}
+	[data-theme='dark'] &:hover {
+		--pagefind-ui-text: var(--color-primary-400);
 	}
 }
 

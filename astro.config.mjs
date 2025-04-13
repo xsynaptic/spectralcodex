@@ -116,7 +116,15 @@ export default defineConfig({
 			mediaPath: CONTENT_MEDIA_PATH,
 			mediaBaseUrl: CONTENT_MEDIA_BASE_URL,
 		}),
-		pagefind(),
+		pagefind({
+			indexConfig: {
+				excludeSelectors: [
+					"[id='footnote-label']",
+					"[id^='user-content-fnref']",
+					'[data-footnote-backref]',
+				],
+			},
+		}),
 	],
 	image: {
 		service: {
