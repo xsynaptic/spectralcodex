@@ -13,7 +13,6 @@ import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
-import MapComponent from '#components/map/map-component.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
@@ -21,6 +20,7 @@ import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 
 interface Props {
 	entry: CollectionEntry<'themes'>;
@@ -28,11 +28,7 @@ interface Props {
 	page: Page<ContentMetadataItem>;
 }
 
-const {
-	entry,
-	mapData: { hasGeodata, ...mapComponentProps },
-	page,
-} = Astro.props;
+const { entry, mapData, page } = Astro.props;
 
 const {
 	data: { title, titleAlt, description, imageSet },
@@ -55,7 +51,7 @@ const t = getTranslations();
 			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
 			alt: title,
 		}),
-		prefetchUrls: mapComponentProps.prefetchUrls,
+		prefetchUrls: mapData.prefetchUrls,
 	}}
 	hasHeroImage={hasHeroImage}
 >
@@ -85,15 +81,10 @@ const t = getTranslations();
 				</ContentHeader>
 			)
 		}
-		<ProseBody class="pb-small"><Content /></ProseBody>
-		{
-			hasGeodata ? (
-				<ContentSection fillViewport={true}>
-					<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-					<MapComponent {...mapComponentProps} />
-				</ContentSection>
-			) : undefined
-		}
+		<ProseBody class="pb-small" data-pagefind-weight="2">
+			<Content />
+		</ProseBody>
+		<ContentSectionMap mapData={mapData} />
 		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={page.data} showDate={true} showRegion={true} />

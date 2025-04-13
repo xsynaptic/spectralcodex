@@ -10,7 +10,7 @@ interface Props {
 	entry: CollectionEntry<'locations'>;
 }
 
-const { entry } = Astro.props;
+const { entry, ...props } = Astro.props;
 
 const showDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
@@ -22,7 +22,7 @@ const t = getTranslations();
 
 {
 	showDangerNotice && !showDemolishedNotice ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection data-pagefind-ignore {...props}>
 			<StatusBox status="warning" class="mb-small">
 				<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
 			</StatusBox>
@@ -31,7 +31,7 @@ const t = getTranslations();
 }
 {
 	showDemolishedNotice ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection data-pagefind-ignore {...props}>
 			<StatusBox status="error" class="mb-small">
 				<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
 			</StatusBox>

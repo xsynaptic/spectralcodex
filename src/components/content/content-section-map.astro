@@ -1,0 +1,28 @@
+---
+import type { MapComponentData } from '#lib/map/map-types.ts';
+
+import ContentSection from '#components/content/content-section.astro';
+import MapComponent from '#components/map/map-component.astro';
+import { getTranslations } from '#lib/utils/i18n.ts';
+
+interface Props {
+	mapData: MapComponentData;
+}
+
+const {
+	mapData: { hasGeodata, ...mapComponentProps },
+	...props
+} = Astro.props;
+
+const t = getTranslations();
+---
+
+{
+	hasGeodata ? (
+		<ContentSection fillViewport={true} data-pagefind-ignore {...props}>
+			<Fragment slot="section-title">{t('content.section.map')}</Fragment>
+			<MapComponent {...mapComponentProps} />
+			<slot />
+		</ContentSection>
+	) : undefined
+}

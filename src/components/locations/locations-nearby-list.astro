@@ -14,7 +14,7 @@ interface Props {
 	entry: CollectionEntry<'locations'>;
 }
 
-const { entry } = Astro.props;
+const { entry, ...props } = Astro.props;
 
 const { locationsMap } = await getLocationsCollection();
 
@@ -23,7 +23,7 @@ const t = getTranslations();
 
 {
 	entry.data.nearby && entry.data.nearby.length > 0 ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.locationsNearby')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{entry.data.nearby.map(({ locationId, distanceDisplay }) => {

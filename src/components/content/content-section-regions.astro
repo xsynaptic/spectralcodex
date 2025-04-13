@@ -8,7 +8,7 @@ interface Props {
 	regionIds: Array<string> | undefined;
 }
 
-const { regionIds } = Astro.props;
+const { regionIds, ...props } = Astro.props;
 
 const getRegionsByIds = await getRegionsByIdsFunction();
 
@@ -19,7 +19,7 @@ const t = getTranslations();
 
 {
 	regions && regions.length > 0 ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection {...props}>
 			<Fragment slot="section-title">{t('collection.regions.labelPlural')}</Fragment>
 			<RegionsList terms={regions} dividerContent="chevron" showSingleRegionAncestors={true} />
 		</ContentSection>

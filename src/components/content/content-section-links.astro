@@ -28,7 +28,7 @@ const t = getTranslations();
 
 {
 	links || sources ? (
-		<ContentSection {...props}>
+		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.links.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{links?.map((link) => (

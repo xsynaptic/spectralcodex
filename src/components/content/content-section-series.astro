@@ -18,7 +18,7 @@ interface Props {
 	entry: CollectionEntry<'locations' | 'posts'>;
 }
 
-const { entry } = Astro.props;
+const { entry, ...props } = Astro.props;
 
 const getSeriesById = await getSeriesByIdFunction();
 
@@ -31,7 +31,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 				const { Content } = await render(entry);
 
 				return metadataItems.length > 0 ? (
-					<ContentSection data-pagefind-ignore>
+					<ContentSection data-pagefind-ignore {...props}>
 						<Fragment slot="section-title">
 							{t('collection.series.labelPlural')}: <span>{entry.data.title}</span>
 						</Fragment>

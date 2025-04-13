@@ -5,14 +5,11 @@ import MainSite from '#components/main/main-site.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
-import MapComponent from '#components/map/map-component.astro';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 
 type Props = MapComponentData;
 
-const { hasGeodata, ...mapComponentProps } = Astro.props;
-
-const t = getTranslations();
+const mapData = Astro.props;
 
 const title = 'Objectives';
 const description = 'Points in the database that still require visitation and documentation.';
@@ -23,12 +20,5 @@ const description = 'Points in the database that still require visitation and do
 	<ContentSection>
 		<Fragment slot="section-description"><FormatMarkdown>{description}</FormatMarkdown></Fragment>
 	</ContentSection>
-	{
-		hasGeodata ? (
-			<ContentSection fillViewport={true}>
-				<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-				<MapComponent {...mapComponentProps} />
-			</ContentSection>
-		) : undefined
-	}
+	<ContentSectionMap mapData={mapData} />
 </MainSite>

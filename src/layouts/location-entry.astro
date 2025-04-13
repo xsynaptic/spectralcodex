@@ -23,7 +23,6 @@ import ImageHero from '#components/image-hero/image-hero.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
-import MapComponent from '#components/map/map-component.astro';
 import StatusBox from '#components/parts/alert-box.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
@@ -33,6 +32,7 @@ import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -41,12 +41,7 @@ interface Props {
 	regionPrimary: CollectionEntry<'regions'> | undefined;
 }
 
-const {
-	entry,
-	mapData: { hasGeodata, ...mapComponentProps },
-	metadataItems,
-	regionPrimary,
-} = Astro.props;
+const { entry, mapData, metadataItems, regionPrimary } = Astro.props;
 
 const {
 	data: {
@@ -152,7 +147,7 @@ const t = getTranslations();
 		}
 		{
 			entry.data.entryQuality === 1 ? (
-				<ContentSection>
+				<ContentSection data-pagefind-ignore>
 					<StatusBox status="warning">
 						<FormatMarkdown>{t('notice.quality')}</FormatMarkdown>
 					</StatusBox>
@@ -170,24 +165,18 @@ const t = getTranslations();
 			<PreviewGrid items={metadataItems} showDate={true} showRegion={true} />
 		</ContentSection>
 		<LocationsNotices entry={entry} />
-		{
-			hasGeodata ? (
-				<>
-					<ContentSection fillViewport={true}>
-						<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-						<MapComponent {...mapComponentProps} />
-						{address ? (
-							<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
-								{t('locations.address.label')}:{' '}
-								<span>
-									<FormatCjk>{address}</FormatCjk>
-								</span>
-							</address>
-						) : undefined}
-					</ContentSection>
-				</>
-			) : undefined
-		}
+		<ContentSectionMap mapData={mapData}>
+			{
+				address ? (
+					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
+						{t('locations.address.label')}:{' '}
+						<span>
+							<FormatCjk>{address}</FormatCjk>
+						</span>
+					</address>
+				) : undefined
+			}
+		</ContentSectionMap>
 		<LocationsNearbyList entry={entry} />
 	</article>
 </MainSite>

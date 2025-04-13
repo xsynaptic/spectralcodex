@@ -14,23 +14,18 @@ import ContentSectionLinks from '#components/content/content-section-links.astro
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
-import ContentSection from '#components/content/content-section.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
-import MapComponent from '#components/map/map-component.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
-import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 
 interface Props {
 	entry: CollectionEntry<'posts'>;
 	mapData: MapComponentData;
 }
 
-const {
-	entry,
-	mapData: { hasGeodata, ...mapComponentProps },
-} = Astro.props;
+const { entry, mapData } = Astro.props;
 
 const {
 	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
@@ -40,8 +35,6 @@ const { Content } = await render(entry);
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
-
-const t = getTranslations();
 ---
 
 <MainSite
@@ -53,7 +46,7 @@ const t = getTranslations();
 			alt: title,
 		}),
 		...getSeoArticleProps({ dateCreated, dateUpdated }),
-		prefetchUrls: mapComponentProps.prefetchUrls,
+		prefetchUrls: mapData.prefetchUrls,
 	}}
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
@@ -90,19 +83,14 @@ const t = getTranslations();
 				</ContentHeader>
 			)
 		}
-		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
+		<ProseBody class="pb-small" data-reading-frame>
+			<Content />
+		</ProseBody>
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
-		{
-			hasGeodata ? (
-				<ContentSection fillViewport={true}>
-					<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-					<MapComponent {...mapComponentProps} />
-				</ContentSection>
-			) : undefined
-		}
+		<ContentSectionMap mapData={mapData} />
 	</article>
 </MainSite>

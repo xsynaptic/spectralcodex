@@ -15,7 +15,7 @@ interface Props {
 	themeIds: Array<string> | undefined;
 }
 
-const { themeIds } = Astro.props;
+const { themeIds, ...props } = Astro.props;
 
 const getThemesByIds = await getThemesByIdsFunction();
 
@@ -26,7 +26,7 @@ const t = getTranslations();
 
 {
 	themes && themes.length > 0 ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
 				{themes.map((item) => (

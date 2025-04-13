@@ -16,7 +16,7 @@ const t = getTranslations();
 
 {
 	dateVisited ? (
-		<ContentSection {...props}>
+		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.dateVisited')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{Array.isArray(dateVisited) ? (

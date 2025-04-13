@@ -1,7 +1,7 @@
 @reference "./global.css";
 
 .pagefind-ui {
-	--pagefind-ui-scale: 0.666;
+	--pagefind-ui-scale: 0.666; /* 😈 */
 	--pagefind-ui-primary: var(--color-primary-400);
 	--pagefind-ui-text: var(--color-primary-600);
 	--pagefind-ui-background: var(--color-primary-100);
@@ -31,7 +31,7 @@
 
 /* Adjust the sizing and positioning of the search result drawer */
 .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-	@apply px-small py-small absolute z-[97] mt-0 max-h-[85vh] w-full min-w-64 overflow-y-auto rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[450px];
+	@apply px-small py-small absolute z-[99] mt-0 max-h-[85vh] w-full min-w-64 overflow-y-auto rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
 	background-color: var(--pagefind-ui-background);
 }
 

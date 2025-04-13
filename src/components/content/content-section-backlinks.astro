@@ -16,7 +16,7 @@ interface Props {
 	entry: CollectionEntry<CollectionKey>;
 }
 
-const { entry } = Astro.props;
+const { entry, ...props } = Astro.props;
 
 const backlinkItems = await getContentBacklinks({ id: entry.id });
 
@@ -36,7 +36,7 @@ const t = getTranslations();
 
 {
 	backlinks && backlinks.length > 0 ? (
-		<ContentSection data-pagefind-ignore>
+		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{backlinks.map(({ url, title, titleAlt }) => (

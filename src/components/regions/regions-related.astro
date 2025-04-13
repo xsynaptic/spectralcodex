@@ -47,7 +47,11 @@ const t = getTranslations();
 
 {
 	regionChildren.length > 0 || regionSiblings.length > 0 ? (
-		<Container as="div" class="mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6">
+		<Container
+			as="div"
+			class="mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
+			data-pagefind-ignore
+		>
 			{regionChildren.length > 0 ? (
 				<div class="flex-1">
 					<h3

@@ -78,7 +78,9 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 				</ContentHeader>
 			)
 		}
-		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
+		<ProseBody class="pb-small" data-reading-frame>
+			<Content />
+		</ProseBody>
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 	</article>

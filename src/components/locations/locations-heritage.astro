@@ -10,12 +10,12 @@ interface Props {
 	heritage: LocationTwHeritage | undefined;
 }
 
-const { heritage } = Astro.props;
+const { heritage, ...props } = Astro.props;
 
 const t = getTranslations();
 ---
 
-<ContentSection>
+<ContentSection data-pagefind-ignore {...props}>
 	<Fragment slot="section-title">{t('content.section.heritage')}</Fragment>
 	{
 		heritage ? (
