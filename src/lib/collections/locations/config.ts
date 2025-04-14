@@ -47,6 +47,14 @@ export const locations = defineCollection({
 			safety: NumericScaleSchema.optional(),
 			entryQuality: NumericScaleSchema,
 			hideLocation: z.boolean().optional(), // Do not show this location on any map
+			override: z
+				.object({
+					slug: z.string().optional(),
+					title: TitleSchema.optional(),
+					titleAlt: z.string().optional(),
+					regions: reference('regions').array().optional(),
+				})
+				.optional(),
 			outlier: z.boolean().optional(), // Do not use this location to calculate bounding boxes
 			objective: NumericScaleSchema.optional(), // Only for personal reference
 			incomplete: z.boolean().optional(), // Only for personal reference

@@ -97,9 +97,9 @@ export async function getPrimaryRegionByLocationFunction() {
 	const { regionsMap } = await getRegionsCollection();
 
 	return function getPrimaryRegionByLocation(
-		location: CollectionEntry<'locations'>,
+		entry: CollectionEntry<'locations'>,
 	): CollectionEntry<'regions'> | undefined {
-		const regionId = location.data.regions.at(0)?.id;
+		const regionId = entry.data.override?.regions?.at(0)?.id ?? entry.data.regions.at(0)?.id;
 
 		return regionId ? regionsMap.get(regionId) : undefined;
 	};
@@ -116,9 +116,15 @@ export async function getPrimaryRegionIdFromEntryFunction() {
 			entry.data.regions &&
 			entry.data.regions.length > 0
 		) {
-			return entry.data.regions.length > 1
-				? getRegionCommonAncestor(entry.data.regions.map(({ id }) => id))
-				: entry.data.regions.at(0)?.id;
+			let regions = entry.data.regions;
+
+			if (entry.collection === 'locations') {
+				regions = entry.data.override?.regions ?? regions;
+			}
+
+			return regions.length > 1
+				? getRegionCommonAncestor(regions.map(({ id }) => id))
+				: regions.at(0)?.id;
 		}
 		return;
 	};

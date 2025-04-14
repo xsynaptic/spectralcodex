@@ -44,18 +44,11 @@ interface Props {
 const { entry, mapData, metadataItems, regionPrimary } = Astro.props;
 
 const {
-	data: {
-		title,
-		titleAlt,
-		description,
-		dateCreated,
-		dateUpdated,
-		imageFeatured,
-		imageHero,
-		heritage,
-		address,
-	},
+	data: { description, dateCreated, dateUpdated, imageFeatured, imageHero, heritage, address },
 } = entry;
+
+const title = entry.data.override?.title ?? entry.data.title;
+const titleAlt = entry.data.override?.titleAlt ?? entry.data.titleAlt;
 
 const { Content } = await render(entry);
 
@@ -155,8 +148,12 @@ const t = getTranslations();
 			) : undefined
 		}
 		<LocationsHeritage heritage={heritage} />
-		<ContentSectionLinks entry={entry} />
-		<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
+		{!!entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
+		{
+			!!entry.data.hideLocation ? undefined : (
+				<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
+			)
+		}
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
@@ -167,7 +164,7 @@ const t = getTranslations();
 		<LocationsNotices entry={entry} />
 		<ContentSectionMap mapData={mapData}>
 			{
-				address ? (
+				address && !entry.data.hideLocation ? (
 					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
 						{t('locations.address.label')}:{' '}
 						<span>

@@ -85,11 +85,21 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				throw new Error(`Duplicate ID found for "${entry.id}" across different collections!`);
 			}
 
+			let id = entry.id;
+			let title = entry.data.title;
+			let titleAlt = 'titleAlt' in entry.data ? entry.data.titleAlt : undefined;
+
+			if ('override' in entry.data) {
+				id = entry.data.override?.slug ?? id;
+				title = entry.data.override?.title ?? title;
+				titleAlt = entry.data.override?.titleAlt ?? titleAlt;
+			}
+
 			contentMetadataMap.set(entry.id, {
 				collection: entry.collection,
-				id: entry.id,
-				title: entry.data.title,
-				titleAlt: 'titleAlt' in entry.data ? entry.data.titleAlt : undefined,
+				id,
+				title,
+				titleAlt,
 				description: entry.data.description,
 				date:
 					parseContentDate(entry.data.dateUpdated) ??
