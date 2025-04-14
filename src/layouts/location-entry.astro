@@ -78,7 +78,7 @@ const t = getTranslations();
 	hasHeroImage={!!imageHero}
 	hasReadingBar={true}
 >
-	<article {...getPagefindBodyProp(entry)}>
+	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
 			imageHero ? (
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">

@@ -59,7 +59,7 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article {...getPagefindBodyProp(entry)}>
+	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
