@@ -38,7 +38,7 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 }
 
 interface LocationsFeatureCollectionOptions {
-	showHiddenLocations?: boolean | undefined;
+	showAllLocations?: boolean | undefined;
 }
 
 // Generate canonical map feature data for a set of locations
@@ -48,14 +48,14 @@ export function getLocationsFeatureCollection(
 ) {
 	if (!locations || locations.length === 0) return;
 
-	const { showHiddenLocations } = Object.assign(
+	const { showAllLocations } = Object.assign(
 		{
-			showHiddenLocations: false,
+			showAllLocations: false,
 		},
 		options ?? {},
 	);
 
-	const locationsFiltered = showHiddenLocations
+	const locationsFiltered = showAllLocations
 		? locations
 		: locations.filter((entry) => entry.data.hideLocation !== true);
 

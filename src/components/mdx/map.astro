@@ -24,7 +24,7 @@ const getLocationsByReference = await getLocationsByIdsFunction();
 // We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, ...mapComponentProps } = getMapData({
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, { showHiddenLocations: showHidden })
+		getLocationsFeatureCollection(locations, { showAllLocations: showHidden })
 	),
 	mapApiBaseUrl: undefined,
 	languages,

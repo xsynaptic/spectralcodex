@@ -11,7 +11,7 @@ const objectiveLocations = await getObjectiveLocations();
 
 const mapData = getMapData({
 	featureCollection: R.pipe(objectiveLocations, (locations) =>
-		getLocationsFeatureCollection(locations, { showHiddenLocations: true })
+		getLocationsFeatureCollection(locations, { showAllLocations: true })
 	),
 	mapApiBaseUrl: getMapApiBaseUrl('objectives'),
 	boundsBufferMax: 400,

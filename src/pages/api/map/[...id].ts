@@ -94,7 +94,7 @@ export const getStaticPaths = (async () => {
 	const objectiveLocations = await getObjectiveLocations();
 
 	const objectivesData = R.pipe(objectiveLocations, (locations) =>
-		getLocationsMapApiData(locations, 'objectives', { showHiddenLocations: true }),
+		getLocationsMapApiData(locations, 'objectives', { showAllLocations: true }),
 	);
 
 	return [
