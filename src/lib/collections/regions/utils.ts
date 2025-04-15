@@ -1,17 +1,6 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
-
-import * as R from 'remeda';
+import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
 
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-
-/**
- * Type guard to ensure this collection entry is configured for regions
- */
-function isCollectionEntryWithRegions(
-	entry: CollectionEntry<CollectionKey>,
-): entry is CollectionEntry<'ephemera' | 'locations' | 'pages' | 'posts' | 'regions'> {
-	return R.isIncludedIn(entry.collection, ['ephemera', 'locations', 'pages', 'posts', 'regions']);
-}
 
 /**
  * Transform an array of strings into collection entries
@@ -92,40 +81,15 @@ export async function getRegionCommonAncestorFunction() {
 /**
  * Primary region
  */
-// Return the first (primary) region associated with a location
-export async function getPrimaryRegionByLocationFunction() {
+// Return the first region from an array of region references
+export async function getFirstRegionByReferenceFunction() {
 	const { regionsMap } = await getRegionsCollection();
 
-	return function getPrimaryRegionByLocation(
-		entry: CollectionEntry<'locations'>,
+	return function getFirstRegionByReference(
+		regions: Array<ReferenceDataEntry<'regions'>>,
 	): CollectionEntry<'regions'> | undefined {
-		const regionId = entry.data.override?.regions?.at(0)?.id ?? entry.data.regions.at(0)?.id;
+		const regionId = regions.at(0)?.id;
 
 		return regionId ? regionsMap.get(regionId) : undefined;
-	};
-}
-
-// Used by the content metadata index
-export async function getPrimaryRegionIdFromEntryFunction() {
-	const getRegionCommonAncestor = await getRegionCommonAncestorFunction();
-
-	return function getPrimaryRegionIdFromEntry<T extends CollectionKey>(entry: CollectionEntry<T>) {
-		if (
-			isCollectionEntryWithRegions(entry) &&
-			'regions' in entry.data &&
-			entry.data.regions &&
-			entry.data.regions.length > 0
-		) {
-			let regions = entry.data.regions;
-
-			if (entry.collection === 'locations') {
-				regions = entry.data.override?.regions ?? regions;
-			}
-
-			return regions.length > 1
-				? getRegionCommonAncestor(regions.map(({ id }) => id))
-				: regions.at(0)?.id;
-		}
-		return;
 	};
 }

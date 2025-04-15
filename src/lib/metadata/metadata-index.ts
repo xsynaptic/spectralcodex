@@ -1,4 +1,4 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
@@ -13,7 +13,7 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPagesCollection } from '#lib/collections/pages/data.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-import { getPrimaryRegionIdFromEntryFunction } from '#lib/collections/regions/utils.ts';
+import { getRegionCommonAncestorFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
@@ -57,6 +57,20 @@ function getContentMetadataWordCount(entry: CollectionEntry<CollectionKey>): num
 	return undefined;
 }
 
+// Find the common ancestor of a set of regions so there's only one in the content metadata index
+async function getRegionPrimaryIdFunction() {
+	const getRegionCommonAncestor = await getRegionCommonAncestorFunction();
+
+	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
+		if (regions && regions.length > 0) {
+			return regions.length > 1
+				? getRegionCommonAncestor(regions.map(({ id }) => id))
+				: regions.at(0)?.id;
+		}
+		return;
+	};
+}
+
 // This function does all the heavy lifting and should only run once
 async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	const startTime = performance.now();
@@ -70,7 +84,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	const { themes } = await getThemesCollection();
 
 	// Regions require some special handling; this will calculate a common ancestor if necessary
-	const getPrimaryRegionIdFromEntry = await getPrimaryRegionIdFromEntryFunction();
+	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
 
 	// Check some additional location properties in development
 	// Note: due to the operation of the new Content Layer API this is now throwing too many errors
@@ -85,14 +99,17 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				throw new Error(`Duplicate ID found for "${entry.id}" across different collections!`);
 			}
 
+			// Here we allow for location data to have overrides; this is used to obscure sensitive sites
 			let id = entry.id;
 			let title = entry.data.title;
 			let titleAlt = 'titleAlt' in entry.data ? entry.data.titleAlt : undefined;
+			let regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
 			if ('override' in entry.data) {
 				id = entry.data.override?.slug ?? id;
 				title = entry.data.override?.title ?? title;
 				titleAlt = entry.data.override?.titleAlt ?? titleAlt;
+				regions = entry.data.override?.regions ?? regions;
 			}
 
 			contentMetadataMap.set(entry.id, {
@@ -107,7 +124,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 					new Date(String(SITE_YEAR_FOUNDED)),
 				url: getContentUrl(entry.collection, entry.id),
 				imageId: getContentMetadataImageId(entry),
-				regionPrimaryId: getPrimaryRegionIdFromEntry(entry),
+				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
 				wordCount: getContentMetadataWordCount(entry), // Expensive!!!

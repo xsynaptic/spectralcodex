@@ -47,6 +47,7 @@ const {
 	data: { description, dateCreated, dateUpdated, imageFeatured, imageHero, heritage, address },
 } = entry;
 
+// This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
 const titleAlt = entry.data.override?.titleAlt ?? entry.data.titleAlt;
 
