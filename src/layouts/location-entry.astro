@@ -23,7 +23,7 @@ import ImageHero from '#components/image-hero/image-hero.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
-import StatusBox from '#components/parts/alert-box.astro';
+import AlertBox from '#components/parts/alert-box.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
@@ -142,9 +142,9 @@ const t = getTranslations();
 		{
 			entry.data.entryQuality === 1 ? (
 				<ContentSection data-pagefind-ignore>
-					<StatusBox status="warning">
+					<AlertBox status="warning">
 						<FormatMarkdown>{t('notice.quality')}</FormatMarkdown>
-					</StatusBox>
+					</AlertBox>
 				</ContentSection>
 			) : undefined
 		}

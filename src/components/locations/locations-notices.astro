@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
-import StatusBox from '#components/parts/alert-box.astro';
+import AlertBox from '#components/parts/alert-box.astro';
 import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
@@ -23,18 +23,18 @@ const t = getTranslations();
 {
 	showDangerNotice && !showDemolishedNotice ? (
 		<ContentSection data-pagefind-ignore {...props}>
-			<StatusBox status="warning" class="mb-small">
+			<AlertBox status="warning" class="mb-small">
 				<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
-			</StatusBox>
+			</AlertBox>
 		</ContentSection>
 	) : undefined
 }
 {
 	showDemolishedNotice ? (
 		<ContentSection data-pagefind-ignore {...props}>
-			<StatusBox status="error" class="mb-small">
+			<AlertBox status="error" class="mb-small">
 				<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
-			</StatusBox>
+			</AlertBox>
 		</ContentSection>
 	) : undefined
 }
