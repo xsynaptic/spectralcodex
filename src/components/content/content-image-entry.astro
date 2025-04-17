@@ -9,9 +9,9 @@ import { FEATURE_IMAGE_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps } from '#lib/image/image-layout.ts';
-import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props {
 	imageId: string;
@@ -51,11 +51,12 @@ const imageProps = imageEntry
 						height: imageEntry.data.height,
 						layout,
 					}),
-					...getImagePlaceholderProps(imageEntry.data.placeholder),
 				}) satisfies RemoteImageProps)
 	: undefined;
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
+
+const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 ---
 
 {
@@ -87,29 +88,32 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 					layout === 'full' ? 'mb-2 w-full' : undefined,
 				]}
 			>
-				{imageLinkUrl ? (
-					<a href={imageLinkUrl}>
+				<ImagePlaceholder
+					class:list={[layout === 'full' ? undefined : 'sm:rounded-xs']}
+					placeholder={placeholder}
+				>
+					{imageLinkUrl ? (
+						<a href={imageLinkUrl}>
+							<Image
+								class:list={[
+									'm-0 object-cover object-center text-sm text-transparent',
+									layout === 'full' ? undefined : 'sm:rounded-xs',
+								]}
+								loading="lazy"
+								{...imageProps}
+							/>
+						</a>
+					) : (
 						<Image
 							class:list={[
-								'bg-fallback',
 								'm-0 object-cover object-center text-sm text-transparent',
 								layout === 'full' ? undefined : 'sm:rounded-xs',
 							]}
 							loading="lazy"
 							{...imageProps}
 						/>
-					</a>
-				) : (
-					<Image
-						class:list={[
-							'bg-fallback',
-							'm-0 object-cover object-center text-sm text-transparent',
-							layout === 'full' ? undefined : 'sm:rounded-xs',
-						]}
-						loading="lazy"
-						{...imageProps}
-					/>
-				)}
+					)}
+				</ImagePlaceholder>
 				{caption ? (
 					<figcaption
 						class:list={[

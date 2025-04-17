@@ -9,11 +9,9 @@ import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
-import {
-	getImagePlaceholderDataUrlHq,
-	getImagePlaceholderProps,
-} from '#lib/image/image-placeholder.ts';
+import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props extends ImageSetWithMetadata {
 	index: number;
@@ -33,19 +31,21 @@ const imageProps = imageEntry
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps(await getImagePlaceholderDataUrlHq(imageEntry.data.src)),
 		} satisfies RemoteImageProps)
 	: undefined;
 
 const loading = index === 0 ? 'eager' : 'lazy';
+
+const placeholder = imageEntry
+	? await getImagePlaceholderDataUrlHq(imageEntry.data.src)
+	: undefined;
 ---
 
 {
 	imageProps ? (
-		<div class="carousel-item relative">
+		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
 			<Image
 				class:list={[
-					'bg-fallback',
 					'z-10 max-h-screen min-h-[400px] w-[100vw] object-cover object-center text-sm text-transparent xl:min-h-screen',
 				]}
 				loading={loading}
@@ -59,6 +59,6 @@ const loading = index === 0 ? 'eager' : 'lazy';
 				{...imageProps}
 			/>
 			{contentMetadata ? <ImageHeroCarouselCaption {...contentMetadata} /> : undefined}
-		</div>
+		</ImagePlaceholder>
 	) : undefined
 }

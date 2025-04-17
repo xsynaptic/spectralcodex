@@ -14,9 +14,9 @@ import DividedItem from '#components/parts/divided-item.astro';
 import TextGridItem from '#components/parts/text-grid-item.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageLayoutProps } from '#lib/image/image-layout.ts';
-import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props {
 	image: CollectionEntry<'images'>;
@@ -38,8 +38,9 @@ const imageProps = {
 		height: image.data.height,
 		layout: 'medium',
 	}),
-	...getImagePlaceholderProps(image.data.placeholder),
 } satisfies RemoteImageProps;
+
+const placeholder = image.data.placeholder;
 
 // TODO: offer direct image downloads at various sizes
 // TODO: image licensing statement
@@ -65,11 +66,16 @@ const t = getTranslations();
 		</Fragment>
 	</ContentHeader>
 	<Container as="div">
-		<Image
-			class:list={['bg-fallback', 'rounded-xs object-cover object-center text-sm text-transparent']}
-			loading="lazy"
-			{...imageProps}
-		/>
+		<ImagePlaceholder placeholder={placeholder}>
+			<Image
+				class:list={[
+					'bg-fallback',
+					'rounded-xs object-cover object-center text-sm text-transparent',
+				]}
+				loading="lazy"
+				{...imageProps}
+			/>
+		</ImagePlaceholder>
 	</Container>
 	<ContentSection class="mt-small">
 		<Fragment slot="section-title">{t('collection.images.metadata.title')}</Fragment>

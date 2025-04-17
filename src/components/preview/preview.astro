@@ -7,8 +7,8 @@ import { Image } from 'astro:assets';
 import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
-import { getImagePlaceholderProps } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;
@@ -35,13 +35,14 @@ const imageProps = imageEntry
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 450px`,
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
-			...getImagePlaceholderProps(imageEntry.data.placeholder),
 		} satisfies RemoteImageProps)
 	: undefined;
 
 const titleAlt = await Astro.slots.render('preview-title-alt');
 const subtitle = await Astro.slots.render('preview-subtitle');
 const description = await Astro.slots.render('preview-description');
+
+const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 ---
 
 <div
@@ -53,17 +54,18 @@ const description = await Astro.slots.render('preview-description');
 >
 	{
 		imageProps ? (
-			<a href={linkUrl}>
-				<Image
-					class:list={[
-						'bg-fallback',
-						'w-full rounded-xs object-cover object-center text-sm text-transparent',
-						isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
-					]}
-					loading="lazy"
-					{...imageProps}
-				/>
-			</a>
+			<ImagePlaceholder placeholder={placeholder}>
+				<a href={linkUrl}>
+					<Image
+						class:list={[
+							'w-full rounded-xs object-cover object-center text-sm text-transparent',
+							isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
+						]}
+						loading="lazy"
+						{...imageProps}
+					/>
+				</a>
+			</ImagePlaceholder>
 		) : (
 			<div
 				class:list={[

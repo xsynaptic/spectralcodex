@@ -65,31 +65,3 @@ export async function getImagePlaceholderDataUrlHq(src: string) {
 		pixelCount: IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ,
 	});
 }
-
-// Generate placeholder props for use with the Image component
-export function getImagePlaceholderProps(placeholder: string | undefined) {
-	return {
-		...(placeholder
-			? {
-					style: [
-						`background-image: url(${placeholder});`,
-						'background-position-x: center;',
-						'background-position-y: center;',
-						'background-size: cover;',
-						'image-rendering: pixelated;',
-					].join(''),
-					onload: `this.style.imageRendering=null;this.removeAttribute('onload');`,
-				}
-			: {}),
-	};
-}
-
-export async function getImageMetadataPlaceholderProps(imageMetadata: ImageMetadata) {
-	const imageObject = await getImageObject(imageMetadata.src);
-	const placeholder = await getImagePlaceholderDataUrl({
-		imageObject,
-		pixelCount: IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
-	});
-
-	return getImagePlaceholderProps(placeholder);
-}
