@@ -68,10 +68,7 @@ const t = getTranslations();
 	<Container as="div">
 		<ImagePlaceholder placeholder={placeholder}>
 			<Image
-				class:list={[
-					'bg-fallback',
-					'rounded-xs object-cover object-center text-sm text-transparent',
-				]}
+				class:list={['rounded-xs object-cover object-center text-sm text-transparent']}
 				loading="lazy"
 				{...imageProps}
 			/>

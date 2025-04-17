@@ -15,11 +15,11 @@ const { as: Tag = 'div', class: className, placeholder, ...props } = Astro.props
 
 <Tag
 	class:list={[
-		placeholder ? 'bg-(image:--img-placeholder) bg-cover bg-center' : 'bg-fallback',
+		placeholder ? 'bg-primary-200 dark:bg-primary-700 bg-cover bg-center' : 'bg-fallback',
 		className,
 	]}
 	style={placeholder
-		? `image-rendering: pixelated; --img-placeholder: url(${placeholder})`
+		? `background-image: url(${placeholder}) image-rendering: pixelated;`
 		: undefined}
 	{...props}
 >
