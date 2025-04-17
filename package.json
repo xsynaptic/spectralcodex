@@ -34,7 +34,7 @@
 		"vite": "6.2.6"
 	},
 	"dependencies": {
-		"astro": "^5.7.0",
+		"astro": "^5.7.2",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"
 	},
@@ -49,7 +49,7 @@
 		"@fontsource-variable/geologica": "^5.2.5",
 		"@fontsource-variable/lora": "^5.2.5",
 		"@fontsource/geologica": "^5.2.5",
-		"@iconify/json": "^2.2.327",
+		"@iconify/json": "^2.2.328",
 		"@iconify/tools": "^4.1.2",
 		"@iconify/utils": "^2.3.0",
 		"@sindresorhus/slugify": "^2.2.1",
@@ -100,7 +100,7 @@
 		"url-join": "^5.0.0",
 		"vite": "6.2.6",
 		"vitest": "^3.1.1",
-		"zx": "^8.5.2"
+		"zx": "^8.5.3"
 	},
 	"packageManager": "pnpm@10.7.1+sha512.2d92c86b7928dc8284f53494fb4201f983da65f0fb4f0d40baafa5cf628fa31dae3e5968f12466f17df7e97310e30f343a648baea1b9b350685dafafffdf5808"
 }
