@@ -6,10 +6,12 @@ import MapComponent from '#components/map/map-component.astro';
 import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
+	mapId?: string;
 	mapData: MapComponentData;
 }
 
 const {
+	mapId,
 	mapData: { hasGeodata, ...mapComponentProps },
 	...props
 } = Astro.props;
@@ -21,7 +23,7 @@ const t = getTranslations();
 	hasGeodata ? (
 		<ContentSection fillViewport={true} data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-			<MapComponent {...mapComponentProps} />
+			<MapComponent mapId={mapId} {...mapComponentProps} />
 			<slot />
 		</ContentSection>
 	) : undefined

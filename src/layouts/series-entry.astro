@@ -83,6 +83,6 @@ const t = getTranslations();
 			<PreviewGrid items={page.data} showDate={true} showRegion={true} />
 			<Pagination class="mt-small md:mt-medium" page={page} />
 		</ContentSection>
-		<ContentSectionMap mapData={mapData} />
+		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
 	</article>
 </MainSite>

@@ -110,7 +110,7 @@ const t = getTranslations();
 				) : undefined
 			}
 		</RegionsRelated>
-		<ContentSectionMap mapData={mapData} />
+		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
 		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={page.data} showDate={true} showCollection={true} showTitleAlt={true} />

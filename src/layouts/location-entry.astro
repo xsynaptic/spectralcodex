@@ -163,7 +163,7 @@ const t = getTranslations();
 			<PreviewGrid items={metadataItems} showDate={true} showRegion={true} />
 		</ContentSection>
 		<LocationsNotices entry={entry} />
-		<ContentSectionMap mapData={mapData}>
+		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{
 				address && !entry.data.hideLocation ? (
 					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">

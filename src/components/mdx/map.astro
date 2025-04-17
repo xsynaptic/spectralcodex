@@ -33,7 +33,7 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 
 {
 	hasGeodata && !isRss ? (
-		<Container as="div" class="not-prose" fillViewport={true}>
+		<Container as="div" class="not-prose" fillViewport={true} data-pagefind-ignore>
 			<MapComponent {...mapComponentProps} />
 		</Container>
 	) : undefined

@@ -7,9 +7,9 @@ import MapComponentSprites from '#components/map/map-component-sprites.astro';
 
 import '#styles/map.css';
 
-type Props = MapComponentProps;
+type Props = { mapId?: string | undefined } & MapComponentProps;
 
-const props = Astro.props;
+const { mapId, ...mapComponentProps } = Astro.props;
 ---
 
 <MapComponentSprites />
@@ -21,7 +21,18 @@ const props = Astro.props;
 	]}
 	data-pagefind-ignore
 >
-	<ReactMapComponent style={{ zIndex: 20 }} {...props} client:visible />
+	{
+		mapId ? (
+			<ReactMapComponent
+				style={{ zIndex: 20 }}
+				{...mapComponentProps}
+				client:visible
+				transition:persist={mapId}
+			/>
+		) : (
+			<ReactMapComponent style={{ zIndex: 20 }} {...mapComponentProps} client:visible />
+		)
+	}
 	<div class="absolute z-10 flex h-full w-full justify-center">
 		<div class="loading w-[20%]"></div>
 	</div>

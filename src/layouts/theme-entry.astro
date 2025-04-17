@@ -84,7 +84,7 @@ const t = getTranslations();
 		<ProseBody class="pb-small" data-pagefind-weight="2">
 			<Content />
 		</ProseBody>
-		<ContentSectionMap mapData={mapData} />
+		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
 		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			<PreviewGrid items={page.data} showDate={true} showRegion={true} />
