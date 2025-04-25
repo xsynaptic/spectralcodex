@@ -19,7 +19,7 @@ const { as: Tag = 'div', class: className, placeholder, ...props } = Astro.props
 		className,
 	]}
 	style={placeholder
-		? `background-image: url(${placeholder}) image-rendering: pixelated;`
+		? `background-image: url(${placeholder}); image-rendering: pixelated;`
 		: undefined}
 	{...props}
 >

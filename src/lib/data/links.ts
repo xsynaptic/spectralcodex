@@ -494,4 +494,8 @@ export const linksMap = [
 		title: 'Dax Ward',
 		match: 'daxward.com',
 	},
+	{
+		title: 'Tom Higgs',
+		match: 'https://www.flickr.com/photos/truebritishmetal/',
+	},
 ] as const satisfies Array<LinksMapItem>;
