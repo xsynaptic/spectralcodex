@@ -80,8 +80,9 @@
 @utility bg-fallback {
 	@apply bg-primary-200 bg-repeat;
 	background-image: svg-load('seigaiha.svg', fill=#dbdbdf);
-	[data-theme='dark'] & {
-		@apply bg-primary-700;
-		background-image: svg-load('seigaiha.svg', fill=#3f3f46);
-	}
+}
+
+@utility bg-fallback-dark {
+	@apply bg-primary-700;
+	background-image: svg-load('seigaiha.svg', fill=#3f3f46);
 }
