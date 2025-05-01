@@ -328,6 +328,11 @@ export const linksMap = [
 		match: 'ourisland.pts.org.tw',
 	},
 	{
+		title: 'Initium Media',
+		titleAlt: '端傳媒',
+		match: 'theinitium.com',
+	},
+	{
 		title: 'PTS News',
 		titleAlt: '公視新聞網',
 		match: 'pts.org.tw',

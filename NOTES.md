@@ -17,6 +17,12 @@ In cases where you'd like to find properties _not_ present in frontmatter, run t
 find . -name "*.mdx" -print0 | xargs -0 grep -L "rating:" | sort
 ```
 
+Another command to find all files with `imageFeatured` and `entryQuality` of a particular value (in this case `1`):
+
+```
+find collections/locations -name "*.mdx" -type f -exec grep -l "imageFeatured:" {} \; | xargs grep -l "entryQuality: 1"
+```
+
 ## Build Profiling
 
 This worked pretty well to debug some major issues with `getCollection` calls:
