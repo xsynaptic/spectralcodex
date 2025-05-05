@@ -1,5 +1,7 @@
 import type { LocationStatus } from '@spectralcodex/map-types';
 
+import { LocationStatusEnum } from '@spectralcodex/map-types';
+
 /** Sky blue colors from Tailwind */
 export const mapClusterStyle = {
 	circleSmFill: '#0284c7',
@@ -15,52 +17,52 @@ export const mapClusterStyle = {
 
 export const locationStatusStyle: Record<LocationStatus, { color: string; stroke: string }> = {
 	/** Emerald */
-	operational: {
+	[LocationStatusEnum.Operational]: {
 		color: '#10b981',
 		stroke: '#059669',
 	},
 	/** Green */
-	public: {
+	[LocationStatusEnum.Public]: {
 		color: '#22c55e',
 		stroke: '#16a34a',
 	},
 	/** Lime */
-	restored: {
+	[LocationStatusEnum.Restored]: {
 		color: '#84cc16',
 		stroke: '#65a30d',
 	},
 	/** Yellow */
-	converted: {
+	[LocationStatusEnum.Converted]: {
 		color: '#eab308',
 		stroke: '#ca8a04',
 	},
 	/** Amber */
-	private: {
+	[LocationStatusEnum.Private]: {
 		color: '#f59e0b',
 		stroke: '#d97706',
 	},
 	/** Orange */
-	idle: {
+	[LocationStatusEnum.Idle]: {
 		color: '#f97316',
 		stroke: '#ea580c',
 	},
 	/** Red */
-	abandoned: {
+	[LocationStatusEnum.Abandoned]: {
 		color: '#dc2626',
 		stroke: '#b91c1c',
 	},
 	/** Red (darker) */
-	remnants: {
+	[LocationStatusEnum.Remnants]: {
 		color: '#991b1b',
 		stroke: '#7f1d1d',
 	},
 	/** Zinc */
-	demolished: {
+	[LocationStatusEnum.Demolished]: {
 		color: '#52525b',
 		stroke: '#e4e4e7',
 	},
 	/** Zinc (darker) */
-	unknown: {
+	[LocationStatusEnum.Unknown]: {
 		color: '#27272a',
 		stroke: '#d4d4d8',
 	},

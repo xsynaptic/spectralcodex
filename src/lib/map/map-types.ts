@@ -46,10 +46,3 @@ export interface MapComponentData extends MapComponentProps {
 	featureCount: number;
 	prefetchUrls?: Array<string> | undefined;
 }
-
-export type {
-	MapComponentProps,
-	MapGeometry,
-	MapPopupDataRaw,
-	MapSourceDataRaw,
-} from '@spectralcodex/react-map-component';

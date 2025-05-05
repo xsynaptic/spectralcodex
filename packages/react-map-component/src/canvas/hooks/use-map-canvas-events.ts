@@ -3,7 +3,7 @@ import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import { useCallback } from 'react';
 import { funnel } from 'remeda';
 
-import { mapLayerIds } from '../../config/layer';
+import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
 import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
 import { useMediaQuery } from '../../lib/hooks/use-media-query';
@@ -31,7 +31,7 @@ export function useMapCanvasEvents() {
 			setFilterOpen(false);
 
 			switch (feature.layer.id) {
-				case mapLayerIds.clusters: {
+				case MapLayerIdEnum.Clusters: {
 					const clusterId =
 						typeof feature.properties.cluster_id === 'string' ||
 						typeof feature.properties.cluster_id === 'number'
@@ -69,8 +69,8 @@ export function useMapCanvasEvents() {
 
 				// When a click event occurs on a feature in the unclustered-point layer, open a popup
 				// TODO: fly first, then open the popup, which requires getting into tricky event handling
-				case mapLayerIds.points:
-				case mapLayerIds.pointsTarget: {
+				case MapLayerIdEnum.Points:
+				case MapLayerIdEnum.PointsTarget: {
 					if (isMapCoordinates(feature.geometry.coordinates)) {
 						mapInstance.flyTo({
 							center: feature.geometry.coordinates,
@@ -97,12 +97,12 @@ export function useMapCanvasEvents() {
 			const feature = features && features[0];
 
 			switch (feature?.layer.id) {
-				case mapLayerIds.clusters: {
+				case MapLayerIdEnum.Clusters: {
 					setCanvasCursor('zoom-in');
 					break;
 				}
-				case mapLayerIds.points:
-				case mapLayerIds.pointsTarget: {
+				case MapLayerIdEnum.Points:
+				case MapLayerIdEnum.PointsTarget: {
 					setCanvasCursor('pointer');
 					break;
 				}

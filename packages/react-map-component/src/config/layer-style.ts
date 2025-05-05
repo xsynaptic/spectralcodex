@@ -4,13 +4,16 @@ import type {
 	SymbolLayerSpecification,
 } from 'react-map-gl/maplibre';
 
+import type { MapLayerId } from './layer';
+import type { MapSourceId } from './source';
+
 import { locationStatusStyle, mapClusterStyle } from './colors';
-import { mapLayerIds } from './layer';
+import { MapLayerIdEnum } from './layer';
 import { MapSourceIdEnum } from './source';
 
 interface StyleIdentifiers {
-	id: (typeof mapLayerIds)[keyof typeof mapLayerIds];
-	source: (typeof MapSourceIdEnum)[keyof typeof MapSourceIdEnum];
+	id: MapLayerId;
+	source: MapSourceId;
 }
 
 // MapLibre expects some style properties to have at least two items
@@ -211,28 +214,31 @@ const getLineStringStyle = (identifiers: StyleIdentifiers) =>
 
 export const layerStyles = {
 	clusterCircle: getClusterCircleLayerStyle({
-		id: mapLayerIds.clusters,
+		id: MapLayerIdEnum.Clusters,
 		source: MapSourceIdEnum.PointCollection,
 	}),
 	clusterSymbol: getClusterSymbolLayerStyle({
-		id: mapLayerIds.clustersLabel,
+		id: MapLayerIdEnum.ClustersLabel,
 		source: MapSourceIdEnum.PointCollection,
 	}),
 	pointsTarget: getPointsTargetLayerStyle({
-		id: mapLayerIds.pointsTarget,
+		id: MapLayerIdEnum.PointsTarget,
 		source: MapSourceIdEnum.PointCollection,
 	}),
-	points: getPointsLayerStyle({ id: mapLayerIds.points, source: MapSourceIdEnum.PointCollection }),
+	points: getPointsLayerStyle({
+		id: MapLayerIdEnum.Points,
+		source: MapSourceIdEnum.PointCollection,
+	}),
 	multiPointsTarget: getPointsTargetLayerStyle({
-		id: mapLayerIds.pointsTarget,
+		id: MapLayerIdEnum.PointsTarget,
 		source: MapSourceIdEnum.MultiPointCollection,
 	}),
 	multiPoints: getPointsLayerStyle({
-		id: mapLayerIds.points,
+		id: MapLayerIdEnum.Points,
 		source: MapSourceIdEnum.MultiPointCollection,
 	}),
 	lineString: getLineStringStyle({
-		id: mapLayerIds.lineString,
+		id: MapLayerIdEnum.LineString,
 		source: MapSourceIdEnum.LineStringCollection,
 	}),
 };

@@ -1,11 +1,9 @@
+import type { MapComponentProps } from '@spectralcodex/react-map-component';
+
 import { bbox, buffer, center as getCenter, truncate } from '@turf/turf';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
-import type {
-	MapComponentData,
-	MapComponentProps,
-	MapFeatureCollection,
-} from '#lib/map/map-types.ts';
+import type { MapComponentData, MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { getLocationsMapPopupData, getLocationsMapSourceData } from '#lib/map/map-locations.ts';
 import { isLngLatBoundsLike } from '#lib/map/map-type-guards.ts';

@@ -1,3 +1,8 @@
+import type {
+	MapGeometry,
+	MapPopupDataRaw,
+	MapSourceDataRaw,
+} from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
 import {
@@ -6,12 +11,7 @@ import {
 	MapLocationStatusMap,
 } from '@spectralcodex/react-map-component';
 
-import type {
-	MapFeatureCollection,
-	MapGeometry,
-	MapPopupDataRaw,
-	MapSourceDataRaw,
-} from '#lib/map/map-types.ts';
+import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 

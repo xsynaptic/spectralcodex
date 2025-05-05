@@ -3,3 +3,5 @@ export const MapSourceIdEnum = {
 	MultiPointCollection: 'multiPointCollection',
 	LineStringCollection: 'lineStringCollection',
 } as const;
+
+export type MapSourceId = (typeof MapSourceIdEnum)[keyof typeof MapSourceIdEnum];

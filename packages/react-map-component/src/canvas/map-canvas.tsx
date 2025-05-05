@@ -8,7 +8,7 @@ import type { MapComponentProps } from '../types';
 import { useMapApiPopupData } from '../api/hooks/use-map-api-popup-data';
 import { useMapApiSourceData } from '../api/hooks/use-map-api-source-data';
 import { useMapCanvasEvents } from '../canvas/hooks/use-map-canvas-events';
-import { mapLayerIds } from '../config/layer';
+import { MapLayerIdEnum } from '../config/layer';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
@@ -25,9 +25,9 @@ import { MapLoading } from './map-loading';
 import { MapPopup } from './map-popup';
 
 const interactiveLayerIds = [
-	mapLayerIds.clusters,
-	mapLayerIds.points,
-	mapLayerIds.pointsTarget,
+	MapLayerIdEnum.Clusters,
+	MapLayerIdEnum.Points,
+	MapLayerIdEnum.PointsTarget,
 ] as const;
 
 export const MapCanvas = ({
