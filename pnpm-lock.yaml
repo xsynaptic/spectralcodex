@@ -72,6 +72,9 @@ importers:
       '@spectralcodex/local-image-server':
         specifier: workspace:*
         version: link:packages/local-image-server
+      '@spectralcodex/map-types':
+        specifier: workspace:*
+        version: link:packages/map-types
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
@@ -334,11 +337,16 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
 
+  packages/map-types: {}
+
   packages/react-map-component:
     devDependencies:
       '@protomaps/basemaps':
         specifier: ^5.3.0
         version: 5.3.0
+      '@spectralcodex/map-types':
+        specifier: workspace:*
+        version: link:../map-types
       '@tanstack/react-query':
         specifier: ^5.75.2
         version: 5.75.2(react@18.3.1)

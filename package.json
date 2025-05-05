@@ -56,6 +56,7 @@
 		"@spectralcodex/image-loader": "workspace:*",
 		"@spectralcodex/image-open-graph": "workspace:*",
 		"@spectralcodex/local-image-server": "workspace:*",
+		"@spectralcodex/map-types": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tailwindcss/vite": "^4.1.5",

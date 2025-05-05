@@ -66,7 +66,7 @@ export const LocationCategoryEnum = {
 	Lake: 'lake',
 	Rock: 'rock',
 	Tree: 'tree',
-	WaterFall: 'waterfall',
+	Waterfall: 'waterfall',
 	/** Religious */
 	Religious: 'religious',
 	AncestralHall: 'ancestral-hall',

@@ -1,3 +1,4 @@
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 import * as R from 'remeda';
 
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
@@ -29,7 +30,7 @@ export async function getTheaterLocations() {
 		),
 		theaterLocationsUnknownStatus: R.pipe(
 			theaterLocations,
-			R.filter(({ data }) => data.precision >= 3 && data.status === 'unknown'),
+			R.filter(({ data }) => data.precision >= 3 && data.status === LocationStatusEnum.Unknown),
 			R.sort(
 				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
 			),
@@ -39,7 +40,10 @@ export async function getTheaterLocations() {
 			R.filter(
 				({ data }) => !!data.themes?.find(({ id }) => id === 'taiwan-japanese-colonial-era'),
 			),
-			R.filter(({ data }) => !['demolished', 'unknown'].includes(data.status)),
+			R.filter(
+				({ data }) =>
+					!R.isIncludedIn(data.status, [LocationStatusEnum.Demolished, LocationStatusEnum.Unknown]),
+			),
 			R.sort(
 				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
 			),

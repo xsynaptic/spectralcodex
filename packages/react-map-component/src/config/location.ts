@@ -1,6 +1,6 @@
-import type { LocationStatus, LocationStatusMetadata } from '../types/map-locations';
+import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/map-types';
 
-import { LocationStatusEnum } from '../types/map-locations';
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 
 export const LocationStatusRecords = {
 	[LocationStatusEnum.Operational]: {

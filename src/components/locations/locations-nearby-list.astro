@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 
 import ContentSection from '#components/content/content-section.astro';
 import FormatCjk from '#components/format/format-cjk.astro';
@@ -42,7 +43,7 @@ const t = getTranslations();
 									{distanceDisplay}&nbsp;{t('locations.unit.km')}
 								</span>
 							) : undefined}
-							{location.data.status === 'demolished' ? (
+							{location.data.status === LocationStatusEnum.Demolished ? (
 								<span class:list={['select-none', 'text-primary-300 dark:text-primary-500']}>
 									&#x2717;
 								</span>

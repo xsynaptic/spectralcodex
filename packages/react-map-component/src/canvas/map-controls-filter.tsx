@@ -1,6 +1,7 @@
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { MapSpritesEnum } from '../config/sprites';
+import { MapSpritesEnum } from '@spectralcodex/map-types';
+
 import { MAP_FILTER_CONTROL_ID } from '../constants';
 import {
 	useMapCanvasLoading,
@@ -30,11 +31,11 @@ export const FilterControl = ({ position }: { position: ControlPosition }) => {
 				}}
 			>
 				<div
-					className={`flex h-full w-full items-center justify-center text-primary-700 ${filterOpen ? 'bg-primary-300 hover:bg-primary-200' : ''} ${isLoading ? 'bg-primary-200 opacity-50' : ''}`}
+					className={`text-primary-700 flex h-full w-full items-center justify-center ${filterOpen ? 'bg-primary-300 hover:bg-primary-200' : ''} ${isLoading ? 'bg-primary-200 opacity-50' : ''}`}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						className={`h-[20px] text-primary-700 ${filterOpen ? 'mt-[1px] text-primary-600' : ''} ${isLoading ? 'text-primary-600' : ''}`}
+						className={`text-primary-700 h-[20px] ${filterOpen ? 'text-primary-600 mt-[1px]' : ''} ${isLoading ? 'text-primary-600' : ''}`}
 						viewBox="0 0 24 24"
 					>
 						<use xlinkHref={`#${MapSpritesEnum.Filters}`}></use>

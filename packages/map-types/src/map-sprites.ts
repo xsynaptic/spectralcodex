@@ -1,6 +1,5 @@
 // Define any icons used in the map component in this file
-// Note 1: DO NOT import anything else (to avoid issues with bundling non-client-side code)
-// Note 2: the viewbox attribute needs to be copied in-line to wherever the sprite is being displayed
+// Note: the viewbox attribute needs to be copied in-line to wherever the sprite is being displayed
 export const MapSpritesEnum = {
 	Google: 'logos:google-maps',
 	Wikipedia: 'hugeicons:wikipedia',

@@ -1,10 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-
+import * as R from 'remeda';
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import { getTranslations } from '#lib/utils/i18n.ts';
+import { LocationStatusEnum } from '#types/map-locations.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -14,8 +15,13 @@ const { entry, ...props } = Astro.props;
 
 const showDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
-	: ['abandoned', 'idle', 'remnants'].includes(entry.data.status);
-const showDemolishedNotice = entry.data.status === 'demolished';
+	: R.isIncludedIn(entry.data.status, [
+			LocationStatusEnum.Abandoned,
+			LocationStatusEnum.Idle,
+			LocationStatusEnum.Remnants,
+		]);
+
+const showDemolishedNotice = entry.data.status === LocationStatusEnum.Demolished;
 
 const t = getTranslations();
 ---

@@ -6,6 +6,7 @@
 	"private": true,
 	"devDependencies": {
 		"@protomaps/basemaps": "^5.3.0",
+		"@spectralcodex/map-types": "workspace:*",
 		"@tanstack/react-query": "^5.75.2",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^18.3.20",

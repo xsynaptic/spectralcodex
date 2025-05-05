@@ -1,9 +1,9 @@
+import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItem } from '../types';
 
-import { MapSpritesEnum } from '../config/sprites';
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';

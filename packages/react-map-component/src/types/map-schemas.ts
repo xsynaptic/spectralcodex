@@ -1,7 +1,6 @@
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import * as R from 'remeda';
 import { z } from 'zod';
-
-import { LocationCategoryEnum, LocationStatusEnum } from './map-locations';
 
 const NumericScaleSchema = z.number().int().min(1).max(5);
 
@@ -39,8 +38,8 @@ export const MapSourceDataSchema = z
 	.transform((value) => ({
 		properties: {
 			id: value.i,
-			category: R.invert(MapLocationCategoryMap)[value.c] ?? ('unknown' as const),
-			status: R.invert(MapLocationStatusMap)[value.s] ?? ('unknown' as const),
+			category: R.invert(MapLocationCategoryMap)[value.c] ?? LocationCategoryEnum.Unknown,
+			status: R.invert(MapLocationStatusMap)[value.s] ?? LocationCategoryEnum.Unknown,
 			precision: value.p,
 			quality: value.q,
 			rating: value.r,

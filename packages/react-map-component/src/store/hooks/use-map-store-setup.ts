@@ -1,10 +1,10 @@
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 import { useMemo, useState } from 'react';
 import * as R from 'remeda';
 import { createStore } from 'zustand';
 
 import type { MapDataConfigurableState, MapDataState, MapDataStore } from '../map-store-types';
 
-import { LocationStatusEnum } from '../../types/map-locations';
 import { getPopupItem } from '../map-store-utils';
 
 const defaultState = {

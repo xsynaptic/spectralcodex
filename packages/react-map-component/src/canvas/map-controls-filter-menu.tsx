@@ -1,11 +1,11 @@
+import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/map-types';
+
+import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, type ReactNode } from 'react';
 import * as R from 'remeda';
 
-import type { LocationStatus, LocationStatusMetadata } from '../types/map-locations';
-
 import { locationStatusStyle } from '../config/colors';
 import { LocationStatusRecords } from '../config/location';
-import { MapSpritesEnum } from '../config/sprites';
 import { translations } from '../config/translations';
 import {
 	useMapFilterOpen,
@@ -35,7 +35,7 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 			className={`rounded-sm transition-colors ${isFiltered ? 'bg-primary-200 hover:bg-primary-300' : 'bg-primary-50 hover:bg-primary-100'}`}
 		>
 			<button
-				className="flex w-full cursor-pointer select-none items-center gap-1 px-1 py-1 sm:py-0.5"
+				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
 				onClick={() => {
 					toggleStatusFilter(status);
 				}}
@@ -48,7 +48,7 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 					}}
 				></div>
 				<div
-					className={`flex w-full flex-nowrap items-center justify-between gap-1 font-display text-xs sm:text-sm ${isFiltered ? 'text-primary-500' : 'text-primary-700'}`}
+					className={`font-display flex w-full flex-nowrap items-center justify-between gap-1 text-xs sm:text-sm ${isFiltered ? 'text-primary-500' : 'text-primary-700'}`}
 				>
 					{languages?.includes('zh') ? (
 						<>
@@ -76,14 +76,14 @@ const MapFilterStatusShowHideMenuItem = memo(function MapFilterStatusShowHideMen
 	children: ReactNode;
 }) {
 	return (
-		<li className="rounded-sm bg-primary-50 transition-colors hover:bg-primary-100">
+		<li className="bg-primary-50 hover:bg-primary-100 rounded-sm transition-colors">
 			<button
-				className="flex w-full cursor-pointer select-none items-center gap-1 px-1 py-1 sm:py-0.5"
+				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
 				onClick={onClick}
 			>
-				<div className={`h-2 w-2 rounded-full border border-primary-500 bg-primary-200`}></div>
+				<div className={`border-primary-500 bg-primary-200 h-2 w-2 rounded-full border`}></div>
 				<div
-					className={`flex w-full flex-nowrap items-center justify-between gap-1 font-display text-xs text-primary-700 sm:text-sm`}
+					className={`font-display text-primary-700 flex w-full flex-nowrap items-center justify-between gap-1 text-xs sm:text-sm`}
 				>
 					{children}
 				</div>
@@ -107,7 +107,7 @@ const MapFilterStatusShowHideMenu = () => {
 				{languages?.includes('zh') ? (
 					<>
 						<span>{translations.showAll}</span>
-						<span className="font-sans font-medium text-primary-600 sm:text-xs">
+						<span className="text-primary-600 font-sans font-medium sm:text-xs">
 							{translations.showAllAlt}
 						</span>
 					</>
@@ -123,7 +123,7 @@ const MapFilterStatusShowHideMenu = () => {
 				{languages?.includes('zh') ? (
 					<>
 						<span>{translations.hideAll}</span>
-						<span className="font-sans font-medium text-primary-600 sm:text-xs">
+						<span className="text-primary-600 font-sans font-medium sm:text-xs">
 							{translations.hideAllAlt}
 						</span>
 					</>
@@ -142,7 +142,7 @@ const MapFilterRatingMenuItem = () => {
 
 	return (
 		<li>
-			<div className="flex h-[20px] w-full select-none items-center justify-center gap-2 px-1 md:h-[24px]">
+			<div className="flex h-[20px] w-full items-center justify-center gap-2 px-1 select-none md:h-[24px]">
 				{R.range(1, 6).map((value) => (
 					<svg
 						key={`rating-${String(value)}`}
@@ -171,10 +171,10 @@ const MapFilterObjectiveMenuItem = () => {
 
 	return (
 		<li className="rounded-sm transition-colors">
-			<div className="flex w-full cursor-pointer select-none items-center gap-1">
+			<div className="flex w-full cursor-pointer items-center gap-1 select-none">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
-						className={`flex-1 rounded-full border font-display text-xs text-primary-700 ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
+						className={`font-display text-primary-700 flex-1 rounded-full border text-xs ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
 						onClick={() => {
 							setObjectiveFilter(value);
 						}}

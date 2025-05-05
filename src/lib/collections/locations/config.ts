@@ -1,3 +1,4 @@
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
@@ -12,7 +13,6 @@ import {
 import { GeometrySchema } from '#lib/schemas/geometry.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
-import { LocationCategoryEnum, LocationStatusEnum } from '#types/map-locations.ts';
 
 export const locations = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/locations` }),

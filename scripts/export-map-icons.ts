@@ -1,9 +1,8 @@
 import { lookupCollection } from '@iconify/json';
 import { blankIconSet, exportToDirectory, IconSet } from '@iconify/tools';
 import { getIcons, validateIconSet } from '@iconify/utils';
+import { mapMarkerIcons } from '@spectralcodex/map-types';
 import path from 'node:path';
-
-import { mapMarkerIcons } from '../src/lib/map/map-marker-icons';
 
 /**
  * Populate a custom icon set with whatever we might use in maps

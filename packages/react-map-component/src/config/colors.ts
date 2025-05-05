@@ -1,4 +1,4 @@
-import type { LocationStatus } from '../types/map-locations';
+import type { LocationStatus } from '@spectralcodex/map-types';
 
 /** Sky blue colors from Tailwind */
 export const mapClusterStyle = {

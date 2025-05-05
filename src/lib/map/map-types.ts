@@ -1,7 +1,7 @@
 import type { MapComponentProps, MapGeometry } from '@spectralcodex/react-map-component';
 import type { FeatureCollection } from 'geojson';
 
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/react-map-component';
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
 
 import { NumericScaleSchema } from '#lib/schemas/content.ts';
@@ -52,9 +52,4 @@ export type {
 	MapGeometry,
 	MapPopupDataRaw,
 	MapSourceDataRaw,
-} from '@spectralcodex/react-map-component';
-export {
-	MapGeometryTypeMap,
-	MapLocationCategoryMap,
-	MapLocationStatusMap,
 } from '@spectralcodex/react-map-component';
