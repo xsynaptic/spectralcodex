@@ -7,7 +7,7 @@ import localImageServer from '@spectralcodex/local-image-server';
 import tailwindcss from '@tailwindcss/vite';
 import AutoImport from 'astro-auto-import';
 import pagefind from 'astro-pagefind';
-import { defineConfig, envField } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import { nanoid } from 'nanoid';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
@@ -145,6 +145,34 @@ export default defineConfig({
 		],
 	},
 	experimental: {
+		fonts: [
+			{
+				provider: fontProviders.fontsource(),
+				name: 'Commissioner',
+				cssVariable: '--font-commissioner',
+				weights: ['300 700'],
+				styles: ['normal'],
+				subsets: ['latin'],
+				optimizedFallbacks: false,
+			},
+			{
+				provider: fontProviders.fontsource(),
+				name: 'Geologica',
+				cssVariable: '--font-geologica',
+				weights: ['300 700'],
+				styles: ['normal'],
+				subsets: ['latin'],
+				optimizedFallbacks: false,
+			},
+			{
+				provider: fontProviders.fontsource(),
+				name: 'Lora',
+				cssVariable: '--font-lora',
+				weights: ['300 700'],
+				styles: ['normal', 'italic'],
+				optimizedFallbacks: false,
+			},
+		],
 		contentIntellisense: true,
 	},
 });

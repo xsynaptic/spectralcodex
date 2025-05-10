@@ -39,18 +39,6 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.3.1
         version: 3.3.1
-      '@fontsource-variable/commissioner':
-        specifier: ^5.2.7
-        version: 5.2.7
-      '@fontsource-variable/geologica':
-        specifier: ^5.2.5
-        version: 5.2.5
-      '@fontsource-variable/lora':
-        specifier: ^5.2.5
-        version: 5.2.5
-      '@fontsource/geologica':
-        specifier: ^5.2.5
-        version: 5.2.5
       '@iconify/json':
         specifier: ^2.2.336
         version: 2.2.336
@@ -786,18 +774,6 @@ packages:
   '@eslint/plugin-kit@0.2.8':
     resolution: {integrity: sha512-ZAoA40rNMPwSm+AeHpCq8STiNAwzWLJuP8Xv4CHIc9wv/PSuExjMrmjfYNj682vW0OOiZ1HKxzvjQr9XZIisQA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@fontsource-variable/commissioner@5.2.7':
-    resolution: {integrity: sha512-iE3GsJF+WJvTqxoAH0tl2gYUqqruhkx95azhRnORnY9HHaRk5OABM+z3yeiRuriQ8wEVCTau69TlLs91Q4LcVw==}
-
-  '@fontsource-variable/geologica@5.2.5':
-    resolution: {integrity: sha512-jNjF5bpffc9y6p/cVGZSSnAA06JgxQjt/7Ux+t19xmroHjQhPkGBIY72chy3XUg4GBH72ByPzdAT1RxOQNiWNQ==}
-
-  '@fontsource-variable/lora@5.2.5':
-    resolution: {integrity: sha512-eupTrzQnDFr3i9pci0efxfT0mCjGmWJNmDyvsl9Wq11JCyNr5ZN7bTjhIT6/q9daq5CshTsowg0/BH2gERbtXQ==}
-
-  '@fontsource/geologica@5.2.5':
-    resolution: {integrity: sha512-KmOYZ1jT4cINhxA1uShmXBs/2FFHMQJrOnAXTSm24XHmJiOq7VQ/NxQ6dS0gkQhaTPCwC9SO/tuDzpRAVKL9PQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -6294,14 +6270,6 @@ snapshots:
     dependencies:
       '@eslint/core': 0.13.0
       levn: 0.4.1
-
-  '@fontsource-variable/commissioner@5.2.7': {}
-
-  '@fontsource-variable/geologica@5.2.5': {}
-
-  '@fontsource-variable/lora@5.2.5': {}
-
-  '@fontsource/geologica@5.2.5': {}
 
   '@humanfs/core@0.19.1': {}
 

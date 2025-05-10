@@ -3,10 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 
 import type { MetaProps } from '#components/main/main-meta.astro';
 
-import '@fontsource-variable/commissioner';
-import '@fontsource-variable/geologica';
-import '@fontsource-variable/lora';
-import '@fontsource-variable/lora/wght-italic.css';
+import { Font } from 'astro:assets';
 
 import '#styles/global.css';
 import MainFooter from '#components/main/main-footer.astro';
@@ -44,6 +41,9 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 			media="(prefers-color-scheme: dark)"
 		/>
 		<MainMeta meta={meta} />
+		<Font cssVariable="--font-commissioner" preload />
+		<Font cssVariable="--font-geologica" preload />
+		<Font cssVariable="--font-lora" />
 		<ThemeManager defaultTheme="auto" />
 		<ClientRouter />
 	</head>
