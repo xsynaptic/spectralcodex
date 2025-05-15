@@ -35,8 +35,8 @@
 	},
 	"dependencies": {
 		"astro": "^5.7.13",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1"
+		"react": "^19.1.0",
+		"react-dom": "^19.1.0"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.1",
@@ -61,8 +61,8 @@
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
 		"@types/postcss-inline-svg": "^5.0.4",
-		"@types/react": "^18.3.21",
-		"@types/react-dom": "^18.3.7",
+		"@types/react": "^19.1.4",
+		"@types/react-dom": "^19.1.5",
 		"@xsynaptic/eslint-config": "link:../eslint-config",
 		"@xsynaptic/unified-tools": "^0.0.4",
 		"alfaaz": "^1.1.0",
@@ -86,7 +86,7 @@
 		"prettier": "^3.5.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"react-compiler-runtime": "19.1.0-rc.1",
+		"react-compiler-runtime": "19.1.0-rc.2",
 		"rehype-wrap-cjk": "^0.2.6",
 		"remeda": "^2.21.6",
 		"sharp": "^0.34.1",
