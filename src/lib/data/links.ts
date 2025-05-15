@@ -127,6 +127,10 @@ export const linksMap = [
 		match: 'rhinohcp.blogspot.',
 	},
 	{
+		title: "Leon's Way",
+		match: 'leonsway.blogspot.',
+	},
+	{
 		title: 'Time Field',
 		titleAlt: '時光土場',
 		match: 'milkyrailway.blogspot.',
