@@ -1,11 +1,14 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+
 import * as R from 'remeda';
+
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import { getTranslations } from '#lib/utils/i18n.ts';
-import { LocationStatusEnum } from '#types/map-locations.ts';
+
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;

@@ -1,5 +1,5 @@
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import type { TimelineMonthlyData, TimelineSpan } from '#lib/timeline/timeline-types.ts';
-import type { ContentMetadataItem } from '#types/metadata.ts';
 
 import { getTimelineMonthlySlug, getTimelineSpan } from '#lib/timeline/timeline-utils.ts';
 

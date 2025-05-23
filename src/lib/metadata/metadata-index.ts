@@ -5,7 +5,7 @@ import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '#types/metadata.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '#constants.ts';
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';

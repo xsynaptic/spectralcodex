@@ -1,6 +1,6 @@
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '#types/metadata.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';

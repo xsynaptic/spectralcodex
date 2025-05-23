@@ -1,4 +1,4 @@
-import type { ContentMetadataItem } from '#types/metadata.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 export type TimelineSpan = 'day' | 'month' | 'year';
 

@@ -1,7 +1,7 @@
 import * as R from 'remeda';
 
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import type { ImageSet } from '#lib/schemas/image.ts';
-import type { ContentMetadataItem } from '#types/metadata.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
