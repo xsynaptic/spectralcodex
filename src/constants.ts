@@ -85,14 +85,11 @@ export const FEATURE_IMAGE_PAGES = false as boolean;
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
 
-//Generate open graph images
+// Generate open graph images
 export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;
 
 // Set to "true" to log missing shortcode IDs
 export const FEATURE_SHORTCODES_ERROR_LOG = true as boolean;
-
-// Set to "true" to activate the experimental theme toggle
-export const FEATURE_DARK_MODE = true as boolean;
 
 // Feature flag for local image collections
 export const FEATURE_IMAGE_COLLECTION = false as boolean;
