@@ -1,6 +1,4 @@
 ---
-import * as R from 'remeda';
-
 import type { TimelineYearlyData } from '#lib/timeline/timeline-types.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
@@ -9,14 +7,11 @@ import { getTimelineYearlyMap } from '#lib/timeline/timeline-items.ts';
 
 const timelineYearlyMap = await getTimelineYearlyMap();
 
-const timelineYearlyData = R.pipe(
-	[...timelineYearlyMap.entries()],
-	R.map(([timelineSlug]) => ({
-		id: timelineSlug,
-		date: new Date(timelineSlug),
-		title: timelineSlug,
-	}))
-) satisfies Array<TimelineYearlyData>;
+const timelineYearlyData = [...timelineYearlyMap.entries()].map(([timelineSlug]) => ({
+	id: timelineSlug,
+	date: new Date(timelineSlug),
+	title: timelineSlug,
+})) satisfies Array<TimelineYearlyData>;
 ---
 
 {

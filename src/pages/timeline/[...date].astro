@@ -1,8 +1,6 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
 import TimelineMonthlyIndex from '#layouts/timeline-monthly-index.astro';
 import { getTimelineItemsMap } from '#lib/timeline/timeline-items.ts';
@@ -13,18 +11,16 @@ export const getStaticPaths = (async () => {
 
 	const timelineItemsMap = await getTimelineItemsMap();
 
-	const timelineItems = R.pipe(
-		[...timelineItemsMap.entries()],
-		R.map(([timelineSlug, timelineItems]) => ({
+	const timelineItems = [...timelineItemsMap.entries()]
+		.map(([timelineSlug, timelineItems]) => ({
 			params: { date: timelineSlug },
 			props: getTimelineProps({
 				timelineItems,
 				timelineSlug,
 				timelineSlugs: [...timelineItemsMap.keys()],
 			}),
-		})),
-		R.sort((a, b) => a.params.date.localeCompare(b.params.date))
-	);
+		}))
+		.sort((a, b) => a.params.date.localeCompare(b.params.date));
 
 	// TODO: pagination
 	return timelineItems;
