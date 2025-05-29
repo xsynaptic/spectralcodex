@@ -2,6 +2,7 @@ import { LocationStatusEnum } from '@spectralcodex/map-types';
 import * as R from 'remeda';
 
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { sortLocationsByLatitude } from '#lib/collections/locations/utils.ts';
 
 // Saved queries for use in MDX and other places
 // TODO: this should eventually end up in a database or something
@@ -17,23 +18,17 @@ export async function getTheaterLocations() {
 		theaterLocationsLowPrecision: R.pipe(
 			theaterLocations,
 			R.filter(({ data }) => data.precision === 1),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsRoughPrecision: R.pipe(
 			theaterLocations,
 			R.filter(({ data }) => data.precision === 2),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsUnknownStatus: R.pipe(
 			theaterLocations,
 			R.filter(({ data }) => data.precision >= 3 && data.status === LocationStatusEnum.Unknown),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsJapanese: R.pipe(
 			theaterLocations,
@@ -44,25 +39,19 @@ export async function getTheaterLocations() {
 				({ data }) =>
 					!R.isIncludedIn(data.status, [LocationStatusEnum.Demolished, LocationStatusEnum.Unknown]),
 			),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsObjectivesTop: R.pipe(
 			theaterLocations,
 			R.filter(({ data }) => data.objective !== undefined && data.objective >= 4),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsObjectivesAll: R.pipe(
 			theaterLocations,
 			R.filter(
 				({ data }) => data.objective !== undefined && data.objective > 1 && data.objective < 4,
 			),
-			R.sort(
-				(a, b) => Number(b.data.geometry.coordinates[1]) - Number(a.data.geometry.coordinates[1]),
-			),
+			R.sort(sortLocationsByLatitude),
 		),
 	};
 }
