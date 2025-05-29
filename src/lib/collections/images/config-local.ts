@@ -1,4 +1,5 @@
 import { imageLoader } from '@spectralcodex/image-loader';
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { defineCollection, z } from 'astro:content';
 import { ExifTool } from 'exiftool-vendored';
 
@@ -8,7 +9,7 @@ import {
 	getImageFileUrlPlaceholder,
 	getImageTitle,
 } from '#lib/image/image-loader-utils.ts';
-import { GeometrySchema } from '#lib/schemas/geometry.ts';
+import { GeometryMetadataSchema, GeometrySchema } from '#lib/schemas/geometry.ts';
 import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
 
 // Note: this file contains a more full-fledged image loader example
@@ -27,6 +28,7 @@ const ImageMetadataSchema = z.object({
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
 	geometry: GeometrySchema.optional(),
+	geometryMetadata: GeometryMetadataSchema.optional(),
 	placeholder: z.string().optional(),
 });
 
@@ -73,7 +75,7 @@ export const images = defineCollection({
 							...(tags.GPSLatitude && tags.GPSLongitude
 								? {
 										geometry: {
-											type: 'Point' as const,
+											type: GeometryTypeEnum.Point,
 											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)] as [
 												number,
 												number,

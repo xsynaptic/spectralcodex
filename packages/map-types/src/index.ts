@@ -1,3 +1,4 @@
+export { GeometryTypeEnum } from './map-geometry';
 export { LocationCategoryEnum, LocationStatusEnum } from './map-locations';
 export type { LocationCategory, LocationStatus, LocationStatusMetadata } from './map-locations';
 export { mapMarkerIcons } from './map-marker-icons';

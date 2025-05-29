@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
+
 import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
 
 // Check for duplicate locations entered by mistake
@@ -50,8 +52,8 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 
 		// Since Zod rounds the value and we might want to search for it let's shave off the last bit
 		switch (location.data.geometry.type) {
-			case 'MultiPoint':
-			case 'LineString': {
+			case GeometryTypeEnum.MultiPoint:
+			case GeometryTypeEnum.LineString: {
 				for (const coordinates of location.data.geometry.coordinates) {
 					const coordinatesString = coordinates
 						.map((coordinate) => coordinate.toString().slice(0, -1))

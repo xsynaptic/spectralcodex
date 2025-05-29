@@ -1,3 +1,4 @@
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useMemo } from 'react';
 
 import type { MapGeometry, MapSourceFeatureCollection, MapSourceItem } from '../../types';
@@ -48,15 +49,24 @@ export function useMapCanvasData() {
 	return {
 		filteredCount: filteredData.length,
 		pointCollection: useMemo(
-			() => getGeojsonData(filteredData.filter((item) => item.geometry.type === 'Point')),
+			() =>
+				getGeojsonData(
+					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Point),
+				),
 			[filteredData],
 		),
 		multiPointCollection: useMemo(
-			() => getGeojsonData(filteredData.filter((item) => item.geometry.type === 'MultiPoint')),
+			() =>
+				getGeojsonData(
+					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.MultiPoint),
+				),
 			[filteredData],
 		),
 		lineStringCollection: useMemo(
-			() => getGeojsonData(filteredData.filter((item) => item.geometry.type === 'LineString')),
+			() =>
+				getGeojsonData(
+					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.LineString),
+				),
 			[filteredData],
 		),
 	};

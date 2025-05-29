@@ -1,5 +1,6 @@
 import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback } from 'react';
 import { funnel } from 'remeda';
 
@@ -22,7 +23,7 @@ export function useMapCanvasEvents() {
 			const feature = features && features[0];
 
 			// If the click event is not within interactive layers close any open popup and exit early
-			if (!feature || !feature.layer.id || feature.geometry.type !== 'Point') {
+			if (!feature || !feature.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
 				setSelectedId(undefined);
 				return;
 			}

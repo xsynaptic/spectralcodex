@@ -1,3 +1,5 @@
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
+
 import type { MapPopupData, MapPopupItem, MapSourceData } from '../types';
 
 // Popup data is incomplete; we need to assemble some props from source data
@@ -26,7 +28,7 @@ export function getPopupItem({
 		image: undefined,
 		precision: 1,
 		geometry: {
-			type: 'Point' as const,
+			type: GeometryTypeEnum.Point,
 			coordinates: [0, 0],
 		},
 		...(popupItem ? { ...popupItem } : {}),

@@ -10,7 +10,7 @@ import {
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/content.ts';
-import { GeometrySchema } from '#lib/schemas/geometry.ts';
+import { GeometryMetadataSchema, GeometrySchema } from '#lib/schemas/geometry.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -22,10 +22,6 @@ export const locations = defineCollection({
 			title: TitleSchema,
 			titleAlt: z.string().optional(),
 			description: DescriptionSchema,
-			/**
-			 * Note: these enums are duplicated; they appear in this project and the React map component
-			 * This seems to be the only way around an Astro/Vite bug which causes content collections to fail
-			 */
 			category: z.nativeEnum(LocationCategoryEnum),
 			status: z.nativeEnum(LocationStatusEnum),
 			heritage: LocationTwHeritageSchema.optional(),
@@ -36,8 +32,9 @@ export const locations = defineCollection({
 			sources: SourceSchema.array().optional(),
 			notes: z.string().optional(),
 			address: z.string().optional(),
-			geometry: GeometrySchema,
 			precision: NumericScaleSchema,
+			geometry: GeometrySchema,
+			geometryMetadata: GeometryMetadataSchema.optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			dateVisited: DateStringSchema.array().optional(),

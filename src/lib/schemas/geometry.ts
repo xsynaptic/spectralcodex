@@ -1,15 +1,25 @@
 import type { LineString, MultiPoint, Point } from 'geojson';
 
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
 import * as R from 'remeda';
 
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
+import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { LinkSchema } from '#lib/schemas/links.ts';
 
-const GeometryTypeEnum = {
-	Point: 'Point',
-	MultiPoint: 'MultiPoint',
-	LineString: 'LineString',
-} as const;
+export const GeometryMetadataSchema = z
+	.object({
+		title: TitleSchema,
+		titleAlt: z.string().optional(),
+		description: DescriptionSchema.optional(),
+		category: z.nativeEnum(LocationCategoryEnum).optional(),
+		status: z.nativeEnum(LocationStatusEnum).optional(),
+		precision: NumericScaleSchema.optional(),
+		links: LinkSchema.array().optional(),
+	})
+	.array();
 
 const GeometryPointSchema = z.object({
 	type: z.literal(GeometryTypeEnum.Point),
@@ -18,7 +28,7 @@ const GeometryPointSchema = z.object({
 
 const GeometryMultiPointSchema = z.object({
 	type: z.literal(GeometryTypeEnum.MultiPoint),
-	coordinates: z.tuple([z.number(), z.number()]).array().nonempty(),
+	coordinates: z.tuple([z.number(), z.number()]).array().nonempty().min(2),
 });
 
 const GeometryLineStringSchema = z.object({
@@ -54,7 +64,7 @@ function validateCoordinates(coordinates: [number, number]): z.IssueData | undef
 	return;
 }
 
-// GeoJSON geometry; currently we only support Point
+// GeoJSON geometry; currently we only support Point and MultiPoint geometries
 export const GeometrySchema = z
 	.discriminatedUnion('type', [
 		GeometryPointSchema,

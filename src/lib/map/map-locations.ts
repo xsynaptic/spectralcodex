@@ -5,6 +5,7 @@ import type {
 } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import {
 	MapGeometryTypeMap,
 	MapLocationCategoryMap,
@@ -18,7 +19,7 @@ import { MapApiDataEnum } from '#lib/map/map-types.ts';
 // An alternative to using Turf's truncate function
 function getMapGeometryOptimized(geometry: MapGeometry) {
 	switch (geometry.type) {
-		case 'Point': {
+		case GeometryTypeEnum.Point: {
 			return {
 				t: MapGeometryTypeMap[geometry.type],
 				x: geometry.coordinates.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))) as [
