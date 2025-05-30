@@ -1,11 +1,16 @@
 export {
-	MapDataGeometryTypeMap,
+	MapDataGeometryTypeNumericMapping,
 	MapDataKeyMap,
 	MapDataKeys,
 	MapDataKeysCompressed,
 } from './map-data';
 export { GeometrySchema, GeometryTypeEnum } from './map-geometry';
-export { LocationCategoryEnum, LocationStatusEnum } from './map-locations';
+export {
+	LocationCategoryEnum,
+	LocationStatusEnum,
+	LocationCategoryNumericMapping,
+	LocationStatusNumericMapping,
+} from './map-locations';
 export type { LocationCategory, LocationStatus, LocationStatusMetadata } from './map-locations';
 export { mapMarkerIcons } from './map-marker-icons';
 export { MapSpritesEnum } from './map-sprites';

@@ -325,7 +325,11 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1
 
-  packages/map-types: {}
+  packages/map-types:
+    devDependencies:
+      zod:
+        specifier: ^3.25.36
+        version: 3.25.36
 
   packages/react-map-component:
     devDependencies:

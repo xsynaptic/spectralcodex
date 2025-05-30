@@ -13,10 +13,7 @@ export function getPopupItem({
 	sourceData: MapSourceData;
 	popupData: MapPopupData;
 }) {
-	const sourceItem = sourceData.find((sourceItem) => sourceItem.properties.id === selectedId);
-	const popupItem = popupData.find((popupItem) => popupItem.id === selectedId);
-
-	return {
+	const popupItem = popupData.find((popupItem) => popupItem.id === selectedId) ?? {
 		id: 'default',
 		title: 'Untitled',
 		titleAlt: undefined,
@@ -26,17 +23,24 @@ export function getPopupItem({
 		googleMapsUrl: undefined,
 		wikipediaUrl: undefined,
 		image: undefined,
-		precision: 1,
-		geometry: {
-			type: GeometryTypeEnum.Point,
-			coordinates: [0, 0],
-		},
-		...(popupItem ? { ...popupItem } : {}),
-		...(sourceItem
-			? {
-					precision: sourceItem.properties.precision,
-					geometry: sourceItem.geometry,
-				}
-			: {}),
+	};
+
+	const sourceItem = sourceData.find((sourceItem) => sourceItem.properties.id === selectedId);
+	const sourceItemDetails = sourceItem
+		? {
+				precision: sourceItem.properties.precision,
+				geometry: sourceItem.geometry,
+			}
+		: {
+				precision: 1,
+				geometry: {
+					type: GeometryTypeEnum.Point,
+					coordinates: [0, 0] as [number, number],
+				},
+			};
+
+	return {
+		...popupItem,
+		...sourceItemDetails,
 	} satisfies MapPopupItem;
 }

@@ -95,6 +95,10 @@ export const LocationCategoryEnum = {
 
 export type LocationCategory = (typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum];
 
+export const LocationCategoryNumericMapping = Object.fromEntries(
+	Object.values(LocationCategoryEnum).map((value, i) => [value, i]),
+) as Record<(typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum], number>;
+
 export const LocationStatusEnum = {
 	Operational: 'operational',
 	Public: 'public',
@@ -109,6 +113,10 @@ export const LocationStatusEnum = {
 } as const satisfies Record<string, string>;
 
 export type LocationStatus = (typeof LocationStatusEnum)[keyof typeof LocationStatusEnum];
+
+export const LocationStatusNumericMapping = Object.fromEntries(
+	Object.values(LocationStatusEnum).map((value, i) => [value, i]),
+) as Record<(typeof LocationStatusEnum)[keyof typeof LocationStatusEnum], number>;
 
 export interface LocationStatusMetadata {
 	title: string;

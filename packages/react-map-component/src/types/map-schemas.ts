@@ -1,86 +1,98 @@
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import {
+	LocationCategoryEnum,
+	LocationCategoryNumericMapping,
+	LocationStatusEnum,
+	LocationStatusNumericMapping,
+	MapDataGeometryTypeNumericMapping,
+	MapDataKeyMap,
+	MapDataKeys,
+	MapDataKeysCompressed,
+} from '@spectralcodex/map-types';
 import * as R from 'remeda';
 import { z } from 'zod';
 
 const NumericScaleSchema = z.number().int().min(1).max(5);
 
-export const MapLocationCategoryMap = R.mapToObj(R.values(LocationCategoryEnum), (value, i) => [
-	value,
-	i,
-]);
-
-export const MapLocationStatusMap = R.mapToObj(R.values(LocationStatusEnum), (value, i) => [
-	value,
-	i,
-]);
-
-export const MapGeometryTypeMap = {
-	Point: 0,
-	MultiPoint: 1,
-	LineString: 2,
-} as const;
-
 export const MapSourceDataSchema = z
 	.object({
-		i: z.string(), // ID
-		c: z.nativeEnum(MapLocationCategoryMap), // Category
-		s: z.nativeEnum(MapLocationStatusMap), // Status
-		p: NumericScaleSchema, // Precision
-		q: NumericScaleSchema, // Quality
-		r: NumericScaleSchema, // Rating
-		o: NumericScaleSchema.optional(), // Objective
-		l: z.boolean().optional(),
-		g: z.object({
-			t: z.nativeEnum(MapGeometryTypeMap),
-			x: z.union([z.tuple([z.number(), z.number()]), z.tuple([z.number(), z.number()]).array()]),
+		[MapDataKeysCompressed.Id]: z.string(),
+		[MapDataKeysCompressed.Category]: z.nativeEnum(LocationCategoryNumericMapping),
+		[MapDataKeysCompressed.Status]: z.nativeEnum(LocationStatusNumericMapping),
+		[MapDataKeysCompressed.Precision]: NumericScaleSchema,
+		[MapDataKeysCompressed.Quality]: NumericScaleSchema,
+		[MapDataKeysCompressed.Rating]: NumericScaleSchema,
+		[MapDataKeysCompressed.Objective]: NumericScaleSchema.optional(),
+		[MapDataKeysCompressed.Outlier]: z.boolean().optional(),
+		[MapDataKeysCompressed.Geometry]: z.object({
+			[MapDataKeysCompressed.GeometryType]: z.nativeEnum(MapDataGeometryTypeNumericMapping),
+			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
+				z.tuple([z.number(), z.number()]),
+				z.tuple([z.number(), z.number()]).array(),
+			]),
 		}),
+		// TODO: geometry metadata
 	})
 	.transform((value) => ({
 		properties: {
-			id: value.i,
-			category: R.invert(MapLocationCategoryMap)[value.c] ?? LocationCategoryEnum.Unknown,
-			status: R.invert(MapLocationStatusMap)[value.s] ?? LocationCategoryEnum.Unknown,
-			precision: value.p,
-			quality: value.q,
-			rating: value.r,
-			objective: value.o,
-			outlier: value.l,
+			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
+			[MapDataKeys.Category]:
+				R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
+				LocationCategoryEnum.Unknown,
+			[MapDataKeys.Status]:
+				R.invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
+				LocationStatusEnum.Unknown,
+			[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
+			[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
+			[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
+			[MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]],
+			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]] ?? false,
 		},
-		geometry: {
-			type: R.invert(MapGeometryTypeMap)[value.g.t],
-			coordinates: value.g.x,
+		[MapDataKeys.Geometry]: {
+			[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[
+				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryType]]
+			],
+			[MapDataKeys.GeometryCoordinates]:
+				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryCoordinates]],
 		},
 	}))
 	.array();
 
 export const MapPopupDataSchema = z
 	.object({
-		i: z.string(), // ID
-		t: z.string(), // Title
-		a: z.string().optional(), // Title (alt)
-		u: z.string().optional(), // URL
-		d: z.string().optional(), // Description
-		s: NumericScaleSchema.optional(), // Safety
-		g: z.string().url().optional(), // Google URL
-		w: z.string().url().optional(), // Wikipedia URL
-		m: z
-			.object({
-				src: z.string(),
-				srcSet: z.string(),
-				height: z.string(),
-				width: z.string(),
-			})
-			.optional(),
+		[MapDataKeysCompressed.Id]: z.string(),
+		[MapDataKeysCompressed.Title]: z.string(),
+		[MapDataKeysCompressed.TitleAlt]: z.string().optional(),
+		[MapDataKeysCompressed.Url]: z.string().optional(),
+		[MapDataKeysCompressed.Description]: z.string().optional(),
+		[MapDataKeysCompressed.Safety]: NumericScaleSchema.optional(),
+		[MapDataKeysCompressed.GoogleMapsUrl]: z.string().url().optional(),
+		[MapDataKeysCompressed.WikipediaUrl]: z.string().url().optional(),
+		[MapDataKeysCompressed.ImageSrc]: z.string().optional(),
+		[MapDataKeysCompressed.ImageSrcSet]: z.string().optional(),
+		[MapDataKeysCompressed.ImageHeight]: z.string().optional(),
+		[MapDataKeysCompressed.ImageWidth]: z.string().optional(),
 	})
 	.transform((value) => ({
-		id: value.i,
-		title: value.t,
-		titleAlt: value.a,
-		url: value.u,
-		description: value.d,
-		safety: value.s,
-		googleMapsUrl: value.g,
-		wikipediaUrl: value.w,
-		image: value.m,
+		[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
+		[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
+		[MapDataKeys.TitleAlt]: value[MapDataKeyMap[MapDataKeys.TitleAlt]],
+		[MapDataKeys.Url]: value[MapDataKeyMap[MapDataKeys.Url]],
+		[MapDataKeys.Description]: value[MapDataKeyMap[MapDataKeys.Description]],
+		[MapDataKeys.Safety]: value[MapDataKeyMap[MapDataKeys.Safety]],
+		[MapDataKeys.GoogleMapsUrl]: value[MapDataKeyMap[MapDataKeys.GoogleMapsUrl]],
+		[MapDataKeys.WikipediaUrl]: value[MapDataKeyMap[MapDataKeys.WikipediaUrl]],
+		...(value[MapDataKeyMap[MapDataKeys.ImageSrc]] === undefined ||
+		value[MapDataKeyMap[MapDataKeys.ImageSrcSet]] === undefined ||
+		value[MapDataKeyMap[MapDataKeys.ImageHeight]] === undefined ||
+		value[MapDataKeyMap[MapDataKeys.ImageWidth]] === undefined
+			? { [MapDataKeys.Image]: undefined }
+			: {
+					[MapDataKeys.Image]: {
+						[MapDataKeys.ImageSrc]: value[MapDataKeyMap[MapDataKeys.ImageSrc]],
+						[MapDataKeys.ImageSrcSet]: value[MapDataKeyMap[MapDataKeys.ImageSrcSet]],
+						[MapDataKeys.ImageHeight]: value[MapDataKeyMap[MapDataKeys.ImageHeight]],
+						[MapDataKeys.ImageWidth]: value[MapDataKeyMap[MapDataKeys.ImageWidth]],
+					},
+				}),
 	}))
 	.array();

@@ -4,37 +4,52 @@ import type {
 	MapSourceDataRaw,
 } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
+import type { Position } from 'geojson';
 
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import {
-	MapGeometryTypeMap,
-	MapLocationCategoryMap,
-	MapLocationStatusMap,
-} from '@spectralcodex/react-map-component';
+	GeometryTypeEnum,
+	LocationCategoryNumericMapping,
+	LocationStatusNumericMapping,
+	MapDataGeometryTypeNumericMapping,
+	MapDataKeysCompressed,
+} from '@spectralcodex/map-types';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
+function getMapGeometryCoordinatesOptimized(coordinates: Position) {
+	return coordinates.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))) as [
+		number,
+		number,
+	];
+}
+
 // An alternative to using Turf's truncate function
 function getMapGeometryOptimized(geometry: MapGeometry) {
-	switch (geometry.type) {
+	const geometryType = geometry.type;
+
+	switch (geometryType) {
 		case GeometryTypeEnum.Point: {
 			return {
-				t: MapGeometryTypeMap[geometry.type],
-				x: geometry.coordinates.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))) as [
-					number,
-					number,
-				],
+				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
+				[MapDataKeysCompressed.GeometryCoordinates]: getMapGeometryCoordinatesOptimized(
+					geometry.coordinates,
+				),
+			};
+		}
+		case GeometryTypeEnum.MultiPoint:
+		case GeometryTypeEnum.LineString: {
+			return {
+				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
+				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map(
+					getMapGeometryCoordinatesOptimized,
+				),
 			};
 		}
 		default: {
-			return {
-				t: MapGeometryTypeMap[geometry.type],
-				x: geometry.coordinates.map((position) =>
-					position.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))),
-				) as Array<[number, number]>,
-			};
+			geometryType satisfies never;
+			return;
 		}
 	}
 }
@@ -82,6 +97,7 @@ export function getLocationsFeatureCollection(
 				googleMapsUrl: entry.data.googleMapsUrl,
 				wikipediaUrl: entry.data.wikipediaUrl,
 				image: entry.data.imageThumbnail,
+				geometryMetadata: entry.data.geometryMetadata,
 			},
 			geometry: entry.data.geometry,
 		})),
@@ -92,16 +108,26 @@ export function getLocationsFeatureCollection(
 export function getLocationsMapSourceData(featureCollection: MapFeatureCollection | undefined) {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
+	// TODO: MultiPoint handling
+
 	return featureCollection.features.map((feature, index) => ({
-		i: typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
-		c: MapLocationCategoryMap[feature.properties.category],
-		s: MapLocationStatusMap[feature.properties.status],
-		p: feature.properties.precision,
-		q: feature.properties.quality,
-		r: feature.properties.rating,
-		...(feature.properties.objective === undefined ? {} : { o: feature.properties.objective }),
-		...(feature.properties.outlier === undefined ? {} : { l: feature.properties.outlier }),
-		g: getMapGeometryOptimized(feature.geometry),
+		[MapDataKeysCompressed.Id]:
+			typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
+		[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[feature.properties.category],
+		[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
+		[MapDataKeysCompressed.Precision]: feature.properties.precision,
+		[MapDataKeysCompressed.Quality]: feature.properties.quality,
+		[MapDataKeysCompressed.Rating]: feature.properties.rating,
+		...(feature.properties.objective === undefined
+			? {}
+			: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
+		...(feature.properties.outlier === undefined
+			? {}
+			: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
+		...(feature.properties.geometryMetadata === undefined
+			? {}
+			: { [MapDataKeysCompressed.GeometryMetadata]: feature.properties.geometryMetadata }),
+		[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 	})) satisfies MapSourceDataRaw;
 }
 
@@ -110,15 +136,23 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
 	return featureCollection.features.map((feature, index) => ({
-		i: typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
-		t: feature.properties.title,
-		a: feature.properties.titleAlt,
-		u: feature.properties.url,
-		d: feature.properties.description,
-		s: feature.properties.safety,
-		g: feature.properties.googleMapsUrl,
-		w: feature.properties.wikipediaUrl,
-		m: feature.properties.image, // TODO: compress `srcSet` field; this can still be optimized
+		[MapDataKeysCompressed.Id]:
+			typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
+		[MapDataKeysCompressed.Title]: feature.properties.title,
+		[MapDataKeysCompressed.TitleAlt]: feature.properties.titleAlt,
+		[MapDataKeysCompressed.Url]: feature.properties.url,
+		[MapDataKeysCompressed.Description]: feature.properties.description,
+		[MapDataKeysCompressed.Safety]: feature.properties.safety,
+		[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
+		[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
+		...(feature.properties.image === undefined
+			? {}
+			: {
+					[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
+					[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
+					[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
+					[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
+				}),
 	})) satisfies MapPopupDataRaw;
 }
 

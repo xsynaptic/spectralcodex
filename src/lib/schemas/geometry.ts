@@ -2,6 +2,7 @@ import type { LineString, MultiPoint, Point } from 'geojson';
 
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { GeometrySchema as GeometryBasicSchema } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
 import * as R from 'remeda';
 
@@ -20,21 +21,6 @@ export const GeometryMetadataSchema = z
 		links: LinkSchema.array().optional(),
 	})
 	.array();
-
-const GeometryPointSchema = z.object({
-	type: z.literal(GeometryTypeEnum.Point),
-	coordinates: z.tuple([z.number(), z.number()]),
-});
-
-const GeometryMultiPointSchema = z.object({
-	type: z.literal(GeometryTypeEnum.MultiPoint),
-	coordinates: z.tuple([z.number(), z.number()]).array().nonempty().min(2),
-});
-
-const GeometryLineStringSchema = z.object({
-	type: z.literal(GeometryTypeEnum.LineString),
-	coordinates: z.tuple([z.number(), z.number()]).array().nonempty().min(2),
-});
 
 function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {
 	if (!coordinates[0] || !coordinates[1]) {
@@ -65,60 +51,30 @@ function validateCoordinates(coordinates: [number, number]): z.IssueData | undef
 }
 
 // GeoJSON geometry; currently we only support Point and MultiPoint geometries
-export const GeometrySchema = z
-	.discriminatedUnion('type', [
-		GeometryPointSchema,
-		GeometryMultiPointSchema,
-		GeometryLineStringSchema,
-	])
-	.transform((value, ctx) => {
-		if (!R.isIncludedIn(value.type, R.values(GeometryTypeEnum))) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: `Geometry type "${value.type}" is not supported.`,
-			});
+export const GeometrySchema = GeometryBasicSchema.transform((value, ctx) => {
+	if (!R.isIncludedIn(value.type, R.values(GeometryTypeEnum))) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: `Geometry type "${value.type}" is not supported.`,
+		});
+		return z.NEVER;
+	}
+
+	if (value.type === GeometryTypeEnum.Point) {
+		const issueData = validateCoordinates(value.coordinates);
+
+		if (issueData) {
+			ctx.addIssue(issueData);
 			return z.NEVER;
 		}
 
-		if (value.type === GeometryTypeEnum.Point) {
-			const issueData = validateCoordinates(value.coordinates);
+		return {
+			...value,
+			coordinates: getTruncatedLngLat(value.coordinates),
+		} satisfies Point;
+	}
 
-			if (issueData) {
-				ctx.addIssue(issueData);
-				return z.NEVER;
-			}
-
-			return {
-				...value,
-				coordinates: getTruncatedLngLat(value.coordinates),
-			} satisfies Point;
-		}
-
-		if (value.type === GeometryTypeEnum.MultiPoint) {
-			for (const coordinates of value.coordinates) {
-				const issueData = validateCoordinates(coordinates);
-
-				if (issueData) {
-					ctx.addIssue(issueData);
-					return z.NEVER;
-				}
-			}
-
-			return {
-				...value,
-				coordinates: value.coordinates.map(getTruncatedLngLat),
-			} satisfies MultiPoint;
-		}
-
-		// Value is LineString
-		if (value.coordinates.length < 2) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: `Geometry type "${value.type}" requires at least two coordinates in the array.`,
-			});
-			return z.NEVER;
-		}
-
+	if (value.type === GeometryTypeEnum.MultiPoint) {
 		for (const coordinates of value.coordinates) {
 			const issueData = validateCoordinates(coordinates);
 
@@ -131,5 +87,29 @@ export const GeometrySchema = z
 		return {
 			...value,
 			coordinates: value.coordinates.map(getTruncatedLngLat),
-		} satisfies LineString;
-	});
+		} satisfies MultiPoint;
+	}
+
+	// Value is LineString
+	if (value.coordinates.length < 2) {
+		ctx.addIssue({
+			code: z.ZodIssueCode.custom,
+			message: `Geometry type "${value.type}" requires at least two coordinates in the array.`,
+		});
+		return z.NEVER;
+	}
+
+	for (const coordinates of value.coordinates) {
+		const issueData = validateCoordinates(coordinates);
+
+		if (issueData) {
+			ctx.addIssue(issueData);
+			return z.NEVER;
+		}
+	}
+
+	return {
+		...value,
+		coordinates: value.coordinates.map(getTruncatedLngLat),
+	} satisfies LineString;
+});

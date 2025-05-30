@@ -84,7 +84,7 @@ export const MapDataKeyMap = {
 	(typeof MapDataKeysCompressed)[keyof typeof MapDataKeysCompressed]
 >;
 
-export const MapDataGeometryTypeMap = {
+export const MapDataGeometryTypeNumericMapping = {
 	[GeometryTypeEnum.Point]: 0,
 	[GeometryTypeEnum.MultiPoint]: 1,
 	[GeometryTypeEnum.LineString]: 2,
