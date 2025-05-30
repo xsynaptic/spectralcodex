@@ -5,5 +5,8 @@
 	"exports": {
 		".": "./src/index.ts"
 	},
-	"private": true
+	"private": true,
+	"devDependencies": {
+		"zod": "^3.25.36"
+	}
 }
