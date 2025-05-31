@@ -1,12 +1,10 @@
 import type { Position } from 'geojson';
 
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
 
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
 
 function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {
 	if (!coordinates[0] || !coordinates[1]) {
@@ -55,7 +53,5 @@ export const GeometryPointsSchema = z.object({
 	category: z.nativeEnum(LocationCategoryEnum).optional(),
 	status: z.nativeEnum(LocationStatusEnum).optional(),
 	precision: NumericScaleSchema.optional(),
-	links: LinkSchema.array().optional(),
-	// Legacy support; TODO: remove this
-	type: z.enum([GeometryTypeEnum.Point]).optional(),
+	googleMapsUrl: z.string().url().optional(),
 });

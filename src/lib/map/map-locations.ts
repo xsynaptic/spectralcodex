@@ -38,7 +38,6 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 				),
 			};
 		}
-		case GeometryTypeEnum.MultiPoint:
 		case GeometryTypeEnum.LineString: {
 			return {
 				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
@@ -99,16 +98,16 @@ export function getLocationsFeatureCollection(
 						title,
 						titleAlt,
 						url: entry.data.url,
-						description: entry.data.descriptionHtml,
-						category: entry.data.category,
-						status: entry.data.status,
-						precision: entry.data.precision,
+						description: geometry.description ?? entry.data.descriptionHtml,
+						category: geometry.category ?? entry.data.category,
+						status: geometry.status ?? entry.data.status,
+						precision: geometry.precision ?? entry.data.precision,
 						quality: entry.data.entryQuality,
 						rating: entry.data.rating,
 						objective: entry.data.objective,
 						outlier: entry.data.outlier,
 						safety: entry.data.safety,
-						googleMapsUrl: entry.data.googleMapsUrl,
+						googleMapsUrl: geometry.googleMapsUrl ?? entry.data.googleMapsUrl,
 						wikipediaUrl: entry.data.wikipediaUrl,
 						image: entry.data.imageThumbnail,
 					},
