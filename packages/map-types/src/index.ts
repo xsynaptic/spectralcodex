@@ -7,8 +7,8 @@ export {
 export { GeometrySchema, GeometryTypeEnum } from './map-geometry';
 export {
 	LocationCategoryEnum,
-	LocationStatusEnum,
 	LocationCategoryNumericMapping,
+	LocationStatusEnum,
 	LocationStatusNumericMapping,
 } from './map-locations';
 export type { LocationCategory, LocationStatus, LocationStatusMetadata } from './map-locations';

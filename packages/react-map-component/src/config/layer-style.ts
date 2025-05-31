@@ -229,14 +229,6 @@ export const layerStyles = {
 		id: MapLayerIdEnum.Points,
 		source: MapSourceIdEnum.PointCollection,
 	}),
-	multiPointsTarget: getPointsTargetLayerStyle({
-		id: MapLayerIdEnum.PointsTarget,
-		source: MapSourceIdEnum.MultiPointCollection,
-	}),
-	multiPoints: getPointsLayerStyle({
-		id: MapLayerIdEnum.Points,
-		source: MapSourceIdEnum.MultiPointCollection,
-	}),
 	lineString: getLineStringStyle({
 		id: MapLayerIdEnum.LineString,
 		source: MapSourceIdEnum.LineStringCollection,

@@ -9,7 +9,7 @@ import {
 	getImageFileUrlPlaceholder,
 	getImageTitle,
 } from '#lib/image/image-loader-utils.ts';
-import { GeometryMetadataSchema, GeometrySchema } from '#lib/schemas/geometry.ts';
+import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
 
 // Note: this file contains a more full-fledged image loader example
@@ -27,8 +27,7 @@ const ImageMetadataSchema = z.object({
 	focalLength: z.string().optional(),
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
-	geometry: GeometrySchema.optional(),
-	geometryMetadata: GeometryMetadataSchema.optional(),
+	geometry: GeometryPointsSchema.optional(),
 	placeholder: z.string().optional(),
 });
 

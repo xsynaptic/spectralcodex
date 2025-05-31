@@ -55,13 +55,6 @@ export function useMapCanvasData() {
 				),
 			[filteredData],
 		),
-		multiPointCollection: useMemo(
-			() =>
-				getGeojsonData(
-					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.MultiPoint),
-				),
-			[filteredData],
-		),
 		lineStringCollection: useMemo(
 			() =>
 				getGeojsonData(

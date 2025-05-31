@@ -30,7 +30,6 @@ export const MapSourceDataSchema = z
 				z.tuple([z.number(), z.number()]).array(),
 			]),
 		}),
-		// TODO: geometry metadata
 	})
 	.transform((value) => ({
 		properties: {

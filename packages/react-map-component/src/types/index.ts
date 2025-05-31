@@ -1,5 +1,5 @@
 import type { Flavor } from '@protomaps/basemaps';
-import type { FeatureCollection, LineString, MultiPoint, Point } from 'geojson';
+import type { FeatureCollection, LineString, Point } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { MapPopupDataSchema, MapSourceDataSchema } from './map-schemas';
 
 // Supported geometry for use with this component
-export type MapGeometry = Point | MultiPoint | LineString;
+export type MapGeometry = Point | LineString;
 
 /**
  * Map canvas data

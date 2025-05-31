@@ -1,26 +1,12 @@
-import type { LineString, MultiPoint, Point } from 'geojson';
+import type { Position } from 'geojson';
 
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
-import { GeometrySchema as GeometryBasicSchema } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
-import * as R from 'remeda';
 
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
-
-export const GeometryMetadataSchema = z
-	.object({
-		title: TitleSchema,
-		titleAlt: z.string().optional(),
-		description: DescriptionSchema.optional(),
-		category: z.nativeEnum(LocationCategoryEnum).optional(),
-		status: z.nativeEnum(LocationStatusEnum).optional(),
-		precision: NumericScaleSchema.optional(),
-		links: LinkSchema.array().optional(),
-	})
-	.array();
 
 function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {
 	if (!coordinates[0] || !coordinates[1]) {
@@ -50,66 +36,26 @@ function validateCoordinates(coordinates: [number, number]): z.IssueData | undef
 	return;
 }
 
-// GeoJSON geometry; currently we only support Point and MultiPoint geometries
-export const GeometrySchema = GeometryBasicSchema.transform((value, ctx) => {
-	if (!R.isIncludedIn(value.type, R.values(GeometryTypeEnum))) {
-		ctx.addIssue({
-			code: z.ZodIssueCode.custom,
-			message: `Geometry type "${value.type}" is not supported.`,
-		});
+export const PositionSchema = z.tuple([z.number(), z.number()]).transform((value, ctx) => {
+	const issueData = validateCoordinates(value);
+
+	if (issueData) {
+		ctx.addIssue(issueData);
 		return z.NEVER;
 	}
 
-	if (value.type === GeometryTypeEnum.Point) {
-		const issueData = validateCoordinates(value.coordinates);
+	return getTruncatedLngLat(value) satisfies Position;
+});
 
-		if (issueData) {
-			ctx.addIssue(issueData);
-			return z.NEVER;
-		}
-
-		return {
-			...value,
-			coordinates: getTruncatedLngLat(value.coordinates),
-		} satisfies Point;
-	}
-
-	if (value.type === GeometryTypeEnum.MultiPoint) {
-		for (const coordinates of value.coordinates) {
-			const issueData = validateCoordinates(coordinates);
-
-			if (issueData) {
-				ctx.addIssue(issueData);
-				return z.NEVER;
-			}
-		}
-
-		return {
-			...value,
-			coordinates: value.coordinates.map(getTruncatedLngLat),
-		} satisfies MultiPoint;
-	}
-
-	// Value is LineString
-	if (value.coordinates.length < 2) {
-		ctx.addIssue({
-			code: z.ZodIssueCode.custom,
-			message: `Geometry type "${value.type}" requires at least two coordinates in the array.`,
-		});
-		return z.NEVER;
-	}
-
-	for (const coordinates of value.coordinates) {
-		const issueData = validateCoordinates(coordinates);
-
-		if (issueData) {
-			ctx.addIssue(issueData);
-			return z.NEVER;
-		}
-	}
-
-	return {
-		...value,
-		coordinates: value.coordinates.map(getTruncatedLngLat),
-	} satisfies LineString;
+export const GeometryPointsSchema = z.object({
+	coordinates: PositionSchema,
+	title: TitleSchema.optional(),
+	titleAlt: z.string().optional(),
+	description: DescriptionSchema.optional(),
+	category: z.nativeEnum(LocationCategoryEnum).optional(),
+	status: z.nativeEnum(LocationStatusEnum).optional(),
+	precision: NumericScaleSchema.optional(),
+	links: LinkSchema.array().optional(),
+	// Legacy support; TODO: remove this
+	type: z.enum([GeometryTypeEnum.Point]).optional(),
 });

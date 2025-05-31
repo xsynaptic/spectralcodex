@@ -1,7 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
-
 import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
 
 // Check for duplicate locations entered by mistake
@@ -51,37 +49,27 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 		}
 
 		// Since Zod rounds the value and we might want to search for it let's shave off the last bit
-		switch (location.data.geometry.type) {
-			case GeometryTypeEnum.MultiPoint:
-			case GeometryTypeEnum.LineString: {
-				for (const coordinates of location.data.geometry.coordinates) {
-					const coordinatesString = coordinates
-						.map((coordinate) => coordinate.toString().slice(0, -1))
-						.join('x');
-
-					if (locationCoordinates.has(coordinatesString)) {
-						throw new Error(
-							`Duplicate coordinates found for "${location.id}": ${coordinatesString}`,
-						);
-					}
-					locationCoordinates.add(coordinatesString);
-				}
-				break;
-			}
-			default: {
-				const coordinatesString = location.data.geometry.coordinates
-					.map((coordinate) => coordinate.toFixed(MAP_GEOMETRY_COORDINATES_PRECISION - 1))
+		if (Array.isArray(location.data.geometry)) {
+			for (const { coordinates } of location.data.geometry) {
+				const coordinatesString = coordinates
+					.map((coordinate) => coordinate.toString().slice(0, -1))
 					.join('x');
 
 				if (locationCoordinates.has(coordinatesString)) {
 					throw new Error(`Duplicate coordinates found for "${location.id}": ${coordinatesString}`);
 				}
 				locationCoordinates.add(coordinatesString);
-
-				break;
 			}
-		}
+		} else {
+			const coordinatesString = location.data.geometry.coordinates
+				.map((coordinate) => coordinate.toFixed(MAP_GEOMETRY_COORDINATES_PRECISION - 1))
+				.join('x');
 
+			if (locationCoordinates.has(coordinatesString)) {
+				throw new Error(`Duplicate coordinates found for "${location.id}": ${coordinatesString}`);
+			}
+			locationCoordinates.add(coordinatesString);
+		}
 		return false;
 	});
 }

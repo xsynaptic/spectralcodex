@@ -19,7 +19,6 @@ import { useThemeMode } from './hooks/use-theme-mode';
 import { MapControls } from './map-controls';
 import { MapControlsFilterMenu } from './map-controls-filter-menu';
 import { MapLineStringLayer } from './map-layers-line-string';
-import { MapMultiPointLayer } from './map-layers-multi-point';
 import { MapPointLayer } from './map-layers-point';
 import { MapLoading } from './map-loading';
 import { MapPopup } from './map-popup';
@@ -91,7 +90,6 @@ export const MapCanvas = ({
 		>
 			<MapControls />
 			<MapPointLayer />
-			<MapMultiPointLayer />
 			<MapLineStringLayer />
 			<MapControlsFilterMenu />
 			<MapPopup />

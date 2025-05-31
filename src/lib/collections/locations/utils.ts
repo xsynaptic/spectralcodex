@@ -1,7 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { GeometryTypeEnum } from 'packages/map-types/src';
-
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 
 // Used to conditionally render descriptions or body contents of an entry
@@ -50,18 +48,9 @@ export function sortLocationsByLatitude(
 	b: CollectionEntry<'locations'>,
 ) {
 	function getLatitudeCoordinate(entry: CollectionEntry<'locations'>): number {
-		switch (entry.data.geometry.type) {
-			case GeometryTypeEnum.Point: {
-				return entry.data.geometry.coordinates[1];
-			}
-			case GeometryTypeEnum.MultiPoint:
-			case GeometryTypeEnum.LineString: {
-				return Math.max(...entry.data.geometry.coordinates.map((coordinates) => coordinates[1]));
-			}
-			default: {
-				return 0; // Default case, should not happen
-			}
-		}
+		return Array.isArray(entry.data.geometry)
+			? Math.max(...entry.data.geometry.map(({ coordinates }) => coordinates[1]))
+			: entry.data.geometry.coordinates[1];
 	}
 
 	return getLatitudeCoordinate(b) - getLatitudeCoordinate(a);

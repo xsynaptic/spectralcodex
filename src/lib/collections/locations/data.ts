@@ -1,7 +1,6 @@
 import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
 
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import {
 	booleanIntersects,
 	centroid,
@@ -14,6 +13,7 @@ import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
+import { GeometryTypeEnum } from 'packages/map-types/src';
 
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
@@ -40,27 +40,21 @@ function getLocationNearbyDistances(locations: Array<CollectionEntry<'locations'
 	// Because for single points, A<->B is the same as B<->A
 	const distances = new Map<string, number>();
 
-	// Currently we only calculate nearby locations for Point and MultiPoint geometry
+	// Currently we only calculate nearby locations for Point geometry
 	// This operation also simplifies the data structure to just the essentials
 	const points = locations.map((entry) => {
-		switch (entry.data.geometry.type) {
-			case GeometryTypeEnum.Point: {
-				return {
+		return Array.isArray(entry.data.geometry)
+			? {
+					id: entry.id,
+					coordinates: centroid({
+						type: GeometryTypeEnum.MultiPoint,
+						coordinates: entry.data.geometry.map((point) => point.coordinates),
+					}).geometry.coordinates,
+				}
+			: {
 					id: entry.id,
 					coordinates: entry.data.geometry.coordinates,
 				};
-			}
-			// In this case we calculate the centroid and use it as the representative point
-			case GeometryTypeEnum.MultiPoint: {
-				return {
-					id: entry.id,
-					coordinates: centroid(entry.data.geometry).geometry.coordinates,
-				};
-			}
-			default: {
-				return;
-			}
-		}
 	});
 
 	// Calculate distances between all points
@@ -108,40 +102,31 @@ function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locati
 
 	// Now return the function that handles the calculation for a specific location
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
-		switch (entry.data.geometry.type) {
-			case GeometryTypeEnum.Point:
-			case GeometryTypeEnum.MultiPoint: {
-				const nearby = points
-					.map((point) => {
-						if (!point || entry.id === point.id) return;
+		const nearby = points
+			.map((point) => {
+				if (entry.id === point.id) return;
 
-						const distanceId = getDistanceId(entry.id, point.id);
-						const distance = distances.get(distanceId);
+				const distanceId = getDistanceId(entry.id, point.id);
+				const distance = distances.get(distanceId);
 
-						return distance && distance > 0
-							? {
-									locationId: point.id,
-									distance,
-									distanceDisplay: distance.toFixed(2),
-								}
-							: undefined;
-					})
-					.filter((item) => !!item)
-					.sort((a, b) => a.distance - b.distance)
-					.slice(
-						0,
-						LOCATIONS_NEARBY_COUNT_LIMIT,
-					) satisfies CollectionEntry<'locations'>['data']['nearby'];
+				return distance && distance > 0
+					? {
+							locationId: point.id,
+							distance,
+							distanceDisplay: distance.toFixed(2),
+						}
+					: undefined;
+			})
+			.filter((item) => !!item)
+			.sort((a, b) => a.distance - b.distance)
+			.slice(
+				0,
+				LOCATIONS_NEARBY_COUNT_LIMIT,
+			) satisfies CollectionEntry<'locations'>['data']['nearby'];
 
-				// If we have nearby points let's add data to the actual location entry
-				if (nearby.length > 0) {
-					entry.data.nearby = nearby;
-				}
-				break;
-			}
-			default: {
-				break;
-			}
+		// If we have nearby points let's add data to the actual location entry
+		if (nearby.length > 0) {
+			entry.data.nearby = nearby;
 		}
 	};
 }

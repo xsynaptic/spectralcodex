@@ -78,29 +78,47 @@ export function getLocationsFeatureCollection(
 
 	return {
 		type: 'FeatureCollection' as const,
-		features: locationsFiltered.map((entry) => ({
-			type: 'Feature' as const,
-			id: entry.data.uuid ?? entry.id,
-			properties: {
-				title: entry.data.title,
-				titleAlt: entry.data.titleAlt,
-				url: entry.data.url,
-				description: entry.data.descriptionHtml,
-				category: entry.data.category,
-				status: entry.data.status,
-				precision: entry.data.precision,
-				quality: entry.data.entryQuality,
-				rating: entry.data.rating,
-				objective: entry.data.objective,
-				outlier: entry.data.outlier,
-				safety: entry.data.safety,
-				googleMapsUrl: entry.data.googleMapsUrl,
-				wikipediaUrl: entry.data.wikipediaUrl,
-				image: entry.data.imageThumbnail,
-				geometryMetadata: entry.data.geometryMetadata,
-			},
-			geometry: entry.data.geometry,
-		})),
+		features: locationsFiltered.flatMap((entry) => {
+			const geometryArray = Array.isArray(entry.data.geometry)
+				? entry.data.geometry
+				: [entry.data.geometry];
+
+			return geometryArray.map((geometry, index) => {
+				const uuid = entry.data.uuid ?? entry.id;
+				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
+				const title = geometry.title ? `${entry.data.title} - ${geometry.title}` : entry.data.title;
+				const titleAlt =
+					entry.data.titleAlt && geometry.titleAlt
+						? `${entry.data.titleAlt}．${geometry.titleAlt}`
+						: entry.data.titleAlt;
+
+				return {
+					type: 'Feature' as const,
+					id,
+					properties: {
+						title,
+						titleAlt,
+						url: entry.data.url,
+						description: entry.data.descriptionHtml,
+						category: entry.data.category,
+						status: entry.data.status,
+						precision: entry.data.precision,
+						quality: entry.data.entryQuality,
+						rating: entry.data.rating,
+						objective: entry.data.objective,
+						outlier: entry.data.outlier,
+						safety: entry.data.safety,
+						googleMapsUrl: entry.data.googleMapsUrl,
+						wikipediaUrl: entry.data.wikipediaUrl,
+						image: entry.data.imageThumbnail,
+					},
+					geometry: {
+						type: GeometryTypeEnum.Point,
+						coordinates: geometry.coordinates,
+					},
+				};
+			});
+		}),
 	} satisfies MapFeatureCollection;
 }
 
@@ -108,27 +126,25 @@ export function getLocationsFeatureCollection(
 export function getLocationsMapSourceData(featureCollection: MapFeatureCollection | undefined) {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
-	// TODO: MultiPoint handling
+	return featureCollection.features.map((feature, index) => {
+		const featureIdFallback = `feature-${String(index)}`;
 
-	return featureCollection.features.map((feature, index) => ({
-		[MapDataKeysCompressed.Id]:
-			typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
-		[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[feature.properties.category],
-		[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
-		[MapDataKeysCompressed.Precision]: feature.properties.precision,
-		[MapDataKeysCompressed.Quality]: feature.properties.quality,
-		[MapDataKeysCompressed.Rating]: feature.properties.rating,
-		...(feature.properties.objective === undefined
-			? {}
-			: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
-		...(feature.properties.outlier === undefined
-			? {}
-			: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
-		...(feature.properties.geometryMetadata === undefined
-			? {}
-			: { [MapDataKeysCompressed.GeometryMetadata]: feature.properties.geometryMetadata }),
-		[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
-	})) satisfies MapSourceDataRaw;
+		return {
+			[MapDataKeysCompressed.Id]: typeof feature.id === 'string' ? feature.id : featureIdFallback,
+			[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[feature.properties.category],
+			[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
+			[MapDataKeysCompressed.Precision]: feature.properties.precision,
+			[MapDataKeysCompressed.Quality]: feature.properties.quality,
+			[MapDataKeysCompressed.Rating]: feature.properties.rating,
+			...(feature.properties.objective === undefined
+				? {}
+				: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
+			...(feature.properties.outlier === undefined
+				? {}
+				: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
+			[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
+		};
+	}) satisfies MapSourceDataRaw;
 }
 
 // Extended locations metadata for popups

@@ -18,7 +18,7 @@ interface PopupCoordinates {
 	lat: number;
 }
 
-// Currently this handles Point, MultiPoint, and LineString geometry without complicated types
+// Currently this handles Point and LineString geometry without complicated types
 const sanitizeCoordinates = (feature: MapPopupItem): PopupCoordinates => {
 	if (
 		typeof feature.geometry.coordinates[0] === 'number' &&

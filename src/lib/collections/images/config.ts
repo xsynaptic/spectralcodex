@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH } from '#constants.ts';
 import { getImageFileUrlPlaceholder } from '#lib/image/image-loader-utils.ts';
-import { GeometryMetadataSchema, GeometrySchema } from '#lib/schemas/geometry.ts';
+import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 
 const ImageMetadataSchema = z.object({
 	src: z.string(),
@@ -24,8 +24,7 @@ const ImageMetadataSchema = z.object({
 	focalLength: z.string().optional(),
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
-	geometry: GeometrySchema.optional(),
-	geometryMetadata: GeometryMetadataSchema.optional(),
+	geometry: GeometryPointsSchema.optional(),
 	placeholder: z.string().optional(),
 });
 

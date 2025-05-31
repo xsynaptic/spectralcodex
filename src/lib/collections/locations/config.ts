@@ -10,7 +10,7 @@ import {
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/content.ts';
-import { GeometryMetadataSchema, GeometrySchema } from '#lib/schemas/geometry.ts';
+import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -33,8 +33,7 @@ export const locations = defineCollection({
 			notes: z.string().optional(),
 			address: z.string().optional(),
 			precision: NumericScaleSchema,
-			geometry: GeometrySchema,
-			geometryMetadata: GeometryMetadataSchema.optional(),
+			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			dateVisited: DateStringSchema.array().optional(),
