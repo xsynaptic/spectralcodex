@@ -28,13 +28,13 @@ export const MetricsControl = ({ position }: { position: ControlPosition }) => {
 					<div className="loading w-[15px]" />
 				</div>
 			) : (
-				<div className="flex select-none flex-nowrap gap-1 font-sans text-xs mix-blend-difference">
+				<div className="flex flex-nowrap gap-1 font-sans text-xs mix-blend-difference select-none">
 					<span className="text-primary-600 drop-shadow-sm">
 						{formatNumber.format(filteredCount)}
 					</span>
-					<span className="font-light text-primary-400 drop-shadow-sm">/</span>
+					<span className="text-primary-400 font-light drop-shadow-sm">/</span>
 					<span className="text-primary-600 drop-shadow-sm">
-						{formatNumber.format(sourceDataCount)} {translations.locations}
+						{formatNumber.format(sourceDataCount)} {translations.points}
 					</span>
 				</div>
 			)}

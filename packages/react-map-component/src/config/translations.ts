@@ -3,7 +3,7 @@ export const translations = {
 	showAllAlt: '顯示全部',
 	hideAll: 'Hide All',
 	hideAllAlt: '隱藏全部',
-	locations: 'locations',
-	precisionWarning: 'Coordinates for this location are not precise!',
-	precisionError: 'Coordinates for this location are only a guess!',
+	points: 'Points',
+	precisionWarning: 'Coordinates for this point are imprecise!',
+	precisionError: 'Coordinates for this point are merely a guess!',
 } as const;
