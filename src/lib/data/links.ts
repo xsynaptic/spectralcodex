@@ -507,4 +507,9 @@ export const linksMap = [
 		title: 'Tom Higgs',
 		match: 'https://www.flickr.com/photos/truebritishmetal/',
 	},
+	{
+		title: 'Reading Military Villages',
+		titleAlt: '閱讀眷村',
+		match: 'lov.vac.gov.tw',
+	},
 ] as const satisfies Array<LinksMapItem>;
