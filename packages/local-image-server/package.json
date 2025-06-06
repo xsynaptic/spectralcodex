@@ -7,9 +7,9 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"astro": "^5.8.1",
+		"astro": "^5.9.0",
 		"astro-integration-kit": "^0.18.0",
-		"remeda": "^2.22.5",
+		"remeda": "^2.22.6",
 		"sirv": "^3.0.1"
 	}
 }
