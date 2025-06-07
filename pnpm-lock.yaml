@@ -328,8 +328,8 @@ importers:
   packages/map-types:
     devDependencies:
       zod:
-        specifier: ^3.25.55
-        version: 3.25.55
+        specifier: ^3.25.56
+        version: 3.25.56
 
   packages/react-map-component:
     devDependencies:
@@ -376,8 +376,8 @@ importers:
         specifier: ^2.22.6
         version: 2.22.6
       zod:
-        specifier: ^3.25.55
-        version: 3.25.55
+        specifier: ^3.25.56
+        version: 3.25.56
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@19.1.6)(react@19.1.0)(use-sync-external-store@1.2.0(react@19.1.0))
@@ -5689,6 +5689,9 @@ packages:
 
   zod@3.25.55:
     resolution: {integrity: sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==}
+
+  zod@3.25.56:
+    resolution: {integrity: sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==}
 
   zustand@5.0.5:
     resolution: {integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==}
@@ -12961,6 +12964,8 @@ snapshots:
   zod@3.25.51: {}
 
   zod@3.25.55: {}
+
+  zod@3.25.56: {}
 
   zustand@5.0.5(@types/react@19.1.6)(react@19.1.0)(use-sync-external-store@1.2.0(react@19.1.0)):
     optionalDependencies:
