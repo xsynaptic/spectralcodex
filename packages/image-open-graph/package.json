@@ -7,7 +7,7 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"satori": "^0.14.0",
+		"satori": "^0.15.2",
 		"sharp": "^0.34.2"
 	}
 }
