@@ -5,20 +5,20 @@
 	"exports": "./src/index.tsx",
 	"private": true,
 	"devDependencies": {
-		"@protomaps/basemaps": "^5.4.0",
+		"@protomaps/basemaps": "^5.4.1",
 		"@spectralcodex/map-types": "workspace:*",
 		"@tanstack/react-query": "^5.80.6",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.1.6",
 		"@types/react-dom": "^19.1.6",
-		"astro": "^5.9.0",
+		"astro": "^5.9.1",
 		"geojson": "^0.5.0",
 		"maplibre-gl": "^5.6.0",
 		"pmtiles": "^4.3.0",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-map-gl": "^8.0.4",
-		"remeda": "^2.22.6",
+		"remeda": "^2.23.0",
 		"zod": "^3.25.56",
 		"zustand": "^5.0.5"
 	}
