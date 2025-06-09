@@ -512,4 +512,14 @@ export const linksMap = [
 		titleAlt: '閱讀眷村',
 		match: 'lov.vac.gov.tw',
 	},
+	{
+		title: 'Lin Chun-sheng',
+		titleAlt: '林小昇之米克斯拼盤',
+		match: 'linchunsheng.blogspot.',
+	},
+	{
+		title: '228 Memorial Foundation',
+		titleAlt: '二二八事件紀念基金會',
+		match: '228.org.tw',
+	},
 ] as const satisfies Array<LinksMapItem>;
