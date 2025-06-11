@@ -1,5 +1,10 @@
 packages:
   - packages/**
+
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - sharp
+
+overrides:
+  vite: 6.3.4
+  '@xsynaptic/eslint-config': link:../eslint-config

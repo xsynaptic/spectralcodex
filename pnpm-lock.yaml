@@ -97,8 +97,8 @@ importers:
         specifier: link:../eslint-config
         version: link:../eslint-config
       '@xsynaptic/unified-tools':
-        specifier: ^0.0.4
-        version: 0.0.4
+        specifier: ^0.0.5
+        version: 0.0.5
       alfaaz:
         specifier: ^1.1.0
         version: 1.1.0
@@ -136,8 +136,8 @@ importers:
         specifier: ^16.2.0
         version: 16.2.0
       keyv:
-        specifier: ^5.3.3
-        version: 5.3.3
+        specifier: ^5.3.4
+        version: 5.3.4
       ky:
         specifier: ^1.8.1
         version: 1.8.1
@@ -166,8 +166,8 @@ importers:
         specifier: 19.1.0-rc.2
         version: 19.1.0-rc.2(react@19.1.0)
       rehype-wrap-cjk:
-        specifier: ^0.2.6
-        version: 0.2.6
+        specifier: ^0.2.7
+        version: 0.2.7
       remeda:
         specifier: ^2.23.0
         version: 2.23.0
@@ -328,8 +328,8 @@ importers:
   packages/map-types:
     devDependencies:
       zod:
-        specifier: ^3.25.56
-        version: 3.25.56
+        specifier: ^3.25.58
+        version: 3.25.58
 
   packages/react-map-component:
     devDependencies:
@@ -376,8 +376,8 @@ importers:
         specifier: ^2.23.0
         version: 2.23.0
       zod:
-        specifier: ^3.25.56
-        version: 3.25.56
+        specifier: ^3.25.58
+        version: 3.25.58
       zustand:
         specifier: ^5.0.5
         version: 5.0.5(@types/react@19.1.7)(react@19.1.0)(use-sync-external-store@1.2.0(react@19.1.0))
@@ -2027,8 +2027,8 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@xsynaptic/unified-tools@0.0.4':
-    resolution: {integrity: sha512-oMiuyjcUZxPseaKnWHyqDzIXDyX9WT2/BSu3RSiOJKyOdww+jUiBE7z2i9qmkfkDRZSiqLSUqumdZgUaqt2IjQ==}
+  '@xsynaptic/unified-tools@0.0.5':
+    resolution: {integrity: sha512-zr9IjCE0CjbgkvJCXrqHV33bAWRHxWMwbbqOeeXKGlwEuY0zhqJd1la+zDqZw2aJgsWefq4BVEZAbEiQpwsZXA==}
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -3513,8 +3513,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  keyv@5.3.3:
-    resolution: {integrity: sha512-Rwu4+nXI9fqcxiEHtbkvoes2X+QfkTRo1TMkPfwzipGsJlJO/z69vqB4FNl9xJ3xCpAcbkvmEabZfPzrwN3+gQ==}
+  keyv@5.3.4:
+    resolution: {integrity: sha512-ypEvQvInNpUe+u+w8BIcPkQvEqXquyyibWE/1NB5T2BTzIpS5cGEV1LZskDzPSTvNAaT4+5FutvzlvnkxOSKlw==}
 
   kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -4496,8 +4496,8 @@ packages:
   rehype-stringify@10.0.1:
     resolution: {integrity: sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA==}
 
-  rehype-wrap-cjk@0.2.6:
-    resolution: {integrity: sha512-tu5RONN0pbrOJoMddv3+JxBghXkkqCEikr8w7J9ZEbrVBtp8flcop6WMefXuV5eXmDNv+g061JxEu4NH8nAF/g==}
+  rehype-wrap-cjk@0.2.7:
+    resolution: {integrity: sha512-aP2XA7RD+q+YfotVhWRMWEbSY6MavGUE2xvImAjtnrT12bYjCRjb+d4YZoGPssNhtz7O6KWcXs3SOLNiP4W3NQ==}
 
   rehype@13.0.2:
     resolution: {integrity: sha512-j31mdaRFrwFRUIlxGeuPXXKWQxet52RBQRvCmzl5eCefn/KGbomK5GMHNMsOJf55fgo3qw5tST5neDuarDYR2A==}
@@ -5696,8 +5696,8 @@ packages:
   zod@3.25.55:
     resolution: {integrity: sha512-219huNnkSLQnLsQ3uaRjXsxMrVm5C9W3OOpEVt2k5tvMKuA8nBSu38e0B//a+he9Iq2dvmk2VyYVlHqiHa4YBA==}
 
-  zod@3.25.56:
-    resolution: {integrity: sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ==}
+  zod@3.25.58:
+    resolution: {integrity: sha512-DVLmMQzSZwNYzQoMaM3MQWnxr2eq+AtM9Hx3w1/Yl0pH8sLTSjN4jGP7w6f7uand6Hw44tsnSu1hz1AOA6qI2Q==}
 
   zustand@5.0.5:
     resolution: {integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==}
@@ -8215,14 +8215,14 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@xsynaptic/unified-tools@0.0.4':
+  '@xsynaptic/unified-tools@0.0.5':
     dependencies:
       rehype-parse: 9.0.1
       rehype-sanitize: 6.0.0
       rehype-stringify: 10.0.1
-      rehype-wrap-cjk: 0.2.6
+      rehype-wrap-cjk: 0.2.7
       remark-parse: 11.0.0
-      remark-rehype: 11.1.1
+      remark-rehype: 11.1.2
       remark-smartypants: 3.0.2
       retext: 9.0.0
       retext-smartypants: 6.2.0
@@ -10072,7 +10072,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  keyv@5.3.3:
+  keyv@5.3.4:
     dependencies:
       '@keyv/serialize': 1.0.3
 
@@ -11340,7 +11340,7 @@ snapshots:
       hast-util-to-html: 9.0.5
       unified: 11.0.5
 
-  rehype-wrap-cjk@0.2.6:
+  rehype-wrap-cjk@0.2.7:
     dependencies:
       hast-util-is-element: 3.0.0
       hastscript: 9.0.1
@@ -12978,7 +12978,7 @@ snapshots:
 
   zod@3.25.55: {}
 
-  zod@3.25.56: {}
+  zod@3.25.58: {}
 
   zustand@5.0.5(@types/react@19.1.7)(react@19.1.0)(use-sync-external-store@1.2.0(react@19.1.0)):
     optionalDependencies:

@@ -5,7 +5,7 @@ import globals from 'globals';
 export default getConfig(
 	[
 		{
-			ignores: ['**/.astro', '**/.astro-cache', 'dist/**/*', 'content/**/*'],
+			ignores: ['**/.astro', '**/.astro-cache', 'dist/**/*', 'content/**/*', 'temp/**/*'],
 		},
 		/**
 		 * React
