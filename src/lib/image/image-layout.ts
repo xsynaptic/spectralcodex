@@ -7,7 +7,6 @@ import {
 // Note that only the first three are currently in use
 export const ImageLayoutEnum = {
 	Default: 'default',
-	Medium: 'medium',
 	Wide: 'wide',
 	Full: 'full',
 	Half: 'half',
@@ -16,6 +15,7 @@ export const ImageLayoutEnum = {
 	Third: 'third',
 	ThirdWide: 'third-wide',
 	ThirdFull: 'third-full',
+	None: 'none',
 } as const;
 
 export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
@@ -79,8 +79,7 @@ export function getImageLayoutProps({
 	const imageOrientation = getImageOrientation({ width, height });
 
 	switch (layout) {
-		case ImageLayoutEnum.Default:
-		case ImageLayoutEnum.Medium: {
+		case ImageLayoutEnum.Default: {
 			return {
 				width: 900,
 				height: 600,

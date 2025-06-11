@@ -4,6 +4,7 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import localImageServer from '@spectralcodex/local-image-server';
+import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import AutoImport from 'astro-auto-import';
 import pagefind from 'astro-pagefind';
@@ -82,6 +83,7 @@ export default defineConfig({
 		},
 	},
 	markdown: {
+		remarkPlugins: [remarkImgGroup],
 		rehypePlugins: [rehypeWrapCjk],
 	},
 	integrations: [

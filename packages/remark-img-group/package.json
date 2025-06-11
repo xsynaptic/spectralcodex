@@ -1,0 +1,17 @@
+{
+	"name": "@spectralcodex/remark-img-group",
+	"version": "1.0.0",
+	"description": "A simple remark plugin for use with MDX and image layout in Spectral Codex",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"devDependencies": {
+		"@types/mdast": "^4.0.4",
+		"@types/unist": "^3.0.3",
+		"mdast-util-mdx": "^2.0.0",
+		"unified": "^11.0.5",
+		"unist-util-visit": "^5.0.0"
+	}
+}
