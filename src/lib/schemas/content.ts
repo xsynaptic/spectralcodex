@@ -5,7 +5,7 @@ import { z } from 'astro:content';
 export const TitleSchema = z.string().transform((value) => stylizeText(value));
 
 // Descriptions should meet basic SEO requirements
-const DESCRIPTION_CHARACTER_LENGTH = 30; // TODO: increase this value over time
+const DESCRIPTION_CHARACTER_LENGTH = 30;
 
 // Markdown may be present so we don't further transform the value
 export const DescriptionSchema = z.string().min(DESCRIPTION_CHARACTER_LENGTH, {
