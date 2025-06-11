@@ -5,8 +5,7 @@ import { render } from 'astro:content';
 
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import MainSite from '#components/main/main-site.astro';
+
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -14,6 +13,7 @@ import ContentImageEntry from '#components/content/content-image-entry.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -23,6 +23,7 @@ import ImageHero from '#components/image-hero/image-hero.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
+import MainSite from '#components/main/main-site.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
@@ -31,8 +32,8 @@ import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
-import ContentSectionMap from '#components/content/content-section-map.astro';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -149,9 +150,9 @@ const t = getTranslations();
 			) : undefined
 		}
 		<LocationsHeritage heritage={heritage} />
-		{!!entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
+		{entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{
-			!!entry.data.hideLocation ? undefined : (
+			entry.data.hideLocation ? undefined : (
 				<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
 			)
 		}

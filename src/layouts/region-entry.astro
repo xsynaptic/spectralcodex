@@ -7,13 +7,14 @@ import { render } from 'astro:content';
 import type { RegionsOption } from '#lib/collections/regions/options.ts';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import MainSite from '#components/main/main-site.astro';
+
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
+import MainSite from '#components/main/main-site.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
@@ -22,8 +23,8 @@ import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
-import ContentSectionMap from '#components/content/content-section-map.astro';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;

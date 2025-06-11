@@ -2,12 +2,13 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import MainSite from '#components/main/main-site.astro';
+
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
+import MainSite from '#components/main/main-site.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {

@@ -6,12 +6,12 @@ import { Image } from 'astro:assets';
 import type { ImageSetWithMetadata } from '#lib/image/image-set.ts';
 
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
-import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props extends ImageSetWithMetadata {
 	index: number;

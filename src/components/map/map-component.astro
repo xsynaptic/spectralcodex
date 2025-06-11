@@ -4,10 +4,9 @@ import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
-
 import '#styles/map.css';
 
-type Props = { mapId?: string | undefined } & MapComponentProps;
+type Props = MapComponentProps & { mapId?: string | undefined };
 
 const { mapId, ...mapComponentProps } = Astro.props;
 ---

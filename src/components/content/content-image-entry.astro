@@ -5,13 +5,13 @@ import { Image } from 'astro:assets';
 
 import type { ImageLayoutOption } from '#lib/image/image-layout.ts';
 
+import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import { FEATURE_IMAGE_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps } from '#lib/image/image-layout.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
-import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 
 interface Props {
 	imageId: string;
