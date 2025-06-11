@@ -1,9 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { parseContentDate } from '#lib/utils/date.ts';
+import type { DatePreset } from '#lib/utils/date.ts';
 
-export type DatePreset = 'short' | 'medium' | 'long';
+import { DatePresetEnum, parseContentDate } from '#lib/utils/date.ts';
 
 interface Props extends HTMLAttributes<'time'> {
 	date: string | Date;
@@ -12,21 +12,21 @@ interface Props extends HTMLAttributes<'time'> {
 }
 
 const datePresets = {
-	short: {
+	[DatePresetEnum.Short]: {
 		year: 'numeric',
 		month: 'numeric',
 		day: 'numeric',
 		hour12: false,
 		timeZone: 'UTC',
 	},
-	medium: {
+	[DatePresetEnum.Medium]: {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 		hour12: false,
 		timeZone: 'UTC',
 	},
-	long: {
+	[DatePresetEnum.Long]: {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
@@ -38,7 +38,7 @@ const datePresets = {
 	},
 } satisfies Record<DatePreset, Intl.DateTimeFormatOptions>;
 
-const { date, datePreset = 'medium', dateOptions, ...props } = Astro.props;
+const { date, datePreset = DatePresetEnum.Medium, dateOptions, ...props } = Astro.props;
 
 const dateRaw = parseContentDate(date);
 

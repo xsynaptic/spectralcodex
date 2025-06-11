@@ -3,6 +3,7 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
+import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
@@ -24,12 +25,12 @@ const t = getTranslations();
 						.sort((a, b) => b.valueOf() - a.valueOf())
 						.map((dateVisited) => (
 							<ListColumnItem>
-								<ContentDate date={dateVisited} datePreset="medium" />
+								<ContentDate date={dateVisited} datePreset={DatePresetEnum.Medium} />
 							</ListColumnItem>
 						))
 				) : (
 					<ListColumnItem>
-						<ContentDate date={dateVisited} datePreset="medium" />
+						<ContentDate date={dateVisited} datePreset={DatePresetEnum.Medium} />
 					</ListColumnItem>
 				)}
 			</ListColumn>

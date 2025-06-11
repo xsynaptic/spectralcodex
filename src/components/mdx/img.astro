@@ -1,12 +1,12 @@
 ---
-import type { ImageLayoutOption } from '#lib/image/image-layout.ts';
+import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import ContentImageEntry from '#components/content/content-image-entry.astro';
 
 interface Props {
 	src: string;
 	alt?: string;
-	layout?: ImageLayoutOption;
+	layout?: ImageLayout;
 }
 
 const { src: imageId, ...props } = Astro.props;

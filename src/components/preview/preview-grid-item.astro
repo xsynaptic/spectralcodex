@@ -10,6 +10,7 @@ import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import Preview from '#components/preview/preview.astro';
 import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -118,7 +119,9 @@ const t = getTranslations();
 				</DividedItem>
 			) : undefined
 		}
-		{showDate ? <ContentDate date={item.date} datePreset="medium" /> : undefined}</Fragment
+		{
+			showDate ? <ContentDate date={item.date} datePreset={DatePresetEnum.Medium} /> : undefined
+		}</Fragment
 	>
 	{
 		showDescription ? (

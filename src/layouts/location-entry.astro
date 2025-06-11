@@ -31,6 +31,7 @@ import ProseDescription from '#components/parts/prose-description.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
@@ -95,7 +96,11 @@ const t = getTranslations();
 								</DividedItem>
 							) : undefined}
 							<DividedItem dividerColor="hero">
-								<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="medium" />
+								<ContentDate
+									date={dateCreated}
+									dateUpdated={dateUpdated}
+									datePreset={DatePresetEnum.Medium}
+								/>
 							</DividedItem>
 						</Fragment>
 					</ContentHeader>
@@ -114,7 +119,11 @@ const t = getTranslations();
 							</DividedItem>
 						) : undefined}
 						<DividedItem>
-							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="medium" />
+							<ContentDate
+								date={dateCreated}
+								dateUpdated={dateUpdated}
+								datePreset={DatePresetEnum.Medium}
+							/>
 						</DividedItem>
 					</Fragment>
 				</ContentHeader>
@@ -127,9 +136,7 @@ const t = getTranslations();
 				</ProseBody>
 			) : (
 				<>
-					{imageFeatured ? (
-						<ContentImageEntry imageId={imageFeatured} layout="medium" alt={title} />
-					) : undefined}
+					{imageFeatured ? <ContentImageEntry imageId={imageFeatured} alt={title} /> : undefined}
 					<ContentSection>
 						<Fragment slot="section-description">
 							<ProseDescription>

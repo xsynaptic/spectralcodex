@@ -5,18 +5,28 @@ import {
 } from '#constants.ts';
 
 // Note that only the first three are currently in use
-export type ImageLayoutOption =
-	| 'medium'
-	| 'wide'
-	| 'full'
-	| 'half'
-	| 'half-wide'
-	| 'half-full'
-	| 'third'
-	| 'third-wide'
-	| 'third-full';
+export const ImageLayoutEnum = {
+	Default: 'default',
+	Medium: 'medium',
+	Wide: 'wide',
+	Full: 'full',
+	Half: 'half',
+	HalfWide: 'half-wide',
+	HalfFull: 'half-full',
+	Third: 'third',
+	ThirdWide: 'third-wide',
+	ThirdFull: 'third-full',
+} as const;
 
-type ImageOrientation = 'landscape' | 'portrait' | 'square';
+export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
+
+const ImageOrientationEnum = {
+	Landscape: 'landscape',
+	Portrait: 'portrait',
+	Square: 'square',
+} as const;
+
+type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
 
 // These are the widths we're building for in almost all scenarios
 const imageSrcsetWidthsDefault = [450, 600, 900, 1200, 1800, 2400, 3600];
@@ -29,9 +39,13 @@ function getImageOrientation({
 	width: number;
 	height?: number | undefined;
 }): ImageOrientation {
-	if (height === width) return 'square';
-	if (height && height > width) return 'portrait';
-	return 'landscape';
+	if (height === width) {
+		return ImageOrientationEnum.Square;
+	}
+	if (height && height > width) {
+		return ImageOrientationEnum.Portrait;
+	}
+	return ImageOrientationEnum.Landscape;
 }
 
 // Simple utility to remove any widths over the size of the original image
@@ -60,12 +74,13 @@ export function getImageLayoutProps({
 }: {
 	width: number;
 	height?: number | undefined;
-	layout?: ImageLayoutOption | undefined;
+	layout?: ImageLayout | undefined;
 }) {
 	const imageOrientation = getImageOrientation({ width, height });
 
 	switch (layout) {
-		case 'medium': {
+		case ImageLayoutEnum.Default:
+		case ImageLayoutEnum.Medium: {
 			return {
 				width: 900,
 				height: 600,
@@ -73,7 +88,7 @@ export function getImageLayoutProps({
 				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - 32px), (max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - 64px), ${TAILWIND_BREAKPOINT_CONTENT}`,
 			};
 		}
-		case 'wide': {
+		case ImageLayoutEnum.Wide: {
 			return {
 				width: 1800,
 				height: 1200,
@@ -81,7 +96,7 @@ export function getImageLayoutProps({
 				sizes: `calc(100vw - 64px)`,
 			};
 		}
-		case 'full': {
+		case ImageLayoutEnum.Full: {
 			return {
 				width: 1800,
 				height: 1200,

@@ -1,3 +1,11 @@
+export const DatePresetEnum = {
+	Short: 'short',
+	Medium: 'medium',
+	Long: 'long',
+} as const;
+
+export type DatePreset = (typeof DatePresetEnum)[keyof typeof DatePresetEnum];
+
 export function parseContentDate(date: string | Date | undefined) {
 	if (!date) return;
 	if (date instanceof Date) return date;

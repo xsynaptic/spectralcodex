@@ -3,23 +3,23 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import type { ImageLayoutOption } from '#lib/image/image-layout.ts';
+import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import { FEATURE_IMAGE_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
-import { getImageLayoutProps } from '#lib/image/image-layout.ts';
+import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
 interface Props {
 	imageId: string;
 	alt?: string;
-	layout?: ImageLayoutOption;
+	layout?: ImageLayout;
 }
 
-const { imageId, alt: altProp, layout } = Astro.props;
+const { imageId, alt: altProp, layout = ImageLayoutEnum.Default } = Astro.props;
 
 // This controls how the component is rendered; RSS requires a less complex output
 const { isRss } = Astro.locals;
@@ -81,15 +81,15 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 				class:list={[
 					'content-image',
 					'not-prose',
-					layout === 'medium'
+					layout === ImageLayoutEnum.Default || layout === ImageLayoutEnum.Medium
 						? 'max-w-content sm:px-small md:px-medium mx-auto mb-2 md:mb-4'
 						: undefined,
-					layout === 'wide' ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
-					layout === 'full' ? 'mb-2 w-full' : undefined,
+					layout === ImageLayoutEnum.Wide ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
+					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
 				]}
 			>
 				<ImagePlaceholder
-					class:list={[layout === 'full' ? undefined : 'sm:rounded-xs']}
+					class:list={[layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs']}
 					placeholder={placeholder}
 				>
 					{imageLinkUrl ? (
@@ -97,7 +97,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 							<Image
 								class:list={[
 									'm-0 object-cover object-center text-sm text-transparent',
-									layout === 'full' ? undefined : 'sm:rounded-xs',
+									layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
 								]}
 								loading="lazy"
 								{...imageProps}
@@ -107,7 +107,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 						<Image
 							class:list={[
 								'm-0 object-cover object-center text-sm text-transparent',
-								layout === 'full' ? undefined : 'sm:rounded-xs',
+								layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
 							]}
 							loading="lazy"
 							{...imageProps}
@@ -120,7 +120,9 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 							'content-image-caption',
 							'px-small py-1 text-sm leading-relaxed italic',
 							'text-primary-500 dark:text-primary-400',
-							layout === 'full' ? 'max-w-content px-small md:px-medium mx-auto' : 'sm:px-0',
+							layout === ImageLayoutEnum.Full
+								? 'max-w-content px-small md:px-medium mx-auto'
+								: 'sm:px-0',
 						]}
 					>
 						<Fragment set:html={caption} />

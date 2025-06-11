@@ -14,7 +14,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import TextGridItem from '#components/parts/text-grid-item.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
-import { getImageLayoutProps } from '#lib/image/image-layout.ts';
+import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -36,7 +36,7 @@ const imageProps = {
 	...getImageLayoutProps({
 		width: image.data.width,
 		height: image.data.height,
-		layout: 'medium',
+		layout: ImageLayoutEnum.Default,
 	}),
 } satisfies RemoteImageProps;
 

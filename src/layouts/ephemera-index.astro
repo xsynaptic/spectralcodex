@@ -12,6 +12,7 @@ import MainSite from '#components/main/main-site.astro';
 import PaginationCounter from '#components/pagination/pagination-counter.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import Container from '#components/parts/container.astro';
+import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getTranslations } from '#lib/utils/i18n.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -53,7 +54,7 @@ const description = t('collection.ephemera.description');
 									<ContentDate
 										date={entry.data.dateCreated}
 										dateUpdated={entry.data.dateUpdated}
-										datePreset="medium"
+										datePreset={DatePresetEnum.Medium}
 									/>
 								</Fragment>
 								<Content />
