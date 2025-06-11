@@ -4,18 +4,11 @@ import {
 	TAILWIND_BREAKPOINT_SM,
 } from '#constants.ts';
 
-// Note that only the first three are currently in use
 export const ImageLayoutEnum = {
 	Default: 'default',
 	Wide: 'wide',
 	Full: 'full',
-	Half: 'half',
-	HalfWide: 'half-wide',
-	HalfFull: 'half-full',
-	Third: 'third',
-	ThirdWide: 'third-wide',
-	ThirdFull: 'third-full',
-	None: 'none',
+	None: 'none', // A special case for images in groups
 } as const;
 
 export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
@@ -28,8 +21,26 @@ const ImageOrientationEnum = {
 
 type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
 
+const ImageSizeEnum = {
+	ExtraSmall: 450,
+	Small: 600,
+	Medium: 900,
+	Large: 1200,
+	ExtraLarge: 1800,
+	ExtraExtraLarge: 2400,
+	ExtraExtraExtraLarge: 3600,
+} as const;
+
 // These are the widths we're building for in almost all scenarios
-const imageSrcsetWidthsDefault = [450, 600, 900, 1200, 1800, 2400, 3600];
+const imageSrcsetWidthsDefault = [
+	ImageSizeEnum.ExtraSmall,
+	ImageSizeEnum.Small,
+	ImageSizeEnum.Medium,
+	ImageSizeEnum.Large,
+	ImageSizeEnum.ExtraLarge,
+	ImageSizeEnum.ExtraExtraLarge,
+	ImageSizeEnum.ExtraExtraExtraLarge,
+];
 
 // A simple check for image orientation
 function getImageOrientation({
@@ -61,12 +72,6 @@ export function getImageSrcsetWidths({
 	return [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
 }
 
-// Currently we have no way to know the sizing of images in figure groups
-// Astro processes MDX from inside to out, meaning figures are interpreted first
-// Therefore we can't pass something from the surrounding tag without writing another remark plugin
-// This creates a blind spot for specifying sizes attributes
-// One solution would be to explicitly require layout props in grouped images
-// But this would require a lot of rework to existing content, so maybe later
 export function getImageLayoutProps({
 	width,
 	height,
@@ -81,42 +86,42 @@ export function getImageLayoutProps({
 	switch (layout) {
 		case ImageLayoutEnum.Default: {
 			return {
-				width: 900,
-				height: 600,
+				width: ImageSizeEnum.Medium,
+				height: ImageSizeEnum.Large,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - 32px), (max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - 64px), ${TAILWIND_BREAKPOINT_CONTENT}`,
 			};
 		}
 		case ImageLayoutEnum.Wide: {
 			return {
-				width: 1800,
-				height: 1200,
+				width: ImageSizeEnum.ExtraLarge,
+				height: ImageSizeEnum.Large,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `calc(100vw - 64px)`,
 			};
 		}
 		case ImageLayoutEnum.Full: {
 			return {
-				width: 1800,
-				height: 1200,
+				width: ImageSizeEnum.ExtraLarge,
+				height: ImageSizeEnum.Large,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: '100vw',
 			};
 		}
-		// No layout prop; typically seen in images in groups, so we have to guess...
-		// TODO: complete additional sizes estimates for the other layout types
+		// No layout prop; typically seen in images in groups
+		// Ultimately we're just guessing here
 		default: {
 			return {
 				...(() => {
 					switch (imageOrientation) {
 						case 'portrait': {
-							return { width: 600, height: 900 };
+							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
 						}
 						case 'square': {
-							return { width: 600, height: 600 };
+							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
 						}
 						default: {
-							return { width: 900, height: 600 };
+							return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
 						}
 					}
 				})(),
