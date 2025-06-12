@@ -67,8 +67,8 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 	}
 }
 
-// Generate spritesheets using spreet
-async function generateSpritesheets(): Promise<void> {
+// Generate sprites using spreet
+async function generateMapSpritesheet(): Promise<void> {
 	console.log(chalk.blue('Generating map icon spritesheets...'));
 
 	try {
@@ -82,7 +82,5 @@ async function generateSpritesheets(): Promise<void> {
 	}
 }
 
-console.log(chalk.blue('Running map icons export...'));
-
 await exportMapIcons(mapMarkerIcons);
-await generateSpritesheets();
+await generateMapSpritesheet();

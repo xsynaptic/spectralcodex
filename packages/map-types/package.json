@@ -7,6 +7,6 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"zod": "^3.25.61"
+		"zod": "^3.25.63"
 	}
 }
