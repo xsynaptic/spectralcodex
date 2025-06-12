@@ -1,8 +1,8 @@
-import type { MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback } from 'react';
-import { funnel } from 'remeda';
+import { funnel, isIncludedIn } from 'remeda';
 
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
@@ -25,6 +25,12 @@ export function useMapCanvasEvents() {
 			// If the click event is not within interactive layers close any open popup and exit early
 			if (!feature || !feature.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
 				setSelectedId(undefined);
+
+				// This clears *all* feature states for the entire source
+				// It's a simple way to clear selected state without having to know the feature ID
+				mapInstance.removeFeatureState({
+					source: MapSourceIdEnum.PointCollection,
+				});
 				return;
 			}
 
@@ -71,7 +77,8 @@ export function useMapCanvasEvents() {
 				// When a click event occurs on a feature in the unclustered-point layer, open a popup
 				// TODO: fly first, then open the popup, which requires getting into tricky event handling
 				case MapLayerIdEnum.Points:
-				case MapLayerIdEnum.PointsTarget: {
+				case MapLayerIdEnum.PointsTarget:
+				case MapLayerIdEnum.PointsIcon: {
 					if (isMapCoordinates(feature.geometry.coordinates)) {
 						mapInstance.flyTo({
 							center: feature.geometry.coordinates,
@@ -82,6 +89,16 @@ export function useMapCanvasEvents() {
 
 					if (typeof feature.properties.id === 'string') {
 						setSelectedId(feature.properties.id);
+					}
+
+					if (feature.id !== undefined) {
+						mapInstance.setFeatureState(
+							{
+								source: MapSourceIdEnum.PointCollection,
+								id: feature.id,
+							},
+							{ selected: true },
+						);
 					}
 					break;
 				}
@@ -94,7 +111,7 @@ export function useMapCanvasEvents() {
 	);
 
 	const onMouseEnter = useCallback(
-		({ features }: MapLayerMouseEvent) => {
+		({ features, target: mapInstance }: MapLayerMouseEvent) => {
 			const feature = features && features[0];
 
 			switch (feature?.layer.id) {
@@ -103,8 +120,20 @@ export function useMapCanvasEvents() {
 					break;
 				}
 				case MapLayerIdEnum.Points:
-				case MapLayerIdEnum.PointsTarget: {
+				case MapLayerIdEnum.PointsTarget:
+				case MapLayerIdEnum.PointsIcon: {
 					setCanvasCursor('pointer');
+
+					// Set hover state for the feature
+					if (feature.id !== undefined) {
+						mapInstance.setFeatureState(
+							{
+								source: MapSourceIdEnum.PointCollection,
+								id: feature.id,
+							},
+							{ hover: true },
+						);
+					}
 					break;
 				}
 				default: {
@@ -115,9 +144,32 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const onMouseLeave = useCallback(() => {
-		setCanvasCursor('grab');
-	}, [setCanvasCursor]);
+	const onMouseLeave = useCallback(
+		({ features, target: mapInstance }: MapLayerMouseEvent) => {
+			const feature = features && features[0];
+
+			// Reset hover state
+			if (
+				feature?.id !== undefined &&
+				isIncludedIn(feature.layer.id, [
+					MapLayerIdEnum.Points,
+					MapLayerIdEnum.PointsTarget,
+					MapLayerIdEnum.PointsIcon,
+				])
+			) {
+				mapInstance.setFeatureState(
+					{
+						source: MapSourceIdEnum.PointCollection,
+						id: feature.id,
+					},
+					{ hover: false },
+				);
+			}
+
+			setCanvasCursor('grab');
+		},
+		[setCanvasCursor],
+	);
 
 	const onMouseDown = useCallback(
 		({ features }: MapLayerMouseEvent) => {
@@ -191,9 +243,10 @@ export function useMapCanvasEvents() {
 					onClick,
 					onMouseEnter,
 					onMouseLeave,
+					onMouseOut: onMouseLeave,
 					onMouseDown,
 					onMouseUp,
 				}
 			: undefined),
-	};
+	} satisfies MapCallbacks;
 }

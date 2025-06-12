@@ -4,11 +4,14 @@ import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
+import { FEATURE_MAP_ICONS } from '#constants.ts';
 import '#styles/map.css';
 
 type Props = MapComponentProps & { mapId?: string | undefined };
 
 const { mapId, ...mapComponentProps } = Astro.props;
+
+const spritesUrl = FEATURE_MAP_ICONS ? new URL('icons/map-icons', Astro.site).href : undefined;
 ---
 
 <MapComponentSprites />
@@ -24,6 +27,7 @@ const { mapId, ...mapComponentProps } = Astro.props;
 		mapId ? (
 			<ReactMapComponent
 				style={{ zIndex: 20 }}
+				{...(spritesUrl ? { spritesId: 'custom', spritesUrl } : {})}
 				{...mapComponentProps}
 				client:visible
 				transition:persist={mapId}

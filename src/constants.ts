@@ -85,6 +85,9 @@ export const FEATURE_IMAGE_PAGES = false as boolean;
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
 
+// Map icons are currently under development
+export const FEATURE_MAP_ICONS = false as boolean;
+
 // Generate open graph images
 export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;
 

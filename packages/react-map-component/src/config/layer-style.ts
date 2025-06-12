@@ -1,5 +1,6 @@
 import type {
 	CircleLayerSpecification,
+	LayerSpecification,
 	LineLayerSpecification,
 	SymbolLayerSpecification,
 } from 'react-map-gl/maplibre';
@@ -124,16 +125,51 @@ const getPointsTargetLayerStyle = (identifiers: StyleIdentifiers) =>
 				'interpolate',
 				['linear'],
 				['zoom'],
-				0, // Zoom level
-				5, // Radius
+				0, // Zoom level followed by radius (repeated)
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					9,
+					['boolean', ['feature-state', 'hover'], false],
+					6,
+					5,
+				],
 				8,
-				10,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					14,
+					['boolean', ['feature-state', 'hover'], false],
+					11,
+					10,
+				],
 				12,
-				12,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					16,
+					['boolean', ['feature-state', 'hover'], false],
+					13,
+					12,
+				],
 				15,
-				15,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					20,
+					['boolean', ['feature-state', 'hover'], false],
+					16,
+					15,
+				],
 				18,
-				20,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					24,
+					['boolean', ['feature-state', 'hover'], false],
+					21,
+					20,
+				],
 			],
 		},
 	}) satisfies CircleLayerSpecification;
@@ -154,16 +190,51 @@ const getPointsLayerStyle = (identifiers: StyleIdentifiers) =>
 				'interpolate',
 				['linear'],
 				['zoom'],
-				0, // Zoom level
-				2, // Radius
+				0, // Zoom level followed by radius (repeated)
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					5,
+					['boolean', ['feature-state', 'hover'], false],
+					3,
+					2,
+				],
 				8,
-				4,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					6,
+					['boolean', ['feature-state', 'hover'], false],
+					5,
+					4,
+				],
 				12,
-				5,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					8,
+					['boolean', ['feature-state', 'hover'], false],
+					6,
+					5,
+				],
 				15,
-				7,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					10,
+					['boolean', ['feature-state', 'hover'], false],
+					8,
+					7,
+				],
 				18,
-				8,
+				[
+					'case',
+					['boolean', ['feature-state', 'selected'], false],
+					12,
+					['boolean', ['feature-state', 'hover'], false],
+					9,
+					8,
+				],
 			],
 			'circle-stroke-width': 1,
 			...(statusStrokeColorMap
@@ -178,6 +249,54 @@ const getPointsLayerStyle = (identifiers: StyleIdentifiers) =>
 				: {}),
 		},
 	}) satisfies CircleLayerSpecification;
+
+// Icon symbols for individual points based on category
+// TODO: this is still under development
+const getPointsIconLayerStyle = (identifiers: StyleIdentifiers, spritesPrefix = 'custom') =>
+	({
+		...identifiers,
+		type: 'symbol',
+		filter: ['!', ['has', 'point_count']],
+		layout: {
+			'icon-image': [
+				'concat',
+				spritesPrefix,
+				':',
+				[
+					'case',
+					['has', 'category'],
+					['get', 'category'],
+					'unknown', // fallback if no category
+				],
+			],
+			'icon-size': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0, // Zoom level
+				0.2, // Size
+				8,
+				0.3,
+				12,
+				0.4,
+				15,
+				0.5,
+				18,
+				1,
+			],
+			'icon-allow-overlap': true,
+			'icon-ignore-placement': false,
+		},
+		paint: {
+			'icon-opacity': 1,
+			'icon-color': [
+				'case',
+				['boolean', ['feature-state', 'selected'], false],
+				'#ffffff',
+				'#cccccc',
+			],
+		},
+	}) satisfies SymbolLayerSpecification;
 
 // Experimental line drawing style
 const getLineStringStyle = (identifiers: StyleIdentifiers) =>
@@ -213,24 +332,28 @@ const getLineStringStyle = (identifiers: StyleIdentifiers) =>
 	}) satisfies LineLayerSpecification;
 
 export const layerStyles = {
-	clusterCircle: getClusterCircleLayerStyle({
+	[MapLayerIdEnum.Clusters]: getClusterCircleLayerStyle({
 		id: MapLayerIdEnum.Clusters,
 		source: MapSourceIdEnum.PointCollection,
 	}),
-	clusterSymbol: getClusterSymbolLayerStyle({
+	[MapLayerIdEnum.ClustersLabel]: getClusterSymbolLayerStyle({
 		id: MapLayerIdEnum.ClustersLabel,
 		source: MapSourceIdEnum.PointCollection,
 	}),
-	pointsTarget: getPointsTargetLayerStyle({
-		id: MapLayerIdEnum.PointsTarget,
-		source: MapSourceIdEnum.PointCollection,
-	}),
-	points: getPointsLayerStyle({
+	[MapLayerIdEnum.Points]: getPointsLayerStyle({
 		id: MapLayerIdEnum.Points,
 		source: MapSourceIdEnum.PointCollection,
 	}),
-	lineString: getLineStringStyle({
+	[MapLayerIdEnum.PointsTarget]: getPointsTargetLayerStyle({
+		id: MapLayerIdEnum.PointsTarget,
+		source: MapSourceIdEnum.PointCollection,
+	}),
+	[MapLayerIdEnum.PointsIcon]: getPointsIconLayerStyle({
+		id: MapLayerIdEnum.PointsIcon,
+		source: MapSourceIdEnum.PointCollection,
+	}),
+	[MapLayerIdEnum.LineString]: getLineStringStyle({
 		id: MapLayerIdEnum.LineString,
 		source: MapSourceIdEnum.LineStringCollection,
 	}),
-};
+} satisfies Record<MapLayerId, LayerSpecification>;

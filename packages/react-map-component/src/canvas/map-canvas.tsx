@@ -25,6 +25,7 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.Clusters,
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsTarget,
+	MapLayerIdEnum.PointsIcon,
 ] as const;
 
 export const MapCanvas = ({
@@ -90,7 +91,7 @@ export const MapCanvas = ({
 			{...mapCanvasEvents}
 		>
 			<MapControls />
-			<MapPointLayer />
+			<MapPointLayer hasMapIcons={spritesId !== undefined && spritesUrl !== undefined} />
 			<MapLineStringLayer />
 			<MapControlsFilterMenu />
 			<MapPopup />
