@@ -1,21 +1,33 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
-import { type Flavor, layers } from '@protomaps/basemaps';
+import { layers, namedFlavor } from '@protomaps/basemaps';
 import maplibregl from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
 
+import type { MapComponentProps } from '../../types';
+
 import { useMapLanguages } from '../../store/hooks/use-map-store';
+import { useThemeMode } from '../hooks/use-theme-mode';
 
 export function useProtomaps({
 	protomapsApiKey,
 	baseMapTheme,
-}: {
-	protomapsApiKey: string;
-	baseMapTheme: Flavor;
-}) {
+	spritesId = 'custom',
+	spritesUrl,
+	isDev,
+}: Pick<
+	MapComponentProps,
+	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'isDev'
+>) {
 	const languages = useMapLanguages();
+
+	const isDarkMode = useThemeMode();
+
+	const flavor = useMemo(() => {
+		return baseMapTheme ?? (isDarkMode ? namedFlavor('dark') : namedFlavor('light'));
+	}, [baseMapTheme, isDarkMode]);
 
 	useEffect(function loadProtomapsProtocol() {
 		const protocol = new Protocol();
@@ -43,7 +55,13 @@ export function useProtomaps({
 			({
 				version: 8,
 				glyphs: `https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf`,
-				sprite: `https://protomaps.github.io/basemaps-assets/sprites/v4/light`,
+				sprite: [
+					{
+						id: 'default',
+						url: `https://protomaps.github.io/basemaps-assets/sprites/v4/light`,
+					},
+					...(isDev && spritesId && spritesUrl ? [{ id: spritesId, url: spritesUrl }] : []),
+				],
 				sources: {
 					protomaps: {
 						type: 'vector',
@@ -51,7 +69,7 @@ export function useProtomaps({
 						attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
 					},
 				},
-				layers: layers('protomaps', baseMapTheme, { lang: languages?.at(0) ?? 'en' }),
+				layers: layers('protomaps', flavor, { lang: languages?.at(0) ?? 'en' }),
 			}) satisfies StyleSpecification,
 		[baseMapTheme, languages],
 	);

@@ -43,7 +43,7 @@ export interface MapComponentProps {
 	apiPopupUrl?: string | undefined;
 	sourceData?: MapSourceDataRaw | undefined;
 	popupData?: MapPopupDataRaw | undefined;
-	baseMapTheme?: Flavor;
+	baseMapTheme?: Flavor | undefined;
 	bounds?: LngLatBoundsLike;
 	maxBounds?: LngLatBoundsLike;
 	center?: [number, number];
@@ -54,6 +54,8 @@ export interface MapComponentProps {
 	showObjectiveFilter?: boolean | undefined;
 	languages?: Array<string> | undefined;
 	protomapsApiKey: string;
+	spritesId?: string | undefined;
+	spritesUrl?: string | undefined;
 	buildId?: string | undefined;
 	isDev?: boolean | undefined;
 }

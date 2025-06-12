@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 
-import { namedFlavor } from '@protomaps/basemaps';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
@@ -15,7 +14,6 @@ import {
 	useMapCanvasLoading,
 } from '../store/hooks/use-map-store';
 import { useProtomaps } from './hooks/use-protomaps';
-import { useThemeMode } from './hooks/use-theme-mode';
 import { MapControls } from './map-controls';
 import { MapControlsFilterMenu } from './map-controls-filter-menu';
 import { MapLineStringLayer } from './map-layers-line-string';
@@ -40,15 +38,18 @@ export const MapCanvas = ({
 	zoom = 12,
 	style,
 	protomapsApiKey,
+	spritesUrl,
+	spritesId,
 	isDev,
 }: Omit<MapComponentProps, 'geodata' | 'cluster' | 'buildId'> & {
 	style?: CSSProperties | undefined;
 }) => {
-	const isDarkMode = useThemeMode();
-
 	const mapStyle = useProtomaps({
 		protomapsApiKey,
-		baseMapTheme: baseMapTheme ?? (isDarkMode ? namedFlavor('dark') : namedFlavor('light')),
+		baseMapTheme,
+		spritesId,
+		spritesUrl,
+		isDev,
 	});
 	const mapCanvasEvents = useMapCanvasEvents();
 	const canvasCursor = useMapCanvasCursor();
