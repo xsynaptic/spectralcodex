@@ -2,7 +2,7 @@ import type { LocationCategory } from './map-locations';
 
 import { LocationCategoryEnum } from './map-locations';
 
-export const mapMarkerIcons = {
+export const mapIcons = {
 	/** Civic */
 	[LocationCategoryEnum.Civic]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Cemetery]: 'material-symbols:question-mark-rounded',

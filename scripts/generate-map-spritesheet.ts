@@ -2,7 +2,7 @@
 import { lookupCollection } from '@iconify/json';
 import { blankIconSet, exportToDirectory, IconSet } from '@iconify/tools';
 import { getIcons, validateIconSet } from '@iconify/utils';
-import { mapMarkerIcons } from '@spectralcodex/map-types';
+import { mapIcons } from '@spectralcodex/map-types';
 import chalk from 'chalk';
 import path from 'node:path';
 import { $ } from 'zx';
@@ -82,5 +82,5 @@ async function generateMapSpritesheet(): Promise<void> {
 	}
 }
 
-await exportMapIcons(mapMarkerIcons);
+await exportMapIcons(mapIcons);
 await generateMapSpritesheet();
