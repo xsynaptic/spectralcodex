@@ -1,11 +1,12 @@
 import { z } from 'astro:content';
 
 import { sourcesMap } from '#lib/data/sources.ts';
+import { titleMultilingualSchema } from '#lib/schemas/i18n.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 
 const SourceItemSchema = z.object({
 	title: z.string(),
-	titleAlt: z.string().optional(),
+	...titleMultilingualSchema,
 	description: z.string().optional(),
 	authors: z.string().array().optional(),
 	publisher: z.string().optional(),

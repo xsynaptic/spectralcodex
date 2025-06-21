@@ -7,6 +7,7 @@ import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/utils/i18n.ts';
+import { getMultilingualValue } from '#lib/schemas/i18n.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
@@ -31,32 +32,40 @@ const t = getTranslations();
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.links.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
-				{links?.map((link) => (
-					<ListColumnItem>
-						<Link href={link.url}>{link.title}</Link>
-						{link.titleAlt ? (
-							<span>
-								<FormatCjk>({link.titleAlt})</FormatCjk>
-							</span>
-						) : undefined}
-					</ListColumnItem>
-				))}
-				{sources?.map((source) => (
-					<ListColumnItem>
-						<span class="italic">{source.title}</span>
-						{'titleAlt' in source && source.titleAlt ? (
-							<span>
-								<FormatCjk>({source.titleAlt})</FormatCjk>
-							</span>
-						) : undefined}
-						{'publisher' in source && source.publisher ? (
-							<span>{source.publisher}</span>
-						) : undefined}
-						{'datePublished' in source && source.datePublished ? (
-							<span>({source.datePublished})</span>
-						) : undefined}
-					</ListColumnItem>
-				))}
+				{links?.map((link) => {
+					const titleAlt = getMultilingualValue('title', link);
+
+					return (
+						<ListColumnItem>
+							<Link href={link.url}>{link.title}</Link>
+							{titleAlt ? (
+								<span>
+									<FormatCjk>({titleAlt})</FormatCjk>
+								</span>
+							) : undefined}
+						</ListColumnItem>
+					);
+				})}
+				{sources?.map((source) => {
+					const titleAlt = getMultilingualValue('title', source);
+
+					return (
+						<ListColumnItem>
+							<span class="italic">{source.title}</span>
+							{titleAlt ? (
+								<span>
+									<FormatCjk>({titleAlt})</FormatCjk>
+								</span>
+							) : undefined}
+							{'publisher' in source && source.publisher ? (
+								<span>{source.publisher}</span>
+							) : undefined}
+							{'datePublished' in source && source.datePublished ? (
+								<span>({source.datePublished})</span>
+							) : undefined}
+						</ListColumnItem>
+					);
+				})}
 			</ListColumn>
 		</ContentSection>
 	) : undefined

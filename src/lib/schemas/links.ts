@@ -1,10 +1,11 @@
 import { z } from 'astro:content';
 
 import { linksMap } from '#lib/data/links.ts';
+import { titleMultilingualSchema } from '#lib/schemas/i18n.ts';
 
 const LinkItemSchema = z.object({
 	title: z.string(),
-	titleAlt: z.string().optional(),
+	...titleMultilingualSchema,
 	url: z.string().url(),
 });
 
@@ -16,11 +17,10 @@ export const LinkSchema = LinkItemSchema.or(
 		.transform((value) => {
 			const url = new URL(value).href;
 
-			for (const linksMapItem of linksMap) {
-				if (url.includes(linksMapItem.match)) {
+			for (const { match, ...linksMapItem } of linksMap) {
+				if (url.includes(match)) {
 					return {
-						title: linksMapItem.title,
-						...('titleAlt' in linksMapItem ? { titleAlt: linksMapItem.titleAlt } : {}),
+						...linksMapItem,
 						url: value,
 					};
 				}
