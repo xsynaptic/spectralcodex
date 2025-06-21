@@ -30,54 +30,54 @@ export type LocationTwHeritage = z.output<typeof LocationTwHeritageSchema>;
 export const LocationTwHeritageRecords = {
 	'national-monument': {
 		title: 'National Monument',
-		titleAlt: '國定古蹟',
+		title_zh: '國定古蹟',
 	},
 	'municipal-monument': {
 		title: 'Municipal Monument',
-		titleAlt: '直轄市定古蹟',
+		title_zh: '直轄市定古蹟',
 	},
 	'city-monument': {
 		title: 'City Monument',
-		titleAlt: '縣(市)定古蹟',
+		title_zh: '縣(市)定古蹟',
 	},
 	'historic-building': {
 		title: 'Historic Building',
-		titleAlt: '歷史建築',
+		title_zh: '歷史建築',
 	},
 	'commemorative-building': {
 		title: 'Commemorative Building',
-		titleAlt: '紀念建築',
+		title_zh: '紀念建築',
 	},
 	'historic-building-group': {
 		title: 'Historic Building Group',
-		titleAlt: '聚落建築群',
+		title_zh: '聚落建築群',
 	},
 	'national-archaeological-site': {
 		title: 'National Archaeological Site',
-		titleAlt: '國定考古遺址',
+		title_zh: '國定考古遺址',
 	},
 	'municipal-archaeological-site': {
 		title: 'Municipal Archaeological Site',
-		titleAlt: '直轄市定考古遺址',
+		title_zh: '直轄市定考古遺址',
 	},
 	'city-archaeological-site': {
 		title: 'City Archaeological Site',
-		titleAlt: '縣(市)定考古遺址',
+		title_zh: '縣(市)定考古遺址',
 	},
 	'historic-site': {
 		title: 'Historic Site',
-		titleAlt: '史蹟',
+		title_zh: '史蹟',
 	},
 	'cultural-landscape': {
 		title: 'Cultural Landscape',
-		titleAlt: '文化景觀',
+		title_zh: '文化景觀',
 	},
 	'natural-monument': {
 		title: 'Natural Monument',
-		titleAlt: '自然紀念物',
+		title_zh: '自然紀念物',
 	},
 	antiquity: {
 		title: 'Antiquity',
-		titleAlt: '古物',
+		title_zh: '古物',
 	},
-} as const satisfies Record<LocationTwHeritage, { title: string; titleAlt: string }>;
+} as const satisfies Record<LocationTwHeritage, { title: string; title_zh: string }>;
