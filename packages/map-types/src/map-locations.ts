@@ -117,9 +117,3 @@ export type LocationStatus = (typeof LocationStatusEnum)[keyof typeof LocationSt
 export const LocationStatusNumericMapping = Object.fromEntries(
 	Object.values(LocationStatusEnum).map((value, i) => [value, i]),
 ) as Record<(typeof LocationStatusEnum)[keyof typeof LocationStatusEnum], number>;
-
-export interface LocationStatusMetadata {
-	title: string;
-	titleAlt: string;
-	description: string;
-}

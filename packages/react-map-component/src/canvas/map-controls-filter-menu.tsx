@@ -1,8 +1,10 @@
-import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/map-types';
+import type { LocationStatus } from '@spectralcodex/map-types';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, type ReactNode } from 'react';
 import * as R from 'remeda';
+
+import type { LocationStatusMetadata } from '../config/location';
 
 import { locationStatusStyle } from '../config/colors';
 import { LocationStatusRecords } from '../config/location';
@@ -56,7 +58,7 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 							<span
 								className={`font-sans font-medium sm:text-xs ${isFiltered ? 'text-primary-400' : 'text-primary-600'}`}
 							>
-								{data.titleAlt}
+								{data.title_zh}
 							</span>
 						</>
 					) : (
