@@ -31,6 +31,9 @@ const imageProps = imageEntry
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
+			loading: 'eager',
+			decoding: 'sync',
+			fetchpriority: 'high',
 		} satisfies RemoteImageProps)
 	: undefined;
 
@@ -48,7 +51,6 @@ const placeholder = imageEntry
 						'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
 						'aspect-[3/2] sm:aspect-[5/4] md:aspect-[3/2] lg:aspect-[16/9] xl:aspect-auto',
 					]}
-					loading="eager"
 					data-pagefind-meta="image[src], image_alt[alt]"
 					{...imageProps}
 				/>

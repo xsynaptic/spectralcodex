@@ -31,10 +31,11 @@ const imageProps = imageEntry
 			sizes: '100vw',
 			format: IMAGE_FORMAT,
 			quality: IMAGE_QUALITY,
+			...(index === 0
+				? { loading: 'eager', decoding: 'sync', fetchpriority: 'high' }
+				: { loading: 'lazy', decoding: 'async', fetchpriority: 'low' }),
 		} satisfies RemoteImageProps)
 	: undefined;
-
-const loading = index === 0 ? 'eager' : 'lazy';
 
 const placeholder = imageEntry
 	? await getImagePlaceholderDataUrlHq(imageEntry.data.src)
@@ -48,13 +49,6 @@ const placeholder = imageEntry
 				class:list={[
 					'z-10 max-h-screen min-h-[400px] w-[100vw] object-cover object-center text-sm text-transparent xl:min-h-screen',
 				]}
-				loading={loading}
-				{...(loading === 'lazy'
-					? {
-							decoding: 'async',
-							fetchpriority: 'low',
-						}
-					: {})}
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}
 			/>
