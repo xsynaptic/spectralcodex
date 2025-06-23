@@ -1,3 +1,4 @@
+import { LocationStatusEnum } from '@spectralcodex/map-types';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
@@ -18,16 +19,23 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 	interactive: boolean;
 	hasMapIcons: boolean;
 }) {
-	// TODO: investigate `clusterProperties` for displaying status types in clusters
-	const clusterConfig = useMemo(
-		() => ({
+	const clusterConfig = useMemo(() => {
+		// Create cluster properties dynamically for each status
+		const clusterProperties = Object.fromEntries(
+			Object.values(LocationStatusEnum).map((status) => [
+				status,
+				['+', ['case', ['==', ['get', 'status'], status], 1, 0]],
+			]),
+		);
+
+		return {
 			cluster: interactive,
 			clusterRadius: 14, // How much space to provide for clusters; lower number = higher density
 			clusterMaxZoom: 14, // Max zoom to cluster points on
 			clusterMinPoints: 2, // Minimum number of points to cluster
-		}),
-		[interactive],
-	);
+			clusterProperties,
+		};
+	}, [interactive]);
 
 	return (
 		<Source
