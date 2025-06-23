@@ -4,6 +4,7 @@ import { defineCollection, z } from 'astro:content';
 import { ExifTool } from 'exiftool-vendored';
 
 import { CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholder,
@@ -16,7 +17,7 @@ import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
 // Because we are not using EXIF data in this project it is not currently in use
 const ImageMetadataSchema = z.object({
 	title: z.string().optional(),
-	titleAlt: z.string().optional(),
+	...titleMultilingualSchema,
 	titleRaw: z.string().optional(),
 	dateCaptured: z.date().optional(),
 	brand: z.string().optional(),

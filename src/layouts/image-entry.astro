@@ -15,8 +15,10 @@ import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import TextGridItem from '#components/parts/text-grid-item.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import Multilingual from '#components/parts/multilingual.astro';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	image: CollectionEntry<'images'>;
@@ -24,7 +26,9 @@ interface Props {
 
 const { image } = Astro.props;
 
-// const { title, titleAlt, dateCaptured } = image.data;
+// const { title, dateCaptured } = image.data;
+
+const titleMultilingual = getMultilingualContent(image.data, 'title');
 
 const alt = sanitizeAltAttribute(image.data.title ?? '');
 
@@ -58,7 +62,9 @@ const t = getTranslations();
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{image.data.title}</Fragment>
-		<Fragment slot="header-title-alt">{image.data.titleAlt}</Fragment>
+		<Fragment slot="header-title-multilingual">
+			<Multilingual content={titleMultilingual} />
+		</Fragment>
 		<Fragment slot="header-subtitle">
 			<DividedItem>
 				<ContentDate date={image.data.dateCaptured} datePreset="long" />

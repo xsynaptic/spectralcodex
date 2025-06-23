@@ -38,7 +38,7 @@ const imageProps = imageEntry
 		} satisfies RemoteImageProps)
 	: undefined;
 
-const titleAlt = await Astro.slots.render('preview-title-alt');
+const titleMultilingual = await Astro.slots.render('preview-title-multilingual');
 const subtitle = await Astro.slots.render('preview-subtitle');
 const description = await Astro.slots.render('preview-description');
 
@@ -87,10 +87,10 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 			<slot name="preview-title" />
 		</a>
 		{
-			titleAlt ? (
+			titleMultilingual ? (
 				<div class:list={['inline-flex font-semibold', 'text-primary-500 dark:text-primary-400']}>
 					<span class="font-light">(</span>
-					<Fragment set:html={titleAlt} />
+					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
 				</div>
 			) : undefined

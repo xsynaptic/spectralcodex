@@ -1,7 +1,7 @@
 import { z } from 'astro:content';
 
 import { linksMap } from '#lib/data/links.ts';
-import { titleMultilingualSchema } from '#lib/schemas/i18n.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 
 const LinkItemSchema = z.object({
 	title: z.string(),

@@ -2,16 +2,16 @@
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import FormatNumber from '#components/format/format-number.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import Preview from '#components/preview/preview.astro';
 import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
 export interface PreviewItemProps {
@@ -22,7 +22,7 @@ export interface PreviewItemProps {
 	showLocations?: boolean | undefined;
 	showRegion?: boolean | undefined;
 	showPosts?: boolean | undefined;
-	showTitleAlt?: boolean | undefined;
+	showTitleMultilingual?: boolean | undefined;
 	showWordCount?: boolean | undefined;
 }
 
@@ -39,7 +39,7 @@ const {
 	showDescriptionCompact = true,
 	showRegion,
 	showPosts,
-	showTitleAlt,
+	showTitleMultilingual,
 	showWordCount,
 } = Astro.props;
 
@@ -58,9 +58,9 @@ const t = getTranslations();
 <Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
 	<Fragment slot="preview-title">{item.title}</Fragment>
 	{
-		showTitleAlt && item.titleAlt ? (
-			<Fragment slot="preview-title-alt">
-				<FormatCjk>{item.titleAlt}</FormatCjk>
+		showTitleMultilingual && item.titleMultilingual ? (
+			<Fragment slot="preview-title-multilingual">
+				<Multilingual content={item.titleMultilingual} />
 			</Fragment>
 		) : undefined
 	}

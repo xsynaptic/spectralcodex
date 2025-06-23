@@ -16,6 +16,7 @@ import {
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position) {
@@ -81,22 +82,34 @@ export function getLocationsFeatureCollection(
 			const geometryArray = Array.isArray(entry.data.geometry)
 				? entry.data.geometry
 				: [entry.data.geometry];
+			const entryTitleMultilingual = getMultilingualContent(entry.data, 'title');
 
 			return geometryArray.map((geometry, index) => {
 				const uuid = entry.data.uuid ?? entry.id;
 				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
 				const title = geometry.title ? `${entry.data.title} - ${geometry.title}` : entry.data.title;
-				const titleAlt =
-					entry.data.titleAlt && geometry.titleAlt
-						? `${entry.data.titleAlt}．${geometry.titleAlt}`
-						: entry.data.titleAlt;
+				const geometryTitleMultilingual = getMultilingualContent(geometry, 'title');
+				const googleMapsUrl =
+					geometry.googleMapsUrl || entry.data.googleMapsUrl
+						? (geometry.googleMapsUrl ?? entry.data.googleMapsUrl ?? '').replace('https://', '')
+						: undefined;
+				const wikipediaUrl = entry.data.wikipediaUrl
+					? entry.data.wikipediaUrl.replace('https://', '')
+					: undefined;
 
 				return {
 					type: 'Feature' as const,
 					id,
 					properties: {
 						title,
-						titleAlt,
+						...(entryTitleMultilingual
+							? {
+									titleMultilingualLang: entryTitleMultilingual.lang,
+									titleMultilingualValue: geometryTitleMultilingual
+										? `${entryTitleMultilingual.value} - ${geometryTitleMultilingual.value}`
+										: entryTitleMultilingual.value,
+								}
+							: {}),
 						url: entry.data.url,
 						description: geometry.description ?? entry.data.descriptionHtml,
 						category: geometry.category ?? entry.data.category,
@@ -107,8 +120,8 @@ export function getLocationsFeatureCollection(
 						objective: entry.data.objective,
 						outlier: entry.data.outlier,
 						safety: entry.data.safety,
-						googleMapsUrl: geometry.googleMapsUrl ?? entry.data.googleMapsUrl,
-						wikipediaUrl: entry.data.wikipediaUrl,
+						googleMapsUrl,
+						wikipediaUrl,
 						image: entry.data.imageThumbnail,
 					},
 					geometry: {
@@ -154,7 +167,8 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 		[MapDataKeysCompressed.Id]:
 			typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
 		[MapDataKeysCompressed.Title]: feature.properties.title,
-		[MapDataKeysCompressed.TitleAlt]: feature.properties.titleAlt,
+		[MapDataKeysCompressed.TitleMultilingualLang]: feature.properties.titleMultilingualLang,
+		[MapDataKeysCompressed.TitleMultilingualValue]: feature.properties.titleMultilingualValue,
 		[MapDataKeysCompressed.Url]: feature.properties.url,
 		[MapDataKeysCompressed.Description]: feature.properties.description,
 		[MapDataKeysCompressed.Safety]: feature.properties.safety,

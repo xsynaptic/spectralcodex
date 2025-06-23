@@ -3,6 +3,7 @@ import type { Position } from 'geojson';
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { z } from 'astro:content';
 
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
 
@@ -48,10 +49,15 @@ export const PositionSchema = z.tuple([z.number(), z.number()]).transform((value
 export const GeometryPointsSchema = z.object({
 	coordinates: PositionSchema,
 	title: TitleSchema.optional(),
-	titleAlt: z.string().optional(),
+	...titleMultilingualSchema,
 	description: DescriptionSchema.optional(),
 	category: z.nativeEnum(LocationCategoryEnum).optional(),
 	status: z.nativeEnum(LocationStatusEnum).optional(),
 	precision: NumericScaleSchema.optional(),
 	googleMapsUrl: z.string().url().optional(),
+});
+
+export const GeometryLinesSchema = z.object({
+	coordinates: PositionSchema.array().min(2),
+	rounded: z.boolean().optional(),
 });

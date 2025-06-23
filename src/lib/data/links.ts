@@ -1,7 +1,7 @@
 // Commonly linked domains
 // Note: we're using an array of tuples since sources may repeat with different URL fragments
 
-import type { TitleMultilingual } from '#lib/schemas/i18n.ts';
+import type { TitleMultilingual } from '#lib/i18n/i18n-schemas.ts';
 
 // cSpell:disable -- Too many proper names in this file
 interface LinksMapItem extends TitleMultilingual {

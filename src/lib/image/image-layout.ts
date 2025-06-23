@@ -114,10 +114,10 @@ export function getImageLayoutProps({
 			return {
 				...(() => {
 					switch (imageOrientation) {
-						case 'portrait': {
+						case ImageOrientationEnum.Portrait: {
 							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
 						}
-						case 'square': {
+						case ImageOrientationEnum.Square: {
 							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
 						}
 						default: {

@@ -2,15 +2,20 @@
 import type { LocationTwHeritage } from '#lib/collections/locations/schemas.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import { LocationTwHeritageRecords } from '#lib/collections/locations/schemas.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	heritage: LocationTwHeritage | undefined;
 }
 
 const { heritage, ...props } = Astro.props;
+
+const titleMultilingual = heritage
+	? getMultilingualContent(LocationTwHeritageRecords[heritage], 'title')
+	: undefined;
 
 const t = getTranslations();
 ---
@@ -21,9 +26,7 @@ const t = getTranslations();
 		heritage ? (
 			<div class="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
 				<span>{LocationTwHeritageRecords[heritage].title}</span>
-				<span>
-					<FormatCjk>({LocationTwHeritageRecords[heritage].title_zh})</FormatCjk>
-				</span>
+				<Multilingual content={titleMultilingual} parenthesis={true} />
 			</div>
 		) : undefined
 	}

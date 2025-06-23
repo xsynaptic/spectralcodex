@@ -3,6 +3,7 @@ import { defineCollection, z } from 'astro:content';
 import sharp from 'sharp';
 
 import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH } from '#constants.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getImageFileUrlPlaceholder } from '#lib/image/image-loader-utils.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 
@@ -13,7 +14,7 @@ const ImageMetadataSchema = z.object({
 	height: z.number(),
 	modifiedTime: z.date().optional(),
 	title: z.string().optional(),
-	titleAlt: z.string().optional(),
+	...titleMultilingualSchema,
 	titleRaw: z.string().optional(),
 	dateCaptured: z.date().optional(),
 	brand: z.string().optional(),

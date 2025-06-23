@@ -8,6 +8,6 @@ export function isActiveMenuItem(item: MenuItem, pathname: string): boolean {
 	return item.children?.some((child) => isActiveMenuItem(child, pathname)) ?? false;
 }
 
-export function getMenuItemId(item: MenuItem): string {
+export function getMenuItemId(item: MenuItem) {
 	return `menu-${slugify(item.title)}`;
 }

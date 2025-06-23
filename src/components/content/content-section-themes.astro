@@ -2,13 +2,14 @@
 import * as R from 'remeda';
 
 import ContentSection from '#components/content/content-section.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
 import ListRow from '#components/list/list-row.astro';
-import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import { getThemesByIdsFunction } from '#lib/collections/themes/utils.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -29,23 +30,27 @@ const t = getTranslations();
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
-				{themes.map((item) => (
-					<DividedItem as="li" class="font-serif text-sm after:text-sm after:font-light">
-						<span data-pagefind-filter="theme">
-							{item.data.title ? (
-								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title.trim()}</Link>
-							) : undefined}
-							{item.data.titleAlt ? (
-								<>
-									{' '}
-									<span>
-										<FormatCjk>({item.data.titleAlt})</FormatCjk>
-									</span>
-								</>
-							) : undefined}
-						</span>
-					</DividedItem>
-				))}
+				{themes.map((item) => {
+					const titleMultilingual = getMultilingualContent(item.data, 'title');
+
+					return (
+						<DividedItem as="li" class="font-serif text-sm after:text-sm after:font-light">
+							<span data-pagefind-filter="theme">
+								{item.data.title ? (
+									<Link href={getContentUrl(item.collection, item.id)}>
+										{item.data.title.trim()}
+									</Link>
+								) : undefined}
+								{titleMultilingual ? (
+									<>
+										{' '}
+										<Multilingual content={titleMultilingual} parenthesis={true} />
+									</>
+								) : undefined}
+							</span>
+						</DividedItem>
+					);
+				})}
 			</ListRow>
 		</ContentSection>
 	) : undefined

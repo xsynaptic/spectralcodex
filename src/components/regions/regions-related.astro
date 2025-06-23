@@ -10,7 +10,7 @@ import {
 	getRegionsByIdsFunction,
 } from '#lib/collections/regions/utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;
@@ -62,7 +62,10 @@ const t = getTranslations();
 					>
 						<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
 					</h3>
-					<RegionsList terms={regionChildren} showTitleAlt={depth >= SHOW_TITLE_ALT_DEPTH} />
+					<RegionsList
+						terms={regionChildren}
+						showTitleMultilingual={depth >= SHOW_TITLE_ALT_DEPTH}
+					/>
 				</div>
 			) : undefined}
 			{regionSiblings.length > 0 ? (
@@ -75,7 +78,10 @@ const t = getTranslations();
 					>
 						<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
 					</h3>
-					<RegionsList terms={regionSiblings} showTitleAlt={depth >= SHOW_TITLE_ALT_DEPTH} />
+					<RegionsList
+						terms={regionSiblings}
+						showTitleMultilingual={depth >= SHOW_TITLE_ALT_DEPTH}
+					/>
 				</div>
 			) : undefined}
 		</Container>

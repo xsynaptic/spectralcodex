@@ -2,6 +2,7 @@ import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
 import { ImageSetSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
@@ -12,7 +13,7 @@ export const regions = defineCollection({
 		.object({
 			slug: z.string(),
 			title: TitleSchema,
-			titleAlt: z.string().optional(),
+			...titleMultilingualSchema,
 			description: z.string().optional(),
 			parent: reference('regions').optional(),
 			links: LinkSchema.array().optional(),

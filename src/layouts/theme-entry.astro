@@ -16,10 +16,12 @@ import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro'
 import MainSite from '#components/main/main-site.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import DividedItem from '#components/parts/divided-item.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -32,8 +34,10 @@ interface Props {
 const { entry, mapData, page } = Astro.props;
 
 const {
-	data: { title, titleAlt, description, imageSet },
+	data: { title, description, imageSet },
 } = entry;
+
+const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
 const imageSetMetadata = await getImageSetMetadata({ imageSet });
 
@@ -46,7 +50,7 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: titleAlt ? `${title} (${titleAlt})` : title,
+		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		description: description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
 			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
@@ -62,7 +66,9 @@ const t = getTranslations();
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-title-multilingual">
+							<Multilingual content={titleMultilingual} />
+						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
 								<ContentCollectionLink collection={entry.collection} showFeatured={true} />
@@ -73,7 +79,9 @@ const t = getTranslations();
 			) : (
 				<ContentHeader>
 					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<Multilingual content={titleMultilingual} />
+					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
 							<ContentCollectionLink collection={entry.collection} />
@@ -88,7 +96,12 @@ const t = getTranslations();
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
 		<ContentSection data-pagefind-ignore>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
-			<PreviewGrid items={page.data} showDate={true} showRegion={true} />
+			<PreviewGrid
+				items={page.data}
+				showDate={true}
+				showRegion={true}
+				showTitleMultilingual={true}
+			/>
 			<Pagination class="mt-small md:mt-medium" page={page} />
 		</ContentSection>
 		<ContentSectionLinks entry={entry} />

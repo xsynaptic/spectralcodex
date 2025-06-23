@@ -1,12 +1,13 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
 export function validateLocations(locations: Array<CollectionEntry<'locations'>>) {
 	const locationTitle = new Set<string>();
-	const locationTitleAlt = new Set<string>();
+	const locationTitleMultilingual = new Set<string>();
 	const locationAddress = new Set<string>();
 	const locationGoogleMapsLinks = new Set<string>();
 	const locationCoordinates = new Set<string>();
@@ -19,13 +20,17 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 		}
 		locationTitle.add(title);
 
-		const titleAlt = location.data.titleAlt;
+		const titleMultilingual = getMultilingualContent(location.data, 'title');
 
-		if (titleAlt) {
-			if (locationTitleAlt.has(titleAlt)) {
-				throw new Error(`Duplicate titleAlt found for "${location.id}": ${titleAlt}`);
+		if (titleMultilingual) {
+			const titleMultilingualString = `${titleMultilingual.value} (${titleMultilingual.lang})`;
+
+			if (locationTitleMultilingual.has(titleMultilingualString)) {
+				throw new Error(
+					`Duplicate multilingual title found for "${location.id}": ${titleMultilingualString}`,
+				);
 			}
-			locationTitleAlt.add(titleAlt);
+			locationTitleMultilingual.add(titleMultilingualString);
 		}
 
 		const address = location.data.address;
@@ -34,7 +39,7 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 			if (locationAddress.has(address)) {
 				throw new Error(`Duplicate address found for "${location.id}": ${address}`);
 			}
-			locationTitleAlt.add(address);
+			locationTitleMultilingual.add(address);
 		}
 
 		const googleMapsLink = location.data.links?.find(({ url }) =>

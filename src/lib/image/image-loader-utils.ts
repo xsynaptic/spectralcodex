@@ -12,6 +12,7 @@ export function getImageTitle(titleRaw: string | undefined) {
 	if (titleWrapped) {
 		const matches = [...titleWrapped.matchAll(/<span lang="zh">(.*?)<\/span>/g)][0];
 
+		// TODO: update this for multilingual use
 		return {
 			title: titleWrapped
 				.replaceAll(/<span lang="zh">.*?<\/span>/g, '')

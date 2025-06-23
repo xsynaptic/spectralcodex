@@ -14,7 +14,8 @@ export const MapApiDataEnum = {
 
 export const MapFeaturePropertiesSchema = z.object({
 	title: z.string(),
-	titleAlt: z.string().optional(),
+	titleMultilingualLang: z.string().optional(),
+	titleMultilingualValue: z.string().optional(),
 	url: z.string().optional(),
 	description: z.string().optional(),
 	category: z.nativeEnum(LocationCategoryEnum),

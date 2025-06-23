@@ -2,6 +2,7 @@ import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
@@ -16,7 +17,7 @@ export const pages = defineCollection({
 	schema: z
 		.object({
 			title: TitleSchema,
-			titleAlt: z.string().optional(),
+			...titleMultilingualSchema,
 			description: DescriptionSchema,
 			themes: reference('themes').array().optional(),
 			links: LinkSchema.array().optional(),

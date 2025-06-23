@@ -4,13 +4,14 @@ import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/schemas.ts';
+import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/content.ts';
-import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { GeometryLinesSchema, GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -20,7 +21,7 @@ export const locations = defineCollection({
 		.object({
 			slug: z.string(),
 			title: TitleSchema,
-			titleAlt: z.string().optional(),
+			...titleMultilingualSchema,
 			description: DescriptionSchema,
 			category: z.nativeEnum(LocationCategoryEnum),
 			status: z.nativeEnum(LocationStatusEnum),
@@ -34,6 +35,8 @@ export const locations = defineCollection({
 			address: z.string().optional(),
 			precision: NumericScaleSchema,
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
+			// Optional geometry lines, used for paths or routes; TODO: under development, complete
+			geometryLines: z.union([GeometryLinesSchema, GeometryLinesSchema.array()]).optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			dateVisited: DateStringSchema.array().optional(),
@@ -48,7 +51,7 @@ export const locations = defineCollection({
 				.object({
 					slug: z.string().optional(),
 					title: TitleSchema.optional(),
-					titleAlt: z.string().optional(),
+					...titleMultilingualSchema,
 					regions: reference('regions').array().optional(),
 				})
 				.optional(),

@@ -4,13 +4,13 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 import * as R from 'remeda';
 
 import ContentSection from '#components/content/content-section.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
+import Multilingual from '#components/parts/multilingual.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentBacklinks } from '#lib/metadata/metadata-backlinks.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
 
 interface Props {
 	entry: CollectionEntry<CollectionKey>;
@@ -39,14 +39,10 @@ const t = getTranslations();
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
-				{backlinks.map(({ url, title, titleAlt }) => (
+				{backlinks.map(({ url, title, titleMultilingual }) => (
 					<ListColumnItem>
 						<Link href={url}>{title}</Link>
-						{titleAlt ? (
-							<span>
-								<FormatCjk>({titleAlt})</FormatCjk>
-							</span>
-						) : undefined}
+						{titleMultilingual ? <Multilingual content={titleMultilingual} /> : undefined}
 					</ListColumnItem>
 				))}
 			</ListColumn>

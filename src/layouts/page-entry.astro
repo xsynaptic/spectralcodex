@@ -7,7 +7,9 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -18,8 +20,10 @@ interface Props {
 const { entry } = Astro.props;
 
 const {
-	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
+	data: { title, description, dateCreated, dateUpdated, imageFeatured, imageHero },
 } = entry;
+
+const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
 const { Content } = await render(entry);
 ---
@@ -39,7 +43,9 @@ const { Content } = await render(entry);
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-title-multilingual">
+							<Multilingual content={titleMultilingual} />
+						</Fragment>
 						<Fragment slot="header-subtitle">
 							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
 						</Fragment>
@@ -48,7 +54,9 @@ const { Content } = await render(entry);
 			) : (
 				<ContentHeader>
 					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<Multilingual content={titleMultilingual} />
+					</Fragment>
 					<Fragment slot="header-subtitle">
 						<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
 					</Fragment>

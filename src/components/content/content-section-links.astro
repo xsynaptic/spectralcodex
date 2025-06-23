@@ -2,12 +2,11 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
-import { getTranslations } from '#lib/utils/i18n.ts';
-import { getMultilingualValue } from '#lib/schemas/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
@@ -33,29 +32,25 @@ const t = getTranslations();
 			<Fragment slot="section-title">{t('content.section.links.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{links?.map((link) => {
-					const titleAlt = getMultilingualValue('title', link);
+					const titleMultilingual = getMultilingualContent(link, 'title');
 
 					return (
 						<ListColumnItem>
 							<Link href={link.url}>{link.title}</Link>
-							{titleAlt ? (
-								<span>
-									<FormatCjk>({titleAlt})</FormatCjk>
-								</span>
+							{titleMultilingual ? (
+								<span lang={titleMultilingual.lang}>{titleMultilingual.value}</span>
 							) : undefined}
 						</ListColumnItem>
 					);
 				})}
 				{sources?.map((source) => {
-					const titleAlt = getMultilingualValue('title', source);
+					const titleMultilingual = getMultilingualContent(source, 'title');
 
 					return (
 						<ListColumnItem>
 							<span class="italic">{source.title}</span>
-							{titleAlt ? (
-								<span>
-									<FormatCjk>({titleAlt})</FormatCjk>
-								</span>
+							{titleMultilingual ? (
+								<span lang={titleMultilingual.lang}>{titleMultilingual.value}</span>
 							) : undefined}
 							{'publisher' in source && source.publisher ? (
 								<span>{source.publisher}</span>

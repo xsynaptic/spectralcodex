@@ -3,9 +3,10 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import FormatCjk from '#components/format/format-cjk.astro';
 import Link from '#components/parts/link.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -57,16 +58,15 @@ const columns = {
 							const region = getFirstRegionByReference(
 								item.data.override?.regions ?? item.data.regions
 							);
+							const titleMultilingual = getMultilingualContent(item.data, 'title');
 
 							return (
 								<tr class="font-sans text-sm">
 									<td class="w-full px-2 py-1 align-text-top">
 										<div class="flex flex-wrap items-center gap-1">
 											<Link href={getSiteUrl(item.id)}>{item.data.title}</Link>
-											{item.data.titleAlt ? (
-												<span>
-													<FormatCjk>({item.data.titleAlt})</FormatCjk>
-												</span>
+											{titleMultilingual ? (
+												<Multilingual content={titleMultilingual} parenthesis={true} />
 											) : undefined}
 										</div>
 									</td>

@@ -9,7 +9,7 @@ import Link from '#components/parts/link.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getImageSetFromContentMetadata } from '#lib/image/image-set.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -61,7 +61,7 @@ const t = getTranslations();
 			items={recentMetadataItems}
 			showDate={true}
 			showRegion={true}
-			showTitleAlt={true}
+			showTitleMultilingual={true}
 		/>
 	</ContentSection>
 	<ContentSection>
@@ -77,7 +77,7 @@ const t = getTranslations();
 			items={themesMetadataItems}
 			showLocations={true}
 			showPosts={true}
-			showTitleAlt={true}
+			showTitleMultilingual={true}
 		/>
 	</ContentSection>
 	<ContentSection>

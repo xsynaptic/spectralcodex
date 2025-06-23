@@ -5,8 +5,8 @@ import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 const t = getTranslations();

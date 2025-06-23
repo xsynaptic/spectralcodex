@@ -26,13 +26,15 @@ import LocationsNotices from '#components/locations/locations-notices.astro';
 import MainSite from '#components/main/main-site.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import DividedItem from '#components/parts/divided-item.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
-import { getTranslations } from '#lib/utils/i18n.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -51,7 +53,9 @@ const {
 
 // This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
-const titleAlt = entry.data.override?.titleAlt ?? entry.data.titleAlt;
+const titleMultilingual =
+	getMultilingualContent(entry.data.override, 'title') ??
+	getMultilingualContent(entry.data, 'title');
 
 const { Content } = await render(entry);
 
@@ -64,7 +68,7 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: titleAlt ? `${title} (${titleAlt})` : title,
+		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		description,
 		image: getSeoImageProps({
 			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
@@ -80,7 +84,9 @@ const t = getTranslations();
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-title-multilingual">
+							<Multilingual content={titleMultilingual} />
+						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
 								<ContentCollectionLink collection="locations" showFeatured={true} />
@@ -108,7 +114,9 @@ const t = getTranslations();
 			) : (
 				<ContentHeader>
 					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<Multilingual content={titleMultilingual} />
+					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
 							<ContentCollectionLink collection="locations" />

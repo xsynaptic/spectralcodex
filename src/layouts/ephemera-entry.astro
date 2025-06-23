@@ -10,8 +10,10 @@ import ContentSectionRegions from '#components/content/content-section-regions.a
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -22,8 +24,10 @@ interface Props {
 const { entry } = Astro.props;
 
 const {
-	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
+	data: { title, description, dateCreated, dateUpdated, imageFeatured, imageHero },
 } = entry;
+
+const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
 const { Content } = await render(entry);
 
@@ -35,7 +39,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 <MainSite
 	meta={{
-		title: titleAlt ? `${title} (${titleAlt})` : title,
+		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		description: description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
 			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-ephemera' }),
@@ -52,7 +56,9 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-title-multilingual">
+							<Multilingual content={titleMultilingual} />
+						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
 								<ContentCollectionLink collection="ephemera" showFeatured={true} />
@@ -66,7 +72,9 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 			) : (
 				<ContentHeader>
 					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<Multilingual content={titleMultilingual} />
+					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
 							<ContentCollectionLink collection="ephemera" />

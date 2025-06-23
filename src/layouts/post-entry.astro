@@ -20,6 +20,8 @@ import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import Multilingual from '#components/parts/multilingual.astro';
 
 interface Props {
 	entry: CollectionEntry<'posts'>;
@@ -29,8 +31,10 @@ interface Props {
 const { entry, mapData } = Astro.props;
 
 const {
-	data: { title, titleAlt, description, dateCreated, dateUpdated, imageFeatured, imageHero },
+	data: { title, description, dateCreated, dateUpdated, imageFeatured, imageHero },
 } = entry;
+
+const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
 const { Content } = await render(entry);
 
@@ -40,7 +44,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 <MainSite
 	meta={{
-		title: titleAlt ? `${title} (${titleAlt})` : title,
+		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		description: description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
 			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-post' }),
@@ -58,7 +62,9 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+						<Fragment slot="header-title-multilingual">
+							<Multilingual content={titleMultilingual} />
+						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
 								<ContentCollectionLink collection="posts" showFeatured={true} />
@@ -72,7 +78,9 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 			) : (
 				<ContentHeader>
 					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-alt">{titleAlt}</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<Multilingual content={titleMultilingual} />
+					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
 							<ContentCollectionLink collection="posts" />
