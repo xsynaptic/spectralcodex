@@ -59,7 +59,16 @@ export const MapPopup = memo(function MapPopup() {
 
 	if (!popupItem) return;
 
-	const { title, titleAlt, url, description, precision, wikipediaUrl, image } = popupItem;
+	const {
+		title,
+		titleMultilingualLang,
+		titleMultilingualValue,
+		url,
+		description,
+		precision,
+		wikipediaUrl,
+		image,
+	} = popupItem;
 
 	const coordinates = sanitizeCoordinates(popupItem);
 	const coordinatesString = `${String(coordinates.lat)}, ${String(coordinates.lng)}`;
@@ -112,9 +121,9 @@ export const MapPopup = memo(function MapPopup() {
 							</div>
 						) : undefined}
 						<div className="flex flex-col px-2 pt-1 pb-2">
-							{titleAlt ? (
+							{titleMultilingualLang && titleMultilingualValue ? (
 								<div className="from-accent-500 to-accent-600 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
-									{titleAlt}
+									<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 								</div>
 							) : undefined}
 							<div className="border-b-primary-300 text-primary-800 dark:text-primary-300 dark:border-b-primary-700 border-b pb-1 text-base leading-snug font-semibold">
@@ -161,7 +170,13 @@ export const MapPopup = memo(function MapPopup() {
 								</div>
 								<div className="flex gap-2 select-none">
 									{wikipediaUrl ? (
-										<a className="cursor-pointer" href={wikipediaUrl} target="_blank">
+										<a
+											className="cursor-pointer"
+											href={
+												wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`
+											}
+											target="_blank"
+										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 24 24"
@@ -172,7 +187,15 @@ export const MapPopup = memo(function MapPopup() {
 										</a>
 									) : undefined}
 									{googleMapsUrl ? (
-										<a className="cursor-pointer" href={googleMapsUrl} target="_blank">
+										<a
+											className="cursor-pointer"
+											href={
+												googleMapsUrl.includes('https://')
+													? googleMapsUrl
+													: `https://${googleMapsUrl}`
+											}
+											target="_blank"
+										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 256 367"

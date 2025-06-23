@@ -16,7 +16,8 @@ export function getPopupItem({
 	const popupItem = popupData.find((popupItem) => popupItem.id === selectedId) ?? {
 		id: 'default',
 		title: 'Untitled',
-		titleAlt: undefined,
+		titleMultilingualLang: undefined,
+		titleMultilingualValue: undefined,
 		url: undefined,
 		description: undefined,
 		safety: undefined,
