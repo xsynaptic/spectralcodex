@@ -12,14 +12,12 @@ export const MapStoreContext = createContext<ReturnType<typeof useMapStoreSetup>
 
 export const MapStoreProvider = ({
 	initialState,
-	buildId,
 	children,
 }: {
 	initialState?: Partial<MapDataConfigurableState>;
-	buildId?: string | undefined;
 	children: ReactNode;
 }) => {
-	const mapStore = useMapStoreSetup({ initialState, buildId });
+	const mapStore = useMapStoreSetup({ initialState });
 
 	return <MapStoreContext.Provider value={mapStore}>{children}</MapStoreContext.Provider>;
 };

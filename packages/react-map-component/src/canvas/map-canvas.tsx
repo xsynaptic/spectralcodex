@@ -42,7 +42,7 @@ export const MapCanvas = ({
 	spritesUrl,
 	spritesId,
 	isDev,
-}: Omit<MapComponentProps, 'geodata' | 'cluster' | 'buildId'> & {
+}: Omit<MapComponentProps, 'geodata' | 'cluster'> & {
 	style?: CSSProperties | undefined;
 }) => {
 	const mapStyle = useProtomaps({

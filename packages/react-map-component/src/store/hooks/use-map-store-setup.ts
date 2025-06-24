@@ -38,14 +38,13 @@ export const useMapStoreSetup = ({
 	initialState: initialStatePartial,
 }: {
 	initialState?: Partial<MapDataConfigurableState> | undefined;
-	buildId?: string | undefined;
 }) => {
 	const initialState = useMemo(
 		() => ({ ...defaultState, ...initialStatePartial }),
 		[initialStatePartial],
 	);
 
-	// TODO: persistent storage with the build ID as key
+	// TODO: persistent storage with the hash as key
 	const [mapStore] = useState(() =>
 		createStore<MapDataStore>()((set, get) => ({
 			...initialState,

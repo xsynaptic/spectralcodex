@@ -5,7 +5,11 @@ import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
 import type { MapComponentData, MapFeatureCollection } from '#lib/map/map-types.ts';
 
-import { getLocationsMapPopupData, getLocationsMapSourceData } from '#lib/map/map-locations.ts';
+import {
+	getLocationsMapApiHashes,
+	getLocationsMapPopupData,
+	getLocationsMapSourceData,
+} from '#lib/map/map-locations.ts';
 import { isLngLatBoundsLike } from '#lib/map/map-type-guards.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
@@ -23,7 +27,6 @@ interface MapDataProps extends MapDataBoundsProps {
 
 const buildProps = {
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
-	buildId: import.meta.env.BUILD_ID,
 	isDev: import.meta.env.DEV,
 };
 
@@ -90,8 +93,9 @@ export function getMapData({
 
 	if (featureCollection && mapBounds) {
 		if (mapApiBaseUrl) {
-			const apiSourceUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Source}`;
-			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}`;
+			const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+			const apiSourceUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Source}?v=${sourceHash}`;
+			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}?v=${popupHash}`;
 
 			return {
 				hasGeodata: true,

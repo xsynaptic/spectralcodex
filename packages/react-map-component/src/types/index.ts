@@ -56,7 +56,6 @@ export interface MapComponentProps {
 	protomapsApiKey: string;
 	spritesId?: string | undefined;
 	spritesUrl?: string | undefined;
-	buildId?: string | undefined;
 	isDev?: boolean | undefined;
 }
 

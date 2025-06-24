@@ -17,7 +17,6 @@ export const ReactMapComponent = memo(function ReactMapComponent({
 	cluster,
 	showObjectiveFilter,
 	languages,
-	buildId,
 	...props
 }: MapComponentProps & { style: CSSProperties }) {
 	const sourceDataParsed = sourceData ? parseSourceData(sourceData) : undefined;
@@ -34,7 +33,6 @@ export const ReactMapComponent = memo(function ReactMapComponent({
 					...(props.interactive === false ? { canvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),
 				}}
-				buildId={buildId}
 			>
 				<MapCanvas {...props} />
 			</MapStoreProvider>

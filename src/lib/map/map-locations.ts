@@ -13,6 +13,7 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
+import { createHash } from 'node:crypto';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
@@ -138,54 +139,76 @@ export function getLocationsFeatureCollection(
 export function getLocationsMapSourceData(featureCollection: MapFeatureCollection | undefined) {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
-	return featureCollection.features.map((feature, index) => {
-		const featureIdFallback = `feature-${String(index)}`;
+	return featureCollection.features
+		.map((feature, index) => {
+			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 
-		return {
-			[MapDataKeysCompressed.Id]: typeof feature.id === 'string' ? feature.id : featureIdFallback,
-			[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[feature.properties.category],
-			[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
-			[MapDataKeysCompressed.Precision]: feature.properties.precision,
-			[MapDataKeysCompressed.Quality]: feature.properties.quality,
-			[MapDataKeysCompressed.Rating]: feature.properties.rating,
-			...(feature.properties.objective === undefined
-				? {}
-				: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
-			...(feature.properties.outlier === undefined
-				? {}
-				: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
-			[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
-		};
-	}) satisfies MapSourceDataRaw;
+			return {
+				[MapDataKeysCompressed.Id]: featureId,
+				[MapDataKeysCompressed.Category]:
+					LocationCategoryNumericMapping[feature.properties.category],
+				[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
+				[MapDataKeysCompressed.Precision]: feature.properties.precision,
+				[MapDataKeysCompressed.Quality]: feature.properties.quality,
+				[MapDataKeysCompressed.Rating]: feature.properties.rating,
+				...(feature.properties.objective === undefined
+					? {}
+					: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
+				...(feature.properties.outlier === undefined
+					? {}
+					: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
+				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
+			};
+		})
+		.sort((a, b) =>
+			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
+		) satisfies MapSourceDataRaw;
 }
 
 // Extended locations metadata for popups
 export function getLocationsMapPopupData(featureCollection: MapFeatureCollection | undefined) {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
-	return featureCollection.features.map((feature, index) => ({
-		[MapDataKeysCompressed.Id]:
-			typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`,
-		[MapDataKeysCompressed.Title]: feature.properties.title,
-		[MapDataKeysCompressed.TitleMultilingualLang]: feature.properties.titleMultilingualLang,
-		[MapDataKeysCompressed.TitleMultilingualValue]: feature.properties.titleMultilingualValue,
-		[MapDataKeysCompressed.Url]: feature.properties.url,
-		[MapDataKeysCompressed.Description]: feature.properties.description,
-		[MapDataKeysCompressed.Safety]: feature.properties.safety,
-		[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
-		[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
-		...(feature.properties.image === undefined
-			? {}
-			: {
-					[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
-					[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
-					[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
-					[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
-				}),
-	})) satisfies MapPopupDataRaw;
+	return featureCollection.features
+		.map((feature, index) => {
+			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
+
+			return {
+				[MapDataKeysCompressed.Id]: featureId,
+				[MapDataKeysCompressed.Title]: feature.properties.title,
+				[MapDataKeysCompressed.TitleMultilingualLang]: feature.properties.titleMultilingualLang,
+				[MapDataKeysCompressed.TitleMultilingualValue]: feature.properties.titleMultilingualValue,
+				[MapDataKeysCompressed.Url]: feature.properties.url,
+				[MapDataKeysCompressed.Description]: feature.properties.description,
+				[MapDataKeysCompressed.Safety]: feature.properties.safety,
+				[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
+				[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
+				...(feature.properties.image === undefined
+					? {}
+					: {
+							[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
+							[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
+							[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
+							[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
+						}),
+			};
+		})
+		.sort((a, b) =>
+			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
+		) satisfies MapPopupDataRaw;
 }
 
-// A specialized function for returning data for API endpoints
+// Hash the contents of each API endpoint
+export function getLocationsMapApiHashes(featureCollection: MapFeatureCollection | undefined) {
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	const popupData = getLocationsMapPopupData(featureCollection);
+
+	return {
+		sourceHash: createHash('md5').update(JSON.stringify(sourceData)).digest('hex').slice(0, 8),
+		popupHash: createHash('md5').update(JSON.stringify(popupData)).digest('hex').slice(0, 8),
+	};
+}
+
 export function getLocationsMapApiData(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
 	basePath: string,
