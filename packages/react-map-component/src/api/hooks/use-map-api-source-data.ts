@@ -8,7 +8,6 @@ import type { MapSourceDataRaw } from '../../types';
 import { useMapStoreActions } from '../../store/hooks/use-map-store';
 import { MapSourceDataSchema } from '../../types/map-schemas';
 
-// Note: dev server can timeout when regenerating large amounts of content
 export function useMapApiSourceData({
 	apiSourceUrl,
 	isDev,
@@ -16,7 +15,7 @@ export function useMapApiSourceData({
 	const { setSourceData, setSourceDataLoading } = useMapStoreActions();
 
 	const mapSourceDataQuery = useQuery({
-		queryKey: ['canvas-data', apiSourceUrl],
+		queryKey: ['source-data', apiSourceUrl],
 		queryFn: async () => {
 			if (apiSourceUrl) {
 				try {
@@ -29,10 +28,8 @@ export function useMapApiSourceData({
 			}
 			return false;
 		},
-		// Server data does not change on a static site!
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
-		staleTime: 100_000,
 		enabled: !!apiSourceUrl,
 	});
 

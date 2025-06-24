@@ -44,7 +44,6 @@ export const useMapStoreSetup = ({
 		[initialStatePartial],
 	);
 
-	// TODO: persistent storage with the hash as key
 	const [mapStore] = useState(() =>
 		createStore<MapDataStore>()((set, get) => ({
 			...initialState,
