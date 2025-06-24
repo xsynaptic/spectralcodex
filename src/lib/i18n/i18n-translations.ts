@@ -134,9 +134,9 @@ const translationStrings = {
 		'site.footer.powered.label': 'Powered by',
 		'site.footer.updated.label': 'Site updated on',
 		'site.breadcrumbs.aria.label': 'Breadcrumb Navigation',
-		'site.theme.toggle.label': 'Toggle theme',
-		'site.theme.mode.dark': 'Dark mode',
-		'site.theme.mode.light': 'Light mode',
+		'site.mode.toggle.label': 'Toggle mode',
+		'site.mode.mode.dark': 'Dark mode',
+		'site.mode.mode.light': 'Light mode',
 
 		// Menu items
 		'menu.timeline.label': 'Timeline',

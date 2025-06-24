@@ -9,18 +9,18 @@ interface ImportMeta {
 	readonly env: ImportMetaEnv;
 }
 
-type ThemeType = 'auto' | 'dark' | 'light';
+type ModeType = 'auto' | 'dark' | 'light';
 
-interface ThemeManager {
-	setTheme: (theme: ThemeType) => void;
-	getTheme: () => ThemeType;
-	getSystemTheme: () => Extract<ThemeType, 'light' | 'dark'>;
-	getDefaultTheme: () => ThemeType;
+interface ModeManager {
+	setMode: (mode: ModeType) => void;
+	getMode: () => ModeType;
+	getSystemMode: () => Extract<ModeType, 'light' | 'dark'>;
+	getDefaultMode: () => ModeType;
 	cleanup: () => void;
 }
 
 interface Window {
-	theme: ThemeManager | undefined;
+	mode: ModeManager | undefined;
 }
 
 // Astro.locals typing; must be namespaced "App" and in this file

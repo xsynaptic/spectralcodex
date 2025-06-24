@@ -8,16 +8,16 @@ const t = getTranslations();
 
 <div>
 	<button
-		id="theme-toggle"
+		id="mode-toggle"
 		class:list={[
 			'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-all hover:opacity-100',
 		]}
-		aria-label={t('site.theme.toggle.label')}
-		title={t('site.theme.toggle.label')}
+		aria-label={t('site.mode.toggle.label')}
+		title={t('site.mode.toggle.label')}
 	>
 		<div
 			class:list={['hidden dark:inline', 'text-primary-300']}
-			aria-label={t('site.theme.mode.light')}
+			aria-label={t('site.mode.mode.light')}
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 				><g
@@ -34,7 +34,7 @@ const t = getTranslations();
 		</div>
 		<div
 			class:list={['inline dark:hidden', 'text-primary-700']}
-			aria-label={t('site.theme.mode.dark')}
+			aria-label={t('site.mode.mode.dark')}
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 				><path
@@ -50,11 +50,11 @@ const t = getTranslations();
 </div>
 
 <script>
-	import { activateThemeToggle } from '#components/theme/theme-toggle.ts';
+	import { activateModeToggle } from '#components/mode/mode-toggle.ts';
 
-	activateThemeToggle('#theme-toggle');
+	activateModeToggle('#mode-toggle');
 
 	document.addEventListener('astro:after-swap', () => {
-		activateThemeToggle('#theme-toggle');
+		activateModeToggle('#mode-toggle');
 	});
 </script>

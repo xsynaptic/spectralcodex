@@ -1,0 +1,39 @@
+---
+import type { ModeGeneralType } from '#components/mode/mode-types.ts';
+
+import { ModeTypeEnum } from '#components/mode/mode-types.ts';
+
+interface Props {
+	defaultMode?: ModeGeneralType | undefined;
+}
+
+const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
+---
+
+{
+	defaultMode === ModeTypeEnum.Auto ? undefined : (
+		<script id="mode-default" is:inline data-default-mode={defaultMode} />
+	)
+}
+
+<script>
+	import { modeManager } from '#components/mode/mode-manager.ts';
+
+	function initializeMode() {
+		if (!window.mode) {
+			window.mode = modeManager('#mode-default');
+			window.mode.setMode(window.mode.getMode());
+		}
+	}
+
+	initializeMode();
+
+	document.addEventListener('astro:after-swap', () => {
+		initializeMode();
+		if (window.mode) window.mode.setMode(window.mode.getMode());
+	});
+
+	window.addEventListener('unload', () => {
+		if (window.mode) window.mode.cleanup();
+	});
+</script>

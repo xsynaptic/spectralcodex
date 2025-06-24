@@ -10,7 +10,7 @@ import MainHeader from '#components/main/main-header.astro';
 import MainMeta from '#components/main/main-meta.astro';
 import LoadingBar from '#components/progress-bar/progress-bar-loading.astro';
 import ReadingBar from '#components/progress-bar/progress-bar-reading.astro';
-import ThemeManager from '#components/theme/theme-manager.astro';
+import ModeManager from '#components/mode/mode-manager.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -43,7 +43,7 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 		<Font cssVariable="--font-commissioner" preload />
 		<Font cssVariable="--font-geologica" preload />
 		<Font cssVariable="--font-lora" />
-		<ThemeManager defaultTheme="auto" />
+		<ModeManager defaultMode="auto" />
 		<ClientRouter />
 	</head>
 	<body
