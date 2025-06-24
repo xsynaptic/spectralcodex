@@ -3,7 +3,6 @@ export interface OpenGraphMetadataItem {
 	collection: string;
 	id: string;
 	title: string;
-	titleAlt: string | undefined;
 	description?: string | undefined;
 	date: Date;
 	regionPrimaryId: string | undefined;
