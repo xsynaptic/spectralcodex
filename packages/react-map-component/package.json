@@ -15,6 +15,7 @@
 		"@types/react-dom": "^19.1.6",
 		"astro": "^5.10.1",
 		"geojson": "^0.5.0",
+		"idb-keyval": "^6.2.2",
 		"maplibre-gl": "^5.6.0",
 		"pmtiles": "^4.3.0",
 		"react": "^19.1.0",
