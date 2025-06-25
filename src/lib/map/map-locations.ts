@@ -157,6 +157,7 @@ export function getLocationsMapSourceData(featureCollection: MapFeatureCollectio
 				...(feature.properties.outlier === undefined
 					? {}
 					: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
+				...(feature.properties.image === undefined ? {} : { [MapDataKeysCompressed.HasImage]: true }),
 				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 			};
 		})

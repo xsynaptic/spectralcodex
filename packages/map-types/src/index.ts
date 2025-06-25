@@ -5,7 +5,7 @@ export {
 	MapDataKeysCompressed,
 } from './map-data';
 export { GeometrySchema, GeometryTypeEnum } from './map-geometry';
-export { mapIcons } from './map-icons';
+export { mapIcons, mapLocationCategoryIcons } from './map-icons';
 export {
 	LocationCategoryEnum,
 	LocationCategoryNumericMapping,

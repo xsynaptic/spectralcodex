@@ -1,6 +1,6 @@
 {
 	"name": "@spectralcodex/map-types",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Map types and schemas for Spectral Codex",
 	"exports": {
 		".": "./src/index.ts"

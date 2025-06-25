@@ -25,6 +25,7 @@ export const MapDataKeys = {
 	ImageSrcSet: 'srcSet',
 	ImageHeight: 'height',
 	ImageWidth: 'width',
+	HasImage: 'hasImage',
 } as const;
 
 export const MapDataKeysCompressed = {
@@ -52,6 +53,7 @@ export const MapDataKeysCompressed = {
 	ImageSrcSet: 'y',
 	ImageHeight: 'h',
 	ImageWidth: 'z',
+	HasImage: 'n',
 } as const satisfies Record<keyof typeof MapDataKeys, string>;
 
 export const MapDataKeyMap = {
@@ -79,6 +81,7 @@ export const MapDataKeyMap = {
 	[MapDataKeys.ImageSrcSet]: MapDataKeysCompressed.ImageSrcSet,
 	[MapDataKeys.ImageHeight]: MapDataKeysCompressed.ImageHeight,
 	[MapDataKeys.ImageWidth]: MapDataKeysCompressed.ImageWidth,
+	[MapDataKeys.HasImage]: MapDataKeysCompressed.HasImage,
 } as const satisfies Record<
 	(typeof MapDataKeys)[keyof typeof MapDataKeys],
 	(typeof MapDataKeysCompressed)[keyof typeof MapDataKeysCompressed]
