@@ -9,6 +9,7 @@ import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/options.ts';
 import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
@@ -59,7 +60,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 			boundsBuffer: regionsOption.mapBoundsBuffer,
 			boundsBufferMax: regionsOption.mapBoundsBufferMax,
-			...(showChineseInterface ? { languages: ['en', 'zh'] } : {}),
+			...(showChineseInterface
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
+				: {}),
 		});
 
 		results.push(

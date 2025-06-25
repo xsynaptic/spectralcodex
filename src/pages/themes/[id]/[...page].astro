@@ -7,6 +7,7 @@ import ThemeEntry from '#layouts/theme-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPostsByThemeFunction } from '#lib/collections/themes/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
@@ -48,7 +49,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 			boundsBufferMax: 400,
-			...(showChineseInterface ? { languages: ['en', 'zh'] } : {}),
+			...(showChineseInterface
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
+				: {}),
 		});
 
 		results.push(
