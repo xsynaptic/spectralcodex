@@ -9,6 +9,7 @@ import { getPopupItem } from '../map-store-utils';
 
 const defaultState = {
 	selectedId: undefined,
+	hoveredId: undefined,
 	/** Source */
 	sourceData: [],
 	sourceDataLoading: true,
@@ -60,6 +61,9 @@ export const useMapStoreSetup = ({
 							: undefined,
 						filterOpen: false,
 					});
+				},
+				setHoveredId: (hoveredId) => {
+					set({ hoveredId });
 				},
 				/**
 				 * Source data

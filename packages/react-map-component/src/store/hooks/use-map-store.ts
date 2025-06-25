@@ -14,7 +14,14 @@ const useMapDataStore = <T>(selector: (state: MapDataStore) => T): T => {
 };
 
 /**
- * Map canvas data
+ * Feature state
+ */
+export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);
+
+export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
+
+/**
+ * Map source data
  */
 export const useMapSourceData = () => useMapDataStore((state) => state.sourceData);
 
@@ -23,7 +30,7 @@ export const useMapSourceDataLoading = () => useMapDataStore((state) => state.so
 export const useMapSourceDataCount = () => useMapDataStore((state) => state.sourceDataCount);
 
 /**
- * Map canvas
+ * Map canvas state
  */
 export const useMapCanvasCursor = () => useMapDataStore((state) => state.canvasCursor);
 

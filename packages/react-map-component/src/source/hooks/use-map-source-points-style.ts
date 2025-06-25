@@ -1,3 +1,4 @@
+import type { ExpressionSpecification } from 'maplibre-gl';
 import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
 import { useMemo } from 'react';
@@ -5,9 +6,22 @@ import { useMemo } from 'react';
 import { mapClusterStyle } from '../../config/colors';
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
+import { useMapHoveredId, useMapSelectedId } from '../../store/hooks/use-map-store';
 import { statusColorMap, statusStrokeColorMap } from '../map-source-utils';
 
 export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
+	const selectedId = useMapSelectedId();
+	const hoveredId = useMapHoveredId();
+
+	const isSelectedIdExpression = useMemo(
+		() => ['==', ['get', 'id'], selectedId ?? ''] satisfies ExpressionSpecification,
+		[selectedId],
+	);
+	const isHoveredIdExpression = useMemo(
+		() => ['==', ['get', 'id'], hoveredId ?? ''] satisfies ExpressionSpecification,
+		[hoveredId],
+	);
+
 	const clustersLayerStyle = useMemo(
 		() =>
 			({
@@ -104,50 +118,15 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							5,
-							['boolean', ['feature-state', 'hover'], false],
-							3,
-							2,
-						],
+						['case', isSelectedIdExpression, 5, isHoveredIdExpression, 3, 2],
 						8,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							6,
-							['boolean', ['feature-state', 'hover'], false],
-							5,
-							4,
-						],
+						['case', isSelectedIdExpression, 6, isHoveredIdExpression, 5, 4],
 						12,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							8,
-							['boolean', ['feature-state', 'hover'], false],
-							6,
-							5,
-						],
+						['case', isSelectedIdExpression, 8, isHoveredIdExpression, 6, 5],
 						15,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							10,
-							['boolean', ['feature-state', 'hover'], false],
-							8,
-							7,
-						],
+						['case', isSelectedIdExpression, 10, isHoveredIdExpression, 8, 7],
 						18,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							12,
-							['boolean', ['feature-state', 'hover'], false],
-							9,
-							8,
-						],
+						['case', isSelectedIdExpression, 12, isHoveredIdExpression, 9, 8],
 					],
 					'circle-stroke-width': 1,
 					...(statusStrokeColorMap
@@ -162,7 +141,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						: {}),
 				},
 			}) satisfies CircleLayerSpecification,
-		[],
+		[isSelectedIdExpression, isHoveredIdExpression],
 	);
 
 	// Visually obscured tap targets for all visible points; this makes the mobile experience better
@@ -186,54 +165,19 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							9,
-							['boolean', ['feature-state', 'hover'], false],
-							6,
-							5,
-						],
+						['case', isSelectedIdExpression, 9, isHoveredIdExpression, 6, 5],
 						8,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							14,
-							['boolean', ['feature-state', 'hover'], false],
-							11,
-							10,
-						],
+						['case', isSelectedIdExpression, 14, isHoveredIdExpression, 11, 10],
 						12,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							16,
-							['boolean', ['feature-state', 'hover'], false],
-							13,
-							12,
-						],
+						['case', isSelectedIdExpression, 16, isHoveredIdExpression, 13, 12],
 						15,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							20,
-							['boolean', ['feature-state', 'hover'], false],
-							16,
-							15,
-						],
+						['case', isSelectedIdExpression, 20, isHoveredIdExpression, 16, 15],
 						18,
-						[
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							24,
-							['boolean', ['feature-state', 'hover'], false],
-							21,
-							20,
-						],
+						['case', isSelectedIdExpression, 24, isHoveredIdExpression, 21, 20],
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[],
+		[isSelectedIdExpression, isHoveredIdExpression],
 	);
 
 	// Featured image overlay for points with images
@@ -267,15 +211,10 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					],
 				},
 				paint: {
-					'icon-color': [
-						'case',
-						['boolean', ['feature-state', 'selected'], false],
-						'#ffffff',
-						'#ffffff',
-					],
+					'icon-color': ['case', isSelectedIdExpression, '#ffff00', '#ff00ff'],
 				},
 			}) satisfies SymbolLayerSpecification,
-		[],
+		[isSelectedIdExpression],
 	);
 
 	return {

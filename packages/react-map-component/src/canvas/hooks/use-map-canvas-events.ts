@@ -1,36 +1,44 @@
-import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import type { MapCallbacks, MapEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback } from 'react';
-import { funnel, isIncludedIn } from 'remeda';
+import { funnel } from 'remeda';
 
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
 import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
 import { useMediaQuery } from '../../lib/hooks/use-media-query';
-import { useMapCanvasInteractive, useMapStoreActions } from '../../store/hooks/use-map-store';
+import {
+	useMapCanvasInteractive,
+	useMapHoveredId,
+	useMapSourceDataLoading,
+	useMapStoreActions,
+} from '../../store/hooks/use-map-store';
 import { isMapCoordinates, isMapGeojsonSource } from '../map-canvas-utils';
 
 export function useMapCanvasEvents() {
-	const interactive = useMapCanvasInteractive();
+	const isInteractive = useMapCanvasInteractive();
+	const isSourceDataLoading = useMapSourceDataLoading();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
-	const { setCanvasLoading } = useMapStoreActions();
 
-	const { setCanvasCursor, setSelectedId, setFilterPosition, setFilterOpen } = useMapStoreActions();
+	const hoveredId = useMapHoveredId();
+	const {
+		setCanvasLoading,
+		setCanvasCursor,
+		setSelectedId,
+		setHoveredId,
+		setFilterPosition,
+		setFilterOpen,
+	} = useMapStoreActions();
 
-	const onClick = useCallback(
-		({ features, target: mapInstance }: MapLayerMouseEvent) => {
+	const onClick = useCallback<NonNullable<MapCallbacks['onClick']>>(
+		({ features, target: mapInstance }) => {
 			const feature = features && features[0];
 
 			// If the click event is not within interactive layers close any open popup and exit early
 			if (!feature || !feature.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
 				setSelectedId(undefined);
-
-				// This clears *all* feature states for the entire source
-				// It's a simple way to clear selected state without having to know the feature ID
-				mapInstance.removeFeatureState({
-					source: MapSourceIdEnum.PointCollection,
-				});
+				setHoveredId(undefined);
 				return;
 			}
 
@@ -89,16 +97,7 @@ export function useMapCanvasEvents() {
 
 					if (typeof feature.properties.id === 'string') {
 						setSelectedId(feature.properties.id);
-					}
-
-					if (feature.id !== undefined) {
-						mapInstance.setFeatureState(
-							{
-								source: MapSourceIdEnum.PointCollection,
-								id: feature.id,
-							},
-							{ selected: true },
-						);
+						setHoveredId(undefined);
 					}
 					break;
 				}
@@ -107,16 +106,29 @@ export function useMapCanvasEvents() {
 				}
 			}
 		},
-		[isMobile, setFilterOpen, setSelectedId],
+		[isMobile, setFilterOpen, setSelectedId, setHoveredId],
 	);
 
-	const onMouseEnter = useCallback(
-		({ features, target: mapInstance }: MapLayerMouseEvent) => {
-			const feature = features && features[0];
+	const onMouseMove = useCallback<NonNullable<MapCallbacks['onMouseMove']>>(
+		({ point, target: mapInstance }) => {
+			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
+				layers: [MapLayerIdEnum.Clusters, MapLayerIdEnum.Points, MapLayerIdEnum.PointsTarget],
+			});
 
-			switch (feature?.layer.id) {
+			// TODO: is there any chance we'd want to handle multiple queried features?
+			const feature = renderedFeatures[0];
+
+			// Nothing under the mouse, clear hover state
+			if (!feature) {
+				setHoveredId(undefined);
+				setCanvasCursor('grab');
+				return;
+			}
+
+			switch (feature.layer.id) {
 				case MapLayerIdEnum.Clusters: {
 					setCanvasCursor('zoom-in');
+					setHoveredId(undefined);
 					break;
 				}
 				case MapLayerIdEnum.Points:
@@ -124,55 +136,24 @@ export function useMapCanvasEvents() {
 				case MapLayerIdEnum.PointsImage: {
 					setCanvasCursor('pointer');
 
-					// Set hover state for the feature
-					if (feature.id !== undefined) {
-						mapInstance.setFeatureState(
-							{
-								source: MapSourceIdEnum.PointCollection,
-								id: feature.id,
-							},
-							{ hover: true },
-						);
+					// Only update if it's different from current hovered ID
+					if (typeof feature.properties.id === 'string' && feature.properties.id !== hoveredId) {
+						setHoveredId(feature.properties.id);
 					}
 					break;
 				}
 				default: {
+					setHoveredId(undefined);
+					setCanvasCursor('grab');
 					break;
 				}
 			}
 		},
-		[setCanvasCursor],
+		[setCanvasCursor, setHoveredId, hoveredId],
 	);
 
-	const onMouseLeave = useCallback(
-		({ features, target: mapInstance }: MapLayerMouseEvent) => {
-			const feature = features && features[0];
-
-			// Reset hover state
-			if (
-				feature?.id !== undefined &&
-				isIncludedIn(feature.layer.id, [
-					MapLayerIdEnum.Points,
-					MapLayerIdEnum.PointsTarget,
-					MapLayerIdEnum.PointsImage,
-				])
-			) {
-				mapInstance.setFeatureState(
-					{
-						source: MapSourceIdEnum.PointCollection,
-						id: feature.id,
-					},
-					{ hover: false },
-				);
-			}
-
-			setCanvasCursor('grab');
-		},
-		[setCanvasCursor],
-	);
-
-	const onMouseDown = useCallback(
-		({ features }: MapLayerMouseEvent) => {
+	const onMouseDown = useCallback<NonNullable<MapCallbacks['onMouseDown']>>(
+		({ features }) => {
 			const feature = features && features[0];
 
 			if (feature?.layer.id === undefined) {
@@ -182,8 +163,8 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const onMouseUp = useCallback(
-		({ features }: MapLayerMouseEvent) => {
+	const onMouseUp = useCallback<NonNullable<MapCallbacks['onMouseUp']>>(
+		({ features }) => {
 			const feature = features && features[0];
 
 			if (feature?.layer.id === undefined) {
@@ -233,20 +214,24 @@ export function useMapCanvasEvents() {
 	return {
 		onLoad: (event: MapEvent) => {
 			setCanvasLoading(false);
-			if (interactive) {
-				debouncedOnLoad.call(event); // Initialize the position of the filter control
+
+			// Initialize the position of the filter control
+			if (isInteractive) {
+				debouncedOnLoad.call(event);
 			}
 		},
 		onResize: debouncedOnLoad.call,
-		...(interactive
+		...(isInteractive
 			? {
 					onClick,
-					onMouseEnter,
-					onMouseLeave,
-					onMouseOut: onMouseLeave,
 					onMouseDown,
 					onMouseUp,
 				}
-			: undefined),
+			: {}),
+		...(isSourceDataLoading
+			? {}
+			: {
+					onMouseMove,
+				}),
 	} satisfies MapCallbacks;
 }
