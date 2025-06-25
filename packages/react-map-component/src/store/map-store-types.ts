@@ -1,15 +1,16 @@
 import type { LocationStatus } from '@spectralcodex/map-types';
 import type { CSSProperties } from 'react';
 
-import type { MapPopupData, MapPopupItem, MapSourceData } from '../types';
+import type { MapPopupItem, MapPopupItemExtended, MapSourceItem } from '../types';
 
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 
 export interface MapDataState {
-	// Feature state
+	/** Feature state */
 	selectedId: string | undefined;
+	hoveredId: string | undefined;
 	/** Source */
-	sourceData: MapSourceData;
+	sourceData: Array<MapSourceItem>;
 	sourceDataLoading: boolean;
 	sourceDataCount: number;
 	/** Canvas */
@@ -18,9 +19,9 @@ export interface MapDataState {
 	canvasClusters: boolean | undefined;
 	canvasLoading: boolean;
 	/** Popup  */
-	popupData: MapPopupData;
+	popupData: Array<MapPopupItem>;
 	popupDataLoading: boolean;
-	popupItem: MapPopupItem | undefined;
+	popupItem: MapPopupItemExtended | undefined;
 	/** Filter */
 	filterPosition: DOMCoordinates | undefined;
 	filterOpen: boolean;
@@ -36,6 +37,7 @@ export interface MapDataState {
 export type MapDataConfigurableState = Pick<
 	MapDataState,
 	| 'selectedId'
+	| 'hoveredId'
 	| 'sourceData'
 	| 'popupData'
 	| 'canvasCursor'
@@ -53,13 +55,14 @@ export type MapDataConfigurableState = Pick<
 export interface MapDataStore extends MapDataState {
 	actions: {
 		setSelectedId: (selectedId: string | undefined) => void;
-		setSourceData: (sourceData: MapSourceData) => void;
+		setHoveredId: (hoveredId: string | undefined) => void;
+		setSourceData: (sourceData: Array<MapSourceItem>) => void;
 		setSourceDataLoading: (sourceDataLoading: boolean) => void;
 		setCanvasCursor: (canvasCursor: NonNullable<CSSProperties['cursor']>) => void;
 		setCanvasInteractive: (canvasInteractive: boolean) => void;
 		setCanvasLoading: (canvasLoading: boolean) => void;
 		setCanvasClusters: (canvasClusters: boolean | undefined) => void;
-		setPopupData: (popupData: MapPopupData) => void;
+		setPopupData: (popupData: Array<MapPopupItem>) => void;
 		setPopupDataLoading: (popupDataLoading: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
 		setFilterOpen: (filterOpen: boolean) => void;

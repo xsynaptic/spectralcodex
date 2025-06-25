@@ -3,10 +3,10 @@ import ky from 'ky';
 import { useEffect } from 'react';
 
 import type { MapComponentProps } from '../../types';
-import type { MapPopupDataRaw } from '../../types';
+import type { MapPopupItemInput } from '../../types';
 
 import { useMapStoreActions } from '../../store/hooks/use-map-store';
-import { MapPopupDataSchema } from '../../types/map-schemas';
+import { MapPopupItemSchema } from '../../types/map-schemas';
 
 export function useMapApiPopupData({
 	apiPopupUrl,
@@ -20,7 +20,7 @@ export function useMapApiPopupData({
 			if (apiPopupUrl) {
 				try {
 					return await ky
-						.get<MapPopupDataRaw>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
+						.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
 						.json();
 				} catch (error) {
 					console.error(error);
@@ -36,7 +36,7 @@ export function useMapApiPopupData({
 	useEffect(
 		function parsePopupData() {
 			if (mapPopupDataQuery.data && mapPopupDataQuery.data.length > 0) {
-				const parsedResponse = MapPopupDataSchema.safeParse(mapPopupDataQuery.data);
+				const parsedResponse = MapPopupItemSchema.array().safeParse(mapPopupDataQuery.data);
 
 				if (!parsedResponse.success) {
 					console.error(parsedResponse.error);

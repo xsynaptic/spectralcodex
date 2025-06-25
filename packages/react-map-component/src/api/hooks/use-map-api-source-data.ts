@@ -3,10 +3,10 @@ import ky from 'ky';
 import { useEffect } from 'react';
 
 import type { MapComponentProps } from '../../types';
-import type { MapSourceDataRaw } from '../../types';
+import type { MapSourceItemInput } from '../../types';
 
 import { useMapStoreActions } from '../../store/hooks/use-map-store';
-import { MapSourceDataSchema } from '../../types/map-schemas';
+import { MapSourceItemSchema } from '../../types/map-schemas';
 
 export function useMapApiSourceData({
 	apiSourceUrl,
@@ -20,7 +20,7 @@ export function useMapApiSourceData({
 			if (apiSourceUrl) {
 				try {
 					return await ky
-						.get<MapSourceDataRaw>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
+						.get<Array<MapSourceItemInput>>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
 						.json();
 				} catch (error) {
 					console.error(error);
@@ -36,7 +36,7 @@ export function useMapApiSourceData({
 	useEffect(
 		function parseSourceData() {
 			if (mapSourceDataQuery.data && mapSourceDataQuery.data.length > 0) {
-				const parsedResponse = MapSourceDataSchema.safeParse(mapSourceDataQuery.data);
+				const parsedResponse = MapSourceItemSchema.array().safeParse(mapSourceDataQuery.data);
 
 				if (!parsedResponse.success) {
 					console.error(parsedResponse.error);

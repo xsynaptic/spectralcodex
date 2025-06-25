@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 const NumericScaleSchema = z.number().int().min(1).max(5);
 
-export const MapSourceDataSchema = z
+export const MapSourceItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
 		[MapDataKeysCompressed.Category]: z.nativeEnum(LocationCategoryNumericMapping),
@@ -32,6 +32,7 @@ export const MapSourceDataSchema = z
 			]),
 		}),
 	})
+	.strict()
 	.transform((value) => ({
 		properties: {
 			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
@@ -55,10 +56,9 @@ export const MapSourceDataSchema = z
 			[MapDataKeys.GeometryCoordinates]:
 				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryCoordinates]],
 		},
-	}))
-	.array();
+	}));
 
-export const MapPopupDataSchema = z
+export const MapPopupItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
 		[MapDataKeysCompressed.Title]: z.string(),
@@ -74,6 +74,7 @@ export const MapPopupDataSchema = z
 		[MapDataKeysCompressed.ImageHeight]: z.string().optional(),
 		[MapDataKeysCompressed.ImageWidth]: z.string().optional(),
 	})
+	.strict()
 	.transform((value) => ({
 		[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
 		[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
@@ -97,5 +98,4 @@ export const MapPopupDataSchema = z
 						[MapDataKeys.ImageWidth]: value[MapDataKeyMap[MapDataKeys.ImageWidth]],
 					},
 				}),
-	}))
-	.array();
+	}));

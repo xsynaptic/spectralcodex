@@ -4,19 +4,23 @@ import type { LngLatBoundsLike } from 'maplibre-gl';
 
 import { z } from 'zod';
 
-import type { MapPopupDataSchema, MapSourceDataSchema } from './map-schemas';
+import type { MapPopupItemSchema, MapSourceItemSchema } from './map-schemas';
 
 // Supported geometry for use with this component
 export type MapGeometry = Point | LineString;
 
 /**
- * Map canvas data
+ * Map source data
  */
-export type MapSourceDataRaw = z.input<typeof MapSourceDataSchema>;
+export type MapSourceItemInput = z.input<typeof MapSourceItemSchema>;
 
-export type MapSourceData = z.output<typeof MapSourceDataSchema>;
+export type MapSourceItem = z.output<typeof MapSourceItemSchema>;
 
-export type MapSourceItem = z.output<typeof MapSourceDataSchema>[number];
+export type MapSourceItemExtended = MapSourceItem & {
+	properties: MapSourceItem['properties'] & {
+		selected?: boolean;
+	};
+};
 
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
@@ -26,23 +30,28 @@ export type MapSourceFeatureCollection = FeatureCollection<
 /**
  * Map popup data
  */
-export type MapPopupDataRaw = z.input<typeof MapPopupDataSchema>;
+export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
 
-export type MapPopupData = z.output<typeof MapPopupDataSchema>;
+export type MapPopupItem = z.output<typeof MapPopupItemSchema>;
 
-export type MapPopupItem = MapPopupData[number] & {
+export interface MapPopupCoordinates {
+	lat: number;
+	lng: number;
+}
+
+export type MapPopupItemExtended = MapPopupItem & {
 	precision: MapSourceItem['properties']['precision'];
-	geometry: MapSourceItem['geometry'];
+	popupCoordinates: MapPopupCoordinates;
 };
 
 /**
- * Map component
+ * Map component props
  */
 export interface MapComponentProps {
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
-	sourceData?: MapSourceDataRaw | undefined;
-	popupData?: MapPopupDataRaw | undefined;
+	sourceData?: Array<MapSourceItemInput> | undefined;
+	popupData?: Array<MapPopupItemInput> | undefined;
 	baseMapTheme?: Flavor | undefined;
 	bounds?: LngLatBoundsLike;
 	maxBounds?: LngLatBoundsLike;

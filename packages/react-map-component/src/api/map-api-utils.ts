@@ -1,9 +1,9 @@
-import type { MapPopupDataRaw, MapSourceDataRaw } from '../types';
+import type { MapPopupItemInput, MapSourceItemInput } from '../types';
 
-import { MapPopupDataSchema, MapSourceDataSchema } from '../types/map-schemas';
+import { MapPopupItemSchema, MapSourceItemSchema } from '../types/map-schemas';
 
-export function parseSourceData(sourceDataRaw: MapSourceDataRaw) {
-	const { data, success, error } = MapSourceDataSchema.safeParse(sourceDataRaw);
+export function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
+	const { data, success, error } = MapSourceItemSchema.array().safeParse(sourceDataRaw);
 
 	if (!success) {
 		console.error(error);
@@ -13,8 +13,8 @@ export function parseSourceData(sourceDataRaw: MapSourceDataRaw) {
 	return data;
 }
 
-export function parsePopupData(popupDataRaw: MapPopupDataRaw) {
-	const { data, success, error } = MapPopupDataSchema.safeParse(popupDataRaw);
+export function parsePopupData(popupDataRaw: Array<MapPopupItemInput>) {
+	const { data, success, error } = MapPopupItemSchema.array().safeParse(popupDataRaw);
 
 	if (!success) {
 		console.error(error);

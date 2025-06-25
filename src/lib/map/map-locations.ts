@@ -1,7 +1,7 @@
 import type {
 	MapGeometry,
-	MapPopupDataRaw,
-	MapSourceDataRaw,
+	MapPopupItemInput,
+	MapSourceItemInput,
 } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
@@ -157,13 +157,15 @@ export function getLocationsMapSourceData(featureCollection: MapFeatureCollectio
 				...(feature.properties.outlier === undefined
 					? {}
 					: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
-				...(feature.properties.image === undefined ? {} : { [MapDataKeysCompressed.HasImage]: true }),
+				...(feature.properties.image === undefined
+					? {}
+					: { [MapDataKeysCompressed.HasImage]: true }),
 				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 			};
 		})
 		.sort((a, b) =>
 			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
-		) satisfies MapSourceDataRaw;
+		) satisfies Array<MapSourceItemInput>;
 }
 
 // Extended locations metadata for popups
@@ -196,7 +198,7 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 		})
 		.sort((a, b) =>
 			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
-		) satisfies MapPopupDataRaw;
+		) satisfies Array<MapPopupItemInput>;
 }
 
 // Hash the contents of each API endpoint
