@@ -5,10 +5,10 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapSourceFeatureCollection } from '../types';
 
 import { MapLayerIdEnum } from '../config/layer';
-import { layerStyles } from '../config/layer-style';
 import { MapSourceIdEnum } from '../config/source';
 import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
 import { useMapCanvasData } from './hooks/use-map-canvas-data';
+import { useMapLayerStyles } from './hooks/use-map-layer-styles';
 
 const MapPointLayerContent = memo(function MapPointLayerContents({
 	data,
@@ -19,6 +19,8 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 	interactive: boolean;
 	hasMapIcons: boolean;
 }) {
+	const mapLayerStyles = useMapLayerStyles();
+
 	const clusterConfig = useMemo(() => {
 		// Create cluster properties dynamically for each status
 		const clusterProperties = Object.fromEntries(
@@ -45,12 +47,12 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 			generateId={true}
 			{...clusterConfig}
 		>
-			<Layer key={MapLayerIdEnum.Clusters} {...layerStyles[MapLayerIdEnum.Clusters]} />
-			<Layer key={MapLayerIdEnum.ClustersLabel} {...layerStyles[MapLayerIdEnum.ClustersLabel]} />
-			<Layer key={MapLayerIdEnum.PointsTarget} {...layerStyles[MapLayerIdEnum.PointsTarget]} />
-			<Layer key={MapLayerIdEnum.Points} {...layerStyles[MapLayerIdEnum.Points]} />
+			<Layer key={MapLayerIdEnum.Clusters} {...mapLayerStyles[MapLayerIdEnum.Clusters]} />
+			<Layer key={MapLayerIdEnum.ClustersLabel} {...mapLayerStyles[MapLayerIdEnum.ClustersLabel]} />
+			<Layer key={MapLayerIdEnum.PointsTarget} {...mapLayerStyles[MapLayerIdEnum.PointsTarget]} />
+			<Layer key={MapLayerIdEnum.Points} {...mapLayerStyles[MapLayerIdEnum.Points]} />
 			{hasMapIcons ? (
-				<Layer key={MapLayerIdEnum.PointsIcon} {...layerStyles[MapLayerIdEnum.PointsIcon]} />
+				<Layer key={MapLayerIdEnum.PointsIcon} {...mapLayerStyles[MapLayerIdEnum.PointsIcon]} />
 			) : undefined}
 		</Source>
 	);
