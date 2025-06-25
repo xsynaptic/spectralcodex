@@ -6,7 +6,7 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
-import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
+import { useMapCanvasInteractive } from '../../store/hooks/use-map-store';
 import { FilterControl } from './map-controls-filter';
 import { MetricsControl } from './map-controls-metrics';
 

@@ -2,13 +2,13 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
-import { MAP_FILTER_CONTROL_ID } from '../constants';
+import { MAP_FILTER_CONTROL_ID } from '../../constants';
 import {
 	useMapCanvasLoading,
 	useMapFilterOpen,
 	useMapSourceDataLoading,
 	useMapStoreActions,
-} from '../store/hooks/use-map-store';
+} from '../../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
 export const FilterControl = ({ position }: { position: ControlPosition }) => {

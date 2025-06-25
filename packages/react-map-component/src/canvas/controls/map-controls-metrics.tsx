@@ -1,8 +1,8 @@
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { translations } from '../config/translations';
-import { useMapSourceDataCount, useMapSourceDataLoading } from '../store/hooks/use-map-store';
-import { useMapCanvasData } from './hooks/use-map-canvas-data';
+import { translations } from '../../config/translations';
+import { useMapSourceDataCount, useMapSourceDataLoading } from '../../store/hooks/use-map-store';
+import { useMapCanvasData } from '../hooks/use-map-canvas-data';
 import { CustomControlPortal } from './map-controls-custom';
 
 export const formatNumber = ({

@@ -1,4 +1,4 @@
-export const MapLoading = ({ loading }: { loading: boolean }) => {
+export const MapCanvasLoading = ({ loading }: { loading: boolean }) => {
 	return (
 		<div className="flex h-full justify-center">
 			<div
