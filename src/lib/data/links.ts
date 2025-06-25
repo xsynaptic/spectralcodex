@@ -50,6 +50,10 @@ export const linksMap = [
 		match: 'cwhung.blogspot.',
 	},
 	{
+		title: 'Apex Cheng',
+		match: 'apextraveller.com',
+	},
+	{
 		title: 'Taiwan Air Power',
 		match: 'taiwanairpower.org',
 	},
