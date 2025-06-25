@@ -8,24 +8,24 @@ import { useMapApiPopupData } from '../api/hooks/use-map-api-popup-data';
 import { useMapApiSourceData } from '../api/hooks/use-map-api-source-data';
 import { useMapCanvasEvents } from '../canvas/hooks/use-map-canvas-events';
 import { MapLayerIdEnum } from '../config/layer';
+import { MapControls } from '../controls/map-controls';
+import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
+import { useProtomaps } from '../lib/hooks/use-protomaps';
+import { MapPopup } from '../popup/map-popup';
+import { MapLineStringLayer } from '../source/map-source-lines';
+import { MapPointLayer } from '../source/map-source-points';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
 	useMapCanvasLoading,
 } from '../store/hooks/use-map-store';
-import { useProtomaps } from './hooks/use-protomaps';
-import { MapControls } from './map-controls';
-import { MapControlsFilterMenu } from './map-controls-filter-menu';
-import { MapLineStringLayer } from './map-layers-line-string';
-import { MapPointLayer } from './map-layers-point';
-import { MapLoading } from './map-loading';
-import { MapPopup } from './map-popup';
+import { MapCanvasLoading } from './map-canvas-loading';
 
 const interactiveLayerIds = [
 	MapLayerIdEnum.Clusters,
-	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsTarget,
-	MapLayerIdEnum.PointsIcon,
+	MapLayerIdEnum.Points,
+	MapLayerIdEnum.PointsImage,
 ] as const;
 
 export const MapCanvas = ({
@@ -95,7 +95,7 @@ export const MapCanvas = ({
 			<MapLineStringLayer />
 			<MapControlsFilterMenu />
 			<MapPopup />
-			<MapLoading loading={canvasLoading || sourceDataQueryLoading} />
+			<MapCanvasLoading loading={canvasLoading || sourceDataQueryLoading} />
 		</ReactMapGlMap>
 	);
 };

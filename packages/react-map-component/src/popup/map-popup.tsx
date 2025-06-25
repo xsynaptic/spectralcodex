@@ -2,8 +2,6 @@ import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import type { MapPopupItem } from '../types';
-
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';
@@ -12,43 +10,7 @@ import {
 	useMapPopupItem,
 	useMapStoreActions,
 } from '../store/hooks/use-map-store';
-
-interface PopupCoordinates {
-	lng: number;
-	lat: number;
-}
-
-// Currently this handles Point and LineString geometry without complicated types
-const sanitizeCoordinates = (feature: MapPopupItem): PopupCoordinates => {
-	if (
-		typeof feature.geometry.coordinates[0] === 'number' &&
-		typeof feature.geometry.coordinates[1] === 'number'
-	) {
-		return {
-			lng: feature.geometry.coordinates[0],
-			lat: feature.geometry.coordinates[1],
-		};
-	}
-
-	if (Array.isArray(feature.geometry.coordinates[0])) {
-		return {
-			lng: feature.geometry.coordinates[0][0],
-			lat: feature.geometry.coordinates[0][1],
-		};
-	}
-
-	return { lng: 0, lat: 0 };
-};
-
-// Generate a standard Google Maps URL from a set of coordinates
-function getGoogleMapsUrlFromGeometry(coordinates: PopupCoordinates) {
-	const url = new URL('https://www.google.com/maps/search/');
-
-	url.searchParams.set('api', '1');
-	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
-
-	return url.toString();
-}
+import { getGoogleMapsUrlFromGeometry, sanitizeCoordinates } from './map-popup-utils';
 
 export const MapPopup = memo(function MapPopup() {
 	const popupDataLoading = useMapPopupDataLoading();
@@ -105,7 +67,6 @@ export const MapPopup = memo(function MapPopup() {
 				</div>
 				{popupDataLoading ? undefined : (
 					<>
-						{' '}
 						{image ? (
 							<div>
 								<img

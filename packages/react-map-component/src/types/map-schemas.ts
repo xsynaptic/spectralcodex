@@ -23,6 +23,7 @@ export const MapSourceDataSchema = z
 		[MapDataKeysCompressed.Rating]: NumericScaleSchema,
 		[MapDataKeysCompressed.Objective]: NumericScaleSchema.optional(),
 		[MapDataKeysCompressed.Outlier]: z.boolean().optional(),
+		[MapDataKeysCompressed.HasImage]: z.boolean().optional(),
 		[MapDataKeysCompressed.Geometry]: z.object({
 			[MapDataKeysCompressed.GeometryType]: z.nativeEnum(MapDataGeometryTypeNumericMapping),
 			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
@@ -45,6 +46,7 @@ export const MapSourceDataSchema = z
 			[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
 			[MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]],
 			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]] ?? false,
+			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]] ?? false,
 		},
 		[MapDataKeys.Geometry]: {
 			[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[

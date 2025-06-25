@@ -9,7 +9,7 @@ import { MapSourceIdEnum } from '../../config/source';
 import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
 import { useMediaQuery } from '../../lib/hooks/use-media-query';
 import { useMapCanvasInteractive, useMapStoreActions } from '../../store/hooks/use-map-store';
-import { isMapCoordinates, isMapGeojsonSource } from '../../types/map-type-guards';
+import { isMapCoordinates, isMapGeojsonSource } from '../map-canvas-utils';
 
 export function useMapCanvasEvents() {
 	const interactive = useMapCanvasInteractive();
@@ -78,7 +78,7 @@ export function useMapCanvasEvents() {
 				// TODO: fly first, then open the popup, which requires getting into tricky event handling
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
-				case MapLayerIdEnum.PointsIcon: {
+				case MapLayerIdEnum.PointsImage: {
 					if (isMapCoordinates(feature.geometry.coordinates)) {
 						mapInstance.flyTo({
 							center: feature.geometry.coordinates,
@@ -121,7 +121,7 @@ export function useMapCanvasEvents() {
 				}
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
-				case MapLayerIdEnum.PointsIcon: {
+				case MapLayerIdEnum.PointsImage: {
 					setCanvasCursor('pointer');
 
 					// Set hover state for the feature
@@ -154,7 +154,7 @@ export function useMapCanvasEvents() {
 				isIncludedIn(feature.layer.id, [
 					MapLayerIdEnum.Points,
 					MapLayerIdEnum.PointsTarget,
-					MapLayerIdEnum.PointsIcon,
+					MapLayerIdEnum.PointsImage,
 				])
 			) {
 				mapInstance.setFeatureState(

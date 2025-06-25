@@ -4,11 +4,11 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
+import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapSourceIdEnum } from '../config/source';
 import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
-import { useMapCanvasData } from './hooks/use-map-canvas-data';
-import { useMapLayerStyles } from './hooks/use-map-layer-styles';
+import { useMapSourcePointsStyle } from './hooks/use-map-source-points-style';
 
 const MapPointLayerContent = memo(function MapPointLayerContents({
 	data,
@@ -19,7 +19,7 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 	interactive: boolean;
 	hasMapIcons: boolean;
 }) {
-	const mapLayerStyles = useMapLayerStyles();
+	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
 		// Create cluster properties dynamically for each status
@@ -47,12 +47,12 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 			generateId={true}
 			{...clusterConfig}
 		>
-			<Layer key={MapLayerIdEnum.Clusters} {...mapLayerStyles[MapLayerIdEnum.Clusters]} />
-			<Layer key={MapLayerIdEnum.ClustersLabel} {...mapLayerStyles[MapLayerIdEnum.ClustersLabel]} />
-			<Layer key={MapLayerIdEnum.PointsTarget} {...mapLayerStyles[MapLayerIdEnum.PointsTarget]} />
-			<Layer key={MapLayerIdEnum.Points} {...mapLayerStyles[MapLayerIdEnum.Points]} />
+			<Layer key={MapLayerIdEnum.Clusters} {...pointsStyle[MapLayerIdEnum.Clusters]} />
+			<Layer key={MapLayerIdEnum.ClustersLabel} {...pointsStyle[MapLayerIdEnum.ClustersLabel]} />
+			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
+			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
 			{hasMapIcons ? (
-				<Layer key={MapLayerIdEnum.PointsIcon} {...mapLayerStyles[MapLayerIdEnum.PointsIcon]} />
+				<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
 			) : undefined}
 		</Source>
 	);

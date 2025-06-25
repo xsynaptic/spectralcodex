@@ -3,21 +3,21 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
+import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapSourceIdEnum } from '../config/source';
-import { useMapCanvasData } from './hooks/use-map-canvas-data';
-import { useMapLayerStyles } from './hooks/use-map-layer-styles';
+import { useMapSourceLinesStyle } from './hooks/use-map-source-lines-style';
 
 const MapLineStringLayerContent = memo(function MapLineStringLayerContent({
 	data,
 }: {
 	data: MapSourceFeatureCollection;
 }) {
-	const mapLayerStyles = useMapLayerStyles();
+	const linesStyle = useMapSourceLinesStyle();
 
 	return (
 		<Source id={MapSourceIdEnum.LineStringCollection} type="geojson" data={data} generateId={true}>
-			<Layer key={MapLayerIdEnum.LineString} {...mapLayerStyles[MapLayerIdEnum.LineString]} />
+			<Layer key={MapLayerIdEnum.LineString} {...linesStyle[MapLayerIdEnum.LineString]} />
 		</Source>
 	);
 });

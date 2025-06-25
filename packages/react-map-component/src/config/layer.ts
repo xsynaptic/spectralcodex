@@ -3,7 +3,7 @@ export const MapLayerIdEnum = {
 	ClustersLabel: 'clusters-label',
 	Points: 'points',
 	PointsTarget: 'points-target',
-	PointsIcon: 'points-icon',
+	PointsImage: 'points-image',
 	LineString: 'line-string',
 } as const satisfies Record<string, string>;
 

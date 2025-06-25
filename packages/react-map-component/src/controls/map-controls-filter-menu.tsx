@@ -4,11 +4,11 @@ import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, type ReactNode } from 'react';
 import * as R from 'remeda';
 
-import type { LocationStatusMetadata } from '../../config/location';
+import type { LocationStatusMetadata } from '../config/location';
 
-import { locationStatusStyle } from '../../config/colors';
-import { LocationStatusRecords } from '../../config/location';
-import { translations } from '../../config/translations';
+import { locationStatusStyle } from '../config/colors';
+import { LocationStatusRecords } from '../config/location';
+import { translations } from '../config/translations';
 import {
 	useMapFilterOpen,
 	useMapFilterPosition,
@@ -18,7 +18,7 @@ import {
 	useMapShowObjectiveFilter,
 	useMapStatusFilter,
 	useMapStoreActions,
-} from '../../store/hooks/use-map-store';
+} from '../store/hooks/use-map-store';
 
 const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 	status,
