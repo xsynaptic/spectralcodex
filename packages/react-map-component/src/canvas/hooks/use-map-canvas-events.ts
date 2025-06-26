@@ -132,7 +132,11 @@ export function useMapCanvasEvents() {
 			switch (feature.layer.id) {
 				case MapLayerIdEnum.Clusters: {
 					setCanvasCursor('zoom-in');
-					setHoveredId(undefined);
+
+					// Cluster IDs are not the same as point IDs
+					if (typeof feature.properties.cluster_id === 'number') {
+						setHoveredId(`cluster-${String(feature.properties.cluster_id)}`);
+					}
 					break;
 				}
 				case MapLayerIdEnum.Points:

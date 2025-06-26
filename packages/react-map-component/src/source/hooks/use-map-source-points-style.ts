@@ -21,6 +21,15 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 		() => ['==', ['get', 'id'], hoveredId ?? ''] satisfies ExpressionSpecification,
 		[hoveredId],
 	);
+	const isHoveredClusterIdExpression = useMemo(
+		() =>
+			[
+				'==',
+				['concat', 'cluster-', ['get', 'cluster_id']],
+				hoveredId ?? '',
+			] satisfies ExpressionSpecification,
+		[hoveredId],
+	);
 
 	const clustersLayerStyle = useMemo(
 		() =>
@@ -51,11 +60,11 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['get', 'point_count'],
 						0, // Point count
-						7, // Radius
+						['case', isHoveredClusterIdExpression, 9, 7],
 						10,
-						9,
+						['case', isHoveredClusterIdExpression, 11, 9],
 						60,
-						14,
+						['case', isHoveredClusterIdExpression, 16, 14],
 					],
 					'circle-stroke-width': 1,
 					'circle-stroke-color': [
@@ -73,7 +82,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[],
+		[isHoveredClusterIdExpression],
 	);
 
 	// Numeric labels for clusters
@@ -87,7 +96,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 				layout: {
 					'text-field': '{point_count_abbreviated}',
 					'text-font': ['Noto Sans Medium'],
-					'text-size': 10,
+					'text-size': ['case', isHoveredClusterIdExpression, 12, 10],
 					'text-allow-overlap': true,
 				},
 				paint: {
@@ -96,7 +105,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-halo-width': 1,
 				},
 			}) satisfies SymbolLayerSpecification,
-		[],
+		[isHoveredClusterIdExpression],
 	);
 
 	// Visual points for unfiltered (zoomed-in) points
