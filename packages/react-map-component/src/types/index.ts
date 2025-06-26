@@ -1,6 +1,6 @@
 import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, Point } from 'geojson';
-import type { LngLatBoundsLike } from 'maplibre-gl';
+import type { LngLat, LngLatBoundsLike } from 'maplibre-gl';
 
 import { z } from 'zod';
 
@@ -34,14 +34,9 @@ export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
 
 export type MapPopupItem = z.output<typeof MapPopupItemSchema>;
 
-export interface MapPopupCoordinates {
-	lat: number;
-	lng: number;
-}
-
 export type MapPopupItemExtended = MapPopupItem & {
 	precision: MapSourceItem['properties']['precision'];
-	popupCoordinates: MapPopupCoordinates;
+	popupCoordinates: LngLat;
 };
 
 /**
