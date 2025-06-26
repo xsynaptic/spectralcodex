@@ -1,7 +1,7 @@
-import type { MapCallbacks, MapEvent } from 'react-map-gl/maplibre';
+import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { funnel } from 'remeda';
 
 import { MapLayerIdEnum } from '../../config/layer';
@@ -109,8 +109,12 @@ export function useMapCanvasEvents() {
 		[isMobile, setFilterOpen, setSelectedId, setHoveredId],
 	);
 
-	const onMouseMove = useCallback<NonNullable<MapCallbacks['onMouseMove']>>(
-		({ point, target: mapInstance }) => {
+	const onMouseMove = useCallback(
+		(event: MapLayerMouseEvent | undefined) => {
+			if (!event) return;
+
+			const { point, target: mapInstance } = event;
+
 			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
 				layers: [MapLayerIdEnum.Clusters, MapLayerIdEnum.Points, MapLayerIdEnum.PointsTarget],
 			});
@@ -152,6 +156,21 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor, setHoveredId, hoveredId],
 	);
 
+	// Create throttled version using funnel
+	const throttledOnMouseMove = useMemo(
+		() =>
+			funnel(onMouseMove, {
+				reducer: (_, ...args: Array<MapLayerMouseEvent>) => {
+					if (args.length === 0 || !args[0]) return;
+
+					return args[0];
+				},
+				minGapMs: 20,
+				triggerAt: 'both',
+			}),
+		[onMouseMove],
+	);
+
 	const onMouseDown = useCallback<NonNullable<MapCallbacks['onMouseDown']>>(
 		({ features }) => {
 			const feature = features && features[0];
@@ -174,41 +193,47 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const debouncedOnLoad = funnel<Array<MapEvent>, HTMLElement | undefined>(
-		(container) => {
-			if (!container) {
-				console.warn('[Map] Map instance not found!');
-				return;
-			}
+	const debouncedOnLoad = useMemo(
+		() =>
+			funnel<Array<MapEvent>, HTMLElement | undefined>(
+				(container) => {
+					if (!container) {
+						console.warn('[Map] Map instance not found!');
+						return;
+					}
 
-			const filterControl = container.querySelector<HTMLButtonElement>(`#${MAP_FILTER_CONTROL_ID}`);
+					const filterControl = container.querySelector<HTMLButtonElement>(
+						`#${MAP_FILTER_CONTROL_ID}`,
+					);
 
-			if (!filterControl) {
-				console.warn('[Map] Filter control not found!');
-				return;
-			}
+					if (!filterControl) {
+						console.warn('[Map] Filter control not found!');
+						return;
+					}
 
-			const { x: containerX, y: containerY } = container.getBoundingClientRect();
-			const {
-				x: controlX,
-				y: controlY,
-				height: controlHeight,
-				width: controlWidth,
-			} = filterControl.getBoundingClientRect();
+					const { x: containerX, y: containerY } = container.getBoundingClientRect();
+					const {
+						x: controlX,
+						y: controlY,
+						height: controlHeight,
+						width: controlWidth,
+					} = filterControl.getBoundingClientRect();
 
-			setFilterPosition({
-				x: controlX - containerX + controlWidth,
-				y: controlY - containerY + controlHeight / 2,
-			});
-		},
-		{
-			reducer: (_, ...args: Array<MapEvent>) => {
-				if (args.length === 0) return;
+					setFilterPosition({
+						x: controlX - containerX + controlWidth,
+						y: controlY - containerY + controlHeight / 2,
+					});
+				},
+				{
+					reducer: (_previousElement, ...args: Array<MapEvent>) => {
+						if (args.length === 0 || !args[0]) return;
 
-				return args[0]?.target.getContainer();
-			},
-			minQuietPeriodMs: 300,
-		},
+						return args[0].target.getContainer();
+					},
+					minQuietPeriodMs: 300,
+				},
+			),
+		[setFilterPosition],
 	);
 
 	return {
@@ -231,7 +256,7 @@ export function useMapCanvasEvents() {
 		...(isSourceDataLoading
 			? {}
 			: {
-					onMouseMove,
+					onMouseMove: throttledOnMouseMove.call,
 				}),
 	} satisfies MapCallbacks;
 }
