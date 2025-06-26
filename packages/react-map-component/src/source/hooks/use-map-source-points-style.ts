@@ -227,11 +227,43 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 		[isSelectedIdExpression],
 	);
 
+	// Text labels for individual points on hover
+	const pointsLabelLayerStyle = useMemo(
+		() =>
+			({
+				id: MapLayerIdEnum.PointsLabel,
+				source: MapSourceIdEnum.PointCollection,
+				type: 'symbol',
+				filter: [
+					'all',
+					['!', ['has', 'point_count']], // Not a cluster
+					isHoveredIdExpression, // Only show when hovered
+				],
+				layout: {
+					'text-field': ['get', 'title'],
+					'text-font': ['Noto Sans Medium'],
+					'text-size': 11,
+					'text-anchor': 'right',
+					'text-justify': 'auto',
+					'text-ignore-placement': true,
+					'text-variable-anchor': ['bottom', 'right'],
+					'text-variable-anchor-offset': ['bottom', [0, -0.8], 'right', [-0.8, 0]],
+				},
+				paint: {
+					'text-color': '#222222',
+					'text-halo-color': 'rgba(255, 255, 255, 0.8)',
+					'text-halo-width': 1,
+				},
+			}) satisfies SymbolLayerSpecification,
+		[isHoveredIdExpression],
+	);
+
 	return {
 		[MapLayerIdEnum.Clusters]: clustersLayerStyle,
 		[MapLayerIdEnum.ClustersLabel]: clustersLabelLayerStyle,
 		[MapLayerIdEnum.Points]: pointsLayerStyle,
 		[MapLayerIdEnum.PointsTarget]: pointsTargetLayerStyle,
 		[MapLayerIdEnum.PointsImage]: pointsImageLayerStyle,
+		[MapLayerIdEnum.PointsLabel]: pointsLabelLayerStyle,
 	};
 }

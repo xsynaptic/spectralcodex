@@ -16,6 +16,7 @@ const NumericScaleSchema = z.number().int().min(1).max(5);
 export const MapSourceItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
+		[MapDataKeysCompressed.Title]: z.string(),
 		[MapDataKeysCompressed.Category]: z.nativeEnum(LocationCategoryNumericMapping),
 		[MapDataKeysCompressed.Status]: z.nativeEnum(LocationStatusNumericMapping),
 		[MapDataKeysCompressed.Precision]: NumericScaleSchema,
@@ -36,6 +37,7 @@ export const MapSourceItemSchema = z
 	.transform((value) => ({
 		properties: {
 			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
+			[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
 			[MapDataKeys.Category]:
 				R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
 				LocationCategoryEnum.Unknown,

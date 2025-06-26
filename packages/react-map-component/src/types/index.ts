@@ -16,12 +16,6 @@ export type MapSourceItemInput = z.input<typeof MapSourceItemSchema>;
 
 export type MapSourceItem = z.output<typeof MapSourceItemSchema>;
 
-export type MapSourceItemExtended = MapSourceItem & {
-	properties: MapSourceItem['properties'] & {
-		selected?: boolean;
-	};
-};
-
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
 	MapSourceItem['properties']
@@ -35,7 +29,7 @@ export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
 export type MapPopupItem = z.output<typeof MapPopupItemSchema>;
 
 export type MapPopupItemExtended = MapPopupItem & {
-	precision: MapSourceItem['properties']['precision'];
+	precision: number;
 	popupCoordinates: LngLat;
 };
 

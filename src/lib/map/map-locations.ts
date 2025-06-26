@@ -145,6 +145,7 @@ export function getLocationsMapSourceData(featureCollection: MapFeatureCollectio
 
 			return {
 				[MapDataKeysCompressed.Id]: featureId,
+				[MapDataKeysCompressed.Title]: feature.properties.title,
 				[MapDataKeysCompressed.Category]:
 					LocationCategoryNumericMapping[feature.properties.category],
 				[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],

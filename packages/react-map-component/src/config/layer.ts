@@ -4,6 +4,7 @@ export const MapLayerIdEnum = {
 	Points: 'points',
 	PointsTarget: 'points-target',
 	PointsImage: 'points-image',
+	PointsLabel: 'points-label',
 	LineString: 'line-string',
 } as const satisfies Record<string, string>;
 

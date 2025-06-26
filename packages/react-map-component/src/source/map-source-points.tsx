@@ -51,6 +51,7 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 			<Layer key={MapLayerIdEnum.ClustersLabel} {...pointsStyle[MapLayerIdEnum.ClustersLabel]} />
 			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
 			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
+			<Layer key={MapLayerIdEnum.PointsLabel} {...pointsStyle[MapLayerIdEnum.PointsLabel]} />
 			{hasMapIcons ? (
 				<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
 			) : undefined}
