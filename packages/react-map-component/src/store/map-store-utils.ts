@@ -1,4 +1,4 @@
-import { LngLat } from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 
 import type { MapPopupItem, MapPopupItemExtended, MapSourceItem } from '../types';
 
@@ -8,14 +8,17 @@ function getPopupCoordinates(feature: MapSourceItem) {
 		typeof feature.geometry.coordinates[0] === 'number' &&
 		typeof feature.geometry.coordinates[1] === 'number'
 	) {
-		return new LngLat(feature.geometry.coordinates[0], feature.geometry.coordinates[1]);
+		return new maplibregl.LngLat(feature.geometry.coordinates[0], feature.geometry.coordinates[1]);
 	}
 
 	if (Array.isArray(feature.geometry.coordinates[0])) {
-		return new LngLat(feature.geometry.coordinates[0][0], feature.geometry.coordinates[0][1]);
+		return new maplibregl.LngLat(
+			feature.geometry.coordinates[0][0],
+			feature.geometry.coordinates[0][1],
+		);
 	}
 
-	return new LngLat(0, 0);
+	return new maplibregl.LngLat(0, 0);
 }
 
 // Popup data is incomplete; we need to assemble some props from source data
@@ -50,7 +53,7 @@ export function getPopupItem({
 			}
 		: {
 				precision: 1,
-				popupCoordinates: new LngLat(0, 0),
+				popupCoordinates: new maplibregl.LngLat(0, 0),
 			};
 
 	return {
