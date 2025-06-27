@@ -2,7 +2,7 @@ import type { LocationCategory } from './map-locations';
 
 import { LocationCategoryEnum } from './map-locations';
 
-export const mapIcons = {
+export const mapLocationCategoryIcons = {
 	/** Civic */
 	[LocationCategoryEnum.Civic]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Cemetery]: 'material-symbols:question-mark-rounded',
@@ -91,3 +91,10 @@ export const mapIcons = {
 	[LocationCategoryEnum.Other]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Unknown]: 'mingcute:ghost-line',
 } as const satisfies Record<LocationCategory, string>;
+
+export const mapIcons = {
+	star: 'mingcute:star-fill',
+	asterisk: 'mingcute:asterisk-fill',
+	diamond: 'mingcute:diamond-fill',
+	flame: 'mingcute:flame-fill',
+} as const satisfies Record<string, string>;
