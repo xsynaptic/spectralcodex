@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /** Enable dark mode with a custom selector */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
 /* Spacing */
 @theme {

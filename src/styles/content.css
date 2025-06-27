@@ -6,7 +6,7 @@
 		2px 0 1px var(--color-primary-100),
 		-2px 0 1px var(--color-primary-100);
 }
-[data-theme='dark'] .content a {
+[data-mode='dark'] .content a {
 	text-shadow:
 		1px 1px 0 var(--color-primary-800),
 		-1px 1px 0 var(--color-primary-800),
@@ -27,7 +27,7 @@
 .content-image-caption a {
 	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 underline underline-offset-2 transition-colors duration-150 ease-in;
 }
-[data-theme='dark'] .content-image-caption a {
+[data-mode='dark'] .content-image-caption a {
 	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
 }
 
@@ -50,8 +50,8 @@
 .content [data-footnote-ref]::after {
 	@apply text-accent-300 font-light;
 }
-[data-theme='dark'] .content [data-footnote-ref]::before,
-[data-theme='dark'] .content [data-footnote-ref]::after {
+[data-mode='dark'] .content [data-footnote-ref]::before,
+[data-mode='dark'] .content [data-footnote-ref]::after {
 	@apply text-accent-400;
 }
 
