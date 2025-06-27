@@ -6,6 +6,7 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
 export function validateLocations(locations: Array<CollectionEntry<'locations'>>) {
+	const locationSlug = new Set<string>();
 	const locationTitle = new Set<string>();
 	const locationTitleMultilingual = new Set<string>();
 	const locationAddress = new Set<string>();
@@ -13,6 +14,13 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 	const locationCoordinates = new Set<string>();
 
 	locations.some((location) => {
+		const slug = location.data.slug;
+
+		if (locationSlug.has(slug)) {
+			throw new Error(`Duplicate slug found for "${location.id}": ${slug}`);
+		}
+		locationSlug.add(slug);
+
 		const title = location.data.title;
 
 		if (locationTitle.has(title)) {
