@@ -71,6 +71,6 @@ export function useProtomaps({
 				},
 				layers: layers('protomaps', flavor, { lang: languages?.at(0) ?? 'en' }),
 			}) satisfies StyleSpecification,
-		[baseMapTheme, languages],
+		[flavor, isDev, languages, protomapsApiKey, spritesId, spritesUrl],
 	);
 }

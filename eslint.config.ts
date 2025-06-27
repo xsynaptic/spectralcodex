@@ -1,5 +1,6 @@
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import { getConfig } from '@xsynaptic/eslint-config';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default getConfig(
@@ -10,18 +11,15 @@ export default getConfig(
 		/**
 		 * React
 		 */
-		// Note 2024Q4: React Hooks plugin not yet compatible with tseslint and flat config
-		// There are some workarounds but they seem like more trouble than it's worth
-		// Wait for some post 5.0.0 update?
 		{
 			files: ['packages/react-map-component/**/*.ts', 'packages/react-map-component/**/*.tsx'],
 			plugins: {
 				'@tanstack/query': tanstackQueryPlugin,
-				// 'react-hooks': reactHooksPlugin,
+				'react-hooks': reactHooksPlugin,
 			},
 			rules: {
 				...tanstackQueryPlugin.configs.recommended.rules,
-				// ...reactHooksPlugin.configs.recommended,
+				...reactHooksPlugin.configs['recommended-latest'].rules,
 			},
 		},
 		// Those files run in the browser and need the browser globals

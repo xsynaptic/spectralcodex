@@ -224,7 +224,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'icon-color': ['case', isSelectedIdExpression, '#ffff00', '#ff00ff'],
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isSelectedIdExpression],
+		[isSelectedIdExpression, spritesPrefix],
 	);
 
 	// Text labels for individual points on hover
@@ -243,6 +243,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-field': ['get', 'title'],
 					'text-font': ['Noto Sans Medium'],
 					'text-size': 11,
+					'text-ignore-placement': true,
 					'text-justify': 'auto',
 					'text-max-width': 20,
 					'text-variable-anchor': ['bottom', 'right'],
