@@ -77,6 +77,7 @@ export function getLocationsFeatureCollection(
 		? locations
 		: locations.filter((entry) => entry.data.hideLocation !== true);
 
+	// TODO: implement override system for map data
 	return {
 		type: 'FeatureCollection' as const,
 		features: locationsFiltered.flatMap((entry) => {
@@ -142,10 +143,13 @@ export function getLocationsMapSourceData(featureCollection: MapFeatureCollectio
 	return featureCollection.features
 		.map((feature, index) => {
 			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
+			const title = feature.properties.titleMultilingualValue
+				? `${feature.properties.title} (${feature.properties.titleMultilingualValue})`
+				: feature.properties.title;
 
 			return {
 				[MapDataKeysCompressed.Id]: featureId,
-				[MapDataKeysCompressed.Title]: feature.properties.title,
+				[MapDataKeysCompressed.Title]: title,
 				[MapDataKeysCompressed.Category]:
 					LocationCategoryNumericMapping[feature.properties.category],
 				[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
