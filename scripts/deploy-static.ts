@@ -139,14 +139,6 @@ async function transferApp() {
 	}
 }
 
-async function deploy() {
-	await buildProject();
-	if (!imageRemote) await removeOriginalImages();
-	await moveHashedImages();
-	await transferHashedImages();
-	await transferApp();
-}
-
 const step = process.argv[2] ?? 'deploy';
 
 console.log(chalk.blue(`Deploying with arguments "${chalk.underline(step)}"...`));
@@ -172,8 +164,17 @@ switch (step) {
 		await transferApp();
 		break;
 	}
+	case 'transfer': {
+		await transferHashedImages();
+		await transferApp();
+		break;
+	}
 	default: {
-		await deploy();
+		await buildProject();
+		if (!imageRemote) await removeOriginalImages();
+		await moveHashedImages();
+		await transferHashedImages();
+		await transferApp();
 		break;
 	}
 }
