@@ -42,7 +42,9 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 							{metadataItems.map(({ url, title, titleMultilingual }) => (
 								<ListColumnItem>
 									<Link href={url}>{title}</Link>
-									{titleMultilingual ? <Multilingual content={titleMultilingual} /> : undefined}
+									{titleMultilingual ? (
+										<Multilingual content={titleMultilingual} parenthesis={true} />
+									) : undefined}
 								</ListColumnItem>
 							))}
 						</ListColumn>
