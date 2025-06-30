@@ -15,7 +15,12 @@ export async function getContentStats() {
 
 	return {
 		ephemera: formatNumber({ number: contentMetadataGroups.ephemera?.length ?? 0 }),
-		locations: formatNumber({ number: contentMetadataGroups.locations?.length ?? 0 }),
+		locations: {
+			itemCount: formatNumber({ number: contentMetadataGroups.locations?.length ?? 0 }),
+			withImages: formatNumber({
+				number: contentMetadataGroups.locations?.filter((item) => item.imageId).length ?? 0,
+			}),
+		},
 		pages: formatNumber({ number: contentMetadataGroups.pages?.length ?? 0 }),
 		posts: {
 			itemCount: formatNumber({ number: contentMetadataGroups.posts?.length ?? 0 }),
