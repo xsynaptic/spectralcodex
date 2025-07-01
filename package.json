@@ -35,7 +35,7 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.10.1",
+		"astro": "^5.10.2",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0"
 	},
@@ -46,7 +46,7 @@
 		"@astrojs/react": "^4.3.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.4.1",
-		"@iconify/json": "^2.2.353",
+		"@iconify/json": "^2.2.354",
 		"@iconify/tools": "^4.1.2",
 		"@iconify/utils": "^2.3.0",
 		"@sindresorhus/slugify": "^2.2.1",
@@ -78,7 +78,7 @@
 		"eslint-plugin-react-hooks": "^5.2.0",
 		"exiftool-vendored": "^30.3.0",
 		"geojson": "^0.5.0",
-		"globals": "^16.2.0",
+		"globals": "^16.3.0",
 		"keyv": "^5.3.4",
 		"ky": "^1.8.1",
 		"maplibre-gl": "^5.6.0",
