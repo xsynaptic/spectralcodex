@@ -28,8 +28,8 @@ export const getStaticPaths = (async () => {
 				featureCollection: getLocationsFeatureCollection([entry]),
 				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 				targetId: entry.id, // Center on the main location
-				boundsBuffer: 2,
-				boundsBufferMax: 25,
+				boundsBuffer: 2, // 2km fixed buffer
+				limitsBuffer: 25, // 25km fixed limit
 			}),
 			metadataItems: R.pipe(
 				entry.data.posts ?? [],

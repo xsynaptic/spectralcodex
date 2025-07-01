@@ -22,8 +22,6 @@ export const getStaticPaths = (async () => {
 			mapData: getMapData({
 				featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
 				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-				// TODO: bounds buffer should probably be proportionate to the number of items
-				boundsBufferMax: 50,
 			}),
 		},
 	}));

@@ -29,7 +29,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const mapData = getMapData({
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-			boundsBufferMax: 300,
 		});
 
 		results.push(

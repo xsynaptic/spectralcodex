@@ -1,6 +1,7 @@
 import type { MapComponentProps } from '@spectralcodex/react-map-component';
+import type { BBox } from 'geojson';
 
-import { bbox, buffer, center as getCenter, truncate } from '@turf/turf';
+import { bbox, buffer, distance, truncate, center as turfCenter } from '@turf/turf';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
 import type { MapComponentData, MapFeatureCollection } from '#lib/map/map-types.ts';
@@ -15,14 +16,12 @@ import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
 interface MapDataBoundsProps {
-	boundsBuffer?: number | undefined;
-	boundsBufferMax?: number | undefined;
 	featureCollection: MapFeatureCollection | undefined;
+	boundsBuffer?: number | undefined;
+	boundsBufferPercentage?: number | undefined;
+	limitsBuffer?: number | undefined;
+	limitsBufferPercentage?: number | undefined;
 	targetId?: string | undefined; // Optional: use for centering on a specific point
-}
-
-interface MapDataProps extends MapDataBoundsProps {
-	mapApiBaseUrl?: string | undefined;
 }
 
 const buildProps = {
@@ -30,48 +29,91 @@ const buildProps = {
 	isDev: import.meta.env.DEV,
 };
 
-// Calculate map bounds based on geodata and some parameters; should not include outliers
-function getMapBounds({
-	featureCollection,
-	targetId,
-	boundsBuffer,
-	boundsBufferMax,
-}: MapDataBoundsProps) {
-	if (!featureCollection) return;
+const BOUNDS_BUFFER_MIN = 0.1;
+const LIMITS_BUFFER_MIN = 10;
 
-	const featureCollectionFiltered = {
-		...featureCollection,
-		features: featureCollection.features.filter((item) => item.properties.outlier !== true),
+// Calculate map bounds based on geodata and some parameters; should not include outliers
+// By default there is a 10% buffer added to the bounding box
+// The overall limit of the map is set to 100% of the maximum span
+// But these values can be overridden on a case-by-case basis
+function getMapBounds({
+	featureCollection: featureCollectionRaw,
+	boundsBuffer,
+	boundsBufferPercentage = 10,
+	limitsBuffer,
+	limitsBufferPercentage = 100,
+	targetId,
+}: MapDataBoundsProps) {
+	if (!featureCollectionRaw) return;
+
+	// Filter the feature collection for outliers
+	// This can be set in frontmatter to avoid skewing calculations
+	const featureCollection = {
+		...featureCollectionRaw,
+		features: featureCollectionRaw.features.filter((item) => item.properties.outlier !== true),
 	} satisfies MapFeatureCollection;
 
-	if (featureCollectionFiltered.features.length === 0) return;
+	if (featureCollection.features.length === 0) return;
 
 	const targetFeature = targetId
 		? featureCollection.features.find(({ id }) => id === targetId)
 		: undefined;
 
-	const center = truncate(
-		getCenter(targetFeature ? targetFeature.geometry : featureCollectionFiltered),
-	);
+	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
 
-	const boundsBufferCollection = buffer(featureCollectionFiltered, boundsBuffer, {
-		units: 'kilometers',
-	});
-	const boundsBufferMaxCollection = buffer(featureCollectionFiltered, boundsBufferMax, {
-		units: 'kilometers',
-	});
+	let bounds: BBox | undefined;
+	let maxBounds: BBox | undefined;
+	let boundsBufferCollection: ReturnType<typeof buffer> | undefined;
+	let maxBoundsBufferCollection: ReturnType<typeof buffer> | undefined;
 
-	if (boundsBufferCollection && boundsBufferMaxCollection) {
-		const bounds = bbox(boundsBufferCollection);
-		const maxBounds = bbox(boundsBufferMaxCollection);
+	if (boundsBuffer && limitsBuffer) {
+		boundsBufferCollection = buffer(featureCollection, boundsBuffer);
+		maxBoundsBufferCollection = buffer(featureCollection, limitsBuffer);
+	} else {
+		// Note: single points will have a fixed buffer
+		if (featureCollection.features.length === 1) {
+			boundsBufferCollection = buffer(
+				featureCollection,
+				Math.max(BOUNDS_BUFFER_MIN, BOUNDS_BUFFER_MIN * (boundsBufferPercentage / 100)),
+			);
+			maxBoundsBufferCollection = buffer(
+				featureCollection,
+				Math.max(LIMITS_BUFFER_MIN, LIMITS_BUFFER_MIN * (limitsBufferPercentage / 100)),
+			);
+		} else {
+			const naturalBounds = bbox(featureCollection);
+			const spanX = distance(
+				[naturalBounds[0], naturalBounds[1]],
+				[naturalBounds[2], naturalBounds[1]],
+			);
+			const spanY = distance(
+				[naturalBounds[0], naturalBounds[1]],
+				[naturalBounds[0], naturalBounds[3]],
+			);
+			const spanMax = Math.max(spanX, spanY);
 
-		if (isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
-			return {
-				center: getTruncatedLngLat(center.geometry.coordinates),
-				bounds,
-				maxBounds,
-			};
+			boundsBufferCollection = buffer(
+				featureCollection,
+				Math.max(BOUNDS_BUFFER_MIN, spanMax * (boundsBufferPercentage / 100)),
+			);
+			maxBoundsBufferCollection = buffer(
+				featureCollection,
+				Math.max(LIMITS_BUFFER_MIN, spanMax * (limitsBufferPercentage / 100)),
+			);
 		}
+	}
+
+	if (boundsBufferCollection && maxBoundsBufferCollection) {
+		bounds = bbox(boundsBufferCollection);
+		maxBounds = bbox(maxBoundsBufferCollection);
+	}
+
+	if (bounds && maxBounds && isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
+		return {
+			center: getTruncatedLngLat(center.geometry.coordinates),
+			bounds,
+			maxBounds,
+		};
 	}
 	return;
 }
@@ -80,16 +122,27 @@ function getMapBounds({
 export function getMapData({
 	featureCollection,
 	targetId,
-	boundsBuffer = 5,
-	boundsBufferMax = 300,
+	boundsBuffer,
+	boundsBufferPercentage,
+	limitsBuffer,
+	limitsBufferPercentage,
 	mapApiBaseUrl,
 	...restProps
-}: MapDataProps &
+}: MapDataBoundsProps &
 	Omit<
 		MapComponentProps,
 		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
-	>) {
-	const mapBounds = getMapBounds({ featureCollection, targetId, boundsBuffer, boundsBufferMax });
+	> & {
+		mapApiBaseUrl?: string | undefined;
+	}) {
+	const mapBounds = getMapBounds({
+		featureCollection,
+		boundsBuffer,
+		boundsBufferPercentage,
+		limitsBuffer,
+		limitsBufferPercentage,
+		targetId,
+	});
 
 	if (featureCollection && mapBounds) {
 		if (mapApiBaseUrl) {
@@ -106,7 +159,7 @@ export function getMapData({
 				...mapBounds,
 				...buildProps,
 				...restProps,
-			};
+			} satisfies MapComponentData;
 		} else {
 			const sourceData = getLocationsMapSourceData(featureCollection);
 			const popupData = getLocationsMapPopupData(featureCollection);

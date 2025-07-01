@@ -58,8 +58,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const mapData = getMapData({
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-			boundsBuffer: regionsOption.mapBoundsBuffer,
-			boundsBufferMax: regionsOption.mapBoundsBufferMax,
 			...(showChineseInterface
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
 				: {}),
