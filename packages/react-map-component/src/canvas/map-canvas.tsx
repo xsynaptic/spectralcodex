@@ -12,6 +12,7 @@ import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
 import { MapPopup } from '../popup/map-popup';
+import { MapDebugLayer } from '../source/map-source-debug';
 import { MapLineStringLayer } from '../source/map-source-lines';
 import { MapPointLayer } from '../source/map-source-points';
 import {
@@ -27,6 +28,8 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsImage,
 ] as const;
+
+const IS_DEBUG = false as boolean;
 
 export const MapCanvas = ({
 	apiSourceUrl,
@@ -81,7 +84,7 @@ export const MapCanvas = ({
 			hash={hash}
 			interactive={canvasInteractive}
 			interactiveLayerIds={[...interactiveLayerIds]}
-			maxZoom={18}
+			maxZoom={19}
 			minZoom={4}
 			fadeDuration={0}
 			renderWorldCopies={false}
@@ -93,6 +96,7 @@ export const MapCanvas = ({
 			<MapControls />
 			<MapPointLayer hasMapIcons={spritesId !== undefined && spritesUrl !== undefined} />
 			<MapLineStringLayer />
+			{IS_DEBUG && bounds ? <MapDebugLayer bounds={bounds} /> : undefined}
 			<MapControlsFilterMenu />
 			<MapPopup />
 			<MapCanvasLoading loading={canvasLoading || sourceDataQueryLoading} />
