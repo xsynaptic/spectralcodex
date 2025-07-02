@@ -1,7 +1,9 @@
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import { getConfig } from '@xsynaptic/eslint-config';
+import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default getConfig(
 	[
@@ -36,7 +38,33 @@ export default getConfig(
 				'unicorn/prefer-global-this': 'off',
 			},
 		},
+		/**
+		 * Astro support; with some help from...
+		 * @reference - https://github.com/Princesseuh/erika.florist/blob/main/eslint.config.js
+		 */
+		...astroPlugin.configs['flat/recommended'],
+		...astroPlugin.configs['jsx-a11y-strict'],
+		{
+			files: ['**/*.astro'],
+			// Remove some safety rules around `any` for various reasons
+			// Astro.props isn't typed correctly in some contexts, so a bunch of things ends up being `any`
+			rules: {
+				'@typescript-eslint/no-unsafe-argument': 'off',
+				'@typescript-eslint/no-unsafe-assignment': 'off',
+				'@typescript-eslint/no-unsafe-call': 'off',
+				'@typescript-eslint/no-unsafe-member-access': 'off',
+				'@typescript-eslint/no-unsafe-return': 'off',
+			},
+		},
+		// Disable typed rules for scripts inside Astro files
+		{
+			files: ['**/*.astro/*.ts', '*.astro/*.ts'],
+			...tseslint.configs.disableTypeChecked,
+		},
 	],
-	// TODO: Astro TypeScript support became buggy around March 2025; disabling this until a fix is found
-	{ customGlobals: { mode: 'readonly' }, withAstro: false },
+	{
+		customGlobals: { mode: 'readonly' },
+		// Note: Astro's TypeScript linting support is incompatible with the newer `projectService` option
+		parserOptions: { project: './tsconfig.json' },
+	},
 );
