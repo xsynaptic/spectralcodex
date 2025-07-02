@@ -1,6 +1,4 @@
 ---
-import * as R from 'remeda';
-
 import ContentSection from '#components/content/content-section.astro';
 import ListRow from '#components/list/list-row.astro';
 import Link from '#components/parts/link.astro';
@@ -20,7 +18,7 @@ const { themeIds, ...props } = Astro.props;
 
 const getThemesByIds = await getThemesByIdsFunction();
 
-const themes = themeIds ? R.pipe(themeIds, getThemesByIds, R.sort(sortByContentCount)) : undefined;
+const themes = themeIds ? getThemesByIds(themeIds).sort(sortByContentCount) : undefined;
 
 const t = getTranslations();
 ---
