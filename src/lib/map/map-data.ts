@@ -64,21 +64,23 @@ function getMapBounds({
 	let bounds: BBox | undefined;
 	let maxBounds: BBox | undefined;
 	let boundsBufferCollection: ReturnType<typeof buffer> | undefined;
-	let maxBoundsBufferCollection: ReturnType<typeof buffer> | undefined;
+	let limitsBufferCollection: ReturnType<typeof buffer> | undefined;
 
 	if (boundsBuffer && limitsBuffer) {
 		boundsBufferCollection = buffer(featureCollection, boundsBuffer);
-		maxBoundsBufferCollection = buffer(featureCollection, limitsBuffer);
+		limitsBufferCollection = buffer(featureCollection, limitsBuffer);
 	} else {
 		// Note: single points will have a fixed buffer
 		if (featureCollection.features.length === 1) {
 			boundsBufferCollection = buffer(
 				featureCollection,
-				Math.max(BOUNDS_BUFFER_MIN, BOUNDS_BUFFER_MIN * (boundsBufferPercentage / 100)),
+				boundsBuffer ??
+					Math.max(BOUNDS_BUFFER_MIN, BOUNDS_BUFFER_MIN * (boundsBufferPercentage / 100)),
 			);
-			maxBoundsBufferCollection = buffer(
+			limitsBufferCollection = buffer(
 				featureCollection,
-				Math.max(LIMITS_BUFFER_MIN, LIMITS_BUFFER_MIN * (limitsBufferPercentage / 100)),
+				limitsBuffer ??
+					Math.max(LIMITS_BUFFER_MIN, LIMITS_BUFFER_MIN * (limitsBufferPercentage / 100)),
 			);
 		} else {
 			const naturalBounds = bbox(featureCollection);
@@ -94,18 +96,18 @@ function getMapBounds({
 
 			boundsBufferCollection = buffer(
 				featureCollection,
-				Math.max(BOUNDS_BUFFER_MIN, spanMax * (boundsBufferPercentage / 100)),
+				boundsBuffer ?? Math.max(BOUNDS_BUFFER_MIN, spanMax * (boundsBufferPercentage / 100)),
 			);
-			maxBoundsBufferCollection = buffer(
+			limitsBufferCollection = buffer(
 				featureCollection,
-				Math.max(LIMITS_BUFFER_MIN, spanMax * (limitsBufferPercentage / 100)),
+				limitsBuffer ?? Math.max(LIMITS_BUFFER_MIN, spanMax * (limitsBufferPercentage / 100)),
 			);
 		}
 	}
 
-	if (boundsBufferCollection && maxBoundsBufferCollection) {
+	if (boundsBufferCollection && limitsBufferCollection) {
 		bounds = bbox(boundsBufferCollection);
-		maxBounds = bbox(maxBoundsBufferCollection);
+		maxBounds = bbox(limitsBufferCollection);
 	}
 
 	if (bounds && maxBounds && isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
