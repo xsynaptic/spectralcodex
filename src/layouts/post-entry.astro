@@ -17,11 +17,11 @@ import ContentSectionThemes from '#components/content/content-section-themes.ast
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
+import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import Multilingual from '#components/parts/multilingual.astro';
 
 interface Props {
 	entry: CollectionEntry<'posts'>;
