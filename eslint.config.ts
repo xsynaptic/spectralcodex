@@ -46,6 +46,13 @@ export default getConfig(
 		...astroPlugin.configs['jsx-a11y-strict'],
 		{
 			files: ['**/*.astro'],
+			languageOptions: {
+				parserOptions: {
+					parser: tseslint.parser,
+					extraFileExtensions: ['.astro'],
+				},
+			},
+
 			// Remove some safety rules around `any` for various reasons
 			// Astro.props isn't typed correctly in some contexts, so a bunch of things ends up being `any`
 			rules: {
@@ -65,6 +72,8 @@ export default getConfig(
 	{
 		customGlobals: { mode: 'readonly' },
 		// Note: Astro's TypeScript linting support is incompatible with the newer `projectService` option
-		parserOptions: { project: './tsconfig.json' },
+		parserOptions: {
+			project: './tsconfig.json',
+		},
 	},
 );
