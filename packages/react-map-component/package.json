@@ -5,7 +5,7 @@
 	"exports": "./src/index.tsx",
 	"private": true,
 	"devDependencies": {
-		"@protomaps/basemaps": "^5.4.1",
+		"@protomaps/basemaps": "^5.5.0",
 		"@spectralcodex/map-types": "workspace:*",
 		"@tanstack/query-sync-storage-persister": "^5.81.5",
 		"@tanstack/react-query": "^5.81.5",
@@ -13,7 +13,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
-		"astro": "^5.10.2",
+		"astro": "^5.11.0",
 		"geojson": "^0.5.0",
 		"idb-keyval": "^6.2.2",
 		"maplibre-gl": "^5.6.1",
@@ -21,8 +21,8 @@
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0",
 		"react-map-gl": "^8.0.4",
-		"remeda": "^2.23.2",
-		"zod": "^3.25.67",
+		"remeda": "^2.24.0",
+		"zod": "^3.25.73",
 		"zustand": "^5.0.6"
 	}
 }
