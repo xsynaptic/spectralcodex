@@ -4,6 +4,9 @@
 // Path to content from the root; defaults *e.g.* `./packages/content-demo/collections`
 export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 
+// Path to content data from the root; defaults *e.g.* `./packages/content-demo/data`
+export const CONTENT_DATA_PATH = './packages/content/data';
+
 // Path to image assets from the root; *e.g.* `./packages/content-demo/media`
 export const CONTENT_MEDIA_PATH = './packages/content/media';
 
