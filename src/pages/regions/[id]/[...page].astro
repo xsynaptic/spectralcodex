@@ -28,15 +28,19 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const results = [];
 
 	for (const entry of regions) {
-		// Note: this is temporary code to limit map display to Taiwan and subregions
-		// TODO: whitelist additional regions as content is populated
 		const ancestors = getRegionAncestors(entry);
+
+		// Note: this is temporary code to limit map display specified regions
+		const displayRegionIds = new Set(['taiwan', 'thailand']);
+		const chineseRegionIds = new Set(['china', 'hong-kong', 'taiwan']);
+
 		const showRegionMap =
-			['taiwan'].includes(entry.id) ||
-			ancestors.some((ancestor) => ['taiwan'].includes(ancestor.id));
+			displayRegionIds.has(entry.id) ||
+			ancestors.some((ancestor) => displayRegionIds.has(ancestor.id));
+
 		const showChineseInterface =
-			['china', 'hong-kong', 'taiwan'].includes(entry.id) ||
-			ancestors.some((ancestor) => ['china', 'hong-kong', 'taiwan'].includes(ancestor.id));
+			chineseRegionIds.has(entry.id) ||
+			ancestors.some((ancestor) => chineseRegionIds.has(ancestor.id));
 
 		const entryLocations = entry.data.locations ? getLocationsByIds(entry.data.locations) : [];
 
