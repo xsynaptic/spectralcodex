@@ -9,7 +9,7 @@
 	"devDependencies": {
 		"astro": "^5.11.0",
 		"astro-integration-kit": "^0.18.0",
-		"remeda": "^2.24.0",
+		"remeda": "^2.25.0",
 		"sirv": "^3.0.1"
 	}
 }

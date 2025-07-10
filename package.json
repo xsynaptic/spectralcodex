@@ -91,7 +91,7 @@
 		"prettier-plugin-tailwindcss": "^0.6.13",
 		"react-compiler-runtime": "19.1.0-rc.2",
 		"rehype-wrap-cjk": "^0.2.8",
-		"remeda": "^2.24.0",
+		"remeda": "^2.25.0",
 		"sharp": "^0.34.2",
 		"tailwindcss": "^4.1.11",
 		"tsx": "^4.20.3",
@@ -102,7 +102,7 @@
 		"vite": "6.3.4",
 		"vitest": "^3.2.4",
 		"yaml": "^2.8.0",
-		"zx": "^8.6.1"
+		"zx": "^8.6.2"
 	},
 	"packageManager": "pnpm@10.12.3+sha512.467df2c586056165580ad6dfb54ceaad94c5a30f80893ebdec5a44c5aa73c205ae4a5bb9d5ed6bb84ea7c249ece786642bbb49d06a307df218d03da41c317417"
 }
