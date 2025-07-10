@@ -39,7 +39,8 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 				type: 'circle',
 				filter: ['has', 'point_count'],
 				layout: {
-					'circle-sort-key': 0,
+					// Sort clusters by point count, descending
+					'circle-sort-key': ['-', ['get', 'point_count']],
 				},
 				paint: {
 					'circle-color': [
@@ -98,6 +99,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-font': ['Noto Sans Medium'],
 					'text-size': ['case', isHoveredClusterIdExpression, 12, 10],
 					'text-allow-overlap': true,
+					'text-ignore-placement': true,
 				},
 				paint: {
 					'text-color': mapClusterStyle.countTextColor,
