@@ -39,3 +39,12 @@ export const ImageSetSchema = z.object({
 });
 
 export type ImageSet = z.infer<typeof ImageSetSchema>;
+
+export const ImageThumbnailSchema = z.object({
+	src: z.string(),
+	srcSet: z.string(),
+	height: z.string(),
+	width: z.string(),
+});
+
+export type ImageThumbnail = z.infer<typeof ImageThumbnailSchema>;

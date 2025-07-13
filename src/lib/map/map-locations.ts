@@ -99,6 +99,12 @@ export function getLocationsFeatureCollection(
 					? entry.data.wikipediaUrl.replace('https://', '')
 					: undefined;
 
+				// Image thumbnails can be nulled by sub-locations
+				const image =
+					geometry.imageThumbnail === undefined
+						? entry.data.imageThumbnail
+						: geometry.imageThumbnail;
+
 				return {
 					type: 'Feature' as const,
 					id,
@@ -124,7 +130,7 @@ export function getLocationsFeatureCollection(
 						safety: entry.data.safety,
 						googleMapsUrl,
 						wikipediaUrl,
-						image: entry.data.imageThumbnail,
+						...(image === null ? {} : { image }),
 					},
 					geometry: {
 						type: GeometryTypeEnum.Point,

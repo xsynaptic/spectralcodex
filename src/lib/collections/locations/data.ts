@@ -1,4 +1,5 @@
 import type { Units } from '@turf/helpers';
+import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import {
@@ -14,6 +15,8 @@ import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
 import { GeometryTypeEnum } from 'packages/map-types/src';
+
+import type { ImageThumbnail } from '#lib/schemas/image.ts';
 
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
@@ -142,6 +145,14 @@ async function generateLocationPostDataFunction() {
 	};
 }
 
+const imageTransformOptions = {
+	width: 450,
+	height: 300,
+	widths: [450, 600, 900],
+	format: IMAGE_FORMAT,
+	quality: IMAGE_QUALITY,
+} satisfies Omit<UnresolvedImageTransform, 'src'>;
+
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
@@ -159,11 +170,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 						if (imageEntry) {
 							const imageObject = await getImage({
 								src: imageEntry.data.src,
-								width: 450,
-								height: 300,
-								widths: [450, 600, 900],
-								format: IMAGE_FORMAT,
-								quality: IMAGE_QUALITY,
+								...imageTransformOptions,
 							});
 
 							// Directly add some basic image data to the location entry
@@ -172,10 +179,51 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 								srcSet: imageObject.srcSet.attribute,
 								height: String(imageObject.attributes.height),
 								width: String(imageObject.attributes.width),
-							} satisfies CollectionEntry<'locations'>['data']['imageThumbnail'];
+							} satisfies ImageThumbnail;
 						}
 					}
-					return;
+				}),
+			),
+	);
+
+	// Add image data to sub-locations; same as above
+	await Promise.all(
+		locations
+			.filter((entry) => Array.isArray(entry.data.geometry))
+			.map((entry) =>
+				limit(async () => {
+					if (Array.isArray(entry.data.geometry)) {
+						for (const [index, geometry] of entry.data.geometry.entries()) {
+							if (!entry.data.geometry[index]) continue;
+
+							// Null overrides the main `imageFeatured` and shows no thumbnail
+							// This is used in cases where there is no image for the sub-location
+							if (geometry.imageFeatured === null) {
+								// eslint-disable-next-line unicorn/no-null
+								entry.data.geometry[index].imageThumbnail = null;
+								continue;
+							}
+
+							if (geometry.imageFeatured) {
+								const imageEntry = getImageById(geometry.imageFeatured);
+
+								if (imageEntry) {
+									const imageObject = await getImage({
+										src: imageEntry.data.src,
+										...imageTransformOptions,
+									});
+
+									// Directly add some basic image data to the geometry entry
+									entry.data.geometry[index].imageThumbnail = {
+										src: imageObject.src,
+										srcSet: imageObject.srcSet.attribute,
+										height: String(imageObject.attributes.height),
+										width: String(imageObject.attributes.width),
+									} satisfies ImageThumbnail;
+								}
+							}
+						}
+					}
 				}),
 			),
 	);

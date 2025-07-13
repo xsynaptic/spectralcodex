@@ -5,6 +5,7 @@ import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-typ
 import { z } from 'astro:content';
 
 import { NumericScaleSchema } from '#lib/schemas/content.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 
 // This is used to form map API endpoint URLs
 export const MapApiDataEnum = {
@@ -28,14 +29,7 @@ export const MapFeaturePropertiesSchema = z.object({
 	outlier: z.boolean().optional(),
 	googleMapsUrl: z.string().url().optional(),
 	wikipediaUrl: z.string().url().optional(),
-	image: z
-		.object({
-			src: z.string(),
-			srcSet: z.string(),
-			height: z.string(),
-			width: z.string(),
-		})
-		.optional(),
+	image: ImageThumbnailSchema.optional(),
 });
 
 type MapFeatureProperties = z.output<typeof MapFeaturePropertiesSchema>;

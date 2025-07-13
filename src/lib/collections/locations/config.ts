@@ -12,6 +12,7 @@ import {
 	TitleSchema,
 } from '#lib/schemas/content.ts';
 import { GeometryLinesSchema, GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -72,14 +73,7 @@ export const locations = defineCollection({
 			/** Map properties, for internal use only! */
 			uuid: z.string().optional(),
 			descriptionHtml: z.string().optional(),
-			imageThumbnail: z
-				.object({
-					src: z.string(),
-					srcSet: z.string(),
-					height: z.string(),
-					width: z.string(),
-				})
-				.optional(),
+			imageThumbnail: ImageThumbnailSchema.optional(),
 			url: z.string().url().optional(),
 			googleMapsUrl: z.string().url().optional(),
 			wikipediaUrl: z.string().url().optional(),
