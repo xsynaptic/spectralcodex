@@ -145,7 +145,8 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				const matches = [...entry.body.matchAll(/<Link id="([^"]+)"/g)];
 
 				for (const [, backlinkId] of matches) {
-					if (!backlinkId) continue;
+					// Skip self-links and invalid backlinks
+					if (!backlinkId || backlinkId === entry.id) continue;
 
 					const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
 
