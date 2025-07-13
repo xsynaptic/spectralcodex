@@ -7,9 +7,9 @@
 	"devDependencies": {
 		"@protomaps/basemaps": "^5.5.0",
 		"@spectralcodex/map-types": "workspace:*",
-		"@tanstack/query-sync-storage-persister": "^5.82.0",
-		"@tanstack/react-query": "^5.82.0",
-		"@tanstack/react-query-persist-client": "^5.82.0",
+		"@tanstack/query-sync-storage-persister": "^5.83.0",
+		"@tanstack/react-query": "^5.83.0",
+		"@tanstack/react-query-persist-client": "^5.83.0",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
