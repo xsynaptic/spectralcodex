@@ -91,4 +91,6 @@ export const MapDataGeometryTypeNumericMapping = {
 	[GeometryTypeEnum.Point]: 0,
 	[GeometryTypeEnum.MultiPoint]: 1,
 	[GeometryTypeEnum.LineString]: 2,
+	[GeometryTypeEnum.Polygon]: 3,
+	[GeometryTypeEnum.MultiPolygon]: 4,
 } as const;

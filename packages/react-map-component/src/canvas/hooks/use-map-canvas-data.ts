@@ -62,5 +62,6 @@ export function useMapCanvasData() {
 				),
 			[filteredData],
 		),
+		// TODO: add polygon and multi-polygon collections
 	};
 }

@@ -48,6 +48,7 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 				),
 			};
 		}
+		// TODO: add polygon and multi-polygon collections
 		default: {
 			geometryType satisfies never;
 			return;
