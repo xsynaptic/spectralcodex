@@ -1,7 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { z } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
+
+import { loadYamlData } from '#lib/utils/yaml.ts';
 
 interface CollectionData {
 	regions: Array<CollectionEntry<'regions'>>;
@@ -10,12 +13,31 @@ interface CollectionData {
 
 let collection: Promise<CollectionData> | undefined;
 
+// Cache for loaded links data
+let regionsGeodataCache: Record<string, string> | undefined;
+
+async function getRegionsGeodata() {
+	if (!regionsGeodataCache) {
+		try {
+			const data = await loadYamlData('geodata.yaml');
+
+			regionsGeodataCache = await z.record(z.string()).parseAsync(data);
+		} catch (error) {
+			console.error('Failed to load regions geodata:', error);
+			regionsGeodataCache = undefined;
+		}
+	}
+	return regionsGeodataCache;
+}
+
 async function generateCollection() {
 	const startTime = performance.now();
 
 	const locations = await getCollection('locations');
 	const posts = await getCollection('posts');
 	const regions = await getCollection('regions');
+
+	const regionsGeodata = await getRegionsGeodata();
 
 	// Calculate ancestors
 	for (const entry of regions) {
@@ -111,8 +133,14 @@ async function generateCollection() {
 			(item): item is string => !!item,
 		);
 		entry.data.postCount = entry.data.posts.length;
+
+		// Optionally assign geodata status to regions entries
+		if (regionsGeodata) {
+			entry.data.hasGeodata = !!regionsGeodata[entry.id];
+		}
 	}
 
+	// Assign all data to the map and collection
 	const regionsMap = new Map<string, CollectionEntry<'regions'>>();
 
 	for (const entry of regions) {

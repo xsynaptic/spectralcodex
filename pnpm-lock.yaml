@@ -39,6 +39,9 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.4.1
         version: 3.4.1
+      '@duckdb/node-api':
+        specifier: 1.3.2-alpha.24
+        version: 1.3.2-alpha.24
       '@iconify/json':
         specifier: ^2.2.357
         version: 2.2.357
@@ -598,6 +601,37 @@ packages:
 
   '@capsizecss/unpack@2.4.0':
     resolution: {integrity: sha512-GrSU71meACqcmIUxPYOJvGKF0yryjN/L1aCuE9DViCTJI7bfkjgYDPD1zbNDcINJwSSP6UaBZY9GAbYDO7re0Q==}
+
+  '@duckdb/node-api@1.3.2-alpha.24':
+    resolution: {integrity: sha512-m1gXrG5HyzfJA1uFtw2jwvcfm2sG6vY6uQrE2L9bQJPfHRbAuxse+mkZXxmm7SVi15bNw5RXHzuHOJyT6uB8dQ==}
+
+  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.24':
+    resolution: {integrity: sha512-0znVE4wQHgMy6PlEyC3cxfJATEhdi24CEtu8e/5FKgBrzTjpzLQ1BM9qSsvdVaF2IAQxk1PNpuj60k9iMEKm4w==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.24':
+    resolution: {integrity: sha512-RsqAKNYT2UA2tVirplzNO6+r20PNCf8CEK0+FSt8ULaTqtCP9TAzMI6vcP0+3lUWYHCH59XOS7XgDbNHL9zQxA==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.24':
+    resolution: {integrity: sha512-v63F51a6M5NYDD+08uwP+3sfZe9wvlV30OxPi95GOudn5cDONStWrQ6OSMEYTL6F08s1iFgnUy+/W+w8ANTgNQ==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.24':
+    resolution: {integrity: sha512-waHoC4iMT1seCdu1zRGpBnwUG7uPhasVF7EdVlgKUKOK0h0rHAbuisTwFCs4cx6lbEM/2zd8Zn4UzZI8YoOWbg==}
+    cpu: [x64]
+    os: [linux]
+
+  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.24':
+    resolution: {integrity: sha512-MTGOIFC1T+5VR8bt6L7tfB/n3lzCHeMSbdo0RrsEux1lrdCdU4yDb4+VAC38iXyPrnB8/PwAbSLZSP047vymNg==}
+    cpu: [x64]
+    os: [win32]
+
+  '@duckdb/node-bindings@1.3.2-alpha.24':
+    resolution: {integrity: sha512-JUnbqADokfDwIKYnhb8WygZLQdpqoxkHyux00qzeERfPEnekuPGirq7CitF4SuSqZAMScNmC+r/pOviDtEKNGA==}
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -6428,6 +6462,33 @@ snapshots:
       fontkit: 2.0.4
     transitivePeerDependencies:
       - encoding
+
+  '@duckdb/node-api@1.3.2-alpha.24':
+    dependencies:
+      '@duckdb/node-bindings': 1.3.2-alpha.24
+
+  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.24':
+    optional: true
+
+  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.24':
+    optional: true
+
+  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.24':
+    optional: true
+
+  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.24':
+    optional: true
+
+  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.24':
+    optional: true
+
+  '@duckdb/node-bindings@1.3.2-alpha.24':
+    optionalDependencies:
+      '@duckdb/node-bindings-darwin-arm64': 1.3.2-alpha.24
+      '@duckdb/node-bindings-darwin-x64': 1.3.2-alpha.24
+      '@duckdb/node-bindings-linux-arm64': 1.3.2-alpha.24
+      '@duckdb/node-bindings-linux-x64': 1.3.2-alpha.24
+      '@duckdb/node-bindings-win32-x64': 1.3.2-alpha.24
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:

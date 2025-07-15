@@ -31,6 +31,7 @@ export const regions = defineCollection({
 			posts: z.string().array().optional(),
 			postCount: z.number().int().optional(),
 			hideSearch: z.boolean().optional(),
+			hasGeodata: z.boolean().optional(),
 		})
 		.strict(),
 });
