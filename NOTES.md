@@ -39,14 +39,13 @@ Astro in hybrid most still requires a build step to generate the `client` folder
 
 Experimental: This site uses custom map icons. To regenerate icons run `pnpm export-map-icons`. This requires [spreet](https://github.com/flother/spreet) to be installed separately (and globally).
 
-## Todo
+# Things To Do
 
 - new content collection for commercial establishments (restaurants, cafes, etc.)... gastronomy?
-- [remark-oembed](https://github.com/sergioramos/remark-oembed), [mdx-embed](https://mdx-embed.netlify.app/), or [astro embed](https://astro-embed.netlify.app/)
 - multiple featured images for post-like content
-- carousel buttons (or some other hint to indicate that some images can be swiped)
+- carousel buttons (or some other hint to indicate that some images can be swiped); this feature is only partly complete
 - better pagination (_e.g._ [here](https://github.com/philnash/astro-pagination))
-- sources styling
+- better formatting for sources; currently the mix of languages leads to some awkward output
 
 ### Maps
 
@@ -54,9 +53,9 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm exp
 - protomaps self-hosted setup
 - option to convert GeoJSON to something Google Maps (or Google My Maps) can consume, ultimately so anyone can import a map with at least some of the relevant info
 - for locations with a distance query draw a circle with the radius of the query and shade everything outside of it
-- [Overture Maps](https://docs.overturemaps.org/) data, especially boundaries
+- [Overture Maps](https://docs.overturemaps.org/) data, especially boundaries, should be displayed per region
 - persistent storage for stateful data (per map)
-- multiple points per location entry
+- multiple points per location entry (in progress 2025Q2)
 - different geography support (in progress 2024Q4)
 
 ### SEO
@@ -90,7 +89,7 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm exp
 - backlinks in content
 - combine links and sources
 - improve understanding of conditions under which images are completely regenerated; the hash for individual images will cause everything to change when we relocate the repo; another hash is generated for overall image service configuration and file location
-- [contribute](https://opencollective.com/astrodotbuild)
+- [contribute to Astro](https://opencollective.com/astrodotbuild)
 - fix reading progress bar so it starts at the top of the page (well, good enough)
 - center on the current location when displaying nearby points on the map
 - reading stats/word count (without it being a frontmatter thing, the performance issues are too much)
