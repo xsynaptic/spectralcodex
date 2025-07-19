@@ -1,0 +1,11 @@
+---
+import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
+
+const { PROD } = import.meta.env;
+---
+
+{
+	PROD && UMAMI_DOMAIN && UMAMI_ID ? (
+		<script defer src={`${String(UMAMI_DOMAIN)}/script.js`} data-website-id={UMAMI_ID} is:inline />
+	) : undefined
+}

@@ -5,6 +5,7 @@ import { ClientRouter } from 'astro:transitions';
 import type { MetaProps } from '#components/main/main-meta.astro';
 
 import '#styles/global.css';
+import MainAnalytics from '#components/main/main-analytics.astro';
 import MainFooter from '#components/main/main-footer.astro';
 import MainHeader from '#components/main/main-header.astro';
 import MainMeta from '#components/main/main-meta.astro';
@@ -45,6 +46,7 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 		<Font cssVariable="--font-lora" />
 		<ModeManager defaultMode="auto" />
 		<ClientRouter />
+		<MainAnalytics />
 	</head>
 	<body
 		class:list={[

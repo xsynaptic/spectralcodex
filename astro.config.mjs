@@ -73,7 +73,13 @@ export default defineConfig({
 				// This should match `outDir`; `server` must be added to the path when using the Node adapter
 				default: isSsr ? './dist/server' : './dist',
 			}),
-			MAP_PROTOMAPS_API_KEY: envField.string({ context: 'client', access: 'public' }),
+			MAP_PROTOMAPS_API_KEY: envField.string({
+				context: 'client',
+				access: 'public',
+				optional: false,
+			}),
+			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
+			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
 		},
 	},
 	vite: {

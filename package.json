@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.3.1",
+	"version": "5.4.0",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
