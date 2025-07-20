@@ -1,21 +1,21 @@
 #!/usr/bin/env tsx
 import type { FeatureCollection, Geometry } from 'geojson';
 
+import { parseFrontmatter } from '@astrojs/markdown-remark';
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import { feature, featureCollection } from '@turf/helpers';
 import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { parse } from 'yaml';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
 
 const outputPathIndex = args.indexOf('--output-path');
-const divisionsPathIndex = args.indexOf('--divisions-path');
+const regionsPathIndex = args.indexOf('--regions-path');
 
 const OUTPUT_PATH = args[outputPathIndex + 1] ?? './public/divisions';
-const DIVISIONS_PATH = args[divisionsPathIndex + 1] ?? './packages/content/data/divisions.yaml';
+const REGIONS_PATH = args[regionsPathIndex + 1] ?? './packages/content/collections/regions';
 
 const OVERTURE_RELEASE = '2025-06-25.0';
 const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
@@ -41,29 +41,59 @@ async function ensureOutputDirectory(dir: string) {
 }
 
 /**
- * Load YAML data from the configured divisions data path
+ * Load frontmatter from the regions collection
  */
 async function parseDivisionIds() {
-	console.log('Scanning geodata.yaml for items with GERS IDs...');
+	console.log('Scanning regions collection for divisionId in frontmatter...');
+
+	const items: Array<DivisionMetadata> = [];
+
+	async function scanDirectory(dir: string): Promise<void> {
+		const entries = await fs.readdir(dir, { withFileTypes: true });
+
+		for (const entry of entries) {
+			if (entry.isDirectory()) {
+				const dirPath = path.join(dir, entry.name);
+				await scanDirectory(dirPath);
+			} else if (entry.name.endsWith('.mdx')) {
+				const filePath = path.join(dir, entry.name);
+				const slug = entry.name.replace('.mdx', '');
+
+				try {
+					const fileContent = await fs.readFile(filePath, 'utf8');
+					const { frontmatter } = parseFrontmatter(fileContent);
+
+					if (frontmatter.divisionId) {
+						// Handle divisionId as string or array - take first if array
+						const divisionIdValue = frontmatter.divisionId as string | Array<string>;
+						const divisionId = Array.isArray(divisionIdValue)
+							? divisionIdValue[0]
+							: divisionIdValue;
+
+						if (typeof divisionId === 'string') {
+							items.push({
+								slug,
+								gersId: divisionId,
+							});
+						}
+					}
+				} catch (error) {
+					console.warn(`Failed to parse frontmatter for ${filePath}:`, error);
+				}
+			}
+		}
+	}
 
 	try {
-		const filePath = path.join(process.cwd(), DIVISIONS_PATH);
-		const fileContent = await fs.readFile(filePath, 'utf8');
-		const geodataIds = parse(fileContent) as Record<string, string>;
+		const regionsPath = path.join(process.cwd(), REGIONS_PATH);
+		await scanDirectory(regionsPath);
 
-		// Convert Record to array of GeodataItem objects
-		const items = Object.entries(geodataIds).map(([slug, gersId]) => ({
-			slug,
-			gersId,
-		})) satisfies Array<DivisionMetadata>;
-
-		console.log(`Found ${items.length.toString()} items with GERS IDs`);
+		console.log(`Found ${items.length.toString()} items with division IDs`);
 
 		return items;
 	} catch (error) {
-		console.error(`Failed to load YAML data from ${DIVISIONS_PATH}:`, error);
-
-		throw new Error(`Failed to load YAML data from ${DIVISIONS_PATH}`);
+		console.error(`Failed to scan regions directory ${REGIONS_PATH}:`, error);
+		throw new Error(`Failed to scan regions directory ${REGIONS_PATH}`);
 	}
 }
 
@@ -301,11 +331,11 @@ async function mapDivisions() {
 	);
 
 	try {
-		// Load geodata items from YAML
+		// Load division items from regions collection
 		const items = await parseDivisionIds();
 
 		if (items.length === 0) {
-			console.log(`No items with GERS IDs found in ${DIVISIONS_PATH}.`);
+			console.log(`No items with division IDs found in ${REGIONS_PATH}.`);
 			return;
 		}
 
