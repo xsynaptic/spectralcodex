@@ -16,7 +16,7 @@
 		"clean-build-images": "tsx --env-file=.env ./scripts/clean-build-images.ts",
 		"clean-content-layer": "rm -rf .astro && rm node_modules/.astro/data-store.json",
 		"host-images": "serve packages/content/media",
-		"content-utils": "tsx ./scripts/content-utils.ts",
+		"validate-content": "tsx ./scripts/validate-content.ts",
 		"fetch-geodata": "tsx ./scripts/fetch-geodata.ts",
 		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
 		"deploy-static": "tsx --env-file=.env ./scripts/deploy-static.ts"

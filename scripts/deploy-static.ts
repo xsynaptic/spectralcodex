@@ -30,6 +30,18 @@ const skipBuild = process.argv.includes('--skip-build');
 // Output shell command results
 $.verbose = true;
 
+async function validateContent() {
+	console.log(chalk.blue('Validating content integrity...'));
+
+	try {
+		await $`pnpm validate-content`;
+		console.log(chalk.green('Content validation passed.'));
+	} catch (error) {
+		console.error(chalk.red('Content validation failed:'), error);
+		process.exit(1);
+	}
+}
+
 async function buildProject() {
 	if (skipBuild) {
 		console.log(chalk.yellow('Skipping build...'));
@@ -144,6 +156,10 @@ const step = process.argv[2] ?? 'deploy';
 console.log(chalk.blue(`Deploying with arguments "${chalk.underline(step)}"...`));
 
 switch (step) {
+	case 'validate': {
+		await validateContent();
+		break;
+	}
 	case 'build': {
 		await buildProject();
 		break;
@@ -170,6 +186,7 @@ switch (step) {
 		break;
 	}
 	default: {
+		await validateContent();
 		await buildProject();
 		if (!imageRemote) await removeOriginalImages();
 		await moveHashedImages();
