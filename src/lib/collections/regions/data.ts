@@ -13,21 +13,20 @@ interface CollectionData {
 
 let collection: Promise<CollectionData> | undefined;
 
-// Cache for loaded links data
-let regionsGeodataCache: Record<string, string> | undefined;
+let regionsDivisionCache: Record<string, string> | undefined;
 
-async function getRegionsGeodata() {
-	if (!regionsGeodataCache) {
+async function getRegionsDivisionData() {
+	if (!regionsDivisionCache) {
 		try {
-			const data = await loadYamlData('geodata.yaml');
+			const data = await loadYamlData('divisions.yaml');
 
-			regionsGeodataCache = await z.record(z.string()).parseAsync(data);
+			regionsDivisionCache = await z.record(z.string()).parseAsync(data);
 		} catch (error) {
-			console.error('Failed to load regions geodata:', error);
-			regionsGeodataCache = undefined;
+			console.error('Failed to load regions division data:', error);
+			regionsDivisionCache = undefined;
 		}
 	}
-	return regionsGeodataCache;
+	return regionsDivisionCache;
 }
 
 async function generateCollection() {
@@ -37,7 +36,7 @@ async function generateCollection() {
 	const posts = await getCollection('posts');
 	const regions = await getCollection('regions');
 
-	const regionsGeodata = await getRegionsGeodata();
+	const regionsDivisionData = await getRegionsDivisionData();
 
 	// Calculate ancestors
 	for (const entry of regions) {
@@ -135,8 +134,8 @@ async function generateCollection() {
 		entry.data.postCount = entry.data.posts.length;
 
 		// Optionally assign geodata status to regions entries
-		if (regionsGeodata) {
-			entry.data.hasGeodata = !!regionsGeodata[entry.id];
+		if (regionsDivisionData) {
+			entry.data.hasDivision = !!regionsDivisionData[entry.id];
 		}
 	}
 

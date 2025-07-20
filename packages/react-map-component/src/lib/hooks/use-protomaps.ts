@@ -32,7 +32,6 @@ export function useProtomaps({
 	useEffect(function loadProtomapsProtocol() {
 		const protocol = new Protocol();
 
-		// maplibregl.addProtocol('pmtiles', protocol.tile);
 		maplibregl.addProtocol('pmtiles', (request) => {
 			return new Promise((resolve, reject) => {
 				protocol.tile(request, (err: unknown, data: unknown) => {

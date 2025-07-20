@@ -6,6 +6,10 @@ export const MapLayerIdEnum = {
 	PointsImage: 'points-image',
 	PointsLabel: 'points-label',
 	LineString: 'line-string',
+	Polygon: 'polygon',
+	PolygonOutline: 'polygon-outline',
+	Division: 'division',
+	DivisionOutline: 'division-outline',
 } as const satisfies Record<string, string>;
 
 export type MapLayerId = (typeof MapLayerIdEnum)[keyof typeof MapLayerIdEnum];

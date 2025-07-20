@@ -62,6 +62,12 @@ export function useMapCanvasData() {
 				),
 			[filteredData],
 		),
-		// TODO: add polygon and multi-polygon collections
+		polygonCollection: useMemo(
+			() =>
+				getGeojsonData(
+					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Polygon),
+				),
+			[filteredData],
+		),
 	};
 }

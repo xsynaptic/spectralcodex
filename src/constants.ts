@@ -32,6 +32,9 @@ export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
 export const MAP_GEOMETRY_COORDINATES_PRECISION = 6;
 
+// Public folder for map division data
+export const MAP_DIVISION_DATA_PATH = 'divisions';
+
 /**
  * MDX
  */

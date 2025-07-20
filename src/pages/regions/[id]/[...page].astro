@@ -3,6 +3,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
+import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
 import RegionEntry from '#layouts/region-entry.astro';
 import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
 import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
@@ -15,6 +16,7 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { getBaseUrl } from '#lib/utils/routing.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -64,6 +66,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 			...(showChineseInterface
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
+				: {}),
+			...(entry.data.hasDivision
+				? { apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`) }
 				: {}),
 		});
 

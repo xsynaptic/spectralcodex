@@ -29,7 +29,8 @@ astro-error.log*
 .astro-cache/
 temp
 
-# open graph fonts
+# public generated files
+public/divisions
 public/fonts
 
 # ignore content and media

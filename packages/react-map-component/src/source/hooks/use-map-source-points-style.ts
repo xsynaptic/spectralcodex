@@ -249,6 +249,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-justify': 'auto',
 					'text-max-width': 20,
 					'text-variable-anchor': ['bottom', 'right'],
+					// We'd like to interpolate these values but there is a type issue with MapLibre
 					'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
 				},
 				paint: {

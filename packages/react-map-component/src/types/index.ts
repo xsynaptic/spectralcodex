@@ -1,5 +1,5 @@
 import type { Flavor } from '@protomaps/basemaps';
-import type { FeatureCollection, LineString, Point } from 'geojson';
+import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
 import type { LngLat, LngLatBoundsLike } from 'maplibre-gl';
 
 import { z } from 'zod';
@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { MapPopupItemSchema, MapSourceItemSchema } from './map-schemas';
 
 // Supported geometry for use with this component
-export type MapGeometry = Point | LineString;
+export type MapGeometry = Point | LineString | Polygon;
 
 /**
  * Map source data
@@ -39,6 +39,7 @@ export type MapPopupItemExtended = MapPopupItem & {
 export interface MapComponentProps {
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
+	apiDivisionUrl?: string | undefined;
 	sourceData?: Array<MapSourceItemInput> | undefined;
 	popupData?: Array<MapPopupItemInput> | undefined;
 	baseMapTheme?: Flavor | undefined;

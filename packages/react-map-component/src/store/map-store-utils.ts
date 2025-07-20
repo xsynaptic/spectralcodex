@@ -11,7 +11,20 @@ function getPopupCoordinates(feature: MapSourceItem) {
 		return new maplibregl.LngLat(feature.geometry.coordinates[0], feature.geometry.coordinates[1]);
 	}
 
+	// TODO: there really should be a better way to handle this
 	if (Array.isArray(feature.geometry.coordinates[0])) {
+		if (Array.isArray(feature.geometry.coordinates[0][0])) {
+			return new maplibregl.LngLat(
+				feature.geometry.coordinates[0][0][0],
+				feature.geometry.coordinates[0][0][1],
+			);
+		}
+		if (Array.isArray(feature.geometry.coordinates[0][1])) {
+			return new maplibregl.LngLat(
+				feature.geometry.coordinates[0][1][0],
+				feature.geometry.coordinates[0][1][1],
+			);
+		}
 		return new maplibregl.LngLat(
 			feature.geometry.coordinates[0][0],
 			feature.geometry.coordinates[0][1],

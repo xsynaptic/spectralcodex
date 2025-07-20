@@ -48,7 +48,14 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 				),
 			};
 		}
-		// TODO: add polygon and multi-polygon collections
+		case GeometryTypeEnum.Polygon: {
+			return {
+				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
+				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map((ring) =>
+					ring.map(getMapGeometryCoordinatesOptimized),
+				),
+			};
+		}
 		default: {
 			geometryType satisfies never;
 			return;

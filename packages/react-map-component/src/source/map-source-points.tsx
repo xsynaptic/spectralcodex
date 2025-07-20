@@ -10,7 +10,7 @@ import { MapSourceIdEnum } from '../config/source';
 import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
 import { useMapSourcePointsStyle } from './hooks/use-map-source-points-style';
 
-const MapPointLayerContent = memo(function MapPointLayerContents({
+const MapPointSourceLayers = memo(function MapPointLayerContents({
 	data,
 	interactive,
 	hasMapIcons,
@@ -59,11 +59,11 @@ const MapPointLayerContent = memo(function MapPointLayerContents({
 	);
 });
 
-export const MapPointLayer = ({ hasMapIcons }: { hasMapIcons: boolean }) => {
+export const MapPointSource = ({ hasMapIcons }: { hasMapIcons: boolean }) => {
 	const interactive = useMapCanvasInteractive();
 	const { pointCollection: data } = useMapCanvasData();
 
 	return data ? (
-		<MapPointLayerContent data={data} interactive={interactive} hasMapIcons={hasMapIcons} />
+		<MapPointSourceLayers data={data} interactive={interactive} hasMapIcons={hasMapIcons} />
 	) : undefined;
 };

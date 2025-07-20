@@ -28,8 +28,9 @@ export const MapSourceItemSchema = z
 		[MapDataKeysCompressed.Geometry]: z.object({
 			[MapDataKeysCompressed.GeometryType]: z.nativeEnum(MapDataGeometryTypeNumericMapping),
 			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
-				z.tuple([z.number(), z.number()]),
-				z.tuple([z.number(), z.number()]).array(),
+				z.tuple([z.number(), z.number()]), // Point
+				z.tuple([z.number(), z.number()]).array(), // LineString
+				z.tuple([z.number(), z.number()]).array().array(), // Polygon
 			]),
 		}),
 	})

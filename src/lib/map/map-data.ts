@@ -129,6 +129,7 @@ export function getMapData({
 	limitsBuffer,
 	limitsBufferPercentage,
 	mapApiBaseUrl,
+	apiDivisionUrl,
 	...restProps
 }: MapDataBoundsProps &
 	Omit<
@@ -137,6 +138,17 @@ export function getMapData({
 	> & {
 		mapApiBaseUrl?: string | undefined;
 	}) {
+	const defaultProps = {
+		hasGeodata: false,
+		apiSourceUrl: undefined,
+		apiDivisionUrl,
+		apiPopupUrl: undefined,
+		sourceData: undefined,
+		popupData: undefined,
+		featureCount: 0,
+		...buildProps,
+	};
+
 	const mapBounds = getMapBounds({
 		featureCollection,
 		boundsBuffer,
@@ -153,13 +165,13 @@ export function getMapData({
 			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}?v=${popupHash}`;
 
 			return {
+				...defaultProps,
 				hasGeodata: true,
 				apiSourceUrl,
 				apiPopupUrl,
 				prefetchUrls: [apiSourceUrl, apiPopupUrl],
 				featureCount: featureCollection.features.length,
 				...mapBounds,
-				...buildProps,
 				...restProps,
 			} satisfies MapComponentData;
 		} else {
@@ -167,27 +179,19 @@ export function getMapData({
 			const popupData = getLocationsMapPopupData(featureCollection);
 
 			return {
+				...defaultProps,
 				hasGeodata: true,
-				apiSourceUrl: undefined,
-				apiPopupUrl: undefined,
 				sourceData,
 				popupData,
 				featureCount: featureCollection.features.length,
 				...mapBounds,
-				...buildProps,
 				...restProps,
 			} satisfies MapComponentData;
 		}
 	}
 
 	return {
-		hasGeodata: false,
-		apiSourceUrl: undefined,
-		apiPopupUrl: undefined,
-		sourceData: undefined,
-		popupData: undefined,
-		featureCount: 0,
-		...buildProps,
+		...defaultProps,
 		...restProps,
 	} satisfies MapComponentData;
 }

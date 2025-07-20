@@ -3,6 +3,7 @@ import type { FeatureCollection, Geometry } from 'geojson';
 
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import { feature, featureCollection } from '@turf/helpers';
+import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'yaml';
@@ -11,30 +12,24 @@ import { parse } from 'yaml';
 const args = process.argv.slice(2);
 
 const outputPathIndex = args.indexOf('--output-path');
-const geodataPathIndex = args.indexOf('--geodata-path');
+const divisionsPathIndex = args.indexOf('--divisions-path');
 
-const OUTPUT_PATH = args[outputPathIndex + 1] ?? './temp/geodata';
-const CONTENT_GEODATA_PATH = args[geodataPathIndex + 1] ?? './packages/content/data/geodata.yaml';
+const OUTPUT_PATH = args[outputPathIndex + 1] ?? './public/divisions';
+const DIVISIONS_PATH = args[divisionsPathIndex + 1] ?? './packages/content/data/divisions.yaml';
 
 const OVERTURE_RELEASE = '2025-06-25.0';
 const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
 
-interface GeodataItem {
+interface DivisionMetadata {
 	slug: string;
 	gersId: string;
 }
 
-interface SimplifiedBoundary {
+interface DivisionItem {
 	id: string;
+	slug: string;
 	geometry: Geometry | undefined;
-	slug: string;
 }
-
-interface GeodataProperties {
-	slug: string;
-}
-
-type GeodataFeatureCollection = FeatureCollection<Geometry, GeodataProperties>;
 
 async function ensureOutputDirectory(dir: string) {
 	try {
@@ -46,13 +41,13 @@ async function ensureOutputDirectory(dir: string) {
 }
 
 /**
- * Load YAML data from the configured content data path
+ * Load YAML data from the configured divisions data path
  */
-async function parseContentGeodataIds() {
+async function parseDivisionIds() {
 	console.log('Scanning geodata.yaml for items with GERS IDs...');
 
 	try {
-		const filePath = path.join(process.cwd(), CONTENT_GEODATA_PATH);
+		const filePath = path.join(process.cwd(), DIVISIONS_PATH);
 		const fileContent = await fs.readFile(filePath, 'utf8');
 		const geodataIds = parse(fileContent) as Record<string, string>;
 
@@ -60,15 +55,15 @@ async function parseContentGeodataIds() {
 		const items = Object.entries(geodataIds).map(([slug, gersId]) => ({
 			slug,
 			gersId,
-		})) satisfies Array<GeodataItem>;
+		})) satisfies Array<DivisionMetadata>;
 
 		console.log(`Found ${items.length.toString()} items with GERS IDs`);
 
 		return items;
 	} catch (error) {
-		console.error(`Failed to load YAML data from ${CONTENT_GEODATA_PATH}:`, error);
+		console.error(`Failed to load YAML data from ${DIVISIONS_PATH}:`, error);
 
-		throw new Error(`Failed to load YAML data from ${CONTENT_GEODATA_PATH}`);
+		throw new Error(`Failed to load YAML data from ${DIVISIONS_PATH}`);
 	}
 }
 
@@ -103,7 +98,7 @@ async function initializeDuckDB(): Promise<DuckDBConnection> {
 // Query division_area table using multiple Overture Maps IDs in a single query
 // Convert WKB geometry to GeoJSON using DuckDB's spatial functions
 // Only select the essential data we need: id and geometry
-function buildBatchQuery(items: Array<GeodataItem>) {
+function buildBatchQuery(items: Array<DivisionMetadata>) {
 	const gersIds = items.map((item) => `'${item.gersId}'`).join(', ');
 
 	return `
@@ -115,15 +110,16 @@ function buildBatchQuery(items: Array<GeodataItem>) {
 	`;
 }
 
-async function fetchBoundaryDataBatch(
+async function fetchDivisionData(
 	db: DuckDBConnection,
-	items: Array<GeodataItem>,
-): Promise<Array<SimplifiedBoundary>> {
-	console.log(`Fetching boundary data for ${items.length.toString()} items...`);
+	items: Array<DivisionMetadata>,
+): Promise<Array<DivisionItem>> {
+	console.log(`Fetching division data for ${items.length.toString()} items...`);
 
 	const query = buildBatchQuery(items);
 
-	console.log(`Executing batch query...`);
+	console.log(`Executing batch query against Overture Maps...`);
+	console.log(`This may take several minutes for large datasets. Please wait...`);
 
 	try {
 		const result = await db.run(query);
@@ -146,10 +142,10 @@ async function fetchBoundaryDataBatch(
 			}
 		}
 
-		console.log(`Found ${rows.length.toString()} total boundaries`);
+		console.log(`Found ${rows.length.toString()} total divisions`);
 
 		if (rows.length === 0) {
-			console.warn(`No boundary data found for any items`);
+			console.warn(`No division data found for any items`);
 			return [];
 		}
 
@@ -182,57 +178,66 @@ async function fetchBoundaryDataBatch(
 
 			return {
 				id,
-				geometry,
 				slug,
+				geometry,
 			};
 		});
 	} catch (error) {
+		console.log(`\nQuery failed`);
 		console.error(`Error fetching batch data:`, error);
 
 		throw error;
 	}
 }
 
-function convertToGeoJSON(boundaries: Array<SimplifiedBoundary>) {
-	if (boundaries.length === 0) {
-		return featureCollection([]) satisfies GeodataFeatureCollection;
+function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
+	if (divisionItems.length === 0) {
+		return featureCollection([]) satisfies FeatureCollection;
 	}
 
-	const features = boundaries.map((boundary) =>
-		feature(boundary.geometry!, { slug: boundary.slug } satisfies GeodataProperties, {
-			id: boundary.id,
+	const features = divisionItems.map((divisionItem) =>
+		feature(divisionItem.geometry!, undefined, {
+			id: divisionItem.id,
 		}),
 	);
 
-	return featureCollection(features) satisfies GeodataFeatureCollection;
+	return featureCollection(features) satisfies FeatureCollection;
 }
 
-async function saveGeoJSON(geojson: FeatureCollection, slug: string) {
+async function saveFlatgeobuf(geojsonData: FeatureCollection, slug: string) {
 	const outputDir = path.join(process.cwd(), OUTPUT_PATH);
 
 	await ensureOutputDirectory(outputDir);
 
-	const filePath = path.join(outputDir, `${slug}.geojson`);
+	const filePath = path.join(outputDir, `${slug}.fgb`);
 
-	await fs.writeFile(filePath, JSON.stringify(geojson, undefined, 2));
-	console.log(`Saved GeoJSON to: ${filePath}`);
+	try {
+		const fgbBuffer = geojson.serialize(geojsonData);
+
+		await fs.writeFile(filePath, fgbBuffer);
+
+		console.log(`Saved FlatGeobuf to: ${filePath}`);
+	} catch (error) {
+		console.error(`Failed to serialize FlatGeobuf for ${slug}:`, error);
+		throw error;
+	}
 }
 
-async function processItems(db: DuckDBConnection, items: Array<GeodataItem>) {
+async function processItems(db: DuckDBConnection, items: Array<DivisionMetadata>) {
 	console.log(`\n=== Processing ${items.length.toString()} items ===`);
 
 	try {
-		// Fetch all boundary data in a single batch query
-		const allBoundaries = await fetchBoundaryDataBatch(db, items);
+		// Fetch all division data in a single batch query
+		const divisionData = await fetchDivisionData(db, items);
 
-		// Group boundaries by slug
-		const boundariesBySlug = new Map<string, Array<SimplifiedBoundary>>();
+		// Group divisions by slug
+		const divisionsBySlug = new Map<string, Array<DivisionItem>>();
 
-		for (const boundary of allBoundaries) {
-			if (!boundariesBySlug.has(boundary.slug)) {
-				boundariesBySlug.set(boundary.slug, []);
+		for (const divisionDatum of divisionData) {
+			if (!divisionsBySlug.has(divisionDatum.slug)) {
+				divisionsBySlug.set(divisionDatum.slug, []);
 			}
-			boundariesBySlug.get(boundary.slug)!.push(boundary);
+			divisionsBySlug.get(divisionDatum.slug)!.push(divisionDatum);
 		}
 
 		// Process each item and save individual GeoJSON files
@@ -240,16 +245,17 @@ async function processItems(db: DuckDBConnection, items: Array<GeodataItem>) {
 
 		for (const item of items) {
 			console.log(`\nProcessing ${item.slug}...`);
-			try {
-				const boundaries = boundariesBySlug.get(item.slug) ?? [];
 
-				if (boundaries.length === 0) {
-					console.warn(`No boundary data found for ${item.slug}`);
+			try {
+				const divisionItems = divisionsBySlug.get(item.slug) ?? [];
+
+				if (divisionItems.length === 0) {
+					console.warn(`No division data found for ${item.slug}`);
 				}
 
-				const geojson = convertToGeoJSON(boundaries);
+				const geojsonData = convertToFeatureCollection(divisionItems);
 
-				await saveGeoJSON(geojson, item.slug);
+				await saveFlatgeobuf(geojsonData, item.slug);
 
 				console.log(`✓ Successfully processed ${item.slug}`);
 
@@ -267,17 +273,17 @@ async function processItems(db: DuckDBConnection, items: Array<GeodataItem>) {
 	}
 }
 
-async function fetchGeodata() {
+async function mapDivisions() {
 	console.log(
-		`🗺️  Fetching administrative boundaries from Overture Maps using release: ${OVERTURE_RELEASE}...`,
+		`🗺️  Fetching administrative divisions from Overture Maps using release: ${OVERTURE_RELEASE}...`,
 	);
 
 	try {
 		// Load geodata items from YAML
-		const items = await parseContentGeodataIds();
+		const items = await parseDivisionIds();
 
 		if (items.length === 0) {
-			console.log('No items with GERS IDs found in geodata.yaml.');
+			console.log(`No items with GERS IDs found in ${DIVISIONS_PATH}.`);
 			return;
 		}
 
@@ -310,4 +316,4 @@ async function fetchGeodata() {
 }
 
 // Run the script
-await fetchGeodata();
+await mapDivisions();
