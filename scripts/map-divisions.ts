@@ -227,8 +227,30 @@ async function processItems(db: DuckDBConnection, items: Array<DivisionMetadata>
 	console.log(`\n=== Processing ${items.length.toString()} items ===`);
 
 	try {
+		// Check which items already exist and filter them out
+		const outputDir = path.join(process.cwd(), OUTPUT_PATH);
+		await ensureOutputDirectory(outputDir);
+
+		const itemsToProcess = [];
+		for (const item of items) {
+			const filePath = path.join(outputDir, `${item.slug}.fgb`);
+			try {
+				await fs.access(filePath);
+				console.log(`Skipping ${item.slug} (already exists)`);
+			} catch {
+				itemsToProcess.push(item);
+			}
+		}
+
+		if (itemsToProcess.length === 0) {
+			console.log('All files already exist, skipping query');
+			return items.length;
+		}
+
+		console.log(`Querying for ${String(itemsToProcess.length)}/${String(items.length)} items`);
+
 		// Fetch all division data in a single batch query
-		const divisionData = await fetchDivisionData(db, items);
+		const divisionData = await fetchDivisionData(db, itemsToProcess);
 
 		// Group divisions by slug
 		const divisionsBySlug = new Map<string, Array<DivisionItem>>();
@@ -241,9 +263,9 @@ async function processItems(db: DuckDBConnection, items: Array<DivisionMetadata>
 		}
 
 		// Process each item and save individual GeoJSON files
-		let successCount = 0;
+		let successCount = items.length - itemsToProcess.length; // Count already existing files as successful
 
-		for (const item of items) {
+		for (const item of itemsToProcess) {
 			console.log(`\nProcessing ${item.slug}...`);
 
 			try {
