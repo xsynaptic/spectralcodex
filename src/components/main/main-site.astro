@@ -46,7 +46,7 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 		<Font cssVariable="--font-lora" />
 		<ModeManager defaultMode="auto" />
 		<ClientRouter />
-		<MainAnalytics />
+		<MainAnalytics isProduction={import.meta.env.PROD} isViewTransitionsEnabled={true} />
 	</head>
 	<body
 		class:list={[

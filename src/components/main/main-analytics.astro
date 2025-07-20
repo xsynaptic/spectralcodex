@@ -1,11 +1,22 @@
 ---
 import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
 
-const { PROD } = import.meta.env;
+interface Props {
+	isProduction: boolean;
+	isViewTransitionsEnabled: boolean;
+}
+
+const { isProduction, isViewTransitionsEnabled } = Astro.props;
 ---
 
 {
-	PROD && UMAMI_DOMAIN && UMAMI_ID ? (
-		<script defer src={`${String(UMAMI_DOMAIN)}/script.js`} data-website-id={UMAMI_ID} is:inline />
+	isProduction && UMAMI_DOMAIN && UMAMI_ID ? (
+		<script
+			defer
+			src={`${String(UMAMI_DOMAIN)}/script.js`}
+			data-website-id={UMAMI_ID}
+			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
+			is:inline
+		/>
 	) : undefined
 }
