@@ -10,6 +10,7 @@ export const MapLayerIdEnum = {
 	PolygonOutline: 'polygon-outline',
 	Division: 'division',
 	DivisionOutline: 'division-outline',
+	DivisionHalo: 'division-halo',
 } as const satisfies Record<string, string>;
 
 export type MapLayerId = (typeof MapLayerIdEnum)[keyof typeof MapLayerIdEnum];

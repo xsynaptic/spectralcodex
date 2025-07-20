@@ -16,6 +16,7 @@ const MapDivisionSourceLayers: FC<{ data: FeatureCollection }> = memo(
 		return (
 			<Source id={MapSourceIdEnum.DivisionCollection} type="geojson" data={data} generateId={true}>
 				<Layer key={MapLayerIdEnum.Division} {...divisionStyle[MapLayerIdEnum.Division]} />
+				<Layer key={MapLayerIdEnum.DivisionHalo} {...divisionStyle[MapLayerIdEnum.DivisionHalo]} />
 				<Layer
 					key={MapLayerIdEnum.DivisionOutline}
 					{...divisionStyle[MapLayerIdEnum.DivisionOutline]}

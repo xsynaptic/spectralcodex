@@ -15,6 +15,12 @@ export const mapClusterStyle = {
 	countTextColor: '#f0f9ff',
 };
 
+export const mapDivisionStyle = {
+	fillColor: '#7f22fe',
+	outlineColor: '#7f22fe',
+	haloColor: '#7f22fe',
+};
+
 export const locationStatusStyle: Record<LocationStatus, { color: string; stroke: string }> = {
 	/** Emerald */
 	[LocationStatusEnum.Operational]: {

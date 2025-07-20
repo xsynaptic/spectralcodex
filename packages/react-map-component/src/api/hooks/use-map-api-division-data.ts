@@ -31,10 +31,10 @@ export function useMapApiDivisionData({
 				});
 
 				// Deserialize FlatGeobuf to GeoJSON features
-				const iter = geojson.deserialize(stream);
+				const featuresIterator = geojson.deserialize(stream);
 				const features: Array<Feature> = [];
 
-				for await (const feature of iter) {
+				for await (const feature of featuresIterator) {
 					features.push(feature as unknown as Feature);
 				}
 

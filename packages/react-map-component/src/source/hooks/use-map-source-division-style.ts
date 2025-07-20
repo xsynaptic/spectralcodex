@@ -1,5 +1,6 @@
 import type { FillLayerSpecification, LineLayerSpecification } from 'react-map-gl/maplibre';
 
+import { mapDivisionStyle } from 'packages/react-map-component/src/config/colors';
 import { useMemo } from 'react';
 
 import { MapLayerIdEnum } from '../../config/layer';
@@ -13,8 +14,8 @@ export function useMapSourceDivisionStyle() {
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'fill',
 				paint: {
-					'fill-color': '#088',
-					'fill-opacity': 0.1,
+					'fill-color': mapDivisionStyle.fillColor,
+					'fill-opacity': 0.05,
 				},
 			}) satisfies FillLayerSpecification,
 		[],
@@ -26,10 +27,54 @@ export function useMapSourceDivisionStyle() {
 				id: MapLayerIdEnum.DivisionOutline,
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'line',
+				layout: {
+					'line-cap': 'round',
+					'line-join': 'round',
+				},
 				paint: {
-					'line-color': '#088',
-					'line-width': 2,
-					'line-opacity': 0.7,
+					'line-color': mapDivisionStyle.outlineColor,
+					'line-width': [
+						'interpolate',
+						['linear'],
+						['zoom'],
+						0, // Zoom level
+						1, // Width
+						12,
+						2,
+						18,
+						3,
+					],
+					'line-opacity': 0.2,
+				},
+			}) satisfies LineLayerSpecification,
+		[],
+	);
+
+	const divisionHaloLayerStyle = useMemo(
+		() =>
+			({
+				id: MapLayerIdEnum.DivisionHalo,
+				source: MapSourceIdEnum.DivisionCollection,
+				type: 'line',
+				layout: {
+					'line-cap': 'round',
+					'line-join': 'round',
+				},
+				paint: {
+					'line-blur': 5,
+					'line-color': mapDivisionStyle.haloColor,
+					'line-width': [
+						'interpolate',
+						['linear'],
+						['zoom'],
+						0, // Zoom level
+						2, // Width
+						12,
+						3,
+						18,
+						5,
+					],
+					'line-opacity': 0.3,
 				},
 			}) satisfies LineLayerSpecification,
 		[],
@@ -38,5 +83,6 @@ export function useMapSourceDivisionStyle() {
 	return {
 		[MapLayerIdEnum.Division]: divisionLayerStyle,
 		[MapLayerIdEnum.DivisionOutline]: divisionOutlineLayerStyle,
+		[MapLayerIdEnum.DivisionHalo]: divisionHaloLayerStyle,
 	};
 }
