@@ -7,10 +7,17 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'yaml';
 
+// Parse command line arguments
+const args = process.argv.slice(2);
+
+const outputPathIndex = args.indexOf('--output-path');
+const geodataPathIndex = args.indexOf('--geodata-path');
+
+const OUTPUT_PATH = args[outputPathIndex + 1] ?? './temp/geodata';
+const CONTENT_GEODATA_PATH = args[geodataPathIndex + 1] ?? './packages/content/data/geodata.yaml';
+
 const OVERTURE_RELEASE = '2025-06-25.0';
 const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
-const OUTPUT_BASE_DIR = './temp';
-const CONTENT_GEODATA_PATH = './packages/content/data/geodata.yaml';
 
 interface GeodataItem {
 	slug: string;
@@ -201,7 +208,7 @@ function convertToGeoJSON(boundaries: Array<SimplifiedBoundary>) {
 }
 
 async function saveGeoJSON(geojson: FeatureCollection, slug: string) {
-	const outputDir = path.join(OUTPUT_BASE_DIR, 'geodata');
+	const outputDir = path.join(process.cwd(), OUTPUT_PATH);
 
 	await ensureOutputDirectory(outputDir);
 
@@ -288,7 +295,7 @@ async function fetchGeodata() {
 		console.log(
 			`Successfully processed: ${successCount.toString()}/${totalCount.toString()} items`,
 		);
-		console.log(`Output directory: ${OUTPUT_BASE_DIR}/geodata`);
+		console.log(`Output directory: ${OUTPUT_PATH}`);
 
 		if (successCount === totalCount) {
 			console.log('🎉 All items processed successfully!');

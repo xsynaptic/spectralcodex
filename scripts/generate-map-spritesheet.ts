@@ -7,11 +7,19 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { $ } from 'zx';
 
-const iconsPath = path.join(process.cwd(), process.env.ICONS_TEMP_PATH ?? 'temp/icons');
-const outputPath = process.env.ICONS_OUTPUT_PATH ?? './public/icons';
+// Parse command line arguments
+const args = process.argv.slice(2);
 
-const verbose = process.argv.includes('--verbose');
-const skipExport = process.argv.includes('--skip-export');
+const verbose = args.includes('--verbose');
+const skipExport = args.includes('--skip-export');
+
+const tempDirIndex = args.indexOf('--temp-path');
+const outputPathIndex = args.indexOf('--output-path');
+
+const tempDir = args[tempDirIndex + 1] ?? 'temp/icons';
+const outputPath = args[outputPathIndex + 1] ?? '../../public/icons';
+
+const iconsPath = path.join(process.cwd(), tempDir);
 
 // Output shell command results
 $.verbose = verbose;
@@ -26,7 +34,7 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 	console.log(chalk.blue('Exporting map icons from Iconify collections...'));
 
 	try {
-		const mapIcons = blankIconSet('mapIcons');
+		const mapIconSet = blankIconSet('mapIcons');
 
 		for (const [iconId, iconRequest] of Object.entries(iconRecord)) {
 			const [iconCollectionId, iconName] = iconRequest.split(':');
@@ -46,7 +54,7 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 				const iconResolved = iconSetRequested.resolve(iconName);
 
 				if (iconResolved) {
-					mapIcons.setIcon(iconId, iconResolved);
+					mapIconSet.setIcon(iconId, iconResolved);
 					if (verbose) console.log(chalk.green(`✓ Exported: ${iconId} (${iconRequest})`));
 				} else {
 					console.log(chalk.red(`✗ Missing ${iconName} (${iconId})!`));
@@ -54,7 +62,7 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 			}
 		}
 
-		await exportToDirectory(mapIcons, {
+		await exportToDirectory(mapIconSet, {
 			cleanup: true,
 			log: verbose,
 			target: iconsPath,
