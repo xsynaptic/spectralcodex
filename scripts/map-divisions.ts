@@ -20,14 +20,13 @@ const REGIONS_PATH = args[regionsPathIndex + 1] ?? './packages/content/collectio
 const OVERTURE_RELEASE = '2025-06-25.0';
 const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
 
-interface DivisionMetadata {
+interface RegionMetadata {
 	slug: string;
-	gersId: string;
+	divisionIds: Array<string>;
 }
 
 interface DivisionItem {
-	id: string;
-	slug: string;
+	divisionId: string;
 	geometry: Geometry | undefined;
 }
 
@@ -36,6 +35,7 @@ async function ensureOutputDirectory(dir: string) {
 		await fs.access(dir);
 	} catch {
 		await fs.mkdir(dir, { recursive: true });
+
 		console.log(`Created output directory: ${dir}`);
 	}
 }
@@ -43,10 +43,10 @@ async function ensureOutputDirectory(dir: string) {
 /**
  * Load frontmatter from the regions collection
  */
-async function parseDivisionIds() {
+async function parseRegionData() {
 	console.log('Scanning regions collection for divisionId in frontmatter...');
 
-	const items: Array<DivisionMetadata> = [];
+	const regions: Array<RegionMetadata> = [];
 
 	async function scanDirectory(dir: string): Promise<void> {
 		const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -54,6 +54,7 @@ async function parseDivisionIds() {
 		for (const entry of entries) {
 			if (entry.isDirectory()) {
 				const dirPath = path.join(dir, entry.name);
+
 				await scanDirectory(dirPath);
 			} else if (entry.name.endsWith('.mdx')) {
 				const filePath = path.join(dir, entry.name);
@@ -64,16 +65,16 @@ async function parseDivisionIds() {
 					const { frontmatter } = parseFrontmatter(fileContent);
 
 					if (frontmatter.divisionId) {
-						// Handle divisionId as string or array - take first if array
+						// Handle divisionId as string or array
 						const divisionIdValue = frontmatter.divisionId as string | Array<string>;
-						const divisionId = Array.isArray(divisionIdValue)
-							? divisionIdValue[0]
-							: divisionIdValue;
+						const divisionIds = Array.isArray(divisionIdValue)
+							? divisionIdValue.filter((id): id is string => typeof id === 'string')
+							: [divisionIdValue].filter((id): id is string => typeof id === 'string');
 
-						if (typeof divisionId === 'string') {
-							items.push({
+						if (divisionIds.length > 0) {
+							regions.push({
 								slug,
-								gersId: divisionId,
+								divisionIds,
 							});
 						}
 					}
@@ -86,13 +87,15 @@ async function parseDivisionIds() {
 
 	try {
 		const regionsPath = path.join(process.cwd(), REGIONS_PATH);
+
 		await scanDirectory(regionsPath);
 
-		console.log(`Found ${items.length.toString()} items with division IDs`);
+		console.log(`Found ${regions.length.toString()} regions with division IDs`);
 
-		return items;
+		return regions;
 	} catch (error) {
 		console.error(`Failed to scan regions directory ${REGIONS_PATH}:`, error);
+
 		throw new Error(`Failed to scan regions directory ${REGIONS_PATH}`);
 	}
 }
@@ -125,28 +128,28 @@ async function initializeDuckDB(): Promise<DuckDBConnection> {
 	}
 }
 
-// Query division_area table using multiple Overture Maps IDs in a single query
+// Query division_area table using unique division IDs (GERS IDs)
 // Convert WKB geometry to GeoJSON using DuckDB's spatial functions
 // Only select the essential data we need: id and geometry
-function buildBatchQuery(items: Array<DivisionMetadata>) {
-	const gersIds = items.map((item) => `'${item.gersId}'`).join(', ');
+function buildBatchQuery(divisionIds: Set<string>) {
+	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
 
 	return `
 		SELECT 
 			id,
 			ST_AsGeoJSON(geometry) as geometry_geojson
 		FROM read_parquet('${OVERTURE_BASE_URL}/theme=divisions/type=division_area/*')
-		WHERE id IN (${gersIds});
+		WHERE id IN (${quotedIds});
 	`;
 }
 
 async function fetchDivisionData(
 	db: DuckDBConnection,
-	items: Array<DivisionMetadata>,
-): Promise<Array<DivisionItem>> {
-	console.log(`Fetching division data for ${items.length.toString()} items...`);
+	divisionIds: Set<string>,
+): Promise<Map<string, DivisionItem>> {
+	console.log(`Fetching division data for ${String(divisionIds.size)} unique division IDs...`);
 
-	const query = buildBatchQuery(items);
+	const query = buildBatchQuery(divisionIds);
 
 	console.log(`Executing batch query against Overture Maps...`);
 	console.log(`This may take several minutes for large datasets. Please wait...`);
@@ -175,23 +178,18 @@ async function fetchDivisionData(
 		console.log(`Found ${rows.length.toString()} total divisions`);
 
 		if (rows.length === 0) {
-			console.warn(`No division data found for any items`);
-			return [];
+			console.warn(`No division data found for any division IDs`);
+			return new Map();
 		}
 
-		// Create a map of gersId to slug for lookup
-		const gersIdToSlug = new Map<string, string>();
+		// Create a map of division ID to division item
+		const divisionsById = new Map<string, DivisionItem>();
 
-		for (const item of items) {
-			gersIdToSlug.set(item.gersId, item.slug);
-		}
-
-		return rows.map((row, index) => {
+		for (const [index, row] of rows.entries()) {
 			const id = (row.id ?? row.col_0) as string;
-			const slug = gersIdToSlug.get(id) ?? 'unknown';
 
 			// Log found matches for debugging
-			console.log(`  Match ${(index + 1).toString()}: ${id} (${slug})`);
+			console.log(`  Match ${(index + 1).toString()}: ${id}`);
 
 			// Parse the GeoJSON geometry string
 			let geometry: Geometry | undefined;
@@ -202,16 +200,16 @@ async function fetchDivisionData(
 				geometry = JSON.parse(geometryJson) as Geometry;
 			} catch (error) {
 				console.warn(`Failed to parse geometry for ${id}:`, error);
-
 				geometry = undefined;
 			}
 
-			return {
-				id,
-				slug,
+			divisionsById.set(id, {
+				divisionId: id,
 				geometry,
-			};
-		});
+			});
+		}
+
+		return divisionsById;
 	} catch (error) {
 		console.log(`\nQuery failed`);
 		console.error(`Error fetching batch data:`, error);
@@ -227,7 +225,7 @@ function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
 
 	const features = divisionItems.map((divisionItem) =>
 		feature(divisionItem.geometry!, undefined, {
-			id: divisionItem.id,
+			id: divisionItem.divisionId,
 		}),
 	);
 
@@ -253,74 +251,94 @@ async function saveFlatgeobuf(geojsonData: FeatureCollection, slug: string) {
 	}
 }
 
-async function processItems(db: DuckDBConnection, items: Array<DivisionMetadata>) {
-	console.log(`\n=== Processing ${items.length.toString()} items ===`);
+async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadata>) {
+	console.log(`\n=== Processing ${String(regions.length)} regions ===`);
 
 	try {
-		// Check which items already exist and filter them out
+		// Check which regions already exist and filter them out
 		const outputDir = path.join(process.cwd(), OUTPUT_PATH);
+
 		await ensureOutputDirectory(outputDir);
 
-		const itemsToProcess = [];
-		for (const item of items) {
-			const filePath = path.join(outputDir, `${item.slug}.fgb`);
+		const regionsToProcess: Array<RegionMetadata> = [];
+
+		for (const region of regions) {
+			const filePath = path.join(outputDir, `${region.slug}.fgb`);
+
 			try {
 				await fs.access(filePath);
-				console.log(`Skipping ${item.slug} (already exists)`);
+
+				console.log(`Skipping ${region.slug} (already exists)`);
 			} catch {
-				itemsToProcess.push(item);
+				regionsToProcess.push(region);
 			}
 		}
 
-		if (itemsToProcess.length === 0) {
+		if (regionsToProcess.length === 0) {
 			console.log('All files already exist, skipping query');
-			return items.length;
+
+			return regions.length;
 		}
 
-		console.log(`Querying for ${String(itemsToProcess.length)}/${String(items.length)} items`);
+		console.log(`Processing ${String(regionsToProcess.length)}/${String(regions.length)} regions`);
+
+		// Collect all unique division IDs needed for regions that don't exist yet
+		const uniqueDivisionIds = new Set<string>();
+
+		for (const region of regionsToProcess) {
+			for (const divisionId of region.divisionIds) {
+				uniqueDivisionIds.add(divisionId);
+			}
+		}
+
+		console.log(`Querying for ${String(uniqueDivisionIds.size)} unique division IDs`);
 
 		// Fetch all division data in a single batch query
-		const divisionData = await fetchDivisionData(db, itemsToProcess);
+		const divisionsById = await fetchDivisionData(db, uniqueDivisionIds);
 
-		// Group divisions by slug
-		const divisionsBySlug = new Map<string, Array<DivisionItem>>();
+		// Process each region and save individual FGB files
+		let successCount = regions.length - regionsToProcess.length; // Count already existing files as successful
 
-		for (const divisionDatum of divisionData) {
-			if (!divisionsBySlug.has(divisionDatum.slug)) {
-				divisionsBySlug.set(divisionDatum.slug, []);
-			}
-			divisionsBySlug.get(divisionDatum.slug)!.push(divisionDatum);
-		}
-
-		// Process each item and save individual GeoJSON files
-		let successCount = items.length - itemsToProcess.length; // Count already existing files as successful
-
-		for (const item of itemsToProcess) {
-			console.log(`\nProcessing ${item.slug}...`);
+		for (const region of regionsToProcess) {
+			console.log(`\nProcessing ${region.slug}...`);
 
 			try {
-				const divisionItems = divisionsBySlug.get(item.slug) ?? [];
+				// Collect division items for this region
+				const divisionItems: Array<DivisionItem> = [];
+
+				for (const divisionId of region.divisionIds) {
+					const divisionItem = divisionsById.get(divisionId);
+
+					if (divisionItem) {
+						divisionItems.push(divisionItem);
+					} else {
+						console.warn(`No division data found for division ID: ${divisionId}`);
+					}
+				}
 
 				if (divisionItems.length === 0) {
-					console.warn(`No division data found for ${item.slug}`);
+					console.warn(`No division data found for any division IDs in ${region.slug}`);
+				} else {
+					console.log(
+						`Found ${divisionItems.length.toString()}/${region.divisionIds.length.toString()} division(s) for ${region.slug}`,
+					);
 				}
 
 				const geojsonData = convertToFeatureCollection(divisionItems);
 
-				await saveFlatgeobuf(geojsonData, item.slug);
+				await saveFlatgeobuf(geojsonData, region.slug);
 
-				console.log(`✓ Successfully processed ${item.slug}`);
+				console.log(`✓ Successfully processed ${region.slug}`);
 
 				successCount++;
 			} catch (error) {
-				console.error(`✗ Failed to process ${item.slug}:`, error);
+				console.error(`✗ Failed to process ${region.slug}:`, error);
 			}
 		}
 
 		return successCount;
 	} catch (error) {
-		console.error(`Error processing items:`, error);
-
+		console.error(`Error processing regions:`, error);
 		throw error;
 	}
 }
@@ -331,34 +349,34 @@ async function mapDivisions() {
 	);
 
 	try {
-		// Load division items from regions collection
-		const items = await parseDivisionIds();
+		// Load region data from regions collection
+		const regions = await parseRegionData();
 
-		if (items.length === 0) {
-			console.log(`No items with division IDs found in ${REGIONS_PATH}.`);
+		if (regions.length === 0) {
+			console.log(`No regions with division IDs found in ${REGIONS_PATH}.`);
 			return;
 		}
 
 		// Initialize DuckDB connection
 		const connection = await initializeDuckDB();
 
-		const totalCount = items.length;
+		const totalCount = regions.length;
 
-		// Process all items in a single batch
-		const successCount = await processItems(connection, items);
+		// Process all regions in a single batch
+		const successCount = await processRegions(connection, regions);
 
 		connection.disconnectSync();
 
 		console.log(`\n=== Summary ===`);
 		console.log(
-			`Successfully processed: ${successCount.toString()}/${totalCount.toString()} items`,
+			`Successfully processed: ${successCount.toString()}/${totalCount.toString()} regions`,
 		);
 		console.log(`Output directory: ${OUTPUT_PATH}`);
 
 		if (successCount === totalCount) {
-			console.log('🎉 All items processed successfully!');
+			console.log('🎉 All regions processed successfully!');
 		} else {
-			console.log('⚠️  Some items failed to process. Check the logs above.');
+			console.log('⚠️  Some regions failed to process. Check the logs above.');
 			process.exit(1);
 		}
 	} catch (error) {
