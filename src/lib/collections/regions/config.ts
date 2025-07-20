@@ -20,6 +20,7 @@ export const regions = defineCollection({
 			dateCreated: DateStringSchema.optional(),
 			dateUpdated: DateStringSchema.optional(),
 			imageSet: ImageSetSchema.array().optional(),
+			divisionId: z.union([z.string(), z.string().array()]).optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
 			ancestors: z.string().array().optional(),
@@ -31,7 +32,6 @@ export const regions = defineCollection({
 			posts: z.string().array().optional(),
 			postCount: z.number().int().optional(),
 			hideSearch: z.boolean().optional(),
-			hasDivision: z.boolean().optional(),
 		})
 		.strict(),
 });

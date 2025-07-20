@@ -1,10 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { z } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-
-import { loadYamlData } from '#lib/utils/yaml.ts';
 
 interface CollectionData {
 	regions: Array<CollectionEntry<'regions'>>;
@@ -13,30 +10,12 @@ interface CollectionData {
 
 let collection: Promise<CollectionData> | undefined;
 
-let regionsDivisionCache: Record<string, string> | undefined;
-
-async function getRegionsDivisionData() {
-	if (!regionsDivisionCache) {
-		try {
-			const data = await loadYamlData('divisions.yaml');
-
-			regionsDivisionCache = await z.record(z.string()).parseAsync(data);
-		} catch (error) {
-			console.error('Failed to load regions division data:', error);
-			regionsDivisionCache = undefined;
-		}
-	}
-	return regionsDivisionCache;
-}
-
 async function generateCollection() {
 	const startTime = performance.now();
 
 	const locations = await getCollection('locations');
 	const posts = await getCollection('posts');
 	const regions = await getCollection('regions');
-
-	const regionsDivisionData = await getRegionsDivisionData();
 
 	// Calculate ancestors
 	for (const entry of regions) {
@@ -132,11 +111,6 @@ async function generateCollection() {
 			(item): item is string => !!item,
 		);
 		entry.data.postCount = entry.data.posts.length;
-
-		// Optionally assign geodata status to regions entries
-		if (regionsDivisionData) {
-			entry.data.hasDivision = !!regionsDivisionData[entry.id];
-		}
 	}
 
 	// Assign all data to the map and collection
