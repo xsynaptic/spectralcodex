@@ -2,6 +2,7 @@
 	"name": "@spectralcodex/image-loader",
 	"version": "1.0.0",
 	"description": "Image loader for Spectral Codex",
+	"type": "module",
 	"exports": {
 		".": "./src/index.ts"
 	},

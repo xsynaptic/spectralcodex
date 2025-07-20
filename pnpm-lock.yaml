@@ -40,8 +40,8 @@ importers:
         specifier: ^3.4.1
         version: 3.4.1
       '@duckdb/node-api':
-        specifier: 1.3.2-alpha.24
-        version: 1.3.2-alpha.24
+        specifier: 1.3.2-alpha.25
+        version: 1.3.2-alpha.25
       '@iconify/json':
         specifier: ^2.2.359
         version: 2.2.359
@@ -145,8 +145,8 @@ importers:
         specifier: ^16.3.0
         version: 16.3.0
       keyv:
-        specifier: ^5.3.4
-        version: 5.3.4
+        specifier: ^5.4.0
+        version: 5.4.0
       ky:
         specifier: ^1.8.2
         version: 1.8.2
@@ -178,8 +178,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0
       remeda:
-        specifier: ^2.26.0
-        version: 2.26.0
+        specifier: ^2.26.1
+        version: 2.26.1
       sharp:
         specifier: ^0.34.3
         version: 0.34.3
@@ -334,8 +334,8 @@ importers:
         specifier: ^0.18.0
         version: 0.18.0(astro@5.12.0(@types/node@22.15.17)(idb-keyval@6.2.2)(jiti@2.4.2)(lightningcss@1.30.1)(rollup@4.40.1)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0))
       remeda:
-        specifier: ^2.26.0
-        version: 2.26.0
+        specifier: ^2.26.1
+        version: 2.26.1
       sirv:
         specifier: ^3.0.1
         version: 3.0.1
@@ -397,8 +397,8 @@ importers:
         specifier: ^8.0.4
         version: 8.0.4(maplibre-gl@5.6.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       remeda:
-        specifier: ^2.26.0
-        version: 2.26.0
+        specifier: ^2.26.1
+        version: 2.26.1
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -602,36 +602,36 @@ packages:
   '@capsizecss/unpack@2.4.0':
     resolution: {integrity: sha512-GrSU71meACqcmIUxPYOJvGKF0yryjN/L1aCuE9DViCTJI7bfkjgYDPD1zbNDcINJwSSP6UaBZY9GAbYDO7re0Q==}
 
-  '@duckdb/node-api@1.3.2-alpha.24':
-    resolution: {integrity: sha512-m1gXrG5HyzfJA1uFtw2jwvcfm2sG6vY6uQrE2L9bQJPfHRbAuxse+mkZXxmm7SVi15bNw5RXHzuHOJyT6uB8dQ==}
+  '@duckdb/node-api@1.3.2-alpha.25':
+    resolution: {integrity: sha512-AzDyyjTtnYUxoy/MHDFRwfOggDOkS8RBgGA82OI6nla8B9NDNZeAYJ97T3PvCL8cx7y00EtGVN3g03aoW4fRmw==}
 
-  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.24':
-    resolution: {integrity: sha512-0znVE4wQHgMy6PlEyC3cxfJATEhdi24CEtu8e/5FKgBrzTjpzLQ1BM9qSsvdVaF2IAQxk1PNpuj60k9iMEKm4w==}
+  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.25':
+    resolution: {integrity: sha512-vRjzNgkz2TAYW5c2rzPwcHBctBWr0lxQ4blFASAv0DdeGPOeuCMXJUA3982X7iPNwAppH0VMII6cYzON0GA+RA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.24':
-    resolution: {integrity: sha512-RsqAKNYT2UA2tVirplzNO6+r20PNCf8CEK0+FSt8ULaTqtCP9TAzMI6vcP0+3lUWYHCH59XOS7XgDbNHL9zQxA==}
+  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.25':
+    resolution: {integrity: sha512-BSg/DZjT25QZe87+pmdMfE1XlHdi2WxtAO+F2PEXN6VnPeLyTdl5bYlnhOGrDKquKDmUEqok5OwF7mR4QfU+Aw==}
     cpu: [x64]
     os: [darwin]
 
-  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.24':
-    resolution: {integrity: sha512-v63F51a6M5NYDD+08uwP+3sfZe9wvlV30OxPi95GOudn5cDONStWrQ6OSMEYTL6F08s1iFgnUy+/W+w8ANTgNQ==}
+  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.25':
+    resolution: {integrity: sha512-VhjUH/AvolZWDX/URqiIh58JbAB1vYbDgSmQ0wvqhS9jzJ9Sj88urGDw+XWXw49Rr4BhIgDtX70SoARhO2i/Gg==}
     cpu: [arm64]
     os: [linux]
 
-  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.24':
-    resolution: {integrity: sha512-waHoC4iMT1seCdu1zRGpBnwUG7uPhasVF7EdVlgKUKOK0h0rHAbuisTwFCs4cx6lbEM/2zd8Zn4UzZI8YoOWbg==}
+  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.25':
+    resolution: {integrity: sha512-raav2ypBiV4TlpnKU9hocsuFDO4ipwIcQQmkMIh20/Qd9vkv35QcQYNqStiZVJh2LAaVoQffNvcKMlclblYqUQ==}
     cpu: [x64]
     os: [linux]
 
-  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.24':
-    resolution: {integrity: sha512-MTGOIFC1T+5VR8bt6L7tfB/n3lzCHeMSbdo0RrsEux1lrdCdU4yDb4+VAC38iXyPrnB8/PwAbSLZSP047vymNg==}
+  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.25':
+    resolution: {integrity: sha512-/fAKax+xYkdRhkUl3PkL3HfFd1ZsezG1yiOkL0StHBdD3xB80Njm1JGHxx1fO3WWE5XTbE1MTJ5I0xjEzPwsfQ==}
     cpu: [x64]
     os: [win32]
 
-  '@duckdb/node-bindings@1.3.2-alpha.24':
-    resolution: {integrity: sha512-JUnbqADokfDwIKYnhb8WygZLQdpqoxkHyux00qzeERfPEnekuPGirq7CitF4SuSqZAMScNmC+r/pOviDtEKNGA==}
+  '@duckdb/node-bindings@1.3.2-alpha.25':
+    resolution: {integrity: sha512-FkoSaoeRAi6Em0hs0qzr3SN04ykN99R+Qap5kLwhi6GNPnHzWMU1VrNpK9cE4eBj0n+RWlNK0TiO712dn44QzQ==}
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -1148,8 +1148,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@keyv/serialize@1.0.3':
-    resolution: {integrity: sha512-qnEovoOp5Np2JDGonIDL6Ayihw0RhnRh6vxPuHo4RDn1UOzwEo4AeIfpL6UGIrsceWrCMiVPgwRjbHu4vYFc3g==}
+  '@keyv/serialize@1.1.0':
+    resolution: {integrity: sha512-RlDgexML7Z63Q8BSaqhXdCYNBy/JQnqYIwxofUrNLGCblOMHp+xux2Q8nLMLlPpgHQPoU0Do8Z6btCpRBEqZ8g==}
 
   '@mapbox/geojson-rewind@0.5.2':
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
@@ -2480,9 +2480,6 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-
-  buffer@6.0.3:
-    resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
 
   builtin-modules@5.0.0:
     resolution: {integrity: sha512-bkXY9WsVpY7CvMhKSR6pZilZu9Ln5WDrKVBUXf2S443etkmEO4V58heTecXcUIsNsi4Rx8JUO4NfX1IcQl4deg==}
@@ -3885,8 +3882,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  keyv@5.3.4:
-    resolution: {integrity: sha512-ypEvQvInNpUe+u+w8BIcPkQvEqXquyyibWE/1NB5T2BTzIpS5cGEV1LZskDzPSTvNAaT4+5FutvzlvnkxOSKlw==}
+  keyv@5.4.0:
+    resolution: {integrity: sha512-TMckyVjEoacG5IteUpUrOBsFORtheqziVyyY2dLUwg1jwTb8u48LX4TgmtogkNl9Y9unaEJ1luj10fGyjMGFOQ==}
 
   kind-of@6.0.3:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
@@ -5023,8 +5020,8 @@ packages:
   remark@15.0.1:
     resolution: {integrity: sha512-Eht5w30ruCXgFmxVUSlNWQ9iiimq07URKeFS3hNc8cUWy1llX4KDWfyEDZRycMc+znsN9Ux5/tJ/BFdgdOwA3A==}
 
-  remeda@2.26.0:
-    resolution: {integrity: sha512-lmNNwtaC6Co4m0WTTNoZ/JlpjEqAjPZO0+czC9YVRQUpkbS4x8Hmh+Mn9HPfJfiXqUQ5IXXgSXSOB2pBKAytdA==}
+  remeda@2.26.1:
+    resolution: {integrity: sha512-hpiLfhUwkJhiMS3Z7dRrygcRdkMRZASw5qUdNdi33x1/Y9y/J5q5TyLyf8btDoVLIcsg/4fzPdaGXDTbnl+ixw==}
 
   request-light@0.5.8:
     resolution: {integrity: sha512-3Zjgh+8b5fhRJBQZoy+zbVKpAQGLyka0MPgW3zruTF4dFFJ8Fqcfu9YsAvi/rvdcaTeWG3MkbZv4WKxAn/84Lg==}
@@ -6453,32 +6450,32 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@duckdb/node-api@1.3.2-alpha.24':
+  '@duckdb/node-api@1.3.2-alpha.25':
     dependencies:
-      '@duckdb/node-bindings': 1.3.2-alpha.24
+      '@duckdb/node-bindings': 1.3.2-alpha.25
 
-  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.24':
+  '@duckdb/node-bindings-darwin-arm64@1.3.2-alpha.25':
     optional: true
 
-  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.24':
+  '@duckdb/node-bindings-darwin-x64@1.3.2-alpha.25':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.24':
+  '@duckdb/node-bindings-linux-arm64@1.3.2-alpha.25':
     optional: true
 
-  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.24':
+  '@duckdb/node-bindings-linux-x64@1.3.2-alpha.25':
     optional: true
 
-  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.24':
+  '@duckdb/node-bindings-win32-x64@1.3.2-alpha.25':
     optional: true
 
-  '@duckdb/node-bindings@1.3.2-alpha.24':
+  '@duckdb/node-bindings@1.3.2-alpha.25':
     optionalDependencies:
-      '@duckdb/node-bindings-darwin-arm64': 1.3.2-alpha.24
-      '@duckdb/node-bindings-darwin-x64': 1.3.2-alpha.24
-      '@duckdb/node-bindings-linux-arm64': 1.3.2-alpha.24
-      '@duckdb/node-bindings-linux-x64': 1.3.2-alpha.24
-      '@duckdb/node-bindings-win32-x64': 1.3.2-alpha.24
+      '@duckdb/node-bindings-darwin-arm64': 1.3.2-alpha.25
+      '@duckdb/node-bindings-darwin-x64': 1.3.2-alpha.25
+      '@duckdb/node-bindings-linux-arm64': 1.3.2-alpha.25
+      '@duckdb/node-bindings-linux-x64': 1.3.2-alpha.25
+      '@duckdb/node-bindings-win32-x64': 1.3.2-alpha.25
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -6886,9 +6883,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@keyv/serialize@1.0.3':
-    dependencies:
-      buffer: 6.0.3
+  '@keyv/serialize@1.1.0': {}
 
   '@mapbox/geojson-rewind@0.5.2':
     dependencies:
@@ -9264,11 +9259,6 @@ snapshots:
 
   buffer-from@1.1.2: {}
 
-  buffer@6.0.3:
-    dependencies:
-      base64-js: 1.5.1
-      ieee754: 1.2.1
-
   builtin-modules@5.0.0: {}
 
   bytewise-core@1.2.3:
@@ -10982,9 +10972,9 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  keyv@5.3.4:
+  keyv@5.4.0:
     dependencies:
-      '@keyv/serialize': 1.0.3
+      '@keyv/serialize': 1.1.0
 
   kind-of@6.0.3: {}
 
@@ -12635,7 +12625,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  remeda@2.26.0:
+  remeda@2.26.1:
     dependencies:
       type-fest: 4.41.0
 

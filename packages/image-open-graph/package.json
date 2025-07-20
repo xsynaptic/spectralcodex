@@ -2,6 +2,7 @@
 	"name": "@spectralcodex/image-open-graph",
 	"version": "1.0.0",
 	"description": "Open Graph image generator for Spectral Codex",
+	"type": "module",
 	"exports": {
 		".": "./src/index.ts"
 	},
