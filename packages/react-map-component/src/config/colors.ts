@@ -16,9 +16,9 @@ export const mapClusterStyle = {
 };
 
 export const mapDivisionStyle = {
-	fillColor: '#7f22fe',
-	outlineColor: '#7f22fe',
-	haloColor: '#7f22fe',
+	fillColor: '#999999',
+	outlineColor: '#ff6467',
+	haloColor: '#fb2c36',
 };
 
 export const locationStatusStyle: Record<LocationStatus, { color: string; stroke: string }> = {

@@ -7,15 +7,15 @@ import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
 
 export function useMapSourceDivisionStyle() {
-	const divisionLayerStyle = useMemo(
+	const divisionMaskLayerStyle = useMemo(
 		() =>
 			({
-				id: MapLayerIdEnum.Division,
+				id: MapLayerIdEnum.DivisionMask,
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'fill',
 				paint: {
 					'fill-color': mapDivisionStyle.fillColor,
-					'fill-opacity': 0.05,
+					'fill-opacity': 0.2,
 				},
 			}) satisfies FillLayerSpecification,
 		[],
@@ -44,7 +44,7 @@ export function useMapSourceDivisionStyle() {
 						18,
 						3,
 					],
-					'line-opacity': 0.2,
+					'line-opacity': 0.7,
 				},
 			}) satisfies LineLayerSpecification,
 		[],
@@ -74,14 +74,14 @@ export function useMapSourceDivisionStyle() {
 						18,
 						5,
 					],
-					'line-opacity': 0.3,
+					'line-opacity': 0.2,
 				},
 			}) satisfies LineLayerSpecification,
 		[],
 	);
 
 	return {
-		[MapLayerIdEnum.Division]: divisionLayerStyle,
+		[MapLayerIdEnum.DivisionMask]: divisionMaskLayerStyle,
 		[MapLayerIdEnum.DivisionOutline]: divisionOutlineLayerStyle,
 		[MapLayerIdEnum.DivisionHalo]: divisionHaloLayerStyle,
 	};

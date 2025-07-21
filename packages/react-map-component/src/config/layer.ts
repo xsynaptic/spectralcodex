@@ -8,7 +8,7 @@ export const MapLayerIdEnum = {
 	LineString: 'line-string',
 	Polygon: 'polygon',
 	PolygonOutline: 'polygon-outline',
-	Division: 'division',
+	DivisionMask: 'division-mask',
 	DivisionOutline: 'division-outline',
 	DivisionHalo: 'division-halo',
 } as const satisfies Record<string, string>;

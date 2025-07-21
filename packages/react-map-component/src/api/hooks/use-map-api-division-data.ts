@@ -1,10 +1,20 @@
-import type { Feature, FeatureCollection } from 'geojson';
+import type { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 import { useQuery } from '@tanstack/react-query';
+import { bboxPolygon, difference, featureCollection } from '@turf/turf';
 import { geojson } from 'flatgeobuf';
 import ky from 'ky';
+import { GeometryTypeEnum } from 'packages/map-types/src';
+import { isIncludedIn } from 'remeda';
 
 import type { MapComponentProps } from '../../types';
+
+// This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
+export function createFeatureMask(feature: Feature<Polygon | MultiPolygon>) {
+	const worldMap = bboxPolygon([-180, -85, 180, 85]);
+
+	return difference(featureCollection([worldMap, feature]));
+}
 
 export function useMapApiDivisionData({
 	apiDivisionUrl,
@@ -32,16 +42,25 @@ export function useMapApiDivisionData({
 
 				// Deserialize FlatGeobuf to GeoJSON features
 				const featuresIterator = geojson.deserialize(stream);
-				const features: Array<Feature> = [];
+				const features: Array<Feature<Polygon | MultiPolygon>> = [];
 
 				for await (const feature of featuresIterator) {
-					features.push(feature as unknown as Feature);
+					if (
+						isIncludedIn(feature.geometry.type, [
+							GeometryTypeEnum.MultiPolygon,
+							GeometryTypeEnum.Polygon,
+						])
+					) {
+						const invertedFeature = createFeatureMask(feature as Feature<Polygon | MultiPolygon>);
+
+						if (invertedFeature) features.push(invertedFeature);
+					}
 				}
 
 				return {
 					type: 'FeatureCollection',
 					features,
-				} satisfies FeatureCollection;
+				} satisfies FeatureCollection<Polygon | MultiPolygon>;
 			} catch (error) {
 				console.error('Failed to process FlatGeobuf data:', error);
 				return false;
