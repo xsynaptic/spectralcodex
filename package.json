@@ -13,7 +13,7 @@
 		"test": "vitest",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"map-spritesheet": "tsx ./scripts/map-spritesheet.ts --temp-path ./temp/icons --output-path ./public/icons",
-		"map-divisions": "tsx ./scripts/map-divisions.ts --output-path ./public/divisions --regions-path ./packages/content/collections/regions",
+		"map-divisions": "tsx ./scripts/map-divisions/index.ts --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions",
 		"clean-build-images": "tsx --env-file=.env ./scripts/clean-build-images.ts",
 		"clean-content-layer": "rm -rf .astro && rm node_modules/.astro/data-store.json",
 		"host-images": "serve packages/content/media",
