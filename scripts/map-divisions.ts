@@ -1,9 +1,10 @@
 #!/usr/bin/env tsx
-import type { FeatureCollection, Geometry } from 'geojson';
+import type { FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson';
 
 import { parseFrontmatter } from '@astrojs/markdown-remark';
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import { feature, featureCollection } from '@turf/helpers';
+import { union } from '@turf/turf';
 import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -27,7 +28,7 @@ interface RegionMetadata {
 
 interface DivisionItem {
 	divisionId: string;
-	geometry: Geometry | undefined;
+	geometry: Polygon | MultiPolygon;
 }
 
 async function ensureOutputDirectory(dir: string) {
@@ -90,7 +91,7 @@ async function parseRegionData() {
 
 		await scanDirectory(regionsPath);
 
-		console.log(`Found ${regions.length.toString()} regions with division IDs`);
+		console.log(`Found ${String(regions.length)} regions with division IDs`);
 
 		return regions;
 	} catch (error) {
@@ -157,7 +158,7 @@ async function fetchDivisionData(
 	try {
 		const result = await db.run(query);
 
-		console.log(`Found ${result.rowCount.toString()} rows`);
+		console.log(`Found ${String(result.rowCount)} rows`);
 
 		// Extract data from DuckDB result using getChunk
 		const rows: Array<Record<string, unknown>> = [];
@@ -175,7 +176,7 @@ async function fetchDivisionData(
 			}
 		}
 
-		console.log(`Found ${rows.length.toString()} total divisions`);
+		console.log(`Found ${String(rows.length)} total divisions`);
 
 		if (rows.length === 0) {
 			console.warn(`No division data found for any division IDs`);
@@ -189,7 +190,7 @@ async function fetchDivisionData(
 			const id = (row.id ?? row.col_0) as string;
 
 			// Log found matches for debugging
-			console.log(`  Match ${(index + 1).toString()}: ${id}`);
+			console.log(`  Match ${String(index + 1)}: ${id}`);
 
 			// Parse the GeoJSON geometry string
 			let geometry: Geometry | undefined;
@@ -203,10 +204,12 @@ async function fetchDivisionData(
 				geometry = undefined;
 			}
 
-			divisionsById.set(id, {
-				divisionId: id,
-				geometry,
-			});
+			if (geometry && ['MultiPolygon', 'Polygon'].includes(geometry.type)) {
+				divisionsById.set(id, {
+					divisionId: id,
+					geometry: geometry as Polygon | MultiPolygon,
+				});
+			}
 		}
 
 		return divisionsById;
@@ -219,17 +222,31 @@ async function fetchDivisionData(
 }
 
 function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
-	if (divisionItems.length === 0) {
-		return featureCollection([]) satisfies FeatureCollection;
+	if (divisionItems.length === 1 && divisionItems[0]) {
+		return featureCollection([
+			feature(divisionItems[0].geometry, undefined, {
+				id: divisionItems[0].divisionId,
+			}),
+		]);
 	}
 
-	const features = divisionItems.map((divisionItem) =>
-		feature(divisionItem.geometry!, undefined, {
-			id: divisionItem.divisionId,
-		}),
-	);
+	if (divisionItems.length > 1) {
+		const divisionItemsUnion = union(
+			featureCollection(
+				divisionItems.map((divisionItem) =>
+					feature(divisionItem.geometry, undefined, {
+						id: divisionItem.divisionId,
+					}),
+				),
+			),
+		);
 
-	return featureCollection(features) satisfies FeatureCollection;
+		if (divisionItemsUnion) {
+			return featureCollection([feature(divisionItemsUnion.geometry)]);
+		}
+	}
+
+	return featureCollection([]);
 }
 
 async function saveFlatgeobuf(geojsonData: FeatureCollection, slug: string) {
@@ -240,7 +257,8 @@ async function saveFlatgeobuf(geojsonData: FeatureCollection, slug: string) {
 	const filePath = path.join(outputDir, `${slug}.fgb`);
 
 	try {
-		const fgbBuffer = geojson.serialize(geojsonData);
+		// Attempt to enforce a standard projection, WGS84 (EPSG:4326)
+		const fgbBuffer = geojson.serialize(geojsonData, 4326);
 
 		await fs.writeFile(filePath, fgbBuffer);
 
@@ -320,7 +338,7 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 					console.warn(`No division data found for any division IDs in ${region.slug}`);
 				} else {
 					console.log(
-						`Found ${divisionItems.length.toString()}/${region.divisionIds.length.toString()} division(s) for ${region.slug}`,
+						`Found ${String(divisionItems.length)}/${String(region.divisionIds.length)} division(s) for ${region.slug}`,
 					);
 				}
 
@@ -368,9 +386,7 @@ async function mapDivisions() {
 		connection.disconnectSync();
 
 		console.log(`\n=== Summary ===`);
-		console.log(
-			`Successfully processed: ${successCount.toString()}/${totalCount.toString()} regions`,
-		);
+		console.log(`Successfully processed: ${String(successCount)} / ${String(totalCount)} regions`);
 		console.log(`Output directory: ${OUTPUT_PATH}`);
 
 		if (successCount === totalCount) {
