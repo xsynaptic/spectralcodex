@@ -67,7 +67,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			...(showChineseInterface
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
 				: {}),
-			...(entry.data.divisionId
+			...(entry.data.divisionId && !entry.data.hideDivision
 				? { apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`) }
 				: {}),
 		});
