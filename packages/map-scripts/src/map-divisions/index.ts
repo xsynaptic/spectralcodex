@@ -4,30 +4,49 @@ import type { Geometry, MultiPolygon, Polygon } from 'geojson';
 import { DuckDBConnection } from '@duckdb/node-api';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 
 import type { DivisionItem, RegionMetadata } from './types';
 
-import { boundingBoxes } from './bbox';
-import { getDivisionDataCache, saveCachedGeoJSON } from './cache';
+import { boundingBoxes } from './bounding-boxes';
 import { parseRegionData } from './content';
 import { buildQuery, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
 import { convertToFeatureCollection } from './geojson';
+import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache';
 import { safelyCreateDirectory } from './utils';
 
 // Parse command line arguments
-const args = process.argv.slice(2);
-
-const outputPathIndex = args.indexOf('--output-path');
-const regionsPathIndex = args.indexOf('--regions-path');
-const cachePathIndex = args.indexOf('--cache-path');
-
-const OUTPUT_PATH = args[outputPathIndex + 1] ?? './public/divisions';
-const REGIONS_PATH = args[regionsPathIndex + 1] ?? './packages/content/collections/regions';
-const CACHE_PATH = args[cachePathIndex + 1] ?? './temp/divisions';
-
-const OVERTURE_RELEASE = '2025-06-25.0';
-const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
+const { values: args } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		'root-path': {
+			type: 'string',
+			short: 'r',
+			default: process.cwd(),
+		},
+		'output-path': {
+			type: 'string',
+			short: 'o',
+			default: './public/divisions',
+		},
+		'regions-path': {
+			type: 'string',
+			short: 'p',
+			default: './packages/content/collections/regions',
+		},
+		'cache-path': {
+			type: 'string',
+			short: 'c',
+			default: './temp/divisions',
+		},
+		'overture-url': {
+			type: 'string',
+			short: 'u',
+			default: 's3://overturemaps-us-west-2/release/2025-06-25.0',
+		},
+	},
+});
 
 async function fetchDivisionData(
 	db: DuckDBConnection,
@@ -41,7 +60,7 @@ async function fetchDivisionData(
 	const uncachedDivisionIds = new Set<string>();
 
 	for (const divisionId of divisionIds) {
-		const cached = await getDivisionDataCache(divisionId, CACHE_PATH);
+		const cached = await getDivisionDataCache(divisionId, args['cache-path']);
 
 		if (cached) {
 			console.log(`  Using cached data for ${divisionId}`);
@@ -65,7 +84,7 @@ async function fetchDivisionData(
 	// Get bounding box for this ancestor region
 	const boundingBox = boundingBoxes[ancestorId];
 
-	const query = buildQuery(OVERTURE_BASE_URL, uncachedDivisionIds, boundingBox);
+	const query = buildQuery(args['overture-url'], uncachedDivisionIds, boundingBox);
 
 	console.log(`Running query against Overture Maps...`);
 
@@ -127,7 +146,7 @@ async function fetchDivisionData(
 
 				// Save to cache
 				try {
-					await saveCachedGeoJSON(id, geometry as Polygon | MultiPolygon, CACHE_PATH);
+					await saveDivisionDataCache(id, geometry as Polygon | MultiPolygon, args['cache-path']);
 
 					console.log(`  Cached ${id}`);
 				} catch (error) {
@@ -150,7 +169,7 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 	try {
 		// Check which regions already exist and filter them out
-		const outputDir = path.join(process.cwd(), OUTPUT_PATH);
+		const outputDir = path.join(args['root-path'], args['output-path']);
 
 		await safelyCreateDirectory(outputDir);
 
@@ -233,15 +252,15 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 						console.log(
 							`Found ${String(divisionItems.length)}/${String(region.divisionIds.length)} division(s) for ${region.slug}`,
 						);
+
+						const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
+
+						await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputDir);
+
+						console.log(`✓ Successfully processed ${region.slug}`);
+
+						successCount++;
 					}
-
-					const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
-
-					await saveFlatgeobuf(divisionFeatureCollection, region.slug, OUTPUT_PATH);
-
-					console.log(`✓ Successfully processed ${region.slug}`);
-
-					successCount++;
 				} catch (error) {
 					console.error(`✗ Failed to process ${region.slug}:`, error);
 				}
@@ -257,15 +276,15 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 async function mapDivisions() {
 	console.log(
-		`🗺️  Fetching administrative divisions from Overture Maps using release: ${OVERTURE_RELEASE}...`,
+		`🗺️  Fetching administrative divisions from Overture Maps using release: ${args['overture-url']}...`,
 	);
 
 	try {
 		// Load region data from regions collection
-		const regions = await parseRegionData(REGIONS_PATH);
+		const regions = await parseRegionData(args['root-path'], args['regions-path']);
 
 		if (regions.length === 0) {
-			console.log(`No regions with division IDs found in ${REGIONS_PATH}.`);
+			console.log(`No regions with division IDs found in ${args['regions-path']}.`);
 			return;
 		}
 
@@ -281,7 +300,7 @@ async function mapDivisions() {
 
 		console.log(`\n=== Summary ===`);
 		console.log(`Successfully processed: ${String(successCount)} / ${String(totalCount)} regions`);
-		console.log(`Output directory: ${OUTPUT_PATH}`);
+		console.log(`Output directory: ${args['output-path']}`);
 
 		if (successCount === totalCount) {
 			console.log('🎉 All regions processed successfully!');

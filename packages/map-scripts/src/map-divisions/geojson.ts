@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 import { feature, featureCollection } from '@turf/helpers';

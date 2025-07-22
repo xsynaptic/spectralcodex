@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import type { FeatureCollection } from 'geojson';
 
 import { geojson } from 'flatgeobuf';
@@ -10,10 +9,8 @@ import { safelyCreateDirectory } from './utils';
 export async function saveFlatgeobuf(
 	geojsonData: FeatureCollection,
 	slug: string,
-	outputPath: string,
+	outputDir: string,
 ) {
-	const outputDir = path.join(process.cwd(), outputPath);
-
 	await safelyCreateDirectory(outputDir);
 
 	const filePath = path.join(outputDir, `${slug}.fgb`);
@@ -24,7 +21,7 @@ export async function saveFlatgeobuf(
 
 		await fs.writeFile(filePath, fgbBuffer);
 
-		console.log(`Saved FlatGeobuf to: ${filePath}`);
+		console.log(`Saved FlatGeobuf file to: ${filePath}`);
 	} catch (error) {
 		console.error(`Failed to serialize FlatGeobuf for ${slug}:`, error);
 		throw error;

@@ -1,0 +1,20 @@
+{
+	"name": "@spectralcodex/map-scripts",
+	"version": "1.0.0",
+	"description": "Map scripts for Spectral Codex",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"map-divisions": "tsx ./src/map-divisions/index.ts"
+	},
+	"devDependencies": {
+		"@duckdb/node-api": "1.3.2-alpha.25",
+		"@turf/helpers": "^7.2.0",
+		"@turf/turf": "^7.2.0",
+		"@types/geojson": "^7946.0.16",
+		"astro": "^5.12.1",
+		"flatgeobuf": "^4.1.1",
+		"geojson": "^0.5.0",
+		"tsx": "^4.20.3"
+	}
+}

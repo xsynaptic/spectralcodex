@@ -27,7 +27,7 @@ export async function getDivisionDataCache(
 	}
 }
 
-export async function saveCachedGeoJSON(
+export async function saveDivisionDataCache(
 	divisionId: string,
 	geometry: Polygon | MultiPolygon,
 	cacheDir: string,

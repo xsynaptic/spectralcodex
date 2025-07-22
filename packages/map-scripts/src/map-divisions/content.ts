@@ -1,5 +1,3 @@
-#!/usr/bin/env tsx
-
 import { parseFrontmatter } from '@astrojs/markdown-remark';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +7,7 @@ import type { RegionMetadata } from './types';
 /**
  * Load frontmatter from the regions collection
  */
-export async function parseRegionData(regionsPath: string) {
+export async function parseRegionData(rootPath: string, regionsPath: string) {
 	console.log('Scanning regions collection for divisionId in frontmatter...');
 
 	const regions: Array<RegionMetadata> = [];
@@ -33,20 +31,23 @@ export async function parseRegionData(regionsPath: string) {
 
 					if (frontmatter.divisionId) {
 						// Handle divisionId as string or array (used for composite regions)
-						const divisionIdValue = frontmatter.divisionId as string | Array<string>;
-						const divisionIds = Array.isArray(divisionIdValue)
-							? divisionIdValue.filter((id): id is string => typeof id === 'string')
-							: [divisionIdValue].filter((id): id is string => typeof id === 'string');
+						const divisionIdValue = frontmatter.divisionId as string | Array<string> | null;
 
-						if (divisionIds.length > 0) {
-							// Determine ancestor ID from path structure
-							const regionAncestorId = parentPath ? parentPath.split('/')[0]! : slug;
+						if (divisionIdValue) {
+							const divisionIds = Array.isArray(divisionIdValue)
+								? divisionIdValue.filter((id): id is string => typeof id === 'string')
+								: [divisionIdValue].filter((id): id is string => typeof id === 'string');
 
-							regions.push({
-								slug,
-								divisionIds,
-								regionAncestorId,
-							});
+							if (divisionIds.length > 0) {
+								// Determine ancestor ID from path structure
+								const regionAncestorId = parentPath ? parentPath.split('/')[0]! : slug;
+
+								regions.push({
+									slug,
+									divisionIds,
+									regionAncestorId,
+								});
+							}
 						}
 					}
 				} catch (error) {
@@ -57,7 +58,7 @@ export async function parseRegionData(regionsPath: string) {
 	}
 
 	try {
-		const regionsDir = path.join(process.cwd(), regionsPath);
+		const regionsDir = path.join(rootPath, regionsPath);
 
 		await scanDirectory(regionsDir);
 
