@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import fs from 'node:fs/promises';
 
 export async function safelyCreateDirectory(dir: string) {
@@ -6,6 +7,6 @@ export async function safelyCreateDirectory(dir: string) {
 	} catch {
 		await fs.mkdir(dir, { recursive: true });
 
-		console.log(`Created directory: ${dir}`);
+		console.log(chalk.gray(`Created directory: ${chalk.cyan(dir)}`));
 	}
 }

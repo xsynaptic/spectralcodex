@@ -1,9 +1,10 @@
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
+import chalk from 'chalk';
 
 import type { BoundingBox } from './types';
 
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
-	console.log('Initializing DuckDB...');
+	console.log(chalk.blue('Initializing DuckDB...'));
 
 	try {
 		// Create DuckDB instance with in-memory database
@@ -21,11 +22,11 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 			LOAD httpfs;
 		`);
 
-		console.log('DuckDB initialized with spatial and httpfs extensions');
+		console.log(chalk.green('DuckDB initialized with spatial and httpfs extensions'));
 
 		return connection;
 	} catch (error) {
-		console.error('Failed to initialize DuckDB:', error);
+		console.error(chalk.red('Failed to initialize DuckDB:'), error);
 
 		throw error;
 	}

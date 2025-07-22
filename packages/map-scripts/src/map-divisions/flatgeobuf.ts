@@ -1,6 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 
 import { geojson } from 'flatgeobuf';
+import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -21,9 +22,9 @@ export async function saveFlatgeobuf(
 
 		await fs.writeFile(filePath, fgbBuffer);
 
-		console.log(`Saved FlatGeobuf file to: ${filePath}`);
+		console.log(chalk.gray(`Saved FlatGeobuf file to: ${chalk.cyan(filePath)}`));
 	} catch (error) {
-		console.error(`Failed to serialize FlatGeobuf for ${slug}:`, error);
+		console.error(chalk.red(`Failed to serialize FlatGeobuf for ${chalk.cyan(slug)}:`), error);
 		throw error;
 	}
 }

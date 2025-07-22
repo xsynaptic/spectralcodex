@@ -1,4 +1,5 @@
 import { parseFrontmatter } from '@astrojs/markdown-remark';
+import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -8,7 +9,7 @@ import type { RegionMetadata } from './types';
  * Load frontmatter from the regions collection
  */
 export async function parseRegionData(rootPath: string, regionsPath: string) {
-	console.log('Scanning regions collection for divisionId in frontmatter...');
+	console.log(chalk.blue('Scanning regions collection for divisionId in frontmatter...'));
 
 	const regions: Array<RegionMetadata> = [];
 
@@ -51,7 +52,7 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 						}
 					}
 				} catch (error) {
-					console.warn(`Failed to parse frontmatter for ${filePath}:`, error);
+					console.warn(chalk.yellow(`Failed to parse frontmatter for ${chalk.cyan(filePath)}:`), error);
 				}
 			}
 		}
@@ -62,11 +63,11 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 
 		await scanDirectory(regionsDir);
 
-		console.log(`Found ${String(regions.length)} regions with division IDs`);
+		console.log(chalk.green(`Found ${chalk.cyan(String(regions.length))} regions with division IDs`));
 
 		return regions;
 	} catch (error) {
-		console.error(`Failed to scan regions directory ${regionsPath}:`, error);
+		console.error(chalk.red(`Failed to scan regions directory ${chalk.cyan(regionsPath)}:`), error);
 
 		throw new Error(`Failed to scan regions directory ${regionsPath}`);
 	}
