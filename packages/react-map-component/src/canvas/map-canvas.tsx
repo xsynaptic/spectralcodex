@@ -12,8 +12,8 @@ import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
 import { MapPopup } from '../popup/map-popup';
-import { MapDivisionSource } from '../source/map-source-division';
 import { MapDebugLayer } from '../source/map-source-debug';
+import { MapDivisionSource } from '../source/map-source-division';
 import { MapLineStringSource } from '../source/map-source-lines';
 import { MapPointSource } from '../source/map-source-points';
 import {
@@ -99,9 +99,9 @@ export const MapCanvas = ({
 			{apiDivisionUrl ? (
 				<MapDivisionSource apiDivisionUrl={apiDivisionUrl} isDev={isDev} />
 			) : undefined}
-			<MapPointSource hasMapIcons={spritesId !== undefined && spritesUrl !== undefined} />
 			<MapLineStringSource />
 			{IS_DEBUG && bounds ? <MapDebugLayer bounds={bounds} /> : undefined}
+			<MapPointSource hasMapIcons={spritesId !== undefined && spritesUrl !== undefined} />
 			<MapControlsFilterMenu />
 			<MapPopup />
 			<MapCanvasLoading loading={canvasLoading || sourceDataQueryLoading} />

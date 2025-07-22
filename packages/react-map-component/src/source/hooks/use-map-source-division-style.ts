@@ -15,7 +15,7 @@ export function useMapSourceDivisionStyle() {
 				type: 'fill',
 				paint: {
 					'fill-color': mapDivisionStyle.fillColor,
-					'fill-opacity': 0.2,
+					'fill-opacity': 0.18,
 				},
 			}) satisfies FillLayerSpecification,
 		[],
