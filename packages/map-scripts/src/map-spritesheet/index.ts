@@ -1,32 +1,54 @@
-/* eslint-disable unicorn/no-process-exit */
+#!/usr/bin/env tsx
 import { lookupCollection } from '@iconify/json';
 import { blankIconSet, exportToDirectory, IconSet } from '@iconify/tools';
 import { getIcons, validateIconSet } from '@iconify/utils';
 import { mapIcons } from '@spectralcodex/map-types';
 import chalk from 'chalk';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 // Parse command line arguments
-const args = process.argv.slice(2);
+const { values: args } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		'root-path': {
+			type: 'string',
+			short: 'r',
+			default: process.cwd(),
+		},
+		'output-path': {
+			type: 'string',
+			short: 'o',
+			default: './public/icons',
+		},
+		'temp-path': {
+			type: 'string',
+			short: 't',
+			default: './temp/icons',
+		},
+		'skip-export': {
+			type: 'boolean',
+			short: 's',
+			default: false,
+		},
+		verbose: {
+			type: 'boolean',
+			short: 'v',
+			default: false,
+		},
+	},
+});
 
-const verbose = args.includes('--verbose');
-const skipExport = args.includes('--skip-export');
-
-const tempDirIndex = args.indexOf('--temp-path');
-const outputPathIndex = args.indexOf('--output-path');
-
-const tempDir = args[tempDirIndex + 1] ?? 'temp/icons';
-const outputPath = args[outputPathIndex + 1] ?? '../../public/icons';
-
-const iconsPath = path.join(process.cwd(), tempDir);
+const iconsPath = path.join(args['root-path'], args['temp-path']);
+const outputPath = path.join(args['root-path'], args['output-path']);
 
 // Output shell command results
-$.verbose = verbose;
+$.verbose = args.verbose;
 
 // Populate a custom icon set with whatever we might use in maps
 async function exportMapIcons(iconRecord: Record<string, string>): Promise<void> {
-	if (skipExport) {
+	if (args['skip-export']) {
 		console.log(chalk.yellow('Skipping icon export...'));
 		return;
 	}
@@ -55,7 +77,7 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 
 				if (iconResolved) {
 					mapIconSet.setIcon(iconId, iconResolved);
-					if (verbose) console.log(chalk.green(`✓ Exported: ${iconId} (${iconRequest})`));
+					if (args.verbose) console.log(chalk.green(`✓ Exported: ${iconId} (${iconRequest})`));
 				} else {
 					console.log(chalk.red(`✗ Missing ${iconName} (${iconId})!`));
 				}
@@ -64,11 +86,13 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 
 		await exportToDirectory(mapIconSet, {
 			cleanup: true,
-			log: verbose,
+			log: args.verbose,
 			target: iconsPath,
 		});
 
-		console.log(chalk.green(`Icons exported to ${iconsPath}`));
+		console.log(
+			chalk.green(`Icons exported to ${path.join(args['root-path'], args['output-path'])}`),
+		);
 	} catch (error) {
 		console.error(chalk.red('Error exporting icons:'), error);
 		process.exit(1);
