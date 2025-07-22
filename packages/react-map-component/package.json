@@ -6,7 +6,7 @@
 	"exports": "./src/index.tsx",
 	"private": true,
 	"devDependencies": {
-		"@protomaps/basemaps": "^5.5.0",
+		"@protomaps/basemaps": "^5.5.1",
 		"@spectralcodex/map-types": "workspace:*",
 		"@tanstack/query-sync-storage-persister": "^5.83.0",
 		"@tanstack/react-query": "^5.83.0",
@@ -14,7 +14,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
-		"astro": "^5.12.0",
+		"astro": "^5.12.1",
 		"flatgeobuf": "^4.1.1",
 		"geojson": "^0.5.0",
 		"idb-keyval": "^6.2.2",
