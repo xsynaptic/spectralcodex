@@ -10,3 +10,10 @@ export interface DivisionItem {
 	divisionId: string;
 	geometry: Polygon | MultiPolygon;
 }
+
+export interface BoundingBox {
+	lngMin: number;
+	lngMax: number;
+	latMin: number;
+	latMax: number;
+}

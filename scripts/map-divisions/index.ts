@@ -7,9 +7,10 @@ import path from 'node:path';
 
 import type { DivisionItem, RegionMetadata } from './types';
 
+import { boundingBoxes } from './bbox';
 import { getDivisionDataCache, saveCachedGeoJSON } from './cache';
 import { parseRegionData } from './content';
-import { initializeDuckDB } from './duckdb-setup';
+import { buildQuery, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
 import { convertToFeatureCollection } from './geojson';
 import { safelyCreateDirectory } from './utils';
@@ -28,55 +29,10 @@ const CACHE_PATH = args[cachePathIndex + 1] ?? './temp/divisions';
 const OVERTURE_RELEASE = '2025-06-25.0';
 const OVERTURE_BASE_URL = `s3://overturemaps-us-west-2/release/${OVERTURE_RELEASE}`;
 
-// Bounding boxes for top-level/ancestral regions [west, south, east, north]
-// TODO: this is just a proof-of-concept, we need to get actual bounding box data
-// And test more thoroughly
-const REGION_BOUNDING_BOXES: Record<string, [number, number, number, number]> = {
-	canada: [-141, 42, -52, 84],
-	china: [73, 18, 135, 54],
-	'hong-kong': [113.8, 22.1, 114.5, 22.6],
-	japan: [129, 24, 146, 46],
-	malaysia: [99, 1, 120, 7],
-	philippines: [116, 5, 127, 19],
-	singapore: [103.6, 1.2, 104, 1.5],
-	'south-korea': [125, 33, 130, 39],
-	taiwan: [119.3, 21.9, 122, 25.3],
-	thailand: [97, 5.6, 106, 20.5],
-	'united-states': [-180, 19, -66, 72],
-	vietnam: [102, 8, 110, 24],
-};
-
-// Query division_area table using unique division IDs (GERS IDs) with bounding box optimization
-// Convert WKB geometry to GeoJSON using DuckDB's spatial functions
-// Only select the essential data we need: id and geometry
-function buildBatchQuery(divisionIds: Set<string>, boundingBox?: [number, number, number, number]) {
-	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
-
-	let query = `
-		SELECT 
-			id,
-			ST_AsGeoJSON(geometry) as geometry_geojson
-		FROM read_parquet('${OVERTURE_BASE_URL}/theme=divisions/type=division_area/*')
-		WHERE id IN (${quotedIds})`;
-
-	// Add bounding box filter if provided
-	if (boundingBox) {
-		const [west, south, east, north] = boundingBox;
-
-		query += `
-			AND bbox.xmin > ${String(west)}
-			AND bbox.xmax < ${String(east)}
-			AND bbox.ymin > ${String(south)}
-			AND bbox.ymax < ${String(north)}`;
-	}
-
-	return query + ';';
-}
-
 async function fetchDivisionData(
 	db: DuckDBConnection,
 	divisionIds: Set<string>,
-	boundingBox?: [number, number, number, number],
+	ancestorId: string,
 ): Promise<Map<string, DivisionItem>> {
 	console.log(`Fetching division data for ${String(divisionIds.size)} unique division IDs...`);
 
@@ -106,13 +62,12 @@ async function fetchDivisionData(
 		`Fetching ${String(uncachedDivisionIds.size)} uncached divisions from Overture Maps...`,
 	);
 
-	const query = buildBatchQuery(uncachedDivisionIds, boundingBox);
+	// Get bounding box for this ancestor region
+	const boundingBox = boundingBoxes[ancestorId];
 
-	console.log(`Executing batch query against Overture Maps...`);
-	if (boundingBox) {
-		console.log(`Using bounding box: [${boundingBox.join(', ')}]`);
-	}
-	console.log(`This may take several minutes for large datasets. Please wait...`);
+	const query = buildQuery(OVERTURE_BASE_URL, uncachedDivisionIds, boundingBox);
+
+	console.log(`Running query against Overture Maps...`);
 
 	try {
 		const result = await db.run(query);
@@ -206,8 +161,6 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 			try {
 				await fs.access(filePath);
-
-				console.log(`Skipping ${region.slug} (already exists)`);
 			} catch {
 				regionsToProcess.push(region);
 			}
@@ -253,11 +206,8 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 				}
 			}
 
-			// Get bounding box for this ancestor region
-			const boundingBox = REGION_BOUNDING_BOXES[ancestorId];
-
 			// Fetch division data for this group
-			const divisionsById = await fetchDivisionData(db, divisionIds, boundingBox);
+			const divisionsById = await fetchDivisionData(db, divisionIds, ancestorId);
 
 			// Process each region in this group
 			for (const region of ancestorRegions) {
