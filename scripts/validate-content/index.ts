@@ -73,12 +73,17 @@ switch (command) {
 	default: {
 		if (command) {
 			console.log(chalk.red('Unknown command: ' + command));
+			process.exit(1);
 		}
 
-		await checkSlugMismatches(ContentCollectionsPathEnum);
-		await checkLocationRegions(ContentCollectionsPathEnum.Locations);
+		// Run all validations for deployment - exit immediately on first failure
+		const slugSuccess = await checkSlugMismatches(ContentCollectionsPathEnum);
 
-		if (command) process.exit(1);
+		if (!slugSuccess) process.exit(1);
+
+		const regionSuccess = await checkLocationRegions(ContentCollectionsPathEnum.Locations);
+
+		if (!regionSuccess) process.exit(1);
 
 		break;
 	}

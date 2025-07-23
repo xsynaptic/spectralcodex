@@ -37,11 +37,13 @@ export async function checkLocationRegions(locationsPath: string) {
 
 	if (mismatchCount === 0) {
 		console.log(chalk.green('🎉 All location regions match their directory structure!'));
+		return true;
 	} else {
 		console.log(
 			chalk.yellow(
 				'⚠️  Found ' + mismatchCount.toString() + ' location(s) with region/directory mismatches',
 			),
 		);
+		return false;
 	}
 }
