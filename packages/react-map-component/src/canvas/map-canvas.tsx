@@ -12,11 +12,8 @@ import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
 import { MapPopup } from '../popup/map-popup';
-import { MapBaseSource } from '../source/map-source-base';
-import { MapDebugLayer } from '../source/map-source-debug';
-import { MapDivisionSource } from '../source/map-source-division';
-import { MapLineStringSource } from '../source/map-source-lines';
-import { MapPointSource } from '../source/map-source-points';
+import { MapSource } from '../source/map-source';
+import { MapSourceDebug } from '../source/map-source-debug';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
@@ -97,13 +94,13 @@ export const MapCanvas = ({
 			{...mapCanvasEvents}
 		>
 			<MapControls />
-			<MapBaseSource />
-			{apiDivisionUrl ? (
-				<MapDivisionSource apiDivisionUrl={apiDivisionUrl} isDev={isDev} />
-			) : undefined}
-			<MapLineStringSource />
-			{IS_DEBUG && bounds ? <MapDebugLayer bounds={bounds} /> : undefined}
-			<MapPointSource hasMapIcons={spritesId !== undefined && spritesUrl !== undefined} />
+			<MapSource
+				apiDivisionUrl={apiDivisionUrl}
+				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
+				bounds={bounds}
+				isDebug={IS_DEBUG}
+				isDev={isDev}
+			/>
 			<MapControlsFilterMenu />
 			<MapPopup />
 			<MapCanvasLoading loading={canvasLoading || sourceDataQueryLoading} />

@@ -1,24 +1,20 @@
+import type { FC } from 'react';
+
 import { LocationStatusEnum } from '@spectralcodex/map-types';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapSourceIdEnum } from '../config/source';
-import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
 import { useMapSourcePointsStyle } from './hooks/use-map-source-points-style';
 
-const MapPointSourceLayers = memo(function MapPointLayerContents({
-	data,
-	interactive,
-	hasMapIcons,
-}: {
+export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
 	interactive: boolean;
 	hasMapIcons: boolean;
-}) {
+}> = memo(function MapPointLayerContents({ data, interactive, hasMapIcons }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
@@ -58,12 +54,3 @@ const MapPointSourceLayers = memo(function MapPointLayerContents({
 		</Source>
 	);
 });
-
-export const MapPointSource = ({ hasMapIcons }: { hasMapIcons: boolean }) => {
-	const interactive = useMapCanvasInteractive();
-	const { pointCollection: data } = useMapCanvasData();
-
-	return data ? (
-		<MapPointSourceLayers data={data} interactive={interactive} hasMapIcons={hasMapIcons} />
-	) : undefined;
-};

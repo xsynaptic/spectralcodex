@@ -5,16 +5,13 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapSourceIdEnum } from '../config/source';
 import { useMapSourceLinesStyle } from './hooks/use-map-source-lines-style';
 
-const MapLineStringSourceLayers = memo(function MapLineStringLayerContent({
-	data,
-}: {
+export const MapSourceLines: FC<{
 	data: MapSourceFeatureCollection;
-}) {
+}> = memo(function MapLineStringLayerContent({ data }: { data: MapSourceFeatureCollection }) {
 	const linesStyle = useMapSourceLinesStyle();
 
 	return (
@@ -23,9 +20,3 @@ const MapLineStringSourceLayers = memo(function MapLineStringLayerContent({
 		</Source>
 	);
 });
-
-export const MapLineStringSource: FC = function MapLineStringSource() {
-	const { lineStringCollection: data } = useMapCanvasData();
-
-	return data ? <MapLineStringSourceLayers data={data} /> : undefined;
-};

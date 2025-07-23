@@ -1,5 +1,4 @@
 export const MapLayerIdEnum = {
-	Base: 'base',
 	Clusters: 'clusters',
 	ClustersLabel: 'clusters-label',
 	Points: 'points',
