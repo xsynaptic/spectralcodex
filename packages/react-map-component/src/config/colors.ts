@@ -16,7 +16,7 @@ export const mapClusterStyle = {
 };
 
 export const mapDivisionStyle = {
-	fillColor: '#999999',
+	fillColor: '#a6a09b',
 	outlineColor: '#ff6467',
 	haloColor: '#fb2c36',
 };

@@ -15,7 +15,7 @@ export function useMapSourceDivisionStyle() {
 				type: 'fill',
 				paint: {
 					'fill-color': mapDivisionStyle.fillColor,
-					'fill-opacity': 0.18,
+					'fill-opacity': 0.16,
 				},
 			}) satisfies FillLayerSpecification,
 		[],
@@ -38,11 +38,11 @@ export function useMapSourceDivisionStyle() {
 						['linear'],
 						['zoom'],
 						0, // Zoom level
-						1, // Width
+						0.8, // Width
 						12,
-						2,
+						1,
 						18,
-						3,
+						2,
 					],
 					'line-opacity': 0.7,
 				},
@@ -68,11 +68,13 @@ export function useMapSourceDivisionStyle() {
 						['linear'],
 						['zoom'],
 						0, // Zoom level
+						1,
+						8,
 						2, // Width
 						12,
 						3,
 						18,
-						5,
+						4,
 					],
 					'line-opacity': 0.2,
 				},

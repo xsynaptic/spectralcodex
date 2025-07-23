@@ -15,11 +15,20 @@ const MapDivisionSourceLayers: FC<{ data: FeatureCollection }> = memo(
 
 		return (
 			<Source id={MapSourceIdEnum.DivisionCollection} type="geojson" data={data} generateId={true}>
-				<Layer key={MapLayerIdEnum.DivisionMask} {...divisionStyle[MapLayerIdEnum.DivisionMask]} />
-				<Layer key={MapLayerIdEnum.DivisionHalo} {...divisionStyle[MapLayerIdEnum.DivisionHalo]} />
+				<Layer
+					key={MapLayerIdEnum.DivisionMask}
+					{...divisionStyle[MapLayerIdEnum.DivisionMask]}
+					beforeId={MapLayerIdEnum.Base}
+				/>
+				<Layer
+					key={MapLayerIdEnum.DivisionHalo}
+					{...divisionStyle[MapLayerIdEnum.DivisionHalo]}
+					beforeId={MapLayerIdEnum.Base}
+				/>
 				<Layer
 					key={MapLayerIdEnum.DivisionOutline}
 					{...divisionStyle[MapLayerIdEnum.DivisionOutline]}
+					beforeId={MapLayerIdEnum.Base}
 				/>
 			</Source>
 		);

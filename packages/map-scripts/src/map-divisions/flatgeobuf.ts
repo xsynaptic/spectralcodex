@@ -1,7 +1,7 @@
 import type { FeatureCollection } from 'geojson';
 
-import { geojson } from 'flatgeobuf';
 import chalk from 'chalk';
+import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 

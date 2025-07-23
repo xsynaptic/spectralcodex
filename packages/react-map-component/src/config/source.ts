@@ -1,4 +1,5 @@
 export const MapSourceIdEnum = {
+	BaseCollection: 'baseCollection',
 	PointCollection: 'pointCollection',
 	LineStringCollection: 'lineStringCollection',
 	PolygonCollection: 'polygonCollection',

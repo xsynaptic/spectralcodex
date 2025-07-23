@@ -12,6 +12,7 @@ import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
 import { MapPopup } from '../popup/map-popup';
+import { MapBaseSource } from '../source/map-source-base';
 import { MapDebugLayer } from '../source/map-source-debug';
 import { MapDivisionSource } from '../source/map-source-division';
 import { MapLineStringSource } from '../source/map-source-lines';
@@ -96,6 +97,7 @@ export const MapCanvas = ({
 			{...mapCanvasEvents}
 		>
 			<MapControls />
+			<MapBaseSource />
 			{apiDivisionUrl ? (
 				<MapDivisionSource apiDivisionUrl={apiDivisionUrl} isDev={isDev} />
 			) : undefined}
