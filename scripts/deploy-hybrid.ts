@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/no-process-exit */
+#!/usr/bin/env tsx
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';

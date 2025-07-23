@@ -17,7 +17,6 @@ import { convertToFeatureCollection } from './geojson';
 import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache';
 import { safelyCreateDirectory } from './utils';
 
-// Parse command line arguments
 const { values: args } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
@@ -54,7 +53,11 @@ async function fetchDivisionData(
 	divisionIds: Set<string>,
 	ancestorId: string,
 ): Promise<Map<string, DivisionItem>> {
-	console.log(chalk.blue(`Fetching division data for ${chalk.cyan(String(divisionIds.size))} unique division IDs...`));
+	console.log(
+		chalk.blue(
+			`Fetching division data for ${chalk.cyan(String(divisionIds.size))} unique division IDs...`,
+		),
+	);
 
 	// Check cache for each division ID first
 	const divisionsById = new Map<string, DivisionItem>();
@@ -73,13 +76,17 @@ async function fetchDivisionData(
 
 	// If all divisions are cached, return early
 	if (uncachedDivisionIds.size === 0) {
-		console.log(chalk.green(`All ${chalk.cyan(String(divisionIds.size))} divisions found in cache`));
+		console.log(
+			chalk.green(`All ${chalk.cyan(String(divisionIds.size))} divisions found in cache`),
+		);
 
 		return divisionsById;
 	}
 
 	console.log(
-		chalk.blue(`Fetching ${chalk.cyan(String(uncachedDivisionIds.size))} uncached divisions from Overture Maps...`),
+		chalk.blue(
+			`Fetching ${chalk.cyan(String(uncachedDivisionIds.size))} uncached divisions from Overture Maps...`,
+		),
 	);
 
 	// Get bounding box for this ancestor region
@@ -192,7 +199,11 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 			return regions.length;
 		}
 
-		console.log(chalk.blue(`Processing ${chalk.cyan(String(regionsToProcess.length))}/${chalk.cyan(String(regions.length))} regions`));
+		console.log(
+			chalk.blue(
+				`Processing ${chalk.cyan(String(regionsToProcess.length))}/${chalk.cyan(String(regions.length))} regions`,
+			),
+		);
 
 		// Group regions by regionAncestorId for batched processing
 		const regionsByAncestor = new Map<string, Array<RegionMetadata>>();
@@ -207,14 +218,20 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 			regionsByAncestor.get(ancestorId)!.push(region);
 		}
 
-		console.log(chalk.blue(`Processing ${chalk.cyan(String(regionsByAncestor.size))} region groups by ancestor...`));
+		console.log(
+			chalk.blue(
+				`Processing ${chalk.cyan(String(regionsByAncestor.size))} region groups by ancestor...`,
+			),
+		);
 
 		let successCount = regions.length - regionsToProcess.length;
 
 		// Process each region group with its bounding box
 		for (const [ancestorId, ancestorRegions] of regionsByAncestor) {
 			console.log(
-				chalk.magenta(`\n--- Processing ${chalk.cyan(ancestorId)} group (${chalk.cyan(String(ancestorRegions.length))} regions) ---`),
+				chalk.magenta(
+					`\n--- Processing ${chalk.cyan(ancestorId)} group (${chalk.cyan(String(ancestorRegions.length))} regions) ---`,
+				),
 			);
 
 			// Collect division IDs for this ancestor group
@@ -243,15 +260,23 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 						if (divisionItem) {
 							divisionItems.push(divisionItem);
 						} else {
-							console.warn(chalk.yellow(`No division data found for division ID: ${chalk.cyan(divisionId)}`));
+							console.warn(
+								chalk.yellow(`No division data found for division ID: ${chalk.cyan(divisionId)}`),
+							);
 						}
 					}
 
 					if (divisionItems.length === 0) {
-						console.warn(chalk.yellow(`No division data found for any division IDs in ${chalk.cyan(region.slug)}`));
+						console.warn(
+							chalk.yellow(
+								`No division data found for any division IDs in ${chalk.cyan(region.slug)}`,
+							),
+						);
 					} else {
 						console.log(
-							chalk.green(`Found ${chalk.cyan(String(divisionItems.length))}/${chalk.cyan(String(region.divisionIds.length))} division(s) for ${chalk.cyan(region.slug)}`),
+							chalk.green(
+								`Found ${chalk.cyan(String(divisionItems.length))}/${chalk.cyan(String(region.divisionIds.length))} division(s) for ${chalk.cyan(region.slug)}`,
+							),
 						);
 
 						const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
@@ -277,7 +302,9 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 async function mapDivisions() {
 	console.log(
-		chalk.blue(`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(args['overture-url'])}...`),
+		chalk.blue(
+			`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(args['overture-url'])}...`,
+		),
 	);
 
 	try {
@@ -285,7 +312,9 @@ async function mapDivisions() {
 		const regions = await parseRegionData(args['root-path'], args['regions-path']);
 
 		if (regions.length === 0) {
-			console.log(chalk.yellow(`No regions with division IDs found in ${chalk.cyan(args['regions-path'])}.`));
+			console.log(
+				chalk.yellow(`No regions with division IDs found in ${chalk.cyan(args['regions-path'])}.`),
+			);
 			return;
 		}
 
@@ -300,7 +329,11 @@ async function mapDivisions() {
 		connection.disconnectSync();
 
 		console.log(chalk.magenta(`\n=== Summary ===`));
-		console.log(chalk.green(`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`));
+		console.log(
+			chalk.green(
+				`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`,
+			),
+		);
 		console.log(chalk.blue(`Output directory: ${chalk.cyan(args['output-path'])}`));
 
 		if (successCount === totalCount) {
