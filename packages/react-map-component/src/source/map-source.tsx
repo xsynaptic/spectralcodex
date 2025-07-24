@@ -10,13 +10,14 @@ import { MapSourceDivisions } from './map-source-divisions';
 import { MapSourceLines } from './map-source-lines';
 import { MapSourcePoints } from './map-source-points';
 
+const IS_DEBUG = false as boolean;
+
 export const MapSource: FC<{
 	apiDivisionUrl?: string | undefined;
 	hasMapIcons: boolean;
 	bounds: MapComponentProps['bounds'];
 	isDev?: boolean | undefined;
-	isDebug?: boolean | undefined;
-}> = ({ apiDivisionUrl, hasMapIcons, bounds, isDev, isDebug }) => {
+}> = ({ apiDivisionUrl, hasMapIcons, bounds, isDev }) => {
 	const interactive = useMapCanvasInteractive();
 
 	const { pointCollection, lineStringCollection } = useMapCanvasData();
@@ -43,7 +44,7 @@ export const MapSource: FC<{
 				interactive={interactive}
 				hasMapIcons={hasMapIcons}
 			/>
-			{isDebug && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
+			{IS_DEBUG && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
 		</>
 	);
 };

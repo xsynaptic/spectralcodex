@@ -13,7 +13,6 @@ import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
 import { MapPopup } from '../popup/map-popup';
 import { MapSource } from '../source/map-source';
-import { MapSourceDebug } from '../source/map-source-debug';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
@@ -27,8 +26,6 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsImage,
 ] as const;
-
-const IS_DEBUG = false as boolean;
 
 export const MapCanvas = ({
 	apiSourceUrl,
@@ -98,7 +95,6 @@ export const MapCanvas = ({
 				apiDivisionUrl={apiDivisionUrl}
 				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
 				bounds={bounds}
-				isDebug={IS_DEBUG}
 				isDev={isDev}
 			/>
 			<MapControlsFilterMenu />
