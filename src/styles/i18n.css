@@ -1,3 +1,4 @@
+html:not([lang^='cjk']) span[lang^='cjk'],
 html:not([lang^='zh']) span[lang^='zh'],
 html:not([lang^='ja']) span[lang^='ja'],
 html:not([lang^='ko']) span[lang^='ko'] {

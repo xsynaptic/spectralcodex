@@ -87,10 +87,15 @@ export default defineConfig({
 		define: {
 			'import.meta.env.BUILD_ID': JSON.stringify(isProduction ? nanoid() : 'dev'),
 		},
+		server: {
+			watch: {
+				ignored: ['./*.md'],
+			},
+		},
 	},
 	markdown: {
 		remarkPlugins: [remarkImgGroup],
-		rehypePlugins: [rehypeWrapCjk],
+		rehypePlugins: [[rehypeWrapCjk, { langCode: 'cjk' }]],
 	},
 	integrations: [
 		react({

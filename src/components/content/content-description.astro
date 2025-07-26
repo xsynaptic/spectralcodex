@@ -1,0 +1,33 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import type { RegionLanguage } from '#lib/collections/regions/types.ts';
+
+import FormatMarkdown from '#components/format/format-markdown.astro';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+
+interface Props {
+	entry: CollectionEntry<
+		'ephemera' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
+	>;
+}
+
+const { entry } = Astro.props;
+
+let regionLanguage: RegionLanguage | undefined;
+
+if (entry.collection === 'regions') {
+	regionLanguage = entry.data.langCode;
+} else if (entry.collection === 'locations') {
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
+	regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
+		?.data.langCode;
+} else {
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
+	regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
+}
+---
+
+<FormatMarkdown langCode={regionLanguage}>{entry.data.description}</FormatMarkdown>
