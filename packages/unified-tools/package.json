@@ -1,0 +1,35 @@
+{
+	"name": "@spectralcodex/unified-tools",
+	"version": "1.0.0",
+	"description": "A common set of tools for transforming and manipulating markup and text",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"sideEffects": false,
+	"files": [
+		"src/**/*"
+	],
+	"private": true,
+	"keywords": [
+		"unified",
+		"rehype",
+		"rehype-plugin",
+		"remark",
+		"remark-plugin"
+	],
+	"author": "Alexander Synaptic <x@synapticism.com>",
+	"license": "MIT",
+	"dependencies": {
+		"rehype-parse": "^9.0.1",
+		"rehype-sanitize": "^6.0.0",
+		"rehype-stringify": "^10.0.1",
+		"rehype-wrap-cjk": "^0.4.0",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.2",
+		"remark-smartypants": "^3.0.2",
+		"retext": "^9.0.0",
+		"retext-smartypants": "^6.2.0",
+		"unified": "^11.0.5"
+	}
+}

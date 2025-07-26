@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.4.0",
+	"version": "5.4.1",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -15,7 +15,6 @@
 		"map-divisions": "pnpm --filter @spectralcodex/map-scripts map-divisions --root-path=$PWD --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions",
 		"map-spritesheet": "pnpm --filter @spectralcodex/map-scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons",
 		"clean-build-images": "tsx --env-file=.env ./scripts/clean-build-images.ts",
-		"clean-content-layer": "rm -rf .astro && rm node_modules/.astro/data-store.json",
 		"host-images": "serve packages/content/media",
 		"update-content-schemas": "tsx ./scripts/update-content-schemas.ts",
 		"validate-content": "tsx ./scripts/validate-content/index.ts",
@@ -37,7 +36,7 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.12.2",
+		"astro": "^5.12.3",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0"
 	},
@@ -48,7 +47,7 @@
 		"@astrojs/react": "^4.3.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.4.1",
-		"@iconify/json": "^2.2.360",
+		"@iconify/json": "^2.2.362",
 		"@iconify/utils": "^2.3.0",
 		"@sindresorhus/slugify": "^2.2.1",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -58,6 +57,7 @@
 		"@spectralcodex/map-types": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
+		"@spectralcodex/unified-tools": "workspace:*",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tailwindcss/vite": "^4.1.11",
 		"@tanstack/eslint-plugin-query": "^5.81.2",
@@ -68,13 +68,12 @@
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
 		"@xsynaptic/eslint-config": "^2.0.1",
-		"@xsynaptic/unified-tools": "^0.0.7",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.4",
 		"astro-pagefind": "^1.8.3",
 		"astro-seo": "^0.8.4",
 		"chalk": "^5.4.1",
-		"eslint": "^9.31.0",
+		"eslint": "^9.32.0",
 		"eslint-plugin-astro": "^1.3.1",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react": "^7.37.5",
