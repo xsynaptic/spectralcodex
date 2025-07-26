@@ -2,6 +2,7 @@ import { glob } from 'astro/loaders';
 import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
 import { ImageSetSchema } from '#lib/schemas/image.ts';
@@ -32,6 +33,7 @@ export const regions = defineCollection({
 			locationCount: z.number().int().optional(),
 			posts: z.string().array().optional(),
 			postCount: z.number().int().optional(),
+			langCode: z.nativeEnum(RegionLanguageMap).optional(),
 			hideSearch: z.boolean().optional(),
 		})
 		.strict(),

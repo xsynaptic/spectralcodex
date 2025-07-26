@@ -8,7 +8,6 @@ import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholder,
-	getImageTitle,
 } from '#lib/image/image-loader-utils.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
@@ -18,7 +17,6 @@ import { getLocalImageTransformFunction } from '#lib/schemas/image.ts';
 const ImageMetadataSchema = z.object({
 	title: z.string().optional(),
 	...titleMultilingualSchema,
-	titleRaw: z.string().optional(),
 	dateCaptured: z.date().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
@@ -58,8 +56,7 @@ export const images = defineCollection({
 						const dateCaptured = tags.DateCreated ? tags.DateCreated.toString() : undefined;
 
 						return {
-							...getImageTitle(tags.Title),
-							titleRaw: String(tags.Title),
+							title: String(tags.Title),
 							dateCaptured: dateCaptured ? new Date(dateCaptured) : undefined,
 							brand: String(tags.Make),
 							camera: String(tags.Model),

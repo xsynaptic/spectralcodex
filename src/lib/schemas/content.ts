@@ -1,4 +1,4 @@
-import { stylizeText } from '@xsynaptic/unified-tools';
+import { stylizeText } from '@spectralcodex/unified-tools';
 import { z } from 'astro:content';
 
 // Title schema; apply SmartyPants to arbitrary strings

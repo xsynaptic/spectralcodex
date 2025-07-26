@@ -18,9 +18,9 @@ const description = await Astro.slots.render('excerpt-description');
 const content = (await Astro.slots.render('default')) as string | undefined;
 
 // Generate the excerpt
-const excerpt = content?.split(`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`) ?? [];
-const excerptContent = excerpt[0];
-const hasExcerpt = excerpt.length > 1;
+const excerptSplit = content?.split(`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`) ?? [];
+const excerptContent = excerptSplit[0];
+const hasExcerpt = excerptSplit.length > 1;
 
 const t = getTranslations();
 ---

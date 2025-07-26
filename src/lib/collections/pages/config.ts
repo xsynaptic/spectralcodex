@@ -19,6 +19,7 @@ export const pages = defineCollection({
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
+			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
 			links: LinkSchema.array().optional(),
 			dateCreated: DateStringSchema,

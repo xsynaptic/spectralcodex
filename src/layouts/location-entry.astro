@@ -1,13 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { render } from 'astro:content';
-
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentBody from '#components/content/content-body.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
+import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentImageEntry from '#components/content/content-image-entry.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
@@ -32,6 +32,7 @@ import ProseDescription from '#components/parts/prose-description.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -42,14 +43,9 @@ interface Props {
 	entry: CollectionEntry<'locations'>;
 	mapData: MapComponentData;
 	metadataItems: Array<ContentMetadataItem>;
-	regionPrimary: CollectionEntry<'regions'> | undefined;
 }
 
-const { entry, mapData, metadataItems, regionPrimary } = Astro.props;
-
-const {
-	data: { description, dateCreated, dateUpdated, imageFeatured, imageHero, heritage, address },
-} = entry;
+const { entry, mapData, metadataItems } = Astro.props;
 
 // This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
@@ -57,7 +53,9 @@ const titleMultilingual =
 	getMultilingualContent(entry.data.override, 'title') ??
 	getMultilingualContent(entry.data, 'title');
 
-const { Content } = await render(entry);
+const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
+const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions);
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
@@ -69,19 +67,19 @@ const t = getTranslations();
 <MainSite
 	meta={{
 		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
-		description,
+		description: entry.data.description,
 		image: getSeoImageProps({
-			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
+			...(entry.data.imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
 			alt: title,
 		}),
 	}}
-	hasHeroImage={!!imageHero}
+	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			imageHero ? (
-				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
+			entry.data.imageHero ? (
+				<ImageHero imageId={entry.data.imageHero} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-multilingual">
@@ -103,8 +101,8 @@ const t = getTranslations();
 							) : undefined}
 							<DividedItem dividerColor="hero">
 								<ContentDate
-									date={dateCreated}
-									dateUpdated={dateUpdated}
+									date={entry.data.dateCreated}
+									dateUpdated={entry.data.dateUpdated}
 									datePreset={DatePresetEnum.Medium}
 								/>
 							</DividedItem>
@@ -128,8 +126,8 @@ const t = getTranslations();
 						) : undefined}
 						<DividedItem>
 							<ContentDate
-								date={dateCreated}
-								dateUpdated={dateUpdated}
+								date={entry.data.dateCreated}
+								dateUpdated={entry.data.dateUpdated}
 								datePreset={DatePresetEnum.Medium}
 							/>
 						</DividedItem>
@@ -140,15 +138,17 @@ const t = getTranslations();
 		{
 			hasContent ? (
 				<ProseBody class="pb-small" data-reading-frame>
-					<Content />
+					<ContentBody entry={entry} />
 				</ProseBody>
 			) : (
 				<>
-					{imageFeatured ? <ContentImageEntry imageId={imageFeatured} alt={title} /> : undefined}
+					{entry.data.imageFeatured ? (
+						<ContentImageEntry imageId={entry.data.imageFeatured} alt={title} />
+					) : undefined}
 					<ContentSection>
 						<Fragment slot="section-description">
 							<ProseDescription>
-								<FormatMarkdown>{description}</FormatMarkdown>
+								<ContentDescription entry={entry} />
 							</ProseDescription>
 						</Fragment>
 					</ContentSection>
@@ -164,7 +164,7 @@ const t = getTranslations();
 				</ContentSection>
 			) : undefined
 		}
-		<LocationsHeritage heritage={heritage} />
+		<LocationsHeritage heritage={entry.data.heritage} />
 		{entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{
 			entry.data.hideLocation ? undefined : (
@@ -181,12 +181,16 @@ const t = getTranslations();
 		<LocationsNotices entry={entry} />
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{
-				address && !entry.data.hideLocation ? (
+				entry.data.address && !entry.data.hideLocation ? (
 					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
 						{t('locations.address.label')}:{' '}
-						<span>
-							<FormatCjk>{address}</FormatCjk>
-						</span>
+						{regionPrimary?.data.langCode ? (
+							<span>
+								<FormatCjk langCode={regionPrimary.data.langCode}>{entry.data.address}</FormatCjk>
+							</span>
+						) : (
+							<span>{entry.data.address}</span>
+						)}
 					</address>
 				) : undefined
 			}

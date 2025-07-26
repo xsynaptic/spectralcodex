@@ -1,8 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { render } from 'astro:content';
-
+import ContentBody from '#components/content/content-body.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
@@ -19,50 +18,57 @@ interface Props {
 
 const { entry } = Astro.props;
 
-const {
-	data: { title, description, dateCreated, dateUpdated, imageFeatured, imageHero },
-} = entry;
-
 const titleMultilingual = getMultilingualContent(entry.data, 'title');
-
-const { Content } = await render(entry);
 ---
 
 <MainSite
 	meta={{
-		title,
-		description,
-		image: getSeoImageProps({ ...(imageFeatured ? { id: entry.id } : {}), alt: title }),
+		title: entry.data.title,
+		description: entry.data.description,
+		image: getSeoImageProps({
+			...(entry.data.imageFeatured ? { id: entry.id } : {}),
+			alt: entry.data.title,
+		}),
 	}}
-	hasHeroImage={!!imageHero}
+	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			imageHero ? (
-				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
+			entry.data.imageHero ? (
+				<ImageHero imageId={entry.data.imageHero} alt={entry.data.title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
-						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+							<ContentDate
+								date={entry.data.dateCreated}
+								dateUpdated={entry.data.dateUpdated}
+								datePreset="long"
+							/>
 						</Fragment>
 					</ContentHeader>
 				</ImageHero>
 			) : (
 				<ContentHeader>
-					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title">{entry.data.title}</Fragment>
 					<Fragment slot="header-title-multilingual">
 						<Multilingual content={titleMultilingual} />
 					</Fragment>
 					<Fragment slot="header-subtitle">
-						<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+						<ContentDate
+							date={entry.data.dateCreated}
+							dateUpdated={entry.data.dateUpdated}
+							datePreset="long"
+						/>
 					</Fragment>
 				</ContentHeader>
 			)
 		}
-		<ProseBody class="pb-small" data-reading-frame><Content /></ProseBody>
+		<ProseBody class="pb-small" data-reading-frame>
+			<ContentBody entry={entry} />
+		</ProseBody>
 	</article>
 </MainSite>

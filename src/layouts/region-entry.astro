@@ -2,12 +2,11 @@
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import { render } from 'astro:content';
-
 import type { RegionsOption } from '#lib/collections/regions/options.ts';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentBody from '#components/content/content-body.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
@@ -37,28 +36,24 @@ interface Props {
 
 const { page, mapData, entry, regionsOption } = Astro.props;
 
-const {
-	data: { title, description, imageSet },
-} = entry;
-
 const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
-const imageSetMetadata = await getImageSetMetadata({ imageSet });
+const imageSetMetadata = await getImageSetMetadata({ imageSet: entry.data.imageSet });
 
 const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
-
-const { Content } = await render(entry);
 
 const t = getTranslations();
 ---
 
 <MainSite
 	meta={{
-		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
-		description: description ?? entry.body ?? undefined,
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
+		description: entry.data.description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
 			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
-			alt: title,
+			alt: entry.data.title,
 		}),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
@@ -69,7 +64,7 @@ const t = getTranslations();
 			hasHeroImage ? (
 				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
-						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
@@ -87,7 +82,7 @@ const t = getTranslations();
 				</ImageHeroCarousel>
 			) : (
 				<ContentHeader>
-					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title">{entry.data.title}</Fragment>
 					<Fragment slot="header-title-multilingual">
 						<Multilingual content={titleMultilingual} />
 					</Fragment>
@@ -105,7 +100,7 @@ const t = getTranslations();
 			)
 		}
 		<ProseBody class="pb-medium" data-pagefind-weight="2">
-			<Content />
+			<ContentBody entry={entry} />
 		</ProseBody>
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 			{

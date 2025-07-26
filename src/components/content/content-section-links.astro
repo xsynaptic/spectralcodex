@@ -47,7 +47,7 @@ const t = getTranslations();
 				{sources?.map((source) => {
 					const titleMultilingual = getMultilingualContent(source, 'title');
 
-					return (
+					return source ? (
 						<ListColumnItem>
 							<span class="italic">{source.title}</span>
 							{titleMultilingual ? (
@@ -60,7 +60,7 @@ const t = getTranslations();
 								<span>({source.datePublished})</span>
 							) : undefined}
 						</ListColumnItem>
-					);
+					) : undefined;
 				})}
 			</ListColumn>
 		</ContentSection>

@@ -1,8 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { render } from 'astro:content';
-
+import ContentBody from '#components/content/content-body.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -23,13 +22,7 @@ interface Props {
 
 const { entry } = Astro.props;
 
-const {
-	data: { title, description, dateCreated, dateUpdated, imageFeatured, imageHero },
-} = entry;
-
 const titleMultilingual = getMultilingualContent(entry.data, 'title');
-
-const { Content } = await render(entry);
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
@@ -39,23 +32,28 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 <MainSite
 	meta={{
-		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
-		description: description ?? entry.body ?? undefined,
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
+		description: entry.data.description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
-			...(imageFeatured ? { id: entry.id } : { fallback: 'og-image-ephemera' }),
-			alt: title,
+			...(entry.data.imageFeatured ? { id: entry.id } : { fallback: 'og-image-ephemera' }),
+			alt: entry.data.title,
 		}),
-		...getSeoArticleProps({ dateCreated, dateUpdated }),
+		...getSeoArticleProps({
+			dateCreated: entry.data.dateCreated,
+			dateUpdated: entry.data.dateUpdated,
+		}),
 	}}
-	hasHeroImage={!!imageHero}
+	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			imageHero ? (
-				<ImageHero imageId={imageHero} alt={title} class="sm:mb-small">
+			entry.data.imageHero ? (
+				<ImageHero imageId={entry.data.imageHero} alt={entry.data.title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
-						<Fragment slot="header-title">{title}</Fragment>
+						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
@@ -64,14 +62,18 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 								<ContentCollectionLink collection="ephemera" showFeatured={true} />
 							</DividedItem>
 							<DividedItem dividerColor="hero">
-								<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+								<ContentDate
+									date={entry.data.dateCreated}
+									dateUpdated={entry.data.dateUpdated}
+									datePreset="long"
+								/>
 							</DividedItem>
 						</Fragment>
 					</ContentHeader>
 				</ImageHero>
 			) : (
 				<ContentHeader>
-					<Fragment slot="header-title">{title}</Fragment>
+					<Fragment slot="header-title">{entry.data.title}</Fragment>
 					<Fragment slot="header-title-multilingual">
 						<Multilingual content={titleMultilingual} />
 					</Fragment>
@@ -80,14 +82,18 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 							<ContentCollectionLink collection="ephemera" />
 						</DividedItem>
 						<DividedItem>
-							<ContentDate date={dateCreated} dateUpdated={dateUpdated} datePreset="long" />
+							<ContentDate
+								date={entry.data.dateCreated}
+								dateUpdated={entry.data.dateUpdated}
+								datePreset="long"
+							/>
 						</DividedItem>
 					</Fragment>
 				</ContentHeader>
 			)
 		}
 		<ProseBody class="pb-small" data-reading-frame>
-			<Content />
+			<ContentBody entry={entry} />
 		</ProseBody>
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />

@@ -86,8 +86,10 @@ export async function getFirstRegionByReferenceFunction() {
 	const { regionsMap } = await getRegionsCollection();
 
 	return function getFirstRegionByReference(
-		regions: Array<ReferenceDataEntry<'regions'>>,
+		regions: Array<ReferenceDataEntry<'regions'>> | undefined,
 	): CollectionEntry<'regions'> | undefined {
+		if (!regions) return;
+
 		const regionId = regions.at(0)?.id;
 
 		return regionId ? regionsMap.get(regionId) : undefined;

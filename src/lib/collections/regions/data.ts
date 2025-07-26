@@ -3,12 +3,28 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 
+import type { RegionLanguage } from '#lib/collections/regions/types.ts';
+
+import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
+
 interface CollectionData {
 	regions: Array<CollectionEntry<'regions'>>;
 	regionsMap: Map<string, CollectionEntry<'regions'>>;
 }
 
 let collection: Promise<CollectionData> | undefined;
+
+function isRegionWithLanguage(
+	region: CollectionEntry<'regions'>['id'],
+): region is keyof typeof RegionLanguageMap {
+	return region in RegionLanguageMap;
+}
+
+function getRegionLanguageById(
+	regionId: CollectionEntry<'regions'>['id'] | undefined,
+): RegionLanguage | undefined {
+	return regionId && isRegionWithLanguage(regionId) ? RegionLanguageMap[regionId] : undefined;
+}
 
 async function generateCollection() {
 	const startTime = performance.now();
@@ -71,6 +87,15 @@ async function generateCollection() {
 					ancestor.data.descendants = [entry.id];
 				}
 			}
+		}
+	}
+
+	// Assign language code, where applicable
+	for (const entry of regions) {
+		if (entry.data.ancestors && entry.data.ancestors.length > 0) {
+			entry.data.langCode = getRegionLanguageById(entry.data.ancestors.at(-1));
+		} else if (!entry.data.parent) {
+			entry.data.langCode = getRegionLanguageById(entry.id);
 		}
 	}
 

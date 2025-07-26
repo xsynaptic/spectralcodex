@@ -1,8 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { render } from 'astro:content';
-
+import ContentBody from '#components/content/content-body.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
@@ -27,16 +26,14 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 
 {
 	seriesData.length > 0
-		? seriesData.map(async ({ entry, metadataItems }) => {
-				const { Content } = await render(entry);
-
-				return metadataItems.length > 0 ? (
+		? seriesData.map(({ entry, metadataItems }) =>
+				metadataItems.length > 0 ? (
 					<ContentSection data-pagefind-ignore {...props}>
 						<Fragment slot="section-title">
 							{t('collection.series.labelPlural')}: <span>{entry.data.title}</span>
 						</Fragment>
 						<ProseDescription showCompact={true}>
-							<Content />
+							<ContentBody entry={entry} />
 						</ProseDescription>
 						<ListColumn class="mt-small font-serif text-xs md:text-sm">
 							{metadataItems.map(({ url, title, titleMultilingual }) => (
@@ -49,7 +46,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 							))}
 						</ListColumn>
 					</ContentSection>
-				) : undefined;
-			})
+				) : undefined
+			)
 		: undefined
 }

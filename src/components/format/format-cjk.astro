@@ -1,8 +1,20 @@
 ---
-import { wrapCjk } from '@xsynaptic/unified-tools';
+import { wrapCjk } from '@spectralcodex/unified-tools';
+
+import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
+
+interface Props {
+	langCode?: Extract<LanguageCode, 'zh' | 'ja' | 'ko'> | undefined;
+}
+
+const { langCode } = Astro.props;
 
 const slotContents = (await Astro.slots.render('default')) as string | undefined;
-const output = wrapCjk(slotContents ?? '');
+
+const output = wrapCjk({
+	input: slotContents ?? '',
+	...(langCode ? { wrapCjkOptions: { langCode } } : {}),
+});
 ---
 
 {output ? <Fragment set:html={output} /> : undefined}

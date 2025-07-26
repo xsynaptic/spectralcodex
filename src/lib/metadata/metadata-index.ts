@@ -1,6 +1,6 @@
 import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
-import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
 import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
@@ -50,7 +50,7 @@ function getContentMetadataWordCount(entry: CollectionEntry<CollectionKey>): num
 		return R.pipe(
 			entry.body,
 			(body) => stripMdxComponents(body, MDX_COMPONENTS_TO_STRIP),
-			transformMarkdown,
+			(body) => transformMarkdown({ input: body }),
 			stripTags,
 			countWords,
 		);

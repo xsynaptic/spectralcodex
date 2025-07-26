@@ -1,7 +1,8 @@
 ---
-import { stylizeText } from '@xsynaptic/unified-tools';
+import { stylizeText } from '@spectralcodex/unified-tools';
 
 const slotContents = (await Astro.slots.render('default')) as string | undefined;
+
 const output = stylizeText(slotContents ?? '');
 ---
 

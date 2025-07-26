@@ -15,7 +15,6 @@ const ImageMetadataSchema = z.object({
 	modifiedTime: z.date().optional(),
 	title: z.string().optional(),
 	...titleMultilingualSchema,
-	titleRaw: z.string().optional(),
 	dateCaptured: z.date().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),

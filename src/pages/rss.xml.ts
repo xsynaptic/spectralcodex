@@ -9,7 +9,7 @@ import {
 	sanitizeHtml,
 	stripTags,
 	transformMarkdown,
-} from '@xsynaptic/unified-tools';
+} from '@spectralcodex/unified-tools';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
@@ -65,7 +65,7 @@ const getRssItem = async (
 		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		link: getContentUrl(item.collection, item.id),
 		pubDate: parseContentDate(dateUpdated ?? dateCreated),
-		...(description ? { description: stripTags(transformMarkdown(description)) } : {}),
+		...(description ? { description: stripTags(transformMarkdown({ input: description })) } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 

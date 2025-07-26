@@ -1,8 +1,7 @@
 ---
 import type { Page } from 'astro';
 
-import { render } from 'astro:content';
-
+import ContentBody from '#components/content/content-body.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -40,33 +39,26 @@ const description = t('collection.ephemera.description');
 	</ContentSection>
 	{
 		page.data.length > 0
-			? page.data.map(async (entry, index) => {
-					const { Content } = await render(entry);
-
-					return (
-						<div>
-							<ContentExcerpt
-								entryUrl={getContentUrl(entry.collection, entry.id)}
-								class="mb-medium"
-							>
-								<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
-								<Fragment slot="excerpt-subtitle">
-									<ContentDate
-										date={entry.data.dateCreated}
-										dateUpdated={entry.data.dateUpdated}
-										datePreset={DatePresetEnum.Medium}
-									/>
-								</Fragment>
-								<Content />
-							</ContentExcerpt>
-							{index + 1 < page.data.length ? (
-								<Container as="div">
-									<hr class="mb-medium text-primary-200 dark:text-primary-700" />
-								</Container>
-							) : undefined}
-						</div>
-					);
-				})
+			? page.data.map((entry, index) => (
+					<div>
+						<ContentExcerpt entryUrl={getContentUrl(entry.collection, entry.id)} class="mb-medium">
+							<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
+							<Fragment slot="excerpt-subtitle">
+								<ContentDate
+									date={entry.data.dateCreated}
+									dateUpdated={entry.data.dateUpdated}
+									datePreset={DatePresetEnum.Medium}
+								/>
+							</Fragment>
+							<ContentBody entry={entry} />
+						</ContentExcerpt>
+						{index + 1 < page.data.length ? (
+							<Container as="div">
+								<hr class="mb-medium text-primary-200 dark:text-primary-700" />
+							</Container>
+						) : undefined}
+					</div>
+				))
 			: undefined
 	}
 	<ContentSection>

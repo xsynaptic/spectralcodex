@@ -2,6 +2,7 @@ import type { Units } from '@turf/helpers';
 import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
+import { transformMarkdown } from '@spectralcodex/unified-tools';
 import {
 	booleanIntersects,
 	centroid,
@@ -9,7 +10,6 @@ import {
 	distance as getDistance,
 	point as getPoint,
 } from '@turf/turf';
-import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
@@ -236,7 +236,7 @@ function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data.wikipediaUrl = entry.data.links?.find(({ title }) =>
 		title.startsWith('Wikipedia'),
 	)?.url;
-	entry.data.descriptionHtml = transformMarkdown(entry.data.description);
+	entry.data.descriptionHtml = transformMarkdown({ input: entry.data.description });
 }
 
 // Nearby location data is expensive to calculate

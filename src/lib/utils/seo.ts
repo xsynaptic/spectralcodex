@@ -1,4 +1,4 @@
-import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 
@@ -20,7 +20,7 @@ export function getSeoDescription(description: string | undefined) {
 		? R.pipe(
 				description,
 				(description) => stripMdxComponents(description, MDX_COMPONENTS_TO_STRIP),
-				transformMarkdown,
+				(description) => transformMarkdown({ input: description }),
 				stripTags,
 				(stripped) => textClipper(stripped, { wordCount: 100 }),
 			)

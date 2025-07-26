@@ -6,7 +6,6 @@ import * as R from 'remeda';
 import LocationEntry from '#layouts/location-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
@@ -16,7 +15,6 @@ import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 export const getStaticPaths = (async () => {
 	const { locations } = await getLocationsCollection();
 
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 	const getPostsByIds = await getPostsByIdsFunction();
 	const getContentMetadata = await getContentMetadataFunction();
 
@@ -36,7 +34,6 @@ export const getStaticPaths = (async () => {
 				getContentMetadata,
 				R.sort(sortContentMetadataByDate)
 			),
-			regionPrimary: getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions),
 		},
 	}));
 }) satisfies GetStaticPaths;
