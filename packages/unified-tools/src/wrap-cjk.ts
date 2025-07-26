@@ -9,10 +9,9 @@ export function wrapChinese(input: string) {
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'zh' })
 		.use(rehypeSanitize)
-		.use(rehypeStringify)
-		.processSync(input);
+		.use(rehypeStringify);
 
-	return String(processor);
+	return processor.processSync(input).toString();
 }
 
 export function wrapJapanese(input: string) {
@@ -20,10 +19,9 @@ export function wrapJapanese(input: string) {
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'ja' })
 		.use(rehypeSanitize)
-		.use(rehypeStringify)
-		.processSync(input);
+		.use(rehypeStringify);
 
-	return String(processor);
+	return processor.processSync(input).toString();
 }
 
 export function wrapKorean(input: string) {
@@ -31,10 +29,9 @@ export function wrapKorean(input: string) {
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'ko' })
 		.use(rehypeSanitize)
-		.use(rehypeStringify)
-		.processSync(input);
+		.use(rehypeStringify);
 
-	return String(processor);
+	return processor.processSync(input).toString();
 }
 
 export function wrapCjk({
@@ -42,13 +39,13 @@ export function wrapCjk({
 	wrapCjkOptions,
 }: {
 	input: string;
-	wrapCjkOptions?: RehypeWrapCjkOptions;
+	wrapCjkOptions?: Partial<RehypeWrapCjkOptions>;
 }) {
 	const processor = unified().use(rehypeParse, { fragment: true });
 
 	if (wrapCjkOptions) processor.use(rehypeWrapCjk, wrapCjkOptions);
 
-	processor.use(rehypeSanitize).use(rehypeStringify).processSync(input);
+	processor.use(rehypeSanitize).use(rehypeStringify);
 
-	return String(processor);
+	return processor.processSync(input).toString();
 }

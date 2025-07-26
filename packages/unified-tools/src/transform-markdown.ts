@@ -13,13 +13,13 @@ export function transformMarkdown({
 	wrapCjkOptions,
 }: {
 	input: string;
-	wrapCjkOptions?: RehypeWrapCjkOptions;
+	wrapCjkOptions?: Partial<RehypeWrapCjkOptions>;
 }) {
 	const processor = unified().use(remarkParse).use(remarkSmartyPants).use(remarkRehype);
 
 	if (wrapCjkOptions) processor.use(rehypeWrapCjk, wrapCjkOptions);
 
-	processor.use(rehypeSanitize).use(rehypeStringify).processSync(input);
+	processor.use(rehypeSanitize).use(rehypeStringify);
 
-	return String(processor);
+	return processor.processSync(input).toString();
 }
