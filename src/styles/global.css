@@ -21,6 +21,7 @@
 @import './background.css';
 @import './content.css';
 @import './carousel.css';
+@import './i18n.css';
 @import './loading.css';
 
 /** These custom properties are defined outside Tailwind's system */
@@ -34,26 +35,4 @@
 
 html {
 	scrollbar-gutter: stable;
-}
-
-html:not([lang^='zh']) span[lang^='zh'],
-html:not([lang^='ja']) span[lang^='ja'],
-html:not([lang^='ko']) span[lang^='ko'] {
-	font-style: normal !important; /* Never italicize CJK characters */
-	font-variant: normal !important;
-	letter-spacing: normal !important;
-	line-break: strict !important;
-	text-decoration: none !important;
-	text-transform: none !important;
-	word-break: keep-all !important; /* Magic property for CJK text: keeps characters together but also line breaks without overflow */
-}
-
-html:not([lang^='th']) span[lang^='th'] {
-	font-style: normal !important; /* Never italicize CJK characters */
-	font-variant: normal !important;
-	letter-spacing: normal !important;
-	line-break: auto !important;
-	text-decoration: none !important;
-	text-transform: none !important;
-	word-break: break-word !important;
 }
