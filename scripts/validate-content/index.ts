@@ -5,6 +5,7 @@ import { $ } from 'zx';
 
 import { checkDivisionIds } from './divisions';
 import { checkLocationRegions } from './locations-region';
+import { checkContentQuality } from './quality';
 import { checkSlugMismatches } from './slug-mismatch';
 
 const { values: args, positionals } = parseArgs({
@@ -39,14 +40,17 @@ function showHelp() {
 	console.log('                   (locations collection only)');
 	console.log('  divisions        Check for regions without divisionId property');
 	console.log('                   (regions collection only)');
+	console.log('  quality          Check for content quality issues (e.g., featured images with low quality)');
+	console.log('                   (on-demand validation only)');
 	console.log('');
 	console.log('Options:');
 	console.log('  --verbose        Show detailed output');
 	console.log('');
 	console.log('Usage:');
-	console.log('  pnpm content-utils slug-mismatch');
-	console.log('  pnpm content-utils location-regions');
-	console.log('  pnpm content-utils divisions');
+	console.log('  pnpm validate-content slug-mismatch');
+	console.log('  pnpm validate-content location-regions');
+	console.log('  pnpm validate-content divisions');
+	console.log('  pnpm validate-content quality');
 }
 
 const command = positionals[0];
@@ -62,6 +66,10 @@ switch (command) {
 	}
 	case 'divisions': {
 		await checkDivisionIds(ContentCollectionsPathEnum.Regions);
+		break;
+	}
+	case 'quality': {
+		await checkContentQuality(ContentCollectionsPathEnum);
 		break;
 	}
 	case 'help':
