@@ -14,11 +14,17 @@ import { stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 
+// Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
+function stripFootnoteReferences(input: string) {
+	return input.replaceAll(/\[\^[^\]]+\]/g, '');
+}
+
 // Simple text-only SEO description that accepts a variety of things you might throw at it
 export function getSeoDescription(description: string | undefined) {
 	return description
 		? R.pipe(
 				description,
+				stripFootnoteReferences,
 				(description) => stripMdxComponents(description, MDX_COMPONENTS_TO_STRIP),
 				(description) => transformMarkdown({ input: description }),
 				stripTags,
