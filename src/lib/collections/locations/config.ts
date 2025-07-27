@@ -11,7 +11,7 @@ import {
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/content.ts';
-import { GeometryLinesSchema, GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';

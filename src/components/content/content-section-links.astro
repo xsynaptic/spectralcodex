@@ -47,6 +47,7 @@ const t = getTranslations();
 				{sources?.map((source) => {
 					const titleMultilingual = getMultilingualContent(source, 'title');
 
+					// TODO: fully multilingual output for this section
 					return source ? (
 						<ListColumnItem>
 							<span class="italic">{source.title}</span>
