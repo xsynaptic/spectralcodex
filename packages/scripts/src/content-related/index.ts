@@ -4,9 +4,9 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { ContentCollectionFileMetadata } from '../content-utils';
+import type { ContentFileMetadata } from '../content-utils';
 
-import { parseContentCollectionFiles } from '../content-utils';
+import { parseContentFiles } from '../content-utils';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -20,16 +20,16 @@ const { values } = parseArgs({
 });
 
 interface Embedding {
-	slug: string;
+	id: string;
 	vector: Array<number>;
 }
 
-interface SimilarPost {
-	slug: string;
+interface RelatedContentItem {
+	id: string;
 	score: number;
 }
 
-type SimilarityResult = Record<string, Array<SimilarPost>>;
+type RelatedContentResult = Record<string, Array<RelatedContentItem>>;
 
 // Clean content for embedding
 function cleanContent(content: string, frontmatter: Record<string, unknown>): string {
@@ -70,9 +70,9 @@ function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 	return dotProduct / (magnitudeA * magnitudeB);
 }
 
-// Generate embeddings for all posts
+// Generate embeddings for all content files
 async function generateEmbeddings(
-	posts: Array<ContentCollectionFileMetadata>,
+	contentFiles: Array<ContentFileMetadata>,
 ): Promise<Array<Embedding>> {
 	console.log('Loading embedding model...');
 
@@ -82,41 +82,42 @@ async function generateEmbeddings(
 
 	console.log('Generating embeddings...');
 
-	for (let i = 0; i < posts.length; i++) {
-		const post = posts[i];
+	for (let i = 0; i < contentFiles.length; i++) {
+		const contentFile = contentFiles[i];
 
-		if (!post) continue;
+		if (!contentFile) continue;
 
 		try {
-			const cleanedContent = cleanContent(post.content, post.frontmatter);
+			const cleanedContent = cleanContent(contentFile.content, contentFile.frontmatter);
 			const output = await embedder(cleanedContent, { pooling: 'mean', normalize: true });
 			const vector = [...output.data] as Array<number>;
 
 			embeddings.push({
-				slug: post.id,
+				id: contentFile.id,
 				vector,
 			});
 
 			if ((i + 1) % 10 === 0) {
-				console.log(`Generated ${String(i + 1)}/${String(posts.length)} embeddings`);
+				console.log(`Generated ${String(i + 1)}/${String(contentFiles.length)} embeddings`);
 			}
 		} catch (error) {
-			console.error(`Error generating embedding for ${post.id}:`, error);
+			console.error(`Error generating embedding for ${contentFile.id}:`, error);
 		}
 	}
 
 	console.log(`Generated ${String(embeddings.length)} embeddings`);
+
 	return embeddings;
 }
 
 // Calculate similarities and find top matches
-function calculateSimilarities(embeddings: Array<Embedding>): SimilarityResult {
-	console.log('Calculating similarities...');
-	const result: SimilarityResult = {};
+function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResult {
+	console.log('Calculating relatedness...');
+	const result: RelatedContentResult = {};
 
 	for (let i = 0; i < embeddings.length; i++) {
 		const current = embeddings[i];
-		const similarities: Array<SimilarPost> = [];
+		const similarities: Array<RelatedContentItem> = [];
 
 		for (const [j, other] of embeddings.entries()) {
 			if (i === j || !current) continue;
@@ -124,7 +125,7 @@ function calculateSimilarities(embeddings: Array<Embedding>): SimilarityResult {
 			const score = cosineSimilarity(current.vector, other.vector);
 
 			similarities.push({
-				slug: other.slug,
+				id: other.id,
 				score,
 			});
 		}
@@ -132,12 +133,12 @@ function calculateSimilarities(embeddings: Array<Embedding>): SimilarityResult {
 		// Sort by score and take top 5
 		similarities.sort((a, b) => b.score - a.score);
 		if (current) {
-			result[current.slug] = similarities.slice(0, 5);
+			result[current.id] = similarities.slice(0, 5);
 		}
 
 		if ((i + 1) % 50 === 0) {
 			console.log(
-				`Calculated similarities for ${String(i + 1)}/${String(embeddings.length)} posts`,
+				`Calculated cosine similarities for ${String(i + 1)}/${String(embeddings.length)} items`,
 			);
 		}
 	}
@@ -152,15 +153,15 @@ async function main() {
 
 		const contentPath = path.join(values['root-path'], 'packages/content/collections/posts');
 
-		const posts = await parseContentCollectionFiles(contentPath);
+		const contentFiles = await parseContentFiles(contentPath);
 
-		if (posts.length === 0) {
-			console.error('No posts found!');
+		if (contentFiles.length === 0) {
+			console.error('No content found!');
 			process.exit(1);
 		}
 
 		// Generate embeddings
-		const embeddings = await generateEmbeddings(posts);
+		const embeddings = await generateEmbeddings(contentFiles);
 
 		if (embeddings.length === 0) {
 			console.error('No embeddings generated!');
@@ -177,7 +178,7 @@ async function main() {
 		writeFileSync(outputPath, JSON.stringify(similarities, null, 2));
 
 		console.log(`✅ Similarity data written to ${outputPath}`);
-		console.log(`📊 Generated similarities for ${String(Object.keys(similarities).length)} posts`);
+		console.log(`📊 Generated similarities for ${String(Object.keys(similarities).length)} items`);
 	} catch (error) {
 		console.error('❌ Error:', error);
 		process.exit(1);

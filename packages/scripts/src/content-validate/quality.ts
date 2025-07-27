@@ -1,15 +1,15 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 
-import { parseContentCollectionFiles } from '../content-utils';
+import { parseContentFiles } from '../content-utils';
 
-export async function checkContentQuality(contentCollectionPaths: Record<string, string>) {
+export async function checkContentQuality(contentPaths: Record<string, string>) {
 	let overallMismatchCount = 0;
 
-	for (const contentCollectionPath of Object.values(contentCollectionPaths)) {
-		console.log(chalk.blue('Checking for low quality content in ' + contentCollectionPath + '...'));
+	for (const contentPath of Object.values(contentPaths)) {
+		console.log(chalk.blue('Checking for low quality content in ' + contentPath + '...'));
 
-		const parsedFiles = await parseContentCollectionFiles(contentCollectionPath);
+		const parsedFiles = await parseContentFiles(contentPath);
 
 		if (parsedFiles.length === 0) {
 			console.log(chalk.yellow('No MDX files found in specified collections.'));

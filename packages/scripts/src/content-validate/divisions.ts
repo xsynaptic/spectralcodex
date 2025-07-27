@@ -1,14 +1,14 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 
-import { parseContentCollectionFiles } from '../content-utils';
+import { parseContentFiles } from '../content-utils';
 
 export async function checkDivisionIds(regionsPath: string) {
 	console.log(chalk.blue('Checking regions for missing divisionId...'));
 
 	const regionsWithoutDivision: Array<string> = [];
 
-	const parsedFiles = await parseContentCollectionFiles(regionsPath);
+	const parsedFiles = await parseContentFiles(regionsPath);
 
 	for (const parsedFile of parsedFiles) {
 		if (parsedFile.frontmatter.divisionId === undefined) {

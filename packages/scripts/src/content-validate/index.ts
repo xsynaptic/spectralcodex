@@ -29,7 +29,7 @@ const { values, positionals } = parseArgs({
 // Output shell command results only in verbose mode
 $.verbose = values.verbose;
 
-const ContentCollectionsPathEnum = {
+const ContentFilesPathEnum = {
 	Ephemera: path.join(values['root-path'], 'packages/content/collections/ephemera'),
 	Locations: path.join(values['root-path'], 'packages/content/collections/locations'),
 	Posts: path.join(values['root-path'], 'packages/content/collections/posts'),
@@ -65,19 +65,19 @@ const command = positionals[0];
 
 switch (command) {
 	case 'slug-mismatch': {
-		await checkSlugMismatches(ContentCollectionsPathEnum);
+		await checkSlugMismatches(ContentFilesPathEnum);
 		break;
 	}
 	case 'location-regions': {
-		await checkLocationRegions(ContentCollectionsPathEnum.Locations);
+		await checkLocationRegions(ContentFilesPathEnum.Locations);
 		break;
 	}
 	case 'divisions': {
-		await checkDivisionIds(ContentCollectionsPathEnum.Regions);
+		await checkDivisionIds(ContentFilesPathEnum.Regions);
 		break;
 	}
 	case 'quality': {
-		await checkContentQuality(ContentCollectionsPathEnum);
+		await checkContentQuality(ContentFilesPathEnum);
 		break;
 	}
 	case 'help':
@@ -93,11 +93,11 @@ switch (command) {
 		}
 
 		// Run all validations for deployment - exit immediately on first failure
-		const slugSuccess = await checkSlugMismatches(ContentCollectionsPathEnum);
+		const slugSuccess = await checkSlugMismatches(ContentFilesPathEnum);
 
 		if (!slugSuccess) process.exit(1);
 
-		const regionSuccess = await checkLocationRegions(ContentCollectionsPathEnum.Locations);
+		const regionSuccess = await checkLocationRegions(ContentFilesPathEnum.Locations);
 
 		if (!regionSuccess) process.exit(1);
 

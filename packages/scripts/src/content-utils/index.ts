@@ -4,7 +4,7 @@ import { readdirSync, statSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export interface ContentCollectionFileMetadata {
+export interface ContentFileMetadata {
 	id: string;
 	filename: string;
 	extension: string;
@@ -15,7 +15,7 @@ export interface ContentCollectionFileMetadata {
 	content: string;
 }
 
-export async function parseContentCollectionFiles(
+export async function parseContentFiles(
 	basePath: string,
 	options: {
 		skipUnderscoreFiles?: boolean;
@@ -23,7 +23,7 @@ export async function parseContentCollectionFiles(
 	} = {},
 ) {
 	const { skipUnderscoreFiles = true, recursive = true } = options;
-	const contentMetadata: Array<ContentCollectionFileMetadata> = [];
+	const contentMetadata: Array<ContentFileMetadata> = [];
 
 	async function processDirectory(dirPath: string) {
 		const filenames = readdirSync(dirPath);
