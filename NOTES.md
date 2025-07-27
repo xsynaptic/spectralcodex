@@ -9,20 +9,6 @@
 
 Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom.
 
-## Metadata Improvements
-
-In cases where you'd like to find properties _not_ present in frontmatter, run this from the `content` folder (exchanging "rating:" for whatever you want to find):
-
-```sh
-find . -name "*.mdx" -print0 | xargs -0 grep -L "rating:" | sort
-```
-
-Another command to find all files with `imageFeatured` and `entryQuality` of a particular value (in this case `1`):
-
-```
-find collections/locations -name "*.mdx" -type f -exec grep -l "imageFeatured:" {} \; | xargs grep -l "entryQuality: 1"
-```
-
 ## Build Profiling
 
 This worked pretty well to debug some major issues with `getCollection` calls:
@@ -37,7 +23,11 @@ Astro in hybrid most still requires a build step to generate the `client` folder
 
 ## Map Icons
 
-Experimental: This site uses custom map icons. To regenerate icons run `pnpm export-map-icons`. This requires [spreet](https://github.com/flother/spreet) to be installed separately (and globally).
+Experimental: This site uses custom map icons. To regenerate icons run `pnpm map-spritesheet`. This requires [spreet](https://github.com/flother/spreet) to be installed separately (and globally).
+
+# CJK Handling
+
+Currently we use a custom rehype plugin for wrapping CJK characters so they can be styled with CSS. Unfortunately Astro provides little control over how Rehype and Remark plugins are used in the MDX rendering chain; it's either there or it isn't. We'd prefer to specify language based on the root region for some content types but such granular control isn't possible with the built-in MDX pipeline.
 
 # Things To Do
 
@@ -53,7 +43,6 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm exp
 - protomaps self-hosted setup
 - option to convert GeoJSON to something Google Maps (or Google My Maps) can consume, ultimately so anyone can import a map with at least some of the relevant info
 - for locations with a distance query draw a circle with the radius of the query and shade everything outside of it
-- [Overture Maps](https://docs.overturemaps.org/) data, especially boundaries, should be displayed per region
 - persistent storage for stateful data (per map)
 - multiple points per location entry (in progress 2025Q2)
 - different geography support (in progress 2024Q4)
@@ -76,6 +65,7 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm exp
 
 ## Done
 
+- [Overture Maps](https://docs.overturemaps.org/) data, especially boundaries, should be displayed per region
 - utility function to fetch resolved color tokens from Tailwind
 - content excerpts
 - fonts
