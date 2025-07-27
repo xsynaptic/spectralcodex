@@ -57,3 +57,5 @@ export function getGenerateOpenGraphImageFunction({
 		return sharp(Buffer.from(satoriSvg), { failOn: 'error' }).png().toBuffer();
 	};
 }
+
+export { type OpenGraphMetadataItem } from './types';

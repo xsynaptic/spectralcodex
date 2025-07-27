@@ -1,3 +1,4 @@
+import type { OpenGraphMetadataItem } from '@spectralcodex/image-open-graph';
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { getGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
@@ -30,13 +31,20 @@ export const getStaticPaths = (async () => {
 		R.pipe(
 			locations,
 			getContentMetadata,
-			R.map(async (item) => {
-				const imageEntry = item.imageId ? await getImageById(item.imageId) : undefined;
+			R.map(async (entry) => {
+				// TODO: restrict what properties are passed on?
+				const openGraphMetadataItem = {
+					...entry,
+				} satisfies OpenGraphMetadataItem;
+
+				const imageEntry = entry.imageId ? await getImageById(entry.imageId) : undefined;
 				const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
 
 				return {
-					params: { id: item.id },
-					props: { imageOpenGraph: await generateOpenGraphImage(item, imageObject) },
+					params: { id: entry.id },
+					props: {
+						imageOpenGraph: await generateOpenGraphImage(openGraphMetadataItem, imageObject),
+					},
 				};
 			}),
 		),
