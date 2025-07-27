@@ -25,8 +25,3 @@
 - `pnpm map-divisions` - Extract administrative boundaries from Overture Maps
 - `pnpm map-spritesheet` - Generate map icon spritesheet
 - `pnpm validate-content` - Run content utility scripts
-
-## Development Notes
-
-- **Always check package.json before installing dependencies** - Many common packages like @types/geojson are already installed
-- **First request to dev server is slow** - The initial request after starting `pnpm dev` may take time to respond as the content metadata index will be rebuilt

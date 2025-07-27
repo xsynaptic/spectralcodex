@@ -57,11 +57,11 @@ Custom image pipeline with:
 - Automatic image optimization
 - LQIP (Low Quality Image Placeholder) generation
 - OpenGraph image generation using Satori (not yet completely implemented)
-- Local image server for development
+- Local image server for development and builds
 
 ## Content Architecture
 
-- Content stored in workspace packages for modularity
+- Content stored in workspace packages for modularity and privacy
 - MDX files with frontmatter schemas
 - Organized by geographic regions and themes
 - Custom remark plugins for enhanced functionality

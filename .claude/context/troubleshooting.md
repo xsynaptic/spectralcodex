@@ -8,3 +8,7 @@
 
 - Run `pnpm astro sync --force` after schema changes
 - Restart dev server after content collection changes
+
+## Development Server
+
+- **First request to dev server is slow** - The initial request after starting `pnpm dev` may take time to respond as the content metadata index will be rebuilt
