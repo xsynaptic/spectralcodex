@@ -10,6 +10,7 @@ export interface ContentFileMetadata {
 	extension: string;
 	filePath: string;
 	relativePath: string;
+	collection: string;
 	hierarchy: Array<string>;
 	frontmatter: Record<string, unknown>;
 	content: string;
@@ -28,6 +29,8 @@ export async function parseContentFiles(
 ) {
 	const { skipUnderscoreFiles = true, recursive = true } = options;
 	const contentMetadata: Array<ContentFileMetadata> = [];
+
+	const collection = basePath.split('/').pop() ?? '';
 
 	async function processDirectory(dirPath: string) {
 		const filenames = readdirSync(dirPath);
@@ -54,6 +57,7 @@ export async function parseContentFiles(
 						extension: extension.replace('.', ''),
 						filePath,
 						relativePath,
+						collection,
 						hierarchy: relativePath.replace(extension, '').split('/'),
 						frontmatter,
 						content,

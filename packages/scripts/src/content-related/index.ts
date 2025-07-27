@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
 import { pipeline } from '@xenova/transformers';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -23,42 +24,54 @@ const { values } = parseArgs({
 			short: 'c',
 			default: 'packages/content',
 		},
+		'character-limit': {
+			type: 'string',
+			short: 'l',
+			default: '10000',
+		},
+		'result-count': {
+			type: 'string',
+			short: 'rc',
+			default: '5',
+		},
 	},
 });
 
 interface Embedding {
 	id: string;
+	collection: string;
 	vector: Array<number>;
 }
 
 interface RelatedContentItem {
 	id: string;
+	collection: string;
 	score: number;
 }
 
 type RelatedContentResult = Record<string, Array<RelatedContentItem>>;
 
-// Clean content for embedding
+// Clean content for embedding using unified tools
 function cleanContent(content: string, frontmatter: Record<string, unknown>): string {
 	// Get title and description from frontmatter
 	const title = typeof frontmatter.title === 'string' ? frontmatter.title : '';
 	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
 
-	// Basic markdown cleaning
-	// TODO: use remark toolchain from the RSS feed
-	const cleaned = content
-		.replaceAll(/!\[.*?\]\(.*?\)/g, '') // Images
-		.replaceAll(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
-		.replaceAll(/#{1,6}\s+/g, '') // Headers
-		.replaceAll(/\*\*(.*?)\*\*/g, '$1') // Bold
-		.replaceAll(/\*(.*?)\*/g, '$1') // Italic
-		.replaceAll(/`([^`]+)`/g, '$1') // Inline code
-		.replaceAll(/```[\s\S]*?```/g, '') // Code blocks
-		.replaceAll(/\n+/g, ' ') // Multiple newlines
+	// Remove MDX components and their content (custom components we don't care about)
+	const contentWithoutComponents = content
+		.replaceAll(/<[A-Z][^>]*>.*?<\/[A-Z][^>]*>/gs, '') // Remove JSX/MDX components with content
+		.replaceAll(/<[A-Z][^>]*\/>/g, '') // Remove self-closing JSX/MDX components
+		.replaceAll(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '') // Remove import statements
+		.replaceAll(/export\s+.*?;?\s*/g, ''); // Remove export statements
+
+	// Transform markdown to HTML, then strip all HTML tags to get clean text
+	const htmlContent = transformMarkdown({ input: contentWithoutComponents });
+	const cleanText = stripTags(htmlContent)
+		.replaceAll(/\s+/g, ' ') // Normalize whitespace
 		.trim();
 
-	// Combine title, description, and content (limit to 1000 chars for performance)
-	return `${title} ${description} ${cleaned}`.slice(0, 1000);
+	// Combine title, description, and content
+	return `${title} ${description} ${cleanText}`.slice(0, Number(values['character-limit']));
 }
 
 // Cosine similarity function
@@ -102,6 +115,7 @@ async function generateEmbeddings(
 
 			embeddings.push({
 				id: contentFile.id,
+				collection: contentFile.collection,
 				vector,
 			});
 
@@ -127,21 +141,22 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 		const current = embeddings[i];
 		const similarities: Array<RelatedContentItem> = [];
 
-		for (const [j, other] of embeddings.entries()) {
+		for (const [j, content] of embeddings.entries()) {
 			if (i === j || !current) continue;
 
-			const score = cosineSimilarity(current.vector, other.vector);
+			const score = cosineSimilarity(current.vector, content.vector);
 
 			similarities.push({
-				id: other.id,
+				id: content.id,
+				collection: content.collection,
 				score,
 			});
 		}
 
-		// Sort by score and take top 5
+		// Sort by score and slice top results
 		similarities.sort((a, b) => b.score - a.score);
 		if (current) {
-			result[current.id] = similarities.slice(0, 10);
+			result[current.id] = similarities.slice(0, Number(values['result-count']));
 		}
 
 		if ((i + 1) % 50 === 0) {
@@ -178,12 +193,13 @@ async function getContentFiles() {
 		contentFiles.push(...files);
 	}
 
-	// Remove low-quality and hidden entries to reduce data processing burden
+	// Remove low-quality entries to reduce data processing burden
 	const contentFilesFiltered = contentFiles.filter(
 		(file) =>
 			!!file.frontmatter.entryQuality &&
 			R.isNumber(file.frontmatter.entryQuality) &&
-			file.frontmatter.entryQuality >= 2,
+			file.frontmatter.entryQuality >= 2 &&
+			!!file.frontmatter.imageFeatured,
 	);
 
 	return contentFilesFiltered;
@@ -191,7 +207,7 @@ async function getContentFiles() {
 
 async function contentRelated() {
 	try {
-		console.log('=== SpectralCodex Related Content Generator ===');
+		console.log('=== Spectral Codex Related Content Generator ===');
 
 		const contentFiles = await getContentFiles();
 
