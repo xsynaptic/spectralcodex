@@ -31,7 +31,7 @@ const { values } = parseArgs({
 		},
 		'result-count': {
 			type: 'string',
-			short: 'rc',
+			short: 'n',
 			default: '5',
 		},
 	},
@@ -41,6 +41,7 @@ interface Embedding {
 	id: string;
 	collection: string;
 	vector: Array<number>;
+	frontmatter: Record<string, unknown>;
 }
 
 interface RelatedContentItem {
@@ -91,6 +92,41 @@ function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 	return dotProduct / (magnitudeA * magnitudeB);
 }
 
+// Calculate metadata boost based on shared regions and themes
+function calculateMetadataBoost(current: Embedding, other: Embedding): number {
+	let boost = 0;
+
+	// Extract arrays from frontmatter, handling various formats
+	const getCurrentArray = (key: string): Array<string> => {
+		const value = current.frontmatter[key];
+		if (Array.isArray(value)) return value.map(String);
+		if (typeof value === 'string') return [value];
+		return [];
+	};
+
+	const getOtherArray = (key: string): Array<string> => {
+		const value = other.frontmatter[key];
+		if (Array.isArray(value)) return value.map(String);
+		if (typeof value === 'string') return [value];
+		return [];
+	};
+
+	// Theme alignment boost
+	const currentThemes = new Set(getCurrentArray('themes'));
+	const otherThemes = new Set(getOtherArray('themes'));
+	const sharedThemes = [...currentThemes].filter((theme) => otherThemes.has(theme));
+	boost += sharedThemes.length * 0.15; // % boost per shared theme
+
+	// Region alignment boost
+	const currentRegions = new Set(getCurrentArray('regions'));
+	const otherRegions = new Set(getOtherArray('regions'));
+	const sharedRegions = [...currentRegions].filter((region) => otherRegions.has(region));
+	boost += sharedRegions.length * 0.1; // % boost per shared region
+
+	// Cap the total boost to prevent overwhelming semantic similarity
+	return Math.min(boost, 0.3); // Maximum % boost
+}
+
 // Generate embeddings for all content files
 async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
@@ -117,6 +153,7 @@ async function generateEmbeddings(
 				id: contentFile.id,
 				collection: contentFile.collection,
 				vector,
+				frontmatter: contentFile.frontmatter,
 			});
 
 			if ((i + 1) % 10 === 0) {
@@ -144,12 +181,16 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 		for (const [j, content] of embeddings.entries()) {
 			if (i === j || !current) continue;
 
-			const score = cosineSimilarity(current.vector, content.vector);
+			const semanticScore = cosineSimilarity(current.vector, content.vector);
+			const metadataBoost = calculateMetadataBoost(current, content);
+
+			// Combine for hybrid score
+			const hybridScore = semanticScore + metadataBoost;
 
 			similarities.push({
 				id: content.id,
 				collection: content.collection,
-				score,
+				score: hybridScore,
 			});
 		}
 
