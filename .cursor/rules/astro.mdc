@@ -1,39 +1,118 @@
 ---
-description: Astro coding standards; consult this anytime Astro files are being created or modified
-globs: ["*.astro"]
-alwaysApply: false
+alwaysApply: true
 ---
-# Astro component development
 
+# Astro Expert Guidelines
+
+You are an expert in TypeScript, Astro.js, Tailwind v4, Node.js 20+, React, Vite, MapLibre GL JS, and ESLint.
+
+## Key Principles
+
+- Write concise, technical responses with accurate TypeScript examples.
+- Use functional, declarative programming. Avoid classes.
+- Prefer iteration and modularization over duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading).
+- Use lowercase with dashes (also known as kebab-case) for all files and directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+- Prioritize static generation and minimal JavaScript for optimal performance.
+
+## Dependencies
+
+- Astro.js 5
+- Tailwind CSS v4
+- MapLibre GL JS
+- ESLint
+
+## Routing and Pages
+
+- Utilize Astro's file-based routing system in the src/pages/ directory.
+- Implement dynamic routes using `[...id].astro` syntax.
+- Use getStaticPaths() for generating static pages with dynamic routes.
+- Adopt existing practices in the project for routing and layout.
+- Implement proper 404 handling with a 404.astro page.
+- All Astro pages can be found in `./src/pages`; this includes several API endpoints.
+- Note that with Astro V5 we are using the Content Layer API and `id` instead of `slug` for determining most paths.
+
+## Content Management
+
+- Use Markdown (.md) or MDX (.mdx) files for content-heavy pages.
+- Leverage Astro's built-in support for frontmatter in Markdown files.
+- Implement content collections for organized content management.
+
+## Styling
+
+- Prefer using Tailwind CSS V4 for all styling tasks.
+- Use Astro's scoped styling with tags in .astro files.
+- Leverage global styles when necessary, importing them in layouts.
+- Implement responsive design using CSS custom properties and media queries.
 - Tailwind-First Approach: Use Tailwind CSS V4 for all styling, keeping the utility-first approach in mind. Optimize class usage to avoid excessive nesting or redundant styles.
 - Where necessary update [global.css](mdc:src/styles/global.css) (and its auxiliary files) when developing common patterns with Tailwind CSS V4.
+
+## Performance Optimization
+
+- Minimize use of client-side JavaScript; leverage Astro's static generation.
+- Use the `client:*` directives judiciously for partial hydration:
+  - client:load for immediately needed interactivity
+  - client:idle for non-critical interactivity
+  - client:visible for components that should hydrate when visible
+- Implement proper lazy loading for images and other assets.
+- Utilize Astro's built-in asset optimization features.
+- Use interactive client-side JavaScript sparingly, and for more complex implementations prefer React or native Web Components.
+
+## Data Fetching
+
+- Use Astro.props for passing data to components.
+- Implement getStaticPaths() for fetching data at build time.
+- Implement proper error handling for data fetching operations.
+
+## Build and Deployment
+
+- Optimize the build process using Astro's build command.
+- Implement proper environment variable handling for different environments.
+- Be careful with memory usage and performance during the build process.
+
+## Tailwind CSS Best Practices
+
+- Use Tailwind utility classes extensively in your Astro components.
+- Leverage Tailwind's responsive design utilities (sm:, md:, lg:, etc.).
+- Utilize Tailwind's color palette and spacing scale for consistency.
+- Implement custom theme extensions in `src/styles/global.css` using the new Tailwind V4 conventions when necessary.
+
+## Accessibility
+
+- Ensure proper semantic HTML structure in Astro components.
+- Implement ARIA attributes where necessary.
+- Ensure keyboard navigation support for interactive elements.
+
+## Performance Metrics
+
+- Prioritize Core Web Vitals (LCP, FID, CLS) in development.
+- Use Lighthouse and WebPageTest for performance auditing.
+- Implement performance budgets and monitoring.
+
+## Component Development
+
 - Ensure Astro components are modular, reusable, and maintain a clear separation of concerns.
 - Pure Astro components should all go in `./src/components`; utilities should be organized into `./src/lib/utils`, but be sure to use existing functionality where possible.
 - Craft components so they leave no HTML output if no data is passed to them (usually with a conditional check on key props).
 - Ensure server-side rendering (SSR) compatibility for all components. Currently this project is static site generated (SSG) but it may become SSR in the future.
 
-# Pages
+## Coding Standards
 
-- All Astro pages can be found in `./src/pages`; this includes several API endpoints.
-- Note that with Astro V5 we are using the Content Layer API and `id` instead of `slug` for determining most paths.
-
-# Coding standards
-
-- Enforce strict TypeScript settings, ensuring type safety across the project. All generated code must adhere to strictest Astro TypeScript rules. 
+- Enforce strict TypeScript settings, ensuring type safety across the project. All generated code must adhere to strictest Astro TypeScript rules.
 - No use of any, implicit any, or // @ts-ignore unless explicitly justified.
 - Consistent ESLint and Prettier Formatting: Adhere to the project's ESLint rules (based on the latest flat config). Ensure generated code is formatted with Prettier and follows linting guidelines.
 - Maintain a clear directory structure that aligns with project conventions.
 - Avoid Unnecessary Dependencies: Prioritize built-in Astro, React, and Tailwind functionality before suggesting third-party libraries. No redundant dependencies; keep the dependency tree minimal and well-documented.
 - Use descriptive variable names and follow Astro's naming conventions.
 - Organize files using Astro's file-based routing system; all files should use kebab case (like-this.astro).
-- Use interactive client-side JavaScript sparingly, and for more complex implementations prefer React or native Web Components.
 
-# Conditional Rendering
+## Conditional Rendering
 
 - Always use ternary expressions for conditional rendering
 - Always explicitly return `undefined` for the false case
-- Never use logical operators (`&&`) for conditional rendering 
+- Never use logical operators (`&&`) for conditional rendering
 
-# Documentation
+## Documentation
 
-Refer to the latest Astro documentation (only version 5 and above) at: https://docs.astro.build/
+Refer to Astro's official documentation for detailed information on components, routing, and integrations for best practices (only version 5 and above) at: https://docs.astro.build/
