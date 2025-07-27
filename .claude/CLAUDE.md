@@ -9,3 +9,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 @.claude/context/decisions.md
 @.claude/tasks/active.md
 @.claude/tasks/backlog.md
+@.claude/tasks/completed.md
+@.claude/tasks/drafts.md
