@@ -85,7 +85,6 @@ export function getLocationsFeatureCollection(
 		? locations
 		: locations.filter((entry) => entry.data.hideLocation !== true);
 
-	// TODO: implement override system for map data
 	return {
 		type: 'FeatureCollection' as const,
 		features: locationsFiltered.flatMap((entry) => {

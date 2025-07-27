@@ -10,7 +10,7 @@ interface Props {
 
 const { showPrebuiltSprites = true } = Astro.props;
 
-// TODO: this is really slow
+// TODO: investigate performance issues with this function; this is really slow
 const mapSprites = showPrebuiltSprites
 	? undefined
 	: await getSprites('map-sprites', MapSpritesEnum);

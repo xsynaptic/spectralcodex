@@ -192,7 +192,7 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 	);
 
 	// Featured image overlay for points with images
-	// TODO: this still needs to be implemented
+	// TODO: this still needs to be implemented but we haven't yet come up with a good design
 	const pointsImageLayerStyle = useMemo(
 		() =>
 			({

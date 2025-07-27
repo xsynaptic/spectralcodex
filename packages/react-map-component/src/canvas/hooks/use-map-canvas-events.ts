@@ -119,7 +119,7 @@ export function useMapCanvasEvents() {
 				layers: [MapLayerIdEnum.Clusters, MapLayerIdEnum.Points, MapLayerIdEnum.PointsTarget],
 			});
 
-			// TODO: is there any chance we'd want to handle multiple queried features?
+			// Note: this only queries the first matching feature, but that is sufficient
 			const feature = renderedFeatures[0];
 
 			// Nothing under the mouse, clear hover state
