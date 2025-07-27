@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 
-import { parseContentCollectionFiles } from './content-utils';
+import { parseContentCollectionFiles } from '../utils';
 
 export async function checkDivisionIds(regionsPath: string) {
 	console.log(chalk.blue('Checking regions for missing divisionId...'));

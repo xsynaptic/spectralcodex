@@ -23,7 +23,7 @@ export async function parseContentCollectionFiles(
 	} = {},
 ) {
 	const { skipUnderscoreFiles = true, recursive = true } = options;
-	const metadata: Array<ContentCollectionFileMetadata> = [];
+	const contentMetadata: Array<ContentCollectionFileMetadata> = [];
 
 	async function processDirectory(dirPath: string) {
 		const filenames = readdirSync(dirPath);
@@ -44,7 +44,7 @@ export async function parseContentCollectionFiles(
 					const extension = path.extname(filename);
 					const relativePath = path.relative(basePath, filePath);
 
-					metadata.push({
+					contentMetadata.push({
 						id: filename.replace(extension, ''),
 						filename,
 						extension: extension.replace('.', ''),
@@ -63,5 +63,5 @@ export async function parseContentCollectionFiles(
 
 	await processDirectory(basePath);
 
-	return metadata;
+	return contentMetadata;
 }

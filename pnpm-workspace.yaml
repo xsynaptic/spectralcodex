@@ -3,8 +3,9 @@ packages:
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
+  - protobufjs
   - sharp
 
 overrides:
-  vite: 6.3.4
   '@xsynaptic/eslint-config': link:../eslint-config
+  vite: 6.3.4

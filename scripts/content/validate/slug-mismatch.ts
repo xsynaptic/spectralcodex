@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import { parseContentCollectionFiles } from 'scripts/validate-content/content-utils';
+
+import { parseContentCollectionFiles } from '../utils';
 
 export async function checkSlugMismatches(contentCollectionPaths: Record<string, string>) {
 	let overallMismatchCount = 0;

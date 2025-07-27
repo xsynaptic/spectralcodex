@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import { parseContentCollectionFiles } from 'scripts/validate-content/content-utils';
+
+import { parseContentCollectionFiles } from '../utils';
 
 export async function checkLocationRegions(locationsPath: string) {
 	console.log(chalk.blue('Checking for location/region mismatches...'));

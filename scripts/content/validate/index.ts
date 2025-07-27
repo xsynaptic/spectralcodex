@@ -40,7 +40,9 @@ function showHelp() {
 	console.log('                   (locations collection only)');
 	console.log('  divisions        Check for regions without divisionId property');
 	console.log('                   (regions collection only)');
-	console.log('  quality          Check for content quality issues (e.g., featured images with low quality)');
+	console.log(
+		'  quality          Check for content quality issues (e.g., featured images with low quality)',
+	);
 	console.log('                   (on-demand validation only)');
 	console.log('');
 	console.log('Options:');
