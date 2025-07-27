@@ -11,19 +11,19 @@ const { values } = parseArgs({
 			short: 'r',
 			default: process.cwd(),
 		},
-		'package-name': {
+		'content-path': {
 			type: 'string',
 			default: 'content',
 		},
 	},
 });
 
-if (!values['package-name']) {
-	console.error('Usage: pnpm run update-content-schemas <package>');
+if (!values['content-path']) {
+	console.error('Usage: pnpm run content-schemas --content-path=<content-path>');
 	process.exit(1);
 }
 
 /**
  * This simple script copies content collection schemas into the actual content package consumed by this project
  */
-await $`cp ${path.join(values['root-path'], '.astro/collections')}/*.schema.json ${path.join(values['root-path'], 'packages', values['package-name'], 'schemas')}`;
+await $`cp ${path.join(values['root-path'], '.astro/collections')}/*.schema.json ${path.join(values['root-path'], values['content-path'], 'schemas')}`;

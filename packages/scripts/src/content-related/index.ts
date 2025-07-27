@@ -3,6 +3,8 @@ import { pipeline } from '@xenova/transformers';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections';
+import * as R from 'remeda';
 
 import type { ContentFileMetadata } from '../content-utils';
 
@@ -15,6 +17,11 @@ const { values } = parseArgs({
 			type: 'string',
 			short: 'r',
 			default: process.cwd(),
+		},
+		'content-path': {
+			type: 'string',
+			short: 'c',
+			default: 'packages/content',
 		},
 	},
 });
@@ -38,6 +45,7 @@ function cleanContent(content: string, frontmatter: Record<string, unknown>): st
 	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
 
 	// Basic markdown cleaning
+	// TODO: use remark toolchain from the RSS feed
 	const cleaned = content
 		.replaceAll(/!\[.*?\]\(.*?\)/g, '') // Images
 		.replaceAll(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
@@ -133,7 +141,7 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 		// Sort by score and take top 5
 		similarities.sort((a, b) => b.score - a.score);
 		if (current) {
-			result[current.id] = similarities.slice(0, 5);
+			result[current.id] = similarities.slice(0, 10);
 		}
 
 		if ((i + 1) % 50 === 0) {
@@ -146,14 +154,46 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 	return result;
 }
 
-// Main execution
-async function main() {
+async function getContentFiles() {
+	const contentPaths = [
+		path.join(
+			values['root-path'],
+			values['content-path'],
+			'collections',
+			ContentCollectionsEnum.Posts,
+		),
+		path.join(
+			values['root-path'],
+			values['content-path'],
+			'collections',
+			ContentCollectionsEnum.Locations,
+		),
+	];
+
+	const contentFiles: Array<ContentFileMetadata> = [];
+
+	for (const contentPath of contentPaths) {
+		const files = await parseContentFiles(contentPath);
+
+		contentFiles.push(...files);
+	}
+
+	// Remove low-quality and hidden entries to reduce data processing burden
+	const contentFilesFiltered = contentFiles.filter(
+		(file) =>
+			!!file.frontmatter.entryQuality &&
+			R.isNumber(file.frontmatter.entryQuality) &&
+			file.frontmatter.entryQuality >= 2,
+	);
+
+	return contentFilesFiltered;
+}
+
+async function contentRelated() {
 	try {
 		console.log('=== SpectralCodex Related Content Generator ===');
 
-		const contentPath = path.join(values['root-path'], 'packages/content/collections/posts');
-
-		const contentFiles = await parseContentFiles(contentPath);
+		const contentFiles = await getContentFiles();
 
 		if (contentFiles.length === 0) {
 			console.error('No content found!');
@@ -185,4 +225,4 @@ async function main() {
 	}
 }
 
-await main();
+await contentRelated();

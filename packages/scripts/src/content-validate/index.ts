@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections';
 import { $ } from 'zx';
 
 import { checkDivisionIds } from './divisions';
@@ -17,6 +18,11 @@ const { values, positionals } = parseArgs({
 			short: 'r',
 			default: process.cwd(),
 		},
+		'content-path': {
+			type: 'string',
+			short: 'c',
+			default: 'packages/content',
+		},
 		verbose: {
 			type: 'boolean',
 			short: 'v',
@@ -30,10 +36,30 @@ const { values, positionals } = parseArgs({
 $.verbose = values.verbose;
 
 const ContentFilesPathEnum = {
-	Ephemera: path.join(values['root-path'], 'packages/content/collections/ephemera'),
-	Locations: path.join(values['root-path'], 'packages/content/collections/locations'),
-	Posts: path.join(values['root-path'], 'packages/content/collections/posts'),
-	Regions: path.join(values['root-path'], 'packages/content/collections/regions'),
+	Ephemera: path.join(
+		values['root-path'],
+		values['content-path'],
+		'collections',
+		ContentCollectionsEnum.Ephemera,
+	),
+	Locations: path.join(
+		values['root-path'],
+		values['content-path'],
+		'collections',
+		ContentCollectionsEnum.Locations,
+	),
+	Posts: path.join(
+		values['root-path'],
+		values['content-path'],
+		'collections',
+		ContentCollectionsEnum.Posts,
+	),
+	Regions: path.join(
+		values['root-path'],
+		values['content-path'],
+		'collections',
+		ContentCollectionsEnum.Regions,
+	),
 } as const;
 
 function showHelp() {

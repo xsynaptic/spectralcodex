@@ -15,6 +15,10 @@ export interface ContentFileMetadata {
 	content: string;
 }
 
+function isContentFile(filename: string) {
+	return filename.endsWith('.md') || filename.endsWith('.mdx');
+}
+
 export async function parseContentFiles(
 	basePath: string,
 	options: {
@@ -34,7 +38,7 @@ export async function parseContentFiles(
 
 			if (stat.isDirectory() && recursive) {
 				await processDirectory(filePath);
-			} else if (filename.endsWith('.md') || filename.endsWith('.mdx')) {
+			} else if (isContentFile(filename)) {
 				if (skipUnderscoreFiles && filename.startsWith('_')) continue;
 
 				try {
