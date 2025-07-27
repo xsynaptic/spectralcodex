@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
@@ -8,9 +9,14 @@ import { checkLocationRegions } from './locations-region';
 import { checkContentQuality } from './quality';
 import { checkSlugMismatches } from './slug-mismatch';
 
-const { values: args, positionals } = parseArgs({
+const { values, positionals } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
+		'root-path': {
+			type: 'string',
+			short: 'r',
+			default: process.cwd(),
+		},
 		verbose: {
 			type: 'boolean',
 			short: 'v',
@@ -21,13 +27,13 @@ const { values: args, positionals } = parseArgs({
 });
 
 // Output shell command results only in verbose mode
-$.verbose = args.verbose;
+$.verbose = values.verbose;
 
 const ContentCollectionsPathEnum = {
-	Ephemera: './packages/content/collections/ephemera',
-	Locations: './packages/content/collections/locations',
-	Posts: './packages/content/collections/posts',
-	Regions: './packages/content/collections/regions',
+	Ephemera: path.join(values['root-path'], 'packages/content/collections/ephemera'),
+	Locations: path.join(values['root-path'], 'packages/content/collections/locations'),
+	Posts: path.join(values['root-path'], 'packages/content/collections/posts'),
+	Regions: path.join(values['root-path'], 'packages/content/collections/regions'),
 } as const;
 
 function showHelp() {

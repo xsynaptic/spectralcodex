@@ -9,7 +9,7 @@ import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 // Parse command line arguments
-const { values: args } = parseArgs({
+const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': {
@@ -40,15 +40,15 @@ const { values: args } = parseArgs({
 	},
 });
 
-const iconsPath = path.join(args['root-path'], args['temp-path']);
-const outputPath = path.join(args['root-path'], args['output-path']);
+const iconsPath = path.join(values['root-path'], values['temp-path']);
+const outputPath = path.join(values['root-path'], values['output-path']);
 
 // Output shell command results
-$.verbose = args.verbose;
+$.verbose = values.verbose;
 
 // Populate a custom icon set with whatever we might use in maps
 async function exportMapIcons(iconRecord: Record<string, string>): Promise<void> {
-	if (args['skip-export']) {
+	if (values['skip-export']) {
 		console.log(chalk.yellow('Skipping icon export...'));
 		return;
 	}
@@ -77,7 +77,7 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 
 				if (iconResolved) {
 					mapIconSet.setIcon(iconId, iconResolved);
-					if (args.verbose) console.log(chalk.green(`✓ Exported: ${iconId} (${iconRequest})`));
+					if (values.verbose) console.log(chalk.green(`✓ Exported: ${iconId} (${iconRequest})`));
 				} else {
 					console.log(chalk.red(`✗ Missing ${iconName} (${iconId})!`));
 				}
@@ -86,13 +86,11 @@ async function exportMapIcons(iconRecord: Record<string, string>): Promise<void>
 
 		await exportToDirectory(mapIconSet, {
 			cleanup: true,
-			log: args.verbose,
+			log: values.verbose,
 			target: iconsPath,
 		});
 
-		console.log(
-			chalk.green(`Icons exported to ${path.join(args['root-path'], args['output-path'])}`),
-		);
+		console.log(chalk.green(`Icons exported to ${outputPath}`));
 	} catch (error) {
 		console.error(chalk.red('Error exporting icons:'), error);
 		process.exit(1);

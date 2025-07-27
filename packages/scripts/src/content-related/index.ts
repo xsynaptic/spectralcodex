@@ -2,15 +2,22 @@
 import { pipeline } from '@xenova/transformers';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 
-import type { ContentCollectionFileMetadata } from '../utils';
+import type { ContentCollectionFileMetadata } from '../content-utils';
 
-import { parseContentCollectionFiles } from '../utils';
+import { parseContentCollectionFiles } from '../content-utils';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.join(__filename, '..');
-const PROJECT_ROOT = path.join(__dirname, '..');
+const { values } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		'root-path': {
+			type: 'string',
+			short: 'r',
+			default: process.cwd(),
+		},
+	},
+});
 
 interface Embedding {
 	slug: string;
@@ -68,6 +75,7 @@ async function generateEmbeddings(
 	posts: Array<ContentCollectionFileMetadata>,
 ): Promise<Array<Embedding>> {
 	console.log('Loading embedding model...');
+
 	const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
 	const embeddings: Array<Embedding> = [];
@@ -140,10 +148,10 @@ function calculateSimilarities(embeddings: Array<Embedding>): SimilarityResult {
 // Main execution
 async function main() {
 	try {
-		console.log('=== SpectralCodex Similarity Generator (MVP) ===');
+		console.log('=== SpectralCodex Related Content Generator ===');
 
-		// Load posts
-		const contentPath = path.join(PROJECT_ROOT, 'packages/content/collections/posts');
+		const contentPath = path.join(values['root-path'], 'packages/content/collections/posts');
+
 		const posts = await parseContentCollectionFiles(contentPath);
 
 		if (posts.length === 0) {
@@ -153,6 +161,7 @@ async function main() {
 
 		// Generate embeddings
 		const embeddings = await generateEmbeddings(posts);
+
 		if (embeddings.length === 0) {
 			console.error('No embeddings generated!');
 			process.exit(1);
@@ -162,7 +171,7 @@ async function main() {
 		const similarities = calculateSimilarities(embeddings);
 
 		// Output results
-		const outputPath = path.join(PROJECT_ROOT, 'src/data/similarity-data.json');
+		const outputPath = path.join(values['root-path'], 'temp/related-content.json');
 
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(outputPath, JSON.stringify(similarities, null, 2));

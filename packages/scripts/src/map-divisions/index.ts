@@ -17,7 +17,7 @@ import { convertToFeatureCollection } from './geojson';
 import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache';
 import { safelyCreateDirectory } from './utils';
 
-const { values: args } = parseArgs({
+const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': {
@@ -48,6 +48,9 @@ const { values: args } = parseArgs({
 	},
 });
 
+const cachePath = path.join(values['root-path'], values['cache-path']);
+const outputPath = path.join(values['root-path'], values['output-path']);
+
 async function fetchDivisionData(
 	db: DuckDBConnection,
 	divisionIds: Set<string>,
@@ -64,7 +67,7 @@ async function fetchDivisionData(
 	const uncachedDivisionIds = new Set<string>();
 
 	for (const divisionId of divisionIds) {
-		const cached = await getDivisionDataCache(divisionId, args['cache-path']);
+		const cached = await getDivisionDataCache(divisionId, cachePath);
 
 		if (cached) {
 			console.log(chalk.gray(`  Using cached data for ${chalk.cyan(divisionId)}`));
@@ -92,7 +95,7 @@ async function fetchDivisionData(
 	// Get bounding box for this ancestor region
 	const boundingBox = boundingBoxes[ancestorId];
 
-	const query = buildQuery(args['overture-url'], uncachedDivisionIds, boundingBox);
+	const query = buildQuery(values['overture-url'], uncachedDivisionIds, boundingBox);
 
 	console.log(chalk.blue(`Running query against Overture Maps...`));
 
@@ -154,7 +157,7 @@ async function fetchDivisionData(
 
 				// Save to cache
 				try {
-					await saveDivisionDataCache(id, geometry as Polygon | MultiPolygon, args['cache-path']);
+					await saveDivisionDataCache(id, geometry as Polygon | MultiPolygon, cachePath);
 
 					console.log(chalk.gray(`  Cached ${chalk.cyan(id)}`));
 				} catch (error) {
@@ -177,14 +180,12 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 	try {
 		// Check which regions already exist and filter them out
-		const outputDir = path.join(args['root-path'], args['output-path']);
-
-		await safelyCreateDirectory(outputDir);
+		await safelyCreateDirectory(outputPath);
 
 		const regionsToProcess: Array<RegionMetadata> = [];
 
 		for (const region of regions) {
-			const filePath = path.join(outputDir, `${region.slug}.fgb`);
+			const filePath = path.join(outputPath, `${region.slug}.fgb`);
 
 			try {
 				await fs.access(filePath);
@@ -281,7 +282,7 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 						const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
 
-						await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputDir);
+						await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputPath);
 
 						console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.slug)}`));
 
@@ -303,17 +304,17 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 async function mapDivisions() {
 	console.log(
 		chalk.blue(
-			`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(args['overture-url'])}...`,
+			`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(values['overture-url'])}...`,
 		),
 	);
 
 	try {
 		// Load region data from regions collection
-		const regions = await parseRegionData(args['root-path'], args['regions-path']);
+		const regions = await parseRegionData(values['root-path'], values['regions-path']);
 
 		if (regions.length === 0) {
 			console.log(
-				chalk.yellow(`No regions with division IDs found in ${chalk.cyan(args['regions-path'])}.`),
+				chalk.yellow(`No regions with division IDs found in ${chalk.cyan(values['regions-path'])}.`),
 			);
 			return;
 		}
@@ -334,7 +335,7 @@ async function mapDivisions() {
 				`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`,
 			),
 		);
-		console.log(chalk.blue(`Output directory: ${chalk.cyan(args['output-path'])}`));
+		console.log(chalk.blue(`Output directory: ${chalk.cyan(values['output-path'])}`));
 
 		if (successCount === totalCount) {
 			console.log(chalk.green('🎉 All regions processed successfully!'));

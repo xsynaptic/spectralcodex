@@ -1,14 +1,18 @@
 {
-	"name": "@spectralcodex/map-scripts",
+	"name": "@spectralcodex/scripts",
 	"version": "1.0.0",
-	"description": "Map scripts for Spectral Codex",
+	"description": "Scripts for Spectral Codex",
 	"type": "module",
 	"private": true,
 	"scripts": {
+		"content-related": "tsx ./src/content-related/index.ts",
+		"content-schemas": "tsx ./src/content-schemas/index.ts",
+		"content-validate": "tsx ./src/content-validate/index.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
 		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts"
 	},
 	"devDependencies": {
+		"@astrojs/markdown-remark": "^6.3.3",
 		"@duckdb/node-api": "1.3.2-alpha.25",
 		"@iconify/json": "^2.2.362",
 		"@iconify/tools": "^4.1.2",
@@ -16,6 +20,7 @@
 		"@turf/helpers": "^7.2.0",
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
+		"@xenova/transformers": "^2.17.2",
 		"astro": "^5.12.3",
 		"chalk": "^5.4.1",
 		"flatgeobuf": "^4.1.1",

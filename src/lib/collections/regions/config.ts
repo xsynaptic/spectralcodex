@@ -21,7 +21,7 @@ export const regions = defineCollection({
 			dateCreated: DateStringSchema.optional(),
 			dateUpdated: DateStringSchema.optional(),
 			imageSet: ImageSetSchema.array().optional(),
-			divisionId: z.union([z.string(), z.string().array()]).nullable().optional(),
+			divisionId: z.union([z.string(), z.string().array()]).nullable(),
 			hideDivision: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
