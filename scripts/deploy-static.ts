@@ -34,7 +34,7 @@ async function validateContent() {
 	console.log(chalk.blue('Validating content integrity...'));
 
 	try {
-		await $`pnpm validate-content`;
+		await $`pnpm content-validate`;
 		console.log(chalk.green('Content validation passed.'));
 	} catch (error) {
 		console.error(chalk.red('Content validation failed:'), error);
