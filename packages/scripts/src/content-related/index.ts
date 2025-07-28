@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
 import { pipeline } from '@xenova/transformers';
+import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -161,7 +162,7 @@ async function generateEmbeddings(
 
 	const embedder = await pipeline('feature-extraction', MODEL_ID);
 
-	console.log(`✅ Loaded embedding model ${MODEL_ID}`);
+	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(MODEL_ID)}`));
 
 	const embeddings: Array<ContentRelatedEmbedding> = [];
 
@@ -203,11 +204,11 @@ async function generateEmbeddings(
 
 			if ((i + 1) % 10 === 0) {
 				console.log(
-					`Processed ${String(i + 1)}/${String(contentFiles.length)} embeddings (${String(cacheHits)} cached, ${String(generated)} generated)`,
+					chalk.blue(`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(contentFiles.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`),
 				);
 			}
 		} catch (error) {
-			console.error(`Error processing embedding for ${contentFile.id}:`, error);
+			console.error(chalk.red(`Error processing embedding for ${chalk.cyan(contentFile.id)}:`), error);
 		}
 	}
 
@@ -215,7 +216,7 @@ async function generateEmbeddings(
 	saveCache(cache, cacheDir);
 
 	console.log(
-		`✅ Generated ${String(embeddings.length)} embeddings (${String(cacheHits)} from cache, ${String(generated)} newly generated)`,
+		chalk.green(`✅ Generated ${chalk.cyan(String(embeddings.length))} embeddings (${chalk.gray(String(cacheHits))} from cache, ${chalk.yellow(String(generated))} newly generated)`),
 	);
 
 	return embeddings;
@@ -223,7 +224,7 @@ async function generateEmbeddings(
 
 // Calculate similarities and find top matches
 function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): ContentRelatedResult {
-	console.log('Calculating relatedness...');
+	console.log(chalk.blue('Calculating relatedness...'));
 
 	const result: ContentRelatedResult = {};
 
@@ -255,7 +256,7 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 
 		if ((i + 1) % 50 === 0) {
 			console.log(
-				`Calculated cosine similarities for ${String(i + 1)}/${String(embeddings.length)} items`,
+				chalk.blue(`Calculated cosine similarities for ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(embeddings.length))} items`),
 			);
 		}
 	}
@@ -301,12 +302,12 @@ async function getContentFiles() {
 
 async function contentRelated() {
 	try {
-		console.log('=== Related Content Generator ===');
+		console.log(chalk.magenta('=== Related Content Generator ==='));
 
 		const contentFiles = await getContentFiles();
 
 		if (contentFiles.length === 0) {
-			console.error('No content found!');
+			console.error(chalk.red('❌ No content found!'));
 			process.exit(1);
 		}
 
@@ -314,7 +315,7 @@ async function contentRelated() {
 		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
 
 		if (embeddings.length === 0) {
-			console.error('No embeddings generated!');
+			console.error(chalk.red('❌ No embeddings generated!'));
 			process.exit(1);
 		}
 
@@ -330,12 +331,12 @@ async function contentRelated() {
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));
 
-		console.log(`✅ Related content data written to ${outputPath}`);
+		console.log(chalk.green(`✅ Related content data written to ${chalk.cyan(outputPath)}`));
 		console.log(
-			`📊 Generated related content data for ${String(Object.keys(relatedContentItems).length)} items`,
+			chalk.green(`📊 Generated related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items`),
 		);
 	} catch (error) {
-		console.error('❌ Error:', error);
+		console.error(chalk.red('❌ Error:'), error);
 		process.exit(1);
 	}
 }
