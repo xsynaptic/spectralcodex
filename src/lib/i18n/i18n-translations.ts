@@ -92,6 +92,7 @@ const translationStrings = {
 		'content.section.map': 'Map',
 		'content.section.locationsNearby': 'Nearby Locations',
 		'content.section.backlinks': 'Connections',
+		'content.section.related': 'Related Content',
 		'content.section.dateVisited': 'Visitation Log',
 
 		// Locations

@@ -1,11 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { RelatedContentEmbedding } from './index.js';
+import type { ContentRelatedEmbedding } from './index.js';
 
-type VectorCache = Record<string, RelatedContentEmbedding>;
+type VectorCache = Record<string, ContentRelatedEmbedding>;
 
-const CACHE_FILE_NAME = 'related-content-vector-cache.json';
+const CACHE_FILE_NAME = 'content-related-vector-cache.json';
 
 export function loadCache(cacheDir: string): VectorCache {
 	const cachePath = path.join(cacheDir, CACHE_FILE_NAME);
@@ -42,7 +42,7 @@ export function getCachedEmbedding(
 	cache: VectorCache,
 	contentId: string,
 	contentHash: string,
-): RelatedContentEmbedding | undefined {
+): ContentRelatedEmbedding | undefined {
 	const cached = cache[contentId];
 
 	return cached?.hash === contentHash ? cached : undefined;

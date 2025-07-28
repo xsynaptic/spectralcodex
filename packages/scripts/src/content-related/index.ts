@@ -38,7 +38,7 @@ const { values } = parseArgs({
 	},
 });
 
-export interface RelatedContentEmbedding {
+export interface ContentRelatedEmbedding {
 	id: string;
 	hash: string;
 	collection: string;
@@ -46,13 +46,13 @@ export interface RelatedContentEmbedding {
 	frontmatter: Record<string, unknown>;
 }
 
-interface RelatedContentItem {
+interface ContentRelatedItem {
 	id: string;
 	collection: string;
 	score: number;
 }
 
-type RelatedContentResult = Record<string, Array<RelatedContentItem>>;
+type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
 
 const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
 
@@ -107,8 +107,8 @@ function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 
 // Calculate metadata boost based on shared regions and themes
 function calculateMetadataBoost(
-	current: RelatedContentEmbedding,
-	other: RelatedContentEmbedding,
+	current: ContentRelatedEmbedding,
+	other: ContentRelatedEmbedding,
 ): number {
 	let boost = 0;
 
@@ -147,7 +147,7 @@ function calculateMetadataBoost(
 async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
 	cacheDir: string,
-): Promise<Array<RelatedContentEmbedding>> {
+): Promise<Array<ContentRelatedEmbedding>> {
 	// Load existing cache
 	const cache = loadCache(cacheDir);
 
@@ -155,7 +155,7 @@ async function generateEmbeddings(
 
 	console.log(`✅ Loaded embedding model ${MODEL_ID}`);
 
-	const embeddings: Array<RelatedContentEmbedding> = [];
+	const embeddings: Array<ContentRelatedEmbedding> = [];
 
 	let cacheHits = 0;
 	let generated = 0;
@@ -178,7 +178,7 @@ async function generateEmbeddings(
 				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
 				const vector = [...output.data] as Array<number>;
 
-				const embedding: RelatedContentEmbedding = {
+				const embedding: ContentRelatedEmbedding = {
 					id: contentFile.id,
 					hash: contentFile.hash,
 					collection: contentFile.collection,
@@ -214,14 +214,14 @@ async function generateEmbeddings(
 }
 
 // Calculate similarities and find top matches
-function calculateSimilarities(embeddings: Array<RelatedContentEmbedding>): RelatedContentResult {
+function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): ContentRelatedResult {
 	console.log('Calculating relatedness...');
 
-	const result: RelatedContentResult = {};
+	const result: ContentRelatedResult = {};
 
 	for (let i = 0; i < embeddings.length; i++) {
 		const current = embeddings[i];
-		const relatedContentItems: Array<RelatedContentItem> = [];
+		const relatedContentItems: Array<ContentRelatedItem> = [];
 
 		for (const [j, content] of embeddings.entries()) {
 			if (i === j || !current) continue;
@@ -316,7 +316,7 @@ async function contentRelated() {
 		const outputPath = path.join(
 			values['root-path'],
 			values['content-path'],
-			'data/related-content.json',
+			'data/content-related.json',
 		);
 
 		// eslint-disable-next-line unicorn/no-null

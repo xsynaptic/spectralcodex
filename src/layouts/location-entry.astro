@@ -14,6 +14,7 @@ import ContentSectionBacklinks from '#components/content/content-section-backlin
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
+import ContentSectionRelated from '#components/content/content-section-related.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -196,5 +197,6 @@ const t = getTranslations();
 			}
 		</ContentSectionMap>
 		<LocationsNearbyList entry={entry} />
+		<ContentSectionRelated entry={entry} />
 	</article>
 </MainSite>
