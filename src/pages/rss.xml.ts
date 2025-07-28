@@ -2,7 +2,6 @@ import type { RSSFeedItem } from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import mdxRenderer from '@astrojs/mdx/server.js';
 import rss from '@astrojs/rss';
 import {
 	defaultSchema,
@@ -10,8 +9,6 @@ import {
 	stripTags,
 	transformMarkdown,
 } from '@spectralcodex/unified-tools';
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
@@ -22,6 +19,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
+import { getRenderMdxFunction } from '#lib/utils/mdx.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Provide some helpful info while debugging RSS feed generation
@@ -30,27 +28,16 @@ const RSS_FEED_DEBUG = true as boolean;
 // How many items should be included in the RSS feed?
 const RSS_FEED_ITEM_COUNT = 20;
 
-/**
- * @link https://docs.astro.build/en/reference/container-reference/
- */
-const container = await AstroContainer.create();
-
-container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
+const renderMdx = await getRenderMdxFunction();
 
 const getRssItem = async (
-	item: CollectionEntry<'ephemera' | 'posts'> | CollectionEntry<'locations'>,
+	entry: CollectionEntry<'ephemera' | 'posts'> | CollectionEntry<'locations'>,
 ) => {
 	const startTime = performance.now();
 
-	const {
-		data: { title, description, dateCreated, dateUpdated },
-	} = item;
+	const titleMultilingual = getMultilingualContent(entry.data, 'title');
 
-	const titleMultilingual = getMultilingualContent(item.data, 'title');
-
-	// These are expensive operations; everything below content rendering is not
-	const { Content } = await render(item);
-	const postHtml = await container.renderToString(Content, {
+	const postHtml = await renderMdx(entry, {
 		locals: {
 			isRss: true, // This conditional controls the output of MDX components
 		},
@@ -62,16 +49,21 @@ const getRssItem = async (
 	});
 
 	const rssFeedItem = {
-		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
-		link: getContentUrl(item.collection, item.id),
-		pubDate: parseContentDate(dateUpdated ?? dateCreated),
-		...(description ? { description: stripTags(transformMarkdown({ input: description })) } : {}),
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
+		link: getContentUrl(entry.collection, entry.id),
+		pubDate: parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated),
+		...(entry.data.description
+			? { description: stripTags(transformMarkdown({ input: entry.data.description })) }
+			: {}),
+		...(entry.data.imageFeatured ? { image: entry.data.imageFeatured } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 
 	if (RSS_FEED_DEBUG) {
 		console.log(
-			`[RSS] Generated entry for "${title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+			`[RSS] Generated entry for "${entry.data.title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
 		);
 	}
 
