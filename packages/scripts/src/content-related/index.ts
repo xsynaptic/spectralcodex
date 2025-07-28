@@ -10,6 +10,7 @@ import * as R from 'remeda';
 import type { ContentFileMetadata } from '../content-utils';
 
 import { parseContentFiles } from '../content-utils';
+import { getCachedEmbedding, loadCache, saveCache } from './vector-cache.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -37,7 +38,7 @@ const { values } = parseArgs({
 	},
 });
 
-interface RelatedContentEmbedding {
+export interface RelatedContentEmbedding {
 	id: string;
 	hash: string;
 	collection: string;
@@ -52,6 +53,8 @@ interface RelatedContentItem {
 }
 
 type RelatedContentResult = Record<string, Array<RelatedContentItem>>;
+
+const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
 
 // Clean content for embedding using unified tools
 // TODO: use unified system tools to handle MDX; currently this is a big kludge with a lot of regex
@@ -143,43 +146,69 @@ function calculateMetadataBoost(
 // Generate embeddings for all content files
 async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
+	cacheDir: string,
 ): Promise<Array<RelatedContentEmbedding>> {
-	console.log('Loading embedding model...');
+	// Load existing cache
+	const cache = loadCache(cacheDir);
 
-	const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+	const embedder = await pipeline('feature-extraction', MODEL_ID);
+
+	console.log(`✅ Loaded embedding model ${MODEL_ID}`);
 
 	const embeddings: Array<RelatedContentEmbedding> = [];
 
-	console.log('Generating embeddings...');
+	let cacheHits = 0;
+	let generated = 0;
 
 	for (let i = 0; i < contentFiles.length; i++) {
 		const contentFile = contentFiles[i];
 
-		if (!contentFile) continue;
+		if (!contentFile?.hash) continue;
 
-		// TODO: cache embedding
 		try {
-			const plainTextContent = cleanContent(contentFile.content, contentFile.frontmatter);
-			const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
-			const vector = [...output.data] as Array<number>;
+			// Check cache first
+			const cachedEmbedding = getCachedEmbedding(cache, contentFile.id, contentFile.hash);
 
-			embeddings.push({
-				id: contentFile.id,
-				hash: contentFile.hash ?? '',
-				collection: contentFile.collection,
-				vector,
-				frontmatter: contentFile.frontmatter,
-			});
+			if (cachedEmbedding) {
+				embeddings.push(cachedEmbedding);
+				cacheHits++;
+			} else {
+				// Generate new embedding
+				const plainTextContent = cleanContent(contentFile.content, contentFile.frontmatter);
+				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
+				const vector = [...output.data] as Array<number>;
+
+				const embedding: RelatedContentEmbedding = {
+					id: contentFile.id,
+					hash: contentFile.hash,
+					collection: contentFile.collection,
+					frontmatter: contentFile.frontmatter,
+					vector,
+				};
+
+				embeddings.push(embedding);
+
+				// Update cache in memory
+				cache[contentFile.id] = embedding;
+				generated++;
+			}
 
 			if ((i + 1) % 10 === 0) {
-				console.log(`Generated ${String(i + 1)}/${String(contentFiles.length)} embeddings`);
+				console.log(
+					`Processed ${String(i + 1)}/${String(contentFiles.length)} embeddings (${String(cacheHits)} cached, ${String(generated)} generated)`,
+				);
 			}
 		} catch (error) {
-			console.error(`Error generating embedding for ${contentFile.id}:`, error);
+			console.error(`Error processing embedding for ${contentFile.id}:`, error);
 		}
 	}
 
-	console.log(`Generated ${String(embeddings.length)} embeddings`);
+	// Save updated cache
+	saveCache(cache, cacheDir);
+
+	console.log(
+		`✅ Generated ${String(embeddings.length)} embeddings (${String(cacheHits)} from cache, ${String(generated)} newly generated)`,
+	);
 
 	return embeddings;
 }
@@ -187,6 +216,7 @@ async function generateEmbeddings(
 // Calculate similarities and find top matches
 function calculateSimilarities(embeddings: Array<RelatedContentEmbedding>): RelatedContentResult {
 	console.log('Calculating relatedness...');
+
 	const result: RelatedContentResult = {};
 
 	for (let i = 0; i < embeddings.length; i++) {
@@ -263,7 +293,7 @@ async function getContentFiles() {
 
 async function contentRelated() {
 	try {
-		console.log('=== Spectral Codex Related Content Generator ===');
+		console.log('=== Related Content Generator ===');
 
 		const contentFiles = await getContentFiles();
 
@@ -272,7 +302,8 @@ async function contentRelated() {
 			process.exit(1);
 		}
 
-		const embeddings = await generateEmbeddings(contentFiles);
+		const cacheDir = path.join(values['root-path'], values['content-path'], 'data');
+		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
 
 		if (embeddings.length === 0) {
 			console.error('No embeddings generated!');
