@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import { parseFrontmatter } from '@astrojs/markdown-remark';
+import { createHash } from 'node:crypto';
 import { readdirSync, statSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -8,12 +9,13 @@ export interface ContentFileMetadata {
 	id: string;
 	filename: string;
 	extension: string;
-	filePath: string;
-	relativePath: string;
+	pathAbsolute: string;
+	pathRelative: string;
 	collection: string;
 	hierarchy: Array<string>;
 	frontmatter: Record<string, unknown>;
 	content: string;
+	hash?: string | undefined;
 }
 
 function isContentFile(filename: string) {
@@ -25,9 +27,10 @@ export async function parseContentFiles(
 	options: {
 		skipUnderscoreFiles?: boolean;
 		recursive?: boolean;
+		withHashes?: boolean;
 	} = {},
 ) {
-	const { skipUnderscoreFiles = true, recursive = true } = options;
+	const { skipUnderscoreFiles = true, recursive = true, withHashes = false } = options;
 	const contentMetadata: Array<ContentFileMetadata> = [];
 
 	const collection = basePath.split('/').pop() ?? '';
@@ -36,34 +39,40 @@ export async function parseContentFiles(
 		const filenames = readdirSync(dirPath);
 
 		for (const filename of filenames) {
-			const filePath = path.join(dirPath, filename);
-			const stat = statSync(filePath);
+			const pathAbsolute = path.join(dirPath, filename);
+			const stat = statSync(pathAbsolute);
 
 			if (stat.isDirectory() && recursive) {
-				await processDirectory(filePath);
+				await processDirectory(pathAbsolute);
 			} else if (isContentFile(filename)) {
 				if (skipUnderscoreFiles && filename.startsWith('_')) continue;
 
 				try {
-					const fileContent = await fs.readFile(filePath, 'utf8');
+					const fileContent = await fs.readFile(pathAbsolute, 'utf8');
+
 					const { frontmatter, content } = parseFrontmatter(fileContent);
 
 					const extension = path.extname(filename);
-					const relativePath = path.relative(basePath, filePath);
+					const pathRelative = path.relative(basePath, pathAbsolute);
+
+					const hash = withHashes
+						? createHash('md5').update(JSON.stringify(fileContent)).digest('hex')
+						: undefined;
 
 					contentMetadata.push({
 						id: filename.replace(extension, ''),
 						filename,
 						extension: extension.replace('.', ''),
-						filePath,
-						relativePath,
+						pathAbsolute,
+						pathRelative,
 						collection,
-						hierarchy: relativePath.replace(extension, '').split('/'),
+						hierarchy: pathRelative.replace(extension, '').split('/'),
 						frontmatter,
 						content,
+						hash,
 					});
 				} catch (error) {
-					console.warn(`Warning: Could not parse ${filePath}:`, error);
+					console.warn(`Warning: Could not parse ${pathAbsolute}:`, error);
 				}
 			}
 		}

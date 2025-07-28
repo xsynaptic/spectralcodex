@@ -37,8 +37,9 @@ const { values } = parseArgs({
 	},
 });
 
-interface Embedding {
+interface RelatedContentEmbedding {
 	id: string;
+	hash: string;
 	collection: string;
 	vector: Array<number>;
 	frontmatter: Record<string, unknown>;
@@ -53,15 +54,24 @@ interface RelatedContentItem {
 type RelatedContentResult = Record<string, Array<RelatedContentItem>>;
 
 // Clean content for embedding using unified tools
+// TODO: use unified system tools to handle MDX; currently this is a big kludge with a lot of regex
 function cleanContent(content: string, frontmatter: Record<string, unknown>): string {
 	// Get title and description from frontmatter
 	const title = typeof frontmatter.title === 'string' ? frontmatter.title : '';
 	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
 
-	// Remove MDX components and their content (custom components we don't care about)
-	const contentWithoutComponents = content
-		.replaceAll(/<[A-Z][^>]*>.*?<\/[A-Z][^>]*>/gs, '') // Remove JSX/MDX components with content
-		.replaceAll(/<[A-Z][^>]*\/>/g, '') // Remove self-closing JSX/MDX components
+	// Preserve Link component content before removing other components
+	const contentWithPreservedLinks = content
+		// Extract and preserve Link component content: <Link>Content</Link> or <Link id="id">Content</Link>
+		.replaceAll(/<Link(?:\s+[^>]*)?>([^<]*)<\/Link>/g, '$1') // Keep the content, remove Link tags
+		// Remove footnote references [^1], [^2], etc.
+		.replaceAll(/\[\^\d+\]/g, '');
+
+	// Remove other MDX components and their content (custom components we don't care about)
+	// Note: We exclude Link from this removal since we handled it above
+	const contentWithoutComponents = contentWithPreservedLinks
+		.replaceAll(/<(?!Link)[A-Z][^>]*>.*?<\/(?!Link)[A-Z][^>]*>/gs, '') // Remove JSX/MDX components except Link
+		.replaceAll(/<(?!Link)[A-Z][^>]*\/>/g, '') // Remove self-closing JSX/MDX components except Link
 		.replaceAll(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '') // Remove import statements
 		.replaceAll(/export\s+.*?;?\s*/g, ''); // Remove export statements
 
@@ -93,7 +103,10 @@ function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 }
 
 // Calculate metadata boost based on shared regions and themes
-function calculateMetadataBoost(current: Embedding, other: Embedding): number {
+function calculateMetadataBoost(
+	current: RelatedContentEmbedding,
+	other: RelatedContentEmbedding,
+): number {
 	let boost = 0;
 
 	// Extract arrays from frontmatter, handling various formats
@@ -130,12 +143,12 @@ function calculateMetadataBoost(current: Embedding, other: Embedding): number {
 // Generate embeddings for all content files
 async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
-): Promise<Array<Embedding>> {
+): Promise<Array<RelatedContentEmbedding>> {
 	console.log('Loading embedding model...');
 
 	const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
 
-	const embeddings: Array<Embedding> = [];
+	const embeddings: Array<RelatedContentEmbedding> = [];
 
 	console.log('Generating embeddings...');
 
@@ -144,13 +157,15 @@ async function generateEmbeddings(
 
 		if (!contentFile) continue;
 
+		// TODO: cache embedding
 		try {
-			const cleanedContent = cleanContent(contentFile.content, contentFile.frontmatter);
-			const output = await embedder(cleanedContent, { pooling: 'mean', normalize: true });
+			const plainTextContent = cleanContent(contentFile.content, contentFile.frontmatter);
+			const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
 			const vector = [...output.data] as Array<number>;
 
 			embeddings.push({
 				id: contentFile.id,
+				hash: contentFile.hash ?? '',
 				collection: contentFile.collection,
 				vector,
 				frontmatter: contentFile.frontmatter,
@@ -170,13 +185,13 @@ async function generateEmbeddings(
 }
 
 // Calculate similarities and find top matches
-function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResult {
+function calculateSimilarities(embeddings: Array<RelatedContentEmbedding>): RelatedContentResult {
 	console.log('Calculating relatedness...');
 	const result: RelatedContentResult = {};
 
 	for (let i = 0; i < embeddings.length; i++) {
 		const current = embeddings[i];
-		const similarities: Array<RelatedContentItem> = [];
+		const relatedContentItems: Array<RelatedContentItem> = [];
 
 		for (const [j, content] of embeddings.entries()) {
 			if (i === j || !current) continue;
@@ -187,7 +202,7 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 			// Combine for hybrid score
 			const hybridScore = semanticScore + metadataBoost;
 
-			similarities.push({
+			relatedContentItems.push({
 				id: content.id,
 				collection: content.collection,
 				score: hybridScore,
@@ -195,9 +210,9 @@ function calculateSimilarities(embeddings: Array<Embedding>): RelatedContentResu
 		}
 
 		// Sort by score and slice top results
-		similarities.sort((a, b) => b.score - a.score);
+		relatedContentItems.sort((a, b) => b.score - a.score);
 		if (current) {
-			result[current.id] = similarities.slice(0, Number(values['result-count']));
+			result[current.id] = relatedContentItems.slice(0, Number(values['result-count']));
 		}
 
 		if ((i + 1) % 50 === 0) {
@@ -229,7 +244,7 @@ async function getContentFiles() {
 	const contentFiles: Array<ContentFileMetadata> = [];
 
 	for (const contentPath of contentPaths) {
-		const files = await parseContentFiles(contentPath);
+		const files = await parseContentFiles(contentPath, { withHashes: true });
 
 		contentFiles.push(...files);
 	}
@@ -257,7 +272,6 @@ async function contentRelated() {
 			process.exit(1);
 		}
 
-		// Generate embeddings
 		const embeddings = await generateEmbeddings(contentFiles);
 
 		if (embeddings.length === 0) {
@@ -265,17 +279,22 @@ async function contentRelated() {
 			process.exit(1);
 		}
 
-		// Calculate similarities
-		const similarities = calculateSimilarities(embeddings);
+		const relatedContentItems = calculateSimilarities(embeddings);
 
 		// Output results
-		const outputPath = path.join(values['root-path'], 'temp/related-content.json');
+		const outputPath = path.join(
+			values['root-path'],
+			values['content-path'],
+			'data/related-content.json',
+		);
 
 		// eslint-disable-next-line unicorn/no-null
-		writeFileSync(outputPath, JSON.stringify(similarities, null, 2));
+		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));
 
-		console.log(`✅ Similarity data written to ${outputPath}`);
-		console.log(`📊 Generated similarities for ${String(Object.keys(similarities).length)} items`);
+		console.log(`✅ Related content data written to ${outputPath}`);
+		console.log(
+			`📊 Generated related content data for ${String(Object.keys(relatedContentItems).length)} items`,
+		);
 	} catch (error) {
 		console.error('❌ Error:', error);
 		process.exit(1);

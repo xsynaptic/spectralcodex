@@ -12,7 +12,7 @@ export async function checkDivisionIds(regionsPath: string) {
 
 	for (const parsedFile of parsedFiles) {
 		if (parsedFile.frontmatter.divisionId === undefined) {
-			regionsWithoutDivision.push(parsedFile.relativePath);
+			regionsWithoutDivision.push(parsedFile.pathRelative);
 		}
 	}
 
