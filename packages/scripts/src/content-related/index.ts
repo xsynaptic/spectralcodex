@@ -54,7 +54,15 @@ interface ContentRelatedItem {
 
 type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
 
-const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
+// Some recommended models to experiment with; more complex models are more accurate but slower
+const ModelIdEnum = {
+	MiniLm: 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
+	MpNet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
+	Bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
+} as const;
+
+// Note: when changing models be sure to manually delete the cache!
+const MODEL_ID = ModelIdEnum.MpNet;
 
 // Clean content for embedding using unified tools
 // TODO: use unified system tools to handle MDX; currently this is a big kludge with a lot of regex
