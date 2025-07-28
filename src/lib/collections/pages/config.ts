@@ -8,7 +8,7 @@ import {
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
-} from '#lib/schemas/content.ts';
+} from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 
 // Note: pages do not have a flat structure; the URL will reflect the location on the file system

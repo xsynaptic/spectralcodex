@@ -5,7 +5,7 @@ import { z } from 'astro:content';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
-import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 
 function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {

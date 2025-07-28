@@ -3,7 +3,7 @@ import { defineCollection, reference, z } from 'astro:content';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { ImageSetSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';

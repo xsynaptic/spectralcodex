@@ -1,7 +1,7 @@
 import { reference, z } from 'astro:content';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/content.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 

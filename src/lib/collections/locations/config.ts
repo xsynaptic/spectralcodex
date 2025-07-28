@@ -10,7 +10,7 @@ import {
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
-} from '#lib/schemas/content.ts';
+} from '#lib/schemas/index.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
