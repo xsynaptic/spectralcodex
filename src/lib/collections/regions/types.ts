@@ -8,6 +8,8 @@ export const RegionLanguageMap = {
 	japan: LanguageCodeEnum.Japanese,
 	'south-korea': LanguageCodeEnum.Korean,
 	taiwan: LanguageCodeEnum.ChineseMandarin,
+	// When we include other scripts in Vietnam posts its usually Chinese
+	vietnam: LanguageCodeEnum.ChineseMandarin,
 } as const;
 
 export type RegionLanguage = (typeof RegionLanguageMap)[keyof typeof RegionLanguageMap];

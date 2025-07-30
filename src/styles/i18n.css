@@ -6,6 +6,7 @@ html:not([lang^='ko']) span[lang^='ko'] {
 	font-variant: normal !important;
 	letter-spacing: normal !important;
 	line-break: strict !important;
+	overflow-wrap: break-word !important;
 	text-decoration: none !important;
 	text-transform: none !important;
 	word-break: keep-all !important; /* Magic property for CJK text: keeps characters together but also line breaks without overflow */

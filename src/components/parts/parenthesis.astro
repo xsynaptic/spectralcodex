@@ -3,18 +3,19 @@ import type { HTMLTag, Polymorphic } from 'astro/types';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
+	class?: string | undefined;
 	before?: string | undefined;
 	after?: string | undefined;
 }>;
 
-const { as: Tag = 'span', before = '(', after = ')' } = Astro.props;
+const { as: Tag = 'span', class: className, before = '(', after = ')' } = Astro.props;
 
 const content = await Astro.slots.render('default');
 ---
 
 {
 	content ? (
-		<Tag>
+		<Tag class={className}>
 			{before}
 			<slot />
 			{after}
