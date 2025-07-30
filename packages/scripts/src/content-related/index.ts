@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
+import { sanitizeMdx } from '@spectralcodex/unified-tools';
 import { pipeline } from '@xenova/transformers';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
@@ -66,35 +66,13 @@ const ModelIdEnum = {
 const MODEL_ID = ModelIdEnum.MpNet;
 
 // Clean content for embedding using unified tools
-// TODO: use unified system tools to handle MDX; currently this is a big kludge with a lot of regex
-function cleanContent(content: string, frontmatter: Record<string, unknown>): string {
-	// Get title and description from frontmatter
+function cleanContent(contentRaw: string, frontmatter: Record<string, unknown>): string {
 	const title = typeof frontmatter.title === 'string' ? frontmatter.title : '';
 	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
+	const content = sanitizeMdx(contentRaw);
 
-	// Preserve Link component content before removing other components
-	const contentWithPreservedLinks = content
-		// Extract and preserve Link component content: <Link>Content</Link> or <Link id="id">Content</Link>
-		.replaceAll(/<Link(?:\s+[^>]*)?>([^<]*)<\/Link>/g, '$1') // Keep the content, remove Link tags
-		// Remove footnote references [^1], [^2], etc.
-		.replaceAll(/\[\^\d+\]/g, '');
-
-	// Remove other MDX components and their content (custom components we don't care about)
-	// Note: We exclude Link from this removal since we handled it above
-	const contentWithoutComponents = contentWithPreservedLinks
-		.replaceAll(/<(?!Link)[A-Z][^>]*>.*?<\/(?!Link)[A-Z][^>]*>/gs, '') // Remove JSX/MDX components except Link
-		.replaceAll(/<(?!Link)[A-Z][^>]*\/>/g, '') // Remove self-closing JSX/MDX components except Link
-		.replaceAll(/import\s+.*?from\s+['"][^'"]*['"];?\s*/g, '') // Remove import statements
-		.replaceAll(/export\s+.*?;?\s*/g, ''); // Remove export statements
-
-	// Transform markdown to HTML, then strip all HTML tags to get clean text
-	const htmlContent = transformMarkdown({ input: contentWithoutComponents });
-	const cleanText = stripTags(htmlContent)
-		.replaceAll(/\s+/g, ' ') // Normalize whitespace
-		.trim();
-
-	// Combine title, description, and content
-	return `${title} ${description} ${cleanText}`.slice(0, Number(values['character-limit']));
+	// Combine title, description, and content; the model will consume it as-is
+	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
 }
 
 // Cosine similarity function
@@ -204,11 +182,16 @@ async function generateEmbeddings(
 
 			if ((i + 1) % 10 === 0) {
 				console.log(
-					chalk.blue(`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(contentFiles.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`),
+					chalk.blue(
+						`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(contentFiles.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
+					),
 				);
 			}
 		} catch (error) {
-			console.error(chalk.red(`Error processing embedding for ${chalk.cyan(contentFile.id)}:`), error);
+			console.error(
+				chalk.red(`Error processing embedding for ${chalk.cyan(contentFile.id)}:`),
+				error,
+			);
 		}
 	}
 
@@ -216,7 +199,9 @@ async function generateEmbeddings(
 	saveCache(cache, cacheDir);
 
 	console.log(
-		chalk.green(`✅ Generated ${chalk.cyan(String(embeddings.length))} embeddings (${chalk.gray(String(cacheHits))} from cache, ${chalk.yellow(String(generated))} newly generated)`),
+		chalk.green(
+			`✅ Generated ${chalk.cyan(String(embeddings.length))} embeddings (${chalk.gray(String(cacheHits))} from cache, ${chalk.yellow(String(generated))} newly generated)`,
+		),
 	);
 
 	return embeddings;
@@ -256,7 +241,9 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 
 		if ((i + 1) % 50 === 0) {
 			console.log(
-				chalk.blue(`Calculated cosine similarities for ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(embeddings.length))} items`),
+				chalk.blue(
+					`Calculated cosine similarities for ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(embeddings.length))} items`,
+				),
 			);
 		}
 	}
@@ -333,7 +320,9 @@ async function contentRelated() {
 
 		console.log(chalk.green(`✅ Related content data written to ${chalk.cyan(outputPath)}`));
 		console.log(
-			chalk.green(`📊 Generated related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items`),
+			chalk.green(
+				`📊 Generated related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items`,
+			),
 		);
 	} catch (error) {
 		console.error(chalk.red('❌ Error:'), error);
