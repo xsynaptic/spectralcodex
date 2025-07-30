@@ -23,7 +23,7 @@ import { getRenderMdxFunction } from '#lib/utils/mdx.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Provide some helpful info while debugging RSS feed generation
-const RSS_FEED_DEBUG = true as boolean;
+const RSS_FEED_DEBUG = false as boolean;
 
 // How many items should be included in the RSS feed?
 const RSS_FEED_ITEM_COUNT = 20;

@@ -5,14 +5,14 @@ import { defineCollection, reference, z } from 'astro:content';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/schemas.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/index.ts';
-import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
-import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
