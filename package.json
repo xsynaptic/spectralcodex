@@ -37,18 +37,18 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.12.3",
-		"react": "^19.1.0",
-		"react-dom": "^19.1.0"
+		"astro": "^5.12.6",
+		"react": "^19.1.1",
+		"react-dom": "^19.1.1"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.3",
 		"@astrojs/mdx": "^4.3.1",
-		"@astrojs/node": "^9.3.0",
+		"@astrojs/node": "^9.3.1",
 		"@astrojs/react": "^4.3.0",
 		"@astrojs/rss": "^4.0.12",
-		"@astrojs/sitemap": "^3.4.1",
-		"@iconify/json": "^2.2.363",
+		"@astrojs/sitemap": "^3.4.2",
+		"@iconify/json": "^2.2.364",
 		"@iconify/utils": "^2.3.0",
 		"@sindresorhus/slugify": "^2.2.1",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -66,8 +66,8 @@
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
 		"@types/postcss-inline-svg": "^5.0.4",
-		"@types/react": "^19.1.8",
-		"@types/react-dom": "^19.1.6",
+		"@types/react": "^19.1.9",
+		"@types/react-dom": "^19.1.7",
 		"@xsynaptic/eslint-config": "^2.0.1",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.4",
@@ -93,7 +93,7 @@
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"react-compiler-runtime": "19.1.0-rc.2",
 		"rehype-wrap-cjk": "^0.5.0",
-		"remeda": "^2.26.1",
+		"remeda": "^2.27.0",
 		"sharp": "^0.34.3",
 		"tailwindcss": "^4.1.11",
 		"tsx": "^4.20.3",
@@ -104,7 +104,7 @@
 		"vite": "6.3.4",
 		"vitest": "^3.2.4",
 		"yaml": "^2.8.0",
-		"zx": "^8.7.1"
+		"zx": "^8.7.2"
 	},
 	"packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
 }

@@ -9,7 +9,7 @@
 	"private": true,
 	"devDependencies": {
 		"@types/micromatch": "^4.0.9",
-		"astro": "^5.12.3",
+		"astro": "^5.12.6",
 		"fast-glob": "^3.3.3",
 		"micromatch": "^4.0.8",
 		"p-limit": "^6.2.0"
