@@ -30,7 +30,7 @@ const skipBuild = process.argv.includes('--skip-build');
 // Output shell command results
 $.verbose = true;
 
-async function validateContent() {
+async function contentValidate() {
 	console.log(chalk.blue('Validating content integrity...'));
 
 	try {
@@ -38,6 +38,18 @@ async function validateContent() {
 		console.log(chalk.green('Content validation passed.'));
 	} catch (error) {
 		console.error(chalk.red('Content validation failed:'), error);
+		process.exit(1);
+	}
+}
+
+async function contentRelated() {
+	console.log(chalk.blue('Generating related content...'));
+
+	try {
+		await $`pnpm content-related`;
+		console.log(chalk.green('Related content generated.'));
+	} catch (error) {
+		console.error(chalk.red('Related content generation failed:'), error);
 		process.exit(1);
 	}
 }
@@ -157,7 +169,11 @@ console.log(chalk.blue(`Deploying with arguments "${chalk.underline(step)}"...`)
 
 switch (step) {
 	case 'validate': {
-		await validateContent();
+		await contentValidate();
+		break;
+	}
+	case 'related': {
+		await contentRelated();
 		break;
 	}
 	case 'build': {
@@ -186,7 +202,8 @@ switch (step) {
 		break;
 	}
 	default: {
-		await validateContent();
+		await contentValidate();
+		await contentRelated();
 		await buildProject();
 		if (!imageRemote) await removeOriginalImages();
 		await moveHashedImages();
