@@ -59,7 +59,7 @@ export const getStaticPaths = (async () => {
 export const GET = (({ props: { imageOpenGraph } }) => {
 	if (!imageOpenGraph) return new Response(undefined, { status: 404 });
 
-	return new Response(imageOpenGraph.data, {
+	return new Response(new Uint8Array(imageOpenGraph.data), {
 		status: 200,
 		headers: {
 			'Content-Type': `image/${imageOpenGraph.info.format === 'jpg' ? 'jpeg' : imageOpenGraph.info.format}`,

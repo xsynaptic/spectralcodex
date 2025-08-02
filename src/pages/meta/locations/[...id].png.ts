@@ -52,7 +52,7 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 export const GET = (({ props: { imageOpenGraph } }) => {
-	return new Response(imageOpenGraph, {
+	return new Response(new Uint8Array(imageOpenGraph), {
 		status: 200,
 		headers: {
 			'Content-Type': 'image/png',
