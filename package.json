@@ -82,7 +82,7 @@
 		"exiftool-vendored": "^30.3.0",
 		"geojson": "^0.5.0",
 		"globals": "^16.3.0",
-		"keyv": "^5.4.0",
+		"keyv": "^5.5.0",
 		"ky": "^1.8.2",
 		"maplibre-gl": "^5.6.1",
 		"nanoid": "^5.1.5",
