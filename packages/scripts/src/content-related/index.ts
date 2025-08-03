@@ -34,7 +34,7 @@ const { values } = parseArgs({
 		'result-count': {
 			type: 'string',
 			short: 'n',
-			default: '5',
+			default: '10',
 		},
 	},
 });
