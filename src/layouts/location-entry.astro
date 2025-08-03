@@ -9,7 +9,6 @@ import ContentCollectionLink from '#components/content/content-collection-link.a
 import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ContentImageEntry from '#components/content/content-image-entry.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
@@ -21,6 +20,7 @@ import ContentSection from '#components/content/content-section.astro';
 import FormatCjk from '#components/format/format-cjk.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
+import ImageComponent from '#components/image/image-component.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
@@ -144,7 +144,7 @@ const t = getTranslations();
 			) : (
 				<>
 					{entry.data.imageFeatured ? (
-						<ContentImageEntry imageId={entry.data.imageFeatured} alt={title} />
+						<ImageComponent imageId={entry.data.imageFeatured} alt={title} />
 					) : undefined}
 					<ContentSection>
 						<Fragment slot="section-description">

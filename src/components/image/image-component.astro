@@ -5,7 +5,8 @@ import { Image } from 'astro:assets';
 
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
-import ImagePlaceholder from '#components/parts/image-placeholder.astro';
+import ImageLink from '#components/image/image-link.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { FEATURE_IMAGE_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
@@ -63,13 +64,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 	imageProps ? (
 		isRss ? (
 			<figure>
-				{imageLinkUrl ? (
-					<a href={imageLinkUrl}>
-						<Image loading="lazy" {...imageProps} />
-					</a>
-				) : (
-					<Image loading="lazy" {...imageProps} />
-				)}
+				<Image loading="lazy" {...imageProps} />
 				{caption ? (
 					<figcaption>
 						<Fragment set:html={caption} />
@@ -89,30 +84,21 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 				]}
 			>
 				<ImagePlaceholder
-					class:list={[layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs']}
+					class:list={[
+						layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
+						imageLinkUrl ? 'group relative' : undefined,
+					]}
 					placeholder={placeholder}
 				>
-					{imageLinkUrl ? (
-						<a href={imageLinkUrl}>
-							<Image
-								class:list={[
-									'm-0 object-cover object-center text-sm text-transparent',
-									layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
-								]}
-								loading="lazy"
-								{...imageProps}
-							/>
-						</a>
-					) : (
-						<Image
-							class:list={[
-								'm-0 object-cover object-center text-sm text-transparent',
-								layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
-							]}
-							loading="lazy"
-							{...imageProps}
-						/>
-					)}
+					<Image
+						class:list={[
+							'm-0 object-cover object-center text-sm text-transparent',
+							layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
+						]}
+						loading="lazy"
+						{...imageProps}
+					/>
+					{imageLinkUrl ? <ImageLink imageLinkUrl={imageLinkUrl} /> : undefined}
 				</ImagePlaceholder>
 				{caption ? (
 					<figcaption

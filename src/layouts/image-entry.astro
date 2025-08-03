@@ -9,11 +9,11 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSection from '#components/content/content-section.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
 import Container from '#components/parts/container.astro';
 import DateDisplay from '#components/parts/date-display.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import ImagePlaceholder from '#components/parts/image-placeholder.astro';
 import TextGridItem from '#components/parts/text-grid-item.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -29,11 +29,11 @@ const { entry } = Astro.props;
 // There is no way to know what sort of content we might be getting here
 // May as well pass it through the CJK wrapper with the default settings (wrap any CJK characters)
 const title = wrapCjk({
-	input: entry.data.title ?? '',
+	input: entry.data.title,
 	wrapCjkOptions: { langCode: 'cjk' },
 });
 
-const alt = sanitizeAltAttribute(entry.data.title ?? '');
+const alt = sanitizeAltAttribute(entry.data.title);
 
 const imageProps = {
 	src: entry.data.src,

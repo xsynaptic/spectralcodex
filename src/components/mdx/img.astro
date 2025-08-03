@@ -1,7 +1,7 @@
 ---
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
-import ContentImageEntry from '#components/content/content-image-entry.astro';
+import ImageComponent from '#components/image/image-component.astro';
 
 interface Props {
 	src: string;
@@ -14,8 +14,8 @@ const { src: imageId, ...props } = Astro.props;
 
 {
 	imageId ? (
-		<ContentImageEntry imageId={imageId} {...props}>
+		<ImageComponent imageId={imageId} {...props}>
 			<slot />
-		</ContentImageEntry>
+		</ImageComponent>
 	) : undefined
 }
