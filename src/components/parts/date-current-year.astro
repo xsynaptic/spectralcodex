@@ -9,13 +9,15 @@ const currentYear = new Date().getFullYear();
 <span data-current-year>{currentYear}</span>
 
 <script data-astro-rerun is:inline>
-	const currentYearElement = document.querySelector(`[data-current-year]`);
-	const currentYear = String(new Date().getFullYear());
+	(() => {
+		const currentYearElement = document.querySelector(`[data-current-year]`);
+		const currentYear = String(new Date().getFullYear());
 
-	if (
-		currentYearElement instanceof HTMLSpanElement &&
-		currentYearElement.textContent !== currentYear
-	) {
-		currentYearElement.textContent = currentYear;
-	}
+		if (
+			currentYearElement instanceof HTMLSpanElement &&
+			currentYearElement.textContent !== currentYear
+		) {
+			currentYearElement.textContent = currentYear;
+		}
+	})();
 </script>
