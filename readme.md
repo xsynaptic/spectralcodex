@@ -2,9 +2,63 @@
 
 This repository contains the working Astro project used to generate the [Spectral Codex](https://spectralcodex.com) website.
 
+## Features
+
+### Content Management
+
+- All content is authored in MDX using the Content Layer API
+- Comprehensive validation system ensuring data quality and consistency across collections (including frontmatter field and GPS coordinate de-duplication checks)
+- Visual reading progress indicator for long-form content
+- Automated content excerpt generation for previews and listings
+
+### Image Handling
+
+- Experimental image loader treating individual images as first-class content with metadata
+- Automatic extraction of camera settings, GPS coordinates, and other EXIF data from images
+- Automatic generation of data URI-encoded low-quality image placeholders (LQIPs) for improved perceived performance
+- Custom Astro integration for serving local images over localhost to reduce the memory burden of Rollup-based builds
+- Customer remark plugin to handle advanced image layout
+- Hero image support with optional CSS-only image carousels
+
+### Interactive Maps
+
+- React-based map component built with [MapLibre](https://maplibre.org/), [react-map-gl](https://visgl.github.io/react-map-gl/), and [Protomaps](https://protomaps.com/)
+- Custom filter controls for adjusting what points are visible on the map
+- Popups, clustering, filtering by objectives, and responsive design
+- Administrative boundaries are sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rending on region maps
+- Persistent storage of map data via IndexedDB
+
+### Search & Discovery
+
+- Integrated [Pagefind](https://pagefind.app/) via [astro-pagefind](https://github.com/shishkin/astro-pagefind) for client-side full-text search across all content
+- LLM-powered related content recommendations using vector similarity
+- Automatic discovery and display of content relationships via backlinks
+- Hierarchical navigation through regions, themes, and series
+- Distance-based point-of-interest discovery via nearby locations
+
+### Internationalization
+
+- Custom CJK character handling and language-specific styling
+- Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
+
+## SEO & RSS
+
+- Comprehensive meta tags, structured data, and OpenGraph images
+- Dynamic sitemap generation with [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
+- Full RSS feeds built with [@astrojs/rss](https://docs.astro.build/en/recipes/rss/) and the experimental Container API
+
 ## Usage
 
 Standard Astro commands apply; use `pnpm astro dev` to fire up the development server and `pnpm astro build` to generate a build. Deployment is handled by custom scripts invoked by `pnpm deploy-static` (but you'd need to modify this script for your own needs; it won't work out of the box).
+
+### MDX Configuration
+
+- `tsconfig` should also specify the remark plugin toolchain Astro uses (and the user may modify) to lint Markdown and MDX files
+- ESLint should be used to lint and format MDX files; Prettier support for MDX is not comprehensive and errors will be introduced when using it as the MDX formatter
+
+### Image Assets
+
+Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom.
 
 ## Project Structure
 
