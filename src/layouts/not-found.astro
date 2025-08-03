@@ -11,7 +11,7 @@ const title = t('404.title');
 const description = t('404.description');
 ---
 
-<MainSite meta={{ title, description }}>
+<MainSite meta={{ title, description, noIndex: true, noFollow: true }}>
 	<ContentHeader><Fragment slot="header-title">{title}</Fragment></ContentHeader>
 	<ContentSection>
 		<Fragment slot="section-description"><FormatMarkdown>{description}</FormatMarkdown></Fragment>

@@ -35,6 +35,8 @@ const t = getTranslations();
 		description: isYearlyData
 			? t('timeline.yearly.description').replace('%s', title)
 			: t('timeline.monthly.description').replace('%s', title),
+		noIndex: true,
+		noFollow: true,
 	}}
 >
 	<ContentHeader>
