@@ -11,9 +11,9 @@ export const getStaticPaths = (async () => {
 	const { images } = await getImagesCollection();
 
 	// TODO: add map data
-	return images.map((image) => ({
-		params: { id: image.id },
-		props: { image },
+	return images.map((entry) => ({
+		params: { id: entry.id },
+		props: { entry },
 	}));
 }) satisfies GetStaticPaths;
 

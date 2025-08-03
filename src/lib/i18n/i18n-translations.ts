@@ -29,7 +29,7 @@ const translationStrings = {
 		'collection.images.labelSingular': 'Image',
 		'collection.images.labelPlural': 'Images',
 		'collection.images.metadata.title': 'Image Metadata',
-		'collection.images.metadata.dateCaptured.label': 'Date Captured',
+		'collection.images.metadata.dateCreated.label': 'Date Captured',
 		'collection.images.metadata.cameraModel.label': 'Camera',
 		'collection.images.metadata.lensModel.label': 'Lens',
 		'collection.images.metadata.aperture.label': 'Aperture',

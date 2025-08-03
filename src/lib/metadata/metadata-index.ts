@@ -9,6 +9,7 @@ import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '#constants.ts';
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getImagesCollection } from '#lib/collections/images/data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPagesCollection } from '#lib/collections/pages/data.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
@@ -42,7 +43,9 @@ function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): strin
 // Generate a word count from a crude rendering of the body without transforming MDX
 // This method won't work if your MDX components introduce text from outside sources
 // But for this project MDX mainly adds decorative classes so we can get away with this
-function getContentMetadataWordCount(entry: CollectionEntry<CollectionKey>): number | undefined {
+function generateContentMetadataWordCount(
+	entry: CollectionEntry<CollectionKey>,
+): number | undefined {
 	if (['series'].includes(entry.collection)) {
 		return undefined; // We will set this after individual posts and locations have a word count
 	}
@@ -72,11 +75,40 @@ async function getRegionPrimaryIdFunction() {
 	};
 }
 
+/**
+ * Content backlinks; this functionality relies on custom MDX components
+ */
+const backlinkMdxComponentPatterns = [
+	['<Link ', /<Link id="([^"]+)"/g],
+	['<Img src="', /<Img src="([^"]+)"/g],
+] as const;
+
+function generateContentBacklinksFromMdxComponents(
+	entry: CollectionEntry<CollectionKey>,
+	contentMetadataMap: Map<string, ContentMetadataItem>,
+) {
+	for (const [pattern, regex] of backlinkMdxComponentPatterns) {
+		if (entry.body?.includes(pattern)) {
+			const matches = [...entry.body.matchAll(regex)];
+
+			for (const [, backlinkId] of matches) {
+				// Skip self-links and invalid backlinks
+				if (!backlinkId || backlinkId === entry.id) continue;
+
+				const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
+
+				if (backlinkSet) backlinkSet.add(entry.id);
+			}
+		}
+	}
+}
+
 // This function does all the heavy lifting and should only run once
 async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	const startTime = performance.now();
 
 	const { ephemera } = await getEphemeraCollection();
+	const { images } = await getImagesCollection();
 	const { locations } = await getLocationsCollection();
 	const { pages } = await getPagesCollection();
 	const { posts } = await getPostsCollection();
@@ -94,7 +126,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	}
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
-	for (const collection of [pages, posts, ephemera, locations, regions, themes, series]) {
+	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
 		for (const entry of collection) {
 			if (contentMetadataMap.has(entry.id)) {
 				throw new Error(`Duplicate ID found for "${entry.id}" across different collections!`);
@@ -123,7 +155,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				titleMultilingual,
 				description: entry.data.description,
 				date:
-					parseContentDate(entry.data.dateUpdated) ??
+					parseContentDate('dateUpdated' in entry.data ? entry.data.dateUpdated : undefined) ??
 					parseContentDate(entry.data.dateCreated) ??
 					new Date(String(SITE_YEAR_FOUNDED)),
 				url: getContentUrl(entry.collection, entry.id),
@@ -131,28 +163,17 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
-				wordCount: getContentMetadataWordCount(entry), // Expensive!!!
+				wordCount: generateContentMetadataWordCount(entry), // Expensive!!!
 				backlinks: new Set<string>(), // Populated below
 				entryQuality: entry.data.entryQuality,
 			});
 		}
 	}
 
-	// Now run through everything again and save backlinks; a surprisingly efficient process
-	for (const collection of [pages, posts, ephemera, locations, regions, themes, series]) {
+	// Now run through everything again and generate backlinks from MDX components (Link, Img)
+	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
 		for (const entry of collection) {
-			if (entry.body?.includes('<Link ')) {
-				const matches = [...entry.body.matchAll(/<Link id="([^"]+)"/g)];
-
-				for (const [, backlinkId] of matches) {
-					// Skip self-links and invalid backlinks
-					if (!backlinkId || backlinkId === entry.id) continue;
-
-					const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
-
-					if (backlinkSet) backlinkSet.add(entry.id);
-				}
-			}
+			generateContentBacklinksFromMdxComponents(entry, contentMetadataMap);
 		}
 	}
 

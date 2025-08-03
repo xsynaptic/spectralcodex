@@ -10,6 +10,7 @@ import {
 	getImageFileUrlPlaceholder,
 } from '#lib/image/image-loader-utils.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
 const ImageBaseSchema = z.object({
 	src: z.string(),
@@ -20,8 +21,9 @@ const ImageBaseSchema = z.object({
 });
 
 const ImageExifDataSchema = z.object({
-	title: z.string().optional(),
-	dateCaptured: z.date().optional(),
+	title: z.string(),
+	description: z.string(),
+	dateCreated: z.date().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
 	lens: z.string().optional(),
@@ -31,6 +33,7 @@ const ImageExifDataSchema = z.object({
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
 	geometry: GeometryPointsSchema.optional(),
+	entryQuality: NumericScaleSchema,
 });
 
 const ImageMetadataSchema = ImageBaseSchema.merge(ImageExifDataSchema).extend({
@@ -63,24 +66,20 @@ export const images = defineCollection({
 				}
 			: {}),
 		dataHandler: async ({ logger, id, filePathRelative, fileUrl }) => {
+			const defaultMetadata = {
+				src: `${CONTENT_MEDIA_HOST}/${id}`,
+				path: filePathRelative,
+				width: 1200,
+				height: 900,
+				title: '',
+				description: '',
+				entryQuality: 1,
+			};
+
 			/**
 			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
 			 */
 			const dimensions = await getImageDimensions(filePathRelative);
-
-			/**
-			 * Generate a low-quality placeholder (LQIP) for the image
-			 * This is base 64-encoded and stored in the content collection for easy reference
-			 */
-			const placeholder = await getImageFileUrlPlaceholder({
-				fileUrl,
-				onError: (errorMessage) => {
-					logger.error(errorMessage);
-				},
-				onNotFound: (errorMessage) => {
-					logger.warn(errorMessage);
-				},
-			});
 
 			/**
 			 * Harvest EXIF data from images
@@ -89,11 +88,16 @@ export const images = defineCollection({
 				? await (async () => {
 						const tags = await exiftool.read(filePathRelative);
 
-						const dateCaptured = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+						const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+						const entryQuality = Math.min(
+							1,
+							Math.max(Number.parseInt(String(tags.Rating ?? 0), 10), 5),
+						);
 
 						return {
 							title: String(tags.Title),
-							dateCaptured: dateCaptured ? new Date(dateCaptured) : undefined,
+							description: String(tags.Description),
+							dateCreated: dateCreated ? new Date(dateCreated) : undefined,
 							brand: String(tags.Make),
 							camera: String(tags.Model),
 							lens: tags.LensID ? String(tags.LensID) : String(tags.LensModel),
@@ -116,14 +120,28 @@ export const images = defineCollection({
 										},
 									}
 								: {}),
+							entryQuality,
 						};
 					})()
 				: {};
 
+			/**
+			 * Generate a low-quality placeholder (LQIP) for the image
+			 * This is base 64-encoded and stored in the content collection for easy reference
+			 */
+			const placeholder = await getImageFileUrlPlaceholder({
+				fileUrl,
+				onError: (errorMessage) => {
+					logger.error(errorMessage);
+				},
+				onNotFound: (errorMessage) => {
+					logger.warn(errorMessage);
+				},
+			});
+
 			return {
-				src: `${CONTENT_MEDIA_HOST}/${id}`,
-				path: filePathRelative,
-				...Object.assign({ width: 1200, height: 900 }, dimensions),
+				...defaultMetadata,
+				...dimensions,
 				...exifData,
 				placeholder,
 			} satisfies ImageMetadataInput;

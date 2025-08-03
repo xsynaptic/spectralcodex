@@ -29,20 +29,22 @@ const backlinks = backlinkItems
 			R.sort(sortContentMetadataByDate),
 			R.take(10)
 		)
-	: undefined;
+	: [];
 
 const t = getTranslations();
 ---
 
 {
-	backlinks && backlinks.length > 0 ? (
+	backlinks.length > 0 ? (
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{backlinks.map(({ url, title, titleMultilingual }) => (
 					<ListColumnItem>
 						<Link href={url}>{title}</Link>
-						{titleMultilingual ? <Multilingual content={titleMultilingual} parenthesis={true} /> : undefined}
+						{titleMultilingual ? (
+							<Multilingual content={titleMultilingual} parenthesis={true} />
+						) : undefined}
 					</ListColumnItem>
 				))}
 			</ListColumn>
