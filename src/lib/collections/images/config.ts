@@ -9,7 +9,7 @@ import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholder,
 } from '#lib/image/image-loader-utils.ts';
-import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
+import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
 const ImageBaseSchema = z.object({
@@ -32,9 +32,16 @@ const ImageExifDataSchema = z.object({
 	focalLength: z.string().optional(),
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
-	geometry: GeometryPointsSchema.optional(),
+	geometry: z
+		.object({
+			type: z.literal(GeometryTypeEnum.Point),
+			coordinates: PositionSchema,
+		})
+		.optional(),
 	entryQuality: NumericScaleSchema,
 });
+
+type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
 
 const ImageMetadataSchema = ImageBaseSchema.merge(ImageExifDataSchema).extend({
 	placeholder: z.string().optional(),
@@ -121,7 +128,7 @@ export const images = defineCollection({
 									}
 								: {}),
 							entryQuality,
-						};
+						} satisfies ImageExifDataInput;
 					})()
 				: {};
 

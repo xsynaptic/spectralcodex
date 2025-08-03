@@ -7,7 +7,7 @@ import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import ImageLink from '#components/image/image-link.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import { FEATURE_IMAGE_PAGES } from '#constants.ts';
+import { FEATURE_IMAGE_ENTRY_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
@@ -30,7 +30,7 @@ const slotContents = (await Astro.slots.render('default')) as string | undefined
 const imageEntry = await getImageById(imageId);
 
 const imageLinkUrl =
-	FEATURE_IMAGE_PAGES && imageEntry?.id ? getSiteUrl('image', imageEntry.id) : undefined;
+	FEATURE_IMAGE_ENTRY_PAGES && imageEntry?.id ? getSiteUrl('image', imageEntry.id) : undefined;
 
 const imageProps = imageEntry
 	? ((isRss

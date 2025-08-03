@@ -13,9 +13,10 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
+import { featureCollection } from '@turf/helpers';
 import { createHash } from 'node:crypto';
 
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
+import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
@@ -85,9 +86,8 @@ export function getLocationsFeatureCollection(
 		? locations
 		: locations.filter((entry) => entry.data.hideLocation !== true);
 
-	return {
-		type: 'FeatureCollection' as const,
-		features: locationsFiltered.flatMap((entry) => {
+	return featureCollection<MapGeometry, MapFeatureProperties>(
+		locationsFiltered.flatMap((entry) => {
 			const geometryArray = Array.isArray(entry.data.geometry)
 				? entry.data.geometry
 				: [entry.data.geometry];
@@ -146,7 +146,7 @@ export function getLocationsFeatureCollection(
 				};
 			});
 		}),
-	} satisfies MapFeatureCollection;
+	) satisfies MapFeatureCollection;
 }
 
 // Optimized geodata for the map component; it will be reassembled into GeoJSON on the client

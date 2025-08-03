@@ -82,11 +82,14 @@ export const SITE_YEAR_FOUNDED = 2009;
 // Date-based post archives; set to "true" to enable
 export const FEATURE_DATE_ARCHIVES = false as boolean;
 
-// Image metadata generation
+// Image metadata generation; set to "true" to enable
 export const FEATURE_IMAGE_METADATA = true as boolean;
 
-// Image metadata page functionality is disabled by default; set to "true" to enable
-export const FEATURE_IMAGE_PAGES = true as boolean;
+// Image metadata page; set to "true" to enable
+export const FEATURE_IMAGE_ENTRY_PAGES = true as boolean;
+
+// Image metadata page maps; set to "true" to enable
+export const FEATURE_IMAGE_ENTRY_MAPS = false as boolean;
 
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;

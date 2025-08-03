@@ -1,20 +1,35 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import { FEATURE_IMAGE_PAGES } from '#constants.ts';
+import { FEATURE_IMAGE_ENTRY_MAPS, FEATURE_IMAGE_ENTRY_PAGES } from '#constants.ts';
 import ImageEntry from '#layouts/image-entry.astro';
 import { getImagesCollection } from '#lib/collections/images/data.ts';
+import { getMapData } from '#lib/map/map-data.ts';
+import { getImageFeatureCollection } from '#lib/map/map-images.ts';
 
 export const getStaticPaths = (async () => {
-	if (!FEATURE_IMAGE_PAGES) return [];
+	if (!FEATURE_IMAGE_ENTRY_PAGES) return [];
 
 	const { images } = await getImagesCollection();
 
-	// TODO: add map data
-	return images.map((entry) => ({
-		params: { id: entry.id },
-		props: { entry },
-	}));
+	return images.map((entry) => {
+		return {
+			params: { id: entry.id },
+			props: {
+				entry,
+				mapData:
+					FEATURE_IMAGE_ENTRY_MAPS && entry.data.geometry
+						? getMapData({
+								featureCollection: getImageFeatureCollection(entry),
+								mapApiBaseUrl: undefined,
+								languages: undefined,
+								boundsBuffer: 1, // 1km fixed buffer
+								interactive: false,
+							})
+						: undefined,
+			},
+		};
+	});
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

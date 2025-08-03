@@ -5,9 +5,12 @@ import type { CollectionEntry } from 'astro:content';
 import { wrapCjk } from '@spectralcodex/unified-tools';
 import { Image } from 'astro:assets';
 
+import type { MapComponentData } from '#lib/map/map-types.ts';
+
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
+import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
@@ -22,9 +25,10 @@ import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'images'>;
+	mapData: MapComponentData | undefined;
 }
 
-const { entry } = Astro.props;
+const { entry, mapData } = Astro.props;
 
 // There is no way to know what sort of content we might be getting here
 // May as well pass it through the CJK wrapper with the default settings (wrap any CJK characters)
@@ -173,5 +177,6 @@ const t = getTranslations();
 			</TextGridItem>
 		</div>
 	</ContentSection>
+	{mapData ? <ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} /> : undefined}
 	<ContentSectionBacklinks entry={entry} />
 </MainSite>
