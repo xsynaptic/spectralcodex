@@ -20,6 +20,8 @@ import {
 } from '../store/hooks/use-map-store';
 import { MapCanvasLoading } from './map-canvas-loading';
 
+// Layers where pointer events are triggered (whether in interactive mode or not)
+// All other layers do not trigger pointer events
 const interactiveLayerIds = [
 	MapLayerIdEnum.Clusters,
 	MapLayerIdEnum.PointsTarget,

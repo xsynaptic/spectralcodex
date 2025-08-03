@@ -35,6 +35,7 @@ export const MapSourcePoints: FC<{
 		};
 	}, [interactive]);
 
+	// Note: Layer components need to be immediate children of Source components; do not use React.Fragment here
 	return (
 		<Source
 			id={MapSourceIdEnum.PointCollection}
@@ -43,8 +44,12 @@ export const MapSourcePoints: FC<{
 			generateId={true}
 			{...clusterConfig}
 		>
-			<Layer key={MapLayerIdEnum.Clusters} {...pointsStyle[MapLayerIdEnum.Clusters]} />
-			<Layer key={MapLayerIdEnum.ClustersLabel} {...pointsStyle[MapLayerIdEnum.ClustersLabel]} />
+			{interactive ? (
+				<Layer key={MapLayerIdEnum.Clusters} {...pointsStyle[MapLayerIdEnum.Clusters]} />
+			) : undefined}
+			{interactive ? (
+				<Layer key={MapLayerIdEnum.ClustersLabel} {...pointsStyle[MapLayerIdEnum.ClustersLabel]} />
+			) : undefined}
 			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
 			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
 			<Layer key={MapLayerIdEnum.PointsLabel} {...pointsStyle[MapLayerIdEnum.PointsLabel]} />

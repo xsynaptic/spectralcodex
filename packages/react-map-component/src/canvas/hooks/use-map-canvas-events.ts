@@ -197,7 +197,7 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
-	const debouncedOnLoad = useMemo(
+	const debouncedFilterControlSetup = useMemo(
 		() =>
 			funnel<Array<MapEvent>, HTMLElement | undefined>(
 				(container) => {
@@ -244,23 +244,21 @@ export function useMapCanvasEvents() {
 		onLoad: (event: MapEvent) => {
 			setCanvasLoading(false);
 
-			// Initialize the position of the filter control
-			if (isInteractive) {
-				debouncedOnLoad.call(event);
-			}
+			// Initialize the position of the filter control on interactive maps
+			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
-		onResize: debouncedOnLoad.call,
 		...(isInteractive
 			? {
+					onResize: debouncedFilterControlSetup.call,
 					onClick,
 					onMouseDown,
 					onMouseUp,
+					...(isSourceDataLoading
+						? {}
+						: {
+								onMouseMove: throttledOnMouseMove.call,
+							}),
 				}
 			: {}),
-		...(isSourceDataLoading
-			? {}
-			: {
-					onMouseMove: throttledOnMouseMove.call,
-				}),
 	} satisfies MapCallbacks;
 }
