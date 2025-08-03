@@ -7,56 +7,16 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
 
-interface LocalImageLoaderGenerateIdOptions {
-	/** The path to the entry file, relative to the base directory. */
-	filePath: string;
-	/** The base directory URL. */
-	base: URL;
-}
+import type { FileChangeQueueItem, ImageLoaderOptions, ValidInputFormat } from './types';
 
-type LocalImageLoaderDataHandler = (args: {
-	id: string;
-	filePath: string;
-	filePathRelative: string;
-	fileUrl: URL;
-	logger: LoaderContext['logger'];
-}) => Record<string, unknown> | Promise<Record<string, unknown>>;
+import { VALID_INPUT_FORMATS } from './types';
 
-interface FileChangeQueueItem {
-	filePath: string;
-	id: string;
-	type: 'change' | 'add' | 'unlink';
-}
-
-// Valid image formats supported by Astro; note that SVGs will not be processed
-const VALID_IMAGE_FORMATS = ['jpeg', 'jpg', 'png', 'tiff', 'webp', 'gif', 'svg', 'avif'] as const;
-
-interface ImageLoaderOptions {
-	/** The base directory to resolve images from. Relative to the root directory, or an absolute file URL. Defaults to `.` */
-	base?: string;
-	/** Valid image extensions to scan for. Defaults to the Astro defaults. */
-	extensions?: Array<(typeof VALID_IMAGE_FORMATS)[number]>;
-	/** How many images to process at a time. */
-	concurrency?: number;
-	/**
-	 * Function that generates an ID for an entry. Default implementation generates a slug from the entry path.
-	 * @returns The ID of the entry. Must be unique per collection.
-	 **/
-	generateId?: (options: LocalImageLoaderGenerateIdOptions) => string;
-	/**
-	 * Function that processes file and EXIF metadata for an image. This should match whatever custom metadata schema is defined for use with this loader as a record type.
-	 * @returns Image metadata ready to be parsed.
-	 **/
-	dataHandler?: LocalImageLoaderDataHandler;
-	/**
-	 * Run once after loading all images; can be used to invoke a setup function.
-	 */
-	beforeLoad?: () => void;
-	/**
-	 * Run once after loading all images; can be used to invoke a clean-up function.
-	 */
-	afterLoad?: () => void;
-}
+const defaultOptions = {
+	base: '.',
+	extensions: [...VALID_INPUT_FORMATS],
+	concurrency: 50,
+	generateId: ({ filePath }) => filePath,
+} as const satisfies ImageLoaderOptions;
 
 function getSyncDataFunction({
 	baseDir,
@@ -65,12 +25,12 @@ function getSyncDataFunction({
 	parseData,
 	generateDigest,
 	logger,
-}: Pick<
-	LoaderContext,
-	'store' | 'parseData' | 'generateDigest' | 'logger'
-> & { baseDir: URL; options: ImageLoaderOptions }) {
+}: Pick<LoaderContext, 'store' | 'parseData' | 'generateDigest' | 'logger'> & {
+	baseDir: URL;
+	options: ImageLoaderOptions;
+}) {
 	// Limit the concurrency of files processed to reduce memory usage
-	const limit = pLimit(options.concurrency ?? 50);
+	const limit = pLimit(options.concurrency);
 
 	return async function syncData({
 		id,
@@ -114,7 +74,7 @@ function getSyncDataFunction({
 			const fileUrl = new URL(filePath, baseDir);
 
 			// Relative to the project root, where is this image found; it needs to be importable
-			const filePathRelative = path.join(options.base ?? '', filePath);
+			const filePathRelative = path.join(options.base, filePath);
 
 			try {
 				const parsedData = await parseData({
@@ -151,13 +111,6 @@ function getSyncDataFunction({
 	};
 }
 
-// Unlike `path.posix.relative`, this function will accept a platform path and return a posix path.
-function posixRelative(from: string, to: string) {
-	const pathRelative = path.relative(from, to);
-
-	return pathRelative.split(path.sep).join('/');
-}
-
 // Only return the relative path if it matches what we're watching
 function getFilePathMatchesFunction(pattern: string, baseDir: URL) {
 	const matcher: RegExp = micromatch.makeRe(pattern);
@@ -169,20 +122,21 @@ function getFilePathMatchesFunction(pattern: string, baseDir: URL) {
 	return function filePathMatches(changedPath: string) {
 		const extension = path.extname(changedPath).replaceAll('.', '');
 
-		if (VALID_IMAGE_FORMATS.includes(extension as (typeof VALID_IMAGE_FORMATS)[number])) {
-			const filePath = posixRelative(basePath, changedPath); // Relative path
+		if (VALID_INPUT_FORMATS.includes(extension as ValidInputFormat)) {
+			const pathRelative = path.relative(basePath, changedPath);
+			const filePath = pathRelative.split(path.sep).join('/');
 
-			if (matchesGlob(filePath)) {
-				return filePath;
-			}
+			if (matchesGlob(filePath)) return filePath;
 		}
 		return;
 	};
 }
 
-export function imageLoader(options: ImageLoaderOptions) {
-	const generateId =
-		options.generateId ?? (({ filePath }: LocalImageLoaderGenerateIdOptions) => filePath);
+export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
+	const options = {
+		...defaultOptions,
+		...optionsPartial,
+	} satisfies ImageLoaderOptions;
 
 	return {
 		name: 'local-image-loader',
@@ -190,11 +144,11 @@ export function imageLoader(options: ImageLoaderOptions) {
 			const { config, store, parseData, generateDigest, logger, watcher } = context;
 
 			const pattern =
-				options.extensions && options.extensions.length > 0
+				options.extensions.length > 0
 					? `**/[^_]*.(${options.extensions.join('|')})`
-					: `**/[^_]*.(${VALID_IMAGE_FORMATS.join('|')})`;
+					: `**/[^_]*.(${VALID_INPUT_FORMATS.join('|')})`;
 
-			const baseDir = options.base ? new URL(options.base, config.root) : config.root;
+			const baseDir = new URL(options.base, config.root);
 
 			if (!baseDir.pathname.endsWith('/')) {
 				baseDir.pathname = `${baseDir.pathname}/`;
@@ -226,7 +180,7 @@ export function imageLoader(options: ImageLoaderOptions) {
 			// Loop through glob data and generate metadata as needed
 			await Promise.all(
 				imageGlobData.map(({ path: filePath, stats }) => {
-					const id = generateId({ filePath, base: baseDir });
+					const id = options.generateId({ filePath, base: baseDir });
 
 					// This entry will be synced; don't remove it later on
 					untouchedEntries.delete(id);
@@ -257,7 +211,7 @@ export function imageLoader(options: ImageLoaderOptions) {
 
 				if (!filePath) return;
 
-				const id = generateId({ filePath, base: baseDir });
+				const id = options.generateId({ filePath, base: baseDir });
 
 				changeQueue.set(filePath, { filePath, id, type });
 
