@@ -46,7 +46,7 @@ function getSyncDataFunction({
 			id,
 			filePath,
 			mtime: modifiedTime,
-			options,
+			options, // Note: if options handling changes ALL entries will be regenerated
 		});
 
 		// Does this entry already exist?
