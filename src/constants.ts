@@ -83,10 +83,10 @@ export const SITE_YEAR_FOUNDED = 2009;
 export const FEATURE_DATE_ARCHIVES = false as boolean;
 
 // Image metadata generation
-export const FEATURE_IMAGE_METADATA = false as boolean;
+export const FEATURE_IMAGE_METADATA = true as boolean;
 
 // Image metadata page functionality is disabled by default; set to "true" to enable
-export const FEATURE_IMAGE_PAGES = false as boolean;
+export const FEATURE_IMAGE_PAGES = true as boolean;
 
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
@@ -99,6 +99,3 @@ export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;
 
 // Set to "true" to log missing shortcode IDs
 export const FEATURE_SHORTCODES_ERROR_LOG = true as boolean;
-
-// Feature flag for local image collections
-export const FEATURE_IMAGE_COLLECTION = false as boolean;

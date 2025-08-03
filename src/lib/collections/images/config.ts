@@ -1,20 +1,26 @@
 import { imageLoader } from '@spectralcodex/image-loader';
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { defineCollection, z } from 'astro:content';
+import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 
-import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH } from '#constants.ts';
-import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { getImageFileUrlPlaceholder } from '#lib/image/image-loader-utils.ts';
+import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
+import {
+	getImageExposureValue,
+	getImageFileUrlPlaceholder,
+} from '#lib/image/image-loader-utils.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 
-const ImageMetadataSchema = z.object({
+const ImageBaseSchema = z.object({
 	src: z.string(),
 	path: z.string(),
 	width: z.number(),
 	height: z.number(),
 	modifiedTime: z.date().optional(),
+});
+
+const ImageExifDataSchema = z.object({
 	title: z.string().optional(),
-	...titleMultilingualSchema,
 	dateCaptured: z.date().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
@@ -25,11 +31,17 @@ const ImageMetadataSchema = z.object({
 	iso: z.string().optional(),
 	exposureValue: z.string().optional(),
 	geometry: GeometryPointsSchema.optional(),
+});
+
+const ImageMetadataSchema = ImageBaseSchema.merge(ImageExifDataSchema).extend({
 	placeholder: z.string().optional(),
 });
 
+let exiftool: ExifTool;
+
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
 
+// Read a local image with Sharp and return dimension metrics
 async function getImageDimensions(imagePath: string) {
 	const metadata = await sharp(imagePath).metadata();
 
@@ -39,10 +51,27 @@ async function getImageDimensions(imagePath: string) {
 export const images = defineCollection({
 	loader: imageLoader({
 		base: CONTENT_MEDIA_PATH,
-		concurrency: 80,
+		concurrency: 100,
+		...(FEATURE_IMAGE_METADATA
+			? {
+					beforeLoad: () => {
+						exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
+					},
+					afterLoad: () => {
+						void exiftool.end();
+					},
+				}
+			: {}),
 		dataHandler: async ({ logger, id, filePathRelative, fileUrl }) => {
+			/**
+			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
+			 */
 			const dimensions = await getImageDimensions(filePathRelative);
 
+			/**
+			 * Generate a low-quality placeholder (LQIP) for the image
+			 * This is base 64-encoded and stored in the content collection for easy reference
+			 */
 			const placeholder = await getImageFileUrlPlaceholder({
 				fileUrl,
 				onError: (errorMessage) => {
@@ -53,10 +82,49 @@ export const images = defineCollection({
 				},
 			});
 
+			/**
+			 * Harvest EXIF data from images
+			 */
+			const exifData = FEATURE_IMAGE_METADATA
+				? await (async () => {
+						const tags = await exiftool.read(filePathRelative);
+
+						const dateCaptured = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+
+						return {
+							title: String(tags.Title),
+							dateCaptured: dateCaptured ? new Date(dateCaptured) : undefined,
+							brand: String(tags.Make),
+							camera: String(tags.Model),
+							lens: tags.LensID ? String(tags.LensID) : String(tags.LensModel),
+							aperture: String(tags.FNumber),
+							shutterSpeed: String(tags.ShutterSpeed),
+							focalLength: String(tags.FocalLength),
+							iso: String(tags.ISO),
+							exposureValue: getImageExposureValue({
+								aperture: String(tags.FNumber),
+								shutterSpeed: String(tags.ShutterSpeed),
+							}),
+							...(tags.GPSLatitude && tags.GPSLongitude
+								? {
+										geometry: {
+											type: GeometryTypeEnum.Point,
+											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)] as [
+												number,
+												number,
+											],
+										},
+									}
+								: {}),
+						};
+					})()
+				: {};
+
 			return {
 				src: `${CONTENT_MEDIA_HOST}/${id}`,
 				path: filePathRelative,
 				...Object.assign({ width: 1200, height: 900 }, dimensions),
+				...exifData,
 				placeholder,
 			} satisfies ImageMetadataInput;
 		},
