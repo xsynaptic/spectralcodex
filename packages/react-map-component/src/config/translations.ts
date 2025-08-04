@@ -5,5 +5,5 @@ export const translations = {
 	hideAllAlt: '隱藏全部',
 	points: 'Points',
 	precisionWarning: 'Coordinates for this point are imprecise!',
-	precisionError: 'Coordinates for this point are merely a guess!',
+	precisionError: 'Coordinates for this point are only a guess!',
 } as const;

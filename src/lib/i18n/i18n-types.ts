@@ -1,6 +1,7 @@
 export const LanguageCodeEnum = {
 	English: 'en',
-	ChineseMandarin: 'zh',
+	ChineseTraditional: 'zh',
+	ChineseSimplified: 'zh-Hans',
 	Japanese: 'ja',
 	Thai: 'th',
 	Korean: 'ko',

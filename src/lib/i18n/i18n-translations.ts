@@ -122,9 +122,9 @@ const translationStrings = {
 			'This is a custom map tracking points in the geospatial database that still require verification and documentation. It is not meant for external consumption.',
 
 		// Notices
-		'notice.danger': `**Warning**: this site may be abandoned, under restoration, or otherwise poorly maintained and monitored. The information on this page may also be inaccurate or out of date. Exercise appropriate precautions when visiting!`,
-		'notice.demolished': `**Warning**: this location has been demolished and no longer exists. Any geospatial details presented here are only for reference.`,
-		'notice.quality': `**Warning**: this entry is marked as low-quality. More information may be found by searching the web for the name of the place. Location info and other details may not be accurate.`,
+		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
+		'notice.demolished': `**Note**: this location has been demolished and no longer exists. Any information presented here is only for reference.`,
+		'notice.quality': `**Note**: this entry contains only basic information and may be out of date, inaccurate, or even wrong. Additional research is strongly recommended.`,
 
 		// Site
 		'site.title': 'Spectral Codex',
@@ -156,12 +156,36 @@ const translationStrings = {
 		'404.title': 'Error 404: Page Not Found',
 		'404.description': `Sorry, there doesn't seem to be anything at this URL! Please try another path.`,
 	},
+	[LanguageCodeEnum.ChineseTraditional]: {
+		'notice.danger': `**警告**：此地點已遭廢棄、荒廢，或長期無人管理，存在潛在危險。造訪時請務必提高警覺並採取適當防範措施。`,
+		'notice.demolished': `**提醒**：此地點已遭拆除，不再存在。本文僅供參考用途。`,
+		'notice.quality': `**說明**：本條目僅提供基礎資訊，內容可能過時、未經查證，甚至有所錯誤。建議進一步查閱相關資料以獲得更準確的理解。`,
+	},
+	[LanguageCodeEnum.ChineseSimplified]: {},
+	[LanguageCodeEnum.Japanese]: {},
+	[LanguageCodeEnum.Korean]: {},
+	[LanguageCodeEnum.Vietnamese]: {},
+	[LanguageCodeEnum.Thai]: {},
 } as const satisfies TranslationsRecord<Record<string, string>>;
 
-type TranslationKey = keyof (typeof translationStrings)[typeof defaultLanguage];
+// Get all possible translation keys across ALL languages
+type TranslationKey = {
+	[L in keyof typeof translationStrings]: keyof (typeof translationStrings)[L];
+}[keyof typeof translationStrings];
 
-export function getTranslations(language: keyof typeof translationStrings = defaultLanguage) {
-	return function t(key: TranslationKey) {
-		return translationStrings[language][key];
+export function getTranslations() {
+	return function t(key: TranslationKey, langCode: LanguageCode = defaultLanguage) {
+		const langTranslations = translationStrings[langCode] as Partial<
+			Record<TranslationKey, string>
+		>;
+		const defaultTranslations = translationStrings[defaultLanguage] as Record<
+			TranslationKey,
+			string
+		>;
+
+		if (key in langTranslations && langTranslations[key] !== undefined) {
+			return langTranslations[key];
+		}
+		return defaultTranslations[key];
 	};
 }

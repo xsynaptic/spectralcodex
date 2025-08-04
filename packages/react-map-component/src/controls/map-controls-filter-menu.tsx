@@ -1,7 +1,8 @@
 import type { LocationStatus } from '@spectralcodex/map-types';
+import type { ReactNode } from 'react';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
-import { memo, type ReactNode } from 'react';
+import { memo, useMemo } from 'react';
 import * as R from 'remeda';
 
 import type { LocationStatusMetadata } from '../config/location';
@@ -30,6 +31,9 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 	data: LocationStatusMetadata;
 }) {
 	const languages = useMapLanguages();
+
+	const showChinese = useMemo(() => languages?.some((lang) => lang.startsWith('zh')), [languages]);
+
 	const { toggleStatusFilter } = useMapStoreActions();
 
 	return (
@@ -52,7 +56,7 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 				<div
 					className={`font-display flex w-full flex-nowrap items-center justify-between gap-1 text-xs sm:text-sm ${isFiltered ? 'text-primary-500' : 'text-primary-700'}`}
 				>
-					{languages?.includes('zh') ? (
+					{showChinese ? (
 						<>
 							<span>{data.title}</span>
 							<span
@@ -95,7 +99,12 @@ const MapFilterStatusShowHideMenuItem = memo(function MapFilterStatusShowHideMen
 });
 
 const MapFilterStatusShowHideMenu = () => {
-	const languages = useMapLanguages();
+	const mapLanguages = useMapLanguages();
+
+	const showChinese = useMemo(
+		() => mapLanguages?.some((lang) => lang.startsWith('zh')),
+		[mapLanguages],
+	);
 
 	const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
 
@@ -106,7 +115,7 @@ const MapFilterStatusShowHideMenu = () => {
 					showAllStatusFilter();
 				}}
 			>
-				{languages?.includes('zh') ? (
+				{showChinese ? (
 					<>
 						<span>{translations.showAll}</span>
 						<span className="text-primary-600 font-sans font-medium sm:text-xs">
@@ -122,7 +131,7 @@ const MapFilterStatusShowHideMenu = () => {
 					hideAllStatusFilter();
 				}}
 			>
-				{languages?.includes('zh') ? (
+				{showChinese ? (
 					<>
 						<span>{translations.hideAll}</span>
 						<span className="text-primary-600 font-sans font-medium sm:text-xs">

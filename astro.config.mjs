@@ -153,7 +153,7 @@ export default defineConfig({
 			'en',
 			{
 				path: 'zh',
-				codes: ['zh', 'zh-TW', 'zh-hant'],
+				codes: ['zh', 'zh-TW', 'zh-Hant'],
 			},
 		],
 	},

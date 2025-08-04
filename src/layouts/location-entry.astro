@@ -22,7 +22,6 @@ import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
 import MainSite from '#components/main/main-site.astro';
-import AlertBoxQuality from '#components/parts/alert-box-quality.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
@@ -52,6 +51,7 @@ const titleMultilingual =
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
 const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions);
+const regionLangCode = regionPrimary?.data.langCode;
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
@@ -155,16 +155,14 @@ const t = getTranslations();
 				showTitleMultilingual: true,
 			}}
 		/>
-		<AlertBoxQuality quality={entry.data.entryQuality} />
-		<LocationsNotices entry={entry} />
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{
 				entry.data.address && !entry.data.hideLocation ? (
 					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
 						{t('locations.address.label')}:{' '}
-						{regionPrimary?.data.langCode ? (
+						{regionLangCode ? (
 							<span>
-								<FormatCjk langCode={regionPrimary.data.langCode}>{entry.data.address}</FormatCjk>
+								<FormatCjk langCode={regionLangCode}>{entry.data.address}</FormatCjk>
 							</span>
 						) : (
 							<span>{entry.data.address}</span>
@@ -173,6 +171,7 @@ const t = getTranslations();
 				) : undefined
 			}
 		</ContentSectionMap>
+		<LocationsNotices entry={entry} langCode={regionLangCode} />
 		<LocationsNearbyList entry={entry} />
 		<ContentSectionRelated entry={entry} />
 	</article>

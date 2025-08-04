@@ -6,6 +6,8 @@ import * as R from 'remeda';
 import PostEntry from '#layouts/post-entry.astro';
 import { getLocationsByPostsFunction } from '#lib/collections/locations/utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
@@ -14,17 +16,25 @@ export const getStaticPaths = (async () => {
 	const { posts } = await getPostsCollection();
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
-	return posts.map((entry) => ({
-		params: { post: entry.id },
-		props: {
-			entry,
-			mapData: getMapData({
-				featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
-				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-			}),
-		},
-	}));
+	return posts.map((entry) => {
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+
+		return {
+			params: { post: entry.id },
+			props: {
+				entry,
+				mapData: getMapData({
+					featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
+					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+					...(regionPrimary?.data.langCode?.startsWith('zh')
+						? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+						: {}),
+				}),
+			},
+		};
+	});
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

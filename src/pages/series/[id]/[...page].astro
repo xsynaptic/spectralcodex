@@ -2,11 +2,13 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import SeriesEntry from '#layouts/series-entry.astro';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import {
 	getLocationsBySeriesFunction,
 	getSeriesContentMetadataItemsFunction,
 } from '#lib/collections/series/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
@@ -16,6 +18,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	const getSeriesContentMetadataItems = await getSeriesContentMetadataItemsFunction();
 	const getSeriesLocations = await getLocationsBySeriesFunction();
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
 	const results = [];
 
@@ -26,9 +29,14 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
 
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+
 		const mapData = getMapData({
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+			...(regionPrimary?.data.langCode?.startsWith('zh')
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+				: {}),
 		});
 
 		results.push(

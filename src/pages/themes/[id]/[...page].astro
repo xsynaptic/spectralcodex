@@ -5,6 +5,7 @@ import * as R from 'remeda';
 
 import ThemeEntry from '#layouts/theme-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPostsByThemeFunction } from '#lib/collections/themes/utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
@@ -21,11 +22,12 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	const getPostsByTerm = await getPostsByThemeFunction();
 	const getContentMetadata = await getContentMetadataFunction();
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
 	const results = [];
 
 	for (const entry of themes) {
-		const showChineseInterface = entry.id.startsWith('taiwan');
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		// Note: the need to get location data async means we should filter this first!
 		const locationsFiltered = locations.filter(
@@ -48,8 +50,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const mapData = getMapData({
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-			...(showChineseInterface
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseMandarin] }
+			...(regionPrimary?.data.langCode?.startsWith('zh')
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
 				: {}),
 		});
 

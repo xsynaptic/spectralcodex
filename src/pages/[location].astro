@@ -6,6 +6,8 @@ import * as R from 'remeda';
 import LocationEntry from '#layouts/location-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
@@ -17,25 +19,35 @@ export const getStaticPaths = (async () => {
 
 	const getPostsByIds = await getPostsByIdsFunction();
 	const getContentMetadata = await getContentMetadataFunction();
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
-	return locations.map((entry) => ({
-		params: { location: entry.data.override?.slug ?? entry.id },
-		props: {
-			entry,
-			mapData: getMapData({
-				featureCollection: getLocationsFeatureCollection([entry]),
-				mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-				targetId: entry.id, // Center on the main location
-				boundsBuffer: 1, // 1km fixed buffer
-			}),
-			metadataItems: R.pipe(
-				entry.data.posts ?? [],
-				getPostsByIds,
-				getContentMetadata,
-				R.sort(sortContentMetadataByDate)
-			),
-		},
-	}));
+	return locations.map((entry) => {
+		const regionPrimary = getFirstRegionByReference(
+			entry.data.override?.regions ?? entry.data.regions
+		);
+
+		return {
+			params: { location: entry.data.override?.slug ?? entry.id },
+			props: {
+				entry,
+				mapData: getMapData({
+					featureCollection: getLocationsFeatureCollection([entry]),
+					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+					targetId: entry.id, // Center on the main location
+					boundsBuffer: 1, // 1km fixed buffer
+					...(regionPrimary?.data.langCode?.startsWith('zh')
+						? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+						: {}),
+				}),
+				metadataItems: R.pipe(
+					entry.data.posts ?? [],
+					getPostsByIds,
+					getContentMetadata,
+					R.sort(sortContentMetadataByDate)
+				),
+			},
+		};
+	});
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

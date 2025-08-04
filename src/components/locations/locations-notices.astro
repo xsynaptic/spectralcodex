@@ -4,6 +4,8 @@ import type { CollectionEntry } from 'astro:content';
 import { LocationStatusEnum } from '@spectralcodex/map-types';
 import * as R from 'remeda';
 
+import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
+
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import AlertBox from '#components/parts/alert-box.astro';
@@ -11,9 +13,10 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
+	langCode?: Extract<LanguageCode, 'zh-Hant' | 'zh-Hans' | 'ja' | 'ko'> | undefined;
 }
 
-const { entry, ...props } = Astro.props;
+const { entry, langCode, ...props } = Astro.props;
 
 const showDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
@@ -25,21 +28,38 @@ const showDangerNotice = entry.data.safety
 
 const showDemolishedNotice = entry.data.status === LocationStatusEnum.Demolished;
 
+const showChinese = langCode?.startsWith('zh');
+
 const t = getTranslations();
 ---
 
 {
 	showDangerNotice || showDemolishedNotice ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore>
 			{showDemolishedNotice ? (
-				<AlertBox status="error" class="mb-small">
+				<AlertBox status="warning">
 					<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
+					{showChinese ? (
+						<FormatMarkdown>{t('notice.demolished', langCode)}</FormatMarkdown>
+					) : undefined}
 				</AlertBox>
-			) : (
-				<AlertBox status="warning" class="mb-small">
+			) : undefined}
+			{showDangerNotice && !showDemolishedNotice ? (
+				<AlertBox status="warning">
 					<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
+					{showChinese ? (
+						<FormatMarkdown>{t('notice.danger', langCode)}</FormatMarkdown>
+					) : undefined}
 				</AlertBox>
-			)}
+			) : undefined}
+			{entry.data.entryQuality <= 1 ? (
+				<AlertBox status="warning">
+					<FormatMarkdown>{t('notice.quality')}</FormatMarkdown>
+					{showChinese ? (
+						<FormatMarkdown>{t('notice.quality', langCode)}</FormatMarkdown>
+					) : undefined}
+				</AlertBox>
+			) : undefined}
 		</ContentSection>
 	) : undefined
 }
