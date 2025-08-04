@@ -17,12 +17,3 @@ export const DateStringSchema = z.string().transform((value) => new Date(value))
 
 // Numeric scale schema, from 1 to 5; used by locations and timelines
 export const NumericScaleSchema = z.number().int().min(1).max(5);
-
-// Quality schema; for tracking entry quality and filtering low-quality content
-export const QualityScale: Record<number, string> = {
-	1: 'Stub',
-	2: 'Outline',
-	3: 'Mature',
-	4: 'Complete',
-	5: 'Featured',
-};

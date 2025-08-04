@@ -21,39 +21,41 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 {
 	description || children?.trim() ? (
 		<Container class:list={['mb-medium', className]} fillViewport={fillViewport} {...props}>
-			<header
-				class:list={[
-					description ? undefined : 'mb-2',
-					fillViewport ? 'px-small sm:px-0' : undefined,
-				]}
-			>
-				{title ? (
-					<h2
-						class:list={[
-							'mb-1 font-semibold',
-							'text-primary-700 dark:text-primary-200',
-							titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
-						]}
-					>
-						<Fragment set:html={title} />
-					</h2>
-				) : undefined}
-				{subtitle ? (
-					<h3
-						class:list={[
-							'mb-1 text-xs font-medium md:text-sm',
-							'text-primary-400 dark:text-primary-600',
-						]}
-					>
-						<Fragment set:html={subtitle} />
-					</h3>
-				) : undefined}
-				{description ? (
-					<ProseDescription class:list={['mb-small']}>
-						<Fragment set:html={description} />
-					</ProseDescription>
-				) : undefined}
-			</header>
+			{title || subtitle || description ? (
+				<header
+					class:list={[
+						description ? undefined : 'mb-2',
+						fillViewport ? 'px-small sm:px-0' : undefined,
+					]}
+				>
+					{title ? (
+						<h2
+							class:list={[
+								'mb-1 font-semibold',
+								'text-primary-700 dark:text-primary-200',
+								titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
+							]}
+						>
+							<Fragment set:html={title} />
+						</h2>
+					) : undefined}
+					{subtitle ? (
+						<h3
+							class:list={[
+								'mb-1 text-xs font-medium md:text-sm',
+								'text-primary-400 dark:text-primary-600',
+							]}
+						>
+							<Fragment set:html={subtitle} />
+						</h3>
+					) : undefined}
+					{description ? (
+						<ProseDescription class:list={['mb-small']}>
+							<Fragment set:html={description} />
+						</ProseDescription>
+					) : undefined}
+				</header>
+			) : undefined}
 			<Fragment set:html={children} />
 		</Container>
 	) : undefined
