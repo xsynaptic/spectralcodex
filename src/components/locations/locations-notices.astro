@@ -29,20 +29,17 @@ const t = getTranslations();
 ---
 
 {
-	showDangerNotice && !showDemolishedNotice ? (
+	showDangerNotice || showDemolishedNotice ? (
 		<ContentSection data-pagefind-ignore {...props}>
-			<AlertBox status="warning" class="mb-small">
-				<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
-			</AlertBox>
-		</ContentSection>
-	) : undefined
-}
-{
-	showDemolishedNotice ? (
-		<ContentSection data-pagefind-ignore {...props}>
-			<AlertBox status="error" class="mb-small">
-				<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
-			</AlertBox>
+			{showDemolishedNotice ? (
+				<AlertBox status="error" class="mb-small">
+					<FormatMarkdown>{t('notice.demolished')}</FormatMarkdown>
+				</AlertBox>
+			) : (
+				<AlertBox status="warning" class="mb-small">
+					<FormatMarkdown>{t('notice.danger')}</FormatMarkdown>
+				</AlertBox>
+			)}
 		</ContentSection>
 	) : undefined
 }

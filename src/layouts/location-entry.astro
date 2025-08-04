@@ -137,7 +137,6 @@ const t = getTranslations();
 			) : undefined
 		}
 		<ContentDescription entry={entry} />
-		<AlertBoxQuality quality={entry.data.entryQuality} />
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{
@@ -156,6 +155,7 @@ const t = getTranslations();
 				showTitleMultilingual: true,
 			}}
 		/>
+		<AlertBoxQuality quality={entry.data.entryQuality} />
 		<LocationsNotices entry={entry} />
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{

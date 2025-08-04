@@ -1,29 +1,259 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+const AlertBoxStatusEnum = {
+	Default: 'default',
+	Success: 'success',
+	Notice: 'notice',
+	Warning: 'warning',
+	Error: 'error',
+} as const;
+
 interface Props extends HTMLAttributes<'div'> {
-	status: 'notice' | 'warning' | 'error';
+	status?: (typeof AlertBoxStatusEnum)[keyof typeof AlertBoxStatusEnum];
 	class?: string | undefined;
+	showIcon?: boolean;
 }
 
-const { status, class: className, ...props } = Astro.props;
+const {
+	status = AlertBoxStatusEnum.Default,
+	class: className,
+	showIcon = true,
+	...props
+} = Astro.props;
+
+const iconOpacity = 0.2;
+const iconSize = 20;
 ---
 
 <div
 	class:list={[
-		'rounded-sm border px-2 py-1 text-sm',
-		status === 'notice'
+		'flex gap-x-1 overflow-clip rounded-sm border',
+		status === AlertBoxStatusEnum.Default
 			? 'border-primary-300 bg-primary-100 text-primary-600 dark:border-primary-900 dark:bg-primary-600 dark:text-primary-200'
 			: undefined,
-		status === 'warning'
-			? 'border-amber-300 bg-amber-100 text-amber-600 dark:border-amber-900 dark:bg-amber-600 dark:text-amber-200'
+		status === AlertBoxStatusEnum.Success
+			? 'border-green-300 bg-green-100 text-green-600 dark:border-green-900 dark:bg-green-600 dark:text-green-200'
 			: undefined,
-		status === 'error'
-			? 'border-orange-300 bg-orange-100 text-orange-600 dark:border-orange-900 dark:bg-orange-600 dark:text-orange-200'
+		status === AlertBoxStatusEnum.Notice
+			? 'border-primary-300 bg-primary-100 text-primary-600 dark:border-primary-900 dark:bg-primary-600 dark:text-primary-200'
+			: undefined,
+		status === AlertBoxStatusEnum.Warning
+			? 'border-amber-300 bg-amber-100 text-amber-700 dark:border-amber-600 dark:bg-amber-700 dark:text-amber-200'
+			: undefined,
+		status === AlertBoxStatusEnum.Error
+			? 'border-orange-300 bg-orange-100 text-orange-700 dark:border-orange-600 dark:bg-orange-700 dark:text-orange-200'
 			: undefined,
 		className,
 	]}
 	{...props}
 >
-	<slot />
+	{
+		showIcon ? (
+			<div
+				class:list={[
+					'border-r px-1 py-1',
+					status === AlertBoxStatusEnum.Default
+						? 'border-primary-200 bg-primary-50 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300'
+						: undefined,
+					status === AlertBoxStatusEnum.Success
+						? 'border-green-200 bg-green-50 text-green-500 dark:border-green-600 dark:bg-green-600 dark:text-green-300'
+						: undefined,
+					status === AlertBoxStatusEnum.Notice
+						? 'border-primary-200 bg-primary-50 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300'
+						: undefined,
+					status === AlertBoxStatusEnum.Warning
+						? 'border-amber-200 bg-amber-50 text-amber-500 dark:border-amber-600 dark:bg-amber-600 dark:text-amber-300'
+						: undefined,
+					status === AlertBoxStatusEnum.Error
+						? 'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300'
+						: undefined,
+				]}
+			>
+				{(() => {
+					switch (status) {
+						case AlertBoxStatusEnum.Default: {
+							return (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={iconSize}
+									height={iconSize}
+									viewBox="0 0 24 24"
+								>
+									<g fill="none">
+										<circle cx="12" cy="12" r="9" fill="currentColor" opacity={iconOpacity} />
+										<circle
+											cx="12"
+											cy="12"
+											r="9"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M12 16h.01v.01H12z"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M10.586 7.586c.39-.39.9-.585 1.41-.586a2 2 0 0 1 1.418.586c.39.39.586.902.586 1.414s-.195 1.024-.586 1.414a2 2 0 0 1-1.418.586L12 12"
+										/>
+									</g>
+								</svg>
+							);
+						}
+						case AlertBoxStatusEnum.Success: {
+							// iconamoon:check-circle-1-duotone
+							return (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={iconSize}
+									height={iconSize}
+									viewBox="0 0 24 24"
+								>
+									<g fill="none">
+										<circle cx="12" cy="12" r="9" fill="currentColor" opacity={iconOpacity} />
+										<circle
+											cx="12"
+											cy="12"
+											r="9"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="m15 10l-4 4l-2-2"
+										/>
+									</g>
+								</svg>
+							);
+						}
+						case AlertBoxStatusEnum.Notice: {
+							// iconamoon:information-circle-duotone
+							return (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={iconSize}
+									height={iconSize}
+									viewBox="0 0 24 24"
+								>
+									<g fill="none">
+										<circle cx="12" cy="12" r="9" fill="currentColor" opacity={iconOpacity} />
+										<circle
+											cx="12"
+											cy="12"
+											r="9"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M12 8h.01v.01H12z"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 12v4"
+										/>
+									</g>
+								</svg>
+							);
+						}
+						case AlertBoxStatusEnum.Warning: {
+							// iconamoon:attention-circle-duotone
+							return (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={iconSize}
+									height={iconSize}
+									viewBox="0 0 24 24"
+								>
+									<g fill="none">
+										<circle cx="12" cy="12" r="9" fill="currentColor" opacity={iconOpacity} />
+										<circle
+											cx="12"
+											cy="12"
+											r="9"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linejoin="round"
+											stroke-width="3"
+											d="M12 16h.01v.01H12z"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 12V8"
+										/>
+									</g>
+								</svg>
+							);
+						}
+						case AlertBoxStatusEnum.Error: {
+							// iconamoon:close-circle-1-duotone
+							return (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width={iconSize}
+									height={iconSize}
+									viewBox="0 0 24 24"
+								>
+									<g fill="none">
+										<circle cx="12" cy="12" r="9" fill="currentColor" opacity={iconOpacity} />
+										<circle
+											cx="12"
+											cy="12"
+											r="9"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+										/>
+										<path
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="m14 10l-4 4m0-4l4 4"
+										/>
+									</g>
+								</svg>
+							);
+						}
+						default: {
+							status satisfies never;
+							return;
+						}
+					}
+				})()}
+			</div>
+		) : undefined
+	}
+	<div class="py-1 pr-2 pl-1 text-sm">
+		<slot />
+	</div>
 </div>
