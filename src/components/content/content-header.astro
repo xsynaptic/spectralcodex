@@ -35,6 +35,7 @@ const caption = await Astro.slots.render('header-caption');
 						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 						: 'text-lg md:text-xl lg:text-2xl',
 				]}
+				data-pagefind-weight="2"
 			>
 				<Fragment set:html={titleMultilingual} />
 			</TextGradient>
@@ -50,12 +51,13 @@ const caption = await Astro.slots.render('header-caption');
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: '-mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
+			data-pagefind-weight="3"
 		>
 			<slot name="header-title" />
 		</TextGradient>
 		{
 			titleInfo ? (
-				<div class="self-end pb-0 sm:pb-2">
+				<div class="self-end pb-0 sm:pb-2" data-pagefind-ignore>
 					<Fragment set:html={titleInfo} />
 				</div>
 			) : undefined
@@ -70,6 +72,7 @@ const caption = await Astro.slots.render('header-caption');
 						? 'text-primary-500 sm:text-primary-300 dark:text-primary-400 dark:sm:text-primary-300'
 						: 'text-primary-500 dark:text-primary-400',
 				]}
+				data-pagefind-ignore
 			>
 				{subtitle ? <Fragment set:html={subtitle} /> : undefined}
 				{caption ? (

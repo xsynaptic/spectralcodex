@@ -4,7 +4,6 @@ import type { CollectionEntry } from 'astro:content';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -12,22 +11,21 @@ import ContentSectionBacklinks from '#components/content/content-section-backlin
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
+import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
 import ContentSectionRelated from '#components/content/content-section-related.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
-import ContentSection from '#components/content/content-section.astro';
 import FormatCjk from '#components/format/format-cjk.astro';
-import FormatMarkdown from '#components/format/format-markdown.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import ImageComponent from '#components/image/image-component.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
 import MainSite from '#components/main/main-site.astro';
-import AlertBox from '#components/parts/alert-box.astro';
+import AlertBoxQuality from '#components/parts/alert-box-quality.astro';
 import DividedItem from '#components/parts/divided-item.astro';
+import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
-import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -85,7 +83,7 @@ const t = getTranslations();
 						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
-								<ContentCollectionLink collection="locations" showFeatured={true} />
+								<CollectionLink collection="locations" showFeatured={true} />
 							</DividedItem>
 							{regionPrimary ? (
 								<DividedItem dividerColor="hero">
@@ -115,7 +113,7 @@ const t = getTranslations();
 					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
-							<ContentCollectionLink collection="locations" />
+							<CollectionLink collection="locations" />
 						</DividedItem>
 						{regionPrimary ? (
 							<DividedItem>
@@ -139,15 +137,7 @@ const t = getTranslations();
 			) : undefined
 		}
 		<ContentDescription entry={entry} />
-		{
-			entry.data.entryQuality === 1 ? (
-				<ContentSection data-pagefind-ignore>
-					<AlertBox status="warning">
-						<FormatMarkdown>{t('notice.quality')}</FormatMarkdown>
-					</AlertBox>
-				</ContentSection>
-			) : undefined
-		}
+		<AlertBoxQuality quality={entry.data.entryQuality} />
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{
@@ -158,10 +148,14 @@ const t = getTranslations();
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
-		<ContentSection data-pagefind-ignore>
-			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
-			<PreviewGrid items={metadataItems} showDate={true} showRegion={true} />
-		</ContentSection>
+		<ContentSectionPreviewGrid
+			items={metadataItems}
+			previewItemProps={{
+				showDate: true,
+				showRegion: true,
+				showTitleMultilingual: true,
+			}}
+		/>
 		<LocationsNotices entry={entry} />
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{

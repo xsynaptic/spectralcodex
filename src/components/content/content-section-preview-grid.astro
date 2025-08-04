@@ -1,0 +1,38 @@
+---
+import type { Page } from 'astro';
+
+import type { PreviewItemProps } from '#components/preview/preview-grid-item.astro';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
+import ContentSection from '#components/content/content-section.astro';
+import Pagination from '#components/pagination/pagination.astro';
+import PreviewGrid from '#components/preview/preview-grid.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	items?: Array<ContentMetadataItem>;
+	page?: Page<ContentMetadataItem>;
+	previewItemProps?: PreviewItemProps;
+}
+
+const { items, page, previewItemProps, ...props } = Astro.props;
+
+const t = getTranslations();
+
+const hasItems = items && items.length > 0;
+---
+
+{
+	hasItems || page ? (
+		<ContentSection data-pagefind-ignore {...props}>
+			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
+			{page ? (
+				<>
+					<PreviewGrid items={page.data} {...previewItemProps} />
+					<Pagination class="mt-small md:mt-medium" page={page} />
+				</>
+			) : undefined}
+			{hasItems ? <PreviewGrid items={items} {...previewItemProps} /> : undefined}
+		</ContentSection>
+	) : undefined
+}
