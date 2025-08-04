@@ -6,8 +6,8 @@ import type { RegionsOption } from '#lib/collections/regions/options.ts';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import ContentBody from '#components/content/content-body.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
+import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
@@ -17,7 +17,6 @@ import MainSite from '#components/main/main-site.astro';
 import Pagination from '#components/pagination/pagination.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
-import ProseBody from '#components/parts/prose-body.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
@@ -99,9 +98,7 @@ const t = getTranslations();
 				</ContentHeader>
 			)
 		}
-		<ProseBody class="pb-medium" data-pagefind-weight="2">
-			<ContentBody entry={entry} />
-		</ProseBody>
+		<ContentDescription entry={entry} />
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 			{
 				regionsOption?.termsChildrenLabel ? (

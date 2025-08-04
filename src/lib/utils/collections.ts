@@ -34,3 +34,8 @@ export function getFilterEntryQualityFunction<
 		return !!entry.data.entryQuality && entry.data.entryQuality >= entryQuality;
 	};
 }
+
+// Used to conditionally render descriptions or body contents of an entry
+export const getHasContent = (
+	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>,
+) => 'body' in entry && typeof entry.body === 'string' && entry.body.trim().length > 0;

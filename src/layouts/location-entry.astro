@@ -4,7 +4,6 @@ import type { CollectionEntry } from 'astro:content';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import ContentBody from '#components/content/content-body.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
@@ -28,14 +27,12 @@ import MainSite from '#components/main/main-site.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
-import ProseBody from '#components/parts/prose-body.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
-import { getLocationHasContent } from '#lib/collections/locations/utils.ts';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getHasContent } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
@@ -60,7 +57,7 @@ const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? 
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
-const hasContent = getLocationHasContent(entry);
+const hasContent = getHasContent(entry);
 
 const t = getTranslations();
 ---
@@ -137,25 +134,11 @@ const t = getTranslations();
 			)
 		}
 		{
-			hasContent ? (
-				<ProseBody class="pb-small" data-reading-frame>
-					<ContentBody entry={entry} />
-				</ProseBody>
-			) : (
-				<>
-					{entry.data.imageFeatured ? (
-						<ImageComponent imageId={entry.data.imageFeatured} alt={title} />
-					) : undefined}
-					<ContentSection>
-						<Fragment slot="section-description">
-							<ProseDescription>
-								<ContentDescription entry={entry} />
-							</ProseDescription>
-						</Fragment>
-					</ContentSection>
-				</>
-			)
+			!hasContent && entry.data.imageFeatured ? (
+				<ImageComponent imageId={entry.data.imageFeatured} alt={title} />
+			) : undefined
 		}
+		<ContentDescription entry={entry} />
 		{
 			entry.data.entryQuality === 1 ? (
 				<ContentSection data-pagefind-ignore>

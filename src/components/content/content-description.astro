@@ -3,31 +3,56 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { RegionLanguage } from '#lib/collections/regions/types.ts';
 
+import ContentBody from '#components/content/content-body.astro';
+import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
+import ProseBody from '#components/parts/prose-body.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { getHasContent } from '#lib/utils/collections.ts';
 
 interface Props {
-	entry: CollectionEntry<
-		'ephemera' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
-	>;
+	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
 }
 
 const { entry } = Astro.props;
 
 let regionLanguage: RegionLanguage | undefined;
 
-if (entry.collection === 'regions') {
-	regionLanguage = entry.data.langCode;
-} else if (entry.collection === 'locations') {
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+switch (entry.collection) {
+	case 'regions': {
+		regionLanguage = entry.data.langCode;
+		break;
+	}
+	case 'locations': {
+		const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
-	regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
-		?.data.langCode;
-} else {
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+		regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
+			?.data.langCode;
+		break;
+	}
+	default: {
+		const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
-	regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
+		regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
+	}
 }
+
+const hasContent = getHasContent(entry);
 ---
 
-<FormatMarkdown langCode={regionLanguage}>{entry.data.description}</FormatMarkdown>
+{
+	hasContent ? (
+		<ProseBody class="pb-medium" data-pagefind-weight="2">
+			<ContentBody entry={entry} />
+		</ProseBody>
+	) : (
+		<ContentSection>
+			<Fragment slot="section-description">
+				<ProseDescription data-pagefind-weight="2">
+					<FormatMarkdown langCode={regionLanguage}>{entry.data.description}</FormatMarkdown>
+				</ProseDescription>
+			</Fragment>
+		</ContentSection>
+	)
+}
