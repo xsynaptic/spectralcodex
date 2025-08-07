@@ -48,7 +48,7 @@
 		"@astrojs/react": "^4.3.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.4.2",
-		"@iconify/json": "^2.2.366",
+		"@iconify/json": "^2.2.367",
 		"@iconify/utils": "^2.3.0",
 		"@sindresorhus/slugify": "^2.2.1",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -84,16 +84,16 @@
 		"globals": "^16.3.0",
 		"keyv": "^5.5.0",
 		"ky": "^1.8.2",
-		"maplibre-gl": "^5.6.1",
+		"maplibre-gl": "^5.6.2",
 		"nanoid": "^5.1.5",
 		"p-limit": "^6.2.0",
 		"postcss-inline-svg": "^6.0.0",
 		"prettier": "^3.6.2",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.6.14",
-		"react-compiler-runtime": "19.1.0-rc.2",
+		"react-compiler-runtime": "^19.1.0-rc.2",
 		"rehype-wrap-cjk": "^0.5.0",
-		"remeda": "^2.28.0",
+		"remeda": "^2.29.0",
 		"sharp": "^0.34.3",
 		"tailwindcss": "^4.1.11",
 		"tsx": "^4.20.3",
@@ -104,7 +104,7 @@
 		"vite": "6.3.4",
 		"vitest": "^3.2.4",
 		"yaml": "^2.8.1",
-		"zx": "^8.7.2"
+		"zx": "^8.8.0"
 	},
-	"packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
+	"packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }
