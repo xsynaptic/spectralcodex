@@ -13,7 +13,7 @@ const { isProduction, isViewTransitionsEnabled } = Astro.props;
 	isProduction && UMAMI_DOMAIN && UMAMI_ID ? (
 		<script
 			defer
-			src={`${String(UMAMI_DOMAIN)}/script.js`}
+			src={`${UMAMI_DOMAIN}/script.js`}
 			data-website-id={UMAMI_ID}
 			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
 			is:inline

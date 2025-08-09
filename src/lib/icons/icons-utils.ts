@@ -82,9 +82,7 @@ export async function getSprites<T extends string>(
 
 		await iconsCache.set(key, sprites);
 
-		console.log(
-			`[Icons] Sprites generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
-		);
+		console.log(`[Icons] Sprites generated in ${(performance.now() - startTime).toFixed(5)}ms`);
 	}
 
 	return sprites;

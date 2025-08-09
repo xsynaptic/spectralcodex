@@ -34,7 +34,7 @@ async function generateCollection() {
 	}
 
 	console.log(
-		`[Themes] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Themes] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { themes, themesMap };

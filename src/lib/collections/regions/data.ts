@@ -146,7 +146,7 @@ async function generateCollection() {
 	}
 
 	console.log(
-		`[Regions] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Regions] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { regions, regionsMap };

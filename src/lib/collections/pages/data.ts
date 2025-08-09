@@ -15,7 +15,7 @@ async function generateCollection() {
 	const pages = await getCollection('pages');
 
 	console.log(
-		`[Pages] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Pages] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { pages };

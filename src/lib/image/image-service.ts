@@ -176,7 +176,7 @@ const localImageService = {
 					allWidths.push({
 						maxTargetWidth: width,
 						// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-						descriptor: `${Number(densityValues[index])}x` as const,
+						descriptor: `${densityValues[index]}x` as const,
 					});
 				}
 			}

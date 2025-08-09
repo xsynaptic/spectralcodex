@@ -15,7 +15,7 @@ async function generateCollection() {
 	const ephemera = await getCollection('ephemera');
 
 	console.log(
-		`[Ephemera] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Ephemera] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { ephemera };

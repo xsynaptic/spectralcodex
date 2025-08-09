@@ -107,7 +107,7 @@ export const images = defineCollection({
 							dateCreated: dateCreated ? new Date(dateCreated) : undefined,
 							brand: String(tags.Make),
 							camera: String(tags.Model),
-							lens: tags.LensID ? String(tags.LensID) : String(tags.LensModel),
+							lens: tags.LensID ?? String(tags.LensModel),
 							aperture: String(tags.FNumber),
 							shutterSpeed: String(tags.ShutterSpeed),
 							focalLength: String(tags.FocalLength),

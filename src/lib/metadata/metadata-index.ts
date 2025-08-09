@@ -194,7 +194,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	const endTime = performance.now();
 
-	console.log(`[Metadata Index] Generated in ${Number(endTime - startTime).toFixed(5)}ms`);
+	console.log(`[Metadata Index] Generated in ${(endTime - startTime).toFixed(5)}ms`);
 
 	return contentMetadataMap;
 }

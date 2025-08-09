@@ -22,7 +22,7 @@ async function generateCollection() {
 	}
 
 	console.log(
-		`[Posts] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Posts] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { posts, postsMap };

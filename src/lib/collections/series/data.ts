@@ -30,7 +30,7 @@ async function generateCollection() {
 	}
 
 	console.log(
-		`[Series] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Series] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { series, seriesMap };

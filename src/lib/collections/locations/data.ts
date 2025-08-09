@@ -268,7 +268,7 @@ async function generateCollection() {
 	}
 
 	console.log(
-		`[Locations] Collection data generated in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+		`[Locations] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
 	);
 
 	return { locations, locationsMap };

@@ -112,7 +112,7 @@ const openGraphImage = {
 	description={description}
 	openGraph={{
 		basic: {
-			title: contentTitle ? `${String(contentTitle)} - ${siteTitle}` : siteTitle,
+			title: contentTitle ? `${contentTitle} - ${siteTitle}` : siteTitle,
 			type: ogType ?? 'website',
 			image: openGraphImage.url,
 		},

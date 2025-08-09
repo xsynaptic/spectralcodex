@@ -33,7 +33,7 @@ export function useMapCanvasEvents() {
 
 	const onClick = useCallback<NonNullable<MapCallbacks['onClick']>>(
 		({ features, target: mapInstance }) => {
-			const feature = features && features[0];
+			const feature = features?.[0];
 
 			// If the click event is not within interactive layers close any open popup and exit early
 			if (!feature || !feature.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
@@ -177,7 +177,7 @@ export function useMapCanvasEvents() {
 
 	const onMouseDown = useCallback<NonNullable<MapCallbacks['onMouseDown']>>(
 		({ features }) => {
-			const feature = features && features[0];
+			const feature = features?.[0];
 
 			if (feature?.layer.id === undefined) {
 				setCanvasCursor('grabbing');
@@ -188,7 +188,7 @@ export function useMapCanvasEvents() {
 
 	const onMouseUp = useCallback<NonNullable<MapCallbacks['onMouseUp']>>(
 		({ features }) => {
-			const feature = features && features[0];
+			const feature = features?.[0];
 
 			if (feature?.layer.id === undefined) {
 				setCanvasCursor('grab');

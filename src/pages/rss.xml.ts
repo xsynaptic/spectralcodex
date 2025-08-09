@@ -63,7 +63,7 @@ const getRssItem = async (
 
 	if (RSS_FEED_DEBUG) {
 		console.log(
-			`[RSS] Generated entry for "${entry.data.title}" in ${Number(performance.now() - startTime).toFixed(5)}ms`,
+			`[RSS] Generated entry for "${entry.data.title}" in ${(performance.now() - startTime).toFixed(5)}ms`,
 		);
 	}
 
@@ -110,7 +110,7 @@ export async function GET(context: APIContext): Promise<Response> {
 	});
 
 	if (RSS_FEED_DEBUG) {
-		console.log(`[RSS] Generated in ${Number(performance.now() - startTime).toFixed(5)}ms`);
+		console.log(`[RSS] Generated in ${(performance.now() - startTime).toFixed(5)}ms`);
 
 		if (items.length > 0) {
 			console.log(`[RSS] Feed contains ${String(items.length)} items:`);
