@@ -15,10 +15,10 @@ export const boundingBoxes: Record<string, BoundingBox> = {
 		lngMax: 134.775_456_3,
 	},
 	'hong-kong': {
-		latMin: 22.119_327_8,
-		latMax: 22.439_327_8,
-		lngMin: 114.002_813_1,
-		lngMax: 114.322_813_1,
+		latMin: 22.133,
+		latMax: 22.597,
+		lngMin: 113.805,
+		lngMax: 114.441,
 	},
 	indonesia: {
 		latMin: -11.208_566_9,
@@ -33,10 +33,10 @@ export const boundingBoxes: Record<string, BoundingBox> = {
 		lngMax: 154.205_541,
 	},
 	malaysia: {
-		latMin: -5.107_624_1,
-		latMax: 9.892_375_9,
-		lngMin: 105.347_193_9,
-		lngMax: 120.347_193_9,
+		latMin: -0.086,
+		latMax: 7.025,
+		lngMin: 99.34,
+		lngMax: 119.292,
 	},
 	philippines: {
 		latMin: 4.215_806_4,
@@ -73,5 +73,12 @@ export const boundingBoxes: Record<string, BoundingBox> = {
 		latMax: 23.393_395,
 		lngMin: 102.144_41,
 		lngMax: 114.333_759_5,
+	},
+	// Includes ROC's South China Sea claims
+	kaohsiung: {
+		latMin: 10.326,
+		latMax: 23.491,
+		lngMin: 114.302,
+		lngMax: 121.091,
 	},
 };

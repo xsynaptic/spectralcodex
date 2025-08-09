@@ -40,19 +40,31 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 								: [divisionIdValue].filter((id): id is string => typeof id === 'string');
 
 							if (divisionIds.length > 0) {
-								// Determine ancestor ID from path structure
-								const regionAncestorId = parentPath ? parentPath.split('/')[0]! : slug;
+								// Determine all ancestor IDs from path structure
+								const regionPathIds: Array<string> = [];
+
+								if (parentPath) {
+									const pathParts = parentPath.split('/');
+									// Add all path parts from most specific to least specific
+									for (let i = pathParts.length; i > 0; i--) {
+										if (pathParts[i - 1]) regionPathIds.push(pathParts[i - 1]!);
+									}
+								}
+								regionPathIds.push(slug);
 
 								regions.push({
 									slug,
 									divisionIds,
-									regionAncestorId,
+									regionPathIds,
 								});
 							}
 						}
 					}
 				} catch (error) {
-					console.warn(chalk.yellow(`Failed to parse frontmatter for ${chalk.cyan(filePath)}:`), error);
+					console.warn(
+						chalk.yellow(`Failed to parse frontmatter for ${chalk.cyan(filePath)}:`),
+						error,
+					);
 				}
 			}
 		}
@@ -63,7 +75,9 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 
 		await scanDirectory(regionsDir);
 
-		console.log(chalk.green(`Found ${chalk.cyan(String(regions.length))} regions with division IDs`));
+		console.log(
+			chalk.green(`Found ${chalk.cyan(String(regions.length))} regions with division IDs`),
+		);
 
 		return regions;
 	} catch (error) {

@@ -3,7 +3,7 @@ import type { MultiPolygon, Polygon } from 'geojson';
 export interface RegionMetadata {
 	slug: string;
 	divisionIds: Array<string>;
-	regionAncestorId: string;
+	regionPathIds: Array<string>;
 }
 
 export interface DivisionItem {

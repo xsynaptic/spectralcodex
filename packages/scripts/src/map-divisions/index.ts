@@ -7,7 +7,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { DivisionItem, RegionMetadata } from './types';
+import type { BoundingBox, DivisionItem, RegionMetadata } from './types';
 
 import { boundingBoxes } from './bounding-boxes';
 import { parseRegionData } from './content';
@@ -51,16 +51,27 @@ const { values } = parseArgs({
 const cachePath = path.join(values['root-path'], values['cache-path']);
 const outputPath = path.join(values['root-path'], values['output-path']);
 
+function getBoundingBox(boundingBoxId: string): BoundingBox {
+	try {
+		return boundingBoxes[boundingBoxId]!;
+	} catch (error) {
+		console.warn(chalk.yellow(`No bounding box found for ${chalk.cyan(boundingBoxId)}`));
+		throw error;
+	}
+}
+
 async function fetchDivisionData(
 	db: DuckDBConnection,
 	divisionIds: Set<string>,
-	ancestorId: string,
+	boundingBoxId: string,
 ): Promise<Map<string, DivisionItem>> {
 	console.log(
 		chalk.blue(
 			`Fetching division data for ${chalk.cyan(String(divisionIds.size))} unique division IDs...`,
 		),
 	);
+
+	console.log('boundingBoxId', boundingBoxId);
 
 	// Check cache for each division ID first
 	const divisionsById = new Map<string, DivisionItem>();
@@ -92,8 +103,7 @@ async function fetchDivisionData(
 		),
 	);
 
-	// Get bounding box for this ancestor region
-	const boundingBox = boundingBoxes[ancestorId];
+	const boundingBox = getBoundingBox(boundingBoxId);
 
 	const query = buildQuery(values['overture-url'], uncachedDivisionIds, boundingBox);
 
@@ -170,7 +180,6 @@ async function fetchDivisionData(
 	} catch (error) {
 		console.log(chalk.red(`\nQuery failed`));
 		console.error(chalk.red(`Error fetching batch data:`), error);
-
 		throw error;
 	}
 }
@@ -206,29 +215,32 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 			),
 		);
 
-		// Group regions by regionAncestorId for batched processing
-		const regionsByAncestor = new Map<string, Array<RegionMetadata>>();
+		// Group regions by bounding box ID for batched processing
+		const regionsByBoundingBox = new Map<string, Array<RegionMetadata>>();
 
 		for (const region of regionsToProcess) {
-			const ancestorId = region.regionAncestorId;
-
-			if (!regionsByAncestor.has(ancestorId)) {
-				regionsByAncestor.set(ancestorId, []);
+			// Cycle through parent regions until we match with a bounding box ID
+			for (const regionPathId of region.regionPathIds) {
+				if (boundingBoxes[regionPathId]) {
+					if (!regionsByBoundingBox.has(regionPathId)) {
+						regionsByBoundingBox.set(regionPathId, []);
+					}
+					regionsByBoundingBox.get(regionPathId)!.push(region);
+					break;
+				}
 			}
-
-			regionsByAncestor.get(ancestorId)!.push(region);
 		}
 
 		console.log(
 			chalk.blue(
-				`Processing ${chalk.cyan(String(regionsByAncestor.size))} region groups by ancestor...`,
+				`Processing ${chalk.cyan(String(regionsByBoundingBox.size))} region groups by ancestor...`,
 			),
 		);
 
 		let successCount = regions.length - regionsToProcess.length;
 
 		// Process each region group with its bounding box
-		for (const [ancestorId, ancestorRegions] of regionsByAncestor) {
+		for (const [ancestorId, ancestorRegions] of regionsByBoundingBox) {
 			console.log(
 				chalk.magenta(
 					`\n--- Processing ${chalk.cyan(ancestorId)} group (${chalk.cyan(String(ancestorRegions.length))} regions) ---`,
@@ -314,7 +326,9 @@ async function mapDivisions() {
 
 		if (regions.length === 0) {
 			console.log(
-				chalk.yellow(`No regions with division IDs found in ${chalk.cyan(values['regions-path'])}.`),
+				chalk.yellow(
+					`No regions with division IDs found in ${chalk.cyan(values['regions-path'])}.`,
+				),
 			);
 			return;
 		}
