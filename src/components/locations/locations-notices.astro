@@ -13,7 +13,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
-	langCode?: Extract<LanguageCode, 'zh-Hant' | 'zh-CN' | 'ja' | 'ko'> | undefined;
+	langCode?: Extract<LanguageCode, 'zh' | 'zh-CN' | 'ja' | 'ko'> | undefined;
 }
 
 const { entry, langCode, ...props } = Astro.props;
