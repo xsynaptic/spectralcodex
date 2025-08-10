@@ -19,6 +19,7 @@ const {
 	status = AlertBoxStatusEnum.Default,
 	class: className,
 	showIcon = true,
+	role = 'note',
 	...props
 } = Astro.props;
 
@@ -46,6 +47,7 @@ const iconSize = 20;
 			: undefined,
 		className,
 	]}
+	role={role}
 	{...props}
 >
 	{

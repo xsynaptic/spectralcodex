@@ -1,23 +1,32 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-type LinkColor =
-	| 'primary'
-	| 'primary-bright'
-	| 'primary-featured'
-	| 'highlight'
-	| 'highlight-bright'
-	| 'highlight-featured'
-	| 'accent'
-	| 'accent-bright'
-	| 'accent-featured';
+const LinkColorEnum = {
+	Primary: 'primary',
+	PrimaryBright: 'primary-bright',
+	PrimaryFeatured: 'primary-featured',
+	Highlight: 'highlight',
+	HighlightBright: 'highlight-bright',
+	HighlightFeatured: 'highlight-featured',
+	Accent: 'accent',
+	AccentBright: 'accent-bright',
+	AccentFeatured: 'accent-featured',
+} as const;
+
+type LinkColor = (typeof LinkColorEnum)[keyof typeof LinkColorEnum];
 
 interface Props extends HTMLAttributes<'a'> {
 	linkColor?: LinkColor | undefined;
-	darkMode?: boolean | undefined;
+	showDarkMode?: boolean | undefined;
 }
 
-const { class: className, href, linkColor = 'accent', darkMode = true, ...props } = Astro.props;
+const {
+	class: className,
+	href,
+	linkColor = LinkColorEnum.Accent,
+	showDarkMode = true,
+	...props
+} = Astro.props;
 
 const children = (await Astro.slots.render('default')) as string | undefined;
 ---
@@ -26,59 +35,69 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 	href={href}
 	class:list={[
 		'cursor-pointer transition-colors ease-linear',
-		(() => {
-			switch (linkColor) {
-				case 'primary': {
-					return darkMode
+		linkColor === LinkColorEnum.Primary
+			? [
+					showDarkMode
 						? 'text-primary-800 hover:text-primary-600 dark:text-primary-200 dark:hover:text-primary-50'
-						: 'text-primary-800 hover:text-primary-600';
-				}
-				case 'primary-bright': {
-					return darkMode
+						: 'text-primary-800 hover:text-primary-600',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.PrimaryBright
+			? [
+					showDarkMode
 						? 'text-primary-300 hover:text-primary-100 dark:text-primary-600 dark:hover:text-primary-300'
-						: 'text-primary-300 hover:text-primary-100';
-				}
-				case 'primary-featured': {
-					return darkMode
+						: 'text-primary-300 hover:text-primary-100',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.PrimaryFeatured
+			? [
+					showDarkMode
 						? 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50 dark:text-primary-200 dark:hover:text-primary-50 dark:sm:text-primary-800 dark:sm:hover:text-primary-500'
-						: 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50';
-				}
-				case 'highlight': {
-					return darkMode
+						: 'text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.Highlight
+			? [
+					showDarkMode
 						? 'text-highlight-500 hover:text-highlight-300 dark:text-highlight-400 dark:hover:text-highlight-700'
-						: 'text-highlight-500 hover:text-highlight-300';
-				}
-				case 'highlight-bright': {
-					return darkMode
+						: 'text-highlight-500 hover:text-highlight-300',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.HighlightBright
+			? [
+					showDarkMode
 						? 'text-highlight-300 hover:text-highlight-200 dark:text-highlight-600 dark:hover:text-highlight-800'
-						: 'text-highlight-300 hover:text-highlight-200';
-				}
-				case 'highlight-featured': {
-					return darkMode
+						: 'text-highlight-300 hover:text-highlight-200',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.HighlightFeatured
+			? [
+					showDarkMode
 						? 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200 dark:text-highlight-400 dark:hover:text-highlight-700 dark:sm:text-highlight-400 dark:sm:hover:text-highlight-200'
-						: 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200';
-				}
-				case 'accent': {
-					return darkMode
+						: 'text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.Accent
+			? [
+					showDarkMode
 						? 'text-accent-500 hover:text-accent-300 dark:text-accent-400 dark:hover:text-accent-200'
-						: 'text-accent-500 hover:text-accent-300';
-				}
-				case 'accent-bright': {
-					return darkMode
+						: 'text-accent-500 hover:text-accent-300',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.AccentBright
+			? [
+					showDarkMode
 						? 'text-accent-300 hover:text-accent-200 dark:text-accent-200 dark:hover:text-accent-100'
-						: 'text-accent-300 hover:text-accent-200';
-				}
-				case 'accent-featured': {
-					return darkMode
+						: 'text-accent-300 hover:text-accent-200',
+				]
+			: undefined,
+		linkColor === LinkColorEnum.AccentFeatured
+			? [
+					showDarkMode
 						? 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200 dark:text-accent-400 dark:hover:text-accent-700 dark:sm:text-accent-300 dark:sm:hover:text-accent-200'
-						: 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200';
-				}
-				default: {
-					linkColor satisfies never;
-					return '';
-				}
-			}
-		})(),
+						: 'text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200',
+				]
+			: undefined,
 		className,
 	]}
 	{...props}><Fragment set:html={children?.trim()} /></a

@@ -1,7 +1,14 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
-export type DividerColor = 'default' | 'lighter' | 'darker' | 'hero';
+const DividerColorEnum = {
+	Default: 'default',
+	Lighter: 'lighter',
+	Darker: 'darker',
+	Hero: 'hero',
+} as const;
+
+export type DividerColor = (typeof DividerColorEnum)[keyof typeof DividerColorEnum];
 
 export type DividerContent = 'bar' | 'bullet' | 'chevron' | 'dot' | 'slash';
 
@@ -10,7 +17,7 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	class?: string | undefined;
 	dividerColor?: DividerColor | undefined;
 	dividerContent?: DividerContent | undefined;
-	darkMode?: boolean | undefined;
+	showDarkMode?: boolean | undefined;
 }>;
 
 const {
@@ -18,7 +25,7 @@ const {
 	class: className,
 	dividerColor = 'default',
 	dividerContent = 'slash',
-	darkMode = true,
+	showDarkMode = true,
 	...props
 } = Astro.props;
 ---
@@ -26,51 +33,26 @@ const {
 <Tag
 	class:list={[
 		'divider-after inline-flex gap-1 last:after:content-none',
-		(() => {
-			switch (dividerColor) {
-				case 'default': {
-					return darkMode
-						? 'after:text-primary-400 dark:after:text-primary-500'
-						: 'after:text-primary-400';
-				}
-				case 'darker': {
-					return 'after:text-primary-500 dark:after:text-primary-700';
-				}
-				case 'lighter': {
-					return 'after:text-primary-300 dark:after:text-primary-600';
-				}
-				case 'hero': {
-					return 'after:text-primary-500 sm:after:text-primary-300 sm:after:opacity-80 dark:after:text-primary-400 dark:sm:after:text-primary-700';
-				}
-				default: {
-					dividerColor satisfies never;
-					return '';
-				}  
-			}
-		})(),
-		(() => {
-			switch (dividerContent) {
-				case 'bar': {
-					return 'after:content-(--content-bar)';
-				}
-				case 'bullet': {
-					return 'after:content-(--content-bullet)';
-				}
-				case 'chevron': {
-					return 'after:content-(--content-chevron)';
-				}
-				case 'dot': {
-					return 'after:content-(--content-dot)';
-				}
-				case 'slash': {
-					return 'after:content-(--content-slash)';
-				}
-				default: {
-					dividerContent satisfies never;
-					return '';
-				}
-			}
-		})(),
+		dividerColor === DividerColorEnum.Default && showDarkMode
+			? 'after:text-primary-400 dark:after:text-primary-500'
+			: undefined,
+		dividerColor === DividerColorEnum.Default && !showDarkMode
+			? 'after:text-primary-400'
+			: undefined,
+		dividerColor === DividerColorEnum.Darker
+			? 'after:text-primary-500 dark:after:text-primary-700'
+			: undefined,
+		dividerColor === DividerColorEnum.Lighter
+			? 'after:text-primary-300 dark:after:text-primary-600'
+			: undefined,
+		dividerColor === DividerColorEnum.Hero
+			? 'after:text-primary-500 sm:after:text-primary-300 dark:after:text-primary-400 dark:sm:after:text-primary-700 sm:after:opacity-80'
+			: undefined,
+		dividerContent === 'bar' ? 'after:content-(--content-bar)' : undefined,
+		dividerContent === 'bullet' ? 'after:content-(--content-bullet)' : undefined,
+		dividerContent === 'chevron' ? 'after:content-(--content-chevron)' : undefined,
+		dividerContent === 'dot' ? 'after:content-(--content-dot)' : undefined,
+		dividerContent === 'slash' ? 'after:content-(--content-slash)' : undefined,
 		className,
 	]}
 	{...props}

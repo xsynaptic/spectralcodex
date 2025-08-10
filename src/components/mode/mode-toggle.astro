@@ -13,13 +13,20 @@ const t = getTranslations();
 			'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-all hover:opacity-100',
 		]}
 		aria-label={t('site.mode.toggle.label')}
+		aria-pressed="false"
 		title={t('site.mode.toggle.label')}
+		transition:persist
 	>
 		<div
 			class:list={['hidden dark:inline', 'text-primary-300']}
-			aria-label={t('site.mode.mode.light')}
+			aria-label={t('site.mode.toggle.light.label')}
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				aria-hidden="true"
 				><g
 					fill="none"
 					stroke="currentColor"
@@ -34,9 +41,14 @@ const t = getTranslations();
 		</div>
 		<div
 			class:list={['inline dark:hidden', 'text-primary-700']}
-			aria-label={t('site.mode.mode.dark')}
+			aria-label={t('site.mode.toggle.dark.label')}
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				aria-hidden="true"
 				><path
 					fill="none"
 					stroke="currentColor"

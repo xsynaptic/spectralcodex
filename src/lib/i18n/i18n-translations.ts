@@ -134,10 +134,13 @@ const translationStrings = {
 		'site.skip.label': 'Skip to content',
 		'site.footer.powered.label': 'Powered by',
 		'site.footer.updated.label': 'Site updated on',
-		'site.breadcrumbs.aria.label': 'Breadcrumb Navigation',
+		'site.breadcrumbs.label': 'Breadcrumb Navigation',
 		'site.mode.toggle.label': 'Toggle mode',
-		'site.mode.mode.dark': 'Dark mode',
-		'site.mode.mode.light': 'Light mode',
+		'site.mode.toggle.dark.label': 'Dark mode',
+		'site.mode.toggle.light.label': 'Light mode',
+		'site.mode.toggle.system': 'System mode',
+		'site.pagination.label': 'Pagination',
+		'site.pagination.pageNumber.label': 'Page %s',
 
 		// Menu items
 		'menu.timeline.label': 'Timeline',

@@ -1,0 +1,44 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+	target?: string | undefined;
+	label: string;
+}
+
+const { class: className, target = '#content', label, ...restProps } = Astro.props;
+
+/**
+ * Adapted from the Accessible Astro Components library
+ * @link https://github.com/incluud/accessible-astro-components
+ */
+---
+
+<div class:list={['skip-link', className]} {...restProps}>
+	<a
+		href={target}
+		class="bg-primary-50 dark:bg-primary-800 text-accent-600 dark:text-accent-400 rounded-br-sm px-2 py-1 text-lg"
+		>{label}</a
+	>
+</div>
+
+<style>
+	:where(.skip-link a) {
+		position: absolute;
+		z-index: 9999;
+		transition: inset-block-start 0.2s ease-in-out;
+		inset-block-start: -100vh;
+		inset-inline-start: 0;
+	}
+	:where(.skip-link a:hover),
+	:where(.skip-link a:focus-visible) {
+		inset-block-start: 0;
+		outline: 2px solid currentColor;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		:where(.skip-link a) {
+			transition: none;
+		}
+	}
+</style>

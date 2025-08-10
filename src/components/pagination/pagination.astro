@@ -18,11 +18,15 @@ const { getPageNumberLink, pagePrevLink, pageNextLink, pageArray } = getPaginati
 let isMidpointNumbers = false;
 
 const t = getTranslations();
+
+function getPageNumberAriaLabel(pageNumber: number) {
+	return t('site.pagination.pageNumber.label').replaceAll('%s', String(pageNumber));
+}
 ---
 
 {
 	pagePrevLink || pageNextLink ? (
-		<nav class:list={[className]} aria-label="pagination">
+		<nav class:list={[className]} aria-label={t('site.pagination.label')}>
 			<ul
 				class:list={[
 					'flex flex-wrap gap-4 text-base font-medium tabular-nums md:gap-1 md:text-sm',
@@ -34,7 +38,9 @@ const t = getTranslations();
 						<span class:list={['select-none', 'text-accent-300 dark:text-accent-400']}>
 							&lsaquo;
 						</span>
-						<Link href={pagePrevLink}>{t('pagination.previous')}</Link>
+						<Link href={pagePrevLink} aria-label={t('pagination.previous')}>
+							{t('pagination.previous')}
+						</Link>
 					</li>
 				) : undefined}
 				{pageArray.map((pageNumber) => {
@@ -68,7 +74,11 @@ const t = getTranslations();
 										isMidpointNumbers ? 'hidden md:block' : undefined,
 									]}
 								>
-									<Link href={getPageNumberLink(pageNumber)} class="px-2">
+									<Link
+										href={getPageNumberLink(pageNumber)}
+										class="px-2"
+										aria-label={getPageNumberAriaLabel(pageNumber)}
+									>
 										{String(pageNumber)}
 									</Link>
 								</li>
@@ -78,7 +88,9 @@ const t = getTranslations();
 				})}
 				{pageNextLink ? (
 					<li class="flex flex-wrap gap-1 pl-2">
-						<Link href={pageNextLink}>{t('pagination.next')}</Link>
+						<Link href={pageNextLink} aria-label={t('pagination.next')}>
+							{t('pagination.next')}
+						</Link>
 						<span class:list={['select-none', 'text-accent-300 dark:text-accent-500']}>
 							&rsaquo;
 						</span>

@@ -1,5 +1,6 @@
 ---
 import MainSearch from '#components/main/main-search.astro';
+import MainSkipLink from '#components/main/main-skip-link.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
 import ModeToggle from '#components/mode/mode-toggle.astro';
 import Container from '#components/parts/container.astro';
@@ -26,7 +27,7 @@ const t = getTranslations();
 			: 'bg-primary-100 dark:bg-primary-800',
 	]}
 >
-	<a href="#content" class="sr-only focus:not-sr-only">{t('site.skip.label')}</a>
+	<MainSkipLink target="#content" label={t('site.skip.label')} />
 	<Container
 		as="div"
 		class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"

@@ -18,25 +18,17 @@ interface Props {
 
 const { entry } = Astro.props;
 
+const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
 let regionLanguage: RegionLanguage | undefined;
 
-switch (entry.collection) {
-	case 'regions': {
-		regionLanguage = entry.data.langCode;
-		break;
-	}
-	case 'locations': {
-		const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
-
-		regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
-			?.data.langCode;
-		break;
-	}
-	default: {
-		const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
-
-		regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
-	}
+if (entry.collection === 'regions') {
+	regionLanguage = entry.data.langCode;
+} else if (entry.collection === 'locations') {
+	regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
+		?.data.langCode;
+} else {
+	regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
 }
 
 const hasContent = getHasContent(entry);
