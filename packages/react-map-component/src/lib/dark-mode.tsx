@@ -1,23 +1,26 @@
 /* eslint-disable unicorn/prefer-global-this */
-import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+
+import { createContext, useEffect, useState } from 'react';
 
 /**
- * These types mirror the mode system types in the main Astro application.
- * They must be kept in sync with @/components/mode/mode-types
+ * These types mirror the mode system types in the main Astro application; they must be kept in sync
  */
 type Mode = 'light' | 'dark' | 'auto';
 type ModeResolved = Omit<Mode, 'auto'>;
 
 interface ModeChangedEventDetail {
 	mode: Mode;
-	modeResolved: ModeResolved;
+	resolvedMode: ModeResolved;
 }
 
 interface ModeChangedEvent extends CustomEvent {
 	detail: ModeChangedEventDetail;
 }
 
-export function useMode() {
+export const DarkModeContext = createContext<boolean>(false);
+
+export function DarkModeProvider({ children }: { children: ReactNode }) {
 	const [isDarkMode, setDarkMode] = useState(() => {
 		if (typeof window === 'undefined') return false;
 
@@ -29,7 +32,7 @@ export function useMode() {
 
 	useEffect(() => {
 		function handleModeChange(event: ModeChangedEvent) {
-			setDarkMode(event.detail.modeResolved === 'dark');
+			setDarkMode(event.detail.resolvedMode === 'dark');
 		}
 
 		document.addEventListener('mode-changed', handleModeChange as EventListener);
@@ -39,5 +42,5 @@ export function useMode() {
 		};
 	}, []);
 
-	return isDarkMode;
+	return <DarkModeContext.Provider value={isDarkMode}>{children}</DarkModeContext.Provider>;
 }

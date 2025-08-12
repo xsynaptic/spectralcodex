@@ -6,6 +6,7 @@ import type { MapComponentProps } from './types';
 
 import { parsePopupData, parseSourceData } from './api/map-api-utils';
 import { MapCanvas } from './canvas/map-canvas';
+import { DarkModeProvider } from './lib/dark-mode';
 import { ReactQueryProvider } from './lib/react-query/react-query-provider';
 import { MapStoreProvider } from './store/map-store-provider';
 
@@ -24,18 +25,20 @@ export const ReactMapComponent = memo(function ReactMapComponent({
 
 	return (
 		<ReactQueryProvider>
-			<MapStoreProvider
-				initialState={{
-					...(sourceDataParsed ? { sourceData: sourceDataParsed, sourceDataLoading: false } : {}),
-					...(popupDataParsed ? { popupData: popupDataParsed, popupDataLoading: false } : {}),
-					...(cluster ? { canvasClusters: cluster } : {}),
-					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
-					...(props.interactive === false ? { canvasInteractive: false } : {}),
-					...(languages ? { languages } : {}),
-				}}
-			>
-				<MapCanvas {...props} />
-			</MapStoreProvider>
+			<DarkModeProvider>
+				<MapStoreProvider
+					initialState={{
+						...(sourceDataParsed ? { sourceData: sourceDataParsed, sourceDataLoading: false } : {}),
+						...(popupDataParsed ? { popupData: popupDataParsed, popupDataLoading: false } : {}),
+						...(cluster ? { canvasClusters: cluster } : {}),
+						...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
+						...(props.interactive === false ? { canvasInteractive: false } : {}),
+						...(languages ? { languages } : {}),
+					}}
+				>
+					<MapCanvas {...props} />
+				</MapStoreProvider>
+			</DarkModeProvider>
 		</ReactQueryProvider>
 	);
 });

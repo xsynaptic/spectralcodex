@@ -6,12 +6,14 @@ import { useMemo } from 'react';
 import { mapClusterStyle } from '../../config/colors';
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
+import { useDarkMode } from '../../lib/hooks/use-dark-mode';
 import { useMapHoveredId, useMapSelectedId } from '../../store/hooks/use-map-store';
 import { statusColorMap, statusStrokeColorMap } from '../map-source-utils';
 
 export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 	const selectedId = useMapSelectedId();
 	const hoveredId = useMapHoveredId();
+	const isDarkMode = useDarkMode();
 
 	const isSelectedIdExpression = useMemo(
 		() => ['==', ['get', 'id'], selectedId ?? ''] satisfies ExpressionSpecification,
@@ -253,12 +255,12 @@ export function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
 				},
 				paint: {
-					'text-color': '#222222',
-					'text-halo-color': 'rgba(255, 255, 255, 0.8)',
+					'text-color': isDarkMode ? '#e7e3e4' : '#3f3f47',
+					'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
 					'text-halo-width': 1.2,
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isHoveredIdExpression],
+		[isHoveredIdExpression, isDarkMode],
 	);
 
 	return {

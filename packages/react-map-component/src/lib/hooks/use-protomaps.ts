@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import type { MapComponentProps } from '../../types';
 
 import { useMapLanguages } from '../../store/hooks/use-map-store';
-import { useMode } from './use-mode';
+import { useDarkMode } from './use-dark-mode';
 
 export function useProtomaps({
 	protomapsApiKey,
@@ -23,7 +23,7 @@ export function useProtomaps({
 >) {
 	const languages = useMapLanguages();
 
-	const isDarkMode = useMode();
+	const isDarkMode = useDarkMode();
 
 	const flavor = useMemo(() => {
 		return baseMapTheme ?? (isDarkMode ? namedFlavor('dark') : namedFlavor('light'));

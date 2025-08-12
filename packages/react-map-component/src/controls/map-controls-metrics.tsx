@@ -5,16 +5,6 @@ import { translations } from '../config/translations';
 import { useMapSourceDataCount, useMapSourceDataLoading } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const formatNumber = ({
-	number,
-	locales,
-	options,
-}: {
-	number: string | number;
-	locales?: Intl.LocalesArgument | undefined;
-	options?: Intl.NumberFormatOptions | undefined;
-}) => new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
-
 export const MetricsControl = ({ position }: { position: ControlPosition }) => {
 	const sourceDataLoading = useMapSourceDataLoading();
 	const sourceDataCount = useMapSourceDataCount();
@@ -28,9 +18,9 @@ export const MetricsControl = ({ position }: { position: ControlPosition }) => {
 					<div className="loading w-[15px]" />
 				</div>
 			) : (
-				<div className="text-primary-600 dark:text-primary-400 flex flex-nowrap gap-1 font-sans text-xs mix-blend-difference select-none">
+				<div className="text-primary-700 dark:text-primary-300 flex flex-nowrap gap-1 font-sans text-xs select-none">
 					<span className="drop-shadow-sm">{formatNumber.format(filteredCount)}</span>
-					<span className="text-primary-400 dark:text-primary-600 font-light drop-shadow-sm">
+					<span className="text-primary-400 dark:text-primary-500 font-light drop-shadow-xs">
 						/
 					</span>
 					<span className="drop-shadow-sm">

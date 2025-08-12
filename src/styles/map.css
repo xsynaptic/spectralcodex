@@ -1,5 +1,6 @@
 @reference "./global.css";
 
+/** Popup */
 div.maplibregl-popup-content {
 	overflow: auto;
 	padding: 0;
@@ -24,22 +25,28 @@ button.maplibregl-popup-close-button {
 button.maplibregl-popup-close-button:focus {
 	outline: none;
 }
+.maplibregl-popup-content {
+	@apply dark:bg-primary-950;
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+	@apply dark:border-r-primary-950;
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+	@apply dark:border-l-primary-950;
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+	@apply dark:border-b-primary-950;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+	@apply dark:border-t-primary-950;
+}
+
+/** Controls */
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-scale {
-	user-select: none;
+	@apply select-none;
 }
-[data-mode='dark'] .maplibregl-popup-content {
-	@apply bg-primary-950;
-}
-[data-mode='dark'] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	@apply border-r-primary-950;
-}
-[data-mode='dark'] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	@apply border-l-primary-950;
-}
-[data-mode='dark'] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	@apply border-b-primary-950;
-}
-[data-mode='dark'] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	@apply border-t-primary-950;
+.maplibregl-ctrl-scale {
+	@apply text-primary-600 dark:text-primary-300 dark:border-primary-500 border-primary-400 bg-transparent dark:bg-transparent;
+	@apply rounded-br-sm rounded-bl-sm border-r border-b border-l font-sans text-shadow-sm;
 }
