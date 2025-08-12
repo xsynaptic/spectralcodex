@@ -2,7 +2,7 @@
 import type { MenuItem } from '#lib/menu/menu-types.ts';
 
 import Link from '#components/parts/link.astro';
-import { getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
+import { getMenuItemAriaLabel, getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
 interface Props {
 	hasHeroImage: boolean;
@@ -54,7 +54,10 @@ const { pathname } = Astro.url;
 					id={getMenuItemId(item)}
 					class:list={['relative', depth === 1 ? 'group/d2' : 'group/d3']}
 				>
-					<button class="px-small flex w-full items-center justify-between gap-x-1 py-1 text-sm sm:px-2">
+					<button
+						class="px-small flex w-full items-center justify-between gap-x-1 py-1 text-sm sm:px-2"
+						aria-label={getMenuItemAriaLabel(item)}
+					>
 						<Link
 							href={item.url}
 							class:list={[
@@ -72,9 +75,9 @@ const { pathname } = Astro.url;
 								height="24"
 								viewBox="0 0 24 24"
 								class:list={['text-primary-400 invisible h-full w-[14px] sm:visible']}
-								aria-labelledby="menu-chevron-right"
+								aria-hidden="true"
 							>
-								<title id="menu-chevron-right">A right-facing chevron</title>
+								<title>A right-facing chevron</title>
 								<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z" />
 							</svg>
 						) : undefined}

@@ -4,20 +4,26 @@ import { menuFooterItems } from '#lib/menu/menu-footer.ts';
 import { isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
 const { pathname } = Astro.url;
+
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const t = getTranslations();
 ---
 
-<ul class="flex flex-wrap gap-x-4 gap-y-2">
-	{
-		menuFooterItems.map((item) => (
-			<li class="text-xs font-medium sm:text-sm">
-				<Link
-					href={item.url}
-					class:list={[isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined]}
-					linkColor="primary"
-				>
-					{item.title}
-				</Link>
-			</li>
-		))
-	}
-</ul>
+<nav class="pb-small text-sm" aria-label={t('site.menu.footer.label')}>
+	<ul class="flex flex-wrap gap-x-4 gap-y-2">
+		{
+			menuFooterItems.map((item) => (
+				<li class="text-xs font-medium sm:text-sm">
+					<Link
+						href={item.url}
+						class:list={[isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined]}
+						linkColor="primary"
+					>
+						{item.title}
+					</Link>
+				</li>
+			))
+		}
+	</ul>
+</nav>

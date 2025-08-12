@@ -47,24 +47,22 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 					: undefined;
 
 				return (
-					<DividedItem dividerContent={dividerContent}>
-						<span data-pagefind-filter="region">
-							{entry.data.title ? (
-								<Link href={getContentUrl(entry.collection, entry.id)}>
-									<Fragment set:html={entry.data.title.trim()} />
-								</Link>
-							) : undefined}
-							{titleMultilingual ? (
-								<>
-									{' '}
-									<Multilingual
-										content={titleMultilingual}
-										class="text-primary-600 dark:text-primary-400"
-										parenthesis={true}
-									/>
-								</>
-							) : undefined}
-						</span>
+					<DividedItem as="li" dividerContent={dividerContent} data-pagefind-filter="region">
+						{entry.data.title ? (
+							<Link href={getContentUrl(entry.collection, entry.id)}>
+								<Fragment set:html={entry.data.title.trim()} />
+							</Link>
+						) : undefined}
+						{titleMultilingual ? (
+							<>
+								{' '}
+								<Multilingual
+									content={titleMultilingual}
+									class="text-primary-600 dark:text-primary-400"
+									parenthesis={true}
+								/>
+							</>
+						) : undefined}
 					</DividedItem>
 				);
 			})}

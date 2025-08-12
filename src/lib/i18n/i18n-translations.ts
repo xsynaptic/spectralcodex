@@ -138,6 +138,7 @@ const translationStrings = {
 		'site.colophon.label': 'Colophon',
 		'site.menu.footer.label': 'Footer Navigation',
 		'site.menu.header.label': 'Header Navigation',
+		'site.menu.header.submenu.label': 'Submenu for %s',
 		'site.mode.toggle.label': 'Toggle mode',
 		'site.mode.toggle.dark.label': 'Dark mode',
 		'site.mode.toggle.light.label': 'Light mode',

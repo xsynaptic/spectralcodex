@@ -32,20 +32,20 @@ const t = getTranslations();
 					const titleMultilingual = getMultilingualContent(item.data, 'title');
 
 					return (
-						<DividedItem as="li" class="font-serif text-sm after:text-sm after:font-light">
-							<span data-pagefind-filter="theme">
-								{item.data.title ? (
-									<Link href={getContentUrl(item.collection, item.id)}>
-										{item.data.title.trim()}
-									</Link>
-								) : undefined}
-								{titleMultilingual ? (
-									<>
-										{' '}
-										<Multilingual content={titleMultilingual} parenthesis={true} />
-									</>
-								) : undefined}
-							</span>
+						<DividedItem
+							as="li"
+							class="font-serif text-sm after:text-sm after:font-light"
+							data-pagefind-filter="theme"
+						>
+							{item.data.title ? (
+								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title.trim()}</Link>
+							) : undefined}
+							{titleMultilingual ? (
+								<>
+									{' '}
+									<Multilingual content={titleMultilingual} parenthesis={true} />
+								</>
+							) : undefined}
 						</DividedItem>
 					);
 				})}
