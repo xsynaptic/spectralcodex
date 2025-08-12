@@ -5,6 +5,7 @@ import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { CONTENT_EXCERPT_IDENTIFIER } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props {
 	class?: string | undefined;
@@ -13,9 +14,9 @@ interface Props {
 
 const { class: className, entryUrl } = Astro.props;
 
-const subtitle = await Astro.slots.render('excerpt-subtitle');
-const description = await Astro.slots.render('excerpt-description');
-const content = (await Astro.slots.render('default')) as string | undefined;
+const subtitle = await renderSlot(Astro.slots, 'excerpt-subtitle');
+const description = await renderSlot(Astro.slots, 'excerpt-description');
+const content = await renderSlot(Astro.slots, 'default');
 
 // Generate the excerpt
 const excerptSplit = content?.split(`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`) ?? [];

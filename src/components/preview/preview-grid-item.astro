@@ -69,7 +69,7 @@ const t = getTranslations();
 			showCollection ? (
 				<DividedItem>
 					{indexUrl ? (
-						<Link href={indexUrl} class="font-semibold" darkMode={false}>
+						<Link href={indexUrl} class="font-semibold" showDarkMode={false}>
 							{t(`collection.${item.collection}.labelSingular`)}
 						</Link>
 					) : (
@@ -83,7 +83,7 @@ const t = getTranslations();
 				<DividedItem>
 					{regions.map((region) => (
 						<DividedItem dividerContent="chevron">
-							<Link href={getContentUrl('regions', region.id)} darkMode={false}>
+							<Link href={getContentUrl('regions', region.id)} showDarkMode={false}>
 								{region.data.title.trim()}
 							</Link>
 						</DividedItem>
@@ -126,7 +126,7 @@ const t = getTranslations();
 	{
 		showDescription ? (
 			<Fragment slot="preview-description">
-				<ProseDescription class="mt-1" showCompact={showDescriptionCompact} darkMode={false}>
+				<ProseDescription class="mt-1" showCompact={showDescriptionCompact} showDarkMode={false}>
 					<FormatMarkdown>{item.description}</FormatMarkdown>
 				</ProseDescription>
 			</Fragment>

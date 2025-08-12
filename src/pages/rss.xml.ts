@@ -17,9 +17,9 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getRenderMdxFunction } from '#lib/utils/astro.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
-import { getRenderMdxFunction } from '#lib/utils/mdx.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Provide some helpful info while debugging RSS feed generation

@@ -1,6 +1,8 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { renderSlot } from '#lib/utils/astro.ts';
+
 const LinkColorEnum = {
 	Primary: 'primary',
 	PrimaryBright: 'primary-bright',
@@ -28,7 +30,7 @@ const {
 	...props
 } = Astro.props;
 
-const children = (await Astro.slots.render('default')) as string | undefined;
+const children = await renderSlot(Astro.slots, 'default');
 ---
 
 <a
@@ -100,5 +102,5 @@ const children = (await Astro.slots.render('default')) as string | undefined;
 			: undefined,
 		className,
 	]}
-	{...props}><Fragment set:html={children?.trim()} /></a
+	{...props}><Fragment set:html={children} /></a
 >

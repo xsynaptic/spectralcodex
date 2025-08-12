@@ -3,13 +3,15 @@ import { transformMarkdown } from '@spectralcodex/unified-tools';
 
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
+import { renderSlot } from '#lib/utils/astro.ts';
+
 interface Props {
 	langCode?: Extract<LanguageCode, 'zh' | 'zh-CN' | 'ja' | 'ko'> | undefined;
 }
 
 const { langCode } = Astro.props;
 
-const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const slotContents = await renderSlot(Astro.slots, 'default');
 
 const output = transformMarkdown({
 	input: slotContents ?? '',

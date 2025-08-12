@@ -1,4 +1,5 @@
 ---
+import { renderSlot } from '#lib/utils/astro.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 
 const { locales, options } = Astro.props;
 
-const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const slotContents = await renderSlot(Astro.slots, 'default');
 ---
 
 {

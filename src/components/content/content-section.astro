@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import Container from '#components/parts/container.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
+import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
@@ -12,14 +13,14 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { class: className, fillViewport, titleLarge, ...props } = Astro.props;
 
-const title = await Astro.slots.render('section-title');
-const subtitle = await Astro.slots.render('section-subtitle');
-const description = await Astro.slots.render('section-description');
-const children = (await Astro.slots.render('default')) as string | undefined;
+const title = await renderSlot(Astro.slots, 'section-title');
+const subtitle = await renderSlot(Astro.slots, 'section-subtitle');
+const description = await renderSlot(Astro.slots, 'section-description');
+const children = await renderSlot(Astro.slots, 'default');
 ---
 
 {
-	description || children?.trim() ? (
+	description || children ? (
 		<Container class:list={['mb-medium', className]} fillViewport={fillViewport} {...props}>
 			{title || subtitle || description ? (
 				<header

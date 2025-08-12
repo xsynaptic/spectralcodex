@@ -2,6 +2,7 @@
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import { ImageLayoutEnum } from '#lib/image/image-layout.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props {
 	layout?: Extract<ImageLayout, 'medium' | 'wide'>;
@@ -14,7 +15,7 @@ const { layout, columns: columnsProp } = Astro.props;
 const { isRss } = Astro.locals;
 
 // This outputs MDX components already transformed into HTML
-const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const slotContents = await renderSlot(Astro.slots, 'default');
 
 const imageCount = slotContents?.match(new RegExp('<img', 'g'))?.length ?? 0;
 

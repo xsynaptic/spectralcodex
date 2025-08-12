@@ -2,6 +2,7 @@
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMenuHeaderItems } from '#lib/menu/menu-header.ts';
 import { getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
@@ -14,9 +15,11 @@ const { hasHeroImage } = Astro.props;
 const { pathname } = Astro.url;
 
 const menuItems = await getMenuHeaderItems();
+
+const t = getTranslations();
 ---
 
-<Container as="nav" class="relative">
+<Container as="nav" class="relative" aria-label={t('site.menu.header.label')}>
 	<ul
 		class:list={[
 			'flex flex-wrap justify-between gap-x-4 gap-y-2 md:gap-x-2',

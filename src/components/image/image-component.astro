@@ -11,6 +11,7 @@ import { FEATURE_IMAGE_ENTRY_PAGES } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
@@ -25,7 +26,7 @@ const { imageId, alt: altProp, layout = ImageLayoutEnum.Default } = Astro.props;
 // This controls how the component is rendered; RSS requires a less complex output
 const { isRss } = Astro.locals;
 
-const slotContents = (await Astro.slots.render('default')) as string | undefined;
+const slotContents = await renderSlot(Astro.slots, 'default');
 
 const imageEntry = await getImageById(imageId);
 

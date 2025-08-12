@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import { getContentMetadataById } from '#lib/metadata/metadata-utils.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'a'> {
 	id?: string | undefined;
@@ -9,7 +10,7 @@ interface Props extends HTMLAttributes<'a'> {
 
 const { id, ...props } = Astro.props;
 
-const content = (await Astro.slots.render('default')) as string | undefined;
+const content = await renderSlot(Astro.slots, 'default');
 
 const contentMetadata = await getContentMetadataById(id ?? content?.toLowerCase());
 ---

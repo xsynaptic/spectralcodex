@@ -1,6 +1,8 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
+import { renderSlot } from '#lib/utils/astro.ts';
+
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	class?: string | undefined;
@@ -10,7 +12,7 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 
 const { as: Tag = 'span', class: className, before = '(', after = ')' } = Astro.props;
 
-const content = await Astro.slots.render('default');
+const content = await renderSlot(Astro.slots, 'default');
 ---
 
 {

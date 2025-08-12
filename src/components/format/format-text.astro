@@ -1,7 +1,9 @@
 ---
 import { stylizeText } from '@spectralcodex/unified-tools';
 
-const slotContents = (await Astro.slots.render('default')) as string | undefined;
+import { renderSlot } from '#lib/utils/astro.ts';
+
+const slotContents = await renderSlot(Astro.slots, 'default');
 
 const output = stylizeText(slotContents ?? '');
 ---

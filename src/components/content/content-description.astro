@@ -10,7 +10,7 @@ import FormatMarkdown from '#components/format/format-markdown.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getHasContent } from '#lib/utils/collections.ts';
+import { getHasContent } from '#lib/utils/astro.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;

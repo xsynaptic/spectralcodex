@@ -8,6 +8,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -38,9 +39,9 @@ const imageProps = imageEntry
 		} satisfies RemoteImageProps)
 	: undefined;
 
-const titleMultilingual = await Astro.slots.render('preview-title-multilingual');
-const subtitle = await Astro.slots.render('preview-subtitle');
-const description = await Astro.slots.render('preview-description');
+const titleMultilingual = await renderSlot(Astro.slots, 'preview-title-multilingual');
+const subtitle = await renderSlot(Astro.slots, 'preview-subtitle');
+const description = await renderSlot(Astro.slots, 'preview-description');
 
 const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 ---

@@ -1,6 +1,7 @@
 ---
 import Container from '#components/parts/container.astro';
 import TextGradient from '#components/parts/text-gradient.astro';
+import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props {
 	class?: string | undefined;
@@ -9,10 +10,10 @@ interface Props {
 
 const { class: className, showFeatured } = Astro.props;
 
-const titleMultilingual = await Astro.slots.render('header-title-multilingual');
-const titleInfo = await Astro.slots.render('header-title-info');
-const subtitle = await Astro.slots.render('header-subtitle');
-const caption = await Astro.slots.render('header-caption');
+const titleMultilingual = await renderSlot(Astro.slots, 'header-title-multilingual');
+const titleInfo = await renderSlot(Astro.slots, 'header-title-info');
+const subtitle = await renderSlot(Astro.slots, 'header-subtitle');
+const caption = await renderSlot(Astro.slots, 'header-caption');
 ---
 
 <Container

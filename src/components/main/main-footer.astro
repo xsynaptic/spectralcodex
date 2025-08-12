@@ -2,6 +2,9 @@
 import MainColophon from '#components/main/main-colophon.astro';
 import MenuFooter from '#components/menu/menu-footer.astro';
 import Container from '#components/parts/container.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const t = getTranslations();
 ---
 
 <Container as="footer" class="mb-medium mt-medium w-full pt-4">
@@ -11,7 +14,7 @@ import Container from '#components/parts/container.astro';
 			'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
 		]}
 	>
-		<nav class="pb-small text-sm">
+		<nav class="pb-small text-sm" aria-label={t('site.menu.footer.label')}>
 			<MenuFooter />
 		</nav>
 		<MainColophon />
