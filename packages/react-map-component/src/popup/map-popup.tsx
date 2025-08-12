@@ -47,7 +47,9 @@ export const MapPopup = memo(function MapPopup() {
 						style={{ opacity: popupDataLoading ? 1 : 0 }}
 					/>
 				</div>
-				{popupDataLoading ? undefined : <MapPopupContent />}
+				<div style={{ opacity: popupDataLoading ? 0 : 1 }}>
+					{popupDataLoading ? undefined : <MapPopupContent key={popupItem.id} />}
+				</div>
 			</div>
 		</Popup>
 	) : undefined;

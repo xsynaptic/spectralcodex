@@ -43,7 +43,7 @@ export const MapPopupContent = () => {
 			) : undefined}
 			<div className="flex flex-col px-2 pt-1 pb-2">
 				{titleMultilingualLang && titleMultilingualValue ? (
-					<div className="from-accent-500 to-accent-600 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
+					<div className="from-accent-500 to-accent-600 dark:from-accent-400 dark:to-accent-500 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
 						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 					</div>
 				) : undefined}
@@ -66,7 +66,7 @@ export const MapPopupContent = () => {
 				) : undefined}
 				{description ? (
 					<div
-						className="mt-1 mb-2 max-h-[126px] overflow-x-auto text-sm"
+						className="mt-1 mb-2 max-h-[119px] overflow-x-auto text-sm"
 						dangerouslySetInnerHTML={{ __html: description }}
 					/>
 				) : undefined}
@@ -78,12 +78,12 @@ export const MapPopupContent = () => {
 							void navigator.clipboard.writeText(coordinatesString);
 						}}
 					>
-						<div className="text-primary-400 group-hover:text-highlight-300 transition-colors duration-300">
+						<div className="text-primary-400 dark:text-primary-500 group-hover:text-highlight-300 transition-colors duration-300">
 							{coordinatesString}
 						</div>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							className="text-primary-500 group-hover:text-highlight-400 h-[14px] transition-colors duration-300"
+							className="text-primary-500 dark:text-primary-400 group-hover:text-highlight-400 h-[14px] transition-colors duration-300"
 							viewBox="0 0 24 24"
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>

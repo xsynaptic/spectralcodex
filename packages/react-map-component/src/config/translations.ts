@@ -6,4 +6,5 @@ export const translations = {
 	points: 'Points',
 	precisionWarning: 'Coordinates for this point are imprecise!',
 	precisionError: 'Coordinates for this point are only a guess!',
+	filterMenuAriaLabel: 'Filter Menu',
 } as const;

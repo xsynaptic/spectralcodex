@@ -1,5 +1,5 @@
 import type { LocationStatus } from '@spectralcodex/map-types';
-import type { ReactNode } from 'react';
+import type { FC, PropsWithChildren } from 'react';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, useMemo } from 'react';
@@ -21,15 +21,25 @@ import {
 	useMapStoreActions,
 } from '../store/hooks/use-map-store';
 
-const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
-	status,
-	isFiltered,
-	data,
-}: {
+const MapFilterMenuItem: FC<
+	PropsWithChildren<{
+		isActive?: boolean;
+	}>
+> = memo(function MapFilterMenuItem({ isActive, children }) {
+	return (
+		<li
+			className={`rounded-sm transition-colors ${isActive ? 'bg-primary-200 hover:bg-primary-300 dark:bg-primary-800 dark:hover:bg-primary-700' : 'bg-primary-50 hover:bg-primary-100 dark:bg-primary-900 dark:hover:bg-primary-800'}`}
+		>
+			{children}
+		</li>
+	);
+});
+
+const MapFilterStatusMenuItem: FC<{
 	status: LocationStatus;
 	isFiltered: boolean;
 	data: LocationStatusMetadata;
-}) {
+}> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
 	const languages = useMapLanguages();
 
 	const showChinese = useMemo(() => languages?.some((lang) => lang.startsWith('zh')), [languages]);
@@ -37,9 +47,7 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 	const { toggleStatusFilter } = useMapStoreActions();
 
 	return (
-		<li
-			className={`rounded-sm transition-colors ${isFiltered ? 'bg-primary-200 hover:bg-primary-300' : 'bg-primary-50 hover:bg-primary-100'}`}
-		>
+		<MapFilterMenuItem isActive={isFiltered}>
 			<button
 				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
 				onClick={() => {
@@ -54,13 +62,13 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 					}}
 				></div>
 				<div
-					className={`font-display flex w-full flex-nowrap items-center justify-between gap-1 text-xs sm:text-sm ${isFiltered ? 'text-primary-500' : 'text-primary-700'}`}
+					className={`font-display flex w-full flex-nowrap items-center justify-between gap-2 text-xs sm:text-sm ${isFiltered ? 'text-primary-500 dark:text-primary-400' : 'text-primary-700 dark:text-primary-300'}`}
 				>
 					{showChinese ? (
 						<>
 							<span>{data.title}</span>
 							<span
-								className={`font-sans font-medium sm:text-xs ${isFiltered ? 'text-primary-400' : 'text-primary-600'}`}
+								className={`font-sans font-medium sm:text-xs ${isFiltered ? 'text-primary-400 dark:text-primary-500' : 'text-primary-600 dark:text-primary-400'}`}
 							>
 								{data.title_zh}
 							</span>
@@ -70,35 +78,33 @@ const MapFilterStatusMenuItem = memo(function MapFilterStatusMenuItem({
 					)}
 				</div>
 			</button>
-		</li>
+		</MapFilterMenuItem>
 	);
 });
 
-const MapFilterStatusShowHideMenuItem = memo(function MapFilterStatusShowHideMenuItem({
-	onClick,
-	children,
-}: {
-	onClick: () => void;
-	children: ReactNode;
-}) {
+const MapFilterStatusShowHideMenuItem: FC<
+	PropsWithChildren<{
+		onClick: () => void;
+	}>
+> = memo(function MapFilterStatusShowHideMenuItem({ onClick, children }) {
 	return (
-		<li className="bg-primary-50 hover:bg-primary-100 rounded-sm transition-colors">
+		<MapFilterMenuItem>
 			<button
 				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
 				onClick={onClick}
 			>
 				<div className={`border-primary-500 bg-primary-200 h-2 w-2 rounded-full border`}></div>
 				<div
-					className={`font-display text-primary-700 flex w-full flex-nowrap items-center justify-between gap-1 text-xs sm:text-sm`}
+					className={`font-display text-primary-700 dark:text-primary-300 flex w-full flex-nowrap items-center justify-between gap-2 text-xs sm:text-sm`}
 				>
 					{children}
 				</div>
 			</button>
-		</li>
+		</MapFilterMenuItem>
 	);
 });
 
-const MapFilterStatusShowHideMenu = () => {
+const MapFilterStatusShowHideMenu: FC = () => {
 	const mapLanguages = useMapLanguages();
 
 	const showChinese = useMemo(
@@ -118,7 +124,7 @@ const MapFilterStatusShowHideMenu = () => {
 				{showChinese ? (
 					<>
 						<span>{translations.showAll}</span>
-						<span className="text-primary-600 font-sans font-medium sm:text-xs">
+						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
 							{translations.showAllAlt}
 						</span>
 					</>
@@ -134,7 +140,7 @@ const MapFilterStatusShowHideMenu = () => {
 				{showChinese ? (
 					<>
 						<span>{translations.hideAll}</span>
-						<span className="text-primary-600 font-sans font-medium sm:text-xs">
+						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
 							{translations.hideAllAlt}
 						</span>
 					</>
@@ -146,7 +152,7 @@ const MapFilterStatusShowHideMenu = () => {
 	);
 };
 
-const MapFilterRatingMenuItem = () => {
+const MapFilterRatingMenuItem: FC = () => {
 	const ratingFilterValue = useMapRatingFilter();
 
 	const { setRatingFilter } = useMapStoreActions();
@@ -159,7 +165,7 @@ const MapFilterRatingMenuItem = () => {
 						key={`rating-${String(value)}`}
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 36 36"
-						className={`w-[16px] cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 hover:text-highlight-300 focus:text-primary-300'}`}
+						className={`w-[16px] cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 dark:text-primary-600 dark:focus:text-primary-400 hover:text-highlight-300 focus:text-primary-300'}`}
 						onClick={() => {
 							if (ratingFilterValue === value) {
 								setRatingFilter(1);
@@ -176,7 +182,7 @@ const MapFilterRatingMenuItem = () => {
 	);
 };
 
-const MapFilterObjectiveMenuItem = () => {
+const MapFilterObjectiveMenuItem: FC = () => {
 	const objectiveFilter = useMapObjectiveFilter();
 	const { setObjectiveFilter } = useMapStoreActions();
 
@@ -198,11 +204,9 @@ const MapFilterObjectiveMenuItem = () => {
 	);
 };
 
-export const MapControlsFilterMenu = ({
-	filterPopupOffset = 8,
-}: {
+export const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
-}) => {
+}> = ({ filterPopupOffset = 8 }) => {
 	const filterPosition = useMapFilterPosition();
 	const filterOpen = useMapFilterOpen();
 	const statusFilter = useMapStatusFilter();

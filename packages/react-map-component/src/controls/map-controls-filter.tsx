@@ -1,6 +1,7 @@
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
+import { translations } from 'packages/react-map-component/src/config/translations';
 
 import { MAP_FILTER_CONTROL_ID } from '../constants';
 import {
@@ -29,6 +30,7 @@ export const FilterControl = ({ position }: { position: ControlPosition }) => {
 				onClick={() => {
 					if (!isLoading) setFilterOpen(!filterOpen);
 				}}
+				aria-label={translations.filterMenuAriaLabel}
 			>
 				<div
 					className={`text-primary-700 flex h-full w-full items-center justify-center ${filterOpen ? 'bg-primary-300 hover:bg-primary-200' : ''} ${isLoading ? 'bg-primary-200 opacity-50' : ''}`}
