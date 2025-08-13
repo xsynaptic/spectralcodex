@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
@@ -5,7 +6,7 @@ import { translations } from '../config/translations';
 import { useMapSourceDataCount, useMapSourceDataLoading } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const MetricsControl = ({ position }: { position: ControlPosition }) => {
+export const MetricsControl: FC<{ position: ControlPosition }> = ({ position }) => {
 	const sourceDataLoading = useMapSourceDataLoading();
 	const sourceDataCount = useMapSourceDataCount();
 	const { filteredCount } = useMapCanvasData();

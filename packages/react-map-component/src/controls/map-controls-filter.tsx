@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
@@ -12,7 +13,7 @@ import {
 } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const FilterControl = ({ position }: { position: ControlPosition }) => {
+export const FilterControl: FC<{ position: ControlPosition }> = ({ position }) => {
 	const sourceDataLoading = useMapSourceDataLoading();
 	const mapCanvasLoading = useMapCanvasLoading();
 	const { setFilterOpen } = useMapStoreActions();

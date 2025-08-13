@@ -1,4 +1,6 @@
-export const MapCanvasLoading = ({ loading }: { loading: boolean }) => {
+import type { FC } from 'react';
+
+export const MapCanvasLoading: FC<{ loading: boolean }> = ({ loading }) => {
 	return (
 		<div className="flex h-full justify-center">
 			<div

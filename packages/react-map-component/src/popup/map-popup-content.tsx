@@ -1,12 +1,24 @@
+import type { LngLat } from 'maplibre-gl';
+import type { FC } from 'react';
+
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';
 import { useMapPopupItem } from '../store/hooks/use-map-store';
-import { getGoogleMapsUrlFromGeometry } from './map-popup-utils';
 
-export const MapPopupContent = () => {
+// Generate a standard Google Maps URL from a set of coordinates
+function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
+	const url = new URL('https://www.google.com/maps/search/');
+
+	url.searchParams.set('api', '1');
+	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
+
+	return url.toString();
+}
+
+export const MapPopupContent: FC = () => {
 	const popupItem = useMapPopupItem();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 

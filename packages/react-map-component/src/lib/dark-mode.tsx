@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-global-this */
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { createContext, useEffect, useState } from 'react';
 
@@ -20,7 +20,7 @@ interface ModeChangedEvent extends CustomEvent {
 
 export const DarkModeContext = createContext<boolean>(false);
 
-export function DarkModeProvider({ children }: { children: ReactNode }) {
+export function DarkModeProvider({ children }: PropsWithChildren) {
 	const [isDarkMode, setDarkMode] = useState(() => {
 		if (typeof window === 'undefined') return false;
 

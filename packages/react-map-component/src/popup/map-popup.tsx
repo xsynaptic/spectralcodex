@@ -1,3 +1,5 @@
+import type { FC } from 'react';
+
 import { memo, useCallback } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
@@ -10,7 +12,7 @@ import {
 } from '../store/hooks/use-map-store';
 import { MapPopupContent } from './map-popup-content';
 
-export const MapPopup = memo(function MapPopup() {
+export const MapPopup: FC = memo(function MapPopup() {
 	const popupDataLoading = useMapPopupDataLoading();
 	const popupItem = useMapPopupItem();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });

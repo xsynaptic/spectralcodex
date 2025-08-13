@@ -1,3 +1,4 @@
+import type { GeoJSONSource, Source } from 'maplibre-gl';
 import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
@@ -14,7 +15,15 @@ import {
 	useMapSourceDataLoading,
 	useMapStoreActions,
 } from '../../store/hooks/use-map-store';
-import { isMapCoordinates, isMapGeojsonSource } from '../map-canvas-utils';
+
+const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
+
+const isMapCoordinates = (input: unknown): input is [number, number] =>
+	!!input &&
+	Array.isArray(input) &&
+	input.length === 2 &&
+	typeof input[0] === 'number' &&
+	typeof input[1] === 'number';
 
 export function useMapCanvasEvents() {
 	const isInteractive = useMapCanvasInteractive();

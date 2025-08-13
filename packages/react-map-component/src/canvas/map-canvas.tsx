@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import type { CSSProperties, FC } from 'react';
 
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
@@ -29,7 +29,11 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.PointsImage,
 ] as const;
 
-export const MapCanvas = ({
+export const MapCanvas: FC<
+	Omit<MapComponentProps, 'geodata' | 'cluster'> & {
+		style?: CSSProperties | undefined;
+	}
+> = ({
 	apiSourceUrl,
 	apiDivisionUrl,
 	apiPopupUrl,
@@ -44,8 +48,6 @@ export const MapCanvas = ({
 	spritesUrl,
 	spritesId,
 	isDev,
-}: Omit<MapComponentProps, 'geodata' | 'cluster'> & {
-	style?: CSSProperties | undefined;
 }) => {
 	const mapStyle = useProtomaps({
 		protomapsApiKey,
