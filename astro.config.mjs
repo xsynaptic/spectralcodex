@@ -9,7 +9,6 @@ import tailwindcss from '@tailwindcss/vite';
 import AutoImport from 'astro-auto-import';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
-import { nanoid } from 'nanoid';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
 
@@ -67,11 +66,11 @@ export default defineConfig({
 		: {}),
 	env: {
 		schema: {
-			BUILD_OUTPUT_PATH: envField.string({
-				context: 'server',
-				access: 'secret',
-				// This should match `outDir`; `server` must be added to the path when using the Node adapter
-				default: isSsr ? './dist/server' : './dist',
+			MAP_ICONS_PATH: envField.string({
+				context: 'client',
+				access: 'public',
+				optional: false,
+				default: 'icons/map-icons',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				context: 'client',
@@ -84,9 +83,6 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss()],
-		define: {
-			'import.meta.env.BUILD_ID': JSON.stringify(isProduction ? nanoid() : 'dev'),
-		},
 		server: {
 			watch: {
 				ignored: ['./*.md'],
@@ -187,5 +183,6 @@ export default defineConfig({
 			},
 		],
 		contentIntellisense: true,
+		staticImportMetaEnv: true,
 	},
 });

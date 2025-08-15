@@ -18,7 +18,7 @@
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --content-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD --content-path=packages/content",
 		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions",
-		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons",
+		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
 		"deploy-static": "tsx --env-file=.env ./scripts/deploy-static.ts"
 	},

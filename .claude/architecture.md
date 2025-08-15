@@ -80,5 +80,4 @@ Key environment variables (see astro.config.mjs):
 - `NODE_ENV`: Environment mode
 - `DEV_SERVER_URL`: Development server URL
 - `PROD_SERVER_URL`: Production server URL
-- `BUILD_OUTPUT_PATH`: Build output directory
 - `MAP_PROTOMAPS_API_KEY`: Map API key

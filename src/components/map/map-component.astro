@@ -2,16 +2,18 @@
 import type { MapComponentProps } from '@spectralcodex/react-map-component';
 
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
+import { MAP_ICONS_PATH } from 'astro:env/client';
 
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
-import { FEATURE_MAP_ICONS } from '#constants.ts';
 import '#styles/map.css';
+import { FEATURE_MAP_ICONS } from '#constants.ts';
 
 type Props = MapComponentProps & { mapId?: string | undefined };
 
 const { mapId, ...mapComponentProps } = Astro.props;
 
-const spritesUrl = FEATURE_MAP_ICONS ? new URL('icons/map-icons', Astro.site).href : undefined;
+const spritesUrl =
+	FEATURE_MAP_ICONS && MAP_ICONS_PATH ? new URL(MAP_ICONS_PATH, Astro.site).href : undefined;
 ---
 
 <MapComponentSprites />

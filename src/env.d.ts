@@ -1,14 +1,3 @@
-// Not covered by astro:env but sometimes used in the application
-interface ImportMetaEnv {
-	readonly BUILD_ID: string;
-	readonly BUILD_OUTPUT_PATH: string;
-	readonly MAP_ICONS_PATH: string;
-}
-
-interface ImportMeta {
-	readonly env: ImportMetaEnv;
-}
-
 type ModeType = 'auto' | 'dark' | 'light';
 
 interface ModeManager {

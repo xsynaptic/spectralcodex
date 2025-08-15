@@ -102,8 +102,8 @@ async function generateMapSpritesheet(): Promise<void> {
 	console.log(chalk.blue('Generating map icon spritesheets...'));
 
 	try {
-		await $`spreet --unique --minify-index-file --sdf ${iconsPath} ${outputPath}/map-icons`;
-		await $`spreet --retina --unique --minify-index-file --sdf ${iconsPath} ${outputPath}/map-icons@2x`;
+		await $`spreet --unique --minify-index-file --sdf ${iconsPath} ${outputPath}`;
+		await $`spreet --retina --unique --minify-index-file --sdf ${iconsPath} ${outputPath}@2x`;
 
 		console.log(chalk.green('Spritesheets generated successfully'));
 	} catch (error) {
