@@ -49,7 +49,7 @@ const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
 
 const regions =
 	showRegion && item.regionPrimaryId
-		? getRegionAncestorsById(item.regionPrimaryId).slice(0, 2).reverse()
+		? getRegionAncestorsById(item.regionPrimaryId).slice(0, 2).toReversed()
 		: undefined;
 
 const t = getTranslations();

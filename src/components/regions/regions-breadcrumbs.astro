@@ -27,7 +27,7 @@ const {
 
 const getRegionAncestors = await getRegionAncestorsFunction();
 
-const termAncestors = getRegionAncestors(entry).reverse();
+const termAncestors = getRegionAncestors(entry).toReversed();
 
 const t = getTranslations();
 ---
