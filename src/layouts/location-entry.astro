@@ -56,6 +56,7 @@ const regionLangCode = regionPrimary?.data.langCode;
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
+const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 
 const t = getTranslations();
 ---
@@ -138,9 +139,9 @@ const t = getTranslations();
 		}
 		<ContentDescription entry={entry} />
 		<LocationsHeritage heritage={entry.data.heritage} />
-		{entry.data.hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
+		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{
-			entry.data.hideLocation ? undefined : (
+			hideLocation ? undefined : (
 				<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
 			)
 		}
@@ -157,7 +158,7 @@ const t = getTranslations();
 		/>
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
 			{
-				entry.data.address && !entry.data.hideLocation ? (
+				entry.data.address && !hideLocation ? (
 					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
 						{t('locations.address.label')}:{' '}
 						{regionLangCode ? (

@@ -82,9 +82,10 @@ export function getLocationsFeatureCollection(
 		options ?? {},
 	);
 
-	const locationsFiltered = showAllLocations
-		? locations
-		: locations.filter((entry) => entry.data.hideLocation !== true);
+	const locationsFiltered =
+		showAllLocations || import.meta.env.DEV
+			? locations
+			: locations.filter((entry) => !entry.data.hideLocation);
 
 	return featureCollection<MapGeometry, MapFeatureProperties>(
 		locationsFiltered.flatMap((entry) => {

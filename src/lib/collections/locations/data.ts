@@ -247,10 +247,12 @@ async function generateCollection() {
 
 	const locations = await getCollection('locations');
 
+	const locationsFiltered = import.meta.env.DEV
+		? locations
+		: locations.filter((location) => !location.data.hideLocation);
+
 	const generateLocationPostData = await generateLocationPostDataFunction();
-	const generateNearbyItems = getGenerateNearbyItemsFunction(
-		locations.filter((location) => !location.data.hideLocation),
-	);
+	const generateNearbyItems = getGenerateNearbyItemsFunction(locationsFiltered);
 
 	// Loop through every item in the collection and add metadata
 	for (const entry of locations) {
