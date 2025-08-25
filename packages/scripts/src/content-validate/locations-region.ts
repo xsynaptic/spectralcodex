@@ -3,7 +3,7 @@ import chalk from 'chalk';
 
 import { parseContentFiles } from '../content-utils';
 
-export async function checkLocationRegions(locationsPath: string) {
+export async function checkLocationsRegions(locationsPath: string) {
 	console.log(chalk.blue('Checking for location/region mismatches...'));
 
 	const parsedFiles = await parseContentFiles(locationsPath);

@@ -6,7 +6,8 @@ import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/colle
 import { $ } from 'zx';
 
 import { checkDivisionIds } from './divisions';
-import { checkLocationRegions } from './locations-region';
+import { checkLocationsRegions } from './locations-region';
+import { checkLocationsVisibility } from './locations-visibility';
 import { checkContentQuality } from './quality';
 import { checkSlugMismatches } from './slug-mismatch';
 
@@ -62,40 +63,20 @@ const ContentFilesPathEnum = {
 	),
 } as const;
 
-function showHelp() {
-	console.log(chalk.blue('Content Utilities'));
-	console.log(chalk.blue('================'));
-	console.log('Available commands:');
-	console.log('  slug-mismatch    Check for MDX files where slug field does not match filename');
-	console.log('                   (locations and regions collections only)');
-	console.log('  location-regions Check that location regions match their directory structure');
-	console.log('                   (locations collection only)');
-	console.log('  divisions        Check for regions without divisionId property');
-	console.log('                   (regions collection only)');
-	console.log(
-		'  quality          Check for content quality issues (e.g., featured images with low quality)',
-	);
-	console.log('                   (on-demand validation only)');
-	console.log('');
-	console.log('Options:');
-	console.log('  --verbose        Show detailed output');
-	console.log('');
-	console.log('Usage:');
-	console.log('  pnpm validate-content slug-mismatch');
-	console.log('  pnpm validate-content location-regions');
-	console.log('  pnpm validate-content divisions');
-	console.log('  pnpm validate-content quality');
-}
-
 const command = positionals[0];
 
+// Note: there is no need for a help command
 switch (command) {
 	case 'slug-mismatch': {
 		await checkSlugMismatches(ContentFilesPathEnum);
 		break;
 	}
 	case 'location-regions': {
-		await checkLocationRegions(ContentFilesPathEnum.Locations);
+		await checkLocationsRegions(ContentFilesPathEnum.Locations);
+		break;
+	}
+	case 'location-visibility': {
+		await checkLocationsVisibility(ContentFilesPathEnum.Locations);
 		break;
 	}
 	case 'divisions': {
@@ -104,12 +85,6 @@ switch (command) {
 	}
 	case 'quality': {
 		await checkContentQuality(ContentFilesPathEnum);
-		break;
-	}
-	case 'help':
-	case '--help':
-	case '-h': {
-		showHelp();
 		break;
 	}
 	default: {
@@ -123,7 +98,7 @@ switch (command) {
 
 		if (!slugSuccess) process.exit(1);
 
-		const regionSuccess = await checkLocationRegions(ContentFilesPathEnum.Locations);
+		const regionSuccess = await checkLocationsRegions(ContentFilesPathEnum.Locations);
 
 		if (!regionSuccess) process.exit(1);
 
