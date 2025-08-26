@@ -11,7 +11,8 @@ import { featureCollection } from '@turf/helpers';
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 /**
- * Generate a feature collection for an image entry; used to generate map data for image pages
+ * Generate a feature collection for an image entry; used to generate map data
+ * Note: not currently used in the project
  */
 export function getImageFeatureCollection(entry: CollectionEntry<'images'>) {
 	return entry.data.geometry

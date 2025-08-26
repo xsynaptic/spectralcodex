@@ -14,7 +14,7 @@ const { src: imageId, ...props } = Astro.props;
 
 {
 	imageId ? (
-		<ImageComponent imageId={imageId} {...props}>
+		<ImageComponent imageId={imageId} showMetadata={true} {...props}>
 			<slot />
 		</ImageComponent>
 	) : undefined

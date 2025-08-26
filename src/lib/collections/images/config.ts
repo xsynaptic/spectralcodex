@@ -12,14 +12,6 @@ import {
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
-const ImageBaseSchema = z.object({
-	src: z.string(),
-	path: z.string(),
-	width: z.number(),
-	height: z.number(),
-	modifiedTime: z.date().optional(),
-});
-
 const ImageExifDataSchema = z.object({
 	title: z.string(),
 	description: z.string(),
@@ -43,7 +35,12 @@ const ImageExifDataSchema = z.object({
 
 type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
 
-const ImageMetadataSchema = ImageBaseSchema.merge(ImageExifDataSchema).extend({
+const ImageMetadataSchema = ImageExifDataSchema.extend({
+	src: z.string(),
+	path: z.string(),
+	width: z.number(),
+	height: z.number(),
+	modifiedTime: z.date().optional(),
 	placeholder: z.string().optional(),
 });
 

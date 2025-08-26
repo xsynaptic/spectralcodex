@@ -5,23 +5,28 @@ import { Image } from 'astro:assets';
 
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
-import ImageLink from '#components/image/image-link.astro';
+import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import { FEATURE_IMAGE_ENTRY_PAGES } from '#constants.ts';
+import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
 interface Props {
 	imageId: string;
 	alt?: string;
 	layout?: ImageLayout;
+	showMetadata?: boolean;
 }
 
-const { imageId, alt: altProp, layout = ImageLayoutEnum.Default } = Astro.props;
+const {
+	imageId,
+	alt: altProp,
+	layout = ImageLayoutEnum.Default,
+	showMetadata = false,
+} = Astro.props;
 
 // This controls how the component is rendered; RSS requires a less complex output
 const { isRss } = Astro.locals;
@@ -29,9 +34,6 @@ const { isRss } = Astro.locals;
 const slotContents = await renderSlot(Astro.slots, 'default');
 
 const imageEntry = await getImageById(imageId);
-
-const imageLinkUrl =
-	FEATURE_IMAGE_ENTRY_PAGES && imageEntry?.id ? getSiteUrl('image', imageEntry.id) : undefined;
 
 const imageProps = imageEntry
 	? ((isRss
@@ -86,8 +88,8 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 			>
 				<ImagePlaceholder
 					class:list={[
+						'group relative',
 						layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
-						imageLinkUrl ? 'group relative' : undefined,
 					]}
 					placeholder={placeholder}
 				>
@@ -99,7 +101,9 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 						loading="lazy"
 						{...imageProps}
 					/>
-					{imageLinkUrl ? <ImageLink imageLinkUrl={imageLinkUrl} /> : undefined}
+					{FEATURE_IMAGE_METADATA && showMetadata && imageEntry ? (
+						<ImageMetadata entry={imageEntry} />
+					) : undefined}
 				</ImagePlaceholder>
 				{caption ? (
 					<figcaption

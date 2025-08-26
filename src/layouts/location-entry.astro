@@ -134,17 +134,13 @@ const t = getTranslations();
 		}
 		{
 			!hasContent && entry.data.imageFeatured ? (
-				<ImageComponent imageId={entry.data.imageFeatured} alt={title} />
+				<ImageComponent imageId={entry.data.imageFeatured} alt={title} showMetadata={true} />
 			) : undefined
 		}
 		<ContentDescription entry={entry} />
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
-		{
-			hideLocation ? undefined : (
-				<ContentSectionDateVisited dateVisited={entry.data.dateVisited} />
-			)
-		}
+		{hideLocation ? undefined : <ContentSectionDateVisited dateVisited={entry.data.dateVisited} />}
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
@@ -156,22 +152,24 @@ const t = getTranslations();
 				showTitleMultilingual: true,
 			}}
 		/>
-		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
-			{
-				entry.data.address && !hideLocation ? (
-					<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
-						{t('locations.address.label')}:{' '}
-						{regionLangCode ? (
-							<span>
-								<FormatCjk langCode={regionLangCode}>{entry.data.address}</FormatCjk>
-							</span>
-						) : (
-							<span>{entry.data.address}</span>
-						)}
-					</address>
-				) : undefined
-			}
-		</ContentSectionMap>
+		{
+			hideLocation ? undefined : (
+				<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
+					{entry.data.address ? (
+						<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
+							{t('locations.address.label')}:{' '}
+							{regionLangCode ? (
+								<span>
+									<FormatCjk langCode={regionLangCode}>{entry.data.address}</FormatCjk>
+								</span>
+							) : (
+								<span>{entry.data.address}</span>
+							)}
+						</address>
+					) : undefined}
+				</ContentSectionMap>
+			)
+		}
 		<LocationsNotices entry={entry} langCode={regionLangCode} />
 		<LocationsNearbyList entry={entry} />
 		<ContentSectionRelated entry={entry} />

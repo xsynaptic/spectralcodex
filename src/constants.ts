@@ -13,8 +13,10 @@ export const CONTENT_MEDIA_PATH = './packages/content/media';
 // Remote host for media assets; mainly used to offset memory usage from direct imports
 export const CONTENT_MEDIA_HOST = 'http://localhost:4321/media';
 
+// An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
+// Minimum width for featured images
 export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
 
 /**
@@ -84,12 +86,6 @@ export const FEATURE_DATE_ARCHIVES = false as boolean;
 
 // Image metadata generation; set to "true" to enable
 export const FEATURE_IMAGE_METADATA = false as boolean;
-
-// Image metadata page; set to "true" to enable
-export const FEATURE_IMAGE_ENTRY_PAGES = false as boolean;
-
-// Image metadata page maps; set to "true" to enable
-export const FEATURE_IMAGE_ENTRY_MAPS = false as boolean;
 
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
