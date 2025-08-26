@@ -14,13 +14,14 @@ const { entry } = Astro.props;
 const t = getTranslations();
 ---
 
-<div
-	class:list={[
-		'group/meta',
-		'absolute right-0 bottom-0 left-0 flex items-end transition-opacity delay-200 duration-300 sm:opacity-0 sm:group-hover:opacity-100',
-	]}
->
-	<div class="text-primary-50 z-10 ml-auto cursor-pointer p-2">
+<div class:list={['group absolute right-0 bottom-0 left-0 flex items-end']} data-pagefind-ignore>
+	<button
+		class:list={[
+			'text-primary-50',
+			'z-10 ml-auto cursor-pointer p-2 transition-opacity delay-200 duration-300 sm:opacity-0 sm:hover:opacity-90 sm:focus:opacity-90',
+		]}
+		aria-label={t('collection.images.metadata.title')}
+	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
@@ -33,12 +34,14 @@ const t = getTranslations();
 				d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
 			></path>
 		</svg>
-	</div>
+	</button>
 	<div
-		class="bg-primary-50 invisible absolute right-0 bottom-0 left-0 group-focus-within/meta:visible sm:rounded-b-xs"
+		class:list={[
+			'bg-primary-50/75 dark:bg-primary-900/75 backdrop-grayscale',
+			'px-small invisible absolute right-0 bottom-0 left-0 py-1 font-sans group-focus-within:visible sm:rounded-b-xs',
+		]}
 	>
-		<h3>{t('collection.images.metadata.title')}</h3>
-		<div class="px-small grid grid-cols-1 gap-2 py-1 md:grid-cols-3 md:gap-4">
+		<div class="grid grid-cols-1 gap-1 sm:gap-2 md:grid-cols-3 md:gap-4">
 			{
 				entry.data.dateCreated ? (
 					<ImageMetadataItem>

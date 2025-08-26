@@ -85,7 +85,7 @@ export const SITE_YEAR_FOUNDED = 2009;
 export const FEATURE_DATE_ARCHIVES = false as boolean;
 
 // Image metadata generation; set to "true" to enable
-export const FEATURE_IMAGE_METADATA = false as boolean;
+export const FEATURE_IMAGE_METADATA = true as boolean;
 
 // Nearby items are the single most expensive data generated in this project
 export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
