@@ -30,7 +30,6 @@
 [data-mode='dark'] .content-image-caption a {
 	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
 }
-
 .content-image-caption em {
 	@apply not-italic;
 }
