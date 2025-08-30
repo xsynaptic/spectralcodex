@@ -8,9 +8,11 @@ interface Props extends HTMLAttributes<'div'> {
 const { class: className, ...props } = Astro.props;
 ---
 
-<div class:list={[className]} {...props}>
-	<h3 class="text-primary-800 dark:text-primary-100 text-xs font-semibold">
+<div class:list={[className, 'text-left']} {...props}>
+	<h3 class="text-primary-800 dark:text-primary-100 text-xs font-semibold select-none">
 		<slot name="image-metadata-item-title" />
 	</h3>
-	<div class="text-primary-700 dark:text-primary-200 truncate text-sm"><slot /></div>
+	<div class="text-primary-700 dark:text-primary-200 cursor-text truncate text-sm select-text">
+		<slot />
+	</div>
 </div>
