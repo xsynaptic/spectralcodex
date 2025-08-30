@@ -50,13 +50,23 @@ const t = getTranslations();
 			<div
 				class:list={[
 					'bg-primary-50/75 dark:bg-primary-800/75',
-					'grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-2 md:grid-cols-3 md:gap-4 @max-lg:sm:gap-1 @max-lg:md:grid-cols-2 @max-sm:sm:grid-cols-1 @max-sm:md:grid-cols-1',
+					'grid grid-cols-4 gap-1 sm:grid-cols-8 sm:gap-2 md:grid-cols-12 md:gap-4 @max-lg:sm:gap-1 @max-lg:md:grid-cols-8 @max-sm:sm:grid-cols-4 @max-sm:md:grid-cols-4',
 					'px-small max-h-full w-full overflow-y-auto py-2 backdrop-grayscale',
 				]}
 			>
 				{
+					entry.data.dateCreated ? (
+						<ImageMetadataItem class="col-span-4">
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.dateCreated.label')}
+							</Fragment>
+							<DateDisplay date={entry.data.dateCreated} datePreset="long" />
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
 					entry.data.camera ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-4">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.cameraModel.label')}
 							</Fragment>
@@ -66,7 +76,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.lens ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-4">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.lensModel.label')}
 							</Fragment>
@@ -76,7 +86,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.aperture ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-2">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.aperture.label')}
 							</Fragment>
@@ -86,7 +96,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.shutterSpeed ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-2">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.shutterSpeed.label')}
 							</Fragment>
@@ -96,7 +106,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.focalLength ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-2">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.focalLength.label')}
 							</Fragment>
@@ -106,7 +116,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.iso ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-2">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.iso.label')}
 							</Fragment>
@@ -116,7 +126,7 @@ const t = getTranslations();
 				}
 				{
 					entry.data.exposureValue ? (
-						<ImageMetadataItem>
+						<ImageMetadataItem class="col-span-2">
 							<Fragment slot="image-metadata-item-title">
 								{t('collection.images.metadata.exposureValue.label')}
 							</Fragment>
@@ -125,7 +135,7 @@ const t = getTranslations();
 						</ImageMetadataItem>
 					) : undefined
 				}
-				<ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
 					<Fragment slot="image-metadata-item-title"
 						>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
 					>
@@ -133,16 +143,6 @@ const t = getTranslations();
 						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
 					/>
 				</ImageMetadataItem>
-				{
-					entry.data.dateCreated ? (
-						<ImageMetadataItem>
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.dateCreated.label')}
-							</Fragment>
-							<DateDisplay date={entry.data.dateCreated} datePreset="long" />
-						</ImageMetadataItem>
-					) : undefined
-				}
 			</div>
 		</div>
 	</button>

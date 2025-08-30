@@ -39,7 +39,7 @@ const translationStrings = {
 		'collection.images.metadata.iso.label': 'ISO',
 		'collection.images.metadata.exposureValue.label': 'Exposure Value',
 		'collection.images.metadata.ev.label': 'EV',
-		'collection.images.metadata.sourceDimensions.label': 'Source Dimensions',
+		'collection.images.metadata.sourceDimensions.label': 'Original Size',
 
 		// Locations
 		'collection.locations.labelSingular': 'Location',
