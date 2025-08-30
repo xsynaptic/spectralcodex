@@ -14,133 +14,134 @@ const { entry } = Astro.props;
 const t = getTranslations();
 ---
 
-<button
-	class:list={[
-		'group absolute inset-0 transition-opacity delay-200 duration-300 sm:opacity-0 sm:hover:opacity-100 sm:focus:opacity-100',
-	]}
-	aria-label={t('collection.images.metadata.title')}
-	data-pagefind-ignore
->
-	<div
+<div class:list={['group absolute inset-0']} data-pagefind-ignore>
+	<button
 		class:list={[
-			'text-primary-50',
-			'absolute right-0 bottom-0 z-10 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:opacity-0 group-focus-within:delay-100',
+			'transition-opacity delay-200 duration-300 sm:opacity-0 sm:hover:opacity-100 sm:focus:opacity-100',
 		]}
-	>
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			class="drop-shadow-md"
-		>
-			<path
-				fill="currentColor"
-				d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
-			></path>
-		</svg>
-	</div>
-	<div
-		class:list={[
-			'pointer-events-none absolute inset-0 flex h-full max-h-full w-full items-end overflow-y-auto font-sans opacity-0 transition-opacity delay-100 duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 sm:rounded-b-xs',
-		]}
+		aria-label={t('collection.images.metadata.title')}
 	>
 		<div
 			class:list={[
-				'bg-primary-50/75 dark:bg-primary-900/75',
-				'grid grid-cols-1 gap-1 sm:gap-2 md:grid-cols-3 md:gap-4',
-				'px-small max-h-full w-full overflow-y-auto py-1 backdrop-grayscale',
+				'text-primary-50',
+				'absolute right-0 bottom-0 z-10 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:opacity-0 group-focus-within:delay-100',
 			]}
 		>
-			{
-				entry.data.dateCreated ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.dateCreated.label')}
-						</Fragment>
-						<DateDisplay date={entry.data.dateCreated} datePreset="long" />
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.camera ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.cameraModel.label')}
-						</Fragment>
-						{entry.data.camera}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.lens ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.lensModel.label')}
-						</Fragment>
-						{entry.data.lens}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.aperture ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.aperture.label')}
-						</Fragment>
-						<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.shutterSpeed ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.shutterSpeed.label')}
-						</Fragment>
-						{`${entry.data.shutterSpeed} sec`}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.focalLength ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.focalLength.label')}
-						</Fragment>
-						{entry.data.focalLength}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.iso ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.iso.label')}
-						</Fragment>
-						{entry.data.iso}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			{
-				entry.data.exposureValue ? (
-					<ImageMetadataItem>
-						<Fragment slot="image-metadata-item-title">
-							{t('collection.images.metadata.exposureValue.label')}
-						</Fragment>
-						{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
-						{t('collection.images.metadata.ev.label')}
-					</ImageMetadataItem>
-				) : undefined
-			}
-			<ImageMetadataItem>
-				<Fragment slot="image-metadata-item-title"
-					>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
-				>
-				<Fragment
-					set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
-				/>
-			</ImageMetadataItem>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				class="drop-shadow-md"
+			>
+				<path
+					fill="currentColor"
+					d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
+				></path>
+			</svg>
 		</div>
-	</div>
-</button>
+		<div
+			class:list={[
+				'pointer-events-none absolute inset-0 flex h-full max-h-full w-full items-end overflow-y-auto font-sans opacity-0 transition-opacity delay-100 duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 sm:rounded-b-xs',
+			]}
+		>
+			<div
+				class:list={[
+					'bg-primary-50/75 dark:bg-primary-900/75',
+					'grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-2 md:grid-cols-3 md:gap-4 @max-lg:sm:gap-1 @max-lg:md:grid-cols-2 @max-sm:sm:grid-cols-1 @max-sm:md:grid-cols-1',
+					'px-small max-h-full w-full overflow-y-auto py-2 backdrop-grayscale',
+				]}
+			>
+				{
+					entry.data.camera ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.cameraModel.label')}
+							</Fragment>
+							{entry.data.camera}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.lens ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.lensModel.label')}
+							</Fragment>
+							{entry.data.lens}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.aperture ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.aperture.label')}
+							</Fragment>
+							<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.shutterSpeed ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.shutterSpeed.label')}
+							</Fragment>
+							{`${entry.data.shutterSpeed} sec`}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.focalLength ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.focalLength.label')}
+							</Fragment>
+							{entry.data.focalLength}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.iso ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.iso.label')}
+							</Fragment>
+							{entry.data.iso}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				{
+					entry.data.exposureValue ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.exposureValue.label')}
+							</Fragment>
+							{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
+							{t('collection.images.metadata.ev.label')}
+						</ImageMetadataItem>
+					) : undefined
+				}
+				<ImageMetadataItem>
+					<Fragment slot="image-metadata-item-title"
+						>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
+					>
+					<Fragment
+						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
+					/>
+				</ImageMetadataItem>
+				{
+					entry.data.dateCreated ? (
+						<ImageMetadataItem>
+							<Fragment slot="image-metadata-item-title">
+								{t('collection.images.metadata.dateCreated.label')}
+							</Fragment>
+							<DateDisplay date={entry.data.dateCreated} datePreset="long" />
+						</ImageMetadataItem>
+					) : undefined
+				}
+			</div>
+		</div>
+	</button>
+</div>
