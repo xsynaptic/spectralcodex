@@ -77,8 +77,8 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 		) : (
 			<figure
 				class:list={[
-					'@container',
-					'content-image',
+					'@container', // Used by image metadata
+					'content-image', // Custom CSS styles defined in src/styles/content.css
 					'not-prose',
 					layout === ImageLayoutEnum.Default
 						? 'max-w-content sm:px-small md:px-medium mx-auto mb-2 md:mb-4'

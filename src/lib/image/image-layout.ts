@@ -86,8 +86,8 @@ export function getImageLayoutProps({
 	switch (layout) {
 		case ImageLayoutEnum.Default: {
 			return {
-				width: ImageSizeEnum.Medium,
-				height: ImageSizeEnum.Large,
+				width: ImageSizeEnum.Large,
+				height: ImageSizeEnum.Medium,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
 				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - 32px), (max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - 64px), ${TAILWIND_BREAKPOINT_CONTENT}`,
 			};
