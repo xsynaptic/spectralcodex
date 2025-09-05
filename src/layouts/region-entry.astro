@@ -11,6 +11,7 @@ import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -117,5 +118,6 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 			}}
 		/>
 		<ContentSectionLinks entry={entry} />
+		<ContentSectionSources entry={entry} />
 	</article>
 </MainSite>

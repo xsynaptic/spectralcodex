@@ -13,6 +13,7 @@ import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionRelated from '#components/content/content-section-related.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
+import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
@@ -107,6 +108,7 @@ const { Content } = await render(entry);
 			<Content />
 		</ProseBody>
 		<ContentSectionLinks entry={entry} />
+		<ContentSectionSources entry={entry} />
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionBacklinks entry={entry} />

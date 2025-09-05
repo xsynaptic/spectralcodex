@@ -86,7 +86,6 @@ const translationStrings = {
 
 		// Content sections
 		'content.section.content': 'Content',
-		'content.section.links.sources': 'Links & Sources',
 		'content.section.links': 'Links',
 		'content.section.sources': 'Sources',
 		'content.section.heritage': 'Heritage Status',

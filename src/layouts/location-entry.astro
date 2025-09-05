@@ -14,6 +14,7 @@ import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
 import ContentSectionRelated from '#components/content/content-section-related.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
+import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import FormatCjk from '#components/format/format-cjk.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
@@ -141,6 +142,7 @@ const t = getTranslations();
 		<ContentDescription entry={entry} />
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
+		{hideLocation ? undefined : <ContentSectionSources entry={entry} />}
 		{hideLocation ? undefined : <ContentSectionDateVisited dateVisited={entry.data.dateVisited} />}
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />

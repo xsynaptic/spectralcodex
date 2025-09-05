@@ -8,7 +8,7 @@ import { LanguageCodeEnum } from './i18n-types.ts';
  * Utility type that creates a multilingual type structure for a given base property name.
  * Generates optional properties like `${BaseProp}_${LanguageCode}` for each supported language.
  */
-type MultilingualSchemaSet<BaseProp extends string> = {
+export type MultilingualSchemaSet<BaseProp extends string> = {
 	[K in LanguageCode as `${BaseProp}_${K}`]?: string;
 };
 
@@ -36,4 +36,6 @@ function createMultilingualSchemas<T extends string>(key: T) {
  */
 export const titleMultilingualSchema = createMultilingualSchemas('title');
 
-export type TitleMultilingual = MultilingualSchemaSet<'title'>;
+export const nameMultilingualSchema = createMultilingualSchemas('name');
+
+export const publisherMultilingualSchema = createMultilingualSchemas('publisher');

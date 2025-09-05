@@ -1,15 +1,25 @@
 import { z } from 'astro:content';
 
-import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import {
+	nameMultilingualSchema,
+	publisherMultilingualSchema,
+	titleMultilingualSchema,
+} from '#lib/i18n/i18n-schemas.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { loadYamlData } from '#lib/utils/data.ts';
+
+const SourceAuthorSchema = z.object({
+	name: z.string(),
+	...nameMultilingualSchema,
+});
 
 const SourceItemSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
 	description: z.string().optional(),
-	authors: z.string().array().optional(),
+	authors: SourceAuthorSchema.array().optional(),
 	publisher: z.string().optional(),
+	...publisherMultilingualSchema,
 	datePublished: z.string().optional(),
 	links: LinkSchema.array().optional(),
 });
