@@ -32,7 +32,7 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -69,6 +69,7 @@ const t = getTranslations();
 			...(entry.data.imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
 			alt: title,
 		}),
+		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}

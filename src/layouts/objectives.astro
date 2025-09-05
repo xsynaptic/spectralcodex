@@ -6,6 +6,7 @@ import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSection from '#components/content/content-section.astro';
 import FormatMarkdown from '#components/format/format-markdown.astro';
 import MainSite from '#components/main/main-site.astro';
+import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 type Props = MapComponentData;
 
@@ -15,7 +16,7 @@ const title = 'Objectives';
 const description = 'Points in the database that still require visitation and documentation.';
 ---
 
-<MainSite meta={{ title, description, noIndex: true, noFollow: true }}>
+<MainSite meta={{ title, description, ...getSeoHideSearch(true) }}>
 	<ContentHeader><Fragment slot="header-title">{title}</Fragment></ContentHeader>
 	<ContentSection>
 		<Fragment slot="section-description"><FormatMarkdown>{description}</FormatMarkdown></Fragment>

@@ -11,6 +11,7 @@ import TimelineMonthlyList from '#components/timeline/timeline-monthly-list.astr
 import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 interface Props {
 	title: string;
@@ -35,8 +36,7 @@ const t = getTranslations();
 		description: isYearlyData
 			? t('timeline.yearly.description').replace('%s', title)
 			: t('timeline.monthly.description').replace('%s', title),
-		noIndex: true,
-		noFollow: true,
+		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>

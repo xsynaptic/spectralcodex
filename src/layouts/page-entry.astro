@@ -11,7 +11,7 @@ import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'pages'>;
@@ -32,6 +32,7 @@ const { Content } = await render(entry);
 			...(entry.data.imageFeatured ? { id: entry.id } : {}),
 			alt: entry.data.title,
 		}),
+		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}

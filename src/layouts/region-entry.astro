@@ -21,7 +21,7 @@ import RegionsRelated from '#components/regions/regions-related.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;
@@ -49,6 +49,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
 			alt: entry.data.title,
 		}),
+		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
 	hasHeroImage={hasHeroImage}

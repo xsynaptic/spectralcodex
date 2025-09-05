@@ -15,7 +15,7 @@ import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
-import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'ephemera'>;
@@ -47,6 +47,7 @@ const { Content } = await render(entry);
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
 		}),
+		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	hasHeroImage={!!entry.data.imageHero}
 	hasReadingBar={true}

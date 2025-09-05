@@ -77,15 +77,12 @@ export function getSeoImageProps({
 	}
 
 	// Explicit fallback images should already exist in the public folder
-	if (fallback) {
-		return {
-			url: urlJoin(PROD ? SITE : BASE_URL, `${fallback}.${OPEN_GRAPH_IMAGE_FORMAT}`),
-			alt,
-		};
-	}
-
-	// Nothing
-	return;
+	return fallback
+		? {
+				url: urlJoin(PROD ? SITE : BASE_URL, `${fallback}.${OPEN_GRAPH_IMAGE_FORMAT}`),
+				alt,
+			}
+		: undefined;
 }
 
 // These fallback images should already exist in the public folder
@@ -94,4 +91,13 @@ export function getSeoImageFallback() {
 		PROD ? SITE : BASE_URL,
 		`${OPEN_GRAPH_IMAGE_FALLBACK_PREFIX}-${String(R.randomInteger(1, OPEN_GRAPH_IMAGE_FALLBACK_COUNT))}.${OPEN_GRAPH_IMAGE_FORMAT}`,
 	);
+}
+
+export function getSeoHideSearch(shouldHide: boolean | undefined) {
+	return shouldHide
+		? {
+				noIndex: true,
+				noFollow: true,
+			}
+		: undefined;
 }
