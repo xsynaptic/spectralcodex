@@ -1,0 +1,9 @@
+/** Enable dark mode with a custom selector */
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
+/* Spacing */
+@theme {
+	--spacing-small: 1rem;
+	--spacing-medium: 2rem;
+	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
+}
