@@ -156,7 +156,7 @@
 	"[mdx]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
 		"files.autoSave": "afterDelay",
-		"files.autoSaveDelay": 5000, // Prevent some weird issues with Astro 5's new Content Layer API
+		"files.autoSaveDelay": 3000, // Prevent some weird issues with Astro 5's new Content Layer API
 		"typescript.suggest.enabled": false // Too noisy when we're mostly working with plain text
 	},
 	"mdx.validate.validateReferences": "ignore",

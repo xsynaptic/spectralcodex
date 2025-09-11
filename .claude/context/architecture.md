@@ -72,12 +72,3 @@ Custom image pipeline with:
 2. Images are processed through custom loaders
 3. Map data is generated and served through specialized components
 4. Build process optimizes for static generation with selective hydration
-
-## Environment Variables
-
-Key environment variables (see astro.config.mjs):
-
-- `NODE_ENV`: Environment mode
-- `DEV_SERVER_URL`: Development server URL
-- `PROD_SERVER_URL`: Production server URL
-- `MAP_PROTOMAPS_API_KEY`: Map API key

@@ -12,5 +12,5 @@
 
 ## Development Server
 
-- **First request to dev server is slow** - The initial request after starting `pnpm dev` may take time to respond as the content metadata index will be rebuilt
+- **First request to dev server is slow** - The initial request after starting `pnpm dev` may take ~30 seconds to respond as the content metadata index will be rebuilt
 - Subsequent startups are faster unless schema or collection configuration changes

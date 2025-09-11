@@ -37,17 +37,11 @@
 - Use Sharp directly via project utilities, not other image libraries
 - Aggressive lazy loading by default except above-the-fold cases
 
-## Content Processing
-
-- Line breaks matter in MDX - whitespace can break JSX components
-- Multiple language variants supported for some fields (e.g., `title` and `title_zh`)
-- Content is content-heavy - consider memory usage and build times
-
 ## Styling
 
-- Tailwind CSS v4 for all styling
-- Scoped styles in .astro files only when necessary
-- Global styles in `src/styles/global.css`
+- Use Tailwind CSS v4 for all styling
+- Use scoped styles in .astro files only when necessary
+- Place global styles in `src/styles/global.css`
 - Responsive design using Tailwind utilities
 - Layout components use computed `props` for dynamic CSS classes
 - Ensure full class names available for dynamically applied utilities
