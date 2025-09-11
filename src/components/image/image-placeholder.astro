@@ -15,9 +15,7 @@ const { as: Tag = 'div', class: className, placeholder, ...props } = Astro.props
 
 <Tag
 	class:list={[
-		placeholder
-			? 'bg-primary-200 dark:bg-primary-700 bg-cover bg-center'
-			: 'bg-fallback dark:bg-fallback-dark',
+		placeholder ? 'bg-primary-200 dark:bg-primary-700 bg-cover bg-center' : 'bg-fallback',
 		className,
 	]}
 	style={placeholder

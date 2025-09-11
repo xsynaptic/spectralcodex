@@ -6,7 +6,7 @@ import { translations } from '../config/translations';
 import { useMapSourceDataCount, useMapSourceDataLoading } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const MetricsControl: FC<{ position: ControlPosition }> = ({ position }) => {
+export const MetricsControl: FC<{ position: ControlPosition }> = function ({ position }) {
 	const sourceDataLoading = useMapSourceDataLoading();
 	const sourceDataCount = useMapSourceDataCount();
 	const { filteredCount } = useMapCanvasData();
@@ -16,7 +16,7 @@ export const MetricsControl: FC<{ position: ControlPosition }> = ({ position }) 
 		<CustomControlPortal position={position} className="maplibregl-ctrl">
 			{sourceDataLoading ? (
 				<div className="flex flex-col items-end">
-					<div className="loading w-[15px]" />
+					<div className="loading-animation w-[15px]" />
 				</div>
 			) : (
 				<div className="text-primary-700 dark:text-primary-300 flex flex-nowrap gap-1 font-sans text-xs select-none">

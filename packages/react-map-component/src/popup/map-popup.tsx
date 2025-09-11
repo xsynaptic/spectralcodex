@@ -45,7 +45,7 @@ export const MapPopup: FC = memo(function MapPopup() {
 			<div className="relative flex min-h-[80px] min-w-[200px] flex-col">
 				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
 					<div
-						className="loading max-w-[100%] transition-opacity duration-500"
+						className="loading-animation max-w-[100%] transition-opacity duration-500"
 						style={{ opacity: popupDataLoading ? 1 : 0 }}
 					/>
 				</div>
