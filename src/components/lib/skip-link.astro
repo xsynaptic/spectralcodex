@@ -1,26 +1,30 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-interface Props extends HTMLAttributes<'div'> {
-	class?: string | undefined;
-	target?: string | undefined;
-	label: string;
-}
-
-const { class: className, target = '#content', label, ...restProps } = Astro.props;
-
 /**
  * Adapted from the Accessible Astro Components library
  * @link https://github.com/incluud/accessible-astro-components
  */
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+	classGeneric?: string | undefined;
+	linkClass?: string | undefined;
+	target?: string | undefined;
+	label: string;
+}
+
+const {
+	class: className,
+	classGeneric = 'skip-link',
+	linkClass,
+	target = '#content',
+	label,
+	...restProps
+} = Astro.props;
 ---
 
-<div class:list={['skip-link', className]} {...restProps}>
-	<a
-		href={target}
-		class="bg-primary-50 dark:bg-primary-800 text-accent-600 dark:text-accent-400 rounded-br-sm px-2 py-1 text-lg"
-		>{label}</a
-	>
+<div class:list={[classGeneric, className]} {...restProps}>
+	<a href={target} class={linkClass}>{label}</a>
 </div>
 
 <style>

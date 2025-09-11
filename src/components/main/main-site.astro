@@ -5,7 +5,7 @@ import { ClientRouter } from 'astro:transitions';
 import type { MetaProps } from '#components/main/main-meta.astro';
 
 import '#styles/global.css';
-import MainAnalytics from '#components/main/main-analytics.astro';
+import UmamiAnalytics from '#components/lib/umami-analytics.astro';
 import MainFooter from '#components/main/main-footer.astro';
 import MainHeader from '#components/main/main-header.astro';
 import MainMeta from '#components/main/main-meta.astro';
@@ -13,6 +13,8 @@ import ModeManager from '#components/mode/mode-manager.astro';
 import LoadingBar from '#components/progress-bar/progress-bar-loading.astro';
 import ReadingBar from '#components/progress-bar/progress-bar-reading.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+
+import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
 
 interface Props {
 	meta?: MetaProps;
@@ -46,7 +48,12 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 		<Font cssVariable="--font-lora" />
 		<ModeManager defaultMode="auto" />
 		<ClientRouter />
-		<MainAnalytics isProduction={import.meta.env.PROD} isViewTransitionsEnabled={true} />
+		<UmamiAnalytics
+			id={UMAMI_ID}
+			domain={UMAMI_DOMAIN}
+			isProduction={import.meta.env.PROD}
+			isViewTransitionsEnabled={true}
+		/>
 	</head>
 	<body
 		class:list={[

@@ -1,0 +1,22 @@
+---
+interface Props {
+	id: string | undefined;
+	domain: string | undefined;
+	isProduction: boolean;
+	isViewTransitionsEnabled: boolean;
+}
+
+const { id, domain, isProduction, isViewTransitionsEnabled } = Astro.props;
+---
+
+{
+	isProduction && id && domain ? (
+		<script
+			defer
+			src={`${domain}/script.js`}
+			data-website-id={id}
+			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
+			is:inline
+		/>
+	) : undefined
+}
