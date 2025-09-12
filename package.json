@@ -48,7 +48,7 @@
 		"@astrojs/react": "^4.3.1",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.5.1",
-		"@iconify/json": "^2.2.382",
+		"@iconify/json": "^2.2.383",
 		"@iconify/utils": "^3.0.1",
 		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/image-loader": "workspace:*",
