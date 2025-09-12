@@ -10,6 +10,12 @@ export default getConfig(
 		{
 			ignores: ['**/.astro', '**/.astro-cache', 'dist/**/*', 'content/**/*', 'temp/**/*'],
 		},
+		{
+			rules: {
+				// Conflicts with Remeda's sort function
+				'unicorn/no-array-sort': 'off',
+			},
+		},
 		/**
 		 * React
 		 */
