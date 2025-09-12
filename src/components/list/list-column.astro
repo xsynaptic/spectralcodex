@@ -11,7 +11,7 @@ const { as: Tag = 'ul', class: className, ...props } = Astro.props;
 ---
 
 <Tag
-	class:list={['flex flex-col gap-2 pl-4', Tag === 'ul' ? 'list-disc' : 'list-decimal', className]}
+	class:list={[className, 'flex flex-col gap-2 pl-4', Tag === 'ul' ? 'list-disc' : 'list-decimal']}
 	{...props}
 >
 	<slot />

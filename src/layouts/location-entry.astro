@@ -16,9 +16,9 @@ import ContentSectionRelated from '#components/content/content-section-related.a
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
-import FormatCjk from '#components/format/format-cjk.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import ImageComponent from '#components/image/image-component.astro';
+import LocationsAddress from '#components/locations/locations-address.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
@@ -28,7 +28,6 @@ import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -58,8 +57,6 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
-
-const t = getTranslations();
 ---
 
 <MainSite
@@ -158,18 +155,7 @@ const t = getTranslations();
 		{
 			hideLocation ? undefined : (
 				<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
-					{entry.data.address ? (
-						<address class="px-small text-primary-400 mt-1 text-xs not-italic sm:px-0">
-							{t('locations.address.label')}:{' '}
-							{regionLangCode ? (
-								<span>
-									<FormatCjk langCode={regionLangCode}>{entry.data.address}</FormatCjk>
-								</span>
-							) : (
-								<span>{entry.data.address}</span>
-							)}
-						</address>
-					) : undefined}
+					<LocationsAddress address={entry.data.address} langCode={regionLangCode} />
 				</ContentSectionMap>
 			)
 		}

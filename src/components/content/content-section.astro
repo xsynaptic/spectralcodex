@@ -21,7 +21,7 @@ const children = await renderSlot(Astro.slots, 'default');
 
 {
 	description || children ? (
-		<Container class:list={['mb-medium', className]} fillViewport={fillViewport} {...props}>
+		<Container class:list={[className, 'mb-medium']} fillViewport={fillViewport} {...props}>
 			{title || subtitle || description ? (
 				<header
 					class:list={[

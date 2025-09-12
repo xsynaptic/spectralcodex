@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { wrapCjk } from '@spectralcodex/unified-tools';
+
+import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
+
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props extends HTMLAttributes<'address'> {
+	address?: string | undefined;
+	langCode?: Extract<LanguageCode, 'zh' | 'zh-CN' | 'ja' | 'ko'> | undefined;
+	class?: string | undefined;
+}
+
+const { address, langCode, class: className, ...props } = Astro.props;
+
+const output = address
+	? wrapCjk({
+			input: address,
+			...(langCode
+				? { wrapCjkOptions: { langCode: langCode.startsWith('zh') ? 'zh' : langCode } }
+				: {}),
+		})
+	: undefined;
+
+const t = getTranslations();
+---
+
+{
+	output ? (
+		<address
+			class:list={[className, 'px-small text-primary-400 mt-1 text-xs not-italic sm:px-0']}
+			{...props}
+		>
+			{t('locations.address.label')}: <span set:html={output} />
+		</address>
+	) : undefined
+}
