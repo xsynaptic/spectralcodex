@@ -6,7 +6,7 @@ import * as R from 'remeda';
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -58,7 +58,7 @@ const columns = {
 							const region = getFirstRegionByReference(
 								item.data.override?.regions ?? item.data.regions
 							);
-							const titleMultilingual = getMultilingualContent(item.data, 'title');
+							const titleMultilingual = getPrimaryMultilingualContent(item.data, 'title');
 
 							return (
 								<tr class="font-sans text-sm">

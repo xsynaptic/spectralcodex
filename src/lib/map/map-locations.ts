@@ -18,7 +18,7 @@ import { createHash } from 'node:crypto';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position) {
@@ -92,13 +92,13 @@ export function getLocationsFeatureCollection(
 			const geometryArray = Array.isArray(entry.data.geometry)
 				? entry.data.geometry
 				: [entry.data.geometry];
-			const entryTitleMultilingual = getMultilingualContent(entry.data, 'title');
+			const entryTitleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 			return geometryArray.map((geometry, index) => {
 				const uuid = entry.data.uuid ?? entry.id;
 				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
 				const title = geometry.title ? `${entry.data.title} - ${geometry.title}` : entry.data.title;
-				const geometryTitleMultilingual = getMultilingualContent(geometry, 'title');
+				const geometryTitleMultilingual = getPrimaryMultilingualContent(geometry, 'title');
 				const googleMapsUrl =
 					geometry.googleMapsUrl || entry.data.googleMapsUrl
 						? (geometry.googleMapsUrl ?? entry.data.googleMapsUrl ?? '').replace('https://', '')

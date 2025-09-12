@@ -28,7 +28,7 @@ import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
@@ -45,8 +45,8 @@ const { entry, mapData, metadataItems } = Astro.props;
 // This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
 const titleMultilingual =
-	getMultilingualContent(entry.data.override, 'title') ??
-	getMultilingualContent(entry.data, 'title');
+	getPrimaryMultilingualContent(entry.data.override, 'title') ??
+	getPrimaryMultilingualContent(entry.data, 'title');
 
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 

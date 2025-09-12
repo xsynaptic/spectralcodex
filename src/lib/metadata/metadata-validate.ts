@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
@@ -28,7 +28,7 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 		}
 		locationTitle.add(title);
 
-		const titleMultilingual = getMultilingualContent(location.data, 'title');
+		const titleMultilingual = getPrimaryMultilingualContent(location.data, 'title');
 
 		if (titleMultilingual) {
 			const titleMultilingualString = `${titleMultilingual.value} (${titleMultilingual.lang})`;

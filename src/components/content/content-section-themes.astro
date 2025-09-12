@@ -6,7 +6,7 @@ import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getThemesByIdsFunction } from '#lib/collections/themes/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -29,7 +29,7 @@ const t = getTranslations();
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
 				{themes.map((item) => {
-					const titleMultilingual = getMultilingualContent(item.data, 'title');
+					const titleMultilingual = getPrimaryMultilingualContent(item.data, 'title');
 
 					return (
 						<DividedItem

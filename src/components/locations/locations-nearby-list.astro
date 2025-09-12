@@ -10,7 +10,7 @@ import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -31,7 +31,7 @@ const t = getTranslations();
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{entry.data.nearby.map(({ locationId, distanceDisplay }) => {
 					const location = locationsMap.get(locationId);
-					const titleMultilingual = getMultilingualContent(location?.data, 'title');
+					const titleMultilingual = getPrimaryMultilingualContent(location?.data, 'title');
 
 					return location ? (
 						<ListColumnItem>

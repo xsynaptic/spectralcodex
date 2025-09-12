@@ -5,7 +5,7 @@ import ContentSection from '#components/content/content-section.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { LocationTwHeritageRecords } from '#lib/collections/locations/schemas.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	heritage: LocationTwHeritage | undefined;
@@ -14,7 +14,7 @@ interface Props {
 const { heritage, ...props } = Astro.props;
 
 const titleMultilingual = heritage
-	? getMultilingualContent(LocationTwHeritageRecords[heritage], 'title')
+	? getPrimaryMultilingualContent(LocationTwHeritageRecords[heritage], 'title')
 	: undefined;
 
 const t = getTranslations();

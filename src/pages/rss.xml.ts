@@ -16,7 +16,7 @@ import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getRenderMdxFunction } from '#lib/utils/astro.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
@@ -35,7 +35,7 @@ const getRssItem = async (
 ) => {
 	const startTime = performance.now();
 
-	const titleMultilingual = getMultilingualContent(entry.data, 'title');
+	const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 	const postHtml = await renderMdx(entry, {
 		locals: {

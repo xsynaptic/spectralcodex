@@ -4,9 +4,8 @@ import type { CollectionEntry } from 'astro:content';
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
-import Multilingual from '#components/parts/multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
@@ -30,20 +29,73 @@ const t = getTranslations();
 				{sources.map((source) => {
 					if (!source) return;
 
-					const titleMultilingual = getMultilingualContent(source, 'title');
+					// Get multilingual content for each field
+					const titleMultilingual = getPrimaryMultilingualContent(source, 'title');
+					const publisherMultilingual = getPrimaryMultilingualContent(source, 'publisher');
 
-					// TODO: fully multilingual output for this section
+					console.log(titleMultilingual);
+
+					let Authors: Node | undefined;
+					let Title: Node | undefined;
+					let Publisher: Node | undefined;
+
+					if (source.authors) {
+						Authors = <span>{source.authors.map((author) => author.name).join(' / ')}</span>;
+					}
+					if (source.title) {
+						Title = <span class="italic">{source.title}</span>;
+						if (source.publisher && source.datePublished) {
+							Publisher = (
+								<span>
+									{source.publisher}, {source.datePublished}
+								</span>
+							);
+						} else if (source.publisher) {
+							Publisher = <span>{source.publisher}</span>;
+						} else if (source.datePublished) {
+							Publisher = <span>{source.datePublished}</span>;
+						}
+					}
+
+					let TitleMultilingual: Node | undefined;
+					let PublisherMultilingual: Node | undefined;
+
+					/** Currently we only support Chinese language sources */
+					if (
+						(titleMultilingual?.lang.startsWith('zh') ||
+							publisherMultilingual?.lang.startsWith('zh')) &&
+						titleMultilingual?.value
+					) {
+						TitleMultilingual = <span>《{titleMultilingual.value}》</span>;
+						if (publisherMultilingual?.value && source.datePublished) {
+							PublisherMultilingual = (
+								<span>
+									{publisherMultilingual?.value}, {source.datePublished}
+								</span>
+							);
+						} else if (publisherMultilingual?.value) {
+							PublisherMultilingual = <span>{publisherMultilingual?.value}</span>;
+						} else if (source.datePublished) {
+							PublisherMultilingual = <span>{source.datePublished}</span>;
+						}
+					}
+
 					return (
-						<ListColumnItem>
-							<span class="italic">{source.title}</span>
-							{titleMultilingual ? (
-								<Multilingual content={titleMultilingual} parenthesis={true} />
-							) : undefined}
-							{'publisher' in source && source.publisher ? (
-								<span>{source.publisher}</span>
-							) : undefined}
-							{'datePublished' in source && source.datePublished ? (
-								<span>({source.datePublished})</span>
+						<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
+							<span>
+								{Authors}
+								{Authors && Title ? ', ' : undefined}
+								{Title}
+								{Title && Publisher ? ', ' : undefined}
+								{Publisher}
+								{TitleMultilingual ? ' ' : undefined}
+							</span>
+							{TitleMultilingual ? (
+								<span lang="zh">
+									{TitleMultilingual}
+									{PublisherMultilingual ? '，' : undefined}
+									{PublisherMultilingual}
+								</span>
 							) : undefined}
 						</ListColumnItem>
 					);

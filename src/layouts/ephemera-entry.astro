@@ -13,7 +13,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -23,7 +23,7 @@ interface Props {
 
 const { entry } = Astro.props;
 
-const titleMultilingual = getMultilingualContent(entry.data, 'title');
+const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);

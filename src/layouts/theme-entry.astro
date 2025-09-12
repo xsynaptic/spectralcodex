@@ -16,7 +16,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
@@ -29,7 +29,7 @@ interface Props {
 
 const { entry, mapData, page } = Astro.props;
 
-const titleMultilingual = getMultilingualContent(entry.data, 'title');
+const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 const imageSetMetadata = await getImageSetMetadata({ imageSet: entry.data.imageSet });
 

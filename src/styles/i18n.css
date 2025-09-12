@@ -1,7 +1,7 @@
-html:not([lang^='cjk']) span[lang^='cjk'],
-html:not([lang^='zh']) span[lang^='zh'],
-html:not([lang^='ja']) span[lang^='ja'],
-html:not([lang^='ko']) span[lang^='ko'] {
+html:not([lang^='cjk']) [lang^='cjk'],
+html:not([lang^='zh']) [lang^='zh'],
+html:not([lang^='ja']) [lang^='ja'],
+html:not([lang^='ko']) [lang^='ko'] {
 	font-style: normal !important; /* Never italicize CJK characters */
 	font-variant: normal !important;
 	letter-spacing: normal !important;
@@ -12,7 +12,7 @@ html:not([lang^='ko']) span[lang^='ko'] {
 	word-break: keep-all !important; /* Magic property for CJK text: keeps characters together but also line breaks without overflow */
 }
 
-html:not([lang^='th']) span[lang^='th'] {
+html:not([lang^='th']) [lang^='th'] {
 	font-style: normal !important; /* Never italicize CJK characters */
 	font-variant: normal !important;
 	letter-spacing: normal !important;
