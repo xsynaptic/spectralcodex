@@ -12,15 +12,13 @@ const { class: className, ...props } = Astro.props;
 ---
 
 <div
-	class:list={[className, 'progress-bar', 'pointer-events-none fixed top-0 left-0 h-1 w-full']}
+	class:list={['progress-bar', className, 'pointer-events-none fixed top-0 left-0 h-1 w-full']}
 	aria-hidden="true"
 	{...props}
 >
 </div>
 
 <style>
-	@reference "../../styles/global.css";
-
 	.progress-bar {
 		transition:
 			background-color 100ms 100ms ease-in-out,

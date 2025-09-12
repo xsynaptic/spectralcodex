@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import ProgressBar from './progress-bar.astro';
+
+interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
+}
+
+const { class: className, ...props } = Astro.props;
+---
+
+<ProgressBar id="reading-bar" class:list={[className]} {...props} />
+
+<script>
+	import { initialize } from './progress-bar-reading.ts';
+
+	initialize('#reading-bar');
+</script>
