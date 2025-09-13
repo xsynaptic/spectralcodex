@@ -1,3 +1,5 @@
+import type { ESLint } from 'eslint';
+
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import { getConfig } from '@xsynaptic/eslint-config';
 import astroPlugin from 'eslint-plugin-astro';
@@ -22,7 +24,8 @@ export default getConfig(
 		{
 			files: ['packages/react-map-component/**/*.ts', 'packages/react-map-component/**/*.tsx'],
 			plugins: {
-				'@tanstack/query': tanstackQueryPlugin,
+				// Note: this was causing a type error in September 2025; check back to see if it is necessary in the future
+				'@tanstack/query': tanstackQueryPlugin as unknown as ESLint.Plugin,
 				'react-hooks': reactHooksPlugin,
 			},
 			rules: {

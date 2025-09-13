@@ -37,10 +37,10 @@ const t = getTranslations();
 					let Title: Node | undefined;
 					let Publisher: Node | undefined;
 
-					if (source.authors) {
-						Authors = <span>{source.authors.map((author) => author.name).join(' / ')}</span>;
-					}
 					if (source.title) {
+						if (source.authors) {
+							Authors = <span>{source.authors.map((author) => author.name).join(' / ')}</span>;
+						}
 						Title = <span class="italic">{source.title}</span>;
 						if (source.publisher && source.datePublished) {
 							Publisher = (
@@ -55,6 +55,7 @@ const t = getTranslations();
 						}
 					}
 
+					let AuthorsMultilingual: Node | undefined;
 					let TitleMultilingual: Node | undefined;
 					let PublisherMultilingual: Node | undefined;
 
@@ -64,11 +65,20 @@ const t = getTranslations();
 							publisherMultilingual?.lang.startsWith('zh')) &&
 						titleMultilingual?.value
 					) {
+						if (source.authors) {
+							const authorNames = source.authors
+								.map((author) => author.name_zh)
+								.filter((name) => name !== undefined);
+
+							if (authorNames.length > 0) {
+								AuthorsMultilingual = <span>{authorNames.join('，')}</span>;
+							}
+						}
 						TitleMultilingual = <span>《{titleMultilingual.value}》</span>;
 						if (publisherMultilingual?.value && source.datePublished) {
 							PublisherMultilingual = (
 								<span>
-									{publisherMultilingual.value}, {source.datePublished}
+									{publisherMultilingual.value}，{source.datePublished}
 								</span>
 							);
 						} else if (publisherMultilingual?.value) {
@@ -90,6 +100,8 @@ const t = getTranslations();
 							</span>
 							{TitleMultilingual ? (
 								<span lang="zh">
+									{AuthorsMultilingual}
+									{AuthorsMultilingual ? '。' : undefined}
 									{TitleMultilingual}
 									{PublisherMultilingual ? '，' : undefined}
 									{PublisherMultilingual}
