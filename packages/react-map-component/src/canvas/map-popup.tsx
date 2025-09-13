@@ -2,11 +2,17 @@ import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
+import { memo, useCallback } from 'react';
+import { Popup } from 'react-map-gl/maplibre';
 
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';
-import { useMapPopupItem } from '../store/hooks/use-map-store';
+import {
+	useMapPopupDataLoading,
+	useMapPopupItem,
+	useMapStoreActions,
+} from '../store/hooks/use-map-store';
 
 // Generate a standard Google Maps URL from a set of coordinates
 function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
@@ -18,7 +24,7 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	return url.toString();
 }
 
-export const MapPopupContent: FC = () => {
+const MapPopupContent: FC = () => {
 	const popupItem = useMapPopupItem();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
@@ -140,3 +146,48 @@ export const MapPopupContent: FC = () => {
 		</>
 	);
 };
+
+export const MapPopup: FC = memo(function MapPopup() {
+	const popupDataLoading = useMapPopupDataLoading();
+	const popupItem = useMapPopupItem();
+	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+
+	const { setSelectedId } = useMapStoreActions();
+
+	const onClose = useCallback(() => {
+		setSelectedId(undefined);
+	}, [setSelectedId]);
+
+	// Note: `closeOnClick` must be false to better control popup display with custom events
+	return popupItem ? (
+		<Popup
+			longitude={popupItem.popupCoordinates.lng}
+			latitude={popupItem.popupCoordinates.lat}
+			{...(isMobile
+				? {
+						anchor: 'top',
+						offset: 10,
+						maxWidth: `calc(min(300px, 80vw))`,
+					}
+				: {
+						anchor: 'left',
+						offset: 16,
+						maxWidth: `calc(min(350px, 80vw))`,
+					})}
+			closeOnClick={false}
+			onClose={onClose}
+		>
+			<div className="relative flex min-h-[80px] min-w-[200px] flex-col">
+				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
+					<div
+						className="loading-animation max-w-[100%] transition-opacity duration-500"
+						style={{ opacity: popupDataLoading ? 1 : 0 }}
+					/>
+				</div>
+				<div style={{ opacity: popupDataLoading ? 0 : 1 }}>
+					{popupDataLoading ? undefined : <MapPopupContent key={popupItem.id} />}
+				</div>
+			</div>
+		</Popup>
+	) : undefined;
+});

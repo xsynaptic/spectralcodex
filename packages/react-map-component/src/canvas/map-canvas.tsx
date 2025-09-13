@@ -11,14 +11,13 @@ import { MapLayerIdEnum } from '../config/layer';
 import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
 import { useProtomaps } from '../lib/hooks/use-protomaps';
-import { MapPopup } from '../popup/map-popup';
 import { MapSource } from '../source/map-source';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
 	useMapCanvasLoading,
 } from '../store/hooks/use-map-store';
-import { MapCanvasLoading } from './map-canvas-loading';
+import { MapPopup } from './map-popup';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)
 // All other layers do not trigger pointer events
@@ -28,6 +27,17 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsImage,
 ] as const;
+
+const MapCanvasLoading: FC<{ loading: boolean }> = function ({ loading }) {
+	return (
+		<div className="flex h-full justify-center">
+			<div
+				className="loading-animation w-[20%] transition-opacity duration-500"
+				style={{ opacity: loading ? 1 : 0 }}
+			/>
+		</div>
+	);
+};
 
 export const MapCanvas: FC<
 	Omit<MapComponentProps, 'geodata' | 'cluster'> & {
