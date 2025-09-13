@@ -35,9 +35,5 @@ export function getPrimaryMultilingualContent(
 ): MultilingualContent | undefined {
 	const multilingualContent = getMultilingualContent(data, id, priority);
 
-	if (multilingualContent?.[0]) {
-		// console.log(multilingualContent[0]);
-	}
-
 	return multilingualContent ? multilingualContent[0] : undefined;
 }
