@@ -1,0 +1,15 @@
+{
+	"name": "@spectralcodex/astro-build-logger",
+	"version": "1.0.0",
+	"description": "Astro integration for logging build times",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"devDependencies": {
+		"astro": "^5.13.7",
+		"astro-integration-kit": "^0.19.0",
+		"zod": "^3.25.76"
+	}
+}

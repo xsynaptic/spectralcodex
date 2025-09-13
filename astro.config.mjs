@@ -3,6 +3,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import buildLogger from '@spectralcodex/astro-build-logger';
 import localImageServer from '@spectralcodex/local-image-server';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
@@ -94,6 +95,7 @@ export default defineConfig({
 		rehypePlugins: [[rehypeWrapCjk, { langCode: 'cjk' }]],
 	},
 	integrations: [
+		buildLogger(),
 		react({
 			include: ['packages/react**/*'],
 		}),
