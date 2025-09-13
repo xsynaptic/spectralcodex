@@ -66,6 +66,7 @@ export function modeManager(defaultModeId: string | undefined) {
 
 	mediaMatcher.addEventListener('change', handleMediaChange);
 
+	/** Note: this is not currently used and may have no real value */
 	function cleanup() {
 		mediaMatcher.removeEventListener('change', handleMediaChange);
 	}

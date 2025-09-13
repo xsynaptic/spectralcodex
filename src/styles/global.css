@@ -1,4 +1,8 @@
-@import 'tailwindcss';
+@import 'tailwindcss' source(none);
+
+/** Tailwind usually scans everything for class names but for performance reasons we're explicitly naming paths and file types here */
+@source '../**/*.astro';
+@source '../../packages/react-map-component/src/**/*.tsx';
 
 /** Theme styling */
 @import './theme/config.css';
@@ -12,10 +16,6 @@
 @import './carousel.css';
 @import './i18n.css';
 @import './loading.css';
-
-/** 2025Q1 there seems to be a bug with Astro where Tailwind won't detect all classes in client code */
-/** Currently the workaround is to explicitly name the path as a source */
-@source '../../packages/react-map-component';
 
 /** These custom properties are defined outside Tailwind's system */
 :root {

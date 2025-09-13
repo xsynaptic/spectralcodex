@@ -70,11 +70,11 @@ const t = getTranslations();
 						if (publisherMultilingual?.value && source.datePublished) {
 							PublisherMultilingual = (
 								<span>
-									{publisherMultilingual?.value}, {source.datePublished}
+									{publisherMultilingual.value}, {source.datePublished}
 								</span>
 							);
 						} else if (publisherMultilingual?.value) {
-							PublisherMultilingual = <span>{publisherMultilingual?.value}</span>;
+							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
 						} else if (source.datePublished) {
 							PublisherMultilingual = <span>{source.datePublished}</span>;
 						}

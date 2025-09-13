@@ -32,8 +32,4 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 		initializeMode();
 		if (window.mode) window.mode.setMode(window.mode.getMode());
 	});
-
-	window.addEventListener('unload', () => {
-		if (window.mode) window.mode.cleanup();
-	});
 </script>
