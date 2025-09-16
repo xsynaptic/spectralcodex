@@ -56,9 +56,9 @@ export interface ImageLoaderOptions {
 	/**
 	 * Run once after loading all images; can be used to invoke a setup function.
 	 */
-	beforeLoad?: () => void;
+	beforeLoad?: () => void | Promise<void>;
 	/**
 	 * Run once after loading all images; can be used to invoke a clean-up function.
 	 */
-	afterLoad?: () => void;
+	afterLoad?: () => void | Promise<void>;
 }
