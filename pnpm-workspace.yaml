@@ -6,6 +6,7 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
 
+minimumReleaseAge: 1440
+
 overrides:
-  '@xsynaptic/eslint-config': link:../eslint-config
   vite: 6.3.4
