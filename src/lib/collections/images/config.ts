@@ -64,8 +64,8 @@ export const images = defineCollection({
 					beforeLoad: () => {
 						exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
 					},
-					afterLoad: () => {
-						void exiftool.end();
+					afterLoad: async () => {
+						await exiftool.end();
 					},
 				}
 			: {}),
