@@ -16,6 +16,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const metadataItems = R.pipe(
 		themes,
 		R.filter(filterWithContent),
+		/** Only display themes with associated images */
+		R.filter((entry) => !!entry.data.imageSet && entry.data.imageSet.length > 0),
 		R.sort(sortByContentCount),
 		getContentMetadata
 	);
