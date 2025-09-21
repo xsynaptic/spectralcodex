@@ -40,8 +40,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       '@iconify/json':
-        specifier: ^2.2.385
-        version: 2.2.385
+        specifier: ^2.2.386
+        version: 2.2.386
       '@iconify/utils':
         specifier: ^3.0.2
         version: 3.0.2
@@ -205,8 +205,8 @@ importers:
         specifier: ^2.8.1
         version: 2.8.1
       zx:
-        specifier: ^8.8.1
-        version: 8.8.1
+        specifier: ^8.8.2
+        version: 8.8.2
 
   packages/astro-build-logger:
     devDependencies:
@@ -442,8 +442,8 @@ importers:
         specifier: 1.3.4-alpha.27
         version: 1.3.4-alpha.27
       '@iconify/json':
-        specifier: ^2.2.385
-        version: 2.2.385
+        specifier: ^2.2.386
+        version: 2.2.386
       '@iconify/tools':
         specifier: ^4.1.3
         version: 4.1.3
@@ -478,8 +478,8 @@ importers:
         specifier: ^4.20.5
         version: 4.20.5
       zx:
-        specifier: ^8.8.1
-        version: 8.8.1
+        specifier: ^8.8.2
+        version: 8.8.2
 
   packages/unified-tools:
     dependencies:
@@ -978,8 +978,8 @@ packages:
     resolution: {integrity: sha512-xeO57FpIu4p1Ri3Jq/EXq4ClRm86dVF2z/+kvFnyqVYRavTZmaFaUBbWCOuuTh0o/g7DSsk6kc2vrS4Vl5oPOQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.385':
-    resolution: {integrity: sha512-IOUKB/gXgATc76rejBzy+ypG7alDhLxC2jL7unmi+nB4mmztRUTtfF3wsMv2b+j0Zk/qMTB7wlvAhvqKsvdWGA==}
+  '@iconify/json@2.2.386':
+    resolution: {integrity: sha512-qvSvaRBu4B1PXKLoXc2yme+eRy3NDTQh/CO3k1vmXjwDKFTFUEVmn8nTD4elPMJZEQa3OOVjh4NfYopnxiAabA==}
 
   '@iconify/tools@4.1.3':
     resolution: {integrity: sha512-guPw9jvkrCCGFUvPr+NgUcQIpQcIll38NQzUzrEMK/1vrDmeJ9jstsp/Dx5LIP2na9BUBLHKOKXA6cERTpnGFw==}
@@ -6261,8 +6261,8 @@ packages:
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
-  zx@8.8.1:
-    resolution: {integrity: sha512-qvsKBnvWHstHKCluKPlEgI/D3+mdiQyMoSSeFR8IX/aXzWIas5A297KxKgPJhuPXdrR6ma0Jzx43+GQ/8sqbrw==}
+  zx@8.8.2:
+    resolution: {integrity: sha512-JuCw+diiuDihAtDC/ClDjaP3spsOxfFAMWrSa+esdU+YnBwYGuFef+B127zQ3x2FHOFULQ4NbaX/95d5260eYQ==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
 
@@ -6767,7 +6767,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.2': {}
 
-  '@iconify/json@2.2.385':
+  '@iconify/json@2.2.386':
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 1.1.2
@@ -14040,4 +14040,4 @@ snapshots:
 
   zwitch@2.0.4: {}
 
-  zx@8.8.1: {}
+  zx@8.8.2: {}
