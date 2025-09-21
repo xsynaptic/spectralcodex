@@ -6,8 +6,8 @@ import { ClientRouter } from 'astro:transitions';
 import '#styles/global.css';
 import type { MetaProps } from '#components/main/main-meta.astro';
 
-import LoadingBar from '#components/lib/progress-bar/progress-bar-loading.astro';
-import ReadingBar from '#components/lib/progress-bar/progress-bar-reading.astro';
+import ProgressBarLoading from '#components/lib/progress-bar/progress-bar-loading.astro';
+import ProgressBarReading from '#components/lib/progress-bar/progress-bar-reading.astro';
 import UmamiAnalytics from '#components/lib/umami-analytics.astro';
 import MainFooter from '#components/main/main-footer.astro';
 import MainHeader from '#components/main/main-header.astro';
@@ -18,10 +18,9 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 interface Props {
 	meta?: MetaProps;
 	hasHeroImage?: boolean;
-	hasReadingBar?: boolean;
 }
 
-const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
+const { hasHeroImage = false, meta } = Astro.props;
 ---
 
 <!doctype html>
@@ -65,21 +64,19 @@ const { hasHeroImage = false, hasReadingBar, meta } = Astro.props;
 			<slot />
 		</main>
 		<MainFooter />
-		<LoadingBar
+		<ProgressBarLoading
 			class:list={[
-				'z-[99] h-[2.5px] rounded-br-md shadow-lg shadow-current',
+				'z-[99] rounded-br-md shadow-lg shadow-current',
 				'from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800 bg-gradient-to-r',
 			]}
+			height="2.5px"
 		/>
-		{
-			hasReadingBar ? (
-				<ReadingBar
-					class:list={[
-						'z-[98] h-[2.5px] rounded-br-md shadow-lg shadow-current',
-						'from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800 bg-gradient-to-r',
-					]}
-				/>
-			) : undefined
-		}
+		<ProgressBarReading
+			class:list={[
+				'z-[98] rounded-br-md shadow-lg shadow-current',
+				'from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800 bg-gradient-to-r',
+			]}
+			height="2.5px"
+		/>
 	</body>
 </html>

@@ -5,12 +5,13 @@ import ProgressBar from './progress-bar.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
+	height?: string | undefined;
 }
 
-const { class: className, ...props } = Astro.props;
+const { class: className, height, ...props } = Astro.props;
 ---
 
-<ProgressBar id="loading-bar" class:list={[className]} {...props} />
+<ProgressBar id="loading-bar" class:list={[className]} height={height} {...props} />
 
 <script>
 	import { initialize } from './progress-bar-loading.ts';
