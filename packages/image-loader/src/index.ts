@@ -175,7 +175,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 			});
 
 			// Run the before load hook
-			options.beforeLoad?.();
+			await options.beforeLoad?.();
 
 			// Loop through glob data and generate metadata as needed
 			await Promise.all(
@@ -190,7 +190,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 			);
 
 			// Run the after load hook
-			options.afterLoad?.();
+			await options.afterLoad?.();
 
 			// Remove entries that were not found this time; they were presumably deleted
 			for (const id of untouchedEntries) {
@@ -220,7 +220,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 
 				// eslint-disable-next-line @typescript-eslint/no-misused-promises
 				changeTimeout = setTimeout(async () => {
-					options.beforeLoad?.();
+					await options.beforeLoad?.();
 
 					// Process all queued changes
 					for (const change of changeQueue.values()) {
@@ -244,7 +244,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 
 					changeQueue.clear();
 
-					options.afterLoad?.();
+					await options.afterLoad?.();
 				}, 300);
 			}
 
