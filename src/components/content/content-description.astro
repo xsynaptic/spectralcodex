@@ -1,12 +1,12 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
+import { transformMarkdown } from '@spectralcodex/unified-tools';
 import { render } from 'astro:content';
 
 import type { RegionLanguage } from '#lib/collections/regions/types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import FormatMarkdown from '#components/format/format-markdown.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
@@ -20,16 +20,18 @@ const { entry } = Astro.props;
 
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
-let regionLanguage: RegionLanguage | undefined;
+let langCode: RegionLanguage | undefined;
 
 if (entry.collection === 'regions') {
-	regionLanguage = entry.data.langCode;
+	langCode = entry.data.langCode;
 } else if (entry.collection === 'locations') {
-	regionLanguage = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)
-		?.data.langCode;
+	langCode = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)?.data
+		.langCode;
 } else {
-	regionLanguage = getFirstRegionByReference(entry.data.regions)?.data.langCode;
+	langCode = getFirstRegionByReference(entry.data.regions)?.data.langCode;
 }
+
+const wrapCjkOptions = langCode ? { langCode: langCode.startsWith('zh') ? 'zh' : langCode } : {};
 
 const hasContent = getHasContent(entry);
 
@@ -41,13 +43,17 @@ const { Content } = await render(entry);
 		<ProseBody class="pb-medium" data-pagefind-weight="2">
 			<Content />
 		</ProseBody>
-	) : (
+	) : undefined
+}{
+	!hasContent && entry.data.description ? (
 		<ContentSection>
 			<Fragment slot="section-description">
 				<ProseDescription data-pagefind-weight="2">
-					<FormatMarkdown langCode={regionLanguage}>{entry.data.description}</FormatMarkdown>
+					<Fragment
+						set:html={transformMarkdown({ input: entry.data.description, wrapCjkOptions })}
+					/>
 				</ProseDescription>
 			</Fragment>
 		</ContentSection>
-	)
+	) : undefined
 }

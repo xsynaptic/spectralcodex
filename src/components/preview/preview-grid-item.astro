@@ -1,9 +1,9 @@
 ---
+import { transformMarkdown } from '@spectralcodex/unified-tools';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
-import FormatMarkdown from '#components/format/format-markdown.astro';
-import FormatNumber from '#components/format/format-number.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
@@ -13,6 +13,7 @@ import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.t
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 export interface PreviewItemProps {
 	showCollection?: boolean | undefined;
@@ -95,8 +96,7 @@ const t = getTranslations();
 			showLocations && item.locationCount && item.locationCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('collection.locations.labelPlural')}:{' '}
-						<FormatNumber>{item.locationCount}</FormatNumber>
+						{t('collection.locations.labelPlural')}: {formatNumber({ number: item.locationCount })}
 					</span>
 				</DividedItem>
 			) : undefined
@@ -105,7 +105,7 @@ const t = getTranslations();
 			showPosts && item.postCount && item.postCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('collection.posts.labelPlural')}: <FormatNumber>{item.postCount}</FormatNumber>
+						{t('collection.posts.labelPlural')}: {formatNumber({ number: item.postCount })}
 					</span>
 				</DividedItem>
 			) : undefined
@@ -114,7 +114,7 @@ const t = getTranslations();
 			showWordCount && item.wordCount && item.wordCount > 0 ? (
 				<DividedItem>
 					<span>
-						{t('content.meta.wordCount.label')}: <FormatNumber>{item.wordCount}</FormatNumber>
+						{t('content.meta.wordCount.label')}: {formatNumber({ number: item.wordCount })}
 					</span>
 				</DividedItem>
 			) : undefined
@@ -124,10 +124,10 @@ const t = getTranslations();
 		}</Fragment
 	>
 	{
-		showDescription ? (
+		showDescription && item.description ? (
 			<Fragment slot="preview-description">
 				<ProseDescription class="mt-1" showCompact={showDescriptionCompact} showDarkMode={false}>
-					<FormatMarkdown>{item.description}</FormatMarkdown>
+					<Fragment set:html={transformMarkdown({ input: item.description })} />
 				</ProseDescription>
 			</Fragment>
 		) : undefined

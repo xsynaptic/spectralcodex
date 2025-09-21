@@ -1,11 +1,12 @@
 ---
 import type { Page } from 'astro';
 
+import { transformMarkdown } from '@spectralcodex/unified-tools';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
-import FormatMarkdown from '#components/format/format-markdown.astro';
 import MainSite from '#components/main/main-site.astro';
 import PaginationCounter from '#components/pagination/pagination-counter.astro';
 import Pagination from '#components/pagination/pagination.astro';
@@ -31,9 +32,10 @@ const description = t('collection.locations.description');
 		<Fragment slot="header-title-info"><PaginationCounter page={page} /></Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description">
-			{page.currentPage === 1 ? <FormatMarkdown>{description}</FormatMarkdown> : undefined}
-		</Fragment>
+		<Fragment
+			slot="section-description"
+			set:html={page.currentPage === 1 ? transformMarkdown({ input: description }) : undefined}
+		/>
 		<PreviewGrid items={page.data} showDate={true} showRegion={true} showTitleMultilingual={true} />
 		<Pagination class="mt-small md:mt-medium" page={page} />
 	</ContentSection>
