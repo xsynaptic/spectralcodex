@@ -37,14 +37,14 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.13.9",
+		"astro": "^5.13.10",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^6.3.6",
-		"@astrojs/mdx": "^4.3.5",
-		"@astrojs/node": "^9.4.3",
+		"@astrojs/markdown-remark": "^6.3.7",
+		"@astrojs/mdx": "^4.3.6",
+		"@astrojs/node": "^9.4.4",
 		"@astrojs/react": "^4.3.1",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.6.0",
@@ -62,7 +62,7 @@
 		"@spectralcodex/unified-tools": "workspace:*",
 		"@tailwindcss/typography": "^0.5.18",
 		"@tailwindcss/vite": "^4.1.13",
-		"@tanstack/eslint-plugin-query": "^5.89.0",
+		"@tanstack/eslint-plugin-query": "^5.90.1",
 		"@turf/helpers": "^7.2.0",
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
@@ -85,7 +85,7 @@
 		"keyv": "^5.5.2",
 		"ky": "^1.10.0",
 		"maplibre-gl": "^5.7.3",
-		"nanoid": "^5.1.5",
+		"nanoid": "^5.1.6",
 		"p-limit": "^7.1.1",
 		"prettier": "^3.6.2",
 		"prettier-plugin-astro": "^0.14.1",
@@ -103,7 +103,8 @@
 		"vite": "6.3.4",
 		"vitest": "^3.2.4",
 		"yaml": "^2.8.1",
-		"zx": "^8.8.2"
+		"zod": "^3.25.76",
+		"zx": "^8.8.3"
 	},
-	"packageManager": "pnpm@10.15.1+sha512.34e538c329b5553014ca8e8f4535997f96180a1d0f614339357449935350d924e22f8614682191264ec33d1462ac21561aff97f6bb18065351c162c7e8f6de67"
+	"packageManager": "pnpm@10.17.0+sha512.fce8a3dd29a4ed2ec566fb53efbb04d8c44a0f05bc6f24a73046910fb9c3ce7afa35a0980500668fa3573345bd644644fa98338fa168235c80f4aa17aa17fbef"
 }
