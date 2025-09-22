@@ -186,5 +186,6 @@ export default defineConfig({
 		],
 		contentIntellisense: true,
 		staticImportMetaEnv: true,
+		preserveScriptOrder: true, // Presumably the default in Astro 6
 	},
 });
