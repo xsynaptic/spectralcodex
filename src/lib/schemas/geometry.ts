@@ -1,7 +1,7 @@
 import type { Position } from 'geojson';
 
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';

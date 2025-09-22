@@ -1,6 +1,6 @@
 import type { ImageFunction } from 'astro:content';
 
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 import { CONTENT_IMAGE_FEATURED_MIN_WIDTH } from '#constants.ts';
 

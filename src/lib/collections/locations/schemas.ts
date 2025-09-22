@@ -1,4 +1,4 @@
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 /**
  * This closely maps to the Cultural Heritage Preservation Act's Tangible Cultural Assets definitions

@@ -1,8 +1,9 @@
 import { imageLoader } from '@spectralcodex/image-loader';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
+import { z } from 'zod';
 
 import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
 import {

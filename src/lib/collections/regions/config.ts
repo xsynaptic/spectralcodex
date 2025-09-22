@@ -1,5 +1,6 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
+import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/types.ts';

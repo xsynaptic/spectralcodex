@@ -1,4 +1,4 @@
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 import type { LanguageCode } from './i18n-types.ts';
 

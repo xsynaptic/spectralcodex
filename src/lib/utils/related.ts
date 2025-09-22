@@ -1,4 +1,4 @@
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 

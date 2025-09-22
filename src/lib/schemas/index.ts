@@ -1,5 +1,5 @@
 import { stylizeText } from '@spectralcodex/unified-tools';
-import { z } from 'astro:content';
+import { z } from 'zod';
 
 // Title schema; apply SmartyPants to arbitrary strings
 export const TitleSchema = z.string().transform((value) => stylizeText(value));

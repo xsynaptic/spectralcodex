@@ -1,4 +1,5 @@
-import { reference, z } from 'astro:content';
+import { reference } from 'astro:content';
+import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
