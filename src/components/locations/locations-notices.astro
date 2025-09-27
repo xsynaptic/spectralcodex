@@ -43,7 +43,10 @@ const t = getTranslations();
 					<Fragment set:html={transformMarkdown({ input: t('notice.demolished') })} />
 					{showChinese ? (
 						<Fragment
-							set:html={transformMarkdown({ input: t('notice.demolished'), wrapCjkOptions })}
+							set:html={transformMarkdown({
+								input: t('notice.demolished', langCode),
+								wrapCjkOptions,
+							})}
 						/>
 					) : undefined}
 				</AlertBox>
@@ -52,7 +55,9 @@ const t = getTranslations();
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.danger') })} />
 					{showChinese ? (
-						<Fragment set:html={transformMarkdown({ input: t('notice.danger'), wrapCjkOptions })} />
+						<Fragment
+							set:html={transformMarkdown({ input: t('notice.danger', langCode), wrapCjkOptions })}
+						/>
 					) : undefined}
 				</AlertBox>
 			) : undefined}
@@ -61,7 +66,7 @@ const t = getTranslations();
 					<Fragment set:html={transformMarkdown({ input: t('notice.quality') })} />
 					{showChinese ? (
 						<Fragment
-							set:html={transformMarkdown({ input: t('notice.quality'), wrapCjkOptions })}
+							set:html={transformMarkdown({ input: t('notice.quality', langCode), wrapCjkOptions })}
 						/>
 					) : undefined}
 				</AlertBox>

@@ -164,7 +164,7 @@ const translationStrings = {
 		'404.description': `Sorry, there doesn't seem to be anything at this URL! Please try another path.`,
 	},
 	[LanguageCodeEnum.ChineseTraditional]: {
-		'notice.danger': `**警告**：此地點已遭廢棄、荒廢，或長期無人管理，存在潛在危險。造訪時請務必提高警覺並採取適當防範措施。`,
+		'notice.danger': `**警告**：此地點已廢棄或長期無人管理，可能存在潛在危險。造訪時請務必提高警覺，並採取適當的安全防範措施。`,
 		'notice.demolished': `**提醒**：此地點已遭拆除，不再存在。本文僅供參考用途。`,
 		'notice.quality': `**說明**：本條目僅提供基礎資訊，內容可能過時、未經查證，甚至有所錯誤。建議進一步查閱相關資料以獲得更準確的理解。`,
 	},
