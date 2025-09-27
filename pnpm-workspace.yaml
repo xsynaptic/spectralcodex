@@ -6,7 +6,5 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
 
-minimumReleaseAge: 1440
-
 overrides:
   vite: 6.3.4
