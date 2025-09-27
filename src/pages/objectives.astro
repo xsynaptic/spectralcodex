@@ -1,6 +1,4 @@
 ---
-import * as R from 'remeda';
-
 import ObjectivesLayout from '#layouts/objectives.astro';
 import { getObjectiveLocations } from '#lib/collections/locations/utils-objectives.ts';
 import { getMapData } from '#lib/map/map-data.ts';
@@ -10,9 +8,7 @@ import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 const objectiveLocations = await getObjectiveLocations();
 
 const mapData = getMapData({
-	featureCollection: R.pipe(objectiveLocations, (locations) =>
-		getLocationsFeatureCollection(locations, { showAllLocations: true })
-	),
+	featureCollection: getLocationsFeatureCollection(objectiveLocations, { showAllLocations: true }),
 	mapApiBaseUrl: getMapApiBaseUrl('objectives'),
 	showObjectiveFilter: true,
 });
