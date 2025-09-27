@@ -41,5 +41,13 @@ export async function getContentStats() {
 		images: {
 			itemCount: formatNumber({ number: images.length }),
 		},
+		links: {
+			itemCount: formatNumber({
+				number: contentMetadataArray.reduce(
+					(linksCountPrevious, { linksCount }) => linksCountPrevious + (linksCount ?? 0),
+					0,
+				),
+			}),
+		},
 	};
 }

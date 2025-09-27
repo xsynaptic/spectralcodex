@@ -163,6 +163,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
+				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
 				wordCount: generateContentMetadataWordCount(entry), // Expensive!!!
 				backlinks: new Set<string>(), // Populated below
 				entryQuality: entry.data.entryQuality,
