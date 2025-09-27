@@ -17,7 +17,7 @@
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD --content-path=packages/content",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --content-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD --content-path=packages/content",
-		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions",
+		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-09-24.0/",
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
 		"deploy-static": "tsx --env-file=.env ./scripts/deploy-static.ts"
@@ -79,7 +79,7 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^5.2.0",
-		"exiftool-vendored": "^30.5.0",
+		"exiftool-vendored": "^31.0.0",
 		"geojson": "^0.5.0",
 		"globals": "^16.4.0",
 		"keyv": "^5.5.2",

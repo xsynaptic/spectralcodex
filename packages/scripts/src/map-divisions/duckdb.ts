@@ -42,7 +42,7 @@ export function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBo
 		SELECT 
 			id,
 			ST_AsGeoJSON(geometry) as geometry_geojson
-		FROM read_parquet('${baseUrl}/theme=divisions/type=division_area/*')
+		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*')
 		WHERE id IN (${quotedIds})`;
 
 	// Add bounding box filter if provided

@@ -43,7 +43,7 @@ const { values } = parseArgs({
 		'overture-url': {
 			type: 'string',
 			short: 'u',
-			default: 's3://overturemaps-us-west-2/release/2025-06-25.0',
+			default: '', // Note: this is required at runtime because the URL regularly changes!
 		},
 	},
 });
@@ -70,8 +70,6 @@ async function fetchDivisionData(
 			`Fetching division data for ${chalk.cyan(String(divisionIds.size))} unique division IDs...`,
 		),
 	);
-
-	console.log('boundingBoxId', boundingBoxId);
 
 	// Check cache for each division ID first
 	const divisionsById = new Map<string, DivisionItem>();
@@ -314,6 +312,11 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 }
 
 async function mapDivisions() {
+	if (values['overture-url'] === '') {
+		console.error(chalk.red('Overture URL is required'));
+		process.exit(1);
+	}
+
 	console.log(
 		chalk.blue(
 			`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(values['overture-url'])}...`,
