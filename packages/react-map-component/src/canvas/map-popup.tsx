@@ -50,7 +50,8 @@ const MapPopupContent: FC = () => {
 			{image ? (
 				<div>
 					<img
-						className="bg-fallback aspect-[3/2] w-full object-cover select-none"
+						className="bg-fallback w-full object-cover select-none"
+						style={{ aspectRatio: '3/2' }}
 						src={image.src}
 						srcSet={image.srcSet}
 						sizes={isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw'}
@@ -73,7 +74,7 @@ const MapPopupContent: FC = () => {
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 36 36"
-							className="text-highlight-500 w-[20px] md:w-[20px]"
+							className="text-highlight-500 h-[20px] md:h-[16px]"
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
 						</svg>
@@ -84,7 +85,8 @@ const MapPopupContent: FC = () => {
 				) : undefined}
 				{description ? (
 					<div
-						className="mt-1 mb-2 max-h-[119px] overflow-x-auto text-sm"
+						className="mt-1 mb-2 overflow-x-auto text-sm"
+						style={{ maxHeight: '119px' }}
 						dangerouslySetInnerHTML={{ __html: description }}
 					/>
 				) : undefined}
@@ -101,7 +103,8 @@ const MapPopupContent: FC = () => {
 						</div>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							className="text-primary-500 dark:text-primary-400 group-hover:text-highlight-400 h-[14px] transition-colors duration-300"
+							className="text-primary-500 dark:text-primary-400 group-hover:text-highlight-400 transition-colors duration-300"
+							style={{ height: '14px' }}
 							viewBox="0 0 24 24"
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>
@@ -177,11 +180,11 @@ export const MapPopup: FC = memo(function MapPopup() {
 			closeOnClick={false}
 			onClose={onClose}
 		>
-			<div className="relative flex min-h-[80px] min-w-[200px] flex-col">
+			<div className="relative flex flex-col" style={{ minWidth: '200px', minHeight: '80px' }}>
 				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
 					<div
-						className="loading-animation max-w-[100%] transition-opacity duration-500"
-						style={{ opacity: popupDataLoading ? 1 : 0 }}
+						className="loading-animation transition-opacity duration-500"
+						style={{ maxWidth: '100%', opacity: popupDataLoading ? 1 : 0 }}
 					/>
 				</div>
 				<div style={{ opacity: popupDataLoading ? 0 : 1 }}>

@@ -165,7 +165,8 @@ const MapFilterRatingMenuItem: FC = () => {
 						key={`rating-${String(value)}`}
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 36 36"
-						className={`w-[16px] cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 dark:text-primary-600 dark:focus:text-primary-400 hover:text-highlight-300 focus:text-primary-300'}`}
+						className={`cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 dark:text-primary-600 dark:focus:text-primary-400 hover:text-highlight-300 focus:text-primary-300'}`}
+						style={{ width: '16px' }}
 						onClick={() => {
 							if (ratingFilterValue === value) {
 								setRatingFilter(1);

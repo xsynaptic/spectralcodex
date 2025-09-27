@@ -31,8 +31,12 @@
 
 /* Adjust the sizing and positioning of the search result drawer */
 .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-	@apply px-small py-small absolute z-[99] mt-0 max-h-[85vh] w-full min-w-64 overflow-y-auto rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
+	@apply px-small py-small absolute w-full min-w-64 rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
 	background-color: var(--pagefind-ui-background);
+	margin-top: 0;
+	max-height: 85vh;
+	overflow-y: auto;
+	z-index: 99;
 }
 
 /* Hide "clear" text for visual users but keep it for screen readers */
@@ -43,10 +47,15 @@
 /* Create visible icon with pseudo-element */
 .pagefind-ui__search-clear::before {
 	--svg-cancel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.59-13L12 10.59L8.41 7L7 8.41L10.59 12L7 15.59L8.41 17L12 13.41L15.59 17L17 15.59L13.41 12L17 8.41z'/%3E%3C/svg%3E");
-	@apply text-primary-400 visible absolute top-1/2 aspect-square w-[16px] -translate-y-1/2 cursor-pointer bg-current;
-	@apply mask-size-[100%] mask-center mask-no-repeat;
+	@apply text-primary-400 visible absolute top-1/2 -translate-y-1/2 cursor-pointer;
+	aspect-ratio: 1/1;
+	background-color: currentColor;
 	content: '';
 	mask-image: var(--svg-cancel);
+	mask-position: center;
+	mask-repeat: no-repeat;
+	mask-size: 100%;
+	width: 16px;
 }
 [data-mode='dark'] .pagefind-ui__search-clear::before {
 	@apply text-primary-600;

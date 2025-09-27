@@ -30,7 +30,8 @@ const t = getTranslations();
 {
 	output ? (
 		<address
-			class:list={[className, 'px-small text-primary-400 mt-1 text-xs not-italic sm:px-0']}
+			class:list={[className, 'px-small text-primary-400 mt-1 text-xs sm:px-0']}
+			style={{ fontStyle: 'normal' }}
 			{...props}
 		>
 			{t('locations.address.label')}: <span set:html={output} />

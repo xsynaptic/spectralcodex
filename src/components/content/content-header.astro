@@ -31,11 +31,12 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 				as="h2"
 				gradientColor={showFeatured ? 'accent-featured' : 'accent'}
 				class:list={[
-					'font-heiti ml-[-0.125rem] pb-1 text-base leading-snug font-medium sm:font-semibold',
+					'font-heiti pb-1 text-base leading-snug font-medium sm:font-semibold',
 					showFeatured
 						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 						: 'text-lg md:text-xl lg:text-2xl',
 				]}
+				style={{ marginLeft: '-0.125rem' }}
 				data-pagefind-weight="2"
 			>
 				<Fragment set:html={titleMultilingual} />
@@ -47,11 +48,12 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 			as="h1"
 			gradientColor={showFeatured ? 'primary-featured' : 'primary'}
 			class:list={[
-				'font-display ml-[-0.125rem] pb-2 text-2xl leading-[1.125] font-semibold',
+				'font-display pb-2 text-2xl leading-[1.125] font-semibold',
 				showFeatured
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: '-mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
+			style={{ marginLeft: '-0.125rem' }}
 			data-pagefind-weight="3"
 		>
 			<slot name="header-title" />

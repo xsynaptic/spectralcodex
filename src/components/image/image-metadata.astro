@@ -26,8 +26,9 @@ const t = getTranslations();
 		<div
 			class:list={[
 				'text-primary-50 dark:text-primary-50',
-				'absolute right-0 bottom-0 z-10 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:opacity-0 group-focus-within:delay-100',
+				'absolute right-0 bottom-0 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:opacity-0 group-focus-within:delay-100',
 			]}
+			style={{ zIndex: 10 }}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -154,8 +155,9 @@ const t = getTranslations();
 		><div
 			class:list={[
 				'text-accent-700 dark:text-accent-400',
-				'absolute right-0 bottom-0 z-20 cursor-pointer p-2',
+				'absolute right-0 bottom-0 cursor-pointer p-2',
 			]}
+			style={{ zIndex: 20 }}
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

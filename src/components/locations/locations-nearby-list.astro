@@ -45,7 +45,10 @@ const t = getTranslations();
 							{distanceDisplay ? (
 								<>
 									{' '}
-									<span class:list={['break-keep', 'text-primary-500 dark:text-primary-600']}>
+									<span
+										class:list={['text-primary-500 dark:text-primary-600']}
+										style={{ wordBreak: 'keep-all' }}
+									>
 										{distanceDisplay}&nbsp;{t('locations.unit.km')}
 									</span>
 								</>

@@ -55,9 +55,10 @@ const { hasHeroImage = false, meta } = Astro.props;
 	</head>
 	<body
 		class:list={[
-			'flex min-h-screen min-w-[350px] flex-col overscroll-contain transition-colors',
+			'flex min-h-screen flex-col transition-colors',
 			'bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-400',
 		]}
+		style={{ minWidth: '350px', overscrollBehavior: 'contain' }}
 	>
 		<MainHeader hasHeroImage={hasHeroImage} />
 		<main id="content" class="flex-1">
@@ -66,17 +67,19 @@ const { hasHeroImage = false, meta } = Astro.props;
 		<MainFooter />
 		<ProgressBarLoading
 			class:list={[
-				'z-[99] rounded-br-md shadow-lg shadow-current',
+				'rounded-br-md shadow-lg shadow-current',
 				'from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800 bg-gradient-to-r',
 			]}
 			height="2.5px"
+			style={{ zIndex: 99 }}
 		/>
 		<ProgressBarReading
 			class:list={[
-				'z-[98] rounded-br-md shadow-lg shadow-current',
+				'rounded-br-md shadow-lg shadow-current',
 				'from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800 bg-gradient-to-r',
 			]}
 			height="2.5px"
+			style={{ zIndex: 98 }}
 		/>
 	</body>
 </html>

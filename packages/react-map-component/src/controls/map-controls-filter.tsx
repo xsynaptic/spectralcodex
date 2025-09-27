@@ -38,7 +38,8 @@ export const FilterControl: FC<{ position: ControlPosition }> = ({ position }) =
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						className={`text-primary-700 h-[20px] ${filterOpen ? 'text-primary-600 mt-[1px]' : ''} ${isLoading ? 'text-primary-600' : ''}`}
+						className={isLoading ? 'text-primary-600' : 'text-primary-700'}
+						style={{ height: '20px', ...(filterOpen ? { marginTop: '1px' } : {}) }}
 						viewBox="0 0 24 24"
 					>
 						<use xlinkHref={`#${MapSpritesEnum.Filters}`}></use>

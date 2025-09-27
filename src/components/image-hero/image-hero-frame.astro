@@ -9,15 +9,17 @@ const { class: className } = Astro.props;
 <div class:list={[className, 'sm:relative', 'dark:sm-bg-primary-300 sm:bg-primary-300']}>
 	<div
 		class:list={[
-			'pointer-events-none left-0 right-0 top-0 z-20 block h-0 w-full select-none text-transparent sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',
+			'pointer-events-none top-0 right-0 left-0 block h-0 w-full text-transparent select-none sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',
 			'sm:bg-featured-a',
 		]}
+		style={{ zIndex: 20 }}
 	>
 	</div><slot /><div
 		class:list={[
-			'pointer-events-none bottom-0 left-0 right-0 z-20 block h-0 w-full select-none sm:absolute sm:min-h-[20vh] md:h-[25vh] lg:h-[30vh]',
+			'pointer-events-none right-0 bottom-0 left-0 block h-0 w-full select-none sm:absolute sm:min-h-[20vh] md:h-[25vh] lg:h-[30vh]',
 			'sm:bg-featured-b',
 		]}
+		style={{ zIndex: 20 }}
 	>
 	</div>
 </div>

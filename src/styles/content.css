@@ -18,11 +18,9 @@
 .content > *:not(.content-image):not(.figure-group) {
 	@apply max-w-content px-small md:px-medium mx-auto;
 }
-.content > .content-image {
-	@apply mt-0;
-}
+.content > .content-image,
 .content > .content-image + p {
-	@apply mt-0;
+	margin-top: 0;
 }
 .content-image-caption a {
 	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 underline underline-offset-2 transition-colors duration-150 ease-in;
@@ -31,7 +29,7 @@
 	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
 }
 .content-image-caption em {
-	@apply not-italic;
+	font-style: normal;
 }
 
 /* Footnotes */
@@ -39,7 +37,8 @@
 	@apply prose-sm max-w-content;
 }
 .content > .footnotes ol li::marker {
-	@apply text-xs italic;
+	@apply text-xs;
+	font-style: italic;
 	margin-top: -5px;
 }
 .content .footnotes li p {
@@ -63,7 +62,8 @@
 }
 .content [data-footnote-ref],
 .content [data-footnote-backref] {
-	@apply font-medium no-underline select-none;
+	@apply font-medium select-none;
+	text-decoration-line: none;
 }
 
 /** Inserted by remark-rehype for use with the footnotes label */

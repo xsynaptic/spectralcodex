@@ -16,7 +16,7 @@ export const MetricsControl: FC<{ position: ControlPosition }> = function ({ pos
 		<CustomControlPortal position={position} className="maplibregl-ctrl">
 			{sourceDataLoading ? (
 				<div className="flex flex-col items-end">
-					<div className="loading-animation w-[15px]" />
+					<div className="loading-animation" style={{ width: '15px' }} />
 				</div>
 			) : (
 				<div className="text-primary-700 dark:text-primary-300 flex flex-nowrap gap-1 font-sans text-xs select-none">

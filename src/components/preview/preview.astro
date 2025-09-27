@@ -58,10 +58,8 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 			<ImagePlaceholder placeholder={placeholder}>
 				<a href={linkUrl}>
 					<Image
-						class:list={[
-							'w-full rounded-xs object-cover object-center text-sm text-transparent',
-							isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
-						]}
+						class:list={['w-full rounded-xs object-cover object-center text-sm text-transparent']}
+						style={{ aspectRatio: isImageSquare ? '1/1' : '3/2' }}
 						loading="lazy"
 						{...imageProps}
 					/>
@@ -69,11 +67,8 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 			</ImagePlaceholder>
 		) : (
 			<div
-				class:list={[
-					'bg-fallback',
-					'w-full rounded-xs text-sm text-transparent shadow-inner',
-					isImageSquare ? 'aspect-square' : 'aspect-[3/2]',
-				]}
+				class:list={['bg-fallback', 'w-full rounded-xs text-sm text-transparent shadow-inner']}
+				style={{ aspectRatio: isImageSquare ? '1/1' : '3/2' }}
 			/>
 		)
 	}
