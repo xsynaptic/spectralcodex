@@ -1,6 +1,7 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
+import { LocationLayerEnum } from 'packages/map-types/src/map-locations';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
@@ -25,6 +26,7 @@ export const locations = defineCollection({
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
+			layer: z.nativeEnum(LocationLayerEnum).default(LocationLayerEnum.Neutral),
 			category: z.nativeEnum(LocationCategoryEnum),
 			status: z.nativeEnum(LocationStatusEnum),
 			heritage: LocationTwHeritageSchema.optional(),

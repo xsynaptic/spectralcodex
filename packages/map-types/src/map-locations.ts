@@ -114,6 +114,14 @@ export const LocationStatusEnum = {
 
 export type LocationStatus = (typeof LocationStatusEnum)[keyof typeof LocationStatusEnum];
 
+export const LocationLayerEnum = {
+	Light: 'light',
+	Neutral: 'neutral',
+	Dark: 'dark',
+} as const satisfies Record<string, string>;
+
+export type LocationLayer = (typeof LocationLayerEnum)[keyof typeof LocationLayerEnum];
+
 export const LocationStatusNumericMapping = Object.fromEntries(
 	Object.values(LocationStatusEnum).map((value, i) => [value, i]),
 ) as Record<(typeof LocationStatusEnum)[keyof typeof LocationStatusEnum], number>;
