@@ -5,13 +5,13 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageSetSchema } from '#lib/schemas/image.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
 
 export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
 	schema: z
 		.object({
-			title: TitleSchema,
+			title: StylizedStringSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
 			// Strings, not references, because we mix content here (posts and locations)

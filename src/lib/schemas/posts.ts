@@ -2,7 +2,7 @@ import { reference } from 'astro:content';
 import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -10,7 +10,7 @@ import { SourceSchema } from '#lib/schemas/sources.ts';
 export const postSchema = z
 	.object({
 		slug: z.string(),
-		title: TitleSchema,
+		title: StylizedStringSchema,
 		...titleMultilingualSchema,
 		description: z.string().optional(),
 		locations: reference('locations').array().optional(),

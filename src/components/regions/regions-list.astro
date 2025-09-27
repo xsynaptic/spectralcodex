@@ -50,7 +50,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 					<DividedItem as="li" dividerContent={dividerContent} data-pagefind-filter="region">
 						{entry.data.title ? (
 							<Link href={getContentUrl(entry.collection, entry.id)}>
-								<Fragment set:html={entry.data.title.trim()} />
+								<Fragment set:html={entry.data.title} />
 							</Link>
 						) : undefined}
 						{titleMultilingual ? (

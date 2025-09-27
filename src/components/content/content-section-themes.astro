@@ -38,7 +38,7 @@ const t = getTranslations();
 							data-pagefind-filter="theme"
 						>
 							{item.data.title ? (
-								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title.trim()}</Link>
+								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title}</Link>
 							) : undefined}
 							{titleMultilingual ? (
 								<>

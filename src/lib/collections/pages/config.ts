@@ -8,7 +8,7 @@ import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
-	TitleSchema,
+	StylizedStringSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 
@@ -17,7 +17,7 @@ export const pages = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/pages` }),
 	schema: z
 		.object({
-			title: TitleSchema,
+			title: StylizedStringSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
 			regions: reference('regions').array().optional(),

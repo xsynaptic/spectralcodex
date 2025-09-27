@@ -85,7 +85,7 @@ const t = getTranslations();
 					{regions.map((region) => (
 						<DividedItem dividerContent="chevron">
 							<Link href={getContentUrl('regions', region.id)} showDarkMode={false}>
-								{region.data.title.trim()}
+								{region.data.title}
 							</Link>
 						</DividedItem>
 					))}
