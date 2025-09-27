@@ -32,17 +32,17 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	}
 }
 
-// Query division_area table using unique division IDs (GERS IDs) with bounding box optimization
+// Query division_area table using unique division (GERS) IDs with bounding box optimization
 // Convert WKB geometry to GeoJSON using DuckDB's spatial functions
 // Only select the essential data we need: id and geometry
 export function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: BoundingBox) {
 	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
 
 	let query = `
-		SELECT 
+		SELECT
 			id,
 			ST_AsGeoJSON(geometry) as geometry_geojson
-		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*')
+		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*', hive_partitioning=1)
 		WHERE id IN (${quotedIds})`;
 
 	// Add bounding box filter if provided
