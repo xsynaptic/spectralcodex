@@ -156,6 +156,7 @@ export default defineConfig({
 		],
 	},
 	experimental: {
+		// Note: fallback fonts are handled in `styles/themes/fonts.css`
 		fonts: [
 			{
 				provider: fontProviders.fontsource(),
@@ -164,6 +165,7 @@ export default defineConfig({
 				weights: ['300 700'],
 				styles: ['normal'],
 				subsets: ['latin'],
+				fallbacks: [],
 				optimizedFallbacks: false,
 			},
 			{
@@ -173,6 +175,7 @@ export default defineConfig({
 				weights: ['300 700'],
 				styles: ['normal'],
 				subsets: ['latin'],
+				fallbacks: [],
 				optimizedFallbacks: false,
 			},
 			{
@@ -181,6 +184,7 @@ export default defineConfig({
 				cssVariable: '--font-lora',
 				weights: ['300 700'],
 				styles: ['normal', 'italic'],
+				fallbacks: [],
 				optimizedFallbacks: false,
 			},
 		],
