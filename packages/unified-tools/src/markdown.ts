@@ -14,12 +14,12 @@ export function transformMarkdown({
 }: {
 	input: string;
 	wrapCjkOptions?: Partial<RehypeWrapCjkOptions>;
-}) {
+}): string {
 	const processor = unified().use(remarkParse).use(remarkSmartyPants).use(remarkRehype);
 
 	if (wrapCjkOptions) processor.use(rehypeWrapCjk, wrapCjkOptions);
 
 	processor.use(rehypeSanitize).use(rehypeStringify);
 
-	return processor.processSync(input).toString();
+	return processor.processSync(input).toString().trim();
 }

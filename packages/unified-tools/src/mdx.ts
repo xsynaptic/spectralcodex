@@ -5,7 +5,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified } from 'unified';
 
-export function sanitizeMdx(input: string) {
+export function sanitizeMdx(input: string): string {
 	const processor = unified()
 		.use(remarkParse)
 		.use(remarkMdx)

@@ -4,7 +4,7 @@ import rehypeStringify from 'rehype-stringify';
 import rehypeWrapCjk, { type RehypeWrapCjkOptions } from 'rehype-wrap-cjk';
 import { unified } from 'unified';
 
-export function wrapChinese(input: string) {
+export function wrapChinese(input: string): string {
 	const processor = unified()
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'zh' })
@@ -14,7 +14,7 @@ export function wrapChinese(input: string) {
 	return processor.processSync(input).toString();
 }
 
-export function wrapJapanese(input: string) {
+export function wrapJapanese(input: string): string {
 	const processor = unified()
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'ja' })
@@ -24,7 +24,7 @@ export function wrapJapanese(input: string) {
 	return processor.processSync(input).toString();
 }
 
-export function wrapKorean(input: string) {
+export function wrapKorean(input: string): string {
 	const processor = unified()
 		.use(rehypeParse, { fragment: true })
 		.use(rehypeWrapCjk, { langCode: 'ko' })
@@ -40,7 +40,7 @@ export function wrapCjk({
 }: {
 	input: string;
 	wrapCjkOptions?: Partial<RehypeWrapCjkOptions>;
-}) {
+}): string {
 	const processor = unified().use(rehypeParse, { fragment: true });
 
 	if (wrapCjkOptions) processor.use(rehypeWrapCjk, wrapCjkOptions);
