@@ -17,8 +17,8 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { locations: locationIds, languages, showHidden = false, ...props } = Astro.props;
 
-// No map components in RSS allowed
-const { isRss } = Astro.locals;
+// No map components in feed allowed
+const { isFeed } = Astro.locals;
 
 const getLocationsByReference = await getLocationsByIdsFunction();
 
@@ -34,7 +34,7 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 ---
 
 {
-	hasGeodata && !isRss ? (
+	hasGeodata && !isFeed ? (
 		<Container as="div" fillViewport={true} {...props} class="not-prose" data-pagefind-ignore>
 			<MapComponent mapComponentProps={mapComponentProps} />
 		</Container>

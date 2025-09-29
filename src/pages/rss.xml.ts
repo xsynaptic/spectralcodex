@@ -23,39 +23,37 @@ import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
-// Provide some helpful info while debugging RSS feed generation
-const RSS_FEED_DEBUG = false as boolean;
+// Provide some helpful info while debugging feed generation
+const FEED_DEBUG = false as boolean;
 
-// Should footnotes be excluded from RSS feed content?
-const RSS_FEED_EXCLUDE_FOOTNOTES = true as boolean;
+// Should footnotes be excluded from feed content?
+const FEED_EXCLUDE_FOOTNOTES = true as boolean;
 
-// How many items should be included in the RSS feed?
-const RSS_FEED_ITEM_COUNT = 20;
+// How many items should be included in the feed?
+const FEED_ITEM_COUNT = 20;
 
 const renderMdx = await getRenderMdxFunction();
 
-const getRssItem = async (
-	entry: CollectionEntry<'ephemera' | 'posts'> | CollectionEntry<'locations'>,
-) => {
+const generateFeedItem = async (entry: CollectionEntry<'ephemera' | 'locations' | 'posts'>) => {
 	const startTime = performance.now();
 
 	const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
-	const postHtml = await renderMdx(entry, {
+	const contentHtml = await renderMdx(entry, {
 		locals: {
-			isRss: true, // This conditional controls the output of MDX components
+			isFeed: true, // This conditional controls the output of MDX components
 		},
 	});
 
 	const contentSanitized = sanitizeHtml(
-		RSS_FEED_EXCLUDE_FOOTNOTES ? stripFootnotes(postHtml) : postHtml,
+		FEED_EXCLUDE_FOOTNOTES ? stripFootnotes(contentHtml) : contentHtml,
 		{
 			...defaultSchema,
 			tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'],
 		},
 	);
 
-	const rssFeedItem = {
+	const feedItem = {
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
@@ -68,32 +66,23 @@ const getRssItem = async (
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 
-	if (RSS_FEED_DEBUG) {
+	if (FEED_DEBUG) {
 		console.log(
 			`[RSS] Generated entry for "${entry.data.title}" in ${(performance.now() - startTime).toFixed(5)}ms`,
 		);
 	}
 
-	return rssFeedItem;
+	return feedItem;
 };
 
-/**
- * @link https://docs.astro.build/en/guides/rss/
- */
-export async function GET(context: APIContext): Promise<Response> {
-	const startTime = performance.now();
-
-	if (RSS_FEED_DEBUG) console.log(`[RSS] Initializing feed...`);
-
+async function generateFeedItems() {
 	const { ephemera } = await getEphemeraCollection();
 	const { locations } = await getLocationsCollection();
 	const { posts } = await getPostsCollection();
 
 	const filterEntryQuality = getFilterEntryQualityFunction(3);
 
-	const t = getTranslations();
-
-	const items = R.pipe(
+	return R.pipe(
 		await R.pipe(
 			[
 				...ephemera.filter(filterEntryQuality),
@@ -101,12 +90,25 @@ export async function GET(context: APIContext): Promise<Response> {
 				...locations.filter(filterEntryQuality),
 			],
 			R.sort(sortByDateReverseChronological),
-			R.take(RSS_FEED_ITEM_COUNT),
-			(items) => Promise.all(items.map(getRssItem)),
+			R.take(FEED_ITEM_COUNT),
+			(items) => Promise.all(items.map(generateFeedItem)),
 		),
 		R.sort((a, b) => (a.pubDate && b.pubDate ? b.pubDate.getTime() - a.pubDate.getTime() : -1)),
-		R.take(RSS_FEED_ITEM_COUNT),
+		R.take(FEED_ITEM_COUNT),
 	);
+}
+
+/**
+ * @link https://docs.astro.build/en/guides/rss/
+ */
+export async function GET(context: APIContext): Promise<Response> {
+	const startTime = performance.now();
+
+	if (FEED_DEBUG) console.log(`[RSS] Initializing feed...`);
+
+	const items = await generateFeedItems();
+
+	const t = getTranslations();
 
 	const rssFeed = rss({
 		customData: '<language>en-us</language>',
@@ -116,7 +118,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		items,
 	});
 
-	if (RSS_FEED_DEBUG) {
+	if (FEED_DEBUG) {
 		console.log(`[RSS] Generated in ${(performance.now() - startTime).toFixed(5)}ms`);
 
 		if (items.length > 0) {

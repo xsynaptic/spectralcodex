@@ -1,7 +1,7 @@
 ---
 import { CONTENT_EXCERPT_IDENTIFIER } from '#constants.ts';
 
-const { isRss } = Astro.locals;
+const { isFeed } = Astro.locals;
 ---
 
-{isRss ? undefined : <Fragment set:html={`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`} />}
+{isFeed ? undefined : <Fragment set:html={`<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->`} />}

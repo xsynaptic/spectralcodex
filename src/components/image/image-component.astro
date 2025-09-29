@@ -30,15 +30,15 @@ const {
 	...props
 } = Astro.props;
 
-// This controls how the component is rendered; RSS requires a less complex output
-const { isRss } = Astro.locals;
+// This controls how the component is rendered; feeds requires a less complex output
+const { isFeed } = Astro.locals;
 
 const slotContents = await renderSlot(Astro.slots, 'default');
 
 const imageEntry = await getImageById(imageId);
 
 const imageProps = imageEntry
-	? ((isRss
+	? ((isFeed
 			? {
 					src: imageEntry.data.src,
 					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
@@ -67,7 +67,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 
 {
 	imageProps ? (
-		isRss ? (
+		isFeed ? (
 			<figure {...props}>
 				<Image loading="lazy" {...imageProps} />
 				{caption ? (
