@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { MapComponentProps } from 'packages/react-map-component/src';
 
 import { MAP_ICONS_PATH } from 'astro:env/client';
@@ -8,9 +9,12 @@ import MapComponentSprites from '#components/map/map-component-sprites.astro';
 import '#styles/map.css';
 import { FEATURE_MAP_ICONS } from '#constants.ts';
 
-type Props = MapComponentProps & { mapId?: string | undefined };
+interface Props extends HTMLAttributes<'div'> {
+	mapId?: string | undefined;
+	mapComponentProps: MapComponentProps;
+}
 
-const { mapId, ...mapComponentProps } = Astro.props;
+const { mapId, mapComponentProps, ...props } = Astro.props;
 
 const spritesUrl =
 	FEATURE_MAP_ICONS && MAP_ICONS_PATH ? new URL(MAP_ICONS_PATH, Astro.site).href : undefined;
@@ -19,10 +23,9 @@ const spritesUrl =
 <MapComponentSprites />
 
 <div
-	class:list={[
-		'relative flex h-full max-h-[100vh] min-h-[min(600px,100vh)] overflow-hidden sm:rounded-xs lg:rounded-md',
-		'bg-fallback',
-	]}
+	class:list={['bg-fallback', 'relative flex h-full sm:rounded-xs lg:rounded-md']}
+	style={{ maxHeight: '100vh', minHeight: 'min(600px,100vh)', overflow: 'hidden' }}
+	{...props}
 	data-pagefind-ignore
 >
 	{
@@ -42,6 +45,6 @@ const spritesUrl =
 		class="text-primary-700 dark:text-highlight-400 absolute flex h-full w-full justify-center"
 		style={{ zIndex: 10 }}
 	>
-		<div class="loading-animation w-[20%]"></div>
+		<div class="loading-animation" style={{ width: '20%' }}></div>
 	</div>
 </div>

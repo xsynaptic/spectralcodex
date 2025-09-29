@@ -1,15 +1,17 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import { ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	layout?: Extract<ImageLayout, 'medium' | 'wide'>;
 	columns?: number | string;
 }
 
-const { layout, columns: columnsProp } = Astro.props;
+const { layout, columns: columnsProp, ...props } = Astro.props;
 
 // This conditional controls whether slot contents are just passed through
 const { isRss } = Astro.locals;
@@ -50,6 +52,7 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 				columns === 4 ? 'md:grid-cols-4' : undefined,
 				columns === 5 ? 'md:grid-cols-5' : undefined,
 			]}
+			{...props}
 		>
 			<Fragment set:html={slotContents} />
 		</div>

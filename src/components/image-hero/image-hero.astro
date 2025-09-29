@@ -44,7 +44,7 @@ const placeholder = imageEntry
 
 {
 	imageProps ? (
-		<ImageHeroFrame class:list={[className, 'overflow-hidden']}>
+		<ImageHeroFrame class={className} style={{ overflow: 'hidden' }}>
 			<ImagePlaceholder placeholder={placeholder}>
 				<Image
 					class:list={[

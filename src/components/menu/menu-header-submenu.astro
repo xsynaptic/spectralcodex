@@ -1,16 +1,18 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { MenuItem } from '#lib/menu/menu-types.ts';
 
 import Link from '#components/parts/link.astro';
 import { getMenuItemAriaLabel, getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'ul'> {
 	hasHeroImage: boolean;
 	menuItems: Array<MenuItem>;
 	depth: number;
 }
 
-const { hasHeroImage, menuItems, depth } = Astro.props;
+const { hasHeroImage, menuItems, depth, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 ---
@@ -46,6 +48,7 @@ const { pathname } = Astro.url;
 				]
 			: undefined,
 	]}
+	{...props}
 >
 	{
 		menuItems.map((item) => {

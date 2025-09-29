@@ -47,9 +47,11 @@ button.maplibregl-popup-close-button:focus {
 	user-select: none;
 }
 .maplibregl-ctrl-scale {
-	@apply text-primary-600 border-primary-400 bg-transparent;
+	@apply text-primary-600 border-primary-400;
 	@apply rounded-br-sm rounded-bl-sm border-r border-b border-l font-sans text-shadow-sm;
+	background-color: transparent;
 }
 [data-mode='dark'] .maplibregl-ctrl-scale {
-	@apply text-primary-300 border-primary-500 bg-transparent;
+	@apply text-primary-300 border-primary-500;
+	background-color: transparent;
 }

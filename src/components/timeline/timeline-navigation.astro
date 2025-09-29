@@ -1,18 +1,20 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	dateNavAllYears: Array<string>;
 }
 
-const { dateNavAllYears } = Astro.props;
+const { dateNavAllYears, ...props } = Astro.props;
 ---
 
 {
 	dateNavAllYears.length > 0 ? (
-		<div class="flex flex-wrap gap-1">
+		<div class="flex flex-wrap gap-1" {...props}>
 			{dateNavAllYears.map((year) => (
 				<DividedItem>
 					<Link class="text-sm" href={getSiteUrl('timeline', year)}>

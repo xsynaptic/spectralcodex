@@ -5,13 +5,13 @@ import type { CollectionEntry } from 'astro:content';
 import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
-import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageSetMetadata } from '#lib/image/image-set.ts';
@@ -61,7 +61,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<CollectionLink collection={entry.collection} showFeatured={true} />
+							<ContentCollectionLink collection={entry.collection} showFeatured={true} />
 						</Fragment>
 					</ContentHeader>
 				</ImageHeroCarousel>
@@ -72,7 +72,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 						<Multilingual content={titleMultilingual} />
 					</Fragment>
 					<Fragment slot="header-subtitle">
-						<CollectionLink collection={entry.collection} />
+						<ContentCollectionLink collection={entry.collection} />
 					</Fragment>
 				</ContentHeader>
 			)

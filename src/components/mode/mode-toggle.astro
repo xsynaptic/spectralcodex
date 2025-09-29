@@ -1,12 +1,18 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+type Props = HTMLAttributes<'div'>;
+
+const props = Astro.props;
 
 const t = getTranslations();
 
 // Icons from Lucide; lucide:moon and lucide:sun-medium
 ---
 
-<div>
+<div {...props}>
 	<button
 		id="mode-toggle"
 		class:list={[

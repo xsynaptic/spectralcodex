@@ -5,6 +5,7 @@ import { render } from 'astro:content';
 
 import type { MapComponentData } from '#lib/map/map-types.ts';
 
+import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
@@ -18,7 +19,6 @@ import ContentSectionThemes from '#components/content/content-section-themes.ast
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import CollectionLink from '#components/parts/link-collection.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -70,7 +70,7 @@ const { Content } = await render(entry);
 						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
-								<CollectionLink collection="posts" showFeatured={true} />
+								<ContentCollectionLink collection="posts" showFeatured={true} />
 							</DividedItem>
 							<DividedItem dividerColor="hero">
 								<ContentDate
@@ -90,7 +90,7 @@ const { Content } = await render(entry);
 					</Fragment>
 					<Fragment slot="header-subtitle">
 						<DividedItem>
-							<CollectionLink collection="posts" />
+							<ContentCollectionLink collection="posts" />
 						</DividedItem>
 						<DividedItem>
 							<ContentDate

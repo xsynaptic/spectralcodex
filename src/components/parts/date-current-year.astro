@@ -3,10 +3,16 @@
  * A simple hack to always update the year in the event of my untimely demise
  * @link - https://astro-tips.dev/recipes/dynamic-footer-date-for-static-websites/
  */
+import type { HTMLAttributes } from 'astro/types';
+
+type Props = HTMLAttributes<'span'>;
+
+const props = Astro.props;
+
 const currentYear = new Date().getFullYear();
 ---
 
-<span data-current-year>{currentYear}</span>
+<span data-current-year {...props}>{currentYear}</span>
 
 <script data-astro-rerun is:inline>
 	(() => {

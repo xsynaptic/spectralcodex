@@ -1,12 +1,14 @@
 ---
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'script'> {
 	id: string | undefined;
 	domain: string | undefined;
 	isProduction: boolean;
 	isViewTransitionsEnabled: boolean;
 }
 
-const { id, domain, isProduction, isViewTransitionsEnabled } = Astro.props;
+const { id, domain, isProduction, isViewTransitionsEnabled, ...props } = Astro.props;
 ---
 
 {
@@ -15,6 +17,7 @@ const { id, domain, isProduction, isViewTransitionsEnabled } = Astro.props;
 			defer
 			src={`${domain}/script.js`}
 			data-website-id={id}
+			{...props}
 			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
 			is:inline
 		/>

@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
@@ -14,7 +15,7 @@ import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'figure'> {
 	imageId: string;
 	alt?: string;
 	layout?: ImageLayout;
@@ -26,6 +27,7 @@ const {
 	alt: altProp,
 	layout = ImageLayoutEnum.Default,
 	showMetadata = false,
+	...props
 } = Astro.props;
 
 // This controls how the component is rendered; RSS requires a less complex output
@@ -66,7 +68,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 {
 	imageProps ? (
 		isRss ? (
-			<figure>
+			<figure {...props}>
 				<Image loading="lazy" {...imageProps} />
 				{caption ? (
 					<figcaption>
@@ -86,6 +88,7 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 					layout === ImageLayoutEnum.Wide ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
 					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
 				]}
+				{...props}
 			>
 				<ImagePlaceholder
 					class:list={['relative', layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs']}

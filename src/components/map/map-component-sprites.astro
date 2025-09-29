@@ -1,7 +1,6 @@
 ---
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
-import SpriteSheet from '#components/parts/sprite-sheet.astro';
 import { getSprites } from '#lib/icons/icons-utils.ts';
 
 interface Props {
@@ -18,7 +17,11 @@ const mapSprites = showPrebuiltSprites
 
 {
 	mapSprites ? (
-		<SpriteSheet sprites={mapSprites} />
+		<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
+			{mapSprites.map((sprite) => (
+				<Fragment set:html={sprite} />
+			))}
+		</svg>
 	) : (
 		<svg xmlns="http://www.w3.org/2000/svg" class="hidden">
 			<>

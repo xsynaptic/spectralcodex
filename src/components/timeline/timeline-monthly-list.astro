@@ -1,18 +1,20 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { TimelineMonthlyData } from '#lib/timeline/timeline-types.ts';
 
 import Link from '#components/parts/link.astro';
 import TimelineList from '#components/timeline/timeline-list.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'ul'> {
 	timelineMonthlyData: Array<TimelineMonthlyData>;
 }
 
-const { timelineMonthlyData } = Astro.props;
+const { timelineMonthlyData, ...props } = Astro.props;
 ---
 
-<ul class="mb-medium">
+<ul class="mb-medium" {...props}>
 	{
 		timelineMonthlyData.map(({ id, title, timelineItems }) => (
 			<li class="mb-1">

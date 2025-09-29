@@ -10,14 +10,14 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	after?: string | undefined;
 }>;
 
-const { as: Tag = 'span', class: className, before = '(', after = ')' } = Astro.props;
+const { as: Tag = 'span', class: className, before = '(', after = ')', ...props } = Astro.props;
 
 const content = await renderSlot(Astro.slots, 'default');
 ---
 
 {
 	content ? (
-		<Tag class={className}>
+		<Tag class={className} {...props}>
 			{before}
 			<slot />
 			{after}

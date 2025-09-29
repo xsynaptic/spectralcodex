@@ -1,9 +1,11 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import ImageComponent from '#components/image/image-component.astro';
 
-interface Props {
+interface Props extends HTMLAttributes<'figure'> {
 	src: string;
 	alt?: string;
 	layout?: ImageLayout;

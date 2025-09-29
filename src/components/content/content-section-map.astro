@@ -23,7 +23,7 @@ const t = getTranslations();
 	hasGeodata ? (
 		<ContentSection fillViewport={true} data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.map')}</Fragment>
-			<MapComponent mapId={mapId} {...mapComponentProps} />
+			<MapComponent mapId={mapId} mapComponentProps={mapComponentProps} />
 			<slot />
 		</ContentSection>
 	) : undefined

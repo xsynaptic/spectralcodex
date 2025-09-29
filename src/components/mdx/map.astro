@@ -1,4 +1,6 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import * as R from 'remeda';
 
 import MapComponent from '#components/map/map-component.astro';
@@ -7,13 +9,13 @@ import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	locations: Array<string>;
 	languages?: Array<string> | undefined; // For controlling interface language
 	showHidden: boolean;
 }
 
-const { locations: locationIds, languages, showHidden = false } = Astro.props;
+const { locations: locationIds, languages, showHidden = false, ...props } = Astro.props;
 
 // No map components in RSS allowed
 const { isRss } = Astro.locals;
@@ -33,8 +35,8 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 
 {
 	hasGeodata && !isRss ? (
-		<Container as="div" class="not-prose" fillViewport={true} data-pagefind-ignore>
-			<MapComponent {...mapComponentProps} />
+		<Container as="div" fillViewport={true} {...props} class="not-prose" data-pagefind-ignore>
+			<MapComponent mapComponentProps={mapComponentProps} />
 		</Container>
 	) : undefined
 }

@@ -23,7 +23,9 @@
 	margin-top: 0;
 }
 .content-image-caption a {
-	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 underline underline-offset-2 transition-colors duration-150 ease-in;
+	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 transition-colors duration-150 ease-in;
+	text-decoration-line: underline;
+	text-underline-offset: 2px;
 }
 [data-mode='dark'] .content-image-caption a {
 	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;

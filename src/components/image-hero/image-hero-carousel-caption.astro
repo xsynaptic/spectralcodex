@@ -7,7 +7,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 type Props = ContentMetadataItem;
 
-const { title, titleMultilingual, url } = Astro.props;
+const { title, titleMultilingual, url, ...props } = Astro.props;
 
 const t = getTranslations();
 
@@ -18,11 +18,12 @@ const t = getTranslations();
 	title ? (
 		<div
 			class:list={[
-				'sm:min-h-none max-w-content pointer-events-none absolute right-0 bottom-0 left-0 mx-auto flex flex-col justify-end sm:bg-none',
 				'bg-featured-b',
+				'sm:min-h-none max-w-content pointer-events-none absolute right-0 bottom-0 left-0 mx-auto flex flex-col justify-end sm:bg-none',
 			]}
 			style={{ zIndex: 31, minHeight: '80px' }}
 			data-pagefind-ignore
+			{...props}
 		>
 			<div
 				class:list={[

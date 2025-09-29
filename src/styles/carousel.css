@@ -1,5 +1,5 @@
 /* Carousel; adapted from Daisy UI */
-.carousel {
+.carousel-container {
 	display: flex;
 	overflow-x: scroll;
 	scroll-behavior: smooth;

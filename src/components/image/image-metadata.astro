@@ -1,22 +1,23 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import ImageMetadataItem from '#components/image/image-metadata-item.astro';
 import DateDisplay from '#components/parts/date-display.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'images'>;
 }
 
-const { entry } = Astro.props;
+const { entry, ...props } = Astro.props;
 
 const t = getTranslations();
 
 // Icons: mdi:eye + mdi:eye-off
 ---
 
-<div class:list={['group absolute inset-0']} data-pagefind-ignore>
+<div class:list={['group absolute inset-0']} data-pagefind-ignore {...props}>
 	<button
 		class:list={[
 			'peer transition-opacity delay-200 duration-300 sm:opacity-0 sm:hover:opacity-100 sm:focus:opacity-100',
@@ -45,15 +46,17 @@ const t = getTranslations();
 		</div>
 		<div
 			class:list={[
-				'pointer-events-none absolute inset-0 flex h-full max-h-full w-full items-end overflow-y-auto font-sans opacity-0 transition-opacity delay-100 duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 sm:rounded-b-xs',
+				'pointer-events-none absolute inset-0 flex h-full max-h-full w-full items-end font-sans opacity-0 transition-opacity delay-100 duration-200 group-focus-within:pointer-events-auto group-focus-within:opacity-100 sm:rounded-b-xs',
 			]}
+			style={{ overflowY: 'auto' }}
 		>
 			<div
 				class:list={[
 					'bg-primary-50/75 dark:bg-primary-800/75',
 					'grid grid-cols-4 gap-1 sm:grid-cols-8 sm:gap-2 md:grid-cols-12 md:gap-4 @max-lg:sm:gap-1 @max-lg:md:grid-cols-8 @max-sm:sm:grid-cols-4 @max-sm:md:grid-cols-4',
-					'px-small max-h-full w-full overflow-y-auto py-2 backdrop-grayscale',
+					'px-small max-h-full w-full py-2 backdrop-grayscale',
 				]}
+				style={{ overflowY: 'auto' }}
 			>
 				{
 					entry.data.dateCreated ? (

@@ -1,15 +1,17 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMenuHeaderItems } from '#lib/menu/menu-header.ts';
 import { getMenuItemAriaLabel, getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'nav'> {
 	hasHeroImage: boolean;
 }
 
-const { hasHeroImage } = Astro.props;
+const { hasHeroImage, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 
@@ -18,7 +20,7 @@ const menuItems = await getMenuHeaderItems();
 const t = getTranslations();
 ---
 
-<nav class="relative" aria-label={t('site.menu.header.label')}>
+<nav class="relative" aria-label={t('site.menu.header.label')} {...props}>
 	<ul
 		class:list={[
 			'flex flex-wrap justify-between gap-x-4 gap-y-2 md:gap-x-2',

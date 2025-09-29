@@ -26,11 +26,11 @@ export const FilterControl: FC<{ position: ControlPosition }> = ({ position }) =
 		<CustomControlPortal position={position}>
 			<button
 				id={MAP_FILTER_CONTROL_ID}
-				className="overflow-hidden"
 				disabled={isLoading}
 				onClick={() => {
 					if (!isLoading) setFilterOpen(!filterOpen);
 				}}
+				style={{ overflow: 'hidden' }}
 				aria-label={translations.filterMenuAriaLabel}
 			>
 				<div

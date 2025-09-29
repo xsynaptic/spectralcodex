@@ -1,7 +1,19 @@
 ---
-import MainColophon from '#components/main/main-colophon.astro';
 import MenuFooter from '#components/menu/menu-footer.astro';
 import Container from '#components/parts/container.astro';
+import DateCurrentYear from '#components/parts/date-current-year.astro';
+import DateDisplay from '#components/parts/date-display.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Link from '#components/parts/link.astro';
+import { SITE_YEAR_FOUNDED } from '#constants.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+
+const siteUrl = getSiteUrl();
+
+const dateBuild = new Date();
+
+const t = getTranslations();
 ---
 
 <Container as="footer" class="mb-medium mt-medium w-full pt-4">
@@ -12,6 +24,66 @@ import Container from '#components/parts/container.astro';
 		]}
 	>
 		<MenuFooter />
-		<MainColophon />
+		<nav
+			class:list={[
+				'flex flex-wrap gap-x-1 gap-y-2 font-sans text-xs',
+				'text-primary-500 dark:text-primary-400',
+			]}
+			aria-label={t('site.colophon.label')}
+		>
+			<DividedItem dividerColor="lighter"
+				><span class="text-primary-400 dark:text-primary-500">※</span>
+				<span>{t('site.footer.updated.label')} <DateDisplay date={dateBuild} /></span></DividedItem
+			>
+			<DividedItem dividerColor="lighter">
+				<span
+					>{t('site.footer.powered.label')}
+					<Link href="https://astro.build" linkColor="accent">Astro</Link></span
+				>
+			</DividedItem>
+			<DividedItem dividerColor="lighter"
+				><span>
+					&copy;{SITE_YEAR_FOUNDED}&ndash;<DateCurrentYear />
+					<Link href={siteUrl} class="font-semibold">{t('site.title')}</Link></span
+				>
+			</DividedItem>
+			<DividedItem dividerColor="lighter">
+				<Link
+					href={`${getSiteUrl()}rss.xml`}
+					linkColor="accent"
+					class="group flex flex-nowrap items-center gap-1"
+					><span>{t('menu.feed.label')}</span>
+					<div class="colophon-rss-icon relative bg-white">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="1em"
+							height="1em"
+							viewBox="0 0 24 24"
+							class="absolute text-orange-400 transition-colors duration-300 group-hover:text-orange-300 hover:text-orange-300"
+							aria-labelledby="colophon-rss-icon"
+							><path
+								fill="currentColor"
+								d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2.5 12A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 18A1.5 1.5 0 0 0 9 16.5A1.5 1.5 0 0 0 7.5 15M6 10v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8m0-4v2a10 10 0 0 1 10 10h2A12 12 0 0 0 6 6"
+							></path><title id="colophon-rss-icon">{t('menu.feed.label')}</title></svg
+						>
+					</div>
+				</Link>
+			</DividedItem>
+		</nav>
 	</div>
 </Container>
+
+<style>
+	.colophon-rss-icon {
+		margin-left: 0.5;
+		height: 10px;
+		width: 10px;
+		svg {
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			height: 16px;
+			width: 16px;
+		}
+	}
+</style>

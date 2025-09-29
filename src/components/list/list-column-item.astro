@@ -1,11 +1,13 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import { renderSlot } from '#lib/utils/astro.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'li'> {
 	class?: string | undefined;
 }
 
-const { class: className } = Astro.props;
+const { class: className, ...props } = Astro.props;
 
 const children = await renderSlot(Astro.slots, 'default');
 ---
@@ -19,6 +21,7 @@ const children = await renderSlot(Astro.slots, 'default');
 					'text-primary-700 dark:text-primary-500',
 					className,
 				]}
+				{...props}
 			>
 				<Fragment set:html={children} />{' '}
 			</div>

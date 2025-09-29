@@ -85,8 +85,8 @@ const MapPopupContent: FC = () => {
 				) : undefined}
 				{description ? (
 					<div
-						className="mt-1 mb-2 overflow-x-auto text-sm"
-						style={{ maxHeight: '119px' }}
+						className="mt-1 mb-2 text-sm"
+						style={{ maxHeight: '119px', overflowX: 'auto' }}
 						dangerouslySetInnerHTML={{ __html: description }}
 					/>
 				) : undefined}

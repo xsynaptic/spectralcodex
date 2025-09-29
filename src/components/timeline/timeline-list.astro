@@ -1,17 +1,19 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import DateDisplay from '#components/parts/date-display.astro';
 import Link from '#components/parts/link.astro';
 
-interface Props {
+interface Props extends HTMLAttributes<'ul'> {
 	timelineItems: Array<ContentMetadataItem>;
 }
 
-const { timelineItems } = Astro.props;
+const { timelineItems, ...props } = Astro.props;
 ---
 
-<ul class="mb-small">
+<ul class="mb-small" {...props}>
 	{
 		timelineItems.map(({ title, url, date }) => (
 			<li class="mb-small">

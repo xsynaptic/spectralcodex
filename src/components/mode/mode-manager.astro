@@ -1,18 +1,20 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { ModeGeneralType } from '#components/mode/mode-types.ts';
 
 import { ModeTypeEnum } from '#components/mode/mode-types.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'script'> {
 	defaultMode?: ModeGeneralType | undefined;
 }
 
-const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
+const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
 ---
 
 {
 	defaultMode === ModeTypeEnum.Auto ? undefined : (
-		<script id="mode-default" is:inline data-default-mode={defaultMode} />
+		<script id="mode-default" is:inline data-default-mode={defaultMode} {...props} />
 	)
 }
 
