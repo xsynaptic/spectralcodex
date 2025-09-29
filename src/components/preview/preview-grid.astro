@@ -1,24 +1,143 @@
 ---
-import type { PreviewItemProps } from '#components/preview/preview-grid-item.astro';
+import { transformMarkdown } from '@spectralcodex/unified-tools';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentDate from '#components/content/content-date.astro';
+import DividedItem from '#components/parts/divided-item.astro';
 import Grid from '#components/parts/grid.astro';
-import PreviewGridItem from '#components/preview/preview-grid-item.astro';
+import Link from '#components/parts/link.astro';
+import Multilingual from '#components/parts/multilingual.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import Preview from '#components/preview/preview.astro';
+import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { formatNumber } from '#lib/utils/text.ts';
+
+export interface PreviewItemProps {
+	showCollection?: boolean | undefined;
+	showDate?: boolean | undefined;
+	showDescription?: boolean | undefined;
+	showDescriptionCompact?: boolean | undefined;
+	showLocations?: boolean | undefined;
+	showRegion?: boolean | undefined;
+	showPosts?: boolean | undefined;
+	showTitleMultilingual?: boolean | undefined;
+	showWordCount?: boolean | undefined;
+}
 
 interface Props extends PreviewItemProps {
 	class?: string | undefined;
 	items: Array<ContentMetadataItem>;
 }
 
-const { class: className, items, ...contentPreviewGridOptions } = Astro.props;
+const { class: className, items, ...previewItemProps } = Astro.props;
+
+const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
+
+const t = getTranslations();
 ---
 
 {
 	items.length > 0 ? (
 		<Grid class={className}>
-			{items.map((item) => (
-				<PreviewGridItem item={item} {...contentPreviewGridOptions} />
-			))}
+			{items.map((item) => {
+				const {
+					showCollection,
+					showLocations,
+					showDate,
+					showDescription,
+					showDescriptionCompact = true,
+					showRegion,
+					showPosts,
+					showTitleMultilingual,
+					showWordCount,
+				} = previewItemProps;
+
+				const indexUrl = getSiteUrl(item.collection);
+
+				const regions =
+					showRegion && item.regionPrimaryId
+						? getRegionAncestorsById(item.regionPrimaryId).slice(0, 2).toReversed()
+						: undefined;
+
+				console.log(showTitleMultilingual, item.titleMultilingual);
+
+				return (
+					<Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
+						<Fragment slot="preview-title">{item.title}</Fragment>
+						{showTitleMultilingual && item.titleMultilingual ? (
+							<Fragment slot="preview-title-multilingual">
+								<Multilingual content={item.titleMultilingual} />
+							</Fragment>
+						) : undefined}
+						<Fragment slot="preview-subtitle">
+							{showCollection ? (
+								<DividedItem>
+									{indexUrl ? (
+										<Link href={indexUrl} class="font-semibold" showDarkMode={false}>
+											{t(`collection.${item.collection}.labelSingular`)}
+										</Link>
+									) : (
+										<div class="font-semibold">
+											{t(`collection.${item.collection}.labelSingular`)}
+										</div>
+									)}
+								</DividedItem>
+							) : undefined}
+							{showRegion && regions && regions.length > 0 ? (
+								<DividedItem>
+									{regions.map((region) => (
+										<DividedItem dividerContent="chevron">
+											<Link href={getContentUrl('regions', region.id)} showDarkMode={false}>
+												{region.data.title}
+											</Link>
+										</DividedItem>
+									))}
+								</DividedItem>
+							) : undefined}
+							{showLocations && item.locationCount && item.locationCount > 0 ? (
+								<DividedItem>
+									<span>
+										{t('collection.locations.labelPlural')}:{' '}
+										{formatNumber({ number: item.locationCount })}
+									</span>
+								</DividedItem>
+							) : undefined}
+							{showPosts && item.postCount && item.postCount > 0 ? (
+								<DividedItem>
+									<span>
+										{t('collection.posts.labelPlural')}: {formatNumber({ number: item.postCount })}
+									</span>
+								</DividedItem>
+							) : undefined}
+							{showWordCount && item.wordCount && item.wordCount > 0 ? (
+								<DividedItem>
+									<span>
+										{t('content.meta.wordCount.label')}: {formatNumber({ number: item.wordCount })}
+									</span>
+								</DividedItem>
+							) : undefined}
+							{showDate ? (
+								<ContentDate date={item.date} datePreset={DatePresetEnum.Medium} />
+							) : undefined}
+						</Fragment>
+						{showDescription && item.description ? (
+							<Fragment slot="preview-description">
+								<ProseDescription
+									class="mt-1"
+									showCompact={showDescriptionCompact}
+									showDarkMode={false}
+								>
+									<Fragment set:html={transformMarkdown({ input: item.description })} />
+								</ProseDescription>
+							</Fragment>
+						) : undefined}
+					</Preview>
+				);
+			})}
 		</Grid>
 	) : undefined
 }

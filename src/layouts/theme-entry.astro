@@ -83,14 +83,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 		}
 		<ContentDescription entry={entry} />
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
-		<ContentSectionPreviewGrid
-			page={page}
-			previewItemProps={{
-				showDate: true,
-				showRegion: true,
-				showTitleMultilingual: true,
-			}}
-		/>
+		<ContentSectionPreviewGrid page={page} />
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionSources entry={entry} />
 	</article>

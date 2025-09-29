@@ -143,14 +143,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks entry={entry} />
 		<ContentSectionSeries entry={entry} />
-		<ContentSectionPreviewGrid
-			items={metadataItems}
-			previewItemProps={{
-				showDate: true,
-				showRegion: true,
-				showTitleMultilingual: true,
-			}}
-		/>
+		<ContentSectionPreviewGrid items={metadataItems} />
 		{
 			hideLocation ? undefined : (
 				<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>

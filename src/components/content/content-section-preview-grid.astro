@@ -1,7 +1,7 @@
 ---
 import type { Page } from 'astro';
 
-import type { PreviewItemProps } from '#components/preview/preview-grid-item.astro';
+import type { PreviewItemProps } from '#components/preview/preview-grid.astro';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -17,9 +17,15 @@ interface Props {
 
 const { items, page, previewItemProps, ...props } = Astro.props;
 
-const t = getTranslations();
+const defaultPreviewItemProps = {
+	showDate: true,
+	showRegion: true,
+	showTitleMultilingual: true,
+} satisfies PreviewItemProps;
 
 const hasItems = items && items.length > 0;
+
+const t = getTranslations();
 ---
 
 {
@@ -28,7 +34,7 @@ const hasItems = items && items.length > 0;
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			{page ? (
 				<>
-					<PreviewGrid items={page.data} {...previewItemProps} />
+					<PreviewGrid items={page.data} {...defaultPreviewItemProps} {...previewItemProps} />
 					<Pagination class="mt-small md:mt-medium" page={page} />
 				</>
 			) : undefined}
