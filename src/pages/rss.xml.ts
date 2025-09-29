@@ -6,6 +6,7 @@ import rss from '@astrojs/rss';
 import {
 	defaultSchema,
 	sanitizeHtml,
+	stripFootnotes,
 	stripTags,
 	transformMarkdown,
 } from '@spectralcodex/unified-tools';
@@ -25,6 +26,9 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 // Provide some helpful info while debugging RSS feed generation
 const RSS_FEED_DEBUG = false as boolean;
 
+// Should footnotes be excluded from RSS feed content?
+const RSS_FEED_EXCLUDE_FOOTNOTES = true as boolean;
+
 // How many items should be included in the RSS feed?
 const RSS_FEED_ITEM_COUNT = 20;
 
@@ -43,10 +47,13 @@ const getRssItem = async (
 		},
 	});
 
-	const contentSanitized = sanitizeHtml(postHtml, {
-		...defaultSchema,
-		tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'],
-	});
+	const contentSanitized = sanitizeHtml(
+		RSS_FEED_EXCLUDE_FOOTNOTES ? stripFootnotes(postHtml) : postHtml,
+		{
+			...defaultSchema,
+			tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'],
+		},
+	);
 
 	const rssFeedItem = {
 		title: titleMultilingual
