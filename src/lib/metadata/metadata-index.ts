@@ -121,9 +121,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	// Check some additional location properties in development
 	// Note: due to the operation of the new Content Layer API this is now throwing too many errors
-	if (import.meta.env.DEV) {
-		validateLocations(locations);
-	}
+	if (import.meta.env.DEV) validateLocations(locations);
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
 	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
@@ -136,7 +134,6 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 			let id = entry.id;
 			let title = entry.data.title;
 			let titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
-
 			let regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
 			if ('override' in entry.data) {
@@ -163,8 +160,8 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
+				wordCount: generateContentMetadataWordCount(entry), // Warning: this is an expensive operation
 				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
-				wordCount: generateContentMetadataWordCount(entry), // Expensive!!!
 				backlinks: new Set<string>(), // Populated below
 				entryQuality: entry.data.entryQuality,
 			});
