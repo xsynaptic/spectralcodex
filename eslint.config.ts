@@ -22,15 +22,15 @@ export default getConfig(
 		 * React
 		 */
 		{
-			files: ['packages/react-map-component/**/*.ts', 'packages/react-map-component/**/*.tsx'],
+			files: ['packages/react-map-component/**/*.{js,jsx,ts,tsx}'],
 			plugins: {
 				// Note: this was causing a type error in September 2025; check back to see if it is necessary in the future
 				'@tanstack/query': tanstackQueryPlugin as unknown as ESLint.Plugin,
 				'react-hooks': reactHooksPlugin,
 			},
+			extends: ['react-hooks/recommended'],
 			rules: {
 				...tanstackQueryPlugin.configs.recommended.rules,
-				...reactHooksPlugin.configs['recommended-latest'].rules,
 			},
 		},
 		// Those files run in the browser and need the browser globals

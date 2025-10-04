@@ -8,7 +8,7 @@
 	},
 	"devDependencies": {
 		"astro": "^5.14.1",
-		"eslint": "^9.36.0",
+		"eslint": "^9.37.0",
 		"eslint-mdx": "^3.6.2",
 		"eslint-plugin-mdx": "^3.6.2",
 		"remark": "^15.0.1",
