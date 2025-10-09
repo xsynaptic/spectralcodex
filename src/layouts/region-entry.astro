@@ -96,6 +96,8 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 			)
 		}
 		<ContentDescription entry={entry} />
+		<ContentSectionLinks entry={entry} />
+		<ContentSectionSources entry={entry} />
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 			{
 				regionsOption?.termsChildrenLabel ? (
@@ -110,7 +112,5 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 		</RegionsRelated>
 		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
 		<ContentSectionPreviewGrid page={page} />
-		<ContentSectionLinks entry={entry} />
-		<ContentSectionSources entry={entry} />
 	</article>
 </MainSite>
