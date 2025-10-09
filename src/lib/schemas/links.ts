@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import { UrlSchema } from '#lib/schemas/index.ts';
 import { loadYamlData } from '#lib/utils/data.ts';
 
 const LinkItemSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
-	url: z.string().url(),
+	url: UrlSchema,
 });
 
 // Since links data is transformed we use a slightly modified schema
@@ -33,21 +34,18 @@ async function getLinksData() {
 
 // Link schema; with URLs and predefined titles for commonly referenced sites
 export const LinkSchema = LinkItemSchema.or(
-	z
-		.string()
-		.url()
-		.transform(async (value) => {
-			const url = new URL(value).href;
-			const linksData = await getLinksData();
+	UrlSchema.transform(async (value) => {
+		const url = new URL(value).href;
+		const linksData = await getLinksData();
 
-			for (const { match, ...linksDataItem } of linksData) {
-				if (url.includes(match)) {
-					return {
-						...linksDataItem,
-						url: value,
-					};
-				}
+		for (const { match, ...linksDataItem } of linksData) {
+			if (url.includes(match)) {
+				return {
+					...linksDataItem,
+					url: value,
+				};
 			}
-			throw new Error(`Error: there was no match for this link: "${value}"`);
-		}),
+		}
+		throw new Error(`Error: there was no match for this link: "${value}"`);
+	}),
 );

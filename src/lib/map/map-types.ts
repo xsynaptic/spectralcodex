@@ -5,6 +5,7 @@ import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-typ
 import { z } from 'zod';
 
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
+import { UrlSchema } from '#lib/schemas/index.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
 // This is used to form map API endpoint URLs
@@ -27,8 +28,8 @@ export const MapFeaturePropertiesSchema = z.object({
 	safety: NumericScaleSchema.optional(),
 	objective: NumericScaleSchema.optional(),
 	outlier: z.boolean().optional(),
-	googleMapsUrl: z.string().url().optional(),
-	wikipediaUrl: z.string().url().optional(),
+	googleMapsUrl: UrlSchema.optional(),
+	wikipediaUrl: UrlSchema.optional(),
 	image: ImageThumbnailSchema.optional(),
 });
 
