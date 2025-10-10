@@ -12,7 +12,7 @@ import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
 import { FilterControl } from './map-controls-filter';
 import { MetricsControl } from './map-controls-metrics';
 
-export const MapControls: FC = () => {
+export const MapControls: FC = function MapControls() {
 	const canvasInteractive = useMapCanvasInteractive();
 
 	return (

@@ -1,6 +1,7 @@
 import type { FeatureCollection } from 'geojson';
-import type { MapComponentProps } from 'packages/react-map-component/src/types';
 import type { FC } from 'react';
+
+import type { MapComponentProps } from '../types';
 
 import { useMapApiDivisionData } from '../api/hooks/use-map-api-division-data';
 import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
@@ -12,12 +13,12 @@ import { MapSourcePoints } from './map-source-points';
 
 const IS_DEBUG = false as boolean;
 
-export const MapSource: FC<{
-	apiDivisionUrl?: string | undefined;
-	hasMapIcons: boolean;
-	bounds: MapComponentProps['bounds'];
-	isDev?: boolean | undefined;
-}> = ({ apiDivisionUrl, hasMapIcons, bounds, isDev }) => {
+export const MapSource: FC<
+	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'> & {
+		bounds: MapComponentProps['bounds'] | undefined;
+		hasMapIcons: boolean;
+	}
+> = function MapSource({ apiDivisionUrl, hasMapIcons, bounds, isDev }) {
 	const interactive = useMapCanvasInteractive();
 
 	const { pointCollection, lineStringCollection } = useMapCanvasData();

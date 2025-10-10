@@ -1,10 +1,11 @@
 import type { FeatureCollection } from 'geojson';
-import type { MapComponentProps } from 'packages/react-map-component/src/types';
 import type { FC } from 'react';
 import type { LineLayerSpecification } from 'react-map-gl/maplibre';
 
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
+
+import type { MapComponentProps } from '../types';
 
 export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = function MapSourceDebug({
 	bounds,

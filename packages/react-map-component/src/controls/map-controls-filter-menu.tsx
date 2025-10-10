@@ -40,9 +40,12 @@ const MapFilterStatusMenuItem: FC<{
 	isFiltered: boolean;
 	data: LocationStatusMetadata;
 }> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
-	const languages = useMapLanguages();
+	const mapLanguages = useMapLanguages();
 
-	const showChinese = useMemo(() => languages?.some((lang) => lang.startsWith('zh')), [languages]);
+	const showChinese = useMemo(
+		() => mapLanguages?.some((lang) => lang.startsWith('zh')),
+		[mapLanguages],
+	);
 
 	const { toggleStatusFilter } = useMapStoreActions();
 
@@ -104,7 +107,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 	);
 });
 
-const MapFilterStatusShowHideMenu: FC = () => {
+const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 	const mapLanguages = useMapLanguages();
 
 	const showChinese = useMemo(
@@ -152,7 +155,7 @@ const MapFilterStatusShowHideMenu: FC = () => {
 	);
 };
 
-const MapFilterRatingMenuItem: FC = () => {
+const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 	const ratingFilterValue = useMapRatingFilter();
 
 	const { setRatingFilter } = useMapStoreActions();
@@ -183,7 +186,7 @@ const MapFilterRatingMenuItem: FC = () => {
 	);
 };
 
-const MapFilterObjectiveMenuItem: FC = () => {
+const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 	const objectiveFilter = useMapObjectiveFilter();
 	const { setObjectiveFilter } = useMapStoreActions();
 
@@ -207,7 +210,7 @@ const MapFilterObjectiveMenuItem: FC = () => {
 
 export const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
-}> = ({ filterPopupOffset = 8 }) => {
+}> = function MapControlsFilterMenu({ filterPopupOffset = 8 }) {
 	const filterPosition = useMapFilterPosition();
 	const filterOpen = useMapFilterOpen();
 	const statusFilter = useMapStatusFilter();

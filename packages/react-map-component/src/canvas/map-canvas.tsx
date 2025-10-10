@@ -1,11 +1,15 @@
 import type { CSSProperties, FC } from 'react';
 
+import { memo } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
 
-import { useMapApiPopupData } from '../api/hooks/use-map-api-popup-data';
-import { useMapApiSourceData } from '../api/hooks/use-map-api-source-data';
+import { PopupDataContextProvider } from '../api/hooks/use-map-api-popup-data';
+import {
+	SourceDataContextProvider,
+	useSourceDataQuery,
+} from '../api/hooks/use-map-api-source-data';
 import { useMapCanvasEvents } from '../canvas/hooks/use-map-canvas-events';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapControls } from '../controls/map-controls';
@@ -17,6 +21,7 @@ import {
 	useMapCanvasInteractive,
 	useMapCanvasLoading,
 } from '../store/hooks/use-map-store';
+import { MapStoreProvider } from '../store/map-store-provider';
 import { MapPopup } from './map-popup';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)
@@ -28,7 +33,7 @@ const interactiveLayerIds = [
 	MapLayerIdEnum.PointsImage,
 ] as const;
 
-const MapCanvasLoading: FC<{ loading: boolean }> = function ({ loading }) {
+const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (
 		<div className="flex h-full justify-center">
 			<div
@@ -39,14 +44,15 @@ const MapCanvasLoading: FC<{ loading: boolean }> = function ({ loading }) {
 	);
 };
 
-export const MapCanvas: FC<
-	Omit<MapComponentProps, 'geodata' | 'cluster'> & {
+const MapCanvasContainer: FC<
+	Omit<
+		MapComponentProps,
+		'geodata' | 'cluster' | 'showObjectiveFilter' | 'apiSourceUrl' | 'apiPopupUrl'
+	> & {
 		style?: CSSProperties | undefined;
 	}
-> = ({
-	apiSourceUrl,
+> = function MapCanvasContainer({
 	apiDivisionUrl,
-	apiPopupUrl,
 	baseMapTheme,
 	bounds,
 	maxBounds,
@@ -58,7 +64,7 @@ export const MapCanvas: FC<
 	spritesUrl,
 	spritesId,
 	isDev,
-}) => {
+}) {
 	const mapStyle = useProtomaps({
 		protomapsApiKey,
 		baseMapTheme,
@@ -66,14 +72,13 @@ export const MapCanvas: FC<
 		spritesUrl,
 		isDev,
 	});
+
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
 	const mapCanvasEvents = useMapCanvasEvents();
 	const canvasCursor = useMapCanvasCursor();
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
-
-	const { isLoading: sourceDataQueryLoading } = useMapApiSourceData({ apiSourceUrl, isDev });
-
-	useMapApiPopupData({ apiPopupUrl, isDev });
 
 	return (
 		<ReactMapGlMap
@@ -113,7 +118,39 @@ export const MapCanvas: FC<
 			/>
 			<MapControlsFilterMenu />
 			<MapPopup />
-			<MapCanvasLoading loading={canvasLoading || sourceDataQueryLoading} />
+			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);
 };
+
+export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(function MapCanvas({
+	cluster,
+	showObjectiveFilter,
+	apiSourceUrl,
+	apiPopupUrl,
+	sourceData,
+	popupData,
+	languages,
+	...props
+}) {
+	return (
+		<SourceDataContextProvider
+			apiSourceUrl={apiSourceUrl}
+			sourceData={sourceData}
+			isDev={props.isDev}
+		>
+			<PopupDataContextProvider apiPopupUrl={apiPopupUrl} popupData={popupData} isDev={props.isDev}>
+				<MapStoreProvider
+					initialState={{
+						...(cluster ? { canvasClusters: cluster } : {}),
+						...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
+						...(props.interactive === false ? { canvasInteractive: false } : {}),
+						...(languages ? { languages } : {}),
+					}}
+				>
+					<MapCanvasContainer {...props} />
+				</MapStoreProvider>
+			</PopupDataContextProvider>
+		</SourceDataContextProvider>
+	);
+});

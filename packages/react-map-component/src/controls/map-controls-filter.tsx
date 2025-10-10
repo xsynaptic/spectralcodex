@@ -2,25 +2,28 @@ import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
-import { translations } from 'packages/react-map-component/src/config/translations';
 
+import { useSourceDataQuery } from '../api/hooks/use-map-api-source-data';
+import { translations } from '../config/translations';
 import { MAP_FILTER_CONTROL_ID } from '../constants';
 import {
 	useMapCanvasLoading,
 	useMapFilterOpen,
-	useMapSourceDataLoading,
 	useMapStoreActions,
 } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const FilterControl: FC<{ position: ControlPosition }> = ({ position }) => {
-	const sourceDataLoading = useMapSourceDataLoading();
-	const mapCanvasLoading = useMapCanvasLoading();
-	const { setFilterOpen } = useMapStoreActions();
-
+export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
+	position,
+}) {
+	const isCanvasLoading = useMapCanvasLoading();
 	const filterOpen = useMapFilterOpen();
 
-	const isLoading = sourceDataLoading || mapCanvasLoading;
+	const { setFilterOpen } = useMapStoreActions();
+
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
+	const isLoading = isSourceDataLoading || isCanvasLoading;
 
 	return (
 		<CustomControlPortal position={position}>

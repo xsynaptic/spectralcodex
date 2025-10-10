@@ -62,7 +62,11 @@ class CustomControl implements IControl {
 	}
 }
 
-export const CustomControlPortal = memo(({ position, className, children }: CustomControlProps) => {
+export const CustomControlPortal = memo(function CustomControlPortal({
+	position,
+	className,
+	children,
+}: CustomControlProps) {
 	const customControl = useControl<CustomControl>(
 		({ map }) => new CustomControl({ map: map.getMap(), position, className }),
 	);

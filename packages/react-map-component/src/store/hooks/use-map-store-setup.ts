@@ -5,24 +5,14 @@ import { createStore } from 'zustand';
 
 import type { MapDataConfigurableState, MapDataState, MapDataStore } from '../map-store-types';
 
-import { getPopupItem } from '../map-store-utils';
-
 const defaultState = {
 	selectedId: undefined,
 	hoveredId: undefined,
-	/** Source */
-	sourceData: [],
-	sourceDataLoading: true,
-	sourceDataCount: 0,
 	/** Canvas */
 	canvasCursor: 'grab',
 	canvasInteractive: true,
 	canvasLoading: true,
 	canvasClusters: undefined,
-	/** Popup  */
-	popupData: [],
-	popupDataLoading: true,
-	popupItem: undefined,
 	/** Filter */
 	filterPosition: undefined,
 	filterOpen: false,
@@ -52,30 +42,11 @@ export const useMapStoreSetup = ({
 				setSelectedId: (selectedId) => {
 					set({
 						selectedId,
-						popupItem: selectedId
-							? getPopupItem({
-									selectedId,
-									sourceData: get().sourceData,
-									popupData: get().popupData,
-								})
-							: undefined,
 						filterOpen: false,
 					});
 				},
 				setHoveredId: (hoveredId) => {
 					set({ hoveredId });
-				},
-				/**
-				 * Source data
-				 */
-				setSourceData(sourceData) {
-					set({
-						sourceData,
-						sourceDataCount: sourceData.length,
-					});
-				},
-				setSourceDataLoading(sourceDataLoading) {
-					set({ sourceDataLoading });
 				},
 				/**
 				 * Canvas
@@ -91,15 +62,6 @@ export const useMapStoreSetup = ({
 				},
 				setCanvasClusters(canvasClusters) {
 					set({ canvasClusters });
-				},
-				/**
-				 * Popup
-				 */
-				setPopupData(popupData) {
-					set({ popupData });
-				},
-				setPopupDataLoading(popupDataLoading) {
-					set({ popupDataLoading });
 				},
 				/**
 				 * Filters

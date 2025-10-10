@@ -5,6 +5,7 @@ import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback, useMemo } from 'react';
 import { funnel } from 'remeda';
 
+import { useSourceDataQuery } from '../../api/hooks/use-map-api-source-data';
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
 import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
@@ -12,7 +13,6 @@ import { useMediaQuery } from '../../lib/hooks/use-media-query';
 import {
 	useMapCanvasInteractive,
 	useMapHoveredId,
-	useMapSourceDataLoading,
 	useMapStoreActions,
 } from '../../store/hooks/use-map-store';
 
@@ -26,8 +26,9 @@ const isMapCoordinates = (input: unknown): input is [number, number] =>
 	typeof input[1] === 'number';
 
 export function useMapCanvasEvents() {
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
 	const isInteractive = useMapCanvasInteractive();
-	const isSourceDataLoading = useMapSourceDataLoading();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
 	const hoveredId = useMapHoveredId();

@@ -1,10 +1,10 @@
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useQuery } from '@tanstack/react-query';
 import { bboxPolygon, difference, featureCollection } from '@turf/turf';
 import { geojson } from 'flatgeobuf';
 import ky from 'ky';
-import { GeometryTypeEnum } from 'packages/map-types/src';
 import { isIncludedIn } from 'remeda';
 
 import type { MapComponentProps } from '../../types';

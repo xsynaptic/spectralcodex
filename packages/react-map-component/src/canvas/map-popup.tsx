@@ -5,14 +5,14 @@ import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, useCallback } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
+import type { MapPopupItemExtended } from '../types';
+
+import { usePopupDataQuery } from '../api/hooks/use-map-api-popup-data';
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';
-import {
-	useMapPopupDataLoading,
-	useMapPopupItem,
-	useMapStoreActions,
-} from '../store/hooks/use-map-store';
+import { useMapStoreActions } from '../store/hooks/use-map-store';
+import { useMapCanvasPopupItem } from './hooks/use-map-canvas-popup-item';
 
 // Generate a standard Google Maps URL from a set of coordinates
 function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
@@ -24,11 +24,10 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	return url.toString();
 }
 
-const MapPopupContent: FC = () => {
-	const popupItem = useMapPopupItem();
+const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
+	popupItem,
+}) {
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
-
-	if (!popupItem) return;
 
 	const {
 		title,
@@ -151,15 +150,20 @@ const MapPopupContent: FC = () => {
 };
 
 export const MapPopup: FC = memo(function MapPopup() {
-	const popupDataLoading = useMapPopupDataLoading();
-	const popupItem = useMapPopupItem();
+	const popupItem = useMapCanvasPopupItem();
+
+	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
+
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
 	const { setSelectedId } = useMapStoreActions();
 
-	const onClose = useCallback(() => {
-		setSelectedId(undefined);
-	}, [setSelectedId]);
+	const onClose = useCallback(
+		function onClose() {
+			setSelectedId(undefined);
+		},
+		[setSelectedId],
+	);
 
 	// Note: `closeOnClick` must be false to better control popup display with custom events
 	return popupItem ? (
@@ -184,11 +188,13 @@ export const MapPopup: FC = memo(function MapPopup() {
 				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
 					<div
 						className="loading-animation transition-opacity duration-500"
-						style={{ maxWidth: '100%', opacity: popupDataLoading ? 1 : 0 }}
+						style={{ maxWidth: '100%', opacity: isPopupDataLoading ? 1 : 0 }}
 					/>
 				</div>
-				<div style={{ opacity: popupDataLoading ? 0 : 1 }}>
-					{popupDataLoading ? undefined : <MapPopupContent key={popupItem.id} />}
+				<div style={{ opacity: isPopupDataLoading ? 0 : 1 }}>
+					{isPopupDataLoading ? undefined : (
+						<MapPopupContent key={popupItem.id} popupItem={popupItem} />
+					)}
 				</div>
 			</div>
 		</Popup>

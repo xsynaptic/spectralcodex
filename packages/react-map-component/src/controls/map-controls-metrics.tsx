@@ -1,20 +1,23 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import { useSourceDataQuery } from '../api/hooks/use-map-api-source-data';
 import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
 import { translations } from '../config/translations';
-import { useMapSourceDataCount, useMapSourceDataLoading } from '../store/hooks/use-map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
-export const MetricsControl: FC<{ position: ControlPosition }> = function ({ position }) {
-	const sourceDataLoading = useMapSourceDataLoading();
-	const sourceDataCount = useMapSourceDataCount();
-	const { filteredCount } = useMapCanvasData();
+export const MetricsControl: FC<{
+	position: ControlPosition;
+}> = function MetricsControl({ position }) {
+	const { filteredCount, totalCount } = useMapCanvasData();
+
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
 	const formatNumber = new Intl.NumberFormat('en');
 
 	return (
 		<CustomControlPortal position={position} className="maplibregl-ctrl">
-			{sourceDataLoading ? (
+			{isSourceDataLoading ? (
 				<div className="flex flex-col items-end">
 					<div className="loading-animation" style={{ width: '15px' }} />
 				</div>
@@ -25,7 +28,7 @@ export const MetricsControl: FC<{ position: ControlPosition }> = function ({ pos
 						/
 					</span>
 					<span className="drop-shadow-sm">
-						{formatNumber.format(sourceDataCount)} {translations.points}
+						{formatNumber.format(totalCount)} {translations.points}
 					</span>
 				</div>
 			)}

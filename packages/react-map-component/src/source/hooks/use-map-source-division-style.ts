@@ -1,11 +1,12 @@
 import type { FillLayerSpecification, LineLayerSpecification } from 'react-map-gl/maplibre';
 
-import { mapDivisionStyle } from 'packages/react-map-component/src/config/colors';
 import { useMemo } from 'react';
 
+import { mapDivisionStyle } from '../../config/colors';
 import { MapLayerIdEnum } from '../../config/layer';
 import { MapSourceIdEnum } from '../../config/source';
 
+// TODO: adjust style for dark mode
 export function useMapSourceDivisionStyle() {
 	const divisionMaskLayerStyle = useMemo(
 		() =>

@@ -3,11 +3,11 @@ import { useMemo } from 'react';
 
 import type { MapGeometry, MapSourceFeatureCollection, MapSourceItem } from '../../types';
 
+import { useSourceDataQuery } from '../../api/hooks/use-map-api-source-data';
 import {
 	useMapObjectiveFilter,
 	useMapQualityFilter,
 	useMapRatingFilter,
-	useMapSourceData,
 	useMapStatusFilter,
 } from '../../store/hooks/use-map-store';
 
@@ -26,7 +26,8 @@ function getGeojsonData(sourceItems: Array<MapSourceItem>) {
 }
 
 export function useMapCanvasData() {
-	const sourceData = useMapSourceData();
+	const { data: sourceData } = useSourceDataQuery();
+
 	const statusFilter = useMapStatusFilter();
 	const qualityFilter = useMapQualityFilter();
 	const ratingFilter = useMapRatingFilter();
@@ -34,7 +35,7 @@ export function useMapCanvasData() {
 
 	const filteredData = useMemo(
 		() =>
-			sourceData.filter((item) => {
+			sourceData?.filter((item) => {
 				const { status, quality, rating, objective } = item.properties;
 
 				if (statusFilter.includes(status)) return false;
@@ -42,12 +43,13 @@ export function useMapCanvasData() {
 				if (rating < ratingFilter) return false;
 				if (objective && objective < objectiveFilter) return false;
 				return true;
-			}),
+			}) ?? [],
 		[sourceData, statusFilter, qualityFilter, ratingFilter, objectiveFilter],
 	);
 
 	return {
 		filteredCount: filteredData.length,
+		totalCount: sourceData?.length ?? 0,
 		pointCollection: useMemo(
 			() =>
 				getGeojsonData(

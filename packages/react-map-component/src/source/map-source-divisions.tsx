@@ -1,11 +1,12 @@
 import type { FeatureCollection } from 'geojson';
 import type { FC } from 'react';
 
-import { MapLayerIdEnum } from 'packages/react-map-component/src/config/layer';
-import { MapSourceIdEnum } from 'packages/react-map-component/src/config/source';
-import { useMapSourceDivisionStyle } from 'packages/react-map-component/src/source/hooks/use-map-source-division-style';
 import { memo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
+
+import { MapLayerIdEnum } from '../config/layer';
+import { MapSourceIdEnum } from '../config/source';
+import { useMapSourceDivisionStyle } from '../source/hooks/use-map-source-division-style';
 
 export const MapSourceDivisions: FC<{ data: FeatureCollection }> = memo(
 	function MapDivisionSourceLayers({ data }) {

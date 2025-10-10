@@ -3,23 +3,23 @@ import type { MapPopupItemInput, MapSourceItemInput } from '../types';
 import { MapPopupItemSchema, MapSourceItemSchema } from '../types/map-schemas';
 
 export function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
-	const { data, success, error } = MapSourceItemSchema.array().safeParse(sourceDataRaw);
+	const parsedResponse = MapSourceItemSchema.array().safeParse(sourceDataRaw);
 
-	if (!success) {
-		console.error(error);
-		return;
+	if (!parsedResponse.success) {
+		console.error('[Map] Source data parse error:', parsedResponse.error);
+		throw new Error('Failed to parse source data');
 	}
 
-	return data;
+	return parsedResponse.data;
 }
 
 export function parsePopupData(popupDataRaw: Array<MapPopupItemInput>) {
-	const { data, success, error } = MapPopupItemSchema.array().safeParse(popupDataRaw);
+	const parsedResponse = MapPopupItemSchema.array().safeParse(popupDataRaw);
 
-	if (!success) {
-		console.error(error);
-		return;
+	if (!parsedResponse.success) {
+		console.error('[Map] Popup data parse error:', parsedResponse.error);
+		throw new Error('Failed to parse popup data');
 	}
 
-	return data;
+	return parsedResponse.data;
 }

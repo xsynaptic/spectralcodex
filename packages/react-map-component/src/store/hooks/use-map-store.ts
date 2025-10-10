@@ -21,15 +21,6 @@ export const useMapSelectedId = () => useMapDataStore((state) => state.selectedI
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
 
 /**
- * Map source data
- */
-export const useMapSourceData = () => useMapDataStore((state) => state.sourceData);
-
-export const useMapSourceDataLoading = () => useMapDataStore((state) => state.sourceDataLoading);
-
-export const useMapSourceDataCount = () => useMapDataStore((state) => state.sourceDataCount);
-
-/**
  * Map canvas state
  */
 export const useMapCanvasCursor = () => useMapDataStore((state) => state.canvasCursor);
@@ -39,13 +30,6 @@ export const useMapCanvasInteractive = () => useMapDataStore((state) => state.ca
 export const useMapCanvasLoading = () => useMapDataStore((state) => state.canvasLoading);
 
 export const useMapCanvasClusters = () => useMapDataStore((state) => state.canvasClusters);
-
-/**
- * Map popup
- */
-export const useMapPopupDataLoading = () => useMapDataStore((state) => state.popupDataLoading);
-
-export const useMapPopupItem = () => useMapDataStore((state) => state.popupItem);
 
 /**
  * Map filters
