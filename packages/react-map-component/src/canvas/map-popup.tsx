@@ -12,7 +12,7 @@ import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { useMediaQuery } from '../lib/hooks/use-media-query';
 import { useMapStoreActions } from '../store/hooks/use-map-store';
-import { useMapCanvasPopupItem } from './hooks/use-map-canvas-popup-item';
+import { useMapCanvasPopup } from './hooks/use-map-canvas-popup';
 
 // Generate a standard Google Maps URL from a set of coordinates
 function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
@@ -150,7 +150,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 };
 
 export const MapPopup: FC = memo(function MapPopup() {
-	const popupItem = useMapCanvasPopupItem();
+	const popupItem = useMapCanvasPopup();
 
 	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
 
