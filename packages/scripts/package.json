@@ -14,7 +14,7 @@
 		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^6.3.7",
+		"@astrojs/markdown-remark": "^6.3.8",
 		"@duckdb/node-api": "^1.4.1-r.1",
 		"@iconify/json": "^2.2.393",
 		"@iconify/tools": "^4.1.4",
@@ -23,7 +23,7 @@
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
 		"@xenova/transformers": "^2.17.2",
-		"astro": "^5.14.1",
+		"astro": "^5.14.3",
 		"chalk": "^5.6.2",
 		"flatgeobuf": "^4.3.1",
 		"geojson": "^0.5.0",

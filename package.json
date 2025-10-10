@@ -37,14 +37,14 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.14.1",
+		"astro": "^5.14.3",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^6.3.7",
-		"@astrojs/mdx": "^4.3.6",
-		"@astrojs/node": "^9.4.4",
+		"@astrojs/markdown-remark": "^6.3.8",
+		"@astrojs/mdx": "^4.3.7",
+		"@astrojs/node": "^9.4.5",
 		"@astrojs/react": "^4.4.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.6.0",
@@ -84,7 +84,7 @@
 		"globals": "^16.4.0",
 		"keyv": "^5.5.3",
 		"ky": "^1.11.0",
-		"maplibre-gl": "^5.8.0",
+		"maplibre-gl": "^5.9.0",
 		"nanoid": "^5.1.6",
 		"p-limit": "^7.1.1",
 		"prettier": "^3.6.2",
