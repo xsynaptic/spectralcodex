@@ -29,7 +29,7 @@ export default defineIntegration({
 					const buildEndTime = Date.now();
 					const duration = (buildEndTime - buildStartTime) / 1000;
 					const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-					const logEntry = `[${timestamp}] Build completed in ${duration.toFixed(2)}s\n`;
+					const logEntry = `[${timestamp}] Build completed in ${Math.floor(duration / 60).toFixed(2)} minutes (${duration.toFixed(2)} seconds)\n`;
 
 					try {
 						await appendFile(logFileName, logEntry);
