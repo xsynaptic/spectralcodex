@@ -1,6 +1,7 @@
 import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
+import type { CSSProperties } from 'react';
 
 import {
 	LocationCategoryEnum,
@@ -147,6 +148,8 @@ export interface MapComponentProps
 	protomapsApiKey: string;
 	spritesId?: string | undefined;
 	spritesUrl?: string | undefined;
+	style?: CSSProperties | undefined;
+	version?: string | undefined;
 	isDev?: boolean | undefined;
 }
 

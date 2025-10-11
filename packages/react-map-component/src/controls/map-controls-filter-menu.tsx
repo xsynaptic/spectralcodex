@@ -25,7 +25,7 @@ const MapFilterMenuItem: FC<
 	PropsWithChildren<{
 		isActive?: boolean;
 	}>
-> = memo(function MapFilterMenuItem({ isActive, children }) {
+> = function MapFilterMenuItem({ isActive, children }) {
 	return (
 		<li
 			className={`rounded-sm transition-colors ${isActive ? 'bg-primary-200 hover:bg-primary-300 dark:bg-primary-800 dark:hover:bg-primary-700' : 'bg-primary-50 hover:bg-primary-100 dark:bg-primary-900 dark:hover:bg-primary-800'}`}
@@ -33,7 +33,7 @@ const MapFilterMenuItem: FC<
 			{children}
 		</li>
 	);
-});
+};
 
 const MapFilterStatusMenuItem: FC<{
 	status: LocationStatus;

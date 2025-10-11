@@ -59,6 +59,7 @@ const MapCanvasContainer: FC<
 	spritesId,
 	apiPopupUrl,
 	popupData,
+	version,
 	isDev,
 }) {
 	const mapStyle = useProtomaps({
@@ -118,7 +119,12 @@ const MapCanvasContainer: FC<
 				isDev={isDev}
 			/>
 			<MapControlsFilterMenu />
-			<PopupDataContextProvider apiPopupUrl={apiPopupUrl} popupData={popupData} isDev={isDev}>
+			<PopupDataContextProvider
+				apiPopupUrl={apiPopupUrl}
+				popupData={popupData}
+				version={version}
+				isDev={isDev}
+			>
 				<MapPopup />
 			</PopupDataContextProvider>
 			<MapCanvasLoading loading={loading} />
@@ -126,31 +132,35 @@ const MapCanvasContainer: FC<
 	);
 };
 
-export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(
-	function MapCanvas(props) {
-		const {
-			cluster,
-			interactive,
-			showObjectiveFilter,
-			apiSourceUrl,
-			sourceData,
-			languages,
-			isDev,
-		} = props;
+export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
+	const {
+		cluster,
+		interactive,
+		showObjectiveFilter,
+		apiSourceUrl,
+		sourceData,
+		languages,
+		version,
+		isDev,
+	} = props;
 
-		return (
-			<SourceDataContextProvider apiSourceUrl={apiSourceUrl} sourceData={sourceData} isDev={isDev}>
-				<MapStoreProvider
-					initialState={{
-						...(cluster ? { canvasClusters: cluster } : {}),
-						...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
-						...(interactive === false ? { canvasInteractive: false } : {}),
-						...(languages ? { languages } : {}),
-					}}
-				>
-					<MapCanvasContainer {...props} />
-				</MapStoreProvider>
-			</SourceDataContextProvider>
-		);
-	},
-);
+	return (
+		<SourceDataContextProvider
+			apiSourceUrl={apiSourceUrl}
+			sourceData={sourceData}
+			version={version}
+			isDev={isDev}
+		>
+			<MapStoreProvider
+				initialState={{
+					...(cluster ? { canvasClusters: cluster } : {}),
+					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
+					...(interactive === false ? { canvasInteractive: false } : {}),
+					...(languages ? { languages } : {}),
+				}}
+			>
+				<MapCanvasContainer {...props} />
+			</MapStoreProvider>
+		</SourceDataContextProvider>
+	);
+});

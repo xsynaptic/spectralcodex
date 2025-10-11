@@ -32,12 +32,12 @@ export const useSourceDataQuery = () => {
 };
 
 export const SourceDataContextProvider: FC<
-	Pick<MapComponentProps, 'apiSourceUrl' | 'sourceData' | 'isDev'> & {
+	Pick<MapComponentProps, 'apiSourceUrl' | 'sourceData' | 'version' | 'isDev'> & {
 		children: ReactNode;
 	}
-> = function SourceDataContextProvider({ apiSourceUrl, sourceData, isDev, children }) {
+> = function SourceDataContextProvider({ apiSourceUrl, sourceData, version, isDev, children }) {
 	const sourceDataQuery = useQuery<Array<MapSourceItemParsed> | undefined>({
-		queryKey: ['source-data', apiSourceUrl, sourceData, isDev],
+		queryKey: ['source-data', apiSourceUrl, sourceData, version, isDev],
 		queryFn: async () => {
 			// Use data passed directly to this component
 			if (sourceData) {

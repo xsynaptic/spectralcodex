@@ -15,8 +15,6 @@ export const ReactQueryProvider = ({ children }: PropsWithChildren) => {
 				queries: {
 					staleTime: TIME_24_HOURS,
 					gcTime: TIME_24_HOURS,
-					// Throw errors to error boundary for critical data
-					throwOnError: true,
 				},
 			},
 		});
@@ -26,7 +24,7 @@ export const ReactQueryProvider = ({ children }: PropsWithChildren) => {
 		<PersistQueryClientProvider
 			client={queryClient}
 			persistOptions={{
-				persister: createIdbPersister('scx-map-data-cache'),
+				persister: createIdbPersister('spectralcodex-map-data-cache'),
 				maxAge: TIME_24_HOURS,
 			}}
 		>
