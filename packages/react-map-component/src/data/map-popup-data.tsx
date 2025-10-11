@@ -35,12 +35,10 @@ export const usePopupDataQuery = () => {
 export const PopupDataContextProvider: FC<
 	Pick<MapComponentProps, 'mapId' | 'apiPopupUrl' | 'popupData' | 'isDev'> & { children: ReactNode }
 > = function PopupDataContextProvider({ mapId, apiPopupUrl, popupData, isDev, children }) {
-	const popupDataQuery = useQuery({
+	const popupDataQuery = useQuery<Array<MapPopupItemParsed> | undefined>({
 		queryKey: ['popup-data', mapId, apiPopupUrl, isDev],
 		queryFn: async () => {
-			if (!apiPopupUrl) {
-				throw new Error('[Map] Popup data URL is required for fetching');
-			}
+			if (!apiPopupUrl) throw new Error('[Map] Popup data URL is required for fetching');
 
 			const rawData = await ky
 				.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })

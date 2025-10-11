@@ -83,7 +83,7 @@ export function useMapCanvasEvents() {
 							});
 						})
 						.catch(() => {
-							throw new Error('Could not get cluster expansion zoom!');
+							console.warn('[Map] Could not get cluster expansion zoom!');
 						});
 					break;
 				}

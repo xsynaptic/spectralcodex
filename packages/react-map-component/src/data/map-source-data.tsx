@@ -36,12 +36,10 @@ export const SourceDataContextProvider: FC<
 		children: ReactNode;
 	}
 > = function SourceDataContextProvider({ mapId, apiSourceUrl, sourceData, isDev, children }) {
-	const sourceDataQuery = useQuery({
+	const sourceDataQuery = useQuery<Array<MapSourceItemParsed> | undefined>({
 		queryKey: ['source-data', mapId, apiSourceUrl, isDev],
 		queryFn: async () => {
-			if (!apiSourceUrl) {
-				throw new Error('[Map] Source data URL is required for fetching');
-			}
+			if (!apiSourceUrl) throw new Error('[Map] Source data URL is required for fetching');
 
 			const rawData = await ky
 				.get<Array<MapSourceItemInput>>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
