@@ -4,13 +4,24 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import ky from 'ky';
 import { createContext, useContext } from 'react';
 
-import type { MapComponentProps, MapPopupItem, MapPopupItemInput } from '../../types';
+import type { MapComponentProps, MapPopupItemInput, MapPopupItemParsed } from '../types';
 
-import { parsePopupData } from '../map-api-utils';
+import { MapPopupItemSchema } from '../types';
 
-const PopupDataContext = createContext<UseQueryResult<Array<MapPopupItem> | undefined> | undefined>(
-	undefined,
-);
+function parsePopupData(popupDataRaw: Array<MapPopupItemInput>) {
+	const parsedResponse = MapPopupItemSchema.array().safeParse(popupDataRaw);
+
+	if (!parsedResponse.success) {
+		console.error('[Map] Popup data parse error:', parsedResponse.error);
+		throw new Error('Failed to parse popup data');
+	}
+
+	return parsedResponse.data;
+}
+
+const PopupDataContext = createContext<
+	UseQueryResult<Array<MapPopupItemParsed> | undefined> | undefined
+>(undefined);
 
 export const usePopupDataQuery = () => {
 	const context = useContext(PopupDataContext);

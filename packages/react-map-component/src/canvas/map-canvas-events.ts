@@ -5,16 +5,12 @@ import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback, useMemo } from 'react';
 import { funnel } from 'remeda';
 
-import { useSourceDataQuery } from '../../api/hooks/use-map-api-source-data';
-import { MapLayerIdEnum } from '../../config/layer';
-import { MapSourceIdEnum } from '../../config/source';
-import { MAP_FILTER_CONTROL_ID, MEDIA_QUERY_MOBILE } from '../../constants';
-import { useMediaQuery } from '../../lib/hooks/use-media-query';
-import {
-	useMapCanvasInteractive,
-	useMapHoveredId,
-	useMapStoreActions,
-} from '../../store/hooks/use-map-store';
+import { MapLayerIdEnum } from '../config/layer';
+import { MapSourceIdEnum } from '../config/source';
+import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
+import { useSourceDataQuery } from '../data/map-source-data';
+import { useMediaQuery } from '../lib/media-query';
+import { useMapCanvasInteractive, useMapHoveredId, useMapStoreActions } from '../store/map-store';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 
@@ -216,9 +212,7 @@ export function useMapCanvasEvents() {
 						return;
 					}
 
-					const filterControl = container.querySelector<HTMLButtonElement>(
-						`#${MAP_FILTER_CONTROL_ID}`,
-					);
+					const filterControl = container.querySelector<HTMLButtonElement>(`#${CONTROL_FILTER_ID}`);
 
 					if (!filterControl) {
 						console.warn('[Map] Filter control not found!');

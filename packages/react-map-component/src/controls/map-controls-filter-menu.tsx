@@ -19,7 +19,7 @@ import {
 	useMapShowObjectiveFilter,
 	useMapStatusFilter,
 	useMapStoreActions,
-} from '../store/hooks/use-map-store';
+} from '../store/map-store';
 
 const MapFilterMenuItem: FC<
 	PropsWithChildren<{

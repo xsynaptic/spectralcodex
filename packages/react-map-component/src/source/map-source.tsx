@@ -3,9 +3,9 @@ import type { FC } from 'react';
 
 import type { MapComponentProps } from '../types';
 
-import { useMapApiDivisionData } from '../api/hooks/use-map-api-division-data';
-import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
-import { useMapCanvasInteractive } from '../store/hooks/use-map-store';
+import { useMapCanvasData } from '../canvas/map-canvas-data';
+import { useMapApiDivisionData } from '../data/map-division-data';
+import { useMapCanvasInteractive } from '../store/map-store';
 import { MapSourceDebug } from './map-source-debug';
 import { MapSourceDivisions } from './map-source-divisions';
 import { MapSourceLines } from './map-source-lines';

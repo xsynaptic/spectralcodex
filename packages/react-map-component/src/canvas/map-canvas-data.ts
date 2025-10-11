@@ -1,18 +1,18 @@
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useMemo } from 'react';
 
-import type { MapGeometry, MapSourceFeatureCollection, MapSourceItem } from '../../types';
+import type { MapGeometry, MapSourceFeatureCollection, MapSourceItemParsed } from '../types';
 
-import { useSourceDataQuery } from '../../api/hooks/use-map-api-source-data';
+import { useSourceDataQuery } from '../data/map-source-data';
 import {
 	useMapObjectiveFilter,
 	useMapQualityFilter,
 	useMapRatingFilter,
 	useMapStatusFilter,
-} from '../../store/hooks/use-map-store';
+} from '../store/map-store';
 
 // Reconstitute a valid GeoJSON object at the point of use
-function getGeojsonData(sourceItems: Array<MapSourceItem>) {
+function getGeojsonData(sourceItems: Array<MapSourceItemParsed>) {
 	return sourceItems.length > 0
 		? ({
 				type: 'FeatureCollection' as const,

@@ -6,10 +6,10 @@ import { Protocol } from 'pmtiles';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
 
-import type { MapComponentProps } from '../../types';
+import type { MapComponentProps } from '../types';
 
-import { useMapLanguages } from '../../store/hooks/use-map-store';
-import { useDarkMode } from './use-dark-mode';
+import { useMapLanguages } from '../store/map-store';
+import { useDarkMode } from './dark-mode';
 
 export function useProtomaps({
 	protomapsApiKey,

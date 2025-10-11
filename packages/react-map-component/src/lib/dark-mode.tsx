@@ -1,6 +1,7 @@
 /* eslint-disable unicorn/prefer-global-this */
 import type { PropsWithChildren } from 'react';
 
+import { useContext } from 'react';
 import { createContext, useEffect, useState } from 'react';
 
 /**
@@ -18,7 +19,7 @@ interface ModeChangedEvent extends CustomEvent {
 	detail: ModeChangedEventDetail;
 }
 
-export const DarkModeContext = createContext<boolean>(false);
+const DarkModeContext = createContext<boolean>(false);
 
 export function DarkModeProvider({ children }: PropsWithChildren) {
 	const [isDarkMode, setDarkMode] = useState(() => {
@@ -43,4 +44,13 @@ export function DarkModeProvider({ children }: PropsWithChildren) {
 	}, []);
 
 	return <DarkModeContext.Provider value={isDarkMode}>{children}</DarkModeContext.Provider>;
+}
+
+export function useDarkMode() {
+	const context = useContext(DarkModeContext);
+
+	if ((context as boolean | undefined) === undefined) {
+		throw new Error('[Map] useDarkMode must be used within DarkModeProvider');
+	}
+	return context;
 }

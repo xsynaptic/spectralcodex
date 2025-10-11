@@ -4,12 +4,22 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import ky from 'ky';
 import { createContext, useContext } from 'react';
 
-import type { MapComponentProps, MapSourceItem, MapSourceItemInput } from '../../types';
+import type { MapComponentProps, MapSourceItemInput, MapSourceItemParsed } from '../types';
 
-import { parseSourceData } from '../map-api-utils';
+import { MapSourceItemSchema } from '../types';
+
+export function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
+	const parsedResponse = MapSourceItemSchema.array().safeParse(sourceDataRaw);
+
+	if (!parsedResponse.success) {
+		console.error('[Map] Source data parse error:', parsedResponse.error);
+		throw new Error('Failed to parse source data');
+	}
+	return parsedResponse.data;
+}
 
 const SourceDataContext = createContext<
-	UseQueryResult<Array<MapSourceItem> | undefined> | undefined
+	UseQueryResult<Array<MapSourceItemParsed> | undefined> | undefined
 >(undefined);
 
 export const useSourceDataQuery = () => {

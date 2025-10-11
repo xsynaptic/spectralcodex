@@ -3,14 +3,10 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
-import { useSourceDataQuery } from '../api/hooks/use-map-api-source-data';
 import { translations } from '../config/translations';
-import { MAP_FILTER_CONTROL_ID } from '../constants';
-import {
-	useMapCanvasLoading,
-	useMapFilterOpen,
-	useMapStoreActions,
-} from '../store/hooks/use-map-store';
+import { CONTROL_FILTER_ID } from '../constants';
+import { useSourceDataQuery } from '../data/map-source-data';
+import { useMapCanvasLoading, useMapFilterOpen, useMapStoreActions } from '../store/map-store';
 import { CustomControlPortal } from './map-controls-custom';
 
 export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
@@ -28,7 +24,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 	return (
 		<CustomControlPortal position={position}>
 			<button
-				id={MAP_FILTER_CONTROL_ID}
+				id={CONTROL_FILTER_ID}
 				disabled={isLoading}
 				onClick={() => {
 					if (!isLoading) setFilterOpen(!filterOpen);

@@ -1,3 +1,7 @@
+import type { Flavor } from '@protomaps/basemaps';
+import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
+import type { MapOptions } from 'maplibre-gl';
+
 import {
 	LocationCategoryEnum,
 	LocationCategoryNumericMapping,
@@ -11,8 +15,14 @@ import {
 import * as R from 'remeda';
 import { z } from 'zod';
 
+// Supported geometry for use with this component
+export type MapGeometry = Point | LineString | Polygon;
+
 const NumericScaleSchema = z.number().int().min(1).max(5);
 
+/**
+ * Map source data
+ */
 export const MapSourceItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
@@ -61,6 +71,18 @@ export const MapSourceItemSchema = z
 		},
 	}));
 
+export type MapSourceItemInput = z.input<typeof MapSourceItemSchema>;
+
+export type MapSourceItemParsed = z.output<typeof MapSourceItemSchema>;
+
+export type MapSourceFeatureCollection = FeatureCollection<
+	MapGeometry,
+	MapSourceItemParsed['properties']
+>;
+
+/**
+ * Map popup data
+ */
 export const MapPopupItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
@@ -102,3 +124,36 @@ export const MapPopupItemSchema = z
 					},
 				}),
 	}));
+
+export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
+
+export type MapPopupItemParsed = z.output<typeof MapPopupItemSchema>;
+
+/**
+ * Map component props
+ */
+export interface MapComponentProps
+	extends Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'> {
+	mapId: string;
+	apiSourceUrl?: string | undefined;
+	apiPopupUrl?: string | undefined;
+	apiDivisionUrl?: string | undefined;
+	sourceData?: Array<MapSourceItemInput> | undefined;
+	popupData?: Array<MapPopupItemInput> | undefined;
+	baseMapTheme?: Flavor | undefined;
+	center?: [number, number];
+	cluster?: boolean | undefined;
+	showObjectiveFilter?: boolean | undefined;
+	languages?: Array<string> | undefined;
+	protomapsApiKey: string;
+	spritesId?: string | undefined;
+	spritesUrl?: string | undefined;
+	isDev?: boolean | undefined;
+}
+
+// Used within Astro to determine whether a map should be rendered
+export interface MapComponentData extends MapComponentProps {
+	hasGeodata: boolean;
+	featureCount: number;
+	prefetchUrls?: Array<string> | undefined;
+}

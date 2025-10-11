@@ -15,6 +15,8 @@ export const ReactQueryProvider = ({ children }: PropsWithChildren) => {
 				queries: {
 					staleTime: TIME_24_HOURS,
 					gcTime: TIME_24_HOURS,
+					// Throw errors to error boundary for critical data
+					throwOnError: true,
 				},
 			},
 		});

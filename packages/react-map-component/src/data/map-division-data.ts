@@ -7,10 +7,10 @@ import { geojson } from 'flatgeobuf';
 import ky from 'ky';
 import { isIncludedIn } from 'remeda';
 
-import type { MapComponentProps } from '../../types';
+import type { MapComponentProps } from '../types';
 
 // This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
-export function createFeatureMask(feature: Feature<Polygon | MultiPolygon>) {
+function createFeatureMask(feature: Feature<Polygon | MultiPolygon>) {
 	const worldMap = bboxPolygon([-180, -85, 180, 85]);
 
 	return difference(featureCollection([worldMap, feature]));

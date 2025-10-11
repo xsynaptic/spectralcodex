@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { useSourceDataQuery } from '../api/hooks/use-map-api-source-data';
-import { useMapCanvasData } from '../canvas/hooks/use-map-canvas-data';
+import { useMapCanvasData } from '../canvas/map-canvas-data';
 import { translations } from '../config/translations';
+import { useSourceDataQuery } from '../data/map-source-data';
 import { CustomControlPortal } from './map-controls-custom';
 
 export const MetricsControl: FC<{

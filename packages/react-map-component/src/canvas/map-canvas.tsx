@@ -5,23 +5,20 @@ import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
 
-import { PopupDataContextProvider } from '../api/hooks/use-map-api-popup-data';
-import {
-	SourceDataContextProvider,
-	useSourceDataQuery,
-} from '../api/hooks/use-map-api-source-data';
-import { useMapCanvasEvents } from '../canvas/hooks/use-map-canvas-events';
 import { MapLayerIdEnum } from '../config/layer';
 import { MapControls } from '../controls/map-controls';
 import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
-import { useProtomaps } from '../lib/hooks/use-protomaps';
+import { PopupDataContextProvider } from '../data/map-popup-data';
+import { SourceDataContextProvider, useSourceDataQuery } from '../data/map-source-data';
+import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/map-source';
 import {
 	useMapCanvasCursor,
 	useMapCanvasInteractive,
 	useMapCanvasLoading,
-} from '../store/hooks/use-map-store';
+} from '../store/map-store';
 import { MapStoreProvider } from '../store/map-store-provider';
+import { useMapCanvasEvents } from './map-canvas-events';
 import { MapPopup } from './map-popup';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)

@@ -2,17 +2,85 @@ import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
-import { memo, useCallback } from 'react';
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import maplibregl from 'maplibre-gl';
+import { useCallback } from 'react';
+import { useMemo } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import type { MapPopupItemExtended } from '../types';
+import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
 
-import { usePopupDataQuery } from '../api/hooks/use-map-api-popup-data';
 import { translations } from '../config/translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
-import { useMediaQuery } from '../lib/hooks/use-media-query';
-import { useMapStoreActions } from '../store/hooks/use-map-store';
-import { useMapCanvasPopup } from './hooks/use-map-canvas-popup';
+import { usePopupDataQuery } from '../data/map-popup-data';
+import { useSourceDataQuery } from '../data/map-source-data';
+import { useMediaQuery } from '../lib/media-query';
+import { useMapStoreActions } from '../store/map-store';
+import { useMapSelectedId } from '../store/map-store';
+
+type MapPopupItemExtended = MapPopupItemParsed & {
+	precision: number;
+	popupCoordinates: LngLat;
+};
+
+const defaultPopupItem = {
+	id: 'default',
+	title: 'Untitled',
+	titleMultilingualLang: undefined,
+	titleMultilingualValue: undefined,
+	url: undefined,
+	description: undefined,
+	safety: undefined,
+	googleMapsUrl: undefined,
+	wikipediaUrl: undefined,
+	image: undefined,
+	precision: 1,
+	popupCoordinates: new maplibregl.LngLat(0, 0),
+} satisfies MapPopupItemExtended;
+
+/**
+ * Extract popup coordinates from geometry using type discrimination
+ * - Point: use coordinates directly
+ * - LineString: use first point
+ * - Polygon: use first point of outer ring
+ */
+function getPopupCoordinates({ geometry }: MapSourceItemParsed): maplibregl.LngLat {
+	switch (geometry.type) {
+		case GeometryTypeEnum.Point: {
+			const [lng, lat] = geometry.coordinates as [number, number];
+
+			return new maplibregl.LngLat(lng, lat);
+		}
+
+		case GeometryTypeEnum.LineString: {
+			const coordinates = geometry.coordinates as Array<[number, number]>;
+
+			if (!coordinates[0]) return new maplibregl.LngLat(0, 0);
+
+			const [lng, lat] = coordinates[0];
+
+			return new maplibregl.LngLat(lng, lat);
+		}
+
+		case GeometryTypeEnum.Polygon: {
+			const coordinates = geometry.coordinates as Array<Array<[number, number]>>;
+
+			if (!coordinates[0]) return new maplibregl.LngLat(0, 0);
+			if (!coordinates[0][0]) return new maplibregl.LngLat(0, 0);
+
+			const [lng, lat] = coordinates[0][0];
+
+			return new maplibregl.LngLat(lng, lat);
+		}
+
+		// Should never reach here due to MapGeometry type constraint
+		default: {
+			console.warn(`[Map] Unsupported geometry type for popup:`, geometry);
+
+			return new maplibregl.LngLat(0, 0);
+		}
+	}
+}
 
 // Generate a standard Google Maps URL from a set of coordinates
 function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
@@ -22,6 +90,34 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
 
 	return url.toString();
+}
+
+// Popup data is incomplete; we need to assemble some props from source data
+// Default data is also provided in case of errors and other issues
+function useMapCanvasPopup() {
+	const selectedId = useMapSelectedId();
+
+	const { data: sourceData } = useSourceDataQuery();
+	const { data: popupData } = usePopupDataQuery();
+
+	return useMemo(() => {
+		if (!selectedId) return;
+
+		const selectedSourceItem = sourceData?.find(
+			(sourceItem) => sourceItem.properties.id === selectedId,
+		);
+
+		return {
+			...defaultPopupItem,
+			...popupData?.find((popupItem) => popupItem.id === selectedId),
+			...(selectedSourceItem
+				? {
+						precision: selectedSourceItem.properties.precision,
+						popupCoordinates: getPopupCoordinates(selectedSourceItem),
+					}
+				: {}),
+		} satisfies MapPopupItemExtended;
+	}, [selectedId, popupData, sourceData]);
 }
 
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
@@ -149,7 +245,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 	);
 };
 
-export const MapPopup: FC = memo(function MapPopup() {
+export const MapPopup: FC = function MapPopup() {
 	const popupItem = useMapCanvasPopup();
 
 	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
@@ -199,4 +295,4 @@ export const MapPopup: FC = memo(function MapPopup() {
 			</div>
 		</Popup>
 	) : undefined;
-});
+};
