@@ -110,7 +110,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 				) : undefined
 			}
 		</RegionsRelated>
-		<ContentSectionMap mapData={mapData} />
+		<ContentSectionMap mapData={mapData} persistId={`region-${entry.id}`} />
 		<ContentSectionPreviewGrid page={page} />
 	</article>
 </MainSite>

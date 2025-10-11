@@ -84,7 +84,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 		<ContentDescription entry={entry} />
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionSources entry={entry} />
-		<ContentSectionMap mapData={mapData} />
+		<ContentSectionMap mapData={mapData} persistId={`theme-${entry.id}`} />
 		<ContentSectionPreviewGrid page={page} />
 	</article>
 </MainSite>

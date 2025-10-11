@@ -10,14 +10,21 @@ import '#styles/map.css';
 import { FEATURE_MAP_ICONS } from '#constants.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	mapId?: string | undefined;
 	mapComponentProps: MapComponentProps;
+	/** Pass a unique ID to persist the map component across view transitions */
+	persistId?: string | undefined;
 }
 
-const { mapId, mapComponentProps, ...props } = Astro.props;
+const { mapComponentProps, persistId, ...props } = Astro.props;
 
 const spritesUrl =
 	FEATURE_MAP_ICONS && MAP_ICONS_PATH ? new URL(MAP_ICONS_PATH, Astro.site).href : undefined;
+
+const mapComponentExtendedProps = {
+	...(spritesUrl ? { spritesId: 'custom', spritesUrl } : {}),
+	style: { zIndex: 20 },
+	...mapComponentProps,
+};
 ---
 
 <MapComponentSprites />
@@ -29,16 +36,14 @@ const spritesUrl =
 	data-pagefind-ignore
 >
 	{
-		mapId ? (
+		persistId ? (
 			<ReactMapComponent
-				style={{ zIndex: 20 }}
-				{...(spritesUrl ? { spritesId: 'custom', spritesUrl } : {})}
-				{...mapComponentProps}
+				{...mapComponentExtendedProps}
 				client:visible
-				transition:persist={mapId}
+				transition:persist={persistId}
 			/>
 		) : (
-			<ReactMapComponent style={{ zIndex: 20 }} {...mapComponentProps} client:visible />
+			<ReactMapComponent {...mapComponentExtendedProps} client:visible />
 		)
 	}
 	<div

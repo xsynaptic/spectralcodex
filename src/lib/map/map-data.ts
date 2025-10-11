@@ -24,13 +24,19 @@ interface MapDataBoundsProps {
 	targetId?: string | undefined; // Optional: use for centering on a specific point
 }
 
-const buildProps = {
-	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
-	isDev: import.meta.env.DEV,
-};
-
 const BOUNDS_BUFFER_MIN = 0.1;
 const LIMITS_BUFFER_MIN = 10;
+
+const defaultMapDataProps = {
+	hasGeodata: false,
+	apiSourceUrl: undefined,
+	apiPopupUrl: undefined,
+	sourceData: undefined,
+	popupData: undefined,
+	featureCount: 0,
+	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
+	isDev: import.meta.env.DEV,
+} satisfies MapComponentData;
 
 // Calculate map bounds based on geodata and some parameters; should not include outliers
 // By default there is a 10% buffer added to the bounding box
@@ -129,25 +135,14 @@ export function getMapData({
 	limitsBuffer,
 	limitsBufferPercentage,
 	mapApiBaseUrl,
-	...restProps
+	...props
 }: MapDataBoundsProps &
 	Omit<
 		MapComponentProps,
-		'mapId' | 'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
 	> & {
 		mapApiBaseUrl?: string | undefined;
 	}) {
-	const defaultProps = {
-		mapId: '', // TODO: generate this from a hash of the data
-		hasGeodata: false,
-		apiSourceUrl: undefined,
-		apiPopupUrl: undefined,
-		sourceData: undefined,
-		popupData: undefined,
-		featureCount: 0,
-		...buildProps,
-	};
-
 	const mapBounds = getMapBounds({
 		featureCollection,
 		boundsBuffer,
@@ -164,33 +159,33 @@ export function getMapData({
 			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}?v=${popupHash}`;
 
 			return {
-				...defaultProps,
+				...defaultMapDataProps,
 				hasGeodata: true,
 				apiSourceUrl,
 				apiPopupUrl,
 				prefetchUrls: [apiSourceUrl, apiPopupUrl],
 				featureCount: featureCollection.features.length,
 				...mapBounds,
-				...restProps,
+				...props,
 			} satisfies MapComponentData;
 		} else {
 			const sourceData = getLocationsMapSourceData(featureCollection);
 			const popupData = getLocationsMapPopupData(featureCollection);
 
 			return {
-				...defaultProps,
+				...defaultMapDataProps,
 				hasGeodata: true,
 				sourceData,
 				popupData,
 				featureCount: featureCollection.features.length,
 				...mapBounds,
-				...restProps,
+				...props,
 			} satisfies MapComponentData;
 		}
 	}
 
 	return {
-		...defaultProps,
-		...restProps,
+		...defaultMapDataProps,
+		...props,
 	} satisfies MapComponentData;
 }
