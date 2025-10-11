@@ -1,6 +1,6 @@
 {
 	"name": "@spectralcodex/map-types",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Map types and schemas for Spectral Codex",
 	"type": "module",
 	"exports": {

@@ -1,4 +1,4 @@
-import { GeometryTypeEnum } from 'packages/map-types/src/map-geometry';
+import { GeometryTypeEnum } from './map-geometry';
 
 export const MapDataKeys = {
 	Id: 'id',

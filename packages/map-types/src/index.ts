@@ -9,6 +9,7 @@ export { mapIcons, mapLocationCategoryIcons } from './map-icons';
 export {
 	LocationCategoryEnum,
 	LocationCategoryNumericMapping,
+	LocationLayerEnum,
 	LocationStatusEnum,
 	LocationStatusNumericMapping,
 } from './map-locations';
