@@ -1,7 +1,7 @@
 ---
+import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
-import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -146,7 +146,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<ContentSectionPreviewGrid items={metadataItems} />
 		{
 			hideLocation ? undefined : (
-				<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`}>
+				<ContentSectionMap mapData={mapData}>
 					<LocationsAddress address={entry.data.address} langCode={regionLangCode} />
 				</ContentSectionMap>
 			)

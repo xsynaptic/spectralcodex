@@ -1,7 +1,7 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationLayerEnum } from '@spectralcodex/map-types';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
-import { LocationLayerEnum } from 'packages/map-types/src/map-locations';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';

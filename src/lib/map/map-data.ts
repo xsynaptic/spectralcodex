@@ -1,10 +1,10 @@
-import type { MapComponentProps } from '@spectralcodex/react-map-component';
+import type { MapComponentData, MapComponentProps } from '@spectralcodex/react-map-component';
 import type { BBox } from 'geojson';
 
 import { bbox, buffer, distance, truncate, center as turfCenter } from '@turf/turf';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
-import type { MapComponentData, MapFeatureCollection } from '#lib/map/map-types.ts';
+import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import {
 	getLocationsMapApiHashes,
@@ -129,19 +129,18 @@ export function getMapData({
 	limitsBuffer,
 	limitsBufferPercentage,
 	mapApiBaseUrl,
-	apiDivisionUrl,
 	...restProps
 }: MapDataBoundsProps &
 	Omit<
 		MapComponentProps,
-		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+		'mapId' | 'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
 	> & {
 		mapApiBaseUrl?: string | undefined;
 	}) {
 	const defaultProps = {
+		mapId: '', // TODO: generate this from a hash of the data
 		hasGeodata: false,
 		apiSourceUrl: undefined,
-		apiDivisionUrl,
 		apiPopupUrl: undefined,
 		sourceData: undefined,
 		popupData: undefined,

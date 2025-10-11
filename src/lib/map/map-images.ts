@@ -1,5 +1,5 @@
+import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
-import type { MapGeometry } from 'packages/react-map-component/src';
 
 import {
 	GeometryTypeEnum,

@@ -1,4 +1,4 @@
-import type { MapComponentProps, MapGeometry } from '@spectralcodex/react-map-component';
+import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { FeatureCollection } from 'geojson';
 
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
@@ -36,9 +36,3 @@ export const MapFeaturePropertiesSchema = z.object({
 export type MapFeatureProperties = z.output<typeof MapFeaturePropertiesSchema>;
 
 export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProperties>;
-
-export interface MapComponentData extends MapComponentProps {
-	hasGeodata: boolean;
-	featureCount: number;
-	prefetchUrls?: Array<string> | undefined;
-}

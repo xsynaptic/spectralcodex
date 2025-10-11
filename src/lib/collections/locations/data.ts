@@ -2,6 +2,7 @@ import type { Units } from '@turf/helpers';
 import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
+import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { transformMarkdown } from '@spectralcodex/unified-tools';
 import {
 	booleanIntersects,
@@ -14,7 +15,6 @@ import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { nanoid } from 'nanoid';
 import pLimit from 'p-limit';
-import { GeometryTypeEnum } from 'packages/map-types/src';
 
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
 

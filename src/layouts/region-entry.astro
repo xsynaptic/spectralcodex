@@ -1,9 +1,9 @@
 ---
+import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { RegionsOption } from '#lib/collections/regions/options.ts';
-import type { MapComponentData } from '#lib/map/map-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -110,7 +110,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 				) : undefined
 			}
 		</RegionsRelated>
-		<ContentSectionMap mapData={mapData} mapId={`map-${entry.id}`} />
+		<ContentSectionMap mapData={mapData} />
 		<ContentSectionPreviewGrid page={page} />
 	</article>
 </MainSite>
