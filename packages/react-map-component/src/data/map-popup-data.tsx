@@ -33,23 +33,29 @@ export const usePopupDataQuery = () => {
 };
 
 export const PopupDataContextProvider: FC<
-	Pick<MapComponentProps, 'mapId' | 'apiPopupUrl' | 'popupData' | 'isDev'> & { children: ReactNode }
-> = function PopupDataContextProvider({ mapId, apiPopupUrl, popupData, isDev, children }) {
+	Pick<MapComponentProps, 'apiPopupUrl' | 'popupData' | 'isDev'> & { children: ReactNode }
+> = function PopupDataContextProvider({ apiPopupUrl, popupData, isDev, children }) {
 	const popupDataQuery = useQuery<Array<MapPopupItemParsed> | undefined>({
-		queryKey: ['popup-data', mapId, apiPopupUrl, isDev],
+		queryKey: ['popup-data', apiPopupUrl, popupData, isDev],
 		queryFn: async () => {
-			if (!apiPopupUrl) throw new Error('[Map] Popup data URL is required for fetching');
+			// Use data passed directly to this component
+			if (popupData) {
+				return parsePopupData(popupData);
+			}
 
-			const rawData = await ky
-				.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
-				.json();
+			// Otherwise fetch via API
+			if (apiPopupUrl) {
+				const rawData = await ky
+					.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
+					.json();
 
-			return parsePopupData(rawData);
+				return parsePopupData(rawData);
+			}
+			throw new Error('[Map] Either popupData or apiPopupUrl must be provided');
 		},
-		initialData: popupData ? parsePopupData(popupData) : undefined,
-		enabled: !!apiPopupUrl,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
+		enabled: !!apiPopupUrl || !!popupData,
 	});
 
 	return <PopupDataContext.Provider value={popupDataQuery}>{children}</PopupDataContext.Provider>;

@@ -1,6 +1,6 @@
 import type { CSSProperties, FC } from 'react';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
@@ -46,7 +46,6 @@ const MapCanvasContainer: FC<
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
-	mapId,
 	apiDivisionUrl,
 	baseMapTheme,
 	bounds,
@@ -76,6 +75,11 @@ const MapCanvasContainer: FC<
 	const canvasCursor = useMapCanvasCursor();
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
+
+	const loading = useMemo(
+		() => canvasLoading || isSourceDataLoading,
+		[canvasLoading, isSourceDataLoading],
+	);
 
 	return (
 		<ReactMapGlMap
@@ -114,15 +118,10 @@ const MapCanvasContainer: FC<
 				isDev={isDev}
 			/>
 			<MapControlsFilterMenu />
-			<PopupDataContextProvider
-				mapId={mapId}
-				apiPopupUrl={apiPopupUrl}
-				popupData={popupData}
-				isDev={isDev}
-			>
+			<PopupDataContextProvider apiPopupUrl={apiPopupUrl} popupData={popupData} isDev={isDev}>
 				<MapPopup />
 			</PopupDataContextProvider>
-			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
+			<MapCanvasLoading loading={loading} />
 		</ReactMapGlMap>
 	);
 };
@@ -130,7 +129,6 @@ const MapCanvasContainer: FC<
 export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(
 	function MapCanvas(props) {
 		const {
-			mapId,
 			cluster,
 			interactive,
 			showObjectiveFilter,
@@ -141,12 +139,7 @@ export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(
 		} = props;
 
 		return (
-			<SourceDataContextProvider
-				mapId={mapId}
-				apiSourceUrl={apiSourceUrl}
-				sourceData={sourceData}
-				isDev={isDev}
-			>
+			<SourceDataContextProvider apiSourceUrl={apiSourceUrl} sourceData={sourceData} isDev={isDev}>
 				<MapStoreProvider
 					initialState={{
 						...(cluster ? { canvasClusters: cluster } : {}),

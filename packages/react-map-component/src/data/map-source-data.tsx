@@ -32,23 +32,28 @@ export const useSourceDataQuery = () => {
 };
 
 export const SourceDataContextProvider: FC<
-	Pick<MapComponentProps, 'mapId' | 'apiSourceUrl' | 'sourceData' | 'isDev'> & {
+	Pick<MapComponentProps, 'apiSourceUrl' | 'sourceData' | 'isDev'> & {
 		children: ReactNode;
 	}
-> = function SourceDataContextProvider({ mapId, apiSourceUrl, sourceData, isDev, children }) {
+> = function SourceDataContextProvider({ apiSourceUrl, sourceData, isDev, children }) {
 	const sourceDataQuery = useQuery<Array<MapSourceItemParsed> | undefined>({
-		queryKey: ['source-data', mapId, apiSourceUrl, isDev],
+		queryKey: ['source-data', apiSourceUrl, sourceData, isDev],
 		queryFn: async () => {
-			if (!apiSourceUrl) throw new Error('[Map] Source data URL is required for fetching');
+			// Use data passed directly to this component
+			if (sourceData) {
+				return parseSourceData(sourceData);
+			}
 
-			const rawData = await ky
-				.get<Array<MapSourceItemInput>>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
-				.json();
+			// Otherwise fetch via API
+			if (apiSourceUrl) {
+				const rawData = await ky
+					.get<Array<MapSourceItemInput>>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
+					.json();
 
-			return parseSourceData(rawData);
+				return parseSourceData(rawData);
+			}
+			throw new Error('[Map] Either sourceData or apiSourceUrl must be provided');
 		},
-		initialData: sourceData ? parseSourceData(sourceData) : undefined,
-		enabled: !!apiSourceUrl,
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 	});
