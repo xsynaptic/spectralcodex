@@ -5,8 +5,8 @@ import type { HTMLAttributes } from 'astro/types';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import { MAP_ICONS_PATH } from 'astro:env/client';
 
-import MapComponentSprites from '#components/map/map-component-sprites.astro';
 import '#styles/map.css';
+import MapComponentSprites from '#components/map/map-component-sprites.astro';
 import { FEATURE_MAP_ICONS } from '#constants.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -21,10 +21,11 @@ const spritesUrl =
 	FEATURE_MAP_ICONS && MAP_ICONS_PATH ? new URL(MAP_ICONS_PATH, Astro.site).href : undefined;
 
 const mapComponentExtendedProps = {
+	version: import.meta.env.BUILD_VERSION,
 	...(spritesUrl ? { spritesId: 'custom', spritesUrl } : {}),
 	style: { zIndex: 20 },
 	...mapComponentProps,
-};
+} satisfies MapComponentProps;
 ---
 
 <MapComponentSprites />

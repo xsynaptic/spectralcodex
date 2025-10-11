@@ -83,6 +83,9 @@ export default defineConfig({
 		},
 	},
 	vite: {
+		define: {
+			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
+		},
 		plugins: [tailwindcss()],
 		server: {
 			watch: {

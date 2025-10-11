@@ -1,3 +1,11 @@
+interface ImportMetaEnv {
+	readonly BUILD_VERSION: string | undefined;
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv;
+}
+
 type ModeType = 'auto' | 'dark' | 'light';
 
 interface ModeManager {
