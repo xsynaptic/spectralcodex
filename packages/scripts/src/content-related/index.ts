@@ -5,12 +5,12 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections';
 import * as R from 'remeda';
 
 import type { ContentFileMetadata } from '../content-utils';
 
 import { parseContentFiles } from '../content-utils';
+import { ContentCollectionsEnum } from '../content-utils/collections';
 import { getCachedEmbedding, loadCache, saveCache } from './vector-cache.js';
 
 const { values } = parseArgs({

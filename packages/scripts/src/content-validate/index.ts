@@ -2,9 +2,9 @@
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections';
 import { $ } from 'zx';
 
+import { ContentCollectionsEnum } from '../content-utils/collections';
 import { checkDivisionIds } from './divisions';
 import { checkLocationsRegions } from './locations-region';
 import { checkLocationsVisibility } from './locations-visibility';
