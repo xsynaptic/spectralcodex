@@ -8,34 +8,6 @@ import type { MapComponentProps, MapPopupItem, MapPopupItemInput } from '../../t
 
 import { parsePopupData } from '../map-api-utils';
 
-function useMapApiPopupData({
-	apiPopupUrl,
-	popupData,
-	isDev,
-}: Pick<MapComponentProps, 'apiPopupUrl' | 'popupData' | 'isDev'>) {
-	return useQuery({
-		queryKey: ['popup-data', apiPopupUrl],
-		queryFn: async () => {
-			if (!apiPopupUrl) return [];
-
-			try {
-				const rawData = await ky
-					.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
-					.json();
-
-				return parsePopupData(rawData);
-			} catch (error) {
-				console.error('[Map] Popup data fetch error:', error);
-				throw error;
-			}
-		},
-		initialData: popupData ? parsePopupData(popupData) : undefined,
-		enabled: !!apiPopupUrl || !!popupData,
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
-	});
-}
-
 const PopupDataContext = createContext<UseQueryResult<Array<MapPopupItem> | undefined> | undefined>(
 	undefined,
 );
@@ -50,9 +22,26 @@ export const usePopupDataQuery = () => {
 };
 
 export const PopupDataContextProvider: FC<
-	Pick<MapComponentProps, 'apiPopupUrl' | 'popupData' | 'isDev'> & { children: ReactNode }
-> = function PopupDataContextProvider({ apiPopupUrl, popupData, isDev, children }) {
-	const popupDataQuery = useMapApiPopupData({ apiPopupUrl, popupData, isDev });
+	Pick<MapComponentProps, 'mapId' | 'apiPopupUrl' | 'popupData' | 'isDev'> & { children: ReactNode }
+> = function PopupDataContextProvider({ mapId, apiPopupUrl, popupData, isDev, children }) {
+	const popupDataQuery = useQuery({
+		queryKey: ['popup-data', mapId, apiPopupUrl, isDev],
+		queryFn: async () => {
+			if (!apiPopupUrl) {
+				throw new Error('[Map] Popup data URL is required for fetching');
+			}
+
+			const rawData = await ky
+				.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
+				.json();
+
+			return parsePopupData(rawData);
+		},
+		initialData: popupData ? parsePopupData(popupData) : undefined,
+		enabled: !!apiPopupUrl,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
+	});
 
 	return <PopupDataContext.Provider value={popupDataQuery}>{children}</PopupDataContext.Provider>;
 };

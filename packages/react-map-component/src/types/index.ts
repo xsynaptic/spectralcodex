@@ -1,6 +1,6 @@
 import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
-import type { LngLat, LngLatBoundsLike } from 'maplibre-gl';
+import type { LngLat, MapOptions } from 'maplibre-gl';
 
 import { z } from 'zod';
 
@@ -36,20 +36,17 @@ export type MapPopupItemExtended = MapPopupItem & {
 /**
  * Map component props
  */
-export interface MapComponentProps {
+export interface MapComponentProps
+	extends Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'> {
+	mapId: string;
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;
 	sourceData?: Array<MapSourceItemInput> | undefined;
 	popupData?: Array<MapPopupItemInput> | undefined;
 	baseMapTheme?: Flavor | undefined;
-	bounds?: LngLatBoundsLike;
-	maxBounds?: LngLatBoundsLike;
 	center?: [number, number];
 	cluster?: boolean | undefined;
-	hash?: boolean;
-	interactive?: boolean;
-	zoom?: number | undefined;
 	showObjectiveFilter?: boolean | undefined;
 	languages?: Array<string> | undefined;
 	protomapsApiKey: string;

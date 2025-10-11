@@ -45,13 +45,11 @@ const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ l
 };
 
 const MapCanvasContainer: FC<
-	Omit<
-		MapComponentProps,
-		'geodata' | 'cluster' | 'showObjectiveFilter' | 'apiSourceUrl' | 'apiPopupUrl'
-	> & {
+	Omit<MapComponentProps, 'geodata' | 'cluster' | 'showObjectiveFilter' | 'apiSourceUrl'> & {
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
+	mapId,
 	apiDivisionUrl,
 	baseMapTheme,
 	bounds,
@@ -63,6 +61,8 @@ const MapCanvasContainer: FC<
 	protomapsApiKey,
 	spritesUrl,
 	spritesId,
+	apiPopupUrl,
+	popupData,
 	isDev,
 }) {
 	const mapStyle = useProtomaps({
@@ -117,40 +117,50 @@ const MapCanvasContainer: FC<
 				isDev={isDev}
 			/>
 			<MapControlsFilterMenu />
-			<MapPopup />
+			<PopupDataContextProvider
+				mapId={mapId}
+				apiPopupUrl={apiPopupUrl}
+				popupData={popupData}
+				isDev={isDev}
+			>
+				<MapPopup />
+			</PopupDataContextProvider>
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);
 };
 
-export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(function MapCanvas({
-	cluster,
-	showObjectiveFilter,
-	apiSourceUrl,
-	apiPopupUrl,
-	sourceData,
-	popupData,
-	languages,
-	...props
-}) {
-	return (
-		<SourceDataContextProvider
-			apiSourceUrl={apiSourceUrl}
-			sourceData={sourceData}
-			isDev={props.isDev}
-		>
-			<PopupDataContextProvider apiPopupUrl={apiPopupUrl} popupData={popupData} isDev={props.isDev}>
+export const MapCanvas: FC<MapComponentProps & { style: CSSProperties }> = memo(
+	function MapCanvas(props) {
+		const {
+			mapId,
+			cluster,
+			interactive,
+			showObjectiveFilter,
+			apiSourceUrl,
+			sourceData,
+			languages,
+			isDev,
+		} = props;
+
+		return (
+			<SourceDataContextProvider
+				mapId={mapId}
+				apiSourceUrl={apiSourceUrl}
+				sourceData={sourceData}
+				isDev={isDev}
+			>
 				<MapStoreProvider
 					initialState={{
 						...(cluster ? { canvasClusters: cluster } : {}),
 						...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
-						...(props.interactive === false ? { canvasInteractive: false } : {}),
+						...(interactive === false ? { canvasInteractive: false } : {}),
 						...(languages ? { languages } : {}),
 					}}
 				>
 					<MapCanvasContainer {...props} />
 				</MapStoreProvider>
-			</PopupDataContextProvider>
-		</SourceDataContextProvider>
-	);
-});
+			</SourceDataContextProvider>
+		);
+	},
+);

@@ -23,7 +23,9 @@ export function useMapApiDivisionData({
 	return useQuery({
 		queryKey: ['division-data', apiDivisionUrl],
 		queryFn: async () => {
-			if (!apiDivisionUrl) return false;
+			if (!apiDivisionUrl) {
+				throw new Error('[Map] Division data URL is required for fetching');
+			}
 
 			try {
 				// Fetch FlatGeobuf file
@@ -62,7 +64,7 @@ export function useMapApiDivisionData({
 					features,
 				} satisfies FeatureCollection<Polygon | MultiPolygon>;
 			} catch (error) {
-				console.error('Failed to process FlatGeobuf data:', error);
+				console.error('[Map] Failed to process FlatGeobuf data:', error);
 				return false;
 			}
 		},

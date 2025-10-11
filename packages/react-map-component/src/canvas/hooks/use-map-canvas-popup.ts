@@ -8,6 +8,21 @@ import { usePopupDataQuery } from '../../api/hooks/use-map-api-popup-data';
 import { useSourceDataQuery } from '../../api/hooks/use-map-api-source-data';
 import { useMapSelectedId } from '../../store/hooks/use-map-store';
 
+const defaultPopupItem = {
+	id: 'default',
+	title: 'Untitled',
+	titleMultilingualLang: undefined,
+	titleMultilingualValue: undefined,
+	url: undefined,
+	description: undefined,
+	safety: undefined,
+	googleMapsUrl: undefined,
+	wikipediaUrl: undefined,
+	image: undefined,
+	precision: 1,
+	popupCoordinates: new maplibregl.LngLat(0, 0),
+} satisfies MapPopupItemExtended;
+
 /**
  * Extract popup coordinates from geometry using type discrimination
  * - Point: use coordinates directly
@@ -63,35 +78,19 @@ export function useMapCanvasPopup() {
 	return useMemo(() => {
 		if (!selectedId) return;
 
-		const selectedPopupItemProps = popupData?.find((popupItem) => popupItem.id === selectedId) ?? {
-			id: 'default',
-			title: 'Untitled',
-			titleMultilingualLang: undefined,
-			titleMultilingualValue: undefined,
-			url: undefined,
-			description: undefined,
-			safety: undefined,
-			googleMapsUrl: undefined,
-			wikipediaUrl: undefined,
-			image: undefined,
-		};
-
 		const selectedSourceItem = sourceData?.find(
 			(sourceItem) => sourceItem.properties.id === selectedId,
 		);
-		const selectedSourceItemProps = selectedSourceItem
-			? {
-					precision: selectedSourceItem.properties.precision,
-					popupCoordinates: getPopupCoordinates(selectedSourceItem),
-				}
-			: {
-					precision: 1,
-					popupCoordinates: new maplibregl.LngLat(0, 0),
-				};
 
 		return {
-			...selectedPopupItemProps,
-			...selectedSourceItemProps,
+			...defaultPopupItem,
+			...popupData?.find((popupItem) => popupItem.id === selectedId),
+			...(selectedSourceItem
+				? {
+						precision: selectedSourceItem.properties.precision,
+						popupCoordinates: getPopupCoordinates(selectedSourceItem),
+					}
+				: {}),
 		} satisfies MapPopupItemExtended;
 	}, [selectedId, popupData, sourceData]);
 }
