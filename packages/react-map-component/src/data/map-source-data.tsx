@@ -37,7 +37,7 @@ export const SourceDataContextProvider: FC<
 	}
 > = function SourceDataContextProvider({ apiSourceUrl, sourceData, version, isDev, children }) {
 	const sourceDataQuery = useQuery<Array<MapSourceItemParsed> | undefined>({
-		queryKey: ['source-data', apiSourceUrl, sourceData, version, isDev],
+		queryKey: ['source-data', apiSourceUrl, !!sourceData, version, isDev],
 		queryFn: async () => {
 			// Use data passed directly to this component
 			if (sourceData) {

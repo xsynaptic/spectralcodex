@@ -35,6 +35,7 @@ const defaultMapDataProps = {
 	popupData: undefined,
 	featureCount: 0,
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
+	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
 
@@ -153,8 +154,9 @@ export function getMapData({
 	});
 
 	if (featureCollection && mapBounds) {
+		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+
 		if (mapApiBaseUrl) {
-			const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
 			const apiSourceUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Source}?v=${sourceHash}`;
 			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}?v=${popupHash}`;
 
@@ -178,6 +180,8 @@ export function getMapData({
 				sourceData,
 				popupData,
 				featureCount: featureCollection.features.length,
+				/** Extend the version to include source and popup hashes when passing data directly */
+				version: `${import.meta.env.BUILD_VERSION ?? 'unknown'}-${sourceHash}-${popupHash}`,
 				...mapBounds,
 				...props,
 			} satisfies MapComponentData;

@@ -21,7 +21,6 @@ const spritesUrl =
 	FEATURE_MAP_ICONS && MAP_ICONS_PATH ? new URL(MAP_ICONS_PATH, Astro.site).href : undefined;
 
 const mapComponentExtendedProps = {
-	version: import.meta.env.BUILD_VERSION,
 	...(spritesUrl ? { spritesId: 'custom', spritesUrl } : {}),
 	style: { zIndex: 20 },
 	...mapComponentProps,

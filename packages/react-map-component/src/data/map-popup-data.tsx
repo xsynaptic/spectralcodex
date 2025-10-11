@@ -38,7 +38,7 @@ export const PopupDataContextProvider: FC<
 	}
 > = function PopupDataContextProvider({ apiPopupUrl, popupData, version, isDev, children }) {
 	const popupDataQuery = useQuery<Array<MapPopupItemParsed> | undefined>({
-		queryKey: ['popup-data', apiPopupUrl, popupData, version, isDev],
+		queryKey: ['popup-data', apiPopupUrl, !!popupData, version, isDev],
 		queryFn: async () => {
 			// Use data passed directly to this component
 			if (popupData) {
