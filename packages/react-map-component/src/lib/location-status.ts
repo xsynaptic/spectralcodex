@@ -48,10 +48,10 @@ export const LocationStatusRecords = {
 		title_zh: '改建',
 		description:
 			'The structure is intact but it has been converted for some other use than originally intended.',
-		color: tailwindColors.yellow400,
-		stroke: tailwindColors.yellow500,
-		colorDark: tailwindColors.yellow500,
-		strokeDark: tailwindColors.yellow600,
+		color: tailwindColors.yellow300,
+		stroke: tailwindColors.yellow400,
+		colorDark: tailwindColors.yellow400,
+		strokeDark: tailwindColors.yellow500,
 	},
 	[LocationStatusEnum.Private]: {
 		title: 'Private',

@@ -13,7 +13,7 @@ import { useDarkMode } from './dark-mode';
 export function useProtomaps({
 	protomapsApiKey,
 	baseMapTheme,
-	spritesId = 'custom',
+	spritesId,
 	spritesUrl,
 	languages,
 	isDev,
@@ -55,9 +55,9 @@ export function useProtomaps({
 				sprite: [
 					{
 						id: 'default',
-						url: `https://protomaps.github.io/basemaps-assets/sprites/v4/light`,
+						url: `https://protomaps.github.io/basemaps-assets/sprites/v4/${isDarkMode ? 'dark' : 'light'}`,
 					},
-					...(isDev && spritesId && spritesUrl ? [{ id: spritesId, url: spritesUrl }] : []),
+					...(isDev && spritesUrl ? [{ id: spritesId ?? 'custom', url: spritesUrl }] : []),
 				],
 				sources: {
 					protomaps: {
@@ -68,6 +68,6 @@ export function useProtomaps({
 				},
 				layers: layers('protomaps', flavor, { lang: languages?.at(0) ?? 'en' }),
 			}) satisfies StyleSpecification,
-		[flavor, isDev, languages, protomapsApiKey, spritesId, spritesUrl],
+		[flavor, isDarkMode, protomapsApiKey, spritesId, spritesUrl, languages, isDev],
 	);
 }

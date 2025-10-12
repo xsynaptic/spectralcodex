@@ -47,15 +47,15 @@ const MapCanvasContainer: FC<
 	bounds,
 	maxBounds,
 	center,
-	hash = false,
-	zoom = 12,
+	hash,
+	zoom,
 	style,
 	protomapsApiKey,
 	spritesUrl,
 	spritesId,
 	apiPopupUrl,
 	popupData,
-	languages = ['en'],
+	languages,
 	version,
 	isDev,
 }) {
@@ -81,7 +81,10 @@ const MapCanvasContainer: FC<
 	);
 
 	/** Optionally display some additional Chinese language translations in some places */
-	const showChinese = useMemo(() => languages.some((lang) => lang.startsWith('zh')), [languages]);
+	const showChinese = useMemo(
+		() => languages?.some((lang) => lang.startsWith('zh')) ?? false,
+		[languages],
+	);
 
 	return (
 		<ReactMapGlMap
@@ -92,15 +95,15 @@ const MapCanvasContainer: FC<
 							longitude: center?.[0] ?? 0,
 							latitude: center?.[1] ?? 0,
 						}),
-				...(zoom ? { zoom } : {}),
 				...(maxBounds ? { maxBounds } : {}),
+				zoom: zoom ?? 12,
 				fitBoundsOptions: {
 					padding: { top: 20, bottom: 20, left: 50, right: 50 },
 				},
 			}}
 			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
 			styleDiffing={false}
-			hash={hash}
+			hash={hash ?? false}
 			interactive={canvasInteractive}
 			interactiveLayerIds={[...interactiveLayerIds]}
 			maxZoom={19}
