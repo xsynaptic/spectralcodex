@@ -5,11 +5,11 @@ import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo } from 'react';
 import * as R from 'remeda';
 
-import type { LocationStatusMetadata } from '../config/config-location';
+import type { LocationStatusMetadata } from '../lib/location-status';
 
-import { locationStatusStyle } from '../config/config-colors';
-import { LocationStatusRecords } from '../config/config-location';
-import { translations } from '../config/config-translations';
+import { useDarkMode } from '../lib/dark-mode';
+import { LocationStatusRecords } from '../lib/location-status';
+import { translations } from '../lib/translations';
 import {
 	useMapFilterOpen,
 	useMapFilterPosition,
@@ -40,6 +40,8 @@ const MapFilterStatusMenuItem: FC<{
 	data: LocationStatusMetadata;
 	showChinese: boolean;
 }> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data, showChinese }) {
+	const isDarkMode = useDarkMode();
+
 	const { toggleStatusFilter } = useMapStoreActions();
 
 	return (
@@ -53,8 +55,12 @@ const MapFilterStatusMenuItem: FC<{
 				<div
 					className={`h-2 w-2 rounded-full border ${isFiltered ? 'opacity-60' : ''}`}
 					style={{
-						backgroundColor: locationStatusStyle[status].color,
-						borderColor: locationStatusStyle[status].stroke,
+						backgroundColor: isDarkMode
+							? LocationStatusRecords[status].colorDark
+							: LocationStatusRecords[status].color,
+						borderColor: isDarkMode
+							? LocationStatusRecords[status].strokeDark
+							: LocationStatusRecords[status].stroke,
 					}}
 				></div>
 				<div

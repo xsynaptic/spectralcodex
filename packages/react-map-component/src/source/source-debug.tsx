@@ -7,6 +7,8 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
 
+import { tailwindColors } from '../lib/tailwind-colors';
+
 export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = function MapSourceDebug({
 	bounds,
 }) {
@@ -45,7 +47,7 @@ export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = funct
 				source: 'debug',
 				type: 'line',
 				paint: {
-					'line-color': '#ff0000',
+					'line-color': tailwindColors.red400,
 					'line-width': 1,
 					'line-opacity': 0.7,
 				},

@@ -8,17 +8,22 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { mapClusterStyle } from '../config/config-colors';
-import { MapLayerIdEnum } from '../config/config-layer';
-import { MapSourceIdEnum } from '../config/config-source';
 import { useDarkMode } from '../lib/dark-mode';
+import {
+	statusColorArray,
+	statusColorDarkArray,
+	statusStrokeColorArray,
+	statusStrokeColorDarkArray,
+} from '../lib/location-status';
+import { tailwindColors } from '../lib/tailwind-colors';
 import { useMapHoveredId, useMapSelectedId } from '../store/store';
-import { statusColorMap, statusStrokeColorMap } from './source-utils';
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
 function useMapSourcePointsStyle(spritesPrefix = 'custom') {
+	const isDarkMode = useDarkMode();
+
 	const selectedId = useMapSelectedId();
 	const hoveredId = useMapHoveredId();
-	const isDarkMode = useDarkMode();
 
 	const isSelectedIdExpression = useMemo(
 		() => ['==', ['get', 'id'], selectedId ?? ''] satisfies ExpressionSpecification,
@@ -55,13 +60,13 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['get', 'point_count'],
 						0,
-						mapClusterStyle.circleSmFill,
+						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky500,
 						10,
-						mapClusterStyle.circleMdFill,
+						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky400,
 						80,
-						mapClusterStyle.circleLgFill,
+						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky300,
 						150,
-						mapClusterStyle.circleXlFill,
+						isDarkMode ? tailwindColors.sky300 : tailwindColors.sky200,
 					],
 					'circle-radius': [
 						'interpolate',
@@ -80,17 +85,17 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['get', 'point_count'],
 						0,
-						mapClusterStyle.circleSmStroke,
+						isDarkMode ? tailwindColors.sky700 : tailwindColors.sky600,
 						10,
-						mapClusterStyle.circleMdStroke,
+						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky500,
 						80,
-						mapClusterStyle.circleLgStroke,
+						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky400,
 						150,
-						mapClusterStyle.circleXlStroke,
+						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky300,
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isHoveredClusterIdExpression],
+		[isDarkMode, isHoveredClusterIdExpression],
 	);
 
 	// Numeric labels for clusters
@@ -109,12 +114,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-ignore-placement': true,
 				},
 				paint: {
-					'text-color': mapClusterStyle.countTextColor,
+					'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
 					'text-halo-color': 'rgba(0, 0, 0, 0.2)',
 					'text-halo-width': 1,
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isHoveredClusterIdExpression],
+		[isDarkMode, isHoveredClusterIdExpression],
 	);
 
 	// Visual points for unfiltered (zoomed-in) points
@@ -126,11 +131,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 				type: 'circle',
 				filter: ['!', ['has', 'point_count']],
 				paint: {
-					...(statusColorMap
-						? {
-								'circle-color': ['match', ['string', ['get', 'status']], ...statusColorMap, 'gray'],
-							}
-						: {}),
+					'circle-color': [
+						'match',
+						['string', ['get', 'status']],
+						...(isDarkMode ? statusColorDarkArray : statusColorArray),
+						'gray',
+					],
 					'circle-radius': [
 						'interpolate',
 						['linear'],
@@ -147,19 +153,15 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['case', isSelectedIdExpression, 12, isHoveredIdExpression, 9, 8],
 					],
 					'circle-stroke-width': 1,
-					...(statusStrokeColorMap
-						? {
-								'circle-stroke-color': [
-									'match',
-									['string', ['get', 'status']],
-									...statusStrokeColorMap,
-									'gray',
-								],
-							}
-						: {}),
+					'circle-stroke-color': [
+						'match',
+						['string', ['get', 'status']],
+						...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
+						'gray',
+					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isSelectedIdExpression, isHoveredIdExpression],
+		[isDarkMode, isSelectedIdExpression, isHoveredIdExpression],
 	);
 
 	// Visually obscured tap targets for all visible points; this makes the mobile experience better
@@ -172,11 +174,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 				type: 'circle',
 				filter: ['!', ['has', 'point_count']],
 				paint: {
-					...(statusColorMap
-						? {
-								'circle-color': ['match', ['string', ['get', 'status']], ...statusColorMap, 'gray'],
-							}
-						: {}),
+					'circle-color': [
+						'match',
+						['string', ['get', 'status']],
+						...(isDarkMode ? statusColorDarkArray : statusColorArray),
+						'gray',
+					],
 					'circle-opacity': 0.2,
 					'circle-radius': [
 						'interpolate',
@@ -195,7 +198,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isSelectedIdExpression, isHoveredIdExpression],
+		[isDarkMode, isSelectedIdExpression, isHoveredIdExpression],
 	);
 
 	// Featured image overlay for points with images
@@ -230,7 +233,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					],
 				},
 				paint: {
-					'icon-color': ['case', isSelectedIdExpression, '#ffff00', '#ff00ff'],
+					'icon-color': [
+						'case',
+						isSelectedIdExpression,
+						tailwindColors.red500,
+						tailwindColors.red600,
+					],
 				},
 			}) satisfies SymbolLayerSpecification,
 		[isSelectedIdExpression, spritesPrefix],
@@ -260,7 +268,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 					'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
 				},
 				paint: {
-					'text-color': isDarkMode ? '#e7e3e4' : '#3f3f47',
+					'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
 					'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
 					'text-halo-width': 1.2,
 				},

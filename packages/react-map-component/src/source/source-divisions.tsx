@@ -6,12 +6,13 @@ import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { mapDivisionStyle } from '../config/config-colors';
-import { MapLayerIdEnum } from '../config/config-layer';
-import { MapSourceIdEnum } from '../config/config-source';
+import { useDarkMode } from '../lib/dark-mode';
+import { tailwindColors } from '../lib/tailwind-colors';
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
-// TODO: adjust style for dark mode
 function useMapSourceDivisionStyle() {
+	const isDarkMode = useDarkMode();
+
 	const divisionMaskLayerStyle = useMemo(
 		() =>
 			({
@@ -19,11 +20,11 @@ function useMapSourceDivisionStyle() {
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'fill',
 				paint: {
-					'fill-color': mapDivisionStyle.fillColor,
-					'fill-opacity': 0.16,
+					'fill-color': isDarkMode ? tailwindColors.zinc500 : tailwindColors.stone400,
+					'fill-opacity': isDarkMode ? 0.09 : 0.15,
 				},
 			}) satisfies FillLayerSpecification,
-		[],
+		[isDarkMode],
 	);
 
 	const divisionOutlineLayerStyle = useMemo(
@@ -37,7 +38,7 @@ function useMapSourceDivisionStyle() {
 					'line-join': 'round',
 				},
 				paint: {
-					'line-color': mapDivisionStyle.outlineColor,
+					'line-color': isDarkMode ? tailwindColors.red500 : tailwindColors.red400,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -52,7 +53,7 @@ function useMapSourceDivisionStyle() {
 					'line-opacity': 0.7,
 				},
 			}) satisfies LineLayerSpecification,
-		[],
+		[isDarkMode],
 	);
 
 	const divisionHaloLayerStyle = useMemo(
@@ -67,7 +68,7 @@ function useMapSourceDivisionStyle() {
 				},
 				paint: {
 					'line-blur': 5,
-					'line-color': mapDivisionStyle.haloColor,
+					'line-color': isDarkMode ? tailwindColors.red600 : tailwindColors.red500,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -84,7 +85,7 @@ function useMapSourceDivisionStyle() {
 					'line-opacity': 0.2,
 				},
 			}) satisfies LineLayerSpecification,
-		[],
+		[isDarkMode],
 	);
 
 	return {

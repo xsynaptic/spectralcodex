@@ -7,11 +7,13 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { MapLayerIdEnum } from '../config/config-layer';
-import { MapSourceIdEnum } from '../config/config-source';
-import { statusColorMap } from './source-utils';
+import { useDarkMode } from '../lib/dark-mode';
+import { statusColorArray, statusColorDarkArray } from '../lib/location-status';
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
 function useMapSourceLinesStyle() {
+	const isDarkMode = useDarkMode();
+
 	// Experimental line drawing style
 	const lineStringLayerStyle = useMemo(
 		() =>
@@ -24,11 +26,12 @@ function useMapSourceLinesStyle() {
 					'line-cap': 'round',
 				},
 				paint: {
-					...(statusColorMap
-						? {
-								'line-color': ['match', ['string', ['get', 'status']], ...statusColorMap, 'gray'],
-							}
-						: {}),
+					'line-color': [
+						'match',
+						['string', ['get', 'status']],
+						...(isDarkMode ? statusColorDarkArray : statusColorArray),
+						'gray',
+					],
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -46,7 +49,7 @@ function useMapSourceLinesStyle() {
 					],
 				},
 			}) satisfies LineLayerSpecification,
-		[],
+		[isDarkMode],
 	);
 
 	return {

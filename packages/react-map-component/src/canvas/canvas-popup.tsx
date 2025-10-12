@@ -10,11 +10,11 @@ import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
 
-import { translations } from '../config/config-translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
+import { translations } from '../lib/translations';
 import { useMapStoreActions } from '../store/store';
 import { useMapSelectedId } from '../store/store';
 

@@ -3,9 +3,9 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
-import { translations } from '../config/config-translations';
 import { CONTROL_FILTER_ID } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
+import { translations } from '../lib/translations';
 import { useMapCanvasLoading, useMapFilterOpen, useMapStoreActions } from '../store/store';
 import { CustomControlPortal } from './controls-custom';
 
