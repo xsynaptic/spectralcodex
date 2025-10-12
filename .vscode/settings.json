@@ -109,19 +109,6 @@
 		"zustand"
 	],
 	"cSpell.ignorePaths": [".vscode", "pnpm*.yaml", "node_modules", "tsconfig.json"],
-	"cssVariables.blacklistFolders": [
-		"**/.git",
-		"**/.svn",
-		"**/.hg",
-		"**/CVS",
-		"**/.DS_Store",
-		"**/node_modules",
-		"**/bower_components",
-		"**/tmp",
-		"**/dist",
-		"**/tests",
-		"content"
-	],
 	"eslint.validate": [
 		"javascript",
 		"javascriptreact",
@@ -135,6 +122,7 @@
 		"source.fixAll": "always",
 		"source.fixAll.eslint": "always"
 	},
+	"editor.colorDecorators": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.formatOnSave": true,
 	"editor.quickSuggestions": {

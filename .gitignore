@@ -41,7 +41,7 @@ packages/content-demo/collections
 packages/content-demo/media
 
 # ignore some files temporarily
-config/
+/config/
 public/icons/
 public/og*.jpg
 docker-compose*
