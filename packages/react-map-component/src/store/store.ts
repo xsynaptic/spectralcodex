@@ -50,11 +50,6 @@ export const useMapShowObjectiveFilter = () =>
 	useMapDataStore((state) => state.showObjectiveFilter);
 
 /**
- * Map languages
- */
-export const useMapLanguages = () => useMapDataStore((state) => state.languages);
-
-/**
  * Map actions
  */
 export const useMapStoreActions = () => useMapDataStore((state) => state.actions);

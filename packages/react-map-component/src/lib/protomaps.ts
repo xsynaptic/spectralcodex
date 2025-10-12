@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 
 import type { MapComponentProps } from '../types';
 
-import { useMapLanguages } from '../store/store';
 import { useDarkMode } from './dark-mode';
 
 export function useProtomaps({
@@ -16,13 +15,12 @@ export function useProtomaps({
 	baseMapTheme,
 	spritesId = 'custom',
 	spritesUrl,
+	languages,
 	isDev,
 }: Pick<
 	MapComponentProps,
-	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'isDev'
+	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'languages' | 'isDev'
 >) {
-	const languages = useMapLanguages();
-
 	const isDarkMode = useDarkMode();
 
 	const flavor = useMemo(() => {

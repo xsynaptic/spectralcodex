@@ -2,7 +2,7 @@ import type { LocationStatus } from '@spectralcodex/map-types';
 import type { FC, PropsWithChildren } from 'react';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import * as R from 'remeda';
 
 import type { LocationStatusMetadata } from '../config/config-location';
@@ -13,7 +13,6 @@ import { translations } from '../config/config-translations';
 import {
 	useMapFilterOpen,
 	useMapFilterPosition,
-	useMapLanguages,
 	useMapObjectiveFilter,
 	useMapRatingFilter,
 	useMapShowObjectiveFilter,
@@ -39,14 +38,8 @@ const MapFilterStatusMenuItem: FC<{
 	status: LocationStatus;
 	isFiltered: boolean;
 	data: LocationStatusMetadata;
-}> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
-	const mapLanguages = useMapLanguages();
-
-	const showChinese = useMemo(
-		() => mapLanguages?.some((lang) => lang.startsWith('zh')),
-		[mapLanguages],
-	);
-
+	showChinese: boolean;
+}> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data, showChinese }) {
 	const { toggleStatusFilter } = useMapStoreActions();
 
 	return (
@@ -107,53 +100,47 @@ const MapFilterStatusShowHideMenuItem: FC<
 	);
 });
 
-const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
-	const mapLanguages = useMapLanguages();
+const MapFilterStatusShowHideMenu: FC<{ showChinese: boolean }> =
+	function MapFilterStatusShowHideMenu({ showChinese }) {
+		const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
 
-	const showChinese = useMemo(
-		() => mapLanguages?.some((lang) => lang.startsWith('zh')),
-		[mapLanguages],
-	);
-
-	const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
-
-	return (
-		<>
-			<MapFilterStatusShowHideMenuItem
-				onClick={() => {
-					showAllStatusFilter();
-				}}
-			>
-				{showChinese ? (
-					<>
-						<span>{translations.showAll}</span>
-						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
-							{translations.showAllAlt}
-						</span>
-					</>
-				) : (
-					translations.showAll
-				)}
-			</MapFilterStatusShowHideMenuItem>
-			<MapFilterStatusShowHideMenuItem
-				onClick={() => {
-					hideAllStatusFilter();
-				}}
-			>
-				{showChinese ? (
-					<>
-						<span>{translations.hideAll}</span>
-						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
-							{translations.hideAllAlt}
-						</span>
-					</>
-				) : (
-					translations.hideAll
-				)}
-			</MapFilterStatusShowHideMenuItem>
-		</>
-	);
-};
+		return (
+			<>
+				<MapFilterStatusShowHideMenuItem
+					onClick={() => {
+						showAllStatusFilter();
+					}}
+				>
+					{showChinese ? (
+						<>
+							<span>{translations.showAll}</span>
+							<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
+								{translations.showAllAlt}
+							</span>
+						</>
+					) : (
+						translations.showAll
+					)}
+				</MapFilterStatusShowHideMenuItem>
+				<MapFilterStatusShowHideMenuItem
+					onClick={() => {
+						hideAllStatusFilter();
+					}}
+				>
+					{showChinese ? (
+						<>
+							<span>{translations.hideAll}</span>
+							<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
+								{translations.hideAllAlt}
+							</span>
+						</>
+					) : (
+						translations.hideAll
+					)}
+				</MapFilterStatusShowHideMenuItem>
+			</>
+		);
+	};
 
 const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 	const ratingFilterValue = useMapRatingFilter();
@@ -210,7 +197,8 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 
 export const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
-}> = function MapControlsFilterMenu({ filterPopupOffset = 8 }) {
+	showChinese?: boolean;
+}> = function MapControlsFilterMenu({ filterPopupOffset = 8, showChinese = false }) {
 	const filterPosition = useMapFilterPosition();
 	const filterOpen = useMapFilterOpen();
 	const statusFilter = useMapStatusFilter();
@@ -233,9 +221,10 @@ export const MapControlsFilterMenu: FC<{
 							status={status}
 							data={data}
 							isFiltered={statusFilter.includes(status)}
+							showChinese={showChinese}
 						/>
 					))}
-					<MapFilterStatusShowHideMenu />
+					<MapFilterStatusShowHideMenu showChinese={showChinese} />
 					<MapFilterRatingMenuItem />
 					{showObjectiveFilter ? <MapFilterObjectiveMenuItem /> : undefined}
 				</ul>
