@@ -1,6 +1,6 @@
 {
 	"name": "@spectralcodex/react-map-component",
-	"version": "1.3.0",
+	"version": "2.0.0",
 	"description": "React map component for Spectral Codex",
 	"type": "module",
 	"exports": "./src/index.ts",
