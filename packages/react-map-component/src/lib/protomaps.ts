@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 
 import type { MapComponentProps } from '../types';
 
-import { useMapLanguages } from '../store/map-store';
+import { useMapLanguages } from '../store/store';
 import { useDarkMode } from './dark-mode';
 
 export function useProtomaps({

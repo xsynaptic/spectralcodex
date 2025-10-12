@@ -7,9 +7,9 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { MapLayerIdEnum } from '../config/layer';
-import { MapSourceIdEnum } from '../config/source';
-import { statusColorMap } from './map-source-utils';
+import { MapLayerIdEnum } from '../config/config-layer';
+import { MapSourceIdEnum } from '../config/config-source';
+import { statusColorMap } from './source-utils';
 
 function useMapSourceLinesStyle() {
 	// Experimental line drawing style

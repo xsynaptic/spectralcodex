@@ -5,11 +5,11 @@ import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo, useMemo } from 'react';
 import * as R from 'remeda';
 
-import type { LocationStatusMetadata } from '../config/location';
+import type { LocationStatusMetadata } from '../config/config-location';
 
-import { locationStatusStyle } from '../config/colors';
-import { LocationStatusRecords } from '../config/location';
-import { translations } from '../config/translations';
+import { locationStatusStyle } from '../config/config-colors';
+import { LocationStatusRecords } from '../config/config-location';
+import { translations } from '../config/config-translations';
 import {
 	useMapFilterOpen,
 	useMapFilterPosition,
@@ -19,7 +19,7 @@ import {
 	useMapShowObjectiveFilter,
 	useMapStatusFilter,
 	useMapStoreActions,
-} from '../store/map-store';
+} from '../store/store';
 
 const MapFilterMenuItem: FC<
 	PropsWithChildren<{

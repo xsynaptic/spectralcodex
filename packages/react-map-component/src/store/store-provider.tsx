@@ -71,7 +71,7 @@ export interface MapDataStore extends MapDataState {
 	};
 }
 
-const defaultState = {
+const defaultMapDataState = {
 	selectedId: undefined,
 	hoveredId: undefined,
 	/** Canvas */
@@ -97,7 +97,7 @@ const useMapStoreSetup = ({
 	initialState?: Partial<MapDataConfigurableState> | undefined;
 }) => {
 	const initialState = useMemo<MapDataState>(
-		() => ({ ...defaultState, ...initialStatePartial }),
+		() => ({ ...defaultMapDataState, ...initialStatePartial }),
 		[initialStatePartial],
 	);
 

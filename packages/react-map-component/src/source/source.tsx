@@ -3,13 +3,13 @@ import type { FC } from 'react';
 
 import type { MapComponentProps } from '../types';
 
-import { useMapCanvasData } from '../canvas/map-canvas-data';
-import { useMapApiDivisionData } from '../data/map-division-data';
-import { useMapCanvasInteractive } from '../store/map-store';
-import { MapSourceDebug } from './map-source-debug';
-import { MapSourceDivisions } from './map-source-divisions';
-import { MapSourceLines } from './map-source-lines';
-import { MapSourcePoints } from './map-source-points';
+import { useMapCanvasData } from '../canvas/canvas-data';
+import { useMapApiDivisionData } from '../data/data-division';
+import { useMapCanvasInteractive } from '../store/store';
+import { MapSourceDebug } from './source-debug';
+import { MapSourceDivisions } from './source-divisions';
+import { MapSourceLines } from './source-lines';
+import { MapSourcePoints } from './source-points';
 
 const IS_DEBUG = false as boolean;
 

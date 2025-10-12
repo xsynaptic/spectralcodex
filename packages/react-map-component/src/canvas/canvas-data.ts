@@ -3,13 +3,13 @@ import { useMemo } from 'react';
 
 import type { MapGeometry, MapSourceFeatureCollection, MapSourceItemParsed } from '../types';
 
-import { useSourceDataQuery } from '../data/map-source-data';
+import { useSourceDataQuery } from '../data/data-source';
 import {
 	useMapObjectiveFilter,
 	useMapQualityFilter,
 	useMapRatingFilter,
 	useMapStatusFilter,
-} from '../store/map-store';
+} from '../store/store';
 
 // Reconstitute a valid GeoJSON object at the point of use
 function getGeojsonData(sourceItems: Array<MapSourceItemParsed>) {

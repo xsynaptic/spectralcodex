@@ -5,12 +5,12 @@ import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback, useMemo } from 'react';
 import { funnel } from 'remeda';
 
-import { MapLayerIdEnum } from '../config/layer';
-import { MapSourceIdEnum } from '../config/source';
+import { MapLayerIdEnum } from '../config/config-layer';
+import { MapSourceIdEnum } from '../config/config-source';
 import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
-import { useSourceDataQuery } from '../data/map-source-data';
+import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
-import { useMapCanvasInteractive, useMapHoveredId, useMapStoreActions } from '../store/map-store';
+import { useMapCanvasInteractive, useMapHoveredId, useMapStoreActions } from '../store/store';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 

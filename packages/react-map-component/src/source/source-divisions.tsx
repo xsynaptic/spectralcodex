@@ -6,9 +6,9 @@ import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { mapDivisionStyle } from '../config/colors';
-import { MapLayerIdEnum } from '../config/layer';
-import { MapSourceIdEnum } from '../config/source';
+import { mapDivisionStyle } from '../config/config-colors';
+import { MapLayerIdEnum } from '../config/config-layer';
+import { MapSourceIdEnum } from '../config/config-source';
 
 // TODO: adjust style for dark mode
 function useMapSourceDivisionStyle() {

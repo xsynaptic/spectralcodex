@@ -13,7 +13,7 @@ export function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
 
 	if (!parsedResponse.success) {
 		console.error('[Map] Source data parse error:', parsedResponse.error);
-		throw new Error('Failed to parse source data');
+		throw new Error('[Map] Failed to parse source data');
 	}
 	return parsedResponse.data;
 }

@@ -3,11 +3,11 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 
-import { translations } from '../config/translations';
+import { translations } from '../config/config-translations';
 import { CONTROL_FILTER_ID } from '../constants';
-import { useSourceDataQuery } from '../data/map-source-data';
-import { useMapCanvasLoading, useMapFilterOpen, useMapStoreActions } from '../store/map-store';
-import { CustomControlPortal } from './map-controls-custom';
+import { useSourceDataQuery } from '../data/data-source';
+import { useMapCanvasLoading, useMapFilterOpen, useMapStoreActions } from '../store/store';
+import { CustomControlPortal } from './controls-custom';
 
 export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
 	position,

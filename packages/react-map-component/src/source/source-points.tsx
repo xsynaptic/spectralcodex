@@ -8,12 +8,12 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { mapClusterStyle } from '../config/colors';
-import { MapLayerIdEnum } from '../config/layer';
-import { MapSourceIdEnum } from '../config/source';
+import { mapClusterStyle } from '../config/config-colors';
+import { MapLayerIdEnum } from '../config/config-layer';
+import { MapSourceIdEnum } from '../config/config-source';
 import { useDarkMode } from '../lib/dark-mode';
-import { useMapHoveredId, useMapSelectedId } from '../store/map-store';
-import { statusColorMap, statusStrokeColorMap } from './map-source-utils';
+import { useMapHoveredId, useMapSelectedId } from '../store/store';
+import { statusColorMap, statusStrokeColorMap } from './source-utils';
 
 function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 	const selectedId = useMapSelectedId();

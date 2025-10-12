@@ -5,21 +5,17 @@ import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
 
-import { MapLayerIdEnum } from '../config/layer';
-import { MapControls } from '../controls/map-controls';
-import { MapControlsFilterMenu } from '../controls/map-controls-filter-menu';
-import { PopupDataContextProvider } from '../data/map-popup-data';
-import { SourceDataContextProvider, useSourceDataQuery } from '../data/map-source-data';
+import { MapLayerIdEnum } from '../config/config-layer';
+import { MapControls } from '../controls/controls';
+import { MapControlsFilterMenu } from '../controls/controls-filter-menu';
+import { PopupDataContextProvider } from '../data/data-popup';
+import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
 import { useProtomaps } from '../lib/protomaps';
-import { MapSource } from '../source/map-source';
-import {
-	useMapCanvasCursor,
-	useMapCanvasInteractive,
-	useMapCanvasLoading,
-} from '../store/map-store';
-import { MapStoreProvider } from '../store/map-store-provider';
-import { useMapCanvasEvents } from './map-canvas-events';
-import { MapPopup } from './map-popup';
+import { MapSource } from '../source/source';
+import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
+import { MapStoreProvider } from '../store/store-provider';
+import { useMapCanvasEvents } from './canvas-events';
+import { MapPopup } from './canvas-popup';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)
 // All other layers do not trigger pointer events

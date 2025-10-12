@@ -10,13 +10,13 @@ import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
 
-import { translations } from '../config/translations';
+import { translations } from '../config/config-translations';
 import { MEDIA_QUERY_MOBILE } from '../constants';
-import { usePopupDataQuery } from '../data/map-popup-data';
-import { useSourceDataQuery } from '../data/map-source-data';
+import { usePopupDataQuery } from '../data/data-popup';
+import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
-import { useMapStoreActions } from '../store/map-store';
-import { useMapSelectedId } from '../store/map-store';
+import { useMapStoreActions } from '../store/store';
+import { useMapSelectedId } from '../store/store';
 
 type MapPopupItemExtended = MapPopupItemParsed & {
 	precision: number;

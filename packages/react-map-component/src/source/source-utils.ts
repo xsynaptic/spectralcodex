@@ -1,4 +1,4 @@
-import { locationStatusStyle } from '../config/colors';
+import { locationStatusStyle } from '../config/config-colors';
 
 // MapLibre expects some style properties to have at least two items
 export function isDoubleStringArray(

@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import type { MapComponentProps } from './types';
 
-import { MapCanvas } from './canvas/map-canvas';
+import { MapCanvas } from './canvas/canvas';
 import { DarkModeProvider } from './lib/dark-mode';
 
 import 'maplibre-gl/dist/maplibre-gl.css';

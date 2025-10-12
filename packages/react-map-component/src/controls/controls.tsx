@@ -8,9 +8,9 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
-import { useMapCanvasInteractive } from '../store/map-store';
-import { FilterControl } from './map-controls-filter';
-import { MetricsControl } from './map-controls-metrics';
+import { useMapCanvasInteractive } from '../store/store';
+import { FilterControl } from './controls-filter';
+import { MetricsControl } from './controls-metrics';
 
 export const MapControls: FC = function MapControls() {
 	const canvasInteractive = useMapCanvasInteractive();
