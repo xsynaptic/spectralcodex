@@ -37,18 +37,18 @@
 		"vite": "6.3.4"
 	},
 	"dependencies": {
-		"astro": "^5.14.3",
+		"astro": "^5.14.4",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.8",
 		"@astrojs/mdx": "^4.3.7",
-		"@astrojs/node": "^9.4.5",
+		"@astrojs/node": "^9.4.6",
 		"@astrojs/react": "^4.4.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.393",
+		"@iconify/json": "^2.2.394",
 		"@iconify/utils": "^3.0.2",
 		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",
@@ -68,7 +68,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.2",
 		"@types/react-dom": "^19.2.1",
-		"@xsynaptic/eslint-config": "^3.0.4",
+		"@xsynaptic/eslint-config": "^3.0.5",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.5",
 		"astro-pagefind": "^1.8.5",
