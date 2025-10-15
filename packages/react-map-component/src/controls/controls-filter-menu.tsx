@@ -216,6 +216,7 @@ export const MapControlsFilterMenu: FC<{
 			style={{
 				maxWidth: 'min(350px, 80vw)',
 				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
+				zIndex: 10,
 			}}
 		>
 			<div className="maplibregl-popup-tip"></div>

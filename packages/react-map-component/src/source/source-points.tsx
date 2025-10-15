@@ -60,31 +60,6 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						['linear'],
 						['get', 'point_count'],
 						0,
-						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky500,
-						10,
-						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky400,
-						80,
-						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky300,
-						150,
-						isDarkMode ? tailwindColors.sky300 : tailwindColors.sky200,
-					],
-					'circle-radius': [
-						'interpolate',
-						['linear'],
-						['get', 'point_count'],
-						0, // Point count
-						['case', isHoveredClusterIdExpression, 9, 7],
-						10,
-						['case', isHoveredClusterIdExpression, 11, 9],
-						60,
-						['case', isHoveredClusterIdExpression, 16, 14],
-					],
-					'circle-stroke-width': 1,
-					'circle-stroke-color': [
-						'interpolate',
-						['linear'],
-						['get', 'point_count'],
-						0,
 						isDarkMode ? tailwindColors.sky700 : tailwindColors.sky600,
 						10,
 						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky500,
@@ -92,6 +67,31 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom') {
 						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky400,
 						150,
 						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky300,
+					],
+					'circle-radius': [
+						'interpolate',
+						['linear'],
+						['get', 'point_count'],
+						0, // Point count
+						['case', isHoveredClusterIdExpression, 9, 7],
+						20,
+						['case', isHoveredClusterIdExpression, 11, 9],
+						60,
+						['case', isHoveredClusterIdExpression, 14, 12],
+					],
+					'circle-stroke-width': 1,
+					'circle-stroke-color': [
+						'interpolate',
+						['linear'],
+						['get', 'point_count'],
+						0,
+						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky700,
+						10,
+						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky600,
+						80,
+						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky500,
+						150,
+						isDarkMode ? tailwindColors.sky300 : tailwindColors.sky400,
 					],
 				},
 			}) satisfies CircleLayerSpecification,
@@ -304,7 +304,7 @@ export const MapSourcePoints: FC<{
 
 		return {
 			cluster: interactive,
-			clusterRadius: 14, // How much space to provide for clusters; lower number = higher density
+			clusterRadius: 13, // How much space to provide for clusters; lower number = higher density
 			clusterMaxZoom: 14, // Max zoom to cluster points on
 			clusterMinPoints: 2, // Minimum number of points to cluster
 			clusterProperties,

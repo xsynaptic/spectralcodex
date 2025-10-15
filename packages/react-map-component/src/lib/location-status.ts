@@ -48,8 +48,8 @@ export const LocationStatusRecords = {
 		title_zh: '改建',
 		description:
 			'The structure is intact but it has been converted for some other use than originally intended.',
-		color: tailwindColors.yellow300,
-		stroke: tailwindColors.yellow400,
+		color: tailwindColors.yellow400,
+		stroke: tailwindColors.yellow500,
 		colorDark: tailwindColors.yellow400,
 		strokeDark: tailwindColors.yellow500,
 	},
@@ -89,8 +89,8 @@ export const LocationStatusRecords = {
 			'Mostly demolished or transformed beyond recognition but some traces remain, though they may be minor.',
 		color: tailwindColors.red700,
 		stroke: tailwindColors.red800,
-		colorDark: tailwindColors.red700,
-		strokeDark: tailwindColors.red800,
+		colorDark: tailwindColors.red600,
+		strokeDark: tailwindColors.red700,
 	},
 	[LocationStatusEnum.Demolished]: {
 		title: 'Demolished',
@@ -106,9 +106,9 @@ export const LocationStatusRecords = {
 		title_zh: '不明',
 		description: 'The status of this location is unknown.',
 		color: tailwindColors.zinc800,
-		stroke: tailwindColors.zinc300,
+		stroke: tailwindColors.zinc400,
 		colorDark: tailwindColors.zinc800,
-		strokeDark: tailwindColors.zinc300,
+		strokeDark: tailwindColors.zinc400,
 	},
 } as const satisfies Record<LocationStatus, LocationStatusMetadata>;
 
