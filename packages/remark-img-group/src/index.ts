@@ -51,4 +51,8 @@ const plugin = ((options?) => {
 	};
 }) satisfies Plugin<[(Readonly<RemarkImgGroupOptions> | null | undefined)?], Root>;
 
+export type { RemarkImgGroupOptions };
+
+export { plugin as remarkImgGroupPlugin };
+
 export default plugin;
