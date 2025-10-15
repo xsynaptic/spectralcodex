@@ -29,7 +29,14 @@ export default defineIntegration({
 					const buildEndTime = Date.now();
 					const duration = (buildEndTime - buildStartTime) / 1000;
 					const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-					const logEntry = `[${timestamp}] Build completed in ${Math.floor(duration / 60).toFixed(2)} minutes (${duration.toFixed(2)} seconds)\n`;
+
+					const durationDate = new Date(duration * 1000);
+					const hours = durationDate.getUTCHours().toString().padStart(2, '0');
+					const minutes = durationDate.getUTCMinutes().toString().padStart(2, '0');
+					const seconds = durationDate.getUTCSeconds().toString().padStart(2, '0');
+					const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+					const logEntry = `[${timestamp}] Build completed in ${formattedTime}\n`;
 
 					try {
 						await appendFile(logFileName, logEntry);
