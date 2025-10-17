@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import dotenv from 'dotenv';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -19,27 +20,10 @@ const { values, positionals } = parseArgs({
 			short: 'd',
 			default: './dist',
 		},
-		'assets-path': {
-			type: 'string',
-			short: 'a',
-			default: process.env.BUILD_ASSETS_PATH ?? '_x',
-		},
 		'images-path': {
 			type: 'string',
 			short: 'i',
 			default: 'temp/images',
-		},
-		'remote-host-app': {
-			type: 'string',
-			default: process.env.DEPLOY_REMOTE_HOST_APP ?? 'user@remote-server:/path/to/app',
-		},
-		'remote-host-images': {
-			type: 'string',
-			default: process.env.DEPLOY_REMOTE_HOST_IMAGES ?? 'user@remote-server:/path/to/images',
-		},
-		'ssh-key-path': {
-			type: 'string',
-			default: process.env.DEPLOY_SSH_KEY_PATH,
 		},
 		'dry-run': {
 			type: 'boolean',
@@ -58,13 +42,25 @@ const { values, positionals } = parseArgs({
 	allowPositionals: true,
 });
 
+// Load .env from root-path
+dotenv.config({ path: path.join(values['root-path'], '.env') });
+
 const distPath = path.join(values['root-path'], values['dist-path']);
-const assetsPath = path.join(distPath, values['assets-path']);
 const imagesPath = path.join(values['root-path'], values['images-path']);
 
-const remoteHostApp = values['remote-host-app'];
-const remoteHostImages = values['remote-host-images'];
-const sshKeyPath = values['ssh-key-path'];
+// Deployment configuration from environment variables
+const assetsPath = process.env.BUILD_ASSETS_PATH ?? '_x';
+const remoteHostApp = process.env.DEPLOY_REMOTE_HOST_APP;
+const remoteHostImages = process.env.DEPLOY_REMOTE_HOST_IMAGES;
+const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
+
+if (!remoteHostApp || !remoteHostImages || !sshKeyPath) {
+	console.error(chalk.red('Missing required environment variables:'));
+	if (!remoteHostApp) console.error(chalk.red('  DEPLOY_REMOTE_HOST_APP'));
+	if (!remoteHostImages) console.error(chalk.red('  DEPLOY_REMOTE_HOST_IMAGES'));
+	if (!sshKeyPath) console.error(chalk.red('  DEPLOY_SSH_KEY_PATH'));
+	process.exit(1);
+}
 
 // A flag for whether we're using the remote image strategy, which affects the build output
 const imageRemote = true as boolean;
