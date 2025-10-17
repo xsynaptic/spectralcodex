@@ -2,17 +2,69 @@
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 import { $ } from 'zx';
 
-const distPath = './dist';
-const assetsPath = path.join(distPath, process.env.BUILD_ASSETS_PATH ?? '_x');
-const imagesPath = path.join('temp/images');
+const { values, positionals } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		'root-path': {
+			type: 'string',
+			short: 'r',
+			default: process.cwd(),
+		},
+		'dist-path': {
+			type: 'string',
+			short: 'd',
+			default: './dist',
+		},
+		'assets-path': {
+			type: 'string',
+			short: 'a',
+			default: process.env.BUILD_ASSETS_PATH ?? '_x',
+		},
+		'images-path': {
+			type: 'string',
+			short: 'i',
+			default: 'temp/images',
+		},
+		'remote-host-app': {
+			type: 'string',
+			default: process.env.DEPLOY_REMOTE_HOST_APP ?? 'user@remote-server:/path/to/app',
+		},
+		'remote-host-images': {
+			type: 'string',
+			default: process.env.DEPLOY_REMOTE_HOST_IMAGES ?? 'user@remote-server:/path/to/images',
+		},
+		'ssh-key-path': {
+			type: 'string',
+			default: process.env.DEPLOY_SSH_KEY_PATH,
+		},
+		'dry-run': {
+			type: 'boolean',
+			default: false,
+		},
+		verbose: {
+			type: 'boolean',
+			short: 'v',
+			default: false,
+		},
+		'skip-build': {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	allowPositionals: true,
+});
 
-const remoteHostApp = process.env.DEPLOY_REMOTE_HOST_APP ?? 'user@remote-server:/path/to/app';
-const remoteHostImages =
-	process.env.DEPLOY_REMOTE_HOST_IMAGES ?? 'user@remote-server:/path/to/images';
-const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
+const distPath = path.join(values['root-path'], values['dist-path']);
+const assetsPath = path.join(distPath, values['assets-path']);
+const imagesPath = path.join(values['root-path'], values['images-path']);
+
+const remoteHostApp = values['remote-host-app'];
+const remoteHostImages = values['remote-host-images'];
+const sshKeyPath = values['ssh-key-path'];
 
 // A flag for whether we're using the remote image strategy, which affects the build output
 const imageRemote = true as boolean;
@@ -23,9 +75,9 @@ const processedImagePattern = imageRemote
 	? /^[\w#$%+=@~-]+_[\w-]{1,8}\.(avif|gif|jpg|jpeg|png|webp)$/i
 	: /^[\w#$%+=@~-]+\.[\w-]{8}_[\w-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
 
-const dryRun = process.argv.includes('--dry-run');
-const verbose = process.argv.includes('--verbose');
-const skipBuild = process.argv.includes('--skip-build');
+const dryRun = values['dry-run'];
+const verbose = values.verbose;
+const skipBuild = values['skip-build'];
 
 // Output shell command results
 $.verbose = true;
@@ -34,7 +86,7 @@ async function contentValidate() {
 	console.log(chalk.blue('Validating content integrity...'));
 
 	try {
-		await $`pnpm content-validate`;
+		await $`pnpm content-validate --root-path=${values['root-path']}`;
 		console.log(chalk.green('Content validation passed.'));
 	} catch (error) {
 		console.error(chalk.red('Content validation failed:'), error);
@@ -46,7 +98,7 @@ async function contentRelated() {
 	console.log(chalk.blue('Generating related content...'));
 
 	try {
-		await $`pnpm content-related`;
+		await $`pnpm content-related --root-path=${values['root-path']}`;
 		console.log(chalk.green('Related content generated.'));
 	} catch (error) {
 		console.error(chalk.red('Related content generation failed:'), error);
@@ -62,7 +114,10 @@ async function buildProject() {
 	console.log(chalk.blue('Building Astro project...'));
 
 	try {
+		// Run astro build from the root directory
+		$.cwd = values['root-path'];
 		await $`pnpm astro build`;
+		$.cwd = process.cwd();
 		console.log(chalk.green('Build completed.'));
 		if (assetsPath.includes('temp')) await $`rm -rf ${assetsPath}`;
 	} catch (error) {
@@ -163,7 +218,7 @@ async function transferApp() {
 	}
 }
 
-const step = process.argv[2] ?? 'deploy';
+const step = positionals[0] ?? 'deploy';
 
 console.log(chalk.blue(`Deploying with arguments "${chalk.underline(step)}"...`));
 

@@ -20,7 +20,7 @@
 		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./temp/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-09-24.0/",
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
-		"deploy-static": "tsx --env-file=.env ./scripts/deploy-static.ts"
+		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD"
 	},
 	"license": "MIT",
 	"browserslist": [
@@ -48,7 +48,7 @@
 		"@astrojs/react": "^4.4.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.395",
+		"@iconify/json": "^2.2.396",
 		"@iconify/utils": "^3.0.2",
 		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",
@@ -62,7 +62,7 @@
 		"@spectralcodex/unified-tools": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.14",
-		"@tanstack/eslint-plugin-query": "^5.91.0",
+		"@tanstack/eslint-plugin-query": "^5.91.2",
 		"@turf/helpers": "^7.2.0",
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",

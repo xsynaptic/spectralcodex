@@ -8,6 +8,7 @@
 		"content-related": "tsx ./src/content-related/index.ts",
 		"content-schemas": "tsx ./src/content-schemas/index.ts",
 		"content-validate": "tsx ./src/content-validate/index.ts",
+		"deploy-static": "tsx ./src/deploy-static/index.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
 		"map-divisions:clear-cache": "tsx ./src/map-divisions/clear-cache.ts",
 		"map-divisions:status": "tsx ./src/map-divisions/status.ts",
@@ -15,8 +16,8 @@
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.8",
-		"@duckdb/node-api": "^1.4.1-r.1",
-		"@iconify/json": "^2.2.395",
+		"@duckdb/node-api": "1.4.1-r.2",
+		"@iconify/json": "^2.2.396",
 		"@iconify/tools": "^4.1.4",
 		"@iconify/utils": "^3.0.2",
 		"@turf/helpers": "^7.2.0",
@@ -27,6 +28,7 @@
 		"chalk": "^5.6.2",
 		"flatgeobuf": "^4.3.1",
 		"geojson": "^0.5.0",
+		"p-limit": "^7.1.1",
 		"tsx": "^4.20.6",
 		"zx": "^8.8.4"
 	}

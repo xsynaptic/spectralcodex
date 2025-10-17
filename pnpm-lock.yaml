@@ -40,8 +40,8 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       '@iconify/json':
-        specifier: ^2.2.395
-        version: 2.2.395
+        specifier: ^2.2.396
+        version: 2.2.396
       '@iconify/utils':
         specifier: ^3.0.2
         version: 3.0.2
@@ -82,8 +82,8 @@ importers:
         specifier: ^4.1.14
         version: 4.1.14(vite@6.3.4(@types/node@22.15.17)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(yaml@2.8.1))
       '@tanstack/eslint-plugin-query':
-        specifier: ^5.91.0
-        version: 5.91.0(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
+        specifier: ^5.91.2
+        version: 5.91.2(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
       '@turf/helpers':
         specifier: ^7.2.0
         version: 7.2.0
@@ -367,14 +367,14 @@ importers:
         specifier: workspace:*
         version: link:../map-types
       '@tanstack/query-sync-storage-persister':
-        specifier: ^5.90.5
-        version: 5.90.5
+        specifier: ^5.90.7
+        version: 5.90.7
       '@tanstack/react-query':
-        specifier: ^5.90.3
-        version: 5.90.3(react@19.2.0)
-      '@tanstack/react-query-persist-client':
         specifier: ^5.90.5
-        version: 5.90.5(@tanstack/react-query@5.90.3(react@19.2.0))(react@19.2.0)
+        version: 5.90.5(react@19.2.0)
+      '@tanstack/react-query-persist-client':
+        specifier: ^5.90.7
+        version: 5.90.7(@tanstack/react-query@5.90.5(react@19.2.0))(react@19.2.0)
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
@@ -445,11 +445,11 @@ importers:
         specifier: ^6.3.8
         version: 6.3.8
       '@duckdb/node-api':
-        specifier: ^1.4.1-r.1
-        version: 1.4.1-r.1
+        specifier: 1.4.1-r.2
+        version: 1.4.1-r.2
       '@iconify/json':
-        specifier: ^2.2.395
-        version: 2.2.395
+        specifier: ^2.2.396
+        version: 2.2.396
       '@iconify/tools':
         specifier: ^4.1.4
         version: 4.1.4
@@ -480,6 +480,9 @@ importers:
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
+      p-limit:
+        specifier: ^7.1.1
+        version: 7.1.1
       tsx:
         specifier: ^4.20.6
         version: 4.20.6
@@ -700,36 +703,36 @@ packages:
     resolution: {integrity: sha512-+ntATQe1AlL7nTOYjwjj6w3299CgRot48wL761TUGYpYgAou3AaONZazp0PKZyCyWhudWsjhq1nvRHOvbMzhTA==}
     engines: {node: '>=18'}
 
-  '@duckdb/node-api@1.4.1-r.1':
-    resolution: {integrity: sha512-OQgLTZHkHfhbl4lNgn/dD9WwwKujbshPTl6ZW/waqNK10kcZmrtZM70FrMiBVKi4FDbaFSN8/EQ6n8N2K1GlRw==}
+  '@duckdb/node-api@1.4.1-r.2':
+    resolution: {integrity: sha512-HoV8h6nxxZTIPdKiKkuwNcA0d1O4bMQQ5RH19XooBzq16/ZRFeYIoU/Q8yKNPTMd3OhYDwcsukFMMu8SEYuJNQ==}
 
-  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.1':
-    resolution: {integrity: sha512-Ji/b0zKg7R2tta3T0CQx29XtLlkrJggDK91d0qaFtPgXSrtnevEBHg7PVS5lC0i0Lwksk1BQB8P5/5aGwUGttA==}
+  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.2':
+    resolution: {integrity: sha512-DBmnR/mm8AE/y/KjWtMn5bkd+lmlcXpVZEPgNOPyWJEV6Xyxr7gmyr1OT31FQQr5Julvup+WvwmGiY5/jC9LHw==}
     cpu: [arm64]
     os: [darwin]
 
-  '@duckdb/node-bindings-darwin-x64@1.4.1-r.1':
-    resolution: {integrity: sha512-4q8jk+mII15UmonkhniEHpXYJ9Motu/J+HgftJoX6aBh8Ic8HnpqrDYdaV1LwVUBQuw9sIuKPT7uvY+sbzKr9Q==}
+  '@duckdb/node-bindings-darwin-x64@1.4.1-r.2':
+    resolution: {integrity: sha512-oVLILsLAB/g1svhLsJSKI0FjbC7gpnDNaJOumUMC3RlWCOdXOUCjEyCnimdl+AaYgQS4mJ7f+BoAV/3YUj6ELA==}
     cpu: [x64]
     os: [darwin]
 
-  '@duckdb/node-bindings-linux-arm64@1.4.1-r.1':
-    resolution: {integrity: sha512-8ugaMZsPSBhys+ZubWzfuJ3Q67anOCOIeu+w34W0HVq3jy0MWA8LOGTNWPbTvdQuVKrS7YyBLtAxjeBy2akiRg==}
+  '@duckdb/node-bindings-linux-arm64@1.4.1-r.2':
+    resolution: {integrity: sha512-d1/EVsjMrmlovGzz7QkgVk/lch1gIaeu/yAr0eZADgMcYMQTnwULm7gOJfUABSW0O46HC0HcoCJGJ2y3Kn1DxA==}
     cpu: [arm64]
     os: [linux]
 
-  '@duckdb/node-bindings-linux-x64@1.4.1-r.1':
-    resolution: {integrity: sha512-FZlEpYB+KHUqBmqkXH4kA08i4UHBLBm87i3N1Vu6s10pqFPOW0dLQPruSPheiWFPfnmBF1Go7SreOvTHz17lxA==}
+  '@duckdb/node-bindings-linux-x64@1.4.1-r.2':
+    resolution: {integrity: sha512-Hvc6BTMqiCfJ9oauXhZ3e45XsD/KegTYQQv0eJPoXGWmzmXINVlaBNonmAe257dPn+f8LVlpZGFY3T3Ko5nSGw==}
     cpu: [x64]
     os: [linux]
 
-  '@duckdb/node-bindings-win32-x64@1.4.1-r.1':
-    resolution: {integrity: sha512-8yCoZBD3bJy1wUTfMSlIAfaxhqh3zrSk+XZn7KC3D3mQzx37zDV0i0HGl5W57q0tOYknBCqkamlklDAY8oK8TQ==}
+  '@duckdb/node-bindings-win32-x64@1.4.1-r.2':
+    resolution: {integrity: sha512-KnzmN5TVOfYzhZWuzUrzLdt5aPHg2EKaIJgnCOifGYf4YH2gPSpct4wWCKGuRSb0JcACFNaKI42kcRMo9k5RXw==}
     cpu: [x64]
     os: [win32]
 
-  '@duckdb/node-bindings@1.4.1-r.1':
-    resolution: {integrity: sha512-juctO06hK1DVPCt8uLwZh8IY/aqlUPEZ7MuAsecP3DVSfQH8L3T3/KRvanjg0X1PrviLptr81BYilriOarbP8g==}
+  '@duckdb/node-bindings@1.4.1-r.2':
+    resolution: {integrity: sha512-WiCmg/1GJhzeytJiBET7Qbr8R0HcRIwYUP4C/gmEmHMZrvPp7ZTeSuIOazHTL2kducW5OpfHQQ9gj+/padR+rA==}
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -987,8 +990,8 @@ packages:
     resolution: {integrity: sha512-xeO57FpIu4p1Ri3Jq/EXq4ClRm86dVF2z/+kvFnyqVYRavTZmaFaUBbWCOuuTh0o/g7DSsk6kc2vrS4Vl5oPOQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.395':
-    resolution: {integrity: sha512-XSYOnlGqiZhJkFFBUiVK4C5VIiv4rxyKtCmkQ9nS4zfMpS4xT0BF9+qWUKOHYgeCzCLghyWfrm6Eti3Sv5kfqQ==}
+  '@iconify/json@2.2.396':
+    resolution: {integrity: sha512-tijg77JFuYIt32S9N8p7La8C0zp9zKZsX6UP8ip5GVB1F6Mp3pZA5Vc5eAquTY50NoDJX58U6z4Qn3d6Wyossg==}
 
   '@iconify/tools@4.1.4':
     resolution: {integrity: sha512-s6BcNUcCxQ3S6cvhlsoWzOuBt8qKXdVyXB9rT57uSJ/ARHD7dVM43+5ERBWn3tmkMWXeJ/s9DPVc3dUasayzeA==}
@@ -1579,28 +1582,28 @@ packages:
     peerDependencies:
       vite: 6.3.4
 
-  '@tanstack/eslint-plugin-query@5.91.0':
-    resolution: {integrity: sha512-Kn6yWyRe3dIPf7NqyDMhcsTBz2Oh8jPSOpBdlnLQhGBJ6iTMBFYA4B1UreGJ/WdfzQskSMh5imcyWF+wqa/Q5g==}
+  '@tanstack/eslint-plugin-query@5.91.2':
+    resolution: {integrity: sha512-UPeWKl/Acu1IuuHJlsN+eITUHqAaa9/04geHHPedY8siVarSaWprY0SVMKrkpKfk5ehRT7+/MZ5QwWuEtkWrFw==}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
 
-  '@tanstack/query-core@5.90.3':
-    resolution: {integrity: sha512-HtPOnCwmx4dd35PfXU8jjkhwYrsHfuqgC8RCJIwWglmhIUIlzPP0ZcEkDAc+UtAWCiLm7T8rxeEfHZlz3hYMCA==}
+  '@tanstack/query-core@5.90.5':
+    resolution: {integrity: sha512-wLamYp7FaDq6ZnNehypKI5fNvxHPfTYylE0m/ZpuuzJfJqhR5Pxg9gvGBHZx4n7J+V5Rg5mZxHHTlv25Zt5u+w==}
 
-  '@tanstack/query-persist-client-core@5.91.2':
-    resolution: {integrity: sha512-3a8l4SOADTI4ZXlXyMPqhTpUaeofQJLiILA6bSpd+ofrujCRrYyJWIcwZP6XnOBHn+0s5MVtSZBS0SFVXTmQmA==}
+  '@tanstack/query-persist-client-core@5.91.4':
+    resolution: {integrity: sha512-HZ8kvAbhttLZKUO4ASHl49u7dQXzRVEogi7/6CCZ5BBItWh2hoEUqy9QHUS4ji7iZiuXe4jwTJNzq2VIuxlnsQ==}
 
-  '@tanstack/query-sync-storage-persister@5.90.5':
-    resolution: {integrity: sha512-lJpXg3dL57IdGO60kXV3qsjgyCSoYwCH0cNjlywfLEmWqnMRwM50RJNB9safKIeIZNLNK5oE50k+3ln51Fsfmw==}
+  '@tanstack/query-sync-storage-persister@5.90.7':
+    resolution: {integrity: sha512-Go4QSOv0wz5RNaJR54wvCp5D+mVUBYidKTYj4zvUU8GGkLxL1E+yx0lBkGNvfRmFRjdgWrJb5XS+0Clc5tKzpQ==}
 
-  '@tanstack/react-query-persist-client@5.90.5':
-    resolution: {integrity: sha512-FPgThLtKQOLHRvXPoXzYWRLBC85kGCqN/LGZcQuxeJjw1xOtXkOHm2xJscWE2ggFxR2Ji+o1ekZsdQjSZcZThg==}
+  '@tanstack/react-query-persist-client@5.90.7':
+    resolution: {integrity: sha512-TlEzewa4YN51ZhbLZ9HzIBTY/b1K7xFJGSm1cUCE+tNnzSUwiLWhoD6H7EvgWb/KJePYDIJ3hGWLwQPdP86fmA==}
     peerDependencies:
-      '@tanstack/react-query': ^5.90.3
+      '@tanstack/react-query': ^5.90.5
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.90.3':
-    resolution: {integrity: sha512-i/LRL6DtuhG6bjGzavIMIVuKKPWx2AnEBIsBfuMm3YoHne0a20nWmsatOCBcVSaT0/8/5YFjNkebHAPLVUSi0Q==}
+  '@tanstack/react-query@5.90.5':
+    resolution: {integrity: sha512-pN+8UWpxZkEJ/Rnnj2v2Sxpx1WFlaa9L6a4UO89p6tTQbeo+m0MS8oYDjbggrR8QcTyjKoYWKS3xJQGr3ExT8Q==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -6575,32 +6578,32 @@ snapshots:
     dependencies:
       fontkit: 2.0.4
 
-  '@duckdb/node-api@1.4.1-r.1':
+  '@duckdb/node-api@1.4.1-r.2':
     dependencies:
-      '@duckdb/node-bindings': 1.4.1-r.1
+      '@duckdb/node-bindings': 1.4.1-r.2
 
-  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.1':
+  '@duckdb/node-bindings-darwin-arm64@1.4.1-r.2':
     optional: true
 
-  '@duckdb/node-bindings-darwin-x64@1.4.1-r.1':
+  '@duckdb/node-bindings-darwin-x64@1.4.1-r.2':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64@1.4.1-r.1':
+  '@duckdb/node-bindings-linux-arm64@1.4.1-r.2':
     optional: true
 
-  '@duckdb/node-bindings-linux-x64@1.4.1-r.1':
+  '@duckdb/node-bindings-linux-x64@1.4.1-r.2':
     optional: true
 
-  '@duckdb/node-bindings-win32-x64@1.4.1-r.1':
+  '@duckdb/node-bindings-win32-x64@1.4.1-r.2':
     optional: true
 
-  '@duckdb/node-bindings@1.4.1-r.1':
+  '@duckdb/node-bindings@1.4.1-r.2':
     optionalDependencies:
-      '@duckdb/node-bindings-darwin-arm64': 1.4.1-r.1
-      '@duckdb/node-bindings-darwin-x64': 1.4.1-r.1
-      '@duckdb/node-bindings-linux-arm64': 1.4.1-r.1
-      '@duckdb/node-bindings-linux-x64': 1.4.1-r.1
-      '@duckdb/node-bindings-win32-x64': 1.4.1-r.1
+      '@duckdb/node-bindings-darwin-arm64': 1.4.1-r.2
+      '@duckdb/node-bindings-darwin-x64': 1.4.1-r.2
+      '@duckdb/node-bindings-linux-arm64': 1.4.1-r.2
+      '@duckdb/node-bindings-linux-x64': 1.4.1-r.2
+      '@duckdb/node-bindings-win32-x64': 1.4.1-r.2
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -6785,7 +6788,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.2': {}
 
-  '@iconify/json@2.2.395':
+  '@iconify/json@2.2.396':
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 2.0.3
@@ -7389,7 +7392,7 @@ snapshots:
       tailwindcss: 4.1.14
       vite: 6.3.4(@types/node@22.15.17)(jiti@2.6.1)(lightningcss@1.30.1)(tsx@4.20.6)(yaml@2.8.1)
 
-  '@tanstack/eslint-plugin-query@5.91.0(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)':
+  '@tanstack/eslint-plugin-query@5.91.2(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/utils': 8.44.1(eslint@9.37.0(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.37.0(jiti@2.6.1)
@@ -7397,26 +7400,26 @@ snapshots:
       - supports-color
       - typescript
 
-  '@tanstack/query-core@5.90.3': {}
+  '@tanstack/query-core@5.90.5': {}
 
-  '@tanstack/query-persist-client-core@5.91.2':
+  '@tanstack/query-persist-client-core@5.91.4':
     dependencies:
-      '@tanstack/query-core': 5.90.3
+      '@tanstack/query-core': 5.90.5
 
-  '@tanstack/query-sync-storage-persister@5.90.5':
+  '@tanstack/query-sync-storage-persister@5.90.7':
     dependencies:
-      '@tanstack/query-core': 5.90.3
-      '@tanstack/query-persist-client-core': 5.91.2
+      '@tanstack/query-core': 5.90.5
+      '@tanstack/query-persist-client-core': 5.91.4
 
-  '@tanstack/react-query-persist-client@5.90.5(@tanstack/react-query@5.90.3(react@19.2.0))(react@19.2.0)':
+  '@tanstack/react-query-persist-client@5.90.7(@tanstack/react-query@5.90.5(react@19.2.0))(react@19.2.0)':
     dependencies:
-      '@tanstack/query-persist-client-core': 5.91.2
-      '@tanstack/react-query': 5.90.3(react@19.2.0)
+      '@tanstack/query-persist-client-core': 5.91.4
+      '@tanstack/react-query': 5.90.5(react@19.2.0)
       react: 19.2.0
 
-  '@tanstack/react-query@5.90.3(react@19.2.0)':
+  '@tanstack/react-query@5.90.5(react@19.2.0)':
     dependencies:
-      '@tanstack/query-core': 5.90.3
+      '@tanstack/query-core': 5.90.5
       react: 19.2.0
 
   '@trysound/sax@0.2.0': {}
