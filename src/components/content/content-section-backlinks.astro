@@ -43,7 +43,11 @@ const t = getTranslations();
 					<ListColumnItem>
 						<Link href={url}>{title}</Link>
 						{titleMultilingual ? (
-							<Multilingual content={titleMultilingual} parenthesis={true} />
+							<Multilingual
+								content={titleMultilingual}
+								parenthesis={true}
+								class="text-primary-600 dark:text-primary-400"
+							/>
 						) : undefined}
 					</ListColumnItem>
 				))}

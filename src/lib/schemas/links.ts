@@ -11,7 +11,7 @@ const LinkItemSchema = z.object({
 });
 
 // Since links data is transformed we use a slightly modified schema
-const LinkDataSchema = LinkItemSchema.omit({ url: true }).extend({
+const LinkDataSchema = LinkItemSchema.extend({
 	match: z.string(),
 });
 

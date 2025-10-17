@@ -33,7 +33,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const ancestors = getRegionAncestors(entry);
 
 		// Note: this is temporary code to limit map display specified regions
-		const displayRegionMapIds = new Set(['taiwan', 'thailand']);
+		const displayRegionMapIds = new Set(['taiwan', 'thailand', 'hong-kong']);
 
 		const showRegionMap =
 			displayRegionMapIds.has(entry.id) ||
