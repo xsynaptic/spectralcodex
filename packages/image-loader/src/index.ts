@@ -53,7 +53,7 @@ function getSyncDataFunction({
 		const existingEntry = store.get(filePath);
 
 		// If the data entry is already in the store and seems current, skip further processing
-		if (existingEntry && existingEntry.digest === digest && existingEntry.filePath) {
+		if (existingEntry?.digest === digest && existingEntry.filePath) {
 			// This seems to be necessary otherwise the Zod schema transforms module data
 			if (existingEntry.deferredRender) {
 				store.addModuleImport(existingEntry.filePath);

@@ -62,12 +62,8 @@ const t = getTranslations();
 	<ProseBody class="pb-small"><Fragment set:html={excerptContent} /></ProseBody>
 	{
 		hasExcerpt ? (
-			<Container as="div">
-				<slot name="excerpt-more-link">
-					<div class="text-right font-serif font-medium italic">
-						<Link href={entryUrl}>{t('content.more.label')}</Link>&nbsp;&raquo;
-					</div>
-				</slot>
+			<Container as="div" class="text-right font-serif font-medium italic">
+				<Link href={entryUrl}>{t('content.more.label')}</Link>&nbsp;&raquo;
 			</Container>
 		) : undefined
 	}

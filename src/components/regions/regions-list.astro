@@ -29,8 +29,7 @@ const {
 async function getRegions() {
 	const getRegionAncestors = await getRegionAncestorsFunction();
 
-	const ancestors =
-		terms && terms.length === 1 && terms[0] ? getRegionAncestors(terms[0]) : undefined;
+	const ancestors = terms?.length === 1 && terms[0] ? getRegionAncestors(terms[0]) : undefined;
 
 	return ancestors ?? terms;
 }
