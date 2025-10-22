@@ -46,6 +46,14 @@
 - Layout components use computed `props` for dynamic CSS classes
 - Ensure full class names available for dynamically applied utilities
 
+### Debugging Tailwind Utilities
+
+- **Start with minimal changes** - When fixing Tailwind utility issues, prefer moving/relocating classes before restructuring entire component patterns
+- **Test incrementally** - Make one small change at a time and test, rather than rewriting entire approaches
+- **Understand variant scope** - `group-*` variants apply when the ancestor with `group` class matches the condition; `peer-*` variants apply when the sibling with `peer` class matches the condition
+- **Don't over-engineer** - CSS-only patterns like checkbox toggles are powerful but may be overkill; simpler class relocation often solves the problem
+- **Know your tools** - With `group-focus-within`, the focus state persists as long as ANY descendant has focus, not just the element that triggered it
+
 ## Performance
 
 - Minimize client-side JavaScript
