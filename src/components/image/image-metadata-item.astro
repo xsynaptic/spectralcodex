@@ -1,18 +1,27 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { renderSlot } from '#lib/utils/astro.ts';
+
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
 }
 
 const { class: className, ...props } = Astro.props;
+
+const title = await renderSlot(Astro.slots, 'image-metadata-item-title');
+const contents = await renderSlot(Astro.slots, 'default');
 ---
 
-<div class:list={[className, 'text-left']} {...props}>
-	<h3 class="text-primary-800 dark:text-primary-400 text-xs font-semibold select-none">
-		<slot name="image-metadata-item-title" />
-	</h3>
-	<div class="text-primary-700 dark:text-primary-200 cursor-text text-sm select-text">
-		<slot />
-	</div>
-</div>
+{
+	title && contents ? (
+		<div class:list={[className, 'text-left']} {...props}>
+			<h3 class="text-primary-800 dark:text-primary-400 text-xs font-semibold select-none">
+				<slot name="image-metadata-item-title" />
+			</h3>
+			<div class="text-primary-700 dark:text-primary-200 cursor-text text-sm select-text">
+				<slot />
+			</div>
+		</div>
+	) : undefined
+}

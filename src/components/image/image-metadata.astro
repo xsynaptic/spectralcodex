@@ -20,14 +20,14 @@ const t = getTranslations();
 <div class:list={['group absolute inset-0']} data-pagefind-ignore {...props}>
 	<button
 		class:list={[
-			'peer transition-opacity delay-200 duration-300 sm:opacity-0 sm:hover:opacity-100 sm:focus:opacity-100',
+			'peer opacity-80 transition-opacity delay-200 duration-300 focus:opacity-100 sm:opacity-0 sm:hover:opacity-100',
 		]}
 		aria-label={t('collection.images.metadata.title')}
 	>
 		<div
 			class:list={[
 				'text-primary-50 dark:text-primary-50',
-				'absolute right-0 bottom-0 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:opacity-0 group-focus-within:delay-100',
+				'absolute right-0 bottom-0 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:pointer-events-none group-focus-within:opacity-0 group-focus-within:delay-100',
 			]}
 			style={{ zIndex: 10 }}
 		>
@@ -58,87 +58,71 @@ const t = getTranslations();
 				]}
 				style={{ overflowY: 'auto' }}
 			>
-				{
-					entry.data.dateCreated ? (
-						<ImageMetadataItem class="col-span-4">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.dateCreated.label')}
-							</Fragment>
+				<ImageMetadataItem class="col-span-4">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.dateCreated.label')}
+					</Fragment>
+					{
+						entry.data.dateCreated ? (
 							<DateDisplay date={entry.data.dateCreated} datePreset="long" />
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.camera ? (
-						<ImageMetadataItem class="col-span-4">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.cameraModel.label')}
-							</Fragment>
-							{entry.data.camera}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.lens ? (
-						<ImageMetadataItem class="col-span-4">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.lensModel.label')}
-							</Fragment>
-							{entry.data.lens}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.aperture ? (
-						<ImageMetadataItem class="col-span-2">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.aperture.label')}
-							</Fragment>
-							<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.shutterSpeed ? (
-						<ImageMetadataItem class="col-span-2">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.shutterSpeed.label')}
-							</Fragment>
-							{`${entry.data.shutterSpeed} sec`}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.focalLength ? (
-						<ImageMetadataItem class="col-span-2">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.focalLength.label')}
-							</Fragment>
-							{entry.data.focalLength}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.iso ? (
-						<ImageMetadataItem class="col-span-2">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.iso.label')}
-							</Fragment>
-							{entry.data.iso}
-						</ImageMetadataItem>
-					) : undefined
-				}
-				{
-					entry.data.exposureValue ? (
-						<ImageMetadataItem class="col-span-2">
-							<Fragment slot="image-metadata-item-title">
-								{t('collection.images.metadata.exposureValue.label')}
-							</Fragment>
-							{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
-							{t('collection.images.metadata.ev.label')}
-						</ImageMetadataItem>
-					) : undefined
-				}
+						) : undefined
+					}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-4">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.cameraModel.label')}
+					</Fragment>
+					{entry.data.camera}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-4">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.lensModel.label')}
+					</Fragment>
+					{entry.data.lens}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.aperture.label')}
+					</Fragment>
+					{
+						entry.data.aperture ? (
+							<>
+								<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
+							</>
+						) : undefined
+					}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.shutterSpeed.label')}
+					</Fragment>
+					{entry.data.shutterSpeed ? `${entry.data.shutterSpeed} sec` : undefined}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.focalLength.label')}
+					</Fragment>
+					{entry.data.focalLength}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.iso.label')}
+					</Fragment>
+					{entry.data.iso}
+				</ImageMetadataItem>
+				<ImageMetadataItem class="col-span-2">
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.exposureValue.label')}
+					</Fragment>
+					{
+						entry.data.exposureValue ? (
+							<>
+								{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
+								{t('collection.images.metadata.ev.label')}
+							</>
+						) : undefined
+					}
+				</ImageMetadataItem>
 				<ImageMetadataItem class="col-span-2">
 					<Fragment slot="image-metadata-item-title"
 						>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
