@@ -44,7 +44,8 @@ async function cacheFileExists(filePath: string): Promise<boolean> {
 export async function getOpenGraphImageFunction() {
 	const getImageById = await getImageByIdFunction();
 
-	// ensure cache directory exists
+	// Ensure cache directory exists
+	await fs.mkdir(OPENGRAPH_IMAGE_CACHE_DIR, { recursive: true });
 
 	return async function getOpenGraphImage({
 		entryId,
@@ -98,7 +99,6 @@ export async function getOpenGraphImageFunction() {
 			.toBuffer({ resolveWithObject: true });
 
 		// Save image to cache and update timestamp in Keyv
-		await fs.mkdir(OPENGRAPH_IMAGE_CACHE_DIR, { recursive: true });
 		await fs.writeFile(cachePath, new Uint8Array(result.data));
 		await keyv.set(entryId, new Date().toISOString());
 
