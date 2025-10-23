@@ -48,8 +48,9 @@
 		"@astrojs/react": "^4.4.0",
 		"@astrojs/rss": "^4.0.12",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.398",
+		"@iconify/json": "^2.2.399",
 		"@iconify/utils": "^3.0.2",
+		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -83,7 +84,7 @@
 		"geojson": "^0.5.0",
 		"globals": "^16.4.0",
 		"keyv": "^5.5.3",
-		"ky": "^1.12.0",
+		"ky": "^1.13.0",
 		"maplibre-gl": "^5.9.0",
 		"nanoid": "^5.1.6",
 		"p-limit": "^7.2.0",
@@ -106,5 +107,5 @@
 		"zod": "^3.25.76",
 		"zx": "^8.8.5"
 	},
-	"packageManager": "pnpm@10.18.1+sha512.77a884a165cbba2d8d1c19e3b4880eee6d2fcabd0d879121e282196b80042351d5eb3ca0935fa599da1dc51265cc68816ad2bddd2a2de5ea9fdf92adbec7cd34"
+	"packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
 }

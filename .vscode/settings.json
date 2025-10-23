@@ -148,6 +148,7 @@
 		"typescript.suggest.enabled": false // Too noisy when we're mostly working with plain text
 	},
 	"mdx.validate.validateReferences": "ignore",
+	"npm.packageManager": "pnpm",
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
