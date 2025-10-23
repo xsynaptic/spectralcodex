@@ -12,13 +12,11 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
+import { hashData } from '#lib/utils/cache.ts';
+
 interface CacheMetadata {
 	generatedAt: string;
-	metadata: {
-		collection: string;
-		title: string;
-		title_zh?: string | undefined;
-	};
+	metadataHash: string;
 	sourceImageModifiedTime?: string | undefined;
 }
 
@@ -59,30 +57,25 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 	const format = 'png';
 
 	// Return cached wrapper function
-	return async function generateWithCache(
-		entry: OpenGraphMetadataItem,
+	return async function generateOpenGraphImage(
+		metadataItem: OpenGraphMetadataItem,
 		imageObject?: sharp.Sharp,
 		imageEntry?: CollectionEntry<'images'>,
 	): Promise<Buffer> {
-		const cacheFilename = `${entry.id}.${format}`;
+		const cacheFilename = `${metadataItem.id}.${format}`;
 		const cachePath = path.join(OPENGRAPH_IMAGE_SATORI_CACHE_DIR, cacheFilename);
 
-		// Extract current metadata (only fields used in template)
-		const currentMetadata = {
-			collection: entry.collection,
-			title: entry.title,
-			...(entry.title_zh ? { title_zh: entry.title_zh } : {}),
-		};
+		// Compute hash of metadata
+		const currentMetadataHash = hashData({ data: metadataItem });
 
 		// Get cached record
-		const cachedString = await keyv.get<string | undefined>(entry.id);
+		const cachedString = await keyv.get<string | undefined>(metadataItem.id);
 		const cached: CacheMetadata | undefined = cachedString
 			? (JSON.parse(cachedString) as CacheMetadata)
 			: undefined;
 
 		// Check if cache is still valid
-		const metadataUnchanged =
-			cached && JSON.stringify(cached.metadata) === JSON.stringify(currentMetadata);
+		const metadataUnchanged = cached?.metadataHash === currentMetadataHash;
 
 		const imageUnchanged =
 			!imageEntry?.data.modifiedTime ||
@@ -97,7 +90,7 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 		}
 
 		// Cache MISS - generate new image
-		const imageBuffer = await baseGenerator(entry, imageObject);
+		const imageBuffer = await baseGenerator(metadataItem, imageObject);
 
 		// Save image to cache
 		await fs.mkdir(OPENGRAPH_IMAGE_SATORI_CACHE_DIR, { recursive: true });
@@ -106,11 +99,11 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 		// Update metadata in Keyv
 		const cacheMetadata: CacheMetadata = {
 			generatedAt: new Date().toISOString(),
-			metadata: currentMetadata,
+			metadataHash: currentMetadataHash,
 			sourceImageModifiedTime: imageEntry?.data.modifiedTime?.toISOString() ?? undefined,
 		};
 
-		await keyv.set(entry.id, JSON.stringify(cacheMetadata));
+		await keyv.set(metadataItem.id, JSON.stringify(cacheMetadata));
 
 		return imageBuffer;
 	};

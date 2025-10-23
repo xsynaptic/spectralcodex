@@ -52,9 +52,17 @@ export const getStaticPaths = (async () => {
 			R.filter((item) => !!item.imageId && item.entryQuality >= 5), // TODO: relax this restriction later
 			R.map((entry) =>
 				limit(async () => {
-					// TODO: restrict what properties are passed on?
 					const openGraphMetadataItem = {
-						...entry,
+						collection: entry.collection,
+						id: entry.id,
+						title: entry.title,
+						subtitle: entry.titleMultilingual?.lang.startsWith('zh')
+							? entry.titleMultilingual.value
+							: undefined,
+						category: entry.collection,
+						description: entry.description,
+						date: entry.date,
+						icon: undefined,
 					} satisfies OpenGraphMetadataItem;
 
 					const imageEntry = entry.imageId ? await getImageById(entry.imageId) : undefined;
