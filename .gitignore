@@ -26,12 +26,12 @@ astro-error.log*
 
 # generated types and files
 .astro/
-.astro-cache/
-temp
+temp/
 
 # public generated files
-public/divisions
-public/fonts
+public/divisions/
+public/icons/
+public/og*.jpg
 
 # ignore content and media
 packages/content/
@@ -42,6 +42,4 @@ packages/content-demo/media
 
 # ignore some files temporarily
 /config/
-public/icons/
-public/og*.jpg
 docker-compose*

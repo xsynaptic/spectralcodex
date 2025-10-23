@@ -15,6 +15,16 @@ const { values, positionals } = parseArgs({
 			short: 'r',
 			default: process.cwd(),
 		},
+		'content-path': {
+			type: 'string',
+			short: 'p',
+			default: 'packages/content',
+		},
+		'cache-path': {
+			type: 'string',
+			short: 'c',
+			default: './node_modules/.astro',
+		},
 		'dist-path': {
 			type: 'string',
 			short: 'd',
@@ -49,7 +59,7 @@ const distPath = path.join(values['root-path'], values['dist-path']);
 const imagesPath = path.join(values['root-path'], values['images-path']);
 
 // Deployment configuration from environment variables
-const assetsPath = process.env.BUILD_ASSETS_PATH ?? '_x';
+const assetsPath = path.join(distPath, process.env.BUILD_ASSETS_PATH ?? '_x');
 const remoteHostApp = process.env.DEPLOY_REMOTE_HOST_APP;
 const remoteHostImages = process.env.DEPLOY_REMOTE_HOST_IMAGES;
 const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
@@ -94,7 +104,7 @@ async function contentRelated() {
 	console.log(chalk.blue('Generating related content...'));
 
 	try {
-		await $`pnpm content-related --root-path=${values['root-path']}`;
+		await $`pnpm content-related --root-path=${values['root-path']} --content-path=${values['content-path']} --cache-path=${values['cache-path']}`;
 		console.log(chalk.green('Related content generated.'));
 	} catch (error) {
 		console.error(chalk.red('Related content generation failed:'), error);

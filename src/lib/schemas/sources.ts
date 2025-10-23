@@ -1,5 +1,7 @@
+import path from 'node:path';
 import { z } from 'zod';
 
+import { CONTENT_DATA_PATH } from '#constants.ts';
 import {
 	nameMultilingualSchema,
 	publisherMultilingualSchema,
@@ -30,7 +32,7 @@ let sourcesMapCache: Record<string, z.infer<typeof SourceItemSchema>> | undefine
 async function getSourcesMap() {
 	if (!sourcesMapCache) {
 		try {
-			const data = await loadYamlData('sources.yaml');
+			const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'sources.yaml'));
 
 			sourcesMapCache = await z.record(z.string(), SourceItemSchema).parseAsync(data);
 		} catch (error) {

@@ -10,8 +10,6 @@
 		"content-validate": "tsx ./src/content-validate/index.ts",
 		"deploy-static": "tsx ./src/deploy-static/index.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
-		"map-divisions:clear-cache": "tsx ./src/map-divisions/clear-cache.ts",
-		"map-divisions:status": "tsx ./src/map-divisions/status.ts",
 		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts"
 	},
 	"devDependencies": {
@@ -24,7 +22,7 @@
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
 		"@xenova/transformers": "^2.17.2",
-		"astro": "^5.14.8",
+		"astro": "^5.15.0",
 		"chalk": "^5.6.2",
 		"dotenv": "^17.2.3",
 		"flatgeobuf": "^4.3.1",

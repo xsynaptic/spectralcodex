@@ -1,5 +1,7 @@
+import path from 'node:path';
 import { z } from 'zod';
 
+import { CONTENT_DATA_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 import { loadYamlData } from '#lib/utils/data.ts';
@@ -21,7 +23,7 @@ let linksMapCache: Array<z.infer<typeof LinkDataSchema>> | undefined;
 async function getLinksData() {
 	if (!linksMapCache) {
 		try {
-			const data = await loadYamlData('links.yaml');
+			const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'links.yaml'));
 
 			linksMapCache = await z.array(LinkDataSchema).parseAsync(data);
 		} catch (error) {

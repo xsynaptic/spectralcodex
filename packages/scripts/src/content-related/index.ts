@@ -23,8 +23,13 @@ const { values } = parseArgs({
 		},
 		'content-path': {
 			type: 'string',
-			short: 'c',
+			short: 'p',
 			default: 'packages/content',
+		},
+		'cache-path': {
+			type: 'string',
+			short: 'c',
+			default: './node_modules/.astro',
 		},
 		'character-limit': {
 			type: 'string',
@@ -298,7 +303,7 @@ async function contentRelated() {
 			process.exit(1);
 		}
 
-		const cacheDir = path.join(values['root-path'], values['content-path'], 'data');
+		const cacheDir = path.join(values['root-path'], values['cache-path'], 'content-related');
 		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
 
 		if (embeddings.length === 0) {
@@ -309,11 +314,7 @@ async function contentRelated() {
 		const relatedContentItems = calculateSimilarities(embeddings);
 
 		// Output results
-		const outputPath = path.join(
-			values['root-path'],
-			values['content-path'],
-			'data/content-related.json',
-		);
+		const outputPath = path.join(cacheDir, 'content-related.json');
 
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));

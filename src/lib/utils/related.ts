@@ -1,3 +1,5 @@
+import { CACHE_DIR } from 'astro:env/server';
+import path from 'node:path';
 import { z } from 'zod';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
@@ -17,7 +19,9 @@ const RelatedContentItemSchema = z.record(
 );
 
 export async function getRelatedContentFunction() {
-	const relatedContent = await loadJsonData('content-related.json');
+	const relatedContent = await loadJsonData(
+		path.join(CACHE_DIR, 'content-related/content-related.json'),
+	);
 
 	const relatedContentParsed = await RelatedContentItemSchema.parseAsync(relatedContent);
 

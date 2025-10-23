@@ -2,46 +2,47 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parse } from 'yaml';
 
-import { CONTENT_DATA_PATH } from '#constants.ts';
-
-async function loadDataFile(filename: string) {
+/**
+ * A general file loading function that resolves the file path relative to the project root
+ */
+async function loadDataFile(filePath: string) {
 	try {
-		const filePath = path.join(process.cwd(), CONTENT_DATA_PATH, filename);
+		const resolvedFilePath = path.join(process.cwd(), filePath);
 
-		return await readFile(filePath, 'utf8');
+		return await readFile(resolvedFilePath, 'utf8');
 	} catch (error) {
-		console.error(`Failed to load data from ${filename}:`, error);
+		console.error(`Failed to load data from ${filePath}:`, error);
 
-		throw new Error(`Failed to load data from ${filename}`);
+		throw new Error(`Failed to load data from ${filePath}`);
 	}
 }
 
 /**
  * Load YAML data from the configured content data path
  */
-export async function loadYamlData(filename: string) {
+export async function loadYamlData(filePath: string) {
 	try {
-		const fileContent = await loadDataFile(filename);
+		const fileContent = await loadDataFile(filePath);
 
 		return parse(fileContent) as unknown;
 	} catch (error) {
-		console.error(`Failed to load YAML data from ${filename}:`, error);
+		console.error(`Failed to load YAML data from ${filePath}:`, error);
 
-		throw new Error(`Failed to load YAML data from ${filename}`);
+		throw new Error(`Failed to load YAML data from ${filePath}`);
 	}
 }
 
 /**
  * Load JSON data from the configured content data path
  */
-export async function loadJsonData(filename: string) {
+export async function loadJsonData(filePath: string) {
 	try {
-		const fileContent = await loadDataFile(filename);
+		const fileContent = await loadDataFile(filePath);
 
 		return JSON.parse(fileContent) as unknown;
 	} catch (error) {
-		console.error(`Failed to load JSON data from ${filename}:`, error);
+		console.error(`Failed to load JSON data from ${filePath}:`, error);
 
-		throw new Error(`Failed to load JSON data from ${filename}`);
+		throw new Error(`Failed to load JSON data from ${filePath}`);
 	}
 }

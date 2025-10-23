@@ -6,18 +6,6 @@ import path from 'node:path';
 import type { OpenGraphImageFontConfig, OpenGraphImageFontVariant } from './types';
 
 /**
- * Build Fontsource CDN URL for a specific font variant
- * Note: Satori requires the font file to be in the WOFF format
- * Pattern: https://cdn.jsdelivr.net/npm/@fontsource/{family}@latest/files/{family}-{subset}-{weight}-{style}.woff
- */
-function buildFontUrl(family: string, variant: OpenGraphImageFontVariant): string {
-	const familyLower = family.toLowerCase();
-	const filename = `${familyLower}-${variant.subset}-${String(variant.weight)}-${variant.style}.woff`;
-
-	return `https://cdn.jsdelivr.net/npm/@fontsource/${familyLower}@latest/files/${filename}`;
-}
-
-/**
  * Download font from CDN and save to cache
  */
 async function downloadFont(url: string, cachePath: string): Promise<ArrayBuffer> {
@@ -37,7 +25,9 @@ async function downloadFont(url: string, cachePath: string): Promise<ArrayBuffer
 }
 
 /**
- * Load font data from cache or download if not cached
+ * Load font data from cache or download from Fontsource CDN if not cached
+ * Note: Satori requires the font file to be in the WOFF format
+ * Pattern: https://cdn.jsdelivr.net/npm/@fontsource/{family}@latest/files/{family}-{subset}-{weight}-{style}.woff
  */
 async function loadFontData({
 	cacheDir,
@@ -60,7 +50,7 @@ async function loadFontData({
 
 		return buffer.buffer as ArrayBuffer;
 	} catch {
-		const url = buildFontUrl(family, variant);
+		const url = `https://cdn.jsdelivr.net/npm/@fontsource/${familyLower}@latest/files/${filename}`;
 
 		return downloadFont(url, cachePath);
 	}
