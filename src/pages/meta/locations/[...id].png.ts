@@ -1,10 +1,7 @@
 import type { OpenGraphMetadataItem } from '@spectralcodex/image-open-graph';
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import {
-	getGenerateOpenGraphImageFunction,
-	loadOpenGraphImageFonts,
-} from '@spectralcodex/image-open-graph';
+import { loadOpenGraphImageFonts } from '@spectralcodex/image-open-graph';
 import { CACHE_DIR } from 'astro:env/server';
 import path from 'node:path';
 import pLimit from 'p-limit';
@@ -15,6 +12,7 @@ import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
 import { getImageById } from '#lib/collections/images/utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
+import { getGenerateOpenGraphImageFunction } from '#lib/image/image-open-graph-satori.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 
 export const getStaticPaths = (async () => {
@@ -65,7 +63,11 @@ export const getStaticPaths = (async () => {
 					return {
 						params: { id: entry.id },
 						props: {
-							imageOpenGraph: await generateOpenGraphImage(openGraphMetadataItem, imageObject),
+							imageOpenGraph: await generateOpenGraphImage(
+								openGraphMetadataItem,
+								imageObject,
+								imageEntry,
+							),
 						},
 					};
 				}),

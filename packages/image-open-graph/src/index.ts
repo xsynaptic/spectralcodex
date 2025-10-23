@@ -6,4 +6,5 @@ export {
 	type OpenGraphImageFontConfig,
 	type OpenGraphImageFontVariant,
 	type OpenGraphMetadataItem,
+	type OpenGraphSatoriOptions,
 } from './types';
