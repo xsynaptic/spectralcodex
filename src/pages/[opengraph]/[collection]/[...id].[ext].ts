@@ -4,12 +4,10 @@ import pLimit from 'p-limit';
 import * as R from 'remeda';
 
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
-import { getImageObject } from '#lib/image/image-file-handling.ts';
-import { getOpenGraphImage } from '#lib/image/image-open-graph.ts';
+import { getOpenGraphImageFunction } from '#lib/image/image-open-graph.ts';
 import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
 
 export const getStaticPaths = (async () => {
@@ -17,7 +15,7 @@ export const getStaticPaths = (async () => {
 	const { series } = await getSeriesCollection();
 	const { themes } = await getThemesCollection();
 
-	const getImageById = await getImageByIdFunction();
+	const getOpenGraphImage = await getOpenGraphImageFunction();
 
 	const limit = pLimit(40);
 
@@ -30,8 +28,13 @@ export const getStaticPaths = (async () => {
 					const featuredImage = getImageSetPrimaryImage({
 						imageSet: entry.data.imageSet,
 					})!;
-					const imageEntry = getImageById(featuredImage.id);
-					const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
+
+					const imageOpenGraph = await getOpenGraphImage({
+						entryId: entry.id,
+						imageId: featuredImage.id,
+						format: OPEN_GRAPH_IMAGE_FORMAT,
+						formatOptions: { quality: 85 },
+					});
 
 					return {
 						params: {
@@ -41,13 +44,7 @@ export const getStaticPaths = (async () => {
 							ext: OPEN_GRAPH_IMAGE_FORMAT,
 						},
 						props: {
-							imageOpenGraph: imageObject
-								? await getOpenGraphImage({
-										imageObject,
-										format: OPEN_GRAPH_IMAGE_FORMAT,
-										formatOptions: { quality: 85 },
-									})
-								: undefined,
+							imageOpenGraph,
 						},
 					};
 				}),
@@ -62,7 +59,7 @@ export const GET = (({ props: { imageOpenGraph } }) => {
 	return new Response(new Uint8Array(imageOpenGraph.data), {
 		status: 200,
 		headers: {
-			'Content-Type': `image/${imageOpenGraph.info.format === 'jpg' ? 'jpeg' : imageOpenGraph.info.format}`,
+			'Content-Type': `image/${imageOpenGraph.format}`,
 		},
 	});
 }) satisfies APIRoute<InferGetStaticPropsType<typeof getStaticPaths>>;

@@ -23,8 +23,10 @@ export async function getImageFileBufferAsync(src: string): Promise<Buffer | und
 }
 
 // A simple utility function to handle invoking Sharp after locating an image on disk
-export async function getImageObject(src: string) {
+export async function getImageObject(src: string): Promise<sharp.Sharp | undefined> {
 	const imageFileBuffer = await getImageFileBufferAsync(src);
+
+	if (!imageFileBuffer) return undefined;
 
 	return sharp(imageFileBuffer, { failOn: 'error' });
 }

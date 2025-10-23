@@ -29,9 +29,11 @@ export async function getImagePlaceholderDataUrl({
 	imageObject,
 	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
 }: {
-	imageObject: sharp.Sharp;
+	imageObject: sharp.Sharp | undefined;
 	pixelCount?: number;
-}) {
+}): Promise<string | undefined> {
+	if (!imageObject) return;
+
 	const metadata = await imageObject.metadata();
 
 	if (!metadata.height || !metadata.width) return;
@@ -57,7 +59,7 @@ export async function getImagePlaceholderDataUrl({
 }
 
 // Hero images need larger placeholders but we can generate these on-demand
-export async function getImagePlaceholderDataUrlHq(src: string) {
+export async function getImagePlaceholderDataUrlHq(src: string): Promise<string | undefined> {
 	const imageObject = await getImageObject(src);
 
 	return await getImagePlaceholderDataUrl({

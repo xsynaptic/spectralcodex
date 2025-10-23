@@ -5,8 +5,6 @@ import path from 'node:path';
 
 import type { OpenGraphImageFontConfig, OpenGraphImageFontVariant } from './types';
 
-const CACHE_DIR = 'node_modules/.cache/spectralcodex-og-fonts';
-
 /**
  * Build Fontsource CDN URL for a specific font variant
  * Note: Satori requires the font file to be in the WOFF format
@@ -17,16 +15,6 @@ function buildFontUrl(family: string, variant: OpenGraphImageFontVariant): strin
 	const filename = `${familyLower}-${variant.subset}-${String(variant.weight)}-${variant.style}.woff`;
 
 	return `https://cdn.jsdelivr.net/npm/@fontsource/${familyLower}@latest/files/${filename}`;
-}
-
-/**
- * Build cache file path for a font variant
- */
-function buildCachePath(family: string, variant: OpenGraphImageFontVariant): string {
-	const familyLower = family.toLowerCase();
-	const filename = `${familyLower}-${variant.subset}-${String(variant.weight)}-${variant.style}.woff`;
-
-	return path.join(process.cwd(), CACHE_DIR, filename);
 }
 
 /**
@@ -51,11 +39,19 @@ async function downloadFont(url: string, cachePath: string): Promise<ArrayBuffer
 /**
  * Load font data from cache or download if not cached
  */
-async function loadFontData(
-	family: string,
-	variant: OpenGraphImageFontVariant,
-): Promise<ArrayBuffer> {
-	const cachePath = buildCachePath(family, variant);
+async function loadFontData({
+	cacheDir,
+	family,
+	variant,
+}: {
+	cacheDir: string;
+	family: string;
+	variant: OpenGraphImageFontVariant;
+}): Promise<ArrayBuffer> {
+	const familyLower = family.toLowerCase();
+	const filename = `${familyLower}-${variant.subset}-${String(variant.weight)}-${variant.style}.woff`;
+
+	const cachePath = path.join(process.cwd(), cacheDir, filename);
 
 	try {
 		await fs.access(cachePath);
@@ -75,14 +71,18 @@ async function loadFontData(
  * Fonts are downloaded from Fontsource CDN and cached locally
  * Returns array in Satori-compatible format
  */
-export async function loadOpenGraphImageFonts(
-	configs: Array<OpenGraphImageFontConfig>,
-): Promise<Array<Font>> {
+export async function loadOpenGraphImageFonts({
+	fontConfigs,
+	cacheDir,
+}: {
+	fontConfigs: Array<OpenGraphImageFontConfig>;
+	cacheDir: string;
+}): Promise<Array<Font>> {
 	const fonts: Array<Font> = [];
 
-	for (const config of configs) {
+	for (const config of fontConfigs) {
 		for (const variant of config.variants) {
-			const data = await loadFontData(config.family, variant);
+			const data = await loadFontData({ cacheDir, family: config.family, variant });
 
 			fonts.push({
 				name: config.family,

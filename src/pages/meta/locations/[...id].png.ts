@@ -5,6 +5,8 @@ import {
 	getGenerateOpenGraphImageFunction,
 	loadOpenGraphImageFonts,
 } from '@spectralcodex/image-open-graph';
+import { CACHE_DIR } from 'astro:env/server';
+import path from 'node:path';
 import pLimit from 'p-limit';
 import * as R from 'remeda';
 
@@ -15,7 +17,6 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 
-// TODO: this feature is currently under development
 export const getStaticPaths = (async () => {
 	if (!FEATURE_OPEN_GRAPH_IMAGES) return [];
 
@@ -23,16 +24,19 @@ export const getStaticPaths = (async () => {
 
 	const getContentMetadata = await getContentMetadataFunction();
 
-	const openGraphImageFonts = await loadOpenGraphImageFonts([
-		{
-			family: 'Geologica',
-			variants: [
-				{ weight: 300, style: 'normal', subset: 'latin' },
-				{ weight: 500, style: 'normal', subset: 'latin' },
-				{ weight: 700, style: 'normal', subset: 'latin' },
-			],
-		},
-	]);
+	const openGraphImageFonts = await loadOpenGraphImageFonts({
+		cacheDir: path.join(CACHE_DIR, 'opengraph-fonts'),
+		fontConfigs: [
+			{
+				family: 'Geologica',
+				variants: [
+					{ weight: 300, style: 'normal', subset: 'latin' },
+					{ weight: 500, style: 'normal', subset: 'latin' },
+					{ weight: 700, style: 'normal', subset: 'latin' },
+				],
+			},
+		],
+	});
 
 	const generateOpenGraphImage = getGenerateOpenGraphImageFunction({
 		fonts: openGraphImageFonts,
