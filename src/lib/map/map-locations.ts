@@ -14,12 +14,12 @@ import {
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
 import { featureCollection } from '@turf/helpers';
-import { createHash } from 'node:crypto';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
+import { hashData } from '#lib/utils/cache.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position) {
 	return coordinates.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))) as [
@@ -226,8 +226,8 @@ export function getLocationsMapApiHashes(featureCollection: MapFeatureCollection
 	const popupData = getLocationsMapPopupData(featureCollection);
 
 	return {
-		sourceHash: createHash('md5').update(JSON.stringify(sourceData)).digest('hex').slice(0, 8),
-		popupHash: createHash('md5').update(JSON.stringify(popupData)).digest('hex').slice(0, 8),
+		sourceHash: hashData({ data: sourceData, short: true }),
+		popupHash: hashData({ data: popupData, short: true }),
 	};
 }
 
