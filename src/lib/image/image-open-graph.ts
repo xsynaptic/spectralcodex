@@ -5,7 +5,10 @@ import sharp from 'sharp';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 
-// A basic OpenGraph image function; nothing fancy, just returns a featured image
+/**
+ * A basic OpenGraph image function; nothing fancy, just returns a featured image
+ * Note: this is a self-contained function that does not rely on the `@spectralcodex/image-open-graph` package
+ */
 export async function getOpenGraphImage({
 	imageObject,
 	targetHeight = OPEN_GRAPH_IMAGE_HEIGHT,

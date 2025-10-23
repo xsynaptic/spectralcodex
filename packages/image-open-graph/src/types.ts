@@ -1,3 +1,5 @@
+import type { FontStyle, FontWeight, SatoriOptions } from 'satori';
+
 // This replicates some parts of ContentMetadataItem since we can't import it directly
 export interface OpenGraphMetadataItem {
 	collection: string;
@@ -11,3 +13,18 @@ export interface OpenGraphMetadataItem {
 	locationCount: number | undefined;
 	wordCount: number | undefined;
 }
+
+export interface OpenGraphImageFontVariant {
+	weight: FontWeight;
+	style: FontStyle;
+	subset: string;
+}
+
+export interface OpenGraphImageFontConfig {
+	family: string;
+	variants: Array<OpenGraphImageFontVariant>;
+}
+
+export type OpenGraphSatoriOptions = SatoriOptions & {
+	density?: number;
+};

@@ -1,61 +1,9 @@
-import type { SatoriOptions } from 'satori';
+export { loadOpenGraphImageFonts } from './fonts';
 
-import satori from 'satori';
-import sharp from 'sharp';
+export { getGenerateOpenGraphImageFunction } from './generate';
 
-import type { OpenGraphMetadataItem } from './types';
-
-import { getOpenGraphImageElement } from './element';
-
-async function getOpenGraphImageDataUrl({
-	imageObject,
-	height,
-	width,
-	density,
-}: {
-	imageObject: sharp.Sharp;
-	height: number;
-	width: number;
-	density: number;
-}) {
-	const imageBuffer = await imageObject
-		.resize({
-			fit: 'cover',
-			position: 'top',
-			height: height * density,
-			width: width * density,
-		})
-		.toBuffer({ resolveWithObject: true });
-
-	return `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
-}
-
-export function getGenerateOpenGraphImageFunction({
-	density,
-	...satoriOptions
-}: SatoriOptions & { density?: number }) {
-	const height = 'height' in satoriOptions ? satoriOptions.height : 600;
-	const width = 'width' in satoriOptions ? satoriOptions.width : 900;
-
-	return async function generateOpenGraphImage(
-		entry: OpenGraphMetadataItem,
-		imageObject?: sharp.Sharp,
-	): Promise<Buffer> {
-		const imageEncoded = imageObject
-			? await getOpenGraphImageDataUrl({
-					imageObject,
-					height,
-					width,
-					density: density ?? 1,
-				})
-			: '';
-
-		const openGraphElement = getOpenGraphImageElement(entry, { src: imageEncoded, height, width });
-
-		const satoriSvg = await satori(openGraphElement, satoriOptions);
-
-		return sharp(Buffer.from(satoriSvg), { failOn: 'error' }).png().toBuffer();
-	};
-}
-
-export { type OpenGraphMetadataItem } from './types';
+export {
+	type OpenGraphImageFontConfig,
+	type OpenGraphImageFontVariant,
+	type OpenGraphMetadataItem,
+} from './types';
