@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.6.0",
+	"version": "5.7.0",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -19,6 +19,7 @@
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD --content-path=packages/content",
 		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./node_modules/.astro/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-09-24.0/",
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
+		"opengraph-image": "pnpm --filter @spectralcodex/scripts opengraph-image --root-path=$PWD --content-path=packages/content --output-path=./public/0g",
 		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
 		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD"
 	},
@@ -34,10 +35,10 @@
 		"#*": "./src/*"
 	},
 	"resolutions": {
-		"vite": "6.3.4"
+		"vite": "6.3.6"
 	},
 	"dependencies": {
-		"astro": "^5.15.0",
+		"astro": "^5.15.1",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
@@ -101,7 +102,7 @@
 		"typescript-eslint": "^8.46.2",
 		"unified": "^11.0.5",
 		"url-join": "^5.0.0",
-		"vite": "6.3.4",
+		"vite": "6.3.6",
 		"vitest": "^3.2.4",
 		"yaml": "^2.8.1",
 		"zod": "^3.25.76",

@@ -31,6 +31,7 @@ temp/
 # public generated files
 public/divisions/
 public/icons/
+public/0g/
 public/og*.jpg
 
 # ignore content and media
