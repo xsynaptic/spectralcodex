@@ -6,6 +6,7 @@ import Keyv from 'keyv';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
+import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
@@ -34,6 +35,28 @@ async function cacheFileExists(filePath: string): Promise<boolean> {
 		return true;
 	} catch {
 		return false;
+	}
+}
+
+/**
+ * Load pre-generated OG images from public directory
+ * Returns a Set of entry IDs for fast lookup
+ */
+export async function getPreGeneratedOpenGraphImages(): Promise<Set<string>> {
+	const publicOgPath = path.join(process.cwd(), 'public', OPEN_GRAPH_BASE_PATH);
+
+	try {
+		const files = await fs.readdir(publicOgPath);
+
+		// Extract entry IDs by removing file extension
+		const entryIds = files
+			.filter((file) => file.endsWith(`.${OPEN_GRAPH_IMAGE_FORMAT}`))
+			.map((file) => file.replace(`.${OPEN_GRAPH_IMAGE_FORMAT}`, ''));
+
+		return new Set(entryIds);
+	} catch {
+		// Directory doesn't exist or is empty
+		return new Set();
 	}
 }
 
