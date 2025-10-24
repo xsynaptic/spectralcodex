@@ -364,8 +364,8 @@ importers:
   packages/react-map-component:
     devDependencies:
       '@protomaps/basemaps':
-        specifier: ^5.5.2
-        version: 5.5.2
+        specifier: ^5.6.0
+        version: 5.6.0
       '@spectralcodex/map-types':
         specifier: workspace:*
         version: link:../map-types
@@ -1335,8 +1335,8 @@ packages:
   '@protobufjs/utf8@1.1.0':
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
 
-  '@protomaps/basemaps@5.5.2':
-    resolution: {integrity: sha512-IFp+R6f401wu5R3UJ4XgwqeiCzqvr+i6HFOf1YRp3eMP+j6kzRObCd5YfBU3D7rqpKzEnUiP1w601Z0E1tDlvA==}
+  '@protomaps/basemaps@5.6.0':
+    resolution: {integrity: sha512-BRzMRu1P+jIzWfhfl/fkF1uSZnW4vUbZtEu5fl4+IfsSZ/NWB+IVfiK2FQ+c9cWA/QqpDOpGL80B2L4riULwYw==}
     hasBin: true
 
   '@repeaterjs/repeater@3.0.6':
@@ -7346,7 +7346,7 @@ snapshots:
 
   '@protobufjs/utf8@1.1.0': {}
 
-  '@protomaps/basemaps@5.5.2': {}
+  '@protomaps/basemaps@5.6.0': {}
 
   '@repeaterjs/repeater@3.0.6': {}
 

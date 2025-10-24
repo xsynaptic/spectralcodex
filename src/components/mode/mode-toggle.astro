@@ -76,6 +76,10 @@ const t = getTranslations();
 
 		if (!toggleElement) return;
 
+		// Check if already initialized to prevent duplicate listeners
+		if (toggleElement.dataset.modeInitialized === 'true') return;
+		toggleElement.dataset.modeInitialized = 'true';
+
 		// Debounce toggle that prevents rapid flicking between modes
 		const debouncedModeToggle = funnel(
 			() => {
