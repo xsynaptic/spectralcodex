@@ -1,13 +1,11 @@
 import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
-import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
-import { countWords } from 'alfaaz';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import { MDX_COMPONENTS_TO_STRIP, SITE_YEAR_FOUNDED } from '#constants.ts';
+import { SITE_YEAR_FOUNDED } from '#constants.ts';
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import { getImagesCollection } from '#lib/collections/images/data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
@@ -20,9 +18,10 @@ import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
 import { validateLocations } from '#lib/metadata/metadata-validate.ts';
+import { hashData } from '#lib/utils/cache.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-import { stripMdxComponents } from '#lib/utils/text.ts';
+import { getWordCount } from '#lib/utils/word-count.ts';
 
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();
@@ -38,27 +37,6 @@ function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): strin
 		return featuredImage?.id;
 	}
 	return 'imageFeatured' in entry.data ? entry.data.imageFeatured : undefined;
-}
-
-// Generate a word count from a crude rendering of the body without transforming MDX
-// This method won't work if your MDX components introduce text from outside sources
-// But for this project MDX mainly adds decorative classes so we can get away with this
-function generateContentMetadataWordCount(
-	entry: CollectionEntry<CollectionKey>,
-): number | undefined {
-	if (['series'].includes(entry.collection)) {
-		return undefined; // We will set this after individual posts and locations have a word count
-	}
-	if (entry.body && entry.body.length > 0) {
-		return R.pipe(
-			entry.body,
-			(body) => stripMdxComponents(body, MDX_COMPONENTS_TO_STRIP),
-			(body) => transformMarkdown({ input: body }),
-			stripTags,
-			countWords,
-		);
-	}
-	return undefined;
 }
 
 // Find the common ancestor of a set of regions so there's only one in the content metadata index
@@ -120,7 +98,6 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
 
 	// Check some additional location properties in development
-	// Note: due to the operation of the new Content Layer API this is now throwing too many errors
 	if (import.meta.env.DEV) validateLocations(locations);
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
@@ -136,6 +113,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 			let titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 			let regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
+			// Overrides allow us to hide or obscure certain items of content
 			if ('override' in entry.data) {
 				id = entry.data.override?.slug ?? id;
 				title = entry.data.override?.title ?? title;
@@ -145,9 +123,13 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regions = entry.data.override?.regions ?? regions;
 			}
 
+			// Hash the entire entry; useful for caching content metadata items
+			const hash = hashData(entry);
+
 			contentMetadataMap.set(entry.id, {
 				collection: entry.collection,
 				id,
+				hash,
 				title,
 				titleMultilingual,
 				description: entry.data.description,
@@ -160,7 +142,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
-				wordCount: generateContentMetadataWordCount(entry), // Warning: this is an expensive operation
+				wordCount: await getWordCount({ entry, hash }),
 				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
 				backlinks: new Set<string>(), // Populated below
 				entryQuality: entry.data.entryQuality,
@@ -180,13 +162,12 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 		const seriesMetadata = contentMetadataMap.get(entry.id);
 
 		if (seriesMetadata) {
-			const wordCount = R.pipe(
+			seriesMetadata.wordCount = R.pipe(
 				entry.data.seriesItems ?? [],
 				R.map((seriesItem) => contentMetadataMap.get(seriesItem)?.wordCount ?? 0),
 				R.sum,
+				Number,
 			);
-
-			seriesMetadata.wordCount = Number(wordCount);
 		}
 	}
 
