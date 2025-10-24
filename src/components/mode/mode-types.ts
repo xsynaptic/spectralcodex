@@ -14,11 +14,3 @@ export type ModeChangedEvent = CustomEvent<{
 	systemMode: ModeSystemType;
 	resolvedMode: ModeSystemType;
 }>;
-
-export function isModeValid(mode: string | undefined): mode is ModeGeneralType {
-	return (
-		(mode !== undefined && mode === ModeTypeEnum.Auto) ||
-		mode === ModeTypeEnum.Dark ||
-		mode === ModeTypeEnum.Light
-	);
-}
