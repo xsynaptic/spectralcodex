@@ -62,7 +62,7 @@ const imageFeaturedId = getImageFeaturedId({
 });
 const imageHeroId = getImageHeroId({
 	imageFeatured: entry.data.imageHero ?? entry.data.imageFeatured,
-	fallback: !!entry.data.imageHero,
+	fallback: !!entry.data.imageHero || entry.data.showHero === true,
 });
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 ---

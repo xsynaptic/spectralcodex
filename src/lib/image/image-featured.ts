@@ -18,9 +18,8 @@ type ImageFeaturedObject = z.infer<typeof ImageFeaturedObjectSchema>;
 
 export const ImageFeaturedSchema = z.union([
 	z.string(),
-	z.string().array(),
 	ImageFeaturedObjectSchema,
-	ImageFeaturedObjectSchema.array(),
+	z.union([z.string(), ImageFeaturedObjectSchema]).array(),
 ]);
 
 type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;

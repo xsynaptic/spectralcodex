@@ -24,7 +24,7 @@ const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 const imageHeroId = getImageHeroId({
 	imageFeatured: entry.data.imageHero ?? entry.data.imageFeatured,
-	fallback: !!entry.data.imageHero,
+	fallback: !!entry.data.imageHero || entry.data.showHero === true,
 });
 
 const { Content } = await render(entry);
