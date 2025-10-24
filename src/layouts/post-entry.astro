@@ -38,8 +38,8 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const imageHeroId = getImageHeroId({
-	imageFeatured: entry.data.imageHero ?? entry.data.imageFeatured,
-	fallback: !!entry.data.imageHero || entry.data.showHero === true,
+	imageFeatured: entry.data.imageFeatured,
+	fallback: entry.data.showHero === true,
 });
 
 const { Content } = await render(entry);

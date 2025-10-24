@@ -22,8 +22,6 @@ export const postSchema = z
 		dateCreated: DateStringSchema,
 		dateUpdated: DateStringSchema.optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
-		/** @deprecated -- migrate to imageFeatured with `hero: true` */
-		imageHero: ImageFeaturedSchema.optional(),
 		showHero: z.boolean().optional(),
 		hideSearch: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
