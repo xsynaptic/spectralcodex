@@ -8,6 +8,7 @@ import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPagesCollection } from '#lib/collections/pages/data.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getOpenGraphImageFunction } from '#lib/image/image-open-graph.ts';
 
 export const getStaticPaths = (async () => {
@@ -26,9 +27,12 @@ export const getStaticPaths = (async () => {
 			R.filter(({ data }) => !!data.imageFeatured),
 			R.map((entry) =>
 				limit(async () => {
+					const featuredImageId = getImageFeaturedId({
+						imageFeatured: entry.data.imageFeatured,
+					});
 					const imageOpenGraph = await getOpenGraphImage({
 						entryId: entry.id,
-						imageId: entry.data.imageFeatured,
+						imageId: featuredImageId,
 						format: OPEN_GRAPH_IMAGE_FORMAT,
 						formatOptions: { quality: 85 },
 					});

@@ -7,8 +7,8 @@ import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getOpenGraphImageFunction } from '#lib/image/image-open-graph.ts';
-import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
 
 export const getStaticPaths = (async () => {
 	const { regions } = await getRegionsCollection();
@@ -22,16 +22,15 @@ export const getStaticPaths = (async () => {
 	return await Promise.all(
 		R.pipe(
 			[...regions, ...series, ...themes] as const,
-			R.filter(({ data }) => !!data.imageSet),
+			R.filter(({ data }) => !!data.imageFeatured),
 			R.map((entry) =>
 				limit(async () => {
-					const featuredImage = getImageSetPrimaryImage({
-						imageSet: entry.data.imageSet,
-					})!;
-
+					const featuredImageId = getImageFeaturedId({
+						imageFeatured: entry.data.imageFeatured,
+					});
 					const imageOpenGraph = await getOpenGraphImage({
 						entryId: entry.id,
-						imageId: featuredImage.id,
+						imageId: featuredImageId,
 						format: OPEN_GRAPH_IMAGE_FORMAT,
 						formatOptions: { quality: 85 },
 					});
