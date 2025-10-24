@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { ImageSetSchema } from '#lib/schemas/image.ts';
+import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import { DateStringSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
@@ -22,7 +22,7 @@ export const themes = defineCollection({
 			themes: reference('themes').array().optional(),
 			dateCreated: DateStringSchema.optional(),
 			dateUpdated: DateStringSchema.optional(),
-			imageSet: ImageSetSchema.array().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
 			locationCount: z.number().int().optional(),

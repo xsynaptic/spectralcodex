@@ -29,6 +29,7 @@ import Multilingual from '#components/parts/multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
@@ -56,6 +57,13 @@ const regionLangCode = regionPrimary?.data.langCode;
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
+const imageFeaturedId = getImageFeaturedId({
+	imageFeatured: entry.data.imageFeatured,
+});
+const imageHeroId = getImageHeroId({
+	imageFeatured: entry.data.imageHero ?? entry.data.imageFeatured,
+	fallback: !!entry.data.imageHero,
+});
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 ---
 
@@ -69,12 +77,12 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
-	hasHeroImage={!!entry.data.imageHero}
+	hasHeroImage={!!imageHeroId}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			entry.data.imageHero ? (
-				<ImageHero imageId={entry.data.imageHero} alt={title} class="sm:mb-small">
+			imageHeroId ? (
+				<ImageHero imageId={imageHeroId} alt={title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-multilingual">
@@ -131,8 +139,8 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			)
 		}
 		{
-			!hasContent && entry.data.imageFeatured ? (
-				<ImageComponent imageId={entry.data.imageFeatured} alt={title} showMetadata={true} />
+			!hasContent && imageFeaturedId ? (
+				<ImageComponent imageId={imageFeaturedId} alt={title} showMetadata={true} />
 			) : undefined
 		}
 		<ContentDescription entry={entry} />

@@ -14,6 +14,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getImageHeroId } from '#lib/image/image-featured.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -27,6 +28,10 @@ const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
+
+const imageHeroId = getImageHeroId({
+	imageFeatured: entry.data.imageHero,
+});
 
 const { Content } = await render(entry);
 
@@ -49,12 +54,12 @@ const { Content } = await render(entry);
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
-	hasHeroImage={!!entry.data.imageHero}
+	hasHeroImage={!!imageHeroId}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			entry.data.imageHero ? (
-				<ImageHero imageId={entry.data.imageHero} alt={entry.data.title} class="sm:mb-small">
+			imageHeroId ? (
+				<ImageHero imageId={imageHeroId} alt={entry.data.title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">

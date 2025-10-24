@@ -17,7 +17,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		themes,
 		R.filter(filterWithContent),
 		/** Only display themes with associated images */
-		R.filter((entry) => !!entry.data.imageSet && entry.data.imageSet.length > 0),
+		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByContentCount),
 		getContentMetadata
 	);

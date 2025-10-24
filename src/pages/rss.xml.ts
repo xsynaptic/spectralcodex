@@ -62,7 +62,6 @@ const generateFeedItem = async (entry: CollectionEntry<'ephemera' | 'locations' 
 		...(entry.data.description
 			? { description: stripTags(transformMarkdown({ input: entry.data.description })) }
 			: {}),
-		...(entry.data.imageFeatured ? { image: entry.data.imageFeatured } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 

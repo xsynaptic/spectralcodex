@@ -16,7 +16,7 @@ import { getRegionCommonAncestorFunction } from '#lib/collections/regions/utils.
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageSetPrimaryImage } from '#lib/image/image-set.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { validateLocations } from '#lib/metadata/metadata-validate.ts';
 import { hashData } from '#lib/utils/cache.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
@@ -25,19 +25,6 @@ import { getWordCount } from '#lib/utils/word-count.ts';
 
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();
-
-// Note: we could get all featured images but prefer to just grab one for simplicity
-function getContentMetadataImageId(entry: CollectionEntry<CollectionKey>): string | undefined {
-	if ('imageSet' in entry.data) {
-		const featuredImage = getImageSetPrimaryImage({
-			imageSet: entry.data.imageSet,
-			shuffle: false,
-		});
-
-		return featuredImage?.id;
-	}
-	return 'imageFeatured' in entry.data ? entry.data.imageFeatured : undefined;
-}
 
 // Find the common ancestor of a set of regions so there's only one in the content metadata index
 async function getRegionPrimaryIdFunction() {
@@ -138,7 +125,10 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 					parseContentDate(entry.data.dateCreated) ??
 					new Date(String(SITE_YEAR_FOUNDED)),
 				url: getContentUrl(entry.collection, entry.id),
-				imageId: getContentMetadataImageId(entry),
+				imageId:
+					'imageFeatured' in entry.data
+						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })
+						: undefined,
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,

@@ -20,6 +20,7 @@ import type { ImageThumbnail } from '#lib/schemas/image.ts';
 
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface CollectionData {
@@ -165,7 +166,9 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			.map((entry) =>
 				limit(async () => {
 					if (entry.data.imageFeatured) {
-						const imageEntry = getImageById(entry.data.imageFeatured);
+						const imageEntry = getImageById(
+							getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
+						);
 
 						if (imageEntry) {
 							const imageObject = await getImage({

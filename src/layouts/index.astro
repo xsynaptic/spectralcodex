@@ -9,7 +9,7 @@ import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageSetFromContentMetadata } from '#lib/image/image-set.ts';
+import { getImageFeaturedObjectWithCaptionMetadataGroup } from '#lib/image/image-featured.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -23,12 +23,12 @@ interface Props {
 const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =
 	Astro.props;
 
-const imageSetMetadata = getImageSetFromContentMetadata({
+const imageFeaturedGroup = getImageFeaturedObjectWithCaptionMetadataGroup({
 	items: featuredMetadataItems,
 	shuffle: true,
 });
 
-const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
 const contentStats = await getContentStats();
 
@@ -39,14 +39,14 @@ const t = getTranslations();
 	meta={{
 		...(hasHeroImage
 			? {
-					imageId: imageSetMetadata.at(0)?.id,
-					imageAlt: imageSetMetadata.at(0)?.title,
+					imageId: imageFeaturedGroup.at(0)?.id,
+					imageAlt: imageFeaturedGroup.at(0)?.title,
 				}
 			: {}),
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	{hasHeroImage ? <ImageHeroCarousel imageSet={imageSetMetadata} /> : undefined}
+	{hasHeroImage ? <ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} /> : undefined}
 	<ContentSection class="mt-small">
 		<Fragment
 			slot="section-description"

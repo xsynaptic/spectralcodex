@@ -17,7 +17,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageSetMetadata } from '#lib/image/image-set.ts';
+import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -31,9 +31,11 @@ const { entry, mapData, page } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
-const imageSetMetadata = await getImageSetMetadata({ imageSet: entry.data.imageSet });
+const imageFeaturedData = await getImageFeaturedObjectGroup({
+	imageFeatured: entry.data.imageFeatured,
+});
 
-const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
+const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 ---
 
 <MainSite
@@ -54,7 +56,7 @@ const hasHeroImage = !!imageSetMetadata && imageSetMetadata.length > 0;
 	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
 		{
 			hasHeroImage ? (
-				<ImageHeroCarousel imageSet={imageSetMetadata} class="sm:mb-small">
+				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedData} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">

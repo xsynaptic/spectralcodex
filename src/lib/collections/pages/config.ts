@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
@@ -25,8 +26,10 @@ export const pages = defineCollection({
 			links: LinkSchema.array().optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			imageFeatured: z.string().optional(),
-			imageHero: z.string().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
+			/** @deprecated -- migrate to imageFeatured with `hero: true` */
+			imageHero: ImageFeaturedSchema.optional(),
+			showHero: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			hideSearch: z.boolean().optional(),
 		})

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/schemas.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import {
@@ -43,8 +44,10 @@ export const locations = defineCollection({
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			dateVisited: DateStringSchema.array().optional(),
-			imageFeatured: z.string().optional(),
-			imageHero: z.string().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
+			/** @deprecated -- migrate to imageFeatured with `hero: true` */
+			imageHero: ImageFeaturedSchema.optional(),
+			showHero: z.boolean().optional(),
 			rating: NumericScaleSchema,
 			safety: NumericScaleSchema.optional(),
 			entryQuality: NumericScaleSchema,

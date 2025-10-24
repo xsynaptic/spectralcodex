@@ -10,6 +10,7 @@ import MainSite from '#components/main/main-site.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getImageHeroId } from '#lib/image/image-featured.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -20,6 +21,11 @@ interface Props {
 const { entry } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+
+const imageHeroId = getImageHeroId({
+	imageFeatured: entry.data.imageHero ?? entry.data.imageFeatured,
+	fallback: !!entry.data.imageHero,
+});
 
 const { Content } = await render(entry);
 ---
@@ -34,12 +40,12 @@ const { Content } = await render(entry);
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
-	hasHeroImage={!!entry.data.imageHero}
+	hasHeroImage={!!imageHeroId}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
 		{
-			entry.data.imageHero ? (
-				<ImageHero imageId={entry.data.imageHero} alt={entry.data.title} class="sm:mb-small">
+			imageHeroId ? (
+				<ImageHero imageId={imageHeroId} alt={entry.data.title} class="sm:mb-small">
 					<ContentHeader showFeatured={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">

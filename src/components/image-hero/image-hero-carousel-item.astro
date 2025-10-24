@@ -3,7 +3,7 @@ import type { RemoteImageProps } from 'astro:assets';
 
 import { Image } from 'astro:assets';
 
-import type { ImageSetWithMetadata } from '#lib/image/image-set.ts';
+import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -13,11 +13,11 @@ import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
-interface Props extends ImageSetWithMetadata {
+interface Props extends ImageFeaturedObjectWithCaptionMetadata {
 	index: number;
 }
 
-const { index, id: imageId, title: alt = '', contentMetadata } = Astro.props;
+const { index, id: imageId, title: alt = '', captionMetadata } = Astro.props;
 
 const imageEntry = await getImageById(imageId);
 
@@ -55,7 +55,7 @@ const placeholder = imageEntry
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}
 			/>
-			{contentMetadata ? <ImageHeroCarouselCaption {...contentMetadata} /> : undefined}
+			{captionMetadata ? <ImageHeroCarouselCaption captionMetadata={captionMetadata} /> : undefined}
 		</ImagePlaceholder>
 	) : undefined
 }
