@@ -13,6 +13,7 @@ import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 
@@ -34,6 +35,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false
 		);
 
+		// Metadata items are the posts and locations that are associated with the theme
 		const metadataItems = R.pipe(
 			[
 				...R.pipe(
@@ -55,10 +57,18 @@ export const getStaticPaths = (async ({ paginate }) => {
 				: {}),
 		});
 
+		// Related themes are those that reference the current theme
+		const relatedThemeIds = R.pipe(
+			themes,
+			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
+			R.sort(sortByContentCount),
+			R.map((theme) => theme.id)
+		);
+
 		results.push(
 			...paginate(metadataItems, {
 				params: { id: entry.id },
-				props: { entry, mapData },
+				props: { entry, mapData, relatedThemeIds },
 				pageSize: 20,
 			})
 		);

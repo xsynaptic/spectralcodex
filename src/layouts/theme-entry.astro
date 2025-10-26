@@ -11,7 +11,9 @@ import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
+import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -24,12 +26,17 @@ import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 interface Props {
 	entry: CollectionEntry<'themes'>;
 	mapData: MapComponentData;
+	relatedThemeIds: Array<string>;
 	page: Page<ContentMetadataItem>;
 }
 
-const { entry, mapData, page } = Astro.props;
+const { entry, mapData, relatedThemeIds, page } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+
+const regionIds = entry.data.regions?.map(({ id }) => id);
+const themeIds = entry.data.themes?.map(({ id }) => id);
+const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
 const imageFeaturedData = await getImageFeaturedObjectGroup({
 	imageFeatured: entry.data.imageFeatured,
@@ -86,6 +93,8 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 		<ContentDescription entry={entry} />
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionSources entry={entry} />
+		<ContentSectionRegions regionIds={regionIds} />
+		<ContentSectionThemes themeIds={allThemeIds} />
 		<ContentSectionMap mapData={mapData} persistId={`theme-${entry.id}`} />
 		<ContentSectionPreviewGrid page={page} />
 	</article>
