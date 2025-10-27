@@ -24,13 +24,12 @@ export default getConfig(
 		{
 			files: ['packages/react-map-component/**/*.{js,jsx,ts,tsx}'],
 			plugins: {
-				// Note: this was causing a type error in September 2025; check back to see if it is necessary in the future
 				'@tanstack/query': tanstackQueryPlugin as unknown as ESLint.Plugin,
-				'react-hooks': reactHooksPlugin,
+				'react-hooks': reactHooksPlugin as unknown as ESLint.Plugin,
 			},
 			rules: {
 				...tanstackQueryPlugin.configs.recommended.rules,
-				...reactHooksPlugin.configs.flat['recommended-latest']?.rules,
+				...reactHooksPlugin.configs['recommended-latest'].rules,
 				'react-hooks/component-hook-factories': 'warn',
 				'react-hooks/config': 'warn',
 				'react-hooks/error-boundaries': 'warn',
