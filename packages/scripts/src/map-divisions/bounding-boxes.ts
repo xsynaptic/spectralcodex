@@ -62,6 +62,12 @@ export const boundingBoxes: Record<string, BoundingBox> = {
 		lngMin: 114.359_905_8,
 		lngMax: 122.297,
 	},
+	thailand: {
+		latMin: 5.613_081_1,
+		latMax: 20.921_401_3,
+		lngMin: 97.353_515_6,
+		lngMax: 105.598_632_8,
+	},
 	'united-states': {
 		latMin: 24.9493,
 		latMax: 49.5904,
