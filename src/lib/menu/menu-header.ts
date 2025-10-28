@@ -1,3 +1,5 @@
+import type { CollectionEntry } from 'astro:content';
+
 import type { MenuItem } from '#lib/menu/menu-types.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
@@ -11,6 +13,34 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
 
+function getMenuItemData({
+	entry,
+	slug,
+}: {
+	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
+	slug: 'regions' | 'series' | 'themes';
+}) {
+	return {
+		title: entry.data.title,
+		url: getSiteUrl(`${slug}/${entry.id}`),
+	};
+}
+
+function filterMenuItemContentCount(depth: 1 | 2 | 3) {
+	let minContentCount: number;
+
+	if (depth === 1) {
+		minContentCount = 5;
+	} else if (depth === 2) {
+		minContentCount = 2;
+	} else {
+		minContentCount = 8;
+	}
+
+	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
+		(entry.data.postCount ?? 0) + (entry.data.locationCount ?? 0) >= minContentCount;
+}
+
 export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 	const { regions } = await getRegionsCollection();
 	const getRegionsByIds = await getRegionsByIdsFunction();
@@ -22,19 +52,28 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
+		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
-		.slice(0, 8)
+		.slice(0, 12)
 		.map((entry) => ({
-			title: entry.data.title,
-			url: getSiteUrl(`regions/${entry.id}`),
+			...getMenuItemData({ entry, slug: 'regions' }),
 			...(entry.data.children
 				? {
 						children: getRegionsByIds(entry.data.children)
+							.filter(filterMenuItemContentCount(2))
 							.sort(sortByContentCount)
-							.slice(0, 15)
+							.slice(0, 12)
 							.map((entry) => ({
-								title: entry.data.title,
-								url: getSiteUrl(`regions/${entry.id}`),
+								...getMenuItemData({ entry, slug: 'regions' }),
+								...(entry.data.children
+									? {
+											children: getRegionsByIds(entry.data.children)
+												.filter(filterMenuItemContentCount(3))
+												.sort(sortByContentCount)
+												.slice(0, 8)
+												.map((entry) => getMenuItemData({ entry, slug: 'regions' })),
+										}
+									: {}),
 							})),
 					}
 				: {}),
@@ -42,21 +81,17 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const seriesMenu = series
 		.filter(filterEntryQualityFunction)
+		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
-		.slice(0, 8)
-		.map((entry) => ({
-			title: entry.data.title,
-			url: getSiteUrl(`series/${entry.id}`),
-		}));
+		.slice(0, 12)
+		.map((entry) => getMenuItemData({ entry, slug: 'series' }));
 
 	const themesMenu = themes
 		.filter(filterEntryQualityFunction)
+		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
-		.map((entry) => ({
-			title: entry.data.title,
-			url: getSiteUrl(`themes/${entry.id}`),
-		}));
+		.map((entry) => getMenuItemData({ entry, slug: 'themes' }));
 
 	return [
 		{
