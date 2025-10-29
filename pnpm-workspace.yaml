@@ -3,6 +3,7 @@ packages:
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
+  - esbuild
   - protobufjs
   - sharp
   - sqlite3
