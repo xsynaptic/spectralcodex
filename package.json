@@ -38,7 +38,7 @@
 		"vite": "6.3.6"
 	},
 	"dependencies": {
-		"astro": "^5.15.2",
+		"astro": "^5.15.3",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
@@ -49,7 +49,7 @@
 		"@astrojs/react": "^4.4.1",
 		"@astrojs/rss": "^4.0.13",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.401",
+		"@iconify/json": "^2.2.402",
 		"@iconify/utils": "^3.0.2",
 		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
@@ -76,7 +76,7 @@
 		"astro-pagefind": "^1.8.5",
 		"astro-seo": "^0.8.4",
 		"chalk": "^5.6.2",
-		"eslint": "^9.38.0",
+		"eslint": "^9.39.0",
 		"eslint-plugin-astro": "^1.4.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react": "^7.37.5",
@@ -102,8 +102,8 @@
 		"typescript-eslint": "^8.46.2",
 		"unified": "^11.0.5",
 		"url-join": "^5.0.0",
-		"vite": "6.4.1",
-		"vitest": "^4.0.4",
+		"vite": "6.3.6",
+		"vitest": "^4.0.6",
 		"yaml": "^2.8.1",
 		"zod": "^3.25.76",
 		"zx": "^8.8.5"
