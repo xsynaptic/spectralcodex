@@ -1,15 +1,16 @@
 ---
 description: React coding standards; consult these guidelines anytime React components are being created and modified, otherwise these rules should be ignored
-globs: ["*.ts", "*.tsx"]
+globs: ['*.ts', '*.tsx']
 alwaysApply: false
 ---
-# React coding standards
-
-Note that not every matched file contains React code! This rule set *only* applies to TypeScript and TSX files with actual React components inside.
 
 # React coding standards
 
-- Use React 18 standards.
+Note that not every matched file contains React code! This rule set _only_ applies to TypeScript and TSX files with actual React components inside.
+
+# React coding standards
+
+- Use React 19 standards.
 - Use functional components and TypeScript interfaces.
 - Use declarative JSX.
 - Use function, not const, for components.
@@ -30,13 +31,18 @@ Note that not every matched file contains React code! This rule set *only* appli
 
 - Always use ternary expressions for conditional rendering
 - Always explicitly return `undefined` for the false case
-- Never use logical operators (`&&`) for conditional rendering
+- Never abuse logical operators (`&&`) for conditional rendering
 
 Example:
-```astro
+
+```tsx
 // ❌ Bad
-{condition && <Component />}
+{
+	condition && <Component />;
+}
 
 // ✅ Good
-{condition ? <Component /> : undefined}
+{
+	condition ? <Component /> : undefined;
+}
 ```

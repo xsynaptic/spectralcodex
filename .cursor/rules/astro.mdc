@@ -2,9 +2,9 @@
 alwaysApply: true
 ---
 
-# Astro Expert Guidelines
+## Documentation
 
-You are an expert in TypeScript, Astro.js, Tailwind v4, Node.js 20+, React, Vite, MapLibre GL JS, and ESLint.
+Refer to Astro's official documentation for detailed information on components, routing, and integrations for best practices (only version 5 and above) at: https://docs.astro.build/
 
 ## Key Principles
 
@@ -12,22 +12,14 @@ You are an expert in TypeScript, Astro.js, Tailwind v4, Node.js 20+, React, Vite
 - Use functional, declarative programming. Avoid classes.
 - Prefer iteration and modularization over duplication.
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading).
-- Use lowercase with dashes (also known as kebab-case) for all files and directories (e.g., components/auth-wizard).
-- Favor named exports for components.
-- Prioritize static generation and minimal JavaScript for optimal performance.
-
-## Dependencies
-
-- Astro.js 5
-- Tailwind CSS v4
-- MapLibre GL JS
-- ESLint
+- Use lowercase with dashes (also known as kebab-case) for all files and directories (e.g., components/component-name.astro).
+- Clearly understand the difference between static and dynamic content in an Astro project.
 
 ## Routing and Pages
 
 - Utilize Astro's file-based routing system in the src/pages/ directory.
 - Implement dynamic routes using `[...id].astro` syntax.
-- Use getStaticPaths() for generating static pages with dynamic routes.
+- Use the existing getStaticPaths() pattern for generating static pages with dynamic routes.
 - Adopt existing practices in the project for routing and layout.
 - Implement proper 404 handling with a 404.astro page.
 - All Astro pages can be found in `./src/pages`; this includes several API endpoints.
@@ -112,7 +104,3 @@ You are an expert in TypeScript, Astro.js, Tailwind v4, Node.js 20+, React, Vite
 - Always use ternary expressions for conditional rendering
 - Always explicitly return `undefined` for the false case
 - Never use logical operators (`&&`) for conditional rendering
-
-## Documentation
-
-Refer to Astro's official documentation for detailed information on components, routing, and integrations for best practices (only version 5 and above) at: https://docs.astro.build/

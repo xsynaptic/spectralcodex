@@ -1,15 +1,16 @@
 ---
 description: TypeScript standards; these rules and guidelines should always be consulted since the entire project is in TypeScript!
-globs: ["*.ts", "*.tsx", "*.astro"]
+globs: ['*.ts', '*.tsx', '*.astro']
 alwaysApply: true
 ---
+
 # TypeScript coding standards
 
 - Use "function" keyword for pure functions.
-- Use TypeScript for all code. 
-- Prefer interfaces over types. 
+- Use TypeScript for all code.
+- Prefer interfaces over types.
 - Avoid TypeScript enums altogether, use maps or objects with "as const".
-- Prefer `satisfies` over type assertions. 
+- Prefer `satisfies` over type assertions.
 - Optimize for code readability over conciseness.
 - Always use full, descriptive variable names.
 - Prioritize error handling and edge cases:
