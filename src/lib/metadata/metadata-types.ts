@@ -6,7 +6,6 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	collection: T;
 	id: string;
-	hash: string;
 	title: string;
 	titleMultilingual: MultilingualContent | undefined;
 	description?: string | undefined;

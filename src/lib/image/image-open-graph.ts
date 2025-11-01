@@ -1,8 +1,7 @@
 import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
-import KeyvSqlite from '@keyv/sqlite';
 import { CACHE_DIR } from 'astro:env/server';
-import Keyv from 'keyv';
+
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
@@ -11,21 +10,14 @@ import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
-import { cacheFileExists } from '#lib/utils/cache.ts';
+import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
 
 const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image');
 
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking
  */
-const keyv = new Keyv({
-	store: new KeyvSqlite({
-		uri: `sqlite://${path.join(CACHE_DIR, 'opengraph.sqlite')}`,
-		table: 'opengraph_cache',
-		busyTimeout: 10_000,
-	}),
-	namespace: 'opengraph',
-});
+const cacheInstance = getCacheInstance('opengraph');
 
 /**
  * Load pre-generated OG images from public directory
@@ -85,7 +77,7 @@ export async function getOpenGraphImageFunction() {
 		const cachePath = path.join(OPENGRAPH_IMAGE_CACHE_DIR, cacheFilename);
 
 		// Check if cache is still valid
-		const cachedAt = await keyv.get<string | undefined>(entryId);
+		const cachedAt = await cacheInstance.get<string | undefined>(entryId);
 		const isValid =
 			cachedAt &&
 			(!imageEntry?.data.modifiedTime || imageEntry.data.modifiedTime <= new Date(cachedAt));
@@ -112,7 +104,7 @@ export async function getOpenGraphImageFunction() {
 
 		// Save image to cache and update timestamp in Keyv
 		await fs.writeFile(cachePath, new Uint8Array(result.data));
-		await keyv.set(entryId, new Date().toISOString());
+		await cacheInstance.set(entryId, new Date().toISOString());
 
 		return {
 			data: result.data,

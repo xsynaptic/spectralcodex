@@ -1,24 +1,14 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import KeyvSqlite from '@keyv/sqlite';
 import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
 import { countWords } from 'alfaaz';
-import { CACHE_DIR } from 'astro:env/server';
-import Keyv from 'keyv';
-import path from 'node:path';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
+import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
-const keyv = new Keyv({
-	store: new KeyvSqlite({
-		uri: `sqlite://${path.join(CACHE_DIR, 'word-counts.sqlite')}`,
-		table: 'content_word_counts',
-		busyTimeout: 10_000,
-	}),
-	namespace: 'word-counts',
-});
+const cacheInstance = getCacheInstance('word-counts');
 
 /**
  * Generate word count from content body
@@ -40,19 +30,17 @@ function computeWordCount(body: string): number {
  * Get word count with caching
  * Returns function that computes or retrieves cached word count for entry body content
  */
-export async function getWordCount({
-	entry,
-	hash,
-}: {
-	entry: CollectionEntry<CollectionKey>;
-	hash: string;
-}): Promise<number | undefined> {
+export async function getWordCount(
+	entry: CollectionEntry<CollectionKey>,
+): Promise<number | undefined> {
 	// Series word counts are calculated separately (aggregated from items)
 	if (entry.collection === 'series') {
 		return undefined;
 	}
 
-	const cachedCount = await keyv.get<number>(hash);
+	const hash = hashData({ data: { id: entry.id, body: entry.body } });
+
+	const cachedCount = await cacheInstance.get<number>(hash);
 
 	// Check cache first
 	if (cachedCount !== undefined) {
@@ -62,7 +50,7 @@ export async function getWordCount({
 	// Compute and cache
 	const wordCount = !entry.body || entry.body.length === 0 ? 0 : computeWordCount(entry.body);
 
-	await keyv.set(hash, wordCount);
+	await cacheInstance.set(hash, wordCount);
 
 	return wordCount;
 }

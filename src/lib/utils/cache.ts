@@ -1,5 +1,27 @@
-import { createHash } from 'node:crypto';
+import KeyvSqlite from '@keyv/sqlite';
+import Keyv from 'keyv';
+import { hash } from 'ohash';
+import type { KeyvOptions } from 'keyv';
+
 import { promises as fs } from 'node:fs';
+import path from 'node:path';
+
+import { CACHE_DIR } from 'astro:env/server';
+
+/**
+ * Initialize Keyv with SQLite backend
+ */
+export function getCacheInstance(namespace: string, options?: KeyvOptions) {
+	return new Keyv({
+		store: new KeyvSqlite({
+			uri: `sqlite://${path.join(CACHE_DIR, `${namespace}.sqlite`)}`,
+			table: 'cache',
+			busyTimeout: 10_000,
+			...options,
+		}),
+		namespace,
+	});
+}
 
 /**
  * Generate MD5 hash of data for cache validation
@@ -7,9 +29,9 @@ import { promises as fs } from 'node:fs';
  * @param short - Return 8-char hash instead of full 32-char hash
  */
 export function hashData({ data, short = false }: { data: unknown; short?: boolean }): string {
-	const hash = createHash('md5').update(JSON.stringify(data)).digest('hex');
+	const hashValue = hash(data);
 
-	return short ? hash.slice(0, 8) : hash;
+	return short ? hashValue.slice(0, 12) : hashValue;
 }
 
 /**

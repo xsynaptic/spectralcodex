@@ -18,7 +18,6 @@ import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { validateLocations } from '#lib/metadata/metadata-validate.ts';
-import { hashData } from '#lib/utils/cache.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getWordCount } from '#lib/utils/word-count.ts';
@@ -110,13 +109,9 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regions = entry.data.override?.regions ?? regions;
 			}
 
-			// Hash the entire entry; useful for caching content metadata items
-			const hash = hashData(entry);
-
 			contentMetadataMap.set(entry.id, {
 				collection: entry.collection,
 				id,
-				hash,
 				title,
 				titleMultilingual,
 				description: entry.data.description,
@@ -132,7 +127,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
 				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
-				wordCount: await getWordCount({ entry, hash }),
+				wordCount: await getWordCount(entry),
 				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
 				backlinks: new Set<string>(), // Populated below
 				entryQuality: entry.data.entryQuality,

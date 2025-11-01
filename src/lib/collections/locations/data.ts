@@ -2,7 +2,6 @@ import type { Units } from '@turf/helpers';
 import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import KeyvSqlite from '@keyv/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { transformMarkdown } from '@spectralcodex/unified-tools';
 import {
@@ -14,9 +13,6 @@ import {
 } from '@turf/turf';
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import { CACHE_DIR } from 'astro:env/server';
-import Keyv from 'keyv';
-import path from 'node:path';
 import pLimit from 'p-limit';
 
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
@@ -24,7 +20,7 @@ import type { ImageThumbnail } from '#lib/schemas/image.ts';
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { hashData } from '#lib/utils/cache.ts';
+import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface CollectionData {
@@ -38,17 +34,7 @@ const LOCATIONS_NEARBY_DISTANCE_UNITS: Units = 'kilometers';
 
 let collection: Promise<CollectionData> | undefined;
 
-/**
- * Initialize Keyv with SQLite backend for timestamp tracking
- */
-const keyv = new Keyv({
-	store: new KeyvSqlite({
-		uri: `sqlite://${path.join(CACHE_DIR, 'locations-map-data.sqlite')}`,
-		table: 'locations_map_data',
-		busyTimeout: 10_000,
-	}),
-	namespace: 'locations-map-data',
-});
+const cacheInstance = getCacheInstance('locations-map-data');
 
 // A simple function for creating reliable IDs for distance pair calculations
 function getDistanceId(idA: string, idB: string) {
@@ -266,13 +252,13 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 		title.startsWith('Wikipedia'),
 	)?.url;
 
-	const cachedDescriptionHtml = await keyv.get<string>(locationMapDataHash);
+	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {
 		entry.data.descriptionHtml = cachedDescriptionHtml;
 	} else {
 		entry.data.descriptionHtml = transformMarkdown({ input: entry.data.description });
-		await keyv.set(locationMapDataHash, entry.data.descriptionHtml);
+		await cacheInstance.set(locationMapDataHash, entry.data.descriptionHtml);
 	}
 }
 

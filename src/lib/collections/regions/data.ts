@@ -14,32 +14,18 @@ interface CollectionData {
 
 let collection: Promise<CollectionData> | undefined;
 
-function isRegionWithLanguage(
-	region: CollectionEntry<'regions'>['id'],
-): region is keyof typeof RegionLanguageMap {
-	return region in RegionLanguageMap;
-}
-
-function getRegionLanguageById(
-	regionId: CollectionEntry<'regions'>['id'] | undefined,
-): RegionLanguage | undefined {
-	return regionId && isRegionWithLanguage(regionId) ? RegionLanguageMap[regionId] : undefined;
-}
-
-async function generateCollection() {
-	const startTime = performance.now();
-
-	const locations = await getCollection('locations');
-	const posts = await getCollection('posts');
-	const regions = await getCollection('regions');
-
+function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 	// Calculate ancestors
 	for (const entry of regions) {
 		if (entry.data.parent) {
+			if (entry.id === entry.data.parent) {
+				throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
+			}
+
 			let current = entry;
 
-			while (current.data.parent?.id) {
-				const parent = regions.find(({ id }) => id === current.data.parent?.id);
+			while (current.data.parent) {
+				const parent = regions.find(({ id }) => id === current.data.parent);
 
 				if (!parent) break;
 
@@ -55,7 +41,7 @@ async function generateCollection() {
 
 	// Calculate children, siblings, and descendants
 	for (const entry of regions) {
-		const children = regions.filter(({ data }) => data.parent?.id === entry.id);
+		const children = regions.filter(({ data }) => data.parent === entry.id);
 
 		if (children.length > 0) {
 			entry.data.children = children.map(({ id }) => id);
@@ -65,9 +51,7 @@ async function generateCollection() {
 		const siblings = regions.filter(({ id, data }) => {
 			if (id === entry.id) return false;
 
-			return entry.data.parent
-				? data.parent?.id === entry.data.parent.id
-				: data.parent?.id === undefined;
+			return entry.data.parent ? data.parent === entry.data.parent : data.parent === undefined;
 		});
 
 		if (siblings.length > 0) {
@@ -89,7 +73,22 @@ async function generateCollection() {
 			}
 		}
 	}
+}
 
+function isRegionWithLanguage(
+	region: CollectionEntry<'regions'>['id'],
+): region is keyof typeof RegionLanguageMap {
+	return region in RegionLanguageMap;
+}
+
+function getRegionLanguageById(
+	regionId: CollectionEntry<'regions'>['id'] | undefined,
+): RegionLanguage | undefined {
+	return regionId && isRegionWithLanguage(regionId) ? RegionLanguageMap[regionId] : undefined;
+}
+
+// Assign language code, where applicable
+function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'>>) {
 	// Assign language code, where applicable
 	for (const entry of regions) {
 		if (entry.data.ancestors && entry.data.ancestors.length > 0) {
@@ -98,6 +97,11 @@ async function generateCollection() {
 			entry.data.langCode = getRegionLanguageById(entry.id);
 		}
 	}
+}
+
+async function populateRegionsContent(regions: Array<CollectionEntry<'regions'>>) {
+	const locations = await getCollection('locations');
+	const posts = await getCollection('posts');
 
 	// Generate locations and posts by region maps; this will make subsequent calculations faster
 	const locationsByRegionMap = new Map<string, Array<string>>();
@@ -137,6 +141,16 @@ async function generateCollection() {
 		);
 		entry.data.postCount = entry.data.posts.length;
 	}
+}
+
+async function generateCollection() {
+	const startTime = performance.now();
+
+	const regions = await getCollection('regions');
+
+	populateRegionsHierarchy(regions);
+	populateRegionsLangCode(regions);
+	await populateRegionsContent(regions);
 
 	// Assign all data to the map and collection
 	const regionsMap = new Map<string, CollectionEntry<'regions'>>();

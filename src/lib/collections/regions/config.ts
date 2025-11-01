@@ -1,5 +1,5 @@
 import { glob } from 'astro/loaders';
-import { defineCollection, reference } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
@@ -17,7 +17,7 @@ export const regions = defineCollection({
 			title: StylizedStringSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
-			parent: reference('regions').optional(),
+			parent: z.string().optional(),
 			links: LinkSchema.array().optional(),
 			dateCreated: DateStringSchema.optional(),
 			dateUpdated: DateStringSchema.optional(),

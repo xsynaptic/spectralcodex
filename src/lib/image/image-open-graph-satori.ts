@@ -4,15 +4,13 @@ import type {
 } from '@spectralcodex/image-open-graph';
 import type { CollectionEntry } from 'astro:content';
 
-import KeyvSqlite from '@keyv/sqlite';
 import { getGenerateOpenGraphImageFunction as getBaseGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
 import { CACHE_DIR } from 'astro:env/server';
-import Keyv from 'keyv';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { cacheFileExists, hashData } from '#lib/utils/cache.ts';
+import { cacheFileExists, getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
 interface CacheMetadata {
 	generatedAt: string;
@@ -25,14 +23,7 @@ const OPENGRAPH_IMAGE_SATORI_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image')
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking
  */
-const keyv = new Keyv({
-	store: new KeyvSqlite({
-		uri: `sqlite://${path.join(CACHE_DIR, 'opengraph-satori.sqlite')}`,
-		table: 'opengraph_satori_cache',
-		busyTimeout: 10_000,
-	}),
-	namespace: 'opengraph-satori',
-});
+const cacheInstance = getCacheInstance('opengraph-satori');
 
 /**
  * Create a cached wrapper around the Satori-based OpenGraph image generator
@@ -57,7 +48,7 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 		const currentMetadataHash = hashData({ data: metadataItem });
 
 		// Get cached record
-		const cachedString = await keyv.get<string | undefined>(metadataItem.id);
+		const cachedString = await cacheInstance.get<string | undefined>(metadataItem.id);
 		const cached: CacheMetadata | undefined = cachedString
 			? (JSON.parse(cachedString) as CacheMetadata)
 			: undefined;
@@ -91,7 +82,7 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 			sourceImageModifiedTime: imageEntry?.data.modifiedTime?.toISOString() ?? undefined,
 		};
 
-		await keyv.set(metadataItem.id, JSON.stringify(cacheMetadata));
+		await cacheInstance.set(metadataItem.id, JSON.stringify(cacheMetadata));
 
 		return imageBuffer;
 	};

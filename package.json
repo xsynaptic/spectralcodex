@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.7.0",
+	"version": "5.7.1",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -12,7 +12,6 @@
 		"lint-content-demo": "eslint ./packages/content-demo --config ./packages/content-demo/eslint.config.mjs",
 		"test": "vitest",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
-		"clean-build-images": "tsx --env-file=.env ./scripts/clean-build-images.ts",
 		"host-images": "serve packages/content/media",
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD --content-path=packages/content --cache-path=./node_modules/.astro",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --content-path=packages/content",
@@ -20,7 +19,6 @@
 		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./node_modules/.astro/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-09-24.0/",
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"opengraph-image": "pnpm --filter @spectralcodex/scripts opengraph-image --root-path=$PWD --content-path=packages/content --output-path=./public/0g",
-		"deploy-hybrid": "tsx --env-file=.env ./scripts/deploy-hybrid.ts",
 		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD"
 	},
 	"license": "MIT",
