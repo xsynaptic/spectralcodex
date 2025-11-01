@@ -27,6 +27,8 @@ interface MapDataState {
 	ratingFilter: number;
 	objectiveFilter: number;
 	showObjectiveFilter: boolean;
+	/** Language */
+	languages: Array<string>;
 }
 
 /**
@@ -45,6 +47,7 @@ type MapDataConfigurableState = Pick<
 	| 'ratingFilter'
 	| 'objectiveFilter'
 	| 'showObjectiveFilter'
+	| 'languages'
 >;
 
 export interface MapDataStore extends MapDataState {
@@ -64,6 +67,7 @@ export interface MapDataStore extends MapDataState {
 		setQualityFilter: (qualityFilter: number) => void;
 		setRatingFilter: (ratingFilter: number) => void;
 		setObjectiveFilter: (objectiveFilter: number) => void;
+		setLanguages: (languages: Array<string>) => void;
 	};
 }
 
@@ -83,6 +87,7 @@ const defaultMapDataState = {
 	ratingFilter: 1,
 	objectiveFilter: 1,
 	showObjectiveFilter: false,
+	languages: ['en'],
 } satisfies MapDataState;
 
 const useMapStoreSetup = ({
@@ -180,6 +185,9 @@ const useMapStoreSetup = ({
 						selectedId: undefined,
 						objectiveFilter,
 					});
+				},
+				setLanguages: (languages) => {
+					set({ languages });
 				},
 			},
 		})),

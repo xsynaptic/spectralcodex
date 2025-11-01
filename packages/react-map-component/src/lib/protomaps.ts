@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 
 import type { MapComponentProps } from '../types';
 
+import { useMapLanguages } from '../store/store';
 import { useDarkMode } from './dark-mode';
 
 export function useProtomaps({
@@ -15,13 +16,14 @@ export function useProtomaps({
 	baseMapTheme,
 	spritesId,
 	spritesUrl,
-	languages,
 	isDev,
 }: Pick<
 	MapComponentProps,
-	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'languages' | 'isDev'
+	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'isDev'
 >) {
 	const isDarkMode = useDarkMode();
+
+	const languages = useMapLanguages();
 
 	const flavor = useMemo(() => {
 		return baseMapTheme ?? (isDarkMode ? namedFlavor('dark') : namedFlavor('light'));
@@ -66,7 +68,7 @@ export function useProtomaps({
 						attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
 					},
 				},
-				layers: layers('protomaps', flavor, { lang: languages?.at(0) ?? 'en' }),
+				layers: layers('protomaps', flavor, { lang: languages.at(0) ?? 'en' }),
 			}) satisfies StyleSpecification,
 		[flavor, isDarkMode, protomapsApiKey, spritesId, spritesUrl, languages, isDev],
 	);

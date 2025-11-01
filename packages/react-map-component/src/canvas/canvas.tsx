@@ -6,7 +6,6 @@ import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 import type { MapComponentProps } from '../types';
 
 import { MapControls } from '../controls/controls';
-import { MapControlsFilterMenu } from '../controls/controls-filter-menu';
 import { PopupDataContextProvider } from '../data/data-popup';
 import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
 import { useProtomaps } from '../lib/protomaps';
@@ -55,7 +54,6 @@ const MapCanvasContainer: FC<
 	spritesId,
 	apiPopupUrl,
 	popupData,
-	languages,
 	version,
 	isDev,
 }) {
@@ -64,7 +62,6 @@ const MapCanvasContainer: FC<
 		baseMapTheme,
 		spritesId,
 		spritesUrl,
-		languages,
 		isDev,
 	});
 
@@ -78,12 +75,6 @@ const MapCanvasContainer: FC<
 	const loading = useMemo(
 		() => canvasLoading || isSourceDataLoading,
 		[canvasLoading, isSourceDataLoading],
-	);
-
-	/** Optionally display some additional Chinese language translations in some places */
-	const showChinese = useMemo(
-		() => languages?.some((lang) => lang.startsWith('zh')) ?? false,
-		[languages],
 	);
 
 	return (
@@ -115,30 +106,37 @@ const MapCanvasContainer: FC<
 			style={{ height: 'auto', ...style }}
 			{...canvasEvents}
 		>
-			<MapControls />
-			<MapSource
-				apiDivisionUrl={apiDivisionUrl}
-				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
-				bounds={bounds}
-				isDev={isDev}
-			/>
-			<MapControlsFilterMenu showChinese={showChinese} />
 			<PopupDataContextProvider
 				apiPopupUrl={apiPopupUrl}
 				popupData={popupData}
 				version={version}
 				isDev={isDev}
 			>
+				<MapControls />
 				<MapPopup />
 			</PopupDataContextProvider>
+			<MapSource
+				apiDivisionUrl={apiDivisionUrl}
+				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
+				bounds={bounds}
+				isDev={isDev}
+			/>
 			<MapCanvasLoading loading={loading} />
 		</ReactMapGlMap>
 	);
 };
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
-	const { cluster, interactive, showObjectiveFilter, apiSourceUrl, sourceData, version, isDev } =
-		props;
+	const {
+		cluster,
+		interactive,
+		showObjectiveFilter,
+		apiSourceUrl,
+		sourceData,
+		languages,
+		version,
+		isDev,
+	} = props;
 
 	return (
 		<SourceDataContextProvider
@@ -152,6 +150,7 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(cluster ? { canvasClusters: cluster } : {}),
 					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
 					...(interactive === false ? { canvasInteractive: false } : {}),
+					...(languages ? { languages } : {}),
 				}}
 			>
 				<MapCanvasContainer {...props} />

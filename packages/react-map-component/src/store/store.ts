@@ -50,6 +50,14 @@ export const useMapShowObjectiveFilter = () =>
 	useMapDataStore((state) => state.showObjectiveFilter);
 
 /**
+ * Map language settings
+ */
+export const useMapLanguages = () => useMapDataStore((state) => state.languages);
+
+export const useMapChineseLabels = () =>
+	useMapDataStore((state) => state.languages.some((lang) => lang.startsWith('zh')));
+
+/**
  * Map actions
  */
 export const useMapStoreActions = () => useMapDataStore((state) => state.actions);
