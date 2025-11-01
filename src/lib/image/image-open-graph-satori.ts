@@ -12,7 +12,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { hashData } from '#lib/utils/cache.ts';
+import { cacheFileExists, hashData } from '#lib/utils/cache.ts';
 
 interface CacheMetadata {
 	generatedAt: string;
@@ -33,18 +33,6 @@ const keyv = new Keyv({
 	}),
 	namespace: 'opengraph-satori',
 });
-
-/**
- * Check if a cached file exists on disk
- */
-async function cacheFileExists(filePath: string): Promise<boolean> {
-	try {
-		await fs.access(filePath);
-		return true;
-	} catch {
-		return false;
-	}
-}
 
 /**
  * Create a cached wrapper around the Satori-based OpenGraph image generator

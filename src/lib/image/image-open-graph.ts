@@ -11,6 +11,7 @@ import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
+import { cacheFileExists } from '#lib/utils/cache.ts';
 
 const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image');
 
@@ -25,18 +26,6 @@ const keyv = new Keyv({
 	}),
 	namespace: 'opengraph',
 });
-
-/**
- * Check if a cached file exists on disk
- */
-async function cacheFileExists(filePath: string): Promise<boolean> {
-	try {
-		await fs.access(filePath);
-		return true;
-	} catch {
-		return false;
-	}
-}
 
 /**
  * Load pre-generated OG images from public directory

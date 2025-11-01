@@ -2,6 +2,7 @@ import type { Units } from '@turf/helpers';
 import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
+import KeyvSqlite from '@keyv/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { transformMarkdown } from '@spectralcodex/unified-tools';
 import {
@@ -13,7 +14,9 @@ import {
 } from '@turf/turf';
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import { nanoid } from 'nanoid';
+import { CACHE_DIR } from 'astro:env/server';
+import Keyv from 'keyv';
+import path from 'node:path';
 import pLimit from 'p-limit';
 
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
@@ -21,6 +24,7 @@ import type { ImageThumbnail } from '#lib/schemas/image.ts';
 import { FEATURE_LOCATION_NEARBY_ITEMS, IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface CollectionData {
@@ -33,6 +37,18 @@ const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // Everything within 10 km
 const LOCATIONS_NEARBY_DISTANCE_UNITS: Units = 'kilometers';
 
 let collection: Promise<CollectionData> | undefined;
+
+/**
+ * Initialize Keyv with SQLite backend for timestamp tracking
+ */
+const keyv = new Keyv({
+	store: new KeyvSqlite({
+		uri: `sqlite://${path.join(CACHE_DIR, 'locations-map-data.sqlite')}`,
+		table: 'locations_map_data',
+		busyTimeout: 10_000,
+	}),
+	namespace: 'locations-map-data',
+});
 
 // A simple function for creating reliable IDs for distance pair calculations
 function getDistanceId(idA: string, idB: string) {
@@ -232,19 +248,39 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 	);
 }
 
-function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	entry.data.uuid = nanoid();
+async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
+	const locationMapDataHash = hashData({
+		data: {
+			id: entry.id,
+			title: entry.data.title,
+			description: entry.data.description,
+			links: entry.data.links,
+		},
+		short: true,
+	});
+
+	entry.data.uuid = locationMapDataHash;
 	entry.data.url = getContentUrl('locations', entry.id);
 	entry.data.googleMapsUrl = entry.data.links?.find(({ title }) => title === 'Google Maps')?.url;
 	entry.data.wikipediaUrl = entry.data.links?.find(({ title }) =>
 		title.startsWith('Wikipedia'),
 	)?.url;
-	entry.data.descriptionHtml = transformMarkdown({ input: entry.data.description });
+
+	const cachedDescriptionHtml = await keyv.get<string>(locationMapDataHash);
+
+	if (cachedDescriptionHtml) {
+		entry.data.descriptionHtml = cachedDescriptionHtml;
+	} else {
+		entry.data.descriptionHtml = transformMarkdown({ input: entry.data.description });
+		await keyv.set(locationMapDataHash, entry.data.descriptionHtml);
+	}
 }
 
-// Nearby location data is expensive to calculate
-// To reduce the cost we use buffer zones to reduce the overall number of operations performed
-// We also stash distance pairs in a Map to further cut calculations by half
+/**
+ * Nearby location data is expensive to calculate
+ * To reduce the cost we use buffer zones to reduce the overall number of operations performed
+ * We also stash distance pairs in a Map to further cut calculations by half
+ */
 async function generateCollection() {
 	const startTime = performance.now();
 
@@ -260,7 +296,7 @@ async function generateCollection() {
 	// Loop through every item in the collection and add metadata
 	for (const entry of locations) {
 		generateLocationPostData(entry);
-		generateLocationMapData(entry);
+		await generateLocationMapData(entry);
 		generateNearbyItems?.(entry);
 	}
 
