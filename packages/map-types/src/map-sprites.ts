@@ -5,6 +5,7 @@ export const MapSpritesEnum = {
 	Wikipedia: 'hugeicons:wikipedia',
 	Copy: 'uil:copy',
 	Filters: 'uil:layer-group',
+	Search: 'uil:search',
 	Clusters: 'uil:expand-arrows-alt',
 	Rating: 'clarity:star-solid',
 	Warning: 'clarity:warning-solid',

@@ -11,6 +11,9 @@ import {
 import { useMapCanvasInteractive } from '../store/store';
 import { FilterControl } from './controls-filter';
 import { MetricsControl } from './controls-metrics';
+import { SearchControl } from './controls-search';
+
+const FEATURE_SEARCH_CONTROL = false as boolean;
 
 export const MapControls: FC = function MapControls() {
 	const canvasInteractive = useMapCanvasInteractive();
@@ -29,6 +32,7 @@ export const MapControls: FC = function MapControls() {
 					/>
 					<NavigationControl position="top-left" showCompass={true} />
 					<FilterControl position="top-left" />
+					{FEATURE_SEARCH_CONTROL ? <SearchControl position="top-right" /> : undefined}
 					<MetricsControl position="bottom-left" />
 				</>
 			) : undefined}

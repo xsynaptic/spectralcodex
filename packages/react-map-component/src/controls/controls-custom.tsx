@@ -10,7 +10,7 @@ interface CustomControlConfig {
 	map: MapInstance;
 	position: ControlPosition;
 	className?: string | undefined;
-	redraw?: () => void; // Not entirely sure what this is for
+	redraw?: () => void; // Optional; use this if the control needs to be redrawn when the map is moved
 }
 
 type CustomControlProps = Pick<CustomControlConfig, 'position' | 'className'> & {

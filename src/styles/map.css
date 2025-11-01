@@ -42,6 +42,9 @@ button.maplibregl-popup-close-button:focus {
 }
 
 /** Controls */
+.maplibregl-ctrl-group {
+	overflow: hidden;
+}
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-scale {
 	user-select: none;

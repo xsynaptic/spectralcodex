@@ -15,14 +15,15 @@ export const MetricsControl: FC<{
 
 	const formatNumber = new Intl.NumberFormat('en');
 
+	// Note: the class name is specified to remove the white background and border added by default
 	return (
-		<CustomControlPortal position={position} className="maplibregl-ctrl">
+		<CustomControlPortal className="maplibregl-ctrl" position={position}>
 			{isSourceDataLoading ? (
 				<div className="flex flex-col items-end">
 					<div className="loading-animation" style={{ width: '15px' }} />
 				</div>
 			) : (
-				<div className="text-primary-700 dark:text-primary-300 flex flex-nowrap gap-1 font-sans text-xs select-none">
+				<div className="maplibregl-ctrl-metrics text-primary-700 dark:text-primary-300 flex flex-nowrap gap-1 font-sans text-xs select-none">
 					<span className="drop-shadow-sm">{formatNumber.format(filteredCount)}</span>
 					<span className="text-primary-400 dark:text-primary-500 font-light drop-shadow-xs">
 						/

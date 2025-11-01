@@ -157,7 +157,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 			) : undefined}
 			<div className="flex flex-col px-2 pt-1 pb-2">
 				{titleMultilingualLang && titleMultilingualValue ? (
-					<div className="from-accent-500 to-accent-600 dark:from-accent-400 dark:to-accent-500 bg-gradient-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
+					<div className="from-accent-500 to-accent-600 dark:from-accent-400 dark:to-accent-500 bg-linear-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
 						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 					</div>
 				) : undefined}

@@ -224,13 +224,17 @@ const MapControlsFilterMenu: FC<{
 		<div
 			className="maplibregl-popup maplibregl-popup-anchor-left"
 			style={{
+				maxHeight: 'calc(100% - 40px)',
 				maxWidth: 'min(350px, 80vw)',
 				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
 				zIndex: 10,
 			}}
 		>
 			<div className="maplibregl-popup-tip"></div>
-			<div className="maplibregl-popup-content">
+			<div
+				className="maplibregl-popup-content"
+				style={{ boxShadow: '0 0 0 2px rgba(0, 0, 0, .1)' }}
+			>
 				<ul className="flex flex-col gap-1 px-1 py-1">
 					{R.entries(LocationStatusRecords).map(([status, data]) => (
 						<MapFilterStatusMenuItem
@@ -263,27 +267,27 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 
 	return (
 		<>
-			<CustomControlPortal
-				className="maplibregl-ctrl maplibregl-ctrl-group maplibregl-ctrl-filter"
-				position={position}
-			>
+			<CustomControlPortal position={position}>
 				<button
 					id={CONTROL_FILTER_ID}
+					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
 					onClick={() => {
 						if (!isLoading) setFilterOpen(!filterOpen);
 					}}
-					style={{ overflow: 'hidden' }}
 					aria-label={translations.filterMenuAriaLabel}
 				>
-					<div
-						className={`text-primary-700 flex h-full w-full items-center justify-center ${filterOpen ? 'bg-primary-300 hover:bg-primary-200' : ''} ${isLoading ? 'bg-primary-200 opacity-50' : ''}`}
-					>
+					<div className="flex items-center justify-center">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							className={isLoading ? 'text-primary-600' : 'text-primary-700'}
-							style={{ height: '20px', ...(filterOpen ? { marginTop: '1px' } : {}) }}
 							viewBox="0 0 24 24"
+							style={{
+								height: '20px',
+								width: '20px',
+								...(filterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
+								...(isLoading ? { opacity: '0.6' } : {}),
+							}}
+							aria-hidden="true"
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Filters}`}></use>
 						</svg>
