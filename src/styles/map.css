@@ -46,12 +46,42 @@ button.maplibregl-popup-close-button:focus {
 	overflow: hidden;
 }
 .maplibregl-ctrl-attrib,
-.maplibregl-ctrl-scale {
+.maplibregl-ctrl-scale,
+.maplibregl-ctrl-metrics {
+	@apply font-sans;
 	user-select: none;
 }
+
+/** Scale and metrics controls */
+.maplibregl-ctrl-bottom-left {
+	display: flex;
+	font-size: 10px;
+}
+.maplibregl-ctrl-metrics-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+.maplibregl-ctrl-metrics {
+	@apply text-primary-600;
+	align-items: center;
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 2px;
+	height: 100%;
+}
+[data-mode='dark'] .maplibregl-ctrl-metrics {
+	@apply text-primary-300;
+}
+.maplibregl-ctrl-metrics-divider {
+	@apply text-primary-400;
+}
+[data-mode='dark'] .maplibregl-ctrl-metrics-divider {
+	@apply text-primary-500;
+}
 .maplibregl-ctrl-scale {
+	@apply rounded-br-xs rounded-bl-xs border-r border-b border-l;
 	@apply text-primary-600 border-primary-400;
-	@apply rounded-br-sm rounded-bl-sm border-r border-b border-l font-sans text-shadow-sm;
 	background-color: transparent;
 }
 [data-mode='dark'] .maplibregl-ctrl-scale {
