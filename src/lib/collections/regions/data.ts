@@ -8,11 +8,9 @@ import type { RegionLanguage } from '#lib/collections/regions/types.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
-interface CollectionData {
-	regions: Array<CollectionEntry<'regions'>>;
-	regionsMap: Map<string, CollectionEntry<'regions'>>;
-}
-
+/**
+ * Computed data cache
+ */
 type RegionComputedData = Pick<
 	CollectionEntry<'regions'>['data'],
 	| 'ancestors'
@@ -27,9 +25,7 @@ type RegionComputedData = Pick<
 >;
 
 // Cache of all region computed data, keyed by region ID
-type RegionsCacheData = Record<string, RegionComputedData>;
-
-let collection: Promise<CollectionData> | undefined;
+type RegionComputedDataCache = Record<string, RegionComputedData>;
 
 const cacheInstance = getCacheInstance('regions-collection');
 
@@ -65,52 +61,57 @@ async function generateCacheKey({
 }
 
 /**
- * Apply cached computed data back to fresh collection entries
+ * Apply cache computed data back to fresh collection entries
  */
-function applyCachedData(regions: Array<CollectionEntry<'regions'>>, cachedData: RegionsCacheData) {
+function applyComputedDataCache(
+	regions: Array<CollectionEntry<'regions'>>,
+	computedDataCache: RegionComputedDataCache,
+) {
 	for (const entry of regions) {
-		const cached = cachedData[entry.id];
+		const entryComputedData = computedDataCache[entry.id];
 
 		// Merge all computed fields from cache into the entry
-		if (cached) {
-			if (cached.ancestors) entry.data.ancestors = cached.ancestors;
-			if (cached.children) entry.data.children = cached.children;
-			if (cached.siblings) entry.data.siblings = cached.siblings;
-			if (cached.descendants) entry.data.descendants = cached.descendants;
-			if (cached.langCode) entry.data.langCode = cached.langCode;
-			if (cached.locations) entry.data.locations = cached.locations;
-			if (cached.locationCount !== undefined) entry.data.locationCount = cached.locationCount;
-			if (cached.posts) entry.data.posts = cached.posts;
-			if (cached.postCount !== undefined) entry.data.postCount = cached.postCount;
-		}
+		if (entryComputedData) Object.assign(entry.data, entryComputedData);
 	}
 }
 
 /**
  * Extract computed data from processed entries for caching
  */
-function extractComputedData(regions: Array<CollectionEntry<'regions'>>): RegionsCacheData {
-	const cacheData: RegionsCacheData = {};
+function extractComputedData(regions: Array<CollectionEntry<'regions'>>): RegionComputedDataCache {
+	const computedDataCache: RegionComputedDataCache = {};
 
 	for (const entry of regions) {
-		const computed: RegionComputedData = {};
+		const {
+			ancestors,
+			children,
+			siblings,
+			descendants,
+			langCode,
+			locations,
+			locationCount,
+			posts,
+			postCount,
+		} = entry.data;
 
-		if (entry.data.ancestors) computed.ancestors = entry.data.ancestors;
-		if (entry.data.children) computed.children = entry.data.children;
-		if (entry.data.siblings) computed.siblings = entry.data.siblings;
-		if (entry.data.descendants) computed.descendants = entry.data.descendants;
-		if (entry.data.langCode) computed.langCode = entry.data.langCode;
-		if (entry.data.locations) computed.locations = entry.data.locations;
-		if (entry.data.locationCount !== undefined) computed.locationCount = entry.data.locationCount;
-		if (entry.data.posts) computed.posts = entry.data.posts;
-		if (entry.data.postCount !== undefined) computed.postCount = entry.data.postCount;
-
-		cacheData[entry.id] = computed;
+		computedDataCache[entry.id] = {
+			ancestors,
+			children,
+			siblings,
+			descendants,
+			langCode,
+			locations,
+			locationCount,
+			posts,
+			postCount,
+		};
 	}
-
-	return cacheData;
+	return computedDataCache;
 }
 
+/**
+ * Computed data functions
+ */
 function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 	// Calculate ancestors
 	for (const entry of regions) {
@@ -245,6 +246,16 @@ async function populateRegionsContent({
 	}
 }
 
+/**
+ * Collection data
+ */
+interface CollectionData {
+	regions: Array<CollectionEntry<'regions'>>;
+	regionsMap: Map<string, CollectionEntry<'regions'>>;
+}
+
+let collection: Promise<CollectionData> | undefined;
+
 async function generateCollection() {
 	const startTime = performance.now();
 
@@ -254,10 +265,10 @@ async function generateCollection() {
 
 	// Generate cache key from current content graph state
 	const cacheKey = await generateCacheKey({ regions, locations, posts });
-	const cachedData = await cacheInstance.get<RegionsCacheData>(cacheKey);
+	const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
 
-	if (cachedData) {
-		applyCachedData(regions, cachedData);
+	if (cacheData) {
+		applyComputedDataCache(regions, cacheData);
 
 		console.log(
 			`[Regions] Collection data loaded from cache in ${(performance.now() - startTime).toFixed(5)}ms`,
