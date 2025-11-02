@@ -23,7 +23,8 @@
 
 /* Inline search result highlights */
 .pagefind-ui mark {
-	@apply bg-highlight-100 text-highlight-600 rounded-sm px-0.5 py-0.5;
+	@apply bg-highlight-100 text-highlight-600 rounded-sm;
+	padding: 2px;
 }
 [data-mode='dark'] .pagefind-ui mark {
 	@apply bg-primary-600 text-primary-300;

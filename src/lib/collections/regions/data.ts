@@ -13,17 +13,18 @@ interface CollectionData {
 	regionsMap: Map<string, CollectionEntry<'regions'>>;
 }
 
-interface RegionComputedData {
-	ancestors?: Array<string>;
-	children?: Array<string>;
-	siblings?: Array<string>;
-	descendants?: Array<string>;
-	langCode?: RegionLanguage;
-	locations?: Array<string>;
-	locationCount?: number;
-	posts?: Array<string>;
-	postCount?: number;
-}
+type RegionComputedData = Pick<
+	CollectionEntry<'regions'>['data'],
+	| 'ancestors'
+	| 'children'
+	| 'siblings'
+	| 'descendants'
+	| 'langCode'
+	| 'locations'
+	| 'locationCount'
+	| 'posts'
+	| 'postCount'
+>;
 
 // Cache of all region computed data, keyed by region ID
 type RegionsCacheData = Record<string, RegionComputedData>;
