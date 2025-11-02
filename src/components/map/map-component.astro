@@ -30,7 +30,10 @@ const mapComponentExtendedProps = {
 <MapComponentSprites />
 
 <div
-	class:list={['bg-fallback', 'relative flex h-full sm:rounded-xs lg:rounded-md']}
+	class:list={[
+		'bg-fallback',
+		'shadow-primary-300 dark:shadow-primary-900 relative flex h-full shadow-sm sm:rounded-xs lg:rounded-md',
+	]}
 	style={{ maxHeight: '100vh', minHeight: 'min(600px,100vh)', overflow: 'hidden' }}
 	{...props}
 	data-pagefind-ignore

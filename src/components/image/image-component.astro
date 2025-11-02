@@ -91,14 +91,14 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 				{...props}
 			>
 				<ImagePlaceholder
-					class:list={['relative', layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs']}
+					class:list={[
+						'relative',
+						layout === ImageLayoutEnum.Full ? undefined : 'overflow-hidden sm:rounded-xs',
+					]}
 					placeholder={placeholder}
 				>
 					<Image
-						class:list={[
-							'm-0 object-cover object-center text-sm text-transparent',
-							layout === ImageLayoutEnum.Full ? undefined : 'sm:rounded-xs',
-						]}
+						class:list={['m-0 object-cover object-center text-sm text-transparent']}
 						loading="lazy"
 						{...imageProps}
 					/>
