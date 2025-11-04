@@ -19,13 +19,13 @@ const { pathname } = Astro.url;
 
 <ul
 	class:list={[
-		'invisible absolute w-full max-w-full divide-y opacity-0 transition-all transition-discrete sm:max-w-64 sm:min-w-48 md:max-w-80',
+		'pointer-events-none invisible absolute w-full max-w-full divide-y opacity-0 transition-all transition-discrete sm:max-w-64 sm:min-w-48 md:max-w-80',
 		depth === 1
 			? [
 					hasHeroImage
 						? 'bg-primary-100 divide-primary-200 dark:divide-primary-700 dark:bg-primary-800'
 						: 'bg-primary-100 divide-primary-200 dark:divide-primary-700 dark:bg-primary-800 mt-px',
-					'group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100',
+					'group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100',
 					'left-0 z-90 -mb-px shadow-md duration-200 sm:top-full sm:-left-2 sm:rounded-bl-md',
 				]
 			: undefined,
@@ -34,7 +34,7 @@ const { pathname } = Astro.url;
 					hasHeroImage
 						? 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700'
 						: 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700',
-					'sm:group-focus-within/d2:visible sm:group-focus-within/d2:opacity-100 sm:group-hover/d2:visible sm:group-hover/d2:opacity-100',
+					'sm:group-focus-within/d2:pointer-events-auto sm:group-focus-within/d2:visible sm:group-focus-within/d2:opacity-100 sm:group-hover/d2:pointer-events-auto sm:group-hover/d2:visible sm:group-hover/d2:opacity-100',
 					'left-0 z-91 shadow-md duration-50 sm:top-0 sm:left-full sm:rounded-br-md',
 				]
 			: undefined,
@@ -43,7 +43,7 @@ const { pathname } = Astro.url;
 					hasHeroImage
 						? 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700'
 						: 'bg-primary-200 divide-primary-300 dark:divide-primary-600 dark:bg-primary-700',
-					'sm:group-focus-within/d3:visible sm:group-focus-within/d3:opacity-100 sm:group-hover/d3:visible sm:group-hover/d3:opacity-100',
+					'sm:group-focus-within/d3:pointer-events-auto sm:group-focus-within/d3:visible sm:group-focus-within/d3:opacity-100 sm:group-hover/d3:pointer-events-auto sm:group-hover/d3:visible sm:group-hover/d3:opacity-100',
 					'left-0 z-92 duration-50 sm:top-0 sm:left-full sm:rounded-br-md',
 				]
 			: undefined,
