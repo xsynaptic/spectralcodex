@@ -10,6 +10,7 @@ import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/util
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
@@ -20,6 +21,7 @@ export const getStaticPaths = (async () => {
 	const getPostsByIds = await getPostsByIdsFunction();
 	const getContentMetadata = await getContentMetadataFunction();
 	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+	const getContentBacklinks = await getContentBacklinksFunction();
 
 	return locations.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(
@@ -45,6 +47,7 @@ export const getStaticPaths = (async () => {
 					getContentMetadata,
 					R.sort(sortContentMetadataByDate)
 				),
+				backlinks: getContentBacklinks({ id: entry.id }),
 			},
 		};
 	});

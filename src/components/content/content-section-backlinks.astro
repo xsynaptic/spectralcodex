@@ -1,7 +1,5 @@
 ---
-import type { CollectionEntry, CollectionKey } from 'astro:content';
-
-import * as R from 'remeda';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
@@ -9,33 +7,18 @@ import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getContentBacklinks } from '#lib/metadata/metadata-backlinks.ts';
-import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 
 interface Props {
-	entry: CollectionEntry<CollectionKey>;
+	backlinks: Array<ContentMetadataItem> | undefined;
 }
 
-const { entry, ...props } = Astro.props;
-
-const backlinkItems = await getContentBacklinks({ id: entry.id });
-
-const backlinks = backlinkItems
-	? R.pipe(
-			backlinkItems,
-			R.filter((backlinkItem) =>
-				['ephemera', 'locations', 'posts'].includes(backlinkItem.collection)
-			),
-			R.sort(sortContentMetadataByDate),
-			R.take(10)
-		)
-	: [];
+const { backlinks, ...props } = Astro.props;
 
 const t = getTranslations();
 ---
 
 {
-	backlinks.length > 0 ? (
+	backlinks && backlinks.length > 0 ? (
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">

@@ -39,9 +39,10 @@ interface Props {
 	entry: CollectionEntry<'locations'>;
 	mapData: MapComponentData;
 	metadataItems: Array<ContentMetadataItem>;
+	backlinks: Array<ContentMetadataItem> | undefined;
 }
 
-const { entry, mapData, metadataItems } = Astro.props;
+const { entry, mapData, metadataItems, backlinks } = Astro.props;
 
 // This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
@@ -149,7 +150,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		{hideLocation ? undefined : <ContentSectionSources entry={entry} />}
 		{hideLocation ? undefined : <ContentSectionDateVisited dateVisited={entry.data.dateVisited} />}
 		<ContentSectionThemes themeIds={themeIds} />
-		<ContentSectionBacklinks entry={entry} />
+		<ContentSectionBacklinks backlinks={backlinks} />
 		<ContentSectionSeries entry={entry} />
 		<ContentSectionPreviewGrid items={metadataItems} />
 		{

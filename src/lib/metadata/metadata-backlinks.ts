@@ -1,23 +1,38 @@
+import * as R from 'remeda';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 
-// A specialized function for fetching backlink metadata
-export async function getContentBacklinks({ id }: { id: string }) {
+export async function getContentBacklinksFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	const contentMetadataItem = contentMetadataIndex.get(id);
+	return function getContentBacklinks({ id }: { id: string }) {
+		const contentMetadataItem = contentMetadataIndex.get(id);
 
-	if (!contentMetadataItem || contentMetadataItem.backlinks.size === 0) return;
+		if (!contentMetadataItem || contentMetadataItem.backlinks.size === 0) return;
 
-	const backlinkItems: Array<ContentMetadataItem> = [];
+		const backlinkItems: Array<ContentMetadataItem> = [];
 
-	for (const backlinkId of contentMetadataItem.backlinks) {
-		const backlinkItem = contentMetadataIndex.get(backlinkId);
+		for (const backlinkId of contentMetadataItem.backlinks) {
+			const backlinkItem = contentMetadataIndex.get(backlinkId);
 
-		if (backlinkItem) {
-			backlinkItems.push(backlinkItem);
+			if (backlinkItem) {
+				backlinkItems.push(backlinkItem);
+			}
 		}
-	}
-	return backlinkItems;
+
+		const backlinks = R.pipe(
+			backlinkItems,
+			/** Limit backlinks to specific collections */
+			R.filter((backlinkItem) =>
+				['ephemera', 'locations', 'posts'].includes(backlinkItem.collection),
+			),
+			R.sort(sortContentMetadataByDate),
+			R.take(10),
+		);
+
+		return backlinks;
+	};
 }

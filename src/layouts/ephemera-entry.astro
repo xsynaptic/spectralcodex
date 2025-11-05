@@ -3,9 +3,12 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
@@ -20,9 +23,10 @@ import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/uti
 
 interface Props {
 	entry: CollectionEntry<'ephemera'>;
+	backlinks: Array<ContentMetadataItem> | undefined;
 }
 
-const { entry } = Astro.props;
+const { entry, backlinks } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
@@ -106,5 +110,6 @@ const { Content } = await render(entry);
 		</ProseBody>
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
+		<ContentSectionBacklinks backlinks={backlinks} />
 	</article>
 </MainSite>

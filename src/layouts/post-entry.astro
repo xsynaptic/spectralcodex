@@ -4,6 +4,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -28,9 +30,10 @@ import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/uti
 interface Props {
 	entry: CollectionEntry<'posts'>;
 	mapData: MapComponentData;
+	backlinks: Array<ContentMetadataItem> | undefined;
 }
 
-const { entry, mapData } = Astro.props;
+const { entry, mapData, backlinks } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
@@ -115,7 +118,7 @@ const { Content } = await render(entry);
 		<ContentSectionSources entry={entry} />
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
-		<ContentSectionBacklinks entry={entry} />
+		<ContentSectionBacklinks backlinks={backlinks} />
 		<ContentSectionSeries entry={entry} />
 		<ContentSectionMap mapData={mapData} />
 		<ContentSectionRelated entry={entry} />
