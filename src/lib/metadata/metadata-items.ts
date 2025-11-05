@@ -16,7 +16,7 @@ export async function getContentMetadataFunction() {
 
 			if (!contentMetadata) {
 				throw new Error(
-					`Content metadata for "${id}" in the "${collection}" collection was not found!`,
+					`[Metadata] Content metadata for "${id}" in the "${collection}" collection was not found!`,
 				);
 			}
 			return contentMetadata as ContentMetadataItem<T>;

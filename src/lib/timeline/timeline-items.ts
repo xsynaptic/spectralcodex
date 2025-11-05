@@ -40,7 +40,7 @@ export async function getTimelineItemsMap() {
 
 	if (timelineItems.length > 0) {
 		for (const timelineItem of timelineItems) {
-			const timelineSlugs = getTimelineSlugs(timelineItem.date);
+			const timelineSlugs = getTimelineSlugs(timelineItem.dateCreated);
 
 			for (const timelineSlug of timelineSlugs) {
 				if (!timelineItemsMap.has(timelineSlug)) {
@@ -61,7 +61,7 @@ export async function getTimelineYearlyMap() {
 
 	if (timelineItems.length > 0) {
 		for (const timelineItem of timelineItems) {
-			const timelineSlug = getTimelineYearlySlug(timelineItem.date);
+			const timelineSlug = getTimelineYearlySlug(timelineItem.dateCreated);
 
 			if (!timelineItemsMap.has(timelineSlug)) {
 				timelineItemsMap.set(timelineSlug, []);

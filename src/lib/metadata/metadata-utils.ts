@@ -4,7 +4,7 @@ import slugify from '@sindresorhus/slugify';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import { FEATURE_SHORTCODES_ERROR_LOG } from '#constants.ts';
+import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
 
@@ -15,8 +15,8 @@ export async function getContentMetadataById(id: string | undefined) {
 
 	const contentMetadata = contentMetadataIndex.get(slug);
 
-	if (!contentMetadata && FEATURE_SHORTCODES_ERROR_LOG) {
-		logError(`Missing content metadata specified in Link component: "${slug}"`);
+	if (!contentMetadata && CONTENT_LINKS_MISSING_ID_LOG) {
+		logError(`[Metadata] Missing content specified in Link component: "${slug}"`);
 	}
 	return contentMetadata;
 }
@@ -30,5 +30,5 @@ export function filterHasFeaturedImage<T extends CollectionKey = CollectionKey>(
 
 // Sort content metadata; reverse chronological order
 export function sortContentMetadataByDate(a: ContentMetadataItem, b: ContentMetadataItem) {
-	return b.date.valueOf() - a.date.valueOf();
+	return b.dateCreated.valueOf() - a.dateCreated.valueOf();
 }

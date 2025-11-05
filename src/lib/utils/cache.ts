@@ -1,12 +1,11 @@
-import KeyvSqlite from '@keyv/sqlite';
-import Keyv from 'keyv';
-import { hash } from 'ohash';
 import type { KeyvOptions } from 'keyv';
 
+import KeyvSqlite from '@keyv/sqlite';
+import { CACHE_DIR } from 'astro:env/server';
+import Keyv from 'keyv';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-
-import { CACHE_DIR } from 'astro:env/server';
+import { hash } from 'ohash';
 
 /**
  * Initialize Keyv with SQLite backend

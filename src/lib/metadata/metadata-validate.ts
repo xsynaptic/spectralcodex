@@ -17,14 +17,14 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 		const slug = location.data.slug;
 
 		if (locationSlug.has(slug)) {
-			throw new Error(`Duplicate slug found for "${location.id}": ${slug}`);
+			throw new Error(`[Metadata] Duplicate slug found for "${location.id}": ${slug}`);
 		}
 		locationSlug.add(slug);
 
 		const title = location.data.title;
 
 		if (locationTitle.has(title)) {
-			throw new Error(`Duplicate title found for "${location.id}": ${title}`);
+			throw new Error(`[Metadata] Duplicate title found for "${location.id}": ${title}`);
 		}
 		locationTitle.add(title);
 
@@ -35,7 +35,7 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 
 			if (locationTitleMultilingual.has(titleMultilingualString)) {
 				throw new Error(
-					`Duplicate multilingual title found for "${location.id}": ${titleMultilingualString}`,
+					`[Metadata] Duplicate multilingual title found for "${location.id}": ${titleMultilingualString}`,
 				);
 			}
 			locationTitleMultilingual.add(titleMultilingualString);
@@ -45,7 +45,7 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 
 		if (address) {
 			if (locationAddress.has(address)) {
-				throw new Error(`Duplicate address found for "${location.id}": ${address}`);
+				throw new Error(`[Metadata] Duplicate address found for "${location.id}": ${address}`);
 			}
 			locationTitleMultilingual.add(address);
 		}
@@ -69,7 +69,9 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 					.join('x');
 
 				if (locationCoordinates.has(coordinatesString)) {
-					throw new Error(`Duplicate coordinates found for "${location.id}": ${coordinatesString}`);
+					throw new Error(
+						`[Metadata] Duplicate coordinates found for "${location.id}": ${coordinatesString}`,
+					);
 				}
 				locationCoordinates.add(coordinatesString);
 			}
@@ -79,7 +81,9 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 				.join('x');
 
 			if (locationCoordinates.has(coordinatesString)) {
-				throw new Error(`Duplicate coordinates found for "${location.id}": ${coordinatesString}`);
+				throw new Error(
+					`[Metadata] Duplicate coordinates found for "${location.id}": ${coordinatesString}`,
+				);
 			}
 			locationCoordinates.add(coordinatesString);
 		}

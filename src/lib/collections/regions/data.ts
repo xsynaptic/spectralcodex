@@ -33,7 +33,7 @@ const cacheInstance = getCacheInstance('regions-collection');
  * Generate a stable cache key from the content graph state
  * This key changes when any region structure, location-region, or post-region relationship changes
  */
-async function generateCacheKey({
+function generateCacheKey({
 	regions,
 	locations,
 	posts,
@@ -197,7 +197,7 @@ function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'>>) {
 	}
 }
 
-async function populateRegionsContent({
+function populateRegionsContent({
 	regions,
 	locations,
 	posts,
@@ -264,7 +264,7 @@ async function generateCollection() {
 	const posts = await getCollection('posts');
 
 	// Generate cache key from current content graph state
-	const cacheKey = await generateCacheKey({ regions, locations, posts });
+	const cacheKey = generateCacheKey({ regions, locations, posts });
 	const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
 
 	if (cacheData) {
@@ -276,7 +276,7 @@ async function generateCollection() {
 	} else {
 		populateRegionsHierarchy(regions);
 		populateRegionsLangCode(regions);
-		await populateRegionsContent({ regions, locations, posts });
+		populateRegionsContent({ regions, locations, posts });
 
 		// Extract and cache the computed data
 		await cacheInstance.set(cacheKey, extractComputedData(regions));

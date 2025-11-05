@@ -134,7 +134,7 @@ export type MapPopupItemParsed = z.output<typeof MapPopupItemSchema>;
  * Map component props
  */
 export interface MapComponentProps
-	extends Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'> {
+	extends Partial<Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>> {
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;

@@ -7,7 +7,8 @@ export interface OpenGraphMetadataItem {
 	subtitle?: string | undefined;
 	category?: string | undefined;
 	description?: string | undefined;
-	date: Date;
+	dateCreated: Date;
+	dateUpdated?: Date | undefined;
 	icon?: string | undefined;
 }
 

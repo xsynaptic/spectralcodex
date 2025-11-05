@@ -61,7 +61,8 @@ export const getStaticPaths = (async () => {
 							: undefined,
 						category: entry.collection,
 						description: entry.description,
-						date: entry.date,
+						dateCreated: entry.dateCreated,
+						dateUpdated: entry.dateUpdated,
 						icon: undefined,
 					} satisfies OpenGraphMetadataItem;
 

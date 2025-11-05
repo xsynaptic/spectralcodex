@@ -20,7 +20,7 @@ export const themes = defineCollection({
 			sources: SourceSchema.array().optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
-			dateCreated: DateStringSchema.optional(),
+			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			entryQuality: NumericScaleSchema,

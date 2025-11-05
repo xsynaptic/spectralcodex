@@ -10,7 +10,7 @@ function getTimelineMonthlyItems(
 
 	if (timelineItems.length > 0) {
 		for (const timelineItem of timelineItems) {
-			const timelineSlug = getTimelineMonthlySlug(timelineItem.date);
+			const timelineSlug = getTimelineMonthlySlug(timelineItem.dateCreated);
 
 			if (!timelineItemsMap.has(timelineSlug)) {
 				timelineItemsMap.set(timelineSlug, {
@@ -54,7 +54,7 @@ export function getTimelineProps({
 		dateNavCurrentYear: timelineSlugs.filter((slug) => slug.startsWith(currentYear)).sort(),
 		dateNavAllYears: timelineSlugs.filter((slug) => !slug.includes('/')).sort(),
 		timelineSpan,
-		timelineItems: timelineItems.sort((a, b) => a.date.getTime() - b.date.getTime()),
+		timelineItems: timelineItems.sort((a, b) => a.dateCreated.getTime() - b.dateCreated.getTime()),
 	};
 
 	switch (timelineSpan) {

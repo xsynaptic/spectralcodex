@@ -90,7 +90,9 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
 		for (const entry of collection) {
 			if (contentMetadataMap.has(entry.id)) {
-				throw new Error(`Duplicate ID found for "${entry.id}" across different collections!`);
+				throw new Error(
+					`[Metadata] Duplicate ID found for "${entry.id}" across different collections!`,
+				);
 			}
 
 			// Here we allow for location data to have overrides; this is used to obscure sensitive sites
@@ -115,10 +117,6 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				title,
 				titleMultilingual,
 				description: entry.data.description,
-				date:
-					parseContentDate('dateUpdated' in entry.data ? entry.data.dateUpdated : undefined) ??
-					parseContentDate(entry.data.dateCreated) ??
-					new Date(String(SITE_YEAR_FOUNDED)),
 				url: getContentUrl(entry.collection, entry.id),
 				imageId:
 					'imageFeatured' in entry.data
@@ -130,6 +128,15 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				wordCount: await getWordCount(entry),
 				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
 				backlinks: new Set<string>(), // Populated below
+				dateCreated:
+					parseContentDate(entry.data.dateCreated) ?? new Date(String(SITE_YEAR_FOUNDED)),
+				dateUpdated: parseContentDate(
+					'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,
+				),
+				dateVisited:
+					'dateVisited' in entry.data && entry.data.dateVisited
+						? entry.data.dateVisited.map(parseContentDate).filter((date) => date !== undefined)
+						: undefined,
 				entryQuality: entry.data.entryQuality,
 			});
 		}
@@ -158,7 +165,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	const endTime = performance.now();
 
-	console.log(`[Metadata Index] Generated in ${(endTime - startTime).toFixed(5)}ms`);
+	console.log(`[Metadata] Generated in ${(endTime - startTime).toFixed(5)}ms`);
 
 	return contentMetadataMap;
 }

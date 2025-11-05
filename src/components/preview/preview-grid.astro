@@ -119,7 +119,10 @@ const t = getTranslations();
 								</DividedItem>
 							) : undefined}
 							{showDate ? (
-								<ContentDate date={item.date} datePreset={DatePresetEnum.Medium} />
+								<ContentDate
+									date={item.dateUpdated ?? item.dateCreated}
+									datePreset={DatePresetEnum.Medium}
+								/>
 							) : undefined}
 						</Fragment>
 						{showDescription && item.description ? (

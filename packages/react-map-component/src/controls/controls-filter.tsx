@@ -1,33 +1,30 @@
+import type { LocationStatus } from '@spectralcodex/map-types';
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
-
-import { CONTROL_FILTER_ID } from '../constants';
-import { useSourceDataQuery } from '../data/data-source';
-import { translations } from '../lib/translations';
-import {
-	useMapCanvasLoading,
-	useMapFilterOpen,
-	useMapStoreActions,
-	useMapFilterPosition,
-	useMapObjectiveFilter,
-	useMapRatingFilter,
-	useMapShowObjectiveFilter,
-	useMapStatusFilter,
-	useMapChineseLabels,
-} from '../store/store';
-import { CustomControlPortal } from './controls-custom';
-
-import type { LocationStatus } from '@spectralcodex/map-types';
-
 import { memo } from 'react';
 import * as R from 'remeda';
 
 import type { LocationStatusMetadata } from '../lib/location-status';
 
+import { CONTROL_FILTER_ID } from '../constants';
+import { useSourceDataQuery } from '../data/data-source';
 import { useDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
+import { translations } from '../lib/translations';
+import {
+	useMapCanvasLoading,
+	useMapChineseLabels,
+	useMapFilterOpen,
+	useMapFilterPosition,
+	useMapObjectiveFilter,
+	useMapRatingFilter,
+	useMapShowObjectiveFilter,
+	useMapStatusFilter,
+	useMapStoreActions,
+} from '../store/store';
+import { CustomControlPortal } from './controls-custom';
 
 const MapFilterMenuItem: FC<
 	PropsWithChildren<{

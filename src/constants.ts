@@ -19,6 +19,9 @@ export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 // Minimum width for featured images
 export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
 
+// Set to "true" to log missing Link component IDs
+export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
+
 /**
  * Image processing
  */
@@ -82,7 +85,7 @@ export const SITE_YEAR_FOUNDED = 2009;
  * Feature flags
  */
 // Date-based post archives; set to "true" to enable
-export const FEATURE_DATE_ARCHIVES = false as boolean;
+export const FEATURE_DATE_ARCHIVES = true as boolean;
 
 // Image metadata generation; set to "true" to enable
 export const FEATURE_IMAGE_METADATA = true as boolean;
@@ -93,8 +96,5 @@ export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
 // Map icons are currently under development
 export const FEATURE_MAP_ICONS = false as boolean;
 
-// Generate open graph images
+// Generate open graph images with Satori
 export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;
-
-// Set to "true" to log missing shortcode IDs
-export const FEATURE_SHORTCODES_ERROR_LOG = true as boolean;

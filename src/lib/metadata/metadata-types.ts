@@ -9,7 +9,6 @@ export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	title: string;
 	titleMultilingual: MultilingualContent | undefined;
 	description?: string | undefined;
-	date: Date;
 	url: string;
 	imageId: string | undefined;
 	regionPrimaryId: string | undefined;
@@ -18,5 +17,8 @@ export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	linksCount: number | undefined;
 	wordCount: number | undefined;
 	backlinks: Set<string>;
+	dateCreated: Date;
+	dateUpdated: Date | undefined;
+	dateVisited: Array<Date> | undefined;
 	entryQuality: number;
 }

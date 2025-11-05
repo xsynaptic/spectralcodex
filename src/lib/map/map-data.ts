@@ -127,6 +127,15 @@ function getMapBounds({
 	return;
 }
 
+interface MapDataProps
+	extends MapDataBoundsProps,
+		Omit<
+			MapComponentProps,
+			'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+		> {
+	mapApiBaseUrl?: string | undefined;
+}
+
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
 	featureCollection,
@@ -137,13 +146,7 @@ export function getMapData({
 	limitsBufferPercentage,
 	mapApiBaseUrl,
 	...props
-}: MapDataBoundsProps &
-	Omit<
-		MapComponentProps,
-		'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
-	> & {
-		mapApiBaseUrl?: string | undefined;
-	}) {
+}: MapDataProps) {
 	const mapBounds = getMapBounds({
 		featureCollection,
 		boundsBuffer,

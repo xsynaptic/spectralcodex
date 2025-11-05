@@ -1,7 +1,6 @@
 import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
 import { CACHE_DIR } from 'astro:env/server';
-
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 

@@ -19,7 +19,7 @@ export const regions = defineCollection({
 			description: z.string().optional(),
 			parent: z.string().optional(),
 			links: LinkSchema.array().optional(),
-			dateCreated: DateStringSchema.optional(),
+			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			divisionId: z.union([z.string(), z.string().array()]).nullable(),

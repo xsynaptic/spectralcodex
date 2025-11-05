@@ -22,7 +22,6 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm map
 - multiple featured images for post-like content
 - carousel buttons (or some other hint to indicate that some images can be swiped); this feature is only partly complete
 - better pagination (_e.g._ [here](https://github.com/philnash/astro-pagination))
-- better formatting for sources; currently the mix of languages leads to some awkward output
 
 ### Maps
 
@@ -30,8 +29,9 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm map
 - protomaps self-hosted setup
 - option to convert GeoJSON to something Google Maps (or Google My Maps) can consume, ultimately so anyone can import a map with at least some of the relevant info
 - for locations with a distance query draw a circle with the radius of the query and shade everything outside of it
-- multiple points per location entry (in progress 2025Q2)
 - different geography support (in progress 2024Q4)
+- ruler tool
+- [fuzzy search](https://github.com/m31coding/fuzzy-search)
 
 ### SEO
 
@@ -40,7 +40,6 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm map
 
 ### Extras
 
-- basic analytics with [umami](https://github.com/umami-software/umami); see also [awesome analytics](https://github.com/newTendermint/awesome-analytics)
 - [astro-i18next](https://github.com/yassinedoghri/astro-i18next) or some other i18n solution; currently this project only sketches things out
 - link-rot prevention: scan all official links in content to identify sources that have disappeared from the web
 - auto-archiver: maintain a backup copy of all official links and swap that in by including the archived webpage in the public folder
@@ -61,3 +60,6 @@ Experimental: This site uses custom map icons. To regenerate icons run `pnpm map
 - reading stats/word count (without it being a frontmatter thing, the performance issues are too much)
 - slideshow for the homepage based on content metadata
 - multiple featured images (_e.g._ use arrays to define them and rotate every build)
+- better formatting for sources; currently the mix of languages leads to some awkward output
+- basic analytics with [umami](https://github.com/umami-software/umami); see also [awesome analytics](https://github.com/newTendermint/awesome-analytics)
+- multiple points per location entry (in progress 2025Q2)
