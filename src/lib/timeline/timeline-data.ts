@@ -117,6 +117,13 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 	return timelineDataMap;
 }
 
+function aggregateYearlyData(
+	yearlyData: Map<string, TimelineDataMapMonthlyItem>,
+	category: 'updated' | 'created' | 'visited',
+): Array<ContentMetadataItem> {
+	return [...yearlyData.values()].flatMap((monthData) => [...monthData[category].values()]);
+}
+
 function filterAndSortItems(
 	items: Array<ContentMetadataItem>,
 	qualityThreshold: number,
@@ -133,8 +140,12 @@ function filterAndSortItems(
 		.slice(0, limit);
 }
 
+let timelineData: TimelineData | undefined;
+
 // Convert timeline data into the structures consumed by the three timeline pages
 export async function getTimelineData(): Promise<TimelineData> {
+	if (timelineData) return timelineData;
+
 	const timelineDataMap = await getTimelineDataMap();
 
 	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
@@ -183,18 +194,9 @@ export async function getTimelineData(): Promise<TimelineData> {
 		/**
 		 * Timeline index data
 		 */
-		const allUpdated = [...yearlyData.values()]
-			.map((item) => [...item.updated.values()])
-			.filter((item) => item.length > 0)
-			.flat();
-		const allCreated = [...yearlyData.values()]
-			.map((item) => [...item.created.values()])
-			.filter((item) => item.length > 0)
-			.flat();
-		const allVisited = [...yearlyData.values()]
-			.map((item) => [...item.visited.values()])
-			.filter((item) => item.length > 0)
-			.flat();
+		const allUpdated = aggregateYearlyData(yearlyData, 'updated');
+		const allCreated = aggregateYearlyData(yearlyData, 'created');
+		const allVisited = aggregateYearlyData(yearlyData, 'visited');
 
 		const updated = filterAndSortItems(allUpdated, 3, 12);
 		const created = filterAndSortItems(allCreated, 3, 12);
@@ -219,10 +221,12 @@ export async function getTimelineData(): Promise<TimelineData> {
 
 	const timelineYears = Object.keys(timelineYearlyData).sort((a, b) => b.localeCompare(a));
 
-	return {
+	timelineData = {
 		timelineIndexData,
 		timelineYearlyData,
 		timelineMonthlyData,
 		timelineYears,
 	};
+
+	return timelineData;
 }
