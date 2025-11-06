@@ -27,13 +27,10 @@ const t = getTranslations();
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title"
-			><div class="inline-flex font-normal">
-				{t('timeline.title')}: {timelineMonthlyItem.title}
-			</div></Fragment
-		>
+		<Fragment slot="header-title">{t('timeline.title')}: {timelineMonthlyItem.title}</Fragment>
 		<Fragment slot="header-subtitle"
 			><TimelineNavigation
+				currentMonth={timelineMonthlyItem.month}
 				currentYear={timelineMonthlyItem.year}
 				timelineYears={timelineYears}
 			/></Fragment

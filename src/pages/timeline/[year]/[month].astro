@@ -8,9 +8,9 @@ import { getTimelineData } from '#lib/timeline/timeline-data.ts';
 export const getStaticPaths = (async () => {
 	if (!FEATURE_DATE_ARCHIVES) return [];
 
-	const { timelineMonthly, timelineYears } = await getTimelineData();
+	const { timelineMonthlyData, timelineYears } = await getTimelineData();
 
-	return timelineMonthly.map((timelineMonthlyItem) => ({
+	return timelineMonthlyData.map((timelineMonthlyItem) => ({
 		params: { year: timelineMonthlyItem.year, month: timelineMonthlyItem.month },
 		props: { timelineMonthlyItem, timelineYears },
 	}));

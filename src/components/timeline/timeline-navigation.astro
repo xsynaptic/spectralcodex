@@ -1,18 +1,19 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { TimelineData } from '#lib/timeline/timeline-types.ts';
+import * as R from 'remeda';
 
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
+	currentMonth?: string | undefined;
 	currentYear?: string | undefined;
 	timelineYears: Array<string>;
 }
 
-const { currentYear, timelineYears, ...props } = Astro.props;
+const { currentMonth, currentYear, timelineYears, ...props } = Astro.props;
 ---
 
 {
@@ -29,6 +30,28 @@ const { currentYear, timelineYears, ...props } = Astro.props;
 					)}
 				</DividedItem>
 			))}
+		</div>
+	) : undefined
+}
+{
+	currentYear && currentMonth ? (
+		<div class="flex flex-wrap gap-1">
+			{R.range(1, 13).map((month) => {
+				const monthNumber = month.toString().padStart(2, '0');
+				const monthName = new Date(0, month - 1).toLocaleDateString('default', { month: 'long' });
+
+				return (
+					<DividedItem>
+						{currentMonth === monthNumber ? (
+							<span class="text-primary-600 text-sm font-semibold">{monthName}</span>
+						) : (
+							<Link class="text-sm" href={getSiteUrl('timeline', currentYear, monthNumber)}>
+								{monthName}
+							</Link>
+						)}
+					</DividedItem>
+				);
+			})}
 		</div>
 	) : undefined
 }

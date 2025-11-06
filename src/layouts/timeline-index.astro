@@ -1,9 +1,5 @@
 ---
-import type {
-	ContentMetadataItem,
-	TimelineDataMap,
-	TimelineMonthlyData,
-} from '#lib/types/index.ts';
+import type { TimelineData } from '#lib/timeline/timeline-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -16,28 +12,13 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 interface Props {
-	timelineDataMap: TimelineDataMap;
-	years: Array<string>;
+	timelineIndexData: TimelineData['timelineIndexData'];
+	timelineYears: Array<string>;
 }
 
-const { timelineDataMap, years } = Astro.props;
+const { timelineIndexData, timelineYears } = Astro.props;
 
 const t = getTranslations();
-
-const mergeAndFilter = (
-	yearlyData: Map<string, TimelineMonthlyData>,
-	category: 'updated' | 'created' | 'visited'
-) => {
-	const allItems = new Set<ContentMetadataItem>();
-
-	for (const monthData of yearlyData.values()) {
-		for (const item of monthData[category]) allItems.add(item);
-	}
-
-	return [...allItems]
-		.filter((item) => item.entryQuality >= 3 && item.imageId !== undefined)
-		.sort((a, b) => b.entryQuality - a.entryQuality);
-};
 ---
 
 <MainSite
@@ -49,26 +30,14 @@ const mergeAndFilter = (
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{t('timeline.title')}</Fragment>
-		<Fragment slot="header-subtitle"><TimelineNavigation years={years} /></Fragment>
+		<Fragment slot="header-subtitle"><TimelineNavigation timelineYears={timelineYears} /></Fragment>
 	</ContentHeader>
 	<ContentSection>
 		<ol>
 			{
-				[...timelineDataMap.entries()]
-					.sort(([a], [b]) => Number(b) - Number(a))
+				Object.entries(timelineIndexData)
+					.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
 					.map(([year, yearlyData]) => {
-						const updated = mergeAndFilter(yearlyData, 'updated');
-						const updatedIds = new Set(updated.map((item) => item.id));
-						const created = mergeAndFilter(yearlyData, 'created').filter(
-							(item) => !updatedIds.has(item.id)
-						);
-						const createdIds = new Set(created.map((item) => item.id));
-						const visited = mergeAndFilter(yearlyData, 'visited').filter(
-							(item) => !updatedIds.has(item.id) && !createdIds.has(item.id)
-						);
-
-						if (updated.length === 0 && created.length === 0 && visited.length === 0) return;
-
 						return (
 							<li class="mb-medium flex flex-col gap-1">
 								<h2 class="border-primary-200 mb-1 border-b pb-1 text-sm font-semibold uppercase">
@@ -80,9 +49,9 @@ const mergeAndFilter = (
 										{year}
 									</Link>
 								</h2>
-								<TimelineItem title={t('timeline.monthly.updated')} items={updated} />
-								<TimelineItem title={t('timeline.monthly.created')} items={created} />
-								<TimelineItem title={t('timeline.monthly.visited')} items={visited} />
+								<TimelineItem title={t('timeline.monthly.updated')} items={yearlyData.updated} />
+								<TimelineItem title={t('timeline.monthly.created')} items={yearlyData.created} />
+								<TimelineItem title={t('timeline.monthly.visited')} items={yearlyData.visited} />
 							</li>
 						);
 					})

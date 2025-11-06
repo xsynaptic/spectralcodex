@@ -1,15 +1,13 @@
 ---
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
 import TimelineIndex from '#layouts/timeline-index.astro';
-import { getTimelineDataMap } from '#lib/timeline/timeline-data.ts';
+import { getTimelineData } from '#lib/timeline/timeline-data.ts';
 
-const timelineDataMap = await getTimelineDataMap();
-
-const years = [...timelineDataMap.keys()].sort((a, b) => Number(b) - Number(a));
+const { timelineIndexData, timelineYears } = await getTimelineData();
 
 const data = {
-	timelineDataMap,
-	years,
+	timelineIndexData,
+	timelineYears,
 };
 ---
 
