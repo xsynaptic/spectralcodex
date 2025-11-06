@@ -1,0 +1,27 @@
+---
+import { renderSlot } from '#lib/utils/astro.ts';
+
+interface Props {
+	index: number;
+	total: number;
+	separator?: string | undefined;
+	penultimate?: string | undefined;
+	final?: string | undefined;
+}
+
+const { index, total, separator = ', ', penultimate = 'and ', final = '.' } = Astro.props;
+
+const content = await renderSlot(Astro.slots, 'default');
+
+let suffix = '';
+
+if (index <= total - 2 && total > 2) {
+	suffix = index === total - 2 ? `${separator}${penultimate}` : separator;
+} else if (index === total - 2) {
+	suffix = ` ${penultimate}`;
+} else if (index === total - 1) {
+	suffix = final;
+}
+---
+
+<Fragment set:html={content} />{suffix}
