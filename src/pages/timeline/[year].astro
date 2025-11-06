@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
+import TimelineYearly from '#layouts/timeline-yearly.astro';
+import { getTimelineDataMap } from '#lib/timeline/timeline-data.ts';
+
+export const getStaticPaths = (async () => {
+	if (!FEATURE_DATE_ARCHIVES) return [];
+
+	const timelineItemsMap = await getTimelineDataMap();
+
+	const years = [...timelineItemsMap.keys()].sort((a, b) => Number(b) - Number(a));
+
+	return [...timelineItemsMap.entries()].map(([year, yearlyData]) => ({
+		params: { year },
+		props: {
+			yearlyData,
+			year,
+			years,
+		},
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<TimelineYearly {...Astro.props} />

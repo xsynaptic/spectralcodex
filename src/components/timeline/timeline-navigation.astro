@@ -6,20 +6,25 @@ import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	dateNavAllYears: Array<string>;
+	currentYear?: string | undefined;
+	years: Array<string>;
 }
 
-const { dateNavAllYears, ...props } = Astro.props;
+const { currentYear, years, ...props } = Astro.props;
 ---
 
 {
-	dateNavAllYears.length > 0 ? (
+	years.length > 0 ? (
 		<div class="flex flex-wrap gap-1" {...props}>
-			{dateNavAllYears.map((year) => (
+			{years.map((year) => (
 				<DividedItem>
-					<Link class="text-sm" href={getSiteUrl('timeline', year)}>
-						{year}
-					</Link>
+					{currentYear === year ? (
+						<span class="text-primary-600 text-sm font-semibold">{year}</span>
+					) : (
+						<Link class="text-sm" href={getSiteUrl('timeline', year)}>
+							{year}
+						</Link>
+					)}
 				</DividedItem>
 			))}
 		</div>

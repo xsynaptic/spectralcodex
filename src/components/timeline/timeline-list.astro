@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import DateDisplay from '#components/parts/date-display.astro';
 import Link from '#components/parts/link.astro';
@@ -15,13 +15,13 @@ const { timelineItems, ...props } = Astro.props;
 
 <ul class="mb-small" {...props}>
 	{
-		timelineItems.map(({ title, url, date }) => (
+		timelineItems.map(({ title, url, dateCreated }) => (
 			<li class="mb-small">
 				<h2 class="text-xl font-semibold sm:text-lg">
 					<Link href={url}>{title}</Link>
 				</h2>
 				<div class="text-xs font-medium sm:text-sm">
-					<DateDisplay date={date} />
+					<DateDisplay date={dateCreated} />
 				</div>
 			</li>
 		))

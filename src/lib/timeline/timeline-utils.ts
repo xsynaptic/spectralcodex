@@ -1,48 +1,11 @@
-import type { TimelineSpan } from '#lib/timeline/timeline-types.ts';
+import { getTimelineDataMap } from '#lib/timeline/timeline-data.ts';
 
-const getPaddedDate = (number: number): string => number.toString().padStart(2, '0');
+// Dynamically fetch the latest year from the timeline items map
+// This is used to populate the menu header
+export async function getTimelineLatestYear() {
+	const timelineItemsMap = await getTimelineDataMap();
 
-const getDateParts = (date: Date): { year: string; month: string; day: string } => ({
-	year: date.getFullYear().toString(),
-	// Note: Months are zero-based (0 for January), so we add 1 to get the correct month
-	// Then we pad the value so we always have two digits
-	month: getPaddedDate(date.getUTCMonth() + 1),
-	day: getPaddedDate(date.getUTCDate()),
-});
+	const latestYear = [...timelineItemsMap.keys()].sort((a, b) => Number(b) - Number(a))[0];
 
-// Generate slugs for different combinations of year, month, and day
-export function getTimelineSlugs(date: Date): Array<string> {
-	const { year, month, day } = getDateParts(date);
-
-	return [year, `${year}/${month}`, `${year}/${month}/${day}`];
-}
-
-// Generate a slug representing the year and month for a given date
-export function getTimelineMonthlySlug(date: Date): string {
-	const { year, month } = getDateParts(date);
-
-	return `${year}/${month}`;
-}
-
-// Generate a slug only for the year of a give date
-export function getTimelineYearlySlug(date: Date): string {
-	const { year } = getDateParts(date);
-
-	return year;
-}
-
-export function getTimelineSpan(slug: string): TimelineSpan {
-	const depth = slug.split('/').length - 1;
-
-	switch (depth) {
-		case 2: {
-			return 'day';
-		}
-		case 1: {
-			return 'month';
-		}
-		default: {
-			return 'year';
-		}
-	}
+	return latestYear;
 }

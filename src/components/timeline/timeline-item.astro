@@ -1,0 +1,38 @@
+---
+import type { ContentMetadataItem } from '#lib/types/index.ts';
+
+import Link from '#components/parts/link.astro';
+import TextSeparated from '#components/parts/text-separated.astro';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+
+interface Props {
+	title: string;
+	items: Array<ContentMetadataItem>;
+	count?: number | undefined;
+}
+
+const { title, items, count } = Astro.props;
+
+const showCount = count ? Math.abs(items.length - count) > 10 : false;
+---
+
+{
+	items.length > 0 ? (
+		<div class="text-sm">
+			{title}:
+			{items.map((item, index) => (
+				<TextSeparated
+					index={index}
+					total={items.length}
+					final={
+						showCount && count !== undefined
+							? ` (and ${String(count - items.length)} more).`
+							: undefined
+					}
+				>
+					<Link href={getSiteUrl(item.url)}>{item.title}</Link>
+				</TextSeparated>
+			))}
+		</div>
+	) : undefined
+}

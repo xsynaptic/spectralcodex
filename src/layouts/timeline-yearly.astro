@@ -1,0 +1,88 @@
+---
+import type { TimelineMonthlyData } from '#lib/types/index.ts';
+
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import MainSite from '#components/main/main-site.astro';
+import Link from '#components/parts/link.astro';
+import TimelineItem from '#components/timeline/timeline-item.astro';
+import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoHideSearch } from '#lib/utils/seo.ts';
+
+interface Props {
+	yearlyData: Map<string, TimelineMonthlyData>;
+	year: string;
+	years: Array<string>;
+}
+
+const { yearlyData, year, years } = Astro.props;
+
+const t = getTranslations();
+---
+
+<MainSite
+	meta={{
+		title: t('timeline.title'),
+		description: t('timeline.yearly.description').replace('%s', year),
+		...getSeoHideSearch(true),
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title">{t('timeline.title')}: {year}</Fragment>
+		<Fragment slot="header-subtitle"
+			><TimelineNavigation currentYear={year} years={years} /></Fragment
+		>
+	</ContentHeader>
+	<ContentSection>
+		<ol>
+			{
+				[...yearlyData.entries()]
+					.sort(([a], [b]) => Number(a) - Number(b))
+					.map(([month, monthlyData]) => {
+						const updated = [...monthlyData.updated.values()].filter(
+							(item) => item.entryQuality > 2
+						);
+						const created = [...monthlyData.created.values()].filter(
+							(item) => item.entryQuality > 2
+						);
+						const visited = [...monthlyData.visited.values()].filter(
+							(item) => item.entryQuality > 2
+						);
+
+						if (updated.length === 0 && created.length === 0 && visited.length === 0) return;
+
+						return (
+							<li class="mb-medium flex flex-col gap-1">
+								<h2 class="border-primary-200 mb-1 border-b pb-1 text-sm font-semibold uppercase">
+									<Link
+										class="text-sm font-semibold uppercase"
+										href={getSiteUrl('timeline', year, month)}
+										linkColor="primary"
+									>
+										{monthlyData.title}
+									</Link>
+								</h2>
+								<TimelineItem
+									title={t('timeline.monthly.updated')}
+									items={updated}
+									count={monthlyData.updatedCount}
+								/>
+								<TimelineItem
+									title={t('timeline.monthly.created')}
+									items={created}
+									count={monthlyData.createdCount}
+								/>
+								<TimelineItem
+									title={t('timeline.monthly.visited')}
+									items={visited}
+									count={monthlyData.visitedCount}
+								/>
+							</li>
+						);
+					})
+			}
+		</ol>
+	</ContentSection>
+</MainSite>

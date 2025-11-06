@@ -1,0 +1,64 @@
+---
+import type { TimelineMonthlyData } from '#lib/types/index.ts';
+
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import MainSite from '#components/main/main-site.astro';
+import TimelineItem from '#components/timeline/timeline-item.astro';
+import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSeoHideSearch } from '#lib/utils/seo.ts';
+
+interface Props {
+	monthlyData: TimelineMonthlyData;
+	month: string;
+	year: string;
+	years: Array<string>;
+}
+
+const { month, monthlyData, year, years } = Astro.props;
+
+const updated = [...monthlyData.updated.values()].filter((item) => item.entryQuality > 1);
+const created = [...monthlyData.created.values()].filter((item) => item.entryQuality > 1);
+const visited = [...monthlyData.visited.values()].filter((item) => item.entryQuality > 1);
+
+const t = getTranslations();
+---
+
+<MainSite
+	meta={{
+		title: t('timeline.title'),
+		description: t('timeline.monthly.description').replace('%s', month),
+		...getSeoHideSearch(true),
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title"
+			><div class="inline-flex font-normal">
+				{t('timeline.title')}: {`${monthlyData.title} ${year}`}
+			</div></Fragment
+		>
+		<Fragment slot="header-subtitle"
+			><TimelineNavigation currentYear={year} years={years} /></Fragment
+		>
+	</ContentHeader>
+	<ContentSection>
+		<div class="mb-medium flex flex-col gap-1">
+			<TimelineItem
+				title={t('timeline.monthly.updated')}
+				items={updated}
+				count={monthlyData.updatedCount}
+			/>
+			<TimelineItem
+				title={t('timeline.monthly.created')}
+				items={created}
+				count={monthlyData.createdCount}
+			/>
+			<TimelineItem
+				title={t('timeline.monthly.visited')}
+				items={visited}
+				count={monthlyData.visitedCount}
+			/>
+		</div></ContentSection
+	>
+</MainSite>
