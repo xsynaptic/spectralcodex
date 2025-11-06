@@ -1,4 +1,4 @@
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { LanguageCodeEnum } from '#lib/types/index.ts';
 
 /**
  * Regions

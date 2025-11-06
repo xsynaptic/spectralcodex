@@ -1,6 +1,6 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 

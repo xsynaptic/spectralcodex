@@ -1,10 +1,9 @@
 import { z } from 'zod';
 
+import type { LanguageCode } from '#lib/types/index.ts';
+
 import { StylizedStringSchema } from '#lib/schemas/index.ts';
-
-import type { LanguageCode } from './i18n-types.ts';
-
-import { LanguageCodeEnum } from './i18n-types.ts';
+import { LanguageCodeEnum } from '#lib/types/index.ts';
 
 /**
  * Utility type that creates a multilingual type structure for a given base property name.

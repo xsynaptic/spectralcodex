@@ -1,6 +1,6 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getLocationsByPostsFunction } from '#lib/collections/locations/utils.ts';

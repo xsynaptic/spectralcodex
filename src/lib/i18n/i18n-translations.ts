@@ -1,6 +1,6 @@
-import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
+import type { LanguageCode } from '#lib/types/index.ts';
 
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { LanguageCodeEnum } from '#lib/types/index.ts';
 
 const defaultLanguage = LanguageCodeEnum.English;
 
@@ -106,11 +106,12 @@ const translationStrings = {
 
 		// Timeline
 		'timeline.title': 'Timeline',
-		'timeline.overview.description': 'High level overview of all content on this site by year.',
+		'timeline.index.description': 'High level overview of all content on this site by year.',
 		'timeline.yearly.description': 'Monthly content archives for the year %s.',
 		'timeline.monthly.description': 'Content archives for %s.',
-		'timeline.stats.title': 'Stats',
-		'timeline.stats.images.label': 'Images',
+		'timeline.monthly.created': 'Created',
+		'timeline.monthly.updated': 'Updated',
+		'timeline.monthly.visited': 'Visited',
 
 		// Pagination
 		'pagination.next': 'Next',

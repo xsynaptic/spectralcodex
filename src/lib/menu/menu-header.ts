@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import type { MenuItem } from '#lib/menu/menu-types.ts';
+import type { MenuItem } from '#lib/types/index.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
@@ -8,6 +8,7 @@ import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getTimelineLatestYear } from '#lib/timeline/timeline-utils.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -93,6 +94,8 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, slug: 'themes' }));
 
+	const timelineLatestYear = await getTimelineLatestYear();
+
 	return [
 		{
 			title: t('collection.posts.labelPlural'),
@@ -121,11 +124,11 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 			title: t('collection.ephemera.labelPlural'),
 			url: getSiteUrl('ephemera'),
 		},
-		...(FEATURE_DATE_ARCHIVES
+		...(FEATURE_DATE_ARCHIVES && timelineLatestYear
 			? [
 					{
 						title: t('menu.timeline.label'),
-						url: getSiteUrl('timeline'),
+						url: getSiteUrl('timeline', timelineLatestYear),
 					},
 				]
 			: []),

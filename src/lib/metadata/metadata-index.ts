@@ -3,7 +3,7 @@ import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:c
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
 import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
