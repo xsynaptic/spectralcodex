@@ -60,6 +60,39 @@ function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData:
 	return yearMap.get(dateUpdatedData.month)!;
 }
 
+// Select a highlight for the month
+function getMonthlyHighlight(
+	monthData: TimelineDataMapMonthlyItem,
+): ContentMetadataItem | undefined {
+	// Gather all items from the month that have images and meet minimum quality
+	const allItems = [
+		...new Set([
+			...monthData.created.values(),
+			...monthData.updated.values(),
+			...monthData.visited.values(),
+		]),
+	].filter((item) => item.imageId && item.entryQuality >= 2);
+
+	if (allItems.length === 0) return undefined;
+
+	// Group by quality level
+	const highlightQualityMap = new Map<number, Array<ContentMetadataItem>>();
+
+	for (const item of allItems) {
+		if (!highlightQualityMap.has(item.entryQuality)) {
+			highlightQualityMap.set(item.entryQuality, []);
+		}
+		highlightQualityMap.get(item.entryQuality)!.push(item);
+	}
+
+	// Get the highest quality level
+	const highestQuality = Math.max(...highlightQualityMap.keys());
+	const highlightCandidates = highlightQualityMap.get(highestQuality)!;
+
+	// Randomly select one from the top quality tier
+	return highlightCandidates[Math.floor(Math.random() * highlightCandidates.length)];
+}
+
 // Generate a map of timeline data from the content metadata index
 async function getTimelineDataMap(): Promise<TimelineDataMap> {
 	const contentMetadataIndex = await getContentMetadataIndex();
@@ -110,7 +143,8 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 			monthData.updatedCount = monthData.updated.size;
 			monthData.visitedCount = monthData.visited.size;
 
-			// TODO: cycle through timelineItemsMap by year and month and assign a highlight item if any items qualify
+			// Select a highlight item for the month
+			monthData.highlight = getMonthlyHighlight(monthData);
 		}
 	}
 
@@ -151,11 +185,14 @@ export async function getTimelineData(): Promise<TimelineData> {
 	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
 	const timelineYearlyData: TimelineData['timelineYearlyData'] = {};
 	const timelineIndexData: TimelineData['timelineIndexData'] = {};
+	const timelineMonths: Record<string, Array<string>> = {};
 
 	for (const [year, yearlyData] of timelineDataMap.entries()) {
 		/**
 		 * Timeline monthly data
 		 */
+		if (!timelineMonths[year]) timelineMonths[year] = [];
+
 		for (const monthlyData of yearlyData.values()) {
 			const updated = filterAndSortItems([...monthlyData.updated.values()], 1, 40);
 			const created = filterAndSortItems([...monthlyData.created.values()], 1, 40);
@@ -169,6 +206,7 @@ export async function getTimelineData(): Promise<TimelineData> {
 				updated,
 				visited,
 			});
+			timelineMonths[year].push(monthlyData.month);
 		}
 
 		/**
@@ -226,6 +264,7 @@ export async function getTimelineData(): Promise<TimelineData> {
 		timelineYearlyData,
 		timelineMonthlyData,
 		timelineYears,
+		timelineMonths,
 	};
 
 	return timelineData;

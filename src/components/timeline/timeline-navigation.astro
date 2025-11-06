@@ -1,32 +1,29 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import * as R from 'remeda';
-
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	currentMonth?: string | undefined;
 	currentYear?: string | undefined;
+	currentMonth?: string | undefined;
 	timelineYears: Array<string>;
+	timelineMonths?: Array<string> | undefined;
 }
 
-const { currentMonth, currentYear, timelineYears, ...props } = Astro.props;
+const { currentYear, currentMonth, timelineYears, timelineMonths, ...props } = Astro.props;
 ---
 
 {
 	timelineYears.length > 0 ? (
-		<div class="flex flex-wrap gap-1" {...props}>
+		<div class="text-primary-500 dark:text-primary-400 flex flex-wrap gap-1 text-sm" {...props}>
 			{timelineYears.map((timelineYear) => (
 				<DividedItem>
 					{currentYear === timelineYear ? (
-						<span class="text-primary-600 text-sm font-semibold">{timelineYear}</span>
+						<span class="text-primary-600 font-semibold">{timelineYear}</span>
 					) : (
-						<Link class="text-sm" href={getSiteUrl('timeline', timelineYear)}>
-							{timelineYear}
-						</Link>
+						<Link href={getSiteUrl('timeline', timelineYear)}>{timelineYear}</Link>
 					)}
 				</DividedItem>
 			))}
@@ -34,24 +31,25 @@ const { currentMonth, currentYear, timelineYears, ...props } = Astro.props;
 	) : undefined
 }
 {
-	currentYear && currentMonth ? (
-		<div class="flex flex-wrap gap-1">
-			{R.range(1, 13).map((month) => {
-				const monthNumber = month.toString().padStart(2, '0');
-				const monthName = new Date(0, month - 1).toLocaleDateString('default', { month: 'long' });
+	currentYear && currentMonth && timelineMonths && timelineMonths.length > 0 ? (
+		<div class="text-primary-500 dark:text-primary-400 flex flex-wrap gap-1 text-sm">
+			{timelineMonths
+				.sort((monthA, monthB) => monthA.localeCompare(monthB))
+				.map((monthNumber) => {
+					const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('default', {
+						month: 'long',
+					});
 
-				return (
-					<DividedItem>
-						{currentMonth === monthNumber ? (
-							<span class="text-primary-600 text-sm font-semibold">{monthName}</span>
-						) : (
-							<Link class="text-sm" href={getSiteUrl('timeline', currentYear, monthNumber)}>
-								{monthName}
-							</Link>
-						)}
-					</DividedItem>
-				);
-			})}
+					return (
+						<DividedItem>
+							{currentMonth === monthNumber ? (
+								<span class="text-primary-600 font-semibold">{monthName}</span>
+							) : (
+								<Link href={getSiteUrl('timeline', currentYear, monthNumber)}>{monthName}</Link>
+							)}
+						</DividedItem>
+					);
+				})}
 		</div>
 	) : undefined
 }

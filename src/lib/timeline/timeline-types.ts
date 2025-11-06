@@ -25,4 +25,5 @@ export interface TimelineData {
 	timelineMonthlyData: Array<TimelineMonthlyItem>;
 	timelineYearlyData: Record<string, Array<TimelineMonthlyItem>>;
 	timelineYears: Array<string>;
+	timelineMonths: Record<string, Array<string>>;
 }

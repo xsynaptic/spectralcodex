@@ -3,7 +3,9 @@ import type { TimelineMonthlyItem } from '#lib/timeline/timeline-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
+import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
+import Container from '#components/parts/container.astro';
 import TimelineItem from '#components/timeline/timeline-item.astro';
 import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -12,9 +14,12 @@ import { getSeoHideSearch } from '#lib/utils/seo.ts';
 interface Props {
 	timelineMonthlyItem: TimelineMonthlyItem;
 	timelineYears: Array<string>;
+	timelineMonths?: Array<string> | undefined;
 }
 
-const { timelineMonthlyItem, timelineYears } = Astro.props;
+const { timelineMonthlyItem, timelineYears, timelineMonths } = Astro.props;
+
+const imageHeroId = timelineMonthlyItem.highlight?.imageId;
 
 const t = getTranslations();
 ---
@@ -25,17 +30,45 @@ const t = getTranslations();
 		description: t('timeline.monthly.description').replace('%s', timelineMonthlyItem.title),
 		...getSeoHideSearch(true),
 	}}
+	hasHeroImage={!!imageHeroId}
 >
-	<ContentHeader>
-		<Fragment slot="header-title">{t('timeline.title')}: {timelineMonthlyItem.title}</Fragment>
-		<Fragment slot="header-subtitle"
-			><TimelineNavigation
-				currentMonth={timelineMonthlyItem.month}
-				currentYear={timelineMonthlyItem.year}
-				timelineYears={timelineYears}
-			/></Fragment
-		>
-	</ContentHeader>
+	{
+		imageHeroId ? (
+			<ImageHero imageId={imageHeroId} alt={timelineMonthlyItem.title} class="sm:mb-small">
+				<ContentHeader showFeatured={true}>
+					<Fragment slot="header-title">
+						{t('timeline.title')}: {timelineMonthlyItem.title}
+					</Fragment>
+				</ContentHeader>
+			</ImageHero>
+		) : (
+			<ContentHeader>
+				<Fragment slot="header-title">
+					{t('timeline.title')}: {timelineMonthlyItem.title}
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<TimelineNavigation
+						currentYear={timelineMonthlyItem.year}
+						currentMonth={timelineMonthlyItem.month}
+						timelineYears={timelineYears}
+						timelineMonths={timelineMonths}
+					/>
+				</Fragment>
+			</ContentHeader>
+		)
+	}
+	{
+		imageHeroId ? (
+			<Container class="flex gap-1 flex-col mb-small" data-pagefind-ignore>
+				<TimelineNavigation
+					currentMonth={timelineMonthlyItem.month}
+					currentYear={timelineMonthlyItem.year}
+					timelineYears={timelineYears}
+					timelineMonths={timelineMonths}
+				/>
+			</Container>
+		) : undefined
+	}
 	<ContentSection>
 		<div class="mb-medium flex flex-col gap-1">
 			<TimelineItem
