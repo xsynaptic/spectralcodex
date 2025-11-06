@@ -53,21 +53,3 @@ export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
 	dateVisited: Array<Date> | undefined;
 	entryQuality: number;
 }
-
-/**
- * Timeline
- */
-export interface TimelineMonthlyData {
-	title: string;
-	highlight: ContentMetadataItem | undefined;
-	posted: Set<ContentMetadataItem>;
-	postedCount: number;
-	created: Set<ContentMetadataItem>;
-	createdCount: number;
-	updated: Set<ContentMetadataItem>;
-	updatedCount: number;
-	visited: Set<ContentMetadataItem>;
-	visitedCount: number;
-}
-
-export type TimelineDataMap = Map<string, Map<string, TimelineMonthlyData>>;

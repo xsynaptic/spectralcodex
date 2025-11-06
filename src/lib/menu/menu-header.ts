@@ -8,7 +8,7 @@ import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getTimelineLatestYear } from '#lib/timeline/timeline-utils.ts';
+import { getTimelineData } from '#lib/timeline/timeline-data.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -94,7 +94,9 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, slug: 'themes' }));
 
-	const timelineLatestYear = await getTimelineLatestYear();
+	const timelineData = await getTimelineData();
+
+	const timelineLatestYear = timelineData.timelineYears.at(0);
 
 	return [
 		{

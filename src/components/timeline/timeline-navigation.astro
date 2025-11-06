@@ -1,28 +1,30 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import type { TimelineData } from '#lib/timeline/timeline-types.ts';
+
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	currentYear?: string | undefined;
-	years: Array<string>;
+	timelineYears: Array<string>;
 }
 
-const { currentYear, years, ...props } = Astro.props;
+const { currentYear, timelineYears, ...props } = Astro.props;
 ---
 
 {
-	years.length > 0 ? (
+	timelineYears.length > 0 ? (
 		<div class="flex flex-wrap gap-1" {...props}>
-			{years.map((year) => (
+			{timelineYears.map((timelineYear) => (
 				<DividedItem>
-					{currentYear === year ? (
-						<span class="text-primary-600 text-sm font-semibold">{year}</span>
+					{currentYear === timelineYear ? (
+						<span class="text-primary-600 text-sm font-semibold">{timelineYear}</span>
 					) : (
-						<Link class="text-sm" href={getSiteUrl('timeline', year)}>
-							{year}
+						<Link class="text-sm" href={getSiteUrl('timeline', timelineYear)}>
+							{timelineYear}
 						</Link>
 					)}
 				</DividedItem>

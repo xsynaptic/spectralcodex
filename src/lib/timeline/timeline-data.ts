@@ -1,4 +1,4 @@
-import type { TimelineDataMap } from '#lib/types/index.ts';
+import type { TimelineData, TimelineDataMap } from '#lib/timeline/timeline-types.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
@@ -21,19 +21,21 @@ function getDateData(date: Date): TimelineDateData {
 	};
 }
 
-function getTimelineMonthData(
-	timelineItemsMap: TimelineDataMap,
-	dateUpdatedData: TimelineDateData,
-) {
-	if (!timelineItemsMap.has(dateUpdatedData.year)) {
-		timelineItemsMap.set(dateUpdatedData.year, new Map());
+function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData: TimelineDateData) {
+	if (!timelineDataMap.has(dateUpdatedData.year)) {
+		timelineDataMap.set(dateUpdatedData.year, new Map());
 	}
 
-	const yearMap = timelineItemsMap.get(dateUpdatedData.year)!;
+	const yearMap = timelineDataMap.get(dateUpdatedData.year)!;
 
 	if (!yearMap.has(dateUpdatedData.month)) {
+		const monthName = dateUpdatedData.date.toLocaleDateString('default', { month: 'long' });
+
 		yearMap.set(dateUpdatedData.month, {
-			title: dateUpdatedData.date.toLocaleDateString('default', { month: 'long' }),
+			year: dateUpdatedData.year,
+			month: dateUpdatedData.month,
+			monthName,
+			title: `${monthName} ${dateUpdatedData.year}`,
 			highlight: undefined,
 			posted: new Set(),
 			postedCount: 0,
@@ -49,11 +51,11 @@ function getTimelineMonthData(
 	return yearMap.get(dateUpdatedData.month)!;
 }
 
-const timelineItemsMap: TimelineDataMap = new Map();
+const timelineDataMap: TimelineDataMap = new Map();
 
 export async function getTimelineDataMap() {
-	if (timelineItemsMap.size > 0) {
-		return timelineItemsMap;
+	if (timelineDataMap.size > 0) {
+		return timelineDataMap;
 	}
 
 	const contentMetadataIndex = await getContentMetadataIndex();
@@ -63,12 +65,12 @@ export async function getTimelineDataMap() {
 		const dateCreatedData = getDateData(item.dateCreated);
 
 		if (dateUpdatedData && dateUpdatedData.slug !== dateCreatedData.slug) {
-			const updatedMonthData = getTimelineMonthData(timelineItemsMap, dateUpdatedData);
+			const updatedMonthData = getTimelineMonthData(timelineDataMap, dateUpdatedData);
 
 			updatedMonthData.updated.add(item);
 		}
 
-		const createdMonthData = getTimelineMonthData(timelineItemsMap, dateCreatedData);
+		const createdMonthData = getTimelineMonthData(timelineDataMap, dateCreatedData);
 
 		createdMonthData.created.add(item);
 
@@ -76,16 +78,16 @@ export async function getTimelineDataMap() {
 		if (item.dateVisited) {
 			for (const dateVisited of item.dateVisited) {
 				const dateVisitedData = getDateData(dateVisited);
-				const visitedMonthData = getTimelineMonthData(timelineItemsMap, dateVisitedData);
+				const visitedMonthData = getTimelineMonthData(timelineDataMap, dateVisitedData);
 
 				visitedMonthData.visited.add(item);
 			}
 		}
 	}
 
-	for (const year of timelineItemsMap.keys()) {
-		for (const month of timelineItemsMap.get(year)!.keys()) {
-			const monthData = timelineItemsMap.get(year)!.get(month)!;
+	for (const year of timelineDataMap.keys()) {
+		for (const month of timelineDataMap.get(year)!.keys()) {
+			const monthData = timelineDataMap.get(year)!.get(month)!;
 
 			monthData.postedCount = monthData.posted.size;
 			monthData.createdCount = monthData.created.size;
@@ -96,5 +98,75 @@ export async function getTimelineDataMap() {
 		}
 	}
 
-	return timelineItemsMap;
+	return timelineDataMap;
+}
+
+export async function getTimelineData(): Promise<TimelineData> {
+	const timelineDataMap = await getTimelineDataMap();
+
+	const timelineYears = [...timelineDataMap.keys()].sort((a, b) => Number(b) - Number(a));
+
+	const timelineMonthly: TimelineData['timelineMonthly'] = [];
+	const timelineYearly: TimelineData['timelineYearly'] = {};
+	const timelineIndex: TimelineData['timelineIndex'] = {};
+
+	for (const [year, yearlyData] of timelineDataMap.entries()) {
+		for (const [, monthlyData] of yearlyData.entries()) {
+			const updated = [...monthlyData.updated.values()].filter((item) => item.entryQuality > 1);
+			const created = [...monthlyData.created.values()].filter((item) => item.entryQuality > 1);
+			const visited = [...monthlyData.visited.values()].filter((item) => item.entryQuality > 1);
+
+			if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
+
+			timelineMonthly.push({
+				...monthlyData,
+				posted: [...monthlyData.posted.values()],
+				created,
+				updated,
+				visited,
+			});
+		}
+
+		for (const [, monthlyData] of yearlyData.entries()) {
+			const updated = [...monthlyData.updated.values()].filter((item) => item.entryQuality > 2);
+			const created = [...monthlyData.created.values()].filter((item) => item.entryQuality > 2);
+			const visited = [...monthlyData.visited.values()].filter((item) => item.entryQuality > 2);
+
+			if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
+
+			if (!timelineYearly[year]) timelineYearly[year] = [];
+
+			timelineYearly[year].push({
+				...monthlyData,
+				posted: [...monthlyData.posted.values()],
+				created,
+				updated,
+				visited,
+			});
+		}
+
+		for (const [, monthlyData] of yearlyData.entries()) {
+			const updated = [...monthlyData.updated.values()].filter((item) => item.entryQuality > 3);
+			const created = [...monthlyData.created.values()].filter((item) => item.entryQuality > 3);
+			const visited = [...monthlyData.visited.values()].filter((item) => item.entryQuality > 3);
+
+			if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
+
+			// TODO: add to timelineIndex; currently this only sets the last value
+			timelineIndex[year] = {
+				...monthlyData,
+				posted: [...monthlyData.posted.values()],
+				created,
+				updated,
+				visited,
+			};
+		}
+	}
+
+	return {
+		timelineIndex,
+		timelineYearly,
+		timelineMonthly,
+		timelineYears,
+	};
 }

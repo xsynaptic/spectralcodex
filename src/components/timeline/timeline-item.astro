@@ -9,30 +9,36 @@ interface Props {
 	title: string;
 	items: Array<ContentMetadataItem>;
 	count?: number | undefined;
+	countThreshold?: number | undefined;
 }
 
-const { title, items, count } = Astro.props;
+const { title, items, count, countThreshold = 10 } = Astro.props;
 
-const showCount = count ? Math.abs(items.length - count) > 10 : false;
+const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
+
+const numberFormatter = Intl.NumberFormat('en', { maximumFractionDigits: 0 });
+
+const countText =
+	showCount && count
+		? { title: `${numberFormatter.format(count - items.length)} more`, url: undefined }
+		: undefined;
 ---
 
 {
 	items.length > 0 ? (
 		<div class="text-sm">
 			{title}:
-			{items.map((item, index) => (
-				<TextSeparated
-					index={index}
-					total={items.length}
-					final={
-						showCount && count !== undefined
-							? ` (and ${String(count - items.length)} more).`
-							: undefined
-					}
-				>
-					<Link href={getSiteUrl(item.url)}>{item.title}</Link>
-				</TextSeparated>
-			))}
+			{countText
+				? [...items, countText].map((item, index) => (
+						<TextSeparated index={index} total={items.length + 1}>
+							{item.url ? <Link href={getSiteUrl(item.url)}>{item.title}</Link> : item.title}
+						</TextSeparated>
+					))
+				: items.map((item, index) => (
+						<TextSeparated index={index} total={items.length}>
+							<Link href={getSiteUrl(item.url)}>{item.title}</Link>
+						</TextSeparated>
+					))}
 		</div>
 	) : undefined
 }

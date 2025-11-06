@@ -1,5 +1,5 @@
 ---
-import type { TimelineMonthlyData } from '#lib/types/index.ts';
+import type { TimelineMonthlyItem } from '#lib/timeline/timeline-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -10,17 +10,11 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 interface Props {
-	monthlyData: TimelineMonthlyData;
-	month: string;
-	year: string;
-	years: Array<string>;
+	timelineMonthlyItem: TimelineMonthlyItem;
+	timelineYears: Array<string>;
 }
 
-const { month, monthlyData, year, years } = Astro.props;
-
-const updated = [...monthlyData.updated.values()].filter((item) => item.entryQuality > 1);
-const created = [...monthlyData.created.values()].filter((item) => item.entryQuality > 1);
-const visited = [...monthlyData.visited.values()].filter((item) => item.entryQuality > 1);
+const { timelineMonthlyItem, timelineYears } = Astro.props;
 
 const t = getTranslations();
 ---
@@ -28,36 +22,39 @@ const t = getTranslations();
 <MainSite
 	meta={{
 		title: t('timeline.title'),
-		description: t('timeline.monthly.description').replace('%s', month),
+		description: t('timeline.monthly.description').replace('%s', timelineMonthlyItem.title),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
 		<Fragment slot="header-title"
 			><div class="inline-flex font-normal">
-				{t('timeline.title')}: {`${monthlyData.title} ${year}`}
+				{t('timeline.title')}: {timelineMonthlyItem.title}
 			</div></Fragment
 		>
 		<Fragment slot="header-subtitle"
-			><TimelineNavigation currentYear={year} years={years} /></Fragment
+			><TimelineNavigation
+				currentYear={timelineMonthlyItem.year}
+				timelineYears={timelineYears}
+			/></Fragment
 		>
 	</ContentHeader>
 	<ContentSection>
 		<div class="mb-medium flex flex-col gap-1">
 			<TimelineItem
 				title={t('timeline.monthly.updated')}
-				items={updated}
-				count={monthlyData.updatedCount}
+				items={timelineMonthlyItem.updated}
+				count={timelineMonthlyItem.updatedCount}
 			/>
 			<TimelineItem
 				title={t('timeline.monthly.created')}
-				items={created}
-				count={monthlyData.createdCount}
+				items={timelineMonthlyItem.created}
+				count={timelineMonthlyItem.createdCount}
 			/>
 			<TimelineItem
 				title={t('timeline.monthly.visited')}
-				items={visited}
-				count={monthlyData.visitedCount}
+				items={timelineMonthlyItem.visited}
+				count={timelineMonthlyItem.visitedCount}
 			/>
 		</div></ContentSection
 	>
