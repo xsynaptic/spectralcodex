@@ -10,8 +10,6 @@ export const getStaticPaths = (async () => {
 
 	const { timelineYearlyData, timelineYears } = await getTimelineData();
 
-	if (!timelineYearlyData) return [];
-
 	return Object.entries(timelineYearlyData).map(([timelineYear, timelineMonthlyData]) => ({
 		params: { year: timelineYear },
 		props: {

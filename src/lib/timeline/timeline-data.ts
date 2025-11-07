@@ -13,21 +13,16 @@ type TimelineDataMap = Map<string, Map<string, TimelineDataMapMonthlyItem>>;
 
 interface TimelineDateData {
 	date: Date;
-	slug: string;
 	month: string;
 	year: string;
 }
 
 // Standardize date objects for use in the timeline data map
 function getDateData(date: Date): TimelineDateData {
-	const month = String(date.getMonth() + 1).padStart(2, '0');
-	const year = String(date.getFullYear()).padStart(4, '0');
-
 	return {
 		date,
-		slug: `${year}/${month}`,
-		month,
-		year,
+		month: String(date.getMonth() + 1).padStart(2, '0'),
+		year: String(date.getFullYear()).padStart(4, '0'),
 	};
 }
 
@@ -66,11 +61,9 @@ function getMonthlyHighlight(
 ): ContentMetadataItem | undefined {
 	// Gather all items from the month that have images and meet minimum quality
 	const allItems = [
-		...new Set([
-			...monthData.created.values(),
-			...monthData.updated.values(),
-			...monthData.visited.values(),
-		]),
+		...monthData.created.values(),
+		...monthData.updated.values(),
+		...monthData.visited.values(),
 	].filter((item) => item.imageId && item.entryQuality >= 2);
 
 	if (allItems.length === 0) return undefined;
@@ -105,7 +98,11 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 		const dateUpdatedData = item.dateUpdated ? getDateData(item.dateUpdated) : undefined;
 		const dateCreatedData = getDateData(item.dateCreated);
 
-		if (dateUpdatedData && dateUpdatedData.slug !== dateCreatedData.slug) {
+		if (
+			dateUpdatedData &&
+			dateUpdatedData.year !== dateCreatedData.year &&
+			dateUpdatedData.month !== dateCreatedData.month
+		) {
 			const updatedMonthData = getTimelineMonthData(timelineDataMap, dateUpdatedData);
 
 			updatedMonthData.updated.add(item);
@@ -119,9 +116,9 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 		if (item.dateVisited) {
 			const yearsVisited = new Set<string>();
 
-			const dateVisitedData = item.dateVisited.sort((a, b) => b.getTime() - a.getTime());
+			const dateVisitedArray = item.dateVisited.sort((a, b) => b.getTime() - a.getTime());
 
-			for (const dateVisited of dateVisitedData) {
+			for (const dateVisited of dateVisitedArray) {
 				const dateVisitedData = getDateData(dateVisited);
 				const visitedMonthData = getTimelineMonthData(timelineDataMap, dateVisitedData);
 
@@ -130,21 +127,18 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 					visitedMonthData.visited.add(item);
 				}
 			}
-			yearsVisited.clear();
 		}
 	}
 
-	for (const year of timelineDataMap.keys()) {
-		for (const month of timelineDataMap.get(year)!.keys()) {
-			const monthData = timelineDataMap.get(year)!.get(month)!;
-
+	for (const yearlyData of timelineDataMap.values()) {
+		for (const monthlyData of yearlyData.values()) {
 			// Stash total counts for later reference
-			monthData.createdCount = monthData.created.size;
-			monthData.updatedCount = monthData.updated.size;
-			monthData.visitedCount = monthData.visited.size;
+			monthlyData.createdCount = monthlyData.created.size;
+			monthlyData.updatedCount = monthlyData.updated.size;
+			monthlyData.visitedCount = monthlyData.visited.size;
 
 			// Select a highlight item for the month
-			monthData.highlight = getMonthlyHighlight(monthData);
+			monthlyData.highlight = getMonthlyHighlight(monthlyData);
 		}
 	}
 
@@ -174,6 +168,33 @@ function filterAndSortItems(
 		.slice(0, limit);
 }
 
+function getTimelineMonthlyData(monthlyData: TimelineDataMapMonthlyItem) {
+	const monthlyUpdated = filterAndSortItems([...monthlyData.updated.values()], 1, 40);
+	const monthlyCreated = filterAndSortItems([...monthlyData.created.values()], 1, 40);
+	const monthlyVisited = filterAndSortItems([...monthlyData.visited.values()], 1, 40);
+
+	const yearlyUpdated = filterAndSortItems([...monthlyData.updated.values()], 2, 20);
+	const yearlyCreated = filterAndSortItems([...monthlyData.created.values()], 2, 20);
+	const yearlyVisited = filterAndSortItems([...monthlyData.visited.values()], 2, 20);
+
+	return {
+		monthly: {
+			updated: monthlyUpdated,
+			created: monthlyCreated,
+			visited: monthlyVisited,
+			isEmpty:
+				monthlyUpdated.length === 0 && monthlyCreated.length === 0 && monthlyVisited.length === 0,
+		},
+		yearly: {
+			updated: yearlyUpdated,
+			created: yearlyCreated,
+			visited: yearlyVisited,
+			isEmpty:
+				yearlyUpdated.length === 0 && yearlyCreated.length === 0 && yearlyVisited.length === 0,
+		},
+	};
+}
+
 let timelineData: TimelineData | undefined;
 
 // Convert timeline data into the structures consumed by the three timeline pages
@@ -185,48 +206,36 @@ export async function getTimelineData(): Promise<TimelineData> {
 	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
 	const timelineYearlyData: TimelineData['timelineYearlyData'] = {};
 	const timelineIndexData: TimelineData['timelineIndexData'] = {};
+
+	// This tracks the months for each year with data available on the monthly page
 	const timelineMonths: Record<string, Array<string>> = {};
 
 	for (const [year, yearlyData] of timelineDataMap.entries()) {
-		/**
-		 * Timeline monthly data
-		 */
 		if (!timelineMonths[year]) timelineMonths[year] = [];
 
 		for (const monthlyData of yearlyData.values()) {
-			const updated = filterAndSortItems([...monthlyData.updated.values()], 1, 40);
-			const created = filterAndSortItems([...monthlyData.created.values()], 1, 40);
-			const visited = filterAndSortItems([...monthlyData.visited.values()], 1, 40);
+			const { monthly, yearly } = getTimelineMonthlyData(monthlyData);
 
-			if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
+			if (!monthly.isEmpty) {
+				timelineMonthlyData.push({
+					...monthlyData,
+					created: monthly.created,
+					updated: monthly.updated,
+					visited: monthly.visited,
+				});
+				timelineMonths[year].push(monthlyData.month);
+			}
 
-			timelineMonthlyData.push({
-				...monthlyData,
-				created,
-				updated,
-				visited,
-			});
-			timelineMonths[year].push(monthlyData.month);
-		}
+			if (!yearly.isEmpty) {
+				if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
 
-		/**
-		 * Timeline yearly data
-		 */
-		for (const monthlyData of yearlyData.values()) {
-			const updated = filterAndSortItems([...monthlyData.updated.values()], 2, 20);
-			const created = filterAndSortItems([...monthlyData.created.values()], 2, 20);
-			const visited = filterAndSortItems([...monthlyData.visited.values()], 2, 20);
-
-			if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
-
-			if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
-
-			timelineYearlyData[year].push({
-				...monthlyData,
-				created,
-				updated,
-				visited,
-			});
+				timelineYearlyData[year].push({
+					...monthlyData,
+					created: yearly.created,
+					updated: yearly.updated,
+					visited: yearly.visited,
+				});
+			}
 		}
 
 		/**

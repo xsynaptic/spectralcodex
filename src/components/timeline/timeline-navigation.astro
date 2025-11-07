@@ -6,50 +6,101 @@ import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
 	currentYear?: string | undefined;
 	currentMonth?: string | undefined;
 	timelineYears: Array<string>;
 	timelineMonths?: Array<string> | undefined;
+	isHeroImage?: boolean | undefined;
 }
 
-const { currentYear, currentMonth, timelineYears, timelineMonths, ...props } = Astro.props;
+const {
+	class: className,
+	currentYear,
+	currentMonth,
+	timelineYears,
+	timelineMonths,
+	isHeroImage = false,
+	...props
+} = Astro.props;
 ---
 
 {
 	timelineYears.length > 0 ? (
-		<div class="text-primary-500 dark:text-primary-400 flex flex-wrap gap-1 text-sm" {...props}>
-			{timelineYears.map((timelineYear) => (
-				<DividedItem>
-					{currentYear === timelineYear ? (
-						<span class="text-primary-600 font-semibold">{timelineYear}</span>
-					) : (
-						<Link href={getSiteUrl('timeline', timelineYear)}>{timelineYear}</Link>
-					)}
-				</DividedItem>
-			))}
-		</div>
-	) : undefined
-}
-{
-	currentYear && currentMonth && timelineMonths && timelineMonths.length > 0 ? (
-		<div class="text-primary-500 dark:text-primary-400 flex flex-wrap gap-1 text-sm">
-			{timelineMonths
-				.sort((monthA, monthB) => monthA.localeCompare(monthB))
-				.map((monthNumber) => {
-					const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('default', {
-						month: 'long',
-					});
+		<div
+			class:list={[
+				'text-primary-500 dark:text-primary-400 flex flex-col gap-1 text-sm',
+				isHeroImage ? 'mb-medium sm:mb-0' : '',
+				className,
+			]}
+			{...props}
+		>
+			<div
+				class:list={[
+					'flex gap-1',
+					isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-auto' : 'flex-wrap',
+				]}
+			>
+				{timelineYears.map((timelineYear) => (
+					<DividedItem dividerColor={isHeroImage ? 'hero' : 'default'}>
+						{currentYear === timelineYear ? (
+							<span
+								class:list={[
+									'text-primary-600 font-semibold',
+									isHeroImage ? 'sm:text-highlight-200' : '',
+								]}
+							>
+								{timelineYear}
+							</span>
+						) : (
+							<Link
+								href={getSiteUrl('timeline', timelineYear)}
+								linkColor={isHeroImage ? 'highlight-featured' : 'accent'}
+							>
+								{timelineYear}
+							</Link>
+						)}
+					</DividedItem>
+				))}
+			</div>
+			{currentYear && currentMonth && timelineMonths && timelineMonths.length > 0 ? (
+				<div
+					class:list={[
+						'flex gap-1',
+						isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-auto' : 'flex-wrap',
+					]}
+				>
+					{timelineMonths
+						.sort((monthA, monthB) => monthA.localeCompare(monthB))
+						.map((monthNumber) => {
+							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('default', {
+								month: 'long',
+							});
 
-					return (
-						<DividedItem>
-							{currentMonth === monthNumber ? (
-								<span class="text-primary-600 font-semibold">{monthName}</span>
-							) : (
-								<Link href={getSiteUrl('timeline', currentYear, monthNumber)}>{monthName}</Link>
-							)}
-						</DividedItem>
-					);
-				})}
+							return (
+								<DividedItem dividerColor={isHeroImage ? 'hero' : 'default'}>
+									{currentMonth === monthNumber ? (
+										<span
+											class:list={[
+												'text-primary-600 font-semibold',
+												isHeroImage ? 'sm:text-accent-200' : '',
+											]}
+										>
+											{monthName}
+										</span>
+									) : (
+										<Link
+											href={getSiteUrl('timeline', currentYear, monthNumber)}
+											linkColor={isHeroImage ? 'accent-featured' : 'accent'}
+										>
+											{monthName}
+										</Link>
+									)}
+								</DividedItem>
+							);
+						})}
+				</div>
+			) : undefined}
 		</div>
 	) : undefined
 }
