@@ -152,46 +152,51 @@ function aggregateYearlyData(
 	return [...yearlyData.values()].flatMap((monthData) => [...monthData[category].values()]);
 }
 
+interface TimelineFilterOptions {
+	quality: number;
+	limit: number;
+}
+
 function filterAndSortItems(
 	items: Array<ContentMetadataItem>,
-	qualityThreshold: number,
-	limit: number,
+	options: TimelineFilterOptions,
 ): Array<ContentMetadataItem> {
 	return items
-		.filter((item) => item.entryQuality >= qualityThreshold)
+		.filter((item) => item.entryQuality >= options.quality)
 		.sort((a, b) => {
 			const qualityDifference = b.entryQuality - a.entryQuality;
 			if (qualityDifference !== 0) return qualityDifference;
 
 			return a.title.localeCompare(b.title);
 		})
-		.slice(0, limit);
+		.slice(0, options.limit);
 }
 
-function getTimelineMonthlyData(monthlyData: TimelineDataMapMonthlyItem) {
-	const monthlyUpdated = filterAndSortItems([...monthlyData.updated.values()], 1, 40);
-	const monthlyCreated = filterAndSortItems([...monthlyData.created.values()], 1, 40);
-	const monthlyVisited = filterAndSortItems([...monthlyData.visited.values()], 1, 40);
+function getTimelineMonthlyData(
+	updated: Array<ContentMetadataItem>,
+	created: Array<ContentMetadataItem>,
+	visited: Array<ContentMetadataItem>,
+	options: TimelineFilterOptions,
+) {
+	const updatedFiltered = filterAndSortItems(updated, options);
+	const createdFiltered = filterAndSortItems(created, options);
+	const visitedFiltered = filterAndSortItems(visited, options);
 
-	const yearlyUpdated = filterAndSortItems([...monthlyData.updated.values()], 2, 20);
-	const yearlyCreated = filterAndSortItems([...monthlyData.created.values()], 2, 20);
-	const yearlyVisited = filterAndSortItems([...monthlyData.visited.values()], 2, 20);
+	const updatedIds = new Set(updatedFiltered.map((item) => item.id));
+
+	const createdDeduped = createdFiltered.filter((item) => !updatedIds.has(item.id));
+	const createdIds = new Set(createdDeduped.map((item) => item.id));
+
+	const visitedDeduped = visitedFiltered.filter(
+		(item) => !updatedIds.has(item.id) && !createdIds.has(item.id),
+	);
 
 	return {
-		monthly: {
-			updated: monthlyUpdated,
-			created: monthlyCreated,
-			visited: monthlyVisited,
-			isEmpty:
-				monthlyUpdated.length === 0 && monthlyCreated.length === 0 && monthlyVisited.length === 0,
-		},
-		yearly: {
-			updated: yearlyUpdated,
-			created: yearlyCreated,
-			visited: yearlyVisited,
-			isEmpty:
-				yearlyUpdated.length === 0 && yearlyCreated.length === 0 && yearlyVisited.length === 0,
-		},
+		updated: updatedFiltered,
+		created: createdDeduped,
+		visited: visitedDeduped,
+		isEmpty:
+			updatedFiltered.length === 0 && createdDeduped.length === 0 && visitedDeduped.length === 0,
 	};
 }
 
@@ -214,26 +219,37 @@ export async function getTimelineData(): Promise<TimelineData> {
 		if (!timelineMonths[year]) timelineMonths[year] = [];
 
 		for (const monthlyData of yearlyData.values()) {
-			const { monthly, yearly } = getTimelineMonthlyData(monthlyData);
+			const monthlyDataProcessed = getTimelineMonthlyData(
+				[...monthlyData.updated.values()],
+				[...monthlyData.created.values()],
+				[...monthlyData.visited.values()],
+				{ quality: 1, limit: 40 },
+			);
+			const yearlyDataProcessed = getTimelineMonthlyData(
+				[...monthlyData.updated.values()],
+				[...monthlyData.created.values()],
+				[...monthlyData.visited.values()],
+				{ quality: 2, limit: 20 },
+			);
 
-			if (!monthly.isEmpty) {
+			if (!monthlyDataProcessed.isEmpty) {
 				timelineMonthlyData.push({
 					...monthlyData,
-					created: monthly.created,
-					updated: monthly.updated,
-					visited: monthly.visited,
+					created: monthlyDataProcessed.created,
+					updated: monthlyDataProcessed.updated,
+					visited: monthlyDataProcessed.visited,
 				});
 				timelineMonths[year].push(monthlyData.month);
 			}
 
-			if (!yearly.isEmpty) {
+			if (!yearlyDataProcessed.isEmpty) {
 				if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
 
 				timelineYearlyData[year].push({
 					...monthlyData,
-					created: yearly.created,
-					updated: yearly.updated,
-					visited: yearly.visited,
+					created: yearlyDataProcessed.created,
+					updated: yearlyDataProcessed.updated,
+					visited: yearlyDataProcessed.visited,
 				});
 			}
 		}
@@ -241,15 +257,16 @@ export async function getTimelineData(): Promise<TimelineData> {
 		/**
 		 * Timeline index data
 		 */
-		const allUpdated = aggregateYearlyData(yearlyData, 'updated');
-		const allCreated = aggregateYearlyData(yearlyData, 'created');
-		const allVisited = aggregateYearlyData(yearlyData, 'visited');
+		const updatedAll = aggregateYearlyData(yearlyData, 'updated');
+		const createdAll = aggregateYearlyData(yearlyData, 'created');
+		const visitedAll = aggregateYearlyData(yearlyData, 'visited');
 
-		const updated = filterAndSortItems(allUpdated, 3, 12);
-		const created = filterAndSortItems(allCreated, 3, 12);
-		const visited = filterAndSortItems(allVisited, 3, 12);
+		const indexDataProcessed = getTimelineMonthlyData(updatedAll, createdAll, visitedAll, {
+			quality: 3,
+			limit: 12,
+		});
 
-		if (updated.length === 0 && created.length === 0 && visited.length === 0) continue;
+		if (indexDataProcessed.isEmpty) continue;
 
 		timelineIndexData[year] = {
 			year,
@@ -257,12 +274,12 @@ export async function getTimelineData(): Promise<TimelineData> {
 			monthName: '',
 			title: year,
 			highlight: undefined,
-			created,
-			createdCount: allCreated.length,
-			updated,
-			updatedCount: allUpdated.length,
-			visited,
-			visitedCount: allVisited.length,
+			created: indexDataProcessed.created,
+			createdCount: createdAll.length,
+			updated: indexDataProcessed.updated,
+			updatedCount: updatedAll.length,
+			visited: indexDataProcessed.visited,
+			visitedCount: visitedAll.length,
 		};
 	}
 
