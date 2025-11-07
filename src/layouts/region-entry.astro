@@ -61,18 +61,18 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedData} class="sm:mb-small">
-					<ContentHeader showFeatured={true}>
+					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
-								<ContentCollectionLink collection={entry.collection} showFeatured={true} />
+								<ContentCollectionLink collection={entry.collection} isHeroImage={true} />
 							</DividedItem>
 							{entry.data.parent ? (
 								<DividedItem dividerColor="hero">
-									<RegionsBreadcrumbs entry={entry} showFeatured={true} dividerColor="hero" />
+									<RegionsBreadcrumbs entry={entry} isHeroImage={true} dividerColor="hero" />
 								</DividedItem>
 							) : undefined}
 						</Fragment>
@@ -90,7 +90,7 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 						</DividedItem>
 						{entry.data.parent ? (
 							<DividedItem>
-								<RegionsBreadcrumbs entry={entry} showFeatured={false} />
+								<RegionsBreadcrumbs entry={entry} isHeroImage={false} />
 							</DividedItem>
 						) : undefined}
 					</Fragment>

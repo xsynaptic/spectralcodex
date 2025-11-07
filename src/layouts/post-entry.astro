@@ -71,14 +71,14 @@ const { Content } = await render(entry);
 		{
 			imageHeroId ? (
 				<ImageHero imageId={imageHeroId} alt={entry.data.title} class="sm:mb-small">
-					<ContentHeader showFeatured={true}>
+					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
-								<ContentCollectionLink collection="posts" showFeatured={true} />
+								<ContentCollectionLink collection="posts" isHeroImage={true} />
 							</DividedItem>
 							<DividedItem dividerColor="hero">
 								<ContentDate

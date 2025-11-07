@@ -46,7 +46,7 @@ const { Content } = await render(entry);
 		{
 			imageHeroId ? (
 				<ImageHero imageId={imageHeroId} alt={entry.data.title} class="sm:mb-small">
-					<ContentHeader showFeatured={true}>
+					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />

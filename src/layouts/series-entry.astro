@@ -55,13 +55,13 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 		{
 			hasHeroImage ? (
 				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedData} class="sm:mb-small">
-					<ContentHeader showFeatured={true}>
+					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<ContentCollectionLink collection={entry.collection} showFeatured={true} />
+							<ContentCollectionLink collection={entry.collection} isHeroImage={true} />
 						</Fragment>
 					</ContentHeader>
 				</ImageHeroCarousel>

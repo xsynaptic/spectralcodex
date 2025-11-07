@@ -84,21 +84,21 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		{
 			imageHeroId ? (
 				<ImageHero imageId={imageHeroId} alt={title} class="sm:mb-small">
-					<ContentHeader showFeatured={true}>
+					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{title}</Fragment>
 						<Fragment slot="header-title-multilingual">
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
 							<DividedItem dividerColor="hero">
-								<ContentCollectionLink collection="locations" showFeatured={true} />
+								<ContentCollectionLink collection="locations" isHeroImage={true} />
 							</DividedItem>
 							{regionPrimary ? (
 								<DividedItem dividerColor="hero">
 									<RegionsBreadcrumbs
 										entry={regionPrimary}
 										showCurrentLink={true}
-										showFeatured={true}
+										isHeroImage={true}
 										dividerColor="hero"
 									/>
 								</DividedItem>

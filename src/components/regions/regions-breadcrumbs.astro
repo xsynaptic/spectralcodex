@@ -13,17 +13,11 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 interface Props {
 	entry: CollectionEntry<'regions'>;
 	showCurrentLink?: boolean;
-	showFeatured?: boolean;
+	isHeroImage?: boolean;
 	dividerColor?: DividerColor;
 }
 
-const {
-	entry,
-	showCurrentLink = false,
-	showFeatured = false,
-	dividerColor,
-	...props
-} = Astro.props;
+const { entry, showCurrentLink = false, isHeroImage = false, dividerColor, ...props } = Astro.props;
 
 const getRegionAncestors = await getRegionAncestorsFunction();
 
@@ -48,7 +42,7 @@ const t = getTranslations();
 						) : (
 							<Link
 								href={getContentUrl('regions', termAncestor.id)}
-								linkColor={showFeatured ? 'accent-featured' : 'accent'}
+								linkColor={isHeroImage ? 'accent-featured' : 'accent'}
 							>
 								{termAncestor.data.title}
 							</Link>
