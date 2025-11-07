@@ -90,20 +90,19 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<DividedItem dividerColor="hero">
+							<DividedItem isHeroImage={true}>
 								<ContentCollectionLink collection="locations" isHeroImage={true} />
 							</DividedItem>
 							{regionPrimary ? (
-								<DividedItem dividerColor="hero">
+								<DividedItem isHeroImage={true}>
 									<RegionsBreadcrumbs
 										entry={regionPrimary}
 										showCurrentLink={true}
 										isHeroImage={true}
-										dividerColor="hero"
 									/>
 								</DividedItem>
 							) : undefined}
-							<DividedItem dividerColor="hero">
+							<DividedItem isHeroImage={true}>
 								<ContentDate
 									date={entry.data.dateCreated}
 									dateUpdated={entry.data.dateUpdated}

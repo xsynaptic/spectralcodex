@@ -71,10 +71,10 @@ const { Content } = await render(entry);
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<DividedItem dividerColor="hero">
+							<DividedItem isHeroImage={true}>
 								<ContentCollectionLink collection="ephemera" isHeroImage={true} />
 							</DividedItem>
-							<DividedItem dividerColor="hero">
+							<DividedItem isHeroImage={true}>
 								<ContentDate
 									date={entry.data.dateCreated}
 									dateUpdated={entry.data.dateUpdated}

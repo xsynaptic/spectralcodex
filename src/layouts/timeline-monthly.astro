@@ -5,6 +5,7 @@ import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
+import Link from '#components/parts/link.astro';
 import TimelineItem from '#components/timeline/timeline-item.astro';
 import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -66,7 +67,7 @@ const t = getTranslations();
 		)
 	}
 	<ContentSection>
-		<div class="mb-medium flex flex-col gap-1">
+		<div class="text-primary-700 dark:text-primary-400 mb-medium flex flex-col gap-2 text-base">
 			<TimelineItem
 				title={t('timeline.monthly.updated')}
 				items={timelineMonthlyItem.updated}
@@ -82,6 +83,6 @@ const t = getTranslations();
 				items={timelineMonthlyItem.visited}
 				count={timelineMonthlyItem.visitedCount}
 			/>
-		</div></ContentSection
-	>
+		</div>
+	</ContentSection>
 </MainSite>

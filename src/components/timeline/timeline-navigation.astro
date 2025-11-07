@@ -42,20 +42,21 @@ const {
 				]}
 			>
 				{timelineYears.map((timelineYear) => (
-					<DividedItem dividerColor={isHeroImage ? 'hero' : 'default'}>
-						{currentYear === timelineYear ? (
+					<DividedItem isHeroImage={isHeroImage}>
+						{!currentMonth && currentYear === timelineYear ? (
 							<span
 								class:list={[
-									'text-primary-600 font-semibold',
-									isHeroImage ? 'sm:text-highlight-200' : '',
+									'text-primary-600 dark:text-primary-400 font-semibold',
+									isHeroImage ? 'sm:text-accent-200' : '',
 								]}
 							>
 								{timelineYear}
 							</span>
 						) : (
 							<Link
+								class={currentMonth && currentYear === timelineYear ? 'font-semibold' : undefined}
 								href={getSiteUrl('timeline', timelineYear)}
-								linkColor={isHeroImage ? 'highlight-featured' : 'accent'}
+								linkColor={isHeroImage ? 'accent-featured' : 'accent'}
 							>
 								{timelineYear}
 							</Link>
@@ -78,12 +79,12 @@ const {
 							});
 
 							return (
-								<DividedItem dividerColor={isHeroImage ? 'hero' : 'default'}>
+								<DividedItem isHeroImage={isHeroImage}>
 									{currentMonth === monthNumber ? (
 										<span
 											class:list={[
-												'text-primary-600 font-semibold',
-												isHeroImage ? 'sm:text-accent-200' : '',
+												'text-highlight-600 font-semibold',
+												isHeroImage ? 'sm:text-highlight-200' : '',
 											]}
 										>
 											{monthName}
@@ -91,7 +92,7 @@ const {
 									) : (
 										<Link
 											href={getSiteUrl('timeline', currentYear, monthNumber)}
-											linkColor={isHeroImage ? 'accent-featured' : 'accent'}
+											linkColor={isHeroImage ? 'highlight-featured' : 'highlight'}
 										>
 											{monthName}
 										</Link>

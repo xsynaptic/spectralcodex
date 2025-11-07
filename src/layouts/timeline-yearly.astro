@@ -42,10 +42,9 @@ const t = getTranslations();
 					.sort((a, b) => Number(a.month) - Number(b.month))
 					.map((monthlyData) => {
 						return (
-							<li class="mb-medium flex flex-col gap-1">
-								<h2 class="border-primary-200 mb-1 border-b pb-1 text-sm font-semibold uppercase">
+							<li class="text-primary-700 dark:text-primary-400 mb-medium flex flex-col gap-2 text-sm">
+								<h2 class="border-primary-200 dark:border-primary-700 border-b pb-1 text-sm font-semibold uppercase">
 									<Link
-										class="text-sm font-semibold uppercase"
 										href={getSiteUrl('timeline', monthlyData.year, monthlyData.month)}
 										linkColor="primary"
 									>

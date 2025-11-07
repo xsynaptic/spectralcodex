@@ -67,12 +67,12 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 							<Multilingual content={titleMultilingual} />
 						</Fragment>
 						<Fragment slot="header-subtitle">
-							<DividedItem dividerColor="hero">
+							<DividedItem isHeroImage={true}>
 								<ContentCollectionLink collection={entry.collection} isHeroImage={true} />
 							</DividedItem>
 							{entry.data.parent ? (
-								<DividedItem dividerColor="hero">
-									<RegionsBreadcrumbs entry={entry} isHeroImage={true} dividerColor="hero" />
+								<DividedItem isHeroImage={true}>
+									<RegionsBreadcrumbs entry={entry} isHeroImage={true} />
 								</DividedItem>
 							) : undefined}
 						</Fragment>

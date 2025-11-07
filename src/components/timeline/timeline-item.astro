@@ -11,9 +11,10 @@ interface Props {
 	items: Array<ContentMetadataItem>;
 	count?: number | undefined;
 	countThreshold?: number | undefined;
+	class?: string | undefined;
 }
 
-const { title, items, count, countThreshold = 10 } = Astro.props;
+const { title, items, count, countThreshold = 10, class: className, ...props } = Astro.props;
 
 const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
 
@@ -27,7 +28,7 @@ const countText =
 
 {
 	items.length > 0 ? (
-		<div class="text-sm">
+		<div class={className} {...props}>
 			<span class="font-medium">{title}</span>:
 			{countText
 				? [...items, countText].map((item, index) => (

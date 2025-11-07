@@ -1,8 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import type { DividerColor } from '#components/parts/divided-item.astro';
-
 import ListRow from '#components/list/list-row.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
@@ -14,10 +12,9 @@ interface Props {
 	entry: CollectionEntry<'regions'>;
 	showCurrentLink?: boolean;
 	isHeroImage?: boolean;
-	dividerColor?: DividerColor;
 }
 
-const { entry, showCurrentLink = false, isHeroImage = false, dividerColor, ...props } = Astro.props;
+const { entry, showCurrentLink = false, isHeroImage = false, ...props } = Astro.props;
 
 const getRegionAncestors = await getRegionAncestorsFunction();
 
@@ -33,8 +30,8 @@ const t = getTranslations();
 				{termAncestors.map((termAncestor) => (
 					<DividedItem
 						as="li"
-						dividerColor={dividerColor}
 						dividerContent="chevron"
+						isHeroImage={isHeroImage}
 						aria-current={termAncestor.id === entry.id ? 'page' : undefined}
 					>
 						{!showCurrentLink && termAncestor.id === entry.id ? (

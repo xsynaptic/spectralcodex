@@ -39,19 +39,27 @@ const t = getTranslations();
 					.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
 					.map(([year, yearlyData]) => {
 						return (
-							<li class="mb-medium flex flex-col gap-1">
-								<h2 class="border-primary-200 mb-1 border-b pb-1 text-sm font-semibold uppercase">
-									<Link
-										class="text-sm font-semibold uppercase"
-										href={getSiteUrl('timeline', year)}
-										linkColor="primary"
-									>
+							<li class="text-primary-700 dark:text-primary-400 mb-medium flex flex-col gap-2 text-sm">
+								<h2 class="border-primary-200 dark:border-primary-700 border-b pb-1 text-sm font-semibold uppercase">
+									<Link href={getSiteUrl('timeline', year)} linkColor="primary">
 										{year}
 									</Link>
 								</h2>
-								<TimelineItem title={t('timeline.monthly.updated')} items={yearlyData.updated} />
-								<TimelineItem title={t('timeline.monthly.created')} items={yearlyData.created} />
-								<TimelineItem title={t('timeline.monthly.visited')} items={yearlyData.visited} />
+								<TimelineItem
+									title={t('timeline.monthly.updated')}
+									items={yearlyData.updated}
+									count={yearlyData.updatedCount}
+								/>
+								<TimelineItem
+									title={t('timeline.monthly.created')}
+									items={yearlyData.created}
+									count={yearlyData.createdCount}
+								/>
+								<TimelineItem
+									title={t('timeline.monthly.visited')}
+									items={yearlyData.visited}
+									count={yearlyData.visitedCount}
+								/>
 							</li>
 						);
 					})
