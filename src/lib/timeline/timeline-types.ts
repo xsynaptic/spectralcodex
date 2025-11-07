@@ -8,7 +8,7 @@ export interface TimelineBaseItem {
 	month: string;
 	monthName: string;
 	title: string; // _e.g._ "January 2025"
-	highlight: ContentMetadataItem | undefined;
+	highlights: Array<ContentMetadataItem> | undefined;
 	createdCount: number;
 	updatedCount: number;
 	visitedCount: number;

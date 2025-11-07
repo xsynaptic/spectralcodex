@@ -29,7 +29,7 @@ const {
 	timelineYears.length > 0 ? (
 		<div
 			class:list={[
-				'text-primary-500 dark:text-primary-400 flex flex-col gap-1 text-sm',
+				'text-primary-500 dark:text-primary-400 flex flex-col gap-1 overflow-hidden text-sm',
 				isHeroImage ? 'mb-medium sm:mb-0' : '',
 				className,
 			]}
@@ -38,7 +38,7 @@ const {
 			<div
 				class:list={[
 					'flex gap-1',
-					isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-auto' : 'flex-wrap',
+					isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 				]}
 			>
 				{timelineYears.map((timelineYear) => (
@@ -68,7 +68,7 @@ const {
 				<div
 					class:list={[
 						'flex gap-1',
-						isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-auto' : 'flex-wrap',
+						isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 					]}
 				>
 					{timelineMonths

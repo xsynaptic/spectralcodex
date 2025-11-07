@@ -42,7 +42,7 @@ function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData:
 			month: dateUpdatedData.month,
 			monthName,
 			title: `${monthName} ${dateUpdatedData.year}`,
-			highlight: undefined,
+			highlights: undefined,
 			created: new Set(),
 			createdCount: 0,
 			updated: new Set(),
@@ -56,9 +56,9 @@ function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData:
 }
 
 // Select a highlight for the month
-function getMonthlyHighlight(
+function getMonthlyHighlights(
 	monthData: TimelineDataMapMonthlyItem,
-): ContentMetadataItem | undefined {
+): Array<ContentMetadataItem> | undefined {
 	// Gather all items from the month that have images and meet minimum quality
 	const allItems = [
 		...monthData.created.values(),
@@ -80,10 +80,9 @@ function getMonthlyHighlight(
 
 	// Get the highest quality level
 	const highestQuality = Math.max(...highlightQualityMap.keys());
-	const highlightCandidates = highlightQualityMap.get(highestQuality)!;
+	const highlightCandidates = highlightQualityMap.get(highestQuality);
 
-	// Randomly select one from the top quality tier
-	return highlightCandidates[Math.floor(Math.random() * highlightCandidates.length)];
+	return highlightCandidates ? highlightCandidates.slice(0, 5) : undefined;
 }
 
 // Generate a map of timeline data from the content metadata index
@@ -138,14 +137,14 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 			monthlyData.visitedCount = monthlyData.visited.size;
 
 			// Select a highlight item for the month
-			monthlyData.highlight = getMonthlyHighlight(monthlyData);
+			monthlyData.highlights = getMonthlyHighlights(monthlyData);
 		}
 	}
 
 	return timelineDataMap;
 }
 
-function aggregateYearlyData(
+function getMonthlyDataByYear(
 	yearlyData: Map<string, TimelineDataMapMonthlyItem>,
 	category: 'updated' | 'created' | 'visited',
 ): Array<ContentMetadataItem> {
@@ -218,18 +217,31 @@ export async function getTimelineData(): Promise<TimelineData> {
 	for (const [year, yearlyData] of timelineDataMap.entries()) {
 		if (!timelineMonths[year]) timelineMonths[year] = [];
 
+		// Aggregate all data for the year (used for both yearly and index views)
+		const yearUpdatedAll = getMonthlyDataByYear(yearlyData, 'updated');
+		const yearCreatedAll = getMonthlyDataByYear(yearlyData, 'created');
+		const yearVisitedAll = getMonthlyDataByYear(yearlyData, 'visited');
+
+		// Year-level deduplication for yearly view
+		const yearDeduplicated = getTimelineMonthlyData(
+			yearUpdatedAll,
+			yearCreatedAll,
+			yearVisitedAll,
+			{ quality: 1, limit: 1000 },
+		);
+
+		// Build lookup sets for allowed items per category (for yearly view)
+		const allowedUpdated = new Set(yearDeduplicated.updated.map((i) => i.id));
+		const allowedCreated = new Set(yearDeduplicated.created.map((i) => i.id));
+		const allowedVisited = new Set(yearDeduplicated.visited.map((i) => i.id));
+
+		// Process monthly and yearly views using the allowed sets
 		for (const monthlyData of yearlyData.values()) {
 			const monthlyDataProcessed = getTimelineMonthlyData(
 				[...monthlyData.updated.values()],
 				[...monthlyData.created.values()],
 				[...monthlyData.visited.values()],
 				{ quality: 1, limit: 40 },
-			);
-			const yearlyDataProcessed = getTimelineMonthlyData(
-				[...monthlyData.updated.values()],
-				[...monthlyData.created.values()],
-				[...monthlyData.visited.values()],
-				{ quality: 2, limit: 20 },
 			);
 
 			if (!monthlyDataProcessed.isEmpty) {
@@ -242,29 +254,46 @@ export async function getTimelineData(): Promise<TimelineData> {
 				timelineMonths[year].push(monthlyData.month);
 			}
 
-			if (!yearlyDataProcessed.isEmpty) {
-				if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
+			// Yearly view; filter by allowed sets AND quality threshold
+			const yearlyUpdated = [...monthlyData.updated.values()].filter(
+				(item) => item.entryQuality >= 2 && allowedUpdated.has(item.id),
+			);
+			const yearlyCreated = [...monthlyData.created.values()].filter(
+				(item) => item.entryQuality >= 2 && allowedCreated.has(item.id),
+			);
+			const yearlyVisited = [...monthlyData.visited.values()].filter(
+				(item) => item.entryQuality >= 2 && allowedVisited.has(item.id),
+			);
 
-				timelineYearlyData[year].push({
-					...monthlyData,
-					created: yearlyDataProcessed.created,
-					updated: yearlyDataProcessed.updated,
-					visited: yearlyDataProcessed.visited,
-				});
-			}
+			// Sort by quality and limit per month
+			const yearlyUpdatedSorted = filterAndSortItems(yearlyUpdated, { quality: 0, limit: 20 });
+			const yearlyCreatedSorted = filterAndSortItems(yearlyCreated, { quality: 0, limit: 20 });
+			const yearlyVisitedSorted = filterAndSortItems(yearlyVisited, { quality: 0, limit: 20 });
+
+			if (
+				yearlyUpdatedSorted.length === 0 &&
+				yearlyCreatedSorted.length === 0 &&
+				yearlyVisitedSorted.length === 0
+			)
+				continue;
+
+			if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
+
+			timelineYearlyData[year].push({
+				...monthlyData,
+				created: yearlyCreatedSorted,
+				updated: yearlyUpdatedSorted,
+				visited: yearlyVisitedSorted,
+			});
 		}
 
-		/**
-		 * Timeline index data
-		 */
-		const updatedAll = aggregateYearlyData(yearlyData, 'updated');
-		const createdAll = aggregateYearlyData(yearlyData, 'created');
-		const visitedAll = aggregateYearlyData(yearlyData, 'visited');
-
-		const indexDataProcessed = getTimelineMonthlyData(updatedAll, createdAll, visitedAll, {
-			quality: 3,
-			limit: 12,
-		});
+		// Timeline index data (reuse aggregated year data)
+		const indexDataProcessed = getTimelineMonthlyData(
+			yearUpdatedAll,
+			yearCreatedAll,
+			yearVisitedAll,
+			{ quality: 3, limit: 20 },
+		);
 
 		if (indexDataProcessed.isEmpty) continue;
 
@@ -273,13 +302,13 @@ export async function getTimelineData(): Promise<TimelineData> {
 			month: '',
 			monthName: '',
 			title: year,
-			highlight: undefined,
+			highlights: undefined,
 			created: indexDataProcessed.created,
-			createdCount: createdAll.length,
+			createdCount: yearCreatedAll.length,
 			updated: indexDataProcessed.updated,
-			updatedCount: updatedAll.length,
+			updatedCount: yearUpdatedAll.length,
 			visited: indexDataProcessed.visited,
-			visitedCount: visitedAll.length,
+			visitedCount: yearVisitedAll.length,
 		};
 	}
 

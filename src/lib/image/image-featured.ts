@@ -143,8 +143,8 @@ export async function getImageFeaturedObjectGroup({
 	return shuffle ? R.shuffle(items) : items;
 }
 
-// Rather than accepting image set items directly from frontmatter this handles content metadata
-export function getImageFeaturedObjectWithCaptionMetadataGroup({
+// Rather than accepting image set items directly from frontmatter this handles content metadata items
+export function getImageFeaturedGroupByContentMetadata({
 	items,
 	shuffle = false,
 }: {

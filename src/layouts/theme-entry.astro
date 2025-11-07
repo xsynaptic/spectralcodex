@@ -38,11 +38,11 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
-const imageFeaturedData = await getImageFeaturedObjectGroup({
+const imageFeaturedGroup = await getImageFeaturedObjectGroup({
 	imageFeatured: entry.data.imageFeatured,
 });
 
-const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <MainSite
@@ -63,7 +63,7 @@ const hasHeroImage = !!imageFeaturedData && imageFeaturedData.length > 0;
 	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
 		{
 			hasHeroImage ? (
-				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedData} class="sm:mb-small">
+				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} class="sm:mb-small">
 					<ContentHeader isHeroImage={true}>
 						<Fragment slot="header-title">{entry.data.title}</Fragment>
 						<Fragment slot="header-title-multilingual">

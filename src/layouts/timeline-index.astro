@@ -45,21 +45,23 @@ const t = getTranslations();
 										{year}
 									</Link>
 								</h2>
-								<TimelineItem
-									title={t('timeline.monthly.updated')}
-									items={yearlyData.updated}
-									count={yearlyData.updatedCount}
-								/>
-								<TimelineItem
-									title={t('timeline.monthly.created')}
-									items={yearlyData.created}
-									count={yearlyData.createdCount}
-								/>
-								<TimelineItem
-									title={t('timeline.monthly.visited')}
-									items={yearlyData.visited}
-									count={yearlyData.visitedCount}
-								/>
+								<div class="flex flex-col gap-2">
+									<TimelineItem
+										title={t('timeline.monthly.updated')}
+										items={yearlyData.updated}
+										count={yearlyData.updatedCount}
+									/>
+									<TimelineItem
+										title={t('timeline.monthly.created')}
+										items={yearlyData.created}
+										count={yearlyData.createdCount}
+									/>
+									<TimelineItem
+										title={t('timeline.monthly.visited')}
+										items={yearlyData.visited}
+										count={yearlyData.visitedCount}
+									/>
+								</div>
 							</li>
 						);
 					})

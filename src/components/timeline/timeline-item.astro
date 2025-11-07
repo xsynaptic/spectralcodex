@@ -3,6 +3,7 @@ import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
+import ProseBody from '#components/parts/prose-body.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -28,7 +29,7 @@ const countText =
 
 {
 	items.length > 0 ? (
-		<div class={className} {...props}>
+		<ProseBody class={className} {...props}>
 			<span class="font-medium">{title}</span>:
 			{countText
 				? [...items, countText].map((item, index) => (
@@ -59,6 +60,6 @@ const countText =
 							) : undefined}
 						</TextSeparated>
 					))}
-		</div>
+		</ProseBody>
 	) : undefined
 }

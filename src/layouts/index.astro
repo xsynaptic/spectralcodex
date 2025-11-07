@@ -9,7 +9,7 @@ import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageFeaturedObjectWithCaptionMetadataGroup } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -23,7 +23,7 @@ interface Props {
 const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =
 	Astro.props;
 
-const imageFeaturedGroup = getImageFeaturedObjectWithCaptionMetadataGroup({
+const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
 	items: featuredMetadataItems,
 	shuffle: true,
 });
