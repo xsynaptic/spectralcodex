@@ -5,7 +5,6 @@ import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
-import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	title: string;
@@ -36,7 +35,7 @@ const countText =
 						<TextSeparated index={index} total={items.length + 1}>
 							{item.url ? (
 								<>
-									<Link href={getSiteUrl(item.url)}>{item.title}</Link>
+									<Link href={item.url}>{item.title}</Link>
 									{item.titleMultilingual ? (
 										<>
 											{' '}
@@ -51,7 +50,7 @@ const countText =
 					))
 				: items.map((item, index) => (
 						<TextSeparated index={index} total={items.length}>
-							<Link href={getSiteUrl(item.url)}>{item.title}</Link>
+							<Link href={item.url}>{item.title}</Link>
 							{item.titleMultilingual ? (
 								<>
 									{' '}
