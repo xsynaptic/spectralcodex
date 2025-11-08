@@ -29,6 +29,7 @@ This repository contains the working Astro project used to generate the [Spectra
 - Popups, clustering, filtering by objectives, and responsive design
 - Administrative boundaries are sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rending on region maps
 - Persistent storage of map data via IndexedDB
+- Distance-based discovery system for geographic content via nearby locations feature
 
 ### Search & Discovery
 
@@ -45,16 +46,13 @@ This repository contains the working Astro project used to generate the [Spectra
 - Automatic highlight selection using quality scores
 - Quality-based filtering with different thresholds for overview vs. detailed views
 
-### Internationalization
-
-- Custom CJK character handling and language-specific styling
-- Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
-
 ### User Experience
 
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Visual reading progress indicator for long-form content
 - Loading progress bar during navigation
+- Custom CJK character handling and language-specific styling
+- Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
 
 ## SEO & RSS
 
@@ -77,7 +75,7 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ## Project Structure
 
-- `./public`: contains a favicon, fallback Open Graph images, and map data
+- `./public`: contains a favicon, fallback Open Graph images, and map division data
 - `./scripts`: deployment and maintenance scripts
 - `./src`: primary project source files
 - `./src/components`: Astro components organized by functionality
@@ -102,10 +100,9 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ### Generated/Temporary
 
-- `./astro`: automatically generated types and schemas
+- `./.astro`: automatically generated types and schemas
 - `./dist`: output folder, automatically generated; delete this anytime
 - `./public/divisions`: FlatGeobuf files for geographic divisions used by the map component
-- `./public/fonts`: required for generating OpenGraph images using Satori
 - `./public/icons`: icon sprites and JSON files for the map component
 - `./temp`: temporary storage for generated files, delete anytime
 
