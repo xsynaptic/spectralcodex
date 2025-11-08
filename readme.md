@@ -7,9 +7,11 @@ This repository contains the working Astro project used to generate the [Spectra
 ### Content Management
 
 - All content is authored in MDX using the Content Layer API
+- Content quality scoring system (0-5 scale) drives content prioritization across the site
 - Comprehensive validation system ensuring data quality and consistency across collections (including frontmatter field and GPS coordinate de-duplication checks)
 - Visual reading progress indicator for long-form content
 - Automated content excerpt generation for previews and listings
+- Metadata index with automatic backlinks discovery from internal links
 
 ### Image Handling
 
@@ -31,21 +33,34 @@ This repository contains the working Astro project used to generate the [Spectra
 ### Search & Discovery
 
 - Integrated [Pagefind](https://pagefind.app/) via [astro-pagefind](https://github.com/shishkin/astro-pagefind) for client-side full-text search across all content
-- LLM-powered related content recommendations using vector similarity
+- Related content recommendations using vector similarity (Transformers.js embeddings) with hybrid ranking combining semantic and metadata-based scoring
 - Automatic discovery and display of content relationships via backlinks
 - Hierarchical navigation through regions, themes, and series
 - Distance-based point-of-interest discovery via nearby locations
+
+### Timeline & Archives
+
+- Chronological content browsing with yearly, monthly, and daily views
+- Intelligent content deduplication across time periods based on created, updated, and visited dates
+- Automatic highlight selection using quality scores
+- Quality-based filtering with different thresholds for overview vs. detailed views
 
 ### Internationalization
 
 - Custom CJK character handling and language-specific styling
 - Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
 
+### User Experience
+
+- Dark/light mode toggle with system preference detection and localStorage persistence
+- Visual reading progress indicator for long-form content
+- Loading progress bar during navigation
+
 ## SEO & RSS
 
 - Comprehensive meta tags, structured data, and OpenGraph images
 - Dynamic sitemap generation with [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
-- Full RSS feeds built with [@astrojs/rss](https://docs.astro.build/en/recipes/rss/) and the experimental Container API
+- Full RSS feeds with server-side rendered MDX content via Astro's Container API
 
 ## Usage
 
@@ -74,6 +89,7 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ### Packages
 
+- `./packages/astro-build-logger`: Astro integration that logs build timestamps and durations
 - `./packages/content-example`: example content for testing and demonstration purposes ([more info](./packages/content-example/readme.md))
 - `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs) ([more info](./packages/image-loader/readme.md))
 - `./packages/image-open-graph`: experimental OpenGraph image generator using Satori ([more info](./packages/image-open-graph/readme.md))
@@ -81,8 +97,8 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 - `./packages/map-types`: TypeScript type definitions for map-related data structures
 - `./packages/react-map-component`: interactive map component used across this project
 - `./packages/remark-img-group`: Remark plugin for handling image groups
-- `./packages/scripts`: utility scripts for related content, content processing, map spritesheet generation, and project maintenance
-- `./packages/unified-tools`: utilities for processing markdown, HTML, and text content
+- `./packages/scripts`: utility scripts for related content generation, content validation, map division processing, spritesheet generation, and deployment
+- `./packages/unified-tools`: utilities for processing markdown, MDX, HTML, and text content including sanitization, CJK wrapping, and footnote handling
 
 ### Generated/Temporary
 
