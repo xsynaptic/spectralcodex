@@ -23,13 +23,13 @@
 		"@turf/turf": "^7.2.0",
 		"@types/geojson": "^7946.0.16",
 		"@xenova/transformers": "^2.17.2",
-		"astro": "^5.15.3",
+		"astro": "^5.15.4",
 		"chalk": "^5.6.2",
 		"dotenv": "^17.2.3",
 		"flatgeobuf": "^4.3.1",
 		"geojson": "^0.5.0",
 		"p-limit": "^7.2.0",
-		"sharp": "^0.34.4",
+		"sharp": "^0.34.5",
 		"tsx": "^4.20.6",
 		"zx": "^8.8.5"
 	}
