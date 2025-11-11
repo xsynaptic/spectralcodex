@@ -145,7 +145,7 @@ export interface MapComponentProps
 	cluster?: boolean | undefined;
 	showObjectiveFilter?: boolean | undefined;
 	languages?: Array<string> | undefined;
-	protomapsApiKey: string;
+	protomapsApiKey?: string | undefined;
 	spritesId?: string | undefined;
 	spritesUrl?: string | undefined;
 	style?: CSSProperties | undefined;
