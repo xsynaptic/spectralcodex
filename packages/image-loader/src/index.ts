@@ -3,6 +3,7 @@ import type { Loader, LoaderContext } from 'astro/loaders';
 
 import fastGlob from 'fast-glob';
 import micromatch from 'micromatch';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
@@ -154,8 +155,18 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 				baseDir.pathname = `${baseDir.pathname}/`;
 			}
 
+			const baseDirPath = fileURLToPath(baseDir);
+
+			// Check if the base directory exists
+			if (!existsSync(baseDirPath)) {
+				logger.warn(
+					`Image directory "${options.base}" does not exist. No images will be loaded.`,
+				);
+				return;
+			}
+
 			const imageGlobData = await fastGlob(pattern, {
-				cwd: fileURLToPath(baseDir),
+				cwd: baseDirPath,
 				stats: true, // Collect last modified time
 			});
 

@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'sirv';
 
 import { createResolver, defineIntegration, watchDirectory } from 'astro-integration-kit';
+import { existsSync } from 'node:fs';
 import { createServer, Server } from 'node:http';
 import sirv from 'sirv';
 import { z } from 'zod';
@@ -30,7 +31,7 @@ export default defineIntegration({
 		immutable: z.boolean().optional().default(false),
 	}),
 	setup({ options }) {
-		let imageRequestHandler: RequestHandler;
+		let imageRequestHandler: RequestHandler | undefined;
 		let server: Server | undefined;
 
 		// This integration handles both dev mode and the build process (via `astro:build` hooks)
@@ -38,16 +39,21 @@ export default defineIntegration({
 			hooks: {
 				'astro:config:setup': (params) => {
 					const { resolve } = createResolver(params.config.root.pathname);
+					const resolvedMediaPath = resolve(options.mediaPath);
 
-					imageRequestHandler = sirv(options.mediaPath, {
-						dev: params.command === 'dev',
-						etag: true,
-						maxAge: options.maxAge,
-						immutable: options.immutable,
-						brotli: false,
-						gzip: false,
-						dotfiles: false,
-					});
+					// Check if media directory exists
+					if (existsSync(resolvedMediaPath)) {
+						imageRequestHandler = sirv(options.mediaPath, {
+							dev: params.command === 'dev',
+							etag: true,
+							maxAge: options.maxAge,
+							immutable: options.immutable,
+							brotli: false,
+							gzip: false,
+							dotfiles: false,
+						});
+						watchDirectory(params, resolvedMediaPath);
+					}
 
 					params.updateConfig({
 						image: {
@@ -59,35 +65,39 @@ export default defineIntegration({
 							],
 						},
 					});
-
-					watchDirectory(params, resolve(options.mediaPath));
 				},
 				'astro:server:setup': ({ server, logger }) => {
-					logger.info(
-						`Serving local images from "${options.mediaPath}" at "${options.mediaBaseUrl}"`,
-					);
+					const { resolve } = createResolver(server.config.root);
+					const resolvedMediaPath = resolve(options.mediaPath);
 
-					server.middlewares.use((req, res, next) => {
-						if (req.url?.startsWith(options.mediaBaseUrl)) {
-							req.url = req.url.replace(options.mediaBaseUrl, '');
-							imageRequestHandler(req, res, next);
-						} else {
-							next();
-						}
-					});
+					if (existsSync(resolvedMediaPath)) {
+						logger.info(
+							`Serving local images from "${options.mediaPath}" at "${options.mediaBaseUrl}"`,
+						);
+						server.middlewares.use((req, res, next) => {
+							if (req.url?.startsWith(options.mediaBaseUrl) && imageRequestHandler) {
+								req.url = req.url.replace(options.mediaBaseUrl, '');
+								imageRequestHandler(req, res, next);
+							} else {
+								next();
+							}
+						});
+					}
 				},
 				'astro:build:start': ({ logger }) => {
 					server = createServer((req, res) => {
-						if (req.url?.startsWith(options.mediaBaseUrl)) {
+						if (req.url?.startsWith(options.mediaBaseUrl) && imageRequestHandler) {
 							req.url = req.url.replace(options.mediaBaseUrl, '');
 							imageRequestHandler(req, res);
 						}
 					});
-					server.listen(options.buildPort, () => {
-						logger.info(
-							`Local image server running at "http://localhost:${String(options.buildPort)}"`,
-						);
-					});
+					if (imageRequestHandler) {
+						server.listen(options.buildPort, () => {
+							logger.info(
+								`Local image server running at "http://localhost:${String(options.buildPort)}"`,
+							);
+						});
+					}
 				},
 				'astro:build:done': ({ logger }) => {
 					if (server) {

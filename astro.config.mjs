@@ -77,13 +77,13 @@ export default defineConfig({
 			MAP_ICONS_PATH: envField.string({
 				context: 'client',
 				access: 'public',
-				optional: false,
+				optional: true,
 				default: 'icons/map-icons',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				context: 'client',
 				access: 'public',
-				optional: false,
+				optional: true,
 			}),
 			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
 			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
