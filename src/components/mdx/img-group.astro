@@ -22,7 +22,7 @@ const slotContents = await renderSlot(Astro.slots, 'default');
 const imageCount = slotContents?.match(new RegExp('<img', 'g'))?.length ?? 0;
 
 if (imageCount === 0) {
-	throw new Error('ImgGroup components require at least one image!');
+	console.warn('[MDX] ImgGroup component has no images!');
 }
 
 function getGridColumnCount(itemCount: number) {
@@ -36,10 +36,9 @@ function getGridColumnCount(itemCount: number) {
 const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCount);
 ---
 
+{imageCount > 0 && isFeed ? <Fragment set:html={slotContents} /> : undefined}
 {
-	isFeed ? (
-		<Fragment set:html={slotContents} />
-	) : (
+	imageCount > 0 && !isFeed ? (
 		<div
 			class:list={[
 				'figure-group',
@@ -56,5 +55,5 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 		>
 			<Fragment set:html={slotContents} />
 		</div>
-	)
+	) : undefined
 }
