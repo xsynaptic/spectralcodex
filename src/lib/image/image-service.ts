@@ -7,7 +7,7 @@ import { isESMImportedImage } from 'astro/assets/utils';
 import sharp from 'sharp';
 
 import { CONTENT_MEDIA_HOST } from '#constants.ts';
-import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 
 /**
  * This custom image service adapts code from Astro core to accomplish several goals:
@@ -148,10 +148,10 @@ const localImageService = {
 	async getSrcSet({ src, height, width, widths, densities, quality, format }) {
 		const srcSet: Array<UnresolvedSrcSetValue> = [];
 
+		const getImageById = await getImageByIdFunction();
+
 		const imageEntry =
-			typeof src === 'string'
-				? await getImageById(src.replace(`${CONTENT_MEDIA_HOST}/`, ''))
-				: undefined;
+			typeof src === 'string' ? getImageById(src.replace(`${CONTENT_MEDIA_HOST}/`, '')) : undefined;
 
 		const { targetWidth, maxWidth } = getTargetDimensions({ src, height, width, imageEntry });
 

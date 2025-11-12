@@ -6,7 +6,7 @@ import { Image } from 'astro:assets';
 
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
-import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -20,7 +20,9 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { imageId, isImageSquare, linkUrl, alt, ...props } = Astro.props;
 
-const imageEntry = imageId ? await getImageById(imageId) : undefined;
+const getImageById = await getImageByIdFunction();
+
+const imageEntry = imageId ? getImageById(imageId) : undefined;
 
 // Dimensions chosen for a two-column grid
 const imageProps = imageEntry

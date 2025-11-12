@@ -10,7 +10,7 @@ import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
-import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
@@ -35,7 +35,9 @@ const { isFeed } = Astro.locals;
 
 const slotContents = await renderSlot(Astro.slots, 'default');
 
-const imageEntry = await getImageById(imageId);
+const getImageById = await getImageByIdFunction();
+
+const imageEntry = getImageById(imageId);
 
 const imageProps = imageEntry
 	? ((isFeed

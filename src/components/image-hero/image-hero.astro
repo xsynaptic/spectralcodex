@@ -6,7 +6,7 @@ import { Image } from 'astro:assets';
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
-import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -19,7 +19,9 @@ interface Props {
 
 const { imageId, alt, class: className } = Astro.props;
 
-const imageEntry = await getImageById(imageId);
+const getImageById = await getImageByIdFunction();
+
+const imageEntry = getImageById(imageId);
 
 const imageProps = imageEntry
 	? ({

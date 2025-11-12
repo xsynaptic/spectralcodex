@@ -9,7 +9,7 @@ import * as R from 'remeda';
 
 import { FEATURE_OPEN_GRAPH_IMAGES } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
-import { getImageById } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { getGenerateOpenGraphImageFunction } from '#lib/image/image-open-graph-satori.ts';
@@ -43,6 +43,8 @@ export const getStaticPaths = (async () => {
 		density: 2,
 	});
 
+	const getImageById = await getImageByIdFunction();
+
 	const limit = pLimit(40);
 
 	return await Promise.all(
@@ -66,7 +68,7 @@ export const getStaticPaths = (async () => {
 						icon: undefined,
 					} satisfies OpenGraphMetadataItem;
 
-					const imageEntry = entry.imageId ? await getImageById(entry.imageId) : undefined;
+					const imageEntry = entry.imageId ? getImageById(entry.imageId) : undefined;
 					const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
 
 					return {
