@@ -44,10 +44,10 @@ const placeholder = imageEntry
 	: undefined;
 ---
 
-{
-	imageProps ? (
-		<ImageHeroFrame class={className} style={{ overflow: 'hidden' }}>
-			<ImagePlaceholder placeholder={placeholder}>
+<ImageHeroFrame class:list={['overflow-hidden', className]}>
+	<ImagePlaceholder placeholder={placeholder}>
+		{
+			imageProps ? (
 				<Image
 					class:list={[
 						'max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
@@ -57,8 +57,15 @@ const placeholder = imageEntry
 					data-pagefind-meta="image[src], image_alt[alt]"
 					{...imageProps}
 				/>
-			</ImagePlaceholder>
-			<slot />
-		</ImageHeroFrame>
-	) : undefined
-}
+			) : (
+				<div
+					class:list={[
+						'max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+						'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
+					]}
+				/>
+			)
+		}
+	</ImagePlaceholder>
+	<slot />
+</ImageHeroFrame>
