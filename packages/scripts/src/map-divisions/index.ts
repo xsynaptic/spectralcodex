@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import type { Geometry, MultiPolygon, Polygon } from 'geojson';
+import type { FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson';
 
 import { DuckDBConnection } from '@duckdb/node-api';
 import chalk from 'chalk';
@@ -15,6 +15,7 @@ import { buildQuery, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
 import { convertToFeatureCollection } from './geojson';
 import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache';
+import { saveSvg } from './svg';
 import { safelyCreateDirectory } from './utils';
 
 const { values } = parseArgs({
@@ -186,26 +187,49 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
 
 	try {
-		// Check which regions already exist and filter them out
+		// Create output directory
 		await safelyCreateDirectory(outputPath);
 
-		const regionsToProcess: Array<RegionMetadata> = [];
+		// Check which regions need FGB or SVG files
+		interface RegionProcessingNeeds {
+			region: RegionMetadata;
+			needsFgb: boolean;
+			needsSvg: boolean;
+		}
+
+		const processingNeeds: Array<RegionProcessingNeeds> = [];
 
 		for (const region of regions) {
-			const filePath = path.join(outputPath, `${region.slug}.fgb`);
+			const fgbPath = path.join(outputPath, `${region.slug}.fgb`);
+			const svgPath = path.join(outputPath, `${region.slug}.svg`);
+
+			let needsFgb = false;
+			let needsSvg = false;
 
 			try {
-				await fs.access(filePath);
+				await fs.access(fgbPath);
 			} catch {
-				regionsToProcess.push(region);
+				needsFgb = true;
+			}
+
+			try {
+				await fs.access(svgPath);
+			} catch {
+				needsSvg = true;
+			}
+
+			if (needsFgb || needsSvg) {
+				processingNeeds.push({ region, needsFgb, needsSvg });
 			}
 		}
 
-		if (regionsToProcess.length === 0) {
+		if (processingNeeds.length === 0) {
 			console.log(chalk.green('All files already exist, skipping query'));
 
 			return regions.length;
 		}
+
+		const regionsToProcess = processingNeeds.map((need) => need.region);
 
 		console.log(
 			chalk.blue(
@@ -262,6 +286,14 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 				console.log(chalk.blue(`\nProcessing ${chalk.cyan(region.slug)}...`));
 
 				try {
+					// Find what files this region needs
+					const needs = processingNeeds.find((need) => need.region.slug === region.slug);
+
+					if (!needs) {
+						// Region doesn't need processing (both files exist)
+						continue;
+					}
+
 					// Collect division items for this region
 					const divisionItems: Array<DivisionItem> = [];
 
@@ -292,7 +324,23 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 
 						const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
 
-						await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputPath);
+						// Save FGB if needed
+						if (needs.needsFgb) {
+							await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputPath);
+						} else {
+							console.log(chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.slug)}`));
+						}
+
+						// Save SVG if needed
+						if (needs.needsSvg) {
+							await saveSvg(
+								divisionFeatureCollection as FeatureCollection<Polygon | MultiPolygon>,
+								region.slug,
+								outputPath,
+							);
+						} else {
+							console.log(chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.slug)}`));
+						}
 
 						console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.slug)}`));
 
