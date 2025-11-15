@@ -50,10 +50,9 @@ const placeholder = imageEntry
 			imageProps ? (
 				<Image
 					class:list={[
-						'max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+						'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
 						'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
 					]}
-					style={{ zIndex: 10 }}
 					data-pagefind-meta="image[src], image_alt[alt]"
 					{...imageProps}
 				/>

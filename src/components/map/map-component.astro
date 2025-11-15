@@ -32,9 +32,10 @@ const mapComponentExtendedProps = {
 <div
 	class:list={[
 		'bg-fallback',
-		'shadow-primary-300 dark:shadow-primary-900 relative flex h-full shadow-sm sm:rounded-xs lg:rounded-md',
+		'max-h-100vh relative flex h-full overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
+		'shadow-primary-300 dark:shadow-primary-900',
 	]}
-	style={{ maxHeight: '100vh', minHeight: 'min(600px,100vh)', overflow: 'hidden' }}
+	style={{ minHeight: 'min(600px,100vh)' }}
 	{...props}
 	data-pagefind-ignore
 >
@@ -50,9 +51,11 @@ const mapComponentExtendedProps = {
 		)
 	}
 	<div
-		class="text-primary-700 dark:text-highlight-400 absolute flex h-full w-full justify-center"
-		style={{ zIndex: 10 }}
+		class:list={[
+			'absolute z-10 flex h-full w-full justify-center',
+			'text-primary-700 dark:text-highlight-400',
+		]}
 	>
-		<div class="loading-animation" style={{ width: '20%' }}></div>
+		<div class="loading-animation w-20%"></div>
 	</div>
 </div>

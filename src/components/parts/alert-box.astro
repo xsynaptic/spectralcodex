@@ -29,7 +29,7 @@ const iconSize = 20;
 
 <div
 	class:list={[
-		'flex gap-x-1 rounded-sm border',
+		'overlow-clip flex gap-x-1 rounded-sm border',
 		status === AlertBoxStatusEnum.Default
 			? 'border-primary-300 bg-primary-100 text-primary-600 dark:border-primary-900 dark:bg-primary-600 dark:text-primary-200'
 			: undefined,
@@ -47,7 +47,6 @@ const iconSize = 20;
 			: undefined,
 		className,
 	]}
-	style={{ overflow: 'clip' }}
 	role={role}
 	{...props}
 >

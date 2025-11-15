@@ -13,8 +13,12 @@ const { as: Tag = 'ul', class: className, listStyleType, ...props } = Astro.prop
 ---
 
 <Tag
-	class:list={[className, 'flex flex-col gap-2 pl-4']}
-	style={{ listStyleType: listStyleType ?? (Tag === 'ul' ? 'disc' : 'decimal') }}
+	class:list={[
+		'flex flex-col gap-2 pl-4',
+		listStyleType && Tag === 'ul' ? 'list-disc' : undefined,
+		listStyleType && Tag === 'ol' ? 'list-decimal' : undefined,
+		className,
+	]}
 	{...props}
 >
 	<slot />

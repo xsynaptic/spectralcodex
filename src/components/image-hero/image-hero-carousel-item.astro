@@ -51,9 +51,8 @@ const placeholder = imageEntry
 		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
 			<Image
 				class:list={[
-					'max-h-screen min-h-[400px] w-screen object-cover object-center text-sm text-transparent xl:min-h-screen',
+					'z-10 max-h-screen min-h-[400px] w-screen object-cover object-center text-sm text-transparent xl:min-h-screen',
 				]}
-				style={{ zIndex: 10 }}
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}
 			/>
