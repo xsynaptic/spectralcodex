@@ -18,7 +18,7 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	dividerColor?: DividerColor | undefined;
 	dividerContent?: DividerContent | undefined;
 	showDarkMode?: boolean | undefined;
-	isHeroImage?: boolean | undefined;
+	hasHeroImage?: boolean | undefined;
 }>;
 
 const {
@@ -27,7 +27,7 @@ const {
 	dividerColor = 'default',
 	dividerContent = 'slash',
 	showDarkMode = true,
-	isHeroImage = false,
+	hasHeroImage = false,
 	...props
 } = Astro.props;
 ---
@@ -50,8 +50,8 @@ const {
 		dividerColor === DividerColorEnum.Hero
 			? 'after:text-primary-500 sm:after:text-primary-300 dark:after:text-primary-400 dark:sm:after:text-primary-700 sm:after:opacity-80'
 			: undefined,
-		isHeroImage ? 'sm:after:text-primary-300 sm:after:opacity-80' : undefined,
-		isHeroImage && showDarkMode ? 'dark:sm:after:text-primary-700' : undefined,
+		hasHeroImage ? 'sm:after:text-primary-300 sm:after:opacity-80' : undefined,
+		hasHeroImage && showDarkMode ? 'dark:sm:after:text-primary-700' : undefined,
 		dividerContent === 'bar' ? 'after:content-(--content-bar)' : undefined,
 		dividerContent === 'bullet' ? 'after:content-(--content-bullet)' : undefined,
 		dividerContent === 'chevron' ? 'after:content-(--content-chevron)' : undefined,

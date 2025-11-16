@@ -38,12 +38,16 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	{
-		hasHeroImage ? (
-			<ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} class="sm:mb-small">
-				<ContentHeader isHeroImage={true}>
-					<Fragment slot="header-title">{timelineMonthlyItem.title}</Fragment>
-					<Fragment slot="header-subtitle">
+	<ImageHeroCarousel
+		class="sm:mb-small"
+		hasHeroImage={hasHeroImage}
+		imageFeaturedGroup={imageFeaturedGroup}
+	>
+		<ContentHeader hasHeroImage={hasHeroImage}>
+			<Fragment slot="header-title">{timelineMonthlyItem.title}</Fragment>
+			<Fragment slot="header-subtitle">
+				{
+					hasHeroImage ? (
 						<Link
 							class="font-semibold"
 							href={getSiteUrl('timeline')}
@@ -51,25 +55,18 @@ const t = getTranslations();
 						>
 							{t('timeline.title')}
 						</Link>
-					</Fragment>
-				</ContentHeader>
-			</ImageHeroCarousel>
-		) : (
-			<ContentHeader>
-				<Fragment slot="header-title">
-					{t('timeline.title')}: {timelineMonthlyItem.title}
-				</Fragment>
-				<Fragment slot="header-subtitle">
-					<TimelineNavigation
-						currentYear={timelineMonthlyItem.year}
-						currentMonth={timelineMonthlyItem.month}
-						timelineYears={timelineYears}
-						timelineMonths={timelineMonths}
-					/>
-				</Fragment>
-			</ContentHeader>
-		)
-	}
+					) : (
+						<TimelineNavigation
+							currentYear={timelineMonthlyItem.year}
+							currentMonth={timelineMonthlyItem.month}
+							timelineYears={timelineYears}
+							timelineMonths={timelineMonths}
+						/>
+					)
+				}
+			</Fragment>
+		</ContentHeader>
+	</ImageHeroCarousel>
 	<ContentSection>
 		<TimelineNavigation
 			class="border-primary-300 dark:border-primary-700 pb-small border-b"

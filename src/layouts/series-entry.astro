@@ -52,31 +52,21 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	hasHeroImage={hasHeroImage}
 >
 	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
-		{
-			hasHeroImage ? (
-				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} class="sm:mb-small">
-					<ContentHeader isHeroImage={true}>
-						<Fragment slot="header-title">{entry.data.title}</Fragment>
-						<Fragment slot="header-title-multilingual">
-							<Multilingual content={titleMultilingual} />
-						</Fragment>
-						<Fragment slot="header-subtitle">
-							<ContentCollectionLink collection={entry.collection} isHeroImage={true} />
-						</Fragment>
-					</ContentHeader>
-				</ImageHeroCarousel>
-			) : (
-				<ContentHeader>
-					<Fragment slot="header-title">{entry.data.title}</Fragment>
-					<Fragment slot="header-title-multilingual">
-						<Multilingual content={titleMultilingual} />
-					</Fragment>
-					<Fragment slot="header-subtitle">
-						<ContentCollectionLink collection={entry.collection} />
-					</Fragment>
-				</ContentHeader>
-			)
-		}
+		<ImageHeroCarousel
+			class="sm:mb-small"
+			hasHeroImage={hasHeroImage}
+			imageFeaturedGroup={imageFeaturedGroup}
+		>
+			<ContentHeader hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<Multilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<ContentCollectionLink collection={entry.collection} hasHeroImage={hasHeroImage} />
+				</Fragment>
+			</ContentHeader>
+		</ImageHeroCarousel>
 		<ContentDescription entry={entry} />
 		<ContentSectionPreviewGrid page={page} />
 		<ContentSectionMap mapData={mapData} persistId={`series-${entry.id}`} />

@@ -38,6 +38,8 @@ const imageHeroId = getImageHeroId({
 	fallback: entry.data.showHero === true,
 });
 
+const hasHeroImage = !!imageHeroId;
+
 const { Content } = await render(entry);
 
 // TODO: convert `<!-- ${CONTENT_EXCERPT_IDENTIFIER} -->` to an anchor (#)
@@ -59,52 +61,34 @@ const { Content } = await render(entry);
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
-	hasHeroImage={!!imageHeroId}
+	hasHeroImage={hasHeroImage}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
-		{
-			imageHeroId ? (
-				<ImageHero imageId={imageHeroId} alt={entry.data.title} class="sm:mb-small">
-					<ContentHeader isHeroImage={true}>
-						<Fragment slot="header-title">{entry.data.title}</Fragment>
-						<Fragment slot="header-title-multilingual">
-							<Multilingual content={titleMultilingual} />
-						</Fragment>
-						<Fragment slot="header-subtitle">
-							<DividedItem isHeroImage={true}>
-								<ContentCollectionLink collection="ephemera" isHeroImage={true} />
-							</DividedItem>
-							<DividedItem isHeroImage={true}>
-								<ContentDate
-									date={entry.data.dateCreated}
-									dateUpdated={entry.data.dateUpdated}
-									datePreset="long"
-								/>
-							</DividedItem>
-						</Fragment>
-					</ContentHeader>
-				</ImageHero>
-			) : (
-				<ContentHeader>
-					<Fragment slot="header-title">{entry.data.title}</Fragment>
-					<Fragment slot="header-title-multilingual">
-						<Multilingual content={titleMultilingual} />
-					</Fragment>
-					<Fragment slot="header-subtitle">
-						<DividedItem>
-							<ContentCollectionLink collection="ephemera" />
-						</DividedItem>
-						<DividedItem>
-							<ContentDate
-								date={entry.data.dateCreated}
-								dateUpdated={entry.data.dateUpdated}
-								datePreset="long"
-							/>
-						</DividedItem>
-					</Fragment>
-				</ContentHeader>
-			)
-		}
+		<ImageHero
+			class="sm:mb-small"
+			hasHeroImage={hasHeroImage}
+			imageId={imageHeroId}
+			alt={entry.data.title}
+		>
+			<ContentHeader hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<Multilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentCollectionLink collection="ephemera" hasHeroImage={hasHeroImage} />
+					</DividedItem>
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentDate
+							date={entry.data.dateCreated}
+							dateUpdated={entry.data.dateUpdated}
+							datePreset="long"
+						/>
+					</DividedItem>
+				</Fragment>
+			</ContentHeader>
+		</ImageHero>
 		<ProseBody class="content pb-small" data-reading-frame>
 			<Content />
 		</ProseBody>

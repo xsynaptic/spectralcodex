@@ -11,10 +11,10 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 interface Props {
 	entry: CollectionEntry<'regions'>;
 	showCurrentLink?: boolean;
-	isHeroImage?: boolean;
+	hasHeroImage?: boolean;
 }
 
-const { entry, showCurrentLink = false, isHeroImage = false, ...props } = Astro.props;
+const { entry, showCurrentLink = false, hasHeroImage = false, ...props } = Astro.props;
 
 const getRegionAncestors = await getRegionAncestorsFunction();
 
@@ -31,7 +31,7 @@ const t = getTranslations();
 					<DividedItem
 						as="li"
 						dividerContent="chevron"
-						isHeroImage={isHeroImage}
+						hasHeroImage={hasHeroImage}
 						aria-current={termAncestor.id === entry.id ? 'page' : undefined}
 					>
 						{!showCurrentLink && termAncestor.id === entry.id ? (
@@ -39,7 +39,7 @@ const t = getTranslations();
 						) : (
 							<Link
 								href={getContentUrl('regions', termAncestor.id)}
-								linkColor={isHeroImage ? 'accent-featured' : 'accent'}
+								linkColor={hasHeroImage ? 'accent-featured' : 'accent'}
 							>
 								{termAncestor.data.title}
 							</Link>

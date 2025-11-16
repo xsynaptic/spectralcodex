@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { getRegionsDivisionSvgContent } from '#lib/utils/regions-division.ts';
+
+interface Props extends HTMLAttributes<'div'> {
+	id: string;
+	class?: string | undefined;
+}
+
+const { id, class: className, ...props } = Astro.props;
+
+// Construct path to the SVG file
+const svgContent = await getRegionsDivisionSvgContent(id);
+
+// Note: `--division-stroke-color` and `--division-stroke-width` are available for styling
+---
+
+{
+	svgContent ? (
+		<div
+			class:list={['pointer-events-none select-none', className]}
+			aria-hidden="true"
+			set:html={svgContent}
+			{...props}
+		/>
+	) : undefined
+}

@@ -5,20 +5,25 @@ import ImageHeroCarouselItem from '#components/image-hero/image-hero-carousel-it
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 
 interface Props {
-	imageFeaturedGroup: Array<ImageFeaturedObjectWithCaptionMetadata>;
+	hasHeroImage: boolean;
+	imageFeaturedGroup?: Array<ImageFeaturedObjectWithCaptionMetadata> | undefined;
 	class?: string | undefined;
 }
 
-const { imageFeaturedGroup, class: className } = Astro.props;
+const { hasHeroImage, imageFeaturedGroup, class: className } = Astro.props;
 ---
 
-<ImageHeroFrame class={className}>
-	<div class="carousel-container">
-		{
-			imageFeaturedGroup.map((imageFeaturedGroupItem, index) => (
-				<ImageHeroCarouselItem index={index} {...imageFeaturedGroupItem} />
-			))
-		}
-	</div>
-	<slot />
-</ImageHeroFrame>
+{
+	hasHeroImage && imageFeaturedGroup ? (
+		<ImageHeroFrame class={className}>
+			<div class="carousel-container">
+				{imageFeaturedGroup.map((imageFeaturedGroupItem, index) => (
+					<ImageHeroCarouselItem index={index} {...imageFeaturedGroupItem} />
+				))}
+			</div>
+			<slot />
+		</ImageHeroFrame>
+	) : (
+		<slot />
+	)
+}

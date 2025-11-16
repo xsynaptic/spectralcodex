@@ -8,7 +8,7 @@ interface Props extends HTMLAttributes<'div'> {
 const { class: className, ...props } = Astro.props;
 ---
 
-<div class:list={[className, 'sm:relative', 'dark:sm-bg-primary-300 sm:bg-primary-300']} {...props}>
+<div class:list={['sm:relative', 'dark:sm-bg-primary-300 sm:bg-primary-300', className]} {...props}>
 	<div
 		class:list={[
 			'pointer-events-none top-0 right-0 left-0 z-20 block h-0 w-full text-transparent select-none sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',

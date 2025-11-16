@@ -18,6 +18,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
+import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
@@ -58,45 +59,41 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	hasHeroImage={hasHeroImage}
 >
 	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
-		{
-			hasHeroImage ? (
-				<ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} class="sm:mb-small">
-					<ContentHeader isHeroImage={true}>
-						<Fragment slot="header-title">{entry.data.title}</Fragment>
-						<Fragment slot="header-title-multilingual">
-							<Multilingual content={titleMultilingual} />
-						</Fragment>
-						<Fragment slot="header-subtitle">
-							<DividedItem isHeroImage={true}>
-								<ContentCollectionLink collection={entry.collection} isHeroImage={true} />
+		<ImageHeroCarousel
+			class="sm:mb-small"
+			hasHeroImage={hasHeroImage}
+			imageFeaturedGroup={imageFeaturedGroup}
+		>
+			<ContentHeader class="relative" hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<Multilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentCollectionLink collection={entry.collection} hasHeroImage={hasHeroImage} />
+					</DividedItem>
+					{
+						entry.data.parent ? (
+							<DividedItem hasHeroImage={hasHeroImage}>
+								<RegionsBreadcrumbs entry={entry} hasHeroImage={hasHeroImage} />
 							</DividedItem>
-							{entry.data.parent ? (
-								<DividedItem isHeroImage={true}>
-									<RegionsBreadcrumbs entry={entry} isHeroImage={true} />
-								</DividedItem>
-							) : undefined}
-						</Fragment>
-					</ContentHeader>
-				</ImageHeroCarousel>
-			) : (
-				<ContentHeader>
-					<Fragment slot="header-title">{entry.data.title}</Fragment>
-					<Fragment slot="header-title-multilingual">
-						<Multilingual content={titleMultilingual} />
-					</Fragment>
-					<Fragment slot="header-subtitle">
-						<DividedItem>
-							<ContentCollectionLink collection={entry.collection} />
-						</DividedItem>
-						{entry.data.parent ? (
-							<DividedItem>
-								<RegionsBreadcrumbs entry={entry} isHeroImage={false} />
-							</DividedItem>
-						) : undefined}
-					</Fragment>
-				</ContentHeader>
-			)
-		}
+						) : undefined
+					}
+				</Fragment>
+				<Fragment slot="header-background">
+					<RegionsDivision
+						id={entry.id}
+						class:list={[
+							'right-small md:right-medium top-small absolute -z-1 aspect-square h-full max-h-[400px] w-48 opacity-20 sm:w-60 md:w-72 dark:opacity-30',
+							'text-primary-300 dark:text-primary-700',
+							'[--division-stroke-color:var(--color-primary-400)] [--division-stroke-width:4] dark:[--division-stroke-color:var(--color-primary-500)]',
+							hasHeroImage ? 'sm:mt-small sm:top-full' : undefined,
+						]}
+					/>
+				</Fragment>
+			</ContentHeader>
+		</ImageHeroCarousel>
 		<ContentDescription entry={entry} />
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionSources entry={entry} />

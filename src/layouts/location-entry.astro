@@ -65,6 +65,9 @@ const imageHeroId = getImageHeroId({
 	imageFeatured: entry.data.imageFeatured,
 	fallback: entry.data.showHero === true,
 });
+
+const hasHeroImage = !!imageHeroId;
+
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 ---
 
@@ -78,66 +81,40 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
-	hasHeroImage={!!imageHeroId}
+	hasHeroImage={hasHeroImage}
 >
 	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
-		{
-			imageHeroId ? (
-				<ImageHero imageId={imageHeroId} alt={title} class="sm:mb-small">
-					<ContentHeader isHeroImage={true}>
-						<Fragment slot="header-title">{title}</Fragment>
-						<Fragment slot="header-title-multilingual">
-							<Multilingual content={titleMultilingual} />
-						</Fragment>
-						<Fragment slot="header-subtitle">
-							<DividedItem isHeroImage={true}>
-								<ContentCollectionLink collection="locations" isHeroImage={true} />
-							</DividedItem>
-							{regionPrimary ? (
-								<DividedItem isHeroImage={true}>
-									<RegionsBreadcrumbs
-										entry={regionPrimary}
-										showCurrentLink={true}
-										isHeroImage={true}
-									/>
-								</DividedItem>
-							) : undefined}
-							<DividedItem isHeroImage={true}>
-								<ContentDate
-									date={entry.data.dateCreated}
-									dateUpdated={entry.data.dateUpdated}
-									datePreset={DatePresetEnum.Medium}
+		<ImageHero class="sm:mb-small" hasHeroImage={hasHeroImage} imageId={imageHeroId} alt={title}>
+			<ContentHeader hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{title}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<Multilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentCollectionLink collection="locations" hasHeroImage={hasHeroImage} />
+					</DividedItem>
+					{
+						regionPrimary ? (
+							<DividedItem hasHeroImage={hasHeroImage}>
+								<RegionsBreadcrumbs
+									entry={regionPrimary}
+									showCurrentLink={true}
+									hasHeroImage={hasHeroImage}
 								/>
 							</DividedItem>
-						</Fragment>
-					</ContentHeader>
-				</ImageHero>
-			) : (
-				<ContentHeader>
-					<Fragment slot="header-title">{title}</Fragment>
-					<Fragment slot="header-title-multilingual">
-						<Multilingual content={titleMultilingual} />
-					</Fragment>
-					<Fragment slot="header-subtitle">
-						<DividedItem>
-							<ContentCollectionLink collection="locations" />
-						</DividedItem>
-						{regionPrimary ? (
-							<DividedItem>
-								<RegionsBreadcrumbs entry={regionPrimary} showCurrentLink={true} />
-							</DividedItem>
-						) : undefined}
-						<DividedItem>
-							<ContentDate
-								date={entry.data.dateCreated}
-								dateUpdated={entry.data.dateUpdated}
-								datePreset={DatePresetEnum.Medium}
-							/>
-						</DividedItem>
-					</Fragment>
-				</ContentHeader>
-			)
-		}
+						) : undefined
+					}
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentDate
+							date={entry.data.dateCreated}
+							dateUpdated={entry.data.dateUpdated}
+							datePreset={DatePresetEnum.Medium}
+						/>
+					</DividedItem>
+				</Fragment>
+			</ContentHeader>
+		</ImageHero>
 		{
 			!hasContent && imageFeaturedId ? (
 				<ImageComponent imageId={imageFeaturedId} alt={title} showMetadata={true} />

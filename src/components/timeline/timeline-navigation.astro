@@ -11,7 +11,7 @@ interface Props extends HTMLAttributes<'div'> {
 	currentMonth?: string | undefined;
 	timelineYears: Array<string>;
 	timelineMonths?: Array<string> | undefined;
-	isHeroImage?: boolean | undefined;
+	hasHeroImage?: boolean | undefined;
 }
 
 const {
@@ -20,7 +20,7 @@ const {
 	currentMonth,
 	timelineYears,
 	timelineMonths,
-	isHeroImage = false,
+	hasHeroImage = false,
 	...props
 } = Astro.props;
 ---
@@ -30,7 +30,7 @@ const {
 		<div
 			class:list={[
 				'text-primary-500 dark:text-primary-400 flex flex-col gap-1 overflow-hidden text-sm',
-				isHeroImage ? 'mb-medium sm:mb-0' : '',
+				hasHeroImage ? 'mb-medium sm:mb-0' : '',
 				className,
 			]}
 			{...props}
@@ -38,16 +38,16 @@ const {
 			<div
 				class:list={[
 					'flex gap-1',
-					isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
+					hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 				]}
 			>
 				{timelineYears.map((timelineYear) => (
-					<DividedItem isHeroImage={isHeroImage}>
+					<DividedItem hasHeroImage={hasHeroImage}>
 						{!currentMonth && currentYear === timelineYear ? (
 							<span
 								class:list={[
 									'text-primary-600 dark:text-primary-400 font-semibold',
-									isHeroImage ? 'sm:text-accent-200' : '',
+									hasHeroImage ? 'sm:text-accent-200' : '',
 								]}
 							>
 								{timelineYear}
@@ -56,7 +56,7 @@ const {
 							<Link
 								class={currentMonth && currentYear === timelineYear ? 'font-semibold' : undefined}
 								href={getSiteUrl('timeline', timelineYear)}
-								linkColor={isHeroImage ? 'accent-featured' : 'accent'}
+								linkColor={hasHeroImage ? 'accent-featured' : 'accent'}
 							>
 								{timelineYear}
 							</Link>
@@ -68,7 +68,7 @@ const {
 				<div
 					class:list={[
 						'flex gap-1',
-						isHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
+						hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 					]}
 				>
 					{timelineMonths
@@ -79,12 +79,12 @@ const {
 							});
 
 							return (
-								<DividedItem isHeroImage={isHeroImage}>
+								<DividedItem hasHeroImage={hasHeroImage}>
 									{currentMonth === monthNumber ? (
 										<span
 											class:list={[
 												'text-highlight-600 font-semibold',
-												isHeroImage ? 'sm:text-highlight-200' : '',
+												hasHeroImage ? 'sm:text-highlight-200' : '',
 											]}
 										>
 											{monthName}
@@ -92,7 +92,7 @@ const {
 									) : (
 										<Link
 											href={getSiteUrl('timeline', currentYear, monthNumber)}
-											linkColor={isHeroImage ? 'highlight-featured' : 'highlight'}
+											linkColor={hasHeroImage ? 'highlight-featured' : 'highlight'}
 										>
 											{monthName}
 										</Link>
