@@ -8,7 +8,7 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"astro": "^5.15.7",
+		"astro": "^5.15.8",
 		"astro-integration-kit": "^0.19.1",
 		"zod": "^3.25.76"
 	}
