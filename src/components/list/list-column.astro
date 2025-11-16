@@ -1,25 +1,15 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
-import type { CSSProperties } from 'react';
 
 type Props<Tag extends Extract<HTMLTag, 'ol' | 'ul'> = Extract<HTMLTag, 'ol' | 'ul'>> =
 	Polymorphic<{
 		as: Tag;
 		class?: string | undefined;
-		listStyleType?: CSSProperties['listStyleType'];
 	}>;
 
-const { as: Tag = 'ul', class: className, listStyleType, ...props } = Astro.props;
+const { as: Tag = 'ul', class: className, ...props } = Astro.props;
 ---
 
-<Tag
-	class:list={[
-		'flex flex-col gap-2 pl-4',
-		listStyleType && Tag === 'ul' ? 'list-disc' : undefined,
-		listStyleType && Tag === 'ol' ? 'list-decimal' : undefined,
-		className,
-	]}
-	{...props}
->
+<Tag class:list={['flex flex-col gap-2 pl-4', className]} {...props}>
 	<slot />
 </Tag>
