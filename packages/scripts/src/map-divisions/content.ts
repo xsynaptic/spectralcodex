@@ -1,4 +1,5 @@
 import { parseFrontmatter } from '@astrojs/markdown-remark';
+import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/map-types';
 import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -32,7 +33,7 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 
 					if (frontmatter.divisionId) {
 						// Handle divisionId as string or array (used for composite regions)
-						const divisionIdValue = frontmatter.divisionId as string | Array<string> | null;
+						const divisionIdValue = GeometryDivisionIdSchema.parse(frontmatter.divisionId);
 
 						if (divisionIdValue) {
 							const divisionIds = Array.isArray(divisionIdValue)
@@ -52,10 +53,15 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 								}
 								regionPathIds.push(slug);
 
+								const divisionClippingBBox = GeometryBoundingBoxSchema.optional().parse(
+									frontmatter.divisionClippingBBox,
+								);
+
 								regions.push({
 									slug,
 									divisionIds,
 									regionPathIds,
+									...(divisionClippingBBox ? { divisionClippingBBox } : {}),
 								});
 							}
 						}

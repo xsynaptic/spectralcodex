@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
-import type { FeatureCollection, Geometry, MultiPolygon, Polygon } from 'geojson';
+import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { Geometry } from 'geojson';
 
 import { DuckDBConnection } from '@duckdb/node-api';
 import chalk from 'chalk';
@@ -7,7 +8,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { BoundingBox, DivisionItem, RegionMetadata } from './types';
+import type {
+	DivisionFeatureCollection,
+	DivisionGeometry,
+	DivisionItem,
+	RegionMetadata,
+} from './types';
 
 import { boundingBoxes } from './bounding-boxes';
 import { parseRegionData } from './content';
@@ -52,7 +58,7 @@ const { values } = parseArgs({
 const cachePath = path.join(values['root-path'], values['cache-path']);
 const outputPath = path.join(values['root-path'], values['output-path']);
 
-function getBoundingBox(boundingBoxId: string): BoundingBox {
+function getBoundingBox(boundingBoxId: string): GeometryBoundingBox {
 	try {
 		return boundingBoxes[boundingBoxId]!;
 	} catch (error) {
@@ -159,14 +165,14 @@ async function fetchDivisionData(
 			if (geometry && ['MultiPolygon', 'Polygon'].includes(geometry.type)) {
 				const divisionItem = {
 					divisionId: id,
-					geometry: geometry as Polygon | MultiPolygon,
+					geometry: geometry as DivisionGeometry,
 				};
 
 				divisionsById.set(id, divisionItem);
 
 				// Save to cache
 				try {
-					await saveDivisionDataCache(id, geometry as Polygon | MultiPolygon, cachePath);
+					await saveDivisionDataCache(id, geometry as DivisionGeometry, cachePath);
 
 					console.log(chalk.gray(`  Cached ${chalk.cyan(id)}`));
 				} catch (error) {
@@ -328,18 +334,25 @@ async function processRegions(db: DuckDBConnection, regions: Array<RegionMetadat
 						if (needs.needsFgb) {
 							await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputPath);
 						} else {
-							console.log(chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.slug)}`));
+							console.log(
+								chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.slug)}`),
+							);
 						}
 
 						// Save SVG if needed
 						if (needs.needsSvg) {
 							await saveSvg(
-								divisionFeatureCollection as FeatureCollection<Polygon | MultiPolygon>,
+								divisionFeatureCollection as DivisionFeatureCollection,
 								region.slug,
 								outputPath,
+								region.divisionClippingBBox
+									? { divisionClippingBBox: region.divisionClippingBBox }
+									: {},
 							);
 						} else {
-							console.log(chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.slug)}`));
+							console.log(
+								chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.slug)}`),
+							);
 						}
 
 						console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.slug)}`));

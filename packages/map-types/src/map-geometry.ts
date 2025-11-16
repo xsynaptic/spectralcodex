@@ -40,3 +40,14 @@ export const GeometrySchema = z.discriminatedUnion('type', [
 	GeometryPolygonSchema,
 	GeometryMultiPolygonSchema,
 ]);
+
+export const GeometryDivisionIdSchema = z.union([z.string(), z.string().array()]).nullable();
+
+export const GeometryBoundingBoxSchema = z.object({
+	lngMin: z.number(),
+	lngMax: z.number(),
+	latMin: z.number(),
+	latMax: z.number(),
+});
+
+export type GeometryBoundingBox = z.infer<typeof GeometryBoundingBoxSchema>;

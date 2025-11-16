@@ -4,7 +4,13 @@ export {
 	MapDataKeys,
 	MapDataKeysCompressed,
 } from './map-data';
-export { GeometrySchema, GeometryTypeEnum } from './map-geometry';
+export {
+	GeometryBoundingBoxSchema,
+	GeometryDivisionIdSchema,
+	GeometrySchema,
+	GeometryTypeEnum,
+} from './map-geometry';
+export type { GeometryBoundingBox } from './map-geometry';
 export { mapIcons, mapLocationCategoryIcons } from './map-icons';
 export {
 	LocationCategoryEnum,

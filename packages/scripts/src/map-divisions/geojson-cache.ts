@@ -1,9 +1,7 @@
-import type { MultiPolygon, Polygon } from 'geojson';
-
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { DivisionItem } from './types';
+import type { DivisionGeometry, DivisionItem } from './types';
 
 import { safelyCreateDirectory } from './utils';
 
@@ -16,7 +14,7 @@ export async function getDivisionDataCache(
 	try {
 		await fs.access(cacheFilePath);
 		const cachedData = await fs.readFile(cacheFilePath, 'utf8');
-		const geometry = JSON.parse(cachedData) as Polygon | MultiPolygon;
+		const geometry = JSON.parse(cachedData) as DivisionGeometry;
 
 		return {
 			divisionId,
@@ -29,7 +27,7 @@ export async function getDivisionDataCache(
 
 export async function saveDivisionDataCache(
 	divisionId: string,
-	geometry: Polygon | MultiPolygon,
+	geometry: DivisionGeometry,
 	cacheDir: string,
 ) {
 	await safelyCreateDirectory(cacheDir);

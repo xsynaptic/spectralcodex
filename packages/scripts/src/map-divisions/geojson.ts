@@ -1,9 +1,7 @@
-import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
-
 import { feature, featureCollection } from '@turf/helpers';
 import { union } from '@turf/turf';
 
-import type { DivisionItem } from './types';
+import type { DivisionFeatureCollection, DivisionItem } from './types';
 
 export function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
 	const divisionFeatureCollection = (() => {
@@ -31,7 +29,7 @@ export function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
 			}
 		}
 
-		return featureCollection([]) satisfies FeatureCollection<Polygon | MultiPolygon>;
+		return featureCollection([]) satisfies DivisionFeatureCollection;
 	})();
 
 	if (divisionFeatureCollection.features.length === 0) {

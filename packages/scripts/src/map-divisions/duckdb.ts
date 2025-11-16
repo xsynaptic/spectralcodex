@@ -1,7 +1,7 @@
+import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import chalk from 'chalk';
-
-import type { BoundingBox } from './types';
 
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	console.log(chalk.blue('Initializing DuckDB...'));
@@ -35,7 +35,11 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 // Query division_area table using unique division (GERS) IDs with bounding box optimization
 // Convert WKB geometry to GeoJSON using DuckDB's spatial functions
 // Only select the essential data we need: id and geometry
-export function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: BoundingBox) {
+export function buildQuery(
+	baseUrl: string,
+	divisionIds: Set<string>,
+	boundingBox?: GeometryBoundingBox,
+) {
 	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
 
 	let query = `

@@ -1,7 +1,7 @@
-import type { BoundingBox } from './types';
+import type { GeometryBoundingBox } from '@spectralcodex/map-types';
 
 // Bounding boxes for top-level/ancestral regions
-export const boundingBoxes: Record<string, BoundingBox> = {
+export const boundingBoxes: Record<string, GeometryBoundingBox> = {
 	canada: {
 		latMin: 41.676_555_6,
 		latMax: 83.336_212_8,

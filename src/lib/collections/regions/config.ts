@@ -1,3 +1,4 @@
+import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/map-types';
 import { glob } from 'astro/loaders';
 import { defineCollection } from 'astro:content';
 import { z } from 'zod';
@@ -22,7 +23,9 @@ export const regions = defineCollection({
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
-			divisionId: z.union([z.string(), z.string().array()]).nullable(),
+			divisionId: GeometryDivisionIdSchema,
+			divisionSelectionBBox: GeometryBoundingBoxSchema.optional(),
+			divisionClippingBBox: GeometryBoundingBoxSchema.optional(),
 			hideDivision: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Derived properties, for internal use only! */
