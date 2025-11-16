@@ -1,5 +1,6 @@
 import type { MapComponentData, MapComponentProps } from '@spectralcodex/react-map-component';
 import type { BBox } from 'geojson';
+import type { LngLatBoundsLike } from 'maplibre-gl';
 
 import { bbox, buffer, distance, truncate, center as turfCenter } from '@turf/turf';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
@@ -11,7 +12,6 @@ import {
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
-import { isLngLatBoundsLike } from '#lib/map/map-type-guards.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
@@ -38,6 +38,16 @@ const defaultMapDataProps = {
 	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
+
+// GeoJSON bounding boxes can have 6 items in the array; MapLibre only supports 4
+function isLngLatBoundsLike(input: unknown): input is LngLatBoundsLike {
+	return (
+		!!input &&
+		Array.isArray(input) &&
+		input.length === 4 &&
+		input.every((item) => typeof item === 'number')
+	);
+}
 
 // Calculate map bounds based on geodata and some parameters; should not include outliers
 // By default there is a 10% buffer added to the bounding box
