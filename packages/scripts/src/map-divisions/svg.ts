@@ -1,38 +1,80 @@
-import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
+import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { Feature } from 'geojson';
 
-import { simplify } from '@turf/turf';
+import { bboxClip, featureCollection, rewind, simplify } from '@turf/turf';
 import chalk from 'chalk';
 import { geoIdentity, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import type { DivisionFeatureCollection, DivisionGeometry } from './types';
+
 import { safelyCreateDirectory } from './utils';
 
 interface SvgOptions {
-	tolerance?: number; // Tolerance for geometry simplification (lower = more detail)
+	// Tolerance for geometry simplification (lower = more detail)
+	tolerance?: number;
+	// Whether to use high-quality simplification (slower but better results)
 	highQuality?: boolean;
+	// Width of the SVG viewport
 	width?: number;
+	// Height of the SVG viewport
 	height?: number;
+	// Optional bounding box to clip geometry
+	divisionClippingBBox?: GeometryBoundingBox;
 }
 
 /**
  * Generates an SVG string from a GeoJSON FeatureCollection using d3-geo
  */
-function generateSvg(
-	geojsonData: FeatureCollection<Polygon | MultiPolygon>,
-	options: SvgOptions = {},
-): string {
-	const { tolerance = 0.0005, highQuality = true, width = 800, height = 800 } = options;
+function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions = {}): string {
+	const {
+		tolerance = 0.0005,
+		highQuality = true,
+		width = 800,
+		height = 800,
+		divisionClippingBBox,
+	} = options;
+
+	// Clip to bounding box if provided
+	let clippedFeatureCollection = geojsonData;
+
+	if (divisionClippingBBox) {
+		// Clip each feature individually and reconstruct FeatureCollection
+		// Note: bboxClip required BBox in the format [minX, minY, maxX, maxY] order
+		const clippedFeatures = geojsonData.features
+			.map((feature) =>
+				bboxClip(feature, [
+					divisionClippingBBox.latMin,
+					divisionClippingBBox.lngMin,
+					divisionClippingBBox.latMax,
+					divisionClippingBBox.lngMax,
+				]),
+			)
+			.filter((feature) => ['MultiPolygon', 'Polygon'].includes(feature.geometry.type));
+
+		// Type assertion is safe because we filtered for Polygon/MultiPolygon above
+		clippedFeatureCollection = featureCollection(
+			clippedFeatures as Array<Feature<DivisionGeometry>>,
+		);
+	}
+
+	// Ensure polygons follow the right-hand rule (exterior rings counterclockwise, holes clockwise)
+	// This prevents rendering issues where polygons might appear inverted or not render at all
+	const corrected = rewind(clippedFeatureCollection, {
+		reverse: false,
+	}) as DivisionFeatureCollection;
 
 	// Simplify geometry for decorative purposes
-	const simplified = simplify(geojsonData, {
+	const simplified = simplify(corrected, {
 		tolerance,
 		highQuality,
 	});
 
 	// Create a projection that fits the geometry to the viewport
 	// geoIdentity is a "flat" projection that just scales and translates
-	const projection = geoIdentity().fitSize([width, height], simplified);
+	// reflectY(true) flips the Y-axis so north is up (SVG Y increases downward)
+	const projection = geoIdentity().reflectY(true).fitSize([width, height], simplified);
 
 	// Create a path generator
 	const pathGenerator = geoPath(projection);
@@ -53,7 +95,7 @@ function generateSvg(
  * Saves a GeoJSON FeatureCollection as an optimized SVG file
  */
 export async function saveSvg(
-	geojsonData: FeatureCollection<Polygon | MultiPolygon>,
+	geojsonData: DivisionFeatureCollection,
 	slug: string,
 	outputDir: string,
 	options: SvgOptions = {},
