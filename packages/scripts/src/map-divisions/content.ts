@@ -33,17 +33,15 @@ export async function parseRegionData(rootPath: string, regionsPath: string) {
 					const fileContent = await fs.readFile(filePath, 'utf8');
 					const { frontmatter } = parseFrontmatter(fileContent);
 
-					// Determine all ancestor IDs from path structure
-					const regionPathIds: Array<string> = [];
+					const regionPathIds: Array<string> = [slug];
 
 					if (parentPath) {
 						const pathParts = parentPath.split('/');
-						// Add all path parts from most specific to least specific
+						// Add ancestors from immediate parent to root
 						for (let i = pathParts.length; i > 0; i--) {
 							if (pathParts[i - 1]) regionPathIds.push(pathParts[i - 1]!);
 						}
 					}
-					regionPathIds.push(slug);
 
 					const divisionSelectionBBox = GeometryBoundingBoxSchema.optional().parse(
 						frontmatter.divisionSelectionBBox,
@@ -108,17 +106,10 @@ export function resolveBoundingBox(
 	regionsBySlug: Map<string, RegionMetadata>,
 	bboxField: 'divisionSelectionBBox' | 'divisionClippingBBox',
 ): GeometryBoundingBox | undefined {
-	// Check if this region has its own bbox
-	if (region[bboxField]) {
-		return region[bboxField];
-	}
-
-	// Walk up ancestry chain (from most specific to least specific)
 	for (const ancestorSlug of region.regionPathIds) {
 		const ancestor = regionsBySlug.get(ancestorSlug);
 
 		if (ancestor?.[bboxField]) return ancestor[bboxField];
 	}
-
 	return undefined;
 }

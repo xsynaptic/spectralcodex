@@ -102,27 +102,42 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 	// Create a path generator
 	const pathGenerator = geoPath(projection);
 
+	// Calculate actual bounds of the geometry with buffer for strokes
+	const bounds = pathGenerator.bounds(simplified);
+	const [[x0, y0], [x1, y1]] = bounds;
+	const buffer = 10; // 10px buffer to prevent stroke clipping
+	const viewBoxX = x0 - buffer;
+	const viewBoxY = y0 - buffer;
+	const viewBoxWidth = x1 - x0 + buffer * 2;
+	const viewBoxHeight = y1 - y0 + buffer * 2;
+
 	// Generate path data for all features
 	const pathData = simplified.features
 		.map((feature) => pathGenerator(feature))
 		.filter((path): path is string => path !== null)
 		.join(' ');
 
-	// Generate SVG with proper viewBox
-	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${String(width)} ${String(height)}" preserveAspectRatio="xMidYMid meet">
-  <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke, none)" stroke-width="var(--division-stroke-width, 0)" />
+	// Generate SVG with dynamic viewBox matching actual geometry bounds
+	// Includes buffer to prevent stroke clipping at edges
+	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMin meet">
+  <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;
 }
 
 /**
  * Saves a GeoJSON FeatureCollection as an optimized SVG file
  */
-export async function saveSvg(
-	geojsonData: DivisionFeatureCollection,
-	slug: string,
-	outputDir: string,
-	options: SvgOptions = {},
-): Promise<void> {
+export async function saveSvg({
+	geojsonData,
+	slug,
+	outputDir,
+	options = {},
+}: {
+	geojsonData: DivisionFeatureCollection;
+	slug: string;
+	outputDir: string;
+	options: SvgOptions;
+}): Promise<void> {
 	await safelyCreateDirectory(outputDir);
 
 	const filePath = path.join(outputDir, `${slug}.svg`);

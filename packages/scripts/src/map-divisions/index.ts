@@ -37,7 +37,7 @@ const { values } = parseArgs({
 		'cache-path': {
 			type: 'string',
 			short: 'c',
-			default: './temp/divisions',
+			default: './node_modules/.astro/divisions',
 		},
 		'overture-url': {
 			type: 'string',
@@ -72,7 +72,7 @@ async function processRegions(
 
 		for (const region of regions) {
 			const fgbPath = path.join(outputPath, `${region.slug}.fgb`);
-			const svgPath = path.join(outputPath, `${region.slug}.svg`);
+			const svgPath = path.join(cachePath, `${region.slug}.svg`);
 
 			let needsFgb = false;
 			let needsSvg = false;
@@ -218,19 +218,18 @@ async function processRegions(
 
 						// Save SVG if needed
 						if (needs.needsSvg) {
-							// Resolve clipping bbox hierarchically
 							const divisionClippingBBox = resolveBoundingBox(
 								region,
 								regionsBySlug,
 								'divisionClippingBBox',
 							);
 
-							await saveSvg(
-								divisionFeatureCollection as DivisionFeatureCollection,
-								region.slug,
-								outputPath,
-								divisionClippingBBox ? { divisionClippingBBox } : {},
-							);
+							await saveSvg({
+								geojsonData: divisionFeatureCollection as DivisionFeatureCollection,
+								slug: region.slug,
+								outputDir: cachePath,
+								options: divisionClippingBBox ? { divisionClippingBBox } : {},
+							});
 						} else {
 							console.log(
 								chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.slug)}`),
