@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
 
@@ -19,7 +20,7 @@ export async function checkSlugMismatches(contentPaths: Record<string, string>) 
 		let mismatchCount = 0;
 
 		for (const parsedFile of parsedFiles) {
-			const slug = parsedFile.frontmatter.slug as string | undefined;
+			const slug = z.string().optional().parse(parsedFile.frontmatter.slug);
 
 			try {
 				if (!slug) {

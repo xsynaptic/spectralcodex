@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
 
@@ -11,7 +12,7 @@ export async function checkLocationsRegions(locationsPath: string) {
 	let mismatchCount = 0;
 
 	for (const parsedFile of parsedFiles) {
-		const regions = parsedFile.frontmatter.regions as Array<string> | undefined;
+		const regions = z.string().array().optional().parse(parsedFile.frontmatter.regions);
 
 		if (!regions?.[0]) {
 			console.log(chalk.red('❌ ' + parsedFile.filename));

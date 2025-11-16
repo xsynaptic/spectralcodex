@@ -1,32 +1,31 @@
 #!/usr/bin/env tsx
-import type { LocationStatus } from '@spectralcodex/map-types';
-
 import { LocationStatusEnum } from '@spectralcodex/map-types';
 import chalk from 'chalk';
 import { isIncludedIn } from 'remeda';
+import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
 
-interface LocationFrontmatter {
-	status: LocationStatus;
-	safety?: number | undefined;
-	hideLocation?: boolean | undefined;
-}
+const LocationFrontmatterSchema = z.object({
+	status: z.nativeEnum(LocationStatusEnum),
+	safety: z.number().optional(),
+	hideLocation: z.boolean().optional(),
+});
+
+type LocationItem = z.output<typeof LocationFrontmatterSchema> & {
+	path: string;
+	reason: string;
+};
 
 export async function checkLocationsVisibility(locationsPath: string): Promise<boolean> {
 	console.log(chalk.blue('Checking locations that should potentially be hidden...'));
 
 	try {
 		const locations = await parseContentFiles(locationsPath);
-		const candidateLocations: Array<
-			LocationFrontmatter & {
-				path: string;
-				reason: string;
-			}
-		> = [];
+		const candidateLocations: Array<LocationItem> = [];
 
 		for (const location of locations) {
-			const frontmatter = location.frontmatter as unknown as LocationFrontmatter;
+			const frontmatter = LocationFrontmatterSchema.parse(location.frontmatter);
 			const { status, safety, hideLocation } = frontmatter;
 
 			// Skip if already hidden or demolished

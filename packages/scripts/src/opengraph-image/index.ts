@@ -5,6 +5,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 import sharp from 'sharp';
+import { z } from 'zod';
 
 import { ContentCollectionsEnum } from '../content-utils/collections.js';
 import { parseContentFiles } from '../content-utils/index.js';
@@ -37,7 +38,13 @@ const OG_DENSITY = 2;
 const OG_FORMAT = 'jpg';
 const OG_QUALITY = 85;
 
-type ImageFeatured = string | { id: string } | Array<string | { id: string }>;
+const ImageFeaturedSchema = z.union([
+	z.string(),
+	z.object({ id: z.string() }),
+	z.array(z.union([z.string(), z.object({ id: z.string() })])),
+]);
+
+type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;
 
 interface ContentEntry {
 	id: string;
@@ -86,7 +93,7 @@ async function getContentEntries(): Promise<Array<ContentEntry>> {
 		const files = await parseContentFiles(collectionPath);
 
 		for (const file of files) {
-			const imageFeatured = file.frontmatter.imageFeatured as ImageFeatured | undefined;
+			const imageFeatured = ImageFeaturedSchema.optional().parse(file.frontmatter.imageFeatured);
 
 			if (imageFeatured) {
 				allEntries.push({

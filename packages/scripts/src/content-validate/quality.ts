@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
 
@@ -19,8 +20,8 @@ export async function checkContentQuality(contentPaths: Record<string, string>) 
 		let mismatchCount = 0;
 
 		for (const parsedFile of parsedFiles) {
-			const imageFeatured = parsedFile.frontmatter.imageFeatured as string | undefined;
-			const entryQuality = parsedFile.frontmatter.entryQuality as number | undefined;
+			const imageFeatured = z.string().optional().parse(parsedFile.frontmatter.imageFeatured);
+			const entryQuality = z.number().optional().parse(parsedFile.frontmatter.entryQuality);
 
 			if (imageFeatured && entryQuality && entryQuality < 2) {
 				console.log(chalk.red('❌ ' + parsedFile.filename));

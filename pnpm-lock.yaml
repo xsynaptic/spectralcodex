@@ -504,6 +504,9 @@ importers:
       tsx:
         specifier: ^4.20.6
         version: 4.20.6
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
       zx:
         specifier: ^8.8.5
         version: 8.8.5
