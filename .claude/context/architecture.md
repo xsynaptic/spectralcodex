@@ -2,24 +2,23 @@
 
 ## Project Structure
 
-This is an Astro 5 project with a monorepo structure using pnpm workspaces:
+Astro 5 monorepo using pnpm workspaces:
 
-- **Root**: Main Astro application
-  - `src/`: Astro source files
-  - `astro.config.mjs`: Astro configuration
-- **packages/**: Workspace packages for specialized functionality
-  - `content/`: Production content (MDX files and media)
+- **Root**: Main Astro application (`src/`, `astro.config.mjs`)
+- **packages/**: Workspace packages
+  - `content/`: Production content (MDX + media)
   - `content-demo/`: Example content for testing
   - `react-map-component/`: Interactive map component
-  - `map-types/`: Map-related TypeScript types
+  - `map-types/`: Map TypeScript types
   - `image-loader/`: Custom image processing
   - `image-open-graph/`: OpenGraph image generation
   - `local-image-server/`: Development image server
   - `remark-img-group/`: Custom remark plugin
+  - `unified-tools/`: Unified/remark utilities
+  - `astro-build-logger/`: Build logging utilities
+  - `scripts/`: Build and utility scripts
 
 ## Content Collections
-
-The project uses Astro's Content Collections API with these collections:
 
 - `ephemera`: Short-form content and observations
 - `locations`: Geographic location entries
@@ -33,42 +32,9 @@ The project uses Astro's Content Collections API with these collections:
 ## Key Technologies
 
 - **Astro 5**: Static site generator with partial hydration
-- **React 19**: For interactive components; avoid using unless necessary
-- **Tailwind CSS v4**: Utility-first CSS framework
-- **TypeScript**: Strict typing throughout
+- **React 19**: Interactive components (use sparingly)
+- **Tailwind CSS v4**: Utility-first CSS
+- **TypeScript**: Strict typing
 - **MapLibre GL JS**: Interactive maps
-- **MDX**: Enhanced Markdown with components
-- **Vite**: Build tool and dev server
+- **MDX**: Enhanced Markdown
 - **Vitest**: Testing framework
-
-## Map Integration
-
-The project includes a sophisticated map system:
-
-- Interactive map component using MapLibre GL JS
-- Custom map data types and utilities
-- Location-based content organization
-- Map sprite generation for icons
-
-## Image Processing
-
-Custom image pipeline with:
-
-- Automatic image optimization
-- LQIP (Low Quality Image Placeholder) generation
-- OpenGraph image generation using Satori (not yet completely implemented)
-- Local image server for development and builds
-
-## Content Architecture
-
-- Content stored in workspace packages for modularity and privacy
-- MDX files with frontmatter schemas
-- Organized by geographic regions and themes
-- Custom remark plugins for enhanced functionality
-
-## Development Workflow
-
-1. Content is authored in MDX files within workspace packages
-2. Images are processed through custom loaders
-3. Map data is generated and served through specialized components
-4. Build process optimizes for static generation with selective hydration
