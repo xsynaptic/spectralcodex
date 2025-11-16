@@ -26,10 +26,11 @@ interface SvgOptions {
 
 /**
  * Generates an SVG string from a GeoJSON FeatureCollection using d3-geo
+ * This approach references: https://css-irl.info/creating-static-svgs-from-geojson/
  */
 function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions = {}): string {
 	const {
-		tolerance = 0.0005,
+		tolerance = 0.0002,
 		highQuality = true,
 		width = 800,
 		height = 800,
@@ -109,7 +110,7 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 
 	// Generate SVG with proper viewBox
 	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${String(width)} ${String(height)}" preserveAspectRatio="xMidYMid meet">
-  <path d="${pathData}" fill="currentColor" stroke="none"/>
+  <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke, none)" stroke-width="var(--division-stroke-width, 0)" />
 </svg>`;
 }
 
