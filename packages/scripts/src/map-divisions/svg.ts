@@ -40,20 +40,42 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 	let clippedFeatureCollection = geojsonData;
 
 	if (divisionClippingBBox) {
-		// Clip each feature individually and reconstruct FeatureCollection
-		// Note: bboxClip required BBox in the format [minX, minY, maxX, maxY] order
 		const clippedFeatures = geojsonData.features
 			.map((feature) =>
 				bboxClip(feature, [
-					divisionClippingBBox.latMin,
 					divisionClippingBBox.lngMin,
-					divisionClippingBBox.latMax,
+					divisionClippingBBox.latMin,
 					divisionClippingBBox.lngMax,
+					divisionClippingBBox.latMax,
 				]),
 			)
-			.filter((feature) => ['MultiPolygon', 'Polygon'].includes(feature.geometry.type));
+			.map((feature) => {
+				// Clean up MultiPolygons by removing empty polygon parts (clipped out)
+				if (feature.geometry.type === 'MultiPolygon') {
+					const validPolygons = feature.geometry.coordinates.filter(
+						(polygon) => polygon.length > 0 && (polygon[0]?.length ?? 0) > 0,
+					);
+					return {
+						...feature,
+						geometry: {
+							...feature.geometry,
+							coordinates: validPolygons,
+						},
+					};
+				}
+				return feature;
+			})
+			.filter(({ geometry }) => {
+				if (!['MultiPolygon', 'Polygon'].includes(geometry.type)) return false;
 
-		// Type assertion is safe because we filtered for Polygon/MultiPolygon above
+				// Filter out empty geometries
+				if (geometry.type === 'Polygon') {
+					return geometry.coordinates.length > 0 && (geometry.coordinates[0]?.length ?? 0) > 0;
+				}
+				// After cleanup, MultiPolygons just need at least one polygon
+				return geometry.coordinates.length > 0;
+			});
+
 		clippedFeatureCollection = featureCollection(
 			clippedFeatures as Array<Feature<DivisionGeometry>>,
 		);
