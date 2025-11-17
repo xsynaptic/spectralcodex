@@ -7,22 +7,26 @@ import type { HTMLAttributes } from 'astro/types';
  */
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
-	linkClass?: string | undefined;
+	parentClass?: string | undefined;
 	target?: string | undefined;
 	label: string;
 }
 
-const { class: className, linkClass, target = '#content', label, ...props } = Astro.props;
+const { class: className, parentClass, target = '#content', label, ...props } = Astro.props;
 ---
 
-<div class:list={['skip-link', className]} {...props}>
-	<a href={target} class={linkClass}>{label}</a>
+<div class:list={['skip-link', parentClass]} {...props}>
+	<a
+		href={target}
+		class:list={[
+			'absolute z-9999 hover:outline-2 hover:outline-current focus-visible:outline-2 focus-visible:outline-current',
+			className,
+		]}>{label}</a
+	>
 </div>
 
 <style>
 	:where(.skip-link a) {
-		position: absolute;
-		z-index: 9999;
 		transition: inset-block-start 0.2s ease-in-out;
 		inset-block-start: -100vh;
 		inset-inline-start: 0;
@@ -30,7 +34,6 @@ const { class: className, linkClass, target = '#content', label, ...props } = As
 	:where(.skip-link a:hover),
 	:where(.skip-link a:focus-visible) {
 		inset-block-start: 0;
-		outline: 2px solid currentColor;
 	}
 	@media (prefers-reduced-motion: reduce) {
 		:where(.skip-link a) {

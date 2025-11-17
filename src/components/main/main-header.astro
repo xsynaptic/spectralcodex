@@ -31,9 +31,12 @@ const t = getTranslations();
 	]}
 >
 	<SkipLink
+		class:list={[
+			'font-display px-small rounded-br-sm py-1 uppercase transition-colors',
+			'bg-primary-50 dark:bg-primary-800 text-accent-500 dark:text-accent-400 hover:text-accent-400 dark:hover:text-accent-300',
+		]}
 		target="#content"
 		label={t('site.skip.label')}
-		linkClass="bg-primary-50 dark:bg-primary-800 text-accent-600 dark:text-accent-400 rounded-br-sm px-2 py-1 text-lg"
 	/>
 	<Container
 		as="div"
