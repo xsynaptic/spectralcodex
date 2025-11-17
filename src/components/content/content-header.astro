@@ -15,7 +15,6 @@ const titleMultilingual = await renderSlot(Astro.slots, 'header-title-multilingu
 const titleInfo = await renderSlot(Astro.slots, 'header-title-info');
 const subtitle = await renderSlot(Astro.slots, 'header-subtitle');
 const caption = await renderSlot(Astro.slots, 'header-caption');
-const background = await renderSlot(Astro.slots, 'header-background');
 ---
 
 <Container
@@ -88,5 +87,4 @@ const background = await renderSlot(Astro.slots, 'header-background');
 			</div>
 		) : undefined
 	}
-	{background ? <Fragment set:html={background} /> : undefined}
 </Container>

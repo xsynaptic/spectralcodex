@@ -119,7 +119,7 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 
 	// Generate SVG with dynamic viewBox matching actual geometry bounds
 	// Includes buffer to prevent stroke clipping at edges
-	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMin meet">
+	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMid meet">
   <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;
 }
