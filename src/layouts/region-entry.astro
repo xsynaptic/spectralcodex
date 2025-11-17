@@ -13,7 +13,6 @@ import ContentSectionLinks from '#components/content/content-section-links.astro
 import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
-import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -101,15 +100,6 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		</RegionsRelated>
 		<ContentSectionMap mapData={mapData} persistId={`region-${entry.id}`} />
 		<ContentSectionPreviewGrid page={page} />
-		<ContentSection>
-			<RegionsDivision
-				id={entry.id}
-				class:list={[
-					'align-items relative -z-1 mx-auto flex h-full max-h-[300px] max-w-48 opacity-20 sm:max-w-60 md:max-w-72 dark:opacity-30',
-					'text-primary-300 dark:text-primary-700',
-					'[--division-stroke-color:var(--color-primary-400)] [--division-stroke-width:4] dark:[--division-stroke-color:var(--color-primary-500)]',
-				]}
-			/>
-		</ContentSection>
+		<RegionsDivision id={entry.id} />
 	</article>
 </MainSite>

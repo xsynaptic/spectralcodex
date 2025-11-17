@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import Container from '#components/parts/container.astro';
 import { getRegionsDivisionSvgContent } from '#lib/utils/regions-division.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -18,11 +19,17 @@ const svgContent = await getRegionsDivisionSvgContent(id);
 
 {
 	svgContent ? (
-		<div
-			class:list={['pointer-events-none select-none', className]}
+		<Container
+			class:list={[
+				'align-items pointer-events-none relative -z-1 mx-auto flex h-full max-h-[300px] max-w-48 opacity-60 select-none sm:max-w-60 md:max-w-72 dark:opacity-30',
+				'text-primary-200 dark:text-primary-700',
+				'[--division-stroke-color:var(--color-primary-300)] [--division-stroke-width:4] dark:[--division-stroke-color:var(--color-primary-500)]',
+				className,
+			]}
 			aria-hidden="true"
-			set:html={svgContent}
 			{...props}
-		/>
+		>
+			<Fragment set:html={svgContent} />
+		</Container>
 	) : undefined
 }
