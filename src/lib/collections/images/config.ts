@@ -118,10 +118,7 @@ export const images = defineCollection({
 								? {
 										geometry: {
 											type: GeometryTypeEnum.Point,
-											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)] as [
-												number,
-												number,
-											],
+											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
 										},
 									}
 								: {}),

@@ -13,9 +13,9 @@ export function logError(message: string) {
 	if (!fs.existsSync(logFilePath)) {
 		fs.writeFileSync(logFilePath, ''); // Create an empty log file, if needed
 	}
-	fs.appendFile(logFilePath, errorMessage, (err) => {
-		if (err) {
-			console.error('Error writing to log file:', err);
+	fs.appendFile(logFilePath, errorMessage, (error) => {
+		if (error) {
+			console.error('Error writing to log file:', error);
 		}
 	});
 }

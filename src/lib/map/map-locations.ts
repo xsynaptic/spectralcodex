@@ -21,11 +21,12 @@ import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { hashData } from '#lib/utils/cache.ts';
 
-function getMapGeometryCoordinatesOptimized(coordinates: Position) {
-	return coordinates.slice(0, 2).map((value) => Number.parseFloat(value.toFixed(6))) as [
-		number,
-		number,
-	];
+function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
+	const truncatedCoordinates = coordinates
+		.slice(0, 2)
+		.map((value) => Number.parseFloat(value.toFixed(6)));
+
+	return [truncatedCoordinates[0] ?? 0, truncatedCoordinates[1] ?? 0];
 }
 
 // An alternative to using Turf's truncate function

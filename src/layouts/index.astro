@@ -46,7 +46,11 @@ const t = getTranslations();
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	{hasHeroImage ? <ImageHeroCarousel imageFeaturedGroup={imageFeaturedGroup} /> : undefined}
+	{
+		hasHeroImage ? (
+			<ImageHeroCarousel hasHeroImage={hasHeroImage} imageFeaturedGroup={imageFeaturedGroup} />
+		) : undefined
+	}
 	<ContentSection class="mt-small">
 		<Fragment
 			slot="section-description"
