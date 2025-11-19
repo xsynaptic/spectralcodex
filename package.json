@@ -16,7 +16,7 @@
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD --content-path=packages/content --cache-path=./node_modules/.astro",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --content-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD --content-path=packages/content",
-		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./node_modules/.astro/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-09-24.0/",
+		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --cache-path ./node_modules/.astro/divisions --regions-path ./packages/content/collections/regions --output-path ./public/divisions --overture-url=s3://overturemaps-us-west-2/release/2025-10-22.0/",
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"opengraph-image": "pnpm --filter @spectralcodex/scripts opengraph-image --root-path=$PWD --content-path=packages/content --output-path=./public/0g",
 		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD"

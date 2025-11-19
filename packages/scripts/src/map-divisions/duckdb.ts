@@ -12,13 +12,9 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	console.log(chalk.blue('Initializing DuckDB...'));
 
 	try {
-		// Create DuckDB instance with in-memory database
 		const instance = await DuckDBInstance.create(':memory:');
-
-		// Connect to the instance
 		const connection = await instance.connect();
 
-		// Install and load spatial extension
 		await connection.run(`
 			INSTALL spatial;
 			LOAD spatial;
@@ -37,35 +33,49 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	}
 }
 
-// Query division_area table using unique division (GERS) IDs with bounding box optimization
-// Convert WKB geometry to GeoJSON using DuckDB's spatial functions
-// Only select the essential data we need: id and geometry
 export function buildQuery(
 	baseUrl: string,
 	divisionIds: Set<string>,
 	boundingBox?: GeometryBoundingBox,
 ) {
-	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
+	const setBBoxVars = boundingBox
+		? `
+		SET VARIABLE xmin = ${String(boundingBox.lngMin)};
+		SET VARIABLE xmax = ${String(boundingBox.lngMax)};
+		SET VARIABLE ymin = ${String(boundingBox.latMin)};
+		SET VARIABLE ymax = ${String(boundingBox.latMax)};
+		`
+		: '';
 
 	let query = `
 		SELECT
 			id,
 			ST_AsGeoJSON(geometry) as geometry_geojson
-		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*', hive_partitioning=1)
-		WHERE id IN (${quotedIds})`;
+		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*', hive_partitioning=1)`;
 
-	// Add bounding box filter if provided
+	const conditions: Array<string> = [];
+
 	if (boundingBox) {
-		const { lngMin, latMin, lngMax, latMax } = boundingBox;
-
-		query += `
-			AND bbox.xmin > ${String(lngMin)}
-			AND bbox.xmax < ${String(lngMax)}
-			AND bbox.ymin > ${String(latMin)}
-			AND bbox.ymax < ${String(latMax)}`;
+		conditions.push(
+			`bbox.xmin >= getvariable('xmin')`,
+			`bbox.xmax <= getvariable('xmax')`,
+			`bbox.ymin >= getvariable('ymin')`,
+			`bbox.ymax <= getvariable('ymax')`,
+		);
 	}
 
-	return query + ';';
+	if (divisionIds.size === 1) {
+		const id = [...divisionIds][0] ?? '';
+		conditions.push(`id = '${id}'`);
+	} else {
+		const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
+		conditions.push(`id IN (${quotedIds})`);
+	}
+
+	query += `
+		WHERE ${conditions.join('\n\t\t\tAND ')}`;
+
+	return setBBoxVars + query + ';';
 }
 
 export async function fetchDivisionData({
