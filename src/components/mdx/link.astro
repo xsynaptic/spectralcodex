@@ -5,14 +5,14 @@ import { getContentMetadataById } from '#lib/metadata/metadata-utils.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'a'> {
-	id?: string | undefined;
+	id: string;
 }
 
 const { id, ...props } = Astro.props;
 
 const content = await renderSlot(Astro.slots, 'default');
 
-const contentMetadata = await getContentMetadataById(id ?? content?.toLowerCase());
+const contentMetadata = await getContentMetadataById(id);
 ---
 
 {
