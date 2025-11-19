@@ -6,6 +6,7 @@ import { $ } from 'zx';
 
 import { ContentCollectionsEnum } from '../content-utils/collections';
 import { checkDivisionIds } from './divisions';
+import { checkLocationsCoordinates } from './locations-coordinates';
 import { checkLocationsRegions } from './locations-region';
 import { checkLocationsVisibility } from './locations-visibility';
 import { checkContentQuality } from './quality';
@@ -23,6 +24,11 @@ const { values, positionals } = parseArgs({
 			type: 'string',
 			short: 'c',
 			default: 'packages/content',
+		},
+		'divisions-path': {
+			type: 'string',
+			short: 'd',
+			default: './public/divisions',
 		},
 		verbose: {
 			type: 'boolean',
@@ -77,6 +83,13 @@ switch (command) {
 	}
 	case 'location-visibility': {
 		await checkLocationsVisibility(ContentFilesPathEnum.Locations);
+		break;
+	}
+	case 'location-coordinates': {
+		await checkLocationsCoordinates(
+			ContentFilesPathEnum.Locations,
+			path.join(values['root-path'], values['divisions-path']),
+		);
 		break;
 	}
 	case 'divisions': {
