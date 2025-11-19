@@ -18,9 +18,12 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 		await connection.run(`
 			INSTALL spatial;
 			LOAD spatial;
-			SET enable_object_cache=true;
 			INSTALL httpfs;
 			LOAD httpfs;
+			SET enable_object_cache=true;
+			SET http_timeout=12000;
+			SET http_retries=5;
+			SET s3_region='us-west-2';
 		`);
 
 		console.log(chalk.green('DuckDB initialized with spatial and httpfs extensions'));
@@ -57,10 +60,10 @@ export function buildQuery(
 
 	if (boundingBox) {
 		conditions.push(
-			`bbox.xmin >= getvariable('xmin')`,
-			`bbox.xmax <= getvariable('xmax')`,
-			`bbox.ymin >= getvariable('ymin')`,
-			`bbox.ymax <= getvariable('ymax')`,
+			`bbox.xmin > getvariable('xmin')`,
+			`bbox.xmax < getvariable('xmax')`,
+			`bbox.ymin > getvariable('ymin')`,
+			`bbox.ymax < getvariable('ymax')`,
 		);
 	}
 
