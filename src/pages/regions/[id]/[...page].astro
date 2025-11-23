@@ -33,7 +33,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const ancestors = getRegionAncestors(entry);
 
 		// Note: this is temporary code to limit map display specified regions
-		const displayRegionMapIds = new Set(['taiwan', 'thailand', 'hong-kong']);
+		const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
 
 		const showRegionMap =
 			displayRegionMapIds.has(entry.id) ||
@@ -50,11 +50,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			R.sort(sortContentMetadataByDate)
 		);
 
-		const regionsOption = R.pipe(
-			entry,
-			(entry) => getRegionAncestors(entry).length, // Depth
-			getRegionsOptions
-		);
+		const regionsOption = getRegionsOptions(getRegionAncestors(entry).length);
 
 		const mapData = getMapData({
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
