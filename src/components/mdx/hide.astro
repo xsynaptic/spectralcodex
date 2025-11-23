@@ -1,0 +1,23 @@
+---
+import { stripTags } from '@spectralcodex/unified-tools';
+
+import { renderSlot } from '#lib/utils/astro.ts';
+
+interface Props {
+	char?: string;
+}
+
+const { char = '█' } = Astro.props;
+
+// Validate and normalize to single character
+const character = char.length > 0 ? (char[0] ?? '█') : '█';
+
+// Get the content to hide
+const content = await renderSlot(Astro.slots, 'default');
+
+const contentStripped = stripTags(content ?? '').trim();
+
+const contentHidden = character.repeat(contentStripped.length);
+---
+
+<span class="content-hidden">{contentHidden}</span>

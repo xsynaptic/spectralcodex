@@ -20,6 +20,11 @@ declare global {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			children: any;
 		}) => React.JSX.Element;
+		Hide: (props: {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			children: any;
+			char?: string;
+		}) => React.JSX.Element;
 		Link: (props: { id?: string; children: string | React.JSX.Element }) => React.JSX.Element;
 		LocationsTable: (props: { id: string }) => React.JSX.Element;
 		Map: (props: {

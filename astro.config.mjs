@@ -115,6 +115,7 @@ export default defineConfig({
 				{
 					'./src/components/mdx/img.astro': [['default', 'Img']],
 					'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
+					'./src/components/mdx/hide.astro': [['default', 'Hide']],
 					'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
 					'./src/components/mdx/link.astro': [['default', 'Link']],
 					'./src/components/mdx/map.astro': [['default', 'Map']],
