@@ -72,6 +72,13 @@ if (!remoteHostApp || !remoteHostImages || !sshKeyPath) {
 	process.exit(1);
 }
 
+// Load SSH keys from macOS Keychain to avoid passphrase prompts
+try {
+	await $`ssh-add --apple-load-keychain 2>/dev/null`;
+} catch {
+	console.warn(chalk.yellow('Warning: Could not load SSH keys from keychain. You may be prompted for passphrase.'));
+}
+
 // A flag for whether we're using the remote image strategy, which affects the build output
 const imageRemote = true as boolean;
 

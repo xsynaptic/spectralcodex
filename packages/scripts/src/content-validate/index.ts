@@ -115,6 +115,13 @@ switch (command) {
 
 		if (!regionSuccess) process.exit(1);
 
+		const coordinatesSuccess = await checkLocationsCoordinates(
+			ContentFilesPathEnum.Locations,
+			path.join(values['root-path'], values['divisions-path']),
+		);
+
+		if (!coordinatesSuccess) process.exit(1);
+
 		break;
 	}
 }
