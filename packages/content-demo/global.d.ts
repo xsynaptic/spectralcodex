@@ -8,24 +8,24 @@ declare global {
 		// Since we use custom remark transformers to include import statements
 		// So here we manually type the components, but that's OK, there aren't too many of them
 		Img: (props: {
-			src: string;
 			alt?: string;
-			layout?: 'medium' | 'wide' | 'full';
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			children?: any;
+			layout?: 'wide' | 'full';
+			src: string;
 		}) => React.JSX.Element;
 		ImgGroup: (props: {
-			layout?: 'wide';
-			columns?: number | string;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			children: any;
+			columns?: number | string;
+			layout?: 'wide' | 'full';
 		}) => React.JSX.Element;
 		Hide: (props: {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			children: any;
 			char?: string;
 		}) => React.JSX.Element;
-		Link: (props: { id?: string; children: string | React.JSX.Element }) => React.JSX.Element;
+		Link: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
 		LocationsTable: (props: { id: string }) => React.JSX.Element;
 		Map: (props: {
 			locations: Array<string>;
