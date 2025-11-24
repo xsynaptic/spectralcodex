@@ -3,17 +3,16 @@ import chalk from 'chalk';
 
 import { parseContentFiles } from '../content-utils';
 
-interface LinkError {
+interface ComponentError {
 	line: number;
 	message: string;
 	context: string;
 }
 
-function validateLinkComponents(content: string): Array<LinkError> {
-	const errors: Array<LinkError> = [];
+function validateLinkComponents(content: string): Array<ComponentError> {
+	const errors: Array<ComponentError> = [];
 	const lines = content.split('\n');
 
-	// Regex to match Link components - make whitespace optional
 	const linkRegex = /<Link(?:\s+([^>]*?))?(?:>|\/?>)/g;
 	const idPropRegex = /id=["']([^"']+)["']/;
 
@@ -21,19 +20,45 @@ function validateLinkComponents(content: string): Array<LinkError> {
 
 	while ((match = linkRegex.exec(content)) !== null) {
 		const props = match[1] || '';
-
-		// Check if id prop exists and is not empty
 		const idMatch = idPropRegex.exec(props);
 
 		if (!idMatch?.[1]) {
-			// Find line number
 			const beforeMatch = content.slice(0, match.index);
 			const lineNumber = beforeMatch.split('\n').length;
 			const lineContent = lines[lineNumber - 1];
 
 			errors.push({
 				line: lineNumber,
-				message: 'Link component missing ID prop',
+				message: 'Link component missing id prop',
+				context: lineContent ?? '',
+			});
+		}
+	}
+
+	return errors;
+}
+
+function validateImgComponents(content: string): Array<ComponentError> {
+	const errors: Array<ComponentError> = [];
+	const lines = content.split('\n');
+
+	const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
+	const srcPropRegex = /src=["']([^"']+)["']/;
+
+	let match: RegExpExecArray | null;
+
+	while ((match = imgRegex.exec(content)) !== null) {
+		const props = match[1] || '';
+		const srcMatch = srcPropRegex.exec(props);
+
+		if (!srcMatch?.[1]) {
+			const beforeMatch = content.slice(0, match.index);
+			const lineNumber = beforeMatch.split('\n').length;
+			const lineContent = lines[lineNumber - 1];
+
+			errors.push({
+				line: lineNumber,
+				message: 'Img component missing src prop',
 				context: lineContent ?? '',
 			});
 		}
@@ -58,17 +83,19 @@ export async function checkMdxComponents(contentPaths: Array<string>) {
 		let errorCount = 0;
 
 		for (const parsedFile of parsedFiles) {
-			const errors = validateLinkComponents(parsedFile.content);
+			const linkErrors = validateLinkComponents(parsedFile.content);
+			const imgErrors = validateImgComponents(parsedFile.content);
+			const allErrors = [...linkErrors, ...imgErrors];
 
-			if (errors.length > 0) {
+			if (allErrors.length > 0) {
 				console.log(chalk.red(`❌ ${parsedFile.pathRelative}`));
 
-				for (const error of errors) {
+				for (const error of allErrors) {
 					console.log(chalk.red(`   Line ${error.line.toString()}: ${error.message}`));
 					console.log(chalk.gray(`   ${error.context.trim()}`));
 				}
 
-				errorCount += errors.length;
+				errorCount += allErrors.length;
 			}
 		}
 
