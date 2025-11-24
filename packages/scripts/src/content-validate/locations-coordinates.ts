@@ -68,11 +68,9 @@ function isPointInRegion(
 }
 
 export async function checkLocationsCoordinates(locationsPath: string, divisionsPath: string) {
-	console.log(chalk.blue('Checking if location coordinates fall within their assigned regions...'));
+	console.log(chalk.blue(`🔍 Checking location coordinates in ${locationsPath}`));
 
 	const parsedFiles = await parseContentFiles(locationsPath);
-
-	console.log(chalk.gray(`Found ${String(parsedFiles.length)} location files to process...`));
 
 	let mismatchCount = 0;
 	let missingFgbCount = 0;
@@ -161,29 +159,21 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 		checkedCount++;
 	}
 
-	console.log(chalk.blue('='.repeat(50)));
-	console.log(chalk.blue('Total locations: ' + parsedFiles.length.toString()));
-	console.log(chalk.blue('Checked: ' + checkedCount.toString()));
-	console.log(chalk.blue('Skipped (no FGB): ' + missingFgbCount.toString()));
-	if (missingFgbRegions.size > 0) {
-		console.log(chalk.blue('Missing FGB regions: ' + [...missingFgbRegions].sort().join(', ')));
-	}
-	console.log(chalk.blue('Mismatches: ' + mismatchCount.toString()));
-
 	if (mismatchCount === 0 && checkedCount > 0) {
-		console.log(chalk.green('🎉 All checked locations have coordinates within their regions!'));
+		console.log(
+			chalk.green(
+				`✓ All location coordinates valid! Checked: ${checkedCount.toString()}; skipped: ${missingFgbCount.toString()}`,
+			),
+		);
 		return true;
 	} else if (checkedCount === 0) {
 		console.log(chalk.yellow('⚠️  No locations could be checked'));
 		return false;
 	} else {
-		console.log(
-			chalk.yellow(
-				'⚠️  Found ' +
-					mismatchCount.toString() +
-					' location(s) with coordinates outside their region boundaries',
-			),
-		);
+		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
+		if (missingFgbRegions.size > 0) {
+			console.log(chalk.gray(`Missing FGB regions: ${[...missingFgbRegions].sort().join(', ')}`));
+		}
 		return false;
 	}
 }

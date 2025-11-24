@@ -10,7 +10,7 @@ import * as R from 'remeda';
 import type { ContentFileMetadata } from '../content-utils';
 
 import { parseContentFiles } from '../content-utils';
-import { ContentCollectionsEnum } from '../content-utils/collections';
+import { getContentCollectionPaths } from '../content-utils/collections';
 import { getCachedEmbedding, loadCache, saveCache } from './vector-cache.js';
 
 const { values } = parseArgs({
@@ -256,29 +256,16 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 	return result;
 }
 
+const ContentCollectionPaths = getContentCollectionPaths(
+	values['root-path'],
+	values['content-path'],
+);
+
 async function getContentFiles() {
-	const contentPaths = [
-		path.join(
-			values['root-path'],
-			values['content-path'],
-			'collections',
-			ContentCollectionsEnum.Posts,
-		),
-		path.join(
-			values['root-path'],
-			values['content-path'],
-			'collections',
-			ContentCollectionsEnum.Locations,
-		),
-	];
-
-	const contentFiles: Array<ContentFileMetadata> = [];
-
-	for (const contentPath of contentPaths) {
-		const files = await parseContentFiles(contentPath, { withHashes: true });
-
-		contentFiles.push(...files);
-	}
+	const contentFiles = await parseContentFiles(
+		[ContentCollectionPaths.Posts, ContentCollectionPaths.Locations],
+		{ withHashes: true },
+	);
 
 	// Remove low-quality entries to reduce data processing burden
 	const contentFilesFiltered = contentFiles.filter(
@@ -319,10 +306,9 @@ async function contentRelated() {
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));
 
-		console.log(chalk.green(`✅ Related content data written to ${chalk.cyan(outputPath)}`));
 		console.log(
 			chalk.green(
-				`📊 Generated related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items`,
+				`✅ Related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items written to ${chalk.cyan(outputPath)}`,
 			),
 		);
 	} catch (error) {

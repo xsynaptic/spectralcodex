@@ -498,6 +498,9 @@ importers:
       p-limit:
         specifier: ^7.2.0
         version: 7.2.0
+      remeda:
+        specifier: ^2.32.0
+        version: 2.32.0
       sharp:
         specifier: ^0.34.5
         version: 0.34.5

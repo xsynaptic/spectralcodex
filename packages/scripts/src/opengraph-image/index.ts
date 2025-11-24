@@ -7,7 +7,7 @@ import pLimit from 'p-limit';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { ContentCollectionsEnum } from '../content-utils/collections.js';
+import { getContentCollectionPaths, ImageFeaturedSchema } from '../content-utils/collections.js';
 import { parseContentFiles } from '../content-utils/index.js';
 
 const { values } = parseArgs({
@@ -38,12 +38,6 @@ const OG_DENSITY = 2;
 const OG_FORMAT = 'jpg';
 const OG_QUALITY = 85;
 
-const ImageFeaturedSchema = z.union([
-	z.string(),
-	z.object({ id: z.string() }),
-	z.array(z.union([z.string(), z.object({ id: z.string() })])),
-]);
-
 type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;
 
 interface ContentEntry {
@@ -67,40 +61,26 @@ function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | 
 		: imageFeatured;
 }
 
+const ContentCollectionPaths = getContentCollectionPaths(
+	values['root-path'],
+	values['content-path'],
+);
+
 async function getContentEntries(): Promise<Array<ContentEntry>> {
 	console.log(chalk.blue('Reading content collections...'));
 
-	const collections = [
-		ContentCollectionsEnum.Ephemera,
-		ContentCollectionsEnum.Locations,
-		ContentCollectionsEnum.Pages,
-		ContentCollectionsEnum.Posts,
-		ContentCollectionsEnum.Regions,
-		ContentCollectionsEnum.Series,
-		ContentCollectionsEnum.Themes,
-	];
-
 	const allEntries: Array<ContentEntry> = [];
 
-	for (const collection of collections) {
-		const collectionPath = path.join(
-			values['root-path'],
-			values['content-path'],
-			'collections',
-			collection,
-		);
+	const files = await parseContentFiles(Object.values(ContentCollectionPaths));
 
-		const files = await parseContentFiles(collectionPath);
+	for (const file of files) {
+		const imageFeatured = ImageFeaturedSchema.optional().parse(file.frontmatter.imageFeatured);
 
-		for (const file of files) {
-			const imageFeatured = ImageFeaturedSchema.optional().parse(file.frontmatter.imageFeatured);
-
-			if (imageFeatured) {
-				allEntries.push({
-					id: file.id,
-					imageFeatured,
-				});
-			}
+		if (imageFeatured) {
+			allEntries.push({
+				id: file.id,
+				imageFeatured,
+			});
 		}
 	}
 

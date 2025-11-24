@@ -23,62 +23,67 @@ function isContentFile(filename: string) {
 }
 
 export async function parseContentFiles(
-	basePath: string,
+	basePaths: string | Array<string>,
 	options: {
 		skipUnderscoreFiles?: boolean;
-		recursive?: boolean;
+		isRecursive?: boolean;
 		withHashes?: boolean;
 	} = {},
 ) {
-	const { skipUnderscoreFiles = true, recursive = true, withHashes = false } = options;
+	const { skipUnderscoreFiles = true, isRecursive = true, withHashes = false } = options;
+
 	const contentMetadata: Array<ContentFileMetadata> = [];
 
-	const collection = basePath.split('/').pop() ?? '';
+	const paths = Array.isArray(basePaths) ? basePaths : [basePaths];
 
-	async function processDirectory(dirPath: string) {
-		const filenames = readdirSync(dirPath);
+	for (const basePath of paths) {
+		const collection = basePath.split('/').pop() ?? '';
 
-		for (const filename of filenames) {
-			const pathAbsolute = path.join(dirPath, filename);
-			const stat = statSync(pathAbsolute);
+		async function processDirectory(dirPath: string) {
+			const filenames = readdirSync(dirPath);
 
-			if (stat.isDirectory() && recursive) {
-				await processDirectory(pathAbsolute);
-			} else if (isContentFile(filename)) {
-				if (skipUnderscoreFiles && filename.startsWith('_')) continue;
+			for (const filename of filenames) {
+				const pathAbsolute = path.join(dirPath, filename);
+				const stat = statSync(pathAbsolute);
 
-				try {
-					const fileContent = await fs.readFile(pathAbsolute, 'utf8');
+				if (stat.isDirectory() && isRecursive) {
+					await processDirectory(pathAbsolute);
+				} else if (isContentFile(filename)) {
+					if (skipUnderscoreFiles && filename.startsWith('_')) continue;
 
-					const { frontmatter, content } = parseFrontmatter(fileContent);
+					try {
+						const fileContent = await fs.readFile(pathAbsolute, 'utf8');
 
-					const extension = path.extname(filename);
-					const pathRelative = path.relative(basePath, pathAbsolute);
+						const { frontmatter, content } = parseFrontmatter(fileContent);
 
-					const hash = withHashes
-						? createHash('md5').update(JSON.stringify(fileContent)).digest('hex')
-						: undefined;
+						const extension = path.extname(filename);
+						const pathRelative = path.relative(basePath, pathAbsolute);
 
-					contentMetadata.push({
-						id: filename.replace(extension, ''),
-						filename,
-						extension: extension.replace('.', ''),
-						pathAbsolute,
-						pathRelative,
-						collection,
-						hierarchy: pathRelative.replace(extension, '').split('/'),
-						frontmatter,
-						content,
-						hash,
-					});
-				} catch (error) {
-					console.warn(`Warning: Could not parse ${pathAbsolute}:`, error);
+						const hash = withHashes
+							? createHash('md5').update(JSON.stringify(fileContent)).digest('hex')
+							: undefined;
+
+						contentMetadata.push({
+							id: filename.replace(extension, ''),
+							filename,
+							extension: extension.replace('.', ''),
+							pathAbsolute,
+							pathRelative,
+							collection,
+							hierarchy: pathRelative.replace(extension, '').split('/'),
+							frontmatter,
+							content,
+							hash,
+						});
+					} catch (error) {
+						console.warn(`Warning: Could not parse ${pathAbsolute}:`, error);
+					}
 				}
 			}
 		}
-	}
 
-	await processDirectory(basePath);
+		await processDirectory(basePath);
+	}
 
 	return contentMetadata;
 }

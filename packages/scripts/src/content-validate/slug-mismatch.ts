@@ -4,16 +4,16 @@ import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
 
-export async function checkSlugMismatches(contentPaths: Record<string, string>) {
+export async function checkSlugMismatches(contentPaths: Array<string>) {
 	let overallMismatchCount = 0;
 
-	for (const contentPath of Object.values(contentPaths)) {
-		console.log(chalk.blue('Checking for slug/filename mismatches in ' + contentPath + '...'));
+	for (const contentPath of contentPaths) {
+		console.log(chalk.blue(`🔍 Checking slugs in ${contentPath}`));
 
 		const parsedFiles = await parseContentFiles(contentPath);
 
 		if (parsedFiles.length === 0) {
-			console.log(chalk.yellow('No MDX files found in specified collections.'));
+			console.log(chalk.yellow(`No MDX files found in ${contentPath}`));
 			continue;
 		}
 
@@ -24,33 +24,25 @@ export async function checkSlugMismatches(contentPaths: Record<string, string>) 
 
 			try {
 				if (!slug) {
-					console.log(chalk.red('❌ ' + parsedFile.filename));
+					console.log(chalk.red(`❌ ${parsedFile.filename}`));
 					console.log(chalk.red('   ERROR: No slug field found'));
 					mismatchCount++;
 				} else if (slug !== parsedFile.id) {
-					console.log(chalk.red('❌ ' + parsedFile.filename));
-					console.log(chalk.red('   Expected: ' + parsedFile.id + ', Found: ' + slug));
+					console.log(chalk.red(`❌ ${parsedFile.filename}`));
+					console.log(chalk.red(`   Expected: ${parsedFile.id}, Found: ${slug}`));
 					mismatchCount++;
 				}
 			} catch (error) {
-				console.log(chalk.red('❌ ' + parsedFile.filename));
-				console.log(chalk.red('   ERROR: Failed to read file - ' + String(error)));
+				console.log(chalk.red(`❌ ${parsedFile.filename}`));
+				console.log(chalk.red(`   ERROR: Failed to read file - ${String(error)}`));
 				mismatchCount++;
 			}
 		}
 
-		console.log(chalk.blue('='.repeat(50)));
-		console.log(chalk.blue('Total files checked: ' + parsedFiles.length.toString()));
-		console.log(chalk.blue('Mismatches found: ' + mismatchCount.toString()));
-
 		if (mismatchCount === 0) {
-			console.log(chalk.green('🎉 All slugs match their filenames!'));
+			console.log(chalk.green(`✓ All slugs valid! Checked: ${parsedFiles.length.toString()}`));
 		} else {
-			console.log(
-				chalk.yellow(
-					'⚠️  Found ' + mismatchCount.toString() + ' file(s) with slug/filename mismatches',
-				),
-			);
+			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} slug mismatch(es)`));
 			overallMismatchCount += mismatchCount;
 		}
 	}

@@ -3,43 +3,42 @@ import chalk from 'chalk';
 import { z } from 'zod';
 
 import { parseContentFiles } from '../content-utils';
+import { ImageFeaturedSchema } from '../content-utils/collections';
 
-export async function checkContentQuality(contentPaths: Record<string, string>) {
+export async function checkContentQuality(contentPaths: Array<string>) {
 	let overallMismatchCount = 0;
 
-	for (const contentPath of Object.values(contentPaths)) {
-		console.log(chalk.blue('Checking for low quality content in ' + contentPath + '...'));
+	for (const contentPath of contentPaths) {
+		console.log(chalk.blue(`🔍 Checking content quality in ${contentPath}`));
 
 		const parsedFiles = await parseContentFiles(contentPath);
 
 		if (parsedFiles.length === 0) {
-			console.log(chalk.yellow('No MDX files found in specified collections.'));
+			console.log(chalk.yellow(`No MDX files found in ${contentPath}`));
 			continue;
 		}
 
 		let mismatchCount = 0;
 
 		for (const parsedFile of parsedFiles) {
-			const imageFeatured = z.string().optional().parse(parsedFile.frontmatter.imageFeatured);
-			const entryQuality = z.number().optional().parse(parsedFile.frontmatter.entryQuality);
+			const imageFeatured = ImageFeaturedSchema.optional().parse(
+				parsedFile.frontmatter.imageFeatured,
+			);
+			const entryQuality = z.number().parse(parsedFile.frontmatter.entryQuality);
 
 			if (imageFeatured && entryQuality && entryQuality < 2) {
-				console.log(chalk.red('❌ ' + parsedFile.filename));
+				console.log(chalk.red(`❌ ${parsedFile.filename}`));
 				console.log(chalk.red('   ERROR: Image featured but entry quality is low'));
 				mismatchCount++;
 			}
 		}
 
-		console.log(chalk.blue('='.repeat(50)));
-		console.log(chalk.blue('Total files checked: ' + parsedFiles.length.toString()));
-		console.log(chalk.blue('Mismatches found: ' + mismatchCount.toString()));
-
 		if (mismatchCount === 0) {
-			console.log(chalk.green('🎉 All content is of high quality!'));
-		} else {
 			console.log(
-				chalk.yellow('⚠️  Found ' + mismatchCount.toString() + ' file(s) with low quality content'),
+				chalk.green(`✓ All content quality valid! Checked: ${parsedFiles.length.toString()}`),
 			);
+		} else {
+			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} quality issue(s)`));
 			overallMismatchCount += mismatchCount;
 		}
 	}

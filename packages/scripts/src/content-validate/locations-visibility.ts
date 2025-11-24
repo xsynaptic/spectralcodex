@@ -18,7 +18,7 @@ type LocationItem = z.output<typeof LocationFrontmatterSchema> & {
 };
 
 export async function checkLocationsVisibility(locationsPath: string): Promise<boolean> {
-	console.log(chalk.blue('Checking locations that should potentially be hidden...'));
+	console.log(chalk.blue(`🔍 Checking location visibility in ${locationsPath}`));
 
 	try {
 		const locations = await parseContentFiles(locationsPath);
@@ -66,29 +66,23 @@ export async function checkLocationsVisibility(locationsPath: string): Promise<b
 		}
 
 		if (candidateLocations.length === 0) {
-			console.log(chalk.green('✓ No locations found that should be hidden'));
+			console.log(
+				chalk.green(`✓ All location visibility valid! Checked: ${locations.length.toString()}`),
+			);
 			return true;
 		}
 
 		console.log(
 			chalk.yellow(
-				`Found ${String(candidateLocations.length)} location(s) that might need hideLocation: true:`,
+				`⚠️  Found ${candidateLocations.length.toString()} location(s) that might need hideLocation: true:`,
 			),
 		);
-		console.log('');
 
 		for (const candidate of candidateLocations) {
 			console.log(chalk.cyan(`  ${candidate.path}`));
 			console.log(chalk.gray(`    Reason: ${candidate.reason}`));
-			console.log('');
 		}
 
-		console.log(chalk.blue('Summary:'));
-		console.log(chalk.blue(`  Total locations checked: ${String(locations.length)}`));
-		console.log(
-			chalk.yellow(`  Locations that might need hiding: ${String(candidateLocations.length)}`),
-		);
-		console.log('');
 		console.log(
 			chalk.gray('Note: This is a diagnostic tool. No corrections are made automatically.'),
 		);

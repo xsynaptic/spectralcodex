@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { parseContentFiles } from '../content-utils';
 
 export async function checkDivisionIds(regionsPath: string) {
-	console.log(chalk.blue('Checking regions for missing divisionId...'));
+	console.log(chalk.blue(`🔍 Checking division IDs in ${regionsPath}`));
 
 	const regionsWithoutDivision: Array<string> = [];
 
@@ -17,11 +17,13 @@ export async function checkDivisionIds(regionsPath: string) {
 	}
 
 	if (regionsWithoutDivision.length === 0) {
-		console.log(chalk.green('✓ All regions have divisionId defined'));
+		console.log(
+			chalk.green(`✓ All region divisionIds valid! Checked: ${parsedFiles.length.toString()}`),
+		);
 		return true;
 	} else {
 		console.log(
-			chalk.red(`✗ Found ${String(regionsWithoutDivision.length)} regions without divisionId:`),
+			chalk.red(`✗ Found ${regionsWithoutDivision.length.toString()} regions without divisionId:`),
 		);
 		for (const region of regionsWithoutDivision) {
 			console.log(chalk.red(`  - ${region}`));

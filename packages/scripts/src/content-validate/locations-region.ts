@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { parseContentFiles } from '../content-utils';
 
 export async function checkLocationsRegions(locationsPath: string) {
-	console.log(chalk.blue('Checking for location/region mismatches...'));
+	console.log(chalk.blue(`🔍 Checking location regions in ${locationsPath}`));
 
 	const parsedFiles = await parseContentFiles(locationsPath);
 
@@ -15,7 +15,7 @@ export async function checkLocationsRegions(locationsPath: string) {
 		const regions = z.string().array().optional().parse(parsedFile.frontmatter.regions);
 
 		if (!regions?.[0]) {
-			console.log(chalk.red('❌ ' + parsedFile.filename));
+			console.log(chalk.red(`❌ ${parsedFile.filename}`));
 			console.log(chalk.red('   ERROR: No regions field found'));
 			continue;
 		}
@@ -26,26 +26,20 @@ export async function checkLocationsRegions(locationsPath: string) {
 		const expectedRegion = parsedFile.hierarchy.at(-2) ?? 'unknown';
 
 		if (firstRegion !== expectedRegion) {
-			console.log(chalk.red('❌ ' + parsedFile.filename));
-			console.log(chalk.red('   Expected region: ' + expectedRegion + ', Found: ' + firstRegion));
-			console.log(chalk.red('   Directory path: ' + parsedFile.hierarchy.join(' → ')));
+			console.log(chalk.red(`❌ ${parsedFile.filename}`));
+			console.log(chalk.red(`   Expected region: ${expectedRegion}, Found: ${firstRegion}`));
+			console.log(chalk.red(`   Directory path: ${parsedFile.hierarchy.join(' → ')}`));
 			mismatchCount++;
 		}
 	}
 
-	console.log(chalk.blue('='.repeat(50)));
-	console.log(chalk.blue('Total location files checked: ' + parsedFiles.length.toString()));
-	console.log(chalk.blue('Region mismatches found: ' + mismatchCount.toString()));
-
 	if (mismatchCount === 0) {
-		console.log(chalk.green('🎉 All location regions match their directory structure!'));
+		console.log(
+			chalk.green(`✓ All location regions valid! Checked: ${parsedFiles.length.toString()}`),
+		);
 		return true;
 	} else {
-		console.log(
-			chalk.yellow(
-				'⚠️  Found ' + mismatchCount.toString() + ' location(s) with region/directory mismatches',
-			),
-		);
+		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} region mismatch(es)`));
 		return false;
 	}
 }
