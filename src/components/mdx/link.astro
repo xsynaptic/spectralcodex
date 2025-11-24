@@ -5,12 +5,18 @@ import { getContentMetadataById } from '#lib/metadata/metadata-utils.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'a'> {
-	id: string;
+	id: string | undefined;
 }
 
 const { id, ...props } = Astro.props;
 
 const content = await renderSlot(Astro.slots, 'default');
+
+const pathname = Astro.url.pathname;
+
+if (!id) {
+	throw new Error(`Link component requires an ID; rendering path: ${pathname}`);
+}
 
 const contentMetadata = await getContentMetadataById(id);
 ---

@@ -8,10 +8,10 @@ import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
 
-export async function getContentMetadataById(id: string | undefined) {
+export async function getContentMetadataById(id: string) {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	const slug = slugify(id ?? `test-${String(Math.random())}`);
+	const slug = slugify(id);
 
 	const contentMetadata = contentMetadataIndex.get(slug);
 
