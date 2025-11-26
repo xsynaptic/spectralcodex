@@ -96,7 +96,6 @@ async function getContentEntries(): Promise<Array<ContentEntry>> {
 async function getSourceImagePath(imageId: string): Promise<string | undefined> {
 	const imagePath = path.join(values['root-path'], values['content-path'], 'media', imageId);
 
-	// Verify the image exists on disk and is readable (never write to source images!)
 	try {
 		await fs.access(imagePath, fs.constants.R_OK);
 		return imagePath;
@@ -149,6 +148,7 @@ async function generateOpenGraphImage(
 		}
 
 		const outputPath = path.join(values['root-path'], values['output-path']);
+
 		await fs.mkdir(outputPath, { recursive: true });
 
 		const outputFilePath = path.join(outputPath, `${entry.id}.${OG_FORMAT}`);

@@ -84,7 +84,7 @@ export function getImageHeroId({
 // Image featured data is sometimes displayed with a caption
 export type ImageFeaturedCaptionMetadata = Pick<
 	ContentMetadataItem,
-	'title' | 'titleMultilingual' | 'url'
+	'id' | 'title' | 'titleMultilingual' | 'url'
 >;
 
 export type ImageFeaturedObjectWithCaptionMetadata = ImageFeaturedObject & {
@@ -131,6 +131,7 @@ export async function getImageFeaturedObjectGroup({
 			...(contentMetadata
 				? {
 						captionMetadata: {
+							id: contentMetadata.id,
 							title: contentMetadata.title,
 							titleMultilingual: contentMetadata.titleMultilingual,
 							url: contentMetadata.url,
@@ -159,6 +160,7 @@ export function getImageFeaturedGroupByContentMetadata({
 			id: item.imageId!,
 			title: item.title,
 			captionMetadata: {
+				id: item.id,
 				title: item.title,
 				titleMultilingual: item.titleMultilingual,
 				url: item.url,

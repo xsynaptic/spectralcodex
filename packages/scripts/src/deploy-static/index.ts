@@ -76,7 +76,11 @@ if (!remoteHostApp || !remoteHostImages || !sshKeyPath) {
 try {
 	await $`ssh-add --apple-load-keychain 2>/dev/null`;
 } catch {
-	console.warn(chalk.yellow('Warning: Could not load SSH keys from keychain. You may be prompted for passphrase.'));
+	console.warn(
+		chalk.yellow(
+			'Warning: Could not load SSH keys from keychain. You may be prompted for passphrase.',
+		),
+	);
 }
 
 // A flag for whether we're using the remote image strategy, which affects the build output
@@ -115,6 +119,18 @@ async function contentRelated() {
 		console.log(chalk.green('Related content generated.'));
 	} catch (error) {
 		console.error(chalk.red('Related content generation failed:'), error);
+		process.exit(1);
+	}
+}
+
+async function openGraphImages() {
+	console.log(chalk.blue('Generating OpenGraph images...'));
+
+	try {
+		await $`pnpm openGraph-image --root-path=${values['root-path']} --content-path=${values['content-path']} --output-path=${values['root-path']}/public/0g`;
+		console.log(chalk.green('OpenGraph images generated.'));
+	} catch (error) {
+		console.error(chalk.red('OpenGraph image generation failed:'), error);
 		process.exit(1);
 	}
 }
@@ -244,6 +260,10 @@ switch (step) {
 		await contentRelated();
 		break;
 	}
+	case 'openGraph': {
+		await openGraphImages();
+		break;
+	}
 	case 'build': {
 		await buildProject();
 		break;
@@ -272,6 +292,7 @@ switch (step) {
 	default: {
 		await contentValidate();
 		await contentRelated();
+		await openGraphImages();
 		await buildProject();
 		if (!imageRemote) await removeOriginalImages();
 		await moveHashedImages();

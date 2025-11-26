@@ -12,6 +12,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	featuredMetadataItems: Array<ContentMetadataItem>;
@@ -28,6 +29,9 @@ const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
 	shuffle: true,
 });
 
+// This regularly changes but as long as the source images remain constant this should be OK!
+const featuredOgImageId = imageFeaturedGroup?.at(0)?.id;
+
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
 const contentStats = await getContentStats();
@@ -37,12 +41,10 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		...(hasHeroImage
-			? {
-					imageId: imageFeaturedGroup.at(0)?.id,
-					imageAlt: imageFeaturedGroup.at(0)?.title,
-				}
-			: {}),
+		image: getSeoImageProps({
+			...(featuredOgImageId ? { id: featuredOgImageId } : {}),
+			alt: t('site.title'),
+		}),
 	}}
 	hasHeroImage={hasHeroImage}
 >

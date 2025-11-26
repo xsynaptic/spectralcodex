@@ -34,13 +34,35 @@ export function hashData({ data, short = false }: { data: unknown; short?: boole
 }
 
 /**
+ * Module-level cache of directory contents to avoid repeated fs.readdir calls
+ */
+let cacheDirectoryContents: Map<string, Set<string>> | undefined;
+
+async function getCacheDirectoryContents(dirPath: string): Promise<Set<string>> {
+	if (!cacheDirectoryContents) {
+		cacheDirectoryContents = new Map();
+	}
+
+	if (!cacheDirectoryContents.has(dirPath)) {
+		try {
+			const files = await fs.readdir(dirPath);
+
+			cacheDirectoryContents.set(dirPath, new Set(files));
+		} catch {
+			cacheDirectoryContents.set(dirPath, new Set());
+		}
+	}
+
+	return cacheDirectoryContents.get(dirPath)!;
+}
+
+/**
  * Check if a cached file exists on disk
  */
 export async function cacheFileExists(filePath: string): Promise<boolean> {
-	try {
-		await fs.access(filePath);
-		return true;
-	} catch {
-		return false;
-	}
+	const dirPath = path.dirname(filePath);
+	const fileName = path.basename(filePath);
+	const dirContents = await getCacheDirectoryContents(dirPath);
+
+	return dirContents.has(fileName);
 }
