@@ -2,15 +2,14 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
+import pMemoize from 'p-memoize';
 
 interface CollectionData {
 	themes: Array<CollectionEntry<'themes'>>;
 	themesMap: Map<string, CollectionEntry<'themes'>>;
 }
 
-let collection: Promise<CollectionData> | undefined;
-
-async function generateCollection() {
+export const getThemesCollection = pMemoize(async (): Promise<CollectionData> => {
 	const startTime = performance.now();
 
 	const themes = await getCollection('themes');
@@ -38,11 +37,4 @@ async function generateCollection() {
 	);
 
 	return { themes, themesMap };
-}
-
-export async function getThemesCollection() {
-	if (!collection) {
-		collection = generateCollection();
-	}
-	return collection;
-}
+});

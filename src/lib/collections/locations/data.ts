@@ -14,6 +14,7 @@ import {
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import pLimit from 'p-limit';
+import pMemoize from 'p-memoize';
 
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
 
@@ -31,8 +32,6 @@ interface CollectionData {
 const LOCATIONS_NEARBY_COUNT_LIMIT = 25; // Max number of locations returned
 const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // Everything within 10 km
 const LOCATIONS_NEARBY_DISTANCE_UNITS: Units = 'kilometers';
-
-let collection: Promise<CollectionData> | undefined;
 
 const cacheInstance = getCacheInstance('locations-map-data');
 
@@ -267,7 +266,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
  * To reduce the cost we use buffer zones to reduce the overall number of operations performed
  * We also stash distance pairs in a Map to further cut calculations by half
  */
-async function generateCollection() {
+async function generateCollection(): Promise<CollectionData> {
 	const startTime = performance.now();
 
 	const locations = await getCollection('locations');
@@ -301,9 +300,4 @@ async function generateCollection() {
 	return { locations, locationsMap };
 }
 
-export async function getLocationsCollection() {
-	if (!collection) {
-		collection = generateCollection();
-	}
-	return collection;
-}
+export const getLocationsCollection = pMemoize(generateCollection);

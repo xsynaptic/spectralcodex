@@ -2,14 +2,13 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
+import pMemoize from 'p-memoize';
 
 interface CollectionData {
 	ephemera: Array<CollectionEntry<'ephemera'>>;
 }
 
-let collection: Promise<CollectionData> | undefined;
-
-async function generateCollection() {
+export const getEphemeraCollection = pMemoize(async (): Promise<CollectionData> => {
 	const startTime = performance.now();
 
 	const ephemera = await getCollection('ephemera');
@@ -19,11 +18,4 @@ async function generateCollection() {
 	);
 
 	return { ephemera };
-}
-
-export async function getEphemeraCollection() {
-	if (!collection) {
-		collection = generateCollection();
-	}
-	return collection;
-}
+});

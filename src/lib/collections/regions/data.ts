@@ -2,11 +2,17 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
+import pMemoize from 'p-memoize';
 
 import type { RegionLanguage } from '#lib/collections/regions/types.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
+
+interface CollectionData {
+	regions: Array<CollectionEntry<'regions'>>;
+	regionsMap: Map<string, CollectionEntry<'regions'>>;
+}
 
 /**
  * Computed data cache
@@ -246,17 +252,7 @@ function populateRegionsContent({
 	}
 }
 
-/**
- * Collection data
- */
-interface CollectionData {
-	regions: Array<CollectionEntry<'regions'>>;
-	regionsMap: Map<string, CollectionEntry<'regions'>>;
-}
-
-let collection: Promise<CollectionData> | undefined;
-
-async function generateCollection() {
+async function generateCollection(): Promise<CollectionData> {
 	const startTime = performance.now();
 
 	const regions = await getCollection('regions');
@@ -296,9 +292,4 @@ async function generateCollection() {
 	return { regions, regionsMap };
 }
 
-export async function getRegionsCollection() {
-	if (!collection) {
-		collection = generateCollection();
-	}
-	return collection;
-}
+export const getRegionsCollection = pMemoize(generateCollection);
