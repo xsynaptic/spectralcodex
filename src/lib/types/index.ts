@@ -25,8 +25,11 @@ export interface MultilingualContent {
  * Menu
  */
 export interface MenuItem {
+	collection?: CollectionKey | undefined;
 	title: string;
+	titleMultilingual?: MultilingualContent | undefined;
 	url: string;
+	ancestor?: string | undefined;
 	children?: Array<MenuItem>;
 }
 

@@ -8,6 +8,7 @@ import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTimelineData } from '#lib/timeline/timeline-data.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -21,9 +22,14 @@ function getMenuItemData({
 	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
 	slug: 'regions' | 'series' | 'themes';
 }) {
+	const ancestor = entry.collection === 'regions' ? entry.data.ancestors?.at(-1) : undefined;
+
 	return {
+		collection: entry.collection,
 		title: entry.data.title,
+		titleMultilingual: getPrimaryMultilingualContent(entry.data, 'title'),
 		url: getSiteUrl(`${slug}/${entry.id}`),
+		...(ancestor ? { ancestor } : {}),
 	};
 }
 
