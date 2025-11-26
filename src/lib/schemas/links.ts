@@ -1,4 +1,5 @@
 import path from 'node:path';
+import pMemoize from 'p-memoize';
 import { z } from 'zod';
 
 import { CONTENT_DATA_PATH } from '#constants.ts';
@@ -17,22 +18,22 @@ const LinkDataSchema = LinkItemSchema.extend({
 	match: z.string(),
 });
 
-// Cache for loaded links data
-let linksMapCache: Array<z.infer<typeof LinkDataSchema>> | undefined;
+type LinkData = z.infer<typeof LinkDataSchema>;
 
-async function getLinksData() {
-	if (!linksMapCache) {
-		try {
-			const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'links.yaml'));
+/**
+ * Load and cache links data from YAML file
+ */
+const getLinksData = pMemoize(async (): Promise<Array<LinkData>> => {
+	try {
+		const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'links.yaml'));
 
-			linksMapCache = await z.array(LinkDataSchema).parseAsync(data);
-		} catch (error) {
-			console.error('Failed to load links data:', error);
-			linksMapCache = [];
-		}
+		return await z.array(LinkDataSchema).parseAsync(data);
+	} catch (error) {
+		console.error('Failed to load links data:', error);
+
+		return [];
 	}
-	return linksMapCache;
-}
+});
 
 // Link schema; with URLs and predefined titles for commonly referenced sites
 export const LinkSchema = LinkItemSchema.or(

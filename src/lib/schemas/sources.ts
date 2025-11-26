@@ -1,4 +1,5 @@
 import path from 'node:path';
+import pMemoize from 'p-memoize';
 import { z } from 'zod';
 
 import { CONTENT_DATA_PATH } from '#constants.ts';
@@ -26,22 +27,22 @@ const SourceItemSchema = z.object({
 	links: LinkSchema.array().optional(),
 });
 
-// Cache for loaded sources data
-let sourcesMapCache: Record<string, z.infer<typeof SourceItemSchema>> | undefined;
+type SourceData = z.infer<typeof SourceItemSchema>;
 
-async function getSourcesMap() {
-	if (!sourcesMapCache) {
-		try {
-			const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'sources.yaml'));
+/**
+ * Load and cache sources data from YAML file
+ */
+const getSourcesMap = pMemoize(async (): Promise<Record<string, SourceData>> => {
+	try {
+		const data = await loadYamlData(path.join(CONTENT_DATA_PATH, 'sources.yaml'));
 
-			sourcesMapCache = await z.record(z.string(), SourceItemSchema).parseAsync(data);
-		} catch (error) {
-			console.error('Failed to load sources data:', error);
-			sourcesMapCache = {};
-		}
+		return await z.record(z.string(), SourceItemSchema).parseAsync(data);
+	} catch (error) {
+		console.error('Failed to load sources data:', error);
+
+		return {};
 	}
-	return sourcesMapCache;
-}
+});
 
 // Sources schema; individual or predefined sources both work with this schema
 export const SourceSchema = SourceItemSchema.or(

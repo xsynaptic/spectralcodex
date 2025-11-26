@@ -1,3 +1,5 @@
+import pMemoize from 'p-memoize';
+
 import type { TimelineBaseItem, TimelineData } from '#lib/timeline/timeline-types.ts';
 import type { ContentMetadataItem } from '#lib/types/index.ts';
 
@@ -199,12 +201,10 @@ function getTimelineMonthlyData(
 	};
 }
 
-let timelineData: TimelineData | undefined;
-
-// Convert timeline data into the structures consumed by the three timeline pages
-export async function getTimelineData(): Promise<TimelineData> {
-	if (timelineData) return timelineData;
-
+/**
+ * Convert timeline data into the structures consumed by the three timeline pages
+ */
+export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 	const timelineDataMap = await getTimelineDataMap();
 
 	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
@@ -314,13 +314,11 @@ export async function getTimelineData(): Promise<TimelineData> {
 
 	const timelineYears = Object.keys(timelineYearlyData).sort((a, b) => b.localeCompare(a));
 
-	timelineData = {
+	return {
 		timelineIndexData,
 		timelineYearlyData,
 		timelineMonthlyData,
 		timelineYears,
 		timelineMonths,
 	};
-
-	return timelineData;
-}
+});

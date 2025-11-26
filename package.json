@@ -88,6 +88,7 @@
 		"nanoid": "^5.1.6",
 		"ohash": "^2.0.11",
 		"p-limit": "^7.2.0",
+		"p-memoize": "^8.0.0",
 		"prettier": "^3.6.2",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.7.1",

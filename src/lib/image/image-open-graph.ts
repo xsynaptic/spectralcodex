@@ -3,6 +3,7 @@ import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 import { CACHE_DIR } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import pMemoize from 'p-memoize';
 
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
@@ -18,35 +19,27 @@ const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image');
  */
 const cacheInstance = getCacheInstance('opengraph');
 
-let preGeneratedOpenGraphImages: Set<string> | undefined;
-
 /**
  * Load pre-generated OG images from public directory
  * Returns a Set of entry IDs for fast lookup
  */
-export async function getPreGeneratedOpenGraphImages(): Promise<Set<string>> {
-	if (preGeneratedOpenGraphImages) {
-		return preGeneratedOpenGraphImages;
-	}
-
+export const getPreGeneratedOpenGraphImages = pMemoize(async (): Promise<Set<string>> => {
 	const publicOgPath = path.join(process.cwd(), 'public', OPEN_GRAPH_BASE_PATH);
 
 	try {
 		const files = await fs.readdir(publicOgPath);
 
 		// Extract entry IDs by removing file extension
-		preGeneratedOpenGraphImages = new Set(
+		return new Set(
 			files
 				.filter((file) => file.endsWith(`.${OPEN_GRAPH_IMAGE_FORMAT}`))
 				.map((file) => file.replace(`.${OPEN_GRAPH_IMAGE_FORMAT}`, '')),
 		);
 	} catch {
 		// Directory doesn't exist or is empty
-		preGeneratedOpenGraphImages = new Set();
+		return new Set<string>();
 	}
-
-	return preGeneratedOpenGraphImages;
-}
+});
 
 /**
  * A basic OpenGraph image function; nothing fancy, just returns a featured image
