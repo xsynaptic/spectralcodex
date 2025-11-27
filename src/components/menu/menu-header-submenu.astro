@@ -11,9 +11,10 @@ interface Props extends HTMLAttributes<'ul'> {
 	hasHeroImage: boolean;
 	menuItems: Array<MenuItem>;
 	depth: number;
+	isFirstMenuItem?: boolean;
 }
 
-const { hasHeroImage, menuItems, depth, ...props } = Astro.props;
+const { hasHeroImage, menuItems, depth, isFirstMenuItem = true, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 
@@ -67,11 +68,12 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 					'left-0 z-92 duration-50 sm:top-0 sm:left-full sm:max-w-50 sm:min-w-40 sm:rounded-br-md',
 				]
 			: undefined,
+		depth > 1 && !isFirstMenuItem ? 'sm:rounded-tr-md' : undefined,
 	]}
 	{...props}
 >
 	{
-		menuItems.map((item) => {
+		menuItems.map((item, index) => {
 			const showMultilingual = shouldShowMultilingual({ item, depth });
 
 			return (
@@ -95,7 +97,11 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 							{showMultilingual ? (
 								<Multilingual
 									content={item.titleMultilingual}
-									class="text-primary-700 dark:text-primary-300 text-xs"
+									class:list={[
+										'text-xs',
+										'text-primary-700 dark:text-primary-400',
+										isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
+									]}
 									parenthesis={true}
 								/>
 							) : undefined}
@@ -115,7 +121,12 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 						) : undefined}
 					</button>
 					{item.children && item.children.length > 0 ? (
-						<Astro.self hasHeroImage={hasHeroImage} menuItems={item.children} depth={depth + 1} />
+						<Astro.self
+							hasHeroImage={hasHeroImage}
+							menuItems={item.children}
+							depth={depth + 1}
+							isFirstMenuItem={isFirstMenuItem && index === 0}
+						/>
 					) : undefined}
 				</li>
 			);
