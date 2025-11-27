@@ -13,7 +13,7 @@ import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { getGenerateOpenGraphImageFunction } from '#lib/image/image-open-graph-satori.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
+import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 
 export const getStaticPaths = (async () => {
 	if (!FEATURE_OPEN_GRAPH_IMAGES) return [];

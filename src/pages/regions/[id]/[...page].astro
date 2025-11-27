@@ -12,8 +12,11 @@ import { getRegionsOptions } from '#lib/collections/regions/options.ts';
 import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-items.ts';
-import { filterHasFeaturedImage, sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
+import {
+	filterHasFeaturedImage,
+	getContentMetadataFunction,
+	sortContentMetadataByDate,
+} from '#lib/metadata/metadata-utils.ts';
 import { LanguageCodeEnum } from '#lib/types/index.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getBaseUrl } from '#lib/utils/routing.ts';
