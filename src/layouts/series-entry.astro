@@ -12,19 +12,23 @@ import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
+import DividedItem from '#components/parts/divided-item.astro';
 import Multilingual from '#components/parts/multilingual.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'series'>;
 	mapData: MapComponentData;
 	page: Page<ContentMetadataItem>;
+	wordCount?: number | undefined;
 }
 
-const { entry, mapData, page } = Astro.props;
+const { entry, mapData, page, wordCount } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
@@ -34,6 +38,8 @@ const imageFeaturedGroup = await getImageFeaturedObjectGroup({
 });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+const t = getTranslations();
 ---
 
 <MainSite
@@ -63,7 +69,18 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 					<Multilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
-					<ContentCollectionLink collection={entry.collection} hasHeroImage={hasHeroImage} />
+					<DividedItem hasHeroImage={hasHeroImage}>
+						<ContentCollectionLink collection={entry.collection} hasHeroImage={hasHeroImage} />
+					</DividedItem>
+					{
+						wordCount && wordCount > 0 ? (
+							<DividedItem hasHeroImage={hasHeroImage}>
+								<span>
+									{t('content.meta.wordCount.label')}: {formatNumber({ number: wordCount })}
+								</span>
+							</DividedItem>
+						) : undefined
+					}
 				</Fragment>
 			</ContentHeader>
 		</ImageHeroCarousel>

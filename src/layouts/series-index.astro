@@ -30,7 +30,7 @@ const description = t('collection.series.description');
 	</ContentHeader>
 	<ContentSection>
 		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
-		<PreviewGrid items={page.data} showDescription={true} showWordCount={true} />
+		<PreviewGrid items={page.data} showDescription={true} />
 		<Pagination class="mt-small md:mt-medium" page={page} />
 	</ContentSection>
 </MainSite>
