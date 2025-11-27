@@ -147,7 +147,7 @@ async function generateOpenGraphImage(
 			return { status: 'error' };
 		}
 
-		const outputPath = path.join(values['root-path'], values['output-path']);
+		const outputPath = path.resolve(values['output-path']);
 
 		await fs.mkdir(outputPath, { recursive: true });
 

@@ -127,7 +127,7 @@ async function openGraphImages() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 
 	try {
-		await $`pnpm openGraph-image --root-path=${values['root-path']} --content-path=${values['content-path']} --output-path=${values['root-path']}/public/0g`;
+		await $`pnpm opengraph-image --root-path=${values['root-path']} --content-path=${values['content-path']} --output-path=${values['root-path']}/public/0g`;
 		console.log(chalk.green('OpenGraph images generated.'));
 	} catch (error) {
 		console.error(chalk.red('OpenGraph image generation failed:'), error);
