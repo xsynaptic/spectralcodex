@@ -8,7 +8,6 @@ import DividedItem from '#components/parts/divided-item.astro';
 import Grid from '#components/parts/grid.astro';
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
 import Preview from '#components/preview/preview.astro';
 import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -20,12 +19,10 @@ export interface PreviewItemProps {
 	showCollection?: boolean | undefined;
 	showDate?: boolean | undefined;
 	showDescription?: boolean | undefined;
-	showDescriptionCompact?: boolean | undefined;
 	showLocations?: boolean | undefined;
 	showRegion?: boolean | undefined;
 	showPosts?: boolean | undefined;
 	showTitleMultilingual?: boolean | undefined;
-	showWordCount?: boolean | undefined;
 }
 
 interface Props extends PreviewItemProps {
@@ -33,7 +30,17 @@ interface Props extends PreviewItemProps {
 	items: Array<ContentMetadataItem>;
 }
 
-const { class: className, items, ...previewItemProps } = Astro.props;
+const {
+	class: className,
+	items,
+	showCollection,
+	showLocations,
+	showDate,
+	showDescription,
+	showRegion,
+	showPosts,
+	showTitleMultilingual,
+} = Astro.props;
 
 const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
 
@@ -44,18 +51,6 @@ const t = getTranslations();
 	items.length > 0 ? (
 		<Grid class={className}>
 			{items.map((item) => {
-				const {
-					showCollection,
-					showLocations,
-					showDate,
-					showDescription,
-					showDescriptionCompact = true,
-					showRegion,
-					showPosts,
-					showTitleMultilingual,
-					showWordCount,
-				} = previewItemProps;
-
 				const indexUrl = getSiteUrl(item.collection);
 
 				const regions =
@@ -111,13 +106,6 @@ const t = getTranslations();
 									</span>
 								</DividedItem>
 							) : undefined}
-							{showWordCount && item.wordCount && item.wordCount > 0 ? (
-								<DividedItem>
-									<span>
-										{t('content.meta.wordCount.label')}: {formatNumber({ number: item.wordCount })}
-									</span>
-								</DividedItem>
-							) : undefined}
 							{showDate ? (
 								<ContentDate
 									date={item.dateUpdated ?? item.dateCreated}
@@ -127,13 +115,7 @@ const t = getTranslations();
 						</Fragment>
 						{showDescription && item.description ? (
 							<Fragment slot="preview-description">
-								<ProseDescription
-									class="mt-1"
-									showCompact={showDescriptionCompact}
-									showDarkMode={false}
-								>
-									<Fragment set:html={transformMarkdown({ input: item.description })} />
-								</ProseDescription>
+								<Fragment set:html={transformMarkdown({ input: item.description })} />
 							</Fragment>
 						) : undefined}
 					</Preview>

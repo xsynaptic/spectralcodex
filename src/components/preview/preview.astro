@@ -5,6 +5,7 @@ import type { RemoteImageProps } from 'astro:assets';
 import { Image } from 'astro:assets';
 
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
 import { IMAGE_FORMAT, IMAGE_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
@@ -105,9 +106,9 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 	}
 	{
 		description ? (
-			<div class="prose prose-sm dark:prose-invert">
+			<ProseDescription class="mt-1" showCompact={true}>
 				<Fragment set:html={description} />
-			</div>
+			</ProseDescription>
 		) : undefined
 	}
 </div>
