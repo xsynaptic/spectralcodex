@@ -80,8 +80,8 @@ function getMapBounds({
 
 	let bounds: BBox | undefined;
 	let maxBounds: BBox | undefined;
-	let boundsBufferCollection: ReturnType<typeof buffer> | undefined;
-	let limitsBufferCollection: ReturnType<typeof buffer> | undefined;
+	let boundsBufferCollection: ReturnType<typeof buffer>;
+	let limitsBufferCollection: ReturnType<typeof buffer>;
 
 	if (boundsBuffer && limitsBuffer) {
 		boundsBufferCollection = buffer(featureCollection, boundsBuffer);
