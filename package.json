@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.7.4",
+	"version": "5.7.5",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -36,7 +36,7 @@
 		"vite": "6.4.1"
 	},
 	"dependencies": {
-		"astro": "^5.16.1",
+		"astro": "^5.16.2",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
@@ -47,8 +47,8 @@
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/rss": "^4.0.14",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.410",
-		"@iconify/utils": "^3.0.2",
+		"@iconify/json": "^2.2.411",
+		"@iconify/utils": "^3.1.0",
 		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",
@@ -63,8 +63,8 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.17",
 		"@tanstack/eslint-plugin-query": "^5.91.2",
-		"@turf/helpers": "^7.3.0",
-		"@turf/turf": "^7.3.0",
+		"@turf/helpers": "^7.3.1",
+		"@turf/turf": "^7.3.1",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
@@ -89,7 +89,7 @@
 		"ohash": "^2.0.11",
 		"p-limit": "^7.2.0",
 		"p-memoize": "^8.0.0",
-		"prettier": "^3.6.2",
+		"prettier": "^3.7.1",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.7.1",
 		"react-compiler-runtime": "19.1.0-rc.3",
