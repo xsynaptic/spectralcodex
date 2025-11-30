@@ -14,7 +14,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
-		"astro": "^5.16.2",
+		"astro": "^5.16.3",
 		"flatgeobuf": "^4.3.1",
 		"geojson": "^0.5.0",
 		"idb-keyval": "^6.2.2",
@@ -25,6 +25,6 @@
 		"react-map-gl": "^8.1.0",
 		"remeda": "^2.32.0",
 		"zod": "^3.25.76",
-		"zustand": "^5.0.8"
+		"zustand": "^5.0.9"
 	}
 }

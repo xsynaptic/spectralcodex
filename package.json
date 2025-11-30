@@ -36,7 +36,7 @@
 		"vite": "6.4.1"
 	},
 	"dependencies": {
-		"astro": "^5.16.2",
+		"astro": "^5.16.3",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},
@@ -47,7 +47,7 @@
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/rss": "^4.0.14",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.411",
+		"@iconify/json": "^2.2.412",
 		"@iconify/utils": "^3.1.0",
 		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
@@ -89,7 +89,7 @@
 		"ohash": "^2.0.11",
 		"p-limit": "^7.2.0",
 		"p-memoize": "^8.0.0",
-		"prettier": "^3.7.1",
+		"prettier": "^3.7.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.7.1",
 		"react-compiler-runtime": "19.1.0-rc.3",
