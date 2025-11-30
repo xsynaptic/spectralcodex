@@ -138,6 +138,6 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		}
 		<LocationsNotices entry={entry} langCode={regionLangCode} />
 		<LocationsNearbyList entry={entry} />
-		<ContentSectionRelated entry={entry} />
+		<ContentSectionRelated entry={entry} showPreviews={true} />
 	</article>
 </MainSite>

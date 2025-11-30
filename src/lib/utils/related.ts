@@ -40,7 +40,15 @@ export async function getRelatedContentFunction() {
 
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	return function getRelatedContent(id: string, threshold: number): Array<ContentMetadataItem> {
+	return function getRelatedContent({
+		id,
+		limit = 10,
+		threshold = 0.6,
+	}: {
+		id: string;
+		limit?: number | undefined;
+		threshold: number;
+	}): Array<ContentMetadataItem> {
 		if (!relatedContentData) return [];
 
 		const relatedItem = relatedContentData[id];
@@ -50,6 +58,7 @@ export async function getRelatedContentFunction() {
 		return relatedItem
 			.filter((item) => item.score >= threshold)
 			.map((item) => contentMetadataIndex.get(item.id))
-			.filter((item) => item !== undefined);
+			.filter((item) => item !== undefined)
+			.slice(0, limit);
 	};
 }

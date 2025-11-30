@@ -6,19 +6,22 @@ import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
 import Multilingual from '#components/parts/multilingual.astro';
+import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getRelatedContentFunction } from '#lib/utils/related.ts';
 
 interface Props {
 	entry: CollectionEntry<CollectionKey>;
+	showPreviews?: boolean | undefined;
+	limit?: number | undefined;
 	threshold?: number;
 }
 
-const { entry, threshold = 0.6, ...props } = Astro.props;
+const { entry, showPreviews, limit = 10, threshold = 0.6, ...props } = Astro.props;
 
 const getRelatedContent = await getRelatedContentFunction();
 
-const relatedContentItems = getRelatedContent(entry.id, threshold);
+const relatedContentItems = getRelatedContent({ id: entry.id, limit, threshold });
 
 const t = getTranslations();
 ---
@@ -27,16 +30,25 @@ const t = getTranslations();
 	relatedContentItems.length > 0 ? (
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.related')}</Fragment>
-			<ListColumn class="font-serif text-xs sm:text-sm">
-				{relatedContentItems.map(({ url, title, titleMultilingual }) => (
-					<ListColumnItem>
-						<Link href={url}>{title}</Link>
-						{titleMultilingual ? (
-							<Multilingual content={titleMultilingual} parenthesis={true} />
-						) : undefined}
-					</ListColumnItem>
-				))}
-			</ListColumn>
+			{showPreviews ? (
+				<PreviewGrid
+					items={relatedContentItems}
+					showDate={true}
+					showRegion={true}
+					showTitleMultilingual={true}
+				/>
+			) : (
+				<ListColumn class="font-serif text-xs sm:text-sm">
+					{relatedContentItems.map(({ url, title, titleMultilingual }) => (
+						<ListColumnItem>
+							<Link href={url}>{title}</Link>
+							{titleMultilingual ? (
+								<Multilingual content={titleMultilingual} parenthesis={true} />
+							) : undefined}
+						</ListColumnItem>
+					))}
+				</ListColumn>
+			)}
 		</ContentSection>
 	) : undefined
 }
