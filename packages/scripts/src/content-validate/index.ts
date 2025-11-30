@@ -8,7 +8,6 @@ import { getContentCollectionPaths } from '../content-utils/collections';
 import { checkDivisionIds } from './divisions';
 import { checkLocationsCoordinates } from './locations-coordinates';
 import { checkLocationsRegions } from './locations-region';
-import { checkLocationsVisibility } from './locations-visibility';
 import { checkMdxComponents } from './mdx';
 import { checkContentQuality } from './quality';
 import { checkSlugMismatches } from './slug-mismatch';
@@ -67,10 +66,6 @@ switch (command) {
 		await checkLocationsRegions(ContentCollectionsPaths.Locations);
 		break;
 	}
-	case 'location-visibility': {
-		await checkLocationsVisibility(ContentCollectionsPaths.Locations);
-		break;
-	}
 	case 'location-coordinates': {
 		await checkLocationsCoordinates(
 			ContentCollectionsPaths.Locations,
@@ -119,6 +114,10 @@ switch (command) {
 		);
 
 		if (!coordinatesSuccess) process.exit(1);
+
+		const divisionsSuccess = await checkDivisionIds(ContentCollectionsPaths.Regions);
+
+		if (!divisionsSuccess) process.exit(1);
 
 		break;
 	}
