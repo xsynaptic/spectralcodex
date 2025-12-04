@@ -94,6 +94,14 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
+		build: {
+			rollupOptions: {
+				output: {
+					entryFileNames: 'js/a-[hash].js',
+					chunkFileNames: 'js/c-[hash].js',
+				},
+			},
+		},
 		server: {
 			watch: {
 				ignored: ['./*.md'],
