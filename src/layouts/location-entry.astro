@@ -137,7 +137,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			)
 		}
 		<LocationsNotices entry={entry} langCode={regionLangCode} />
-		<LocationsNearbyList entry={entry} />
-		<ContentSectionRelated entry={entry} showPreviews={true} />
+		<LocationsNearbyList entry={entry} limit={12} />
+		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
 	</article>
 </MainSite>

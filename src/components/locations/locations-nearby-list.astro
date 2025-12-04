@@ -15,21 +15,24 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
+	limit?: number | undefined;
 }
 
-const { entry, ...props } = Astro.props;
+const { entry, limit = 20, ...props } = Astro.props;
 
 const { locationsMap } = await getLocationsCollection();
+
+const locationsNearby = entry.data.nearby?.slice(0, limit) ?? [];
 
 const t = getTranslations();
 ---
 
 {
-	entry.data.nearby && entry.data.nearby.length > 0 ? (
+	locationsNearby.length > 0 ? (
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('content.section.locationsNearby')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
-				{entry.data.nearby.map(({ locationId, distanceDisplay }) => {
+				{locationsNearby.map(({ locationId, distanceDisplay }) => {
 					const location = locationsMap.get(locationId);
 					const titleMultilingual = getPrimaryMultilingualContent(location?.data, 'title');
 

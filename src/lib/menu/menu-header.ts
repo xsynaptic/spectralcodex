@@ -69,7 +69,7 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 						children: getRegionsByIds(entry.data.children)
 							.filter(filterMenuItemContentCount(2))
 							.sort(sortByContentCount)
-							.slice(0, 12)
+							.slice(0, 15)
 							.map((entry) => ({
 								...getMenuItemData({ entry, slug: 'regions' }),
 								...(entry.data.children
