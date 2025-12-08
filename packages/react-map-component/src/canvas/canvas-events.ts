@@ -20,6 +20,12 @@ const isMapCoordinates = (input: unknown): input is [number, number] =>
 	typeof input[0] === 'number' &&
 	typeof input[1] === 'number';
 
+const queryableLayerIds = [
+	MapLayerIdEnum.Clusters,
+	MapLayerIdEnum.Points,
+	MapLayerIdEnum.PointsTarget,
+];
+
 export function useMapCanvasEvents() {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
@@ -120,8 +126,13 @@ export function useMapCanvasEvents() {
 
 			const { point, target: mapInstance } = event;
 
+			// Ensure all queryable layers have been loaded by MapLibre
+			for (const layerId of queryableLayerIds) {
+				if (!mapInstance.getLayer(layerId)) return;
+			}
+
 			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
-				layers: [MapLayerIdEnum.Clusters, MapLayerIdEnum.Points, MapLayerIdEnum.PointsTarget],
+				layers: queryableLayerIds,
 			});
 
 			// Note: this only queries the first matching feature, but that is sufficient
