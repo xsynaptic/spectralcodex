@@ -4,7 +4,7 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { memo } from 'react';
-import * as R from 'remeda';
+import { entries, range } from 'remeda';
 
 import type { LocationStatusMetadata } from '../lib/location-status';
 
@@ -164,7 +164,7 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 	return (
 		<li>
 			<div className="flex h-[20px] w-full items-center justify-center gap-2 px-1 select-none md:h-[24px]">
-				{R.range(1, 6).map((value) => (
+				{range(1, 6).map((value) => (
 					<svg
 						key={`rating-${String(value)}`}
 						xmlns="http://www.w3.org/2000/svg"
@@ -233,7 +233,7 @@ const MapControlsFilterMenu: FC<{
 				style={{ boxShadow: '0 0 0 2px rgba(0, 0, 0, .1)' }}
 			>
 				<ul className="flex flex-col gap-1 px-1 py-1">
-					{R.entries(LocationStatusRecords).map(([status, data]) => (
+					{entries(LocationStatusRecords).map(([status, data]) => (
 						<MapFilterStatusMenuItem
 							key={status}
 							status={status}

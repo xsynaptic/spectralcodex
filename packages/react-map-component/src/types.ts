@@ -13,7 +13,7 @@ import {
 	MapDataKeys,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
-import * as R from 'remeda';
+import { invert } from 'remeda';
 import { z } from 'zod';
 
 // Supported geometry for use with this component
@@ -34,8 +34,8 @@ export const MapSourceItemSchema = z
 		[MapDataKeysCompressed.Quality]: NumericScaleSchema,
 		[MapDataKeysCompressed.Rating]: NumericScaleSchema,
 		[MapDataKeysCompressed.Objective]: NumericScaleSchema.optional(),
-		[MapDataKeysCompressed.Outlier]: z.boolean().optional(),
-		[MapDataKeysCompressed.HasImage]: z.boolean().optional(),
+		[MapDataKeysCompressed.Outlier]: z.boolean().optional().default(false),
+		[MapDataKeysCompressed.HasImage]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.Geometry]: z.object({
 			[MapDataKeysCompressed.GeometryType]: z.nativeEnum(MapDataGeometryTypeNumericMapping),
 			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
@@ -51,20 +51,22 @@ export const MapSourceItemSchema = z
 			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
 			[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
 			[MapDataKeys.Category]:
-				R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
+				invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
 				LocationCategoryEnum.Unknown,
 			[MapDataKeys.Status]:
-				R.invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
+				invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
 				LocationStatusEnum.Unknown,
 			[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
 			[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
 			[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
-			[MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]],
-			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]] ?? false,
-			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]] ?? false,
+			...(value[MapDataKeyMap[MapDataKeys.Objective]]
+				? { [MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]] }
+				: {}),
+			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]],
+			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]],
 		},
 		[MapDataKeys.Geometry]: {
-			[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[
+			[MapDataKeys.GeometryType]: invert(MapDataGeometryTypeNumericMapping)[
 				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryType]]
 			],
 			[MapDataKeys.GeometryCoordinates]:
@@ -133,8 +135,9 @@ export type MapPopupItemParsed = z.output<typeof MapPopupItemSchema>;
 /**
  * Map component props
  */
-export interface MapComponentProps
-	extends Partial<Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>> {
+export interface MapComponentProps extends Partial<
+	Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>
+> {
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;

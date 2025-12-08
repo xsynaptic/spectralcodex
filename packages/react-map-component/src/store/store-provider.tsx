@@ -5,7 +5,6 @@ import type { CSSProperties } from 'react';
 import { LocationStatusEnum } from '@spectralcodex/map-types';
 import { createContext } from 'react';
 import { useMemo, useState } from 'react';
-import * as R from 'remeda';
 import { createStore } from 'zustand';
 
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
@@ -165,7 +164,7 @@ const useMapStoreSetup = ({
 				hideAllStatusFilter: () => {
 					set({
 						selectedId: undefined,
-						statusFilter: R.values(LocationStatusEnum),
+						statusFilter: Object.values(LocationStatusEnum),
 					});
 				},
 				setQualityFilter: (qualityFilter) => {
