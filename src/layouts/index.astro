@@ -50,14 +50,18 @@ const t = getTranslations();
 >
 	{
 		hasHeroImage ? (
-			<ImageHeroCarousel hasHeroImage={hasHeroImage} imageFeaturedGroup={imageFeaturedGroup} />
+			<ImageHeroCarousel
+				hasHeroImage={hasHeroImage}
+				imageFeaturedGroup={imageFeaturedGroup}
+				withTitle={false}
+			/>
 		) : undefined
 	}
 	<ContentSection class="mt-small">
 		<Fragment
 			slot="section-description"
 			set:html={transformMarkdown({
-				input: `Welcome to the latest incarnation of **Spectral Codex**, a travel journal, photography portfolio, geospatial database, and personal blog. This site is completely ad-free, you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex). Read a little more about my background and motivations [here](/about), or start browsing the collection! Currently there are ${contentStats.locations.itemCount} [locations](/locations) (${contentStats.locations.withImages} with images), ${contentStats.posts.itemCount} [posts](/posts), ${contentStats.regions} [regions](/regions), ${contentStats.themes} [themes](/themes), ${contentStats.images.itemCount} images, and ${contentStats.links.itemCount} outbound links in the database, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the higher ranking and more recent links from around the site to get you started...`,
+				input: `Welcome to the latest incarnation of **Spectral Codex**, a travel journal, photography portfolio, geospatial database, and personal blog. This site is completely ad-free; you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex). Read a little more about my background and motivations [here](/about), or start browsing the collection! Currently there are ${contentStats.locations.itemCount} [locations](/locations) (${contentStats.locations.withImages} with images), ${contentStats.posts.itemCount} [posts](/posts), ${contentStats.regions} [regions](/regions), ${contentStats.themes} [themes](/themes), ${contentStats.images.itemCount} images, and ${contentStats.links.itemCount} outbound links in the database, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the higher ranking and more recent links from around the site to get you started...`,
 			})}
 		/>
 	</ContentSection>
