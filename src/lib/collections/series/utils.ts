@@ -13,13 +13,15 @@ import { filterHasFeaturedImage } from '#lib/metadata/metadata-utils.ts';
 export async function getSeriesContentMetadataItemsFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	return function getSeriesContentMetadataItems(ids: Array<string> | undefined) {
+	return function getSeriesContentMetadataItems(
+		ids: Array<string> | undefined,
+	): Array<ContentMetadataItem> | undefined {
 		if (!ids || ids.length === 0) return;
 
 		return ids
 			.map((id) => (contentMetadataIndex.has(id) ? contentMetadataIndex.get(id) : undefined))
-			.filter((entry): entry is ContentMetadataItem => !!entry)
-			.filter(filterHasFeaturedImage) satisfies Array<ContentMetadataItem>;
+			.filter((entry) => !!entry)
+			.filter(filterHasFeaturedImage);
 	};
 }
 
@@ -30,7 +32,9 @@ export async function getLocationsBySeriesFunction() {
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();
 
-	return function getLocationsBySeries(seriesItemIds: Array<string> | undefined) {
+	return function getLocationsBySeries(
+		seriesItemIds: Array<string> | undefined,
+	): Array<CollectionEntry<'locations'>> {
 		if (!seriesItemIds || seriesItemIds.length === 0) return [];
 
 		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
@@ -77,7 +81,10 @@ export async function getSeriesByIdFunction() {
 	}: {
 		collection: Extract<CollectionKey, 'locations' | 'posts'>;
 		id: string;
-	}) {
+	}): Array<{
+		entry: CollectionEntry<'series'>;
+		metadataItems: Array<ContentMetadataItem>;
+	}> {
 		// Note: a post or location may be in more than one series!
 		const entries = series.filter((entry: CollectionEntry<'series'>) =>
 			entry.data.seriesItems?.includes(id),

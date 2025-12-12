@@ -8,7 +8,7 @@ import { getThemesCollection } from '#lib/collections/themes/data.ts';
 export async function getThemesByIdsFunction() {
 	const { themesMap } = await getThemesCollection();
 
-	return function getThemesById(ids: Array<string>) {
+	return function getThemesById(ids: Array<string>): Array<CollectionEntry<'themes'>> {
 		return ids
 			.map((id) => {
 				const entry = themesMap.get(id);
@@ -18,7 +18,7 @@ export async function getThemesByIdsFunction() {
 				}
 				return entry;
 			})
-			.filter((item) => !!item) satisfies Array<CollectionEntry<'themes'>>;
+			.filter((item) => !!item);
 	};
 }
 
@@ -26,10 +26,10 @@ export async function getThemesByIdsFunction() {
 export async function getPostsByThemeFunction() {
 	const { posts } = await getPostsCollection();
 
-	return function getPostsByTheme(entry: CollectionEntry<'themes'>) {
-		return posts.filter(({ data }) =>
-			data.themes?.find(({ id }) => id === entry.id),
-		) satisfies Array<CollectionEntry<'posts'>>;
+	return function getPostsByTheme(
+		entry: CollectionEntry<'themes'>,
+	): Array<CollectionEntry<'posts'>> {
+		return posts.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
 	};
 }
 
@@ -37,10 +37,10 @@ export async function getPostsByThemeFunction() {
 export async function getLocationsByThemeFunction() {
 	const { locations } = await getLocationsCollection();
 
-	return function getLocationsByTheme(entry: CollectionEntry<'themes'>) {
-		return locations.filter(({ data }) =>
-			data.themes?.find(({ id }) => id === entry.id),
-		) satisfies Array<CollectionEntry<'locations'>>;
+	return function getLocationsByTheme(
+		entry: CollectionEntry<'themes'>,
+	): Array<CollectionEntry<'locations'>> {
+		return locations.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
 	};
 }
 

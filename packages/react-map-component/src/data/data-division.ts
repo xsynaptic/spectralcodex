@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { bboxPolygon, difference, featureCollection } from '@turf/turf';
 import { geojson } from 'flatgeobuf';
 import ky from 'ky';
-import { isIncludedIn } from 'remeda';
+import * as R from 'remeda';
 
 import type { MapComponentProps } from '../types';
 
@@ -46,7 +46,7 @@ export function useMapApiDivisionData({
 
 				for await (const feature of featuresIterator) {
 					if (
-						isIncludedIn(feature.geometry.type, [
+						R.isIncludedIn(feature.geometry.type, [
 							GeometryTypeEnum.MultiPolygon,
 							GeometryTypeEnum.Polygon,
 						])

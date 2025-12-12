@@ -60,7 +60,13 @@ function getMapBounds({
 	limitsBuffer,
 	limitsBufferPercentage = 100,
 	targetId,
-}: MapDataBoundsProps) {
+}: MapDataBoundsProps):
+	| {
+			center: [number, number];
+			bounds: [number, number, number, number];
+			maxBounds: [number, number, number, number];
+	  }
+	| undefined {
 	if (!featureCollectionRaw) return;
 
 	// Filter the feature collection for outliers
@@ -138,7 +144,8 @@ function getMapBounds({
 }
 
 interface MapDataProps
-	extends MapDataBoundsProps,
+	extends
+		MapDataBoundsProps,
 		Omit<
 			MapComponentProps,
 			'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'

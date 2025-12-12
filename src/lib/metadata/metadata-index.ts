@@ -173,7 +173,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 // Initialize the content metadata index and return on demand
 let contentMetadataIndex: ReturnType<typeof populateContentMetadataIndex> | undefined;
 
-export async function getContentMetadataIndex() {
+export async function getContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	if (!contentMetadataIndex) {
 		contentMetadataIndex = populateContentMetadataIndex();
 	}

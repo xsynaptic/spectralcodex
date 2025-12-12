@@ -3,7 +3,7 @@ import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/ma
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useCallback, useMemo } from 'react';
-import { funnel } from 'remeda';
+import * as R from 'remeda';
 
 import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
@@ -179,7 +179,7 @@ export function useMapCanvasEvents() {
 	// Create throttled version using funnel
 	const throttledOnMouseMove = useMemo(
 		() =>
-			funnel(onMouseMove, {
+			R.funnel(onMouseMove, {
 				reducer: (_, ...args: Array<MapLayerMouseEvent>) => {
 					if (args.length === 0 || !args[0]) return;
 
@@ -215,7 +215,7 @@ export function useMapCanvasEvents() {
 
 	const debouncedFilterControlSetup = useMemo(
 		() =>
-			funnel<Array<MapEvent>, HTMLElement | undefined>(
+			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
 				(container) => {
 					if (!container) {
 						console.warn('[Map] Map instance not found!');

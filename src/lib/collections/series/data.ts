@@ -12,10 +12,9 @@ interface CollectionData {
 export const getSeriesCollection = pMemoize(async (): Promise<CollectionData> => {
 	const startTime = performance.now();
 
-	const series = await getCollection('series');
-
 	const locations = await getCollection('locations');
 	const posts = await getCollection('posts');
+	const series = await getCollection('series');
 
 	const seriesMap = new Map<string, CollectionEntry<'series'>>();
 

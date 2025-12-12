@@ -6,7 +6,7 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 export async function getLocationsByIdsFunction() {
 	const { locationsMap } = await getLocationsCollection();
 
-	return function getLocationsById(ids: Array<string>) {
+	return function getLocationsById(ids: Array<string>): Array<CollectionEntry<'locations'>> {
 		return ids
 			.map((id) => {
 				const entry = locationsMap.get(id);
@@ -16,9 +16,7 @@ export async function getLocationsByIdsFunction() {
 				}
 				return entry;
 			})
-			.filter((entry): entry is CollectionEntry<'locations'> => !!entry) satisfies Array<
-			CollectionEntry<'locations'>
-		>;
+			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
 	};
 }
 
@@ -26,16 +24,16 @@ export async function getLocationsByIdsFunction() {
 export async function getLocationsByPostsFunction() {
 	const { locationsMap } = await getLocationsCollection();
 
-	return function getLocationsByPosts(...posts: Array<CollectionEntry<'posts'>>) {
+	return function getLocationsByPosts(
+		...posts: Array<CollectionEntry<'posts'>>
+	): Array<CollectionEntry<'locations'>> {
 		const ids = [
 			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
 		];
 
 		return ids
 			.map((id) => locationsMap.get(id))
-			.filter((entry): entry is CollectionEntry<'locations'> => !!entry) satisfies Array<
-			CollectionEntry<'locations'>
-		>;
+			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
 	};
 }
 

@@ -4,7 +4,7 @@ import type {
 	MapSourceItemInput,
 } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
-import type { Position } from 'geojson';
+import type { FeatureCollection, Position } from 'geojson';
 
 import {
 	GeometryTypeEnum,
@@ -73,7 +73,7 @@ interface LocationsFeatureCollectionOptions {
 export function getLocationsFeatureCollection(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
 	options?: LocationsFeatureCollectionOptions,
-) {
+): FeatureCollection<MapGeometry, MapFeatureProperties> | undefined {
 	if (!locations || locations.length === 0) return;
 
 	const { showAllLocations } = Object.assign(
@@ -152,7 +152,9 @@ export function getLocationsFeatureCollection(
 }
 
 // Optimized geodata for the map component; it will be reassembled into GeoJSON on the client
-export function getLocationsMapSourceData(featureCollection: MapFeatureCollection | undefined) {
+export function getLocationsMapSourceData(
+	featureCollection: MapFeatureCollection | undefined,
+): Array<MapSourceItemInput> | undefined {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
 	return featureCollection.features
@@ -183,13 +185,13 @@ export function getLocationsMapSourceData(featureCollection: MapFeatureCollectio
 				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 			};
 		})
-		.sort((a, b) =>
-			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
-		) satisfies Array<MapSourceItemInput>;
+		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));
 }
 
 // Extended locations metadata for popups
-export function getLocationsMapPopupData(featureCollection: MapFeatureCollection | undefined) {
+export function getLocationsMapPopupData(
+	featureCollection: MapFeatureCollection | undefined,
+): Array<MapPopupItemInput> | undefined {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
 	return featureCollection.features
@@ -216,9 +218,7 @@ export function getLocationsMapPopupData(featureCollection: MapFeatureCollection
 						}),
 			};
 		})
-		.sort((a, b) =>
-			a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]),
-		) satisfies Array<MapPopupItemInput>;
+		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));
 }
 
 // Hash the contents of each API endpoint
@@ -236,10 +236,17 @@ export function getLocationsMapApiData(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
 	basePath: string,
 	options?: LocationsFeatureCollectionOptions,
-) {
+):
+	| Array<{
+			params: { id: string };
+			props: { data: Array<MapSourceItemInput> | Array<MapPopupItemInput> };
+	  }>
+	| undefined {
 	const featureCollection = getLocationsFeatureCollection(locations, options);
 	const sourceData = getLocationsMapSourceData(featureCollection);
 	const popupData = getLocationsMapPopupData(featureCollection);
+
+	if (!sourceData || !popupData) return;
 
 	return [MapApiDataEnum.Source, MapApiDataEnum.Popup].map((key) => ({
 		params: {

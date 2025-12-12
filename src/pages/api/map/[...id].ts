@@ -75,7 +75,7 @@ export const getStaticPaths = (async () => {
 			R.pipe(
 				entry.data.seriesItems ?? [],
 				getLocationsBySeries,
-				R.filter((item) => !!item),
+				R.filter(R.isDefined),
 				(locations) => getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
 			),
 		),
@@ -97,14 +97,17 @@ export const getStaticPaths = (async () => {
 		getLocationsMapApiData(locations, 'objectives', { showAllLocations: true }),
 	);
 
-	return [
-		...locationsData,
-		...postsData,
-		...regionsData,
-		...seriesData,
-		...themesData,
-		...objectivesData,
-	];
+	return R.pipe(
+		[
+			...locationsData,
+			...postsData,
+			...regionsData,
+			...seriesData,
+			...themesData,
+			...(objectivesData ?? []),
+		],
+		R.filter(R.isDefined),
+	);
 }) satisfies GetStaticPaths;
 
 export const GET = (({ props: { data } }) => {

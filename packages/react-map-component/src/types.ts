@@ -13,7 +13,7 @@ import {
 	MapDataKeys,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
-import { invert } from 'remeda';
+import * as R from 'remeda';
 import { z } from 'zod';
 
 // Supported geometry for use with this component
@@ -51,10 +51,10 @@ export const MapSourceItemSchema = z
 			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
 			[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
 			[MapDataKeys.Category]:
-				invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
+				R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
 				LocationCategoryEnum.Unknown,
 			[MapDataKeys.Status]:
-				invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
+				R.invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
 				LocationStatusEnum.Unknown,
 			[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
 			[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
@@ -66,7 +66,7 @@ export const MapSourceItemSchema = z
 			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]],
 		},
 		[MapDataKeys.Geometry]: {
-			[MapDataKeys.GeometryType]: invert(MapDataGeometryTypeNumericMapping)[
+			[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[
 				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryType]]
 			],
 			[MapDataKeys.GeometryCoordinates]:

@@ -4,7 +4,29 @@ import { getImagesCollection } from '#lib/collections/images/data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
-export async function getContentStats() {
+interface ContentStats {
+	ephemera: string;
+	locations: {
+		itemCount: string;
+		withImages: string;
+	};
+	pages: string;
+	posts: {
+		itemCount: string;
+		wordCount: string;
+	};
+	regions: string;
+	series: string;
+	themes: string;
+	images: {
+		itemCount: string;
+	};
+	links: {
+		itemCount: string;
+	};
+}
+
+export async function getContentStats(): Promise<ContentStats> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const contentMetadataArray = [...contentMetadataIndex.values()];
