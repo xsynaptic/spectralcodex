@@ -1,3 +1,5 @@
+import type { CollectionEntry } from 'astro:content';
+
 import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 /**
@@ -18,6 +20,7 @@ export interface TimelineMonthlyItem extends TimelineBaseItem {
 	created: Array<ContentMetadataItem>;
 	updated: Array<ContentMetadataItem>;
 	visited: Array<ContentMetadataItem>;
+	timelineEntry?: CollectionEntry<'timeline'> | undefined;
 }
 
 export interface TimelineData {

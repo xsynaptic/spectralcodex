@@ -3,6 +3,7 @@ import pMemoize from 'p-memoize';
 import type { TimelineBaseItem, TimelineData } from '#lib/timeline/timeline-types.ts';
 import type { ContentMetadataItem } from '#lib/types/index.ts';
 
+import { getTimelineCollection } from '#lib/collections/timeline/data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 interface TimelineDataMapMonthlyItem extends TimelineBaseItem {
@@ -207,6 +208,8 @@ function getTimelineMonthlyData(
 export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 	const timelineDataMap = await getTimelineDataMap();
 
+	const { timelineEntriesMap } = await getTimelineCollection();
+
 	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
 	const timelineYearlyData: TimelineData['timelineYearlyData'] = {};
 	const timelineIndexData: TimelineData['timelineIndexData'] = {};
@@ -245,11 +248,16 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 			);
 
 			if (!monthlyDataProcessed.isEmpty) {
+				// Check for a matching timeline collection entry
+				// This allows for custom descriptions and images on monthly timeline pages
+				const timelineEntry = timelineEntriesMap.get(`${year}/${year}-${monthlyData.month}`);
+
 				timelineMonthlyData.push({
 					...monthlyData,
 					created: monthlyDataProcessed.created,
 					updated: monthlyDataProcessed.updated,
 					visited: monthlyDataProcessed.visited,
+					timelineEntry,
 				});
 				timelineMonths[year].push(monthlyData.month);
 			}

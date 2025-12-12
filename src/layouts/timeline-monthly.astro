@@ -1,4 +1,6 @@
 ---
+import { render } from 'astro:content';
+
 import type { TimelineMonthlyItem } from '#lib/timeline/timeline-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
@@ -6,10 +8,14 @@ import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
+import ProseBody from '#components/parts/prose-body.astro';
 import TimelineItem from '#components/timeline/timeline-item.astro';
 import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
+import {
+	getImageFeaturedGroupByContentMetadata,
+	getImageFeaturedObjectGroup,
+} from '#lib/image/image-featured.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
@@ -21,11 +27,18 @@ interface Props {
 
 const { timelineMonthlyItem, timelineYears, timelineMonths } = Astro.props;
 
-const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
-	items: timelineMonthlyItem.highlights,
-});
+// Check for custom timeline entry
+const { timelineEntry } = timelineMonthlyItem;
+
+// Use custom imageFeatured from timeline entry if available, otherwise use generated highlights
+const imageFeaturedGroup = timelineEntry?.data.imageFeatured
+	? await getImageFeaturedObjectGroup({ imageFeatured: timelineEntry.data.imageFeatured })
+	: getImageFeaturedGroupByContentMetadata({ items: timelineMonthlyItem.highlights });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+// Render timeline entry MDX content if available
+const timelineRenderResult = timelineEntry ? await render(timelineEntry) : undefined;
 
 const t = getTranslations();
 ---
@@ -67,7 +80,7 @@ const t = getTranslations();
 			</Fragment>
 		</ContentHeader>
 	</ImageHeroCarousel>
-	<ContentSection>
+	<ContentSection marginSmall={true}>
 		<TimelineNavigation
 			class="border-primary-300 dark:border-primary-700 pb-small border-b"
 			currentYear={timelineMonthlyItem.year}
@@ -76,6 +89,13 @@ const t = getTranslations();
 			timelineMonths={timelineMonths}
 		/>
 	</ContentSection>
+	{
+		timelineRenderResult ? (
+			<ProseBody class="content pb-small">
+				<timelineRenderResult.Content />
+			</ProseBody>
+		) : undefined
+	}
 	<ContentSection class="flex flex-col gap-2">
 		<TimelineItem
 			title={t('timeline.monthly.updated')}

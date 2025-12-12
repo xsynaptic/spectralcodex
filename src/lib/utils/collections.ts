@@ -28,7 +28,7 @@ export function filterWithContent<T extends CollectionEntryWithContentCount>(ent
 
 // Filter content by entry quality
 export function getFilterEntryQualityFunction<
-	T extends CollectionEntry<Exclude<CollectionKey, 'images'>>,
+	T extends CollectionEntry<Exclude<CollectionKey, 'images' | 'timeline'>>,
 >(entryQuality: 1 | 2 | 3 | 4 | 5) {
 	return function filterEntryQuality(entry: T): entry is T {
 		return !!entry.data.entryQuality && entry.data.entryQuality >= entryQuality;

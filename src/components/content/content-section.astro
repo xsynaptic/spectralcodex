@@ -9,9 +9,10 @@ interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
 	fillViewport?: boolean | undefined;
 	titleLarge?: boolean | undefined;
+	marginSmall?: boolean | undefined;
 }
 
-const { class: className, fillViewport, titleLarge, ...props } = Astro.props;
+const { class: className, fillViewport, titleLarge, marginSmall, ...props } = Astro.props;
 
 const title = await renderSlot(Astro.slots, 'section-title');
 const subtitle = await renderSlot(Astro.slots, 'section-subtitle');
@@ -21,7 +22,11 @@ const children = await renderSlot(Astro.slots, 'default');
 
 {
 	description || children ? (
-		<Container class:list={[className, 'mb-medium']} fillViewport={fillViewport} {...props}>
+		<Container
+			class:list={[marginSmall ? 'mb-small' : 'mb-medium', className]}
+			fillViewport={fillViewport}
+			{...props}
+		>
 			{title || subtitle || description ? (
 				<header
 					class:list={[
