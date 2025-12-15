@@ -37,8 +37,8 @@
 	},
 	"dependencies": {
 		"astro": "^5.16.5",
-		"react": "^19.2.1",
-		"react-dom": "^19.2.1"
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.10",
@@ -47,7 +47,7 @@
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/rss": "^4.0.14",
 		"@astrojs/sitemap": "^3.6.0",
-		"@iconify/json": "^2.2.416",
+		"@iconify/json": "^2.2.418",
 		"@iconify/utils": "^3.1.0",
 		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
@@ -61,7 +61,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/unified-tools": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
-		"@tailwindcss/vite": "^4.1.17",
+		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/eslint-plugin-query": "^5.91.2",
 		"@turf/helpers": "^7.3.1",
 		"@turf/turf": "^7.3.1",
@@ -74,7 +74,7 @@
 		"astro-pagefind": "^1.8.5",
 		"astro-seo": "^0.8.4",
 		"chalk": "^5.6.2",
-		"eslint": "^9.39.1",
+		"eslint": "^9.39.2",
 		"eslint-plugin-astro": "^1.5.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react": "^7.37.5",
@@ -96,7 +96,7 @@
 		"rehype-wrap-cjk": "^1.0.3",
 		"remeda": "^2.32.0",
 		"sharp": "^0.34.5",
-		"tailwindcss": "^4.1.17",
+		"tailwindcss": "^4.1.18",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.49.0",

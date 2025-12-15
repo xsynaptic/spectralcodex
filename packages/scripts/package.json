@@ -16,7 +16,7 @@
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^6.3.10",
 		"@duckdb/node-api": "1.4.2-r.1",
-		"@iconify/json": "^2.2.416",
+		"@iconify/json": "^2.2.418",
 		"@iconify/tools": "^4.2.0",
 		"@iconify/utils": "^3.1.0",
 		"@turf/helpers": "^7.3.1",
