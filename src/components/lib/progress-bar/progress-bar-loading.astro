@@ -19,8 +19,6 @@ const { class: className, height, ...props } = Astro.props;
 <ProgressBar id="loading-bar" class:list={[className]} height={height} {...props} />
 
 <script>
-	import { TRANSITION_BEFORE_PREPARATION, TRANSITION_BEFORE_SWAP } from 'astro:transitions/client';
-
 	const animationDuration = 300;
 
 	function loadingBar(selector: string) {
@@ -62,7 +60,7 @@ const { class: className, height, ...props } = Astro.props;
 		let trickleInterval: number | undefined;
 		let thresholdTimeout: number;
 
-		document.addEventListener(TRANSITION_BEFORE_PREPARATION, () => {
+		document.addEventListener('astro:before-preparation', () => {
 			setProgress(0);
 			thresholdTimeout = globalThis.window.setTimeout(() => {
 				setOpacity(1);
@@ -72,7 +70,7 @@ const { class: className, height, ...props } = Astro.props;
 			}, threshold);
 		});
 
-		document.addEventListener(TRANSITION_BEFORE_SWAP, (event) => {
+		document.addEventListener('astro:before-swap', (event) => {
 			if (!thresholdTimeout) return;
 
 			globalThis.window.clearTimeout(thresholdTimeout);
