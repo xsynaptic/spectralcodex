@@ -8,10 +8,10 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"astro": "^5.16.5",
+		"astro": "^6.0.0-alpha.1",
 		"astro-integration-kit": "^0.19.1",
 		"remeda": "^2.32.0",
 		"sirv": "^3.0.2",
-		"zod": "^3.25.76"
+		"zod": "^4.1.13"
 	}
 }

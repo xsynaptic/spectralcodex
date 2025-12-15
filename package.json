@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "5.7.6",
+	"version": "6.0.0",
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
@@ -32,11 +32,8 @@
 	"imports": {
 		"#*": "./src/*"
 	},
-	"resolutions": {
-		"vite": "6.4.1"
-	},
 	"dependencies": {
-		"astro": "^5.16.5",
+		"astro": "^6.0.0-alpha.1",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3"
 	},
@@ -102,11 +99,11 @@
 		"typescript-eslint": "^8.49.0",
 		"unified": "^11.0.5",
 		"url-join": "^5.0.0",
-		"vite": "6.4.1",
+		"vite": "^7.2.7",
 		"vitest": "^4.0.15",
 		"yaml": "^2.8.2",
-		"zod": "^3.25.76",
+		"zod": "^4.1.13",
 		"zx": "^8.8.5"
 	},
-	"packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c"
+	"packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"
 }
