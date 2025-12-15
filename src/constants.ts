@@ -16,9 +16,6 @@ export const CONTENT_MEDIA_HOST = 'http://localhost:4321/media';
 // An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
-// Minimum width for featured images
-export const CONTENT_IMAGE_FEATURED_MIN_WIDTH = 480;
-
 // Set to "true" to log missing Link component IDs
 export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
 
