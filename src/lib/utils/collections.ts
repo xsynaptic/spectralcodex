@@ -1,4 +1,6 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+import type { ContentMetadataCollectionKey } from '#lib/types/index.ts';
 
 interface CollectionEntryWithContentCount {
 	data: {
@@ -28,7 +30,7 @@ export function filterWithContent<T extends CollectionEntryWithContentCount>(ent
 
 // Filter content by entry quality
 export function getFilterEntryQualityFunction<
-	T extends CollectionEntry<Exclude<CollectionKey, 'images' | 'timeline'>>,
+	T extends CollectionEntry<ContentMetadataCollectionKey>,
 >(entryQuality: 1 | 2 | 3 | 4 | 5) {
 	return function filterEntryQuality(entry: T): entry is T {
 		return !!entry.data.entryQuality && entry.data.entryQuality >= entryQuality;

@@ -1,8 +1,8 @@
-import type { CollectionEntry, CollectionKey, DataEntryMap } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 
 import slugify from '@sindresorhus/slugify';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataCollectionKey, ContentMetadataItem } from '#lib/types/index.ts';
 
 import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
@@ -10,15 +10,15 @@ import { logError } from '#lib/utils/logging.ts';
 
 // Provision the content metadata getter function
 export async function getContentMetadataFunction(): Promise<
-	<T extends CollectionKey = keyof DataEntryMap>(
+	<T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey>(
 		entries: Array<CollectionEntry<T>>,
 	) => Array<ContentMetadataItem<T>>
 > {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	return function getContentMetadata<T extends CollectionKey = CollectionKey>(
-		entries: Array<CollectionEntry<T>>,
-	): Array<ContentMetadataItem<T>> {
+	return function getContentMetadata<
+		T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey,
+	>(entries: Array<CollectionEntry<T>>): Array<ContentMetadataItem<T>> {
 		return entries.map(({ id, collection }) => {
 			const contentMetadata = contentMetadataIndex.get(id);
 
@@ -46,9 +46,9 @@ export async function getContentMetadataById(id: string): Promise<ContentMetadat
 }
 
 // Filter content metadata by featured images
-export function filterHasFeaturedImage<T extends CollectionKey = CollectionKey>(
-	item: ContentMetadataItem<T>,
-) {
+export function filterHasFeaturedImage<
+	T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey,
+>(item: ContentMetadataItem<T>) {
 	return !!item.imageId;
 }
 
