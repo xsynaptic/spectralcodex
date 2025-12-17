@@ -87,6 +87,11 @@ export default defineConfig({
 			}),
 			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
 			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
+			IPX_SERVER_URL: envField.string({
+				context: 'server',
+				access: 'secret',
+				default: 'http://localhost:3333',
+			}),
 		},
 	},
 	vite: {

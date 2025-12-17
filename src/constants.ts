@@ -22,8 +22,8 @@ export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
 /**
  * Image processing
  */
-export const IMAGE_FORMAT = 'jpg';
-export const IMAGE_QUALITY = 88;
+export const IMAGE_FORMAT = 'jpg' as const;
+export const IMAGE_QUALITY = 88 as const;
 
 export const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
 export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;

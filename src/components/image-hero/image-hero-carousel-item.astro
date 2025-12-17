@@ -1,15 +1,12 @@
 ---
-import type { RemoteImageProps } from 'astro:assets';
-
-import { Image } from 'astro:assets';
+import { Image } from '@unpic/astro';
 
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getUnpicImageProps } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -19,29 +16,33 @@ interface Props extends ImageFeaturedObjectWithCaptionMetadata {
 
 const { index, id: imageId, title: alt = '', captionMetadata } = Astro.props;
 
-const getImageById = await getImageByIdFunction();
+async function getImageProps(imageId: string | undefined, alt: string) {
+	const getImageById = await getImageByIdFunction();
 
-const imageEntry = getImageById(imageId);
+	const imageEntry = getImageById(imageId);
 
-const imageProps = imageEntry
-	? ({
-			src: imageEntry.data.src,
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
+
+	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+
+	return {
+		imageProps: {
+			src: imageId,
 			alt: sanitizeAltAttribute(alt),
 			width: imageEntry.data.width,
 			height: imageEntry.data.height,
-			widths: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: '100vw',
-			format: IMAGE_FORMAT,
-			quality: IMAGE_QUALITY,
 			...(index === 0
-				? { loading: 'eager', decoding: 'sync', fetchpriority: 'high' }
-				: { loading: 'lazy', decoding: 'async', fetchpriority: 'low' }),
-		} satisfies RemoteImageProps)
-	: undefined;
+				? { loading: 'eager' as const, decoding: 'sync' as const, fetchpriority: 'high' as const }
+				: { loading: 'lazy' as const, decoding: 'async' as const, fetchpriority: 'low' as const }),
+			...unpicImageProps,
+			unstyled: true,
+		},
+		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),
+	};
+}
 
-const placeholder = imageEntry
-	? await getImagePlaceholderDataUrlHq(imageEntry.data.src)
-	: undefined;
+const { imageProps, placeholder } = await getImageProps(imageId, alt);
 
 // TODO: carousel items should have a visual indicator to show they can be scrolled through
 ---
@@ -51,7 +52,7 @@ const placeholder = imageEntry
 		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
 			<Image
 				class:list={[
-					'z-10 max-h-screen min-h-[400px] w-screen object-cover object-center text-sm text-transparent xl:min-h-screen',
+					'z-10 max-h-screen min-h-[400px] w-screen object-cover text-sm text-transparent xl:min-h-screen',
 				]}
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}

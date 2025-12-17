@@ -1,17 +1,19 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { RemoteImageProps } from 'astro:assets';
 
-import { Image } from 'astro:assets';
+import { Image } from '@unpic/astro';
 
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
 import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
+import {
+	getImageLayoutProps,
+	getUnpicImageProps,
+	ImageLayoutEnum,
+} from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
@@ -30,48 +32,58 @@ const {
 	...props
 } = Astro.props;
 
-// This controls how the component is rendered; feeds requires a less complex output
+// This controls how the component is rendered; feeds require a less complex output
 const { isFeed } = Astro.locals;
 
 const slotContents = await renderSlot(Astro.slots, 'default');
 
-const getImageById = await getImageByIdFunction();
+async function getImageProps() {
+	const getImageById = await getImageByIdFunction();
 
-const imageEntry = getImageById(imageId);
+	const imageEntry = getImageById(imageId);
 
-const imageProps = imageEntry
-	? ((isFeed
-			? {
-					src: imageEntry.data.src,
-					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-					width: imageEntry.data.height > imageEntry.data.width ? 900 : 1200,
-					height: imageEntry.data.height > imageEntry.data.width ? 120 : 900,
-					format: IMAGE_FORMAT,
-					quality: IMAGE_QUALITY,
-				}
-			: {
-					src: imageEntry.data.src,
-					alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-					format: IMAGE_FORMAT,
-					quality: IMAGE_QUALITY,
-					...getImageLayoutProps({
-						width: imageEntry.data.width,
-						height: imageEntry.data.height,
-						layout,
-					}),
-				}) satisfies RemoteImageProps)
-	: undefined;
+	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+
+	const layoutProps = getImageLayoutProps({
+		width: imageEntry.data.width,
+		height: imageEntry.data.height,
+		layout,
+	});
+	const feedWidth = imageEntry.data.height > imageEntry.data.width ? 900 : 1200;
+	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
+	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
+
+	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+
+	return {
+		imageEntry,
+		imageProps: {
+			src: imageId,
+			width: primaryWidth,
+			height: Math.round(primaryWidth / aspectRatio),
+			sizes: layoutProps.sizes,
+			loading: 'lazy' as const,
+			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
+			layout:
+				layout === ImageLayoutEnum.Full || layout === ImageLayoutEnum.Wide
+					? ('fullWidth' as const)
+					: ('constrained' as const),
+			...unpicImageProps,
+		},
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageEntry, imageProps, placeholder } = await getImageProps();
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
-
-const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 ---
 
 {
 	imageProps ? (
 		isFeed ? (
 			<figure {...props}>
-				<Image loading="lazy" {...imageProps} />
+				<Image {...imageProps} />
 				{caption ? (
 					<figcaption>
 						<Fragment set:html={caption} />
@@ -99,12 +111,8 @@ const placeholder = imageEntry ? imageEntry.data.placeholder : undefined;
 					]}
 					placeholder={placeholder}
 				>
-					<Image
-						class:list={['m-0 object-cover object-center text-sm text-transparent']}
-						loading="lazy"
-						{...imageProps}
-					/>
-					{FEATURE_IMAGE_METADATA && showMetadata && imageEntry ? (
+					<Image class="m-0 text-sm text-transparent" {...imageProps} />
+					{FEATURE_IMAGE_METADATA && showMetadata ? (
 						<ImageMetadata entry={imageEntry} />
 					) : undefined}
 				</ImagePlaceholder>

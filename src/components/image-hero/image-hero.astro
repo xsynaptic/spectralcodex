@@ -1,13 +1,14 @@
 ---
-import type { RemoteImageProps } from 'astro:assets';
-
-import { Image } from 'astro:assets';
+import { Image } from '@unpic/astro';
 
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import {
+	getImageLayoutProps,
+	getUnpicImageProps,
+	ImageLayoutEnum,
+} from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -25,29 +26,35 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 
 	const imageEntry = getImageById(imageId);
 
+	if (!hasHeroImage || !imageId || !imageEntry)
+		return { imageProps: undefined, placeholder: undefined };
+
+	const layoutProps = getImageLayoutProps({
+		width: imageEntry.data.width,
+		height: imageEntry.data.height,
+		layout: ImageLayoutEnum.Full,
+	});
+
+	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+
 	return {
-		imageProps: imageEntry
-			? ({
-					src: imageEntry.data.src,
-					alt: sanitizeAltAttribute(alt),
-					width: imageEntry.data.width,
-					height: imageEntry.data.height,
-					widths: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
-					sizes: '100vw',
-					format: IMAGE_FORMAT,
-					quality: IMAGE_QUALITY,
-					loading: 'eager',
-					decoding: 'sync',
-					fetchpriority: 'high',
-				} satisfies RemoteImageProps)
-			: undefined,
-		placeholder: imageEntry ? await getImagePlaceholderDataUrlHq(imageEntry.data.src) : undefined,
+		imageProps: {
+			src: imageId,
+			alt: sanitizeAltAttribute(alt),
+			width: imageEntry.data.width,
+			height: imageEntry.data.height,
+			sizes: layoutProps.sizes,
+			loading: 'eager' as const,
+			decoding: 'sync' as const,
+			fetchpriority: 'high' as const,
+			layout: 'fullWidth' as const,
+			...unpicImageProps,
+		},
+		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),
 	};
 }
 
-const { imageProps, placeholder } = hasHeroImage
-	? await getImageProps(imageId, alt)
-	: { imageProps: undefined, placeholder: undefined };
+const { imageProps, placeholder } = await getImageProps(imageId, alt);
 ---
 
 {
@@ -57,7 +64,7 @@ const { imageProps, placeholder } = hasHeroImage
 				{imageProps ? (
 					<Image
 						class:list={[
-							'z-10 max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+							'z-10 max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 							'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
 						]}
 						data-pagefind-meta="image[src], image_alt[alt]"
@@ -66,7 +73,7 @@ const { imageProps, placeholder } = hasHeroImage
 				) : (
 					<div
 						class:list={[
-							'max-h-screen min-h-[400px] w-full object-cover object-center text-sm text-transparent xl:min-h-screen',
+							'max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 							'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
 						]}
 					/>
