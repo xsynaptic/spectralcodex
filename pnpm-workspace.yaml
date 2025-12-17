@@ -3,6 +3,15 @@ packages:
 
 minimumReleaseAge: 1440
 
+minimumReleaseAgeExclude:
+  - astro
+  - '@astrojs/markdown-remark'
+  - '@astrojs/mdx'
+  - '@astrojs/node'
+  - '@astrojs/react'
+  - '@astrojs/rss'
+  - '@astrojs/sitemap'
+
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild

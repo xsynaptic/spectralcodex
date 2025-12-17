@@ -33,17 +33,17 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.0-alpha.1",
+		"astro": "^6.0.0-alpha.2",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^6.3.10",
-		"@astrojs/mdx": "^4.3.13",
-		"@astrojs/node": "^9.5.1",
-		"@astrojs/react": "^4.4.2",
-		"@astrojs/rss": "^4.0.14",
-		"@astrojs/sitemap": "^3.6.0",
+		"@astrojs/markdown-remark": "^7.0.0-alpha.0",
+		"@astrojs/mdx": "^5.0.0-alpha.0",
+		"@astrojs/node": "^10.0.0-alpha.2",
+		"@astrojs/react": "^5.0.0-alpha.0",
+		"@astrojs/rss": "^4.0.15-alpha.0",
+		"@astrojs/sitemap": "^3.6.1-alpha.1",
 		"@iconify/json": "^2.2.418",
 		"@iconify/utils": "^3.1.0",
 		"@keyv/sqlite": "^4.0.6",
@@ -105,5 +105,5 @@
 		"zod": "^4.1.13",
 		"zx": "^8.8.5"
 	},
-	"packageManager": "pnpm@10.25.0+sha512.5e82639027af37cf832061bcc6d639c219634488e0f2baebe785028a793de7b525ffcd3f7ff574f5e9860654e098fe852ba8ac5dd5cefe1767d23a020a92f501"
+	"packageManager": "pnpm@10.26.0+sha512.3b3f6c725ebe712506c0ab1ad4133cf86b1f4b687effce62a9b38b4d72e3954242e643190fc51fa1642949c735f403debd44f5cb0edd657abe63a8b6a7e1e402"
 }
