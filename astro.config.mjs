@@ -95,6 +95,7 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 		// Note: this is a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
 		optimizeDeps: {
+			include: ['react-dom/client'],
 			exclude: ['virtual:astro:adapter-config/client'],
 		},
 		build: {
