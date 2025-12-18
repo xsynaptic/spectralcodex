@@ -1,4 +1,4 @@
-import { IPX_SERVER_URL } from 'astro:env/client';
+import { IPX_SERVER_URL } from 'astro:env/server';
 
 import {
 	TAILWIND_BREAKPOINT_CONTENT,
