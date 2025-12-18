@@ -8,6 +8,7 @@
 		"content-related": "tsx ./src/content-related/index.ts",
 		"content-schemas": "tsx ./src/content-schemas/index.ts",
 		"content-validate": "tsx ./src/content-validate/index.ts",
+		"deploy-media": "tsx ./src/deploy-media/index.ts",
 		"deploy-static": "tsx ./src/deploy-static/index.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
 		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts",
