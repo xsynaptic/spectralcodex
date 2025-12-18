@@ -1,11 +1,12 @@
 import { IPX_SERVER_URL } from 'astro:env/server';
 
 import {
+	IMAGE_FORMAT,
+	IMAGE_QUALITY,
 	TAILWIND_BREAKPOINT_CONTENT,
 	TAILWIND_BREAKPOINT_MD,
 	TAILWIND_BREAKPOINT_SM,
 } from '#constants.ts';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 
 export const ImageLayoutEnum = {
 	Default: 'default',

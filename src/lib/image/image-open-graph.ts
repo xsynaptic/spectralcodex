@@ -1,13 +1,20 @@
 import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
+import { IPX_SERVER_URL } from 'astro:env/server';
 import { CACHE_DIR } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import pMemoize from 'p-memoize';
+import { transform as ipxTransform } from 'unpic/providers/ipx';
 
+import {
+	IMAGE_FORMAT,
+	IMAGE_QUALITY,
+	OPEN_GRAPH_IMAGE_DENSITY,
+	OPEN_GRAPH_IMAGE_HEIGHT,
+	OPEN_GRAPH_IMAGE_WIDTH,
+} from '#constants.ts';
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
-import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
@@ -111,4 +118,37 @@ export async function getOpenGraphImageFunction() {
 			format: result.info.format === 'jpg' ? 'jpeg' : result.info.format,
 		};
 	};
+}
+
+/**
+ * Generate an Open Graph image URL using IPX without local image processing
+ * This bypasses Astro's getImage and generates CDN URLs directly
+ */
+interface OpenGraphImageUrlOptions {
+	width?: number;
+	height?: number;
+	density?: number;
+	quality?: number;
+	format?: 'jpg' | 'png' | 'webp';
+}
+
+export function getOpenGraphImageUrl(imageSrc: string, options?: OpenGraphImageUrlOptions) {
+	const {
+		width = OPEN_GRAPH_IMAGE_WIDTH,
+		height = OPEN_GRAPH_IMAGE_HEIGHT,
+		density = OPEN_GRAPH_IMAGE_DENSITY,
+		quality = IMAGE_QUALITY,
+		format = IMAGE_FORMAT,
+	} = options ?? {};
+
+	return ipxTransform(
+		imageSrc,
+		{
+			w: width * density,
+			h: height * density,
+			q: quality,
+			f: format,
+		},
+		{ baseURL: IPX_SERVER_URL },
+	);
 }
