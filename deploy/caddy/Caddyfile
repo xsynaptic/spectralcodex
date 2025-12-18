@@ -9,6 +9,13 @@ spectralcodex.com {
 	file_server
 	encode gzip
 
+	# Enforce trailing slashes (except for files with extensions)
+	@no_trailing_slash {
+		path_regexp notrail ^(.+[^/])$
+		not path_regexp \.[a-zA-Z0-9]+$
+	}
+	redir @no_trailing_slash {re.notrail.1}/ 301
+
 	# Redirects
 	import redirects.caddy
 
