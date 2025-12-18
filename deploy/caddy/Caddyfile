@@ -9,6 +9,11 @@ spectralcodex.com {
 	file_server
 	encode gzip
 
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+
 	# Enforce trailing slashes (except for files with extensions)
 	@no_trailing_slash {
 		path_regexp notrail ^(.+[^/])$
