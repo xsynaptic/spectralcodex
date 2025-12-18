@@ -4,10 +4,10 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import buildLogger from '@spectralcodex/astro-build-logger';
-import localImageServer from '@spectralcodex/local-image-server';
+import imageServer from '@spectralcodex/image-server';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
-import AutoImport from 'astro-auto-import';
+import autoImport from 'astro-auto-import';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
@@ -20,9 +20,7 @@ const {
 	PROD_SERVER_URL,
 	BASE_PATH_PROD,
 	BUILD_ASSETS_PATH,
-	CONTENT_MEDIA_BASE_URL,
 	CONTENT_MEDIA_PATH,
-	PROD_ASSETS_URL,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -44,18 +42,6 @@ export default defineConfig({
 	...(BASE_PATH ? { base: `/${BASE_PATH}` } : {}),
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
-		assetsPrefix: {
-			...(PROD_ASSETS_URL
-				? {
-						gif: PROD_ASSETS_URL,
-						jpg: PROD_ASSETS_URL,
-						jpeg: PROD_ASSETS_URL,
-						png: PROD_ASSETS_URL,
-						webp: PROD_ASSETS_URL,
-					}
-				: {}),
-			fallback: `/${BASE_PATH ?? ''}`, // Used by all other assets
-		},
 	},
 	cacheDir: CACHE_DIR,
 	// Still having some trouble getting this working as expected due to memory issues
@@ -99,6 +85,10 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
+		// Note: this is a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
+		optimizeDeps: {
+			exclude: ['virtual:astro:adapter-config/client'],
+		},
 		build: {
 			rollupOptions: {
 				output: {
@@ -123,7 +113,7 @@ export default defineConfig({
 			include: ['packages/react**/*'],
 		}),
 		// AutoImport *must* appear before the MDX integration
-		AutoImport({
+		autoImport({
 			imports: [
 				{
 					'./src/components/mdx/img.astro': [['default', 'Img']],
@@ -147,9 +137,8 @@ export default defineConfig({
 				return { ...item, lastMod: currentDate };
 			},
 		}),
-		localImageServer({
+		imageServer({
 			mediaPath: CONTENT_MEDIA_PATH,
-			mediaBaseUrl: CONTENT_MEDIA_BASE_URL,
 		}),
 		pagefind({
 			indexConfig: {
