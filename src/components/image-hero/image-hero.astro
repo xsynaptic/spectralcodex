@@ -4,8 +4,8 @@ import { Image } from '@unpic/astro';
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageLayoutProps, getIpxImageProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
-import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
+import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
+import { getIpxImageProps } from '#lib/image/image-server.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
@@ -46,7 +46,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 			layout: 'fullWidth' as const,
 			...ipxImageProps,
 		},
-		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),
+		placeholder: imageEntry.data.placeholderHq,
 	};
 }
 

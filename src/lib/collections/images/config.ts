@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
 import {
 	getImageExposureValue,
-	getImageFileUrlPlaceholder,
+	getImageFileUrlPlaceholders,
 } from '#lib/image/image-loader-utils.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
@@ -43,6 +43,7 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 	height: z.number(),
 	modifiedTime: z.date().optional(),
 	placeholder: z.string().optional(),
+	placeholderHq: z.string().optional(),
 });
 
 let exiftool: ExifTool;
@@ -89,49 +90,51 @@ export const images = defineCollection({
 			/**
 			 * Harvest EXIF data from images
 			 */
-			const exifData = FEATURE_IMAGE_METADATA
-				? await (async () => {
-						const tags = await exiftool.read(filePathRelative);
+			async function getExifData() {
+				if (!FEATURE_IMAGE_METADATA) return;
 
-						const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
-						const entryQuality = Math.min(
-							1,
-							Math.max(Number.parseInt(String(tags.Rating ?? 0), 10), 5),
-						);
+				const tags = await exiftool.read(filePathRelative);
 
-						return {
-							title: String(tags.Title),
-							description: String(tags.Description),
-							dateCreated: dateCreated ? new Date(dateCreated) : undefined,
-							brand: String(tags.Make),
-							camera: String(tags.Model),
-							lens: tags.LensID ?? String(tags.LensModel),
-							aperture: String(tags.FNumber),
-							shutterSpeed: String(tags.ShutterSpeed),
-							focalLength: String(tags.FocalLength),
-							iso: String(tags.ISO),
-							exposureValue: getImageExposureValue({
-								aperture: String(tags.FNumber),
-								shutterSpeed: String(tags.ShutterSpeed),
-							}),
-							...(tags.GPSLatitude && tags.GPSLongitude
-								? {
-										geometry: {
-											type: GeometryTypeEnum.Point,
-											coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
-										},
-									}
-								: {}),
-							entryQuality,
-						} satisfies ImageExifDataInput;
-					})()
-				: {};
+				const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+				const entryQuality = Math.min(
+					1,
+					Math.max(Number.parseInt(String(tags.Rating ?? 0), 10), 5),
+				);
+
+				return {
+					title: String(tags.Title),
+					description: String(tags.Description),
+					dateCreated: dateCreated ? new Date(dateCreated) : undefined,
+					brand: String(tags.Make),
+					camera: String(tags.Model),
+					lens: tags.LensID ?? String(tags.LensModel),
+					aperture: String(tags.FNumber),
+					shutterSpeed: String(tags.ShutterSpeed),
+					focalLength: String(tags.FocalLength),
+					iso: String(tags.ISO),
+					exposureValue: getImageExposureValue({
+						aperture: String(tags.FNumber),
+						shutterSpeed: String(tags.ShutterSpeed),
+					}),
+					...(tags.GPSLatitude && tags.GPSLongitude
+						? {
+								geometry: {
+									type: GeometryTypeEnum.Point,
+									coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
+								},
+							}
+						: {}),
+					entryQuality,
+				} satisfies ImageExifDataInput;
+			}
+
+			const exifData = await getExifData();
 
 			/**
-			 * Generate a low-quality placeholder (LQIP) for the image
-			 * This is base 64-encoded and stored in the content collection for easy reference
+			 * Generate LQ and HQ placeholders for the image
+			 * Both are base64-encoded and stored in the content collection for easy reference
 			 */
-			const placeholder = await getImageFileUrlPlaceholder({
+			const { placeholder, placeholderHq } = await getImageFileUrlPlaceholders({
 				fileUrl,
 				onError: (errorMessage) => {
 					logger.error(errorMessage);
@@ -146,6 +149,7 @@ export const images = defineCollection({
 				...dimensions,
 				...exifData,
 				placeholder,
+				placeholderHq,
 			} satisfies ImageMetadataInput;
 		},
 	}),

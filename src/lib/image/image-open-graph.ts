@@ -72,7 +72,7 @@ export async function getOpenGraphImageFunction() {
 		density?: number;
 	}) {
 		const imageEntry = getImageById(imageId);
-		const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
+		const imageObject = imageEntry ? await getImageObject(imageEntry.data.path) : undefined;
 
 		if (!imageObject) return;
 

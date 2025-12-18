@@ -6,7 +6,6 @@ import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-fe
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { getIpxImageProps } from '#lib/image/image-server.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -16,7 +15,7 @@ interface Props extends ImageFeaturedObjectWithCaptionMetadata {
 
 const { index, id: imageId, title: alt = '', captionMetadata } = Astro.props;
 
-async function getImageProps(imageId: string | undefined, alt: string) {
+async function getImageProps(imageId: string | undefined, alt: string, isFirst: boolean) {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(imageId);
@@ -32,17 +31,17 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 			width: imageEntry.data.width,
 			height: imageEntry.data.height,
 			sizes: '100vw',
-			...(index === 0
+			...(isFirst
 				? { loading: 'eager' as const, decoding: 'sync' as const, fetchpriority: 'high' as const }
 				: { loading: 'lazy' as const, decoding: 'async' as const, fetchpriority: 'low' as const }),
 			...ipxImageProps,
 			unstyled: true,
 		},
-		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),
+		placeholder: isFirst ? imageEntry.data.placeholderHq : imageEntry.data.placeholder,
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps(imageId, alt);
+const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 0);
 
 // TODO: carousel items should have a visual indicator to show they can be scrolled through
 ---
