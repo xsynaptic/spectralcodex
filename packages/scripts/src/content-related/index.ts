@@ -2,7 +2,7 @@
 import { sanitizeMdx } from '@spectralcodex/unified-tools';
 import { pipeline } from '@xenova/transformers';
 import chalk from 'chalk';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import * as R from 'remeda';
@@ -291,6 +291,9 @@ async function contentRelated() {
 		}
 
 		const cacheDir = path.join(values['root-path'], values['cache-path'], 'content-related');
+
+		mkdirSync(cacheDir, { recursive: true });
+
 		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
 
 		if (embeddings.length === 0) {
