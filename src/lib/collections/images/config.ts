@@ -1,15 +1,17 @@
 import { imageLoader } from '@spectralcodex/image-loader';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { defineCollection } from 'astro:content';
+import { CONTENT_MEDIA_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { CONTENT_MEDIA_HOST, CONTENT_MEDIA_PATH, FEATURE_IMAGE_METADATA } from '#constants.ts';
+import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholders,
 } from '#lib/image/image-loader-utils.ts';
+import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
@@ -73,7 +75,7 @@ export const images = defineCollection({
 			: {}),
 		dataHandler: async ({ logger, id, filePathRelative, fileUrl }) => {
 			const defaultMetadata = {
-				src: `${CONTENT_MEDIA_HOST}/${id}`,
+				src: getIpxImageUrl(id, { width: 1800 }),
 				path: filePathRelative,
 				width: 1200,
 				height: 900,

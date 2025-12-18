@@ -41,9 +41,5 @@ packages/content/
 packages/content-demo/collections
 packages/content-demo/media
 
-# ignore some files temporarily
-/config/
-docker-compose*
-
 # claude notes
 .claude/tasks/

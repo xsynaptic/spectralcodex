@@ -1,7 +1,8 @@
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 
-import { IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ, IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ } from '#constants.ts';
+const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
+const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 
 // Calculate EV using the formula EV = log2(N^2 / t)
 export function getImageExposureValue({

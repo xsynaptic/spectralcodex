@@ -4,7 +4,6 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import buildLogger from '@spectralcodex/astro-build-logger';
-import imageServer from '@spectralcodex/image-server';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import autoImport from 'astro-auto-import';
@@ -20,7 +19,6 @@ const {
 	PROD_SERVER_URL,
 	BASE_PATH_PROD,
 	BUILD_ASSETS_PATH,
-	CONTENT_MEDIA_PATH,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -59,6 +57,16 @@ export default defineConfig({
 				access: 'public',
 				optional: true,
 				default: CACHE_DIR,
+			}),
+			CONTENT_DATA_PATH: envField.string({
+				context: 'server',
+				access: 'public',
+				default: 'packages/content-demo/data',
+			}),
+			CONTENT_MEDIA_PATH: envField.string({
+				context: 'server',
+				access: 'public',
+				default: 'packages/content-demo/media',
 			}),
 			MAP_ICONS_PATH: envField.string({
 				context: 'client',
@@ -137,9 +145,6 @@ export default defineConfig({
 				return { ...item, lastMod: currentDate };
 			},
 		}),
-		imageServer({
-			mediaPath: CONTENT_MEDIA_PATH,
-		}),
 		pagefind({
 			indexConfig: {
 				excludeSelectors: [
@@ -150,14 +155,6 @@ export default defineConfig({
 			},
 		}),
 	],
-	image: {
-		service: {
-			entrypoint: './src/lib/image/image-service',
-			config: {
-				limitInputPixels: false,
-			},
-		},
-	},
 	i18n: {
 		defaultLocale: 'en',
 		locales: [

@@ -18,6 +18,7 @@ const ipx = createIPX({
 		dir: config.mediaDir,
 		maxAge: config.maxAge,
 	}),
+	sharpOptions: { jpegProgressive: true },
 });
 
 // Create h3 app with router

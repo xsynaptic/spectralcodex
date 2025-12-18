@@ -6,8 +6,6 @@ import { transform as ipxTransform } from 'unpic/providers/ipx';
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
 
 import {
-	IMAGE_FORMAT,
-	IMAGE_QUALITY,
 	OPEN_GRAPH_IMAGE_DENSITY,
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
@@ -18,13 +16,16 @@ import {
 	type ImageSrcsetWidthsProps,
 } from '#lib/image/image-layout.ts';
 
+const IMAGE_FORMAT = 'jpg' as const;
+const IMAGE_QUALITY = 88 as const;
+
 // In development, use local IPX server; in production, use the configured URL
-const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : `http://localhost:3002`;
+const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : `http://localhost:3100`;
 
 /**
  * Generate an IPX image URL directly without local image processing
  */
-function getIpxImageUrl(
+export function getIpxImageUrl(
 	imageSrc: string,
 	options: { width: number; height?: number; quality?: number; format?: ImageFormat },
 ) {
