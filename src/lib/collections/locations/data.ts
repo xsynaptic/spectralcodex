@@ -1,18 +1,13 @@
-import type { UnresolvedImageTransform } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import { transformMarkdown } from '@spectralcodex/unified-tools';
-import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import pLimit from 'p-limit';
 import pMemoize from 'p-memoize';
 
-import type { ImageThumbnail } from '#lib/schemas/image.ts';
-
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getImageThumbnail } from '#lib/image/image-server.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -34,90 +29,55 @@ async function generateLocationPostDataFunction() {
 	};
 }
 
-const imageTransformOptions = {
+const imageThumbnailOptions = {
 	width: 450,
 	height: 300,
 	widths: [450, 600, 900],
-	format: IMAGE_FORMAT,
-	quality: IMAGE_QUALITY,
-} satisfies Omit<UnresolvedImageTransform, 'src'>;
+};
 
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
-	const limit = pLimit(100);
-
 	// Add image data to locations; for use with the mapping system
-	await Promise.all(
-		locations
-			.filter((entry) => !!entry.data.imageFeatured)
-			.map((entry) =>
-				limit(async () => {
-					if (entry.data.imageFeatured) {
-						const imageEntry = getImageById(
-							getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
-						);
+	for (const entry of locations) {
+		if (entry.data.imageFeatured) {
+			const imageEntry = getImageById(
+				getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
+			);
 
-						if (imageEntry) {
-							const imageObject = await getImage({
-								src: imageEntry.data.src,
-								...imageTransformOptions,
-							});
-
-							// Directly add some basic image data to the location entry
-							entry.data.imageThumbnail = {
-								src: imageObject.src,
-								srcSet: imageObject.srcSet.attribute,
-								height: String(imageObject.attributes.height),
-								width: String(imageObject.attributes.width),
-							} satisfies ImageThumbnail;
-						}
-					}
-				}),
-			),
-	);
+			if (imageEntry) {
+				entry.data.imageThumbnail = getImageThumbnail(imageEntry.id, imageThumbnailOptions);
+			}
+		}
+	}
 
 	// Add image data to sub-locations; same as above
-	await Promise.all(
-		locations
-			.filter((entry) => Array.isArray(entry.data.geometry))
-			.map((entry) =>
-				limit(async () => {
-					if (Array.isArray(entry.data.geometry)) {
-						for (const [index, geometry] of entry.data.geometry.entries()) {
-							if (!entry.data.geometry[index]) continue;
+	for (const entry of locations) {
+		if (Array.isArray(entry.data.geometry)) {
+			for (const [index, geometry] of entry.data.geometry.entries()) {
+				if (!entry.data.geometry[index]) continue;
 
-							// Null overrides the main `imageFeatured` and shows no thumbnail
-							// This is used in cases where there is no image for the sub-location
-							if (geometry.imageFeatured === null) {
-								// eslint-disable-next-line unicorn/no-null
-								entry.data.geometry[index].imageThumbnail = null;
-								continue;
-							}
+				// Null overrides the main `imageFeatured` and shows no thumbnail
+				// This is used in cases where there is no image for the sub-location
+				if (geometry.imageFeatured === null) {
+					// eslint-disable-next-line unicorn/no-null
+					entry.data.geometry[index].imageThumbnail = null;
+					continue;
+				}
 
-							if (geometry.imageFeatured) {
-								const imageEntry = getImageById(geometry.imageFeatured);
+				if (geometry.imageFeatured) {
+					const imageEntry = getImageById(geometry.imageFeatured);
 
-								if (imageEntry) {
-									const imageObject = await getImage({
-										src: imageEntry.data.src,
-										...imageTransformOptions,
-									});
-
-									// Directly add some basic image data to the geometry entry
-									entry.data.geometry[index].imageThumbnail = {
-										src: imageObject.src,
-										srcSet: imageObject.srcSet.attribute,
-										height: String(imageObject.attributes.height),
-										width: String(imageObject.attributes.width),
-									} satisfies ImageThumbnail;
-								}
-							}
-						}
+					if (imageEntry) {
+						entry.data.geometry[index].imageThumbnail = getImageThumbnail(
+							imageEntry.id,
+							imageThumbnailOptions,
+						);
 					}
-				}),
-			),
-	);
+				}
+			}
+		}
+	}
 }
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
