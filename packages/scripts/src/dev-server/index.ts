@@ -11,7 +11,7 @@ const { values } = parseArgs({
 	},
 });
 
-const rootPath = values['root-path']!;
+const rootPath = values['root-path'];
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 
 $.verbose = false;
@@ -21,9 +21,8 @@ async function cleanup() {
 	await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
 }
 
-process.on('SIGINT', async () => {
-	await cleanup();
-	process.exit(0);
+process.on('SIGINT', () => {
+	void cleanup().then(() => process.exit(0));
 });
 
 try {

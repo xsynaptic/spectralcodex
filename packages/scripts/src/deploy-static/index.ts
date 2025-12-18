@@ -16,24 +16,28 @@ const { values } = parseArgs({
 	},
 });
 
-const rootPath = values['root-path']!;
-const contentPath = values['content-path']!;
-const cachePath = values['cache-path']!;
+const rootPath = values['root-path'];
+const contentPath = values['content-path'];
+const cachePath = values['cache-path'];
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
 dotenv.config({ path: path.join(rootPath, '.env') });
 dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
 
-const remoteHost = process.env.DEPLOY_REMOTE_HOST;
-const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
-const remotePath = process.env.DEPLOY_REMOTE_PATH;
-const distPath = path.join(rootPath, 'dist');
+const envRemoteHost = process.env.DEPLOY_REMOTE_HOST;
+const envSshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
+const envRemotePath = process.env.DEPLOY_REMOTE_PATH;
 
-if (!remoteHost || !sshKeyPath || !remotePath) {
+if (!envRemoteHost || !envSshKeyPath || !envRemotePath) {
 	console.error(chalk.red('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_REMOTE_PATH'));
 	process.exit(1);
 }
+
+const remoteHost = envRemoteHost;
+const sshKeyPath = envSshKeyPath;
+const remotePath = envRemotePath;
+const distPath = path.join(rootPath, 'dist');
 
 try {
 	await $`ssh-add --apple-load-keychain 2>/dev/null`;

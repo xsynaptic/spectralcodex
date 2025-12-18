@@ -87,7 +87,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	if (import.meta.env.DEV) validateLocations(locations);
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
-	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
+	for (const collection of [pages, posts, ephemera, locations, regions, themes, series]) {
 		for (const entry of collection) {
 			if (contentMetadataMap.has(entry.id)) {
 				throw new Error(
