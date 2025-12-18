@@ -1,8 +1,4 @@
-import { IPX_SERVER_URL } from 'astro:env/server';
-
 import {
-	IMAGE_FORMAT,
-	IMAGE_QUALITY,
 	TAILWIND_BREAKPOINT_CONTENT,
 	TAILWIND_BREAKPOINT_MD,
 	TAILWIND_BREAKPOINT_SM,
@@ -36,7 +32,7 @@ const ImageSizeEnum = {
 } as const;
 
 // These are the widths we're building for in almost all scenarios
-const imageSrcsetWidthsDefault = [
+export const imageSrcsetWidthsDefault = [
 	ImageSizeEnum.ExtraSmall,
 	ImageSizeEnum.Small,
 	ImageSizeEnum.Medium,
@@ -66,12 +62,12 @@ function getImageOrientation({
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
-interface ImageSrcsetWidthsProps {
+export interface ImageSrcsetWidthsProps {
 	maxWidth: number;
 	widths?: Array<number>;
 }
 
-function getImageSrcsetWidths({
+export function getImageSrcsetWidths({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
 }: ImageSrcsetWidthsProps) {
@@ -136,18 +132,4 @@ export function getImageLayoutProps({
 			};
 		}
 	}
-}
-
-export function getUnpicImageProps({
-	maxWidth,
-	widths = imageSrcsetWidthsDefault,
-}: ImageSrcsetWidthsProps) {
-	const breakpoints = getImageSrcsetWidths({ maxWidth, widths });
-
-	return {
-		cdn: 'ipx' as const,
-		breakpoints,
-		options: { ipx: { baseURL: IPX_SERVER_URL } },
-		operations: { ipx: { q: IMAGE_QUALITY, f: IMAGE_FORMAT } },
-	};
 }

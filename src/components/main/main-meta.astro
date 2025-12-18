@@ -11,7 +11,7 @@ import {
 } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getOpenGraphImageUrl } from '#lib/image/image-open-graph.ts';
+import { getOpenGraphImageUrl } from '#lib/image/image-server.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoDescription, getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -88,8 +88,7 @@ async function generateOpenGraphImageUrl({
 
 	// Generate OG image URL using IPX CDN (no local image processing)
 	const openGraphImageUrl =
-		imageLocalUrl ??
-		(imageEntry ? getOpenGraphImageUrl(imageEntry.data.src) : getSeoImageFallback());
+		imageLocalUrl ?? (imageEntry ? getOpenGraphImageUrl(imageEntry.id) : getSeoImageFallback());
 
 	return {
 		url: openGraphImageUrl,

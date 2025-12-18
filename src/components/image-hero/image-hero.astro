@@ -4,11 +4,7 @@ import { Image } from '@unpic/astro';
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import {
-	getImageLayoutProps,
-	getUnpicImageProps,
-	ImageLayoutEnum,
-} from '#lib/image/image-layout.ts';
+import { getImageLayoutProps, getIpxImageProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -35,7 +31,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 		layout: ImageLayoutEnum.Full,
 	});
 
-	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+	const ipxImageProps = getIpxImageProps({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageProps: {
@@ -48,7 +44,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 			decoding: 'sync' as const,
 			fetchpriority: 'high' as const,
 			layout: 'fullWidth' as const,
-			...unpicImageProps,
+			...ipxImageProps,
 		},
 		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),
 	};

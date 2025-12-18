@@ -6,8 +6,8 @@ import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-fe
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getUnpicImageProps } from '#lib/image/image-layout.ts';
 import { getImagePlaceholderDataUrlHq } from '#lib/image/image-placeholder.ts';
+import { getIpxImageProps } from '#lib/image/image-server.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -23,7 +23,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 
 	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
 
-	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+	const ipxImageProps = getIpxImageProps({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageProps: {
@@ -35,7 +35,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 			...(index === 0
 				? { loading: 'eager' as const, decoding: 'sync' as const, fetchpriority: 'high' as const }
 				: { loading: 'lazy' as const, decoding: 'async' as const, fetchpriority: 'low' as const }),
-			...unpicImageProps,
+			...ipxImageProps,
 			unstyled: true,
 		},
 		placeholder: await getImagePlaceholderDataUrlHq(imageEntry.data.src),

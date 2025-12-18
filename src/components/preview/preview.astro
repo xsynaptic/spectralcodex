@@ -7,7 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getUnpicImageProps } from '#lib/image/image-layout.ts';
+import { getIpxImageProps } from '#lib/image/image-server.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -31,7 +31,7 @@ async function getImageProps() {
 	const primaryWidth = 450;
 	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
 
-	const unpicImageProps = getUnpicImageProps({
+	const ipxImageProps = getIpxImageProps({
 		maxWidth: imageEntry.data.width,
 		widths: [450, 600, 900, 1200],
 	});
@@ -45,7 +45,7 @@ async function getImageProps() {
 			loading: 'lazy' as const,
 			alt: sanitizeAltAttribute(alt),
 			layout: 'constrained' as const,
-			...unpicImageProps,
+			...ipxImageProps,
 		},
 		placeholder: imageEntry.data.placeholder,
 	};

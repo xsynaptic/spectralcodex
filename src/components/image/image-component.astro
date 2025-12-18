@@ -9,11 +9,8 @@ import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import {
-	getImageLayoutProps,
-	getUnpicImageProps,
-	ImageLayoutEnum,
-} from '#lib/image/image-layout.ts';
+import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
+import { getIpxImageProps } from '#lib/image/image-server.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
@@ -53,7 +50,7 @@ async function getImageProps() {
 	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
 	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
 
-	const unpicImageProps = getUnpicImageProps({ maxWidth: imageEntry.data.width });
+	const ipxImageProps = getIpxImageProps({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageEntry,
@@ -68,7 +65,7 @@ async function getImageProps() {
 				layout === ImageLayoutEnum.Full || layout === ImageLayoutEnum.Wide
 					? ('fullWidth' as const)
 					: ('constrained' as const),
-			...unpicImageProps,
+			...ipxImageProps,
 		},
 		placeholder: imageEntry.data.placeholder,
 	};

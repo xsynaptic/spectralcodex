@@ -232,4 +232,5 @@ const localImageService = {
 	},
 } satisfies LocalImageService<SharpImageServiceConfig>;
 
+/** @deprecated -- use ipx */
 export default localImageService;
