@@ -5,6 +5,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
+		"dev-server": "tsx ./src/dev-server/index.ts",
 		"content-related": "tsx ./src/content-related/index.ts",
 		"content-schemas": "tsx ./src/content-schemas/index.ts",
 		"content-validate": "tsx ./src/content-validate/index.ts",

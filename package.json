@@ -5,6 +5,7 @@
 	"scripts": {
 		"astro": "astro",
 		"dev": "astro dev",
+		"dev:ipx": "pnpm --filter @spectralcodex/scripts dev-server --root-path=$PWD",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"preview": "astro preview",
 		"lint": "eslint",
