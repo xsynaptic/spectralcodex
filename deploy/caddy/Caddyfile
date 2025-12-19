@@ -1,10 +1,12 @@
 # Redirect www to apex
 www.spectralcodex.com {
+	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	redir https://spectralcodex.com{uri} permanent
 }
 
 # Main site, static files only
 spectralcodex.com {
+	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	root * /srv/www
 	file_server
 	encode gzip
@@ -38,15 +40,18 @@ spectralcodex.com {
 
 # Analytics
 u.spectralcodex.com {
+	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	reverse_proxy umami:3000
 }
 
 # Image server (through nginx cache)
 img.spectralcodex.com {
+	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	reverse_proxy ipx-cache:80
 }
 
 # API
 api.spectralcodex.com {
+	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	respond "API coming soon!" 503
 }

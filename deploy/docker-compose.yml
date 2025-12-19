@@ -14,6 +14,7 @@ services:
       - "443:443"
     volumes:
       - ./caddy:/etc/caddy:ro
+      - ./certs:/certs:ro
       - caddy_data:/data
       - caddy_config:/config
       - ${DEPLOY_REMOTE_PATH}:/srv/www:ro

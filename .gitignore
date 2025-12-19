@@ -28,6 +28,9 @@ astro-error.log*
 .astro/
 temp/
 
+# certificates
+deploy/certs/
+
 # public generated files
 public/divisions/
 public/icons/
