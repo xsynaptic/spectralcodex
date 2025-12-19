@@ -14,17 +14,18 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
-		"astro": "^6.0.0-alpha.2",
+		"astro": "^6.0.0-alpha.3",
 		"flatgeobuf": "^4.3.4",
 		"geojson": "^0.5.0",
 		"idb-keyval": "^6.2.2",
-		"maplibre-gl": "^5.14.0",
+		"ky": "^1.14.1",
+		"maplibre-gl": "^5.15.0",
 		"pmtiles": "^4.3.0",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"react-map-gl": "^8.1.0",
 		"remeda": "^2.32.0",
-		"zod": "^4.1.13",
+		"zod": "^4.2.1",
 		"zustand": "^5.0.9"
 	}
 }

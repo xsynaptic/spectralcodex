@@ -93,10 +93,9 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
-		// Note: this is a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
 		optimizeDeps: {
+			// Added as a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
 			include: ['react-dom/client'],
-			exclude: ['virtual:astro:adapter-config/client'],
 		},
 		build: {
 			rollupOptions: {
