@@ -52,7 +52,7 @@ export async function getRelatedContentFunction() {
 	}: {
 		id: string;
 		limit?: number | undefined;
-		threshold: number;
+		threshold?: number;
 	}): Array<ContentMetadataItem> {
 		if (!relatedContentData) return [];
 

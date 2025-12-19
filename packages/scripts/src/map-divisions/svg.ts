@@ -136,7 +136,7 @@ export async function saveSvg({
 	geojsonData: DivisionFeatureCollection;
 	slug: string;
 	outputDir: string;
-	options: SvgOptions;
+	options?: SvgOptions;
 }): Promise<void> {
 	await safelyCreateDirectory(outputDir);
 
