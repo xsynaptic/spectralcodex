@@ -47,17 +47,17 @@ try {
 
 async function validate() {
 	console.log(chalk.blue('Validating content...'));
-	await $`pnpm content-validate --root-path=${rootPath}`;
+	await $({ stdio: 'inherit' })`pnpm content-validate --root-path=${rootPath}`;
 }
 
 async function related() {
 	console.log(chalk.blue('Generating related content...'));
-	await $`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
+	await $({ stdio: 'inherit' })`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
 }
 
 async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
-	await $`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/og`;
+	await $({ stdio: 'inherit' })`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/0g`;
 }
 
 async function build() {
@@ -66,8 +66,7 @@ async function build() {
 		return;
 	}
 	console.log(chalk.blue('Building...'));
-	$.cwd = rootPath;
-	await $`pnpm astro build`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro build`;
 }
 
 async function transfer() {
@@ -84,7 +83,7 @@ async function transfer() {
 		`${remoteHost}:${remotePath}/`,
 	];
 
-	await $`rsync ${rsyncArgs}`;
+	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
 }
 
 try {
