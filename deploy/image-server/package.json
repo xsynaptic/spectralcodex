@@ -1,0 +1,19 @@
+{
+	"name": "@spectralcodex/image-server",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/server.ts",
+		"build": "tsdown src/server.ts --format esm --outDir dist",
+		"start": "node dist/server.mjs"
+	},
+	"dependencies": {
+		"dotenv": "^17.2.3",
+		"ipx": "^4.0.0-alpha.1"
+	},
+	"devDependencies": {
+		"tsdown": "^0.18.1",
+		"tsx": "^4.19.4",
+		"typescript": "^5.8.3"
+	}
+}

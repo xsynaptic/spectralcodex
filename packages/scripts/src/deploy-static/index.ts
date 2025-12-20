@@ -1,303 +1,99 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 import dotenv from 'dotenv';
-import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import pLimit from 'p-limit';
 import { $ } from 'zx';
 
-const { values, positionals } = parseArgs({
+const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			short: 'r',
-			default: process.cwd(),
-		},
-		'content-path': {
-			type: 'string',
-			short: 'p',
-			default: 'packages/content',
-		},
-		'cache-path': {
-			type: 'string',
-			short: 'c',
-			default: './node_modules/.astro',
-		},
-		'dist-path': {
-			type: 'string',
-			short: 'd',
-			default: './dist',
-		},
-		'images-path': {
-			type: 'string',
-			short: 'i',
-			default: 'temp/images',
-		},
-		'dry-run': {
-			type: 'boolean',
-			default: false,
-		},
-		verbose: {
-			type: 'boolean',
-			short: 'v',
-			default: false,
-		},
-		'skip-build': {
-			type: 'boolean',
-			default: false,
-		},
+		'root-path': { type: 'string', default: process.cwd() },
+		'content-path': { type: 'string', default: 'packages/content' },
+		'cache-path': { type: 'string', default: './node_modules/.astro' },
+		'dry-run': { type: 'boolean', default: false },
+		'skip-build': { type: 'boolean', default: false },
 	},
-	allowPositionals: true,
 });
 
-// Load .env from root-path
-dotenv.config({ path: path.join(values['root-path'], '.env') });
+const rootPath = values['root-path'];
+const contentPath = values['content-path'];
+const cachePath = values['cache-path'];
+const dryRun = values['dry-run'];
+const skipBuild = values['skip-build'];
 
-const distPath = path.join(values['root-path'], values['dist-path']);
-const imagesPath = path.join(values['root-path'], values['images-path']);
+dotenv.config({ path: path.join(rootPath, '.env') });
+dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
 
-// Deployment configuration from environment variables
-const assetsPath = path.join(distPath, process.env.BUILD_ASSETS_PATH ?? '_x');
-const remoteHostApp = process.env.DEPLOY_REMOTE_HOST_APP;
-const remoteHostImages = process.env.DEPLOY_REMOTE_HOST_IMAGES;
-const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
+const envRemoteHost = process.env.DEPLOY_REMOTE_HOST;
+const envSshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
+const envRemotePath = process.env.DEPLOY_REMOTE_PATH;
 
-if (!remoteHostApp || !remoteHostImages || !sshKeyPath) {
-	console.error(chalk.red('Missing required environment variables:'));
-	if (!remoteHostApp) console.error(chalk.red('  DEPLOY_REMOTE_HOST_APP'));
-	if (!remoteHostImages) console.error(chalk.red('  DEPLOY_REMOTE_HOST_IMAGES'));
-	if (!sshKeyPath) console.error(chalk.red('  DEPLOY_SSH_KEY_PATH'));
+if (!envRemoteHost || !envSshKeyPath || !envRemotePath) {
+	console.error(chalk.red('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_REMOTE_PATH'));
 	process.exit(1);
 }
 
-// Load SSH keys from macOS Keychain to avoid passphrase prompts
+const remoteHost = envRemoteHost;
+const sshKeyPath = envSshKeyPath;
+const remotePath = envRemotePath;
+const distPath = path.join(rootPath, 'dist');
+
 try {
 	await $`ssh-add --apple-load-keychain 2>/dev/null`;
 } catch {
-	console.warn(
-		chalk.yellow(
-			'Warning: Could not load SSH keys from keychain. You may be prompted for passphrase.',
-		),
-	);
+	console.warn(chalk.yellow('Could not load SSH keys from keychain'));
 }
 
-// A flag for whether we're using the remote image strategy, which affects the build output
-const imageRemote = true as boolean;
-
-const allImagePattern = /^[\w#$%+=@~-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
-const originalImagePattern = /^[\w#$%+=@~-]+\.[\w-]{8}\.(avif|gif|jpg|jpeg|png|webp)$/i;
-const processedImagePattern = imageRemote
-	? /^[\w#$%+=@~-]+_[\w-]{1,8}\.(avif|gif|jpg|jpeg|png|webp)$/i
-	: /^[\w#$%+=@~-]+\.[\w-]{8}_[\w-]+\.(avif|gif|jpg|jpeg|png|webp)$/i;
-
-const dryRun = values['dry-run'];
-const verbose = values.verbose;
-const skipBuild = values['skip-build'];
-
-// Output shell command results
-$.verbose = true;
-
-async function contentValidate() {
-	console.log(chalk.blue('Validating content integrity...'));
-
-	try {
-		await $`pnpm content-validate --root-path=${values['root-path']}`;
-		console.log(chalk.green('Content validation passed.'));
-	} catch (error) {
-		console.error(chalk.red('Content validation failed:'), error);
-		process.exit(1);
-	}
+async function validate() {
+	console.log(chalk.blue('Validating content...'));
+	await $({ stdio: 'inherit' })`pnpm content-validate --root-path=${rootPath}`;
 }
 
-async function contentRelated() {
+async function related() {
 	console.log(chalk.blue('Generating related content...'));
-
-	try {
-		await $`pnpm content-related --root-path=${values['root-path']} --content-path=${values['content-path']} --cache-path=${values['cache-path']}`;
-		console.log(chalk.green('Related content generated.'));
-	} catch (error) {
-		console.error(chalk.red('Related content generation failed:'), error);
-		process.exit(1);
-	}
+	await $({ stdio: 'inherit' })`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
 }
 
-async function openGraphImages() {
+async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
-
-	try {
-		await $`pnpm opengraph-image --root-path=${values['root-path']} --content-path=${values['content-path']} --output-path=${values['root-path']}/public/0g`;
-		console.log(chalk.green('OpenGraph images generated.'));
-	} catch (error) {
-		console.error(chalk.red('OpenGraph image generation failed:'), error);
-		process.exit(1);
-	}
+	await $({ stdio: 'inherit' })`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/0g`;
 }
 
-async function buildProject() {
+async function build() {
 	if (skipBuild) {
-		console.log(chalk.yellow('Skipping build...'));
+		console.log(chalk.yellow('Skipping build'));
 		return;
 	}
-	console.log(chalk.blue('Building Astro project...'));
-
-	try {
-		// Run astro build from the root directory
-		$.cwd = values['root-path'];
-		await $`pnpm astro build`;
-		$.cwd = process.cwd();
-		console.log(chalk.green('Build completed.'));
-		if (assetsPath.includes('temp')) await $`rm -rf ${assetsPath}`;
-	} catch (error) {
-		console.error(chalk.red('Error during build:'), error);
-		process.exit(1);
-	}
+	console.log(chalk.blue('Building...'));
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro build`;
 }
 
-// With the remote image strategy original images are no longer copied to the output path
-async function removeOriginalImages() {
-	console.log(chalk.blue('Removing original built images...'));
+async function transfer() {
+	console.log(chalk.blue(`Transferring to ${remoteHost}:${remotePath}`));
+	if (dryRun) console.log(chalk.yellow('DRY RUN'));
 
-	try {
-		const limit = pLimit(200);
-		const files = await fs.readdir(assetsPath);
+	const rsyncArgs = [
+		'-avz',
+		'--progress',
+		'-e', `ssh -i ${sshKeyPath}`,
+		'--delete-after',
+		...(dryRun ? ['--dry-run'] : []),
+		`${distPath}/`,
+		`${remoteHost}:${remotePath}/`,
+	];
 
-		if (files.length > 0) {
-			await Promise.all(
-				files.map((file) =>
-					limit(async () => {
-						if (originalImagePattern.test(file)) {
-							await fs.unlink(path.join(assetsPath, file));
-
-							if (verbose) console.log(chalk.yellow(`Removed: ${file}`));
-						} else {
-							console.log(chalk.red(`File did not match original image pattern: ${file}`));
-						}
-					}),
-				),
-			);
-		} else {
-			console.log(chalk.yellow('No original images to remove!'));
-		}
-	} catch (error) {
-		console.error(chalk.red('Error removing original images:'), error);
-		process.exit(1);
-	}
+	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
 }
 
-async function moveHashedImages() {
-	console.log(chalk.blue('Relocating hashed images...'));
-
-	try {
-		const limit = pLimit(200);
-		const files = await fs.readdir(assetsPath);
-
-		await fs.mkdir(imagesPath, { recursive: true });
-
-		if (files.length > 0) {
-			await Promise.all(
-				files.map((file) =>
-					limit(async () => {
-						if (processedImagePattern.test(file)) {
-							await fs.rename(path.join(assetsPath, file), path.join(imagesPath, file));
-
-							if (verbose) console.log(chalk.yellow(`Relocated: ${file}`));
-						} else if (allImagePattern.test(file)) {
-							console.log(chalk.red(`Failed to relocate image: ${file}`));
-						}
-					}),
-				),
-			);
-		} else {
-			console.log(chalk.yellow('No hashed images to relocate!'));
-		}
-	} catch (error) {
-		console.error(chalk.red('Error relocating hashed images:'), error);
-		process.exit(1);
-	}
-}
-
-async function transferHashedImages() {
-	console.log(chalk.blue('Transferring hashed images...'));
-
-	try {
-		await (dryRun
-			? $`rsync -avz -e "ssh -i ${sshKeyPath}" --delete-after --checksum ${imagesPath}/ ${remoteHostImages}/ --dry-run`
-			: $`rsync -avz -e "ssh -i ${sshKeyPath}" --delete-after --checksum ${imagesPath}/ ${remoteHostImages}/`);
-
-		console.log(chalk.green('Hashed images transferred.'));
-	} catch (error) {
-		console.error(chalk.red('Error transferring hashed images:'), error);
-		process.exit(1);
-	}
-}
-
-async function transferApp() {
-	console.log(chalk.blue('Transferring app files...'));
-
-	try {
-		await (dryRun
-			? $`rsync -avz -e "ssh -i ${sshKeyPath}" ${distPath}/ ${remoteHostApp}/ --delete-after --dry-run`
-			: $`rsync -avz -e "ssh -i ${sshKeyPath}" ${distPath}/ ${remoteHostApp}/ --delete-after`);
-		console.log(chalk.green('App files transferred.'));
-	} catch (error) {
-		console.error(chalk.red('Error transferring app files:'), error);
-		process.exit(1);
-	}
-}
-
-const step = positionals[0] ?? 'deploy';
-
-console.log(chalk.blue(`Deploying with arguments "${chalk.underline(step)}"...`));
-
-switch (step) {
-	case 'validate': {
-		await contentValidate();
-		break;
-	}
-	case 'related': {
-		await contentRelated();
-		break;
-	}
-	case 'openGraph': {
-		await openGraphImages();
-		break;
-	}
-	case 'build': {
-		await buildProject();
-		break;
-	}
-	case 'remove-original-images': {
-		if (!imageRemote) await removeOriginalImages();
-		break;
-	}
-	case 'move-images': {
-		await moveHashedImages();
-		break;
-	}
-	case 'transfer-images': {
-		await transferHashedImages();
-		break;
-	}
-	case 'transfer-app': {
-		await transferApp();
-		break;
-	}
-	case 'transfer': {
-		await transferHashedImages();
-		await transferApp();
-		break;
-	}
-	default: {
-		await contentValidate();
-		await contentRelated();
-		await openGraphImages();
-		await buildProject();
-		if (!imageRemote) await removeOriginalImages();
-		await moveHashedImages();
-		await transferHashedImages();
-		await transferApp();
-		break;
-	}
+try {
+	await validate();
+	await related();
+	await opengraph();
+	await build();
+	await transfer();
+	console.log(chalk.green('Deploy complete'));
+} catch (error) {
+	console.error(chalk.red('Deploy failed:'), error);
+	process.exit(1);
 }

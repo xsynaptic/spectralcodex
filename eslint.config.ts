@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint';
 export default getConfig(
 	[
 		{
-			ignores: ['**/.astro', '**/.astro-cache', 'dist/**/*', 'content/**/*', 'temp/**/*'],
+			ignores: ['**/.astro', '**/.astro-cache', 'deploy/**/*', 'dist/**/*', 'content/**/*', 'temp/**/*'],
 		},
 		{
 			rules: {

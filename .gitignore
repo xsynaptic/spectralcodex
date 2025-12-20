@@ -28,6 +28,9 @@ astro-error.log*
 .astro/
 temp/
 
+# certificates
+deploy/certs/
+
 # public generated files
 public/divisions/
 public/icons/
@@ -40,10 +43,6 @@ packages/content/
 # example content, still under development
 packages/content-demo/collections
 packages/content-demo/media
-
-# ignore some files temporarily
-/config/
-docker-compose*
 
 # claude notes
 .claude/tasks/

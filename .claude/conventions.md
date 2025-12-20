@@ -31,9 +31,10 @@
 
 ## Images & Media
 
-- All image hosting handled centrally from local sources only for memory efficiency
-- Astro uses Vite and hence Rollup for builds; images directly imported cause memory issues
-- Consequently, this project hosts source images over localhost, something to keep in mind when moving to a hybrid setup
+- Production images served via IPX image server (`deploy/image-server/`)
+- Development uses `pnpm dev` which starts a local Docker-based image server
+- Astro uses Vite/Rollup for builds; directly importing images causes memory issues
+- Images referenced by URL, transformed on-demand by IPX (resize, format conversion)
 - Use Sharp directly via project utilities, not other image libraries
 - Aggressive lazy loading by default except above-the-fold cases
 

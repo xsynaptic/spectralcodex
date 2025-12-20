@@ -4,29 +4,11 @@
 // Path to content from the root; defaults *e.g.* `./packages/content-demo/collections`
 export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 
-// Path to content data from the root; defaults *e.g.* `./packages/content-demo/data`
-export const CONTENT_DATA_PATH = './packages/content/data';
-
-// Path to image assets from the root; *e.g.* `./packages/content-demo/media`
-export const CONTENT_MEDIA_PATH = './packages/content/media';
-
-// Remote host for media assets; mainly used to offset memory usage from direct imports
-export const CONTENT_MEDIA_HOST = 'http://localhost:4321/media';
-
 // An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
 // Set to "true" to log missing Link component IDs
 export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
-
-/**
- * Image processing
- */
-export const IMAGE_FORMAT = 'jpg';
-export const IMAGE_QUALITY = 88;
-
-export const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
-export const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 
 /**
  * Map configuration

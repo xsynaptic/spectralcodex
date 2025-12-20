@@ -6,16 +6,15 @@ Astro 5 monorepo using pnpm workspaces:
 
 - **Root**: Main Astro application (`src/`, `astro.config.mjs`)
 - **packages/**: Workspace packages
+  - `astro-build-logger/`: Build logging utilities
   - `content/`: Production content (MDX + media)
   - `content-demo/`: Example content for testing
   - `react-map-component/`: Interactive map component
   - `map-types/`: Map TypeScript types
   - `image-loader/`: Custom image processing
   - `image-open-graph/`: OpenGraph image generation
-  - `local-image-server/`: Development image server
   - `remark-img-group/`: Custom remark plugin
   - `unified-tools/`: Unified/remark utilities
-  - `astro-build-logger/`: Build logging utilities
   - `scripts/`: Build and utility scripts
 
 ## Content Collections

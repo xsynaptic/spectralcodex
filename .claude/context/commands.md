@@ -22,5 +22,4 @@
 - `pnpm map-divisions` - Extract administrative boundaries from Overture Maps
 - `pnpm map-spritesheet` - Generate map icon spritesheet
 - `pnpm opengraph-image` - Generate OpenGraph images
-- `pnpm host-images` - Serve media files locally
 - `pnpm deploy-static` - Deploy static build; may take 10+ minutes

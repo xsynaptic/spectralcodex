@@ -3,12 +3,10 @@
 .github
 .gitignore
 .vscode
-config
 Dockerfile
 docker-data/*
 dist
 node_modules
-scripts
 temp
 packages/content/media
-.astro-cache
+.astro

@@ -1,8 +1,8 @@
+import { CONTENT_DATA_PATH } from 'astro:env/server';
 import path from 'node:path';
 import pMemoize from 'p-memoize';
 import { z } from 'zod';
 
-import { CONTENT_DATA_PATH } from '#constants.ts';
 import {
 	nameMultilingualSchema,
 	publisherMultilingualSchema,

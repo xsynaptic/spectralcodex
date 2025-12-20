@@ -2,11 +2,8 @@
 import type { SEOProps } from 'astro-seo';
 
 import { SEO } from 'astro-seo';
-import { getImage } from 'astro:assets';
 
 import {
-	IMAGE_FORMAT,
-	IMAGE_QUALITY,
 	OPEN_GRAPH_IMAGE_DENSITY,
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
@@ -14,6 +11,7 @@ import {
 } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getOpenGraphImageUrl } from '#lib/image/image-server.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoDescription, getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -73,38 +71,39 @@ const siteDescription = t('site.description');
 
 const description = getSeoDescription(descriptionRaw) ?? siteDescription;
 
-const imageLocalUrl = image?.url ? new URL(image.url, Astro.site).href : undefined;
+async function generateOpenGraphImageUrl({
+	imageId,
+	imageUrl,
+	imageAlt,
+}: {
+	imageId?: string | undefined;
+	imageUrl?: string | URL | undefined;
+	imageAlt: string;
+}) {
+	const getImageById = await getImageByIdFunction();
 
-const getImageById = await getImageByIdFunction();
+	const imageEntry = imageId ? getImageById(imageId) : undefined;
 
-const imageEntry = imageId ? getImageById(imageId) : undefined;
+	const imageLocalUrl = imageUrl ? new URL(imageUrl, Astro.site).href : undefined;
 
-const imageDynamic =
-	!imageLocalUrl && imageEntry
-		? await getImage({
-				src: imageEntry.data.src,
-				height: 1800,
-				width: 1200,
-				format: IMAGE_FORMAT,
-				quality: IMAGE_QUALITY,
-			})
-		: undefined;
+	// Generate OG image URL using IPX CDN (no local image processing)
+	const openGraphImageUrl =
+		imageLocalUrl ?? (imageEntry ? getOpenGraphImageUrl(imageEntry.id) : getSeoImageFallback());
 
-const openGraphImage = {
-	url: imageLocalUrl ?? imageDynamic?.src ?? getSeoImageFallback(),
-	...(imageDynamic
-		? {
-				height: imageDynamic.options.height ?? 1200,
-				width: imageDynamic.options.width ?? 1800,
-				type: `image/${String(imageDynamic.options.format === 'jpg' ? 'jpeg' : imageDynamic.options.format)}`,
-			}
-		: {
-				height: OPEN_GRAPH_IMAGE_HEIGHT * OPEN_GRAPH_IMAGE_DENSITY,
-				width: OPEN_GRAPH_IMAGE_WIDTH * OPEN_GRAPH_IMAGE_DENSITY,
-				type: 'image/jpeg', // Needs to be changed if we no longer use JPG format for OG images
-			}),
-	alt: sanitizeAltAttribute(image?.alt ?? imageAlt ?? description ?? contentTitle ?? siteTitle),
-} satisfies NonNullable<SEOProps['openGraph']>['image'];
+	return {
+		url: openGraphImageUrl,
+		height: OPEN_GRAPH_IMAGE_HEIGHT * OPEN_GRAPH_IMAGE_DENSITY,
+		width: OPEN_GRAPH_IMAGE_WIDTH * OPEN_GRAPH_IMAGE_DENSITY,
+		type: 'image/jpeg',
+		alt: sanitizeAltAttribute(imageAlt),
+	} satisfies NonNullable<SEOProps['openGraph']>['image'];
+}
+
+const openGraphImage = await generateOpenGraphImageUrl({
+	imageId,
+	imageUrl: image?.url,
+	imageAlt: image?.alt ?? imageAlt ?? description ?? contentTitle ?? siteTitle,
+});
 ---
 
 <SEO
@@ -125,7 +124,7 @@ const openGraphImage = {
 		...(ogType === 'article' && article !== undefined ? { article } : {}),
 	}}
 	twitter={{
-		card: imageDynamic ? 'summary_large_image' : 'summary',
+		card: 'summary_large_image',
 		site: OPEN_GRAPH_TWITTER_USERNAME,
 		title: contentTitle ?? siteTitle,
 		description,

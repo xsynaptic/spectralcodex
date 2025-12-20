@@ -274,7 +274,8 @@ async function generateCollection(): Promise<CollectionData> {
 		populateRegionsLangCode(regions);
 		populateRegionsContent({ regions, locations, posts });
 
-		// Extract and cache the computed data
+		// Clear old cache entries before setting new one (prevents unbounded growth)
+		await cacheInstance.clear();
 		await cacheInstance.set(cacheKey, extractComputedData(regions));
 
 		console.log(
