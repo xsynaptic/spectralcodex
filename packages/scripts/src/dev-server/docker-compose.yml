@@ -7,9 +7,9 @@
 
 services:
   # Nginx cache (ephemeral for dev)
-  image-server-cache:
+  image-cache:
     image: nginx:1.27-alpine
-    container_name: image-server-cache-dev
+    container_name: image-cache-dev
     ports:
       - "3100:80"
     volumes:
@@ -23,7 +23,7 @@ services:
       image-server:
         condition: service_healthy
     networks:
-      - image-server-dev
+      - image-dev
 
   # Image transformation server
   image-server:
@@ -37,7 +37,7 @@ services:
       - IPX_FS_DIR=/media
       - IPX_FS_MAX_AGE=86400
     networks:
-      - image-server-dev
+      - image-dev
     mem_limit: 512m
     # Faster health check for dev (overrides Dockerfile)
     healthcheck:
@@ -48,5 +48,5 @@ services:
       retries: 3
 
 networks:
-  image-server-dev:
+  image-dev:
     driver: bridge
