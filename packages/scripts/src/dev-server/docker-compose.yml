@@ -1,4 +1,4 @@
-# Local development IPX stack
+# Local development image server stack
 # Managed by dev-server script
 #
 # Test endpoints:
@@ -6,29 +6,29 @@
 #   Image:  http://localhost:3100/w_800,f_webp/path/to/image.jpg
 
 services:
-  # Nginx cache for IPX (ephemeral cache for dev)
-  ipx-cache:
+  # Nginx cache (ephemeral for dev)
+  image-server-cache:
     image: nginx:1.27-alpine
-    container_name: ipx-cache-dev
+    container_name: image-server-cache-dev
     ports:
       - "3100:80"
     volumes:
-      - ./deploy/ipx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/image-server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       # Ephemeral cache - gone when container stops
       - type: tmpfs
         target: /var/cache/nginx/ipx
         tmpfs:
           size: 1073741824  # 1GB
     depends_on:
-      ipx:
+      image-server:
         condition: service_healthy
     networks:
-      - ipx-dev
+      - image-server-dev
 
-  # IPX image server
-  ipx:
-    build: ./deploy/ipx
-    container_name: ipx-dev
+  # Image transformation server
+  image-server:
+    build: ./deploy/image-server
+    container_name: image-server-dev
     volumes:
       - ./${CONTENT_MEDIA_PATH:?CONTENT_MEDIA_PATH is required}:/media:ro
     environment:
@@ -37,9 +37,16 @@ services:
       - IPX_FS_DIR=/media
       - IPX_FS_MAX_AGE=86400
     networks:
-      - ipx-dev
+      - image-server-dev
     mem_limit: 512m
+    # Faster health check for dev (overrides Dockerfile)
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 2s
+      timeout: 2s
+      start_period: 1s
+      retries: 3
 
 networks:
-  ipx-dev:
+  image-server-dev:
     driver: bridge

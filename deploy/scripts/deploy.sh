@@ -22,7 +22,7 @@ echo "=== Deploy Server Configuration ==="
 echo "Target: $REMOTE_HOST:$REMOTE_PATH"
 echo ""
 
-# Sync deploy directory to remote (Docker builds IPX on server)
+# Sync deploy directory to remote (Docker builds image-server on server)
 echo "Syncing server configs..."
 cd "$SCRIPT_DIR/.."
 rsync -avz --delete \

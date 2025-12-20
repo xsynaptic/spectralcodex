@@ -59,7 +59,7 @@ img.spectralcodex.com {
 Disallow: /`
 	}
 
-	reverse_proxy ipx-cache:80
+	reverse_proxy image-cache:80
 }
 
 # API

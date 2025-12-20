@@ -27,10 +27,10 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Nginx cache for IPX
-  ipx-cache:
+  # Nginx cache for image server
+  image-cache:
     image: nginx:1.27-alpine
-    container_name: ipx-cache
+    container_name: image-cache
     init: true
     cap_drop:
       - ALL
@@ -40,10 +40,10 @@ services:
       - SETUID
       - DAC_READ_SEARCH
     volumes:
-      - ./ipx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./image-server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ${STORAGE_PATH}/cache/ipx:/var/cache/nginx/ipx
     depends_on:
-      - ipx
+      - image-server
     networks:
       - frontend
     restart: unless-stopped
@@ -53,10 +53,10 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # IPX image server
-  ipx:
-    build: ./ipx
-    container_name: ipx
+  # Image server (IPX)
+  image-server:
+    build: ./image-server
+    container_name: image-server
     init: true
     cap_drop:
       - ALL

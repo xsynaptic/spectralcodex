@@ -1,39 +1,44 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'root-path': { type: 'string', default: process.cwd() },
-	},
-});
-
-const rootPath = values['root-path'];
+const rootPath = process.cwd();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 
 $.verbose = false;
 
-async function cleanup() {
-	console.log(chalk.gray('\nStopping IPX containers...'));
-	await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
+function timestamp() {
+	return new Date().toLocaleTimeString('en-US', { hour12: false });
 }
 
-process.on('SIGINT', () => {
-	void cleanup().then(() => process.exit(0));
-});
+function log(message: string) {
+	console.log(`${chalk.gray(timestamp())} ${chalk.cyan('[docker]')} ${message}`);
+}
+
+let cleanedUp = false;
+
+async function cleanup() {
+	if (cleanedUp) return;
+	cleanedUp = true;
+	log(chalk.gray('Stopping containers...'));
+	await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
+	process.exit(0);
+}
+
+process.on('SIGINT', () => void cleanup());
+process.on('SIGTERM', () => void cleanup());
+
+const startTime = performance.now();
+log('Starting containers...');
+await $`docker compose -f ${composePath} --project-directory ${rootPath} up -d`;
+log(`Ready ${chalk.bold(chalk.green(`${String(Math.round(performance.now() - startTime))}ms`))}`);
+
+console.log();
 
 try {
-	console.log(chalk.blue('Starting IPX containers...'));
-	await $`docker compose -f ${composePath} --project-directory ${rootPath} up -d --build --force-recreate`;
-
-	console.log(chalk.blue('Starting Astro dev server...\n'));
-	$.cwd = rootPath;
-	await $({ stdio: 'inherit' })`pnpm astro dev`;
+	await $({ stdio: 'inherit' })`npx astro dev`;
 } catch {
 	// Astro dev was interrupted
-} finally {
 	await cleanup();
 }

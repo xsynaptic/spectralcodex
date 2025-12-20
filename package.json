@@ -4,8 +4,7 @@
 	"version": "6.0.0",
 	"scripts": {
 		"astro": "astro",
-		"dev": "astro dev",
-		"dev:ipx": "pnpm --filter @spectralcodex/scripts dev-server --root-path=$PWD",
+		"dev": "tsx packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"preview": "astro preview",
 		"lint": "eslint",
@@ -13,7 +12,6 @@
 		"lint-content-demo": "eslint ./packages/content-demo --config ./packages/content-demo/eslint.config.mjs",
 		"test": "vitest",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
-		"host-images": "serve packages/content/media",
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD --content-path=packages/content --cache-path=./node_modules/.astro",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --content-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD --content-path=packages/content",
@@ -35,7 +33,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.0-alpha.3",
+		"astro": "^6.0.0-alpha.4",
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3"
 	},
@@ -53,7 +51,7 @@
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
 		"@spectralcodex/image-open-graph": "workspace:*",
-		"@spectralcodex/local-image-server": "workspace:*",
+		"@spectralcodex/image-server": "workspace:*",
 		"@spectralcodex/map-types": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
@@ -91,7 +89,7 @@
 		"prettier": "^3.7.4",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.7.2",
-		"react-compiler-runtime": "19.1.0-rc.3",
+		"react-compiler-runtime": "^19.1.0-rc.3",
 		"rehype-wrap-cjk": "^1.0.3",
 		"remeda": "^2.32.0",
 		"sharp": "^0.34.5",
@@ -102,7 +100,7 @@
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
 		"url-join": "^5.0.0",
-		"vite": "7.3.0",
+		"vite": "^7.3.0",
 		"vitest": "^4.0.16",
 		"yaml": "^2.8.2",
 		"zod": "^4.2.1",
