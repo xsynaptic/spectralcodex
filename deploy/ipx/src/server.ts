@@ -18,7 +18,8 @@ const ipx = createIPX({
 		dir: config.mediaDir,
 		maxAge: config.maxAge,
 	}),
-	sharpOptions: { jpegProgressive: true },
+	// Note: `jpegProgressive` is already set to `true` by default
+	sharpOptions: { concurrency: 4 },
 });
 
 // Create h3 app with router

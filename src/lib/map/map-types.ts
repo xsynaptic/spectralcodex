@@ -10,8 +10,8 @@ import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
 // This is used to form map API endpoint URLs
 export const MapApiDataEnum = {
-	Source: 's',
-	Popup: 'p',
+	Source: 's.json',
+	Popup: 'p.json',
 } as const;
 
 export const MapFeaturePropertiesSchema = z.object({

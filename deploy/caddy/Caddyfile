@@ -41,17 +41,32 @@ spectralcodex.com {
 # Analytics
 u.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+
+	handle /robots.txt {
+		respond "User-agent: *\nDisallow: /"
+	}
+
 	reverse_proxy umami:3000
 }
 
 # Image server (through nginx cache)
 img.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+
+	handle /robots.txt {
+		respond "User-agent: *\nDisallow: /"
+	}
+
 	reverse_proxy ipx-cache:80
 }
 
 # API
 api.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+
+	handle /robots.txt {
+		respond "User-agent: *\nDisallow: /"
+	}
+
 	respond "API coming soon!" 503
 }
