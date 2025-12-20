@@ -43,7 +43,8 @@ u.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 
 	handle /robots.txt {
-		respond "User-agent: *\nDisallow: /"
+		respond `User-agent: *
+Disallow: /`
 	}
 
 	reverse_proxy umami:3000
@@ -54,7 +55,8 @@ img.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 
 	handle /robots.txt {
-		respond "User-agent: *\nDisallow: /"
+		respond `User-agent: *
+Disallow: /`
 	}
 
 	reverse_proxy ipx-cache:80
@@ -65,7 +67,8 @@ api.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 
 	handle /robots.txt {
-		respond "User-agent: *\nDisallow: /"
+		respond `User-agent: *
+Disallow: /`
 	}
 
 	respond "API coming soon!" 503
