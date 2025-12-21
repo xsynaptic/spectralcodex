@@ -19,6 +19,3 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - sqlite3
-
-overrides:
-  vite: 6.3.4
