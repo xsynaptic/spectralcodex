@@ -106,6 +106,16 @@ services:
     image: postgres:15.10-alpine
     container_name: umami-db
     init: true
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=512MB"
+      - "-c"
+      - "effective_cache_size=1536MB"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "max_connections=50"
     cap_drop:
       - ALL
     cap_add:
