@@ -3,7 +3,7 @@
 #
 # Test endpoints:
 #   Health: http://localhost:3100/health
-#   Image:  http://localhost:3100/w_800,f_webp/path/to/image.jpg
+#   Image:  http://localhost:3100/q_80,f_webp,s_800/path/to/image.jpg
 
 services:
   # Nginx cache (ephemeral for dev)
@@ -21,7 +21,7 @@ services:
           size: 1073741824  # 1GB
     depends_on:
       image-server:
-        condition: service_healthy
+        condition: service_started
     networks:
       - image-dev
 

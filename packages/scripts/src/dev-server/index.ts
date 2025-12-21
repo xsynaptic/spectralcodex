@@ -18,27 +18,40 @@ function log(message: string) {
 
 let cleanedUp = false;
 
-async function cleanup() {
+function cleanup() {
 	if (cleanedUp) return;
 	cleanedUp = true;
 	log(chalk.gray('Stopping containers...'));
-	await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
+	// Fire and forget - don't block exit
+	void $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
 	process.exit(0);
 }
 
-process.on('SIGINT', () => void cleanup());
-process.on('SIGTERM', () => void cleanup());
+process.on('SIGINT', () => {
+	cleanup();
+});
+process.on('SIGTERM', () => {
+	cleanup();
+});
 
-const startTime = performance.now();
+// Start Docker containers in background
 log('Starting containers...');
-await $`docker compose -f ${composePath} --project-directory ${rootPath} up -d`;
-log(`Ready ${chalk.bold(chalk.green(`${String(Math.round(performance.now() - startTime))}ms`))}`);
 
-console.log();
+$`docker compose -f ${composePath} --project-directory ${rootPath} up -d`
+	.then(() => {
+		log(chalk.green('Containers ready'));
+	})
+	// eslint-disable-next-line unicorn/prefer-top-level-await
+	.catch((error: unknown) => {
+		if (error instanceof Error) {
+			log(chalk.red(`Container error: ${error.message}`));
+		} else {
+			log(chalk.red(`Container error: ${String(error)}`));
+		}
+	});
 
 try {
 	await $({ stdio: 'inherit' })`npx astro dev`;
 } catch {
-	// Astro dev was interrupted
-	await cleanup();
+	cleanup();
 }

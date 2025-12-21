@@ -1,12 +1,10 @@
 # Stage 1: Build TypeScript and install all dependencies
 FROM node:20-alpine AS builder
 
-# Sharp/vips native dependencies for building
-RUN apk add --no-cache python3 make g++ vips-dev
-
 WORKDIR /app
 
 COPY package.json ./
+
 RUN npm install
 
 COPY src/ ./src/
@@ -17,9 +15,6 @@ RUN npm prune --omit=dev
 
 # Stage 2: Production image
 FROM node:20-alpine
-
-# Sharp/vips runtime dependencies only
-RUN apk add --no-cache vips
 
 # Create non-root user for security
 RUN addgroup -g 1001 nodejs && \
