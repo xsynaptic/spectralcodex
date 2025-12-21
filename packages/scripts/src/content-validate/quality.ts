@@ -34,9 +34,7 @@ export async function checkContentQuality(contentPaths: Array<string>) {
 		}
 
 		if (mismatchCount === 0) {
-			console.log(
-				chalk.green(`✓ All content quality valid! Checked: ${parsedFiles.length.toString()}`),
-			);
+			console.log(chalk.green(`✓ ${parsedFiles.length.toString()} entry quality values valid`));
 		} else {
 			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} quality issue(s)`));
 			overallMismatchCount += mismatchCount;

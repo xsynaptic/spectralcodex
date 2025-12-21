@@ -6,6 +6,7 @@ import { $ } from 'zx';
 
 import { getContentCollectionPaths } from '../content-utils/collections';
 import { checkDivisionIds } from './divisions';
+import { checkImageReferences } from './images';
 import { checkLocationsCoordinates } from './locations-coordinates';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
@@ -29,6 +30,11 @@ const { values, positionals } = parseArgs({
 			type: 'string',
 			short: 'd',
 			default: './public/divisions',
+		},
+		'media-path': {
+			type: 'string',
+			short: 'm',
+			default: 'packages/content/media',
 		},
 		verbose: {
 			type: 'boolean',
@@ -85,6 +91,13 @@ switch (command) {
 		await checkMdxComponents(Object.values(ContentCollectionsPaths));
 		break;
 	}
+	case 'images': {
+		await checkImageReferences(
+			Object.values(ContentCollectionsPaths),
+			path.join(values['root-path'], values['media-path']),
+		);
+		break;
+	}
 	default: {
 		if (command) {
 			console.log(chalk.red('Unknown command: ' + command));
@@ -95,6 +108,13 @@ switch (command) {
 		const mdxSuccess = await checkMdxComponents(Object.values(ContentCollectionsPaths));
 
 		if (!mdxSuccess) process.exit(1);
+
+		const imagesSuccess = await checkImageReferences(
+			Object.values(ContentCollectionsPaths),
+			path.join(values['root-path'], values['media-path']),
+		);
+
+		if (!imagesSuccess) process.exit(1);
 
 		const slugSuccess = await checkSlugMismatches(checkSlugPaths);
 

@@ -14,7 +14,9 @@ export async function getImageByIdFunction() {
 		const entry = imagesMap.get(id);
 
 		if (!entry) {
-			console.warn(`Image not found: ${id}`);
+			if (import.meta.env.DEV) {
+				console.warn(`Image not found: ${id}`);
+			}
 			return;
 		}
 
