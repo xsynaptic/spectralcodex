@@ -162,7 +162,7 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 	if (mismatchCount === 0 && checkedCount > 0) {
 		console.log(
 			chalk.green(
-				`✓ All location coordinates valid! Checked: ${checkedCount.toString()}; skipped: ${missingFgbCount.toString()}`,
+				`✓ ${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
 			),
 		);
 		return true;

@@ -91,7 +91,6 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 - `./packages/content-example`: example content for testing and demonstration purposes ([more info](./packages/content-example/readme.md))
 - `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs) ([more info](./packages/image-loader/readme.md))
 - `./packages/image-open-graph`: experimental OpenGraph image generator using Satori ([more info](./packages/image-open-graph/readme.md))
-- `./packages/local-image-server`: simple Astro integration that hosts local images so they can be consumed by the Astro image optimization pipeline as if they were remote images ([more info](./packages/local-image-server/readme.md))
 - `./packages/map-types`: TypeScript type definitions for map-related data structures
 - `./packages/react-map-component`: interactive map component used across this project
 - `./packages/remark-img-group`: Remark plugin for handling image groups

@@ -69,7 +69,7 @@ export const getStaticPaths = (async () => {
 					} satisfies OpenGraphMetadataItem;
 
 					const imageEntry = entry.imageId ? getImageById(entry.imageId) : undefined;
-					const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
+					const imageObject = imageEntry ? await getImageObject(imageEntry.data.path) : undefined;
 
 					return {
 						params: { id: entry.id },

@@ -5,9 +5,12 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import pMemoize from 'p-memoize';
 
+import {
+	OPEN_GRAPH_IMAGE_DENSITY,
+	OPEN_GRAPH_IMAGE_HEIGHT,
+	OPEN_GRAPH_IMAGE_WIDTH,
+} from '#constants.ts';
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '#constants.ts';
-import { OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
@@ -69,7 +72,7 @@ export async function getOpenGraphImageFunction() {
 		density?: number;
 	}) {
 		const imageEntry = getImageById(imageId);
-		const imageObject = imageEntry ? await getImageObject(imageEntry.data.src) : undefined;
+		const imageObject = imageEntry ? await getImageObject(imageEntry.data.path) : undefined;
 
 		if (!imageObject) return;
 

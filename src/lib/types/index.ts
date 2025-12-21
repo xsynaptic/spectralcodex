@@ -36,8 +36,12 @@ export interface MenuItem {
 /**
  * Metadata
  */
+export type ContentMetadataCollectionKey = Exclude<CollectionKey, 'images' | 'timeline'>;
+
 // This is a subset of common properties of different content collections
-export interface ContentMetadataItem<T extends CollectionKey = CollectionKey> {
+export interface ContentMetadataItem<
+	T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey,
+> {
 	collection: T;
 	id: string;
 	title: string;

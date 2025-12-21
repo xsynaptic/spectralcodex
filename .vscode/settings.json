@@ -131,7 +131,8 @@
 	},
 	"files.associations": {
 		"*.css": "tailwindcss",
-		"*.conf.template": "nginx"
+		"*.conf.template": "nginx",
+		"*.caddy": "caddyfile"
 	},
 	"typescript.preferences.importModuleSpecifier": "non-relative", // Suggest import mapped paths over others
 	"workbench.editor.labelFormat": "short",

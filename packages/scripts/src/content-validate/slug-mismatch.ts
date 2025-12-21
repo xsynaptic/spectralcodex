@@ -40,7 +40,7 @@ export async function checkSlugMismatches(contentPaths: Array<string>) {
 		}
 
 		if (mismatchCount === 0) {
-			console.log(chalk.green(`✓ All slugs valid! Checked: ${parsedFiles.length.toString()}`));
+			console.log(chalk.green(`✓ ${parsedFiles.length.toString()} slugs valid`));
 		} else {
 			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} slug mismatch(es)`));
 			overallMismatchCount += mismatchCount;

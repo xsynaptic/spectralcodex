@@ -34,9 +34,7 @@ export async function checkLocationsRegions(locationsPath: string) {
 	}
 
 	if (mismatchCount === 0) {
-		console.log(
-			chalk.green(`✓ All location regions valid! Checked: ${parsedFiles.length.toString()}`),
-		);
+		console.log(chalk.green(`✓ ${parsedFiles.length.toString()} location regions valid`));
 		return true;
 	} else {
 		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} region mismatch(es)`));

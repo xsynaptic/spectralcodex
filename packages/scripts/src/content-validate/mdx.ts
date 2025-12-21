@@ -100,9 +100,7 @@ export async function checkMdxComponents(contentPaths: Array<string>) {
 		}
 
 		if (errorCount === 0) {
-			console.log(
-				chalk.green(`✓ All MDX components valid! Checked: ${parsedFiles.length.toString()}`),
-			);
+			console.log(chalk.green(`✓ ${parsedFiles.length.toString()} MDX components valid`));
 		} else {
 			console.log(chalk.yellow(`⚠️  Found ${errorCount.toString()} invalid component(s)`));
 			overallErrorCount += errorCount;

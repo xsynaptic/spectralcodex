@@ -17,9 +17,7 @@ export async function checkDivisionIds(regionsPath: string) {
 	}
 
 	if (regionsWithoutDivision.length === 0) {
-		console.log(
-			chalk.green(`✓ All region divisionIds valid! Checked: ${parsedFiles.length.toString()}`),
-		);
+		console.log(chalk.green(`✓ ${parsedFiles.length.toString()} region divisionIds valid`));
 		return true;
 	} else {
 		console.log(

@@ -32,7 +32,7 @@ const ImageSizeEnum = {
 } as const;
 
 // These are the widths we're building for in almost all scenarios
-const imageSrcsetWidthsDefault = [
+export const imageSrcsetWidthsDefault = [
 	ImageSizeEnum.ExtraSmall,
 	ImageSizeEnum.Small,
 	ImageSizeEnum.Medium,
@@ -62,13 +62,15 @@ function getImageOrientation({
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
+export interface ImageSrcsetWidthsProps {
+	maxWidth: number;
+	widths?: Array<number>;
+}
+
 export function getImageSrcsetWidths({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
-}: {
-	maxWidth: number;
-	widths?: Array<number>;
-}) {
+}: ImageSrcsetWidthsProps) {
 	return [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
 }
 

@@ -28,8 +28,8 @@ export const MapSourceItemSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
 		[MapDataKeysCompressed.Title]: z.string(),
-		[MapDataKeysCompressed.Category]: z.nativeEnum(LocationCategoryNumericMapping),
-		[MapDataKeysCompressed.Status]: z.nativeEnum(LocationStatusNumericMapping),
+		[MapDataKeysCompressed.Category]: z.enum(LocationCategoryNumericMapping),
+		[MapDataKeysCompressed.Status]: z.enum(LocationStatusNumericMapping),
 		[MapDataKeysCompressed.Precision]: NumericScaleSchema,
 		[MapDataKeysCompressed.Quality]: NumericScaleSchema,
 		[MapDataKeysCompressed.Rating]: NumericScaleSchema,
@@ -37,7 +37,7 @@ export const MapSourceItemSchema = z
 		[MapDataKeysCompressed.Outlier]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.HasImage]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.Geometry]: z.object({
-			[MapDataKeysCompressed.GeometryType]: z.nativeEnum(MapDataGeometryTypeNumericMapping),
+			[MapDataKeysCompressed.GeometryType]: z.enum(MapDataGeometryTypeNumericMapping),
 			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
 				z.tuple([z.number(), z.number()]), // Point
 				z.tuple([z.number(), z.number()]).array(), // LineString

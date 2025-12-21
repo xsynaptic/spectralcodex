@@ -1,0 +1,52 @@
+# Local development image server stack
+# Managed by dev-server script
+#
+# Test endpoints:
+#   Health: http://localhost:3100/health
+#   Image:  http://localhost:3100/q_80,f_webp,s_800/path/to/image.jpg
+
+services:
+  # Nginx cache (ephemeral for dev)
+  image-cache:
+    image: nginx:1.27-alpine
+    container_name: image-cache-dev
+    ports:
+      - "3100:80"
+    volumes:
+      - ./deploy/image-server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Ephemeral cache - gone when container stops
+      - type: tmpfs
+        target: /var/cache/nginx/ipx
+        tmpfs:
+          size: 1073741824  # 1GB
+    depends_on:
+      image-server:
+        condition: service_started
+    networks:
+      - image-dev
+
+  # Image transformation server
+  image-server:
+    build: ./deploy/image-server
+    container_name: image-server-dev
+    volumes:
+      - ./${CONTENT_MEDIA_PATH:?CONTENT_MEDIA_PATH is required}:/media:ro
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - IPX_FS_DIR=/media
+      - IPX_FS_MAX_AGE=86400
+    networks:
+      - image-dev
+    mem_limit: 512m
+    # Faster health check for dev (overrides Dockerfile)
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 2s
+      timeout: 2s
+      start_period: 1s
+      retries: 3
+
+networks:
+  image-dev:
+    driver: bridge

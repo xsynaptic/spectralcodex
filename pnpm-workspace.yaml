@@ -1,7 +1,17 @@
 packages:
   - packages/**
+  - deploy/image-server
 
 minimumReleaseAge: 1440
+
+minimumReleaseAgeExclude:
+  - astro
+  - '@astrojs/markdown-remark'
+  - '@astrojs/mdx'
+  - '@astrojs/node'
+  - '@astrojs/react'
+  - '@astrojs/rss'
+  - '@astrojs/sitemap'
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
@@ -9,6 +19,3 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - sqlite3
-
-overrides:
-  vite: 6.3.4

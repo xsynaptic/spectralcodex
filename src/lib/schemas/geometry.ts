@@ -9,28 +9,25 @@ import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
 import { DescriptionSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 
-function validateCoordinates(coordinates: [number, number]): z.IssueData | undefined {
+function validateCoordinates(coordinates: [number, number]) {
 	if (!coordinates[0] || !coordinates[1]) {
 		return {
-			code: z.ZodIssueCode.custom,
-			message: `Coordinates should be an array of two numbers.`,
-		};
-	}
-	if (!coordinates[0] || !coordinates[1]) {
-		return {
-			code: z.ZodIssueCode.custom,
+			code: 'custom' as const,
+			input: coordinates,
 			message: `Coordinates should be an array of two numbers.`,
 		};
 	}
 	if (coordinates[0] < -180 || coordinates[0] > 180) {
 		return {
-			code: z.ZodIssueCode.custom,
+			code: 'custom' as const,
+			input: coordinates,
 			message: `Longitude should be between 180 and -180; value was "${String(coordinates[0])}".`,
 		};
 	}
 	if (coordinates[1] < -90 || coordinates[1] > 90) {
 		return {
-			code: z.ZodIssueCode.custom,
+			code: 'custom' as const,
+			input: coordinates,
 			message: `Latitude should be between 90 and -90; value was "${String(coordinates[1])}".`,
 		};
 	}
@@ -53,8 +50,8 @@ export const GeometryPointsSchema = z.object({
 	title: StylizedStringSchema.optional(),
 	...titleMultilingualSchema,
 	description: DescriptionSchema.optional(),
-	category: z.nativeEnum(LocationCategoryEnum).optional(),
-	status: z.nativeEnum(LocationStatusEnum).optional(),
+	category: z.enum(LocationCategoryEnum).optional(),
+	status: z.enum(LocationStatusEnum).optional(),
 	precision: NumericScaleSchema.optional(),
 	googleMapsUrl: UrlSchema.optional(),
 	imageFeatured: z.string().nullable().optional(),

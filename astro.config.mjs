@@ -4,10 +4,9 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import buildLogger from '@spectralcodex/astro-build-logger';
-import localImageServer from '@spectralcodex/local-image-server';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
-import AutoImport from 'astro-auto-import';
+import autoImport from 'astro-auto-import';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
@@ -20,9 +19,6 @@ const {
 	PROD_SERVER_URL,
 	BASE_PATH_PROD,
 	BUILD_ASSETS_PATH,
-	CONTENT_MEDIA_BASE_URL,
-	CONTENT_MEDIA_PATH,
-	PROD_ASSETS_URL,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -44,18 +40,6 @@ export default defineConfig({
 	...(BASE_PATH ? { base: `/${BASE_PATH}` } : {}),
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
-		assetsPrefix: {
-			...(PROD_ASSETS_URL
-				? {
-						gif: PROD_ASSETS_URL,
-						jpg: PROD_ASSETS_URL,
-						jpeg: PROD_ASSETS_URL,
-						png: PROD_ASSETS_URL,
-						webp: PROD_ASSETS_URL,
-					}
-				: {}),
-			fallback: `/${BASE_PATH ?? ''}`, // Used by all other assets
-		},
 	},
 	cacheDir: CACHE_DIR,
 	// Still having some trouble getting this working as expected due to memory issues
@@ -74,6 +58,16 @@ export default defineConfig({
 				optional: true,
 				default: CACHE_DIR,
 			}),
+			CONTENT_DATA_PATH: envField.string({
+				context: 'server',
+				access: 'public',
+				default: 'packages/content-demo/data',
+			}),
+			CONTENT_MEDIA_PATH: envField.string({
+				context: 'server',
+				access: 'public',
+				default: 'packages/content-demo/media',
+			}),
 			MAP_ICONS_PATH: envField.string({
 				context: 'client',
 				access: 'public',
@@ -87,6 +81,11 @@ export default defineConfig({
 			}),
 			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
 			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
+			IPX_SERVER_URL: envField.string({
+				context: 'server',
+				access: 'secret',
+				default: 'http://localhost:3333',
+			}),
 		},
 	},
 	vite: {
@@ -94,6 +93,10 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
+		optimizeDeps: {
+			// Added as a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
+			include: ['react-dom/client'],
+		},
 		build: {
 			rollupOptions: {
 				output: {
@@ -118,7 +121,7 @@ export default defineConfig({
 			include: ['packages/react**/*'],
 		}),
 		// AutoImport *must* appear before the MDX integration
-		AutoImport({
+		autoImport({
 			imports: [
 				{
 					'./src/components/mdx/img.astro': [['default', 'Img']],
@@ -142,10 +145,6 @@ export default defineConfig({
 				return { ...item, lastMod: currentDate };
 			},
 		}),
-		localImageServer({
-			mediaPath: CONTENT_MEDIA_PATH,
-			mediaBaseUrl: CONTENT_MEDIA_BASE_URL,
-		}),
 		pagefind({
 			indexConfig: {
 				excludeSelectors: [
@@ -156,14 +155,6 @@ export default defineConfig({
 			},
 		}),
 	],
-	image: {
-		service: {
-			entrypoint: './src/lib/image/image-service',
-			config: {
-				limitInputPixels: false,
-			},
-		},
-	},
 	i18n: {
 		defaultLocale: 'en',
 		locales: [
@@ -209,7 +200,5 @@ export default defineConfig({
 			},
 		],
 		contentIntellisense: true,
-		staticImportMetaEnv: true,
-		preserveScriptOrder: true, // Presumably the default in Astro 6
 	},
 });

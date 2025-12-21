@@ -21,17 +21,22 @@ const RelatedContentItemSchema = z
 	.optional();
 
 async function loadRelatedContentData() {
-	try {
-		const relatedContent = await loadJsonData(
-			path.join(CACHE_DIR, 'content-related/content-related.json'),
-		);
+	const filePath = path.join(CACHE_DIR, 'content-related/content-related.json');
 
+	try {
+		const relatedContent = await loadJsonData(filePath);
 		const relatedContentParsed = await RelatedContentItemSchema.parseAsync(relatedContent);
 
 		return relatedContentParsed;
-	} catch {
-		// We aren't really concerned about missing related content data
-		return;
+	} catch (error) {
+		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
+
+		if (isNotFound) {
+			console.warn(`[Related] Not found: ${filePath} (run pnpm content-related to generate)`);
+			return;
+		}
+
+		throw error;
 	}
 }
 
@@ -47,7 +52,7 @@ export async function getRelatedContentFunction() {
 	}: {
 		id: string;
 		limit?: number | undefined;
-		threshold: number;
+		threshold?: number;
 	}): Array<ContentMetadataItem> {
 		if (!relatedContentData) return [];
 

@@ -12,7 +12,7 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 interface Props extends HTMLAttributes<'div'> {
 	locations: Array<string>;
 	languages?: Array<string> | undefined; // For controlling interface language
-	showHidden: boolean;
+	showHidden?: boolean;
 }
 
 const { locations: locationIds, languages, showHidden = false, ...props } = Astro.props;

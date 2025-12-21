@@ -37,7 +37,7 @@ export const regions = defineCollection({
 			locationCount: z.number().int().optional(),
 			posts: z.string().array().optional(),
 			postCount: z.number().int().optional(),
-			langCode: z.nativeEnum(RegionLanguageMap).optional(),
+			langCode: z.enum(RegionLanguageMap).optional(),
 			hideSearch: z.boolean().optional(),
 		})
 		.strict(),
