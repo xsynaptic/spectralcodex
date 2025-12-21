@@ -44,5 +44,6 @@ packages/content/
 packages/content-demo/collections
 packages/content-demo/media
 
-# claude notes
-.claude/tasks/
+# project directives
+.claude
+.cursor
