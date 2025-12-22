@@ -5,12 +5,14 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev-server": "tsx ./src/dev-server/index.ts",
 		"content-related": "tsx ./src/content-related/index.ts",
 		"content-schemas": "tsx ./src/content-schemas/index.ts",
 		"content-validate": "tsx ./src/content-validate/index.ts",
 		"deploy-media": "tsx ./src/deploy-media/index.ts",
 		"deploy-static": "tsx ./src/deploy-static/index.ts",
+		"dev-server": "tsx ./src/dev-server/index.ts",
+		"image-server-manifest": "tsx ./src/image-server/manifest.ts",
+		"image-server-warm": "tsx ./src/image-server/warm.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
 		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts",
 		"opengraph-image": "tsx ./src/opengraph-image/index.ts"

@@ -19,7 +19,8 @@
 		"map-spritesheet": "pnpm --filter @spectralcodex/scripts map-spritesheet --root-path=$PWD --temp-path ./temp/icons --output-path ./public/icons/map-icons",
 		"opengraph-image": "pnpm --filter @spectralcodex/scripts opengraph-image --root-path=$PWD --content-path=packages/content --output-path=./public/0g",
 		"deploy-media": "pnpm --filter @spectralcodex/scripts deploy-media --root-path=$PWD",
-		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD"
+		"deploy-static": "pnpm --filter @spectralcodex/scripts deploy-static --root-path=$PWD",
+		"cache-warm": "pnpm --filter @spectralcodex/scripts image-server-warm --root-path=$PWD"
 	},
 	"license": "MIT",
 	"browserslist": [
