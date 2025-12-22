@@ -9,11 +9,12 @@ interface WarmOptions {
 	rootPath: string;
 	nginxUrl?: string;
 	concurrency?: number;
+	random?: boolean;
 	dryRun?: boolean;
 }
 
 export async function warmCache(options: WarmOptions): Promise<void> {
-	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 2, dryRun = false } = options;
+	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 2, random = false, dryRun = false } = options;
 
 	dotenv.config({ path: path.join(rootPath, '.env') });
 	dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
@@ -62,10 +63,12 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 			START=$(date +%s)
 			DONE=0
 
-			jq -r '.[]' "${manifestPath}" | \\
+			jq -r '.[]' "${manifestPath}"${random ? ' | shuf' : ''} | \\
 				xargs -P ${String(concurrency)} -I {} sh -c '
-					RESULT=$(curl -s -o /dev/null -w "%{http_code} %{time_total}s" "${nginxUrl}{}")
-					echo "$RESULT {}"
+					RESP=$(curl -s -D - -o /dev/null -w "%{http_code} %{time_total}s" "${nginxUrl}{}")
+					CACHE=$(echo "$RESP" | grep -o "X-Cache-Status: [A-Z]*" | cut -d" " -f2)
+					STATS=$(echo "$RESP" | tail -1)
+					echo "$STATS $CACHE {}"
 				'
 
 			END=$(date +%s)
@@ -85,6 +88,7 @@ if (process.argv[1]?.endsWith('warm.ts')) {
 			'root-path': { type: 'string', default: process.cwd() },
 			'nginx-url': { type: 'string', default: 'http://localhost:3100' },
 			concurrency: { type: 'string', default: '2' },
+			random: { type: 'boolean', default: false },
 			'dry-run': { type: 'boolean', default: false },
 		},
 	});
@@ -93,6 +97,7 @@ if (process.argv[1]?.endsWith('warm.ts')) {
 		rootPath: values['root-path'],
 		nginxUrl: values['nginx-url'],
 		concurrency: Number(values.concurrency),
+		random: values.random,
 		dryRun: values['dry-run'],
 	});
 }
