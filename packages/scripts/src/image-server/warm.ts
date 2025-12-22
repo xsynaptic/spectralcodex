@@ -13,7 +13,7 @@ interface WarmOptions {
 }
 
 export async function warmCache(options: WarmOptions): Promise<void> {
-	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 5, dryRun = false } = options;
+	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 2, dryRun = false } = options;
 
 	dotenv.config({ path: path.join(rootPath, '.env') });
 	dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
@@ -84,7 +84,7 @@ if (process.argv[1]?.endsWith('warm.ts')) {
 		options: {
 			'root-path': { type: 'string', default: process.cwd() },
 			'nginx-url': { type: 'string', default: 'http://localhost:3100' },
-			concurrency: { type: 'string', default: '5' },
+			concurrency: { type: 'string', default: '2' },
 			'dry-run': { type: 'boolean', default: false },
 		},
 	});
