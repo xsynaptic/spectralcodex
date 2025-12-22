@@ -15,12 +15,24 @@ This repository contains the working Astro project used to generate the [Spectra
 
 ### Image Handling
 
+**Content Layer Integration**
+
 - Experimental image loader treating individual images as first-class content with metadata
 - Automatic extraction of camera settings, GPS coordinates, and other EXIF data from images
-- Automatic generation of data URI-encoded low-quality image placeholders (LQIPs) for improved perceived performance
-- Custom Astro integration for serving local images over localhost to reduce the memory burden of Rollup-based builds
-- Customer remark plugin to handle advanced image layout
+- Automatic generation of data URI-encoded low-quality image placeholders (LQIPs)
+- Custom remark plugin for advanced image layout (groups, carousels, aspect ratio handling)
 - Hero image support with optional CSS-only image carousels
+
+**External Image Server**
+
+Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service.
+
+- [@unjs/ipx](https://github.com/unjs/ipx)-based image server handles on-demand resizing, format conversion, and quality adjustment
+- Nginx reverse proxy with aggressive caching ensures images are only processed once
+- URL-based transformations (e.g., `/q_80,f_webp,s_1200x800/path/to/image.jpg`) allow flexible sizing without pre-generating variants
+- Rate limiting and request validation protect against cache-busting attacks
+- Warming script pre-populates the cache after deployment; this runs on the server, making internal requests on localhost
+- Docker Compose orchestration for easy deployment and updates
 
 ### Interactive Maps
 
@@ -62,7 +74,30 @@ This repository contains the working Astro project used to generate the [Spectra
 
 ## Usage
 
-Standard Astro commands apply; use `pnpm astro dev` to fire up the development server and `pnpm astro build` to generate a build. Deployment is handled by custom scripts invoked by `pnpm deploy-static` (but you'd need to modify this script for your own needs; it won't work out of the box).
+### Development
+
+Standard Astro commands apply:
+
+- `pnpm dev` - start the development server (includes local image serving)
+- `pnpm build` - generate a production build
+- `pnpm preview` - preview the production build locally
+
+### Deployment
+
+Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns:
+
+- `pnpm deploy-static` - full deployment pipeline:
+  1. Validates content (frontmatter, references, duplicates)
+  2. Generates related content recommendations
+  3. Creates OpenGraph images
+  4. Builds the Astro site
+  5. Generates cache manifest from built HTML
+  6. Syncs media files to remote storage
+  7. Transfers static files via rsync
+
+- `pnpm deploy-media` - sync source images to remote storage (standalone)
+- `pnpm cache-warm` - pre-populate image cache on the server
+- `pnpm cache-warm --random` - randomized order for better coverage if interrupted
 
 ### MDX Configuration
 
@@ -75,8 +110,8 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ## Project Structure
 
+- `./deploy`: Docker Compose configuration, Caddy config, and image server setup
 - `./public`: contains a favicon, fallback Open Graph images, and map division data
-- `./scripts`: deployment and maintenance scripts
 - `./src`: primary project source files
 - `./src/components`: Astro components organized by functionality
 - `./src/layouts`: layouts for different content types and page structures
@@ -88,13 +123,13 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 ### Packages
 
 - `./packages/astro-build-logger`: Astro integration that logs build timestamps and durations
-- `./packages/content-example`: example content for testing and demonstration purposes ([more info](./packages/content-example/readme.md))
+- `./packages/content-demo`: example content for testing and demonstration purposes ([more info](./packages/content-example/readme.md))
 - `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs) ([more info](./packages/image-loader/readme.md))
 - `./packages/image-open-graph`: experimental OpenGraph image generator using Satori ([more info](./packages/image-open-graph/readme.md))
 - `./packages/map-types`: TypeScript type definitions for map-related data structures
 - `./packages/react-map-component`: interactive map component used across this project
 - `./packages/remark-img-group`: Remark plugin for handling image groups
-- `./packages/scripts`: utility scripts for related content generation, content validation, map division processing, spritesheet generation, and deployment
+- `./packages/scripts`: utility scripts for content validation, related content generation, map division processing, spritesheet generation, cache manifest generation, cache warming, and deployment
 - `./packages/unified-tools`: utilities for processing markdown, MDX, HTML, and text content including sanitization, CJK wrapping, and footnote handling
 
 ### Generated/Temporary
