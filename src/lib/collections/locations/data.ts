@@ -1,5 +1,4 @@
 import type { CollectionEntry } from 'astro:content';
-import type { ImageFormat } from 'unpic';
 
 import { transformMarkdown } from '@spectralcodex/unified-tools';
 import { getCollection } from 'astro:content';
@@ -7,7 +6,6 @@ import pMemoize from 'p-memoize';
 
 import type { ImageThumbnail } from '#lib/schemas/image.ts';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
@@ -48,18 +46,16 @@ function getLocationThumbnailProps(
 		height: number;
 		width: number;
 		widths: Array<number>;
-		quality?: number;
-		format?: ImageFormat;
 	},
 ): ImageThumbnail {
-	const { height, width, widths, quality = IMAGE_QUALITY, format = IMAGE_FORMAT } = options;
+	const { height, width, widths } = options;
 
 	// Generate main src URL at base width
-	const src = getIpxImageUrl(imageSrc, { quality, format, width });
+	const src = getIpxImageUrl(imageSrc, { width });
 
 	// Generate srcSet with proportional heights for each width
 	const srcSet = widths
-		.map((width) => `${getIpxImageUrl(imageSrc, { quality, format, width })} ${String(width)}w`)
+		.map((width) => `${getIpxImageUrl(imageSrc, { width })} ${String(width)}w`)
 		.join(', ');
 
 	return {
