@@ -1,14 +1,16 @@
 import type { ImageFormat } from 'unpic';
 
-import { IPX_SERVER_URL } from 'astro:env/server';
+import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+import { createHash } from 'node:crypto';
 import { transform as ipxTransform } from 'unpic/providers/ipx';
 
 import {
+	IMAGE_FORMAT,
+	IMAGE_QUALITY,
 	OPEN_GRAPH_IMAGE_DENSITY,
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
 } from '#constants.ts';
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import {
 	getImageSrcsetWidths,
 	imageSrcsetWidthsDefault,
@@ -16,10 +18,23 @@ import {
 } from '#lib/image/image-layout.ts';
 
 // In development, use local IPX server; in production, use the configured URL
-const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : `http://localhost:3100`;
+export const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100';
 
 /**
- * Generate an IPX image URL directly without local image processing
+ * Sign an image URL for nginx secure_link validation
+ * The signature is an MD5 hash of: pathname + secret
+ */
+export function signImageUrl(url: string): string {
+	const urlObj = new URL(url);
+	const signature = createHash('md5')
+		.update(`${urlObj.pathname}${IPX_SERVER_SECRET}`)
+		.digest('base64url');
+	urlObj.searchParams.set('s', signature);
+	return urlObj.toString();
+}
+
+/**
+ * Generate a signed IPX image URL
  */
 export function getIpxImageUrl(
 	imageSrc: string,
@@ -27,7 +42,7 @@ export function getIpxImageUrl(
 ) {
 	const { width, height, quality = IMAGE_QUALITY, format = IMAGE_FORMAT } = options;
 
-	return ipxTransform(
+	const url = ipxTransform(
 		imageSrc,
 		{
 			q: quality,
@@ -37,8 +52,13 @@ export function getIpxImageUrl(
 		},
 		{ baseURL: ipxBaseUrl },
 	);
+
+	return signImageUrl(url);
 }
 
+/**
+ * Generate a signed Open Graph image URL
+ */
 export function getOpenGraphImageUrl(
 	imageSrc: string,
 	options?: {
@@ -65,16 +85,12 @@ export function getOpenGraphImageUrl(
 	});
 }
 
-export function getIpxImageProps({
+/**
+ * Get breakpoints for responsive images
+ */
+export function getImageBreakpoints({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
 }: ImageSrcsetWidthsProps) {
-	const breakpoints = getImageSrcsetWidths({ maxWidth, widths });
-
-	return {
-		cdn: 'ipx' as const,
-		breakpoints,
-		options: { ipx: { baseURL: ipxBaseUrl } },
-		operations: { ipx: { q: IMAGE_QUALITY, f: IMAGE_FORMAT } },
-	};
+	return getImageSrcsetWidths({ maxWidth, widths });
 }

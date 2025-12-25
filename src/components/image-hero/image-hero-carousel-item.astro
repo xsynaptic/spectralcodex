@@ -1,12 +1,11 @@
 ---
-import { Image } from '@unpic/astro';
-
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
 import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/image/image-unpic.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getIpxImageProps } from '#lib/image/image-server.ts';
+import { getImageBreakpoints } from '#lib/image/image-server.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -22,7 +21,7 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 
 	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
 
-	const ipxImageProps = getIpxImageProps({ maxWidth: imageEntry.data.width });
+	const breakpoints = getImageBreakpoints({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageProps: {
@@ -34,7 +33,7 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 			...(isFirst
 				? { loading: 'eager' as const, decoding: 'sync' as const, fetchpriority: 'high' as const }
 				: { loading: 'lazy' as const, decoding: 'async' as const, fetchpriority: 'low' as const }),
-			...ipxImageProps,
+			breakpoints,
 			unstyled: true,
 		},
 		placeholder: isFirst ? imageEntry.data.placeholderHq : imageEntry.data.placeholder,

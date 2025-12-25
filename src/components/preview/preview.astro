@@ -1,13 +1,12 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { Image } from '@unpic/astro';
-
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/image/image-unpic.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getIpxImageProps } from '#lib/image/image-server.ts';
+import { getImageBreakpoints } from '#lib/image/image-server.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -28,10 +27,7 @@ async function getImageProps() {
 	if (!imageId || !imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
 
-	const primaryWidth = 450;
-	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
-
-	const ipxImageProps = getIpxImageProps({
+	const breakpoints = getImageBreakpoints({
 		maxWidth: imageEntry.data.width,
 		widths: [450, 600, 900, 1200],
 	});
@@ -39,13 +35,12 @@ async function getImageProps() {
 	return {
 		imageProps: {
 			src: imageId,
-			width: primaryWidth,
-			height: Math.round(primaryWidth / aspectRatio),
+			aspectRatio: 3 / 2,
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 450px`,
 			loading: 'lazy' as const,
 			alt: sanitizeAltAttribute(alt),
 			layout: 'constrained' as const,
-			...ipxImageProps,
+			breakpoints,
 		},
 		placeholder: imageEntry.data.placeholder,
 	};

@@ -84,7 +84,12 @@ export default defineConfig({
 			IPX_SERVER_URL: envField.string({
 				context: 'server',
 				access: 'secret',
-				default: 'http://localhost:3333',
+				default: 'http://localhost:3100',
+			}),
+			IPX_SERVER_SECRET: envField.string({
+				context: 'server',
+				access: 'secret',
+				default: 'dev-secret-do-not-use-in-production',
 			}),
 		},
 	},

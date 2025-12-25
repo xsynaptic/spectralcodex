@@ -1,0 +1,48 @@
+---
+import type { UnpicBaseImageProps } from '@unpic/core';
+import type { HTMLAttributes } from 'astro/types';
+import type { IPXOperations, IPXOptions } from 'unpic/providers/ipx';
+
+import { Image } from '@unpic/astro/base';
+import { transform as ipxTransform } from 'unpic/providers/ipx';
+
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { ipxBaseUrl, signImageUrl } from '#lib/image/image-server.ts';
+
+// Signed transformer that wraps IPX with URL signing and default operations
+const signedIpxTransformer = (
+	src: string | URL,
+	operations: IPXOperations,
+	options?: IPXOptions
+) => {
+	return signImageUrl(
+		ipxTransform(
+			src,
+			{ ...operations, q: IMAGE_QUALITY, f: IMAGE_FORMAT },
+			{ ...options, baseURL: ipxBaseUrl }
+		)
+	);
+};
+
+// Props interface: same as unpic base but without transformer (we provide it)
+// Fix: HTMLAttributes<'img'> allows undefined for some properties, but UnpicBaseImageProps requires string | number | null (no undefined)
+// Utility type to replace undefined with null in union types
+type ReplaceUndefinedWithNull<T> = T extends undefined
+	? null
+	: T extends infer U | undefined
+		? U | null
+		: T;
+
+type ImgAttributes = {
+	[K in keyof HTMLAttributes<'img'>]: ReplaceUndefinedWithNull<HTMLAttributes<'img'>[K]>;
+};
+
+type Props = Omit<
+	UnpicBaseImageProps<IPXOperations, IPXOptions, ImgAttributes>,
+	'transformer' | 'operations' | 'options'
+>;
+
+const props = Astro.props;
+---
+
+<Image transformer={signedIpxTransformer} {...props} />
