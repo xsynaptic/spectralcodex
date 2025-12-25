@@ -71,7 +71,7 @@ export function getImageSrcsetWidths({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
 }: ImageSrcsetWidthsProps) {
-	return [...new Set([...widths, maxWidth])].filter((width) => width <= maxWidth);
+	return widths.filter((width) => width <= maxWidth);
 }
 
 export function getImageLayoutProps({

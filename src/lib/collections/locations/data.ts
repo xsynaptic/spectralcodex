@@ -1,13 +1,17 @@
 import type { CollectionEntry } from 'astro:content';
+import type { ImageFormat } from 'unpic';
 
 import { transformMarkdown } from '@spectralcodex/unified-tools';
 import { getCollection } from 'astro:content';
 import pMemoize from 'p-memoize';
 
+import type { ImageThumbnail } from '#lib/schemas/image.ts';
+
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getImageThumbnail } from '#lib/image/image-server.ts';
+import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -35,6 +39,37 @@ const imageThumbnailOptions = {
 	widths: [450, 600, 900],
 };
 
+/**
+ * Generate thumbnail data with srcSet for map popups using IPX
+ */
+function getLocationThumbnailProps(
+	imageSrc: string,
+	options: {
+		height: number;
+		width: number;
+		widths: Array<number>;
+		quality?: number;
+		format?: ImageFormat;
+	},
+): ImageThumbnail {
+	const { height, width, widths, quality = IMAGE_QUALITY, format = IMAGE_FORMAT } = options;
+
+	// Generate main src URL at base width
+	const src = getIpxImageUrl(imageSrc, { quality, format, width });
+
+	// Generate srcSet with proportional heights for each width
+	const srcSet = widths
+		.map((width) => `${getIpxImageUrl(imageSrc, { quality, format, width })} ${String(width)}w`)
+		.join(', ');
+
+	return {
+		src,
+		srcSet,
+		height: String(height),
+		width: String(width),
+	};
+}
+
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
@@ -46,7 +81,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			);
 
 			if (imageEntry) {
-				entry.data.imageThumbnail = getImageThumbnail(imageEntry.id, imageThumbnailOptions);
+				entry.data.imageThumbnail = getLocationThumbnailProps(imageEntry.id, imageThumbnailOptions);
 			}
 		}
 	}
@@ -69,7 +104,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 					const imageEntry = getImageById(geometry.imageFeatured);
 
 					if (imageEntry) {
-						entry.data.geometry[index].imageThumbnail = getImageThumbnail(
+						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(
 							imageEntry.id,
 							imageThumbnailOptions,
 						);

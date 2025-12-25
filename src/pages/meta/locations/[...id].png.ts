@@ -15,6 +15,7 @@ import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { getGenerateOpenGraphImageFunction } from '#lib/image/image-open-graph-satori.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 
+// Note: this is not currently used as of December 2025
 export const getStaticPaths = (async () => {
 	if (!FEATURE_OPEN_GRAPH_IMAGES) return [];
 

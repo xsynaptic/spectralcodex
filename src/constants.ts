@@ -11,6 +11,15 @@ export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
 
 /**
+ * Image configuration
+ */
+// Image quality for all transformations
+export const IMAGE_QUALITY = 88 as const;
+
+// Image format for all transformations
+export const IMAGE_FORMAT = 'jpg' as const;
+
+/**
  * Map configuration
  */
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
