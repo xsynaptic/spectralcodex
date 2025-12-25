@@ -78,6 +78,7 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 
 	// Cache loaded region geometries to avoid re-reading files
 	const regionGeometryCache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
+
 	// Track regions with missing FGB files to skip them entirely
 	const missingFgbRegions = new Set<string>();
 
@@ -141,6 +142,7 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 
 		// Check each coordinate against all valid regions
 		let hasInvalidCoordinate = false;
+		
 		for (const geometry of geometries) {
 			const coordinates = geometry.coordinates;
 			const isInside = isPointInRegion(coordinates, allRegionFeatures);

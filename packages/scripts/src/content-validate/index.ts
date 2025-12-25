@@ -8,6 +8,7 @@ import { getContentCollectionPaths } from '../content-utils/collections';
 import { checkDivisionIds } from './divisions';
 import { checkImageReferences } from './images';
 import { checkLocationsCoordinates } from './locations-coordinates';
+import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
 import { checkContentQuality } from './quality';
@@ -41,6 +42,11 @@ const { values, positionals } = parseArgs({
 			short: 'v',
 			default: false,
 		},
+		threshold: {
+			type: 'string',
+			short: 't',
+			default: '10',
+		},
 	},
 	allowPositionals: true,
 });
@@ -64,14 +70,17 @@ const checkSlugPaths = [
 
 // Note: there is no need for a help command
 switch (command) {
+	// Check for slugs that don't match filenames
 	case 'slug-mismatch': {
 		await checkSlugMismatches(checkSlugPaths);
 		break;
 	}
+	// Check for locations not assigned to regions OR locations with mismatching regions and assigned paths
 	case 'location-regions': {
 		await checkLocationsRegions(ContentCollectionsPaths.Locations);
 		break;
 	}
+	// Check for locations not inside their assigned regions
 	case 'location-coordinates': {
 		await checkLocationsCoordinates(
 			ContentCollectionsPaths.Locations,
@@ -79,18 +88,30 @@ switch (command) {
 		);
 		break;
 	}
+	// Check for locations that are too close to each other
+	case 'location-overlap': {
+		await checkLocationsOverlap(
+			ContentCollectionsPaths.Locations,
+			Number.parseInt(values.threshold, 10),
+		);
+		break;
+	}
+	// Check for regions without a divisionId
 	case 'divisions': {
 		await checkDivisionIds(ContentCollectionsPaths.Regions);
 		break;
 	}
+	// Check for quality mismatch e.g. entry has a featured image but hasn't been bumped to quality 2
 	case 'quality': {
 		await checkContentQuality(Object.values(ContentCollectionsPaths));
 		break;
 	}
+	// Check for malformed MDX components
 	case 'mdx': {
 		await checkMdxComponents(Object.values(ContentCollectionsPaths));
 		break;
 	}
+	// Check for image references that do not exist
 	case 'images': {
 		await checkImageReferences(
 			Object.values(ContentCollectionsPaths),
@@ -134,6 +155,13 @@ switch (command) {
 		);
 
 		if (!coordinatesSuccess) process.exit(1);
+
+		const overlapSuccess = await checkLocationsOverlap(
+			ContentCollectionsPaths.Locations,
+			Number.parseInt(values.threshold, 10),
+		);
+
+		if (!overlapSuccess) process.exit(1);
 
 		const divisionsSuccess = await checkDivisionIds(ContentCollectionsPaths.Regions);
 
