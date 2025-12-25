@@ -31,36 +31,24 @@ async function generateLocationPostDataFunction() {
 	};
 }
 
+/**
+ * Generate thumbnail data with srcSet for map popups using IPX
+ * We pass this data via the API so URLs can be signed at build time
+ */
 const imageThumbnailOptions = {
 	width: 450,
 	height: 300,
 	widths: [450, 600, 900],
 };
 
-/**
- * Generate thumbnail data with srcSet for map popups using IPX
- */
-function getLocationThumbnailProps(
-	imageSrc: string,
-	options: {
-		height: number;
-		width: number;
-		widths: Array<number>;
-	},
-): ImageThumbnail {
-	const { height, width, widths } = options;
-
-	// Generate main src URL at base width
-	const src = getIpxImageUrl(imageSrc, { width });
-
-	// Generate srcSet with proportional heights for each width
-	const srcSet = widths
-		.map((width) => `${getIpxImageUrl(imageSrc, { width })} ${String(width)}w`)
-		.join(', ');
+function getLocationThumbnailProps(imageSrc: string): ImageThumbnail {
+	const { height, width, widths } = imageThumbnailOptions;
 
 	return {
-		src,
-		srcSet,
+		src: getIpxImageUrl(imageSrc, { width }),
+		srcSet: widths
+			.map((width) => `${getIpxImageUrl(imageSrc, { width })} ${String(width)}w`)
+			.join(', '),
 		height: String(height),
 		width: String(width),
 	};
@@ -77,7 +65,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			);
 
 			if (imageEntry) {
-				entry.data.imageThumbnail = getLocationThumbnailProps(imageEntry.id, imageThumbnailOptions);
+				entry.data.imageThumbnail = getLocationThumbnailProps(imageEntry.id);
 			}
 		}
 	}
@@ -100,10 +88,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 					const imageEntry = getImageById(geometry.imageFeatured);
 
 					if (imageEntry) {
-						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(
-							imageEntry.id,
-							imageThumbnailOptions,
-						);
+						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(imageEntry.id);
 					}
 				}
 			}
