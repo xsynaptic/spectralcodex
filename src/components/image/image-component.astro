@@ -68,6 +68,7 @@ async function getImageProps() {
 					? ('fullWidth' as const)
 					: ('constrained' as const),
 			breakpoints,
+			unstyled: true,
 		},
 		placeholder: imageEntry.data.placeholder,
 	};
