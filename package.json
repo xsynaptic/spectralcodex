@@ -46,7 +46,7 @@
 		"@astrojs/react": "^5.0.0-alpha.0",
 		"@astrojs/rss": "^4.0.15-alpha.0",
 		"@astrojs/sitemap": "^3.6.1-alpha.1",
-		"@iconify/json": "^2.2.420",
+		"@iconify/json": "^2.2.421",
 		"@iconify/utils": "^3.1.0",
 		"@keyv/sqlite": "^4.0.6",
 		"@sindresorhus/slugify": "^3.0.0",
