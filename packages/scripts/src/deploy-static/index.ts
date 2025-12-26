@@ -101,7 +101,7 @@ async function transfer() {
 		'-avz',
 		'--progress',
 		'-e', `ssh -i ${sshKeyPath}`,
-		'--delete-after',
+		...(skipBuild ? [] : ['--delete-after']),
 		...(dryRun ? ['--dry-run'] : []),
 		`${distPath}/`,
 		`${remoteHost}:${remotePath}/`,
