@@ -40,7 +40,7 @@ export function generateManifest(options: ManifestOptions): number {
 
 	const escapedPattern = urlPattern.replaceAll('.', String.raw`\.`);
 	const urlRegex = new RegExp(
-		String.raw`${escapedPattern}/[^"'\s]+\.(?:jpg|jpeg|png|webp|avif)`,
+		String.raw`${escapedPattern}/[^"'\s]+\.(?:jpg|jpeg|png|webp|avif)(?:\?[^"'\s]*)?`,
 		'g',
 	);
 
