@@ -62,15 +62,13 @@ function getImageOrientation({
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
-export interface ImageSrcsetWidthsProps {
-	maxWidth: number;
-	widths?: Array<number>;
-}
-
 export function getImageSrcsetWidths({
 	maxWidth,
 	widths = imageSrcsetWidthsDefault,
-}: ImageSrcsetWidthsProps) {
+}: {
+	maxWidth: number;
+	widths?: Array<number>;
+}) {
 	return widths.filter((width) => width <= maxWidth);
 }
 

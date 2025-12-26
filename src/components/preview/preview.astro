@@ -6,7 +6,7 @@ import Image from '#components/image/image-unpic.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageBreakpoints } from '#lib/image/image-server.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -27,7 +27,7 @@ async function getImageProps() {
 	if (!imageId || !imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
 
-	const breakpoints = getImageBreakpoints({
+	const breakpoints = getImageSrcsetWidths({
 		maxWidth: imageEntry.data.width,
 		widths: [450, 600, 900, 1200],
 	});

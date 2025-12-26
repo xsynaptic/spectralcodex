@@ -5,7 +5,7 @@ import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/image/image-unpic.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageBreakpoints } from '#lib/image/image-server.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -21,7 +21,7 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 
 	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
 
-	const breakpoints = getImageBreakpoints({ maxWidth: imageEntry.data.width });
+	const breakpoints = getImageSrcsetWidths({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageProps: {

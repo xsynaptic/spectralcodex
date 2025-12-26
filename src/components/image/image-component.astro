@@ -8,8 +8,11 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/image/image-unpic.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageLayoutProps, ImageLayoutEnum } from '#lib/image/image-layout.ts';
-import { getImageBreakpoints } from '#lib/image/image-server.ts';
+import {
+	getImageLayoutProps,
+	getImageSrcsetWidths,
+	ImageLayoutEnum,
+} from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
@@ -49,7 +52,7 @@ async function getImageProps() {
 	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
 	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
 
-	const breakpoints = getImageBreakpoints({ maxWidth: imageEntry.data.width });
+	const breakpoints = getImageSrcsetWidths({ maxWidth: imageEntry.data.width });
 
 	return {
 		imageEntry,
