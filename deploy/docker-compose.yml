@@ -43,8 +43,10 @@ services:
     ports:
       - "127.0.0.1:3100:80" # Localhost access for cache warming
     volumes:
-      - ./image-server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./image-server/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ${STORAGE_PATH}/cache/ipx:/var/cache/nginx/ipx
+    environment:
+      - IPX_SERVER_SECRET=${IPX_SERVER_SECRET}
     depends_on:
       - image-server
     networks:
