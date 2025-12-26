@@ -33,7 +33,9 @@ services:
     build: ./deploy/image-server
     container_name: image-server-dev
     volumes:
-      - ./${CONTENT_MEDIA_PATH:?CONTENT_MEDIA_PATH is required}:/media:ro
+      - ./${CONTENT_MEDIA_PATH:?CONTENT_MEDIA_PATH is required}:/media
+      # Test fixtures overlay - always available for integration tests
+      - ./packages/content-demo/media/test:/media/test:ro
     environment:
       - NODE_ENV=development
       - PORT=3000
