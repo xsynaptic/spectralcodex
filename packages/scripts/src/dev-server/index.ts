@@ -7,7 +7,9 @@ import { $ } from 'zx';
 const rootPath = process.cwd();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 
+// Load environment variables; the `.env.dev` file allows for a dev-only IPX secret to be set
 dotenv.config({ path: path.join(rootPath, '.env') });
+dotenv.config({ path: path.join(rootPath, '.env.dev'), override: true });
 
 // Resolve paths to absolute for Docker
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
@@ -16,12 +18,10 @@ process.env.DEPLOY_IMAGE_SERVER_PATH = path.resolve(rootPath, 'deploy/image-serv
 
 $.verbose = false;
 
-function timestamp() {
-	return new Date().toLocaleTimeString('en-US', { hour12: false });
-}
-
 function log(message: string) {
-	console.log(`${chalk.gray(timestamp())} ${chalk.cyan('[docker]')} ${message}`);
+	console.log(
+		`${chalk.gray(new Date().toLocaleTimeString('en-US', { hour12: false }))} ${chalk.cyan('[docker]')} ${message}`,
+	);
 }
 
 let cleanedUp = false;
@@ -30,6 +30,7 @@ function cleanup() {
 	if (cleanedUp) return;
 	cleanedUp = true;
 	log(chalk.gray('Stopping containers...'));
+
 	// Fire and forget - don't block exit
 	void $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
 	process.exit(0);

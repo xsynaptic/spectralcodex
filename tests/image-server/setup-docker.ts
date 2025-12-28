@@ -1,6 +1,7 @@
 /**
  * Vitest global setup; starts Docker containers for integration tests
  */
+import dotenv from 'dotenv';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -13,8 +14,8 @@ const HEALTH_URL = 'http://localhost:3100/health';
 const MAX_WAIT_MS = 30_000;
 const POLL_INTERVAL_MS = 500;
 
-// Test secret; must match the value used in integration.test.ts
-const TEST_SECRET = 'dev-secret-do-not-use-in-production';
+// Load dev environment for test secret
+dotenv.config({ path: path.join(PROJECT_ROOT, '.env.dev') });
 
 async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();
@@ -70,8 +71,8 @@ export async function setup() {
 					// Absolute paths required for Docker
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
 					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/image-server'),
-					// Use known test secret for predictable signature validation
-					IPX_SERVER_SECRET: TEST_SECRET,
+					// Use dev secret from .env.dev for predictable signature validation
+					IPX_SERVER_SECRET: process.env.IPX_SERVER_SECRET,
 				},
 			},
 		);
