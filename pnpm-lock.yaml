@@ -57,9 +57,6 @@ importers:
       '@spectralcodex/image-open-graph':
         specifier: workspace:*
         version: link:packages/image-open-graph
-      '@spectralcodex/image-server':
-        specifier: workspace:*
-        version: link:deploy/image-server
       '@spectralcodex/map-types':
         specifier: workspace:*
         version: link:packages/map-types
@@ -108,6 +105,9 @@ importers:
       '@xsynaptic/eslint-config':
         specifier: ^3.0.10
         version: 3.0.10(jiti@2.6.1)(typescript@5.9.3)
+      '@xsynaptic/image-server':
+        specifier: workspace:*
+        version: link:deploy/image-server
       alfaaz:
         specifier: ^1.1.0
         version: 1.1.0
@@ -139,8 +139,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^34.1.0
-        version: 34.1.0
+        specifier: ^34.2.0
+        version: 34.2.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -410,14 +410,14 @@ importers:
         specifier: ^6.2.2
         version: 6.2.2
       ky:
-        specifier: ^1.14.1
-        version: 1.14.1
+        specifier: ^1.14.2
+        version: 1.14.2
       maplibre-gl:
         specifier: ^5.15.0
         version: 5.15.0
       pmtiles:
-        specifier: ^4.3.1
-        version: 4.3.1
+        specifier: ^4.3.2
+        version: 4.3.2
       react:
         specifier: ^19.2.3
         version: 19.2.3
@@ -3664,17 +3664,17 @@ packages:
   eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
 
-  exiftool-vendored.exe@13.44.0:
-    resolution: {integrity: sha512-PzQrrz9k4YzxtcX1r/hEy+xzj6MKXXiEBCU+FhYlipr4fuKKeXgspB7kliPSfSSFAChYoSH294zd23ZUXgB4TQ==}
+  exiftool-vendored.exe@13.45.0:
+    resolution: {integrity: sha512-xa+gEnZ2Q9BAzaDr35xgADql+T6L92RqK0GjzOjzDuObwhr+sBr5RdySvZ3osHac9GJypxvk4cewNnj4OnPL3Q==}
     os: [win32]
 
-  exiftool-vendored.pl@13.44.0:
-    resolution: {integrity: sha512-KPqyZK5guU/HKJ4x7OdxC0bqwClz34AtQYeirvvGFBjvfpG6Ewt+Kx9TEd/JbvJyLgMS5k5GHvkH5R5iAL+Arg==}
+  exiftool-vendored.pl@13.45.0:
+    resolution: {integrity: sha512-uA58bMcXqdSQAqsZbHa/SMU6XKXsmoMcJSlKJjsCmLlQKEThncuAlpg8wGVNhULNXxYmRXXnYQ1756UYQY9VIA==}
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@34.1.0:
-    resolution: {integrity: sha512-piPUu8oaBT0JQcR0gH/ZLjnTrHu51lMs+GjAQPrtVyvt8bfB1vzTWYbw+9jN4qyO8HwCweJuj7xivmWS0/fa/A==}
+  exiftool-vendored@34.2.0:
+    resolution: {integrity: sha512-s12oPPIQgjnIpbRlk6tLKo5/D56I/pZB9yelSHGmKiHvZLrLMAUrXI2Ns7d6qmDka2FXTTXeh1rWdSeh/Tk+MA==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -4403,8 +4403,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  ky@1.14.1:
-    resolution: {integrity: sha512-hYje4L9JCmpEQBtudo+v52X5X8tgWXUYyPcxKSuxQNboqufecl9VMWjGiucAFH060AwPXHZuH+WB2rrqfkmafw==}
+  ky@1.14.2:
+    resolution: {integrity: sha512-q3RBbsO5A5zrPhB6CaCS8ZUv+NWCXv6JJT4Em0i264G9W0fdPB8YRfnnEi7Dm7X7omAkBIPojzYJ2D1oHTHqug==}
     engines: {node: '>=18'}
 
   language-subtag-registry@0.3.23:
@@ -5153,8 +5153,8 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
 
-  pmtiles@4.3.1:
-    resolution: {integrity: sha512-Eyosl5Mm9kOh6a0IvFCJDAHHMlguYFiZ7B/DEbZDGGYBom8iefupAKP4KAqNCu0ixG7KDeXXnrg5LcmRCQk4ug==}
+  pmtiles@4.3.2:
+    resolution: {integrity: sha512-Ath2F2U2E37QyNXjN1HOF+oLiNIbdrDYrk/K3C9K4Pgw2anwQX10y4WYWEH9O75vPiu0gBbSWIAbSG19svyvZg==}
 
   pngjs@7.0.0:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
@@ -10987,13 +10987,13 @@ snapshots:
 
   eventemitter3@5.0.1: {}
 
-  exiftool-vendored.exe@13.44.0:
+  exiftool-vendored.exe@13.45.0:
     optional: true
 
-  exiftool-vendored.pl@13.44.0:
+  exiftool-vendored.pl@13.45.0:
     optional: true
 
-  exiftool-vendored@34.1.0:
+  exiftool-vendored@34.2.0:
     dependencies:
       '@photostructure/tz-lookup': 11.3.0
       '@types/luxon': 3.7.1
@@ -11001,8 +11001,8 @@ snapshots:
       he: 1.2.0
       luxon: 3.7.2
     optionalDependencies:
-      exiftool-vendored.exe: 13.44.0
-      exiftool-vendored.pl: 13.44.0
+      exiftool-vendored.exe: 13.45.0
+      exiftool-vendored.pl: 13.45.0
 
   expand-template@2.0.3: {}
 
@@ -11816,7 +11816,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  ky@1.14.1: {}
+  ky@1.14.2: {}
 
   language-subtag-registry@0.3.23: {}
 
@@ -12916,7 +12916,7 @@ snapshots:
 
   pluralize@8.0.0: {}
 
-  pmtiles@4.3.1:
+  pmtiles@4.3.2:
     dependencies:
       fflate: 0.8.2
 
