@@ -67,8 +67,9 @@ export async function setup() {
 				stdio: 'pipe',
 				env: {
 					...process.env,
-					// Use content-demo for tests (has dedicated test images)
-					CONTENT_MEDIA_PATH: 'packages/content-demo/media',
+					// Absolute paths required for Docker
+					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
+					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/image-server'),
 					// Use known test secret for predictable signature validation
 					IPX_SERVER_SECRET: TEST_SECRET,
 				},
@@ -105,7 +106,6 @@ export async function setup() {
 }
 
 export function teardown() {
-	// Always stop containers to ensure clean state for next run
 	console.log('[Test] Stopping Docker containers...');
 
 	try {
@@ -114,6 +114,11 @@ export function teardown() {
 			{
 				cwd: PROJECT_ROOT,
 				stdio: 'pipe',
+				env: {
+					...process.env,
+					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
+					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/image-server'),
+				},
 			},
 		);
 		console.log('[Test] Docker containers stopped');

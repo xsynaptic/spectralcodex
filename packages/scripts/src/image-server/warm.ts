@@ -21,13 +21,13 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 
 	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
 	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
-	const remotePath = process.env.DEPLOY_REMOTE_PATH;
+	const sitePath = process.env.DEPLOY_SITE_PATH;
 
-	if (!remoteHost || !sshKeyPath || !remotePath) {
-		throw new Error('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_REMOTE_PATH');
+	if (!remoteHost || !sshKeyPath || !sitePath) {
+		throw new Error('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_SITE_PATH');
 	}
 
-	const manifestPath = `${remotePath}/cache-manifest.json`;
+	const manifestPath = `${sitePath}/cache-manifest.json`;
 
 	try {
 		await $`ssh-add --apple-load-keychain 2>/dev/null`;

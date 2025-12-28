@@ -1,57 +1,26 @@
-# Local development image server stack
-# Managed by dev-server script
-#
-# Test endpoints:
-#   Health: http://localhost:3100/health
-#   Image:  http://localhost:3100/q_80,f_webp,s_800/path/to/image.jpg
+# Development image server for spectralcodex
+# Started automatically by `pnpm dev`
 
 services:
-  # Nginx cache (ephemeral for dev)
   image-cache:
     image: nginx:1.27-alpine
-    container_name: image-cache-dev
+    container_name: dev-image-cache
     ports:
       - "3100:80"
     volumes:
-      # Use nginx's built-in template processing (envsubst on startup)
-      - ./deploy/image-server/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-      # Ephemeral cache - gone when container stops
-      - type: tmpfs
-        target: /var/cache/nginx/ipx
-        tmpfs:
-          size: 1073741824  # 1GB
+      - ${DEPLOY_IMAGE_SERVER_PATH}/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     environment:
       - IPX_SERVER_SECRET=${IPX_SERVER_SECRET:-dev-secret-do-not-use-in-production}
     depends_on:
-      image-server:
-        condition: service_started
-    networks:
-      - image-dev
+      - image-server
 
-  # Image transformation server
   image-server:
-    build: ./deploy/image-server
-    container_name: image-server-dev
+    build: ${DEPLOY_IMAGE_SERVER_PATH}
+    container_name: dev-image-server
     volumes:
-      - ./${CONTENT_MEDIA_PATH:?CONTENT_MEDIA_PATH is required}:/media
-      # Test fixtures overlay - always available for integration tests
-      - ./packages/content-demo/media/test:/media/test:ro
+      - ${CONTENT_MEDIA_PATH}:/media:ro
     environment:
       - NODE_ENV=development
       - PORT=3000
       - IPX_FS_DIR=/media
-      - IPX_FS_MAX_AGE=86400
-    networks:
-      - image-dev
-    mem_limit: 512m
-    # Faster health check for dev (overrides Dockerfile)
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
-      interval: 2s
-      timeout: 2s
-      start_period: 1s
-      retries: 3
-
-networks:
-  image-dev:
-    driver: bridge
+      - IPX_FS_MAX_AGE=0

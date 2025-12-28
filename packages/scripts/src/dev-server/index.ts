@@ -1,10 +1,18 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
+import dotenv from 'dotenv';
 import path from 'node:path';
 import { $ } from 'zx';
 
 const rootPath = process.cwd();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
+
+dotenv.config({ path: path.join(rootPath, '.env') });
+
+// Resolve paths to absolute for Docker
+const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
+process.env.CONTENT_MEDIA_PATH = path.resolve(rootPath, mediaPathRelative);
+process.env.DEPLOY_IMAGE_SERVER_PATH = path.resolve(rootPath, 'deploy/image-server');
 
 $.verbose = false;
 

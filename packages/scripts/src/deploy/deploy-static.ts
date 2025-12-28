@@ -1,12 +1,12 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { deployMedia } from '../deploy-media/index.js';
 import { generateManifest } from '../image-server/manifest.js';
+import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
+import { deployMedia } from './deploy-media.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -25,23 +25,12 @@ const cachePath = values['cache-path'];
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
-dotenv.config({ path: path.join(rootPath, '.env') });
-dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
+// Load and validate deploy configuration
+const config = loadDeployConfig(rootPath);
+
+printDeployConfig(config);
 
 const distPath = path.join(rootPath, 'dist');
-
-const envRemoteHost = process.env.DEPLOY_REMOTE_HOST;
-const envSshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
-const envRemotePath = process.env.DEPLOY_REMOTE_PATH;
-
-if (!envRemoteHost || !envSshKeyPath || !envRemotePath) {
-	console.error(chalk.red('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_REMOTE_PATH'));
-	process.exit(1);
-}
-
-const remoteHost = envRemoteHost;
-const sshKeyPath = envSshKeyPath;
-const remotePath = envRemotePath;
 
 try {
 	await $`ssh-add --apple-load-keychain 2>/dev/null`;
@@ -56,12 +45,16 @@ async function validate() {
 
 async function related() {
 	console.log(chalk.blue('Generating related content...'));
-	await $({ stdio: 'inherit' })`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
+	await $({
+		stdio: 'inherit',
+	})`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
 }
 
 async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
-	await $({ stdio: 'inherit' })`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/0g`;
+	await $({
+		stdio: 'inherit',
+	})`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/0g`;
 }
 
 async function build() {
@@ -100,11 +93,12 @@ async function transfer() {
 	const rsyncArgs = [
 		'-avz',
 		'--progress',
-		'-e', `ssh -i ${sshKeyPath}`,
+		'-e',
+		`ssh -i ${config.sshKeyPath}`,
 		...(skipBuild ? [] : ['--delete-after']),
 		...(dryRun ? ['--dry-run'] : []),
 		`${distPath}/`,
-		`${remoteHost}:${remotePath}/`,
+		`${config.remoteHost}:${config.sitePath}/`,
 	];
 
 	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;

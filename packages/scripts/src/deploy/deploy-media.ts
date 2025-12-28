@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
+
+import { loadDeployConfig } from './deploy-config.js';
 
 interface DeployMediaOptions {
 	rootPath: string;
@@ -15,13 +16,11 @@ interface DeployMediaOptions {
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const { rootPath, dryRun = false, fast = false } = options;
 
-	dotenv.config({ path: path.join(rootPath, '.env') });
+	// Load deploy configuration
+	const config = loadDeployConfig(rootPath);
 
 	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 	const mediaPath = path.join(rootPath, mediaPathRelative);
-	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
-	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
-	const remotePath = '/mnt/storage/media';
 
 	const stats = await fs.stat(mediaPath).catch(() => {
 		// Return undefined implicitly
@@ -31,13 +30,12 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 		throw new Error(`Media path not found: ${mediaPath}`);
 	}
 
-	if (!remoteHost || !sshKeyPath) {
-		throw new Error('Missing DEPLOY_REMOTE_HOST or DEPLOY_SSH_KEY_PATH');
-	}
+	// Remote path is project root + /media subfolder
+	const remoteMediaPath = `${config.mediaPath}/media`;
 
 	console.log(chalk.blue('Syncing media...'));
 	console.log(chalk.gray(`  From: ${mediaPath}`));
-	console.log(chalk.gray(`  To:   ${remoteHost}:${remotePath}`));
+	console.log(chalk.gray(`  To:   ${config.remoteHost}:${remoteMediaPath}`));
 	console.log(chalk.gray(`  Mode: ${fast ? 'fast (size-only)' : 'checksum'}`));
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
@@ -48,13 +46,13 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 		'--partial',
 		...(fast ? ['--size-only'] : ['-c']),
 		'-e',
-		`ssh -i ${sshKeyPath}`,
+		`ssh -i ${config.sshKeyPath}`,
 		'--exclude=.DS_Store',
 		'--exclude=*.tmp',
 		'--exclude=.gitkeep',
 		...(dryRun ? ['--dry-run'] : []),
 		`${mediaPath}/`,
-		`${remoteHost}:${remotePath}/`,
+		`${config.remoteHost}:${remoteMediaPath}/`,
 	];
 
 	const start = Date.now();
@@ -67,7 +65,7 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 // CLI entry point
 const scriptPath = process.argv[1] ?? '';
 
-if (scriptPath.endsWith('index.ts') && scriptPath.includes('deploy-media')) {
+if (scriptPath.includes('deploy-media')) {
 	const { values, positionals } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
