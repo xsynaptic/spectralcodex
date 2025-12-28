@@ -1,12 +1,11 @@
 .DS_Store
+.astro
 .git
 .github
 .gitignore
 .vscode
 Dockerfile
-docker-data/*
 dist
 node_modules
-temp
 packages/content/media
-.astro
+temp

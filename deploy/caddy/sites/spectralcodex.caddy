@@ -1,13 +1,11 @@
-# Redirect www to apex
 www.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 	redir https://spectralcodex.com{uri} permanent
 }
 
-# Main site, static files only
 spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
-	root * /srv/www
+	root * /var/www/spectralcodex
 	file_server
 	encode gzip
 
@@ -16,60 +14,47 @@ spectralcodex.com {
 		file_server
 	}
 
-	# Enforce trailing slashes (except for files with extensions)
 	@no_trailing_slash {
 		path_regexp notrail ^(.+[^/])$
 		not path_regexp \.[a-zA-Z0-9]+$
 	}
 	redir @no_trailing_slash {re.notrail.1}/ 301
 
-	# Redirects
-	import redirects.caddy
+	import spectralcodex-redirects.conf
 
-	# Cache static assets aggressively
 	@immutable path /_x/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
 	@static path *.css *.js *.jpg *.jpeg *.png *.gif *.webp *.avif *.woff2 *.woff
 	header @static Cache-Control "public, max-age=31536000"
 
-	# HTML pages - short cache
 	@html path *.html /
 	header @html Cache-Control "public, max-age=3600"
 }
 
-# Analytics
 u.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
-
 	handle /robots.txt {
-		respond `User-agent: *
-Disallow: /`
+		respond "User-agent: *
+Disallow: /"
 	}
-
 	reverse_proxy umami:3000
 }
 
-# Image server (through nginx cache)
 img.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
-
 	handle /robots.txt {
-		respond `User-agent: *
-Disallow: /`
+		respond "User-agent: *
+Disallow: /"
 	}
-
-	reverse_proxy image-cache:80
+	reverse_proxy spectralcodex-image-cache:80
 }
 
-# API
 api.spectralcodex.com {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
-
 	handle /robots.txt {
-		respond `User-agent: *
-Disallow: /`
+		respond "User-agent: *
+Disallow: /"
 	}
-
 	respond "API coming soon!" 503
 }

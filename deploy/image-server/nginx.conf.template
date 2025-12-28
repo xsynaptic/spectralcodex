@@ -1,6 +1,6 @@
 proxy_cache_path /var/cache/nginx/ipx levels=1:2 keys_zone=ipx_cache:10m max_size=50g inactive=365d use_temp_path=off;
 
-# Rate limiting: 100 req/s sustained, burst of 1000 for development
+# Rate limiting: 100 req/s sustained, burst of 1000 for production
 limit_req_zone $binary_remote_addr zone=ipx_limit:10m rate=100r/s;
 limit_req_status 429;
 
@@ -38,7 +38,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Caching; use URI only (not query params) as cache key
+        # Caching
         proxy_cache ipx_cache;
         proxy_cache_valid 200 365d;
         proxy_cache_valid 404 1m;

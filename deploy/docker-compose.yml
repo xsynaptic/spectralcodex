@@ -1,36 +1,8 @@
 services:
-  # Reverse proxy with automatic SSL
-  caddy:
-    image: caddy:2.8-alpine
-    container_name: caddy
-    init: true
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
-      - DAC_READ_SEARCH
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./caddy:/etc/caddy:ro
-      - ./certs:/certs:ro
-      - caddy_data:/data
-      - caddy_config:/config
-      - ${DEPLOY_REMOTE_PATH}:/srv/www:ro
-    networks:
-      - frontend
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   # Nginx cache for image server
   image-cache:
-    image: nginx:1.27-alpine
-    container_name: image-cache
+    image: nginx:1.29.4-alpine
+    container_name: spectralcodex-image-cache
     init: true
     cap_drop:
       - ALL
@@ -44,13 +16,13 @@ services:
       - "127.0.0.1:3100:80" # Localhost access for cache warming
     volumes:
       - ./image-server/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ${STORAGE_PATH}/cache/ipx:/var/cache/nginx/ipx
+      - ${DEPLOY_MEDIA_PATH}/cache:/var/cache/nginx/ipx
     environment:
       - IPX_SERVER_SECRET=${IPX_SERVER_SECRET}
     depends_on:
       - image-server
     networks:
-      - frontend
+      - astro-frontend
     restart: unless-stopped
     logging:
       driver: json-file
@@ -61,19 +33,19 @@ services:
   # Image server (IPX)
   image-server:
     build: ./image-server
-    container_name: image-server
+    container_name: spectralcodex-image-server
     init: true
     cap_drop:
       - ALL
     volumes:
-      - ${STORAGE_PATH}/media:/media:ro
+      - ${DEPLOY_MEDIA_PATH}/media:/media:ro
     environment:
       - NODE_ENV=production
       - PORT=3000
       - IPX_FS_DIR=/media
       - IPX_FS_MAX_AGE=31536000
     networks:
-      - frontend
+      - astro-frontend
     restart: unless-stopped
     mem_limit: 1536m
     logging:
@@ -82,80 +54,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # Umami analytics
-  umami:
-    image: ghcr.io/umami-software/umami:postgresql-v2.15.1
-    container_name: umami
-    init: true
-    cap_drop:
-      - ALL
-    environment:
-      - DATABASE_URL=postgresql://umami:${UMAMI_DB_PASSWORD}@umami-db:5432/umami
-      - DATABASE_TYPE=postgresql
-      - APP_SECRET=${UMAMI_APP_SECRET}
-    depends_on:
-      umami-db:
-        condition: service_healthy
-    networks:
-      - frontend
-      - backend
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # Umami PostgreSQL database (internal network only)
-  umami-db:
-    image: postgres:15.10-alpine
-    container_name: umami-db
-    init: true
-    command:
-      - "postgres"
-      - "-c"
-      - "shared_buffers=512MB"
-      - "-c"
-      - "effective_cache_size=1536MB"
-      - "-c"
-      - "random_page_cost=1.1"
-      - "-c"
-      - "max_connections=50"
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
-      - FOWNER
-    volumes:
-      - ${STORAGE_PATH}/data/umami:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=umami
-      - POSTGRES_USER=umami
-      - POSTGRES_PASSWORD=${UMAMI_DB_PASSWORD}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
 networks:
-  frontend:
-    driver: bridge
-  backend:
-    driver: bridge
-    internal: true
-
-volumes:
-  caddy_data:
-  caddy_config:
+  astro-frontend:
+    name: astro-frontend
+    external: true
