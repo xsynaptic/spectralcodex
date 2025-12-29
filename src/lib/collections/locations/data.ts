@@ -41,16 +41,27 @@ const imageThumbnailOptions = {
 	widths: [450, 600, 900],
 };
 
-function getLocationThumbnailProps(imageSrc: string): ImageThumbnail {
+function getLocationThumbnailProps(
+	imageSrc: string,
+	sourceWidth: number,
+	sourceHeight: number,
+): ImageThumbnail {
 	const { height, width, widths } = imageThumbnailOptions;
 
+	// Filter widths to avoid upscaling
+	const clampedWidths = widths.filter((width) => width <= sourceWidth);
+	const clampedWidth = Math.min(width, sourceWidth);
+
 	return {
-		src: getIpxImageUrl(imageSrc, { width }),
-		srcSet: widths
-			.map((width) => `${getIpxImageUrl(imageSrc, { width })} ${String(width)}w`)
+		src: getIpxImageUrl(imageSrc, { width: clampedWidth, sourceWidth, sourceHeight }),
+		srcSet: clampedWidths
+			.map(
+				(width) =>
+					`${getIpxImageUrl(imageSrc, { width, sourceWidth, sourceHeight })} ${String(width)}w`,
+			)
 			.join(', '),
 		height: String(height),
-		width: String(width),
+		width: String(clampedWidth),
 	};
 }
 
@@ -65,7 +76,11 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			);
 
 			if (imageEntry) {
-				entry.data.imageThumbnail = getLocationThumbnailProps(imageEntry.id);
+				entry.data.imageThumbnail = getLocationThumbnailProps(
+					imageEntry.id,
+					imageEntry.data.width,
+					imageEntry.data.height,
+				);
 			}
 		}
 	}
@@ -88,7 +103,11 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 					const imageEntry = getImageById(geometry.imageFeatured);
 
 					if (imageEntry) {
-						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(imageEntry.id);
+						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(
+							imageEntry.id,
+							imageEntry.data.width,
+							imageEntry.data.height,
+						);
 					}
 				}
 			}

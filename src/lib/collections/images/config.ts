@@ -74,8 +74,20 @@ export const images = defineCollection({
 				}
 			: {}),
 		dataHandler: async ({ logger, id, filePathRelative, fileUrl }) => {
+			/**
+			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
+			 */
+			const dimensions = await getImageDimensions(filePathRelative);
+
+			// Clamp source width to avoid upscaling
+			const srcWidth = Math.min(1800, dimensions.width);
+
 			const defaultMetadata = {
-				src: getIpxImageUrl(id, { width: 1800 }),
+				src: getIpxImageUrl(id, {
+					width: srcWidth,
+					sourceWidth: dimensions.width,
+					sourceHeight: dimensions.height,
+				}),
 				path: filePathRelative,
 				width: 1200,
 				height: 900,
@@ -83,11 +95,6 @@ export const images = defineCollection({
 				description: '',
 				entryQuality: 1,
 			};
-
-			/**
-			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
-			 */
-			const dimensions = await getImageDimensions(filePathRelative);
 
 			/**
 			 * Harvest EXIF data from images

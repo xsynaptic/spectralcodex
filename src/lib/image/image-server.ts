@@ -1,4 +1,5 @@
 import type { ImageFormat } from 'unpic';
+import type { IPXOperations, IPXOptions } from 'unpic/providers/ipx';
 
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 import { transform as ipxTransform } from 'unpic/providers/ipx';
@@ -20,9 +21,20 @@ export const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : 'http://localh
  */
 export function getIpxImageUrl(
 	imageSrc: string,
-	options: { width: number; height?: number; quality?: number; format?: ImageFormat },
+	options: {
+		width: number;
+		height?: number;
+		sourceWidth?: number;
+		sourceHeight?: number;
+		quality?: number;
+		format?: ImageFormat;
+	},
 ) {
-	const { width, height, quality = IMAGE_QUALITY, format = IMAGE_FORMAT } = options;
+	const { sourceWidth, sourceHeight, quality = IMAGE_QUALITY, format = IMAGE_FORMAT } = options;
+
+	const width = sourceWidth ? Math.min(options.width, sourceWidth) : options.width;
+	const height =
+		options.height && sourceHeight ? Math.min(options.height, sourceHeight) : options.height;
 
 	const url = ipxTransform(
 		imageSrc,
@@ -36,6 +48,22 @@ export function getIpxImageUrl(
 	);
 
 	return generateSignedUrl(url, IPX_SERVER_SECRET);
+}
+
+// Signed transformer that wraps IPX with URL signing and default operations for the image component
+export function signedIpxTransformer(
+	src: string | URL,
+	operations: IPXOperations,
+	options?: IPXOptions,
+) {
+	return generateSignedUrl(
+		ipxTransform(
+			src,
+			{ ...operations, q: IMAGE_QUALITY, f: IMAGE_FORMAT },
+			{ ...options, baseURL: ipxBaseUrl },
+		),
+		IPX_SERVER_SECRET,
+	);
 }
 
 /**
