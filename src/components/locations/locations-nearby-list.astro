@@ -1,8 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { LocationStatusEnum } from '@spectralcodex/map-types';
-
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/list/list-column-item.astro';
 import ListColumn from '#components/list/list-column.astro';
@@ -29,7 +27,7 @@ const t = getTranslations();
 
 {
 	locationsNearby.length > 0 ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.locationsNearby')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{locationsNearby.map(({ locationId, distanceDisplay }) => {
@@ -52,16 +50,6 @@ const t = getTranslations();
 										{distanceDisplay}&nbsp;{t('locations.unit.km')}
 									</span>
 								</>
-							) : undefined}
-							{location.data.status === LocationStatusEnum.Demolished ? (
-								<span class:list={['select-none', 'text-primary-300 dark:text-primary-500']}>
-									&#x2717;
-								</span>
-							) : undefined}
-							{location.data.entryQuality > 2 ? (
-								<span class:list={['select-none', 'text-primary-300 dark:text-primary-500']}>
-									&#10042;
-								</span>
 							) : undefined}
 						</ListColumnItem>
 					) : undefined;
