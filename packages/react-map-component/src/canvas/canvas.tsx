@@ -62,7 +62,6 @@ const MapCanvasContainer: FC<
 		baseMapTheme,
 		spritesId,
 		spritesUrl,
-		isDev,
 	});
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();

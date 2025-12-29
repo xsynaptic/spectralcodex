@@ -12,10 +12,6 @@ npx 0x -- node ./node_modules/astro/astro.js build
 
 Astro in hybrid mode still requires a build step to generate the `client` folder. After this, `pnpm install` still needs to run on whatever machine is actually going to be hosting Astro SSR. This means that you _need_ to run `pnpm install` on remote, and it remains unknown whether this will cause any trouble for a project that is built locally and then synced with the server, where production dependencies are then installed.
 
-## Map Icons
-
-Experimental: This site uses custom map icons. To regenerate icons run `pnpm map-spritesheet`. This requires [spreet](https://github.com/flother/spreet) to be installed separately (and globally).
-
 # Things To Do
 
 - new content collection for commercial establishments (restaurants, cafes, etc.)... gastronomy?

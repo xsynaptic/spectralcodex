@@ -60,12 +60,6 @@ export default defineConfig({
 				access: 'public',
 				default: 'packages/content-demo/media',
 			}),
-			MAP_ICONS_PATH: envField.string({
-				context: 'client',
-				access: 'public',
-				optional: true,
-				default: 'icons/map-icons',
-			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				context: 'client',
 				access: 'public',

@@ -15,15 +15,11 @@
 		"image-server-manifest": "tsx ./src/image-server/manifest.ts",
 		"image-server-warm": "tsx ./src/image-server/warm.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
-		"map-spritesheet": "tsx ./src/map-spritesheet/index.ts",
 		"opengraph-image": "tsx ./src/opengraph-image/index.ts"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^7.0.0-alpha.0",
 		"@duckdb/node-api": "1.4.3-r.1",
-		"@iconify/json": "^2.2.421",
-		"@iconify/tools": "^5.0.1",
-		"@iconify/utils": "^3.1.0",
 		"@turf/helpers": "^7.3.1",
 		"@turf/turf": "^7.3.1",
 		"@types/d3-geo": "^3.1.0",
