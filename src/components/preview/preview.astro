@@ -1,8 +1,10 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import type { ImageComponentProps } from '#components/image/image-component.astro';
+
+import Image from '#components/image/image-component.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import Image from '#components/image/image-unpic.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
@@ -27,21 +29,18 @@ async function getImageProps() {
 	if (!imageId || !imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
 
-	const breakpoints = getImageSrcsetWidths({
-		maxWidth: imageEntry.data.width,
-		widths: [450, 600, 900, 1200],
-	});
-
 	return {
 		imageProps: {
 			src: imageId,
-			aspectRatio: 3 / 2,
+			breakpoints: getImageSrcsetWidths({
+				maxWidth: imageEntry.data.width,
+				widths: [450, 600, 900, 1200],
+			}),
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 450px`,
-			loading: 'lazy' as const,
+			aspectRatio: 3 / 2,
+			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
-			layout: 'constrained' as const,
-			breakpoints,
-		},
+		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholder,
 	};
 }

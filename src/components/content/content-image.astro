@@ -1,0 +1,139 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageLayout } from '#lib/image/image-layout.ts';
+
+import Image from '#components/image/image-component.astro';
+import ImageMetadata from '#components/image/image-metadata.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import { FEATURE_IMAGE_METADATA } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import {
+	getImageLayoutProps,
+	getImageSrcsetWidths,
+	ImageLayoutEnum,
+} from '#lib/image/image-layout.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
+import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
+
+interface Props extends HTMLAttributes<'figure'> {
+	imageId: string;
+	alt?: string;
+	layout?: ImageLayout;
+	showMetadata?: boolean;
+}
+
+const {
+	imageId,
+	alt: altProp,
+	layout = ImageLayoutEnum.Default,
+	showMetadata = false,
+	...props
+} = Astro.props;
+
+// This controls how the component is rendered; feeds require a less complex output
+const { isFeed } = Astro.locals;
+
+const slotContents = await renderSlot(Astro.slots, 'default');
+
+async function getImageProps() {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(imageId);
+
+	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+
+	const layoutProps = getImageLayoutProps({
+		width: imageEntry.data.width,
+		height: imageEntry.data.height,
+		layout,
+	});
+	const feedWidth = imageEntry.data.height > imageEntry.data.width ? 900 : 1200;
+	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
+	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
+
+	return {
+		imageEntry,
+		imageProps: {
+			src: imageId,
+			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
+			sizes: layoutProps.sizes,
+			aspectRatio,
+			layout:
+				layout === ImageLayoutEnum.Full || layout === ImageLayoutEnum.Wide
+					? ('fullWidth' as const)
+					: ('constrained' as const),
+			...(isFeed
+				? {
+						width: primaryWidth,
+						height: Math.round(primaryWidth / aspectRatio),
+						unstyled: true,
+					}
+				: {}),
+			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
+		} satisfies ImageComponentProps,
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageEntry, imageProps, placeholder } = await getImageProps();
+
+const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
+---
+
+{
+	imageProps ? (
+		isFeed ? (
+			<figure {...props}>
+				<Image {...imageProps} />
+				{caption ? (
+					<figcaption>
+						<Fragment set:html={caption} />
+					</figcaption>
+				) : undefined}
+			</figure>
+		) : (
+			<figure
+				class:list={[
+					'@container', // Used by image metadata
+					'content-image', // Custom CSS styles defined in src/styles/content.css
+					'not-prose',
+					layout === ImageLayoutEnum.Default
+						? 'max-w-content sm:px-small md:px-medium mx-auto mb-2 md:mb-4'
+						: undefined,
+					layout === ImageLayoutEnum.Wide ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
+					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
+				]}
+				{...props}
+			>
+				<ImagePlaceholder
+					class:list={[
+						'relative',
+						layout === ImageLayoutEnum.Full ? undefined : 'overflow-hidden sm:rounded-xs',
+					]}
+					placeholder={placeholder}
+				>
+					<Image class="m-0 text-sm text-transparent" {...imageProps} />
+					{FEATURE_IMAGE_METADATA && showMetadata ? (
+						<ImageMetadata entry={imageEntry} />
+					) : undefined}
+				</ImagePlaceholder>
+				{caption ? (
+					<figcaption
+						class:list={[
+							'content-image-caption',
+							'px-small py-1 text-sm leading-relaxed italic',
+							'text-primary-500 dark:text-primary-400',
+							layout === ImageLayoutEnum.Full
+								? 'max-w-content px-small md:px-medium mx-auto'
+								: 'sm:px-0',
+						]}
+					>
+						<Fragment set:html={caption} />
+					</figcaption>
+				) : undefined}
+			</figure>
+		)
+	) : undefined
+}

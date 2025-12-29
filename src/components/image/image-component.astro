@@ -1,136 +1,39 @@
 ---
+import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
 import type { HTMLAttributes } from 'astro/types';
+import type { IPXOperations, IPXOptions } from 'unpic/providers/ipx';
 
-import type { ImageLayout } from '#lib/image/image-layout.ts';
+import { Image } from '@unpic/astro/base';
+import { IPX_SERVER_SECRET } from 'astro:env/server';
+import { transform as ipxTransform } from 'unpic/providers/ipx';
 
-import ImageMetadata from '#components/image/image-metadata.astro';
-import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import Image from '#components/image/image-unpic.astro';
-import { FEATURE_IMAGE_METADATA } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import {
-	getImageLayoutProps,
-	getImageSrcsetWidths,
-	ImageLayoutEnum,
-} from '#lib/image/image-layout.ts';
-import { renderSlot } from '#lib/utils/astro.ts';
-import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { generateSignedUrl } from '#lib/image/image-server-utils.ts';
+import { ipxBaseUrl } from '#lib/image/image-server.ts';
 
-interface Props extends HTMLAttributes<'figure'> {
-	imageId: string;
-	alt?: string;
-	layout?: ImageLayout;
-	showMetadata?: boolean;
-}
+// Signed transformer that wraps IPX with URL signing and default operations
+const signedIpxTransformer = (
+	src: string | URL,
+	operations: IPXOperations,
+	options?: IPXOptions
+) => {
+	return generateSignedUrl(
+		ipxTransform(
+			src,
+			{ ...operations, q: IMAGE_QUALITY, f: IMAGE_FORMAT },
+			{ ...options, baseURL: ipxBaseUrl }
+		),
+		IPX_SERVER_SECRET
+	);
+};
 
-const {
-	imageId,
-	alt: altProp,
-	layout = ImageLayoutEnum.Default,
-	showMetadata = false,
-	...props
-} = Astro.props;
+// Props interface: same as unpic base but without transformer
+type Props = HTMLAttributes<'img'> &
+	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'>;
 
-// This controls how the component is rendered; feeds require a less complex output
-const { isFeed } = Astro.locals;
+export type ImageComponentProps = Props;
 
-const slotContents = await renderSlot(Astro.slots, 'default');
-
-async function getImageProps() {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = getImageById(imageId);
-
-	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
-
-	const layoutProps = getImageLayoutProps({
-		width: imageEntry.data.width,
-		height: imageEntry.data.height,
-		layout,
-	});
-	const feedWidth = imageEntry.data.height > imageEntry.data.width ? 900 : 1200;
-	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
-	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
-
-	const breakpoints = getImageSrcsetWidths({ maxWidth: imageEntry.data.width });
-
-	return {
-		imageEntry,
-		imageProps: {
-			src: imageId,
-			width: primaryWidth,
-			height: Math.round(primaryWidth / aspectRatio),
-			sizes: layoutProps.sizes,
-			loading: 'lazy' as const,
-			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-			layout:
-				layout === ImageLayoutEnum.Full || layout === ImageLayoutEnum.Wide
-					? ('fullWidth' as const)
-					: ('constrained' as const),
-			breakpoints,
-			unstyled: true,
-		},
-		placeholder: imageEntry.data.placeholder,
-	};
-}
-
-const { imageEntry, imageProps, placeholder } = await getImageProps();
-
-const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
+const props = Astro.props;
 ---
 
-{
-	imageProps ? (
-		isFeed ? (
-			<figure {...props}>
-				<Image {...imageProps} />
-				{caption ? (
-					<figcaption>
-						<Fragment set:html={caption} />
-					</figcaption>
-				) : undefined}
-			</figure>
-		) : (
-			<figure
-				class:list={[
-					'@container', // Used by image metadata
-					'content-image', // Custom CSS styles defined in src/styles/content.css
-					'not-prose',
-					layout === ImageLayoutEnum.Default
-						? 'max-w-content sm:px-small md:px-medium mx-auto mb-2 md:mb-4'
-						: undefined,
-					layout === ImageLayoutEnum.Wide ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
-					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
-				]}
-				{...props}
-			>
-				<ImagePlaceholder
-					class:list={[
-						'relative',
-						layout === ImageLayoutEnum.Full ? undefined : 'overflow-hidden sm:rounded-xs',
-					]}
-					placeholder={placeholder}
-				>
-					<Image class="m-0 text-sm text-transparent" {...imageProps} />
-					{FEATURE_IMAGE_METADATA && showMetadata ? (
-						<ImageMetadata entry={imageEntry} />
-					) : undefined}
-				</ImagePlaceholder>
-				{caption ? (
-					<figcaption
-						class:list={[
-							'content-image-caption',
-							'px-small py-1 text-sm leading-relaxed italic',
-							'text-primary-500 dark:text-primary-400',
-							layout === ImageLayoutEnum.Full
-								? 'max-w-content px-small md:px-medium mx-auto'
-								: 'sm:px-0',
-						]}
-					>
-						<Fragment set:html={caption} />
-					</figcaption>
-				) : undefined}
-			</figure>
-		)
-	) : undefined
-}
+<Image {...props} transformer={signedIpxTransformer} />

@@ -8,6 +8,7 @@ import ContentCollectionLink from '#components/content/content-collection-link.a
 import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentImage from '#components/content/content-image.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
@@ -18,7 +19,6 @@ import ContentSectionSeries from '#components/content/content-section-series.ast
 import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
-import ImageComponent from '#components/image/image-component.astro';
 import LocationsAddress from '#components/locations/locations-address.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
@@ -117,7 +117,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		</ImageHero>
 		{
 			!hasContent && imageFeaturedId ? (
-				<ImageComponent imageId={imageFeaturedId} alt={title} showMetadata={true} />
+				<ContentImage imageId={imageFeaturedId} alt={title} showMetadata={true} />
 			) : undefined
 		}
 		<ContentDescription entry={entry} />

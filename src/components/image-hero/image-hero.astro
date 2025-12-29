@@ -1,7 +1,9 @@
 ---
+import type { ImageComponentProps } from '#components/image/image-component.astro';
+
 import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
+import Image from '#components/image/image-component.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import Image from '#components/image/image-unpic.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import {
 	getImageLayoutProps,
@@ -33,21 +35,15 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 		layout: ImageLayoutEnum.Full,
 	});
 
-	const breakpoints = getImageSrcsetWidths({ maxWidth: imageEntry.data.width });
-
 	return {
 		imageProps: {
 			src: imageId,
-			alt: sanitizeAltAttribute(alt),
-			width: imageEntry.data.width,
-			height: imageEntry.data.height,
+			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: layoutProps.sizes,
-			loading: 'eager' as const,
-			decoding: 'sync' as const,
-			fetchpriority: 'high' as const,
+			priority: true,
 			unstyled: true,
-			breakpoints,
-		},
+			alt: sanitizeAltAttribute(alt),
+		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholderHq,
 	};
 }

@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
-import ImageComponent from '#components/image/image-component.astro';
+import ContentImage from '#components/content/content-image.astro';
 
 interface Props extends HTMLAttributes<'figure'> {
 	src: string;
@@ -16,8 +16,8 @@ const { src: imageId, ...props } = Astro.props;
 
 {
 	imageId ? (
-		<ImageComponent imageId={imageId} showMetadata={true} {...props}>
+		<ContentImage imageId={imageId} showMetadata={true} {...props}>
 			<slot />
-		</ImageComponent>
+		</ContentImage>
 	) : undefined
 }
