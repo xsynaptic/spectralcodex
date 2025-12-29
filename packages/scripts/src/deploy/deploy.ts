@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 import { generateManifest } from '../image-server/manifest.js';
+import { deployApp } from './deploy-app.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
 
@@ -87,21 +88,7 @@ async function media() {
 }
 
 async function transfer() {
-	console.log(chalk.blue('Transferring static files...'));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
-
-	const rsyncArgs = [
-		'-avz',
-		'--progress',
-		'-e',
-		`ssh -i ${config.sshKeyPath}`,
-		...(skipBuild ? [] : ['--delete-after']),
-		...(dryRun ? ['--dry-run'] : []),
-		`${distPath}/`,
-		`${config.remoteHost}:${config.sitePath}/`,
-	];
-
-	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
+	await deployApp({ rootPath, dryRun, skipDelete: skipBuild });
 }
 
 try {

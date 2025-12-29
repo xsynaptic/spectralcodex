@@ -35,6 +35,10 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
 rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   "$DEPLOY_DIR/certs/" "$REMOTE_HOST:/opt/server/certs/"
 
+# Reload Caddy to pick up config changes
+echo "Reloading Caddy..."
+ssh $SSH_OPTS "$REMOTE_HOST" "docker exec caddy caddy reload --config /etc/caddy/Caddyfile" || echo "Warning: Caddy reload failed (container may not be running)"
+
 # Sync image server to project-specific location
 echo "Syncing image server..."
 rsync -avz --delete ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \

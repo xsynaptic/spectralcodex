@@ -17,15 +17,11 @@ const {
 	CACHE_DIR = './node_modules/.astro',
 	DEV_SERVER_URL = 'http://localhost:4321/',
 	PROD_SERVER_URL,
-	BASE_PATH_PROD,
 	BUILD_ASSETS_PATH,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
-
-// TODO: base path handling is an overcomplicated mess
-const BASE_PATH = isProduction ? BASE_PATH_PROD : '';
 
 const currentDate = new Date();
 
@@ -33,11 +29,7 @@ const currentDate = new Date();
  * @link https://astro.build/config
  */
 export default defineConfig({
-	site:
-		isProduction && PROD_SERVER_URL
-			? `${PROD_SERVER_URL}${BASE_PATH ?? ''}`
-			: `${DEV_SERVER_URL}${BASE_PATH ?? ''}`,
-	...(BASE_PATH ? { base: `/${BASE_PATH}` } : {}),
+	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
