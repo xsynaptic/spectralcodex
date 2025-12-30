@@ -9,7 +9,7 @@ import {
 	stripFootnotes,
 	stripTags,
 	transformMarkdown,
-} from '@spectralcodex/unified-tools';
+} from '@xsynaptic/unified-tools';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 

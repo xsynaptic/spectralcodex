@@ -7,7 +7,7 @@ import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 
 export const regions = defineCollection({
@@ -15,7 +15,7 @@ export const regions = defineCollection({
 	schema: z
 		.object({
 			slug: z.string(),
-			title: StylizedStringSchema,
+			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
 			parent: z.string().optional(),

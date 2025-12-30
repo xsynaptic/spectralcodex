@@ -14,7 +14,7 @@ import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
-	StylizedStringSchema,
+	StylizedTextSchema,
 } from '#lib/schemas/index.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
@@ -25,7 +25,7 @@ export const locations = defineCollection({
 	schema: z
 		.object({
 			slug: z.string(),
-			title: StylizedStringSchema,
+			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
 			layer: z.enum(LocationLayerEnum).default(LocationLayerEnum.Neutral),
@@ -54,7 +54,7 @@ export const locations = defineCollection({
 			override: z
 				.object({
 					slug: z.string().optional(),
-					title: StylizedStringSchema.optional(),
+					title: StylizedTextSchema.optional(),
 					...titleMultilingualSchema,
 					regions: reference('regions').array().optional(),
 				})

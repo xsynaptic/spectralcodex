@@ -1,6 +1,6 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { stripTags, transformMarkdown } from '@spectralcodex/unified-tools';
+import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import * as R from 'remeda';
 

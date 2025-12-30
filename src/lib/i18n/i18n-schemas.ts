@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { LanguageCode } from '#lib/types/index.ts';
 
-import { StylizedStringSchema } from '#lib/schemas/index.ts';
+import { StylizedTextSchema } from '#lib/schemas/index.ts';
 import { LanguageCodeEnum } from '#lib/types/index.ts';
 
 /**
@@ -39,7 +39,7 @@ function createMultilingualSchemas<T extends string>(
 /**
  * Multilingual content schemas for this project
  */
-export const titleMultilingualSchema = createMultilingualSchemas('title', StylizedStringSchema);
+export const titleMultilingualSchema = createMultilingualSchemas('title', StylizedTextSchema);
 
 export const nameMultilingualSchema = createMultilingualSchemas('name');
 

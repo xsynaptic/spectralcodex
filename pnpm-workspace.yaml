@@ -12,6 +12,9 @@ minimumReleaseAgeExclude:
   - '@astrojs/react'
   - '@astrojs/rss'
   - '@astrojs/sitemap'
+  - '@xsynaptic/eslint-config'
+  - '@xsynaptic/unified-tools'
+  - 'rehype-wrap-cjk'
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'

@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.1.0",
+	"version": "6.2.0",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -55,7 +55,6 @@
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
-		"@spectralcodex/unified-tools": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/eslint-plugin-query": "^5.91.2",
@@ -66,8 +65,9 @@
 		"@types/react-dom": "^19.2.3",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
-		"@xsynaptic/eslint-config": "^3.0.10",
+		"@xsynaptic/eslint-config": "^3.1.0",
 		"@xsynaptic/image-server": "workspace:*",
+		"@xsynaptic/unified-tools": "2.0.0",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.4.5",
 		"astro-pagefind": "^1.8.5",

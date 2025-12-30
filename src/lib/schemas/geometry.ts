@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
-import { DescriptionSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
+import { DescriptionSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 
 function validateCoordinates(coordinates: [number, number]) {
@@ -47,7 +47,7 @@ export const PositionSchema = z.tuple([z.number(), z.number()]).transform((value
 
 export const GeometryPointsSchema = z.object({
 	coordinates: PositionSchema,
-	title: StylizedStringSchema.optional(),
+	title: StylizedTextSchema.optional(),
 	...titleMultilingualSchema,
 	description: DescriptionSchema.optional(),
 	category: z.enum(LocationCategoryEnum).optional(),

@@ -1,4 +1,4 @@
-import { stripTags } from '@spectralcodex/unified-tools';
+import { stripTags } from '@xsynaptic/unified-tools';
 
 export function textClipper(
 	input: string,

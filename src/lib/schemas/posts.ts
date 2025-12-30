@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedStringSchema } from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/links.ts';
 import { SourceSchema } from '#lib/schemas/sources.ts';
 
@@ -11,7 +11,7 @@ import { SourceSchema } from '#lib/schemas/sources.ts';
 export const postSchema = z
 	.object({
 		slug: z.string(),
-		title: StylizedStringSchema,
+		title: StylizedTextSchema,
 		...titleMultilingualSchema,
 		description: z.string().optional(),
 		locations: reference('locations').array().optional(),

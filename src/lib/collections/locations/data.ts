@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { transformMarkdown } from '@spectralcodex/unified-tools';
+import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import pMemoize from 'p-memoize';
 

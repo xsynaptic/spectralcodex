@@ -1,8 +1,8 @@
-import { stylizeText } from '@spectralcodex/unified-tools';
+import { stylizeText } from '@xsynaptic/unified-tools';
 import { z } from 'zod';
 
-// Title schema; apply SmartyPants to arbitrary strings
-export const StylizedStringSchema = z.string().transform((value) => stylizeText(value).trim());
+// Stylized text schema; apply SmartyPants to arbitrary strings
+export const StylizedTextSchema = z.string().transform((value) => stylizeText(value).trim());
 
 // Descriptions should meet basic SEO requirements
 const DESCRIPTION_CHARACTER_LENGTH = 30;

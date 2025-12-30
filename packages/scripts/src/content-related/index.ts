@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
-import { sanitizeMdx } from '@spectralcodex/unified-tools';
 import { pipeline } from '@xenova/transformers';
+import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
