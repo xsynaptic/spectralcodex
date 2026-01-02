@@ -8,9 +8,9 @@
 	"devDependencies": {
 		"@protomaps/basemaps": "^5.7.0",
 		"@spectralcodex/map-types": "workspace:*",
-		"@tanstack/query-sync-storage-persister": "^5.90.16",
-		"@tanstack/react-query": "^5.90.14",
-		"@tanstack/react-query-persist-client": "^5.90.16",
+		"@tanstack/query-sync-storage-persister": "^5.90.18",
+		"@tanstack/react-query": "^5.90.16",
+		"@tanstack/react-query-persist-client": "^5.90.18",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
@@ -24,8 +24,8 @@
 		"react": "^19.2.3",
 		"react-dom": "^19.2.3",
 		"react-map-gl": "^8.1.0",
-		"remeda": "^2.32.0",
-		"zod": "^4.2.1",
+		"remeda": "^2.33.0",
+		"zod": "4.2.1",
 		"zustand": "^5.0.9"
 	}
 }
