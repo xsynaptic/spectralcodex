@@ -16,7 +16,7 @@ spectralcodex.com {
 
 	@no_trailing_slash {
 		path_regexp notrail ^(.+[^/])$
-		not path_regexp \.[a-zA-Z0-9]+$
+		not path_regexp \.[a-zA-Z0-9_-]+$
 	}
 	redir @no_trailing_slash {re.notrail.1}/ 301
 
