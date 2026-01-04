@@ -2,6 +2,7 @@
 import type { SEOProps } from 'astro-seo';
 
 import { SEO } from 'astro-seo';
+import { WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import {
 	OPEN_GRAPH_IMAGE_DENSITY,
@@ -151,3 +152,8 @@ const openGraphImage = await generateOpenGraphImageUrl({
 	href={`${getSiteUrl()}rss.xml`}
 />
 <link rel="sitemap" href={`${getSiteUrl()}sitemap-index.xml`} />
+{
+	WEBMENTION_DOMAIN ? (
+		<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
+	) : undefined
+}

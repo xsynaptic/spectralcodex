@@ -106,6 +106,7 @@
 		"upslope",
 		"urbex",
 		"viewbox",
+		"webmention",
 		"xsynaptic",
 		"zustand"
 	],
@@ -134,6 +135,7 @@
 		"*.conf.template": "nginx",
 		"*.caddy": "caddyfile"
 	},
+	"npm.packageManager": "pnpm",
 	"typescript.preferences.importModuleSpecifier": "non-relative", // Suggest import mapped paths over others
 	"workbench.editor.labelFormat": "short",
 	"[astro]": {
@@ -143,14 +145,6 @@
 	"[md]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint"
 	},
-	"[mdx]": {
-		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
-		"files.autoSave": "afterDelay",
-		"files.autoSaveDelay": 3000, // Prevent some weird issues with Astro 5's new Content Layer API
-		"typescript.suggest.enabled": false // Too noisy when we're mostly working with plain text
-	},
-	"mdx.validate.validateReferences": "ignore",
-	"npm.packageManager": "pnpm",
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},

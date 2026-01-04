@@ -77,6 +77,16 @@ export default defineConfig({
 				access: 'secret',
 				default: 'dev-secret-do-not-use-in-production',
 			}),
+			WEBMENTION_API_KEY: envField.string({
+				context: 'server',
+				access: 'secret',
+				optional: true,
+			}),
+			WEBMENTION_DOMAIN: envField.string({
+				context: 'client',
+				access: 'public',
+				optional: true,
+			}),
 		},
 	},
 	vite: {
