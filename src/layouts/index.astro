@@ -6,11 +6,11 @@ import type { ContentMetadataItem } from '#lib/types/index.ts';
 import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
+import IndexDescription from '#components/parts/index-description.astro';
 import Link from '#components/parts/link.astro';
 import PreviewGrid from '#components/preview/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
-import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -34,8 +34,6 @@ const featuredOgImageId = imageFeaturedGroup?.at(0)?.id;
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
-const contentStats = await getContentStats();
-
 const t = getTranslations();
 ---
 
@@ -57,15 +55,8 @@ const t = getTranslations();
 			/>
 		) : undefined
 	}
-	<ContentSection class="mt-small">
-		<Fragment
-			slot="section-description"
-			set:html={transformMarkdown({
-				input: `Welcome to the latest incarnation of **Spectral Codex**, a travel journal, photography portfolio, geospatial database, and personal blog. This site is completely ad-free; you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex). Read a little more about my background and motivations [here](/about), or start browsing the collection! Currently there are ${contentStats.locations.itemCount} [locations](/locations) (${contentStats.locations.withImages} with images), ${contentStats.posts.itemCount} [posts](/posts), ${contentStats.regions} [regions](/regions), ${contentStats.themes} [themes](/themes), ${contentStats.images.itemCount} images, and ${contentStats.links.itemCount} outbound links in the database, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the higher ranking and more recent links from around the site to get you started...`,
-			})}
-		/>
-	</ContentSection>
-	<ContentSection>
+	<IndexDescription />
+	<ContentSection class="clear-both">
 		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
 		<PreviewGrid
 			items={recentMetadataItems}

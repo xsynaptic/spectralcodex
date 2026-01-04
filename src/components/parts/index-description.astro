@@ -1,0 +1,88 @@
+---
+import { transformMarkdown } from '@xsynaptic/unified-tools';
+
+import type { ImageComponentProps } from '#components/image/image-component.astro';
+
+import ContentSection from '#components/content/content-section.astro';
+import Image from '#components/image/image-component.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import CardFrame from '#components/parts/card-frame.astro';
+import Link from '#components/parts/link.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getContentStats } from '#lib/metadata/metadata-stats.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+
+const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+
+const contentStats = await getContentStats();
+
+async function getImageProps() {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(IMAGE_SRC);
+
+	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+
+	return {
+		imageEntry,
+		imageProps: {
+			src: IMAGE_SRC,
+			breakpoints: getImageSrcsetWidths({ maxWidth: 1200 }),
+			sizes: '(max-width: 640px) 200px, 300px',
+			aspectRatio: 1,
+			priority: true,
+			unstyled: true,
+			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
+		} satisfies ImageComponentProps,
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageProps, placeholder } = await getImageProps();
+---
+
+<ContentSection class="mt-small">
+	<CardFrame
+		class:list={[
+			'h-card',
+			'mb-small max-w-[300px] min-w-[200px] xs:float-end xs:mt-1 xs:mb-1 xs:ml-4 lg:mt-2 lg:mb-2',
+		]}
+	>
+		{
+			imageProps ? (
+				<ImagePlaceholder
+					class:list={['relative', 'overflow-hidden rounded-xs grayscale']}
+					placeholder={placeholder}
+				>
+					<Image class:list={['u-photo', 'w-full']} {...imageProps} />
+				</ImagePlaceholder>
+			) : undefined
+		}
+		<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
+			<Link class:list={['u-url', 'text-sm font-semibold']} href={getSiteUrl('/about')} rel="me"
+				><span class="p-name">Alexander Synaptic</span></Link
+			>
+			<div class="text-xs">
+				<span class="p-role">Curator</span>, <Link
+					class:list={['p-org h-card', 'italic']}
+					href={getSiteUrl()}>Spectral Codex</Link
+				>
+			</div>
+		</div>
+	</CardFrame>
+	<ProseDescription>
+		<p
+			set:html={transformMarkdown({
+				input: `Welcome to the latest incarnation of **Spectral Codex**, a travel journal, photography portfolio, geospatial database, and personal blog curated by Alexander Synaptic. This site is completely ad-free and features no sponsored content, though you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex) if you like what you find here. Read a little more about my background and motivations [here](/about), or start browsing the collection!`,
+			})}
+		/>
+		<p
+			set:html={transformMarkdown({
+				input: `Currently there are ${contentStats.locations.itemCount} [locations](/locations) (${contentStats.locations.withImages} with images), ${contentStats.posts.itemCount} [posts](/posts), ${contentStats.regions} [regions](/regions), ${contentStats.themes} [themes](/themes), ${contentStats.images.itemCount} images, and ${contentStats.links.itemCount} outbound links in the database, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the higher ranking and more recent links from around the site to get you started...`,
+			})}
+		/>
+	</ProseDescription>
+</ContentSection>
