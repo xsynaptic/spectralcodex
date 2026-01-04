@@ -3,6 +3,7 @@
 
 /* Spacing */
 @theme {
+	--breakpoint-xs: 420px;
 	--spacing-small: 1rem;
 	--spacing-medium: 2rem;
 	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */

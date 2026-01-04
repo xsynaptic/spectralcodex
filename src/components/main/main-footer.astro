@@ -16,10 +16,10 @@ const dateBuild = new Date();
 const t = getTranslations();
 ---
 
-<Container as="footer" class="mb-medium mt-medium w-full pt-4">
+<Container as="footer" class="mt-medium mb-medium w-full pt-4">
 	<div
 		class:list={[
-			'pb-medium pt-small border-t',
+			'border-t pt-small pb-medium',
 			'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
 		]}
 	>
@@ -57,19 +57,25 @@ const t = getTranslations();
 					href={`${getSiteUrl()}rss.xml`}
 					linkColor="accent"
 					class="group flex flex-nowrap items-center gap-1"
+					rel="feed"
 					><span>{t('site.footer.feed.label')}</span>
-					<div class="colophon-rss-icon relative bg-white">
+					<div class:list={['colophon-rss-icon relative', 'bg-white']}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="1em"
 							height="1em"
 							viewBox="0 0 24 24"
-							class="absolute text-orange-400 transition-colors duration-300 group-hover:text-orange-300 hover:text-orange-300"
+							class:list={[
+								'absolute transition-colors duration-300',
+								'text-orange-400 group-hover:text-orange-300 hover:text-orange-300',
+							]}
 							aria-labelledby="colophon-rss-icon"
 							><path
 								fill="currentColor"
 								d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2.5 12A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 18A1.5 1.5 0 0 0 9 16.5A1.5 1.5 0 0 0 7.5 15M6 10v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8m0-4v2a10 10 0 0 1 10 10h2A12 12 0 0 0 6 6"
-							></path><title id="colophon-rss-icon">{t('site.footer.feed.label')}</title></svg
+							></path><title id="colophon-rss-icon">
+								{t('site.footer.feed.label')}
+							</title></svg
 						>
 					</div>
 				</Link>

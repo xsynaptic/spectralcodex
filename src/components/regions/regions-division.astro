@@ -5,13 +5,13 @@ import Container from '#components/parts/container.astro';
 import { getRegionsDivisionSvgContent } from '#lib/utils/regions-division.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	id: string;
+	entryId: string;
 }
 
-const { id, class: className, ...props } = Astro.props;
+const { entryId, class: className, ...props } = Astro.props;
 
 // Construct path to the SVG file
-const svgContent = await getRegionsDivisionSvgContent(id);
+const svgContent = await getRegionsDivisionSvgContent(entryId);
 
 // Note: `--division-stroke-color` and `--division-stroke-width` are available for styling
 ---
