@@ -22,4 +22,5 @@ export default {
 			},
 		},
 	],
+	tailwindStylesheet: './src/styles/global.css',
 };
