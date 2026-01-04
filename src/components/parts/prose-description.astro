@@ -2,7 +2,6 @@
 import type { HTMLAttributes } from 'astro/types';
 
 interface Props extends HTMLAttributes<'div'> {
-	class?: string | undefined;
 	showCompact?: boolean | undefined;
 	showDarkMode?: boolean | undefined;
 }
@@ -12,7 +11,7 @@ const { class: className, showCompact, showDarkMode = true, ...props } = Astro.p
 
 <div
 	class:list={[
-		'prose prose-primary max-w-none font-serif',
+		'prose-primary prose max-w-none font-serif',
 		showDarkMode ? 'dark:prose-invert' : undefined,
 		'prose-a:underline-offset-2 prose-a:transition-colors prose-a:duration-150 prose-a:ease-in',
 		'prose-a:text-accent-500 prose-a:decoration-accent-200 prose-a:hover:text-accent-300 prose-a:hover:decoration-accent-100',

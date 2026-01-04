@@ -5,19 +5,19 @@ import LocationsTableComponent from '#components/locations/locations-table.astro
 import { getTheaterLocations } from '#lib/collections/locations/utils-theaters.ts';
 
 interface Props {
-	id?: string;
+	tableId?: string;
 }
 
-const { id } = Astro.props;
+const { tableId } = Astro.props;
 
 const theaterLocations = await getTheaterLocations();
 
-const isIdValid = (id: unknown): id is keyof typeof theaterLocations =>
-	!!id && typeof id === 'string' && R.isIncludedIn(id, R.keys(theaterLocations));
+const isIdValid = (tableId: unknown): tableId is keyof typeof theaterLocations =>
+	!!tableId && typeof tableId === 'string' && R.isIncludedIn(tableId, R.keys(theaterLocations));
 
-if (!isIdValid(id)) {
-	throw new Error(`[Locations Table] Invalid location query id: ${String(id)}`);
+if (!isIdValid(tableId)) {
+	throw new Error(`[Locations Table] Invalid location query id: ${String(tableId)}`);
 }
 ---
 
-<LocationsTableComponent locations={theaterLocations[id]} />
+<LocationsTableComponent locations={theaterLocations[tableId]} />

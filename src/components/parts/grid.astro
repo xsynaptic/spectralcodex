@@ -3,9 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { renderSlot } from '#lib/utils/astro.ts';
 
-interface Props extends HTMLAttributes<'div'> {
-	class?: string | undefined;
-}
+type Props = HTMLAttributes<'div'>;
 
 const { class: className, ...props } = Astro.props;
 

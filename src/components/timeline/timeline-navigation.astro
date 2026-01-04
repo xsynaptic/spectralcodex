@@ -6,7 +6,6 @@ import Link from '#components/parts/link.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	class?: string | undefined;
 	currentYear?: string | undefined;
 	currentMonth?: string | undefined;
 	timelineYears: Array<string>;
@@ -29,7 +28,7 @@ const {
 	timelineYears.length > 0 ? (
 		<div
 			class:list={[
-				'text-primary-500 dark:text-primary-400 flex flex-col gap-1 overflow-hidden text-sm',
+				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
 				hasHeroImage ? 'mb-medium sm:mb-0' : '',
 				className,
 			]}
@@ -46,7 +45,7 @@ const {
 						{!currentMonth && currentYear === timelineYear ? (
 							<span
 								class:list={[
-									'text-primary-600 dark:text-primary-400 font-semibold',
+									'font-semibold text-primary-600 dark:text-primary-400',
 									hasHeroImage ? 'sm:text-accent-200' : '',
 								]}
 							>
@@ -83,7 +82,7 @@ const {
 									{currentMonth === monthNumber ? (
 										<span
 											class:list={[
-												'text-highlight-600 font-semibold',
+												'font-semibold text-highlight-600',
 												hasHeroImage ? 'sm:text-highlight-200' : '',
 											]}
 										>

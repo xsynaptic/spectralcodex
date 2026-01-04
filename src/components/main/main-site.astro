@@ -47,7 +47,7 @@ const { hasHeroImage = false, meta } = Astro.props;
 		<ModeManager defaultMode="auto" />
 		<ClientRouter />
 		<UmamiAnalytics
-			id={UMAMI_ID}
+			siteId={UMAMI_ID}
 			domain={UMAMI_DOMAIN}
 			isProduction={import.meta.env.PROD}
 			isViewTransitionsEnabled={true}
@@ -67,14 +67,14 @@ const { hasHeroImage = false, meta } = Astro.props;
 		<ProgressBarLoading
 			class:list={[
 				'z-99 rounded-br-md shadow-lg shadow-current',
-				'from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800 bg-linear-to-r',
+				'bg-linear-to-r from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800',
 			]}
 			height="2.5px"
 		/>
 		<ProgressBarReading
 			class:list={[
 				'z-98 rounded-br-md shadow-lg shadow-current',
-				'from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800 bg-linear-to-r',
+				'bg-linear-to-r from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800',
 			]}
 			height="2.5px"
 		/>

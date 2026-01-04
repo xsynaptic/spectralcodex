@@ -3,7 +3,6 @@ import type { HTMLAttributes } from 'astro/types';
 
 interface Props extends HTMLAttributes<'div'> {
 	withTitle?: boolean | undefined;
-	class?: string | undefined;
 }
 
 const { withTitle = true, class: className, ...props } = Astro.props;

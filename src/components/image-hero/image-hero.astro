@@ -5,11 +5,7 @@ import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
 import Image from '#components/image/image-component.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import {
-	getImageLayoutProps,
-	getImageSrcsetWidths,
-	ImageLayoutEnum,
-} from '#lib/image/image-layout.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
@@ -29,17 +25,11 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 	if (!hasHeroImage || !imageId || !imageEntry)
 		return { imageProps: undefined, placeholder: undefined };
 
-	const layoutProps = getImageLayoutProps({
-		width: imageEntry.data.width,
-		height: imageEntry.data.height,
-		layout: ImageLayoutEnum.Full,
-	});
-
 	return {
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
-			sizes: layoutProps.sizes,
+			sizes: '100vw',
 			priority: true,
 			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
