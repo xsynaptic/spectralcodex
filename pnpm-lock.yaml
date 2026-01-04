@@ -133,8 +133,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^34.2.0
-        version: 34.2.0
+        specifier: ^34.3.0
+        version: 34.3.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -172,8 +172,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5
       remeda:
-        specifier: ^2.33.0
-        version: 2.33.0
+        specifier: ^2.33.1
+        version: 2.33.1
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -416,8 +416,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0(maplibre-gl@5.15.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       remeda:
-        specifier: ^2.33.0
-        version: 2.33.0
+        specifier: ^2.33.1
+        version: 2.33.1
       zod:
         specifier: 4.2.1
         version: 4.2.1
@@ -491,8 +491,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       remeda:
-        specifier: ^2.33.0
-        version: 2.33.0
+        specifier: ^2.33.1
+        version: 2.33.1
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -3587,8 +3587,8 @@ packages:
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@34.2.0:
-    resolution: {integrity: sha512-s12oPPIQgjnIpbRlk6tLKo5/D56I/pZB9yelSHGmKiHvZLrLMAUrXI2Ns7d6qmDka2FXTTXeh1rWdSeh/Tk+MA==}
+  exiftool-vendored@34.3.0:
+    resolution: {integrity: sha512-CpNH1FAhIQG5AlKndlTf05mNbuFxINyzG9629ZI/CKwr+39zWo8swxpnXc3GUfUvUfxkCCxumDPy2QVmi3XJkQ==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -5483,8 +5483,8 @@ packages:
   remark@15.0.1:
     resolution: {integrity: sha512-Eht5w30ruCXgFmxVUSlNWQ9iiimq07URKeFS3hNc8cUWy1llX4KDWfyEDZRycMc+znsN9Ux5/tJ/BFdgdOwA3A==}
 
-  remeda@2.33.0:
-    resolution: {integrity: sha512-10g+LXHpn3qG/sa7Yi3/eJUk6iFoPnfB1/l5Avj4BaGTIcQT7qQd4UblsoqqJvBsiMD5GIWv5TfNKh/x4Yj5hQ==}
+  remeda@2.33.1:
+    resolution: {integrity: sha512-404Eba/HI/blNfbebo586OjEnAhq/x5jN1aIfK4gHnjAP7SADaRfDdIjo8Acpz7hkXgM06MPTwu4IbXamvM9Qw==}
 
   request-light@0.5.8:
     resolution: {integrity: sha512-3Zjgh+8b5fhRJBQZoy+zbVKpAQGLyka0MPgW3zruTF4dFFJ8Fqcfu9YsAvi/rvdcaTeWG3MkbZv4WKxAn/84Lg==}
@@ -10858,7 +10858,7 @@ snapshots:
   exiftool-vendored.pl@13.45.0:
     optional: true
 
-  exiftool-vendored@34.2.0:
+  exiftool-vendored@34.3.0:
     dependencies:
       '@photostructure/tz-lookup': 11.3.0
       '@types/luxon': 3.7.1
@@ -13429,7 +13429,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  remeda@2.33.0: {}
+  remeda@2.33.1: {}
 
   request-light@0.5.8: {}
 
