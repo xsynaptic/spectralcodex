@@ -9,26 +9,32 @@ export const menuFooterItems = [
 	{
 		title: t('menu.bluesky.label'),
 		url: 'https://bsky.app/profile/spectralcodex.com',
+		rel: 'me',
 	},
 	{
 		title: t('menu.facebook.label'),
 		url: 'https://www.facebook.com/SpectralCodex/',
+		rel: 'me',
 	},
 	{
 		title: t('menu.instagram.label'),
 		url: 'https://www.instagram.com/spectralcodex',
+		rel: 'me',
 	},
 	{
 		title: t('menu.mastodon.label'),
 		url: 'https://indieweb.social/@SpectralCodex',
+		rel: 'me',
 	},
 	{
 		title: t('menu.flickr.label'),
 		url: 'https://www.flickr.com/photos/spectralcodex/',
+		rel: 'me',
 	},
 	{
 		title: t('menu.patreon.label'),
 		url: 'https://www.patreon.com/spectralcodex',
+		rel: 'me',
 	},
 	{
 		title: t('menu.terms.label'),

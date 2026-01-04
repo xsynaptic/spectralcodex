@@ -32,12 +32,13 @@ const t = getTranslations();
 				<li id={getMenuItemId(item)} class="group py-2 sm:relative">
 					<button class="flex items-center gap-x-1" aria-label={getMenuItemAriaLabel(item)}>
 						<Link
-							href={item.url}
+							linkColor="accent"
 							class:list={[
 								'text-sm font-medium sm:text-base',
 								isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
 							]}
-							linkColor="accent"
+							href={item.url}
+							{...(item.rel ? { rel: item.rel } : undefined)}
 						>
 							{item.title}
 						</Link>

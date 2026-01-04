@@ -29,6 +29,7 @@ export interface MenuItem {
 	title: string;
 	titleMultilingual?: MultilingualContent | undefined;
 	url: string;
+	rel?: string | undefined;
 	ancestor?: string | undefined;
 	children?: Array<MenuItem>;
 }

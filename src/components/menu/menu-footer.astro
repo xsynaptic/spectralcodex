@@ -21,9 +21,10 @@ const t = getTranslations();
 			menuFooterItems.map((item) => (
 				<li class="text-xs font-medium sm:text-sm">
 					<Link
-						href={item.url}
-						class:list={[isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined]}
 						linkColor="primary"
+						class:list={[isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined]}
+						href={item.url}
+						{...(item.rel ? { rel: item.rel } : undefined)}
 					>
 						{item.title}
 					</Link>

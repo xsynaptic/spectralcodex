@@ -86,12 +86,13 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 						aria-label={getMenuItemAriaLabel(item)}
 					>
 						<Link
-							href={item.url}
+							linkColor="accent"
 							class:list={[
 								'w-full truncate text-left',
 								isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
 							]}
-							linkColor="accent"
+							href={item.url}
+							{...(item.rel ? { rel: item.rel } : undefined)}
 						>
 							<Fragment set:html={item.title} />
 							{showMultilingual ? (
