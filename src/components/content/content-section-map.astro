@@ -21,7 +21,7 @@ const t = getTranslations();
 
 {
 	hasGeodata ? (
-		<ContentSection fillViewport={true} data-pagefind-ignore {...props}>
+		<ContentSection fillViewport={true} data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.map')}</Fragment>
 			<MapComponent persistId={persistId} mapComponentProps={mapComponentProps} />
 			<slot />

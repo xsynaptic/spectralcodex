@@ -25,7 +25,7 @@ const t = getTranslations();
 
 {
 	themes && themes.length > 0 ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
 				{themes.map((item) => {
@@ -34,7 +34,7 @@ const t = getTranslations();
 					return (
 						<DividedItem
 							as="li"
-							class="font-serif text-sm after:text-sm after:font-light"
+							class:list={['p-category', 'font-serif text-sm after:text-sm after:font-light']}
 							data-pagefind-filter="theme"
 						>
 							{item.data.title ? (

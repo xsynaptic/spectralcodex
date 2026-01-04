@@ -23,7 +23,7 @@ const t = getTranslations();
 
 {
 	sources ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{sources.map((source) => {

@@ -26,14 +26,14 @@ const t = getTranslations();
 		'transition-colors',
 		'z-40',
 		hasHeroImage
-			? 'bg-header-fade dark:bg-header-fade-dark sm:absolute sm:top-0 sm:right-0 sm:left-0'
+			? 'bg-header-fade sm:absolute sm:top-0 sm:right-0 sm:left-0 dark:bg-header-fade-dark'
 			: 'bg-primary-100 dark:bg-primary-800',
 	]}
 >
 	<SkipLink
 		class:list={[
-			'font-display px-small rounded-br-sm py-1 uppercase transition-colors',
-			'bg-primary-50 dark:bg-primary-800 text-accent-500 dark:text-accent-400 hover:text-accent-400 dark:hover:text-accent-300',
+			'rounded-br-sm px-small py-1 font-display uppercase transition-colors',
+			'bg-primary-50 text-accent-500 hover:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300',
 		]}
 		target="#content"
 		label={t('site.skip.label')}

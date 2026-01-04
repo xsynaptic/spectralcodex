@@ -30,7 +30,7 @@ const t = getTranslations();
 
 {
 	hasItems || page ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			{page ? (
 				<>

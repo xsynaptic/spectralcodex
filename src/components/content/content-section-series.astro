@@ -31,7 +31,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 				const { Content } = await render(entry);
 
 				return metadataItems.length > 0 ? (
-					<ContentSection data-pagefind-ignore {...props}>
+					<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 						<Fragment slot="section-title">
 							{t('collection.series.labelPlural')}: <span>{entry.data.title}</span>
 						</Fragment>

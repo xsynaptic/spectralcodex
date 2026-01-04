@@ -19,7 +19,7 @@ const t = getTranslations();
 
 {
 	backlinks && backlinks.length > 0 ? (
-		<ContentSection data-pagefind-ignore {...props}>
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.backlinks')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{backlinks.map(({ url, title, titleMultilingual }) => (

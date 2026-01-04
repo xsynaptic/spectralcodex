@@ -100,9 +100,9 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 					'content-image', // Custom CSS styles defined in src/styles/content.css
 					'not-prose',
 					layout === ImageLayoutEnum.Default
-						? 'max-w-content sm:px-small md:px-medium mx-auto mb-2 md:mb-4'
+						? 'mx-auto mb-2 max-w-content sm:px-small md:mb-4 md:px-medium'
 						: undefined,
-					layout === ImageLayoutEnum.Wide ? 'sm:px-small md:px-medium mb-2 w-full' : undefined,
+					layout === ImageLayoutEnum.Wide ? 'mb-2 w-full sm:px-small md:px-medium' : undefined,
 					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
 				]}
 				{...props}
@@ -126,7 +126,7 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 							'px-small py-1 text-sm leading-relaxed italic',
 							'text-primary-500 dark:text-primary-400',
 							layout === ImageLayoutEnum.Full
-								? 'max-w-content px-small md:px-medium mx-auto'
+								? 'mx-auto max-w-content px-small md:px-medium'
 								: 'sm:px-0',
 						]}
 					>
