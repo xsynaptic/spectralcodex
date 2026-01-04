@@ -10,6 +10,7 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -42,6 +43,8 @@ async function getImageProps() {
 }
 
 const { imageProps, placeholder } = await getImageProps();
+
+const t = getTranslations();
 ---
 
 <ContentSection class="mt-small">
@@ -54,7 +57,7 @@ const { imageProps, placeholder } = await getImageProps();
 		{
 			imageProps ? (
 				<ImagePlaceholder
-					class:list={['relative', 'overflow-hidden rounded-xs grayscale']}
+					class="relative overflow-hidden rounded-xs grayscale"
 					placeholder={placeholder}
 				>
 					<Image class:list={['u-photo', 'w-full']} {...imageProps} />
@@ -63,12 +66,12 @@ const { imageProps, placeholder } = await getImageProps();
 		}
 		<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
 			<Link class:list={['u-url', 'text-sm font-semibold']} href={getSiteUrl('/about')} rel="me"
-				><span class="p-name">Alexander Synaptic</span></Link
+				><span class="p-name">{t('site.author')}</span></Link
 			>
 			<div class="text-xs">
-				<span class="p-role">Curator</span>, <Link
+				<span class="p-role">{t('site.author.role')}</span>, <Link
 					class:list={['p-org h-card', 'italic']}
-					href={getSiteUrl()}>Spectral Codex</Link
+					href={getSiteUrl()}>{t('site.title')}</Link
 				>
 			</div>
 		</div>

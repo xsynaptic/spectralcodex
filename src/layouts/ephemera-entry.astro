@@ -5,6 +5,7 @@ import { render } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/types/index.ts';
 
+import ContentAuthor from '#components/content/content-author.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -63,7 +64,7 @@ const { Content } = await render(entry);
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<article class="h-entry" {...getPagefindBodyProp(entry.data.hideSearch)}>
 		<ImageHero
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}
@@ -71,7 +72,9 @@ const { Content } = await render(entry);
 			alt={entry.data.title}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title">
+					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
+				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<Multilingual content={titleMultilingual} />
 				</Fragment>
@@ -84,16 +87,18 @@ const { Content } = await render(entry);
 							date={entry.data.dateCreated}
 							dateUpdated={entry.data.dateUpdated}
 							datePreset="long"
+							showMicroformats={true}
 						/>
 					</DividedItem>
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<ProseBody class="content pb-small" data-reading-frame>
+		<ProseBody class:list={['content', 'e-content', 'pb-small']} data-reading-frame>
 			<Content />
 		</ProseBody>
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionBacklinks backlinks={backlinks} />
+		<ContentAuthor />
 	</article>
 </MainSite>

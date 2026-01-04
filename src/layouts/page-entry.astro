@@ -44,7 +44,7 @@ const { Content } = await render(entry);
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<article class="h-entry" {...getPagefindBodyProp(entry.data.hideSearch)}>
 		<ImageHero
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}
@@ -52,7 +52,9 @@ const { Content } = await render(entry);
 			alt={entry.data.title}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title">
+					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
+				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<Multilingual content={titleMultilingual} />
 				</Fragment>
@@ -61,11 +63,12 @@ const { Content } = await render(entry);
 						date={entry.data.dateCreated}
 						dateUpdated={entry.data.dateUpdated}
 						datePreset="long"
+						showMicroformats={true}
 					/>
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<ProseBody class="content pb-small" data-reading-frame>
+		<ProseBody class:list={['content', 'e-content', 'pb-small']} data-reading-frame>
 			<Content />
 		</ProseBody>
 	</article>

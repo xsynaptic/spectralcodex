@@ -1,0 +1,90 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { transformMarkdown } from '@xsynaptic/unified-tools';
+
+import type { ImageComponentProps } from '#components/image/image-component.astro';
+
+import ContentSection from '#components/content/content-section.astro';
+import Image from '#components/image/image-component.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import CardFrame from '#components/parts/card-frame.astro';
+import Link from '#components/parts/link.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+
+type Props = HTMLAttributes<'div'> & {
+	showAuthor?: boolean | undefined;
+};
+
+const { class: className, showAuthor = false, ...props } = Astro.props;
+
+const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+
+async function getImageProps() {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(IMAGE_SRC);
+
+	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+
+	return {
+		imageEntry,
+		imageProps: {
+			src: IMAGE_SRC,
+			breakpoints: getImageSrcsetWidths({ maxWidth: 900 }),
+			sizes: '(max-width: 640px) 150px, 150px',
+			aspectRatio: 3 / 2,
+			priority: true,
+			unstyled: true,
+			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
+		} satisfies ImageComponentProps,
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageProps, placeholder } = await getImageProps();
+
+const t = getTranslations();
+---
+
+<ContentSection
+	class:list={['h-card p-author', showAuthor ? undefined : 'sr-only', className]}
+	data-pagefind-ignore
+	data-nosnippet
+	{...props}
+>
+	<Fragment slot="section-title">{t('content.section.author')}</Fragment>
+	<div class="flex items-start gap-4">
+		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
+			{
+				imageProps ? (
+					<ImagePlaceholder
+						class="relative overflow-hidden rounded-xs grayscale"
+						placeholder={placeholder}
+					>
+						<Image class:list={['u-photo', 'w-full']} {...imageProps} />
+					</ImagePlaceholder>
+				) : undefined
+			}
+			<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
+				<Link class:list={['u-url', 'text-sm font-semibold']} href={getSiteUrl('/about')} rel="me"
+					><span class="p-name">{t('site.author')}</span></Link
+				>
+				<div class="text-xs">
+					<span class="p-role">{t('site.author.role')}</span>, <Link
+						class:list={['p-org h-card', 'italic']}
+						href={getSiteUrl()}>{t('site.title')}</Link
+					>
+				</div>
+			</div>
+		</CardFrame>
+		<ProseDescription>
+			<Fragment set:html={transformMarkdown({ input: t('site.author.bio') })} />
+		</ProseDescription>
+	</div>
+</ContentSection>

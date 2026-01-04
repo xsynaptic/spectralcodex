@@ -10,9 +10,10 @@ interface Props extends HTMLAttributes<'div'> {
 	date: string | Date | undefined;
 	dateUpdated?: string | Date | undefined;
 	datePreset: DatePreset;
+	showMicroformats?: boolean | undefined;
 }
 
-const { date, datePreset, dateUpdated, ...props } = Astro.props;
+const { date, datePreset, dateUpdated, showMicroformats = false, ...props } = Astro.props;
 
 const t = getTranslations();
 ---
@@ -23,16 +24,27 @@ const t = getTranslations();
 			{dateUpdated ? (
 				<div class="flex flex-wrap gap-1">
 					<span>
-						<DateDisplay date={date} datePreset={datePreset} />
+						<DateDisplay
+							class:list={[showMicroformats ? 'dt-published' : undefined]}
+							date={date}
+							datePreset={datePreset}
+						/>
 						{'; '}
 					</span>
 					<span>{t('content.meta.dateUpdated.label')}</span>
 					<span>
-						<DateDisplay date={dateUpdated} />
+						<DateDisplay
+							class:list={[showMicroformats ? 'dt-updated' : undefined]}
+							date={dateUpdated}
+						/>
 					</span>
 				</div>
 			) : (
-				<DateDisplay date={date} datePreset={datePreset} />
+				<DateDisplay
+					class:list={[showMicroformats ? 'dt-published' : undefined]}
+					date={date}
+					datePreset={datePreset}
+				/>
 			)}
 		</div>
 	) : undefined

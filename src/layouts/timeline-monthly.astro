@@ -82,7 +82,7 @@ const t = getTranslations();
 	</ImageHeroCarousel>
 	<ContentSection marginSmall={true}>
 		<TimelineNavigation
-			class="border-primary-300 dark:border-primary-700 pb-small border-b"
+			class="border-b border-primary-300 pb-small dark:border-primary-700"
 			currentYear={timelineMonthlyItem.year}
 			currentMonth={timelineMonthlyItem.month}
 			timelineYears={timelineYears}
@@ -91,7 +91,7 @@ const t = getTranslations();
 	</ContentSection>
 	{
 		timelineRenderResult ? (
-			<ProseBody class="content pb-small">
+			<ProseBody class:list={['content', 'pb-small']}>
 				<timelineRenderResult.Content />
 			</ProseBody>
 		) : undefined

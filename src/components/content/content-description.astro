@@ -13,10 +13,11 @@ import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/util
 import { getHasContent } from '#lib/utils/astro.ts';
 
 interface Props {
+	class?: string | undefined;
 	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
 }
 
-const { entry } = Astro.props;
+const { class: className, entry } = Astro.props;
 
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
@@ -40,7 +41,7 @@ const { Content } = await render(entry);
 
 {
 	hasContent ? (
-		<ProseBody class="content pb-medium" data-pagefind-weight="2">
+		<ProseBody class:list={['content', 'pb-medium', className]} data-pagefind-weight="2">
 			<Content />
 		</ProseBody>
 	) : undefined
@@ -48,7 +49,7 @@ const { Content } = await render(entry);
 	!hasContent && entry.data.description ? (
 		<ContentSection>
 			<Fragment slot="section-description">
-				<ProseDescription data-pagefind-weight="2">
+				<ProseDescription class:list={[className]} data-pagefind-weight="2">
 					<Fragment
 						set:html={transformMarkdown({ input: entry.data.description, wrapCjkOptions })}
 					/>

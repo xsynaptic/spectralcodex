@@ -85,6 +85,7 @@ const translationStrings = {
 		'content.more.label': 'Read more',
 
 		// Content sections
+		'content.section.author': 'Author',
 		'content.section.content': 'Content',
 		'content.section.links': 'Links',
 		'content.section.sources': 'Sources',
@@ -94,6 +95,16 @@ const translationStrings = {
 		'content.section.backlinks': 'Connections',
 		'content.section.related': 'Related Content',
 		'content.section.dateVisited': 'Visitation Log',
+		'content.section.webmentions': 'Webmentions',
+
+		// Webmentions
+		'webmentions.likes': 'Likes',
+		'webmentions.reposts': 'Reposts',
+		'webmentions.bookmarks': 'Bookmarks',
+		'webmentions.replies': 'Replies',
+		'webmentions.mentions': 'Mentions',
+		'webmentions.loading': 'Loading mentions...',
+		'webmentions.error': 'Could not load mentions',
 
 		// Locations
 		'locations.status.demolished': 'Demolished',
@@ -132,6 +143,10 @@ const translationStrings = {
 		'site.subtitle': 'An evolving journal of synchronicity and connection.',
 		'site.description':
 			'Photo essays, road trips, and a geospatial database with a particular emphasis on the history and culture of Taiwan.',
+		'site.author': 'Alexander Synaptic',
+		'site.author.role': 'Curator',
+		'site.author.bio':
+			'A software engineer, photojournalist, and former biogeographer passionate about documenting his travels. He is the founder of **Spectral Codex**, a website that explores history and culture through maps and imagery.',
 		'site.skip.label': 'Skip to content',
 		'site.footer.updated.label': 'Site updated on',
 		'site.footer.powered.label': 'Powered by',

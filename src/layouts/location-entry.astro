@@ -83,10 +83,12 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<article class="h-entry" {...getPagefindBodyProp(entry.data.hideSearch)}>
 		<ImageHero class="sm:mb-small" hasHeroImage={hasHeroImage} imageId={imageHeroId} alt={title}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{title}</Fragment>
+				<Fragment slot="header-title">
+					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
+				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<Multilingual content={titleMultilingual} />
 				</Fragment>
@@ -110,6 +112,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 							date={entry.data.dateCreated}
 							dateUpdated={entry.data.dateUpdated}
 							datePreset={DatePresetEnum.Medium}
+							showMicroformats={true}
 						/>
 					</DividedItem>
 				</Fragment>
@@ -120,7 +123,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 				<ContentImage imageId={imageFeaturedId} alt={title} showMetadata={true} />
 			) : undefined
 		}
-		<ContentDescription entry={entry} />
+		<ContentDescription class="e-content" entry={entry} />
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{hideLocation ? undefined : <ContentSectionSources entry={entry} />}
