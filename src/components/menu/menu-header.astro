@@ -20,10 +20,10 @@ const menuItems = await getMenuHeaderItems();
 const t = getTranslations();
 ---
 
-<nav class="relative" aria-label={t('site.menu.header.label')} {...props}>
+<nav class="relative px-small sm:px-0" aria-label={t('site.menu.header.label')} {...props}>
 	<ul
 		class:list={[
-			'flex flex-wrap justify-between gap-x-4 gap-y-2 md:gap-x-2',
+			'flex flex-wrap justify-between gap-x-4 md:gap-x-2',
 			hasHeroImage ? undefined : 'border-b border-primary-200 dark:border-primary-700',
 		]}
 	>
