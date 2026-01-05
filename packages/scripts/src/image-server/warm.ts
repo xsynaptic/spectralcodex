@@ -13,7 +13,17 @@ interface WarmOptions {
 	dryRun?: boolean;
 }
 
-export async function warmCache(options: WarmOptions): Promise<void> {
+interface WarmConfig {
+	remoteHost: string;
+	sshKeyPath: string;
+	sitePath: string;
+	nginxUrl: string;
+	concurrency: number;
+	random: boolean;
+	dryRun: boolean;
+}
+
+function loadWarmConfig(options: WarmOptions): WarmConfig {
 	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 2, random = false, dryRun = false } = options;
 
 	dotenv.config({ path: path.join(rootPath, '.env') });
@@ -27,7 +37,12 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 		throw new Error('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_SITE_PATH');
 	}
 
-	const manifestPath = `${sitePath}/cache-manifest.json`;
+	return { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun };
+}
+
+async function runWarmScript(config: WarmConfig, manifestFile: string): Promise<void> {
+	const { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun } = config;
+	const manifestPath = `${sitePath}/${manifestFile}`;
 
 	try {
 		await $`ssh-add --apple-load-keychain 2>/dev/null`;
@@ -36,9 +51,6 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 	}
 
 	$.verbose = false;
-
-	console.log(chalk.blue('Warming image cache...'));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
 	const sshArgs = ['-i', sshKeyPath, remoteHost];
 
@@ -58,6 +70,11 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 			fi
 
 			COUNT=$(jq length "${manifestPath}")
+			if [ "$COUNT" -eq 0 ]; then
+				echo "No URLs to warm"
+				exit 0
+			fi
+
 			echo "Warming $COUNT URLs with concurrency ${String(concurrency)}..."
 
 			START=$(date +%s)
@@ -78,6 +95,24 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 		`;
 
 	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${remoteScript}`;
+}
+
+export async function warmCache(options: WarmOptions): Promise<void> {
+	const config = loadWarmConfig(options);
+
+	console.log(chalk.blue('Warming image cache...'));
+	if (config.dryRun) console.log(chalk.yellow('  DRY RUN'));
+
+	await runWarmScript(config, 'cache-manifest.json');
+}
+
+export async function warmCacheNew(options: WarmOptions): Promise<void> {
+	const config = loadWarmConfig(options);
+
+	console.log(chalk.blue('Warming new image cache...'));
+	if (config.dryRun) console.log(chalk.yellow('  DRY RUN'));
+
+	await runWarmScript(config, 'cache-manifest-new.json');
 }
 
 // CLI entry point

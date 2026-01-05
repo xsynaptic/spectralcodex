@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 import { generateManifest } from '../image-server/manifest.js';
+import { warmCacheNew } from '../image-server/warm.js';
 import { deployApp } from './deploy-app.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
@@ -68,10 +69,17 @@ async function build() {
 }
 
 function manifest() {
+	const urlPattern = process.env.IPX_SERVER_URL;
+	if (!urlPattern) {
+		throw new Error('Missing IPX_SERVER_URL environment variable');
+	}
+
 	console.log(chalk.blue('Generating cache manifest...'));
 	generateManifest({
 		distPath,
 		outputPath: path.join(distPath, 'cache-manifest.json'),
+		urlPattern,
+		mainPath: path.join(cachePath, 'cache-manifest-main.json'),
 	});
 }
 
@@ -91,6 +99,11 @@ async function transfer() {
 	await deployApp({ rootPath, dryRun, skipDelete: skipBuild });
 }
 
+async function warmNew() {
+	console.log(chalk.blue('Warming new image cache...'));
+	await warmCacheNew({ rootPath, dryRun });
+}
+
 try {
 	await validate();
 	await related();
@@ -99,6 +112,7 @@ try {
 	manifest();
 	await media();
 	await transfer();
+	await warmNew();
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {
 	console.error(chalk.red('Deploy failed:'), error);

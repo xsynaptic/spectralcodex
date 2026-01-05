@@ -21,7 +21,8 @@
 		"deploy-site": "pnpm --filter @spectralcodex/scripts deploy-site --root-path=$PWD",
 		"deploy-app": "pnpm --filter @spectralcodex/scripts deploy-app --root-path=$PWD",
 		"deploy-media": "pnpm --filter @spectralcodex/scripts deploy-media --root-path=$PWD",
-		"cache-warm": "pnpm --filter @spectralcodex/scripts image-server-warm --root-path=$PWD"
+		"cache-warm": "pnpm --filter @spectralcodex/scripts image-server-warm --root-path=$PWD",
+		"cache-warm-new": "pnpm --filter @spectralcodex/scripts image-server-warm-new --root-path=$PWD"
 	},
 	"license": "MIT",
 	"browserslist": [
