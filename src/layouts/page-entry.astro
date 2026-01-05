@@ -5,6 +5,7 @@ import { render } from 'astro:content';
 
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentSectionAuthor from '#components/content/content-section-author.astro';
 import ImageHero from '#components/image-hero/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import Multilingual from '#components/parts/multilingual.astro';
@@ -71,5 +72,6 @@ const { Content } = await render(entry);
 		<ProseBody class:list={['content', 'e-content', 'pb-small']} data-reading-frame>
 			<Content />
 		</ProseBody>
+		<ContentSectionAuthor showAuthor={false} />
 	</article>
 </MainSite>

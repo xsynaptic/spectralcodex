@@ -5,10 +5,10 @@ import { render } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/types/index.ts';
 
-import ContentAuthor from '#components/content/content-author.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentSectionAuthor from '#components/content/content-section-author.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
@@ -99,6 +99,6 @@ const { Content } = await render(entry);
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionBacklinks backlinks={backlinks} />
-		<ContentAuthor />
+		<ContentSectionAuthor showAuthor={false} />
 	</article>
 </MainSite>

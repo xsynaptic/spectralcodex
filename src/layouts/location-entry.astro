@@ -9,6 +9,7 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentImage from '#components/content/content-image.astro';
+import ContentSectionAuthor from '#components/content/content-section-author.astro';
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
@@ -142,5 +143,6 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<LocationsNotices entry={entry} langCode={regionLangCode} />
 		<LocationsNearbyList entry={entry} limit={12} />
 		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
+		<ContentSectionAuthor showAuthor={false} />
 	</article>
 </MainSite>

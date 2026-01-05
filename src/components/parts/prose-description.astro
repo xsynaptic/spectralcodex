@@ -19,7 +19,7 @@ const { class: className, showCompact, showDarkMode = true, ...props } = Astro.p
 			? 'dark:prose-a:text-accent-300 dark:prose-a:decoration-accent-500 dark:prose-a:hover:text-accent-200 dark:prose-a:hover:decoration-accent-400'
 			: undefined,
 		'prose-h2:mb-small',
-		showCompact ? 'prose-xs lg:prose-sm' : 'prose-base lg:prose-lg',
+		showCompact ? 'prose-sm lg:prose-base' : 'prose-base lg:prose-lg',
 		className,
 	]}
 	{...props}

@@ -145,8 +145,7 @@ const translationStrings = {
 			'Photo essays, road trips, and a geospatial database with a particular emphasis on the history and culture of Taiwan.',
 		'site.author': 'Alexander Synaptic',
 		'site.author.role': 'Curator',
-		'site.author.bio':
-			'A software engineer, photojournalist, and former biogeographer passionate about documenting his travels. He is the founder of **Spectral Codex**, a website that explores history and culture through maps and imagery.',
+		'site.author.description': `I am a web application developer, photojournalist, urban explorer, and history enthusiast passionate about the open web and documenting my experiences on this planet. This project was founded in the early 2010s and has evolved into a sort of personal Wikipedia of places that interest me (and often the photographs I've taken there). I'm originally from Toronto, Canada, but spend most of my time residing in [Taiwan](/regions/taiwan]).`,
 		'site.skip.label': 'Skip to content',
 		'site.footer.updated.label': 'Site updated on',
 		'site.footer.powered.label': 'Powered by',
