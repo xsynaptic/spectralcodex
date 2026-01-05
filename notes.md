@@ -1,23 +1,25 @@
 # Notes
 
-## Build Profiling
+## Debug
 
-This worked pretty well to debug some major issues with `getCollection` calls:
+### Build Profiling
+
+This profiling command worked pretty well to debug some major issues with `getCollection` calls:
 
 ```sh
 npx 0x -- node ./node_modules/astro/astro.js build
 ```
 
-## Deployment
+## Things To Do
 
-Astro in hybrid mode still requires a build step to generate the `client` folder. After this, `pnpm install` still needs to run on whatever machine is actually going to be hosting Astro SSR. This means that you _need_ to run `pnpm install` on remote, and it remains unknown whether this will cause any trouble for a project that is built locally and then synced with the server, where production dependencies are then installed.
-
-# Things To Do
-
-- new content collection for commercial establishments (restaurants, cafes, etc.)... gastronomy?
+- new content collection for commercial establishments (restaurants, cafes, etc.), maybe "gastronomy" or just "food and drink"?
 - multiple featured images for post-like content
 - carousel buttons (or some other hint to indicate that some images can be swiped); this feature is only partly complete
 - better pagination (_e.g._ [here](https://github.com/philnash/astro-pagination))
+
+### Image Server
+
+- currently the ipx provider limits parameters such that we can't crop images on the server, only with CSS; in the future we'd like to have this capability
 
 ### Maps
 
@@ -26,8 +28,9 @@ Astro in hybrid mode still requires a build step to generate the `client` folder
 - option to convert GeoJSON to something Google Maps (or Google My Maps) can consume, ultimately so anyone can import a map with at least some of the relevant info
 - for locations with a distance query draw a circle with the radius of the query and shade everything outside of it
 - different geography support (in progress 2024Q4)
+- filter for themes or categories
 - ruler tool
-- [fuzzy search](https://github.com/m31coding/fuzzy-search)
+- [fuzzy search](https://github.com/m31coding/fuzzy-search) in the mapping application itself
 
 ### SEO
 

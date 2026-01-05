@@ -60,7 +60,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 				<a href={linkUrl}>
 					<Image
 						class:list={[
-							'w-full text-sm text-transparent',
+							'w-full object-cover text-sm text-transparent',
 							isImageSquare ? 'aspect-square' : 'aspect-3/2',
 						]}
 						{...imageProps}
@@ -69,8 +69,11 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 			</ImagePlaceholder>
 		) : (
 			<div
-				class:list={['bg-fallback', 'w-full rounded-xs text-sm text-transparent shadow-inner']}
-				style={{ aspectRatio: isImageSquare ? '1/1' : '3/2' }}
+				class:list={[
+					'bg-fallback',
+					'w-full rounded-xs text-sm text-transparent shadow-inner',
+					isImageSquare ? 'aspect-square' : 'aspect-3/2',
+				]}
 			/>
 		)
 	}
