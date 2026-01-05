@@ -3,9 +3,9 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/server.ts",
-		"build": "tsdown src/server.ts --format esm --outDir dist",
-		"start": "node dist/server.mjs"
+		"dev": "tsx watch src/image-server.ts",
+		"build": "tsdown src/image-server.ts --format esm --outDir dist",
+		"start": "node dist/image-server.mjs"
 	},
 	"dependencies": {
 		"dotenv": "^17.2.3",
