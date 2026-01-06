@@ -27,3 +27,13 @@ export const UrlSchema = z
 	.refine((value) => /^(https?):\/\/(?=.*\.[a-z]{2,})[^\s$.?#].[^\s]*$/i.test(value), {
 		message: 'Please enter a valid URL',
 	});
+
+// Image thumbnail schema
+export const ImageThumbnailSchema = z.object({
+	src: z.string(),
+	srcSet: z.string(),
+	height: z.string(),
+	width: z.string(),
+});
+
+export type ImageThumbnail = z.infer<typeof ImageThumbnailSchema>;

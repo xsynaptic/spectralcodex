@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
-import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { DescriptionSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 

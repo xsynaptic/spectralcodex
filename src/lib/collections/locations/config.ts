@@ -9,7 +9,7 @@ import { LocationTwHeritageSchema } from '#lib/collections/locations/schemas.ts'
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
-import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,

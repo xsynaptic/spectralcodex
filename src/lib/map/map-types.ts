@@ -4,7 +4,7 @@ import type { FeatureCollection } from 'geojson';
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { z } from 'zod';
 
-import { ImageThumbnailSchema } from '#lib/schemas/image.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { UrlSchema } from '#lib/schemas/index.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 

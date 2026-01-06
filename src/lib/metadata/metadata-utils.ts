@@ -52,7 +52,10 @@ export function filterHasFeaturedImage<
 	return !!item.imageId;
 }
 
-// Sort content metadata; reverse chronological order
+// Sort content metadata; reverse chronological order (by dateUpdated, falling back to dateCreated)
 export function sortContentMetadataByDate(a: ContentMetadataItem, b: ContentMetadataItem) {
-	return b.dateCreated.valueOf() - a.dateCreated.valueOf();
+	const dateA = a.dateUpdated ?? a.dateCreated;
+	const dateB = b.dateUpdated ?? b.dateCreated;
+
+	return dateB.valueOf() - dateA.valueOf();
 }

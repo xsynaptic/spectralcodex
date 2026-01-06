@@ -4,7 +4,7 @@ import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import pMemoize from 'p-memoize';
 
-import type { ImageThumbnail } from '#lib/schemas/image.ts';
+import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';

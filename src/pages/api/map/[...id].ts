@@ -15,7 +15,6 @@ import { getLocationsBySeriesFunction } from '#lib/collections/series/utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getLocationsByThemeFunction } from '#lib/collections/themes/utils.ts';
 import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
-import { generateApiResponse } from '#lib/utils/api.ts';
 
 // Note: map API is served in two parts, suffixed to the endpoint URL:
 // 1) a highly optimized endpoint with only essential point data
@@ -111,5 +110,5 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 export const GET = (({ props: { data } }) => {
-	return generateApiResponse(JSON.stringify(data));
+	return Response.json(data);
 }) satisfies APIRoute<InferGetStaticPropsType<typeof getStaticPaths>>;
