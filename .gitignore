@@ -29,7 +29,7 @@ astro-error.log*
 temp/
 
 # certificates
-deploy/certs/
+deploy/site/certs/
 
 # public generated files
 public/divisions/

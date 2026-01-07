@@ -70,7 +70,7 @@ export async function setup() {
 					...process.env,
 					// Absolute paths required for Docker
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/image-server'),
+					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/site/image-server'),
 					// Use dev secret from .env.dev for predictable signature validation
 					IPX_SERVER_SECRET: process.env.IPX_SERVER_SECRET,
 				},
@@ -118,7 +118,7 @@ export function teardown() {
 				env: {
 					...process.env,
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/image-server'),
+					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'deploy/site/image-server'),
 				},
 			},
 		);

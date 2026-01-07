@@ -98,7 +98,7 @@ importers:
         version: 3.1.1(jiti@2.6.1)(typescript@5.9.3)
       '@xsynaptic/image-server':
         specifier: workspace:*
-        version: link:deploy/image-server
+        version: link:deploy/site/image-server
       '@xsynaptic/unified-tools':
         specifier: 2.0.0
         version: 2.0.0
@@ -211,7 +211,7 @@ importers:
         specifier: 4.2.1
         version: 4.2.1
 
-  deploy/image-server:
+  deploy/site/image-server:
     dependencies:
       dotenv:
         specifier: ^17.2.3
@@ -221,8 +221,8 @@ importers:
         version: 4.0.0-alpha.1(unstorage@1.17.3(idb-keyval@6.2.2))
     devDependencies:
       tsdown:
-        specifier: ^0.19.0-beta.2
-        version: 0.19.0-beta.2(typescript@5.9.3)
+        specifier: 0.19.0-beta.3
+        version: 0.19.0-beta.3(typescript@5.9.3)
       tsx:
         specifier: ^4.19.4
         version: 4.21.0
@@ -6039,8 +6039,8 @@ packages:
       typescript:
         optional: true
 
-  tsdown@0.19.0-beta.2:
-    resolution: {integrity: sha512-hIn4nKz9YY5rUEiD/JPFIX0SI733ktgEESyn9o/iS1fnfryhxe7/FfJ0KuM2enxOKHqpAdHU/DiC0DPzBC5CVg==}
+  tsdown@0.19.0-beta.3:
+    resolution: {integrity: sha512-Ud75SBmTap0kDf9hs31yBBlU0iAV17gtZgTJlW6nG/e4J6wXPXwQtUXt/Fck4XSmHXXgSuYRwGrjF6AxTLwk+Q==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -14242,7 +14242,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
 
-  tsdown@0.19.0-beta.2(typescript@5.9.3):
+  tsdown@0.19.0-beta.3(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14

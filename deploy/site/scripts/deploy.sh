@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Load environment from project root
+# Load environment from deploy/.env
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DEPLOY_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-PROJECT_ROOT="$(cd "$DEPLOY_DIR/.." && pwd)"
+SITE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+DEPLOY_DIR="$(cd "$SITE_DIR/.." && pwd)"
 
-if [ -f "$PROJECT_ROOT/.env" ]; then
-  source "$PROJECT_ROOT/.env"
+if [ -f "$DEPLOY_DIR/.env" ]; then
+  source "$DEPLOY_DIR/.env"
 fi
 
 if [ -z "$DEPLOY_REMOTE_HOST" ]; then
@@ -24,16 +24,27 @@ if [ -n "$SSH_KEY" ]; then
   SSH_OPTS="-i $SSH_KEY"
 fi
 
-echo "=== Deploy server ==="
+echo "=== Deploy site ==="
 echo "Target: $REMOTE_HOST"
 echo ""
+
+# Create server-side .env with only what docker-compose needs
+echo "Preparing server environment..."
+SERVER_ENV=$(cat <<EOF
+# spectralcodex deployment paths
+DEPLOY_MEDIA_PATH=${DEPLOY_MEDIA_PATH}
+
+# Image server secret
+IPX_SERVER_SECRET=${IPX_SERVER_SECRET}
+EOF
+)
 
 # Sync Caddy config and certs to shared infra location
 echo "Syncing Caddy config and certs..."
 rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
-  "$DEPLOY_DIR/caddy/sites/" "$REMOTE_HOST:/opt/server/caddy/sites/"
+  "$SITE_DIR/caddy/sites/" "$REMOTE_HOST:/opt/server/caddy/sites/"
 rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
-  "$DEPLOY_DIR/certs/" "$REMOTE_HOST:/opt/server/certs/"
+  "$SITE_DIR/certs/" "$REMOTE_HOST:/opt/server/certs/"
 
 # Reload Caddy to pick up config changes
 echo "Reloading Caddy..."
@@ -47,7 +58,13 @@ rsync -avz --delete ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   --exclude 'caddy' \
   --exclude 'certs' \
   --exclude 'scripts' \
-  "$DEPLOY_DIR/" "$REMOTE_HOST:/opt/server/spectralcodex/"
+  "$SITE_DIR/" "$REMOTE_HOST:/opt/server/spectralcodex/"
+
+# Write server-side .env
+echo "Writing server environment..."
+ssh $SSH_OPTS "$REMOTE_HOST" "cat > /opt/server/spectralcodex/.env << 'ENVEOF'
+$SERVER_ENV
+ENVEOF"
 
 # Restart image server containers
 echo "Restarting image server..."
