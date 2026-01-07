@@ -18,7 +18,6 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Viewpoint]: 'mdi:binoculars',
 	[LocationCategoryEnum.Water]: 'mdi:water',
 	/** Commercial */
-	[LocationCategoryEnum.Attraction]: 'material-symbols:star-rate-rounded',
 	[LocationCategoryEnum.Cafe]: 'material-symbols:local-cafe',
 	[LocationCategoryEnum.Commercial]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Hotel]: 'material-symbols:question-mark-rounded',
@@ -30,11 +29,8 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.ThemePark]: 'mingcute:ferris-wheel-fill',
 	/** Historic */
 	[LocationCategoryEnum.Historic]: 'mingcute:pavilion-fill',
-	[LocationCategoryEnum.Memorial]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Monument]: 'mingcute:palace-line',
 	[LocationCategoryEnum.Site]: 'material-symbols:question-mark-rounded',
-	[LocationCategoryEnum.Statue]: 'material-symbols:question-mark-rounded',
-	[LocationCategoryEnum.Tomb]: 'material-symbols:question-mark-rounded',
 	/** Industrial */
 	[LocationCategoryEnum.Industrial]: 'mingcute:factory-2-fill',
 	[LocationCategoryEnum.Factory]: 'mdi:gear',
@@ -50,11 +46,9 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Infrastructure]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Dam]: 'mdi:electricity',
 	[LocationCategoryEnum.Lighthouse]: 'mingcute:lighthouse-fill',
-	[LocationCategoryEnum.Reservoir]: 'material-symbols:question-mark-rounded',
 	/** Military */
 	[LocationCategoryEnum.Military]: 'material-symbols:military-tech-outline-rounded',
 	[LocationCategoryEnum.Base]: 'material-symbols:military-tech-outline-rounded',
-	[LocationCategoryEnum.Bunker]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Fortification]: 'material-symbols:question-mark-rounded',
 	/** Natural */
 	[LocationCategoryEnum.Natural]: 'mingcute:tree-fill',
@@ -62,8 +56,6 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Cave]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Forest]: 'mingcute:tree-fill',
 	[LocationCategoryEnum.HotSpring]: 'material-symbols:question-mark-rounded',
-	[LocationCategoryEnum.Lake]: 'material-symbols:question-mark-rounded',
-	[LocationCategoryEnum.Rock]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Tree]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Waterfall]: 'material-symbols:question-mark-rounded',
 	/** Religious */

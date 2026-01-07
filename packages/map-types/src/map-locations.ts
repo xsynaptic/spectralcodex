@@ -18,7 +18,6 @@ export const LocationCategoryEnum = {
 	Viewpoint: 'viewpoint',
 	Water: 'water', // Should relate to water supply technology
 	/** Commercial */
-	Attraction: 'attraction',
 	Commercial: 'commercial',
 	Hotel: 'hotel',
 	Market: 'market',
@@ -31,11 +30,8 @@ export const LocationCategoryEnum = {
 	Restaurant: 'restaurant',
 	/** Historic */
 	Historic: 'historic',
-	Memorial: 'memorial',
 	Monument: 'monument',
 	Site: 'site',
-	Statue: 'statue',
-	Tomb: 'tomb',
 	/** Industrial */
 	Industrial: 'industrial',
 	Factory: 'factory',
@@ -51,11 +47,9 @@ export const LocationCategoryEnum = {
 	Infrastructure: 'infrastructure',
 	Dam: 'dam',
 	Lighthouse: 'lighthouse',
-	Reservoir: 'reservoir',
 	/** Military */
 	Military: 'military',
 	Base: 'base',
-	Bunker: 'bunker',
 	Fortification: 'fortification',
 	/** Natural */
 	Natural: 'natural',
@@ -63,8 +57,6 @@ export const LocationCategoryEnum = {
 	Cave: 'cave',
 	Forest: 'forest',
 	HotSpring: 'hot-spring',
-	Lake: 'lake',
-	Rock: 'rock',
 	Tree: 'tree',
 	Waterfall: 'waterfall',
 	/** Religious */
