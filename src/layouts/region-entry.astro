@@ -50,7 +50,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			: entry.data.title,
 		description: entry.data.description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
-			...(hasHeroImage ? { id: `${entry.collection}/${entry.id}` } : {}),
+			...(hasHeroImage ? { id: entry.id } : {}),
 			alt: entry.data.title,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),

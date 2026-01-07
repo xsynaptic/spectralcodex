@@ -29,8 +29,8 @@ const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
 	shuffle: true,
 });
 
-// This regularly changes but as long as the source images remain constant this should be OK!
-const featuredOgImageId = imageFeaturedGroup?.at(0)?.id;
+// Use the content entry ID (not the image ID) for OG image lookup
+const featuredOgImageId = imageFeaturedGroup?.at(0)?.captionMetadata?.id;
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
