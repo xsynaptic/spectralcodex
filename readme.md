@@ -110,7 +110,7 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ## Project Structure
 
-- `./deploy`: Docker Compose configuration, Caddy config, and image server setup
+- `./deploy`: Deployment configuration split into `infra/` (Caddy, analytics) and `site/` (image server)
 - `./public`: contains a favicon, fallback Open Graph images, and map division data
 - `./src`: primary project source files
 - `./src/components`: Astro components organized by functionality
