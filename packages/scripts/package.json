@@ -20,7 +20,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^7.0.0-alpha.0",
-		"@duckdb/node-api": "1.4.3-r.2",
+		"@duckdb/node-api": "1.4.3-r.3",
 		"@turf/helpers": "^7.3.1",
 		"@turf/turf": "^7.3.1",
 		"@types/d3-geo": "^3.1.0",
