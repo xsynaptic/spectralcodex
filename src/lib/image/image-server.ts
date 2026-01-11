@@ -1,8 +1,10 @@
 import type { ImageFormat } from 'unpic';
-import type { IPXOperations, IPXOptions } from 'unpic/providers/ipx';
+import type { IPXOptions } from 'unpic/providers/ipx';
 
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 import { transform as ipxTransform } from 'unpic/providers/ipx';
+
+import type { IPXOperations } from '#lib/image/image-server-types.ts';
 
 import {
 	IMAGE_FORMAT,
@@ -15,6 +17,14 @@ import { generateSignedUrl } from '#lib/image/image-server-utils.ts';
 
 // In development, use local IPX server; in production, use the configured URL
 export const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100';
+
+// Fix for IPX v4 alpha bug: quote the s_WxH modifier value
+// This way it parses as a JSON string instead of failing
+// Example: s_450x300 → s_%22450x300%22 (URL-encoded quotes)
+// TODO: Remove this workaround when IPX v4 fixes VArg to handle non-JSON strings
+function fixIpxV4SizeModifier(url: string) {
+	return url.replaceAll(/s_(\d+x\d+)/g, 's_%22$1%22');
+}
 
 /**
  * Generate a signed IPX image URL
@@ -41,8 +51,7 @@ export function getIpxImageUrl(
 		{
 			q: quality,
 			f: format,
-			w: width,
-			...(height ? { h: height } : {}),
+			...(height ? { s: `${String(width)}x${String(height)}` } : { w: width }),
 		},
 		{ baseURL: ipxBaseUrl },
 	);
@@ -56,14 +65,13 @@ export function signedIpxTransformer(
 	operations: IPXOperations,
 	options?: IPXOptions,
 ) {
-	return generateSignedUrl(
-		ipxTransform(
-			src,
-			{ ...operations, q: IMAGE_QUALITY, f: IMAGE_FORMAT },
-			{ ...options, baseURL: ipxBaseUrl },
-		),
-		IPX_SERVER_SECRET,
+	const url = ipxTransform(
+		src,
+		{ ...operations, q: IMAGE_QUALITY, f: IMAGE_FORMAT },
+		{ ...options, baseURL: ipxBaseUrl },
 	);
+
+	return generateSignedUrl(fixIpxV4SizeModifier(url), IPX_SERVER_SECRET);
 }
 
 /**

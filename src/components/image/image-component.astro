@@ -1,9 +1,11 @@
 ---
 import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
 import type { HTMLAttributes } from 'astro/types';
-import type { IPXOperations, IPXOptions } from 'unpic/providers/ipx';
+import type { IPXOptions } from 'unpic/providers/ipx';
 
 import { Image } from '@unpic/astro/base';
+
+import type { IPXOperations } from '#lib/image/image-server-types.ts';
 
 import { signedIpxTransformer } from '#lib/image/image-server.ts';
 

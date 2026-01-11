@@ -37,10 +37,14 @@ async function getImageProps() {
 				maxWidth: imageEntry.data.width,
 				widths: [450, 600, 900, 1200],
 			}),
-			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 450px`,
-			aspectRatio: 3 / 2,
+			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 410px`,
+			width: 900,
+			height: 600,
 			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
+			operations: {
+				fit: 'cover',
+			},
 		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholder,
 	};
