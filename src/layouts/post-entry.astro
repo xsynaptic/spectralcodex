@@ -25,6 +25,7 @@ import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageHeroId } from '#lib/image/image-featured.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -70,7 +71,7 @@ const { Content } = await render(entry);
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article class="h-entry" {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
 		<ImageHero
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}

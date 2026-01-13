@@ -13,6 +13,7 @@ import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -38,7 +39,6 @@ async function getImageProps() {
 			src: IMAGE_SRC,
 			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
 			sizes: '(max-width: 640px) 200px, 300px',
-			aspectRatio: 1,
 			priority: true,
 			unstyled: true,
 			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
@@ -55,8 +55,8 @@ const t = getTranslations();
 <ContentSection class="mt-small">
 	<CardFrame
 		class:list={[
-			'h-card',
 			'mb-small max-w-[300px] min-w-[200px] xs:float-end xs:mt-1 xs:mb-1 xs:ml-4 lg:mt-2 lg:mb-2',
+			MicroformatClassNames.Card,
 		]}
 	>
 		{
@@ -65,17 +65,19 @@ const t = getTranslations();
 					class="relative overflow-hidden rounded-xs grayscale"
 					placeholder={placeholder}
 				>
-					<Image class:list={['u-photo', 'aspect-square w-full']} {...imageProps} />
+					<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
 				</ImagePlaceholder>
 			) : undefined
 		}
 		<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
-			<Link class:list={['u-url', 'text-sm font-semibold']} href={getSiteUrl('/about')} rel="me"
-				><span class="p-name">{t('site.author')}</span></Link
+			<Link
+				class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
+				href={getSiteUrl('/about')}
+				rel="me"><span class={MicroformatClassNames.Name}>{t('site.author')}</span></Link
 			>
 			<div class="text-xs">
-				<span class="p-role">{t('site.author.role')}</span>, <Link
-					class:list={['p-org h-card', 'italic']}
+				<span class={MicroformatClassNames.Role}>{t('site.author.role')}</span>, <Link
+					class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
 					href={getSiteUrl()}>{t('site.title')}</Link
 				>
 			</div>

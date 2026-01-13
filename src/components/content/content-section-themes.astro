@@ -8,6 +8,7 @@ import { getThemesByIdsFunction } from '#lib/collections/themes/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -34,7 +35,10 @@ const t = getTranslations();
 					return (
 						<DividedItem
 							as="li"
-							class:list={['p-category', 'font-serif text-sm after:text-sm after:font-light']}
+							class:list={[
+								'font-serif text-sm after:text-sm after:font-light',
+								MicroformatClassNames.Category,
+							]}
 							data-pagefind-filter="theme"
 						>
 							{item.data.title ? (

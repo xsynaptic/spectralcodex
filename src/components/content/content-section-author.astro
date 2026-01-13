@@ -14,6 +14,7 @@ import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -54,7 +55,12 @@ const t = getTranslations();
 ---
 
 <ContentSection
-	class:list={['h-card p-author', showAuthor ? undefined : 'sr-only', className]}
+	class:list={[
+		showAuthor ? undefined : 'sr-only',
+		MicroformatClassNames.Card,
+		MicroformatClassNames.Author,
+		className,
+	]}
 	data-pagefind-ignore
 	data-nosnippet
 	{...props}
@@ -68,17 +74,19 @@ const t = getTranslations();
 						class="relative overflow-hidden rounded-xs grayscale"
 						placeholder={placeholder}
 					>
-						<Image class:list={['u-photo', 'aspect-square w-full']} {...imageProps} />
+						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
 					</ImagePlaceholder>
 				) : undefined
 			}
 			<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
-				<Link class:list={['u-url', 'text-sm font-semibold']} href={getSiteUrl('/about')} rel="me"
-					><span class="p-name">{t('site.author')}</span></Link
+				<Link
+					class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
+					href={getSiteUrl('/about')}
+					rel="me"><span class={MicroformatClassNames.Name}>{t('site.author')}</span></Link
 				>
 				<div class="text-xs">
-					<span class="p-role">{t('site.author.role')}</span>, <Link
-						class:list={['p-org h-card', 'italic']}
+					<span class={MicroformatClassNames.Role}>{t('site.author.role')}</span>, <Link
+						class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
 						href={getSiteUrl()}>{t('site.title')}</Link
 					>
 				</div>

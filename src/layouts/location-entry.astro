@@ -33,6 +33,7 @@ import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -84,7 +85,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article class="h-entry" {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
 		<ImageHero class="sm:mb-small" hasHeroImage={hasHeroImage} imageId={imageHeroId} alt={title}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">

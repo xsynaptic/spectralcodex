@@ -5,6 +5,7 @@ import type { DatePreset } from '#lib/utils/date.ts';
 
 import DateDisplay from '#components/parts/date-display.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	date: string | Date | undefined;
@@ -25,7 +26,7 @@ const t = getTranslations();
 				<div class="flex flex-wrap gap-1">
 					<span>
 						<DateDisplay
-							class:list={[showMicroformats ? 'dt-published' : undefined]}
+							class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
 							date={date}
 							datePreset={datePreset}
 						/>
@@ -34,14 +35,14 @@ const t = getTranslations();
 					<span>{t('content.meta.dateUpdated.label')}</span>
 					<span>
 						<DateDisplay
-							class:list={[showMicroformats ? 'dt-updated' : undefined]}
+							class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
 							date={dateUpdated}
 						/>
 					</span>
 				</div>
 			) : (
 				<DateDisplay
-					class:list={[showMicroformats ? 'dt-published' : undefined]}
+					class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
 					date={date}
 					datePreset={datePreset}
 				/>
