@@ -13,7 +13,7 @@ import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -36,12 +36,13 @@ async function getImageProps() {
 		imageEntry,
 		imageProps: {
 			src: IMAGE_SRC,
-			breakpoints: getImageSrcsetWidths({ maxWidth: 900 }),
+			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
 			sizes: '(max-width: 640px) 150px, 150px',
-			aspectRatio: 3 / 2,
-			priority: true,
-			unstyled: true,
 			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
+			unstyled: true,
+			operations: {
+				fit: 'cover',
+			},
 		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholder,
 	};
@@ -67,7 +68,7 @@ const t = getTranslations();
 						class="relative overflow-hidden rounded-xs grayscale"
 						placeholder={placeholder}
 					>
-						<Image class:list={['u-photo', 'w-full']} {...imageProps} />
+						<Image class:list={['u-photo', 'aspect-square w-full']} {...imageProps} />
 					</ImagePlaceholder>
 				) : undefined
 			}

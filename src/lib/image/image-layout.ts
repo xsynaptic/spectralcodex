@@ -21,7 +21,7 @@ const ImageOrientationEnum = {
 
 type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
 
-const ImageSizeEnum = {
+export const ImageSizeEnum = {
 	ExtraSmall: 450,
 	Small: 600,
 	Medium: 900,
@@ -30,17 +30,6 @@ const ImageSizeEnum = {
 	ExtraExtraLarge: 2400,
 	ExtraExtraExtraLarge: 3600,
 } as const;
-
-// These are the widths we're building for in almost all scenarios
-export const imageSrcsetWidthsDefault = [
-	ImageSizeEnum.ExtraSmall,
-	ImageSizeEnum.Small,
-	ImageSizeEnum.Medium,
-	ImageSizeEnum.Large,
-	ImageSizeEnum.ExtraLarge,
-	ImageSizeEnum.ExtraExtraLarge,
-	ImageSizeEnum.ExtraExtraExtraLarge,
-];
 
 // A simple check for image orientation
 function getImageOrientation({
@@ -64,7 +53,16 @@ function getImageOrientation({
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
 export function getImageSrcsetWidths({
 	maxWidth,
-	widths = imageSrcsetWidthsDefault,
+	// These are the widths we're building for in almost all scenarios
+	widths = [
+		ImageSizeEnum.ExtraSmall,
+		ImageSizeEnum.Small,
+		ImageSizeEnum.Medium,
+		ImageSizeEnum.Large,
+		ImageSizeEnum.ExtraLarge,
+		ImageSizeEnum.ExtraExtraLarge,
+		ImageSizeEnum.ExtraExtraExtraLarge,
+	],
 }: {
 	maxWidth: number;
 	widths?: Array<number>;

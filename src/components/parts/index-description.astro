@@ -11,7 +11,7 @@ import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -25,13 +25,18 @@ async function getImageProps() {
 
 	const imageEntry = getImageById(IMAGE_SRC);
 
-	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+	if (!imageEntry)
+		return {
+			imageEntry: undefined,
+			imageProps: undefined,
+			placeholder: undefined,
+		};
 
 	return {
 		imageEntry,
 		imageProps: {
 			src: IMAGE_SRC,
-			breakpoints: getImageSrcsetWidths({ maxWidth: 1200 }),
+			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
 			sizes: '(max-width: 640px) 200px, 300px',
 			aspectRatio: 1,
 			priority: true,
@@ -60,7 +65,7 @@ const t = getTranslations();
 					class="relative overflow-hidden rounded-xs grayscale"
 					placeholder={placeholder}
 				>
-					<Image class:list={['u-photo', 'w-full']} {...imageProps} />
+					<Image class:list={['u-photo', 'aspect-square w-full']} {...imageProps} />
 				</ImagePlaceholder>
 			) : undefined
 		}

@@ -13,6 +13,7 @@ import {
 	getImageLayoutProps,
 	getImageSrcsetWidths,
 	ImageLayoutEnum,
+	ImageSizeEnum,
 } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
@@ -49,7 +50,8 @@ async function getImageProps() {
 		height: imageEntry.data.height,
 		layout,
 	});
-	const feedWidth = imageEntry.data.height > imageEntry.data.width ? 900 : 1200;
+	const feedWidth =
+		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
 	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
 	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
 
@@ -59,25 +61,17 @@ async function getImageProps() {
 			src: imageId,
 			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: layoutProps.sizes,
-			aspectRatio,
-			layout:
-				layout === ImageLayoutEnum.Full || layout === ImageLayoutEnum.Wide
-					? ('fullWidth' as const)
-					: ('constrained' as const),
-			...(isFeed
-				? {
-						width: primaryWidth,
-						height: Math.round(primaryWidth / aspectRatio),
-						unstyled: true,
-					}
-				: {}),
+			width: primaryWidth,
+			...(isFeed ? { height: Math.round(primaryWidth / aspectRatio) } : {}),
+			unstyled: true,
 			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
 		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholder,
+		aspectRatio,
 	};
 }
 
-const { imageEntry, imageProps, placeholder } = await getImageProps();
+const { imageEntry, imageProps, placeholder, aspectRatio } = await getImageProps();
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 ---
@@ -114,7 +108,15 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 					]}
 					placeholder={placeholder}
 				>
-					<Image class="m-0 text-sm text-transparent" {...imageProps} />
+					<Image
+						class:list={[
+							'm-0 object-cover text-sm text-transparent',
+							aspectRatio === 1 ? 'aspect-square' : undefined,
+							aspectRatio === 3 / 2 ? 'aspect-3/2' : undefined,
+							aspectRatio === 2 / 3 ? 'aspect-2/3' : undefined,
+						]}
+						{...imageProps}
+					/>
 					{FEATURE_IMAGE_METADATA && showMetadata ? (
 						<ImageMetadata entry={imageEntry} />
 					) : undefined}

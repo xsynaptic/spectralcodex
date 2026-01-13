@@ -9,18 +9,17 @@ import CardFrame from '#components/parts/card-frame.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;
-	isImageSquare?: boolean;
 	linkUrl: string;
 	alt: string;
 }
 
-const { imageId, isImageSquare, linkUrl, alt, ...props } = Astro.props;
+const { imageId, linkUrl, alt, ...props } = Astro.props;
 
 async function getImageProps() {
 	const getImageById = await getImageByIdFunction();
@@ -30,16 +29,23 @@ async function getImageProps() {
 	if (!imageId || !imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
 
+	const aspectRatio = 3 / 2;
+
 	return {
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageSrcsetWidths({
 				maxWidth: imageEntry.data.width,
-				widths: [450, 600, 900, 1200],
+				widths: [
+					ImageSizeEnum.ExtraSmall,
+					ImageSizeEnum.Small,
+					ImageSizeEnum.Medium,
+					ImageSizeEnum.Large,
+				],
 			}),
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 410px`,
-			width: 900,
-			height: 600,
+			width: ImageSizeEnum.Medium,
+			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
 			operations: {
@@ -62,23 +68,11 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 		imageProps ? (
 			<ImagePlaceholder class="overflow-hidden rounded-xs shadow-sm" placeholder={placeholder}>
 				<a href={linkUrl}>
-					<Image
-						class:list={[
-							'w-full object-cover text-sm text-transparent',
-							isImageSquare ? 'aspect-square' : 'aspect-3/2',
-						]}
-						{...imageProps}
-					/>
+					<Image class="aspect-3/2 w-full object-cover text-sm text-transparent" {...imageProps} />
 				</a>
 			</ImagePlaceholder>
 		) : (
-			<div
-				class:list={[
-					'bg-fallback',
-					'w-full rounded-xs text-sm text-transparent shadow-inner',
-					isImageSquare ? 'aspect-square' : 'aspect-3/2',
-				]}
-			/>
+			<div class="aspect-3/2 w-full rounded-xs bg-fallback text-sm text-transparent shadow-inner" />
 		)
 	}
 	<h2 class="mt-1 flex flex-wrap gap-x-1 text-xl">

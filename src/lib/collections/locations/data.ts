@@ -9,6 +9,7 @@ import type { ImageThumbnail } from '#lib/schemas/index.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -36,9 +37,9 @@ async function generateLocationPostDataFunction() {
  * We pass this data via the API so URLs can be signed at build time
  */
 const imageThumbnailOptions = {
-	width: 450,
+	width: ImageSizeEnum.ExtraSmall,
 	height: 300,
-	widths: [450, 600, 900],
+	widths: [ImageSizeEnum.ExtraSmall, ImageSizeEnum.Small, ImageSizeEnum.Medium],
 };
 
 function getLocationThumbnailProps(

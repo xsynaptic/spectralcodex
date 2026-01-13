@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import { z } from 'zod';
 
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
+import { ImageSizeEnum } from '#lib/image/image-layout.ts';
 import {
 	getImageExposureValue,
 	getImageFileUrlPlaceholders,
@@ -82,6 +83,8 @@ export const images = defineCollection({
 			// Clamp source width to avoid upscaling
 			const srcWidth = Math.min(1800, dimensions.width);
 
+			const defaultAspectRatio = 3 / 2;
+
 			const defaultMetadata = {
 				src: getIpxImageUrl(id, {
 					width: srcWidth,
@@ -89,8 +92,8 @@ export const images = defineCollection({
 					sourceHeight: dimensions.height,
 				}),
 				path: filePathRelative,
-				width: 1200,
-				height: 900,
+				width: ImageSizeEnum.Large,
+				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
 				title: '',
 				description: '',
 				entryQuality: 1,
