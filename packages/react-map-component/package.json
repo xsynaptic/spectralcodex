@@ -12,7 +12,7 @@
 		"@tanstack/react-query": "^5.90.16",
 		"@tanstack/react-query-persist-client": "^5.90.18",
 		"@types/geojson": "^7946.0.16",
-		"@types/react": "^19.2.7",
+		"@types/react": "^19.2.8",
 		"@types/react-dom": "^19.2.3",
 		"astro": "6.0.0-alpha.5",
 		"flatgeobuf": "^4.4.0",

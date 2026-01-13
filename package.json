@@ -62,7 +62,7 @@
 		"@turf/helpers": "^7.3.1",
 		"@turf/turf": "^7.3.1",
 		"@types/geojson": "^7946.0.16",
-		"@types/react": "^19.2.7",
+		"@types/react": "^19.2.8",
 		"@types/react-dom": "^19.2.3",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
