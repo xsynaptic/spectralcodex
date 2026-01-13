@@ -46,8 +46,8 @@ async function getImageProps() {
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 410px`,
 			width: ImageSizeEnum.Medium,
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
-			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
+			unstyled: true,
 			operations: {
 				fit: 'cover',
 			},

@@ -38,6 +38,16 @@ const { isFeed } = Astro.locals;
 
 const slotContents = await renderSlot(Astro.slots, 'default');
 
+function getAspectRatio(width: number, height: number) {
+	function greatestCommonDenominator(a: number, b: number): number {
+		return b === 0 ? a : greatestCommonDenominator(b, a % b);
+	}
+
+	const aspectRatioDivisor = greatestCommonDenominator(width, height);
+
+	return `${String(width / aspectRatioDivisor)} / ${String(height / aspectRatioDivisor)}`;
+}
+
 async function getImageProps() {
 	const getImageById = await getImageByIdFunction();
 
@@ -53,7 +63,6 @@ async function getImageProps() {
 	const feedWidth =
 		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
 	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
-	const aspectRatio = imageEntry.data.width / imageEntry.data.height;
 
 	return {
 		imageEntry,
@@ -62,12 +71,14 @@ async function getImageProps() {
 			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: layoutProps.sizes,
 			width: primaryWidth,
-			...(isFeed ? { height: Math.round(primaryWidth / aspectRatio) } : {}),
+			...(isFeed
+				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }
+				: {}),
 			unstyled: true,
 			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
 		} satisfies ImageComponentProps,
 		placeholder: imageEntry.data.placeholder,
-		aspectRatio,
+		aspectRatio: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
 	};
 }
 
@@ -109,12 +120,8 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 					placeholder={placeholder}
 				>
 					<Image
-						class:list={[
-							'm-0 object-cover text-sm text-transparent',
-							aspectRatio === 1 ? 'aspect-square' : undefined,
-							aspectRatio === 3 / 2 ? 'aspect-3/2' : undefined,
-							aspectRatio === 2 / 3 ? 'aspect-2/3' : undefined,
-						]}
+						class:list={['m-0 text-sm text-transparent']}
+						{...(aspectRatio ? { style: { aspectRatio } } : {})}
 						{...imageProps}
 					/>
 					{FEATURE_IMAGE_METADATA && showMetadata ? (

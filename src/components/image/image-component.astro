@@ -16,7 +16,11 @@ type Props = HTMLAttributes<'img'> &
 // Helpful for validating prop types in other components
 export type ImageComponentProps = Props;
 
-const props = Astro.props;
+const { class: className, ...props } = Astro.props;
 ---
 
-<Image {...props} transformer={signedIpxTransformer} />
+<Image
+	{...props}
+	class:list={['w-full object-cover', className]}
+	transformer={signedIpxTransformer}
+/>
