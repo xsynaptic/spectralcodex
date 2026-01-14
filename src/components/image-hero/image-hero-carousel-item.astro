@@ -38,6 +38,7 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 0);
 
 // TODO: carousel items should have a visual indicator to show they can be scrolled through
+// Note: carousel items need `min-w-screen` on large viewports
 ---
 
 {
@@ -45,7 +46,7 @@ const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 
 		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
 			<Image
 				class:list={[
-					'z-10 max-h-screen min-h-[400px] text-sm text-transparent xl:min-h-screen',
+					'z-10 max-h-screen min-h-[400px] min-w-screen text-sm text-transparent xl:min-h-screen',
 					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
 				]}
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}

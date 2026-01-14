@@ -68,7 +68,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 		imageProps ? (
 			<ImagePlaceholder class="overflow-hidden rounded-xs shadow-sm" placeholder={placeholder}>
 				<a href={linkUrl}>
-					<Image class="aspect-3/2 w-full object-cover text-sm text-transparent" {...imageProps} />
+					<Image class="aspect-3/2 text-sm text-transparent" {...imageProps} />
 				</a>
 			</ImagePlaceholder>
 		) : (
