@@ -9,6 +9,7 @@ minimumReleaseAgeExclude:
   - '@astrojs/markdown-remark'
   - '@astrojs/mdx'
   - '@astrojs/node'
+  - '@astrojs/prism'
   - '@astrojs/react'
   - '@astrojs/rss'
   - '@astrojs/sitemap'
