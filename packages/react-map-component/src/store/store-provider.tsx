@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import type { CSSProperties } from 'react';
 
 import { LocationStatusEnum } from '@spectralcodex/map-types';
-import { createContext } from 'react';
-import { useMemo, useState } from 'react';
+import { createContext, useMemo, useState } from 'react';
 import { createStore } from 'zustand';
 
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
@@ -81,7 +80,7 @@ const defaultMapDataState = {
 	/** Filter */
 	filterPosition: undefined,
 	filterOpen: false,
-	statusFilter: [],
+	statusFilter: [LocationStatusEnum.Demolished, LocationStatusEnum.Unknown],
 	qualityFilter: 1,
 	ratingFilter: 1,
 	objectiveFilter: 1,
