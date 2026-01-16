@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/image-server",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/image-server.ts",
@@ -12,7 +12,7 @@
 	},
 	"devDependencies": {
 		"dotenv": "^17.2.3",
-		"tsdown": "0.20.0-beta.1",
+		"tsdown": "0.19.0",
 		"tsx": "^4.19.4",
 		"typescript": "^5.8.3"
 	}

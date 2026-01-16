@@ -114,6 +114,7 @@ export default defineConfig({
 	},
 	markdown: {
 		remarkPlugins: [remarkImgGroup],
+		// @ts-expect-error Plugin type is stricter than Astro's RehypePlugin expectation
 		rehypePlugins: [[rehypeWrapCjk, { langCode: 'cjk' }]],
 	},
 	integrations: [
