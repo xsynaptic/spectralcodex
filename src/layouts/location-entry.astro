@@ -125,7 +125,11 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 				<ContentImage imageId={imageFeaturedId} alt={title} showMetadata={true} />
 			) : undefined
 		}
-		<ContentDescription class="e-content" entry={entry} />
+		<ContentDescription
+			class="e-content"
+			entry={entry}
+			{...hasContent ? { 'data-reading-frame': '' } : {}}
+		/>
 		<LocationsHeritage heritage={entry.data.heritage} />
 		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
 		{hideLocation ? undefined : <ContentSectionSources entry={entry} />}

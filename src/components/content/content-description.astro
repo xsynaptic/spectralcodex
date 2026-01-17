@@ -17,7 +17,7 @@ interface Props {
 	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
 }
 
-const { class: className, entry } = Astro.props;
+const { class: className, entry, ...props } = Astro.props;
 
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
@@ -41,13 +41,13 @@ const { Content } = await render(entry);
 
 {
 	hasContent ? (
-		<ProseBody class:list={['content', 'pb-medium', className]} data-pagefind-weight="2">
+		<ProseBody class:list={['content', 'pb-medium', className]} data-pagefind-weight="2" {...props}>
 			<Content />
 		</ProseBody>
 	) : undefined
 }{
 	!hasContent && entry.data.description ? (
-		<ContentSection>
+		<ContentSection {...props}>
 			<Fragment slot="section-description">
 				<ProseDescription class:list={[className]} data-pagefind-weight="2">
 					<Fragment

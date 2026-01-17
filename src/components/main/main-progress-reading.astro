@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import ProgressBar from './progress-bar.astro';
+import ProgressBar from './main-progress.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
@@ -54,9 +54,9 @@ const { class: className, height, ...props } = Astro.props;
 					Math.max(
 						0,
 						(globalThis.window.innerHeight - readingFrameRect.top) /
-							(readingFrameRect.height + globalThis.window.innerHeight)
+							(readingFrameRect.height + globalThis.window.innerHeight),
 					),
-					1
+					1,
 				);
 
 				if (readingProgress === 1) {
@@ -66,7 +66,7 @@ const { class: className, height, ...props } = Astro.props;
 					setProgress(readingProgress);
 				}
 			},
-			{ triggerAt: 'both', minGapMs: 200 }
+			{ triggerAt: 'both', minGapMs: 200 },
 		);
 
 		const observer = new IntersectionObserver(
@@ -84,7 +84,7 @@ const { class: className, height, ...props } = Astro.props;
 			},
 			{
 				threshold: 0,
-			}
+			},
 		);
 
 		observer.observe(readingFrame);
