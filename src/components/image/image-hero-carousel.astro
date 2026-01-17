@@ -1,8 +1,8 @@
 ---
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
-import ImageHeroCarouselItem from '#components/image-hero/image-hero-carousel-item.astro';
-import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
+import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
+import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 
 interface Props {
 	hasHeroImage: boolean;
@@ -28,3 +28,19 @@ const { hasHeroImage, imageFeaturedGroup, withTitle, class: className } = Astro.
 		<slot />
 	)
 }
+
+<style>
+	/* Carousel; adapted from Daisy UI */
+	.carousel-container {
+		display: flex;
+		overflow-x: scroll;
+		scroll-behavior: smooth;
+		scroll-snap-align: start;
+		scroll-snap-type: x mandatory;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+		&::-webkit-scrollbar {
+			display: none;
+		}
+	}
+</style>

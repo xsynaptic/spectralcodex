@@ -1,6 +1,6 @@
-import type { LanguageCode } from '#lib/types/index.ts';
+import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
-import { LanguageCodeEnum } from '#lib/types/index.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
 const defaultLanguage = LanguageCodeEnum.English;
 
@@ -143,9 +143,6 @@ const translationStrings = {
 		'site.subtitle': 'An evolving journal of synchronicity and connection.',
 		'site.description':
 			'Photo essays, road trips, and a geospatial database with a particular emphasis on the history and culture of Taiwan.',
-		'site.author': 'Alexander Synaptic',
-		'site.author.role': 'Curator',
-		'site.author.description': `I am a web application developer, photojournalist, urban explorer, and history enthusiast passionate about the open web and documenting my experiences on this planet. This project was founded in the early 2010s and has evolved into a sort of personal Wikipedia of places that interest me (and often the photographs I've taken there). I'm originally from Toronto, Canada, but spend most of my time residing in [Taiwan](/regions/taiwan]).`,
 		'site.skip.label': 'Skip to content',
 		'site.footer.updated.label': 'Site updated on',
 		'site.footer.powered.label': 'Powered by',
@@ -174,6 +171,12 @@ const translationStrings = {
 		'menu.instagram.label': 'Instagram',
 		'menu.mastodon.label': 'Mastodon',
 		'menu.patreon.label': 'Patreon',
+
+		// Author
+		'author.name': 'Alexander Synaptic',
+		'author.role': 'Curator',
+		'author.description': `I am a web application developer, photojournalist, urban explorer, and history enthusiast passionate about the open web and documenting my experiences on this planet. This project was founded in the early 2010s and has evolved into a sort of personal Wikipedia of places that interest me (and often the photographs I've taken there). I'm originally from Toronto, Canada, but spend most of my time residing in [Taiwan](/regions/taiwan]).`,
+		'author.photo.alt': 'Profile photo of Alexander Synaptic, founder of Spectral Codex',
 
 		// 404
 		'404.title': 'Error 404: Page Not Found',

@@ -1,7 +1,7 @@
 import * as R from 'remeda';
 import { z } from 'zod';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';

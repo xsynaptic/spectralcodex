@@ -2,11 +2,11 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import ListColumnItem from '#components/list/list-column-item.astro';
-import ListColumn from '#components/list/list-column.astro';
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
-import PreviewGrid from '#components/preview/preview-grid.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import PreviewGrid from '#components/parts/preview-grid.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getRelatedContentFunction } from '#lib/utils/related.ts';
 
@@ -43,7 +43,7 @@ const t = getTranslations();
 						<ListColumnItem>
 							<Link href={url}>{title}</Link>
 							{titleMultilingual ? (
-								<Multilingual content={titleMultilingual} parenthesis={true} />
+								<TextMultilingual content={titleMultilingual} parenthesis={true} />
 							) : undefined}
 						</ListColumnItem>
 					))}

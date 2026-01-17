@@ -1,9 +1,9 @@
 ---
-import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageComponentProps } from '#components/parts/image.astro';
 
-import ImageHeroFrame from '#components/image-hero/image-hero-frame.astro';
-import Image from '#components/image/image-component.astro';
+import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';

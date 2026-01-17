@@ -1,11 +1,15 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { MenuItem } from '#lib/types/index.ts';
+import type { MenuItem } from '#lib/main/main-types.ts';
 
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
-import { getMenuItemAriaLabel, getMenuItemId, isActiveMenuItem } from '#lib/menu/menu-utils.ts';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import {
+	getMenuItemAriaLabel,
+	getMenuItemId,
+	isActiveMenuItem,
+} from '#lib/main/main-menu-utils.ts';
 
 interface Props extends HTMLAttributes<'ul'> {
 	hasHeroImage: boolean;
@@ -96,7 +100,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 						>
 							<Fragment set:html={item.title} />
 							{showMultilingual ? (
-								<Multilingual
+								<TextMultilingual
 									content={item.titleMultilingual}
 									class:list={[
 										'text-xs',

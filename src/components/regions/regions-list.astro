@@ -3,10 +3,10 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { DividerContent } from '#components/parts/divided-item.astro';
 
-import ListRow from '#components/list/list-row.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
+import ListRow from '#components/parts/list-row.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -55,7 +55,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 						{titleMultilingual ? (
 							<>
 								{' '}
-								<Multilingual
+								<TextMultilingual
 									content={titleMultilingual}
 									class="text-primary-600 dark:text-primary-400"
 									parenthesis={true}

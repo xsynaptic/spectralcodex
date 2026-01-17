@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
@@ -12,11 +12,11 @@ import ContentSectionAuthor from '#components/content/content-section-author.ast
 import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
-import ImageHero from '#components/image-hero/image-hero.astro';
+import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageHeroId } from '#lib/image/image-featured.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
@@ -77,7 +77,7 @@ const { Content } = await render(entry);
 					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
-					<Multilingual content={titleMultilingual} />
+					<TextMultilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem hasHeroImage={hasHeroImage}>

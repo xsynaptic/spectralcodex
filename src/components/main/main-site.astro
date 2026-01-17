@@ -6,13 +6,13 @@ import { ClientRouter } from 'astro:transitions';
 import '#styles/global.css';
 import type { MetaProps } from '#components/main/main-meta.astro';
 
-import ProgressBarLoading from '#components/lib/progress-bar/progress-bar-loading.astro';
-import ProgressBarReading from '#components/lib/progress-bar/progress-bar-reading.astro';
-import UmamiAnalytics from '#components/lib/umami-analytics.astro';
 import MainFooter from '#components/main/main-footer.astro';
 import MainHeader from '#components/main/main-header.astro';
 import MainMeta from '#components/main/main-meta.astro';
-import ModeManager from '#components/mode/mode-manager.astro';
+import ModeManager from '#components/main/main-mode-manager.astro';
+import ProgressBarLoading from '#components/main/main-progress-loading.astro';
+import ProgressBarReading from '#components/main/main-progress-reading.astro';
+import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {

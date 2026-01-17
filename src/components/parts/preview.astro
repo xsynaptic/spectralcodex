@@ -1,11 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageComponentProps } from '#components/parts/image.astro';
 
-import Image from '#components/image/image-component.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
+import Image from '#components/parts/image.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';

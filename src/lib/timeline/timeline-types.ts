@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 /**
  * Timeline

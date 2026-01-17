@@ -69,7 +69,7 @@ const t = getTranslations();
 <script>
 	import { funnel } from 'remeda';
 
-	import { ModeTypeEnum } from '#components/mode/mode-types.ts';
+	import { ModeTypeEnum } from '#lib/main/main-types.ts';
 
 	function activateModeToggle(toggleElementId: string) {
 		const toggleElement = document.querySelector<HTMLButtonElement>(toggleElementId);
@@ -103,7 +103,7 @@ const t = getTranslations();
 					}
 				}
 			},
-			{ triggerAt: 'start', minQuietPeriodMs: 500 }
+			{ triggerAt: 'start', minQuietPeriodMs: 500 },
 		);
 
 		toggleElement.addEventListener('click', () => {

@@ -1,9 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ModeGeneralType } from '#components/mode/mode-types.ts';
+import type { ModeGeneralType } from '#lib/main/main-types.ts';
 
-import { ModeTypeEnum } from '#components/mode/mode-types.ts';
+import { ModeTypeEnum } from '#lib/main/main-types.ts';
 
 interface Props extends HTMLAttributes<'script'> {
 	defaultMode?: ModeGeneralType | undefined;
@@ -19,13 +19,9 @@ const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
 }
 
 <script>
-	import type {
-		ModeChangedEvent,
-		ModeGeneralType,
-		ModeSystemType,
-	} from '#components/mode/mode-types.ts';
+	import type { ModeChangedEvent, ModeGeneralType, ModeSystemType } from '#lib/main/main-types.ts';
 
-	import { ModeTypeEnum } from '#components/mode/mode-types.ts';
+	import { ModeTypeEnum } from '#lib/main/main-types.ts';
 
 	function isModeValid(mode: string | undefined): mode is ModeGeneralType {
 		return (
@@ -77,7 +73,7 @@ const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
 				document.dispatchEvent(
 					new CustomEvent('mode-changed', {
 						detail: { mode, systemMode, defaultMode, resolvedMode },
-					}) satisfies ModeChangedEvent
+					}) satisfies ModeChangedEvent,
 				);
 			});
 		}

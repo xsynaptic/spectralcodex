@@ -3,7 +3,7 @@
 
 /* Spacing */
 @theme {
-	--breakpoint-xs: 420px;
+	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
 	--spacing-small: 1rem;
 	--spacing-medium: 2rem;
 	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */

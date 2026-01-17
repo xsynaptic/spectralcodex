@@ -1,6 +1,6 @@
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';

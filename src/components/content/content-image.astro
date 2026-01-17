@@ -1,12 +1,12 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageComponentProps } from '#components/parts/image.astro';
 import type { ImageLayout } from '#lib/image/image-layout.ts';
 
-import Image from '#components/image/image-component.astro';
 import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/parts/image.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import {

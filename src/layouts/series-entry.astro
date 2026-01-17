@@ -3,17 +3,17 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
-import ImageHeroCarousel from '#components/image-hero/image-hero-carousel.astro';
+import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import Multilingual from '#components/parts/multilingual.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
@@ -66,7 +66,7 @@ const t = getTranslations();
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{entry.data.title}</Fragment>
 				<Fragment slot="header-title-multilingual">
-					<Multilingual content={titleMultilingual} />
+					<TextMultilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem hasHeroImage={hasHeroImage}>

@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import slugify from '@sindresorhus/slugify';
 
-import type { ContentMetadataCollectionKey, ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataCollectionKey, ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';

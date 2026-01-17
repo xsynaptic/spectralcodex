@@ -1,10 +1,10 @@
 ---
-import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageComponentProps } from '#components/parts/image.astro';
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
-import ImageHeroCarouselCaption from '#components/image-hero/image-hero-carousel-caption.astro';
-import Image from '#components/image/image-component.astro';
+import ImageHeroCarouselCaption from '#components/image/image-hero-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
 import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -56,3 +56,13 @@ const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 
 		</ImagePlaceholder>
 	) : undefined
 }
+
+<style>
+	/* Carousel; adapted from Daisy UI */
+	.carousel-item {
+		box-sizing: content-box;
+		display: flex;
+		flex: none;
+		scroll-snap-align: start;
+	}
+</style>

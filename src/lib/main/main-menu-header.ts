@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import type { MenuItem } from '#lib/types/index.ts';
+import type { MenuItem } from '#lib/main/main-types.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';

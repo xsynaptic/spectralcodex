@@ -1,38 +1,6 @@
 import type { CollectionKey } from 'astro:content';
 
-/**
- * i18n
- */
-// TODO: standardize language and script code handling
-export const LanguageCodeEnum = {
-	English: 'en',
-	ChineseTraditional: 'zh',
-	ChineseSimplified: 'zh-CN',
-	Japanese: 'ja',
-	Thai: 'th',
-	Korean: 'ko',
-	Vietnamese: 'vi',
-} as const;
-
-export type LanguageCode = (typeof LanguageCodeEnum)[keyof typeof LanguageCodeEnum];
-
-export interface MultilingualContent {
-	lang: LanguageCode;
-	value: string;
-}
-
-/**
- * Menu
- */
-export interface MenuItem {
-	collection?: CollectionKey | undefined;
-	title: string;
-	titleMultilingual?: MultilingualContent | undefined;
-	url: string;
-	rel?: string | undefined;
-	ancestor?: string | undefined;
-	children?: Array<MenuItem>;
-}
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
 /**
  * Metadata

@@ -2,7 +2,7 @@
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
@@ -19,14 +19,14 @@ import ContentSectionRelated from '#components/content/content-section-related.a
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
-import ImageHero from '#components/image-hero/image-hero.astro';
+import ImageHero from '#components/image/image-hero.astro';
 import LocationsAddress from '#components/locations/locations-address.astro';
 import LocationsHeritage from '#components/locations/locations-heritage.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import Multilingual from '#components/parts/multilingual.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -92,7 +92,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
-					<Multilingual content={titleMultilingual} />
+					<TextMultilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem hasHeroImage={hasHeroImage}>

@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import type { ContentMetadataCollectionKey } from '#lib/types/index.ts';
+import type { ContentMetadataCollectionKey } from '#lib/metadata/metadata-types.ts';
 
 interface CollectionEntryWithContentCount {
 	data: {

@@ -3,12 +3,12 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
-import type { ImageComponentProps } from '#components/image/image-component.astro';
+import type { ImageComponentProps } from '#components/parts/image.astro';
 
 import ContentSection from '#components/content/content-section.astro';
-import Image from '#components/image/image-component.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
+import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
@@ -82,10 +82,10 @@ const t = getTranslations();
 				<Link
 					class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
 					href={getSiteUrl('/about')}
-					rel="me"><span class={MicroformatClassNames.Name}>{t('site.author')}</span></Link
+					rel="me"><span class={MicroformatClassNames.Name}>{t('author.name')}</span></Link
 				>
 				<div class="text-xs">
-					<span class={MicroformatClassNames.Role}>{t('site.author.role')}</span>, <Link
+					<span class={MicroformatClassNames.Role}>{t('author.role')}</span>, <Link
 						class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
 						href={getSiteUrl()}>{t('site.title')}</Link
 					>
@@ -93,7 +93,7 @@ const t = getTranslations();
 			</div>
 		</CardFrame>
 		<ProseDescription>
-			<Fragment set:html={transformMarkdown({ input: t('site.author.description') })} />
+			<Fragment set:html={transformMarkdown({ input: t('author.description') })} />
 		</ProseDescription>
 	</div>
 </ContentSection>

@@ -10,6 +10,7 @@ import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/options.ts';
 import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
@@ -17,7 +18,6 @@ import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { LanguageCodeEnum } from '#lib/types/index.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getBaseUrl } from '#lib/utils/routing.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
@@ -50,7 +50,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				...R.pipe(entry.data.posts ?? [], getPostsByIds, getContentMetadata),
 			],
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate)
+			R.sort(sortContentMetadataByDate),
 		);
 
 		const regionsOption = getRegionsOptions(getRegionAncestors(entry).length);
@@ -75,7 +75,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 					regionsOption,
 				},
 				pageSize: 20,
-			})
+			}),
 		);
 	}
 	return results;

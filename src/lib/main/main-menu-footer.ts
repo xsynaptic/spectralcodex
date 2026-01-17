@@ -1,4 +1,4 @@
-import type { MenuItem } from '#lib/types/index.ts';
+import type { MenuItem } from '#lib/main/main-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';

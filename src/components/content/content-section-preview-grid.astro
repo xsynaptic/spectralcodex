@@ -1,12 +1,12 @@
 ---
 import type { Page } from 'astro';
 
-import type { PreviewItemProps } from '#components/preview/preview-grid.astro';
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { PreviewItemProps } from '#components/parts/preview-grid.astro';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import Pagination from '#components/pagination/pagination.astro';
-import PreviewGrid from '#components/preview/preview-grid.astro';
+import Pagination from '#components/parts/pagination.astro';
+import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {

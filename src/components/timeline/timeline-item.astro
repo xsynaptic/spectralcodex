@@ -1,9 +1,9 @@
 ---
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
 import ProseBody from '#components/parts/prose-body.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
 
 interface Props {
@@ -39,7 +39,7 @@ const countText =
 									{item.titleMultilingual ? (
 										<>
 											{' '}
-											<Multilingual content={item.titleMultilingual} parenthesis={true} />
+											<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
 										</>
 									) : undefined}
 								</>
@@ -54,7 +54,7 @@ const countText =
 							{item.titleMultilingual ? (
 								<>
 									{' '}
-									<Multilingual content={item.titleMultilingual} parenthesis={true} />
+									<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
 								</>
 							) : undefined}
 						</TextSeparated>

@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import * as R from 'remeda';
 
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
@@ -56,7 +56,7 @@ const columns = {
 					<tbody class:list={['divide-y', 'divide-primary-200 dark:divide-primary-700']}>
 						{locations.map((item) => {
 							const region = getFirstRegionByReference(
-								item.data.override?.regions ?? item.data.regions
+								item.data.override?.regions ?? item.data.regions,
 							);
 							const titleMultilingual = getPrimaryMultilingualContent(item.data, 'title');
 
@@ -66,7 +66,7 @@ const columns = {
 										<div class="flex flex-wrap items-center gap-1">
 											<Link href={getSiteUrl(item.id)}>{item.data.title}</Link>
 											{titleMultilingual ? (
-												<Multilingual content={titleMultilingual} parenthesis={true} />
+												<TextMultilingual content={titleMultilingual} parenthesis={true} />
 											) : undefined}
 										</div>
 									</td>

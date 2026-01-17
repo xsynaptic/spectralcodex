@@ -8,6 +8,7 @@ import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
 import { getPostsByThemeFunction } from '#lib/collections/themes/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
@@ -15,7 +16,6 @@ import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { LanguageCodeEnum } from '#lib/types/index.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
@@ -35,7 +35,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		// Note: the need to get location data async means we should filter this first!
 		const locationsFiltered = locations.filter(
-			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false
+			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false,
 		);
 
 		// Metadata items are the posts and locations that are associated with the theme
@@ -44,12 +44,12 @@ export const getStaticPaths = (async ({ paginate }) => {
 				...R.pipe(
 					locationsFiltered,
 					R.filter(getFilterEntryQualityFunction(2)), // Quality filter last!
-					getContentMetadata
+					getContentMetadata,
 				),
 				...R.pipe(entry, getPostsByTerm, getContentMetadata),
 			],
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate)
+			R.sort(sortContentMetadataByDate),
 		);
 
 		const mapData = getMapData({
@@ -65,7 +65,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			themes,
 			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
 			R.sort(sortByContentCount),
-			R.map((theme) => theme.id)
+			R.map((theme) => theme.id),
 		);
 
 		results.push(
@@ -73,7 +73,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				params: { id: entry.id },
 				props: { entry, mapData, relatedThemeIds },
 				pageSize: 20,
-			})
+			}),
 		);
 	}
 	return results;

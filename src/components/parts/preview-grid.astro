@@ -1,14 +1,14 @@
 ---
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
-import type { ContentMetadataItem } from '#lib/types/index.ts';
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Grid from '#components/parts/grid.astro';
 import Link from '#components/parts/link.astro';
-import Multilingual from '#components/parts/multilingual.astro';
-import Preview from '#components/preview/preview.astro';
+import Preview from '#components/parts/preview.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -63,7 +63,7 @@ const t = getTranslations();
 						<Fragment slot="preview-title">{item.title}</Fragment>
 						{showTitleMultilingual && item.titleMultilingual ? (
 							<Fragment slot="preview-title-multilingual">
-								<Multilingual content={item.titleMultilingual} />
+								<TextMultilingual content={item.titleMultilingual} />
 							</Fragment>
 						) : undefined}
 						<Fragment slot="preview-subtitle">

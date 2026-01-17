@@ -1,9 +1,9 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
-import type { MultilingualContent } from '#lib/types/index.ts';
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-import Parenthesis from '#components/parts/parenthesis.astro';
+import TextParenthesis from '#components/parts/text-parenthesis.astro';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
@@ -19,11 +19,11 @@ const { as: Tag = 'span', class: className, content, parenthesis = false, ...pro
 	content ? (
 		<>
 			{parenthesis ? (
-				<Parenthesis as={Tag} class={className}>
+				<TextParenthesis as={Tag} class={className}>
 					<Tag lang={content.lang} {...props}>
 						<Fragment set:html={content.value} />
 					</Tag>
-				</Parenthesis>
+				</TextParenthesis>
 			) : (
 				<Tag lang={content.lang} class={className} {...props}>
 					<Fragment set:html={content.value} />

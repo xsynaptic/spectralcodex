@@ -1,7 +1,7 @@
 import pMemoize from 'p-memoize';
 
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import type { TimelineBaseItem, TimelineData } from '#lib/timeline/timeline-types.ts';
-import type { ContentMetadataItem } from '#lib/types/index.ts';
 
 import { getTimelineCollection } from '#lib/collections/timeline/data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';

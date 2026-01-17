@@ -7,6 +7,7 @@ import LocationEntry from '#layouts/location-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/data.ts';
 import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
@@ -14,7 +15,6 @@ import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { LanguageCodeEnum } from '#lib/types/index.ts';
 import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 
 export const getStaticPaths = (async () => {
@@ -27,7 +27,7 @@ export const getStaticPaths = (async () => {
 
 	return locations.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(
-			entry.data.override?.regions ?? entry.data.regions
+			entry.data.override?.regions ?? entry.data.regions,
 		);
 
 		return {
@@ -47,7 +47,7 @@ export const getStaticPaths = (async () => {
 					entry.data.posts ?? [],
 					getPostsByIds,
 					getContentMetadata,
-					R.sort(sortContentMetadataByDate)
+					R.sort(sortContentMetadataByDate),
 				),
 				backlinks: getContentBacklinks({ id: entry.id }),
 			},
