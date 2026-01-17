@@ -94,10 +94,6 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
-		optimizeDeps: {
-			// Added as a workaround for a bug in 6.0.0-alpha.2, remove it when it is fixed on main
-			include: ['react-dom/client'],
-		},
 		build: {
 			rollupOptions: {
 				output: {
@@ -114,7 +110,6 @@ export default defineConfig({
 	},
 	markdown: {
 		remarkPlugins: [remarkImgGroup],
-		// @ts-expect-error Plugin type is stricter than Astro's RehypePlugin expectation
 		rehypePlugins: [[rehypeWrapCjk, { langCode: 'cjk' }]],
 	},
 	integrations: [
