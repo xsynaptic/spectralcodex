@@ -79,7 +79,7 @@ const defaultMapDataState = {
 	canvasClusters: undefined,
 	/** Filter */
 	filterPosition: undefined,
-	filterOpen: false,
+	filterOpen: true,
 	statusFilter: [LocationStatusEnum.Demolished, LocationStatusEnum.Unknown],
 	qualityFilter: 1,
 	ratingFilter: 1,
