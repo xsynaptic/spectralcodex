@@ -6,25 +6,47 @@ import Link from '#components/parts/link.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
+import { matchLinkUrl } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
-	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
+	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>;
 }
 
 const { entry, ...props } = Astro.props;
 
-const links =
+const { resources } = await getResourcesCollection();
+
+const entryLinks =
 	'links' in entry.data && entry.data.links && entry.data.links.length > 0
 		? entry.data.links
 		: undefined;
+
+const links = entryLinks
+	?.map((entryLink) => {
+		if (typeof entryLink === 'string') {
+			const resource = resources.find((resource) => matchLinkUrl(entryLink, resource.data.match));
+
+			if (!resource) return;
+
+			return {
+				id: resource.id,
+				...resource.data,
+			};
+		}
+
+		return entryLink;
+	})
+	.filter((link) => !!link);
 
 const t = getTranslations();
 ---
 
 {
-	links ? (
+	links && links.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.links')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
@@ -36,6 +58,22 @@ const t = getTranslations();
 							<Link href={link.url}>{link.title}</Link>
 							{titleMultilingual ? (
 								<TextMultilingual content={titleMultilingual} parenthesis={true} />
+							) : undefined}
+							{'showPage' in link && link.showPage ? (
+								<Link href={getContentUrl('resources', link.id)} linkColor="primary">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+									>
+										<path
+											fill="currentColor"
+											d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
+										/>
+										<title>{t('collection.resources.showPage.label')}</title>
+									</svg>
+								</Link>
 							) : undefined}
 						</ListColumnItem>
 					);

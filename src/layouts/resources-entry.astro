@@ -1,0 +1,82 @@
+---
+import type { MapComponentData } from '@spectralcodex/react-map-component';
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
+import ContentDescription from '#components/content/content-description.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSectionLinks from '#components/content/content-section-links.astro';
+import ContentSectionMap from '#components/content/content-section-map.astro';
+import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionRegions from '#components/content/content-section-regions.astro';
+import ContentSectionThemes from '#components/content/content-section-themes.astro';
+import MainSite from '#components/main/main-site.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Link from '#components/parts/link.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
+import { formatNumber } from '#lib/utils/text.ts';
+
+interface Props {
+	entry: CollectionEntry<'resources'>;
+	mapData: MapComponentData;
+	page: Page<ContentMetadataItem>;
+}
+
+const { entry, mapData, page } = Astro.props;
+
+const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+
+const regionIds = entry.data.regions?.map(({ id }) => id);
+const themeIds = entry.data.themes?.map(({ id }) => id);
+
+const t = getTranslations();
+---
+
+<MainSite
+	meta={{
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
+		description: entry.body ?? undefined,
+		prefetchUrls: mapData.prefetchUrls,
+	}}
+>
+	<article {...getPagefindBodyProp(page.currentPage !== 1)}>
+		<ContentHeader>
+			<Fragment slot="header-title">{entry.data.title}</Fragment>
+			<Fragment slot="header-title-multilingual">
+				<TextMultilingual content={titleMultilingual} />
+			</Fragment>
+			<Fragment slot="header-subtitle">
+				{
+					entry.data.url ? (
+						<DividedItem>
+							<Link href={entry.data.url}>{t('collection.resources.homepage.label')}</Link>
+						</DividedItem>
+					) : undefined
+				}
+				{
+					entry.data.contentCount ? (
+						<DividedItem>
+							<span>
+								{t('collection.resources.contentCount.label')}:{' '}
+								{formatNumber({ number: entry.data.contentCount })}
+							</span>
+						</DividedItem>
+					) : undefined
+				}
+			</Fragment>
+		</ContentHeader>
+		<ContentDescription entry={entry} />
+		<ContentSectionLinks entry={entry} />
+		<ContentSectionRegions regionIds={regionIds} />
+		<ContentSectionThemes themeIds={themeIds} />
+		<ContentSectionMap mapData={mapData} persistId={`link-${entry.id}`} />
+		<ContentSectionPreviewGrid page={page} />
+	</article>
+</MainSite>

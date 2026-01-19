@@ -1,0 +1,56 @@
+---
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+
+import { transformMarkdown } from '@xsynaptic/unified-tools';
+
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import MainSite from '#components/main/main-site.astro';
+import Link from '#components/parts/link.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import Pagination from '#components/parts/pagination.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
+
+interface Props {
+	page: Page<CollectionEntry<'resources'>>;
+}
+
+const { page } = Astro.props;
+
+const t = getTranslations();
+
+const title = t(`collection.resources.labelPlural`);
+const description = t(`collection.resources.description`);
+---
+
+<MainSite meta={{ title, description }}>
+	<ContentHeader>
+		<Fragment slot="header-title">{title}</Fragment>
+	</ContentHeader>
+	<ContentSection>
+		<Fragment
+			slot="section-description"
+			set:html={page.currentPage === 1 ? transformMarkdown({ input: description }) : undefined}
+		/>
+		{
+			page.data.length > 0 ? (
+				<>
+					<ListColumn>
+						{page.data.map((entry) => (
+							<ListColumnItem>
+								<Link href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Link>{' '}
+								{entry.data.contentCount ? (
+									<span class="text-sm text-gray-500">({entry.data.contentCount})</span>
+								) : undefined}
+							</ListColumnItem>
+						))}
+					</ListColumn>
+					<Pagination class="mt-small md:mt-medium" page={page} />
+				</>
+			) : undefined
+		}
+	</ContentSection>
+</MainSite>

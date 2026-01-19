@@ -10,6 +10,8 @@ import {
 } from '#lib/collections/locations/utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
+import { getLocationsByResourceFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/data.ts';
 import { getLocationsBySeriesFunction } from '#lib/collections/series/utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/data.ts';
@@ -25,11 +27,13 @@ export const getStaticPaths = (async () => {
 	const { locations } = await getLocationsCollection();
 	const { posts } = await getPostsCollection();
 	const { regions } = await getRegionsCollection();
+	const { resources } = await getResourcesCollection();
 	const { series } = await getSeriesCollection();
 	const { themes } = await getThemesCollection();
 
 	const getLocationsByIds = await getLocationsByIdsFunction();
 	const getLocationsByPosts = await getLocationsByPostsFunction();
+	const getLocationsByResource = await getLocationsByResourceFunction();
 	const getLocationsByTheme = await getLocationsByThemeFunction();
 	const getLocationsBySeries = await getLocationsBySeriesFunction();
 
@@ -90,6 +94,16 @@ export const getStaticPaths = (async () => {
 		),
 	);
 
+	const resourcesData = R.pipe(
+		resources,
+		R.filter((entry) => entry.data.showPage && entry.data.locationCount && entry.data.locationCount > 0 ? true : false),
+		R.flatMap((entry) =>
+			R.pipe(entry, getLocationsByResource, (locations) =>
+				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
+			),
+		),
+	);
+
 	const objectiveLocations = await getObjectiveLocations();
 
 	const objectivesData = R.pipe(objectiveLocations, (locations) =>
@@ -101,6 +115,7 @@ export const getStaticPaths = (async () => {
 			...locationsData,
 			...postsData,
 			...regionsData,
+			...resourcesData,
 			...seriesData,
 			...themesData,
 			...(objectivesData ?? []),

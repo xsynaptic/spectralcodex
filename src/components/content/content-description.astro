@@ -14,7 +14,7 @@ import { getHasContent } from '#lib/utils/astro.ts';
 
 interface Props {
 	class?: string | undefined;
-	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
+	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>;
 }
 
 const { class: className, entry, ...props } = Astro.props;

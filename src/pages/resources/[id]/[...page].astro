@@ -1,0 +1,81 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import * as R from 'remeda';
+
+import ResourcesEntry from '#layouts/resources-entry.astro';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
+import {
+	getLocationsByResourceFunction,
+	getPostsByResourceFunction,
+} from '#lib/collections/resources/resources-utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMapData } from '#lib/map/map-data.ts';
+import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import {
+	filterHasFeaturedImage,
+	getContentMetadataFunction,
+	sortContentMetadataByDate,
+} from '#lib/metadata/metadata-utils.ts';
+import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const { resources } = await getResourcesCollection();
+
+	const resourcesPublic = resources.filter((resource) => !!resource.data.showPage);
+
+	const getLocationsByResource = await getLocationsByResourceFunction();
+	const getPostsByResource = await getPostsByResourceFunction();
+	const getContentMetadata = await getContentMetadataFunction();
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
+	const results = [];
+
+	for (const entry of resourcesPublic) {
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+
+		// Get locations associated with this link
+		const locationsFiltered = getLocationsByResource(entry);
+
+		// Get posts associated with this link
+		const postsFiltered = getPostsByResource(entry);
+
+		// Metadata items are the posts and locations that are associated with the link
+		const metadataItems = R.pipe(
+			[
+				...R.pipe(
+					locationsFiltered,
+					R.filter(getFilterEntryQualityFunction(2)),
+					getContentMetadata,
+				),
+				...R.pipe(postsFiltered, getContentMetadata),
+			],
+			R.filter(filterHasFeaturedImage),
+			R.sort(sortContentMetadataByDate),
+		);
+
+		const mapData = getMapData({
+			featureCollection: getLocationsFeatureCollection(locationsFiltered),
+			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
+			...(regionPrimary?.data.langCode?.startsWith('zh')
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+				: {}),
+		});
+
+		results.push(
+			...paginate(metadataItems, {
+				params: { id: entry.id },
+				props: { entry, mapData },
+				pageSize: 20,
+			}),
+		);
+	}
+	return results;
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<ResourcesEntry {...Astro.props} />

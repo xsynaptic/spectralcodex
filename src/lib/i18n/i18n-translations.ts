@@ -66,6 +66,15 @@ const translationStrings = {
 		'collection.regions.depth.3.labelChildren': 'Subregions',
 		'collection.regions.depth.3.labelSiblings': 'Other Regions',
 
+		// Resources
+		'collection.resources.labelSingular': 'Resource',
+		'collection.resources.labelPlural': 'Resources',
+		'collection.resources.description':
+			'Featured websites, blogs, and online resources that have informed or documented content on this site.',
+		'collection.resources.homepage.label': 'Visit Homepage',
+		'collection.resources.showPage.label': 'See more...',
+		'collection.resources.contentCount.label': 'Content Count',
+
 		// Series
 		'collection.series.labelSingular': 'Series',
 		'collection.series.labelPlural': 'Series',

@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import ContentSection from '#components/content/content-section.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
@@ -13,22 +14,33 @@ interface Props {
 
 const { entry, ...props } = Astro.props;
 
-const sources =
+const { resourcesMap } = await getResourcesCollection();
+
+const entrySources =
 	'sources' in entry.data && entry.data.sources && entry.data.sources.length > 0
 		? entry.data.sources
 		: undefined;
+
+const sources = entrySources
+	?.map((entrySource) => {
+		const source =
+			typeof entrySource === 'string' ? resourcesMap.get(entrySource)?.data : entrySource;
+
+		if (!source) return;
+
+		return source;
+	})
+	.filter((source) => !!source);
 
 const t = getTranslations();
 ---
 
 {
-	sources ? (
+	sources && sources.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('content.section.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{sources.map((source) => {
-					if (!source) return;
-
 					// Get multilingual content for each field
 					const titleMultilingual = getPrimaryMultilingualContent(source, 'title');
 					const publisherMultilingual = getPrimaryMultilingualContent(source, 'publisher');

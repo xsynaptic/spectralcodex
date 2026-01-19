@@ -30,7 +30,7 @@ export async function getRenderMdxFunction() {
 
 // Used to conditionally render descriptions or body contents of an entry
 export function getHasContent(
-	entry: CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>,
+	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
 ) {
 	return 'body' in entry && typeof entry.body === 'string' && entry.body.trim().length > 0;
 }

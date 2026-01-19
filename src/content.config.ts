@@ -4,6 +4,7 @@ import { locations } from '#lib/collections/locations/config.ts';
 import { pages } from '#lib/collections/pages/config.ts';
 import { posts } from '#lib/collections/posts/config.ts';
 import { regions } from '#lib/collections/regions/config.ts';
+import { resources } from '#lib/collections/resources/resources-config.ts';
 import { series } from '#lib/collections/series/config.ts';
 import { themes } from '#lib/collections/themes/config.ts';
 import { timeline } from '#lib/collections/timeline/config.ts';
@@ -15,6 +16,7 @@ export const collections = {
 	pages,
 	posts,
 	regions,
+	resources,
 	series,
 	themes,
 	timeline,
