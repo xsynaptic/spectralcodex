@@ -4,7 +4,7 @@ import { defineCollection } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
-import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
+import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import { DateStringSchema, NumericScaleSchema, StylizedTextSchema, LinkSchema } from '#lib/schemas/index.ts';

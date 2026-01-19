@@ -11,7 +11,7 @@ import {
 	OPEN_GRAPH_IMAGE_WIDTH,
 } from '#constants.ts';
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
 

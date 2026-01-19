@@ -2,12 +2,12 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import SeriesEntry from '#layouts/series-entry.astro';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import {
 	getLocationsBySeriesFunction,
 	getSeriesContentMetadataItemsFunction,
-} from '#lib/collections/series/utils.ts';
+} from '#lib/collections/series/series-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';

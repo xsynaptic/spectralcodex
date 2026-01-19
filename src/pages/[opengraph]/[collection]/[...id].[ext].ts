@@ -4,9 +4,9 @@ import pLimit from 'p-limit';
 import * as R from 'remeda';
 
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import {
 	getOpenGraphImageFunction,

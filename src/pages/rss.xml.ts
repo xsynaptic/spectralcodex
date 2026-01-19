@@ -13,9 +13,9 @@ import {
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getRenderMdxFunction } from '#lib/utils/astro.ts';

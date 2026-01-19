@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import SeriesIndex from '#layouts/series-index.astro';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
@@ -19,9 +19,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 		R.sort((a, b) =>
 			a.data.seriesItems && b.data.seriesItems
 				? b.data.seriesItems.length - a.data.seriesItems.length
-				: 0
+				: 0,
 		),
-		getContentMetadata
+		getContentMetadata,
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

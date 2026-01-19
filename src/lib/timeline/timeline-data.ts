@@ -3,7 +3,7 @@ import pMemoize from 'p-memoize';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import type { TimelineBaseItem, TimelineData } from '#lib/timeline/timeline-types.ts';
 
-import { getTimelineCollection } from '#lib/collections/timeline/data.ts';
+import { getTimelineCollection } from '#lib/collections/timeline/timeline-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 interface TimelineDataMapMonthlyItem extends TimelineBaseItem {

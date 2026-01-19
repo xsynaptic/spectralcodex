@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import LocationIndex from '#layouts/location-index.astro';
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
@@ -21,7 +21,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		R.filter(getFilterEntryQualityFunction(2)),
 		R.filter((item) => !!item.data.imageFeatured),
 		getContentMetadata,
-		R.sort(sortContentMetadataByDate)
+		R.sort(sortContentMetadataByDate),
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

@@ -2,10 +2,10 @@
 import * as R from 'remeda';
 
 import IndexLayout from '#layouts/index.astro';
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import {
 	filterHasFeaturedImage,
 	getContentMetadataFunction,
@@ -28,7 +28,7 @@ const metadataItems = {
 		],
 		R.filter(filterHasFeaturedImage),
 		R.shuffle(),
-		R.take(5)
+		R.take(5),
 	),
 	recentMetadataItems: R.pipe(
 		[
@@ -37,7 +37,7 @@ const metadataItems = {
 		],
 		R.filter(filterHasFeaturedImage),
 		R.sort(sortContentMetadataByDate),
-		R.take(16)
+		R.take(16),
 	),
 	seriesMetadataItems: R.pipe(
 		series,
@@ -46,7 +46,7 @@ const metadataItems = {
 		R.sortBy(({ data }) => data.entryQuality),
 		getContentMetadata,
 		R.filter(filterHasFeaturedImage),
-		R.take(4)
+		R.take(4),
 	),
 	themesMetadataItems: R.pipe(
 		themes,
@@ -55,7 +55,7 @@ const metadataItems = {
 		R.sortBy(({ data }) => data.entryQuality),
 		getContentMetadata,
 		R.filter(filterHasFeaturedImage),
-		R.take(8)
+		R.take(8),
 	),
 };
 ---

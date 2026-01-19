@@ -3,10 +3,10 @@ import type { CollectionEntry } from 'astro:content';
 import type { MenuItem } from '#lib/main/main-types.ts';
 
 import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
-import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTimelineData } from '#lib/timeline/timeline-data.ts';

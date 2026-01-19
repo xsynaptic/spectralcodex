@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import ThemeIndex from '#layouts/theme-index.astro';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
@@ -19,7 +19,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		/** Only display themes with associated images */
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByContentCount),
-		getContentMetadata
+		getContentMetadata,
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import PageEntry from '#layouts/page-entry.astro';
-import { getPagesCollection } from '#lib/collections/pages/data.ts';
+import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 
 export const getStaticPaths = (async () => {
 	const { pages } = await getPagesCollection();

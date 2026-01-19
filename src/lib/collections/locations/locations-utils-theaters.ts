@@ -1,8 +1,8 @@
 import { LocationStatusEnum } from '@spectralcodex/map-types';
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { sortLocationsByLatitude } from '#lib/collections/locations/utils.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { sortLocationsByLatitude } from '#lib/collections/locations/locations-utils.ts';
 
 // Saved queries for use in MDX and other places
 // TODO: this should eventually end up in a database or something

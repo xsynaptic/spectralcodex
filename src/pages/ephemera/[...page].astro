@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import EphemeraIndex from '#layouts/ephemera-index.astro';
-import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 
@@ -14,7 +14,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const entries = R.pipe(
 		ephemera,
 		R.filter(getFilterEntryQualityFunction(2)),
-		R.sort(sortByDateReverseChronological)
+		R.sort(sortByDateReverseChronological),
 	);
 
 	return paginate(entries, { pageSize: 10 });

@@ -4,10 +4,10 @@ import pLimit from 'p-limit';
 import * as R from 'remeda';
 
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
-import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getPagesCollection } from '#lib/collections/pages/data.ts';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import {
 	getOpenGraphImageFunction,

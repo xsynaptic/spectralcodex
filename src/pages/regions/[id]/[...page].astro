@@ -5,11 +5,11 @@ import * as R from 'remeda';
 
 import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
 import RegionEntry from '#layouts/region-entry.astro';
-import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
-import { getPostsByIdsFunction } from '#lib/collections/posts/utils.ts';
-import { getRegionsCollection } from '#lib/collections/regions/data.ts';
-import { getRegionsOptions } from '#lib/collections/regions/options.ts';
-import { getRegionAncestorsFunction } from '#lib/collections/regions/utils.ts';
+import { getLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { getPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
+import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
+import { getRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';

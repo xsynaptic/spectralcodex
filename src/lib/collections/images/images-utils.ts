@@ -1,4 +1,4 @@
-import { getImagesCollection } from '#lib/collections/images/data.ts';
+import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 
 export async function getImageByIdFunction() {
 	const { imagesMap } = await getImagesCollection();

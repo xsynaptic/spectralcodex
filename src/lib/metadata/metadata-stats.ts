@@ -1,6 +1,6 @@
 import * as R from 'remeda';
 
-import { getImagesCollection } from '#lib/collections/images/data.ts';
+import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 

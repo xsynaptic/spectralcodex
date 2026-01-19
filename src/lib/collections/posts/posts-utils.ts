@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function getPostsByIdsFunction() {

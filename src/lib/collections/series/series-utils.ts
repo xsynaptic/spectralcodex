@@ -2,10 +2,10 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getLocationsByPostsFunction } from '#lib/collections/locations/utils.ts';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
-import { getSeriesCollection } from '#lib/collections/series/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { filterHasFeaturedImage } from '#lib/metadata/metadata-utils.ts';
 

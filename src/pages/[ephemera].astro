@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import EphemeraEntry from '#layouts/ephemera-entry.astro';
-import { getEphemeraCollection } from '#lib/collections/ephemera/data.ts';
+import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
 import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {

@@ -5,7 +5,7 @@ import * as R from 'remeda';
 
 import MapComponent from '#components/map/map-component.astro';
 import Container from '#components/parts/container.astro';
-import { getLocationsByIdsFunction } from '#lib/collections/locations/utils.ts';
+import { getLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
@@ -32,7 +32,7 @@ const getLocationsByReference = await getLocationsByIdsFunction();
 // We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, ...mapComponentProps } = getMapData({
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, { showAllLocations: showHidden })
+		getLocationsFeatureCollection(locations, { showAllLocations: showHidden }),
 	),
 	mapApiBaseUrl: undefined,
 	languages,

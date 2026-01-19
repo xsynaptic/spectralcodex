@@ -1,8 +1,8 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function getThemesByIdsFunction() {

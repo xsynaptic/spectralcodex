@@ -6,8 +6,8 @@ import pMemoize from 'p-memoize';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
-import { getImageByIdFunction } from '#lib/collections/images/utils.ts';
-import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/data-nearby.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';

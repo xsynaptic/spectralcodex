@@ -4,9 +4,9 @@ import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 
-import type { RegionLanguage } from '#lib/collections/regions/types.ts';
+import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 
-import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
+import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
 interface CollectionData {

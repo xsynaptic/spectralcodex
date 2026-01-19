@@ -1,6 +1,6 @@
 import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
 
-import { getRegionsCollection } from '#lib/collections/regions/data.ts';
+import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 
 /**
  * Transform an array of strings into collection entries

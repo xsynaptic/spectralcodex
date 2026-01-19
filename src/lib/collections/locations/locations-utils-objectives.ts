@@ -1,7 +1,7 @@
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getRegionsByIdsFunction } from '#lib/collections/regions/utils.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
 
 // Saved queries for use in MDX and other places
 // TODO: this should eventually be handled via user authentication

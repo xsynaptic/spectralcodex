@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import PostIndex from '#layouts/post-index.astro';
-import { getPostsCollection } from '#lib/collections/posts/data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
@@ -20,7 +20,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		posts,
 		R.filter(getFilterEntryQualityFunction(2)),
 		getContentMetadata,
-		R.sort(sortContentMetadataByDate)
+		R.sort(sortContentMetadataByDate),
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

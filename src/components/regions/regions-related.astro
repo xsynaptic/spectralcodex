@@ -8,7 +8,7 @@ import RegionsList from '#components/regions/regions-list.astro';
 import {
 	getRegionAncestorsFunction,
 	getRegionsByIdsFunction,
-} from '#lib/collections/regions/utils.ts';
+} from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
@@ -32,7 +32,7 @@ function getRegionsRelatedByIds(ids: Array<string> | undefined, limit: number) {
 				getRegionsByIds,
 				R.filter(filterWithContent),
 				R.sort(sortByContentCount),
-				R.take(limit)
+				R.take(limit),
 			)
 		: [];
 }

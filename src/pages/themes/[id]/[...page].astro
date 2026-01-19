@@ -4,10 +4,10 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import ThemeEntry from '#layouts/theme-entry.astro';
-import { getLocationsCollection } from '#lib/collections/locations/data.ts';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/utils.ts';
-import { getThemesCollection } from '#lib/collections/themes/data.ts';
-import { getPostsByThemeFunction } from '#lib/collections/themes/utils.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
+import { getPostsByThemeFunction } from '#lib/collections/themes/themes-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
