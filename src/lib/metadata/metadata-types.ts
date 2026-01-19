@@ -5,7 +5,10 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 /**
  * Metadata
  */
-export type ContentMetadataCollectionKey = Exclude<CollectionKey, 'images' | 'timeline'>;
+export type ContentMetadataCollectionKey = Extract<
+	CollectionKey,
+	'ephemera' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
+>;
 
 // This is a subset of common properties of different content collections
 export interface ContentMetadataItem<
