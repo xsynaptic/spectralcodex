@@ -5,9 +5,7 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
-import { SourceSchema } from '#lib/schemas/sources.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema, LinkSchema, SourceSchema } from '#lib/schemas/index.ts';
 
 export const themes = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/themes` }),

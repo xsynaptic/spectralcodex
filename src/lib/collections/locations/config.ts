@@ -16,9 +16,7 @@ import {
 	NumericScaleSchema,
 	StylizedTextSchema,
 } from '#lib/schemas/index.ts';
-import { UrlSchema } from '#lib/schemas/index.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
-import { SourceSchema } from '#lib/schemas/sources.ts';
+import { LinkSchema, SourceSchema, UrlSchema } from '#lib/schemas/index.ts';
 
 export const locations = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/locations` }),

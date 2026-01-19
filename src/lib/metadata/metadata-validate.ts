@@ -2,6 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { MAP_GEOMETRY_COORDINATES_PRECISION } from '#constants.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMatchingLinkUrl } from '#lib/schemas/index.ts';
 
 // Check for duplicate locations entered by mistake
 // We do this here instead of at the schema level because Zod doesn't have context
@@ -50,9 +51,7 @@ export function validateLocations(locations: Array<CollectionEntry<'locations'>>
 			locationTitleMultilingual.add(address);
 		}
 
-		const googleMapsLink = location.data.links?.find(({ url }) =>
-			url.startsWith('https://maps.app.goo.gl'),
-		)?.url;
+		const googleMapsLink = getMatchingLinkUrl('maps.app.goo.gl', location.data.links);
 
 		if (googleMapsLink) {
 			if (locationGoogleMapsLinks.has(googleMapsLink)) {

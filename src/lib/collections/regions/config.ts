@@ -7,8 +7,7 @@ import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema, LinkSchema } from '#lib/schemas/index.ts';
 
 export const regions = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/regions` }),

@@ -3,9 +3,7 @@ import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
-import { SourceSchema } from '#lib/schemas/sources.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema, LinkSchema, SourceSchema } from '#lib/schemas/index.ts';
 
 // Used by ephemera and posts
 export const postSchema = z
