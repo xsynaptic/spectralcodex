@@ -10,7 +10,8 @@ import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
+import ContentSectionMetadataList from '#components/content/content-section-metadata-list.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
@@ -26,11 +27,13 @@ import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 interface Props {
 	entry: CollectionEntry<'themes'>;
 	mapData: MapComponentData;
+	metadataItems: Array<ContentMetadataItem>;
+	metadataItemsCount: number;
 	relatedThemeIds: Array<string>;
 	page: Page<ContentMetadataItem>;
 }
 
-const { entry, mapData, relatedThemeIds, page } = Astro.props;
+const { entry, mapData, metadataItems, metadataItemsCount, relatedThemeIds, page } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
@@ -84,6 +87,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionThemes themeIds={allThemeIds} />
 		<ContentSectionMap mapData={mapData} persistId={`theme-${entry.id}`} />
-		<ContentSectionPreviewGrid page={page} />
+		<ContentSectionMetadataGrid page={page} />
+		{
+			page.currentPage === 1 && metadataItems.length > 0 ? (
+				<ContentSectionMetadataList items={metadataItems} count={metadataItemsCount} />
+			) : undefined
+		}
 	</article>
 </MainSite>

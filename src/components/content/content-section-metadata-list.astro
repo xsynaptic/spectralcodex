@@ -1,0 +1,30 @@
+---
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
+import ContentSection from '#components/content/content-section.astro';
+import MetadataList from '#components/parts/metadata-list.astro';
+import ProseBody from '#components/parts/prose-body.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	items: Array<ContentMetadataItem>;
+	count: number;
+}
+
+const { items, count, ...props } = Astro.props;
+
+const hasItems = items.length > 0;
+
+const t = getTranslations();
+---
+
+{
+	hasItems ? (
+		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
+			<Fragment slot="section-title">{t('content.section.itemsList')}</Fragment>
+			<ProseBody>
+				<MetadataList items={items} count={count} />
+			</ProseBody>
+		</ContentSection>
+	) : undefined
+}

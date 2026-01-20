@@ -8,8 +8,8 @@ import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
+import MetadataGrid from '#components/parts/metadata-grid.astro';
 import Pagination from '#components/parts/pagination.astro';
-import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
@@ -36,7 +36,7 @@ const description = t(`collection.regions.description`);
 		{
 			page.data.length > 0 ? (
 				<>
-					<PreviewGrid
+					<MetadataGrid
 						items={page.data}
 						showLocations={true}
 						showPosts={true}

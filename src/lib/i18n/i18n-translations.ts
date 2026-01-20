@@ -96,6 +96,7 @@ const translationStrings = {
 		// Content sections
 		'content.section.author': 'Author',
 		'content.section.content': 'Content',
+		'content.section.itemsList': 'More',
 		'content.section.links': 'Links',
 		'content.section.sources': 'Sources',
 		'content.section.heritage': 'Heritage Status',
@@ -136,6 +137,9 @@ const translationStrings = {
 		// Pagination
 		'pagination.next': 'Next',
 		'pagination.previous': 'Previous',
+
+		// Parts
+		'parts.textSeparatedList.more': 'More',
 
 		// Objectives
 		'objectives.title': 'Objectives',

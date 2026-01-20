@@ -27,7 +27,7 @@ interface Props {
 
 const { timelineMonthlyItem, timelineYears, timelineMonths } = Astro.props;
 
-// Check for custom timeline entry
+// Check for custom timeline entry; this may override generated data
 const { timelineEntry } = timelineMonthlyItem;
 
 // Use custom imageFeatured from timeline entry if available, otherwise use generated highlights

@@ -44,14 +44,25 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		const entryLocations = entry.data.locations ? getLocationsByIds(entry.data.locations) : [];
 
-		const metadataItems = R.pipe(
+		const metadataItemsFiltered = R.pipe(
 			[
 				...R.pipe(entryLocations, R.filter(getFilterEntryQualityFunction(2)), getContentMetadata),
 				...R.pipe(entry.data.posts ?? [], getPostsByIds, getContentMetadata),
 			],
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
+			R.sort(sortContentMetadataByDate)
 		);
+
+		// Anything that wasn't included above
+		const metadataItemsAll = R.pipe(
+			entryLocations,
+			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
+			R.filter(({ data }) => !data.hideLocation),
+			getContentMetadata,
+			R.shuffle()
+		);
+		const metadataItems = metadataItemsAll.slice(0, 25);
+		const metadataItemsCount = metadataItemsAll.length;
 
 		const regionsOption = getRegionsOptions(getRegionAncestors(entry).length);
 
@@ -67,15 +78,17 @@ export const getStaticPaths = (async ({ paginate }) => {
 		});
 
 		results.push(
-			...paginate(metadataItems, {
+			...paginate(metadataItemsFiltered, {
 				params: { id: entry.id },
 				props: {
 					entry,
 					mapData,
+					metadataItems,
+					metadataItemsCount,
 					regionsOption,
 				},
 				pageSize: 20,
-			}),
+			})
 		);
 	}
 	return results;

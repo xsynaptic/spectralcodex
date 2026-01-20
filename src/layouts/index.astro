@@ -8,7 +8,7 @@ import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import IndexDescription from '#components/index/index-description.astro';
 import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
-import PreviewGrid from '#components/parts/preview-grid.astro';
+import MetadataGrid from '#components/parts/metadata-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -58,7 +58,7 @@ const t = getTranslations();
 	<IndexDescription />
 	<ContentSection class="clear-both">
 		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
-		<PreviewGrid
+		<MetadataGrid
 			items={recentMetadataItems}
 			showDate={true}
 			showRegion={true}
@@ -75,7 +75,7 @@ const t = getTranslations();
 			slot="section-description"
 			set:html={transformMarkdown({ input: t('index.themes') })}
 		/>
-		<PreviewGrid
+		<MetadataGrid
 			items={themesMetadataItems}
 			showLocations={true}
 			showPosts={true}
@@ -92,6 +92,6 @@ const t = getTranslations();
 			slot="section-description"
 			set:html={transformMarkdown({ input: t('index.series') })}
 		/>
-		<PreviewGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
+		<MetadataGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 </MainSite>

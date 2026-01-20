@@ -1,64 +1,24 @@
 ---
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
-import Link from '#components/parts/link.astro';
+import MetadataList from '#components/parts/metadata-list.astro';
 import ProseBody from '#components/parts/prose-body.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
-import TextSeparated from '#components/parts/text-separated.astro';
 
 interface Props {
 	title: string;
 	items: Array<ContentMetadataItem>;
 	count?: number | undefined;
-	countThreshold?: number | undefined;
 	class?: string | undefined;
 }
 
-const { title, items, count, countThreshold = 10, class: className, ...props } = Astro.props;
-
-const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
-
-const numberFormatter = Intl.NumberFormat('en', { maximumFractionDigits: 0 });
-
-const countText =
-	showCount && count
-		? { title: `${numberFormatter.format(count - items.length)} more`, url: undefined }
-		: undefined;
+const { title, items, count, class: className, ...props } = Astro.props;
 ---
 
 {
 	items.length > 0 ? (
 		<ProseBody class={className} {...props}>
 			<span class="font-medium">{title}</span>:
-			{countText
-				? [...items, countText].map((item, index) => (
-						<TextSeparated index={index} total={items.length + 1}>
-							{item.url ? (
-								<>
-									<Link href={item.url}>{item.title}</Link>
-									{item.titleMultilingual ? (
-										<>
-											{' '}
-											<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-										</>
-									) : undefined}
-								</>
-							) : (
-								item.title
-							)}
-						</TextSeparated>
-					))
-				: items.map((item, index) => (
-						<TextSeparated index={index} total={items.length}>
-							<Link href={item.url}>{item.title}</Link>
-							{item.titleMultilingual ? (
-								<>
-									{' '}
-									<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-								</>
-							) : undefined}
-						</TextSeparated>
-					))}
+			<MetadataList items={items} count={count} />
 		</ProseBody>
 	) : undefined
 }

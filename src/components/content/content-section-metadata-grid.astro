@@ -1,12 +1,12 @@
 ---
 import type { Page } from 'astro';
 
-import type { PreviewItemProps } from '#components/parts/preview-grid.astro';
+import type { PreviewItemProps } from '#components/parts/metadata-grid.astro';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
+import MetadataGrid from '#components/parts/metadata-grid.astro';
 import Pagination from '#components/parts/pagination.astro';
-import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
@@ -34,11 +34,11 @@ const t = getTranslations();
 			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
 			{page ? (
 				<>
-					<PreviewGrid items={page.data} {...defaultPreviewItemProps} {...previewItemProps} />
+					<MetadataGrid items={page.data} {...defaultPreviewItemProps} {...previewItemProps} />
 					<Pagination class="mt-small md:mt-medium" page={page} />
 				</>
 			) : undefined}
-			{hasItems ? <PreviewGrid items={items} {...previewItemProps} /> : undefined}
+			{hasItems ? <MetadataGrid items={items} {...previewItemProps} /> : undefined}
 		</ContentSection>
 	) : undefined
 }

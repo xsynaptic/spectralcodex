@@ -14,7 +14,7 @@ import ContentSectionBacklinks from '#components/content/content-section-backlin
 import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
 import ContentSectionRelated from '#components/content/content-section-related.astro';
 import ContentSectionSeries from '#components/content/content-section-series.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
@@ -137,7 +137,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionBacklinks backlinks={backlinks} />
 		<ContentSectionSeries entry={entry} />
-		<ContentSectionPreviewGrid items={metadataItems} />
+		<ContentSectionMetadataGrid items={metadataItems} />
 		{
 			hideLocation ? undefined : (
 				<ContentSectionMap mapData={mapData}>

@@ -9,7 +9,7 @@ import ContentCollectionLink from '#components/content/content-collection-link.a
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -85,7 +85,7 @@ const t = getTranslations();
 			</ContentHeader>
 		</ImageHeroCarousel>
 		<ContentDescription entry={entry} />
-		<ContentSectionPreviewGrid page={page} />
+		<ContentSectionMetadataGrid page={page} />
 		<ContentSectionMap mapData={mapData} persistId={`series-${entry.id}`} />
 	</article>
 </MainSite>

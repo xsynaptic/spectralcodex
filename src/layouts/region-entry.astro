@@ -11,7 +11,8 @@ import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
+import ContentSectionMetadataList from '#components/content/content-section-metadata-list.astro';
 import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
@@ -29,10 +30,12 @@ interface Props {
 	entry: CollectionEntry<'regions'>;
 	page: Page<ContentMetadataItem>;
 	mapData: MapComponentData;
+	metadataItems: Array<ContentMetadataItem>;
+	metadataItemsCount: number;
 	regionsOption?: RegionsOption;
 }
 
-const { page, mapData, entry, regionsOption } = Astro.props;
+const { page, mapData, entry, metadataItems, metadataItemsCount, regionsOption } = Astro.props;
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
@@ -99,7 +102,12 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			}
 		</RegionsRelated>
 		<ContentSectionMap mapData={mapData} persistId={`region-${entry.id}`} />
-		<ContentSectionPreviewGrid page={page} />
+		<ContentSectionMetadataGrid page={page} />
+		{
+			page.currentPage === 1 && metadataItems.length > 0 ? (
+				<ContentSectionMetadataList items={metadataItems} count={metadataItemsCount} />
+			) : undefined
+		}
 		<RegionsDivision entryId={entry.id} />
 	</article>
 </MainSite>

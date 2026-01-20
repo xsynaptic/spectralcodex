@@ -35,22 +35,34 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		// Note: the need to get location data async means we should filter this first!
 		const locationsFiltered = locations.filter(
-			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false,
+			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false
 		);
 
+		const postsFiltered = getPostsByTerm(entry);
+
 		// Metadata items are the posts and locations that are associated with the theme
-		const metadataItems = R.pipe(
+		const metadataItemsFiltered = R.pipe(
 			[
 				...R.pipe(
 					locationsFiltered,
-					R.filter(getFilterEntryQualityFunction(2)), // Quality filter last!
-					getContentMetadata,
+					R.filter(getFilterEntryQualityFunction(2)) // Quality filter last!
 				),
-				...R.pipe(entry, getPostsByTerm, getContentMetadata),
+				...postsFiltered,
 			],
+			getContentMetadata,
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
+			R.sort(sortContentMetadataByDate)
 		);
+
+		// Anything that wasn't included above
+		const metadataItemsAll = R.pipe(
+			[...locationsFiltered, ...postsFiltered],
+			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
+			getContentMetadata,
+			R.shuffle()
+		);
+		const metadataItems = metadataItemsAll.slice(0, 25);
+		const metadataItemsCount = metadataItemsAll.length;
 
 		const mapData = getMapData({
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
@@ -65,15 +77,15 @@ export const getStaticPaths = (async ({ paginate }) => {
 			themes,
 			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
 			R.sort(sortByContentCount),
-			R.map((theme) => theme.id),
+			R.map((theme) => theme.id)
 		);
 
 		results.push(
-			...paginate(metadataItems, {
+			...paginate(metadataItemsFiltered, {
 				params: { id: entry.id },
-				props: { entry, mapData, relatedThemeIds },
+				props: { entry, mapData, metadataItems, metadataItemsCount, relatedThemeIds },
 				pageSize: 20,
-			}),
+			})
 		);
 	}
 	return results;

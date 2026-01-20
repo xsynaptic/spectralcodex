@@ -9,7 +9,7 @@ import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
 import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionPreviewGrid from '#components/content/content-section-preview-grid.astro';
+import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
 import ContentSectionRegions from '#components/content/content-section-regions.astro';
 import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import MainSite from '#components/main/main-site.astro';
@@ -19,6 +19,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
@@ -43,6 +44,10 @@ const t = getTranslations();
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		description: entry.body ?? undefined,
+		image: getSeoImageProps({
+			...(entry.data.imageFeatured ? { id: entry.id } : {}),
+			alt: entry.data.title,
+		}),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
 >
@@ -77,6 +82,6 @@ const t = getTranslations();
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionMap mapData={mapData} persistId={`link-${entry.id}`} />
-		<ContentSectionPreviewGrid page={page} />
+		<ContentSectionMetadataGrid page={page} />
 	</article>
 </MainSite>
