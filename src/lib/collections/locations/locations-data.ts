@@ -11,7 +11,7 @@ import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locat
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
-import { getMatchingLinkUrl } from '#lib/schemas/index.ts';
+import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -132,7 +132,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data.url = getContentUrl('locations', entry.id);
 	entry.data.googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data.wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
-	
+
 	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {

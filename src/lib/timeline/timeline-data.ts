@@ -167,6 +167,7 @@ function filterAndSortItems(
 		.filter((item) => item.entryQuality >= options.quality)
 		.sort((a, b) => {
 			const qualityDifference = b.entryQuality - a.entryQuality;
+			
 			if (qualityDifference !== 0) return qualityDifference;
 
 			return a.title.localeCompare(b.title);
@@ -234,9 +235,9 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 		);
 
 		// Build lookup sets for allowed items per category (for yearly view)
-		const allowedUpdated = new Set(yearDeduplicated.updated.map((i) => i.id));
-		const allowedCreated = new Set(yearDeduplicated.created.map((i) => i.id));
-		const allowedVisited = new Set(yearDeduplicated.visited.map((i) => i.id));
+		const allowedUpdated = new Set(yearDeduplicated.updated.map(({ id }) => id));
+		const allowedCreated = new Set(yearDeduplicated.created.map(({ id }) => id));
+		const allowedVisited = new Set(yearDeduplicated.visited.map(({ id }) => id));
 
 		// Process monthly and yearly views using the allowed sets
 		for (const monthlyData of yearlyData.values()) {

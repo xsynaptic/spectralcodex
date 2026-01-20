@@ -10,8 +10,8 @@ import {
 	DescriptionSchema,
 	NumericScaleSchema,
 	StylizedTextSchema,
-	LinkSchema
 } from '#lib/schemas/index.ts';
+import { LinkSchema } from '#lib/schemas/resources.ts';
 
 // Note: pages do not have a flat structure; the URL will reflect the location on the file system
 export const pages = defineCollection({

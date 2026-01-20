@@ -33,11 +33,15 @@ export const getResourcesCollection = pMemoize(async (): Promise<CollectionData>
 			// Check URL match via links field (for website-type resources with match field)
 			const hasLinkMatch =
 				matchPattern &&
-				contentEntry.data.links?.some((link) => typeof link === 'string' ? matchLinkUrl(link, matchPattern) : matchLinkUrl(link.url, matchPattern));
+				contentEntry.data.links?.some((link) =>
+					typeof link === 'string'
+						? matchLinkUrl(link, matchPattern)
+						: matchLinkUrl(link.url, matchPattern),
+				);
 
 			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = contentEntry.data.sources?.some(
-				(source) => typeof source === 'string' ? source === resourceId : false,
+			const hasSourceMatch = contentEntry.data.sources?.some((source) =>
+				typeof source === 'string' ? source === resourceId : false,
 			);
 
 			if (hasLinkMatch || hasSourceMatch) {

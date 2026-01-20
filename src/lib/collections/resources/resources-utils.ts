@@ -2,10 +2,15 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
+
 /**
  * Match a given string against a match pattern (either a single string or an array of strings)
  */
-export function matchLinkUrl(linkUrl: string, matchPattern: string | Array<string> | undefined): boolean {
+export function matchLinkUrl(
+	linkUrl: string,
+	matchPattern: string | Array<string> | undefined,
+): boolean {
 	if (!matchPattern) return false;
 
 	if (typeof matchPattern === 'string') {
@@ -30,11 +35,16 @@ export async function getLocationsByResourceFunction() {
 		return locations.filter((location) => {
 			// Check URL match via links field (for website-type resources with match field)
 			const hasLinkMatch =
-				matchPattern && location.data.links?.some((link) => typeof link === 'string' ? matchLinkUrl(link, matchPattern) : matchLinkUrl(link.url, matchPattern));
+				matchPattern &&
+				location.data.links?.some((link) =>
+					typeof link === 'string'
+						? matchLinkUrl(link, matchPattern)
+						: matchLinkUrl(link.url, matchPattern),
+				);
 
 			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = location.data.sources?.some(
-				(source) => typeof source === 'string' ? source === resourceId : false,
+			const hasSourceMatch = location.data.sources?.some((source) =>
+				typeof source === 'string' ? source === resourceId : false,
 			);
 
 			return hasLinkMatch || hasSourceMatch;
@@ -57,12 +67,78 @@ export async function getPostsByResourceFunction() {
 		return posts.filter((post) => {
 			// Check URL match via links field (for website-type resources with match field)
 			const hasLinkMatch =
-			matchPattern && post.data.links?.some((link) => typeof link === 'string' ? matchLinkUrl(link, matchPattern) : matchLinkUrl(link.url, matchPattern));
+				matchPattern &&
+				post.data.links?.some((link) =>
+					typeof link === 'string'
+						? matchLinkUrl(link, matchPattern)
+						: matchLinkUrl(link.url, matchPattern),
+				);
 
 			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = post.data.sources?.some((source) => typeof source === 'string' ? source === resourceId : false);
+			const hasSourceMatch = post.data.sources?.some((source) =>
+				typeof source === 'string' ? source === resourceId : false,
+			);
 
 			return hasLinkMatch || hasSourceMatch;
 		});
+	};
+}
+
+/**
+ * Resolve links and sources
+ */
+export async function getResolveResourceLinksFunction() {
+	const { resources } = await getResourcesCollection();
+
+	return function resolveResourceLinks(
+		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
+	) {
+		const entryLinks =
+			'links' in entry.data && entry.data.links && entry.data.links.length > 0
+				? entry.data.links
+				: undefined;
+
+		return entryLinks
+			?.map((entryLink) => {
+				if (typeof entryLink === 'string') {
+					const resource = resources.find((resource) =>
+						matchLinkUrl(entryLink, resource.data.match),
+					);
+
+					if (!resource) return;
+
+					return {
+						id: resource.id,
+						...resource.data,
+					};
+				}
+
+				return entryLink;
+			})
+			.filter((link) => !!link);
+	};
+}
+
+export async function getResolveResourceSourcesFunction() {
+	const { resourcesMap } = await getResourcesCollection();
+
+	return function resolveResourceSources(
+		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
+	) {
+		const entrySources =
+			'sources' in entry.data && entry.data.sources && entry.data.sources.length > 0
+				? entry.data.sources
+				: undefined;
+
+		return entrySources
+			?.map((entrySource) => {
+				const source =
+					typeof entrySource === 'string' ? resourcesMap.get(entrySource)?.data : entrySource;
+
+				if (!source) return;
+
+				return source;
+			})
+			.filter((source) => !!source);
 	};
 }

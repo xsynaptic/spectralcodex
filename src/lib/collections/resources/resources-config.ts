@@ -9,8 +9,13 @@ import {
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedTextSchema, UrlSchema } from '#lib/schemas/index.ts';
-import { LinkSchema } from '#lib/schemas/links.ts';
+import {
+	DateStringSchema,
+	NumericScaleSchema,
+	StylizedTextSchema,
+	UrlSchema,
+} from '#lib/schemas/index.ts';
+import { LinkSchema } from '#lib/schemas/resources.ts';
 
 export const resources = defineCollection({
 	loader: glob({ pattern: '**/*.mdx', base: `${CONTENT_COLLECTIONS_PATH}/resources` }),
@@ -23,10 +28,13 @@ export const resources = defineCollection({
 			url: UrlSchema.optional(),
 			match: z.union([z.string(), z.array(z.string())]).optional(),
 			// Publication-specific fields (optional)
-			authors: z.object({
-				name: z.string(),
-				...nameMultilingualSchema,
-			}).array().optional(),
+			authors: z
+				.object({
+					name: z.string(),
+					...nameMultilingualSchema,
+				})
+				.array()
+				.optional(),
 			publisher: z.string().optional(),
 			...publisherMultilingualSchema,
 			datePublished: z.string().optional(),

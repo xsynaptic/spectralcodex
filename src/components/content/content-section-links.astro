@@ -6,8 +6,7 @@ import Link from '#components/parts/link.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-import { matchLinkUrl } from '#lib/collections/resources/resources-utils.ts';
+import { getResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -18,29 +17,9 @@ interface Props {
 
 const { entry, ...props } = Astro.props;
 
-const { resources } = await getResourcesCollection();
+const getResolveResourceLinks = await getResolveResourceLinksFunction();
 
-const entryLinks =
-	'links' in entry.data && entry.data.links && entry.data.links.length > 0
-		? entry.data.links
-		: undefined;
-
-const links = entryLinks
-	?.map((entryLink) => {
-		if (typeof entryLink === 'string') {
-			const resource = resources.find((resource) => matchLinkUrl(entryLink, resource.data.match));
-
-			if (!resource) return;
-
-			return {
-				id: resource.id,
-				...resource.data,
-			};
-		}
-
-		return entryLink;
-	})
-	.filter((link) => !!link);
+const links = getResolveResourceLinks(entry);
 
 const t = getTranslations();
 ---
