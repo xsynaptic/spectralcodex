@@ -72,7 +72,7 @@ const translationStrings = {
 		'collection.resources.description':
 			'Featured websites, blogs, and online resources that have informed or documented content on this site.',
 		'collection.resources.homepage.label': 'Visit Homepage',
-		'collection.resources.showPage.label': 'See more...',
+		'collection.resources.showPage.label': 'View Index',
 		'collection.resources.contentCount.label': 'Content Count',
 
 		// Series
@@ -139,7 +139,7 @@ const translationStrings = {
 		'pagination.previous': 'Previous',
 
 		// Parts
-		'parts.textSeparatedList.more': 'More',
+		'parts.textSeparatedList.more': 'more',
 
 		// Objectives
 		'objectives.title': 'Objectives',

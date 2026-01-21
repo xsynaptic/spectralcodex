@@ -17,7 +17,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		R.sort(sortByContentCount),
 	);
 
-	return paginate(items, { pageSize: 20 });
+	return paginate(items, { pageSize: 50 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
