@@ -21,11 +21,11 @@ export const series = defineCollection({
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
-			entryQuality: NumericScaleSchema,
-			/** Derived properties, for internal use only! */
-			locationCount: z.number().int().optional(),
-			postCount: z.number().int().optional(),
 			hideSearch: z.boolean().optional(),
+			entryQuality: NumericScaleSchema,
+			/** Computed properties, for internal use only! */
+			_locationCount: z.number().int().optional(),
+			_postCount: z.number().int().optional(),
 		})
 		.strict(),
 });

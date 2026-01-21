@@ -22,7 +22,7 @@ function getMenuItemData({
 	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
 	slug: 'regions' | 'series' | 'themes';
 }) {
-	const ancestor = entry.collection === 'regions' ? entry.data.ancestors?.at(-1) : undefined;
+	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
 
 	return {
 		collection: entry.collection,
@@ -45,7 +45,7 @@ function filterMenuItemContentCount(depth: 1 | 2 | 3) {
 	}
 
 	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
-		(entry.data.postCount ?? 0) + (entry.data.locationCount ?? 0) >= minContentCount;
+		(entry.data._postCount ?? 0) + (entry.data._locationCount ?? 0) >= minContentCount;
 }
 
 export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
@@ -64,17 +64,17 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => ({
 			...getMenuItemData({ entry, slug: 'regions' }),
-			...(entry.data.children
+			...(entry.data._children
 				? {
-						children: getRegionsByIds(entry.data.children)
+						children: getRegionsByIds(entry.data._children)
 							.filter(filterMenuItemContentCount(2))
 							.sort(sortByContentCount)
 							.slice(0, 15)
 							.map((entry) => ({
 								...getMenuItemData({ entry, slug: 'regions' }),
-								...(entry.data.children
+								...(entry.data._children
 									? {
-											children: getRegionsByIds(entry.data.children)
+											children: getRegionsByIds(entry.data._children)
 												.filter(filterMenuItemContentCount(3))
 												.sort(sortByContentCount)
 												.slice(0, 8)

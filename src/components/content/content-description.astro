@@ -4,12 +4,10 @@ import type { CollectionEntry } from 'astro:content';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { render } from 'astro:content';
 
-import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
-
 import ContentSection from '#components/content/content-section.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { getRegionLangCodeByEntry } from '#lib/collections/regions/regions-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 
 interface Props {
@@ -19,18 +17,7 @@ interface Props {
 
 const { class: className, entry, ...props } = Astro.props;
 
-const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
-
-let langCode: RegionLanguage | undefined;
-
-if (entry.collection === 'regions') {
-	langCode = entry.data.langCode;
-} else if (entry.collection === 'locations') {
-	langCode = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)?.data
-		.langCode;
-} else {
-	langCode = getFirstRegionByReference(entry.data.regions)?.data.langCode;
-}
+const langCode = await getRegionLangCodeByEntry(entry);
 
 const wrapCjkOptions = langCode ? { langCode: langCode.startsWith('zh') ? 'zh' : langCode } : {};
 

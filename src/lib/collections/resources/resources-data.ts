@@ -57,9 +57,8 @@ export const getResourcesCollection = pMemoize(async (): Promise<CollectionData>
 			...entry,
 			data: {
 				...entry.data,
-				locationCount,
-				postCount,
-				contentCount: locationCount + postCount,
+				_locationCount: locationCount,
+				_postCount: postCount,
 			},
 		});
 	}

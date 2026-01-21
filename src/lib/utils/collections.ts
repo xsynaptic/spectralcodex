@@ -4,8 +4,8 @@ import type { ContentMetadataCollectionKey } from '#lib/metadata/metadata-types.
 
 interface CollectionEntryWithContentCount {
 	data: {
-		locationCount?: number | undefined;
-		postCount?: number | undefined;
+		_locationCount?: number | undefined;
+		_postCount?: number | undefined;
 	};
 }
 
@@ -14,8 +14,8 @@ export function sortByContentCount<T extends CollectionEntryWithContentCount>(
 	entryA: T,
 	entryB: T,
 ) {
-	const aTotal = (entryA.data.locationCount ?? 0) + (entryA.data.postCount ?? 0);
-	const bTotal = (entryB.data.locationCount ?? 0) + (entryB.data.postCount ?? 0);
+	const aTotal = (entryA.data._locationCount ?? 0) + (entryA.data._postCount ?? 0);
+	const bTotal = (entryB.data._locationCount ?? 0) + (entryB.data._postCount ?? 0);
 
 	return bTotal - aTotal;
 }
@@ -23,8 +23,8 @@ export function sortByContentCount<T extends CollectionEntryWithContentCount>(
 // Filter out terms that do *not* have any associated posts or locations
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
 export function filterWithContent<T extends CollectionEntryWithContentCount>(entry: T) {
-	if (entry.data.locationCount && entry.data.locationCount > 0) return true;
-	if (entry.data.postCount && entry.data.postCount > 0) return true;
+	if (entry.data._locationCount && entry.data._locationCount > 0) return true;
+	if (entry.data._postCount && entry.data._postCount > 0) return true;
 	return false;
 }
 

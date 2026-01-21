@@ -15,6 +15,8 @@ import {
 	point as getPoint,
 } from '@turf/turf';
 
+import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
+
 import { FEATURE_LOCATION_NEARBY_ITEMS } from '#constants.ts';
 
 const LOCATIONS_NEARBY_COUNT_LIMIT = 25; // Max number of locations returned
@@ -125,14 +127,11 @@ export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<
 			})
 			.filter((item) => !!item)
 			.sort((a, b) => a.distance - b.distance)
-			.slice(
-				0,
-				LOCATIONS_NEARBY_COUNT_LIMIT,
-			) satisfies CollectionEntry<'locations'>['data']['nearby'];
+			.slice(0, LOCATIONS_NEARBY_COUNT_LIMIT) satisfies Array<LocationsNearbyItem>;
 
 		// If we have nearby points let's add data to the actual location entry
 		if (nearby.length > 0) {
-			entry.data.nearby = nearby;
+			entry.data._nearby = nearby;
 		}
 	};
 }

@@ -15,7 +15,7 @@ export async function getObjectiveLocations() {
 		R.filter((entry) => !!entry.data.objective && entry.data.objective >= 1),
 		R.filter((entry) =>
 			getRegionsByIds(entry.data.regions.map(({ id }) => id)).some(
-				(region) => region.id === 'taiwan' || region.data.ancestors?.includes('taiwan'),
+				(region) => region.id === 'taiwan' || region.data._ancestors?.includes('taiwan'),
 			),
 		),
 	);

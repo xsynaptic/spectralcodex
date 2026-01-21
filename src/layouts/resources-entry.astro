@@ -66,11 +66,13 @@ const t = getTranslations();
 					) : undefined
 				}
 				{
-					entry.data.contentCount ? (
+					entry.data._locationCount || entry.data._postCount ? (
 						<DividedItem>
 							<span>
 								{t('collection.resources.contentCount.label')}:{' '}
-								{formatNumber({ number: entry.data.contentCount })}
+								{formatNumber({
+									number: Number(entry.data._locationCount) + Number(entry.data._postCount),
+								})}
 							</span>
 						</DividedItem>
 					) : undefined

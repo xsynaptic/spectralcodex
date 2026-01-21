@@ -55,7 +55,7 @@ const titleMultilingual =
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
 const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions);
-const regionLangCode = regionPrimary?.data.langCode;
+const regionLangCode = regionPrimary?.data._langCode;
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 

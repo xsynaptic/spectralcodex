@@ -20,7 +20,7 @@ const { entry, limit = 20, ...props } = Astro.props;
 
 const { locationsMap } = await getLocationsCollection();
 
-const locationsNearby = entry.data.nearby?.slice(0, limit) ?? [];
+const locationsNearby = entry.data._nearby?.slice(0, limit) ?? [];
 
 const t = getTranslations();
 ---

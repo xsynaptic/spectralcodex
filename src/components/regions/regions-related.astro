@@ -37,8 +37,8 @@ function getRegionsRelatedByIds(ids: Array<string> | undefined, limit: number) {
 		: [];
 }
 
-const regionChildren = getRegionsRelatedByIds(entry.data.children, limit);
-const regionSiblings = getRegionsRelatedByIds(entry.data.siblings, limit);
+const regionChildren = getRegionsRelatedByIds(entry.data._children, limit);
+const regionSiblings = getRegionsRelatedByIds(entry.data._siblings, limit);
 
 const depth = getRegionAncestors(entry).length;
 

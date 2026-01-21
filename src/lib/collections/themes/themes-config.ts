@@ -22,11 +22,11 @@ export const themes = defineCollection({
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
-			entryQuality: NumericScaleSchema,
-			/** Derived properties, for internal use only! */
-			locationCount: z.number().int().optional(),
-			postCount: z.number().int().optional(),
 			hideSearch: z.boolean().optional(),
+			entryQuality: NumericScaleSchema,
+			/** Computed properties, for internal use only! */
+			_locationCount: z.number().int().optional(),
+			_postCount: z.number().int().optional(),
 		})
 		.strict(),
 });

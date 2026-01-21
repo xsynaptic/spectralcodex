@@ -55,8 +55,8 @@ export const GeometryPointsSchema = z.object({
 	precision: NumericScaleSchema.optional(),
 	googleMapsUrl: UrlSchema.optional(),
 	imageFeatured: z.string().nullable().optional(),
-	/** Map properties, for internal use only! */
-	imageThumbnail: ImageThumbnailSchema.nullable().optional(),
+	/** Computed properties, for internal use only! */
+	_imageThumbnail: ImageThumbnailSchema.nullable().optional(),
 });
 
 export const GeometryLinesSchema = z.object({

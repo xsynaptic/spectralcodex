@@ -32,7 +32,7 @@ export async function getRegionAncestorsFunction() {
 	const getRegionsById = await getRegionsByIdsFunction();
 
 	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
-		const ancestors = region.data.ancestors ? getRegionsById(region.data.ancestors) : [];
+		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
 
 		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
 	};
@@ -94,4 +94,22 @@ export async function getFirstRegionByReferenceFunction() {
 
 		return regionId ? regionsMap.get(regionId) : undefined;
 	};
+}
+
+/**
+ * Language code
+ */
+export async function getRegionLangCodeByEntry(
+	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
+) {
+	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+
+	if (entry.collection === 'regions') {
+		return entry.data._langCode;
+	} else if (entry.collection === 'locations') {
+		return getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)?.data
+			._langCode;
+	} else {
+		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
+	}
 }

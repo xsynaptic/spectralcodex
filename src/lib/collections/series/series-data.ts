@@ -19,10 +19,12 @@ export const getSeriesCollection = pMemoize(async (): Promise<CollectionData> =>
 	const seriesMap = new Map<string, CollectionEntry<'series'>>();
 
 	for (const entry of series) {
-		entry.data.locationCount = locations.filter((location) =>
+		entry.data._locationCount = locations.filter((location) =>
 			entry.data.seriesItems?.includes(location.id),
 		).length;
-		entry.data.postCount = posts.filter((post) => entry.data.seriesItems?.includes(post.id)).length;
+		entry.data._postCount = posts.filter((post) =>
+			entry.data.seriesItems?.includes(post.id),
+		).length;
 
 		seriesMap.set(entry.id, entry);
 	}

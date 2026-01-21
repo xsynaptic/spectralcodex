@@ -19,15 +19,15 @@ interface CollectionData {
  */
 type RegionComputedData = Pick<
 	CollectionEntry<'regions'>['data'],
-	| 'ancestors'
-	| 'children'
-	| 'siblings'
-	| 'descendants'
-	| 'langCode'
-	| 'locations'
-	| 'locationCount'
-	| 'posts'
-	| 'postCount'
+	| '_ancestors'
+	| '_children'
+	| '_siblings'
+	| '_descendants'
+	| '_langCode'
+	| '_locations'
+	| '_locationCount'
+	| '_posts'
+	| '_postCount'
 >;
 
 // Cache of all region computed data, keyed by region ID
@@ -89,27 +89,27 @@ function extractComputedData(regions: Array<CollectionEntry<'regions'>>): Region
 
 	for (const entry of regions) {
 		const {
-			ancestors,
-			children,
-			siblings,
-			descendants,
-			langCode,
-			locations,
-			locationCount,
-			posts,
-			postCount,
+			_ancestors,
+			_children,
+			_siblings,
+			_descendants,
+			_langCode,
+			_locations,
+			_locationCount,
+			_posts,
+			_postCount,
 		} = entry.data;
 
 		computedDataCache[entry.id] = {
-			ancestors,
-			children,
-			siblings,
-			descendants,
-			langCode,
-			locations,
-			locationCount,
-			posts,
-			postCount,
+			_ancestors,
+			_children,
+			_siblings,
+			_descendants,
+			_langCode,
+			_locations,
+			_locationCount,
+			_posts,
+			_postCount,
 		};
 	}
 	return computedDataCache;
@@ -133,10 +133,10 @@ function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 
 				if (!parent) break;
 
-				if (entry.data.ancestors) {
-					entry.data.ancestors.push(parent.id);
+				if (entry.data._ancestors) {
+					entry.data._ancestors.push(parent.id);
 				} else {
-					entry.data.ancestors = [parent.id];
+					entry.data._ancestors = [parent.id];
 				}
 				current = parent;
 			}
@@ -148,7 +148,7 @@ function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 		const children = regions.filter(({ data }) => data.parent === entry.id);
 
 		if (children.length > 0) {
-			entry.data.children = children.map(({ id }) => id);
+			entry.data._children = children.map(({ id }) => id);
 		}
 
 		// Do not include the current term, and also handle ancestral terms
@@ -159,20 +159,20 @@ function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 		});
 
 		if (siblings.length > 0) {
-			entry.data.siblings = siblings.map(({ id }) => id);
+			entry.data._siblings = siblings.map(({ id }) => id);
 		}
 
 		// Calculate descendants
-		if (entry.data.ancestors) {
-			for (const ancestorId of entry.data.ancestors) {
+		if (entry.data._ancestors) {
+			for (const ancestorId of entry.data._ancestors) {
 				const ancestor = regions.find(({ id }) => id === ancestorId);
 
 				if (!ancestor || ancestor.id === entry.id) continue;
 
-				if (ancestor.data.descendants) {
-					ancestor.data.descendants.push(entry.id);
+				if (ancestor.data._descendants) {
+					ancestor.data._descendants.push(entry.id);
 				} else {
-					ancestor.data.descendants = [entry.id];
+					ancestor.data._descendants = [entry.id];
 				}
 			}
 		}
@@ -195,10 +195,10 @@ function getRegionLanguageById(
 function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'>>) {
 	// Assign language code, where applicable
 	for (const entry of regions) {
-		if (entry.data.ancestors && entry.data.ancestors.length > 0) {
-			entry.data.langCode = getRegionLanguageById(entry.data.ancestors.at(-1));
+		if (entry.data._ancestors && entry.data._ancestors.length > 0) {
+			entry.data._langCode = getRegionLanguageById(entry.data._ancestors.at(-1));
 		} else if (!entry.data.parent) {
-			entry.data.langCode = getRegionLanguageById(entry.id);
+			entry.data._langCode = getRegionLanguageById(entry.id);
 		}
 	}
 }
@@ -239,16 +239,16 @@ function populateRegionsContent({
 
 	// Calculate cumulative post and location count
 	for (const entry of regions) {
-		const entries = entry.data.descendants ? [entry.id, ...entry.data.descendants] : [entry.id];
+		const entries = entry.data._descendants ? [entry.id, ...entry.data._descendants] : [entry.id];
 
-		entry.data.locations = [
+		entry.data._locations = [
 			...new Set(entries.flatMap((id) => locationsByRegionMap.get(id))),
 		].filter((item): item is string => !!item);
-		entry.data.locationCount = entry.data.locations.length;
-		entry.data.posts = [...new Set(entries.flatMap((id) => postsByRegionMap.get(id)))].filter(
+		entry.data._locationCount = entry.data._locations.length;
+		entry.data._posts = [...new Set(entries.flatMap((id) => postsByRegionMap.get(id)))].filter(
 			(item): item is string => !!item,
 		);
-		entry.data.postCount = entry.data.posts.length;
+		entry.data._postCount = entry.data._posts.length;
 	}
 }
 

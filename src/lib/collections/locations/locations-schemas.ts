@@ -81,3 +81,14 @@ export const LocationTwHeritageRecords = {
 		title_zh: '古物',
 	},
 } as const satisfies Record<LocationTwHeritage, { title: string; title_zh: string }>;
+
+/**
+ * Internal data structure for nearby locations
+ */
+export const LocationsNearbyItemSchema = z.object({
+	locationId: z.string(),
+	distance: z.number().int(),
+	distanceDisplay: z.string(),
+});
+
+export type LocationsNearbyItem = z.infer<typeof LocationsNearbyItemSchema>;

@@ -42,12 +42,12 @@ export const getStaticPaths = (async ({ paginate }) => {
 			displayRegionMapIds.has(entry.id) ||
 			ancestors.some((ancestor) => displayRegionMapIds.has(ancestor.id));
 
-		const entryLocations = entry.data.locations ? getLocationsByIds(entry.data.locations) : [];
+		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
 
 		const metadataItemsFiltered = R.pipe(
 			[
 				...R.pipe(entryLocations, R.filter(getFilterEntryQualityFunction(2)), getContentMetadata),
-				...R.pipe(entry.data.posts ?? [], getPostsByIds, getContentMetadata),
+				...R.pipe(entry.data._posts ?? [], getPostsByIds, getContentMetadata),
 			],
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate)
@@ -69,7 +69,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		const mapData = getMapData({
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
 			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
-			...(entry.data.langCode?.startsWith('zh')
+			...(entry.data._langCode?.startsWith('zh')
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
 				: {}),
 			...(entry.data.divisionId && !entry.data.hideDivision

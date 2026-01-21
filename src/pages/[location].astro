@@ -27,7 +27,7 @@ export const getStaticPaths = (async () => {
 
 	return locations.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(
-			entry.data.override?.regions ?? entry.data.regions,
+			entry.data.override?.regions ?? entry.data.regions
 		);
 
 		return {
@@ -39,15 +39,15 @@ export const getStaticPaths = (async () => {
 					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 					targetId: entry.id, // Center on the main location
 					boundsBuffer: 1, // 1km fixed buffer
-					...(regionPrimary?.data.langCode?.startsWith('zh')
+					...(regionPrimary?.data._langCode?.startsWith('zh')
 						? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
 						: {}),
 				}),
 				metadataItems: R.pipe(
-					entry.data.posts ?? [],
+					entry.data._posts ?? [],
 					getPostsByIds,
 					getContentMetadata,
-					R.sort(sortContentMetadataByDate),
+					R.sort(sortContentMetadataByDate)
 				),
 				backlinks: getContentBacklinks({ id: entry.id }),
 			},

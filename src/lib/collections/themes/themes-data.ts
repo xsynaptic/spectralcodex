@@ -18,10 +18,10 @@ export const getThemesCollection = pMemoize(async (): Promise<CollectionData> =>
 	const posts = await getCollection('posts');
 
 	for (const entry of themes) {
-		entry.data.locationCount = locations.filter((location) =>
+		entry.data._locationCount = locations.filter((location) =>
 			location.data.themes?.some(({ id }) => id === entry.id),
 		).length;
-		entry.data.postCount = posts.filter((post) =>
+		entry.data._postCount = posts.filter((post) =>
 			post.data.themes?.some(({ id }) => id === entry.id),
 		).length;
 	}

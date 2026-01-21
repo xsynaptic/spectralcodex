@@ -26,10 +26,10 @@ async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
 
 	return function getLocationPostData(entry: CollectionEntry<'locations'>) {
-		entry.data.posts = posts
+		entry.data._posts = posts
 			.filter((post) => post.data.locations?.some((location) => location.id === entry.id))
 			.map(({ id }) => id);
-		entry.data.postCount = entry.data.posts.length;
+		entry.data._postCount = entry.data._posts.length;
 	};
 }
 
@@ -78,7 +78,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 			);
 
 			if (imageEntry) {
-				entry.data.imageThumbnail = getLocationThumbnailProps(
+				entry.data._imageThumbnail = getLocationThumbnailProps(
 					imageEntry.id,
 					imageEntry.data.width,
 					imageEntry.data.height,
@@ -97,7 +97,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 				// This is used in cases where there is no image for the sub-location
 				if (geometry.imageFeatured === null) {
 					// eslint-disable-next-line unicorn/no-null
-					entry.data.geometry[index].imageThumbnail = null;
+					entry.data.geometry[index]._imageThumbnail = null;
 					continue;
 				}
 
@@ -105,7 +105,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 					const imageEntry = getImageById(geometry.imageFeatured);
 
 					if (imageEntry) {
-						entry.data.geometry[index].imageThumbnail = getLocationThumbnailProps(
+						entry.data.geometry[index]._imageThumbnail = getLocationThumbnailProps(
 							imageEntry.id,
 							imageEntry.data.width,
 							imageEntry.data.height,
@@ -128,18 +128,18 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 		short: true,
 	});
 
-	entry.data.uuid = locationMapDataHash;
-	entry.data.url = getContentUrl('locations', entry.id);
-	entry.data.googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
-	entry.data.wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
+	entry.data._uuid = locationMapDataHash;
+	entry.data._url = getContentUrl('locations', entry.id);
+	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
+	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
 	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {
-		entry.data.descriptionHtml = cachedDescriptionHtml;
+		entry.data._descriptionHtml = cachedDescriptionHtml;
 	} else {
-		entry.data.descriptionHtml = transformMarkdown({ input: entry.data.description });
-		await cacheInstance.set(locationMapDataHash, entry.data.descriptionHtml);
+		entry.data._descriptionHtml = transformMarkdown({ input: entry.data.description });
+		await cacheInstance.set(locationMapDataHash, entry.data._descriptionHtml);
 	}
 }
 

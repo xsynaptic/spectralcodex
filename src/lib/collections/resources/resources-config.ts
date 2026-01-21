@@ -47,10 +47,9 @@ export const resources = defineCollection({
 			imageFeatured: ImageFeaturedSchema.optional(),
 			showPage: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
-			/* Derived properties, for internal use only! */
-			locationCount: z.number().optional(),
-			postCount: z.number().optional(),
-			contentCount: z.number().optional(),
+			/** Computed properties, for internal use only! */
+			_locationCount: z.number().optional(),
+			_postCount: z.number().optional(),
 		})
 		.strict(),
 });

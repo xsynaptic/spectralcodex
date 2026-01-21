@@ -96,23 +96,23 @@ export function getLocationsFeatureCollection(
 			const entryTitleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
 			return geometryArray.map((geometry, index) => {
-				const uuid = entry.data.uuid ?? entry.id;
+				const uuid = entry.data._uuid ?? entry.id;
 				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
 				const title = geometry.title ? `${entry.data.title} - ${geometry.title}` : entry.data.title;
 				const geometryTitleMultilingual = getPrimaryMultilingualContent(geometry, 'title');
 				const googleMapsUrl =
-					geometry.googleMapsUrl || entry.data.googleMapsUrl
-						? (geometry.googleMapsUrl ?? entry.data.googleMapsUrl ?? '').replace('https://', '')
+					geometry.googleMapsUrl || entry.data._googleMapsUrl
+						? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
 						: undefined;
-				const wikipediaUrl = entry.data.wikipediaUrl
-					? entry.data.wikipediaUrl.replace('https://', '')
+				const wikipediaUrl = entry.data._wikipediaUrl
+					? entry.data._wikipediaUrl.replace('https://', '')
 					: undefined;
 
 				// Image thumbnails can be nulled by sub-locations
 				const image =
-					geometry.imageThumbnail === undefined
-						? entry.data.imageThumbnail
-						: geometry.imageThumbnail;
+					geometry._imageThumbnail === undefined
+						? entry.data._imageThumbnail
+						: geometry._imageThumbnail;
 
 				return {
 					type: 'Feature' as const,
@@ -127,8 +127,8 @@ export function getLocationsFeatureCollection(
 										: entryTitleMultilingual.value,
 								}
 							: {}),
-						url: entry.data.url,
-						description: geometry.description ?? entry.data.descriptionHtml,
+						url: entry.data._url,
+						description: geometry.description ?? entry.data._descriptionHtml,
 						category: geometry.category ?? entry.data.category,
 						status: geometry.status ?? entry.data.status,
 						precision: geometry.precision ?? entry.data.precision,

@@ -123,8 +123,8 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })
 						: undefined,
 				regionPrimaryId: getRegionPrimaryId(regions),
-				locationCount: 'locationCount' in entry.data ? entry.data.locationCount : undefined,
-				postCount: 'postCount' in entry.data ? entry.data.postCount : undefined,
+				locationCount: '_locationCount' in entry.data ? entry.data._locationCount : undefined,
+				postCount: '_postCount' in entry.data ? entry.data._postCount : undefined,
 				wordCount: await getWordCount(entry),
 				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
 				backlinks: new Set<string>(), // Populated below

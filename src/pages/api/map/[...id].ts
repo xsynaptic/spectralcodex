@@ -43,7 +43,7 @@ export const getStaticPaths = (async () => {
 			R.pipe(
 				[
 					entry.id,
-					...(entry.data.nearby ? entry.data.nearby.map(({ locationId }) => locationId) : []),
+					...(entry.data._nearby ? entry.data._nearby.map(({ locationId }) => locationId) : []),
 				],
 				getLocationsByIds,
 				(locations) => getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
@@ -63,9 +63,9 @@ export const getStaticPaths = (async () => {
 
 	const regionsData = R.pipe(
 		regions,
-		R.filter((entry) => !!entry.data.locations && entry.data.locations.length > 0),
+		R.filter((entry) => !!entry.data._locations && entry.data._locations.length > 0),
 		R.flatMap((entry) =>
-			R.pipe(entry.data.locations ?? [], getLocationsByIds, (locations) =>
+			R.pipe(entry.data._locations ?? [], getLocationsByIds, (locations) =>
 				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
 			),
 		),
@@ -86,7 +86,7 @@ export const getStaticPaths = (async () => {
 
 	const themesData = R.pipe(
 		themes,
-		R.filter((entry) => !!entry.data.locationCount && entry.data.locationCount > 0),
+		R.filter((entry) => !!entry.data._locationCount && entry.data._locationCount > 0),
 		R.flatMap((entry) =>
 			R.pipe(entry, getLocationsByTheme, (locations) =>
 				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
@@ -96,7 +96,11 @@ export const getStaticPaths = (async () => {
 
 	const resourcesData = R.pipe(
 		resources,
-		R.filter((entry) => entry.data.showPage && entry.data.locationCount && entry.data.locationCount > 0 ? true : false),
+		R.filter((entry) =>
+			entry.data.showPage && entry.data._locationCount && entry.data._locationCount > 0
+				? true
+				: false,
+		),
 		R.flatMap((entry) =>
 			R.pipe(entry, getLocationsByResource, (locations) =>
 				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),

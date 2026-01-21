@@ -5,7 +5,10 @@ import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
-import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
+import {
+	LocationsNearbyItemSchema,
+	LocationTwHeritageSchema,
+} from '#lib/collections/locations/locations-schemas.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
@@ -61,25 +64,18 @@ export const locations = defineCollection({
 			outlier: z.boolean().optional(), // Do not use this location to calculate bounding boxes
 			objective: NumericScaleSchema.optional(), // Only for personal reference
 			incomplete: z.boolean().optional(), // Only for personal reference
-			/** Derived properties, for internal use only! */
-			nearby: z
-				.object({
-					locationId: z.string(),
-					distance: z.number().int(),
-					distanceDisplay: z.string(),
-				})
-				.array()
-				.optional(),
-			posts: z.string().array().optional(),
-			postCount: z.number().int().optional(),
-			/** Map properties, for internal use only! */
-			uuid: z.string().optional(),
-			descriptionHtml: z.string().optional(),
-			imageThumbnail: ImageThumbnailSchema.optional(),
-			url: UrlSchema.optional(),
-			googleMapsUrl: UrlSchema.optional(),
-			wikipediaUrl: UrlSchema.optional(),
 			hideSearch: z.boolean().optional(),
+			/** Computed properties, for internal use only! */
+			_nearby: LocationsNearbyItemSchema.array().optional(),
+			_posts: z.string().array().optional(),
+			_postCount: z.number().int().optional(),
+			/** Map properties, for internal use only! */
+			_uuid: z.string().optional(),
+			_descriptionHtml: z.string().optional(),
+			_imageThumbnail: ImageThumbnailSchema.optional(),
+			_url: UrlSchema.optional(),
+			_googleMapsUrl: UrlSchema.optional(),
+			_wikipediaUrl: UrlSchema.optional(),
 		})
 		.strict(),
 });
