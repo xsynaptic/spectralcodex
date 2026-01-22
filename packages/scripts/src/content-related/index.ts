@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { pipeline } from '@xenova/transformers';
+import { pipeline } from '@huggingface/transformers';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -34,7 +34,7 @@ const { values } = parseArgs({
 		'character-limit': {
 			type: 'string',
 			short: 'l',
-			default: '10000',
+			default: '5000',
 		},
 		'result-count': {
 			type: 'string',
@@ -140,10 +140,10 @@ async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
 	cacheDir: string,
 ): Promise<Array<ContentRelatedEmbedding>> {
-	// Load existing cache
-	const cache = loadCache(cacheDir);
+	// Load existing cache (model-specific to prevent stale vector mismatches)
+	const cache = loadCache(cacheDir, MODEL_ID);
 
-	const embedder = await pipeline('feature-extraction', MODEL_ID);
+	const embedder = await pipeline('feature-extraction', MODEL_ID, { dtype: 'fp32' });
 
 	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(MODEL_ID)}`));
 
@@ -201,7 +201,7 @@ async function generateEmbeddings(
 	}
 
 	// Save updated cache
-	saveCache(cache, cacheDir);
+	saveCache(cache, cacheDir, MODEL_ID);
 
 	console.log(
 		chalk.green(

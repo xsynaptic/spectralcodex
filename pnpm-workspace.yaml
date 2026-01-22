@@ -15,11 +15,12 @@ minimumReleaseAgeExclude:
   - '@astrojs/sitemap'
   - '@xsynaptic/eslint-config'
   - '@xsynaptic/unified-tools'
-  - 'rehype-wrap-cjk'
+  - rehype-wrap-cjk
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
+  - onnxruntime-node
   - protobufjs
   - sharp
   - sqlite3

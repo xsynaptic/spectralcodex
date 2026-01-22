@@ -5,10 +5,13 @@ import type { ContentRelatedEmbedding } from './index.js';
 
 type VectorCache = Record<string, ContentRelatedEmbedding>;
 
-const CACHE_FILE_NAME = 'content-related-vector-cache.json';
+function getCacheFileName(modelId: string): string {
+	return `content-related-vector-cache-${modelId.replaceAll('/', '-')}.json`;
+}
 
-export function loadCache(cacheDir: string): VectorCache {
-	const cachePath = path.join(cacheDir, CACHE_FILE_NAME);
+export function loadCache(cacheDir: string, modelId: string): VectorCache {
+	const cacheFileName = getCacheFileName(modelId);
+	const cachePath = path.join(cacheDir, cacheFileName);
 
 	if (!existsSync(cachePath)) {
 		return {};
@@ -26,8 +29,9 @@ export function loadCache(cacheDir: string): VectorCache {
 	}
 }
 
-export function saveCache(cache: VectorCache, cacheDir: string): void {
-	const cachePath = path.join(cacheDir, CACHE_FILE_NAME);
+export function saveCache(cache: VectorCache, cacheDir: string, modelId: string): void {
+	const cacheFileName = getCacheFileName(modelId);
+	const cachePath = path.join(cacheDir, cacheFileName);
 
 	try {
 		// eslint-disable-next-line unicorn/no-null
