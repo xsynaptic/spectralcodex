@@ -2,17 +2,18 @@
 import { pipeline } from '@huggingface/transformers';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import * as R from 'remeda';
 
 import type { ContentFileMetadata } from '../content-utils';
 
 import { parseContentFiles } from '../content-utils';
 import { getContentCollectionPaths } from '../content-utils/collections';
-import { getCachedEmbedding, loadCache, saveCache } from './vector-cache.js';
 
+/**
+ * Arguments
+ */
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
@@ -31,6 +32,11 @@ const { values } = parseArgs({
 			short: 'c',
 			default: './node_modules/.astro',
 		},
+		'cache-name': {
+			type: 'string',
+			short: 'n',
+			default: 'content-related-cache',
+		},
 		'character-limit': {
 			type: 'string',
 			short: 'l',
@@ -41,16 +47,25 @@ const { values } = parseArgs({
 			short: 'n',
 			default: '10',
 		},
+		'clear-cache': {
+			type: 'boolean',
+			default: false,
+		},
 	},
 });
 
-export interface ContentRelatedEmbedding {
+/**
+ * Types
+ */
+interface ContentRelatedEmbedding {
 	id: string;
 	hash: string;
 	collection: string;
 	vector: Array<number>;
 	frontmatter: Record<string, unknown>;
 }
+
+type ContentRelatedEmbeddingCache = Record<string, ContentRelatedEmbedding>;
 
 interface ContentRelatedItem {
 	id: string;
@@ -60,6 +75,9 @@ interface ContentRelatedItem {
 
 type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
 
+/**
+ * Models
+ */
 // Some recommended models to experiment with; more complex models are more accurate but slower
 const ModelIdEnum = {
 	MiniLm: 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
@@ -67,10 +85,12 @@ const ModelIdEnum = {
 	Bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
 } as const;
 
-// Note: when changing models be sure to manually delete the cache!
+// Note: changing models will regenerate all embeddings (cache is model-specific)
 const MODEL_ID = ModelIdEnum.MpNet;
 
-// Clean content for embedding using unified tools
+/**
+ * Clean content for embedding using unified tools
+ */
 function cleanContent(contentRaw: string, frontmatter: Record<string, unknown>): string {
 	const title = typeof frontmatter.title === 'string' ? frontmatter.title : '';
 	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
@@ -80,7 +100,9 @@ function cleanContent(contentRaw: string, frontmatter: Record<string, unknown>):
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
 }
 
-// Cosine similarity function
+/**
+ * Cosine similarity function
+ */
 function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 	if (vecA.length !== vecB.length) {
 		throw new Error('Vectors must have the same dimensions');
@@ -90,14 +112,14 @@ function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
 	const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
 	const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
 
-	if (magnitudeA === 0 || magnitudeB === 0) {
-		return 0;
-	}
+	if (magnitudeA === 0 || magnitudeB === 0) return 0;
 
 	return dotProduct / (magnitudeA * magnitudeB);
 }
 
-// Calculate metadata boost based on shared regions and themes
+/**
+ * Calculate metadata boost based on shared regions and themes
+ */
 function calculateMetadataBoost(
 	current: ContentRelatedEmbedding,
 	other: ContentRelatedEmbedding,
@@ -135,13 +157,73 @@ function calculateMetadataBoost(
 	return Math.min(boost, 0.3); // Maximum % boost
 }
 
-// Generate embeddings for all content files
+/**
+ * Vector caching
+ */
+function getCacheFileName(cacheName: string, modelId: string): string {
+	return `${cacheName}-${modelId.replaceAll('/', '-')}.json`;
+}
+
+function loadCache(
+	cacheDir: string,
+	cacheName: string,
+	modelId: string,
+): ContentRelatedEmbeddingCache {
+	const cacheFileName = getCacheFileName(cacheName, modelId);
+	const cachePath = path.join(cacheDir, cacheFileName);
+
+	if (!existsSync(cachePath)) {
+		return {};
+	}
+
+	try {
+		const data = readFileSync(cachePath, 'utf8');
+		const cache = JSON.parse(data) as ContentRelatedEmbeddingCache;
+
+		console.log(`📦 Loaded ${String(Object.keys(cache).length)} cached embeddings`);
+		return cache;
+	} catch (error) {
+		console.warn('⚠️  Failed to load embedding cache:', error);
+		return {};
+	}
+}
+
+function saveCache(
+	cache: ContentRelatedEmbeddingCache,
+	cacheDir: string,
+	cacheName: string,
+	modelId: string,
+): void {
+	const cacheFileName = getCacheFileName(cacheName, modelId);
+	const cachePath = path.join(cacheDir, cacheFileName);
+
+	try {
+		// eslint-disable-next-line unicorn/no-null
+		writeFileSync(cachePath, JSON.stringify(cache, null, 2));
+		console.log(`💾 Saved ${String(Object.keys(cache).length)} embeddings to cache`);
+	} catch (error) {
+		console.error('❌ Failed to save embedding cache:', error);
+	}
+}
+
+function getCachedEmbedding(
+	cache: ContentRelatedEmbeddingCache,
+	contentId: string,
+	contentHash: string,
+): ContentRelatedEmbedding | undefined {
+	const cached = cache[contentId];
+
+	return cached?.hash === contentHash ? cached : undefined;
+}
+
+/**
+ * Generate embeddings for all content files
+ */
 async function generateEmbeddings(
 	contentFiles: Array<ContentFileMetadata>,
 	cacheDir: string,
 ): Promise<Array<ContentRelatedEmbedding>> {
-	// Load existing cache (model-specific to prevent stale vector mismatches)
-	const cache = loadCache(cacheDir, MODEL_ID);
+	const cache = loadCache(cacheDir, values['cache-name'], MODEL_ID);
 
 	const embedder = await pipeline('feature-extraction', MODEL_ID, { dtype: 'fp32' });
 
@@ -165,7 +247,6 @@ async function generateEmbeddings(
 				embeddings.push(cachedEmbedding);
 				cacheHits++;
 			} else {
-				// Generate new embedding
 				const plainTextContent = cleanContent(contentFile.content, contentFile.frontmatter);
 				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
 				const vector = [...output.data] as Array<number>;
@@ -201,7 +282,7 @@ async function generateEmbeddings(
 	}
 
 	// Save updated cache
-	saveCache(cache, cacheDir, MODEL_ID);
+	saveCache(cache, cacheDir, values['cache-name'], MODEL_ID);
 
 	console.log(
 		chalk.green(
@@ -212,7 +293,9 @@ async function generateEmbeddings(
 	return embeddings;
 }
 
-// Calculate similarities and find top matches
+/**
+ * Calculate similarities and find top matches
+ */
 function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): ContentRelatedResult {
 	console.log(chalk.blue('Calculating relatedness...'));
 
@@ -256,6 +339,9 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 	return result;
 }
 
+/**
+ * Content handling
+ */
 const ContentCollectionPaths = getContentCollectionPaths(
 	values['root-path'],
 	values['content-path'],
@@ -267,32 +353,52 @@ async function getContentFiles() {
 		{ withHashes: true },
 	);
 
+	if (contentFiles.length === 0) {
+		console.error(chalk.red('❌ No content found!'));
+		process.exit(1);
+	}
+
 	// Remove low-quality entries to reduce data processing burden
+	/*
 	const contentFilesFiltered = contentFiles.filter(
 		(file) =>
 			!!file.frontmatter.entryQuality &&
 			R.isNumber(file.frontmatter.entryQuality) &&
-			file.frontmatter.entryQuality >= 2 &&
-			!!file.frontmatter.imageFeatured,
+			file.frontmatter.entryQuality >= 2,
 	);
+	*/
 
-	return contentFilesFiltered;
+	return contentFiles;
 }
 
+/**
+ * Main function
+ */
 async function contentRelated() {
 	try {
 		console.log(chalk.magenta('=== Related Content Generator ==='));
 
 		const contentFiles = await getContentFiles();
 
-		if (contentFiles.length === 0) {
-			console.error(chalk.red('❌ No content found!'));
-			process.exit(1);
-		}
-
 		const cacheDir = path.join(values['root-path'], values['cache-path'], 'content-related');
 
 		mkdirSync(cacheDir, { recursive: true });
+
+		if (values['clear-cache']) {
+			const cacheFiles = readdirSync(cacheDir).filter((file) =>
+				file.startsWith(values['cache-name']),
+			);
+			for (const file of cacheFiles) {
+				rmSync(path.join(cacheDir, file));
+			}
+			if (cacheFiles.length > 0) {
+				console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
+				process.exit(0);
+			} else {
+				console.log(chalk.green('🗑️  No cache files to clear'));
+				process.exit(0);
+			}
+		}
 
 		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
 

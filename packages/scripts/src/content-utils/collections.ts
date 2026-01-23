@@ -8,8 +8,10 @@ const ContentCollectionsEnum = {
 	Pages: 'pages',
 	Posts: 'posts',
 	Regions: 'regions',
+	Resources: 'resources',
 	Series: 'series',
 	Themes: 'themes',
+	Timeline: 'timeline',
 } as const;
 
 export type ContentCollectionRecord = Record<keyof typeof ContentCollectionsEnum, string>;
