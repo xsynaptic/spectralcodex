@@ -102,19 +102,14 @@ function cleanContent(contentRaw: string, frontmatter: Record<string, unknown>):
 
 /**
  * Cosine similarity function
+ * Note: embeddings are already normalized
  */
-function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
-	if (vecA.length !== vecB.length) {
+function cosineSimilarity(vectorA: Array<number>, vectorB: Array<number>): number {
+	if (vectorA.length !== vectorB.length) {
 		throw new Error('Vectors must have the same dimensions');
 	}
 
-	const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i]!, 0);
-	const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-	const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-
-	if (magnitudeA === 0 || magnitudeB === 0) return 0;
-
-	return dotProduct / (magnitudeA * magnitudeB);
+	return vectorA.reduce((sum, next, index) => sum + next * vectorB[index]!, 0);
 }
 
 /**
