@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections.js';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../content-utils/data-store.js';
@@ -277,8 +278,9 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 	const idToKey = new Map<string, bigint>();
 	const keyToEmbedding = new Map<bigint, ContentRelatedEmbedding>();
 
-	for (const [i, embedding] of embeddings.entries()) {
-		const key = BigInt(i);
+	for (const [index, embedding] of embeddings.entries()) {
+		const key = BigInt(index);
+
 		idToKey.set(embedding.id, key);
 		keyToEmbedding.set(key, embedding);
 	}
@@ -296,9 +298,8 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 
 	for (const emb of embeddings) {
 		const key = idToKey.get(emb.id);
-		if (key !== undefined) {
-			index.add(key, new Float32Array(emb.vector));
-		}
+
+		if (key !== undefined) index.add(key, new Float32Array(emb.vector));
 	}
 
 	// Query for similar items and re-rank with metadata boost
@@ -318,6 +319,7 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 			const distance = distances[i];
 
 			const other = keyToEmbedding.get(key);
+
 			if (!other || other.id === current.id) continue;
 
 			// Convert cosine distance to similarity (usearch returns distance, not similarity)
@@ -336,10 +338,9 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 		result[current.id] = candidates.slice(0, resultCount);
 	}
 
-	const queryTime = (performance.now() - queryStart).toFixed(2);
 	console.log(
 		chalk.green(
-			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan(queryTime)}ms`,
+			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan((performance.now() - queryStart).toFixed(2))}ms`,
 		),
 	);
 
@@ -354,11 +355,10 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 
 	console.log(chalk.gray(`Loaded data store from: ${resolvedPath}`));
 
-	// Get entries from posts and locations collections
-	const collectionsToProcess = ['posts', 'locations'] as const;
 	const entries: Array<ContentEntry> = [];
 
-	for (const collectionName of collectionsToProcess) {
+	// Get entries from posts and locations collections
+	for (const collectionName of [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]) {
 		const collectionEntries = getCollection(collections, collectionName);
 
 		for (const entry of collectionEntries) {
@@ -388,7 +388,7 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
  */
 async function contentRelated() {
 	try {
-		console.log(chalk.magenta('=== Related Content Generator (v2 - usearch) ==='));
+		console.log(chalk.magenta('=== Related Content Generator ==='));
 
 		const dataStorePath = path.join(values['root-path'], values['data-store-path']);
 

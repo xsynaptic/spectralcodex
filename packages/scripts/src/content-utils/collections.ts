@@ -2,7 +2,7 @@ import path from 'node:path';
 import * as R from 'remeda';
 import { z } from 'zod';
 
-const ContentCollectionsEnum = {
+export const ContentCollectionsEnum = {
 	Ephemera: 'ephemera',
 	Locations: 'locations',
 	Pages: 'pages',
