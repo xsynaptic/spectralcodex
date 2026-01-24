@@ -3,9 +3,9 @@ import type { CollectionEntry } from 'astro:content';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 /**
- * Timeline
+ * Archives
  */
-export interface TimelineBaseItem {
+export interface ArchivesBaseItem {
 	year: string;
 	month: string;
 	monthName: string;
@@ -16,17 +16,17 @@ export interface TimelineBaseItem {
 	visitedCount: number;
 }
 
-export interface TimelineMonthlyItem extends TimelineBaseItem {
+export interface ArchivesMonthlyItem extends ArchivesBaseItem {
 	created: Array<ContentMetadataItem>;
 	updated: Array<ContentMetadataItem>;
 	visited: Array<ContentMetadataItem>;
-	timelineEntry?: CollectionEntry<'timeline'> | undefined;
+	archiveEntry?: CollectionEntry<'archives'> | undefined;
 }
 
-export interface TimelineData {
-	timelineIndexData: Record<string, TimelineMonthlyItem>;
-	timelineMonthlyData: Array<TimelineMonthlyItem>;
-	timelineYearlyData: Record<string, Array<TimelineMonthlyItem>>;
-	timelineYears: Array<string>;
-	timelineMonths: Record<string, Array<string>>;
+export interface ArchivesData {
+	archivesIndexData: Record<string, ArchivesMonthlyItem>;
+	archivesMonthlyData: Array<ArchivesMonthlyItem>;
+	archivesYearlyData: Record<string, Array<ArchivesMonthlyItem>>;
+	archivesYears: Array<string>;
+	archivesMonths: Record<string, Array<string>>;
 }

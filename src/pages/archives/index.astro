@@ -1,0 +1,13 @@
+---
+import ArchivesIndex from '#layouts/archives-index.astro';
+import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
+
+const { archivesIndexData, archivesYears } = await getArchivesData();
+
+const data = {
+	archivesIndexData,
+	archivesYears,
+};
+---
+
+<ArchivesIndex {...data} />

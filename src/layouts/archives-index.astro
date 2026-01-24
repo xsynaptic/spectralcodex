@@ -1,63 +1,63 @@
 ---
-import type { TimelineData } from '#lib/timeline/timeline-types.ts';
+import type { ArchivesData } from '#lib/collections/archives/archives-types.ts';
 
+import ArchivesItem from '#components/archives/archives-item.astro';
+import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
-import TimelineItem from '#components/timeline/timeline-item.astro';
-import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 interface Props {
-	timelineIndexData: TimelineData['timelineIndexData'];
-	timelineYears: Array<string>;
+	archivesIndexData: ArchivesData['archivesIndexData'];
+	archivesYears: Array<string>;
 }
 
-const { timelineIndexData, timelineYears } = Astro.props;
+const { archivesIndexData, archivesYears } = Astro.props;
 
 const t = getTranslations();
 ---
 
 <MainSite
 	meta={{
-		title: t('timeline.title'),
-		description: t('timeline.index.description'),
+		title: t('archives.title'),
+		description: t('archives.index.description'),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{t('timeline.title')}</Fragment>
-		<Fragment slot="header-subtitle"><TimelineNavigation timelineYears={timelineYears} /></Fragment>
+		<Fragment slot="header-title">{t('archives.title')}</Fragment>
+		<Fragment slot="header-subtitle"><ArchivesNavigation archivesYears={archivesYears} /></Fragment>
 	</ContentHeader>
 	<ContentSection>
 		<ol>
 			{
-				Object.entries(timelineIndexData)
+				Object.entries(archivesIndexData)
 					.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
 					.map(([year, yearlyData]) => {
 						return (
-							<li class="text-primary-700 dark:text-primary-400 mb-medium flex flex-col gap-2 text-sm">
-								<h2 class="border-primary-200 dark:border-primary-700 border-b pb-1 text-sm font-semibold uppercase">
-									<Link href={getSiteUrl('timeline', year)} linkColor="primary">
+							<li class="mb-medium flex flex-col gap-2 text-sm text-primary-700 dark:text-primary-400">
+								<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
+									<Link href={getSiteUrl('archives', year)} linkColor="primary">
 										{year}
 									</Link>
 								</h2>
 								<div class="flex flex-col gap-2">
-									<TimelineItem
-										title={t('timeline.monthly.updated')}
+									<ArchivesItem
+										title={t('archives.monthly.updated')}
 										items={yearlyData.updated}
 										count={yearlyData.updatedCount}
 									/>
-									<TimelineItem
-										title={t('timeline.monthly.created')}
+									<ArchivesItem
+										title={t('archives.monthly.created')}
 										items={yearlyData.created}
 										count={yearlyData.createdCount}
 									/>
-									<TimelineItem
-										title={t('timeline.monthly.visited')}
+									<ArchivesItem
+										title={t('archives.monthly.visited')}
 										items={yearlyData.visited}
 										count={yearlyData.visitedCount}
 									/>

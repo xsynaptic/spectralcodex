@@ -1,46 +1,46 @@
 ---
-import type { TimelineMonthlyItem } from '#lib/timeline/timeline-types.ts';
+import type { ArchivesMonthlyItem } from '#lib/collections/archives/archives-types.ts';
 
+import ArchivesItem from '#components/archives/archives-item.astro';
+import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
-import TimelineItem from '#components/timeline/timeline-item.astro';
-import TimelineNavigation from '#components/timeline/timeline-navigation.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 interface Props {
-	timelineMonthlyData: Array<TimelineMonthlyItem>;
-	timelineYear: string;
-	timelineYears: Array<string>;
+	archivesMonthlyData: Array<ArchivesMonthlyItem>;
+	archivesYear: string;
+	archivesYears: Array<string>;
 }
 
-const { timelineMonthlyData, timelineYear, timelineYears } = Astro.props;
+const { archivesMonthlyData, archivesYear, archivesYears } = Astro.props;
 
 const t = getTranslations();
 ---
 
 <MainSite
 	meta={{
-		title: t('timeline.title'),
-		description: t('timeline.yearly.description').replace('%s', timelineYear),
+		title: t('archives.title'),
+		description: t('archives.yearly.description').replace('%s', archivesYear),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{timelineYear}</Fragment>
+		<Fragment slot="header-title">{archivesYear}</Fragment>
 		<Fragment slot="header-subtitle"
 			><DividedItem dividerContent="chevron"
-				><Link href={getSiteUrl('timeline')} linkColor="accent" class="font-semibold"
-					>{t('timeline.title')}</Link
+				><Link href={getSiteUrl('archives')} linkColor="accent" class="font-semibold"
+					>{t('archives.title')}</Link
 				></DividedItem
 			><DividedItem
-				><TimelineNavigation
-					currentYear={timelineYear}
-					timelineYears={timelineYears}
+				><ArchivesNavigation
+					currentYear={archivesYear}
+					archivesYears={archivesYears}
 				/></DividedItem
 			></Fragment
 		>
@@ -48,32 +48,32 @@ const t = getTranslations();
 	<ContentSection>
 		<ol>
 			{
-				timelineMonthlyData
+				archivesMonthlyData
 					.sort((a, b) => Number(a.month) - Number(b.month))
 					.map((monthlyData) => {
 						return (
-							<li class="text-primary-700 dark:text-primary-400 mb-medium flex flex-col gap-2 text-sm">
-								<h2 class="border-primary-200 dark:border-primary-700 border-b pb-1 text-sm font-semibold uppercase">
+							<li class="mb-medium flex flex-col gap-2 text-sm text-primary-700 dark:text-primary-400">
+								<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
 									<Link
-										href={getSiteUrl('timeline', monthlyData.year, monthlyData.month)}
+										href={getSiteUrl('archives', monthlyData.year, monthlyData.month)}
 										linkColor="primary"
 									>
 										{monthlyData.monthName}
 									</Link>
 								</h2>
 								<div class="flex flex-col gap-2">
-									<TimelineItem
-										title={t('timeline.monthly.updated')}
+									<ArchivesItem
+										title={t('archives.monthly.updated')}
 										items={monthlyData.updated}
 										count={monthlyData.updatedCount}
 									/>
-									<TimelineItem
-										title={t('timeline.monthly.created')}
+									<ArchivesItem
+										title={t('archives.monthly.created')}
 										items={monthlyData.created}
 										count={monthlyData.createdCount}
 									/>
-									<TimelineItem
-										title={t('timeline.monthly.visited')}
+									<ArchivesItem
+										title={t('archives.monthly.visited')}
 										items={monthlyData.visited}
 										count={monthlyData.visitedCount}
 									/>

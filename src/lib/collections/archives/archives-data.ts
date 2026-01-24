@@ -1,27 +1,54 @@
+import type { CollectionEntry } from 'astro:content';
+
+import { getCollection } from 'astro:content';
+import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 
+import type { ArchivesBaseItem, ArchivesData } from '#lib/collections/archives/archives-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
-import type { TimelineBaseItem, TimelineData } from '#lib/timeline/timeline-types.ts';
 
-import { getTimelineCollection } from '#lib/collections/timeline/timeline-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
-interface TimelineDataMapMonthlyItem extends TimelineBaseItem {
+interface CollectionData {
+	archives: Array<CollectionEntry<'archives'>>;
+	archivesMap: Map<string, CollectionEntry<'archives'>>;
+}
+
+// TODO: this data handler is non-standard and could use some refactoring
+const getArchivesCollection = pMemoize(async (): Promise<CollectionData> => {
+	const startTime = performance.now();
+
+	const archives = await getCollection('archives');
+
+	const archivesMap = new Map<string, CollectionEntry<'archives'>>();
+
+	for (const entry of archives) {
+		archivesMap.set(entry.id, entry);
+	}
+
+	console.log(
+		`[Archives] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
+	);
+
+	return { archives, archivesMap };
+});
+
+interface ArchivesDataMapMonthlyItem extends ArchivesBaseItem {
 	created: Set<ContentMetadataItem>;
 	updated: Set<ContentMetadataItem>;
 	visited: Set<ContentMetadataItem>;
 }
 
-type TimelineDataMap = Map<string, Map<string, TimelineDataMapMonthlyItem>>;
+type ArchivesDataMap = Map<string, Map<string, ArchivesDataMapMonthlyItem>>;
 
-interface TimelineDateData {
+interface ArchivesDateData {
 	date: Date;
 	month: string;
 	year: string;
 }
 
-// Standardize date objects for use in the timeline data map
-function getDateData(date: Date): TimelineDateData {
+// Standardize date objects for use in the archive data map
+function getDateData(date: Date): ArchivesDateData {
 	return {
 		date,
 		month: String(date.getMonth() + 1).padStart(2, '0'),
@@ -29,13 +56,13 @@ function getDateData(date: Date): TimelineDateData {
 	};
 }
 
-// Get or create the timeline data map for a given month
-function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData: TimelineDateData) {
-	if (!timelineDataMap.has(dateUpdatedData.year)) {
-		timelineDataMap.set(dateUpdatedData.year, new Map());
+// Get or create the archive data map for a given month
+function getArchivesMonthData(archiveDataMap: ArchivesDataMap, dateUpdatedData: ArchivesDateData) {
+	if (!archiveDataMap.has(dateUpdatedData.year)) {
+		archiveDataMap.set(dateUpdatedData.year, new Map());
 	}
 
-	const yearMap = timelineDataMap.get(dateUpdatedData.year)!;
+	const yearMap = archiveDataMap.get(dateUpdatedData.year)!;
 
 	if (!yearMap.has(dateUpdatedData.month)) {
 		const monthName = dateUpdatedData.date.toLocaleDateString('default', { month: 'long' });
@@ -60,7 +87,7 @@ function getTimelineMonthData(timelineDataMap: TimelineDataMap, dateUpdatedData:
 
 // Select a highlight for the month
 function getMonthlyHighlights(
-	monthData: TimelineDataMapMonthlyItem,
+	monthData: ArchivesDataMapMonthlyItem,
 ): Array<ContentMetadataItem> | undefined {
 	// Gather all items from the month that have images and meet minimum quality
 	const allItems = [
@@ -88,11 +115,11 @@ function getMonthlyHighlights(
 	return highlightCandidates ? highlightCandidates.slice(0, 5) : undefined;
 }
 
-// Generate a map of timeline data from the content metadata index
-async function getTimelineDataMap(): Promise<TimelineDataMap> {
+// Generate a map of archive data from the content metadata index
+async function getArchivesDataMap(): Promise<ArchivesDataMap> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	const timelineDataMap: TimelineDataMap = new Map();
+	const archiveDataMap: ArchivesDataMap = new Map();
 
 	for (const item of contentMetadataIndex.values()) {
 		if (['images', 'pages'].includes(item.collection)) continue;
@@ -105,12 +132,12 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 			dateUpdatedData.year !== dateCreatedData.year &&
 			dateUpdatedData.month !== dateCreatedData.month
 		) {
-			const updatedMonthData = getTimelineMonthData(timelineDataMap, dateUpdatedData);
+			const updatedMonthData = getArchivesMonthData(archiveDataMap, dateUpdatedData);
 
 			updatedMonthData.updated.add(item);
 		}
 
-		const createdMonthData = getTimelineMonthData(timelineDataMap, dateCreatedData);
+		const createdMonthData = getArchivesMonthData(archiveDataMap, dateCreatedData);
 
 		createdMonthData.created.add(item);
 
@@ -122,7 +149,7 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 
 			for (const dateVisited of dateVisitedArray) {
 				const dateVisitedData = getDateData(dateVisited);
-				const visitedMonthData = getTimelineMonthData(timelineDataMap, dateVisitedData);
+				const visitedMonthData = getArchivesMonthData(archiveDataMap, dateVisitedData);
 
 				if (!yearsVisited.has(dateVisitedData.year)) {
 					yearsVisited.add(dateVisitedData.year);
@@ -132,7 +159,7 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 		}
 	}
 
-	for (const yearlyData of timelineDataMap.values()) {
+	for (const yearlyData of archiveDataMap.values()) {
 		for (const monthlyData of yearlyData.values()) {
 			// Stash total counts for later reference
 			monthlyData.createdCount = monthlyData.created.size;
@@ -144,30 +171,30 @@ async function getTimelineDataMap(): Promise<TimelineDataMap> {
 		}
 	}
 
-	return timelineDataMap;
+	return archiveDataMap;
 }
 
 function getMonthlyDataByYear(
-	yearlyData: Map<string, TimelineDataMapMonthlyItem>,
+	yearlyData: Map<string, ArchivesDataMapMonthlyItem>,
 	category: 'updated' | 'created' | 'visited',
 ): Array<ContentMetadataItem> {
 	return [...yearlyData.values()].flatMap((monthData) => [...monthData[category].values()]);
 }
 
-interface TimelineFilterOptions {
+interface ArchivesFilterOptions {
 	quality: number;
 	limit: number;
 }
 
 function filterAndSortItems(
 	items: Array<ContentMetadataItem>,
-	options: TimelineFilterOptions,
+	options: ArchivesFilterOptions,
 ): Array<ContentMetadataItem> {
 	return items
 		.filter((item) => item.entryQuality >= options.quality)
 		.sort((a, b) => {
 			const qualityDifference = b.entryQuality - a.entryQuality;
-			
+
 			if (qualityDifference !== 0) return qualityDifference;
 
 			return a.title.localeCompare(b.title);
@@ -175,11 +202,11 @@ function filterAndSortItems(
 		.slice(0, options.limit);
 }
 
-function getTimelineMonthlyData(
+function getArchivesMonthlyData(
 	updated: Array<ContentMetadataItem>,
 	created: Array<ContentMetadataItem>,
 	visited: Array<ContentMetadataItem>,
-	options: TimelineFilterOptions,
+	options: ArchivesFilterOptions,
 ) {
 	const updatedFiltered = filterAndSortItems(updated, options);
 	const createdFiltered = filterAndSortItems(created, options);
@@ -204,22 +231,22 @@ function getTimelineMonthlyData(
 }
 
 /**
- * Convert timeline data into the structures consumed by the three timeline pages
+ * Convert archive data into the structures consumed by the three archive pages
  */
-export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
-	const timelineDataMap = await getTimelineDataMap();
+export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
+	const archivesDataMap = await getArchivesDataMap();
 
-	const { timelineEntriesMap } = await getTimelineCollection();
+	const { archivesMap } = await getArchivesCollection();
 
-	const timelineMonthlyData: TimelineData['timelineMonthlyData'] = [];
-	const timelineYearlyData: TimelineData['timelineYearlyData'] = {};
-	const timelineIndexData: TimelineData['timelineIndexData'] = {};
+	const archivesMonthlyData: ArchivesData['archivesMonthlyData'] = [];
+	const archivesYearlyData: ArchivesData['archivesYearlyData'] = {};
+	const archivesIndexData: ArchivesData['archivesIndexData'] = {};
 
 	// This tracks the months for each year with data available on the monthly page
-	const timelineMonths: Record<string, Array<string>> = {};
+	const archivesMonths: Record<string, Array<string>> = {};
 
-	for (const [year, yearlyData] of timelineDataMap.entries()) {
-		if (!timelineMonths[year]) timelineMonths[year] = [];
+	for (const [year, yearlyData] of archivesDataMap.entries()) {
+		if (!archivesMonths[year]) archivesMonths[year] = [];
 
 		// Aggregate all data for the year (used for both yearly and index views)
 		const yearUpdatedAll = getMonthlyDataByYear(yearlyData, 'updated');
@@ -227,7 +254,7 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 		const yearVisitedAll = getMonthlyDataByYear(yearlyData, 'visited');
 
 		// Year-level deduplication for yearly view
-		const yearDeduplicated = getTimelineMonthlyData(
+		const yearDeduplicated = getArchivesMonthlyData(
 			yearUpdatedAll,
 			yearCreatedAll,
 			yearVisitedAll,
@@ -241,7 +268,7 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 
 		// Process monthly and yearly views using the allowed sets
 		for (const monthlyData of yearlyData.values()) {
-			const monthlyDataProcessed = getTimelineMonthlyData(
+			const monthlyDataProcessed = getArchivesMonthlyData(
 				[...monthlyData.updated.values()],
 				[...monthlyData.created.values()],
 				[...monthlyData.visited.values()],
@@ -249,18 +276,18 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 			);
 
 			if (!monthlyDataProcessed.isEmpty) {
-				// Check for a matching timeline collection entry
-				// This allows for custom descriptions and images on monthly timeline pages
-				const timelineEntry = timelineEntriesMap.get(`${year}/${year}-${monthlyData.month}`);
+				// Check for a matching archive collection entry
+				// This allows for custom descriptions and images on monthly archive pages
+				const archiveEntry = archivesMap.get(`${year}/${year}-${monthlyData.month}`);
 
-				timelineMonthlyData.push({
+				archivesMonthlyData.push({
 					...monthlyData,
 					created: monthlyDataProcessed.created,
 					updated: monthlyDataProcessed.updated,
 					visited: monthlyDataProcessed.visited,
-					timelineEntry,
+					archiveEntry,
 				});
-				timelineMonths[year].push(monthlyData.month);
+				archivesMonths[year].push(monthlyData.month);
 			}
 
 			// Yearly view; filter by allowed sets AND quality threshold
@@ -286,9 +313,9 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 			)
 				continue;
 
-			if (!timelineYearlyData[year]) timelineYearlyData[year] = [];
+			if (!archivesYearlyData[year]) archivesYearlyData[year] = [];
 
-			timelineYearlyData[year].push({
+			archivesYearlyData[year].push({
 				...monthlyData,
 				created: yearlyCreatedSorted,
 				updated: yearlyUpdatedSorted,
@@ -296,8 +323,8 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 			});
 		}
 
-		// Timeline index data (reuse aggregated year data)
-		const indexDataProcessed = getTimelineMonthlyData(
+		// Archives index data (reuse aggregated year data)
+		const indexDataProcessed = getArchivesMonthlyData(
 			yearUpdatedAll,
 			yearCreatedAll,
 			yearVisitedAll,
@@ -306,7 +333,7 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 
 		if (indexDataProcessed.isEmpty) continue;
 
-		timelineIndexData[year] = {
+		archivesIndexData[year] = {
 			year,
 			month: '',
 			monthName: '',
@@ -321,13 +348,13 @@ export const getTimelineData = pMemoize(async (): Promise<TimelineData> => {
 		};
 	}
 
-	const timelineYears = Object.keys(timelineYearlyData).sort((a, b) => b.localeCompare(a));
+	const archivesYears = Object.keys(archivesYearlyData).sort((a, b) => b.localeCompare(a));
 
 	return {
-		timelineIndexData,
-		timelineYearlyData,
-		timelineMonthlyData,
-		timelineYears,
-		timelineMonths,
+		archivesIndexData,
+		archivesYearlyData,
+		archivesMonthlyData,
+		archivesYears,
+		archivesMonths,
 	};
 });

@@ -125,14 +125,15 @@ const translationStrings = {
 		'terms.related.children.label': 'Subterms',
 		'terms.related.siblings.label': 'Other Terms',
 
-		// Timeline
-		'timeline.title': 'Timeline',
-		'timeline.index.description': 'High level overview of all content on this site by year.',
-		'timeline.yearly.description': 'Monthly content archives for the year %s.',
-		'timeline.monthly.description': 'Content archives for %s.',
-		'timeline.monthly.created': 'Created',
-		'timeline.monthly.updated': 'Updated',
-		'timeline.monthly.visited': 'Visited',
+		// Archives
+		'archives.title': 'Archives',
+		'archives.index.description':
+			'High level overview of all content on this site by year. Monthly data is also available after clicking on a year.',
+		'archives.yearly.description': 'Monthly content archives for the year %s.',
+		'archives.monthly.description': 'Content archives for %s.',
+		'archives.monthly.created': 'Created',
+		'archives.monthly.updated': 'Updated',
+		'archives.monthly.visited': 'Visited',
 
 		// Pagination
 		'pagination.next': 'Next',
@@ -174,7 +175,7 @@ const translationStrings = {
 		'site.pagination.pageNumber.label': 'Page %s',
 
 		// Menu items
-		'menu.timeline.label': 'Timeline',
+		'menu.archive.label': 'Archives',
 		'menu.about.label': 'About',
 		'menu.contact.label': 'Contact',
 		'menu.terms.label': 'Terms of Use',

@@ -5,13 +5,13 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 
-const timelineSchema = z
+const archivesSchema = z
 	.object({
 		imageFeatured: ImageFeaturedSchema.optional(),
 	})
 	.strict();
 
-export const timeline = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/timeline` }),
-	schema: timelineSchema,
+export const archives = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/archives` }),
+	schema: archivesSchema,
 });

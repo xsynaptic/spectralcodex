@@ -17,12 +17,12 @@ export const DescriptionSchema = z
 	})
 	.transform((value) => value.trim()); // Markdown may be present so we don't further transform the value
 
-	/**
-	 * Date schema
-	 */
+/**
+ * Date schema
+ */
 export const DateStringSchema = z.string().transform((value) => new Date(value));
 
-// Numeric scale schema, from 1 to 5; used by locations and timelines
+// Numeric scale schema, from 1 to 5; used by locations and archives
 export const NumericScaleSchema = z.number().int().min(1).max(5);
 
 // Zod 3 uses a very permissive URL schema via z.string().url(); this makes it more strict

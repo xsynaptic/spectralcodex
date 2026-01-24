@@ -3,6 +3,7 @@ import * as R from 'remeda';
 import { z } from 'zod';
 
 export const ContentCollectionsEnum = {
+	Archives: 'archives',
 	Ephemera: 'ephemera',
 	Locations: 'locations',
 	Pages: 'pages',
@@ -11,7 +12,6 @@ export const ContentCollectionsEnum = {
 	Resources: 'resources',
 	Series: 'series',
 	Themes: 'themes',
-	Timeline: 'timeline',
 } as const;
 
 export type ContentCollectionRecord = Record<keyof typeof ContentCollectionsEnum, string>;

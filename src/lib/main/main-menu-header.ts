@@ -2,14 +2,13 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { MenuItem } from '#lib/main/main-types.ts';
 
-import { FEATURE_DATE_ARCHIVES } from '#constants.ts';
+import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getTimelineData } from '#lib/timeline/timeline-data.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -100,9 +99,7 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, slug: 'themes' }));
 
-	const timelineData = await getTimelineData();
-
-	const timelineLatestYear = timelineData.timelineYears.at(0);
+	const archivesData = await getArchivesData();
 
 	return [
 		{
@@ -132,14 +129,14 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 			title: t('collection.ephemera.labelPlural'),
 			url: getSiteUrl('ephemera'),
 		},
-		...(FEATURE_DATE_ARCHIVES && timelineLatestYear
-			? [
-					{
-						title: t('menu.timeline.label'),
-						url: getSiteUrl('timeline', timelineLatestYear),
-					},
-				]
-			: []),
+		{
+			title: t('menu.archive.label'),
+			url: getSiteUrl('archives'),
+			children: archivesData.archivesYears.slice(0, 12).map((year) => ({
+				title: year,
+				url: getSiteUrl('archives', year),
+			})),
+		},
 		{
 			title: t('menu.about.label'),
 			url: getSiteUrl('about'),

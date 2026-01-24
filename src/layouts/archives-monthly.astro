@@ -1,0 +1,120 @@
+---
+import { render } from 'astro:content';
+
+import type { ArchivesMonthlyItem } from '#lib/collections/archives/archives-types.ts';
+
+import ArchivesItem from '#components/archives/archives-item.astro';
+import ArchivesNavigation from '#components/archives/archives-navigation.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
+import MainSite from '#components/main/main-site.astro';
+import Link from '#components/parts/link.astro';
+import ProseBody from '#components/parts/prose-body.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import {
+	getImageFeaturedGroupByContentMetadata,
+	getImageFeaturedObjectGroup,
+} from '#lib/image/image-featured.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+
+interface Props {
+	archivesMonthlyItem: ArchivesMonthlyItem;
+	archivesYears: Array<string>;
+	archivesMonths?: Array<string> | undefined;
+}
+
+const { archivesMonthlyItem, archivesYears, archivesMonths } = Astro.props;
+
+// Check for custom archive entry; this may override generated data
+const { archiveEntry } = archivesMonthlyItem;
+
+// Use custom imageFeatured from archive entry if available, otherwise use generated highlights
+const imageFeaturedGroup = archiveEntry?.data.imageFeatured
+	? await getImageFeaturedObjectGroup({ imageFeatured: archiveEntry.data.imageFeatured })
+	: getImageFeaturedGroupByContentMetadata({ items: archivesMonthlyItem.highlights });
+
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+// Render archive entry MDX content if available
+const archiveRenderResult = archiveEntry ? await render(archiveEntry) : undefined;
+
+const t = getTranslations();
+---
+
+<MainSite
+	meta={{
+		title: t('archives.title'),
+		description: t('archives.monthly.description').replace('%s', archivesMonthlyItem.title),
+		image: getSeoImageProps({
+			...(hasHeroImage ? { id: imageFeaturedGroup.at(0)?.captionMetadata?.id ?? '' } : {}),
+			alt: archivesMonthlyItem.title,
+		}),
+		...getSeoHideSearch(true),
+	}}
+	hasHeroImage={hasHeroImage}
+>
+	<ImageHeroCarousel
+		class="sm:mb-small"
+		hasHeroImage={hasHeroImage}
+		imageFeaturedGroup={imageFeaturedGroup}
+	>
+		<ContentHeader hasHeroImage={hasHeroImage}>
+			<Fragment slot="header-title">{archivesMonthlyItem.title}</Fragment>
+			<Fragment slot="header-subtitle">
+				{
+					hasHeroImage ? (
+						<Link
+							class="font-semibold"
+							href={getSiteUrl('archives')}
+							linkColor="highlight-featured"
+						>
+							{t('archives.title')}
+						</Link>
+					) : (
+						<ArchivesNavigation
+							currentYear={archivesMonthlyItem.year}
+							currentMonth={archivesMonthlyItem.month}
+							archivesYears={archivesYears}
+							archivesMonths={archivesMonths}
+						/>
+					)
+				}
+			</Fragment>
+		</ContentHeader>
+	</ImageHeroCarousel>
+	<ContentSection marginSmall={true}>
+		<ArchivesNavigation
+			class="border-b border-primary-300 pb-small dark:border-primary-700"
+			currentYear={archivesMonthlyItem.year}
+			currentMonth={archivesMonthlyItem.month}
+			archivesYears={archivesYears}
+			archivesMonths={archivesMonths}
+		/>
+	</ContentSection>
+	{
+		archiveRenderResult ? (
+			<ProseBody class:list={['content', 'pb-small']}>
+				<archiveRenderResult.Content />
+			</ProseBody>
+		) : undefined
+	}
+	<ContentSection class="flex flex-col gap-2">
+		<ArchivesItem
+			title={t('archives.monthly.updated')}
+			items={archivesMonthlyItem.updated}
+			count={archivesMonthlyItem.updatedCount}
+		/>
+		<ArchivesItem
+			title={t('archives.monthly.created')}
+			items={archivesMonthlyItem.created}
+			count={archivesMonthlyItem.createdCount}
+		/>
+		<ArchivesItem
+			title={t('archives.monthly.visited')}
+			items={archivesMonthlyItem.visited}
+			count={archivesMonthlyItem.visitedCount}
+		/>
+	</ContentSection>
+</MainSite>

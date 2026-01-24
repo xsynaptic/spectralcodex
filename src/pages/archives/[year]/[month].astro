@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import ArchivesMonthly from '#layouts/archives-monthly.astro';
+import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
+
+export const getStaticPaths = (async () => {
+	const { archivesMonthlyData, archivesYears, archivesMonths } = await getArchivesData();
+
+	return archivesMonthlyData.map((archivesMonthlyItem) => ({
+		params: { year: archivesMonthlyItem.year, month: archivesMonthlyItem.month },
+		props: {
+			archivesMonthlyItem,
+			archivesYears,
+			archivesMonths: archivesMonths[archivesMonthlyItem.year],
+		},
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<ArchivesMonthly {...Astro.props} />

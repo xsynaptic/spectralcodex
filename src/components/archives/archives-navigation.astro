@@ -8,8 +8,8 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 interface Props extends HTMLAttributes<'div'> {
 	currentYear?: string | undefined;
 	currentMonth?: string | undefined;
-	timelineYears: Array<string>;
-	timelineMonths?: Array<string> | undefined;
+	archivesYears: Array<string>;
+	archivesMonths?: Array<string> | undefined;
 	hasHeroImage?: boolean | undefined;
 }
 
@@ -17,15 +17,15 @@ const {
 	class: className,
 	currentYear,
 	currentMonth,
-	timelineYears,
-	timelineMonths,
+	archivesYears,
+	archivesMonths,
 	hasHeroImage = false,
 	...props
 } = Astro.props;
 ---
 
 {
-	timelineYears.length > 0 ? (
+	archivesYears.length > 0 ? (
 		<div
 			class:list={[
 				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
@@ -40,37 +40,37 @@ const {
 					hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 				]}
 			>
-				{timelineYears.map((timelineYear) => (
+				{archivesYears.map((archivesYear) => (
 					<DividedItem hasHeroImage={hasHeroImage}>
-						{!currentMonth && currentYear === timelineYear ? (
+						{!currentMonth && currentYear === archivesYear ? (
 							<span
 								class:list={[
 									'font-semibold text-primary-600 dark:text-primary-400',
 									hasHeroImage ? 'sm:text-accent-200' : '',
 								]}
 							>
-								{timelineYear}
+								{archivesYear}
 							</span>
 						) : (
 							<Link
-								class={currentMonth && currentYear === timelineYear ? 'font-semibold' : undefined}
-								href={getSiteUrl('timeline', timelineYear)}
+								class={currentMonth && currentYear === archivesYear ? 'font-semibold' : undefined}
+								href={getSiteUrl('archives', archivesYear)}
 								linkColor={hasHeroImage ? 'accent-featured' : 'accent'}
 							>
-								{timelineYear}
+								{archivesYear}
 							</Link>
 						)}
 					</DividedItem>
 				))}
 			</div>
-			{currentYear && currentMonth && timelineMonths && timelineMonths.length > 0 ? (
+			{currentYear && currentMonth && archivesMonths && archivesMonths.length > 0 ? (
 				<div
 					class:list={[
 						'flex gap-1',
 						hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 					]}
 				>
-					{timelineMonths
+					{archivesMonths
 						.sort((monthA, monthB) => monthA.localeCompare(monthB))
 						.map((monthNumber) => {
 							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('default', {
@@ -90,7 +90,7 @@ const {
 										</span>
 									) : (
 										<Link
-											href={getSiteUrl('timeline', currentYear, monthNumber)}
+											href={getSiteUrl('archives', currentYear, monthNumber)}
 											linkColor={hasHeroImage ? 'highlight-featured' : 'highlight'}
 										>
 											{monthName}
