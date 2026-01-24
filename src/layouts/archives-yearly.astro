@@ -26,7 +26,7 @@ const t = getTranslations();
 <MainSite
 	meta={{
 		title: formatStringTemplate(t('archives.yearly.title'), { date: archivesYear }),
-		description: t('archives.yearly.description').replace('%s', archivesYear),
+		description: formatStringTemplate(t('archives.yearly.description'), { date: archivesYear }),
 		...getSeoHideSearch(true),
 	}}
 >

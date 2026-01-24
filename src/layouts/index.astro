@@ -1,18 +1,28 @@
 ---
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
+import type { ImageComponentProps } from '#components/parts/image.astro';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
-import IndexDescription from '#components/index/index-description.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
+import CardFrame from '#components/parts/card-frame.astro';
+import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
+import ProseDescription from '#components/parts/prose-description.astro';
+import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
+import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { getContentStats } from '#lib/metadata/metadata-stats.ts';
+import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatStringTemplate, sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
 	featuredMetadataItems: Array<ContentMetadataItem>;
@@ -20,6 +30,40 @@ interface Props {
 	themesMetadataItems: Array<ContentMetadataItem>;
 	seriesMetadataItems: Array<ContentMetadataItem>;
 }
+
+const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+
+const t = getTranslations();
+
+async function getImageProps() {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(IMAGE_SRC);
+
+	if (!imageEntry)
+		return {
+			imageEntry: undefined,
+			imageProps: undefined,
+			placeholder: undefined,
+		};
+
+	return {
+		imageEntry,
+		imageProps: {
+			src: IMAGE_SRC,
+			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
+			sizes: `(min-width: 360px) 180px, (min-width: ${TAILWIND_BREAKPOINT_SM}) 300px, 300px`,
+			priority: true,
+			unstyled: true,
+			alt: sanitizeAltAttribute(t('author.photo.alt')),
+		} satisfies ImageComponentProps,
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageProps, placeholder } = await getImageProps();
+
+const contentStats = await getContentStats();
 
 const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =
 	Astro.props;
@@ -33,8 +77,6 @@ const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
 const featuredOgImageId = imageFeaturedGroup?.at(0)?.captionMetadata?.id;
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
-
-const t = getTranslations();
 ---
 
 <MainSite
@@ -55,7 +97,58 @@ const t = getTranslations();
 			/>
 		) : undefined
 	}
-	<IndexDescription />
+	<ContentSection class="mt-small">
+		<CardFrame
+			class:list={[
+				'mb-small min-w-[180px] xs:float-end xs:mt-1 xs:mb-1 xs:ml-4 xs:w-[30%] xs:max-w-[300px] lg:mt-2 lg:mb-2',
+				MicroformatClassNames.Card,
+			]}
+		>
+			{
+				imageProps ? (
+					<ImagePlaceholder
+						class="relative overflow-hidden rounded-xs grayscale"
+						placeholder={placeholder}
+					>
+						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
+					</ImagePlaceholder>
+				) : undefined
+			}
+			<div class="prose-primary prose mt-1 flex flex-col gap-1 font-serif">
+				<Link
+					class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
+					href={getSiteUrl('/about')}
+					rel="me"><span class={MicroformatClassNames.Name}>{t('author.name')}</span></Link
+				>
+				<div class="text-xs">
+					<span class={MicroformatClassNames.Role}>{t('author.role')}</span>, <Link
+						class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
+						href={getSiteUrl()}>{t('site.title')}</Link
+					>
+				</div>
+			</div>
+		</CardFrame>
+		<ProseDescription>
+			<p
+				set:html={transformMarkdown({
+					input: t('index.introduction'),
+				})}
+			/>
+			<p
+				set:html={transformMarkdown({
+					input: formatStringTemplate(t('index.overview'), {
+						locationsCount: contentStats.locations.itemCount,
+						locationsWithImagesCount: contentStats.locations.withImages,
+						postsCount: contentStats.posts.itemCount,
+						regionsCount: contentStats.regions,
+						themesCount: contentStats.themes,
+						imagesCount: contentStats.images.itemCount,
+						linksCount: contentStats.links.itemCount,
+					}),
+				})}
+			/>
+		</ProseDescription>
+	</ContentSection>
 	<ContentSection class="clear-both">
 		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
 		<MetadataGrid

@@ -47,7 +47,9 @@ const t = getTranslations();
 <MainSite
 	meta={{
 		title: formatStringTemplate(t('archives.monthly.title'), { date: archivesMonthlyItem.title }),
-		description: t('archives.monthly.description').replace('%s', archivesMonthlyItem.title),
+		description: formatStringTemplate(t('archives.monthly.description'), {
+			date: archivesMonthlyItem.title,
+		}),
 		image: getSeoImageProps({
 			...(hasHeroImage ? { id: imageFeaturedGroup.at(0)?.captionMetadata?.id ?? '' } : {}),
 			alt: archivesMonthlyItem.title,

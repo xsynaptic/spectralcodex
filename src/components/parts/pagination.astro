@@ -8,6 +8,7 @@ import urlJoin from 'url-join';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
 	page: Page;
@@ -128,7 +129,7 @@ let isMidpointNumbers = false;
 const t = getTranslations();
 
 function getPageNumberAriaLabel(pageNumber: number) {
-	return t('site.pagination.pageNumber.label').replaceAll('%s', String(pageNumber));
+	return formatStringTemplate(t('site.pagination.pageNumber.label'), { page: pageNumber });
 }
 ---
 

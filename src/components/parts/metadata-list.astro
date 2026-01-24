@@ -5,6 +5,7 @@ import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	items: Array<ContentMetadataItem>;
@@ -23,7 +24,9 @@ const t = getTranslations();
 function getCountText() {
 	if (showCount && count) {
 		return {
-			title: `${numberFormatter.format(count - items.length)} ${t('parts.textSeparatedList.more')}`,
+			title: formatStringTemplate(t('parts.textSeparatedList.more'), {
+				count: numberFormatter.format(count - items.length),
+			}),
 			url: undefined,
 		};
 	}

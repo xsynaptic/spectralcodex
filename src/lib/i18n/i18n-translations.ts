@@ -15,9 +15,10 @@ type TranslationsRecord<T extends Record<string, string>> = Partial<
 const translationStrings = {
 	[defaultLanguage]: {
 		// Homepage
-		'index.introduction': `Welcome to the latest incarnation of **Spectral Codex**, a personal website blending aspects of a traditional blog, photography portfolio, travel journal, and geospatial database. You can read more about me [here](/about), or start browsing the collection! Gathered here are some of the better and more recent links from around the site to get you started...`,
+		'index.introduction': `Welcome to **Spectral Codex**, a travel journal, photography portfolio, geospatial database, and personal blog curated by Alexander Synaptic. This site is completely ad-free and features no sponsored content, though you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex) if you like what you find here. Read a little more about my background and motivations [here](/about), or start browsing the collection!`,
+		'index.overview': `Currently this project features {locationsCount} [locations](/locations) ({locationsWithImagesCount} with images), {postsCount} [posts](/posts), {regionsCount} [regions](/regions), {themesCount} [themes](/themes), {imagesCount} images, and {linksCount} outbound links, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the better and more recent links from around the site to get you started...`,
 		'index.recent.label': 'Recent Updates',
-		'index.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of more than 1,000 [movie theaters in Taiwan](/themes/taiwan-theaters).`,
+		'index.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of nearly 1,200 [movie theaters across Taiwan](/themes/taiwan-theaters).`,
 		'index.series': `Complete series of photo essays and field notes from some of the many road trips and bicycle journeys I've undertaken over the years, mostly around Taiwan. If you prefer more of a narrative structure to explore the many places documented on this site you might like to start here.`,
 
 		// Ephemera
@@ -44,7 +45,7 @@ const translationStrings = {
 		// Locations
 		'collection.locations.labelSingular': 'Location',
 		'collection.locations.labelPlural': 'Locations',
-		'collection.locations.description': `Every entry in this section contains information about a specific point of interest, often cultural attractions or historic sites, as well as geospatial data and links to more information.`,
+		'collection.locations.description': `Each entry in this section contains information about a specific point of interest, often cultural attractions or historic sites, as well as geospatial data and outbound links to more information.`,
 
 		// Pages
 		'collection.pages.labelSingular': 'Page',
@@ -70,7 +71,7 @@ const translationStrings = {
 		'collection.resources.labelSingular': 'Resource',
 		'collection.resources.labelPlural': 'Resources',
 		'collection.resources.description':
-			'Featured websites, blogs, and online resources that have informed or documented content on this site.',
+			'Featured websites, blogs, and online resources that have informed or documented content on this site. Some entries also include maps generated from content cross-referenced in this project.',
 		'collection.resources.homepage.label': 'Visit Homepage',
 		'collection.resources.showPage.label': 'View Index',
 		'collection.resources.contentCount.label': 'Content Count',
@@ -87,7 +88,7 @@ const translationStrings = {
 			'This site explores numerous themes, many of them overlapping, from history and culture through to art and architecture.',
 
 		// Content
-		'content.meta.dateUpdated.label': 'updated on',
+		'content.meta.dateUpdated.label': 'last updated',
 		'content.meta.locations.label': 'Mapped locations',
 		'content.meta.wordCount.label': 'Word count',
 		'content.meta.imageFeatured.label': 'Photo:',
@@ -131,9 +132,9 @@ const translationStrings = {
 		'archives.index.description':
 			'High level overview of all content on this site by year. Monthly data is also available after clicking on a year.',
 		'archives.yearly.title': '{date} Archives',
-		'archives.yearly.description': 'Monthly content archives for the year %s.',
+		'archives.yearly.description': 'Monthly content archives for the year {date}.',
 		'archives.monthly.title': '{date} Archives',
-		'archives.monthly.description': 'Content archives for %s.',
+		'archives.monthly.description': 'Content archives for {date}.',
 		'archives.monthly.created': 'Created',
 		'archives.monthly.updated': 'Updated',
 		'archives.monthly.visited': 'Visited',
@@ -143,12 +144,12 @@ const translationStrings = {
 		'pagination.previous': 'Previous',
 
 		// Parts
-		'parts.textSeparatedList.more': 'more',
+		'parts.textSeparatedList.more': '{count} more',
 
 		// Objectives
 		'objectives.title': 'Objectives',
 		'objectives.description':
-			'This is a custom map tracking points in the geospatial database that still require verification and documentation. It is not meant for external consumption.',
+			'This is a custom map tracking points in the geospatial database that still require verification and documentation. It is not intended for external consumption.',
 
 		// Notices
 		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
@@ -169,13 +170,13 @@ const translationStrings = {
 		'site.colophon.label': 'Colophon',
 		'site.menu.footer.label': 'Footer Navigation',
 		'site.menu.header.label': 'Header Navigation',
-		'site.menu.header.submenu.label': 'Submenu for %s',
+		'site.menu.header.submenu.label': 'Submenu for {title}',
 		'site.mode.toggle.label': 'Toggle mode',
 		'site.mode.toggle.dark.label': 'Dark mode',
 		'site.mode.toggle.light.label': 'Light mode',
 		'site.mode.toggle.system': 'System mode',
 		'site.pagination.label': 'Pagination',
-		'site.pagination.pageNumber.label': 'Page %s',
+		'site.pagination.pageNumber.label': 'Page {page}',
 
 		// Menu items
 		'menu.archive.label': 'Archives',
