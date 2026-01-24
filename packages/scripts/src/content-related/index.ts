@@ -6,10 +6,9 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { ContentFileMetadata } from '../content-utils';
+import type { DataStoreEntry } from '../content-utils/data-store.js';
 
-import { parseContentFiles } from '../content-utils';
-import { getContentCollectionPaths } from '../content-utils/collections';
+import { getCollection, loadDataStore } from '../content-utils/data-store.js';
 
 /**
  * Arguments
@@ -17,15 +16,10 @@ import { getContentCollectionPaths } from '../content-utils/collections';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
+		'data-store-path': {
 			type: 'string',
-			short: 'r',
-			default: process.cwd(),
-		},
-		'content-path': {
-			type: 'string',
-			short: 'p',
-			default: 'packages/content',
+			short: 'd',
+			default: '.astro/data-store.json',
 		},
 		'cache-path': {
 			type: 'string',
@@ -34,13 +28,12 @@ const { values } = parseArgs({
 		},
 		'cache-name': {
 			type: 'string',
-			short: 'n',
 			default: 'content-related-cache',
 		},
 		'character-limit': {
 			type: 'string',
 			short: 'l',
-			default: '5000',
+			default: '2000',
 		},
 		'result-count': {
 			type: 'string',
@@ -57,12 +50,21 @@ const { values } = parseArgs({
 /**
  * Types
  */
+interface ContentEntry extends DataStoreEntry {
+	collection: string;
+}
+
+interface ContentRelatedMetadata {
+	themes: Array<string>;
+	regions: Array<string>;
+}
+
 interface ContentRelatedEmbedding {
 	id: string;
-	hash: string;
+	digest: string;
 	collection: string;
 	vector: Array<number>;
-	frontmatter: Record<string, unknown>;
+	metadata: ContentRelatedMetadata;
 }
 
 type ContentRelatedEmbeddingCache = Record<string, ContentRelatedEmbedding>;
@@ -86,15 +88,15 @@ const ModelIdEnum = {
 } as const;
 
 // Note: changing models will regenerate all embeddings (cache is model-specific)
-const MODEL_ID = ModelIdEnum.MpNet;
+const MODEL_ID = ModelIdEnum.MiniLm;
 
 /**
  * Clean content for embedding using unified tools
  */
-function cleanContent(contentRaw: string, frontmatter: Record<string, unknown>): string {
-	const title = typeof frontmatter.title === 'string' ? frontmatter.title : '';
-	const description = typeof frontmatter.description === 'string' ? frontmatter.description : '';
-	const content = sanitizeMdx(contentRaw);
+function cleanContent(body: string, data: Record<string, unknown>): string {
+	const title = typeof data.title === 'string' ? data.title : '';
+	const description = typeof data.description === 'string' ? data.description : '';
+	const content = sanitizeMdx(body);
 
 	// Combine title, description, and content; the model will consume it as-is
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
@@ -113,6 +115,15 @@ function cosineSimilarity(vectorA: Array<number>, vectorB: Array<number>): numbe
 }
 
 /**
+ * Extract only the metadata fields needed for relatedness calculation
+ */
+function toStringArray(value: unknown): Array<string> {
+	if (Array.isArray(value)) return value.map(String);
+	if (typeof value === 'string') return [value];
+	return [];
+}
+
+/**
  * Calculate metadata boost based on shared regions and themes
  */
 function calculateMetadataBoost(
@@ -121,30 +132,15 @@ function calculateMetadataBoost(
 ): number {
 	let boost = 0;
 
-	// Extract arrays from frontmatter, handling various formats
-	const getCurrentArray = (key: string): Array<string> => {
-		const value = current.frontmatter[key];
-		if (Array.isArray(value)) return value.map(String);
-		if (typeof value === 'string') return [value];
-		return [];
-	};
-
-	const getOtherArray = (key: string): Array<string> => {
-		const value = other.frontmatter[key];
-		if (Array.isArray(value)) return value.map(String);
-		if (typeof value === 'string') return [value];
-		return [];
-	};
-
 	// Theme alignment boost
-	const currentThemes = new Set(getCurrentArray('themes'));
-	const otherThemes = new Set(getOtherArray('themes'));
+	const currentThemes = new Set(current.metadata.themes);
+	const otherThemes = new Set(other.metadata.themes);
 	const sharedThemes = [...currentThemes].filter((theme) => otherThemes.has(theme));
 	boost += sharedThemes.length * 0.15; // % boost per shared theme
 
 	// Region alignment boost
-	const currentRegions = new Set(getCurrentArray('regions'));
-	const otherRegions = new Set(getOtherArray('regions'));
+	const currentRegions = new Set(current.metadata.regions);
+	const otherRegions = new Set(other.metadata.regions);
 	const sharedRegions = [...currentRegions].filter((region) => otherRegions.has(region));
 	boost += sharedRegions.length * 0.1; // % boost per shared region
 
@@ -201,21 +197,11 @@ function saveCache(
 	}
 }
 
-function getCachedEmbedding(
-	cache: ContentRelatedEmbeddingCache,
-	contentId: string,
-	contentHash: string,
-): ContentRelatedEmbedding | undefined {
-	const cached = cache[contentId];
-
-	return cached?.hash === contentHash ? cached : undefined;
-}
-
 /**
- * Generate embeddings for all content files
+ * Generate embeddings for all content entries
  */
 async function generateEmbeddings(
-	contentFiles: Array<ContentFileMetadata>,
+	entries: Array<ContentEntry>,
 	cacheDir: string,
 ): Promise<Array<ContentRelatedEmbedding>> {
 	const cache = loadCache(cacheDir, values['cache-name'], MODEL_ID);
@@ -229,50 +215,49 @@ async function generateEmbeddings(
 	let cacheHits = 0;
 	let generated = 0;
 
-	for (let i = 0; i < contentFiles.length; i++) {
-		const contentFile = contentFiles[i];
+	for (let i = 0; i < entries.length; i++) {
+		const entry = entries[i];
 
-		if (!contentFile?.hash) continue;
+		if (!entry?.digest) continue;
 
 		try {
-			// Check cache first
-			const cachedEmbedding = getCachedEmbedding(cache, contentFile.id, contentFile.hash);
+			const cachedEmbedding = cache[entry.id];
 
-			if (cachedEmbedding) {
+			if (cachedEmbedding?.digest === entry.digest) {
 				embeddings.push(cachedEmbedding);
 				cacheHits++;
 			} else {
-				const plainTextContent = cleanContent(contentFile.content, contentFile.frontmatter);
+				const plainTextContent = cleanContent(entry.body ?? '', entry.data);
 				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
 				const vector = [...output.data] as Array<number>;
 
 				const embedding: ContentRelatedEmbedding = {
-					id: contentFile.id,
-					hash: contentFile.hash,
-					collection: contentFile.collection,
-					frontmatter: contentFile.frontmatter,
+					id: entry.id,
+					digest: entry.digest,
+					collection: entry.collection,
+					metadata: {
+						themes: toStringArray(entry.data.themes),
+						regions: toStringArray(entry.data.regions),
+					},
 					vector,
 				};
 
 				embeddings.push(embedding);
 
 				// Update cache in memory
-				cache[contentFile.id] = embedding;
+				cache[entry.id] = embedding;
 				generated++;
 			}
 
 			if ((i + 1) % 10 === 0) {
 				console.log(
 					chalk.blue(
-						`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(contentFiles.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
+						`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(entries.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
 					),
 				);
 			}
 		} catch (error) {
-			console.error(
-				chalk.red(`Error processing embedding for ${chalk.cyan(contentFile.id)}:`),
-				error,
-			);
+			console.error(chalk.red(`Error processing embedding for ${chalk.cyan(entry.id)}:`), error);
 		}
 	}
 
@@ -337,33 +322,38 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 /**
  * Content handling
  */
-const ContentCollectionPaths = getContentCollectionPaths(
-	values['root-path'],
-	values['content-path'],
-);
+function getContentEntries(dataStorePath: string): Array<ContentEntry> {
+	const { collections, path: resolvedPath } = loadDataStore(dataStorePath);
 
-async function getContentFiles() {
-	const contentFiles = await parseContentFiles(
-		[ContentCollectionPaths.Posts, ContentCollectionPaths.Locations],
-		{ withHashes: true },
-	);
+	console.log(chalk.gray(`Loaded data store from: ${resolvedPath}`));
 
-	if (contentFiles.length === 0) {
+	// Get entries from posts and locations collections
+	const collectionsToProcess = ['posts', 'locations'] as const;
+	const entries: Array<ContentEntry> = [];
+
+	for (const collectionName of collectionsToProcess) {
+		const collectionEntries = getCollection(collections, collectionName);
+
+		for (const entry of collectionEntries) {
+			// Filter: must have digest
+			if (!entry.digest) continue;
+
+			// Filter: must have entry quality and be at least 2
+			if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
+
+			entries.push({
+				...entry,
+				collection: collectionName,
+			});
+		}
+	}
+
+	if (entries.length === 0) {
 		console.error(chalk.red('❌ No content found!'));
 		process.exit(1);
 	}
 
-	// Remove low-quality entries to reduce data processing burden
-	/*
-	const contentFilesFiltered = contentFiles.filter(
-		(file) =>
-			!!file.frontmatter.entryQuality &&
-			R.isNumber(file.frontmatter.entryQuality) &&
-			file.frontmatter.entryQuality >= 2,
-	);
-	*/
-
-	return contentFiles;
+	return entries;
 }
 
 /**
@@ -373,9 +363,8 @@ async function contentRelated() {
 	try {
 		console.log(chalk.magenta('=== Related Content Generator ==='));
 
-		const contentFiles = await getContentFiles();
-
-		const cacheDir = path.join(values['root-path'], values['cache-path'], 'content-related');
+		const dataStorePath = values['data-store-path'];
+		const cacheDir = values['cache-path'];
 
 		mkdirSync(cacheDir, { recursive: true });
 
@@ -395,7 +384,11 @@ async function contentRelated() {
 			}
 		}
 
-		const embeddings = await generateEmbeddings(contentFiles, cacheDir);
+		const entries = getContentEntries(dataStorePath);
+
+		console.log(chalk.gray(`Processing ${String(entries.length)} entries from data store`));
+
+		const embeddings = await generateEmbeddings(entries, cacheDir);
 
 		if (embeddings.length === 0) {
 			console.error(chalk.red('❌ No embeddings generated!'));
