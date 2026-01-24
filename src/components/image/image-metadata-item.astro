@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { renderSlot } from '#lib/utils/astro.ts';
 
-type Props = HTMLAttributes<'div'>;
+type Props = HTMLAttributes<'span'>;
 
 const { class: className, ...props } = Astro.props;
 
@@ -13,13 +13,13 @@ const contents = await renderSlot(Astro.slots, 'default');
 
 {
 	title && contents ? (
-		<div class:list={[className, 'text-left']} {...props}>
+		<span class:list={[className, 'text-left']} {...props}>
 			<h3 class="text-xs font-semibold text-primary-800 select-none dark:text-primary-400">
 				<slot name="image-metadata-item-title" />
 			</h3>
-			<div class="cursor-text text-sm text-primary-700 select-text dark:text-primary-200">
+			<span class="cursor-text text-sm text-primary-700 select-text dark:text-primary-200">
 				<slot />
-			</div>
-		</div>
+			</span>
+		</span>
 	) : undefined
 }

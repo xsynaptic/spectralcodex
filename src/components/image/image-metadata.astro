@@ -24,7 +24,7 @@ const t = getTranslations();
 		]}
 		aria-label={t('collection.images.metadata.title')}
 	>
-		<div
+		<span
 			class:list={[
 				'text-primary-50 dark:text-primary-50',
 				'absolute right-0 bottom-0 z-10 cursor-pointer p-2 transition-opacity delay-500 duration-200 group-focus-within:pointer-events-none group-focus-within:opacity-0 group-focus-within:delay-100',
@@ -42,13 +42,13 @@ const t = getTranslations();
 					d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"
 				></path>
 			</svg>
-		</div>
-		<div
+		</span>
+		<span
 			class:list={[
 				'pointer-events-none absolute inset-0 flex h-full max-h-full w-full translate-x-full items-end overflow-y-auto font-sans opacity-0 transition-[opacity,translate] delay-[100ms,300ms] duration-[200ms,0ms] group-focus-within:pointer-events-auto group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:delay-[100ms,0ms] sm:rounded-b-xs',
 			]}
 		>
-			<div
+			<span
 				class:list={[
 					'bg-primary-50/75 dark:bg-primary-800/75',
 					'grid max-h-full w-full grid-cols-4 gap-1 overflow-y-auto px-small py-2 backdrop-grayscale sm:grid-cols-8 sm:gap-2 md:grid-cols-12 md:gap-4 @max-lg:sm:gap-1 @max-lg:md:grid-cols-8 @max-sm:sm:grid-cols-4 @max-sm:md:grid-cols-4',
@@ -127,15 +127,15 @@ const t = getTranslations();
 						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
 					/>
 				</ImageMetadataItem>
-			</div>
-		</div>
+			</span>
+		</span>
 	</button>
 	<button
 		class:list={[
 			'pointer-events-none opacity-0 transition-opacity duration-100 peer-focus-within:pointer-events-auto peer-focus-within:opacity-100',
 		]}
 		aria-label={t('collection.images.metadata.close.title')}
-		><div
+		><span
 			class:list={[
 				'text-accent-700 dark:text-accent-400',
 				'absolute right-0 bottom-0 z-20 cursor-pointer p-2',
@@ -153,6 +153,6 @@ const t = getTranslations();
 					d="M11.83 9L15 12.16V12a3 3 0 0 0-3-3zm-4.3.8l1.55 1.55c-.05.21-.08.42-.08.65a3 3 0 0 0 3 3c.22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53a5 5 0 0 1-5-5c0-.79.2-1.53.53-2.2M2 4.27l2.28 2.28l.45.45C3.08 8.3 1.78 10 1 12c1.73 4.39 6 7.5 11 7.5c1.55 0 3.03-.3 4.38-.84l.43.42L19.73 22L21 20.73L3.27 3M12 7a5 5 0 0 1 5 5c0 .64-.13 1.26-.36 1.82l2.93 2.93c1.5-1.25 2.7-2.89 3.43-4.75c-1.73-4.39-6-7.5-11-7.5c-1.4 0-2.74.25-4 .7l2.17 2.15C10.74 7.13 11.35 7 12 7"
 				></path>
 			</svg>
-		</div></button
+		</span></button
 	>
 </div>

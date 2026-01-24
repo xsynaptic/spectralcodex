@@ -43,7 +43,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 					}}
 					aria-label={translations.searchAriaLabel}
 				>
-					<div className="flex items-center justify-center">
+					<span className="flex items-center justify-center">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
@@ -52,7 +52,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Search}`}></use>
 						</svg>
-					</div>
+					</span>
 				</button>
 			</div>
 		</CustomControlPortal>

@@ -59,7 +59,7 @@ const MapFilterStatusMenuItem: FC<{
 					toggleStatusFilter(status);
 				}}
 			>
-				<div
+				<span
 					className={`h-2 w-2 rounded-full border ${isFiltered ? 'opacity-60' : ''}`}
 					style={{
 						backgroundColor: isDarkMode
@@ -69,9 +69,9 @@ const MapFilterStatusMenuItem: FC<{
 							? LocationStatusRecords[status].strokeDark
 							: LocationStatusRecords[status].stroke,
 					}}
-				></div>
-				<div
-					className={`font-display flex w-full flex-nowrap items-center justify-between gap-2 text-xs sm:text-sm ${isFiltered ? 'text-primary-500 dark:text-primary-400' : 'text-primary-700 dark:text-primary-300'}`}
+				></span>
+				<span
+					className={`flex w-full flex-nowrap items-center justify-between gap-2 font-display text-xs sm:text-sm ${isFiltered ? 'text-primary-500 dark:text-primary-400' : 'text-primary-700 dark:text-primary-300'}`}
 				>
 					{showChinese ? (
 						<>
@@ -85,7 +85,7 @@ const MapFilterStatusMenuItem: FC<{
 					) : (
 						data.title
 					)}
-				</div>
+				</span>
 			</button>
 		</MapFilterMenuItem>
 	);
@@ -102,12 +102,12 @@ const MapFilterStatusShowHideMenuItem: FC<
 				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
 				onClick={onClick}
 			>
-				<div className={`border-primary-500 bg-primary-200 h-2 w-2 rounded-full border`}></div>
-				<div
-					className={`font-display text-primary-700 dark:text-primary-300 flex w-full flex-nowrap items-center justify-between gap-2 text-xs sm:text-sm`}
+				<span className={`h-2 w-2 rounded-full border border-primary-500 bg-primary-200`}></span>
+				<span
+					className={`flex w-full flex-nowrap items-center justify-between gap-2 font-display text-xs text-primary-700 sm:text-sm dark:text-primary-300`}
 				>
 					{children}
-				</div>
+				</span>
 			</button>
 		</MapFilterMenuItem>
 	);
@@ -128,7 +128,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 				{showChinese ? (
 					<>
 						<span>{translations.showAll}</span>
-						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
+						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
 							{translations.showAllAlt}
 						</span>
 					</>
@@ -144,7 +144,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 				{showChinese ? (
 					<>
 						<span>{translations.hideAll}</span>
-						<span className="text-primary-600 dark:text-primary-400 font-sans font-medium sm:text-xs">
+						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
 							{translations.hideAllAlt}
 						</span>
 					</>
@@ -163,13 +163,13 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 
 	return (
 		<li>
-			<div className="flex h-[20px] w-full items-center justify-center gap-2 px-1 select-none md:h-[24px]">
+			<span className="flex h-[20px] w-full items-center justify-center gap-2 px-1 select-none md:h-[24px]">
 				{R.range(1, 6).map((value) => (
 					<svg
 						key={`rating-${String(value)}`}
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 36 36"
-						className={`cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 dark:text-primary-600 dark:focus:text-primary-400 hover:text-highlight-300 focus:text-primary-300'}`}
+						className={`cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 hover:text-highlight-300 focus:text-primary-300 dark:text-primary-600 dark:focus:text-primary-400'}`}
 						style={{ width: '16px' }}
 						onClick={() => {
 							if (ratingFilterValue === value) {
@@ -182,7 +182,7 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 						<use xlinkHref={`#${MapSpritesEnum.Rating}`}></use>
 					</svg>
 				))}
-			</div>
+			</span>
 		</li>
 	);
 };
@@ -196,7 +196,7 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 			<div className="flex w-full cursor-pointer items-center gap-1 select-none">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
-						className={`font-display text-primary-700 flex-1 rounded-full border text-xs ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
+						className={`flex-1 rounded-full border font-display text-xs text-primary-700 ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
 						onClick={() => {
 							setObjectiveFilter(value);
 						}}
@@ -274,7 +274,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					}}
 					aria-label={translations.filterMenuAriaLabel}
 				>
-					<div className="flex items-center justify-center">
+					<span className="flex items-center justify-center">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
@@ -288,7 +288,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Filters}`}></use>
 						</svg>
-					</div>
+					</span>
 				</button>
 			</CustomControlPortal>
 			<MapControlsFilterMenu />
