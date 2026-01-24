@@ -14,7 +14,6 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': { type: 'string', default: process.cwd() },
-		'content-path': { type: 'string', default: 'packages/content' },
 		'cache-path': { type: 'string', default: 'node_modules/.astro' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
@@ -22,7 +21,6 @@ const { values } = parseArgs({
 });
 
 const rootPath = values['root-path'];
-const contentPath = values['content-path'];
 const cachePath = path.join(rootPath, values['cache-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
@@ -49,14 +47,14 @@ async function related() {
 	console.log(chalk.blue('Generating related content...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm content-related --root-path=${rootPath} --content-path=${contentPath} --cache-path=${cachePath}`;
+	})`pnpm content-related --root-path=${rootPath}`;
 }
 
 async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm opengraph-image --root-path=${rootPath} --content-path=${contentPath} --output-path=${rootPath}/public/0g`;
+	})`pnpm opengraph-image --root-path=${rootPath}`;
 }
 
 async function build() {
