@@ -7,25 +7,26 @@ import pLimit from 'p-limit';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { getContentCollectionPaths, ImageFeaturedSchema } from '../content-utils/collections.js';
-import { parseContentFiles } from '../content-utils/index.js';
+import { ContentCollectionsEnum, ImageFeaturedSchema } from '../content-utils/collections.js';
+import { getCollection, loadDataStore } from '../content-utils/data-store.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': {
 			type: 'string',
-			short: 'r',
 			default: process.cwd(),
 		},
-		'content-path': {
+		'data-store-path': {
 			type: 'string',
-			short: 'c',
-			default: 'packages/content',
+			default: '.astro/data-store.json',
+		},
+		'media-path': {
+			type: 'string',
+			default: 'packages/content/media',
 		},
 		'output-path': {
 			type: 'string',
-			short: 'o',
 			default: 'public/0g',
 		},
 	},
@@ -61,26 +62,23 @@ function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | 
 		: imageFeatured;
 }
 
-const ContentCollectionPaths = getContentCollectionPaths(
-	values['root-path'],
-	values['content-path'],
-);
-
-async function getContentEntries(): Promise<Array<ContentEntry>> {
-	console.log(chalk.blue('Reading content collections...'));
+function getContentEntries(): Array<ContentEntry> {
+	const { collections } = loadDataStore(path.join(values['root-path'], values['data-store-path']));
 
 	const allEntries: Array<ContentEntry> = [];
 
-	const files = await parseContentFiles(Object.values(ContentCollectionPaths));
+	for (const collectionName of Object.values(ContentCollectionsEnum)) {
+		const collectionEntries = getCollection(collections, collectionName);
 
-	for (const file of files) {
-		const imageFeatured = ImageFeaturedSchema.optional().parse(file.frontmatter.imageFeatured);
+		for (const entry of collectionEntries) {
+			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
 
-		if (imageFeatured) {
-			allEntries.push({
-				id: file.id,
-				imageFeatured,
-			});
+			if (imageFeatured) {
+				allEntries.push({
+					id: entry.id,
+					imageFeatured,
+				});
+			}
 		}
 	}
 
@@ -94,7 +92,7 @@ async function getContentEntries(): Promise<Array<ContentEntry>> {
  * Image IDs are paths relative to content/media (e.g., "taiwan/taichung/taichung-1.jpg")
  */
 async function getSourceImagePath(imageId: string): Promise<string | undefined> {
-	const imagePath = path.join(values['root-path'], values['content-path'], 'media', imageId);
+	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
 
 	try {
 		await fs.access(imagePath, fs.constants.R_OK);
@@ -151,7 +149,7 @@ async function generateOpenGraphImage(
 
 		await fs.mkdir(outputPath, { recursive: true });
 
-		const outputFilePath = path.join(outputPath, `${entry.id}.${OG_FORMAT}`);
+		const outputFilePath = path.join(outputPath, `${path.basename(entry.id)}.${OG_FORMAT}`);
 
 		// Check if we need to regenerate
 		const needsRegeneration = await shouldRegenerateImage(sourceImagePath, outputFilePath);
@@ -181,7 +179,7 @@ async function generateAllOpenGraphImages() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator ==='));
 
 	try {
-		const entries = await getContentEntries();
+		const entries = getContentEntries();
 
 		if (entries.length === 0) {
 			console.log(chalk.yellow('No entries with featured images found.'));
