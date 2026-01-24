@@ -15,7 +15,7 @@ const { values } = parseArgs({
 	options: {
 		'root-path': { type: 'string', default: process.cwd() },
 		'content-path': { type: 'string', default: 'packages/content' },
-		'cache-path': { type: 'string', default: './node_modules/.astro' },
+		'cache-path': { type: 'string', default: 'node_modules/.astro' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},
@@ -23,7 +23,7 @@ const { values } = parseArgs({
 
 const rootPath = values['root-path'];
 const contentPath = values['content-path'];
-const cachePath = values['cache-path'];
+const cachePath = path.join(rootPath, values['cache-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 

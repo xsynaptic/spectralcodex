@@ -19,32 +19,26 @@ const { values, positionals } = parseArgs({
 	options: {
 		'root-path': {
 			type: 'string',
-			short: 'r',
 			default: process.cwd(),
 		},
 		'content-path': {
 			type: 'string',
-			short: 'c',
 			default: 'packages/content',
 		},
 		'divisions-path': {
 			type: 'string',
-			short: 'd',
 			default: './public/divisions',
 		},
 		'media-path': {
 			type: 'string',
-			short: 'm',
 			default: 'packages/content/media',
 		},
 		verbose: {
 			type: 'boolean',
-			short: 'v',
 			default: false,
 		},
 		threshold: {
 			type: 'string',
-			short: 't',
 			default: '10',
 		},
 	},
@@ -141,7 +135,14 @@ switch (command) {
 
 		if (!slugSuccess) process.exit(1);
 
-		const qualitySuccess = await checkContentQuality(Object.values(ContentCollectionsPaths));
+		const qualitySuccess = await checkContentQuality([
+			ContentCollectionsPaths.Ephemera,
+			ContentCollectionsPaths.Locations,
+			ContentCollectionsPaths.Posts,
+			ContentCollectionsPaths.Regions,
+			ContentCollectionsPaths.Series,
+			ContentCollectionsPaths.Themes,
+		]);
 
 		if (!qualitySuccess) process.exit(1);
 

@@ -17,11 +17,15 @@ interface Props {
 	threshold?: number;
 }
 
-const { entry, showPreviews, limit = 10, threshold = 0.6, ...props } = Astro.props;
+const { entry, showPreviews, limit = 10, threshold = 0.5, ...props } = Astro.props;
 
 const getRelatedContent = await getRelatedContentFunction();
 
-const relatedContentItems = getRelatedContent({ id: entry.id, limit, threshold });
+const relatedContentItems = getRelatedContent({
+	id: entry.id,
+	limit,
+	threshold,
+});
 
 const t = getTranslations();
 ---

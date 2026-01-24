@@ -1,10 +1,12 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
+import slugify from '@sindresorhus/slugify';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../content-utils/data-store.js';
 
@@ -16,29 +18,41 @@ import { getCollection, loadDataStore } from '../content-utils/data-store.js';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
+		'root-path': {
+			type: 'string',
+			default: process.cwd(),
+		},
 		'data-store-path': {
 			type: 'string',
-			short: 'd',
 			default: '.astro/data-store.json',
 		},
 		'cache-path': {
 			type: 'string',
-			short: 'c',
-			default: './node_modules/.astro',
+			default: 'node_modules/.astro/content-related',
 		},
 		'cache-name': {
 			type: 'string',
 			default: 'content-related-cache',
 		},
+		'output-path': {
+			type: 'string',
+			default: 'node_modules/.astro/content-related',
+		},
+		'output-name': {
+			type: 'string',
+			default: 'content-related.json',
+		},
+		'progress-count': {
+			type: 'string',
+			default: '50',
+		},
 		'character-limit': {
 			type: 'string',
-			short: 'l',
 			default: '2000',
 		},
 		'result-count': {
 			type: 'string',
-			short: 'n',
-			default: '10',
+			default: '25',
 		},
 		'clear-cache': {
 			type: 'boolean',
@@ -78,9 +92,8 @@ interface ContentRelatedItem {
 type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
 
 /**
- * Models
+ * Models; a small sampling of some options; more complex models are more accurate but slower
  */
-// Some recommended models to experiment with; more complex models are more accurate but slower
 const ModelIdEnum = {
 	MiniLm: 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
 	MpNet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
@@ -96,22 +109,10 @@ const MODEL_ID = ModelIdEnum.MiniLm;
 function cleanContent(body: string, data: Record<string, unknown>): string {
 	const title = typeof data.title === 'string' ? data.title : '';
 	const description = typeof data.description === 'string' ? data.description : '';
-	const content = sanitizeMdx(body);
+	const content = body && body.length > 0 ? sanitizeMdx(body) : '';
 
 	// Combine title, description, and content; the model will consume it as-is
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
-}
-
-/**
- * Cosine similarity function
- * Note: embeddings are already normalized
- */
-function cosineSimilarity(vectorA: Array<number>, vectorB: Array<number>): number {
-	if (vectorA.length !== vectorB.length) {
-		throw new Error('Vectors must have the same dimensions');
-	}
-
-	return vectorA.reduce((sum, next, index) => sum + next * vectorB[index]!, 0);
 }
 
 /**
@@ -149,20 +150,13 @@ function calculateMetadataBoost(
 }
 
 /**
- * Vector caching
+ * File-based embedding cache
  */
-function getCacheFileName(cacheName: string, modelId: string): string {
-	return `${cacheName}-${modelId.replaceAll('/', '-')}.json`;
+function getEmbeddingCacheFilename(cacheName: string, modelId: string): string {
+	return `${cacheName}-${slugify(modelId, { lowercase: true })}.json`;
 }
 
-function loadCache(
-	cacheDir: string,
-	cacheName: string,
-	modelId: string,
-): ContentRelatedEmbeddingCache {
-	const cacheFileName = getCacheFileName(cacheName, modelId);
-	const cachePath = path.join(cacheDir, cacheFileName);
-
+function loadEmbeddingCache(cachePath: string): ContentRelatedEmbeddingCache {
 	if (!existsSync(cachePath)) {
 		return {};
 	}
@@ -179,19 +173,10 @@ function loadCache(
 	}
 }
 
-function saveCache(
-	cache: ContentRelatedEmbeddingCache,
-	cacheDir: string,
-	cacheName: string,
-	modelId: string,
-): void {
-	const cacheFileName = getCacheFileName(cacheName, modelId);
-	const cachePath = path.join(cacheDir, cacheFileName);
-
+function saveEmbeddingCache(cache: ContentRelatedEmbeddingCache, cachePath: string): void {
 	try {
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(cachePath, JSON.stringify(cache, null, 2));
-		console.log(`💾 Saved ${String(Object.keys(cache).length)} embeddings to cache`);
 	} catch (error) {
 		console.error('❌ Failed to save embedding cache:', error);
 	}
@@ -202,9 +187,14 @@ function saveCache(
  */
 async function generateEmbeddings(
 	entries: Array<ContentEntry>,
-	cacheDir: string,
 ): Promise<Array<ContentRelatedEmbedding>> {
-	const cache = loadCache(cacheDir, values['cache-name'], MODEL_ID);
+	const cachePath = path.join(
+		values['root-path'],
+		values['cache-path'],
+		getEmbeddingCacheFilename(values['cache-name'], MODEL_ID),
+	);
+
+	const cache = loadEmbeddingCache(cachePath);
 
 	const embedder = await pipeline('feature-extraction', MODEL_ID, { dtype: 'fp32' });
 
@@ -249,7 +239,7 @@ async function generateEmbeddings(
 				generated++;
 			}
 
-			if ((i + 1) % 10 === 0) {
+			if ((i + 1) % Number(values['progress-count']) === 0) {
 				console.log(
 					chalk.blue(
 						`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(entries.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
@@ -262,7 +252,7 @@ async function generateEmbeddings(
 	}
 
 	// Save updated cache
-	saveCache(cache, cacheDir, values['cache-name'], MODEL_ID);
+	saveEmbeddingCache(cache, cachePath);
 
 	console.log(
 		chalk.green(
@@ -274,47 +264,84 @@ async function generateEmbeddings(
 }
 
 /**
- * Calculate similarities and find top matches
+ * Calculate similarities using usearch ANN index
  */
 function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): ContentRelatedResult {
-	console.log(chalk.blue('Calculating relatedness...'));
+	const firstVector = embeddings[0]?.vector;
 
+	if (!firstVector) {
+		throw new Error('No embeddings to process');
+	}
+
+	// Build ID mappings (usearch needs numeric BigInt keys)
+	const idToKey = new Map<string, bigint>();
+	const keyToEmbedding = new Map<bigint, ContentRelatedEmbedding>();
+
+	for (const [i, embedding] of embeddings.entries()) {
+		const key = BigInt(i);
+		idToKey.set(embedding.id, key);
+		keyToEmbedding.set(key, embedding);
+	}
+
+	// Create and populate the index
+	const index = new Index({
+		metric: MetricKind.Cos,
+		dimensions: firstVector.length,
+		connectivity: 16,
+		quantization: ScalarKind.F32,
+		expansion_add: 128,
+		expansion_search: 64,
+		multi: false,
+	});
+
+	for (const emb of embeddings) {
+		const key = idToKey.get(emb.id);
+		if (key !== undefined) {
+			index.add(key, new Float32Array(emb.vector));
+		}
+	}
+
+	// Query for similar items and re-rank with metadata boost
+	console.log(chalk.blue('Querying for related content...'));
+
+	const queryStart = performance.now();
 	const result: ContentRelatedResult = {};
+	const resultCount = Number(values['result-count']);
+	const candidateCount = Math.max(resultCount * 5, 50); // Fetch extra for re-ranking
 
-	for (let i = 0; i < embeddings.length; i++) {
-		const current = embeddings[i];
-		const relatedContentItems: Array<ContentRelatedItem> = [];
+	for (const current of embeddings) {
+		const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
 
-		for (const [j, content] of embeddings.entries()) {
-			if (i === j || !current) continue;
+		const candidates: Array<ContentRelatedItem> = [];
 
-			const semanticScore = cosineSimilarity(current.vector, content.vector);
-			const metadataBoost = calculateMetadataBoost(current, content);
+		for (const [i, key] of keys.entries()) {
+			const distance = distances[i];
 
-			// Combine for hybrid score
-			const hybridScore = semanticScore + metadataBoost;
+			const other = keyToEmbedding.get(key);
+			if (!other || other.id === current.id) continue;
 
-			relatedContentItems.push({
-				id: content.id,
-				collection: content.collection,
-				score: hybridScore,
+			// Convert cosine distance to similarity (usearch returns distance, not similarity)
+			const similarity = distance === undefined ? 0 : 1 - distance;
+			const boost = calculateMetadataBoost(current, other);
+
+			candidates.push({
+				id: other.id,
+				collection: other.collection,
+				score: similarity + boost,
 			});
 		}
 
-		// Sort by score and slice top results
-		relatedContentItems.sort((a, b) => b.score - a.score);
-		if (current) {
-			result[current.id] = relatedContentItems.slice(0, Number(values['result-count']));
-		}
-
-		if ((i + 1) % 50 === 0) {
-			console.log(
-				chalk.blue(
-					`Calculated cosine similarities for ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(embeddings.length))} items`,
-				),
-			);
-		}
+		// Sort by score and take top results
+		candidates.sort((a, b) => b.score - a.score);
+		result[current.id] = candidates.slice(0, resultCount);
 	}
+
+	const queryTime = (performance.now() - queryStart).toFixed(2);
+	console.log(
+		chalk.green(
+			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan(queryTime)}ms`,
+		),
+	);
 
 	return result;
 }
@@ -361,14 +388,14 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
  */
 async function contentRelated() {
 	try {
-		console.log(chalk.magenta('=== Related Content Generator ==='));
+		console.log(chalk.magenta('=== Related Content Generator (v2 - usearch) ==='));
 
-		const dataStorePath = values['data-store-path'];
-		const cacheDir = values['cache-path'];
+		const dataStorePath = path.join(values['root-path'], values['data-store-path']);
 
-		mkdirSync(cacheDir, { recursive: true });
+		mkdirSync(path.join(values['root-path'], values['cache-path']), { recursive: true });
 
 		if (values['clear-cache']) {
+			const cacheDir = path.join(values['root-path'], values['cache-path']);
 			const cacheFiles = readdirSync(cacheDir).filter((file) =>
 				file.startsWith(values['cache-name']),
 			);
@@ -388,7 +415,9 @@ async function contentRelated() {
 
 		console.log(chalk.gray(`Processing ${String(entries.length)} entries from data store`));
 
-		const embeddings = await generateEmbeddings(entries, cacheDir);
+		const totalStart = performance.now();
+
+		const embeddings = await generateEmbeddings(entries);
 
 		if (embeddings.length === 0) {
 			console.error(chalk.red('❌ No embeddings generated!'));
@@ -396,18 +425,19 @@ async function contentRelated() {
 		}
 
 		const relatedContentItems = calculateSimilarities(embeddings);
-
-		// Output results
-		const outputPath = path.join(cacheDir, 'content-related.json');
+		const outputPath = path.join(values['root-path'], values['output-path'], values['output-name']);
 
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));
+
+		const totalTime = ((performance.now() - totalStart) / 1000).toFixed(2);
 
 		console.log(
 			chalk.green(
 				`✅ Related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items written to ${chalk.cyan(outputPath)}`,
 			),
 		);
+		console.log(chalk.magenta(`Total time: ${chalk.cyan(totalTime)}s`));
 	} catch (error) {
 		console.error(chalk.red('❌ Error:'), error);
 		process.exit(1);

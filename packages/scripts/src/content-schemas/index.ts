@@ -8,7 +8,6 @@ const { values } = parseArgs({
 	options: {
 		'root-path': {
 			type: 'string',
-			short: 'r',
 			default: process.cwd(),
 		},
 		'content-path': {

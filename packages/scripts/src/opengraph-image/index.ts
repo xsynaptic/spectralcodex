@@ -26,7 +26,7 @@ const { values } = parseArgs({
 		'output-path': {
 			type: 'string',
 			short: 'o',
-			default: './public/0g',
+			default: 'public/0g',
 		},
 	},
 });
@@ -147,7 +147,7 @@ async function generateOpenGraphImage(
 			return { status: 'error' };
 		}
 
-		const outputPath = path.resolve(values['output-path']);
+		const outputPath = path.join(values['root-path'], values['output-path']);
 
 		await fs.mkdir(outputPath, { recursive: true });
 

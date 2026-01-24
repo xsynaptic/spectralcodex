@@ -67,10 +67,12 @@ export async function getRelatedContentFunction() {
 		id,
 		limit = 10,
 		threshold = 0.6,
+		hasImageFeatured = true,
 	}: {
 		id: string;
 		limit?: number | undefined;
 		threshold?: number;
+		hasImageFeatured?: boolean;
 	}): Array<ContentMetadataItem> {
 		if (!relatedContentData) return [];
 
@@ -81,6 +83,7 @@ export async function getRelatedContentFunction() {
 		return relatedItem
 			.filter((item) => item.score >= threshold)
 			.map((item) => contentMetadataIndex.get(item.id))
+			.filter((item) => !!item?.imageId === hasImageFeatured)
 			.filter((item) => item !== undefined)
 			.slice(0, limit);
 	};

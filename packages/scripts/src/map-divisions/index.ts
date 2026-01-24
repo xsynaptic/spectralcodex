@@ -27,17 +27,17 @@ const { values } = parseArgs({
 		'output-path': {
 			type: 'string',
 			short: 'o',
-			default: './public/divisions',
+			default: 'public/divisions',
 		},
 		'regions-path': {
 			type: 'string',
 			short: 'p',
-			default: './packages/content/collections/regions',
+			default: 'packages/content/collections/regions',
 		},
 		'cache-path': {
 			type: 'string',
 			short: 'c',
-			default: './node_modules/.astro/divisions',
+			default: 'node_modules/.astro/divisions',
 		},
 		'overture-url': {
 			type: 'string',
