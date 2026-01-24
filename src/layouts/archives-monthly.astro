@@ -18,6 +18,7 @@ import {
 } from '#lib/image/image-featured.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	archivesMonthlyItem: ArchivesMonthlyItem;
@@ -45,7 +46,7 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: t('archives.title'),
+		title: formatStringTemplate(t('archives.monthly.title'), { date: archivesMonthlyItem.title }),
 		description: t('archives.monthly.description').replace('%s', archivesMonthlyItem.title),
 		image: getSeoImageProps({
 			...(hasHeroImage ? { id: imageFeaturedGroup.at(0)?.captionMetadata?.id ?? '' } : {}),
@@ -61,16 +62,20 @@ const t = getTranslations();
 		imageFeaturedGroup={imageFeaturedGroup}
 	>
 		<ContentHeader hasHeroImage={hasHeroImage}>
-			<Fragment slot="header-title">{archivesMonthlyItem.title}</Fragment>
+			<Fragment slot="header-title"
+				>{
+					formatStringTemplate(t('archives.monthly.title'), { date: archivesMonthlyItem.title })
+				}</Fragment
+			>
 			<Fragment slot="header-subtitle">
 				{
 					hasHeroImage ? (
 						<Link
 							class="font-semibold"
-							href={getSiteUrl('archives')}
+							href={getSiteUrl('archives', archivesMonthlyItem.year)}
 							linkColor="highlight-featured"
 						>
-							{t('archives.title')}
+							{formatStringTemplate(t('archives.yearly.title'), { date: archivesMonthlyItem.year })}
 						</Link>
 					) : (
 						<ArchivesNavigation

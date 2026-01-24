@@ -6,11 +6,11 @@ import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	archivesMonthlyData: Array<ArchivesMonthlyItem>;
@@ -25,23 +25,20 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: t('archives.title'),
+		title: formatStringTemplate(t('archives.yearly.title'), { date: archivesYear }),
 		description: t('archives.yearly.description').replace('%s', archivesYear),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{archivesYear}</Fragment>
+		<Fragment slot="header-title"
+			>{formatStringTemplate(t('archives.yearly.title'), { date: archivesYear })}</Fragment
+		>
 		<Fragment slot="header-subtitle"
-			><DividedItem dividerContent="chevron"
+			><ArchivesNavigation currentYear={archivesYear} archivesYears={archivesYears}
 				><Link href={getSiteUrl('archives')} linkColor="accent" class="font-semibold"
-					>{t('archives.title')}</Link
-				></DividedItem
-			><DividedItem
-				><ArchivesNavigation
-					currentYear={archivesYear}
-					archivesYears={archivesYears}
-				/></DividedItem
+					>{t('archives.index.label')}</Link
+				></ArchivesNavigation
 			></Fragment
 		>
 	</ContentHeader>

@@ -23,13 +23,13 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: t('archives.title'),
+		title: t('archives.index.title'),
 		description: t('archives.index.description'),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{t('archives.title')}</Fragment>
+		<Fragment slot="header-title">{t('archives.index.title')}</Fragment>
 		<Fragment slot="header-subtitle"><ArchivesNavigation archivesYears={archivesYears} /></Fragment>
 	</ContentHeader>
 	<ContentSection>

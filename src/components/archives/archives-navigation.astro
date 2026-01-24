@@ -3,6 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
+import { renderSlot } from '#lib/utils/astro.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -22,6 +23,8 @@ const {
 	hasHeroImage = false,
 	...props
 } = Astro.props;
+
+const indexSlot = await renderSlot(Astro.slots, 'default');
 ---
 
 {
@@ -40,6 +43,11 @@ const {
 					hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 				]}
 			>
+				{indexSlot ? (
+					<DividedItem hasHeroImage={hasHeroImage} dividerContent="chevron">
+						<Fragment set:html={indexSlot} />
+					</DividedItem>
+				) : undefined}
 				{archivesYears.map((archivesYear) => (
 					<DividedItem hasHeroImage={hasHeroImage}>
 						{!currentMonth && currentYear === archivesYear ? (

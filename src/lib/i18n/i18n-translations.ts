@@ -126,10 +126,13 @@ const translationStrings = {
 		'terms.related.siblings.label': 'Other Terms',
 
 		// Archives
-		'archives.title': 'Archives',
+		'archives.index.label': 'Index',
+		'archives.index.title': 'Archives',
 		'archives.index.description':
 			'High level overview of all content on this site by year. Monthly data is also available after clicking on a year.',
+		'archives.yearly.title': '{date} Archives',
 		'archives.yearly.description': 'Monthly content archives for the year %s.',
+		'archives.monthly.title': '{date} Archives',
 		'archives.monthly.description': 'Content archives for %s.',
 		'archives.monthly.created': 'Created',
 		'archives.monthly.updated': 'Updated',

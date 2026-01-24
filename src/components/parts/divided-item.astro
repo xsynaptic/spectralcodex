@@ -54,7 +54,9 @@ const {
 		hasHeroImage && showDarkMode ? 'dark:sm:after:text-primary-700' : undefined,
 		dividerContent === 'bar' ? 'after:content-(--content-bar)' : undefined,
 		dividerContent === 'bullet' ? 'after:content-(--content-bullet)' : undefined,
-		dividerContent === 'chevron' ? 'after:content-(--content-chevron)' : undefined,
+		dividerContent === 'chevron'
+			? 'after:-translate-y-px after:content-(--content-chevron)'
+			: undefined,
 		dividerContent === 'dot' ? 'after:content-(--content-dot)' : undefined,
 		dividerContent === 'slash' ? 'after:content-(--content-slash)' : undefined,
 		className,

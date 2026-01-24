@@ -55,3 +55,11 @@ export function sanitizeCaption(input: string): string {
 export function sanitizeAltAttribute(input: string): string {
 	return encodeHtmlEntities(stripTags(input));
 }
+
+// Interpolate named placeholders in a string *e.g.* "{year}/{month} Archives"
+export function formatStringTemplate(
+	template: string,
+	values: Record<string, string | number> = {},
+): string {
+	return template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
+}
