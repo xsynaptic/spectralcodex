@@ -2,6 +2,8 @@ import {
 	TAILWIND_BREAKPOINT_CONTENT,
 	TAILWIND_BREAKPOINT_MD,
 	TAILWIND_BREAKPOINT_SM,
+	TAILWIND_CONTENT_PADDING_MD,
+	TAILWIND_CONTENT_PADDING_SM,
 } from '#constants.ts';
 
 export const ImageLayoutEnum = {
@@ -87,7 +89,12 @@ export function getImageLayoutProps({
 				width: ImageSizeEnum.Large,
 				height: ImageSizeEnum.Medium,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - 32px), (max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - 64px), ${TAILWIND_BREAKPOINT_CONTENT}`,
+				sizes: [
+					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
+					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
+					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
+					`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
+				].join(', '),
 			};
 		}
 		case ImageLayoutEnum.Wide: {
@@ -95,7 +102,7 @@ export function getImageLayoutProps({
 				width: ImageSizeEnum.ExtraLarge,
 				height: ImageSizeEnum.Large,
 				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `calc(100vw - 64px)`,
+				sizes: `calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
 			};
 		}
 		case ImageLayoutEnum.Full: {
@@ -124,7 +131,12 @@ export function getImageLayoutProps({
 					}
 				})(),
 				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, (max-width:${TAILWIND_BREAKPOINT_CONTENT}) 50vw`,
+				sizes: [
+					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
+					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc((100vw - ${TAILWIND_CONTENT_PADDING_SM}) / 2)`,
+					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc((100vw - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
+					`calc((${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
+				].join(', '),
 			};
 		}
 	}
