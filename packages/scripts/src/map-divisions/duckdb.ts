@@ -9,8 +9,6 @@ import type { DivisionGeometry, DivisionItem } from './types';
 import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache';
 
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
-	console.log(chalk.blue('Initializing DuckDB...'));
-
 	try {
 		const instance = await DuckDBInstance.create(':memory:');
 		const connection = await instance.connect();

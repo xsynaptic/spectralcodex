@@ -1,101 +1,84 @@
 import type { GeometryBoundingBox } from '@spectralcodex/map-types';
 
-import { parseFrontmatter } from '@astrojs/markdown-remark';
 import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/map-types';
 import chalk from 'chalk';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import type { DataStoreEntry } from '../content-utils/data-store';
 import type { RegionMetadata } from './types';
 
 /**
- * Load frontmatter from the regions collection
+ * Derive regionPathIds (ancestor chain) from filePath
+ * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
+ * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
  */
-export async function parseRegionData(rootPath: string, regionsPath: string) {
-	console.log(chalk.blue('Scanning regions collection for divisionId in frontmatter...'));
+function getRegionPathIds(filePath: string, slug: string): Array<string> {
+	const collectionMarker = 'collections/regions/';
+	const idx = filePath.indexOf(collectionMarker);
 
+	if (idx === -1) return [slug];
+
+	const relativePath = filePath.slice(idx + collectionMarker.length);
+	const ext = path.extname(relativePath);
+	const pathWithoutExt = relativePath.replace(ext, '');
+	const parts = pathWithoutExt.split('/');
+
+	// Start with self (slug), then add ancestors from immediate parent to root
+	const regionPathIds: Array<string> = [slug];
+
+	for (let i = parts.length - 2; i >= 0; i--) {
+		const part = parts[i];
+		if (part) regionPathIds.push(part);
+	}
+
+	return regionPathIds;
+}
+
+/**
+ * Parse region data from data-store entries
+ */
+export function parseRegionData(entries: Array<DataStoreEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
-	async function scanDirectory(dir: string, parentPath = ''): Promise<void> {
-		const entries = await fs.readdir(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		const slug = entry.id;
+		const regionPathIds = entry.filePath ? getRegionPathIds(entry.filePath, slug) : [slug];
 
-		for (const entry of entries) {
-			if (entry.isDirectory()) {
-				const dirPath = path.join(dir, entry.name);
-				const newParentPath = parentPath ? `${parentPath}/${entry.name}` : entry.name;
-
-				await scanDirectory(dirPath, newParentPath);
-			} else if (entry.name.endsWith('.mdx')) {
-				const filePath = path.join(dir, entry.name);
-				const slug = entry.name.replace('.mdx', '');
-
-				try {
-					const fileContent = await fs.readFile(filePath, 'utf8');
-					const { frontmatter } = parseFrontmatter(fileContent);
-
-					const regionPathIds: Array<string> = [slug];
-
-					if (parentPath) {
-						const pathParts = parentPath.split('/');
-						// Add ancestors from immediate parent to root
-						for (let i = pathParts.length; i > 0; i--) {
-							if (pathParts[i - 1]) regionPathIds.push(pathParts[i - 1]!);
-						}
-					}
-
-					const divisionSelectionBBox = GeometryBoundingBoxSchema.optional().parse(
-						frontmatter.divisionSelectionBBox,
-					);
-					const divisionClippingBBox = GeometryBoundingBoxSchema.optional().parse(
-						frontmatter.divisionClippingBBox,
-					);
-
-					const divisionIdValue = GeometryDivisionIdSchema.optional().parse(frontmatter.divisionId);
-
-					let divisionIds: Array<string> = [];
-
-					if (divisionIdValue) {
-						divisionIds = Array.isArray(divisionIdValue)
-							? divisionIdValue.filter((id): id is string => typeof id === 'string')
-							: [divisionIdValue].filter((id): id is string => typeof id === 'string');
-					}
-
-					regions.push({
-						slug,
-						divisionIds,
-						regionPathIds,
-						...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
-						...(divisionClippingBBox ? { divisionClippingBBox } : {}),
-					});
-				} catch (error) {
-					console.warn(
-						chalk.yellow(`Failed to parse frontmatter for ${chalk.cyan(filePath)}:`),
-						error,
-					);
-				}
-			}
-		}
-	}
-
-	try {
-		const regionsDir = path.join(rootPath, regionsPath);
-
-		await scanDirectory(regionsDir);
-
-		const regionsWithDivisionIds = regions.filter((r) => r.divisionIds.length > 0);
-
-		console.log(
-			chalk.green(
-				`Found ${chalk.cyan(String(regionsWithDivisionIds.length))} regions with division IDs (${chalk.cyan(String(regions.length))} total regions scanned)`,
-			),
+		const divisionSelectionBBox = GeometryBoundingBoxSchema.optional().parse(
+			entry.data.divisionSelectionBBox,
+		);
+		const divisionClippingBBox = GeometryBoundingBoxSchema.optional().parse(
+			entry.data.divisionClippingBBox,
 		);
 
-		return { allRegions: regions, regionsWithDivisionIds };
-	} catch (error) {
-		console.error(chalk.red(`Failed to scan regions directory ${chalk.cyan(regionsPath)}:`), error);
+		const divisionIdValue = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
 
-		throw new Error(`Failed to scan regions directory ${regionsPath}`);
+		let divisionIds: Array<string> = [];
+
+		if (divisionIdValue) {
+			divisionIds = Array.isArray(divisionIdValue)
+				? divisionIdValue.filter((id): id is string => typeof id === 'string')
+				: [divisionIdValue].filter((id): id is string => typeof id === 'string');
+		}
+
+		regions.push({
+			slug,
+			divisionIds,
+			regionPathIds,
+			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
+			...(divisionClippingBBox ? { divisionClippingBBox } : {}),
+		});
 	}
+
+	const regionsWithDivisionIds = regions.filter((r) => r.divisionIds.length > 0);
+
+	console.log(
+		chalk.green(
+			`Found ${chalk.cyan(String(regionsWithDivisionIds.length))} regions with division IDs (${chalk.cyan(String(regions.length))} total regions)`,
+		),
+	);
+
+	return { allRegions: regions, regionsWithDivisionIds };
 }
 
 /**

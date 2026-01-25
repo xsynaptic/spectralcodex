@@ -9,6 +9,7 @@ import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
+import { getCollection, loadDataStore } from '../content-utils/data-store';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
@@ -29,10 +30,10 @@ const { values } = parseArgs({
 			short: 'o',
 			default: 'public/divisions',
 		},
-		'regions-path': {
+		'data-store-path': {
 			type: 'string',
-			short: 'p',
-			default: 'packages/content/collections/regions',
+			short: 'd',
+			default: '.astro/data-store.json',
 		},
 		'cache-path': {
 			type: 'string',
@@ -192,13 +193,7 @@ async function processRegions(
 						}
 					}
 
-					if (divisionItems.length === 0) {
-						console.warn(
-							chalk.yellow(
-								`No division data found for any division IDs in ${chalk.cyan(region.slug)}`,
-							),
-						);
-					} else {
+					if (divisionItems.length > 0) {
 						console.log(
 							chalk.green(
 								`Found ${chalk.cyan(String(divisionItems.length))}/${chalk.cyan(String(region.divisionIds.length))} division(s) for ${chalk.cyan(region.slug)}`,
@@ -266,18 +261,15 @@ async function mapDivisions() {
 	);
 
 	try {
-		// Load region data from regions collection
-		const { allRegions, regionsWithDivisionIds } = await parseRegionData(
-			values['root-path'],
-			values['regions-path'],
-		);
+		// Load region data from data-store
+		const dataStorePath = path.join(values['root-path'], values['data-store-path']);
+		const { collections } = loadDataStore(dataStorePath);
+		const regionEntries = getCollection(collections, 'regions');
+
+		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
 
 		if (regionsWithDivisionIds.length === 0) {
-			console.log(
-				chalk.yellow(
-					`No regions with division IDs found in ${chalk.cyan(values['regions-path'])}.`,
-				),
-			);
+			console.log(chalk.yellow('No regions with division IDs found.'));
 			return;
 		}
 
