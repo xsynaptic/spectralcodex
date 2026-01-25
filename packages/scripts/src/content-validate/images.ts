@@ -3,8 +3,9 @@ import chalk from 'chalk';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { parseContentFiles } from '../content-utils';
-import { ImageFeaturedSchema } from '../content-utils/collections';
+import type { DataStoreEntry } from '../content-utils/data-store';
+
+import { ImageFeaturedSchema } from '../content-utils/schemas';
 
 const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
 const srcPropRegex = /src=["']([^"']+)["']/;
@@ -69,7 +70,7 @@ function collectMediaFiles(mediaPath: string): Set<string> {
 	return files;
 }
 
-export async function checkImageReferences(contentPaths: Array<string>, mediaPath: string) {
+export function checkImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
 	console.log(chalk.blue(`🔍 Checking image references against ${mediaPath}`));
 
 	const mediaFiles = collectMediaFiles(mediaPath);
@@ -81,18 +82,14 @@ export async function checkImageReferences(contentPaths: Array<string>, mediaPat
 
 	const missingImages: Array<{ file: string; imageId: string }> = [];
 
-	for (const contentPath of contentPaths) {
-		const parsedFiles = await parseContentFiles(contentPath);
+	for (const entry of entries) {
+		const frontmatterIds = extractImageFeaturedIds(entry.data);
+		const mdxIds = entry.body ? extractMdxImageIds(entry.body) : [];
+		const allIds = [...new Set([...frontmatterIds, ...mdxIds])];
 
-		for (const parsedFile of parsedFiles) {
-			const frontmatterIds = extractImageFeaturedIds(parsedFile.frontmatter);
-			const mdxIds = extractMdxImageIds(parsedFile.content);
-			const allIds = [...new Set([...frontmatterIds, ...mdxIds])];
-
-			for (const imageId of allIds) {
-				if (!mediaFiles.has(imageId)) {
-					missingImages.push({ file: parsedFile.pathRelative, imageId });
-				}
+		for (const imageId of allIds) {
+			if (!mediaFiles.has(imageId)) {
+				missingImages.push({ file: entry.filePath ?? entry.id, imageId });
 			}
 		}
 	}

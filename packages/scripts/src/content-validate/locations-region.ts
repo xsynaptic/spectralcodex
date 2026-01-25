@@ -1,40 +1,61 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import { z } from 'zod';
+import path from 'node:path';
 
-import { parseContentFiles } from '../content-utils';
+import type { DataStoreEntry } from '../content-utils/data-store';
 
-export async function checkLocationsRegions(locationsPath: string) {
-	console.log(chalk.blue(`🔍 Checking location regions in ${locationsPath}`));
+import { RegionsSchema } from '../content-utils/schemas';
 
-	const parsedFiles = await parseContentFiles(locationsPath);
+/**
+ * Derive hierarchy from filePath
+ * *e.g.* "packages/content/collections/locations/south-korea/busan/file.mdx"
+ * → ["south-korea", "busan", "file"]
+ */
+function getHierarchy(filePath: string, collection: string): Array<string> {
+	// Find the collection folder and get everything after it
+	const collectionMarker = `collections/${collection}/`;
+	const idx = filePath.indexOf(collectionMarker);
+
+	if (idx === -1) return [];
+
+	const relativePath = filePath.slice(idx + collectionMarker.length);
+	const ext = path.extname(relativePath);
+
+	return relativePath.replace(ext, '').split('/');
+}
+
+export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
+	console.log(chalk.blue(`🔍 Checking location regions`));
 
 	let mismatchCount = 0;
 
-	for (const parsedFile of parsedFiles) {
-		const regions = z.string().array().optional().parse(parsedFile.frontmatter.regions);
+	for (const entry of entries) {
+		const regions = RegionsSchema.optional().parse(entry.data.regions);
 
 		if (!regions?.[0]) {
-			console.log(chalk.red(`❌ ${parsedFile.filename}`));
+			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
+			console.log(chalk.red(`❌ ${filename}`));
 			console.log(chalk.red('   ERROR: No regions field found'));
 			continue;
 		}
 
-		const firstRegion = regions[0];
+		const firstRegion = regions[0].id;
+		const hierarchy = entry.filePath ? getHierarchy(entry.filePath, 'locations') : [];
 
 		// The parent folder should match the first region
-		const expectedRegion = parsedFile.hierarchy.at(-2) ?? 'unknown';
+		const expectedRegion = hierarchy.at(-2) ?? 'unknown';
 
 		if (firstRegion !== expectedRegion) {
-			console.log(chalk.red(`❌ ${parsedFile.filename}`));
+			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
+			console.log(chalk.red(`❌ ${filename}`));
 			console.log(chalk.red(`   Expected region: ${expectedRegion}, Found: ${firstRegion}`));
-			console.log(chalk.red(`   Directory path: ${parsedFile.hierarchy.join(' → ')}`));
+			console.log(chalk.red(`   Directory path: ${hierarchy.join(' → ')}`));
 			mismatchCount++;
 		}
 	}
 
 	if (mismatchCount === 0) {
-		console.log(chalk.green(`✓ ${parsedFiles.length.toString()} location regions valid`));
+		console.log(chalk.green(`✓ ${entries.length.toString()} location regions valid`));
 		return true;
 	} else {
 		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} region mismatch(es)`));

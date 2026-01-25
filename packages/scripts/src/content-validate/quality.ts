@@ -1,46 +1,46 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import { z } from 'zod';
+import path from 'node:path';
 
-import { parseContentFiles } from '../content-utils';
-import { ImageFeaturedSchema } from '../content-utils/collections';
+import type { DataStoreEntry } from '../content-utils/data-store';
 
-export async function checkContentQuality(contentPaths: Array<string>) {
+import { EntryQualitySchema, ImageFeaturedSchema } from '../content-utils/schemas';
+
+export function checkContentQuality(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallMismatchCount = 0;
 
-	for (const contentPath of contentPaths) {
-		console.log(chalk.blue(`🔍 Checking content quality in ${contentPath}`));
+	for (const [collectionName, entries] of entriesByCollection) {
+		console.log(chalk.blue(`🔍 Checking content quality in ${collectionName}`));
 
-		const parsedFiles = await parseContentFiles(contentPath);
-
-		if (parsedFiles.length === 0) {
-			console.log(chalk.yellow(`No MDX files found in ${contentPath}`));
+		if (entries.length === 0) {
+			console.log(chalk.yellow(`No entries found in ${collectionName}`));
 			continue;
 		}
 
 		let mismatchCount = 0;
 
-		for (const parsedFile of parsedFiles) {
-			const imageFeatured = ImageFeaturedSchema.optional().parse(
-				parsedFile.frontmatter.imageFeatured,
-			);
-			const entryQuality = z.number().parse(parsedFile.frontmatter.entryQuality);
+		for (const entry of entries) {
+			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
+			const entryQuality = EntryQualitySchema.optional().parse(entry.data.entryQuality);
 
-			if (imageFeatured && entryQuality && entryQuality < 2) {
-				console.log(chalk.red(`❌ ${parsedFile.filename}`));
+			// Skip entries without entryQuality (collection doesn't use this field)
+			if (entryQuality === undefined) continue;
+
+			if (imageFeatured && entryQuality < 2) {
+				const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
+				console.log(chalk.red(`❌ ${filename}`));
 				console.log(chalk.red('   ERROR: Image featured but entry quality is low'));
 				mismatchCount++;
 			}
 		}
 
 		if (mismatchCount === 0) {
-			console.log(chalk.green(`✓ ${parsedFiles.length.toString()} entry quality values valid`));
+			console.log(chalk.green(`✓ ${entries.length.toString()} entry quality values valid`));
 		} else {
 			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} quality issue(s)`));
 			overallMismatchCount += mismatchCount;
 		}
 	}
 
-	// Return a boolean to control flow of the main script
 	return overallMismatchCount === 0;
 }

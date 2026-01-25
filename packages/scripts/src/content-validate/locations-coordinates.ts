@@ -6,15 +6,10 @@ import chalk from 'chalk';
 import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { z } from 'zod';
 
-import { parseContentFiles } from '../content-utils';
+import type { DataStoreEntry } from '../content-utils/data-store';
 
-const SingleGeometrySchema = z.object({
-	coordinates: z.tuple([z.number(), z.number()]),
-});
-
-const GeometrySchema = z.union([SingleGeometrySchema, z.array(SingleGeometrySchema)]);
+import { GeometrySchema, RegionsSchema } from '../content-utils/schemas';
 
 async function loadRegionGeometry(
 	regionSlug: string,
@@ -67,10 +62,11 @@ function isPointInRegion(
 	return false;
 }
 
-export async function checkLocationsCoordinates(locationsPath: string, divisionsPath: string) {
-	console.log(chalk.blue(`🔍 Checking location coordinates in ${locationsPath}`));
-
-	const parsedFiles = await parseContentFiles(locationsPath);
+export async function checkLocationsCoordinates(
+	entries: Array<DataStoreEntry>,
+	divisionsPath: string,
+) {
+	console.log(chalk.blue(`🔍 Checking location coordinates`));
 
 	let mismatchCount = 0;
 	let missingFgbCount = 0;
@@ -82,12 +78,14 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 	// Track regions with missing FGB files to skip them entirely
 	const missingFgbRegions = new Set<string>();
 
-	for (const parsedFile of parsedFiles) {
-		// Parse regions array
-		const regions = z.string().array().parse(parsedFile.frontmatter.regions);
+	for (const entry of entries) {
+		// Parse regions array (reference objects)
+		const regionsResult = RegionsSchema.safeParse(entry.data.regions);
+		if (!regionsResult.success) continue;
+		const regions = regionsResult.data.map((r) => r.id);
 
 		// Parse geometry coordinates
-		const geometryResult = GeometrySchema.safeParse(parsedFile.frontmatter.geometry);
+		const geometryResult = GeometrySchema.safeParse(entry.data.geometry);
 
 		if (!geometryResult.success) {
 			continue;
@@ -142,7 +140,7 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 
 		// Check each coordinate against all valid regions
 		let hasInvalidCoordinate = false;
-		
+
 		for (const geometry of geometries) {
 			const coordinates = geometry.coordinates;
 			const isInside = isPointInRegion(coordinates, allRegionFeatures);
@@ -150,7 +148,7 @@ export async function checkLocationsCoordinates(locationsPath: string, divisions
 			if (!isInside) {
 				console.log(
 					chalk.red(
-						`${parsedFile.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
+						`${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
 					),
 				);
 				hasInvalidCoordinate = true;

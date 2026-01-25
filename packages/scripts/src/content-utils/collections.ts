@@ -1,6 +1,5 @@
 import path from 'node:path';
 import * as R from 'remeda';
-import { z } from 'zod';
 
 export const ContentCollectionsEnum = {
 	Archives: 'archives',
@@ -26,9 +25,3 @@ export const getContentCollectionPaths = (
 		path.join(rootPath, contentPath, collectionsPath, collection),
 	]);
 };
-
-export const ImageFeaturedSchema = z.union([
-	z.string(),
-	z.object({ id: z.string() }),
-	z.array(z.union([z.string(), z.object({ id: z.string() })])),
-]);

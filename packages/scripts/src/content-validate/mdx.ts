@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 
-import { parseContentFiles } from '../content-utils';
+import type { DataStoreEntry } from '../content-utils/data-store';
 
 interface ComponentError {
 	line: number;
@@ -67,28 +67,28 @@ function validateImgComponents(content: string): Array<ComponentError> {
 	return errors;
 }
 
-export async function checkMdxComponents(contentPaths: Array<string>) {
+export function checkMdxComponents(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallErrorCount = 0;
 
-	for (const contentPath of contentPaths) {
-		console.log(chalk.blue(`🔍 Checking MDX components in ${contentPath}`));
+	for (const [collectionName, entries] of entriesByCollection) {
+		console.log(chalk.blue(`🔍 Checking MDX components in ${collectionName}`));
 
-		const parsedFiles = await parseContentFiles(contentPath);
-
-		if (parsedFiles.length === 0) {
-			console.log(chalk.yellow(`No MDX files found in ${contentPath}`));
+		if (entries.length === 0) {
+			console.log(chalk.yellow(`No entries found in ${collectionName}`));
 			continue;
 		}
 
 		let errorCount = 0;
 
-		for (const parsedFile of parsedFiles) {
-			const linkErrors = validateLinkComponents(parsedFile.content);
-			const imgErrors = validateImgComponents(parsedFile.content);
+		for (const entry of entries) {
+			if (!entry.body) continue;
+
+			const linkErrors = validateLinkComponents(entry.body);
+			const imgErrors = validateImgComponents(entry.body);
 			const allErrors = [...linkErrors, ...imgErrors];
 
 			if (allErrors.length > 0) {
-				console.log(chalk.red(`❌ ${parsedFile.pathRelative}`));
+				console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
 
 				for (const error of allErrors) {
 					console.log(chalk.red(`   Line ${error.line.toString()}: ${error.message}`));
@@ -100,7 +100,7 @@ export async function checkMdxComponents(contentPaths: Array<string>) {
 		}
 
 		if (errorCount === 0) {
-			console.log(chalk.green(`✓ ${parsedFiles.length.toString()} MDX components valid`));
+			console.log(chalk.green(`✓ ${entries.length.toString()} MDX components valid`));
 		} else {
 			console.log(chalk.yellow(`⚠️  Found ${errorCount.toString()} invalid component(s)`));
 			overallErrorCount += errorCount;

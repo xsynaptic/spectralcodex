@@ -1,42 +1,31 @@
 #!/usr/bin/env tsx
 import { distance as getDistance, point as getPoint } from '@turf/turf';
 import chalk from 'chalk';
-import { z } from 'zod';
 
-import { parseContentFiles } from '../content-utils';
+import type { DataStoreEntry } from '../content-utils/data-store';
 
-const SingleGeometrySchema = z.object({
-	coordinates: z.tuple([z.number(), z.number()]),
-});
-
-const GeometrySchema = z.union([SingleGeometrySchema, z.array(SingleGeometrySchema)]);
+import { GeometrySchema } from '../content-utils/schemas';
 
 interface LocationData {
 	id: string;
 	coordinates: Array<[number, number]>;
 }
 
-export async function checkLocationsOverlap(locationsPath: string, thresholdMeters: number) {
-	console.log(
-		chalk.blue(
-			`🔍 Checking location overlaps in ${locationsPath} (threshold: ${String(thresholdMeters)}m)`,
-		),
-	);
-
-	const parsedFiles = await parseContentFiles(locationsPath);
+export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
+	console.log(chalk.blue(`🔍 Checking location overlaps (threshold: ${String(thresholdMeters)}m)`));
 
 	// Extract all locations with their points
 	const locations: Array<LocationData> = [];
 
-	for (const parsedFile of parsedFiles) {
-		const geometry = GeometrySchema.safeParse(parsedFile.frontmatter.geometry);
+	for (const entry of entries) {
+		const geometry = GeometrySchema.safeParse(entry.data.geometry);
 
 		if (!geometry.success) {
 			continue;
 		}
 
 		locations.push({
-			id: parsedFile.id,
+			id: entry.id,
 			coordinates: Array.isArray(geometry.data)
 				? geometry.data.map(({ coordinates }) => coordinates)
 				: [geometry.data.coordinates],
