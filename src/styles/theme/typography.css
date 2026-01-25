@@ -20,6 +20,7 @@
 		}
 	}
 	blockquote {
+		font-weight: 400;
 		p {
 			&:first-of-type::before,
 			&:last-of-type::after {
@@ -35,8 +36,8 @@
 	--tw-prose-counters: var(--color-accent-300);
 	--tw-prose-bullets: var(--color-accent-200);
 	--tw-prose-hr: var(--color-primary-300);
-	--tw-prose-quotes: var(--color-primary-900);
-	--tw-prose-quote-borders: var(--color-primary-300);
+	--tw-prose-quotes: var(--color-primary-400);
+	--tw-prose-quote-borders: var(--color-primary-200);
 	--tw-prose-captions: var(--color-primary-700);
 	--tw-prose-code: var(--color-primary-900);
 	--tw-prose-pre-code: var(--color-primary-100);
@@ -51,7 +52,7 @@
 	--tw-prose-invert-counters: var(--color-primary-400);
 	--tw-prose-invert-bullets: var(--color-primary-600);
 	--tw-prose-invert-hr: var(--color-primary-700);
-	--tw-prose-invert-quotes: var(--color-primary-100);
+	--tw-prose-invert-quotes: var(--color-primary-300);
 	--tw-prose-invert-quote-borders: var(--color-primary-700);
 	--tw-prose-invert-captions: var(--color-primary-400);
 	--tw-prose-invert-code: var(--color-white);

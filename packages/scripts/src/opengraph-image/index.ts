@@ -7,8 +7,9 @@ import pLimit from 'p-limit';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { ContentCollectionsEnum, ImageFeaturedSchema } from '../content-utils/collections.js';
+import { ContentCollectionsEnum } from '../content-utils/collections.js';
 import { getCollection, loadDataStore } from '../content-utils/data-store.js';
+import { ImageFeaturedSchema } from '../content-utils/schemas.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
