@@ -3,9 +3,13 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
+import * as R from 'remeda';
 
 import type { ArchivesBaseItem, ArchivesData } from '#lib/collections/archives/archives-types.ts';
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type {
+	ContentMetadataCollectionKey,
+	ContentMetadataItem,
+} from '#lib/metadata/metadata-types.ts';
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
@@ -85,24 +89,16 @@ function getArchivesMonthData(archiveDataMap: ArchivesDataMap, dateUpdatedData: 
 	return yearMap.get(dateUpdatedData.month)!;
 }
 
-// Select a highlight for the month
-// TODO: adapt this function for an entire year's worth of data
+// Select a highlight from a bunch of items
 function getArchivesHighlights(
-	monthData: ArchivesDataMapMonthlyItem,
+	items: Array<ContentMetadataItem>,
 ): Array<ContentMetadataItem> | undefined {
-	// Gather all items from the month that have images and meet minimum quality
-	const allItems = [
-		...monthData.created.values(),
-		...monthData.updated.values(),
-		...monthData.visited.values(),
-	].filter((item) => item.imageId && item.entryQuality >= 2);
-
-	if (allItems.length === 0) return undefined;
+	if (items.length === 0) return undefined;
 
 	// Group by quality level
 	const highlightQualityMap = new Map<number, Array<ContentMetadataItem>>();
 
-	for (const item of allItems) {
+	for (const item of items) {
 		if (!highlightQualityMap.has(item.entryQuality)) {
 			highlightQualityMap.set(item.entryQuality, []);
 		}
@@ -117,13 +113,15 @@ function getArchivesHighlights(
 }
 
 // Generate a map of archive data from the content metadata index
+const COLLECTIONS_EXCLUDED = ['pages'] satisfies Array<ContentMetadataCollectionKey>;
+
 async function getArchivesDataMap(): Promise<ArchivesDataMap> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const archiveDataMap: ArchivesDataMap = new Map();
 
 	for (const item of contentMetadataIndex.values()) {
-		if (['images', 'pages'].includes(item.collection)) continue;
+		if (R.isIncludedIn(item.collection, COLLECTIONS_EXCLUDED)) continue;
 
 		const dateUpdatedData = item.dateUpdated ? getDateData(item.dateUpdated) : undefined;
 		const dateCreatedData = getDateData(item.dateCreated);
@@ -161,14 +159,34 @@ async function getArchivesDataMap(): Promise<ArchivesDataMap> {
 	}
 
 	for (const yearlyData of archiveDataMap.values()) {
+		// Don't repeat highlights across a year
+		// Note: Maps are ordered by insertion so this will scramble where a highlight appears, which is fine
+		const yearlyHighlightIds = new Set<string>();
+
 		for (const monthlyData of yearlyData.values()) {
 			// Stash total counts for later reference
 			monthlyData.createdCount = monthlyData.created.size;
 			monthlyData.updatedCount = monthlyData.updated.size;
 			monthlyData.visitedCount = monthlyData.visited.size;
 
-			// Select a highlight item for the month
-			monthlyData.highlights = getArchivesHighlights(monthlyData);
+			// Select a highlight item for the month; don't add any that have already appeared
+			const monthlyHighlights = getArchivesHighlights(
+				[
+					...monthlyData.created.values(),
+					...monthlyData.updated.values(),
+					...monthlyData.visited.values(),
+				]
+					.filter((item) => item.imageId && item.entryQuality >= 2)
+					.filter((item) => !yearlyHighlightIds.has(item.id)),
+			);
+
+			if (monthlyHighlights) {
+				monthlyData.highlights = monthlyHighlights;
+
+				for (const highlight of monthlyHighlights) {
+					yearlyHighlightIds.add(highlight.id);
+				}
+			}
 		}
 	}
 
@@ -245,6 +263,9 @@ export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
 
 	// This tracks the months for each year with data available on the monthly page
 	const archivesMonths: Record<string, Array<string>> = {};
+
+	// This tracks the highlights for each year on the index page
+	const archivesIndexHighlightIds = new Set<string>();
 
 	for (const [year, yearlyData] of archivesDataMap.entries()) {
 		if (!archivesMonths[year]) archivesMonths[year] = [];
@@ -334,12 +355,26 @@ export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
 
 		if (indexDataProcessed.isEmpty) continue;
 
+		const indexHighlights = getArchivesHighlights(
+			[
+				...indexDataProcessed.created.values(),
+				...indexDataProcessed.updated.values(),
+				...indexDataProcessed.visited.values(),
+			].filter((item) => !archivesIndexHighlightIds.has(item.id)),
+		);
+
+		if (indexHighlights) {
+			for (const highlight of indexHighlights) {
+				archivesIndexHighlightIds.add(highlight.id);
+			}
+		}
+
 		archivesIndexData[year] = {
 			year,
 			month: '',
 			monthName: '',
 			title: year,
-			highlights: undefined,
+			highlights: indexHighlights,
 			created: indexDataProcessed.created,
 			createdCount: yearCreatedAll.length,
 			updated: indexDataProcessed.updated,
