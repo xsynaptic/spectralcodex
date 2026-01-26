@@ -4,8 +4,7 @@ import type { FC } from 'react';
 import { MapSpritesEnum } from '@spectralcodex/map-types';
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import maplibregl from 'maplibre-gl';
-import { useCallback } from 'react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
@@ -145,7 +144,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 			{image ? (
 				<div>
 					<img
-						className="bg-fallback w-full object-cover select-none"
+						className="w-full bg-fallback object-cover select-none"
 						style={{ aspectRatio: '3/2' }}
 						src={image.src}
 						srcSet={image.srcSet}
@@ -157,11 +156,11 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 			) : undefined}
 			<div className="flex flex-col px-2 pt-1 pb-2">
 				{titleMultilingualLang && titleMultilingualValue ? (
-					<div className="from-accent-500 to-accent-600 dark:from-accent-400 dark:to-accent-500 bg-linear-to-b bg-clip-text text-sm leading-snug font-medium text-transparent">
+					<div className="bg-linear-to-b from-accent-500 to-accent-600 bg-clip-text text-sm leading-snug font-medium text-transparent dark:from-accent-400 dark:to-accent-500">
 						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 					</div>
 				) : undefined}
-				<div className="border-b-primary-300 text-primary-800 dark:text-primary-300 dark:border-b-primary-700 border-b pb-1 text-base leading-snug font-semibold">
+				<div className="border-b border-b-primary-300 pb-1 text-base leading-snug font-semibold text-primary-800 dark:border-b-primary-700 dark:text-primary-300">
 					<a href={url}>{title}</a>
 				</div>
 				{precision <= 2 ? (
@@ -169,7 +168,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 36 36"
-							className="text-highlight-500 h-[20px] md:h-[16px]"
+							className="h-[20px] text-highlight-500 md:h-[16px]"
 						>
 							<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
 						</svg>
@@ -185,7 +184,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 						dangerouslySetInnerHTML={{ __html: description }}
 					/>
 				) : undefined}
-				<div className="text-primary-700 dark:text-primary-600 m-0 flex justify-between text-xs select-none">
+				<div className="m-0 flex justify-between text-xs text-primary-700 select-none dark:text-primary-600">
 					<div
 						className="group flex cursor-pointer items-center gap-1"
 						onClick={() => {
@@ -193,12 +192,12 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 							void navigator.clipboard.writeText(coordinatesString);
 						}}
 					>
-						<div className="text-primary-400 dark:text-primary-500 group-hover:text-highlight-300 transition-colors duration-300">
+						<div className="text-primary-400 transition-colors duration-300 group-hover:text-highlight-300 dark:text-primary-500">
 							{coordinatesString}
 						</div>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							className="text-primary-500 dark:text-primary-400 group-hover:text-highlight-400 transition-colors duration-300"
+							className="text-primary-500 transition-colors duration-300 group-hover:text-highlight-400 dark:text-primary-400"
 							style={{ height: '14px' }}
 							viewBox="0 0 24 24"
 						>
@@ -215,7 +214,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 24 24"
-									className="dark:text-primary-400 h-[20px] md:h-[16px]"
+									className="h-[20px] md:h-[16px] dark:text-primary-400"
 								>
 									<use xlinkHref={`#${MapSpritesEnum.Wikipedia}`}></use>
 								</svg>
@@ -281,7 +280,7 @@ export const MapPopup: FC = function MapPopup() {
 			onClose={onClose}
 		>
 			<div className="relative flex flex-col" style={{ minWidth: '200px', minHeight: '80px' }}>
-				<div className="p-small pointer-events-none absolute flex h-full w-full justify-center">
+				<div className="pointer-events-none absolute flex h-full w-full justify-center p-small">
 					<div
 						className="loading-animation transition-opacity duration-500"
 						style={{ maxWidth: '100%', opacity: isPopupDataLoading ? 1 : 0 }}

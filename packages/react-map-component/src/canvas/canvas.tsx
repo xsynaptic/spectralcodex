@@ -1,6 +1,6 @@
 import type { CSSProperties, FC } from 'react';
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '../types';
@@ -71,11 +71,6 @@ const MapCanvasContainer: FC<
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
 
-	const loading = useMemo(
-		() => canvasLoading || isSourceDataLoading,
-		[canvasLoading, isSourceDataLoading],
-	);
-
 	return (
 		<ReactMapGlMap
 			initialViewState={{
@@ -120,7 +115,7 @@ const MapCanvasContainer: FC<
 				bounds={bounds}
 				isDev={isDev}
 			/>
-			<MapCanvasLoading loading={loading} />
+			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);
 };

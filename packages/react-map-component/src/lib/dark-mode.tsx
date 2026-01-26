@@ -47,10 +47,5 @@ export function DarkModeProvider({ children }: PropsWithChildren) {
 }
 
 export function useDarkMode() {
-	const context = useContext(DarkModeContext);
-
-	if ((context as boolean | undefined) === undefined) {
-		throw new Error('[Map] useDarkMode must be used within DarkModeProvider');
-	}
-	return context;
+	return useContext(DarkModeContext);
 }

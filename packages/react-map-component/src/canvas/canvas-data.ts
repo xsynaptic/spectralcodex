@@ -47,29 +47,33 @@ export function useMapCanvasData() {
 		[sourceData, statusFilter, qualityFilter, ratingFilter, objectiveFilter],
 	);
 
+	const pointCollection = useMemo(
+		() =>
+			getGeojsonData(filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Point)),
+		[filteredData],
+	);
+
+	const lineStringCollection = useMemo(
+		() =>
+			getGeojsonData(
+				filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.LineString),
+			),
+		[filteredData],
+	);
+
+	const polygonCollection = useMemo(
+		() =>
+			getGeojsonData(
+				filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Polygon),
+			),
+		[filteredData],
+	);
+
 	return {
 		filteredCount: filteredData.length,
 		totalCount: sourceData?.length ?? 0,
-		pointCollection: useMemo(
-			() =>
-				getGeojsonData(
-					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Point),
-				),
-			[filteredData],
-		),
-		lineStringCollection: useMemo(
-			() =>
-				getGeojsonData(
-					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.LineString),
-				),
-			[filteredData],
-		),
-		polygonCollection: useMemo(
-			() =>
-				getGeojsonData(
-					filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Polygon),
-				),
-			[filteredData],
-		),
+		pointCollection,
+		lineStringCollection,
+		polygonCollection,
 	};
 }

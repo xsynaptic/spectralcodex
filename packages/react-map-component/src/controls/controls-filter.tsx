@@ -196,6 +196,7 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 			<div className="flex w-full cursor-pointer items-center gap-1 select-none">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
+						key={`objective-${String(value)}`}
 						className={`flex-1 rounded-full border font-display text-xs text-primary-700 ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
 						onClick={() => {
 							setObjectiveFilter(value);
