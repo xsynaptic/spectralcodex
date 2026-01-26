@@ -33,12 +33,13 @@ function computeWordCount(body: string): number {
 export async function getWordCount(
 	entry: CollectionEntry<CollectionKey>,
 ): Promise<number | undefined> {
-	// Series word counts are calculated separately (aggregated from items)
-	if (entry.collection === 'series') {
-		return undefined;
-	}
-
-	const hash = hashData({ data: { id: entry.id, body: entry.body } });
+	const hash = hashData({
+		data: {
+			id: entry.id,
+			body: entry.body,
+			description: 'description' in entry.data ? entry.data.description : '',
+		},
+	});
 
 	const cachedCount = await cacheInstance.get<number>(hash);
 
@@ -48,7 +49,17 @@ export async function getWordCount(
 	}
 
 	// Compute and cache
-	const wordCount = !entry.body || entry.body.length === 0 ? 0 : computeWordCount(entry.body);
+	let wordCount = 0;
+
+	if (entry.body && entry.body.length > 0) {
+		wordCount = computeWordCount(entry.body);
+	} else if (
+		'description' in entry.data &&
+		entry.data.description &&
+		entry.data.description.length > 0
+	) {
+		wordCount = computeWordCount(entry.data.description);
+	}
 
 	await cacheInstance.set(hash, wordCount);
 

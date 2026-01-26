@@ -140,10 +140,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 						locationsCount: contentStats.locations.itemCount,
 						locationsWithImagesCount: contentStats.locations.withImages,
 						postsCount: contentStats.posts.itemCount,
-						regionsCount: contentStats.regions,
-						themesCount: contentStats.themes,
+						regionsCount: contentStats.regions.itemCount,
+						themesCount: contentStats.themes.itemCount,
 						imagesCount: contentStats.images.itemCount,
 						linksCount: contentStats.links.itemCount,
+						totalWordCount: contentStats.total.wordCount,
 					}),
 				})}
 			/>

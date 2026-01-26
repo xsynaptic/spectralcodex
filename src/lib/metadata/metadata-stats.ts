@@ -1,32 +1,21 @@
 import * as R from 'remeda';
 
+import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
-interface ContentStats {
-	ephemera: string;
-	locations: {
-		itemCount: string;
-		withImages: string;
-	};
-	pages: string;
-	posts: {
-		itemCount: string;
-		wordCount: string;
-	};
-	regions: string;
-	series: string;
-	themes: string;
-	images: {
-		itemCount: string;
-	};
-	links: {
-		itemCount: string;
+function getContentCounts(data: Array<ContentMetadataItem> | undefined) {
+	return {
+		itemCount: formatNumber({ number: data?.length ?? 0 }),
+		wordCount: formatNumber({
+			number: data?.reduce((previous, { wordCount }) => previous + (wordCount ?? 0), 0) ?? 0,
+		}),
 	};
 }
 
-export async function getContentStats(): Promise<ContentStats> {
+export async function getContentStats() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const contentMetadataArray = [...contentMetadataIndex.values()];
@@ -35,31 +24,19 @@ export async function getContentStats(): Promise<ContentStats> {
 
 	const { images } = await getImagesCollection();
 
-	return {
-		ephemera: formatNumber({ number: contentMetadataGroups.ephemera?.length ?? 0 }),
+	const contentStats = {
+		ephemera: getContentCounts(contentMetadataGroups.ephemera),
 		locations: {
-			itemCount: formatNumber({ number: contentMetadataGroups.locations?.length ?? 0 }),
+			...getContentCounts(contentMetadataGroups.locations),
 			withImages: formatNumber({
 				number: contentMetadataGroups.locations?.filter((item) => item.imageId).length ?? 0,
 			}),
 		},
-		pages: formatNumber({ number: contentMetadataGroups.pages?.length ?? 0 }),
-		posts: {
-			itemCount: formatNumber({ number: contentMetadataGroups.posts?.length ?? 0 }),
-			wordCount: formatNumber({
-				number: contentMetadataGroups.posts
-					? R.pipe(
-							contentMetadataGroups.posts,
-							R.map((item) => item.wordCount ?? 0),
-							R.sum,
-							Number,
-						)
-					: 0,
-			}),
-		},
-		regions: formatNumber({ number: contentMetadataGroups.regions?.length ?? 0 }),
-		series: formatNumber({ number: contentMetadataGroups.series?.length ?? 0 }),
-		themes: formatNumber({ number: contentMetadataGroups.themes?.length ?? 0 }),
+		pages: getContentCounts(contentMetadataGroups.pages),
+		posts: getContentCounts(contentMetadataGroups.posts),
+		regions: getContentCounts(contentMetadataGroups.regions),
+		series: getContentCounts(contentMetadataGroups.series),
+		themes: getContentCounts(contentMetadataGroups.themes),
 		images: {
 			itemCount: formatNumber({ number: images.length }),
 		},
@@ -70,6 +47,13 @@ export async function getContentStats(): Promise<ContentStats> {
 					0,
 				),
 			}),
+		},
+	};
+
+	return {
+		...contentStats,
+		total: {
+			...getContentCounts(contentMetadataArray),
 		},
 	};
 }
