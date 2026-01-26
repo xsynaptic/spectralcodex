@@ -1,0 +1,74 @@
+---
+import type { ImageComponentProps } from '#components/parts/image.astro';
+import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
+
+import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/parts/image.astro';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import {
+	getImageLayoutProps,
+	getImageSrcsetWidths,
+	ImageLayoutEnum,
+	ImageSizeEnum,
+} from '#lib/image/image-layout.ts';
+import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+
+type Props = ImageFeaturedObjectWithCaptionMetadata;
+
+const { id: imageId, title: alt = '', captionMetadata } = Astro.props;
+
+async function getImageProps(imageId: string | undefined, alt: string) {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(imageId);
+
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
+
+	const { sizes } = getImageLayoutProps({
+		width: imageEntry.data.width,
+		height: imageEntry.data.height,
+		layout: ImageLayoutEnum.Default,
+	});
+
+	const aspectRatio = 3 / 2;
+
+	return {
+		imageProps: {
+			src: imageId,
+			breakpoints: getImageSrcsetWidths({
+				maxWidth: imageEntry.data.width,
+				widths: [
+					ImageSizeEnum.ExtraSmall,
+					ImageSizeEnum.Small,
+					ImageSizeEnum.Medium,
+					ImageSizeEnum.Large,
+					ImageSizeEnum.ExtraLarge,
+				],
+			}),
+			sizes,
+			width: ImageSizeEnum.Large,
+			height: Math.round(ImageSizeEnum.Large / aspectRatio),
+			alt: sanitizeAltAttribute(alt),
+			unstyled: true,
+			operations: {
+				fit: 'cover',
+			},
+		} satisfies ImageComponentProps,
+		placeholder: imageEntry.data.placeholder,
+	};
+}
+
+const { imageProps, placeholder } = await getImageProps(imageId, alt);
+---
+
+{
+	imageProps ? (
+		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
+			<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
+			{captionMetadata ? (
+				<ImageCarouselCaption captionMetadata={captionMetadata} isHero={false} withTitle={false} />
+			) : undefined}
+		</ImagePlaceholder>
+	) : undefined
+}

@@ -86,7 +86,8 @@ function getArchivesMonthData(archiveDataMap: ArchivesDataMap, dateUpdatedData: 
 }
 
 // Select a highlight for the month
-function getMonthlyHighlights(
+// TODO: adapt this function for an entire year's worth of data
+function getArchivesHighlights(
 	monthData: ArchivesDataMapMonthlyItem,
 ): Array<ContentMetadataItem> | undefined {
 	// Gather all items from the month that have images and meet minimum quality
@@ -167,7 +168,7 @@ async function getArchivesDataMap(): Promise<ArchivesDataMap> {
 			monthlyData.visitedCount = monthlyData.visited.size;
 
 			// Select a highlight item for the month
-			monthlyData.highlights = getMonthlyHighlights(monthlyData);
+			monthlyData.highlights = getArchivesHighlights(monthlyData);
 		}
 	}
 

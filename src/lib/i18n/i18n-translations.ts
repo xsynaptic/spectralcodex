@@ -135,9 +135,9 @@ const translationStrings = {
 		'archives.yearly.description': 'Monthly content archives for the year {date}.',
 		'archives.monthly.title': '{date} Archives',
 		'archives.monthly.description': 'Content archives for {date}.',
-		'archives.monthly.created': 'Created',
-		'archives.monthly.updated': 'Updated',
-		'archives.monthly.visited': 'Visited',
+		'archives.created.label': 'Created',
+		'archives.updated.label': 'Updated',
+		'archives.visited.label': 'Visited',
 
 		// Pagination
 		'pagination.next': 'Next',

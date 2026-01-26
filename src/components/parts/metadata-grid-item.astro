@@ -26,8 +26,7 @@ async function getImageProps() {
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageId || !imageEntry)
-		return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
 
 	const aspectRatio = 3 / 2;
 
@@ -43,7 +42,7 @@ async function getImageProps() {
 					ImageSizeEnum.Large,
 				],
 			}),
-			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 410px`,
+			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 425px`,
 			width: ImageSizeEnum.Medium,
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			alt: sanitizeAltAttribute(alt),

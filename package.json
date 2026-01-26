@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.5.0",
+	"version": "6.5.1",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",

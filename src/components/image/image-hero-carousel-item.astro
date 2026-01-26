@@ -2,18 +2,19 @@
 import type { ImageComponentProps } from '#components/parts/image.astro';
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
-import ImageHeroCarouselCaption from '#components/image/image-hero-carousel-caption.astro';
+import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getImageSrcsetWidths } from '#lib/image/image-layout.ts';
+import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
 	index: number;
+	withTitle?: boolean | undefined;
 }
 
-const { index, id: imageId, title: alt = '', captionMetadata } = Astro.props;
+const { index, id: imageId, title: alt = '', captionMetadata, withTitle = false } = Astro.props;
 
 async function getImageProps(imageId: string | undefined, alt: string, isFirst: boolean) {
 	const getImageById = await getImageByIdFunction();
@@ -22,14 +23,21 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 
 	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
 
+	const aspectRatio = 3 / 2;
+
 	return {
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: '100vw',
-			...(isFirst ? { priority: true } : {}),
-			unstyled: true,
+			width: ImageSizeEnum.ExtraExtraLarge,
+			height: Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio),
 			alt: sanitizeAltAttribute(alt),
+			unstyled: true,
+			operations: {
+				fit: 'cover',
+			},
+			...(isFirst ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
 		placeholder: isFirst ? imageEntry.data.placeholderHq : imageEntry.data.placeholder,
 	};
@@ -38,7 +46,6 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 0);
 
 // TODO: carousel items should have a visual indicator to show they can be scrolled through
-// Note: carousel items need `min-w-screen` on large viewports
 ---
 
 {
@@ -46,23 +53,19 @@ const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 
 		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
 			<Image
 				class:list={[
-					'z-10 max-h-screen min-h-[400px] min-w-screen text-sm text-transparent xl:min-h-screen',
+					'z-10 max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
 				]}
 				{...(index === 0 ? { 'data-pagefind-meta': 'image[src], image_alt[alt]' } : {})}
 				{...imageProps}
 			/>
-			{captionMetadata ? <ImageHeroCarouselCaption captionMetadata={captionMetadata} /> : undefined}
+			{captionMetadata ? (
+				<ImageCarouselCaption
+					captionMetadata={captionMetadata}
+					isHero={true}
+					withTitle={withTitle}
+				/>
+			) : undefined}
 		</ImagePlaceholder>
 	) : undefined
 }
-
-<style>
-	/* Carousel; adapted from Daisy UI */
-	.carousel-item {
-		box-sizing: content-box;
-		display: flex;
-		flex: none;
-		scroll-snap-align: start;
-	}
-</style>

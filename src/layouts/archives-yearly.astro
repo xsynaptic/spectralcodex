@@ -4,10 +4,15 @@ import type { ArchivesMonthlyItem } from '#lib/collections/archives/archives-typ
 import ArchivesItem from '#components/archives/archives-item.astro';
 import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ContentSection from '#components/content/content-section.astro';
+import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
+import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import {
+	getImageFeaturedObjectGroup,
+	getImageFeaturedGroupByContentMetadata,
+} from '#lib/image/image-featured.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -42,43 +47,50 @@ const t = getTranslations();
 			></Fragment
 		>
 	</ContentHeader>
-	<ContentSection>
-		<ol>
-			{
-				archivesMonthlyData
-					.sort((a, b) => Number(a.month) - Number(b.month))
-					.map((monthlyData) => {
-						return (
-							<li class="mb-medium flex flex-col gap-2 text-sm text-primary-700 dark:text-primary-400">
-								<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-									<Link
-										href={getSiteUrl('archives', monthlyData.year, monthlyData.month)}
-										linkColor="primary"
-									>
-										{monthlyData.monthName}
-									</Link>
-								</h2>
-								<div class="flex flex-col gap-2">
-									<ArchivesItem
-										title={t('archives.monthly.updated')}
-										items={monthlyData.updated}
-										count={monthlyData.updatedCount}
-									/>
-									<ArchivesItem
-										title={t('archives.monthly.created')}
-										items={monthlyData.created}
-										count={monthlyData.createdCount}
-									/>
-									<ArchivesItem
-										title={t('archives.monthly.visited')}
-										items={monthlyData.visited}
-										count={monthlyData.visitedCount}
-									/>
-								</div>
-							</li>
-						);
-					})
-			}
-		</ol>
-	</ContentSection>
+	{
+		archivesMonthlyData
+			.sort((a, b) => Number(a.month) - Number(b.month))
+			.map(async (monthlyData) => {
+				const imageFeaturedGroup = monthlyData.archiveEntry?.data.imageFeatured
+					? await getImageFeaturedObjectGroup({
+							imageFeatured: monthlyData.archiveEntry.data.imageFeatured,
+						})
+					: getImageFeaturedGroupByContentMetadata({ items: monthlyData.highlights });
+
+				return (
+					<Container class="mb-medium" fillViewport={true}>
+						<div class="flex flex-col gap-2 px-small text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
+								<Link
+									href={getSiteUrl('archives', monthlyData.year, monthlyData.month)}
+									linkColor="primary"
+								>
+									{monthlyData.monthName}
+								</Link>
+							</h2>
+							<div class="flex flex-col gap-2">
+								<ArchivesItem
+									title={t('archives.updated.label')}
+									items={monthlyData.updated}
+									count={monthlyData.updatedCount}
+								/>
+								<ArchivesItem
+									title={t('archives.created.label')}
+									items={monthlyData.created}
+									count={monthlyData.createdCount}
+								/>
+								<ArchivesItem
+									title={t('archives.visited.label')}
+									items={monthlyData.visited}
+									count={monthlyData.visitedCount}
+								/>
+							</div>
+						</div>
+						{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
+							<ImageCarousel class="mt-small" imageFeaturedGroup={imageFeaturedGroup} />
+						) : undefined}
+					</Container>
+				);
+			})
+	}
 </MainSite>

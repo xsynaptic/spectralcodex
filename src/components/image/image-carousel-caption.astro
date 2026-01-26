@@ -7,10 +7,14 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	captionMetadata: ImageFeaturedCaptionMetadata;
+	isHero?: boolean | undefined;
+	withTitle?: boolean | undefined;
 }
 
 const {
 	captionMetadata: { title, titleMultilingual, url },
+	isHero = false,
+	withTitle = false,
 	...props
 } = Astro.props;
 
@@ -25,7 +29,9 @@ const t = getTranslations();
 		<div
 			class:list={[
 				'bg-featured-b',
-				'sm:min-h-none pointer-events-none absolute right-0 bottom-0 left-0 z-31 mx-auto flex min-h-[80px] max-w-content flex-col justify-end sm:bg-none',
+				'sm:min-h-none pointer-events-none absolute right-0 bottom-0 left-0 z-31 mx-auto flex max-w-content flex-col justify-end',
+				// Note: the min-height spreads the background gradient
+				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
 			]}
 			data-pagefind-ignore
 			{...props}
@@ -33,16 +39,25 @@ const t = getTranslations();
 			<div
 				class:list={[
 					'text-primary-300',
-					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pr-small pb-2 text-sm sm:max-w-[70%] md:pr-medium',
+					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm',
+					isHero && !withTitle ? 'md:px-medium' : undefined,
+					withTitle
+						? 'w-full px-small sm:max-w-[70%] sm:pr-small sm:pl-0 md:pr-medium'
+						: 'px-small',
 				]}
 			>
-				<span>{t('content.meta.imageFeatured.label')}</span>
+				<span class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}>
+					{t('content.meta.imageFeatured.label')}
+				</span>
 				{url ? (
 					<Link
 						href={url}
 						linkColor="primary-bright"
 						showDarkMode={false}
-						class="max-w-[75vw] truncate font-medium sm:max-w-[60vw] sm:font-semibold"
+						class:list={[
+							'truncate font-medium sm:font-semibold',
+							withTitle ? 'max-w-[75vw] sm:max-w-[60vw]' : undefined,
+						]}
 					>
 						{title}
 					</Link>
@@ -52,7 +67,7 @@ const t = getTranslations();
 				{titleMultilingual ? (
 					<TextMultilingual
 						content={titleMultilingual}
-						class="hidden sm:block"
+						class:list={[withTitle ? 'block sm:hidden md:block' : undefined]}
 						parenthesis={true}
 					/>
 				) : undefined}

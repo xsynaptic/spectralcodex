@@ -1,0 +1,24 @@
+---
+import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
+
+import ImageCarouselItem from '#components/image/image-carousel-item.astro';
+
+interface Props {
+	imageFeaturedGroup?: Array<ImageFeaturedObjectWithCaptionMetadata> | undefined;
+	class?: string | undefined;
+}
+
+const { imageFeaturedGroup, class: className } = Astro.props;
+---
+
+{
+	imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
+		<div class:list={['relative max-w-content overflow-hidden sm:rounded-xs', className]}>
+			<div class="carousel-container">
+				{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
+					<ImageCarouselItem {...imageFeaturedGroupItem} />
+				))}
+			</div>
+		</div>
+	) : undefined
+}

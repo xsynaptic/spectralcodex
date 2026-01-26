@@ -1,0 +1,20 @@
+/* Carousel; adapted from Daisy UI */
+.carousel-container {
+	display: flex;
+	overflow-x: scroll;
+	scroll-behavior: smooth;
+	scroll-snap-align: start;
+	scroll-snap-type: x mandatory;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+.carousel-item {
+	box-sizing: content-box;
+	display: flex;
+	flex: none;
+	scroll-snap-align: start;
+	width: 100%;
+}
