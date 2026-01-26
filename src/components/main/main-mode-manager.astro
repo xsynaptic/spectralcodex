@@ -73,7 +73,7 @@ const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
 				document.dispatchEvent(
 					new CustomEvent('mode-changed', {
 						detail: { mode, systemMode, defaultMode, resolvedMode },
-					}) satisfies ModeChangedEvent,
+					}) satisfies ModeChangedEvent
 				);
 			});
 		}
@@ -105,17 +105,17 @@ const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
 		};
 	}
 
-	function initializeMode() {
+	function initialize() {
 		if (!window.mode) {
 			window.mode = modeManager('#mode-default');
 			window.mode.setMode(window.mode.getMode());
 		}
 	}
 
-	initializeMode();
+	initialize();
 
 	document.addEventListener('astro:after-swap', () => {
-		initializeMode();
+		initialize();
 		if (window.mode) window.mode.setMode(window.mode.getMode());
 	});
 </script>

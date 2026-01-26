@@ -13,7 +13,7 @@ const t = getTranslations();
 <button
 	type="button"
 	class:list={[
-		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all group-hover:opacity-100 lg:flex',
+		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-hover:opacity-100 active:scale-90 lg:flex',
 		'bg-white/25 text-white/75 hover:bg-white/50 hover:text-white/80',
 		'left-2',
 	]}
@@ -41,7 +41,7 @@ const t = getTranslations();
 <button
 	type="button"
 	class:list={[
-		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all group-hover:opacity-100 lg:flex',
+		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-hover:opacity-100 active:scale-90 lg:flex',
 		'bg-white/25 text-white/75 hover:bg-white/50 hover:text-white/80',
 		'right-2',
 	]}
@@ -68,13 +68,14 @@ const t = getTranslations();
 </button>
 
 <script>
-	function initCarouselNav() {
-		const navButtons = document.querySelectorAll<HTMLButtonElement>('[data-carousel-nav]');
+	function initialize() {
+		const buttons = document.querySelectorAll<HTMLButtonElement>('[data-carousel-nav]');
 
-		for (const button of navButtons) {
+		for (const button of buttons) {
 			button.addEventListener('click', () => {
 				const targetId = button.dataset.carouselTarget;
 				const direction = button.dataset.carouselNav;
+
 				const container = document.querySelector<HTMLElement>(
 					`[data-carousel-id="${targetId}"] .carousel-container`
 				);
@@ -83,12 +84,27 @@ const t = getTranslations();
 
 				const itemWidth =
 					container.querySelector('.carousel-item')?.clientWidth ?? container.clientWidth;
-				const scrollAmount = direction === 'next' ? itemWidth : -itemWidth;
+				const maxScroll = container.scrollWidth - container.clientWidth;
+				const atStart = container.scrollLeft < itemWidth / 2;
+				const atEnd = container.scrollLeft > maxScroll - itemWidth / 2;
 
-				container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+				if (direction === 'prev' && atStart) {
+					container.scrollTo({ left: maxScroll, behavior: 'smooth' }); // Wrap to end
+				} else if (direction === 'next' && atEnd) {
+					container.scrollTo({ left: 0, behavior: 'smooth' }); // Wrap to start
+				} else {
+					container.scrollBy({
+						left: direction === 'next' ? itemWidth : -itemWidth,
+						behavior: 'smooth',
+					});
+				}
 			});
 		}
 	}
 
-	document.addEventListener('DOMContentLoaded', initCarouselNav);
+	initialize();
+
+	document.addEventListener('astro:after-swap', () => {
+		initialize();
+	});
 </script>
