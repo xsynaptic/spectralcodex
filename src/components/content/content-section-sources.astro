@@ -2,11 +2,13 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
+import Link from '#components/parts/link.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import { getResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
@@ -37,9 +39,16 @@ const t = getTranslations();
 
 					if (source.title) {
 						if (source.authors) {
-							Authors = <span>{source.authors.map((author) => author.name).join(' / ')}</span>;
+							Authors = <span>{source.authors.map((author) => author.name).join(' & ')}</span>;
 						}
-						Title = <span class="italic">{source.title}</span>;
+						Title =
+							'id' in source && 'showPage' in source && source.showPage ? (
+								<Link href={getContentUrl('resources', source.id)}>
+									<span class="italic">{source.title}</span>
+								</Link>
+							) : (
+								<span class="italic">{source.title}</span>
+							);
 						if (source.publisher && source.datePublished) {
 							Publisher = (
 								<span>
@@ -72,7 +81,14 @@ const t = getTranslations();
 								AuthorsMultilingual = <span>{authorNames.join('，')}</span>;
 							}
 						}
-						TitleMultilingual = <span>《{titleMultilingual.value}》</span>;
+						TitleMultilingual =
+							'id' in source && 'showPage' in source && source.showPage ? (
+								<Link href={getContentUrl('resources', source.id)}>
+									《{titleMultilingual.value}》
+								</Link>
+							) : (
+								<span>《{titleMultilingual.value}》</span>
+							);
 						if (publisherMultilingual?.value && source.datePublished) {
 							PublisherMultilingual = (
 								<span>

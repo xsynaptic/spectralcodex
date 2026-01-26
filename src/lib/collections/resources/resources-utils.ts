@@ -105,12 +105,8 @@ export async function getResolveResourceLinksFunction() {
 						matchLinkUrl(entryLink, resource.data.match),
 					);
 
-					if (!resource) return;
-
-					return {
-						id: resource.id,
-						...resource.data,
-					};
+					return resource ? { id: resource.id, ...resource.data }
+						: undefined;
 				}
 
 				return entryLink;
@@ -132,12 +128,13 @@ export async function getResolveResourceSourcesFunction() {
 
 		return entrySources
 			?.map((entrySource) => {
-				const source =
-					typeof entrySource === 'string' ? resourcesMap.get(entrySource)?.data : entrySource;
+				if (typeof entrySource === 'string') {
+					const resource = resourcesMap.get(entrySource);
 
-				if (!source) return;
+					return resource ? { id: resource.id, ...resource.data } : undefined;
+				}
 
-				return source;
+				return entrySource;
 			})
 			.filter((source) => !!source);
 	};

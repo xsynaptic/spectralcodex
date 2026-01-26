@@ -77,6 +77,17 @@ const t = getTranslations();
 						</DividedItem>
 					) : undefined
 				}
+				{
+					entry.data.authors || entry.data.publisher || entry.data.datePublished ? (
+						<DividedItem>
+							{entry.data.authors?.map((author) => author.name).join(' & ')}
+							{entry.data.authors && (entry.data.publisher || entry.data.datePublished) ? ', ' : ''}
+							{entry.data.publisher}
+							{entry.data.publisher && entry.data.datePublished ? ', ' : ''}
+							{entry.data.datePublished}
+						</DividedItem>
+					) : undefined
+				}
 			</Fragment>
 		</ContentHeader>
 		<ContentDescription entry={entry} />
