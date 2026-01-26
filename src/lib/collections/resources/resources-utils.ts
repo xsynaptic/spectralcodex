@@ -105,8 +105,7 @@ export async function getResolveResourceLinksFunction() {
 						matchLinkUrl(entryLink, resource.data.match),
 					);
 
-					return resource ? { id: resource.id, ...resource.data }
-						: undefined;
+					return resource ? { id: resource.id, ...resource.data } : undefined;
 				}
 
 				return entryLink;
