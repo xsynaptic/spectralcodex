@@ -146,6 +146,10 @@ const translationStrings = {
 		// Parts
 		'parts.textSeparatedList.more': '{count} more',
 
+		// Carousel
+		'carousel.nav.previous': 'Previous image',
+		'carousel.nav.next': 'Next image',
+
 		// Objectives
 		'objectives.title': 'Objectives',
 		'objectives.description':

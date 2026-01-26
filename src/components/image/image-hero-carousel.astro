@@ -1,6 +1,7 @@
 ---
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
+import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
 import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 
@@ -12,16 +13,23 @@ interface Props {
 }
 
 const { hasHeroImage, imageFeaturedGroup, withTitle = true, class: className } = Astro.props;
+
+const carouselId = 'hero-carousel';
 ---
 
 {
 	hasHeroImage && imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-		<ImageHeroFrame withTitle={withTitle} class={className}>
+		<ImageHeroFrame
+			class:list={['group', className]}
+			withTitle={withTitle}
+			data-carousel-id={carouselId}
+		>
 			<div class="carousel-container">
 				{imageFeaturedGroup.map((imageFeaturedGroupItem, index) => (
 					<ImageHeroCarouselItem {...imageFeaturedGroupItem} index={index} withTitle={withTitle} />
 				))}
 			</div>
+			{imageFeaturedGroup.length > 1 && <ImageCarouselNavigation carouselId={carouselId} />}
 			<slot />
 		</ImageHeroFrame>
 	) : (

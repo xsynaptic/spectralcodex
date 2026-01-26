@@ -2,6 +2,7 @@
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 
 import ImageCarouselItem from '#components/image/image-carousel-item.astro';
+import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 
 interface Props {
 	imageFeaturedGroup?: Array<ImageFeaturedObjectWithCaptionMetadata> | undefined;
@@ -9,16 +10,21 @@ interface Props {
 }
 
 const { imageFeaturedGroup, class: className } = Astro.props;
+const carouselId = `carousel-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
 {
 	imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-		<div class:list={['relative max-w-content overflow-hidden sm:rounded-xs', className]}>
+		<div
+			class:list={['group relative max-w-content overflow-hidden sm:rounded-xs', className]}
+			data-carousel-id={carouselId}
+		>
 			<div class="carousel-container">
 				{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
 					<ImageCarouselItem {...imageFeaturedGroupItem} />
 				))}
 			</div>
+			{imageFeaturedGroup.length > 1 && <ImageCarouselNavigation carouselId={carouselId} />}
 		</div>
 	) : undefined
 }
