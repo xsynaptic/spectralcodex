@@ -7,7 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
-import { getCroppedPlaceholder } from '#lib/image/image-placeholder-cache.ts';
+import { getImagePlaceholder } from '#lib/image/image-placeholders.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -42,10 +42,9 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 			},
 			...(isFirst ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
-		placeholder: await getCroppedPlaceholder({
+		placeholder: await getImagePlaceholder({
 			imageId,
-			width,
-			height,
+			aspectRatio,
 			fit: 'cover',
 			highQuality: isFirst,
 		}),

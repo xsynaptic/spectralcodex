@@ -12,7 +12,7 @@ import {
 	ImageLayoutEnum,
 	ImageSizeEnum,
 } from '#lib/image/image-layout.ts';
-import { getCroppedPlaceholder } from '#lib/image/image-placeholder-cache.ts';
+import { getImagePlaceholder } from '#lib/image/image-placeholders.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 type Props = ImageFeaturedObjectWithCaptionMetadata;
@@ -58,10 +58,9 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 				fit: 'cover',
 			},
 		} satisfies ImageComponentProps,
-		placeholder: await getCroppedPlaceholder({
+		placeholder: await getImagePlaceholder({
 			imageId,
-			width,
-			height,
+			aspectRatio,
 			fit: 'cover',
 		}),
 	};
