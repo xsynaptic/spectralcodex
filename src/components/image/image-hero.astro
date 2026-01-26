@@ -23,7 +23,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 	const imageEntry = getImageById(imageId);
 
 	if (!hasHeroImage || !imageId || !imageEntry)
-		return { imageProps: undefined, placeholder: undefined };
+		return { imageProps: undefined, placeholderProps: undefined };
 
 	return {
 		imageProps: {
@@ -34,17 +34,21 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 			unstyled: true,
 			alt: sanitizeAltAttribute(alt),
 		} satisfies ImageComponentProps,
-		placeholder: imageEntry.data.placeholderHq,
+		placeholderProps: {
+			imageId,
+			aspectRatio: imageEntry.data.width / imageEntry.data.height,
+			highQuality: true,
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps(imageId, alt);
+const { imageProps, placeholderProps } = await getImageProps(imageId, alt);
 ---
 
 {
 	hasHeroImage ? (
 		<ImageHeroFrame class:list={['overflow-hidden', className]}>
-			<ImagePlaceholder placeholder={placeholder}>
+			<ImagePlaceholder placeholderProps={placeholderProps}>
 				{imageProps ? (
 					<Image
 						class:list={[

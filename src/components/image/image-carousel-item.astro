@@ -12,7 +12,7 @@ import {
 	ImageLayoutEnum,
 	ImageSizeEnum,
 } from '#lib/image/image-layout.ts';
-import { getImagePlaceholder } from '#lib/image/image-placeholders.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 type Props = ImageFeaturedObjectWithCaptionMetadata;
@@ -24,7 +24,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
 
 	const { sizes } = getImageLayoutProps({
 		width: imageEntry.data.width,
@@ -33,8 +33,7 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 	});
 
 	const aspectRatio = 3 / 2;
-	const width = ImageSizeEnum.Large;
-	const height = Math.round(width / aspectRatio);
+	const fit = ImageFitOptionEnum.Cover;
 
 	return {
 		imageProps: {
@@ -50,28 +49,26 @@ async function getImageProps(imageId: string | undefined, alt: string) {
 				],
 			}),
 			sizes,
-			width,
-			height,
+			width: ImageSizeEnum.Large,
+			height: Math.round(ImageSizeEnum.Large / aspectRatio),
 			alt: sanitizeAltAttribute(alt),
 			unstyled: true,
-			operations: {
-				fit: 'cover',
-			},
+			operations: { fit },
 		} satisfies ImageComponentProps,
-		placeholder: await getImagePlaceholder({
+		placeholderProps: {
 			imageId,
 			aspectRatio,
-			fit: 'cover',
-		}),
+			fit,
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps(imageId, alt);
+const { imageProps, placeholderProps } = await getImageProps(imageId, alt);
 ---
 
 {
 	imageProps ? (
-		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
+		<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
 			<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
 			{captionMetadata ? (
 				<ImageCarouselCaption captionMetadata={captionMetadata} isHero={false} withTitle={false} />

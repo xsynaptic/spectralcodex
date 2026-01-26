@@ -7,7 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
-import { getImagePlaceholder } from '#lib/image/image-placeholders.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -22,41 +22,38 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
 
 	const aspectRatio = 3 / 2;
-	const width = ImageSizeEnum.ExtraExtraLarge;
-	const height = Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio);
+	const fit = ImageFitOptionEnum.Cover;
 
 	return {
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
 			sizes: '100vw',
-			width,
-			height,
+			width: ImageSizeEnum.ExtraExtraLarge,
+			height: Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio),
 			alt: sanitizeAltAttribute(alt),
 			unstyled: true,
-			operations: {
-				fit: 'cover',
-			},
+			operations: { fit },
 			...(isFirst ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
-		placeholder: await getImagePlaceholder({
+		placeholderProps: {
 			imageId,
 			aspectRatio,
-			fit: 'cover',
+			fit,
 			highQuality: isFirst,
-		}),
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps(imageId, alt, index === 0);
+const { imageProps, placeholderProps } = await getImageProps(imageId, alt, index === 0);
 ---
 
 {
 	imageProps ? (
-		<ImagePlaceholder class="carousel-item relative" placeholder={placeholder}>
+		<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
 			<Image
 				class:list={[
 					'z-10 max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',

@@ -8,10 +8,6 @@ import { z } from 'zod';
 
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { ImageSizeEnum } from '#lib/image/image-layout.ts';
-import {
-	getImageExposureValue,
-	getImageFileUrlPlaceholders,
-} from '#lib/image/image-loader-utils.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
@@ -45,8 +41,6 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 	width: z.number(),
 	height: z.number(),
 	modifiedTime: z.date().optional(),
-	placeholder: z.string().optional(),
-	placeholderHq: z.string().optional(),
 });
 
 let exiftool: ExifTool;
@@ -58,6 +52,31 @@ async function getImageDimensions(imagePath: string) {
 	const metadata = await sharp(imagePath).metadata();
 
 	return { width: metadata.width, height: metadata.height };
+}
+
+// Calculate EV using the formula EV = log2(N^2 / t)
+function getImageExposureValue({
+	aperture,
+	shutterSpeed,
+}: {
+	aperture: string | undefined;
+	shutterSpeed: string | undefined;
+}) {
+	if (!aperture || !shutterSpeed) return;
+
+	let shutterTime: number;
+
+	if (shutterSpeed.includes('/')) {
+		const [numerator, denominator] = shutterSpeed.split('/').map(Number);
+
+		if (!numerator || !denominator) return;
+
+		shutterTime = numerator / denominator;
+	} else {
+		shutterTime = Number(shutterSpeed);
+	}
+
+	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
 export const images = defineCollection({
@@ -74,7 +93,7 @@ export const images = defineCollection({
 					},
 				}
 			: {}),
-		dataHandler: async ({ logger, id, filePathRelative, fileUrl }) => {
+		dataHandler: async ({ id, filePathRelative }) => {
 			/**
 			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
 			 */
@@ -142,26 +161,10 @@ export const images = defineCollection({
 
 			const exifData = await getExifData();
 
-			/**
-			 * Generate LQ and HQ placeholders for the image
-			 * Both are base64-encoded and stored in the content collection for easy reference
-			 */
-			const { placeholder, placeholderHq } = await getImageFileUrlPlaceholders({
-				fileUrl,
-				onError: (errorMessage) => {
-					logger.error(errorMessage);
-				},
-				onNotFound: (errorMessage) => {
-					logger.warn(errorMessage);
-				},
-			});
-
 			return {
 				...defaultMetadata,
 				...dimensions,
 				...exifData,
-				placeholder,
-				placeholderHq,
 			} satisfies ImageMetadataInput;
 		},
 	}),

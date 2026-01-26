@@ -14,6 +14,7 @@ import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -31,7 +32,10 @@ async function getImageProps() {
 
 	const imageEntry = getImageById(IMAGE_SRC);
 
-	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+	if (!imageEntry)
+		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
+
+	const fit = ImageFitOptionEnum.Cover;
 
 	return {
 		imageEntry,
@@ -41,15 +45,17 @@ async function getImageProps() {
 			sizes: '(max-width: 640px) 150px, 150px',
 			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
 			unstyled: true,
-			operations: {
-				fit: 'cover',
-			},
+			operations: { fit },
 		} satisfies ImageComponentProps,
-		placeholder: imageEntry.data.placeholder,
+		placeholderProps: {
+			imageId: IMAGE_SRC,
+			aspectRatio: 1,
+			fit,
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps();
+const { imageProps, placeholderProps } = await getImageProps();
 
 const t = getTranslations();
 ---
@@ -72,7 +78,7 @@ const t = getTranslations();
 				imageProps ? (
 					<ImagePlaceholder
 						class="relative overflow-hidden rounded-xs grayscale"
-						placeholder={placeholder}
+						placeholderProps={placeholderProps}
 					>
 						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
 					</ImagePlaceholder>

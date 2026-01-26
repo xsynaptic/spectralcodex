@@ -4,12 +4,20 @@ import sharp from 'sharp';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
-type FitMode = 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
+export const ImageFitOptionEnum = {
+	Contain: 'contain',
+	Cover: 'cover',
+	Fill: 'fill',
+	Inside: 'inside',
+	Outside: 'outside',
+} as const;
 
-interface PlaceholderOptions {
+type ImageFitOption = (typeof ImageFitOptionEnum)[keyof typeof ImageFitOptionEnum];
+
+export interface PlaceholderProps {
 	imageId: string;
 	aspectRatio: number;
-	fit?: FitMode;
+	fit?: ImageFitOption;
 	position?: string;
 	highQuality?: boolean;
 }
@@ -36,13 +44,13 @@ function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
 async function generatePlaceholderDataUrl({
 	imageObject,
 	aspectRatio,
-	fit = 'cover',
+	fit = ImageFitOptionEnum.Cover,
 	position = 'center',
 	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
 }: {
 	imageObject: sharp.Sharp;
 	aspectRatio: number;
-	fit?: FitMode;
+	fit?: ImageFitOption;
 	position?: string;
 	pixelCount?: number;
 }): Promise<string | undefined> {
@@ -67,10 +75,10 @@ async function generatePlaceholderDataUrl({
 export async function getImagePlaceholder({
 	imageId,
 	aspectRatio,
-	fit = 'cover',
+	fit = ImageFitOptionEnum.Cover,
 	position = 'center',
 	highQuality = false,
-}: PlaceholderOptions): Promise<string | undefined> {
+}: PlaceholderProps): Promise<string | undefined> {
 	const getImageById = await getImageByIdFunction();
 	const imageEntry = getImageById(imageId);
 
