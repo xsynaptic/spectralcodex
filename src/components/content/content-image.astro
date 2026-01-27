@@ -10,10 +10,11 @@ import Image from '#components/parts/image.astro';
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
-	getImageLayoutProps,
-	getImageSrcsetWidths,
+	getImageLayoutSizesProp,
+	getImageBreakpoints,
 	ImageLayoutEnum,
 	ImageSizeEnum,
+	getImageInferredWidth,
 } from '#lib/image/image-layout.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
@@ -56,21 +57,21 @@ async function getImageProps() {
 	if (!imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
 
-	const layoutProps = getImageLayoutProps({
+	const { width } = getImageInferredWidth({
 		width: imageEntry.data.width,
 		height: imageEntry.data.height,
 		layout,
 	});
 	const feedWidth =
 		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
-	const primaryWidth = isFeed ? feedWidth : layoutProps.width;
+	const primaryWidth = isFeed ? feedWidth : width;
 
 	return {
 		imageEntry,
 		imageProps: {
 			src: imageId,
-			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
-			sizes: layoutProps.sizes,
+			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
+			sizes: getImageLayoutSizesProp(layout),
 			width: primaryWidth,
 			...(isFeed
 				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }

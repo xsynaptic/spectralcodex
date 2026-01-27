@@ -5,7 +5,7 @@ import sharp from 'sharp';
  * Read an image file from the filesystem and return it as a Buffer
  * @param filePath - The relative path to the image file (e.g., from imageEntry.data.path)
  */
-export async function getImageFileBuffer(filePath: string): Promise<Buffer | undefined> {
+async function getImageFileBuffer(filePath: string): Promise<Buffer | undefined> {
 	if (!filePath) return undefined;
 
 	try {

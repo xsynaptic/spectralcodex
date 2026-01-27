@@ -6,7 +6,7 @@ import ImageCarouselCaption from '#components/image/image-carousel-caption.astro
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -30,7 +30,7 @@ async function getImageProps(imageId: string | undefined, alt: string, isFirst: 
 	return {
 		imageProps: {
 			src: imageId,
-			breakpoints: getImageSrcsetWidths({ maxWidth: imageEntry.data.width }),
+			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
 			sizes: '100vw',
 			width: ImageSizeEnum.ExtraExtraLarge,
 			height: Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio),

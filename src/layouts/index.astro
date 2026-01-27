@@ -17,7 +17,7 @@ import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
-import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -51,7 +51,7 @@ async function getImageProps() {
 		imageEntry,
 		imageProps: {
 			src: IMAGE_SRC,
-			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
+			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
 			sizes: `(min-width: 360px) 180px, (min-width: ${TAILWIND_BREAKPOINT_SM}) 300px, 300px`,
 			alt: sanitizeAltAttribute(t('author.photo.alt')),
 			unstyled: true,

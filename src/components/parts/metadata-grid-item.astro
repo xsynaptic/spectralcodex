@@ -9,7 +9,7 @@ import Image from '#components/parts/image.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -35,7 +35,7 @@ async function getImageProps() {
 	return {
 		imageProps: {
 			src: imageId,
-			breakpoints: getImageSrcsetWidths({
+			breakpoints: getImageBreakpoints({
 				maxWidth: imageEntry.data.width,
 				widths: [
 					ImageSizeEnum.ExtraSmall,

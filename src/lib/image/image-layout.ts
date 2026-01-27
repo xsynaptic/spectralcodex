@@ -53,7 +53,7 @@ function getImageOrientation({
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
-export function getImageSrcsetWidths({
+export function getImageBreakpoints({
 	maxWidth,
 	// These are the widths we're building for in almost all scenarios
 	widths = [
@@ -72,7 +72,9 @@ export function getImageSrcsetWidths({
 	return widths.filter((width) => width <= maxWidth);
 }
 
-export function getImageLayoutProps({
+// Infer a width from layout and orientation
+// This ultimately selects which image is used for the `src` prop
+export function getImageInferredWidth({
 	width,
 	height,
 	layout,
@@ -88,56 +90,63 @@ export function getImageLayoutProps({
 			return {
 				width: ImageSizeEnum.Large,
 				height: ImageSizeEnum.Medium,
-				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: [
-					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
-					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
-					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
-					`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
-				].join(', '),
 			};
 		}
 		case ImageLayoutEnum.Wide: {
 			return {
 				width: ImageSizeEnum.ExtraLarge,
 				height: ImageSizeEnum.Large,
-				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: `calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
 			};
 		}
 		case ImageLayoutEnum.Full: {
 			return {
 				width: ImageSizeEnum.ExtraLarge,
 				height: ImageSizeEnum.Large,
-				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: '100vw',
 			};
 		}
 		// No layout prop; typically seen in images in groups
 		// Ultimately we're just guessing here
 		default: {
-			return {
-				...(() => {
-					switch (imageOrientation) {
-						case ImageOrientationEnum.Portrait: {
-							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
-						}
-						case ImageOrientationEnum.Square: {
-							return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
-						}
-						default: {
-							return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
-						}
-					}
-				})(),
-				widths: getImageSrcsetWidths({ maxWidth: width }),
-				sizes: [
-					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
-					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc((100vw - ${TAILWIND_CONTENT_PADDING_SM}) / 2)`,
-					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc((100vw - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
-					`calc((${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
-				].join(', '),
-			};
+			switch (imageOrientation) {
+				case ImageOrientationEnum.Portrait: {
+					return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
+				}
+				case ImageOrientationEnum.Square: {
+					return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
+				}
+				default: {
+					return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
+				}
+			}
+		}
+	}
+}
+
+export function getImageLayoutSizesProp(layout?: ImageLayout) {
+	switch (layout) {
+		case ImageLayoutEnum.Default: {
+			return [
+				`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
+				`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
+				`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
+				`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
+			].join(', ');
+		}
+		case ImageLayoutEnum.Wide: {
+			return `calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`;
+		}
+		case ImageLayoutEnum.Full: {
+			return '100vw';
+		}
+		// No layout prop; typically seen in images in groups
+		// Ultimately we're just guessing here
+		default: {
+			return [
+				`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
+				`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc((100vw - ${TAILWIND_CONTENT_PADDING_SM}) / 2)`,
+				`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc((100vw - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
+				`calc((${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
+			].join(', ');
 		}
 	}
 }
