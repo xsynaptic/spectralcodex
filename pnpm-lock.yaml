@@ -133,8 +133,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^35.2.0
-        version: 35.2.0
+        specifier: ^35.4.0
+        version: 35.4.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -410,8 +410,8 @@ importers:
         specifier: ^6.2.2
         version: 6.2.2
       ky:
-        specifier: ^1.14.2
-        version: 1.14.2
+        specifier: ^1.14.3
+        version: 1.14.3
       maplibre-gl:
         specifier: ^5.16.0
         version: 5.16.0
@@ -3835,17 +3835,17 @@ packages:
     resolution: {integrity: sha512-CRT1WTyuQoD771GW56XEZFQ/ZoSfWid1alKGDYMmkt2yl8UXrVR4pspqWNEcqKvVIzg6PAltWjxcSSPrboA4iA==}
     engines: {node: '>=18.0.0'}
 
-  exiftool-vendored.exe@13.45.0:
-    resolution: {integrity: sha512-xa+gEnZ2Q9BAzaDr35xgADql+T6L92RqK0GjzOjzDuObwhr+sBr5RdySvZ3osHac9GJypxvk4cewNnj4OnPL3Q==}
+  exiftool-vendored.exe@13.46.0:
+    resolution: {integrity: sha512-Jx5YOS62NkJ7PPO29nYI4NXoK9sI/5eEDfNtLWt/45VPV2LnODiyn+U2oDjp6luTOU6zcVWxzmrrUMgxScIfow==}
     os: [win32]
 
-  exiftool-vendored.pl@13.45.0:
-    resolution: {integrity: sha512-uA58bMcXqdSQAqsZbHa/SMU6XKXsmoMcJSlKJjsCmLlQKEThncuAlpg8wGVNhULNXxYmRXXnYQ1756UYQY9VIA==}
+  exiftool-vendored.pl@13.46.0:
+    resolution: {integrity: sha512-PduZFtpmAwbzC/qHMNbzz4anOpDfLCtBeGCNJRKaMACwijpZ8K9OkPbGMx+TR0VCv/BF64RBZCvSp/kZ4neUrA==}
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@35.2.0:
-    resolution: {integrity: sha512-NF1kEM7/VC2GJqvgOaZHN1/tH5QZ06NStlUEhCjn7YRuXH+uCjcE/dsuZLst0Xt9ErCpcK0f02mg6D+osL6RTg==}
+  exiftool-vendored@35.4.0:
+    resolution: {integrity: sha512-xUG2AJEh6RIncwHr4TQ3N4b9FwSCXfkAJr+iG93JR+DWtA5PWnmRUPiRQW4YQ+vwQRDrkFnq2O7f+c8ab0aM3A==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -4674,8 +4674,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  ky@1.14.2:
-    resolution: {integrity: sha512-q3RBbsO5A5zrPhB6CaCS8ZUv+NWCXv6JJT4Em0i264G9W0fdPB8YRfnnEi7Dm7X7omAkBIPojzYJ2D1oHTHqug==}
+  ky@1.14.3:
+    resolution: {integrity: sha512-9zy9lkjac+TR1c2tG+mkNSVlyOpInnWdSMiue4F+kq8TwJSgv6o8jhLRg8Ho6SnZ9wOYUq/yozts9qQCfk7bIw==}
     engines: {node: '>=18'}
 
   language-subtag-registry@0.3.23:
@@ -11934,13 +11934,13 @@ snapshots:
     dependencies:
       eventsource-parser: 3.0.6
 
-  exiftool-vendored.exe@13.45.0:
+  exiftool-vendored.exe@13.46.0:
     optional: true
 
-  exiftool-vendored.pl@13.45.0:
+  exiftool-vendored.pl@13.46.0:
     optional: true
 
-  exiftool-vendored@35.2.0:
+  exiftool-vendored@35.4.0:
     dependencies:
       '@photostructure/tz-lookup': 11.4.0
       '@types/luxon': 3.7.1
@@ -11948,8 +11948,8 @@ snapshots:
       he: 1.2.0
       luxon: 3.7.2
     optionalDependencies:
-      exiftool-vendored.exe: 13.45.0
-      exiftool-vendored.pl: 13.45.0
+      exiftool-vendored.exe: 13.46.0
+      exiftool-vendored.pl: 13.46.0
 
   expand-template@2.0.3: {}
 
@@ -12902,7 +12902,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  ky@1.14.2: {}
+  ky@1.14.3: {}
 
   language-subtag-registry@0.3.23: {}
 
