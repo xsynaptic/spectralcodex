@@ -53,15 +53,18 @@ async function getImageProps() {
 			src: IMAGE_SRC,
 			breakpoints: getImageSrcsetWidths({ maxWidth: ImageSizeEnum.Large }),
 			sizes: `(min-width: 360px) 180px, (min-width: ${TAILWIND_BREAKPOINT_SM}) 300px, 300px`,
-			priority: true,
-			unstyled: true,
 			alt: sanitizeAltAttribute(t('author.photo.alt')),
+			unstyled: true,
+			priority: true,
 		} satisfies ImageComponentProps,
-		placeholder: imageEntry.data.placeholder,
+		placeholderProps: {
+			imageId: IMAGE_SRC,
+			aspectRatio: 1,
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps();
+const { imageProps, placeholderProps } = await getImageProps();
 
 const contentStats = await getContentStats();
 
@@ -108,7 +111,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				imageProps ? (
 					<ImagePlaceholder
 						class="relative overflow-hidden rounded-xs grayscale"
-						placeholder={placeholder}
+						placeholderProps={placeholderProps}
 					>
 						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
 					</ImagePlaceholder>

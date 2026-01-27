@@ -1,0 +1,130 @@
+import { promises as fs } from 'node:fs';
+import sharp from 'sharp';
+
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
+
+export const ImageFitOptionEnum = {
+	Contain: 'contain',
+	Cover: 'cover',
+	Fill: 'fill',
+	Inside: 'inside',
+	Outside: 'outside',
+} as const;
+
+type ImageFitOption = (typeof ImageFitOptionEnum)[keyof typeof ImageFitOptionEnum];
+
+export interface PlaceholderProps {
+	imageId: string;
+	aspectRatio: number;
+	fit?: ImageFitOption;
+	position?: string;
+	highQuality?: boolean;
+}
+
+const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
+const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
+
+const cache = getCacheInstance('image-placeholders');
+
+/**
+ * Generate placeholder dimensions from aspect ratio and pixel budget
+ */
+function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
+	const height = Math.sqrt(pixelCount / aspectRatio);
+	const width = pixelCount / height;
+
+	return { width: Math.round(width), height: Math.round(height) };
+}
+
+/**
+ * Generate a placeholder data URL with specified aspect ratio
+ * Sharp handles cropping via fit/position when aspect ratios don't match
+ */
+async function generatePlaceholderDataUrl({
+	imageObject,
+	aspectRatio,
+	fit = ImageFitOptionEnum.Cover,
+	position = 'center',
+	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+}: {
+	imageObject: sharp.Sharp;
+	aspectRatio: number;
+	fit?: ImageFitOption;
+	position?: string;
+	pixelCount?: number;
+}): Promise<string | undefined> {
+	const { width, height } = getPlaceholderDimensions(aspectRatio, pixelCount);
+
+	const placeholderBuffer = await imageObject
+		.resize(width, height, { fit, position })
+		.toFormat('webp', { quality: 10 })
+		.modulate({ brightness: 1, saturation: 1.2 })
+		.toBuffer({ resolveWithObject: true });
+
+	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString('base64')}`;
+}
+
+/**
+ * Get a placeholder for an image with specified aspect ratio
+ * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality + mtime
+ *
+ * For source aspect ratio placeholders, pass the image's native width/height ratio
+ * For cropped placeholders, pass the target display aspect ratio
+ */
+export async function getImagePlaceholder({
+	imageId,
+	aspectRatio,
+	fit = ImageFitOptionEnum.Cover,
+	position = 'center',
+	highQuality = false,
+}: PlaceholderProps): Promise<string | undefined> {
+	const getImageById = await getImageByIdFunction();
+	const imageEntry = getImageById(imageId);
+
+	if (!imageEntry) return;
+
+	// Get mtime for cache invalidation
+	let mtime: number | undefined;
+
+	try {
+		const stats = await fs.stat(imageEntry.data.path);
+
+		mtime = stats.mtimeMs;
+	} catch {
+		mtime = imageEntry.data.modifiedTime?.getTime();
+	}
+
+	// Normalize aspect ratio for consistent cache keys
+	const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
+
+	const cacheKey = hashData({
+		data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime },
+	});
+
+	const cached = await cache.get<string | undefined>(cacheKey);
+
+	if (cached) return cached;
+
+	const imageBuffer = await fs.readFile(imageEntry.data.path).catch(() => {
+		// Do nothing
+	});
+
+	if (!imageBuffer) return;
+
+	const imageObject = sharp(imageBuffer, { failOn: 'error' });
+
+	const placeholder = await generatePlaceholderDataUrl({
+		imageObject,
+		aspectRatio,
+		fit,
+		position,
+		pixelCount: highQuality ? IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ : IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+	});
+
+	if (placeholder) {
+		await cache.set(cacheKey, placeholder);
+	}
+
+	return placeholder;
+}

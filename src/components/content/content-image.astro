@@ -53,7 +53,8 @@ async function getImageProps() {
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageEntry) return { imageEntry: undefined, imageProps: undefined, placeholder: undefined };
+	if (!imageEntry)
+		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
 
 	const layoutProps = getImageLayoutProps({
 		width: imageEntry.data.width,
@@ -77,12 +78,15 @@ async function getImageProps() {
 			unstyled: true,
 			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
 		} satisfies ImageComponentProps,
-		placeholder: imageEntry.data.placeholder,
-		aspectRatio: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
+		placeholderProps: {
+			imageId,
+			aspectRatio: imageEntry.data.width / imageEntry.data.height,
+		},
+		aspectRatioString: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
 	};
 }
 
-const { imageEntry, imageProps, placeholder, aspectRatio } = await getImageProps();
+const { imageEntry, imageProps, placeholderProps, aspectRatioString } = await getImageProps();
 
 const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 ---
@@ -117,11 +121,11 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 						'relative',
 						layout === ImageLayoutEnum.Full ? undefined : 'overflow-hidden sm:rounded-xs',
 					]}
-					placeholder={placeholder}
+					placeholderProps={placeholderProps}
 				>
 					<Image
 						class:list={['m-0 text-sm text-transparent']}
-						{...(aspectRatio ? { style: { aspectRatio } } : {})}
+						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
 						{...imageProps}
 					/>
 					{FEATURE_IMAGE_METADATA && showMetadata ? (

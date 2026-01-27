@@ -10,6 +10,7 @@ import ProseDescription from '#components/parts/prose-description.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageSrcsetWidths, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -26,9 +27,10 @@ async function getImageProps() {
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageId || !imageEntry) return { imageProps: undefined, placeholder: undefined };
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
 
 	const aspectRatio = 3 / 2;
+	const fit = ImageFitOptionEnum.Cover;
 
 	return {
 		imageProps: {
@@ -47,15 +49,17 @@ async function getImageProps() {
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			alt: sanitizeAltAttribute(alt),
 			unstyled: true,
-			operations: {
-				fit: 'cover',
-			},
+			operations: { fit },
 		} satisfies ImageComponentProps,
-		placeholder: imageEntry.data.placeholder,
+		placeholderProps: {
+			imageId,
+			aspectRatio,
+			fit,
+		},
 	};
 }
 
-const { imageProps, placeholder } = await getImageProps();
+const { imageProps, placeholderProps } = await getImageProps();
 
 const titleMultilingual = await renderSlot(Astro.slots, 'preview-title-multilingual');
 const subtitle = await renderSlot(Astro.slots, 'preview-subtitle');
@@ -65,7 +69,10 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 <CardFrame {...props}>
 	{
 		imageProps ? (
-			<ImagePlaceholder class="overflow-hidden rounded-xs shadow-sm" placeholder={placeholder}>
+			<ImagePlaceholder
+				class="overflow-hidden rounded-xs shadow-sm"
+				placeholderProps={placeholderProps}
+			>
 				<a href={linkUrl}>
 					<Image class="aspect-3/2 text-sm text-transparent" {...imageProps} />
 				</a>

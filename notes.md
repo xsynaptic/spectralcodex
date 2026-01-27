@@ -17,10 +17,6 @@ npx 0x -- node ./node_modules/astro/astro.js build
 - carousel buttons (or some other hint to indicate that some images can be swiped); this feature is only partly complete
 - better pagination (_e.g._ [here](https://github.com/philnash/astro-pagination))
 
-### Image Server
-
-- currently the ipx provider limits parameters such that we can't crop images on the server, only with CSS; in the future we'd like to have this capability
-
 ### Maps
 
 - [build fonts](https://maplibre.org/font-maker/) and sprites for local hosting; see [here](https://github.com/protomaps/basemaps-assets) for an example
