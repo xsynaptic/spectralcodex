@@ -15,7 +15,7 @@ const MAX_WAIT_MS = 30_000;
 const POLL_INTERVAL_MS = 500;
 
 // Load dev environment for test secret
-dotenv.config({ path: path.join(PROJECT_ROOT, '.env.dev') });
+dotenv.config({ path: path.join(PROJECT_ROOT, '.env.dev'), quiet: true });
 
 async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();

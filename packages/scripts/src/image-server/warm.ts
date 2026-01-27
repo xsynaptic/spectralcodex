@@ -24,10 +24,16 @@ interface WarmConfig {
 }
 
 function loadWarmConfig(options: WarmOptions): WarmConfig {
-	const { rootPath, nginxUrl = 'http://localhost:3100', concurrency = 2, random = false, dryRun = false } = options;
+	const {
+		rootPath,
+		nginxUrl = 'http://localhost:3100',
+		concurrency = 2,
+		random = false,
+		dryRun = false,
+	} = options;
 
-	dotenv.config({ path: path.join(rootPath, '.env') });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
+	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
+	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
 
 	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
 	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;

@@ -11,8 +11,8 @@ interface DeployConfig {
 
 export function loadDeployConfig(rootPath: string): DeployConfig {
 	// Load env files
-	dotenv.config({ path: path.join(rootPath, '.env') });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env') });
+	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
+	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
 
 	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
 	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;

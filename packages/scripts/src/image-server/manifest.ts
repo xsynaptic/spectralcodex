@@ -126,7 +126,7 @@ if (process.argv[1]?.endsWith('manifest.ts')) {
 	const rootPath = values['root-path'];
 
 	// Load environment variables
-	dotenv.config({ path: path.join(rootPath, '.env') });
+	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
 
 	// URL pattern from args or environment
 	const urlPattern = values['url-pattern'] ?? process.env.IPX_SERVER_URL;
