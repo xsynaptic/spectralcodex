@@ -1,8 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
 
-import slugify from '@sindresorhus/slugify';
-
-import type { ContentMetadataCollectionKey, ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type {
+	ContentMetadataCollectionKey,
+	ContentMetadataItem,
+} from '#lib/metadata/metadata-types.ts';
 
 import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
@@ -35,12 +36,10 @@ export async function getContentMetadataFunction(): Promise<
 export async function getContentMetadataById(id: string): Promise<ContentMetadataItem | undefined> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	const slug = slugify(id);
-
-	const contentMetadata = contentMetadataIndex.get(slug);
+	const contentMetadata = contentMetadataIndex.get(id);
 
 	if (!contentMetadata && CONTENT_LINKS_MISSING_ID_LOG) {
-		logError(`[Metadata] Missing content specified in Link component: "${slug}"`);
+		logError(`[Metadata] Missing content specified in Link component: "${id}"`);
 	}
 	return contentMetadata;
 }
