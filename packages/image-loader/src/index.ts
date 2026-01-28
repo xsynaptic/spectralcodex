@@ -29,7 +29,15 @@ function getSyncDataFunction({
 }: Pick<LoaderContext, 'store' | 'parseData' | 'generateDigest' | 'logger'> & {
 	baseDir: URL;
 	options: ImageLoaderOptions;
-}) {
+}): ({
+	id,
+	filePath,
+	modifiedTime,
+}: {
+	id: string;
+	filePath: string;
+	modifiedTime?: Date | undefined;
+}) => Promise<void> {
 	// Limit the concurrency of files processed to reduce memory usage
 	const limit = pLimit(options.concurrency);
 
@@ -159,9 +167,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 
 			// Check if the base directory exists
 			if (!existsSync(baseDirPath)) {
-				logger.warn(
-					`Image directory "${options.base}" does not exist. No images will be loaded.`,
-				);
+				logger.warn(`Image directory "${options.base}" does not exist. No images will be loaded.`);
 				return;
 			}
 

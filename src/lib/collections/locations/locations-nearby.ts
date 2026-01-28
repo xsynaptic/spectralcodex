@@ -2,11 +2,7 @@ import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
-import {
-	GeometryTypeEnum,
-	type LocationStatus,
-	LocationStatusEnum,
-} from '@spectralcodex/map-types';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { booleanIntersects } from '@turf/boolean-intersects';
 import { buffer as getBuffer } from '@turf/buffer';
 import { centroid } from '@turf/centroid';
@@ -25,7 +21,7 @@ interface LocationNearbyData {
 	distances: Map<string, number>;
 	points: Array<{
 		id: string;
-		status: LocationStatus;
+		status: string; // Actual type: LocationStatus; we simplify this here for performance reasons
 		coordinates: Position;
 	}>;
 }

@@ -11,7 +11,9 @@ import { useDarkMode } from '../lib/dark-mode';
 import { statusColorArray, statusColorDarkArray } from '../lib/location-status';
 import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
-function useMapSourceLinesStyle() {
+function useMapSourceLinesStyle(): {
+	[MapLayerIdEnum.LineString]: LineLayerSpecification;
+} {
 	const isDarkMode = useDarkMode();
 
 	// Experimental line drawing style

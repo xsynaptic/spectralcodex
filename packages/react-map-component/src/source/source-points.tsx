@@ -19,7 +19,14 @@ import { tailwindColors } from '../lib/tailwind-colors';
 import { useMapHoveredId, useMapSelectedId } from '../store/store';
 import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
-function useMapSourcePointsStyle(spritesPrefix = 'custom') {
+function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
+	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
+	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
+	[MapLayerIdEnum.Points]: CircleLayerSpecification;
+	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
+	[MapLayerIdEnum.PointsImage]: SymbolLayerSpecification;
+	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
+} {
 	const isDarkMode = useDarkMode();
 
 	const selectedId = useMapSelectedId();
