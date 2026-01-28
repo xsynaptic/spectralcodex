@@ -1,6 +1,7 @@
 ---
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
+import type { MetadataGridOptions } from '#components/types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
@@ -15,17 +16,7 @@ import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
-export interface PreviewItemProps {
-	showCollection?: boolean | undefined;
-	showDate?: boolean | undefined;
-	showDescription?: boolean | undefined;
-	showLocations?: boolean | undefined;
-	showRegion?: boolean | undefined;
-	showPosts?: boolean | undefined;
-	showTitleMultilingual?: boolean | undefined;
-}
-
-interface Props extends PreviewItemProps {
+interface Props extends MetadataGridOptions {
 	class?: string | undefined;
 	items: Array<ContentMetadataItem>;
 }
@@ -60,13 +51,13 @@ const t = getTranslations();
 
 				return (
 					<Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
-						<Fragment slot="preview-title">{item.title}</Fragment>
+						<Fragment slot="grid-item-title">{item.title}</Fragment>
 						{showTitleMultilingual && item.titleMultilingual ? (
-							<Fragment slot="preview-title-multilingual">
+							<Fragment slot="grid-item-title-multilingual">
 								<TextMultilingual content={item.titleMultilingual} />
 							</Fragment>
 						) : undefined}
-						<Fragment slot="preview-subtitle">
+						<Fragment slot="grid-item-subtitle">
 							{showCollection ? (
 								<DividedItem>
 									{indexUrl ? (
@@ -114,7 +105,7 @@ const t = getTranslations();
 							) : undefined}
 						</Fragment>
 						{showDescription && item.description ? (
-							<Fragment slot="preview-description">
+							<Fragment slot="grid-item-description">
 								<Fragment set:html={transformMarkdown({ input: item.description })} />
 							</Fragment>
 						) : undefined}

@@ -1,5 +1,6 @@
 ---
 import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { render } from 'astro:content';
@@ -17,7 +18,7 @@ import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
-	page: Page;
+	page: Page<CollectionEntry<'ephemera'>>;
 }
 
 const { page } = Astro.props;

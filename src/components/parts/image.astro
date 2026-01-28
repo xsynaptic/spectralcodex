@@ -1,20 +1,12 @@
 ---
-import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
-import type { HTMLAttributes } from 'astro/types';
-import type { IPXOptions } from 'unpic/providers/ipx';
-
 import { Image as UnpicImage } from '@unpic/astro/base';
 
-import type { IPXOperations } from '#lib/image/image-server-types.ts';
+import type { ImageComponentProps } from '#lib/image/image-types.ts';
 
 import { signedIpxTransformer } from '#lib/image/image-server.ts';
 
 // Props interface: same as unpic base but without transformer
-type Props = HTMLAttributes<'img'> &
-	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'>;
-
-// Helpful for validating prop types in other components
-export type ImageComponentProps = Props;
+type Props = ImageComponentProps;
 
 const { class: className, ...props } = Astro.props;
 ---

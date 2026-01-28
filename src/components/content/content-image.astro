@@ -1,8 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import type { CollectionEntry } from 'astro:content';
 
-import type { ImageComponentProps } from '#components/parts/image.astro';
-import type { ImageLayout } from '#lib/image/image-layout.ts';
+import type { ImageLayout } from '#lib/image/image-types.ts';
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -12,10 +13,9 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
 	getImageLayoutSizesProp,
 	getImageBreakpoints,
-	ImageLayoutEnum,
-	ImageSizeEnum,
 	getImageInferredWidth,
 } from '#lib/image/image-layout.ts';
+import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
 
@@ -49,13 +49,23 @@ function getAspectRatio(width: number, height: number) {
 	return `${String(width / aspectRatioDivisor)} / ${String(height / aspectRatioDivisor)}`;
 }
 
-async function getImageProps() {
+async function getImageProps(): Promise<{
+	imageEntry: CollectionEntry<'images'> | undefined;
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+	aspectRatioString: string | undefined;
+}> {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(imageId);
 
 	if (!imageEntry)
-		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
+		return {
+			imageEntry: undefined,
+			imageProps: undefined,
+			placeholderProps: undefined,
+			aspectRatioString: undefined,
+		};
 
 	const { width } = getImageInferredWidth({
 		width: imageEntry.data.width,
@@ -78,7 +88,7 @@ async function getImageProps() {
 				: {}),
 			unstyled: true,
 			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
-		} satisfies ImageComponentProps,
+		},
 		placeholderProps: {
 			imageId,
 			aspectRatio: imageEntry.data.width / imageEntry.data.height,
@@ -129,7 +139,7 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
 						{...imageProps}
 					/>
-					{FEATURE_IMAGE_METADATA && showMetadata ? (
+					{FEATURE_IMAGE_METADATA && showMetadata && imageEntry ? (
 						<ImageMetadata entry={imageEntry} />
 					) : undefined}
 				</ImagePlaceholder>

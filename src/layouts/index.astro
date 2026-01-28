@@ -1,7 +1,9 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
-import type { ImageComponentProps } from '#components/parts/image.astro';
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -17,7 +19,8 @@ import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
-import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
+import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -35,7 +38,11 @@ const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
 
 const t = getTranslations();
 
-async function getImageProps() {
+async function getImageProps(): Promise<{
+	imageEntry: CollectionEntry<'images'> | undefined;
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+}> {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(IMAGE_SRC);
@@ -44,7 +51,7 @@ async function getImageProps() {
 		return {
 			imageEntry: undefined,
 			imageProps: undefined,
-			placeholder: undefined,
+			placeholderProps: undefined,
 		};
 
 	return {
@@ -56,7 +63,7 @@ async function getImageProps() {
 			alt: sanitizeAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			priority: true,
-		} satisfies ImageComponentProps,
+		},
 		placeholderProps: {
 			imageId: IMAGE_SRC,
 			aspectRatio: 1,

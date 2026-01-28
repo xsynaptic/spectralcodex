@@ -1,3 +1,5 @@
+import type { ImageLayout, ImageOrientation } from '#lib/image/image-types.ts';
+
 import {
 	TAILWIND_BREAKPOINT_CONTENT,
 	TAILWIND_BREAKPOINT_MD,
@@ -5,33 +7,7 @@ import {
 	TAILWIND_CONTENT_PADDING_MD,
 	TAILWIND_CONTENT_PADDING_SM,
 } from '#constants.ts';
-
-export const ImageLayoutEnum = {
-	Default: 'default',
-	Wide: 'wide',
-	Full: 'full',
-	None: 'none', // A special case for images in groups
-} as const;
-
-export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
-
-const ImageOrientationEnum = {
-	Landscape: 'landscape',
-	Portrait: 'portrait',
-	Square: 'square',
-} as const;
-
-type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
-
-export const ImageSizeEnum = {
-	ExtraSmall: 450,
-	Small: 600,
-	Medium: 900,
-	Large: 1200,
-	ExtraLarge: 1800,
-	ExtraExtraLarge: 2400,
-	ExtraExtraExtraLarge: 3600,
-} as const;
+import { ImageOrientationEnum, ImageSizeEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 
 // A simple check for image orientation
 function getImageOrientation({

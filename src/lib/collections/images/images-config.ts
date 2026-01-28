@@ -7,8 +7,8 @@ import sharp from 'sharp';
 import { z } from 'zod';
 
 import { FEATURE_IMAGE_METADATA } from '#constants.ts';
-import { ImageSizeEnum } from '#lib/image/image-layout.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
+import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 

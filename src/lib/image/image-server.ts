@@ -4,7 +4,7 @@ import type { IPXOptions } from 'unpic/providers/ipx';
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 import { transform as ipxTransform } from 'unpic/providers/ipx';
 
-import type { IPXOperations } from '#lib/image/image-server-types.ts';
+import type { IPXOperations } from '#lib/image/image-types.ts';
 
 import {
 	IMAGE_FORMAT,

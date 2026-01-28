@@ -1,13 +1,14 @@
 ---
-import type { ImageComponentProps } from '#components/parts/image.astro';
 import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
+import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { ImageSizeEnum } from '#lib/image/image-types.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedObjectWithCaptionMetadata {
@@ -17,7 +18,14 @@ interface Props extends ImageFeaturedObjectWithCaptionMetadata {
 
 const { index, id: imageId, title: alt = '', captionMetadata, withTitle = false } = Astro.props;
 
-async function getImageProps(imageId: string | undefined, alt: string, isFirst: boolean) {
+async function getImageProps(
+	imageId: string | undefined,
+	alt: string,
+	isFirst: boolean
+): Promise<{
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+}> {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(imageId);

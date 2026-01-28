@@ -1,16 +1,9 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
-const DividerColorEnum = {
-	Default: 'default',
-	Lighter: 'lighter',
-	Darker: 'darker',
-	Hero: 'hero',
-} as const;
+import type { DividerColor, DividerContent } from '#components/types.ts';
 
-export type DividerColor = (typeof DividerColorEnum)[keyof typeof DividerColorEnum];
-
-export type DividerContent = 'bar' | 'bullet' | 'chevron' | 'dot' | 'slash';
+import { DividerColorEnum, DividerContentEnum } from '#components/types.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
@@ -24,8 +17,8 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 const {
 	as: Tag = 'div',
 	class: className,
-	dividerColor = 'default',
-	dividerContent = 'slash',
+	dividerColor = DividerColorEnum.Default,
+	dividerContent = DividerContentEnum.Slash,
 	showDarkMode = true,
 	hasHeroImage = false,
 	...props

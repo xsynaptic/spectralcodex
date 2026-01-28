@@ -1,9 +1,10 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
+import type { CollectionEntry } from 'astro:content';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
-import type { ImageComponentProps } from '#components/parts/image.astro';
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -13,8 +14,9 @@ import Link from '#components/parts/link.astro';
 import ProseDescription from '#components/parts/prose-description.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageBreakpoints, ImageSizeEnum } from '#lib/image/image-layout.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-placeholders.ts';
+import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { ImageSizeEnum } from '#lib/image/image-types.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
@@ -27,7 +29,11 @@ const { class: className, showAuthor = false, ...props } = Astro.props;
 
 const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
 
-async function getImageProps() {
+async function getImageProps(): Promise<{
+	imageEntry: CollectionEntry<'images'> | undefined;
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+}> {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(IMAGE_SRC);
@@ -46,7 +52,7 @@ async function getImageProps() {
 			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
 			unstyled: true,
 			operations: { fit },
-		} satisfies ImageComponentProps,
+		},
 		placeholderProps: {
 			imageId: IMAGE_SRC,
 			aspectRatio: 1,

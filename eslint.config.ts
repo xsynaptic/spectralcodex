@@ -83,18 +83,9 @@ export default getConfig(
 					extraFileExtensions: ['.astro'],
 				},
 			},
-
-			// Remove some safety rules around `any` for various reasons
-			// Astro.props isn't typed correctly in some contexts, so a bunch of things ends up being `any`
-			rules: {
-				'@typescript-eslint/no-unsafe-argument': 'off',
-				'@typescript-eslint/no-unsafe-assignment': 'off',
-				'@typescript-eslint/no-unsafe-call': 'off',
-				'@typescript-eslint/no-unsafe-member-access': 'off',
-				'@typescript-eslint/no-unsafe-return': 'off',
-			},
 		},
 		// Disable typed rules for scripts inside Astro files
+		// 2026Q1: this is still required otherwise TypeScript might crash!
 		{
 			files: ['**/*.astro/*.ts', '*.astro/*.ts'],
 			...tseslint.configs.disableTypeChecked,

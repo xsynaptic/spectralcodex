@@ -1,8 +1,8 @@
 ---
-import type { SEOProps } from 'astro-seo';
-
 import { SEO } from 'astro-seo';
 import { WEBMENTION_DOMAIN } from 'astro:env/client';
+
+import type { MetaProps } from '#components/types.ts';
 
 import {
 	OPEN_GRAPH_IMAGE_DENSITY,
@@ -17,33 +17,7 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoDescription, getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
-export interface MetaProps {
-	title?: string | undefined;
-	description?: string | undefined;
-	ogType?: 'article' | 'website' | undefined;
-	image?: NonNullable<SEOProps['openGraph']>['image'];
-	imageId?: string | undefined;
-	imageAlt?: string | undefined;
-	article?: {
-		publishedTime?: string;
-		modifiedTime?: string;
-		expirationTime?: string;
-		authors?: Array<string>;
-		section?: string;
-		tags?: Array<string>;
-	};
-	prefetchUrls?: Array<string> | undefined;
-	noIndex?: boolean;
-	noFollow?: boolean;
-}
-
-interface Props {
-	meta?: MetaProps | undefined;
-}
-
-const { meta } = Astro.props;
-
-const t = getTranslations();
+type Props = MetaProps;
 
 const {
 	title: contentTitle,
@@ -56,16 +30,9 @@ const {
 	prefetchUrls,
 	noIndex,
 	noFollow,
-} = meta ?? {
-	title: undefined,
-	description: undefined,
-	ogType: undefined,
-	image: undefined,
-	imageId: undefined,
-	imageAlt: undefined,
-	article: undefined,
-	prefetchUrls: undefined,
-};
+} = Astro.props;
+
+const t = getTranslations();
 
 const siteTitle = t('site.title');
 const siteDescription = t('site.description');
@@ -97,13 +64,13 @@ async function generateOpenGraphImageUrl({
 		width: OPEN_GRAPH_IMAGE_WIDTH * OPEN_GRAPH_IMAGE_DENSITY,
 		type: 'image/jpeg',
 		alt: sanitizeAltAttribute(imageAlt),
-	} satisfies NonNullable<SEOProps['openGraph']>['image'];
+	};
 }
 
 const openGraphImage = await generateOpenGraphImageUrl({
 	imageId,
 	imageUrl: image?.url,
-	imageAlt: image?.alt ?? imageAlt ?? description ?? contentTitle ?? siteTitle,
+	imageAlt: image?.alt ?? imageAlt ?? description,
 });
 ---
 

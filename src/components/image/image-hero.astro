@@ -1,5 +1,5 @@
 ---
-import type { ImageComponentProps } from '#components/parts/image.astro';
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -17,7 +17,13 @@ interface Props {
 
 const { hasHeroImage, imageId, alt, class: className } = Astro.props;
 
-async function getImageProps(imageId: string | undefined, alt: string) {
+async function getImageProps(
+	imageId: string | undefined,
+	alt: string
+): Promise<{
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+}> {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(imageId);
