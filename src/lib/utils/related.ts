@@ -25,6 +25,9 @@ async function loadJsonData(filePath: string) {
 	return JSON.parse(fileContent) as unknown;
 }
 
+/**
+ * Schema for related content data
+ */
 const RelatedContentItemSchema = z
 	.record(
 		z.string(),
@@ -58,7 +61,7 @@ async function loadRelatedContentData() {
 	}
 }
 
-export async function getRelatedContentFunction() {
+async function createRelatedContentFunction() {
 	const relatedContentData = await loadRelatedContentData();
 
 	const contentMetadataIndex = await getContentMetadataIndex();
@@ -87,4 +90,13 @@ export async function getRelatedContentFunction() {
 			.filter((item) => item !== undefined)
 			.slice(0, limit);
 	};
+}
+
+let relatedContentFunction: ReturnType<typeof createRelatedContentFunction> | undefined;
+
+export async function getRelatedContentFunction() {
+	if (!relatedContentFunction) {
+		relatedContentFunction = createRelatedContentFunction();
+	}
+	return relatedContentFunction;
 }
