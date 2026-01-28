@@ -115,8 +115,8 @@ importers:
         specifier: workspace:*
         version: link:deploy/site/image-server
       '@xsynaptic/unified-tools':
-        specifier: 2.0.1
-        version: 2.0.1
+        specifier: 3.0.0
+        version: 3.0.0
       alfaaz:
         specifier: ^1.1.0
         version: 1.1.0
@@ -506,8 +506,8 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       '@xsynaptic/unified-tools':
-        specifier: 2.0.1
-        version: 2.0.1
+        specifier: 3.0.0
+        version: 3.0.0
       astro:
         specifier: 6.0.0-beta.3
         version: 6.0.0-beta.3(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
@@ -2868,8 +2868,8 @@ packages:
   '@xsynaptic/eslint-config@3.1.3':
     resolution: {integrity: sha512-4G8G6vmUFpOj6MDJRpYdM8qxT66k2poYxqFsIVjO3Azq3VpOSLNr+jcNvyziVRkTC8mHoa69bsD4yylVMn51fA==}
 
-  '@xsynaptic/unified-tools@2.0.1':
-    resolution: {integrity: sha512-5+xQNt4s98SoW92Q4mlw51SC5D6gsqH7WcV74th+uV3RNlDs8TJI31E5mKK4Hacz6h5z0yEMpBYxxe5E5fQxJA==}
+  '@xsynaptic/unified-tools@3.0.0':
+    resolution: {integrity: sha512-ww28rAArqtU4N3Dv4juooy7WV/R1K0QRoOLDSsk2biGBRWC8dvIpOg1ZAYxcClDqlucDhysT3LTT3Z1O+YW9ww==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -5936,6 +5936,9 @@ packages:
   rehype-wrap-cjk@1.0.8:
     resolution: {integrity: sha512-EJG9L9mYsdxDb0N0MXKr0vDgHbwh7ikeZtIKI80leno2he3+iCGL5GMi1HxoNyCfdI5geDDFWPVe5nm8sgibsQ==}
 
+  rehype-wrap-cjk@1.0.9:
+    resolution: {integrity: sha512-aeMuS8YL/3KT6hXax/1w6d7tCetduXgazxFRqKCX8MzXNoQybNgn8DElVF6JUcbUxlo+MLPEgajuq4V5FcEDFg==}
+
   rehype@13.0.2:
     resolution: {integrity: sha512-j31mdaRFrwFRUIlxGeuPXXKWQxet52RBQRvCmzl5eCefn/KGbomK5GMHNMsOJf55fgo3qw5tST5neDuarDYR2A==}
 
@@ -7521,7 +7524,7 @@ snapshots:
       smol-toml: 1.5.2
       unified: 11.0.5
       unist-util-remove-position: 5.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       unist-util-visit-parents: 6.0.2
       vfile: 6.0.3
     transitivePeerDependencies:
@@ -10621,12 +10624,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@xsynaptic/unified-tools@2.0.1':
+  '@xsynaptic/unified-tools@3.0.0':
     dependencies:
       rehype-parse: 9.0.1
       rehype-sanitize: 6.0.0
       rehype-stringify: 10.0.1
-      rehype-wrap-cjk: 1.0.8
+      rehype-wrap-cjk: 1.0.9
       remark-mdx: 3.1.1
       remark-parse: 11.0.0
       remark-rehype: 11.1.2
@@ -13457,7 +13460,7 @@ snapshots:
       micromark-util-sanitize-uri: 2.0.1
       trim-lines: 3.0.1
       unist-util-position: 5.0.0
-      unist-util-visit: 5.0.0
+      unist-util-visit: 5.1.0
       vfile: 6.0.3
 
   mdast-util-to-markdown@0.6.5:
@@ -14626,6 +14629,12 @@ snapshots:
       hast-util-is-element: 3.0.0
       hastscript: 9.0.1
       unist-util-visit: 5.0.0
+
+  rehype-wrap-cjk@1.0.9:
+    dependencies:
+      hast-util-is-element: 3.0.0
+      hastscript: 9.0.1
+      unist-util-visit: 5.1.0
 
   rehype@13.0.2:
     dependencies:
