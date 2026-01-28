@@ -25,8 +25,6 @@ export interface PlaceholderProps {
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 
-const cache = getCacheInstance('image-placeholders');
-
 /**
  * Generate placeholder dimensions from aspect ratio and pixel budget
  */
@@ -72,59 +70,73 @@ async function generatePlaceholderDataUrl({
  * For source aspect ratio placeholders, pass the image's native width/height ratio
  * For cropped placeholders, pass the target display aspect ratio
  */
-export async function getImagePlaceholder({
-	imageId,
-	aspectRatio,
-	fit = ImageFitOptionEnum.Cover,
-	position = 'center',
-	highQuality = false,
-}: PlaceholderProps): Promise<string | undefined> {
+async function createImagePlaceholderFunction() {
+	const cache = getCacheInstance('image-placeholders');
+
 	const getImageById = await getImageByIdFunction();
-	const imageEntry = getImageById(imageId);
 
-	if (!imageEntry) return;
-
-	// Get mtime for cache invalidation
-	let mtime: number | undefined;
-
-	try {
-		const stats = await fs.stat(imageEntry.data.path);
-
-		mtime = stats.mtimeMs;
-	} catch {
-		mtime = imageEntry.data.modifiedTime?.getTime();
-	}
-
-	// Normalize aspect ratio for consistent cache keys
-	const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
-
-	const cacheKey = hashData({
-		data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime },
-	});
-
-	const cached = await cache.get<string | undefined>(cacheKey);
-
-	if (cached) return cached;
-
-	const imageBuffer = await fs.readFile(imageEntry.data.path).catch(() => {
-		// Do nothing
-	});
-
-	if (!imageBuffer) return;
-
-	const imageObject = sharp(imageBuffer, { failOn: 'error' });
-
-	const placeholder = await generatePlaceholderDataUrl({
-		imageObject,
+	return async function getImagePlaceholder({
+		imageId,
 		aspectRatio,
-		fit,
-		position,
-		pixelCount: highQuality ? IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ : IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
-	});
+		fit = ImageFitOptionEnum.Cover,
+		position = 'center',
+		highQuality = false,
+	}: PlaceholderProps): Promise<string | undefined> {
+		const imageEntry = getImageById(imageId);
 
-	if (placeholder) {
-		await cache.set(cacheKey, placeholder);
+		if (!imageEntry) return;
+
+		// Get mtime for cache invalidation
+		let mtime: number | undefined;
+
+		try {
+			const stats = await fs.stat(imageEntry.data.path);
+
+			mtime = stats.mtimeMs;
+		} catch {
+			mtime = imageEntry.data.modifiedTime?.getTime();
+		}
+
+		// Normalize aspect ratio for consistent cache keys
+		const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
+
+		const cacheKey = hashData({
+			data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime },
+		});
+
+		const cached = await cache.get<string | undefined>(cacheKey);
+
+		if (cached) return cached;
+
+		const imageBuffer = await fs.readFile(imageEntry.data.path).catch(() => {
+			// Do nothing
+		});
+
+		if (!imageBuffer) return;
+
+		const imageObject = sharp(imageBuffer, { failOn: 'error' });
+
+		const placeholder = await generatePlaceholderDataUrl({
+			imageObject,
+			aspectRatio,
+			fit,
+			position,
+			pixelCount: highQuality ? IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ : IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+		});
+
+		if (placeholder) {
+			await cache.set(cacheKey, placeholder);
+		}
+
+		return placeholder;
+	};
+}
+
+let imagePlaceholderFunction: ReturnType<typeof createImagePlaceholderFunction> | undefined;
+
+export async function getImagePlaceholderFunction() {
+	if (!imagePlaceholderFunction) {
+		imagePlaceholderFunction = createImagePlaceholderFunction();
 	}
-
-	return placeholder;
+	return imagePlaceholderFunction;
 }
