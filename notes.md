@@ -7,7 +7,7 @@
 This profiling command worked pretty well to debug some major issues with `getCollection` calls:
 
 ```sh
-npx 0x -- node ./node_modules/astro/astro.js build
+npx 0x -- node ./node_modules/astro/bin/astro.mjs build
 ```
 
 ## Things To Do
