@@ -22,7 +22,8 @@ import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -39,8 +40,11 @@ const { page, mapData, entry, metadataItems, metadataItemsCount, regionsOption }
 
 const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 
-const imageFeaturedGroup = await getImageFeaturedObjectGroup({
+const contentMetadataIndex = await getContentMetadataIndex();
+
+const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
+	contentMetadataIndex,
 });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;

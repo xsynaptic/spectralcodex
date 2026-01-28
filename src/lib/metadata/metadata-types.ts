@@ -1,6 +1,7 @@
 import type { CollectionKey } from 'astro:content';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+import type { ImageFeaturedObject } from '#lib/schemas/index.ts';
 
 /**
  * Metadata
@@ -32,3 +33,13 @@ export interface ContentMetadataItem<
 	dateVisited: Array<Date> | undefined;
 	entryQuality: number;
 }
+
+// Image featured data is sometimes displayed with a caption
+export type ImageFeaturedCaptionMetadata = Pick<
+	ContentMetadataItem,
+	'id' | 'title' | 'titleMultilingual' | 'url'
+>;
+
+export type ImageFeaturedWithCaption = ImageFeaturedObject & {
+	captionMetadata?: ImageFeaturedCaptionMetadata | undefined;
+};

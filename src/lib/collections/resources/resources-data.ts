@@ -4,11 +4,25 @@ import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 
-import { matchLinkUrl } from '#lib/collections/resources/resources-utils.ts';
-
 interface CollectionData {
 	resources: Array<CollectionEntry<'resources'>>;
 	resourcesMap: Map<string, CollectionEntry<'resources'>>;
+}
+
+/**
+ * Match a given string against a match pattern (either a single string or an array of strings)
+ */
+export function matchLinkUrl(
+	linkUrl: string,
+	matchPattern: string | Array<string> | undefined,
+): boolean {
+	if (!matchPattern) return false;
+
+	if (typeof matchPattern === 'string') {
+		return linkUrl.includes(matchPattern);
+	}
+
+	return matchPattern.some((pattern) => linkUrl.includes(pattern));
 }
 
 export const getResourcesCollection = pMemoize(async (): Promise<CollectionData> => {

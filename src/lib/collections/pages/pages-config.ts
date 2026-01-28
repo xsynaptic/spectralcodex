@@ -4,12 +4,12 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
 	StylizedTextSchema,
+	ImageFeaturedSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 

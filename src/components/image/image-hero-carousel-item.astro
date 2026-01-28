@@ -1,6 +1,6 @@
 ---
-import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
+import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -11,7 +11,7 @@ import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeAltAttribute } from '#lib/utils/text.ts';
 
-interface Props extends ImageFeaturedObjectWithCaptionMetadata {
+interface Props extends ImageFeaturedWithCaption {
 	index: number;
 	withTitle?: boolean | undefined;
 }

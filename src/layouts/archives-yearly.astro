@@ -10,9 +10,10 @@ import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import {
-	getImageFeaturedObjectGroup,
+	getImageFeaturedGroup,
 	getImageFeaturedGroupByContentMetadata,
 } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -24,6 +25,8 @@ interface Props {
 }
 
 const { archivesMonthlyData, archivesYear, archivesYears } = Astro.props;
+
+const contentMetadataIndex = await getContentMetadataIndex();
 
 const t = getTranslations();
 ---
@@ -50,10 +53,11 @@ const t = getTranslations();
 	{
 		archivesMonthlyData
 			.sort((a, b) => Number(a.month) - Number(b.month))
-			.map(async (monthlyData) => {
+			.map((monthlyData) => {
 				const imageFeaturedGroup = monthlyData.archiveEntry?.data.imageFeatured
-					? await getImageFeaturedObjectGroup({
+					? getImageFeaturedGroup({
 							imageFeatured: monthlyData.archiveEntry.data.imageFeatured,
+							contentMetadataIndex,
 						})
 					: getImageFeaturedGroupByContentMetadata({ items: monthlyData.highlights });
 

@@ -2,23 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 
-import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-
-/**
- * Match a given string against a match pattern (either a single string or an array of strings)
- */
-export function matchLinkUrl(
-	linkUrl: string,
-	matchPattern: string | Array<string> | undefined,
-): boolean {
-	if (!matchPattern) return false;
-
-	if (typeof matchPattern === 'string') {
-		return linkUrl.includes(matchPattern);
-	}
-
-	return matchPattern.some((pattern) => linkUrl.includes(pattern));
-}
+import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
 
 /**
  * Get locations associated with a resource (via links URL match or sources ID match)

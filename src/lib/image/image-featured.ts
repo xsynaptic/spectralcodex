@@ -1,28 +1,12 @@
 import * as R from 'remeda';
-import { z } from 'zod';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type {
+	ContentMetadataItem,
+	ImageFeaturedWithCaption,
+} from '#lib/metadata/metadata-types.ts';
+import type { ImageFeatured, ImageFeaturedObject } from '#lib/schemas/index.ts';
 
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
-
-// Image featured schemas
-const ImageFeaturedObjectSchema = z.object({
-	id: z.string(),
-	title: z.string().optional(),
-	link: z.string().optional(), // Functions just like a Link component in MDX content
-	hero: z.boolean().optional(),
-});
-
-type ImageFeaturedObject = z.infer<typeof ImageFeaturedObjectSchema>;
-
-export const ImageFeaturedSchema = z.union([
-	z.string(),
-	ImageFeaturedObjectSchema,
-	z.union([z.string(), ImageFeaturedObjectSchema]).array(),
-]);
-
-type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;
 
 // A simple type guard to help maintain type safety
 function isImageFeaturedObject(imageFeatured: ImageFeatured): imageFeatured is ImageFeaturedObject {
@@ -81,26 +65,16 @@ export function getImageHeroId({
 	return fallback ? getImageFeaturedId({ imageFeatured, shuffle }) : undefined;
 }
 
-// Image featured data is sometimes displayed with a caption
-export type ImageFeaturedCaptionMetadata = Pick<
-	ContentMetadataItem,
-	'id' | 'title' | 'titleMultilingual' | 'url'
->;
-
-export type ImageFeaturedObjectWithCaptionMetadata = ImageFeaturedObject & {
-	captionMetadata?: ImageFeaturedCaptionMetadata | undefined;
-};
-
-export async function getImageFeaturedObjectGroup({
+export function getImageFeaturedGroup({
 	imageFeatured,
+	contentMetadataIndex,
 	shuffle = false,
 }: {
 	imageFeatured: ImageFeatured | undefined;
+	contentMetadataIndex: Map<string, ContentMetadataItem>;
 	shuffle?: boolean;
-}): Promise<Array<ImageFeaturedObjectWithCaptionMetadata> | undefined> {
+}): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
-
-	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = [];
 
@@ -151,7 +125,7 @@ export function getImageFeaturedGroupByContentMetadata({
 }: {
 	items: Array<ContentMetadataItem> | undefined;
 	shuffle?: boolean;
-}): Array<ImageFeaturedObjectWithCaptionMetadata> | undefined {
+}): Array<ImageFeaturedWithCaption> | undefined {
 	if (!items || items.length === 0) return;
 
 	const itemsWithImages = items

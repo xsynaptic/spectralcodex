@@ -1,5 +1,5 @@
 ---
-import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
+import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
@@ -7,7 +7,7 @@ import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 
 interface Props {
 	hasHeroImage: boolean;
-	imageFeaturedGroup?: Array<ImageFeaturedObjectWithCaptionMetadata> | undefined;
+	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 	withTitle?: boolean | undefined;
 	class?: string | undefined;
 }

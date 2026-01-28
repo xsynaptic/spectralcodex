@@ -2,8 +2,12 @@ import { reference } from 'astro:content';
 import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
-import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
+import {
+	DateStringSchema,
+	NumericScaleSchema,
+	StylizedTextSchema,
+	ImageFeaturedSchema,
+} from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 // Used by ephemera and posts

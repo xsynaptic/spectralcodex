@@ -1,11 +1,11 @@
 ---
-import type { ImageFeaturedObjectWithCaptionMetadata } from '#lib/image/image-featured.ts';
+import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselItem from '#components/image/image-carousel-item.astro';
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 
 interface Props {
-	imageFeaturedGroup?: Array<ImageFeaturedObjectWithCaptionMetadata> | undefined;
+	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 	class?: string | undefined;
 }
 

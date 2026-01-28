@@ -3,7 +3,7 @@ import { defineCollection } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
-import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
+import { ImageFeaturedSchema } from '#lib/schemas/index.ts';
 
 const archivesSchema = z
 	.object({

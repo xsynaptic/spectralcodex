@@ -20,7 +20,8 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedObjectGroup } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -41,8 +42,11 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
-const imageFeaturedGroup = await getImageFeaturedObjectGroup({
+const contentMetadataIndex = await getContentMetadataIndex();
+
+const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
+	contentMetadataIndex,
 });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;

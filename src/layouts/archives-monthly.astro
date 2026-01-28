@@ -14,8 +14,9 @@ import ProseBody from '#components/parts/prose-body.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import {
 	getImageFeaturedGroupByContentMetadata,
-	getImageFeaturedObjectGroup,
+	getImageFeaturedGroup,
 } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -31,9 +32,14 @@ const { archivesMonthlyItem, archivesYears, archivesMonths } = Astro.props;
 // Check for custom archive entry; this may override generated data
 const { archiveEntry } = archivesMonthlyItem;
 
+const contentMetadataIndex = await getContentMetadataIndex();
+
 // Use custom imageFeatured from archive entry if available, otherwise use generated highlights
 const imageFeaturedGroup = archiveEntry?.data.imageFeatured
-	? await getImageFeaturedObjectGroup({ imageFeatured: archiveEntry.data.imageFeatured })
+	? getImageFeaturedGroup({
+			imageFeatured: archiveEntry.data.imageFeatured,
+			contentMetadataIndex,
+		})
 	: getImageFeaturedGroupByContentMetadata({ items: archivesMonthlyItem.highlights });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;

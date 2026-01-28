@@ -8,12 +8,12 @@ import {
 	publisherMultilingualSchema,
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
-import { ImageFeaturedSchema } from '#lib/image/image-featured.ts';
 import {
 	DateStringSchema,
 	NumericScaleSchema,
 	StylizedTextSchema,
 	UrlSchema,
+	ImageFeaturedSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
