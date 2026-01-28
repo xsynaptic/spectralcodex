@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import pMemoize from 'p-memoize';
+
 import type { MenuItem } from '#lib/main/main-types.ts';
 
 import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
@@ -47,7 +49,7 @@ function filterMenuItemContentCount(depth: 1 | 2 | 3) {
 		(entry.data._postCount ?? 0) + (entry.data._locationCount ?? 0) >= minContentCount;
 }
 
-export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
+async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 	const { regions } = await getRegionsCollection();
 	const getRegionsByIds = await getRegionsByIdsFunction();
 
@@ -143,3 +145,5 @@ export async function getMenuHeaderItems(): Promise<Array<MenuItem>> {
 		},
 	];
 }
+
+export const getMenuHeaderItems = pMemoize(createMenuHeaderItems);

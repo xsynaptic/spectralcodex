@@ -1,4 +1,4 @@
-import slugify from '@sindresorhus/slugify';
+import { hash } from 'ohash';
 
 import type { MenuItem } from '#lib/main/main-types.ts';
 
@@ -11,8 +11,9 @@ export function isActiveMenuItem(item: MenuItem, pathname: string): boolean {
 	return item.children?.some((child) => isActiveMenuItem(child, pathname)) ?? false;
 }
 
+// TODO: investigate whether this is even used for anything
 export function getMenuItemId(item: MenuItem) {
-	return `menu-${slugify(item.title)}`;
+	return `menu-${hash(item.title)}`;
 }
 
 export function getMenuItemAriaLabel(item: MenuItem) {
