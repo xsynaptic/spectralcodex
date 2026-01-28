@@ -37,8 +37,8 @@
 	},
 	"dependencies": {
 		"astro": "6.0.0-beta.3",
-		"react": "^19.2.3",
-		"react-dom": "^19.2.3"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "7.0.0-beta.2",
@@ -48,7 +48,6 @@
 		"@astrojs/rss": "4.0.15-beta.1",
 		"@astrojs/sitemap": "^3.7.0",
 		"@keyv/sqlite": "^4.0.8",
-		"@sindresorhus/slugify": "^3.0.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
 		"@spectralcodex/image-open-graph": "workspace:*",
@@ -59,8 +58,14 @@
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/eslint-plugin-query": "^5.91.3",
+		"@turf/bbox": "^7.3.2",
+		"@turf/boolean-intersects": "^7.3.2",
+		"@turf/buffer": "^7.3.2",
+		"@turf/center": "^7.3.2",
+		"@turf/centroid": "^7.3.2",
+		"@turf/distance": "^7.3.2",
 		"@turf/helpers": "^7.3.2",
-		"@turf/turf": "^7.3.2",
+		"@turf/truncate": "^7.3.2",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.9",
 		"@types/react-dom": "^19.2.3",
@@ -97,7 +102,7 @@
 		"tailwindcss": "^4.1.18",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.53.1",
+		"typescript-eslint": "^8.54.0",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
 		"url-join": "^5.0.0",
@@ -106,5 +111,5 @@
 		"yaml": "^2.8.2",
 		"zod": "4.2.1"
 	},
-	"packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
+	"packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
 }

@@ -2,7 +2,11 @@ import type { MapComponentData, MapComponentProps } from '@spectralcodex/react-m
 import type { BBox } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 
-import { bbox, buffer, distance, truncate, center as turfCenter } from '@turf/turf';
+import { bbox } from '@turf/bbox';
+import { buffer } from '@turf/buffer';
+import { center as turfCenter } from '@turf/center';
+import { distance } from '@turf/distance';
+import { truncate } from '@turf/truncate';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';

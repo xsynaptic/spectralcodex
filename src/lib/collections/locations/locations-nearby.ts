@@ -7,13 +7,11 @@ import {
 	type LocationStatus,
 	LocationStatusEnum,
 } from '@spectralcodex/map-types';
-import {
-	booleanIntersects,
-	centroid,
-	buffer as getBuffer,
-	distance as getDistance,
-	point as getPoint,
-} from '@turf/turf';
+import { booleanIntersects } from '@turf/boolean-intersects';
+import { buffer as getBuffer } from '@turf/buffer';
+import { centroid } from '@turf/centroid';
+import { distance as getDistance } from '@turf/distance';
+import { point as getPoint } from '@turf/helpers';
 
 import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
 

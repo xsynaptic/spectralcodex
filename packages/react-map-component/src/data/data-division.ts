@@ -2,7 +2,9 @@ import type { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson'
 
 import { GeometryTypeEnum } from '@spectralcodex/map-types';
 import { useQuery } from '@tanstack/react-query';
-import { bboxPolygon, difference, featureCollection } from '@turf/turf';
+import { bboxPolygon } from '@turf/bbox-polygon';
+import { difference } from '@turf/difference';
+import { featureCollection } from '@turf/helpers';
 import { geojson } from 'flatgeobuf';
 import ky from 'ky';
 import * as R from 'remeda';
