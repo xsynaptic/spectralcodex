@@ -7,6 +7,8 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+const isStrictLint = process.env.ESLINT_STRICT === '1';
+
 export default getConfig(
 	[
 		{
@@ -24,6 +26,8 @@ export default getConfig(
 			rules: {
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
+				// Expensive rule (~17s); only run in strict mode
+				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
 			},
 		},
 		/**
