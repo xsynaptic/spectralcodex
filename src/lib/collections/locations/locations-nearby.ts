@@ -17,10 +17,16 @@ interface LocationPoint {
 }
 
 /**
- * Extract coordinates from location entries; handles both single Point and MultiPoint geometries.
+ * Extract coordinates from location entries; handles both single Point and MultiPoint geometries
  */
-function extractPoints(locations: Array<CollectionEntry<'locations'>>): Array<LocationPoint> {
-	return locations.flatMap((entry) => {
+function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
+	pointsMap: Map<string, LocationPoint>;
+	pointsIndex: Array<LocationPoint>;
+} {
+	const pointsMap = new Map<string, LocationPoint>();
+	const pointsIndex: Array<LocationPoint> = [];
+
+	for (const entry of locations) {
 		const coordinates = Array.isArray(entry.data.geometry)
 			? centroid({
 					type: GeometryTypeEnum.MultiPoint,
@@ -31,18 +37,20 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): Array<Lo
 		const lng = coordinates[0];
 		const lat = coordinates[1];
 
-		// Skip invalid coordinates
-		if (lng === undefined || lat === undefined) return [];
+		if (lng === undefined || lat === undefined) continue;
 
-		return [
-			{
-				id: entry.id,
-				lng,
-				lat,
-				status: entry.data.status,
-			},
-		];
-	});
+		const point: LocationPoint = {
+			id: entry.id,
+			lng,
+			lat,
+			status: entry.data.status,
+		};
+
+		pointsMap.set(entry.id, point);
+		pointsIndex.push(point);
+	}
+
+	return { pointsMap, pointsIndex };
 }
 
 /**
@@ -50,28 +58,24 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): Array<Lo
  * Post-query filtering handles status checks (demolished, etc.)
  */
 export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
-	const points = extractPoints(locations);
+	const { pointsMap, pointsIndex } = extractPoints(locations);
 
 	// Build spatial index from all points (no pre-filtering)
-	const index = new GeospatialIndex(points.length);
+	const index = new GeospatialIndex(pointsIndex.length);
 
-	for (const point of points) {
+	for (const point of pointsIndex) {
 		index.add(point.lng, point.lat);
 	}
 
 	index.finish();
 
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
-		const entryIndex = points.findIndex((p) => p.id === entry.id);
-
-		if (entryIndex === -1) return;
-
-		const entryPoint = points[entryIndex];
+		const entryPoint = pointsMap.get(entry.id);
 
 		if (!entryPoint) return;
 
 		// Query for more than we need to account for post-filtering
-		const nearbyIndices = getPointsAround(
+		const pointsAroundIds = getPointsAround(
 			index,
 			entryPoint.lng,
 			entryPoint.lat,
@@ -81,8 +85,8 @@ export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<
 
 		const nearby: Array<LocationsNearbyItem> = [];
 
-		for (const idx of nearbyIndices) {
-			const point = points[idx];
+		for (const pointsAroundId of pointsAroundIds) {
+			const point = pointsIndex[pointsAroundId];
 
 			// Skip invalid points and self
 			if (!point || point.id === entry.id) continue;
