@@ -164,6 +164,39 @@ export default defineConfig({
 			},
 		}),
 	],
+	// Note: fallback fonts are handled in `styles/themes/fonts.css`
+	fonts: [
+		{
+			provider: fontProviders.fontsource(),
+			name: 'Commissioner',
+			cssVariable: '--font-commissioner',
+			weights: ['300 700'],
+			styles: ['normal'],
+			subsets: ['latin', 'vietnamese'],
+			fallbacks: [],
+			optimizedFallbacks: false,
+		},
+		{
+			provider: fontProviders.fontsource(),
+			name: 'Geologica',
+			cssVariable: '--font-geologica',
+			weights: ['300 700'],
+			styles: ['normal'],
+			subsets: ['latin', 'vietnamese'],
+			fallbacks: [],
+			optimizedFallbacks: false,
+		},
+		{
+			provider: fontProviders.fontsource(),
+			name: 'Lora',
+			cssVariable: '--font-lora',
+			weights: ['300 700'],
+			styles: ['normal', 'italic'],
+			subsets: ['latin', 'vietnamese'],
+			fallbacks: [],
+			optimizedFallbacks: false,
+		},
+	],
 	i18n: {
 		defaultLocale: 'en',
 		locales: [
@@ -175,39 +208,6 @@ export default defineConfig({
 		],
 	},
 	experimental: {
-		// Note: fallback fonts are handled in `styles/themes/fonts.css`
-		fonts: [
-			{
-				provider: fontProviders.fontsource(),
-				name: 'Commissioner',
-				cssVariable: '--font-commissioner',
-				weights: ['300 700'],
-				styles: ['normal'],
-				subsets: ['latin', 'vietnamese'],
-				fallbacks: [],
-				optimizedFallbacks: false,
-			},
-			{
-				provider: fontProviders.fontsource(),
-				name: 'Geologica',
-				cssVariable: '--font-geologica',
-				weights: ['300 700'],
-				styles: ['normal'],
-				subsets: ['latin', 'vietnamese'],
-				fallbacks: [],
-				optimizedFallbacks: false,
-			},
-			{
-				provider: fontProviders.fontsource(),
-				name: 'Lora',
-				cssVariable: '--font-lora',
-				weights: ['300 700'],
-				styles: ['normal', 'italic'],
-				subsets: ['latin', 'vietnamese'],
-				fallbacks: [],
-				optimizedFallbacks: false,
-			},
-		],
 		contentIntellisense: true,
 	},
 });

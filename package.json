@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.6.0",
+	"version": "6.6.1",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -37,13 +37,13 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.0-beta.5",
+		"astro": "^6.0.0-beta.6",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.0.0-beta.2",
-		"@astrojs/mdx": "^5.0.0-beta.2",
+		"@astrojs/markdown-remark": "^7.0.0-beta.3",
+		"@astrojs/mdx": "^5.0.0-beta.3",
 		"@astrojs/node": "^10.0.0-beta.0",
 		"@astrojs/react": "^5.0.0-beta.3",
 		"@astrojs/rss": "4.0.15-beta.2",
