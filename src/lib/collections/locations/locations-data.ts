@@ -7,7 +7,7 @@ import pMemoize from 'p-memoize';
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.ts';
+import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
@@ -164,7 +164,7 @@ async function generateCollection(): Promise<CollectionData> {
 	for (const entry of locations) {
 		generateLocationPostData(entry);
 		await generateLocationMapData(entry);
-		generateNearbyItems?.(entry);
+		generateNearbyItems(entry);
 	}
 
 	await generateLocationImageData(locations);

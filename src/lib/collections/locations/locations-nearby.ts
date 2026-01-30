@@ -1,129 +1,108 @@
-import type { Units } from '@turf/helpers';
 import type { CollectionEntry } from 'astro:content';
-import type { Position } from 'geojson';
 
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/map-types';
-import { booleanIntersects } from '@turf/boolean-intersects';
-import { buffer as getBuffer } from '@turf/buffer';
 import { centroid } from '@turf/centroid';
-import { distance as getDistance } from '@turf/distance';
-import { point as getPoint } from '@turf/helpers';
+import { around as getPointsAround, distance as getDistance } from 'geokdbush';
+import GeospatialIndex from 'kdbush';
 
 import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
 
-import { FEATURE_LOCATION_NEARBY_ITEMS } from '#constants.ts';
+import { LOCATIONS_NEARBY_COUNT_LIMIT, LOCATIONS_NEARBY_DISTANCE_LIMIT } from '#constants.ts';
 
-const LOCATIONS_NEARBY_COUNT_LIMIT = 25; // Max number of locations returned
-const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // Everything within 10 km
-const LOCATIONS_NEARBY_DISTANCE_UNITS: Units = 'kilometers';
-
-interface LocationNearbyData {
-	distances: Map<string, number>;
-	points: Array<{
-		id: string;
-		status: string; // Actual type: LocationStatus; we simplify this here for performance reasons
-		coordinates: Position;
-	}>;
+interface LocationPoint {
+	id: string;
+	lng: number;
+	lat: number;
+	status: string;
 }
 
-// A simple function for creating reliable IDs for distance pair calculations
-function getDistanceId(idA: string, idB: string) {
-	return [idA, idB].sort().join('-');
-}
+/**
+ * Extract coordinates from location entries; handles both single Point and MultiPoint geometries.
+ */
+function extractPoints(locations: Array<CollectionEntry<'locations'>>): Array<LocationPoint> {
+	return locations.flatMap((entry) => {
+		const coordinates = Array.isArray(entry.data.geometry)
+			? centroid({
+					type: GeometryTypeEnum.MultiPoint,
+					coordinates: entry.data.geometry.map((point) => point.coordinates),
+				}).geometry.coordinates
+			: entry.data.geometry.coordinates;
 
-function getLocationNearbyDistances(
-	locations: Array<CollectionEntry<'locations'>>,
-): LocationNearbyData {
-	// In-memory cache of distances; this way we can do half the number of operations
-	// Because for single points, A<->B is the same as B<->A
-	const distances = new Map<string, number>();
+		const lng = coordinates[0];
+		const lat = coordinates[1];
 
-	// Currently we only calculate nearby locations for Point geometry
-	// This operation also simplifies the data structure to just the essentials
-	const points = locations.map((entry) => {
-		return Array.isArray(entry.data.geometry)
-			? {
-					id: entry.id,
-					status: entry.data.status,
-					coordinates: centroid({
-						type: GeometryTypeEnum.MultiPoint,
-						coordinates: entry.data.geometry.map((point) => point.coordinates),
-					}).geometry.coordinates,
-				}
-			: {
-					id: entry.id,
-					status: entry.data.status,
-					coordinates: entry.data.geometry.coordinates,
-				};
+		// Skip invalid coordinates
+		if (lng === undefined || lat === undefined) return [];
+
+		return [
+			{
+				id: entry.id,
+				lng,
+				lat,
+				status: entry.data.status,
+			},
+		];
 	});
+}
 
-	// Calculate distances between all points
-	for (let i = 0; i < points.length; i++) {
-		const entryA = points[i];
+/**
+ * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
+ * Post-query filtering handles status checks (demolished, etc.)
+ */
+export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
+	const points = extractPoints(locations);
 
-		if (!entryA) continue;
+	// Build spatial index from all points (no pre-filtering)
+	const index = new GeospatialIndex(points.length);
 
-		// This buffer allows us to simplify operations and only consider points within a certain range
-		// This is a little expensive but for large number of points actually saves us time
-		const buffer = getBuffer(getPoint(entryA.coordinates), LOCATIONS_NEARBY_DISTANCE_LIMIT, {
-			units: LOCATIONS_NEARBY_DISTANCE_UNITS,
-		});
-
-		if (!buffer) continue;
-
-		for (let j = i + 1; j < points.length; j++) {
-			const entryB = points[j];
-
-			if (!entryB) continue;
-
-			if (booleanIntersects(buffer, getPoint(entryB.coordinates))) {
-				const distanceId = getDistanceId(entryA.id, entryB.id);
-				const distance = distances.get(distanceId);
-
-				if (!distance) {
-					const distanceValue = getDistance(entryA.coordinates, entryB.coordinates, {
-						units: LOCATIONS_NEARBY_DISTANCE_UNITS,
-					});
-
-					distances.set(distanceId, distanceValue);
-				}
-			}
-		}
+	for (const point of points) {
+		index.add(point.lng, point.lat);
 	}
 
-	return { distances, points };
-}
+	index.finish();
 
-// This calculation is expensive; disable it with a feature flag if needed
-export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
-	if (!FEATURE_LOCATION_NEARBY_ITEMS) return;
-
-	const { distances, points } = getLocationNearbyDistances(locations);
-
-	// Now return the function that handles the calculation for a specific location
-	// Note: we ignore demolished locations
 	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
-		const nearby = points
-			.filter((point) => point.status !== LocationStatusEnum.Demolished)
-			.map((point) => {
-				if (entry.id === point.id) return;
+		const entryIndex = points.findIndex((p) => p.id === entry.id);
 
-				const distanceId = getDistanceId(entry.id, point.id);
-				const distance = distances.get(distanceId);
+		if (entryIndex === -1) return;
 
-				return distance && distance > 0
-					? {
-							locationId: point.id,
-							distance,
-							distanceDisplay: distance.toFixed(2),
-						}
-					: undefined;
-			})
-			.filter((item) => !!item)
-			.sort((a, b) => a.distance - b.distance)
-			.slice(0, LOCATIONS_NEARBY_COUNT_LIMIT) satisfies Array<LocationsNearbyItem>;
+		const entryPoint = points[entryIndex];
 
-		// If we have nearby points let's add data to the actual location entry
+		if (!entryPoint) return;
+
+		// Query for more than we need to account for post-filtering
+		const nearbyIndices = getPointsAround(
+			index,
+			entryPoint.lng,
+			entryPoint.lat,
+			LOCATIONS_NEARBY_COUNT_LIMIT * 2,
+			LOCATIONS_NEARBY_DISTANCE_LIMIT,
+		);
+
+		const nearby: Array<LocationsNearbyItem> = [];
+
+		for (const idx of nearbyIndices) {
+			const point = points[idx];
+
+			// Skip invalid points and self
+			if (!point || point.id === entry.id) continue;
+
+			// Post-index filtering: skip demolished locations
+			if (point.status === LocationStatusEnum.Demolished) continue;
+
+			const dist = getDistance(entryPoint.lng, entryPoint.lat, point.lng, point.lat);
+
+			if (dist > 0) {
+				nearby.push({
+					locationId: point.id,
+					distance: dist,
+					distanceDisplay: dist.toFixed(2),
+				});
+			}
+
+			if (nearby.length >= LOCATIONS_NEARBY_COUNT_LIMIT) break;
+		}
+
 		if (nearby.length > 0) {
 			entry.data._nearby = nearby;
 		}

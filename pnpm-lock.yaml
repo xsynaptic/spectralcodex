@@ -153,9 +153,15 @@ importers:
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
+      geokdbush:
+        specifier: ^2.0.1
+        version: 2.0.1
       globals:
         specifier: ^17.2.0
         version: 17.2.0
+      kdbush:
+        specifier: ^4.0.2
+        version: 4.0.2
       keyv:
         specifier: ^5.6.0
         version: 5.6.0

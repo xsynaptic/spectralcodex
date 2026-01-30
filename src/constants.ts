@@ -20,6 +20,15 @@ export const IMAGE_QUALITY = 88 as const;
 export const IMAGE_FORMAT = 'jpg' as const;
 
 /**
+ * Location configuration
+ */
+// Max number of locations returned
+export const LOCATIONS_NEARBY_COUNT_LIMIT = 20;
+
+// Maximum distance in kilometers for nearby locations
+export const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // km
+
+/**
  * Map configuration
  */
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
@@ -76,9 +85,6 @@ export const SITE_YEAR_FOUNDED = 2009;
  */
 // Image metadata generation; set to "true" to enable
 export const FEATURE_IMAGE_METADATA = import.meta.env.PROD;
-
-// Nearby items are the single most expensive data generated in this project
-export const FEATURE_LOCATION_NEARBY_ITEMS = import.meta.env.PROD;
 
 // Generate open graph images with Satori
 export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;

@@ -107,6 +107,18 @@ export default defineConfig({
 				ignored: ['./*.md'],
 			},
 		},
+		optimizeDeps: {
+			include: [
+				'@turf/bbox',
+				'@turf/boolean-intersects',
+				'@turf/buffer',
+				'@turf/center',
+				'@turf/centroid',
+				'@turf/distance',
+				'@turf/helpers',
+				'@turf/truncate',
+			],
+		},
 	},
 	markdown: {
 		remarkPlugins: [remarkImgGroup],
