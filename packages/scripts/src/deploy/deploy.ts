@@ -38,6 +38,12 @@ try {
 	// Ignore
 }
 
+// Note: because our content validation scripts rely on data-store.json we need to sync first
+async function sync() {
+	console.log(chalk.blue('Syncing content...'));
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro sync`;
+}
+
 async function validate() {
 	console.log(chalk.blue('Validating content...'));
 	await $({ stdio: 'inherit' })`pnpm content-validate --root-path=${rootPath}`;
@@ -103,6 +109,7 @@ async function warmNew() {
 }
 
 try {
+	await sync();
 	await validate();
 	await related();
 	await opengraph();
