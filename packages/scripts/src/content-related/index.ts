@@ -49,7 +49,7 @@ const { values } = parseArgs({
 		},
 		'character-limit': {
 			type: 'string',
-			default: '2000',
+			default: '5000',
 		},
 		'result-count': {
 			type: 'string',
@@ -102,7 +102,7 @@ const ModelIdEnum = {
 } as const;
 
 // Note: changing models will regenerate all embeddings (cache is model-specific)
-const MODEL_ID = ModelIdEnum.MiniLm;
+const MODEL_ID = ModelIdEnum.MpNet;
 
 /**
  * Clean content for embedding using unified tools
