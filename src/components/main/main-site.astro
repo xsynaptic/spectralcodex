@@ -18,9 +18,10 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 interface Props {
 	meta?: MetaProps;
 	hasHeroImage?: boolean;
+	isHomepage?: boolean;
 }
 
-const { hasHeroImage = false, meta } = Astro.props;
+const { hasHeroImage = false, meta, isHomepage = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -59,7 +60,7 @@ const { hasHeroImage = false, meta } = Astro.props;
 			'flex min-h-screen min-w-[350px] flex-col overscroll-contain transition-colors',
 		]}
 	>
-		<MainHeader hasHeroImage={hasHeroImage} />
+		<MainHeader hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
 		<main id="content" class="flex-1">
 			<slot />
 		</main>

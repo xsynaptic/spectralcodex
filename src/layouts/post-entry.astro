@@ -80,7 +80,9 @@ const { Content } = await render(entry);
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
-					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
+					<a href={Astro.url.toString()} class="p-name p-url" aria-hidden="true" tabindex="-1"
+						>{entry.data.title}</a
+					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
@@ -110,7 +112,7 @@ const { Content } = await render(entry);
 		<ContentSectionBacklinks backlinks={backlinks} />
 		<ContentSectionSeries entry={entry} />
 		<ContentSectionMap mapData={mapData} />
-		<ContentSectionRelated entry={entry} />
+		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
 		<ContentSectionAuthor showAuthor={false} />
 	</article>
 </MainSite>

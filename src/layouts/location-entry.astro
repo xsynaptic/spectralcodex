@@ -89,7 +89,9 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<ImageHero class="sm:mb-small" hasHeroImage={hasHeroImage} imageId={imageHeroId} alt={title}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
-					<a href={Astro.url.toString()} class="p-name p-url">{entry.data.title}</a>
+					<a href={Astro.url.toString()} class="p-name p-url" aria-hidden="true" tabindex="-1"
+						>{entry.data.title}</a
+					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
