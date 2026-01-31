@@ -41,7 +41,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Popups, clustering, filtering by objectives, and responsive design
 - Administrative boundaries are sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rending on region maps
 - Persistent storage of map data via IndexedDB
-- Distance-based discovery system for geographic content via nearby locations feature
+- Distance-based discovery system for geographic content via nearby locations feature, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
 
 ### Search & Discovery
 
