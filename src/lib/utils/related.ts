@@ -1,4 +1,4 @@
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -42,7 +42,7 @@ const RelatedContentItemSchema = z
 	.optional();
 
 async function loadRelatedContentData() {
-	const filePath = path.join(CACHE_DIR, 'content-related/content-related.json');
+	const filePath = path.join(CUSTOM_CACHE_PATH, 'content-related/content-related.json');
 
 	try {
 		const relatedContent = await loadJsonData(filePath);

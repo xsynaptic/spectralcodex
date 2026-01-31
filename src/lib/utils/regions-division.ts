@@ -1,4 +1,4 @@
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import pMemoize from 'p-memoize';
@@ -9,7 +9,7 @@ import pMemoize from 'p-memoize';
  */
 const loadRegionDivisionsSvgCache = pMemoize(async (): Promise<Map<string, string>> => {
 	const cache = new Map<string, string>();
-	const divisionsPath = path.join(process.cwd(), CACHE_DIR, 'divisions');
+	const divisionsPath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions');
 
 	try {
 		const files = await readdir(divisionsPath);

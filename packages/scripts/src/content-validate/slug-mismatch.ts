@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 import path from 'node:path';
+import { z } from 'zod';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
-
-import { SlugSchema } from '../content-utils/schemas';
 
 export function checkSlugMismatches(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallMismatchCount = 0;
@@ -20,7 +19,7 @@ export function checkSlugMismatches(entriesByCollection: Array<[string, Array<Da
 		let mismatchCount = 0;
 
 		for (const entry of entries) {
-			const slug = SlugSchema.optional().parse(entry.data.slug);
+			const slug = z.string().optional().parse(entry.data.slug);
 			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
 
 			try {

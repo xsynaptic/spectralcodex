@@ -3,10 +3,13 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
+import type { DataStoreEntry } from '../content-utils/data-store';
+
 import { getCollection, loadDataStore } from '../content-utils/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkImageReferences } from './images';
 import { checkLocationsCoordinates } from './locations-coordinates';
+import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
@@ -45,9 +48,7 @@ const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];
 
-type CollectionEntries = Array<
-	[string, Array<import('../content-utils/data-store').DataStoreEntry>]
->;
+type CollectionEntries = Array<[string, Array<DataStoreEntry>]>;
 
 const checkSlugCollections: CollectionEntries = [
 	['ephemera', getCollection(collections, 'ephemera')],
@@ -105,6 +106,11 @@ switch (command) {
 		);
 		break;
 	}
+	// Check for duplicate location data (slugs, titles, addresses, links)
+	case 'location-duplicates': {
+		checkLocationsDuplicates(getCollection(collections, 'locations'));
+		break;
+	}
 	// Check for regions without a divisionId
 	case 'divisions': {
 		checkDivisionIds(getCollection(collections, 'regions'));
@@ -153,6 +159,10 @@ switch (command) {
 		const qualitySuccess = checkContentQuality(qualityCollections);
 
 		if (!qualitySuccess) process.exit(1);
+
+		const duplicatesSuccess = checkLocationsDuplicates(getCollection(collections, 'locations'));
+
+		if (!duplicatesSuccess) process.exit(1);
 
 		const regionSuccess = checkLocationsRegions(getCollection(collections, 'locations'));
 

@@ -5,7 +5,7 @@ import type {
 import type { CollectionEntry } from 'astro:content';
 
 import { getGenerateOpenGraphImageFunction as getBaseGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -18,7 +18,7 @@ interface CacheMetadata {
 	sourceImageModifiedTime?: string | undefined;
 }
 
-const OPENGRAPH_IMAGE_SATORI_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image');
+const OPENGRAPH_IMAGE_SATORI_CACHE_DIR = path.join(CUSTOM_CACHE_PATH, 'opengraph-image');
 
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking

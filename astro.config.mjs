@@ -14,7 +14,6 @@ import { loadEnv } from 'vite';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
 const {
-	CACHE_DIR = './node_modules/.astro',
 	DEV_SERVER_URL = 'http://localhost:4321/',
 	PROD_SERVER_URL,
 	BUILD_ASSETS_PATH,
@@ -33,7 +32,8 @@ export default defineConfig({
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
-	cacheDir: CACHE_DIR,
+	// Use .astro for data-store (matching dev server behavior)
+	cacheDir: './.astro',
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
@@ -44,12 +44,6 @@ export default defineConfig({
 		: {}),
 	env: {
 		schema: {
-			CACHE_DIR: envField.string({
-				context: 'server',
-				access: 'public',
-				optional: true,
-				default: CACHE_DIR,
-			}),
 			CONTENT_DATA_PATH: envField.string({
 				context: 'server',
 				access: 'public',
@@ -59,6 +53,12 @@ export default defineConfig({
 				context: 'server',
 				access: 'public',
 				default: 'packages/content-demo/media',
+			}),
+			CUSTOM_CACHE_PATH: envField.string({
+				context: 'server',
+				access: 'public',
+				optional: true,
+				default: './node_modules/.astro',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				context: 'client',

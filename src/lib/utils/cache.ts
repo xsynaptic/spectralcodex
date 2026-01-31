@@ -1,7 +1,7 @@
 import type { KeyvOptions } from 'keyv';
 
 import KeyvSqlite from '@keyv/sqlite';
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import Keyv from 'keyv';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -14,7 +14,7 @@ import pMemoize from 'p-memoize';
 export function getCacheInstance(namespace: string, options?: KeyvOptions) {
 	return new Keyv({
 		store: new KeyvSqlite({
-			uri: `sqlite://${path.join(CACHE_DIR, `${namespace}.sqlite`)}`,
+			uri: `sqlite://${path.join(CUSTOM_CACHE_PATH, `${namespace}.sqlite`)}`,
 			table: 'cache',
 			busyTimeout: 10_000,
 			...options,

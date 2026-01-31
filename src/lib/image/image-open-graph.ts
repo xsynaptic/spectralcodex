@@ -1,6 +1,6 @@
 import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import pMemoize from 'p-memoize';
@@ -15,7 +15,7 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
 import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
 
-const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CACHE_DIR, 'opengraph-image');
+const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CUSTOM_CACHE_PATH, 'opengraph-image');
 
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking

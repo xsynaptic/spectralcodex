@@ -2,7 +2,7 @@ import type { OpenGraphMetadataItem } from '@spectralcodex/image-open-graph';
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { loadOpenGraphImageFonts } from '@spectralcodex/image-open-graph';
-import { CACHE_DIR } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import path from 'node:path';
 import pLimit from 'p-limit';
 import * as R from 'remeda';
@@ -24,7 +24,7 @@ export const getStaticPaths = (async () => {
 	const getContentMetadata = await getContentMetadataFunction();
 
 	const openGraphImageFonts = await loadOpenGraphImageFonts({
-		cacheDir: path.join(CACHE_DIR, 'opengraph-fonts'),
+		cacheDir: path.join(CUSTOM_CACHE_PATH, 'opengraph-fonts'),
 		fontConfigs: [
 			{
 				family: 'Geologica',

@@ -17,7 +17,6 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { validateLocations } from '#lib/metadata/metadata-validate.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getWordCount } from '#lib/utils/word-count.ts';
@@ -82,9 +81,6 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	// Regions require some special handling; this will calculate a common ancestor if necessary
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
-
-	// Check some additional location properties in development
-	if (import.meta.env.DEV) validateLocations(locations);
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
 	for (const collection of [pages, posts, ephemera, locations, regions, themes, series]) {
