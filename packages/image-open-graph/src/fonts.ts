@@ -48,7 +48,7 @@ async function loadFontData({
 
 		const buffer = await fs.readFile(cachePath);
 
-		return buffer.buffer as ArrayBuffer;
+		return buffer.buffer;
 	} catch {
 		const url = `https://cdn.jsdelivr.net/npm/@fontsource/${familyLower}@latest/files/${filename}`;
 

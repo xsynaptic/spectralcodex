@@ -6,6 +6,7 @@ minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
   - astro
+  - '@astrojs/internal-helpers'
   - '@astrojs/markdown-remark'
   - '@astrojs/mdx'
   - '@astrojs/node'
