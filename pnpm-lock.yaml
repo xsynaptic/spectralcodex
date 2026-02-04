@@ -493,6 +493,12 @@ importers:
       '@duckdb/node-api':
         specifier: 1.4.4-r.1
         version: 1.4.4-r.1
+      '@fontsource/geologica':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/noto-sans-tc':
+        specifier: ^5.2.8
+        version: 5.2.9
       '@huggingface/transformers':
         specifier: ^3.8.1
         version: 3.8.1
@@ -541,6 +547,9 @@ importers:
       remeda:
         specifier: ^2.33.4
         version: 2.33.4
+      satori:
+        specifier: ^0.19.1
+        version: 0.19.1
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -1221,6 +1230,12 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@fontsource/geologica@5.2.8':
+    resolution: {integrity: sha512-yZKBLK1jdlO5oet8MUXU4Gb5a2q+c70a3mti0w/6tl9uBC9gbb2SMxPWUBukHtnYZOVxQ88mp1/+BXwHQMRrlw==}
+
+  '@fontsource/noto-sans-tc@5.2.9':
+    resolution: {integrity: sha512-Z+pXTvXYrip79lPV9X1lCYO3UTys55P25VqcifDStIzdZ86I4R6t8dz+NhGd09YdbvHWvOCB5Icw1m7glKHPNQ==}
 
   '@gar/promisify@1.1.3':
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
@@ -8197,6 +8212,10 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@fontsource/geologica@5.2.8': {}
+
+  '@fontsource/noto-sans-tc@5.2.9': {}
 
   '@gar/promisify@1.1.3':
     optional: true
