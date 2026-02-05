@@ -1,4 +1,4 @@
-import { hash } from 'ohash';
+import { hash } from '@spectralcodex/utils';
 
 import type { MenuItem } from '#lib/main/main-types.ts';
 

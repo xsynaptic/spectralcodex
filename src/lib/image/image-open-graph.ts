@@ -1,5 +1,6 @@
 import type { FormatEnum, JpegOptions, PngOptions, WebpOptions } from 'sharp';
 
+import { cacheFileExists, getCacheInstance } from '@spectralcodex/utils';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -13,14 +14,13 @@ import {
 import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageObject } from '#lib/image/image-file-handling.ts';
-import { cacheFileExists, getCacheInstance } from '#lib/utils/cache.ts';
 
 const OPENGRAPH_IMAGE_CACHE_DIR = path.join(CUSTOM_CACHE_PATH, 'opengraph-image');
 
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking
  */
-const cacheInstance = getCacheInstance('opengraph');
+const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'opengraph');
 
 /**
  * Load pre-generated OG images from public directory

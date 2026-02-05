@@ -1,7 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { getCacheInstance, hashShort } from '@spectralcodex/utils/cache';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import pMemoize from 'p-memoize';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
@@ -12,7 +14,6 @@ import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface CollectionData {
@@ -20,7 +21,7 @@ interface CollectionData {
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
-const cacheInstance = getCacheInstance('locations-map-data');
+const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
@@ -118,14 +119,13 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 }
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	const locationMapDataHash = hashData({
+	const locationMapDataHash = hashShort({
 		data: {
 			id: entry.id,
 			title: entry.data.title,
 			description: entry.data.description,
 			links: entry.data.links,
 		},
-		short: true,
 	});
 
 	entry.data._uuid = locationMapDataHash;

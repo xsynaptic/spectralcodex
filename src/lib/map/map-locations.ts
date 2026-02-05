@@ -13,13 +13,13 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
+import { hashShort } from '@spectralcodex/utils';
 import { featureCollection } from '@turf/helpers';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
-import { hashData } from '#lib/utils/cache.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
 	const truncatedCoordinates = coordinates
@@ -227,8 +227,8 @@ export function getLocationsMapApiHashes(featureCollection: MapFeatureCollection
 	const popupData = getLocationsMapPopupData(featureCollection);
 
 	return {
-		sourceHash: hashData({ data: sourceData, short: true }),
-		popupHash: hashData({ data: popupData, short: true }),
+		sourceHash: hashShort({ data: sourceData }),
+		popupHash: hashShort({ data: popupData }),
 	};
 }
 

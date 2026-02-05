@@ -5,12 +5,11 @@ import type {
 import type { CollectionEntry } from 'astro:content';
 
 import { getGenerateOpenGraphImageFunction as getBaseGenerateOpenGraphImageFunction } from '@spectralcodex/image-open-graph';
+import { cacheFileExists, getCacheInstance, hash } from '@spectralcodex/utils';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-
-import { cacheFileExists, getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
 interface CacheMetadata {
 	generatedAt: string;
@@ -23,7 +22,7 @@ const OPENGRAPH_IMAGE_SATORI_CACHE_DIR = path.join(CUSTOM_CACHE_PATH, 'opengraph
 /**
  * Initialize Keyv with SQLite backend for timestamp tracking
  */
-const cacheInstance = getCacheInstance('opengraph-satori');
+const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'opengraph-satori');
 
 /**
  * Create a cached wrapper around the Satori-based OpenGraph image generator
@@ -45,7 +44,7 @@ export function getGenerateOpenGraphImageFunction(satoriOptions: OpenGraphSatori
 		const cachePath = path.join(OPENGRAPH_IMAGE_SATORI_CACHE_DIR, cacheFilename);
 
 		// Compute hash of metadata
-		const currentMetadataHash = hashData({ data: metadataItem });
+		const currentMetadataHash = hash({ data: metadataItem });
 
 		// Get cached record
 		const cachedString = await cacheInstance.get<string | undefined>(metadataItem.id);

@@ -1,3 +1,5 @@
+import { getCacheInstance, hash } from '@spectralcodex/utils';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
 
@@ -5,7 +7,6 @@ import type { ImageFitOption, ImagePlaceholderProps } from '#lib/image/image-typ
 
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
-import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
@@ -56,7 +57,7 @@ async function generatePlaceholderDataUrl({
  * For cropped placeholders, pass the target display aspect ratio
  */
 async function createImagePlaceholderFunction() {
-	const cache = getCacheInstance('image-placeholders');
+	const cache = getCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
 
 	const getImageById = await getImageByIdFunction();
 
@@ -85,7 +86,7 @@ async function createImagePlaceholderFunction() {
 		// Normalize aspect ratio for consistent cache keys
 		const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
 
-		const cacheKey = hashData({
+		const cacheKey = hash({
 			data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime },
 		});
 

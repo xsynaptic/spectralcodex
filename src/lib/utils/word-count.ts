@@ -1,14 +1,15 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
+import { getCacheInstance, hash } from '@spectralcodex/utils';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
-import { getCacheInstance, hashData } from '#lib/utils/cache.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
-const cacheInstance = getCacheInstance('word-counts');
+const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
 
 /**
  * Generate word count from content body
@@ -33,7 +34,7 @@ function computeWordCount(body: string): number {
 export async function getWordCount(
 	entry: CollectionEntry<CollectionKey>,
 ): Promise<number | undefined> {
-	const hash = hashData({
+	const hashValue = hash({
 		data: {
 			id: entry.id,
 			body: entry.body,
@@ -41,7 +42,7 @@ export async function getWordCount(
 		},
 	});
 
-	const cachedCount = await cacheInstance.get<number>(hash);
+	const cachedCount = await cacheInstance.get<number>(hashValue);
 
 	// Check cache first
 	if (cachedCount !== undefined) {
@@ -61,7 +62,7 @@ export async function getWordCount(
 		wordCount = computeWordCount(entry.data.description);
 	}
 
-	await cacheInstance.set(hash, wordCount);
+	await cacheInstance.set(hashValue, wordCount);
 
 	return wordCount;
 }
