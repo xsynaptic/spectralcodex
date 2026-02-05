@@ -1,4 +1,4 @@
-import type { FontStyle, FontWeight, SatoriOptions } from 'satori';
+import type { FontStyle, FontWeight } from 'satori';
 
 export interface OpenGraphMetadataItem {
 	collection: string;
@@ -22,7 +22,3 @@ export interface OpenGraphFontConfig {
 	name: string;
 	variants: Array<OpenGraphFontVariant>;
 }
-
-export type OpenGraphSatoriOptions = SatoriOptions & {
-	density?: number;
-};

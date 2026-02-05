@@ -2,7 +2,7 @@ import type { OpenGraphMetadataItem } from './types.js';
 
 const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
 
-function SafeZoneOverlay() {
+function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
 	if (!SHOW_SAFE_ZONE_OVERLAY) return;
 
 	// Canvas: 1200 × 630
@@ -10,7 +10,7 @@ function SafeZoneOverlay() {
 	// Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
 	const overlayStyle = {
 		position: 'absolute' as const,
-		background: 'rgba(255, 0, 0, 0.5)',
+		background: `rgba(255, 0, 0, ${opacity})`,
 	};
 
 	return (
@@ -27,52 +27,74 @@ function SafeZoneOverlay() {
 	);
 }
 
-function Brand() {
+function TitleSite({ luminance }: { luminance?: number | undefined }) {
+	const brandLabel = 'Spectral Codex'.toUpperCase().trim();
+
+	// Letter spacing is also added AFTER characters
+	const letterSpacing = '56px';
+
 	const commonStyles = {
 		fontFamily: 'Lora',
-		fontSize: '24px',
+		fontSize: '26px',
 		fontWeight: 700,
-		letterSpacing: '30px',
+		letterSpacing,
 		lineHeight: 1.25,
-		padding: '0 120px',
+		maxWidth: '1200px',
+		paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
 	} as const;
 
+	const showInverted = luminance && luminance >= 200;
+
 	return (
-		<div style={{ display: 'flex', position: 'absolute', top: '60px' }}>
+		<div
+			style={{
+				display: 'flex',
+				position: 'absolute',
+				top: '60px',
+			}}
+		>
 			<div
 				style={{
 					color: 'transparent',
 					position: 'absolute',
-					textShadow: `1px 1px 3px rgb(24, 24, 27, 0.4)`,
+					textShadow: showInverted
+						? `0px 0px 3px rgb(220, 220, 225, 0.6)`
+						: `0px 0px 3px rgb(24, 24, 27, 0.4)`,
 					...commonStyles,
 				}}
 			>
-				SPECTRAL CODEX
+				{brandLabel}
 			</div>
 			<div
 				style={{
-					color: '#ffffff',
+					color: showInverted ? 'rgb(24, 24, 27)' : '#ffffff',
 					...commonStyles,
 				}}
 			>
-				SPECTRAL CODEX
+				{brandLabel}
 			</div>
 		</div>
 	);
 }
 
-function TitleMultiLingual({
+/**
+ * Multilingual title support requires different params and styles for each language
+ */
+function TitleMultilingual({
 	titleZh,
 	titleJa,
 	titleTh,
+	luminance,
 }: {
 	titleZh?: string | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
+	luminance?: number | undefined;
 }) {
 	const commonStyles = {
 		display: 'block', // Necessary for line clamp
 		lineClamp: 1,
+		maxWidth: '960px',
 		padding: '0 120px',
 	} as const;
 
@@ -109,13 +131,17 @@ function TitleMultiLingual({
 		lang = 'th';
 	}
 
+	const showInverted = luminance && luminance >= 200;
+
 	return (
 		<div style={{ display: 'flex' }}>
 			<div
 				style={{
 					color: 'transparent',
 					position: 'absolute',
-					textShadow: `1px 1px 4px rgb(12, 12, 14, 0.6)`,
+					textShadow: showInverted
+						? `0px 0px 4px rgb(220, 220, 225, 0.6)`
+						: `1px 1px 4px rgb(12, 12, 14, 0.6)`,
 					...langStyles,
 					...commonStyles,
 				}}
@@ -126,7 +152,9 @@ function TitleMultiLingual({
 			<div
 				style={{
 					backgroundClip: 'text',
-					backgroundImage: 'linear-gradient(to bottom, #fef9ec, #f4da93)',
+					backgroundImage: showInverted
+						? 'linear-gradient(to bottom, #18181b, #27272a)'
+						: 'linear-gradient(to bottom, #fef9ec, #f4da93)',
 					color: 'transparent',
 					...langStyles,
 					...commonStyles,
@@ -139,7 +167,7 @@ function TitleMultiLingual({
 	);
 }
 
-function Title({ title }: { title: string }) {
+function Title({ title, luminance }: { title: string; luminance?: number | undefined }) {
 	const commonStyles = {
 		display: 'block', // Necessary for line clamp
 		fontFamily: 'Lora',
@@ -147,8 +175,11 @@ function Title({ title }: { title: string }) {
 		fontWeight: 700,
 		lineClamp: 2,
 		lineHeight: 1.15,
+		maxWidth: '960px',
 		padding: '0 120px 60px 120px',
 	} as const;
+
+	const showInverted = luminance && luminance >= 200;
 
 	return (
 		<div style={{ display: 'flex' }}>
@@ -156,7 +187,9 @@ function Title({ title }: { title: string }) {
 				style={{
 					color: 'transparent',
 					position: 'absolute',
-					textShadow: `1px 1px 6px rgb(24, 24, 27, 0.4)`,
+					textShadow: showInverted
+						? `1px 1px 6px rgb(220, 220, 225, 0.8)`
+						: `1px 1px 6px rgb(24, 24, 27, 0.4)`,
 					...commonStyles,
 				}}
 			>
@@ -165,7 +198,9 @@ function Title({ title }: { title: string }) {
 			<div
 				style={{
 					backgroundClip: 'text',
-					backgroundImage: 'linear-gradient(to bottom, #ffffff, #fef9ec)',
+					backgroundImage: showInverted
+						? 'linear-gradient(to bottom, #000000, #18181b)'
+						: 'linear-gradient(to bottom, #ffffff, #fef9ec)',
 					color: 'transparent',
 					...commonStyles,
 				}}
@@ -182,6 +217,10 @@ export function getOpenGraphElement(
 		src: string;
 		height: number;
 		width: number;
+		/** Luminance of top zone (10%-20%), 0-255 */
+		luminanceTop?: number | undefined;
+		/** Luminance of bottom zone (70%-90%), 0-255 */
+		luminanceBottom?: number | undefined;
 	},
 ) {
 	return (
@@ -227,13 +266,14 @@ export function getOpenGraphElement(
 					width: '100%',
 				}}
 			>
-				<Brand />
-				<TitleMultiLingual
+				<TitleSite luminance={image?.luminanceTop} />
+				<TitleMultilingual
 					titleZh={entry.titleZh}
 					titleJa={entry.titleJa}
 					titleTh={entry.titleTh}
+					luminance={image?.luminanceBottom}
 				/>
-				<Title title={entry.title} />
+				<Title title={entry.title} luminance={image?.luminanceBottom} />
 			</div>
 		</div>
 	);

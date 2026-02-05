@@ -46,8 +46,7 @@ export const MDX_COMPONENTS_TO_STRIP = ['Img', 'ImgGroup', 'Map', 'More'];
 /**
  * Open Graph config
  */
-export const OPEN_GRAPH_BASE_PATH = '0g';
-
+export const OPEN_GRAPH_BASE_PATH = 'og';
 export const OPEN_GRAPH_IMAGE_FORMAT = 'jpg';
 
 // How many fallback images are there? These should already be located in the `/public` folder

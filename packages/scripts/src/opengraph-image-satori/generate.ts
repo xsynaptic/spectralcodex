@@ -1,11 +1,42 @@
+import type { SatoriOptions } from 'satori';
+
 import satori from 'satori';
 import sharp from 'sharp';
 
-import type { OpenGraphMetadataItem, OpenGraphSatoriOptions } from './types.js';
+import type { OpenGraphMetadataItem } from './types.js';
 
 import { getOpenGraphElement } from './element.js';
 
-async function getImageDataUrl({
+/**
+ * Analyze luminance of a horizontal band within an image
+ * Returns perceived brightness (0-255) using standard luminance formula
+ */
+async function getZoneLuminance(
+	imageBuffer: Buffer,
+	fullHeight: number,
+	fullWidth: number,
+	startPercent: number,
+	endPercent: number,
+): Promise<number> {
+	const topOffset = Math.floor(fullHeight * startPercent);
+	const zoneHeight = Math.floor(fullHeight * (endPercent - startPercent));
+
+	// Extract to buffer first; chaining extract().stats() doesn't work correctly
+	const extractedBuffer = await sharp(imageBuffer)
+		.extract({ left: 0, top: topOffset, width: fullWidth, height: zoneHeight })
+		.toBuffer();
+
+	const { channels } = await sharp(extractedBuffer).stats();
+
+	const r = channels[0]?.mean ?? 0;
+	const g = channels[1]?.mean ?? 0;
+	const b = channels[2]?.mean ?? 0;
+
+	// Perceived luminance formula (ITU-R BT.601)
+	return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+}
+
+async function processImage({
 	imageObject,
 	height,
 	width,
@@ -15,17 +46,32 @@ async function getImageDataUrl({
 	height: number;
 	width: number;
 	density: number;
-}) {
+}): Promise<{
+	dataUrl: string;
+	luminanceTop: number;
+	luminanceBottom: number;
+}> {
+	const scaledHeight = height * density;
+	const scaledWidth = width * density;
+
 	const imageBuffer = await imageObject
 		.resize({
 			fit: 'cover',
 			position: 'top',
-			height: height * density,
-			width: width * density,
+			height: scaledHeight,
+			width: scaledWidth,
 		})
 		.toBuffer({ resolveWithObject: true });
 
-	return `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
+	// Analyze luminance zones (10%-20% for top, 70%-90% for bottom)
+	const [luminanceTop, luminanceBottom] = await Promise.all([
+		getZoneLuminance(imageBuffer.data, scaledHeight, scaledWidth, 0.1, 0.2),
+		getZoneLuminance(imageBuffer.data, scaledHeight, scaledWidth, 0.7, 0.9),
+	]);
+
+	const dataUrl = `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
+
+	return { dataUrl, luminanceTop, luminanceBottom };
 }
 
 /**
@@ -37,7 +83,7 @@ export function createGenerator({
 	density = 1,
 	jpegQuality = 80,
 	...satoriOptions
-}: OpenGraphSatoriOptions & { jpegQuality?: number }) {
+}: SatoriOptions & { density?: number; jpegQuality?: number }) {
 	const height = 'height' in satoriOptions ? satoriOptions.height : 630;
 	const width = 'width' in satoriOptions ? satoriOptions.width : 1200;
 
@@ -45,16 +91,17 @@ export function createGenerator({
 		entry: OpenGraphMetadataItem,
 		imageObject?: sharp.Sharp,
 	): Promise<Buffer> {
-		const imageEncoded = imageObject
-			? await getImageDataUrl({
-					imageObject,
-					height,
-					width,
-					density,
-				})
-			: '';
+		const processed = imageObject
+			? await processImage({ imageObject, height, width, density })
+			: undefined;
 
-		const element = getOpenGraphElement(entry, { src: imageEncoded, height, width });
+		const element = getOpenGraphElement(entry, {
+			src: processed?.dataUrl ?? '',
+			height,
+			width,
+			luminanceTop: processed?.luminanceTop,
+			luminanceBottom: processed?.luminanceBottom,
+		});
 
 		const satoriSvg = await satori(element, { ...satoriOptions, fonts });
 

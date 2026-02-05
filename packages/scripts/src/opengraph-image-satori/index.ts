@@ -6,12 +6,13 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 import sharp from 'sharp';
+import { z } from 'zod';
 
 import type { OpenGraphFontConfig, OpenGraphMetadataItem } from './types.js';
 
 import { ContentCollectionsEnum } from '../content-utils/collections.js';
 import { getCollection, loadDataStore } from '../content-utils/data-store.js';
-import { EntryQualitySchema, ImageFeaturedSchema } from '../content-utils/schemas.js';
+import { ImageFeaturedSchema } from '../content-utils/schemas.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -32,11 +33,11 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: 'public/og',
+			default: 'node_modules/.astro/og-image-output',
 		},
 		'cache-path': {
 			type: 'string',
-			default: 'node_modules/.astro/opengraph-satori',
+			default: 'node_modules/.astro/og-image-cache',
 		},
 	},
 });
@@ -48,22 +49,18 @@ const { values } = parseArgs({
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 const OG_FORMAT = 'jpg';
-const CONCURRENCY = 30;
+const CONCURRENCY = 40;
 
 // Testing constraints (hardcoded for development)
-const MIN_QUALITY = 1;
-const LIMIT = Infinity;
-const CACHE_ENABLED = true as boolean;
+const LIMIT = 80; // Infinity;
+const CACHE_ENABLED = false as boolean;
 
 // Font configuration
 const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 	{
 		package: 'lora',
 		name: 'Lora',
-		variants: [
-			{ weight: 400, style: 'normal', subset: 'latin' },
-			{ weight: 700, style: 'normal', subset: 'latin' },
-		],
+		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
 	},
 	{
 		package: 'noto-serif-tc',
@@ -86,6 +83,39 @@ interface ContentEntry extends OpenGraphMetadataItem {
 	digest: string;
 	entryQuality?: number | undefined;
 	imageFeaturedId?: string | undefined;
+	category?: string | undefined;
+}
+
+/**
+ * Fallback image configuration
+ * Customize these paths to match your media directory structure
+ */
+const FALLBACK_IMAGES = {
+	// Category-specific fallbacks
+	temple: 'fallbacks/temple.jpg',
+	// Collection-specific fallbacks
+	pages: 'fallbacks/pages.jpg',
+	// Default fallback (always required)
+	default: 'fallbacks/default.jpg',
+} as const;
+
+/**
+ * Returns a fallback image ID based on entry properties
+ * Priority: category > collection > default
+ */
+function getFallbackImageId(entry: Pick<ContentEntry, 'collection' | 'category'>): string {
+	// Category-specific fallbacks (most specific)
+	if (entry.category === 'temple') {
+		return FALLBACK_IMAGES.temple;
+	}
+
+	// Collection-specific fallbacks
+	if (entry.collection === 'pages') {
+		return FALLBACK_IMAGES.pages;
+	}
+
+	// Default fallback
+	return FALLBACK_IMAGES.default;
 }
 
 interface CacheEntry {
@@ -115,12 +145,9 @@ function getContentEntries(): Array<ContentEntry> {
 
 		for (const entry of collectionEntries) {
 			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
-			const entryQuality = EntryQualitySchema.optional().parse(entry.data.entryQuality);
+			const title = z.string().parse(entry.data.title);
 
-			const title = entry.data.title as string | undefined;
-
-			if (entryQuality === undefined || entryQuality < MIN_QUALITY) continue;
-			if (!title) continue;
+			// Skip entries without digest
 			if (!entry.digest) continue;
 
 			allEntries.push({
@@ -131,13 +158,11 @@ function getContentEntries(): Array<ContentEntry> {
 				titleZh: entry.data.title_zh as string | undefined,
 				titleJa: entry.data.title_ja as string | undefined,
 				titleTh: entry.data.title_th as string | undefined,
-				entryQuality,
 				imageFeaturedId: getImageFeaturedId(imageFeatured),
+				category: entry.data.category as string | undefined,
 			});
 		}
 	}
-
-	allEntries.sort((a, b) => (b.entryQuality ?? 0) - (a.entryQuality ?? 0));
 
 	return allEntries;
 }
@@ -153,7 +178,7 @@ async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined>
 	}
 }
 
-async function getImageMtime(imageId: string): Promise<number | undefined> {
+async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
 	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
 
 	try {
@@ -202,7 +227,7 @@ async function main() {
 	await fs.mkdir(outputPath, { recursive: true });
 	await fs.mkdir(cachePath, { recursive: true });
 
-	const cache = getFileCacheInstance(cachePath, 'opengraph-satori');
+	const cache = getFileCacheInstance(cachePath, 'og-image-cache');
 
 	const concurrencyLimit = pLimit(CONCURRENCY);
 
@@ -216,11 +241,12 @@ async function main() {
 				try {
 					const outputFilePath = path.join(outputPath, `${path.basename(entry.id)}.${OG_FORMAT}`);
 
+					// Resolve image ID: use featured image or fall back based on entry properties
+					const imageId = entry.imageFeaturedId ?? getFallbackImageId(entry);
+
 					// Check cache for existing entry
 					const cached = await cache.get<CacheEntry>(entry.id);
-					const imageMtime = entry.imageFeaturedId
-						? await getImageMtime(entry.imageFeaturedId)
-						: undefined;
+					const imageMtime = await getImageModifiedTime(imageId);
 
 					// Cache hit: digest matches and image hasn't changed
 					const digestMatch = cached?.digest === entry.digest;
@@ -233,10 +259,7 @@ async function main() {
 						return;
 					}
 
-					// Generate image
-					const imageObject = entry.imageFeaturedId
-						? await getSourceImage(entry.imageFeaturedId)
-						: undefined;
+					const imageObject = await getSourceImage(imageId);
 
 					const metadata: OpenGraphMetadataItem = {
 						collection: entry.collection,

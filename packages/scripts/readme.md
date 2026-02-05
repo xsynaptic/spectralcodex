@@ -61,7 +61,7 @@ Full deployment pipeline:
 1. `astro sync` - sync content
 2. `content-validate` - validate content
 3. `content-related` - generate similarity data
-4. `opengraph-image` - generate OG images
+4. `og-image` - generate OG images
 5. `astro build` - build site
 6. `image-server-manifest` - extract image URLs
 7. `deploy-media` - sync media to remote
