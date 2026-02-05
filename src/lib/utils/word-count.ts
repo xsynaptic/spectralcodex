@@ -1,6 +1,6 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { getCacheInstance, hash } from '@spectralcodex/utils';
+import { getSqliteCacheInstance, hash } from '@spectralcodex/utils';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
@@ -9,7 +9,7 @@ import * as R from 'remeda';
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
-const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
 
 /**
  * Generate word count from content body

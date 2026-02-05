@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getCacheInstance, hashShort } from '@spectralcodex/utils/cache';
+import { getSqliteCacheInstance, hashShort } from '@spectralcodex/utils/cache';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
@@ -21,7 +21,7 @@ interface CollectionData {
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
-const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');

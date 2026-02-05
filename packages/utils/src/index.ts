@@ -1,1 +1,7 @@
-export { cacheFileExists, getCacheInstance, hash, hashShort } from './cache.js';
+export {
+	cacheFileExists,
+	getFileCacheInstance,
+	getSqliteCacheInstance,
+	hash,
+	hashShort,
+} from './cache.js';

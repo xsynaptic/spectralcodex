@@ -1,25 +1,37 @@
-import type { KeyvOptions } from 'keyv';
-
 import KeyvSqlite from '@keyv/sqlite';
 import Keyv from 'keyv';
+import KeyvFile from 'keyv-file';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { hash } from 'ohash';
 import pMemoize from 'p-memoize';
 
 /**
- * Initialize Keyv with SQLite backend
- * @param cachePath - Base directory for cache files
- * @param namespace - Cache namespace (used for filename and internal namespacing)
- * @param options - Additional Keyv options
+ * Initialize Keyv with file-based JSON backend
+ * Best for batch processing scripts
  */
-export function getCacheInstance(cachePath: string, namespace: string, options?: KeyvOptions) {
+export function getFileCacheInstance(cachePath: string, namespace: string): Keyv {
+	return new Keyv({
+		store: new KeyvFile({
+			filename: path.join(cachePath, `${namespace}.json`),
+			writeDelay: 100,
+			serialize: JSON.stringify,
+			deserialize: (val): unknown => JSON.parse(val.toString()),
+		}),
+		namespace,
+	});
+}
+
+/**
+ * Initialize Keyv with SQLite backend
+ * Best for concurrent access during Astro builds
+ */
+export function getSqliteCacheInstance(cachePath: string, namespace: string): Keyv {
 	return new Keyv({
 		store: new KeyvSqlite({
 			uri: `sqlite://${path.join(cachePath, `${namespace}.sqlite`)}`,
 			table: 'cache',
 			busyTimeout: 10_000,
-			...options,
 		}),
 		namespace,
 	});
@@ -29,9 +41,7 @@ export function getCacheInstance(cachePath: string, namespace: string, options?:
  * Generate an abbreviated hash of data for cache validation
  */
 export function hashShort({ data, length = 12 }: { data: unknown; length?: number }): string {
-	const hashValue = hash(data);
-
-	return hashValue.slice(0, length);
+	return hash(data).slice(0, length);
 }
 
 /**
@@ -58,5 +68,4 @@ export async function cacheFileExists(filePath: string): Promise<boolean> {
 	return dirContents.has(fileName);
 }
 
-// Re-export this useful function to reduce dependencies in other packages
 export { hash } from 'ohash';

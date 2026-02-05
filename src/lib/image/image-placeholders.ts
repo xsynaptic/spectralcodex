@@ -1,4 +1,4 @@
-import { getCacheInstance, hash } from '@spectralcodex/utils';
+import { getSqliteCacheInstance, hash } from '@spectralcodex/utils';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';
@@ -57,7 +57,7 @@ async function generatePlaceholderDataUrl({
  * For cropped placeholders, pass the target display aspect ratio
  */
 async function createImagePlaceholderFunction() {
-	const cache = getCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
+	const cache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
 
 	const getImageById = await getImageByIdFunction();
 

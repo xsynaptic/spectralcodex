@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getCacheInstance, hash } from '@spectralcodex/utils';
+import { getSqliteCacheInstance, hash } from '@spectralcodex/utils';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
@@ -34,7 +34,7 @@ type RegionComputedData = Pick<
 // Cache of all region computed data, keyed by region ID
 type RegionComputedDataCache = Record<string, RegionComputedData>;
 
-const cacheInstance = getCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
 
 /**
  * Generate a stable cache key from the content graph state
