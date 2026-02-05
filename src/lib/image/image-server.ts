@@ -1,18 +1,13 @@
 import type { ImageFormat } from 'unpic';
 import type { IPXOptions } from 'unpic/providers/ipx';
 
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 import { transform as ipxTransform } from 'unpic/providers/ipx';
 
 import type { IPXOperations } from '#lib/image/image-types.ts';
 
-import {
-	IMAGE_FORMAT,
-	IMAGE_QUALITY,
-	OPEN_GRAPH_IMAGE_DENSITY,
-	OPEN_GRAPH_IMAGE_HEIGHT,
-	OPEN_GRAPH_IMAGE_WIDTH,
-} from '#constants.ts';
+import { IMAGE_FORMAT, IMAGE_QUALITY, OPEN_GRAPH_IMAGE_DENSITY } from '#constants.ts';
 import { generateSignedUrl } from '#lib/image/image-server-utils.ts';
 
 // In development, use local IPX server; in production, use the configured URL

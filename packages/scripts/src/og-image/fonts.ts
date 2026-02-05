@@ -33,7 +33,6 @@ async function loadFontData({
 /**
  * Load all configured fonts for OpenGraph image generation
  * Fonts are loaded from @fontsource packages in node_modules
- * Returns array in Satori-compatible format
  */
 export async function loadFonts({
 	fontConfigs,

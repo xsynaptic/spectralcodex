@@ -1,5 +1,6 @@
 import type { SatoriOptions } from 'satori';
 
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
 import satori from 'satori';
 import sharp from 'sharp';
 
@@ -81,11 +82,11 @@ async function processImage({
 export function createGenerator({
 	fonts,
 	density = 1,
-	jpegQuality = 80,
+	jpegQuality = 90,
 	...satoriOptions
 }: SatoriOptions & { density?: number; jpegQuality?: number }) {
-	const height = 'height' in satoriOptions ? satoriOptions.height : 630;
-	const width = 'width' in satoriOptions ? satoriOptions.width : 1200;
+	const height = 'height' in satoriOptions ? satoriOptions.height : OPEN_GRAPH_IMAGE_HEIGHT;
+	const width = 'width' in satoriOptions ? satoriOptions.width : OPEN_GRAPH_IMAGE_WIDTH;
 
 	return async function generateOpenGraphImage(
 		entry: OpenGraphMetadataItem,

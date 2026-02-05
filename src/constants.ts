@@ -46,16 +46,9 @@ export const MDX_COMPONENTS_TO_STRIP = ['Img', 'ImgGroup', 'Map', 'More'];
 /**
  * Open Graph config
  */
-export const OPEN_GRAPH_BASE_PATH = 'og';
-export const OPEN_GRAPH_IMAGE_FORMAT = 'jpg';
-
 // How many fallback images are there? These should already be located in the `/public` folder
 export const OPEN_GRAPH_IMAGE_FALLBACK_COUNT = 5;
 export const OPEN_GRAPH_IMAGE_FALLBACK_PREFIX = 'og-image';
-
-// Minimum dimensions recommended by Facebook (1.91:1 aspect ratio)
-export const OPEN_GRAPH_IMAGE_HEIGHT = 630;
-export const OPEN_GRAPH_IMAGE_WIDTH = 1200;
 
 // Generate high DPI Open Graph images
 export const OPEN_GRAPH_IMAGE_DENSITY = 2;

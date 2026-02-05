@@ -16,7 +16,7 @@
 		"image-server-warm": "tsx ./src/image-server/warm.ts",
 		"image-server-warm-new": "tsx ./src/image-server/warm-new.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
-		"og-image": "tsx ./src/opengraph-image-satori/index.ts"
+		"og-image": "tsx ./src/og-image/index.ts"
 	},
 	"devDependencies": {
 		"@spectralcodex/shared": "workspace:*",

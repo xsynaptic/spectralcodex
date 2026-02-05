@@ -1,13 +1,12 @@
+import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 
 import {
 	MDX_COMPONENTS_TO_STRIP,
-	OPEN_GRAPH_BASE_PATH,
 	OPEN_GRAPH_IMAGE_FALLBACK_COUNT,
 	OPEN_GRAPH_IMAGE_FALLBACK_PREFIX,
-	OPEN_GRAPH_IMAGE_FORMAT,
 } from '#constants.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { stripMdxComponents, textClipper } from '#lib/utils/text.ts';

@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -60,12 +61,12 @@ async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm opengraph-image --root-path=${rootPath}`;
+	})`pnpm og-image --root-path=${rootPath}`;
 }
 
 async function mergeOpengraph() {
 	const ogCachePath = path.join(cachePath, 'og-image-output');
-	const ogDistPath = path.join(distPath, 'og');
+	const ogDistPath = path.join(distPath, OPEN_GRAPH_BASE_PATH);
 
 	console.log(chalk.blue('Merging OpenGraph images into dist...'));
 	console.log(chalk.gray(`  From: ${ogCachePath}`));

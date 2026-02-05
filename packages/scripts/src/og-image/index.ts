@@ -1,5 +1,10 @@
 #!/usr/bin/env tsx
 import { getFileCacheInstance } from '@spectralcodex/shared/cache';
+import {
+	OPEN_GRAPH_IMAGE_FORMAT,
+	OPEN_GRAPH_IMAGE_HEIGHT,
+	OPEN_GRAPH_IMAGE_WIDTH,
+} from '@spectralcodex/shared/constants';
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
@@ -44,11 +49,7 @@ const { values } = parseArgs({
 
 /**
  * Open Graph image settings
- * Note: JPG quality is 90 because platforms will re-encode; this gives them better quality source material
  */
-const OG_WIDTH = 1200;
-const OG_HEIGHT = 630;
-const OG_FORMAT = 'jpg';
 const CONCURRENCY = 40;
 
 // Testing constraints (hardcoded for development)
@@ -207,8 +208,8 @@ async function main() {
 
 	const generateImage = createGenerator({
 		fonts,
-		width: OG_WIDTH,
-		height: OG_HEIGHT,
+		width: OPEN_GRAPH_IMAGE_WIDTH,
+		height: OPEN_GRAPH_IMAGE_HEIGHT,
 		density: 2, // Better quality when downscaling
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
@@ -239,7 +240,10 @@ async function main() {
 		entriesFiltered.map((entry) =>
 			concurrencyLimit(async () => {
 				try {
-					const outputFilePath = path.join(outputPath, `${path.basename(entry.id)}.${OG_FORMAT}`);
+					const outputFilePath = path.join(
+						outputPath,
+						`${path.basename(entry.id)}.${OPEN_GRAPH_IMAGE_FORMAT}`,
+					);
 
 					// Resolve image ID: use featured image or fall back based on entry properties
 					const imageId = entry.imageFeaturedId ?? getFallbackImageId(entry);

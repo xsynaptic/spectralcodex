@@ -1,3 +1,5 @@
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
+
 import type { OpenGraphMetadataItem } from './types.js';
 
 const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
@@ -5,7 +7,6 @@ const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
 function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
 	if (!SHOW_SAFE_ZONE_OVERLAY) return;
 
-	// Canvas: 1200 × 630
 	// Safe zone (10% inset): 120px left/right, 63px top/bottom
 	// Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
 	const overlayStyle = {
@@ -39,7 +40,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 		fontWeight: 700,
 		letterSpacing,
 		lineHeight: 1.25,
-		maxWidth: '1200px',
+		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
 		paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
 	} as const;
 
@@ -228,8 +229,8 @@ export function getOpenGraphElement(
 			style={{
 				background: '#18181b',
 				display: 'flex',
-				width: '1200px',
-				height: '630px',
+				width: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+				height: `${String(OPEN_GRAPH_IMAGE_HEIGHT)}px`,
 			}}
 		>
 			{image && image.src.length > 0 ? (

@@ -1,15 +1,11 @@
 ---
+import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
 import { SEO } from 'astro-seo';
 import { WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import type { MetaProps } from '#components/types.ts';
 
-import {
-	OPEN_GRAPH_IMAGE_DENSITY,
-	OPEN_GRAPH_IMAGE_HEIGHT,
-	OPEN_GRAPH_IMAGE_WIDTH,
-	OPEN_GRAPH_TWITTER_USERNAME,
-} from '#constants.ts';
+import { OPEN_GRAPH_IMAGE_DENSITY, OPEN_GRAPH_TWITTER_USERNAME } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getOpenGraphImageUrl } from '#lib/image/image-server.ts';
