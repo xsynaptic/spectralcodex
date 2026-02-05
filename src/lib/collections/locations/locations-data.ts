@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getSqliteCacheInstance, hashShort } from '@spectralcodex/utils/cache';
+import { getSqliteCacheInstance, hashShort } from '@spectralcodex/shared/cache';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';

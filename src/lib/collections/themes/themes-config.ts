@@ -1,15 +1,11 @@
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import {
-	DateStringSchema,
-	NumericScaleSchema,
-	StylizedTextSchema,
-	ImageFeaturedSchema,
-} from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const themes = defineCollection({

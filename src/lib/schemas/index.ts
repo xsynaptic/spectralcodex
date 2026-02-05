@@ -33,26 +33,6 @@ export const UrlSchema = z
 	});
 
 /**
- * Featured images
- */
-const ImageFeaturedObjectSchema = z.object({
-	id: z.string(),
-	title: z.string().optional(),
-	link: z.string().optional(), // Functions just like a Link component in MDX content
-	hero: z.boolean().optional(),
-});
-
-export type ImageFeaturedObject = z.infer<typeof ImageFeaturedObjectSchema>;
-
-export const ImageFeaturedSchema = z.union([
-	z.string(),
-	ImageFeaturedObjectSchema,
-	z.union([z.string(), ImageFeaturedObjectSchema]).array(),
-]);
-
-export type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;
-
-/**
  * Image thumbnail schema
  */
 export const ImageThumbnailSchema = z.object({

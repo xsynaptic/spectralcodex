@@ -1,9 +1,9 @@
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
-import { ImageFeaturedSchema } from '#lib/schemas/index.ts';
 
 const archivesSchema = z
 	.object({

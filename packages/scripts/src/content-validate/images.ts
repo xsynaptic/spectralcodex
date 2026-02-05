@@ -1,11 +1,10 @@
 #!/usr/bin/env tsx
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
-
-import { ImageFeaturedSchema } from '../content-utils/schemas';
 
 const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
 const srcPropRegex = /src=["']([^"']+)["']/;

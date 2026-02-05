@@ -13,7 +13,7 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
 } from '@spectralcodex/map-types';
-import { hashShort } from '@spectralcodex/utils';
+import { hashShort } from '@spectralcodex/shared/cache';
 import { featureCollection } from '@turf/helpers';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';

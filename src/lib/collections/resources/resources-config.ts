@@ -1,3 +1,4 @@
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
@@ -13,7 +14,6 @@ import {
 	NumericScaleSchema,
 	StylizedTextSchema,
 	UrlSchema,
-	ImageFeaturedSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 

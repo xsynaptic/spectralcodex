@@ -63,6 +63,19 @@ async function opengraph() {
 	})`pnpm opengraph-image --root-path=${rootPath}`;
 }
 
+async function mergeOpengraph() {
+	const ogCachePath = path.join(cachePath, 'og-image-output');
+	const ogDistPath = path.join(distPath, 'og');
+
+	console.log(chalk.blue('Merging OpenGraph images into dist...'));
+	console.log(chalk.gray(`  From: ${ogCachePath}`));
+	console.log(chalk.gray(`  To:   ${ogDistPath}`));
+
+	// Merge without deleting existing files (preserves public/og defaults and renamed entries)
+	// rsync -av: archive mode, verbose, only transfers changed files based on mtime/size
+	await $({ stdio: 'inherit' })`rsync -av ${ogCachePath}/ ${ogDistPath}/`;
+}
+
 async function build() {
 	if (skipBuild) {
 		console.log(chalk.yellow('Skipping build'));
@@ -114,6 +127,7 @@ try {
 	await related();
 	await opengraph();
 	await build();
+	await mergeOpengraph();
 	manifest();
 	await media();
 	await transfer();

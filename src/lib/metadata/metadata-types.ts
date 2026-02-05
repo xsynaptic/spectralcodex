@@ -1,7 +1,7 @@
+import type { ImageFeaturedObject } from '@spectralcodex/shared/schemas';
 import type { CollectionKey } from 'astro:content';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
-import type { ImageFeaturedObject } from '#lib/schemas/index.ts';
 
 /**
  * Metadata

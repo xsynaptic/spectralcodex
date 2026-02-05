@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
 import slugify from '@sindresorhus/slugify';
-import { getFileCacheInstance } from '@spectralcodex/utils';
+import { getFileCacheInstance } from '@spectralcodex/shared/cache';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -362,9 +362,7 @@ async function contentRelated() {
 		if (values['clear-cache']) {
 			const cacheDir = path.join(values['root-path'], values['cache-path']);
 			const cacheNamespace = getCacheNamespace(values['cache-name'], MODEL_ID);
-			const cacheFiles = readdirSync(cacheDir).filter(
-				(file) => file === `${cacheNamespace}.json`,
-			);
+			const cacheFiles = readdirSync(cacheDir).filter((file) => file === `${cacheNamespace}.json`);
 			for (const file of cacheFiles) {
 				rmSync(path.join(cacheDir, file));
 			}

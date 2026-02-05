@@ -19,7 +19,7 @@
 		"og-image": "tsx ./src/opengraph-image-satori/index.ts"
 	},
 	"devDependencies": {
-		"@spectralcodex/utils": "workspace:*",
+		"@spectralcodex/shared": "workspace:*",
 		"@astrojs/markdown-remark": "7.0.0-beta.1",
 		"@duckdb/node-api": "1.4.4-r.1",
 		"@fontsource/lora": "^5.2.8",
@@ -33,7 +33,7 @@
 		"@types/d3-geo": "^3.1.0",
 		"@types/geojson": "^7946.0.16",
 		"@xsynaptic/unified-tools": "3.0.0",
-		"astro": "^6.0.0-beta.7",
+		"astro": "^6.0.0-beta.8",
 		"chalk": "^5.6.2",
 		"d3-geo": "^3.1.1",
 		"devalue": "^5.6.2",
@@ -46,7 +46,7 @@
 		"sharp": "^0.34.5",
 		"tsx": "^4.21.0",
 		"usearch": "^2.17.0",
-		"zod": "4.2.1",
+		"zod": "^4.3.6",
 		"zx": "^8.8.5"
 	}
 }

@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +10,6 @@ import { z } from 'zod';
 
 import { ContentCollectionsEnum } from '../content-utils/collections.js';
 import { getCollection, loadDataStore } from '../content-utils/data-store.js';
-import { ImageFeaturedSchema } from '../content-utils/schemas.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),

@@ -1,4 +1,4 @@
-import { getSqliteCacheInstance, hash } from '@spectralcodex/utils';
+import { getSqliteCacheInstance, hash } from '@spectralcodex/shared/cache';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import sharp from 'sharp';

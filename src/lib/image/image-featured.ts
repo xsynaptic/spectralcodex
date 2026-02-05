@@ -1,10 +1,11 @@
+import type { ImageFeatured, ImageFeaturedObject } from '@spectralcodex/shared/schemas';
+
 import * as R from 'remeda';
 
 import type {
 	ContentMetadataItem,
 	ImageFeaturedWithCaption,
 } from '#lib/metadata/metadata-types.ts';
-import type { ImageFeatured, ImageFeaturedObject } from '#lib/schemas/index.ts';
 
 import { logError } from '#lib/utils/logging.ts';
 

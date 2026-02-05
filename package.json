@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.6.1",
+	"version": "6.6.2",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -37,14 +37,14 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.0-beta.7",
+		"astro": "^6.0.0-beta.8",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.0.0-beta.4",
-		"@astrojs/mdx": "^5.0.0-beta.4",
-		"@astrojs/node": "^10.0.0-beta.1",
+		"@astrojs/markdown-remark": "^7.0.0-beta.5",
+		"@astrojs/mdx": "^5.0.0-beta.5",
+		"@astrojs/node": "^10.0.0-beta.2",
 		"@astrojs/react": "^5.0.0-beta.3",
 		"@astrojs/rss": "4.0.15-beta.3",
 		"@astrojs/sitemap": "3.6.1-beta.3",
@@ -54,7 +54,7 @@
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
-		"@spectralcodex/utils": "workspace:*",
+		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/eslint-plugin-query": "^5.91.4",
@@ -109,7 +109,7 @@
 		"vite": "^7.3.1",
 		"vitest": "^4.0.18",
 		"yaml": "^2.8.2",
-		"zod": "4.2.1"
+		"zod": "^4.3.6"
 	},
 	"packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
 }

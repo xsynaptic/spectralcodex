@@ -1,5 +1,6 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
 import { LocationLayerEnum } from '@spectralcodex/map-types';
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
@@ -11,7 +12,7 @@ import {
 } from '#lib/collections/locations/locations-schemas.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
-import { ImageThumbnailSchema, ImageFeaturedSchema } from '#lib/schemas/index.ts';
+import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import {
 	DateStringSchema,
 	DescriptionSchema,

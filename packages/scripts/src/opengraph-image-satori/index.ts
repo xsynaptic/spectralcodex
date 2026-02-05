@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
-import { getFileCacheInstance } from '@spectralcodex/utils';
+import { getFileCacheInstance } from '@spectralcodex/shared/cache';
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +13,6 @@ import type { OpenGraphFontConfig, OpenGraphMetadataItem } from './types.js';
 
 import { ContentCollectionsEnum } from '../content-utils/collections.js';
 import { getCollection, loadDataStore } from '../content-utils/data-store.js';
-import { ImageFeaturedSchema } from '../content-utils/schemas.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 

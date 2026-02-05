@@ -1,4 +1,5 @@
 import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/map-types';
+import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection } from 'astro:content';
 import { z } from 'zod';
@@ -6,12 +7,7 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import {
-	DateStringSchema,
-	NumericScaleSchema,
-	StylizedTextSchema,
-	ImageFeaturedSchema,
-} from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, StylizedTextSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
 export const regions = defineCollection({
