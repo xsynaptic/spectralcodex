@@ -41,38 +41,49 @@ const { values } = parseArgs({
 	},
 });
 
-// OG image settings
+/**
+ * Open Graph image settings
+ * Note: JPG quality is 90 because platforms will re-encode; this gives them better quality source material
+ */
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
-const OG_DENSITY = 2;
 const OG_FORMAT = 'jpg';
-const OG_QUALITY = 80;
-const CONCURRENCY = 10;
+const CONCURRENCY = 30;
 
 // Testing constraints (hardcoded for development)
-const MIN_QUALITY = 4;
-const LIMIT = 10;
+const MIN_QUALITY = 1;
+const LIMIT = Infinity;
+const CACHE_ENABLED = true as boolean;
 
 // Font configuration
 const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 	{
-		package: 'geologica',
-		name: 'Geologica',
-		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
+		package: 'lora',
+		name: 'Lora',
+		variants: [
+			{ weight: 400, style: 'normal', subset: 'latin' },
+			{ weight: 700, style: 'normal', subset: 'latin' },
+		],
 	},
 	{
 		package: 'noto-serif-tc',
 		name: 'Noto Serif TC',
-		variants: [{ weight: 500, style: 'normal', subset: 'chinese-traditional' }],
+		variants: [{ weight: 700, style: 'normal', subset: 'chinese-traditional' }],
+	},
+	{
+		package: 'noto-serif-thai',
+		name: 'Noto Serif Thai',
+		variants: [{ weight: 500, style: 'normal', subset: 'thai' }],
+	},
+	{
+		package: 'zen-antique',
+		name: 'Zen Antique',
+		variants: [{ weight: 400, style: 'normal', subset: 'japanese' }],
 	},
 ];
 
-interface ContentEntry {
-	collection: string;
-	id: string;
+interface ContentEntry extends OpenGraphMetadataItem {
 	digest: string;
-	title: string;
-	subtitle?: string | undefined;
 	entryQuality?: number | undefined;
 	imageFeaturedId?: string | undefined;
 }
@@ -86,6 +97,7 @@ function getImageFeaturedId(
 	imageFeatured: ReturnType<typeof ImageFeaturedSchema.parse> | undefined,
 ): string | undefined {
 	if (!imageFeatured) return undefined;
+
 	if (Array.isArray(imageFeatured)) return getImageFeaturedId(imageFeatured[0]);
 
 	return typeof imageFeatured === 'object' && 'id' in imageFeatured
@@ -95,6 +107,7 @@ function getImageFeaturedId(
 
 function getContentEntries(): Array<ContentEntry> {
 	const { collections } = loadDataStore(path.join(values['root-path'], values['data-store-path']));
+
 	const allEntries: Array<ContentEntry> = [];
 
 	for (const collectionName of Object.values(ContentCollectionsEnum)) {
@@ -106,9 +119,6 @@ function getContentEntries(): Array<ContentEntry> {
 
 			const title = entry.data.title as string | undefined;
 
-			// Note: currently this package only supports Chinese subtitles because of font limitations
-			const subtitle = entry.data.title_zh as string | undefined;
-
 			if (entryQuality === undefined || entryQuality < MIN_QUALITY) continue;
 			if (!title) continue;
 			if (!entry.digest) continue;
@@ -118,7 +128,9 @@ function getContentEntries(): Array<ContentEntry> {
 				id: entry.id,
 				digest: entry.digest,
 				title,
-				subtitle,
+				titleZh: entry.data.title_zh as string | undefined,
+				titleJa: entry.data.title_ja as string | undefined,
+				titleTh: entry.data.title_th as string | undefined,
 				entryQuality,
 				imageFeaturedId: getImageFeaturedId(imageFeatured),
 			});
@@ -172,8 +184,8 @@ async function main() {
 		fonts,
 		width: OG_WIDTH,
 		height: OG_HEIGHT,
-		density: OG_DENSITY,
-		jpegQuality: OG_QUALITY,
+		density: 2, // Better quality when downscaling
+		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
 	const entries = getContentEntries();
@@ -193,6 +205,7 @@ async function main() {
 	const cache = getFileCacheInstance(cachePath, 'opengraph-satori');
 
 	const concurrencyLimit = pLimit(CONCURRENCY);
+
 	let generatedCount = 0;
 	let skippedCount = 0;
 	let errorCount = 0;
@@ -211,10 +224,11 @@ async function main() {
 
 					// Cache hit: digest matches and image hasn't changed
 					const digestMatch = cached?.digest === entry.digest;
-					const imageUnchanged = !imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
+					const imageUnchanged =
+						!imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
 					const fileExists = await outputFileExists(outputFilePath);
 
-					if (digestMatch && imageUnchanged && fileExists) {
+					if (digestMatch && imageUnchanged && fileExists && CACHE_ENABLED) {
 						skippedCount++;
 						return;
 					}
@@ -228,7 +242,9 @@ async function main() {
 						collection: entry.collection,
 						id: entry.id,
 						title: entry.title,
-						subtitle: entry.subtitle,
+						titleZh: entry.titleZh,
+						titleJa: entry.titleJa,
+						titleTh: entry.titleTh,
 					};
 
 					const imageBuffer = await generateImage(metadata, imageObject);

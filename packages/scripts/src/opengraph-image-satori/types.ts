@@ -4,7 +4,9 @@ export interface OpenGraphMetadataItem {
 	collection: string;
 	id: string;
 	title: string;
-	subtitle?: string | undefined;
+	titleZh?: string | undefined;
+	titleJa?: string | undefined;
+	titleTh?: string | undefined;
 }
 
 export interface OpenGraphFontVariant {

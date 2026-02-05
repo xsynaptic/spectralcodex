@@ -34,13 +34,9 @@ Copies generated Astro content collection schemas from `.astro/collections` to t
 
 ## OpenGraph Images
 
-### `opengraph-image`
+### `og-image`
 
-Simple OG image generator that resizes featured images to OG dimensions (1200×630). Uses mtime-based caching to skip unchanged images. Output: `public/0g/`
-
-### `opengraph-image-satori`
-
-Advanced OG image generator using [Satori](https://github.com/vercel/satori) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Uses digest-based caching via Keyv. Output: `public/og/`
+Advanced OG image generator using [Satori](https://github.com/vercel/satori) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Uses digest-based caching via Keyv.
 
 ## Map Data
 
