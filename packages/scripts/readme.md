@@ -1,48 +1,87 @@
 # Spectral Codex Scripts
 
-Internal tooling for [Spectral Codex](https://spectralcodex.com) content and map data processing. Built for Astro-based content collections with geographic and semantic analysis capabilities.
+Internal tooling for [Spectral Codex](https://spectralcodex.com) content processing, deployment, and asset generation. Built for Astro-based content collections with geographic and semantic analysis capabilities.
 
-## `map-divisions`
+## Content Processing
 
-Fetches administrative boundary polygons from [Overture Maps](https://overturemaps.org/) and generates [FlatGeobuf](https://github.com/flatgeobuf/flatgeobuf/) files for client-side map rendering.
+### `content-related`
 
-The script reads region metadata from the content package, extracting Overture division IDs that correspond to administrative boundaries. It queries Overture's Parquet datasets via [DuckDB](https://duckdb.org/), leveraging bounding box optimizations to minimize data transfer. Division geometries are cached locally to avoid redundant API calls on subsequent runs.
+Generates semantic similarity scores between content entries using transformer-based embeddings.
 
-For regions with multiple divisions, the script performs geometric unions using [Turf.js](https://turfjs.org/) before outputting optimized FlatGeobuf files. This format provides efficient streaming decode for [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/), enabling boundary overlays without loading entire datasets into memory.
+Processes MDX content into embeddings via [Transformers.js](https://huggingface.co/docs/transformers.js), combining cosine similarity with metadata-based scoring boosts (shared themes/regions). Results cached with content digest hashes via Keyv to skip regeneration for unchanged files.
 
-## `content-related`
+Output: JSON mapping of content IDs to ranked related items.
 
-Generates semantic similarity scores between content entries using transformer-based embeddings with metadata-aware hybrid ranking.
+### `content-validate`
 
-The script processes MDX content into embeddings via [Transformers](https://huggingface.co/docs/transformers.js/en/index). Content is sanitized to remove MDX components and extract plain text, limited to a configurable character threshold to manage token usage.
+Runs validation checks against content:
 
-Similarity calculation combines cosine distance between embedding vectors with metadata-based scoring boosts. Shared themes and regions increase relevance scores, with configurable weight multipliers to balance semantic and taxonomic signals. Results are cached with content hashes to skip regeneration for unchanged files.
+- `slug-mismatch` - filename matches frontmatter slug
+- `location-regions` - region references valid
+- `location-coordinates` - coordinates inside assigned regions
+- `location-overlap` - locations not too close together
+- `location-duplicates` - no duplicate slugs/titles/addresses
+- `divisions` - division IDs exist in Overture
+- `quality` - quality scores and completeness
+- `mdx` - MDX component syntax valid
+- `images` - image references exist
 
-Output is a JSON mapping of content IDs to ranked lists of related items, consumed by the main Astro project for "related content" features.
+Run with no arguments to execute all checks (used in CI/deploy).
 
-## `content-validate`
+### `content-schemas`
 
-Runs validation checks against content files:
+Copies generated Astro content collection schemas from `.astro/collections` to the content package.
 
-- `slug-mismatch`: Ensures filename matches frontmatter slug
-- `location-regions`: Validates region references in location entries
-- `location-visibility`: Checks visibility/status field consistency
-- `divisions`: Verifies division IDs exist in Overture datasets
-- `quality`: Audits content quality scores and completeness
+## OpenGraph Images
 
-## `opengraph-image-satori`
+### `opengraph-image`
 
-# OpenGraph Image Generator
+Simple OG image generator that resizes featured images to OG dimensions (1200×630). Uses mtime-based caching to skip unchanged images. Output: `public/0g/`
 
-This script contains some code sketching out an implementation of an Open Graph image generator for Astro using Vercel's [Satori](https://github.com/vercel/satori). Some references consulted while hammering out this as-yet unused prototype:
+### `opengraph-image-satori`
 
-- [this post](https://snorre.io/blog/2023-09-08-generating-opengraph-images-for-astro-copy/) detailing a plugin-based approach
-- [another post](https://techsquidtv.com/blog/generating-open-graph-images-for-astro/) for some discussion of build time image path issues
-- [this playground](https://og-playground.vercel.app/) for further developing image element style
-- [this repo](https://github.com/delucis/astro-og-canvas/tree/latest/packages/astro-og-canvas) for some direction on image caching
-- [this post](https://dietcode.io/p/astro-og/) implements an Astro integration for Satori
-- [this post](https://www.anav.dev/blogs/how-to-generate-dynamic-open-graph-images-with-astro-and-satori) discusses a simple endpoint-based approach
+Advanced OG image generator using [Satori](https://github.com/vercel/satori) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Uses digest-based caching via Keyv. Output: `public/og/`
 
-## `content-schemas`
+## Map Data
 
-Copies generated Astro content collection schemas from build artifacts into the content package for external reference.
+### `map-divisions`
+
+Fetches administrative boundary polygons from [Overture Maps](https://overturemaps.org/) via [DuckDB](https://duckdb.org/) and generates [FlatGeobuf](https://flatgeobuf.org/) files for client-side map rendering with [MapLibre GL JS](https://maplibre.org/).
+
+Reads region metadata to extract Overture division IDs, queries Parquet datasets with bounding box optimization, performs geometric unions for multi-division regions via [Turf.js](https://turfjs.org/), and outputs optimized FlatGeobuf files.
+
+## Development
+
+### `dev-server`
+
+Starts Docker containers (IPX image server) alongside Astro dev server. Loads `.env.dev` for dev-specific overrides.
+
+## Deployment
+
+### `deploy-site`
+
+Full deployment pipeline:
+
+1. `astro sync` - sync content
+2. `content-validate` - validate content
+3. `content-related` - generate similarity data
+4. `opengraph-image` - generate OG images
+5. `astro build` - build site
+6. `image-server-manifest` - extract image URLs
+7. `deploy-media` - sync media to remote
+8. `deploy-app` - transfer built app
+9. `image-server-warm` - warm image cache
+
+### `deploy-app` / `deploy-media`
+
+Individual deployment scripts for app files and media assets via rsync.
+
+## Image Server
+
+### `image-server-manifest`
+
+Extracts image URLs from built HTML for cache warming. Supports incremental manifests to track new vs existing URLs across deploys.
+
+### `image-server-warm` / `image-server-warm-new`
+
+Warms IPX image cache on remote server by requesting all URLs (or only new URLs) from the manifest. Runs via SSH with configurable concurrency.

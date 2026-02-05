@@ -86,7 +86,7 @@ Standard Astro commands apply:
 
 Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns:
 
-- `pnpm deploy-static` - full deployment pipeline:
+- `pnpm deploy-site` - full deployment pipeline:
   1. Validates content (frontmatter, references, duplicates)
   2. Generates related content recommendations
   3. Creates OpenGraph images
@@ -123,14 +123,14 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 ### Packages
 
 - `./packages/astro-build-logger`: Astro integration that logs build timestamps and durations
-- `./packages/content-demo`: example content for testing and demonstration purposes ([more info](./packages/content-example/readme.md))
-- `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs) ([more info](./packages/image-loader/readme.md))
-- `./packages/image-open-graph`: experimental OpenGraph image generator using Satori ([more info](./packages/image-open-graph/readme.md))
+- `./packages/content`: primary content collection (private, not included in repo)
+- `./packages/content-demo`: example content for testing and demonstration purposes
+- `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs)
 - `./packages/map-types`: TypeScript type definitions for map-related data structures
-- `./packages/react-map-component`: interactive map component used across this project
-- `./packages/remark-img-group`: Remark plugin for handling image groups
-- `./packages/scripts`: utility scripts for content validation, related content generation, map division processing, spritesheet generation, cache manifest generation, cache warming, and deployment
-- `./packages/unified-tools`: utilities for processing markdown, MDX, HTML, and text content including sanitization, CJK wrapping, and footnote handling
+- `./packages/react-map-component`: interactive map component built with MapLibre and react-map-gl
+- `./packages/remark-img-group`: Remark plugin for handling image groups in MDX
+- `./packages/scripts`: build tooling for content validation, semantic similarity generation, OpenGraph image generation (Satori), map division processing, and deployment orchestration
+- `./packages/utils`: shared utilities including Keyv-based caching (SQLite and file backends) for build-time data persistence
 
 ### Generated/Temporary
 
