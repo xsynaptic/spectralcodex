@@ -7,6 +7,7 @@ export interface OpenGraphMetadataItem {
 	titleZh?: string | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
+	isFallback: boolean;
 }
 
 export interface OpenGraphFontVariant {

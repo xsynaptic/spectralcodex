@@ -42,11 +42,13 @@ async function processImage({
 	height,
 	width,
 	density,
+	isFallback,
 }: {
 	imageObject: sharp.Sharp;
 	height: number;
 	width: number;
 	density: number;
+	isFallback: boolean;
 }): Promise<{
 	dataUrl: string;
 	luminanceTop: number;
@@ -55,14 +57,18 @@ async function processImage({
 	const scaledHeight = height * density;
 	const scaledWidth = width * density;
 
-	const imageBuffer = await imageObject
-		.resize({
-			fit: 'cover',
-			position: 'top',
-			height: scaledHeight,
-			width: scaledWidth,
-		})
-		.toBuffer({ resolveWithObject: true });
+	const imagePipeline = imageObject.resize({
+		fit: 'cover',
+		position: 'top',
+		height: scaledHeight,
+		width: scaledWidth,
+	});
+
+	if (isFallback) {
+		imagePipeline.blur(16);
+	}
+
+	const imageBuffer = await imagePipeline.toBuffer({ resolveWithObject: true });
 
 	// Analyze luminance zones (10%-20% for top, 70%-90% for bottom)
 	const [luminanceTop, luminanceBottom] = await Promise.all([
@@ -93,7 +99,7 @@ export function createGenerator({
 		imageObject?: sharp.Sharp,
 	): Promise<Buffer> {
 		const processed = imageObject
-			? await processImage({ imageObject, height, width, density })
+			? await processImage({ imageObject, height, width, density, isFallback: entry.isFallback })
 			: undefined;
 
 		const element = getOpenGraphElement(entry, {

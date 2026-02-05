@@ -87,41 +87,19 @@ interface ContentEntry extends OpenGraphMetadataItem {
 	category?: string | undefined;
 }
 
-/**
- * Fallback image configuration
- * Customize these paths to match your media directory structure
- */
-const FALLBACK_IMAGES = {
-	// Category-specific fallbacks
-	temple: 'fallbacks/temple.jpg',
-	// Collection-specific fallbacks
-	pages: 'fallbacks/pages.jpg',
-	// Default fallback (always required)
-	default: 'fallbacks/default.jpg',
-} as const;
-
-/**
- * Returns a fallback image ID based on entry properties
- * Priority: category > collection > default
- */
-function getFallbackImageId(entry: Pick<ContentEntry, 'collection' | 'category'>): string {
-	// Category-specific fallbacks (most specific)
-	if (entry.category === 'temple') {
-		return FALLBACK_IMAGES.temple;
-	}
-
-	// Collection-specific fallbacks
-	if (entry.collection === 'pages') {
-		return FALLBACK_IMAGES.pages;
-	}
-
-	// Default fallback
-	return FALLBACK_IMAGES.default;
-}
-
 interface CacheEntry {
 	digest: string;
 	imageMtime?: number;
+}
+
+/**
+ * Returns a fallback image ID based on entry properties
+ */
+function getFallbackImageId(entry: ContentEntry): string {
+	if (entry.category === 'temple') {
+		return 'taiwan/nantou/caotun/caotun-cide-temple-1.jpg';
+	}
+	return 'taiwan/nantou/caotun/caotun-cide-temple-2.jpg';
 }
 
 function getImageFeaturedId(
@@ -141,25 +119,30 @@ function getContentEntries(): Array<ContentEntry> {
 
 	const allEntries: Array<ContentEntry> = [];
 
-	for (const collectionName of Object.values(ContentCollectionsEnum)) {
-		const collectionEntries = getCollection(collections, collectionName);
+	for (const collection of Object.values(ContentCollectionsEnum)) {
+		const collectionEntries = getCollection(collections, collection);
 
 		for (const entry of collectionEntries) {
+			const title = z.string().optional().parse(entry.data.title);
+			const titleZh = z.string().optional().parse(entry.data.title_zh);
+			const titleJa = z.string().optional().parse(entry.data.title_ja);
+			const titleTh = z.string().optional().parse(entry.data.title_th);
 			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
-			const title = z.string().parse(entry.data.title);
+			const imageFeaturedId = getImageFeaturedId(imageFeatured);
 
 			// Skip entries without digest
-			if (!entry.digest) continue;
+			if (!title || !entry.digest) continue;
 
 			allEntries.push({
-				collection: collectionName,
+				collection,
 				id: entry.id,
 				digest: entry.digest,
 				title,
-				titleZh: entry.data.title_zh as string | undefined,
-				titleJa: entry.data.title_ja as string | undefined,
-				titleTh: entry.data.title_th as string | undefined,
-				imageFeaturedId: getImageFeaturedId(imageFeatured),
+				titleZh,
+				titleJa,
+				titleTh,
+				imageFeaturedId,
+				isFallback: imageFeaturedId === undefined,
 				category: entry.data.category as string | undefined,
 			});
 		}
@@ -173,6 +156,7 @@ async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined>
 
 	try {
 		await fs.access(imagePath, fs.constants.R_OK);
+
 		return sharp(imagePath);
 	} catch {
 		return undefined;
@@ -184,6 +168,7 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 
 	try {
 		const stats = await fs.stat(imagePath);
+
 		return stats.mtimeMs;
 	} catch {
 		return undefined;
@@ -193,6 +178,7 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 async function outputFileExists(filePath: string): Promise<boolean> {
 	try {
 		await fs.access(filePath);
+
 		return true;
 	} catch {
 		return false;
@@ -203,7 +189,9 @@ async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator (Satori) ===\n'));
 
 	console.log(chalk.blue('Loading fonts...'));
+
 	const fonts = await loadFonts({ fontConfigs: FONT_CONFIGS });
+
 	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
 
 	const generateImage = createGenerator({
@@ -216,6 +204,7 @@ async function main() {
 
 	const entries = getContentEntries();
 	const entriesFiltered = entries.slice(0, LIMIT);
+
 	console.log(
 		chalk.blue(
 			`Processing ${String(entriesFiltered.length)} of ${String(entries.length)} entries...\n`,
@@ -272,6 +261,7 @@ async function main() {
 						titleZh: entry.titleZh,
 						titleJa: entry.titleJa,
 						titleTh: entry.titleTh,
+						isFallback: entry.imageFeaturedId === undefined,
 					};
 
 					const imageBuffer = await generateImage(metadata, imageObject);

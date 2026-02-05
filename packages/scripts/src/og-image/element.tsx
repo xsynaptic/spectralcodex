@@ -11,7 +11,7 @@ function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) 
 	// Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
 	const overlayStyle = {
 		position: 'absolute' as const,
-		background: `rgba(255, 0, 0, ${opacity})`,
+		background: `rgb(255, 0, 0, ${opacity})`,
 	};
 
 	return (
@@ -59,7 +59,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 					color: 'transparent',
 					position: 'absolute',
 					textShadow: showInverted
-						? `0px 0px 3px rgb(220, 220, 225, 0.6)`
+						? `0px 0px 3px rgb(220, 220, 225, 0.8)`
 						: `0px 0px 3px rgb(24, 24, 27, 0.4)`,
 					...commonStyles,
 				}}
@@ -141,7 +141,7 @@ function TitleMultilingual({
 					color: 'transparent',
 					position: 'absolute',
 					textShadow: showInverted
-						? `0px 0px 4px rgb(220, 220, 225, 0.6)`
+						? `0px 0px 4px rgb(220, 220, 225, 0.7)`
 						: `1px 1px 4px rgb(12, 12, 14, 0.6)`,
 					...langStyles,
 					...commonStyles,
@@ -154,7 +154,7 @@ function TitleMultilingual({
 				style={{
 					backgroundClip: 'text',
 					backgroundImage: showInverted
-						? 'linear-gradient(to bottom, #18181b, #27272a)'
+						? 'rgb(12, 12, 14)'
 						: 'linear-gradient(to bottom, #fef9ec, #f4da93)',
 					color: 'transparent',
 					...langStyles,
@@ -189,7 +189,7 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 					color: 'transparent',
 					position: 'absolute',
 					textShadow: showInverted
-						? `1px 1px 6px rgb(220, 220, 225, 0.8)`
+						? `0px 0px 5px rgb(240, 240, 245, 0.8)`
 						: `1px 1px 6px rgb(24, 24, 27, 0.4)`,
 					...commonStyles,
 				}}
@@ -200,7 +200,7 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 				style={{
 					backgroundClip: 'text',
 					backgroundImage: showInverted
-						? 'linear-gradient(to bottom, #000000, #18181b)'
+						? 'rgb(24, 24, 27)'
 						: 'linear-gradient(to bottom, #ffffff, #fef9ec)',
 					color: 'transparent',
 					...commonStyles,
@@ -252,7 +252,7 @@ export function getOpenGraphElement(
 					width: '100%',
 					height: '100%',
 					background:
-						'linear-gradient(to bottom, rgb(64, 64, 71, 0) 70%, rgb(24, 24, 27, 0.4) 80%, rgb(12, 12, 14, 0.7) 100%)',
+						'linear-gradient(to bottom, rgb(24, 24, 27, 0) 75%, rgb(24, 24, 27, 0.4) 88%, rgb(12, 12, 14, 0.6) 100%)',
 				}}
 			/>
 			<SafeZoneOverlay />
