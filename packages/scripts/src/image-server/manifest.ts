@@ -66,6 +66,7 @@ export function generateManifest(options: {
 
 	// Load main manifest for incremental comparison
 	let mainUrls = new Set<string>();
+
 	if (mainPath && existsSync(mainPath)) {
 		const mainData = JSON.parse(readFileSync(mainPath, 'utf8')) as Array<string>;
 		mainUrls = new Set(mainData);
@@ -82,6 +83,7 @@ export function generateManifest(options: {
 
 	// Write new-only manifest
 	const newOutputPath = outputPath.replace('cache-manifest.json', 'cache-manifest-new.json');
+
 	// eslint-disable-next-line unicorn/no-null
 	writeFileSync(newOutputPath, JSON.stringify(newUrls, null, 2));
 

@@ -1,6 +1,6 @@
 import KeyvSqlite from '@keyv/sqlite';
 import Keyv from 'keyv';
-import KeyvFile from 'keyv-file';
+import { KeyvFile } from 'keyv-file';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { hash } from 'ohash';

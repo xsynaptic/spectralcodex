@@ -1,9 +1,10 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
 import slugify from '@sindresorhus/slugify';
+import { getFileCacheInstance } from '@spectralcodex/utils';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections.js';
@@ -82,8 +83,6 @@ interface ContentRelatedEmbedding {
 	metadata: ContentRelatedMetadata;
 }
 
-type ContentRelatedEmbeddingCache = Record<string, ContentRelatedEmbedding>;
-
 interface ContentRelatedItem {
 	id: string;
 	collection: string;
@@ -151,36 +150,10 @@ function calculateMetadataBoost(
 }
 
 /**
- * File-based embedding cache
+ * Get cache namespace that includes model ID for cache isolation between models
  */
-function getEmbeddingCacheFilename(cacheName: string, modelId: string): string {
-	return `${cacheName}-${slugify(modelId, { lowercase: true })}.json`;
-}
-
-function loadEmbeddingCache(cachePath: string): ContentRelatedEmbeddingCache {
-	if (!existsSync(cachePath)) {
-		return {};
-	}
-
-	try {
-		const data = readFileSync(cachePath, 'utf8');
-		const cache = JSON.parse(data) as ContentRelatedEmbeddingCache;
-
-		console.log(`📦 Loaded ${String(Object.keys(cache).length)} cached embeddings`);
-		return cache;
-	} catch (error) {
-		console.warn('⚠️  Failed to load embedding cache:', error);
-		return {};
-	}
-}
-
-function saveEmbeddingCache(cache: ContentRelatedEmbeddingCache, cachePath: string): void {
-	try {
-		// eslint-disable-next-line unicorn/no-null
-		writeFileSync(cachePath, JSON.stringify(cache, null, 2));
-	} catch (error) {
-		console.error('❌ Failed to save embedding cache:', error);
-	}
+function getCacheNamespace(cacheName: string, modelId: string): string {
+	return `${cacheName}-${slugify(modelId, { lowercase: true })}`;
 }
 
 /**
@@ -189,13 +162,9 @@ function saveEmbeddingCache(cache: ContentRelatedEmbeddingCache, cachePath: stri
 async function generateEmbeddings(
 	entries: Array<ContentEntry>,
 ): Promise<Array<ContentRelatedEmbedding>> {
-	const cachePath = path.join(
-		values['root-path'],
-		values['cache-path'],
-		getEmbeddingCacheFilename(values['cache-name'], MODEL_ID),
-	);
-
-	const cache = loadEmbeddingCache(cachePath);
+	const cachePath = path.join(values['root-path'], values['cache-path']);
+	const cacheNamespace = getCacheNamespace(values['cache-name'], MODEL_ID);
+	const cache = getFileCacheInstance(cachePath, cacheNamespace);
 
 	const embedder = await pipeline('feature-extraction', MODEL_ID, { dtype: 'fp32' });
 
@@ -212,7 +181,7 @@ async function generateEmbeddings(
 		if (!entry?.digest) continue;
 
 		try {
-			const cachedEmbedding = cache[entry.id];
+			const cachedEmbedding = await cache.get<ContentRelatedEmbedding>(entry.id);
 
 			if (cachedEmbedding?.digest === entry.digest) {
 				embeddings.push(cachedEmbedding);
@@ -235,8 +204,7 @@ async function generateEmbeddings(
 
 				embeddings.push(embedding);
 
-				// Update cache in memory
-				cache[entry.id] = embedding;
+				await cache.set(entry.id, embedding);
 				generated++;
 			}
 
@@ -251,9 +219,6 @@ async function generateEmbeddings(
 			console.error(chalk.red(`Error processing embedding for ${chalk.cyan(entry.id)}:`), error);
 		}
 	}
-
-	// Save updated cache
-	saveEmbeddingCache(cache, cachePath);
 
 	console.log(
 		chalk.green(
@@ -396,8 +361,9 @@ async function contentRelated() {
 
 		if (values['clear-cache']) {
 			const cacheDir = path.join(values['root-path'], values['cache-path']);
-			const cacheFiles = readdirSync(cacheDir).filter((file) =>
-				file.startsWith(values['cache-name']),
+			const cacheNamespace = getCacheNamespace(values['cache-name'], MODEL_ID);
+			const cacheFiles = readdirSync(cacheDir).filter(
+				(file) => file === `${cacheNamespace}.json`,
 			);
 			for (const file of cacheFiles) {
 				rmSync(path.join(cacheDir, file));

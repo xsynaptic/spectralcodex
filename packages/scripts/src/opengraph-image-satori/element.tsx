@@ -41,7 +41,7 @@ export function getOpenGraphElement(
 						backgroundClip: 'text',
 						backgroundImage: 'linear-gradient(to bottom, #fef9ec, #f4da93)',
 						color: 'transparent',
-						fontFamily: 'Noto Sans TC',
+						fontFamily: 'Noto Serif TC',
 						fontSize: '40px',
 						fontWeight: 500,
 						marginBottom: '-4px',

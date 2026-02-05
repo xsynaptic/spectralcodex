@@ -499,6 +499,9 @@ importers:
       '@sindresorhus/slugify':
         specifier: ^3.0.0
         version: 3.0.0
+      '@spectralcodex/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@turf/helpers':
         specifier: ^7.3.3
         version: 7.3.3

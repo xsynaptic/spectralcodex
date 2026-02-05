@@ -30,9 +30,18 @@ Runs validation checks against content files:
 - `divisions`: Verifies division IDs exist in Overture datasets
 - `quality`: Audits content quality scores and completeness
 
-## `map-spritesheet`
+## `opengraph-image-satori`
 
-uilds SDF icon spritesheets for MapLibre markers from Iconify collections. Generates standard and @2x retina sprites using `spreet`.
+# OpenGraph Image Generator
+
+This script contains some code sketching out an implementation of an Open Graph image generator for Astro using Vercel's [Satori](https://github.com/vercel/satori). Some references consulted while hammering out this as-yet unused prototype:
+
+- [this post](https://snorre.io/blog/2023-09-08-generating-opengraph-images-for-astro-copy/) detailing a plugin-based approach
+- [another post](https://techsquidtv.com/blog/generating-open-graph-images-for-astro/) for some discussion of build time image path issues
+- [this playground](https://og-playground.vercel.app/) for further developing image element style
+- [this repo](https://github.com/delucis/astro-og-canvas/tree/latest/packages/astro-og-canvas) for some direction on image caching
+- [this post](https://dietcode.io/p/astro-og/) implements an Astro integration for Satori
+- [this post](https://www.anav.dev/blogs/how-to-generate-dynamic-open-graph-images-with-astro-and-satori) discusses a simple endpoint-based approach
 
 ## `content-schemas`
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { getFileCacheInstance } from '@spectralcodex/utils';
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -33,6 +34,10 @@ const { values } = parseArgs({
 			type: 'string',
 			default: 'public/og',
 		},
+		'cache-path': {
+			type: 'string',
+			default: 'node_modules/.astro/opengraph-satori',
+		},
 	},
 });
 
@@ -56,8 +61,8 @@ const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
 	},
 	{
-		package: 'noto-sans-tc',
-		name: 'Noto Sans TC',
+		package: 'noto-serif-tc',
+		name: 'Noto Serif TC',
 		variants: [{ weight: 500, style: 'normal', subset: 'chinese-traditional' }],
 	},
 ];
@@ -65,10 +70,16 @@ const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 interface ContentEntry {
 	collection: string;
 	id: string;
+	digest: string;
 	title: string;
 	subtitle?: string | undefined;
 	entryQuality?: number | undefined;
 	imageFeaturedId?: string | undefined;
+}
+
+interface CacheEntry {
+	digest: string;
+	imageMtime?: number;
 }
 
 function getImageFeaturedId(
@@ -100,10 +111,12 @@ function getContentEntries(): Array<ContentEntry> {
 
 			if (entryQuality === undefined || entryQuality < MIN_QUALITY) continue;
 			if (!title) continue;
+			if (!entry.digest) continue;
 
 			allEntries.push({
 				collection: collectionName,
 				id: entry.id,
+				digest: entry.digest,
 				title,
 				subtitle,
 				entryQuality,
@@ -125,6 +138,26 @@ async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined>
 		return sharp(imagePath);
 	} catch {
 		return undefined;
+	}
+}
+
+async function getImageMtime(imageId: string): Promise<number | undefined> {
+	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
+
+	try {
+		const stats = await fs.stat(imagePath);
+		return stats.mtimeMs;
+	} catch {
+		return undefined;
+	}
+}
+
+async function outputFileExists(filePath: string): Promise<boolean> {
+	try {
+		await fs.access(filePath);
+		return true;
+	} catch {
+		return false;
 	}
 }
 
@@ -152,17 +185,41 @@ async function main() {
 	);
 
 	const outputPath = path.join(values['root-path'], values['output-path']);
+	const cachePath = path.join(values['root-path'], values['cache-path']);
 
 	await fs.mkdir(outputPath, { recursive: true });
+	await fs.mkdir(cachePath, { recursive: true });
+
+	const cache = getFileCacheInstance(cachePath, 'opengraph-satori');
 
 	const concurrencyLimit = pLimit(CONCURRENCY);
-	let successCount = 0;
+	let generatedCount = 0;
+	let skippedCount = 0;
 	let errorCount = 0;
 
 	await Promise.all(
 		entriesFiltered.map((entry) =>
 			concurrencyLimit(async () => {
 				try {
+					const outputFilePath = path.join(outputPath, `${path.basename(entry.id)}.${OG_FORMAT}`);
+
+					// Check cache for existing entry
+					const cached = await cache.get<CacheEntry>(entry.id);
+					const imageMtime = entry.imageFeaturedId
+						? await getImageMtime(entry.imageFeaturedId)
+						: undefined;
+
+					// Cache hit: digest matches and image hasn't changed
+					const digestMatch = cached?.digest === entry.digest;
+					const imageUnchanged = !imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
+					const fileExists = await outputFileExists(outputFilePath);
+
+					if (digestMatch && imageUnchanged && fileExists) {
+						skippedCount++;
+						return;
+					}
+
+					// Generate image
 					const imageObject = entry.imageFeaturedId
 						? await getSourceImage(entry.imageFeaturedId)
 						: undefined;
@@ -175,12 +232,14 @@ async function main() {
 					};
 
 					const imageBuffer = await generateImage(metadata, imageObject);
-					const outputFilePath = path.join(outputPath, `${path.basename(entry.id)}.${OG_FORMAT}`);
 
 					await fs.writeFile(outputFilePath, new Uint8Array(imageBuffer));
 
+					// Update cache
+					await cache.set(entry.id, { digest: entry.digest, imageMtime });
+
 					console.log(chalk.green(`✓ ${entry.collection}/${entry.id}`));
-					successCount++;
+					generatedCount++;
 				} catch (error) {
 					console.log(chalk.red(`✗ ${entry.collection}/${entry.id}`));
 					console.log(chalk.red(`  ${error instanceof Error ? error.message : String(error)}`));
@@ -191,7 +250,10 @@ async function main() {
 	);
 
 	console.log(chalk.magenta(`\n=== Summary ===`));
-	console.log(chalk.green(`Generated: ${String(successCount)} images`));
+	console.log(chalk.green(`Generated: ${String(generatedCount)} images`));
+	if (skippedCount > 0) {
+		console.log(chalk.blue(`Skipped: ${String(skippedCount)} (cached)`));
+	}
 	if (errorCount > 0) {
 		console.log(chalk.red(`Errors: ${String(errorCount)}`));
 	}
