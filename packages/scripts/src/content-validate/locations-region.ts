@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
+import { RegionsSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
-
-import { RegionsSchema } from '../content-utils/schemas';
 
 /**
  * Derive hierarchy from filePath

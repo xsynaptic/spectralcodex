@@ -12,7 +12,7 @@ import {
 	MapDataKeyMap,
 	MapDataKeys,
 	MapDataKeysCompressed,
-} from '@spectralcodex/map-types';
+} from '@spectralcodex/shared/map';
 import * as R from 'remeda';
 import { z } from 'zod';
 

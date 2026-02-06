@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 
 import { DuckDBConnection } from '@duckdb/node-api';
 import chalk from 'chalk';

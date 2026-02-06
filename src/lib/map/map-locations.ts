@@ -12,9 +12,9 @@ import {
 	LocationStatusNumericMapping,
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
-} from '@spectralcodex/map-types';
-import { hashShort } from '@spectralcodex/shared/cache';
+} from '@spectralcodex/shared/map';
 import { featureCollection } from '@turf/helpers';
+import { hashShort } from 'packages/shared/src/cache';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 

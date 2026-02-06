@@ -1,8 +1,8 @@
 import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { MapSpritesEnum } from '@spectralcodex/map-types';
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { MapSpritesEnum } from '@spectralcodex/shared/map';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import maplibregl from 'maplibre-gl';
 import { useCallback, useMemo } from 'react';
 import { Popup } from 'react-map-gl/maplibre';

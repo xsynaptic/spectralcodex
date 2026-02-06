@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { centroid } from '@turf/centroid';
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';

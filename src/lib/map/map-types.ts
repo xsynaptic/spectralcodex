@@ -1,7 +1,7 @@
 import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { FeatureCollection } from 'geojson';
 
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { z } from 'zod';
 
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';

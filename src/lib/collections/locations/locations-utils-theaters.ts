@@ -1,4 +1,4 @@
-import { LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import * as R from 'remeda';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';

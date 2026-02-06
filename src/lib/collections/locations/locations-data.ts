@@ -1,10 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getSqliteCacheInstance, hashShort } from '@spectralcodex/shared/cache';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import pMemoize from 'p-memoize';
+import { getSqliteCacheInstance, hashShort } from 'packages/shared/src/cache';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
+import { GeometrySchema, RegionsSchema } from '@spectralcodex/shared/schemas';
 import { booleanPointInPolygon, point } from '@turf/turf';
 import chalk from 'chalk';
 import { geojson } from 'flatgeobuf';
@@ -8,8 +9,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
-
-import { GeometrySchema, RegionsSchema } from '../content-utils/schemas';
 
 async function loadRegionGeometry(
 	regionSlug: string,

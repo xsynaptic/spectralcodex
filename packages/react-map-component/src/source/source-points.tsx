@@ -2,7 +2,7 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
-import { LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 

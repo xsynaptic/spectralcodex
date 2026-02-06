@@ -1,6 +1,6 @@
-import { getSqliteCacheInstance, hash } from '@spectralcodex/shared/cache';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
+import { getSqliteCacheInstance, hash } from 'packages/shared/src/cache';
 import sharp from 'sharp';
 
 import type { ImageFitOption, ImagePlaceholderProps } from '#lib/image/image-types.ts';

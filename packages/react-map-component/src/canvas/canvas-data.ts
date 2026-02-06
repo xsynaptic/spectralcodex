@@ -1,4 +1,4 @@
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useMemo } from 'react';
 
 import type { MapGeometry, MapSourceFeatureCollection, MapSourceItemParsed } from '../types';

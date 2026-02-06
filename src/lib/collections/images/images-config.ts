@@ -1,5 +1,5 @@
 import { imageLoader } from '@spectralcodex/image-loader';
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { defineCollection } from 'astro:content';
 import { CONTENT_MEDIA_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';

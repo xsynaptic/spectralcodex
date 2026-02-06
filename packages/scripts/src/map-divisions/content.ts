@@ -1,6 +1,6 @@
-import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 
-import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/map-types';
+import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/shared/map';
 import chalk from 'chalk';
 import path from 'node:path';
 

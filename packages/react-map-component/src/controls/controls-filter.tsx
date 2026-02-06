@@ -1,8 +1,8 @@
-import type { LocationStatus } from '@spectralcodex/map-types';
+import type { LocationStatus } from '@spectralcodex/shared/map';
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { MapSpritesEnum } from '@spectralcodex/map-types';
+import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { memo } from 'react';
 import * as R from 'remeda';
 

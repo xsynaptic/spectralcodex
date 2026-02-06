@@ -1,4 +1,4 @@
-import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Geometry } from 'geojson';
 
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';

@@ -126,11 +126,10 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 - `./packages/content`: primary content collection (private, not included in repo)
 - `./packages/content-demo`: example content for testing and demonstration purposes
 - `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs)
-- `./packages/map-types`: TypeScript type definitions for map-related data structures
 - `./packages/react-map-component`: interactive map component built with MapLibre and react-map-gl
 - `./packages/remark-img-group`: Remark plugin for handling image groups in MDX
 - `./packages/scripts`: build tooling for content validation, semantic similarity generation, OpenGraph image generation (Satori), map division processing, and deployment orchestration
-- `./packages/utils`: shared utilities including Keyv-based caching (SQLite and file backends) for build-time data persistence
+- `./packages/shared`: shared utilities including Keyv-based caching (SQLite and file backends) for build-time data persistence, common map types and schemas
 
 ### Generated/Temporary
 

@@ -1,12 +1,13 @@
 {
 	"name": "@spectralcodex/shared",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Shared code for Spectral Codex",
 	"type": "module",
 	"exports": {
-		"./cache": "./src/cache.ts",
+		"./cache": "./src/cache/index.ts",
 		"./constants": "./src/constants.ts",
-		"./schemas": "./src/schemas.ts"
+		"./map": "./src/map/index.ts",
+		"./schemas": "./src/schemas/index.ts"
 	},
 	"private": true,
 	"devDependencies": {

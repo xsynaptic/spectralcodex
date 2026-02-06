@@ -1,5 +1,5 @@
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
-import { LocationLayerEnum } from '@spectralcodex/map-types';
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
+import { LocationLayerEnum } from '@spectralcodex/shared/map';
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';

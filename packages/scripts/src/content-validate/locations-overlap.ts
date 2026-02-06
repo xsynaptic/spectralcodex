@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
+import { GeometrySchema } from '@spectralcodex/shared/schemas';
 import { distance as getDistance, point as getPoint } from '@turf/turf';
 import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
-
-import { GeometrySchema } from '../content-utils/schemas';
 
 interface LocationData {
 	id: string;

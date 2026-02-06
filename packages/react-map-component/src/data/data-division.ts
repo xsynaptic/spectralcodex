@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useQuery } from '@tanstack/react-query';
 import { bboxPolygon } from '@turf/bbox-polygon';
 import { difference } from '@turf/difference';

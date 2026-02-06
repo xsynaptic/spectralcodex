@@ -1,10 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getSqliteCacheInstance, hash } from '@spectralcodex/shared/cache';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
+import { getSqliteCacheInstance, hash } from 'packages/shared/src/cache';
 
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 

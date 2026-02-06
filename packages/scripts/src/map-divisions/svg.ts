@@ -1,4 +1,4 @@
-import type { GeometryBoundingBox } from '@spectralcodex/map-types';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Feature } from 'geojson';
 
 import { bboxClip, featureCollection, rewind, simplify } from '@turf/turf';

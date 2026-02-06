@@ -1,5 +1,4 @@
 #!/usr/bin/env tsx
-import { getFileCacheInstance } from '@spectralcodex/shared/cache';
 import {
 	OPEN_GRAPH_IMAGE_FORMAT,
 	OPEN_GRAPH_IMAGE_HEIGHT,
@@ -11,6 +10,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
+import { getFileCacheInstance } from 'packages/shared/src/cache/index.js';
 import sharp from 'sharp';
 import { z } from 'zod';
 

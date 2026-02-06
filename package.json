@@ -50,7 +50,6 @@
 		"@astrojs/sitemap": "3.6.1-beta.3",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
-		"@spectralcodex/map-types": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",

@@ -1,13 +1,13 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
 import slugify from '@sindresorhus/slugify';
-import { getFileCacheInstance } from '@spectralcodex/shared/cache';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { ContentCollectionsEnum } from 'packages/scripts/src/content-utils/collections.js';
+import { getFileCacheInstance } from 'packages/shared/src/cache/index.js';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../content-utils/data-store.js';

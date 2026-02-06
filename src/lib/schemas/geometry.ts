@@ -1,6 +1,6 @@
 import type { Position } from 'geojson';
 
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';

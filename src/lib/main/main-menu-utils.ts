@@ -1,4 +1,4 @@
-import { hash } from '@spectralcodex/shared/cache';
+import { hash } from 'packages/shared/src/cache';
 
 import type { MenuItem } from '#lib/main/main-types.ts';
 

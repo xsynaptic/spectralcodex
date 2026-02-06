@@ -1,6 +1,6 @@
-import type { LocationStatus } from '@spectralcodex/map-types';
+import type { LocationStatus } from '@spectralcodex/shared/map';
 
-import { LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 
 import { tailwindColors } from './tailwind-colors';
 

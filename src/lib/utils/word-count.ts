@@ -1,9 +1,9 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { getSqliteCacheInstance, hash } from '@spectralcodex/shared/cache';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import { getSqliteCacheInstance, hash } from 'packages/shared/src/cache';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';

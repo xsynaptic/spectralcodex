@@ -1,8 +1,8 @@
-import type { LocationStatus } from '@spectralcodex/map-types';
+import type { LocationStatus } from '@spectralcodex/shared/map';
 import type { ReactNode } from 'react';
 import type { CSSProperties } from 'react';
 
-import { LocationStatusEnum } from '@spectralcodex/map-types';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createContext, useMemo, useState } from 'react';
 import { createStore } from 'zustand';
 

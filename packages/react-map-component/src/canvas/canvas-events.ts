@@ -1,7 +1,7 @@
 import type { GeoJSONSource, Source } from 'maplibre-gl';
 import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
-import { GeometryTypeEnum } from '@spectralcodex/map-types';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo } from 'react';
 import * as R from 'remeda';
 
