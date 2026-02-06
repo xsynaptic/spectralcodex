@@ -38,7 +38,7 @@ export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
 			continue;
 		}
 
-		const firstRegion = regions[0].id;
+		const firstRegion = regions[0];
 		const hierarchy = entry.filePath ? getHierarchy(entry.filePath, 'locations') : [];
 
 		// The parent folder should match the first region

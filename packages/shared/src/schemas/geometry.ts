@@ -5,6 +5,3 @@ const SingleGeometrySchema = z.object({
 });
 
 export const GeometrySchema = z.union([SingleGeometrySchema, z.array(SingleGeometrySchema)]);
-
-// Regions in the data store are resolved references with {id, collection}
-export const RegionsSchema = z.object({ id: z.string(), collection: z.literal('regions') }).array();

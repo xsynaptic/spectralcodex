@@ -4,20 +4,17 @@ import {
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
 } from '@spectralcodex/shared/constants';
-import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
+import { getContentEntries } from 'packages/scripts/src/og-image/content.js';
 import { getFileCacheInstance } from 'packages/shared/src/cache/index.js';
 import sharp from 'sharp';
-import { z } from 'zod';
 
-import type { OpenGraphFontConfig, OpenGraphMetadataItem } from './types.js';
+import type { OpenGraphFontConfig } from './types.js';
 
-import { ContentCollectionsEnum } from '../content-utils/collections.js';
-import { getCollection, loadDataStore } from '../content-utils/data-store.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -47,11 +44,6 @@ const { values } = parseArgs({
 	},
 });
 
-/**
- * Open Graph image settings
- */
-const CONCURRENCY = 40;
-
 // Testing constraints (hardcoded for development)
 const LIMIT = 80; // Infinity;
 const CACHE_ENABLED = false as boolean;
@@ -80,77 +72,12 @@ const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 	},
 ];
 
-interface ContentEntry extends OpenGraphMetadataItem {
-	digest: string;
-	entryQuality?: number | undefined;
-	imageFeaturedId?: string | undefined;
-	category?: string | undefined;
-}
-
 interface CacheEntry {
 	digest: string;
 	imageMtime?: number;
 }
 
-/**
- * Returns a fallback image ID based on entry properties
- */
-function getFallbackImageId(entry: ContentEntry): string {
-	if (entry.category === 'temple') {
-		return 'taiwan/nantou/caotun/caotun-cide-temple-1.jpg';
-	}
-	return 'taiwan/nantou/caotun/caotun-cide-temple-2.jpg';
-}
-
-function getImageFeaturedId(
-	imageFeatured: ReturnType<typeof ImageFeaturedSchema.parse> | undefined,
-): string | undefined {
-	if (!imageFeatured) return undefined;
-
-	if (Array.isArray(imageFeatured)) return getImageFeaturedId(imageFeatured[0]);
-
-	return typeof imageFeatured === 'object' && 'id' in imageFeatured
-		? imageFeatured.id
-		: imageFeatured;
-}
-
-function getContentEntries(): Array<ContentEntry> {
-	const { collections } = loadDataStore(path.join(values['root-path'], values['data-store-path']));
-
-	const allEntries: Array<ContentEntry> = [];
-
-	for (const collection of Object.values(ContentCollectionsEnum)) {
-		const collectionEntries = getCollection(collections, collection);
-
-		for (const entry of collectionEntries) {
-			const title = z.string().optional().parse(entry.data.title);
-			const titleZh = z.string().optional().parse(entry.data.title_zh);
-			const titleJa = z.string().optional().parse(entry.data.title_ja);
-			const titleTh = z.string().optional().parse(entry.data.title_th);
-			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
-			const imageFeaturedId = getImageFeaturedId(imageFeatured);
-
-			// Skip entries without digest
-			if (!title || !entry.digest) continue;
-
-			allEntries.push({
-				collection,
-				id: entry.id,
-				digest: entry.digest,
-				title,
-				titleZh,
-				titleJa,
-				titleTh,
-				imageFeaturedId,
-				isFallback: imageFeaturedId === undefined,
-				category: entry.data.category as string | undefined,
-			});
-		}
-	}
-
-	return allEntries;
-}
-
+// Load the source image from the media path
 async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined> {
 	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
 
@@ -202,7 +129,7 @@ async function main() {
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
-	const entries = getContentEntries();
+	const entries = getContentEntries(path.join(values['root-path'], values['data-store-path']));
 	const entriesFiltered = entries.slice(0, LIMIT);
 
 	console.log(
@@ -219,7 +146,8 @@ async function main() {
 
 	const cache = getFileCacheInstance(cachePath, 'og-image-cache');
 
-	const concurrencyLimit = pLimit(CONCURRENCY);
+	// How many images should be processed concurrently?
+	const concurrencyLimit = pLimit(50);
 
 	let generatedCount = 0;
 	let skippedCount = 0;
@@ -235,7 +163,7 @@ async function main() {
 					);
 
 					// Resolve image ID: use featured image or fall back based on entry properties
-					const imageId = entry.imageFeaturedId ?? getFallbackImageId(entry);
+					const imageId = entry.imageFeaturedId;
 
 					// Check cache for existing entry
 					const cached = await cache.get<CacheEntry>(entry.id);
@@ -253,18 +181,18 @@ async function main() {
 					}
 
 					const imageObject = await getSourceImage(imageId);
-
-					const metadata: OpenGraphMetadataItem = {
-						collection: entry.collection,
-						id: entry.id,
-						title: entry.title,
-						titleZh: entry.titleZh,
-						titleJa: entry.titleJa,
-						titleTh: entry.titleTh,
-						isFallback: entry.imageFeaturedId === undefined,
-					};
-
-					const imageBuffer = await generateImage(metadata, imageObject);
+					const imageBuffer = await generateImage(
+						{
+							collection: entry.collection,
+							id: entry.id,
+							title: entry.title,
+							titleZh: entry.titleZh,
+							titleJa: entry.titleJa,
+							titleTh: entry.titleTh,
+							isFallback: entry.isFallback,
+						},
+						imageObject,
+					);
 
 					await fs.writeFile(outputFilePath, new Uint8Array(imageBuffer));
 

@@ -19,8 +19,6 @@ import { z } from 'zod';
 // Supported geometry for use with this component
 export type MapGeometry = Point | LineString | Polygon;
 
-const NumericScaleSchema = z.number().int().min(1).max(5);
-
 /**
  * Map source data
  */
@@ -30,10 +28,10 @@ export const MapSourceItemSchema = z
 		[MapDataKeysCompressed.Title]: z.string(),
 		[MapDataKeysCompressed.Category]: z.enum(LocationCategoryNumericMapping),
 		[MapDataKeysCompressed.Status]: z.enum(LocationStatusNumericMapping),
-		[MapDataKeysCompressed.Precision]: NumericScaleSchema,
-		[MapDataKeysCompressed.Quality]: NumericScaleSchema,
-		[MapDataKeysCompressed.Rating]: NumericScaleSchema,
-		[MapDataKeysCompressed.Objective]: NumericScaleSchema.optional(),
+		[MapDataKeysCompressed.Precision]: z.number().int(),
+		[MapDataKeysCompressed.Quality]: z.number().int(),
+		[MapDataKeysCompressed.Rating]: z.number().int(),
+		[MapDataKeysCompressed.Objective]: z.number().int().optional(),
 		[MapDataKeysCompressed.Outlier]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.HasImage]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.Geometry]: z.object({
@@ -94,7 +92,7 @@ export const MapPopupItemSchema = z
 		[MapDataKeysCompressed.TitleMultilingualValue]: z.string().optional(),
 		[MapDataKeysCompressed.Url]: z.string().optional(),
 		[MapDataKeysCompressed.Description]: z.string().optional(),
-		[MapDataKeysCompressed.Safety]: NumericScaleSchema.optional(),
+		[MapDataKeysCompressed.Safety]: z.number().int().optional(),
 		[MapDataKeysCompressed.GoogleMapsUrl]: z.string().optional(),
 		[MapDataKeysCompressed.WikipediaUrl]: z.string().optional(),
 		[MapDataKeysCompressed.ImageSrc]: z.string().optional(),

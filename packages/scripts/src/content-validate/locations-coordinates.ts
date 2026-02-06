@@ -80,8 +80,10 @@ export async function checkLocationsCoordinates(
 	for (const entry of entries) {
 		// Parse regions array (reference objects)
 		const regionsResult = RegionsSchema.safeParse(entry.data.regions);
+
 		if (!regionsResult.success) continue;
-		const regions = regionsResult.data.map((r) => r.id);
+
+		const regions = regionsResult.data;
 
 		// Parse geometry coordinates
 		const geometryResult = GeometrySchema.safeParse(entry.data.geometry);
