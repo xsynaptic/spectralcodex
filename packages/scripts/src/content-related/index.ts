@@ -12,7 +12,7 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../content-utils/data-store.js';
 
-import { getCollection, loadDataStore } from '../content-utils/data-store.js';
+import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store.js';
 
 /**
  * Arguments
@@ -324,7 +324,7 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 
 	// Get entries from posts and locations collections
 	for (const collectionName of [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]) {
-		const collectionEntries = getCollection(collections, collectionName);
+		const collectionEntries = getDataStoreCollection(collections, collectionName);
 
 		for (const entry of collectionEntries) {
 			// Filter: must have digest

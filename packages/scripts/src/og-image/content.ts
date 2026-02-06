@@ -10,7 +10,11 @@ import { z } from 'zod';
 
 import type { OpenGraphMetadataItem } from './types.js';
 
-import { getCollection, loadDataStore } from '../content-utils/data-store.js';
+import {
+	getDataStoreCollection,
+	getDataStoreRegionParentsById,
+	loadDataStore,
+} from '../content-utils/data-store.js';
 
 interface ContentEntry extends OpenGraphMetadataItem {
 	digest: string;
@@ -26,10 +30,29 @@ function getFallbackImageId(data: {
 	regions?: Array<string> | undefined;
 	themes?: Array<string> | undefined;
 }): string {
-	console.log(data.regions);
-	console.log(data.themes);
+	if (data.regions?.[1] === 'changhua') {
+		return 'taiwan/changhua/changhua-city/changhua-confucius-temple-1.jpg';
+	}
+	if (data.regions?.[1] === 'chiayi') {
+		return 'taiwan/chiayi/chiayi-east/chiayi-sun-shooting-tower-1.jpg';
+	}
+	if (data.regions?.[1] === 'hsinchu') {
+		return 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg';
+	}
+	if (data.regions?.[1] === 'nantou') {
+		return 'taiwan/nantou/caotun/caotun-cide-temple-1.jpg';
+	}
 	if (data.category === 'temple') {
 		return 'taiwan/nantou/caotun/caotun-cide-temple-1.jpg';
+	}
+	if (data.themes?.includes('thailand-theaters')) {
+		return 'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg';
+	}
+	if (data.regions?.[0] === 'canada') {
+		return 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg';
+	}
+	if (data.regions?.[0] === 'thailand') {
+		return 'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg';
 	}
 	return 'taiwan/nantou/caotun/caotun-cide-temple-2.jpg';
 }
@@ -46,12 +69,12 @@ function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | 
 
 // Content entries are constructed with enough metadata to assign fallback images
 export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
-	const { collections } = loadDataStore(dataStorePath);
+	const { collections, regionParentMap } = loadDataStore(dataStorePath);
 
 	const allEntries: Array<ContentEntry> = [];
 
 	for (const collection of Object.values(ContentCollectionsEnum)) {
-		const collectionEntries = getCollection(collections, collection);
+		const collectionEntries = getDataStoreCollection(collections, collection);
 
 		for (const entry of collectionEntries) {
 			const title = z.string().optional().parse(entry.data.title);
@@ -74,7 +97,10 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 					getFallbackImageId({
 						collection,
 						category: z.string().optional().parse(entry.data.category),
-						regions: RegionsSchema.optional().parse(entry.data.regions),
+						regions: getDataStoreRegionParentsById(
+							RegionsSchema.optional().parse(entry.data.regions)?.[0],
+							regionParentMap,
+						),
 						themes: ThemesSchema.optional().parse(entry.data.themes),
 					}),
 				isFallback: imageFeaturedId === undefined,

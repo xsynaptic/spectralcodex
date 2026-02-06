@@ -5,7 +5,7 @@ import { parseArgs } from 'node:util';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
 
-import { getCollection, loadDataStore } from '../content-utils/data-store';
+import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkImageReferences } from './images';
 import { checkLocationsCoordinates } from './locations-coordinates';
@@ -51,31 +51,31 @@ const command = positionals[0];
 type CollectionEntries = Array<[string, Array<DataStoreEntry>]>;
 
 const checkSlugCollections: CollectionEntries = [
-	['ephemera', getCollection(collections, 'ephemera')],
-	['locations', getCollection(collections, 'locations')],
-	['posts', getCollection(collections, 'posts')],
-	['regions', getCollection(collections, 'regions')],
+	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['locations', getDataStoreCollection(collections, 'locations')],
+	['posts', getDataStoreCollection(collections, 'posts')],
+	['regions', getDataStoreCollection(collections, 'regions')],
 ];
 
 const allCollections: CollectionEntries = [
-	['archives', getCollection(collections, 'archives')],
-	['ephemera', getCollection(collections, 'ephemera')],
-	['locations', getCollection(collections, 'locations')],
-	['pages', getCollection(collections, 'pages')],
-	['posts', getCollection(collections, 'posts')],
-	['regions', getCollection(collections, 'regions')],
-	['resources', getCollection(collections, 'resources')],
-	['series', getCollection(collections, 'series')],
-	['themes', getCollection(collections, 'themes')],
+	['archives', getDataStoreCollection(collections, 'archives')],
+	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['locations', getDataStoreCollection(collections, 'locations')],
+	['pages', getDataStoreCollection(collections, 'pages')],
+	['posts', getDataStoreCollection(collections, 'posts')],
+	['regions', getDataStoreCollection(collections, 'regions')],
+	['resources', getDataStoreCollection(collections, 'resources')],
+	['series', getDataStoreCollection(collections, 'series')],
+	['themes', getDataStoreCollection(collections, 'themes')],
 ];
 
 const qualityCollections: CollectionEntries = [
-	['ephemera', getCollection(collections, 'ephemera')],
-	['locations', getCollection(collections, 'locations')],
-	['posts', getCollection(collections, 'posts')],
-	['regions', getCollection(collections, 'regions')],
-	['series', getCollection(collections, 'series')],
-	['themes', getCollection(collections, 'themes')],
+	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['locations', getDataStoreCollection(collections, 'locations')],
+	['posts', getDataStoreCollection(collections, 'posts')],
+	['regions', getDataStoreCollection(collections, 'regions')],
+	['series', getDataStoreCollection(collections, 'series')],
+	['themes', getDataStoreCollection(collections, 'themes')],
 ];
 
 // Note: there is no need for a help command
@@ -87,13 +87,13 @@ switch (command) {
 	}
 	// Check for locations not assigned to regions OR locations with mismatching regions and assigned paths
 	case 'location-regions': {
-		checkLocationsRegions(getCollection(collections, 'locations'));
+		checkLocationsRegions(getDataStoreCollection(collections, 'locations'));
 		break;
 	}
 	// Check for locations not inside their assigned regions
 	case 'location-coordinates': {
 		await checkLocationsCoordinates(
-			getCollection(collections, 'locations'),
+			getDataStoreCollection(collections, 'locations'),
 			path.join(values['root-path'], values['divisions-path']),
 		);
 		break;
@@ -101,19 +101,19 @@ switch (command) {
 	// Check for locations that are too close to each other
 	case 'location-overlap': {
 		checkLocationsOverlap(
-			getCollection(collections, 'locations'),
+			getDataStoreCollection(collections, 'locations'),
 			Number.parseInt(values.threshold, 10),
 		);
 		break;
 	}
 	// Check for duplicate location data (slugs, titles, addresses, links)
 	case 'location-duplicates': {
-		checkLocationsDuplicates(getCollection(collections, 'locations'));
+		checkLocationsDuplicates(getDataStoreCollection(collections, 'locations'));
 		break;
 	}
 	// Check for regions without a divisionId
 	case 'divisions': {
-		checkDivisionIds(getCollection(collections, 'regions'));
+		checkDivisionIds(getDataStoreCollection(collections, 'regions'));
 		break;
 	}
 	// Check for quality mismatch e.g. entry has a featured image but hasn't been bumped to quality 2
@@ -160,29 +160,31 @@ switch (command) {
 
 		if (!qualitySuccess) process.exit(1);
 
-		const duplicatesSuccess = checkLocationsDuplicates(getCollection(collections, 'locations'));
+		const duplicatesSuccess = checkLocationsDuplicates(
+			getDataStoreCollection(collections, 'locations'),
+		);
 
 		if (!duplicatesSuccess) process.exit(1);
 
-		const regionSuccess = checkLocationsRegions(getCollection(collections, 'locations'));
+		const regionSuccess = checkLocationsRegions(getDataStoreCollection(collections, 'locations'));
 
 		if (!regionSuccess) process.exit(1);
 
 		const coordinatesSuccess = await checkLocationsCoordinates(
-			getCollection(collections, 'locations'),
+			getDataStoreCollection(collections, 'locations'),
 			path.join(values['root-path'], values['divisions-path']),
 		);
 
 		if (!coordinatesSuccess) process.exit(1);
 
 		const overlapSuccess = checkLocationsOverlap(
-			getCollection(collections, 'locations'),
+			getDataStoreCollection(collections, 'locations'),
 			Number.parseInt(values.threshold, 10),
 		);
 
 		if (!overlapSuccess) process.exit(1);
 
-		const divisionsSuccess = checkDivisionIds(getCollection(collections, 'regions'));
+		const divisionsSuccess = checkDivisionIds(getDataStoreCollection(collections, 'regions'));
 
 		if (!divisionsSuccess) process.exit(1);
 

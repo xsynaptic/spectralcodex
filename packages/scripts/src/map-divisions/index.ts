@@ -9,7 +9,7 @@ import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
-import { getCollection, loadDataStore } from '../content-utils/data-store';
+import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
@@ -265,7 +265,7 @@ async function mapDivisions() {
 		const { collections } = loadDataStore(
 			path.join(values['root-path'], values['data-store-path']),
 		);
-		const regionEntries = getCollection(collections, 'regions');
+		const regionEntries = getDataStoreCollection(collections, 'regions');
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
 

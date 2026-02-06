@@ -32,11 +32,31 @@ export interface DataStoreEntry {
 type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;
 
 /**
+ * Maps each region ID to its parent ID (undefined for root regions)
+ */
+type RegionParentMap = Map<string, string | undefined>;
+
+/**
  * Result of loading the data store
  */
 interface DataStoreResult {
 	collections: DataStoreCollections;
+	regionParentMap: RegionParentMap;
 	path: string;
+}
+
+function buildRegionParentMap(collections: DataStoreCollections): RegionParentMap {
+	const regions = collections.get('regions');
+
+	const parentMap = new Map<string, string | undefined>();
+
+	if (!regions) return parentMap;
+
+	for (const [id, entry] of regions) {
+		parentMap.set(id, entry.data.parent as string | undefined);
+	}
+
+	return parentMap;
 }
 
 /**
@@ -58,6 +78,7 @@ export function loadDataStore(dataStorePath: string): DataStoreResult {
 
 	return {
 		collections,
+		regionParentMap: buildRegionParentMap(collections),
 		path: dataStorePath,
 	};
 }
@@ -65,10 +86,31 @@ export function loadDataStore(dataStorePath: string): DataStoreResult {
 /**
  * Get entries from a specific collection
  */
-export function getCollection(
+export function getDataStoreCollection(
 	collections: DataStoreCollections,
 	name: string,
 ): Array<DataStoreEntry> {
 	const collection = collections.get(name);
+
 	return collection ? [...collection.values()] : [];
+}
+
+/**
+ * Get ancestors from root down to the region itself
+ * [0] = root, [1] = second-most ancestral, ..., [last] = regionId
+ */
+export function getDataStoreRegionParentsById(
+	regionId: string | undefined,
+	parentMap: RegionParentMap,
+): Array<string> {
+	if (!regionId) return [];
+
+	const chain: Array<string> = [regionId];
+	let parent = parentMap.get(regionId);
+
+	while (parent !== undefined) {
+		chain.push(parent);
+		parent = parentMap.get(parent);
+	}
+	return chain.toReversed();
 }
