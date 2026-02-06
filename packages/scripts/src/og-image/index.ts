@@ -45,8 +45,8 @@ const { values } = parseArgs({
 });
 
 // Testing constraints (hardcoded for development)
-const LIMIT = 80; // Infinity;
-const CACHE_ENABLED = false as boolean;
+const LIMIT = Infinity;
+const CACHE_ENABLED = true as boolean;
 
 // Font configuration
 const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
@@ -74,6 +74,7 @@ const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
 
 interface CacheEntry {
 	digest: string;
+	imageId: string;
 	imageMtime?: number;
 }
 
@@ -169,13 +170,14 @@ async function main() {
 					const cached = await cache.get<CacheEntry>(entry.id);
 					const imageMtime = await getImageModifiedTime(imageId);
 
-					// Cache hit: digest matches and image hasn't changed
+					// Cache hit: digest matches, same image used, and image hasn't changed
 					const digestMatch = cached?.digest === entry.digest;
+					const sameImage = cached?.imageId === imageId;
 					const imageUnchanged =
 						!imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
 					const fileExists = await outputFileExists(outputFilePath);
 
-					if (digestMatch && imageUnchanged && fileExists && CACHE_ENABLED) {
+					if (digestMatch && sameImage && imageUnchanged && fileExists && CACHE_ENABLED) {
 						skippedCount++;
 						return;
 					}
@@ -197,7 +199,7 @@ async function main() {
 					await fs.writeFile(outputFilePath, new Uint8Array(imageBuffer));
 
 					// Update cache
-					await cache.set(entry.id, { digest: entry.digest, imageMtime });
+					await cache.set(entry.id, { digest: entry.digest, imageId, imageMtime });
 
 					console.log(chalk.green(`✓ ${entry.collection}/${entry.id}`));
 					generatedCount++;
