@@ -58,7 +58,7 @@ const { Content } = await render(entry);
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		description: entry.data.description ?? entry.body ?? undefined,
-		image: getSeoImageProps({
+		image: await getSeoImageProps({
 			id: entry.id,
 			alt: entry.data.title,
 		}),

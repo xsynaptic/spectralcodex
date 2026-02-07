@@ -44,7 +44,7 @@ const t = getTranslations();
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		description: entry.body ?? undefined,
-		image: getSeoImageProps({
+		image: await getSeoImageProps({
 			id: entry.id,
 			alt: entry.data.title,
 		}),

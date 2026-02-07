@@ -1,5 +1,8 @@
+import { cacheFileExists } from '@spectralcodex/shared/cache';
 import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import path from 'node:path';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 
@@ -52,19 +55,28 @@ export function getSeoArticleProps({
 	};
 }
 
-export function getSeoImageProps({ id, alt }: { id: string; alt: string }) {
-	return {
-		url: urlJoin(PROD ? SITE : BASE_URL, OPEN_GRAPH_BASE_PATH, `${id}.${OPEN_GRAPH_IMAGE_FORMAT}`),
-		alt,
-	};
-}
-
 // These fallback images should already exist in the public folder
 export function getSeoImageFallback() {
 	return urlJoin(
 		PROD ? SITE : BASE_URL,
 		`${OPEN_GRAPH_IMAGE_FALLBACK_PREFIX}-${String(R.randomInteger(1, OPEN_GRAPH_IMAGE_FALLBACK_COUNT))}.${OPEN_GRAPH_IMAGE_FORMAT}`,
 	);
+}
+
+export async function getSeoImageProps({ id, alt }: { id: string; alt: string }) {
+	const filename = `${id}.${OPEN_GRAPH_IMAGE_FORMAT}`;
+	const cachePath = path.join(CUSTOM_CACHE_PATH, 'og-image-output', filename);
+
+	const fileExists = await cacheFileExists(cachePath);
+
+	if (!fileExists) {
+		console.warn(`[OG Image] Missing: ${filename}`);
+	}
+
+	return {
+		url: urlJoin(PROD ? SITE : BASE_URL, OPEN_GRAPH_BASE_PATH, filename),
+		alt,
+	};
 }
 
 export function getSeoHideSearch(shouldHide: boolean | undefined) {

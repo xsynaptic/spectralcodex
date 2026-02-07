@@ -91,7 +91,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
 <MainSite
 	meta={{
-		image: getSeoImageProps({
+		image: await getSeoImageProps({
 			...(featuredOgImageId ? { id: featuredOgImageId } : {}),
 			alt: t('site.title'),
 		}),
