@@ -5,6 +5,8 @@
 	"type": "module",
 	"exports": {
 		"./cache": "./src/cache/index.ts",
+		"./cache/file": "./src/cache/file.ts",
+		"./cache/sqlite": "./src/cache/sqlite.ts",
 		"./constants": "./src/constants.ts",
 		"./map": "./src/map/index.ts",
 		"./schemas": "./src/schemas/index.ts"

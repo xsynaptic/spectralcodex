@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import {
 	OPEN_GRAPH_IMAGE_FORMAT,
 	OPEN_GRAPH_IMAGE_HEIGHT,
@@ -10,7 +11,6 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 import { getContentEntries } from 'packages/scripts/src/og-image/content.js';
-import { getFileCacheInstance } from 'packages/shared/src/cache/index.js';
 import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';

@@ -1,10 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { hash } from '@spectralcodex/shared/cache';
+import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
-import { getSqliteCacheInstance, hash } from 'packages/shared/src/cache';
 
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 
@@ -34,7 +35,12 @@ type RegionComputedData = Pick<
 // Cache of all region computed data, keyed by region ID
 type RegionComputedDataCache = Record<string, RegionComputedData>;
 
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
+let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
+
+async function getCacheInstance() {
+	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
+	return cacheInstance;
+}
 
 /**
  * Generate a stable cache key from the content graph state
@@ -262,7 +268,8 @@ async function generateCollection(): Promise<CollectionData> {
 
 	// Generate cache key from current content graph state
 	const cacheKey = generateCacheKey({ regions, locations, posts });
-	const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
+	const cache = await getCacheInstance();
+	const cacheData = await cache.get<RegionComputedDataCache>(cacheKey);
 
 	if (cacheData) {
 		applyComputedDataCache(regions, cacheData);
@@ -276,8 +283,8 @@ async function generateCollection(): Promise<CollectionData> {
 		populateRegionsContent({ regions, locations, posts });
 
 		// Clear old cache entries before setting new one (prevents unbounded growth)
-		await cacheInstance.clear();
-		await cacheInstance.set(cacheKey, extractComputedData(regions));
+		await cache.clear();
+		await cache.set(cacheKey, extractComputedData(regions));
 
 		console.log(
 			`[Regions] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,

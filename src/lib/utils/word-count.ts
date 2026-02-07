@@ -1,15 +1,21 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
+import { hash } from '@spectralcodex/shared/cache';
+import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { countWords } from 'alfaaz';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
-import { getSqliteCacheInstance, hash } from 'packages/shared/src/cache';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
+let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
+
+async function getCacheInstance() {
+	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
+	return cacheInstance;
+}
 
 /**
  * Generate word count from content body
@@ -42,7 +48,8 @@ export async function getWordCount(
 		},
 	});
 
-	const cachedCount = await cacheInstance.get<number>(hashValue);
+	const cache = await getCacheInstance();
+	const cachedCount = await cache.get<number>(hashValue);
 
 	// Check cache first
 	if (cachedCount !== undefined) {
@@ -62,7 +69,7 @@ export async function getWordCount(
 		wordCount = computeWordCount(entry.data.description);
 	}
 
-	await cacheInstance.set(hashValue, wordCount);
+	await cache.set(hashValue, wordCount);
 
 	return wordCount;
 }

@@ -1,4 +1,3 @@
-import KeyvSqlite from '@keyv/sqlite';
 import Keyv from 'keyv';
 import { KeyvFile } from 'keyv-file';
 import { promises as fs } from 'node:fs';
@@ -17,21 +16,6 @@ export function getFileCacheInstance(cachePath: string, namespace: string): Keyv
 			writeDelay: 100,
 			serialize: JSON.stringify,
 			deserialize: (val): unknown => JSON.parse(val.toString()),
-		}),
-		namespace,
-	});
-}
-
-/**
- * Initialize Keyv with SQLite backend
- * Best for concurrent access during Astro builds
- */
-export function getSqliteCacheInstance(cachePath: string, namespace: string): Keyv {
-	return new Keyv({
-		store: new KeyvSqlite({
-			uri: `sqlite://${path.join(cachePath, `${namespace}.sqlite`)}`,
-			table: 'cache',
-			busyTimeout: 10_000,
 		}),
 		namespace,
 	});

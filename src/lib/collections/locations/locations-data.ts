@@ -1,10 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { hashShort } from '@spectralcodex/shared/cache';
+import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import pMemoize from 'p-memoize';
-import { getSqliteCacheInstance, hashShort } from 'packages/shared/src/cache';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
@@ -21,7 +22,12 @@ interface CollectionData {
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
+let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
+
+async function getCacheInstance() {
+	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
+	return cacheInstance;
+}
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
@@ -133,13 +139,14 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
-	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
+	const cache = await getCacheInstance();
+	const cachedDescriptionHtml = await cache.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {
 		entry.data._descriptionHtml = cachedDescriptionHtml;
 	} else {
 		entry.data._descriptionHtml = transformMarkdown({ input: entry.data.description });
-		await cacheInstance.set(locationMapDataHash, entry.data._descriptionHtml);
+		await cache.set(locationMapDataHash, entry.data._descriptionHtml);
 	}
 }
 
