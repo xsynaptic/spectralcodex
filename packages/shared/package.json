@@ -12,7 +12,7 @@
 		"./schemas": "./src/schemas/index.ts"
 	},
 	"private": true,
-	"devDependencies": {
+	"dependencies": {
 		"@keyv/sqlite": "^4.0.8",
 		"keyv": "^5.6.0",
 		"keyv-file": "^5.3.3",

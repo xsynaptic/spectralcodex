@@ -58,7 +58,7 @@ export default defineConfig({
 				context: 'server',
 				access: 'public',
 				optional: true,
-				default: './node_modules/.astro',
+				default: './.cache',
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				context: 'client',

@@ -13,8 +13,8 @@ export default getConfig(
 	[
 		{
 			ignores: [
-				'**/.astro',
-				'**/.astro-cache',
+				'**/.astro/**/*',
+				'**/.cache/**/*',
 				'deploy/**/*',
 				'dist/**/*',
 				'content/**/*',

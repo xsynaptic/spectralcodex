@@ -30,7 +30,7 @@ const { values } = parseArgs({
 		},
 		'cache-path': {
 			type: 'string',
-			default: 'node_modules/.astro/content-related',
+			default: './.cache',
 		},
 		'cache-name': {
 			type: 'string',
@@ -38,7 +38,7 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: 'node_modules/.astro/content-related',
+			default: './temp',
 		},
 		'output-name': {
 			type: 'string',

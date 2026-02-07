@@ -25,3 +25,4 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - sqlite3
+  - usearch

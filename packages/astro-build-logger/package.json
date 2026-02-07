@@ -7,9 +7,11 @@
 		".": "./src/index.ts"
 	},
 	"private": true,
-	"devDependencies": {
-		"astro": "^6.0.0-beta.9",
+	"dependencies": {
 		"astro-integration-kit": "^0.19.1",
 		"zod": "^4.3.6"
+	},
+	"peerDependencies": {
+		"astro": "^6.0.0-beta.9"
 	}
 }

@@ -17,5 +17,5 @@
 		"packages/content/.remarkrc.mjs",
 		"packages/content-demo/.remarkrc.mjs"
 	],
-	"exclude": [".astro-cache", ".vscode", "dist", "node_modules", "temp"]
+	"exclude": [".vscode", ".cache", "dist", "node_modules", "temp"]
 }

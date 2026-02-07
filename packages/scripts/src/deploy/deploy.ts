@@ -15,7 +15,8 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': { type: 'string', default: process.cwd() },
-		'cache-path': { type: 'string', default: 'node_modules/.astro' },
+		'cache-path': { type: 'string', default: './.cache' },
+		'og-image-path': { type: 'string', default: './temp/og-image' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},
@@ -23,6 +24,7 @@ const { values } = parseArgs({
 
 const rootPath = values['root-path'];
 const cachePath = path.join(rootPath, values['cache-path']);
+const ogImagePath = path.join(rootPath, values['og-image-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
@@ -65,16 +67,15 @@ async function opengraph() {
 }
 
 async function mergeOpengraph() {
-	const ogCachePath = path.join(cachePath, 'og-image-output');
 	const ogDistPath = path.join(distPath, OPEN_GRAPH_BASE_PATH);
 
 	console.log(chalk.blue('Merging OpenGraph images into dist...'));
-	console.log(chalk.gray(`  From: ${ogCachePath}`));
+	console.log(chalk.gray(`  From: ${ogImagePath}`));
 	console.log(chalk.gray(`  To:   ${ogDistPath}`));
 
 	// Merge without deleting existing files (preserves public/og defaults and renamed entries)
 	// rsync -av: archive mode, verbose, only transfers changed files based on mtime/size
-	await $({ stdio: 'inherit' })`rsync -av ${ogCachePath}/ ${ogDistPath}/`;
+	await $({ stdio: 'inherit' })`rsync -av ${ogImagePath}/ ${ogDistPath}/`;
 }
 
 async function build() {

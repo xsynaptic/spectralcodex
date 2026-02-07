@@ -38,7 +38,7 @@ const { values } = parseArgs({
 		'cache-path': {
 			type: 'string',
 			short: 'c',
-			default: 'node_modules/.astro/divisions',
+			default: './.cache/divisions',
 		},
 		'overture-url': {
 			type: 'string',

@@ -35,11 +35,11 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: 'node_modules/.astro/og-image-output',
+			default: './temp/og-image',
 		},
 		'cache-path': {
 			type: 'string',
-			default: 'node_modules/.astro/og-image-cache',
+			default: './.cache',
 		},
 	},
 });

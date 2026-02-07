@@ -26,6 +26,7 @@ astro-error.log*
 
 # generated types and files
 .astro/
+.cache/
 temp/
 
 # certificates
