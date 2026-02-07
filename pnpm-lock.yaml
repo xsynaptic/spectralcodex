@@ -36,6 +36,9 @@ importers:
       '@astrojs/sitemap':
         specifier: 3.6.1-beta.3
         version: 3.6.1-beta.3
+      '@keyv/sqlite':
+        specifier: ^4.0.8
+        version: 4.0.8(keyv@5.6.0)
       '@spectralcodex/astro-build-logger':
         specifier: workspace:*
         version: link:packages/astro-build-logger
@@ -156,6 +159,9 @@ importers:
       kdbush:
         specifier: ^4.0.2
         version: 4.0.2
+      keyv:
+        specifier: ^5.6.0
+        version: 5.6.0
       maplibre-gl:
         specifier: ^5.17.0
         version: 5.17.0

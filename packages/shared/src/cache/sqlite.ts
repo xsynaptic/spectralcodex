@@ -6,6 +6,8 @@ import path from 'node:path';
  * Initialize Keyv with SQLite backend
  * Best for concurrent access during Astro builds
  * Uses dynamic import to avoid bundling sqlite3 into shared chunks
+ * Note: Astro has a tough time with dependencies in pnpm monorepos
+ * The easiest workaround is to include keyv and @keyv/sqlite in the root package.json
  */
 export function getSqliteCacheInstance(cachePath: string, namespace: string): Keyv {
 	return new Keyv({
