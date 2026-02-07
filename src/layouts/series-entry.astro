@@ -53,7 +53,7 @@ const t = getTranslations();
 			: entry.data.title,
 		description: entry.data.description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
-			...(hasHeroImage ? { id: entry.id } : {}),
+			id: entry.id,
 			alt: entry.data.title,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),

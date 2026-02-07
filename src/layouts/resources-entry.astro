@@ -45,7 +45,7 @@ const t = getTranslations();
 			: entry.data.title,
 		description: entry.body ?? undefined,
 		image: getSeoImageProps({
-			...(entry.data.imageFeatured ? { id: entry.id } : {}),
+			id: entry.id,
 			alt: entry.data.title,
 		}),
 		prefetchUrls: mapData.prefetchUrls,

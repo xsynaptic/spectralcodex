@@ -78,7 +78,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
 		description: entry.data.description,
 		image: getSeoImageProps({
-			...(entry.data.imageFeatured ? { id: entry.id } : { fallback: 'og-image-location' }),
+			id: entry.id,
 			alt: title,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),

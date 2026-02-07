@@ -59,7 +59,7 @@ const { Content } = await render(entry);
 			: entry.data.title,
 		description: entry.data.description ?? entry.body ?? undefined,
 		image: getSeoImageProps({
-			...(entry.data.imageFeatured ? { id: entry.id } : { fallback: 'og-image-post' }),
+			id: entry.id,
 			alt: entry.data.title,
 		}),
 		...getSeoArticleProps({
