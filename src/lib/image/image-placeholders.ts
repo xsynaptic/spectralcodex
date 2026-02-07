@@ -58,7 +58,7 @@ async function generatePlaceholderDataUrl({
  * For cropped placeholders, pass the target display aspect ratio
  */
 async function createImagePlaceholderFunction() {
-	const cache = await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
+	const cache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
 
 	const getImageById = await getImageByIdFunction();
 

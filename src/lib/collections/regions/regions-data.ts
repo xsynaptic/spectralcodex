@@ -35,12 +35,7 @@ type RegionComputedData = Pick<
 // Cache of all region computed data, keyed by region ID
 type RegionComputedDataCache = Record<string, RegionComputedData>;
 
-let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
-
-async function getCacheInstance() {
-	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
-	return cacheInstance;
-}
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
 
 /**
  * Generate a stable cache key from the content graph state
@@ -268,8 +263,7 @@ async function generateCollection(): Promise<CollectionData> {
 
 	// Generate cache key from current content graph state
 	const cacheKey = generateCacheKey({ regions, locations, posts });
-	const cache = await getCacheInstance();
-	const cacheData = await cache.get<RegionComputedDataCache>(cacheKey);
+	const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
 
 	if (cacheData) {
 		applyComputedDataCache(regions, cacheData);
@@ -283,8 +277,8 @@ async function generateCollection(): Promise<CollectionData> {
 		populateRegionsContent({ regions, locations, posts });
 
 		// Clear old cache entries before setting new one (prevents unbounded growth)
-		await cache.clear();
-		await cache.set(cacheKey, extractComputedData(regions));
+		await cacheInstance.clear();
+		await cacheInstance.set(cacheKey, extractComputedData(regions));
 
 		console.log(
 			`[Regions] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,

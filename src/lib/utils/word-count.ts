@@ -10,12 +10,7 @@ import * as R from 'remeda';
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
-let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
-
-async function getCacheInstance() {
-	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
-	return cacheInstance;
-}
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
 
 /**
  * Generate word count from content body
@@ -48,8 +43,7 @@ export async function getWordCount(
 		},
 	});
 
-	const cache = await getCacheInstance();
-	const cachedCount = await cache.get<number>(hashValue);
+	const cachedCount = await cacheInstance.get<number>(hashValue);
 
 	// Check cache first
 	if (cachedCount !== undefined) {
@@ -69,7 +63,7 @@ export async function getWordCount(
 		wordCount = computeWordCount(entry.data.description);
 	}
 
-	await cache.set(hashValue, wordCount);
+	await cacheInstance.set(hashValue, wordCount);
 
 	return wordCount;
 }

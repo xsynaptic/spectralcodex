@@ -22,12 +22,7 @@ interface CollectionData {
 	locationsMap: Map<string, CollectionEntry<'locations'>>;
 }
 
-let cacheInstance: Awaited<ReturnType<typeof getSqliteCacheInstance>> | undefined;
-
-async function getCacheInstance() {
-	cacheInstance ??= await getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
-	return cacheInstance;
-}
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
@@ -139,14 +134,13 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
-	const cache = await getCacheInstance();
-	const cachedDescriptionHtml = await cache.get<string>(locationMapDataHash);
+	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {
 		entry.data._descriptionHtml = cachedDescriptionHtml;
 	} else {
 		entry.data._descriptionHtml = transformMarkdown({ input: entry.data.description });
-		await cache.set(locationMapDataHash, entry.data._descriptionHtml);
+		await cacheInstance.set(locationMapDataHash, entry.data._descriptionHtml);
 	}
 }
 
