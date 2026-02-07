@@ -15,7 +15,7 @@
 		"@turf/difference": "^7.3.3",
 		"@turf/helpers": "^7.3.3",
 		"@types/geojson": "^7946.0.16",
-		"@types/react": "^19.2.11",
+		"@types/react": "^19.2.13",
 		"@types/react-dom": "^19.2.3",
 		"astro": "^6.0.0-beta.9",
 		"flatgeobuf": "^4.4.0",
@@ -27,7 +27,7 @@
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
 		"react-map-gl": "^8.1.0",
-		"remeda": "^2.33.4",
+		"remeda": "^2.33.5",
 		"zod": "^4.3.6",
 		"zustand": "^5.0.11"
 	}
