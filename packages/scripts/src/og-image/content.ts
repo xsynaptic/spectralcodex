@@ -49,7 +49,7 @@ function pickFrom<T = string>(id: string, options: Array<T>): T {
 }
 
 /**
- * Returns a fallback image ID based on entry properties
+ * Return a fallback image ID based on entry properties
  */
 function getFallbackImageId({
 	id,
@@ -67,7 +67,7 @@ function getFallbackImageId({
 	const regionAncestor = regions?.[0];
 	const regionParent = regions?.[1];
 
-	if (collection === 'resources') {
+	if (collection === ContentCollectionsEnum.Resources) {
 		return 'v/v-random-1.jpg';
 	}
 
@@ -219,6 +219,9 @@ function getFallbackImageId({
 	]);
 }
 
+/**
+ * Featured image handling
+ */
 function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | undefined {
 	if (!imageFeatured) return undefined;
 
@@ -236,7 +239,7 @@ function getImageFeaturedData({
 }: {
 	entry: DataStoreEntry;
 	collection: string;
-	regionParentMap: RegionParentMap;
+	regionParentMap?: RegionParentMap;
 }): { imageFeaturedId: string; isFallback: boolean } {
 	const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
 
@@ -249,15 +252,17 @@ function getImageFeaturedData({
 			id: entry.id,
 			collection,
 			category: z.string().optional().parse(entry.data.category),
-			regions: getDataStoreRegionParentsById(
-				collection === 'regions'
-					? z.string().optional().parse(entry.data.parent)
-					: RegionsSchema.optional().parse(entry.data.regions)?.[0],
-				regionParentMap,
-			),
+			regions: regionParentMap
+				? getDataStoreRegionParentsById(
+						collection === ContentCollectionsEnum.Regions
+							? z.string().optional().parse(entry.data.parent)
+							: RegionsSchema.optional().parse(entry.data.regions)?.[0],
+						regionParentMap,
+					)
+				: undefined,
 			themes: ThemesSchema.optional().parse(entry.data.themes),
 		}),
-		isFallback: false,
+		isFallback: true,
 	};
 }
 
@@ -276,15 +281,21 @@ function getArchiveEntries(): Array<ContentEntry> {
 	const now = new Date();
 	const currentYear = now.getFullYear();
 	const currentMonth = now.getMonth() + 1;
+	const collection = ContentCollectionsEnum.Archives;
 
 	for (let year = ARCHIVES_YEAR_START; year <= currentYear; year++) {
-		// Yearly entry
+		const id = String(year);
+
+		// Yearly entries
 		entries.push({
-			collection: 'archives',
-			id: String(year),
-			digest: `archives-${String(year)}`,
-			title: `Archives: ${String(year)}`,
-			imageFeaturedId: 'v/v-random-1.jpg',
+			id,
+			collection,
+			digest: `${collection}-${id}`,
+			title: `Archives: ${id}`,
+			imageFeaturedId: getFallbackImageId({
+				id,
+				collection,
+			}),
 			isFallback: true,
 		});
 
@@ -292,16 +303,17 @@ function getArchiveEntries(): Array<ContentEntry> {
 		const maxMonth = year === currentYear ? currentMonth : 12;
 
 		for (let month = 1; month <= maxMonth; month++) {
-			const monthPadded = String(month).padStart(2, '0');
-
-			const id = `${String(year)}-${monthPadded}`;
+			const id = `${String(year)}-${String(month).padStart(2, '0')}`;
 
 			entries.push({
-				collection: 'archives',
 				id,
-				digest: `archives-${id}`,
+				collection,
+				digest: `${collection}-${id}`,
 				title: getArchivesTitle(id),
-				imageFeaturedId: 'v/v-random-1.jpg',
+				imageFeaturedId: getFallbackImageId({
+					id,
+					collection,
+				}),
 				isFallback: true,
 			});
 		}
@@ -310,11 +322,17 @@ function getArchiveEntries(): Array<ContentEntry> {
 	return entries;
 }
 
-// Content entries are constructed with enough metadata to assign fallback images
+/**
+ * Content entries are constructed with enough metadata to assign fallback images
+ */
 export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
 
-	const allEntries: Array<ContentEntry> = [];
+	const entriesMap = new Map<string, ContentEntry>();
+
+	for (const entry of getArchiveEntries()) {
+		entriesMap.set(entry.id, entry);
+	}
 
 	for (const collection of Object.values(ContentCollectionsEnum)) {
 		const collectionEntries = getDataStoreCollection(collections, collection);
@@ -328,10 +346,9 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 			// Skip entries without digest
 			if (!entry.digest) continue;
 
-			if (collection === 'archives') {
+			if (collection === ContentCollectionsEnum.Archives) {
 				title = getArchivesTitle(id);
-				// TODO: improve fallback image logic for archives
-			} else if (collection === 'resources' && title) {
+			} else if (collection === ContentCollectionsEnum.Resources && title) {
 				title = `Resources: ${title}`;
 			} else if (!title) {
 				continue;
@@ -339,7 +356,7 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 
 			const imageFeaturedData = getImageFeaturedData({ entry, collection, regionParentMap });
 
-			allEntries.push({
+			entriesMap.set(id, {
 				collection,
 				id,
 				digest: entry.digest,
@@ -352,8 +369,5 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 		}
 	}
 
-	// Add procedural archive entries
-	allEntries.push(...getArchiveEntries());
-
-	return allEntries;
+	return [...entriesMap.values()];
 }
