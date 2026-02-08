@@ -98,7 +98,7 @@ export function getLocationsFeatureCollection(
 			return geometryArray.map((geometry, index) => {
 				const uuid = entry.data._uuid ?? entry.id;
 				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
-				const title = geometry.title ? `${entry.data.title} - ${geometry.title}` : entry.data.title;
+				const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
 				const geometryTitleMultilingual = getPrimaryMultilingualContent(geometry, 'title');
 				const googleMapsUrl =
 					geometry.googleMapsUrl || entry.data._googleMapsUrl
@@ -123,7 +123,7 @@ export function getLocationsFeatureCollection(
 							? {
 									titleMultilingualLang: entryTitleMultilingual.lang,
 									titleMultilingualValue: geometryTitleMultilingual
-										? `${entryTitleMultilingual.value} - ${geometryTitleMultilingual.value}`
+										? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
 										: entryTitleMultilingual.value,
 								}
 							: {}),
