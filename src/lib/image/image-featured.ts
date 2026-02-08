@@ -1,4 +1,8 @@
-import type { ImageFeatured, ImageFeaturedObject } from '@spectralcodex/shared/schemas';
+import type {
+	ImageFeatured,
+	ImageFeaturedItem,
+	ImageFeaturedObject,
+} from '@spectralcodex/shared/schemas';
 
 import * as R from 'remeda';
 
@@ -9,9 +13,9 @@ import type {
 
 import { logError } from '#lib/utils/logging.ts';
 
-// A simple type guard to help maintain type safety
-function isImageFeaturedObject(imageFeatured: ImageFeatured): imageFeatured is ImageFeaturedObject {
-	return typeof imageFeatured === 'object' && 'id' in imageFeatured;
+// Type guard for array items
+function isImageFeaturedObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
+	return typeof item === 'object' && 'id' in item;
 }
 
 // Get the first image featured item from a set or array
@@ -24,46 +28,27 @@ export function getImageFeaturedId({
 }): string | undefined {
 	if (!imageFeatured) return;
 
-	if (Array.isArray(imageFeatured)) {
-		const primaryImageFeatured = shuffle ? R.shuffle(imageFeatured)[0] : imageFeatured[0];
+	if (typeof imageFeatured === 'string') return imageFeatured;
 
-		return getImageFeaturedId({ imageFeatured: primaryImageFeatured, shuffle });
-	}
+	// Array: get first item (optionally shuffled)
+	const items = shuffle ? R.shuffle(imageFeatured) : imageFeatured;
 
-	if (isImageFeaturedObject(imageFeatured)) {
-		return imageFeatured.id;
-	}
+	if (!items[0]) return;
 
-	return imageFeatured;
+	return isImageFeaturedObject(items[0]) ? items[0].id : items[0];
 }
 
-// Get the hero image ID with optional fallback
-export function getImageHeroId({
-	imageFeatured,
-	shuffle = false,
-	fallback = false,
-}: {
-	imageFeatured: ImageFeatured | undefined;
-	shuffle?: boolean;
-	fallback?: boolean;
-}) {
-	if (!imageFeatured) return;
+// Get the hero image ID if explicitly marked with hero: true
+export function getImageFeaturedHeroId(
+	imageFeatured: ImageFeatured | undefined,
+): string | undefined {
+	if (!imageFeatured || !Array.isArray(imageFeatured)) return;
 
-	if (Array.isArray(imageFeatured)) {
-		const imageHero = imageFeatured.find(
-			(item): item is ImageFeaturedObject => isImageFeaturedObject(item) && item.hero === true,
-		);
+	const imageHero = imageFeatured.find(
+		(item): item is ImageFeaturedObject => isImageFeaturedObject(item) && item.hero === true,
+	);
 
-		if (imageHero) {
-			return imageHero.id;
-		}
-	}
-
-	if (isImageFeaturedObject(imageFeatured) && imageFeatured.hero === true) {
-		return imageFeatured.id;
-	}
-
-	return fallback ? getImageFeaturedId({ imageFeatured, shuffle }) : undefined;
+	return imageHero?.id;
 }
 
 export function getImageFeaturedGroup({
@@ -77,19 +62,10 @@ export function getImageFeaturedGroup({
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
-	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = [];
-
-	if (Array.isArray(imageFeatured)) {
-		for (const imageFeaturedItem of imageFeatured) {
-			imageFeaturedObjectGroup.push(
-				isImageFeaturedObject(imageFeaturedItem) ? imageFeaturedItem : { id: imageFeaturedItem },
-			);
-		}
-	} else {
-		imageFeaturedObjectGroup.push(
-			isImageFeaturedObject(imageFeatured) ? imageFeatured : { id: imageFeatured },
-		);
-	}
+	// Normalize to array of objects
+	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = Array.isArray(imageFeatured)
+		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
+		: [{ id: imageFeatured }];
 
 	const items = imageFeaturedObjectGroup.map((item) => {
 		const contentMetadata = item.link ? contentMetadataIndex.get(item.link) : undefined;

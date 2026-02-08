@@ -27,7 +27,6 @@ export const pages = defineCollection({
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
-			showHero: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			hideSearch: z.boolean().optional(),
 		})

@@ -47,7 +47,6 @@ export const locations = defineCollection({
 			dateUpdated: DateStringSchema.optional(),
 			dateVisited: DateStringSchema.array().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
-			showHero: z.boolean().optional(),
 			rating: NumericScaleSchema,
 			safety: NumericScaleSchema.optional(),
 			entryQuality: NumericScaleSchema,

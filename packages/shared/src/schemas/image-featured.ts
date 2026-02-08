@@ -12,10 +12,10 @@ const ImageFeaturedObjectSchema = z.object({
 
 export type ImageFeaturedObject = z.infer<typeof ImageFeaturedObjectSchema>;
 
-export const ImageFeaturedSchema = z.union([
-	z.string(),
-	ImageFeaturedObjectSchema,
-	z.union([z.string(), ImageFeaturedObjectSchema]).array(),
-]);
+const ImageFeaturedItemSchema = z.union([z.string(), ImageFeaturedObjectSchema]);
+
+export type ImageFeaturedItem = z.infer<typeof ImageFeaturedItemSchema>;
+
+export const ImageFeaturedSchema = z.union([z.string(), ImageFeaturedItemSchema.array()]);
 
 export type ImageFeatured = z.infer<typeof ImageFeaturedSchema>;

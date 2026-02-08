@@ -22,11 +22,7 @@ function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<st
 
 	if (typeof data === 'string') return [data];
 
-	if (Array.isArray(data)) {
-		return data.map((item) => (typeof item === 'string' ? item : item.id));
-	}
-
-	return [data.id];
+	return data.map((item) => (typeof item === 'string' ? item : item.id));
 }
 
 function extractMdxImageIds(content: string): Array<string> {

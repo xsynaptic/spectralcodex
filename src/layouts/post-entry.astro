@@ -24,7 +24,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageHeroId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
@@ -42,10 +42,7 @@ const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
-const imageHeroId = getImageHeroId({
-	imageFeatured: entry.data.imageFeatured,
-	fallback: entry.data.showHero === true,
-});
+const imageHeroId = getImageFeaturedHeroId(entry.data.imageFeatured);
 
 const hasHeroImage = !!imageHeroId;
 

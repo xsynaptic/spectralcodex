@@ -225,11 +225,14 @@ function getFallbackImageId({
 function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | undefined {
 	if (!imageFeatured) return undefined;
 
-	if (Array.isArray(imageFeatured)) return getImageFeaturedId(imageFeatured[0]);
+	// String: return directly
+	if (typeof imageFeatured === 'string') return imageFeatured;
 
-	return typeof imageFeatured === 'object' && 'id' in imageFeatured
-		? imageFeatured.id
-		: imageFeatured;
+	// Array: get first item
+	const firstItem = imageFeatured[0];
+	if (!firstItem) return undefined;
+
+	return typeof firstItem === 'object' && 'id' in firstItem ? firstItem.id : firstItem;
 }
 
 function getImageFeaturedData({
