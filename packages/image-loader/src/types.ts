@@ -12,6 +12,7 @@ type LocalImageLoaderDataHandler = (args: {
 	filePath: string;
 	filePathRelative: string;
 	fileUrl: URL;
+	modifiedTime?: Date | undefined;
 	logger: LoaderContext['logger'];
 }) => Record<string, unknown> | Promise<Record<string, unknown>>;
 

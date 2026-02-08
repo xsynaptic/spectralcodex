@@ -98,6 +98,7 @@ function getSyncDataFunction({
 									filePath,
 									filePathRelative,
 									fileUrl,
+									modifiedTime,
 									logger,
 								})
 							: {}),
