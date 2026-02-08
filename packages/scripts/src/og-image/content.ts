@@ -339,7 +339,7 @@ function getIndexEntries(): Array<OpenGraphContentEntry> {
 		digest: `index-${id}`,
 		title,
 		imageFeaturedId: imageFeaturedId ?? 'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
-		isFallback: isFallback ?? true,
+		isFallback: isFallback ?? false,
 	}));
 }
 

@@ -11,6 +11,7 @@
 		"deploy-site": "tsx ./src/deploy/deploy.ts",
 		"deploy-app": "tsx ./src/deploy/deploy-app.ts",
 		"deploy-media": "tsx ./src/deploy/deploy-media.ts",
+		"deploy-og": "tsx ./src/deploy/deploy-og.ts",
 		"dev-server": "tsx ./src/dev-server/index.ts",
 		"image-server-manifest": "tsx ./src/image-server/manifest.ts",
 		"image-server-warm": "tsx ./src/image-server/warm.ts",

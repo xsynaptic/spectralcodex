@@ -142,8 +142,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.2(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^35.7.0
-        version: 35.7.0
+        specifier: ^35.8.0
+        version: 35.8.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -3169,8 +3169,8 @@ packages:
     resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
     hasBin: true
 
-  batch-cluster@17.1.0:
-    resolution: {integrity: sha512-hLo0+9mlZEvoLdiqffTehuMvUnIBpngt4ORpoYoE77qN/98ay3NnpZqGgmPUMw+x/U/Jz6PUfeDhG+nZ6Ak3CA==}
+  batch-cluster@17.3.0:
+    resolution: {integrity: sha512-oVK+iQ19qW5upm3K7/1Ubjm1w1KI1r3btKnhZaMYA11B77+kOa1H9eccDkZydnExf0qQNz4K3QySlFp7YpH8Aw==}
     engines: {node: '>=20'}
 
   bignumber.js@9.3.1:
@@ -3971,8 +3971,8 @@ packages:
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@35.7.0:
-    resolution: {integrity: sha512-8IV9u5dVrWyGJKV1HGZd1REh1ABCElDLKoOzjK8MrPBZq/whrGWxjQSpD1RN/IugpjMs2Zp/xiguY1ZtI+iutw==}
+  exiftool-vendored@35.8.0:
+    resolution: {integrity: sha512-h0nEuhb0Z88yfFO6/WEDvSH5dZBpZ/9K7bfBoaZDSsgKzUZdHFGF5oD65PrvuDJsbC74veAwqKuksCu6bJNlow==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -11209,7 +11209,7 @@ snapshots:
 
   baseline-browser-mapping@2.8.20: {}
 
-  batch-cluster@17.1.0: {}
+  batch-cluster@17.3.0: {}
 
   bignumber.js@9.3.1: {}
 
@@ -12195,11 +12195,11 @@ snapshots:
   exiftool-vendored.pl@13.49.0:
     optional: true
 
-  exiftool-vendored@35.7.0:
+  exiftool-vendored@35.8.0:
     dependencies:
       '@photostructure/tz-lookup': 11.4.0
       '@types/luxon': 3.7.1
-      batch-cluster: 17.1.0
+      batch-cluster: 17.3.0
       he: 1.2.0
       luxon: 3.7.2
     optionalDependencies:

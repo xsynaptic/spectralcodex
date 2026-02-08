@@ -22,6 +22,7 @@
 		"deploy-site": "pnpm --filter @spectralcodex/scripts deploy-site --root-path=$PWD",
 		"deploy-app": "pnpm --filter @spectralcodex/scripts deploy-app --root-path=$PWD",
 		"deploy-media": "pnpm --filter @spectralcodex/scripts deploy-media --root-path=$PWD",
+		"deploy-og": "pnpm --filter @spectralcodex/scripts deploy-og --root-path=$PWD",
 		"cache-warm": "pnpm --filter @spectralcodex/scripts image-server-warm --root-path=$PWD",
 		"cache-warm-new": "pnpm --filter @spectralcodex/scripts image-server-warm-new --root-path=$PWD"
 	},
@@ -83,7 +84,7 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.0.1",
-		"exiftool-vendored": "^35.7.0",
+		"exiftool-vendored": "^35.8.0",
 		"geojson": "^0.5.0",
 		"geokdbush": "^2.0.1",
 		"globals": "^17.3.0",
