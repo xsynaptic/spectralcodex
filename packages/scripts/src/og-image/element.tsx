@@ -4,11 +4,12 @@ import type { OpenGraphMetadataItem } from './types.js';
 
 const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
 
-function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
-	if (!SHOW_SAFE_ZONE_OVERLAY) return;
+// Threshold at which to show inverted text
+const LUMINANCE_THRESHOLD = 190;
 
-	// Safe zone (10% inset): 120px left/right, 63px top/bottom
-	// Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
+// Safe zone (10% inset): 120px left/right, 63px top/bottom
+// Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
+function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
 	const overlayStyle = {
 		position: 'absolute' as const,
 		background: `rgb(255, 0, 0, ${opacity})`,
@@ -44,7 +45,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 		paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
 	} as const;
 
-	const showInverted = luminance && luminance >= 200;
+	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
 
 	return (
 		<div
@@ -132,7 +133,7 @@ function TitleMultilingual({
 		lang = 'th';
 	}
 
-	const showInverted = luminance && luminance >= 200;
+	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
 
 	return (
 		<div style={{ display: 'flex' }}>
@@ -180,7 +181,7 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 		padding: '0 120px 60px 120px',
 	} as const;
 
-	const showInverted = luminance && luminance >= 200;
+	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
 
 	return (
 		<div style={{ display: 'flex' }}>
@@ -255,7 +256,7 @@ export function getOpenGraphElement(
 						'linear-gradient(to bottom, rgb(24, 24, 27, 0) 75%, rgb(24, 24, 27, 0.4) 88%, rgb(12, 12, 14, 0.6) 100%)',
 				}}
 			/>
-			<SafeZoneOverlay />
+			{SHOW_SAFE_ZONE_OVERLAY ? <SafeZoneOverlay /> : undefined}
 			<div
 				style={{
 					display: 'flex',

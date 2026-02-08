@@ -21,14 +21,25 @@ interface ContentEntry extends OpenGraphMetadataItem {
 	imageFeaturedId: string;
 }
 
+/** Deterministically pick an item from an array based on a string ID */
+function pickFrom<T = string>(id: string, options: Array<T>): T {
+	if (options.length === 1) return options[0] as T;
+	let hash = 0;
+	for (let i = 0; i < id.length; i++) hash += id.codePointAt(i) ?? 0;
+	return options[hash % options.length] as T;
+}
+
 /**
  * Returns a fallback image ID based on entry properties
  */
 function getFallbackImageId({
+	id,
+	collection,
 	category,
 	regions,
 	themes,
 }: {
+	id: string;
 	collection: string;
 	category?: string | undefined;
 	regions?: Array<string> | undefined;
@@ -37,23 +48,43 @@ function getFallbackImageId({
 	const regionAncestor = regions?.[0];
 	const regionParent = regions?.[1];
 
+	if (collection === 'resources') {
+		return 'v/v-random-1.jpg';
+	}
+
 	if (themes?.includes('thailand-theaters')) {
-		return 'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg';
+		return pickFrom(id, [
+			'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg',
+			'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg',
+		]);
 	}
 	if (themes?.includes('taiwan-theaters')) {
-		return 'taiwan/tainan/nanxi/nanxi-huazhou-theater-5.jpg';
+		return pickFrom(id, [
+			'taiwan/tainan/nanxi/nanxi-huazhou-theater-5.jpg',
+			'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg',
+		]);
 	}
 	if (themes?.includes('taiwan-shinto-shrines')) {
 		return 'taiwan/tainan/danei/danei-elementary-school-shinto-shrine-1.jpg';
 	}
+	if (themes?.includes('taiwan-railways')) {
+		return 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg';
+	}
 	if (themes?.includes('taiwan-military-villages')) {
 		return 'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg';
 	}
-	if (themes?.includes('taiwan-urban-exploration')) {
-		return 'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg';
+	if (themes?.includes('taiwan-japanese-colonial-era')) {
+		return 'v/fallback-taiwan-japanese-colonial-era-1.jpg';
 	}
-	if (themes?.includes('taiwan-railways')) {
-		return 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg';
+	if (themes?.includes('taiwan-qing-dynasty-era')) {
+		return 'v/fallback-taiwan-qing-dynasty-era-1.jpg';
+	}
+	if (themes?.includes('taiwan-urban-exploration')) {
+		return pickFrom(id, [
+			'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg',
+			'taiwan/changhua/changhua-city/changhua-bus-terminal-3.jpg',
+			'taiwan/nantou/shuili/shuili-beipu-post-office-4.jpg',
+		]);
 	}
 	if (themes?.includes('taiwan-sanheyuan')) {
 		return 'taiwan/taipei/daan/daan-yifang-old-house-1.jpg';
@@ -66,6 +97,9 @@ function getFallbackImageId({
 	}
 	if (themes?.includes('alishan-forest-railway')) {
 		return 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg';
+	}
+	if (themes?.includes('taiwan-temple-culture')) {
+		return 'v/fallback-taiwan-temple-culture-1.jpg';
 	}
 	if (regionAncestor === 'taiwan') {
 		switch (regionParent) {
@@ -102,7 +136,7 @@ function getFallbackImageId({
 				return 'taiwan/taichung/taichung-west/taichung-prefecture-hall-1.jpg';
 			}
 			case 'tainan': {
-				return 'taiwan/tainan/tainan-west-central/tainan-broadcasting-bureau-1.jpg';
+				return 'v/fallback-tainan-1.jpg';
 			}
 			case 'taipei': {
 				return 'taiwan/taipai/daan/daan-xinyi-market-1.jpg';
@@ -134,27 +168,36 @@ function getFallbackImageId({
 		return 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg';
 	}
 	if (regionAncestor === 'china') {
-		return '2016/05/china-shanghai-hongkou-lilong-ruins-14.jpg';
+		return 'v/fallback-china-1.jpg';
 	}
 	if (regionAncestor === 'hong-kong') {
-		return '2015/04/hong-kong-kowloon-2015-29.jpg';
+		return 'v/fallback-hong-kong-1.jpg';
 	}
 	if (regionAncestor === 'japan') {
-		return '2014/06/osaka-nishinari-2014-9.jpg';
+		return 'v/fallback-japan-1.jpg';
+	}
+	if (regionAncestor === 'malaysia') {
+		return 'v/fallback-malaysia-1.jpg';
 	}
 	if (regionAncestor === 'philippines') {
-		return '2017/02/philippines-manila-intramuros-1.jpg';
+		return 'v/fallback-philippines-1.jpg';
 	}
 	if (regionAncestor === 'south-korea') {
-		return '2013/02/korea-2012-57.jpg';
+		return 'v/fallback-south-korea-1.jpg';
 	}
 	if (regionAncestor === 'thailand') {
-		return 'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg';
+		return 'v/fallback-thailand-1.jpg';
+	}
+	if (regionAncestor === 'usa') {
+		return 'v/fallback-usa-1.jpg';
 	}
 	if (regionAncestor === 'vietnam') {
-		return '2016/12/vietnam-hanoi-postcards-3.jpg';
+		return 'v/fallback-vietnam-1.jpg';
 	}
-	return 'taiwan/keelung/zhongzheng/keelung-ruchuan-village-9.jpg';
+	return pickFrom(id, [
+		'v/v-random-1.jpg',
+		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
+	]);
 }
 
 function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | undefined {
@@ -177,16 +220,23 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 		const collectionEntries = getDataStoreCollection(collections, collection);
 
 		for (const entry of collectionEntries) {
-			const title = z.string().optional().parse(entry.data.title);
+			const id = entry.id.replace('/', '-');
+			const titleRaw = z.string().optional().parse(entry.data.title);
 			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
 			const imageFeaturedId = getImageFeaturedId(imageFeatured);
 
 			// Skip entries without digest
-			if (!title || !entry.digest) continue;
+			if (!titleRaw || !entry.digest) continue;
+
+			let title = titleRaw;
+
+			if (collection === 'resources') {
+				title = `Resources: ${titleRaw}`;
+			}
 
 			allEntries.push({
 				collection,
-				id: entry.id,
+				id,
 				digest: entry.digest,
 				title,
 				titleZh: z.string().optional().parse(entry.data.title_zh),
@@ -195,10 +245,13 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 				imageFeaturedId:
 					imageFeaturedId ??
 					getFallbackImageId({
+						id: entry.id,
 						collection,
 						category: z.string().optional().parse(entry.data.category),
 						regions: getDataStoreRegionParentsById(
-							RegionsSchema.optional().parse(entry.data.regions)?.[0],
+							collection === 'regions'
+								? z.string().optional().parse(entry.data.parent)
+								: RegionsSchema.optional().parse(entry.data.regions)?.[0],
 							regionParentMap,
 						),
 						themes: ThemesSchema.optional().parse(entry.data.themes),
