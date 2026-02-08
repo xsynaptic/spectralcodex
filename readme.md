@@ -134,6 +134,7 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 ### Generated/Temporary
 
 - `./.astro`: automatically generated types and schemas
+- `./.cache`: cache folder for generated files, delete this anytime
 - `./dist`: output folder, automatically generated; delete this anytime
 - `./public/divisions`: FlatGeobuf files for geographic divisions used by the map component
 - `./public/icons`: icon sprites and JSON files for the map component

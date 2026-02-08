@@ -42,7 +42,7 @@ const RelatedContentItemSchema = z
 	.optional();
 
 async function loadRelatedContentData() {
-	const filePath = path.join(CUSTOM_CACHE_PATH, 'content-related/content-related.json');
+	const filePath = path.join(CUSTOM_CACHE_PATH, 'content-related.json');
 
 	try {
 		const relatedContent = await loadJsonData(filePath);

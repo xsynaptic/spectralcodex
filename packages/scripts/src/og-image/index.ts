@@ -35,7 +35,7 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: './temp/og-image',
+			default: './.cache/og-image',
 		},
 		'cache-path': {
 			type: 'string',
@@ -158,10 +158,7 @@ async function main() {
 		entriesFiltered.map((entry) =>
 			concurrencyLimit(async () => {
 				try {
-					const outputFilePath = path.join(
-						outputPath,
-						`${path.basename(entry.id)}.${OPEN_GRAPH_IMAGE_FORMAT}`,
-					);
+					const outputFilePath = path.join(outputPath, `${entry.id}.${OPEN_GRAPH_IMAGE_FORMAT}`);
 
 					// Resolve image ID: use featured image or fall back based on entry properties
 					const imageId = entry.imageFeaturedId;

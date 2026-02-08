@@ -38,7 +38,7 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: './temp',
+			default: './.cache',
 		},
 		'output-name': {
 			type: 'string',
