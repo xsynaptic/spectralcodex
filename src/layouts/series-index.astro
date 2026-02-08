@@ -11,6 +11,7 @@ import MainSite from '#components/main/main-site.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
 import Pagination from '#components/parts/pagination.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	page: Page<ContentMetadataItem>;
@@ -24,7 +25,16 @@ const title = t('collection.series.labelPlural');
 const description = t('collection.series.description');
 ---
 
-<MainSite meta={{ title, description }}>
+<MainSite
+	meta={{
+		title,
+		description,
+		image: await getSeoImageProps({
+			id: 'index-series',
+			alt: title,
+		}),
+	}}
+>
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>

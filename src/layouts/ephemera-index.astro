@@ -16,6 +16,7 @@ import Pagination from '#components/parts/pagination.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	page: Page<CollectionEntry<'ephemera'>>;
@@ -29,7 +30,16 @@ const title = t('collection.ephemera.labelPlural');
 const description = t('collection.ephemera.description');
 ---
 
-<MainSite meta={{ title, description }}>
+<MainSite
+	meta={{
+		title,
+		description,
+		image: await getSeoImageProps({
+			id: 'index-ephemera',
+			alt: title,
+		}),
+	}}
+>
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-title-info"><PaginationCounter page={page} /></Fragment>

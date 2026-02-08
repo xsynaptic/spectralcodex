@@ -9,36 +9,13 @@ import {
 import { z } from 'zod';
 
 import type { DataStoreEntry, RegionParentMap } from '../content-utils/data-store.js';
-import type { OpenGraphMetadataItem } from './types.js';
+import type { OpenGraphContentEntry } from './types.js';
 
 import {
 	getDataStoreCollection,
 	getDataStoreRegionParentsById,
 	loadDataStore,
 } from '../content-utils/data-store.js';
-
-// Archive generation starts from this year
-const ARCHIVES_YEAR_START = 2008;
-
-const ARCHIVES_MONTH_NAMES = [
-	'January',
-	'February',
-	'March',
-	'April',
-	'May',
-	'June',
-	'July',
-	'August',
-	'September',
-	'October',
-	'November',
-	'December',
-] as const;
-
-interface ContentEntry extends OpenGraphMetadataItem {
-	digest: string;
-	imageFeaturedId: string;
-}
 
 /** Deterministically pick an item from an array based on a string ID */
 function pickFrom<T = string>(id: string, options: Array<T>): T {
@@ -230,6 +207,7 @@ function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | 
 
 	// Array: get first item
 	const firstItem = imageFeatured[0];
+
 	if (!firstItem) return undefined;
 
 	return typeof firstItem === 'object' && 'id' in firstItem ? firstItem.id : firstItem;
@@ -270,17 +248,81 @@ function getImageFeaturedData({
 }
 
 /**
+ * Index page entries (collection landing pages)
+ */
+function getIndexEntries(): Array<OpenGraphContentEntry> {
+	const indexes = [
+		{
+			id: ContentCollectionsEnum.Archives,
+			title: 'Archives',
+			imageFeaturedId: 'v/v-random-1.jpg',
+		},
+		{
+			id: ContentCollectionsEnum.Ephemera,
+			title: 'Ephemera',
+		},
+		{
+			id: ContentCollectionsEnum.Locations,
+			title: 'Locations',
+		},
+		{
+			id: ContentCollectionsEnum.Posts,
+			title: 'Posts',
+		},
+		{
+			id: ContentCollectionsEnum.Regions,
+			title: 'Regions',
+		},
+		{
+			id: ContentCollectionsEnum.Resources,
+			title: 'Resources',
+		},
+		{
+			id: ContentCollectionsEnum.Series,
+			title: 'Series',
+		},
+		{
+			id: ContentCollectionsEnum.Themes,
+			title: 'Themes',
+		},
+		{
+			id: 'homepage',
+			title: '', // No duplicate branding
+			isFallback: false,
+		},
+		{
+			id: 'not-found',
+			title: '404: Not Found',
+		},
+	];
+
+	return indexes.map(({ id, title, imageFeaturedId, isFallback }) => ({
+		id: `index-${id}`,
+		collection: 'index',
+		digest: `index-${id}`,
+		title,
+		imageFeaturedId: imageFeaturedId ?? 'v/v-random-1.jpg',
+		isFallback: isFallback === undefined ? true : isFallback,
+	}));
+}
+
+/**
  * Archives handling
  */
+const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
+
 function getArchivesTitle(id: string): string {
 	const year = Number(id.split('-')[0]);
 	const month = Number(id.split('-')[1]);
 
-	return `Archives: ${ARCHIVES_MONTH_NAMES[month - 1] as string} ${String(year)}`;
+	return `Archives: ${monthFormatter.format(new Date(year, month - 1))} ${String(year)}`;
 }
 
-function getArchiveEntries(): Array<ContentEntry> {
-	const entries: Array<ContentEntry> = [];
+// Archive generation starts from this year
+const ARCHIVES_YEAR_START = 2008;
+
+function getArchiveEntries(): Array<OpenGraphContentEntry> {
+	const entries: Array<OpenGraphContentEntry> = [];
 	const now = new Date();
 	const currentYear = now.getFullYear();
 	const currentMonth = now.getMonth() + 1;
@@ -328,12 +370,16 @@ function getArchiveEntries(): Array<ContentEntry> {
 /**
  * Content entries are constructed with enough metadata to assign fallback images
  */
-export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
+export function getContentEntries(dataStorePath: string): Array<OpenGraphContentEntry> {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
 
-	const entriesMap = new Map<string, ContentEntry>();
+	const entriesMap = new Map<string, OpenGraphContentEntry>();
 
 	for (const entry of getArchiveEntries()) {
+		entriesMap.set(entry.id, entry);
+	}
+
+	for (const entry of getIndexEntries()) {
 		entriesMap.set(entry.id, entry);
 	}
 

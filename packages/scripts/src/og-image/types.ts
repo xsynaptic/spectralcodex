@@ -10,6 +10,11 @@ export interface OpenGraphMetadataItem {
 	isFallback: boolean;
 }
 
+export interface OpenGraphContentEntry extends OpenGraphMetadataItem {
+	digest: string;
+	imageFeaturedId: string;
+}
+
 export interface OpenGraphFontVariant {
 	weight: FontWeight;
 	style: FontStyle;

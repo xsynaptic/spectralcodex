@@ -83,16 +83,13 @@ const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
 	shuffle: true,
 });
 
-// Use the content entry ID (not the image ID) for OG image lookup
-const featuredOgImageId = imageFeaturedGroup?.at(0)?.captionMetadata?.id;
-
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <MainSite
 	meta={{
 		image: await getSeoImageProps({
-			...(featuredOgImageId ? { id: featuredOgImageId } : {}),
+			id: 'index-homepage',
 			alt: t('site.title'),
 		}),
 	}}

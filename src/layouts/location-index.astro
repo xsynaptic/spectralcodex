@@ -12,6 +12,7 @@ import MetadataGrid from '#components/parts/metadata-grid.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import Pagination from '#components/parts/pagination.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	page: Page<ContentMetadataItem>;
@@ -26,7 +27,16 @@ const title = t('collection.locations.labelPlural');
 const description = t('collection.locations.description');
 ---
 
-<MainSite meta={{ title, description }}>
+<MainSite
+	meta={{
+		title,
+		description,
+		image: await getSeoImageProps({
+			id: 'index-locations',
+			alt: title,
+		}),
+	}}
+>
 	<ContentHeader>
 		<Fragment slot="header-title">{pageTitle ?? title}</Fragment>
 		<Fragment slot="header-title-info"><PaginationCounter page={page} /></Fragment>
