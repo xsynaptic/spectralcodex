@@ -45,7 +45,11 @@ function getFallbackImageId({
 	const regionParent = regions?.[1];
 
 	if (collection === ContentCollectionsEnum.Resources) {
-		return 'v/v-random-1.jpg';
+		return pickFrom(id, [
+			'taiwan/series/suhua-highway-road-trip-2018-19.jpg',
+			'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
+			'taiwan/taichung/wufeng/wufeng-beigou-forbidden-city-vault-4.jpg',
+		]);
 	}
 
 	if (themes?.includes('thailand-theaters')) {
@@ -58,6 +62,8 @@ function getFallbackImageId({
 		return pickFrom(id, [
 			'taiwan/tainan/nanxi/nanxi-huazhou-theater-5.jpg',
 			'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg',
+			'taiwan/yunlin/baozhong/baozhong-zicheng-theater-13.jpg',
+			'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
 		]);
 	}
 	if (themes?.includes('taiwan-shinto-shrines')) {
@@ -67,20 +73,13 @@ function getFallbackImageId({
 		return 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg';
 	}
 	if (themes?.includes('taiwan-military-villages')) {
-		return 'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg';
-	}
-	if (themes?.includes('taiwan-japanese-colonial-era')) {
-		return 'v/fallback-taiwan-japanese-colonial-era-1.jpg';
-	}
-	if (themes?.includes('taiwan-qing-dynasty-era')) {
-		return 'v/fallback-taiwan-qing-dynasty-era-1.jpg';
-	}
-	if (themes?.includes('taiwan-urban-exploration')) {
 		return pickFrom(id, [
-			'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg',
-			'taiwan/changhua/changhua-city/changhua-bus-terminal-3.jpg',
-			'taiwan/nantou/shuili/shuili-beipu-post-office-4.jpg',
+			'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg',
+			'taiwan/series/nantou-road-trip-2015-1-5.jpg',
 		]);
+	}
+	if (themes?.includes('taiwan-police-history')) {
+		return pickFrom(id, ['taiwan/tainan/dongshan/dongshan-niurouqi-police-station-2.jpg']);
 	}
 	if (themes?.includes('taiwan-sanheyuan')) {
 		return 'taiwan/taipei/daan/daan-yifang-old-house-1.jpg';
@@ -97,6 +96,22 @@ function getFallbackImageId({
 	if (themes?.includes('taiwan-temple-culture')) {
 		return 'v/fallback-taiwan-temple-culture-1.jpg';
 	}
+	if (themes?.includes('taiwan-japanese-colonial-era')) {
+		return pickFrom(id, [
+			'v/fallback-taiwan-japanese-colonial-era-1.jpg',
+			'taiwan/yunlin/douliu/douliu-taiping-old-street-6.jpg',
+		]);
+	}
+	if (themes?.includes('taiwan-qing-dynasty-era')) {
+		return 'v/fallback-taiwan-qing-dynasty-era-1.jpg';
+	}
+	if (themes?.includes('taiwan-urban-exploration')) {
+		return pickFrom(id, [
+			'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg',
+			'taiwan/changhua/changhua-city/changhua-bus-terminal-3.jpg',
+			'taiwan/nantou/shuili/shuili-beipu-post-office-4.jpg',
+		]);
+	}
 	if (regionAncestor === 'taiwan') {
 		switch (regionParent) {
 			case 'changhua': {
@@ -109,7 +124,10 @@ function getFallbackImageId({
 				return 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg';
 			}
 			case 'hualien': {
-				return 'taiwan/series/huadong-valley-ride-2018-3-35.jpg';
+				return pickFrom(id, [
+					'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
+					'taiwan/series/huadong-valley-ride-2018-4-16.jpg',
+				]);
 			}
 			case 'kaohsiung': {
 				return 'taiwan/kaohsiung/hunei/hunei-dahu-tomato-cannery-4.jpg';
@@ -117,12 +135,16 @@ function getFallbackImageId({
 			case 'keelung': {
 				return 'taiwan/keelung/zhongzheng/keelung-agenna-shipyard-3.jpg';
 			}
+			// TODO: Kinmen
 			// TODO: Lienchiang
 			case 'miaoli': {
 				return 'taiwan/miaoli/sanyi/sanyi-longteng-broken-bridge-7.jpg';
 			}
 			case 'nantou': {
-				return 'taiwan/series/nantou-road-trip-2015-1-12.jpg';
+				return pickFrom(id, [
+					'taiwan/series/nantou-road-trip-2015-1-12.jpg',
+					'taiwan/series/nantou-road-trip-2015-2-8.jpg',
+				]);
 			}
 			// TODO: Penghu
 			case 'pingtung': {
@@ -147,13 +169,16 @@ function getFallbackImageId({
 				return 'taiwan/xinbei/wanli/wanli-yeliu-signal-station-1.jpg';
 			}
 			case 'yilan': {
-				return 'taiwan/yilan/datong/datong-jianqing-huaigu-trail-1.jpg';
+				return pickFrom(id, [
+					'taiwan/yilan/datong/datong-jianqing-huaigu-trail-1.jpg',
+					'taiwan/series/suhua-highway-road-trip-2018-21.jpg',
+				]);
 			}
 			case 'yunlin': {
 				return 'taiwan/yunlin/xiluo/xiluo-bridge-4.jpg';
 			}
 			default: {
-				return 'taiwan/series/nantou-road-trip-2015-2-14.jpg';
+				return 'taiwan/series/huadong-valley-ride-2018-3-35.jpg';
 			}
 		}
 	}
@@ -193,6 +218,7 @@ function getFallbackImageId({
 	return pickFrom(id, [
 		'v/v-random-1.jpg',
 		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
+		'huadong-valley-ride-2018-3-35.jpg',
 	]);
 }
 
@@ -255,44 +281,55 @@ function getIndexEntries(): Array<OpenGraphContentEntry> {
 		{
 			id: ContentCollectionsEnum.Archives,
 			title: 'Archives',
-			imageFeaturedId: 'v/v-random-1.jpg',
+			imageFeaturedId: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Ephemera,
 			title: 'Ephemera',
+			imageFeaturedId: 'taiwan/miaoli/tongxiao/tongxiao-railway-granary-complex-3.jpg',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Locations,
 			title: 'Locations',
+			imageFeaturedId: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Posts,
 			title: 'Posts',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Regions,
 			title: 'Regions',
+			imageFeaturedId: 'taiwan/series/nantou-road-trip-2015-5-17.jpg',
 		},
 		{
 			id: ContentCollectionsEnum.Resources,
 			title: 'Resources',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Series,
 			title: 'Series',
+			isFallback: true,
 		},
 		{
 			id: ContentCollectionsEnum.Themes,
 			title: 'Themes',
+			isFallback: true,
 		},
 		{
 			id: 'homepage',
 			title: '', // No duplicate branding
-			isFallback: false,
+			imageFeaturedId: 'taiwan/series/huadong-valley-ride-2018-4-9.jpg',
 		},
 		{
 			id: 'not-found',
 			title: '404: Not Found',
+			isFallback: true,
 		},
 	];
 
@@ -301,8 +338,8 @@ function getIndexEntries(): Array<OpenGraphContentEntry> {
 		collection: 'index',
 		digest: `index-${id}`,
 		title,
-		imageFeaturedId: imageFeaturedId ?? 'v/v-random-1.jpg',
-		isFallback: isFallback === undefined ? true : isFallback,
+		imageFeaturedId: imageFeaturedId ?? 'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
+		isFallback: isFallback ?? true,
 	}));
 }
 
