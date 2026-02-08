@@ -71,12 +71,3 @@ export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent
  */
 // A string representing the year the site was founded; will default to the current year
 export const SITE_YEAR_FOUNDED = 2009;
-
-/**
- * Feature flags
- */
-// Image metadata generation; set to "true" to enable
-export const FEATURE_IMAGE_METADATA = true as boolean;
-
-// Generate open graph images with Satori
-export const FEATURE_OPEN_GRAPH_IMAGES = false as boolean;

@@ -1,21 +1,22 @@
 import { imageLoader } from '@spectralcodex/image-loader';
+import { hash } from '@spectralcodex/shared/cache';
+import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { defineCollection } from 'astro:content';
-import { CONTENT_MEDIA_PATH } from 'astro:env/server';
+import { CONTENT_MEDIA_PATH, CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
-import { NumericScaleSchema } from '#lib/schemas/index.ts';
+import { DateStringSchema } from '#lib/schemas/index.ts';
 
 const ImageExifDataSchema = z.object({
 	title: z.string(),
 	description: z.string(),
-	dateCreated: z.date().optional(),
+	dateCreated: DateStringSchema.optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
 	lens: z.string().optional(),
@@ -30,7 +31,6 @@ const ImageExifDataSchema = z.object({
 			coordinates: PositionSchema,
 		})
 		.optional(),
-	entryQuality: NumericScaleSchema,
 });
 
 type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
@@ -43,9 +43,21 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 	modifiedTime: z.date().optional(),
 });
 
-let exiftool: ExifTool;
-
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
+
+/**
+ * Image metadata schema
+ * Astro caches everything in the data store but rebuilding EXIF data is slow so we cache it here as well
+ * This allows for use to rebuild Astro's content cache as needed without taking several extra minutes
+ * If your image library shifts around or changes a lot you can nuke the sqlite file in the cache folder
+ */
+interface ImageMetadataCached {
+	width: number;
+	height: number;
+	exif?: ImageExifDataInput | undefined;
+}
+
+const imageMetadataCache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-metadata');
 
 // Read a local image with Sharp and return dimension metrics
 async function getImageDimensions(imagePath: string) {
@@ -79,63 +91,43 @@ function getImageExposureValue({
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
+// Initialize ExifTool instance so it can be reused
+let exiftool: ExifTool;
+
 export const images = defineCollection({
 	loader: imageLoader({
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 100,
-		...(FEATURE_IMAGE_METADATA
-			? {
-					beforeLoad: () => {
-						exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
-					},
-					afterLoad: async () => {
-						await exiftool.end();
-					},
+		beforeLoad: () => {
+			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
+		},
+		afterLoad: async () => {
+			await exiftool.end();
+		},
+		dataHandler: async ({ id, filePathRelative, modifiedTime }) => {
+			const cacheKey = hash({ filePath: filePathRelative, mtime: modifiedTime });
+			const cached = await imageMetadataCache.get<ImageMetadataCached>(cacheKey);
+
+			let dimensions: { width: number; height: number };
+			let exif: ImageExifDataInput | undefined;
+
+			if (cached) {
+				dimensions = { width: cached.width, height: cached.height };
+
+				if (cached.exif) {
+					exif = cached.exif;
 				}
-			: {}),
-		dataHandler: async ({ id, filePathRelative }) => {
-			/**
-			 * We save dimensions to the content collection so we can reference locally hosted images without `inferSize`
-			 */
-			const dimensions = await getImageDimensions(filePathRelative);
-
-			// Clamp source width to avoid upscaling
-			const srcWidth = Math.min(1800, dimensions.width);
-
-			const defaultAspectRatio = 3 / 2;
-
-			const defaultMetadata = {
-				src: getIpxImageUrl(id, {
-					width: srcWidth,
-					sourceWidth: dimensions.width,
-					sourceHeight: dimensions.height,
-				}),
-				path: filePathRelative,
-				width: ImageSizeEnum.Large,
-				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
-				title: '',
-				description: '',
-				entryQuality: 1,
-			};
-
-			/**
-			 * Harvest EXIF data from images
-			 */
-			async function getExifData() {
-				if (!FEATURE_IMAGE_METADATA) return;
+			} else {
+				dimensions = await getImageDimensions(filePathRelative);
 
 				const tags = await exiftool.read(filePathRelative);
 
 				const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
-				const entryQuality = Math.min(
-					1,
-					Math.max(Number.parseInt(String(tags.Rating ?? 0), 10), 5),
-				);
 
-				return {
+				exif = {
 					title: String(tags.Title),
 					description: String(tags.Description),
-					dateCreated: dateCreated ? new Date(dateCreated) : undefined,
+					dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
 					brand: String(tags.Make),
 					camera: String(tags.Model),
 					lens: tags.LensID ?? String(tags.LensModel),
@@ -155,16 +147,35 @@ export const images = defineCollection({
 								},
 							}
 						: {}),
-					entryQuality,
-				} satisfies ImageExifDataInput;
+				};
+
+				await imageMetadataCache.set(cacheKey, {
+					...dimensions,
+					exif,
+				} satisfies ImageMetadataCached);
 			}
 
-			const exifData = await getExifData();
+			// Clamp source width to avoid upscaling
+			const srcWidth = Math.min(1800, dimensions.width);
+			const defaultAspectRatio = 3 / 2;
+
+			const defaultMetadata = {
+				src: getIpxImageUrl(id, {
+					width: srcWidth,
+					sourceWidth: dimensions.width,
+					sourceHeight: dimensions.height,
+				}),
+				path: filePathRelative,
+				width: ImageSizeEnum.Large,
+				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
+				title: '',
+				description: '',
+			};
 
 			return {
 				...defaultMetadata,
 				...dimensions,
-				...exifData,
+				...exif,
 			} satisfies ImageMetadataInput;
 		},
 	}),

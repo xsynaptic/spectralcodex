@@ -8,7 +8,6 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageMetadata from '#components/image/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
-import { FEATURE_IMAGE_METADATA } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
 	getImageLayoutSizesProp,
@@ -139,9 +138,7 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
 						{...imageProps}
 					/>
-					{FEATURE_IMAGE_METADATA && showMetadata && imageEntry ? (
-						<ImageMetadata entry={imageEntry} />
-					) : undefined}
+					{showMetadata && imageEntry ? <ImageMetadata entry={imageEntry} /> : undefined}
 				</ImagePlaceholder>
 				{caption ? (
 					<figcaption
