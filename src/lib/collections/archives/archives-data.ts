@@ -72,6 +72,7 @@ function getArchivesMonthData(archiveDataMap: ArchivesDataMap, dateUpdatedData: 
 		const monthName = dateUpdatedData.date.toLocaleDateString('default', { month: 'long' });
 
 		yearMap.set(dateUpdatedData.month, {
+			id: `${dateUpdatedData.year}/${dateUpdatedData.month}`,
 			year: dateUpdatedData.year,
 			month: dateUpdatedData.month,
 			monthName,
@@ -300,7 +301,7 @@ export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
 			if (!monthlyDataProcessed.isEmpty) {
 				// Check for a matching archive collection entry
 				// This allows for custom descriptions and images on monthly archive pages
-				const archiveEntry = archivesMap.get(`${year}/${year}-${monthlyData.month}`);
+				const archiveEntry = archivesMap.get(monthlyData.id);
 
 				archivesMonthlyData.push({
 					...monthlyData,
@@ -370,6 +371,7 @@ export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
 		}
 
 		archivesIndexData[year] = {
+			id: year,
 			year,
 			month: '',
 			monthName: '',

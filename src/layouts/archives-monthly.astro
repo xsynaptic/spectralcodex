@@ -48,17 +48,21 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 const archiveRenderResult = archiveEntry ? await render(archiveEntry) : undefined;
 
 const t = getTranslations();
+
+const title = formatStringTemplate(t('archives.monthly.title'), {
+	date: archivesMonthlyItem.title,
+});
 ---
 
 <MainSite
 	meta={{
-		title: formatStringTemplate(t('archives.monthly.title'), { date: archivesMonthlyItem.title }),
+		title,
 		description: formatStringTemplate(t('archives.monthly.description'), {
 			date: archivesMonthlyItem.title,
 		}),
 		image: await getSeoImageProps({
-			...(hasHeroImage ? { id: imageFeaturedGroup.at(0)?.captionMetadata?.id ?? '' } : {}),
-			alt: archivesMonthlyItem.title,
+			id: archivesMonthlyItem.id,
+			alt: title,
 		}),
 		...getSeoHideSearch(true),
 	}}
@@ -70,11 +74,7 @@ const t = getTranslations();
 		imageFeaturedGroup={imageFeaturedGroup}
 	>
 		<ContentHeader hasHeroImage={hasHeroImage}>
-			<Fragment slot="header-title"
-				>{
-					formatStringTemplate(t('archives.monthly.title'), { date: archivesMonthlyItem.title })
-				}</Fragment
-			>
+			<Fragment slot="header-title">{title}</Fragment>
 			<Fragment slot="header-subtitle">
 				{
 					hasHeroImage ? (

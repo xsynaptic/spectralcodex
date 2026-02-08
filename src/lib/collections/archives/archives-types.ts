@@ -6,10 +6,11 @@ import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
  * Archives
  */
 export interface ArchivesBaseItem {
+	id: string;
+	title: string; // _e.g._ "January 2025"
 	year: string;
 	month: string;
 	monthName: string;
-	title: string; // _e.g._ "January 2025"
 	highlights: Array<ContentMetadataItem> | undefined;
 	createdCount: number;
 	updatedCount: number;

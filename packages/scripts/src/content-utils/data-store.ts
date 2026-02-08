@@ -34,7 +34,7 @@ type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;
 /**
  * Maps each region ID to its parent ID (undefined for root regions)
  */
-type RegionParentMap = Map<string, string | undefined>;
+export type RegionParentMap = Map<string, string | undefined>;
 
 /**
  * Result of loading the data store

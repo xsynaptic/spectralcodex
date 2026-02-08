@@ -8,6 +8,7 @@ import {
 } from '@spectralcodex/shared/schemas';
 import { z } from 'zod';
 
+import type { DataStoreEntry, RegionParentMap } from '../content-utils/data-store.js';
 import type { OpenGraphMetadataItem } from './types.js';
 
 import {
@@ -15,6 +16,24 @@ import {
 	getDataStoreRegionParentsById,
 	loadDataStore,
 } from '../content-utils/data-store.js';
+
+// Archive generation starts from this year
+const ARCHIVES_YEAR_START = 2008;
+
+const ARCHIVES_MONTH_NAMES = [
+	'January',
+	'February',
+	'March',
+	'April',
+	'May',
+	'June',
+	'July',
+	'August',
+	'September',
+	'October',
+	'November',
+	'December',
+] as const;
 
 interface ContentEntry extends OpenGraphMetadataItem {
 	digest: string;
@@ -139,7 +158,7 @@ function getFallbackImageId({
 				return 'v/fallback-tainan-1.jpg';
 			}
 			case 'taipei': {
-				return 'taiwan/taipai/daan/daan-xinyi-market-1.jpg';
+				return 'taiwan/taipei/daan/daan-xinyi-market-1.jpg';
 			}
 			case 'taitung': {
 				return 'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg';
@@ -210,6 +229,87 @@ function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | 
 		: imageFeatured;
 }
 
+function getImageFeaturedData({
+	entry,
+	collection,
+	regionParentMap,
+}: {
+	entry: DataStoreEntry;
+	collection: string;
+	regionParentMap: RegionParentMap;
+}): { imageFeaturedId: string; isFallback: boolean } {
+	const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
+
+	const imageFeaturedId = getImageFeaturedId(imageFeatured);
+
+	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
+
+	return {
+		imageFeaturedId: getFallbackImageId({
+			id: entry.id,
+			collection,
+			category: z.string().optional().parse(entry.data.category),
+			regions: getDataStoreRegionParentsById(
+				collection === 'regions'
+					? z.string().optional().parse(entry.data.parent)
+					: RegionsSchema.optional().parse(entry.data.regions)?.[0],
+				regionParentMap,
+			),
+			themes: ThemesSchema.optional().parse(entry.data.themes),
+		}),
+		isFallback: false,
+	};
+}
+
+/**
+ * Archives handling
+ */
+function getArchivesTitle(id: string): string {
+	const year = Number(id.split('-')[0]);
+	const month = Number(id.split('-')[1]);
+
+	return `Archives: ${ARCHIVES_MONTH_NAMES[month - 1] as string} ${String(year)}`;
+}
+
+function getArchiveEntries(): Array<ContentEntry> {
+	const entries: Array<ContentEntry> = [];
+	const now = new Date();
+	const currentYear = now.getFullYear();
+	const currentMonth = now.getMonth() + 1;
+
+	for (let year = ARCHIVES_YEAR_START; year <= currentYear; year++) {
+		// Yearly entry
+		entries.push({
+			collection: 'archives',
+			id: String(year),
+			digest: `archives-${String(year)}`,
+			title: `Archives: ${String(year)}`,
+			imageFeaturedId: 'v/v-random-1.jpg',
+			isFallback: true,
+		});
+
+		// Monthly entries
+		const maxMonth = year === currentYear ? currentMonth : 12;
+
+		for (let month = 1; month <= maxMonth; month++) {
+			const monthPadded = String(month).padStart(2, '0');
+
+			const id = `${String(year)}-${monthPadded}`;
+
+			entries.push({
+				collection: 'archives',
+				id,
+				digest: `archives-${id}`,
+				title: getArchivesTitle(id),
+				imageFeaturedId: 'v/v-random-1.jpg',
+				isFallback: true,
+			});
+		}
+	}
+
+	return entries;
+}
+
 // Content entries are constructed with enough metadata to assign fallback images
 export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
@@ -222,17 +322,22 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 		for (const entry of collectionEntries) {
 			const id = entry.id.replace('/', '-');
 			const titleRaw = z.string().optional().parse(entry.data.title);
-			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
-			const imageFeaturedId = getImageFeaturedId(imageFeatured);
-
-			// Skip entries without digest
-			if (!titleRaw || !entry.digest) continue;
 
 			let title = titleRaw;
 
-			if (collection === 'resources') {
-				title = `Resources: ${titleRaw}`;
+			// Skip entries without digest
+			if (!entry.digest) continue;
+
+			if (collection === 'archives') {
+				title = getArchivesTitle(id);
+				// TODO: improve fallback image logic for archives
+			} else if (collection === 'resources' && title) {
+				title = `Resources: ${title}`;
+			} else if (!title) {
+				continue;
 			}
+
+			const imageFeaturedData = getImageFeaturedData({ entry, collection, regionParentMap });
 
 			allEntries.push({
 				collection,
@@ -242,24 +347,13 @@ export function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 				titleZh: z.string().optional().parse(entry.data.title_zh),
 				titleJa: z.string().optional().parse(entry.data.title_ja),
 				titleTh: z.string().optional().parse(entry.data.title_th),
-				imageFeaturedId:
-					imageFeaturedId ??
-					getFallbackImageId({
-						id: entry.id,
-						collection,
-						category: z.string().optional().parse(entry.data.category),
-						regions: getDataStoreRegionParentsById(
-							collection === 'regions'
-								? z.string().optional().parse(entry.data.parent)
-								: RegionsSchema.optional().parse(entry.data.regions)?.[0],
-							regionParentMap,
-						),
-						themes: ThemesSchema.optional().parse(entry.data.themes),
-					}),
-				isFallback: imageFeaturedId === undefined,
+				...imageFeaturedData,
 			});
 		}
 	}
+
+	// Add procedural archive entries
+	allEntries.push(...getArchiveEntries());
 
 	return allEntries;
 }

@@ -15,7 +15,7 @@ import {
 } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { getSeoHideSearch } from '#lib/utils/seo.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
@@ -29,19 +29,23 @@ const { archivesMonthlyData, archivesYear, archivesYears } = Astro.props;
 const contentMetadataIndex = await getContentMetadataIndex();
 
 const t = getTranslations();
+
+const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesYear });
 ---
 
 <MainSite
 	meta={{
-		title: formatStringTemplate(t('archives.yearly.title'), { date: archivesYear }),
+		title,
 		description: formatStringTemplate(t('archives.yearly.description'), { date: archivesYear }),
+		image: await getSeoImageProps({
+			id: archivesYear,
+			alt: title,
+		}),
 		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title"
-			>{formatStringTemplate(t('archives.yearly.title'), { date: archivesYear })}</Fragment
-		>
+		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-subtitle"
 			><ArchivesNavigation currentYear={archivesYear} archivesYears={archivesYears}
 				><Link href={getSiteUrl('archives')} linkColor="accent" class="font-semibold"
