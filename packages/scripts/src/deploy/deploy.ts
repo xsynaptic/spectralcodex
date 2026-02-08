@@ -16,7 +16,7 @@ const { values } = parseArgs({
 	options: {
 		'root-path': { type: 'string', default: process.cwd() },
 		'cache-path': { type: 'string', default: './.cache' },
-		'og-image-path': { type: 'string', default: './cache/og-image' },
+		'og-image-path': { type: 'string', default: './.cache/og-image' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},

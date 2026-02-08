@@ -356,7 +356,7 @@ function getArchivesTitle(id: string): string {
 }
 
 // Archive generation starts from this year
-const ARCHIVES_YEAR_START = 2008;
+const ARCHIVES_YEAR_START = 2006;
 
 function getArchiveEntries(): Array<OpenGraphContentEntry> {
 	const entries: Array<OpenGraphContentEntry> = [];
