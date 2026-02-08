@@ -218,7 +218,7 @@ function getFallbackImageId({
 	return pickFrom(id, [
 		'v/v-random-1.jpg',
 		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
-		'huadong-valley-ride-2018-3-35.jpg',
+		'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
 	]);
 }
 
@@ -434,8 +434,13 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 
 			if (collection === ContentCollectionsEnum.Archives) {
 				title = getArchivesTitle(id);
-			} else if (collection === ContentCollectionsEnum.Resources && title) {
-				title = `Resources: ${title}`;
+			} else if (collection === ContentCollectionsEnum.Resources) {
+				if ('showPage' in entry.data && entry.data.showPage && title) {
+					title = `Resources: ${title}`;
+				} else {
+					// Skip resource entries without showPage flag
+					continue;
+				}
 			} else if (!title) {
 				continue;
 			}
