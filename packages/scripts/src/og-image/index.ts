@@ -180,6 +180,13 @@ async function main() {
 					}
 
 					const imageObject = await getSourceImage(imageId);
+
+					if (!imageObject) {
+						console.log(
+							chalk.yellow(`⚠ Missing image: ${imageId} (used by ${entry.collection}/${entry.id})`),
+						);
+					}
+
 					const imageBuffer = await generateImage(
 						{
 							collection: entry.collection,
