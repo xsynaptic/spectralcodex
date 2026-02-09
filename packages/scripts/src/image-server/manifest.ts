@@ -9,9 +9,11 @@
  * - Updates main manifest with all discovered URLs
  */
 import dotenv from 'dotenv';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+
+import { safelyCreateDirectory } from '../shared/utils.js';
 
 function findHtmlFiles(dir: string): Array<string> {
 	const files: Array<string> = [];
@@ -90,9 +92,7 @@ export function generateManifest(options: {
 	// Update main manifest with all URLs (merge new into main)
 	if (mainPath) {
 		const mainDir = path.dirname(mainPath);
-		if (!existsSync(mainDir)) {
-			mkdirSync(mainDir, { recursive: true });
-		}
+		safelyCreateDirectory(mainDir);
 		// eslint-disable-next-line unicorn/no-null
 		writeFileSync(mainPath, JSON.stringify(sortedUrls, null, 2));
 	}

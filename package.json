@@ -18,6 +18,7 @@
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --output-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD",
 		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --overture-url=s3://overturemaps-us-west-2/release/2026-01-21.0/",
+		"media-orphans": "pnpm --filter @spectralcodex/scripts media-orphans --root-path=$PWD",
 		"og-image": "pnpm --filter @spectralcodex/scripts og-image --root-path=$PWD",
 		"deploy-site": "pnpm --filter @spectralcodex/scripts deploy-site --root-path=$PWD",
 		"deploy-app": "pnpm --filter @spectralcodex/scripts deploy-app --root-path=$PWD",

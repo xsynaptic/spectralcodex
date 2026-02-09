@@ -8,14 +8,14 @@ import {
 } from '@spectralcodex/shared/schemas';
 import { z } from 'zod';
 
-import type { DataStoreEntry, RegionParentMap } from '../content-utils/data-store.js';
+import type { DataStoreEntry, RegionParentMap } from '../shared/data-store.js';
 import type { OpenGraphContentEntry } from './types.js';
 
 import {
 	getDataStoreCollection,
 	getDataStoreRegionParentsById,
 	loadDataStore,
-} from '../content-utils/data-store.js';
+} from '../shared/data-store.js';
 
 /** Deterministically pick an item from an array based on a string ID */
 function pickFrom<T = string>(id: string, options: Array<T>): T {

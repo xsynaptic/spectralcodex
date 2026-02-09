@@ -8,7 +8,7 @@ import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 async function loadRegionGeometry(
 	regionSlug: string,

@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { z } from 'zod';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 export function checkContentQuality(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallMismatchCount = 0;

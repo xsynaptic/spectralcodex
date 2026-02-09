@@ -5,14 +5,15 @@ import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
-import type { DataStoreEntry } from '../content-utils/data-store.js';
+import type { DataStoreEntry } from '../shared/data-store.js';
 
-import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store.js';
+import { getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
+import { safelyCreateDirectory } from '../shared/utils.js';
 
 /**
  * Arguments
@@ -357,7 +358,7 @@ async function contentRelated() {
 
 		const dataStorePath = path.join(values['root-path'], values['data-store-path']);
 
-		mkdirSync(path.join(values['root-path'], values['cache-path']), { recursive: true });
+		safelyCreateDirectory(path.join(values['root-path'], values['cache-path']));
 
 		if (values['clear-cache']) {
 			const cacheDir = path.join(values['root-path'], values['cache-path']);

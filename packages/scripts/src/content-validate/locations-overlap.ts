@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 interface IndexedPoint {
 	locationId: string;

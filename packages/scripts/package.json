@@ -14,9 +14,10 @@
 		"deploy-og": "tsx ./src/deploy/deploy-og.ts",
 		"dev-server": "tsx ./src/dev-server/index.ts",
 		"image-server-manifest": "tsx ./src/image-server/manifest.ts",
-		"image-server-warm": "tsx ./src/image-server/warm.ts",
-		"image-server-warm-new": "tsx ./src/image-server/warm-new.ts",
+		"image-server-warm": "tsx ./src/image-server/cache-warm.ts",
+		"image-server-warm-new": "tsx ./src/image-server/cache-warm-new.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
+		"media-orphans": "tsx ./src/media-orphans/index.ts",
 		"og-image": "tsx ./src/og-image/index.ts"
 	},
 	"devDependencies": {

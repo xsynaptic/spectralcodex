@@ -3,7 +3,7 @@ import { RegionsSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 /**
  * Derive hierarchy from filePath

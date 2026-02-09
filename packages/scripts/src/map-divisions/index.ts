@@ -9,13 +9,13 @@ import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
-import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store';
+import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
 import { convertToFeatureCollection } from './geojson';
 import { saveSvg } from './svg';
-import { safelyCreateDirectory } from './utils';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -60,7 +60,7 @@ async function processRegions(
 
 	try {
 		// Create output directory
-		await safelyCreateDirectory(outputPath);
+		safelyCreateDirectory(outputPath);
 
 		// Check which regions need FGB or SVG files
 		interface RegionProcessingNeeds {

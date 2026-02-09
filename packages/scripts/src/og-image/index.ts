@@ -15,6 +15,7 @@ import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';
 
+import { safelyCreateDirectory } from '../shared/utils.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -142,8 +143,8 @@ async function main() {
 	const outputPath = path.join(values['root-path'], values['output-path']);
 	const cachePath = path.join(values['root-path'], values['cache-path']);
 
-	await fs.mkdir(outputPath, { recursive: true });
-	await fs.mkdir(cachePath, { recursive: true });
+	safelyCreateDirectory(outputPath);
+	safelyCreateDirectory(cachePath);
 
 	const cache = getFileCacheInstance(cachePath, 'og-image-cache');
 

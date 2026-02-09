@@ -5,14 +5,14 @@ import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { safelyCreateDirectory } from './utils';
+import { safelyCreateDirectory } from '../shared/utils';
 
 export async function saveFlatgeobuf(
 	geojsonData: FeatureCollection,
 	slug: string,
 	outputDir: string,
 ) {
-	await safelyCreateDirectory(outputDir);
+	safelyCreateDirectory(outputDir);
 
 	const filePath = path.join(outputDir, `${slug}.fgb`);
 

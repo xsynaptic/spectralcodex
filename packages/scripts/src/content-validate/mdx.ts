@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 interface ComponentError {
 	line: number;

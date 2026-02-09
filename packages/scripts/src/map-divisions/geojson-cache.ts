@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { DivisionGeometry, DivisionItem } from './types';
 
-import { safelyCreateDirectory } from './utils';
+import { safelyCreateDirectory } from '../shared/utils';
 
 export async function getDivisionDataCache(
 	divisionId: string,
@@ -30,7 +30,7 @@ export async function saveDivisionDataCache(
 	geometry: DivisionGeometry,
 	cacheDir: string,
 ) {
-	await safelyCreateDirectory(cacheDir);
+	safelyCreateDirectory(cacheDir);
 
 	const cacheFilePath = path.join(cacheDir, `${divisionId}.geojson`);
 

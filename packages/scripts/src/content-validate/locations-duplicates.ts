@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import { z } from 'zod';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
 // Title fields to check for duplicates (kept DRY as array)
 const TITLE_FIELDS = ['title', 'title_zh', 'title_ja'] as const;

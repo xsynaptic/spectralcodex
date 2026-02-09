@@ -4,7 +4,7 @@ import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralco
 import chalk from 'chalk';
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 import type { RegionMetadata } from './types';
 
 /**

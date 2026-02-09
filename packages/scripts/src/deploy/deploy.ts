@@ -5,8 +5,8 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { cacheWarmNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
-import { warmCacheNew } from '../image-server/warm.js';
 import { deployApp } from './deploy-app.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
@@ -120,7 +120,7 @@ async function transfer() {
 
 async function warmNew() {
 	console.log(chalk.blue('Warming new image cache...'));
-	await warmCacheNew({ rootPath, dryRun });
+	await cacheWarmNew({ rootPath, dryRun });
 }
 
 try {

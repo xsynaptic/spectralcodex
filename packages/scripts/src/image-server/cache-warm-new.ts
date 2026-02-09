@@ -5,7 +5,7 @@
  */
 import { parseArgs } from 'node:util';
 
-import { warmCacheNew } from './warm.js';
+import { cacheWarmNew } from './cache-warm.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -18,7 +18,7 @@ const { values } = parseArgs({
 	},
 });
 
-await warmCacheNew({
+await cacheWarmNew({
 	rootPath: values['root-path'],
 	nginxUrl: values['nginx-url'],
 	concurrency: Number(values.concurrency),

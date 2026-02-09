@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import type { DivisionFeatureCollection, DivisionGeometry } from './types';
 
-import { safelyCreateDirectory } from './utils';
+import { safelyCreateDirectory } from '../shared/utils';
 
 interface SvgOptions {
 	// Tolerance for geometry simplification (lower = more detail)
@@ -138,7 +138,7 @@ export async function saveSvg({
 	outputDir: string;
 	options?: SvgOptions;
 }): Promise<void> {
-	await safelyCreateDirectory(outputDir);
+	safelyCreateDirectory(outputDir);
 
 	const filePath = path.join(outputDir, `${slug}.svg`);
 

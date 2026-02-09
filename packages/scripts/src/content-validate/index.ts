@@ -3,9 +3,9 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
-import { getDataStoreCollection, loadDataStore } from '../content-utils/data-store';
+import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkImageReferences } from './images';
 import { checkLocationsCoordinates } from './locations-coordinates';

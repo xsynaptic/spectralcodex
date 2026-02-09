@@ -5,7 +5,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-interface WarmOptions {
+interface CacheWarmOptions {
 	rootPath: string;
 	nginxUrl?: string;
 	concurrency?: number;
@@ -13,7 +13,7 @@ interface WarmOptions {
 	dryRun?: boolean;
 }
 
-interface WarmConfig {
+interface CacheWarmConfig {
 	remoteHost: string;
 	sshKeyPath: string;
 	sitePath: string;
@@ -23,7 +23,7 @@ interface WarmConfig {
 	dryRun: boolean;
 }
 
-function loadWarmConfig(options: WarmOptions): WarmConfig {
+function loadCacheWarmConfig(options: CacheWarmOptions): CacheWarmConfig {
 	const {
 		rootPath,
 		nginxUrl = 'http://localhost:3100',
@@ -46,7 +46,7 @@ function loadWarmConfig(options: WarmOptions): WarmConfig {
 	return { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun };
 }
 
-async function runWarmScript(config: WarmConfig, manifestFile: string): Promise<void> {
+async function runWarmScript(config: CacheWarmConfig, manifestFile: string): Promise<void> {
 	const { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun } = config;
 	const manifestPath = `${sitePath}/${manifestFile}`;
 
@@ -103,8 +103,8 @@ async function runWarmScript(config: WarmConfig, manifestFile: string): Promise<
 	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${remoteScript}`;
 }
 
-export async function warmCache(options: WarmOptions): Promise<void> {
-	const config = loadWarmConfig(options);
+export async function cacheWarm(options: CacheWarmOptions): Promise<void> {
+	const config = loadCacheWarmConfig(options);
 
 	console.log(chalk.blue('Warming image cache...'));
 	if (config.dryRun) console.log(chalk.yellow('  DRY RUN'));
@@ -112,8 +112,8 @@ export async function warmCache(options: WarmOptions): Promise<void> {
 	await runWarmScript(config, 'cache-manifest.json');
 }
 
-export async function warmCacheNew(options: WarmOptions): Promise<void> {
-	const config = loadWarmConfig(options);
+export async function cacheWarmNew(options: CacheWarmOptions): Promise<void> {
+	const config = loadCacheWarmConfig(options);
 
 	console.log(chalk.blue('Warming new image cache...'));
 	if (config.dryRun) console.log(chalk.yellow('  DRY RUN'));
@@ -122,7 +122,7 @@ export async function warmCacheNew(options: WarmOptions): Promise<void> {
 }
 
 // CLI entry point
-if (process.argv[1]?.endsWith('warm.ts')) {
+if (process.argv[1]?.endsWith('cache-warm.ts')) {
 	const { values } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
@@ -134,7 +134,7 @@ if (process.argv[1]?.endsWith('warm.ts')) {
 		},
 	});
 
-	await warmCache({
+	await cacheWarm({
 		rootPath: values['root-path'],
 		nginxUrl: values['nginx-url'],
 		concurrency: Number(values.concurrency),

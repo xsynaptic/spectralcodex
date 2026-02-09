@@ -1,69 +1,9 @@
 #!/usr/bin/env tsx
-import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
-import { readdirSync, statSync } from 'node:fs';
-import path from 'node:path';
 
-import type { DataStoreEntry } from '../content-utils/data-store';
+import type { DataStoreEntry } from '../shared/data-store';
 
-const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
-const srcPropRegex = /src=["']([^"']+)["']/;
-
-function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
-	const imageFeatured = frontmatter.imageFeatured;
-
-	if (!imageFeatured) return [];
-
-	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
-
-	if (!parsed.success) return [];
-
-	const data = parsed.data;
-
-	if (typeof data === 'string') return [data];
-
-	return data.map((item) => (typeof item === 'string' ? item : item.id));
-}
-
-function extractMdxImageIds(content: string): Array<string> {
-	const ids: Array<string> = [];
-	let match: RegExpExecArray | null;
-
-	while ((match = imgRegex.exec(content)) !== null) {
-		const props = match[1] || '';
-		const srcMatch = srcPropRegex.exec(props);
-
-		if (srcMatch?.[1]) {
-			ids.push(srcMatch[1]);
-		}
-	}
-
-	return ids;
-}
-
-function collectMediaFiles(mediaPath: string): Set<string> {
-	const files = new Set<string>();
-
-	function processDirectory(dirPath: string, prefix = '') {
-		const entries = readdirSync(dirPath);
-
-		for (const entry of entries) {
-			const fullPath = path.join(dirPath, entry);
-			const relativePath = prefix ? `${prefix}/${entry}` : entry;
-			const stat = statSync(fullPath);
-
-			if (stat.isDirectory()) {
-				processDirectory(fullPath, relativePath);
-			} else if (/\.(jpe?g|png|webp|avif|gif)$/i.test(entry)) {
-				files.add(relativePath);
-			}
-		}
-	}
-
-	processDirectory(mediaPath);
-
-	return files;
-}
+import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 
 export function checkImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
 	console.log(chalk.blue(`🔍 Checking image references against ${mediaPath}`));
