@@ -11,7 +11,7 @@ import { ReactQueryProvider } from './lib/react-query';
 
 export const ReactMapComponent: FC<MapComponentProps> = function ReactMapComponent(props) {
 	return (
-		<ReactQueryProvider>
+		<ReactQueryProvider isDev={props.isDev}>
 			<DarkModeProvider>
 				<MapCanvas {...props} />
 			</DarkModeProvider>
