@@ -1,70 +1,82 @@
 #!/usr/bin/env tsx
 import { GeometrySchema } from '@spectralcodex/shared/schemas';
-import { distance as getDistance, point as getPoint } from '@turf/turf';
 import chalk from 'chalk';
+import { around as getPointsAround, distance as getDistance } from 'geokdbush';
+import GeospatialIndex from 'kdbush';
 
 import type { DataStoreEntry } from '../content-utils/data-store';
 
-interface LocationData {
-	id: string;
-	coordinates: Array<[number, number]>;
+interface IndexedPoint {
+	locationId: string;
+	lng: number;
+	lat: number;
 }
 
 export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
 	console.log(chalk.blue(`🔍 Checking location overlaps (threshold: ${String(thresholdMeters)}m)`));
 
-	// Extract all locations with their points
-	const locations: Array<LocationData> = [];
+	// Convert threshold to km for geokdbush
+	const thresholdKm = thresholdMeters / 1000;
+
+	const points: Array<IndexedPoint> = [];
+
+	let locationCount = 0;
 
 	for (const entry of entries) {
 		const geometry = GeometrySchema.safeParse(entry.data.geometry);
 
-		if (!geometry.success) {
-			continue;
-		}
+		if (!geometry.success) continue;
 
-		locations.push({
-			id: entry.id,
-			coordinates: Array.isArray(geometry.data)
-				? geometry.data.map(({ coordinates }) => coordinates)
-				: [geometry.data.coordinates],
-		});
+		locationCount++;
+
+		// Handle both single point and multi-point geometries
+		const coords = Array.isArray(geometry.data)
+			? geometry.data.map((point) => point.coordinates)
+			: [geometry.data.coordinates];
+
+		for (const [lng, lat] of coords) {
+			points.push({ locationId: entry.id, lng, lat });
+		}
 	}
 
-	// Check all location pairs for overlap (comparing every point against every other point)
+	// Build spatial index of all individual points
+	const index = new GeospatialIndex(points.length);
+
+	for (const point of points) {
+		index.add(point.lng, point.lat);
+	}
+
+	index.finish();
+
+	// Find overlapping location pairs using spatial queries
 	const overlapData: Array<{ idA: string; idB: string; distance: number }> = [];
+	const coordinatePairs = new Set<string>();
 
-	for (let i = 0; i < locations.length; i++) {
-		const locationA = locations[i];
+	for (const point of points) {
+		// Query for nearby points within threshold
+		const nearbyIds = getPointsAround(index, point.lng, point.lat, Infinity, thresholdKm);
 
-		if (!locationA) continue;
+		for (const nearbyId of nearbyIds) {
+			const nearby = points[nearbyId];
 
-		for (let j = i + 1; j < locations.length; j++) {
-			const locationB = locations[j];
+			// Skip invalid points and points from same location
+			if (!nearby || nearby.locationId === point.locationId) continue;
 
-			if (!locationB) continue;
+			// Create canonical pair key to avoid duplicates (A-B same as B-A)
+			const pairKey = [point.locationId, nearby.locationId].sort().join('|');
 
-			// Find the minimum distance between any point in A and any point in B
-			let minDistance = Number.POSITIVE_INFINITY;
+			if (coordinatePairs.has(pairKey)) continue;
 
-			for (const coordA of locationA.coordinates) {
-				for (const coordB of locationB.coordinates) {
-					const distanceKm = getDistance(getPoint(coordA), getPoint(coordB), {
-						units: 'kilometers',
-					});
-					const distanceMeters = distanceKm * 1000;
+			coordinatePairs.add(pairKey);
 
-					if (distanceMeters < minDistance) {
-						minDistance = distanceMeters;
-					}
-				}
-			}
+			const distanceKm = getDistance(point.lng, point.lat, nearby.lng, nearby.lat);
+			const distanceMeters = distanceKm * 1000;
 
-			if (minDistance < thresholdMeters) {
+			if (distanceMeters < thresholdMeters) {
 				overlapData.push({
-					idA: locationA.id,
-					idB: locationB.id,
-					distance: minDistance,
+					idA: point.locationId,
+					idB: nearby.locationId,
+					distance: distanceMeters,
 				});
 			}
 		}
@@ -74,7 +86,7 @@ export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdM
 	if (overlapData.length === 0) {
 		console.log(
 			chalk.green(
-				`✓ No overlapping locations found (checked ${String(locations.length)} locations)`,
+				`✓ No overlapping locations found (checked ${String(locationCount)} locations, ${String(points.length)} points)`,
 			),
 		);
 		return true;
@@ -85,9 +97,18 @@ export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdM
 
 	for (const overlap of overlapData) {
 		console.log(
-			chalk.yellow(`Warning: overlap detected between ${overlap.idA} and ${overlap.idB}`),
+			chalk.yellow(
+				`Warning: overlap detected between ${overlap.idA} and ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
+			),
 		);
 	}
 
-	return true; // Return true since these are warnings, not errors
+	console.log(
+		chalk.blue(
+			`Checked ${String(locationCount)} locations (${String(points.length)} points), found ${String(overlapData.length)} overlaps`,
+		),
+	);
+
+	// Return true since these are warnings, not errors
+	return true;
 }

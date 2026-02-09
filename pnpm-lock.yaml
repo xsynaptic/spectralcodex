@@ -525,6 +525,12 @@ importers:
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
+      geokdbush:
+        specifier: ^2.0.1
+        version: 2.0.1
+      kdbush:
+        specifier: ^4.0.2
+        version: 4.0.2
       p-limit:
         specifier: ^7.3.0
         version: 7.3.0
