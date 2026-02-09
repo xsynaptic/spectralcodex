@@ -16,14 +16,14 @@
 
 /* Content image styling; these are labelled "not-prose" and require extra rules */
 .content > *:not(.content-image):not(.figure-group) {
-	@apply max-w-content px-small md:px-medium mx-auto;
+	@apply mx-auto max-w-content px-small md:px-medium;
 }
 .content > .content-image,
 .content > .content-image + p {
 	margin-top: 0;
 }
 .content-image-caption a {
-	@apply text-accent-500 decoration-accent-200 hover:text-accent-300 hover:decoration-accent-100 transition-colors duration-150 ease-in;
+	@apply text-accent-500 decoration-accent-200 transition-colors duration-150 ease-in hover:text-accent-300 hover:decoration-accent-100;
 	text-decoration-line: underline;
 	text-underline-offset: 2px;
 }
@@ -48,7 +48,7 @@
 }
 .content [data-footnote-ref]::before,
 .content [data-footnote-ref]::after {
-	@apply text-accent-300 font-light;
+	@apply font-light text-accent-300;
 }
 [data-mode='dark'] .content [data-footnote-ref]::before,
 [data-mode='dark'] .content [data-footnote-ref]::after {

@@ -81,10 +81,10 @@ button.maplibregl-popup-close-button:focus {
 }
 .maplibregl-ctrl-scale {
 	@apply rounded-br-xs rounded-bl-xs border-r border-b border-l;
-	@apply text-primary-600 border-primary-400;
+	@apply border-primary-400 text-primary-600;
 	background-color: transparent;
 }
 [data-mode='dark'] .maplibregl-ctrl-scale {
-	@apply text-primary-300 border-primary-500;
+	@apply border-primary-500 text-primary-300;
 	background-color: transparent;
 }

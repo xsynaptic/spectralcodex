@@ -23,7 +23,7 @@
 
 /* Inline search result highlights */
 .pagefind-ui mark {
-	@apply bg-highlight-100 text-highlight-600 rounded-sm;
+	@apply rounded-sm bg-highlight-100 text-highlight-600;
 	padding: 2px;
 }
 [data-mode='dark'] .pagefind-ui mark {
@@ -32,7 +32,7 @@
 
 /* Adjust the sizing and positioning of the search result drawer */
 .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-	@apply px-small py-small absolute w-full min-w-64 rounded-b-sm shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
+	@apply absolute w-full min-w-64 rounded-b-sm px-small py-small shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
 	background-color: var(--pagefind-ui-background);
 	margin-top: 0;
 	max-height: 85vh;
@@ -48,7 +48,7 @@
 /* Create visible icon with pseudo-element */
 .pagefind-ui__search-clear::before {
 	--svg-cancel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.59-13L12 10.59L8.41 7L7 8.41L10.59 12L7 15.59L8.41 17L12 13.41L15.59 17L17 15.59L13.41 12L17 8.41z'/%3E%3C/svg%3E");
-	@apply text-primary-400 visible absolute top-1/2 -translate-y-1/2 cursor-pointer;
+	@apply visible absolute top-1/2 -translate-y-1/2 cursor-pointer text-primary-400;
 	aspect-ratio: 1/1;
 	background-color: currentColor;
 	content: '';

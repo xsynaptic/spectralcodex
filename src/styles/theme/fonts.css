@@ -11,17 +11,4 @@
 		var(--font-lora), ui-serif, Georgia, Cambria, 'Times New Roman', Times, 'Songti TC',
 		'LiSong Pro', 'Apple LiSung', '新細明體', 'PMingLiU', 'MingLiU', 'AR PL Mingti2L', 'TW-Sung',
 		serif;
-	/** Unused fonts
-	--font-mono:
-		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
-		monospace;
-	--font-heiti:
-		'Noto Sans TC', 'Heiti TC', 'Microsoft JhengHei', 'PingFang TC', '微軟正黑體', sans-serif;
-	--font-songti:
-		'Songti TC', 'LiSong Pro', 'Apple LiSung', '新細明體', 'PMingLiU', 'MingLiU', 'AR PL Mingti2L',
-		'TW-Sung', serif;
-	--font-kaiti:
-		'BiauKai', 'DFKai-SB', 'AR PL KaitiM', 'AR PL KaitiM GB', 'AR PL UKai HK', 'AR PL UKai TW',
-		'TW-Kai', cursive;
-	*/
 }
