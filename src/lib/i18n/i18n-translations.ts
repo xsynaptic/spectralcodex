@@ -73,7 +73,7 @@ const translationStrings = {
 		'collection.resources.description':
 			'Featured websites, blogs, and online resources that have informed or documented content on this site. Some entries also include maps generated from content cross-referenced in this project.',
 		'collection.resources.homepage.label': 'Visit Homepage',
-		'collection.resources.showPage.label': 'View Index',
+		'collection.resources.showPage.label': 'Resource Index',
 		'collection.resources.contentCount.label': 'Content Count',
 
 		// Series
