@@ -10,6 +10,7 @@ const TIME_24_HOURS = 1000 * 60 * 60 * 24;
 
 interface ReactQueryProviderProps extends PropsWithChildren {
 	isDev?: boolean | undefined;
+	version?: string | undefined;
 }
 
 /**
@@ -30,7 +31,7 @@ function createIdbPersister(idbValidKey: IDBValidKey = 'reactQuery') {
 	} satisfies Persister;
 }
 
-export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps) => {
+export const ReactQueryProvider = ({ children, isDev, version }: ReactQueryProviderProps) => {
 	const [queryClient] = useState(() => {
 		return new QueryClient({
 			defaultOptions: {
@@ -52,6 +53,7 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 			persistOptions={{
 				persister: createIdbPersister('spectralcodex-map-data-cache'),
 				maxAge: TIME_24_HOURS,
+				...(version ? { buster: version } : {}),
 			}}
 		>
 			{children}
