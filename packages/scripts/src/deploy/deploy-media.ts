@@ -5,6 +5,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { ensureSshKeychain } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 
 interface DeployMediaOptions {
@@ -75,11 +76,7 @@ if (scriptPath.includes('deploy-media')) {
 		allowPositionals: true,
 	});
 
-	try {
-		await $`ssh-add --apple-load-keychain 2>/dev/null`;
-	} catch {
-		// Ignore
-	}
+	await ensureSshKeychain();
 
 	await deployMedia({
 		rootPath: values['root-path'],

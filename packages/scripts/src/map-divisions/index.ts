@@ -3,14 +3,13 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 
 import { DuckDBConnection } from '@duckdb/node-api';
 import chalk from 'chalk';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
-import { safelyCreateDirectory } from '../shared/utils';
+import { fileExists, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
@@ -75,20 +74,8 @@ async function processRegions(
 			const fgbPath = path.join(outputPath, `${region.slug}.fgb`);
 			const svgPath = path.join(cachePath, `${region.slug}.svg`);
 
-			let needsFgb = false;
-			let needsSvg = false;
-
-			try {
-				await fs.access(fgbPath);
-			} catch {
-				needsFgb = true;
-			}
-
-			try {
-				await fs.access(svgPath);
-			} catch {
-				needsSvg = true;
-			}
+			const needsFgb = !(await fileExists(fgbPath));
+			const needsSvg = !(await fileExists(svgPath));
 
 			if (needsFgb || needsSvg) {
 				processingNeeds.push({ region, needsFgb, needsSvg });

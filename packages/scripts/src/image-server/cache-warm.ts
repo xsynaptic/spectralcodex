@@ -5,6 +5,8 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { ensureSshKeychain } from '../shared/utils.js';
+
 interface CacheWarmOptions {
 	rootPath: string;
 	nginxUrl?: string;
@@ -50,11 +52,7 @@ async function runWarmScript(config: CacheWarmConfig, manifestFile: string): Pro
 	const { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun } = config;
 	const manifestPath = `${sitePath}/${manifestFile}`;
 
-	try {
-		await $`ssh-add --apple-load-keychain 2>/dev/null`;
-	} catch {
-		// Ignore
-	}
+	await ensureSshKeychain();
 
 	$.verbose = false;
 

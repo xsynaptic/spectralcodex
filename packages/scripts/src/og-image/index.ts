@@ -15,7 +15,7 @@ import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';
 
-import { safelyCreateDirectory } from '../shared/utils.js';
+import { fileExists, safelyCreateDirectory } from '../shared/utils.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -104,15 +104,6 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 	}
 }
 
-async function outputFileExists(filePath: string): Promise<boolean> {
-	try {
-		await fs.access(filePath);
-
-		return true;
-	} catch {
-		return false;
-	}
-}
 
 async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator (Satori) ===\n'));
@@ -173,9 +164,9 @@ async function main() {
 					const sameImage = cached?.imageId === imageId;
 					const imageUnchanged =
 						!imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
-					const fileExists = await outputFileExists(outputFilePath);
+					const outputExists = await fileExists(outputFilePath);
 
-					if (digestMatch && sameImage && imageUnchanged && fileExists && CACHE_ENABLED) {
+					if (digestMatch && sameImage && imageUnchanged && outputExists && CACHE_ENABLED) {
 						skippedCount++;
 						return;
 					}

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { ensureSshKeychain } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 
 interface DeployAppOptions {
@@ -57,11 +58,7 @@ if (scriptPath.includes('deploy-app')) {
 		},
 	});
 
-	try {
-		await $`ssh-add --apple-load-keychain 2>/dev/null`;
-	} catch {
-		// Ignore
-	}
+	await ensureSshKeychain();
 
 	await deployApp({
 		rootPath: values['root-path'],

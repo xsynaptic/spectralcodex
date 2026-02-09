@@ -7,6 +7,7 @@ import { $ } from 'zx';
 
 import { cacheWarmNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
+import { ensureSshKeychain } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
@@ -35,11 +36,7 @@ printDeployConfig(config);
 
 const distPath = path.join(rootPath, 'dist');
 
-try {
-	await $`ssh-add --apple-load-keychain 2>/dev/null`;
-} catch {
-	// Ignore
-}
+await ensureSshKeychain();
 
 // Note: because our content validation scripts rely on data-store.json we need to sync first
 async function sync() {
