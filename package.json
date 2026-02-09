@@ -9,7 +9,7 @@
 		"preview": "astro preview",
 		"lint": "eslint",
 		"lint-strict": "ESLINT_STRICT=1 eslint",
-		"lint-content": "eslint ./packages/content --config ./packages/content/eslint.config.mjs",
+		"lint-content": "pnpm --filter @spectralcodex/content lint",
 		"lint-content-demo": "eslint ./packages/content-demo --config ./packages/content-demo/eslint.config.mjs",
 		"test": "vitest",
 		"test:image-server": "vitest run --config vitest.integration.config.ts",
