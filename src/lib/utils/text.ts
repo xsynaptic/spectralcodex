@@ -56,6 +56,11 @@ export function sanitizeAltAttribute(input: string): string {
 	return encodeHtmlEntities(stripTags(input));
 }
 
+// Strip combining diacritical marks for display font compatibility (e.g. "Shōka" → "Shoka")
+export function stripDiacritics(input: string): string {
+	return input.normalize('NFD').replaceAll(/[\u0300-\u036F]/g, '');
+}
+
 // Interpolate named placeholders in a string *e.g.* "{year}/{month} Archives"
 export function formatStringTemplate(
 	template: string,

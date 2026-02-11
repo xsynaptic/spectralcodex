@@ -14,7 +14,7 @@ import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/regions
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { formatNumber } from '#lib/utils/text.ts';
+import { formatNumber, stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props extends MetadataGridOptions {
 	class?: string | undefined;
@@ -51,7 +51,7 @@ const t = getTranslations();
 
 				return (
 					<Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
-						<Fragment slot="grid-item-title">{item.title}</Fragment>
+						<Fragment slot="grid-item-title">{stripDiacritics(item.title)}</Fragment>
 						{showTitleMultilingual && item.titleMultilingual ? (
 							<Fragment slot="grid-item-title-multilingual">
 								<TextMultilingual content={item.titleMultilingual} />

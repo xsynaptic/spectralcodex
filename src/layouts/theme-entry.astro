@@ -24,6 +24,7 @@ import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'themes'>;
@@ -74,7 +75,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			imageFeaturedGroup={imageFeaturedGroup}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{entry.data.title}</Fragment>
+				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
 				</Fragment>

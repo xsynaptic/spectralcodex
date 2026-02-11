@@ -17,6 +17,7 @@ import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'pages'>;
@@ -55,7 +56,7 @@ const { Content } = await render(entry);
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
 					<a href={Astro.url.toString()} class="p-name p-url" aria-hidden="true" tabindex="-1"
-						>{entry.data.title}</a
+						>{stripDiacritics(entry.data.title)}</a
 					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">

@@ -20,7 +20,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
-import { formatNumber } from '#lib/utils/text.ts';
+import { formatNumber, stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'resources'>;
@@ -53,7 +53,7 @@ const t = getTranslations();
 >
 	<article {...getPagefindBodyProp(page.currentPage !== 1)}>
 		<ContentHeader>
-			<Fragment slot="header-title">{entry.data.title}</Fragment>
+			<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 			<Fragment slot="header-title-multilingual">
 				<TextMultilingual content={titleMultilingual} />
 			</Fragment>
