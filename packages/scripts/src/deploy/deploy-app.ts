@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -32,6 +33,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 		'--progress',
 		'-e',
 		`ssh -i ${config.sshKeyPath}`,
+		`--exclude=/${OPEN_GRAPH_BASE_PATH}/`,
 		...(skipDelete ? [] : ['--delete-after']),
 		...(dryRun ? ['--dry-run'] : []),
 		`${distPath}/`,

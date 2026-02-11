@@ -1,5 +1,4 @@
 #!/usr/bin/env tsx
-import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -11,13 +10,13 @@ import { ensureSshKeychain } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
+import { deployOg } from './deploy-og.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'root-path': { type: 'string', default: process.cwd() },
 		'cache-path': { type: 'string', default: './.cache' },
-		'og-image-path': { type: 'string', default: './.cache/og-image' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},
@@ -25,7 +24,6 @@ const { values } = parseArgs({
 
 const rootPath = values['root-path'];
 const cachePath = path.join(rootPath, values['cache-path']);
-const ogImagePath = path.join(rootPath, values['og-image-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
@@ -63,16 +61,8 @@ async function opengraph() {
 	})`pnpm og-image --root-path=${rootPath}`;
 }
 
-async function mergeOpengraph() {
-	const ogDistPath = path.join(distPath, OPEN_GRAPH_BASE_PATH);
-
-	console.log(chalk.blue('Merging OpenGraph images into dist...'));
-	console.log(chalk.gray(`  From: ${ogImagePath}`));
-	console.log(chalk.gray(`  To:   ${ogDistPath}`));
-
-	// Merge without deleting existing files (preserves public/og defaults and renamed entries)
-	// rsync -av: archive mode, verbose, only transfers changed files based on mtime/size
-	await $({ stdio: 'inherit' })`rsync -av ${ogImagePath}/ ${ogDistPath}/`;
+async function og() {
+	await deployOg({ rootPath, dryRun });
 }
 
 async function build() {
@@ -126,10 +116,10 @@ try {
 	await related();
 	await opengraph();
 	await build();
-	await mergeOpengraph();
 	manifest();
 	await media();
 	await transfer();
+	await og();
 	await warmNew();
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {

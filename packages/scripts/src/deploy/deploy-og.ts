@@ -22,7 +22,7 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 	const ogImagePath = path.join(rootPath, '.cache/og-image');
 	const remoteOgPath = `${config.sitePath}/${OPEN_GRAPH_BASE_PATH}`;
 
-	console.log(chalk.blue('Syncing OG images...'));
+	console.log(chalk.blue('Syncing OpenGraph images...'));
 	console.log(chalk.gray(`  From: ${ogImagePath}`));
 	console.log(chalk.gray(`  To:   ${config.remoteHost}:${remoteOgPath}`));
 
@@ -39,7 +39,8 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 		const files = ids.map((id) => `${id}.${OPEN_GRAPH_IMAGE_FORMAT}`);
 
 		const rsyncArgs = [
-			'-avz',
+			'-av',
+			'--checksum',
 			'--progress',
 			'-e',
 			`ssh -i ${config.sshKeyPath}`,
@@ -52,7 +53,8 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 	} else {
 		// Sync all files
 		const rsyncArgs = [
-			'-avz',
+			'-av',
+			'--checksum',
 			'--progress',
 			'-e',
 			`ssh -i ${config.sshKeyPath}`,
