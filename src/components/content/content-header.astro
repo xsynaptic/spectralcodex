@@ -71,7 +71,7 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 		subtitle || caption ? (
 			<div
 				class:list={[
-					'flex flex-wrap items-start gap-1 pb-2 text-sm',
+					'sm:flex sm:flex-wrap items-start gap-1 pb-2 text-sm',
 					hasHeroImage
 						? 'text-primary-500 sm:text-primary-300 dark:text-primary-400 dark:sm:text-primary-300'
 						: 'text-primary-500 dark:text-primary-400',

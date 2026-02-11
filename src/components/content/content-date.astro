@@ -9,44 +9,33 @@ import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	date: string | Date | undefined;
-	dateUpdated?: string | Date | undefined;
 	datePreset: DatePreset;
 	showMicroformats?: boolean | undefined;
+	showUpdated?: boolean | undefined;
 }
 
-const { date, datePreset, dateUpdated, showMicroformats = false, ...props } = Astro.props;
+const { date, datePreset, showMicroformats = false, showUpdated = false } = Astro.props;
 
 const t = getTranslations();
 ---
 
 {
 	date ? (
-		<div {...props}>
-			{dateUpdated ? (
-				<div class="flex flex-wrap gap-1">
-					<span>
-						<DateDisplay
-							class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
-							date={date}
-							datePreset={datePreset}
-						/>
-						{'; '}
-					</span>
-					<span>{t('content.meta.dateUpdated.label')}</span>
-					<span>
-						<DateDisplay
-							class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
-							date={dateUpdated}
-						/>
-					</span>
-				</div>
-			) : (
+		showUpdated ? (
+			<>
+				{t('content.meta.dateUpdated.label')}{' '}
 				<DateDisplay
-					class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
+					class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
 					date={date}
 					datePreset={datePreset}
 				/>
-			)}
-		</div>
+			</>
+		) : (
+			<DateDisplay
+				class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
+				date={date}
+				datePreset={datePreset}
+			/>
+		)
 	) : undefined
 }

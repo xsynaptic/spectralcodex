@@ -5,6 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import ImageMetadataItem from '#components/image/image-metadata-item.astro';
 import DateDisplay from '#components/parts/date-display.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'images'>;
@@ -61,7 +62,7 @@ const t = getTranslations();
 					</Fragment>
 					{
 						entry.data.dateCreated ? (
-							<DateDisplay date={entry.data.dateCreated} datePreset="long" />
+							<DateDisplay date={entry.data.dateCreated} datePreset={DatePresetEnum.Long} />
 						) : undefined
 					}
 				</ImageMetadataItem>

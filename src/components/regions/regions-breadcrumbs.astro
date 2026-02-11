@@ -25,7 +25,7 @@ const t = getTranslations();
 
 {
 	termAncestors.length > 0 ? (
-		<nav class="flex" aria-label={t('site.breadcrumbs.label')} data-pagefind-ignore {...props}>
+		<nav class="inline sm:flex" aria-label={t('site.breadcrumbs.label')} data-pagefind-ignore {...props}>
 			<ListRow as="ol" class="text-sm">
 				{termAncestors.map((termAncestor) => (
 					<DividedItem

@@ -10,6 +10,9 @@ type Props<Tag extends Extract<HTMLTag, 'ol' | 'ul'> = Extract<HTMLTag, 'ol' | '
 const { as: Tag = 'ul', class: className, ...props } = Astro.props;
 ---
 
-<Tag class:list={[className, 'inline-flex flex-wrap items-start gap-x-1 gap-y-2']} {...props}>
+<Tag
+	class:list={[className, 'inline sm:inline-flex sm:flex-wrap items-start gap-x-1 gap-y-1 sm:gap-y-2']}
+	{...props}
+>
 	<slot />
 </Tag>

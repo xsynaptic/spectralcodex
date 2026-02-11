@@ -111,11 +111,22 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 					<DividedItem hasHeroImage={hasHeroImage}>
 						<ContentDate
 							date={entry.data.dateCreated}
-							dateUpdated={entry.data.dateUpdated}
 							datePreset={DatePresetEnum.Medium}
 							showMicroformats={true}
 						/>
 					</DividedItem>
+					{
+						entry.data.dateUpdated ? (
+							<DividedItem hasHeroImage={hasHeroImage}>
+								<ContentDate
+									date={entry.data.dateUpdated}
+									datePreset={DatePresetEnum.Medium}
+									showMicroformats={true}
+									showUpdated={true}
+								/>
+							</DividedItem>
+						) : undefined
+					}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

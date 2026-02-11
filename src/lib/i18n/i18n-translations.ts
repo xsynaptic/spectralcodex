@@ -88,7 +88,7 @@ const translationStrings = {
 			'This site explores numerous themes, many of them overlapping, from history and culture through to art and architecture.',
 
 		// Content
-		'content.meta.dateUpdated.label': 'last updated',
+		'content.meta.dateUpdated.label': 'Last updated',
 		'content.meta.locations.label': 'Mapped locations',
 		'content.meta.wordCount.label': 'Word count',
 		'content.meta.imageFeatured.label': 'Photo:',
