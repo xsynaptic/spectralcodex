@@ -41,27 +41,22 @@ async function processImage({
 	imageObject,
 	height,
 	width,
-	density,
 	isFallback,
 }: {
 	imageObject: sharp.Sharp;
 	height: number;
 	width: number;
-	density: number;
 	isFallback: boolean;
 }): Promise<{
 	dataUrl: string;
 	luminanceTop: number;
 	luminanceBottom: number;
 }> {
-	const scaledHeight = height * density;
-	const scaledWidth = width * density;
-
 	const imagePipeline = imageObject.resize({
 		fit: 'cover',
 		position: 'top',
-		height: scaledHeight,
-		width: scaledWidth,
+		height,
+		width,
 	});
 
 	if (isFallback) {
@@ -72,8 +67,8 @@ async function processImage({
 
 	// Analyze luminance zones (10%-20% for top, 70%-90% for bottom)
 	const [luminanceTop, luminanceBottom] = await Promise.all([
-		getZoneLuminance(imageBuffer.data, scaledHeight, scaledWidth, 0.1, 0.2),
-		getZoneLuminance(imageBuffer.data, scaledHeight, scaledWidth, 0.7, 0.9),
+		getZoneLuminance(imageBuffer.data, height, width, 0.1, 0.2),
+		getZoneLuminance(imageBuffer.data, height, width, 0.7, 0.9),
 	]);
 
 	const dataUrl = `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
@@ -87,20 +82,47 @@ async function processImage({
  */
 export function createGenerator({
 	fonts,
-	density = 1,
 	jpegQuality = 90,
 	...satoriOptions
-}: SatoriOptions & { density?: number; jpegQuality?: number }) {
+}: SatoriOptions & { jpegQuality?: number }) {
 	const height = 'height' in satoriOptions ? satoriOptions.height : OPEN_GRAPH_IMAGE_HEIGHT;
 	const width = 'width' in satoriOptions ? satoriOptions.width : OPEN_GRAPH_IMAGE_WIDTH;
 
-	return async function generateOpenGraphImage(
-		entry: OpenGraphMetadataItem,
-		imageObject?: sharp.Sharp,
-	): Promise<Buffer> {
-		const processed = imageObject
-			? await processImage({ imageObject, height, width, density, isFallback: entry.isFallback })
-			: undefined;
+	// Cache processed image data since source imagery is sometimes reused
+	const processedImageCache = new Map<
+		string,
+		{ dataUrl: string; luminanceTop: number; luminanceBottom: number }
+	>();
+
+	return async function generateOpenGraphImage({
+		entry,
+		imageId,
+		imageObject,
+	}: {
+		entry: OpenGraphMetadataItem;
+		imageId?: string;
+		imageObject?: sharp.Sharp | undefined;
+	}): Promise<Buffer> {
+		let processed: { dataUrl: string; luminanceTop: number; luminanceBottom: number } | undefined;
+
+		if (imageObject) {
+			const cacheKey = imageId ? `${imageId}:${String(entry.isFallback)}` : undefined;
+			const cached = cacheKey ? processedImageCache.get(cacheKey) : undefined;
+
+			if (cached) {
+				processed = cached;
+			} else {
+				processed = await processImage({
+					imageObject,
+					height,
+					width,
+					isFallback: entry.isFallback,
+				});
+				if (cacheKey) {
+					processedImageCache.set(cacheKey, processed);
+				}
+			}
+		}
 
 		const element = getOpenGraphElement(entry, {
 			src: processed?.dataUrl ?? '',

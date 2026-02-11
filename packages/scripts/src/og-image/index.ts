@@ -15,7 +15,7 @@ import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';
 
-import { fileExists, safelyCreateDirectory } from '../shared/utils.js';
+import { safelyCreateDirectory } from '../shared/utils.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -44,10 +44,6 @@ const { values } = parseArgs({
 		},
 	},
 });
-
-// Testing constraints (hardcoded for development)
-const LIMIT = Infinity;
-const CACHE_ENABLED = true as boolean;
 
 // Font configuration
 const FONT_CONFIGS: Array<OpenGraphFontConfig> = [
@@ -104,7 +100,6 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 	}
 }
 
-
 async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator (Satori) ===\n'));
 
@@ -118,18 +113,12 @@ async function main() {
 		fonts,
 		width: OPEN_GRAPH_IMAGE_WIDTH,
 		height: OPEN_GRAPH_IMAGE_HEIGHT,
-		density: 2, // Better quality when downscaling
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
 	const entries = getContentEntries(path.join(values['root-path'], values['data-store-path']));
-	const entriesFiltered = entries.slice(0, LIMIT);
 
-	console.log(
-		chalk.blue(
-			`Processing ${String(entriesFiltered.length)} of ${String(entries.length)} entries...\n`,
-		),
-	);
+	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
 
 	const outputPath = path.join(values['root-path'], values['output-path']);
 	const cachePath = path.join(values['root-path'], values['cache-path']);
@@ -140,14 +129,14 @@ async function main() {
 	const cache = getFileCacheInstance(cachePath, 'og-image-cache');
 
 	// How many images should be processed concurrently?
-	const concurrencyLimit = pLimit(50);
+	const concurrencyLimit = pLimit(10);
 
 	let generatedCount = 0;
 	let skippedCount = 0;
 	let errorCount = 0;
 
 	await Promise.all(
-		entriesFiltered.map((entry) =>
+		entries.map((entry) =>
 			concurrencyLimit(async () => {
 				try {
 					const outputFilePath = path.join(outputPath, `${entry.id}.${OPEN_GRAPH_IMAGE_FORMAT}`);
@@ -156,17 +145,22 @@ async function main() {
 					const imageId = entry.imageFeaturedId;
 
 					// Check cache for existing entry
-					const cached = await cache.get<CacheEntry>(entry.id);
-					const imageMtime = await getImageModifiedTime(imageId);
+					const [cached, imageMtime, outputExists] = await Promise.all([
+						cache.get<CacheEntry>(entry.id),
+						getImageModifiedTime(imageId),
+						fs.stat(outputFilePath).then(
+							() => true,
+							() => false,
+						),
+					]);
 
 					// Cache hit: digest matches, same image used, and image hasn't changed
 					const digestMatch = cached?.digest === entry.digest;
 					const sameImage = cached?.imageId === imageId;
 					const imageUnchanged =
 						!imageMtime || !cached?.imageMtime || imageMtime <= cached.imageMtime;
-					const outputExists = await fileExists(outputFilePath);
 
-					if (digestMatch && sameImage && imageUnchanged && outputExists && CACHE_ENABLED) {
+					if (digestMatch && sameImage && imageUnchanged && outputExists) {
 						skippedCount++;
 						return;
 					}
@@ -179,8 +173,8 @@ async function main() {
 						);
 					}
 
-					const imageBuffer = await generateImage(
-						{
+					const imageBuffer = await generateImage({
+						entry: {
 							collection: entry.collection,
 							id: entry.id,
 							title: entry.title,
@@ -189,8 +183,9 @@ async function main() {
 							titleTh: entry.titleTh,
 							isFallback: entry.isFallback,
 						},
+						imageId,
 						imageObject,
-					);
+					});
 
 					await fs.writeFile(outputFilePath, new Uint8Array(imageBuffer));
 
