@@ -19,7 +19,7 @@ export default getConfig(
 				'dist/**/*',
 				'content/**/*',
 				'node_modules/**/*',
-				'temp/**/*',
+				'**/temp/**/*',
 			],
 		},
 		{
