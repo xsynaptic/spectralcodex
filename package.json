@@ -39,14 +39,14 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "6.0.0-beta.10",
+		"astro": "6.0.0-beta.11",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "7.0.0-beta.6",
-		"@astrojs/mdx": "5.0.0-beta.6",
-		"@astrojs/node": "10.0.0-beta.3",
+		"@astrojs/mdx": "5.0.0-beta.7",
+		"@astrojs/node": "10.0.0-beta.4",
 		"@astrojs/react": "^5.0.0-beta.3",
 		"@astrojs/rss": "4.0.15-beta.3",
 		"@astrojs/sitemap": "3.6.1-beta.3",
@@ -90,7 +90,7 @@
 		"geokdbush": "^2.0.1",
 		"globals": "^17.3.0",
 		"kdbush": "^4.0.2",
-		"maplibre-gl": "^5.17.0",
+		"maplibre-gl": "^5.18.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.8.1",
@@ -112,5 +112,5 @@
 		"yaml": "^2.8.2",
 		"zod": "^4.3.6"
 	},
-	"packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264"
+	"packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
 }
