@@ -70,7 +70,7 @@
 
 .pagefind-ui__message,
 .pagefind-ui__result-title {
-	@apply font-display;
+	@apply font-sans;
 }
 
 .pagefind-ui__result-link {

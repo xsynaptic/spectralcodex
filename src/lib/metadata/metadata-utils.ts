@@ -38,6 +38,7 @@ export async function getContentMetadataById(id: string): Promise<ContentMetadat
 
 	const contentMetadata = contentMetadataIndex.get(id);
 
+	// Note: we now cover this with a content validation check at build time
 	if (!contentMetadata && CONTENT_LINKS_MISSING_ID_LOG) {
 		logError(`[Metadata] Missing content specified in Link component: "${id}"`);
 	}

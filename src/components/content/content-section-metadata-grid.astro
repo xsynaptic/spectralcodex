@@ -38,7 +38,9 @@ const t = getTranslations();
 					<Pagination class="mt-small md:mt-medium" page={page} />
 				</>
 			) : undefined}
-			{hasItems ? <MetadataGrid items={items} {...metadataGridOptions} /> : undefined}
+			{hasItems ? (
+				<MetadataGrid items={items} {...defaultPreviewItemProps} {...metadataGridOptions} />
+			) : undefined}
 		</ContentSection>
 	) : undefined
 }
