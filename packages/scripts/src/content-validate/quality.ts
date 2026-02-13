@@ -9,16 +9,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 export function checkContentQuality(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallMismatchCount = 0;
 
-	for (const [collectionName, entries] of entriesByCollection) {
-		console.log(chalk.blue(`🔍 Checking content quality in ${collectionName}`));
-
-		if (entries.length === 0) {
-			console.log(chalk.yellow(`No entries found in ${collectionName}`));
-			continue;
-		}
-
-		let mismatchCount = 0;
-
+	for (const [, entries] of entriesByCollection) {
 		for (const entry of entries) {
 			const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
 			const entryQuality = z.number().optional().parse(entry.data.entryQuality);
@@ -30,16 +21,15 @@ export function checkContentQuality(entriesByCollection: Array<[string, Array<Da
 				const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
 				console.log(chalk.red(`❌ ${filename}`));
 				console.log(chalk.red('   ERROR: Image featured but entry quality is low'));
-				mismatchCount++;
+				overallMismatchCount++;
 			}
 		}
+	}
 
-		if (mismatchCount === 0) {
-			console.log(chalk.green(`✓ ${entries.length.toString()} entry quality values valid`));
-		} else {
-			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} quality issue(s)`));
-			overallMismatchCount += mismatchCount;
-		}
+	if (overallMismatchCount === 0) {
+		console.log(chalk.green('✓ Content quality valid'));
+	} else {
+		console.log(chalk.yellow(`⚠️  Found ${overallMismatchCount.toString()} quality issue(s)`));
 	}
 
 	return overallMismatchCount === 0;

@@ -4,8 +4,6 @@ import chalk from 'chalk';
 import type { DataStoreEntry } from '../shared/data-store';
 
 export function checkDivisionIds(entries: Array<DataStoreEntry>) {
-	console.log(chalk.blue(`🔍 Checking division IDs in regions`));
-
 	const regionsWithoutDivision: Array<string> = [];
 
 	for (const entry of entries) {

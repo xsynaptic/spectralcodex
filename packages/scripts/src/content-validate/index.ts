@@ -8,6 +8,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkImageReferences } from './images';
+import { checkLinkIds } from './link-ids';
 import { checkLocationsCoordinates } from './locations-coordinates';
 import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
@@ -50,13 +51,6 @@ const command = positionals[0];
 
 type CollectionEntries = Array<[string, Array<DataStoreEntry>]>;
 
-const checkSlugCollections: CollectionEntries = [
-	['ephemera', getDataStoreCollection(collections, 'ephemera')],
-	['locations', getDataStoreCollection(collections, 'locations')],
-	['posts', getDataStoreCollection(collections, 'posts')],
-	['regions', getDataStoreCollection(collections, 'regions')],
-];
-
 const allCollections: CollectionEntries = [
 	['archives', getDataStoreCollection(collections, 'archives')],
 	['ephemera', getDataStoreCollection(collections, 'ephemera')],
@@ -67,6 +61,13 @@ const allCollections: CollectionEntries = [
 	['resources', getDataStoreCollection(collections, 'resources')],
 	['series', getDataStoreCollection(collections, 'series')],
 	['themes', getDataStoreCollection(collections, 'themes')],
+];
+
+const checkSlugCollections: CollectionEntries = [
+	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['locations', getDataStoreCollection(collections, 'locations')],
+	['posts', getDataStoreCollection(collections, 'posts')],
+	['regions', getDataStoreCollection(collections, 'regions')],
 ];
 
 const qualityCollections: CollectionEntries = [
@@ -126,6 +127,11 @@ switch (command) {
 		checkMdxComponents(allCollections);
 		break;
 	}
+	// Check for Link components referencing non-existent entry IDs
+	case 'link-ids': {
+		checkLinkIds(allCollections);
+		break;
+	}
 	// Check for image references that do not exist
 	case 'images': {
 		checkImageReferences(
@@ -140,53 +146,31 @@ switch (command) {
 			process.exit(1);
 		}
 
-		// Run all validations for deployment - exit immediately on first failure
-		const mdxSuccess = checkMdxComponents(allCollections);
+		// Run all validations for deployment and report all problems at once
+		const syncResults: Array<boolean> = [
+			checkMdxComponents(allCollections),
+			checkLinkIds(allCollections),
+			checkImageReferences(
+				allCollections.flatMap(([, entries]) => entries),
+				path.join(values['root-path'], values['media-path']),
+			),
+			checkSlugMismatches(checkSlugCollections),
+			checkContentQuality(qualityCollections),
+			checkLocationsDuplicates(getDataStoreCollection(collections, 'locations')),
+			checkLocationsRegions(getDataStoreCollection(collections, 'locations')),
+			checkLocationsOverlap(
+				getDataStoreCollection(collections, 'locations'),
+				Number.parseInt(values.threshold, 10),
+			),
+			checkDivisionIds(getDataStoreCollection(collections, 'regions')),
+		];
 
-		if (!mdxSuccess) process.exit(1);
-
-		const imagesSuccess = checkImageReferences(
-			allCollections.flatMap(([, entries]) => entries),
-			path.join(values['root-path'], values['media-path']),
-		);
-
-		if (!imagesSuccess) process.exit(1);
-
-		const slugSuccess = checkSlugMismatches(checkSlugCollections);
-
-		if (!slugSuccess) process.exit(1);
-
-		const qualitySuccess = checkContentQuality(qualityCollections);
-
-		if (!qualitySuccess) process.exit(1);
-
-		const duplicatesSuccess = checkLocationsDuplicates(
-			getDataStoreCollection(collections, 'locations'),
-		);
-
-		if (!duplicatesSuccess) process.exit(1);
-
-		const regionSuccess = checkLocationsRegions(getDataStoreCollection(collections, 'locations'));
-
-		if (!regionSuccess) process.exit(1);
-
-		const coordinatesSuccess = await checkLocationsCoordinates(
+		const asyncResults = await checkLocationsCoordinates(
 			getDataStoreCollection(collections, 'locations'),
 			path.join(values['root-path'], values['divisions-path']),
 		);
 
-		if (!coordinatesSuccess) process.exit(1);
-
-		const overlapSuccess = checkLocationsOverlap(
-			getDataStoreCollection(collections, 'locations'),
-			Number.parseInt(values.threshold, 10),
-		);
-
-		if (!overlapSuccess) process.exit(1);
-
-		const divisionsSuccess = checkDivisionIds(getDataStoreCollection(collections, 'regions'));
-
-		if (!divisionsSuccess) process.exit(1);
+		if ([...syncResults, asyncResults].some((success) => !success)) process.exit(1);
 
 		break;
 	}

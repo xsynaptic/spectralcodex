@@ -13,8 +13,6 @@ interface IndexedPoint {
 }
 
 export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
-	console.log(chalk.blue(`🔍 Checking location overlaps (threshold: ${String(thresholdMeters)}m)`));
-
 	// Convert threshold to km for geokdbush
 	const thresholdKm = thresholdMeters / 1000;
 

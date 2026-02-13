@@ -24,8 +24,6 @@ function getHierarchy(filePath: string, collection: string): Array<string> {
 }
 
 export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
-	console.log(chalk.blue(`🔍 Checking location regions`));
-
 	let mismatchCount = 0;
 
 	for (const entry of entries) {

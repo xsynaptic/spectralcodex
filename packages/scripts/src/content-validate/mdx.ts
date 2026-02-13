@@ -70,16 +70,7 @@ function validateImgComponents(content: string): Array<ComponentError> {
 export function checkMdxComponents(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallErrorCount = 0;
 
-	for (const [collectionName, entries] of entriesByCollection) {
-		console.log(chalk.blue(`🔍 Checking MDX components in ${collectionName}`));
-
-		if (entries.length === 0) {
-			console.log(chalk.yellow(`No entries found in ${collectionName}`));
-			continue;
-		}
-
-		let errorCount = 0;
-
+	for (const [, entries] of entriesByCollection) {
 		for (const entry of entries) {
 			if (!entry.body) continue;
 
@@ -95,16 +86,15 @@ export function checkMdxComponents(entriesByCollection: Array<[string, Array<Dat
 					console.log(chalk.gray(`   ${error.context.trim()}`));
 				}
 
-				errorCount += allErrors.length;
+				overallErrorCount += allErrors.length;
 			}
 		}
+	}
 
-		if (errorCount === 0) {
-			console.log(chalk.green(`✓ ${entries.length.toString()} MDX components valid`));
-		} else {
-			console.log(chalk.yellow(`⚠️  Found ${errorCount.toString()} invalid component(s)`));
-			overallErrorCount += errorCount;
-		}
+	if (overallErrorCount === 0) {
+		console.log(chalk.green('✓ MDX components valid'));
+	} else {
+		console.log(chalk.yellow(`⚠️  Found ${overallErrorCount.toString()} invalid component(s)`));
 	}
 
 	return overallErrorCount === 0;

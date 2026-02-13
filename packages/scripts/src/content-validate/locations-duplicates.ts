@@ -26,8 +26,6 @@ function getGoogleMapsLink(links: unknown): string | undefined {
 }
 
 export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
-	console.log(chalk.blue('🔍 Checking location duplicates'));
-
 	const slugs = new Set<string>();
 	const titles = new Map<string, Set<string>>(); // field -> values
 	const addresses = new Set<string>();

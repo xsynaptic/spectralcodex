@@ -65,8 +65,6 @@ export async function checkLocationsCoordinates(
 	entries: Array<DataStoreEntry>,
 	divisionsPath: string,
 ) {
-	console.log(chalk.blue(`🔍 Checking location coordinates`));
-
 	let mismatchCount = 0;
 	let missingFgbCount = 0;
 	let checkedCount = 0;

@@ -6,8 +6,6 @@ import type { DataStoreEntry } from '../shared/data-store';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 
 export function checkImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
-	console.log(chalk.blue(`🔍 Checking image references against ${mediaPath}`));
-
 	const mediaFiles = collectMediaFiles(mediaPath);
 
 	if (mediaFiles.size === 0) {

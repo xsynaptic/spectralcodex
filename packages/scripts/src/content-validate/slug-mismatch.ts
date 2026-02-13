@@ -8,16 +8,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 export function checkSlugMismatches(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
 	let overallMismatchCount = 0;
 
-	for (const [collectionName, entries] of entriesByCollection) {
-		console.log(chalk.blue(`🔍 Checking slugs in ${collectionName}`));
-
-		if (entries.length === 0) {
-			console.log(chalk.yellow(`No entries found in ${collectionName}`));
-			continue;
-		}
-
-		let mismatchCount = 0;
-
+	for (const [, entries] of entriesByCollection) {
 		for (const entry of entries) {
 			const slug = z.string().optional().parse(entry.data.slug);
 			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
@@ -26,25 +17,24 @@ export function checkSlugMismatches(entriesByCollection: Array<[string, Array<Da
 				if (!slug) {
 					console.log(chalk.red(`❌ ${filename}`));
 					console.log(chalk.red('   ERROR: No slug field found'));
-					mismatchCount++;
+					overallMismatchCount++;
 				} else if (slug !== entry.id) {
 					console.log(chalk.red(`❌ ${filename}`));
 					console.log(chalk.red(`   Expected: ${entry.id}, Found: ${slug}`));
-					mismatchCount++;
+					overallMismatchCount++;
 				}
 			} catch (error) {
 				console.log(chalk.red(`❌ ${filename}`));
 				console.log(chalk.red(`   ERROR: Failed to read file - ${String(error)}`));
-				mismatchCount++;
+				overallMismatchCount++;
 			}
 		}
+	}
 
-		if (mismatchCount === 0) {
-			console.log(chalk.green(`✓ ${entries.length.toString()} slugs valid`));
-		} else {
-			console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} slug mismatch(es)`));
-			overallMismatchCount += mismatchCount;
-		}
+	if (overallMismatchCount === 0) {
+		console.log(chalk.green('✓ Slugs valid'));
+	} else {
+		console.log(chalk.yellow(`⚠️  Found ${overallMismatchCount.toString()} slug mismatch(es)`));
 	}
 
 	return overallMismatchCount === 0;
