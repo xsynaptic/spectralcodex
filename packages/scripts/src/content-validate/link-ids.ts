@@ -4,10 +4,13 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 const LINK_ID_REGEX = /<Link\s[^>]*id="([^"]+)"/g;
 
-export function checkLinkIds(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
+export function checkLinkIds(
+	entriesToScan: Array<[string, Array<DataStoreEntry>]>,
+	validTargets: Array<[string, Array<DataStoreEntry>]>,
+) {
 	const validIds = new Set<string>();
 
-	for (const [, entries] of entriesByCollection) {
+	for (const [, entries] of validTargets) {
 		for (const entry of entries) {
 			validIds.add(entry.id);
 		}
@@ -15,7 +18,7 @@ export function checkLinkIds(entriesByCollection: Array<[string, Array<DataStore
 
 	let overallErrorCount = 0;
 
-	for (const [, entries] of entriesByCollection) {
+	for (const [, entries] of entriesToScan) {
 		for (const entry of entries) {
 			if (!entry.body?.includes('<Link ')) continue;
 

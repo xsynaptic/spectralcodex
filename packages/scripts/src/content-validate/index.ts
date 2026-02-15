@@ -70,6 +70,16 @@ const checkSlugCollections: CollectionEntries = [
 	['regions', getDataStoreCollection(collections, 'regions')],
 ];
 
+const metadataCollections: CollectionEntries = [
+	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['locations', getDataStoreCollection(collections, 'locations')],
+	['pages', getDataStoreCollection(collections, 'pages')],
+	['posts', getDataStoreCollection(collections, 'posts')],
+	['regions', getDataStoreCollection(collections, 'regions')],
+	['series', getDataStoreCollection(collections, 'series')],
+	['themes', getDataStoreCollection(collections, 'themes')],
+];
+
 const qualityCollections: CollectionEntries = [
 	['ephemera', getDataStoreCollection(collections, 'ephemera')],
 	['locations', getDataStoreCollection(collections, 'locations')],
@@ -129,7 +139,7 @@ switch (command) {
 	}
 	// Check for Link components referencing non-existent entry IDs
 	case 'link-ids': {
-		checkLinkIds(allCollections);
+		checkLinkIds(allCollections, metadataCollections);
 		break;
 	}
 	// Check for image references that do not exist
@@ -149,7 +159,7 @@ switch (command) {
 		// Run all validations for deployment and report all problems at once
 		const syncResults: Array<boolean> = [
 			checkMdxComponents(allCollections),
-			checkLinkIds(allCollections),
+			checkLinkIds(allCollections, metadataCollections),
 			checkImageReferences(
 				allCollections.flatMap(([, entries]) => entries),
 				path.join(values['root-path'], values['media-path']),
