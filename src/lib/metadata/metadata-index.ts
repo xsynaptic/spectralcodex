@@ -39,6 +39,21 @@ async function getRegionPrimaryIdFunction() {
 }
 
 /**
+ * Content links count
+ */
+function getLinksCount(entry: CollectionEntry<CollectionKey>): number {
+	let linksCount = 0;
+
+	if ('links' in entry.data) {
+		linksCount += entry.data.links?.length ?? 0;
+	}
+	if (entry.body) {
+		linksCount += (entry.body.match(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g) ?? []).length;
+	}
+	return linksCount;
+}
+
+/**
  * Content backlinks; this functionality relies on custom MDX components
  */
 const backlinkMdxComponentPatterns = [
@@ -122,7 +137,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				locationCount: '_locationCount' in entry.data ? entry.data._locationCount : undefined,
 				postCount: '_postCount' in entry.data ? entry.data._postCount : undefined,
 				wordCount: await getWordCount(entry),
-				linksCount: 'links' in entry.data ? entry.data.links?.length : 0,
+				linksCount: getLinksCount(entry),
 				backlinks: new Set<string>(), // Populated below
 				dateCreated:
 					parseContentDate(entry.data.dateCreated) ?? new Date(String(SITE_YEAR_FOUNDED)),
