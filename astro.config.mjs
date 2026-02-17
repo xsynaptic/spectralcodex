@@ -22,8 +22,6 @@ const {
 const isProduction = process.env.NODE_ENV === 'production';
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
-const currentDate = new Date();
-
 /**
  * @link https://astro.build/config
  */
@@ -147,11 +145,16 @@ export default defineConfig({
 			optimize: true,
 		}),
 		sitemap({
-			filter: (page) =>
-				!['/_', '/objectives/', '/planning/', '/taiwan-theater-project/'].includes(page),
-			serialize(item) {
-				// TODO: more accurate last modified date for the sitemap
-				return { ...item, lastMod: currentDate };
+			filter: (page) => {
+				const excludePrefixes = [
+					'/objectives',
+					'/planning',
+					'/taiwan-theater-project',
+					'/archives',
+				];
+				const path = new URL(page).pathname.replace(/\/$/, '');
+
+				return !excludePrefixes.some((prefix) => path === prefix || path.startsWith(prefix + '/'));
 			},
 		}),
 		pagefind({
