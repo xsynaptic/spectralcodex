@@ -29,8 +29,6 @@ export const useMapCanvasInteractive = () => useMapDataStore((state) => state.ca
 
 export const useMapCanvasLoading = () => useMapDataStore((state) => state.canvasLoading);
 
-export const useMapCanvasClusters = () => useMapDataStore((state) => state.canvasClusters);
-
 /**
  * Map filters
  */

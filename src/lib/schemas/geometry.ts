@@ -58,8 +58,3 @@ export const GeometryPointsSchema = z.object({
 	/** Computed properties, for internal use only! */
 	_imageThumbnail: ImageThumbnailSchema.nullable().optional(),
 });
-
-export const GeometryLinesSchema = z.object({
-	coordinates: PositionSchema.array().min(2),
-	rounded: z.boolean().optional(),
-});

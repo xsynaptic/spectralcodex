@@ -37,7 +37,7 @@ const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ l
 };
 
 const MapCanvasContainer: FC<
-	Omit<MapComponentProps, 'geodata' | 'cluster' | 'showObjectiveFilter' | 'apiSourceUrl'> & {
+	Omit<MapComponentProps, 'geodata' | 'showObjectiveFilter' | 'apiSourceUrl'> & {
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
@@ -121,16 +121,8 @@ const MapCanvasContainer: FC<
 };
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
-	const {
-		cluster,
-		interactive,
-		showObjectiveFilter,
-		apiSourceUrl,
-		sourceData,
-		languages,
-		version,
-		isDev,
-	} = props;
+	const { interactive, showObjectiveFilter, apiSourceUrl, sourceData, languages, version, isDev } =
+		props;
 
 	return (
 		<SourceDataContextProvider
@@ -141,7 +133,6 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 		>
 			<MapStoreProvider
 				initialState={{
-					...(cluster ? { canvasClusters: cluster } : {}),
 					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
 					...(interactive === false ? { canvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),

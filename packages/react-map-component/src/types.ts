@@ -143,7 +143,6 @@ export interface MapComponentProps extends Partial<
 	popupData?: Array<MapPopupItemInput> | undefined;
 	baseMapTheme?: Flavor | undefined;
 	center?: [number, number];
-	cluster?: boolean | undefined;
 	showObjectiveFilter?: boolean | undefined;
 	languages?: Array<string> | undefined;
 	protomapsApiKey?: string | undefined;

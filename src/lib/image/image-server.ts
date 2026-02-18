@@ -11,7 +11,7 @@ import { IMAGE_FORMAT, IMAGE_QUALITY, OPEN_GRAPH_IMAGE_DENSITY } from '#constant
 import { generateSignedUrl } from '#lib/image/image-server-utils.ts';
 
 // In development, use local IPX server; in production, use the configured URL
-export const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100';
+const ipxBaseUrl = import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100';
 
 // Fix for IPX v4 alpha bug: quote the s_WxH modifier value
 // This way it parses as a JSON string instead of failing

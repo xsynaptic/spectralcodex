@@ -8,7 +8,7 @@ import type { MapComponentProps, MapSourceItemInput, MapSourceItemParsed } from 
 
 import { MapSourceItemSchema } from '../types';
 
-export function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
+function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
 	const parsedResponse = MapSourceItemSchema.array().safeParse(sourceDataRaw);
 
 	if (!parsedResponse.success) {

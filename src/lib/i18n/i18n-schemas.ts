@@ -6,14 +6,6 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { StylizedTextSchema } from '#lib/schemas/index.ts';
 
 /**
- * Utility type that creates a multilingual type structure for a given base property name.
- * Generates optional properties like `${BaseProp}_${LanguageCode}` for each supported language.
- */
-export type MultilingualSchemaSet<BaseProp extends string> = {
-	[K in LanguageCode as `${BaseProp}_${K}`]?: string;
-};
-
-/**
  * Creates a multilingual schema object for a given base property name.
  * Returns an object with properties like `${key}_${languageCode}` for each supported language.
  *
@@ -24,7 +16,10 @@ export type MultilingualSchemaSet<BaseProp extends string> = {
 function createMultilingualSchemas<T extends string>(
 	key: T,
 	schema: z.ZodType<string> = z.string(),
-) {
+): Record<
+	`${T}_${LanguageCode}`,
+	z.ZodOptional<z.ZodType<string, unknown, z.core.$ZodTypeInternals<string>>>
+> {
 	type MultilingualSchemas = Record<`${T}_${LanguageCode}`, z.ZodOptional<z.ZodType<string>>>;
 
 	const schemas: MultilingualSchemas = {} as MultilingualSchemas;

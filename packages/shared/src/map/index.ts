@@ -19,5 +19,5 @@ export {
 	LocationStatusEnum,
 	LocationStatusNumericMapping,
 } from './map-locations';
-export type { LocationCategory, LocationStatus } from './map-locations';
+export type { LocationCategory, LocationStatus, LocationLayer } from './map-locations';
 export { MapSpritesEnum } from './map-sprites';

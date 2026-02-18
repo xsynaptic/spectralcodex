@@ -15,7 +15,6 @@ interface MapDataState {
 	/** Canvas */
 	canvasCursor: NonNullable<CSSProperties['cursor']>;
 	canvasInteractive: boolean;
-	canvasClusters: boolean | undefined;
 	canvasLoading: boolean;
 	/** Filter */
 	filterPosition: DOMCoordinates | undefined;
@@ -38,7 +37,6 @@ type MapDataConfigurableState = Pick<
 	| 'hoveredId'
 	| 'canvasCursor'
 	| 'canvasInteractive'
-	| 'canvasClusters'
 	| 'filterOpen'
 	| 'statusFilter'
 	| 'qualityFilter'
@@ -55,7 +53,6 @@ export interface MapDataStore extends MapDataState {
 		setCanvasCursor: (canvasCursor: NonNullable<CSSProperties['cursor']>) => void;
 		setCanvasInteractive: (canvasInteractive: boolean) => void;
 		setCanvasLoading: (canvasLoading: boolean) => void;
-		setCanvasClusters: (canvasClusters: boolean | undefined) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
 		setFilterOpen: (filterOpen: boolean) => void;
 		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
@@ -76,7 +73,6 @@ const defaultMapDataState = {
 	canvasCursor: 'grab',
 	canvasInteractive: true,
 	canvasLoading: true,
-	canvasClusters: undefined,
 	/** Filter */
 	filterPosition: undefined,
 	filterOpen: false,
@@ -122,9 +118,6 @@ const useMapStoreSetup = ({
 				},
 				setCanvasLoading: (canvasLoading) => {
 					set({ canvasLoading });
-				},
-				setCanvasClusters(canvasClusters) {
-					set({ canvasClusters });
 				},
 				/**
 				 * Filters

@@ -34,11 +34,7 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	}
 }
 
-export function buildQuery(
-	baseUrl: string,
-	divisionIds: Set<string>,
-	boundingBox?: GeometryBoundingBox,
-) {
+function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: GeometryBoundingBox) {
 	const setBBoxVars = boundingBox
 		? `
 		SET VARIABLE xmin = ${String(boundingBox.lngMin)};

@@ -60,8 +60,7 @@ export const OPEN_GRAPH_TWITTER_USERNAME = '@spectralcodex';
  * Tailwind CSS V4 breakpoints and spacing
  */
 export const TAILWIND_BREAKPOINT_SM = '40rem';
-export const TAILWIND_BREAKPOINT_MD = '48rem';
-export const TAILWIND_BREAKPOINT_LG = '64rem';
+export const TAILWIND_BREAKPOINT_MD = '48rem'; // Note: large is 64rem
 export const TAILWIND_BREAKPOINT_CONTENT = '60.25rem'; // This is a custom setting
 export const TAILWIND_CONTENT_PADDING_SM = '2rem'; // 32px equivalent
 export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent

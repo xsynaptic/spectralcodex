@@ -43,12 +43,3 @@ export async function getLocationsByThemeFunction() {
 		return locations.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
 	};
 }
-
-// Filter out terms that do *not* have any associated posts
-export async function getFilterTermsPostsFunction() {
-	const getPostsByTerm = await getPostsByThemeFunction();
-
-	return function getFilterTermsPosts(term: CollectionEntry<'themes'>) {
-		return getPostsByTerm(term).length > 0;
-	};
-}
