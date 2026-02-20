@@ -68,8 +68,11 @@ ENVEOF"
 
 # Restart image server containers
 echo "Restarting image server..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd /opt/server/spectralcodex && docker compose pull && docker compose up -d --build"
+ssh $SSH_OPTS "$REMOTE_HOST" "cd /opt/server/spectralcodex && docker compose pull && docker compose up -d --build --force-recreate"
 
 echo ""
-echo "Done! Check status:"
-echo "  ssh $SSH_OPTS $REMOTE_HOST 'docker compose -f /opt/server/spectralcodex/docker-compose.yml ps'"
+echo "Waiting for health checks..."
+ssh $SSH_OPTS "$REMOTE_HOST" "cd /opt/server/spectralcodex && docker compose up -d --wait --wait-timeout 30" 2>&1 || true
+ssh $SSH_OPTS "$REMOTE_HOST" "docker compose -f /opt/server/spectralcodex/docker-compose.yml ps"
+echo ""
+echo "Done! Both containers should show 'Up' and 'healthy'."

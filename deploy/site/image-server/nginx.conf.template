@@ -4,9 +4,24 @@ proxy_cache_path /var/cache/nginx/ipx levels=1:2 keys_zone=ipx_cache:10m max_siz
 limit_req_zone $binary_remote_addr zone=ipx_limit:10m rate=100r/s;
 limit_req_status 429;
 
+log_format cache '$remote_addr [$time_local] "$request" '
+                 '$status $body_bytes_sent $upstream_cache_status '
+                 '$request_time $upstream_response_time';
+
 server {
     listen 80;
     server_name _;
+
+    access_log /var/log/nginx/access.log cache;
+
+    # Send response headers + file start in a single TCP packet
+    tcp_nopush on;
+
+    # Cache file descriptors and metadata to avoid repeated syscalls
+    open_file_cache max=10000 inactive=60s;
+    open_file_cache_valid 30s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
 
     # URL signature validation using secure_link; signature is passed as ?s= query param
     secure_link $arg_s;
