@@ -24,7 +24,7 @@ export const LocationCategoryEnum = {
 	NightMarket: 'night-market',
 	Shophouse: 'shophouse',
 	Theater: 'theater',
-	ThemePark: 'theme-park',
+	AmusementPark: 'amusement-park',
 	/** Food and drink  */
 	Cafe: 'cafe',
 	Restaurant: 'restaurant',

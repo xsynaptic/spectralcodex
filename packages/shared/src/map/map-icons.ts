@@ -26,7 +26,7 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Restaurant]: 'mingcute:fork-knife-fill',
 	[LocationCategoryEnum.Shophouse]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Theater]: 'material-symbols-light:theaters-rounded',
-	[LocationCategoryEnum.ThemePark]: 'mingcute:ferris-wheel-fill',
+	[LocationCategoryEnum.AmusementPark]: 'mingcute:ferris-wheel-fill',
 	/** Historic */
 	[LocationCategoryEnum.Historic]: 'mingcute:pavilion-fill',
 	[LocationCategoryEnum.Monument]: 'mingcute:palace-line',
