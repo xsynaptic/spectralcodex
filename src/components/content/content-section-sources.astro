@@ -1,12 +1,15 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
+import * as R from 'remeda';
+
 import ContentSection from '#components/content/content-section.astro';
 import Link from '#components/parts/link.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import { getResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -21,6 +24,30 @@ const getResolveResourceSources = await getResolveResourceSourcesFunction();
 const sources = getResolveResourceSources(entry);
 
 const t = getTranslations();
+
+const SourcesFormattingMap = {
+	[LanguageCodeEnum.English]: {
+		authorsDelimiter: ' & ',
+		delimiter: ', ',
+		quoteStart: '',
+		quoteEnd: '',
+		sentenceDelimiter: '.',
+	},
+	[LanguageCodeEnum.ChineseTraditional]: {
+		authorsDelimiter: '，',
+		delimiter: '，',
+		quoteStart: '《',
+		quoteEnd: '》',
+		sentenceDelimiter: '。',
+	},
+	[LanguageCodeEnum.Japanese]: {
+		authorsDelimiter: '、',
+		delimiter: '、',
+		quoteStart: '『',
+		quoteEnd: '』',
+		sentenceDelimiter: '。',
+	},
+} as const;
 ---
 
 {
@@ -39,7 +66,13 @@ const t = getTranslations();
 
 					if (source.title) {
 						if (source.authors) {
-							Authors = <span>{source.authors.map((author) => author.name).join(' & ')}</span>;
+							Authors = (
+								<span>
+									{source.authors
+										.map((author) => author.name)
+										.join(SourcesFormattingMap[LanguageCodeEnum.English].authorsDelimiter)}
+								</span>
+							);
 						}
 						Title =
 							'id' in source && 'showPage' in source && source.showPage ? (
@@ -66,10 +99,9 @@ const t = getTranslations();
 					let TitleMultilingual: Node | undefined;
 					let PublisherMultilingual: Node | undefined;
 
-					/** Currently we only support Chinese language sources */
 					if (
-						(titleMultilingual?.lang.startsWith('zh') ||
-							publisherMultilingual?.lang.startsWith('zh')) &&
+						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional) ||
+							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional)) &&
 						titleMultilingual?.value
 					) {
 						if (source.authors) {
@@ -78,21 +110,82 @@ const t = getTranslations();
 								.filter((name) => name !== undefined);
 
 							if (authorNames.length > 0) {
-								AuthorsMultilingual = <span>{authorNames.join('，')}</span>;
+								AuthorsMultilingual = (
+									<span>
+										{authorNames.join(
+											SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].authorsDelimiter
+										)}
+									</span>
+								);
 							}
 						}
 						TitleMultilingual =
 							'id' in source && 'showPage' in source && source.showPage ? (
 								<Link href={getContentUrl('resources', source.id)}>
-									《{titleMultilingual.value}》
+									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteStart}
+									{titleMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteEnd}
 								</Link>
 							) : (
-								<span>《{titleMultilingual.value}》</span>
+								<span>
+									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteStart}
+									{titleMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteEnd}
+								</span>
 							);
 						if (publisherMultilingual?.value && source.datePublished) {
 							PublisherMultilingual = (
 								<span>
-									{publisherMultilingual.value}，{source.datePublished}
+									{publisherMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].delimiter}
+									{source.datePublished}
+								</span>
+							);
+						} else if (publisherMultilingual?.value) {
+							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
+						} else if (source.datePublished) {
+							PublisherMultilingual = <span>{source.datePublished}</span>;
+						}
+					} else if (
+						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese) ||
+							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese)) &&
+						titleMultilingual?.value
+					) {
+						if (source.authors) {
+							const authorNames = source.authors
+								.map((author) => author.name_ja)
+								.filter((name) => name !== undefined);
+
+							if (authorNames.length > 0) {
+								AuthorsMultilingual = (
+									<span>
+										{authorNames.join(
+											SourcesFormattingMap[LanguageCodeEnum.Japanese].authorsDelimiter
+										)}
+									</span>
+								);
+							}
+						}
+						TitleMultilingual =
+							'id' in source && 'showPage' in source && source.showPage ? (
+								<Link href={getContentUrl('resources', source.id)}>
+									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteStart}
+									{titleMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteEnd}
+								</Link>
+							) : (
+								<span>
+									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteStart}
+									{titleMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteEnd}
+								</span>
+							);
+						if (publisherMultilingual?.value && source.datePublished) {
+							PublisherMultilingual = (
+								<span>
+									{publisherMultilingual.value}
+									{SourcesFormattingMap[LanguageCodeEnum.Japanese].delimiter}
+									{source.datePublished}
 								</span>
 							);
 						} else if (publisherMultilingual?.value) {
@@ -106,18 +199,31 @@ const t = getTranslations();
 						<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
 							<span>
 								{Authors}
-								{Authors && Title ? ', ' : undefined}
+								{Authors && Title
+									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
+									: undefined}
 								{Title}
-								{Title && Publisher ? ', ' : undefined}
+								{Title && Publisher
+									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
+									: undefined}
 								{Publisher}
 								{TitleMultilingual ? ' ' : undefined}
 							</span>
-							{TitleMultilingual ? (
-								<span lang="zh">
+							{TitleMultilingual &&
+							titleMultilingual?.lang &&
+							R.isIncludedIn(titleMultilingual.lang, [
+								LanguageCodeEnum.ChineseTraditional,
+								LanguageCodeEnum.Japanese,
+							]) ? (
+								<span lang={titleMultilingual.lang}>
 									{AuthorsMultilingual}
-									{AuthorsMultilingual ? '。' : undefined}
+									{AuthorsMultilingual
+										? SourcesFormattingMap[titleMultilingual.lang].delimiter
+										: undefined}
 									{TitleMultilingual}
-									{PublisherMultilingual ? '，' : undefined}
+									{PublisherMultilingual
+										? SourcesFormattingMap[titleMultilingual.lang].delimiter
+										: undefined}
 									{PublisherMultilingual}
 								</span>
 							) : undefined}
