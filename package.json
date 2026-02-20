@@ -40,13 +40,13 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "6.0.0-beta.11",
+		"astro": "6.0.0-beta.14",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "7.0.0-beta.6",
-		"@astrojs/mdx": "5.0.0-beta.7",
+		"@astrojs/markdown-remark": "7.0.0-beta.7",
+		"@astrojs/mdx": "5.0.0-beta.8",
 		"@astrojs/node": "10.0.0-beta.4",
 		"@astrojs/react": "^5.0.0-beta.3",
 		"@astrojs/rss": "4.0.15-beta.3",
@@ -58,7 +58,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
-		"@tailwindcss/vite": "^4.1.18",
+		"@tailwindcss/vite": "^4.2.0",
 		"@tanstack/eslint-plugin-query": "^5.91.4",
 		"@turf/bbox": "^7.3.4",
 		"@turf/buffer": "^7.3.4",
@@ -89,7 +89,7 @@
 		"geokdbush": "^2.0.1",
 		"globals": "^17.3.0",
 		"kdbush": "^4.0.2",
-		"knip": "^5.83.1",
+		"knip": "^5.84.1",
 		"maplibre-gl": "^5.18.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
@@ -99,7 +99,7 @@
 		"rehype-wrap-cjk": "^1.0.9",
 		"remeda": "^2.33.6",
 		"sharp": "^0.34.5",
-		"tailwindcss": "^4.1.18",
+		"tailwindcss": "^4.2.0",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.56.0",
