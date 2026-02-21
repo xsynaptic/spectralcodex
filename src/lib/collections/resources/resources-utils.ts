@@ -1,14 +1,14 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { getCollection } from 'astro:content';
-
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
 
 /**
  * Get locations associated with a resource (via links URL match or sources ID match)
  */
 export async function getLocationsByResourceFunction() {
-	const locations = await getCollection('locations');
+	const { locations } = await getLocationsCollection();
 
 	return function getLocationsByResource(
 		resource: CollectionEntry<'resources'>,
@@ -40,7 +40,7 @@ export async function getLocationsByResourceFunction() {
  * Get posts associated with a resource (via links URL match or sources ID match)
  */
 export async function getPostsByResourceFunction() {
-	const posts = await getCollection('posts');
+	const { posts } = await getPostsCollection();
 
 	return function getPostsByResource(
 		resource: CollectionEntry<'resources'>,
