@@ -17,7 +17,7 @@ interface CacheWarmOptions {
 
 interface CacheWarmConfig {
 	remoteHost: string;
-	sshKeyPath: string;
+	sshKeyPath?: string;
 	sitePath: string;
 	nginxUrl: string;
 	concurrency: number;
@@ -41,11 +41,19 @@ function loadCacheWarmConfig(options: CacheWarmOptions): CacheWarmConfig {
 	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
 	const sitePath = process.env.DEPLOY_SITE_PATH;
 
-	if (!remoteHost || !sshKeyPath || !sitePath) {
-		throw new Error('Missing DEPLOY_REMOTE_HOST, DEPLOY_SSH_KEY_PATH, or DEPLOY_SITE_PATH');
+	if (!remoteHost || !sitePath) {
+		throw new Error('Missing DEPLOY_REMOTE_HOST or DEPLOY_SITE_PATH');
 	}
 
-	return { remoteHost, sshKeyPath, sitePath, nginxUrl, concurrency, random, dryRun };
+	return {
+		remoteHost,
+		...(sshKeyPath ? { sshKeyPath } : {}),
+		sitePath,
+		nginxUrl,
+		concurrency,
+		random,
+		dryRun,
+	};
 }
 
 async function runWarmScript(config: CacheWarmConfig, manifestFile: string): Promise<void> {
@@ -56,7 +64,7 @@ async function runWarmScript(config: CacheWarmConfig, manifestFile: string): Pro
 
 	$.verbose = false;
 
-	const sshArgs = ['-i', sshKeyPath, remoteHost];
+	const sshArgs = [...(sshKeyPath ? ['-i', sshKeyPath] : []), remoteHost];
 
 	const remoteScript = dryRun
 		? `
