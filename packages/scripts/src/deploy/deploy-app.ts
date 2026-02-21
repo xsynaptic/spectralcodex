@@ -31,8 +31,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 	const rsyncArgs = [
 		'-avz',
 		'--progress',
-		'-e',
-		`ssh -i ${config.sshKeyPath}`,
+		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
 		`--exclude=/${OPEN_GRAPH_BASE_PATH}/`,
 		...(skipDelete ? [] : ['--delete-after']),
 		...(dryRun ? ['--dry-run'] : []),

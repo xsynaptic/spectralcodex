@@ -4,7 +4,7 @@ import path from 'node:path';
 
 interface DeployConfig {
 	remoteHost: string;
-	sshKeyPath: string;
+	sshKeyPath?: string;
 	sitePath: string;
 	mediaPath: string;
 }
@@ -23,15 +23,14 @@ export function loadDeployConfig(rootPath: string): DeployConfig {
 	const missing: Array<string> = [];
 
 	if (!remoteHost) missing.push('DEPLOY_REMOTE_HOST');
-	if (!sshKeyPath) missing.push('DEPLOY_SSH_KEY_PATH');
 	if (!sitePath) missing.push('DEPLOY_SITE_PATH');
 	if (!mediaPath) missing.push('DEPLOY_MEDIA_PATH');
 
-	if (!remoteHost || !sshKeyPath || !sitePath || !mediaPath) {
+	if (!remoteHost || !sitePath || !mediaPath) {
 		console.error(chalk.red(`Missing required environment variables: ${missing.join(', ')}`));
 		console.error(chalk.gray('\nExample .env configuration:'));
 		console.error(chalk.gray('  DEPLOY_REMOTE_HOST=deploy@your-server.com'));
-		console.error(chalk.gray('  DEPLOY_SSH_KEY_PATH=/path/to/ssh/key'));
+		console.error(chalk.gray('  DEPLOY_SSH_KEY_PATH=/path/to/ssh/key (optional)'));
 		console.error(chalk.gray('  DEPLOY_SITE_PATH=/var/www/spectralcodex'));
 		console.error(chalk.gray('  DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex'));
 		throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
@@ -39,7 +38,7 @@ export function loadDeployConfig(rootPath: string): DeployConfig {
 
 	return {
 		remoteHost,
-		sshKeyPath,
+		...(sshKeyPath ? { sshKeyPath } : {}),
 		sitePath,
 		mediaPath,
 	};
