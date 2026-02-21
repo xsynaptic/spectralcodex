@@ -2,6 +2,7 @@ import type { Flavor } from '@protomaps/basemaps';
 import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
+import type { MapProps } from 'react-map-gl/maplibre';
 
 import {
 	LocationCategoryEnum,
@@ -15,6 +16,8 @@ import {
 } from '@spectralcodex/shared/map';
 import * as R from 'remeda';
 import { z } from 'zod';
+
+export type MapInitialViewState = MapProps['initialViewState'];
 
 // Supported geometry for use with this component
 export type MapGeometry = Point | LineString | Polygon;
@@ -136,6 +139,7 @@ export type MapPopupItemParsed = z.output<typeof MapPopupItemSchema>;
 export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>
 > {
+	mapId?: string | undefined;
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;

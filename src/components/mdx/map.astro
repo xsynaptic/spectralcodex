@@ -31,10 +31,10 @@ const getLocationsByReference = await getLocationsByIdsFunction();
 // API endpoint is undefined because geodata *must* be inlined with this method
 // We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, ...mapComponentProps } = getMapData({
+	mapId: undefined,
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, { showAllLocations: showHidden }),
+		getLocationsFeatureCollection(locations, { showAllLocations: showHidden })
 	),
-	mapApiBaseUrl: undefined,
 	languages,
 });
 ---

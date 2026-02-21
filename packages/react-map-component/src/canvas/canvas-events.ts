@@ -1,5 +1,10 @@
 import type { GeoJSONSource, Source } from 'maplibre-gl';
-import type { MapCallbacks, MapEvent, MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import type {
+	MapCallbacks,
+	MapEvent,
+	MapLayerMouseEvent,
+	ViewStateChangeEvent,
+} from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo } from 'react';
@@ -10,6 +15,7 @@ import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
 import { useMapCanvasInteractive, useMapHoveredId, useMapStoreActions } from '../store/store';
+import { writeSavedViewport } from '../store/store-viewport';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 
@@ -26,7 +32,7 @@ const queryableLayerIds = [
 	MapLayerIdEnum.PointsTarget,
 ];
 
-export function useMapCanvasEvents() {
+export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const isInteractive = useMapCanvasInteractive();
@@ -213,6 +219,19 @@ export function useMapCanvasEvents() {
 		[setCanvasCursor],
 	);
 
+	const onMoveEnd = useCallback(
+		(event: ViewStateChangeEvent) => {
+			if (!mapId) return;
+
+			writeSavedViewport(mapId, {
+				longitude: event.viewState.longitude,
+				latitude: event.viewState.latitude,
+				zoom: event.viewState.zoom,
+			});
+		},
+		[mapId],
+	);
+
 	const debouncedFilterControlSetup = useMemo(
 		() =>
 			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
@@ -267,6 +286,7 @@ export function useMapCanvasEvents() {
 					onClick,
 					onMouseDown,
 					onMouseUp,
+					onMoveEnd,
 					...(isSourceDataLoading
 						? {}
 						: {

@@ -15,7 +15,6 @@ import {
 	getContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 
 export const getStaticPaths = (async () => {
 	const { locations } = await getLocationsCollection();
@@ -35,8 +34,8 @@ export const getStaticPaths = (async () => {
 			props: {
 				entry,
 				mapData: getMapData({
+					mapId: `${entry.collection}/${entry.id}`,
 					featureCollection: getLocationsFeatureCollection([entry]),
-					mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 					targetId: entry.id, // Center on the main location
 					boundsBuffer: 1, // 1km fixed buffer
 					...(regionPrimary?.data._langCode?.startsWith('zh')

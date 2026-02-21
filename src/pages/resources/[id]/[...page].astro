@@ -19,7 +19,6 @@ import {
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
-import { getMapApiBaseUrl } from '#lib/utils/routing.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { resources } = await getResourcesCollection();
@@ -57,8 +56,8 @@ export const getStaticPaths = (async ({ paginate }) => {
 		);
 
 		const mapData = getMapData({
+			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
-			mapApiBaseUrl: getMapApiBaseUrl(entry.collection, entry.id),
 			...(regionPrimary?.data._langCode?.startsWith('zh')
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
 				: {}),

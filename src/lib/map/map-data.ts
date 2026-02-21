@@ -18,6 +18,7 @@ import {
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
+import { getBaseUrl } from '#lib/utils/routing.ts';
 
 interface MapDataBoundsProps {
 	featureCollection: MapFeatureCollection | undefined;
@@ -147,27 +148,21 @@ function getMapBounds({
 	return;
 }
 
-interface MapDataProps
-	extends
-		MapDataBoundsProps,
-		Omit<
-			MapComponentProps,
-			'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
-		> {
-	mapApiBaseUrl?: string | undefined;
-}
-
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
+	mapId,
 	featureCollection,
 	targetId,
 	boundsBuffer,
 	boundsBufferPercentage,
 	limitsBuffer,
 	limitsBufferPercentage,
-	mapApiBaseUrl,
 	...props
-}: MapDataProps) {
+}: Omit<
+	MapComponentProps,
+	'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+> &
+	MapDataBoundsProps) {
 	const mapBounds = getMapBounds({
 		featureCollection,
 		boundsBuffer,
@@ -180,13 +175,14 @@ export function getMapData({
 	if (featureCollection && mapBounds) {
 		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
 
-		if (mapApiBaseUrl) {
-			const apiSourceUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Source}?v=${sourceHash}`;
-			const apiPopupUrl = `${mapApiBaseUrl}/${MapApiDataEnum.Popup}?v=${popupHash}`;
+		if (mapId) {
+			const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
+			const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}?v=${popupHash}`);
 
 			return {
 				...defaultMapDataProps,
 				hasGeodata: true,
+				mapId,
 				apiSourceUrl,
 				apiPopupUrl,
 				prefetchUrls: [apiSourceUrl, apiPopupUrl],

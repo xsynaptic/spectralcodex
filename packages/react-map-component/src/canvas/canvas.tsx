@@ -1,9 +1,9 @@
 import type { CSSProperties, FC } from 'react';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps } from '../types';
+import type { MapComponentProps, MapInitialViewState } from '../types';
 
 import { MapControls } from '../controls/controls';
 import { PopupDataContextProvider } from '../data/data-popup';
@@ -13,6 +13,7 @@ import { MapSource } from '../source/source';
 import { MapLayerIdEnum } from '../source/source-config';
 import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
+import { readSavedViewport } from '../store/store-viewport';
 import { useMapCanvasEvents } from './canvas-events';
 import { MapPopup } from './canvas-popup';
 
@@ -50,6 +51,7 @@ const MapCanvasContainer: FC<
 	zoom,
 	style,
 	protomapsApiKey,
+	mapId,
 	spritesUrl,
 	spritesId,
 	apiPopupUrl,
@@ -66,26 +68,47 @@ const MapCanvasContainer: FC<
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
-	const canvasEvents = useMapCanvasEvents();
+	const canvasEvents = useMapCanvasEvents({ mapId });
 	const canvasCursor = useMapCanvasCursor();
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
 
+	const [initialViewState] = useState(() => {
+		const saved = readSavedViewport(mapId);
+
+		if (saved) {
+			return {
+				...(maxBounds ? { maxBounds } : {}),
+				...saved,
+			} satisfies MapInitialViewState;
+		}
+
+		const viewState = {
+			...(maxBounds ? { maxBounds } : {}),
+			fitBoundsOptions: {
+				padding: { top: 20, bottom: 20, left: 50, right: 50 },
+			},
+		};
+
+		if (bounds) {
+			return {
+				...viewState,
+				bounds,
+				zoom: zoom ?? 12,
+			} satisfies MapInitialViewState;
+		}
+
+		return {
+			...viewState,
+			longitude: center?.[0] ?? 0,
+			latitude: center?.[1] ?? 0,
+			zoom: zoom ?? 12,
+		} satisfies MapInitialViewState;
+	});
+
 	return (
 		<ReactMapGlMap
-			initialViewState={{
-				...(bounds
-					? { bounds }
-					: {
-							longitude: center?.[0] ?? 0,
-							latitude: center?.[1] ?? 0,
-						}),
-				...(maxBounds ? { maxBounds } : {}),
-				zoom: zoom ?? 12,
-				fitBoundsOptions: {
-					padding: { top: 20, bottom: 20, left: 50, right: 50 },
-				},
-			}}
+			initialViewState={initialViewState}
 			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
 			styleDiffing={false}
 			hash={hash ?? false}

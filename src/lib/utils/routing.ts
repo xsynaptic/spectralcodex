@@ -4,7 +4,8 @@ import urlJoin from 'url-join';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 
-export const getBaseUrl = (...routeParts: Array<string>): string => urlJoin(BASE_URL, ...routeParts);
+export const getBaseUrl = (...routeParts: Array<string>): string =>
+	urlJoin(BASE_URL, ...routeParts);
 
 // Example: /base/{routeParts}
 export const getSiteUrl = (...routeParts: Array<string>): string =>
@@ -16,6 +17,3 @@ export const getContentUrl = (collection: CollectionKey, ...routeParts: Array<st
 		['ephemera', 'locations', 'pages', 'posts'].includes(collection) ? '' : collection,
 		...routeParts,
 	);
-
-export const getMapApiBaseUrl = (...routeParts: Array<string>): string =>
-	urlJoin(BASE_URL, 'api/map', ...routeParts);
