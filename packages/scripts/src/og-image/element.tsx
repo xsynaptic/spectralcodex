@@ -61,7 +61,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 					position: 'absolute',
 					textShadow: showInverted
 						? `0px 0px 3px rgb(220, 220, 225, 0.8)`
-						: `0px 0px 3px rgb(24, 24, 27, 0.4)`,
+						: `0px 0px 3px rgb(12, 12, 14, 0.8)`,
 					...commonStyles,
 				}}
 			>
@@ -96,8 +96,8 @@ function TitleMultilingual({
 	const commonStyles = {
 		display: 'block', // Necessary for line clamp
 		lineClamp: 1,
-		maxWidth: '960px',
-		padding: '0 120px',
+		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+		padding: '0 100px', // Looser side margins for longer text
 	} as const;
 
 	const titleMultilingual = titleZh || titleJa || titleTh;
@@ -177,8 +177,8 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 		fontWeight: 700,
 		lineClamp: 2,
 		lineHeight: 1.15,
-		maxWidth: '960px',
-		padding: '0 120px 60px 120px',
+		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+		padding: '0 100px 60px', // Looser side margins for longer text
 	} as const;
 
 	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;

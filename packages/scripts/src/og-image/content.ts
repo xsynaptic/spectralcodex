@@ -17,6 +17,11 @@ import {
 	loadDataStore,
 } from '../shared/data-store.js';
 
+/** Strip combining diacritical marks for display font compatibility (e.g. "Shoka" from "Shōka") */
+function stripDiacritics(input: string): string {
+	return input.normalize('NFD').replaceAll(/[\u0300-\u036F]/g, '');
+}
+
 /** Deterministically pick an item from an array based on a string ID */
 function pickFrom<T = string>(id: string, options: Array<T>): T {
 	if (options.length === 1) return options[0] as T;
@@ -435,12 +440,10 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 			if (collection === ContentCollectionsEnum.Archives) {
 				title = getArchivesTitle(id);
 			} else if (collection === ContentCollectionsEnum.Resources) {
-				if ('showPage' in entry.data && entry.data.showPage && title) {
-					title = `Resources: ${title}`;
-				} else {
-					// Skip resource entries without showPage flag
+				if (!('showPage' in entry.data) || !entry.data.showPage || !title) {
 					continue;
 				}
+				// TODO: taking up too much space; title = `Resources: ${title}`;
 			} else if (!title) {
 				continue;
 			}
@@ -451,7 +454,7 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 				collection,
 				id,
 				digest: entry.digest,
-				title,
+				title: stripDiacritics(title),
 				titleZh: z.string().optional().parse(entry.data.title_zh),
 				titleJa: z.string().optional().parse(entry.data.title_ja),
 				titleTh: z.string().optional().parse(entry.data.title_th),
