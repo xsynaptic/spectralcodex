@@ -2,7 +2,7 @@
 # Started automatically by `pnpm dev`
 services:
   image-cache:
-    image: nginx:1.29.4-alpine
+    image: nginx:1.29.5-alpine
     container_name: dev-image-cache
     ports:
       - "3100:80"

@@ -2,7 +2,13 @@
 # Contains only Caddy reverse proxy and Umami analytics
 services:
   caddy:
-    image: caddy:2.8-alpine
+    image: caddy:2.10.2-alpine
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
     container_name: caddy
     init: true
     cap_drop:
@@ -30,14 +36,20 @@ services:
 
   # Umami analytics
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-v2.15.1
+    image: ghcr.io/umami-software/umami:3.0.3
     container_name: umami
     init: true
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/heartbeat || exit 1"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
     cap_drop:
       - ALL
     environment:
       - DATABASE_URL=postgresql://umami:${UMAMI_DB_PASSWORD}@umami-db:5432/umami
-      - DATABASE_TYPE=postgresql
       - APP_SECRET=${UMAMI_APP_SECRET}
     depends_on:
       umami-db:
@@ -54,19 +66,20 @@ services:
 
   # Umami PostgreSQL database (internal network only)
   umami-db:
-    image: postgres:15.10-alpine
+    image: postgres:15.16-alpine
     container_name: umami-db
     init: true
+    mem_limit: 384m
     command:
       - "postgres"
       - "-c"
-      - "shared_buffers=512MB"
+      - "shared_buffers=128MB"
       - "-c"
-      - "effective_cache_size=1536MB"
+      - "effective_cache_size=512MB"
       - "-c"
       - "random_page_cost=1.1"
       - "-c"
-      - "max_connections=50"
+      - "max_connections=20"
     cap_drop:
       - ALL
     cap_add:

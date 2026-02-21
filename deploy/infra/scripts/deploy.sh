@@ -11,8 +11,13 @@ if [ -f "$DEPLOY_DIR/.env" ]; then
 fi
 
 REMOTE_HOST="${DEPLOY_REMOTE_HOST:?DEPLOY_REMOTE_HOST is required in deploy/.env}"
-SSH_KEY="${DEPLOY_SSH_KEY_PATH:?DEPLOY_SSH_KEY_PATH is required in deploy/.env}"
+SSH_KEY="${DEPLOY_SSH_KEY_PATH:-}"
 REMOTE_PATH="${DEPLOY_REMOTE_PATH:-/opt/server}"
+
+SSH_OPTS=""
+if [ -n "$SSH_KEY" ]; then
+  SSH_OPTS="-i $SSH_KEY"
+fi
 
 echo "=== Deploy infrastructure ==="
 echo "Target: $REMOTE_HOST:$REMOTE_PATH"
@@ -32,7 +37,7 @@ EOF
 
 # Sync infrastructure files
 echo "Syncing infrastructure files..."
-rsync -avz -e "ssh -i $SSH_KEY" \
+rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   --exclude='.git' \
   --exclude='*.example' \
   --exclude='scripts/' \
@@ -42,14 +47,17 @@ rsync -avz -e "ssh -i $SSH_KEY" \
 
 # Write server-side .env
 echo "Writing server environment..."
-ssh -i "$SSH_KEY" "$REMOTE_HOST" "cat > $REMOTE_PATH/.env << 'ENVEOF'
+ssh $SSH_OPTS "$REMOTE_HOST" "cat > $REMOTE_PATH/.env << 'ENVEOF'
 $SERVER_ENV
 ENVEOF"
 
 # Restart services
 echo "Restarting services..."
-ssh -i "$SSH_KEY" "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose up -d"
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose up -d --force-recreate"
 
 echo ""
-echo "Done! Check status:"
-echo "  ssh -i $SSH_KEY $REMOTE_HOST 'docker compose -f $REMOTE_PATH/docker-compose.yml ps'"
+echo "Waiting for health checks..."
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose up -d --wait --wait-timeout 60" 2>&1 || true
+ssh $SSH_OPTS "$REMOTE_HOST" "docker compose -f $REMOTE_PATH/docker-compose.yml ps"
+echo ""
+echo "Done! All containers should show 'Up' and 'healthy'."

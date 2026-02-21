@@ -1,5 +1,5 @@
 # Stage 1: Build TypeScript and install all dependencies
-FROM node:20-alpine AS builder
+FROM node:20.20.0-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Stage 2: Production image
-FROM node:20-alpine
+FROM node:20.20.0-alpine
 
 # Create non-root user for security
 RUN addgroup -g 1001 nodejs && \
