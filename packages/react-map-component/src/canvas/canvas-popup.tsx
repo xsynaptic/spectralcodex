@@ -14,8 +14,7 @@ import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { translations } from '../lib/translations';
-import { useMapStoreActions } from '../store/store';
-import { useMapSelectedId } from '../store/store';
+import { useMapPopupVisible, useMapSelectedId, useMapStoreActions } from '../store/store';
 
 type MapPopupItemExtended = MapPopupItemParsed & {
 	precision: number;
@@ -246,6 +245,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 
 export const MapPopup: FC = function MapPopup() {
 	const popupItem = useMapCanvasPopup();
+	const popupVisible = useMapPopupVisible();
 
 	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
 
@@ -278,6 +278,7 @@ export const MapPopup: FC = function MapPopup() {
 					})}
 			closeOnClick={false}
 			onClose={onClose}
+			style={{ visibility: popupVisible ? 'visible' : 'hidden' }}
 		>
 			<div className="relative flex flex-col" style={{ minWidth: '200px', minHeight: '80px' }}>
 				<div className="pointer-events-none absolute flex h-full w-full justify-center p-small">

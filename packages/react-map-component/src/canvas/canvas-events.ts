@@ -44,6 +44,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		setCanvasLoading,
 		setCanvasCursor,
 		setSelectedId,
+		setPopupVisible,
 		setHoveredId,
 		setFilterPosition,
 		setFilterOpen,
@@ -106,20 +107,23 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 					const pointId =
 						typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
 
+					if (!pointId) break;
+
 					if (isMapCoordinates(feature.geometry.coordinates)) {
+						setPopupVisible(false);
+						setSelectedId(pointId);
+						setHoveredId(undefined);
+
 						mapInstance.easeTo({
 							center: feature.geometry.coordinates,
 							duration: 150,
 							padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
 						});
 
-						if (pointId) {
-							void mapInstance.once('moveend', () => {
-								setSelectedId(pointId);
-								setHoveredId(undefined);
-							});
-						}
-					} else if (pointId) {
+						void mapInstance.once('moveend', () => {
+							setPopupVisible(true);
+						});
+					} else {
 						setSelectedId(pointId);
 						setHoveredId(undefined);
 					}
@@ -130,7 +134,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 				}
 			}
 		},
-		[isMobile, setFilterOpen, setSelectedId, setHoveredId],
+		[isMobile, setFilterOpen, setSelectedId, setPopupVisible, setHoveredId],
 	);
 
 	const onMouseMove = useCallback(

@@ -12,6 +12,7 @@ interface MapDataState {
 	/** Feature state */
 	selectedId: string | undefined;
 	hoveredId: string | undefined;
+	popupVisible: boolean;
 	/** Canvas */
 	canvasCursor: NonNullable<CSSProperties['cursor']>;
 	canvasInteractive: boolean;
@@ -49,6 +50,7 @@ type MapDataConfigurableState = Pick<
 export interface MapDataStore extends MapDataState {
 	actions: {
 		setSelectedId: (selectedId: string | undefined) => void;
+		setPopupVisible: (popupVisible: boolean) => void;
 		setHoveredId: (hoveredId: string | undefined) => void;
 		setCanvasCursor: (canvasCursor: NonNullable<CSSProperties['cursor']>) => void;
 		setCanvasInteractive: (canvasInteractive: boolean) => void;
@@ -69,6 +71,7 @@ export interface MapDataStore extends MapDataState {
 const defaultMapDataState = {
 	selectedId: undefined,
 	hoveredId: undefined,
+	popupVisible: true,
 	/** Canvas */
 	canvasCursor: 'grab',
 	canvasInteractive: true,
@@ -102,7 +105,11 @@ const useMapStoreSetup = ({
 					set({
 						selectedId,
 						filterOpen: false,
+						...(selectedId === undefined ? { popupVisible: true } : {}),
 					});
+				},
+				setPopupVisible: (popupVisible) => {
+					set({ popupVisible });
 				},
 				setHoveredId: (hoveredId) => {
 					set({ hoveredId });

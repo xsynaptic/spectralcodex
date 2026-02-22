@@ -29,6 +29,8 @@ export function useMapStoreInstance() {
  */
 export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);
 
+export const useMapPopupVisible = () => useMapDataStore((state) => state.popupVisible);
+
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
 
 /**
