@@ -55,7 +55,6 @@ export async function getRegionAncestorsByIdFunction() {
 
 // A utility function to find the common ancestor ID from an arbitrary set of regions
 // Used when generating content metadata
-// TODO: check whether this is the right function for the task
 export async function getRegionCommonAncestorFunction() {
 	const getRegionsById = await getRegionsByIdsFunction();
 	const getRegionAncestors = await getRegionAncestorsFunction();
