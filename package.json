@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.6.2",
+	"version": "6.6.3",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -80,11 +80,11 @@
 		"astro-pagefind": "^1.8.5",
 		"astro-seo": "^1.1.0",
 		"dotenv": "^17.3.1",
-		"eslint": "^9.39.2",
+		"eslint": "^9.39.3",
 		"eslint-plugin-astro": "^1.6.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.0.1",
-		"exiftool-vendored": "^35.9.0",
+		"exiftool-vendored": "^35.10.1",
 		"geojson": "^0.5.0",
 		"geokdbush": "^2.0.1",
 		"globals": "^17.3.0",
