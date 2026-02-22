@@ -5,20 +5,17 @@ import type { MenuItem } from '#lib/main/main-types.ts';
 
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import {
-	getMenuItemAriaLabel,
-	getMenuItemId,
-	isActiveMenuItem,
-} from '#lib/main/main-menu-utils.ts';
+import { getMenuItemAriaLabel, isActiveMenuItem } from '#lib/main/main-menu-utils.ts';
 
 interface Props extends HTMLAttributes<'ul'> {
 	hasHeroImage: boolean;
 	menuItems: Array<MenuItem>;
 	depth: number;
 	isFirstMenuItem?: boolean;
+	ariaLabel?: string;
 }
 
-const { hasHeroImage, menuItems, depth, isFirstMenuItem = true, ...props } = Astro.props;
+const { hasHeroImage, menuItems, depth, isFirstMenuItem = true, ariaLabel, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
 
@@ -74,6 +71,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 			: undefined,
 		depth > 1 && !isFirstMenuItem ? 'sm:rounded-tr-md' : undefined,
 	]}
+	aria-label={ariaLabel}
 	{...props}
 >
 	{
@@ -82,12 +80,10 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 
 			return (
 				<li
-					id={getMenuItemId(item)}
 					class:list={['relative', depth === 1 ? 'group/d2' : 'group/d3']}
 				>
-					<button
+					<div
 						class="flex w-full items-center justify-between gap-x-1 px-small py-1 text-sm sm:px-2"
-						aria-label={getMenuItemAriaLabel(item)}
 					>
 						<Link
 							linkColor="accent"
@@ -124,13 +120,14 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 								<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z" />
 							</svg>
 						) : undefined}
-					</button>
+					</div>
 					{item.children && item.children.length > 0 ? (
 						<Astro.self
 							hasHeroImage={hasHeroImage}
 							menuItems={item.children}
 							depth={depth + 1}
 							isFirstMenuItem={isFirstMenuItem && index === 0}
+							ariaLabel={getMenuItemAriaLabel(item)}
 						/>
 					) : undefined}
 				</li>

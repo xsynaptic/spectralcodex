@@ -5,11 +5,7 @@ import MenuHeaderSubmenu from '#components/main/main-header-menu-submenu.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMenuHeaderItems } from '#lib/main/main-menu-header.ts';
-import {
-	getMenuItemAriaLabel,
-	getMenuItemId,
-	isActiveMenuItem,
-} from '#lib/main/main-menu-utils.ts';
+import { getMenuItemAriaLabel, isActiveMenuItem } from '#lib/main/main-menu-utils.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
 	hasHeroImage: boolean;
@@ -38,8 +34,8 @@ const t = getTranslations();
 	>
 		{
 			menuItems.map((item) => (
-				<li id={getMenuItemId(item)} class="group py-2 sm:relative">
-					<button class="flex items-center gap-x-1" aria-label={getMenuItemAriaLabel(item)}>
+				<li class="group py-2 sm:relative">
+					<div class="flex items-center gap-x-1">
 						<Link
 							linkColor="accent"
 							class:list={[
@@ -66,9 +62,9 @@ const t = getTranslations();
 								<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z" />
 							</svg>
 						) : undefined}
-					</button>
+					</div>
 					{item.children ? (
-						<MenuHeaderSubmenu hasHeroImage={hasHeroImage} menuItems={item.children} depth={1} />
+						<MenuHeaderSubmenu hasHeroImage={hasHeroImage} menuItems={item.children} depth={1} ariaLabel={getMenuItemAriaLabel(item)} />
 					) : undefined}
 				</li>
 			))
