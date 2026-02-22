@@ -14,6 +14,17 @@ const useMapDataStore = <T>(selector: (state: MapDataStore) => T): T => {
 };
 
 /**
+ * Raw store access (for reading state in callbacks without subscribing to re-renders)
+ */
+export function useMapStoreInstance() {
+	const store = useContext(MapStoreContext);
+
+	if (!store) throw new Error('Missing MapStoreContext.Provider!');
+
+	return store;
+}
+
+/**
  * Feature state
  */
 export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);

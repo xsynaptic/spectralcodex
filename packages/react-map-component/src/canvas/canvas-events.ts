@@ -14,7 +14,7 @@ import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
-import { useMapCanvasInteractive, useMapHoveredId, useMapStoreActions } from '../store/store';
+import { useMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
 import { writeSavedViewport } from '../store/store-viewport';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
@@ -38,7 +38,8 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const isInteractive = useMapCanvasInteractive();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
-	const hoveredId = useMapHoveredId();
+	const mapStoreInstance = useMapStoreInstance();
+
 	const {
 		setCanvasLoading,
 		setCanvasCursor,
@@ -167,7 +168,10 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 					setCanvasCursor('pointer');
 
 					// Only update if it's different from current hovered ID
-					if (typeof feature.properties.id === 'string' && feature.properties.id !== hoveredId) {
+					if (
+						typeof feature.properties.id === 'string' &&
+						feature.properties.id !== mapStoreInstance.getState().hoveredId
+					) {
 						setHoveredId(feature.properties.id);
 					}
 					break;
@@ -179,7 +183,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 				}
 			}
 		},
-		[setCanvasCursor, setHoveredId, hoveredId],
+		[setCanvasCursor, setHoveredId, mapStoreInstance],
 	);
 
 	// Create throttled version using funnel
