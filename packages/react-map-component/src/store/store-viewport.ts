@@ -1,6 +1,12 @@
-import type { ViewState } from 'react-map-gl/maplibre';
+import { z } from 'zod';
 
-type SavedViewport = Pick<ViewState, 'longitude' | 'latitude' | 'zoom'>;
+const SavedViewportSchema = z.object({
+	longitude: z.number(),
+	latitude: z.number(),
+	zoom: z.number(),
+});
+
+type SavedViewport = z.infer<typeof SavedViewportSchema>;
 
 function getViewportStorageKey(mapId: string) {
 	return `map-vp:${mapId}`;
@@ -13,20 +19,9 @@ export function readSavedViewport(mapId: string | undefined): SavedViewport | un
 		const raw = sessionStorage.getItem(getViewportStorageKey(mapId));
 		if (!raw) return;
 
-		const parsed: unknown = JSON.parse(raw);
+		const result = SavedViewportSchema.safeParse(JSON.parse(raw));
 
-		if (
-			parsed &&
-			typeof parsed === 'object' &&
-			'longitude' in parsed &&
-			'latitude' in parsed &&
-			'zoom' in parsed &&
-			typeof parsed.longitude === 'number' &&
-			typeof parsed.latitude === 'number' &&
-			typeof parsed.zoom === 'number'
-		) {
-			return parsed as SavedViewport;
-		}
+		return result.success ? result.data : undefined;
 	} catch {
 		// Ignore parse errors or missing sessionStorage
 	}
