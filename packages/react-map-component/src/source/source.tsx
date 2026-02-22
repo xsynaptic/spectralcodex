@@ -13,6 +13,11 @@ import { MapSourcePoints } from './source-points';
 
 const IS_DEBUG = false as boolean;
 
+const EMPTY_FEATURE_COLLECTION: FeatureCollection<never, never> = {
+	type: 'FeatureCollection',
+	features: [],
+};
+
 export const MapSource: FC<
 	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'> & {
 		bounds: MapComponentProps['bounds'] | undefined;
@@ -24,11 +29,6 @@ export const MapSource: FC<
 	const { pointCollection, lineStringCollection } = useMapCanvasData();
 	const { data: divisionData } = useMapApiDivisionData({ apiDivisionUrl, isDev });
 
-	const emptyFeatureCollection = {
-		type: 'FeatureCollection',
-		features: [],
-	} satisfies FeatureCollection;
-
 	/**
 	 * Conditional rendering of layers leads to non-deterministic output
 	 * In some cases the layers will appear in the wrong order
@@ -37,11 +37,11 @@ export const MapSource: FC<
 	return (
 		<>
 			{divisionData === false ? undefined : (
-				<MapSourceDivisions data={divisionData ?? emptyFeatureCollection} />
+				<MapSourceDivisions data={divisionData ?? EMPTY_FEATURE_COLLECTION} />
 			)}
-			<MapSourceLines data={lineStringCollection ?? emptyFeatureCollection} />
+			<MapSourceLines data={lineStringCollection ?? EMPTY_FEATURE_COLLECTION} />
 			<MapSourcePoints
-				data={pointCollection ?? emptyFeatureCollection}
+				data={pointCollection ?? EMPTY_FEATURE_COLLECTION}
 				interactive={interactive}
 				hasMapIcons={hasMapIcons}
 			/>
