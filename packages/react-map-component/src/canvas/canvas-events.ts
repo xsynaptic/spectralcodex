@@ -100,21 +100,27 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 					break;
 				}
 
-				// When a click event occurs on a feature in the unclustered-point layer, open a popup
-				// TODO: fly first, then open the popup, which requires getting into tricky event handling
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
 				case MapLayerIdEnum.PointsImage: {
-					if (isMapCoordinates(feature.geometry.coordinates)) {
-						mapInstance.flyTo({
-							center: feature.geometry.coordinates,
-							duration: 0, // Disabled as the animation may cause flicker
-							padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 }, // Offset to account for the size of the popup
-						});
-					}
+					const pointId =
+						typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
 
-					if (typeof feature.properties.id === 'string') {
-						setSelectedId(feature.properties.id);
+					if (isMapCoordinates(feature.geometry.coordinates)) {
+						mapInstance.easeTo({
+							center: feature.geometry.coordinates,
+							duration: 150,
+							padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
+						});
+
+						if (pointId) {
+							void mapInstance.once('moveend', () => {
+								setSelectedId(pointId);
+								setHoveredId(undefined);
+							});
+						}
+					} else if (pointId) {
+						setSelectedId(pointId);
 						setHoveredId(undefined);
 					}
 					break;
