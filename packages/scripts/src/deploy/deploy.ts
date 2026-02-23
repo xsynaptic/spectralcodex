@@ -8,6 +8,7 @@ import { cacheWarmNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
 import { ensureSshKeychain } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
+import { purgeCache } from './deploy-cache-purge.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
 import { deployOg } from './deploy-og.js';
@@ -126,6 +127,7 @@ try {
 	await media();
 	await transfer();
 	await og();
+	await purgeCache({ rootPath, dryRun });
 	await warmNew();
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {

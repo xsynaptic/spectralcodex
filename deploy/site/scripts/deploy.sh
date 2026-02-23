@@ -1,4 +1,7 @@
 #!/bin/bash
+# Deploy site-specific configs: Caddy site configs (spectralcodex.caddy), certs, and image server.
+# Reloads Caddy to pick up config changes. Does NOT restart shared infra (Umami, etc.).
+# For shared infrastructure, run deploy/infra/scripts/deploy.sh instead.
 set -e
 
 # Load environment from deploy/.env

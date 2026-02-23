@@ -1,4 +1,7 @@
 #!/bin/bash
+# Deploy shared infrastructure: root Caddyfile, Umami, and Docker Compose services.
+# Does NOT deploy site-specific Caddy configs (spectralcodex.caddy) or the image server.
+# For those, run deploy/site/scripts/deploy.sh instead.
 set -euo pipefail
 
 # Load environment from deploy/.env

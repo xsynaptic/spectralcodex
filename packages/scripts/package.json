@@ -10,6 +10,7 @@
 		"content-validate": "tsx ./src/content-validate/index.ts",
 		"deploy-site": "tsx ./src/deploy/deploy.ts",
 		"deploy-app": "tsx ./src/deploy/deploy-app.ts",
+		"deploy-cache-purge": "tsx ./src/deploy/deploy-cache-purge.ts",
 		"deploy-media": "tsx ./src/deploy/deploy-media.ts",
 		"deploy-og": "tsx ./src/deploy/deploy-og.ts",
 		"dev-server": "tsx ./src/dev-server/index.ts",
