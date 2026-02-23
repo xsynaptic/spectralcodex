@@ -14,8 +14,7 @@ export default {
 				'p-limit', // used in workspace packages (image-loader, scripts)
 				'unified', // transitive dep of @xsynaptic/unified-tools
 			],
-			// Tailwind @source directives in CSS — not real JS imports
-			ignoreUnresolved: [String.raw`\*\*/\*\.astro`, String.raw`\*\*/\*\.tsx`],
+
 		},
 		'packages/content-demo': {
 			entry: ['.remarkrc.mjs'],
