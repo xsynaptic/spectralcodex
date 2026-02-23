@@ -141,6 +141,14 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 - `./public/icons`: icon sprites and JSON files for the map component
 - `./temp`: temporary storage for generated files, delete anytime
 
+## Cloudflare Configuration
+
+The site is proxied through Cloudflare. HTML caching requires these dashboard settings:
+
+- **Caching > Configuration**: Browser Cache TTL set to "Respect Existing Headers"
+- **Caching > Cache Rules**: "Cache HTML" rule with hostname `spectralcodex.com`, eligible for cache, edge TTL respects origin headers
+- **Cache purge**: API credentials in `deploy/.env` (`CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_API_TOKEN`), runs during `pnpm deploy-site`
+
 ## License
 
 This project is licensed under the [MIT License](./LICENSE). Feel free to use and adapt the code (but not the personal content specific to the project) for your own projects.
