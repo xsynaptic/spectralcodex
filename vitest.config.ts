@@ -6,6 +6,7 @@ export default defineConfig({
 		exclude: [
 			'**/node_modules/**',
 			'**/integration.test.ts',
+			'tests/e2e/**',
 		],
 	},
 });

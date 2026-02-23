@@ -74,6 +74,11 @@ async function build() {
 	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro build`;
 }
 
+async function test() {
+	console.log(chalk.blue('Running E2E smoke tests...'));
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm test:e2e`;
+}
+
 function manifest() {
 	const urlPattern = process.env.IPX_SERVER_URL;
 	if (!urlPattern) {
@@ -116,6 +121,7 @@ try {
 	await related();
 	await opengraph();
 	await build();
+	await test();
 	manifest();
 	await media();
 	await transfer();
