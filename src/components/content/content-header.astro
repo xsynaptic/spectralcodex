@@ -32,7 +32,8 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 				as="h2"
 				gradientColor={hasHeroImage ? 'accent-featured' : 'accent'}
 				class:list={[
-					'pb-1 text-base leading-snug font-medium sm:font-semibold',
+					'pb-1 text-base leading-snug font-medium',
+					'sm:[&_span[lang="zh"]]:font-semibold', // Boost Chinese title font weight
 					hasHeroImage
 						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 						: 'text-lg md:text-xl lg:text-2xl',

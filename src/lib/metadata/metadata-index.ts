@@ -15,7 +15,7 @@ import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getRegionCommonAncestorFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -109,7 +109,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 			// Here we allow for location data to have overrides; this is used to obscure sensitive sites
 			let id = entry.id;
 			let title = entry.data.title;
-			let titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+			let titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 			let regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
 			// Overrides allow us to hide or obscure certain items of content
@@ -117,7 +117,8 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				id = entry.data.override?.slug ?? id;
 				title = entry.data.override?.title ?? title;
 				titleMultilingual = entry.data.override
-					? (getPrimaryMultilingualContent(entry.data.override, 'title') ?? titleMultilingual)
+					? (getMultilingualContent({ data: entry.data.override, prop: 'title' })?.primary ??
+						titleMultilingual)
 					: titleMultilingual;
 				regions = entry.data.override?.regions ?? regions;
 			}

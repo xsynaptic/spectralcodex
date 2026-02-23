@@ -29,7 +29,8 @@ import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -49,14 +50,24 @@ const { entry, mapData, metadataItems, backlinks } = Astro.props;
 
 // This allows for titles to be overridden for sensitive or hidden sites
 const title = entry.data.override?.title ?? entry.data.title;
-const titleMultilingual =
-	getPrimaryMultilingualContent(entry.data.override, 'title') ??
-	getPrimaryMultilingualContent(entry.data, 'title');
 
 const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 
 const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions);
 const regionLangCode = regionPrimary?.data._langCode;
+
+const langCodeAdditional =
+	regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan')
+		? LanguageCodeEnum.Japanese
+		: undefined;
+const titleResult = getMultilingualContent({
+	data: entry.data.override ?? entry.data,
+	prop: 'title',
+	...(regionLangCode ? { langCode: regionLangCode } : {}),
+	...(langCodeAdditional ? { langCodeAdditional } : {}),
+});
+const titleMultilingual = titleResult?.primary;
+const titleMultilingualAdditional = titleResult?.additional ? [titleResult.additional] : undefined;
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
@@ -92,7 +103,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
-					<TextMultilingual content={titleMultilingual} />
+					<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem hasHeroImage={hasHeroImage}>

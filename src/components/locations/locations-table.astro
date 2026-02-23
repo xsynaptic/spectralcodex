@@ -6,7 +6,7 @@ import * as R from 'remeda';
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -56,9 +56,12 @@ const columns = {
 					<tbody class:list={['divide-y', 'divide-primary-200 dark:divide-primary-700']}>
 						{locations.map((item) => {
 							const region = getFirstRegionByReference(
-								item.data.override?.regions ?? item.data.regions,
+								item.data.override?.regions ?? item.data.regions
 							);
-							const titleMultilingual = getPrimaryMultilingualContent(item.data, 'title');
+							const titleMultilingual = getMultilingualContent({
+								data: item.data,
+								prop: 'title',
+							})?.primary;
 
 							return (
 								<tr class="font-sans text-sm">

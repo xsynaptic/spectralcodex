@@ -9,10 +9,18 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	class?: string | undefined;
 	content?: MultilingualContent | undefined;
+	additional?: Array<MultilingualContent> | undefined;
 	parenthesis?: boolean | undefined;
 }>;
 
-const { as: Tag = 'span', class: className, content, parenthesis = false, ...props } = Astro.props;
+const {
+	as: Tag = 'span',
+	class: className,
+	content,
+	additional,
+	parenthesis = false,
+	...props
+} = Astro.props;
 ---
 
 {
@@ -25,9 +33,19 @@ const { as: Tag = 'span', class: className, content, parenthesis = false, ...pro
 					</Tag>
 				</TextParenthesis>
 			) : (
-				<Tag lang={content.lang} class={className} {...props}>
-					<Fragment set:html={content.value} />
-				</Tag>
+				<>
+					<Tag lang={content.lang} class={className} {...props}>
+						<Fragment set:html={content.value} />
+					</Tag>
+					{additional?.map((item) => (
+						<>
+							{'\uFF0F'}
+							<Tag lang={item.lang} class={className} {...props}>
+								<Fragment set:html={item.value} />
+							</Tag>
+						</>
+					))}
+				</>
 			)}
 		</>
 	) : undefined

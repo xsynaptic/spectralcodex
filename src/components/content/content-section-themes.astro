@@ -6,7 +6,7 @@ import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getThemesByIdsFunction } from '#lib/collections/themes/themes-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -30,7 +30,10 @@ const t = getTranslations();
 			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
 			<ListRow>
 				{themes.map((item) => {
-					const titleMultilingual = getPrimaryMultilingualContent(item.data, 'title');
+					const titleMultilingual = getMultilingualContent({
+						data: item.data,
+						prop: 'title',
+					})?.primary;
 
 					return (
 						<DividedItem

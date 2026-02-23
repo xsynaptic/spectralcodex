@@ -9,7 +9,7 @@ import ListColumn from '#components/parts/list-column.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -31,7 +31,7 @@ const t = getTranslations();
 			<Fragment slot="section-title">{t('content.section.links')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{links.map((link) => {
-					const titleMultilingual = getPrimaryMultilingualContent(link, 'title');
+					const titleMultilingual = getMultilingualContent({ data: link, prop: 'title' })?.primary;
 
 					return (
 						<ListColumnItem>

@@ -9,7 +9,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { LOCATIONS_NEARBY_COUNT_LIMIT } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -33,7 +33,10 @@ const t = getTranslations();
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{locationsNearby.map(({ locationId, distanceDisplay }) => {
 					const location = locationsMap.get(locationId);
-					const titleMultilingual = getPrimaryMultilingualContent(location?.data, 'title');
+					const titleMultilingual = getMultilingualContent({
+						data: location?.data,
+						prop: 'title',
+					})?.primary;
 
 					return location ? (
 						<ListColumnItem>

@@ -19,7 +19,7 @@ import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
@@ -37,7 +37,7 @@ interface Props {
 
 const { entry, mapData, metadataItems, metadataItemsCount, relatedThemeIds, page } = Astro.props;
 
-const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);

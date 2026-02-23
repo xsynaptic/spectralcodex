@@ -8,7 +8,7 @@ import Link from '#components/parts/link.astro';
 import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -42,7 +42,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 		<ListRow class="font-serif text-sm">
 			{regions.map((entry) => {
 				const titleMultilingual = showTitleMultilingual
-					? getPrimaryMultilingualContent(entry.data, 'title')
+					? getMultilingualContent({ data: entry.data, prop: 'title' })?.primary
 					: undefined;
 
 				return (

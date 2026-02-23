@@ -10,7 +10,7 @@ import ListColumn from '#components/parts/list-column.astro';
 import { getResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -57,8 +57,14 @@ const SourcesFormattingMap = {
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{sources.map((source) => {
 					// Get multilingual content for each field
-					const titleMultilingual = getPrimaryMultilingualContent(source, 'title');
-					const publisherMultilingual = getPrimaryMultilingualContent(source, 'publisher');
+					const titleMultilingual = getMultilingualContent({
+						data: source,
+						prop: 'title',
+					})?.primary;
+					const publisherMultilingual = getMultilingualContent({
+						data: source,
+						prop: 'publisher',
+					})?.primary;
 
 					let Authors: Node | undefined;
 					let Title: Node | undefined;

@@ -21,7 +21,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
@@ -39,7 +39,7 @@ interface Props {
 
 const { page, mapData, entry, metadataItems, metadataItemsCount, regionsOption } = Astro.props;
 
-const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const contentMetadataIndex = await getContentMetadataIndex();
 

@@ -10,7 +10,7 @@ import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -28,7 +28,7 @@ function getMenuItemData({
 	return {
 		collection: entry.collection,
 		title: entry.data.title,
-		titleMultilingual: getPrimaryMultilingualContent(entry.data, 'title'),
+		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
 		url: getSiteUrl(`${slug}/${entry.id}`),
 		...(ancestor ? { ancestor } : {}),
 	};

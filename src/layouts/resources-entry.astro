@@ -17,7 +17,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber, stripDiacritics } from '#lib/utils/text.ts';
@@ -30,7 +30,7 @@ interface Props {
 
 const { entry, mapData, page } = Astro.props;
 
-const titleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);

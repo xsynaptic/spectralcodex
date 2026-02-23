@@ -18,7 +18,7 @@ import { hashShort } from 'packages/shared/src/cache';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
-import { getPrimaryMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
@@ -93,13 +93,19 @@ export function getLocationsFeatureCollection(
 			const geometryArray = Array.isArray(entry.data.geometry)
 				? entry.data.geometry
 				: [entry.data.geometry];
-			const entryTitleMultilingual = getPrimaryMultilingualContent(entry.data, 'title');
+			const entryTitleMultilingual = getMultilingualContent({
+				data: entry.data,
+				prop: 'title',
+			})?.primary;
 
 			return geometryArray.map((geometry, index) => {
 				const uuid = entry.data._uuid ?? entry.id;
 				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
 				const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
-				const geometryTitleMultilingual = getPrimaryMultilingualContent(geometry, 'title');
+				const geometryTitleMultilingual = getMultilingualContent({
+					data: geometry,
+					prop: 'title',
+				})?.primary;
 				const googleMapsUrl =
 					geometry.googleMapsUrl || entry.data._googleMapsUrl
 						? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
