@@ -1,6 +1,7 @@
 ---
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
+import { IPX_SERVER_URL } from 'astro:env/server';
 import { ClientRouter } from 'astro:transitions';
 
 import '#styles/global.css';
@@ -41,6 +42,7 @@ const { hasHeroImage = false, meta, isHomepage = false } = Astro.props;
 			href={`${getSiteUrl()}favicon.svg`}
 			media="(prefers-color-scheme: dark)"
 		/>
+		<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
 		<MainMeta {...meta} />
 		<Font cssVariable="--font-commissioner" preload />
 		<Font cssVariable="--font-geologica" preload />
