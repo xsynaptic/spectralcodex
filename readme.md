@@ -6,11 +6,10 @@ This repository contains the working Astro project used to generate the [Spectra
 
 ### Content Management
 
-- All content is authored in MDX using the Content Layer API
-- Content quality scoring system (0-5 scale) drives content prioritization across the site
-- Comprehensive validation system ensuring data quality and consistency across collections (including frontmatter field and GPS coordinate de-duplication checks)
-- Visual reading progress indicator for long-form content
-- Automated content excerpt generation for previews and listings
+- All content authored in MDX using the Content Layer API
+- Quality scoring system (0-5 scale) drives content prioritization site-wide
+- Comprehensive validation ensuring data quality across collections (frontmatter fields, GPS coordinate de-duplication)
+- Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
 
 ### Image Handling
@@ -39,17 +38,16 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - React-based map component built with [MapLibre](https://maplibre.org/), [react-map-gl](https://visgl.github.io/react-map-gl/), and [Protomaps](https://protomaps.com/)
 - Custom filter controls for adjusting what points are visible on the map
 - Popups, clustering, filtering by objectives, and responsive design
-- Administrative boundaries are sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rending on region maps
+- Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
 - Persistent storage of map data via IndexedDB
-- Distance-based discovery system for geographic content via nearby locations feature, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
+- Distance-based discovery via nearby locations, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
 
 ### Search & Discovery
 
 - Integrated [Pagefind](https://pagefind.app/) via [astro-pagefind](https://github.com/shishkin/astro-pagefind) for client-side full-text search across all content
-- Related content recommendations using vector similarity (Transformers.js embeddings) with hybrid ranking combining semantic and metadata-based scoring
-- Automatic discovery and display of content relationships via backlinks
+- Related content recommendations via vector similarity (Transformers.js embeddings) with hybrid semantic + metadata ranking
+- Automatic content relationship discovery via backlinks
 - Hierarchical navigation through regions, themes, and series
-- Distance-based point-of-interest discovery via nearby locations
 
 ### Timeline & Archives
 
@@ -66,10 +64,13 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Custom CJK character handling and language-specific styling
 - Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
 
-## SEO & RSS
+### SEO & Social
 
-- Comprehensive meta tags, structured data, and OpenGraph images
-- Dynamic sitemap generation with [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
+- Programmatic OG image generation via Satori and Sharp; per-page images with featured image backgrounds, multilingual title rendering (CJK/Thai), and luminance-aware adaptive text color
+- Deterministic fallback system (theme/region/country) with blurred visual distinction for entries without a featured image
+- Digest-based caching; only regenerates when content or source image changes
+- Comprehensive meta tags and structured data
+- Dynamic sitemap via [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
 - Full RSS feeds with server-side rendered MDX content via Astro's Container API
 
 ## Usage
@@ -87,13 +88,13 @@ Standard Astro commands apply:
 Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns:
 
 - `pnpm deploy-site` - full deployment pipeline:
-  1. Validates content (frontmatter, references, duplicates)
-  2. Generates related content recommendations
-  3. Creates OpenGraph images
-  4. Builds the Astro site
-  5. Generates cache manifest from built HTML
-  6. Syncs media files to remote storage
-  7. Transfers static files via rsync
+  1. Content validation (frontmatter, references, duplicates)
+  2. Related content generation (semantic similarity)
+  3. OG image generation with Satori and Sharp
+  4. Astro production build
+  5. Cache manifest generation from built HTML
+  6. Media sync to remote storage
+  7. Static file transfer via rsync
 
 - `pnpm deploy-media` - sync source images to remote storage (standalone)
 - `pnpm cache-warm` - pre-populate image cache on the server
