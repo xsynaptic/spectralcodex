@@ -33,26 +33,27 @@ export async function purgeCache(options: PurgeCacheOptions): Promise<void> {
 		return;
 	}
 
-	const response = await fetch(
-		`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
-		{
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${apiToken}`,
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ purge_everything: true }),
+	const response = await fetch(`https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${apiToken}`,
+			'Content-Type': 'application/json',
 		},
-	);
+		body: JSON.stringify({ purge_everything: true }),
+	});
 
 	if (!response.ok) {
-		throw new Error(`Cloudflare API returned ${response.status}: ${response.statusText}`);
+		throw new Error(`Cloudflare API returned ${String(response.status)}: ${response.statusText}`);
 	}
 
-	const result = (await response.json()) as { success: boolean; errors: Array<{ message: string }> };
+	const result = (await response.json()) as {
+		success: boolean;
+		errors: Array<{ message: string }>;
+	};
 
 	if (!result.success) {
-		const messages = result.errors.map((e) => e.message).join(', ');
+		const messages = result.errors.map((error) => error.message).join(', ');
+
 		throw new Error(`Cloudflare cache purge failed: ${messages}`);
 	}
 
