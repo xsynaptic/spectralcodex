@@ -14,8 +14,6 @@ const { class: className, height, ...props } = Astro.props;
 <ProgressBar id="reading-bar" class:list={[className]} height={height} {...props} />
 
 <script>
-	import { funnel } from 'remeda';
-
 	const animationDuration = 300;
 
 	function readingBar(selector: string) {
@@ -47,44 +45,53 @@ const { class: className, height, ...props } = Astro.props;
 		// Initialize opacity value
 		setOpacity(0);
 
-		const onScrollHandler = funnel(
-			() => {
-				const readingFrameRect = readingFrame.getBoundingClientRect();
-				const readingProgress = Math.min(
-					Math.max(
-						0,
-						(globalThis.window.innerHeight - readingFrameRect.top) /
-							(readingFrameRect.height + globalThis.window.innerHeight),
-					),
-					1,
-				);
+		let ticking = false;
 
-				if (readingProgress === 1) {
-					setFinished();
-				} else {
-					setOpacity(1);
-					setProgress(readingProgress);
-				}
-			},
-			{ triggerAt: 'both', minGapMs: 200 },
-		);
+		function updateProgress() {
+			if (!readingFrame) return;
+
+			const readingFrameRect = readingFrame.getBoundingClientRect();
+			const readingProgress = Math.min(
+				Math.max(
+					0,
+					(globalThis.window.innerHeight - readingFrameRect.top) /
+						(readingFrameRect.height + globalThis.window.innerHeight)
+				),
+				1
+			);
+
+			if (readingProgress === 1) {
+				setFinished();
+			} else {
+				setOpacity(1);
+				setProgress(readingProgress);
+			}
+
+			ticking = false;
+		}
+
+		function onScroll() {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(updateProgress);
+		}
 
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {
 					if (entry.isIntersecting) {
-						globalThis.window.addEventListener('resize', onScrollHandler.call);
-						globalThis.window.addEventListener('scroll', onScrollHandler.call);
-						onScrollHandler.call(); // Initial call to set progress if already scrolled into view
+						globalThis.window.addEventListener('resize', onScroll);
+						globalThis.window.addEventListener('scroll', onScroll);
+						onScroll();
 					} else {
-						globalThis.window.removeEventListener('resize', onScrollHandler.call);
-						globalThis.window.removeEventListener('scroll', onScrollHandler.call);
+						globalThis.window.removeEventListener('resize', onScroll);
+						globalThis.window.removeEventListener('scroll', onScroll);
 					}
 				}
 			},
 			{
 				threshold: 0,
-			},
+			}
 		);
 
 		observer.observe(readingFrame);
