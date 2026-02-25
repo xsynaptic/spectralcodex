@@ -1,18 +1,10 @@
-/* eslint-disable unicorn/prefer-global-this */
 import type { PropsWithChildren } from 'react';
 
 import { useContext } from 'react';
 import { createContext, useEffect, useState } from 'react';
 
-/**
- * These types mirror the mode system types in the main Astro application; they must be kept in sync
- */
-type Mode = 'light' | 'dark' | 'auto';
-type ModeResolved = Omit<Mode, 'auto'>;
-
 interface ModeChangedEventDetail {
-	mode: Mode;
-	resolvedMode: ModeResolved;
+	resolvedMode: 'light' | 'dark';
 }
 
 interface ModeChangedEvent extends CustomEvent {
@@ -23,12 +15,8 @@ const DarkModeContext = createContext<boolean>(false);
 
 export function DarkModeProvider({ children }: PropsWithChildren) {
 	const [isDarkMode, setDarkMode] = useState(() => {
-		if (typeof window === 'undefined') return false;
-
-		const modeResolved =
-			window.mode?.getMode() === 'auto' ? window.mode.getSystemMode() : window.mode?.getMode();
-
-		return modeResolved === 'dark';
+		if (typeof document === 'undefined') return false;
+		return document.documentElement.dataset.mode === 'dark';
 	});
 
 	useEffect(() => {

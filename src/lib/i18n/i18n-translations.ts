@@ -175,9 +175,7 @@ const translationStrings = {
 		'site.menu.footer.label': 'Footer Navigation',
 		'site.menu.header.label': 'Header Navigation',
 		'site.menu.header.submenu.label': 'Submenu for {title}',
-		'site.mode.toggle.dark.label': 'Dark mode',
-		'site.mode.toggle.light.label': 'Light mode',
-		'site.mode.toggle.system': 'System mode',
+		'site.mode.toggle.label': 'Toggle dark mode',
 		'site.pagination.label': 'Pagination',
 		'site.pagination.pageNumber.label': 'Page {page}',
 

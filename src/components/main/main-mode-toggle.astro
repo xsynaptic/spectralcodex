@@ -8,23 +8,22 @@ type Props = HTMLAttributes<'div'>;
 const props = Astro.props;
 
 const t = getTranslations();
-
-// Icons from Lucide; lucide:moon and lucide:sun-medium
 ---
 
-<div
-	id="mode-toggle"
+<script>
+	import '#lib/components/mode-toggle.ts';
+</script>
+
+<mode-toggle
 	class:list={[
 		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-all hover:opacity-100',
 	]}
 	transition:persist
 	{...props}
 >
-	<button
-		class:list={['hidden dark:inline', 'text-primary-300']}
-		aria-label={t('site.mode.toggle.light.label')}
-	>
+	<button class="text-primary-700 dark:text-primary-300" aria-label={t('site.mode.toggle.label')}>
 		<svg
+			class="hidden dark:block"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -41,12 +40,8 @@ const t = getTranslations();
 				></path></g
 			></svg
 		>
-	</button>
-	<button
-		class:list={['inline dark:hidden', 'text-primary-700']}
-		aria-label={t('site.mode.toggle.dark.label')}
-	>
 		<svg
+			class="block dark:hidden"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"
 			height="24"
@@ -61,56 +56,4 @@ const t = getTranslations();
 				d="M12 3a6 6 0 0 0 9 9a9 9 0 1 1-9-9"></path></svg
 		>
 	</button>
-</div>
-
-<script>
-	import { funnel } from 'remeda';
-
-	import { ModeTypeEnum } from '#lib/main/main-types.ts';
-
-	function activateModeToggle(toggleElementId: string) {
-		const toggleElement = document.querySelector<HTMLButtonElement>(toggleElementId);
-
-		if (!toggleElement) return;
-
-		// Check if already initialized to prevent duplicate listeners
-		if (toggleElement.dataset.modeInitialized === 'true') return;
-		toggleElement.dataset.modeInitialized = 'true';
-
-		// Debounce toggle that prevents rapid flicking between modes
-		const debouncedModeToggle = funnel(
-			() => {
-				if (!window.mode) return;
-
-				const currentMode = window.mode.getMode();
-
-				switch (currentMode) {
-					case ModeTypeEnum.Auto:
-					case ModeTypeEnum.Light: {
-						window.mode.setMode(ModeTypeEnum.Dark);
-						break;
-					}
-					case ModeTypeEnum.Dark: {
-						window.mode.setMode(ModeTypeEnum.Light);
-						break;
-					}
-					default: {
-						currentMode satisfies never;
-						break;
-					}
-				}
-			},
-			{ triggerAt: 'start', minQuietPeriodMs: 500 }
-		);
-
-		toggleElement.addEventListener('click', () => {
-			debouncedModeToggle.call();
-		});
-	}
-
-	activateModeToggle('#mode-toggle');
-
-	document.addEventListener('astro:after-swap', () => {
-		activateModeToggle('#mode-toggle');
-	});
-</script>
+</mode-toggle>

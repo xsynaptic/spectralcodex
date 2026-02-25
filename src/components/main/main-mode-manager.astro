@@ -1,121 +1,41 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-
 import type { ModeGeneralType } from '#lib/main/main-types.ts';
 
 import { ModeTypeEnum } from '#lib/main/main-types.ts';
 
-interface Props extends HTMLAttributes<'script'> {
+interface Props {
 	defaultMode?: ModeGeneralType | undefined;
 }
 
-const { defaultMode = ModeTypeEnum.Auto, ...props } = Astro.props;
+const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 ---
 
-{
-	defaultMode === ModeTypeEnum.Auto ? undefined : (
-		<script id="mode-default" is:inline data-default-mode={defaultMode} {...props} />
-	)
-}
+<script is:inline data-default-mode={defaultMode}>
+	(function () {
+		let stored;
+
+		try {
+			stored = localStorage.getItem('scx-mode');
+		} catch {
+			// localStorage unavailable
+		}
+
+		let mode =
+			stored === 'auto' || stored === 'light' || stored === 'dark'
+				? stored
+				: (document.currentScript.dataset.defaultMode ?? 'auto');
+
+		if (mode === 'auto') {
+			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+		}
+
+		document.documentElement.dataset.mode = mode;
+		document.documentElement.style.colorScheme = mode;
+	})();
+</script>
 
 <script>
-	import type { ModeChangedEvent, ModeGeneralType, ModeSystemType } from '#lib/main/main-types.ts';
-
-	import { ModeTypeEnum } from '#lib/main/main-types.ts';
-
-	function isModeValid(mode: string | undefined): mode is ModeGeneralType {
-		return (
-			(mode !== undefined && mode === ModeTypeEnum.Auto) ||
-			mode === ModeTypeEnum.Dark ||
-			mode === ModeTypeEnum.Light
-		);
-	}
-
-	/**
-	 * Adapted from Astro Tips!
-	 * @link - https://astro-tips.dev/recipes/dark-mode/
-	 */
-	function modeManager(defaultModeId: string | undefined) {
-		const storageKey = 'scx-mode';
-		const store =
-			typeof localStorage === 'undefined'
-				? {
-						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						getItem: () => {},
-						// eslint-disable-next-line @typescript-eslint/no-empty-function
-						setItem: () => {},
-					}
-				: localStorage;
-
-		const defaultModeRaw = defaultModeId
-			? document.querySelector<HTMLScriptElement>(defaultModeId)?.dataset.defaultMode
-			: undefined;
-		const defaultMode = isModeValid(defaultModeRaw) ? defaultModeRaw : ModeTypeEnum.Auto;
-
-		const mediaMatcher = window.matchMedia(`(prefers-color-scheme: ${ModeTypeEnum.Light})`);
-
-		let systemMode: ModeSystemType = mediaMatcher.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-
-		function getMode(): ModeGeneralType {
-			const stored = store.getItem(storageKey);
-
-			return stored && isModeValid(stored) ? stored : defaultMode;
-		}
-
-		function applyMode(mode: ModeGeneralType) {
-			const resolvedMode = mode === ModeTypeEnum.Auto ? systemMode : mode;
-
-			document.documentElement.dataset.mode = resolvedMode;
-			document.documentElement.style.colorScheme = resolvedMode;
-
-			// Dispatch event after DOM is updated
-			queueMicrotask(() => {
-				document.dispatchEvent(
-					new CustomEvent('mode-changed', {
-						detail: { mode, systemMode, defaultMode, resolvedMode },
-					}) satisfies ModeChangedEvent
-				);
-			});
-		}
-
-		function setMode(mode: ModeGeneralType = defaultMode) {
-			if (!isModeValid(mode)) return;
-			store.setItem(storageKey, mode);
-			applyMode(mode);
-		}
-
-		function handleMediaChange(event: MediaQueryListEvent) {
-			systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-			applyMode(getMode());
-		}
-
-		mediaMatcher.addEventListener('change', handleMediaChange);
-
-		/** Note: this is not currently used and may have no real value */
-		function cleanup() {
-			mediaMatcher.removeEventListener('change', handleMediaChange);
-		}
-
-		return {
-			setMode,
-			getMode,
-			getSystemMode: () => systemMode,
-			getDefaultMode: () => defaultMode,
-			cleanup,
-		};
-	}
-
-	function initialize() {
-		if (!window.mode) {
-			window.mode = modeManager('#mode-default');
-			window.mode.setMode(window.mode.getMode());
-		}
-	}
-
-	initialize();
-
-	document.addEventListener('astro:after-swap', () => {
-		initialize();
-		if (window.mode) window.mode.setMode(window.mode.getMode());
-	});
+	import '#lib/components/mode-manager.ts';
 </script>
+
+<mode-manager default-mode={defaultMode}></mode-manager>
