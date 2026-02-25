@@ -143,8 +143,8 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			</ContentHeader>
 		</ImageHero>
 		{
-			!hasContent && imageFeaturedId ? (
-				<ContentImage imageId={imageFeaturedId} alt={title} showMetadata={true} />
+			!hasContent && !hasHeroImage && imageFeaturedId ? (
+				<ContentImage imageId={imageFeaturedId} alt={title} priority={true} showMetadata={true} />
 			) : undefined
 		}
 		<ContentDescription

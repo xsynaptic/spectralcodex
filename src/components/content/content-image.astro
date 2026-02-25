@@ -22,6 +22,7 @@ interface Props extends HTMLAttributes<'figure'> {
 	imageId: string;
 	alt?: string;
 	layout?: ImageLayout;
+	priority?: boolean;
 	showMetadata?: boolean;
 }
 
@@ -29,6 +30,7 @@ const {
 	imageId,
 	alt: altProp,
 	layout = ImageLayoutEnum.Default,
+	priority = false,
 	showMetadata = false,
 	...props
 } = Astro.props;
@@ -86,6 +88,7 @@ async function getImageProps(): Promise<{
 				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }
 				: {}),
 			unstyled: true,
+			...(priority ? { priority: true } : {}),
 			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
 		},
 		placeholderProps: {

@@ -21,7 +21,7 @@ const { index, id: imageId, title: alt = '', captionMetadata, withTitle = false 
 async function getImageProps(
 	imageId: string | undefined,
 	alt: string,
-	isFirst: boolean
+	priority: boolean
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
@@ -45,13 +45,13 @@ async function getImageProps(
 			alt: sanitizeAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
-			...(isFirst ? { priority: true } : {}),
+			...(priority ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,
 			aspectRatio,
 			fit,
-			highQuality: isFirst,
+			highQuality: priority,
 		},
 	};
 }
