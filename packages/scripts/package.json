@@ -36,7 +36,7 @@
 		"@types/d3-geo": "^3.1.0",
 		"@types/geojson": "^7946.0.16",
 		"@xsynaptic/unified-tools": "3.0.0",
-		"astro": "6.0.0-beta.14",
+		"astro": "^6.0.0-beta.15",
 		"chalk": "^5.6.2",
 		"d3-geo": "^3.1.1",
 		"devalue": "^5.6.3",

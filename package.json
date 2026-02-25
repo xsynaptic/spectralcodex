@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.6.3",
+	"version": "6.6.4",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -11,7 +11,7 @@
 		"lint-strict": "ESLINT_STRICT=1 eslint",
 		"lint-content": "pnpm --filter @spectralcodex/content lint",
 		"lint-content-demo": "eslint ./packages/content-demo --config ./packages/content-demo/eslint.config.mjs",
-		"lint-knip": "knip",
+		"knip": "knip",
 		"test": "vitest",
 		"test:e2e": "playwright test",
 		"test:image-server": "vitest run --config vitest.integration.config.ts",
@@ -41,7 +41,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "6.0.0-beta.14",
+		"astro": "^6.0.0-beta.15",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
@@ -50,7 +50,7 @@
 		"@astrojs/mdx": "5.0.0-beta.8",
 		"@astrojs/node": "10.0.0-beta.4",
 		"@astrojs/react": "^5.0.0-beta.3",
-		"@astrojs/rss": "4.0.15-beta.3",
+		"@astrojs/rss": "4.0.15-beta.4",
 		"@astrojs/sitemap": "3.6.1-beta.3",
 		"@playwright/test": "^1.58.2",
 		"@spectralcodex/astro-build-logger": "workspace:*",
