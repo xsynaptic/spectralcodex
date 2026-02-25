@@ -26,8 +26,10 @@ export default getConfig(
 			rules: {
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
-				// Expensive rule (~17s); only run in strict mode
+				// Expensive type-aware rules; only run in strict mode (projectService incompatible with Astro)
 				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
+				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
+				'@typescript-eslint/no-misused-promises': isStrictLint ? 'error' : 'off',
 			},
 		},
 		/**
