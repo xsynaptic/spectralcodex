@@ -8,6 +8,7 @@ import type { MapComponentProps, MapInitialViewState } from '../types';
 import { MapControls } from '../controls/controls';
 import { PopupDataContextProvider } from '../data/data-popup';
 import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
+import { useStyleLoader } from '../lib/style-loader';
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
 import { MapLayerIdEnum } from '../source/source-config';
@@ -105,6 +106,8 @@ const MapCanvasContainer: FC<
 			zoom: zoom ?? 12,
 		} satisfies MapInitialViewState;
 	});
+
+	useStyleLoader();
 
 	return (
 		<ReactMapGlMap
