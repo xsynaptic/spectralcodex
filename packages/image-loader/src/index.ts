@@ -236,7 +236,6 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 				// Debounce processing changes
 				if (changeTimeout) clearTimeout(changeTimeout);
 
-				// eslint-disable-next-line @typescript-eslint/no-misused-promises
 				changeTimeout = setTimeout(async () => {
 					await options.beforeLoad?.();
 

@@ -19,7 +19,8 @@ const { isFeed } = Astro.locals;
 // This outputs MDX components already transformed into HTML
 const slotContents = await renderSlot(Astro.slots, 'default');
 
-const imageCount = slotContents?.match(new RegExp('<img', 'g'))?.length ?? 0;
+// Astro v6 slots.render() returns entity-encoded HTML; match both raw and encoded <img tags
+const imageCount = slotContents?.match(/(<|&lt;)img/g)?.length ?? 0;
 
 if (imageCount === 0) {
 	console.warn(`[MDX] ImgGroup component has no images! (${Astro.url.pathname})`);
