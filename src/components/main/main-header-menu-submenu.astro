@@ -41,7 +41,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 
 <ul
 	class:list={[
-		'pointer-events-none invisible absolute w-full max-w-full divide-y opacity-0 transition-all transition-discrete sm:w-fit md:max-w-80',
+		'pointer-events-none invisible absolute w-full max-w-full divide-y opacity-0 transition-[opacity,visibility] transition-discrete sm:w-fit md:max-w-80',
 		depth === 1
 			? [
 					hasHeroImage
