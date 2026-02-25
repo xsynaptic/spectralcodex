@@ -2,7 +2,7 @@
 import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselItem from '#components/image/image-carousel-item.astro';
-import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
+import CarouselNavigation from '#components/parts/carousel-navigation.astro';
 
 interface Props {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
@@ -10,21 +10,19 @@ interface Props {
 }
 
 const { imageFeaturedGroup, class: className } = Astro.props;
-const carouselId = `carousel-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
 {
 	imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-		<div
-			class:list={['group relative max-w-content overflow-hidden sm:rounded-xs', className]}
-			data-carousel-id={carouselId}
+		<carousel-slider
+			class:list={['group relative block max-w-content overflow-hidden sm:rounded-xs', className]}
 		>
 			<div class="carousel-container">
 				{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
 					<ImageCarouselItem {...imageFeaturedGroupItem} />
 				))}
 			</div>
-			{imageFeaturedGroup.length > 1 && <ImageCarouselNavigation carouselId={carouselId} />}
-		</div>
+			{imageFeaturedGroup.length > 1 && <CarouselNavigation />}
+		</carousel-slider>
 	) : undefined
 }

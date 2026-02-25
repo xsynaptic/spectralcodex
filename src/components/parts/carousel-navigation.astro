@@ -1,0 +1,64 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const t = getTranslations();
+---
+
+<button
+	type="button"
+	class:list={[
+		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-focus-within:opacity-100 group-hover:opacity-100 active:scale-90 lg:flex',
+		'bg-white/25 text-white/75 hover:bg-white/50 hover:text-white/80',
+		'left-2',
+	]}
+	data-carousel-nav="prev"
+	aria-label={t('carousel.nav.previous')}
+>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		class="h-8 w-8 -translate-x-0.5"
+		aria-hidden="true"
+	>
+		<path
+			fill="none"
+			stroke="currentColor"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="3"
+			d="m15 18l-6-6l6-6"></path>
+	</svg>
+</button>
+<button
+	type="button"
+	class:list={[
+		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-focus-within:opacity-100 group-hover:opacity-100 active:scale-90 lg:flex',
+		'bg-white/25 text-white/75 hover:bg-white/50 hover:text-white/80',
+		'right-2',
+	]}
+	data-carousel-nav="next"
+	aria-label={t('carousel.nav.next')}
+>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		class="h-8 w-8 translate-x-0.5"
+		aria-hidden="true"
+	>
+		<path
+			fill="none"
+			stroke="currentColor"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="3"
+			d="m9 18l6-6l-6-6"></path>
+	</svg>
+</button>
+
+<script>
+	import '#lib/components/carousel-slider.ts';
+</script>
