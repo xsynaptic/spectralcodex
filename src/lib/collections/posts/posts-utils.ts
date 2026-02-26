@@ -1,8 +1,8 @@
 import type { CollectionEntry } from 'astro:content';
-import type { Thing, WithContext } from 'schema-dts';
+import type { Thing } from 'schema-dts';
 
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { buildArticleSchema } from '#lib/utils/schema.ts';
+import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/schema.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function getPostsByIdsFunction() {
@@ -24,10 +24,10 @@ export async function getPostsByIdsFunction() {
 	};
 }
 
-export function getPostSchemas(
+export function getPostSchema(
 	entry: CollectionEntry<'posts'>,
 	props: { url: string; imageUrl: string | undefined },
-): Array<WithContext<Thing>> {
+): Array<Thing> {
 	return [
 		buildArticleSchema({
 			title: entry.data.title,
@@ -37,5 +37,6 @@ export function getPostSchemas(
 			url: props.url,
 			imageUrl: props.imageUrl,
 		}),
+		buildAuthorSchema(),
 	];
 }

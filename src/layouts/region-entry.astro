@@ -21,6 +21,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
+import { getRegionSchema } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
@@ -64,6 +65,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
+	schemas={await getRegionSchema(entry, { url: Astro.url.toString() })}
 	hasHeroImage={hasHeroImage}
 >
 	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>

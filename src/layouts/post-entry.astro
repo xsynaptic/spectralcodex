@@ -23,7 +23,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ProseBody from '#components/parts/prose-body.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getPostSchemas } from '#lib/collections/posts/posts-utils.ts';
+import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -68,7 +68,7 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
-	schemas={getPostSchemas(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
+	schemas={getPostSchema(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
 	hasHeroImage={hasHeroImage}
 >
 	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>

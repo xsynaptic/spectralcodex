@@ -1,5 +1,5 @@
 ---
-import type { Thing, WithContext } from 'schema-dts';
+import type { Thing } from 'schema-dts';
 
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
@@ -17,12 +17,12 @@ import ModeManager from '#components/main/main-mode-manager.astro';
 import ProgressBarLoading from '#components/main/main-progress-loading.astro';
 import ProgressBarReading from '#components/main/main-progress-reading.astro';
 import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
-import Schemas from '#components/parts/schemas.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+import { serializeGraph } from '#lib/utils/schema.ts';
 
 interface Props {
 	meta?: MetaProps;
-	schemas?: Array<WithContext<Thing>>;
+	schemas?: Array<Thing>;
 	hasHeroImage?: boolean;
 	isHomepage?: boolean;
 }
@@ -86,6 +86,6 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 			]}
 			height="2.5px"
 		/>
-		{schemas && schemas.length > 0 ? <Schemas schemas={schemas} /> : undefined}
+		{schemas && schemas.length > 0 ? <script type="application/ld+json" is:inline set:html={serializeGraph(schemas)} /> : undefined}
 	</body>
 </html>

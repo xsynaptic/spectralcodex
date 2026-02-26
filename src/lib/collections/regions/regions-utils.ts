@@ -1,6 +1,10 @@
 import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
+import type { Thing } from 'schema-dts';
 
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { buildBreadcrumbSchema } from '#lib/utils/schema.ts';
 
 /**
  * Transform an array of strings into collection entries
@@ -111,4 +115,31 @@ export async function getRegionLangCodeByEntry(
 	} else {
 		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
 	}
+}
+
+/**
+ * Schema
+ */
+export async function getRegionSchema(
+	entry: CollectionEntry<'regions'>,
+	props: { url: string },
+): Promise<Array<Thing>> {
+	const t = getTranslations();
+
+	const getRegionAncestors = await getRegionAncestorsFunction();
+
+	const allAncestors = getRegionAncestors(entry);
+	const ancestors = allAncestors.slice(1).toReversed();
+
+	const breadcrumbItems = [
+		{ name: t('site.title'), url: getSiteUrl() },
+		{ name: t('collection.regions.labelPlural'), url: getSiteUrl('regions') },
+		...ancestors.map((region) => ({
+			name: region.data.title,
+			url: getContentUrl('regions', region.id),
+		})),
+		{ name: entry.data.title },
+	];
+
+	return [buildBreadcrumbSchema(breadcrumbItems, props.url)];
 }

@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import type { Thing, WithContext } from 'schema-dts';
+import type { Thing } from 'schema-dts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
@@ -45,9 +45,7 @@ export async function getLocationsByPostsFunction() {
 	};
 }
 
-function getFirstCoordinates(
-	entry: CollectionEntry<'locations'>,
-): [number, number] | undefined {
+function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, number] | undefined {
 	const geometry = entry.data.geometry;
 	const point = Array.isArray(geometry) ? geometry[0] : geometry;
 
@@ -72,7 +70,7 @@ export function sortLocationsByLatitude(
 export async function getLocationSchemas(
 	entry: CollectionEntry<'locations'>,
 	props: { url: string },
-): Promise<Array<WithContext<Thing>>> {
+): Promise<Array<Thing>> {
 	if (entry.data.override || (entry.data.hideLocation && !import.meta.env.DEV)) {
 		return [];
 	}
@@ -96,7 +94,7 @@ export async function getLocationSchemas(
 	];
 
 	return [
-		buildBreadcrumbSchema(breadcrumbItems),
+		buildBreadcrumbSchema(breadcrumbItems, props.url),
 		buildPlaceSchema({
 			title: entry.data.title,
 			description: entry.data.description,

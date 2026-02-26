@@ -1,13 +1,24 @@
-import type { Article, BreadcrumbList, Place, Thing, WithContext } from 'schema-dts';
+import type { Article, BreadcrumbList, Graph, Person, Place, Thing, WebSite } from 'schema-dts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeDescription } from '#lib/utils/text.ts';
 
-// Safely serialize JSON-LD for embedding in <script> tags
-// Unicode escapes prevent XSS
-export function serializeSchema(data: WithContext<Thing>) {
-	return JSON.stringify(data)
+const SchemaFragmentIds = {
+	Website: '#website',
+	Breadcrumb: '#breadcrumb',
+	Place: '#place',
+	Article: '#article',
+	Author: '#author',
+} as const;
+
+export function serializeGraph(entities: Array<Thing>): string {
+	const graph: Graph = {
+		'@context': 'https://schema.org',
+		'@graph': entities,
+	};
+
+	return JSON.stringify(graph)
 		.replaceAll('<', String.raw`\u003c`)
 		.replaceAll('>', String.raw`\u003e`)
 		.replaceAll('&', String.raw`\u0026`);
@@ -15,10 +26,11 @@ export function serializeSchema(data: WithContext<Thing>) {
 
 export function buildBreadcrumbSchema(
 	items: Array<{ name: string; url?: string }>,
-): WithContext<BreadcrumbList> {
+	pageUrl: string,
+): BreadcrumbList {
 	return {
-		'@context': 'https://schema.org',
 		'@type': 'BreadcrumbList',
+		'@id': `${pageUrl}${SchemaFragmentIds.Breadcrumb}`,
 		itemListElement: items.map((item, index) => ({
 			'@type': 'ListItem' as const,
 			position: index + 1,
@@ -35,27 +47,45 @@ export function buildArticleSchema(props: {
 	dateUpdated: Date | undefined;
 	url: string;
 	imageUrl: string | undefined;
-}): WithContext<Article> {
-	const t = getTranslations();
+}): Article {
+	const aboutUrl = getSiteUrl('/about');
 	const description = sanitizeDescription(props.description);
 
 	return {
-		'@context': 'https://schema.org',
 		'@type': 'Article',
+		'@id': `${props.url}${SchemaFragmentIds.Article}`,
 		headline: props.title,
 		...(description ? { description } : {}),
 		...(props.imageUrl ? { image: props.imageUrl } : {}),
 		datePublished: props.dateCreated.toISOString(),
 		...(props.dateUpdated ? { dateModified: props.dateUpdated.toISOString() } : {}),
-		author: {
-			'@type': 'Person',
-			name: t('author.name'),
-			url: getSiteUrl(),
-		},
-		mainEntityOfPage: {
-			'@type': 'WebPage',
-			'@id': props.url,
-		},
+		author: { '@id': `${aboutUrl}${SchemaFragmentIds.Author}` },
+		mainEntityOfPage: { '@id': props.url },
+	};
+}
+
+export function buildAuthorSchema(): Person {
+	const t = getTranslations();
+	const aboutUrl = getSiteUrl('/about');
+
+	return {
+		'@type': 'Person',
+		'@id': `${aboutUrl}${SchemaFragmentIds.Author}`,
+		name: t('author.name'),
+		url: aboutUrl,
+	};
+}
+
+export function buildWebSiteSchema(): WebSite {
+	const t = getTranslations();
+	const siteUrl = getSiteUrl();
+
+	return {
+		'@type': 'WebSite',
+		'@id': `${siteUrl}${SchemaFragmentIds.Website}`,
+		name: t('site.title'),
+		url: siteUrl,
+		description: t('site.description'),
 	};
 }
 
@@ -64,12 +94,12 @@ export function buildPlaceSchema(props: {
 	description: string | undefined;
 	url: string;
 	coordinates: [number, number] | undefined;
-}): WithContext<Place> {
+}): Place {
 	const description = sanitizeDescription(props.description);
 
 	return {
-		'@context': 'https://schema.org',
 		'@type': 'Place',
+		'@id': `${props.url}${SchemaFragmentIds.Place}`,
 		name: props.title,
 		...(description ? { description } : {}),
 		url: props.url,

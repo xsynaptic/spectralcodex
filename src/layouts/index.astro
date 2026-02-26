@@ -24,6 +24,7 @@ import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
+import { buildWebSiteSchema } from '#lib/utils/schema.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate, sanitizeAltAttribute } from '#lib/utils/text.ts';
 
@@ -93,6 +94,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			alt: t('site.title'),
 		}),
 	}}
+	schemas={[buildWebSiteSchema()]}
 	hasHeroImage={hasHeroImage}
 	isHomepage={true}
 >
