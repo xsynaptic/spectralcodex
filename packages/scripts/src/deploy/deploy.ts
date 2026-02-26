@@ -108,7 +108,7 @@ async function media() {
 }
 
 async function transfer() {
-	await deployApp({ rootPath, dryRun, skipDelete: skipBuild });
+	await deployApp({ rootPath, dryRun });
 }
 
 async function warmNew() {
