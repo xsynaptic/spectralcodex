@@ -100,6 +100,7 @@
 		"prettier-plugin-tailwindcss": "^0.7.2",
 		"rehype-wrap-cjk": "^1.0.9",
 		"remeda": "^2.33.6",
+		"schema-dts": "^1.1.5",
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.2.1",
 		"tsx": "^4.21.0",

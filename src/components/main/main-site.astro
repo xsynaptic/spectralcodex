@@ -1,10 +1,13 @@
 ---
+import type { Thing, WithContext } from 'schema-dts';
+
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
 import { IPX_SERVER_URL } from 'astro:env/server';
-import { ClientRouter } from 'astro:transitions';
 
 import '#styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
 import type { MetaProps } from '#components/types.ts';
 
 import MainFooter from '#components/main/main-footer.astro';
@@ -14,15 +17,17 @@ import ModeManager from '#components/main/main-mode-manager.astro';
 import ProgressBarLoading from '#components/main/main-progress-loading.astro';
 import ProgressBarReading from '#components/main/main-progress-reading.astro';
 import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
+import Schemas from '#components/parts/schemas.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	meta?: MetaProps;
+	schemas?: Array<WithContext<Thing>>;
 	hasHeroImage?: boolean;
 	isHomepage?: boolean;
 }
 
-const { hasHeroImage = false, meta, isHomepage = false } = Astro.props;
+const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -81,5 +86,6 @@ const { hasHeroImage = false, meta, isHomepage = false } = Astro.props;
 			]}
 			height="2.5px"
 		/>
+		{schemas && schemas.length > 0 ? <Schemas schemas={schemas} /> : undefined}
 	</body>
 </html>

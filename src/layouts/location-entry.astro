@@ -28,6 +28,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
+import { getLocationSchemas } from '#lib/collections/locations/locations-utils.ts';
 import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -92,6 +93,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
+	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	hasHeroImage={hasHeroImage}
 >
 	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
