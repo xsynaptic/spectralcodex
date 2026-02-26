@@ -10,7 +10,6 @@ Disallow: /_x/
 Disallow: /pagefind/
 Disallow: /api/
 
-User-agent: *
 Sitemap: ${sitemapUrl}
 `);
 }) satisfies APIRoute;
