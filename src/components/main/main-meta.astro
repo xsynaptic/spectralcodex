@@ -10,8 +10,8 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getOpenGraphImageUrl } from '#lib/image/image-server.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { getSeoDescription, getSeoImageFallback } from '#lib/utils/seo.ts';
-import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { getSeoImageFallback } from '#lib/utils/seo.ts';
+import { sanitizeAltAttribute, sanitizeDescription } from '#lib/utils/text.ts';
 
 type Props = MetaProps;
 
@@ -33,7 +33,7 @@ const t = getTranslations();
 const siteTitle = t('site.title');
 const siteDescription = t('site.description');
 
-const description = getSeoDescription(descriptionRaw) ?? siteDescription;
+const description = sanitizeDescription(descriptionRaw) ?? siteDescription;
 
 async function generateOpenGraphImageUrl({
 	imageId,

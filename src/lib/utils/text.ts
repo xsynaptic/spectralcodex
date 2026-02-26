@@ -1,4 +1,7 @@
-import { stripTags } from '@xsynaptic/unified-tools';
+import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import * as R from 'remeda';
+
+import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
 
 export function textClipper(
 	input: string,
@@ -44,6 +47,25 @@ function encodeHtmlEntities(input: string): string {
 		.replaceAll('>', '&gt;')
 		.replaceAll('&', '&amp;')
 		.replaceAll('"', '&quot;');
+}
+
+// Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
+function stripFootnoteReferences(input: string) {
+	return input.replaceAll(/\[\^[^\]]+\]/g, '');
+}
+
+// Simple text-only SEO description that accepts a variety of things you might throw at it
+export function sanitizeDescription(description: string | undefined) {
+	return description
+		? R.pipe(
+				description,
+				stripFootnoteReferences,
+				(description) => stripMdxComponents(description, MDX_COMPONENTS_TO_STRIP),
+				(description) => transformMarkdown({ input: description }),
+				stripTags,
+				(stripped) => textClipper(stripped, { wordCount: 100 }),
+			)
+		: undefined;
 }
 
 // Sanitize image captions before returning them for display

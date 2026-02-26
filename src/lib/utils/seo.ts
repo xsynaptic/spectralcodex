@@ -1,40 +1,15 @@
 import { cacheFileExists } from '@spectralcodex/shared/cache';
 import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
-import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import path from 'node:path';
 import * as R from 'remeda';
 import urlJoin from 'url-join';
 
-import {
-	MDX_COMPONENTS_TO_STRIP,
-	OPEN_GRAPH_IMAGE_FALLBACK_COUNT,
-	OPEN_GRAPH_IMAGE_FALLBACK_PREFIX,
-} from '#constants.ts';
+import { OPEN_GRAPH_IMAGE_FALLBACK_COUNT, OPEN_GRAPH_IMAGE_FALLBACK_PREFIX } from '#constants.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { logError } from '#lib/utils/logging.ts';
-import { stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
-
-// Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
-function stripFootnoteReferences(input: string) {
-	return input.replaceAll(/\[\^[^\]]+\]/g, '');
-}
-
-// Simple text-only SEO description that accepts a variety of things you might throw at it
-export function getSeoDescription(description: string | undefined) {
-	return description
-		? R.pipe(
-				description,
-				stripFootnoteReferences,
-				(description) => stripMdxComponents(description, MDX_COMPONENTS_TO_STRIP),
-				(description) => transformMarkdown({ input: description }),
-				stripTags,
-				(stripped) => textClipper(stripped, { wordCount: 100 }),
-			)
-		: undefined;
-}
 
 // Generate some common props for posts and post-like content
 export function getSeoArticleProps({
