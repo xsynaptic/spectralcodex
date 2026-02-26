@@ -3,7 +3,7 @@ import * as R from 'remeda';
 
 import { MDX_COMPONENTS_TO_STRIP } from '#constants.ts';
 
-export function textClipper(
+function textClipper(
 	input: string,
 	options: { wordCount: number; trailer?: string | undefined },
 ): string {

@@ -1,7 +1,7 @@
 /**
  * Carousel slider element; this requires a container and some navigation buttons to work properly
  */
-export class CarouselSlider extends HTMLElement {
+class CarouselSlider extends HTMLElement {
 	#handleClick = (event: Event) => {
 		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-carousel-nav]');
 
@@ -40,6 +40,8 @@ export class CarouselSlider extends HTMLElement {
 }
 
 customElements.define('carousel-slider', CarouselSlider);
+
+export {};
 
 declare global {
 	interface HTMLElementTagNameMap {
