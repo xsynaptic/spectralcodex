@@ -7,10 +7,10 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"astro": "^6.0.0-beta.15",
+		"astro": "^6.0.0-beta.17",
 		"eslint": "^9.39.3",
-		"eslint-mdx": "^3.6.2",
-		"eslint-plugin-mdx": "^3.6.2",
+		"eslint-mdx": "^3.7.0",
+		"eslint-plugin-mdx": "^3.7.0",
 		"remark": "^15.0.1",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
