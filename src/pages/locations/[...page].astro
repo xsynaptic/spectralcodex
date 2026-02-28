@@ -12,16 +12,16 @@ import {
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	const getContentMetadata = await getContentMetadataFunction();
 
 	const metadataItems = R.pipe(
-		locations,
+		entries,
 		R.filter(getFilterEntryQualityFunction(2)),
 		R.filter((item) => !!item.data.imageFeatured),
 		getContentMetadata,
-		R.sort(sortContentMetadataByDate),
+		R.sort(sortContentMetadataByDate)
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

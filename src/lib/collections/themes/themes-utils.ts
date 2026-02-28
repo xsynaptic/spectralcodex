@@ -20,11 +20,11 @@ export async function getPostsByThemeFunction() {
 
 // Get locations that have a term
 export async function getLocationsByThemeFunction() {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	return function getLocationsByTheme(
 		entry: CollectionEntry<'themes'>,
 	): Array<CollectionEntry<'locations'>> {
-		return locations.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
+		return entries.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
 	};
 }

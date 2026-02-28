@@ -12,7 +12,7 @@ import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/schema.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function getLocationsByIdsFunction() {
-	const { locationsMap } = await getLocationsCollection();
+	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getLocationsById(ids: Array<string>): Array<CollectionEntry<'locations'>> {
 		return ids
@@ -30,7 +30,7 @@ export async function getLocationsByIdsFunction() {
 
 // Get all locations referenced by a set of posts
 export async function getLocationsByPostsFunction() {
-	const { locationsMap } = await getLocationsCollection();
+	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getLocationsByPosts(
 		...posts: Array<CollectionEntry<'posts'>>

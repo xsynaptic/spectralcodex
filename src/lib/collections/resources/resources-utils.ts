@@ -8,7 +8,7 @@ import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources
  * Get locations associated with a resource (via links URL match or sources ID match)
  */
 export async function getLocationsByResourceFunction() {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	return function getLocationsByResource(
 		resource: CollectionEntry<'resources'>,
@@ -16,7 +16,7 @@ export async function getLocationsByResourceFunction() {
 		const resourceId = resource.id;
 		const matchPattern = resource.data.match;
 
-		return locations.filter((location) => {
+		return entries.filter((location) => {
 			// Check URL match via links field (for website-type resources with match field)
 			const hasLinkMatch =
 				matchPattern &&

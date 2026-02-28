@@ -6,12 +6,12 @@ import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.
 // Saved queries for use in MDX and other places
 // TODO: this should eventually be handled via user authentication
 export async function getObjectiveLocations() {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	const getRegionsByIds = await getRegionsByIdsFunction();
 
 	return R.pipe(
-		locations,
+		entries,
 		R.filter((entry) => !!entry.data.objective && entry.data.objective >= 1),
 		R.filter((entry) =>
 			getRegionsByIds(entry.data.regions.map(({ id }) => id)).some(

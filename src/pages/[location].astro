@@ -17,14 +17,14 @@ import {
 } from '#lib/metadata/metadata-utils.ts';
 
 export const getStaticPaths = (async () => {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	const getPostsByIds = await getPostsByIdsFunction();
 	const getContentMetadata = await getContentMetadataFunction();
 	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 	const getContentBacklinks = await getContentBacklinksFunction();
 
-	return locations.map((entry) => {
+	return entries.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(
 			entry.data.override?.regions ?? entry.data.regions
 		);

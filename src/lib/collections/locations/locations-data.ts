@@ -5,7 +5,6 @@ import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
-import pMemoize from 'p-memoize';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
@@ -15,12 +14,8 @@ import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getIpxImageUrl } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
+import { createCollectionData } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-
-interface CollectionData {
-	locations: Array<CollectionEntry<'locations'>>;
-	locationsMap: Map<string, CollectionEntry<'locations'>>;
-}
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
@@ -149,38 +144,24 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
  * To reduce the cost we use buffer zones to reduce the overall number of operations performed
  * We also stash distance pairs in a Map to further cut calculations by half
  */
-async function generateCollection(): Promise<CollectionData> {
-	const startTime = performance.now();
+export const getLocationsCollection = createCollectionData({
+	collection: 'locations',
+	label: 'Locations',
+	async augment(entries) {
+		const locationsFiltered = import.meta.env.DEV
+			? entries
+			: entries.filter((location) => !location.data.hideLocation);
 
-	const locations = await getCollection('locations');
+		const generateLocationPostData = await generateLocationPostDataFunction();
+		const generateNearbyItems = getGenerateNearbyItemsFunction(locationsFiltered);
 
-	const locationsFiltered = import.meta.env.DEV
-		? locations
-		: locations.filter((location) => !location.data.hideLocation);
+		// Loop through every item in the collection and add metadata
+		for (const entry of entries) {
+			generateLocationPostData(entry);
+			await generateLocationMapData(entry);
+			generateNearbyItems(entry);
+		}
 
-	const generateLocationPostData = await generateLocationPostDataFunction();
-	const generateNearbyItems = getGenerateNearbyItemsFunction(locationsFiltered);
-
-	// Loop through every item in the collection and add metadata
-	for (const entry of locations) {
-		generateLocationPostData(entry);
-		await generateLocationMapData(entry);
-		generateNearbyItems(entry);
-	}
-
-	await generateLocationImageData(locations);
-
-	const locationsMap = new Map<string, CollectionEntry<'locations'>>();
-
-	for (const entry of locations) {
-		locationsMap.set(entry.id, entry);
-	}
-
-	console.log(
-		`[Locations] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
-	);
-
-	return { locations, locationsMap };
-}
-
-export const getLocationsCollection = pMemoize(generateCollection);
+		await generateLocationImageData(entries);
+	},
+});

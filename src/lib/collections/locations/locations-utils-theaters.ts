@@ -7,10 +7,10 @@ import { sortLocationsByLatitude } from '#lib/collections/locations/locations-ut
 // Saved queries for use in MDX and other places
 // TODO: this should eventually end up in a database or something
 export async function getTheaterLocations() {
-	const { locations } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	const theaterLocations = R.pipe(
-		locations,
+		entries,
 		R.filter(({ data }) => !!data.themes?.find(({ id }) => id === 'taiwan-theaters')),
 	);
 

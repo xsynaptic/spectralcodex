@@ -19,7 +19,7 @@ interface Props {
 
 const { entry, limit = LOCATIONS_NEARBY_COUNT_LIMIT, ...props } = Astro.props;
 
-const { locationsMap } = await getLocationsCollection();
+const { entriesMap: locationsMap } = await getLocationsCollection();
 
 const locationsNearby = entry.data._nearby?.slice(0, limit) ?? [];
 

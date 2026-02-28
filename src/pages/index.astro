@@ -13,7 +13,7 @@ import {
 } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
-const { locations } = await getLocationsCollection();
+const { entries: locations } = await getLocationsCollection();
 const { entries: posts } = await getPostsCollection();
 const { entries: series } = await getSeriesCollection();
 const { entries: themes } = await getThemesCollection();

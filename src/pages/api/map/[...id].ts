@@ -24,7 +24,7 @@ import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
 // This somewhat awkward arrangement is meant to solve the issue of increasingly large payloads
 // While reducing round trips to the server and ensuring popups still work instantaneously
 export const getStaticPaths = (async () => {
-	const { locations } = await getLocationsCollection();
+	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 	const { entries: regions } = await getRegionsCollection();
 	const { entries: resources } = await getResourcesCollection();

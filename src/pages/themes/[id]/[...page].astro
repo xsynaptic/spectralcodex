@@ -20,7 +20,7 @@ import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { locations } = await getLocationsCollection();
+	const { entries: locations } = await getLocationsCollection();
 	const { entries: themes } = await getThemesCollection();
 
 	const getPostsByTerm = await getPostsByThemeFunction();

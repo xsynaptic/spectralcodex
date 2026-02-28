@@ -27,7 +27,7 @@ export async function getSeriesContentMetadataItemsFunction() {
 
 // Generate geodata for series items; combines posts with multiple locations and individual locations
 export async function getLocationsBySeriesFunction() {
-	const { locationsMap } = await getLocationsCollection();
+	const { entriesMap: locationsMap } = await getLocationsCollection();
 	const { entriesMap: postsMap } = await getPostsCollection();
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();

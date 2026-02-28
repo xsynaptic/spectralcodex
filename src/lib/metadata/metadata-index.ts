@@ -87,7 +87,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	const { entries: ephemera } = await getEphemeraCollection();
 	const { entries: images } = await getImagesCollection();
-	const { locations } = await getLocationsCollection();
+	const { entries: locations } = await getLocationsCollection();
 	const { entries: pages } = await getPagesCollection();
 	const { entries: posts } = await getPostsCollection();
 	const { entries: regions } = await getRegionsCollection();
