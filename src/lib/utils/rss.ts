@@ -114,9 +114,9 @@ export async function generateFeedItems({
 	excludeFootnotes: boolean;
 	debug: boolean;
 }) {
-	const { ephemera } = await getEphemeraCollection();
+	const { entries: ephemera } = await getEphemeraCollection();
 	const { locations } = await getLocationsCollection();
-	const { posts } = await getPostsCollection();
+	const { entries: posts } = await getPostsCollection();
 
 	const filterEntryQuality = getFilterEntryQualityFunction(3);
 

@@ -5,9 +5,9 @@ import PageEntry from '#layouts/page-entry.astro';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 
 export const getStaticPaths = (async () => {
-	const { pages } = await getPagesCollection();
+	const { entries } = await getPagesCollection();
 
-	return pages.map((entry) => ({
+	return entries.map((entry) => ({
 		params: { id: entry.id },
 		props: { entry },
 	}));

@@ -2,27 +2,10 @@ import type { CollectionEntry } from 'astro:content';
 import type { Thing } from 'schema-dts';
 
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/schema.ts';
 
-// Transform IDs into entries (and emit a warning when an ID doesn't match)
-export async function getPostsByIdsFunction() {
-	const { postsMap } = await getPostsCollection();
-
-	return function getPostsById(ids: Array<string>) {
-		return ids
-			.map((id) => {
-				const entry = postsMap.get(id);
-
-				if (!entry && import.meta.env.DEV) {
-					console.warn(`[Posts] Requested entry "${id}" not found!`);
-				}
-				return entry;
-			})
-			.filter((entry): entry is CollectionEntry<'posts'> => !!entry) satisfies Array<
-			CollectionEntry<'posts'>
-		>;
-	};
-}
+export const getPostsByIdsFunction = createCollectionLookupByIds('Posts', getPostsCollection);
 
 export function getPostSchema(
 	entry: CollectionEntry<'posts'>,

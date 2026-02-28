@@ -9,16 +9,16 @@ import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { regions } = await getRegionsCollection();
+	const { entries } = await getRegionsCollection();
 
 	const getContentMetadata = await getContentMetadataFunction();
 
 	const metadataItems = R.pipe(
-		regions,
+		entries,
 		R.filter(({ data }) => data.parent === undefined), // Only ancestral terms
 		R.filter(filterWithContent),
 		R.sort(sortByContentCount),
-		getContentMetadata,
+		getContentMetadata
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

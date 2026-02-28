@@ -1,7 +1,7 @@
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 
 async function createImageByIdFunction() {
-	const { imagesMap } = await getImagesCollection();
+	const { entriesMap: imagesMap } = await getImagesCollection();
 
 	return function getImageById(id: string | undefined) {
 		if (!id) return;

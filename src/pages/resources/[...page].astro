@@ -8,11 +8,11 @@ import { getResourcesCollection } from '#lib/collections/resources/resources-dat
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { resources } = await getResourcesCollection();
+	const { entries } = await getResourcesCollection();
 
 	const items = R.pipe(
-		resources,
-		R.filter((resource) => !!resource.data.showPage),
+		entries,
+		R.filter((entry) => !!entry.data.showPage),
 		R.filter(filterWithContent),
 		R.sort(sortByContentCount),
 	);

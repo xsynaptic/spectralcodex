@@ -14,9 +14,9 @@ import {
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 const { locations } = await getLocationsCollection();
-const { posts } = await getPostsCollection();
-const { series } = await getSeriesCollection();
-const { themes } = await getThemesCollection();
+const { entries: posts } = await getPostsCollection();
+const { entries: series } = await getSeriesCollection();
+const { entries: themes } = await getThemesCollection();
 
 const getContentMetadata = await getContentMetadataFunction();
 

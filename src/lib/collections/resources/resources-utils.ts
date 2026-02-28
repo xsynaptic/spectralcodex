@@ -40,7 +40,7 @@ export async function getLocationsByResourceFunction() {
  * Get posts associated with a resource (via links URL match or sources ID match)
  */
 export async function getPostsByResourceFunction() {
-	const { posts } = await getPostsCollection();
+	const { entries } = await getPostsCollection();
 
 	return function getPostsByResource(
 		resource: CollectionEntry<'resources'>,
@@ -48,18 +48,18 @@ export async function getPostsByResourceFunction() {
 		const resourceId = resource.id;
 		const matchPattern = resource.data.match;
 
-		return posts.filter((post) => {
+		return entries.filter((entry) => {
 			// Check URL match via links field (for website-type resources with match field)
 			const hasLinkMatch =
 				matchPattern &&
-				post.data.links?.some((link) =>
+				entry.data.links?.some((link) =>
 					typeof link === 'string'
 						? matchLinkUrl(link, matchPattern)
 						: matchLinkUrl(link.url, matchPattern),
 				);
 
 			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = post.data.sources?.some((source) =>
+			const hasSourceMatch = entry.data.sources?.some((source) =>
 				typeof source === 'string' ? source === resourceId : false,
 			);
 
@@ -72,7 +72,7 @@ export async function getPostsByResourceFunction() {
  * Resolve links and sources
  */
 export async function getResolveResourceLinksFunction() {
-	const { resources } = await getResourcesCollection();
+	const { entries } = await getResourcesCollection();
 
 	return function resolveResourceLinks(
 		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
@@ -85,9 +85,7 @@ export async function getResolveResourceLinksFunction() {
 		return entryLinks
 			?.map((entryLink) => {
 				if (typeof entryLink === 'string') {
-					const resource = resources.find((resource) =>
-						matchLinkUrl(entryLink, resource.data.match),
-					);
+					const resource = entries.find((entry) => matchLinkUrl(entryLink, entry.data.match));
 
 					return resource ? { id: resource.id, ...resource.data, url: entryLink } : undefined;
 				}
@@ -99,7 +97,7 @@ export async function getResolveResourceLinksFunction() {
 }
 
 export async function getResolveResourceSourcesFunction() {
-	const { resourcesMap } = await getResourcesCollection();
+	const { entriesMap } = await getResourcesCollection();
 
 	return function resolveResourceSources(
 		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
@@ -112,7 +110,7 @@ export async function getResolveResourceSourcesFunction() {
 		return entrySources
 			?.map((entrySource) => {
 				if (typeof entrySource === 'string') {
-					const resource = resourcesMap.get(entrySource);
+					const resource = entriesMap.get(entrySource);
 
 					return resource ? { id: resource.id, ...resource.data } : undefined;
 				}

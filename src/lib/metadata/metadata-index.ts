@@ -85,14 +85,14 @@ function generateContentBacklinksFromMdxComponents(
 async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	const startTime = performance.now();
 
-	const { ephemera } = await getEphemeraCollection();
-	const { images } = await getImagesCollection();
+	const { entries: ephemera } = await getEphemeraCollection();
+	const { entries: images } = await getImagesCollection();
 	const { locations } = await getLocationsCollection();
-	const { pages } = await getPagesCollection();
-	const { posts } = await getPostsCollection();
-	const { regions } = await getRegionsCollection();
-	const { series } = await getSeriesCollection();
-	const { themes } = await getThemesCollection();
+	const { entries: pages } = await getPagesCollection();
+	const { entries: posts } = await getPostsCollection();
+	const { entries: regions } = await getRegionsCollection();
+	const { entries: series } = await getSeriesCollection();
+	const { entries: themes } = await getThemesCollection();
 
 	// Regions require some special handling; this will calculate a common ancestor if necessary
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();

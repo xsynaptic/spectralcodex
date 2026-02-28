@@ -5,16 +5,11 @@ import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
-import pMemoize from 'p-memoize';
 
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
-
-interface CollectionData {
-	regions: Array<CollectionEntry<'regions'>>;
-	regionsMap: Map<string, CollectionEntry<'regions'>>;
-}
+import { createCollectionData } from '#lib/utils/collections.ts';
 
 /**
  * Computed data cache
@@ -254,45 +249,37 @@ function populateRegionsContent({
 	}
 }
 
-async function generateCollection(): Promise<CollectionData> {
-	const startTime = performance.now();
+export const getRegionsCollection = createCollectionData({
+	collection: 'regions',
+	label: 'Regions',
+	async augment(entries) {
+		const augmentStart = performance.now();
 
-	const regions = await getCollection('regions');
-	const locations = await getCollection('locations');
-	const posts = await getCollection('posts');
+		const locations = await getCollection('locations');
+		const posts = await getCollection('posts');
 
-	// Generate cache key from current content graph state
-	const cacheKey = generateCacheKey({ regions, locations, posts });
-	const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
+		// Generate cache key from current content graph state
+		const cacheKey = generateCacheKey({ regions: entries, locations, posts });
+		const cacheData = await cacheInstance.get<RegionComputedDataCache>(cacheKey);
 
-	if (cacheData) {
-		applyComputedDataCache(regions, cacheData);
+		if (cacheData) {
+			applyComputedDataCache(entries, cacheData);
 
-		console.log(
-			`[Regions] Collection data loaded from cache in ${(performance.now() - startTime).toFixed(5)}ms`,
-		);
-	} else {
-		populateRegionsHierarchy(regions);
-		populateRegionsLangCode(regions);
-		populateRegionsContent({ regions, locations, posts });
+			console.log(
+				`[Regions] Hierarchy loaded from cache in ${(performance.now() - augmentStart).toFixed(5)}ms`,
+			);
+		} else {
+			populateRegionsHierarchy(entries);
+			populateRegionsLangCode(entries);
+			populateRegionsContent({ regions: entries, locations, posts });
 
-		// Clear old cache entries before setting new one (prevents unbounded growth)
-		await cacheInstance.clear();
-		await cacheInstance.set(cacheKey, extractComputedData(regions));
+			// Clear old cache entries before setting new one (prevents unbounded growth)
+			await cacheInstance.clear();
+			await cacheInstance.set(cacheKey, extractComputedData(entries));
 
-		console.log(
-			`[Regions] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
-		);
-	}
-
-	// Assign all data to the map and collection
-	const regionsMap = new Map<string, CollectionEntry<'regions'>>();
-
-	for (const entry of regions) {
-		regionsMap.set(entry.id, entry);
-	}
-
-	return { regions, regionsMap };
-}
-
-export const getRegionsCollection = pMemoize(generateCollection);
+			console.log(
+				`[Regions] Hierarchy computed in ${(performance.now() - augmentStart).toFixed(5)}ms`,
+			);
+		}
+	},
+});

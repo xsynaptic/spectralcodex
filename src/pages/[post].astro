@@ -13,13 +13,13 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {
-	const { posts } = await getPostsCollection();
+	const { entries } = await getPostsCollection();
 
 	const getLocationsByPosts = await getLocationsByPostsFunction();
 	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
 	const getContentBacklinks = await getContentBacklinksFunction();
 
-	return posts.map((entry) => {
+	return entries.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		return {

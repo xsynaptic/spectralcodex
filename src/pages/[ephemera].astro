@@ -6,11 +6,11 @@ import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.t
 import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {
-	const { ephemera } = await getEphemeraCollection();
+	const { entries } = await getEphemeraCollection();
 
 	const getContentBacklinks = await getContentBacklinksFunction();
 
-	return ephemera.map((entry) => ({
+	return entries.map((entry) => ({
 		params: { ephemera: entry.id },
 		props: {
 			entry,

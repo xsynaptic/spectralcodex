@@ -41,7 +41,7 @@ class CarouselSlider extends HTMLElement {
 
 customElements.define('carousel-slider', CarouselSlider);
 
-export {};
+
 
 declare global {
 	interface HTMLElementTagNameMap {

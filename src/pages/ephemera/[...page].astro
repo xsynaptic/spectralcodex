@@ -9,15 +9,15 @@ import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { ephemera } = await getEphemeraCollection();
+	const { entries } = await getEphemeraCollection();
 
-	const entries = R.pipe(
-		ephemera,
+	const entriesFiltered = R.pipe(
+		entries,
 		R.filter(getFilterEntryQualityFunction(2)),
-		R.sort(sortByDateReverseChronological),
+		R.sort(sortByDateReverseChronological)
 	);
 
-	return paginate(entries, { pageSize: 10 });
+	return paginate(entriesFiltered, { pageSize: 10 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

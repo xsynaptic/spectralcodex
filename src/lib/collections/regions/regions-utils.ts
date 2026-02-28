@@ -10,12 +10,12 @@ import { buildBreadcrumbSchema } from '#lib/utils/schema.ts';
  * Transform an array of strings into collection entries
  */
 export async function getRegionsByIdsFunction() {
-	const { regionsMap } = await getRegionsCollection();
+	const { entriesMap } = await getRegionsCollection();
 
 	return function getRegionsById(ids: Array<string>) {
 		return ids
 			.map((id) => {
-				const entry = regionsMap.get(id);
+				const entry = entriesMap.get(id);
 
 				if (!entry && import.meta.env.DEV) {
 					console.warn(`[Regions] Requested entry "${id}" not found!`);
@@ -44,11 +44,11 @@ export async function getRegionAncestorsFunction() {
 
 // References are not the complete entry; they still need to be fetched from the collection
 export async function getRegionAncestorsByIdFunction() {
-	const { regionsMap } = await getRegionsCollection();
+	const { entriesMap } = await getRegionsCollection();
 	const getRegionAncestors = await getRegionAncestorsFunction();
 
 	return function getRegionAncestorsById(regionId: string) {
-		const region = regionsMap.get(regionId);
+		const region = entriesMap.get(regionId);
 
 		if (!region)
 			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
@@ -86,7 +86,7 @@ export async function getRegionCommonAncestorFunction() {
  */
 // Return the first region from an array of region references
 export async function getFirstRegionByReferenceFunction() {
-	const { regionsMap } = await getRegionsCollection();
+	const { entriesMap } = await getRegionsCollection();
 
 	return function getFirstRegionByReference(
 		regions: Array<ReferenceDataEntry<'regions'>> | undefined,
@@ -95,7 +95,7 @@ export async function getFirstRegionByReferenceFunction() {
 
 		const regionId = regions.at(0)?.id;
 
-		return regionId ? regionsMap.get(regionId) : undefined;
+		return regionId ? entriesMap.get(regionId) : undefined;
 	};
 }
 

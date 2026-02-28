@@ -50,11 +50,11 @@ function filterMenuItemContentCount(depth: 1 | 2 | 3) {
 }
 
 async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
-	const { regions } = await getRegionsCollection();
+	const { entries: regions } = await getRegionsCollection();
 	const getRegionsByIds = await getRegionsByIdsFunction();
 
-	const { series } = await getSeriesCollection();
-	const { themes } = await getThemesCollection();
+	const { entries: series } = await getSeriesCollection();
+	const { entries: themes } = await getThemesCollection();
 
 	const filterEntryQualityFunction = getFilterEntryQualityFunction(2);
 

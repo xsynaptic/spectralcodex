@@ -9,17 +9,17 @@ import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { themes } = await getThemesCollection();
+	const { entries } = await getThemesCollection();
 
 	const getContentMetadata = await getContentMetadataFunction();
 
 	const metadataItems = R.pipe(
-		themes,
+		entries,
 		R.filter(filterWithContent),
 		/** Only display themes with associated images */
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByContentCount),
-		getContentMetadata,
+		getContentMetadata
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

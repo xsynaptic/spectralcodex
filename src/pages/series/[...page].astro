@@ -9,7 +9,7 @@ import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { series } = await getSeriesCollection();
+	const { entries: series } = await getSeriesCollection();
 
 	const getContentMetadata = await getContentMetadataFunction();
 

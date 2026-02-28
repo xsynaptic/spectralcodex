@@ -21,7 +21,7 @@ import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { locations } = await getLocationsCollection();
-	const { themes } = await getThemesCollection();
+	const { entries: themes } = await getThemesCollection();
 
 	const getPostsByTerm = await getPostsByThemeFunction();
 	const getContentMetadata = await getContentMetadataFunction();

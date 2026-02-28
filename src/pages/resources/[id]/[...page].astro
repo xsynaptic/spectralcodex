@@ -21,9 +21,9 @@ import {
 import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { resources } = await getResourcesCollection();
+	const { entries } = await getResourcesCollection();
 
-	const resourcesPublic = resources.filter((resource) => !!resource.data.showPage);
+	const entriesPublic = entries.filter((entry) => !!entry.data.showPage);
 
 	const getLocationsByResource = await getLocationsByResourceFunction();
 	const getPostsByResource = await getPostsByResourceFunction();
@@ -32,7 +32,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	const results = [];
 
-	for (const entry of resourcesPublic) {
+	for (const entry of entriesPublic) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		// Get locations associated with this link

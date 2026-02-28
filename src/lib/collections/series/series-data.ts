@@ -1,37 +1,21 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { getCollection } from 'astro:content';
-import { performance } from 'node:perf_hooks';
-import pMemoize from 'p-memoize';
 
-interface CollectionData {
-	series: Array<CollectionEntry<'series'>>;
-	seriesMap: Map<string, CollectionEntry<'series'>>;
-}
+import { createCollectionData } from '#lib/utils/collections.ts';
 
-export const getSeriesCollection = pMemoize(async (): Promise<CollectionData> => {
-	const startTime = performance.now();
+export const getSeriesCollection = createCollectionData({
+	collection: 'series',
+	label: 'Series',
+	async augment(entries) {
+		const locations = await getCollection('locations');
+		const posts = await getCollection('posts');
 
-	const locations = await getCollection('locations');
-	const posts = await getCollection('posts');
-	const series = await getCollection('series');
-
-	const seriesMap = new Map<string, CollectionEntry<'series'>>();
-
-	for (const entry of series) {
-		entry.data._locationCount = locations.filter((location) =>
-			entry.data.seriesItems?.includes(location.id),
-		).length;
-		entry.data._postCount = posts.filter((post) =>
-			entry.data.seriesItems?.includes(post.id),
-		).length;
-
-		seriesMap.set(entry.id, entry);
-	}
-
-	console.log(
-		`[Series] Collection data generated in ${(performance.now() - startTime).toFixed(5)}ms`,
-	);
-
-	return { series, seriesMap };
+		for (const entry of entries) {
+			entry.data._locationCount = locations.filter((location) =>
+				entry.data.seriesItems?.includes(location.id),
+			).length;
+			entry.data._postCount = posts.filter((post) =>
+				entry.data.seriesItems?.includes(post.id),
+			).length;
+		}
+	},
 });

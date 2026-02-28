@@ -25,11 +25,11 @@ import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
 // While reducing round trips to the server and ensuring popups still work instantaneously
 export const getStaticPaths = (async () => {
 	const { locations } = await getLocationsCollection();
-	const { posts } = await getPostsCollection();
-	const { regions } = await getRegionsCollection();
-	const { resources } = await getResourcesCollection();
-	const { series } = await getSeriesCollection();
-	const { themes } = await getThemesCollection();
+	const { entries: posts } = await getPostsCollection();
+	const { entries: regions } = await getRegionsCollection();
+	const { entries: resources } = await getResourcesCollection();
+	const { entries: series } = await getSeriesCollection();
+	const { entries: themes } = await getThemesCollection();
 
 	const getLocationsByIds = await getLocationsByIdsFunction();
 	const getLocationsByPosts = await getLocationsByPostsFunction();

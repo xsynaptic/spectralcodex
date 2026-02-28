@@ -22,7 +22,7 @@ import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getBaseUrl } from '#lib/utils/routing.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { regions } = await getRegionsCollection();
+	const { entries } = await getRegionsCollection();
 
 	const getRegionAncestors = await getRegionAncestorsFunction();
 	const getPostsByIds = await getPostsByIdsFunction();
@@ -31,7 +31,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	const results = [];
 
-	for (const entry of regions) {
+	for (const entry of entries) {
 		const ancestors = getRegionAncestors(entry);
 
 		// Note: this is temporary code to limit map display specified regions

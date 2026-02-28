@@ -22,7 +22,7 @@ export async function getContentStats() {
 
 	const contentMetadataGroups = R.groupBy(contentMetadataArray, (item) => item.collection);
 
-	const { images } = await getImagesCollection();
+	const { entries: images } = await getImagesCollection();
 
 	const contentStats = {
 		ephemera: getContentCounts(contentMetadataGroups.ephemera),
