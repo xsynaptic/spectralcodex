@@ -6,7 +6,7 @@
 	"exports": "./src/index.ts",
 	"private": true,
 	"devDependencies": {
-		"@protomaps/basemaps": "^5.7.0",
+		"@protomaps/basemaps": "^5.7.1",
 		"@spectralcodex/shared": "workspace:*",
 		"@tanstack/react-query": "^5.90.21",
 		"@tanstack/react-query-persist-client": "^5.90.23",
