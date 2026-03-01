@@ -14,7 +14,6 @@ import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
-import { checkContentQuality } from './quality';
 import { checkSlugMismatches } from './slug-mismatch';
 
 const { values, positionals } = parseArgs({
@@ -80,15 +79,6 @@ const metadataCollections: CollectionEntries = [
 	['themes', getDataStoreCollection(collections, 'themes')],
 ];
 
-const qualityCollections: CollectionEntries = [
-	['ephemera', getDataStoreCollection(collections, 'ephemera')],
-	['locations', getDataStoreCollection(collections, 'locations')],
-	['posts', getDataStoreCollection(collections, 'posts')],
-	['regions', getDataStoreCollection(collections, 'regions')],
-	['series', getDataStoreCollection(collections, 'series')],
-	['themes', getDataStoreCollection(collections, 'themes')],
-];
-
 // Note: there is no need for a help command
 switch (command) {
 	// Check for slugs that don't match filenames
@@ -127,11 +117,6 @@ switch (command) {
 		checkDivisionIds(getDataStoreCollection(collections, 'regions'));
 		break;
 	}
-	// Check for quality mismatch e.g. entry has a featured image but hasn't been bumped to quality 2
-	case 'quality': {
-		checkContentQuality(allCollections);
-		break;
-	}
 	// Check for malformed MDX components
 	case 'mdx': {
 		checkMdxComponents(allCollections);
@@ -165,7 +150,6 @@ switch (command) {
 				path.join(values['root-path'], values['media-path']),
 			),
 			checkSlugMismatches(checkSlugCollections),
-			checkContentQuality(qualityCollections),
 			checkLocationsDuplicates(getDataStoreCollection(collections, 'locations')),
 			checkLocationsRegions(getDataStoreCollection(collections, 'locations')),
 			checkLocationsOverlap(
