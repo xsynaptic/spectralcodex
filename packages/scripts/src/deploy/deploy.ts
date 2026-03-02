@@ -9,6 +9,7 @@ import { generateManifest } from '../image-server/manifest.js';
 import { ensureSshKeychain } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
 import { purgeCache } from './deploy-cache-purge.js';
+import { deployCaddy } from './deploy-caddy.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
 import { deployOg } from './deploy-og.js';
@@ -116,6 +117,10 @@ async function transfer() {
 	await deployApp({ rootPath, dryRun });
 }
 
+async function caddy() {
+	await deployCaddy({ rootPath, dryRun });
+}
+
 async function warmNew() {
 	console.log(chalk.blue('Warming new image cache...'));
 	await cacheWarmNew({ rootPath, dryRun });
@@ -133,6 +138,7 @@ try {
 	await media();
 	await transfer();
 	await og();
+	await caddy();
 	await purgeCache({ rootPath, dryRun });
 	await warmNew();
 	console.log(chalk.green('Deploy complete'));

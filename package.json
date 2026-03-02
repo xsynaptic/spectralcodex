@@ -25,6 +25,8 @@
 		"generate-redirects": "pnpm --filter @spectralcodex/scripts generate-redirects --root-path=$PWD",
 		"deploy-site": "pnpm --filter @spectralcodex/scripts deploy-site --root-path=$PWD",
 		"deploy-app": "pnpm --filter @spectralcodex/scripts deploy-app --root-path=$PWD",
+		"deploy-caddy": "pnpm --filter @spectralcodex/scripts deploy-caddy --root-path=$PWD",
+		"deploy-image-server": "pnpm --filter @spectralcodex/scripts deploy-image-server --root-path=$PWD",
 		"deploy-media": "pnpm --filter @spectralcodex/scripts deploy-media --root-path=$PWD",
 		"deploy-og": "pnpm --filter @spectralcodex/scripts deploy-og --root-path=$PWD",
 		"cache-warm": "pnpm --filter @spectralcodex/scripts image-server-warm --root-path=$PWD",
