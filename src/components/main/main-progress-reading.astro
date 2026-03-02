@@ -1,103 +1,14 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-
-import ProgressBar from './main-progress.astro';
-
-interface Props extends HTMLAttributes<'div'> {
+interface Props {
 	class?: string | undefined;
 	height?: string | undefined;
 }
 
-const { class: className, height, ...props } = Astro.props;
+const { class: className, height = '1px', ...props } = Astro.props;
 ---
 
-<ProgressBar id="reading-bar" class:list={[className]} height={height} {...props} />
+<progress-reading class:list={[className]} style={{ height }} {...props}></progress-reading>
 
 <script>
-	const animationDuration = 300;
-
-	function readingBar(selector: string) {
-		const element = document.querySelector<HTMLDivElement>(selector);
-		const readingFrame = document.querySelector('[data-reading-frame]');
-
-		if (!readingFrame) return;
-
-		function setProgress(progressValue: number) {
-			if (element) {
-				element.style.setProperty('--progress-bar', String(progressValue));
-			}
-		}
-
-		function setOpacity(opacityValue: number) {
-			if (element) {
-				element.style.setProperty('opacity', String(opacityValue));
-				element.ariaHidden = opacityValue === 0 ? 'true' : 'false';
-			}
-		}
-
-		function setFinished() {
-			setProgress(1);
-			globalThis.window.setTimeout(() => {
-				setOpacity(0);
-			}, animationDuration / 2);
-		}
-
-		// Initialize opacity value
-		setOpacity(0);
-
-		let ticking = false;
-
-		function updateProgress() {
-			if (!readingFrame) return;
-
-			const readingFrameRect = readingFrame.getBoundingClientRect();
-			const readingProgress = Math.min(
-				Math.max(
-					0,
-					(globalThis.window.innerHeight - readingFrameRect.top) /
-						(readingFrameRect.height + globalThis.window.innerHeight)
-				),
-				1
-			);
-
-			if (readingProgress === 1) {
-				setFinished();
-			} else {
-				setOpacity(1);
-				setProgress(readingProgress);
-			}
-
-			ticking = false;
-		}
-
-		function onScroll() {
-			if (ticking) return;
-			ticking = true;
-			requestAnimationFrame(updateProgress);
-		}
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) {
-						globalThis.window.addEventListener('resize', onScroll);
-						globalThis.window.addEventListener('scroll', onScroll);
-						onScroll();
-					} else {
-						globalThis.window.removeEventListener('resize', onScroll);
-						globalThis.window.removeEventListener('scroll', onScroll);
-					}
-				}
-			},
-			{
-				threshold: 0,
-			}
-		);
-
-		observer.observe(readingFrame);
-	}
-
-	document.addEventListener('DOMContentLoaded', () => {
-		readingBar('#reading-bar');
-	});
+	import '#lib/components/progress-reading.ts';
 </script>
