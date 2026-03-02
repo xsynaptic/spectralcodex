@@ -1,8 +1,15 @@
 import { stylizeText } from '@xsynaptic/unified-tools';
 import { z } from 'zod';
 
-// Stylized text schema; apply SmartyPants to arbitrary strings
-export const StylizedTextSchema = z.string().transform((value) => stylizeText(value).trim());
+// Title schema; stylized text with a reasonable upper limit
+const TITLE_CHARACTER_LENGTH = 64;
+
+export const TitleSchema = z
+	.string()
+	.max(TITLE_CHARACTER_LENGTH, {
+		message: `Titles must be ${String(TITLE_CHARACTER_LENGTH)} characters or fewer.`,
+	})
+	.transform((value) => stylizeText(value).trim());
 
 /**
  * Description schema

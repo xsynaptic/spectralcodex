@@ -12,7 +12,7 @@ import {
 import {
 	DateStringSchema,
 	NumericScaleSchema,
-	StylizedTextSchema,
+	TitleSchema,
 	UrlSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
@@ -22,8 +22,9 @@ export const resources = defineCollection({
 	schema: z
 		.object({
 			formerSlugs: z.string().array().optional(),
-			title: StylizedTextSchema,
+			title: TitleSchema,
 			...titleMultilingualSchema,
+			subtitle: z.string().optional(),
 			description: z.string().optional(),
 			// Website-specific fields (optional)
 			url: UrlSchema.optional(),

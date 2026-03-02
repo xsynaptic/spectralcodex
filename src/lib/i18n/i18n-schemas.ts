@@ -3,7 +3,7 @@ import { z } from 'zod';
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { StylizedTextSchema } from '#lib/schemas/index.ts';
+import { TitleSchema } from '#lib/schemas/index.ts';
 
 /**
  * Creates a multilingual schema object for a given base property name.
@@ -34,7 +34,7 @@ function createMultilingualSchemas<T extends string>(
 /**
  * Multilingual content schemas for this project
  */
-export const titleMultilingualSchema = createMultilingualSchemas('title', StylizedTextSchema);
+export const titleMultilingualSchema = createMultilingualSchemas('title', TitleSchema);
 
 export const nameMultilingualSchema = createMultilingualSchemas('name');
 

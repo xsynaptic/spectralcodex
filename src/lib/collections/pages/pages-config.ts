@@ -9,7 +9,7 @@ import {
 	DateStringSchema,
 	DescriptionSchema,
 	NumericScaleSchema,
-	StylizedTextSchema,
+	TitleSchema,
 } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
@@ -19,7 +19,7 @@ export const pages = defineCollection({
 	schema: z
 		.object({
 			formerSlugs: z.string().array().optional(),
-			title: StylizedTextSchema,
+			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
 			regions: reference('regions').array().optional(),
