@@ -58,6 +58,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### User Experience
 
+- Native web components for interactive elements (dark mode toggle, progress bars, image carousels)
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Visual reading progress indicator for long-form content
 - Loading progress bar during navigation
@@ -85,20 +86,23 @@ Standard Astro commands apply:
 
 ### Deployment
 
-Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns:
+Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns. The full pipeline runs:
 
-- `pnpm deploy-site` - full deployment pipeline:
-  1. Content validation (frontmatter, references, duplicates)
-  2. Related content generation (semantic similarity)
-  3. OG image generation with Satori and Sharp
-  4. Astro production build
-  5. Cache manifest generation from built HTML
-  6. Media sync to remote storage
-  7. Static file transfer via rsync
+1. Content sync and validation
+2. Redirect generation from former content slugs
+3. Related content generation (semantic similarity)
+4. OG image generation with Satori and Sharp
+5. Astro production build
+6. E2E smoke tests
+7. Cache manifest generation from built HTML
+8. Media sync to remote storage
+9. Static file transfer via rsync
+10. OG image deployment
+11. Caddy config and TLS cert sync with reload
+12. CDN cache purge (Cloudflare)
+13. New image cache warming
 
-- `pnpm deploy-media` - sync source images to remote storage (standalone)
-- `pnpm cache-warm` - pre-populate image cache on the server
-- `pnpm cache-warm --random` - randomized order for better coverage if interrupted
+The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
 
 ### MDX Configuration
 
