@@ -139,8 +139,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.3(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^35.11.0
-        version: 35.11.0
+        specifier: ^35.12.0
+        version: 35.12.0
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -148,8 +148,8 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       globals:
-        specifier: ^17.3.0
-        version: 17.3.0
+        specifier: ^17.4.0
+        version: 17.4.0
       kdbush:
         specifier: ^4.0.2
         version: 4.0.2
@@ -4296,8 +4296,8 @@ packages:
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@35.11.0:
-    resolution: {integrity: sha512-jM6yZOThs8l1yncWFs8xKcfM92V5h98W26Lpanmgx7TSkZIy9NshiAk3k6rP7sYeECB4lZGwYCHSuopC8odmew==}
+  exiftool-vendored@35.12.0:
+    resolution: {integrity: sha512-0gdIG16EMrUV8gWynDDq8iMv+zO02EXiYfDagxQloq8JtB77yNQetBwDS1E1JMvpVb+UNVmS8sDXUjHYIIVE7w==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -4599,8 +4599,8 @@ packages:
     resolution: {integrity: sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==}
     engines: {node: '>=18'}
 
-  globals@17.3.0:
-    resolution: {integrity: sha512-yMqGUQVVCkD4tqjOJf3TnrvaaHDMYp4VlUSObbkIiuCPe/ofdMBFIAcBbCSRFWOnos6qRiTVStDwqPLUclaxIw==}
+  globals@17.4.0:
+    resolution: {integrity: sha512-hjrNztw/VajQwOLsMNT1cbJiH2muO3OROCHnbehc8eY5JyD2gqz4AcMHPqgaOR59DjgUjYAYLeH699g/eWi2jw==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -11335,7 +11335,7 @@ snapshots:
     dependencies:
       eslint-plugin-perfectionist: 5.4.0(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3)
       eslint-plugin-unicorn: 62.0.0(eslint@9.39.3(jiti@2.6.1))
-      globals: 17.3.0
+      globals: 17.4.0
       typescript-eslint: 8.56.1(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - eslint
@@ -12748,7 +12748,7 @@ snapshots:
   exiftool-vendored.pl@13.52.0:
     optional: true
 
-  exiftool-vendored@35.11.0:
+  exiftool-vendored@35.12.0:
     dependencies:
       '@photostructure/tz-lookup': 11.4.0
       '@types/luxon': 3.7.1
@@ -13122,7 +13122,7 @@ snapshots:
 
   globals@16.5.0: {}
 
-  globals@17.3.0: {}
+  globals@17.4.0: {}
 
   globalthis@1.0.4:
     dependencies:
