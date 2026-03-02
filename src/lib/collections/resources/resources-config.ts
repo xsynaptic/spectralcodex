@@ -24,7 +24,7 @@ export const resources = defineCollection({
 			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			subtitle: z.string().optional(),
+			subtitle: z.string().optional(), // TODO: note that this is currently unused
 			description: z.string().optional(),
 			// Website-specific fields (optional)
 			url: UrlSchema.optional(),
