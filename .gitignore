@@ -32,6 +32,9 @@ temp/
 # certificates
 deploy/site/certs/
 
+# generated caddy config
+deploy/site/caddy/sites/spectralcodex-redirects-generated.conf
+
 # public generated files
 public/divisions/
 public/icons/

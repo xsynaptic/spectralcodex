@@ -12,6 +12,7 @@ export const themes = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/themes` }),
 	schema: z
 		.object({
+			formerSlugs: z.string().array().optional(),
 			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),

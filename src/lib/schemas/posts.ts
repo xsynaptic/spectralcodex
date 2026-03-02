@@ -10,6 +10,7 @@ import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 export const postSchema = z
 	.object({
 		slug: z.string(),
+		formerSlugs: z.string().array().optional(),
 		title: StylizedTextSchema,
 		...titleMultilingualSchema,
 		description: z.string().optional(),

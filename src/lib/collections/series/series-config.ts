@@ -11,6 +11,7 @@ export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
 	schema: z
 		.object({
+			formerSlugs: z.string().array().optional(),
 			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),

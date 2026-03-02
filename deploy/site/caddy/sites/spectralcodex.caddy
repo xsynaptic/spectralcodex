@@ -21,6 +21,7 @@ spectralcodex.com {
 	redir @no_trailing_slash {re.notrail.1}/ 301
 
 	import spectralcodex-redirects.conf
+	import spectralcodex-redirects-generated.conf
 
 	@immutable path /_x/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"

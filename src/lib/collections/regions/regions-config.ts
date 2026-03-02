@@ -15,6 +15,7 @@ export const regions = defineCollection({
 	schema: z
 		.object({
 			slug: z.string(),
+			formerSlugs: z.string().array().optional(),
 			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),

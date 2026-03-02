@@ -14,6 +14,7 @@
 		"deploy-media": "tsx ./src/deploy/deploy-media.ts",
 		"deploy-og": "tsx ./src/deploy/deploy-og.ts",
 		"dev-server": "tsx ./src/dev-server/index.ts",
+		"generate-redirects": "tsx ./src/generate-redirects/index.ts",
 		"image-server-manifest": "tsx ./src/image-server/manifest.ts",
 		"image-server-warm": "tsx ./src/image-server/cache-warm.ts",
 		"image-server-warm-new": "tsx ./src/image-server/cache-warm-new.ts",

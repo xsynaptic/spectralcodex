@@ -21,6 +21,7 @@ export const resources = defineCollection({
 	loader: glob({ pattern: '**/*.mdx', base: `${CONTENT_COLLECTIONS_PATH}/resources` }),
 	schema: z
 		.object({
+			formerSlugs: z.string().array().optional(),
 			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),

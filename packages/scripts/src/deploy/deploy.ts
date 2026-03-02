@@ -48,6 +48,11 @@ async function validate() {
 	await $({ stdio: 'inherit' })`pnpm content-validate --root-path=${rootPath}`;
 }
 
+async function generateRedirects() {
+	console.log(chalk.blue('Generating redirects...'));
+	await $({ stdio: 'inherit' })`pnpm generate-redirects --root-path=${rootPath}`;
+}
+
 async function related() {
 	console.log(chalk.blue('Generating related content...'));
 	await $({
@@ -119,6 +124,7 @@ async function warmNew() {
 try {
 	await sync();
 	await validate();
+	await generateRedirects();
 	await related();
 	await opengraph();
 	await build();

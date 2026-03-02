@@ -18,6 +18,7 @@ export const pages = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/pages` }),
 	schema: z
 		.object({
+			formerSlugs: z.string().array().optional(),
 			title: StylizedTextSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
