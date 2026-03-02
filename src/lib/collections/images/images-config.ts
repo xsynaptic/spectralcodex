@@ -3,12 +3,18 @@ import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { defineCollection } from 'astro:content';
-import { CONTENT_MEDIA_PATH, CUSTOM_CACHE_PATH } from 'astro:env/server';
+import {
+	CONTENT_MEDIA_PATH,
+	CUSTOM_CACHE_PATH,
+	IPX_SERVER_SECRET,
+	IPX_SERVER_URL,
+} from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { getIpxImageUrl } from '#lib/image/image-server.ts';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { DateStringSchema } from '#lib/schemas/index.ts';
@@ -90,6 +96,13 @@ function getImageExposureValue({
 
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
+
+const getIpxImageUrl = createIpxImageUrlFunction({
+	imageQuality: IMAGE_QUALITY,
+	imageFormat: IMAGE_FORMAT,
+	serverSecret: IPX_SERVER_SECRET,
+	serverUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
+});
 
 // Initialize ExifTool instance so it can be reused
 let exiftool: ExifTool;

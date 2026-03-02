@@ -6,9 +6,7 @@ import { WEBMENTION_DOMAIN } from 'astro:env/client';
 import type { MetaProps } from '#components/types.ts';
 
 import { OPEN_GRAPH_IMAGE_DENSITY, OPEN_GRAPH_TWITTER_USERNAME } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getOpenGraphImageUrl } from '#lib/image/image-server.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeAltAttribute, sanitizeDescription } from '#lib/utils/text.ts';
@@ -20,7 +18,6 @@ const {
 	description: descriptionRaw,
 	ogType,
 	image,
-	imageId,
 	imageAlt,
 	article,
 	prefetchUrls,
@@ -35,24 +32,17 @@ const siteDescription = t('site.description');
 
 const description = sanitizeDescription(descriptionRaw) ?? siteDescription;
 
-async function generateOpenGraphImageUrl({
-	imageId,
+function generateOpenGraphImageUrl({
 	imageUrl,
 	imageAlt,
 }: {
-	imageId?: string | undefined;
 	imageUrl?: string | URL | undefined;
 	imageAlt: string;
 }) {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = imageId ? getImageById(imageId) : undefined;
-
 	const imageLocalUrl = imageUrl ? new URL(imageUrl, Astro.site).href : undefined;
 
 	// Generate OG image URL using IPX CDN (no local image processing)
-	const openGraphImageUrl =
-		imageLocalUrl ?? (imageEntry ? getOpenGraphImageUrl(imageEntry.id) : getSeoImageFallback());
+	const openGraphImageUrl = imageLocalUrl ?? getSeoImageFallback();
 
 	return {
 		url: openGraphImageUrl,
@@ -63,8 +53,7 @@ async function generateOpenGraphImageUrl({
 	};
 }
 
-const openGraphImage = await generateOpenGraphImageUrl({
-	imageId,
+const openGraphImage = generateOpenGraphImageUrl({
 	imageUrl: image?.url,
 	imageAlt: image?.alt ?? imageAlt ?? description,
 });

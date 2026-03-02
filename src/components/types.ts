@@ -16,7 +16,6 @@ export interface MetaProps {
 	description?: string | undefined;
 	ogType?: 'article' | 'website' | undefined;
 	image?: MetaImageProps | undefined;
-	imageId?: string | undefined;
 	imageAlt?: string | undefined;
 	article?: {
 		publishedTime?: string;

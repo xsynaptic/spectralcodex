@@ -1,14 +1,23 @@
 ---
 import { Image as UnpicImage } from '@unpic/astro/base';
+import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
 import type { ImageComponentProps } from '#lib/image/image-types.ts';
 
-import { signedIpxTransformer } from '#lib/image/image-server.ts';
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { createSignedIpxTransformer } from '#lib/image/image-server.ts';
 
 // Props interface: same as unpic base but without transformer
 type Props = ImageComponentProps;
 
 const { class: className, ...props } = Astro.props;
+
+const signedIpxTransformer = createSignedIpxTransformer({
+	imageQuality: IMAGE_QUALITY,
+	imageFormat: IMAGE_FORMAT,
+	serverSecret: IPX_SERVER_SECRET,
+	serverUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
+});
 ---
 
 <UnpicImage

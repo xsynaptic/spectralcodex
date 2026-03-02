@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
  * Sign a URL by appending a signature query parameter
  * Pure function that takes the secret as a parameter for testability
  * Note 1: nginx's $uri is decoded, so we need to decode the pathname again
- * Note 2: this needs to be in its own file
+ * Note 2: this needs to be in its own file for integration tests
  */
 export function generateSignedUrl(url: string, secret: string): string {
 	const urlObj = new URL(url);

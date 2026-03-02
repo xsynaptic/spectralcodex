@@ -4,20 +4,28 @@ import { hashShort } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
-import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getIpxImageUrl } from '#lib/image/image-server.ts';
+import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
+
+const getIpxImageUrl = createIpxImageUrlFunction({
+	imageQuality: IMAGE_QUALITY,
+	imageFormat: IMAGE_FORMAT,
+	serverSecret: IPX_SERVER_SECRET,
+	serverUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
+});
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
