@@ -5,13 +5,13 @@ import * as R from 'remeda';
 
 import RegionIndex from '#layouts/region-index.astro';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries } = await getRegionsCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
+	const getContentMetadata = await createContentMetadataFunction();
 
 	const metadataItems = R.pipe(
 		entries,

@@ -33,7 +33,7 @@ export function filterWithContent<T extends CollectionEntryWithContentCount>(ent
 }
 
 // Filter content by entry quality
-export function getFilterEntryQualityFunction<
+export function createFilterEntryQualityFunction<
 	T extends CollectionEntry<ContentMetadataCollectionKey>,
 >(entryQuality: 1 | 2 | 3 | 4 | 5) {
 	return function filterEntryQuality(entry: T): entry is T {

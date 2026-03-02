@@ -6,12 +6,12 @@ import type { MenuItem } from '#lib/main/main-types.ts';
 
 import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { getRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
@@ -51,12 +51,12 @@ function filterMenuItemContentCount(depth: 1 | 2 | 3) {
 
 async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 	const { entries: regions } = await getRegionsCollection();
-	const getRegionsByIds = await getRegionsByIdsFunction();
+	const getRegionsByIds = await createRegionsByIdsFunction();
 
 	const { entries: series } = await getSeriesCollection();
 	const { entries: themes } = await getThemesCollection();
 
-	const filterEntryQualityFunction = getFilterEntryQualityFunction(2);
+	const filterEntryQuality = createFilterEntryQualityFunction(2);
 
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
@@ -88,14 +88,14 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		}));
 
 	const seriesMenu = series
-		.filter(filterEntryQualityFunction)
+		.filter(filterEntryQuality)
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, slug: 'series' }));
 
 	const themesMenu = themes
-		.filter(filterEntryQualityFunction)
+		.filter(filterEntryQuality)
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)

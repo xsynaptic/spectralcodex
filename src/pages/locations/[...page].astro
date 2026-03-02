@@ -6,19 +6,19 @@ import * as R from 'remeda';
 import LocationIndex from '#layouts/location-index.astro';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
-	getContentMetadataFunction,
+	createContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries } = await getLocationsCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
+	const getContentMetadata = await createContentMetadataFunction();
 
 	const metadataItems = R.pipe(
 		entries,
-		R.filter(getFilterEntryQualityFunction(2)),
+		R.filter(createFilterEntryQualityFunction(2)),
 		R.filter((item) => !!item.data.imageFeatured),
 		getContentMetadata,
 		R.sort(sortContentMetadataByDate)

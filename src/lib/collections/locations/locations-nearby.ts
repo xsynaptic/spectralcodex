@@ -57,7 +57,7 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
  * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
  * Post-query filtering handles status checks (demolished, etc.)
  */
-export function getGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
+export function createGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
 	const { pointsMap, pointsIndex } = extractPoints(locations);
 
 	// Build spatial index from all points (no pre-filtering)

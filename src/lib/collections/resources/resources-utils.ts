@@ -7,7 +7,7 @@ import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources
 /**
  * Get locations associated with a resource (via links URL match or sources ID match)
  */
-export async function getLocationsByResourceFunction() {
+export async function createLocationsByResourceFunction() {
 	const { entries } = await getLocationsCollection();
 
 	return function getLocationsByResource(
@@ -39,7 +39,7 @@ export async function getLocationsByResourceFunction() {
 /**
  * Get posts associated with a resource (via links URL match or sources ID match)
  */
-export async function getPostsByResourceFunction() {
+export async function createPostsByResourceFunction() {
 	const { entries } = await getPostsCollection();
 
 	return function getPostsByResource(
@@ -71,7 +71,7 @@ export async function getPostsByResourceFunction() {
 /**
  * Resolve links and sources
  */
-export async function getResolveResourceLinksFunction() {
+export async function createResolveResourceLinksFunction() {
 	const { entries } = await getResourcesCollection();
 
 	return function resolveResourceLinks(
@@ -96,7 +96,7 @@ export async function getResolveResourceLinksFunction() {
 	};
 }
 
-export async function getResolveResourceSourcesFunction() {
+export async function createResolveResourceSourcesFunction() {
 	const { entriesMap } = await getResourcesCollection();
 
 	return function resolveResourceSources(

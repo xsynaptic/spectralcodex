@@ -4,20 +4,20 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import PostEntry from '#layouts/post-entry.astro';
-import { getLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
+import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getPostsCollection();
 
-	const getLocationsByPosts = await getLocationsByPostsFunction();
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
-	const getContentBacklinks = await getContentBacklinksFunction();
+	const getLocationsByPosts = await createLocationsByPostsFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const getContentBacklinks = await createContentBacklinksFunction();
 
 	return entries.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);

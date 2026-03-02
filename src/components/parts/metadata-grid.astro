@@ -10,7 +10,7 @@ import Grid from '#components/parts/grid.astro';
 import Link from '#components/parts/link.astro';
 import Preview from '#components/parts/metadata-grid-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getRegionAncestorsByIdFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createRegionAncestorsByIdFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
@@ -33,7 +33,7 @@ const {
 	showTitleMultilingual,
 } = Astro.props;
 
-const getRegionAncestorsById = await getRegionAncestorsByIdFunction();
+const getRegionAncestorsById = await createRegionAncestorsByIdFunction();
 
 const t = getTranslations();
 ---

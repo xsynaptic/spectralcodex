@@ -4,7 +4,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getThemesByIdsFunction } from '#lib/collections/themes/themes-utils.ts';
+import { createThemesByIdsFunction } from '#lib/collections/themes/themes-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByContentCount } from '#lib/utils/collections.ts';
@@ -17,7 +17,7 @@ interface Props {
 
 const { themeIds, ...props } = Astro.props;
 
-const getThemesByIds = await getThemesByIdsFunction();
+const getThemesByIds = await createThemesByIdsFunction();
 
 const themes = themeIds ? getThemesByIds(themeIds).sort(sortByContentCount) : undefined;
 

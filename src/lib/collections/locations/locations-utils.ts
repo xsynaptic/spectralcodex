@@ -3,15 +3,15 @@ import type { Thing } from 'schema-dts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
-	getFirstRegionByReferenceFunction,
-	getRegionAncestorsFunction,
+	createFirstRegionByReferenceFunction,
+	createRegionAncestorsFunction,
 } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/schema.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
-export async function getLocationsByIdsFunction() {
+export async function createLocationsByIdsFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getLocationsById(ids: Array<string>): Array<CollectionEntry<'locations'>> {
@@ -29,7 +29,7 @@ export async function getLocationsByIdsFunction() {
 }
 
 // Get all locations referenced by a set of posts
-export async function getLocationsByPostsFunction() {
+export async function createLocationsByPostsFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getLocationsByPosts(
@@ -77,8 +77,8 @@ export async function getLocationSchemas(
 
 	const t = getTranslations();
 
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
-	const getRegionAncestors = await getRegionAncestorsFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	const regionPrimary = getFirstRegionByReference(entry.data.regions);
 	const regionAncestors = regionPrimary ? getRegionAncestors(regionPrimary).toReversed() : [];

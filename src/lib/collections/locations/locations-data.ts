@@ -10,7 +10,7 @@ import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
+import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
@@ -161,7 +161,7 @@ export const getLocationsCollection = createCollectionData({
 			: entries.filter((location) => !location.data.hideLocation);
 
 		const generateLocationPostData = await generateLocationPostDataFunction();
-		const generateNearbyItems = getGenerateNearbyItemsFunction(locationsFiltered);
+		const generateNearbyItems = createGenerateNearbyItemsFunction(locationsFiltered);
 
 		// Loop through every item in the collection and add metadata
 		for (const entry of entries) {

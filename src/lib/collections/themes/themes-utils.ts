@@ -5,10 +5,10 @@ import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 
-export const getThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
+export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
 
 // Get posts that have a term
-export async function getPostsByThemeFunction() {
+export async function createPostsByThemeFunction() {
 	const { entries } = await getPostsCollection();
 
 	return function getPostsByTheme(
@@ -19,7 +19,7 @@ export async function getPostsByThemeFunction() {
 }
 
 // Get locations that have a term
-export async function getLocationsByThemeFunction() {
+export async function createLocationsByThemeFunction() {
 	const { entries } = await getLocationsCollection();
 
 	return function getLocationsByTheme(

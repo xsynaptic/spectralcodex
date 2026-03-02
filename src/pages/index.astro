@@ -8,23 +8,23 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import {
 	filterHasFeaturedImage,
-	getContentMetadataFunction,
+	createContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 const { entries: locations } = await getLocationsCollection();
 const { entries: posts } = await getPostsCollection();
 const { entries: series } = await getSeriesCollection();
 const { entries: themes } = await getThemesCollection();
 
-const getContentMetadata = await getContentMetadataFunction();
+const getContentMetadata = await createContentMetadataFunction();
 
 const metadataItems = {
 	featuredMetadataItems: R.pipe(
 		[
-			...R.pipe(locations, R.filter(getFilterEntryQualityFunction(4)), getContentMetadata),
-			...R.pipe(posts, R.filter(getFilterEntryQualityFunction(4)), getContentMetadata),
+			...R.pipe(locations, R.filter(createFilterEntryQualityFunction(4)), getContentMetadata),
+			...R.pipe(posts, R.filter(createFilterEntryQualityFunction(4)), getContentMetadata),
 		],
 		R.filter(filterHasFeaturedImage),
 		R.shuffle(),
@@ -32,8 +32,8 @@ const metadataItems = {
 	),
 	recentMetadataItems: R.pipe(
 		[
-			...R.pipe(locations, R.filter(getFilterEntryQualityFunction(3)), getContentMetadata),
-			...R.pipe(posts, R.filter(getFilterEntryQualityFunction(3)), getContentMetadata),
+			...R.pipe(locations, R.filter(createFilterEntryQualityFunction(3)), getContentMetadata),
+			...R.pipe(posts, R.filter(createFilterEntryQualityFunction(3)), getContentMetadata),
 		],
 		R.filter(filterHasFeaturedImage),
 		R.sort(sortContentMetadataByDate),
@@ -41,7 +41,7 @@ const metadataItems = {
 	),
 	seriesMetadataItems: R.pipe(
 		series,
-		R.filter(getFilterEntryQualityFunction(3)),
+		R.filter(createFilterEntryQualityFunction(3)),
 		R.shuffle(),
 		R.sortBy(({ data }) => data.entryQuality),
 		getContentMetadata,
@@ -50,7 +50,7 @@ const metadataItems = {
 	),
 	themesMetadataItems: R.pipe(
 		themes,
-		R.filter(getFilterEntryQualityFunction(3)),
+		R.filter(createFilterEntryQualityFunction(3)),
 		R.shuffle(),
 		R.sortBy(({ data }) => data.entryQuality),
 		getContentMetadata,

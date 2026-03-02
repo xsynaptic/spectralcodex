@@ -18,7 +18,7 @@ import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.t
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -27,7 +27,7 @@ import { getContentUrl } from '#lib/utils/routing.ts';
  * TODO: because there is only one container all rendering is serial; can we run multiple containers in parallel?
  * @link https://docs.astro.build/en/reference/container-reference/
  */
-async function getRenderMdxFunction() {
+async function createRenderMdxFunction() {
 	const container = await AstroContainer.create();
 
 	container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
@@ -55,7 +55,7 @@ function stripFootnotes(input: string): string {
 	return result;
 }
 
-const renderMdx = await getRenderMdxFunction();
+const renderMdx = await createRenderMdxFunction();
 
 const generateFeedItem = async ({
 	entry,
@@ -118,7 +118,7 @@ export async function generateFeedItems({
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 
-	const filterEntryQuality = getFilterEntryQualityFunction(3);
+	const filterEntryQuality = createFilterEntryQualityFunction(3);
 
 	return R.pipe(
 		await R.pipe(

@@ -3,14 +3,14 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { filterHasFeaturedImage } from '#lib/metadata/metadata-utils.ts';
 
 // Filter the content metadata index for series items by ID
-export async function getSeriesContentMetadataItemsFunction() {
+export async function createSeriesContentMetadataItemsFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	return function getSeriesContentMetadataItems(
@@ -26,11 +26,11 @@ export async function getSeriesContentMetadataItemsFunction() {
 }
 
 // Generate geodata for series items; combines posts with multiple locations and individual locations
-export async function getLocationsBySeriesFunction() {
+export async function createLocationsBySeriesFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 	const { entriesMap: postsMap } = await getPostsCollection();
 
-	const getLocationsByPosts = await getLocationsByPostsFunction();
+	const getLocationsByPosts = await createLocationsByPostsFunction();
 
 	return function getLocationsBySeries(
 		seriesItemIds: Array<string> | undefined,
@@ -70,10 +70,10 @@ export async function getLocationsBySeriesFunction() {
 }
 
 // Return all series containing a given entry; used to generate post and location metadata blocks
-export async function getSeriesByIdFunction() {
+export async function createSeriesByIdFunction() {
 	const { entries: series } = await getSeriesCollection();
 
-	const getSeriesContentMetadataItems = await getSeriesContentMetadataItemsFunction();
+	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
 
 	return function getSeriesById({
 		collection,

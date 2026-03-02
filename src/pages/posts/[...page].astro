@@ -6,19 +6,19 @@ import * as R from 'remeda';
 import PostIndex from '#layouts/post-index.astro';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import {
-	getContentMetadataFunction,
+	createContentMetadataFunction,
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
-import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries } = await getPostsCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
+	const getContentMetadata = await createContentMetadataFunction();
 
 	const metadataItems = R.pipe(
 		entries,
-		R.filter(getFilterEntryQualityFunction(2)),
+		R.filter(createFilterEntryQualityFunction(2)),
 		getContentMetadata,
 		R.sort(sortContentMetadataByDate)
 	);

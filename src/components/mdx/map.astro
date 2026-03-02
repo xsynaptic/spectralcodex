@@ -5,7 +5,7 @@ import * as R from 'remeda';
 
 import MapComponent from '#components/map/map-component.astro';
 import Container from '#components/parts/container.astro';
-import { getLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
@@ -26,7 +26,7 @@ const {
 // No map components in feed allowed
 const { isFeed } = Astro.locals;
 
-const getLocationsByReference = await getLocationsByIdsFunction();
+const getLocationsByReference = await createLocationsByIdsFunction();
 
 // API endpoint is undefined because geodata *must* be inlined with this method
 // We can't know in advance what locations are requested by content without a big performance hit

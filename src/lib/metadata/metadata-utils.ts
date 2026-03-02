@@ -10,7 +10,7 @@ import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { logError } from '#lib/utils/logging.ts';
 
 // Provision the content metadata getter function
-export async function getContentMetadataFunction(): Promise<
+export async function createContentMetadataFunction(): Promise<
 	<T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey>(
 		entries: Array<CollectionEntry<T>>,
 	) => Array<ContentMetadataItem<T>>

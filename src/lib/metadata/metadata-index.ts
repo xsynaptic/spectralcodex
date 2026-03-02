@@ -12,7 +12,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { getRegionCommonAncestorFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createRegionCommonAncestorFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -26,7 +26,7 @@ const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
 // Find the common ancestor of a set of regions so there's only one in the content metadata index
 async function getRegionPrimaryIdFunction() {
-	const getRegionCommonAncestor = await getRegionCommonAncestorFunction();
+	const getRegionCommonAncestor = await createRegionCommonAncestorFunction();
 
 	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
 		if (regions && regions.length > 0) {

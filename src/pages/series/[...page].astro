@@ -5,17 +5,17 @@ import * as R from 'remeda';
 
 import SeriesIndex from '#layouts/series-index.astro';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
-import { getFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries: series } = await getSeriesCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
+	const getContentMetadata = await createContentMetadataFunction();
 
 	const metadataItems = R.pipe(
 		series,
-		R.filter(getFilterEntryQualityFunction(2)),
+		R.filter(createFilterEntryQualityFunction(2)),
 		R.sort((a, b) =>
 			a.data.seriesItems && b.data.seriesItems
 				? b.data.seriesItems.length - a.data.seriesItems.length

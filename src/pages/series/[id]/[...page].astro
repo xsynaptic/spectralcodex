@@ -2,24 +2,24 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import SeriesEntry from '#layouts/series-entry.astro';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import {
-	getLocationsBySeriesFunction,
-	getSeriesContentMetadataItemsFunction,
+	createLocationsBySeriesFunction,
+	createSeriesContentMetadataItemsFunction,
 } from '#lib/collections/series/series-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries: series } = await getSeriesCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
-	const getSeriesContentMetadataItems = await getSeriesContentMetadataItemsFunction();
-	const getSeriesLocations = await getLocationsBySeriesFunction();
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+	const getContentMetadata = await createContentMetadataFunction();
+	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
+	const getSeriesLocations = await createLocationsBySeriesFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 	const seriesItemsMetadata = getContentMetadata(series);
 

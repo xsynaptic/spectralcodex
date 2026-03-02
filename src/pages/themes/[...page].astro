@@ -5,13 +5,13 @@ import * as R from 'remeda';
 
 import ThemeIndex from '#layouts/theme-index.astro';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { getContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries } = await getThemesCollection();
 
-	const getContentMetadata = await getContentMetadataFunction();
+	const getContentMetadata = await createContentMetadataFunction();
 
 	const metadataItems = R.pipe(
 		entries,

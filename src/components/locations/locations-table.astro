@@ -5,7 +5,7 @@ import * as R from 'remeda';
 
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 
@@ -15,7 +15,7 @@ interface Props {
 
 const { locations } = Astro.props;
 
-const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 const columns = {
 	title: 'Title',

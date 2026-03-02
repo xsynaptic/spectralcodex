@@ -5,17 +5,17 @@ import * as R from 'remeda';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getObjectiveLocations } from '#lib/collections/locations/locations-utils-objectives.ts';
 import {
-	getLocationsByIdsFunction,
-	getLocationsByPostsFunction,
+	createLocationsByIdsFunction,
+	createLocationsByPostsFunction,
 } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-import { getLocationsByResourceFunction } from '#lib/collections/resources/resources-utils.ts';
+import { createLocationsByResourceFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { getLocationsBySeriesFunction } from '#lib/collections/series/series-utils.ts';
+import { createLocationsBySeriesFunction } from '#lib/collections/series/series-utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { getLocationsByThemeFunction } from '#lib/collections/themes/themes-utils.ts';
+import { createLocationsByThemeFunction } from '#lib/collections/themes/themes-utils.ts';
 import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
 
 // Note: map API is served in two parts, suffixed to the endpoint URL:
@@ -31,11 +31,11 @@ export const getStaticPaths = (async () => {
 	const { entries: series } = await getSeriesCollection();
 	const { entries: themes } = await getThemesCollection();
 
-	const getLocationsByIds = await getLocationsByIdsFunction();
-	const getLocationsByPosts = await getLocationsByPostsFunction();
-	const getLocationsByResource = await getLocationsByResourceFunction();
-	const getLocationsByTheme = await getLocationsByThemeFunction();
-	const getLocationsBySeries = await getLocationsBySeriesFunction();
+	const getLocationsByIds = await createLocationsByIdsFunction();
+	const getLocationsByPosts = await createLocationsByPostsFunction();
+	const getLocationsByResource = await createLocationsByResourceFunction();
+	const getLocationsByTheme = await createLocationsByThemeFunction();
+	const getLocationsBySeries = await createLocationsBySeriesFunction();
 
 	const locationsData = R.pipe(
 		locations,

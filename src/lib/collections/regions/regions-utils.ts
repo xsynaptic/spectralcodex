@@ -9,7 +9,7 @@ import { buildBreadcrumbSchema } from '#lib/utils/schema.ts';
 /**
  * Transform an array of strings into collection entries
  */
-export async function getRegionsByIdsFunction() {
+export async function createRegionsByIdsFunction() {
 	const { entriesMap } = await getRegionsCollection();
 
 	return function getRegionsById(ids: Array<string>) {
@@ -32,8 +32,8 @@ export async function getRegionsByIdsFunction() {
  * Hierarchical functions
  */
 // Get all ancestors of the specified region
-export async function getRegionAncestorsFunction() {
-	const getRegionsById = await getRegionsByIdsFunction();
+export async function createRegionAncestorsFunction() {
+	const getRegionsById = await createRegionsByIdsFunction();
 
 	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
 		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
@@ -43,9 +43,9 @@ export async function getRegionAncestorsFunction() {
 }
 
 // References are not the complete entry; they still need to be fetched from the collection
-export async function getRegionAncestorsByIdFunction() {
+export async function createRegionAncestorsByIdFunction() {
 	const { entriesMap } = await getRegionsCollection();
-	const getRegionAncestors = await getRegionAncestorsFunction();
+	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	return function getRegionAncestorsById(regionId: string) {
 		const region = entriesMap.get(regionId);
@@ -59,9 +59,9 @@ export async function getRegionAncestorsByIdFunction() {
 
 // A utility function to find the common ancestor ID from an arbitrary set of regions
 // Used when generating content metadata
-export async function getRegionCommonAncestorFunction() {
-	const getRegionsById = await getRegionsByIdsFunction();
-	const getRegionAncestors = await getRegionAncestorsFunction();
+export async function createRegionCommonAncestorFunction() {
+	const getRegionsById = await createRegionsByIdsFunction();
+	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	return function getRegionCommonAncestor(regionIds: Array<string>): string | undefined {
 		const regions = getRegionsById(regionIds);
@@ -85,7 +85,7 @@ export async function getRegionCommonAncestorFunction() {
  * Primary region
  */
 // Return the first region from an array of region references
-export async function getFirstRegionByReferenceFunction() {
+export async function createFirstRegionByReferenceFunction() {
 	const { entriesMap } = await getRegionsCollection();
 
 	return function getFirstRegionByReference(
@@ -105,7 +105,7 @@ export async function getFirstRegionByReferenceFunction() {
 export async function getRegionLangCodeByEntry(
 	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
 ) {
-	const getFirstRegionByReference = await getFirstRegionByReferenceFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 	if (entry.collection === 'regions') {
 		return entry.data._langCode;
@@ -126,7 +126,7 @@ export async function getRegionSchema(
 ): Promise<Array<Thing>> {
 	const t = getTranslations();
 
-	const getRegionAncestors = await getRegionAncestorsFunction();
+	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	const allAncestors = getRegionAncestors(entry);
 	const ancestors = allAncestors.slice(1).toReversed();

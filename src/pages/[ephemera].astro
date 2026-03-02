@@ -3,12 +3,12 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import EphemeraEntry from '#layouts/ephemera-entry.astro';
 import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
-import { getContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
+import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getEphemeraCollection();
 
-	const getContentBacklinks = await getContentBacklinksFunction();
+	const getContentBacklinks = await createContentBacklinksFunction();
 
 	return entries.map((entry) => ({
 		params: { ephemera: entry.id },

@@ -5,7 +5,7 @@ import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { sortContentMetadataByDate } from '#lib/metadata/metadata-utils.ts';
 
-export async function getContentBacklinksFunction() {
+export async function createContentBacklinksFunction() {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	return function getContentBacklinks({ id }: { id: string }) {
