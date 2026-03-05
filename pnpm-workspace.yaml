@@ -17,7 +17,6 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/eslint-config'
   - '@xsynaptic/unified-tools'
   - rehype-wrap-cjk
-  - satori
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
