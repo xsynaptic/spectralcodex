@@ -139,8 +139,8 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@9.39.3(jiti@2.6.1))
       exiftool-vendored:
-        specifier: ^35.12.0
-        version: 35.12.0
+        specifier: ^35.13.1
+        version: 35.13.1
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -378,8 +378,8 @@ importers:
         specifier: ^5.90.21
         version: 5.90.21(react@19.2.4)
       '@tanstack/react-query-persist-client':
-        specifier: ^5.90.23
-        version: 5.90.23(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)
+        specifier: ^5.90.24
+        version: 5.90.24(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)
       '@turf/bbox-polygon':
         specifier: ^7.3.4
         version: 7.3.4
@@ -532,8 +532,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0
       satori:
-        specifier: ^0.19.2
-        version: 0.19.2
+        specifier: ^0.24.1
+        version: 0.24.1
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -2460,11 +2460,11 @@ packages:
   '@tanstack/query-core@5.90.20':
     resolution: {integrity: sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg==}
 
-  '@tanstack/query-persist-client-core@5.92.0':
-    resolution: {integrity: sha512-Q6gBeNwwA4fyC/PyW6xXBaAFggeEH+HmgQpmiNjVpTLsV1Una7j5Dzh4N130ZX5So13MAYOglUooceDEJJ479A==}
+  '@tanstack/query-persist-client-core@5.92.1':
+    resolution: {integrity: sha512-XGzB1lulFrGc8UwQnMI12r71R7ock/XOZvDaz3Fu3xrxCFwLHuFcABAOkIolS/6hFHe0pRdsBRXd4Q8ECqiCug==}
 
-  '@tanstack/react-query-persist-client@5.90.23':
-    resolution: {integrity: sha512-GJH6/qnX+r/wdDJJ/zrAzQhBrOeV6KAFKo5L/HTcHnqaz3JBdWLkWUVcWCKYrGrOJqupMfJEdiH8kxzXBmDS3A==}
+  '@tanstack/react-query-persist-client@5.90.24':
+    resolution: {integrity: sha512-FkfU37vHq61Efr/qGiz+CUNmGfCky1jjsaZFuS5MsWwA9vPHudCwmdirgyTx+RfcQxyHON904q/pc48zrIEhxg==}
     peerDependencies:
       '@tanstack/react-query': ^5.90.21
       react: ^18 || ^19
@@ -4296,8 +4296,8 @@ packages:
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@35.12.0:
-    resolution: {integrity: sha512-0gdIG16EMrUV8gWynDDq8iMv+zO02EXiYfDagxQloq8JtB77yNQetBwDS1E1JMvpVb+UNVmS8sDXUjHYIIVE7w==}
+  exiftool-vendored@35.13.1:
+    resolution: {integrity: sha512-RiXz8RrJSBQ5jiZA1yMicmE/FgEFK/4QkU2KsqmlvTvouOOgANsNWv0f0uZbf098Ee933BE4bec5YAOBT0DuIQ==}
     engines: {node: '>=20.0.0'}
 
   expand-template@2.0.3:
@@ -6616,8 +6616,8 @@ packages:
   sass-formatter@0.7.9:
     resolution: {integrity: sha512-CWZ8XiSim+fJVG0cFLStwDvft1VI7uvXdCNJYXhDvowiv+DsbD1nXLiQ4zrE5UBvj5DWZJ93cwN0NX5PMsr1Pw==}
 
-  satori@0.19.2:
-    resolution: {integrity: sha512-71plFHWcq6WJBM5sf/n0eHOmTBiKLUB/G8du7SmLTTLHKEKrV3TPHGKcEVIoyjnbhnjvu9HhLyF9MATB/zzL7g==}
+  satori@0.24.1:
+    resolution: {integrity: sha512-Lqj26wYdMjGR1AE/cwYkcpAFdf1EG0y0amitwu1+JnwCIrGd7cOI+Olap6ASeeOI58wydF0sfs8JET61XM0j/Q==}
     engines: {node: '>=16'}
 
   sax@1.4.3:
@@ -9575,13 +9575,13 @@ snapshots:
 
   '@tanstack/query-core@5.90.20': {}
 
-  '@tanstack/query-persist-client-core@5.92.0':
+  '@tanstack/query-persist-client-core@5.92.1':
     dependencies:
       '@tanstack/query-core': 5.90.20
 
-  '@tanstack/react-query-persist-client@5.90.23(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)':
+  '@tanstack/react-query-persist-client@5.90.24(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)':
     dependencies:
-      '@tanstack/query-persist-client-core': 5.92.0
+      '@tanstack/query-persist-client-core': 5.92.1
       '@tanstack/react-query': 5.90.21(react@19.2.4)
       react: 19.2.4
 
@@ -12748,7 +12748,7 @@ snapshots:
   exiftool-vendored.pl@13.52.0:
     optional: true
 
-  exiftool-vendored@35.12.0:
+  exiftool-vendored@35.13.1:
     dependencies:
       '@photostructure/tz-lookup': 11.4.0
       '@types/luxon': 3.7.1
@@ -15923,7 +15923,7 @@ snapshots:
     dependencies:
       suf-log: 2.5.3
 
-  satori@0.19.2:
+  satori@0.24.1:
     dependencies:
       '@shuding/opentype.js': 1.4.0-beta.0
       css-background-parser: 0.1.0

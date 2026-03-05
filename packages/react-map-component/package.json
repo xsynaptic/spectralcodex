@@ -9,7 +9,7 @@
 		"@protomaps/basemaps": "^5.7.1",
 		"@spectralcodex/shared": "workspace:*",
 		"@tanstack/react-query": "^5.90.21",
-		"@tanstack/react-query-persist-client": "^5.90.23",
+		"@tanstack/react-query-persist-client": "^5.90.24",
 		"@turf/bbox-polygon": "^7.3.4",
 		"@turf/difference": "^7.3.4",
 		"@turf/helpers": "^7.3.4",
