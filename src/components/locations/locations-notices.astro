@@ -37,7 +37,7 @@ const t = getTranslations();
 
 {
 	showDangerNotice || showDemolishedNotice ? (
-		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore>
+		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
 			{showDemolishedNotice ? (
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.demolished') })} />
