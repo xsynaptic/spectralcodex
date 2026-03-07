@@ -18,6 +18,7 @@ export default {
 		},
 		'packages/content-demo': {
 			entry: ['.remarkrc.mjs'],
+			ignore: ['collections/**'],
 			ignoreDependencies: ['remark'], // type-only import in .remarkrc.mjs
 		},
 		'packages/content': {
