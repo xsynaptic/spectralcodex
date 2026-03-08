@@ -27,7 +27,7 @@ export async function createContentBacklinksFunction() {
 			backlinkItems,
 			/** Limit backlinks to specific collections */
 			R.filter((backlinkItem) =>
-				['ephemera', 'locations', 'posts'].includes(backlinkItem.collection),
+				['notes', 'locations', 'posts'].includes(backlinkItem.collection),
 			),
 			R.sort(sortContentMetadataByDate),
 			R.take(10),

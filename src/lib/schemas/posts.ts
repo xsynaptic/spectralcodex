@@ -6,7 +6,7 @@ import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
-// Used by ephemera and posts
+// Used by notes and posts
 export const postSchema = z
 	.object({
 		slug: z.string(),

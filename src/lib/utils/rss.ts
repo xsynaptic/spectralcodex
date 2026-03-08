@@ -14,8 +14,8 @@ import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
@@ -33,7 +33,7 @@ async function createRenderMdxFunction() {
 	container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
 
 	return async function (
-		entry: CollectionEntry<'ephemera' | 'locations' | 'pages' | 'posts'>,
+		entry: CollectionEntry<'notes' | 'locations' | 'pages' | 'posts'>,
 		options?: ContainerRenderOptions,
 	) {
 		const { Content } = await render(entry);
@@ -62,7 +62,7 @@ const generateFeedItem = async ({
 	excludeFootnotes,
 	debug,
 }: {
-	entry: CollectionEntry<'ephemera' | 'locations' | 'posts'>;
+	entry: CollectionEntry<'notes' | 'locations' | 'posts'>;
 	excludeFootnotes: boolean;
 	debug: boolean;
 }) => {
@@ -114,7 +114,7 @@ export async function generateFeedItems({
 	excludeFootnotes: boolean;
 	debug: boolean;
 }) {
-	const { entries: ephemera } = await getEphemeraCollection();
+	const { entries: notes } = await getNotesCollection();
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 
@@ -123,7 +123,7 @@ export async function generateFeedItems({
 	return R.pipe(
 		await R.pipe(
 			[
-				...ephemera.filter(filterEntryQuality),
+				...notes.filter(filterEntryQuality),
 				...posts.filter(filterEntryQuality),
 				...locations.filter(filterEntryQuality),
 			],

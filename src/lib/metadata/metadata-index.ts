@@ -6,9 +6,9 @@ import * as R from 'remeda';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
-import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
@@ -85,7 +85,7 @@ function generateContentBacklinksFromMdxComponents(
 async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
 	const startTime = performance.now();
 
-	const { entries: ephemera } = await getEphemeraCollection();
+	const { entries: notes } = await getNotesCollection();
 	const { entries: images } = await getImagesCollection();
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: pages } = await getPagesCollection();
@@ -98,7 +98,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
-	for (const collection of [pages, posts, ephemera, locations, regions, themes, series]) {
+	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
 		for (const entry of collection) {
 			if (contentMetadataMap.has(entry.id)) {
 				throw new Error(
@@ -155,7 +155,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 	}
 
 	// Now run through everything again and generate backlinks from MDX components (Link, Img)
-	for (const collection of [pages, posts, ephemera, locations, regions, themes, series, images]) {
+	for (const collection of [pages, posts, notes, locations, regions, themes, series, images]) {
 		for (const entry of collection) {
 			generateContentBacklinksFromMdxComponents(entry, contentMetadataMap);
 		}

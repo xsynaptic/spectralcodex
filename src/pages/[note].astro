@@ -1,17 +1,17 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import EphemeraEntry from '#layouts/ephemera-entry.astro';
-import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
+import NotesEntry from '#layouts/notes-entry.astro';
+import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 
 export const getStaticPaths = (async () => {
-	const { entries } = await getEphemeraCollection();
+	const { entries } = await getNotesCollection();
 
 	const getContentBacklinks = await createContentBacklinksFunction();
 
 	return entries.map((entry) => ({
-		params: { ephemera: entry.id },
+		params: { note: entry.id },
 		props: {
 			entry,
 			backlinks: getContentBacklinks({ id: entry.id }),
@@ -22,4 +22,4 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<EphemeraEntry {...Astro.props} />
+<NotesEntry {...Astro.props} />

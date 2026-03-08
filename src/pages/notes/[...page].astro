@@ -3,13 +3,13 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import * as R from 'remeda';
 
-import EphemeraIndex from '#layouts/ephemera-index.astro';
-import { getEphemeraCollection } from '#lib/collections/ephemera/ephemera-data.ts';
+import NotesIndex from '#layouts/notes-index.astro';
+import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { entries } = await getEphemeraCollection();
+	const { entries } = await getNotesCollection();
 
 	const entriesFiltered = R.pipe(
 		entries,
@@ -23,4 +23,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<EphemeraIndex {...Astro.props} />
+<NotesIndex {...Astro.props} />

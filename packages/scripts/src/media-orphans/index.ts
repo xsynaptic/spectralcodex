@@ -33,7 +33,7 @@ const { collections } = loadDataStore(dataStorePath);
 
 const allEntries = [
 	...getDataStoreCollection(collections, 'archives'),
-	...getDataStoreCollection(collections, 'ephemera'),
+	...getDataStoreCollection(collections, 'notes'),
 	...getDataStoreCollection(collections, 'locations'),
 	...getDataStoreCollection(collections, 'pages'),
 	...getDataStoreCollection(collections, 'posts'),

@@ -20,15 +20,15 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	page: Page<CollectionEntry<'ephemera'>>;
+	page: Page<CollectionEntry<'notes'>>;
 }
 
 const { page } = Astro.props;
 
 const t = getTranslations();
 
-const title = t('collection.ephemera.labelPlural');
-const description = t('collection.ephemera.description');
+const title = t('collection.notes.labelPlural');
+const description = t('collection.notes.description');
 ---
 
 <MainSite
@@ -36,7 +36,7 @@ const description = t('collection.ephemera.description');
 		title,
 		description,
 		image: await getSeoImageProps({
-			id: 'index-ephemera',
+			id: 'index-notes',
 			alt: title,
 		}),
 	}}

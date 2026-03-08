@@ -14,6 +14,6 @@ export const getSiteUrl = (...routeParts: Array<string>): string =>
 // Example: /base/{collection}/{routeParts}
 export const getContentUrl = (collection: CollectionKey, ...routeParts: Array<string>): string =>
 	getSiteUrl(
-		['ephemera', 'locations', 'pages', 'posts'].includes(collection) ? '' : collection,
+		['notes', 'locations', 'pages', 'posts'].includes(collection) ? '' : collection,
 		...routeParts,
 	);

@@ -290,8 +290,8 @@ function getIndexEntries(): Array<OpenGraphContentEntry> {
 			isFallback: true,
 		},
 		{
-			id: ContentCollectionsEnum.Ephemera,
-			title: 'Ephemera',
+			id: ContentCollectionsEnum.Notes,
+			title: 'Notes',
 			imageFeaturedId: 'taiwan/miaoli/tongxiao/tongxiao-railway-granary-complex-3.jpg',
 			isFallback: true,
 		},

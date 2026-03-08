@@ -52,7 +52,7 @@ type CollectionEntries = Array<[string, Array<DataStoreEntry>]>;
 
 const allCollections: CollectionEntries = [
 	['archives', getDataStoreCollection(collections, 'archives')],
-	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['notes', getDataStoreCollection(collections, 'notes')],
 	['locations', getDataStoreCollection(collections, 'locations')],
 	['pages', getDataStoreCollection(collections, 'pages')],
 	['posts', getDataStoreCollection(collections, 'posts')],
@@ -63,14 +63,14 @@ const allCollections: CollectionEntries = [
 ];
 
 const checkSlugCollections: CollectionEntries = [
-	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['notes', getDataStoreCollection(collections, 'notes')],
 	['locations', getDataStoreCollection(collections, 'locations')],
 	['posts', getDataStoreCollection(collections, 'posts')],
 	['regions', getDataStoreCollection(collections, 'regions')],
 ];
 
 const metadataCollections: CollectionEntries = [
-	['ephemera', getDataStoreCollection(collections, 'ephemera')],
+	['notes', getDataStoreCollection(collections, 'notes')],
 	['locations', getDataStoreCollection(collections, 'locations')],
 	['pages', getDataStoreCollection(collections, 'pages')],
 	['posts', getDataStoreCollection(collections, 'posts')],

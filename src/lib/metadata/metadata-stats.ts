@@ -25,7 +25,7 @@ export async function getContentStats() {
 	const { entries: images } = await getImagesCollection();
 
 	const contentStats = {
-		ephemera: getContentCounts(contentMetadataGroups.ephemera),
+		notes: getContentCounts(contentMetadataGroups.notes),
 		locations: {
 			...getContentCounts(contentMetadataGroups.locations),
 			withImages: formatNumber({

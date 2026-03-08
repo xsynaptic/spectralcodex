@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const ContentCollectionsEnum = {
 	Archives: 'archives',
-	Ephemera: 'ephemera',
+	Notes: 'notes',
 	Locations: 'locations',
 	Pages: 'pages',
 	Posts: 'posts',

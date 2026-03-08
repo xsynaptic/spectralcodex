@@ -26,7 +26,7 @@ import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/uti
 import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
-	entry: CollectionEntry<'ephemera'>;
+	entry: CollectionEntry<'notes'>;
 	backlinks: Array<ContentMetadataItem> | undefined;
 }
 
@@ -82,7 +82,7 @@ const { Content } = await render(entry);
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem hasHeroImage={hasHeroImage}>
-						<ContentCollectionLink collection="ephemera" hasHeroImage={hasHeroImage} />
+						<ContentCollectionLink collection="notes" hasHeroImage={hasHeroImage} />
 					</DividedItem>
 					<DividedItem hasHeroImage={hasHeroImage}>
 						<ContentDate

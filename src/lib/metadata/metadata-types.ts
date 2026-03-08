@@ -8,7 +8,7 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
  */
 export type ContentMetadataCollectionKey = Extract<
 	CollectionKey,
-	'ephemera' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
+	'notes' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
 >;
 
 // This is a subset of common properties of different content collections
