@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.6.5",
+	"version": "6.6.6",
 	"scripts": {
 		"astro": "astro",
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
@@ -44,17 +44,17 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "6.0.0-beta.20",
+		"astro": "^6.0.0",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "7.0.0-beta.10",
-		"@astrojs/mdx": "5.0.0-beta.11",
-		"@astrojs/node": "10.0.0-beta.4",
-		"@astrojs/react": "^5.0.0-beta.4",
-		"@astrojs/rss": "4.0.15-beta.4",
-		"@astrojs/sitemap": "3.6.1-beta.3",
+		"@astrojs/markdown-remark": "^7.0.0",
+		"@astrojs/mdx": "^5.0.0",
+		"@astrojs/node": "^10.0.0",
+		"@astrojs/react": "^5.0.0",
+		"@astrojs/rss": "^4.0.16",
+		"@astrojs/sitemap": "^3.7.1",
 		"@playwright/test": "^1.58.2",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -108,7 +108,7 @@
 		"tailwindcss": "^4.2.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.56.1",
+		"typescript-eslint": "^8.57.0",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
 		"url-join": "^5.0.0",
