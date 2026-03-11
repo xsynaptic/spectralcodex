@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
-import type { Thing } from 'schema-dts';
+
+import type { Thing } from '#lib/utils/structured-data.ts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
@@ -8,7 +9,7 @@ import {
 } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/schema.ts';
+import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/structured-data.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function createLocationsByIdsFunction() {

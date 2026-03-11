@@ -1,10 +1,11 @@
 import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
-import type { Thing } from 'schema-dts';
+
+import type { Thing } from '#lib/utils/structured-data.ts';
 
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema } from '#lib/utils/schema.ts';
+import { buildBreadcrumbSchema } from '#lib/utils/structured-data.ts';
 
 /**
  * Transform an array of strings into collection entries

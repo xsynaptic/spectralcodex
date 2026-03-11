@@ -1,8 +1,71 @@
-import type { Article, BreadcrumbList, Graph, Person, Place, Thing, WebSite } from 'schema-dts';
-
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { sanitizeDescription } from '#lib/utils/text.ts';
+
+/**
+ * Note: these types are adapted from schema-dts, which is too heavy for the needs of this project
+ */
+interface IdReference {
+	'@id': string;
+}
+
+interface Article {
+	'@type': 'Article';
+	'@id'?: string;
+	headline: string;
+	description?: string;
+	image?: string;
+	datePublished: string;
+	dateModified?: string;
+	author: IdReference;
+	mainEntityOfPage: IdReference;
+}
+
+interface BreadcrumbList {
+	'@type': 'BreadcrumbList';
+	'@id'?: string;
+	itemListElement: Array<{
+		'@type': 'ListItem';
+		position: number;
+		name: string;
+		item?: string;
+	}>;
+}
+
+interface Person {
+	'@type': 'Person';
+	'@id'?: string;
+	name: string;
+	url: string;
+}
+
+interface Place {
+	'@type': 'Place';
+	'@id'?: string;
+	name: string;
+	description?: string;
+	url: string;
+	geo?: {
+		'@type': 'GeoCoordinates';
+		latitude: number;
+		longitude: number;
+	};
+}
+
+interface WebSite {
+	'@type': 'WebSite';
+	'@id'?: string;
+	name: string;
+	url: string;
+	description: string;
+}
+
+export type Thing = Article | BreadcrumbList | Person | Place | WebSite;
+
+interface Graph {
+	'@context': 'https://schema.org';
+	'@graph': ReadonlyArray<Thing>;
+}
 
 const SchemaFragmentIds = {
 	Website: '#website',

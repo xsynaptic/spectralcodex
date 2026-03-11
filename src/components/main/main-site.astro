@@ -1,6 +1,4 @@
 ---
-import type { Thing } from 'schema-dts';
-
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
 import { IPX_SERVER_URL } from 'astro:env/server';
@@ -9,6 +7,7 @@ import '#styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaProps } from '#components/types.ts';
+import type { Thing } from '#lib/utils/structured-data.ts';
 
 import MainFooter from '#components/main/main-footer.astro';
 import MainHeader from '#components/main/main-header.astro';
@@ -18,7 +17,7 @@ import ProgressLoading from '#components/main/main-progress-loading.astro';
 import ProgressReading from '#components/main/main-progress-reading.astro';
 import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { serializeGraph } from '#lib/utils/schema.ts';
+import { serializeGraph } from '#lib/utils/structured-data.ts';
 
 interface Props {
 	meta?: MetaProps;

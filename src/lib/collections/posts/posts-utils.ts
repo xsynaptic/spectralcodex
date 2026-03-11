@@ -1,9 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
-import type { Thing } from 'schema-dts';
+
+import type { Thing } from '#lib/utils/structured-data.ts';
 
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
-import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/schema.ts';
+import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/structured-data.ts';
 
 export const createPostsByIdsFunction = createCollectionLookupByIds('Posts', getPostsCollection);
 
