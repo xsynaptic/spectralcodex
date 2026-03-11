@@ -92,11 +92,10 @@ export const LocationCategoryNumericMapping = Object.fromEntries(
 ) as Record<(typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum], number>;
 
 export const LocationStatusEnum = {
-	Operational: 'operational',
+	Active: 'active',
 	Public: 'public',
 	Private: 'private',
-	Restored: 'restored',
-	Converted: 'converted',
+Converted: 'converted',
 	Idle: 'idle',
 	Abandoned: 'abandoned',
 	Remnants: 'remnants',

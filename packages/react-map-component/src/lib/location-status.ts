@@ -15,10 +15,10 @@ export interface LocationStatusMetadata {
 }
 
 export const LocationStatusRecords = {
-	[LocationStatusEnum.Operational]: {
-		title: 'Operational',
+	[LocationStatusEnum.Active]: {
+		title: 'Active',
 		title_zh: '經營中',
-		description: 'Still in business, typically for something close to its original purpose.',
+		description: 'In business, typically for something close to its original purpose.',
 		color: tailwindColors.emerald500,
 		stroke: tailwindColors.emerald600,
 		colorDark: tailwindColors.emerald400,
@@ -33,15 +33,6 @@ export const LocationStatusRecords = {
 		stroke: tailwindColors.green600,
 		colorDark: tailwindColors.green500,
 		strokeDark: tailwindColors.green600,
-	},
-	[LocationStatusEnum.Restored]: {
-		title: 'Restored',
-		title_zh: '修復',
-		description: 'This building or site has been restored.',
-		color: tailwindColors.lime400,
-		stroke: tailwindColors.lime500,
-		colorDark: tailwindColors.lime400,
-		strokeDark: tailwindColors.lime500,
 	},
 	[LocationStatusEnum.Converted]: {
 		title: 'Converted',
