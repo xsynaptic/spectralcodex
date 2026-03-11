@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
 
-import type { MenuItem } from '#lib/main/main-types.ts';
+import type { MenuItem } from '#lib/main/main-menu-types.ts';
 
 import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';

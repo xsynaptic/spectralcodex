@@ -1,7 +1,7 @@
 ---
-import type { ModeGeneralType } from '#lib/main/main-types.ts';
+import type { ModeGeneralType } from '#lib/components/mode-types.ts';
 
-import { ModeTypeEnum } from '#lib/main/main-types.ts';
+import { ModeTypeEnum } from '#lib/components/mode-types.ts';
 
 interface Props {
 	defaultMode?: ModeGeneralType | undefined;
@@ -38,4 +38,4 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 	import '#lib/components/mode-manager.ts';
 </script>
 
-<mode-manager default-mode={defaultMode}></mode-manager>
+<mode-manager default-mode={defaultMode} storage-key="scx-mode"></mode-manager>

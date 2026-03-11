@@ -1,6 +1,6 @@
-import type { ModeManager } from '#lib/components/mode-manager.ts';
+import type { ModeManager } from './mode-manager.ts';
 
-import { ModeTypeEnum } from '#lib/main/main-types.ts';
+import { ModeTypeEnum } from './mode-types.ts';
 
 class ModeToggle extends HTMLElement {
 	#lastClickTime = 0;

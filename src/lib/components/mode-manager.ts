@@ -1,21 +1,23 @@
-import type { ModeChangedEvent, ModeGeneralType, ModeSystemType } from '#lib/main/main-types.ts';
+import type { ModeChangedEvent, ModeGeneralType, ModeSystemType } from './mode-types.ts';
 
-import { ModeTypeEnum } from '#lib/main/main-types.ts';
+import { ModeTypeEnum } from './mode-types.ts';
 
 function isModeValid(mode: string | undefined): mode is ModeGeneralType {
 	return mode === ModeTypeEnum.Auto || mode === ModeTypeEnum.Dark || mode === ModeTypeEnum.Light;
 }
 
 export class ModeManager extends HTMLElement {
-	static observedAttributes = ['default-mode'];
+	static observedAttributes = ['default-mode', 'storage-key'];
 
-	#storageKey = 'scx-mode';
+	#storageKey = 'color-mode';
 	#mediaMatcher: MediaQueryList | undefined;
 	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
 	#handleMediaChange: ((event: MediaQueryListEvent) => void) | undefined;
 	#storage: Storage | undefined;
 
 	connectedCallback() {
+		this.#storageKey = this.getAttribute('storage-key') ?? this.#storageKey;
+
 		try {
 			this.#storage = localStorage;
 		} catch {
