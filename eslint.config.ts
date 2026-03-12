@@ -26,7 +26,7 @@ export default getConfig(
 			rules: {
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
-				// Expensive type-aware rules; only run in strict mode (projectService incompatible with Astro)
+				// Expensive type-aware rules; only run in strict mode
 				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-misused-promises': isStrictLint ? 'error' : 'off',
@@ -87,6 +87,13 @@ export default getConfig(
 				parserOptions: {
 					parser: tseslint.parser,
 					extraFileExtensions: ['.astro'],
+					/**
+					 * Note: Astro's TypeScript linting support is incompatible with the newer `projectService` option
+					 * Override to project: true to avoid warning spam
+					 * @link - https://github.com/ota-meshi/astro-eslint-parser/issues/331
+					 */
+					projectService: false,
+					project: true,
 				},
 			},
 		},
@@ -99,9 +106,5 @@ export default getConfig(
 	],
 	{
 		customGlobals: { mode: 'readonly' },
-		// Note: Astro's TypeScript linting support is incompatible with the newer `projectService` option
-		parserOptions: {
-			project: './tsconfig.json',
-		},
 	},
 );
