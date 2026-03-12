@@ -95,7 +95,7 @@ export const LocationStatusEnum = {
 	Active: 'active',
 	Public: 'public',
 	Private: 'private',
-Converted: 'converted',
+	Converted: 'converted',
 	Idle: 'idle',
 	Abandoned: 'abandoned',
 	Remnants: 'remnants',

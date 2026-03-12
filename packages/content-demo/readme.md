@@ -1,6 +1,6 @@
 # Demo Content
 
-This package contains some demo content for the Spectral Codex project. 
+This package contains some demo content for the Spectral Codex project.
 
 It also features some configuration and tooling to provide:
 

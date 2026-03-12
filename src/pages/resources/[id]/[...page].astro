@@ -47,12 +47,12 @@ export const getStaticPaths = (async ({ paginate }) => {
 				...R.pipe(
 					locationsFiltered,
 					R.filter(createFilterEntryQualityFunction(2)),
-					getContentMetadata
+					getContentMetadata,
 				),
 				...R.pipe(postsFiltered, getContentMetadata),
 			],
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate)
+			R.sort(sortContentMetadataByDate),
 		);
 
 		const mapData = getMapData({
@@ -68,7 +68,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				params: { id: entry.id },
 				props: { entry, mapData },
 				pageSize: 20,
-			})
+			}),
 		);
 	}
 	return results;

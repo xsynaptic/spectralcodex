@@ -21,7 +21,7 @@ const { index, id: imageId, title: alt = '', captionMetadata, withTitle = false 
 async function getImageProps(
 	imageId: string | undefined,
 	alt: string,
-	priority: boolean
+	priority: boolean,
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;

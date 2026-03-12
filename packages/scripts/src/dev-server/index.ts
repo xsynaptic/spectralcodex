@@ -46,7 +46,8 @@ process.on('SIGTERM', () => {
 // Start Docker containers in background
 log('Starting containers...');
 
-$`docker compose -f ${composePath} --project-directory ${rootPath} up -d`.quiet()
+$`docker compose -f ${composePath} --project-directory ${rootPath} up -d`
+	.quiet()
 	.then(() => {
 		log(chalk.green('Containers ready'));
 	})

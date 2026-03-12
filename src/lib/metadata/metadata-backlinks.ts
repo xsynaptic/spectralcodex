@@ -26,9 +26,7 @@ export async function createContentBacklinksFunction() {
 		const backlinks = R.pipe(
 			backlinkItems,
 			/** Limit backlinks to specific collections */
-			R.filter((backlinkItem) =>
-				['notes', 'locations', 'posts'].includes(backlinkItem.collection),
-			),
+			R.filter((backlinkItem) => ['notes', 'locations', 'posts'].includes(backlinkItem.collection)),
 			R.sort(sortContentMetadataByDate),
 			R.take(10),
 		);

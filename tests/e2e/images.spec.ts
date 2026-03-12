@@ -1,8 +1,8 @@
-import type { Locator, Page } from "@playwright/test";
+import type { Locator, Page } from '@playwright/test';
 
-import { expect, test } from "@playwright/test";
+import { expect, test } from '@playwright/test';
 
-const POST_PATH = "/huadong-valley-ride-2018-taitung-city/";
+const POST_PATH = '/huadong-valley-ride-2018-taitung-city/';
 
 /** Get currentSrc from an img element, scrolling into view and waiting for lazy load if needed */
 async function getCurrentSrc(page: Page, img: Locator): Promise<string> {
@@ -10,7 +10,7 @@ async function getCurrentSrc(page: Page, img: Locator): Promise<string> {
 	await expect(img).toBeVisible();
 
 	await page.waitForFunction(
-		(element) => (element as HTMLImageElement).currentSrc !== "",
+		(element) => (element as HTMLImageElement).currentSrc !== '',
 		await img.elementHandle(),
 	);
 
@@ -24,10 +24,10 @@ function getImageDimensions(page: Page, src: string) {
 			new Promise<{ width: number; height: number }>((resolve, reject) => {
 				const img = new Image();
 
-				img.addEventListener("load", () => {
+				img.addEventListener('load', () => {
 					resolve({ width: img.naturalWidth, height: img.naturalHeight });
 				});
-				img.addEventListener("error", () => {
+				img.addEventListener('error', () => {
 					reject(new Error(`Failed to load image: ${url}`));
 				});
 				img.src = url;
@@ -36,26 +36,23 @@ function getImageDimensions(page: Page, src: string) {
 	);
 }
 
-test.describe("images - desktop (1280x720)", () => {
+test.describe('images - desktop (1280x720)', () => {
 	test.use({ viewport: { width: 1280, height: 720 } });
 
-	test("hero image serves optimized size", async ({ page }) => {
+	test('hero image serves optimized size', async ({ page }) => {
 		await page.goto(POST_PATH);
 
-		const src = await getCurrentSrc(page, page.locator("img").first());
+		const src = await getCurrentSrc(page, page.locator('img').first());
 		const { width } = await getImageDimensions(page, src);
 
 		expect(width).toBeGreaterThan(0);
 		expect(width).toBeLessThanOrEqual(1800);
 	});
 
-	test("first content image serves optimized size", async ({ page }) => {
+	test('first content image serves optimized size', async ({ page }) => {
 		await page.goto(POST_PATH);
 
-		const src = await getCurrentSrc(
-			page,
-			page.locator("article img, main img").nth(1),
-		);
+		const src = await getCurrentSrc(page, page.locator('article img, main img').nth(1));
 		const { width } = await getImageDimensions(page, src);
 
 		expect(width).toBeGreaterThan(0);
@@ -63,26 +60,23 @@ test.describe("images - desktop (1280x720)", () => {
 	});
 });
 
-test.describe("images - mobile (390x844)", () => {
+test.describe('images - mobile (390x844)', () => {
 	test.use({ viewport: { width: 390, height: 844 } });
 
-	test("hero image serves smaller than desktop", async ({ page }) => {
+	test('hero image serves smaller than desktop', async ({ page }) => {
 		await page.goto(POST_PATH);
 
-		const src = await getCurrentSrc(page, page.locator("img").first());
+		const src = await getCurrentSrc(page, page.locator('img').first());
 		const { width } = await getImageDimensions(page, src);
 
 		expect(width).toBeGreaterThan(0);
 		expect(width).toBeLessThanOrEqual(600);
 	});
 
-	test("first content image serves smaller than desktop", async ({ page }) => {
+	test('first content image serves smaller than desktop', async ({ page }) => {
 		await page.goto(POST_PATH);
 
-		const src = await getCurrentSrc(
-			page,
-			page.locator("article img, main img").nth(1),
-		);
+		const src = await getCurrentSrc(page, page.locator('article img, main img').nth(1));
 		const { width } = await getImageDimensions(page, src);
 
 		expect(width).toBeGreaterThan(0);

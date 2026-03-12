@@ -56,7 +56,7 @@ const columns = {
 					<tbody class:list={['divide-y', 'divide-primary-200 dark:divide-primary-700']}>
 						{locations.map((item) => {
 							const region = getFirstRegionByReference(
-								item.data.override?.regions ?? item.data.regions
+								item.data.override?.regions ?? item.data.regions,
 							);
 							const titleMultilingual = getMultilingualContent({
 								data: item.data,

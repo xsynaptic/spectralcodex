@@ -12,8 +12,7 @@ class ProgressReading extends ProgressBar {
 		const progress = Math.min(
 			Math.max(
 				0,
-				(globalThis.window.innerHeight - rect.top) /
-					(rect.height + globalThis.window.innerHeight),
+				(globalThis.window.innerHeight - rect.top) / (rect.height + globalThis.window.innerHeight),
 			),
 			1,
 		);

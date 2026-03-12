@@ -49,11 +49,16 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 		'--delete',
 		'--progress',
 		...sshFlag,
-		'--exclude', 'node_modules',
-		'--exclude', 'dist',
-		'--exclude', 'caddy',
-		'--exclude', 'certs',
-		'--exclude', 'scripts',
+		'--exclude',
+		'node_modules',
+		'--exclude',
+		'dist',
+		'--exclude',
+		'caddy',
+		'--exclude',
+		'certs',
+		'--exclude',
+		'scripts',
 		...dryRunFlag,
 		`${siteDir}/`,
 		`${config.remoteHost}:${projectPath}/`,
@@ -69,23 +74,31 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 	console.log(chalk.gray('Writing server environment...'));
 	const envContent = `DEPLOY_MEDIA_PATH=${config.mediaPath}\nIPX_SERVER_SECRET=${ipxServerSecret}`;
 
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`cat > ${projectPath}/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
+	await $({
+		stdio: 'inherit',
+	})`ssh ${sshArgs} ${`cat > ${projectPath}/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
 
 	// Rebuild containers
 	console.log(chalk.gray('Rebuilding containers...'));
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`cd ${projectPath} && docker compose pull && docker compose up -d --build --force-recreate`}`;
+	await $({
+		stdio: 'inherit',
+	})`ssh ${sshArgs} ${`cd ${projectPath} && docker compose pull && docker compose up -d --build --force-recreate`}`;
 
 	// Health check
 	console.log(chalk.gray('Waiting for health checks...'));
 
 	try {
-		await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`cd ${projectPath} && docker compose up -d --wait --wait-timeout 30`}`;
+		await $({
+			stdio: 'inherit',
+		})`ssh ${sshArgs} ${`cd ${projectPath} && docker compose up -d --wait --wait-timeout 30`}`;
 	} catch {
 		console.log(chalk.yellow('Warning: Health check timed out'));
 	}
 
 	// Show status
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`docker compose -f ${projectPath}/docker-compose.yml ps`}`;
+	await $({
+		stdio: 'inherit',
+	})`ssh ${sshArgs} ${`docker compose -f ${projectPath}/docker-compose.yml ps`}`;
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

@@ -22,8 +22,14 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 	const remoteCertsPath = `${config.remotePath}/certs`;
 
 	console.log(chalk.blue('Deploying Caddy config...'));
-	console.log(chalk.gray(`  Caddy sites: ${siteDir}/caddy/sites/ -> ${config.remoteHost}:${remoteCaddySitesPath}/`));
-	console.log(chalk.gray(`  Certs:       ${siteDir}/certs/ -> ${config.remoteHost}:${remoteCertsPath}/`));
+	console.log(
+		chalk.gray(
+			`  Caddy sites: ${siteDir}/caddy/sites/ -> ${config.remoteHost}:${remoteCaddySitesPath}/`,
+		),
+	);
+	console.log(
+		chalk.gray(`  Certs:       ${siteDir}/certs/ -> ${config.remoteHost}:${remoteCertsPath}/`),
+	);
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
@@ -57,7 +63,9 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 		const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
 		try {
-			await $({ stdio: 'inherit' })`ssh ${sshArgs} ${'docker exec caddy caddy reload --config /etc/caddy/Caddyfile'}`;
+			await $({
+				stdio: 'inherit',
+			})`ssh ${sshArgs} ${'docker exec caddy caddy reload --config /etc/caddy/Caddyfile'}`;
 		} catch {
 			console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
 		}

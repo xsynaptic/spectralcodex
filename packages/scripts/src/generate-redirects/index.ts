@@ -62,7 +62,10 @@ for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLE
 			const currentPath = prefix ? `/${prefix}/${entry.id}/` : `/${entry.id}/`;
 
 			// Page redirect
-			redirects.push({ fromPath: formerPath, toPath: currentPath }, { fromPath: `/og/${formerSlug}.jpg`, toPath: `/og/${entry.id}.jpg` });
+			redirects.push(
+				{ fromPath: formerPath, toPath: currentPath },
+				{ fromPath: `/og/${formerSlug}.jpg`, toPath: `/og/${entry.id}.jpg` },
+			);
 		}
 	}
 }

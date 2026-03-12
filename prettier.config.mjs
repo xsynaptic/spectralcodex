@@ -13,12 +13,11 @@ export default {
 				parser: 'astro',
 			},
 		},
-		// Note: we don't use Prettier for MDX formatting; this is a backup in case extensions fail
 		{
 			files: ['*.mdx'],
 			options: {
 				parser: 'mdx',
-				proseWrap: 'always',
+				proseWrap: 'preserve',
 			},
 		},
 	],

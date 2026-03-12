@@ -20,7 +20,10 @@ const LinkItemSchema = z.object({
 export const LinkSchema = z.union([LinkItemSchema, UrlSchema]);
 
 // A helper utility to find the first matching link by URL fragment
-export function getMatchingLinkUrl(match: string, links: Array<z.infer<typeof LinkSchema>> | undefined) {
+export function getMatchingLinkUrl(
+	match: string,
+	links: Array<z.infer<typeof LinkSchema>> | undefined,
+) {
 	if (!links) return;
 
 	for (const link of links) {

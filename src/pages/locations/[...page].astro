@@ -21,7 +21,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		R.filter(createFilterEntryQualityFunction(2)),
 		R.filter((item) => !!item.data.imageFeatured),
 		getContentMetadata,
-		R.sort(sortContentMetadataByDate)
+		R.sort(sortContentMetadataByDate),
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

@@ -26,7 +26,7 @@ export const getStaticPaths = (async () => {
 
 	return entries.map((entry) => {
 		const regionPrimary = getFirstRegionByReference(
-			entry.data.override?.regions ?? entry.data.regions
+			entry.data.override?.regions ?? entry.data.regions,
 		);
 
 		return {
@@ -46,7 +46,7 @@ export const getStaticPaths = (async () => {
 					entry.data._posts ?? [],
 					getPostsByIds,
 					getContentMetadata,
-					R.sort(sortContentMetadataByDate)
+					R.sort(sortContentMetadataByDate),
 				),
 				backlinks: getContentBacklinks({ id: entry.id }),
 			},

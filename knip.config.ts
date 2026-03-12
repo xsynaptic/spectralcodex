@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck -- KnipConfig is very expensive and we only need this when modifying the config
 import type { KnipConfig } from 'knip';
 
 export default {
@@ -14,7 +16,6 @@ export default {
 				'p-limit', // used in workspace packages (image-loader, scripts)
 				'unified', // transitive dep of @xsynaptic/unified-tools
 			],
-
 		},
 		'packages/content-demo': {
 			entry: ['.remarkrc.mjs'],

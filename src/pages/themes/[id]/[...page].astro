@@ -34,7 +34,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		// Note: the need to get location data async means we should filter this first!
 		const locationsFiltered = locations.filter(
-			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false
+			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false,
 		);
 
 		const postsFiltered = getPostsByTerm(entry);
@@ -44,13 +44,13 @@ export const getStaticPaths = (async ({ paginate }) => {
 			[
 				...R.pipe(
 					locationsFiltered,
-					R.filter(createFilterEntryQualityFunction(2)) // Quality filter last!
+					R.filter(createFilterEntryQualityFunction(2)), // Quality filter last!
 				),
 				...postsFiltered,
 			],
 			getContentMetadata,
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate)
+			R.sort(sortContentMetadataByDate),
 		);
 
 		// Anything that wasn't included above
@@ -58,7 +58,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			[...locationsFiltered, ...postsFiltered],
 			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
 			getContentMetadata,
-			R.shuffle()
+			R.shuffle(),
 		);
 		const metadataItems = metadataItemsAll.slice(0, 25);
 		const metadataItemsCount = metadataItemsAll.length;
@@ -76,7 +76,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 			themes,
 			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
 			R.sort(sortByContentCount),
-			R.map((theme) => theme.id)
+			R.map((theme) => theme.id),
 		);
 
 		results.push(
@@ -84,7 +84,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				params: { id: entry.id },
 				props: { entry, mapData, metadataItems, metadataItemsCount, relatedThemeIds },
 				pageSize: 20,
-			})
+			}),
 		);
 	}
 	return results;

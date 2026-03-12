@@ -19,7 +19,7 @@ const { hasHeroImage, imageId, alt, class: className } = Astro.props;
 
 async function getImageProps(
 	imageId: string | undefined,
-	alt: string
+	alt: string,
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;

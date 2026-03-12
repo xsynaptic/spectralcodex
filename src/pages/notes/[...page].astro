@@ -14,7 +14,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const entriesFiltered = R.pipe(
 		entries,
 		R.filter(createFilterEntryQualityFunction(2)),
-		R.sort(sortByDateReverseChronological)
+		R.sort(sortByDateReverseChronological),
 	);
 
 	return paginate(entriesFiltered, { pageSize: 10 });

@@ -49,7 +49,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 				params: { id: entry.id },
 				props: { entry, mapData, wordCount },
 				pageSize: 20,
-			})
+			}),
 		);
 	}
 	return results;

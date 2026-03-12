@@ -18,7 +18,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 		R.filter(({ data }) => data.parent === undefined), // Only ancestral terms
 		R.filter(filterWithContent),
 		R.sort(sortByContentCount),
-		getContentMetadata
+		getContentMetadata,
 	);
 
 	return paginate(metadataItems, { pageSize: 20 });

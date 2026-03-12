@@ -33,7 +33,7 @@ const getLocationsByReference = await createLocationsByIdsFunction();
 const { hasGeodata, ...mapComponentProps } = getMapData({
 	mapId: undefined,
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, { showAllLocations: showHidden })
+		getLocationsFeatureCollection(locations, { showAllLocations: showHidden }),
 	),
 	languages,
 });
