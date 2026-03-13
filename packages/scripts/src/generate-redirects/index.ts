@@ -74,7 +74,7 @@ if (redirects.length === 0) {
 	console.log(chalk.yellow('No formerSlugs found, writing empty redirect file'));
 	writeFileSync(outputPath, '# Auto-generated redirects (none found)\n');
 } else {
-	const lines = ['# Auto-generated redirects from formerSlugs — do not edit manually', ''];
+	const lines = ['# Auto-generated redirects from formerSlugs; do not edit manually', ''];
 
 	for (const { fromPath, toPath } of redirects) {
 		lines.push(`redir ${fromPath} ${toPath} 301`);

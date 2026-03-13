@@ -10,7 +10,7 @@ const SCHEMA = `
 CREATE TABLE IF NOT EXISTS urls (
   id INTEGER PRIMARY KEY,
   url TEXT UNIQUE NOT NULL,
-  status TEXT NOT NULL DEFAULT ${UrlStatusEnum.Pending},
+  status TEXT NOT NULL DEFAULT '${UrlStatusEnum.Pending}',
   last_http_status INTEGER,
   redirect_url TEXT,
   check_count INTEGER NOT NULL DEFAULT 0,
@@ -151,8 +151,8 @@ export function getUrlsToCheck(options: {
 	return db
 		.prepare(
 			`SELECT * FROM urls
-       WHERE status = ${UrlStatusEnum.Pending}
-          OR (status IN (${UrlStatusEnum.Missing}, ${UrlStatusEnum.Blocked}, ${UrlStatusEnum.Error}) AND check_count < ?)
+       WHERE status = '${UrlStatusEnum.Pending}'
+          OR (status IN ('${UrlStatusEnum.Missing}', '${UrlStatusEnum.Blocked}', '${UrlStatusEnum.Error}') AND check_count < ?)
        ORDER BY id`,
 		)
 		.all(options.maxMissing) as Array<UrlRow>;
