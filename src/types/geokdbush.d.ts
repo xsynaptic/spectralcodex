@@ -1,3 +1,5 @@
+// Ambient module declaration for geokdbush, which ships no types and has no @types package
+// This file lives in src/types/ so it's picked up by the root tsconfig's `include: ["**/*"]`
 declare module 'geokdbush' {
 	import type KDBush from 'kdbush';
 
