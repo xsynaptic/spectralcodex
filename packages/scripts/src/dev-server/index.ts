@@ -18,6 +18,18 @@ process.env.DEPLOY_IMAGE_SERVER_PATH = path.resolve(rootPath, 'deploy/site/image
 
 $.verbose = false;
 
+// Abort early if Docker daemon is not running
+try {
+	await $`docker info`.quiet();
+} catch {
+	console.error(
+		chalk.red('\n  Docker daemon is not running.\n') +
+			chalk.yellow('  The image server requires Docker to serve images in development.\n') +
+			chalk.gray('  Start Docker Desktop (or the Docker daemon) and try again.\n'),
+	);
+	process.exit(1);
+}
+
 function log(message: string) {
 	console.log(
 		`${chalk.gray(new Date().toLocaleTimeString('en-US', { hour12: false }))} ${chalk.cyan('[docker]')} ${message}`,
