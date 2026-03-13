@@ -26,6 +26,7 @@ export default {
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
 				'textlint-rule-diacritics',
 				'textlint-rule-terminology',
+				'@textlint-rule/textlint-rule-pattern',
 			],
 		},
 		'packages/react-map-component': {
