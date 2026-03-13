@@ -28,7 +28,7 @@ const { hasHeroImage, imageFeaturedGroup, withTitle = true, class: className } =
 						/>
 					))}
 				</div>
-				{imageFeaturedGroup.length > 1 && <CarouselNavigation />}
+				{imageFeaturedGroup.length > 1 ? <CarouselNavigation /> : undefined}
 			</carousel-slider>
 			<slot />
 		</ImageHeroFrame>

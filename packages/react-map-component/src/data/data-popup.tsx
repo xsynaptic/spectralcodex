@@ -1,6 +1,7 @@
+import type { UseQueryResult } from '@tanstack/react-query';
 import type { FC, ReactNode } from 'react';
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import ky from 'ky';
 import { createContext, useContext } from 'react';
 

@@ -22,7 +22,7 @@ const { imageFeaturedGroup, class: className } = Astro.props;
 					<ImageCarouselItem {...imageFeaturedGroupItem} />
 				))}
 			</div>
-			{imageFeaturedGroup.length > 1 && <CarouselNavigation />}
+			{imageFeaturedGroup.length > 1 ? <CarouselNavigation /> : undefined}
 		</carousel-slider>
 	) : undefined
 }

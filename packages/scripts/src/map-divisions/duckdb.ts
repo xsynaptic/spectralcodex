@@ -1,7 +1,8 @@
+import type { DuckDBConnection } from '@duckdb/node-api';
 import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Geometry } from 'geojson';
 
-import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
+import { DuckDBInstance } from '@duckdb/node-api';
 import chalk from 'chalk';
 
 import type { DivisionGeometry, DivisionItem } from './types';
