@@ -4,10 +4,7 @@
 	"description": "Spectral Codex demo content",
 	"private": true,
 	"scripts": {
-		"check": "mdxlint 'collections/**/*.mdx' --frail",
-		"format": "mdxlint 'collections/**/*.mdx' --output",
-		"lint": "mdxlint 'collections/**/*.mdx' --frail",
-		"lint:fix": "mdxlint 'collections/**/*.mdx' --output"
+		"format": "mdxlint 'collections/**/*.mdx' --output"
 	},
 	"devDependencies": {
 		"astro": "^6.0.3",
