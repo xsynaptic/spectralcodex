@@ -4,6 +4,7 @@
 		"bradlc.vscode-tailwindcss",
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
+		"remcohaszing.vscode-mdxlint",
 		"unifiedjs.vscode-mdx"
 	],
 	"unwantedRecommendations": []

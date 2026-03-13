@@ -42,7 +42,6 @@ public/icons/
 # ignore content and media
 packages/content/
 
-
 # project directives
 .claude
 .cursor

@@ -10,7 +10,7 @@
 		"lint": "eslint",
 		"lint-strict": "ESLINT_STRICT=1 eslint",
 		"lint-content": "pnpm --filter @spectralcodex/content lint",
-		"lint-content-demo": "eslint ./packages/content-demo --config ./packages/content-demo/eslint.config.mjs",
+		"lint-content-demo": "pnpm --filter @spectralcodex/content-demo lint",
 		"knip": "knip",
 		"test": "vitest",
 		"test:e2e": "playwright test",

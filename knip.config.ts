@@ -18,16 +18,11 @@ export default {
 			],
 		},
 		'packages/content-demo': {
-			entry: ['.remarkrc.mjs'],
 			ignore: ['collections/**'],
-			ignoreDependencies: ['remark'], // type-only import in .remarkrc.mjs
 		},
 		'packages/content': {
-			entry: ['.remarkrc.mjs'],
+			entry: ['.mdxlintrc.mjs'],
 			ignoreDependencies: [
-				'eslint-mdx', // used in workspace eslint.config.mjs (knip doesn't detect)
-				'eslint-plugin-mdx', // used in workspace eslint.config.mjs
-				'remark', // type-only import in .remarkrc.mjs
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
 				'textlint-rule-diacritics',
 				'textlint-rule-terminology',

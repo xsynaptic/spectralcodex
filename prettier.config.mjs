@@ -13,13 +13,6 @@ export default {
 				parser: 'astro',
 			},
 		},
-		{
-			files: ['*.mdx'],
-			options: {
-				parser: 'mdx',
-				proseWrap: 'preserve',
-			},
-		},
 	],
 	tailwindStylesheet: './src/styles/global.css',
 };

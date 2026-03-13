@@ -18,6 +18,7 @@ export default getConfig(
 				'deploy/**/*',
 				'dist/**/*',
 				'content/**/*',
+				'**/.mdxlintrc.mjs',
 				'node_modules/**/*',
 				'**/temp/**/*',
 			],
