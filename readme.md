@@ -11,6 +11,8 @@ This repository contains the working Astro project used to generate the [Spectra
 - Comprehensive validation ensuring data quality across collections (frontmatter fields, GPS coordinate de-duplication)
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
+- Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) with remark plugins
+- Link checker that scans external URLs across collections, tracks status in a SQLite DB, and supports rechecking and filtering to reduce linkrot
 
 ### Image Handling
 
@@ -67,7 +69,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### SEO & Social
 
-- Programmatic OG image generation via Satori and Sharp; per-page images with featured image backgrounds, multilingual title rendering (CJK/Thai), and luminance-aware adaptive text color
+- Programmatic OG image generation via [Satori](https://github.com/vercel/satori) and Sharp; per-page images with featured image backgrounds, multilingual title rendering (CJK/Thai), and luminance-aware adaptive text color
 - Deterministic fallback system (theme/region/country) with blurred visual distinction for entries without a featured image
 - Digest-based caching; only regenerates when content or source image changes
 - Comprehensive meta tags and structured data
@@ -107,7 +109,7 @@ The image server is deployed separately and manually; it is only needed when ima
 ### MDX Configuration
 
 - `tsconfig` should also specify the remark plugin toolchain Astro uses (and the user may modify) to lint Markdown and MDX files
-- ESLint should be used to lint and format MDX files; Prettier support for MDX is not comprehensive and errors will be introduced when using it as the MDX formatter
+- [mdxlint](https://github.com/nicholasgasior/mdxlint) is used to lint and format MDX files (`pnpm check-content` / `pnpm format-content`)
 
 ### Image Assets
 
@@ -133,7 +135,7 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 - `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs)
 - `./packages/react-map-component`: interactive map component built with MapLibre and react-map-gl
 - `./packages/remark-img-group`: Remark plugin for handling image groups in MDX
-- `./packages/scripts`: build tooling for content validation, semantic similarity generation, OpenGraph image generation (Satori), map division processing, and deployment orchestration
+- `./packages/scripts`: build tooling for content validation, semantic similarity generation, OpenGraph image generation (Satori), map division processing, link checking, and deployment orchestration
 - `./packages/shared`: shared utilities including Keyv-based caching (SQLite and file backends) for build-time data persistence, common map types and schemas
 
 ### Generated/Temporary

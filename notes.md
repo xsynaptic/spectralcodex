@@ -23,5 +23,4 @@
 
 ### Extras
 
-- link-rot prevention: scan all official links in content to identify sources that have disappeared from the web
 - auto-archiver: maintain a backup copy of all official links and swap that in by including the archived webpage in the public folder
