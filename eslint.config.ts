@@ -34,6 +34,23 @@ export default getConfig(
 			},
 		},
 		/**
+		 * JSX
+		 */
+		{
+			files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts', '**/*.astro'],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						message:
+							'Use a ternary returning undefined (condition ? <Element /> : undefined) instead of && for conditional rendering.',
+						selector:
+							':matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator="&&"]',
+					},
+				],
+			},
+		},
+		/**
 		 * React
 		 */
 		{
@@ -98,7 +115,7 @@ export default getConfig(
 				},
 			},
 		},
-		// Disable typed rules for scripts inside Astro files
+		// Disable typed rules for scripts _inside_ Astro files
 		// 2026Q1: this is still required otherwise TypeScript might crash!
 		{
 			files: ['**/*.astro/*.ts', '*.astro/*.ts'],
