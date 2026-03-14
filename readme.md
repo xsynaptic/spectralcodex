@@ -7,18 +7,18 @@ This repository contains the working Astro project used to generate the [Spectra
 ### Content Management
 
 - All content authored in MDX using the Content Layer API
-- Quality scoring system (0-5 scale) drives content prioritization site-wide
-- Comprehensive validation ensuring data quality across collections (frontmatter fields, GPS coordinate de-duplication)
+- Quality scoring system (0-5 scale) drives site-wide content prioritization
+- Comprehensive validation ensuring data quality across collections: frontmatter fields, GPS coordinate de-duplication
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
 - Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) with remark plugins
-- Link checker that scans external URLs across collections, tracks status in a SQLite DB, and supports rechecking and filtering to reduce linkrot
+- Link checker that scans external URLs across collections, tracks status, and supports rechecking and filtering to reduce linkrot
 
 ### Image Handling
 
 **Content Layer Integration**
 
-- Experimental image loader treating individual images as first-class content with metadata
+- Experimental image loader treating individual images as first-class content with metadata extraction
 - Automatic extraction of camera settings, GPS coordinates, and other EXIF data from images
 - Automatic generation of data URI-encoded low-quality image placeholders (LQIPs)
 - Custom remark plugin for advanced image layout (groups, carousels, aspect ratio handling)
@@ -28,6 +28,7 @@ This repository contains the working Astro project used to generate the [Spectra
 
 Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service.
 
+- Keep original image assets in the media folder specified in `.env`; high-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended, and the current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom
 - [@unjs/ipx](https://github.com/unjs/ipx)-based image server handles on-demand resizing, format conversion, and quality adjustment
 - Nginx reverse proxy with aggressive caching ensures images are only processed once
 - URL-based transformations (e.g., `/q_80,f_webp,s_1200x800/path/to/image.jpg`) allow flexible sizing without pre-generating variants
@@ -106,15 +107,6 @@ Deployment is handled by custom scripts. These are specific to this project's in
 
 The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
 
-### MDX Configuration
-
-- `tsconfig` should also specify the remark plugin toolchain Astro uses (and the user may modify) to lint Markdown and MDX files
-- [mdxlint](https://github.com/nicholasgasior/mdxlint) is used to lint and format MDX files (`pnpm check-content` / `pnpm format-content`)
-
-### Image Assets
-
-Keep original image assets in the media folder specified in `.env`. High-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended. Current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom.
-
 ## Project Structure
 
 - `./deploy`: Deployment configuration split into `infra/` (Caddy, analytics) and `site/` (image server)
@@ -129,23 +121,14 @@ Keep original image assets in the media folder specified in `.env`. High-quality
 
 ### Packages
 
-- `./packages/astro-build-logger`: Astro integration that logs build timestamps and durations
+- `./packages/astro-build-logger`: build timestamps and durations
 - `./packages/content`: primary content collection (private, not included in repo)
-- `./packages/content-demo`: example content for testing and demonstration purposes
-- `./packages/image-loader`: experimental image loader; treats image files as actual content and optionally reads EXIF metadata and generates low-quality image placeholders (LQIPs)
-- `./packages/react-map-component`: interactive map component built with MapLibre and react-map-gl
-- `./packages/remark-img-group`: Remark plugin for handling image groups in MDX
-- `./packages/scripts`: build tooling for content validation, semantic similarity generation, OpenGraph image generation (Satori), map division processing, link checking, and deployment orchestration
-- `./packages/shared`: shared utilities including Keyv-based caching (SQLite and file backends) for build-time data persistence, common map types and schemas
-
-### Generated/Temporary
-
-- `./.astro`: automatically generated types and schemas
-- `./.cache`: cache folder for generated files, delete this anytime
-- `./dist`: output folder, automatically generated; delete this anytime
-- `./public/divisions`: FlatGeobuf files for geographic divisions used by the map component
-- `./public/icons`: icon sprites and JSON files for the map component
-- `./temp`: temporary storage for generated files, delete anytime
+- `./packages/content-demo`: example content for testing and demonstration
+- `./packages/image-loader`: Content Layer loader for image files with EXIF extraction and LQIP generation
+- `./packages/react-map-component`: interactive map component
+- `./packages/remark-img-group`: remark plugin for image groups in MDX
+- `./packages/scripts`: content validation, semantic similarity, OG images, map divisions, link checking, deployment
+- `./packages/shared`: shared utilities, Keyv-based caching (SQLite/file backends), common types and schemas
 
 ## Cloudflare Configuration
 
