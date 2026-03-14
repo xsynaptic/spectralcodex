@@ -18,7 +18,7 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command: 'pnpm preview',
+		command: 'pnpm astro preview',
 		url: baseURL,
 		reuseExistingServer: true,
 	},
