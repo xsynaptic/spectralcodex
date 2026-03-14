@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import type { DataStoreEntry } from '../shared/data-store.ts';
 
 // Matches markdown links: [text](https://...)
@@ -5,61 +7,55 @@ import type { DataStoreEntry } from '../shared/data-store.ts';
 // Handles escaped parens in URLs like \(Taiwan\)
 const MARKDOWN_LINK_REGEX = /(?<!!)\[(?:[^\]]*)\]\((https?:\/\/(?:[^)\\]|\\.)+)\)/g;
 
+// Minimal extraction schemas; only the fields needed to pull URLs
+const LinkExtractSchema = z.union([z.string(), z.object({ url: z.string() })]);
+
+const SourceExtractSchema = z.union([
+	z.string(),
+	z.object({ links: LinkExtractSchema.array().optional() }),
+]);
+
+const EntryDataSchema = z.object({
+	links: LinkExtractSchema.array().optional(),
+	url: z.string().optional(),
+	sources: SourceExtractSchema.array().optional(),
+});
 interface ExtractedLink {
 	url: string;
 }
 
+function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
+	return typeof link === 'string' ? link : link.url;
+}
+
 /**
- * Extract URLs from a single frontmatter `links` array item.
- * Items can be plain URL strings or {title, url} objects.
+ * Extract URLs from frontmatter fields: links, url, and sources
  */
 function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
+	const result = EntryDataSchema.safeParse(data);
+
+	if (!result.success) {
+		return [];
+	}
+
 	const urls: Array<string> = [];
+	const { links, url, sources } = result.data;
 
-	// links array
-	const links = data.links as Array<unknown> | undefined;
-
-	if (Array.isArray(links)) {
+	if (links) {
 		for (const link of links) {
-			if (typeof link === 'string') {
-				urls.push(link);
-			} else if (link && typeof link === 'object' && 'url' in link) {
-				const url = (link as Record<string, unknown>).url;
-
-				if (typeof url === 'string') {
-					urls.push(url);
-				}
-			}
+			urls.push(extractUrlFromLink(link));
 		}
 	}
 
-	// Top-level url field (resources collection)
-	const topUrl = data.url as string | undefined;
-
-	if (typeof topUrl === 'string') {
-		urls.push(topUrl);
+	if (url) {
+		urls.push(url);
 	}
 
-	// Sources array; can contain objects with nested links arrays
-	const sources = data.sources as Array<unknown> | undefined;
-
-	if (Array.isArray(sources)) {
+	if (sources) {
 		for (const source of sources) {
-			if (source && typeof source === 'object' && 'links' in source) {
-				const sourceLinks = (source as Record<string, unknown>).links as Array<unknown> | undefined;
-
-				if (Array.isArray(sourceLinks)) {
-					for (const link of sourceLinks) {
-						if (typeof link === 'string') {
-							urls.push(link);
-						} else if (link && typeof link === 'object' && 'url' in link) {
-							const url = (link as Record<string, unknown>).url;
-
-							if (typeof url === 'string') {
-								urls.push(url);
-							}
-						}
-					}
+			if (typeof source !== 'string' && source.links) {
+				for (const link of source.links) {
+					urls.push(extractUrlFromLink(link));
 				}
 			}
 		}

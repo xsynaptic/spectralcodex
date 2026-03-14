@@ -57,7 +57,6 @@ export const LINK_COLLECTIONS = [
 	'posts',
 	'regions',
 	'resources',
-	'series',
 	'themes',
 ] as const;
 
