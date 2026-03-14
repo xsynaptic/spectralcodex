@@ -141,6 +141,9 @@ export default defineConfig({
 			],
 		}),
 		mdx({
+			remarkRehype: {
+				footnoteLabelTagName: 'h3',
+			},
 			optimize: true,
 		}),
 		sitemap({

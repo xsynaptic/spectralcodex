@@ -5,7 +5,7 @@ import type { KnipConfig } from 'knip';
 export default {
 	workspaces: {
 		'.': {
-			// MDX auto-import components — referenced via astro-auto-import, not static imports
+			// MDX auto-import components; referenced via astro-auto-import, not static imports
 			entry: ['src/components/mdx/*.astro'],
 			ignoreDependencies: [
 				'@astrojs/check', // used via `astro check` CLI, peer dep of astro
