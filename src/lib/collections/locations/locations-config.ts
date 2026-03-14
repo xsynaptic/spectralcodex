@@ -19,7 +19,6 @@ import {
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/index.ts';
-import { UrlSchema } from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
@@ -73,9 +72,9 @@ export const locations = defineCollection({
 			_uuid: z.string().optional(),
 			_descriptionHtml: z.string().optional(),
 			_imageThumbnail: ImageThumbnailSchema.optional(),
-			_url: UrlSchema.optional(),
-			_googleMapsUrl: UrlSchema.optional(),
-			_wikipediaUrl: UrlSchema.optional(),
+			_url: z.url().optional(),
+			_googleMapsUrl: z.url().optional(),
+			_wikipediaUrl: z.url().optional(),
 		})
 		.strict(),
 });

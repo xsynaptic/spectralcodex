@@ -7,7 +7,6 @@ import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { DescriptionSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
-import { UrlSchema } from '#lib/schemas/index.ts';
 
 function validateCoordinates(coordinates: [number, number]) {
 	if (!coordinates[0] || !coordinates[1]) {
@@ -53,7 +52,7 @@ export const GeometryPointsSchema = z.object({
 	category: z.enum(LocationCategoryEnum).optional(),
 	status: z.enum(LocationStatusEnum).optional(),
 	precision: NumericScaleSchema.optional(),
-	googleMapsUrl: UrlSchema.optional(),
+	googleMapsUrl: z.url().optional(),
 	imageFeatured: z.string().nullable().optional(),
 	/** Computed properties, for internal use only! */
 	_imageThumbnail: ImageThumbnailSchema.nullable().optional(),

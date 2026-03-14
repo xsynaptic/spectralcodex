@@ -9,12 +9,7 @@ import {
 	publisherMultilingualSchema,
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
-import {
-	DateStringSchema,
-	NumericScaleSchema,
-	TitleSchema,
-	UrlSchema,
-} from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
 export const resources = defineCollection({
@@ -27,7 +22,7 @@ export const resources = defineCollection({
 			subtitle: z.string().optional(), // TODO: note that this is currently unused
 			description: z.string().optional(),
 			// Website-specific fields (optional)
-			url: UrlSchema.optional(),
+			url: z.url().optional(),
 			match: z.union([z.string(), z.array(z.string())]).optional(),
 			// Publication-specific fields (optional)
 			authors: z

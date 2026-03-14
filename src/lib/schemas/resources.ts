@@ -5,7 +5,6 @@ import {
 	publisherMultilingualSchema,
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
-import { UrlSchema } from '#lib/schemas/index.ts';
 
 /**
  * Links
@@ -13,11 +12,11 @@ import { UrlSchema } from '#lib/schemas/index.ts';
 const LinkItemSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
-	url: UrlSchema,
+	url: z.url(),
 });
 
 // Link schema; with URLs and predefined titles for commonly referenced sites
-export const LinkSchema = z.union([LinkItemSchema, UrlSchema]);
+export const LinkSchema = z.union([LinkItemSchema, z.url()]);
 
 // A helper utility to find the first matching link by URL fragment
 export function getMatchingLinkUrl(
