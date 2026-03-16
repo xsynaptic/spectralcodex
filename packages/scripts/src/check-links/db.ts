@@ -6,6 +6,8 @@ import type { UrlStatus, UrlRow } from './types.ts';
 
 import { UrlStatusEnum } from './types.ts';
 
+const HEALTHY_MAX_AGE_DAYS = 90;
+
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS urls (
   id INTEGER PRIMARY KEY,
@@ -153,6 +155,7 @@ export function getUrlsToCheck(options: {
 			`SELECT * FROM urls
        WHERE status = '${UrlStatusEnum.Pending}'
           OR (status IN ('${UrlStatusEnum.Missing}', '${UrlStatusEnum.Blocked}', '${UrlStatusEnum.Error}') AND check_count < ?)
+          OR (status = '${UrlStatusEnum.Healthy}' AND updated_at < datetime('now', '-${String(HEALTHY_MAX_AGE_DAYS)} days'))
        ORDER BY id`,
 		)
 		.all(options.maxMissing) as Array<UrlRow>;
