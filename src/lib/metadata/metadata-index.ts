@@ -106,30 +106,22 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				);
 			}
 
-			// Here we allow for location data to have overrides; this is used to obscure sensitive sites
-			let id = entry.id;
-			let title = entry.data.title;
-			let titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
-			let regions = 'regions' in entry.data ? entry.data.regions : undefined;
-
-			// Overrides allow us to hide or obscure certain items of content
-			if ('override' in entry.data) {
-				id = entry.data.override?.slug ?? id;
-				title = entry.data.override?.title ?? title;
-				titleMultilingual = entry.data.override
-					? (getMultilingualContent({ data: entry.data.override, prop: 'title' })?.primary ??
-						titleMultilingual)
-					: titleMultilingual;
-				regions = entry.data.override?.regions ?? regions;
-			}
+			const titleMultilingual = getMultilingualContent({
+				data: entry.data,
+				prop: 'title',
+			})?.primary;
+			const regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
 			contentMetadataMap.set(entry.id, {
 				collection: entry.collection,
-				id,
-				title,
+				id: entry.id,
+				title: entry.data.title,
 				titleMultilingual,
 				description: entry.data.description,
-				url: getContentUrl(entry.collection, entry.id),
+				url: getContentUrl(
+					entry.collection,
+					'override' in entry.data ? (entry.data.override?.slug ?? entry.id) : entry.id,
+				),
 				imageId:
 					'imageFeatured' in entry.data
 						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })

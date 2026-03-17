@@ -49,12 +49,9 @@ interface Props {
 
 const { entry, mapData, metadataItems, backlinks } = Astro.props;
 
-// This allows for titles to be overridden for sensitive or hidden sites
-const title = entry.data.override?.title ?? entry.data.title;
-
 const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
-const regionPrimary = getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions);
+const regionPrimary = getFirstRegionByReference(entry.data.regions);
 const regionLangCode = regionPrimary?.data._langCode;
 
 const langCodeAdditional =
@@ -62,7 +59,7 @@ const langCodeAdditional =
 		? LanguageCodeEnum.Japanese
 		: undefined;
 const titleResult = getMultilingualContent({
-	data: entry.data.override ?? entry.data,
+	data: entry.data,
 	prop: 'title',
 	...(regionLangCode ? { langCode: regionLangCode } : {}),
 	...(langCodeAdditional ? { langCodeAdditional } : {}),
@@ -85,11 +82,13 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 
 <MainSite
 	meta={{
-		title: titleMultilingual ? `${title} (${titleMultilingual.value})` : title,
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
 		description: entry.data.description,
 		image: await getSeoImageProps({
 			id: entry.id,
-			alt: title,
+			alt: entry.data.title,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
@@ -97,7 +96,12 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 	hasHeroImage={hasHeroImage}
 >
 	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
-		<ImageHero class="sm:mb-small" hasHeroImage={hasHeroImage} imageId={imageHeroId} alt={title}>
+		<ImageHero
+			class="sm:mb-small"
+			hasHeroImage={hasHeroImage}
+			imageId={imageHeroId}
+			alt={entry.data.title}
+		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
 					<a href={Astro.url.toString()} class="p-name p-url" aria-hidden="true" tabindex="-1"
@@ -146,7 +150,12 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		</ImageHero>
 		{
 			!hasContent && !hasHeroImage && imageFeaturedId ? (
-				<ContentImage imageId={imageFeaturedId} alt={title} priority={true} showMetadata={true} />
+				<ContentImage
+					imageId={imageFeaturedId}
+					alt={entry.data.title}
+					priority={true}
+					showMetadata={true}
+				/>
 			) : undefined
 		}
 		<ContentDescription

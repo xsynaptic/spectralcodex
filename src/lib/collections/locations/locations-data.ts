@@ -133,7 +133,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	});
 
 	entry.data._uuid = locationMapDataHash;
-	entry.data._url = getContentUrl('locations', entry.id);
+	entry.data._url = getContentUrl('locations', entry.data.override?.slug ?? entry.id);
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
@@ -156,6 +156,18 @@ export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	label: 'Locations',
 	async augment(entries) {
+		// Flatten overrides onto entry.data in production so downstream code never needs to know
+		if (import.meta.env.PROD) {
+			for (const entry of entries) {
+				if (!entry.data.override) continue;
+
+				// Note: slugs require special handling at the point of use
+				const { slug: _, ...overrideFields } = entry.data.override;
+
+				Object.assign(entry.data, overrideFields);
+			}
+		}
+
 		const locationsFiltered = import.meta.env.DEV
 			? entries
 			: entries.filter((location) => !location.data.hideLocation);

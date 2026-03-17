@@ -111,8 +111,7 @@ export async function getRegionLangCodeByEntry(
 	if (entry.collection === 'regions') {
 		return entry.data._langCode;
 	} else if (entry.collection === 'locations') {
-		return getFirstRegionByReference(entry.data.override?.regions ?? entry.data.regions)?.data
-			._langCode;
+		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
 	} else {
 		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
 	}
