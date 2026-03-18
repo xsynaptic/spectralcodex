@@ -91,7 +91,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<ContentSectionSources entry={entry} />
 		<ContentSectionRegions regionIds={regionIds} />
 		<ContentSectionThemes themeIds={allThemeIds} />
-		<ContentSectionMap mapData={mapData} persistId={`theme-${entry.id}`} />
+		<ContentSectionMap mapData={mapData} />
 		<ContentSectionMetadataGrid page={page} />
 		{
 			page.currentPage === 1 && metadataItems.length > 0 ? (

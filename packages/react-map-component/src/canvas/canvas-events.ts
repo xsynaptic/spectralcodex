@@ -55,7 +55,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			const feature = features?.[0];
 
 			// If the click event is not within interactive layers close any open popup and exit early
-			if (!feature || !feature.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
+			if (!feature?.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
 				setSelectedId(undefined);
 				setHoveredId(undefined);
 				return;

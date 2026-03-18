@@ -9,11 +9,9 @@ import MapComponentSprites from '#components/map/map-component-sprites.astro';
 
 interface Props extends HTMLAttributes<'div'> {
 	mapComponentProps: MapComponentProps;
-	/** Pass a unique ID to persist the map component across view transitions */
-	persistId?: string | undefined;
 }
 
-const { mapComponentProps, persistId, ...props } = Astro.props;
+const { mapComponentProps, ...props } = Astro.props;
 
 const mapComponentExtendedProps = {
 	style: { zIndex: 20 },
@@ -32,17 +30,7 @@ const mapComponentExtendedProps = {
 	{...props}
 	data-pagefind-ignore
 >
-	{
-		persistId ? (
-			<ReactMapComponent
-				{...mapComponentExtendedProps}
-				client:visible
-				transition:persist={persistId}
-			/>
-		) : (
-			<ReactMapComponent {...mapComponentExtendedProps} client:visible />
-		)
-	}
+	<ReactMapComponent {...mapComponentExtendedProps} client:visible />
 	<div
 		class:list={[
 			'absolute z-10 flex h-full w-full justify-center',
