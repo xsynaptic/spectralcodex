@@ -123,7 +123,7 @@ const MapCanvasContainer: FC<
 			renderWorldCopies={false}
 			attributionControl={false}
 			cursor={canvasInteractive ? canvasCursor : 'auto'}
-			style={{ height: 'auto', ...style }}
+			style={{ position: 'absolute', inset: '0', ...style }}
 			{...canvasEvents}
 		>
 			<PopupDataContextProvider
