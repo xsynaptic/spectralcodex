@@ -156,6 +156,11 @@ export default defineConfig({
 				];
 				const path = new URL(page).pathname.replace(/\/$/, '');
 
+				// Exclude paginated pages (e.g. /posts/2, /locations/3)
+				if (/\/\d+$/.test(path)) {
+					return false;
+				}
+
 				return !excludePrefixes.some((prefix) => path === prefix || path.startsWith(prefix + '/'));
 			},
 		}),
