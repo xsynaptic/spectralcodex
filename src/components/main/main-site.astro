@@ -48,9 +48,9 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 		/>
 		<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
 		<MainMeta {...meta} />
-		<Font cssVariable="--font-commissioner" preload />
-		<Font cssVariable="--font-geologica" preload />
-		<Font cssVariable="--font-lora" preload />
+		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
+		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
+		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
 		<ModeManager defaultMode="auto" />
 		<ClientRouter />
 		<UmamiAnalytics
