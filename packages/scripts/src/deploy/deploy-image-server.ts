@@ -49,6 +49,7 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 	await $({ stdio: 'inherit' })`rsync ${[
 		'-avz',
 		'--delete',
+		'--mkpath',
 		'--progress',
 		...sshFlag,
 		'--exclude',
@@ -63,6 +64,7 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 	// Sync docker-compose.yml
 	await $({ stdio: 'inherit' })`rsync ${[
 		'-avz',
+		'--mkpath',
 		'--progress',
 		...sshFlag,
 		...dryRunFlag,
