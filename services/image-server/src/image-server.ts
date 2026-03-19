@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { createServer } from 'node:http';
 import { createIPX, createIPXNodeHandler, ipxFSStorage } from 'ipx';
+import { createServer } from 'node:http';
 
 // Server configuration from environment
 const config = {
@@ -38,7 +38,7 @@ const server = createServer((req, res) => {
 	}
 
 	// Delegate all other requests to IPX
-	ipxHandler(req, res);
+	void ipxHandler(req, res);
 });
 
 server.listen(config.port, () => {

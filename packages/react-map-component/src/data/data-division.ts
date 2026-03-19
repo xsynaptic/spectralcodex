@@ -23,7 +23,7 @@ export function useMapApiDivisionData({
 	isDev,
 }: Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'>) {
 	return useQuery<FeatureCollection<Polygon | MultiPolygon> | false>({
-		queryKey: ['division-data', apiDivisionUrl],
+		queryKey: ['division-data', apiDivisionUrl, isDev],
 		queryFn: async () => {
 			if (!apiDivisionUrl) return false;
 

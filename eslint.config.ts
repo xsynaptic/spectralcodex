@@ -13,13 +13,13 @@ export default getConfig(
 	[
 		{
 			ignores: [
+				'node_modules/**/*',
 				'**/.astro/**/*',
 				'**/.cache/**/*',
+				'**/dist/**/*',
 				'deploy/**/*',
-				'dist/**/*',
-				'content/**/*',
+				'packages/content/**/*',
 				'**/.mdxlintrc.mjs',
-				'node_modules/**/*',
 				'**/temp/**/*',
 			],
 		},
