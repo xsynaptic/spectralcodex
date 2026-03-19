@@ -1,6 +1,6 @@
 packages:
   - packages/**
-  - deploy/site/image-server
+  - services/*
 
 minimumReleaseAge: 1440
 

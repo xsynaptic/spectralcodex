@@ -28,12 +28,14 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 		throw new Error('Missing IPX_SERVER_SECRET environment variable');
 	}
 
-	const siteDir = path.join(rootPath, 'deploy/site');
+	const imageServerDir = path.join(rootPath, 'services/image-server');
+	const composeFile = path.join(rootPath, 'deploy/site/docker-compose.yml');
 	const projectPath = `${config.remotePath}/spectralcodex`;
 
 	console.log(chalk.blue('Deploying image server...'));
-	console.log(chalk.gray(`  From: ${siteDir}/`));
-	console.log(chalk.gray(`  To:   ${config.remoteHost}:${projectPath}/`));
+	console.log(chalk.gray(`  Image server: ${imageServerDir}/`));
+	console.log(chalk.gray(`  Compose file: ${composeFile}`));
+	console.log(chalk.gray(`  To: ${config.remoteHost}:${projectPath}/`));
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
@@ -43,7 +45,7 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 
 	const start = Date.now();
 
-	// Sync image server code
+	// Sync image server source
 	await $({ stdio: 'inherit' })`rsync ${[
 		'-avz',
 		'--delete',
@@ -53,15 +55,19 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 		'node_modules',
 		'--exclude',
 		'dist',
-		'--exclude',
-		'caddy',
-		'--exclude',
-		'certs',
-		'--exclude',
-		'scripts',
 		...dryRunFlag,
-		`${siteDir}/`,
-		`${config.remoteHost}:${projectPath}/`,
+		`${imageServerDir}/`,
+		`${config.remoteHost}:${projectPath}/services/image-server/`,
+	]}`;
+
+	// Sync docker-compose.yml
+	await $({ stdio: 'inherit' })`rsync ${[
+		'-avz',
+		'--progress',
+		...sshFlag,
+		...dryRunFlag,
+		composeFile,
+		`${config.remoteHost}:${projectPath}/deploy/site/docker-compose.yml`,
 	]}`;
 
 	if (dryRun) {
@@ -70,19 +76,21 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 		return;
 	}
 
-	// Write server .env
+	// Write server .env to deploy/site/ (docker compose reads from its own directory)
 	console.log(chalk.gray('Writing server environment...'));
 	const envContent = `DEPLOY_MEDIA_PATH=${config.mediaPath}\nIPX_SERVER_SECRET=${ipxServerSecret}`;
 
 	await $({
 		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`cat > ${projectPath}/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
+	})`ssh ${sshArgs} ${`mkdir -p ${projectPath}/deploy/site && cat > ${projectPath}/deploy/site/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
 
 	// Rebuild containers
 	console.log(chalk.gray('Rebuilding containers...'));
+	const composeCmd = `docker compose -p spectralcodex -f ${projectPath}/deploy/site/docker-compose.yml`;
+
 	await $({
 		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`cd ${projectPath} && docker compose pull && docker compose up -d --build --force-recreate`}`;
+	})`ssh ${sshArgs} ${`${composeCmd} pull && ${composeCmd} up -d --build --force-recreate`}`;
 
 	// Health check
 	console.log(chalk.gray('Waiting for health checks...'));
@@ -90,7 +98,7 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 	try {
 		await $({
 			stdio: 'inherit',
-		})`ssh ${sshArgs} ${`cd ${projectPath} && docker compose up -d --wait --wait-timeout 30`}`;
+		})`ssh ${sshArgs} ${`${composeCmd} up -d --wait --wait-timeout 30`}`;
 	} catch {
 		console.log(chalk.yellow('Warning: Health check timed out'));
 	}
@@ -98,7 +106,7 @@ export async function deployImageServer(options: DeployImageServerOptions): Prom
 	// Show status
 	await $({
 		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`docker compose -f ${projectPath}/docker-compose.yml ps`}`;
+	})`ssh ${sshArgs} ${`${composeCmd} ps`}`;
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

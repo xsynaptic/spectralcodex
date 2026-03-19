@@ -64,8 +64,8 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1(vite@7.3.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@tanstack/eslint-plugin-query':
-        specifier: ^5.91.4
-        version: 5.91.4(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+        specifier: ^5.91.5
+        version: 5.91.5(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@turf/bbox':
         specifier: ^7.3.4
         version: 7.3.4
@@ -107,7 +107,7 @@ importers:
         version: 3.2.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@xsynaptic/image-server':
         specifier: workspace:*
-        version: link:deploy/site/image-server
+        version: link:services/image-server
       '@xsynaptic/unified-tools':
         specifier: ^3.0.2
         version: 3.0.2
@@ -123,6 +123,9 @@ importers:
       astro-seo:
         specifier: ^1.1.0
         version: 1.1.0(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.9.3)
+      colorthief:
+        specifier: ^3.3.1
+        version: 3.3.1(sharp@0.34.5)
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
@@ -154,8 +157,8 @@ importers:
         specifier: ^4.0.2
         version: 4.0.2
       knip:
-        specifier: ^5.87.0
-        version: 5.87.0(@types/node@24.10.1)(typescript@5.9.3)
+        specifier: ^5.88.0
+        version: 5.88.0(@types/node@24.10.1)(typescript@5.9.3)
       maplibre-gl:
         specifier: ^5.20.2
         version: 5.20.2
@@ -216,25 +219,6 @@ importers:
       zod:
         specifier: ^4.3.6
         version: 4.3.6
-
-  deploy/site/image-server:
-    dependencies:
-      ipx:
-        specifier: ^4.0.0-alpha.1
-        version: 4.0.0-alpha.1(unstorage@1.17.4(idb-keyval@6.2.2))
-    devDependencies:
-      dotenv:
-        specifier: ^17.3.1
-        version: 17.3.1
-      tsdown:
-        specifier: 0.19.0
-        version: 0.19.0(oxc-resolver@11.19.1)(synckit@0.11.12)(typescript@5.9.3)
-      tsx:
-        specifier: ^4.19.4
-        version: 4.21.0
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
 
   packages/astro-build-logger:
     dependencies:
@@ -544,6 +528,25 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
 
+  services/image-server:
+    dependencies:
+      ipx:
+        specifier: ^4.0.0-alpha.1
+        version: 4.0.0-alpha.1(unstorage@1.17.4(idb-keyval@6.2.2))
+    devDependencies:
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
+      tsdown:
+        specifier: 0.19.0
+        version: 0.19.0(oxc-resolver@11.19.1)(synckit@0.11.12)(typescript@5.9.3)
+      tsx:
+        specifier: ^4.19.4
+        version: 4.21.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
 packages:
 
   '@astrojs/check@0.9.6':
@@ -715,11 +718,6 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  '@babel/parser@7.28.6':
-    resolution: {integrity: sha512-TeR9zWR18BvbfPmGbLampPMW+uW1NZnJlRuuHso8i87QZNq2JRF9i6RgxRqtEq+wQGsS19NNTWr2duhnE49mfQ==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
   '@babel/parser@7.29.0':
     resolution: {integrity: sha512-IyDgFV5GeDUVX4YdF/3CPULtVGSXXMLh1xVIgdCgxApktqnQV0r7/8Nqthg+8YLGaAtdyIlo2qIdZrbCv4+7ww==}
     engines: {node: '>=6.0.0'}
@@ -751,10 +749,6 @@ packages:
 
   '@babel/traverse@7.29.0':
     resolution: {integrity: sha512-4HPiQr0X7+waHfyXPZpWPfWL/J7dcN1mx9gL6WdQVMbPnF3+ZhSMs8tCxN7oHddJE9fhNE7+lxdnlyemKfJRuA==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/types@7.28.6':
-    resolution: {integrity: sha512-0ZrskXVEHSWIqZM/sQZ4EV3jZJXRkio/WCxaqKZP1g//CEWEPSfeZFcms4XeKBCHU0ZKnIkdJeU/kF+eRp5lBg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/types@7.29.0':
@@ -2210,11 +2204,11 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7
 
-  '@tanstack/eslint-plugin-query@5.91.4':
-    resolution: {integrity: sha512-8a+GAeR7oxJ5laNyYBQ6miPK09Hi18o5Oie/jx8zioXODv/AUFLZQecKabPdpQSLmuDXEBPKFh+W5DKbWlahjQ==}
+  '@tanstack/eslint-plugin-query@5.91.5':
+    resolution: {integrity: sha512-4pqgoT5J+ntkyOoBtnxJu8LYRj3CurfNe92fghJw66mI7pZijKmOulM32Wa48cyVzGtgiuQ2o5KWC9LJVXYcBQ==}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: ^5.0.0
+      typescript: ^5.4.0
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3498,6 +3492,15 @@ packages:
   color-support@1.1.3:
     resolution: {integrity: sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==}
     hasBin: true
+
+  colorthief@3.3.1:
+    resolution: {integrity: sha512-a3qzYXy51h6p3725pV8rnJwUBGTtvYQge2pVhKJwL+vETUD5pCi6VKmQyu51pBHdUbu/BPEXbwFLS0GnxXNhGA==}
+    hasBin: true
+    peerDependencies:
+      sharp: '>=0.33.0'
+    peerDependenciesMeta:
+      sharp:
+        optional: true
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -4848,8 +4851,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@5.87.0:
-    resolution: {integrity: sha512-oJBrwd4/Mt5E6817vcdQLaPpejxZTxpASauYLkp6HaT0HN1seHnpF96KEjza9O8yARvHEQ9+So9AFUjkPci7dQ==}
+  knip@5.88.0:
+    resolution: {integrity: sha512-FZjQYLYwUbVrtC3C1cKyEMMqR4K2ZlkQLZszJgF5cfDo4GUSBZAdAV0P3eyzZrkssRoghLJQA9HTQUW7G+Tc8Q==}
     engines: {node: '>=18.18.0'}
     hasBin: true
     peerDependencies:
@@ -7797,10 +7800,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.0
 
-  '@babel/parser@7.28.6':
-    dependencies:
-      '@babel/types': 7.29.0
-
   '@babel/parser@7.29.0':
     dependencies:
       '@babel/types': 7.29.0
@@ -7850,11 +7849,6 @@ snapshots:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
-
-  '@babel/types@7.28.6':
-    dependencies:
-      '@babel/helper-string-parser': 7.27.1
-      '@babel/helper-validator-identifier': 7.28.5
 
   '@babel/types@7.29.0':
     dependencies:
@@ -8968,7 +8962,7 @@ snapshots:
       tailwindcss: 4.2.1
       vite: 7.3.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  '@tanstack/eslint-plugin-query@5.91.4(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
+  '@tanstack/eslint-plugin-query@5.91.5(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
       '@typescript-eslint/utils': 8.53.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.4(jiti@2.6.1)
@@ -11350,6 +11344,10 @@ snapshots:
   color-support@1.1.3:
     optional: true
 
+  colorthief@3.3.1(sharp@0.34.5):
+    optionalDependencies:
+      sharp: 0.34.5
+
   comma-separated-tokens@2.0.3: {}
 
   commander@11.1.0: {}
@@ -12927,7 +12925,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@5.87.0(@types/node@24.10.1)(typescript@5.9.3):
+  knip@5.88.0(@types/node@24.10.1)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
       '@types/node': 24.10.1
@@ -15036,9 +15034,9 @@ snapshots:
 
   rolldown-plugin-dts@0.20.0(oxc-resolver@11.19.1)(rolldown@1.0.0-beta.59)(typescript@5.9.3):
     dependencies:
-      '@babel/generator': 7.28.6
-      '@babel/parser': 7.28.6
-      '@babel/types': 7.28.6
+      '@babel/generator': 7.29.1
+      '@babel/parser': 7.29.0
+      '@babel/types': 7.29.0
       ast-kit: 2.2.0
       birpc: 4.0.0
       dts-resolver: 2.1.3(oxc-resolver@11.19.1)
@@ -15738,7 +15736,7 @@ snapshots:
       picomatch: 4.0.3
       rolldown: 1.0.0-beta.59
       rolldown-plugin-dts: 0.20.0(oxc-resolver@11.19.1)(rolldown@1.0.0-beta.59)(typescript@5.9.3)
-      semver: 7.7.3
+      semver: 7.7.4
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tree-kill: 1.2.2

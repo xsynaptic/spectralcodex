@@ -14,7 +14,7 @@ dotenv.config({ path: path.join(rootPath, '.env.dev'), override: true, quiet: tr
 // Resolve paths to absolute for Docker
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 process.env.CONTENT_MEDIA_PATH = path.resolve(rootPath, mediaPathRelative);
-process.env.DEPLOY_IMAGE_SERVER_PATH = path.resolve(rootPath, 'deploy/site/image-server');
+process.env.DEPLOY_IMAGE_SERVER_PATH = path.resolve(rootPath, 'services/image-server');
 
 $.verbose = false;
 
