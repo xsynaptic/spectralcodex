@@ -19,22 +19,22 @@ test.describe('navigation', () => {
 		});
 
 		// Hover to reveal depth-1 submenu
-		await nav.getByRole('link', { name: t('collection.regions.labelPlural') }).hover();
+		await nav.getByRole('menuitem', { name: t('collection.regions.labelPlural') }).hover();
 
 		// Hover to reveal depth-2 submenu
-		const taiwanLink = nav.getByRole('link', { name: REGIONS_NAME_1, exact: true });
+		const taiwanLink = nav.getByRole('menuitem', { name: REGIONS_NAME_1, exact: true });
 		await expect(taiwanLink).toBeVisible();
 		await taiwanLink.hover();
 
 		// Hover to reveal depth-3 submenu
-		const tainanLink = nav.getByRole('link', {
+		const tainanLink = nav.getByRole('menuitem', {
 			name: new RegExp(String.raw`^${REGIONS_NAME_2} \(`),
 		});
 		await expect(tainanLink).toBeVisible();
 		await tainanLink.hover();
 
 		// Click submenu link and assert URL
-		const tainanCityLink = nav.getByRole('link', {
+		const tainanCityLink = nav.getByRole('menuitem', {
 			name: new RegExp(String.raw`^${REGIONS_NAME_3} \(`),
 		});
 		await expect(tainanCityLink).toBeVisible();

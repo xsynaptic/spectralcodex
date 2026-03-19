@@ -20,59 +20,64 @@ const menuItems = await getMenuHeaderItems();
 const t = getTranslations();
 ---
 
-<nav
-	class="relative px-small sm:px-0"
-	aria-label={t('site.menu.header.label')}
-	data-nosnippet
-	{...props}
->
-	<ul
-		class:list={[
-			'flex flex-wrap justify-between gap-x-4 md:gap-x-2',
-			hasHeroImage ? undefined : 'border-b border-primary-200 dark:border-primary-700',
-		]}
+<nav-menu>
+	<nav
+		class="relative px-small sm:px-0"
+		aria-label={t('site.menu.header.label')}
+		data-nosnippet
+		{...props}
 	>
-		{
-			menuItems.map((item) => (
-				<li class="group py-2 sm:relative">
-					<div class="flex items-center gap-x-1">
-						<Link
-							linkColor="accent"
-							class:list={[
-								'text-sm font-medium sm:text-base',
-								isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
-							]}
-							href={item.url}
-							{...(item.rel ? { rel: item.rel } : undefined)}
-						>
-							{item.title}
-						</Link>
-						{item.children ? (
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
+		<ul
+			class:list={[
+				'flex flex-wrap justify-between gap-x-4 md:gap-x-2',
+				hasHeroImage ? undefined : 'border-b border-primary-200 dark:border-primary-700',
+			]}
+		>
+			{
+				menuItems.map((item) => (
+					<li class="group py-2 sm:relative">
+						<div class="flex items-center gap-x-1">
+							<Link
+								linkColor="accent"
 								class:list={[
-									'h-full w-[18px] text-primary-500 opacity-100 transition-transform transition-discrete duration-100 group-focus-within:scale-y-[-1] group-hover:scale-y-[-1]',
+									'text-sm font-medium sm:text-base',
+									isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
 								]}
-								aria-hidden="true"
+								href={item.url}
+								{...(item.rel ? { rel: item.rel } : undefined)}
 							>
-								<title>A downward-facing chevron</title>
-								<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z" />
-							</svg>
+								{item.title}
+							</Link>
+							{item.children ? (
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									class:list={[
+										'h-full w-[18px] text-primary-500 opacity-100 transition-transform transition-discrete duration-100 group-focus-within:scale-y-[-1] group-hover:scale-y-[-1]',
+									]}
+									aria-hidden="true"
+								>
+									<path fill="currentColor" d="M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z" />
+								</svg>
+							) : undefined}
+						</div>
+						{item.children ? (
+							<MenuHeaderSubmenu
+								hasHeroImage={hasHeroImage}
+								menuItems={item.children}
+								depth={1}
+								ariaLabel={getMenuItemAriaLabel(item)}
+							/>
 						) : undefined}
-					</div>
-					{item.children ? (
-						<MenuHeaderSubmenu
-							hasHeroImage={hasHeroImage}
-							menuItems={item.children}
-							depth={1}
-							ariaLabel={getMenuItemAriaLabel(item)}
-						/>
-					) : undefined}
-				</li>
-			))
-		}
-	</ul>
-</nav>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</nav-menu>
+
+<script>
+	import '#lib/components/nav-menu.ts';
+</script>
