@@ -45,15 +45,15 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.5",
+		"astro": "^6.0.6",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.0.0",
-		"@astrojs/mdx": "^5.0.1",
+		"@astrojs/markdown-remark": "^7.0.1",
+		"@astrojs/mdx": "^5.0.2",
 		"@astrojs/node": "^10.0.2",
-		"@astrojs/react": "^5.0.0",
+		"@astrojs/react": "^5.0.1",
 		"@astrojs/rss": "^4.0.17",
 		"@astrojs/sitemap": "^3.7.1",
 		"@playwright/test": "^1.58.2",
@@ -96,7 +96,7 @@
 		"globals": "^17.4.0",
 		"kdbush": "^4.0.2",
 		"knip": "^5.87.0",
-		"maplibre-gl": "^5.20.1",
+		"maplibre-gl": "^5.20.2",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.8.1",

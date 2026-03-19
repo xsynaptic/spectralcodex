@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -19,17 +19,17 @@ importers:
         version: 19.2.4(react@19.2.4)
     devDependencies:
       '@astrojs/markdown-remark':
-        specifier: ^7.0.0
-        version: 7.0.0
+        specifier: ^7.0.1
+        version: 7.0.1
       '@astrojs/mdx':
-        specifier: ^5.0.1
-        version: 5.0.1(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        specifier: ^5.0.2
+        version: 5.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@astrojs/node':
         specifier: ^10.0.2
-        version: 10.0.2(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 10.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@astrojs/react':
-        specifier: ^5.0.0
-        version: 5.0.0(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(lightningcss@1.31.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^5.0.1
+        version: 5.0.1(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(lightningcss@1.31.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(yaml@2.8.2)
       '@astrojs/rss':
         specifier: ^4.0.17
         version: 4.0.17
@@ -98,7 +98,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@unpic/astro':
         specifier: ^1.0.2
-        version: 1.0.2(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 1.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       '@unpic/core':
         specifier: ^1.0.3
         version: 1.0.3
@@ -116,10 +116,10 @@ importers:
         version: 1.1.0
       astro-auto-import:
         specifier: ^0.5.1
-        version: 0.5.1(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 0.5.1(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-pagefind:
         specifier: ^1.8.5
-        version: 1.8.5(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 1.8.5(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       astro-seo:
         specifier: ^1.1.0
         version: 1.1.0(prettier-plugin-astro@0.14.1)(prettier@3.8.1)(typescript@5.9.3)
@@ -157,8 +157,8 @@ importers:
         specifier: ^5.87.0
         version: 5.87.0(@types/node@24.10.1)(typescript@5.9.3)
       maplibre-gl:
-        specifier: ^5.20.1
-        version: 5.20.1
+        specifier: ^5.20.2
+        version: 5.20.2
       p-limit:
         specifier: ^7.3.0
         version: 7.3.0
@@ -239,11 +239,11 @@ importers:
   packages/astro-build-logger:
     dependencies:
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       astro-integration-kit:
         specifier: ^0.20.0
-        version: 0.20.0(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
+        version: 0.20.0(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -278,8 +278,8 @@ importers:
         specifier: ^15.5.2
         version: 15.5.2
       textlint-plugin-mdx:
-        specifier: ^1.0.2
-        version: 1.0.2(typescript@5.9.3)
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@5.9.3)
       textlint-rule-diacritics:
         specifier: ^2.1.4
         version: 2.1.4(textlint@15.5.2)
@@ -290,8 +290,8 @@ importers:
   packages/content-demo:
     devDependencies:
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       mdxlint:
         specifier: ^1.0.0
         version: 1.0.0
@@ -317,8 +317,8 @@ importers:
   packages/image-loader:
     dependencies:
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -366,8 +366,8 @@ importers:
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       flatgeobuf:
         specifier: ^4.4.0
         version: 4.4.0
@@ -381,8 +381,8 @@ importers:
         specifier: ^1.14.3
         version: 1.14.3
       maplibre-gl:
-        specifier: ^5.20.1
-        version: 5.20.1
+        specifier: ^5.20.2
+        version: 5.20.2
       pmtiles:
         specifier: ^4.4.0
         version: 4.4.0
@@ -394,7 +394,7 @@ importers:
         version: 19.2.4(react@19.2.4)
       react-map-gl:
         specifier: ^8.1.0
-        version: 8.1.0(maplibre-gl@5.20.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 8.1.0(maplibre-gl@5.20.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       remeda:
         specifier: ^2.33.6
         version: 2.33.6
@@ -427,8 +427,8 @@ importers:
   packages/scripts:
     devDependencies:
       '@astrojs/markdown-remark':
-        specifier: ^7.0.0
-        version: 7.0.0
+        specifier: ^7.0.1
+        version: 7.0.1
       '@duckdb/node-api':
         specifier: ^1.5.0-r.1
         version: 1.5.0-r.1
@@ -472,8 +472,8 @@ importers:
         specifier: 3.0.2
         version: 3.0.2
       astro:
-        specifier: ^6.0.5
-        version: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+        specifier: ^6.0.6
+        version: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       better-sqlite3:
         specifier: ^12.8.0
         version: 12.8.0
@@ -576,12 +576,12 @@ packages:
       prettier-plugin-astro:
         optional: true
 
-  '@astrojs/markdown-remark@7.0.0':
-    resolution: {integrity: sha512-jTAXHPy45L7o1ljH4jYV+ShtOHtyQUa1mGp3a5fJp1soX8lInuTJQ6ihmldHzVM4Q7QptU4SzIDIcKbBJO7sXQ==}
+  '@astrojs/markdown-remark@7.0.1':
+    resolution: {integrity: sha512-zAfLJmn07u9SlDNNHTpjv0RT4F8D4k54NR7ReRas8CO4OeGoqSvOuKwqCFg2/cqN3wHwdWlK/7Yv/lMXlhVIaw==}
 
-  '@astrojs/mdx@5.0.1':
-    resolution: {integrity: sha512-xfvc9MuV/5Kl6JaiYYEFi7ilbGYyaaOboH+gH8f2jHAZ2pmmHtnSrewS03vNeruBsa8rtS3X8NHJrqeZt+0wLg==}
-    engines: {node: ^20.19.1 || >=22.12.0}
+  '@astrojs/mdx@5.0.2':
+    resolution: {integrity: sha512-0as6odPH9ZQhS3pdH9dWmVOwgXuDtytJiE4VvYgR0lSFBvF4PSTyE0HdODHm/d7dBghvWTPc2bQaBm4y4nTBNw==}
+    engines: {node: '>=22.12.0'}
     peerDependencies:
       astro: ^6.0.0
 
@@ -590,13 +590,13 @@ packages:
     peerDependencies:
       astro: ^6.0.0
 
-  '@astrojs/prism@4.0.0':
-    resolution: {integrity: sha512-NndtNPpxaGinRpRytljGBvYHpTOwHycSZ/c+lQi5cHvkqqrHKWdkPEhImlODBNmbuB+vyQUNUDXyjzt66CihJg==}
-    engines: {node: ^20.19.1 || >=22.12.0}
+  '@astrojs/prism@4.0.1':
+    resolution: {integrity: sha512-nksZQVjlferuWzhPsBpQ1JE5XuKAf1id1/9Hj4a9KG4+ofrlzxUUwX4YGQF/SuDiuiGKEnzopGOt38F3AnVWsQ==}
+    engines: {node: '>=22.12.0'}
 
-  '@astrojs/react@5.0.0':
-    resolution: {integrity: sha512-OuM+0QFsoPkvv8ZB57kVLxKOqvR+84GR/Em9lh/tAL4fV4CnpBPDxc++0vd1CipH4o99Is7GribuTHFy3doF6g==}
-    engines: {node: ^20.19.1 || >=22.12.0}
+  '@astrojs/react@5.0.1':
+    resolution: {integrity: sha512-gJgQfDUxyePk+UIzwCEtAq04SGbziwRNwOMYvkxLHEtZScSMvRnvQhDWAEMCjLwwEomoT92Tfm34xpD7XAAzOg==}
+    engines: {node: '>=22.12.0'}
     peerDependencies:
       '@types/react': ^17.0.50 || ^18.0.21 || ^19.0.0
       '@types/react-dom': ^17.0.17 || ^18.0.6 || ^19.0.0
@@ -1479,8 +1479,8 @@ packages:
   '@maplibre/geojson-vt@5.0.4':
     resolution: {integrity: sha512-KGg9sma45S+stfH9vPCJk1J0lSDLWZgCT9Y8u8qWZJyjFlP8MNP1WGTxIMYJZjDvVT3PDn05kN1C95Sut1HpgQ==}
 
-  '@maplibre/geojson-vt@6.0.2':
-    resolution: {integrity: sha512-OnXnV2m1yBULKOlUanNFTiOeXCktvWYY4yWoHVETlp6ShJGUhY3DNt9XzPByL24h4JcoJRccPBlMhH1o8cvmyQ==}
+  '@maplibre/geojson-vt@6.0.3':
+    resolution: {integrity: sha512-tJ8df2SAIacER7pWTiSlDjIULBBAfZnzAURvWb1d8kVzx/pmSJcG0L2p0DTAB6nEu8Lmsx5zAc8JFDcs2DTwaw==}
 
   '@maplibre/maplibre-gl-style-spec@19.3.3':
     resolution: {integrity: sha512-cOZZOVhDSulgK0meTsTkmNXb1ahVvmTmWmfx9gRBwc6hq98wS9JP35ESIoNq3xqEan+UN+gn8187Z6E4NKhLsw==}
@@ -3221,9 +3221,9 @@ packages:
   astro-seo@1.1.0:
     resolution: {integrity: sha512-G6LDNDyga30o+52v58jU7C35n3cORUzk7RSuY+xf/ZRbW6JiNplyaOO1VoYVKO+xzYNaBcxqNln2RFRR/wgJNQ==}
 
-  astro@6.0.5:
-    resolution: {integrity: sha512-JnLCwaoCaRXIHuIB8yNztJrd7M3hXrHUMAoQmeXtEBKxRu/738REhaCZ1lapjrS9HlpHsWTu3JUXTERB/0PA7g==}
-    engines: {node: ^20.19.1 || >=22.12.0, npm: '>=9.6.5', pnpm: '>=7.1.0'}
+  astro@6.0.6:
+    resolution: {integrity: sha512-Fg25tok0RF+ToCcfdfNdtkv7MutTfbE0Lc4UhZpQyoc8/iiTdAaNw1nHPxPD6Nfa/ql3lGAp9uOWaTTnnFY2Zg==}
+    engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
 
   astrojs-compiler-sync@1.1.1:
@@ -5020,8 +5020,8 @@ packages:
     resolution: {integrity: sha512-+zopwDy7DNknmwPQplem5lAZX/eCOzSvSNNcSKm5eVwTkOBzoktEfXsa9L23J/GIRhxRsaxzkPEhrJEpE2F4Gg==}
     engines: {node: '>= 10'}
 
-  maplibre-gl@5.20.1:
-    resolution: {integrity: sha512-57YIgfRct+rrk78ldoWRuLWRnXV/1vM2Rk0QYfEDQmsXdpgbACwvGoREIOZtyDIaq/GJK/ORYEriaAdVZuNfvw==}
+  maplibre-gl@5.20.2:
+    resolution: {integrity: sha512-0UzMWOe+GZmIUmOA99yTI1vRh15YcGnHxADVB2s+JF3etpjj2/MBCqbPEuu4BP9mLsJWJcpHH0Nzr9uuimmbuQ==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   markdown-extensions@2.0.0:
@@ -6679,8 +6679,8 @@ packages:
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
 
-  textlint-plugin-mdx@1.0.2:
-    resolution: {integrity: sha512-La+pgFdhw78F93PKm/c8IYipZPUMOxuwSVX9ZcVMT9Q9f3xF7N5rU37dotVjn+D8kmN0AJaxm0qtT5nEEP51mA==}
+  textlint-plugin-mdx@1.1.0:
+    resolution: {integrity: sha512-iEeQO5wW7X0TKChILS45FoPW/e9wrQp8gypAmNTg4DdgYgU3gWT+MbSIshvujD2roCFYVyh2TouZBlsckOYVAA==}
     peerDependencies:
       typescript: ^5.0.0
 
@@ -7537,10 +7537,10 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdown-remark@7.0.0':
+  '@astrojs/markdown-remark@7.0.1':
     dependencies:
       '@astrojs/internal-helpers': 0.8.0
-      '@astrojs/prism': 4.0.0
+      '@astrojs/prism': 4.0.1
       github-slugger: 2.0.0
       hast-util-from-html: 2.0.3
       hast-util-to-text: 4.0.2
@@ -7562,12 +7562,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/mdx@5.0.1(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@astrojs/mdx@5.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
-      '@astrojs/markdown-remark': 7.0.0
+      '@astrojs/markdown-remark': 7.0.1
       '@mdx-js/mdx': 3.1.1
       acorn: 8.16.0
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       es-module-lexer: 2.0.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -7581,20 +7581,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@10.0.2(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@astrojs/node@10.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@astrojs/internal-helpers': 0.8.0
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/prism@4.0.0':
+  '@astrojs/prism@4.0.1':
     dependencies:
       prismjs: 1.30.0
 
-  '@astrojs/react@5.0.0(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(lightningcss@1.31.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(yaml@2.8.2)':
+  '@astrojs/react@5.0.1(@types/node@24.10.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(jiti@2.6.1)(lightningcss@1.31.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(yaml@2.8.2)':
     dependencies:
       '@astrojs/internal-helpers': 0.8.0
       '@types/react': 19.2.14
@@ -8375,7 +8375,7 @@ snapshots:
 
   '@maplibre/geojson-vt@5.0.4': {}
 
-  '@maplibre/geojson-vt@6.0.2':
+  '@maplibre/geojson-vt@6.0.3':
     dependencies:
       kdbush: 4.0.2
 
@@ -10615,12 +10615,12 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@unpic/astro@1.0.2(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
+  '@unpic/astro@1.0.2(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))':
     dependencies:
       '@unpic/core': 1.0.3
       '@unpic/pixels': 1.3.0
       '@unpic/placeholder': 0.1.2
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       blurhash: 2.0.5
 
   '@unpic/core@1.0.3':
@@ -10642,13 +10642,13 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  '@vis.gl/react-maplibre@8.1.0(maplibre-gl@5.20.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@vis.gl/react-maplibre@8.1.0(maplibre-gl@5.20.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@maplibre/maplibre-gl-style-spec': 19.3.3
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
     optionalDependencies:
-      maplibre-gl: 5.20.1
+      maplibre-gl: 5.20.2
 
   '@vitejs/plugin-react@5.1.4(vite@7.3.1(@types/node@24.10.1)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
@@ -10942,10 +10942,10 @@ snapshots:
 
   astring@1.9.0: {}
 
-  astro-auto-import@0.5.1(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-auto-import@0.5.1(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       acorn: 8.15.0
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
 
   astro-eslint-parser@1.3.0:
     dependencies:
@@ -10964,15 +10964,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-integration-kit@0.20.0(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-integration-kit@0.20.0(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       pathe: 2.0.3
 
-  astro-pagefind@1.8.5(astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
+  astro-pagefind@1.8.5(astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)):
     dependencies:
       '@pagefind/default-ui': 1.3.0
-      astro: 6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      astro: 6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
       pagefind: 1.3.0
       sirv: 3.0.1
 
@@ -10984,11 +10984,11 @@ snapshots:
       - prettier-plugin-astro
       - typescript
 
-  astro@6.0.5(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
+  astro@6.0.6(@types/node@24.10.1)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2):
     dependencies:
       '@astrojs/compiler': 3.0.0
       '@astrojs/internal-helpers': 0.8.0
-      '@astrojs/markdown-remark': 7.0.0
+      '@astrojs/markdown-remark': 7.0.1
       '@astrojs/telemetry': 3.3.0
       '@capsizecss/unpack': 4.0.0
       '@clack/prompts': 1.0.1
@@ -13096,7 +13096,7 @@ snapshots:
       - supports-color
     optional: true
 
-  maplibre-gl@5.20.1:
+  maplibre-gl@5.20.2:
     dependencies:
       '@mapbox/jsonlint-lines-primitives': 2.0.2
       '@mapbox/point-geometry': 1.1.0
@@ -13104,7 +13104,7 @@ snapshots:
       '@mapbox/unitbezier': 0.0.1
       '@mapbox/vector-tile': 2.0.4
       '@mapbox/whoots-js': 3.1.0
-      '@maplibre/geojson-vt': 6.0.2
+      '@maplibre/geojson-vt': 6.0.3
       '@maplibre/maplibre-gl-style-spec': 24.7.0
       '@maplibre/mlt': 1.1.7
       '@maplibre/vt-pbf': 4.3.0
@@ -14450,14 +14450,14 @@ snapshots:
       react: 19.2.4
       scheduler: 0.27.0
 
-  react-map-gl@8.1.0(maplibre-gl@5.20.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  react-map-gl@8.1.0(maplibre-gl@5.20.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@vis.gl/react-mapbox': 8.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@vis.gl/react-maplibre': 8.1.0(maplibre-gl@5.20.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@vis.gl/react-maplibre': 8.1.0(maplibre-gl@5.20.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
     optionalDependencies:
-      maplibre-gl: 5.20.1
+      maplibre-gl: 5.20.2
 
   react-refresh@0.18.0: {}
 
@@ -15622,7 +15622,7 @@ snapshots:
 
   text-table@0.2.0: {}
 
-  textlint-plugin-mdx@1.0.2(typescript@5.9.3):
+  textlint-plugin-mdx@1.1.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
 
