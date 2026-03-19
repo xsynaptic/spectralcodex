@@ -9,12 +9,9 @@ import {
 	IPX_SERVER_SECRET,
 	IPX_SERVER_URL,
 } from 'astro:env/server';
-import { getSwatches } from 'colorthief';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 import { z } from 'zod';
-
-import type { ImagePaletteSwatch } from '#lib/image/image-types.ts';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
@@ -44,18 +41,11 @@ const ImageExifDataSchema = z.object({
 
 type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
 
-const ImagePaletteSwatchSchema = z.object({
-	hex: z.string(),
-	label: z.string(),
-	proportion: z.number(),
-});
-
 const ImageMetadataSchema = ImageExifDataSchema.extend({
 	src: z.string(),
 	path: z.string(),
 	width: z.number(),
 	height: z.number(),
-	palette: z.array(ImagePaletteSwatchSchema).optional(),
 	modifiedTime: z.date().optional(),
 });
 
@@ -71,41 +61,15 @@ interface ImageMetadataCached {
 	width: number;
 	height: number;
 	exif?: ImageExifDataInput | undefined;
-	palette?: Array<ImagePaletteSwatch>;
 }
 
 const imageMetadataCache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-metadata');
 
-async function getImageDimensions(imageObject: sharp.Sharp) {
-	const metadata = await imageObject.metadata();
+// Extract image dimensions from the image object
+async function getImageDimensions(imagePath: string) {
+	const metadata = await sharp(imagePath).metadata();
 
 	return { width: metadata.width, height: metadata.height };
-}
-
-const PALETTE_RESIZE_WIDTH = 1000;
-
-function toKebabCase(str: string) {
-	return str.replaceAll(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-async function extractPalette(imageObject: sharp.Sharp): Promise<Array<ImagePaletteSwatch>> {
-	try {
-		const buffer = await imageObject.resize(PALETTE_RESIZE_WIDTH).toBuffer();
-		const swatches = await getSwatches(buffer);
-
-		return Object.entries(swatches)
-			.filter((entry): entry is [string, NonNullable<(typeof entry)[1]>] => entry[1] !== null)
-			.map(([key, swatch]) => ({
-				hex: swatch.color.hex(),
-				label: toKebabCase(key),
-				proportion: swatch.color.proportion,
-			}))
-			.sort((a, b) => b.proportion - a.proportion);
-	} catch (error) {
-		console.warn(`Failed to extract palette from image:`, error);
-
-		return [];
-	}
 }
 
 // Calculate EV using the formula EV = log2(N^2 / t)
@@ -133,6 +97,41 @@ function getImageExposureValue({
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
+// Extract a selection of EXIF data from the image
+async function extractExifData(
+	filePathRelative: string,
+	exiftool: ExifTool,
+): Promise<ImageExifDataInput> {
+	const tags = await exiftool.read(filePathRelative);
+
+	const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+
+	return {
+		title: String(tags.Title),
+		description: String(tags.Description),
+		dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
+		brand: String(tags.Make),
+		camera: String(tags.Model),
+		lens: tags.LensID ?? String(tags.LensModel),
+		aperture: String(tags.FNumber),
+		shutterSpeed: String(tags.ShutterSpeed),
+		focalLength: String(tags.FocalLength),
+		iso: String(tags.ISO),
+		exposureValue: getImageExposureValue({
+			aperture: String(tags.FNumber),
+			shutterSpeed: String(tags.ShutterSpeed),
+		}),
+		...(tags.GPSLatitude && tags.GPSLongitude
+			? {
+					geometry: {
+						type: GeometryTypeEnum.Point,
+						coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
+					},
+				}
+			: {}),
+	};
+}
+
 // This function is used to set a sensible default for the image URL
 const getIpxImageUrl = createIpxImageUrlFunction({
 	imageQuality: IMAGE_QUALITY,
@@ -147,7 +146,7 @@ let exiftool: ExifTool;
 export const images = defineCollection({
 	loader: imageLoader({
 		base: CONTENT_MEDIA_PATH,
-		concurrency: 40,
+		concurrency: 80,
 		beforeLoad: () => {
 			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
 		},
@@ -160,52 +159,18 @@ export const images = defineCollection({
 
 			let dimensions: { width: number; height: number };
 			let exif: ImageExifDataInput | undefined;
-			let palette: Array<ImagePaletteSwatch> = [];
 
 			if (cached) {
 				dimensions = { width: cached.width, height: cached.height };
 
 				if (cached.exif) exif = cached.exif;
-				if (cached.palette) palette = cached.palette;
 			} else {
-				const imageObject = sharp(filePathRelative);
-
-				dimensions = await getImageDimensions(imageObject);
-				palette = await extractPalette(imageObject);
-
-				const tags = await exiftool.read(filePathRelative);
-
-				const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
-
-				exif = {
-					title: String(tags.Title),
-					description: String(tags.Description),
-					dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
-					brand: String(tags.Make),
-					camera: String(tags.Model),
-					lens: tags.LensID ?? String(tags.LensModel),
-					aperture: String(tags.FNumber),
-					shutterSpeed: String(tags.ShutterSpeed),
-					focalLength: String(tags.FocalLength),
-					iso: String(tags.ISO),
-					exposureValue: getImageExposureValue({
-						aperture: String(tags.FNumber),
-						shutterSpeed: String(tags.ShutterSpeed),
-					}),
-					...(tags.GPSLatitude && tags.GPSLongitude
-						? {
-								geometry: {
-									type: GeometryTypeEnum.Point,
-									coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
-								},
-							}
-						: {}),
-				};
+				dimensions = await getImageDimensions(filePathRelative);
+				exif = await extractExifData(filePathRelative, exiftool);
 
 				await imageMetadataCache.set(cacheKey, {
 					...dimensions,
 					exif,
-					palette,
 				} satisfies ImageMetadataCached);
 			}
 
@@ -224,14 +189,12 @@ export const images = defineCollection({
 				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
 				title: '',
 				description: '',
-				palette: [] as Array<ImagePaletteSwatch>,
 			};
 
 			return {
 				...defaultMetadata,
 				...dimensions,
 				...exif,
-				palette,
 			} satisfies ImageMetadataInput;
 		},
 	}),

@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.7.0",
+	"version": "6.8.0",
 	"scripts": {
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
@@ -85,7 +85,6 @@
 		"astro-auto-import": "^0.5.1",
 		"astro-pagefind": "^1.8.5",
 		"astro-seo": "^1.1.0",
-		"colorthief": "^3.3.1",
 		"dotenv": "^17.3.1",
 		"eslint": "^9.39.4",
 		"eslint-plugin-astro": "^1.6.0",

@@ -85,12 +85,3 @@ export interface ImagePlaceholderProps {
  */
 export type ImageComponentProps = HTMLAttributes<'img'> &
 	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'>;
-
-/**
- * Color palette extraction
- */
-export interface ImagePaletteSwatch {
-	hex: string;
-	label: string;
-	proportion: number;
-}
