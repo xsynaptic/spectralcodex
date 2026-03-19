@@ -16,16 +16,21 @@ interface Props extends HTMLAttributes<'nav'> {
 
 const { class: className, page, ...props } = Astro.props;
 
+type PaginationItem =
+	| { type: 'page'; pageNumber: number; isCollapsible: boolean }
+	| { type: 'current'; pageNumber: number }
+	| { type: 'divider' };
+
 interface PaginationData {
 	getPageNumberLink: (pageNumber: number) => string;
 	pagePrevLink: string | undefined;
 	pageNextLink: string | undefined;
-	pageArray: Array<number>;
+	pageArray: Array<PaginationItem>;
 }
 
 /**
  * This function adapted from a comment found on this popular gist
- * Note: `-1` is converted to a divider (...) at the component level
+ * Note: `-1` values represent divider positions
  * @link https://gist.github.com/kottenator/9d936eb3e4e3c3e02598?permalink_comment_id=4215826#gistcomment-4215826
  */
 function getPageNumberArray({
@@ -44,21 +49,21 @@ function getPageNumberArray({
 	const centerPagesShown = pagesShown - 5;
 	const boundaryPagesShown = pagesShown - 3;
 
-	currentPage = R.clamp(currentPage, { min: 1, max: pageCount });
-	pagesShown = R.clamp(pagesShown, { min: minimumPagesShown, max: pageCount });
+	const clampedCurrentPage = R.clamp(currentPage, { min: 1, max: pageCount });
+	const clampedPagesShown = R.clamp(pagesShown, { min: minimumPagesShown, max: pageCount });
 
-	if (pageCount <= pagesShown) {
-		delta = pagesShown;
+	if (pageCount <= clampedPagesShown) {
+		delta = clampedPagesShown;
 	} else {
 		delta =
-			currentPage < boundaryPagesShown || currentPage > pageCount - boundaryPagesShown
+			clampedCurrentPage < boundaryPagesShown || clampedCurrentPage > pageCount - boundaryPagesShown
 				? boundaryPagesShown
 				: centerPagesShown;
 	}
 
 	const range = {
-		start: Math.round(currentPage - delta / 2),
-		end: Math.round(currentPage + delta / 2),
+		start: Math.round(clampedCurrentPage - delta / 2),
+		end: Math.round(clampedCurrentPage + delta / 2),
 	};
 
 	if (range.start - 1 === 1 || range.end + 1 === pageCount) {
@@ -67,11 +72,11 @@ function getPageNumberArray({
 	}
 
 	let pages =
-		currentPage > delta
+		clampedCurrentPage > delta
 			? R.range(Math.min(range.start, pageCount - delta), Math.min(range.end, pageCount) + 1)
 			: R.range(1, Math.min(pageCount, delta + 1) + 1);
 
-	if (currentPage > pageCount - boundaryPagesShown && pageCount > pagesShown) {
+	if (clampedCurrentPage > pageCount - boundaryPagesShown && pageCount > clampedPagesShown) {
 		pages = R.range(pageCount - delta, pageCount + 1);
 	}
 
@@ -108,10 +113,29 @@ function getPaginationData({
 		pageNumber === 1 ? pageBasePath : urlJoin(pageBasePath, String(pageNumber), '/');
 
 	// Generate a list of page numbers, with special handling for large numbers of pages
-	const pageArray =
+	const rawPages =
 		pageCount <= pageCountMax
 			? R.range(1, pageCount + 1)
 			: getPageNumberArray({ currentPage, pageCount, pagesShown: pageCountMax });
+
+	// Transform raw numbers into a discriminated union, pre-computing collapsible state
+	let isCollapsible = false;
+
+	const pageArray: Array<PaginationItem> = rawPages.map((pageNumber) => {
+		if (pageNumber === -1) {
+			isCollapsible = !isCollapsible;
+
+			return { type: 'divider' };
+		}
+
+		if (pageNumber === currentPage) {
+			return { type: 'current', pageNumber };
+		}
+
+		const isAdjacentToCurrent = pageNumber === currentPage - 1 || pageNumber === currentPage + 1;
+
+		return { type: 'page', pageNumber, isCollapsible: isCollapsible && !isAdjacentToCurrent };
+	});
 
 	return {
 		getPageNumberLink,
@@ -122,9 +146,6 @@ function getPaginationData({
 }
 
 const { getPageNumberLink, pagePrevLink, pageNextLink, pageArray } = getPaginationData({ page });
-
-// Hide midpoint numbers on smaller viewports; only triggered when midpoint numbers exist
-let isMidpointNumbers = false;
 
 const t = getTranslations();
 
@@ -138,7 +159,7 @@ function getPageNumberAriaLabel(pageNumber: number) {
 		<nav class:list={[className]} aria-label={t('site.pagination.label')} {...props}>
 			<ul
 				class:list={[
-					'flex flex-wrap gap-4 text-base font-medium tabular-nums md:gap-1 md:text-sm',
+					'flex flex-wrap gap-4 text-base font-medium tabular-nums select-none md:gap-1 md:text-sm',
 					page.lastPage >= 10 ? 'justify-between' : undefined,
 				]}
 			>
@@ -152,43 +173,36 @@ function getPageNumberAriaLabel(pageNumber: number) {
 						</Link>
 					</li>
 				) : undefined}
-				{pageArray.map((pageNumber) => {
-					switch (pageNumber) {
-						case -1: {
-							isMidpointNumbers = !isMidpointNumbers;
-
+				{pageArray.map((item) => {
+					switch (item.type) {
+						case 'divider': {
 							return (
-								<li
-									class:list={[
-										'text-primary-300 dark:text-primary-600',
-										isMidpointNumbers ? 'hidden md:block' : undefined,
-									]}
-								>
+								<li class="text-primary-300 dark:text-primary-600" aria-hidden="true">
 									&#x22EF;
 								</li>
 							);
 						}
-						case page.currentPage: {
+						case 'current': {
 							return (
 								<li class="px-2 font-bold first:pl-0 last:pr-0" aria-current="page">
-									{String(pageNumber)}
+									{String(item.pageNumber)}
 								</li>
 							);
 						}
-						default: {
+						case 'page': {
 							return (
 								<li
 									class:list={[
 										'first:-ml-2 last:-mr-2',
-										isMidpointNumbers ? 'hidden md:block' : undefined,
+										item.isCollapsible ? 'hidden md:block' : undefined,
 									]}
 								>
 									<Link
-										href={getPageNumberLink(pageNumber)}
+										href={getPageNumberLink(item.pageNumber)}
 										class="px-2"
-										aria-label={getPageNumberAriaLabel(pageNumber)}
+										aria-label={getPageNumberAriaLabel(item.pageNumber)}
 									>
-										{String(pageNumber)}
+										{String(item.pageNumber)}
 									</Link>
 								</li>
 							);
