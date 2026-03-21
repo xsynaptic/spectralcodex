@@ -79,7 +79,7 @@ export default getConfig(
 				'react-hooks/use-memo': 'warn',
 			},
 		},
-		// Those files run in the browser and need the browser globals
+		// These files run in the browser and might need the browser globals
 		{
 			files: ['src/components/**/*', 'src/components/**/*/*.ts'],
 			languageOptions: {
@@ -94,31 +94,24 @@ export default getConfig(
 			},
 		},
 		/**
-		 * Astro support; with some help from...
-		 * @reference - https://github.com/Princesseuh/erika.florist/blob/main/eslint.config.js
+		 * Astro
 		 */
 		...astroPlugin.configs['flat/recommended'],
 		...astroPlugin.configs['jsx-a11y-strict'],
+		// Split into two blocks so disableTypeChecked doesn't clobber our parserOptions
 		{
 			files: ['**/*.astro'],
 			languageOptions: {
 				parserOptions: {
 					parser: tseslint.parser,
 					extraFileExtensions: ['.astro'],
-					/**
-					 * Note: Astro's TypeScript linting support is incompatible with the newer `projectService` option
-					 * Override to project: true to avoid warning spam
-					 * @link - https://github.com/ota-meshi/astro-eslint-parser/issues/331
-					 */
-					projectService: false,
-					project: true,
 				},
 			},
 		},
-		// Disable typed rules for scripts _inside_ Astro files
-		// 2026Q1: this is still required otherwise TypeScript might crash!
+		// Type-aware rules can't properly resolve types in .astro files; `astro check` handles this
+		// Keep frontmatter thin and push logic into .ts files for full lint coverage
 		{
-			files: ['**/*.astro/*.ts', '*.astro/*.ts'],
+			files: ['**/*.astro'],
 			...tseslint.configs.disableTypeChecked,
 		},
 	],
