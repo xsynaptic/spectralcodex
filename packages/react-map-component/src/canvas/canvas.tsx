@@ -17,6 +17,7 @@ import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
 import { useMapCanvasEvents } from './canvas-events';
 import { MapPopup } from './canvas-popup';
+import { MapTargetMarkers } from './canvas-target-marker';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)
 // All other layers do not trigger pointer events
@@ -57,6 +58,7 @@ const MapCanvasContainer: FC<
 	spritesId,
 	apiPopupUrl,
 	popupData,
+	targetIds,
 	version,
 	isDev,
 }) {
@@ -141,6 +143,7 @@ const MapCanvasContainer: FC<
 				bounds={bounds}
 				isDev={isDev}
 			/>
+			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);

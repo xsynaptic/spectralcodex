@@ -152,6 +152,7 @@ export interface MapComponentProps extends Partial<
 	protomapsApiKey?: string | undefined;
 	spritesId?: string | undefined;
 	spritesUrl?: string | undefined;
+	targetIds?: Array<string> | undefined;
 	style?: CSSProperties | undefined;
 	version?: string | undefined;
 	isDev?: boolean | undefined;

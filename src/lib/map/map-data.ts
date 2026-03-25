@@ -174,6 +174,7 @@ export function getMapData({
 
 	if (featureCollection && mapBounds) {
 		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+		const targetIds = targetId ? [targetId] : undefined;
 
 		if (mapId) {
 			const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
@@ -189,6 +190,7 @@ export function getMapData({
 				featureCount: featureCollection.features.length,
 				...mapBounds,
 				...props,
+				targetIds,
 			} satisfies MapComponentData;
 		} else {
 			const sourceData = getLocationsMapSourceData(featureCollection);
@@ -204,6 +206,7 @@ export function getMapData({
 				version: `${import.meta.env.BUILD_VERSION ?? 'unknown'}-${sourceHash}-${popupHash}`,
 				...mapBounds,
 				...props,
+				targetIds,
 			} satisfies MapComponentData;
 		}
 	}

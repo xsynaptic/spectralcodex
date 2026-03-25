@@ -41,6 +41,18 @@ button.maplibregl-popup-close-button:focus {
 	@apply border-t-primary-950;
 }
 
+/** Target marker */
+@keyframes target-pulse-ring {
+	0% {
+		transform: scale(0.5);
+		opacity: 0.7;
+	}
+	100% {
+		transform: scale(2.5);
+		opacity: 0;
+	}
+}
+
 /** Controls */
 .maplibregl-ctrl-group {
 	overflow: hidden;

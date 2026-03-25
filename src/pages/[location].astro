@@ -34,7 +34,7 @@ export const getStaticPaths = (async () => {
 				mapData: getMapData({
 					mapId: `${entry.collection}/${entry.id}`,
 					featureCollection: getLocationsFeatureCollection([entry]),
-					targetId: entry.id, // Center on the main location
+					targetId: entry.data._uuid ?? entry.id,
 					boundsBuffer: 1, // 1km fixed buffer
 					...(regionPrimary?.data._langCode?.startsWith('zh')
 						? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
