@@ -1,30 +1,13 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
 import LocationIndex from '#layouts/location-index.astro';
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import {
-	createContentMetadataFunction,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { queryLocationsIndex } from '#lib/collections/locations/locations-data.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { entries } = await getLocationsCollection();
+	const results = await queryLocationsIndex();
 
-	const getContentMetadata = await createContentMetadataFunction();
-
-	const metadataItems = R.pipe(
-		entries,
-		R.filter(createFilterEntryQualityFunction(2)),
-		R.filter((item) => !!item.data.imageFeatured),
-		getContentMetadata,
-		R.sort(sortContentMetadataByDate),
-	);
-
-	return paginate(metadataItems, { pageSize: 20 });
+	return paginate(results, { pageSize: 20 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

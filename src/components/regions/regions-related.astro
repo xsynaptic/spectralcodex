@@ -1,16 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import * as R from 'remeda';
-
 import Container from '#components/parts/container.astro';
 import RegionsList from '#components/regions/regions-list.astro';
-import {
-	createRegionAncestorsFunction,
-	createRegionsByIdsFunction,
-} from '#lib/collections/regions/regions-utils.ts';
+import { createQueryRegionsRelatedFunction } from '#lib/collections/regions/regions-data.ts';
+import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;
@@ -20,25 +15,14 @@ interface Props {
 const { entry, limit = 12 } = Astro.props;
 
 // Only show alternate titles above this depth; saves space for top-level regions
-const SHOW_TITLE_ALT_DEPTH = 2;
+const showTitleAltDepth = 2;
 
-const getRegionsByIds = await createRegionsByIdsFunction();
-const getRegionAncestors = await createRegionAncestorsFunction();
-
-function getRegionsRelatedByIds(ids: Array<string> | undefined, limit: number) {
-	return ids
-		? R.pipe(
-				ids,
-				getRegionsByIds,
-				R.filter(filterWithContent),
-				R.sort(sortByContentCount),
-				R.take(limit),
-			)
-		: [];
-}
+const getRegionsRelatedByIds = await createQueryRegionsRelatedFunction();
 
 const regionChildren = getRegionsRelatedByIds(entry.data._children, limit);
 const regionSiblings = getRegionsRelatedByIds(entry.data._siblings, limit);
+
+const getRegionAncestors = await createRegionAncestorsFunction();
 
 const depth = getRegionAncestors(entry).length;
 
@@ -63,10 +47,7 @@ const t = getTranslations();
 					>
 						<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
 					</h2>
-					<RegionsList
-						terms={regionChildren}
-						showTitleMultilingual={depth >= SHOW_TITLE_ALT_DEPTH}
-					/>
+					<RegionsList terms={regionChildren} showTitleMultilingual={depth >= showTitleAltDepth} />
 				</div>
 			) : undefined}
 			{regionSiblings.length > 0 ? (
@@ -79,10 +60,7 @@ const t = getTranslations();
 					>
 						<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
 					</h2>
-					<RegionsList
-						terms={regionSiblings}
-						showTitleMultilingual={depth >= SHOW_TITLE_ALT_DEPTH}
-					/>
+					<RegionsList terms={regionSiblings} showTitleMultilingual={depth >= showTitleAltDepth} />
 				</div>
 			) : undefined}
 		</Container>

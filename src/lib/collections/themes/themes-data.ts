@@ -1,5 +1,8 @@
 import { getCollection } from 'astro:content';
+import * as R from 'remeda';
 
+import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
 
 export const getThemesCollection = createCollectionData({
@@ -19,3 +22,18 @@ export const getThemesCollection = createCollectionData({
 		}
 	},
 });
+
+export async function queryThemesIndex() {
+	const { entries } = await getThemesCollection();
+
+	const getContentMetadata = await createContentMetadataFunction();
+
+	return R.pipe(
+		entries,
+		R.filter(filterWithContent),
+		/** Only display themes with associated images */
+		R.filter((entry) => !!entry.data.imageFeatured),
+		R.sort(sortByContentCount),
+		getContentMetadata,
+	);
+}

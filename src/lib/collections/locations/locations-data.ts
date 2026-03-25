@@ -5,6 +5,7 @@ import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+import * as R from 'remeda';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
@@ -14,7 +15,12 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
+import {
+	createContentMetadataFunction,
+	sortContentMetadataByDate,
+} from '#lib/metadata/metadata-utils.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -185,3 +191,17 @@ export const getLocationsCollection = createCollectionData({
 		await generateLocationImageData(entries);
 	},
 });
+
+export async function queryLocationsIndex() {
+	const { entries } = await getLocationsCollection();
+
+	const getContentMetadata = await createContentMetadataFunction();
+
+	return R.pipe(
+		entries,
+		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((item) => !!item.data.imageFeatured),
+		getContentMetadata,
+		R.sort(sortContentMetadataByDate),
+	);
+}

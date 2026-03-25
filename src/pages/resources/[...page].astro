@@ -1,23 +1,13 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
 import ResourcesIndex from '#layouts/resources-index.astro';
-import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
+import { queryResourcesIndex } from '#lib/collections/resources/resources-data.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { entries } = await getResourcesCollection();
+	const results = await queryResourcesIndex();
 
-	const items = R.pipe(
-		entries,
-		R.filter((entry) => !!entry.data.showPage),
-		R.filter(filterWithContent),
-		R.sort(sortByContentCount),
-	);
-
-	return paginate(items, { pageSize: 50 });
+	return paginate(results, { pageSize: 50 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

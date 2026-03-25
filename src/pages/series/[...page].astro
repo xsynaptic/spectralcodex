@@ -1,30 +1,13 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
 import SeriesIndex from '#layouts/series-index.astro';
-import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { querySeriesIndex } from '#lib/collections/series/series-data.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const { entries: series } = await getSeriesCollection();
+	const results = await querySeriesIndex();
 
-	const getContentMetadata = await createContentMetadataFunction();
-
-	const metadataItems = R.pipe(
-		series,
-		R.filter(createFilterEntryQualityFunction(2)),
-		R.sort((a, b) =>
-			a.data.seriesItems && b.data.seriesItems
-				? b.data.seriesItems.length - a.data.seriesItems.length
-				: 0,
-		),
-		getContentMetadata,
-	);
-
-	return paginate(metadataItems, { pageSize: 20 });
+	return paginate(results, { pageSize: 20 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
