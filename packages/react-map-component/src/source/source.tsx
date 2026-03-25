@@ -19,11 +19,11 @@ const EMPTY_FEATURE_COLLECTION: FeatureCollection<never, never> = {
 };
 
 export const MapSource: FC<
-	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'> & {
+	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev' | 'targetIds'> & {
 		bounds: MapComponentProps['bounds'] | undefined;
 		hasMapIcons: boolean;
 	}
-> = function MapSource({ apiDivisionUrl, hasMapIcons, bounds, isDev }) {
+> = function MapSource({ apiDivisionUrl, hasMapIcons, bounds, isDev, targetIds }) {
 	const interactive = useMapCanvasInteractive();
 
 	const { pointCollection, lineStringCollection } = useMapCanvasData();
@@ -44,6 +44,7 @@ export const MapSource: FC<
 				data={pointCollection ?? EMPTY_FEATURE_COLLECTION}
 				interactive={interactive}
 				hasMapIcons={hasMapIcons}
+				targetIds={targetIds}
 			/>
 			{IS_DEBUG && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
 		</>

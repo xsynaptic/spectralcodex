@@ -174,7 +174,11 @@ export function getMapData({
 
 	if (featureCollection && mapBounds) {
 		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
-		const targetIds = targetId ? [targetId] : undefined;
+		const targetIds = targetId
+			? featureCollection.features
+					.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
+					.map(({ id }) => String(id))
+			: undefined;
 
 		if (mapId) {
 			const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);

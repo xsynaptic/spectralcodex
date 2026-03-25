@@ -297,17 +297,25 @@ export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
 	interactive: boolean;
 	hasMapIcons: boolean;
-}> = memo(function MapPointLayerContents({ data, interactive, hasMapIcons }) {
+	targetIds?: Array<string> | undefined;
+}> = memo(function MapPointLayerContents({ data, interactive, hasMapIcons, targetIds }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
 		// Create cluster properties dynamically for each status
-		const clusterProperties = Object.fromEntries(
+		const clusterProperties: Record<string, unknown> = Object.fromEntries(
 			Object.values(LocationStatusEnum).map((status) => [
 				status,
 				['+', ['case', ['==', ['get', 'status'], status], 1, 0]],
 			]),
 		);
+
+		if (targetIds && targetIds.length > 0) {
+			clusterProperties.hasTarget = [
+				'+',
+				['case', ['in', ['get', 'id'], ['literal', targetIds]], 1, 0],
+			];
+		}
 
 		return {
 			cluster: interactive,
@@ -316,7 +324,7 @@ export const MapSourcePoints: FC<{
 			clusterMinPoints: 2, // Minimum number of points to cluster
 			clusterProperties,
 		};
-	}, [interactive]);
+	}, [interactive, targetIds]);
 
 	// Note: Layer components need to be immediate children of Source components; do not use React.Fragment here
 	return (

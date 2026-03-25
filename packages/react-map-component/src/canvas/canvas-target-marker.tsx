@@ -1,40 +1,116 @@
 import type { LocationStatus } from '@spectralcodex/shared/map';
+import type { MapGeoJSONFeature } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { useMemo } from 'react';
-import { Marker } from 'react-map-gl/maplibre';
+import { useEffect, useState } from 'react';
+import { Marker, useMap } from 'react-map-gl/maplibre';
 
-import { useSourceDataQuery } from '../data/data-source';
 import { useDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
+import { tailwindColors } from '../lib/tailwind-colors';
+import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
+
+interface TargetMarker {
+	longitude: number;
+	latitude: number;
+	color: string;
+	delay: string;
+}
+
+// Handles status-specific colors as well as a cluster fallback
+function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
+	const status = feature.properties.status as LocationStatus | undefined;
+
+	if (status) {
+		const record = LocationStatusRecords[status];
+
+		return isDark ? record.colorDark : record.color;
+	}
+	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+}
+
+function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
+	const { current: map } = useMap();
+
+	const isDark = useDarkMode();
+
+	const [markers, setMarkers] = useState<Array<TargetMarker>>([]);
+
+	useEffect(() => {
+		if (!map || targetIds.length === 0) return;
+
+		const clusterColor = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+
+		function updateMarkers() {
+			if (!map) return;
+
+			const results: Array<TargetMarker> = [];
+
+			// Delay helps keep pulses in sync in multi-coordinate displays with clustering
+			const delay = `${String(-(performance.now() % 2000))}ms`;
+
+			// Check for unclustered target points
+			if (map.getLayer(MapLayerIdEnum.Points)) {
+				const points = map.queryRenderedFeatures(undefined, {
+					layers: [MapLayerIdEnum.Points],
+					filter: ['in', ['get', 'id'], ['literal', targetIds]],
+				});
+
+				for (const feature of points) {
+					if (feature.geometry.type !== 'Point') continue;
+
+					const [lng, lat] = feature.geometry.coordinates as [number, number];
+
+					results.push({
+						longitude: lng,
+						latitude: lat,
+						color: getMarkerColor(feature, isDark),
+						delay,
+					});
+				}
+			}
+
+			// Check for clusters containing target points
+			if (map.getLayer(MapLayerIdEnum.Clusters)) {
+				const clusters = map.queryRenderedFeatures(undefined, {
+					layers: [MapLayerIdEnum.Clusters],
+					filter: ['>', ['get', 'hasTarget'], 0],
+				});
+
+				for (const feature of clusters) {
+					if (feature.geometry.type !== 'Point') continue;
+
+					const [lng, lat] = feature.geometry.coordinates as [number, number];
+
+					results.push({ longitude: lng, latitude: lat, color: clusterColor, delay });
+				}
+			}
+
+			setMarkers(results);
+		}
+
+		function onSourceData(event: { sourceId: string }) {
+			if (event.sourceId === MapSourceIdEnum.PointCollection) updateMarkers();
+		}
+
+		map.on('moveend', updateMarkers);
+		map.on('sourcedata', onSourceData);
+
+		updateMarkers();
+
+		return () => {
+			map.off('moveend', updateMarkers);
+			map.off('sourcedata', onSourceData);
+		};
+	}, [map, targetIds, isDark]);
+
+	return markers;
+}
 
 export const MapTargetMarkers: FC<{
 	targetIds: Array<string>;
 }> = function MapTargetMarkers({ targetIds }) {
-	const isDark = useDarkMode();
-
-	const { data: sourceData } = useSourceDataQuery();
-
-	const markers = useMemo(() => {
-		if (!sourceData || targetIds.length === 0) return [];
-
-		const idSet = new Set(targetIds);
-
-		return sourceData.flatMap((item) => {
-			if (item.geometry.type !== GeometryTypeEnum.Point) return [];
-
-			const itemId = item.properties.id;
-			const isMatch = idSet.has(itemId) || targetIds.some((id) => itemId.startsWith(`${id}-`));
-
-			if (!isMatch) return [];
-
-			const [lng, lat] = item.geometry.coordinates as [number, number];
-			const record = LocationStatusRecords[item.properties.status as LocationStatus];
-
-			return [{ longitude: lng, latitude: lat, color: isDark ? record.colorDark : record.color }];
-		});
-	}, [sourceData, targetIds, isDark]);
+	const markers = useTargetMarkers(targetIds);
 
 	if (markers.length === 0) return;
 
@@ -45,22 +121,13 @@ export const MapTargetMarkers: FC<{
 			latitude={marker.latitude}
 			anchor="center"
 		>
-			<div
-				style={{
-					position: 'relative',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					pointerEvents: 'none',
-				}}
-			>
+			<div className="pointer-events-none relative flex items-center justify-center">
 				<span
+					className="h-8 w-8 rounded-full border-2"
 					style={{
-						width: '32px',
-						height: '32px',
-						borderRadius: '50%',
-						border: `2px solid ${marker.color}`,
+						borderColor: marker.color,
 						animation: 'target-pulse-ring 2s ease-out infinite',
+						animationDelay: marker.delay,
 					}}
 				/>
 			</div>

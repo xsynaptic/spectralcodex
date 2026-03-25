@@ -142,6 +142,7 @@ const MapCanvasContainer: FC<
 				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
 				bounds={bounds}
 				isDev={isDev}
+				targetIds={targetIds}
 			/>
 			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
