@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import ResourcesIndex from '#layouts/resources-index.astro';
-import { queryResourcesIndex } from '#lib/collections/resources/resources-data.ts';
+import { queryResourcesIndex } from '#lib/collections/resources/resources-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryResourcesIndex();

@@ -2,47 +2,22 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import SeriesEntry from '#layouts/series-entry.astro';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import {
-	createLocationsBySeriesFunction,
-	createSeriesContentMetadataItemsFunction,
-} from '#lib/collections/series/series-utils.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createContentMetadataFunction } from '#lib/metadata/metadata-utils.ts';
+import { createQuerySeriesEntryFunction } from '#lib/collections/series/series-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const { entries: series } = await getSeriesCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
-	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
-	const getSeriesLocations = await createLocationsBySeriesFunction();
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-
-	const seriesItemsMetadata = getContentMetadata(series);
+	const querySeriesEntry = await createQuerySeriesEntryFunction();
 
 	const results = [];
 
 	for (const entry of series) {
-		const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);
+		const result = querySeriesEntry(entry);
 
-		if (!metadataItems) continue;
+		if (!result) continue;
 
-		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
-
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
-
-		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: getLocationsFeatureCollection(seriesLocations),
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
-		});
-
-		const wordCount = seriesItemsMetadata.find((item) => item.id === entry.id)?.wordCount;
+		const { metadataItems, mapData, wordCount } = result;
 
 		results.push(
 			...paginate(metadataItems, {

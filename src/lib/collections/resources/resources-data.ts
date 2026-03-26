@@ -1,8 +1,6 @@
 import { getCollection } from 'astro:content';
-import * as R from 'remeda';
 
 import { createCollectionData } from '#lib/utils/collections.ts';
-import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 /**
  * Match a given string against a match pattern (either a single string or an array of strings)
@@ -64,14 +62,3 @@ export const getResourcesCollection = createCollectionData({
 		}
 	},
 });
-
-export async function queryResourcesIndex() {
-	const { entries } = await getResourcesCollection();
-
-	return R.pipe(
-		entries,
-		R.filter((entry) => !!entry.data.showPage),
-		R.filter(filterWithContent),
-		R.sort(sortByContentCount),
-	);
-}

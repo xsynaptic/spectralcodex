@@ -1,53 +1,21 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
 import LocationEntry from '#layouts/location-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
-import {
-	createContentMetadataFunction,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
+import { createQueryLocationsEntryFunction } from '#lib/collections/locations/locations-utils.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getLocationsCollection();
 
-	const getPostsByIds = await createPostsByIdsFunction();
-	const getContentMetadata = await createContentMetadataFunction();
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const getContentBacklinks = await createContentBacklinksFunction();
+	const queryLocationsEntry = await createQueryLocationsEntryFunction();
 
 	return entries.map((entry) => {
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+		const { mapData, metadataItems, backlinks } = queryLocationsEntry(entry);
 
 		return {
 			params: { location: entry.data.override?.slug ?? entry.id },
-			props: {
-				entry,
-				mapData: getMapData({
-					mapId: `${entry.collection}/${entry.id}`,
-					featureCollection: getLocationsFeatureCollection([entry]),
-					targetId: entry.data._uuid ?? entry.id,
-					boundsBuffer: 1, // 1km fixed buffer
-					...(regionPrimary?.data._langCode?.startsWith('zh')
-						? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-						: {}),
-				}),
-				metadataItems: R.pipe(
-					entry.data._posts ?? [],
-					getPostsByIds,
-					getContentMetadata,
-					R.sort(sortContentMetadataByDate),
-				),
-				backlinks: getContentBacklinks({ id: entry.id }),
-			},
+			props: { entry, mapData, metadataItems, backlinks },
 		};
 	});
 }) satisfies GetStaticPaths;

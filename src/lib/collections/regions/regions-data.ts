@@ -5,34 +5,11 @@ import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
-import * as R from 'remeda';
 
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 
-import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
-import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
-import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
-import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
-import {
-	createRegionAncestorsFunction,
-	createRegionsByIdsFunction,
-} from '#lib/collections/regions/regions-utils.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import {
-	createContentMetadataFunction,
-	filterHasFeaturedImage,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
-import {
-	createFilterEntryQualityFunction,
-	filterWithContent,
-	sortByContentCount,
-} from '#lib/utils/collections.ts';
-import { getBaseUrl } from '#lib/utils/routing.ts';
 
 /**
  * Computed data cache
@@ -306,100 +283,3 @@ export const getRegionsCollection = createCollectionData({
 		}
 	},
 });
-
-/**
- * Data for a single region entry page: metadata items, map data, and display options
- */
-export async function createQueryRegionsEntryFunction() {
-	const getRegionAncestors = await createRegionAncestorsFunction();
-	const getPostsByIds = await createPostsByIdsFunction();
-	const getLocationsByIds = await createLocationsByIdsFunction();
-	const getContentMetadata = await createContentMetadataFunction();
-
-	// Note: this is temporary code to limit map display to specified regions
-	const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
-
-	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
-		const ancestors = getRegionAncestors(entry);
-
-		const showRegionMap =
-			displayRegionMapIds.has(entry.id) ||
-			ancestors.some((ancestor) => displayRegionMapIds.has(ancestor.id));
-
-		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
-
-		const metadataItemsFiltered = R.pipe(
-			[
-				...R.pipe(
-					entryLocations,
-					R.filter(createFilterEntryQualityFunction(2)),
-					getContentMetadata,
-				),
-				...R.pipe(entry.data._posts ?? [], getPostsByIds, getContentMetadata),
-			],
-			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
-		);
-
-		// Anything that wasn't included above
-		const metadataItemsAll = R.pipe(
-			entryLocations,
-			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
-			R.filter(({ data }) => !data.hideLocation),
-			getContentMetadata,
-			R.shuffle(),
-		);
-		const metadataItems = metadataItemsAll.slice(0, 25);
-		const metadataItemsCount = metadataItemsAll.length;
-
-		const regionsOption = getRegionsOptions(ancestors.length);
-
-		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
-			...(entry.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
-			...(entry.data.divisionId && !entry.data.hideDivision
-				? { apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`) }
-				: {}),
-		});
-
-		return { metadataItemsFiltered, metadataItems, metadataItemsCount, mapData, regionsOption };
-	};
-}
-
-/**
- * Filtered and sorted ancestral regions for the regions index page
- */
-export async function queryRegionsIndex() {
-	const { entries } = await getRegionsCollection();
-	const getContentMetadata = await createContentMetadataFunction();
-
-	return R.pipe(
-		entries,
-		R.filter(({ data }) => data.parent === undefined),
-		R.filter(filterWithContent),
-		R.sort(sortByContentCount),
-		getContentMetadata,
-	);
-}
-
-/**
- * Related regions (children/siblings) filtered by content and sorted by content count
- */
-export async function createQueryRegionsRelatedFunction() {
-	const getRegionsByIds = await createRegionsByIdsFunction();
-
-	return function queryRegionsRelated(ids: Array<string> | undefined, limit: number) {
-		return ids
-			? R.pipe(
-					ids,
-					getRegionsByIds,
-					R.filter(filterWithContent),
-					R.sort(sortByContentCount),
-					R.take(limit),
-				)
-			: [];
-	};
-}

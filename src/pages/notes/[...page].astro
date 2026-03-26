@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import NotesIndex from '#layouts/notes-index.astro';
-import { queryNotesIndex } from '#lib/collections/notes/notes-data.ts';
+import { queryNotesIndex } from '#lib/collections/notes/notes-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryNotesIndex();

@@ -1,6 +1,6 @@
 ---
 import IndexLayout from '#layouts/index.astro';
-import { queryIndexData } from '#lib/collections/index/index-data.ts';
+import { queryIndexData } from '#lib/collections/index/index-utils.ts';
 
 const metadataItems = await queryIndexData();
 ---

@@ -8,12 +8,8 @@ import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
+import { createArchivesImageFeaturedGroupFunction } from '#lib/collections/archives/archives-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import {
-	getImageFeaturedGroup,
-	getImageFeaturedGroupByContentMetadata,
-} from '#lib/image/image-featured.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -26,7 +22,7 @@ interface Props {
 
 const { archivesMonthlyData, archivesYear, archivesYears } = Astro.props;
 
-const contentMetadataIndex = await getContentMetadataIndex();
+const getArchivesImageFeaturedGroup = await createArchivesImageFeaturedGroupFunction();
 
 const t = getTranslations();
 
@@ -58,12 +54,7 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 		archivesMonthlyData
 			.sort((a, b) => Number(a.month) - Number(b.month))
 			.map((monthlyData) => {
-				const imageFeaturedGroup = monthlyData.archiveEntry?.data.imageFeatured
-					? getImageFeaturedGroup({
-							imageFeatured: monthlyData.archiveEntry.data.imageFeatured,
-							contentMetadataIndex,
-						})
-					: getImageFeaturedGroupByContentMetadata({ items: monthlyData.highlights });
+				const imageFeaturedGroup = getArchivesImageFeaturedGroup(monthlyData);
 
 				return (
 					<Container class="mb-medium" fillViewport={true}>

@@ -1,13 +1,26 @@
 import type { CollectionEntry } from 'astro:content';
 
+import * as R from 'remeda';
+
 import type { Thing } from '#lib/utils/structured-data.ts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import {
 	createFirstRegionByReferenceFunction,
 	createRegionAncestorsFunction,
 } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMapData } from '#lib/map/map-data.ts';
+import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
+import {
+	createContentMetadataFunction,
+	sortContentMetadataByDate,
+} from '#lib/metadata/metadata-utils.ts';
+import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/structured-data.ts';
 
@@ -103,4 +116,85 @@ export async function getLocationSchemas(
 			coordinates: getFirstCoordinates(entry),
 		}),
 	];
+}
+
+/**
+ * Data for a single location entry page: map data, related posts, and backlinks
+ */
+export async function createQueryLocationsEntryFunction() {
+	const getPostsByIds = await createPostsByIdsFunction();
+	const getContentMetadata = await createContentMetadataFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const getContentBacklinks = await createContentBacklinksFunction();
+
+	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+
+		const mapData = getMapData({
+			mapId: `${entry.collection}/${entry.id}`,
+			featureCollection: getLocationsFeatureCollection([entry]),
+			targetId: entry.data._uuid ?? entry.id,
+			boundsBuffer: 1, // 1km fixed buffer
+			...(regionPrimary?.data._langCode?.startsWith('zh')
+				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+				: {}),
+		});
+
+		const metadataItems = R.pipe(
+			entry.data._posts ?? [],
+			getPostsByIds,
+			getContentMetadata,
+			R.sort(sortContentMetadataByDate),
+		);
+
+		const backlinks = getContentBacklinks({ id: entry.id });
+
+		return { mapData, metadataItems, backlinks };
+	};
+}
+
+/**
+ * Resolve region, lang code, and multilingual title data for a location entry
+ */
+export async function createLocationEntryDisplayFunction() {
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+
+	return function getLocationEntryDisplay(entry: CollectionEntry<'locations'>) {
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+		const regionLangCode = regionPrimary?.data._langCode;
+
+		// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
+		const langCodeAdditional =
+			regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan')
+				? LanguageCodeEnum.Japanese
+				: undefined;
+
+		const titleResult = getMultilingualContent({
+			data: entry.data,
+			prop: 'title',
+			...(regionLangCode ? { langCode: regionLangCode } : {}),
+			...(langCodeAdditional ? { langCodeAdditional } : {}),
+		});
+
+		return {
+			regionPrimary,
+			regionLangCode,
+			titleMultilingual: titleResult?.primary,
+			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
+		};
+	};
+}
+
+export async function queryLocationsIndex() {
+	const { entries } = await getLocationsCollection();
+
+	const getContentMetadata = await createContentMetadataFunction();
+
+	return R.pipe(
+		entries,
+		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((item) => !!item.data.imageFeatured),
+		getContentMetadata,
+		R.sort(sortContentMetadataByDate),
+	);
 }

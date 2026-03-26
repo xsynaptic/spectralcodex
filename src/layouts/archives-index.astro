@@ -8,8 +8,8 @@ import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -44,9 +44,7 @@ const title = t('archives.index.title');
 		Object.entries(archivesIndexData)
 			.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
 			.map(([year, monthlyData]) => {
-				const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
-					items: monthlyData.highlights,
-				});
+				const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({ items: monthlyData.highlights });
 
 				return (
 					<Container class="mb-medium" fillViewport={true}>

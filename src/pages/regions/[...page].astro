@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import RegionIndex from '#layouts/region-index.astro';
-import { queryRegionsIndex } from '#lib/collections/regions/regions-data.ts';
+import { queryRegionsIndex } from '#lib/collections/regions/regions-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryRegionsIndex();

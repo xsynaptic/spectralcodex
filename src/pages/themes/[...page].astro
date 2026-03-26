@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import ThemeIndex from '#layouts/theme-index.astro';
-import { queryThemesIndex } from '#lib/collections/themes/themes-data.ts';
+import { queryThemesIndex } from '#lib/collections/themes/themes-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryThemesIndex();

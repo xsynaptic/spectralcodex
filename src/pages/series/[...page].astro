@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import SeriesIndex from '#layouts/series-index.astro';
-import { querySeriesIndex } from '#lib/collections/series/series-data.ts';
+import { querySeriesIndex } from '#lib/collections/series/series-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await querySeriesIndex();
