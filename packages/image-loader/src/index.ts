@@ -236,33 +236,37 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 				// Debounce processing changes
 				if (changeTimeout) clearTimeout(changeTimeout);
 
-				changeTimeout = setTimeout(async () => {
-					await options.beforeLoad?.();
+				changeTimeout = setTimeout(
+					() =>
+						void (async () => {
+							await options.beforeLoad?.();
 
-					// Process all queued changes
-					for (const change of changeQueue.values()) {
-						try {
-							if (change.type === 'unlink') {
-								store.delete(change.id);
-								logger.info(`Deleted from store: ${change.filePath}`);
-							} else {
-								await syncData({
-									id: change.id,
-									filePath: change.filePath,
-									modifiedTime: new Date(),
-								});
+							// Process all queued changes
+							for (const change of changeQueue.values()) {
+								try {
+									if (change.type === 'unlink') {
+										store.delete(change.id);
+										logger.info(`Deleted from store: ${change.filePath}`);
+									} else {
+										await syncData({
+											id: change.id,
+											filePath: change.filePath,
+											modifiedTime: new Date(),
+										});
+									}
+								} catch (error) {
+									logger.error(
+										`Error processing ${change.type} for ${change.filePath}: ${JSON.stringify(error)}`,
+									);
+								}
 							}
-						} catch (error) {
-							logger.error(
-								`Error processing ${change.type} for ${change.filePath}: ${JSON.stringify(error)}`,
-							);
-						}
-					}
 
-					changeQueue.clear();
+							changeQueue.clear();
 
-					await options.afterLoad?.();
-				}, 300);
+							await options.afterLoad?.();
+						})(),
+					300,
+				);
 			}
 
 			watcher.on('change', (changedPath) => {
