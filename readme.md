@@ -109,7 +109,8 @@ The image server is deployed separately and manually; it is only needed when ima
 
 ## Project Structure
 
-- `./deploy`: Deployment configuration split into `infra/` (Caddy, analytics) and `site/` (image server)
+- `./deploy`: Deployment configuration split into `infra/` (analytics) and `site/` (Caddy, TLS certs)
+- `./services/image-server`: Self-hosted IPX image server with Nginx reverse proxy (Docker Compose)
 - `./public`: contains a favicon, fallback Open Graph images, and map division data
 - `./src`: primary project source files
 - `./src/components`: Astro components organized by functionality
