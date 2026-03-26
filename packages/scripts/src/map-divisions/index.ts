@@ -8,6 +8,19 @@ import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
+const STAC_CATALOG_URL = 'https://stac.overturemaps.org/catalog.json';
+const S3_BASE = 's3://overturemaps-us-west-2/release';
+
+async function resolveLatestRelease(): Promise<string> {
+	const response = await fetch(STAC_CATALOG_URL);
+	const catalog = (await response.json()) as { latest: string };
+	const version = catalog.latest;
+
+	console.log(chalk.green(`Resolved latest Overture Maps release: ${chalk.cyan(version)}`));
+
+	return `${S3_BASE}/${version}/`;
+}
+
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { fileExists, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
@@ -39,11 +52,6 @@ const { values } = parseArgs({
 			short: 'c',
 			default: './.cache/divisions',
 		},
-		'overture-url': {
-			type: 'string',
-			short: 'u',
-			default: '', // Note: this is required at runtime because the URL regularly changes!
-		},
 	},
 });
 
@@ -54,6 +62,7 @@ async function processRegions(
 	db: DuckDBConnection,
 	regions: Array<RegionMetadata>,
 	regionsBySlug: Map<string, RegionMetadata>,
+	overtureUrl: string,
 ) {
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
 
@@ -149,7 +158,7 @@ async function processRegions(
 				divisionIds,
 				selectionBBox,
 				cachePath,
-				overtureUrl: values['overture-url'],
+				overtureUrl,
 			});
 
 			// Process each region in this group
@@ -236,15 +245,10 @@ async function processRegions(
 }
 
 async function mapDivisions() {
-	if (values['overture-url'] === '') {
-		console.error(chalk.red('Overture URL is required'));
-		process.exit(1);
-	}
+	const overtureUrl = await resolveLatestRelease();
 
 	console.log(
-		chalk.blue(
-			`🗺️  Fetching administrative divisions from Overture Maps using release: ${chalk.cyan(values['overture-url'])}...`,
-		),
+		chalk.blue(`Fetching administrative divisions from Overture Maps: ${chalk.cyan(overtureUrl)}`),
 	);
 
 	try {
@@ -271,7 +275,12 @@ async function mapDivisions() {
 		const totalCount = regionsWithDivisionIds.length;
 
 		// Process only regions with division IDs
-		const successCount = await processRegions(connection, regionsWithDivisionIds, regionsBySlug);
+		const successCount = await processRegions(
+			connection,
+			regionsWithDivisionIds,
+			regionsBySlug,
+			overtureUrl,
+		);
 
 		connection.disconnectSync();
 

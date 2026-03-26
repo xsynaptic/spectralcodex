@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/spectralcodex",
 	"type": "module",
-	"version": "6.8.0",
+	"version": "6.8.1",
 	"scripts": {
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
@@ -19,7 +19,7 @@
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --root-path=$PWD --output-path=packages/content",
 		"content-validate": "pnpm --filter @spectralcodex/scripts content-validate --root-path=$PWD",
-		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD --overture-url=s3://overturemaps-us-west-2/release/2026-01-21.0/",
+		"map-divisions": "pnpm --filter @spectralcodex/scripts map-divisions --root-path=$PWD",
 		"media-orphans": "pnpm --filter @spectralcodex/scripts media-orphans --root-path=$PWD",
 		"og-image": "pnpm --filter @spectralcodex/scripts og-image --root-path=$PWD",
 		"generate-redirects": "pnpm --filter @spectralcodex/scripts generate-redirects --root-path=$PWD",
@@ -95,7 +95,7 @@
 		"geokdbush": "^2.0.1",
 		"globals": "^17.4.0",
 		"kdbush": "^4.0.2",
-		"knip": "^6.0.4",
+		"knip": "^6.0.5",
 		"maplibre-gl": "^5.21.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
