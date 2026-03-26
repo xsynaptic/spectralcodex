@@ -7,6 +7,7 @@ export default {
 		'.': {
 			// MDX auto-import components; referenced via astro-auto-import, not static imports
 			entry: ['src/components/mdx/*.astro'],
+			ignoreBinaries: ['down', 'up', 'ssh-add'],
 			ignoreDependencies: [
 				'@astrojs/check', // used via `astro check` CLI, peer dep of astro
 				'@astrojs/markdown-remark', // peer dep, used transitively by remark pipeline
