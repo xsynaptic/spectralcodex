@@ -22,7 +22,7 @@ export function useMediaQuery({
 		return query ?? '';
 	}, [above, below, query]);
 
-	const [matches, setMatches] = useState<boolean>(false);
+	const [matches, setMatches] = useState(false);
 
 	useEffect(
 		function handleWindowChange() {

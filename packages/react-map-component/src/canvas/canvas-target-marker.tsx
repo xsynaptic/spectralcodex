@@ -14,7 +14,6 @@ interface TargetMarker {
 	longitude: number;
 	latitude: number;
 	color: string;
-	delay: string;
 }
 
 // Handles status-specific colors as well as a cluster fallback
@@ -35,19 +34,21 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	const isDark = useDarkMode();
 
 	const [markers, setMarkers] = useState<Array<TargetMarker>>([]);
+	const [visible, setVisible] = useState(true);
 
 	useEffect(() => {
 		if (!map || targetIds.length === 0) return;
 
 		const clusterColor = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
 
+		function hideMarkers() {
+			setVisible(false);
+		}
+
 		function updateMarkers() {
 			if (!map) return;
 
 			const results: Array<TargetMarker> = [];
-
-			// Delay helps keep pulses in sync in multi-coordinate displays with clustering
-			const delay = `${String(-(performance.now() % 2000))}ms`;
 
 			// Check for unclustered target points
 			if (map.getLayer(MapLayerIdEnum.Points)) {
@@ -61,12 +62,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 
 					const [lng, lat] = feature.geometry.coordinates as [number, number];
 
-					results.push({
-						longitude: lng,
-						latitude: lat,
-						color: getMarkerColor(feature, isDark),
-						delay,
-					});
+					results.push({ longitude: lng, latitude: lat, color: getMarkerColor(feature, isDark) });
 				}
 			}
 
@@ -82,27 +78,32 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 
 					const [lng, lat] = feature.geometry.coordinates as [number, number];
 
-					results.push({ longitude: lng, latitude: lat, color: clusterColor, delay });
+					results.push({ longitude: lng, latitude: lat, color: clusterColor });
 				}
 			}
 
 			setMarkers(results);
+			setVisible(true);
 		}
 
 		function onSourceData(event: { sourceId: string }) {
 			if (event.sourceId === MapSourceIdEnum.PointCollection) updateMarkers();
 		}
 
+		map.on('zoomstart', hideMarkers);
 		map.on('moveend', updateMarkers);
 		map.on('sourcedata', onSourceData);
 
 		updateMarkers();
 
 		return () => {
+			map.off('zoomstart', hideMarkers);
 			map.off('moveend', updateMarkers);
 			map.off('sourcedata', onSourceData);
 		};
 	}, [map, targetIds, isDark]);
+
+	if (!visible) return [];
 
 	return markers;
 }
@@ -127,7 +128,6 @@ export const MapTargetMarkers: FC<{
 					style={{
 						borderColor: marker.color,
 						animation: 'target-pulse-ring 2s ease-out infinite',
-						animationDelay: marker.delay,
 					}}
 				/>
 			</div>

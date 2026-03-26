@@ -11,7 +11,7 @@ interface ModeChangedEvent extends CustomEvent {
 	detail: ModeChangedEventDetail;
 }
 
-const DarkModeContext = createContext<boolean>(false);
+const DarkModeContext = createContext(false);
 
 export function DarkModeProvider({ children }: PropsWithChildren) {
 	const [isDarkMode, setDarkMode] = useState(() => {
