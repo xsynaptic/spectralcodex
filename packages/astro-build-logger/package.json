@@ -10,8 +10,5 @@
 	"dependencies": {
 		"astro-integration-kit": "^0.20.0",
 		"zod": "^4.3.6"
-	},
-	"peerDependencies": {
-		"astro": "^6.0.6"
 	}
 }
