@@ -1,7 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"type": "module",
-	"version": "6.8.1",
+	"version": "6.8.2",
 	"scripts": {
 		"dev": "tsx packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
@@ -33,6 +32,7 @@
 		"cache-warm-new": "pnpm --filter @spectralcodex/scripts image-server-warm-new --root-path=$PWD",
 		"check-links": "pnpm --filter @spectralcodex/scripts check-links --root-path=$PWD"
 	},
+	"type": "module",
 	"license": "MIT",
 	"browserslist": [
 		"> 0.5%",
@@ -45,17 +45,17 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.0.8",
+		"astro": "^6.1.1",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.0.1",
-		"@astrojs/mdx": "^5.0.2",
-		"@astrojs/node": "^10.0.3",
-		"@astrojs/react": "^5.0.1",
-		"@astrojs/rss": "^4.0.17",
-		"@astrojs/sitemap": "^3.7.1",
+		"@astrojs/markdown-remark": "^7.1.0",
+		"@astrojs/mdx": "^5.0.3",
+		"@astrojs/node": "^10.0.4",
+		"@astrojs/react": "^5.0.2",
+		"@astrojs/rss": "^4.0.18",
+		"@astrojs/sitemap": "^3.7.2",
 		"@playwright/test": "^1.58.2",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/image-loader": "workspace:*",
@@ -83,7 +83,7 @@
 		"@xsynaptic/unified-tools": "^3.0.2",
 		"alfaaz": "^1.1.0",
 		"astro-auto-import": "^0.5.1",
-		"astro-pagefind": "^1.8.5",
+		"astro-pagefind": "^1.8.6",
 		"astro-seo": "^1.1.0",
 		"dotenv": "^17.3.1",
 		"eslint": "^9.39.4",
@@ -96,7 +96,7 @@
 		"globals": "^17.4.0",
 		"kdbush": "^4.0.2",
 		"knip": "^6.0.5",
-		"maplibre-gl": "^5.21.0",
+		"maplibre-gl": "^5.21.1",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.8.1",
@@ -117,5 +117,5 @@
 		"yaml": "^2.8.3",
 		"zod": "^4.3.6"
 	},
-	"packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+	"packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }
