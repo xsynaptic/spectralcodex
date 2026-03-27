@@ -1,4 +1,4 @@
-import { imageLoader } from '@spectralcodex/image-loader';
+import { imageLoader } from '@spectralcodex/astro-image-loader';
 import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';

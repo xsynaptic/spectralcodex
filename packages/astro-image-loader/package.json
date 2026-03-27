@@ -1,7 +1,7 @@
 {
-	"name": "@spectralcodex/image-loader",
+	"name": "@spectralcodex/astro-image-loader",
 	"version": "1.0.2",
-	"description": "Image loader for Spectral Codex",
+	"description": "Experimental image loader for Spectral Codex",
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts"

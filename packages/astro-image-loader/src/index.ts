@@ -149,7 +149,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 	} satisfies ImageLoaderOptions;
 
 	return {
-		name: 'local-image-loader',
+		name: '@spectralcodex/astro-image-loader',
 		load: async function load(context: LoaderContext): Promise<void> {
 			const { config, store, parseData, generateDigest, logger, watcher } = context;
 
