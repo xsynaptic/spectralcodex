@@ -36,7 +36,7 @@
 
 /* Footnotes */
 .content > .footnotes ol {
-	@apply prose-sm max-w-content;
+	@apply text-sm/6;
 }
 .content > .footnotes ol li::marker {
 	@apply text-xs;
