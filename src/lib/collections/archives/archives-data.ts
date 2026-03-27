@@ -5,7 +5,10 @@ import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
-import type { ArchivesBaseItem, ArchivesData } from '#lib/collections/archives/archives-types.ts';
+import type {
+	ArchivesIndexData,
+	ArchivesMonthlyItem,
+} from '#lib/collections/archives/archives-types.ts';
 import type {
 	ContentMetadataCollectionKey,
 	ContentMetadataItem,
@@ -13,13 +16,7 @@ import type {
 
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
-interface CollectionData {
-	archives: Array<CollectionEntry<'archives'>>;
-	archivesMap: Map<string, CollectionEntry<'archives'>>;
-}
-
-// TODO: this data handler is non-standard and could use some refactoring
-const getArchivesCollection = pMemoize(async (): Promise<CollectionData> => {
+const getArchivesCollection = pMemoize(async () => {
 	const startTime = performance.now();
 
 	const archives = await getCollection('archives');
@@ -37,13 +34,16 @@ const getArchivesCollection = pMemoize(async (): Promise<CollectionData> => {
 	return { archives, archivesMap };
 });
 
-interface ArchivesDataMapMonthlyItem extends ArchivesBaseItem {
+interface ArchivesRawMonthData extends Pick<
+	ArchivesMonthlyItem,
+	'id' | 'year' | 'month' | 'monthName' | 'title'
+> {
 	created: Set<ContentMetadataItem>;
 	updated: Set<ContentMetadataItem>;
 	visited: Set<ContentMetadataItem>;
 }
 
-type ArchivesDataMap = Map<string, Map<string, ArchivesDataMapMonthlyItem>>;
+type ArchivesDataMap = Map<string, Map<string, ArchivesRawMonthData>>;
 
 interface ArchivesDateData {
 	date: Date;
@@ -51,7 +51,6 @@ interface ArchivesDateData {
 	year: string;
 }
 
-// Standardize date objects for use in the archive data map
 function getDateData(date: Date): ArchivesDateData {
 	return {
 		date,
@@ -60,132 +59,79 @@ function getDateData(date: Date): ArchivesDateData {
 	};
 }
 
-// Get or create the archive data map for a given month
-function getArchivesMonthData(archiveDataMap: ArchivesDataMap, dateUpdatedData: ArchivesDateData) {
-	if (!archiveDataMap.has(dateUpdatedData.year)) {
-		archiveDataMap.set(dateUpdatedData.year, new Map());
+function getOrCreateMonthData(archiveDataMap: ArchivesDataMap, dateData: ArchivesDateData) {
+	if (!archiveDataMap.has(dateData.year)) {
+		archiveDataMap.set(dateData.year, new Map());
 	}
 
-	const yearMap = archiveDataMap.get(dateUpdatedData.year)!;
+	const yearMap = archiveDataMap.get(dateData.year)!;
 
-	if (!yearMap.has(dateUpdatedData.month)) {
-		const monthName = dateUpdatedData.date.toLocaleDateString('default', { month: 'long' });
+	if (!yearMap.has(dateData.month)) {
+		const monthName = dateData.date.toLocaleDateString('default', { month: 'long' });
 
-		yearMap.set(dateUpdatedData.month, {
-			id: `${dateUpdatedData.year}/${dateUpdatedData.month}`,
-			year: dateUpdatedData.year,
-			month: dateUpdatedData.month,
+		yearMap.set(dateData.month, {
+			id: `${dateData.year}/${dateData.month}`,
+			year: dateData.year,
+			month: dateData.month,
 			monthName,
-			title: `${monthName} ${dateUpdatedData.year}`,
-			highlights: undefined,
+			title: `${monthName} ${dateData.year}`,
 			created: new Set(),
-			createdCount: 0,
 			updated: new Set(),
-			updatedCount: 0,
 			visited: new Set(),
-			visitedCount: 0,
 		});
 	}
 
-	return yearMap.get(dateUpdatedData.month)!;
+	return yearMap.get(dateData.month)!;
 }
 
-// Select a highlight from a bunch of items
+// Select highlights from candidates, preferring higher quality but drawing from all tiers
 function getArchivesHighlights(
 	items: Array<ContentMetadataItem>,
 ): Array<ContentMetadataItem> | undefined {
 	if (items.length === 0) return undefined;
 
-	// Group by quality level
-	const highlightQualityMap = new Map<number, Array<ContentMetadataItem>>();
+	const sorted = R.pipe(
+		items,
+		R.sortBy([R.prop('entryQuality'), 'desc'], [R.prop('title'), 'asc']),
+		R.take(5),
+	);
 
-	for (const item of items) {
-		if (!highlightQualityMap.has(item.entryQuality)) {
-			highlightQualityMap.set(item.entryQuality, []);
-		}
-		highlightQualityMap.get(item.entryQuality)!.push(item);
-	}
-
-	// Get the highest quality level
-	const highestQuality = Math.max(...highlightQualityMap.keys());
-	const highlightCandidates = highlightQualityMap.get(highestQuality);
-
-	return highlightCandidates ? highlightCandidates.slice(0, 5) : undefined;
+	return sorted.length > 0 ? sorted : undefined;
 }
 
-// Generate a map of archive data from the content metadata index
-const COLLECTIONS_EXCLUDED = ['pages'] satisfies Array<ContentMetadataCollectionKey>;
+const collectionsExcluded = ['pages'] satisfies Array<ContentMetadataCollectionKey>;
 
-async function getArchivesDataMap(): Promise<ArchivesDataMap> {
+async function buildArchivesDataMap(): Promise<ArchivesDataMap> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
 	const archiveDataMap: ArchivesDataMap = new Map();
 
 	for (const item of contentMetadataIndex.values()) {
-		if (R.isIncludedIn(item.collection, COLLECTIONS_EXCLUDED)) continue;
+		if (R.isIncludedIn(item.collection, collectionsExcluded)) continue;
 
-		const dateUpdatedData = item.dateUpdated ? getDateData(item.dateUpdated) : undefined;
 		const dateCreatedData = getDateData(item.dateCreated);
+		const dateUpdatedData = item.dateUpdated ? getDateData(item.dateUpdated) : undefined;
 
 		if (
 			dateUpdatedData &&
-			dateUpdatedData.year !== dateCreatedData.year &&
-			dateUpdatedData.month !== dateCreatedData.month
+			(dateUpdatedData.year !== dateCreatedData.year ||
+				dateUpdatedData.month !== dateCreatedData.month)
 		) {
-			const updatedMonthData = getArchivesMonthData(archiveDataMap, dateUpdatedData);
-
-			updatedMonthData.updated.add(item);
+			getOrCreateMonthData(archiveDataMap, dateUpdatedData).updated.add(item);
 		}
 
-		const createdMonthData = getArchivesMonthData(archiveDataMap, dateCreatedData);
+		getOrCreateMonthData(archiveDataMap, dateCreatedData).created.add(item);
 
-		createdMonthData.created.add(item);
-
-		// Deduplicate multiple visits in the same year
 		if (item.dateVisited) {
 			const yearsVisited = new Set<string>();
-
 			const dateVisitedArray = item.dateVisited.sort((a, b) => b.getTime() - a.getTime());
 
 			for (const dateVisited of dateVisitedArray) {
 				const dateVisitedData = getDateData(dateVisited);
-				const visitedMonthData = getArchivesMonthData(archiveDataMap, dateVisitedData);
 
 				if (!yearsVisited.has(dateVisitedData.year)) {
 					yearsVisited.add(dateVisitedData.year);
-					visitedMonthData.visited.add(item);
-				}
-			}
-		}
-	}
-
-	for (const yearlyData of archiveDataMap.values()) {
-		// Don't repeat highlights across a year
-		// Note: Maps are ordered by insertion so this will scramble where a highlight appears, which is fine
-		const yearlyHighlightIds = new Set<string>();
-
-		for (const monthlyData of yearlyData.values()) {
-			// Stash total counts for later reference
-			monthlyData.createdCount = monthlyData.created.size;
-			monthlyData.updatedCount = monthlyData.updated.size;
-			monthlyData.visitedCount = monthlyData.visited.size;
-
-			// Select a highlight item for the month; don't add any that have already appeared
-			const monthlyHighlights = getArchivesHighlights(
-				[
-					...monthlyData.created.values(),
-					...monthlyData.updated.values(),
-					...monthlyData.visited.values(),
-				]
-					.filter((item) => item.imageId && item.entryQuality >= 2)
-					.filter((item) => !yearlyHighlightIds.has(item.id)),
-			);
-
-			if (monthlyHighlights) {
-				monthlyData.highlights = monthlyHighlights;
-
-				for (const highlight of monthlyHighlights) {
-					yearlyHighlightIds.add(highlight.id);
+					getOrCreateMonthData(archiveDataMap, dateVisitedData).visited.add(item);
 				}
 			}
 		}
@@ -194,179 +140,213 @@ async function getArchivesDataMap(): Promise<ArchivesDataMap> {
 	return archiveDataMap;
 }
 
-function getMonthlyDataByYear(
-	yearlyData: Map<string, ArchivesDataMapMonthlyItem>,
-	category: 'updated' | 'created' | 'visited',
-): Array<ContentMetadataItem> {
-	return [...yearlyData.values()].flatMap((monthData) => [...monthData[category].values()]);
+function sortAndLimit(items: Array<ContentMetadataItem>, limit: number) {
+	return R.pipe(
+		items,
+		R.sortBy([R.prop('entryQuality'), 'desc'], [R.prop('title'), 'asc']),
+		R.take(limit),
+	);
 }
 
-interface ArchivesFilterOptions {
-	quality: number;
-	limit: number;
-}
-
-function filterAndSortItems(
-	items: Array<ContentMetadataItem>,
-	options: ArchivesFilterOptions,
-): Array<ContentMetadataItem> {
-	return items
-		.filter((item) => item.entryQuality >= options.quality)
-		.sort((a, b) => {
-			const qualityDifference = b.entryQuality - a.entryQuality;
-
-			if (qualityDifference !== 0) return qualityDifference;
-
-			return a.title.localeCompare(b.title);
-		})
-		.slice(0, options.limit);
-}
-
-function getArchivesMonthlyData(
+// Deduplicate across categories: updated > created > visited
+function deduplicateCategories(
 	updated: Array<ContentMetadataItem>,
 	created: Array<ContentMetadataItem>,
 	visited: Array<ContentMetadataItem>,
-	options: ArchivesFilterOptions,
+	excludeIds?: Set<string>,
 ) {
-	const updatedFiltered = filterAndSortItems(updated, options);
-	const createdFiltered = filterAndSortItems(created, options);
-	const visitedFiltered = filterAndSortItems(visited, options);
+	const exclude = excludeIds ?? new Set<string>();
 
+	const updatedFiltered = updated.filter((item) => !exclude.has(item.id));
 	const updatedIds = new Set(updatedFiltered.map((item) => item.id));
 
-	const createdDeduped = createdFiltered.filter((item) => !updatedIds.has(item.id));
-	const createdIds = new Set(createdDeduped.map((item) => item.id));
+	const createdFiltered = created.filter(
+		(item) => !exclude.has(item.id) && !updatedIds.has(item.id),
+	);
+	const createdIds = new Set(createdFiltered.map((item) => item.id));
 
-	const visitedDeduped = visitedFiltered.filter(
-		(item) => !updatedIds.has(item.id) && !createdIds.has(item.id),
+	const visitedFiltered = visited.filter(
+		(item) => !exclude.has(item.id) && !updatedIds.has(item.id) && !createdIds.has(item.id),
 	);
 
-	return {
-		updated: updatedFiltered,
-		created: createdDeduped,
-		visited: visitedDeduped,
-		isEmpty:
-			updatedFiltered.length === 0 && createdDeduped.length === 0 && visitedDeduped.length === 0,
-	};
+	return { updated: updatedFiltered, created: createdFiltered, visited: visitedFiltered };
 }
 
-/**
- * Convert archive data into the structures consumed by the three archive pages
- */
-export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
-	const archivesDataMap = await getArchivesDataMap();
+interface ArchivesData {
+	archivesIndexData: ArchivesIndexData;
+	archivesMonthlyData: Array<ArchivesMonthlyItem>;
+	archivesYearlyData: Record<string, Array<ArchivesMonthlyItem>>;
+	archivesYears: Array<string>;
+	archivesMonths: Record<string, Array<string>>;
+}
 
+export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
+	const archivesDataMap = await buildArchivesDataMap();
 	const { archivesMap } = await getArchivesCollection();
 
 	const archivesMonthlyData: ArchivesData['archivesMonthlyData'] = [];
 	const archivesYearlyData: ArchivesData['archivesYearlyData'] = {};
 	const archivesIndexData: ArchivesData['archivesIndexData'] = {};
-
-	// This tracks the months for each year with data available on the monthly page
 	const archivesMonths: Record<string, Array<string>> = {};
 
-	// This tracks the highlights for each year on the index page
-	const archivesIndexHighlightIds = new Set<string>();
+	const indexHighlightIds = new Set<string>();
 
 	for (const [year, yearlyData] of archivesDataMap.entries()) {
-		if (!archivesMonths[year]) archivesMonths[year] = [];
+		archivesMonths[year] = [];
 
-		// Aggregate all data for the year (used for both yearly and index views)
-		const yearUpdatedAll = getMonthlyDataByYear(yearlyData, 'updated');
-		const yearCreatedAll = getMonthlyDataByYear(yearlyData, 'created');
-		const yearVisitedAll = getMonthlyDataByYear(yearlyData, 'visited');
+		// Convert Sets to Arrays once per month
+		const months = [...yearlyData.values()].map((raw) => ({
+			raw,
+			updated: [...raw.updated],
+			created: [...raw.created],
+			visited: [...raw.visited],
+		}));
 
-		// Year-level deduplication for yearly view
-		const yearDeduplicated = getArchivesMonthlyData(
-			yearUpdatedAll,
-			yearCreatedAll,
-			yearVisitedAll,
-			{ quality: 1, limit: 1000 },
+		// Monthly view data
+		for (const month of months) {
+			const deduped = deduplicateCategories(
+				sortAndLimit(
+					month.updated.filter((item) => item.entryQuality >= 1),
+					40,
+				),
+				sortAndLimit(
+					month.created.filter((item) => item.entryQuality >= 1),
+					40,
+				),
+				sortAndLimit(
+					month.visited.filter((item) => item.entryQuality >= 1),
+					40,
+				),
+			);
+
+			const hasData =
+				deduped.updated.length > 0 || deduped.created.length > 0 || deduped.visited.length > 0;
+
+			if (hasData) {
+				archivesMonthlyData.push({
+					...month.raw,
+					highlights: undefined, // Set below
+					createdCount: month.created.length,
+					updatedCount: month.updated.length,
+					visitedCount: month.visited.length,
+					created: deduped.created,
+					updated: deduped.updated,
+					visited: deduped.visited,
+					archiveEntry: archivesMap.get(month.raw.id),
+				});
+				archivesMonths[year].push(month.raw.month);
+			}
+		}
+
+		// Monthly highlights; don't repeat within a year
+		const yearHighlightIds = new Set<string>();
+
+		for (const monthlyItem of archivesMonthlyData.filter((entry) => entry.year === year)) {
+			const candidates = [...monthlyItem.created, ...monthlyItem.updated, ...monthlyItem.visited]
+				.filter((item) => item.imageId && item.entryQuality >= 2)
+				.filter((item) => !yearHighlightIds.has(item.id));
+
+			const highlights = getArchivesHighlights(candidates);
+
+			if (highlights) {
+				monthlyItem.highlights = highlights;
+
+				for (const highlight of highlights) {
+					yearHighlightIds.add(highlight.id);
+				}
+			}
+		}
+
+		// Build a lookup for monthly highlights to reuse in the yearly view
+		const monthlyHighlightsById = new Map(
+			archivesMonthlyData
+				.filter((entry) => entry.year === year && entry.highlights)
+				.map((entry) => [entry.id, entry.highlights]),
 		);
 
-		// Build lookup sets for allowed items per category (for yearly view)
-		const allowedUpdated = new Set(yearDeduplicated.updated.map(({ id }) => id));
-		const allowedCreated = new Set(yearDeduplicated.created.map(({ id }) => id));
-		const allowedVisited = new Set(yearDeduplicated.visited.map(({ id }) => id));
+		// Yearly view data; running deduplication across months
+		const yearlySeenIds = new Set<string>();
 
-		// Process monthly and yearly views using the allowed sets
-		for (const monthlyData of yearlyData.values()) {
-			const monthlyDataProcessed = getArchivesMonthlyData(
-				[...monthlyData.updated.values()],
-				[...monthlyData.created.values()],
-				[...monthlyData.visited.values()],
-				{ quality: 1, limit: 40 },
+		for (const month of months) {
+			const deduped = deduplicateCategories(
+				sortAndLimit(
+					month.updated.filter((item) => item.entryQuality >= 2),
+					20,
+				),
+				sortAndLimit(
+					month.created.filter((item) => item.entryQuality >= 2),
+					20,
+				),
+				sortAndLimit(
+					month.visited.filter((item) => item.entryQuality >= 2),
+					20,
+				),
+				yearlySeenIds,
 			);
 
-			if (!monthlyDataProcessed.isEmpty) {
-				// Check for a matching archive collection entry
-				// This allows for custom descriptions and images on monthly archive pages
-				const archiveEntry = archivesMap.get(monthlyData.id);
+			const hasData =
+				deduped.updated.length > 0 || deduped.created.length > 0 || deduped.visited.length > 0;
 
-				archivesMonthlyData.push({
-					...monthlyData,
-					created: monthlyDataProcessed.created,
-					updated: monthlyDataProcessed.updated,
-					visited: monthlyDataProcessed.visited,
-					archiveEntry,
-				});
-				archivesMonths[year].push(monthlyData.month);
+			if (!hasData) continue;
+
+			for (const item of [...deduped.updated, ...deduped.created, ...deduped.visited]) {
+				yearlySeenIds.add(item.id);
 			}
-
-			// Yearly view; filter by allowed sets AND quality threshold
-			const yearlyUpdated = [...monthlyData.updated.values()].filter(
-				(item) => item.entryQuality >= 2 && allowedUpdated.has(item.id),
-			);
-			const yearlyCreated = [...monthlyData.created.values()].filter(
-				(item) => item.entryQuality >= 2 && allowedCreated.has(item.id),
-			);
-			const yearlyVisited = [...monthlyData.visited.values()].filter(
-				(item) => item.entryQuality >= 2 && allowedVisited.has(item.id),
-			);
-
-			// Sort by quality and limit per month
-			const yearlyUpdatedSorted = filterAndSortItems(yearlyUpdated, { quality: 0, limit: 20 });
-			const yearlyCreatedSorted = filterAndSortItems(yearlyCreated, { quality: 0, limit: 20 });
-			const yearlyVisitedSorted = filterAndSortItems(yearlyVisited, { quality: 0, limit: 20 });
-
-			if (
-				yearlyUpdatedSorted.length === 0 &&
-				yearlyCreatedSorted.length === 0 &&
-				yearlyVisitedSorted.length === 0
-			)
-				continue;
 
 			if (!archivesYearlyData[year]) archivesYearlyData[year] = [];
 
 			archivesYearlyData[year].push({
-				...monthlyData,
-				created: yearlyCreatedSorted,
-				updated: yearlyUpdatedSorted,
-				visited: yearlyVisitedSorted,
+				...month.raw,
+				highlights: monthlyHighlightsById.get(month.raw.id),
+				createdCount: month.created.length,
+				updatedCount: month.updated.length,
+				visitedCount: month.visited.length,
+				created: deduped.created,
+				updated: deduped.updated,
+				visited: deduped.visited,
 			});
 		}
 
-		// Archives index data (reuse aggregated year data)
-		const indexDataProcessed = getArchivesMonthlyData(
-			yearUpdatedAll,
-			yearCreatedAll,
-			yearVisitedAll,
-			{ quality: 3, limit: 20 },
+		// Index view; year-level aggregation
+		const yearUpdated = months.flatMap((month) => month.updated);
+		const yearCreated = months.flatMap((month) => month.created);
+		const yearVisited = months.flatMap((month) => month.visited);
+
+		const indexDeduped = deduplicateCategories(
+			sortAndLimit(
+				yearUpdated.filter((item) => item.entryQuality >= 3),
+				20,
+			),
+			sortAndLimit(
+				yearCreated.filter((item) => item.entryQuality >= 3),
+				20,
+			),
+			sortAndLimit(
+				yearVisited.filter((item) => item.entryQuality >= 3),
+				20,
+			),
 		);
 
-		if (indexDataProcessed.isEmpty) continue;
+		const hasIndexData =
+			indexDeduped.updated.length > 0 ||
+			indexDeduped.created.length > 0 ||
+			indexDeduped.visited.length > 0;
 
-		const indexHighlights = getArchivesHighlights(
-			[
-				...indexDataProcessed.created.values(),
-				...indexDataProcessed.updated.values(),
-				...indexDataProcessed.visited.values(),
-			].filter((item) => !archivesIndexHighlightIds.has(item.id)),
-		);
+		if (!hasIndexData) continue;
+
+		const indexHighlightCandidates = [
+			...indexDeduped.created,
+			...indexDeduped.updated,
+			...indexDeduped.visited,
+		]
+			.filter((item) => item.imageId && item.entryQuality >= 2)
+			.filter((item) => !indexHighlightIds.has(item.id));
+
+		const indexHighlights = getArchivesHighlights(indexHighlightCandidates);
 
 		if (indexHighlights) {
 			for (const highlight of indexHighlights) {
-				archivesIndexHighlightIds.add(highlight.id);
+				indexHighlightIds.add(highlight.id);
 			}
 		}
 
@@ -377,12 +357,12 @@ export const getArchivesData = pMemoize(async (): Promise<ArchivesData> => {
 			monthName: '',
 			title: year,
 			highlights: indexHighlights,
-			created: indexDataProcessed.created,
-			createdCount: yearCreatedAll.length,
-			updated: indexDataProcessed.updated,
-			updatedCount: yearUpdatedAll.length,
-			visited: indexDataProcessed.visited,
-			visitedCount: yearVisitedAll.length,
+			created: indexDeduped.created,
+			createdCount: yearCreated.length,
+			updated: indexDeduped.updated,
+			updatedCount: yearUpdated.length,
+			visited: indexDeduped.visited,
+			visitedCount: yearVisited.length,
 		};
 	}
 

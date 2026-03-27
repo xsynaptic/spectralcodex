@@ -1,5 +1,5 @@
 ---
-import type { ArchivesData } from '#lib/collections/archives/archives-types.ts';
+import type { ArchivesIndexData } from '#lib/collections/archives/archives-types.ts';
 
 import ArchivesItem from '#components/archives/archives-item.astro';
 import ArchivesNavigation from '#components/archives/archives-navigation.astro';
@@ -14,7 +14,7 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	archivesIndexData: ArchivesData['archivesIndexData'];
+	archivesIndexData: ArchivesIndexData;
 	archivesYears: Array<string>;
 }
 
