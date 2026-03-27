@@ -1,9 +1,0 @@
-{
-	"site": "dist",
-	"output_subdir": "pagefind",
-	"vite_plugin_pagefind": {
-		"assets_dir": "public",
-		"build_command": "pnpm astro build",
-		"dev_strategy": "lazy"
-	}
-}

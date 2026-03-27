@@ -15,6 +15,7 @@ import MainMeta from '#components/main/main-meta.astro';
 import ModeManager from '#components/main/main-mode-manager.astro';
 import ProgressLoading from '#components/main/main-progress-loading.astro';
 import ProgressReading from '#components/main/main-progress-reading.astro';
+import MainSearchStyle from '#components/main/main-search-style.astro';
 import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/structured-data.ts';
@@ -52,13 +53,14 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
 		<ModeManager defaultMode="auto" />
-		<ClientRouter />
+		<MainSearchStyle />
 		<UmamiAnalytics
 			siteId={UMAMI_ID}
 			domain={UMAMI_DOMAIN}
 			isProduction={import.meta.env.PROD}
 			isViewTransitionsEnabled={true}
 		/>
+		<ClientRouter />
 	</head>
 	<body
 		class:list={[

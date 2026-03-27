@@ -1,14 +1,12 @@
 ---
-import Search from 'astro-pagefind/components/Search';
-
 import MenuHeader from '#components/main/main-header-menu.astro';
 import ModeToggle from '#components/main/main-mode-toggle.astro';
+import MainSearch from '#components/main/main-search.astro';
 import SkipLink from '#components/main/main-skip-link.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import '#styles/pagefind.css';
 
 interface Props {
 	hasHeroImage: boolean;
@@ -65,23 +63,7 @@ const t = getTranslations();
 				</h2>
 			)
 		}
-		<div>
-			<Search
-				id="search"
-				className="pagefind-ui"
-				uiOptions={{
-					pageSize: 10,
-					showImages: false,
-					resetStyles: false,
-					showEmptyFilters: false,
-					showSubResults: true,
-					ranking: {
-						pageLength: 0.5,
-						termFrequency: 0.8,
-					},
-				}}
-			/>
-		</div>
+		<MainSearch />
 		<ModeToggle />
 	</Container>
 	<Container class="w-full overflow-x-clip" fillViewport={true}>

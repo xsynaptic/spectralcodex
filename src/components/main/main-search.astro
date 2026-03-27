@@ -1,0 +1,43 @@
+---
+
+---
+
+<div>
+	<div id="pagefind-search" class="pagefind-ui"></div>
+</div>
+
+<script>
+	import { PagefindUI } from '@pagefind/default-ui';
+
+	const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
+
+	function initPagefind() {
+		const element = document.querySelector<HTMLDivElement>('#pagefind-search');
+
+		if (!element || element.hasAttribute('data-initialized')) return;
+
+		new PagefindUI({
+			element: '#pagefind-search',
+			bundlePath,
+			pageSize: 10,
+			showImages: false,
+			resetStyles: false,
+			showEmptyFilters: false,
+			showSubResults: true,
+			ranking: {
+				pageLength: 0.5,
+				termFrequency: 0.8,
+			},
+		});
+
+		element.setAttribute('data-initialized', '');
+	}
+
+	document.addEventListener('astro:page-load', initPagefind);
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initPagefind);
+	} else {
+		initPagefind();
+	}
+</script>
