@@ -9,7 +9,19 @@ const DEFAULT_PAGE_SIZE = 5;
 
 export function SearchContainer({ bundlePath, pageSize, ranking }: SearchComponentProps) {
 	const [isOpen, setIsOpen] = useState(false);
-	const { search, results, totalCount, loading, query } = usePagefind({
+	const {
+		search,
+		loadMore,
+		toggleFilter,
+		clearFilters,
+		results,
+		totalCount,
+		loading,
+		query,
+		hasMore,
+		availableFilters,
+		activeFilters,
+	} = usePagefind({
 		bundlePath,
 		pageSize: pageSize ?? DEFAULT_PAGE_SIZE,
 		ranking,
@@ -18,7 +30,8 @@ export function SearchContainer({ bundlePath, pageSize, ranking }: SearchCompone
 	const handleClose = useCallback(() => {
 		setIsOpen(false);
 		search('');
-	}, [search]);
+		clearFilters();
+	}, [search, clearFilters]);
 
 	const handleOpen = useCallback(() => {
 		setIsOpen(true);
@@ -55,7 +68,12 @@ export function SearchContainer({ bundlePath, pageSize, ranking }: SearchCompone
 					results={results}
 					totalCount={totalCount}
 					loading={loading}
+					hasMore={hasMore}
+					onLoadMore={loadMore}
 					onClose={handleClose}
+					availableFilters={availableFilters}
+					activeFilters={activeFilters}
+					onToggleFilter={toggleFilter}
 				/>
 			) : undefined}
 		</>

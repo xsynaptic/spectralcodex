@@ -3,17 +3,26 @@
 export interface PagefindInstance {
 	init: () => Promise<void>;
 	options: (options: { bundlePath: string }) => Promise<void>;
+	search: (
+		query: string,
+		options?: Record<string, unknown>,
+	) => Promise<PagefindSearchResults>;
 	debouncedSearch: (
 		query: string,
 		options?: Record<string, unknown>,
 		timeout?: number,
 	) => Promise<PagefindSearchResults | null>;
+	filters: () => Promise<PagefindFilterCounts>;
 	destroy: () => Promise<void>;
 }
+
+export type PagefindFilterCounts = Record<string, Record<string, number>>;
 
 export interface PagefindSearchResults {
 	results: Array<PagefindSearchResult>;
 	unfilteredResultCount: number;
+	filters: PagefindFilterCounts;
+	totalFilters: PagefindFilterCounts;
 }
 
 export interface PagefindSearchResult {
@@ -35,7 +44,6 @@ export interface PagefindSubResult {
 	excerpt: string;
 }
 
-// Component props
 export interface SearchRankingOptions {
 	pageLength?: number | undefined;
 	termFrequency?: number | undefined;

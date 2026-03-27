@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type {
+	PagefindFilterCounts,
 	PagefindInstance,
 	PagefindSearchFragment,
 	PagefindSearchResult,
@@ -9,7 +10,6 @@ import type {
 
 const DEBOUNCE_TIMEOUT = 300;
 
-// Module-level guard: pagefind is a singleton, only init once per app load (rule 8.1)
 let didInit = false;
 
 interface UsePagefindOptions {
@@ -18,18 +18,11 @@ interface UsePagefindOptions {
 	ranking?: SearchRankingOptions | undefined;
 }
 
-export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOptions): {
-	search: (query: string) => void;
-	loadMore: () => void;
-	results: Array<PagefindSearchFragment>;
-	totalCount: number;
-	loading: boolean;
-	query: string;
-} {
+export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOptions) {
 	const pagefindRef = useRef<PagefindInstance | undefined>(undefined);
 	const pendingResultsRef = useRef<Array<PagefindSearchResult>>([]);
+	const baselineFiltersRef = useRef<PagefindFilterCounts>({});
 
-	// Store ranking in a ref to avoid triggering search effect on object reference changes (rule 5.6)
 	const rankingRef = useRef(ranking);
 	rankingRef.current = ranking;
 
@@ -37,7 +30,9 @@ export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOption
 	const [results, setResults] = useState<Array<PagefindSearchFragment>>([]);
 	const [totalCount, setTotalCount] = useState(0);
 	const [loading, setLoading] = useState(false);
-	const [, setVisibleCount] = useState(pageSize);
+	const visibleCountRef = useRef(pageSize);
+	const [availableFilters, setAvailableFilters] = useState<PagefindFilterCounts>({});
+	const [activeFilters, setActiveFilters] = useState<Record<string, Array<string>>>({});
 
 	useEffect(() => {
 		if (didInit) return;
@@ -54,6 +49,13 @@ export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOption
 
 			await pagefind.options({ bundlePath });
 			pagefindRef.current = pagefind;
+
+			const filters = await pagefind.filters();
+
+			if (!destroyed) { // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+				baselineFiltersRef.current = filters;
+				setAvailableFilters(filters);
+			}
 		}
 
 		void init();
@@ -74,6 +76,7 @@ export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOption
 			setResults([]);
 			setTotalCount(0);
 			pendingResultsRef.current = [];
+			setAvailableFilters(baselineFiltersRef.current);
 			return;
 		}
 
@@ -87,14 +90,24 @@ export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOption
 			setLoading(true);
 
 			const currentRanking = rankingRef.current;
-			const searchOptions = currentRanking ? { ranking: currentRanking } : {};
+			const searchOptions: Record<string, unknown> = {};
+
+			if (currentRanking) {
+				searchOptions.ranking = currentRanking;
+			}
+
+			if (Object.keys(activeFilters).length > 0) {
+				searchOptions.filters = activeFilters;
+			}
+
 			const response = await pagefind.debouncedSearch(query, searchOptions, DEBOUNCE_TIMEOUT);
 
 			if (abortController.signal.aborted || !response) return;
 
 			pendingResultsRef.current = response.results;
-			setTotalCount(response.unfilteredResultCount);
-			setVisibleCount(pageSize);
+			setTotalCount(response.results.length);
+			visibleCountRef.current = pageSize;
+			setAvailableFilters(response.totalFilters);
 
 			const fragments = await Promise.all(
 				response.results.slice(0, pageSize).map((result) => result.data()),
@@ -112,30 +125,64 @@ export function usePagefind({ bundlePath, pageSize, ranking }: UsePagefindOption
 		return () => {
 			abortController.abort();
 		};
-	}, [query, pageSize]);
+	}, [query, pageSize, activeFilters]);
 
 	const search = useCallback((newQuery: string) => {
 		setQuery(newQuery);
 	}, []);
 
-	// Functional setState for both visibleCount and results to avoid stale closures (rule 5.9)
+	const clearFilters = useCallback(() => {
+		setActiveFilters({});
+		setAvailableFilters(baselineFiltersRef.current);
+	}, []);
+
 	const loadMore = useCallback(() => {
-		setVisibleCount((currentVisible) => {
-			const pending = pendingResultsRef.current;
+		const pending = pendingResultsRef.current;
+		const currentVisible = visibleCountRef.current;
 
-			if (currentVisible >= pending.length) return currentVisible;
+		if (currentVisible >= pending.length) return;
 
-			const nextVisible = currentVisible + pageSize;
+		const nextVisible = currentVisible + pageSize;
+		visibleCountRef.current = nextVisible;
 
-			void Promise.all(
-				pending.slice(currentVisible, nextVisible).map((result) => result.data()),
-			).then((newFragments) => {
-				setResults((previous) => [...previous, ...newFragments]);
-			});
-
-			return nextVisible;
+		void Promise.all(
+			pending.slice(currentVisible, nextVisible).map((result) => result.data()),
+		).then((newFragments) => {
+			setResults((previous) => [...previous, ...newFragments]);
 		});
 	}, [pageSize]);
 
-	return { search, loadMore, results, totalCount, loading, query };
+	const toggleFilter = useCallback((filterName: string, filterValue: string) => {
+		setActiveFilters((current) => {
+			const existing = current[filterName] ?? [];
+			const isActive = existing.includes(filterValue);
+
+			const updated = isActive
+				? existing.filter((value) => value !== filterValue)
+				: [...existing, filterValue];
+
+			if (updated.length === 0) {
+				const { [filterName]: _, ...rest } = current;
+				return rest;
+			}
+
+			return { ...current, [filterName]: updated };
+		});
+	}, []);
+
+	const hasMore = results.length < totalCount;
+
+	return {
+		search,
+		loadMore,
+		toggleFilter,
+		clearFilters,
+		results,
+		totalCount,
+		loading,
+		query,
+		hasMore,
+		availableFilters,
+		activeFilters,
+	};
 }

@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-import type { PagefindSearchFragment } from '../types';
+import type { PagefindFilterCounts, PagefindSearchFragment } from '../types';
 
+import { SearchFilters } from './search-filters';
 import { SearchInput } from './search-input';
 import { SearchResults } from './search-results';
 
@@ -11,7 +12,12 @@ interface SearchOverlayProps {
 	results: Array<PagefindSearchFragment>;
 	totalCount: number;
 	loading: boolean;
+	hasMore: boolean;
+	onLoadMore: () => void;
 	onClose: () => void;
+	availableFilters: PagefindFilterCounts;
+	activeFilters: Record<string, Array<string>>;
+	onToggleFilter: (filterName: string, filterValue: string) => void;
 }
 
 export function SearchOverlay({
@@ -20,9 +26,15 @@ export function SearchOverlay({
 	results,
 	totalCount,
 	loading,
+	hasMore,
+	onLoadMore,
 	onClose,
+	availableFilters,
+	activeFilters,
+	onToggleFilter,
 }: SearchOverlayProps) {
 	const overlayRef = useRef<HTMLDivElement>(null);
+	const resultsRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		document.body.style.overflow = 'hidden';
@@ -41,6 +53,12 @@ export function SearchOverlay({
 		};
 	}, [onClose]);
 
+	useEffect(() => {
+		if (resultsRef.current) {
+			resultsRef.current.scrollTop = 0;
+		}
+	}, [query]);
+
 	function handleBackdropClick(event: React.MouseEvent) {
 		if (event.target === overlayRef.current) {
 			onClose();
@@ -51,7 +69,7 @@ export function SearchOverlay({
 		<div
 			ref={overlayRef}
 			onClick={handleBackdropClick}
-			className="fixed inset-0 z-50 flex items-start justify-center bg-primary-900/60 pt-[10vh] backdrop-blur-sm dark:bg-primary-950/70"
+			className="fixed inset-0 z-50 flex items-start justify-center bg-primary-900/60 px-3 pt-4 backdrop-blur-sm sm:px-0 sm:pt-[10vh] dark:bg-primary-950/70"
 			role="dialog"
 			aria-modal="true"
 			aria-label="Search"
@@ -61,7 +79,7 @@ export function SearchOverlay({
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-full p-1 text-primary-300 transition-colors hover:text-white dark:text-primary-500 dark:hover:text-primary-200"
+						className="rounded-full p-2 text-primary-300 transition-colors hover:text-white sm:p-1 dark:text-primary-500 dark:hover:text-primary-200"
 						aria-label="Close search"
 					>
 						<svg
@@ -84,12 +102,22 @@ export function SearchOverlay({
 					<div className="p-3">
 						<SearchInput query={query} onQueryChange={onQueryChange} autoFocus />
 					</div>
-					<div className="max-h-[60vh] overflow-y-auto">
+					<div
+						ref={resultsRef}
+						className="max-h-[75vh] overflow-y-auto sm:max-h-[60vh]"
+					>
+						<SearchFilters
+							availableFilters={availableFilters}
+							activeFilters={activeFilters}
+							onToggleFilter={onToggleFilter}
+						/>
 						<SearchResults
 							results={results}
 							totalCount={totalCount}
 							loading={loading}
 							query={query}
+							hasMore={hasMore}
+							onLoadMore={onLoadMore}
 						/>
 					</div>
 				</div>
