@@ -54,7 +54,10 @@ export default getConfig(
 		 * React
 		 */
 		{
-			files: ['packages/react-map-component/**/*.{js,jsx,ts,tsx}'],
+			files: [
+			'packages/react-map-component/**/*.{js,jsx,ts,tsx}',
+			'packages/react-search-component/**/*.{js,jsx,ts,tsx}',
+		],
 			plugins: {
 				'@tanstack/query': tanstackQueryPlugin as unknown as ESLint.Plugin,
 				'react-hooks': reactHooksPlugin as unknown as ESLint.Plugin,

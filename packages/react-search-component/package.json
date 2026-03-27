@@ -1,0 +1,14 @@
+{
+	"name": "@spectralcodex/react-search-component",
+	"version": "1.0.0",
+	"description": "React search component powered by Pagefind",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"dependencies": {
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	}
+}

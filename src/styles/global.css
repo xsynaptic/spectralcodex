@@ -10,6 +10,7 @@
 @source './**/*.css';
 @source '../**/*.astro';
 @source '../../packages/react-map-component/src/**/*.tsx';
+@source '../../packages/react-search-component/src/**/*.tsx';
 
 /** Theme styling */
 @import './theme/config.css';

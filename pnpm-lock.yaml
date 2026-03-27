@@ -54,6 +54,9 @@ importers:
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
+      '@spectralcodex/react-search-component':
+        specifier: workspace:*
+        version: link:packages/react-search-component
       '@spectralcodex/remark-img-group':
         specifier: workspace:*
         version: link:packages/remark-img-group
@@ -397,6 +400,15 @@ importers:
       zustand:
         specifier: ^5.0.12
         version: 5.0.12(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.2.0(react@19.2.4))
+
+  packages/react-search-component:
+    dependencies:
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
 
   packages/remark-img-group:
     dependencies:

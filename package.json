@@ -62,6 +62,7 @@
 		"@spectralcodex/astro-image-loader": "workspace:*",
 		"@spectralcodex/astro-pagefind": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
+		"@spectralcodex/react-search-component": "workspace:*",
 		"@spectralcodex/remark-img-group": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
