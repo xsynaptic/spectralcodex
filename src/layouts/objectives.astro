@@ -18,7 +18,9 @@ const description = 'Points in the database that still require visitation and do
 ---
 
 <MainSite meta={{ title, description, ...getSeoHideSearch(true) }}>
-	<ContentHeader><Fragment slot="header-title">{title}</Fragment></ContentHeader>
+	<ContentHeader>
+		<Fragment slot="header-title">{title}</Fragment>
+	</ContentHeader>
 	<ContentSection>
 		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
 	</ContentSection>

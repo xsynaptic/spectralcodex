@@ -74,7 +74,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			hasHeroImage={hasHeroImage}
 			imageFeaturedGroup={imageFeaturedGroup}
 		>
-			<ContentHeader class="relative" hasHeroImage={hasHeroImage}>
+			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
