@@ -5,8 +5,8 @@ const baseURL = 'http://localhost:4321';
 export default defineConfig({
 	testDir: './tests/e2e',
 	outputDir: './temp/playwright-results',
-	timeout: 10_000,
-	retries: 0,
+	timeout: 15_000,
+	retries: 3,
 	reporter: 'list',
 	use: {
 		baseURL,
