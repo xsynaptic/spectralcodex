@@ -14,8 +14,7 @@ const HEALTH_URL = 'http://localhost:3100/health';
 const MAX_WAIT_MS = 30_000;
 const POLL_INTERVAL_MS = 500;
 
-// Load dev environment for test secret
-dotenv.config({ path: path.join(PROJECT_ROOT, '.env.dev'), quiet: true });
+dotenv.config({ path: path.join(PROJECT_ROOT, '.env'), quiet: true });
 
 async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();
@@ -71,7 +70,6 @@ export async function setup() {
 					// Absolute paths required for Docker
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
 					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'services/image-server'),
-					// Use dev secret from .env.dev for predictable signature validation
 					IPX_SERVER_SECRET: process.env.IPX_SERVER_SECRET,
 				},
 			},

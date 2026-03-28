@@ -5,7 +5,7 @@ dist/
 node_modules/
 
 # environment variables
-.env
+.env.development
 .env.production
 
 # macOS-specific files
@@ -28,6 +28,9 @@ astro-error.log*
 .astro/
 .cache/
 temp/
+
+# deploy secrets
+deploy/.env
 
 # certificates
 deploy/site/certs/

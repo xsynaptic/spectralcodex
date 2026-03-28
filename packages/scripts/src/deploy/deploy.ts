@@ -41,7 +41,7 @@ await ensureSshKeychain();
 // Note: because our content validation scripts rely on data-store.json we need to sync first
 async function sync() {
 	console.log(chalk.blue('Syncing content...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro sync`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro sync --mode production`;
 }
 
 async function validate() {

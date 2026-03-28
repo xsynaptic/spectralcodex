@@ -4,8 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { generateSignedUrl } from '../../src/lib/image/image-server-utils.js';
 
-// Load dev environment for test secret
-dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env.dev') });
+dotenv.config({ path: path.resolve(import.meta.dirname, '../../.env') });
 
 const IPX_SERVER_URL = 'http://localhost:3100';
 const IPX_SERVER_SECRET = process.env.IPX_SERVER_SECRET!;

@@ -23,7 +23,7 @@ const getIpxImageUrl = createIpxImageUrlFunction({
 	imageQuality: IMAGE_QUALITY,
 	imageFormat: IMAGE_FORMAT,
 	serverSecret: IPX_SERVER_SECRET,
-	serverUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
+	serverUrl: IPX_SERVER_URL,
 });
 
 function getIpxImagePath(...args: Parameters<typeof getIpxImageUrl>) {

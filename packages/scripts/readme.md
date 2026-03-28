@@ -50,7 +50,7 @@ Reads region metadata to extract Overture division IDs, queries Parquet datasets
 
 ### `dev-server`
 
-Starts Docker containers (IPX image server) alongside Astro dev server. Loads `.env.dev` for dev-specific overrides.
+Starts Docker containers (IPX image server) alongside Astro dev server. Loads `.env.development` for dev-specific overrides.
 
 ## Deployment
 

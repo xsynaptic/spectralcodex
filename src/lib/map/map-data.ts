@@ -40,7 +40,7 @@ const defaultMapDataProps = {
 	sourceData: undefined,
 	popupData: undefined,
 	featureCount: 0,
-	imageServerUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
+	imageServerUrl: IPX_SERVER_URL,
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,

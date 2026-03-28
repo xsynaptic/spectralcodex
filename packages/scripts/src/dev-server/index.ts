@@ -7,9 +7,8 @@ import { $ } from 'zx';
 const rootPath = process.cwd();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 
-// Load environment variables; the `.env.dev` file allows for a dev-only IPX secret to be set
 dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-dotenv.config({ path: path.join(rootPath, '.env.dev'), override: true, quiet: true });
+dotenv.config({ path: path.join(rootPath, '.env.development'), override: true, quiet: true });
 
 // Resolve paths to absolute for Docker
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';

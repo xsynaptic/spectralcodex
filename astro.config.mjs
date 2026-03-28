@@ -45,7 +45,7 @@ export default defineConfig({
 			CONTENT_DATA_PATH: envField.string({
 				context: 'server',
 				access: 'public',
-				default: 'packages/content-demo/data',
+				default: 'packages/content-demo/collections',
 			}),
 			CONTENT_MEDIA_PATH: envField.string({
 				context: 'server',
