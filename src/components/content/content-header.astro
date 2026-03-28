@@ -45,7 +45,10 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 			</TextGradient>
 		) : undefined
 	}
-	<div class="flex-wrap items-start justify-between gap-1 bg-clip-padding pb-0 sm:flex sm:pb-2">
+	<div
+		class="flex-wrap items-start justify-between gap-1 bg-clip-padding pb-0 sm:flex sm:pb-2"
+		{...hasHeroImage ? { id: 'main-content' } : {}}
+	>
 		<TextGradient
 			as="h1"
 			gradientColor={hasHeroImage ? 'primary-featured' : 'primary'}

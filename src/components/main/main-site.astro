@@ -69,7 +69,7 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 		]}
 	>
 		<MainHeader hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
-		<main id="content" class="flex-1">
+		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
 			<slot />
 		</main>
 		<MainFooter />
