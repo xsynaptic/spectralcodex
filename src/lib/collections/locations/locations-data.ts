@@ -13,7 +13,6 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -26,6 +25,12 @@ const getIpxImageUrl = createIpxImageUrlFunction({
 	serverSecret: IPX_SERVER_SECRET,
 	serverUrl: import.meta.env.PROD ? IPX_SERVER_URL : 'http://localhost:3100',
 });
+
+function getIpxImagePath(...args: Parameters<typeof getIpxImageUrl>) {
+	const url = new URL(getIpxImageUrl(...args));
+
+	return `${url.pathname}${url.search}`;
+}
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
@@ -43,9 +48,9 @@ async function generateLocationPostDataFunction() {
  * We pass this data via the API so URLs can be signed at build time
  */
 const imageThumbnailOptions = {
-	width: ImageSizeEnum.ExtraSmall,
-	height: 300,
-	widths: [ImageSizeEnum.ExtraSmall, ImageSizeEnum.Small, ImageSizeEnum.Medium],
+	width: 350,
+	height: 234,
+	widths: [350, 700],
 };
 
 function getLocationThumbnailProps(
@@ -60,11 +65,11 @@ function getLocationThumbnailProps(
 	const clampedWidth = Math.min(width, sourceWidth);
 
 	return {
-		src: getIpxImageUrl(imageSrc, { width: clampedWidth, sourceWidth, sourceHeight }),
+		src: getIpxImagePath(imageSrc, { width: clampedWidth, sourceWidth, sourceHeight }),
 		srcSet: clampedWidths
 			.map(
 				(width) =>
-					`${getIpxImageUrl(imageSrc, { width, sourceWidth, sourceHeight })} ${String(width)}w`,
+					`${getIpxImagePath(imageSrc, { width, sourceWidth, sourceHeight })} ${String(width)}w`,
 			)
 			.join(', '),
 		height: String(height),

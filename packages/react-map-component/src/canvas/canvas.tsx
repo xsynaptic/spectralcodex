@@ -54,6 +54,7 @@ const MapCanvasContainer: FC<
 	style,
 	protomapsApiKey,
 	mapId,
+	imageServerUrl,
 	spritesUrl,
 	spritesId,
 	apiPopupUrl,
@@ -135,7 +136,7 @@ const MapCanvasContainer: FC<
 				isDev={isDev}
 			>
 				<MapControls />
-				<MapPopup />
+				<MapPopup imageServerUrl={imageServerUrl} />
 			</PopupDataContextProvider>
 			<MapSource
 				apiDivisionUrl={apiDivisionUrl}

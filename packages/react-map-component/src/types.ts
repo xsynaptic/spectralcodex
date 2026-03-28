@@ -143,6 +143,7 @@ export interface MapComponentProps extends Partial<
 	apiSourceUrl?: string | undefined;
 	apiPopupUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;
+	imageServerUrl?: string | undefined;
 	sourceData?: Array<MapSourceItemInput> | undefined;
 	popupData?: Array<MapPopupItemInput> | undefined;
 	baseMapTheme?: Flavor | undefined;

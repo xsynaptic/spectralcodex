@@ -118,132 +118,138 @@ function useMapCanvasPopup() {
 	}, [selectedId, popupData, sourceData]);
 }
 
-const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
-	popupItem,
-}) {
-	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
+	function MapPopupContent({ popupItem, imageServerUrl }) {
+		const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
-	const {
-		title,
-		titleMultilingualLang,
-		titleMultilingualValue,
-		url,
-		description,
-		precision,
-		wikipediaUrl,
-		image,
-		popupCoordinates,
-	} = popupItem;
+		const {
+			title,
+			titleMultilingualLang,
+			titleMultilingualValue,
+			url,
+			description,
+			precision,
+			wikipediaUrl,
+			image,
+			popupCoordinates,
+		} = popupItem;
 
-	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
-	const googleMapsUrl = popupItem.googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
+		const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
+		const googleMapsUrl = popupItem.googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
 
-	return (
-		<>
-			{image ? (
-				<div>
-					<img
-						className="w-full bg-fallback object-cover select-none"
-						style={{ aspectRatio: '3/2' }}
-						src={image.src}
-						srcSet={image.srcSet}
-						sizes={isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw'}
-						loading="eager"
-						alt={title}
-					/>
-				</div>
-			) : undefined}
-			<div className="flex flex-col px-2 pt-1 pb-2">
-				{titleMultilingualLang && titleMultilingualValue ? (
-					<div className="bg-linear-to-b from-accent-500 to-accent-600 bg-clip-text text-sm leading-snug font-medium text-transparent dark:from-accent-400 dark:to-accent-500">
-						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
+		return (
+			<>
+				{image?.src ? (
+					<div>
+						<img
+							className="w-full bg-fallback object-cover select-none"
+							style={{ aspectRatio: '3/2' }}
+							src={`${imageServerUrl}${image.src}`}
+							srcSet={image.srcSet
+								?.split(', ')
+								.map((entry) => `${imageServerUrl}${entry}`)
+								.join(', ')}
+							sizes={isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw'}
+							loading="eager"
+							alt={title}
+						/>
 					</div>
 				) : undefined}
-				<div className="border-b border-b-primary-300 pb-1 text-base leading-snug font-semibold text-primary-800 dark:border-b-primary-700 dark:text-primary-300">
-					<a href={url}>{title}</a>
-				</div>
-				{precision <= 2 ? (
-					<div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 36 36"
-							className="h-[20px] text-highlight-500 md:h-[16px]"
-						>
-							<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
-						</svg>
-						<span className="text-highlight-400 italic">
-							{precision === 2 ? translations.precisionWarning : translations.precisionError}
-						</span>
-					</div>
-				) : undefined}
-				{description ? (
-					<div
-						className="mt-1 mb-2 text-sm"
-						style={{ maxHeight: '119px', overflowX: 'auto' }}
-						dangerouslySetInnerHTML={{ __html: description }}
-					/>
-				) : undefined}
-				<div className="m-0 flex justify-between text-xs text-primary-700 select-none dark:text-primary-600">
-					<div
-						className="group flex cursor-pointer items-center gap-1"
-						onClick={() => {
-							// Copy coordinates to clipboard by clicking on them
-							void navigator.clipboard.writeText(coordinatesString);
-						}}
-					>
-						<div className="text-primary-400 transition-colors duration-300 group-hover:text-highlight-300 dark:text-primary-500">
-							{coordinatesString}
+				<div className="flex flex-col px-2 pt-1 pb-2">
+					{titleMultilingualLang && titleMultilingualValue ? (
+						<div className="bg-linear-to-b from-accent-500 to-accent-600 bg-clip-text text-sm leading-snug font-medium text-transparent dark:from-accent-400 dark:to-accent-500">
+							<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 						</div>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="text-primary-500 transition-colors duration-300 group-hover:text-highlight-400 dark:text-primary-400"
-							style={{ height: '14px' }}
-							viewBox="0 0 24 24"
-						>
-							<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>
-						</svg>
+					) : undefined}
+					<div className="border-b border-b-primary-300 pb-1 text-base leading-snug font-semibold text-primary-800 dark:border-b-primary-700 dark:text-primary-300">
+						<a href={url}>{title}</a>
 					</div>
-					<div className="flex gap-2 select-none">
-						{wikipediaUrl ? (
-							<a
-								className="cursor-pointer"
-								href={wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`}
-								target="_blank"
+					{precision <= 2 ? (
+						<div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 36 36"
+								className="h-[20px] text-highlight-500 md:h-[16px]"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									className="h-[20px] md:h-[16px] dark:text-primary-400"
-								>
-									<use xlinkHref={`#${MapSpritesEnum.Wikipedia}`}></use>
-								</svg>
-							</a>
-						) : undefined}
-						{googleMapsUrl ? (
-							<a
-								className="cursor-pointer"
-								href={
-									googleMapsUrl.includes('https://') ? googleMapsUrl : `https://${googleMapsUrl}`
-								}
-								target="_blank"
+								<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
+							</svg>
+							<span className="text-highlight-400 italic">
+								{precision === 2 ? translations.precisionWarning : translations.precisionError}
+							</span>
+						</div>
+					) : undefined}
+					{description ? (
+						<div
+							className="mt-1 mb-2 text-sm"
+							style={{ maxHeight: '119px', overflowX: 'auto' }}
+							dangerouslySetInnerHTML={{ __html: description }}
+						/>
+					) : undefined}
+					<div className="m-0 flex justify-between text-xs text-primary-700 select-none dark:text-primary-600">
+						<div
+							className="group flex cursor-pointer items-center gap-1"
+							onClick={() => {
+								// Copy coordinates to clipboard by clicking on them
+								void navigator.clipboard.writeText(coordinatesString);
+							}}
+						>
+							<div className="text-primary-400 transition-colors duration-300 group-hover:text-highlight-300 dark:text-primary-500">
+								{coordinatesString}
+							</div>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="text-primary-500 transition-colors duration-300 group-hover:text-highlight-400 dark:text-primary-400"
+								style={{ height: '14px' }}
+								viewBox="0 0 24 24"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 256 367"
-									className="h-[20px] md:h-[16px]"
+								<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>
+							</svg>
+						</div>
+						<div className="flex gap-2 select-none">
+							{wikipediaUrl ? (
+								<a
+									className="cursor-pointer"
+									href={
+										wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`
+									}
+									target="_blank"
 								>
-									<use xlinkHref={`#${MapSpritesEnum.Google}`}></use>
-								</svg>
-							</a>
-						) : undefined}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										className="h-[20px] md:h-[16px] dark:text-primary-400"
+									>
+										<use xlinkHref={`#${MapSpritesEnum.Wikipedia}`}></use>
+									</svg>
+								</a>
+							) : undefined}
+							{googleMapsUrl ? (
+								<a
+									className="cursor-pointer"
+									href={
+										googleMapsUrl.includes('https://') ? googleMapsUrl : `https://${googleMapsUrl}`
+									}
+									target="_blank"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 256 367"
+										className="h-[20px] md:h-[16px]"
+									>
+										<use xlinkHref={`#${MapSpritesEnum.Google}`}></use>
+									</svg>
+								</a>
+							) : undefined}
+						</div>
 					</div>
 				</div>
-			</div>
-		</>
-	);
-};
+			</>
+		);
+	};
 
-export const MapPopup: FC = function MapPopup() {
+export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function MapPopup({
+	imageServerUrl = '',
+}) {
 	const popupItem = useMapCanvasPopup();
 	const popupVisible = useMapPopupVisible();
 
@@ -289,7 +295,11 @@ export const MapPopup: FC = function MapPopup() {
 				</div>
 				<div style={{ opacity: isPopupDataLoading ? 0 : 1 }}>
 					{isPopupDataLoading ? undefined : (
-						<MapPopupContent key={popupItem.id} popupItem={popupItem} />
+						<MapPopupContent
+							key={popupItem.id}
+							popupItem={popupItem}
+							imageServerUrl={imageServerUrl}
+						/>
 					)}
 				</div>
 			</div>
