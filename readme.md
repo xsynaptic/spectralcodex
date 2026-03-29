@@ -8,11 +8,13 @@ This repository contains the working Astro project used to generate the [Spectra
 
 - All content authored in MDX using the Content Layer API
 - Quality scoring system (0-5 scale) drives site-wide content prioritization
-- Comprehensive validation ensuring data quality across collections: frontmatter fields, GPS coordinate de-duplication
+- Comprehensive validation: frontmatter checks, cross-reference verification, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference validation
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
 - Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) with remark plugins
-- Link checker that scans external URLs across collections, tracks status, and supports rechecking and filtering to reduce linkrot
+- Automatic redirect generation from `formerSlugs` frontmatter into Caddy config
+- Media orphan detection for unreferenced images
+- Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling
 
 ### Image Handling
 
@@ -32,8 +34,8 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - [@unjs/ipx](https://github.com/unjs/ipx)-based image server handles on-demand resizing, format conversion, and quality adjustment
 - Nginx reverse proxy with aggressive caching ensures images are only processed once
 - URL-based transformations (e.g., `/q_80,f_webp,s_1200x800/path/to/image.jpg`) allow flexible sizing without pre-generating variants
-- Rate limiting and request validation protect against cache-busting attacks
-- Warming script pre-populates the cache after deployment; this runs on the server, making internal requests on localhost
+- URL signing (MD5-based) and rate limiting protect against cache-busting attacks
+- Incremental cache warming with manifest tracking and remote SSH execution; only warms newly discovered URLs
 - Docker Compose orchestration for easy deployment and updates
 
 ### Interactive Maps
@@ -48,8 +50,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 ### Search & Discovery
 
 - Integrated [Pagefind](https://pagefind.app/) via [astro-pagefind](https://github.com/shishkin/astro-pagefind) for client-side full-text search across all content
-- Related content recommendations via vector similarity (Transformers.js embeddings) with hybrid semantic + metadata ranking
-- Automatic content relationship discovery via backlinks
+- Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
 - Hierarchical navigation through regions, themes, and series
 
 ### Timeline & Archives
@@ -70,8 +71,8 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### SEO & Social
 
-- Programmatic OG image generation via [Satori](https://github.com/vercel/satori) and Sharp; per-page images with featured image backgrounds, multilingual title rendering (CJK/Thai), and luminance-aware adaptive text color
-- Deterministic fallback system (theme/region/country) with blurred visual distinction for entries without a featured image
+- Programmatic OG image generation via [Satori](https://github.com/vercel/satori) and Sharp with multilingual font subsetting (Latin, CJK, Thai, Japanese), luminance-aware adaptive text color, and concurrent processing
+- Hierarchical deterministic fallback system for entries without a featured image
 - Digest-based caching; only regenerates when content or source image changes
 - Comprehensive meta tags and structured data
 - Dynamic sitemap via [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
@@ -83,7 +84,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 Standard Astro commands apply:
 
-- `pnpm dev` - start the development server (includes local image serving)
+- `pnpm dev` - start the development server with Docker-orchestrated local image serving
 - `pnpm build` - generate a production build
 - `pnpm preview` - preview the production build locally
 
