@@ -1,7 +1,6 @@
 /**
  * Vitest global setup; starts Docker containers for integration tests
  */
-import dotenv from 'dotenv';
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 
@@ -13,8 +12,6 @@ const DOCKER_COMPOSE_FILE = path.resolve(
 const HEALTH_URL = 'http://localhost:3100/health';
 const MAX_WAIT_MS = 30_000;
 const POLL_INTERVAL_MS = 500;
-
-dotenv.config({ path: path.join(PROJECT_ROOT, '.env'), quiet: true });
 
 async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();

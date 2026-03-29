@@ -1,23 +1,17 @@
 import chalk from 'chalk';
-import dotenv from 'dotenv';
-import path from 'node:path';
 
 interface DeployConfig {
 	remoteHost: string;
-	sshKeyPath?: string;
 	remotePath: string;
+	sshKeyPath?: string;
 	sitePath: string;
 	mediaPath: string;
 }
 
-export function loadDeployConfig(rootPath: string): DeployConfig {
-	// Load env files
-	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
-
+export function loadDeployConfig(): DeployConfig {
 	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
-	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
 	const remotePath = process.env.DEPLOY_REMOTE_PATH;
+	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
 	const sitePath = process.env.DEPLOY_SITE_PATH;
 	const mediaPath = process.env.DEPLOY_MEDIA_PATH;
 
@@ -42,8 +36,8 @@ export function loadDeployConfig(rootPath: string): DeployConfig {
 
 	return {
 		remoteHost,
-		...(sshKeyPath ? { sshKeyPath } : {}),
 		remotePath,
+		sshKeyPath: sshKeyPath ?? '',
 		sitePath,
 		mediaPath,
 	};

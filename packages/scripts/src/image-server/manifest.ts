@@ -8,7 +8,6 @@
  * - Outputs full manifest (cache-manifest.json) and new-only manifest (cache-manifest-new.json)
  * - Updates main manifest with all discovered URLs
  */
-import dotenv from 'dotenv';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -124,11 +123,6 @@ if (process.argv[1]?.endsWith('manifest.ts')) {
 			'main-path': { type: 'string' },
 		},
 	});
-
-	const rootPath = values['root-path'];
-
-	// Load environment variables
-	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
 
 	// URL pattern from args or environment
 	const urlPattern = values['url-pattern'] ?? process.env.IPX_SERVER_URL;

@@ -15,7 +15,7 @@ interface DeployCaddyOptions {
 export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 	const { rootPath, dryRun = false } = options;
 
-	const config = loadDeployConfig(rootPath);
+	const config = loadDeployConfig();
 
 	const siteDir = path.join(rootPath, 'deploy/site');
 	const remoteCaddySitesPath = `${config.remotePath}/caddy/sites`;

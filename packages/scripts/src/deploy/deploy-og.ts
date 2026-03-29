@@ -17,7 +17,7 @@ interface DeployOgOptions {
 export async function deployOg(options: DeployOgOptions): Promise<void> {
 	const { rootPath, dryRun = false, ids = [] } = options;
 
-	const config = loadDeployConfig(rootPath);
+	const config = loadDeployConfig();
 
 	const ogImagePath = path.join(rootPath, '.cache/og-image');
 	const remoteOgPath = `${config.sitePath}/${OPEN_GRAPH_BASE_PATH}`;

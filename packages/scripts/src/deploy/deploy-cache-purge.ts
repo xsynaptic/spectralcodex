@@ -1,7 +1,5 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
-import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 interface PurgeCacheOptions {
@@ -10,11 +8,7 @@ interface PurgeCacheOptions {
 }
 
 export async function purgeCache(options: PurgeCacheOptions): Promise<void> {
-	const { rootPath, dryRun = false } = options;
-
-	// Load env files (same as deploy-config)
-	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
+	const { dryRun = false } = options;
 
 	const zoneId = process.env.CLOUDFLARE_ZONE_ID;
 	const apiToken = process.env.CLOUDFLARE_API_TOKEN;

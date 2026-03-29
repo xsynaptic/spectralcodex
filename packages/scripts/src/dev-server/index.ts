@@ -1,14 +1,10 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import path from 'node:path';
 import { $ } from 'zx';
 
 const rootPath = process.cwd();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
-
-dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-dotenv.config({ path: path.join(rootPath, '.env.development'), override: true, quiet: true });
 
 // Resolve paths to absolute for Docker
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';

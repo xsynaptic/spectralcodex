@@ -30,7 +30,7 @@ const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
 // Load and validate deploy configuration
-const config = loadDeployConfig(rootPath);
+const config = loadDeployConfig();
 
 printDeployConfig(config);
 
@@ -83,7 +83,7 @@ async function build() {
 
 async function test() {
 	console.log(chalk.blue('Running E2E smoke tests...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm test:e2e`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm test-e2e`;
 }
 
 function manifest() {

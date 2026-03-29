@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
-import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { loadDeployConfig } from '../deploy/deploy-config.js';
 import { ensureSshKeychain } from '../shared/utils.js';
 
 interface CacheWarmOptions {
@@ -27,27 +26,17 @@ interface CacheWarmConfig {
 
 function loadCacheWarmConfig(options: CacheWarmOptions): CacheWarmConfig {
 	const {
-		rootPath,
 		nginxUrl = 'http://localhost:3100',
 		concurrency = 2,
 		random = false,
 		dryRun = false,
 	} = options;
 
-	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
-
-	const remoteHost = process.env.DEPLOY_REMOTE_HOST;
-	const sshKeyPath = process.env.DEPLOY_SSH_KEY_PATH;
-	const sitePath = process.env.DEPLOY_SITE_PATH;
-
-	if (!remoteHost || !sitePath) {
-		throw new Error('Missing DEPLOY_REMOTE_HOST or DEPLOY_SITE_PATH');
-	}
+	const { remoteHost, sshKeyPath, sitePath } = loadDeployConfig();
 
 	return {
 		remoteHost,
-		...(sshKeyPath ? { sshKeyPath } : {}),
+		...(sshKeyPath && sshKeyPath !== '' ? { sshKeyPath } : {}),
 		sitePath,
 		nginxUrl,
 		concurrency,

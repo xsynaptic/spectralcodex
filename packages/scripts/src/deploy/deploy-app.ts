@@ -18,7 +18,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 	const { rootPath, dryRun = false, skipDelete = false } = options;
 
 	// Load deploy configuration
-	const config = loadDeployConfig(rootPath);
+	const config = loadDeployConfig();
 
 	const distPath = path.join(rootPath, 'dist');
 

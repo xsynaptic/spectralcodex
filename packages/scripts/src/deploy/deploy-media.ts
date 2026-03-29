@@ -18,7 +18,7 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const { rootPath, dryRun = false, fast = false } = options;
 
 	// Load deploy configuration
-	const config = loadDeployConfig(rootPath);
+	const config = loadDeployConfig();
 
 	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 	const mediaPath = path.join(rootPath, mediaPathRelative);

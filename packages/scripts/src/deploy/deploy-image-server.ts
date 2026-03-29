@@ -1,6 +1,5 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
@@ -16,11 +15,7 @@ interface DeployImageServerOptions {
 export async function deployImageServer(options: DeployImageServerOptions): Promise<void> {
 	const { rootPath, dryRun = false } = options;
 
-	const config = loadDeployConfig(rootPath);
-
-	// Load IPX_SERVER_SECRET (only needed by this command)
-	dotenv.config({ path: path.join(rootPath, '.env'), quiet: true });
-	dotenv.config({ path: path.join(rootPath, 'deploy/.env'), quiet: true });
+	const config = loadDeployConfig();
 
 	const ipxServerSecret = process.env.IPX_SERVER_SECRET;
 
