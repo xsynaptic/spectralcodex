@@ -12,6 +12,10 @@ server {
     listen 80;
     server_name _;
 
+    # Re-resolve upstream on every request so nginx picks up new IPs after container restarts
+    resolver 127.0.0.11 valid=10s;
+    set $upstream http://image-server:3000;
+
     access_log /var/log/nginx/access.log cache;
 
     # Send response headers + file start in a single TCP packet
@@ -33,7 +37,7 @@ server {
     location /health {
         # Health check doesn't require signature
         secure_link off;
-        proxy_pass http://image-server:3000;
+        proxy_pass $upstream;
         proxy_cache off;
     }
 
@@ -46,7 +50,7 @@ server {
         # Rate limiting with generous burst for image-heavy pages
         limit_req zone=ipx_limit burst=500 nodelay;
 
-        proxy_pass http://image-server:3000;
+        proxy_pass $upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

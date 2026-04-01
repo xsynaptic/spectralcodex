@@ -121,6 +121,18 @@ async function caddy() {
 	await deployCaddy({ rootPath, dryRun });
 }
 
+async function healthCheck() {
+	const siteUrl = process.env.PROD_SERVER_URL;
+	if (!siteUrl) return;
+
+	console.log(chalk.blue(`Health check: ${siteUrl}`));
+	const response = await fetch(siteUrl);
+	if (!response.ok) {
+		throw new Error(`Health check failed: ${response.status} ${response.statusText}`);
+	}
+	console.log(chalk.green(`Health check passed (${response.status})`));
+}
+
 async function warmNew() {
 	console.log(chalk.blue('Warming new image cache...'));
 	await cacheWarmNew({ rootPath, dryRun });
@@ -137,6 +149,7 @@ try {
 	manifest();
 	await media();
 	await transfer();
+	await healthCheck();
 	await og();
 	await caddy();
 	await purgeCache({ rootPath, dryRun });

@@ -57,4 +57,5 @@ services:
 networks:
   astro-frontend:
     name: astro-frontend
+    # Created by deploy/infra/docker-compose.yml; infra must be deployed first
     external: true

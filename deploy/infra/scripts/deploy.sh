@@ -28,7 +28,9 @@ echo ""
 
 # Create server-side .env with only what docker-compose needs
 echo "Preparing server environment..."
-SERVER_ENV=$(cat <<EOF
+TEMP_ENV=$(mktemp)
+trap 'rm -f "$TEMP_ENV"' EXIT
+cat > "$TEMP_ENV" <<EOF
 # Umami analytics data path
 UMAMI_DATA_PATH=${UMAMI_DATA_PATH}
 
@@ -36,7 +38,6 @@ UMAMI_DATA_PATH=${UMAMI_DATA_PATH}
 UMAMI_DB_PASSWORD=${UMAMI_DB_PASSWORD}
 UMAMI_APP_SECRET=${UMAMI_APP_SECRET}
 EOF
-)
 
 # Sync infrastructure files
 echo "Syncing infrastructure files..."
@@ -50,9 +51,7 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
 
 # Write server-side .env
 echo "Writing server environment..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cat > $REMOTE_PATH/.env << 'ENVEOF'
-$SERVER_ENV
-ENVEOF"
+rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} "$TEMP_ENV" "$REMOTE_HOST:$REMOTE_PATH/.env"
 
 # Restart services
 echo "Restarting services..."
