@@ -103,7 +103,7 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.7.2",
 		"rehype-wrap-cjk": "^1.0.10",
-		"remeda": "^2.33.6",
+		"remeda": "^2.33.7",
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.2.2",
 		"tsx": "^4.21.0",

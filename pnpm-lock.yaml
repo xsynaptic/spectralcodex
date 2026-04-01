@@ -178,8 +178,8 @@ importers:
         specifier: ^1.0.10
         version: 1.0.10
       remeda:
-        specifier: ^2.33.6
-        version: 2.33.6
+        specifier: ^2.33.7
+        version: 2.33.7
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -386,8 +386,8 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0(maplibre-gl@5.21.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       remeda:
-        specifier: ^2.33.6
-        version: 2.33.6
+        specifier: ^2.33.7
+        version: 2.33.7
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -435,8 +435,8 @@ importers:
         specifier: ^5.2.8
         version: 5.2.8
       '@huggingface/transformers':
-        specifier: ^3.8.1
-        version: 3.8.1
+        specifier: ^4.0.0
+        version: 4.0.0
       '@sindresorhus/slugify':
         specifier: ^3.0.0
         version: 3.0.0
@@ -1010,12 +1010,15 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@huggingface/jinja@0.5.3':
-    resolution: {integrity: sha512-asqfZ4GQS0hD876Uw4qiUb7Tr/V5Q+JZuo2L+BtdrD4U40QU58nIRq3ZSgAzJgT874VLjhGVacaYfrdpXtEvtA==}
+  '@huggingface/jinja@0.5.6':
+    resolution: {integrity: sha512-MyMWyLnjqo+KRJYSH7oWNbsOn5onuIvfXYPcc0WOGxU0eHUV7oAYUoQTl2BMdu7ml+ea/bu11UM+EshbeHwtIA==}
     engines: {node: '>=18'}
 
-  '@huggingface/transformers@3.8.1':
-    resolution: {integrity: sha512-tsTk4zVjImqdqjS8/AOZg2yNLd1z9S5v+7oUPpXaasDRwEDhB+xnglK1k5cad26lL5/ZIaeREgWWy0bs9y9pPA==}
+  '@huggingface/tokenizers@0.1.3':
+    resolution: {integrity: sha512-8rF/RRT10u+kn7YuUbUg0OF30K8rjTc78aHpxT+qJ1uWSqxT1MHi8+9ltwYfkFYJzT/oS+qw3JVfHtNMGAdqyA==}
+
+  '@huggingface/transformers@4.0.0':
+    resolution: {integrity: sha512-7shdBRvtjIDP7UUhdi0b4CMRCD+QXvQIsEsxECWS9VEDEsxSQF9Ci+51mwy2OWI8vbsoic8e4dbR4eI8aZWxaw==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -1197,10 +1200,6 @@ packages:
   '@isaacs/cliui@9.0.0':
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
     engines: {node: '>=18'}
-
-  '@isaacs/fs-minipass@4.0.1':
-    resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
-    engines: {node: '>=18.0.0'}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -2934,6 +2933,10 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  adm-zip@0.5.16:
+    resolution: {integrity: sha512-TGw5yVi4saajsSEgz25grObGHEUaDrniwvA2qwSC060KfqGPdglhvPMA2lPIoxs3PQIItj2iag35fONcQqgUaQ==}
+    engines: {node: '>=12.0'}
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -3317,10 +3320,6 @@ packages:
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
-
-  chownr@3.0.0:
-    resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
-    engines: {node: '>=18'}
 
   ci-info@4.4.0:
     resolution: {integrity: sha512-77PSwercCZU2Fc4sX94eF8k8Pxte6JAwL4/ICZLFjJLqegs7kCuAsqqj/70NQF6TvDpgFjkubQB2FW2ZZddvQg==}
@@ -5216,10 +5215,6 @@ packages:
     resolution: {integrity: sha512-bAxsR8BVfj60DWXHE3u30oHzfl4G7khkSuPW+qvpd7jFRHm7dLxOjUk1EHACJ/hxLY8phGJ0YhYHZo7jil7Qdg==}
     engines: {node: '>= 8'}
 
-  minizlib@3.1.0:
-    resolution: {integrity: sha512-KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==}
-    engines: {node: '>= 18'}
-
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
@@ -5394,18 +5389,18 @@ packages:
   oniguruma-to-es@4.3.5:
     resolution: {integrity: sha512-Zjygswjpsewa0NLTsiizVuMQZbp0MDyM6lIt66OxsF21npUDlzpHi1Mgb/qhQdkb+dWFTzJmFbEWdvZgRho8eQ==}
 
-  onnxruntime-common@1.21.0:
-    resolution: {integrity: sha512-Q632iLLrtCAVOTO65dh2+mNbQir/QNTVBG3h/QdZBpns7mZ0RYbLRBgGABPbpU9351AgYy7SJf1WaeVwMrBFPQ==}
+  onnxruntime-common@1.24.0-dev.20251116-b39e144322:
+    resolution: {integrity: sha512-BOoomdHYmNRL5r4iQ4bMvsl2t0/hzVQ3OM3PHD0gxeXu1PmggqBv3puZicEUVOA3AtHHYmqZtjMj9FOfGrATTw==}
 
-  onnxruntime-common@1.22.0-dev.20250409-89f8206ba4:
-    resolution: {integrity: sha512-vDJMkfCfb0b1A836rgHj+ORuZf4B4+cc2bASQtpeoJLueuFc5DuYwjIZUBrSvx/fO5IrLjLz+oTrB3pcGlhovQ==}
+  onnxruntime-common@1.24.3:
+    resolution: {integrity: sha512-GeuPZO6U/LBJXvwdaqHbuUmoXiEdeCjWi/EG7Y1HNnDwJYuk6WUbNXpF6luSUY8yASul3cmUlLGrCCL1ZgVXqA==}
 
-  onnxruntime-node@1.21.0:
-    resolution: {integrity: sha512-NeaCX6WW2L8cRCSqy3bInlo5ojjQqu2fD3D+9W5qb5irwxhEyWKXeH2vZ8W9r6VxaMPUan+4/7NDwZMtouZxEw==}
+  onnxruntime-node@1.24.3:
+    resolution: {integrity: sha512-JH7+czbc8ALA819vlTgcV+Q214/+VjGeBHDjX81+ZCD0PCVCIFGFNtT0V4sXG/1JXypKPgScQcB3ij/hk3YnTg==}
     os: [win32, darwin, linux]
 
-  onnxruntime-web@1.22.0-dev.20250409-89f8206ba4:
-    resolution: {integrity: sha512-0uS76OPgH0hWCPrFKlL8kYVV7ckM7t/36HfbgoFw6Nd0CZVVbQC4PkrR8mBX8LtNUFZO25IQBqV2Hx2ho3FlbQ==}
+  onnxruntime-web@1.25.0-dev.20260327-722743c0e2:
+    resolution: {integrity: sha512-8PXdZy4Ekhg10CLg+cFFt39b4tFDGMRJB6lGjnQL6eA+2boUQYDymZ0gtxiS+H6oIWoCjQp/ziyirvFbaFKfiw==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -6020,8 +6015,8 @@ packages:
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
 
-  remeda@2.33.6:
-    resolution: {integrity: sha512-tazDGH7s75kUPGBKLvhgBEHMgW+TdDFhjUAMdQj57IoWz6HsGa5D2RX5yDUz6IIqiRRvZiaEHzCzWdTeixc/Kg==}
+  remeda@2.33.7:
+    resolution: {integrity: sha512-cXlyjevWx5AcslOUEETG4o8XYi9UkoCXcJmj7XhPFVbla+ITuOBxv6ijBrmbeg+ZhzmDThkNdO+iXKUfrJep1w==}
 
   repeat-string@1.6.1:
     resolution: {integrity: sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==}
@@ -6501,11 +6496,6 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
-    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-
-  tar@7.5.6:
-    resolution: {integrity: sha512-xqUeu2JAIJpXyvskvU3uvQW8PAmHrtXp2KDuMJwQqW8Sqq0CaZBAQ+dKS3RBXVhU4wC5NjAdKrmh84241gO9cA==}
-    engines: {node: '>=18'}
     deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   text-table@0.2.0:
@@ -7222,10 +7212,6 @@ packages:
   yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
-  yallist@5.0.0:
-    resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
-    engines: {node: '>=18'}
-
   yaml-language-server@1.19.2:
     resolution: {integrity: sha512-9F3myNmJzUN/679jycdMxqtydPSDRAarSj3wPiF7pchEPnO9Dg07Oc+gIYLqXR4L+g+FSEVXXv2+mr54StLFOg==}
     hasBin: true
@@ -7826,13 +7812,16 @@ snapshots:
     dependencies:
       hono: 4.12.1
 
-  '@huggingface/jinja@0.5.3': {}
+  '@huggingface/jinja@0.5.6': {}
 
-  '@huggingface/transformers@3.8.1':
+  '@huggingface/tokenizers@0.1.3': {}
+
+  '@huggingface/transformers@4.0.0':
     dependencies:
-      '@huggingface/jinja': 0.5.3
-      onnxruntime-node: 1.21.0
-      onnxruntime-web: 1.22.0-dev.20250409-89f8206ba4
+      '@huggingface/jinja': 0.5.6
+      '@huggingface/tokenizers': 0.1.3
+      onnxruntime-node: 1.24.3
+      onnxruntime-web: 1.25.0-dev.20260327-722743c0e2
       sharp: 0.34.5
 
   '@humanfs/core@0.19.1': {}
@@ -7954,10 +7943,6 @@ snapshots:
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
   '@isaacs/cliui@9.0.0': {}
-
-  '@isaacs/fs-minipass@4.0.1':
-    dependencies:
-      minipass: 7.1.3
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -10467,6 +10452,8 @@ snapshots:
 
   acorn@8.16.0: {}
 
+  adm-zip@0.5.16: {}
+
   agent-base@6.0.2:
     dependencies:
       debug: 4.4.3
@@ -10963,8 +10950,6 @@ snapshots:
   chownr@1.1.4: {}
 
   chownr@2.0.0: {}
-
-  chownr@3.0.0: {}
 
   ci-info@4.4.0: {}
 
@@ -13450,10 +13435,6 @@ snapshots:
       minipass: 3.3.6
       yallist: 4.0.0
 
-  minizlib@3.1.0:
-    dependencies:
-      minipass: 7.1.3
-
   mkdirp-classic@0.5.3: {}
 
   mkdirp@1.0.4: {}
@@ -13637,22 +13618,22 @@ snapshots:
       regex: 6.1.0
       regex-recursion: 6.0.2
 
-  onnxruntime-common@1.21.0: {}
+  onnxruntime-common@1.24.0-dev.20251116-b39e144322: {}
 
-  onnxruntime-common@1.22.0-dev.20250409-89f8206ba4: {}
+  onnxruntime-common@1.24.3: {}
 
-  onnxruntime-node@1.21.0:
+  onnxruntime-node@1.24.3:
     dependencies:
+      adm-zip: 0.5.16
       global-agent: 3.0.0
-      onnxruntime-common: 1.21.0
-      tar: 7.5.6
+      onnxruntime-common: 1.24.3
 
-  onnxruntime-web@1.22.0-dev.20250409-89f8206ba4:
+  onnxruntime-web@1.25.0-dev.20260327-722743c0e2:
     dependencies:
       flatbuffers: 25.9.23
       guid-typescript: 1.0.9
       long: 5.3.2
-      onnxruntime-common: 1.22.0-dev.20250409-89f8206ba4
+      onnxruntime-common: 1.24.0-dev.20251116-b39e144322
       platform: 1.3.6
       protobufjs: 7.5.4
 
@@ -14576,7 +14557,7 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
 
-  remeda@2.33.6: {}
+  remeda@2.33.7: {}
 
   repeat-string@1.6.1: {}
 
@@ -15233,14 +15214,6 @@ snapshots:
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
-
-  tar@7.5.6:
-    dependencies:
-      '@isaacs/fs-minipass': 4.0.1
-      chownr: 3.0.0
-      minipass: 7.1.3
-      minizlib: 3.1.0
-      yallist: 5.0.0
 
   text-table@0.2.0: {}
 
@@ -16011,8 +15984,6 @@ snapshots:
   yallist@3.1.1: {}
 
   yallist@4.0.0: {}
-
-  yallist@5.0.0: {}
 
   yaml-language-server@1.19.2:
     dependencies:

@@ -97,8 +97,10 @@ type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
  */
 const ModelIdEnum = {
 	MiniLm: 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
+	MiniLmV4: 'onnx-community/all-MiniLM-L6-v2-ONNX', // 384 dimensional, v4-optimized
 	MpNet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
 	Bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
+	Gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
 } as const;
 
 // Note: changing models will regenerate all embeddings (cache is model-specific)
