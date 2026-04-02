@@ -19,7 +19,9 @@ test.describe('search', () => {
 			timeout: 10_000,
 		});
 
-		// The specific post appears somewhere in results (may be a sub-result)
-		await expect(resultsArea.getByText('Taitung City')).toBeVisible();
+		// The specific post appears as a result link
+		await expect(
+			resultsArea.getByRole('link', { name: 'Huadong Valley Ride 2018: Taitung City' }),
+		).toBeVisible();
 	});
 });

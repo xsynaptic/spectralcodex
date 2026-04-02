@@ -13,6 +13,7 @@
 		"knip": "knip",
 		"test": "vitest",
 		"test-e2e": "playwright test",
+		"test-e2e-prod": "TEST_ENV=prod node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
 		"test-image-server": "vitest run --config vitest.integration.config.ts",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"content-related": "pnpm --filter @spectralcodex/scripts content-related --root-path=$PWD",
