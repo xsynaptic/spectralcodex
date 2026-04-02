@@ -128,9 +128,9 @@ async function healthCheck() {
 	console.log(chalk.blue(`Health check: ${siteUrl}`));
 	const response = await fetch(siteUrl);
 	if (!response.ok) {
-		throw new Error(`Health check failed: ${response.status} ${response.statusText}`);
+		throw new Error(`Health check failed: ${String(response.status)} ${response.statusText}`);
 	}
-	console.log(chalk.green(`Health check passed (${response.status})`));
+	console.log(chalk.green(`Health check passed (${String(response.status)})`));
 }
 
 async function warmNew() {

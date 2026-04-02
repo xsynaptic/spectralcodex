@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getPublicSlug, loadDataStore } from '../shared/data-store';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -56,8 +56,7 @@ for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLE
 		if (!formerSlugs?.length) continue;
 
 		const prefix = PREFIXED_COLLECTIONS[collectionName];
-		const override = entry.data.override as { slug?: string } | undefined;
-		const canonicalId = override?.slug ?? entry.id;
+		const canonicalId = getPublicSlug(entry);
 
 		for (const formerSlug of formerSlugs) {
 			const formerPath = prefix ? `/${prefix}/${formerSlug}/` : `/${formerSlug}/`;

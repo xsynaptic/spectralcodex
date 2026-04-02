@@ -201,11 +201,11 @@ function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'>>) {
 }
 
 function populateRegionsContent({
-	regions,
+	entries,
 	locations,
 	posts,
 }: {
-	regions: Array<CollectionEntry<'regions'>>;
+	entries: Array<CollectionEntry<'regions'>>;
 	locations: Array<CollectionEntry<'locations'>>;
 	posts: Array<CollectionEntry<'posts'>>;
 }) {
@@ -240,7 +240,7 @@ function populateRegionsContent({
 	}
 
 	// Calculate cumulative post and location count
-	for (const entry of regions) {
+	for (const entry of entries) {
 		const entries = entry.data._descendants ? [entry.id, ...entry.data._descendants] : [entry.id];
 
 		entry.data._locations = [
@@ -276,7 +276,7 @@ export const getRegionsCollection = createCollectionData({
 		} else {
 			populateRegionsHierarchy(entries);
 			populateRegionsLangCode(entries);
-			populateRegionsContent({ regions: entries, locations, posts });
+			populateRegionsContent({ entries, locations, posts });
 
 			// Clear old cache entries before setting new one (prevents unbounded growth)
 			await cacheInstance.clear();

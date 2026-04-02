@@ -18,7 +18,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { createFilterEntryQualityFunction, getPublicSlug } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -88,7 +88,7 @@ const generateFeedItem = async ({
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		link: getContentUrl(entry.collection, entry.id),
+		link: getContentUrl(entry.collection, getPublicSlug(entry)),
 		pubDate: parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated),
 		...(entry.data.description
 			? { description: stripTags(transformMarkdown({ input: entry.data.description })) }

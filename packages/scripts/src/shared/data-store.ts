@@ -27,6 +27,16 @@ export interface DataStoreEntry {
 }
 
 /**
+ * Resolve the public-facing slug for a data-store entry
+ * Locations with overrides return the override slug; all other entries return entry.id
+ */
+export function getPublicSlug(entry: DataStoreEntry): string {
+	const override = entry.data.override as { slug?: string } | undefined;
+
+	return override?.slug ?? entry.id;
+}
+
+/**
  * The full data store is a map of collection names to collections (which are maps of entry IDs to entries)
  */
 type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;

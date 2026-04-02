@@ -14,7 +14,7 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { createCollectionData } from '#lib/utils/collections.ts';
+import { createCollectionData, getPublicSlug } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
@@ -138,7 +138,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	});
 
 	entry.data._uuid = locationMapDataHash;
-	entry.data._url = getContentUrl('locations', entry.data.override?.slug ?? entry.id);
+	entry.data._url = getContentUrl('locations', getPublicSlug(entry));
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 

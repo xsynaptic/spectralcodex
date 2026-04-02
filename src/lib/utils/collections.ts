@@ -13,6 +13,16 @@ interface CollectionEntryWithContentCount {
 	};
 }
 
+/**
+ * Resolve the public-facing slug for a content entry
+ * Locations with overrides return the override slug; all other entries return entry.id
+ */
+export function getPublicSlug(entry: { id: string; data: Record<string, unknown> }): string {
+	const override = entry.data.override as { slug?: string } | undefined;
+
+	return override?.slug ?? entry.id;
+}
+
 // Sort a collection by post and location count, from most to least
 export function sortByContentCount<T extends CollectionEntryWithContentCount>(
 	entryA: T,
