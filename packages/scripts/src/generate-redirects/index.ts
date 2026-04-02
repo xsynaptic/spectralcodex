@@ -56,15 +56,17 @@ for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLE
 		if (!formerSlugs?.length) continue;
 
 		const prefix = PREFIXED_COLLECTIONS[collectionName];
+		const override = entry.data.override as { slug?: string } | undefined;
+		const canonicalId = override?.slug ?? entry.id;
 
 		for (const formerSlug of formerSlugs) {
 			const formerPath = prefix ? `/${prefix}/${formerSlug}/` : `/${formerSlug}/`;
-			const currentPath = prefix ? `/${prefix}/${entry.id}/` : `/${entry.id}/`;
+			const currentPath = prefix ? `/${prefix}/${canonicalId}/` : `/${canonicalId}/`;
 
 			// Page redirect
 			redirects.push(
 				{ fromPath: formerPath, toPath: currentPath },
-				{ fromPath: `/og/${formerSlug}.jpg`, toPath: `/og/${entry.id}.jpg` },
+				{ fromPath: `/og/${formerSlug}.jpg`, toPath: `/og/${canonicalId}.jpg` },
 			);
 		}
 	}

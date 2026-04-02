@@ -53,7 +53,7 @@ function generateCacheKey({
 			})),
 			locations: locations.map((entry) => ({
 				id: entry.id,
-				regions: entry.data.regions.map(({ id }) => id),
+				regions: (entry.data.override?.regions ?? entry.data.regions).map(({ id }) => id),
 			})),
 			posts: posts.map((entry) => ({
 				id: entry.id,
@@ -213,7 +213,12 @@ function populateRegionsContent({
 	const locationsByRegionMap = new Map<string, Array<string>>();
 
 	for (const entry of locations) {
-		for (const { id: regionId } of entry.data.regions) {
+		const regions =
+			import.meta.env.PROD && entry.data.override?.regions
+				? entry.data.override.regions
+				: entry.data.regions;
+
+		for (const { id: regionId } of regions) {
 			if (!locationsByRegionMap.has(regionId)) {
 				locationsByRegionMap.set(regionId, []);
 			}

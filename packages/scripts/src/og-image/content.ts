@@ -429,8 +429,22 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 		const collectionEntries = getDataStoreCollection(collections, collection);
 
 		for (const entry of collectionEntries) {
-			const id = entry.id.replace('/', '-');
-			const titleRaw = z.string().optional().parse(entry.data.title);
+			// For locations with overrides, use the override slug and titles for public-facing OG images
+			const override =
+				collection === ContentCollectionsEnum.Locations
+					? (entry.data.override as
+							| {
+									slug?: string;
+									title?: string;
+									title_zh?: string;
+									title_ja?: string;
+									title_th?: string;
+							  }
+							| undefined)
+					: undefined;
+
+			const id = override?.slug ?? entry.id.replace('/', '-');
+			const titleRaw = override?.title ?? z.string().optional().parse(entry.data.title);
 
 			let title = titleRaw;
 
@@ -455,9 +469,9 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 				id,
 				digest: entry.digest,
 				title: stripDiacritics(title),
-				titleZh: z.string().optional().parse(entry.data.title_zh),
-				titleJa: z.string().optional().parse(entry.data.title_ja),
-				titleTh: z.string().optional().parse(entry.data.title_th),
+				titleZh: z.string().optional().parse(override?.title_zh ?? entry.data.title_zh),
+				titleJa: z.string().optional().parse(override?.title_ja ?? entry.data.title_ja),
+				titleTh: z.string().optional().parse(override?.title_th ?? entry.data.title_th),
 				...imageFeaturedData,
 			});
 		}
