@@ -55,7 +55,7 @@ const { values } = parseArgs({
 		},
 		'result-count': {
 			type: 'string',
-			default: '25',
+			default: '20',
 		},
 		'clear-cache': {
 			type: 'boolean',
@@ -148,8 +148,8 @@ function calculateMetadataBoost(
 	const sharedRegions = [...currentRegions].filter((region) => otherRegions.has(region));
 	boost += sharedRegions.length * 0.1; // % boost per shared region
 
-	// Cap the total boost to prevent overwhelming semantic similarity
-	return Math.min(boost, 0.3); // Maximum % boost
+	// Cap the total boost; applied multiplicatively as similarity * (1 + boost)
+	return Math.min(boost, 0.3);
 }
 
 /**
@@ -297,7 +297,7 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 			candidates.push({
 				id: other.id,
 				collection: other.collection,
-				score: similarity + boost,
+				score: Math.min(similarity * (1 + boost), 1),
 			});
 		}
 

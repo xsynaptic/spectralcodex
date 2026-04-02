@@ -86,8 +86,8 @@ async function createRelatedContentFunction() {
 		return relatedItem
 			.filter((item) => item.score >= threshold)
 			.map((item) => contentMetadataIndex.get(item.id))
-			.filter((item) => !!item?.imageId === hasImageFeatured)
 			.filter((item) => item !== undefined)
+			.filter((item) => !!item.imageId === hasImageFeatured)
 			.slice(0, limit);
 	};
 }
