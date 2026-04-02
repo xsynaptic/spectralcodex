@@ -3,8 +3,13 @@ import { describe, expect, test } from 'vitest';
 import { generateSignedUrl } from '../../src/lib/image/image-server-utils.js';
 
 const IPX_SERVER_URL = 'http://localhost:3100';
-const IPX_SERVER_SECRET = process.env.IPX_SERVER_SECRET!;
 const TEST_IMAGE = 'test/sample.jpg';
+
+if (!process.env.IPX_SERVER_SECRET) {
+	throw new Error('IPX_SERVER_SECRET env var is required to run image server tests');
+}
+
+const IPX_SERVER_SECRET = process.env.IPX_SERVER_SECRET;
 
 function signTestUrl(path: string): string {
 	return generateSignedUrl(`${IPX_SERVER_URL}${path}`, IPX_SERVER_SECRET);

@@ -10,7 +10,6 @@ const REGIONS_NAME_3 = 'Tainan City';
 const REGIONS_URL = '/regions/tainan-city/';
 
 test.describe('navigation', () => {
-	test.describe.configure({ retries: 3 });
 	test('Regions', async ({ page }) => {
 		await page.goto('/');
 
