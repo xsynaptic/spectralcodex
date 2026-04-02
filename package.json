@@ -67,7 +67,7 @@
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.2",
-		"@tanstack/eslint-plugin-query": "^5.96.0",
+		"@tanstack/eslint-plugin-query": "^5.96.1",
 		"@turf/bbox": "^7.3.4",
 		"@turf/buffer": "^7.3.4",
 		"@turf/center": "^7.3.4",
