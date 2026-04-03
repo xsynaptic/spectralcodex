@@ -12,7 +12,7 @@ This repository contains the working Astro project used to generate the [Spectra
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
 - Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) with remark plugins
-- Automatic redirect generation from `formerSlugs` frontmatter into Caddy config
+- Automatic redirect generation from `formerIds` frontmatter into Caddy config
 - Media orphan detection for unreferenced images
 - Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling
 
@@ -93,7 +93,7 @@ Standard Astro commands apply:
 Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns. The full pipeline runs:
 
 1. Content sync and validation
-2. Redirect generation from former content slugs
+2. Redirect generation from former content IDs
 3. Related content generation (semantic similarity)
 4. OG image generation with Satori and Sharp
 5. Astro production build

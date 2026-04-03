@@ -45,7 +45,7 @@ export interface ImageLoaderOptions {
 	/** How many images to process at a time. */
 	concurrency: number;
 	/**
-	 * Function that generates an ID for an entry. Default implementation generates a slug from the entry path.
+	 * Function that generates an ID for an entry. Default implementation generates an ID from the entry path.
 	 * @returns The ID of the entry. Must be unique per collection.
 	 **/
 	generateId: (options: LocalImageLoaderGenerateIdOptions) => string;

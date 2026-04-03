@@ -16,11 +16,10 @@ Output: JSON mapping of content IDs to ranked related items.
 
 Runs validation checks against content:
 
-- `slug-mismatch` - filename matches frontmatter slug
 - `location-regions` - region references valid
 - `location-coordinates` - coordinates inside assigned regions
 - `location-overlap` - locations not too close together
-- `location-duplicates` - no duplicate slugs/titles/addresses
+- `location-duplicates` - no duplicate titles/addresses
 - `divisions` - division IDs exist in Overture
 - `quality` - quality scores and completeness
 - `mdx` - MDX component syntax valid

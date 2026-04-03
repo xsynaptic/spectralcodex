@@ -11,7 +11,6 @@ export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
 	schema: z
 		.object({
-			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
@@ -24,6 +23,7 @@ export const series = defineCollection({
 			imageFeatured: ImageFeaturedSchema.optional(),
 			hideSearch: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
+			formerIds: z.string().array().optional(),
 			/** Computed properties, for internal use only! */
 			_locationCount: z.number().int().optional(),
 			_postCount: z.number().int().optional(),

@@ -16,7 +16,6 @@ export const resources = defineCollection({
 	loader: glob({ pattern: '**/*.mdx', base: `${CONTENT_COLLECTIONS_PATH}/resources` }),
 	schema: z
 		.object({
-			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			subtitle: z.string().optional(), // TODO: note that this is currently unused
@@ -44,6 +43,7 @@ export const resources = defineCollection({
 			imageFeatured: ImageFeaturedSchema.optional(),
 			showPage: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
+			formerIds: z.string().array().optional(),
 			/** Computed properties, for internal use only! */
 			_locationCount: z.number().optional(),
 			_postCount: z.number().optional(),

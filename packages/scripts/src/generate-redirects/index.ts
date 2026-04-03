@@ -4,7 +4,7 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { getDataStoreCollection, getPublicSlug, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getPublicId, loadDataStore } from '../shared/data-store';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -34,7 +34,7 @@ interface RedirectPair {
 	toPath: string;
 }
 
-// Collections where page URL = /{slug}/
+// Collections where page URL = /{id}/
 const FLAT_COLLECTIONS = ['locations', 'posts', 'notes', 'pages'];
 
 // Collections where page URL = /{collection}/{id}/
@@ -51,31 +51,31 @@ for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLE
 	const entries = getDataStoreCollection(collections, collectionName);
 
 	for (const entry of entries) {
-		const formerSlugs = entry.data.formerSlugs as Array<string> | undefined;
+		const formerIds = entry.data.formerIds as Array<string> | undefined;
 
-		if (!formerSlugs?.length) continue;
+		if (!formerIds?.length) continue;
 
 		const prefix = PREFIXED_COLLECTIONS[collectionName];
-		const canonicalId = getPublicSlug(entry);
+		const canonicalId = getPublicId(entry);
 
-		for (const formerSlug of formerSlugs) {
-			const formerPath = prefix ? `/${prefix}/${formerSlug}/` : `/${formerSlug}/`;
+		for (const formerId of formerIds) {
+			const formerPath = prefix ? `/${prefix}/${formerId}/` : `/${formerId}/`;
 			const currentPath = prefix ? `/${prefix}/${canonicalId}/` : `/${canonicalId}/`;
 
 			// Page redirect
 			redirects.push(
 				{ fromPath: formerPath, toPath: currentPath },
-				{ fromPath: `/og/${formerSlug}.jpg`, toPath: `/og/${canonicalId}.jpg` },
+				{ fromPath: `/og/${formerId}.jpg`, toPath: `/og/${canonicalId}.jpg` },
 			);
 		}
 	}
 }
 
 if (redirects.length === 0) {
-	console.log(chalk.yellow('No formerSlugs found, writing empty redirect file'));
+	console.log(chalk.yellow('No formerIds found, writing empty redirect file'));
 	writeFileSync(outputPath, '# Auto-generated redirects (none found)\n');
 } else {
-	const lines = ['# Auto-generated redirects from formerSlugs; do not edit manually', ''];
+	const lines = ['# Auto-generated redirects from formerIds; do not edit manually', ''];
 
 	for (const { fromPath, toPath } of redirects) {
 		lines.push(`redir ${fromPath} ${toPath} 301`);

@@ -27,13 +27,13 @@ export interface DataStoreEntry {
 }
 
 /**
- * Resolve the public-facing slug for a data-store entry
- * Locations with overrides return the override slug; all other entries return entry.id
+ * Resolve the public-facing ID for a data-store entry
+ * Locations with overrides return the override ID; all other entries return entry.id
  */
-export function getPublicSlug(entry: DataStoreEntry): string {
-	const override = entry.data.override as { slug?: string } | undefined;
+export function getPublicId(entry: DataStoreEntry): string {
+	const override = entry.data.override as { id?: string } | undefined;
 
-	return override?.slug ?? entry.id;
+	return override?.id ?? entry.id;
 }
 
 /**

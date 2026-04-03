@@ -4,7 +4,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import LocationEntry from '#layouts/location-entry.astro';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createQueryLocationsEntryFunction } from '#lib/collections/locations/locations-utils.ts';
-import { getPublicSlug } from '#lib/utils/collections.ts';
+import { getPublicId } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getLocationsCollection();
@@ -15,7 +15,7 @@ export const getStaticPaths = (async () => {
 		const { mapData, metadataItems, backlinks } = queryLocationsEntry(entry);
 
 		return {
-			params: { location: getPublicSlug(entry) },
+			params: { location: getPublicId(entry) },
 			props: { entry, mapData, metadataItems, backlinks },
 		};
 	});

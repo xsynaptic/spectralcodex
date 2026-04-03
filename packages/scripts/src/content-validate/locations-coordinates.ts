@@ -11,10 +11,10 @@ import path from 'node:path';
 import type { DataStoreEntry } from '../shared/data-store';
 
 async function loadRegionGeometry(
-	regionSlug: string,
+	regionId: string,
 	divisionsPath: string,
 ): Promise<Array<Feature<Polygon | MultiPolygon>>> {
-	const fgbPath = path.join(divisionsPath, `${regionSlug}.fgb`);
+	const fgbPath = path.join(divisionsPath, `${regionId}.fgb`);
 
 	try {
 		// Read FGB file as buffer
@@ -41,7 +41,7 @@ async function loadRegionGeometry(
 		return features;
 	} catch (error) {
 		throw new Error(
-			`Failed to load FGB file for region "${regionSlug}": ${error instanceof Error ? error.message : String(error)}`,
+			`Failed to load FGB file for region "${regionId}": ${error instanceof Error ? error.message : String(error)}`,
 		);
 	}
 }

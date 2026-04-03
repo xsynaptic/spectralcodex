@@ -22,11 +22,13 @@ import {
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/locations` }),
+	loader: glob({
+		pattern: '**/[^_]*.(md|mdx)',
+		base: `${CONTENT_COLLECTIONS_PATH}/locations`,
+		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
+	}),
 	schema: z
 		.object({
-			slug: z.string(),
-			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
@@ -50,11 +52,12 @@ export const locations = defineCollection({
 			rating: NumericScaleSchema,
 			safety: NumericScaleSchema.optional(),
 			entryQuality: NumericScaleSchema,
+			formerIds: z.string().array().optional(),
 			hideLocation: z.boolean().optional(), // Do not show this location on any map
 			// Override some properties for sensitive sites
 			override: z
 				.object({
-					slug: z.string().optional(),
+					id: z.string().optional(),
 					title: TitleSchema.optional(),
 					...titleMultilingualSchema,
 					regions: reference('regions').array().optional(),

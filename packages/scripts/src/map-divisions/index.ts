@@ -61,7 +61,7 @@ const outputPath = path.join(values['root-path'], values['output-path']);
 async function processRegions(
 	db: DuckDBConnection,
 	regions: Array<RegionMetadata>,
-	regionsBySlug: Map<string, RegionMetadata>,
+	regionsById: Map<string, RegionMetadata>,
 	overtureUrl: string,
 ) {
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
@@ -80,8 +80,8 @@ async function processRegions(
 		const processingNeeds: Array<RegionProcessingNeeds> = [];
 
 		for (const region of regions) {
-			const fgbPath = path.join(outputPath, `${region.slug}.fgb`);
-			const svgPath = path.join(cachePath, `${region.slug}.svg`);
+			const fgbPath = path.join(outputPath, `${region.id}.fgb`);
+			const svgPath = path.join(cachePath, `${region.id}.svg`);
 
 			const needsFgb = !(await fileExists(fgbPath));
 			const needsSvg = !(await fileExists(svgPath));
@@ -110,11 +110,11 @@ async function processRegions(
 
 		for (const region of regionsToProcess) {
 			// Resolve selection bbox hierarchically
-			const selectionBBox = resolveBoundingBox(region, regionsBySlug, 'divisionSelectionBBox');
+			const selectionBBox = resolveBoundingBox(region, regionsById, 'divisionSelectionBBox');
 
 			if (!selectionBBox) {
 				console.warn(
-					chalk.yellow(`No selection bbox found for ${chalk.cyan(region.slug)} or its ancestors`),
+					chalk.yellow(`No selection bbox found for ${chalk.cyan(region.id)} or its ancestors`),
 				);
 				continue;
 			}
@@ -163,11 +163,11 @@ async function processRegions(
 
 			// Process each region in this group
 			for (const region of bboxRegions) {
-				console.log(chalk.blue(`\nProcessing ${chalk.cyan(region.slug)}...`));
+				console.log(chalk.blue(`\nProcessing ${chalk.cyan(region.id)}...`));
 
 				try {
 					// Find what files this region needs
-					const needs = processingNeeds.find((need) => need.region.slug === region.slug);
+					const needs = processingNeeds.find((need) => need.region.id === region.id);
 
 					if (!needs) {
 						// Region doesn't need processing (both files exist)
@@ -192,7 +192,7 @@ async function processRegions(
 					if (divisionItems.length > 0) {
 						console.log(
 							chalk.green(
-								`Found ${chalk.cyan(String(divisionItems.length))}/${chalk.cyan(String(region.divisionIds.length))} division(s) for ${chalk.cyan(region.slug)}`,
+								`Found ${chalk.cyan(String(divisionItems.length))}/${chalk.cyan(String(region.divisionIds.length))} division(s) for ${chalk.cyan(region.id)}`,
 							),
 						);
 
@@ -200,39 +200,35 @@ async function processRegions(
 
 						// Save FGB if needed
 						if (needs.needsFgb) {
-							await saveFlatgeobuf(divisionFeatureCollection, region.slug, outputPath);
+							await saveFlatgeobuf(divisionFeatureCollection, region.id, outputPath);
 						} else {
-							console.log(
-								chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.slug)}`),
-							);
+							console.log(chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.id)}`));
 						}
 
 						// Save SVG if needed
 						if (needs.needsSvg) {
 							const divisionClippingBBox = resolveBoundingBox(
 								region,
-								regionsBySlug,
+								regionsById,
 								'divisionClippingBBox',
 							);
 
 							await saveSvg({
 								geojsonData: divisionFeatureCollection as DivisionFeatureCollection,
-								slug: region.slug,
+								id: region.id,
 								outputDir: cachePath,
 								options: divisionClippingBBox ? { divisionClippingBBox } : {},
 							});
 						} else {
-							console.log(
-								chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.slug)}`),
-							);
+							console.log(chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.id)}`));
 						}
 
-						console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.slug)}`));
+						console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.id)}`));
 
 						successCount++;
 					}
 				} catch (error) {
-					console.error(chalk.red(`✗ Failed to process ${chalk.cyan(region.slug)}:`), error);
+					console.error(chalk.red(`✗ Failed to process ${chalk.cyan(region.id)}:`), error);
 				}
 			}
 		}
@@ -267,7 +263,7 @@ async function mapDivisions() {
 
 		// Build lookup map from ALL regions (including those without divisionIds)
 		// This enables hierarchical bbox resolution from parent regions
-		const regionsBySlug = new Map(allRegions.map((region) => [region.slug, region]));
+		const regionsById = new Map(allRegions.map((region) => [region.id, region]));
 
 		// Initialize DuckDB connection
 		const connection = await initializeDuckDB();
@@ -278,7 +274,7 @@ async function mapDivisions() {
 		const successCount = await processRegions(
 			connection,
 			regionsWithDivisionIds,
-			regionsBySlug,
+			regionsById,
 			overtureUrl,
 		);
 

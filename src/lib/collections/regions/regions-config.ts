@@ -11,11 +11,13 @@ import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
 export const regions = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/regions` }),
+	loader: glob({
+		pattern: '**/[^_]*.(md|mdx)',
+		base: `${CONTENT_COLLECTIONS_PATH}/regions`,
+		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
+	}),
 	schema: z
 		.object({
-			slug: z.string(),
-			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
@@ -29,6 +31,7 @@ export const regions = defineCollection({
 			divisionClippingBBox: GeometryBoundingBoxSchema.optional(),
 			hideDivision: z.boolean().optional(),
 			hideSearch: z.boolean().optional(),
+			formerIds: z.string().array().optional(),
 			entryQuality: NumericScaleSchema,
 			/** Computed properties, for internal use only! */
 			_ancestors: z.string().array().optional(),

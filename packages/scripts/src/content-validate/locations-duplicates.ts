@@ -26,7 +26,6 @@ function getGoogleMapsLink(links: unknown): string | undefined {
 }
 
 export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
-	const slugs = new Set<string>();
 	const titles = new Map<string, Set<string>>(); // field -> values
 	const addresses = new Set<string>();
 	const googleMapsLinks = new Set<string>();
@@ -39,17 +38,6 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 	let duplicateCount = 0;
 
 	for (const entry of entries) {
-		const slug = z.string().optional().safeParse(entry.data.slug);
-
-		if (slug.success && slug.data) {
-			if (slugs.has(slug.data)) {
-				console.log(chalk.red(`${entry.id}: duplicate slug "${slug.data}"`));
-				duplicateCount++;
-			} else {
-				slugs.add(slug.data);
-			}
-		}
-
 		// Check title fields
 		for (const field of TITLE_FIELDS) {
 			const value = entry.data[field];

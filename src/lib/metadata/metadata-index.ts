@@ -17,7 +17,7 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getPublicSlug } from '#lib/utils/collections.ts';
+import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getWordCount } from '#lib/utils/word-count.ts';
@@ -119,7 +119,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				title: entry.data.title,
 				titleMultilingual,
 				description: entry.data.description,
-				url: getContentUrl(entry.collection, getPublicSlug(entry)),
+				url: getContentUrl(entry.collection, getPublicId(entry)),
 				imageId:
 					'imageFeatured' in entry.data
 						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })

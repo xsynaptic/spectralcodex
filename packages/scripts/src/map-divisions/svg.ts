@@ -129,18 +129,18 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
  */
 export async function saveSvg({
 	geojsonData,
-	slug,
+	id,
 	outputDir,
 	options = {},
 }: {
 	geojsonData: DivisionFeatureCollection;
-	slug: string;
+	id: string;
 	outputDir: string;
 	options?: SvgOptions;
 }): Promise<void> {
 	safelyCreateDirectory(outputDir);
 
-	const filePath = path.join(outputDir, `${slug}.svg`);
+	const filePath = path.join(outputDir, `${id}.svg`);
 
 	try {
 		const svg = generateSvg(geojsonData, options);
@@ -149,7 +149,7 @@ export async function saveSvg({
 
 		console.log(chalk.gray(`Saved SVG file to: ${chalk.cyan(filePath)}`));
 	} catch (error) {
-		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(slug)}:`), error);
+		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(id)}:`), error);
 		throw error;
 	}
 }

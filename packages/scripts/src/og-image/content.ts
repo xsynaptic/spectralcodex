@@ -14,7 +14,7 @@ import type { OpenGraphContentEntry } from './types.js';
 import {
 	getDataStoreCollection,
 	getDataStoreRegionParentsById,
-	getPublicSlug,
+	getPublicId,
 	loadDataStore,
 } from '../shared/data-store.js';
 
@@ -430,7 +430,7 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 		const collectionEntries = getDataStoreCollection(collections, collection);
 
 		for (const entry of collectionEntries) {
-			// For locations with overrides, use the override slug and titles for public-facing OG images
+			// For locations with overrides, use the override ID and titles for public-facing OG images
 			const override =
 				collection === ContentCollectionsEnum.Locations
 					? z
@@ -444,7 +444,7 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 							.parse(entry.data.override)
 					: undefined;
 
-			const id = getPublicSlug(entry).replace('/', '-');
+			const id = getPublicId(entry).replace('/', '-');
 			const titleRaw = override?.title ?? z.string().optional().parse(entry.data.title);
 
 			let title = titleRaw;

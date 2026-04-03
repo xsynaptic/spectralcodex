@@ -7,7 +7,7 @@ import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getPublicSlug } from '#lib/utils/collections.ts';
+import { getPublicId } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -66,7 +66,7 @@ const columns = {
 								<tr class="font-sans text-sm">
 									<td class="w-full px-2 py-1 align-text-top">
 										<div class="flex flex-wrap items-center gap-1">
-											<Link href={getContentUrl('locations', getPublicSlug(entry))}>
+											<Link href={getContentUrl('locations', getPublicId(entry))}>
 												{entry.data.title}
 											</Link>
 											{titleMultilingual ? (

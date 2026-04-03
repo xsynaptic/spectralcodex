@@ -9,8 +9,6 @@ import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 // Used by notes and posts
 export const postSchema = z
 	.object({
-		slug: z.string(),
-		formerSlugs: z.string().array().optional(),
 		title: TitleSchema,
 		...titleMultilingualSchema,
 		description: z.string().optional(),
@@ -24,5 +22,6 @@ export const postSchema = z
 		imageFeatured: ImageFeaturedSchema.optional(),
 		hideSearch: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
+		formerIds: z.string().array().optional(),
 	})
 	.strict();

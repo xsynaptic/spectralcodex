@@ -12,19 +12,19 @@ import type { RegionMetadata } from './types';
  * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
  * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
  */
-function getRegionPathIds(filePath: string, slug: string): Array<string> {
+function getRegionPathIds(filePath: string, id: string): Array<string> {
 	const collectionMarker = 'collections/regions/';
-	const idx = filePath.indexOf(collectionMarker);
+	const index = filePath.indexOf(collectionMarker);
 
-	if (idx === -1) return [slug];
+	if (index === -1) return [id];
 
-	const relativePath = filePath.slice(idx + collectionMarker.length);
+	const relativePath = filePath.slice(index + collectionMarker.length);
 	const ext = path.extname(relativePath);
 	const pathWithoutExt = relativePath.replace(ext, '');
 	const parts = pathWithoutExt.split('/');
 
-	// Start with self (slug), then add ancestors from immediate parent to root
-	const regionPathIds: Array<string> = [slug];
+	// Start with self then add ancestors from immediate parent to root
+	const regionPathIds: Array<string> = [id];
 
 	for (let i = parts.length - 2; i >= 0; i--) {
 		const part = parts[i];
@@ -41,8 +41,8 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
 	for (const entry of entries) {
-		const slug = entry.id;
-		const regionPathIds = entry.filePath ? getRegionPathIds(entry.filePath, slug) : [slug];
+		const id = entry.id;
+		const regionPathIds = entry.filePath ? getRegionPathIds(entry.filePath, id) : [id];
 
 		const divisionSelectionBBox = GeometryBoundingBoxSchema.optional().parse(
 			entry.data.divisionSelectionBBox,
@@ -62,7 +62,7 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
 		}
 
 		regions.push({
-			slug,
+			id,
 			divisionIds,
 			regionPathIds,
 			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
@@ -86,11 +86,11 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
  */
 export function resolveBoundingBox(
 	region: RegionMetadata,
-	regionsBySlug: Map<string, RegionMetadata>,
+	regionsById: Map<string, RegionMetadata>,
 	bboxField: 'divisionSelectionBBox' | 'divisionClippingBBox',
 ): GeometryBoundingBox | undefined {
-	for (const ancestorSlug of region.regionPathIds) {
-		const ancestor = regionsBySlug.get(ancestorSlug);
+	for (const ancestorId of region.regionPathIds) {
+		const ancestor = regionsById.get(ancestorId);
 
 		if (ancestor?.[bboxField]) return ancestor[bboxField];
 	}

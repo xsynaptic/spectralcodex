@@ -9,12 +9,12 @@ import { safelyCreateDirectory } from '../shared/utils';
 
 export async function saveFlatgeobuf(
 	geojsonData: FeatureCollection,
-	slug: string,
+	id: string,
 	outputDir: string,
 ) {
 	safelyCreateDirectory(outputDir);
 
-	const filePath = path.join(outputDir, `${slug}.fgb`);
+	const filePath = path.join(outputDir, `${id}.fgb`);
 
 	try {
 		// Attempt to enforce a standard projection, WGS84 (EPSG:4326)
@@ -24,7 +24,7 @@ export async function saveFlatgeobuf(
 
 		console.log(chalk.gray(`Saved FlatGeobuf file to: ${chalk.cyan(filePath)}`));
 	} catch (error) {
-		console.error(chalk.red(`Failed to serialize FlatGeobuf for ${chalk.cyan(slug)}:`), error);
+		console.error(chalk.red(`Failed to serialize FlatGeobuf for ${chalk.cyan(id)}:`), error);
 		throw error;
 	}
 }

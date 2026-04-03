@@ -34,7 +34,7 @@ import {
 } from '#lib/collections/locations/locations-utils.ts';
 import { getImageFeaturedId, getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
-import { getPublicSlug } from '#lib/utils/collections.ts';
+import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
@@ -74,7 +74,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			: entry.data.title,
 		description: entry.data.description,
 		image: await getSeoImageProps({
-			id: getPublicSlug(entry),
+			id: getPublicId(entry),
 			alt: entry.data.title,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),

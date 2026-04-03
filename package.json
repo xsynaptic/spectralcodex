@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.8.3",
+	"version": "6.9.0",
 	"scripts": {
 		"dev": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.development packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",

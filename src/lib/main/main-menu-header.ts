@@ -18,10 +18,10 @@ const t = getTranslations();
 
 function getMenuItemData({
 	entry,
-	slug,
+	collection,
 }: {
 	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
-	slug: 'regions' | 'series' | 'themes';
+	collection: 'regions' | 'series' | 'themes';
 }) {
 	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
 
@@ -29,7 +29,7 @@ function getMenuItemData({
 		collection: entry.collection,
 		title: entry.data.title,
 		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
-		url: getSiteUrl(`${slug}/${entry.id}`),
+		url: getSiteUrl(`${collection}/${entry.id}`),
 		...(ancestor ? { ancestor } : {}),
 	};
 }
@@ -64,7 +64,7 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.sort(sortByContentCount)
 		.slice(0, 12)
 		.map((entry) => ({
-			...getMenuItemData({ entry, slug: 'regions' }),
+			...getMenuItemData({ entry, collection: 'regions' }),
 			...(entry.data._children
 				? {
 						children: getRegionsByIds(entry.data._children)
@@ -72,14 +72,14 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 							.sort(sortByContentCount)
 							.slice(0, 15)
 							.map((entry) => ({
-								...getMenuItemData({ entry, slug: 'regions' }),
+								...getMenuItemData({ entry, collection: 'regions' }),
 								...(entry.data._children
 									? {
 											children: getRegionsByIds(entry.data._children)
 												.filter(filterMenuItemContentCount(3))
 												.sort(sortByContentCount)
 												.slice(0, 8)
-												.map((entry) => getMenuItemData({ entry, slug: 'regions' })),
+												.map((entry) => getMenuItemData({ entry, collection: 'regions' })),
 										}
 									: {}),
 							})),
@@ -92,14 +92,14 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
-		.map((entry) => getMenuItemData({ entry, slug: 'series' }));
+		.map((entry) => getMenuItemData({ entry, collection: 'series' }));
 
 	const themesMenu = themes
 		.filter(filterEntryQuality)
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
-		.map((entry) => getMenuItemData({ entry, slug: 'themes' }));
+		.map((entry) => getMenuItemData({ entry, collection: 'themes' }));
 
 	const archivesData = await getArchivesData();
 

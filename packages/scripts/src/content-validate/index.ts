@@ -14,7 +14,6 @@ import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
-import { checkSlugMismatches } from './slug-mismatch';
 
 const { values, positionals } = parseArgs({
 	args: process.argv.slice(2),
@@ -62,13 +61,6 @@ const allCollections: CollectionEntries = [
 	['themes', getDataStoreCollection(collections, 'themes')],
 ];
 
-const checkSlugCollections: CollectionEntries = [
-	['notes', getDataStoreCollection(collections, 'notes')],
-	['locations', getDataStoreCollection(collections, 'locations')],
-	['posts', getDataStoreCollection(collections, 'posts')],
-	['regions', getDataStoreCollection(collections, 'regions')],
-];
-
 const metadataCollections: CollectionEntries = [
 	['notes', getDataStoreCollection(collections, 'notes')],
 	['locations', getDataStoreCollection(collections, 'locations')],
@@ -81,11 +73,6 @@ const metadataCollections: CollectionEntries = [
 
 // Note: there is no need for a help command
 switch (command) {
-	// Check for slugs that don't match filenames
-	case 'slug-mismatch': {
-		checkSlugMismatches(checkSlugCollections);
-		break;
-	}
 	// Check for locations not assigned to regions OR locations with mismatching regions and assigned paths
 	case 'location-regions': {
 		checkLocationsRegions(getDataStoreCollection(collections, 'locations'));
@@ -107,7 +94,7 @@ switch (command) {
 		);
 		break;
 	}
-	// Check for duplicate location data (slugs, titles, addresses, links)
+	// Check for duplicate location data (titles, addresses, links)
 	case 'location-duplicates': {
 		checkLocationsDuplicates(getDataStoreCollection(collections, 'locations'));
 		break;
@@ -149,7 +136,6 @@ switch (command) {
 				allCollections.flatMap(([, entries]) => entries),
 				path.join(values['root-path'], values['media-path']),
 			),
-			checkSlugMismatches(checkSlugCollections),
 			checkLocationsDuplicates(getDataStoreCollection(collections, 'locations')),
 			checkLocationsRegions(getDataStoreCollection(collections, 'locations')),
 			checkLocationsOverlap(

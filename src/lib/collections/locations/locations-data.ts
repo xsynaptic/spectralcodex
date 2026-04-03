@@ -14,7 +14,7 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { createCollectionData, getPublicSlug } from '#lib/utils/collections.ts';
+import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
@@ -138,7 +138,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	});
 
 	entry.data._uuid = locationMapDataHash;
-	entry.data._url = getContentUrl('locations', getPublicSlug(entry));
+	entry.data._url = getContentUrl('locations', getPublicId(entry));
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
@@ -166,8 +166,8 @@ export const getLocationsCollection = createCollectionData({
 			for (const entry of entries) {
 				if (!entry.data.override) continue;
 
-				// Note: slugs require special handling at the point of use
-				const { slug: _, ...overrideFields } = entry.data.override;
+				// Exclude override ID from flattening; getPublicId() reads it separately
+				const { id: _, ...overrideFields } = entry.data.override;
 
 				Object.assign(entry.data, overrideFields);
 			}

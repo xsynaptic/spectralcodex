@@ -18,7 +18,6 @@ export const pages = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/pages` }),
 	schema: z
 		.object({
-			formerSlugs: z.string().array().optional(),
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: DescriptionSchema,
@@ -29,6 +28,7 @@ export const pages = defineCollection({
 			dateUpdated: DateStringSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			entryQuality: NumericScaleSchema,
+			formerIds: z.string().array().optional(),
 			hideSearch: z.boolean().optional(),
 		})
 		.strict(),

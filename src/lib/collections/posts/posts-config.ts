@@ -5,6 +5,10 @@ import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { postSchema } from '#lib/schemas/posts.ts';
 
 export const posts = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/posts` }),
+	loader: glob({
+		pattern: '**/[^_]*.(md|mdx)',
+		base: `${CONTENT_COLLECTIONS_PATH}/posts`,
+		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
+	}),
 	schema: postSchema,
 });

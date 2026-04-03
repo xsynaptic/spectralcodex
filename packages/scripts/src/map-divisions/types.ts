@@ -2,7 +2,7 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 export interface RegionMetadata {
-	slug: string;
+	id: string;
 	divisionIds: Array<string>;
 	regionPathIds: Array<string>;
 	divisionSelectionBBox?: GeometryBoundingBox;
