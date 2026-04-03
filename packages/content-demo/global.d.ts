@@ -7,6 +7,10 @@ declare global {
 		// Note: we can't import Astro components direct, nor would we really want to
 		// Since we use custom remark transformers to include import statements
 		// So here we manually type the components, but that's OK, there aren't too many of them
+		Email: (props: {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			children: any;
+		}) => React.JSX.Element;
 		Img: (props: {
 			alt?: string;
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

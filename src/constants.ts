@@ -41,7 +41,7 @@ export const MAP_DIVISION_DATA_PATH = 'divisions';
  * MDX
  */
 // Strip these MDX components from SEO descriptions and when generating word counts
-export const MDX_COMPONENTS_TO_STRIP = ['Img', 'ImgGroup', 'Map', 'More'];
+export const MDX_COMPONENTS_TO_STRIP = ['Email', 'Img', 'ImgGroup', 'Map', 'More'];
 
 /**
  * Open Graph config

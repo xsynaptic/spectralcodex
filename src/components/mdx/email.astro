@@ -1,0 +1,40 @@
+---
+import { hashShort } from '@spectralcodex/shared/cache';
+import { stripTags } from '@xsynaptic/unified-tools';
+
+import { renderSlot } from '#lib/utils/astro.ts';
+
+const content = await renderSlot(Astro.slots, 'default');
+
+const email = stripTags(content ?? '').trim();
+
+const { isFeed } = Astro.locals;
+
+const decoyInterval = 5;
+const decoyLength = 3;
+const hashString = hashShort({ data: email });
+
+/**
+ * Obfuscate email addresses using CSS display none prop and hashed characters (deterministic)
+ * @link https://spencermortensen.com/articles/email-obfuscation/
+ */
+function obfuscate(text: string) {
+	let hashOffset = 0;
+	let result = '';
+
+	for (const [index, char] of [...text].entries()) {
+		if (index > 0 && index % decoyInterval === 0) {
+			const chunk = Array.from({ length: decoyLength }, () => {
+				const decoyChar = hashString[hashOffset % hashString.length];
+				hashOffset++;
+				return decoyChar;
+			}).join('');
+			result += `<span style="display:none" aria-hidden="true">${chunk}</span>`;
+		}
+		result += char;
+	}
+	return result;
+}
+---
+
+{isFeed ? '[email]' : <span set:html={obfuscate(email)} />}
