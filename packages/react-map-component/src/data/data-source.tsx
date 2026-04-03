@@ -2,14 +2,13 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import type { FC, ReactNode } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
-import ky from 'ky';
 import { createContext, useContext } from 'react';
 
-import type { MapComponentProps, MapSourceItemInput, MapSourceItemParsed } from '../types';
+import type { MapComponentProps, MapSourceItemParsed } from '../types';
 
 import { MapSourceItemSchema } from '../types';
 
-function parseSourceData(sourceDataRaw: Array<MapSourceItemInput>) {
+function parseSourceData(sourceDataRaw: unknown) {
 	const parsedResponse = MapSourceItemSchema.array().safeParse(sourceDataRaw);
 
 	if (!parsedResponse.success) {
@@ -47,9 +46,12 @@ export const SourceDataContextProvider: FC<
 
 			// Otherwise fetch via API
 			if (apiSourceUrl) {
-				const rawData = await ky
-					.get<Array<MapSourceItemInput>>(apiSourceUrl, { timeout: isDev ? false : 10_000 })
-					.json();
+				const response = await fetch(
+					apiSourceUrl,
+					isDev ? {} : { signal: AbortSignal.timeout(10_000) },
+				);
+				if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
+				const rawData: unknown = await response.json();
 
 				return parseSourceData(rawData);
 			}

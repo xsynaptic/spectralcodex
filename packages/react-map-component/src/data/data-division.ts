@@ -6,7 +6,6 @@ import { bboxPolygon } from '@turf/bbox-polygon';
 import { difference } from '@turf/difference';
 import { featureCollection } from '@turf/helpers';
 import { geojson } from 'flatgeobuf';
-import ky from 'ky';
 import * as R from 'remeda';
 
 import type { MapComponentProps } from '../types';
@@ -29,9 +28,12 @@ export function useMapApiDivisionData({
 
 			try {
 				// Fetch FlatGeobuf file
-				const arrayBuffer = await ky
-					.get(apiDivisionUrl, { timeout: isDev ? false : 10_000 })
-					.arrayBuffer();
+				const response = await fetch(
+					apiDivisionUrl,
+					isDev ? {} : { signal: AbortSignal.timeout(10_000) },
+				);
+				if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
+				const arrayBuffer = await response.arrayBuffer();
 
 				// Convert ArrayBuffer to ReadableStream for FlatGeobuf
 				const uint8Array = new Uint8Array(arrayBuffer);

@@ -1,6 +1,5 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
-import slugify from '@sindresorhus/slugify';
 import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
@@ -95,16 +94,16 @@ type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
 /**
  * Models; a small sampling of some options; more complex models are more accurate but slower
  */
-const ModelIdEnum = {
-	MiniLm: 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
-	MiniLmV4: 'onnx-community/all-MiniLM-L6-v2-ONNX', // 384 dimensional, v4-optimized
-	MpNet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
-	Bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
-	Gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
+const ModelsEnum = {
+	'mini-lm': 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
+	'mini-lm-v4': 'onnx-community/all-MiniLM-L6-v2-ONNX', // 384 dimensional, v4-optimized
+	mpnet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
+	bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
+	gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
 } as const;
 
 // Note: changing models will regenerate all embeddings (cache is model-specific)
-const MODEL_ID = ModelIdEnum.MpNet;
+const modelKey = 'mpnet' satisfies keyof typeof ModelsEnum;
 
 /**
  * Clean content for embedding using unified tools
@@ -152,11 +151,8 @@ function calculateMetadataBoost(
 	return Math.min(boost, 0.3);
 }
 
-/**
- * Get cache namespace that includes model ID for cache isolation between models
- */
-function getCacheNamespace(cacheName: string, modelId: string): string {
-	return `${cacheName}-${slugify(modelId, { lowercase: true })}`;
+function getCacheNamespace(cacheName: string, modelKey: string): string {
+	return `${cacheName}-${modelKey}`;
 }
 
 /**
@@ -166,12 +162,13 @@ async function generateEmbeddings(
 	entries: Array<ContentEntry>,
 ): Promise<Array<ContentRelatedEmbedding>> {
 	const cachePath = path.join(values['root-path'], values['cache-path']);
-	const cacheNamespace = getCacheNamespace(values['cache-name'], MODEL_ID);
+	const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
 	const cache = getFileCacheInstance(cachePath, cacheNamespace);
 
-	const embedder = await pipeline('feature-extraction', MODEL_ID, { dtype: 'fp32' });
+	const modelId = ModelsEnum[modelKey];
+	const embedder = await pipeline('feature-extraction', modelId, { dtype: 'fp32' });
 
-	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(MODEL_ID)}`));
+	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(modelId)}`));
 
 	const embeddings: Array<ContentRelatedEmbedding> = [];
 
@@ -364,7 +361,7 @@ async function contentRelated() {
 
 		if (values['clear-cache']) {
 			const cacheDir = path.join(values['root-path'], values['cache-path']);
-			const cacheNamespace = getCacheNamespace(values['cache-name'], MODEL_ID);
+			const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
 			const cacheFiles = readdirSync(cacheDir).filter((file) => file === `${cacheNamespace}.json`);
 			for (const file of cacheFiles) {
 				rmSync(path.join(cacheDir, file));

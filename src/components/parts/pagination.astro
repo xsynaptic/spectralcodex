@@ -3,11 +3,10 @@ import type { Page } from 'astro';
 import type { HTMLAttributes } from 'astro/types';
 
 import * as R from 'remeda';
-import urlJoin from 'url-join';
 
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { joinUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
@@ -110,7 +109,7 @@ function getPaginationData({
 
 	// Get the URL for a given page
 	const getPageNumberLink = (pageNumber: number) =>
-		pageNumber === 1 ? pageBasePath : urlJoin(pageBasePath, String(pageNumber), '/');
+		pageNumber === 1 ? pageBasePath : joinUrl(pageBasePath, String(pageNumber), '/');
 
 	// Generate a list of page numbers, with special handling for large numbers of pages
 	const rawPages =

@@ -2,14 +2,13 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import type { FC, ReactNode } from 'react';
 
 import { useQuery } from '@tanstack/react-query';
-import ky from 'ky';
 import { createContext, useContext } from 'react';
 
-import type { MapComponentProps, MapPopupItemInput, MapPopupItemParsed } from '../types';
+import type { MapComponentProps, MapPopupItemParsed } from '../types';
 
 import { MapPopupItemSchema } from '../types';
 
-function parsePopupData(popupDataRaw: Array<MapPopupItemInput>) {
+function parsePopupData(popupDataRaw: unknown) {
 	const parsedResponse = MapPopupItemSchema.array().safeParse(popupDataRaw);
 
 	if (!parsedResponse.success) {
@@ -48,9 +47,12 @@ export const PopupDataContextProvider: FC<
 
 			// Otherwise fetch via API
 			if (apiPopupUrl) {
-				const rawData = await ky
-					.get<Array<MapPopupItemInput>>(apiPopupUrl, { timeout: isDev ? false : 10_000 })
-					.json();
+				const response = await fetch(
+					apiPopupUrl,
+					isDev ? {} : { signal: AbortSignal.timeout(10_000) },
+				);
+				if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
+				const rawData: unknown = await response.json();
 
 				return parsePopupData(rawData);
 			}
