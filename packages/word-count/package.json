@@ -1,0 +1,8 @@
+{
+	"name": "@spectralcodex/word-count",
+	"version": "1.0.0",
+	"description": "TypeScript-based multilingual word count utility",
+	"type": "module",
+	"exports": "./src/index.ts",
+	"private": true
+}
