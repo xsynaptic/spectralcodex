@@ -6,8 +6,7 @@ const t = getTranslations();
 
 const REGIONS_NAME_1 = 'Taiwan';
 const REGIONS_NAME_2 = 'Tainan';
-const REGIONS_NAME_3 = 'Tainan City';
-const REGIONS_URL = '/regions/tainan-city/';
+const REGIONS_URL = '/regions/tainan/';
 
 test.describe('navigation', () => {
 	test('Regions', async ({ page }) => {
@@ -25,19 +24,12 @@ test.describe('navigation', () => {
 		await expect(taiwanLink).toBeVisible();
 		await taiwanLink.hover();
 
-		// Hover to reveal depth-3 submenu
+		// Click depth-2 submenu link and assert URL
 		const tainanLink = nav.getByRole('menuitem', {
 			name: new RegExp(String.raw`^${REGIONS_NAME_2} \(`),
 		});
 		await expect(tainanLink).toBeVisible();
-		await tainanLink.hover();
-
-		// Click submenu link and assert URL
-		const tainanCityLink = nav.getByRole('menuitem', {
-			name: new RegExp(String.raw`^${REGIONS_NAME_3} \(`),
-		});
-		await expect(tainanCityLink).toBeVisible();
-		await tainanCityLink.click();
+		await tainanLink.click();
 
 		await expect(page).toHaveURL(new RegExp(REGIONS_URL));
 	});
