@@ -14,6 +14,9 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { createFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
+// Increase this to 3 to show subregions in the header menu
+const maxDepth = 2 as number;
+
 const t = getTranslations();
 
 function getMenuItemData({
@@ -65,7 +68,7 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => ({
 			...getMenuItemData({ entry, collection: 'regions' }),
-			...(entry.data._children
+			...(entry.data._children && maxDepth > 1
 				? {
 						children: getRegionsByIds(entry.data._children)
 							.filter(filterMenuItemContentCount(2))
@@ -73,7 +76,7 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 							.slice(0, 15)
 							.map((entry) => ({
 								...getMenuItemData({ entry, collection: 'regions' }),
-								...(entry.data._children
+								...(entry.data._children && maxDepth > 2
 									? {
 											children: getRegionsByIds(entry.data._children)
 												.filter(filterMenuItemContentCount(3))
