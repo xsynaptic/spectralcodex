@@ -20,6 +20,7 @@ import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-ty
 
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
+import { stripDiacritics } from '#lib/utils/text.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
 	const truncatedCoordinates = coordinates
@@ -172,7 +173,7 @@ export function getLocationsMapSourceData(
 
 			return {
 				[MapDataKeysCompressed.Id]: featureId,
-				[MapDataKeysCompressed.Title]: title,
+				[MapDataKeysCompressed.Title]: stripDiacritics(title),
 				[MapDataKeysCompressed.Category]:
 					LocationCategoryNumericMapping[feature.properties.category],
 				[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
@@ -206,7 +207,7 @@ export function getLocationsMapPopupData(
 
 			return {
 				[MapDataKeysCompressed.Id]: featureId,
-				[MapDataKeysCompressed.Title]: feature.properties.title,
+				[MapDataKeysCompressed.Title]: stripDiacritics(feature.properties.title),
 				[MapDataKeysCompressed.TitleMultilingualLang]: feature.properties.titleMultilingualLang,
 				[MapDataKeysCompressed.TitleMultilingualValue]: feature.properties.titleMultilingualValue,
 				[MapDataKeysCompressed.Url]: feature.properties.url,
