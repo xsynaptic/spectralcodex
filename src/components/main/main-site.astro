@@ -16,6 +16,7 @@ import ModeManager from '#components/main/main-mode-manager.astro';
 import ProgressLoading from '#components/main/main-progress-loading.astro';
 import ProgressReading from '#components/main/main-progress-reading.astro';
 import MainSearchStyle from '#components/main/main-search-style.astro';
+import MainSprites from '#components/main/main-sprites.astro';
 import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/structured-data.ts';
@@ -68,6 +69,7 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 			'flex min-h-screen min-w-[350px] flex-col overscroll-contain transition-colors',
 		]}
 	>
+		<MainSprites />
 		<MainHeader hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
 		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
 			<slot />

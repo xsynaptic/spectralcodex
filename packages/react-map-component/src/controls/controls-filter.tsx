@@ -179,7 +179,7 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 							}
 						}}
 					>
-						<use xlinkHref={`#${MapSpritesEnum.Rating}`}></use>
+						<use href={`#${MapSpritesEnum.Rating}`}></use>
 					</svg>
 				))}
 			</span>
@@ -287,7 +287,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							}}
 							aria-hidden="true"
 						>
-							<use xlinkHref={`#${MapSpritesEnum.Filters}`}></use>
+							<use href={`#${MapSpritesEnum.Filters}`}></use>
 						</svg>
 					</span>
 				</button>

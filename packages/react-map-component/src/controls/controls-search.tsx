@@ -50,7 +50,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 							style={{ height: '20px', width: '20px' }}
 							aria-hidden="true"
 						>
-							<use xlinkHref={`#${MapSpritesEnum.Search}`}></use>
+							<use href={`#${MapSpritesEnum.Search}`}></use>
 						</svg>
 					</span>
 				</button>

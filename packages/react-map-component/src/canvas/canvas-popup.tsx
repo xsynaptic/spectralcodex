@@ -171,7 +171,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 								viewBox="0 0 36 36"
 								className="h-[20px] text-highlight-500 md:h-[16px]"
 							>
-								<use xlinkHref={`#${MapSpritesEnum.Warning}`}></use>
+								<use href={`#${MapSpritesEnum.Warning}`}></use>
 							</svg>
 							<span className="text-highlight-400 italic">
 								{precision === 2 ? translations.precisionWarning : translations.precisionError}
@@ -202,7 +202,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 								style={{ height: '14px' }}
 								viewBox="0 0 24 24"
 							>
-								<use xlinkHref={`#${MapSpritesEnum.Copy}`}></use>
+								<use href={`#${MapSpritesEnum.Copy}`}></use>
 							</svg>
 						</div>
 						<div className="flex gap-2 select-none">
@@ -219,7 +219,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 										viewBox="0 0 24 24"
 										className="h-[20px] md:h-[16px] dark:text-primary-400"
 									>
-										<use xlinkHref={`#${MapSpritesEnum.Wikipedia}`}></use>
+										<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
 									</svg>
 								</a>
 							) : undefined}
@@ -236,7 +236,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 										viewBox="0 0 256 367"
 										className="h-[20px] md:h-[16px]"
 									>
-										<use xlinkHref={`#${MapSpritesEnum.Google}`}></use>
+										<use href={`#${MapSpritesEnum.Google}`}></use>
 									</svg>
 								</a>
 							) : undefined}

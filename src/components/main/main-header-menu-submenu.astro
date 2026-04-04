@@ -100,14 +100,13 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 						</Link>
 						{item.children && item.children.length > 0 ? (
 							<svg
-								xmlns="http://www.w3.org/2000/svg"
 								width="24"
 								height="24"
 								viewBox="0 0 24 24"
 								class:list={['invisible h-full w-[14px] text-primary-400 sm:visible']}
 								aria-hidden="true"
 							>
-								<path fill="currentColor" d="M8.59 16.58L13.17 12L8.59 7.41L10 6l6 6l-6 6z" />
+								<use href="#icon:chevron-right" />
 							</svg>
 						) : undefined}
 					</div>
