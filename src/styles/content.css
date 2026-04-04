@@ -22,16 +22,18 @@
 .content > .content-image + p {
 	margin-top: 0;
 }
-.content-image-caption a {
-	@apply text-accent-500 decoration-accent-200 transition-colors duration-150 ease-in hover:text-accent-300 hover:decoration-accent-100;
-	text-decoration-line: underline;
-	text-underline-offset: 2px;
-}
-[data-mode='dark'] .content-image-caption a {
-	@apply text-accent-400 decoration-accent-800 hover:text-accent-700 hover:decoration-accent-900;
+
+/* Content image caption styling */
+.content-image-caption {
+	font-style: italic;
 }
 .content-image-caption em {
 	font-style: normal;
+}
+.content-image-caption a {
+	@apply text-accent-500 decoration-accent-200 transition-colors duration-150 ease-in hover:text-accent-300 hover:decoration-accent-100 dark:text-accent-400 dark:decoration-accent-800 dark:hover:text-accent-700 dark:hover:decoration-accent-900;
+	text-decoration-line: underline;
+	text-underline-offset: 2px;
 }
 
 /* Footnotes */
