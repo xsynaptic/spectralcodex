@@ -43,9 +43,9 @@ export function formatNumber({
 // Another rough function to do 80% of what is needed here
 function encodeHtmlEntities(input: string): string {
 	return input
+		.replaceAll('&', '&amp;')
 		.replaceAll('<', '&lt;')
 		.replaceAll('>', '&gt;')
-		.replaceAll('&', '&amp;')
 		.replaceAll('"', '&quot;');
 }
 
