@@ -7,6 +7,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { checkDivisionIds } from './divisions';
+import { checkFrontmatterLinks } from './frontmatter-links';
 import { checkImageReferences } from './images';
 import { checkLinkIds } from './link-ids';
 import { checkLocationsCoordinates } from './locations-coordinates';
@@ -114,6 +115,11 @@ switch (command) {
 		checkLinkIds(allCollections, metadataCollections);
 		break;
 	}
+	// Check for shortform links that do not match any resource
+	case 'frontmatter-links': {
+		checkFrontmatterLinks(allCollections);
+		break;
+	}
 	// Check for image references that do not exist
 	case 'images': {
 		checkImageReferences(
@@ -132,6 +138,7 @@ switch (command) {
 		const syncResults: Array<boolean> = [
 			checkMdxComponents(allCollections),
 			checkLinkIds(allCollections, metadataCollections),
+			checkFrontmatterLinks(allCollections),
 			checkImageReferences(
 				allCollections.flatMap(([, entries]) => entries),
 				path.join(values['root-path'], values['media-path']),
