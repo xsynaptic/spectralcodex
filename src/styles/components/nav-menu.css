@@ -214,3 +214,16 @@
 		opacity: 1;
 	}
 }
+
+/* JS-driven open state (keyboard, touch, click) */
+[data-open] > .nav-sub-menu-d1,
+[data-open] > .nav-sub-menu-d2,
+[data-open] > .nav-sub-menu-d3 {
+	pointer-events: auto;
+	visibility: visible;
+	opacity: 1;
+}
+
+[data-open] > .nav-item-trigger > .nav-icon {
+	transform: scaleY(-1);
+}

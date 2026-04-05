@@ -164,18 +164,6 @@ class NavMenu extends HTMLElement {
 		const link = li.querySelector<HTMLElement>('a[role="menuitem"]');
 
 		if (link) link.setAttribute('aria-expanded', 'false');
-
-		const chevron = li.querySelector<HTMLElement>(':scope > div > svg');
-
-		if (chevron) chevron.style.transform = '';
-
-		const submenu = li.querySelector<HTMLElement>(':scope > ul');
-
-		if (submenu) {
-			submenu.style.pointerEvents = '';
-			submenu.style.visibility = '';
-			submenu.style.opacity = '';
-		}
 	}
 
 	#open(li: HTMLElement) {
@@ -184,18 +172,6 @@ class NavMenu extends HTMLElement {
 		const link = li.querySelector<HTMLElement>('a[role="menuitem"]');
 
 		if (link) link.setAttribute('aria-expanded', 'true');
-
-		const chevron = li.querySelector<HTMLElement>(':scope > div > svg');
-
-		if (chevron) chevron.style.transform = 'scaleY(-1)';
-
-		const submenu = li.querySelector<HTMLElement>(':scope > ul');
-
-		if (submenu) {
-			submenu.style.pointerEvents = 'auto';
-			submenu.style.visibility = 'visible';
-			submenu.style.opacity = '1';
-		}
 	}
 
 	#closeSiblings(li: HTMLElement) {
