@@ -6,11 +6,7 @@ const t = getTranslations();
 
 <button
 	type="button"
-	class:list={[
-		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-focus-within:opacity-100 group-hover:opacity-100 active:scale-90 lg:flex',
-		'bg-white/25 text-white opacity-75 hover:bg-white/50 hover:text-white/80',
-		'left-2',
-	]}
+	class:list={['carousel-nav carousel-nav-prev']}
 	data-carousel-nav="prev"
 	aria-label={t('carousel.nav.previous')}
 >
@@ -19,7 +15,6 @@ const t = getTranslations();
 		width="24"
 		height="24"
 		viewBox="0 0 24 24"
-		class="h-8 w-8 -translate-x-0.5"
 		aria-hidden="true"
 	>
 		<path
@@ -33,11 +28,7 @@ const t = getTranslations();
 </button>
 <button
 	type="button"
-	class:list={[
-		'pointer-events-auto absolute top-1/2 z-30 hidden h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full opacity-0 grayscale transition-all duration-200 group-focus-within:opacity-100 group-hover:opacity-100 active:scale-90 lg:flex',
-		'bg-white/25 text-white opacity-75 hover:bg-white/50 hover:text-white/80',
-		'right-2',
-	]}
+	class:list={['carousel-nav carousel-nav-next']}
 	data-carousel-nav="next"
 	aria-label={t('carousel.nav.next')}
 >
@@ -46,7 +37,6 @@ const t = getTranslations();
 		width="24"
 		height="24"
 		viewBox="0 0 24 24"
-		class="h-8 w-8 translate-x-0.5"
 		aria-hidden="true"
 	>
 		<path

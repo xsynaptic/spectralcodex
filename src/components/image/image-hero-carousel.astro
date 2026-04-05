@@ -17,7 +17,7 @@ const { hasHeroImage, imageFeaturedGroup, withTitle = true, class: className } =
 
 {
 	hasHeroImage && imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-		<ImageHeroFrame class:list={['group', className]} withTitle={withTitle}>
+		<ImageHeroFrame class:list={['carousel-group', className]} withTitle={withTitle}>
 			<carousel-slider class="block">
 				<div class="carousel-container">
 					{imageFeaturedGroup.map((imageFeaturedGroupItem, index) => (

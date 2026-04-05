@@ -15,7 +15,11 @@ const { imageFeaturedGroup, class: className } = Astro.props;
 {
 	imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
 		<carousel-slider
-			class:list={['group relative block max-w-content overflow-hidden sm:rounded-xs', className]}
+			class:list={[
+				'carousel-group',
+				'relative block max-w-content overflow-hidden sm:rounded-xs',
+				className,
+			]}
 		>
 			<div class="carousel-container">
 				{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
