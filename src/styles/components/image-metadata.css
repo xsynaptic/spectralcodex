@@ -1,0 +1,174 @@
+/* Image meta wrapper */
+.i-meta {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+/* Show button (triggers metadata display on focus-within) */
+.i-meta-show {
+	@apply transition-opacity delay-200 duration-300;
+	opacity: 0.8;
+}
+.i-meta-show:focus {
+	opacity: 1;
+}
+@media (width >= 40rem) {
+	.i-meta-show {
+		opacity: 0;
+	}
+	.i-meta-show:hover {
+		opacity: 1;
+	}
+}
+
+/* Eye icon */
+.i-meta-show-icon {
+	@apply p-2 transition-opacity duration-200;
+	color: var(--color-primary-50);
+	cursor: pointer;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	transition-delay: 500ms;
+}
+[data-mode='dark'] .i-meta-show-icon {
+	color: var(--color-primary-50);
+}
+.i-meta-show:focus-within .i-meta-show-icon {
+	pointer-events: none;
+	opacity: 0;
+	transition-delay: 100ms;
+}
+
+/* Metadata panel (slides in from the bottom on focus) */
+.i-meta-panel {
+	@apply translate-x-full font-sans transition-[opacity,translate];
+	pointer-events: none;
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	height: 100%;
+	max-height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	opacity: 0;
+	translate: 100% 0;
+	transition-delay: 100ms, 300ms;
+	transition-duration: 200ms, 0ms;
+}
+@media (width >= 40rem) {
+	.i-meta-panel {
+		border-bottom-left-radius: var(--radius-xs);
+		border-bottom-right-radius: var(--radius-xs);
+	}
+}
+.i-meta-show:focus-within .i-meta-panel {
+	@apply translate-x-0;
+	pointer-events: auto;
+	opacity: 1;
+	transition-delay: 100ms, 0ms;
+}
+
+/* EXIF data grid */
+.i-meta-grid {
+	@apply gap-1 bg-primary-50/75 px-small py-2 backdrop-grayscale dark:bg-primary-800/75;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	max-height: 100%;
+	width: 100%;
+	overflow-y: auto;
+}
+@media (width >= 40rem) {
+	.i-meta-grid {
+		@apply gap-2;
+		grid-template-columns: repeat(8, minmax(0, 1fr));
+	}
+}
+@media (width >= 48rem) {
+	.i-meta-grid {
+		@apply gap-4;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+	}
+}
+@container (width < 32rem) {
+	@media (width >= 40rem) {
+		.i-meta-grid {
+			@apply gap-1;
+		}
+	}
+	@media (width >= 48rem) {
+		.i-meta-grid {
+			grid-template-columns: repeat(8, minmax(0, 1fr));
+		}
+	}
+}
+@container (width < 24rem) {
+	@media (width >= 40rem) {
+		.i-meta-grid {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+}
+
+/* Close button (sibling of show button; appears on show's focus-within) */
+.i-meta-close {
+	@apply transition-opacity;
+	pointer-events: none;
+	opacity: 0;
+	transition-duration: 100ms;
+}
+.i-meta-show:focus-within ~ .i-meta-close {
+	pointer-events: auto;
+	opacity: 1;
+}
+.i-meta-close-icon {
+	@apply p-2;
+	color: var(--color-accent-700);
+	cursor: pointer;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	z-index: 20;
+}
+[data-mode='dark'] .i-meta-close-icon {
+	color: var(--color-accent-400);
+}
+
+/* Shared SVG icon style */
+.i-meta-svg {
+	@apply drop-shadow-md;
+}
+
+.i-meta-item {
+	text-align: left;
+}
+.i-meta-item.i-span-2 {
+	grid-column: span 2 / span 2;
+}
+.i-meta-item.i-span-4 {
+	grid-column: span 4 / span 4;
+}
+
+.i-meta-item-title {
+	@apply text-xs font-semibold;
+	color: var(--color-primary-800);
+	-webkit-user-select: none;
+	user-select: none;
+}
+[data-mode='dark'] .i-meta-item-title {
+	color: var(--color-primary-400);
+}
+
+.i-meta-item-value {
+	@apply text-sm;
+	color: var(--color-primary-700);
+	cursor: text;
+	-webkit-user-select: text;
+	user-select: text;
+}
+[data-mode='dark'] .i-meta-item-value {
+	color: var(--color-primary-200);
+}
