@@ -75,7 +75,7 @@ export function countWords(str: string): number {
 		shouldCount = !isMatch;
 
 		// Step by 2 for supplementary plane characters (surrogate pairs)
-		index += charCode > 0xFF_FF ? 2 : 1;
+		index += charCode > 0xff_ff ? 2 : 1;
 	}
 
 	// Count the last word if string didn't end on a boundary
