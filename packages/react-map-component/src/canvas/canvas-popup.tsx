@@ -142,7 +142,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 				{image?.src ? (
 					<div>
 						<img
-							className="w-full bg-fallback object-cover select-none"
+							className="bg-fallback w-full object-cover select-none"
 							style={{ aspectRatio: '3/2' }}
 							src={`${imageServerUrl}${image.src}`}
 							srcSet={image.srcSet

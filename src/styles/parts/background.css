@@ -39,7 +39,7 @@
 }
 
 /* A little texture for the header */
-@utility bg-header-fade {
+.bg-header-fade {
 	background-image: linear-gradient(
 		180deg,
 		hsla(0, 0%, 96%, 0.9),
@@ -57,7 +57,7 @@
 		hsla(0, 0%, 96%, 0.7)
 	);
 }
-@utility bg-header-fade-dark {
+[data-mode='dark'] .bg-header-fade {
 	background-image: linear-gradient(
 		180deg,
 		hsla(0, 0%, 18%, 0.9),
@@ -77,12 +77,12 @@
 }
 
 /* This fallback pattern is a seamless seigaiha (青海波) pattern */
-@utility bg-fallback {
+.bg-fallback {
 	background-color: var(--color-primary-200);
 	background-image: url('/seigaiha-light.svg');
 	background-repeat: repeat;
-	[data-mode='dark'] & {
-		background-color: var(--color-primary-700);
-		background-image: url('/seigaiha-dark.svg');
-	}
+}
+[data-mode='dark'] .bg-fallback {
+	background-color: var(--color-primary-700);
+	background-image: url('/seigaiha-dark.svg');
 }

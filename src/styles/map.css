@@ -26,19 +26,19 @@ button.maplibregl-popup-close-button:focus {
 	outline: none;
 }
 [data-mode='dark'] .maplibregl-popup-content {
-	@apply bg-primary-950;
+	background-color: var(--color-primary-950);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	@apply border-r-primary-950;
+	border-right-color: var(--color-primary-950);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	@apply border-l-primary-950;
+	border-left-color: var(--color-primary-950);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	@apply border-b-primary-950;
+	border-bottom-color: var(--color-primary-950);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	@apply border-t-primary-950;
+	border-top-color: var(--color-primary-950);
 }
 
 /** Target marker */
@@ -75,7 +75,7 @@ button.maplibregl-popup-close-button:focus {
 	align-items: flex-end;
 }
 .maplibregl-ctrl-metrics {
-	@apply text-primary-600;
+	color: var(--color-primary-600);
 	align-items: center;
 	display: flex;
 	flex-wrap: nowrap;
@@ -83,20 +83,24 @@ button.maplibregl-popup-close-button:focus {
 	height: 100%;
 }
 [data-mode='dark'] .maplibregl-ctrl-metrics {
-	@apply text-primary-300;
+	color: var(--color-primary-300);
 }
 .maplibregl-ctrl-metrics-divider {
-	@apply text-primary-400;
+	color: var(--color-primary-400);
 }
 [data-mode='dark'] .maplibregl-ctrl-metrics-divider {
-	@apply text-primary-500;
+	color: var(--color-primary-500);
 }
 .maplibregl-ctrl-scale {
-	@apply rounded-br-xs rounded-bl-xs border-r border-b border-l;
-	@apply border-primary-400 text-primary-600;
+	@apply border-r border-b border-l;
 	background-color: transparent;
+	border-color: var(--color-primary-400);
+	border-bottom-right-radius: var(--radius-xs);
+	border-bottom-left-radius: var(--radius-xs);
+	color: var(--color-primary-600);
 }
 [data-mode='dark'] .maplibregl-ctrl-scale {
-	@apply border-primary-500 text-primary-300;
 	background-color: transparent;
+	border-color: var(--color-primary-500);
+	color: var(--color-primary-300);
 }

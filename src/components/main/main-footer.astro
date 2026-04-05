@@ -59,7 +59,7 @@ const t = getTranslations();
 					class="group flex flex-nowrap items-center gap-1"
 					rel="feed"
 					><span>{t('site.footer.feed.label')}</span>
-					<div class:list={['colophon-rss-icon relative', 'bg-white']}>
+					<div class="colophon-rss-icon">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							width="1em"
@@ -84,15 +84,17 @@ const t = getTranslations();
 
 <style>
 	.colophon-rss-icon {
+		background-color: var(--color-white);
+		position: relative;
 		margin-left: 0.5;
 		height: 10px;
 		width: 10px;
-		svg {
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			height: 16px;
-			width: 16px;
-		}
+	}
+	.colophon-rss-icon svg {
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		height: 16px;
+		width: 16px;
 	}
 </style>

@@ -337,7 +337,7 @@ class NavMenu extends HTMLElement {
 			if (submenu) {
 				li.dataset.hasSubmenu = '';
 
-				const id = `nav-submenu-${String(submenuId++)}`;
+				const id = `nav-sub-menu-${String(submenuId++)}`;
 
 				submenu.id = id;
 				submenu.setAttribute('role', 'menu');

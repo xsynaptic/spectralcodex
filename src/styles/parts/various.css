@@ -1,0 +1,12 @@
+/** These custom properties are defined outside Tailwind's system */
+:root {
+	--content-bar: '|';
+	--content-bullet: '\2022';
+	--content-chevron: '\203A';
+	--content-dot: '\00B7';
+	--content-slash: '/';
+}
+
+html {
+	scrollbar-gutter: stable;
+}

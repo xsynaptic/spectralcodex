@@ -38,11 +38,12 @@
 }
 .prose-x [data-footnote-ref]::before,
 .prose-x [data-footnote-ref]::after {
-	@apply font-light text-accent-300;
+	@apply font-light;
+	color: var(--color-accent-300);
 }
 [data-mode='dark'] .prose-x [data-footnote-ref]::before,
 [data-mode='dark'] .prose-x [data-footnote-ref]::after {
-	@apply text-accent-400;
+	color: var(--color-accent-400);
 }
 .prose-x [data-footnote-ref]::before {
 	content: '[';

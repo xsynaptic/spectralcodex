@@ -1,0 +1,216 @@
+/* Nav element */
+.nav-menu {
+	padding-inline: var(--spacing-small);
+	position: relative;
+}
+@media (width >= 40rem) {
+	.nav-menu {
+		padding-inline: 0;
+	}
+}
+
+/* Top-level list element */
+.nav-ul {
+	@apply gap-x-4 md:gap-x-2;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.nav-ul.nav-no-hero {
+	border-bottom: 1px solid var(--color-primary-200);
+}
+[data-mode='dark'] .nav-ul.nav-no-hero {
+	border-bottom-color: var(--color-primary-700);
+}
+
+/* Top-level menu item */
+.nav-item {
+	@apply py-2;
+}
+@media (width >= 40rem) {
+	.nav-item {
+		position: relative;
+	}
+}
+
+/* Trigger area inside top-level item */
+.nav-item-trigger {
+	@apply gap-x-1;
+	display: flex;
+	align-items: center;
+}
+
+/* Top-level menu link */
+.nav-item-link {
+	@apply text-sm font-medium;
+}
+@media (width >= 40rem) {
+	.nav-item-link {
+		@apply text-base;
+	}
+}
+.nav-item-link.nav-active {
+	@apply font-semibold;
+}
+
+/* Top-level icon */
+.nav-icon {
+	@apply transition-transform transition-discrete duration-100;
+	color: var(--color-primary-500);
+	opacity: 100%;
+	height: 100%;
+	width: 18px;
+}
+
+/* Submenu base element */
+.nav-sub-menu {
+	@apply divide-y transition-[opacity,visibility] transition-discrete;
+	pointer-events: none;
+	position: absolute;
+	opacity: 0;
+	max-width: 100%;
+	width: 100%;
+	visibility: hidden;
+}
+@media (width >= 40rem) {
+	.nav-sub-menu {
+		width: fit-content;
+	}
+}
+@media (width >= 48rem) {
+	.nav-sub-menu {
+		max-width: 20rem;
+	}
+}
+
+.nav-sub-menu-d1 {
+	@apply divide-primary-100 bg-primary-50 shadow-md duration-200 dark:divide-primary-800 dark:bg-primary-900;
+	top: 100%;
+	left: 0;
+	z-index: 90;
+	margin-bottom: -1px;
+}
+@media (width >= 40rem) {
+	.nav-sub-menu-d1 {
+		border-bottom-left-radius: var(--radius-md);
+		left: -0.5rem;
+		min-width: 10rem;
+		max-width: 16rem;
+	}
+}
+.nav-no-hero .nav-sub-menu-d1 {
+	margin-top: 1px;
+}
+
+.nav-sub-menu-d2 {
+	@apply divide-primary-200 bg-primary-100 shadow-md duration-50 dark:divide-primary-700 dark:bg-primary-800;
+	left: 0;
+	z-index: 91;
+}
+@media (width >= 40rem) {
+	.nav-sub-menu-d2 {
+		border-bottom-right-radius: var(--radius-md);
+		top: 0;
+		left: 100%;
+		max-width: 12.5rem;
+		min-width: 10rem;
+	}
+}
+
+/* Depth 3+ submenu */
+.nav-sub-menu-d3 {
+	@apply divide-primary-300 bg-primary-200 duration-50 dark:divide-primary-600 dark:bg-primary-700;
+	left: 0;
+	z-index: 92;
+}
+@media (width >= 40rem) {
+	.nav-sub-menu-d3 {
+		border-bottom-right-radius: var(--radius-md);
+		top: 0;
+		left: 100%;
+		max-width: 12.5rem;
+		min-width: 10rem;
+	}
+}
+
+/* Submenu item (all depths) */
+.nav-sub-item {
+	position: relative;
+}
+
+/* Trigger area inside submenu item */
+.nav-sub-trigger {
+	@apply gap-x-1 px-small py-1 text-sm;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+@media (width >= 40rem) {
+	.nav-sub-trigger {
+		@apply px-2;
+	}
+}
+
+/* Submenu item link */
+.nav-sub-link {
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}
+.nav-sub-link.nav-active {
+	@apply font-semibold;
+}
+
+/* Multilingual text annotation */
+.nav-ml {
+	@apply text-xs text-primary-700 dark:text-primary-400;
+}
+
+/* Right chevron (submenu items with children) */
+.nav-sub-icon {
+	color: var(--color-primary-400);
+	height: 100%;
+	width: 14px;
+	visibility: hidden;
+}
+@media (width >= 40rem) {
+	.nav-sub-icon {
+		visibility: visible;
+	}
+}
+
+/**
+ * Hover/focus interactions (replaces Tailwind group pattern)
+ *
+ * Depth 1: active at all breakpoints
+ * Depth 2+: active at sm (40rem) and above
+ */
+
+/* Depth 1: show submenu on hover/focus-within */
+.nav-item:hover > .nav-sub-menu-d1,
+.nav-item:focus-within > .nav-sub-menu-d1 {
+	pointer-events: auto;
+	opacity: 1;
+	visibility: visible;
+}
+
+/* Depth 1: flip chevron on hover/focus-within */
+.nav-item:hover > .nav-item-trigger > .nav-icon,
+.nav-item:focus-within > .nav-item-trigger > .nav-icon {
+	transform: scaleY(-1);
+}
+
+/* Depth 2 and 3+: show submenu on hover/focus-within (sm+ only) */
+@media (width >= 40rem) {
+	.nav-sub-item:hover > .nav-sub-menu-d2,
+	.nav-sub-item:focus-within > .nav-sub-menu-d2,
+	.nav-sub-item:hover > .nav-sub-menu-d3,
+	.nav-sub-item:focus-within > .nav-sub-menu-d3 {
+		pointer-events: auto;
+		visibility: visible;
+		opacity: 1;
+	}
+}

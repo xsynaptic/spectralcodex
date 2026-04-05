@@ -23,23 +23,36 @@
 
 /* Inline search result highlights */
 .pagefind-ui mark {
-	@apply rounded-sm bg-highlight-100 text-highlight-600;
+	background-color: var(--color-highlight-100);
+	border-radius: var(--radius-sm);
+	color: var(--color-highlight-600);
 	padding: 2px;
 }
 [data-mode='dark'] .pagefind-ui mark {
-	@apply bg-primary-600 text-primary-300;
+	background-color: var(--color-primary-600);
+	color: var(--color-primary-300);
 }
 
 /* Adjust the sizing and positioning of the search result drawer */
 .pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
-	@apply min-w-64 rounded-b-sm px-small py-small shadow-md sm:right-0 sm:w-auto sm:min-w-[480px];
+	@apply px-small py-small shadow-md;
 	background-color: var(--pagefind-ui-background);
+	border-bottom-right-radius: var(--radius-sm);
+	border-bottom-left-radius: var(--radius-sm);
 	margin-top: 0;
 	max-height: 85vh;
+	min-width: 16rem;
 	position: absolute;
 	overflow-y: auto;
 	width: 100%;
 	z-index: 99;
+}
+@media (width >= 40rem) {
+	.pagefind-ui .pagefind-ui__drawer:not(.pagefind-ui__hidden) {
+		right: 0;
+		width: auto;
+		min-width: 480px;
+	}
 }
 
 /* Hide "clear" text for visual users but keep it for screen readers */
@@ -50,9 +63,10 @@
 /* Create visible icon with pseudo-element */
 .pagefind-ui__search-clear::before {
 	--svg-cancel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.59-13L12 10.59L8.41 7L7 8.41L10.59 12L7 15.59L8.41 17L12 13.41L15.59 17L17 15.59L13.41 12L17 8.41z'/%3E%3C/svg%3E");
-	@apply top-1/2 -translate-y-1/2 text-primary-400;
+	@apply -translate-y-1/2;
 	aspect-ratio: 1/1;
 	background-color: currentColor;
+	color: var(--color-primary-400);
 	content: '';
 	cursor: pointer;
 	mask-image: var(--svg-cancel);
@@ -60,17 +74,18 @@
 	mask-repeat: no-repeat;
 	mask-size: 100%;
 	position: absolute;
+	top: 50%;
 	visibility: visible;
 	width: 16px;
 }
 [data-mode='dark'] .pagefind-ui__search-clear::before {
-	@apply text-primary-600;
+	color: var(--color-primary-600);
 }
 .pagefind-ui__search-clear:hover::before {
-	@apply text-accent-300;
+	color: var(--color-accent-300);
 }
 [data-mode='dark'] .pagefind-ui__search-clear:hover::before {
-	@apply text-accent-500;
+	color: var(--color-accent-500);
 }
 
 .pagefind-ui__message,
@@ -81,30 +96,30 @@
 .pagefind-ui__result-link {
 	@apply transition-colors;
 	--pagefind-ui-text: var(--color-accent-500);
-	&:hover {
-		--pagefind-ui-text: var(--color-accent-300);
-	}
+}
+.pagefind-ui__result-link:hover {
+	--pagefind-ui-text: var(--color-accent-300);
 }
 
 .pagefind-ui__result-nested .pagefind-ui__result-link {
 	--pagefind-ui-text: var(--color-primary-600);
-	&:hover {
-		--pagefind-ui-text: var(--color-primary-500);
-	}
+}
+.pagefind-ui__result-nested .pagefind-ui__result-link:hover {
+	--pagefind-ui-text: var(--color-primary-500);
 }
 
 [data-mode='dark'] .pagefind-ui__result-nested .pagefind-ui__result-link {
 	--pagefind-ui-text: var(--color-primary-500);
-	&:hover {
-		--pagefind-ui-text: var(--color-primary-400);
-	}
+}
+[data-mode='dark'] .pagefind-ui__result-nested .pagefind-ui__result-link:hover {
+	--pagefind-ui-text: var(--color-primary-400);
 }
 
 .pagefind-ui__result-nested .pagefind-ui__result-link::before {
-	@apply text-primary-400;
+	color: var(--color-primary-400);
 }
 [data-mode='dark'] .pagefind-ui__result-nested .pagefind-ui__result-link::before {
-	@apply text-primary-500;
+	color: var(--color-primary-500);
 }
 
 /* Spacing is not easily configurable so let's override some things */

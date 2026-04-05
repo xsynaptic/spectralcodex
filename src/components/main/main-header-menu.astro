@@ -21,50 +21,31 @@ const t = getTranslations();
 ---
 
 <nav-menu>
-	<nav
-		class="relative px-small sm:px-0"
-		aria-label={t('site.menu.header.label')}
-		data-nosnippet
-		{...props}
-	>
-		<ul
-			class:list={[
-				'flex flex-wrap justify-between gap-x-4 md:gap-x-2',
-				hasHeroImage ? undefined : 'border-b border-primary-200 dark:border-primary-700',
-			]}
-		>
+	<nav class="nav-menu" aria-label={t('site.menu.header.label')} data-nosnippet {...props}>
+		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{
 				menuItems.map((item) => (
-					<li class="group py-2 sm:relative">
-						<div class="flex items-center gap-x-1">
+					<li class="nav-item">
+						<div class="nav-item-trigger">
 							<Link
-								linkColor="accent"
 								class:list={[
-									'text-sm font-medium sm:text-base',
-									isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined,
+									'nav-item-link',
+									isActiveMenuItem(item, pathname) ? 'nav-active' : undefined,
 								]}
 								href={item.url}
+								linkColor="accent"
 								{...(item.rel ? { rel: item.rel } : undefined)}
 							>
 								{item.title}
 							</Link>
 							{item.children ? (
-								<svg
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									class:list={[
-										'h-full w-[18px] text-primary-500 opacity-100 transition-transform transition-discrete duration-100 group-focus-within:scale-y-[-1] group-hover:scale-y-[-1]',
-									]}
-									aria-hidden="true"
-								>
+								<svg width="24" height="24" viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
 									<use href="#icon:chevron-down" />
 								</svg>
 							) : undefined}
 						</div>
 						{item.children ? (
 							<MenuHeaderSubmenu
-								hasHeroImage={hasHeroImage}
 								menuItems={item.children}
 								depth={1}
 								ariaLabel={getMenuItemAriaLabel(item)}
