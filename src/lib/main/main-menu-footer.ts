@@ -7,6 +7,11 @@ const t = getTranslations();
 
 export const menuFooterItems = [
 	{
+		title: t('menu.threads.label'),
+		url: 'https://www.threads.com/@synapticx',
+		rel: 'me',
+	},
+	{
 		title: t('menu.bluesky.label'),
 		url: 'https://bsky.app/profile/spectralcodex.com',
 		rel: 'me',

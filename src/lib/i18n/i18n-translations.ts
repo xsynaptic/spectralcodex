@@ -189,6 +189,7 @@ const translationStrings = {
 		'menu.flickr.label': 'Flickr',
 		'menu.instagram.label': 'Instagram',
 		'menu.mastodon.label': 'Mastodon',
+		'menu.threads.label': 'Threads',
 		'menu.patreon.label': 'Patreon',
 
 		// Author
