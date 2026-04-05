@@ -26,7 +26,7 @@ spectralcodex.com {
 	@immutable path /_x/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	@static path *.css *.js *.jpg *.jpeg *.png *.gif *.webp *.avif *.woff2 *.woff
+	@static path *.css *.js *.jpg *.jpeg *.png *.gif *.svg *.webp *.avif *.woff2 *.woff
 	header @static Cache-Control "public, max-age=31536000"
 
 	@data path *.json *.fgb
