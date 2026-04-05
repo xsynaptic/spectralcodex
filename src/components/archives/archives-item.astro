@@ -2,7 +2,7 @@
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import MetadataList from '#components/parts/metadata-list.astro';
-import ProseBody from '#components/parts/prose-body.astro';
+import Prose from '#components/parts/prose.astro';
 
 interface Props {
 	title: string;
@@ -16,9 +16,9 @@ const { title, items, count, class: className, ...props } = Astro.props;
 
 {
 	items.length > 0 ? (
-		<ProseBody class={className} {...props}>
+		<Prose class={className} {...props}>
 			<span class="font-medium">{title}</span>:
 			<MetadataList items={items} count={count} />
-		</ProseBody>
+		</Prose>
 	) : undefined
 }

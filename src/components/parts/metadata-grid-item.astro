@@ -6,7 +6,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
+import Prose from '#components/parts/prose.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -116,9 +116,9 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 	}
 	{
 		description ? (
-			<ProseDescription class="mt-1" showCompact={true}>
+			<Prose class="mt-1" showCompact={true}>
 				<Fragment set:html={description} />
-			</ProseDescription>
+			</Prose>
 		) : undefined
 	}
 </CardFrame>

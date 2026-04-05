@@ -10,7 +10,7 @@ import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
-import ProseBody from '#components/parts/prose-body.astro';
+import Prose from '#components/parts/prose.astro';
 import { createArchivesImageFeaturedGroupFunction } from '#lib/collections/archives/archives-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -96,9 +96,9 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 	</ContentSection>
 	{
 		archiveRenderResult ? (
-			<ProseBody class:list={['content', 'pb-small']}>
+			<Prose class:list={['pb-small']} showBlocks={true}>
 				<archiveRenderResult.Content />
-			</ProseBody>
+			</Prose>
 		) : undefined
 	}
 	<ContentSection class="flex flex-col gap-2">

@@ -5,8 +5,7 @@ import { transformMarkdown } from '@xsynaptic/unified-tools';
 import { render } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import ProseBody from '#components/parts/prose-body.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
+import Prose from '#components/parts/prose.astro';
 import { getRegionLangCodeByEntry } from '#lib/collections/regions/regions-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 
@@ -28,19 +27,24 @@ const { Content } = await render(entry);
 
 {
 	hasContent ? (
-		<ProseBody class:list={['content', 'pb-medium', className]} data-pagefind-weight="2" {...props}>
+		<Prose
+			showBlocks={true}
+			class:list={['pb-medium', className]}
+			data-pagefind-weight="2"
+			{...props}
+		>
 			<Content />
-		</ProseBody>
+		</Prose>
 	) : undefined
 }{
 	!hasContent && entry.data.description ? (
 		<ContentSection {...props}>
 			<Fragment slot="section-description">
-				<ProseDescription class:list={[className]} data-pagefind-weight="2">
+				<Prose class:list={[className]} data-pagefind-weight="2">
 					<Fragment
 						set:html={transformMarkdown({ input: entry.data.description, wrapCjkOptions })}
 					/>
-				</ProseDescription>
+				</Prose>
 			</Fragment>
 		</ContentSection>
 	) : undefined

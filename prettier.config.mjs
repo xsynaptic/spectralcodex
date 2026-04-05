@@ -14,5 +14,5 @@ export default {
 			},
 		},
 	],
-	tailwindStylesheet: './src/styles/global.css',
+	tailwindStylesheet: './src/styles/main.css',
 };

@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import Container from '#components/parts/container.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
+import Prose from '#components/parts/prose.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -55,9 +55,9 @@ const children = await renderSlot(Astro.slots, 'default');
 						</h3>
 					) : undefined}
 					{description ? (
-						<ProseDescription class:list={['mb-small']}>
+						<Prose class:list={['mb-small']}>
 							<Fragment set:html={description} />
-						</ProseDescription>
+						</Prose>
 					) : undefined}
 				</header>
 			) : undefined}

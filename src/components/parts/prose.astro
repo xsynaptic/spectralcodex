@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	darkMode?: boolean | undefined;
+	showBlocks?: boolean | undefined;
+	showCompact?: boolean | undefined;
+}
+
+const {
+	class: className,
+	darkMode = true,
+	showBlocks = false,
+	showCompact = false,
+	...props
+} = Astro.props;
+---
+
+<div
+	class:list={[
+		'prose-x',
+		darkMode ? 'prose-dark' : undefined,
+		showBlocks ? 'content-blocks' : undefined,
+		showCompact ? 'prose-compact' : undefined,
+		className,
+	]}
+	{...props}
+>
+	<slot />
+</div>

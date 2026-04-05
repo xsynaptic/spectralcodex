@@ -1,8 +1,7 @@
 ---
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
-import ProseBody from '#components/parts/prose-body.astro';
-import ProseDescription from '#components/parts/prose-description.astro';
+import Prose from '#components/parts/prose.astro';
 import { CONTENT_EXCERPT_IDENTIFIER } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
@@ -53,13 +52,13 @@ const t = getTranslations();
 		}
 		{
 			description ? (
-				<ProseDescription>
+				<Prose>
 					<Fragment set:html={description} />
-				</ProseDescription>
+				</Prose>
 			) : undefined
 		}
 	</Container>
-	<ProseBody class:list={['content', 'pb-small']}><Fragment set:html={excerptContent} /></ProseBody>
+	<Prose class:list={['pb-small']} showBlocks={true}><Fragment set:html={excerptContent} /></Prose>
 	{
 		hasExcerpt ? (
 			<Container as="div" class="text-right font-serif font-medium italic">

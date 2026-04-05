@@ -1,0 +1,21 @@
+/* Content block styling; images are labelled "not-prose" but require extra rules */
+.content-blocks > *:not(.content-image):not(.content-img-group) {
+	@apply mx-auto max-w-content px-small md:px-medium;
+}
+.content-blocks > .content-image,
+.content-blocks > .content-image + p {
+	margin-top: 0;
+}
+
+/* Content image caption styling */
+.content-image-caption {
+	font-style: italic;
+}
+.content-image-caption em {
+	font-style: normal;
+}
+.content-image-caption a {
+	@apply text-accent-500 decoration-accent-200 transition-colors duration-150 ease-in hover:text-accent-300 hover:decoration-accent-100 dark:text-accent-400 dark:decoration-accent-800 dark:hover:text-accent-700 dark:hover:decoration-accent-900;
+	text-decoration-line: underline;
+	text-underline-offset: 2px;
+}

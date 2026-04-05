@@ -18,11 +18,15 @@
 @import './theme/typography.css';
 
 /** Component styling */
-@import './background.css';
-@import './carousel.css';
-@import './content.css';
-@import './i18n.css';
-@import './loading.css';
+@import './components/carousel.css';
+@import './components/links.css';
+@import './components/loading.css';
+
+/** Bits and pieces */
+@import './parts/background.css';
+@import './parts/content.css';
+@import './parts/i18n.css';
+@import './parts/prose.css';
 
 /** These custom properties are defined outside Tailwind's system */
 :root {

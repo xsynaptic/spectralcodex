@@ -21,7 +21,7 @@ import ContentSectionThemes from '#components/content/content-section-themes.ast
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import ProseBody from '#components/parts/prose-body.astro';
+import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -113,9 +113,9 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<ProseBody class:list={['content', 'e-content', 'pb-small']} data-reading-frame>
+		<Prose class:list={['e-content', 'pb-small']} showBlocks={true} data-reading-frame>
 			<Content />
-		</ProseBody>
+		</Prose>
 		<ContentSectionLinks entry={entry} />
 		<ContentSectionSources entry={entry} />
 		<ContentSectionThemes themeIds={themeIds} />
