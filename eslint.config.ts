@@ -27,6 +27,8 @@ export default getConfig(
 			rules: {
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
+				// Conflicts with Prettier, which always uppercases hex digits and is not configurable
+				'unicorn/number-literal-case': 'off',
 				// Expensive type-aware rules; only run in strict mode
 				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
