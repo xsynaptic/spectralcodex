@@ -57,7 +57,7 @@
 .nav-icon {
 	@apply transition-transform transition-discrete duration-100;
 	color: var(--color-primary-500);
-	opacity: 100%;
+	opacity: 1;
 	height: 100%;
 	width: 18px;
 }
