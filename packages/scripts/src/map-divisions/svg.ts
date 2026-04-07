@@ -1,11 +1,12 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Feature } from 'geojson';
 
-import { bboxClip, featureCollection, rewind, simplify } from '@turf/turf';
+import { bboxClip, coordAll, featureCollection, rewind, simplify } from '@turf/turf';
 import chalk from 'chalk';
 import { geoIdentity, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { optimize } from 'svgo';
 
 import type { DivisionFeatureCollection, DivisionGeometry } from './types';
 
@@ -28,7 +29,14 @@ interface SvgOptions {
  * Generates an SVG string from a GeoJSON FeatureCollection using d3-geo
  * This approach references: https://css-irl.info/creating-static-svgs-from-geojson/
  */
-function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions = {}): string {
+function generateSvg(
+	geojsonData: DivisionFeatureCollection,
+	options: SvgOptions = {},
+): {
+	svg: string;
+	pointCount: number;
+	tolerance: number;
+} {
 	const {
 		tolerance = 0.0002,
 		highQuality = true,
@@ -88,9 +96,19 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 		reverse: false,
 	}) as DivisionFeatureCollection;
 
-	// Simplify geometry for decorative purposes
+	// Scale simplification tolerance based on geometry complexity
+	// Complex boundaries get progressively more aggressive simplification (up to 5x)
+	const POINT_THRESHOLD = 5000;
+	const MAX_TOLERANCE_MULTIPLIER = 5;
+
+	const pointCount = coordAll(corrected).length;
+	const adaptiveTolerance =
+		pointCount > POINT_THRESHOLD
+			? tolerance * Math.min(MAX_TOLERANCE_MULTIPLIER, pointCount / POINT_THRESHOLD)
+			: tolerance;
+
 	const simplified = simplify(corrected, {
-		tolerance,
+		tolerance: adaptiveTolerance,
 		highQuality,
 	});
 
@@ -119,9 +137,11 @@ function generateSvg(geojsonData: DivisionFeatureCollection, options: SvgOptions
 
 	// Generate SVG with dynamic viewBox matching actual geometry bounds
 	// Includes buffer to prevent stroke clipping at edges
-	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMid meet">
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMid meet">
   <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;
+
+	return { svg, pointCount, tolerance: adaptiveTolerance };
 }
 
 /**
@@ -143,11 +163,35 @@ export async function saveSvg({
 	const filePath = path.join(outputDir, `${id}.svg`);
 
 	try {
-		const svg = generateSvg(geojsonData, options);
+		const { svg: rawSvg, pointCount, tolerance } = generateSvg(geojsonData, options);
 
-		await fs.writeFile(filePath, svg, 'utf8');
+		const optimized = optimize(rawSvg, {
+			path: filePath,
+			plugins: [
+				{
+					name: 'preset-default',
+					params: {
+						overrides: {
+							convertColors: false,
+						},
+					},
+				},
+				{
+					name: 'convertPathData',
+					params: {
+						floatPrecision: 1,
+					},
+				},
+			],
+		});
 
-		console.log(chalk.gray(`Saved SVG file to: ${chalk.cyan(filePath)}`));
+		await fs.writeFile(filePath, optimized.data, 'utf8');
+
+		console.log(
+			chalk.gray(
+				`Saved SVG file to: ${chalk.cyan(filePath)} (${chalk.green(`${String(rawSvg.length)} → ${String(optimized.data.length)} bytes`)})  points: ${chalk.yellow(String(pointCount))}  tolerance: ${chalk.yellow(String(tolerance))}`,
+			),
+		);
 	} catch (error) {
 		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(id)}:`), error);
 		throw error;
