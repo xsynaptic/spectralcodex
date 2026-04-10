@@ -46,9 +46,9 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.1.4",
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"astro": "^6.1.5",
+		"react": "^19.2.5",
+		"react-dom": "^19.2.5"
 	},
 	"devDependencies": {
 		"@astrojs/markdown-remark": "^7.1.0",
@@ -57,7 +57,7 @@
 		"@astrojs/react": "^5.0.3",
 		"@astrojs/rss": "^4.0.18",
 		"@astrojs/sitemap": "^3.7.2",
-		"@pagefind/default-ui": "^1.4.0",
+		"@pagefind/default-ui": "^1.5.0",
 		"@playwright/test": "^1.59.1",
 		"@spectralcodex/astro-build-logger": "workspace:*",
 		"@spectralcodex/astro-image-loader": "workspace:*",
@@ -88,14 +88,14 @@
 		"astro-auto-import": "^0.5.1",
 		"astro-seo": "^1.1.0",
 		"eslint": "^9.39.4",
-		"eslint-plugin-astro": "^1.6.0",
+		"eslint-plugin-astro": "^1.7.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.0.1",
 		"exiftool-vendored": "^35.15.1",
-		"geokdbush": "^2.0.1",
+		"geokdbush": "^2.1.0",
 		"globals": "^17.4.0",
 		"kdbush": "^4.0.2",
-		"knip": "^6.3.0",
+		"knip": "^6.3.1",
 		"maplibre-gl": "^5.22.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
@@ -108,11 +108,11 @@
 		"tailwindcss": "^4.2.2",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.58.0",
+		"typescript-eslint": "^8.58.1",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
-		"vite": "^7.3.1",
-		"vitest": "^4.1.2",
+		"vite": "^7.3.2",
+		"vitest": "^4.1.3",
 		"zod": "^4.3.6"
 	},
 	"packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"

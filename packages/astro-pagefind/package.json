@@ -9,7 +9,7 @@
 	"private": true,
 	"dependencies": {
 		"astro-integration-kit": "^0.20.0",
-		"pagefind": "^1.4.0",
+		"pagefind": "^1.5.0",
 		"sirv": "^3.0.2",
 		"zod": "^4.3.6"
 	}
