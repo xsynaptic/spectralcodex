@@ -1,46 +1,46 @@
 ---
-import pagefindUiCssUrl from '@pagefind/default-ui/css/ui.css?url';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import pagefindCssUrl from '#styles/pagefind-component.css?url';
 
-import '#styles/pagefind.css';
+const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
+
+const t = getTranslations();
 ---
 
-<link rel="stylesheet" href={pagefindUiCssUrl} />
-<div>
-	<div id="pagefind-search" class="pagefind-ui"></div>
-</div>
-
 <script>
-	import { PagefindUI } from '@pagefind/default-ui';
+	import '@pagefind/component-ui';
 
-	const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
+	// Clear pagefind modal component state before swap
+	document.addEventListener('astro:before-swap', () => {
+		const modal = document.querySelector('pagefind-modal') as
+			| (Element & {
+					instance?: { components: unknown[]; componentsByType: Record<string, unknown[]> };
+			  })
+			| null;
+		const instance = modal?.instance;
 
-	function initPagefind() {
-		const element = document.querySelector<HTMLDivElement>('#pagefind-search');
-
-		if (!element || element.hasAttribute('data-initialized')) return;
-
-		new PagefindUI({
-			element: '#pagefind-search',
-			bundlePath,
-			pageSize: 10,
-			showImages: false,
-			resetStyles: false,
-			showEmptyFilters: false,
-			showSubResults: true,
-			ranking: {
-				pageLength: 0.5,
-				termFrequency: 0.8,
-			},
-		});
-
-		element.setAttribute('data-initialized', '');
-	}
-
-	document.addEventListener('astro:page-load', initPagefind);
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initPagefind);
-	} else {
-		initPagefind();
-	}
+		if (instance) {
+			instance.components = [];
+			instance.componentsByType = {};
+		}
+	});
 </script>
+
+<link rel="stylesheet" href={pagefindCssUrl} />
+
+<pagefind-config bundle-path={bundlePath} preload={true}></pagefind-config>
+
+<pagefind-modal-trigger placeholder={t('site.search.placeholder')} hide-shortcut={true}
+></pagefind-modal-trigger>
+<pagefind-modal reset-on-close={true}>
+	<pagefind-modal-header>
+		<pagefind-input placeholder={t('site.search.placeholder')}></pagefind-input>
+	</pagefind-modal-header>
+	<pagefind-modal-body>
+		<pagefind-summary></pagefind-summary>
+		<pagefind-results max-sub-results="3"></pagefind-results>
+	</pagefind-modal-body>
+	<pagefind-modal-footer>
+		<pagefind-keyboard-hints></pagefind-keyboard-hints>
+	</pagefind-modal-footer>
+</pagefind-modal>

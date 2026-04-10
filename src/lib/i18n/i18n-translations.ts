@@ -176,6 +176,7 @@ const translationStrings = {
 		'site.menu.header.label': 'Header Navigation',
 		'site.menu.header.submenu.label': 'Submenu for {title}',
 		'site.mode.toggle.label': 'Toggle dark mode',
+		'site.search.placeholder': 'Search...',
 		'site.pagination.label': 'Pagination',
 		'site.pagination.pageNumber.label': 'Page {page}',
 

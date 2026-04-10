@@ -28,5 +28,6 @@
 @import './parts/background.css';
 @import './parts/content.css';
 @import './parts/i18n.css';
+@import './parts/pagefind.css';
 @import './parts/prose.css';
 @import './parts/various.css';

@@ -6,22 +6,20 @@ test.describe('search', () => {
 	test('Pagefind returns results for a known post', async ({ page }) => {
 		await page.goto('/');
 
-		const searchInput = page.locator('.pagefind-ui__search-input');
-		await expect(searchInput).toBeVisible();
+		const trigger = page.locator('pagefind-modal-trigger button');
+		await expect(trigger).toBeVisible();
+		await trigger.click();
 
-		await searchInput.click();
+		const searchInput = page.locator('pagefind-input input');
+		await expect(searchInput).toBeVisible();
 		await searchInput.pressSequentially(SEARCH_TERM, { delay: 30 });
 
-		const resultsArea = page.locator('.pagefind-ui__results-area');
-
-		// Results appear (index loaded, search executed)
-		await expect(resultsArea.locator('.pagefind-ui__result-link').first()).toBeVisible({
-			timeout: 10_000,
-		});
+		const resultLink = page.locator('.pf-result-link').first();
+		await expect(resultLink).toBeVisible({ timeout: 10_000 });
 
 		// The specific post appears as a result link
 		await expect(
-			resultsArea.getByRole('link', { name: 'Huadong Valley Ride 2018: Taitung City' }),
+			page.getByRole('link', { name: 'Huadong Valley Ride 2018: Taitung City' }),
 		).toBeVisible();
 	});
 });

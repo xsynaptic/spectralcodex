@@ -1,0 +1,75 @@
+@import '@pagefind/component-ui/css/pagefind-component-ui.css';
+
+:root {
+	--pf-text: var(--color-primary-600);
+	--pf-text-secondary: var(--color-primary-500);
+	--pf-text-muted: var(--color-primary-400);
+	--pf-background: var(--color-primary-100);
+	--pf-border: var(--color-primary-200);
+	--pf-border-focus: var(--color-primary-400);
+	--pf-skeleton: var(--color-primary-200);
+	--pf-skeleton-shine: var(--color-primary-100);
+	--pf-hover: var(--color-primary-200);
+	--pf-mark: var(--color-highlight-600);
+	--pf-scroll-shadow: rgba(0, 0, 0, 0.08);
+	--pf-outline-focus: var(--color-accent-500);
+	--pf-font: var(--font-sans);
+	--pf-input-height: 36px;
+	--pf-border-radius: var(--radius-sm);
+}
+
+[data-mode='dark'] {
+	--pf-text: var(--color-primary-400);
+	--pf-text-secondary: var(--color-primary-500);
+	--pf-text-muted: var(--color-primary-600);
+	--pf-background: var(--color-primary-800);
+	--pf-border: var(--color-primary-600);
+	--pf-border-focus: var(--color-primary-400);
+	--pf-skeleton: var(--color-primary-700);
+	--pf-skeleton-shine: var(--color-primary-800);
+	--pf-hover: var(--color-primary-700);
+	--pf-outline-focus: var(--color-accent-400);
+	--pf-mark: var(--color-primary-300);
+}
+
+/*
+ * Pagefind 1.5.0 fix
+ * `all: initial` on custom elements breaks font inheritance for child buttons
+ */
+pagefind-modal button,
+pagefind-searchbox button {
+	font-family: var(--pf-font) !important;
+}
+
+/* Backdrop blur when modal is open */
+dialog.pf-modal::backdrop {
+	backdrop-filter: blur(4px);
+}
+
+/** Result link colors */
+.pf-result-link {
+	--pf-text: var(--color-accent-500);
+}
+.pf-result-link:hover {
+	--pf-text: var(--color-accent-300);
+}
+[data-mode='dark'] .pf-result-link {
+	--pf-text: var(--color-accent-400);
+}
+[data-mode='dark'] .pf-result-link:hover {
+	--pf-text: var(--color-accent-300);
+}
+
+/* Sub-result link colors */
+.pf-heading-link {
+	--pf-text: var(--color-primary-600);
+}
+.pf-heading-link:hover {
+	--pf-text: var(--color-primary-500);
+}
+[data-mode='dark'] .pf-heading-link {
+	--pf-text: var(--color-primary-500);
+}
+[data-mode='dark'] .pf-heading-link:hover {
+	--pf-text: var(--color-primary-400);
+}
