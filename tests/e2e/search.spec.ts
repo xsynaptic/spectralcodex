@@ -18,8 +18,6 @@ test.describe('search', () => {
 		await expect(resultLink).toBeVisible({ timeout: 10_000 });
 
 		// The specific post appears as a result link
-		await expect(
-			page.getByRole('link', { name: 'Huadong Valley Ride 2018: Taitung City' }),
-		).toBeVisible();
+		await expect(resultLink).toHaveText(SEARCH_TERM);
 	});
 });
