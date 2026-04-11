@@ -4,8 +4,8 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 
-import '#styles/map.css';
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
+import mapCssUrl from '#styles/map-component.css?url';
 
 interface Props extends HTMLAttributes<'div'> {
 	mapComponentProps: MapComponentProps;
@@ -19,6 +19,7 @@ const mapComponentExtendedProps = {
 } satisfies MapComponentProps;
 ---
 
+<link rel="stylesheet" href={mapCssUrl} />
 <MapComponentSprites />
 <div
 	class:list={[
@@ -33,9 +34,10 @@ const mapComponentExtendedProps = {
 	<ReactMapComponent {...mapComponentExtendedProps} client:visible />
 	<div
 		class:list={[
-			'absolute z-10 flex h-full w-full justify-center',
+			'absolute flex h-full w-full justify-center',
 			'text-primary-700 dark:text-highlight-400',
 		]}
+		style={{ zIndex: 10 }}
 	>
 		<div class="loading-animation w-[20%]"></div>
 	</div>

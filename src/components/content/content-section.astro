@@ -22,16 +22,13 @@ const children = await renderSlot(Astro.slots, 'default');
 {
 	description || children ? (
 		<Container
-			class:list={[marginSmall ? 'mb-small' : 'mb-medium', className]}
+			class:list={[marginSmall ? 'mb-4' : 'mb-8', className]}
 			fillViewport={fillViewport}
 			{...props}
 		>
 			{title || subtitle || description ? (
 				<header
-					class:list={[
-						description ? undefined : 'mb-2',
-						fillViewport ? 'px-small sm:px-0' : undefined,
-					]}
+					class:list={[description ? undefined : 'mb-2', fillViewport ? 'px-4 sm:px-0' : undefined]}
 				>
 					{title ? (
 						<h2
@@ -55,7 +52,7 @@ const children = await renderSlot(Astro.slots, 'default');
 						</h3>
 					) : undefined}
 					{description ? (
-						<Prose class:list={['mb-small']}>
+						<Prose class:list={['mb-4']}>
 							<Fragment set:html={description} />
 						</Prose>
 					) : undefined}

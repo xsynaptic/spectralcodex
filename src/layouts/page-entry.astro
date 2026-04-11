@@ -53,7 +53,7 @@ const { Content } = await render(entry);
 		hideSearch={entry.data.hideSearch}
 	>
 		<ImageHero
-			class="sm:mb-small"
+			class="sm:mb-4"
 			hasHeroImage={hasHeroImage}
 			imageId={imageHeroId}
 			alt={entry.data.title}
@@ -90,7 +90,7 @@ const { Content } = await render(entry);
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<Prose class:list={['e-content', 'pb-small']} showBlocks={true} data-reading-frame>
+		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
 			<Content />
 		</Prose>
 		<ContentSectionAuthor showAuthor={false} />

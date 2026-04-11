@@ -18,9 +18,10 @@ const { class: className, parentClass, target = '#main-content', label, ...props
 	<a
 		href={target}
 		class:list={[
-			'absolute z-9999 hover:outline-2 hover:outline-current focus-visible:outline-2 focus-visible:outline-current',
+			'absolute hover:outline-2 hover:outline-current focus-visible:outline-2 focus-visible:outline-current',
 			className,
-		]}>{label}</a
+		]}
+		style={{ zIndex: 9999 }}>{label}</a
 	>
 </div>
 

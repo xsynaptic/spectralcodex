@@ -1,5 +1,6 @@
 @import '@pagefind/component-ui/css/pagefind-component-ui.css';
 
+/** Note: this CSS file does not import Tailwind but relies on variables in the global context */
 :root {
 	--pf-text: var(--color-primary-600);
 	--pf-text-secondary: var(--color-primary-500);

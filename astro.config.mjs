@@ -175,7 +175,6 @@ export default defineConfig({
 			},
 		}),
 	],
-	// Note: fallback fonts are handled in `styles/themes/fonts.css`
 	fonts: [
 		{
 			provider: fontProviders.fontsource(),

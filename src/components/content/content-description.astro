@@ -27,12 +27,7 @@ const { Content } = await render(entry);
 
 {
 	hasContent ? (
-		<Prose
-			showBlocks={true}
-			class:list={['pb-medium', className]}
-			data-pagefind-weight="2"
-			{...props}
-		>
+		<Prose showBlocks={true} class:list={['pb-8', className]} data-pagefind-weight="2" {...props}>
 			<Content />
 		</Prose>
 	) : undefined

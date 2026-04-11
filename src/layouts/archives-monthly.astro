@@ -57,7 +57,7 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 	hasHeroImage={hasHeroImage}
 >
 	<ImageHeroCarousel
-		class="sm:mb-small"
+		class="sm:mb-4"
 		hasHeroImage={hasHeroImage}
 		imageFeaturedGroup={imageFeaturedGroup}
 	>
@@ -87,7 +87,7 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 	</ImageHeroCarousel>
 	<ContentSection marginSmall={true}>
 		<ArchivesNavigation
-			class="border-b border-primary-300 pb-small dark:border-primary-700"
+			class="border-b border-primary-300 pb-4 dark:border-primary-700"
 			currentYear={archivesMonthlyItem.year}
 			currentMonth={archivesMonthlyItem.month}
 			archivesYears={archivesYears}
@@ -96,7 +96,7 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 	</ContentSection>
 	{
 		archiveRenderResult ? (
-			<Prose class:list={['pb-small']} showBlocks={true}>
+			<Prose class:list={['pb-4']} showBlocks={true}>
 				<archiveRenderResult.Content />
 			</Prose>
 		) : undefined

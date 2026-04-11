@@ -3,6 +3,9 @@
 	@apply transition-colors ease-linear;
 	cursor: pointer;
 }
+.l-all.l-active {
+	@apply font-semibold;
+}
 .l-primary {
 	@apply text-primary-800 hover:text-primary-600;
 }

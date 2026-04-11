@@ -42,6 +42,6 @@ const description = t('collection.series.description');
 	<ContentSection>
 		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
 		<MetadataGrid items={page.data} showDescription={true} />
-		<Pagination class="mt-small md:mt-medium" page={page} />
+		<Pagination class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

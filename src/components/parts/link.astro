@@ -17,6 +17,7 @@ type LinkColor = (typeof LinkColorEnum)[keyof typeof LinkColorEnum];
 
 interface Props extends HTMLAttributes<'a'> {
 	linkColor?: LinkColor | undefined;
+	isActive?: boolean | undefined;
 	showDarkMode?: boolean | undefined;
 }
 
@@ -24,6 +25,7 @@ const {
 	class: className,
 	href,
 	linkColor = LinkColorEnum.Accent,
+	isActive = false,
 	showDarkMode = true,
 	...props
 } = Astro.props;
@@ -33,6 +35,12 @@ const children = await renderSlot(Astro.slots, 'default');
 
 <a
 	href={href}
-	class:list={['l-all', `l-${linkColor}`, showDarkMode ? 'l-dark' : undefined, className]}
+	class:list={[
+		'l-all',
+		`l-${linkColor}`,
+		isActive ? 'l-active' : undefined,
+		showDarkMode ? 'l-dark' : undefined,
+		className,
+	]}
 	{...props}><Fragment set:html={children} /></a
 >

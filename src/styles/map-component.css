@@ -1,4 +1,5 @@
-@reference "./main.css";
+/** MapLibre GL vendor styles (lazy-loaded on map pages only) */
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 /** Popup */
 div.maplibregl-popup-content {
@@ -60,7 +61,6 @@ button.maplibregl-popup-close-button:focus {
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-scale,
 .maplibregl-ctrl-metrics {
-	@apply font-sans;
 	user-select: none;
 }
 
@@ -92,11 +92,11 @@ button.maplibregl-popup-close-button:focus {
 	color: var(--color-primary-500);
 }
 .maplibregl-ctrl-scale {
-	@apply border-r border-b border-l;
 	background-color: transparent;
-	border-color: var(--color-primary-400);
 	border-bottom-right-radius: var(--radius-xs);
 	border-bottom-left-radius: var(--radius-xs);
+	border-color: var(--color-primary-400);
+	border-width: 0 1px 1px;
 	color: var(--color-primary-600);
 }
 [data-mode='dark'] .maplibregl-ctrl-scale {

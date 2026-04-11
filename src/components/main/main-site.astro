@@ -1,22 +1,30 @@
 ---
 import { Font } from 'astro:assets';
-import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
-import { IPX_SERVER_URL } from 'astro:env/server';
+import { WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import '#styles/main.css';
+import { IPX_SERVER_URL } from 'astro:env/server';
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaProps } from '#components/types.ts';
 import type { Thing } from '#lib/utils/structured-data.ts';
 
-import MainFooter from '#components/main/main-footer.astro';
-import MainHeader from '#components/main/main-header.astro';
-import MainMeta from '#components/main/main-meta.astro';
-import ModeManager from '#components/main/main-mode-manager.astro';
+import FooterColophon from '#components/main/main-footer-colophon.astro';
+import FooterMenu from '#components/main/main-footer-menu.astro';
+import HeaderMenu from '#components/main/main-header-menu.astro';
+import HeaderModeToggle from '#components/main/main-header-mode-toggle.astro';
+import HeaderSearch from '#components/main/main-header-search.astro';
+import HeaderSkipLink from '#components/main/main-header-skip-link.astro';
 import ProgressLoading from '#components/main/main-progress-loading.astro';
 import ProgressReading from '#components/main/main-progress-reading.astro';
-import MainSprites from '#components/main/main-sprites.astro';
-import UmamiAnalytics from '#components/main/main-umami-analytics.astro';
+import SiteAnalytics from '#components/main/main-site-analytics.astro';
+import SiteMeta from '#components/main/main-site-meta.astro';
+import SiteModeManager from '#components/main/main-site-mode-manager.astro';
+import SiteStyles from '#components/main/main-site-stylesheet.astro';
+import Sprites from '#components/main/main-sprites.astro';
+import Container from '#components/parts/container.astro';
+import Link from '#components/parts/link.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/structured-data.ts';
 
@@ -28,6 +36,10 @@ interface Props {
 }
 
 const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
+
+const siteUrl = getSiteUrl();
+
+const t = getTranslations();
 ---
 
 <!doctype html>
@@ -48,45 +60,114 @@ const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 			media="(prefers-color-scheme: dark)"
 		/>
 		<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
-		<MainMeta {...meta} />
+		<SiteStyles />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
-		<ModeManager defaultMode="auto" />
-		<UmamiAnalytics
-			siteId={UMAMI_ID}
-			domain={UMAMI_DOMAIN}
-			isProduction={import.meta.env.PROD}
-			isViewTransitionsEnabled={true}
-		/>
+		<SiteModeManager defaultMode="auto" />
+		<SiteMeta {...meta} />
+		<SiteAnalytics isViewTransitionsEnabled={true} />
 		<ClientRouter />
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title={t('site.title')}
+			href={`${getSiteUrl()}rss.xml`}
+		/>
+		<link rel="sitemap" href={`${getSiteUrl()}sitemap-index.xml`} />
+		{
+			WEBMENTION_DOMAIN ? (
+				<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
+			) : undefined
+		}
 	</head>
 	<body
 		class:list={[
 			'bg-primary-100 text-primary-700 dark:bg-primary-800 dark:text-primary-400',
-			'flex min-h-screen min-w-[350px] flex-col overscroll-contain transition-colors',
+			'visible flex min-h-screen min-w-[350px] flex-col overflow-visible overscroll-contain transition-colors',
 		]}
 	>
-		<MainSprites />
-		<MainHeader hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
-		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
-			<slot />
-		</main>
-		<MainFooter />
+		<Sprites />
 		<ProgressLoading
 			class:list={[
-				'z-99 rounded-br-md shadow-lg shadow-current',
+				'rounded-br-md shadow-lg shadow-current',
 				'bg-linear-to-r from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800',
 			]}
 			height="2.5px"
+			style={{ zIndex: '99' }}
 		/>
 		<ProgressReading
 			class:list={[
-				'z-98 rounded-br-md shadow-lg shadow-current',
+				'rounded-br-md shadow-lg shadow-current',
 				'bg-linear-to-r from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800',
 			]}
 			height="2.5px"
+			style={{ zIndex: 98 }}
 		/>
+		<header
+			class:list={[
+				'transition-colors',
+				hasHeroImage
+					? 'bg-header-fade sm:absolute sm:top-0 sm:right-0 sm:left-0'
+					: 'bg-primary-100 dark:bg-primary-800',
+			]}
+			style={{ zIndex: 40 }}
+		>
+			<HeaderSkipLink
+				class:list={[
+					'rounded-br-sm px-4 py-1 uppercase transition-colors',
+					'bg-primary-50 text-accent-500 hover:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300',
+				]}
+				target="#main-content"
+				label={t('site.skip.label')}
+			/>
+			<Container
+				as="div"
+				class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"
+				>{
+					isHomepage ? (
+						<h1 class="flex grow items-center gap-1">
+							<Link
+								href={siteUrl}
+								class="text-xl font-semibold md:text-2xl lg:text-3xl"
+								linkColor="primary"
+							>
+								{t('site.title')}
+							</Link>
+						</h1>
+					) : (
+						<h2 class="flex grow items-center gap-1">
+							<Link
+								href={siteUrl}
+								class="text-xl font-semibold md:text-2xl lg:text-3xl"
+								linkColor="primary"
+							>
+								{t('site.title')}
+							</Link>
+						</h2>
+					)
+				}
+				<HeaderSearch />
+				<HeaderModeToggle />
+			</Container>
+			<Container class="w-full overflow-x-clip" fillViewport={true}>
+				<HeaderMenu hasHeroImage={hasHeroImage} />
+			</Container>
+		</header>
+		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
+			<slot />
+		</main>
+		<Container as="footer" class="mt-8 mb-8 w-full pt-4">
+			<div
+				class:list={[
+					'border-t pt-4 pb-8',
+					'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
+				]}
+			>
+				<FooterMenu />
+				<FooterColophon />
+			</div>
+		</Container>
 		{
 			schemas && schemas.length > 0 ? (
 				<script type="application/ld+json" is:inline set:html={serializeGraph(schemas)} />

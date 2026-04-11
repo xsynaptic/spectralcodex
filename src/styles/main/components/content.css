@@ -1,6 +1,6 @@
 /* Content block styling; images are labelled "not-prose" but require extra rules */
 .content-blocks > *:not(.content-image):not(.content-img-group) {
-	@apply mx-auto max-w-content px-small md:px-medium;
+	@apply mx-auto max-w-content px-4 md:px-8;
 }
 .content-blocks > .content-image,
 .content-blocks > .content-image + p {

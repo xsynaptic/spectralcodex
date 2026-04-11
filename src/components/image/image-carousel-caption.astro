@@ -29,10 +29,11 @@ const t = getTranslations();
 		<div
 			class:list={[
 				'bg-featured-b',
-				'pointer-events-none absolute right-0 bottom-0 left-0 z-31 mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
+				'pointer-events-none absolute right-0 bottom-0 left-0 mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
 				// Note: the min-height spreads the background gradient
 				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
 			]}
+			style={{ zIndex: 31 }}
 			data-pagefind-ignore
 			{...props}
 		>
@@ -40,10 +41,8 @@ const t = getTranslations();
 				class:list={[
 					'text-primary-300',
 					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm',
-					isHero && !withTitle ? 'md:px-medium' : undefined,
-					withTitle
-						? 'w-full px-small sm:max-w-[70%] sm:pr-small sm:pl-0 md:pr-medium'
-						: 'px-small',
+					isHero && !withTitle ? 'md:px-8' : undefined,
+					withTitle ? 'w-full px-4 sm:max-w-[70%] sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
 				]}
 			>
 				<span class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}>

@@ -1,13 +1,11 @@
 ---
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
 import { SEO } from 'astro-seo';
-import { WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import type { MetaProps } from '#components/types.ts';
 
 import { OPEN_GRAPH_IMAGE_DENSITY, OPEN_GRAPH_TWITTER_USERNAME } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeAltAttribute, sanitizeDescription } from '#lib/utils/text.ts';
 
@@ -97,15 +95,3 @@ const openGraphImage = generateOpenGraphImageUrl({
 	{...noIndex ? { noindex: noIndex } : {}}
 	{...noFollow ? { nofollow: noFollow } : {}}
 />
-<link
-	rel="alternate"
-	type="application/rss+xml"
-	title={siteTitle}
-	href={`${getSiteUrl()}rss.xml`}
-/>
-<link rel="sitemap" href={`${getSiteUrl()}sitemap-index.xml`} />
-{
-	WEBMENTION_DOMAIN ? (
-		<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
-	) : undefined
-}

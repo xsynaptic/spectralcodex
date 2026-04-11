@@ -1,33 +1,39 @@
 @import 'tailwindcss' source(none);
 
-/** 
+/**
  * Tailwind usually scans everything for class names
  * For performance reasons we're explicitly naming paths and file types here:
  * 1) CSS files, for which we need to check @apply rules and CSS variable names
  * 2) Astro files
  * 3) React component files
  */
-@source './**/*.css';
+@source './main/**/*.css';
 @source '../**/*.astro';
 @source '../../packages/react-map-component/src/**/*.tsx';
 
+/** Enable dark mode with a custom selector */
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
+/* Custom spacing */
+@theme {
+	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
+	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
+}
+
 /** Theme styling */
-@import './theme/config.css';
-@import './theme/colors.css';
-@import './theme/fonts.css';
-@import './theme/typography.css';
+@import './main/theme/colors.css';
+@import './main/theme/fonts.css';
 
 /** Component styling */
-@import './components/carousel.css';
-@import './components/links.css';
-@import './components/loading.css';
-@import './components/nav-menu.css';
-@import './components/image-metadata.css';
+@import './main/components/carousel.css';
+@import './main/components/content.css';
+@import './main/components/links.css';
+@import './main/components/nav-menu.css';
+@import './main/components/image-metadata.css';
+@import './main/components/prose.css';
 
 /** Bits and pieces */
-@import './parts/background.css';
-@import './parts/content.css';
-@import './parts/i18n.css';
-@import './parts/pagefind.css';
-@import './parts/prose.css';
-@import './parts/various.css';
+@import './main/parts/background.css';
+@import './main/parts/i18n.css';
+@import './main/parts/loading.css';
+@import './main/parts/various.css';

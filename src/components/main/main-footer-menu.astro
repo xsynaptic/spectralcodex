@@ -15,14 +15,14 @@ const { pathname } = Astro.url;
 const t = getTranslations();
 ---
 
-<nav class="pb-small text-sm" aria-label={t('site.menu.footer.label')} data-nosnippet {...props}>
+<nav class="pb-4 text-sm" aria-label={t('site.menu.footer.label')} data-nosnippet {...props}>
 	<ul class="flex flex-wrap gap-x-4 gap-y-2">
 		{
 			menuFooterItems.map((item) => (
 				<li class="text-xs font-medium sm:text-sm">
 					<Link
 						linkColor="primary"
-						class:list={[isActiveMenuItem(item, pathname) ? 'font-semibold' : undefined]}
+						class:list={[isActiveMenuItem(item, pathname) ? 'l-active' : undefined]}
 						href={item.url}
 						{...(item.rel ? { rel: item.rel } : undefined)}
 					>

@@ -37,6 +37,8 @@ const resultTemplate = `<script type="text/pagefind-template">
 </li>
 <\/script>`;
 /* eslint-enable no-useless-escape */
+
+/** Note: the styles at the bottom before web component JS loads */
 ---
 
 <script>
@@ -76,3 +78,10 @@ const resultTemplate = `<script type="text/pagefind-template">
 		<pagefind-keyboard-hints></pagefind-keyboard-hints>
 	</pagefind-modal-footer>
 </pagefind-modal>
+
+<style>
+	pagefind-modal-trigger:not(:defined),
+	pagefind-modal:not(:defined) {
+		display: none;
+	}
+</style>

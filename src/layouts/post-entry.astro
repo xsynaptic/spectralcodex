@@ -78,7 +78,7 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 		hideSearch={entry.data.hideSearch}
 	>
 		<ImageHero
-			class="sm:mb-small"
+			class="sm:mb-4"
 			hasHeroImage={hasHeroImage}
 			imageId={imageHeroId}
 			alt={entry.data.title}
@@ -118,7 +118,7 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<Prose class:list={['e-content', 'pb-small']} showBlocks={true} data-reading-frame>
+		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
 			<Content />
 		</Prose>
 		<ContentSectionLinks entry={entry} />

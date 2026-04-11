@@ -64,9 +64,10 @@ const { imageProps, placeholderProps } = await getImageProps(imageId, alt, index
 		<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
 			<Image
 				class:list={[
-					'z-10 max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
-					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-16/9 xl:aspect-auto',
+					'max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
+					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
 				]}
+				style={{ zIndex: 10 }}
 				{...imageProps}
 			/>
 			{captionMetadata ? (

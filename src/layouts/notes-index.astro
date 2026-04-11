@@ -59,10 +59,7 @@ const description = t('collection.notes.description');
 
 					return (
 						<div>
-							<ContentExcerpt
-								entryUrl={getContentUrl(entry.collection, entry.id)}
-								class="mb-medium"
-							>
+							<ContentExcerpt entryUrl={getContentUrl(entry.collection, entry.id)} class="mb-8">
 								<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
 								<Fragment slot="excerpt-subtitle">
 									<DividedItem>
@@ -82,7 +79,7 @@ const description = t('collection.notes.description');
 							</ContentExcerpt>
 							{index + 1 < page.data.length ? (
 								<Container as="div">
-									<hr class="mb-medium text-primary-200 dark:text-primary-700" />
+									<hr class="mb-8 text-primary-200 dark:text-primary-700" />
 								</Container>
 							) : undefined}
 						</div>
@@ -91,6 +88,6 @@ const description = t('collection.notes.description');
 			: undefined
 	}
 	<ContentSection>
-		<Pagination class="mt-small md:mt-medium" page={page} />
+		<Pagination class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

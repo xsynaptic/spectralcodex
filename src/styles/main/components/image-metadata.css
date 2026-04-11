@@ -74,7 +74,7 @@
 
 /* EXIF data grid */
 .i-meta-grid {
-	@apply gap-1 bg-primary-50/75 px-small py-2 backdrop-grayscale dark:bg-primary-800/75;
+	@apply gap-1 bg-primary-50/75 px-4 py-2 backdrop-grayscale dark:bg-primary-800/75;
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	max-height: 100%;

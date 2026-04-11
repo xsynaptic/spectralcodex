@@ -1,5 +1,0 @@
-/** Pagefind: prevent layout shift before web component JS loads */
-pagefind-modal-trigger:not(:defined),
-pagefind-modal:not(:defined) {
-	display: none;
-}

@@ -38,7 +38,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 						<Prose showCompact={true}>
 							<Content />
 						</Prose>
-						<ListColumn class="mt-small font-serif text-xs md:text-sm">
+						<ListColumn class="mt-4 font-serif text-xs md:text-sm">
 							{metadataItems.map(({ url, title, titleMultilingual }) => (
 								<ListColumnItem>
 									<Link href={url}>{title}</Link>

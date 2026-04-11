@@ -57,8 +57,8 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 				const imageFeaturedGroup = getArchivesImageFeaturedGroup(monthlyData);
 
 				return (
-					<Container class="mb-medium" fillViewport={true}>
-						<div class="flex flex-col gap-2 px-small text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+					<Container class="mb-8" fillViewport={true}>
+						<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
 								<Link
 									href={getSiteUrl('archives', monthlyData.year, monthlyData.month)}
@@ -86,7 +86,7 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 							</div>
 						</div>
 						{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-							<ImageCarousel class="mt-small" imageFeaturedGroup={imageFeaturedGroup} />
+							<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
 						) : undefined}
 					</Container>
 				);

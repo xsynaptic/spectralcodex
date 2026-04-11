@@ -64,3 +64,68 @@
 	--tw-prose-invert-th-borders: var(--color-primary-600);
 	--tw-prose-invert-td-borders: var(--color-primary-700);
 }
+
+.prose-x {
+	@apply prose prose-base max-w-none font-serif prose-primary lg:prose-lg prose-h2:mb-4 prose-a:text-accent-500 prose-a:decoration-accent-200 prose-a:underline-offset-2 prose-a:transition-colors prose-a:duration-150 prose-a:ease-in prose-a:hover:text-accent-300 prose-a:hover:decoration-accent-100;
+}
+.prose-x.prose-dark {
+	@apply dark:prose-invert dark:prose-a:text-accent-300 dark:prose-a:decoration-accent-500 dark:prose-a:hover:text-accent-200 dark:prose-a:hover:decoration-accent-400;
+}
+.prose-x.prose-compact {
+	@apply prose-sm lg:prose-base;
+}
+
+/* Note: the text shadow should match the background for the page */
+.prose-x a {
+	text-shadow:
+		1px 1px 0 var(--color-primary-100),
+		-1px 1px 0 var(--color-primary-100),
+		2px 0 1px var(--color-primary-100),
+		-2px 0 1px var(--color-primary-100);
+}
+[data-mode='dark'] .prose-x a {
+	text-shadow:
+		1px 1px 0 var(--color-primary-800),
+		-1px 1px 0 var(--color-primary-800),
+		2px 0 1px var(--color-primary-800),
+		-2px 0 1px var(--color-primary-800);
+}
+
+/* Footnotes */
+.prose-x > .footnotes ol {
+	@apply text-sm leading-6;
+}
+.prose-x > .footnotes ol li::marker {
+	@apply text-xs;
+	font-style: italic;
+	margin-top: -5px;
+}
+.prose-x .footnotes li p {
+	margin: 0;
+}
+.prose-x [data-footnote-ref]::before,
+.prose-x [data-footnote-ref]::after {
+	@apply font-light;
+	color: var(--color-accent-300);
+}
+[data-mode='dark'] .prose-x [data-footnote-ref]::before,
+[data-mode='dark'] .prose-x [data-footnote-ref]::after {
+	color: var(--color-accent-400);
+}
+.prose-x [data-footnote-ref]::before {
+	content: '[';
+	margin-inline-start: 1px;
+}
+.prose-x [data-footnote-ref]::after {
+	content: ']';
+}
+.prose-x [data-footnote-ref],
+.prose-x [data-footnote-backref] {
+	@apply font-medium select-none;
+	text-decoration-line: none;
+}
+
+/** Inserted by remark-rehype for use with the footnotes label */
+.sr-only {
+	@apply sr-only;
+}

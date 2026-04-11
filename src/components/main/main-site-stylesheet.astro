@@ -1,0 +1,20 @@
+---
+/**
+ * We use this to hide the body until the page is loaded to prevent a flash of unstyled content
+ * It is a brute force method but seems effective enough for our purposes
+ * Note: the background colors match Tailwind colors applied to the body element
+ */
+---
+
+<style is:inline>
+	@layer base {
+		body {
+			background-color: oklch(96.7% 0.001 286.375);
+			overflow: hidden;
+			visibility: hidden;
+		}
+		[data-mode='dark'] body {
+			background-color: oklch(27.4% 0.006 286.033);
+		}
+	}
+</style>

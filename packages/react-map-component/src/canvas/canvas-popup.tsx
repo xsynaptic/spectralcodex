@@ -287,7 +287,7 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 			style={{ visibility: popupVisible ? 'visible' : 'hidden' }}
 		>
 			<div className="relative flex flex-col" style={{ minWidth: '200px', minHeight: '80px' }}>
-				<div className="pointer-events-none absolute flex h-full w-full justify-center p-small">
+				<div className="pointer-events-none absolute flex h-full w-full justify-center p-4">
 					<div
 						className="loading-animation transition-opacity duration-500"
 						style={{ maxWidth: '100%', opacity: isPopupDataLoading ? 1 : 0 }}

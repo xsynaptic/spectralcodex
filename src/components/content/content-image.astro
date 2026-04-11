@@ -118,13 +118,12 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 		) : (
 			<figure
 				class:list={[
-					'@container', // Used by image metadata
-					'content-image', // Custom CSS styles defined in src/styles/content.css
+					'content-image',
 					'not-prose',
 					layout === ImageLayoutEnum.Default
-						? 'mx-auto mb-2 max-w-content sm:px-small md:mb-4 md:px-medium'
+						? 'mx-auto mb-2 max-w-content sm:px-4 md:mb-4 md:px-8'
 						: undefined,
-					layout === ImageLayoutEnum.Wide ? 'mb-2 w-full sm:px-small md:px-medium' : undefined,
+					layout === ImageLayoutEnum.Wide ? 'mb-2 w-full sm:px-4 md:px-8' : undefined,
 					layout === ImageLayoutEnum.Full ? 'mb-2 w-full' : undefined,
 				]}
 				{...props}
@@ -150,8 +149,8 @@ const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
 							'py-1 text-sm leading-6',
 							'text-primary-500 dark:text-primary-400',
 							layout === ImageLayoutEnum.Full
-								? 'mx-auto max-w-content px-small md:px-medium'
-								: 'px-small sm:px-0',
+								? 'mx-auto max-w-content px-4 md:px-8'
+								: 'px-4 sm:px-0',
 						]}
 					>
 						<Fragment set:html={caption} />

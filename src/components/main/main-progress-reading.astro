@@ -1,13 +1,15 @@
 ---
-interface Props {
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
 	height?: string | undefined;
 }
 
-const { class: className, height = '1px', ...props } = Astro.props;
+const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ---
 
-<progress-reading class:list={[className]} style={{ height }} {...props}></progress-reading>
+<progress-reading class={className} style={{ height, ...style }} {...props}></progress-reading>
 
 <script>
 	import '#lib/components/progress-reading.ts';
