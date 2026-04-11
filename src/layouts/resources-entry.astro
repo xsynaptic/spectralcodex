@@ -5,6 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentArticle from '#components/content/content-article.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSectionLinks from '#components/content/content-section-links.astro';
@@ -18,7 +19,7 @@ import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber, stripDiacritics } from '#lib/utils/text.ts';
 
@@ -34,6 +35,8 @@ const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'titl
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
+
+const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
 const t = getTranslations();
 ---
@@ -51,7 +54,7 @@ const t = getTranslations();
 		prefetchUrls: mapData.prefetchUrls,
 	}}
 >
-	<article {...getPagefindBodyProp(page.currentPage !== 1)}>
+	<ContentArticle imageId={imageFeaturedId} hideSearch={page.currentPage !== 1}>
 		<ContentHeader>
 			<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 			<Fragment slot="header-title-multilingual">
@@ -96,5 +99,5 @@ const t = getTranslations();
 		<ContentSectionThemes themeIds={themeIds} />
 		<ContentSectionMap mapData={mapData} />
 		<ContentSectionMetadataGrid page={page} />
-	</article>
+	</ContentArticle>
 </MainSite>

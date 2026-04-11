@@ -6,6 +6,7 @@ import { render } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -25,10 +26,9 @@ import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedHeroId, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { stripDiacritics } from '#lib/utils/text.ts';
 
@@ -46,6 +46,7 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const imageHeroId = getImageFeaturedHeroId(entry.data.imageFeatured);
+const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
 const hasHeroImage = !!imageHeroId;
 
@@ -71,7 +72,11 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 	schemas={getPostSchema(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
 	hasHeroImage={hasHeroImage}
 >
-	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<ContentArticle
+		class={MicroformatClassNames.Entry}
+		imageId={imageFeaturedId}
+		hideSearch={entry.data.hideSearch}
+	>
 		<ImageHero
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}
@@ -125,5 +130,5 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 		<ContentSectionMap mapData={mapData} />
 		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
 		<ContentSectionAuthor showAuthor={false} />
-	</article>
+	</ContentArticle>
 </MainSite>

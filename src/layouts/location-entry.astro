@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
@@ -37,7 +38,6 @@ import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { stripDiacritics } from '#lib/utils/text.ts';
 
@@ -82,7 +82,11 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	hasHeroImage={hasHeroImage}
 >
-	<article class={MicroformatClassNames.Entry} {...getPagefindBodyProp(entry.data.hideSearch)}>
+	<ContentArticle
+		class={MicroformatClassNames.Entry}
+		imageId={imageFeaturedId}
+		hideSearch={entry.data.hideSearch}
+	>
 		<ImageHero
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}
@@ -169,5 +173,5 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<LocationsNearbyList entry={entry} limit={12} />
 		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
 		<ContentSectionAuthor showAuthor={false} />
-	</article>
+	</ContentArticle>
 </MainSite>

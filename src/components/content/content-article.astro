@@ -1,0 +1,61 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+
+import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
+
+interface Props extends HTMLAttributes<'article'> {
+	imageId: string | undefined;
+	hideSearch?: boolean | undefined;
+}
+
+const { imageId, hideSearch, ...props } = Astro.props;
+
+const SEARCH_THUMBNAIL_WIDTH = 64;
+const SEARCH_THUMBNAIL_WIDTH_2X = SEARCH_THUMBNAIL_WIDTH * 2;
+
+async function getThumbnailUrls() {
+	if (!imageId) return;
+
+	const getImageById = await getImageByIdFunction();
+	const imageEntry = getImageById(imageId);
+
+	if (!imageEntry) return;
+
+	const getIpxImageUrl = createIpxImageUrlFunction({
+		imageQuality: IMAGE_QUALITY,
+		imageFormat: IMAGE_FORMAT,
+		serverSecret: IPX_SERVER_SECRET,
+		serverUrl: IPX_SERVER_URL,
+	});
+
+	const dimensions = {
+		sourceWidth: imageEntry.data.width,
+		sourceHeight: imageEntry.data.height,
+	};
+
+	return {
+		url1x: getIpxImageUrl(imageId, { width: SEARCH_THUMBNAIL_WIDTH, ...dimensions }),
+		url2x: getIpxImageUrl(imageId, { width: SEARCH_THUMBNAIL_WIDTH_2X, ...dimensions }),
+	};
+}
+
+const thumbnails = await getThumbnailUrls();
+---
+
+<article {...props} {...hideSearch ? {} : { 'data-pagefind-body': '' }}>
+	<slot />
+	{
+		thumbnails ? (
+			<>
+				<meta data-pagefind-meta="image[content]" content={thumbnails.url1x} />
+				<meta data-pagefind-meta="image_2x[content]" content={thumbnails.url2x} />
+			</>
+		) : (
+			<meta data-pagefind-meta="image[content]" content="" />
+		)
+	}
+</article>

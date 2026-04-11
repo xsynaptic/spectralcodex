@@ -5,6 +5,38 @@ import pagefindCssUrl from '#styles/pagefind-component.css?url';
 const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
 
 const t = getTranslations();
+
+// Custom Pagefind result template (extends default with srcset for retina thumbnails)
+// Uses Pagefind's template syntax: https://pagefind.app/docs/components/results/
+/* eslint-disable no-useless-escape */
+const resultTemplate = `<script type="text/pagefind-template">
+<li class="pf-result">
+	<div class="pf-result-card">
+		{{#if options.show_images}}
+		<div class="pf-result-image">
+			{{#if meta.image}}<img src="{{ meta.image | resolveUrl(meta.url | default(url)) }}" {{#if meta.image_2x}}srcset="{{ meta.image | resolveUrl(meta.url | default(url)) }} 1x, {{ meta.image_2x | resolveUrl(meta.url | default(url)) }} 2x"{{/if}} alt="{{ meta.image_alt | default(meta.title) }}">{{/if}}
+		</div>
+		{{/if}}
+		<div class="pf-result-content">
+			<p class="pf-result-title">
+				<a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}</a>
+			</p>
+			{{#if excerpt}}<p class="pf-result-excerpt">{{+ excerpt +}}</p>{{/if}}
+		</div>
+	</div>
+	{{#if sub_results}}
+	<ul class="pf-heading-chips">
+		{{#each sub_results as sub}}
+		<li class="pf-heading-chip">
+			<a class="pf-heading-link" href="{{ sub.url | safeUrl }}">{{ sub.title }}</a>
+			<p class="pf-heading-excerpt">{{+ sub.excerpt +}}</p>
+		</li>
+		{{/each}}
+	</ul>
+	{{/if}}
+</li>
+<\/script>`;
+/* eslint-enable no-useless-escape */
 ---
 
 <script>
@@ -38,7 +70,7 @@ const t = getTranslations();
 	</pagefind-modal-header>
 	<pagefind-modal-body>
 		<pagefind-summary></pagefind-summary>
-		<pagefind-results max-sub-results="3"></pagefind-results>
+		<pagefind-results max-sub-results="3" show-images={true} set:html={resultTemplate} />
 	</pagefind-modal-body>
 	<pagefind-modal-footer>
 		<pagefind-keyboard-hints></pagefind-keyboard-hints>

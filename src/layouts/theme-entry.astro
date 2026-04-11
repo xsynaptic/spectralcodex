@@ -5,6 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -20,9 +21,8 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedGroup } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
-import { getPagefindBodyProp } from '#lib/utils/pagefind.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { stripDiacritics } from '#lib/utils/text.ts';
 
@@ -50,6 +50,8 @@ const imageFeaturedGroup = getImageFeaturedGroup({
 	contentMetadataIndex,
 });
 
+const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
@@ -68,7 +70,10 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<article {...getPagefindBodyProp(!!entry.data.hideSearch || page.currentPage !== 1)}>
+	<ContentArticle
+		imageId={imageFeaturedId}
+		hideSearch={!!entry.data.hideSearch || page.currentPage !== 1}
+	>
 		<ImageHeroCarousel
 			class="sm:mb-small"
 			hasHeroImage={hasHeroImage}
@@ -98,5 +103,5 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				<ContentSectionMetadataList items={metadataItems} count={metadataItemsCount} />
 			) : undefined
 		}
-	</article>
+	</ContentArticle>
 </MainSite>
