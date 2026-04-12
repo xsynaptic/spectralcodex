@@ -1,4 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
+
+function getServerSnapshot() {
+	return false;
+}
+
+function buildMediaQuery(above?: string, below?: string, query?: string): string {
+	if (above) return `(min-width: ${above})`;
+	if (below) return `(max-width: ${below})`;
+	return query ?? '';
+}
 
 // A flexible custom hook to handle media queries
 // This allows for different operations depending on the width of the viewport
@@ -12,37 +22,24 @@ export function useMediaQuery({
 	below?: string;
 	query?: string;
 }): boolean {
-	const mediaQuery = useMemo(() => {
-		if (above) {
-			return `(min-width: ${above})`;
-		}
-		if (below) {
-			return `(max-width: ${below})`;
-		}
-		return query ?? '';
-	}, [above, below, query]);
+	const mediaQuery = buildMediaQuery(above, below, query);
 
-	const [matches, setMatches] = useState(false);
-
-	useEffect(
-		function handleWindowChange() {
-			const handleChange = () => {
-				setMatches(globalThis.matchMedia(mediaQuery).matches);
-			};
-
+	const subscribe = useCallback(
+		(callback: () => void) => {
 			const matchMedia = globalThis.window.matchMedia(mediaQuery);
 
-			// Triggered at the first client-side load and if query changes
-			handleChange();
-
-			matchMedia.addEventListener('change', handleChange);
+			matchMedia.addEventListener('change', callback);
 
 			return () => {
-				matchMedia.removeEventListener('change', handleChange);
+				matchMedia.removeEventListener('change', callback);
 			};
 		},
 		[mediaQuery],
 	);
 
-	return matches;
+	const getSnapshot = useCallback(() => {
+		return globalThis.matchMedia(mediaQuery).matches;
+	}, [mediaQuery]);
+
+	return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
