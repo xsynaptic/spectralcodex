@@ -49,7 +49,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### Search & Discovery
 
-- Integrated [Pagefind](https://pagefind.app/) via [astro-pagefind](https://github.com/shishkin/astro-pagefind) for client-side full-text search across all content
+- Client-side full-text search via [Pagefind](https://pagefind.app/) with a modal interface, keyboard shortcuts, and retina-ready thumbnails
 - Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
 - Hierarchical navigation through regions, themes, and series
 
