@@ -44,7 +44,8 @@
 
 /* Metadata panel (slides in from the bottom on focus) */
 .i-meta-panel {
-	@apply translate-x-full font-sans transition-[opacity,translate];
+	@apply translate-x-full transition-[opacity,translate];
+	font-family: var(--font-sans);
 	pointer-events: none;
 	position: absolute;
 	inset: 0;
