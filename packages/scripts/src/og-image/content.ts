@@ -6,6 +6,7 @@ import {
 	ThemesSchema,
 	ContentCollectionsEnum,
 } from '@spectralcodex/shared/schemas';
+import { stripDiacritics } from '@spectralcodex/shared/text';
 import { z } from 'zod';
 
 import type { DataStoreEntry, RegionParentMap } from '../shared/data-store.js';
@@ -17,11 +18,6 @@ import {
 	getPublicId,
 	loadDataStore,
 } from '../shared/data-store.js';
-
-/** Strip combining diacritical marks for display font compatibility (e.g. "Shoka" from "Shōka") */
-function stripDiacritics(input: string): string {
-	return input.normalize('NFD').replaceAll(/[\u0300-\u036F]/g, '');
-}
 
 /** Deterministically pick an item from an array based on a string ID */
 function pickFrom<T = string>(id: string, options: Array<T>): T {

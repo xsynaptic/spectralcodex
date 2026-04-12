@@ -10,12 +10,12 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
-import { getContentEntries } from 'packages/scripts/src/og-image/content.js';
 import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';
 
 import { safelyCreateDirectory } from '../shared/utils.js';
+import { getContentEntries } from './content.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 

@@ -3,6 +3,8 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
+import { stripDiacritics } from '@spectralcodex/shared/text';
+
 import type { RegionsOption } from '#lib/collections/regions/regions-options.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
@@ -27,7 +29,6 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
-import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'regions'>;

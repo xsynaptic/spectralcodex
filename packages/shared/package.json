@@ -9,7 +9,8 @@
 		"./cache/sqlite": "./src/cache/sqlite.ts",
 		"./constants": "./src/constants.ts",
 		"./map": "./src/map/index.ts",
-		"./schemas": "./src/schemas/index.ts"
+		"./schemas": "./src/schemas/index.ts",
+		"./text": "./src/text.ts"
 	},
 	"private": true,
 	"dependencies": {

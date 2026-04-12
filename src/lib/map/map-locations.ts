@@ -6,6 +6,7 @@ import type {
 import type { CollectionEntry } from 'astro:content';
 import type { FeatureCollection, Position } from 'geojson';
 
+import { hashShort } from '@spectralcodex/shared/cache';
 import {
 	GeometryTypeEnum,
 	LocationCategoryNumericMapping,
@@ -13,14 +14,13 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeysCompressed,
 } from '@spectralcodex/shared/map';
+import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
-import { hashShort } from 'packages/shared/src/cache';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
-import { stripDiacritics } from '#lib/utils/text.ts';
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
 	const truncatedCoordinates = coordinates

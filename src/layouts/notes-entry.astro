@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
+import { stripDiacritics } from '@spectralcodex/shared/text';
 import { render } from 'astro:content';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
@@ -23,7 +24,6 @@ import { getImageFeaturedHeroId, getImageFeaturedId } from '#lib/image/image-fea
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
-import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'notes'>;

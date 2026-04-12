@@ -2,6 +2,8 @@
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
+import { stripDiacritics } from '@spectralcodex/shared/text';
+
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
@@ -39,7 +41,6 @@ import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
-import { stripDiacritics } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;

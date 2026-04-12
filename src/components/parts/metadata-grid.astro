@@ -1,4 +1,5 @@
 ---
+import { stripDiacritics } from '@spectralcodex/shared/text';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
 import type { MetadataGridOptions } from '#components/types.ts';
@@ -14,7 +15,7 @@ import { createRegionAncestorsByIdFunction } from '#lib/collections/regions/regi
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { formatNumber, stripDiacritics } from '#lib/utils/text.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props extends MetadataGridOptions {
 	class?: string | undefined;
