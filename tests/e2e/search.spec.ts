@@ -6,7 +6,7 @@ test.describe('search', () => {
 	test('Pagefind returns results for a known post', async ({ page }) => {
 		await page.goto('/');
 
-		const trigger = page.locator('pagefind-modal-trigger button');
+		const trigger = page.locator('search-toggle button');
 		await expect(trigger).toBeVisible();
 		await trigger.click();
 
