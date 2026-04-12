@@ -293,6 +293,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	};
 }
 
+/**
+ * A note about cluster properties:
+ * MapLibre's setClusterOptions API only accepts cluster, clusterRadius, and clusterMaxZoom as options
+ * We can't set clusterProperties after initialization of a source; changing them requires a complete teardown
+ * Only add cluster properties derived from values that never change
+ */
 export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
 	interactive: boolean;
