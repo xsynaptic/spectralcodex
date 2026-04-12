@@ -13,12 +13,7 @@ import {
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
-import {
-	DateStringSchema,
-	DescriptionSchema,
-	NumericScaleSchema,
-	TitleSchema,
-} from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
@@ -31,7 +26,7 @@ export const locations = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			description: DescriptionSchema,
+			description: z.string().optional(),
 			layer: z.enum(LocationLayerEnum).default(LocationLayerEnum.Neutral),
 			category: z.enum(LocationCategoryEnum),
 			status: z.enum(LocationStatusEnum),

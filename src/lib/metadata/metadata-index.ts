@@ -20,6 +20,7 @@ import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { getDescription } from '#lib/utils/text.ts';
 import { getWordCount } from '#lib/utils/word-count.ts';
 
 // Simple in-memory cache
@@ -118,7 +119,7 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 				id: entry.id,
 				title: entry.data.title,
 				titleMultilingual,
-				description: entry.data.description,
+				description: getDescription(entry),
 				url: getContentUrl(entry.collection, getPublicId(entry)),
 				imageId:
 					'imageFeatured' in entry.data

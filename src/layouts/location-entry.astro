@@ -41,6 +41,7 @@ import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getDescription } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -73,7 +74,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		description: entry.data.description,
+		description: getDescription(entry),
 		image: await getSeoImageProps({
 			id: getPublicId(entry),
 			alt: entry.data.title,

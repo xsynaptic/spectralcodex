@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { hashShort } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
-import { transformMarkdown } from '@xsynaptic/unified-tools';
+import { sanitizeHtml, transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
@@ -16,6 +16,7 @@ import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { getDescription } from '#lib/utils/text.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
@@ -128,11 +129,13 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 }
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
+	const description = getDescription(entry);
+
 	const locationMapDataHash = hashShort({
 		data: {
 			id: entry.id,
 			title: entry.data.title,
-			description: entry.data.description,
+			description,
 			links: entry.data.links,
 		},
 	});
@@ -142,12 +145,17 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
+	if (!description) return;
+
 	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
 
 	if (cachedDescriptionHtml) {
 		entry.data._descriptionHtml = cachedDescriptionHtml;
 	} else {
-		entry.data._descriptionHtml = transformMarkdown({ input: entry.data.description });
+		entry.data._descriptionHtml = sanitizeHtml(transformMarkdown({ input: description }), {
+			tagNames: ['em', 'strong'] as const,
+		});
+
 		await cacheInstance.set(locationMapDataHash, entry.data._descriptionHtml);
 	}
 }

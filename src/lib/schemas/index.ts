@@ -12,19 +12,6 @@ export const TitleSchema = z
 	.transform((value) => stylizeText(value).trim());
 
 /**
- * Description schema
- */
-// Descriptions should meet basic SEO requirements
-const DESCRIPTION_CHARACTER_LENGTH = 30;
-
-export const DescriptionSchema = z
-	.string()
-	.min(DESCRIPTION_CHARACTER_LENGTH, {
-		message: `Descriptions must be ${String(DESCRIPTION_CHARACTER_LENGTH)} or more characters long.`,
-	})
-	.transform((value) => value.trim()); // Markdown may be present so we don't further transform the value
-
-/**
  * Date schema
  */
 export const DateStringSchema = z.string().transform((value) => new Date(value));

@@ -5,12 +5,7 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import {
-	DateStringSchema,
-	DescriptionSchema,
-	NumericScaleSchema,
-	TitleSchema,
-} from '#lib/schemas/index.ts';
+import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
 // Note: pages do not have a flat structure; the URL will reflect the location on the file system
@@ -20,7 +15,7 @@ export const pages = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			description: DescriptionSchema,
+			description: z.string().optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
 			links: LinkSchema.array().optional(),
