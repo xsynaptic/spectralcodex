@@ -9,7 +9,7 @@ import ContentDate from '#components/content/content-date.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Grid from '#components/parts/grid.astro';
 import Link from '#components/parts/link.astro';
-import Preview from '#components/parts/metadata-grid-item.astro';
+import MetadataGridItem from '#components/parts/metadata-grid-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { createRegionAncestorsByIdFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -51,7 +51,7 @@ const t = getTranslations();
 						: undefined;
 
 				return (
-					<Preview imageId={item.imageId} linkUrl={item.url} alt={item.title}>
+					<MetadataGridItem imageId={item.imageId} linkUrl={item.url} alt={item.title}>
 						<Fragment slot="grid-item-title">{stripDiacritics(item.title)}</Fragment>
 						{showTitleMultilingual && item.titleMultilingual ? (
 							<Fragment slot="grid-item-title-multilingual">
@@ -110,7 +110,7 @@ const t = getTranslations();
 								<Fragment set:html={transformMarkdown({ input: item.description })} />
 							</Fragment>
 						) : undefined}
-					</Preview>
+					</MetadataGridItem>
 				);
 			})}
 		</Grid>

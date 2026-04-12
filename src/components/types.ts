@@ -37,7 +37,6 @@ export const DividerColorEnum = {
 	Default: 'default',
 	Lighter: 'lighter',
 	Darker: 'darker',
-	Hero: 'hero',
 } as const;
 
 export type DividerColor = (typeof DividerColorEnum)[keyof typeof DividerColorEnum];

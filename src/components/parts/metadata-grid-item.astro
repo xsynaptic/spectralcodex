@@ -85,19 +85,13 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 			<div class="bg-fallback aspect-3/2 w-full rounded-xs text-sm text-transparent shadow-inner" />
 		)
 	}
-	<h2 class="mt-1 flex flex-wrap gap-x-1 text-xl">
-		<a
-			href={linkUrl}
-			class:list={[
-				'font-display font-bold transition-colors ease-in',
-				'text-primary-700 hover:text-accent-500 dark:text-primary-300 dark:hover:text-accent-400',
-			]}
-		>
+	<h2 class="m-grid-item-title">
+		<a href={linkUrl} class="m-grid-item-title-link">
 			<slot name="grid-item-title" />
 		</a>
 		{
 			titleMultilingual ? (
-				<div class:list={['inline-flex font-semibold', 'text-primary-500 dark:text-primary-400']}>
+				<div class="m-grid-item-title-multilingual">
 					<span class="font-light">(</span>
 					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
@@ -107,9 +101,7 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 	</h2>
 	{
 		subtitle ? (
-			<div
-				class:list={['mt-1 flex flex-wrap gap-1 text-sm', 'text-primary-500 dark:text-primary-400']}
-			>
+			<div class="m-grid-item-subtitle">
 				<Fragment set:html={subtitle} />
 			</div>
 		) : undefined

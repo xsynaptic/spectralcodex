@@ -1,0 +1,56 @@
+/* Divider styles; extracted here to avoid repetition in the divided-item component */
+.d-all {
+	display: inline;
+}
+.d-all:last-child::after {
+	content: none;
+}
+@media (width >= 40rem) {
+	.d-all {
+		display: inline-flex;
+		gap: calc(var(--spacing) * 1);
+	}
+}
+.d-default::after {
+	color: var(--color-primary-400);
+}
+[data-mode='dark'] .d-default::after {
+	color: var(--color-primary-500);
+}
+.d-darker::after {
+	color: var(--color-primary-500);
+}
+[data-mode='dark'] .d-darker::after {
+	color: var(--color-primary-700);
+}
+.d-lighter::after {
+	color: var(--color-primary-300);
+}
+[data-mode='dark'] .d-lighter::after {
+	color: var(--color-primary-600);
+}
+@media (width >= 40rem) {
+	.d-has-hero::after,
+	[data-mode='dark'] .d-has-hero::after {
+		color: var(--color-primary-300);
+		opacity: 0.8;
+	}
+}
+
+/** Divider content styles */
+.d-bar::after {
+	content: var(--content-bar);
+}
+.d-bullet::after {
+	content: var(--content-bullet);
+}
+.d-chevron::after {
+	content: var(--content-chevron);
+	translate: 0 -1px;
+}
+.d-dot::after {
+	content: var(--content-dot);
+}
+.d-slash::after {
+	content: var(--content-slash);
+}

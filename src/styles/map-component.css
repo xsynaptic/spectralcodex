@@ -1,3 +1,5 @@
+/** Note: this CSS file does not import Tailwind but relies on variables in the global context */
+
 /** MapLibre GL vendor styles (lazy-loaded on map pages only) */
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -27,19 +29,19 @@ button.maplibregl-popup-close-button:focus {
 	outline: none;
 }
 [data-mode='dark'] .maplibregl-popup-content {
-	background-color: var(--color-primary-950);
+	background-color: var(--color-primary-900);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	border-right-color: var(--color-primary-950);
+	border-right-color: var(--color-primary-900);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	border-left-color: var(--color-primary-950);
+	border-left-color: var(--color-primary-900);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	border-bottom-color: var(--color-primary-950);
+	border-bottom-color: var(--color-primary-900);
 }
 [data-mode='dark'] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	border-top-color: var(--color-primary-950);
+	border-top-color: var(--color-primary-900);
 }
 
 /** Target marker */

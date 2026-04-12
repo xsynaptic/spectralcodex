@@ -10,7 +10,6 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	class?: string | undefined;
 	dividerColor?: DividerColor | undefined;
 	dividerContent?: DividerContent | undefined;
-	showDarkMode?: boolean | undefined;
 	hasHeroImage?: boolean | undefined;
 }>;
 
@@ -19,7 +18,6 @@ const {
 	class: className,
 	dividerColor = DividerColorEnum.Default,
 	dividerContent = DividerContentEnum.Slash,
-	showDarkMode = true,
 	hasHeroImage = false,
 	...props
 } = Astro.props;
@@ -27,31 +25,10 @@ const {
 
 <Tag
 	class:list={[
-		'divider-after inline last:after:content-none sm:inline-flex sm:gap-1',
-		dividerColor === DividerColorEnum.Default && showDarkMode
-			? 'after:text-primary-400 dark:after:text-primary-500'
-			: undefined,
-		dividerColor === DividerColorEnum.Default && !showDarkMode
-			? 'after:text-primary-400'
-			: undefined,
-		dividerColor === DividerColorEnum.Darker
-			? 'after:text-primary-500 dark:after:text-primary-700'
-			: undefined,
-		dividerColor === DividerColorEnum.Lighter
-			? 'after:text-primary-300 dark:after:text-primary-600'
-			: undefined,
-		dividerColor === DividerColorEnum.Hero
-			? 'after:text-primary-500 sm:after:text-primary-300 sm:after:opacity-80 dark:after:text-primary-400 dark:sm:after:text-primary-700'
-			: undefined,
-		hasHeroImage ? 'sm:after:text-primary-300 sm:after:opacity-80' : undefined,
-		hasHeroImage && showDarkMode ? 'dark:sm:after:text-primary-700' : undefined,
-		dividerContent === 'bar' ? 'after:content-(--content-bar)' : undefined,
-		dividerContent === 'bullet' ? 'after:content-(--content-bullet)' : undefined,
-		dividerContent === 'chevron'
-			? 'after:-translate-y-px after:content-(--content-chevron)'
-			: undefined,
-		dividerContent === 'dot' ? 'after:content-(--content-dot)' : undefined,
-		dividerContent === 'slash' ? 'after:content-(--content-slash)' : undefined,
+		'd-all',
+		`d-${dividerColor}`,
+		`d-${dividerContent}`,
+		hasHeroImage ? 'd-has-hero' : undefined,
 		className,
 	]}
 	{...props}
