@@ -17,7 +17,11 @@ const t = getTranslations();
 	transition:persist
 	{...props}
 >
-	<button class="text-primary-700 dark:text-primary-300" aria-label={t('site.mode.toggle.label')}>
+	<button
+		class="text-primary-700 dark:text-primary-300"
+		aria-label={t('site.mode.toggle.label')}
+		title={t('site.mode.toggle.title')}
+	>
 		<svg
 			class="block dark:hidden"
 			xmlns="http://www.w3.org/2000/svg"

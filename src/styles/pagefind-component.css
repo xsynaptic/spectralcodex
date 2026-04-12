@@ -42,14 +42,17 @@ pagefind-searchbox button {
 	font-family: var(--pf-font) !important;
 }
 
+/* Prevent modal component from taking up space in a flexbox layout */
+pagefind-modal {
+	display: contents;
+}
+
 /* Backdrop blur when modal is open */
 dialog.pf-modal::backdrop {
 	backdrop-filter: blur(4px);
 }
 
-/* Result thumbnail: wraps optional <img> in a <div> for empty-state placeholder.
-   Override --pf-skeleton locally since Pagefind's high-specificity `background` shorthand
-   resets background-image. The background shorthand accepts the full value. */
+/* Result thumbnail: wraps optional <img> in a <div> for empty-state placeholder */
 .pf-result-image {
 	--pf-skeleton: var(--color-primary-200) url('/seigaiha-light.svg') repeat;
 	border: 1px solid var(--pf-border);

@@ -1,6 +1,12 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import pagefindCssUrl from '#styles/pagefind-component.css?url';
+
+type Props = HTMLAttributes<'div'>;
+
+const props = Astro.props;
 
 const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
 
@@ -42,7 +48,7 @@ const resultTemplate = `<script type="text/pagefind-template">
 ---
 
 <script>
-	import '@pagefind/component-ui';
+	import '#lib/components/search-toggle.ts';
 
 	// Clear pagefind modal component state before swap
 	document.addEventListener('astro:before-swap', () => {
@@ -64,8 +70,34 @@ const resultTemplate = `<script type="text/pagefind-template">
 
 <pagefind-config bundle-path={bundlePath} preload={true}></pagefind-config>
 
-<pagefind-modal-trigger placeholder={t('site.search.placeholder')} hide-shortcut={true}
-></pagefind-modal-trigger>
+<search-toggle
+	class:list={[
+		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100',
+	]}
+	{...props}
+>
+	<button
+		class="text-primary-700 dark:text-primary-300"
+		aria-label={t('site.search.toggle.label')}
+		title={t('site.search.toggle.title')}
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			aria-hidden="true"
+			><g
+				fill="none"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				><circle cx="11" cy="11" r="8"></circle><path d="m21 21l-4.35-4.35"></path></g
+			></svg
+		>
+	</button>
+</search-toggle>
 <pagefind-modal reset-on-close={true}>
 	<pagefind-modal-header>
 		<pagefind-input placeholder={t('site.search.placeholder')}></pagefind-input>
@@ -80,7 +112,7 @@ const resultTemplate = `<script type="text/pagefind-template">
 </pagefind-modal>
 
 <style>
-	pagefind-modal-trigger:not(:defined),
+	search-toggle:not(:defined),
 	pagefind-modal:not(:defined) {
 		display: none;
 	}
