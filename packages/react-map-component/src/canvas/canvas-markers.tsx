@@ -9,11 +9,20 @@ import { useDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
 import { tailwindColors } from '../lib/tailwind-colors';
 import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
+import { useMapPopupVisible, useMapSelectedId } from '../store/store';
 
 interface TargetMarker {
 	longitude: number;
 	latitude: number;
 	color: string;
+}
+
+function markersEqual(previous: TargetMarker, next: TargetMarker): boolean {
+	return (
+		previous.longitude === next.longitude &&
+		previous.latitude === next.latitude &&
+		previous.color === next.color
+	);
 }
 
 // Handles status-specific colors as well as a cluster fallback
@@ -82,7 +91,17 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 				}
 			}
 
-			setMarkers(results);
+			setMarkers((previous) => {
+				if (previous.length !== results.length) return results;
+
+				for (const [index, current] of results.entries()) {
+					const before = previous[index];
+
+					if (!before || !markersEqual(before, current)) return results;
+				}
+
+				return previous;
+			});
 			setVisible(true);
 		}
 
@@ -108,6 +127,22 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	return markers;
 }
 
+const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ longitude, latitude, color }) {
+	return (
+		<Marker longitude={longitude} latitude={latitude} anchor="center">
+			<div className="pointer-events-none relative flex items-center justify-center">
+				<span
+					className="h-8 w-8 rounded-full border-2"
+					style={{
+						borderColor: color,
+						animation: 'target-pulse-ring 2s ease-out infinite',
+					}}
+				/>
+			</div>
+		</Marker>
+	);
+};
+
 export const MapTargetMarkers: FC<{
 	targetIds: Array<string>;
 }> = function MapTargetMarkers({ targetIds }) {
@@ -116,21 +151,89 @@ export const MapTargetMarkers: FC<{
 	if (markers.length === 0) return;
 
 	return markers.map((marker) => (
-		<Marker
-			key={`${String(marker.longitude)}-${String(marker.latitude)}`}
-			longitude={marker.longitude}
-			latitude={marker.latitude}
-			anchor="center"
-		>
-			<div className="pointer-events-none relative flex items-center justify-center">
-				<span
-					className="h-8 w-8 rounded-full border-2"
-					style={{
-						borderColor: marker.color,
-						animation: 'target-pulse-ring 2s ease-out infinite',
-					}}
-				/>
-			</div>
-		</Marker>
+		<MapPulseRing
+			key={`target-${String(marker.longitude)}-${String(marker.latitude)}`}
+			{...marker}
+		/>
 	));
 };
+
+interface SelectedMarkerState extends TargetMarker {
+	id: string;
+}
+
+function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker | undefined {
+	const { current: map } = useMap();
+	const isDark = useDarkMode();
+	const selectedId = useMapSelectedId();
+	const popupVisible = useMapPopupVisible();
+
+	const isAlreadyTarget = selectedId !== undefined && targetIds?.includes(selectedId);
+	const enabled = Boolean(map && selectedId && popupVisible && !isAlreadyTarget);
+
+	const [marker, setMarker] = useState<SelectedMarkerState | undefined>();
+
+	useEffect(() => {
+		if (!enabled || !map || !selectedId) return;
+
+		function updateMarker() {
+			if (!map || !selectedId) return;
+
+			if (!map.getLayer(MapLayerIdEnum.Points)) return;
+
+			const features = map.queryRenderedFeatures(undefined, {
+				layers: [MapLayerIdEnum.Points],
+				filter: ['==', ['get', 'id'], selectedId],
+			});
+
+			const feature = features[0];
+
+			if (feature?.geometry.type !== 'Point') {
+				setMarker(undefined);
+
+				return;
+			}
+
+			const [lng, lat] = feature.geometry.coordinates as [number, number];
+
+			const next: SelectedMarkerState = {
+				id: selectedId,
+				longitude: lng,
+				latitude: lat,
+				color: getMarkerColor(feature, isDark),
+			};
+
+			setMarker((previous) => {
+				if (previous?.id === next.id && markersEqual(previous, next)) return previous;
+
+				return next;
+			});
+		}
+
+		map.on('moveend', updateMarker);
+
+		updateMarker();
+
+		return () => {
+			map.off('moveend', updateMarker);
+		};
+	}, [enabled, map, selectedId, isDark]);
+
+	if (!enabled || marker?.id !== selectedId) return undefined;
+
+	return marker;
+}
+
+export const MapSelectedMarker: FC<{ targetIds?: Array<string> | undefined }> =
+	function MapSelectedMarker({ targetIds }) {
+		const marker = useSelectedMarker(targetIds);
+
+		if (!marker) return;
+
+		return (
+			<MapPulseRing
+				key={`selected-${String(marker.longitude)}-${String(marker.latitude)}`}
+				{...marker}
+			/>
+		);
+	};

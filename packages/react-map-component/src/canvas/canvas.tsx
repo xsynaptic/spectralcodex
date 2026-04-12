@@ -15,8 +15,8 @@ import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from
 import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
 import { useMapCanvasEvents } from './canvas-events';
+import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
 import { MapPopup } from './canvas-popup';
-import { MapTargetMarkers } from './canvas-target-marker';
 
 // Layers where pointer events are triggered (whether in interactive mode or not)
 // All other layers do not trigger pointer events
@@ -143,6 +143,7 @@ const MapCanvasContainer: FC<
 				targetIds={targetIds}
 			/>
 			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
+			<MapSelectedMarker targetIds={targetIds} />
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);

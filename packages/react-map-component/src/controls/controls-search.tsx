@@ -2,9 +2,9 @@ import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
-import { usePopupDataQuery } from 'packages/react-map-component/src/data/data-popup';
 
 import { CONTROL_SEARCH_ID } from '../constants';
+import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { translations } from '../lib/translations';
 import { useMapCanvasLoading } from '../store/store';
