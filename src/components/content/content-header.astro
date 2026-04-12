@@ -53,12 +53,12 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 			as="h1"
 			gradientColor={hasHeroImage ? 'primary-featured' : 'primary'}
 			class:list={[
-				'pb-2 font-display text-2xl leading-[1.125] font-semibold',
+				'pb-2 font-display text-2xl font-semibold',
 				hasHeroImage
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
-			style={{ marginLeft: '-0.125rem' }}
+			style={{ lineHeight: '1.125', marginLeft: '-0.125rem' }}
 			data-pagefind-weight="3"
 		>
 			{title ? <Fragment set:html={title} /> : undefined}

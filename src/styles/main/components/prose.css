@@ -93,7 +93,7 @@
 
 /* Footnotes */
 .prose-x > .footnotes ol {
-	@apply text-sm leading-6;
+	@apply text-sm leading-normal;
 }
 .prose-x > .footnotes ol li::marker {
 	@apply text-xs;
