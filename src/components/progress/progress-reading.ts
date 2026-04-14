@@ -1,4 +1,4 @@
-import { ProgressBar } from '#lib/components/progress-base.ts';
+import { ProgressBar } from '#components/progress/progress-base.ts';
 
 class ProgressReading extends ProgressBar {
 	#observer: IntersectionObserver | undefined;

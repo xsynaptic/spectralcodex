@@ -83,7 +83,7 @@ export default getConfig(
 		},
 		// These files run in the browser and might need the browser globals
 		{
-			files: ['src/components/**/*', 'src/components/**/*/*.ts'],
+			files: ['src/components/**/*'],
 			languageOptions: {
 				globals: {
 					...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, 'off'])),

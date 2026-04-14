@@ -1,9 +1,9 @@
 ---
 import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
+import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
 import ImageHeroFrame from '#components/image/image-hero-frame.astro';
-import CarouselNavigation from '#components/parts/carousel-navigation.astro';
 
 interface Props {
 	hasHeroImage: boolean;
@@ -18,7 +18,7 @@ const { hasHeroImage, imageFeaturedGroup, withTitle = true, class: className } =
 {
 	hasHeroImage && imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
 		<ImageHeroFrame class:list={['carousel-group', className]} withTitle={withTitle}>
-			<carousel-slider class="block">
+			<image-carousel class="block">
 				<div class="carousel-container">
 					{imageFeaturedGroup.map((imageFeaturedGroupItem, index) => (
 						<ImageHeroCarouselItem
@@ -28,8 +28,8 @@ const { hasHeroImage, imageFeaturedGroup, withTitle = true, class: className } =
 						/>
 					))}
 				</div>
-				{imageFeaturedGroup.length > 1 ? <CarouselNavigation /> : undefined}
-			</carousel-slider>
+				{imageFeaturedGroup.length > 1 ? <ImageCarouselNavigation /> : undefined}
+			</image-carousel>
 			<slot />
 		</ImageHeroFrame>
 	) : (

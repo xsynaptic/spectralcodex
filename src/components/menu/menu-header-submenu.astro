@@ -1,11 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { MenuItem } from '#lib/main/main-menu-types.ts';
+import type { MenuItem } from '#components/menu/menu-types.ts';
 
+import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getMenuItemAriaLabel, isActiveMenuItem } from '#lib/main/main-menu-utils.ts';
 
 interface Props extends HTMLAttributes<'ul'> {
 	menuItems: Array<MenuItem>;

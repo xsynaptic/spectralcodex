@@ -1,7 +1,7 @@
 /**
  * Carousel slider element; this requires a container and some navigation buttons to work properly
  */
-class CarouselSlider extends HTMLElement {
+class ImageCarousel extends HTMLElement {
 	#handleClick = (event: Event) => {
 		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-carousel-nav]');
 
@@ -39,13 +39,13 @@ class CarouselSlider extends HTMLElement {
 	}
 }
 
-customElements.define('carousel-slider', CarouselSlider);
+customElements.define('image-carousel', ImageCarousel);
 
 // eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'carousel-slider': CarouselSlider;
+		'image-carousel': ImageCarousel;
 	}
 }

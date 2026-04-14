@@ -2,15 +2,15 @@
 import type { HTMLAttributes } from 'astro/types';
 
 interface Props extends HTMLAttributes<'div'> {
+	class?: string | undefined;
 	height?: string | undefined;
 }
 
 const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ---
 
-<progress-loading class={className} style={{ height, ...style }} transition:persist {...props}
-></progress-loading>
+<progress-reading class={className} style={{ height, ...style }} {...props}></progress-reading>
 
 <script>
-	import '#lib/components/progress-loading.ts';
+	import '#components/progress/progress-reading.ts';
 </script>

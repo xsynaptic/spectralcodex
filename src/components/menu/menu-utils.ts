@@ -1,4 +1,4 @@
-import type { MenuItem } from '#lib/main/main-menu-types.ts';
+import type { MenuItem } from '#components/menu/menu-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';

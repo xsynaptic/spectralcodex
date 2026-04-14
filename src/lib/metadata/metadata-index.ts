@@ -17,11 +17,11 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getWordCount } from '#lib/metadata/metadata-word-count.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getDescription } from '#lib/utils/text.ts';
-import { getWordCount } from '#lib/utils/word-count.ts';
 
 // Simple in-memory cache
 const contentMetadataMap = new Map<string, ContentMetadataItem>();

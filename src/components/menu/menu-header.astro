@@ -1,11 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import MenuHeaderSubmenu from '#components/main/main-header-menu-submenu.astro';
+import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
+import { getMenuHeaderItems } from '#components/menu/menu-header.ts';
+import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMenuHeaderItems } from '#lib/main/main-menu-header.ts';
-import { getMenuItemAriaLabel, isActiveMenuItem } from '#lib/main/main-menu-utils.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
 	hasHeroImage: boolean;
@@ -20,7 +20,7 @@ const menuItems = await getMenuHeaderItems();
 const t = getTranslations();
 ---
 
-<nav-menu>
+<menu-navigation>
 	<nav class="nav-menu" aria-label={t('site.menu.header.label')} data-nosnippet {...props}>
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{
@@ -56,8 +56,8 @@ const t = getTranslations();
 			}
 		</ul>
 	</nav>
-</nav-menu>
+</menu-navigation>
 
 <script>
-	import '#lib/components/nav-menu.ts';
+	import '#components/menu/menu-navigation.ts';
 </script>

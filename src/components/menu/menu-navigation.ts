@@ -353,13 +353,13 @@ class NavMenu extends HTMLElement {
 	}
 }
 
-customElements.define('nav-menu', NavMenu);
+customElements.define('menu-navigation', NavMenu);
 
 // eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'nav-menu': NavMenu;
+		'menu-navigation': NavMenu;
 	}
 }

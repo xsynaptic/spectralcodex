@@ -22,7 +22,7 @@ import {
 } from '#lib/metadata/metadata-utils.ts';
 import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/structured-data.ts';
+import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 import { getDescription } from '#lib/utils/text.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)

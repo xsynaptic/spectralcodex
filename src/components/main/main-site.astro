@@ -8,24 +8,24 @@ import { ClientRouter } from 'astro:transitions';
 
 import type { GraphEntity, MetaProps } from '#components/types.ts';
 
-import FooterColophon from '#components/main/main-footer-colophon.astro';
-import FooterMenu from '#components/main/main-footer-menu.astro';
-import HeaderMenu from '#components/main/main-header-menu.astro';
-import HeaderModeToggle from '#components/main/main-header-mode-toggle.astro';
-import HeaderSearch from '#components/main/main-header-search.astro';
-import HeaderSkipLink from '#components/main/main-header-skip-link.astro';
-import ProgressLoading from '#components/main/main-progress-loading.astro';
-import ProgressReading from '#components/main/main-progress-reading.astro';
-import SiteAnalytics from '#components/main/main-site-analytics.astro';
-import SiteMeta from '#components/main/main-site-meta.astro';
-import SiteModeManager from '#components/main/main-site-mode-manager.astro';
-import SiteStyles from '#components/main/main-site-stylesheet.astro';
+import Analytics from '#components/main/main-analytics.astro';
+import Colophon from '#components/main/main-colophon.astro';
+import Meta from '#components/main/main-meta.astro';
+import SkipLink from '#components/main/main-skip-link.astro';
 import Sprites from '#components/main/main-sprites.astro';
+import Stylesheet from '#components/main/main-stylesheet.astro';
+import MenuFooter from '#components/menu/menu-footer.astro';
+import MenuHeader from '#components/menu/menu-header.astro';
+import ModeManager from '#components/mode-manager/mode-manager.astro';
+import ModeToggle from '#components/mode-manager/mode-toggle.astro';
 import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
+import ProgressLoading from '#components/progress/progress-loading.astro';
+import ProgressReading from '#components/progress/progress-reading.astro';
+import Search from '#components/search/search.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { serializeGraph } from '#lib/utils/structured-data.ts';
+import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {
 	meta?: MetaProps;
@@ -59,13 +59,13 @@ const t = getTranslations();
 			media="(prefers-color-scheme: dark)"
 		/>
 		<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
-		<SiteStyles />
+		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
-		<SiteModeManager defaultMode="auto" />
-		<SiteMeta {...meta} />
-		<SiteAnalytics isViewTransitionsEnabled={true} />
+		<ModeManager defaultMode="auto" />
+		<Meta {...meta} />
+		<Analytics isViewTransitionsEnabled={true} />
 		<ClientRouter />
 		<link
 			rel="alternate"
@@ -112,7 +112,7 @@ const t = getTranslations();
 			]}
 			style={{ zIndex: 40 }}
 		>
-			<HeaderSkipLink
+			<SkipLink
 				class:list={[
 					'rounded-br-sm px-4 py-1 uppercase transition-colors',
 					'bg-primary-50 text-accent-500 hover:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300',
@@ -146,11 +146,11 @@ const t = getTranslations();
 						</h2>
 					)
 				}
-				<HeaderModeToggle />
-				<HeaderSearch />
+				<ModeToggle />
+				<Search />
 			</Container>
 			<Container class="w-full overflow-x-clip" fillViewport={true}>
-				<HeaderMenu hasHeroImage={hasHeroImage} />
+				<MenuHeader hasHeroImage={hasHeroImage} />
 			</Container>
 		</header>
 		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
@@ -163,8 +163,8 @@ const t = getTranslations();
 					'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
 				]}
 			>
-				<FooterMenu />
-				<FooterColophon />
+				<MenuFooter />
+				<Colophon />
 			</div>
 		</Container>
 		{

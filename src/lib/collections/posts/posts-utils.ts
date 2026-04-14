@@ -19,7 +19,7 @@ import {
 	createCollectionLookupByIds,
 	createFilterEntryQualityFunction,
 } from '#lib/utils/collections.ts';
-import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/structured-data.ts';
+import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 
 export const createPostsByIdsFunction = createCollectionLookupByIds('Posts', getPostsCollection);
 

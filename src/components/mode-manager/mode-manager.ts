@@ -1,6 +1,10 @@
-import type { ModeChangedEvent, ModeGeneralType, ModeSystemType } from './mode-types.ts';
+import type {
+	ModeChangedEvent,
+	ModeGeneralType,
+	ModeSystemType,
+} from '#components/mode-manager/mode-types.ts';
 
-import { ModeTypeEnum } from './mode-types.ts';
+import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
 function isModeValid(mode: string | undefined): mode is ModeGeneralType {
 	return mode === ModeTypeEnum.Auto || mode === ModeTypeEnum.Dark || mode === ModeTypeEnum.Light;

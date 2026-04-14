@@ -24,7 +24,7 @@ import {
 	sortByContentCount,
 } from '#lib/utils/collections.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema } from '#lib/utils/structured-data.ts';
+import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
 /**
  * Transform an array of strings into collection entries

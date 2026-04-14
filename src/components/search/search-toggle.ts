@@ -69,3 +69,9 @@ class SearchToggle extends HTMLElement {
 }
 
 customElements.define('search-toggle', SearchToggle);
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'search-toggle': SearchToggle;
+	}
+}
