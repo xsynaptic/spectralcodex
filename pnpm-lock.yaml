@@ -147,6 +147,9 @@ importers:
       exiftool-vendored:
         specifier: ^35.16.0
         version: 35.16.0
+      fastest-levenshtein:
+        specifier: ^1.0.16
+        version: 1.0.16
       geokdbush:
         specifier: ^2.1.0
         version: 2.1.0
@@ -3924,6 +3927,10 @@ packages:
   fast-xml-parser@5.5.9:
     resolution: {integrity: sha512-jldvxr1MC6rtiZKgrFnDSvT8xuH+eJqxqOBThUVjYrxssYTo1avZLGql5l0a0BAERR01CadYzZ83kVEkbyDg+g==}
     hasBin: true
+
+  fastest-levenshtein@1.0.16:
+    resolution: {integrity: sha512-eRnCtTTtGZFpQCwhJiUOuxPQWRXVKYDn0b2PeHfXL6/Zi53SLAzAHfVhVWK2AryC/WH05kGfxhFIPvTF0SXQzg==}
+    engines: {node: '>= 4.9.1'}
 
   fastq@1.17.0:
     resolution: {integrity: sha512-zGygtijUMT7jnk3h26kUms3BkSDp4IfIKjmnqI2tvx6nuBfiF1UqOxbnLfzdv+apBy+53oaImsKtMw/xYbW+1w==}
@@ -11704,6 +11711,8 @@ snapshots:
       fast-xml-builder: 1.1.4
       path-expression-matcher: 1.2.0
       strnum: 2.2.2
+
+  fastest-levenshtein@1.0.16: {}
 
   fastq@1.17.0:
     dependencies:

@@ -4,14 +4,15 @@ import { transformMarkdown } from '@xsynaptic/unified-tools';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
+import NotFoundSuggestions from '#components/not-found/not-found-suggestions.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 const t = getTranslations();
 
-const title = t('404.title');
-const description = t('404.description');
+const title = t('notFound.title');
+const description = t('notFound.description');
 ---
 
 <MainSite
@@ -29,6 +30,9 @@ const description = t('404.description');
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
+		<Fragment slot="section-description"
+			><Fragment set:html={transformMarkdown({ input: description })} />
+			<NotFoundSuggestions /></Fragment
+		>
 	</ContentSection>
 </MainSite>

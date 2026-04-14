@@ -204,8 +204,9 @@ const translationStrings = {
 		'author.photo.alt': 'Profile photo of Alexander Synaptic, founder of Spectral Codex',
 
 		// 404
-		'404.title': 'Error 404: Page Not Found',
-		'404.description': `Sorry, there doesn't seem to be anything at this URL! Please try another path.`,
+		'notFound.title': 'Page Not Found',
+		'notFound.description': `Hmm, that's strange. There doesn't appear to be anything at this address. Try something else or try the search function above.`,
+		'notFound.suggestions': 'Perhaps you were looking for one of these:',
 	},
 	[LanguageCodeEnum.ChineseTraditional]: {
 		'notice.danger': `**警告**：此處已廢棄或長期無人管理，可能存在潛在危險。造訪時請務必提高警覺，並做好相關安全防護措施。`,

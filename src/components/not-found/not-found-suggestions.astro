@@ -1,0 +1,36 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	threshold?: number;
+	autoRedirectThreshold?: number;
+	maxSuggestions?: number;
+	suggestionsUrl?: string;
+}
+
+const {
+	threshold = 0.5,
+	autoRedirectThreshold = 0.92,
+	maxSuggestions = 5,
+	suggestionsUrl = '/content-manifest.json',
+} = Astro.props;
+
+const t = getTranslations();
+---
+
+<div
+	id="not-found-suggestions"
+	data-threshold={threshold}
+	data-auto-redirect-threshold={autoRedirectThreshold}
+	data-max-suggestions={maxSuggestions}
+	data-suggestions-url={suggestionsUrl}
+>
+	{t('notFound.suggestions')}
+</div>
+<ul id="not-found-suggestions-list"></ul>
+
+<script>
+	import { runNotFoundSuggestions } from '#components/not-found/not-found-suggestions.ts';
+
+	void runNotFoundSuggestions();
+</script>

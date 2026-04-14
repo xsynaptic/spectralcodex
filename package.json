@@ -94,6 +94,7 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.0.1",
 		"exiftool-vendored": "^35.16.0",
+		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.5.0",
 		"kdbush": "^4.0.2",
