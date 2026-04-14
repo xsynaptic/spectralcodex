@@ -2,7 +2,7 @@ import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { Thing } from '#lib/utils/structured-data.ts';
+import type { GraphEntity } from '#components/types.ts';
 
 import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
@@ -142,7 +142,7 @@ export async function getRegionLangCodeByEntry(
 export async function getRegionSchema(
 	entry: CollectionEntry<'regions'>,
 	props: { url: string },
-): Promise<Array<Thing>> {
+): Promise<Array<GraphEntity>> {
 	const t = getTranslations();
 
 	const getRegionAncestors = await createRegionAncestorsFunction();

@@ -9,7 +9,6 @@ export default {
 			entry: ['src/components/mdx/*.astro'],
 			ignoreBinaries: ['down', 'up', 'ssh-add'],
 			ignoreDependencies: [
-				'@astrojs/check', // used via `astro check` CLI, peer dep of astro
 				'@astrojs/markdown-remark', // peer dep, used transitively by remark pipeline
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
 				'@xsynaptic/image-server', // workspace package used at deploy time

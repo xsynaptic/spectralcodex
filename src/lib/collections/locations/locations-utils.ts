@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { Thing } from '#lib/utils/structured-data.ts';
+import type { GraphEntity } from '#components/types.ts';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
@@ -85,7 +85,7 @@ export function sortLocationsByLatitude(
 export async function getLocationSchemas(
 	entry: CollectionEntry<'locations'>,
 	props: { url: string },
-): Promise<Array<Thing>> {
+): Promise<Array<GraphEntity>> {
 	if (entry.data.override || (entry.data.hideLocation && !import.meta.env.DEV)) {
 		return [];
 	}
