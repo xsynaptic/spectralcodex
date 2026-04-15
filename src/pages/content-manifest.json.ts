@@ -25,12 +25,15 @@ function shouldIncludeUrl(pathname: string): boolean {
 /**
  * Generate JSON consumed by the "page not found" suggestions component
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ site }) => {
+	if (!site) throw new Error('Astro `site` config is required for the content manifest.');
+
 	const index = await getContentMetadataIndex();
 
+	// Content manifest includes relative URLs so we need to normalize output before filtering
 	const entries = [...index.values()]
-		.filter(({ url }) => shouldIncludeUrl(url))
-		.map(({ url, title }) => ({ url, title }));
+		.map(({ url, title }) => ({ url: new URL(url, site).pathname, title }))
+		.filter(({ url }) => shouldIncludeUrl(url));
 
 	return Response.json(entries, {
 		headers: { 'Content-Type': 'application/json' },

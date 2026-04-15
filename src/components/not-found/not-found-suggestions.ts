@@ -59,7 +59,7 @@ export async function runNotFoundSuggestions(): Promise<void> {
 	const best = scored[0];
 	if (!best || best.score < threshold) return;
 
-	if (best.score >= autoRedirectThreshold && best.score < 1) {
+	if (best.score >= autoRedirectThreshold && normalize(best.url) !== current) {
 		window.location.replace(best.url);
 		return;
 	}
