@@ -81,7 +81,10 @@ const t = getTranslations();
 </pagefind-modal>
 
 <style>
-	search-toggle:not(:defined),
+	search-toggle:not(:defined) {
+		opacity: 0.3;
+		pointer-events: none;
+	}
 	pagefind-modal:not(:defined) {
 		display: none;
 	}
