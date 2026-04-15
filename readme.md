@@ -49,9 +49,10 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### Search & Discovery
 
-- Client-side full-text search via [Pagefind](https://pagefind.app/) with a modal interface, keyboard shortcuts, and retina-ready thumbnails
+- Client-side full-text search via [Pagefind](https://pagefind.app/) with a custom Astro integration (fork of [shishkin/astro-pagefind](https://github.com/shishkin/astro-pagefind)), a modal interface via [@pagefind/component-ui](https://pagefind.app/docs/ui-usage/), keyboard shortcuts, and retina-ready thumbnails
 - Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
 - Hierarchical navigation through regions, themes, and series
+- Client-side fuzzy 404 suggestions via [fastest-levenshtein](https://github.com/ka-weihe/fastest-levenshtein) with substring-bonus scoring against a build-time content manifest; auto-redirects on near-exact matches
 
 ### Timeline & Archives
 
@@ -98,7 +99,7 @@ Deployment is handled by custom scripts. These are specific to this project's in
 4. OG image generation with Satori and Sharp
 5. Astro production build
 6. E2E smoke tests
-7. Cache manifest generation from built HTML
+7. Image cache warming manifest generation from built HTML
 8. Media sync to remote storage
 9. Static file transfer via rsync
 10. OG image deployment
@@ -124,13 +125,14 @@ The image server is deployed separately and manually; it is only needed when ima
 ### Packages
 
 - `./packages/astro-build-logger`: build timestamps and durations
+- `./packages/astro-image-loader`: Content Layer loader for image files with EXIF extraction and LQIP generation
 - `./packages/content`: primary content collection (private, not included in repo)
 - `./packages/content-demo`: example content for testing and demonstration
-- `./packages/image-loader`: Content Layer loader for image files with EXIF extraction and LQIP generation
 - `./packages/react-map-component`: interactive map component
 - `./packages/remark-img-group`: remark plugin for image groups in MDX
 - `./packages/scripts`: content validation, semantic similarity, OG images, map divisions, link checking, deployment
 - `./packages/shared`: shared utilities, Keyv-based caching (SQLite/file backends), common types and schemas
+- `./packages/word-count`: multilingual word count utility (fork of [alfaaz](https://github.com/thecodrr/alfaaz))
 
 ## Cloudflare Configuration
 
