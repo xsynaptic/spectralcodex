@@ -7,7 +7,7 @@
 		"check": "mdxlint 'collections/**/*.mdx' --frail --quiet"
 	},
 	"devDependencies": {
-		"astro": "^6.1.6",
+		"astro": "^6.1.7",
 		"mdxlint": "^1.0.0",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
