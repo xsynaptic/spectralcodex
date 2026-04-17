@@ -121,8 +121,8 @@ importers:
         specifier: workspace:*
         version: link:services/image-server
       '@xsynaptic/unified-tools':
-        specifier: ^3.0.3
-        version: 3.0.3
+        specifier: ^4.0.0
+        version: 4.0.0
       astro-auto-import:
         specifier: ^0.5.1
         version: 0.5.1(astro@6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3))
@@ -178,8 +178,8 @@ importers:
         specifier: ^0.7.2
         version: 0.7.2(prettier-plugin-astro@0.14.1)(prettier@3.8.3)
       rehype-wrap-cjk:
-        specifier: ^1.1.0
-        version: 1.1.0
+        specifier: ^2.0.0
+        version: 2.0.0
       remeda:
         specifier: ^2.33.7
         version: 2.33.7
@@ -447,8 +447,8 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       '@xsynaptic/unified-tools':
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: ^4.0.0
+        version: 4.0.0
       astro:
         specifier: ^6.1.7
         version: 6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
@@ -2914,8 +2914,8 @@ packages:
   '@xsynaptic/eslint-config@3.2.2':
     resolution: {integrity: sha512-yQzoje2Cc6UTXuhYfYbuArE09WnPHwzwlzlGmcGrZNXpT+k+Ykp0aU0XhQRxqj2CSQhbBQJQ8GAZ2H8w1RZIvQ==}
 
-  '@xsynaptic/unified-tools@3.0.3':
-    resolution: {integrity: sha512-Hc7NEtCN5jPGaP3h0SbWm6M3413RDnlce3nsql0OxlTXv/R0cHXBv74z4g7PR41kITMzUz1QNUSJ1Wfw/leTNw==}
+  '@xsynaptic/unified-tools@4.0.0':
+    resolution: {integrity: sha512-t4PVsfoUOaUSjY0oETXEFzBajOjQYQXQNXGYIESrs8IQsS9C7I3glaNoXSbUkeGgaM1XZLXLsMLZzDuZFufYeg==}
 
   abbrev@1.1.1:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
@@ -5895,8 +5895,8 @@ packages:
   rehype-stringify@10.0.1:
     resolution: {integrity: sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA==}
 
-  rehype-wrap-cjk@1.1.0:
-    resolution: {integrity: sha512-qOWd2KgboHzg78+ZKk1t8r5FuyuWLrZNoh7Kj5TS+vrIN0wGiuRZDqOxVw1AqQ1BxFSPp9ZCyAo09FsspHVOyQ==}
+  rehype-wrap-cjk@2.0.0:
+    resolution: {integrity: sha512-MbimkEFrMD4b8P+9IBL+3eZZF1wUPdcxu0vioF8NGwbFuWUMqgnb6YeS8MnD+v/97yFIbqnCslnrtOPqorplTw==}
 
   rehype@13.0.2:
     resolution: {integrity: sha512-j31mdaRFrwFRUIlxGeuPXXKWQxet52RBQRvCmzl5eCefn/KGbomK5GMHNMsOJf55fgo3qw5tST5neDuarDYR2A==}
@@ -10450,12 +10450,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@xsynaptic/unified-tools@3.0.3':
+  '@xsynaptic/unified-tools@4.0.0':
     dependencies:
       rehype-parse: 9.0.1
       rehype-sanitize: 6.0.0
       rehype-stringify: 10.0.1
-      rehype-wrap-cjk: 1.1.0
+      rehype-wrap-cjk: 2.0.0
       remark-mdx: 3.1.1
       remark-parse: 11.0.0
       remark-rehype: 11.1.2
@@ -14218,7 +14218,7 @@ snapshots:
       hast-util-to-html: 9.0.5
       unified: 11.0.5
 
-  rehype-wrap-cjk@1.1.0:
+  rehype-wrap-cjk@2.0.0:
     dependencies:
       hastscript: 9.0.1
       unist-util-visit-parents: 6.0.2
