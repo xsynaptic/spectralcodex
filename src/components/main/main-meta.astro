@@ -1,6 +1,6 @@
 ---
-import Seo from '@jdevalk/astro-seo-graph/Seo.astro';
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
+import { SEO } from 'astro-seo';
 
 import type { MetaProps } from '#components/types.ts';
 
@@ -30,6 +30,9 @@ const siteDescription = t('site.description');
 
 const description = sanitizeDescription(descriptionRaw) ?? siteDescription;
 
+const titleDisplay =
+	contentTitle && contentTitle !== siteTitle ? `${contentTitle} - ${siteTitle}` : siteTitle;
+
 function generateOpenGraphImageUrl({
 	imageUrl,
 	imageAlt,
@@ -39,7 +42,6 @@ function generateOpenGraphImageUrl({
 }) {
 	const imageLocalUrl = imageUrl ? new URL(imageUrl, Astro.site).href : undefined;
 
-	// Generate OG image URL using IPX CDN (no local image processing)
 	const openGraphImageUrl = imageLocalUrl ?? getSeoImageFallback();
 
 	return {
@@ -56,23 +58,38 @@ const openGraphImage = generateOpenGraphImageUrl({
 });
 ---
 
-<Seo
-	title={contentTitle ?? siteTitle}
-	titleTemplate={!!contentTitle && contentTitle !== siteTitle ? `%s - ${siteTitle}` : undefined}
+<SEO
+	title={titleDisplay}
 	description={description}
-	siteName={siteTitle}
-	ogType={ogType ?? 'website'}
-	ogImage={openGraphImage.url}
-	ogImageAlt={openGraphImage.alt}
-	ogImageWidth={openGraphImage.width}
-	ogImageHeight={openGraphImage.height}
+	openGraph={{
+		basic: {
+			title: titleDisplay,
+			type: ogType ?? 'website',
+			image: openGraphImage.url,
+		},
+		optional: {
+			description,
+			locale: 'en_US',
+			siteName: siteTitle,
+		},
+		image: openGraphImage,
+		...(ogType === 'article' && article !== undefined ? { article } : {}),
+	}}
 	twitter={{
 		card: 'summary_large_image',
 		site: OPEN_GRAPH_TWITTER_USERNAME,
+		title: contentTitle ?? siteTitle,
+		description,
+		image: openGraphImage.url,
+		imageAlt: openGraphImage.alt,
 	}}
-	article={article}
-	extraMeta={[{ name: 'generator', content: Astro.generator }]}
-	extraLinks={prefetchUrls?.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl }))}
-	noindex={noIndex}
-	nofollow={noFollow}
+	extend={{
+		...(prefetchUrls?.length
+			? { link: prefetchUrls.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl })) }
+			: {}),
+		meta: [{ name: 'generator', content: Astro.generator }],
+	}}
+	noindex={noIndex ?? false}
+	nofollow={noFollow ?? false}
+	robotsExtras="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
 />

@@ -39,12 +39,6 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.7.2
         version: 3.7.2
-      '@jdevalk/astro-seo-graph':
-        specifier: ^1.2.0
-        version: 1.2.0(astro@6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3))(typescript@5.9.3)
-      '@jdevalk/seo-graph-core':
-        specifier: ^0.6.1
-        version: 0.6.1(typescript@5.9.3)
       '@pagefind/component-ui':
         specifier: ^1.5.2
         version: 1.5.2
@@ -132,6 +126,9 @@ importers:
       astro-auto-import:
         specifier: ^0.5.1
         version: 0.5.1(astro@6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3))
+      astro-seo:
+        specifier: ^1.1.0
+        version: 1.1.0(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@5.9.3)
       eslint:
         specifier: ^9.39.4
         version: 9.39.4(jiti@2.6.1)
@@ -1193,14 +1190,6 @@ packages:
   '@isaacs/cliui@9.0.0':
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
     engines: {node: '>=18'}
-
-  '@jdevalk/astro-seo-graph@1.2.0':
-    resolution: {integrity: sha512-pn0NnB7fn/njjhDf6BhEoExJnXbfxFjMLX26fbdOnXP9zMDJ7fzRTCJz1CP98UpV7VG9fqZ3VVN54ggj/OiM5w==}
-    peerDependencies:
-      astro: ^5.0.0 || ^6.0.0
-
-  '@jdevalk/seo-graph-core@0.6.1':
-    resolution: {integrity: sha512-ORZYtfhSOqj2hHDKruPAK4AEgfhKwmGnS5twzUAImu2/TXC5hGk9FY8d9/aC3wMV3uGd5c/qxK2gULZOsgdlwA==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -3101,6 +3090,9 @@ packages:
     resolution: {integrity: sha512-VQQs7hS9M3XrJtxSLHVDhvHzgqwZuhot3sMoYImBJSvL7fMnleSVgkZhoEeRJd1+Qh96eb469nRnn5mdjIJJMQ==}
     peerDependencies:
       astro: ^4.14.0 || ^5.0.0 || ^6.0.0
+
+  astro-seo@1.1.0:
+    resolution: {integrity: sha512-G6LDNDyga30o+52v58jU7C35n3cORUzk7RSuY+xf/ZRbW6JiNplyaOO1VoYVKO+xzYNaBcxqNln2RFRR/wgJNQ==}
 
   astro@6.1.7:
     resolution: {integrity: sha512-pvZysIUV2C2nRv8N7cXAkCLcfDQz/axAxF09SqiTz1B+xnvbhy6KzL2I6J15ZBXk8k0TfMD75dJ151QyQmAqZA==}
@@ -6175,15 +6167,6 @@ packages:
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
 
-  schema-dts-lib@1.0.0:
-    resolution: {integrity: sha512-9MEO5vpQH9JdBioUupqluzxSYxPLjhmqRUudk15adUl/ypnRsM2/M1kN3AmVJQeG7nZqcL68H8JlGqQQT6vy9A==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      typescript: '>=4.9.5'
-
-  schema-dts@2.0.0:
-    resolution: {integrity: sha512-t7NoCy3Rn5GHGx6p7s1qIYK/AeIb8ZxJNR9WUNFkwMv2CiiGZBmqqYWc2FlZVm5ZbiHMY4OvBWhj7QtyrFO2Jw==}
-
   semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
 
@@ -7973,21 +7956,6 @@ snapshots:
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
   '@isaacs/cliui@9.0.0': {}
-
-  '@jdevalk/astro-seo-graph@1.2.0(astro@6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3))(typescript@5.9.3)':
-    dependencies:
-      '@jdevalk/seo-graph-core': 0.6.1(typescript@5.9.3)
-      astro: 6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      schema-dts: 2.0.0(typescript@5.9.3)
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - typescript
-
-  '@jdevalk/seo-graph-core@0.6.1(typescript@5.9.3)':
-    dependencies:
-      schema-dts: 2.0.0(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -10675,6 +10643,14 @@ snapshots:
     dependencies:
       astro: 6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
       pathe: 2.0.3
+
+  astro-seo@1.1.0(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@5.9.3):
+    dependencies:
+      '@astrojs/check': 0.9.8(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - prettier
+      - prettier-plugin-astro
+      - typescript
 
   astro@6.1.7(@types/node@25.6.0)(idb-keyval@6.2.2)(jiti@2.6.1)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3):
     dependencies:
@@ -14827,16 +14803,6 @@ snapshots:
   sax@1.6.0: {}
 
   scheduler@0.27.0: {}
-
-  schema-dts-lib@1.0.0(typescript@5.9.3):
-    dependencies:
-      typescript: 5.9.3
-
-  schema-dts@2.0.0(typescript@5.9.3):
-    dependencies:
-      schema-dts-lib: 1.0.0(typescript@5.9.3)
-    transitivePeerDependencies:
-      - typescript
 
   semver-compare@1.0.0: {}
 

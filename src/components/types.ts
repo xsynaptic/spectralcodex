@@ -1,11 +1,6 @@
 // 2026Q1: TypeScript doesn't deal well with Astro files exporting types and interfaces
 
 /**
- * Schema.org JSON-LD graph entity; re-exported here for convenience
- */
-export type { GraphEntity } from '@jdevalk/seo-graph-core';
-
-/**
  * Meta component types
  */
 interface MetaImageProps {

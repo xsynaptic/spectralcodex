@@ -6,7 +6,8 @@ import '#styles/main.css';
 import { IPX_SERVER_URL } from 'astro:env/server';
 import { ClientRouter } from 'astro:transitions';
 
-import type { GraphEntity, MetaProps } from '#components/types.ts';
+import type { MetaProps } from '#components/types.ts';
+import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import Analytics from '#components/main/main-analytics.astro';
 import Colophon from '#components/main/main-colophon.astro';
@@ -29,7 +30,7 @@ import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {
 	meta?: MetaProps;
-	schemas?: Array<GraphEntity>;
+	schemas?: Array<Thing>;
 	hasHeroImage?: boolean;
 	isHomepage?: boolean;
 }

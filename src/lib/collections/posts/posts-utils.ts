@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { GraphEntity } from '#components/types.ts';
+import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -26,7 +26,7 @@ export const createPostsByIdsFunction = createCollectionLookupByIds('Posts', get
 export function getPostSchema(
 	entry: CollectionEntry<'posts'>,
 	props: { url: string; imageUrl: string | undefined },
-): Array<GraphEntity> {
+): Array<Thing> {
 	return [
 		buildArticleSchema({
 			title: entry.data.title,
