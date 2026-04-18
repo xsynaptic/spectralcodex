@@ -3,26 +3,16 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { wrapCjk } from '@xsynaptic/unified-tools';
 
-import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
-
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'address'> {
 	address?: string | undefined;
-	langCode?: Extract<LanguageCode, 'zh' | 'zh-CN' | 'ja' | 'ko'> | undefined;
 	class?: string | undefined;
 }
 
-const { address, langCode, class: className, ...props } = Astro.props;
+const { address, class: className, ...props } = Astro.props;
 
-const output = address
-	? wrapCjk({
-			input: address,
-			...(langCode
-				? { wrapCjkOptions: { langCode: langCode.startsWith('zh') ? 'zh' : langCode } }
-				: {}),
-		})
-	: undefined;
+const output = address ? wrapCjk({ input: address }) : undefined;
 
 const t = getTranslations();
 ---

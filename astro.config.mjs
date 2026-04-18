@@ -119,7 +119,7 @@ export default defineConfig({
 	},
 	markdown: {
 		remarkPlugins: [remarkImgGroup],
-		rehypePlugins: [[rehypeWrapCjk, { langCode: 'cjk' }]],
+		rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
 	},
 	integrations: [
 		buildLogger(),
@@ -207,16 +207,6 @@ export default defineConfig({
 			optimizedFallbacks: false,
 		},
 	],
-	i18n: {
-		defaultLocale: 'en',
-		locales: [
-			'en',
-			{
-				path: 'zh',
-				codes: ['zh', 'zh-TW', 'zh-Hant'],
-			},
-		],
-	},
 	experimental: {
 		contentIntellisense: true,
 	},

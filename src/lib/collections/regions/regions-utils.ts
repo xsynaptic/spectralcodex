@@ -120,23 +120,6 @@ export async function createFirstRegionByReferenceFunction() {
 }
 
 /**
- * Language code
- */
-export async function getRegionLangCodeByEntry(
-	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
-) {
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-
-	if (entry.collection === 'regions') {
-		return entry.data._langCode;
-	} else if (entry.collection === 'locations') {
-		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
-	} else {
-		return getFirstRegionByReference(entry.data.regions)?.data._langCode;
-	}
-}
-
-/**
  * Schema
  */
 export async function getRegionSchema(

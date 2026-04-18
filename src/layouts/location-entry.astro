@@ -167,7 +167,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		{
 			hideLocation ? undefined : (
 				<ContentSectionMap mapData={mapData}>
-					<LocationsAddress address={entry.data.address} langCode={regionLangCode} />
+					<LocationsAddress address={entry.data.address} />
 				</ContentSectionMap>
 			)
 		}

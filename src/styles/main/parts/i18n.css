@@ -1,4 +1,4 @@
-html:not([lang^='cjk']) [lang^='cjk'],
+.cjk,
 html:not([lang^='zh']) [lang^='zh'],
 html:not([lang^='ja']) [lang^='ja'],
 html:not([lang^='ko']) [lang^='ko'] {

@@ -13,7 +13,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
-	langCode?: Extract<LanguageCode, 'zh' | 'zh-CN' | 'ja' | 'ko'> | undefined;
+	langCode?: Extract<LanguageCode, 'zh' | 'zh-Hans' | 'ja' | 'ko'> | undefined;
 }
 
 const { entry, langCode, ...props } = Astro.props;
@@ -30,8 +30,6 @@ const showDemolishedNotice = entry.data.status === LocationStatusEnum.Demolished
 
 const showChinese = langCode?.startsWith('zh');
 
-const wrapCjkOptions = langCode ? { langCode: langCode.startsWith('zh') ? 'zh' : langCode } : {};
-
 const t = getTranslations();
 ---
 
@@ -42,12 +40,7 @@ const t = getTranslations();
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.demolished') })} />
 					{showChinese ? (
-						<Fragment
-							set:html={transformMarkdown({
-								input: t('notice.demolished', langCode),
-								wrapCjkOptions,
-							})}
-						/>
+						<Fragment set:html={transformMarkdown({ input: t('notice.demolished', langCode) })} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}
@@ -55,9 +48,7 @@ const t = getTranslations();
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.danger') })} />
 					{showChinese ? (
-						<Fragment
-							set:html={transformMarkdown({ input: t('notice.danger', langCode), wrapCjkOptions })}
-						/>
+						<Fragment set:html={transformMarkdown({ input: t('notice.danger', langCode) })} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}
@@ -65,9 +56,7 @@ const t = getTranslations();
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.quality') })} />
 					{showChinese ? (
-						<Fragment
-							set:html={transformMarkdown({ input: t('notice.quality', langCode), wrapCjkOptions })}
-						/>
+						<Fragment set:html={transformMarkdown({ input: t('notice.quality', langCode) })} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}

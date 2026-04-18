@@ -1,11 +1,10 @@
 /**
  * i18n
  */
-// TODO: standardize language and script code handling
 export const LanguageCodeEnum = {
 	English: 'en',
 	ChineseTraditional: 'zh',
-	ChineseSimplified: 'zh-CN',
+	ChineseSimplified: 'zh-Hans',
 	Japanese: 'ja',
 	Thai: 'th',
 	Korean: 'ko',

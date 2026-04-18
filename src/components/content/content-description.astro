@@ -6,7 +6,6 @@ import { render } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
 import Prose from '#components/parts/prose.astro';
-import { getRegionLangCodeByEntry } from '#lib/collections/regions/regions-utils.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 
 interface Props {
@@ -15,10 +14,6 @@ interface Props {
 }
 
 const { class: className, entry, ...props } = Astro.props;
-
-const langCode = await getRegionLangCodeByEntry(entry);
-
-const wrapCjkOptions = langCode ? { langCode: langCode.startsWith('zh') ? 'zh' : langCode } : {};
 
 const hasContent = getHasContent(entry);
 
@@ -36,9 +31,7 @@ const { Content } = await render(entry);
 		<ContentSection {...props}>
 			<Fragment slot="section-description">
 				<Prose class:list={[className]} data-pagefind-weight="2">
-					<Fragment
-						set:html={transformMarkdown({ input: entry.data.description, wrapCjkOptions })}
-					/>
+					<Fragment set:html={transformMarkdown({ input: entry.data.description })} />
 				</Prose>
 			</Fragment>
 		</ContentSection>
