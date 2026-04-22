@@ -8,9 +8,11 @@
 	},
 	"private": true,
 	"dependencies": {
-		"astro-integration-kit": "^0.20.0",
 		"pagefind": "^1.5.2",
 		"sirv": "^3.0.2",
 		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"astro": "^6.1.8"
 	}
 }

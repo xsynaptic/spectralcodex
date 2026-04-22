@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.11.1",
+	"version": "6.11.2",
 	"scripts": {
 		"dev": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.development packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
@@ -97,7 +97,7 @@
 		"geokdbush": "^2.1.0",
 		"globals": "^17.5.0",
 		"kdbush": "^4.0.2",
-		"knip": "6.5.0",
+		"knip": "6.6.0",
 		"maplibre-gl": "^5.23.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
