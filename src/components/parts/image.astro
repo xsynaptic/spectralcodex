@@ -1,27 +1,28 @@
 ---
+import type { IPXOptions } from 'unpic/providers/ipx';
+
 import { Image as UnpicImage } from '@unpic/astro/base';
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
-import type { ImageComponentProps } from '#lib/image/image-types.ts';
+import type { ImageComponentProps, IPXOperations } from '#lib/image/image-types.ts';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
-import { createSignedIpxTransformer } from '#lib/image/image-server.ts';
+import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
 
 // Props interface: same as unpic base but without transformer
 type Props = ImageComponentProps;
 
 const { class: className, ...props } = Astro.props;
 
-const signedIpxTransformer = createSignedIpxTransformer({
+const getSignedIpxPath = createSignedIpxPathFunction({
 	imageQuality: IMAGE_QUALITY,
 	imageFormat: IMAGE_FORMAT,
 	serverSecret: IPX_SERVER_SECRET,
-	serverUrl: IPX_SERVER_URL,
 });
+
+function transformer(src: string | URL, operations: IPXOperations, options?: IPXOptions) {
+	return `${IPX_SERVER_URL}${getSignedIpxPath(src, operations, options)}`;
+}
 ---
 
-<UnpicImage
-	{...props}
-	class:list={['w-full object-cover', className]}
-	transformer={signedIpxTransformer}
-/>
+<UnpicImage {...props} class:list={['w-full object-cover', className]} transformer={transformer} />

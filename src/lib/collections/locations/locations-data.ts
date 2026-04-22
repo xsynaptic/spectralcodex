@@ -4,7 +4,7 @@ import { hashShort } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { sanitizeHtml, transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
-import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET } from 'astro:env/server';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
@@ -12,7 +12,8 @@ import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
+import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -20,22 +21,12 @@ import { getDescription } from '#lib/utils/text.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
-const getIpxImageUrl = createIpxImageUrlFunction({
+// Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
+const getSignedIpxPath = createSignedIpxPathFunction({
 	imageQuality: IMAGE_QUALITY,
 	imageFormat: IMAGE_FORMAT,
 	serverSecret: IPX_SERVER_SECRET,
-	serverUrl: IPX_SERVER_URL,
 });
-
-function getIpxImagePath(...args: Parameters<typeof getIpxImageUrl>) {
-	const url = getIpxImageUrl(...args);
-
-	if (url.startsWith('/')) return url;
-
-	const parsed = new URL(url);
-
-	return `${parsed.pathname}${parsed.search}`;
-}
 
 async function generateLocationPostDataFunction() {
 	const posts = await getCollection('posts');
@@ -54,30 +45,28 @@ async function generateLocationPostDataFunction() {
  */
 const imageThumbnailOptions = {
 	width: 350,
-	height: 234,
+	aspectRatio: 3 / 2,
 	widths: [350, 700],
 };
 
-function getLocationThumbnailProps(
-	imageSrc: string,
-	sourceWidth: number,
-	sourceHeight: number,
-): ImageThumbnail {
-	const { height, width, widths } = imageThumbnailOptions;
+function getLocationThumbnailProps(imageSrc: string, sourceWidth: number): ImageThumbnail {
+	const { aspectRatio, width, widths } = imageThumbnailOptions;
+	const fit = ImageFitOptionEnum.Cover;
 
 	// Filter widths to avoid upscaling
 	const clampedWidths = widths.filter((width) => width <= sourceWidth);
 	const clampedWidth = Math.min(width, sourceWidth);
+	const clampedHeight = Math.round(clampedWidth / aspectRatio);
 
 	return {
-		src: getIpxImagePath(imageSrc, { width: clampedWidth, sourceWidth, sourceHeight }),
+		src: getSignedIpxPath(imageSrc, { width: clampedWidth, height: clampedHeight, fit }),
 		srcSet: clampedWidths
-			.map(
-				(width) =>
-					`${getIpxImagePath(imageSrc, { width, sourceWidth, sourceHeight })} ${String(width)}w`,
-			)
+			.map((width) => {
+				const height = Math.round(width / aspectRatio);
+				return `${getSignedIpxPath(imageSrc, { width, height, fit })} ${String(width)}w`;
+			})
 			.join(', '),
-		height: String(height),
+		height: String(clampedHeight),
 		width: String(clampedWidth),
 	};
 }
@@ -96,7 +85,6 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 				entry.data._imageThumbnail = getLocationThumbnailProps(
 					imageEntry.id,
 					imageEntry.data.width,
-					imageEntry.data.height,
 				);
 			}
 		}
@@ -123,7 +111,6 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 						entry.data.geometry[index]._imageThumbnail = getLocationThumbnailProps(
 							imageEntry.id,
 							imageEntry.data.width,
-							imageEntry.data.height,
 						);
 					}
 				}

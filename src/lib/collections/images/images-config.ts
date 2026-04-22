@@ -14,7 +14,7 @@ import sharp from 'sharp';
 import { z } from 'zod';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
-import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
+import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { DateStringSchema } from '#lib/schemas/index.ts';
@@ -132,12 +132,11 @@ async function extractExifData(
 	};
 }
 
-// This function is used to set a sensible default for the image URL
-const getIpxImageUrl = createIpxImageUrlFunction({
+// Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
+const getSignedIpxPath = createSignedIpxPathFunction({
 	imageQuality: IMAGE_QUALITY,
 	imageFormat: IMAGE_FORMAT,
 	serverSecret: IPX_SERVER_SECRET,
-	serverUrl: IPX_SERVER_URL,
 });
 
 // Initialize ExifTool instance so it can be reused
@@ -179,11 +178,7 @@ export const images = defineCollection({
 			const defaultAspectRatio = 3 / 2;
 
 			const defaultMetadata = {
-				src: getIpxImageUrl(id, {
-					width: srcWidth,
-					sourceWidth: dimensions.width,
-					sourceHeight: dimensions.height,
-				}),
+				src: `${IPX_SERVER_URL}${getSignedIpxPath(id, { width: srcWidth })}`,
 				path: filePathRelative,
 				width: ImageSizeEnum.Large,
 				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),

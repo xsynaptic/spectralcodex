@@ -20,86 +20,30 @@ function fixIpxV4SizeModifier(url: string) {
 }
 
 /**
- * Prepend the server URL/prefix to a signed, path-only image URL
- * The image URL is built and signed without the prefix so signatures match
+ * Build a signed IPX path
+ * Output matches what nginx hashes via `secure_link_md5 "${uri}${IPX_SERVER_SECRET}"`
+ * Callers prepend IPX_SERVER_URL themselves to produce a browser-fetchable URL
  */
-function prependServerUrl(path: string, serverUrl: string) {
-	if (!serverUrl || serverUrl === '/') return path;
-	return serverUrl.replace(/\/$/, '') + path;
-}
-
-/**
- * Generate a signed IPX image URL
- */
-export function createIpxImageUrlFunction({
+export function createSignedIpxPathFunction({
 	imageQuality,
 	imageFormat,
 	serverSecret,
-	serverUrl,
 }: {
 	imageQuality: number;
 	imageFormat: ImageFormat;
 	serverSecret: string;
-	serverUrl: string;
 }) {
-	return function getIpxImageUrl(
-		imageSrc: string,
-		options: {
-			width: number;
-			height?: number;
-			sourceWidth?: number;
-			sourceHeight?: number;
-			quality?: number;
-			format?: ImageFormat;
-		},
-	) {
-		const { sourceWidth, sourceHeight, quality = imageQuality, format = imageFormat } = options;
-
-		const width = sourceWidth ? Math.min(options.width, sourceWidth) : options.width;
-		const height =
-			options.height && sourceHeight ? Math.min(options.height, sourceHeight) : options.height;
-
-		const path = ipxTransform(
-			imageSrc,
-			{
-				q: quality,
-				f: format,
-				...(height ? { s: `${String(width)}x${String(height)}` } : { w: width }),
-			},
-			{ baseURL: '/' },
-		);
-
-		const signedPath = generateSignedUrl(path, serverSecret);
-
-		return prependServerUrl(signedPath, serverUrl);
-	};
-}
-
-// Signed transformer that wraps IPX with URL signing and default operations for the image component
-export function createSignedIpxTransformer({
-	imageQuality,
-	imageFormat,
-	serverSecret,
-	serverUrl,
-}: {
-	imageQuality: number;
-	imageFormat: ImageFormat;
-	serverSecret: string;
-	serverUrl: string;
-}) {
-	return function signedIpxTransformer(
+	return function getSignedIpxPath(
 		src: string | URL,
 		operations: IPXOperations,
 		options?: IPXOptions,
-	) {
+	): string {
 		const path = ipxTransform(
 			src,
-			{ ...operations, q: imageQuality, f: imageFormat },
+			{ ...operations, quality: imageQuality, format: imageFormat },
 			{ ...options, baseURL: '/' },
 		);
 
-		const signedPath = generateSignedUrl(fixIpxV4SizeModifier(path), serverSecret);
-
-		return prependServerUrl(signedPath, serverUrl);
+		return generateSignedUrl(fixIpxV4SizeModifier(path), serverSecret);
 	};
 }

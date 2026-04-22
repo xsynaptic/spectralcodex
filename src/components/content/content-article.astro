@@ -5,7 +5,8 @@ import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
 import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { createIpxImageUrlFunction } from '#lib/image/image-server.ts';
+import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
+import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 interface Props extends HTMLAttributes<'article'> {
 	imageId: string | undefined;
@@ -14,8 +15,10 @@ interface Props extends HTMLAttributes<'article'> {
 
 const { imageId, hideSearch, ...props } = Astro.props;
 
+// Pagefind renders result thumbnails at 64×48 (4:3) via `--pf-image-width` / `--pf-image-height`
 const SEARCH_THUMBNAIL_WIDTH = 64;
 const SEARCH_THUMBNAIL_WIDTH_2X = SEARCH_THUMBNAIL_WIDTH * 2;
+const SEARCH_THUMBNAIL_ASPECT_RATIO = 4 / 3;
 
 async function getThumbnailUrls() {
 	if (!imageId) return;
@@ -25,21 +28,25 @@ async function getThumbnailUrls() {
 
 	if (!imageEntry) return;
 
-	const getIpxImageUrl = createIpxImageUrlFunction({
+	const getSignedIpxPath = createSignedIpxPathFunction({
 		imageQuality: IMAGE_QUALITY,
 		imageFormat: IMAGE_FORMAT,
 		serverSecret: IPX_SERVER_SECRET,
-		serverUrl: IPX_SERVER_URL,
 	});
 
-	const dimensions = {
-		sourceWidth: imageEntry.data.width,
-		sourceHeight: imageEntry.data.height,
-	};
+	const fit = ImageFitOptionEnum.Cover;
 
 	return {
-		url1x: getIpxImageUrl(imageId, { width: SEARCH_THUMBNAIL_WIDTH, ...dimensions }),
-		url2x: getIpxImageUrl(imageId, { width: SEARCH_THUMBNAIL_WIDTH_2X, ...dimensions }),
+		url1x: `${IPX_SERVER_URL}${getSignedIpxPath(imageId, {
+			width: SEARCH_THUMBNAIL_WIDTH,
+			height: Math.round(SEARCH_THUMBNAIL_WIDTH / SEARCH_THUMBNAIL_ASPECT_RATIO),
+			fit,
+		})}`,
+		url2x: `${IPX_SERVER_URL}${getSignedIpxPath(imageId, {
+			width: SEARCH_THUMBNAIL_WIDTH_2X,
+			height: Math.round(SEARCH_THUMBNAIL_WIDTH_2X / SEARCH_THUMBNAIL_ASPECT_RATIO),
+			fit,
+		})}`,
 	};
 }
 
