@@ -8,16 +8,10 @@ import type { DataStoreEntry } from '../shared/data-store';
  * Longform links (objects with title and url) are always valid and skipped
  */
 export function checkFrontmatterLinks(
-	collections: Array<[string, Array<DataStoreEntry>]>,
+	entries: Array<DataStoreEntry>,
+	resourceEntries: Array<DataStoreEntry>,
 ): boolean {
-	const resourcesCollection = collections.find(([collection]) => collection === 'resources')?.[1];
-
-	if (!resourcesCollection) {
-		console.log(chalk.red('❌ Resources collection not found'));
-		return false;
-	}
-
-	const resourcePatterns = resourcesCollection
+	const resourcePatterns = resourceEntries
 		.map((entry) => ({
 			id: entry.id,
 			match: entry.data.match as string | Array<string> | undefined,
@@ -26,26 +20,24 @@ export function checkFrontmatterLinks(
 
 	const unmatchedLinks: Array<{ file: string; url: string }> = [];
 
-	for (const [, entries] of collections) {
-		for (const entry of entries) {
-			const links = entry.data.links as Array<string | { url: string }> | undefined;
+	for (const entry of entries) {
+		const links = entry.data.links as Array<string | { url: string }> | undefined;
 
-			if (!links) continue;
+		if (!links) continue;
 
-			for (const link of links) {
-				if (typeof link !== 'string') continue;
+		for (const link of links) {
+			if (typeof link !== 'string') continue;
 
-				const hasMatch = resourcePatterns.some((resource) => {
-					if (typeof resource.match === 'string') {
-						return link.includes(resource.match);
-					}
-
-					return resource.match!.some((pattern) => link.includes(pattern));
-				});
-
-				if (!hasMatch) {
-					unmatchedLinks.push({ file: entry.filePath ?? entry.id, url: link });
+			const hasMatch = resourcePatterns.some((resource) => {
+				if (typeof resource.match === 'string') {
+					return link.includes(resource.match);
 				}
+
+				return resource.match!.some((pattern) => link.includes(pattern));
+			});
+
+			if (!hasMatch) {
+				unmatchedLinks.push({ file: entry.filePath ?? entry.id, url: link });
 			}
 		}
 	}

@@ -31,17 +31,17 @@ const mediaPath = path.join(values['root-path'], values['media-path']);
 
 const { collections } = loadDataStore(dataStorePath);
 
-const allEntries = [
-	...getDataStoreCollection(collections, 'archives'),
-	...getDataStoreCollection(collections, 'notes'),
-	...getDataStoreCollection(collections, 'locations'),
-	...getDataStoreCollection(collections, 'pages'),
-	...getDataStoreCollection(collections, 'posts'),
-	...getDataStoreCollection(collections, 'regions'),
-	...getDataStoreCollection(collections, 'resources'),
-	...getDataStoreCollection(collections, 'series'),
-	...getDataStoreCollection(collections, 'themes'),
-];
+const allEntries = getDataStoreCollection(collections, [
+	'archives',
+	'notes',
+	'locations',
+	'pages',
+	'posts',
+	'regions',
+	'resources',
+	'series',
+	'themes',
+]);
 
 const mediaFiles = collectMediaFiles(mediaPath);
 const referencedImages = new Set<string>();

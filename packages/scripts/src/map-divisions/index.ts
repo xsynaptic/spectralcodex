@@ -252,7 +252,7 @@ async function mapDivisions() {
 		const { collections } = loadDataStore(
 			path.join(values['root-path'], values['data-store-path']),
 		);
-		const regionEntries = getDataStoreCollection(collections, 'regions');
+		const regionEntries = getDataStoreCollection(collections, ['regions']);
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
 

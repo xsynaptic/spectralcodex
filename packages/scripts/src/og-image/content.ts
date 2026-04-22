@@ -423,7 +423,7 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 	}
 
 	for (const collection of Object.values(ContentCollectionsEnum)) {
-		const collectionEntries = getDataStoreCollection(collections, collection);
+		const collectionEntries = getDataStoreCollection(collections, [collection]);
 
 		for (const entry of collectionEntries) {
 			// For locations with overrides, use the override ID and titles for public-facing OG images

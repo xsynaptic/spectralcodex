@@ -67,27 +67,25 @@ function validateImgComponents(content: string): Array<ComponentError> {
 	return errors;
 }
 
-export function checkMdxComponents(entriesByCollection: Array<[string, Array<DataStoreEntry>]>) {
+export function checkMdxComponents(entries: Array<DataStoreEntry>) {
 	let overallErrorCount = 0;
 
-	for (const [, entries] of entriesByCollection) {
-		for (const entry of entries) {
-			if (!entry.body) continue;
+	for (const entry of entries) {
+		if (!entry.body) continue;
 
-			const linkErrors = validateLinkComponents(entry.body);
-			const imgErrors = validateImgComponents(entry.body);
-			const allErrors = [...linkErrors, ...imgErrors];
+		const linkErrors = validateLinkComponents(entry.body);
+		const imgErrors = validateImgComponents(entry.body);
+		const allErrors = [...linkErrors, ...imgErrors];
 
-			if (allErrors.length > 0) {
-				console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
+		if (allErrors.length > 0) {
+			console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
 
-				for (const error of allErrors) {
-					console.log(chalk.red(`   Line ${error.line.toString()}: ${error.message}`));
-					console.log(chalk.gray(`   ${error.context.trim()}`));
-				}
-
-				overallErrorCount += allErrors.length;
+			for (const error of allErrors) {
+				console.log(chalk.red(`   Line ${error.line.toString()}: ${error.message}`));
+				console.log(chalk.gray(`   ${error.context.trim()}`));
 			}
+
+			overallErrorCount += allErrors.length;
 		}
 	}
 

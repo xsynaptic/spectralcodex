@@ -3,11 +3,10 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { DataStoreEntry } from '../shared/data-store';
-
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
+import { checkImageFeaturedInBody } from './image-featured-in-body';
 import { checkImageReferences } from './images';
 import { checkLinkIds } from './link-ids';
 import { checkLocationsCoordinates } from './locations-coordinates';
@@ -48,41 +47,43 @@ const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];
 
-type CollectionEntries = Array<[string, Array<DataStoreEntry>]>;
+const allEntries = getDataStoreCollection(collections, [
+	'archives',
+	'notes',
+	'locations',
+	'pages',
+	'posts',
+	'regions',
+	'resources',
+	'series',
+	'themes',
+]);
 
-const allCollections: CollectionEntries = [
-	['archives', getDataStoreCollection(collections, 'archives')],
-	['notes', getDataStoreCollection(collections, 'notes')],
-	['locations', getDataStoreCollection(collections, 'locations')],
-	['pages', getDataStoreCollection(collections, 'pages')],
-	['posts', getDataStoreCollection(collections, 'posts')],
-	['regions', getDataStoreCollection(collections, 'regions')],
-	['resources', getDataStoreCollection(collections, 'resources')],
-	['series', getDataStoreCollection(collections, 'series')],
-	['themes', getDataStoreCollection(collections, 'themes')],
-];
+const metadataEntries = getDataStoreCollection(collections, [
+	'notes',
+	'locations',
+	'pages',
+	'posts',
+	'regions',
+	'series',
+	'themes',
+]);
 
-const metadataCollections: CollectionEntries = [
-	['notes', getDataStoreCollection(collections, 'notes')],
-	['locations', getDataStoreCollection(collections, 'locations')],
-	['pages', getDataStoreCollection(collections, 'pages')],
-	['posts', getDataStoreCollection(collections, 'posts')],
-	['regions', getDataStoreCollection(collections, 'regions')],
-	['series', getDataStoreCollection(collections, 'series')],
-	['themes', getDataStoreCollection(collections, 'themes')],
-];
+const bodyContentEntries = getDataStoreCollection(collections, ['notes', 'locations', 'posts']);
+
+const resourceEntries = getDataStoreCollection(collections, ['resources']);
 
 // Note: there is no need for a help command
 switch (command) {
 	// Check for locations not assigned to regions OR locations with mismatching regions and assigned paths
 	case 'location-regions': {
-		checkLocationsRegions(getDataStoreCollection(collections, 'locations'));
+		checkLocationsRegions(getDataStoreCollection(collections, ['locations']));
 		break;
 	}
 	// Check for locations not inside their assigned regions
 	case 'location-coordinates': {
 		await checkLocationsCoordinates(
-			getDataStoreCollection(collections, 'locations'),
+			getDataStoreCollection(collections, ['locations']),
 			path.join(values['root-path'], values['divisions-path']),
 		);
 		break;
@@ -90,42 +91,43 @@ switch (command) {
 	// Check for locations that are too close to each other
 	case 'location-overlap': {
 		checkLocationsOverlap(
-			getDataStoreCollection(collections, 'locations'),
+			getDataStoreCollection(collections, ['locations']),
 			Number.parseInt(values.threshold, 10),
 		);
 		break;
 	}
 	// Check for duplicate location data (titles, addresses, links)
 	case 'location-duplicates': {
-		checkLocationsDuplicates(getDataStoreCollection(collections, 'locations'));
+		checkLocationsDuplicates(getDataStoreCollection(collections, ['locations']));
 		break;
 	}
 	// Check for regions without a divisionId
 	case 'divisions': {
-		checkDivisionIds(getDataStoreCollection(collections, 'regions'));
+		checkDivisionIds(getDataStoreCollection(collections, ['regions']));
 		break;
 	}
 	// Check for malformed MDX components
 	case 'mdx': {
-		checkMdxComponents(allCollections);
+		checkMdxComponents(allEntries);
 		break;
 	}
 	// Check for Link components referencing non-existent entry IDs
 	case 'link-ids': {
-		checkLinkIds(allCollections, metadataCollections);
+		checkLinkIds(allEntries, metadataEntries);
 		break;
 	}
 	// Check for shortform links that do not match any resource
 	case 'frontmatter-links': {
-		checkFrontmatterLinks(allCollections);
+		checkFrontmatterLinks(allEntries, resourceEntries);
+		break;
+	}
+	case 'image-featured-in-body': {
+		checkImageFeaturedInBody(bodyContentEntries);
 		break;
 	}
 	// Check for image references that do not exist
 	case 'images': {
-		checkImageReferences(
-			allCollections.flatMap(([, entries]) => entries),
-			path.join(values['root-path'], values['media-path']),
-		);
+		checkImageReferences(allEntries, path.join(values['root-path'], values['media-path']));
 		break;
 	}
 	default: {
@@ -136,24 +138,22 @@ switch (command) {
 
 		// Run all validations for deployment and report all problems at once
 		const syncResults: Array<boolean> = [
-			checkMdxComponents(allCollections),
-			checkLinkIds(allCollections, metadataCollections),
-			checkFrontmatterLinks(allCollections),
-			checkImageReferences(
-				allCollections.flatMap(([, entries]) => entries),
-				path.join(values['root-path'], values['media-path']),
-			),
-			checkLocationsDuplicates(getDataStoreCollection(collections, 'locations')),
-			checkLocationsRegions(getDataStoreCollection(collections, 'locations')),
+			checkMdxComponents(allEntries),
+			checkLinkIds(allEntries, metadataEntries),
+			checkFrontmatterLinks(allEntries, resourceEntries),
+			checkImageReferences(allEntries, path.join(values['root-path'], values['media-path'])),
+			checkImageFeaturedInBody(bodyContentEntries),
+			checkLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),
+			checkLocationsRegions(getDataStoreCollection(collections, ['locations'])),
 			checkLocationsOverlap(
-				getDataStoreCollection(collections, 'locations'),
+				getDataStoreCollection(collections, ['locations']),
 				Number.parseInt(values.threshold, 10),
 			),
-			checkDivisionIds(getDataStoreCollection(collections, 'regions')),
+			checkDivisionIds(getDataStoreCollection(collections, ['regions'])),
 		];
 
 		const asyncResults = await checkLocationsCoordinates(
-			getDataStoreCollection(collections, 'locations'),
+			getDataStoreCollection(collections, ['locations']),
 			path.join(values['root-path'], values['divisions-path']),
 		);
 

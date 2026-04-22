@@ -98,11 +98,21 @@ export function loadDataStore(dataStorePath: string): DataStoreResult {
  */
 export function getDataStoreCollection(
 	collections: DataStoreCollections,
-	name: string,
+	names: Array<string>,
 ): Array<DataStoreEntry> {
-	const collection = collections.get(name);
+	const entries: Array<DataStoreEntry> = [];
 
-	return collection ? [...collection.values()] : [];
+	for (const name of names) {
+		const collection = collections.get(name);
+
+		if (!collection) {
+			throw new Error(`Unknown collection: "${name}"`);
+		}
+
+		entries.push(...collection.values());
+	}
+
+	return entries;
 }
 
 /**

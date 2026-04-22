@@ -135,7 +135,7 @@ try {
 	let skipped = 0;
 
 	for (const collectionName of LINK_COLLECTIONS) {
-		const entries = getDataStoreCollection(collections, collectionName);
+		const entries = getDataStoreCollection(collections, [collectionName]);
 
 		for (const entry of entries) {
 			const contentId = `${collectionName}/${entry.id}`;

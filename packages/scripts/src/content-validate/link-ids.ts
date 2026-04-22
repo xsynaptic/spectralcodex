@@ -4,43 +4,36 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 const LINK_ID_REGEX = /<Link\s[^>]*id="([^"]+)"/g;
 
-export function checkLinkIds(
-	collections: Array<[string, Array<DataStoreEntry>]>,
-	validTargets: Array<[string, Array<DataStoreEntry>]>,
-) {
+export function checkLinkIds(entries: Array<DataStoreEntry>, validTargets: Array<DataStoreEntry>) {
 	const validIds = new Set<string>();
 
-	for (const [, entries] of validTargets) {
-		for (const entry of entries) {
-			validIds.add(entry.id);
-		}
+	for (const entry of validTargets) {
+		validIds.add(entry.id);
 	}
 
 	let overallErrorCount = 0;
 
-	for (const [, entries] of collections) {
-		for (const entry of entries) {
-			if (!entry.body?.includes('<Link ')) continue;
+	for (const entry of entries) {
+		if (!entry.body?.includes('<Link ')) continue;
 
-			LINK_ID_REGEX.lastIndex = 0;
-			let match: RegExpExecArray | null;
-			let entryHeaderPrinted = false;
+		LINK_ID_REGEX.lastIndex = 0;
+		let match: RegExpExecArray | null;
+		let entryHeaderPrinted = false;
 
-			while ((match = LINK_ID_REGEX.exec(entry.body)) !== null) {
-				const id = match[1];
+		while ((match = LINK_ID_REGEX.exec(entry.body)) !== null) {
+			const id = match[1];
 
-				if (!id || !validIds.has(id)) {
-					if (!entryHeaderPrinted) {
-						console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
-						entryHeaderPrinted = true;
-					}
-
-					const lineNumber = entry.body.slice(0, match.index).split('\n').length;
-					console.log(
-						chalk.red(`   Line ${lineNumber.toString()}: broken link ID "${id ?? 'undefined'}"`),
-					);
-					overallErrorCount++;
+			if (!id || !validIds.has(id)) {
+				if (!entryHeaderPrinted) {
+					console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
+					entryHeaderPrinted = true;
 				}
+
+				const lineNumber = entry.body.slice(0, match.index).split('\n').length;
+				console.log(
+					chalk.red(`   Line ${lineNumber.toString()}: broken link ID "${id ?? 'undefined'}"`),
+				);
+				overallErrorCount++;
 			}
 		}
 	}

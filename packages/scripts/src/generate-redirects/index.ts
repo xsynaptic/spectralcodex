@@ -48,7 +48,7 @@ const PREFIXED_COLLECTIONS: Record<string, string> = {
 const redirects: Array<RedirectPair> = [];
 
 for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLECTIONS)]) {
-	const entries = getDataStoreCollection(collections, collectionName);
+	const entries = getDataStoreCollection(collections, [collectionName]);
 
 	for (const entry of entries) {
 		const formerIds = entry.data.formerIds as Array<string> | undefined;

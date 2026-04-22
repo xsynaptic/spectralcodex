@@ -324,7 +324,7 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 
 	// Get entries from posts and locations collections
 	for (const collectionName of [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]) {
-		const collectionEntries = getDataStoreCollection(collections, collectionName);
+		const collectionEntries = getDataStoreCollection(collections, [collectionName]);
 
 		for (const entry of collectionEntries) {
 			// Filter: must have digest
