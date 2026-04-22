@@ -21,3 +21,10 @@ html:not([lang^='th']) [lang^='th'] {
 	text-transform: none !important;
 	word-break: break-word !important;
 }
+
+/** Multilingual titles */
+@media (min-width: 40rem) {
+	.title-ml .cjk {
+		@apply font-semibold;
+	}
+}

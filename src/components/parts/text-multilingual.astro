@@ -1,9 +1,8 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
-import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
-
 import TextParenthesis from '#components/parts/text-parenthesis.astro';
+import { type MultilingualContent, LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
@@ -21,6 +20,15 @@ const {
 	parenthesis = false,
 	...props
 } = Astro.props;
+
+function isCjk(lang: string): boolean {
+	return (
+		lang === LanguageCodeEnum.ChineseTraditional ||
+		lang === LanguageCodeEnum.ChineseSimplified ||
+		lang === LanguageCodeEnum.Japanese ||
+		lang === LanguageCodeEnum.Korean
+	);
+}
 ---
 
 {
@@ -28,19 +36,31 @@ const {
 		<>
 			{parenthesis ? (
 				<TextParenthesis as={Tag} class={className}>
-					<Tag lang={content.lang} {...props}>
+					<Tag
+						lang={content.lang}
+						class:list={[isCjk(content.lang) ? 'cjk' : undefined]}
+						{...props}
+					>
 						<Fragment set:html={content.value} />
 					</Tag>
 				</TextParenthesis>
 			) : (
 				<>
-					<Tag lang={content.lang} class={className} {...props}>
+					<Tag
+						lang={content.lang}
+						class:list={[className, isCjk(content.lang) ? 'cjk' : undefined]}
+						{...props}
+					>
 						<Fragment set:html={content.value} />
 					</Tag>
 					{additional?.map((item) => (
 						<>
-							{'\uFF0F'}
-							<Tag lang={item.lang} class={className} {...props}>
+							{'／'}
+							<Tag
+								lang={item.lang}
+								class:list={[className, isCjk(item.lang) ? 'cjk' : undefined]}
+								{...props}
+							>
 								<Fragment set:html={item.value} />
 							</Tag>
 						</>
