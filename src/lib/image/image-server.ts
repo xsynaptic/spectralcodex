@@ -20,6 +20,15 @@ function fixIpxV4SizeModifier(url: string) {
 }
 
 /**
+ * Prepend the server URL/prefix to a signed, path-only image URL
+ * The image URL is built and signed without the prefix so signatures match
+ */
+function prependServerUrl(path: string, serverUrl: string) {
+	if (!serverUrl || serverUrl === '/') return path;
+	return serverUrl.replace(/\/$/, '') + path;
+}
+
+/**
  * Generate a signed IPX image URL
  */
 export function createIpxImageUrlFunction({
@@ -50,17 +59,19 @@ export function createIpxImageUrlFunction({
 		const height =
 			options.height && sourceHeight ? Math.min(options.height, sourceHeight) : options.height;
 
-		const url = ipxTransform(
+		const path = ipxTransform(
 			imageSrc,
 			{
 				q: quality,
 				f: format,
 				...(height ? { s: `${String(width)}x${String(height)}` } : { w: width }),
 			},
-			{ baseURL: serverUrl },
+			{ baseURL: '/' },
 		);
 
-		return generateSignedUrl(url, serverSecret);
+		const signedPath = generateSignedUrl(path, serverSecret);
+
+		return prependServerUrl(signedPath, serverUrl);
 	};
 }
 
@@ -81,12 +92,14 @@ export function createSignedIpxTransformer({
 		operations: IPXOperations,
 		options?: IPXOptions,
 	) {
-		const url = ipxTransform(
+		const path = ipxTransform(
 			src,
 			{ ...operations, q: imageQuality, f: imageFormat },
-			{ ...options, baseURL: serverUrl },
+			{ ...options, baseURL: '/' },
 		);
 
-		return generateSignedUrl(fixIpxV4SizeModifier(url), serverSecret);
+		const signedPath = generateSignedUrl(fixIpxV4SizeModifier(path), serverSecret);
+
+		return prependServerUrl(signedPath, serverUrl);
 	};
 }

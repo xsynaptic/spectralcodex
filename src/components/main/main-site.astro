@@ -59,7 +59,11 @@ const t = getTranslations();
 			href={`${getSiteUrl()}favicon.svg`}
 			media="(prefers-color-scheme: dark)"
 		/>
-		<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
+		{
+			IPX_SERVER_URL.startsWith('http') ? (
+				<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
+			) : undefined
+		}
 		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />

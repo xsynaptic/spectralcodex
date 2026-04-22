@@ -28,9 +28,13 @@ const getIpxImageUrl = createIpxImageUrlFunction({
 });
 
 function getIpxImagePath(...args: Parameters<typeof getIpxImageUrl>) {
-	const url = new URL(getIpxImageUrl(...args));
+	const url = getIpxImageUrl(...args);
 
-	return `${url.pathname}${url.search}`;
+	if (url.startsWith('/')) return url;
+
+	const parsed = new URL(url);
+
+	return `${parsed.pathname}${parsed.search}`;
 }
 
 async function generateLocationPostDataFunction() {

@@ -12,7 +12,7 @@ if (!process.env.IPX_SERVER_SECRET) {
 const IPX_SERVER_SECRET = process.env.IPX_SERVER_SECRET;
 
 function signTestUrl(path: string): string {
-	return generateSignedUrl(`${IPX_SERVER_URL}${path}`, IPX_SERVER_SECRET);
+	return `${IPX_SERVER_URL}${generateSignedUrl(path, IPX_SERVER_SECRET)}`;
 }
 
 describe('image server integration', () => {

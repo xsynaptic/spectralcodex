@@ -1,17 +1,18 @@
 import { createHash } from 'node:crypto';
 
 /**
- * Sign a URL by appending a signature query parameter
- * Pure function that takes the secret as a parameter for testability
- * Note 1: nginx's $uri is decoded, so we need to decode the pathname again
- * Note 2: this needs to be in its own file for integration tests
+ * Sign an IPX path by appending a signature query parameter
+ * Input must be a path (e.g. `/w_450,q_88,f_jpg/image.jpg`), not an absolute URL
+ * Domain/origin is prepended *after* signing so the signature matches nginx's $uri
+ * Note: this needs to be in its own file for integration tests to work
  */
-export function generateSignedUrl(url: string, secret: string): string {
-	const urlObj = new URL(url);
-	const decodedPathname = decodeURIComponent(urlObj.pathname);
+export function generateSignedUrl(path: string, secret: string): string {
+	const [pathname = '', query] = path.split('?');
+	const decodedPathname = decodeURIComponent(pathname);
 	const signature = createHash('md5').update(`${decodedPathname}${secret}`).digest('base64url');
+	const params = new URLSearchParams(query);
 
-	urlObj.searchParams.set('s', signature);
+	params.set('s', signature);
 
-	return urlObj.toString();
+	return `${pathname}?${params.toString()}`;
 }

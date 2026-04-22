@@ -68,7 +68,7 @@ export default defineConfig({
 			IPX_SERVER_URL: envField.string({
 				context: 'server',
 				access: 'secret',
-				default: 'http://localhost:3100',
+				default: '/_ipx',
 			}),
 			IPX_SERVER_SECRET: envField.string({
 				context: 'server',
@@ -103,6 +103,13 @@ export default defineConfig({
 		server: {
 			watch: {
 				ignored: ['./*.md'],
+			},
+			proxy: {
+				'/_ipx': {
+					target: 'http://localhost:3100',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/_ipx/, ''),
+				},
 			},
 		},
 		optimizeDeps: {
