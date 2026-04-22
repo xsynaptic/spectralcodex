@@ -20,7 +20,7 @@ class NavMenu extends HTMLElement {
 		if (target.closest('a') && isTouch) {
 			const trigger = li.querySelector<HTMLElement>(':scope > div');
 
-			if (trigger?.contains(target as Node) && li.dataset.open === undefined) {
+			if (trigger?.contains(target) && li.dataset.open === undefined) {
 				event.preventDefault();
 				this.#closeSiblings(li);
 				this.#open(li);
@@ -37,7 +37,7 @@ class NavMenu extends HTMLElement {
 		// Only respond to clicks within the trigger element
 		const trigger = li.querySelector<HTMLElement>(':scope > div');
 
-		if (!trigger?.contains(target as Node)) return;
+		if (!trigger?.contains(target)) return;
 
 		event.preventDefault();
 

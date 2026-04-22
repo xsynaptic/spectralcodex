@@ -14,14 +14,14 @@ export default {
 				'@xsynaptic/image-server', // workspace package used at deploy time
 				'eslint-plugin-jsx-a11y', // transitive dep required by eslint-plugin-astro jsx-a11y-strict
 				'p-limit', // used in workspace packages (image-loader, scripts)
-				'unified', // transitive dep of @xsynaptic/unified-tools
 			],
 		},
 		'packages/content-demo': {
 			ignore: ['collections/**'],
 		},
 		'packages/content': {
-			entry: ['.mdxlintrc.mjs'],
+			entry: ['format-content.mjs', 'global.d.ts'],
+			ignore: ['collections/**'],
 			ignoreDependencies: [
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
 				'textlint-rule-diacritics',
