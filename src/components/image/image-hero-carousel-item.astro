@@ -9,7 +9,7 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
-import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedWithCaption {
 	index: number;
@@ -42,7 +42,7 @@ async function getImageProps(
 			sizes: '100vw',
 			width: ImageSizeEnum.ExtraExtraLarge,
 			height: Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio),
-			alt: sanitizeAltAttribute(alt),
+			alt: sanitizeImageAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
 			...(priority ? { priority: true } : {}),

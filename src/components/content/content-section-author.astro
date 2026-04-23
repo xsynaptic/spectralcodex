@@ -19,7 +19,7 @@ import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 type Props = HTMLAttributes<'div'> & {
 	showAuthor?: boolean | undefined;
@@ -28,6 +28,8 @@ type Props = HTMLAttributes<'div'> & {
 const { class: className, showAuthor = false, ...props } = Astro.props;
 
 const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+
+const t = getTranslations();
 
 async function getImageProps(): Promise<{
 	imageEntry: CollectionEntry<'images'> | undefined;
@@ -49,7 +51,7 @@ async function getImageProps(): Promise<{
 			src: IMAGE_SRC,
 			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
 			sizes: '(max-width: 640px) 150px, 150px',
-			alt: sanitizeAltAttribute('Profile photo of Alexander Synaptic, founder of Spectral Codex'),
+			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			operations: { fit },
 		},
@@ -62,8 +64,6 @@ async function getImageProps(): Promise<{
 }
 
 const { imageProps, placeholderProps } = await getImageProps();
-
-const t = getTranslations();
 ---
 
 <ContentSection

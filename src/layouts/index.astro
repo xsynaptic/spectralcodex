@@ -26,7 +26,7 @@ import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
-import { formatStringTemplate, sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { formatStringTemplate, sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
 	featuredMetadataItems: Array<ContentMetadataItem>;
@@ -61,7 +61,7 @@ async function getImageProps(): Promise<{
 			src: IMAGE_SRC,
 			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
 			sizes: `(min-width: 360px) 180px, (min-width: ${TAILWIND_BREAKPOINT_SM}) 300px, 300px`,
-			alt: sanitizeAltAttribute(t('author.photo.alt')),
+			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			priority: true,
 		},

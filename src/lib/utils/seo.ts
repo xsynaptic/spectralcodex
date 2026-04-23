@@ -1,13 +1,19 @@
 import { cacheFileExists } from '@spectralcodex/shared/cache';
 import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
+import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import path from 'node:path';
 import * as R from 'remeda';
 
-import { OPEN_GRAPH_IMAGE_FALLBACK_COUNT, OPEN_GRAPH_IMAGE_FALLBACK_PREFIX } from '#constants.ts';
+import {
+	MDX_COMPONENTS,
+	OPEN_GRAPH_IMAGE_FALLBACK_COUNT,
+	OPEN_GRAPH_IMAGE_FALLBACK_PREFIX,
+} from '#constants.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { logError } from '#lib/utils/logging.ts';
 import { joinUrl } from '#lib/utils/routing.ts';
+import { stripFootnoteReferences, textClipper, stripMdxComponents } from '#lib/utils/text.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
 
@@ -65,5 +71,21 @@ export function getSeoHideSearch(shouldHide: boolean | undefined) {
 				noIndex: true,
 				noFollow: true,
 			}
+		: undefined;
+}
+
+// Simple text-only SEO description that accepts a variety of things you might throw at it
+export function sanitizeSeoDescription(description: string | undefined): string | undefined {
+	return description
+		? R.pipe(
+				description,
+				stripFootnoteReferences,
+				(description) => stripMdxComponents(description, MDX_COMPONENTS),
+				(description) => transformMarkdown({ input: description }),
+				stripTags,
+				// Collapse paragraph-separating whitespace left behind by stripTags
+				(stripped) => stripped.replaceAll(/\s+/g, ' ').trim(),
+				(stripped) => textClipper(stripped, { wordCount: 100 }),
+			)
 		: undefined;
 }

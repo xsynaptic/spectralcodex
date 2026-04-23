@@ -16,7 +16,7 @@ import {
 } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { sanitizeAltAttribute, sanitizeCaption } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute, sanitizeImageCaption } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'figure'> {
 	imageId: string;
@@ -89,7 +89,7 @@ async function getImageProps(): Promise<{
 				: {}),
 			unstyled: true,
 			...(priority ? { priority: true } : {}),
-			alt: sanitizeAltAttribute(altProp ?? slotContents ?? ''),
+			alt: sanitizeImageAltAttribute(altProp ?? slotContents ?? ''),
 		},
 		placeholderProps: {
 			imageId,
@@ -101,7 +101,7 @@ async function getImageProps(): Promise<{
 
 const { imageEntry, imageProps, placeholderProps, aspectRatioString } = await getImageProps();
 
-const caption = slotContents ? sanitizeCaption(slotContents) : undefined;
+const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 ---
 
 {

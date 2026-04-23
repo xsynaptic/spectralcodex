@@ -13,7 +13,7 @@ import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;
@@ -51,7 +51,7 @@ async function getImageProps(): Promise<{
 			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 425px`,
 			width: ImageSizeEnum.Medium,
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
-			alt: sanitizeAltAttribute(alt),
+			alt: sanitizeImageAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
 		} satisfies ImageComponentProps,

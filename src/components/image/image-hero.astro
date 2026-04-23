@@ -6,7 +6,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
-import { sanitizeAltAttribute } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
 	hasHeroImage: boolean;
@@ -38,7 +38,7 @@ async function getImageProps(
 			sizes: '100vw',
 			priority: true,
 			unstyled: true,
-			alt: sanitizeAltAttribute(alt),
+			alt: sanitizeImageAltAttribute(alt),
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,

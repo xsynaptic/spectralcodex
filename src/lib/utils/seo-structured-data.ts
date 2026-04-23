@@ -1,6 +1,6 @@
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { sanitizeDescription } from '#lib/utils/text.ts';
+import { sanitizeSeoDescription } from '#lib/utils/seo.ts';
 
 const SchemaTypeEnum = {
 	Article: 'Article',
@@ -114,7 +114,7 @@ export function buildArticleSchema(props: {
 	url: string;
 	imageUrl: string | undefined;
 }): Article {
-	const description = sanitizeDescription(props.description);
+	const description = sanitizeSeoDescription(props.description);
 
 	return {
 		'@type': SchemaTypeEnum.Article,
@@ -150,7 +150,7 @@ export function buildPlaceSchema(props: {
 	url: string;
 	coordinates: [number, number] | undefined;
 }): Place {
-	const description = sanitizeDescription(props.description);
+	const description = sanitizeSeoDescription(props.description);
 
 	return {
 		'@type': SchemaTypeEnum.Place,

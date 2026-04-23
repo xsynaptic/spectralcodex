@@ -1,9 +1,9 @@
-import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { stripTags } from '@xsynaptic/unified-tools';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS } from '#constants.ts';
 
-function textClipper(
+export function textClipper(
 	input: string,
 	options: { wordCount: number; trailer?: string | undefined },
 ): string {
@@ -41,17 +41,8 @@ export function formatNumber({
 	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
 }
 
-// Another rough function to do 80% of what is needed here
-function encodeHtmlEntities(input: string): string {
-	return input
-		.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('"', '&quot;');
-}
-
 // Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
-function stripFootnoteReferences(input: string) {
+export function stripFootnoteReferences(input: string) {
 	return input.replaceAll(/\[\^[^\]]+\]/g, '');
 }
 
@@ -74,27 +65,22 @@ export function getDescription(entry: {
 	return undefined;
 }
 
-// Simple text-only SEO description that accepts a variety of things you might throw at it
-export function sanitizeDescription(description: string | undefined) {
-	return description
-		? R.pipe(
-				description,
-				stripFootnoteReferences,
-				(description) => stripMdxComponents(description, MDX_COMPONENTS),
-				(description) => transformMarkdown({ input: description }),
-				stripTags,
-				(stripped) => textClipper(stripped, { wordCount: 100 }),
-			)
-		: undefined;
-}
-
 // Sanitize image captions before returning them for display
-export function sanitizeCaption(input: string): string {
+export function sanitizeImageCaption(input: string): string {
 	return input.replaceAll('<p>', '').replaceAll('</p>', '');
 }
 
+// Another rough function to do 80% of what is needed here
+function encodeHtmlEntities(input: string): string {
+	return input
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;');
+}
+
 // Sanitize alt attributes before returning them for display
-export function sanitizeAltAttribute(input: string): string {
+export function sanitizeImageAltAttribute(input: string): string {
 	return encodeHtmlEntities(stripTags(input));
 }
 
