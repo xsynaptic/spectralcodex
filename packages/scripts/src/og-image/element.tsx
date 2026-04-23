@@ -2,6 +2,8 @@ import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/
 
 import type { OpenGraphMetadataItem } from './types.js';
 
+const showBranding = true as boolean;
+
 const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
 
 // Threshold at which to show inverted text
@@ -268,7 +270,7 @@ export function getOpenGraphElement(
 					width: '100%',
 				}}
 			>
-				<TitleSite luminance={image?.luminanceTop} />
+				{showBranding ? <TitleSite luminance={image?.luminanceTop} /> : undefined}
 				<TitleMultilingual
 					titleZh={entry.titleZh}
 					titleJa={entry.titleJa}
