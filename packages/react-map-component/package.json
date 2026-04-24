@@ -19,7 +19,7 @@
 		"astro": "^6.1.9",
 		"flatgeobuf": "^4.4.0",
 		"idb-keyval": "^6.2.2",
-		"maplibre-gl": "^5.23.0",
+		"maplibre-gl": "^5.24.0",
 		"pmtiles": "^4.4.1",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5",
