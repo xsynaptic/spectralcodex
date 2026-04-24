@@ -7,10 +7,12 @@ import Link from '#components/parts/link.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getLinkPlatform } from '#lib/utils/link-platforms.ts';
 import { createResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>;
@@ -33,6 +35,15 @@ const t = getTranslations();
 				{links.map((link) => {
 					const titleMultilingual = getMultilingualContent({ data: link, prop: 'title' })?.primary;
 
+					// Handle content on various platforms; in these cases the title is the account
+					const platform = 'id' in link ? undefined : getLinkPlatform(link.url);
+					const linkText = platform
+						? formatStringTemplate(t('content.section.links.platform.label'), {
+								platform,
+								title: link.title,
+							})
+						: link.title;
+
 					return (
 						<ListColumnItem>
 							{'showPage' in link && link.showPage ? (
@@ -51,7 +62,7 @@ const t = getTranslations();
 								</>
 							) : (
 								<>
-									<Link href={link.url}>{link.title}</Link>
+									<Link href={link.url}>{linkText}</Link>
 									{titleMultilingual ? (
 										<TextMultilingual content={titleMultilingual} parenthesis={true} />
 									) : undefined}

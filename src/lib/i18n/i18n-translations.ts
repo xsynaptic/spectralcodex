@@ -99,6 +99,7 @@ const translationStrings = {
 		'content.section.content': 'Content',
 		'content.section.itemsList': 'More',
 		'content.section.links': 'Links',
+		'content.section.links.platform.label': '{platform}: {title}',
 		'content.section.sources': 'Sources',
 		'content.section.heritage': 'Heritage Status',
 		'content.section.map': 'Map',
