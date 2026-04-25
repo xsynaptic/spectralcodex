@@ -120,7 +120,7 @@ const translationStrings = {
 
 		// Locations
 		'locations.status.demolished': 'Demolished',
-		'locations.unit.km': 'km',
+		'locations.unit.km': '{distance} km',
 		'locations.address.label': 'Address',
 
 		// Terms

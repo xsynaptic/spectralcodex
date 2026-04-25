@@ -11,6 +11,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -49,9 +50,9 @@ const t = getTranslations();
 							) : undefined}
 							{distanceDisplay ? (
 								<>
-									{' '}
+									<span class="text-primary-300 dark:text-primary-700">—</span>
 									<span class:list={['text-primary-500 dark:text-primary-600', 'break-keep']}>
-										{distanceDisplay}&nbsp;{t('locations.unit.km')}
+										{formatStringTemplate(t('locations.unit.km'), { distance: distanceDisplay })}
 									</span>
 								</>
 							) : undefined}
