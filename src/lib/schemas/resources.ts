@@ -52,7 +52,7 @@ const SourceItemSchema = z.object({
 	authors: SourceAuthorSchema.array().optional(),
 	publisher: z.string().optional(),
 	...publisherMultilingualSchema,
-	datePublished: z.string().optional(),
+	publishedDate: z.string().optional(),
 	publishedDetails: z.string().optional(),
 	...publishedDetailsMultilingualSchema,
 	links: LinkSchema.array().optional(),

@@ -93,16 +93,16 @@ const SourcesFormattingMap = {
 							) : (
 								<span class="italic">{source.title}</span>
 							);
-						if (source.publisher && source.datePublished) {
+						if (source.publisher && source.publishedDate) {
 							Publisher = (
 								<span>
-									{source.publisher}, {source.datePublished}
+									{source.publisher}, {source.publishedDate}
 								</span>
 							);
 						} else if (source.publisher) {
 							Publisher = <span>{source.publisher}</span>;
-						} else if (source.datePublished) {
-							Publisher = <span>{source.datePublished}</span>;
+						} else if (source.publishedDate) {
+							Publisher = <span>{source.publishedDate}</span>;
 						}
 						if (source.publishedDetails) {
 							PublishedDetails = <span>{source.publishedDetails}</span>;
@@ -148,18 +148,18 @@ const SourcesFormattingMap = {
 									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteEnd}
 								</span>
 							);
-						if (publisherMultilingual?.value && source.datePublished) {
+						if (publisherMultilingual?.value && source.publishedDate) {
 							PublisherMultilingual = (
 								<span>
 									{publisherMultilingual.value}
 									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].delimiter}
-									{source.datePublished}
+									{source.publishedDate}
 								</span>
 							);
 						} else if (publisherMultilingual?.value) {
 							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
-						} else if (source.datePublished) {
-							PublisherMultilingual = <span>{source.datePublished}</span>;
+						} else if (source.publishedDate) {
+							PublisherMultilingual = <span>{source.publishedDate}</span>;
 						}
 						if (publishedDetailsMultilingual?.value) {
 							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;
@@ -198,18 +198,18 @@ const SourcesFormattingMap = {
 									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteEnd}
 								</span>
 							);
-						if (publisherMultilingual?.value && source.datePublished) {
+						if (publisherMultilingual?.value && source.publishedDate) {
 							PublisherMultilingual = (
 								<span>
 									{publisherMultilingual.value}
 									{SourcesFormattingMap[LanguageCodeEnum.Japanese].delimiter}
-									{source.datePublished}
+									{source.publishedDate}
 								</span>
 							);
 						} else if (publisherMultilingual?.value) {
 							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
-						} else if (source.datePublished) {
-							PublisherMultilingual = <span>{source.datePublished}</span>;
+						} else if (source.publishedDate) {
+							PublisherMultilingual = <span>{source.publishedDate}</span>;
 						}
 						if (publishedDetailsMultilingual?.value) {
 							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;

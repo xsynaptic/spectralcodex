@@ -83,13 +83,13 @@ const t = getTranslations();
 					) : undefined
 				}
 				{
-					entry.data.authors || entry.data.publisher || entry.data.datePublished ? (
+					entry.data.authors || entry.data.publisher || entry.data.publishedDate ? (
 						<DividedItem>
 							{entry.data.authors?.map((author) => author.name).join(' & ')}
-							{entry.data.authors && (entry.data.publisher || entry.data.datePublished) ? ', ' : ''}
+							{entry.data.authors && (entry.data.publisher || entry.data.publishedDate) ? ', ' : ''}
 							{entry.data.publisher}
-							{entry.data.publisher && entry.data.datePublished ? ', ' : ''}
-							{entry.data.datePublished}
+							{entry.data.publisher && entry.data.publishedDate ? ', ' : ''}
+							{entry.data.publishedDate}
 						</DividedItem>
 					) : undefined
 				}
