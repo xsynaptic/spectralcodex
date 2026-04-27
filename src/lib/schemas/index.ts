@@ -2,7 +2,7 @@ import { stylizeText } from '@xsynaptic/unified-tools';
 import { z } from 'zod';
 
 // Title schema; stylized text with a reasonable upper limit
-const TITLE_CHARACTER_LENGTH = 64;
+const TITLE_CHARACTER_LENGTH = 80;
 
 export const TitleSchema = z
 	.string()

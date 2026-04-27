@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import {
 	nameMultilingualSchema,
+	publishedDetailsMultilingualSchema,
 	publisherMultilingualSchema,
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
@@ -34,6 +35,8 @@ export const resources = defineCollection({
 			publisher: z.string().optional(),
 			...publisherMultilingualSchema,
 			datePublished: z.string().optional(),
+			publishedDetails: z.string().optional(),
+			...publishedDetailsMultilingualSchema,
 			links: LinkSchema.array().optional(),
 			// Common fields
 			regions: reference('regions').array().optional(),

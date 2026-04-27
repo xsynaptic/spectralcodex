@@ -39,3 +39,5 @@ export const titleMultilingualSchema = createMultilingualSchemas('title', TitleS
 export const nameMultilingualSchema = createMultilingualSchemas('name');
 
 export const publisherMultilingualSchema = createMultilingualSchemas('publisher');
+
+export const publishedDetailsMultilingualSchema = createMultilingualSchemas('publishedDetails');

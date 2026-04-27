@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import {
 	nameMultilingualSchema,
+	publishedDetailsMultilingualSchema,
 	publisherMultilingualSchema,
 	titleMultilingualSchema,
 } from '#lib/i18n/i18n-schemas.ts';
@@ -52,6 +53,8 @@ const SourceItemSchema = z.object({
 	publisher: z.string().optional(),
 	...publisherMultilingualSchema,
 	datePublished: z.string().optional(),
+	publishedDetails: z.string().optional(),
+	...publishedDetailsMultilingualSchema,
 	links: LinkSchema.array().optional(),
 });
 

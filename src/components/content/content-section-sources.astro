@@ -65,10 +65,15 @@ const SourcesFormattingMap = {
 						data: source,
 						prop: 'publisher',
 					})?.primary;
+					const publishedDetailsMultilingual = getMultilingualContent({
+						data: source,
+						prop: 'publishedDetails',
+					})?.primary;
 
 					let Authors: Node | undefined;
 					let Title: Node | undefined;
 					let Publisher: Node | undefined;
+					let PublishedDetails: Node | undefined;
 
 					if (source.title) {
 						if (source.authors) {
@@ -99,11 +104,15 @@ const SourcesFormattingMap = {
 						} else if (source.datePublished) {
 							Publisher = <span>{source.datePublished}</span>;
 						}
+						if (source.publishedDetails) {
+							PublishedDetails = <span>{source.publishedDetails}</span>;
+						}
 					}
 
 					let AuthorsMultilingual: Node | undefined;
 					let TitleMultilingual: Node | undefined;
 					let PublisherMultilingual: Node | undefined;
+					let PublishedDetailsMultilingual: Node | undefined;
 
 					if (
 						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional) ||
@@ -152,6 +161,9 @@ const SourcesFormattingMap = {
 						} else if (source.datePublished) {
 							PublisherMultilingual = <span>{source.datePublished}</span>;
 						}
+						if (publishedDetailsMultilingual?.value) {
+							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;
+						}
 					} else if (
 						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese) ||
 							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese)) &&
@@ -199,6 +211,9 @@ const SourcesFormattingMap = {
 						} else if (source.datePublished) {
 							PublisherMultilingual = <span>{source.datePublished}</span>;
 						}
+						if (publishedDetailsMultilingual?.value) {
+							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;
+						}
 					}
 
 					return (
@@ -213,6 +228,10 @@ const SourcesFormattingMap = {
 									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
 									: undefined}
 								{Publisher}
+								{Publisher && PublishedDetails
+									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
+									: undefined}
+								{PublishedDetails}
 								{TitleMultilingual ? ' ' : undefined}
 							</span>
 							{TitleMultilingual &&
@@ -231,6 +250,10 @@ const SourcesFormattingMap = {
 										? SourcesFormattingMap[titleMultilingual.lang].delimiter
 										: undefined}
 									{PublisherMultilingual}
+									{PublisherMultilingual && PublishedDetailsMultilingual
+										? SourcesFormattingMap[titleMultilingual.lang].delimiter
+										: undefined}
+									{PublishedDetailsMultilingual}
 								</span>
 							) : undefined}
 						</ListColumnItem>
