@@ -76,6 +76,8 @@ export async function checkLocationsCoordinates(
 	const missingFgbRegions = new Set<string>();
 
 	for (const entry of entries) {
+		if (entry.data.skipCoordinateCheck === true) continue;
+
 		// Parse regions array (reference objects)
 		const regionsResult = RegionsSchema.safeParse(entry.data.regions);
 

@@ -49,6 +49,7 @@ export const locations = defineCollection({
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			hideLocation: z.boolean().optional(), // Do not show this location on any map
+			skipCoordinateCheck: z.boolean().optional(), // Bypass region/coordinate validation
 			// Override some properties for sensitive sites
 			override: z
 				.object({
