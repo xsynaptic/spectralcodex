@@ -6,10 +6,14 @@ html:not([lang^='ko']) [lang^='ko'] {
 	font-variant: normal !important;
 	letter-spacing: normal !important;
 	line-break: strict !important;
-	overflow-wrap: break-word !important;
+	overflow-wrap: anywhere !important; /* Allow mid-run breaks only when content would overflow */
 	text-decoration: none !important;
 	text-transform: none !important;
-	word-break: keep-all !important; /* Magic property for CJK text: keeps characters together but also line breaks without overflow */
+	word-break: keep-all !important; /* Keep CJK runs intact; pairs with overflow-wrap above */
+}
+
+html:not([lang^='ja']) [lang^='ja'] {
+	word-break: auto-phrase !important; /* Chromium-only phrase-level breaks for Japanese */
 }
 
 html:not([lang^='th']) [lang^='th'] {
