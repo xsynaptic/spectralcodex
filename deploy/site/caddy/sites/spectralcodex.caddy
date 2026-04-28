@@ -52,7 +52,9 @@ img.spectralcodex.com {
 		respond "User-agent: *
 Disallow: /"
 	}
-	reverse_proxy spectralcodex-image-cache:80
+	reverse_proxy spectralcodex-image-cache:80 {
+		header_down -X-Cache-Status
+	}
 }
 
 api.spectralcodex.com {
