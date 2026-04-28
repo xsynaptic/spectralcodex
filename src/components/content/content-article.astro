@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
@@ -29,8 +29,8 @@ async function getThumbnailUrls() {
 	if (!imageEntry) return;
 
 	const getSignedIpxPath = createSignedIpxPathFunction({
-		imageQuality: IMAGE_QUALITY,
-		imageFormat: IMAGE_FORMAT,
+		imageQuality: IMAGE_LQ_QUALITY,
+		imageFormat: IMAGE_LQ_FORMAT,
 		serverSecret: IPX_SERVER_SECRET,
 	});
 

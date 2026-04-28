@@ -12,6 +12,7 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
 import Prose from '#components/parts/prose.astro';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -50,10 +51,12 @@ async function getImageProps(): Promise<{
 		imageProps: {
 			src: IMAGE_SRC,
 			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
-			sizes: '(max-width: 640px) 150px, 150px',
+			sizes: 'auto, (max-width: 640px) 150px, 150px',
 			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			operations: { fit },
+			imageQuality: IMAGE_LQ_QUALITY,
+			imageFormat: IMAGE_LQ_FORMAT,
 		},
 		placeholderProps: {
 			imageId: IMAGE_SRC,

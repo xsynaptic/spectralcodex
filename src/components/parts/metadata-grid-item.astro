@@ -7,6 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -48,12 +49,14 @@ async function getImageProps(): Promise<{
 					ImageSizeEnum.Large,
 				],
 			}),
-			sizes: `(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 425px`,
+			sizes: `auto, (max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 425px`,
 			width: ImageSizeEnum.Medium,
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			alt: sanitizeImageAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
+			imageQuality: IMAGE_LQ_QUALITY,
+			imageFormat: IMAGE_LQ_FORMAT,
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,

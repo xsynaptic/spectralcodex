@@ -8,7 +8,7 @@ import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET } from 'astro:env/server';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
-import { IMAGE_FORMAT, IMAGE_QUALITY } from '#constants.ts';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
@@ -23,8 +23,8 @@ const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-d
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedIpxPath = createSignedIpxPathFunction({
-	imageQuality: IMAGE_QUALITY,
-	imageFormat: IMAGE_FORMAT,
+	imageQuality: IMAGE_LQ_QUALITY,
+	imageFormat: IMAGE_LQ_FORMAT,
 	serverSecret: IPX_SERVER_SECRET,
 });
 

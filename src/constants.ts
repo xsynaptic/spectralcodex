@@ -13,11 +13,10 @@ export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
 /**
  * Image configuration
  */
-// Image quality for all transformations
-export const IMAGE_QUALITY = 88 as const;
-
-// Image format for all transformations
-export const IMAGE_FORMAT = 'jpg' as const;
+export const IMAGE_LQ_QUALITY = 70 as const;
+export const IMAGE_HQ_QUALITY = 85 as const;
+export const IMAGE_LQ_FORMAT = 'webp' as const;
+export const IMAGE_HQ_FORMAT = 'jpg' as const;
 
 /**
  * Location configuration

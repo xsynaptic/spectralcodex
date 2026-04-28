@@ -82,7 +82,7 @@ async function getImageProps(): Promise<{
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
-			sizes: getImageLayoutSizesProp(layout),
+			sizes: getImageLayoutSizesProp(layout, priority),
 			width: primaryWidth,
 			...(isFeed
 				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }

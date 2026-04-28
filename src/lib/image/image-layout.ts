@@ -98,31 +98,35 @@ export function getImageInferredWidth({
 	}
 }
 
-export function getImageLayoutSizesProp(layout?: ImageLayout) {
+export function getImageLayoutSizesProp(layout?: ImageLayout, priority?: boolean) {
+	let sizes: Array<string> = [];
+
 	switch (layout) {
 		case ImageLayoutEnum.Default: {
-			return [
+			sizes = [
 				`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
 				`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
 				`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
 				`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
-			].join(', ');
+			];
+			break;
 		}
 		case ImageLayoutEnum.Wide: {
-			return `calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`;
+			sizes = [`calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`];
+			break;
 		}
 		case ImageLayoutEnum.Full: {
-			return '100vw';
+			sizes = ['100vw'];
+			break;
 		}
 		// No layout prop; typically seen in images in groups
-		// Ultimately we're just guessing here
 		default: {
-			return [
-				`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
-				`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc((100vw - ${TAILWIND_CONTENT_PADDING_SM}) / 2)`,
-				`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc((100vw - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
-				`calc((${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD}) / 2)`,
-			].join(', ');
+			break;
 		}
 	}
+
+	// This handles the default case where images are grouped in an arbitrary grid
+	if (!priority) sizes.unshift('auto');
+
+	return sizes.join(', ');
 }

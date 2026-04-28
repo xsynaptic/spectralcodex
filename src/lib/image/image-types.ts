@@ -1,5 +1,6 @@
 import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
 import type { HTMLAttributes } from 'astro/types';
+import type { ImageFormat } from 'unpic';
 import type { IPXOptions } from 'unpic/providers/ipx';
 import type { IPXOperations as BaseIPXOperations } from 'unpic/providers/ipx';
 
@@ -84,4 +85,7 @@ export interface ImagePlaceholderProps {
  * Unpic Image component props
  */
 export type ImageComponentProps = HTMLAttributes<'img'> &
-	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'>;
+	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'> & {
+		imageQuality?: number;
+		imageFormat?: ImageFormat;
+	};
