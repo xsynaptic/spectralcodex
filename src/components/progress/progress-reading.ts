@@ -9,13 +9,8 @@ class ProgressReading extends ProgressBar {
 		if (!this.#target) return;
 
 		const rect = this.#target.getBoundingClientRect();
-		const progress = Math.min(
-			Math.max(
-				0,
-				(globalThis.window.innerHeight - rect.top) / (rect.height + globalThis.window.innerHeight),
-			),
-			1,
-		);
+		const scrollable = Math.max(1, rect.height - globalThis.window.innerHeight);
+		const progress = Math.min(Math.max(0, -rect.top / scrollable), 1);
 
 		if (progress === 1) {
 			this.setProgress(1);
