@@ -45,10 +45,12 @@ const SourceAuthorSchema = z.object({
 	...nameMultilingualSchema,
 });
 
-const SourceItemSchema = z.object({
+export const SourceItemSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
 	description: z.string().optional(),
+	url: z.url().optional(),
+	resourceType: z.enum(['webpage', 'book', 'article', 'report']),
 	authors: SourceAuthorSchema.array().optional(),
 	publisher: z.string().optional(),
 	...publisherMultilingualSchema,
