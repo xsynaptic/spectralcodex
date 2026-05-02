@@ -10,9 +10,9 @@
 	"dependencies": {
 		"pagefind": "^1.5.2",
 		"sirv": "^3.0.2",
-		"zod": "^4.3.6"
+		"zod": "^4.4.1"
 	},
 	"devDependencies": {
-		"astro": "^6.1.10"
+		"astro": "^6.2.1"
 	}
 }
