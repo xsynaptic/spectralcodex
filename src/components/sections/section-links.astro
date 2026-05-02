@@ -30,7 +30,7 @@ const t = getTranslations();
 {
 	links && links.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('content.section.links')}</Fragment>
+			<Fragment slot="section-title">{t('section.links')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{links.map((link) => {
 					const titleMultilingual = getMultilingualContent({ data: link, prop: 'title' })?.primary;
@@ -38,7 +38,7 @@ const t = getTranslations();
 					// Handle content on various platforms; in these cases the title is the account
 					const platform = 'id' in link ? undefined : getLinkPlatform(link.url);
 					const linkText = platform
-						? formatStringTemplate(t('content.section.links.platform.label'), {
+						? formatStringTemplate(t('section.links.platform.label'), {
 								platform,
 								title: link.title,
 							})

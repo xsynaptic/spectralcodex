@@ -95,19 +95,25 @@ const translationStrings = {
 		'content.more.label': 'Read more',
 
 		// Content sections
-		'content.section.author': 'Author',
-		'content.section.content': 'Content',
-		'content.section.itemsList': 'More',
-		'content.section.links': 'Links',
-		'content.section.links.platform.label': '{platform}: {title}',
-		'content.section.sources': 'Sources',
-		'content.section.heritage': 'Heritage Status',
-		'content.section.map': 'Map',
-		'content.section.locationsNearby': 'Nearby Locations',
-		'content.section.backlinks': 'Connections',
-		'content.section.related': 'Related Content',
-		'content.section.dateVisited': 'Visitation Log',
-		'content.section.webmentions': 'Webmentions',
+		'section.author': 'Author',
+		'section.content': 'Content',
+		'section.itemsList': 'More',
+		'section.links': 'Links',
+		'section.links.platform.label': '{platform}: {title}',
+		'section.sources': 'Sources',
+		'section.heritage': 'Heritage Status',
+		'section.map': 'Map',
+		'section.locationsNearby': 'Nearby Locations',
+		'section.backlinks': 'Connections',
+		'section.related': 'Related Content',
+		'section.dateVisited': 'Visitation Log',
+		'section.webmentions': 'Webmentions',
+
+		// Citations
+		'section.citation.heading': 'Cite this page',
+		'section.citation.copyText': 'Copy citation',
+		'section.citation.copyJson': 'Copy as JSON',
+		'section.citation.copied': 'Copied',
 
 		// Webmentions
 		'webmentions.likes': 'Likes',

@@ -30,7 +30,7 @@ const t = getTranslations();
 {
 	locationsNearby.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('content.section.locationsNearby')}</Fragment>
+			<Fragment slot="section-title">{t('section.locationsNearby')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{locationsNearby.map(({ locationId, distanceDisplay }) => {
 					const location = locationsMap.get(locationId);

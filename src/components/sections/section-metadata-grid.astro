@@ -31,7 +31,7 @@ const t = getTranslations();
 {
 	hasItems || page ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('content.section.content')}</Fragment>
+			<Fragment slot="section-title">{t('section.content')}</Fragment>
 			{page ? (
 				<>
 					<MetadataGrid items={page.data} {...defaultPreviewItemProps} {...metadataGridOptions} />
