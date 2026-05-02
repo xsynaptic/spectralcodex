@@ -12,11 +12,6 @@ import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ContentSectionLinks from '#components/content/content-section-links.astro';
-import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
-import ContentSectionMetadataList from '#components/content/content-section-metadata-list.astro';
-import ContentSectionSources from '#components/content/content-section-sources.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -24,6 +19,11 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
+import SectionLinks from '#components/sections/section-links.astro';
+import SectionMap from '#components/sections/section-map.astro';
+import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
+import SectionMetadataList from '#components/sections/section-metadata-list.astro';
+import SectionSources from '#components/sections/section-sources.astro';
 import { getRegionSchema } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
@@ -100,8 +100,6 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			</ContentHeader>
 		</ImageHeroCarousel>
 		<ContentDescription entry={entry} />
-		<ContentSectionLinks entry={entry} />
-		<ContentSectionSources entry={entry} />
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 			{
 				regionsOption?.termsChildrenLabel ? (
@@ -114,11 +112,13 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				) : undefined
 			}
 		</RegionsRelated>
-		<ContentSectionMap mapData={mapData} />
-		<ContentSectionMetadataGrid page={page} />
+		<SectionMap mapData={mapData} />
+		<SectionLinks entry={entry} />
+		<SectionSources entry={entry} />
+		<SectionMetadataGrid page={page} />
 		{
 			page.currentPage === 1 && metadataItems.length > 0 ? (
-				<ContentSectionMetadataList items={metadataItems} count={metadataItemsCount} />
+				<SectionMetadataList items={metadataItems} count={metadataItemsCount} />
 			) : undefined
 		}
 		<RegionsDivision entryId={entry.id} />

@@ -4,9 +4,9 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
 import ContentHeader from '#components/content/content-header.astro';
-import ContentSectionMap from '#components/content/content-section-map.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
+import SectionMap from '#components/sections/section-map.astro';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 type Props = MapComponentData;
@@ -24,5 +24,5 @@ const description = 'Points in the database that still require visitation and do
 	<ContentSection>
 		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
 	</ContentSection>
-	<ContentSectionMap mapData={mapData} />
+	<SectionMap mapData={mapData} />
 </MainSite>

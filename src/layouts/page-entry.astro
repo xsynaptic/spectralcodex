@@ -7,12 +7,12 @@ import { render } from 'astro:content';
 import ContentArticle from '#components/content/content-article.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ContentSectionAuthor from '#components/content/content-section-author.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
+import SectionAuthor from '#components/sections/section-author.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroId, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -93,6 +93,6 @@ const { Content } = await render(entry);
 		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
 			<Content />
 		</Prose>
-		<ContentSectionAuthor showAuthor={false} />
+		<SectionAuthor showAuthor={false} />
 	</ContentArticle>
 </MainSite>

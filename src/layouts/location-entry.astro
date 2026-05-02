@@ -12,25 +12,25 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentImage from '#components/content/content-image.astro';
-import ContentSectionAuthor from '#components/content/content-section-author.astro';
-import ContentSectionBacklinks from '#components/content/content-section-backlinks.astro';
-import ContentSectionDateVisited from '#components/content/content-section-date-visited.astro';
-import ContentSectionLinks from '#components/content/content-section-links.astro';
-import ContentSectionMap from '#components/content/content-section-map.astro';
-import ContentSectionMetadataGrid from '#components/content/content-section-metadata-grid.astro';
-import ContentSectionRelated from '#components/content/content-section-related.astro';
-import ContentSectionSeries from '#components/content/content-section-series.astro';
-import ContentSectionSources from '#components/content/content-section-sources.astro';
-import ContentSectionThemes from '#components/content/content-section-themes.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import LocationsAddress from '#components/locations/locations-address.astro';
-import LocationsHeritage from '#components/locations/locations-heritage.astro';
-import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
-import LocationsNotices from '#components/locations/locations-notices.astro';
+import SectionDateVisited from '#components/locations/locations-section-date-visited.astro';
+import SectionHeritage from '#components/locations/locations-section-heritage.astro';
+import SectionNearbyList from '#components/locations/locations-section-nearby-list.astro';
+import SectionNotices from '#components/locations/locations-section-notices.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
+import SectionAuthor from '#components/sections/section-author.astro';
+import SectionBacklinks from '#components/sections/section-backlinks.astro';
+import SectionLinks from '#components/sections/section-links.astro';
+import SectionMap from '#components/sections/section-map.astro';
+import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
+import SectionRelated from '#components/sections/section-related.astro';
+import SectionSeries from '#components/sections/section-series.astro';
+import SectionSources from '#components/sections/section-sources.astro';
+import SectionThemes from '#components/sections/section-themes.astro';
 import {
 	createLocationEntryDisplayFunction,
 	getLocationSchemas,
@@ -156,24 +156,24 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			entry={entry}
 			{...hasContent ? { 'data-reading-frame': '' } : {}}
 		/>
-		<LocationsHeritage heritage={entry.data.heritage} />
-		{hideLocation ? undefined : <ContentSectionLinks entry={entry} />}
-		{hideLocation ? undefined : <ContentSectionSources entry={entry} />}
-		{hideLocation ? undefined : <ContentSectionDateVisited dateVisited={entry.data.dateVisited} />}
-		<ContentSectionThemes themeIds={themeIds} />
-		<ContentSectionBacklinks backlinks={backlinks} />
-		<ContentSectionSeries entry={entry} />
-		<ContentSectionMetadataGrid items={metadataItems} />
+		<SectionNotices entry={entry} langCode={regionLangCode} />
 		{
 			hideLocation ? undefined : (
-				<ContentSectionMap mapData={mapData}>
+				<SectionMap mapData={mapData}>
 					<LocationsAddress address={entry.data.address} />
-				</ContentSectionMap>
+				</SectionMap>
 			)
 		}
-		<LocationsNotices entry={entry} langCode={regionLangCode} />
-		<LocationsNearbyList entry={entry} limit={12} />
-		<ContentSectionRelated entry={entry} showPreviews={true} limit={8} />
-		<ContentSectionAuthor showAuthor={false} />
+		<SectionHeritage heritage={entry.data.heritage} />
+		{hideLocation ? undefined : <SectionDateVisited dateVisited={entry.data.dateVisited} />}
+		{hideLocation ? undefined : <SectionLinks entry={entry} />}
+		{hideLocation ? undefined : <SectionSources entry={entry} />}
+		<SectionThemes themeIds={themeIds} />
+		<SectionSeries entry={entry} />
+		<SectionBacklinks backlinks={backlinks} />
+		<SectionMetadataGrid items={metadataItems} />
+		<SectionRelated entry={entry} showPreviews={true} limit={8} />
+		<SectionNearbyList entry={entry} limit={12} />
+		<SectionAuthor showAuthor={false} />
 	</ContentArticle>
 </MainSite>
