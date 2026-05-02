@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.11.2",
+	"version": "6.12.0",
 	"scripts": {
 		"dev": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.development packages/scripts/src/dev-server/index.ts",
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
@@ -109,7 +109,7 @@
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.2.4",
 		"tsx": "^4.21.0",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.59.1",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",

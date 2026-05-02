@@ -1,8 +1,6 @@
 {
 	"extends": "astro/tsconfigs/strictest",
 	"compilerOptions": {
-		"baseUrl": ".",
-		"rootDir": ".",
 		"outDir": "dist",
 		"strictNullChecks": true,
 		"erasableSyntaxOnly": true,
