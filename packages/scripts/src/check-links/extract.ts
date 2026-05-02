@@ -20,9 +20,6 @@ const EntryDataSchema = z.object({
 	url: z.string().optional(),
 	sources: SourceExtractSchema.array().optional(),
 });
-interface ExtractedLink {
-	url: string;
-}
 
 function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
 	return typeof link === 'string' ? link : link.url;
@@ -83,8 +80,10 @@ function extractBodyLinks(body: string): Array<string> {
 /**
  * Extract all external URLs from a data store entry
  */
-export function extractLinksFromEntry(entry: DataStoreEntry): Array<ExtractedLink> {
-	const links: Array<ExtractedLink> = [];
+export function extractLinksFromEntry(entry: DataStoreEntry) {
+	const links: Array<{
+		url: string;
+	}> = [];
 
 	for (const url of extractFrontmatterLinks(entry.data)) {
 		links.push({ url });

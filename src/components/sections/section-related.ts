@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 /**
@@ -65,6 +66,7 @@ async function createRelatedContentFunction() {
 	const relatedContentData = await loadRelatedContentData();
 
 	const contentMetadataIndex = await getContentMetadataIndex();
+	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getRelatedContent({
 		id,
@@ -85,6 +87,7 @@ async function createRelatedContentFunction() {
 
 		return relatedItem
 			.filter((item) => item.score >= threshold)
+			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
 			.map((item) => contentMetadataIndex.get(item.id))
 			.filter((item) => item !== undefined)
 			.filter((item) => !!item.imageId === hasImageFeatured)

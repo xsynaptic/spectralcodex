@@ -4,6 +4,9 @@
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 /** Popup */
+.maplibregl-popup {
+	z-index: 5;
+}
 div.maplibregl-popup-content {
 	overflow: auto;
 	padding: 0;
