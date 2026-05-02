@@ -32,6 +32,7 @@
 @import './main/components/metadata-grid-item.css';
 @import './main/components/nav-menu.css';
 @import './main/components/image-metadata.css';
+@import './main/components/progress.css';
 @import './main/components/prose.css';
 
 /** Bits and pieces */

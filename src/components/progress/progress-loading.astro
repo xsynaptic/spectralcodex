@@ -8,8 +8,11 @@ interface Props extends HTMLAttributes<'div'> {
 const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ---
 
-<progress-loading class={className} style={{ height, ...style }} transition:persist {...props}
-></progress-loading>
+<progress-loading
+	class:list={['progress-bar', className]}
+	style={{ height, ...style }}
+	transition:persist
+	{...props}></progress-loading>
 
 <script>
 	import '#components/progress/progress-loading.ts';

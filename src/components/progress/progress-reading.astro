@@ -9,7 +9,8 @@ interface Props extends HTMLAttributes<'div'> {
 const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ---
 
-<progress-reading class={className} style={{ height, ...style }} {...props}></progress-reading>
+<progress-reading class:list={['progress-bar', className]} style={{ height, ...style }} {...props}
+></progress-reading>
 
 <script>
 	import '#components/progress/progress-reading.ts';
