@@ -18,6 +18,7 @@ import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
+import SectionCitation from '#components/sections/section-citation.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
@@ -130,5 +131,6 @@ const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title })
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionRelated entry={entry} showPreviews={true} limit={8} />
 		<SectionAuthor showAuthor={false} />
+		{import.meta.env.DEV ? <SectionCitation entry={entry} /> : undefined}
 	</ContentArticle>
 </MainSite>

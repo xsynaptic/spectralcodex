@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import ContentSection from '#components/content/content-section.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { buildCitation, formatCitationLine, toCitationJson } from '#lib/utils/citation.ts';
+
+interface Props {
+	entry: CollectionEntry<'locations' | 'posts'>;
+}
+
+const { entry, ...props } = Astro.props;
+
+const t = getTranslations();
+
+const citation = buildCitation(entry);
+const citationLine = formatCitationLine(citation);
+const citationJson = toCitationJson(citation);
+---
+
+<ContentSection data-pagefind-ignore data-nosnippet {...props}>
+	<Fragment slot="section-title">{t('section.citation.heading')}</Fragment>
+	<citation-button data-json={citationJson} data-copied-label={t('section.citation.copied')}>
+		<div class:list={['citation-line', 'mt-2 font-serif text-xs sm:text-sm']}>
+			{citationLine}
+		</div>
+		<div class:list={['citation-actions', 'mt-2 flex flex-wrap gap-2']}>
+			<button
+				type="button"
+				data-action="copy-text"
+				class:list={[
+					'rounded border border-primary-300 px-2 py-1 text-xs',
+					'hover:bg-primary-100 dark:border-primary-700 dark:hover:bg-primary-800',
+				]}
+			>
+				{t('section.citation.copyText')}
+			</button>
+			<button
+				type="button"
+				data-action="copy-json"
+				class:list={[
+					'rounded border border-primary-300 px-2 py-1 text-xs',
+					'hover:bg-primary-100 dark:border-primary-700 dark:hover:bg-primary-800',
+				]}
+			>
+				{t('section.citation.copyJson')}
+			</button>
+		</div>
+	</citation-button>
+</ContentSection>
+
+<script>
+	import '#components/sections/section-citation.ts';
+</script>
