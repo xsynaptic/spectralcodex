@@ -22,19 +22,20 @@ export function checkImageFeaturedInBody(entries: Array<DataStoreEntry>) {
 		}
 	}
 
-	if (orphans.length === 0) return true;
+	if (orphans.length === 0) {
+		console.log(chalk.green('✓ Featured images present in body content'));
+		return true;
+	}
 
 	for (const { file, missingIds } of orphans) {
-		console.log(
-			chalk.yellow(`⚠️  ${file}: featured image(s) not in body: ${missingIds.join(', ')}`),
-		);
+		console.log(chalk.red(`❌ ${file}: featured image(s) not in body: ${missingIds.join(', ')}`));
 	}
 
 	console.log(
-		chalk.yellow(
-			`⚠️  ${orphans.length.toString()} entries have featured images missing from body content`,
+		chalk.red(
+			`❌ ${orphans.length.toString()} entries have featured images missing from body content`,
 		),
 	);
 
-	return true;
+	return false;
 }
