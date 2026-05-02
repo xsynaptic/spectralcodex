@@ -63,15 +63,13 @@ export async function createQueryThemesEntryFunction() {
 		const locationsFiltered = locations.filter(
 			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false,
 		);
+		const locationsListed = locationsFiltered.filter(({ data }) => !data.hideIndex);
 
 		const postsFiltered = getPostsByTerm(entry);
 
 		// Metadata items are the posts and locations that are associated with the theme
 		const metadataItemsFiltered = R.pipe(
-			[
-				...R.pipe(locationsFiltered, R.filter(createFilterEntryQualityFunction(2))),
-				...postsFiltered,
-			],
+			[...R.pipe(locationsListed, R.filter(createFilterEntryQualityFunction(2))), ...postsFiltered],
 			getContentMetadata,
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate),
@@ -79,7 +77,7 @@ export async function createQueryThemesEntryFunction() {
 
 		// Anything that wasn't included above
 		const metadataItemsAll = R.pipe(
-			[...locationsFiltered, ...postsFiltered],
+			[...locationsListed, ...postsFiltered],
 			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
 			getContentMetadata,
 			R.shuffle(),

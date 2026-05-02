@@ -193,6 +193,7 @@ export async function queryLocationsIndex() {
 
 	return R.pipe(
 		entries,
+		R.filter((item) => !item.data.hideIndex),
 		R.filter(createFilterEntryQualityFunction(2)),
 		R.filter((item) => !!item.data.imageFeatured),
 		getContentMetadata,

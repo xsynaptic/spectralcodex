@@ -166,11 +166,12 @@ export async function createQueryRegionsEntryFunction() {
 			ancestors.some((ancestor) => displayRegionMapIds.has(ancestor.id));
 
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
+		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);
 
 		const metadataItemsFiltered = R.pipe(
 			[
 				...R.pipe(
-					entryLocations,
+					entryLocationsListed,
 					R.filter(createFilterEntryQualityFunction(2)),
 					getContentMetadata,
 				),
@@ -182,7 +183,7 @@ export async function createQueryRegionsEntryFunction() {
 
 		// Anything that wasn't included above
 		const metadataItemsAll = R.pipe(
-			entryLocations,
+			entryLocationsListed,
 			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
 			R.filter(({ data }) => !data.hideLocation),
 			getContentMetadata,
