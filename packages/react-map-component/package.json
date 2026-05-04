@@ -8,8 +8,8 @@
 	"devDependencies": {
 		"@protomaps/basemaps": "^5.7.2",
 		"@spectralcodex/shared": "workspace:*",
-		"@tanstack/react-query": "^5.100.6",
-		"@tanstack/react-query-persist-client": "^5.100.6",
+		"@tanstack/react-query": "^5.100.8",
+		"@tanstack/react-query-persist-client": "^5.100.8",
 		"@turf/bbox-polygon": "^7.3.5",
 		"@turf/difference": "^7.3.5",
 		"@turf/helpers": "^7.3.5",
@@ -25,7 +25,7 @@
 		"react-dom": "^19.2.5",
 		"react-map-gl": "^8.1.1",
 		"remeda": "^2.34.0",
-		"zod": "^4.4.1",
+		"zod": "^4.4.2",
 		"zustand": "^5.0.12"
 	}
 }

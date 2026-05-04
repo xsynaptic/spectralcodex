@@ -70,7 +70,7 @@
 		"@spectralcodex/word-count": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.4",
-		"@tanstack/eslint-plugin-query": "^5.100.6",
+		"@tanstack/eslint-plugin-query": "^5.100.8",
 		"@turf/bbox": "^7.3.5",
 		"@turf/buffer": "^7.3.5",
 		"@turf/center": "^7.3.5",
@@ -95,9 +95,9 @@
 		"exiftool-vendored": "^35.19.0",
 		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
-		"globals": "^17.5.0",
+		"globals": "^17.6.0",
 		"kdbush": "^4.0.2",
-		"knip": "^6.9.0",
+		"knip": "^6.11.0",
 		"maplibre-gl": "^5.24.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
@@ -115,7 +115,7 @@
 		"unpic": "^4.2.2",
 		"vite": "^7.3.2",
 		"vitest": "^4.1.5",
-		"zod": "^4.4.1"
+		"zod": "^4.4.2"
 	},
 	"packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
