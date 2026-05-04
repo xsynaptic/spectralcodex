@@ -11,6 +11,7 @@ const linkPlatforms: Array<LinkPlatform> = [
 	{ match: 'instagram.com', name: 'Instagram' },
 	{ match: 'threads.com', name: 'Threads' },
 	{ match: 'reddit.com', name: 'Reddit' },
+	{ match: 'medium.com', name: 'Medium' },
 	{ match: 'vimeo.com', name: 'Vimeo' },
 ];
 
