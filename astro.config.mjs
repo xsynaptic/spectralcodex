@@ -129,7 +129,6 @@ export default defineConfig({
 		rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
 	},
 	integrations: [
-		buildLogger(),
 		react({
 			include: ['packages/react**/*'],
 		}),
@@ -181,6 +180,7 @@ export default defineConfig({
 				],
 			},
 		}),
+		buildLogger(),
 	],
 	fonts: [
 		{

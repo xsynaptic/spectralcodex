@@ -22,7 +22,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 # custom logs for this project
-astro-build.log*
+astro-build.jsonl
 astro-error.log*
 
 # generated types and files

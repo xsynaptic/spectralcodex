@@ -1,6 +1,6 @@
 {
 	"name": "@spectralcodex/astro-build-logger",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Astro integration for logging build times",
 	"type": "module",
 	"exports": {
