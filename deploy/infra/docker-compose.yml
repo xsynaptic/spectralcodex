@@ -36,15 +36,15 @@ services:
 
   # Umami analytics
   umami:
-    image: ghcr.io/umami-software/umami:3.0.3
+    image: ghcr.io/umami-software/umami:3.1.0
     container_name: umami
     init: true
     mem_limit: 512m
     healthcheck:
-      test:
-        [
+      test: [
           'CMD-SHELL',
-          'wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/heartbeat || exit 1',
+          'wget --no-verbose --tries=1 --spider
+          http://127.0.0.1:3000/api/heartbeat || exit 1',
         ]
       interval: 30s
       timeout: 3s
@@ -103,6 +103,37 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  # Umami DB backup
+  umami-db-backup:
+    build: ./umami-db-backup
+    container_name: umami-db-backup
+    init: true
+    mem_limit: 128m
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    environment:
+      - POSTGRES_HOST=umami-db
+      - POSTGRES_DB=umami
+      - POSTGRES_USER=umami
+      - POSTGRES_PASSWORD=${UMAMI_DB_PASSWORD}
+    volumes:
+      - ${UMAMI_BACKUP_PATH}:/backups
+    depends_on:
+      umami-db:
+        condition: service_healthy
     networks:
       - backend
     restart: unless-stopped

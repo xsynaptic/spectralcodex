@@ -33,6 +33,7 @@ trap 'rm -f "$TEMP_ENV"' EXIT
 cat > "$TEMP_ENV" <<EOF
 # Umami analytics data path
 UMAMI_DATA_PATH=${UMAMI_DATA_PATH}
+UMAMI_BACKUP_PATH=${UMAMI_BACKUP_PATH}
 
 # Umami secrets
 UMAMI_DB_PASSWORD=${UMAMI_DB_PASSWORD}
@@ -47,6 +48,7 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   --exclude='scripts/' \
   "$INFRA_DIR/docker-compose.yml" \
   "$INFRA_DIR/caddy" \
+  "$INFRA_DIR/umami-db-backup" \
   "$REMOTE_HOST:$REMOTE_PATH/"
 
 # Write server-side .env
@@ -55,7 +57,7 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} "$TEMP_ENV" "$REMOTE_HOST:$REMOTE_PA
 
 # Restart services
 echo "Restarting services..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose up -d --force-recreate"
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose build && docker compose up -d --force-recreate"
 
 echo ""
 echo "Waiting for health checks..."
