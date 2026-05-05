@@ -133,11 +133,6 @@ async function healthCheck() {
 	console.log(chalk.green(`Health check passed (${String(response.status)})`));
 }
 
-async function warmNew() {
-	console.log(chalk.blue('Warming new image cache...'));
-	await cacheWarmNew({ rootPath, dryRun });
-}
-
 try {
 	await sync();
 	await validate();
@@ -153,7 +148,7 @@ try {
 	await og();
 	await caddy();
 	await purgeCache({ rootPath, dryRun });
-	await warmNew();
+	await cacheWarmNew({ rootPath, dryRun });
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {
 	console.error(chalk.red('Deploy failed:'), error);
