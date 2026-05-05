@@ -83,9 +83,9 @@
 		"@types/react-dom": "^19.2.3",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
-		"@xsynaptic/eslint-config": "^3.2.2",
+		"@xsynaptic/eslint-config": "^3.3.1",
 		"@xsynaptic/image-server": "workspace:*",
-		"@xsynaptic/unified-tools": "^4.0.0",
+		"@xsynaptic/unified-tools": "^4.2.0",
 		"astro-auto-import": "^0.5.1",
 		"astro-seo": "^1.1.0",
 		"eslint": "^9.39.4",
@@ -104,18 +104,18 @@
 		"prettier": "^3.8.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
-		"rehype-wrap-cjk": "^2.0.0",
+		"rehype-wrap-cjk": "^2.1.1",
 		"remeda": "^2.34.0",
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.2.4",
 		"tsx": "^4.21.0",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.59.1",
+		"typescript-eslint": "^8.59.2",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
 		"vite": "^7.3.2",
 		"vitest": "^4.1.5",
-		"zod": "^4.4.2"
+		"zod": "^4.4.3"
 	},
 	"packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
