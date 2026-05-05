@@ -46,7 +46,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.2.1",
+		"astro": "^6.2.2",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5"
 	},
@@ -70,7 +70,7 @@
 		"@spectralcodex/word-count": "workspace:*",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.4",
-		"@tanstack/eslint-plugin-query": "^5.100.8",
+		"@tanstack/eslint-plugin-query": "^5.100.9",
 		"@turf/bbox": "^7.3.5",
 		"@turf/buffer": "^7.3.5",
 		"@turf/center": "^7.3.5",
