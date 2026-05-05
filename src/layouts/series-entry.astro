@@ -21,6 +21,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -55,7 +56,7 @@ const t = getTranslations();
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		description: entry.data.description ?? entry.body ?? undefined,
+		description: await getDescriptionRenderedText(entry),
 		image: await getSeoImageProps({
 			id: entry.id,
 			alt: entry.data.title,

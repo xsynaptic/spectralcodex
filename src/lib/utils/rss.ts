@@ -3,12 +3,7 @@ import type { ContainerRenderOptions } from 'astro/container';
 import type { CollectionEntry } from 'astro:content';
 
 import mdxRenderer from '@astrojs/mdx/server.js';
-import {
-	defaultSchema,
-	sanitizeHtml,
-	stripTags,
-	transformMarkdown,
-} from '@xsynaptic/unified-tools';
+import { defaultSchema, sanitizeHtml } from '@xsynaptic/unified-tools';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
@@ -20,6 +15,7 @@ import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { createFilterEntryQualityFunction, getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 /**
@@ -84,15 +80,15 @@ const generateFeedItem = async ({
 		},
 	);
 
+	const description = await getDescriptionRenderedText(entry);
+
 	const feedItem = {
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		link: getContentUrl(entry.collection, getPublicId(entry)),
 		pubDate: parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated),
-		...(entry.data.description
-			? { description: stripTags(transformMarkdown({ input: entry.data.description })) }
-			: {}),
+		...(description ? { description } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 

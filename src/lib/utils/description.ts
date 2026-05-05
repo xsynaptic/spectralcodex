@@ -1,0 +1,88 @@
+import { hashShort } from '@spectralcodex/shared/cache';
+import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
+import { sanitizeHtml, stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import * as R from 'remeda';
+
+import { MDX_COMPONENTS } from '#constants.ts';
+import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
+
+interface DescriptionRendered {
+	html: string;
+	text: string;
+}
+
+/**
+ * Count of words to feed into the markdown transformer
+ * This is buffered so any orphan markdown syntax falls outside the clip boundary
+ */
+const wordCountBuffer = 150;
+const wordCountFinal = 100;
+
+/**
+ * Tags to allow in description HTML
+ */
+const descriptionTagNames = ['em', 'strong'] satisfies Array<string>;
+
+const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'description-rendered');
+
+// Return the frontmatter description or derive a clipped excerpt from the body
+export function getDescription(
+	entry: {
+		data: { description?: string | undefined };
+		body?: string | undefined;
+	},
+	options: { wordCount?: number } = {},
+): string | undefined {
+	if (entry.data.description) {
+		return entry.data.description;
+	}
+	if (entry.body) {
+		return R.pipe(
+			entry.body,
+			(body) => stripMdxComponents(body, MDX_COMPONENTS),
+			stripFootnoteReferences,
+			(text) => textClipper(text.trim(), { wordCount: options.wordCount ?? 100 }),
+		);
+	}
+	return undefined;
+}
+
+// Render and cache both HTML and plain-text forms of an entry's description in a single parse
+export async function getDescriptionRendered(entry: {
+	id: string;
+	data: { description?: string | undefined };
+	body?: string | undefined;
+}): Promise<DescriptionRendered | undefined> {
+	const source = getDescription(entry, { wordCount: wordCountBuffer });
+
+	if (!source) return undefined;
+
+	const cacheKey = hashShort({ data: { id: entry.id, source } });
+
+	const cached = await cacheInstance.get<DescriptionRendered>(cacheKey);
+
+	if (cached) return cached;
+
+	const rawHtml = transformMarkdown({ input: source });
+
+	const html = sanitizeHtml(rawHtml, { tagNames: descriptionTagNames });
+	const stripped = stripTags(rawHtml).replaceAll(/\s+/g, ' ').trim();
+	const text = textClipper(stripped, { wordCount: wordCountFinal });
+
+	const rendered: DescriptionRendered = { html, text };
+
+	await cacheInstance.set(cacheKey, rendered);
+
+	return rendered;
+}
+
+export async function getDescriptionRenderedText(entry: {
+	id: string;
+	data: { description?: string | undefined };
+	body?: string | undefined;
+}): Promise<string | undefined> {
+	const rendered = await getDescriptionRendered(entry);
+
+	return rendered?.text;
+}

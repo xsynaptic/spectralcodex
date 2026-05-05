@@ -22,6 +22,7 @@ import SectionThemes from '#components/sections/section-themes.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -48,7 +49,7 @@ const t = getTranslations();
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		description: entry.body ?? undefined,
+		description: await getDescriptionRenderedText(entry),
 		image: await getSeoImageProps({
 			id: entry.id,
 			alt: entry.data.title,

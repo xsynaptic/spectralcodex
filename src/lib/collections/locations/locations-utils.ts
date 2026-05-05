@@ -21,9 +21,9 @@ import {
 	sortContentMetadataByDate,
 } from '#lib/metadata/metadata-utils.ts';
 import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
-import { getDescription } from '#lib/utils/text.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
 export async function createLocationsByIdsFunction() {
@@ -112,7 +112,7 @@ export async function getLocationSchemas(
 		buildBreadcrumbSchema(breadcrumbItems, props.url),
 		buildPlaceSchema({
 			title: entry.data.title,
-			description: getDescription(entry),
+			description: await getDescriptionRenderedText(entry),
 			url: props.url,
 			coordinates: getFirstCoordinates(entry),
 		}),

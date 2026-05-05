@@ -6,14 +6,14 @@ import type { MetaProps } from '#components/types.ts';
 
 import { OPEN_GRAPH_IMAGE_DENSITY, OPEN_GRAPH_TWITTER_USERNAME } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSeoImageFallback, sanitizeSeoDescription } from '#lib/utils/seo.ts';
+import { getSeoImageFallback } from '#lib/utils/seo.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 type Props = MetaProps;
 
 const {
 	title: contentTitle,
-	description: descriptionRaw,
+	description: contentDescription,
 	ogType,
 	image,
 	imageAlt,
@@ -28,7 +28,7 @@ const t = getTranslations();
 const siteTitle = t('site.title');
 const siteDescription = t('site.description');
 
-const description = sanitizeSeoDescription(descriptionRaw) ?? siteDescription;
+const description = contentDescription ?? siteDescription;
 
 const titleDisplay =
 	contentTitle && contentTitle !== siteTitle ? `${contentTitle} - ${siteTitle}` : siteTitle;

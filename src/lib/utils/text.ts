@@ -1,7 +1,4 @@
 import { stripTags } from '@xsynaptic/unified-tools';
-import * as R from 'remeda';
-
-import { MDX_COMPONENTS } from '#constants.ts';
 
 export function textClipper(
 	input: string,
@@ -44,25 +41,6 @@ export function formatNumber({
 // Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
 export function stripFootnoteReferences(input: string) {
 	return input.replaceAll(/\[\^[^\]]+\]/g, '');
-}
-
-// Return the frontmatter description or derive a clipped excerpt from the body
-export function getDescription(entry: {
-	data: { description?: string | undefined };
-	body?: string | undefined;
-}): string | undefined {
-	if (entry.data.description) {
-		return entry.data.description;
-	}
-	if (entry.body) {
-		return R.pipe(
-			entry.body,
-			(body) => stripMdxComponents(body, MDX_COMPONENTS),
-			stripFootnoteReferences,
-			(text) => textClipper(text.trim(), { wordCount: 100 }),
-		);
-	}
-	return undefined;
 }
 
 // Sanitize image captions before returning them for display

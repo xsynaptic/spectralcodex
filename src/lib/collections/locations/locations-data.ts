@@ -1,10 +1,8 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { hashShort } from '@spectralcodex/shared/cache';
-import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
-import { sanitizeHtml, transformMarkdown } from '@xsynaptic/unified-tools';
 import { getCollection } from 'astro:content';
-import { CUSTOM_CACHE_PATH, IPX_SERVER_SECRET } from 'astro:env/server';
+import { IPX_SERVER_SECRET } from 'astro:env/server';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
@@ -16,10 +14,8 @@ import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
+import { getDescription, getDescriptionRendered } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-import { getDescription } from '#lib/utils/text.ts';
-
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'locations-map-data');
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedIpxPath = createSignedIpxPathFunction({
@@ -120,13 +116,11 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 }
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	const description = getDescription(entry);
-
 	const locationMapDataHash = hashShort({
 		data: {
 			id: entry.id,
 			title: entry.data.title,
-			description,
+			description: getDescription(entry),
 			links: entry.data.links,
 		},
 	});
@@ -136,18 +130,10 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
-	if (!description) return;
+	const rendered = await getDescriptionRendered(entry);
 
-	const cachedDescriptionHtml = await cacheInstance.get<string>(locationMapDataHash);
-
-	if (cachedDescriptionHtml) {
-		entry.data._descriptionHtml = cachedDescriptionHtml;
-	} else {
-		entry.data._descriptionHtml = sanitizeHtml(transformMarkdown({ input: description }), {
-			tagNames: ['em', 'strong'] as const,
-		});
-
-		await cacheInstance.set(locationMapDataHash, entry.data._descriptionHtml);
+	if (rendered) {
+		entry.data._descriptionHtml = rendered.html;
 	}
 }
 

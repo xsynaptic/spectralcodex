@@ -39,9 +39,9 @@ import { getImageFeaturedId, getImageFeaturedHeroId } from '#lib/image/image-fea
 import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
-import { getDescription } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -74,7 +74,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		description: getDescription(entry),
+		description: await getDescriptionRenderedText(entry),
 		image: await getSeoImageProps({
 			id: getPublicId(entry),
 			alt: entry.data.title,
@@ -171,9 +171,9 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<SectionThemes themeIds={themeIds} />
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
+		<SectionNearbyList entry={entry} limit={12} />
 		<SectionMetadataGrid items={metadataItems} />
 		<SectionRelated entry={entry} showPreviews={true} limit={8} />
-		<SectionNearbyList entry={entry} limit={12} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>
 </MainSite>

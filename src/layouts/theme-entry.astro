@@ -25,6 +25,7 @@ import SectionThemes from '#components/sections/section-themes.astro';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
@@ -61,7 +62,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		description: entry.data.description ?? entry.body ?? undefined,
+		description: await getDescriptionRenderedText(entry),
 		image: await getSeoImageProps({
 			id: entry.id,
 			alt: entry.data.title,
