@@ -57,11 +57,11 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} "$TEMP_ENV" "$REMOTE_HOST:$REMOTE_PA
 
 # Restart services
 echo "Restarting services..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose build && docker compose up -d --force-recreate"
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose build && docker compose up -d --force-recreate --remove-orphans"
 
 echo ""
 echo "Waiting for health checks..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose up -d --wait --wait-timeout 60" 2>&1 || true
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose up -d --wait --wait-timeout 60 --remove-orphans" 2>&1 || true
 ssh $SSH_OPTS "$REMOTE_HOST" "docker compose -f $REMOTE_PATH/docker-compose.yml ps"
 echo ""
 echo "Done! All containers should show 'Up' and 'healthy'."

@@ -32,7 +32,7 @@ services:
 
   # Image server (IPX)
   image-server:
-    build: ../../services/image-server
+    image: spectralcodex-image-server:latest
     container_name: spectralcodex-image-server
     init: true
     cap_drop:

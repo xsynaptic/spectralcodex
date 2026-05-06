@@ -1,5 +1,4 @@
-# Development image server for spectralcodex
-# Started automatically by `pnpm dev`
+# Development image server for spectralcodex; started automatically by `pnpm dev`
 services:
   image-cache:
     image: nginx:1.29.8-alpine
@@ -7,14 +6,14 @@ services:
     ports:
       - '3100:80'
     volumes:
-      - ${DEPLOY_IMAGE_SERVER_PATH}/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ${DEPLOY_IMAGE_SERVER_BUNDLE_PATH}/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     environment:
       - IPX_SERVER_SECRET=${IPX_SERVER_SECRET:-dev-secret-do-not-use-in-production}
     depends_on:
       - image-server
 
   image-server:
-    build: ${DEPLOY_IMAGE_SERVER_PATH}
+    build: ${DEPLOY_IMAGE_SERVER_BUNDLE_PATH}
     container_name: dev-image-server
     volumes:
       - ${CONTENT_MEDIA_PATH}:/media:ro

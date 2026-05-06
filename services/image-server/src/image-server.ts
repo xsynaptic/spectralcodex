@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { createIPX, createIPXNodeHandler, ipxFSStorage } from 'ipx';
 import { createServer } from 'node:http';
 

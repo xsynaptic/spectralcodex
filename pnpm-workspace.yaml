@@ -18,6 +18,19 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/unified-tools'
   - rehype-wrap-cjk
 
+injectWorkspacePackages: true
+
+# Fetch linux-x64 binaries (sharp, esbuild, etc.) alongside the host's platform
+# so that `pnpm deploy` produces bundles that run inside our linux/amd64 Docker
+# containers. Used by services/image-server's deploy flow.
+supportedArchitectures:
+  os:
+    - current
+    - linux
+  cpu:
+    - current
+    - x64
+
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - better-sqlite3
