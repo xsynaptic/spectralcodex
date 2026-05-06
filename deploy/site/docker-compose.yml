@@ -33,8 +33,14 @@ services:
   # Image server (IPX)
   image-server:
     image: spectralcodex-image-server:latest
+    build:
+      context: ../../services/image-server
+      dockerfile: Dockerfile
     container_name: spectralcodex-image-server
     init: true
+    read_only: true
+    tmpfs:
+      - /tmp
     cap_drop:
       - ALL
     volumes:

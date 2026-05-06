@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 import chalk from 'chalk';
-import { readFile } from 'node:fs/promises';
+import { copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
@@ -11,8 +11,6 @@ import { loadDeployConfig } from './deploy-config.js';
 const PROJECT_SLUG = 'spectralcodex';
 const IMAGE_NAME = `${PROJECT_SLUG}-image-server`;
 const BUNDLE_DIR = `/tmp/${IMAGE_NAME}-bundle`;
-const TARBALL_LOCAL = `/tmp/${IMAGE_NAME}.tar.gz`;
-const TARBALL_REMOTE = `/tmp/${IMAGE_NAME}.tar.gz`;
 
 export async function deployImageServer({
 	rootPath,
@@ -28,28 +26,21 @@ export async function deployImageServer({
 		throw new Error('Missing IPX_SERVER_SECRET environment variable');
 	}
 
-	const pkgPath = path.join(rootPath, 'services/image-server/package.json');
-	const pkg = JSON.parse(await readFile(pkgPath, 'utf8')) as { version: string };
-
-	if (!pkg.version) throw new Error(`Missing "version" in ${pkgPath}`);
-
-	const version = pkg.version;
-
+	const serviceDir = path.join(rootPath, 'services/image-server');
 	const composeFile = path.join(rootPath, 'deploy/site/docker-compose.yml');
-	const dockerfile = path.join(rootPath, 'services/image-server/Dockerfile');
+	const dockerfile = path.join(serviceDir, 'Dockerfile');
+	const nginxTemplate = path.join(serviceDir, 'nginx.conf.template');
 	const projectPath = `${config.remotePath}/${PROJECT_SLUG}`;
-
-	const tagLatest = `${IMAGE_NAME}:latest`;
-	const tagVersion = `${IMAGE_NAME}:${version}`;
+	const remoteServiceDir = `${projectPath}/services/image-server`;
+	const remoteComposeFile = `${projectPath}/deploy/site/docker-compose.yml`;
 
 	console.log(chalk.blue('Deploying image server...'));
-	console.log(chalk.gray(`  Tags: ${tagLatest}, ${tagVersion}`));
 	console.log(chalk.gray(`  To: ${config.remoteHost}:${projectPath}/`));
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 	const sshFlag = config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : [];
-	const composeCmd = `docker compose -p ${PROJECT_SLUG} -f ${projectPath}/deploy/site/docker-compose.yml`;
+	const composeCmd = `docker compose -p ${PROJECT_SLUG} -f ${remoteComposeFile}`;
 
 	const start = Date.now();
 
@@ -65,35 +56,10 @@ export async function deployImageServer({
 		cwd: rootPath,
 	})`pnpm --filter @xsynaptic/image-server deploy --prod ${BUNDLE_DIR}`;
 
-	// Build linux/amd64 image with the bundle as context
-	console.log(chalk.gray('Building Docker image (linux/amd64)...'));
-	if (dryRun) {
-		console.log(chalk.yellow('  (skipped: dry run)'));
-	} else {
-		await $({ stdio: 'inherit' })`docker buildx build ${[
-			'--platform',
-			'linux/amd64',
-			'--load',
-			'-t',
-			tagLatest,
-			'-t',
-			tagVersion,
-			'-f',
-			dockerfile,
-			BUNDLE_DIR,
-		]}`;
-	}
-
-	// Save + gzip locally (overwrites any existing tarball at the path)
-	if (dryRun) {
-		console.log(chalk.gray(`Saving image to ${TARBALL_LOCAL}... (skipped: dry run)`));
-	} else {
-		console.log(chalk.gray(`Saving image to ${TARBALL_LOCAL}...`));
-		await $({
-			stdio: 'inherit',
-			shell: true,
-		})`docker save ${tagLatest} ${tagVersion} | gzip > ${TARBALL_LOCAL}`;
-	}
+	// Co-locate Dockerfile and nginx.conf.template inside the bundle for easier rsync
+	console.log(chalk.gray('Adding Dockerfile + nginx.conf.template to bundle...'));
+	await copyFile(dockerfile, path.join(BUNDLE_DIR, 'Dockerfile'));
+	await copyFile(nginxTemplate, path.join(BUNDLE_DIR, 'nginx.conf.template'));
 
 	// Sync compose file
 	await $({ stdio: 'inherit' })`rsync ${[
@@ -103,24 +69,27 @@ export async function deployImageServer({
 		...sshFlag,
 		...(dryRun ? ['--dry-run'] : []),
 		composeFile,
-		`${config.remoteHost}:${projectPath}/deploy/site/docker-compose.yml`,
+		`${config.remoteHost}:${remoteComposeFile}`,
+	]}`;
+
+	// Sync bundle to remote service dir; --delete-after cleans stale files
+	console.log(chalk.gray('Syncing bundle to remote...'));
+	await $({ stdio: 'inherit' })`rsync ${[
+		'-avz',
+		'--mkpath',
+		'--progress',
+		'--delete-after',
+		...sshFlag,
+		...(dryRun ? ['--dry-run'] : []),
+		`${BUNDLE_DIR}/`,
+		`${config.remoteHost}:${remoteServiceDir}/`,
 	]}`;
 
 	if (dryRun) {
-		console.log(chalk.yellow('Skipping tarball rsync and remote SSH commands (dry run)'));
+		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
 		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 		return;
 	}
-
-	// Sync tarball
-	console.log(chalk.gray('Shipping image tarball...'));
-	await $({ stdio: 'inherit' })`rsync ${[
-		'-avz',
-		'--progress',
-		...sshFlag,
-		TARBALL_LOCAL,
-		`${config.remoteHost}:${TARBALL_REMOTE}`,
-	]}`;
 
 	// Write server .env (compose reads from its own directory)
 	console.log(chalk.gray('Writing server environment...'));
@@ -129,24 +98,16 @@ export async function deployImageServer({
 		stdio: 'inherit',
 	})`ssh ${sshArgs} ${`mkdir -p ${projectPath}/deploy/site && cat > ${projectPath}/deploy/site/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
 
-	// Load image into VPS docker
-	console.log(chalk.gray('Loading image on remote...'));
-	await $({
-		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`gunzip -c ${TARBALL_REMOTE} | docker load`}`;
+	// Build image on remote (native amd64, hits local layer cache)
+	console.log(chalk.gray('Building image on remote...'));
+	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`${composeCmd} build image-server`}`;
 
-	// Recreate containers with the new image
+	// Recreate containers and wait for health
 	console.log(chalk.gray('Recreating containers...'));
-	await $({
-		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`${composeCmd} up -d --force-recreate --remove-orphans`}`;
-
-	// Health check
-	console.log(chalk.gray('Waiting for health checks...'));
 	try {
 		await $({
 			stdio: 'inherit',
-		})`ssh ${sshArgs} ${`${composeCmd} up -d --wait --wait-timeout 30`}`;
+		})`ssh ${sshArgs} ${`${composeCmd} up -d --force-recreate --remove-orphans --wait --wait-timeout 30`}`;
 	} catch {
 		console.log(chalk.yellow('Warning: Health check timed out'));
 	}
