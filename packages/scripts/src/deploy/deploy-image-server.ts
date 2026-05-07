@@ -44,17 +44,19 @@ export async function deployImageServer({
 
 	const start = Date.now();
 
-	// Build TypeScript on host (uses workspace install)
-	console.log(chalk.gray('Building image-server (tsdown)...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm --filter @xsynaptic/image-server build`;
-
-	// Extract self-contained production bundle
+	// Use pnpm deploy to produce an isolated package and dedicated lockfile
+	// We discard its node_modules and dist folder; the multi-stage Dockerfile rebuilds them later
 	console.log(chalk.gray(`Producing deploy bundle at ${BUNDLE_DIR}...`));
 	await $({ stdio: 'inherit' })`rm -rf ${BUNDLE_DIR}`;
 	await $({
 		stdio: 'inherit',
 		cwd: rootPath,
 	})`pnpm --filter @xsynaptic/image-server deploy --prod ${BUNDLE_DIR}`;
+
+	// Strip host-built artifacts so the container builds fresh from src + lockfile
+	await $({
+		stdio: 'inherit',
+	})`rm -rf ${path.join(BUNDLE_DIR, 'node_modules')} ${path.join(BUNDLE_DIR, 'dist')}`;
 
 	// Co-locate Dockerfile and nginx.conf.template inside the bundle for easier rsync
 	console.log(chalk.gray('Adding Dockerfile + nginx.conf.template to bundle...'));

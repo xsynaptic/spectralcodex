@@ -1,13 +1,32 @@
-# Build context: a self-contained bundle produced by `pnpm deploy --prod` on the host
-# See packages/scripts/src/deploy/deploy-image-server.ts
-FROM node:22.22.2-alpine
+# Multi-stage build
+# We use pnpm deploy to extract the image server from the pnpm monorepo
+# The build takes place on remote, within the container, so sharp gets the right binaries
 
+# Prod-only deps for the runtime image
+FROM node:22.22.2-alpine AS deps
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+
+# Full deps + tsdown build for dist/
+FROM node:22.22.2-alpine AS builder
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts
+COPY src/ ./src/
+RUN pnpm build
+
+FROM node:22.22.2-alpine
 RUN addgroup -g 1001 nodejs && \
     adduser -u 1001 -G nodejs -s /bin/sh -D nodejs
 
 WORKDIR /app
 
-COPY --chown=nodejs:nodejs . .
+COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --chown=nodejs:nodejs package.json ./
 
 USER nodejs
 
