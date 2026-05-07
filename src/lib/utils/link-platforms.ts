@@ -14,7 +14,6 @@ const linkPlatforms: Array<LinkPlatform> = [
 	{ match: 'reddit.com', title: 'Reddit' },
 	{ match: 'hiking.biji.co', title: 'Hiking Note', title_zh: '健康筆記' },
 	{ match: 'vimeo.com', title: 'Vimeo' },
-	{ match: 'vimeo.com', title: 'Vimeo' },
 ];
 
 export function getLinkPlatform(url: string): string | undefined {
