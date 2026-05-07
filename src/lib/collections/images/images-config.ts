@@ -147,7 +147,7 @@ export const images = defineCollection({
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
 		beforeLoad: () => {
-			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true });
+			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
 		},
 		afterLoad: async () => {
 			await exiftool.end();
