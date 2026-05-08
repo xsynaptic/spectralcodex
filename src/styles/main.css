@@ -26,7 +26,6 @@
 
 /** Component styling */
 @import './main/components/carousel.css';
-@import './main/components/content.css';
 @import './main/components/divider.css';
 @import './main/components/link.css';
 @import './main/components/metadata-grid-item.css';

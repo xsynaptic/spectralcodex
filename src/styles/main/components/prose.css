@@ -1,131 +1,309 @@
-@plugin '@tailwindcss/typography';
-
-@utility prose {
-	p {
-		margin-top: 0;
-	}
-	ol,
-	ul > li {
-		padding-inline-start: 0;
-	}
-	li {
-		margin-top: 0;
-		margin-left: 1rem;
-		margin-bottom: 0.5rem;
-	}
-	code {
-		&::before,
-		&::after {
-			display: none;
-		}
-	}
-	blockquote {
-		font-weight: 400;
-		p {
-			&:first-of-type::before,
-			&:last-of-type::after {
-				display: none;
-			}
-		}
-	}
-}
-
-@utility prose-primary {
-	--tw-prose-body: var(--color-primary-700);
-	--tw-prose-headings: var(--color-primary-900);
-	--tw-prose-lead: var(--color-primary-700);
-	--tw-prose-links: var(--color-primary-900);
-	--tw-prose-bold: var(--color-primary-900);
-	--tw-prose-counters: var(--color-accent-300);
-	--tw-prose-bullets: var(--color-accent-200);
-	--tw-prose-hr: var(--color-primary-300);
-	--tw-prose-quotes: var(--color-primary-500);
-	--tw-prose-quote-borders: var(--color-primary-200);
-	--tw-prose-captions: var(--color-primary-700);
-	--tw-prose-code: var(--color-primary-900);
-	--tw-prose-pre-code: var(--color-primary-100);
-	--tw-prose-pre-bg: var(--color-primary-900);
-	--tw-prose-th-borders: var(--color-primary-300);
-	--tw-prose-td-borders: var(--color-primary-200);
-	--tw-prose-invert-body: var(--color-primary-200);
-	--tw-prose-invert-headings: var(--color-white);
-	--tw-prose-invert-lead: var(--color-primary-300);
-	--tw-prose-invert-links: var(--color-white);
-	--tw-prose-invert-bold: var(--color-white);
-	--tw-prose-invert-counters: var(--color-primary-400);
-	--tw-prose-invert-bullets: var(--color-primary-600);
-	--tw-prose-invert-hr: var(--color-primary-700);
-	--tw-prose-invert-quotes: var(--color-primary-300);
-	--tw-prose-invert-quote-borders: var(--color-primary-700);
-	--tw-prose-invert-captions: var(--color-primary-400);
-	--tw-prose-invert-code: var(--color-white);
-	--tw-prose-invert-pre-code: var(--color-primary-300);
-	--tw-prose-invert-pre-bg: rgb(0 0 0 / 50%);
-	--tw-prose-invert-th-borders: var(--color-primary-600);
-	--tw-prose-invert-td-borders: var(--color-primary-700);
-}
-
+/**
+ * Prose styles for MDX-rendered content
+ *
+ * Hand-rolled replacement for @tailwindcss/typography
+ * All element selectors are wrapped in :where() so prose rules have specificity (0,1,0)
+ * Any utility class on a descendant wins, which makes `.not-prose` work implicitly
+ *
+ * Sizing convention: em for typographic rhythm (auto-scales with prose-compact)
+ */
 .prose-x {
-	@apply prose prose-base max-w-none font-serif prose-primary lg:prose-lg prose-h2:mb-4 prose-a:text-accent-500 prose-a:decoration-accent-200 prose-a:underline-offset-2 prose-a:transition-colors prose-a:duration-150 prose-a:ease-in prose-a:hover:text-accent-300 prose-a:hover:decoration-accent-100;
-}
-.prose-x.prose-dark {
-	@apply dark:prose-invert dark:prose-a:text-accent-300 dark:prose-a:decoration-accent-500 dark:prose-a:hover:text-accent-200 dark:prose-a:hover:decoration-accent-400;
-}
-.prose-x.prose-compact {
-	@apply prose-sm lg:prose-base;
+	color: var(--color-primary-700);
+	font-family: var(--font-serif);
+	font-size: 1rem;
+	line-height: 1.75;
+	max-width: none;
+	@media (width >= 64rem) {
+		font-size: 1.125rem;
+		line-height: 1.7777778;
+	}
+	[data-mode='dark'] & {
+		color: var(--color-primary-200);
+	}
+
+	/* First/last child margin reset */
+	& > :where(:first-child) {
+		margin-top: 0;
+	}
+	& > :where(:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* Headings */
+	& :where(h1) {
+		color: var(--color-primary-900);
+		font-weight: 800;
+		font-size: 2.25em;
+		line-height: 1.1111111;
+		margin-top: 0;
+		margin-bottom: 0.8em;
+	}
+	& :where(h2) {
+		color: var(--color-primary-900);
+		font-weight: 700;
+		font-size: 1.5em;
+		line-height: 1.3333333;
+		margin-top: 2em;
+		margin-bottom: 1em;
+	}
+	& :where(h3) {
+		color: var(--color-primary-900);
+		font-weight: 600;
+		font-size: 1.25em;
+		line-height: 1.6;
+		margin-top: 1.6em;
+		margin-bottom: 0.6em;
+	}
+	& :where(h4) {
+		color: var(--color-primary-900);
+		font-weight: 600;
+		font-size: 1em;
+		line-height: 1.5;
+		margin-top: 1.5em;
+		margin-bottom: 0.5em;
+	}
+	& :where(:is(h1, h2, h3, h4) + *) {
+		margin-top: 0;
+	}
+	& :where(:is(h1, h2, h3, h4) strong) {
+		color: inherit;
+		font-weight: 800;
+	}
+	& :where(:is(h1, h2, h3, h4) code) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(:is(h1, h2, h3, h4)) {
+		color: var(--color-white);
+	}
+
+	/* Links: accent color + halo via text-shadow matching page bg */
+	& :where(a) {
+		color: var(--color-accent-500);
+		font-weight: 500;
+		text-decoration-line: underline;
+		text-decoration-color: var(--color-accent-200);
+		text-underline-offset: 2px;
+		transition:
+			color 150ms ease-in,
+			text-decoration-color 150ms ease-in;
+		text-shadow:
+			1px 1px 0 var(--color-primary-100),
+			-1px 1px 0 var(--color-primary-100),
+			2px 0 1px var(--color-primary-100),
+			-2px 0 1px var(--color-primary-100);
+	}
+	& :where(a):hover {
+		color: var(--color-accent-300);
+		text-decoration-color: var(--color-accent-100);
+	}
+	& :where(a strong),
+	& :where(a code) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(a) {
+		color: var(--color-accent-300);
+		text-decoration-color: var(--color-accent-500);
+		text-shadow:
+			1px 1px 0 var(--color-primary-800),
+			-1px 1px 0 var(--color-primary-800),
+			2px 0 1px var(--color-primary-800),
+			-2px 0 1px var(--color-primary-800);
+	}
+	[data-mode='dark'] & :where(a):hover {
+		color: var(--color-accent-200);
+		text-decoration-color: var(--color-accent-400);
+	}
+
+	/* Text elements */
+	& :where(p) {
+		margin-top: 0;
+		margin-bottom: 1.25em;
+	}
+	& :where(strong) {
+		color: var(--color-primary-900);
+		font-weight: 600;
+	}
+	& :where(blockquote strong),
+	& :where(thead th strong) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(strong) {
+		color: var(--color-white);
+	}
+
+	/* Lists */
+	& :where(ul) {
+		list-style-type: disc;
+		margin: 0 0 1.25em;
+		padding: 0;
+	}
+	& :where(ol) {
+		list-style-type: decimal;
+		margin: 0 0 1.25em;
+		padding: 0;
+	}
+	& :where(li) {
+		margin: 0 0 0.5em 1rem;
+	}
+	& :where(ul > li)::marker {
+		color: var(--color-accent-200);
+	}
+	& :where(ol > li)::marker {
+		color: var(--color-accent-300);
+		font-weight: 400;
+	}
+	& :where(:is(ul, ol) :is(ul, ol)) {
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+	}
+	[data-mode='dark'] & :where(ul > li)::marker {
+		color: var(--color-primary-600);
+	}
+	[data-mode='dark'] & :where(ol > li)::marker {
+		color: var(--color-primary-400);
+	}
+
+	/* Blockquote */
+	& :where(blockquote) {
+		margin: 1.6em 0;
+		padding-inline-start: 1.25em;
+		border-inline-start: 0.25rem solid var(--color-primary-200);
+		color: var(--color-primary-500);
+		font-style: italic;
+		font-weight: 400;
+	}
+	[data-mode='dark'] & :where(blockquote) {
+		color: var(--color-primary-300);
+		border-inline-start-color: var(--color-primary-700);
+	}
+
+	/* Inline code */
+	& :where(code) {
+		color: var(--color-primary-900);
+		font-weight: 600;
+		font-size: 0.875em;
+	}
+	[data-mode='dark'] & :where(code) {
+		color: var(--color-white);
+	}
+
+	/* Highlight */
+	& :where(mark) {
+		background-color: var(--color-highlight-100);
+		color: var(--color-primary-900);
+		padding-inline: 0.2em;
+		border-radius: 0.125rem;
+	}
+	[data-mode='dark'] & :where(mark) {
+		background-color: var(--color-highlight-800);
+		color: var(--color-white);
+	}
+
+	/* Horizontal rule */
+	& :where(hr) {
+		margin: 2.5em 0;
+		border: 0;
+		border-top: 1px solid var(--color-primary-300);
+	}
+	& :where(hr + *) {
+		margin-top: 0;
+	}
+	[data-mode='dark'] & :where(hr) {
+		border-top-color: var(--color-primary-700);
+	}
+
+	/* Footnotes (rendered by remark-rehype) */
+	& > :where(.footnotes) ol {
+		font-size: 0.875em;
+		line-height: 1.5;
+	}
+	& > :where(.footnotes) ol li::marker {
+		font-size: 0.75em;
+		font-style: italic;
+	}
+	& :where(.footnotes li p) {
+		margin: 0;
+	}
+	& :where([data-footnote-ref]),
+	& :where([data-footnote-backref]) {
+		font-weight: 500;
+		text-decoration-line: none;
+		user-select: none;
+	}
+	& :where([data-footnote-ref])::before {
+		content: '[';
+		color: var(--color-accent-300);
+		font-weight: 300;
+		margin-inline-start: 1px;
+	}
+	& :where([data-footnote-ref])::after {
+		content: ']';
+		color: var(--color-accent-300);
+		font-weight: 300;
+	}
+	[data-mode='dark'] & :where([data-footnote-ref])::before,
+	[data-mode='dark'] & :where([data-footnote-ref])::after {
+		color: var(--color-accent-400);
+	}
+
+	/* Inserted by remark-rehype for the footnotes label */
+	& :where(.sr-only) {
+		@apply sr-only;
+	}
 }
 
-/* Note: the text shadow should match the background for the page */
-.prose-x a {
-	text-shadow:
-		1px 1px 0 var(--color-primary-100),
-		-1px 1px 0 var(--color-primary-100),
-		2px 0 1px var(--color-primary-100),
-		-2px 0 1px var(--color-primary-100);
-}
-[data-mode='dark'] .prose-x a {
-	text-shadow:
-		1px 1px 0 var(--color-primary-800),
-		-1px 1px 0 var(--color-primary-800),
-		2px 0 1px var(--color-primary-800),
-		-2px 0 1px var(--color-primary-800);
+/*
+ * Compact size variant; em-based internal margins auto-scale with the smaller font-size
+ */
+.prose-compact {
+	font-size: 0.875rem;
+	line-height: 1.7142857;
+	@media (width >= 64rem) {
+		font-size: 1rem;
+		line-height: 1.75;
+	}
 }
 
-/* Footnotes */
-.prose-x > .footnotes ol {
-	@apply text-sm leading-normal;
+/*
+ * Content-blocks: direct children get constrained to the content column 
+ * Images and image groups can have wide or full layout, spanning the viewport
+ */
+.content-blocks {
+	& > *:not(.content-image):not(.content-img-group) {
+		@apply mx-auto max-w-content px-4 md:px-8;
+	}
+	& > .content-image,
+	& > .content-image + p {
+		margin-top: 0;
+	}
 }
-.prose-x > .footnotes ol li::marker {
-	@apply text-xs;
+
+/*
+ * Image caption styling; applied to caption inside content image components (not styled by prose)
+ * Defined here because it's tightly coupled to content-blocks layout
+ */
+.content-image-caption {
 	font-style: italic;
-	margin-top: -5px;
 }
-.prose-x .footnotes li p {
-	margin: 0;
+.content-image-caption em {
+	font-style: normal;
 }
-.prose-x [data-footnote-ref]::before,
-.prose-x [data-footnote-ref]::after {
-	@apply font-light;
+.content-image-caption a {
+	@apply transition-colors duration-150 ease-in;
+	color: var(--color-accent-500);
+	text-decoration-color: var(--color-accent-200);
+	text-decoration-line: underline;
+	text-underline-offset: 2px;
+}
+.content-image-caption a:hover {
 	color: var(--color-accent-300);
+	text-decoration-color: var(--color-accent-100);
 }
-[data-mode='dark'] .prose-x [data-footnote-ref]::before,
-[data-mode='dark'] .prose-x [data-footnote-ref]::after {
+[data-mode='dark'] .content-image-caption a {
 	color: var(--color-accent-400);
+	text-decoration-color: var(--color-accent-800);
 }
-.prose-x [data-footnote-ref]::before {
-	content: '[';
-	margin-inline-start: 1px;
-}
-.prose-x [data-footnote-ref]::after {
-	content: ']';
-}
-.prose-x [data-footnote-ref],
-.prose-x [data-footnote-backref] {
-	@apply font-medium select-none;
-	text-decoration-line: none;
-}
-
-/** Inserted by remark-rehype for use with the footnotes label */
-.sr-only {
-	@apply sr-only;
+[data-mode='dark'] .content-image-caption a:hover {
+	color: var(--color-accent-700);
+	text-decoration-color: var(--color-accent-900);
 }
