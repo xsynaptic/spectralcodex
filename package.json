@@ -46,7 +46,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.3.0",
+		"astro": "^6.3.1",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6"
 	},
@@ -68,7 +68,6 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@spectralcodex/word-count": "workspace:*",
-		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.2.4",
 		"@tanstack/eslint-plugin-query": "^5.100.9",
 		"@turf/bbox": "^7.3.5",
@@ -113,7 +112,7 @@
 		"typescript-eslint": "^8.59.2",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
-		"vite": "^7.3.2",
+		"vite": "^7.3.3",
 		"vitest": "^4.1.5",
 		"zod": "^4.4.3"
 	},
