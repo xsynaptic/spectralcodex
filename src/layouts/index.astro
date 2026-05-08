@@ -10,6 +10,7 @@ import ContentSection from '#components/content/content-section.astro';
 import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
+import AuthorCard from '#components/parts/author-card.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
@@ -124,19 +125,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 					</ImagePlaceholder>
 				) : undefined
 			}
-			<div class="prose mt-1 flex flex-col gap-1 font-serif prose-primary">
-				<Link
-					class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
-					href={getSiteUrl('/about')}
-					rel="me"><span class={MicroformatClassNames.Name}>{t('author.name')}</span></Link
-				>
-				<div class="text-xs">
-					<span class={MicroformatClassNames.Role}>{t('author.role')}</span>, <Link
-						class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
-						href={getSiteUrl()}>{t('site.title')}</Link
-					>
-				</div>
-			</div>
+			<AuthorCard />
 		</CardFrame>
 		<Prose>
 			<p
