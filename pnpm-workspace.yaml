@@ -2,6 +2,7 @@ packages:
   - packages/**
   - services/*
 
+# Intended to mitigate supply chain attacks
 minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
@@ -19,7 +20,13 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/unified-tools'
   - rehype-wrap-cjk
 
+# This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
+
+# Astro emits prerender chunks under <root>/dist/ that runtime-import @keyv/sqlite
+# via vite.ssr.external; hoist it so Node can resolve it from the root scope
+publicHoistPattern:
+  - '@keyv/sqlite'
 
 allowBuilds:
   '@tailwindcss/oxide': true
