@@ -10,9 +10,9 @@
 div.maplibregl-popup-content {
 	overflow: auto;
 	padding: 0;
-}
-div.maplibregl-popup-content a:focus {
-	outline: none;
+	& a:focus {
+		outline: none;
+	}
 }
 button.maplibregl-popup-close-button {
 	border-bottom-left-radius: 3px;
@@ -25,9 +25,9 @@ button.maplibregl-popup-close-button {
 		height: 25px;
 		width: 25px;
 	}
-}
-button.maplibregl-popup-close-button:focus {
-	outline: none;
+	&:focus {
+		outline: none;
+	}
 }
 [data-mode='dark'] .maplibregl-popup-content {
 	background-color: var(--color-primary-900);
@@ -84,15 +84,15 @@ button.maplibregl-popup-close-button:focus {
 	flex-wrap: nowrap;
 	gap: 2px;
 	height: 100%;
-}
-[data-mode='dark'] .maplibregl-ctrl-metrics {
-	color: var(--color-primary-300);
+	[data-mode='dark'] & {
+		color: var(--color-primary-300);
+	}
 }
 .maplibregl-ctrl-metrics-divider {
 	color: var(--color-primary-400);
-}
-[data-mode='dark'] .maplibregl-ctrl-metrics-divider {
-	color: var(--color-primary-500);
+	[data-mode='dark'] & {
+		color: var(--color-primary-500);
+	}
 }
 .maplibregl-ctrl-scale {
 	background-color: transparent;
@@ -101,9 +101,9 @@ button.maplibregl-popup-close-button:focus {
 	border-color: var(--color-primary-400);
 	border-width: 0 1px 1px;
 	color: var(--color-primary-600);
-}
-[data-mode='dark'] .maplibregl-ctrl-scale {
-	background-color: transparent;
-	border-color: var(--color-primary-500);
-	color: var(--color-primary-300);
+	[data-mode='dark'] & {
+		background-color: transparent;
+		border-color: var(--color-primary-500);
+		color: var(--color-primary-300);
+	}
 }

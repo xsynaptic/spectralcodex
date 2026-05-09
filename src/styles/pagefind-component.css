@@ -57,9 +57,9 @@ dialog.pf-modal::backdrop {
 	--pf-skeleton: var(--color-primary-200) url('/seigaiha-light.svg') repeat;
 	border: 1px solid var(--pf-border);
 	overflow: hidden;
-}
-[data-mode='dark'] .pf-result-image {
-	--pf-skeleton: var(--color-primary-700) url('/seigaiha-dark.svg') repeat;
+	[data-mode='dark'] & {
+		--pf-skeleton: var(--color-primary-700) url('/seigaiha-dark.svg') repeat;
+	}
 }
 .pf-result-image img {
 	width: 100%;
@@ -70,27 +70,27 @@ dialog.pf-modal::backdrop {
 /** Result link colors */
 .pf-result-link {
 	--pf-text: var(--color-accent-500);
-}
-.pf-result-link:hover {
-	--pf-text: var(--color-accent-300);
-}
-[data-mode='dark'] .pf-result-link {
-	--pf-text: var(--color-accent-400);
-}
-[data-mode='dark'] .pf-result-link:hover {
-	--pf-text: var(--color-accent-300);
+	&:hover {
+		--pf-text: var(--color-accent-300);
+	}
+	[data-mode='dark'] & {
+		--pf-text: var(--color-accent-400);
+		&:hover {
+			--pf-text: var(--color-accent-300);
+		}
+	}
 }
 
 /* Sub-result link colors */
 .pf-heading-link {
 	--pf-text: var(--color-primary-600);
-}
-.pf-heading-link:hover {
-	--pf-text: var(--color-primary-500);
-}
-[data-mode='dark'] .pf-heading-link {
-	--pf-text: var(--color-primary-500);
-}
-[data-mode='dark'] .pf-heading-link:hover {
-	--pf-text: var(--color-primary-400);
+	&:hover {
+		--pf-text: var(--color-primary-500);
+	}
+	[data-mode='dark'] & {
+		--pf-text: var(--color-primary-500);
+		&:hover {
+			--pf-text: var(--color-primary-400);
+		}
+	}
 }

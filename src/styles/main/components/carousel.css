@@ -33,12 +33,12 @@
 	@media (width >= 64rem) {
 		display: flex;
 	}
-}
-.carousel-nav:hover {
-	@apply bg-white/50 text-white/80;
-}
-.carousel-nav:active {
-	scale: 0.95;
+	&:hover {
+		@apply bg-white/50 text-white/80;
+	}
+	&:active {
+		scale: 0.95;
+	}
 }
 .carousel-group:focus-within .carousel-nav,
 .carousel-group:hover .carousel-nav {

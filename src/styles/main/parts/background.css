@@ -56,24 +56,24 @@
 		hsla(0, 0%, 96%, 0.704) 99.94%,
 		hsla(0, 0%, 96%, 0.7)
 	);
-}
-[data-mode='dark'] .bg-header-fade {
-	background-image: linear-gradient(
-		180deg,
-		hsla(0, 0%, 18%, 0.9),
-		hsla(0, 0%, 18%, 0.896) 22.97%,
-		hsla(0, 0%, 18%, 0.885) 42.13%,
-		hsla(0, 0%, 18%, 0.869) 57.81%,
-		hsla(0, 0%, 18%, 0.848) 70.37%,
-		hsla(0, 0%, 18%, 0.825) 80.15%,
-		hsla(0, 0%, 18%, 0.8) 87.5%,
-		hsla(0, 0%, 18%, 0.775) 92.77%,
-		hsla(0, 0%, 18%, 0.752) 96.3%,
-		hsla(0, 0%, 18%, 0.731) 98.44%,
-		hsla(0, 0%, 18%, 0.715) 99.54%,
-		hsla(0, 0%, 18%, 0.704) 99.94%,
-		hsla(0, 0%, 18%, 0.7)
-	);
+	[data-mode='dark'] & {
+		background-image: linear-gradient(
+			180deg,
+			hsla(0, 0%, 18%, 0.9),
+			hsla(0, 0%, 18%, 0.896) 22.97%,
+			hsla(0, 0%, 18%, 0.885) 42.13%,
+			hsla(0, 0%, 18%, 0.869) 57.81%,
+			hsla(0, 0%, 18%, 0.848) 70.37%,
+			hsla(0, 0%, 18%, 0.825) 80.15%,
+			hsla(0, 0%, 18%, 0.8) 87.5%,
+			hsla(0, 0%, 18%, 0.775) 92.77%,
+			hsla(0, 0%, 18%, 0.752) 96.3%,
+			hsla(0, 0%, 18%, 0.731) 98.44%,
+			hsla(0, 0%, 18%, 0.715) 99.54%,
+			hsla(0, 0%, 18%, 0.704) 99.94%,
+			hsla(0, 0%, 18%, 0.7)
+		);
+	}
 }
 
 /* This fallback pattern is a seamless seigaiha (青海波) pattern */
@@ -81,8 +81,8 @@
 	background-color: var(--color-primary-200);
 	background-image: url('/seigaiha-light.svg');
 	background-repeat: repeat;
-}
-[data-mode='dark'] .bg-fallback {
-	background-color: var(--color-primary-700);
-	background-image: url('/seigaiha-dark.svg');
+	[data-mode='dark'] & {
+		background-color: var(--color-primary-700);
+		background-image: url('/seigaiha-dark.svg');
+	}
 }

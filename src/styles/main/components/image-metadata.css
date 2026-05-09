@@ -9,15 +9,15 @@
 .i-meta-show {
 	@apply transition-opacity delay-200 duration-300;
 	opacity: 0.8;
+	&:focus {
+		opacity: 1;
+	}
 	@media (width >= 40rem) {
 		opacity: 0;
 		&:hover {
 			opacity: 1;
 		}
 	}
-}
-.i-meta-show:focus {
-	opacity: 1;
 }
 
 /* Eye icon */
@@ -30,9 +30,9 @@
 	bottom: 0;
 	z-index: 10;
 	transition-delay: 500ms;
-}
-[data-mode='dark'] .i-meta-show-icon {
-	color: var(--color-primary-50);
+	[data-mode='dark'] & {
+		color: var(--color-primary-50);
+	}
 }
 .i-meta-show:focus-within .i-meta-show-icon {
 	pointer-events: none;
@@ -119,9 +119,9 @@
 	right: 0;
 	bottom: 0;
 	z-index: 20;
-}
-[data-mode='dark'] .i-meta-close-icon {
-	color: var(--color-accent-400);
+	[data-mode='dark'] & {
+		color: var(--color-accent-400);
+	}
 }
 
 /* Shared SVG icon style */
@@ -144,9 +144,9 @@
 	color: var(--color-primary-800);
 	-webkit-user-select: none;
 	user-select: none;
-}
-[data-mode='dark'] .i-meta-item-title {
-	color: var(--color-primary-400);
+	[data-mode='dark'] & {
+		color: var(--color-primary-400);
+	}
 }
 
 .i-meta-item-value {
@@ -155,7 +155,7 @@
 	cursor: text;
 	-webkit-user-select: text;
 	user-select: text;
-}
-[data-mode='dark'] .i-meta-item-value {
-	color: var(--color-primary-200);
+	[data-mode='dark'] & {
+		color: var(--color-primary-200);
+	}
 }
