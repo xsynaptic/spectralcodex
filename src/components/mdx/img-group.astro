@@ -41,9 +41,8 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 	imageCount > 0 && !isFeed ? (
 		<div
 			class:list={[
-				'content-image-group content-escape',
-				'mb-2 sm:px-4 md:mb-4 md:px-8',
-				layout === ImageLayoutEnum.Wide ? 'w-full' : 'mx-auto max-w-content',
+				'c-image-group c-escape',
+				layout === ImageLayoutEnum.Wide ? 'c-wide' : 'c-default',
 				columns > 1 ? 'grid grid-cols-1 gap-2 md:gap-4' : undefined,
 				columns === 2 ? 'sm:grid-cols-2' : undefined,
 				columns === 3 ? 'md:grid-cols-3' : undefined,

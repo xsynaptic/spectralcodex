@@ -22,13 +22,8 @@ const placeholder = placeholderProps ? await getImagePlaceholder(placeholderProp
 ---
 
 <Tag
-	class:list={[
-		placeholder ? 'bg-primary-200 bg-cover bg-center dark:bg-primary-700' : 'bg-fallback',
-		className,
-	]}
-	style={placeholder
-		? `background-image: url(${placeholder}); image-rendering: pixelated;`
-		: undefined}
+	class:list={['i-placeholder', placeholder ? 'bg-placeholder' : 'bg-fallback', className]}
+	style={placeholder ? `background-image: url(${placeholder});` : undefined}
 	{...props}
 >
 	<slot />

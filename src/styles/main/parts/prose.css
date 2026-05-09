@@ -255,40 +255,4 @@
 			font-size: 1rem;
 		}
 	}
-
-	/* Content-blocks: direct children get constrained to the content column */
-	/* Images and image groups can have wide or full layout, spanning the viewport */
-	.content-blocks {
-		& > *:not(.content-escape) {
-			@apply mx-auto max-w-content px-4 md:px-8;
-		}
-	}
-
-	.content-image {
-		font-size: var(--text-sm);
-		line-height: calc(24 / 14);
-		@media (width >= 64rem) {
-			font-size: var(--text-sm);
-			line-height: calc(24 / 14);
-		}
-	}
-
-	.content-image,
-	.content-image + p {
-		margin-top: 0;
-	}
-
-	/* Image caption styling; applied to caption inside content image components (not styled by prose) */
-	/* Defined here because it's tightly coupled to content-blocks layout */
-	.content-image-caption {
-		color: var(--color-primary-500);
-		font-style: italic;
-		padding: calc(var(--spacing) * 1) 0;
-	}
-	[data-mode='dark'] .content-image-caption {
-		color: var(--color-primary-400);
-	}
-	.content-image-caption em {
-		font-style: normal;
-	}
 }

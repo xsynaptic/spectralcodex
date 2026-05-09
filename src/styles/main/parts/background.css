@@ -86,3 +86,14 @@
 		background-image: url('/seigaiha-dark.svg');
 	}
 }
+
+/* Placeholder image; used in many places in this project */
+.bg-placeholder {
+	background-color: var(--color-primary-200);
+	background-position: center;
+	background-size: cover;
+	image-rendering: pixelated;
+	[data-mode='dark'] & {
+		background-color: var(--color-primary-700);
+	}
+}

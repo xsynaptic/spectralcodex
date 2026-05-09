@@ -35,10 +35,11 @@
 @import './main/components/metadata-grid-item.css';
 @import './main/components/nav-menu.css';
 @import './main/components/progress.css';
-@import './main/components/prose.css';
 
 /** Bits and pieces */
 @import './main/parts/background.css';
+@import './main/parts/content.css';
 @import './main/parts/i18n.css';
 @import './main/parts/loading.css';
+@import './main/parts/prose.css';
 @import './main/parts/various.css';

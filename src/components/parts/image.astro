@@ -30,4 +30,8 @@ function transformer(src: string | URL, operations: IPXOperations, options?: IPX
 }
 ---
 
-<UnpicImage {...props} class:list={['w-full object-cover', className]} transformer={transformer} />
+<UnpicImage
+	{...props}
+	class:list={['i-image', 'w-full object-cover', className]}
+	transformer={transformer}
+/>
