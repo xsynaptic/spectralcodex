@@ -8,13 +8,16 @@
 
 <style is:inline>
 	@layer base {
+		:root {
+			--color-body-bg: oklch(96.7% 0.001 286.375);
+		}
+		[data-mode='dark'] {
+			--color-body-bg: oklch(27.4% 0.006 286.033);
+		}
 		body {
-			background-color: oklch(96.7% 0.001 286.375);
+			background-color: var(--color-body-bg);
 			overflow: hidden;
 			visibility: hidden;
-		}
-		[data-mode='dark'] body {
-			background-color: oklch(27.4% 0.006 286.033);
 		}
 	}
 </style>

@@ -118,8 +118,7 @@ const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 		) : (
 			<figure
 				class:list={[
-					'content-image',
-					'not-prose',
+					'content-image content-escape',
 					layout === ImageLayoutEnum.Default
 						? 'mx-auto mb-2 max-w-content sm:px-4 md:mb-4 md:px-8'
 						: undefined,

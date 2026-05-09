@@ -3,7 +3,6 @@
  *
  * Hand-rolled replacement for @tailwindcss/typography
  * All element selectors are wrapped in :where() so prose rules have specificity (0,1,0)
- * Any utility class on a descendant wins, which makes `.not-prose` work implicitly
  */
 @layer components {
 	.prose-x {
@@ -17,7 +16,7 @@
 			line-height: calc(32 / 18);
 		}
 		[data-mode='dark'] & {
-			color: var(--color-primary-200);
+			color: var(--color-primary-300);
 		}
 
 		/* First/last child margin reset */
@@ -75,21 +74,21 @@
 			color: var(--color-white);
 		}
 
-		/* Links: accent color + halo via text-shadow matching page bg */
+		/* Links: accent color + halo matching page bg */
 		& :where(a) {
 			color: var(--color-accent-500);
 			font-weight: var(--font-weight-medium);
 			text-decoration-line: underline;
 			text-decoration-color: var(--color-accent-200);
 			text-underline-offset: 2px;
+			text-shadow:
+				1px 1px 0 var(--color-body-bg),
+				-1px 1px 0 var(--color-body-bg),
+				2px 0 1px var(--color-body-bg),
+				-2px 0 1px var(--color-body-bg);
 			transition:
 				color 150ms ease-in,
 				text-decoration-color 150ms ease-in;
-			text-shadow:
-				1px 1px 0 var(--color-primary-100),
-				-1px 1px 0 var(--color-primary-100),
-				2px 0 1px var(--color-primary-100),
-				-2px 0 1px var(--color-primary-100);
 		}
 		& :where(a):hover {
 			color: var(--color-accent-300);
@@ -102,11 +101,6 @@
 		[data-mode='dark'] & :where(a) {
 			color: var(--color-accent-300);
 			text-decoration-color: var(--color-accent-500);
-			text-shadow:
-				1px 1px 0 var(--color-primary-800),
-				-1px 1px 0 var(--color-primary-800),
-				2px 0 1px var(--color-primary-800),
-				-2px 0 1px var(--color-primary-800);
 		}
 		[data-mode='dark'] & :where(a):hover {
 			color: var(--color-accent-200);
@@ -265,50 +259,36 @@
 	/* Content-blocks: direct children get constrained to the content column */
 	/* Images and image groups can have wide or full layout, spanning the viewport */
 	.content-blocks {
-		& > *:not(.content-image):not(.content-img-group) {
+		& > *:not(.content-escape) {
 			@apply mx-auto max-w-content px-4 md:px-8;
 		}
-		& > .content-image,
-		& > .content-image + p {
-			margin-top: 0;
+	}
+
+	.content-image {
+		font-size: var(--text-sm);
+		line-height: calc(24 / 14);
+		@media (width >= 64rem) {
+			font-size: var(--text-sm);
+			line-height: calc(24 / 14);
 		}
+	}
+
+	.content-image,
+	.content-image + p {
+		margin-top: 0;
 	}
 
 	/* Image caption styling; applied to caption inside content image components (not styled by prose) */
 	/* Defined here because it's tightly coupled to content-blocks layout */
 	.content-image-caption {
 		color: var(--color-primary-500);
-		font-size: var(--text-sm);
-		line-height: calc(28 / 14);
 		font-style: italic;
-		@media (width >= 64rem) {
-			font-size: var(--text-sm);
-			line-height: calc(32 / 14);
-		}
+		padding: calc(var(--spacing) * 1) 0;
 	}
 	[data-mode='dark'] .content-image-caption {
 		color: var(--color-primary-400);
 	}
 	.content-image-caption em {
 		font-style: normal;
-	}
-	.content-image-caption a {
-		@apply transition-colors duration-150 ease-in;
-		color: var(--color-accent-500);
-		text-decoration-color: var(--color-accent-200);
-		text-decoration-line: underline;
-		text-underline-offset: 2px;
-	}
-	.content-image-caption a:hover {
-		color: var(--color-accent-300);
-		text-decoration-color: var(--color-accent-100);
-	}
-	[data-mode='dark'] .content-image-caption a {
-		color: var(--color-accent-400);
-		text-decoration-color: var(--color-accent-800);
-	}
-	[data-mode='dark'] .content-image-caption a:hover {
-		color: var(--color-accent-700);
-		text-decoration-color: var(--color-accent-900);
 	}
 }

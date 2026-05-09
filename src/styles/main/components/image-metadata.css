@@ -22,17 +22,15 @@
 
 /* Eye icon */
 .i-meta-show-icon {
-	@apply p-2 transition-opacity duration-200;
+	@apply transition-opacity duration-200;
 	color: var(--color-primary-50);
 	cursor: pointer;
+	padding: calc(var(--spacing) * 2);
 	position: absolute;
 	right: 0;
 	bottom: 0;
 	z-index: 10;
 	transition-delay: 500ms;
-	[data-mode='dark'] & {
-		color: var(--color-primary-50);
-	}
 }
 .i-meta-show:focus-within .i-meta-show-icon {
 	pointer-events: none;
@@ -142,6 +140,7 @@
 .i-meta-item-title {
 	@apply text-xs font-semibold;
 	color: var(--color-primary-800);
+	margin: 0;
 	-webkit-user-select: none;
 	user-select: none;
 	[data-mode='dark'] & {
