@@ -274,6 +274,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 						if (!isLoading) setFilterOpen(!filterOpen);
 					}}
 					aria-label={translations.filterMenuAriaLabel}
+					{...(filterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="flex items-center justify-center">
 						<svg

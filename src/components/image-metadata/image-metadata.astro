@@ -17,7 +17,12 @@ const t = getTranslations();
 ---
 
 <div class="i-meta" data-pagefind-ignore {...props}>
-	<button class="i-meta-show" aria-label={t('collection.images.metadata.title')}>
+	<button
+		class="i-meta-show"
+		aria-label={t('collection.images.metadata.title')}
+		data-umami-event="image-metadata-open"
+		data-umami-event-image={entry.id}
+	>
 		<span class="i-meta-show-icon">
 			<svg width="24" height="24" viewBox="0 0 24 24" class="i-meta-svg" aria-hidden="true">
 				<use href="#icon:eye-open"></use>
