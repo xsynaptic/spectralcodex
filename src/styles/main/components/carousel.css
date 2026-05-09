@@ -30,17 +30,15 @@
 	cursor: pointer;
 	align-items: center;
 	justify-content: center;
+	@media (width >= 64rem) {
+		display: flex;
+	}
 }
 .carousel-nav:hover {
 	@apply bg-white/50 text-white/80;
 }
 .carousel-nav:active {
 	scale: 0.95;
-}
-@media (width >= 64rem) {
-	.carousel-nav {
-		display: flex;
-	}
 }
 .carousel-group:focus-within .carousel-nav,
 .carousel-group:hover .carousel-nav {

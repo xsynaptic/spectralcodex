@@ -11,6 +11,9 @@
 @source '../**/*.astro';
 @source '../../packages/react-map-component/src/**/*.tsx';
 
+/** Safelist utilities applied to HTML we don't author directly */
+@source inline('sr-only');
+
 /** Enable dark mode with a custom selector */
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 

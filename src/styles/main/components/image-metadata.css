@@ -9,17 +9,15 @@
 .i-meta-show {
 	@apply transition-opacity delay-200 duration-300;
 	opacity: 0.8;
+	@media (width >= 40rem) {
+		opacity: 0;
+		&:hover {
+			opacity: 1;
+		}
+	}
 }
 .i-meta-show:focus {
 	opacity: 1;
-}
-@media (width >= 40rem) {
-	.i-meta-show {
-		opacity: 0;
-	}
-	.i-meta-show:hover {
-		opacity: 1;
-	}
 }
 
 /* Eye icon */
@@ -59,9 +57,7 @@
 	translate: 100% 0;
 	transition-delay: 100ms, 300ms;
 	transition-duration: 200ms, 0ms;
-}
-@media (width >= 40rem) {
-	.i-meta-panel {
+	@media (width >= 40rem) {
 		border-bottom-left-radius: var(--radius-xs);
 		border-bottom-right-radius: var(--radius-xs);
 	}
@@ -81,34 +77,24 @@
 	max-height: 100%;
 	width: 100%;
 	overflow-y: auto;
-}
-@media (width >= 40rem) {
-	.i-meta-grid {
+	@media (width >= 40rem) {
 		@apply gap-2;
 		grid-template-columns: repeat(8, minmax(0, 1fr));
 	}
-}
-@media (width >= 48rem) {
-	.i-meta-grid {
+	@media (width >= 48rem) {
 		@apply gap-4;
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 	}
-}
-@container (width < 32rem) {
-	@media (width >= 40rem) {
-		.i-meta-grid {
+	@container (width < 32rem) {
+		@media (width >= 40rem) {
 			@apply gap-1;
 		}
-	}
-	@media (width >= 48rem) {
-		.i-meta-grid {
+		@media (width >= 48rem) {
 			grid-template-columns: repeat(8, minmax(0, 1fr));
 		}
 	}
-}
-@container (width < 24rem) {
-	@media (width >= 40rem) {
-		.i-meta-grid {
+	@container (width < 24rem) {
+		@media (width >= 40rem) {
 			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 	}

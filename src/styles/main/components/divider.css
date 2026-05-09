@@ -1,15 +1,13 @@
 /* Divider styles; extracted here to avoid repetition in the divided-item component */
 .d-all {
 	display: inline;
-}
-.d-all:last-child::after {
-	content: none;
-}
-@media (width >= 40rem) {
-	.d-all {
+	@media (width >= 40rem) {
 		display: inline-flex;
 		gap: calc(var(--spacing) * 1);
 	}
+}
+.d-all:last-child::after {
+	content: none;
 }
 .d-default::after {
 	color: var(--color-primary-400);
