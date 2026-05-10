@@ -35,6 +35,7 @@
 .g-item-subtitle {
 	@apply text-sm;
 	color: var(--color-primary-500);
+	display: flex;
 	flex-wrap: wrap;
 	gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 0.5);

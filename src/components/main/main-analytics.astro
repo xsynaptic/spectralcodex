@@ -17,6 +17,7 @@ const { isViewTransitionsEnabled, ...props } = Astro.props;
 			src={`${UMAMI_DOMAIN}/script.js`}
 			data-website-id={UMAMI_ID}
 			data-performance={true}
+			data-exclude-hash={true}
 			{...props}
 			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
 			is:inline
