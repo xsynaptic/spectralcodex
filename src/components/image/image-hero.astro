@@ -4,6 +4,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageHeroFrame from '#components/image/image-hero-frame.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
+import { IMAGE_HERO_FORMAT, IMAGE_HERO_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
@@ -39,6 +40,8 @@ async function getImageProps(
 			priority: true,
 			unstyled: true,
 			alt: sanitizeImageAltAttribute(alt),
+			imageQuality: IMAGE_HERO_QUALITY,
+			imageFormat: IMAGE_HERO_FORMAT,
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,

@@ -5,6 +5,7 @@ import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
+import { IMAGE_HERO_FORMAT, IMAGE_HERO_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
@@ -45,6 +46,8 @@ async function getImageProps(
 			alt: sanitizeImageAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
+			imageQuality: IMAGE_HERO_QUALITY,
+			imageFormat: IMAGE_HERO_FORMAT,
 			...(priority ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
 		placeholderProps: {

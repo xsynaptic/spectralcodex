@@ -6,7 +6,7 @@ import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
 
 import type { ImageComponentProps, IPXOperations } from '#lib/image/image-types.ts';
 
-import { IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
 
 // Props interface: same as unpic base but without transformer
@@ -14,8 +14,8 @@ type Props = ImageComponentProps;
 
 const {
 	class: className,
-	imageQuality = IMAGE_HQ_QUALITY,
-	imageFormat = IMAGE_HQ_FORMAT,
+	imageQuality = IMAGE_LQ_QUALITY,
+	imageFormat = IMAGE_LQ_FORMAT,
 	...props
 } = Astro.props;
 

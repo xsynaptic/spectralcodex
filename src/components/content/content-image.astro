@@ -8,6 +8,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageMetadata from '#components/image-metadata/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
+import { IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
 	getImageLayoutSizesProp,
@@ -88,6 +89,8 @@ async function getImageProps(): Promise<{
 				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }
 				: {}),
 			unstyled: true,
+			imageQuality: IMAGE_HQ_QUALITY,
+			imageFormat: IMAGE_HQ_FORMAT,
 			...(priority ? { priority: true } : {}),
 			alt: sanitizeImageAltAttribute(altProp ?? slotContents ?? ''),
 		},

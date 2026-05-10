@@ -14,8 +14,10 @@ export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
  * Image configuration
  */
 export const IMAGE_LQ_QUALITY = 70 as const;
+export const IMAGE_HERO_QUALITY = 70 as const;
 export const IMAGE_HQ_QUALITY = 85 as const;
 export const IMAGE_LQ_FORMAT = 'webp' as const;
+export const IMAGE_HERO_FORMAT = 'webp' as const;
 export const IMAGE_HQ_FORMAT = 'jpg' as const;
 
 /**
