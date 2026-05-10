@@ -13,13 +13,14 @@ const { isViewTransitionsEnabled, ...props } = Astro.props;
 {
 	import.meta.env.PROD && UMAMI_ID && UMAMI_DOMAIN ? (
 		<script
-			defer
 			src={`${UMAMI_DOMAIN}/script.js`}
 			data-website-id={UMAMI_ID}
 			data-performance={true}
 			data-exclude-hash={true}
+			data-do-not-track={true}
 			{...props}
 			{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
+			defer
 			is:inline
 		/>
 	) : undefined
