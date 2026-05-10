@@ -29,6 +29,6 @@ html:not([lang^='th']) [lang^='th'] {
 /** Multilingual titles */
 @media (min-width: 40rem) {
 	.title-ml .cjk {
-		@apply font-semibold;
+		font-weight: var(--font-weight-semibold);
 	}
 }

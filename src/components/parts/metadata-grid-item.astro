@@ -73,28 +73,25 @@ const subtitle = await renderSlot(Astro.slots, 'grid-item-subtitle');
 const description = await renderSlot(Astro.slots, 'grid-item-description');
 ---
 
-<CardFrame {...props}>
+<CardFrame class="g-item" {...props}>
 	{
 		imageProps ? (
-			<ImagePlaceholder
-				class="overflow-hidden rounded-xs shadow-sm"
-				placeholderProps={placeholderProps}
-			>
+			<ImagePlaceholder placeholderProps={placeholderProps}>
 				<a href={linkUrl}>
-					<Image class="aspect-3/2 text-sm text-transparent" {...imageProps} />
+					<Image {...imageProps} />
 				</a>
 			</ImagePlaceholder>
 		) : (
 			<div class="bg-fallback aspect-3/2 w-full rounded-xs text-sm text-transparent shadow-inner" />
 		)
 	}
-	<h2 class="m-grid-item-title">
-		<a href={linkUrl} class="m-grid-item-title-link">
+	<h2 class="g-item-title">
+		<a href={linkUrl} class="g-item-title-link">
 			<slot name="grid-item-title" />
 		</a>
 		{
 			titleMultilingual ? (
-				<div class="m-grid-item-title-multilingual">
+				<div class="g-item-title-ml">
 					<span class="font-light">(</span>
 					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
@@ -104,7 +101,7 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 	</h2>
 	{
 		subtitle ? (
-			<div class="m-grid-item-subtitle">
+			<div class="g-item-subtitle">
 				<Fragment set:html={subtitle} />
 			</div>
 		) : undefined

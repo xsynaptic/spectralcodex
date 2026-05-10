@@ -1,11 +1,17 @@
-.m-grid-item-title {
+.g-item .i-placeholder {
+	@apply overflow-hidden rounded-xs shadow-sm;
+}
+.g-item .i-image {
+	@apply aspect-3/2 text-sm text-transparent;
+}
+.g-item-title {
 	@apply text-xl;
 	display: flex;
 	flex-wrap: wrap;
 	column-gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 1);
 }
-.m-grid-item-title-multilingual {
+.g-item-title-ml {
 	@apply font-semibold;
 	color: var(--color-primary-500);
 	display: inline-flex;
@@ -13,7 +19,7 @@
 		color: var(--color-primary-400);
 	}
 }
-.m-grid-item-title-link {
+.g-item-title-link {
 	@apply font-display font-bold transition-colors ease-in;
 	color: var(--color-primary-700);
 	&:hover {
@@ -26,7 +32,7 @@
 		}
 	}
 }
-.m-grid-item-subtitle {
+.g-item-subtitle {
 	@apply text-sm;
 	color: var(--color-primary-500);
 	flex-wrap: wrap;
