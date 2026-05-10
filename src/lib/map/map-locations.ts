@@ -22,6 +22,12 @@ import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-ty
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
+function getRelativePath(url: string | undefined): string | undefined {
+	if (!url) return undefined;
+	if (url.startsWith('/')) return url;
+	return new URL(url).pathname;
+}
+
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
 	const truncatedCoordinates = coordinates
 		.slice(0, 2)
@@ -107,10 +113,13 @@ export function getLocationsFeatureCollection(
 					data: geometry,
 					prop: 'title',
 				})?.primary;
-				const googleMapsUrl =
+				const googleMapsUrlRaw =
 					geometry.googleMapsUrl || entry.data._googleMapsUrl
 						? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
 						: undefined;
+				const googleMapsUrl = googleMapsUrlRaw?.startsWith('maps.app.goo.gl/')
+					? googleMapsUrlRaw.slice('maps.app.goo.gl/'.length)
+					: googleMapsUrlRaw;
 				const wikipediaUrl = entry.data._wikipediaUrl
 					? entry.data._wikipediaUrl.replace('https://', '')
 					: undefined;
@@ -134,7 +143,7 @@ export function getLocationsFeatureCollection(
 										: entryTitleMultilingual.value,
 								}
 							: {}),
-						url: entry.data._url,
+						url: getRelativePath(entry.data._url),
 						description: geometry.description ?? entry.data._descriptionHtml,
 						category: geometry.category ?? entry.data.category,
 						status: geometry.status ?? entry.data.status,

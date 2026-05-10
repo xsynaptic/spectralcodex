@@ -90,6 +90,13 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	return url.toString();
 }
 
+// Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
+function getGoogleMapsHref(value: string) {
+	if (value.includes('://')) return value;
+	if (value.includes('/')) return `https://${value}`;
+	return `https://maps.app.goo.gl/${value}`;
+}
+
 // Popup data is incomplete; we need to assemble some props from source data
 // Default data is also provided in case of errors and other issues
 function useMapCanvasPopup() {
@@ -226,9 +233,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 							{googleMapsUrl ? (
 								<a
 									className="cursor-pointer"
-									href={
-										googleMapsUrl.includes('https://') ? googleMapsUrl : `https://${googleMapsUrl}`
-									}
+									href={getGoogleMapsHref(googleMapsUrl)}
 									target="_blank"
 								>
 									<svg
