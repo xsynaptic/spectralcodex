@@ -75,7 +75,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		description: await getDescriptionRenderedText(entry),
-		image: await getSeoImageProps({
+		image: getSeoImageProps({
 			id: getPublicId(entry),
 			alt: entry.data.title,
 		}),

@@ -54,7 +54,7 @@ const hasHeroImage = !!imageHeroId;
 
 const { Content } = await render(entry);
 
-const seoImage = await getSeoImageProps({ id: entry.id, alt: entry.data.title });
+const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 ---
 
 <MainSite

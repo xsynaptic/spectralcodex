@@ -6,6 +6,7 @@ import {
 	OPEN_GRAPH_IMAGE_WIDTH,
 } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
+import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -15,7 +16,7 @@ import sharp from 'sharp';
 import type { OpenGraphFontConfig } from './types.js';
 
 import { safelyCreateDirectory } from '../shared/utils.js';
-import { getContentEntries } from './content.js';
+import { getBuiltEntries } from './content.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
@@ -30,6 +31,10 @@ const { values } = parseArgs({
 			type: 'string',
 			default: '.astro/data-store.json',
 		},
+		'dist-path': {
+			type: 'string',
+			default: './dist',
+		},
 		'media-path': {
 			type: 'string',
 			default: 'packages/content/media',
@@ -41,6 +46,10 @@ const { values } = parseArgs({
 		'cache-path': {
 			type: 'string',
 			default: './.cache',
+		},
+		'clear-cache': {
+			type: 'boolean',
+			default: false,
 		},
 	},
 });
@@ -101,7 +110,20 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 }
 
 async function main() {
-	console.log(chalk.magenta('=== OpenGraph Image Generator (Satori) ===\n'));
+	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
+
+	if (values['clear-cache']) {
+		const outputPath = path.resolve(values['root-path'], values['output-path']);
+		const cacheFile = path.resolve(
+			values['root-path'],
+			values['cache-path'],
+			'og-image-cache.json',
+		);
+		rmSync(outputPath, { force: true, recursive: true });
+		rmSync(cacheFile, { force: true });
+		console.log(chalk.yellow(`🗑️  Cleared OG image output and cache file`));
+		process.exit(0);
+	}
 
 	console.log(chalk.blue('Loading fonts...'));
 
@@ -116,12 +138,29 @@ async function main() {
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
-	const entries = getContentEntries(path.join(values['root-path'], values['data-store-path']));
+	const { entries, unresolved } = getBuiltEntries({
+		dataStorePath: path.resolve(values['root-path'], values['data-store-path']),
+		distPath: path.resolve(values['root-path'], values['dist-path']),
+	});
+
+	if (unresolved.length > 0) {
+		console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
+
+		for (const filename of unresolved) {
+			console.log(chalk.red(`✗ ${filename}`));
+		}
+		console.log(
+			chalk.red(
+				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a data-store entry, index page, or archive pattern.`,
+			),
+		);
+		process.exit(1);
+	}
 
 	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
 
-	const outputPath = path.join(values['root-path'], values['output-path']);
-	const cachePath = path.join(values['root-path'], values['cache-path']);
+	const outputPath = path.resolve(values['root-path'], values['output-path']);
+	const cachePath = path.resolve(values['root-path'], values['cache-path']);
 
 	safelyCreateDirectory(outputPath);
 	safelyCreateDirectory(cachePath);
@@ -169,8 +208,10 @@ async function main() {
 
 					if (!imageObject) {
 						console.log(
-							chalk.yellow(`⚠ Missing image: ${imageId} (used by ${entry.collection}/${entry.id})`),
+							chalk.red(`✗ Missing image: ${imageId} (used by ${entry.collection}/${entry.id})`),
 						);
+						errorCount++;
+						return;
 					}
 
 					const imageBuffer = await generateImage({
@@ -212,6 +253,8 @@ async function main() {
 		console.log(chalk.red(`Errors: ${String(errorCount)}`));
 	}
 	console.log(chalk.gray(`Output: ${outputPath}`));
+
+	if (errorCount > 0) process.exit(1);
 }
 
 await main();

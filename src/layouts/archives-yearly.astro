@@ -33,7 +33,7 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 	meta={{
 		title,
 		description: formatStringTemplate(t('archives.yearly.description'), { date: archivesYear }),
-		image: await getSeoImageProps({
+		image: getSeoImageProps({
 			id: archivesYear,
 			alt: title,
 		}),

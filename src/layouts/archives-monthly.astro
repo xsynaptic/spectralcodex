@@ -48,7 +48,7 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 		description: formatStringTemplate(t('archives.monthly.description'), {
 			date: archivesMonthlyItem.title,
 		}),
-		image: await getSeoImageProps({
+		image: getSeoImageProps({
 			id: archivesMonthlyItem.id,
 			alt: title,
 		}),

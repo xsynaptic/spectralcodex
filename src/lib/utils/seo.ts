@@ -1,12 +1,8 @@
-import { cacheFileExists } from '@spectralcodex/shared/cache';
 import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
-import { CUSTOM_CACHE_PATH } from 'astro:env/server';
-import path from 'node:path';
 import * as R from 'remeda';
 
 import { OPEN_GRAPH_IMAGE_FALLBACK_COUNT, OPEN_GRAPH_IMAGE_FALLBACK_PREFIX } from '#constants.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
-import { logError } from '#lib/utils/logging.ts';
 import { joinUrl } from '#lib/utils/routing.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
@@ -39,24 +35,17 @@ export function getSeoImageFallback() {
 	);
 }
 
-export async function getSeoImageProps({ id, alt }: { id?: string; alt: string }) {
-	if (!id) {
-		return { url: getSeoImageFallback(), alt };
+export function getSeoImageProps({ id, alt }: { id?: string; alt: string }) {
+	if (id) {
+		const filename = `${id.replace('/', '-')}.${OPEN_GRAPH_IMAGE_FORMAT}`;
+
+		return {
+			url: joinUrl(PROD ? SITE : BASE_URL, OPEN_GRAPH_BASE_PATH, filename),
+			alt,
+		};
 	}
 
-	const filename = `${id.replace('/', '-')}.${OPEN_GRAPH_IMAGE_FORMAT}`;
-	const cachePath = path.join(CUSTOM_CACHE_PATH, 'og-image', filename);
-
-	const fileExists = await cacheFileExists(cachePath);
-
-	if (!fileExists) {
-		logError(`[OG Image] Missing: ${filename}`);
-	}
-
-	return {
-		url: joinUrl(PROD ? SITE : BASE_URL, OPEN_GRAPH_BASE_PATH, filename),
-		alt,
-	};
+	return { url: getSeoImageFallback(), alt };
 }
 
 export function getSeoHideSearch(shouldHide: boolean | undefined) {

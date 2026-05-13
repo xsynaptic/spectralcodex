@@ -1,12 +1,15 @@
 import type { ImageFeatured } from '@spectralcodex/shared/schemas';
 
+import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import {
+	ContentCollectionsEnum,
 	ImageFeaturedSchema,
 	RegionsSchema,
 	ThemesSchema,
-	ContentCollectionsEnum,
 } from '@spectralcodex/shared/schemas';
 import { stripDiacritics } from '@spectralcodex/shared/text';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { z } from 'zod';
 
 import type { DataStoreEntry, RegionParentMap } from '../shared/data-store.js';
@@ -18,211 +21,7 @@ import {
 	getPublicId,
 	loadDataStore,
 } from '../shared/data-store.js';
-
-/** Deterministically pick an item from an array based on a string ID */
-function pickFrom<T = string>(id: string, options: Array<T>): T {
-	if (options.length === 1) return options[0] as T;
-	let hash = 0;
-	for (let i = 0; i < id.length; i++) hash += id.codePointAt(i) ?? 0;
-	return options[hash % options.length] as T;
-}
-
-/**
- * Return a fallback image ID based on entry properties
- */
-function getFallbackImageId({
-	id,
-	collection,
-	category,
-	regions,
-	themes,
-}: {
-	id: string;
-	collection: string;
-	category?: string | undefined;
-	regions?: Array<string> | undefined;
-	themes?: Array<string> | undefined;
-}): string {
-	const regionAncestor = regions?.[0];
-	const regionParent = regions?.[1];
-
-	if (collection === ContentCollectionsEnum.Resources) {
-		return pickFrom(id, [
-			'taiwan/series/suhua-highway-road-trip-2018-19.jpg',
-			'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
-			'taiwan/taichung/wufeng/wufeng-beigou-forbidden-city-vault-4.jpg',
-		]);
-	}
-
-	if (themes?.includes('thailand-theaters')) {
-		return pickFrom(id, [
-			'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg',
-			'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg',
-		]);
-	}
-	if (themes?.includes('taiwan-theaters')) {
-		return pickFrom(id, [
-			'taiwan/tainan/nanxi/nanxi-huazhou-theater-5.jpg',
-			'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg',
-			'taiwan/yunlin/baozhong/baozhong-zicheng-theater-13.jpg',
-			'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
-		]);
-	}
-	if (themes?.includes('taiwan-shinto-shrines')) {
-		return 'taiwan/tainan/danei/danei-elementary-school-shinto-shrine-1.jpg';
-	}
-	if (themes?.includes('taiwan-railways')) {
-		return 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg';
-	}
-	if (themes?.includes('taiwan-military-villages')) {
-		return pickFrom(id, [
-			'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg',
-			'taiwan/series/nantou-road-trip-2015-1-5.jpg',
-		]);
-	}
-	if (themes?.includes('taiwan-police-history')) {
-		return pickFrom(id, ['taiwan/tainan/dongshan/dongshan-niurouqi-police-station-2.jpg']);
-	}
-	if (themes?.includes('taiwan-sanheyuan')) {
-		return 'taiwan/taipei/daan/daan-yifang-old-house-1.jpg';
-	}
-	if (themes?.includes('taiwan-ghost-island')) {
-		return 'taiwan/chiayi/minxiong/minxiong-liu-mansion-6.jpg';
-	}
-	if (themes?.includes('taiwan-waterworks')) {
-		return 'taiwan/chiayi/chiayi-east/chiayi-shuiyuan-water-meter-room-1.jpg';
-	}
-	if (themes?.includes('alishan-forest-railway')) {
-		return 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg';
-	}
-	if (themes?.includes('taiwan-temple-culture')) {
-		return 'v/fallback-taiwan-temple-culture-1.jpg';
-	}
-	if (themes?.includes('taiwan-japanese-colonial-era')) {
-		return pickFrom(id, [
-			'v/fallback-taiwan-japanese-colonial-era-1.jpg',
-			'taiwan/yunlin/douliu/douliu-taiping-old-street-6.jpg',
-		]);
-	}
-	if (themes?.includes('taiwan-qing-dynasty-era')) {
-		return 'v/fallback-taiwan-qing-dynasty-era-1.jpg';
-	}
-	if (themes?.includes('taiwan-urban-exploration')) {
-		return pickFrom(id, [
-			'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg',
-			'taiwan/changhua/changhua-city/changhua-bus-terminal-3.jpg',
-			'taiwan/nantou/shuili/shuili-beipu-post-office-4.jpg',
-		]);
-	}
-	if (regionAncestor === 'taiwan') {
-		switch (regionParent) {
-			case 'changhua': {
-				return 'taiwan/changhua/changhua-city/changhua-confucius-temple-1.jpg';
-			}
-			case 'chiayi': {
-				return 'taiwan/chiayi/chiayi-east/chiayi-sun-shooting-tower-1.jpg';
-			}
-			case 'hsinchu': {
-				return 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg';
-			}
-			case 'hualien': {
-				return pickFrom(id, [
-					'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
-					'taiwan/series/huadong-valley-ride-2018-4-16.jpg',
-				]);
-			}
-			case 'kaohsiung': {
-				return 'taiwan/kaohsiung/hunei/hunei-dahu-tomato-cannery-4.jpg';
-			}
-			case 'keelung': {
-				return 'taiwan/keelung/zhongzheng/keelung-agenna-shipyard-3.jpg';
-			}
-			// TODO: Kinmen
-			// TODO: Lienchiang
-			case 'miaoli': {
-				return 'taiwan/miaoli/sanyi/sanyi-longteng-broken-bridge-7.jpg';
-			}
-			case 'nantou': {
-				return pickFrom(id, [
-					'taiwan/series/nantou-road-trip-2015-1-12.jpg',
-					'taiwan/series/nantou-road-trip-2015-2-8.jpg',
-				]);
-			}
-			// TODO: Penghu
-			case 'pingtung': {
-				return 'taiwan/pingtung/xinpi/xinpi-zhang-family-qinghe-hall-1.jpg';
-			}
-			case 'taichung': {
-				return 'taiwan/taichung/taichung-west/taichung-prefecture-hall-1.jpg';
-			}
-			case 'tainan': {
-				return 'v/fallback-tainan-1.jpg';
-			}
-			case 'taipei': {
-				return 'taiwan/taipei/daan/daan-xinyi-market-1.jpg';
-			}
-			case 'taitung': {
-				return 'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg';
-			}
-			case 'taoyuan': {
-				return 'taiwan/taoyuan/longtan/longtan-yeshan-building-3.jpg';
-			}
-			case 'xinbei': {
-				return 'taiwan/xinbei/wanli/wanli-yeliu-signal-station-1.jpg';
-			}
-			case 'yilan': {
-				return pickFrom(id, [
-					'taiwan/yilan/datong/datong-jianqing-huaigu-trail-1.jpg',
-					'taiwan/series/suhua-highway-road-trip-2018-21.jpg',
-				]);
-			}
-			case 'yunlin': {
-				return 'taiwan/yunlin/xiluo/xiluo-bridge-4.jpg';
-			}
-			default: {
-				return 'taiwan/series/huadong-valley-ride-2018-3-35.jpg';
-			}
-		}
-	}
-	if (category === 'temple') {
-		return 'taiwan/tainan/zuozhen/zuozhen-laojun-temple-1.jpg';
-	}
-	if (regionAncestor === 'canada') {
-		return 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg';
-	}
-	if (regionAncestor === 'china') {
-		return 'v/fallback-china-1.jpg';
-	}
-	if (regionAncestor === 'hong-kong') {
-		return 'v/fallback-hong-kong-1.jpg';
-	}
-	if (regionAncestor === 'japan') {
-		return 'v/fallback-japan-1.jpg';
-	}
-	if (regionAncestor === 'malaysia') {
-		return 'v/fallback-malaysia-1.jpg';
-	}
-	if (regionAncestor === 'philippines') {
-		return 'v/fallback-philippines-1.jpg';
-	}
-	if (regionAncestor === 'south-korea') {
-		return 'v/fallback-south-korea-1.jpg';
-	}
-	if (regionAncestor === 'thailand') {
-		return 'v/fallback-thailand-1.jpg';
-	}
-	if (regionAncestor === 'usa') {
-		return 'v/fallback-usa-1.jpg';
-	}
-	if (regionAncestor === 'vietnam') {
-		return 'v/fallback-vietnam-1.jpg';
-	}
-	return pickFrom(id, [
-		'v/v-random-1.jpg',
-		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
-		'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
-	]);
-}
+import { getFallbackImageId, staticFallbackImageIds } from './fallback.js';
 
 /**
  * Featured image handling
@@ -230,10 +29,8 @@ function getFallbackImageId({
 function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | undefined {
 	if (!imageFeatured) return undefined;
 
-	// String: return directly
 	if (typeof imageFeatured === 'string') return imageFeatured;
 
-	// Array: get first item
 	const firstItem = imageFeatured[0];
 
 	if (!firstItem) return undefined;
@@ -276,157 +73,114 @@ function getImageFeaturedData({
 }
 
 /**
- * Index page entries (collection landing pages)
- */
-function getIndexEntries(): Array<OpenGraphContentEntry> {
-	const indexes = [
-		{
-			id: ContentCollectionsEnum.Archives,
-			title: 'Archives',
-			imageFeaturedId: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Notes,
-			title: 'Notes',
-			imageFeaturedId: 'taiwan/miaoli/tongxiao/tongxiao-railway-granary-complex-3.jpg',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Locations,
-			title: 'Locations',
-			imageFeaturedId: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Posts,
-			title: 'Posts',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Regions,
-			title: 'Regions',
-			imageFeaturedId: 'taiwan/series/nantou-road-trip-2015-5-17.jpg',
-		},
-		{
-			id: ContentCollectionsEnum.Resources,
-			title: 'Resources',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Series,
-			title: 'Series',
-			isFallback: true,
-		},
-		{
-			id: ContentCollectionsEnum.Themes,
-			title: 'Themes',
-			isFallback: true,
-		},
-		{
-			id: 'homepage',
-			title: '', // No duplicate branding
-			imageFeaturedId: 'taiwan/series/huadong-valley-ride-2018-4-9.jpg',
-		},
-		{
-			id: 'not-found',
-			title: '404: Not Found',
-			isFallback: true,
-		},
-	];
-
-	return indexes.map(({ id, title, imageFeaturedId, isFallback }) => ({
-		id: `index-${id}`,
-		collection: 'index',
-		digest: `index-${id}`,
-		title,
-		imageFeaturedId: imageFeaturedId ?? 'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
-		isFallback: isFallback ?? false,
-	}));
-}
-
-/**
- * Archives handling
+ * Archives title format: "Archives: March 2024" or "Archives: 2024"
  */
 const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
 
 function getArchivesTitle(id: string): string {
 	const year = Number(id.split('-')[0]);
-	const month = Number(id.split('-')[1]);
+	const monthPart = id.split('-')[1];
+
+	if (!monthPart) return `Archives: ${String(year)}`;
+
+	const month = Number(monthPart);
 
 	return `Archives: ${monthFormatter.format(new Date(year, month - 1))} ${String(year)}`;
 }
 
-// Archive generation starts from this year
-const ARCHIVES_YEAR_START = 2004;
-
-function getArchiveEntries(): Array<OpenGraphContentEntry> {
-	const entries: Array<OpenGraphContentEntry> = [];
-	const now = new Date();
-	const currentYear = now.getFullYear();
-	const currentMonth = now.getMonth() + 1;
-	const collection = ContentCollectionsEnum.Archives;
-
-	for (let year = ARCHIVES_YEAR_START; year <= currentYear; year++) {
-		const id = String(year);
-
-		// Yearly entries
-		entries.push({
-			id,
-			collection,
-			digest: `${collection}-${id}`,
-			title: `Archives: ${id}`,
-			imageFeaturedId: getFallbackImageId({
-				id,
-				collection,
-			}),
+/**
+ * Static metadata for index pages (homepage, not-found, per-collection
+ * landings), keyed by the OG image filename Astro emits.
+ */
+function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
+	const indexes = [
+		{
+			suffix: ContentCollectionsEnum.Archives,
+			title: 'Archives',
+			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Archives],
 			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Notes,
+			title: 'Notes',
+			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Notes],
+			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Locations,
+			title: 'Locations',
+			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Locations],
+			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Posts,
+			title: 'Posts',
+			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Regions,
+			title: 'Regions',
+			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Regions],
+		},
+		{
+			suffix: ContentCollectionsEnum.Resources,
+			title: 'Resources',
+			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Series,
+			title: 'Series',
+			isFallback: true,
+		},
+		{
+			suffix: ContentCollectionsEnum.Themes,
+			title: 'Themes',
+			isFallback: true,
+		},
+		{
+			suffix: 'homepage',
+			title: '', // No duplicate branding
+			imageFeaturedId: staticFallbackImageIds.homepage,
+		},
+		{
+			suffix: 'not-found',
+			title: '404: Not Found',
+			isFallback: true,
+		},
+	];
+
+	const entries = new Map<string, OpenGraphContentEntry>();
+
+	for (const { suffix, title, imageFeaturedId, isFallback } of indexes) {
+		const id = `index-${suffix}`;
+
+		entries.set(id, {
+			id,
+			collection: 'index',
+			digest: id,
+			title,
+			imageFeaturedId: imageFeaturedId ?? staticFallbackImageIds.default,
+			isFallback: isFallback ?? false,
 		});
-
-		// Monthly entries
-		const maxMonth = year === currentYear ? currentMonth : 12;
-
-		for (let month = 1; month <= maxMonth; month++) {
-			const id = `${String(year)}-${String(month).padStart(2, '0')}`;
-
-			entries.push({
-				id,
-				collection,
-				digest: `${collection}-${id}`,
-				title: getArchivesTitle(id),
-				imageFeaturedId: getFallbackImageId({
-					id,
-					collection,
-				}),
-				isFallback: true,
-			});
-		}
 	}
 
 	return entries;
 }
 
 /**
- * Content entries are constructed with enough metadata to assign fallback images
+ * Build a map from OG image filename (entry id) to fully-resolved entry derived from the data store
  */
-export function getContentEntries(dataStorePath: string): Array<OpenGraphContentEntry> {
+function buildDataStoreEntries(dataStorePath: string): Map<string, OpenGraphContentEntry> {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
 
-	const entriesMap = new Map<string, OpenGraphContentEntry>();
-
-	for (const entry of getArchiveEntries()) {
-		entriesMap.set(entry.id, entry);
-	}
-
-	for (const entry of getIndexEntries()) {
-		entriesMap.set(entry.id, entry);
-	}
+	const entries = new Map<string, OpenGraphContentEntry>();
 
 	for (const collection of Object.values(ContentCollectionsEnum)) {
 		const collectionEntries = getDataStoreCollection(collections, [collection]);
 
 		for (const entry of collectionEntries) {
-			// For locations with overrides, use the override ID and titles for public-facing OG images
+			if (!entry.digest) continue;
+
 			const override =
 				collection === ContentCollectionsEnum.Locations
 					? z
@@ -445,23 +199,19 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 
 			let title = titleRaw;
 
-			// Skip entries without digest
-			if (!entry.digest) continue;
-
 			if (collection === ContentCollectionsEnum.Archives) {
 				title = getArchivesTitle(id);
 			} else if (collection === ContentCollectionsEnum.Resources) {
 				if (!('showPage' in entry.data) || !entry.data.showPage || !title) {
 					continue;
 				}
-				// TODO: taking up too much space; title = `Resources: ${title}`;
 			} else if (!title) {
 				continue;
 			}
 
 			const imageFeaturedData = getImageFeaturedData({ entry, collection, regionParentMap });
 
-			entriesMap.set(id, {
+			entries.set(id, {
 				collection,
 				id,
 				digest: entry.digest,
@@ -483,5 +233,120 @@ export function getContentEntries(dataStorePath: string): Array<OpenGraphContent
 		}
 	}
 
-	return [...entriesMap.values()];
+	return entries;
+}
+
+/**
+ * Walk built HTML files and extract the set of OG image filenames referenced
+ */
+function extractBuiltFilenames(distPath: string): Set<string> {
+	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
+	const ogPathSegment = `/${OPEN_GRAPH_BASE_PATH}/`;
+	const filenames = new Set<string>();
+
+	function walkDir(dir: string): void {
+		for (const dirent of readdirSync(dir, { withFileTypes: true })) {
+			const fullPath = path.join(dir, dirent.name);
+
+			if (dirent.isDirectory()) {
+				walkDir(fullPath);
+				continue;
+			}
+
+			if (!dirent.isFile() || !dirent.name.endsWith('.html')) continue;
+
+			const content = readFileSync(fullPath, 'utf8');
+
+			ogImageRegex.lastIndex = 0;
+
+			let match: RegExpExecArray | null;
+
+			while ((match = ogImageRegex.exec(content)) !== null) {
+				const url = match[1] ?? '';
+				const idx = url.indexOf(ogPathSegment);
+
+				if (idx === -1) continue;
+
+				const filename = url.slice(idx + ogPathSegment.length).replace(/\.[^.]+$/, '');
+
+				if (filename) filenames.add(filename);
+			}
+		}
+	}
+
+	walkDir(distPath);
+
+	return filenames;
+}
+
+/**
+ * Resolve a filename emitted by Astro to a full OG entry in this order:
+ * 1) data-store.json
+ * 2) static index entries
+ * 3) synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
+ */
+function resolveEntry({
+	filename,
+	dataStoreEntries,
+	indexEntries,
+}: {
+	filename: string;
+	dataStoreEntries: Map<string, OpenGraphContentEntry>;
+	indexEntries: Map<string, OpenGraphContentEntry>;
+}): OpenGraphContentEntry | undefined {
+	const fromDataStore = dataStoreEntries.get(filename);
+
+	if (fromDataStore) return fromDataStore;
+
+	const fromIndex = indexEntries.get(filename);
+
+	if (fromIndex) return fromIndex;
+
+	// Synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
+	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
+		return {
+			id: filename,
+			collection: ContentCollectionsEnum.Archives,
+			digest: `archives-${filename}`,
+			title: getArchivesTitle(filename),
+			imageFeaturedId: getFallbackImageId({
+				id: filename,
+				collection: ContentCollectionsEnum.Archives,
+			}),
+			isFallback: true,
+		};
+	}
+
+	return undefined;
+}
+
+/**
+ * Enumerate OG image entries by reading the rendered dist output
+ * We treat built HTML as the source of truth for which OG images should exist
+ */
+export function getBuiltEntries({
+	dataStorePath,
+	distPath,
+}: {
+	dataStorePath: string;
+	distPath: string;
+}): { entries: Array<OpenGraphContentEntry>; unresolved: Array<string> } {
+	const dataStoreEntries = buildDataStoreEntries(dataStorePath);
+	const indexEntries = buildIndexEntries();
+	const distFilenames = extractBuiltFilenames(distPath);
+
+	const entries: Array<OpenGraphContentEntry> = [];
+	const unresolved: Array<string> = [];
+
+	for (const filename of distFilenames) {
+		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries });
+
+		if (entry) {
+			entries.push(entry);
+		} else {
+			unresolved.push(filename);
+		}
+	}
+
+	return { entries, unresolved };
 }

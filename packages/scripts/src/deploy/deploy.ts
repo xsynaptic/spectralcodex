@@ -65,7 +65,7 @@ async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm og-image --root-path=${rootPath}`;
+	})`pnpm og-image --root-path=${rootPath} --dist-path=${distPath}`;
 }
 
 async function og() {
@@ -138,8 +138,8 @@ try {
 	await validate();
 	await generateRedirects();
 	await related();
-	await opengraph();
 	await build();
+	await opengraph();
 	await test();
 	manifest();
 	await media();
