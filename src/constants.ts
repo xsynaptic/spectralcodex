@@ -7,9 +7,6 @@ export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 // An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = 'more';
 
-// Set to "true" to log missing Link component IDs
-export const CONTENT_LINKS_MISSING_ID_LOG = true as boolean;
-
 /**
  * Image configuration
  */

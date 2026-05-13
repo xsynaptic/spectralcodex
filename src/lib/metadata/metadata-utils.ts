@@ -5,9 +5,7 @@ import type {
 	ContentMetadataItem,
 } from '#lib/metadata/metadata-types.ts';
 
-import { CONTENT_LINKS_MISSING_ID_LOG } from '#constants.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
-import { logError } from '#lib/utils/logging.ts';
 
 // Provision the content metadata getter function
 export async function createContentMetadataFunction(): Promise<
@@ -36,13 +34,7 @@ export async function createContentMetadataFunction(): Promise<
 export async function getContentMetadataById(id: string): Promise<ContentMetadataItem | undefined> {
 	const contentMetadataIndex = await getContentMetadataIndex();
 
-	const contentMetadata = contentMetadataIndex.get(id);
-
-	// Note: we now cover this with a content validation check at build time
-	if (!contentMetadata && CONTENT_LINKS_MISSING_ID_LOG) {
-		logError(`[Metadata] Missing content specified in Link component: "${id}"`);
-	}
-	return contentMetadata;
+	return contentMetadataIndex.get(id);
 }
 
 // Filter content metadata by featured images
