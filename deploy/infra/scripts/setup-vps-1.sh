@@ -24,8 +24,43 @@ apt-get upgrade -y -qq
 
 echo "Installing fail2ban..."
 apt-get install -y -qq fail2ban
+cat > /etc/fail2ban/jail.local <<'EOF'
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 3
+
+[sshd]
+enabled = true
+mode    = aggressive
+EOF
+chmod 644 /etc/fail2ban/jail.local
 systemctl enable fail2ban
-systemctl start fail2ban
+systemctl restart fail2ban
+
+echo "Configuring unattended-upgrades auto-reboot..."
+apt-get install -y -qq unattended-upgrades
+cat > /etc/apt/apt.conf.d/52-local.conf <<'EOF'
+// Local overrides for unattended-upgrades. Loads after 50unattended-upgrades
+// (managed by package); apt resolves duplicate keys with last-wins.
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "04:00";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+EOF
+chmod 644 /etc/apt/apt.conf.d/52-local.conf
+
+echo "Applying SSH hardening drop-in..."
+cat > /etc/ssh/sshd_config.d/10-hardening.conf <<'EOF'
+# Hardening overrides. Loaded first via 10- prefix; sshd uses
+# first-occurrence semantics for most keywords, so values here win
+# over the cloud-init drop-ins that load later.
+
+PermitRootLogin prohibit-password
+X11Forwarding no
+MaxAuthTries 3
+EOF
+chmod 644 /etc/ssh/sshd_config.d/10-hardening.conf
+sshd -t && systemctl reload ssh
 
 echo "Configuring firewall..."
 ufw deny 2375 >/dev/null 2>&1 || true
