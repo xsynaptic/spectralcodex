@@ -11,8 +11,6 @@ import type {
 	ImageFeaturedWithCaption,
 } from '#lib/metadata/metadata-types.ts';
 
-import { logError } from '#lib/utils/logging.ts';
-
 // Type guard for array items
 function isImageFeaturedObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
 	return typeof item === 'object' && 'id' in item;
@@ -69,13 +67,6 @@ export function getImageFeaturedGroup({
 
 	const items = imageFeaturedObjectGroup.map((item) => {
 		const contentMetadata = item.link ? contentMetadataIndex.get(item.link) : undefined;
-
-		// Throw a warning to catch typos and whatever else
-		if (import.meta.env.DEV && item.link && contentMetadata === undefined) {
-			logError(
-				`Warning: requested link "${item.link}" could not be matched to any content in the system!`,
-			);
-		}
 
 		return {
 			...item,

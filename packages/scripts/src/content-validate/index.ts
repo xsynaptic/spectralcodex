@@ -7,6 +7,7 @@ import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
 import { checkImageFeaturedInBody } from './image-featured-in-body';
+import { checkImageFeaturedLinks } from './image-featured-links';
 import { checkImageReferences } from './images';
 import { checkLinkIds } from './link-ids';
 import { checkLocationsCoordinates } from './locations-coordinates';
@@ -125,6 +126,11 @@ switch (command) {
 		checkImageFeaturedInBody(bodyContentEntries);
 		break;
 	}
+	// Check for imageFeatured.link references that do not resolve to any content
+	case 'image-featured-links': {
+		checkImageFeaturedLinks(allEntries, metadataEntries);
+		break;
+	}
 	// Check for image references that do not exist
 	case 'images': {
 		checkImageReferences(allEntries, path.join(values['root-path'], values['media-path']));
@@ -143,6 +149,7 @@ switch (command) {
 			checkFrontmatterLinks(allEntries, resourceEntries),
 			checkImageReferences(allEntries, path.join(values['root-path'], values['media-path'])),
 			checkImageFeaturedInBody(bodyContentEntries),
+			checkImageFeaturedLinks(allEntries, metadataEntries),
 			checkLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),
 			checkLocationsRegions(getDataStoreCollection(collections, ['locations'])),
 			checkLocationsOverlap(
