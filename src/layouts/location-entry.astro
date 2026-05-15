@@ -35,6 +35,7 @@ import {
 	createLocationEntryDisplayFunction,
 	getLocationSchemas,
 } from '#lib/collections/locations/locations-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
@@ -67,6 +68,8 @@ const imageHeroId = getImageFeaturedHeroId(entry.data.imageFeatured);
 const hasHeroImage = !!imageHeroId;
 
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
+
+const t = getTranslations();
 ---
 
 <MainSite
@@ -172,7 +175,7 @@ const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionNearbyList entry={entry} limit={12} />
-		<SectionMetadataGrid items={metadataItems} />
+		<SectionMetadataGrid title={t('section.content.locations')} items={metadataItems} />
 		<SectionRelated entry={entry} showPreviews={true} limit={8} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>

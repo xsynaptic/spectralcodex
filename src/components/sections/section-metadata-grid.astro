@@ -10,12 +10,13 @@ import Pagination from '#components/parts/pagination.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
+	title?: string;
 	items?: Array<ContentMetadataItem>;
 	page?: Page<ContentMetadataItem>;
 	metadataGridOptions?: MetadataGridOptions | undefined;
 }
 
-const { items, page, metadataGridOptions, ...props } = Astro.props;
+const { title, items, page, metadataGridOptions, ...props } = Astro.props;
 
 const defaultPreviewItemProps: MetadataGridOptions = {
 	showDate: true,
@@ -31,7 +32,7 @@ const t = getTranslations();
 {
 	hasItems || page ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.content')}</Fragment>
+			<Fragment slot="section-title">{title ?? t('section.content')}</Fragment>
 			{page ? (
 				<>
 					<MetadataGrid items={page.data} {...defaultPreviewItemProps} {...metadataGridOptions} />

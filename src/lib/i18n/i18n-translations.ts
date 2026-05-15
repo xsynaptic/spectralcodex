@@ -97,6 +97,7 @@ const translationStrings = {
 		// Content sections
 		'section.author': 'Author',
 		'section.content': 'Content',
+		'section.content.locations': 'Featured By',
 		'section.itemsList': 'More',
 		'section.links': 'Links',
 		'section.links.platform.label': '{platform}: {title}',
