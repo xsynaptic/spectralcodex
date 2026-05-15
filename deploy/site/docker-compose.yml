@@ -4,6 +4,8 @@ services:
     image: nginx:1.29.8-alpine
     container_name: spectralcodex-image-cache
     init: true
+    security_opt:
+      - no-new-privileges:true
     cap_drop:
       - ALL
     cap_add:
@@ -41,6 +43,8 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    security_opt:
+      - no-new-privileges:true
     cap_drop:
       - ALL
     volumes:

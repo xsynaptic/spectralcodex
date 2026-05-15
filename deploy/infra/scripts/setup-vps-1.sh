@@ -60,7 +60,12 @@ X11Forwarding no
 MaxAuthTries 3
 EOF
 chmod 644 /etc/ssh/sshd_config.d/10-hardening.conf
-sshd -t && systemctl reload ssh
+if ! sshd -t; then
+  echo "SSH config invalid, removing hardening drop-in"
+  rm -f /etc/ssh/sshd_config.d/10-hardening.conf
+  exit 1
+fi
+systemctl reload ssh
 
 echo "Configuring firewall..."
 ufw deny 2375 >/dev/null 2>&1 || true
