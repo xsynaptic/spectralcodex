@@ -46,16 +46,16 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.3.1",
+		"astro": "^6.3.2",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@astrojs/markdown-remark": "^7.1.1",
-		"@astrojs/mdx": "^5.0.4",
-		"@astrojs/node": "^10.1.0",
-		"@astrojs/react": "^5.0.4",
+		"@astrojs/markdown-remark": "^7.1.2",
+		"@astrojs/mdx": "^5.0.5",
+		"@astrojs/node": "^10.1.1",
+		"@astrojs/react": "^5.0.5",
 		"@astrojs/rss": "^4.0.18",
 		"@astrojs/sitemap": "^3.7.2",
 		"@pagefind/component-ui": "^1.5.2",
@@ -96,7 +96,7 @@
 		"geokdbush": "^2.1.0",
 		"globals": "^17.6.0",
 		"kdbush": "^4.0.2",
-		"knip": "^6.12.2",
+		"knip": "^6.13.1",
 		"maplibre-gl": "^5.24.0",
 		"p-limit": "^7.3.0",
 		"p-memoize": "^8.0.0",
@@ -104,7 +104,7 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"rehype-wrap-cjk": "^2.1.2",
-		"remeda": "^2.34.0",
+		"remeda": "^2.34.1",
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.3.0",
 		"tsx": "^4.21.0",
@@ -116,5 +116,5 @@
 		"vitest": "^4.1.6",
 		"zod": "^4.4.3"
 	},
-	"packageManager": "pnpm@11.1.1+sha512.d1fdf5f73c617b64fa1a56a81c3c8dfe0e966e33a6010aa256b517ae77be21d93e05affc0de1a83b0e4f29d569f68b446ae8f068cd7247c0bb3df0fb4d7bdf9a"
+	"packageManager": "pnpm@11.1.2+sha512.415a1cc25974731e75455c1468371be74c5aa5fb7621b50d4056d222451609f11412f23fd602e6169f1e060466641f798597e1be961a10688836a67b16569499"
 }

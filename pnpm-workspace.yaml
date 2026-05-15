@@ -4,6 +4,8 @@ packages:
 
 # Intended to mitigate supply chain attacks
 minimumReleaseAge: 1440
+verifyDepsBeforeRun: error
+strictDepBuilds: true
 
 minimumReleaseAgeExclude:
   - '@xsynaptic/eslint-config'

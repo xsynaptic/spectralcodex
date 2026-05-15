@@ -26,7 +26,7 @@
 		"og-image": "tsx ./src/og-image/index.ts"
 	},
 	"devDependencies": {
-		"@astrojs/markdown-remark": "^7.1.1",
+		"@astrojs/markdown-remark": "^7.1.2",
 		"@duckdb/node-api": "^1.5.2-r.1",
 		"@fontsource/lora": "^5.2.8",
 		"@fontsource/noto-serif-tc": "^5.2.10",
@@ -39,9 +39,9 @@
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/d3-geo": "^3.1.0",
 		"@types/geojson": "^7946.0.16",
-		"@xsynaptic/unified-tools": "^4.2.0",
-		"astro": "^6.3.1",
-		"better-sqlite3": "^12.9.0",
+		"@xsynaptic/unified-tools": "^4.2.1",
+		"astro": "^6.3.2",
+		"better-sqlite3": "^12.10.0",
 		"chalk": "^5.6.2",
 		"d3-geo": "^3.1.1",
 		"devalue": "^5.8.0",
