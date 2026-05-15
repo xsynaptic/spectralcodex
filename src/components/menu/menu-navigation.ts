@@ -1,5 +1,53 @@
+/**
+ * An accessible nested menu web component; DOM contract:
+ *
+ * <menu-navigation>
+ *   <nav>
+ *     <ul>                <-- becomes role="menubar"
+ *       <li>              <-- a menu item
+ *         <a>...</a>      <-- first <a> in the <li> that is NOT inside the submenu
+ *         <ul>...</ul>    <-- optional submenu; must be a direct child of the <li>
+ *       </li>
+ *     </ul>
+ *   </nav>
+ * </menu-navigation>
+ *
+ * State exposed for CSS:
+ *   data-has-submenu  on every <li> that has a submenu
+ *   data-open         on every currently-open <li>
+ */
 class NavMenu extends HTMLElement {
 	#lastPointerType = '';
+
+	#getSubmenu(li: HTMLElement): HTMLElement | undefined {
+		return li.querySelector<HTMLElement>(':scope > ul') ?? undefined;
+	}
+
+	#getLink(li: HTMLElement): HTMLAnchorElement | undefined {
+		const submenu = this.#getSubmenu(li);
+
+		for (const link of li.querySelectorAll<HTMLAnchorElement>('a')) {
+			if (!submenu?.contains(link)) return link;
+		}
+
+		return undefined;
+	}
+
+	#getMenuitems(ul: HTMLElement): Array<HTMLAnchorElement> {
+		const menuitems: Array<HTMLAnchorElement> = [];
+
+		for (const li of ul.querySelectorAll<HTMLElement>(':scope > li')) {
+			const link = this.#getLink(li);
+			if (link) menuitems.push(link);
+		}
+
+		return menuitems;
+	}
+
+	#triggerContains(li: HTMLElement, target: Node): boolean {
+		const submenu = this.#getSubmenu(li);
+		return !submenu?.contains(target);
+	}
 
 	#handlePointerDown = (event: PointerEvent) => {
 		this.#lastPointerType = event.pointerType;
@@ -14,30 +62,26 @@ class NavMenu extends HTMLElement {
 			return;
 		}
 
+		const link = this.#getLink(li);
+		const onLink = link ? link.contains(target) : false;
+		const inTrigger = this.#triggerContains(li, target);
 		const isTouch = this.#lastPointerType === 'touch';
 
-		// Touch taps on links with submenus: first tap opens, second tap navigates
-		if (target.closest('a') && isTouch) {
-			const trigger = li.querySelector<HTMLElement>(':scope > div');
-
-			if (trigger?.contains(target) && li.dataset.open === undefined) {
+		// Touch taps on the menuitem link: first tap opens, second tap navigates
+		if (onLink && isTouch) {
+			if (inTrigger && li.dataset.open === undefined) {
 				event.preventDefault();
 				this.#closeSiblings(li);
 				this.#open(li);
-				return;
 			}
-
-			// Already open; let the tap navigate
 			return;
 		}
 
-		// Non-touch: let clicks on links navigate normally
-		if (target.closest('a')) return;
+		// Non-touch: let clicks on the menuitem link navigate normally
+		if (onLink) return;
 
-		// Only respond to clicks within the trigger element
-		const trigger = li.querySelector<HTMLElement>(':scope > div');
-
-		if (!trigger?.contains(target)) return;
+		// Otherwise only respond to clicks in the trigger zone
+		if (!inTrigger) return;
 
 		event.preventDefault();
 
@@ -161,7 +205,7 @@ class NavMenu extends HTMLElement {
 	#resetItem(li: HTMLElement) {
 		delete li.dataset.open;
 
-		const link = li.querySelector<HTMLElement>('a[role="menuitem"]');
+		const link = this.#getLink(li);
 
 		if (link) link.setAttribute('aria-expanded', 'false');
 	}
@@ -169,7 +213,7 @@ class NavMenu extends HTMLElement {
 	#open(li: HTMLElement) {
 		li.dataset.open = '';
 
-		const link = li.querySelector<HTMLElement>('a[role="menuitem"]');
+		const link = this.#getLink(li);
 
 		if (link) link.setAttribute('aria-expanded', 'true');
 	}
@@ -213,9 +257,7 @@ class NavMenu extends HTMLElement {
 		if (triggerLi) {
 			this.#close(triggerLi);
 
-			const triggerLink = triggerLi.querySelector<HTMLAnchorElement>(
-				':scope > div a[role="menuitem"]',
-			);
+			const triggerLink = this.#getLink(triggerLi);
 
 			if (triggerLink) {
 				this.#setRovingTabindex(triggerLink);
@@ -235,9 +277,8 @@ class NavMenu extends HTMLElement {
 				? (currentIndex + 1) % items.length
 				: (currentIndex - 1 + items.length) % items.length;
 
-		const nextLink = items[nextIndex]?.querySelector<HTMLAnchorElement>(
-			':scope > div a[role="menuitem"]',
-		);
+		const nextItem = items[nextIndex];
+		const nextLink = nextItem ? this.#getLink(nextItem) : undefined;
 
 		if (nextLink) {
 			this.#setRovingTabindex(nextLink);
@@ -246,10 +287,11 @@ class NavMenu extends HTMLElement {
 	}
 
 	#focusFirstItem(li: HTMLElement) {
-		const submenu = li.querySelector<HTMLElement>(':scope > ul');
-		const firstLink = submenu?.querySelector<HTMLAnchorElement>(
-			':scope > li > div a[role="menuitem"]',
-		);
+		const submenu = this.#getSubmenu(li);
+
+		if (!submenu) return;
+
+		const firstLink = this.#getMenuitems(submenu)[0];
 
 		if (firstLink) {
 			this.#setRovingTabindex(firstLink);
@@ -258,12 +300,12 @@ class NavMenu extends HTMLElement {
 	}
 
 	#focusEdgeItem(li: HTMLElement, edge: 'first' | 'last') {
-		const items = this.#getSiblingItems(li);
+		const parentUl = li.closest<HTMLElement>('ul');
 
-		if (items.length === 0) return;
+		if (!parentUl) return;
 
-		const target = edge === 'first' ? items[0] : items.at(-1);
-		const link = target?.querySelector<HTMLAnchorElement>(':scope > div a[role="menuitem"]');
+		const menuitems = this.#getMenuitems(parentUl);
+		const link = edge === 'first' ? menuitems[0] : menuitems.at(-1);
 
 		if (link) {
 			this.#setRovingTabindex(link);
@@ -284,9 +326,7 @@ class NavMenu extends HTMLElement {
 
 		if (!parentUl) return;
 
-		for (const link of parentUl.querySelectorAll<HTMLElement>(
-			':scope > li > div a[role="menuitem"]',
-		)) {
+		for (const link of this.#getMenuitems(parentUl)) {
 			link.setAttribute('tabindex', link === activeLink ? '0' : '-1');
 		}
 	}
@@ -304,11 +344,11 @@ class NavMenu extends HTMLElement {
 		for (const li of this.querySelectorAll<HTMLElement>('li')) {
 			li.setAttribute('role', 'none');
 
-			const link = li.querySelector<HTMLElement>(':scope > div a');
+			const link = this.#getLink(li);
 
 			if (link) link.setAttribute('role', 'menuitem');
 
-			const submenu = li.querySelector<HTMLElement>(':scope > ul');
+			const submenu = this.#getSubmenu(li);
 
 			if (submenu) {
 				li.dataset.hasSubmenu = '';
@@ -327,18 +367,13 @@ class NavMenu extends HTMLElement {
 		}
 
 		// Roving tabindex on menubar items
-		const menubarLinks = menubar.querySelectorAll<HTMLElement>(
-			':scope > li > div a[role="menuitem"]',
-		);
-
-		for (const [index, link] of menubarLinks.entries()) {
+		for (const [index, link] of this.#getMenuitems(menubar).entries()) {
 			link.setAttribute('tabindex', index === 0 ? '0' : '-1');
 		}
 	}
 
 	connectedCallback() {
 		this.#injectAria();
-		this.dataset.enhanced = '';
 		this.addEventListener('pointerdown', this.#handlePointerDown);
 		this.addEventListener('click', this.#handleClick);
 		this.addEventListener('keydown', this.#handleKeydown);
