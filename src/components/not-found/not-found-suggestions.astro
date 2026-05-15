@@ -24,8 +24,12 @@ const t = getTranslations();
 	data-auto-redirect-threshold={autoRedirectThreshold}
 	data-max-suggestions={maxSuggestions}
 	data-suggestions-url={suggestionsUrl}
+	hidden
 >
 	{t('notFound.suggestions')}
+</div>
+<div id="not-found-loading" class="text-primary-700 dark:text-highlight-400" aria-hidden="true">
+	<div class="loading-animation w-6"></div>
 </div>
 <ul id="not-found-suggestions-list"></ul>
 

@@ -1,3 +1,4 @@
+import { navigate } from 'astro:transitions/client';
 import { distance } from 'fastest-levenshtein';
 
 interface ContentManifestEntry {
@@ -33,41 +34,46 @@ function normalize(pathname: string): string {
 
 export async function runNotFoundSuggestions(): Promise<void> {
 	const container = document.querySelector<HTMLElement>('#not-found-suggestions');
+	const loading = document.querySelector<HTMLElement>('#not-found-loading');
 
 	if (!container) return;
 
-	const current = normalize(window.location.pathname);
+	try {
+		const current = normalize(window.location.pathname);
 
-	if (current.length < minPathLength) return;
+		if (current.length < minPathLength) return;
 
-	const suggestionsUrl = container.dataset.suggestionsUrl ?? '/content-manifest.json';
-	const threshold = Number.parseFloat(container.dataset.threshold ?? '0.5');
-	const autoRedirectThreshold = Number.parseFloat(
-		container.dataset.autoRedirectThreshold ?? '0.92',
-	);
-	const maxSuggestions = Number.parseInt(container.dataset.maxSuggestions ?? '5', 10);
+		const suggestionsUrl = container.dataset.suggestionsUrl ?? '/content-manifest.json';
+		const threshold = Number.parseFloat(container.dataset.threshold ?? '0.5');
+		const autoRedirectThreshold = Number.parseFloat(
+			container.dataset.autoRedirectThreshold ?? '0.92',
+		);
+		const maxSuggestions = Number.parseInt(container.dataset.maxSuggestions ?? '5', 10);
 
-	const response = await fetch(suggestionsUrl);
-	if (!response.ok) return;
+		const response = await fetch(suggestionsUrl);
+		if (!response.ok) return;
 
-	const entries = (await response.json()) as Array<ContentManifestEntry>;
+		const entries = (await response.json()) as Array<ContentManifestEntry>;
 
-	const scored: Array<ScoredEntry> = entries
-		.map((entry) => ({ ...entry, score: similarity(current, normalize(entry.url)) }))
-		.sort((entryA, entryB) => entryB.score - entryA.score);
+		const scored: Array<ScoredEntry> = entries
+			.map((entry) => ({ ...entry, score: similarity(current, normalize(entry.url)) }))
+			.sort((entryA, entryB) => entryB.score - entryA.score);
 
-	const best = scored[0];
-	if (!best || best.score < threshold) return;
+		const best = scored[0];
+		if (!best || best.score < threshold) return;
 
-	if (best.score >= autoRedirectThreshold && normalize(best.url) !== current) {
-		window.location.replace(best.url);
-		return;
+		if (best.score >= autoRedirectThreshold && normalize(best.url) !== current) {
+			void navigate(best.url, { history: 'replace' });
+			return;
+		}
+
+		const top = scored.filter((entry) => entry.score >= threshold).slice(0, maxSuggestions);
+
+		renderSuggestions(top);
+		container.hidden = false;
+	} finally {
+		loading?.remove();
 	}
-
-	const top = scored.filter((entry) => entry.score >= threshold).slice(0, maxSuggestions);
-
-	renderSuggestions(top);
-	container.hidden = false;
 }
 
 function renderSuggestions(items: Array<ScoredEntry>): void {
@@ -83,6 +89,7 @@ function renderSuggestions(items: Array<ScoredEntry>): void {
 		link.href = item.url;
 		link.className = 'l-all l-accent l-dark';
 		link.textContent = item.title;
+		link.dataset.astroHistory = 'replace';
 
 		listItemInner.append(link);
 		listItem.append(listItemInner);
