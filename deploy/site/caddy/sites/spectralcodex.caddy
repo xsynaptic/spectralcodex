@@ -1,10 +1,14 @@
-www.spectralcodex.com {
+(spectralcodex-tls) {
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+}
+
+www.spectralcodex.com {
+	import spectralcodex-tls
 	redir https://spectralcodex.com{uri} permanent
 }
 
 spectralcodex.com {
-	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+	import spectralcodex-tls
 	root * /var/www/spectralcodex
 	file_server
 	encode gzip
@@ -41,7 +45,7 @@ spectralcodex.com {
 }
 
 u.spectralcodex.com {
-	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+	import spectralcodex-tls
 	handle /robots.txt {
 		respond "User-agent: *
 Disallow: /"
@@ -50,7 +54,7 @@ Disallow: /"
 }
 
 img.spectralcodex.com {
-	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+	import spectralcodex-tls
 	handle /robots.txt {
 		respond "User-agent: *
 Disallow: /"
@@ -61,7 +65,7 @@ Disallow: /"
 }
 
 api.spectralcodex.com {
-	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
+	import spectralcodex-tls
 	handle /robots.txt {
 		respond "User-agent: *
 Disallow: /"

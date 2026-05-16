@@ -109,7 +109,7 @@ export async function deployImageServer({
 	try {
 		await $({
 			stdio: 'inherit',
-		})`ssh ${sshArgs} ${`${composeCmd} up -d --force-recreate --remove-orphans --wait --wait-timeout 30`}`;
+		})`ssh ${sshArgs} ${`${composeCmd} up -d --force-recreate --remove-orphans --wait --wait-timeout 60`}`;
 	} catch {
 		console.log(chalk.yellow('Warning: Health check timed out'));
 	}

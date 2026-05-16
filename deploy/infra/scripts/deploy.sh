@@ -1,10 +1,9 @@
 #!/bin/bash
-# Deploy shared infrastructure: root Caddyfile, Umami, and Docker Compose services.
-# Does NOT deploy site-specific Caddy configs (spectralcodex.caddy) or the image server.
-# For those, run deploy/site/scripts/deploy.sh instead.
+# Deploy shared infra: root Caddyfile, Umami, Docker Compose services
+# Site-specific Caddy and image server live in deploy/site/scripts/deploy.sh
 set -euo pipefail
 
-# Load environment from deploy/.env
+# Load deploy/.env
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DEPLOY_DIR="$(cd "$INFRA_DIR/.." && pwd)"
@@ -26,22 +25,19 @@ echo "=== Deploy infrastructure ==="
 echo "Target: $REMOTE_HOST:$REMOTE_PATH"
 echo ""
 
-# Create server-side .env with only what docker-compose needs
+# Build the server-side .env with only what docker-compose needs
 echo "Preparing server environment..."
 TEMP_ENV=$(mktemp)
 trap 'rm -f "$TEMP_ENV"' EXIT
 cat > "$TEMP_ENV" <<EOF
-# Umami analytics data path
 UMAMI_DATA_PATH=${UMAMI_DATA_PATH}
 UMAMI_BACKUP_PATH=${UMAMI_BACKUP_PATH}
-
-# Umami secrets
 UMAMI_DB_PASSWORD=${UMAMI_DB_PASSWORD}
 UMAMI_APP_SECRET=${UMAMI_APP_SECRET}
 EOF
 
-# Sync infrastructure files
-echo "Syncing infrastructure files..."
+# Sync infra files
+echo "Syncing infra files..."
 rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   --exclude='.git' \
   --exclude='*.example' \
@@ -51,17 +47,28 @@ rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} \
   "$INFRA_DIR/umami-db-backup" \
   "$REMOTE_HOST:$REMOTE_PATH/"
 
-# Write server-side .env
+# Push the server .env
 echo "Writing server environment..."
 rsync -avz ${SSH_KEY:+-e "ssh -i $SSH_KEY"} "$TEMP_ENV" "$REMOTE_HOST:$REMOTE_PATH/.env"
 
-# Restart services
+# Pull, build, recreate, wait for healthchecks
 echo "Restarting services..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose build && docker compose up -d --force-recreate --remove-orphans"
+ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose pull && docker compose build && docker compose up -d --force-recreate --remove-orphans --wait --wait-timeout 60"
 
 echo ""
-echo "Waiting for health checks..."
-ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose up -d --wait --wait-timeout 60 --remove-orphans" 2>&1 || true
-ssh $SSH_OPTS "$REMOTE_HOST" "docker compose -f $REMOTE_PATH/docker-compose.yml ps"
+echo "Verifying service state..."
+PS_OUTPUT=$(ssh $SSH_OPTS "$REMOTE_HOST" "cd $REMOTE_PATH && docker compose ps")
+echo "$PS_OUTPUT"
+
+# Fail loud on non-Up or unhealthy/restarting services
+if echo "$PS_OUTPUT" | tail -n +2 | grep -Ev '\bUp\b' | grep -q .; then
+  echo "ERROR: one or more services not in 'Up' state"
+  exit 1
+fi
+if echo "$PS_OUTPUT" | grep -E '\(unhealthy\)|Exit|Restarting'; then
+  echo "ERROR: one or more services unhealthy or restarting"
+  exit 1
+fi
+
 echo ""
-echo "Done! All containers should show 'Up' and 'healthy'."
+echo "Done"
