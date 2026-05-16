@@ -5,6 +5,7 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
+import { fallbackImageIds } from '../og-image/fallback.js';
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 
@@ -22,6 +23,11 @@ const { values } = parseArgs({
 		'media-path': {
 			type: 'string',
 			default: 'packages/content/media',
+		},
+		ignore: {
+			type: 'string',
+			multiple: true,
+			default: [],
 		},
 	},
 });
@@ -43,7 +49,7 @@ const allEntries = getDataStoreCollection(collections, [
 	'themes',
 ]);
 
-const mediaFiles = collectMediaFiles(mediaPath);
+const mediaFiles = collectMediaFiles(mediaPath, { ignore: values.ignore });
 const referencedImages = new Set<string>();
 
 for (const entry of allEntries) {
@@ -55,6 +61,17 @@ for (const entry of allEntries) {
 	}
 	for (const id of mdxIds) {
 		referencedImages.add(id);
+	}
+}
+
+// OG image fallbacks are referenced indirectly; seed them so they aren't flagged
+for (const value of Object.values(fallbackImageIds)) {
+	if (typeof value === 'string') {
+		referencedImages.add(value);
+	} else {
+		for (const fallbackId of value) {
+			referencedImages.add(fallbackId);
+		}
 	}
 }
 

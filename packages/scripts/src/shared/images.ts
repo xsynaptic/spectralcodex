@@ -37,8 +37,12 @@ export function extractMdxImageIds(content: string): Array<string> {
 	return ids;
 }
 
-export function collectMediaFiles(mediaPath: string): Set<string> {
+export function collectMediaFiles(
+	mediaPath: string,
+	options?: { ignore?: ReadonlyArray<string> },
+): Set<string> {
 	const files = new Set<string>();
+	const ignore = options?.ignore ?? [];
 
 	function processDirectory(dirPath: string, prefix = '') {
 		const entries = readdirSync(dirPath);
@@ -51,6 +55,7 @@ export function collectMediaFiles(mediaPath: string): Set<string> {
 			if (stat.isDirectory()) {
 				processDirectory(fullPath, relativePath);
 			} else if (/\.(jpe?g|png|webp|avif|gif)$/i.test(entry)) {
+				if (ignore.some((ignored) => relativePath.startsWith(ignored))) continue;
 				files.add(relativePath);
 			}
 		}

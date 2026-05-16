@@ -21,7 +21,7 @@ import {
 	getPublicId,
 	loadDataStore,
 } from '../shared/data-store.js';
-import { getFallbackImageId, staticFallbackImageIds } from './fallback.js';
+import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
 
 /**
  * Featured image handling
@@ -93,65 +93,22 @@ function getArchivesTitle(id: string): string {
  * landings), keyed by the OG image filename Astro emits.
  */
 function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
-	const indexes = [
-		{
-			suffix: ContentCollectionsEnum.Archives,
-			title: 'Archives',
-			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Archives],
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Notes,
-			title: 'Notes',
-			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Notes],
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Locations,
-			title: 'Locations',
-			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Locations],
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Posts,
-			title: 'Posts',
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Regions,
-			title: 'Regions',
-			imageFeaturedId: staticFallbackImageIds[ContentCollectionsEnum.Regions],
-		},
-		{
-			suffix: ContentCollectionsEnum.Resources,
-			title: 'Resources',
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Series,
-			title: 'Series',
-			isFallback: true,
-		},
-		{
-			suffix: ContentCollectionsEnum.Themes,
-			title: 'Themes',
-			isFallback: true,
-		},
-		{
-			suffix: 'homepage',
-			title: '', // No duplicate branding
-			imageFeaturedId: staticFallbackImageIds.homepage,
-		},
-		{
-			suffix: 'not-found',
-			title: '404: Not Found',
-			isFallback: true,
-		},
+	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
+		{ suffix: ContentCollectionsEnum.Archives, title: 'Archives', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Notes, title: 'Notes', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Posts, title: 'Posts', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Regions, title: 'Regions' },
+		{ suffix: ContentCollectionsEnum.Resources, title: 'Resources', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Series, title: 'Series', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Themes, title: 'Themes', isFallback: true },
+		{ suffix: 'homepage', title: '' }, // No duplicate branding
+		{ suffix: 'not-found', title: '404: Not Found', isFallback: true },
 	];
 
 	const entries = new Map<string, OpenGraphContentEntry>();
 
-	for (const { suffix, title, imageFeaturedId, isFallback } of indexes) {
+	for (const { suffix, title, isFallback } of indexes) {
 		const id = `index-${suffix}`;
 
 		entries.set(id, {
@@ -159,7 +116,7 @@ function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 			collection: 'index',
 			digest: id,
 			title,
-			imageFeaturedId: imageFeaturedId ?? staticFallbackImageIds.default,
+			imageFeaturedId: resolveFallbackImageId(suffix, id),
 			isFallback: isFallback ?? false,
 		});
 	}
