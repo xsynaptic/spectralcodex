@@ -31,7 +31,6 @@ export const locations = defineCollection({
 			category: z.enum(LocationCategoryEnum),
 			status: z.enum(LocationStatusEnum),
 			heritage: LocationTwHeritageSchema.optional(),
-			locations: reference('locations').array().optional(),
 			regions: reference('regions').array(),
 			themes: reference('themes').array().optional(),
 			links: LinkSchema.array().optional(),
