@@ -37,7 +37,7 @@ export async function getTheaterLocations() {
 			),
 			R.filter(
 				({ data }) =>
-					!R.isIncludedIn(data.status, [LocationStatusEnum.Demolished, LocationStatusEnum.Unknown]),
+					!R.isIncludedIn(data.status, [LocationStatusEnum.Vanished, LocationStatusEnum.Unknown]),
 			),
 			R.sort(sortLocationsByLatitude),
 		),

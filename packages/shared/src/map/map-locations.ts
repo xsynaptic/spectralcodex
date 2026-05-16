@@ -99,7 +99,7 @@ export const LocationStatusEnum = {
 	Idle: 'idle',
 	Abandoned: 'abandoned',
 	Remnants: 'remnants',
-	Demolished: 'demolished',
+	Vanished: 'vanished',
 	Unknown: 'unknown',
 } as const satisfies Record<string, string>;
 

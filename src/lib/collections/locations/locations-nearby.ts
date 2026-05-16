@@ -55,7 +55,7 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 
 /**
  * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
- * Post-query filtering handles status checks (demolished, etc.)
+ * Post-query filtering handles status checks (vanished, etc.)
  */
 export function createGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
 	const { pointsMap, pointsIndex } = extractPoints(locations);
@@ -91,8 +91,8 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 			// Skip invalid points and self
 			if (!point || point.id === entry.id) continue;
 
-			// Post-index filtering: skip demolished locations
-			if (point.status === LocationStatusEnum.Demolished) continue;
+			// Post-index filtering: skip vanished locations
+			if (point.status === LocationStatusEnum.Vanished) continue;
 
 			const dist = getDistance(entryPoint.lng, entryPoint.lat, point.lng, point.lat);
 

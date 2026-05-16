@@ -77,16 +77,16 @@ export const LocationStatusRecords = {
 		title: 'Remnants',
 		title_zh: '遺跡',
 		description:
-			'Mostly demolished or transformed beyond recognition but some traces remain, though they may be minor.',
+			'Mostly dismantled or transformed beyond recognition but some traces remain, though they may be minor.',
 		color: tailwindColors.red700,
 		stroke: tailwindColors.red800,
 		colorDark: tailwindColors.red600,
 		strokeDark: tailwindColors.red700,
 	},
-	[LocationStatusEnum.Demolished]: {
-		title: 'Demolished',
-		title_zh: '被拆除',
-		description: 'Completely demolished and vanished into the mists of time.',
+	[LocationStatusEnum.Vanished]: {
+		title: 'Vanished',
+		title_zh: '已消失',
+		description: 'Vanished into the mists of time.',
 		color: tailwindColors.zinc600,
 		stroke: tailwindColors.zinc200,
 		colorDark: tailwindColors.zinc600,

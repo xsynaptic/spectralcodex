@@ -128,7 +128,7 @@ const translationStrings = {
 		'webmentions.error': 'Could not load mentions',
 
 		// Locations
-		'locations.status.demolished': 'Demolished',
+		'locations.status.vanished': 'Vanished',
 		'locations.unit.km': '{distance} km',
 		'locations.address.label': 'Address',
 
@@ -167,7 +167,7 @@ const translationStrings = {
 
 		// Notices
 		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
-		'notice.demolished': `**Note**: this location has been demolished and no longer exists. Any information presented here is only for reference.`,
+		'notice.vanished': `**Note**: this location has vanished. Any information presented here is only for reference.`,
 		'notice.quality': `**Note**: this entry contains only basic information and may be out of date, inaccurate, or even wrong. Additional research is strongly recommended.`,
 
 		// Site
@@ -220,7 +220,7 @@ const translationStrings = {
 	},
 	[LanguageCodeEnum.ChineseTraditional]: {
 		'notice.danger': `**警告**：此處已廢棄或長期無人管理，可能存在潛在危險。造訪時請務必提高警覺，並做好相關安全防護措施。`,
-		'notice.demolished': `**提醒**：此地點已遭拆除，不再存在。本文僅供參考用途。`,
+		'notice.vanished': `**提醒**：此地點已消失，本文僅供參考用途。`,
 		'notice.quality': `**說明**：本條目僅提供基礎資訊，內容可能過時、未經查證，甚至有誤。建議進一步查閱相關資料，以確認資訊的正確性。`,
 	},
 	[LanguageCodeEnum.ChineseSimplified]: {},

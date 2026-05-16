@@ -26,7 +26,7 @@ const showDangerNotice = entry.data.safety
 			LocationStatusEnum.Remnants,
 		]);
 
-const showDemolishedNotice = entry.data.status === LocationStatusEnum.Demolished;
+const showVanishedNotice = entry.data.status === LocationStatusEnum.Vanished;
 
 const showChinese = langCode?.startsWith('zh');
 
@@ -34,17 +34,17 @@ const t = getTranslations();
 ---
 
 {
-	showDangerNotice || showDemolishedNotice ? (
+	showDangerNotice || showVanishedNotice ? (
 		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
-			{showDemolishedNotice ? (
+			{showVanishedNotice ? (
 				<AlertBox status="warning">
-					<Fragment set:html={transformMarkdown({ input: t('notice.demolished') })} />
+					<Fragment set:html={transformMarkdown({ input: t('notice.vanished') })} />
 					{showChinese ? (
-						<Fragment set:html={transformMarkdown({ input: t('notice.demolished', langCode) })} />
+						<Fragment set:html={transformMarkdown({ input: t('notice.vanished', langCode) })} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}
-			{showDangerNotice && !showDemolishedNotice ? (
+			{showDangerNotice && !showVanishedNotice ? (
 				<AlertBox status="warning">
 					<Fragment set:html={transformMarkdown({ input: t('notice.danger') })} />
 					{showChinese ? (
