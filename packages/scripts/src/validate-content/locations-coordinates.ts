@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import { GeometrySchema, RegionsSchema } from '@spectralcodex/shared/schemas';

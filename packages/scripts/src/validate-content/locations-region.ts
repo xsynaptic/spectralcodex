@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import { RegionsSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import path from 'node:path';

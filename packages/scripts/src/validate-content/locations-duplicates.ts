@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
 import { z } from 'zod';
 

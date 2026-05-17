@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 

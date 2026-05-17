@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import { GeometrySchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';

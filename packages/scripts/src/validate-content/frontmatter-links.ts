@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../shared/data-store';
