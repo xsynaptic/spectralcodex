@@ -22,8 +22,8 @@ import SectionCitation from '#components/sections/section-citation.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
-import SectionRelated from '#components/sections/section-related.astro';
 import SectionSeries from '#components/sections/section-series.astro';
+import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
@@ -130,7 +130,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		<SectionRegions regionIds={regionIds} />
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
-		<SectionRelated entry={entry} showPreviews={true} limit={8} />
+		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
 		<SectionAuthor showAuthor={false} />
 		{import.meta.env.DEV ? <SectionCitation entry={entry} /> : undefined}
 	</ContentArticle>

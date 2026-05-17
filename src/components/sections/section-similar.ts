@@ -27,9 +27,9 @@ async function loadJsonData(filePath: string) {
 }
 
 /**
- * Schema for related content data
+ * Schema for similar content data
  */
-const RelatedContentItemSchema = z
+const SimilarContentItemSchema = z
 	.record(
 		z.string(),
 		z
@@ -42,19 +42,19 @@ const RelatedContentItemSchema = z
 	)
 	.optional();
 
-async function loadRelatedContentData() {
-	const filePath = path.join(CUSTOM_CACHE_PATH, 'content-related.json');
+async function loadSimilarContentData() {
+	const filePath = path.join(CUSTOM_CACHE_PATH, 'similar-content.json');
 
 	try {
-		const relatedContent = await loadJsonData(filePath);
-		const relatedContentParsed = await RelatedContentItemSchema.parseAsync(relatedContent);
+		const similarContent = await loadJsonData(filePath);
+		const similarContentParsed = await SimilarContentItemSchema.parseAsync(similarContent);
 
-		return relatedContentParsed;
+		return similarContentParsed;
 	} catch (error) {
 		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
 
 		if (isNotFound) {
-			console.warn(`[Related] Not found: ${filePath} (run pnpm content-related to generate)`);
+			console.warn(`[Similar] Not found: ${filePath} (run pnpm similar-content to generate)`);
 			return;
 		}
 
@@ -62,13 +62,13 @@ async function loadRelatedContentData() {
 	}
 }
 
-async function createRelatedContentFunction() {
-	const relatedContentData = await loadRelatedContentData();
+async function createSimilarContentFunction() {
+	const similarContentData = await loadSimilarContentData();
 
 	const contentMetadataIndex = await getContentMetadataIndex();
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
-	return function getRelatedContent({
+	return function getSimilarContent({
 		id,
 		limit = 10,
 		threshold = 0.6,
@@ -79,13 +79,13 @@ async function createRelatedContentFunction() {
 		threshold?: number;
 		hasImageFeatured?: boolean;
 	}): Array<ContentMetadataItem> {
-		if (!relatedContentData) return [];
+		if (!similarContentData) return [];
 
-		const relatedItem = relatedContentData[id];
+		const similarItem = similarContentData[id];
 
-		if (!relatedItem) return [];
+		if (!similarItem) return [];
 
-		return relatedItem
+		return similarItem
 			.filter((item) => item.score >= threshold)
 			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
 			.map((item) => contentMetadataIndex.get(item.id))
@@ -95,11 +95,11 @@ async function createRelatedContentFunction() {
 	};
 }
 
-let relatedContentFunction: ReturnType<typeof createRelatedContentFunction> | undefined;
+let similarContentFunction: ReturnType<typeof createSimilarContentFunction> | undefined;
 
-export async function getRelatedContentFunction() {
-	if (!relatedContentFunction) {
-		relatedContentFunction = createRelatedContentFunction();
+export async function getSimilarContentFunction() {
+	if (!similarContentFunction) {
+		similarContentFunction = createSimilarContentFunction();
 	}
-	return relatedContentFunction;
+	return similarContentFunction;
 }

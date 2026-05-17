@@ -7,7 +7,7 @@ import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { getRelatedContentFunction } from '#components/sections/section-related.ts';
+import { getSimilarContentFunction } from '#components/sections/section-similar.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
@@ -19,9 +19,9 @@ interface Props {
 
 const { entry, showPreviews, limit = 10, threshold = 0.5, ...props } = Astro.props;
 
-const getRelatedContent = await getRelatedContentFunction();
+const getSimilarContent = await getSimilarContentFunction();
 
-const relatedContentItems = getRelatedContent({
+const similarContentItems = getSimilarContent({
 	id: entry.id,
 	limit,
 	threshold,
@@ -31,19 +31,19 @@ const t = getTranslations();
 ---
 
 {
-	relatedContentItems.length > 0 ? (
+	similarContentItems.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.related')}</Fragment>
+			<Fragment slot="section-title">{t('section.similar')}</Fragment>
 			{showPreviews ? (
 				<MetadataGrid
-					items={relatedContentItems}
+					items={similarContentItems}
 					showDate={true}
 					showRegion={true}
 					showTitleMultilingual={true}
 				/>
 			) : (
 				<ListColumn class="font-serif text-xs sm:text-sm">
-					{relatedContentItems.map(({ url, title, titleMultilingual }) => (
+					{similarContentItems.map(({ url, title, titleMultilingual }) => (
 						<ListColumnItem>
 							<Link href={url}>{title}</Link>
 							{titleMultilingual ? (

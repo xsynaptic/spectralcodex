@@ -106,7 +106,7 @@ const translationStrings = {
 		'section.map': 'Map',
 		'section.locationsNearby': 'Nearby Locations',
 		'section.backlinks': 'Connections',
-		'section.related': 'Related Content',
+		'section.similar': 'Similar Content',
 		'section.dateVisited': 'Visitation Log',
 		'section.webmentions': 'Webmentions',
 
