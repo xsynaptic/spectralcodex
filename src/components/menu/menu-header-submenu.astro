@@ -51,30 +51,41 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 >
 	{
 		menuItems.map((item, index) => {
+			const children = item.children;
 			const showMultilingual = shouldShowMultilingual({ item, depth });
+			const isActive = isActiveMenuItem(item, pathname);
+			const triggerClasses = ['nav-sub-link', isActive ? 'nav-active' : undefined];
+			const multilingual = showMultilingual ? (
+				<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
+			) : undefined;
 
 			return (
 				<li class="nav-sub-item">
 					<div class="nav-sub-trigger">
-						<Link
-							class:list={[
-								'nav-sub-link',
-								isActiveMenuItem(item, pathname) ? 'nav-active' : undefined,
-							]}
-							href={item.url}
-							linkColor="accent"
-							{...(item.rel ? { rel: item.rel } : undefined)}
-						>
-							<Fragment set:html={item.title} />
-							{showMultilingual ? (
-								<TextMultilingual
-									class="nav-ml"
-									content={item.titleMultilingual}
-									parenthesis={true}
-								/>
-							) : undefined}
-						</Link>
-						{item.children && item.children.length > 0 ? (
+						{item.url ? (
+							<Link
+								class:list={triggerClasses}
+								href={item.url}
+								linkColor="accent"
+								{...(item.rel ? { rel: item.rel } : undefined)}
+							>
+								<Fragment set:html={item.title} />
+								{multilingual}
+							</Link>
+						) : undefined}
+						{!item.url && children?.length ? (
+							<button type="button" class:list={['l-all l-accent l-dark', ...triggerClasses]}>
+								<Fragment set:html={item.title} />
+								{multilingual}
+							</button>
+						) : undefined}
+						{!item.url && !children?.length ? (
+							<span class:list={triggerClasses}>
+								<Fragment set:html={item.title} />
+								{multilingual}
+							</span>
+						) : undefined}
+						{children?.length ? (
 							<svg
 								class="nav-sub-icon"
 								width="24"
@@ -86,9 +97,9 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 							</svg>
 						) : undefined}
 					</div>
-					{item.children && item.children.length > 0 ? (
+					{children?.length ? (
 						<Astro.self
-							menuItems={item.children}
+							menuItems={children}
 							depth={depth + 1}
 							isFirstMenuItem={isFirstMenuItem && index === 0}
 							ariaLabel={getMenuItemAriaLabel(item)}

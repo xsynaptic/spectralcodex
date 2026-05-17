@@ -9,7 +9,7 @@ export interface MenuItem {
 	collection?: CollectionKey | undefined;
 	title: string;
 	titleMultilingual?: MultilingualContent | undefined;
-	url: string;
+	url?: string | undefined;
 	rel?: string | undefined;
 	ancestor?: string | undefined;
 	children?: Array<MenuItem>;

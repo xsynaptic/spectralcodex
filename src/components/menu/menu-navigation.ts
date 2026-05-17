@@ -3,14 +3,16 @@
  *
  * <menu-navigation>
  *   <nav>
- *     <ul>                <-- becomes role="menubar"
- *       <li>              <-- a menu item
- *         <a>...</a>      <-- first <a> in the <li> that is NOT inside the submenu
- *         <ul>...</ul>    <-- optional submenu; must be a direct child of the <li>
+ *     <ul>                  <-- becomes role="menubar"
+ *       <li>                <-- a menu item
+ *         <a|button|span>   <-- first element in the <li> that is NOT inside the submenu
+ *         <ul>...</ul>      <-- optional submenu; must be a direct child of the <li>
  *       </li>
  *     </ul>
  *   </nav>
  * </menu-navigation>
+ *
+ * Note: use <a> for navigable triggers, <button> for text-only labels with children, <span> for text-only
  *
  * State exposed for CSS:
  *   data-has-submenu  on every <li> that has a submenu
@@ -23,22 +25,22 @@ class NavMenu extends HTMLElement {
 		return li.querySelector<HTMLElement>(':scope > ul') ?? undefined;
 	}
 
-	#getLink(li: HTMLElement): HTMLAnchorElement | undefined {
+	#getTrigger(li: HTMLElement): HTMLElement | undefined {
 		const submenu = this.#getSubmenu(li);
 
-		for (const link of li.querySelectorAll<HTMLAnchorElement>('a')) {
-			if (!submenu?.contains(link)) return link;
+		for (const trigger of li.querySelectorAll<HTMLElement>('a, button')) {
+			if (!submenu?.contains(trigger)) return trigger;
 		}
 
 		return undefined;
 	}
 
-	#getMenuitems(ul: HTMLElement): Array<HTMLAnchorElement> {
-		const menuitems: Array<HTMLAnchorElement> = [];
+	#getMenuitems(ul: HTMLElement): Array<HTMLElement> {
+		const menuitems: Array<HTMLElement> = [];
 
 		for (const li of ul.querySelectorAll<HTMLElement>(':scope > li')) {
-			const link = this.#getLink(li);
-			if (link) menuitems.push(link);
+			const trigger = this.#getTrigger(li);
+			if (trigger) menuitems.push(trigger);
 		}
 
 		return menuitems;
@@ -62,13 +64,14 @@ class NavMenu extends HTMLElement {
 			return;
 		}
 
-		const link = this.#getLink(li);
-		const onLink = link ? link.contains(target) : false;
+		const trigger = this.#getTrigger(li);
+		const onTrigger = trigger ? trigger.contains(target) : false;
 		const inTrigger = this.#triggerContains(li, target);
 		const isTouch = this.#lastPointerType === 'touch';
+		const isAnchor = trigger instanceof HTMLAnchorElement;
 
-		// Touch taps on the menuitem link: first tap opens, second tap navigates
-		if (onLink && isTouch) {
+		// Touch taps on an anchor menuitem: first tap opens, second tap navigates
+		if (onTrigger && isTouch && isAnchor) {
 			if (inTrigger && li.dataset.open === undefined) {
 				event.preventDefault();
 				this.#closeSiblings(li);
@@ -77,10 +80,10 @@ class NavMenu extends HTMLElement {
 			return;
 		}
 
-		// Non-touch: let clicks on the menuitem link navigate normally
-		if (onLink) return;
+		// Non-touch click on an anchor: let it navigate normally
+		if (onTrigger && isAnchor) return;
 
-		// Otherwise only respond to clicks in the trigger zone
+		// Button triggers, chevron clicks, or anything else in the trigger zone: toggle
 		if (!inTrigger) return;
 
 		event.preventDefault();
@@ -105,7 +108,7 @@ class NavMenu extends HTMLElement {
 
 		if (!this.contains(target)) return;
 
-		const menuitem = target.closest<HTMLAnchorElement>('a[role="menuitem"]');
+		const menuitem = target.closest<HTMLElement>('[role="menuitem"]');
 
 		if (!menuitem) {
 			if (event.key === 'Escape') this.#closeAll();
@@ -186,7 +189,7 @@ class NavMenu extends HTMLElement {
 						this.#close(li);
 					}
 				}
-				// Enter without children: default link navigation
+				// Enter without children: default trigger behaviour (link navigation or button click)
 				break;
 			}
 			case 'Home': {
@@ -205,17 +208,17 @@ class NavMenu extends HTMLElement {
 	#resetItem(li: HTMLElement) {
 		delete li.dataset.open;
 
-		const link = this.#getLink(li);
+		const trigger = this.#getTrigger(li);
 
-		if (link) link.setAttribute('aria-expanded', 'false');
+		if (trigger) trigger.setAttribute('aria-expanded', 'false');
 	}
 
 	#open(li: HTMLElement) {
 		li.dataset.open = '';
 
-		const link = this.#getLink(li);
+		const trigger = this.#getTrigger(li);
 
-		if (link) link.setAttribute('aria-expanded', 'true');
+		if (trigger) trigger.setAttribute('aria-expanded', 'true');
 	}
 
 	#closeSiblings(li: HTMLElement) {
@@ -257,11 +260,11 @@ class NavMenu extends HTMLElement {
 		if (triggerLi) {
 			this.#close(triggerLi);
 
-			const triggerLink = this.#getLink(triggerLi);
+			const triggerElement = this.#getTrigger(triggerLi);
 
-			if (triggerLink) {
-				this.#setRovingTabindex(triggerLink);
-				triggerLink.focus();
+			if (triggerElement) {
+				this.#setRovingTabindex(triggerElement);
+				triggerElement.focus();
 			}
 		}
 	}
@@ -278,11 +281,11 @@ class NavMenu extends HTMLElement {
 				: (currentIndex - 1 + items.length) % items.length;
 
 		const nextItem = items[nextIndex];
-		const nextLink = nextItem ? this.#getLink(nextItem) : undefined;
+		const nextTrigger = nextItem ? this.#getTrigger(nextItem) : undefined;
 
-		if (nextLink) {
-			this.#setRovingTabindex(nextLink);
-			nextLink.focus();
+		if (nextTrigger) {
+			this.#setRovingTabindex(nextTrigger);
+			nextTrigger.focus();
 		}
 	}
 
@@ -291,11 +294,11 @@ class NavMenu extends HTMLElement {
 
 		if (!submenu) return;
 
-		const firstLink = this.#getMenuitems(submenu)[0];
+		const firstTrigger = this.#getMenuitems(submenu)[0];
 
-		if (firstLink) {
-			this.#setRovingTabindex(firstLink);
-			firstLink.focus();
+		if (firstTrigger) {
+			this.#setRovingTabindex(firstTrigger);
+			firstTrigger.focus();
 		}
 	}
 
@@ -305,11 +308,11 @@ class NavMenu extends HTMLElement {
 		if (!parentUl) return;
 
 		const menuitems = this.#getMenuitems(parentUl);
-		const link = edge === 'first' ? menuitems[0] : menuitems.at(-1);
+		const trigger = edge === 'first' ? menuitems[0] : menuitems.at(-1);
 
-		if (link) {
-			this.#setRovingTabindex(link);
-			link.focus();
+		if (trigger) {
+			this.#setRovingTabindex(trigger);
+			trigger.focus();
 		}
 	}
 
@@ -321,13 +324,13 @@ class NavMenu extends HTMLElement {
 		return [...parentUl.querySelectorAll<HTMLElement>(':scope > li')];
 	}
 
-	#setRovingTabindex(activeLink: HTMLElement) {
-		const parentUl = activeLink.closest<HTMLElement>('ul');
+	#setRovingTabindex(activeTrigger: HTMLElement) {
+		const parentUl = activeTrigger.closest<HTMLElement>('ul');
 
 		if (!parentUl) return;
 
-		for (const link of this.#getMenuitems(parentUl)) {
-			link.setAttribute('tabindex', link === activeLink ? '0' : '-1');
+		for (const trigger of this.#getMenuitems(parentUl)) {
+			trigger.setAttribute('tabindex', trigger === activeTrigger ? '0' : '-1');
 		}
 	}
 
@@ -344,9 +347,9 @@ class NavMenu extends HTMLElement {
 		for (const li of this.querySelectorAll<HTMLElement>('li')) {
 			li.setAttribute('role', 'none');
 
-			const link = this.#getLink(li);
+			const trigger = this.#getTrigger(li);
 
-			if (link) link.setAttribute('role', 'menuitem');
+			if (trigger) trigger.setAttribute('role', 'menuitem');
 
 			const submenu = this.#getSubmenu(li);
 
@@ -358,17 +361,17 @@ class NavMenu extends HTMLElement {
 				submenu.id = id;
 				submenu.setAttribute('role', 'menu');
 
-				if (link) {
-					link.setAttribute('aria-haspopup', 'true');
-					link.setAttribute('aria-expanded', 'false');
-					link.setAttribute('aria-controls', id);
+				if (trigger) {
+					trigger.setAttribute('aria-haspopup', 'true');
+					trigger.setAttribute('aria-expanded', 'false');
+					trigger.setAttribute('aria-controls', id);
 				}
 			}
 		}
 
 		// Roving tabindex on menubar items
-		for (const [index, link] of this.#getMenuitems(menubar).entries()) {
-			link.setAttribute('tabindex', index === 0 ? '0' : '-1');
+		for (const [index, trigger] of this.#getMenuitems(menubar).entries()) {
+			trigger.setAttribute('tabindex', index === 0 ? '0' : '-1');
 		}
 	}
 

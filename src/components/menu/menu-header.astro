@@ -24,35 +24,57 @@ const t = getTranslations();
 	<nav class="nav-menu" aria-label={t('site.menu.header.label')} data-nosnippet {...props}>
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{
-				menuItems.map((item) => (
-					<li class="nav-item">
-						<div class="nav-item-trigger">
-							<Link
-								class:list={[
-									'nav-item-link',
-									isActiveMenuItem(item, pathname) ? 'nav-active' : undefined,
-								]}
-								href={item.url}
-								linkColor="accent"
-								{...(item.rel ? { rel: item.rel } : undefined)}
-							>
-								{item.title}
-							</Link>
-							{item.children ? (
-								<svg width="24" height="24" viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
-									<use href="#icon:chevron-down" />
-								</svg>
+				menuItems.map((item) => {
+					const children = item.children;
+					const isActive = isActiveMenuItem(item, pathname);
+					const triggerClasses = ['nav-item-link', isActive ? 'nav-active' : undefined];
+
+					return (
+						<li class="nav-item">
+							<div class="nav-item-trigger">
+								{item.url ? (
+									<Link
+										class:list={triggerClasses}
+										href={item.url}
+										linkColor="accent"
+										{...(item.rel ? { rel: item.rel } : undefined)}
+									>
+										{item.title}
+									</Link>
+								) : undefined}
+								{!item.url && children?.length ? (
+									<button
+										type="button"
+										class:list={['l-all l-accent l-dark', ...triggerClasses]}
+									>
+										{item.title}
+									</button>
+								) : undefined}
+								{!item.url && !children?.length ? (
+									<span class:list={triggerClasses}>{item.title}</span>
+								) : undefined}
+								{children?.length ? (
+									<svg
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										class="nav-icon"
+										aria-hidden="true"
+									>
+										<use href="#icon:chevron-down" />
+									</svg>
+								) : undefined}
+							</div>
+							{children?.length ? (
+								<MenuHeaderSubmenu
+									menuItems={children}
+									depth={1}
+									ariaLabel={getMenuItemAriaLabel(item)}
+								/>
 							) : undefined}
-						</div>
-						{item.children ? (
-							<MenuHeaderSubmenu
-								menuItems={item.children}
-								depth={1}
-								ariaLabel={getMenuItemAriaLabel(item)}
-							/>
-						) : undefined}
-					</li>
-				))
+						</li>
+					);
+				})
 			}
 		</ul>
 	</nav>
