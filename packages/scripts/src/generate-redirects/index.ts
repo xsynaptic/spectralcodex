@@ -5,14 +5,13 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { getDataStoreCollection, getPublicId, loadDataStore } from '../shared/data-store';
+import { findWorkspaceRoot } from '../shared/utils.js';
+
+const rootPath = findWorkspaceRoot();
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			default: process.cwd(),
-		},
 		'data-store-path': {
 			type: 'string',
 			default: '.astro/data-store.json',
@@ -20,7 +19,6 @@ const { values } = parseArgs({
 	},
 });
 
-const rootPath = values['root-path'];
 const dataStorePath = path.join(rootPath, values['data-store-path']);
 const outputPath = path.join(
 	rootPath,

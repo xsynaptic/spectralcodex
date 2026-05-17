@@ -4,6 +4,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { findWorkspaceRoot } from '../shared/utils.js';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
 import { checkImageFeaturedInBody } from './image-featured-in-body';
@@ -16,13 +17,11 @@ import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
 
+const rootPath = findWorkspaceRoot();
+
 const { values, positionals } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			default: process.cwd(),
-		},
 		'data-store-path': {
 			type: 'string',
 			default: '.astro/data-store.json',
@@ -43,7 +42,7 @@ const { values, positionals } = parseArgs({
 	allowPositionals: true,
 });
 
-const dataStorePath = path.join(values['root-path'], values['data-store-path']);
+const dataStorePath = path.join(rootPath, values['data-store-path']);
 const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];
@@ -85,7 +84,7 @@ switch (command) {
 	case 'location-coordinates': {
 		await checkLocationsCoordinates(
 			getDataStoreCollection(collections, ['locations']),
-			path.join(values['root-path'], values['divisions-path']),
+			path.join(rootPath, values['divisions-path']),
 		);
 		break;
 	}
@@ -133,7 +132,7 @@ switch (command) {
 	}
 	// Check for image references that do not exist
 	case 'images': {
-		checkImageReferences(allEntries, path.join(values['root-path'], values['media-path']));
+		checkImageReferences(allEntries, path.join(rootPath, values['media-path']));
 		break;
 	}
 	default: {
@@ -147,7 +146,7 @@ switch (command) {
 			checkMdxComponents(allEntries),
 			checkLinkIds(allEntries, metadataEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),
-			checkImageReferences(allEntries, path.join(values['root-path'], values['media-path'])),
+			checkImageReferences(allEntries, path.join(rootPath, values['media-path'])),
 			checkImageFeaturedInBody(bodyContentEntries),
 			checkImageFeaturedLinks(allEntries, metadataEntries),
 			checkLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),
@@ -161,7 +160,7 @@ switch (command) {
 
 		const asyncResults = await checkLocationsCoordinates(
 			getDataStoreCollection(collections, ['locations']),
-			path.join(values['root-path'], values['divisions-path']),
+			path.join(rootPath, values['divisions-path']),
 		);
 
 		if ([...syncResults, asyncResults].some((success) => !success)) process.exit(1);

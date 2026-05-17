@@ -3,13 +3,13 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { findWorkspaceRoot } from '../shared/utils.js';
+
+const rootPath = findWorkspaceRoot();
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			default: process.cwd(),
-		},
 		'output-path': {
 			type: 'string',
 			default: 'content',
@@ -25,4 +25,4 @@ if (!values['output-path']) {
 /**
  * This simple script copies content collection schemas into the actual content package consumed by this project
  */
-await $`cp ${path.join(values['root-path'], '.astro/collections')}/*.schema.json ${path.join(values['root-path'], values['output-path'], 'schemas')}`;
+await $`cp ${path.join(rootPath, '.astro/collections')}/*.schema.json ${path.join(rootPath, values['output-path'], 'schemas')}`;

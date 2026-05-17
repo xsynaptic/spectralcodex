@@ -22,21 +22,18 @@ async function resolveLatestRelease(): Promise<string> {
 }
 
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
-import { fileExists, safelyCreateDirectory } from '../shared/utils';
+import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
 import { convertToFeatureCollection } from './geojson';
 import { saveSvg } from './svg';
 
+const rootPath = findWorkspaceRoot();
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			short: 'r',
-			default: process.cwd(),
-		},
 		'output-path': {
 			type: 'string',
 			short: 'o',
@@ -55,8 +52,8 @@ const { values } = parseArgs({
 	},
 });
 
-const cachePath = path.join(values['root-path'], values['cache-path']);
-const outputPath = path.join(values['root-path'], values['output-path']);
+const cachePath = path.join(rootPath, values['cache-path']);
+const outputPath = path.join(rootPath, values['output-path']);
 
 async function processRegions(
 	db: DuckDBConnection,
@@ -249,9 +246,7 @@ async function mapDivisions() {
 
 	try {
 		// Load region data from data-store
-		const { collections } = loadDataStore(
-			path.join(values['root-path'], values['data-store-path']),
-		);
+		const { collections } = loadDataStore(path.join(rootPath, values['data-store-path']));
 		const regionEntries = getDataStoreCollection(collections, ['regions']);
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);

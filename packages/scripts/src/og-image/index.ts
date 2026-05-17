@@ -15,18 +15,16 @@ import sharp from 'sharp';
 
 import type { OpenGraphFontConfig } from './types.js';
 
-import { safelyCreateDirectory } from '../shared/utils.js';
+import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { getBuiltEntries } from './content.js';
 import { loadFonts } from './fonts.js';
 import { createGenerator } from './generate.js';
 
+const rootPath = findWorkspaceRoot();
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			default: process.cwd(),
-		},
 		'data-store-path': {
 			type: 'string',
 			default: '.astro/data-store.json',
@@ -86,7 +84,7 @@ interface CacheEntry {
 
 // Load the source image from the media path
 async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined> {
-	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
+	const imagePath = path.join(rootPath, values['media-path'], imageId);
 
 	try {
 		await fs.access(imagePath, fs.constants.R_OK);
@@ -98,7 +96,7 @@ async function getSourceImage(imageId: string): Promise<sharp.Sharp | undefined>
 }
 
 async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
-	const imagePath = path.join(values['root-path'], values['media-path'], imageId);
+	const imagePath = path.join(rootPath, values['media-path'], imageId);
 
 	try {
 		const stats = await fs.stat(imagePath);
@@ -113,12 +111,8 @@ async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
 
 	if (values['clear-cache']) {
-		const outputPath = path.resolve(values['root-path'], values['output-path']);
-		const cacheFile = path.resolve(
-			values['root-path'],
-			values['cache-path'],
-			'og-image-cache.json',
-		);
+		const outputPath = path.resolve(rootPath, values['output-path']);
+		const cacheFile = path.resolve(rootPath, values['cache-path'], 'og-image-cache.json');
 		rmSync(outputPath, { force: true, recursive: true });
 		rmSync(cacheFile, { force: true });
 		console.log(chalk.yellow(`🗑️  Cleared OG image output and cache file`));
@@ -139,8 +133,8 @@ async function main() {
 	});
 
 	const { entries, unresolved } = getBuiltEntries({
-		dataStorePath: path.resolve(values['root-path'], values['data-store-path']),
-		distPath: path.resolve(values['root-path'], values['dist-path']),
+		dataStorePath: path.resolve(rootPath, values['data-store-path']),
+		distPath: path.resolve(rootPath, values['dist-path']),
 	});
 
 	if (unresolved.length > 0) {
@@ -159,8 +153,8 @@ async function main() {
 
 	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
 
-	const outputPath = path.resolve(values['root-path'], values['output-path']);
-	const cachePath = path.resolve(values['root-path'], values['cache-path']);
+	const outputPath = path.resolve(rootPath, values['output-path']);
+	const cachePath = path.resolve(rootPath, values['cache-path']);
 
 	safelyCreateDirectory(outputPath);
 	safelyCreateDirectory(cachePath);

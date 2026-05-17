@@ -12,7 +12,9 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 import type { DataStoreEntry } from '../shared/data-store.js';
 
 import { getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
-import { safelyCreateDirectory } from '../shared/utils.js';
+import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
+
+const rootPath = findWorkspaceRoot();
 
 /**
  * Arguments
@@ -20,10 +22,6 @@ import { safelyCreateDirectory } from '../shared/utils.js';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': {
-			type: 'string',
-			default: process.cwd(),
-		},
 		'data-store-path': {
 			type: 'string',
 			default: '.astro/data-store.json',
@@ -34,7 +32,7 @@ const { values } = parseArgs({
 		},
 		'cache-name': {
 			type: 'string',
-			default: 'content-related-cache',
+			default: 'similar-content-cache',
 		},
 		'output-path': {
 			type: 'string',
@@ -42,7 +40,7 @@ const { values } = parseArgs({
 		},
 		'output-name': {
 			type: 'string',
-			default: 'content-related.json',
+			default: 'similar-content.json',
 		},
 		'progress-count': {
 			type: 'string',
@@ -70,26 +68,26 @@ interface ContentEntry extends DataStoreEntry {
 	collection: string;
 }
 
-interface ContentRelatedMetadata {
+interface SimilarContentMetadata {
 	themes: Array<string>;
 	regions: Array<string>;
 }
 
-interface ContentRelatedEmbedding {
+interface SimilarContentEmbedding {
 	id: string;
 	digest: string;
 	collection: string;
 	vector: Array<number>;
-	metadata: ContentRelatedMetadata;
+	metadata: SimilarContentMetadata;
 }
 
-interface ContentRelatedItem {
+interface SimilarContentItem {
 	id: string;
 	collection: string;
 	score: number;
 }
 
-type ContentRelatedResult = Record<string, Array<ContentRelatedItem>>;
+type SimilarContentResult = Record<string, Array<SimilarContentItem>>;
 
 /**
  * Models; a small sampling of some options; more complex models are more accurate but slower
@@ -130,8 +128,8 @@ function toStringArray(value: unknown): Array<string> {
  * Calculate metadata boost based on shared regions and themes
  */
 function calculateMetadataBoost(
-	current: ContentRelatedEmbedding,
-	other: ContentRelatedEmbedding,
+	current: SimilarContentEmbedding,
+	other: SimilarContentEmbedding,
 ): number {
 	let boost = 0;
 
@@ -160,8 +158,8 @@ function getCacheNamespace(cacheName: string, modelKey: string): string {
  */
 async function generateEmbeddings(
 	entries: Array<ContentEntry>,
-): Promise<Array<ContentRelatedEmbedding>> {
-	const cachePath = path.join(values['root-path'], values['cache-path']);
+): Promise<Array<SimilarContentEmbedding>> {
+	const cachePath = path.join(rootPath, values['cache-path']);
 	const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
 	const cache = getFileCacheInstance(cachePath, cacheNamespace);
 
@@ -170,7 +168,7 @@ async function generateEmbeddings(
 
 	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(modelId)}`));
 
-	const embeddings: Array<ContentRelatedEmbedding> = [];
+	const embeddings: Array<SimilarContentEmbedding> = [];
 
 	let cacheHits = 0;
 	let generated = 0;
@@ -181,7 +179,7 @@ async function generateEmbeddings(
 		if (!entry?.digest) continue;
 
 		try {
-			const cachedEmbedding = await cache.get<ContentRelatedEmbedding>(entry.id);
+			const cachedEmbedding = await cache.get<SimilarContentEmbedding>(entry.id);
 
 			if (cachedEmbedding?.digest === entry.digest) {
 				embeddings.push(cachedEmbedding);
@@ -191,7 +189,7 @@ async function generateEmbeddings(
 				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
 				const vector = [...output.data] as Array<number>;
 
-				const embedding: ContentRelatedEmbedding = {
+				const embedding: SimilarContentEmbedding = {
 					id: entry.id,
 					digest: entry.digest,
 					collection: entry.collection,
@@ -232,7 +230,7 @@ async function generateEmbeddings(
 /**
  * Calculate similarities using usearch ANN index
  */
-function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): ContentRelatedResult {
+function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
 	const firstVector = embeddings[0]?.vector;
 
 	if (!firstVector) {
@@ -241,7 +239,7 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 
 	// Build ID mappings (usearch needs numeric BigInt keys)
 	const idToKey = new Map<string, bigint>();
-	const keyToEmbedding = new Map<bigint, ContentRelatedEmbedding>();
+	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
 
 	for (const [index, embedding] of embeddings.entries()) {
 		const key = BigInt(index);
@@ -268,17 +266,17 @@ function calculateSimilarities(embeddings: Array<ContentRelatedEmbedding>): Cont
 	}
 
 	// Query for similar items and re-rank with metadata boost
-	console.log(chalk.blue('Querying for related content...'));
+	console.log(chalk.blue('Querying for similar content...'));
 
 	const queryStart = performance.now();
-	const result: ContentRelatedResult = {};
+	const result: SimilarContentResult = {};
 	const resultCount = Number(values['result-count']);
 	const candidateCount = Math.max(resultCount * 5, 50); // Fetch extra for re-ranking
 
 	for (const current of embeddings) {
 		const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
 
-		const candidates: Array<ContentRelatedItem> = [];
+		const candidates: Array<SimilarContentItem> = [];
 
 		for (const [i, key] of keys.entries()) {
 			const distance = distances[i];
@@ -351,16 +349,16 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 /**
  * Main function
  */
-async function contentRelated() {
+async function similarContent() {
 	try {
-		console.log(chalk.magenta('=== Related Content Generator ==='));
+		console.log(chalk.magenta('=== Similar Content Generator ==='));
 
-		const dataStorePath = path.join(values['root-path'], values['data-store-path']);
+		const dataStorePath = path.join(rootPath, values['data-store-path']);
 
-		safelyCreateDirectory(path.join(values['root-path'], values['cache-path']));
+		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
 
 		if (values['clear-cache']) {
-			const cacheDir = path.join(values['root-path'], values['cache-path']);
+			const cacheDir = path.join(rootPath, values['cache-path']);
 			const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
 			const cacheFiles = readdirSync(cacheDir).filter((file) => file === `${cacheNamespace}.json`);
 			for (const file of cacheFiles) {
@@ -388,17 +386,17 @@ async function contentRelated() {
 			process.exit(1);
 		}
 
-		const relatedContentItems = calculateSimilarities(embeddings);
-		const outputPath = path.join(values['root-path'], values['output-path'], values['output-name']);
+		const similarContentItems = calculateSimilarities(embeddings);
+		const outputPath = path.join(rootPath, values['output-path'], values['output-name']);
 
 		// eslint-disable-next-line unicorn/no-null
-		writeFileSync(outputPath, JSON.stringify(relatedContentItems, null, 2));
+		writeFileSync(outputPath, JSON.stringify(similarContentItems, null, 2));
 
 		const totalTime = ((performance.now() - totalStart) / 1000).toFixed(2);
 
 		console.log(
 			chalk.green(
-				`✅ Related content data for ${chalk.cyan(String(Object.keys(relatedContentItems).length))} items written to ${chalk.cyan(outputPath)}`,
+				`✅ Similar content data for ${chalk.cyan(String(Object.keys(similarContentItems).length))} items written to ${chalk.cyan(outputPath)}`,
 			),
 		);
 		console.log(chalk.magenta(`Total time: ${chalk.cyan(totalTime)}s`));
@@ -408,4 +406,4 @@ async function contentRelated() {
 	}
 }
 
-await contentRelated();
+await similarContent();

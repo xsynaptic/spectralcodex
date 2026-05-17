@@ -5,7 +5,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { ensureSshKeychain } from '../shared/utils.js';
+import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 
 interface DeployMediaOptions {
@@ -69,7 +69,6 @@ if (scriptPath.includes('deploy-media')) {
 	const { values, positionals } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
-			'root-path': { type: 'string', default: process.cwd() },
 			'dry-run': { type: 'boolean', default: false },
 		},
 		allowPositionals: true,
@@ -78,7 +77,7 @@ if (scriptPath.includes('deploy-media')) {
 	await ensureSshKeychain();
 
 	await deployMedia({
-		rootPath: values['root-path'],
+		rootPath: findWorkspaceRoot(),
 		dryRun: values['dry-run'],
 		fast: positionals[0] === 'fast',
 	});

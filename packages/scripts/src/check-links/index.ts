@@ -7,6 +7,7 @@ import pLimit from 'p-limit';
 import type { UrlStatus } from './types.ts';
 
 import { loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
+import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
 	closeDatabase,
@@ -30,10 +31,11 @@ const STATUS_LABELS: Record<UrlStatus, string> = {
 	[UrlStatusEnum.Error]: chalk.red('Error'),
 } as const;
 
+const rootPath = findWorkspaceRoot();
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': { type: 'string', default: process.cwd() },
 		'data-store-path': { type: 'string', default: '.astro/data-store.json' },
 		'db-path': { type: 'string', default: '.cache/check-links.db' },
 		recheck: { type: 'string' },
@@ -60,7 +62,6 @@ export const LINK_COLLECTIONS = [
 	'themes',
 ] as const;
 
-const rootPath = values['root-path'];
 const dataStorePath = path.resolve(rootPath, values['data-store-path']);
 const dbPath = path.resolve(rootPath, values['db-path']);
 const concurrency = Number.parseInt(values.concurrency, 10);

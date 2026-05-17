@@ -2,6 +2,8 @@
 import chalk from 'chalk';
 import { parseArgs } from 'node:util';
 
+import { findWorkspaceRoot } from '../shared/utils.js';
+
 interface PurgeCacheOptions {
 	rootPath: string;
 	dryRun?: boolean;
@@ -61,13 +63,12 @@ if (scriptPath.includes('deploy-cache-purge')) {
 	const { values } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
-			'root-path': { type: 'string', default: process.cwd() },
 			'dry-run': { type: 'boolean', default: false },
 		},
 	});
 
 	await purgeCache({
-		rootPath: values['root-path'],
+		rootPath: findWorkspaceRoot(),
 		dryRun: values['dry-run'],
 	});
 }

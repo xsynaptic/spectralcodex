@@ -116,7 +116,6 @@ if (process.argv[1]?.endsWith('manifest.ts')) {
 	const { values } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
-			'root-path': { type: 'string', default: process.cwd() },
 			'dist-path': { type: 'string', default: 'dist' },
 			'output-path': { type: 'string', default: 'dist/cache-manifest.json' },
 			'url-pattern': { type: 'string' },

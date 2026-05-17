@@ -5,10 +5,12 @@ import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { $ } from 'zx';
 
+import { findWorkspaceRoot } from '../shared/utils.js';
+
 // Must match deploy-image-server.ts so dev and deploy share the bundle
 const IMAGE_NAME = 'spectralcodex-image-server';
 
-const rootPath = process.cwd();
+const rootPath = findWorkspaceRoot();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 const bundlePath = `/tmp/${IMAGE_NAME}-bundle`;
 const bundleMarker = path.join(bundlePath, 'dist/image-server.mjs');
@@ -109,7 +111,7 @@ $`docker compose -f ${composePath} --project-directory ${rootPath} up -d --build
 	});
 
 try {
-	await $({ stdio: 'inherit' })`npx astro dev`;
+	await $({ stdio: 'inherit', cwd: rootPath })`npx astro dev`;
 } catch {
 	cleanup();
 }

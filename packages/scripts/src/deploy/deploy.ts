@@ -6,7 +6,7 @@ import { $ } from 'zx';
 
 import { cacheWarmNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
-import { ensureSshKeychain } from '../shared/utils.js';
+import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
 import { purgeCache } from './deploy-cache-purge.js';
 import { deployCaddy } from './deploy-caddy.js';
@@ -14,17 +14,17 @@ import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
 import { deployOg } from './deploy-og.js';
 
+const rootPath = findWorkspaceRoot();
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'root-path': { type: 'string', default: process.cwd() },
 		'cache-path': { type: 'string', default: './.cache' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},
 });
 
-const rootPath = values['root-path'];
 const cachePath = path.join(rootPath, values['cache-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
@@ -46,26 +46,28 @@ async function sync() {
 
 async function validate() {
 	console.log(chalk.blue('Validating content...'));
-	await $({ stdio: 'inherit' })`pnpm content-validate --root-path=${rootPath}`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm validate-content`;
 }
 
 async function generateRedirects() {
 	console.log(chalk.blue('Generating redirects...'));
-	await $({ stdio: 'inherit' })`pnpm generate-redirects --root-path=${rootPath}`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm generate-redirects`;
 }
 
-async function related() {
-	console.log(chalk.blue('Generating related content...'));
+async function similar() {
+	console.log(chalk.blue('Generating similar content...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm content-related --root-path=${rootPath}`;
+		cwd: rootPath,
+	})`pnpm similar-content`;
 }
 
 async function opengraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
 		stdio: 'inherit',
-	})`pnpm og-image --root-path=${rootPath} --dist-path=${distPath}`;
+		cwd: rootPath,
+	})`pnpm og-image --dist-path=${distPath}`;
 }
 
 async function og() {
@@ -137,7 +139,7 @@ try {
 	await sync();
 	await validate();
 	await generateRedirects();
-	await related();
+	await similar();
 	await build();
 	await opengraph();
 	await test();

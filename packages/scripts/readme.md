@@ -4,15 +4,15 @@ Internal tooling for [Spectral Codex](https://spectralcodex.com) content process
 
 ## Content Processing
 
-### `content-related`
+### `similar-content`
 
 Generates semantic similarity scores between content entries using transformer-based embeddings.
 
 Processes MDX content into embeddings via [Transformers.js](https://huggingface.co/docs/transformers.js), combining cosine similarity with metadata-based scoring boosts (shared themes/regions). Results cached with content digest hashes via Keyv to skip regeneration for unchanged files.
 
-Output: JSON mapping of content IDs to ranked related items.
+Output: JSON mapping of content IDs to ranked similar items.
 
-### `content-validate`
+### `validate-content`
 
 Runs validation checks against content:
 
@@ -58,8 +58,8 @@ Starts Docker containers (IPX image server) alongside Astro dev server. Loads `.
 Full deployment pipeline:
 
 1. `astro sync` - sync content
-2. `content-validate` - validate content
-3. `content-related` - generate similarity data
+2. `validate-content` - validate content
+3. `similar-content` - generate similarity data
 4. `og-image` - generate OG images
 5. `astro build` - build site
 6. `image-server-manifest` - extract image URLs

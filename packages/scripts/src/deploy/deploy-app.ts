@@ -5,7 +5,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { ensureSshKeychain } from '../shared/utils.js';
+import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 
 interface DeployAppOptions {
@@ -53,7 +53,6 @@ if (scriptPath.includes('deploy-app')) {
 	const { values } = parseArgs({
 		args: process.argv.slice(2),
 		options: {
-			'root-path': { type: 'string', default: process.cwd() },
 			'dry-run': { type: 'boolean', default: false },
 			'skip-delete': { type: 'boolean', default: false },
 		},
@@ -62,7 +61,7 @@ if (scriptPath.includes('deploy-app')) {
 	await ensureSshKeychain();
 
 	await deployApp({
-		rootPath: values['root-path'],
+		rootPath: findWorkspaceRoot(),
 		dryRun: values['dry-run'],
 		skipDelete: values['skip-delete'],
 	});
