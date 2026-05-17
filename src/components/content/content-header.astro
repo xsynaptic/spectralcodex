@@ -1,4 +1,6 @@
 ---
+import { stripTags } from '@xsynaptic/unified-tools';
+
 import Container from '#components/parts/container.astro';
 import TextGradient from '#components/parts/text-gradient.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
@@ -15,6 +17,8 @@ const titleMultilingual = await renderSlot(Astro.slots, 'header-title-multilingu
 const titleInfo = await renderSlot(Astro.slots, 'header-title-info');
 const subtitle = await renderSlot(Astro.slots, 'header-subtitle');
 const caption = await renderSlot(Astro.slots, 'header-caption');
+
+const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).trim() : undefined;
 ---
 
 <Container
@@ -38,7 +42,10 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 						: 'text-lg md:text-xl lg:text-2xl',
 				]}
 				style={{ marginLeft: '-0.125rem' }}
-				data-pagefind-weight="2"
+				{...(titleMultilingualText
+					? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
+					: undefined)}
+				data-pagefind-ignore
 			>
 				<Fragment set:html={titleMultilingual} />
 			</TextGradient>
@@ -58,7 +65,6 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
 			style={{ lineHeight: '1.125', marginLeft: '-0.125rem' }}
-			data-pagefind-weight="3"
 		>
 			{title ? <Fragment set:html={title} /> : undefined}
 		</TextGradient>

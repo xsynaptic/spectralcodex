@@ -25,6 +25,7 @@ const {
 	class: className,
 	gradientColor = GradientColorEnum.Primary,
 	showDarkMode = true,
+	...props
 } = Astro.props;
 ---
 
@@ -88,5 +89,6 @@ const {
 				]
 			: undefined,
 		className,
-	]}><slot /></Tag
+	]}
+	{...props}><slot /></Tag
 >
