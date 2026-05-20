@@ -38,6 +38,19 @@ export function formatNumber({
 	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
 }
 
+/**
+ * Strips GFM-style footnotes from HTML content using a simple regex approach
+ */
+export function stripFootnotes(input: string): string {
+	// Remove footnote references (`sup` elements with footnote links)
+	let result = input.replaceAll(/<sup><a[^>]*data-footnote-ref[^>]*>.*?<\/a><\/sup>/gi, '');
+
+	// Remove the entire footnotes section
+	result = result.replaceAll(/<section[^>]*data-footnotes[^>]*>.*?<\/section>/gis, '');
+
+	return result;
+}
+
 // Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
 export function stripFootnoteReferences(input: string) {
 	return input.replaceAll(/\[\^[^\]]+\]/g, '');

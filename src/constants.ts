@@ -5,7 +5,7 @@
 export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 
 // An arbitrary identified for the "more" excerpt, used internally
-export const CONTENT_EXCERPT_IDENTIFIER = 'more';
+export const CONTENT_EXCERPT_IDENTIFIER = '<!-- more -->';
 
 /**
  * Image configuration

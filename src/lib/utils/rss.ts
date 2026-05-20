@@ -17,6 +17,7 @@ import { createFilterEntryQualityFunction, getPublicId } from '#lib/utils/collec
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+import { stripFootnotes } from '#lib/utils/text.ts';
 
 /**
  * Use Astro's Container API to render MDX content
@@ -36,19 +37,6 @@ async function createRenderMdxFunction() {
 
 		return await container.renderToString(Content, options);
 	};
-}
-
-/**
- * Strips GFM-style footnotes from HTML content using a simple regex approach
- */
-function stripFootnotes(input: string): string {
-	// Remove footnote references (`sup` elements with footnote links)
-	let result = input.replaceAll(/<sup><a[^>]*data-footnote-ref[^>]*>.*?<\/a><\/sup>/gi, '');
-
-	// Remove the entire footnotes section
-	result = result.replaceAll(/<section[^>]*data-footnotes[^>]*>.*?<\/section>/gis, '');
-
-	return result;
 }
 
 const renderMdx = await createRenderMdxFunction();
