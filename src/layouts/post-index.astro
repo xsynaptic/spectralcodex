@@ -1,25 +1,29 @@
 ---
 import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
+import { render } from 'astro:content';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
-
+import ContentDate from '#components/content/content-date.astro';
+import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import MetadataGrid from '#components/parts/metadata-grid.astro';
+import DividedItem from '#components/parts/divided-item.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import Pagination from '#components/parts/pagination.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	page: Page<ContentMetadataItem>;
-	pageTitle?: string;
+	page: Page<CollectionEntry<'posts'>>;
 }
 
-const { page, pageTitle } = Astro.props;
+const { page } = Astro.props;
 
 const t = getTranslations();
 
@@ -39,7 +43,7 @@ const description = t('collection.posts.description');
 	}}
 >
 	<ContentHeader>
-		<Fragment slot="header-title">{pageTitle ?? title}</Fragment>
+		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-title-info"><PaginationCounter page={page} /></Fragment>
 	</ContentHeader>
 	<ContentSection>
@@ -47,12 +51,41 @@ const description = t('collection.posts.description');
 			slot="section-description"
 			set:html={page.currentPage === 1 ? transformMarkdown({ input: description }) : undefined}
 		/>
-		<MetadataGrid
-			items={page.data}
-			showDate={true}
-			showRegion={true}
-			showTitleMultilingual={true}
-		/>
+	</ContentSection>
+	{
+		page.data.length > 0
+			? page.data.map(async (entry, index) => {
+					const { Content } = await render(entry);
+					const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+
+					return (
+						<ContentExcerpt
+							entryUrl={getContentUrl(entry.collection, entry.id)}
+							imageId={imageFeaturedId}
+							showDivider={index + 1 < page.data.length}
+						>
+							<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
+							<Fragment slot="excerpt-subtitle">
+								<DividedItem>
+									<ContentDate date={entry.data.dateCreated} datePreset={DatePresetEnum.Medium} />
+								</DividedItem>
+								{entry.data.dateUpdated ? (
+									<DividedItem>
+										<ContentDate
+											date={entry.data.dateUpdated}
+											datePreset={DatePresetEnum.Medium}
+											showUpdated={true}
+										/>
+									</DividedItem>
+								) : undefined}
+							</Fragment>
+							<Content />
+						</ContentExcerpt>
+					);
+				})
+			: undefined
+	}
+	<ContentSection>
 		<Pagination class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

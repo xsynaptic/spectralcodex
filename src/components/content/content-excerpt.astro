@@ -1,20 +1,29 @@
 ---
-import ContentImage from '#components/content/content-image.astro';
+import type { HTMLAttributes } from 'astro/types';
+
+import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
+
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Container from '#components/parts/container.astro';
+import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
 import Prose from '#components/parts/prose.astro';
-import { CONTENT_EXCERPT_IDENTIFIER } from '#constants.ts';
+import { CONTENT_EXCERPT_IDENTIFIER, IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
+import { ImageFitOptionEnum, ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { stripFootnotes } from '#lib/utils/text.ts';
+import { sanitizeImageAltAttribute, stripFootnotes } from '#lib/utils/text.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'article'> {
 	class?: string | undefined;
 	entryUrl: string;
 	imageId?: string | undefined;
+	showDivider?: boolean | undefined;
 }
 
-const { class: className, entryUrl, imageId } = Astro.props;
+const { class: className, entryUrl, imageId, showDivider, ...props } = Astro.props;
 
 const subtitle = await renderSlot(Astro.slots, 'excerpt-subtitle');
 const description = await renderSlot(Astro.slots, 'excerpt-description');
@@ -25,10 +34,55 @@ const excerptSplit = content?.split(CONTENT_EXCERPT_IDENTIFIER) ?? [];
 const excerptContent = excerptSplit[0] ? stripFootnotes(excerptSplit[0]) : undefined;
 const hasExcerpt = excerptSplit.length > 1;
 
+async function getImageProps(imageId: string | undefined): Promise<{
+	imageProps: ImageComponentProps | undefined;
+	placeholderProps: ImagePlaceholderProps | undefined;
+}> {
+	const getImageById = await getImageByIdFunction();
+
+	const imageEntry = getImageById(imageId);
+
+	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
+
+	const aspectRatio = 3 / 2;
+	const fit = ImageFitOptionEnum.Cover;
+
+	return {
+		imageProps: {
+			src: imageId,
+			breakpoints: getImageBreakpoints({
+				maxWidth: imageEntry.data.width,
+				widths: [
+					ImageSizeEnum.ExtraSmall,
+					ImageSizeEnum.Small,
+					ImageSizeEnum.Medium,
+					ImageSizeEnum.Large,
+					ImageSizeEnum.ExtraLarge,
+				],
+			}),
+			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+			width: ImageSizeEnum.Large,
+			height: Math.round(ImageSizeEnum.Large / aspectRatio),
+			alt: sanitizeImageAltAttribute(imageEntry.data.title),
+			unstyled: true,
+			operations: { fit },
+			imageQuality: IMAGE_HQ_QUALITY,
+			imageFormat: IMAGE_HQ_FORMAT,
+		},
+		placeholderProps: {
+			imageId,
+			aspectRatio,
+			fit,
+		},
+	};
+}
+
+const { imageProps, placeholderProps } = await getImageProps(imageId);
+
 const t = getTranslations();
 ---
 
-<article class={className}>
+<article class={className} {...props}>
 	<Container as="header" class:list={[description ? undefined : 'mb-2']}>
 		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
 			<a
@@ -61,7 +115,20 @@ const t = getTranslations();
 			) : undefined
 		}
 	</Container>
-	{imageId ? <ContentImage imageId={imageId} /> : undefined}
+	{
+		imageProps && placeholderProps ? (
+			<Container class="mb-2 md:mb-4">
+				<ImagePlaceholder
+					class="relative overflow-hidden rounded-xs"
+					placeholderProps={placeholderProps}
+				>
+					<a href={entryUrl}>
+						<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
+					</a>
+				</ImagePlaceholder>
+			</Container>
+		) : undefined
+	}
 	<Prose class:list={['pb-4']} showBlocks={true}><Fragment set:html={excerptContent} /></Prose>
 	{
 		hasExcerpt ? (
@@ -71,3 +138,10 @@ const t = getTranslations();
 		) : undefined
 	}
 </article>
+{
+	showDivider ? (
+		<Container as="div">
+			<hr class="mt-8 mb-8 text-primary-200 dark:text-primary-700" />
+		</Container>
+	) : undefined
+}

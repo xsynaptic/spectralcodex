@@ -92,7 +92,7 @@ async function getImageProps(): Promise<{
 			imageQuality: IMAGE_HQ_QUALITY,
 			imageFormat: IMAGE_HQ_FORMAT,
 			...(priority ? { priority: true } : {}),
-			alt: sanitizeImageAltAttribute(altProp ?? slotContents ?? ''),
+			alt: sanitizeImageAltAttribute(altProp ?? slotContents ?? imageEntry.data.title),
 		},
 		placeholderProps: {
 			imageId,
@@ -119,7 +119,7 @@ const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 				) : undefined}
 			</figure>
 		) : (
-			<figure class:list={['c-figure c-escape', `c-${layout}`]} {...props}>
+			<figure class:list={['c-wrap c-escape', `c-${layout}`]} {...props}>
 				<ImagePlaceholder placeholderProps={placeholderProps}>
 					<Image
 						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}

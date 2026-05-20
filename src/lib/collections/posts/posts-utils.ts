@@ -12,13 +12,10 @@ import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
 import {
-	createContentMetadataFunction,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import {
 	createCollectionLookupByIds,
 	createFilterEntryQualityFunction,
 } from '#lib/utils/collections.ts';
+import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 
@@ -69,12 +66,9 @@ export async function createQueryPostsEntryFunction() {
 export async function queryPostsIndex() {
 	const { entries } = await getPostsCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
-
 	return R.pipe(
 		entries,
 		R.filter(createFilterEntryQualityFunction(2)),
-		getContentMetadata,
-		R.sort(sortContentMetadataByDate),
+		R.sort(sortByDateReverseChronological),
 	);
 }

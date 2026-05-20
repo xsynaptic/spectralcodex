@@ -10,7 +10,6 @@ import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import Container from '#components/parts/container.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import Pagination from '#components/parts/pagination.astro';
@@ -58,31 +57,27 @@ const description = t('collection.notes.description');
 					const { Content } = await render(entry);
 
 					return (
-						<div>
-							<ContentExcerpt entryUrl={getContentUrl(entry.collection, entry.id)} class="mb-8">
-								<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
-								<Fragment slot="excerpt-subtitle">
+						<ContentExcerpt
+							entryUrl={getContentUrl(entry.collection, entry.id)}
+							showDivider={index + 1 < page.data.length}
+						>
+							<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
+							<Fragment slot="excerpt-subtitle">
+								<DividedItem>
+									<ContentDate date={entry.data.dateCreated} datePreset={DatePresetEnum.Medium} />
+								</DividedItem>
+								{entry.data.dateUpdated ? (
 									<DividedItem>
-										<ContentDate date={entry.data.dateCreated} datePreset={DatePresetEnum.Medium} />
+										<ContentDate
+											date={entry.data.dateUpdated}
+											datePreset={DatePresetEnum.Medium}
+											showUpdated={true}
+										/>
 									</DividedItem>
-									{entry.data.dateUpdated ? (
-										<DividedItem>
-											<ContentDate
-												date={entry.data.dateUpdated}
-												datePreset={DatePresetEnum.Medium}
-												showUpdated={true}
-											/>
-										</DividedItem>
-									) : undefined}
-								</Fragment>
-								<Content />
-							</ContentExcerpt>
-							{index + 1 < page.data.length ? (
-								<Container as="div">
-									<hr class="mb-8 text-primary-200 dark:text-primary-700" />
-								</Container>
-							) : undefined}
-						</div>
+								) : undefined}
+							</Fragment>
+							<Content />
+						</ContentExcerpt>
 					);
 				})
 			: undefined
