@@ -97,6 +97,12 @@ function getImageExposureValue({
 	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
 }
 
+// Coerce an EXIF tag to a string, preserving absence as undefined
+// String(undefined) yields the literal "undefined", which would poison fallbacks
+function getTagString(value: string | number | boolean | null | undefined): string | undefined {
+	return value === undefined || value === null ? undefined : String(value);
+}
+
 // Extract a selection of EXIF data from the image
 async function extractExifData(
 	filePathRelative: string,
@@ -105,22 +111,21 @@ async function extractExifData(
 	const tags = await exiftool.read(filePathRelative);
 
 	const dateCreated = tags.DateCreated ? tags.DateCreated.toString() : undefined;
+	const aperture = getTagString(tags.FNumber);
+	const shutterSpeed = getTagString(tags.ShutterSpeed);
 
 	return {
-		title: String(tags.Title),
-		description: String(tags.Description),
+		title: getTagString(tags.Title) ?? '',
+		description: getTagString(tags.Description) ?? '',
 		dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
-		brand: String(tags.Make),
-		camera: String(tags.Model),
-		lens: tags.LensID ?? String(tags.LensModel),
-		aperture: String(tags.FNumber),
-		shutterSpeed: String(tags.ShutterSpeed),
-		focalLength: String(tags.FocalLength),
-		iso: String(tags.ISO),
-		exposureValue: getImageExposureValue({
-			aperture: String(tags.FNumber),
-			shutterSpeed: String(tags.ShutterSpeed),
-		}),
+		brand: getTagString(tags.Make),
+		camera: getTagString(tags.Model),
+		lens: tags.LensID ?? getTagString(tags.LensModel),
+		aperture,
+		shutterSpeed,
+		focalLength: getTagString(tags.FocalLength),
+		iso: getTagString(tags.ISO),
+		exposureValue: getImageExposureValue({ aperture, shutterSpeed }),
 		...(tags.GPSLatitude && tags.GPSLongitude
 			? {
 					geometry: {
