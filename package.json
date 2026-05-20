@@ -47,7 +47,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.3.3",
+		"astro": "^6.3.5",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6"
 	},
@@ -70,7 +70,7 @@
 		"@spectralcodex/shared": "workspace:*",
 		"@spectralcodex/word-count": "workspace:*",
 		"@tailwindcss/vite": "^4.3.0",
-		"@tanstack/eslint-plugin-query": "^5.100.10",
+		"@tanstack/eslint-plugin-query": "^5.100.11",
 		"@turf/bbox": "^7.3.5",
 		"@turf/buffer": "^7.3.5",
 		"@turf/center": "^7.3.5",
@@ -108,9 +108,9 @@
 		"remeda": "^2.34.1",
 		"sharp": "^0.34.5",
 		"tailwindcss": "^4.3.0",
-		"tsx": "^4.22.0",
+		"tsx": "^4.22.2",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.59.3",
+		"typescript-eslint": "^8.59.4",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
 		"vite": "^7.3.3",
