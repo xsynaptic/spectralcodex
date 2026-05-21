@@ -27,6 +27,7 @@ import Search from '#components/search/search.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
 interface Props {
 	meta?: MetaProps;
@@ -99,7 +100,7 @@ const t = getTranslations();
 				'bg-linear-to-r from-highlight-400 to-highlight-300 text-highlight-200 dark:text-highlight-800',
 			]}
 			height="2.5px"
-			style={{ zIndex: '99' }}
+			style={{ zIndex: zIndexScaleEnum.MainProgress + 1 }}
 		/>
 		<ProgressReading
 			class:list={[
@@ -107,7 +108,7 @@ const t = getTranslations();
 				'bg-linear-to-r from-accent-500 to-accent-300 text-accent-200 dark:text-accent-800',
 			]}
 			height="2.5px"
-			style={{ zIndex: 98 }}
+			style={{ zIndex: zIndexScaleEnum.MainProgress }}
 		/>
 		<header
 			class:list={[
@@ -116,13 +117,14 @@ const t = getTranslations();
 					? 'bg-header-fade sm:absolute sm:top-0 sm:right-0 sm:left-0'
 					: 'bg-primary-100 dark:bg-primary-800',
 			]}
-			style={{ zIndex: 40 }}
+			style={{ zIndex: zIndexScaleEnum.MainHeader }}
 		>
 			<SkipLink
 				class:list={[
 					'rounded-br-sm px-4 py-1 uppercase transition-colors',
 					'bg-primary-50 text-accent-500 hover:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300',
 				]}
+				style={{ zIndex: zIndexScaleEnum.MainSkipLink }}
 				target="#main-content"
 				label={t('site.skip.label')}
 			/>

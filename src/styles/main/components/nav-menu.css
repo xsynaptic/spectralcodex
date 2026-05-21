@@ -59,6 +59,7 @@
 /* Submenu base element */
 .nav-sub-menu {
 	@apply divide-y transition-[opacity,visibility] transition-discrete;
+	--z-sub-menu: 50;
 	pointer-events: none;
 	position: absolute;
 	opacity: 0;
@@ -77,7 +78,7 @@
 	@apply divide-primary-100 bg-primary-50 shadow-md duration-200 dark:divide-primary-800 dark:bg-primary-900;
 	top: 100%;
 	left: 0;
-	z-index: 90;
+	z-index: var(--z-sub-menu);
 	margin-bottom: -1px;
 	@media (width >= 40rem) {
 		border-bottom-left-radius: var(--radius-md);
@@ -92,22 +93,19 @@
 
 .nav-sub-menu-d2 {
 	@apply divide-primary-200 bg-primary-100 shadow-md duration-50 dark:divide-primary-700 dark:bg-primary-800;
-	left: 0;
-	z-index: 91;
-	@media (width >= 40rem) {
-		border-bottom-right-radius: var(--radius-md);
-		top: 0;
-		left: 100%;
-		max-width: 12.5rem;
-		min-width: 10rem;
-	}
+	z-index: calc(var(--z-sub-menu) + 1);
 }
 
 /* Depth 3+ submenu */
 .nav-sub-menu-d3 {
 	@apply divide-primary-300 bg-primary-200 duration-50 dark:divide-primary-600 dark:bg-primary-700;
+	z-index: calc(var(--z-sub-menu) + 2);
+}
+
+/* Shared positioning for depth 2 and 3+ submenus */
+.nav-sub-menu-d2,
+.nav-sub-menu-d3 {
 	left: 0;
-	z-index: 92;
 	@media (width >= 40rem) {
 		border-bottom-right-radius: var(--radius-md);
 		top: 0;

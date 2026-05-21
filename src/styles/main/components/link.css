@@ -2,49 +2,92 @@
 .l-all {
 	@apply transition-colors ease-linear;
 	cursor: pointer;
+	color: var(--l-color);
+}
+.l-all:hover {
+	color: var(--l-hover);
 }
 .l-all.l-active {
 	@apply font-semibold;
 }
+
 .l-primary {
-	@apply text-primary-800 hover:text-primary-600;
-}
-.l-primary.l-dark {
-	@apply dark:text-primary-200 dark:hover:text-primary-50;
+	--l-color: var(--color-primary-800);
+	--l-hover: var(--color-primary-600);
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-primary-200);
+		--l-hover: var(--color-primary-50);
+	}
 }
 .l-primary-bright {
-	@apply text-primary-300 hover:text-primary-100;
-}
-.l-primary-bright.l-dark {
-	@apply dark:text-primary-600 dark:hover:text-primary-300;
+	--l-color: var(--color-primary-300);
+	--l-hover: var(--color-primary-100);
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-primary-600);
+		--l-hover: var(--color-primary-300);
+	}
 }
 .l-primary-featured {
-	@apply text-primary-800 hover:text-primary-500 sm:text-primary-200 sm:hover:text-primary-50;
-}
-.l-primary-featured.l-dark {
-	@apply dark:text-primary-200 dark:hover:text-primary-50 dark:sm:text-primary-800 dark:sm:hover:text-primary-500;
+	--l-color: var(--color-primary-800);
+	--l-hover: var(--color-primary-500);
+	@media (width >= 40rem) {
+		--l-color: var(--color-primary-200);
+		--l-hover: var(--color-primary-50);
+	}
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-primary-200);
+		--l-hover: var(--color-primary-50);
+		@media (width >= 40rem) {
+			--l-color: var(--color-primary-800);
+			--l-hover: var(--color-primary-500);
+		}
+	}
 }
 .l-highlight {
-	@apply text-highlight-500 hover:text-highlight-300;
-}
-.l-highlight.l-dark {
-	@apply dark:text-highlight-400 dark:hover:text-highlight-700;
+	--l-color: var(--color-highlight-500);
+	--l-hover: var(--color-highlight-300);
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-highlight-400);
+		--l-hover: var(--color-highlight-700);
+	}
 }
 .l-highlight-featured {
-	@apply text-highlight-500 hover:text-highlight-300 sm:text-highlight-300 sm:hover:text-highlight-200;
-}
-.l-highlight-featured.l-dark {
-	@apply dark:text-highlight-400 dark:hover:text-highlight-700 dark:sm:text-highlight-400 dark:sm:hover:text-highlight-200;
+	--l-color: var(--color-highlight-500);
+	--l-hover: var(--color-highlight-300);
+	@media (width >= 40rem) {
+		--l-color: var(--color-highlight-300);
+		--l-hover: var(--color-highlight-200);
+	}
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-highlight-400);
+		--l-hover: var(--color-highlight-700);
+		@media (width >= 40rem) {
+			--l-color: var(--color-highlight-400);
+			--l-hover: var(--color-highlight-200);
+		}
+	}
 }
 .l-accent {
-	@apply text-accent-500 hover:text-accent-300;
-}
-.l-accent.l-dark {
-	@apply dark:text-accent-400 dark:hover:text-accent-200;
+	--l-color: var(--color-accent-500);
+	--l-hover: var(--color-accent-300);
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-accent-400);
+		--l-hover: var(--color-accent-200);
+	}
 }
 .l-accent-featured {
-	@apply text-accent-500 hover:text-accent-300 sm:text-accent-300 sm:hover:text-accent-200;
-}
-.l-accent-featured.l-dark {
-	@apply dark:text-accent-400 dark:hover:text-accent-300 dark:sm:text-accent-300 dark:sm:hover:text-accent-200;
+	--l-color: var(--color-accent-500);
+	--l-hover: var(--color-accent-300);
+	@media (width >= 40rem) {
+		--l-color: var(--color-accent-300);
+		--l-hover: var(--color-accent-200);
+	}
+	[data-mode='dark'] &.l-dark {
+		--l-color: var(--color-accent-400);
+		--l-hover: var(--color-accent-300);
+		@media (width >= 40rem) {
+			--l-color: var(--color-accent-300);
+			--l-hover: var(--color-accent-200);
+		}
+	}
 }

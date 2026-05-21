@@ -1,16 +1,19 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import { stripTags } from '@xsynaptic/unified-tools';
 
 import Container from '#components/parts/container.astro';
 import TextGradient from '#components/parts/text-gradient.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;
 	hasHeroImage?: boolean | undefined;
 }
 
-const { class: className, hasHeroImage } = Astro.props;
+const { class: className, hasHeroImage, ...props } = Astro.props;
 
 const title = await renderSlot(Astro.slots, 'header-title');
 const titleMultilingual = await renderSlot(Astro.slots, 'header-title-multilingual');
@@ -25,10 +28,12 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 	as="div"
 	class:list={[
 		hasHeroImage
-			? 'flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:z-30 sm:mb-0 sm:pt-0'
+			? 'flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:mb-0 sm:pt-0'
 			: 'mb-2 pt-4',
 		className,
 	]}
+	{...hasHeroImage ? { style: { zIndex: zIndexScaleEnum.ImageHeader } } : {}}
+	{...props}
 >
 	{
 		titleMultilingual ? (

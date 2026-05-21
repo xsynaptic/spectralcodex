@@ -27,8 +27,6 @@ html:not([lang^='th']) [lang^='th'] {
 }
 
 /** Multilingual titles */
-@media (min-width: 40rem) {
-	.title-ml .cjk {
-		font-weight: var(--font-weight-semibold);
-	}
+.title-ml .cjk {
+	font-weight: var(--font-weight-semibold);
 }

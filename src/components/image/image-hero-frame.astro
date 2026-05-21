@@ -1,6 +1,8 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
+
 interface Props extends HTMLAttributes<'div'> {
 	withTitle?: boolean | undefined;
 }
@@ -14,7 +16,7 @@ const { withTitle = true, class: className, ...props } = Astro.props;
 			'pointer-events-none top-0 right-0 left-0 block h-0 w-full text-transparent select-none sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',
 			'sm:bg-featured-a',
 		]}
-		style={{ zIndex: 20 }}
+		style={{ zIndex: zIndexScaleEnum.ImageShadow }}
 	>
 	</div><slot /><div
 		class:list={[
@@ -22,7 +24,7 @@ const { withTitle = true, class: className, ...props } = Astro.props;
 			withTitle ? 'sm:min-h-[20vh] md:h-[25vh] lg:h-[30vh]' : 'sm:min-h-[50px]',
 			'sm:bg-featured-b',
 		]}
-		style={{ zIndex: 20 }}
+		style={{ zIndex: zIndexScaleEnum.ImageShadow }}
 	>
 	</div>
 </div>

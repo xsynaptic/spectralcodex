@@ -1,11 +1,14 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { ImageFeaturedCaptionMetadata } from '#lib/metadata/metadata-types.ts';
 
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	captionMetadata: ImageFeaturedCaptionMetadata;
 	isHero?: boolean | undefined;
 	withTitle?: boolean | undefined;
@@ -33,7 +36,7 @@ const t = getTranslations();
 				// Note: the min-height spreads the background gradient
 				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
 			]}
-			style={{ zIndex: 31 }}
+			style={{ zIndex: zIndexScaleEnum.ImageCaption }}
 			data-pagefind-ignore
 			{...props}
 		>

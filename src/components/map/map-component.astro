@@ -13,10 +13,7 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { mapComponentProps, ...props } = Astro.props;
 
-const mapComponentExtendedProps = {
-	style: { zIndex: 20 },
-	...mapComponentProps,
-} satisfies MapComponentProps;
+const zIndex = 10;
 ---
 
 <link rel="stylesheet" href={mapCssUrl} />
@@ -31,13 +28,13 @@ const mapComponentExtendedProps = {
 	{...props}
 	data-pagefind-ignore
 >
-	<ReactMapComponent {...mapComponentExtendedProps} client:visible />
+	<ReactMapComponent {...mapComponentProps} style={{ zIndex: zIndex + 1 }} client:visible />
 	<div
 		class:list={[
 			'absolute flex h-full w-full justify-center',
 			'text-primary-700 dark:text-highlight-400',
 		]}
-		style={{ zIndex: 10 }}
+		style={{ zIndex }}
 	>
 		<div class="loading-animation w-[20%]"></div>
 	</div>

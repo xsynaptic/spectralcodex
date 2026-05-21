@@ -1,5 +1,6 @@
 /* Image meta wrapper */
 .i-meta {
+	--z-meta: 10;
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
@@ -29,7 +30,7 @@
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	z-index: 10;
+	z-index: var(--z-meta);
 	transition-delay: 500ms;
 }
 .i-meta-show:focus-within .i-meta-show-icon {
@@ -110,13 +111,13 @@
 	opacity: 1;
 }
 .i-meta-close-icon {
-	@apply p-2;
+	padding: calc(var(--spacing) * 2);
 	color: var(--color-accent-700);
 	cursor: pointer;
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	z-index: 20;
+	z-index: calc(var(--z-meta) + 1);
 	[data-mode='dark'] & {
 		color: var(--color-accent-400);
 	}
