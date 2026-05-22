@@ -79,6 +79,11 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Dynamic sitemap via [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
 - Full RSS feeds with server-side rendered MDX content via Astro's Container API
 
+### Analytics
+
+- Self-hosted [Umami](https://umami.is/) site analytics monitoring web vitals performance metrics
+- Custom event tracking for search queries, map filter changes, dark mode toggling, and image metadata interactions
+
 ## Usage
 
 ### Development
