@@ -11,18 +11,29 @@ import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
 interface Props extends ImageFeaturedWithCaption {
+	class?: string | undefined;
 	index: number;
+	fallbackAlt?: string | undefined;
 	withTitle?: boolean | undefined;
 }
 
-const { index, id: imageId, title: alt = '', captionMetadata, withTitle = false } = Astro.props;
+const {
+	class: className,
+	index,
+	id: imageId,
+	title,
+	captionMetadata,
+	fallbackAlt,
+	withTitle = false,
+} = Astro.props;
 
 async function getImageProps(
 	imageId: string | undefined,
 	alt: string,
-	priority: boolean,
+	priority: boolean
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
@@ -59,17 +70,22 @@ async function getImageProps(
 	};
 }
 
-const { imageProps, placeholderProps } = await getImageProps(imageId, alt, index === 0);
+const { imageProps, placeholderProps } = await getImageProps(
+	imageId,
+	title ?? fallbackAlt ?? '',
+	index === 0
+);
 ---
 
 {
 	imageProps ? (
-		<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
+		<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
 			<Image
 				class:list={[
 					'max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
 				]}
+				style={{ zIndex: zIndexScaleEnum.ImageBase }}
 				{...imageProps}
 			/>
 			{captionMetadata ? (

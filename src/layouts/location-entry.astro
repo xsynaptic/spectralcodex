@@ -36,7 +36,8 @@ import {
 	getLocationSchemas,
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageFeaturedId, getImageFeaturedHeroId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -60,12 +61,16 @@ const { regionPrimary, regionLangCode, titleMultilingual, titleMultilingualAddit
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
+const contentMetadataIndex = await getContentMetadataIndex();
 const imageFeaturedId = getImageFeaturedId({
 	imageFeatured: entry.data.imageFeatured,
 });
-const imageHeroId = getImageFeaturedHeroId(entry.data.imageFeatured);
+const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
+	imageFeatured: entry.data.imageFeatured,
+	contentMetadataIndex,
+});
 
-const hasHeroImage = !!imageHeroId;
+const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
 
 const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
 
@@ -94,9 +99,8 @@ const t = getTranslations();
 	>
 		<ImageHero
 			class="sm:mb-4"
-			hasHeroImage={hasHeroImage}
-			imageId={imageHeroId}
-			alt={entry.data.title}
+			imageFeaturedGroup={imageFeaturedHeroGroup}
+			fallbackAlt={entry.data.title}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">

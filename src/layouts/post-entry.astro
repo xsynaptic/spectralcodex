@@ -28,7 +28,8 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedHeroId, getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
@@ -47,10 +48,14 @@ const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'titl
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
-const imageHeroId = getImageFeaturedHeroId(entry.data.imageFeatured);
+const contentMetadataIndex = await getContentMetadataIndex();
+const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
+	imageFeatured: entry.data.imageFeatured,
+	contentMetadataIndex,
+});
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
-const hasHeroImage = !!imageHeroId;
+const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
 
 const { Content } = await render(entry);
 
@@ -81,9 +86,8 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 	>
 		<ImageHero
 			class="sm:mb-4"
-			hasHeroImage={hasHeroImage}
-			imageId={imageHeroId}
-			alt={entry.data.title}
+			imageFeaturedGroup={imageFeaturedHeroGroup}
+			fallbackAlt={entry.data.title}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">

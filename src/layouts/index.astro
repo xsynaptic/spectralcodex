@@ -7,7 +7,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
+import ImageHero from '#components/image/image-hero.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
 import AuthorCard from '#components/parts/author-card.astro';
@@ -101,11 +101,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 >
 	{
 		hasHeroImage ? (
-			<ImageHeroCarousel
-				hasHeroImage={hasHeroImage}
-				imageFeaturedGroup={imageFeaturedGroup}
-				withTitle={false}
-			/>
+			<ImageHero imageFeaturedGroup={imageFeaturedGroup} withTitle={false} />
 		) : undefined
 	}
 	<ContentSection class="mt-4" {...hasHeroImage ? { id: 'main-content' } : {}}>

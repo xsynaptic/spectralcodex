@@ -36,27 +36,38 @@ export function getImageFeaturedId({
 	return isImageFeaturedObject(items[0]) ? items[0].id : items[0];
 }
 
-// Get the hero image ID if explicitly marked with hero: true
-export function getImageFeaturedHeroId(
-	imageFeatured: ImageFeatured | undefined,
-): string | undefined {
-	if (!imageFeatured || !Array.isArray(imageFeatured)) return;
+function enrichImageFeaturedObjects(
+	imageFeaturedObjects: Array<ImageFeaturedObject>,
+	contentMetadataIndex: Map<string, ContentMetadataItem>,
+): Array<ImageFeaturedWithCaption> {
+	return imageFeaturedObjects.map((item) => {
+		const contentMetadata = item.link ? contentMetadataIndex.get(item.link) : undefined;
 
-	const imageHero = imageFeatured.find(
-		(item): item is ImageFeaturedObject => isImageFeaturedObject(item) && item.hero === true,
-	);
+		// Caption text prefers the image's own title; a link supplies the URL and a fallback title
+		const captionTitle = item.title ?? contentMetadata?.title;
 
-	return imageHero?.id;
+		return {
+			...item,
+			...(captionTitle
+				? {
+						captionMetadata: {
+							title: captionTitle,
+							titleMultilingual: contentMetadata?.titleMultilingual,
+							...(contentMetadata ? { id: contentMetadata.id, url: contentMetadata.url } : {}),
+						},
+					}
+				: {}),
+		};
+	});
 }
 
+// Taxonomy policy: every featured image becomes a hero (regions, themes, series)
 export function getImageFeaturedGroup({
 	imageFeatured,
 	contentMetadataIndex,
-	shuffle = false,
 }: {
 	imageFeatured: ImageFeatured | undefined;
 	contentMetadataIndex: Map<string, ContentMetadataItem>;
-	shuffle?: boolean;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
@@ -65,28 +76,29 @@ export function getImageFeaturedGroup({
 		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
 		: [{ id: imageFeatured }];
 
-	const items = imageFeaturedObjectGroup.map((item) => {
-		const contentMetadata = item.link ? contentMetadataIndex.get(item.link) : undefined;
-
-		return {
-			...item,
-			...(contentMetadata
-				? {
-						captionMetadata: {
-							id: contentMetadata.id,
-							title: contentMetadata.title,
-							titleMultilingual: contentMetadata.titleMultilingual,
-							url: contentMetadata.url,
-						},
-					}
-				: {}),
-		};
-	});
-
-	return shuffle ? R.shuffle(items) : items;
+	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, contentMetadataIndex);
 }
 
-// Rather than accepting image set items directly from frontmatter this handles content metadata items
+// Post-like policy: heroes are opt-in via "hero: true" and authored order
+export function getImageFeaturedHeroGroup({
+	imageFeatured,
+	contentMetadataIndex,
+}: {
+	imageFeatured: ImageFeatured | undefined;
+	contentMetadataIndex: Map<string, ContentMetadataItem>;
+}): Array<ImageFeaturedWithCaption> | undefined {
+	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
+
+	const imageHeroObjectGroup = imageFeatured.filter(
+		(item): item is ImageFeaturedObject => isImageFeaturedObject(item) && item.hero === true,
+	);
+
+	if (imageHeroObjectGroup.length === 0) return undefined;
+
+	return enrichImageFeaturedObjects(imageHeroObjectGroup, contentMetadataIndex);
+}
+
+// Rather than accepting image featured items directly from frontmatter this handles content metadata items
 export function getImageFeaturedGroupByContentMetadata({
 	items,
 	shuffle = false,

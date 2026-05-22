@@ -11,7 +11,7 @@ import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ImageHeroCarousel from '#components/image/image-hero-carousel.astro';
+import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
@@ -41,7 +41,6 @@ const contentMetadataIndex = await getContentMetadataIndex();
 const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
 	contentMetadataIndex,
-	shuffle: true,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
@@ -70,11 +69,7 @@ const t = getTranslations();
 		imageId={imageFeaturedId}
 		hideSearch={!!entry.data.hideSearch || page.currentPage !== 1}
 	>
-		<ImageHeroCarousel
-			class="sm:mb-4"
-			hasHeroImage={hasHeroImage}
-			imageFeaturedGroup={imageFeaturedGroup}
-		>
+		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">
@@ -95,7 +90,7 @@ const t = getTranslations();
 					}
 				</Fragment>
 			</ContentHeader>
-		</ImageHeroCarousel>
+		</ImageHero>
 		<ContentDescription entry={entry} />
 		<SectionMap mapData={mapData} />
 		<SectionMetadataGrid page={page} />

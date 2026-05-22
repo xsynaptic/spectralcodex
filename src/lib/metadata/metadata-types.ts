@@ -34,11 +34,12 @@ export interface ContentMetadataItem<
 	entryQuality: number;
 }
 
-// Image featured data is sometimes displayed with a caption
+// Image featured data is sometimes displayed with a caption; title-only captions carry no id/url
 export type ImageFeaturedCaptionMetadata = Pick<
 	ContentMetadataItem,
-	'id' | 'title' | 'titleMultilingual' | 'url'
->;
+	'title' | 'titleMultilingual'
+> &
+	Partial<Pick<ContentMetadataItem, 'id' | 'url'>>;
 
 export type ImageFeaturedWithCaption = ImageFeaturedObject & {
 	captionMetadata?: ImageFeaturedCaptionMetadata | undefined;

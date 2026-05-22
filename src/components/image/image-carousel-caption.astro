@@ -31,7 +31,7 @@ const t = getTranslations();
 	title ? (
 		<div
 			class:list={[
-				'bg-featured-b',
+				'bg-gradient-b',
 				'pointer-events-none absolute right-0 bottom-0 left-0 mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
 				// Note: the min-height spreads the background gradient
 				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
@@ -58,18 +58,25 @@ const t = getTranslations();
 						showDarkMode={false}
 						class:list={[
 							'truncate font-medium sm:font-semibold',
-							withTitle ? 'max-w-[75vw] sm:max-w-[60vw]' : undefined,
+							withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
 						]}
 					>
 						{title}
 					</Link>
 				) : (
-					<span>{title}</span>
+					<span
+						class:list={[
+							'truncate font-medium sm:font-semibold',
+							withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
+						]}
+					>
+						{title}
+					</span>
 				)}
 				{titleMultilingual ? (
 					<TextMultilingual
 						content={titleMultilingual}
-						class:list={[withTitle ? 'block sm:hidden md:block' : undefined]}
+						class:list={[withTitle ? 'block shrink-0 sm:hidden md:block' : undefined]}
 						parenthesis={true}
 					/>
 				) : undefined}
