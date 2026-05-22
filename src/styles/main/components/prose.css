@@ -1,0 +1,256 @@
+/**
+ * Prose styles for MDX-rendered content
+ *
+ * Hand-rolled replacement for @tailwindcss/typography
+ * All element selectors are wrapped in :where() so prose rules have specificity (0,1,0)
+ */
+.prose-x {
+	color: var(--color-primary-700);
+	font-family: var(--font-serif);
+	font-size: 1rem;
+	line-height: 1.75;
+
+	@media (width >= 64rem) {
+		font-size: 1.125rem;
+		line-height: calc(32 / 18);
+	}
+	[data-mode='dark'] & {
+		color: var(--color-primary-300);
+	}
+
+	/* First/last child margin reset */
+	& > :where(:first-child) {
+		margin-top: 0;
+	}
+	& > :where(:last-child) {
+		margin-bottom: 0;
+	}
+
+	/* Headings */
+	& :where(h1) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-extrabold);
+		font-size: 2em;
+		line-height: 1.25;
+		margin-top: 0;
+		margin-bottom: calc(var(--spacing) * 3);
+	}
+	& :where(h2) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-bold);
+		font-size: 1.5em;
+		line-height: 1.333;
+		margin-top: calc(var(--spacing) * 8);
+		margin-bottom: calc(var(--spacing) * 4);
+	}
+	& :where(h3) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-semibold);
+		font-size: 1.25em;
+		line-height: 1.4;
+		margin-top: calc(var(--spacing) * 6);
+		margin-bottom: calc(var(--spacing) * 2);
+	}
+	& :where(h4) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-semibold);
+		font-size: 1em;
+		line-height: 1.5;
+		margin-top: calc(var(--spacing) * 6);
+		margin-bottom: calc(var(--spacing) * 2);
+	}
+	& :where(:is(h1, h2, h3, h4) + *) {
+		margin-top: 0;
+	}
+	& :where(:is(h1, h2, h3, h4) strong) {
+		color: inherit;
+		font-weight: var(--font-weight-extrabold);
+	}
+	& :where(:is(h1, h2, h3, h4) code) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(:is(h1, h2, h3, h4)) {
+		color: var(--color-white);
+	}
+
+	/* Links: accent color + halo matching page bg */
+	& :where(a) {
+		color: var(--color-accent-500);
+		font-weight: var(--font-weight-medium);
+		text-decoration-line: underline;
+		text-decoration-color: var(--color-accent-200);
+		text-underline-offset: 2px;
+		text-shadow:
+			1px 1px 0 var(--color-body-bg),
+			-1px 1px 0 var(--color-body-bg),
+			2px 0 1px var(--color-body-bg),
+			-2px 0 1px var(--color-body-bg);
+		transition:
+			color 150ms ease-in,
+			text-decoration-color 150ms ease-in;
+	}
+	& :where(a):hover {
+		color: var(--color-accent-300);
+		text-decoration-color: var(--color-accent-100);
+	}
+	& :where(a strong),
+	& :where(a code) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(a) {
+		color: var(--color-accent-300);
+		text-decoration-color: var(--color-accent-500);
+	}
+	[data-mode='dark'] & :where(a):hover {
+		color: var(--color-accent-200);
+		text-decoration-color: var(--color-accent-400);
+	}
+
+	/* Text elements */
+	& :where(p) {
+		margin-top: 0;
+		margin-bottom: calc(var(--spacing) * 5);
+	}
+	& :where(strong) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-semibold);
+	}
+	& :where(blockquote strong),
+	& :where(thead th strong) {
+		color: inherit;
+	}
+	[data-mode='dark'] & :where(strong) {
+		color: var(--color-white);
+	}
+
+	/* Lists */
+	& :where(ul) {
+		list-style-type: disc;
+		margin: 0 0 calc(var(--spacing) * 5);
+		padding: 0;
+	}
+	& :where(ol) {
+		list-style-type: decimal;
+		margin: 0 0 calc(var(--spacing) * 5);
+		padding: 0;
+	}
+	& :where(li) {
+		margin: 0 0 calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+	}
+	& :where(ul > li)::marker {
+		color: var(--color-accent-200);
+	}
+	& :where(ol > li)::marker {
+		color: var(--color-accent-300);
+		font-weight: var(--font-weight-normal);
+	}
+	& :where(:is(ul, ol) :is(ul, ol)) {
+		margin-top: calc(var(--spacing) * 2);
+		margin-bottom: calc(var(--spacing) * 2);
+	}
+	[data-mode='dark'] & :where(ul > li)::marker {
+		color: var(--color-primary-600);
+	}
+	[data-mode='dark'] & :where(ol > li)::marker {
+		color: var(--color-primary-400);
+	}
+
+	/* Blockquote */
+	& :where(blockquote) {
+		margin: calc(var(--spacing) * 6) 0;
+		padding-inline-start: calc(var(--spacing) * 5);
+		border-inline-start: 0.25rem solid var(--color-primary-200);
+		color: var(--color-primary-500);
+		font-style: italic;
+		font-weight: var(--font-weight-normal);
+	}
+	[data-mode='dark'] & :where(blockquote) {
+		color: var(--color-primary-300);
+		border-inline-start-color: var(--color-primary-700);
+	}
+
+	/* Inline code */
+	& :where(code) {
+		color: var(--color-primary-900);
+		font-weight: var(--font-weight-semibold);
+		font-size: 0.875em;
+	}
+	[data-mode='dark'] & :where(code) {
+		color: var(--color-white);
+	}
+
+	/* Highlight */
+	& :where(mark) {
+		background-color: var(--color-highlight-100);
+		color: var(--color-primary-900);
+		padding-inline: 0.2em;
+		border-radius: 0.125rem;
+	}
+	[data-mode='dark'] & :where(mark) {
+		background-color: var(--color-highlight-800);
+		color: var(--color-white);
+	}
+
+	/* Horizontal rule */
+	& :where(hr) {
+		margin: calc(var(--spacing) * 10) 0;
+		border: 0;
+		border-top: 1px solid var(--color-primary-300);
+	}
+	& :where(hr + *) {
+		margin-top: 0;
+	}
+	[data-mode='dark'] & :where(hr) {
+		border-top-color: var(--color-primary-700);
+	}
+
+	/* Footnotes (rendered by remark-rehype) */
+	& > :where(.footnotes) ol {
+		font-size: var(--text-sm);
+		line-height: calc(28 / 14);
+	}
+	@media (width >= 64rem) {
+		& > :where(.footnotes) ol {
+			font-size: var(--text-sm);
+			line-height: calc(24 / 14);
+		}
+	}
+	& > :where(.footnotes) ol li::marker {
+		font-size: var(--text-xs);
+		font-style: italic;
+	}
+	& :where(.footnotes li p) {
+		margin: 0;
+	}
+	& :where([data-footnote-ref]),
+	& :where([data-footnote-backref]) {
+		font-weight: var(--font-weight-medium);
+		text-decoration-line: none;
+		user-select: none;
+	}
+	& :where([data-footnote-ref])::before {
+		content: '[';
+		color: var(--color-accent-300);
+		font-weight: var(--font-weight-light);
+		margin-inline-start: 1px;
+	}
+	& :where([data-footnote-ref])::after {
+		content: ']';
+		color: var(--color-accent-300);
+		font-weight: var(--font-weight-light);
+	}
+	[data-mode='dark'] & :where([data-footnote-ref])::before,
+	[data-mode='dark'] & :where([data-footnote-ref])::after {
+		color: var(--color-accent-400);
+	}
+}
+
+/* Compact size variant; body shrinks but rem-based margins stay constant */
+/* If compact ends up looking too airy, override individual margins here */
+.prose-compact {
+	font-size: 0.875rem;
+	line-height: 1.75;
+	@media (width >= 64rem) {
+		font-size: 1rem;
+	}
+}

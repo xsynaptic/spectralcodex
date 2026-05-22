@@ -17,29 +17,31 @@
 /** Enable dark mode with a custom selector */
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
-/* Custom spacing */
-@theme {
-	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
-	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
-}
-
 /** Theme styling */
-@import './main/theme/colors.css';
-@import './main/theme/fonts.css';
+@import './main/parts/theme.css';
 
-/** Component styling */
-@import './main/components/carousel.css';
-@import './main/components/divider.css';
-@import './main/components/image-metadata.css';
-@import './main/components/link.css';
-@import './main/components/metadata-grid-item.css';
-@import './main/components/nav-menu.css';
-@import './main/components/progress.css';
+/** Tailwind utilities */
+@import './main/parts/utilities.css';
 
-/** Bits and pieces */
-@import './main/parts/background.css';
-@import './main/parts/content.css';
-@import './main/parts/i18n.css';
-@import './main/parts/loading.css';
-@import './main/parts/prose.css';
-@import './main/parts/various.css';
+/** Root variables */
+@import './main/parts/root.css';
+
+/** Global overrides */
+@import './main/parts/global.css';
+
+/** Base layer */
+@import './main/parts/base.css' layer(base);
+
+/** Component layer */
+@import './main/components/background.css' layer(components);
+@import './main/components/carousel.css' layer(components);
+@import './main/components/content.css' layer(components);
+@import './main/components/divider.css' layer(components);
+@import './main/components/i18n.css' layer(components);
+@import './main/components/image-metadata.css' layer(components);
+@import './main/components/link.css' layer(components);
+@import './main/components/loading.css' layer(components);
+@import './main/components/metadata-grid-item.css' layer(components);
+@import './main/components/nav-menu.css' layer(components);
+@import './main/components/progress.css' layer(components);
+@import './main/components/prose.css' layer(components);

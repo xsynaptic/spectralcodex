@@ -11,11 +11,9 @@ html:not([lang^='ko']) [lang^='ko'] {
 	text-transform: none !important;
 	word-break: keep-all !important; /* Keep CJK runs intact; pairs with overflow-wrap above */
 }
-
 html:not([lang^='ja']) [lang^='ja'] {
 	word-break: auto-phrase !important; /* Chromium-only phrase-level breaks for Japanese */
 }
-
 html:not([lang^='th']) [lang^='th'] {
 	font-style: normal !important; /* Never italicize CJK characters */
 	font-variant: normal !important;
@@ -24,9 +22,4 @@ html:not([lang^='th']) [lang^='th'] {
 	text-decoration: none !important;
 	text-transform: none !important;
 	word-break: break-word !important;
-}
-
-/** Multilingual titles */
-.title-ml .cjk {
-	font-weight: var(--font-weight-semibold);
 }

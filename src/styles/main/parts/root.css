@@ -6,7 +6,3 @@
 	--content-dot: '\00B7';
 	--content-slash: '/';
 }
-
-html {
-	scrollbar-gutter: stable;
-}

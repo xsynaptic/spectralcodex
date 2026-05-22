@@ -1,0 +1,4 @@
+/** Multilingual titles */
+.title-ml .cjk {
+	font-weight: var(--font-weight-semibold);
+}

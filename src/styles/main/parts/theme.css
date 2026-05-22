@@ -1,3 +1,26 @@
+/* Custom spacing */
+@theme {
+	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
+	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
+}
+
+/* Custom fonts */
+@theme {
+	--font-display:
+		var(--font-geologica), ui-sans-serif, system-ui, 'Noto Sans TC', 'Heiti TC',
+		'Microsoft JhengHei', 'PingFang TC', '微軟正黑體', sans-serif, 'Segoe UI Emoji',
+		'Segoe UI Symbol', 'Noto Color Emoji';
+	--font-sans:
+		var(--font-commissioner), ui-sans-serif, system-ui, 'Noto Sans TC', 'Heiti TC',
+		'Microsoft JhengHei', 'PingFang TC', '微軟正黑體', sans-serif, 'Segoe UI Emoji',
+		'Segoe UI Symbol', 'Noto Color Emoji';
+	--font-serif:
+		var(--font-lora), ui-serif, Georgia, Cambria, 'Times New Roman', Times, 'Songti TC',
+		'LiSong Pro', 'Apple LiSung', '新細明體', 'PMingLiU', 'MingLiU', 'AR PL Mingti2L', 'TW-Sung',
+		serif;
+}
+
+/* Custom colors */
 @theme {
 	/* Primary colors: zinc */
 	--color-primary-50: var(--color-zinc-50);
