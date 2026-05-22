@@ -57,6 +57,9 @@ for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLE
 		const canonicalId = getPublicId(entry);
 
 		for (const formerId of formerIds) {
+			// Avoid infinite loops
+			if (formerId === canonicalId) continue;
+
 			const formerPath = prefix ? `/${prefix}/${formerId}/` : `/${formerId}/`;
 			const currentPath = prefix ? `/${prefix}/${canonicalId}/` : `/${canonicalId}/`;
 
