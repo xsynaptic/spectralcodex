@@ -9,6 +9,7 @@
 		"content-schemas": "tsx ./src/content-schemas/index.ts",
 		"deploy-app": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-app.ts",
 		"deploy-cache-purge": "tsx --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-cache-purge.ts",
+		"deploy-cache-warm": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-cache-warm.ts",
 		"deploy-caddy": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-caddy.ts",
 		"deploy-image-server": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-image-server.ts",
 		"deploy-media": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-media.ts",

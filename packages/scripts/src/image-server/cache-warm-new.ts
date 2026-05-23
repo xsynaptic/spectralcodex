@@ -6,7 +6,7 @@
 import { parseArgs } from 'node:util';
 
 import { findWorkspaceRoot } from '../shared/utils.js';
-import { cacheWarmNew } from './cache-warm.js';
+import { warmImageCacheNew } from './cache-warm.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -18,7 +18,7 @@ const { values } = parseArgs({
 	},
 });
 
-await cacheWarmNew({
+await warmImageCacheNew({
 	rootPath: findWorkspaceRoot(),
 	nginxUrl: values['nginx-url'],
 	concurrency: Number(values.concurrency),

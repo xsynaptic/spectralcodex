@@ -98,7 +98,7 @@ async function runWarmScript(config: CacheWarmConfig, manifestFile: string): Pro
 	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${remoteScript}`;
 }
 
-export async function cacheWarm(options: CacheWarmOptions): Promise<void> {
+export async function warmImageCache(options: CacheWarmOptions): Promise<void> {
 	const config = loadCacheWarmConfig(options);
 
 	console.log(chalk.blue('Warming image cache...'));
@@ -107,7 +107,7 @@ export async function cacheWarm(options: CacheWarmOptions): Promise<void> {
 	await runWarmScript(config, 'cache-manifest.json');
 }
 
-export async function cacheWarmNew(options: CacheWarmOptions): Promise<void> {
+export async function warmImageCacheNew(options: CacheWarmOptions): Promise<void> {
 	const config = loadCacheWarmConfig(options);
 
 	console.log(chalk.blue('Warming new image cache...'));
@@ -128,7 +128,7 @@ if (process.argv[1]?.endsWith('cache-warm.ts')) {
 		},
 	});
 
-	await cacheWarm({
+	await warmImageCache({
 		rootPath: findWorkspaceRoot(),
 		nginxUrl: values['nginx-url'],
 		concurrency: Number(values.concurrency),

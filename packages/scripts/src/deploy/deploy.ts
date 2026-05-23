@@ -4,11 +4,12 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { cacheWarmNew } from '../image-server/cache-warm.js';
+import { warmImageCacheNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { deployApp } from './deploy-app.js';
 import { purgeCache } from './deploy-cache-purge.js';
+import { warmCache } from './deploy-cache-warm.js';
 import { deployCaddy } from './deploy-caddy.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
@@ -62,7 +63,7 @@ async function similar() {
 	})`pnpm similar-content`;
 }
 
-async function opengraph() {
+async function generateOpenGraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
 		stdio: 'inherit',
@@ -70,7 +71,7 @@ async function opengraph() {
 	})`pnpm og-image --dist-path=${distPath}`;
 }
 
-async function og() {
+async function transferOpenGraph() {
 	await deployOg({ rootPath, dryRun });
 }
 
@@ -136,21 +137,30 @@ async function healthCheck() {
 }
 
 try {
+	// Prepare content
 	await sync();
 	await validate();
 	await generateRedirects();
 	await similar();
+
+	// Build & verify
 	await build();
-	await opengraph();
+	await generateOpenGraph();
 	await test();
 	manifest();
+
+	// Transfer to server
 	await media();
 	await transfer();
-	await healthCheck();
-	await og();
+	await transferOpenGraph();
 	await caddy();
+
+	// Verify & refresh caches
+	await healthCheck();
+	await warmImageCacheNew({ rootPath, dryRun });
 	await purgeCache({ rootPath, dryRun });
-	await cacheWarmNew({ rootPath, dryRun });
+	await warmCache({ dryRun });
+
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {
 	console.error(chalk.red('Deploy failed:'), error);
