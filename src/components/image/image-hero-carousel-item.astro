@@ -33,7 +33,7 @@ const {
 async function getImageProps(
 	imageId: string | undefined,
 	alt: string,
-	priority: boolean
+	priority: boolean,
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
@@ -73,7 +73,7 @@ async function getImageProps(
 const { imageProps, placeholderProps } = await getImageProps(
 	imageId,
 	title ?? fallbackAlt ?? '',
-	index === 0
+	index === 0,
 );
 ---
 

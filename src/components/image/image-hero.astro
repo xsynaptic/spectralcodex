@@ -60,7 +60,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 					<ImageCarouselNavigation />
 				</image-carousel>
 			) : undefined}
-			{imageFeaturedGroup[0] ? (
+			{!hasHeroCarousel && imageFeaturedGroup[0] ? (
 				<ImageHeroCarouselItem
 					{...imageFeaturedGroup[0]}
 					index={0}
