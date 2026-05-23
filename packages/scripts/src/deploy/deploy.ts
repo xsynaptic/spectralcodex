@@ -47,7 +47,7 @@ async function sync() {
 
 async function validate() {
 	console.log(chalk.blue('Validating content...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm validate-content`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm -F @spectralcodex/scripts validate-content`;
 }
 
 async function generateRedirects() {

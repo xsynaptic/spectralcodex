@@ -32,7 +32,7 @@
 		"test-e2e": "playwright test",
 		"test-e2e-prod": "TEST_ENV=prod node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
 		"test-image-server": "vitest run --config vitest.integration.config.ts",
-		"validate-content": "pnpm -F @spectralcodex/scripts validate-content"
+		"validate-content": "astro sync && pnpm -F @spectralcodex/scripts validate-content"
 	},
 	"type": "module",
 	"license": "MIT",
