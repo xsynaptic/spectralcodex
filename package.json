@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.18.0",
+	"version": "6.19.0",
 	"scripts": {
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"check-content": "pnpm --filter @spectralcodex/content check",
@@ -47,7 +47,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.3.6",
+		"astro": "^6.3.7",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6"
 	},
