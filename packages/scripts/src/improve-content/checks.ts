@@ -13,6 +13,11 @@ function isStub(entry: DataStoreEntry, threshold: number): boolean {
 	return (entry.body ?? '').trim().length < threshold;
 }
 
+function isThemeMissing(entry: DataStoreEntry): boolean {
+	const themes = entry.data.themes;
+	return !Array.isArray(themes) || themes.length === 0;
+}
+
 function hasMatchingLink(entry: DataStoreEntry, match: string): boolean {
 	const links = entry.data.links;
 
@@ -33,4 +38,5 @@ export const checks: Record<string, CheckFn> = {
 	'find-stubs': (entries, { threshold }) => entries.filter((entry) => isStub(entry, threshold)),
 	'find-stubs-wiki': (entries, { threshold }) =>
 		entries.filter((entry) => isStub(entry, threshold) && hasMatchingLink(entry, 'wikipedia.org')),
+	'theme-missing': (entries) => entries.filter((entry) => isThemeMissing(entry)),
 };
