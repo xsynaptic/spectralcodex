@@ -21,11 +21,6 @@ const translationStrings = {
 		'index.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of nearly 1,200 [movie theaters across Taiwan](/themes/taiwan-theaters).`,
 		'index.series': `Complete series of photo essays and field notes from some of the many road trips and bicycle journeys I've undertaken over the years, mostly around Taiwan. If you prefer more of a narrative structure to explore the many places documented on this site you might like to start here.`,
 
-		// Notes
-		'collection.notes.labelSingular': 'Note',
-		'collection.notes.labelPlural': 'Notes',
-		'collection.notes.description': `This section gathers more casual content: photo galleries, opinion pieces, administrative announcements, and other miscellaneous stuff. Think of this as the old-fashioned blog within the wider site, much less polished and generally less serious.`,
-
 		// Images
 		'collection.images.labelSingular': 'Image',
 		'collection.images.labelPlural': 'Images',
@@ -54,7 +49,12 @@ const translationStrings = {
 		// Posts
 		'collection.posts.labelSingular': 'Post',
 		'collection.posts.labelPlural': 'Posts',
-		'collection.posts.description': `Feature-length and long-form content, primarily photo essays, road trip journals, and geospatial narratives, with occasional forays into other forms of more in-depth writing.`,
+		'collection.posts.description': `The posts section primarily features long-form content: photo essays and galleries, road trip reports, geospatial narratives, and other writing forming the connective tissue between the other sections of this site. Posts are presented in reverse chronological order, with the most recent posts appearing at the top, adhering to the general principles of old-fashioned blogging.`,
+
+		// Notes
+		'collection.notes.labelSingular': 'Note',
+		'collection.notes.labelPlural': 'Notes',
+		'collection.notes.description': `This section gathers more casual content: photo galleries, opinion pieces, administrative announcements, and other miscellaneous stuff. Think of this as the old-fashioned blog within the wider site, much less polished and generally less serious.`,
 
 		// Regions
 		'collection.regions.labelSingular': 'Region',
