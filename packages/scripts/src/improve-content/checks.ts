@@ -9,15 +9,6 @@ export type CheckFn = (
 	options: CheckOptions,
 ) => Array<DataStoreEntry>;
 
-function isStub(entry: DataStoreEntry, threshold: number): boolean {
-	return (entry.body ?? '').trim().length < threshold;
-}
-
-function isThemeMissing(entry: DataStoreEntry): boolean {
-	const themes = entry.data.themes;
-	return !Array.isArray(themes) || themes.length === 0;
-}
-
 function hasMatchingLink(entry: DataStoreEntry, match: string): boolean {
 	const links = entry.data.links;
 
@@ -35,8 +26,22 @@ function hasMatchingLink(entry: DataStoreEntry, match: string): boolean {
 }
 
 export const checks: Record<string, CheckFn> = {
-	'find-stubs': (entries, { threshold }) => entries.filter((entry) => isStub(entry, threshold)),
+	'bump-quality': (entries) =>
+		entries.filter(
+			(entry) =>
+				entry.data.entryQuality === 1 &&
+				(entry.body ?? '').trim().length >= 200 &&
+				Array.isArray(entry.data.themes) &&
+				entry.data.themes.length > 0 &&
+				/<Link[\s>]/.test(entry.body ?? ''),
+		),
+	'find-stubs': (entries, { threshold }) =>
+		entries.filter((entry) => (entry.body ?? '').trim().length < threshold),
 	'find-stubs-wiki': (entries, { threshold }) =>
-		entries.filter((entry) => isStub(entry, threshold) && hasMatchingLink(entry, 'wikipedia.org')),
-	'theme-missing': (entries) => entries.filter((entry) => isThemeMissing(entry)),
+		entries.filter(
+			(entry) =>
+				(entry.body ?? '').trim().length < threshold && hasMatchingLink(entry, 'wikipedia.org'),
+		),
+	'theme-missing': (entries) =>
+		entries.filter((entry) => !Array.isArray(entry.data.themes) || entry.data.themes.length === 0),
 };
