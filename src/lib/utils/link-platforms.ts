@@ -13,6 +13,7 @@ const linkPlatforms: Array<LinkPlatform> = [
 	{ match: 'threads.com', title: 'Threads' },
 	{ match: 'reddit.com', title: 'Reddit' },
 	{ match: 'hiking.biji.co', title: 'Hiking Note', title_zh: '健康筆記' },
+	{ match: 'home.gamer.com.tw', title: 'Bahamut', title_zh: '巴哈姆特' },
 	{ match: 'vimeo.com', title: 'Vimeo' },
 ];
 
