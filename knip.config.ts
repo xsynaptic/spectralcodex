@@ -22,6 +22,7 @@ export default {
 		'packages/content': {
 			entry: ['format-content.mjs', 'global.d.ts'],
 			ignore: ['collections/**'],
+			ignoreBinaries: ['validate-content'],
 			ignoreDependencies: [
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
 				'textlint-rule-diacritics',
