@@ -1,0 +1,17 @@
+{
+	"name": "@spectralcodex/astro-sitemap",
+	"version": "1.0.0",
+	"description": "A simple wrapper for the official Astro sitemap integration",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"private": true,
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.3",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"astro": "^6.3.8"
+	}
+}

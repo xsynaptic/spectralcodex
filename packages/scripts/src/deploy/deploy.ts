@@ -7,6 +7,7 @@ import { $ } from 'zx';
 import { warmImageCacheNew } from '../image-server/cache-warm.js';
 import { generateManifest } from '../image-server/manifest.js';
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
+import { generateSitemapLastmod } from '../sitemap-lastmod/index.js';
 import { deployApp } from './deploy-app.js';
 import { purgeCache } from './deploy-cache-purge.js';
 import { warmCache } from './deploy-cache-warm.js';
@@ -142,6 +143,7 @@ try {
 	await validate();
 	await generateRedirects();
 	await similar();
+	await generateSitemapLastmod({ rootPath, siteUrl: config.siteUrl });
 
 	// Build & verify
 	await build();

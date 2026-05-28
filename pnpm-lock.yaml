@@ -37,9 +37,6 @@ importers:
       '@astrojs/rss':
         specifier: ^4.0.18
         version: 4.0.18
-      '@astrojs/sitemap':
-        specifier: ^3.7.3
-        version: 3.7.3
       '@pagefind/component-ui':
         specifier: ^1.5.2
         version: 1.5.2
@@ -55,6 +52,9 @@ importers:
       '@spectralcodex/astro-pagefind':
         specifier: workspace:*
         version: link:packages/astro-pagefind
+      '@spectralcodex/astro-sitemap':
+        specifier: workspace:*
+        version: link:packages/astro-sitemap
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
@@ -246,6 +246,19 @@ importers:
       sirv:
         specifier: ^3.0.2
         version: 3.0.2
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      astro:
+        specifier: ^6.3.8
+        version: 6.3.8(@types/node@25.6.0)(idb-keyval@6.2.4)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.22.3)(yaml@2.9.0)
+
+  packages/astro-sitemap:
+    dependencies:
+      '@astrojs/sitemap':
+        specifier: ^3.7.3
+        version: 3.7.3
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -10296,7 +10309,7 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 22.15.17
+      '@types/node': 25.6.0
 
   '@types/d3-geo@3.1.0':
     dependencies:
@@ -10383,7 +10396,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 24.10.1
+      '@types/node': 25.6.0
 
   '@types/supercluster@7.1.3':
     dependencies:

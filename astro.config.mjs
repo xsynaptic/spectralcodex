@@ -2,9 +2,9 @@
 import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
-import sitemap from '@astrojs/sitemap';
 import buildLogger from '@spectralcodex/astro-build-logger';
 import pagefind from '@spectralcodex/astro-pagefind';
+import sitemap from '@spectralcodex/astro-sitemap';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import autoImport from 'astro-auto-import';
@@ -158,22 +158,7 @@ export default defineConfig({
 			optimize: true,
 		}),
 		sitemap({
-			filter: (page) => {
-				const excludePrefixes = [
-					'/objectives',
-					'/planning',
-					'/taiwan-theater-project',
-					'/archives',
-				];
-				const path = new URL(page).pathname.replace(/\/$/, '');
-
-				// Exclude paginated pages (e.g. /posts/2, /locations/3)
-				if (/\/\d+$/.test(path)) {
-					return false;
-				}
-
-				return !excludePrefixes.some((prefix) => path === prefix || path.startsWith(prefix + '/'));
-			},
+			excludePrefixes: ['/objectives', '/planning', '/taiwan-theater-project', '/archives'],
 		}),
 		pagefind({
 			indexConfig: {
