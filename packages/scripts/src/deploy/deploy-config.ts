@@ -7,6 +7,7 @@ interface DeployConfig {
 	sitePath: string;
 	siteUrl: string;
 	mediaPath: string;
+	ipxServerUrl: string;
 }
 
 export function loadDeployConfig(): DeployConfig {
@@ -16,6 +17,7 @@ export function loadDeployConfig(): DeployConfig {
 	const sitePath = process.env.DEPLOY_SITE_PATH;
 	const siteUrl = process.env.PROD_SERVER_URL;
 	const mediaPath = process.env.DEPLOY_MEDIA_PATH;
+	const ipxServerUrl = process.env.IPX_SERVER_URL;
 
 	// Validate required vars
 	const missing: Array<string> = [];
@@ -25,8 +27,9 @@ export function loadDeployConfig(): DeployConfig {
 	if (!sitePath) missing.push('DEPLOY_SITE_PATH');
 	if (!siteUrl) missing.push('PROD_SERVER_URL');
 	if (!mediaPath) missing.push('DEPLOY_MEDIA_PATH');
+	if (!ipxServerUrl) missing.push('IPX_SERVER_URL');
 
-	if (!remoteHost || !remotePath || !sitePath || !siteUrl || !mediaPath) {
+	if (!remoteHost || !remotePath || !sitePath || !siteUrl || !mediaPath || !ipxServerUrl) {
 		console.error(chalk.red(`Missing required environment variables: ${missing.join(', ')}`));
 		console.error(chalk.gray('\nExample .env configuration:'));
 		console.error(chalk.gray('  DEPLOY_REMOTE_HOST=deploy@your-server.com'));
@@ -35,6 +38,7 @@ export function loadDeployConfig(): DeployConfig {
 		console.error(chalk.gray('  DEPLOY_SITE_PATH=/var/www/spectralcodex'));
 		console.error(chalk.gray('  PROD_SERVER_URL=https://example.com/'));
 		console.error(chalk.gray('  DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex'));
+		console.error(chalk.gray('  IPX_SERVER_URL=https://example.com/_ipx'));
 		throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
 	}
 
@@ -45,6 +49,7 @@ export function loadDeployConfig(): DeployConfig {
 		sitePath,
 		siteUrl,
 		mediaPath,
+		ipxServerUrl,
 	};
 }
 
@@ -55,5 +60,6 @@ export function printDeployConfig(config: DeployConfig) {
 	console.log(chalk.gray(`  Site path:   ${config.sitePath}`));
 	console.log(chalk.gray(`  Site URL:    ${config.siteUrl}`));
 	console.log(chalk.gray(`  Media path:  ${config.mediaPath}`));
+	console.log(chalk.gray(`  IPX URL:     ${config.ipxServerUrl}`));
 	console.log('');
 }

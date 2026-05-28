@@ -91,16 +91,11 @@ async function test() {
 }
 
 function manifest() {
-	const urlPattern = process.env.IPX_SERVER_URL;
-	if (!urlPattern) {
-		throw new Error('Missing IPX_SERVER_URL environment variable');
-	}
-
 	console.log(chalk.blue('Generating cache manifest...'));
 	generateManifest({
 		distPath,
 		outputPath: path.join(distPath, 'cache-manifest.json'),
-		urlPattern,
+		urlPattern: config.ipxServerUrl,
 		mainPath: path.join(cachePath, 'cache-manifest-main.json'),
 	});
 }
@@ -126,11 +121,8 @@ async function caddy() {
 }
 
 async function healthCheck() {
-	const siteUrl = process.env.PROD_SERVER_URL;
-	if (!siteUrl) return;
-
-	console.log(chalk.blue(`Health check: ${siteUrl}`));
-	const response = await fetch(siteUrl);
+	console.log(chalk.blue(`Health check: ${config.siteUrl}`));
+	const response = await fetch(config.siteUrl);
 	if (!response.ok) {
 		throw new Error(`Health check failed: ${String(response.status)} ${response.statusText}`);
 	}
@@ -161,7 +153,7 @@ try {
 	await healthCheck();
 	await warmImageCacheNew({ rootPath, dryRun });
 	await purgeCache({ rootPath, dryRun });
-	await warmCache({ dryRun });
+	await warmCache({ baseUrl: config.siteUrl, dryRun });
 
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {
