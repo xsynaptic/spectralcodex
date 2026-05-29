@@ -27,7 +27,7 @@ interface CacheWarmConfig {
 function loadCacheWarmConfig(options: CacheWarmOptions): CacheWarmConfig {
 	const {
 		nginxUrl = 'http://localhost:3100',
-		concurrency = 2,
+		concurrency = 4,
 		random = false,
 		dryRun = false,
 	} = options;

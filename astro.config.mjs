@@ -65,15 +65,20 @@ export default defineConfig({
 			}),
 			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
 			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
-			IPX_SERVER_URL: envField.string({
+			IMAGE_SERVER_URL: envField.string({
 				context: 'server',
 				access: 'secret',
-				default: '/_ipx',
+				default: '/_img',
 			}),
-			IPX_SERVER_SECRET: envField.string({
+			IMAGE_SERVER_SECRET: envField.string({
 				context: 'server',
 				access: 'secret',
 				default: 'dev-secret-do-not-use-in-production',
+			}),
+			IMAGE_SERVER_SIGNATURE_LENGTH: envField.number({
+				context: 'server',
+				access: 'public',
+				default: 20,
 			}),
 			WEBMENTION_API_KEY: envField.string({
 				context: 'server',
@@ -105,10 +110,10 @@ export default defineConfig({
 				ignored: ['./*.md'],
 			},
 			proxy: {
-				'/_ipx': {
+				'/_img': {
 					target: 'http://localhost:3100',
 					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/_ipx/, ''),
+					rewrite: (path) => path.replace(/^\/_img/, ''),
 				},
 			},
 		},

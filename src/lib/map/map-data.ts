@@ -8,7 +8,7 @@ import { center as turfCenter } from '@turf/center';
 import { distance } from '@turf/distance';
 import { truncate } from '@turf/truncate';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
-import { IPX_SERVER_URL } from 'astro:env/server';
+import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
@@ -40,7 +40,7 @@ const defaultMapDataProps = {
 	sourceData: undefined,
 	popupData: undefined,
 	featureCount: 0,
-	imageServerUrl: IPX_SERVER_URL,
+	imageServerUrl: IMAGE_SERVER_URL,
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,

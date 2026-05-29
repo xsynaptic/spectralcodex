@@ -33,7 +33,7 @@ function findHtmlFiles(dir: string): Array<string> {
 export function generateManifest(options: {
 	distPath: string;
 	outputPath: string;
-	urlPattern: string; // Image server URL pattern (e.g., IPX_SERVER_URL from .env)
+	urlPattern: string; // Image server URL pattern (e.g., IMAGE_SERVER_URL from .env)
 	mainPath?: string; // Path to persistent main manifest for incremental updates
 }): {
 	total: number;
@@ -123,10 +123,11 @@ if (process.argv[1]?.endsWith('manifest.ts')) {
 		},
 	});
 
-	// URL pattern from args or environment
-	const urlPattern = values['url-pattern'] ?? process.env.IPX_SERVER_URL;
+	const urlPattern = values['url-pattern'] ?? process.env.IMAGE_SERVER_URL;
 	if (!urlPattern) {
-		console.error('Error: URL pattern required. Set IPX_SERVER_URL in .env or pass --url-pattern');
+		console.error(
+			'Error: URL pattern required. Set IMAGE_SERVER_URL in .env or pass --url-pattern',
+		);
 		process.exit(1);
 	}
 

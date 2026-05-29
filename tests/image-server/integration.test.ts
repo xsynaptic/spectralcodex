@@ -1,53 +1,63 @@
+import { generate, sign } from '@xsynaptic/unpic-imagor';
 import { describe, expect, test } from 'vitest';
 
-import { generateSignedUrl } from '../../src/lib/image/image-server-utils.js';
+const IMAGE_SERVER_URL = 'http://localhost:3100';
+const IMAGE_SERVER_SECRET =
+	process.env.IMAGE_SERVER_SECRET ?? 'dev-secret-do-not-use-in-production';
+const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_LENGTH ?? 20);
+const TEST_IMAGE = 'example-folder-1/example-image-1.jpg';
 
-const IPX_SERVER_URL = 'http://localhost:3100';
-const TEST_IMAGE = 'test/sample.jpg';
-
-if (!process.env.IPX_SERVER_SECRET) {
-	throw new Error('IPX_SERVER_SECRET env var is required to run image server tests');
-}
-
-const IPX_SERVER_SECRET = process.env.IPX_SERVER_SECRET;
-
-function signTestUrl(path: string): string {
-	return `${IPX_SERVER_URL}${generateSignedUrl(path, IPX_SERVER_SECRET)}`;
+function signedUrl(source: string, width: number, format: string, quality: number): string {
+	const unsignedPath = generate(source, { width, format, quality });
+	const signature = sign(unsignedPath, IMAGE_SERVER_SECRET, IMAGE_SERVER_SIGNATURE_LENGTH);
+	return `${IMAGE_SERVER_URL}/${signature}/${unsignedPath}`;
 }
 
 describe('image server integration', () => {
-	test('health check returns 200 (no signature required)', async () => {
-		const response = await fetch(`${IPX_SERVER_URL}/health`);
+	test('health check returns 200', async () => {
+		const response = await fetch(`${IMAGE_SERVER_URL}/health`);
 		expect(response.status).toBe(200);
 	});
 
-	test('signed request returns JPEG', async () => {
-		const url = signTestUrl(`/w_450,q_88,f_jpg/${TEST_IMAGE}`);
-		const response = await fetch(url);
+	test('signed request returns image bytes', async () => {
+		const response = await fetch(signedUrl(TEST_IMAGE, 450, 'jpg', 85));
 		expect(response.status).toBe(200);
-		expect(response.headers.get('content-type')).toBe('image/jpeg');
+		expect(response.headers.get('content-type')).toMatch(/^image\//);
 	});
 
-	test('unsigned request returns 403', async () => {
-		const response = await fetch(`${IPX_SERVER_URL}/w_450,q_88,f_jpg/${TEST_IMAGE}`);
-		expect(response.status).toBe(403);
+	test('unsigned request is rejected', async () => {
+		// No hash segment at all
+		const response = await fetch(
+			`${IMAGE_SERVER_URL}/450x0/filters:quality(85):format(jpg)/${TEST_IMAGE}`,
+		);
+		expect([401, 403]).toContain(response.status);
 	});
 
-	test('invalid signature returns 403', async () => {
-		const response = await fetch(`${IPX_SERVER_URL}/w_450,q_88,f_jpg/${TEST_IMAGE}?s=invalid`);
-		expect(response.status).toBe(403);
+	test('tampered signature is rejected', async () => {
+		const unsignedPath = generate(TEST_IMAGE, { width: 450, quality: 85, format: 'jpg' });
+		const response = await fetch(
+			`${IMAGE_SERVER_URL}/notavalidhash00000000000000000000000000/${unsignedPath}`,
+		);
+		expect([401, 403]).toContain(response.status);
 	});
 
 	test('missing image returns 404', async () => {
-		const url = signTestUrl('/w_450,q_88,f_jpg/does/not/exist.jpg');
-		const response = await fetch(url);
+		const response = await fetch(signedUrl('does/not/exist.jpg', 450, 'jpg', 85));
 		expect(response.status).toBe(404);
 	});
 
-	test('caching works (same URI = cache hit)', async () => {
-		const url = signTestUrl(`/w_600,q_88,f_jpg/${TEST_IMAGE}`);
+	test('second hit on same URL is a cache HIT', async () => {
+		// Use a unique width so this test does not collide with the first signed-request test
+		const url = signedUrl(TEST_IMAGE, 612, 'webp', 70);
 		await fetch(url);
 		const response = await fetch(url);
+		expect(response.status).toBe(200);
 		expect(response.headers.get('x-cache-status')).toBe('HIT');
+	});
+
+	test('format filter actually changes output content-type', async () => {
+		const webpResponse = await fetch(signedUrl(TEST_IMAGE, 451, 'webp', 70));
+		expect(webpResponse.status).toBe(200);
+		expect(webpResponse.headers.get('content-type')).toBe('image/webp');
 	});
 });

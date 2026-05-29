@@ -95,7 +95,7 @@ function manifest() {
 	generateManifest({
 		distPath,
 		outputPath: path.join(distPath, 'cache-manifest.json'),
-		urlPattern: config.ipxServerUrl,
+		urlPattern: config.imageServerUrl,
 		mainPath: path.join(cachePath, 'cache-manifest-main.json'),
 	});
 }

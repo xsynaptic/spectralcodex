@@ -1,8 +1,8 @@
-/**
- * Vitest global setup; starts Docker containers for integration tests
- */
 import { execSync } from 'node:child_process';
 import path from 'node:path';
+
+const IMAGE_SERVER_SECRET =
+	process.env.IMAGE_SERVER_SECRET ?? 'dev-secret-do-not-use-in-production';
 
 const PROJECT_ROOT = path.resolve(import.meta.dirname, '../..');
 const DOCKER_COMPOSE_FILE = path.resolve(
@@ -66,8 +66,8 @@ export async function setup() {
 					...process.env,
 					// Absolute paths required for Docker
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'services/image-server'),
-					IPX_SERVER_SECRET: process.env.IPX_SERVER_SECRET,
+					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/site/nginx.conf.template'),
+					IMAGE_SERVER_SECRET,
 				},
 			},
 		);
@@ -113,7 +113,7 @@ export function teardown() {
 				env: {
 					...process.env,
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					DEPLOY_IMAGE_SERVER_PATH: path.resolve(PROJECT_ROOT, 'services/image-server'),
+					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/site/nginx.conf.template'),
 				},
 			},
 		);

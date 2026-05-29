@@ -12,7 +12,7 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'nginx-url': { type: 'string', default: 'http://localhost:3100' },
-		concurrency: { type: 'string', default: '2' },
+		concurrency: { type: 'string', default: '4' },
 		random: { type: 'boolean', default: false },
 		'dry-run': { type: 'boolean', default: false },
 	},

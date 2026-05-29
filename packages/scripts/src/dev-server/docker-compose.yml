@@ -1,4 +1,3 @@
-# Development image server for spectralcodex; started automatically by `pnpm dev`
 services:
   image-cache:
     image: nginx:1.29.8-alpine
@@ -6,19 +5,33 @@ services:
     ports:
       - '3100:80'
     volumes:
-      - ${DEPLOY_IMAGE_SERVER_BUNDLE_PATH}/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-    environment:
-      - IPX_SERVER_SECRET=${IPX_SERVER_SECRET:-dev-secret-do-not-use-in-production}
+      - ${IMAGE_SERVER_NGINX_CONFIG}:/etc/nginx/templates/default.conf.template:ro
     depends_on:
-      - image-server
+      image-server:
+        condition: service_started
 
   image-server:
-    build: ${DEPLOY_IMAGE_SERVER_BUNDLE_PATH}
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.1
     container_name: dev-image-server
     volumes:
       - ${CONTENT_MEDIA_PATH}:/media:ro
     environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - IPX_FS_DIR=/media
-      - IPX_FS_MAX_AGE=0
+      - PORT=8000
+      - IMAGOR_SECRET=${IMAGE_SERVER_SECRET:-dev-secret-do-not-use-in-production}
+      - IMAGOR_UNSAFE=0
+      - IMAGOR_SIGNER_TYPE=sha256
+      - IMAGOR_SIGNER_TRUNCATE=${IMAGE_SERVER_SIGNATURE_LENGTH:-20}
+      - IMAGOR_AUTO_WEBP=0
+      - IMAGOR_AUTO_AVIF=0
+      - IMAGOR_AUTO_JPEG=0
+      - VIPS_STRIP_METADATA=1
+      - VIPS_MOZJPEG=1
+      - FILE_LOADER_BASE_DIR=/media
+      - HTTP_LOADER_DISABLE=1
+      - IMAGOR_CACHE_HEADER_TTL=8760h
+      - IMAGOR_DISABLE_PARAMS_ENDPOINT=1
+      - IMAGOR_REQUEST_TIMEOUT=30s
+      - IMAGOR_LOAD_TIMEOUT=10s
+      - VIPS_MAX_RESOLUTION=16800000
+      - VIPS_MAX_WIDTH=5000
+      - VIPS_MAX_HEIGHT=5000
