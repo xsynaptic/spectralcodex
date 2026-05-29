@@ -1,5 +1,7 @@
 proxy_cache_path /var/cache/nginx/imagor levels=1:2 keys_zone=imagor_cache:50m max_size=60g inactive=365d use_temp_path=off;
 
+limit_req_zone $binary_remote_addr zone=imagor_limit:10m rate=100r/s;
+
 log_format cache '$remote_addr [$time_local] "$request" '
                  '$status $body_bytes_sent $upstream_cache_status '
                  '$request_time $upstream_response_time';
@@ -10,6 +12,11 @@ server {
 
     resolver 127.0.0.11 valid=10s;
     set $upstream http://image-server:8000;
+
+    # Use the real client IP from X-Forwarded-For (set by Caddy on the Docker bridge), not Caddy's own IP
+    set_real_ip_from 172.16.0.0/12;
+    real_ip_header X-Forwarded-For;
+    real_ip_recursive on;
 
     access_log /var/log/nginx/access.log cache;
 
@@ -29,6 +36,9 @@ server {
     }
 
     location / {
+        limit_req zone=imagor_limit burst=500 nodelay;
+        limit_req_status 429;
+
         proxy_pass $upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
