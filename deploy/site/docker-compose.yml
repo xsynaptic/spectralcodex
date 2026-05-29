@@ -27,7 +27,7 @@ services:
       - '127.0.0.1:3100:80'
     volumes:
       - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ${DEPLOY_MEDIA_PATH}/imagor-cache:/var/cache/nginx/imagor
+      - ${DEPLOY_MEDIA_PATH}/cache:/var/cache/nginx/imagor
     depends_on:
       image-server:
         condition: service_started
@@ -54,14 +54,9 @@ services:
     volumes:
       - ${DEPLOY_MEDIA_PATH}/media:/media:ro
     environment:
-      - PORT=8000
       - IMAGOR_SECRET=${IMAGE_SERVER_SECRET}
-      - IMAGOR_UNSAFE=0
       - IMAGOR_SIGNER_TYPE=sha256
       - IMAGOR_SIGNER_TRUNCATE=${IMAGE_SERVER_SIGNATURE_LENGTH:-20}
-      - IMAGOR_AUTO_WEBP=0
-      - IMAGOR_AUTO_AVIF=0
-      - IMAGOR_AUTO_JPEG=0
       - VIPS_STRIP_METADATA=1
       - VIPS_MOZJPEG=1
       - FILE_LOADER_BASE_DIR=/media
@@ -69,15 +64,13 @@ services:
       - IMAGOR_CACHE_HEADER_TTL=8760h
       - IMAGOR_DISABLE_PARAMS_ENDPOINT=1
       - IMAGOR_DISABLE_ERROR_BODY=1
-      - IMAGOR_REQUEST_TIMEOUT=30s
-      - IMAGOR_LOAD_TIMEOUT=10s
       - VIPS_MAX_RESOLUTION=16800000
       - VIPS_MAX_WIDTH=5000
       - VIPS_MAX_HEIGHT=5000
     networks:
       - astro-frontend
     restart: unless-stopped
-    mem_limit: 1536m
+    mem_limit: 768m
     logging:
       driver: json-file
       options:
