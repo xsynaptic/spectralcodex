@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { generate, sign } from '../src/index.ts';
+import { generate } from '../src/index.ts';
 
 describe('generate', () => {
 	test('width-only emits Wx0 with no fit-in', () => {
@@ -64,27 +64,5 @@ describe('generate', () => {
 		expect(generate('/_imagor/path/photo.jpg', { width: 800 }, { baseURL: '/_imagor' })).toBe(
 			'800x0/path/photo.jpg',
 		);
-	});
-});
-
-describe('sign', () => {
-	// Canonical test vector from docs.imagor.net/security
-	test('matches docs.imagor.net canonical example byte-for-byte', () => {
-		const path = '500x500/top/raw.githubusercontent.com/cshum/imagor/master/testdata/gopher.png';
-		expect(sign(path, 'mysecret')).toBe('IGEn3TxngivD0jy4uuiZim2bdUCvhcnVi1Nm0xGy');
-	});
-
-	test('different secret produces different signature', () => {
-		const path = '800x0/photo.jpg';
-		expect(sign(path, 'a')).not.toBe(sign(path, 'b'));
-	});
-
-	test('signatureLength of 20 returns 20-char signature', () => {
-		expect(sign('800x0/photo.jpg', 'secret', 20)).toHaveLength(20);
-	});
-
-	test('signature is url-safe base64 (no + / =)', () => {
-		const sig = sign('800x0/photo.jpg', 'secret');
-		expect(sig).not.toMatch(/[+/=]/);
 	});
 });

@@ -1,8 +1,10 @@
 import type { ImagorOperations } from '@xsynaptic/unpic-imagor';
 import type { ImageFormat } from 'unpic';
 
-import { generate, sign } from '@xsynaptic/unpic-imagor';
+import { generate } from '@xsynaptic/unpic-imagor';
 import { IMAGE_SERVER_SIGNATURE_LENGTH } from 'astro:env/server';
+
+import { signImageServerPath } from '#lib/image/image-sign.ts';
 
 export function createSignedImagePathFunction({
 	imageQuality,
@@ -22,6 +24,6 @@ export function createSignedImagePathFunction({
 			format: imageFormat,
 		});
 
-		return `/${sign(unsignedPath, serverSecret, signatureLength)}/${unsignedPath}`;
+		return `/${signImageServerPath(unsignedPath, serverSecret, signatureLength)}/${unsignedPath}`;
 	};
 }

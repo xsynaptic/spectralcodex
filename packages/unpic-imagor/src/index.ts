@@ -1,7 +1,5 @@
 import type { Operations } from 'unpic';
 
-import { createHmac } from 'node:crypto';
-
 export interface ImagorOperations extends Operations {
 	fit?: 'cover' | 'contain' | 'inside' | 'outside' | 'fill';
 	smart?: boolean;
@@ -59,15 +57,6 @@ export function extract(_url: string | URL): {
 } | null {
 	// eslint-disable-next-line unicorn/no-null -- upstream convention
 	return null;
-}
-
-export function sign(unsignedPath: string, secret: string, signatureLength = 40): string {
-	return createHmac('sha256', secret)
-		.update(unsignedPath)
-		.digest('base64')
-		.slice(0, signatureLength)
-		.replaceAll('+', '-')
-		.replaceAll('/', '_');
 }
 
 function toNumber(value: string | number | undefined): number | undefined {

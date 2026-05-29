@@ -1,5 +1,7 @@
-import { generate, sign } from '@xsynaptic/unpic-imagor';
+import { generate } from '@xsynaptic/unpic-imagor';
 import { describe, expect, test } from 'vitest';
+
+import { signImageServerPath } from '#lib/image/image-sign.ts';
 
 const IMAGE_SERVER_URL = 'http://localhost:3100';
 const IMAGE_SERVER_SECRET =
@@ -9,7 +11,11 @@ const TEST_IMAGE = 'example-folder-1/example-image-1.jpg';
 
 function signedUrl(source: string, width: number, format: string, quality: number): string {
 	const unsignedPath = generate(source, { width, format, quality });
-	const signature = sign(unsignedPath, IMAGE_SERVER_SECRET, IMAGE_SERVER_SIGNATURE_LENGTH);
+	const signature = signImageServerPath(
+		unsignedPath,
+		IMAGE_SERVER_SECRET,
+		IMAGE_SERVER_SIGNATURE_LENGTH,
+	);
 	return `${IMAGE_SERVER_URL}/${signature}/${unsignedPath}`;
 }
 
