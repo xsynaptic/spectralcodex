@@ -1,3 +1,5 @@
+import type { ImagorFormats } from '@xsynaptic/unpic-imagor';
+
 import { generate } from '@xsynaptic/unpic-imagor';
 import { describe, expect, test } from 'vitest';
 
@@ -6,10 +8,12 @@ import { signImageServerPath } from '#lib/image/image-sign.ts';
 const IMAGE_SERVER_URL = 'http://localhost:3100';
 const IMAGE_SERVER_SECRET =
 	process.env.IMAGE_SERVER_SECRET ?? 'dev-secret-do-not-use-in-production';
-const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_LENGTH ?? 20);
+
+// Empty or unset both fall back to 20, matching the container's `${…:-20}` and Astro's default
+const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_LENGTH) || 20;
 const TEST_IMAGE = 'example-folder-1/example-image-1.jpg';
 
-function signedUrl(source: string, width: number, format: string, quality: number): string {
+function signedUrl(source: string, width: number, format: ImagorFormats, quality: number): string {
 	const unsignedPath = generate(source, { width, format, quality });
 	const signature = signImageServerPath(
 		unsignedPath,

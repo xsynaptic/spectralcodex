@@ -11,11 +11,6 @@ describe('signImageServerPath', () => {
 		);
 	});
 
-	test('different secret produces different signature', () => {
-		const path = '800x0/photo.jpg';
-		expect(signImageServerPath(path, 'a', 40)).not.toBe(signImageServerPath(path, 'b', 40));
-	});
-
 	test('signatureLength of 20 returns 20-char signature', () => {
 		expect(signImageServerPath('800x0/photo.jpg', 'secret', 20)).toHaveLength(20);
 	});

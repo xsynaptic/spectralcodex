@@ -1,7 +1,7 @@
 import { createHmac } from 'node:crypto';
 
 /**
- * Reproduce Imagor's signature function:
+ * Reproduce imagor's signature function:
  * - HMAC-SHA256 of the path
  * - URL-safe base64 encoding
  * - Truncation to the specified length
