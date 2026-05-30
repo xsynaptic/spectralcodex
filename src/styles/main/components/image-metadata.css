@@ -140,6 +140,7 @@
 
 .i-meta-item-title {
 	@apply text-xs font-semibold;
+	display: block;
 	color: var(--color-primary-800);
 	margin: 0;
 	-webkit-user-select: none;
