@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.20.0",
+	"version": "6.21.0",
 	"scripts": {
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"check-content": "pnpm --filter @spectralcodex/content check",
@@ -47,16 +47,16 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^6.3.8",
+		"astro": "^6.4.2",
 		"react": "^19.2.6",
 		"react-dom": "^19.2.6"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@astrojs/markdown-remark": "^7.1.2",
-		"@astrojs/mdx": "^5.0.6",
-		"@astrojs/node": "^10.1.1",
-		"@astrojs/react": "^5.0.5",
+		"@astrojs/markdown-remark": "^7.2.0",
+		"@astrojs/mdx": "^6.0.1",
+		"@astrojs/node": "^10.1.2",
+		"@astrojs/react": "^5.0.6",
 		"@astrojs/rss": "^4.0.18",
 		"@pagefind/component-ui": "^1.5.2",
 		"@playwright/test": "^1.60.0",
@@ -92,7 +92,7 @@
 		"eslint-plugin-astro": "^1.7.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"exiftool-vendored": "^35.20.0",
+		"exiftool-vendored": "^35.21.0",
 		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.6.0",

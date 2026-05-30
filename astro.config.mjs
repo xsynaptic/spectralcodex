@@ -1,4 +1,5 @@
 // @ts-check
+import { unified } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
@@ -134,8 +135,11 @@ export default defineConfig({
 		},
 	},
 	markdown: {
-		remarkPlugins: [remarkImgGroup],
-		rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
+		processor: unified({
+			remarkPlugins: [remarkImgGroup],
+			rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
+			remarkRehype: { footnoteLabelTagName: 'h3' },
+		}),
 	},
 	integrations: [
 		react({
@@ -157,9 +161,6 @@ export default defineConfig({
 			],
 		}),
 		mdx({
-			remarkRehype: {
-				footnoteLabelTagName: 'h3',
-			},
 			optimize: true,
 		}),
 		sitemap({

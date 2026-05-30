@@ -9,7 +9,6 @@ export default {
 			entry: ['src/components/mdx/*.astro'],
 			ignoreBinaries: ['down', 'up', 'ssh-add'],
 			ignoreDependencies: [
-				'@astrojs/markdown-remark', // peer dep, used transitively by remark pipeline
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
 				'eslint-plugin-jsx-a11y', // transitive dep required by eslint-plugin-astro jsx-a11y-strict
 				'p-limit', // used in workspace packages (image-loader, scripts)
