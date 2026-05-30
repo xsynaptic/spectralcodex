@@ -6,15 +6,15 @@ import { defineCollection } from 'astro:content';
 import {
 	CONTENT_MEDIA_PATH,
 	CUSTOM_CACHE_PATH,
-	IPX_SERVER_SECRET,
-	IPX_SERVER_URL,
+	IMAGE_SERVER_SECRET,
+	IMAGE_SERVER_URL,
 } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import sharp from 'sharp';
 import { z } from 'zod';
 
 import { IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
-import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
+import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 import { DateStringSchema } from '#lib/schemas/index.ts';
@@ -138,10 +138,10 @@ async function extractExifData(
 }
 
 // Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
-const getSignedIpxPath = createSignedIpxPathFunction({
+const getSignedImagePath = createSignedImagePathFunction({
 	imageQuality: IMAGE_HQ_QUALITY,
 	imageFormat: IMAGE_HQ_FORMAT,
-	serverSecret: IPX_SERVER_SECRET,
+	serverSecret: IMAGE_SERVER_SECRET,
 });
 
 // Initialize ExifTool instance so it can be reused
@@ -183,7 +183,7 @@ export const images = defineCollection({
 			const defaultAspectRatio = 3 / 2;
 
 			const defaultMetadata = {
-				src: `${IPX_SERVER_URL}${getSignedIpxPath(id, { width: srcWidth })}`,
+				src: `${IMAGE_SERVER_URL}${getSignedImagePath(id, { width: srcWidth })}`,
 				path: filePathRelative,
 				width: ImageSizeEnum.Large,
 				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),

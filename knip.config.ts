@@ -11,7 +11,6 @@ export default {
 			ignoreDependencies: [
 				'@astrojs/markdown-remark', // peer dep, used transitively by remark pipeline
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
-				'@xsynaptic/image-server', // workspace package used at deploy time
 				'eslint-plugin-jsx-a11y', // transitive dep required by eslint-plugin-astro jsx-a11y-strict
 				'p-limit', // used in workspace packages (image-loader, scripts)
 			],

@@ -3,7 +3,7 @@ import { Font } from 'astro:assets';
 import { WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import '#styles/main.css';
-import { IPX_SERVER_URL } from 'astro:env/server';
+import { IMAGE_SERVER_URL } from 'astro:env/server';
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaProps } from '#components/types.ts';
@@ -61,8 +61,8 @@ const t = getTranslations();
 			media="(prefers-color-scheme: dark)"
 		/>
 		{
-			IPX_SERVER_URL.startsWith('http') ? (
-				<link rel="preconnect" href={IPX_SERVER_URL} crossorigin />
+			IMAGE_SERVER_URL.startsWith('http') ? (
+				<link rel="preconnect" href={IMAGE_SERVER_URL} crossorigin />
 			) : undefined
 		}
 		<Stylesheet />

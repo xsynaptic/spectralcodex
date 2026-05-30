@@ -60,6 +60,7 @@ img.spectralcodex.com {
 Disallow: /"
 	}
 	reverse_proxy spectralcodex-image-cache:80 {
+		header_up X-Real-IP {client_ip}
 		header_down -X-Cache-Status
 	}
 }

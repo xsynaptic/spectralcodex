@@ -1,6 +1,5 @@
 packages:
   - packages/**
-  - services/*
 
 # Intended to mitigate supply chain attacks
 minimumReleaseAge: 1440

@@ -49,7 +49,7 @@ Reads region metadata to extract Overture division IDs, queries Parquet datasets
 
 ### `dev-server`
 
-Starts Docker containers (IPX image server) alongside Astro dev server. Loads `.env.development` for dev-specific overrides.
+Starts a containerized image server alongside the Astro dev server. Loads `.env.development` for dev-specific overrides.
 
 ## Deployment
 
@@ -79,4 +79,4 @@ Extracts image URLs from built HTML for cache warming. Supports incremental mani
 
 ### `image-server-warm` / `image-server-warm-new`
 
-Warms IPX image cache on remote server by requesting all URLs (or only new URLs) from the manifest. Runs via SSH with configurable concurrency.
+Warms the image cache on remote server by requesting all URLs (or only new URLs) from the manifest. Runs via SSH with configurable concurrency.

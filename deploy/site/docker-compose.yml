@@ -1,5 +1,4 @@
 services:
-  # Nginx cache for image server
   image-cache:
     image: nginx:1.29.8-alpine
     container_name: spectralcodex-image-cache
@@ -25,15 +24,13 @@ services:
       timeout: 3s
       retries: 3
     ports:
-      - '127.0.0.1:3100:80' # Localhost access for cache warming
+      - '127.0.0.1:3100:80'
     volumes:
-      - ../../services/image-server/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ${DEPLOY_MEDIA_PATH}/cache:/var/cache/nginx/ipx
-    environment:
-      - IPX_SERVER_SECRET=${IPX_SERVER_SECRET}
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ${DEPLOY_MEDIA_PATH}/cache:/var/cache/nginx/imagor
     depends_on:
       image-server:
-        condition: service_healthy
+        condition: service_started
     networks:
       - astro-frontend
     restart: unless-stopped
@@ -43,12 +40,8 @@ services:
         max-size: '10m'
         max-file: '3'
 
-  # Image server (IPX)
   image-server:
-    image: spectralcodex-image-server:latest
-    build:
-      context: ../../services/image-server
-      dockerfile: Dockerfile
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.1
     container_name: spectralcodex-image-server
     init: true
     read_only: true
@@ -61,14 +54,23 @@ services:
     volumes:
       - ${DEPLOY_MEDIA_PATH}/media:/media:ro
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - IPX_FS_DIR=/media
-      - IPX_FS_MAX_AGE=31536000
+      - IMAGOR_SECRET=${IMAGE_SERVER_SECRET}
+      - IMAGOR_SIGNER_TYPE=sha256
+      - IMAGOR_SIGNER_TRUNCATE=${IMAGE_SERVER_SIGNATURE_LENGTH:-20}
+      - VIPS_STRIP_METADATA=1
+      - VIPS_MOZJPEG=1
+      - FILE_LOADER_BASE_DIR=/media
+      - HTTP_LOADER_DISABLE=1
+      - IMAGOR_CACHE_HEADER_TTL=8760h
+      - IMAGOR_DISABLE_PARAMS_ENDPOINT=1
+      - IMAGOR_DISABLE_ERROR_BODY=1
+      - VIPS_MAX_RESOLUTION=16800000
+      - VIPS_MAX_WIDTH=5000
+      - VIPS_MAX_HEIGHT=5000
     networks:
       - astro-frontend
     restart: unless-stopped
-    mem_limit: 1536m
+    mem_limit: 768m
     logging:
       driver: json-file
       options:
@@ -78,5 +80,4 @@ services:
 networks:
   astro-frontend:
     name: astro-frontend
-    # Created by deploy/infra/docker-compose.yml; infra must be deployed first
     external: true

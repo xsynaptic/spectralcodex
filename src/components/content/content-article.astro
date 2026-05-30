@@ -1,11 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
 import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
+import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 interface Props extends HTMLAttributes<'article'> {
@@ -28,21 +28,21 @@ async function getThumbnailUrls() {
 
 	if (!imageEntry) return;
 
-	const getSignedIpxPath = createSignedIpxPathFunction({
+	const getSignedImagePath = createSignedImagePathFunction({
 		imageQuality: IMAGE_LQ_QUALITY,
 		imageFormat: IMAGE_LQ_FORMAT,
-		serverSecret: IPX_SERVER_SECRET,
+		serverSecret: IMAGE_SERVER_SECRET,
 	});
 
 	const fit = ImageFitOptionEnum.Cover;
 
 	return {
-		url1x: `${IPX_SERVER_URL}${getSignedIpxPath(imageId, {
+		url1x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
 			width: SEARCH_THUMBNAIL_WIDTH,
 			height: Math.round(SEARCH_THUMBNAIL_WIDTH / SEARCH_THUMBNAIL_ASPECT_RATIO),
 			fit,
 		})}`,
-		url2x: `${IPX_SERVER_URL}${getSignedIpxPath(imageId, {
+		url2x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
 			width: SEARCH_THUMBNAIL_WIDTH_2X,
 			height: Math.round(SEARCH_THUMBNAIL_WIDTH_2X / SEARCH_THUMBNAIL_ASPECT_RATIO),
 			fit,

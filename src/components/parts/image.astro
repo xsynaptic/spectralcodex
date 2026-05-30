@@ -1,15 +1,14 @@
 ---
-import type { IPXOptions } from 'unpic/providers/ipx';
+import type { ImagorOperations } from '@xsynaptic/unpic-imagor';
 
 import { Image as UnpicImage } from '@unpic/astro/base';
-import { IPX_SERVER_SECRET, IPX_SERVER_URL } from 'astro:env/server';
+import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
-import type { ImageComponentProps, IPXOperations } from '#lib/image/image-types.ts';
+import type { ImageComponentProps } from '#lib/image/image-types.ts';
 
 import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
-import { createSignedIpxPathFunction } from '#lib/image/image-server.ts';
+import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 
-// Props interface: same as unpic base but without transformer
 type Props = ImageComponentProps;
 
 const {
@@ -19,14 +18,14 @@ const {
 	...props
 } = Astro.props;
 
-const getSignedIpxPath = createSignedIpxPathFunction({
+const getSignedImagePath = createSignedImagePathFunction({
 	imageQuality,
 	imageFormat,
-	serverSecret: IPX_SERVER_SECRET,
+	serverSecret: IMAGE_SERVER_SECRET,
 });
 
-function transformer(src: string | URL, operations: IPXOperations, options?: IPXOptions) {
-	return `${IPX_SERVER_URL}${getSignedIpxPath(src, operations, options)}`;
+function transformer(src: string | URL, operations: ImagorOperations) {
+	return `${IMAGE_SERVER_URL}${getSignedImagePath(src, operations)}`;
 }
 ---
 

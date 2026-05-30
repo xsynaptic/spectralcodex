@@ -1,12 +1,8 @@
 import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
+import type { ImagorOperations, ImagorOptions } from '@xsynaptic/unpic-imagor';
 import type { HTMLAttributes } from 'astro/types';
 import type { ImageFormat } from 'unpic';
-import type { IPXOptions } from 'unpic/providers/ipx';
-import type { IPXOperations as BaseIPXOperations } from 'unpic/providers/ipx';
 
-/**
- * Image proxy server types
- */
 export const ImageFitOptionEnum = {
 	Contain: 'contain',
 	Cover: 'cover',
@@ -17,32 +13,6 @@ export const ImageFitOptionEnum = {
 
 export type ImageFitOption = (typeof ImageFitOptionEnum)[keyof typeof ImageFitOptionEnum];
 
-/**
- * Extended IPX operations interface
- *
- * The upstream unpic IPX provider only exposes basic operations (w, h, s, q, f)
- * IPX itself supports many more modifiers which pass through at runtime
- * This file extends the types to expose those additional operations
- *
- * TODO: remove this shim after Unpic introduces enhanced typing
- */
-export interface IPXOperations extends BaseIPXOperations {
-	fit?: ImageFitOption;
-	position?: string;
-	extract?: string;
-	crop?: string;
-	rotate?: number;
-	flip?: boolean;
-	flop?: boolean;
-	blur?: number;
-	sharpen?: number;
-	grayscale?: boolean;
-	background?: string;
-}
-
-/**
- * Image layout
- */
 export const ImageLayoutEnum = {
 	Default: 'default',
 	Wide: 'wide',
@@ -70,9 +40,6 @@ export const ImageSizeEnum = {
 	ExtraExtraExtraLarge: 3600,
 } as const;
 
-/**
- * Image placeholder props
- */
 export interface ImagePlaceholderProps {
 	imageId: string;
 	aspectRatio: number;
@@ -81,11 +48,8 @@ export interface ImagePlaceholderProps {
 	highQuality?: boolean;
 }
 
-/**
- * Unpic Image component props
- */
 export type ImageComponentProps = HTMLAttributes<'img'> &
-	Omit<UnpicBaseImageProps<IPXOperations, IPXOptions, CoreImageAttributes>, 'transformer'> & {
+	Omit<UnpicBaseImageProps<ImagorOperations, ImagorOptions, CoreImageAttributes>, 'transformer'> & {
 		imageQuality?: number;
 		imageFormat?: ImageFormat;
 	};

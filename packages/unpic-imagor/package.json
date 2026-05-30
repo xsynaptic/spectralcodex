@@ -1,0 +1,13 @@
+{
+	"name": "@xsynaptic/unpic-imagor",
+	"version": "0.1.0",
+	"description": "imagor URL provider for unpic",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"devDependencies": {
+		"unpic": "^4.2.2"
+	}
+}
