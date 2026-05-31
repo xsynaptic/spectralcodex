@@ -19,7 +19,8 @@ const t = getTranslations();
 <script>
 	import '#components/search/search-toggle.ts';
 
-	// Clear pagefind modal component state before swap
+	// Clears the Pagefind registry on navigation so search-toggle's modal-trigger registrations don't pile up
+	// Pagefind has no deregisterUtility; see search-toggle.ts
 	document.addEventListener('astro:before-swap', () => {
 		const modal = document.querySelector('pagefind-modal') as
 			| (Element & {
@@ -49,6 +50,8 @@ const t = getTranslations();
 		class="text-primary-700 dark:text-primary-300"
 		aria-label={t('site.search.toggle.label')}
 		title={t('site.search.toggle.title')}
+		aria-haspopup="dialog"
+		aria-expanded="false"
 		data-umami-event="search-open"
 	>
 		<svg

@@ -1,19 +1,27 @@
-import { ProgressBar } from '#components/progress/progress-base.ts';
+const animationDuration = 300;
 
-class ProgressLoading extends ProgressBar {
+class ProgressLoading extends HTMLElement {
 	#progress = 0.2;
 	#trickleInterval: number | undefined;
 	#thresholdTimeout: number | undefined;
 
+	#setProgress(value: number) {
+		this.style.setProperty('--progress-bar', String(value));
+	}
+
+	#setOpacity(value: number) {
+		this.style.setProperty('opacity', String(value));
+	}
+
 	#handlePreparation = () => {
 		this.#progress = 0;
-		this.setProgress(0);
+		this.#setProgress(0);
 		this.#thresholdTimeout = globalThis.window.setTimeout(() => {
-			this.setOpacity(1);
+			this.#setOpacity(1);
 			this.#trickleInterval = globalThis.window.setInterval(() => {
 				this.#progress += Math.random() * 0.03;
-				this.setProgress(this.#progress);
-			}, this.animationDuration);
+				this.#setProgress(this.#progress);
+			}, animationDuration);
 		}, 200);
 	};
 
@@ -25,20 +33,20 @@ class ProgressLoading extends ProgressBar {
 		this.#trickleInterval = undefined;
 
 		this.#progress = 1;
-		this.setProgress(1);
+		this.#setProgress(1);
 
 		globalThis.window.setTimeout(() => {
-			this.setOpacity(0);
-		}, this.animationDuration / 2);
+			this.#setOpacity(0);
+		}, animationDuration / 2);
 
 		globalThis.window.setTimeout(() => {
 			this.#progress = 0.2;
-			this.setProgress(0.2);
-		}, this.animationDuration * 2);
+			this.#setProgress(0.2);
+		}, animationDuration * 2);
 	};
 
-	override connectedCallback() {
-		super.connectedCallback();
+	connectedCallback() {
+		this.ariaHidden = 'true';
 		document.addEventListener('astro:before-preparation', this.#handlePreparation);
 		document.addEventListener('astro:before-swap', this.#handleSwap);
 	}
@@ -51,7 +59,12 @@ class ProgressLoading extends ProgressBar {
 	}
 }
 
-customElements.define('progress-loading', ProgressLoading);
+if (!customElements.get('progress-loading')) {
+	customElements.define('progress-loading', ProgressLoading);
+}
+
+// eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
+export {};
 
 declare global {
 	interface HTMLElementTagNameMap {

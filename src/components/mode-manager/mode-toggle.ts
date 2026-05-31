@@ -1,5 +1,3 @@
-import type { ModeManager } from '#components/mode-manager/mode-manager.ts';
-
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
 class ModeToggle extends HTMLElement {
@@ -12,7 +10,7 @@ class ModeToggle extends HTMLElement {
 
 		this.#lastClickTime = now;
 
-		const manager = document.querySelector<ModeManager>('mode-manager');
+		const manager = document.querySelector('mode-manager');
 
 		if (!manager) return;
 
@@ -44,7 +42,9 @@ class ModeToggle extends HTMLElement {
 	}
 }
 
-customElements.define('mode-toggle', ModeToggle);
+if (!customElements.get('mode-toggle')) {
+	customElements.define('mode-toggle', ModeToggle);
+}
 
 declare global {
 	interface HTMLElementTagNameMap {

@@ -56,8 +56,11 @@ function registerSearchAnalytics(instance: Instance) {
 class SearchToggle extends HTMLElement {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
-	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
-	buttonEl: HTMLButtonElement | null = null;
+
+	/** Pagefind reads this off the registered trigger to toggle aria-expanded and aria-controls */
+	get buttonEl() {
+		return this.querySelector<HTMLButtonElement>('button');
+	}
 
 	#handleClick = () => {
 		const [modal] = (this.instance?.getUtilities('modal') ?? []) as Array<PagefindModal>;
@@ -86,13 +89,8 @@ class SearchToggle extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.buttonEl = this.querySelector('button');
-
-		if (this.buttonEl) {
-			this.buttonEl.setAttribute('aria-haspopup', 'dialog');
-			this.buttonEl.setAttribute('aria-expanded', 'false');
-			this.buttonEl.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K');
-		}
+		// Static props in markup; only the OS-dependent keyboard hint has to be set client-side
+		this.buttonEl?.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K');
 
 		const instanceName = this.getAttribute('instance') ?? 'default';
 
@@ -100,6 +98,8 @@ class SearchToggle extends HTMLElement {
 
 		registerSearchAnalytics(this.instance);
 
+		// Pagefind exposes no deregisterUtility so each navigation's fresh trigger would pile up
+		// The astro:before-swap handler in search.astro clears the registry to bound it; keep these two in sync
 		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
 
 		this.instance.registerShortcut(
@@ -118,7 +118,9 @@ class SearchToggle extends HTMLElement {
 	}
 }
 
-customElements.define('search-toggle', SearchToggle);
+if (!customElements.get('search-toggle')) {
+	customElements.define('search-toggle', SearchToggle);
+}
 
 declare global {
 	interface HTMLElementTagNameMap {

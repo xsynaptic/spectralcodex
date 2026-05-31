@@ -10,9 +10,7 @@ function isModeValid(mode: string | undefined): mode is ModeGeneralType {
 	return mode === ModeTypeEnum.Auto || mode === ModeTypeEnum.Dark || mode === ModeTypeEnum.Light;
 }
 
-export class ModeManager extends HTMLElement {
-	static observedAttributes = ['default-mode', 'storage-key'];
-
+class ModeManager extends HTMLElement {
 	#storageKey = 'color-mode';
 	#mediaMatcher: MediaQueryList | undefined;
 	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
@@ -96,7 +94,9 @@ export class ModeManager extends HTMLElement {
 	}
 }
 
-customElements.define('mode-manager', ModeManager);
+if (!customElements.get('mode-manager')) {
+	customElements.define('mode-manager', ModeManager);
+}
 
 declare global {
 	interface HTMLElementTagNameMap {

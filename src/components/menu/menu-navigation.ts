@@ -18,8 +18,12 @@
  *   data-has-submenu  on every <li> that has a submenu
  *   data-open         on every currently-open <li>
  */
+let instanceCount = 0;
+
 class NavMenu extends HTMLElement {
 	#lastPointerType = '';
+	#instanceId = `nav-${String(instanceCount++)}`;
+	#initialized = false;
 
 	#getSubmenu(li: HTMLElement): HTMLElement | undefined {
 		return li.querySelector<HTMLElement>(':scope > ul') ?? undefined;
@@ -189,7 +193,7 @@ class NavMenu extends HTMLElement {
 						this.#close(li);
 					}
 				}
-				// Enter without children: default trigger behaviour (link navigation or button click)
+				// Enter without children: default trigger behavior (link navigation or button click)
 				break;
 			}
 			case 'Home': {
@@ -356,7 +360,7 @@ class NavMenu extends HTMLElement {
 			if (submenu) {
 				li.dataset.hasSubmenu = '';
 
-				const id = `nav-sub-menu-${String(submenuId++)}`;
+				const id = `${this.#instanceId}-sub-menu-${String(submenuId++)}`;
 
 				submenu.id = id;
 				submenu.setAttribute('role', 'menu');
@@ -376,7 +380,12 @@ class NavMenu extends HTMLElement {
 	}
 
 	connectedCallback() {
-		this.#injectAria();
+		// ARIA injection mutates the light DOM once; a move/reconnect must not re-run it
+		if (!this.#initialized) {
+			this.#injectAria();
+			this.#initialized = true;
+		}
+
 		this.addEventListener('pointerdown', this.#handlePointerDown);
 		this.addEventListener('click', this.#handleClick);
 		this.addEventListener('keydown', this.#handleKeydown);
@@ -391,7 +400,9 @@ class NavMenu extends HTMLElement {
 	}
 }
 
-customElements.define('menu-navigation', NavMenu);
+if (!customElements.get('menu-navigation')) {
+	customElements.define('menu-navigation', NavMenu);
+}
 
 // eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};

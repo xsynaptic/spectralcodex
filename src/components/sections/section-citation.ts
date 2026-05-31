@@ -4,19 +4,12 @@ class CitationButton extends HTMLElement {
 	#timeouts = new Map<HTMLButtonElement, number>();
 
 	connectedCallback() {
-		const buttons = this.querySelectorAll<HTMLButtonElement>('button[data-action]');
-
-		for (const button of buttons) {
-			button.addEventListener('click', this.#handleClick);
-		}
+		this.addEventListener('click', this.#handleClick);
 	}
 
 	disconnectedCallback() {
-		const buttons = this.querySelectorAll<HTMLButtonElement>('button[data-action]');
+		this.removeEventListener('click', this.#handleClick);
 
-		for (const button of buttons) {
-			button.removeEventListener('click', this.#handleClick);
-		}
 		for (const timeoutId of this.#timeouts.values()) {
 			globalThis.window.clearTimeout(timeoutId);
 		}
@@ -24,7 +17,10 @@ class CitationButton extends HTMLElement {
 	}
 
 	#handleClick = async (event: Event) => {
-		const button = event.currentTarget as HTMLButtonElement;
+		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
+
+		if (!button) return;
+
 		const action = button.dataset.action;
 
 		const payload = action === 'copy-json' ? this.#getJsonPayload() : this.#getTextPayload();
@@ -83,7 +79,9 @@ class CitationButton extends HTMLElement {
 	}
 }
 
-customElements.define('citation-button', CitationButton);
+if (!customElements.get('citation-button')) {
+	customElements.define('citation-button', CitationButton);
+}
 
 // eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
