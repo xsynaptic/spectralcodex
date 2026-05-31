@@ -4,6 +4,7 @@ import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import { getConfig } from '@xsynaptic/eslint-config';
 import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import { configs as wcConfigs } from 'eslint-plugin-wc';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -93,6 +94,24 @@ export default getConfig(
 			rules: {
 				// This conflicts with how some client-side code is handled
 				'unicorn/prefer-global-this': 'off',
+			},
+		},
+		/**
+		 * Native web components
+		 */
+		{
+			...wcConfigs['flat/best-practice'],
+			files: ['src/components/**/*.ts'],
+			rules: {
+				...wcConfigs['flat/best-practice'].rules,
+				'wc/define-tag-after-class-definition': 'error',
+				'wc/guard-define-call': 'error',
+				'wc/max-elements-per-file': 'error',
+				'wc/no-constructor': 'error',
+				'wc/no-exports-with-element': 'error',
+				'wc/no-method-prefixed-with-on': 'error',
+				// Redundant under strict TS; the project avoids custom-element inheritance entirely
+				'wc/guard-super-call': 'off',
 			},
 		},
 		/**

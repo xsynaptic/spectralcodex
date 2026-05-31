@@ -92,6 +92,7 @@
 		"eslint-plugin-astro": "^1.7.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-wc": "^3.1.0",
 		"exiftool-vendored": "^35.21.0",
 		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
