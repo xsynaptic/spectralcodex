@@ -4,7 +4,7 @@
 // Geometry is typed as path segments; the `filters:` segment is a flat name -> args map
 // Explicit-provider only: no canonical domain or path marker, so no auto-detect
 
-import type { ImageFormat, Operations } from 'unpic';
+import type { ImageFormat, Operations, TransformerFunction } from 'unpic';
 
 export type ImagorFormats = ImageFormat | 'gif' | 'tiff' | 'jp2' | 'jxl' | 'heif' | (string & {});
 
@@ -37,14 +37,20 @@ export interface ImagorOperations extends Operations<ImagorFormats> {
 }
 
 export interface ImagorOptions {
+	/** Mount prefix stripped from an incoming src; never emitted (imagor signs the bare path) */
 	baseURL?: string;
 }
 
-export function generate(
-	src: string | URL,
-	operations: ImagorOperations,
+type ImagorExtractor = (
+	url: string | URL,
 	options?: ImagorOptions,
-): string {
+) => { src: string; operations: ImagorOperations; options: ImagorOptions } | null;
+
+export const generate: TransformerFunction<ImagorOperations, ImagorOptions> = (
+	src,
+	operations,
+	options,
+) => {
 	const segments: Array<string> = [];
 
 	appendTrim(segments, operations.trim);
@@ -62,34 +68,9 @@ export function generate(
 	segments.push(escapeSource(normaliseSource(src, options?.baseURL)));
 
 	return segments.join('/');
-}
+};
 
-export function transform(
-	src: string | URL,
-	operations: ImagorOperations,
-	options?: ImagorOptions,
-): string {
-	const baseURL = options?.baseURL;
-	const raw = typeof src === 'string' ? src : src.toString();
-
-	if (baseURL !== undefined && raw.startsWith(baseURL)) {
-		const extracted = extract(src, options);
-		if (extracted) {
-			return generate(extracted.src, { ...extracted.operations, ...operations }, options);
-		}
-	}
-
-	return generate(src, operations, options);
-}
-
-export function extract(
-	url: string | URL,
-	options?: ImagorOptions,
-): {
-	src: string;
-	operations: ImagorOperations;
-	options: ImagorOptions;
-} | null {
+export const extract: ImagorExtractor = (url, options) => {
 	const baseURL = options?.baseURL;
 
 	const path = normaliseSource(url, baseURL);
@@ -184,6 +165,34 @@ export function extract(
 		operations,
 		options: baseURL === undefined ? {} : { baseURL },
 	};
+};
+
+export const transform: TransformerFunction<ImagorOperations, ImagorOptions> = (
+	src,
+	operations,
+	options,
+) => {
+	const baseURL = options?.baseURL;
+	const raw = typeof src === 'string' ? src : src.toString();
+
+	// no path marker, so only re-extract when src carries the known baseURL prefix
+	if (baseURL !== undefined && raw.startsWith(baseURL)) {
+		const extracted = extract(src, options);
+		if (extracted) {
+			return generate(
+				extracted.src,
+				{ ...extracted.operations, ...removeUndefined(operations) },
+				options,
+			);
+		}
+	}
+
+	return generate(src, operations, options);
+};
+
+// Explicit undefined in new operations must not clobber extracted ones
+function removeUndefined(operations: ImagorOperations): ImagorOperations {
+	return Object.fromEntries(Object.entries(operations).filter(([, value]) => value !== undefined));
 }
 
 function appendTrim(segments: Array<string>, trim: ImagorOperations['trim']): void {
@@ -246,8 +255,7 @@ function appendAlign(
 	if (vAlign === 'top' || vAlign === 'bottom') segments.push(vAlign);
 }
 
-// quality/format are typed base operations but imagor emits them as filters;
-// fit: 'inside' adds no_upscale(). User filters follow in their own order
+// Quality/format are standard unpic operations but imagor has no native slot, so they become filters
 function buildFilters(operations: ImagorOperations): Array<string> {
 	const entries: Record<string, string> = {};
 	if (operations.quality !== undefined) entries.quality = String(operations.quality);
