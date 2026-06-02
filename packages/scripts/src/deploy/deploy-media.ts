@@ -3,10 +3,10 @@ import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
+import { rsyncTo } from './rsync-exec.js';
 
 interface DeployMediaOptions {
 	rootPath: string;
@@ -17,21 +17,19 @@ interface DeployMediaOptions {
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const { rootPath, dryRun = false, fast = false } = options;
 
-	// Load deploy configuration
 	const config = loadDeployConfig();
 
 	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 	const mediaPath = path.join(rootPath, mediaPathRelative);
 
 	const stats = await fs.stat(mediaPath).catch(() => {
-		// Return undefined implicitly
+		// stat throws if the path is absent; the guard below handles it
 	});
 
 	if (!stats?.isDirectory()) {
 		throw new Error(`Media path not found: ${mediaPath}`);
 	}
 
-	// Remote path is project root + /media subfolder
 	const remoteMediaPath = `${config.mediaPath}/media`;
 
 	console.log(chalk.blue('Syncing media...'));
@@ -41,23 +39,15 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
-	const rsyncArgs = [
-		'-av',
-		'--progress',
-		'--partial',
-		...(fast ? ['--size-only'] : ['-c']),
-		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
-		'--exclude=.DS_Store',
-		'--exclude=*.tmp',
-		'--exclude=.gitkeep',
-		...(dryRun ? ['--dry-run'] : []),
-		`${mediaPath}/`,
-		`${config.remoteHost}:${remoteMediaPath}/`,
-	];
-
 	const start = Date.now();
 
-	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
+	await rsyncTo(`${mediaPath}/`, `${config.remoteHost}:${remoteMediaPath}/`, {
+		config,
+		dryRun,
+		archive: 'av',
+		extraFlags: ['--partial', fast ? '--size-only' : '-c'],
+		excludes: ['.DS_Store', '*.tmp', '.gitkeep'],
+	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

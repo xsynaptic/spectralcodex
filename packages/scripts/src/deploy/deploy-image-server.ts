@@ -2,10 +2,10 @@
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
+import { rsyncTo, sshExec } from './rsync-exec.js';
 
 const PROJECT_SLUG = 'spectralcodex';
 
@@ -34,33 +34,22 @@ export async function deployImageServer({
 	console.log(chalk.gray(`  To: ${config.remoteHost}:${projectPath}/`));
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-	const sshFlag = config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : [];
 	const composeCmd = `docker compose -p ${PROJECT_SLUG} -f ${remoteComposeFile}`;
 
 	const start = Date.now();
 
-	// Sync compose file
-	await $({ stdio: 'inherit' })`rsync ${[
-		'-avz',
-		'--mkpath',
-		'--progress',
-		...sshFlag,
-		...(dryRun ? ['--dry-run'] : []),
-		composeFile,
-		`${config.remoteHost}:${remoteComposeFile}`,
-	]}`;
+	await rsyncTo(composeFile, `${config.remoteHost}:${remoteComposeFile}`, {
+		config,
+		dryRun,
+		extraFlags: ['--mkpath'],
+	});
 
-	// Sync nginx config (volume-mounted by the compose file)
-	await $({ stdio: 'inherit' })`rsync ${[
-		'-avz',
-		'--mkpath',
-		'--progress',
-		...sshFlag,
-		...(dryRun ? ['--dry-run'] : []),
-		nginxTemplate,
-		`${config.remoteHost}:${remoteNginxTemplate}`,
-	]}`;
+	// nginx config is volume-mounted by the compose file
+	await rsyncTo(nginxTemplate, `${config.remoteHost}:${remoteNginxTemplate}`, {
+		config,
+		dryRun,
+		extraFlags: ['--mkpath'],
+	});
 
 	if (dryRun) {
 		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
@@ -74,25 +63,25 @@ export async function deployImageServer({
 		`IMAGE_SERVER_SECRET=${imageServerSecret}`,
 		`IMAGE_SERVER_SIGNATURE_LENGTH=${imageServerSignatureLength}`,
 	].join('\n');
-	await $({
-		stdio: 'inherit',
-	})`ssh ${sshArgs} ${`mkdir -p ${projectPath}/deploy/site && cat > ${projectPath}/deploy/site/.env << 'ENVEOF'\n${envContent}\nENVEOF`}`;
+	await sshExec(
+		config,
+		`mkdir -p ${projectPath}/deploy/site && cat > ${projectPath}/deploy/site/.env << 'ENVEOF'\n${envContent}\nENVEOF`,
+	);
 
-	// Pull the pinned imagor image on remote
 	console.log(chalk.gray('Pulling image on remote...'));
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`${composeCmd} pull`}`;
+	await sshExec(config, `${composeCmd} pull`);
 
-	// Recreate containers and wait for health
 	console.log(chalk.gray('Recreating containers...'));
 	try {
-		await $({
-			stdio: 'inherit',
-		})`ssh ${sshArgs} ${`${composeCmd} up -d --force-recreate --remove-orphans --wait --wait-timeout 60`}`;
+		await sshExec(
+			config,
+			`${composeCmd} up -d --force-recreate --remove-orphans --wait --wait-timeout 60`,
+		);
 	} catch {
 		console.log(chalk.yellow('Warning: Health check timed out'));
 	}
 
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${`${composeCmd} ps`}`;
+	await sshExec(config, `${composeCmd} ps`);
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

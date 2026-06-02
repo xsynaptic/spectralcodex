@@ -3,10 +3,10 @@ import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '@spectralcodex/sh
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
+import { rsyncTo } from './rsync-exec.js';
 
 interface DeployOgOptions {
 	rootPath: string;
@@ -34,35 +34,17 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 
 	const start = Date.now();
 
-	if (ids.length > 0) {
-		// Sync specific files
-		const files = ids.map((id) => `${id}.${OPEN_GRAPH_IMAGE_FORMAT}`);
+	const sources =
+		ids.length > 0
+			? ids.map((id) => path.join(ogImagePath, `${id}.${OPEN_GRAPH_IMAGE_FORMAT}`))
+			: [`${ogImagePath}/`];
 
-		const rsyncArgs = [
-			'-av',
-			'--checksum',
-			'--progress',
-			...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
-			...(dryRun ? ['--dry-run'] : []),
-			...files.map((f) => path.join(ogImagePath, f)),
-			`${config.remoteHost}:${remoteOgPath}/`,
-		];
-
-		await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
-	} else {
-		// Sync all files
-		const rsyncArgs = [
-			'-av',
-			'--checksum',
-			'--progress',
-			...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
-			...(dryRun ? ['--dry-run'] : []),
-			`${ogImagePath}/`,
-			`${config.remoteHost}:${remoteOgPath}/`,
-		];
-
-		await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
-	}
+	await rsyncTo(sources, `${config.remoteHost}:${remoteOgPath}/`, {
+		config,
+		dryRun,
+		archive: 'av',
+		extraFlags: ['--checksum'],
+	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

@@ -2,10 +2,10 @@
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
+import { rsyncTo, sshExec } from './rsync-exec.js';
 
 interface DeployCaddyOptions {
 	rootPath: string;
@@ -33,42 +33,24 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
-	const sshFlag = config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : [];
-	const dryRunFlag = dryRun ? ['--dry-run'] : [];
-
 	const start = Date.now();
 
-	// Sync Caddy site configs
-	await $({ stdio: 'inherit' })`rsync ${[
-		'-avz',
-		'--progress',
-		...sshFlag,
-		...dryRunFlag,
-		`${siteDir}/caddy/sites/`,
-		`${config.remoteHost}:${remoteCaddySitesPath}/`,
-	]}`;
+	await rsyncTo(`${siteDir}/caddy/sites/`, `${config.remoteHost}:${remoteCaddySitesPath}/`, {
+		config,
+		dryRun,
+	});
 
-	// Sync TLS certs
-	await $({ stdio: 'inherit' })`rsync ${[
-		'-avz',
-		'--progress',
-		...sshFlag,
-		...dryRunFlag,
-		`${siteDir}/certs/`,
-		`${config.remoteHost}:${remoteCertsPath}/`,
-	]}`;
+	await rsyncTo(`${siteDir}/certs/`, `${config.remoteHost}:${remoteCertsPath}/`, {
+		config,
+		dryRun,
+	});
 
-	// Reload Caddy
-	if (!dryRun) {
-		const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-
-		try {
-			await $({
-				stdio: 'inherit',
-			})`ssh ${sshArgs} ${'docker exec caddy caddy reload --config /etc/caddy/Caddyfile'}`;
-		} catch {
-			console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
-		}
+	try {
+		await sshExec(config, 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile', {
+			dryRun,
+		});
+	} catch {
+		console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
 	}
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));

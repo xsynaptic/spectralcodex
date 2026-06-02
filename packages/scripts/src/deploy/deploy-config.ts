@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-interface DeployConfig {
+export interface DeployConfig {
 	remoteHost: string;
 	remotePath: string;
 	sshKeyPath?: string;

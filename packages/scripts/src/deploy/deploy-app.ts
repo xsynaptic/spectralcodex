@@ -3,10 +3,10 @@ import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
+import { rsyncTo } from './rsync-exec.js';
 
 interface DeployAppOptions {
 	rootPath: string;
@@ -17,7 +17,6 @@ interface DeployAppOptions {
 export async function deployApp(options: DeployAppOptions): Promise<void> {
 	const { rootPath, dryRun = false, skipDelete = false } = options;
 
-	// Load deploy configuration
 	const config = loadDeployConfig();
 
 	const distPath = path.join(rootPath, 'dist');
@@ -28,20 +27,14 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
-	const rsyncArgs = [
-		'-avz',
-		'--progress',
-		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
-		`--exclude=/${OPEN_GRAPH_BASE_PATH}/`,
-		...(skipDelete ? [] : ['--delete-after']),
-		...(dryRun ? ['--dry-run'] : []),
-		`${distPath}/`,
-		`${config.remoteHost}:${config.sitePath}/`,
-	];
-
 	const start = Date.now();
 
-	await $({ stdio: 'inherit' })`rsync ${rsyncArgs}`;
+	await rsyncTo(`${distPath}/`, `${config.remoteHost}:${config.sitePath}/`, {
+		config,
+		dryRun,
+		excludes: [`/${OPEN_GRAPH_BASE_PATH}/`, '/shrine-app/', '/ruin-app/'],
+		extraFlags: skipDelete ? [] : ['--delete-after'],
+	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }
