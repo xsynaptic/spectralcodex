@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.21.0",
+	"version": "6.22.0",
 	"scripts": {
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"check-content": "pnpm --filter @spectralcodex/content check",
@@ -48,8 +48,8 @@
 	},
 	"dependencies": {
 		"astro": "^6.4.2",
-		"react": "^19.2.6",
-		"react-dom": "^19.2.6"
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
@@ -79,7 +79,7 @@
 		"@turf/helpers": "^7.3.5",
 		"@turf/truncate": "^7.3.5",
 		"@types/geojson": "^7946.0.16",
-		"@types/react": "^19.2.15",
+		"@types/react": "^19.2.16",
 		"@types/react-dom": "^19.2.3",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
@@ -111,12 +111,12 @@
 		"tailwindcss": "^4.3.0",
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.60.0",
+		"typescript-eslint": "^8.60.1",
 		"unified": "^11.0.5",
 		"unpic": "^4.2.2",
-		"vite": "^7.3.3",
-		"vitest": "^4.1.7",
+		"vite": "^7.3.5",
+		"vitest": "^4.1.8",
 		"zod": "^4.4.3"
 	},
-	"packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f"
+	"packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485"
 }
