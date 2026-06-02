@@ -7,7 +7,6 @@ import type { ContentMetadataIndex } from '#lib/metadata/metadata-index-core.ts'
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
-import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
@@ -55,30 +54,23 @@ function getLinksCount(entry: CollectionEntry<CollectionKey>): number {
 }
 
 /**
- * Content backlinks; this functionality relies on custom MDX components
+ * Content backlinks; discovered from the <Link id="..."> MDX component in body content
  */
-const backlinkMdxComponentPatterns = [
-	['<Link ', /<Link id="([^"]+)"/g],
-	['<Img src="', /<Img src="([^"]+)"/g],
-] as const;
+const backlinkLinkPattern = /<Link id="([^"]+)"/g;
 
 function generateContentBacklinksFromMdxComponents(
 	entry: CollectionEntry<CollectionKey>,
 	contentMetadataMap: Map<string, ContentMetadataItem>,
 ) {
-	for (const [pattern, regex] of backlinkMdxComponentPatterns) {
-		if (entry.body?.includes(pattern)) {
-			const matches = [...entry.body.matchAll(regex)];
+	if (!entry.body?.includes('<Link ')) return;
 
-			for (const [, backlinkId] of matches) {
-				// Skip self-links and invalid backlinks
-				if (!backlinkId || backlinkId === entry.id) continue;
+	for (const [, backlinkId] of entry.body.matchAll(backlinkLinkPattern)) {
+		// Skip self-links and invalid backlinks
+		if (!backlinkId || backlinkId === entry.id) continue;
 
-				const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
+		const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
 
-				if (backlinkSet) backlinkSet.add(entry.id);
-			}
-		}
+		if (backlinkSet) backlinkSet.add(entry.id);
 	}
 }
 
@@ -89,7 +81,6 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 	const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
 	const { entries: notes } = await getNotesCollection();
-	const { entries: images } = await getImagesCollection();
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: pages } = await getPagesCollection();
 	const { entries: posts } = await getPostsCollection();
@@ -146,8 +137,8 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 		}
 	}
 
-	// Now run through everything again and generate backlinks from MDX components (Link, Img)
-	for (const collection of [pages, posts, notes, locations, regions, themes, series, images]) {
+	// Now run through everything again and generate backlinks from <Link> components
+	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
 		for (const entry of collection) {
 			generateContentBacklinksFromMdxComponents(entry, contentMetadataMap);
 		}
