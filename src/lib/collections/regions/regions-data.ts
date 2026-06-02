@@ -33,6 +33,15 @@ type RegionComputedDataCache = Record<string, RegionComputedData>;
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collection');
 
 /**
+ * Resolve the regions a location belongs to; overrides apply only in production
+ */
+function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
+	return import.meta.env.PROD && entry.data.override?.regions
+		? entry.data.override.regions
+		: entry.data.regions;
+}
+
+/**
  * Generate a stable cache key from the content graph state
  * This key changes when any region structure, location-region, or post-region relationship changes
  */
@@ -53,7 +62,7 @@ function generateCacheKey({
 			})),
 			locations: locations.map((entry) => ({
 				id: entry.id,
-				regions: (entry.data.override?.regions ?? entry.data.regions).map(({ id }) => id),
+				regions: resolveLocationRegions(entry).map(({ id }) => id),
 			})),
 			posts: posts.map((entry) => ({
 				id: entry.id,
@@ -213,12 +222,7 @@ function populateRegionsContent({
 	const locationsByRegionMap = new Map<string, Array<string>>();
 
 	for (const entry of locations) {
-		const regions =
-			import.meta.env.PROD && entry.data.override?.regions
-				? entry.data.override.regions
-				: entry.data.regions;
-
-		for (const { id: regionId } of regions) {
+		for (const { id: regionId } of resolveLocationRegions(entry)) {
 			if (!locationsByRegionMap.has(regionId)) {
 				locationsByRegionMap.set(regionId, []);
 			}
