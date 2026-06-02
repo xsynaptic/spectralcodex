@@ -39,10 +39,10 @@ const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'titl
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
-const contentMetadataIndex = await getContentMetadataIndex();
+const contentIndex = await getContentMetadataIndex();
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
 	imageFeatured: entry.data.imageFeatured,
-	contentMetadataIndex,
+	getCaption: contentIndex.getCaption,
 });
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 

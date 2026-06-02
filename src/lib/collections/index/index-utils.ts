@@ -1,59 +1,42 @@
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import {
 	filterHasFeaturedImage,
-	createContentMetadataFunction,
 	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+	sortContentMetadataByQuality,
+} from '#lib/metadata/metadata-index-core.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 export async function queryIndexData() {
-	const { entries: locations } = await getLocationsCollection();
-	const { entries: posts } = await getPostsCollection();
-	const { entries: series } = await getSeriesCollection();
-	const { entries: themes } = await getThemesCollection();
-
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return {
 		featuredMetadataItems: R.pipe(
-			[
-				...R.pipe(locations, R.filter(createFilterEntryQualityFunction(4)), getContentMetadata),
-				...R.pipe(posts, R.filter(createFilterEntryQualityFunction(4)), getContentMetadata),
-			],
+			contentIndex.byCollection('locations', 'posts'),
+			R.filter((item) => item.entryQuality >= 4),
 			R.filter(filterHasFeaturedImage),
 			R.shuffle(),
 			R.take(5),
 		),
 		recentMetadataItems: R.pipe(
-			[
-				...R.pipe(locations, R.filter(createFilterEntryQualityFunction(3)), getContentMetadata),
-				...R.pipe(posts, R.filter(createFilterEntryQualityFunction(3)), getContentMetadata),
-			],
+			contentIndex.byCollection('locations', 'posts'),
+			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate),
 			R.take(16),
 		),
 		seriesMetadataItems: R.pipe(
-			series,
-			R.filter(createFilterEntryQualityFunction(3)),
-			R.shuffle(),
-			R.sortBy(({ data }) => data.entryQuality),
-			getContentMetadata,
+			contentIndex.byCollection('series'),
+			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
+			R.sort(sortContentMetadataByQuality),
 			R.take(4),
 		),
 		themesMetadataItems: R.pipe(
-			themes,
-			R.filter(createFilterEntryQualityFunction(3)),
-			R.shuffle(),
-			R.sortBy(({ data }) => data.entryQuality),
-			getContentMetadata,
+			contentIndex.byCollection('themes'),
+			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
+			R.sort(sortContentMetadataByQuality),
 			R.take(8),
 		),
 	};

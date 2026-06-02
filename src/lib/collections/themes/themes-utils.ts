@@ -2,21 +2,20 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
-	createContentMetadataFunction,
 	filterHasFeaturedImage,
 	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
+} from '#lib/metadata/metadata-index-core.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import {
 	createCollectionLookupByIds,
-	createFilterEntryQualityFunction,
 	filterWithContent,
 	sortByContentCount,
 } from '#lib/utils/collections.ts';
@@ -25,23 +24,23 @@ export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', g
 
 // Get posts that have a term
 async function createPostsByThemeFunction() {
-	const { entries } = await getPostsCollection();
+	const getPostsByIds = await createPostsByIdsFunction();
 
 	return function getPostsByTheme(
 		entry: CollectionEntry<'themes'>,
 	): Array<CollectionEntry<'posts'>> {
-		return entries.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
+		return getPostsByIds(entry.data._posts ?? []);
 	};
 }
 
 // Get locations that have a term
 export async function createLocationsByThemeFunction() {
-	const { entries } = await getLocationsCollection();
+	const getLocationsByIds = await createLocationsByIdsFunction();
 
 	return function getLocationsByTheme(
 		entry: CollectionEntry<'themes'>,
 	): Array<CollectionEntry<'locations'>> {
-		return entries.filter(({ data }) => data.themes?.find(({ id }) => id === entry.id));
+		return getLocationsByIds(entry.data._locations ?? []);
 	};
 }
 
@@ -49,28 +48,32 @@ export async function createLocationsByThemeFunction() {
  * Data for a single theme entry page: metadata items, map data, and related themes
  */
 export async function createQueryThemesEntryFunction() {
-	const { entries: locations } = await getLocationsCollection();
 	const { entries: themes } = await getThemesCollection();
 
-	const getPostsByTerm = await createPostsByThemeFunction();
-	const getContentMetadata = await createContentMetadataFunction();
+	const getLocationsByTheme = await createLocationsByThemeFunction();
+	const getPostsByTheme = await createPostsByThemeFunction();
+	const contentIndex = await getContentMetadataIndex();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-		// Note: the need to get location data async means we should filter this first!
-		const locationsFiltered = locations.filter(
-			({ data }) => data.themes?.some(({ id }) => id === entry.id) ?? false,
-		);
+		const locationsFiltered = getLocationsByTheme(entry);
 		const locationsListed = locationsFiltered.filter(({ data }) => !data.hideIndex);
 
-		const postsFiltered = getPostsByTerm(entry);
+		const postsFiltered = getPostsByTheme(entry);
 
 		// Metadata items are the posts and locations that are associated with the theme
 		const metadataItemsFiltered = R.pipe(
-			[...R.pipe(locationsListed, R.filter(createFilterEntryQualityFunction(2))), ...postsFiltered],
-			getContentMetadata,
+			[
+				...R.pipe(
+					locationsListed,
+					R.filter((location) => location.data.entryQuality >= 2),
+				),
+				...postsFiltered,
+			],
+			// Entries become metadata items below this point
+			contentIndex.resolve,
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate),
 		);
@@ -79,7 +82,7 @@ export async function createQueryThemesEntryFunction() {
 		const metadataItemsAll = R.pipe(
 			[...locationsListed, ...postsFiltered],
 			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
-			getContentMetadata,
+			contentIndex.resolve,
 			R.shuffle(),
 		);
 		const metadataItems = metadataItemsAll.slice(0, 25);
@@ -108,7 +111,7 @@ export async function createQueryThemesEntryFunction() {
 export async function queryThemesIndex() {
 	const { entries } = await getThemesCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return R.pipe(
 		entries,
@@ -116,6 +119,6 @@ export async function queryThemesIndex() {
 		/** Only display themes with associated images */
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByContentCount),
-		getContentMetadata,
+		contentIndex.resolve,
 	);
 }

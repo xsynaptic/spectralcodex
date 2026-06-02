@@ -45,11 +45,11 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
-const contentMetadataIndex = await getContentMetadataIndex();
+const contentIndex = await getContentMetadataIndex();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
-	contentMetadataIndex,
+	getCaption: contentIndex.getCaption,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });

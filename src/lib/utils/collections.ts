@@ -4,8 +4,6 @@ import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 
-import type { ContentMetadataCollectionKey } from '#lib/metadata/metadata-types.ts';
-
 interface CollectionEntryWithContentCount {
 	data: {
 		_locationCount?: number | undefined;
@@ -40,15 +38,6 @@ export function filterWithContent<T extends CollectionEntryWithContentCount>(ent
 	if (entry.data._locationCount && entry.data._locationCount > 0) return true;
 	if (entry.data._postCount && entry.data._postCount > 0) return true;
 	return false;
-}
-
-// Filter content by entry quality
-export function createFilterEntryQualityFunction<
-	T extends CollectionEntry<ContentMetadataCollectionKey>,
->(entryQuality: 1 | 2 | 3 | 4 | 5) {
-	return function filterEntryQuality(entry: T): entry is T {
-		return !!entry.data.entryQuality && entry.data.entryQuality >= entryQuality;
-	};
 }
 
 // Collection data factory utilities

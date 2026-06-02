@@ -11,13 +11,13 @@ import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
  * Uses a custom imageFeatured from the archive entry if available, otherwise generates from highlights
  */
 export async function createArchivesImageFeaturedGroupFunction() {
-	const contentMetadataIndex = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 
 	return function getArchivesImageFeaturedGroup(item: ArchivesMonthlyItem) {
 		return item.archiveEntry?.data.imageFeatured
 			? getImageFeaturedGroup({
 					imageFeatured: item.archiveEntry.data.imageFeatured,
-					contentMetadataIndex,
+					getCaption: contentIndex.getCaption,
 				})
 			: getImageFeaturedGroupByContentMetadata({ items: item.highlights });
 	};

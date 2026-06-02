@@ -1,7 +1,6 @@
 import * as R from 'remeda';
 
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 
 export async function queryNotesIndex() {
@@ -9,7 +8,7 @@ export async function queryNotesIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((entry) => entry.data.entryQuality >= 2),
 		R.sort(sortByDateReverseChronological),
 	);
 }

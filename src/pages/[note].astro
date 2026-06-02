@@ -3,18 +3,18 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import NotesEntry from '#layouts/notes-entry.astro';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
-import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getNotesCollection();
 
-	const getContentBacklinks = await createContentBacklinksFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return entries.map((entry) => ({
 		params: { note: entry.id },
 		props: {
 			entry,
-			backlinks: getContentBacklinks({ id: entry.id }),
+			backlinks: contentIndex.backlinksOf(entry.id),
 		},
 	}));
 }) satisfies GetStaticPaths;

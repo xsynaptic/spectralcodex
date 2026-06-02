@@ -3,6 +3,7 @@ import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:c
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
+import type { ContentMetadataIndex } from '#lib/metadata/metadata-index-core.ts';
 import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
@@ -17,14 +18,12 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { createContentMetadataIndex } from '#lib/metadata/metadata-index-core.ts';
 import { getWordCount } from '#lib/metadata/metadata-word-count.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-
-// Simple in-memory cache
-const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
 // Find the common ancestor of a set of regions so there's only one in the content metadata index
 async function getRegionPrimaryIdFunction() {
@@ -84,8 +83,10 @@ function generateContentBacklinksFromMdxComponents(
 }
 
 // This function does all the heavy lifting and should only run once
-async function populateContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
+async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem>> {
 	const startTime = performance.now();
+
+	const contentMetadataMap = new Map<string, ContentMetadataItem>();
 
 	const { entries: notes } = await getNotesCollection();
 	const { entries: images } = await getImagesCollection();
@@ -170,15 +171,14 @@ async function populateContentMetadataIndex(): Promise<Map<string, ContentMetada
 
 	console.log(`[Metadata] Generated in ${(endTime - startTime).toFixed(5)}ms`);
 
-	return contentMetadataMap;
+	return [...contentMetadataMap.values()];
 }
 
-// Initialize the content metadata index and return on demand
-let contentMetadataIndex: ReturnType<typeof populateContentMetadataIndex> | undefined;
+let contentMetadataIndex: Promise<ContentMetadataIndex> | undefined;
 
-export async function getContentMetadataIndex(): Promise<Map<string, ContentMetadataItem>> {
+export async function getContentMetadataIndex(): Promise<ContentMetadataIndex> {
 	if (!contentMetadataIndex) {
-		contentMetadataIndex = populateContentMetadataIndex();
+		contentMetadataIndex = populateContentMetadataItems().then(createContentMetadataIndex);
 	}
 	return contentMetadataIndex;
 }

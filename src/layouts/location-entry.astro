@@ -61,13 +61,13 @@ const { regionPrimary, regionLangCode, titleMultilingual, titleMultilingualAddit
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
-const contentMetadataIndex = await getContentMetadataIndex();
+const contentIndex = await getContentMetadataIndex();
 const imageFeaturedId = getImageFeaturedId({
 	imageFeatured: entry.data.imageFeatured,
 });
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
 	imageFeatured: entry.data.imageFeatured,
-	contentMetadataIndex,
+	getCaption: contentIndex.getCaption,
 });
 
 const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;

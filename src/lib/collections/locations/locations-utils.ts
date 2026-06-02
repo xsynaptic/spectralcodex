@@ -15,12 +15,8 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
-import {
-	createContentMetadataFunction,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
+import { sortContentMetadataByDate } from '#lib/metadata/metadata-index-core.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
@@ -124,9 +120,8 @@ export async function getLocationSchemas(
  */
 export async function createQueryLocationsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
-	const getContentMetadata = await createContentMetadataFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const getContentBacklinks = await createContentBacklinksFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -144,11 +139,11 @@ export async function createQueryLocationsEntryFunction() {
 		const metadataItems = R.pipe(
 			entry.data._posts ?? [],
 			getPostsByIds,
-			getContentMetadata,
+			contentIndex.resolve,
 			R.sort(sortContentMetadataByDate),
 		);
 
-		const backlinks = getContentBacklinks({ id: entry.id });
+		const backlinks = contentIndex.backlinksOf(entry.id);
 
 		return { mapData, metadataItems, backlinks };
 	};
@@ -189,14 +184,14 @@ export async function createLocationEntryDisplayFunction() {
 export async function queryLocationsIndex() {
 	const { entries } = await getLocationsCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return R.pipe(
 		entries,
 		R.filter((item) => !item.data.hideIndex),
-		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((entry) => entry.data.entryQuality >= 2),
 		R.filter((item) => !!item.data.imageFeatured),
-		getContentMetadata,
+		contentIndex.resolve,
 		R.sort(sortContentMetadataByDate),
 	);
 }

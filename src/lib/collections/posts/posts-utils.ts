@@ -10,11 +10,8 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createContentBacklinksFunction } from '#lib/metadata/metadata-backlinks.ts';
-import {
-	createCollectionLookupByIds,
-	createFilterEntryQualityFunction,
-} from '#lib/utils/collections.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
@@ -44,7 +41,7 @@ export async function getPostSchema(
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const getContentBacklinks = await createContentBacklinksFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -57,7 +54,7 @@ export async function createQueryPostsEntryFunction() {
 				: {}),
 		});
 
-		const backlinks = getContentBacklinks({ id: entry.id });
+		const backlinks = contentIndex.backlinksOf(entry.id);
 
 		return { mapData, backlinks };
 	};
@@ -68,7 +65,7 @@ export async function queryPostsIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((entry) => entry.data.entryQuality >= 2),
 		R.sort(sortByDateReverseChronological),
 	);
 }

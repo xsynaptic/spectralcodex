@@ -16,9 +16,9 @@ function getContentCounts(data: Array<ContentMetadataItem> | undefined) {
 }
 
 export async function getContentStats() {
-	const contentMetadataIndex = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 
-	const contentMetadataArray = [...contentMetadataIndex.values()];
+	const contentMetadataArray = [...contentIndex.all()];
 
 	const contentMetadataGroups = R.groupBy(contentMetadataArray, (item) => item.collection);
 

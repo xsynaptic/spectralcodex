@@ -9,13 +9,29 @@ export const getThemesCollection = createCollectionData({
 		const locations = await getCollection('locations');
 		const posts = await getCollection('posts');
 
+		const locationsByThemeMap = new Map<string, Array<string>>();
+
+		for (const location of locations) {
+			for (const { id: themeId } of location.data.themes ?? []) {
+				if (!locationsByThemeMap.has(themeId)) locationsByThemeMap.set(themeId, []);
+				locationsByThemeMap.get(themeId)!.push(location.id);
+			}
+		}
+
+		const postsByThemeMap = new Map<string, Array<string>>();
+
+		for (const post of posts) {
+			for (const { id: themeId } of post.data.themes ?? []) {
+				if (!postsByThemeMap.has(themeId)) postsByThemeMap.set(themeId, []);
+				postsByThemeMap.get(themeId)!.push(post.id);
+			}
+		}
+
 		for (const entry of entries) {
-			entry.data._locationCount = locations.filter((location) =>
-				location.data.themes?.some(({ id }) => id === entry.id),
-			).length;
-			entry.data._postCount = posts.filter((post) =>
-				post.data.themes?.some(({ id }) => id === entry.id),
-			).length;
+			entry.data._locations = locationsByThemeMap.get(entry.id) ?? [];
+			entry.data._locationCount = entry.data._locations.length;
+			entry.data._posts = postsByThemeMap.get(entry.id) ?? [];
+			entry.data._postCount = entry.data._posts.length;
 		}
 	},
 });

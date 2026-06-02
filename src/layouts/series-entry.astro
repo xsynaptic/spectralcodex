@@ -36,11 +36,11 @@ const { entry, mapData, page, wordCount } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
-const contentMetadataIndex = await getContentMetadataIndex();
+const contentIndex = await getContentMetadataIndex();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
-	contentMetadataIndex,
+	getCaption: contentIndex.getCaption,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });

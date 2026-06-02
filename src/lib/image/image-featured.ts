@@ -6,6 +6,7 @@ import type {
 
 import * as R from 'remeda';
 
+import type { ContentCaption } from '#lib/metadata/metadata-index-core.ts';
 import type {
 	ContentMetadataItem,
 	ImageFeaturedWithCaption,
@@ -38,13 +39,13 @@ export function getImageFeaturedId({
 
 function enrichImageFeaturedObjects(
 	imageFeaturedObjects: Array<ImageFeaturedObject>,
-	contentMetadataIndex: Map<string, ContentMetadataItem>,
+	getCaption: (id: string) => ContentCaption | undefined,
 ): Array<ImageFeaturedWithCaption> {
 	return imageFeaturedObjects.map((item) => {
-		const contentMetadata = item.link ? contentMetadataIndex.get(item.link) : undefined;
+		const caption = item.link ? getCaption(item.link) : undefined;
 
 		// Caption text prefers the image's own title; a link supplies the URL and a fallback title
-		const captionTitle = item.title ?? contentMetadata?.title;
+		const captionTitle = item.title ?? caption?.title;
 
 		return {
 			...item,
@@ -52,8 +53,8 @@ function enrichImageFeaturedObjects(
 				? {
 						captionMetadata: {
 							title: captionTitle,
-							titleMultilingual: contentMetadata?.titleMultilingual,
-							...(contentMetadata ? { id: contentMetadata.id, url: contentMetadata.url } : {}),
+							titleMultilingual: caption?.titleMultilingual,
+							...(caption ? { id: caption.id, url: caption.url } : {}),
 						},
 					}
 				: {}),
@@ -64,10 +65,10 @@ function enrichImageFeaturedObjects(
 // Taxonomy policy: every featured image becomes a hero (regions, themes, series)
 export function getImageFeaturedGroup({
 	imageFeatured,
-	contentMetadataIndex,
+	getCaption,
 }: {
 	imageFeatured: ImageFeatured | undefined;
-	contentMetadataIndex: Map<string, ContentMetadataItem>;
+	getCaption: (id: string) => ContentCaption | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
@@ -76,16 +77,16 @@ export function getImageFeaturedGroup({
 		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
 		: [{ id: imageFeatured }];
 
-	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, contentMetadataIndex);
+	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, getCaption);
 }
 
 // Post-like policy: heroes are opt-in via "hero: true" and authored order
 export function getImageFeaturedHeroGroup({
 	imageFeatured,
-	contentMetadataIndex,
+	getCaption,
 }: {
 	imageFeatured: ImageFeatured | undefined;
-	contentMetadataIndex: Map<string, ContentMetadataItem>;
+	getCaption: (id: string) => ContentCaption | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
 
@@ -95,7 +96,7 @@ export function getImageFeaturedHeroGroup({
 
 	if (imageHeroObjectGroup.length === 0) return undefined;
 
-	return enrichImageFeaturedObjects(imageHeroObjectGroup, contentMetadataIndex);
+	return enrichImageFeaturedObjects(imageHeroObjectGroup, getCaption);
 }
 
 // Rather than accepting image featured items directly from frontmatter this handles content metadata items

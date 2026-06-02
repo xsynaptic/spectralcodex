@@ -26,7 +26,9 @@ export const themes = defineCollection({
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			/** Computed properties, for internal use only! */
+			_locations: z.string().array().optional(),
 			_locationCount: z.number().int().optional(),
+			_posts: z.string().array().optional(),
 			_postCount: z.number().int().optional(),
 		})
 		.strict(),

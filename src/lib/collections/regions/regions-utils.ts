@@ -14,15 +14,11 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
-	createContentMetadataFunction,
 	filterHasFeaturedImage,
 	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import {
-	createFilterEntryQualityFunction,
-	filterWithContent,
-	sortByContentCount,
-} from '#lib/utils/collections.ts';
+} from '#lib/metadata/metadata-index-core.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
@@ -153,7 +149,7 @@ export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	// Note: this is temporary code to limit map display to specified regions
 	const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
@@ -172,10 +168,10 @@ export async function createQueryRegionsEntryFunction() {
 			[
 				...R.pipe(
 					entryLocationsListed,
-					R.filter(createFilterEntryQualityFunction(2)),
-					getContentMetadata,
+					R.filter((entry) => entry.data.entryQuality >= 2),
+					contentIndex.resolve,
 				),
-				...R.pipe(entry.data._posts ?? [], getPostsByIds, getContentMetadata),
+				...R.pipe(entry.data._posts ?? [], getPostsByIds, contentIndex.resolve),
 			],
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate),
@@ -186,7 +182,7 @@ export async function createQueryRegionsEntryFunction() {
 			entryLocationsListed,
 			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
 			R.filter(({ data }) => !data.hideLocation),
-			getContentMetadata,
+			contentIndex.resolve,
 			R.shuffle(),
 		);
 		const metadataItems = metadataItemsAll.slice(0, 25);
@@ -214,14 +210,14 @@ export async function createQueryRegionsEntryFunction() {
  */
 export async function queryRegionsIndex() {
 	const { entries } = await getRegionsCollection();
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return R.pipe(
 		entries,
 		R.filter(({ data }) => data.parent === undefined),
 		R.filter(filterWithContent),
 		R.sort(sortByContentCount),
-		getContentMetadata,
+		contentIndex.resolve,
 	);
 }
 

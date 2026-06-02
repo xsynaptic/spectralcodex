@@ -13,7 +13,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { createFilterEntryQualityFunction, getPublicId } from '#lib/utils/collections.ts';
+import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -102,14 +102,12 @@ export async function generateFeedItems({
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 
-	const filterEntryQuality = createFilterEntryQualityFunction(3);
-
 	return R.pipe(
 		await R.pipe(
 			[
-				...notes.filter(filterEntryQuality),
-				...posts.filter(filterEntryQuality),
-				...locations.filter(filterEntryQuality),
+				...notes.filter((entry) => entry.data.entryQuality >= 3),
+				...posts.filter((entry) => entry.data.entryQuality >= 3),
+				...locations.filter((entry) => entry.data.entryQuality >= 3),
 			],
 			R.sort(sortByDateReverseChronological),
 			R.take(itemCount),

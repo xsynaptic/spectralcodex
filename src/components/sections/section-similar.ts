@@ -65,7 +65,7 @@ async function loadSimilarContentData() {
 async function createSimilarContentFunction() {
 	const similarContentData = await loadSimilarContentData();
 
-	const contentMetadataIndex = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getSimilarContent({
@@ -88,7 +88,7 @@ async function createSimilarContentFunction() {
 		return similarItem
 			.filter((item) => item.score >= threshold)
 			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
-			.map((item) => contentMetadataIndex.get(item.id))
+			.map((item) => contentIndex.getById(item.id))
 			.filter((item) => item !== undefined)
 			.filter((item) => !!item.imageId === hasImageFeatured)
 			.slice(0, limit);

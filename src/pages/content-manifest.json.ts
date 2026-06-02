@@ -28,10 +28,10 @@ function shouldIncludeUrl(pathname: string): boolean {
 export const GET: APIRoute = async ({ site }) => {
 	if (!site) throw new Error('Astro `site` config is required for the content manifest.');
 
-	const index = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 
 	// Content manifest includes relative URLs so we need to normalize output before filtering
-	const entries = [...index.values()]
+	const entries = [...contentIndex.all()]
 		.map(({ url, title }) => ({ url: new URL(url, site).pathname, title }))
 		.filter(({ url }) => shouldIncludeUrl(url));
 

@@ -102,11 +102,11 @@ function getArchivesHighlights(
 const collectionsExcluded = ['pages'] satisfies Array<ContentMetadataCollectionKey>;
 
 async function buildArchivesDataMap(): Promise<ArchivesDataMap> {
-	const contentMetadataIndex = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 
 	const archiveDataMap: ArchivesDataMap = new Map();
 
-	for (const item of contentMetadataIndex.values()) {
+	for (const item of contentIndex.all()) {
 		if (R.isIncludedIn(item.collection, collectionsExcluded)) continue;
 
 		const dateCreatedData = getDateData(item.dateCreated);

@@ -10,15 +10,11 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
-	createContentMetadataFunction,
 	filterHasFeaturedImage,
 	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-utils.ts';
-import {
-	createFilterEntryQualityFunction,
-	filterWithContent,
-	sortByContentCount,
-} from '#lib/utils/collections.ts';
+} from '#lib/metadata/metadata-index-core.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 /**
  * Get locations associated with a resource (via links URL match or sources ID match)
@@ -143,7 +139,7 @@ export async function createResolveResourceSourcesFunction() {
 export async function createQueryResourcesEntryFunction() {
 	const getLocationsByResource = await createLocationsByResourceFunction();
 	const getPostsByResource = await createPostsByResourceFunction();
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
@@ -160,10 +156,10 @@ export async function createQueryResourcesEntryFunction() {
 			[
 				...R.pipe(
 					locationsFiltered,
-					R.filter(createFilterEntryQualityFunction(2)),
-					getContentMetadata,
+					R.filter((entry) => entry.data.entryQuality >= 2),
+					contentIndex.resolve,
 				),
-				...R.pipe(postsFiltered, getContentMetadata),
+				...R.pipe(postsFiltered, contentIndex.resolve),
 			],
 			R.filter(filterHasFeaturedImage),
 			R.sort(sortContentMetadataByDate),

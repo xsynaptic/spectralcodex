@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { getContentMetadataById } from '#lib/metadata/metadata-utils.ts';
+import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'a'> {
@@ -18,7 +18,8 @@ if (!id) {
 	throw new Error(`Link component requires an ID; rendering path: ${pathname}`);
 }
 
-const contentMetadata = await getContentMetadataById(id);
+const contentIndex = await getContentMetadataIndex();
+const contentMetadata = contentIndex.getById(id);
 ---
 
 {

@@ -12,16 +12,12 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { filterHasFeaturedImage } from '#lib/metadata/metadata-index-core.ts';
 import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
-import {
-	createContentMetadataFunction,
-	filterHasFeaturedImage,
-} from '#lib/metadata/metadata-utils.ts';
-import { createFilterEntryQualityFunction } from '#lib/utils/collections.ts';
 
 // Filter the content metadata index for series items by ID
 async function createSeriesContentMetadataItemsFunction() {
-	const contentMetadataIndex = await getContentMetadataIndex();
+	const contentIndex = await getContentMetadataIndex();
 
 	return function getSeriesContentMetadataItems(
 		ids: Array<string> | undefined,
@@ -29,7 +25,7 @@ async function createSeriesContentMetadataItemsFunction() {
 		if (!ids || ids.length === 0) return;
 
 		return ids
-			.map((id) => (contentMetadataIndex.has(id) ? contentMetadataIndex.get(id) : undefined))
+			.map((id) => contentIndex.getById(id))
 			.filter((entry) => !!entry)
 			.filter(filterHasFeaturedImage);
 	};
@@ -123,12 +119,12 @@ export async function createSeriesByIdFunction() {
 export async function createQuerySeriesEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
-	const seriesItemsMetadata = getContentMetadata(series);
+	const seriesItemsMetadata = contentIndex.resolve(series);
 
 	return function querySeriesEntry(entry: CollectionEntry<'series'>) {
 		const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);
@@ -155,16 +151,16 @@ export async function createQuerySeriesEntryFunction() {
 export async function querySeriesIndex() {
 	const { entries: series } = await getSeriesCollection();
 
-	const getContentMetadata = await createContentMetadataFunction();
+	const contentIndex = await getContentMetadataIndex();
 
 	return R.pipe(
 		series,
-		R.filter(createFilterEntryQualityFunction(2)),
+		R.filter((entry) => entry.data.entryQuality >= 2),
 		R.sort((a, b) =>
 			a.data.seriesItems && b.data.seriesItems
 				? b.data.seriesItems.length - a.data.seriesItems.length
 				: 0,
 		),
-		getContentMetadata,
+		contentIndex.resolve,
 	);
 }
