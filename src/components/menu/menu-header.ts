@@ -11,7 +11,7 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { createFilterEntryQualityFunction, sortByContentCount } from '#lib/utils/collections.ts';
+import { sortByContentCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 // Increase this to 3 to show subregions in the header menu
@@ -59,8 +59,6 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 	const { entries: series } = await getSeriesCollection();
 	const { entries: themes } = await getThemesCollection();
 
-	const filterEntryQuality = createFilterEntryQualityFunction(2);
-
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
 		.filter(filterMenuItemContentCount(1))
@@ -91,14 +89,14 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		}));
 
 	const seriesMenu = series
-		.filter(filterEntryQuality)
+		.filter((entry) => entry.data.entryQuality >= 2)
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, collection: 'series' }));
 
 	const themesMenu = themes
-		.filter(filterEntryQuality)
+		.filter((entry) => entry.data.entryQuality >= 2)
 		.filter(filterMenuItemContentCount(1))
 		.sort(sortByContentCount)
 		.slice(0, 12)
@@ -130,10 +128,12 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 			url: getSiteUrl('themes'),
 			children: themesMenu,
 		},
+		/* @TODO: decide whether to keep notes or not
 		{
 			title: t('collection.notes.labelPlural'),
 			url: getSiteUrl('notes'),
 		},
+		*/
 		{
 			title: t('menu.archive.label'),
 			url: getSiteUrl('archives'),
