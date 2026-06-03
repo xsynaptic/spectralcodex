@@ -3,38 +3,16 @@ import { describe, expect, test } from 'vitest';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
+import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
 import { sortCatalogByDate, sortCatalogByQuality } from '#lib/catalog/catalog-utils.ts';
-
-function makeItem(
-	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'collection'>,
-): CatalogItem {
-	return {
-		title: overrides.id,
-		titleMultilingual: undefined,
-		description: undefined,
-		url: `/${overrides.id}`,
-		imageId: undefined,
-		regionPrimaryId: undefined,
-		postCount: undefined,
-		locationCount: undefined,
-		linksCount: undefined,
-		wordCount: undefined,
-		backlinks: new Set<string>(),
-		dateCreated: new Date('2020-01-01'),
-		dateUpdated: undefined,
-		dateVisited: undefined,
-		entryQuality: 3,
-		...overrides,
-	};
-}
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
 describe('byCollection', () => {
 	const catalog = createCatalog([
-		makeItem({ id: 'a', collection: 'posts' }),
-		makeItem({ id: 'b', collection: 'locations' }),
-		makeItem({ id: 'c', collection: 'posts' }),
+		makeCatalogItem({ id: 'a', collection: 'posts' }),
+		makeCatalogItem({ id: 'b', collection: 'locations' }),
+		makeCatalogItem({ id: 'c', collection: 'posts' }),
 	]);
 
 	test('returns items from the named collections in source order', () => {
@@ -48,27 +26,35 @@ describe('byCollection', () => {
 });
 
 describe('comparators', () => {
-	const newer = makeItem({ id: 'newer', collection: 'posts', dateCreated: new Date('2024-01-01') });
-	const older = makeItem({ id: 'older', collection: 'posts', dateCreated: new Date('2021-01-01') });
-	const updatedRecently = makeItem({
+	const newer = makeCatalogItem({
+		id: 'newer',
+		collection: 'posts',
+		dateCreated: new Date('2024-01-01'),
+	});
+	const older = makeCatalogItem({
+		id: 'older',
+		collection: 'posts',
+		dateCreated: new Date('2021-01-01'),
+	});
+	const updatedRecently = makeCatalogItem({
 		id: 'updated-recently',
 		collection: 'posts',
 		dateCreated: new Date('2019-01-01'),
 		dateUpdated: new Date('2025-01-01'),
 	});
-	const lowNew = makeItem({
+	const lowNew = makeCatalogItem({
 		id: 'low-new',
 		collection: 'posts',
 		entryQuality: 2,
 		dateCreated: new Date('2024-01-01'),
 	});
-	const highOld = makeItem({
+	const highOld = makeCatalogItem({
 		id: 'high-old',
 		collection: 'posts',
 		entryQuality: 5,
 		dateCreated: new Date('2020-01-01'),
 	});
-	const highNew = makeItem({
+	const highNew = makeCatalogItem({
 		id: 'high-new',
 		collection: 'posts',
 		entryQuality: 5,
@@ -93,7 +79,9 @@ describe('comparators', () => {
 });
 
 describe('lookups', () => {
-	const catalog = createCatalog([makeItem({ id: 'a', collection: 'posts', title: 'Post A' })]);
+	const catalog = createCatalog([
+		makeCatalogItem({ id: 'a', collection: 'posts', title: 'Post A' }),
+	]);
 
 	test('getCaption projects the caption shape, undefined on miss', () => {
 		expect(catalog.getCaption('a')).toEqual({
@@ -113,15 +101,23 @@ describe('lookups', () => {
 
 describe('backlinksOf', () => {
 	const catalog = createCatalog([
-		makeItem({
+		makeCatalogItem({
 			id: 'target',
 			collection: 'posts',
 			backlinks: new Set(['linker-post', 'linker-region', 'linker-note']),
 		}),
-		makeItem({ id: 'linker-post', collection: 'posts', dateCreated: new Date('2023-01-01') }),
-		makeItem({ id: 'linker-note', collection: 'notes', dateCreated: new Date('2024-01-01') }),
+		makeCatalogItem({
+			id: 'linker-post',
+			collection: 'posts',
+			dateCreated: new Date('2023-01-01'),
+		}),
+		makeCatalogItem({
+			id: 'linker-note',
+			collection: 'notes',
+			dateCreated: new Date('2024-01-01'),
+		}),
 		// Regions are not a linkable backlink collection, so this one is filtered out
-		makeItem({ id: 'linker-region', collection: 'regions' }),
+		makeCatalogItem({ id: 'linker-region', collection: 'regions' }),
 	]);
 
 	test('returns backlinks from linkable collections, newest first', () => {

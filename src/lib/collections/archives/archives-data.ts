@@ -3,7 +3,7 @@ import { performance } from 'node:perf_hooks';
 import pMemoize from 'p-memoize';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { createArchivesData } from '#lib/collections/archives/archives-core.ts';
+import { createArchivesData } from '#lib/collections/archives/archives-factory.ts';
 
 export const getArchivesData = pMemoize(async () => {
 	const startTime = performance.now();

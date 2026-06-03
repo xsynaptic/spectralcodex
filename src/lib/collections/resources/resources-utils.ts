@@ -153,7 +153,7 @@ export async function createQueryResourcesEntryFunction() {
 			[
 				...R.pipe(
 					locationsFiltered,
-					R.filter((entry) => entry.data.entryQuality >= 2),
+					R.filter((location) => location.data.entryQuality >= 2),
 					catalog.resolve,
 				),
 				...R.pipe(postsFiltered, catalog.resolve),

@@ -2,31 +2,8 @@ import { describe, expect, test } from 'vitest';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import { createArchivesData } from '#lib/collections/archives/archives-core.ts';
-
-function makeItem(
-	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'collection'>,
-): CatalogItem {
-	return {
-		title: overrides.id,
-		titleMultilingual: undefined,
-		description: undefined,
-		url: `/${overrides.id}`,
-		imageId: undefined,
-		regionPrimaryId: undefined,
-		postCount: undefined,
-		locationCount: undefined,
-		linksCount: undefined,
-		wordCount: undefined,
-		backlinks: new Set<string>(),
-		// Local-time constructor (not an ISO string) so year/month bucketing is timezone stable
-		dateCreated: new Date(2024, 0, 1),
-		dateUpdated: undefined,
-		dateVisited: undefined,
-		entryQuality: 3,
-		...overrides,
-	};
-}
+import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
+import { createArchivesData } from '#lib/collections/archives/archives-factory.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
@@ -42,8 +19,8 @@ describe('createArchivesData', () => {
 	test('excludes the pages collection from every tier', () => {
 		const data = createArchivesData(
 			[
-				makeItem({ id: 'a-page', collection: 'pages', dateCreated: new Date(2024, 2, 10) }),
-				makeItem({ id: 'a-post', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
+				makeCatalogItem({ id: 'a-page', collection: 'pages', dateCreated: new Date(2024, 2, 10) }),
+				makeCatalogItem({ id: 'a-post', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
 			],
 			[],
 		);
@@ -58,14 +35,14 @@ describe('createArchivesData', () => {
 		const data = createArchivesData(
 			[
 				// Created and visited in the same month -> kept as created
-				makeItem({
+				makeCatalogItem({
 					id: 'created-and-visited',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 10),
 					dateVisited: [new Date(2024, 2, 20)],
 				}),
 				// Updated (from a different create month) and visited in the same month -> kept as updated
-				makeItem({
+				makeCatalogItem({
 					id: 'updated-and-visited',
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 5),
@@ -86,15 +63,15 @@ describe('createArchivesData', () => {
 	test('counts are full bucket totals while lists are the filtered projection', () => {
 		const data = createArchivesData(
 			[
-				makeItem({ id: 'q3', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
-				makeItem({
+				makeCatalogItem({ id: 'q3', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
+				makeCatalogItem({
 					id: 'q1',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 11),
 					entryQuality: 1,
 				}),
 				// Below the monthly quality floor (>= 1): counted, but absent from the list
-				makeItem({
+				makeCatalogItem({
 					id: 'q0',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 12),
@@ -114,13 +91,13 @@ describe('createArchivesData', () => {
 	test('within a quality level, a featured image sorts an entry ahead of one without', () => {
 		const data = createArchivesData(
 			[
-				makeItem({
+				makeCatalogItem({
 					id: 'aaa-no-image',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 10),
 					entryQuality: 2,
 				}),
-				makeItem({
+				makeCatalogItem({
 					id: 'zzz-with-image',
 					collection: 'posts',
 					imageId: 'img',
@@ -139,20 +116,20 @@ describe('createArchivesData', () => {
 		const data = createArchivesData(
 			[
 				// Candidate in 2024/01 (created) and 2024/02 (updated) -> highlight in only one
-				makeItem({
+				makeCatalogItem({
 					id: 'shared',
 					collection: 'posts',
 					imageId: 'img-shared',
 					dateCreated: new Date(2024, 0, 10),
 					dateUpdated: new Date(2024, 1, 15),
 				}),
-				makeItem({
+				makeCatalogItem({
 					id: 'jan-only',
 					collection: 'posts',
 					imageId: 'img-jan',
 					dateCreated: new Date(2024, 0, 11),
 				}),
-				makeItem({
+				makeCatalogItem({
 					id: 'feb-only',
 					collection: 'posts',
 					imageId: 'img-feb',
@@ -171,13 +148,17 @@ describe('createArchivesData', () => {
 		const data = createArchivesData(
 			[
 				// Created in 2024/01, updated in 2024/02 -> shows under Feb/updated (updated > created)
-				makeItem({
+				makeCatalogItem({
 					id: 'shared',
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 10),
 					dateUpdated: new Date(2024, 1, 15),
 				}),
-				makeItem({ id: 'jan-only', collection: 'posts', dateCreated: new Date(2024, 0, 11) }),
+				makeCatalogItem({
+					id: 'jan-only',
+					collection: 'posts',
+					dateCreated: new Date(2024, 0, 11),
+				}),
 			],
 			[],
 		);
@@ -194,7 +175,7 @@ describe('createArchivesData', () => {
 		const data = createArchivesData(
 			// Quality 1 clears the monthly floor but not the yearly floor, so 2019 gets no yearly view
 			[
-				makeItem({
+				makeCatalogItem({
 					id: 'low',
 					collection: 'posts',
 					dateCreated: new Date(2019, 2, 10),
@@ -215,9 +196,13 @@ describe('createArchivesData', () => {
 			[
 				// Anchor populates 2023 in the data map before 2024 (oldest-first insertion order)
 				// Test fails unless the year loop deliberately iterates newest-first
-				makeItem({ id: 'anchor-2023', collection: 'posts', dateCreated: new Date(2023, 5, 9) }),
+				makeCatalogItem({
+					id: 'anchor-2023',
+					collection: 'posts',
+					dateCreated: new Date(2023, 5, 9),
+				}),
 				// Index candidate in 2023 (created) and 2024 (updated) -> highlighted in the most recent year
-				makeItem({
+				makeCatalogItem({
 					id: 'shared',
 					collection: 'posts',
 					imageId: 'img-shared',
@@ -235,7 +220,7 @@ describe('createArchivesData', () => {
 	test('the index tier requires quality >= 3', () => {
 		const belowThreshold = createArchivesData(
 			[
-				makeItem({
+				makeCatalogItem({
 					id: 'q2',
 					collection: 'posts',
 					dateCreated: new Date(2024, 5, 10),
@@ -251,7 +236,7 @@ describe('createArchivesData', () => {
 
 		const atThreshold = createArchivesData(
 			[
-				makeItem({
+				makeCatalogItem({
 					id: 'q3',
 					collection: 'posts',
 					dateCreated: new Date(2024, 5, 10),
