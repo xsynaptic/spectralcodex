@@ -95,7 +95,7 @@ type SimilarContentResult = Record<string, Array<SimilarContentItem>>;
 
 /**
  * Models; a small sampling of some options; more complex models are more accurate but slower
- * Note 1: changing models will regenerate all embeddings (cache is namespaced by model)
+ * Note 1: changing models will regenerate all embeddings (cache is namespaced by model and character limit)
  * Note 2: different models have different dimensionalities and input limitations
  */
 const ModelsEnum = {
@@ -148,8 +148,9 @@ function calculateMetadataBoost(
 	return Math.min(boost, boostLimit);
 }
 
-function getCacheNamespace(cacheName: string, modelKey: string): string {
-	return `${cacheName}-${modelKey}`;
+// Cache is keyed by model and character limit so changing either invalidates it
+function getCacheNamespace(): string {
+	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}`;
 }
 
 /**
@@ -159,7 +160,7 @@ async function generateEmbeddings(
 	entries: Array<ContentEntry>,
 ): Promise<Array<SimilarContentEmbedding>> {
 	const cachePath = path.join(rootPath, values['cache-path']);
-	const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
+	const cacheNamespace = getCacheNamespace();
 	const cache = getFileCacheInstance(cachePath, cacheNamespace);
 
 	const modelId = ModelsEnum[modelKey];
@@ -250,11 +251,9 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	const resultCount = Number(values['result-count']);
 	const minScore = Number(values['min-score']);
 
-	// Over-fetch candidates so the metadata re-ranking has room to reorder before we slice to resultCount
-	// expansion_search must be at least as large as the number we request (candidateCount) or usearch silently returns lower-recall results
+	// Over-fetch candidates for re-ranking; expansion_search must be >= candidateCount or usearch silently loses recall
 	const candidateCount = Math.max(resultCount * 3, 50);
 
-	// Create and populate the index
 	const index = new Index({
 		metric: MetricKind.Cos,
 		dimensions: firstVector.length,
@@ -271,7 +270,6 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		if (key !== undefined) index.add(key, new Float32Array(emb.vector));
 	}
 
-	// Query for similar items and re-rank with metadata boost
 	console.log(chalk.blue('Querying for similar content...'));
 
 	const queryStart = performance.now();
@@ -289,11 +287,10 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 
 			if (!other || other.id === current.id) continue;
 
-			// Convert cosine distance to similarity (usearch returns distance, not similarity)
+			// Convert usearch's cosine distance to a similarity score
 			const similarity = Math.max(0, distance === undefined ? 0 : 1 - distance);
 
-			// Apply the taxonomy boost additively within the remaining headroom below 1.0
-			// // Shared themes and regions nudge an item toward a perfect match without ever saturating the score
+			// Blend the boost into the headroom below 1.0 so strong matches never saturate
 			const boost = calculateMetadataBoost(current, other);
 			const score = similarity + (1 - similarity) * boost;
 
@@ -304,7 +301,6 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 			});
 		}
 
-		// Sort by score, drop anything below the retention floor, then keep the top results
 		candidates.sort((a, b) => b.score - a.score);
 
 		result[current.id] = candidates
@@ -331,15 +327,12 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 
 	const entries: Array<ContentEntry> = [];
 
-	// Get entries from posts and locations collections
 	for (const collectionName of [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]) {
 		const collectionEntries = getDataStoreCollection(collections, [collectionName]);
 
 		for (const entry of collectionEntries) {
-			// Filter: must have digest
 			if (!entry.digest) continue;
 
-			// Filter: must have entry quality and be at least 2
 			if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
 
 			entries.push({
@@ -370,8 +363,10 @@ async function similarContent() {
 
 		if (values['clear-cache']) {
 			const cacheDir = path.join(rootPath, values['cache-path']);
-			const cacheNamespace = getCacheNamespace(values['cache-name'], modelKey);
-			const cacheFiles = readdirSync(cacheDir).filter((file) => file === `${cacheNamespace}.json`);
+			const cacheName = values['cache-name'];
+			const cacheFiles = readdirSync(cacheDir).filter(
+				(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
+			);
 			for (const file of cacheFiles) {
 				rmSync(path.join(cacheDir, file));
 			}
