@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "6.23.0",
+	"version": "6.24.0",
 	"scripts": {
 		"build": "astro check && NODE_OPTIONS=--max-old-space-size=8192 astro build",
 		"check-content": "pnpm --filter @spectralcodex/content check",
