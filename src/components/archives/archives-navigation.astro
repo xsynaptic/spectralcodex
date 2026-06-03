@@ -81,7 +81,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 					{archivesMonths
 						.sort((monthA, monthB) => monthA.localeCompare(monthB))
 						.map((monthNumber) => {
-							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('default', {
+							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('en-US', {
 								month: 'long',
 							});
 
