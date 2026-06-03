@@ -58,9 +58,6 @@ importers:
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
-      '@spectralcodex/remark-auto-import':
-        specifier: workspace:*
-        version: link:packages/remark-auto-import
       '@spectralcodex/remark-img-group':
         specifier: workspace:*
         version: link:packages/remark-img-group
@@ -118,6 +115,9 @@ importers:
       '@xsynaptic/eslint-config':
         specifier: ^3.3.2
         version: 3.3.2(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@xsynaptic/remark-auto-import':
+        specifier: workspace:*
+        version: link:packages/remark-auto-import
       '@xsynaptic/unified-tools':
         specifier: ^4.2.1
         version: 4.2.1
