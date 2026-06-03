@@ -1,12 +1,12 @@
 ---
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import MetadataList from '#components/parts/metadata-list.astro';
 import Prose from '#components/parts/prose.astro';
 
 interface Props {
 	title: string;
-	items: Array<ContentMetadataItem>;
+	items: Array<CatalogItem>;
 	count?: number | undefined;
 	class?: string | undefined;
 }

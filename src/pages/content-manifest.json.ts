@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 
 /**
  * Note: this should be kept in sync with the exclude prefixes in `astro.config.mjs`.
@@ -28,10 +28,10 @@ function shouldIncludeUrl(pathname: string): boolean {
 export const GET: APIRoute = async ({ site }) => {
 	if (!site) throw new Error('Astro `site` config is required for the content manifest.');
 
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	// Content manifest includes relative URLs so we need to normalize output before filtering
-	const entries = [...contentIndex.all()]
+	const entries = [...catalog.all()]
 		.map(({ url, title }) => ({ url: new URL(url, site).pathname, title }))
 		.filter(({ url }) => shouldIncludeUrl(url));
 

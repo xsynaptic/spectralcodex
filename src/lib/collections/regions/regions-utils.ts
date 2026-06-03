@@ -5,6 +5,8 @@ import * as R from 'remeda';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
@@ -13,11 +15,6 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import {
-	filterHasFeaturedImage,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-index-core.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
@@ -74,7 +71,7 @@ export async function createRegionAncestorsByIdFunction() {
 }
 
 // A utility function to find the common ancestor ID from an arbitrary set of regions
-// Used when generating content metadata
+// Used when generating catalog items
 export async function createRegionCommonAncestorFunction() {
 	const getRegionsById = await createRegionsByIdsFunction();
 	const getRegionAncestors = await createRegionAncestorsFunction();
@@ -143,13 +140,13 @@ export async function getRegionSchema(
 }
 
 /**
- * Data for a single region entry page: metadata items, map data, and display options
+ * Data for a single region entry page: catalog items, map data, and display options
  */
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	// Note: this is temporary code to limit map display to specified regions
 	const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
@@ -164,29 +161,25 @@ export async function createQueryRegionsEntryFunction() {
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
 		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);
 
-		const metadataItemsFiltered = R.pipe(
-			[
-				...R.pipe(
-					entryLocationsListed,
-					R.filter((entry) => entry.data.entryQuality >= 2),
-					contentIndex.resolve,
-				),
-				...R.pipe(entry.data._posts ?? [], getPostsByIds, contentIndex.resolve),
-			],
-			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
+		const featuredCandidates = [
+			...R.pipe(
+				entryLocationsListed,
+				R.filter((location) => location.data.entryQuality >= 2),
+				catalog.resolve,
+			),
+			...R.pipe(entry.data._posts ?? [], getPostsByIds, catalog.resolve),
+		];
+
+		const restCandidates = R.pipe(
+			entryLocationsListed,
+			R.filter(({ data }) => !data.hideLocation),
+			catalog.resolve,
 		);
 
-		// Anything that wasn't included above
-		const metadataItemsAll = R.pipe(
-			entryLocationsListed,
-			R.filter(({ id }) => !metadataItemsFiltered.some((item) => item.id === id)),
-			R.filter(({ data }) => !data.hideLocation),
-			contentIndex.resolve,
-			R.shuffle(),
+		const { catalogItemsFiltered, catalogItems, catalogItemsCount } = buildEntryCatalogItems(
+			featuredCandidates,
+			restCandidates,
 		);
-		const metadataItems = metadataItemsAll.slice(0, 25);
-		const metadataItemsCount = metadataItemsAll.length;
 
 		const regionsOption = getRegionsOptions(ancestors.length);
 
@@ -201,7 +194,7 @@ export async function createQueryRegionsEntryFunction() {
 				: {}),
 		});
 
-		return { metadataItemsFiltered, metadataItems, metadataItemsCount, mapData, regionsOption };
+		return { catalogItemsFiltered, catalogItems, catalogItemsCount, mapData, regionsOption };
 	};
 }
 
@@ -210,14 +203,14 @@ export async function createQueryRegionsEntryFunction() {
  */
 export async function queryRegionsIndex() {
 	const { entries } = await getRegionsCollection();
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return R.pipe(
 		entries,
 		R.filter(({ data }) => data.parent === undefined),
 		R.filter(filterWithContent),
 		R.sort(sortByContentCount),
-		contentIndex.resolve,
+		catalog.resolve,
 	);
 }
 

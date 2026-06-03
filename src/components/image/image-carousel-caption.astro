@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageFeaturedCaptionMetadata } from '#lib/metadata/metadata-types.ts';
+import type { ImageFeaturedCaption } from '#lib/catalog/catalog-types.ts';
 
 import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
@@ -9,13 +9,13 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	captionMetadata: ImageFeaturedCaptionMetadata;
+	caption: ImageFeaturedCaption;
 	isHero?: boolean | undefined;
 	withTitle?: boolean | undefined;
 }
 
 const {
-	captionMetadata: { title, titleMultilingual, url },
+	caption: { title, titleMultilingual, url },
 	isHero = false,
 	withTitle = false,
 	...props

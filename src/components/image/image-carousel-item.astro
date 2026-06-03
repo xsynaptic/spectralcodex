@@ -1,6 +1,6 @@
 ---
+import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
-import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -14,7 +14,7 @@ import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 type Props = ImageFeaturedWithCaption;
 
-const { id: imageId, title: alt = '', captionMetadata } = Astro.props;
+const { id: imageId, title: alt = '', caption } = Astro.props;
 
 async function getImageProps(
 	imageId: string | undefined,
@@ -69,8 +69,8 @@ const { imageProps, placeholderProps } = await getImageProps(imageId, alt);
 	imageProps ? (
 		<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
 			<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
-			{captionMetadata ? (
-				<ImageCarouselCaption captionMetadata={captionMetadata} isHero={false} withTitle={false} />
+			{caption ? (
+				<ImageCarouselCaption caption={caption} isHero={false} withTitle={false} />
 			) : undefined}
 		</ImagePlaceholder>
 	) : undefined

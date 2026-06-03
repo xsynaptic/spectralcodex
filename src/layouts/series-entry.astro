@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -17,10 +17,10 @@ import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
@@ -28,7 +28,7 @@ import { formatNumber } from '#lib/utils/text.ts';
 interface Props {
 	entry: CollectionEntry<'series'>;
 	mapData: MapComponentData;
-	page: Page<ContentMetadataItem>;
+	page: Page<CatalogItem>;
 	wordCount?: number | undefined;
 }
 
@@ -36,11 +36,11 @@ const { entry, mapData, page, wordCount } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
-const contentIndex = await getContentMetadataIndex();
+const catalog = await getCatalog();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
-	getCaption: contentIndex.getCaption,
+	getCaption: catalog.getCaption,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });

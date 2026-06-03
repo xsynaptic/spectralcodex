@@ -1,19 +1,17 @@
 import { describe, expect, test } from 'vitest';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import {
-	createContentMetadataIndex,
-	sortContentMetadataByDate,
-	sortContentMetadataByQuality,
-} from '#lib/metadata/metadata-index-core.ts';
+import { createCatalog } from '#lib/catalog/catalog-factory.ts';
+import { sortCatalogByDate, sortCatalogByQuality } from '#lib/catalog/catalog-utils.ts';
 
 function makeItem(
-	overrides: Partial<ContentMetadataItem> & Pick<ContentMetadataItem, 'id' | 'collection'>,
-): ContentMetadataItem {
+	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'collection'>,
+): CatalogItem {
 	return {
 		title: overrides.id,
 		titleMultilingual: undefined,
+		description: undefined,
 		url: `/${overrides.id}`,
 		imageId: undefined,
 		regionPrimaryId: undefined,
@@ -30,22 +28,22 @@ function makeItem(
 	};
 }
 
-const ids = (items: ReadonlyArray<ContentMetadataItem>) => items.map((item) => item.id);
+const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
 describe('byCollection', () => {
-	const contentIndex = createContentMetadataIndex([
+	const catalog = createCatalog([
 		makeItem({ id: 'a', collection: 'posts' }),
 		makeItem({ id: 'b', collection: 'locations' }),
 		makeItem({ id: 'c', collection: 'posts' }),
 	]);
 
 	test('returns items from the named collections in source order', () => {
-		expect(ids(contentIndex.byCollection('posts'))).toEqual(['a', 'c']);
-		expect(ids(contentIndex.byCollection('posts', 'locations'))).toEqual(['a', 'b', 'c']);
+		expect(ids(catalog.byCollection('posts'))).toEqual(['a', 'c']);
+		expect(ids(catalog.byCollection('posts', 'locations'))).toEqual(['a', 'b', 'c']);
 	});
 
 	test('returns an empty array when no collection matches', () => {
-		expect(contentIndex.byCollection('notes')).toEqual([]);
+		expect(catalog.byCollection('notes')).toEqual([]);
 	});
 });
 
@@ -77,17 +75,16 @@ describe('comparators', () => {
 		dateCreated: new Date('2023-01-01'),
 	});
 
-	test('sortContentMetadataByDate is newest first, preferring dateUpdated over dateCreated', () => {
-		// updatedRecently has an old dateCreated but a recent dateUpdated, so it sorts first
-		expect(ids([older, newer, updatedRecently].sort(sortContentMetadataByDate))).toEqual([
+	test('sortCatalogByDate is newest first, preferring dateUpdated over dateCreated', () => {
+		expect(ids([older, newer, updatedRecently].sort(sortCatalogByDate))).toEqual([
 			'updated-recently',
 			'newer',
 			'older',
 		]);
 	});
 
-	test('sortContentMetadataByQuality is highest quality first, newest on ties', () => {
-		expect(ids([lowNew, highOld, highNew].sort(sortContentMetadataByQuality))).toEqual([
+	test('sortCatalogByQuality is highest quality first, newest on ties', () => {
+		expect(ids([lowNew, highOld, highNew].sort(sortCatalogByQuality))).toEqual([
 			'high-new',
 			'high-old',
 			'low-new',
@@ -96,30 +93,26 @@ describe('comparators', () => {
 });
 
 describe('lookups', () => {
-	const contentIndex = createContentMetadataIndex([
-		makeItem({ id: 'a', collection: 'posts', title: 'Post A' }),
-	]);
+	const catalog = createCatalog([makeItem({ id: 'a', collection: 'posts', title: 'Post A' })]);
 
 	test('getCaption projects the caption shape, undefined on miss', () => {
-		expect(contentIndex.getCaption('a')).toEqual({
+		expect(catalog.getCaption('a')).toEqual({
 			title: 'Post A',
 			titleMultilingual: undefined,
 			id: 'a',
 			url: '/a',
 		});
-		expect(contentIndex.getCaption('nope')).toBeUndefined();
+		expect(catalog.getCaption('nope')).toBeUndefined();
 	});
 
 	test('resolve returns items in entry order, throws on miss with the id', () => {
-		expect(ids(contentIndex.resolve([{ id: 'a', collection: 'posts' }] as never))).toEqual(['a']);
-		expect(() => contentIndex.resolve([{ id: 'gone', collection: 'posts' }] as never)).toThrow(
-			/gone/,
-		);
+		expect(ids(catalog.resolve([{ id: 'a', collection: 'posts' }] as never))).toEqual(['a']);
+		expect(() => catalog.resolve([{ id: 'gone', collection: 'posts' }] as never)).toThrow(/gone/);
 	});
 });
 
 describe('backlinksOf', () => {
-	const contentIndex = createContentMetadataIndex([
+	const catalog = createCatalog([
 		makeItem({
 			id: 'target',
 			collection: 'posts',
@@ -127,16 +120,16 @@ describe('backlinksOf', () => {
 		}),
 		makeItem({ id: 'linker-post', collection: 'posts', dateCreated: new Date('2023-01-01') }),
 		makeItem({ id: 'linker-note', collection: 'notes', dateCreated: new Date('2024-01-01') }),
-		// regions are not a linkable backlink collection, so this one is filtered out
+		// Regions are not a linkable backlink collection, so this one is filtered out
 		makeItem({ id: 'linker-region', collection: 'regions' }),
 	]);
 
 	test('returns backlinks from linkable collections, newest first', () => {
-		expect(ids(contentIndex.backlinksOf('target'))).toEqual(['linker-note', 'linker-post']);
+		expect(ids(catalog.backlinksOf('target'))).toEqual(['linker-note', 'linker-post']);
 	});
 
 	test('returns an empty array for an unknown or backlink-free id', () => {
-		expect(contentIndex.backlinksOf('nope')).toEqual([]);
-		expect(contentIndex.backlinksOf('linker-post')).toEqual([]);
+		expect(catalog.backlinksOf('nope')).toEqual([]);
+		expect(catalog.backlinksOf('linker-post')).toEqual([]);
 	});
 });

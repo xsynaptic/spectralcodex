@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -31,13 +31,13 @@ import SectionSeries from '#components/sections/section-series.astro';
 import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
 	createLocationEntryDisplayFunction,
 	getLocationSchemas,
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -48,11 +48,11 @@ import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 interface Props {
 	entry: CollectionEntry<'locations'>;
 	mapData: MapComponentData;
-	metadataItems: Array<ContentMetadataItem>;
-	backlinks: Array<ContentMetadataItem> | undefined;
+	catalogItems: Array<CatalogItem>;
+	backlinks: Array<CatalogItem> | undefined;
 }
 
-const { entry, mapData, metadataItems, backlinks } = Astro.props;
+const { entry, mapData, catalogItems, backlinks } = Astro.props;
 
 const getLocationEntryDisplay = await createLocationEntryDisplayFunction();
 const { regionPrimary, regionLangCode, titleMultilingual, titleMultilingualAdditional } =
@@ -61,13 +61,13 @@ const { regionPrimary, regionLangCode, titleMultilingual, titleMultilingualAddit
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const hasContent = getHasContent(entry);
-const contentIndex = await getContentMetadataIndex();
+const catalog = await getCatalog();
 const imageFeaturedId = getImageFeaturedId({
 	imageFeatured: entry.data.imageFeatured,
 });
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
 	imageFeatured: entry.data.imageFeatured,
-	getCaption: contentIndex.getCaption,
+	getCaption: catalog.getCaption,
 });
 
 const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
@@ -179,7 +179,7 @@ const t = getTranslations();
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionNearbyList entry={entry} limit={12} />
-		<SectionMetadataGrid title={t('section.content.locations')} items={metadataItems} />
+		<SectionMetadataGrid title={t('section.content.locations')} items={catalogItems} />
 		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>

@@ -6,11 +6,11 @@ import type {
 
 import * as R from 'remeda';
 
-import type { ContentCaption } from '#lib/metadata/metadata-index-core.ts';
 import type {
-	ContentMetadataItem,
+	CatalogCaption,
+	CatalogItem,
 	ImageFeaturedWithCaption,
-} from '#lib/metadata/metadata-types.ts';
+} from '#lib/catalog/catalog-types.ts';
 
 // Type guard for array items
 function isImageFeaturedObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
@@ -39,7 +39,7 @@ export function getImageFeaturedId({
 
 function enrichImageFeaturedObjects(
 	imageFeaturedObjects: Array<ImageFeaturedObject>,
-	getCaption: (id: string) => ContentCaption | undefined,
+	getCaption: (id: string) => CatalogCaption | undefined,
 ): Array<ImageFeaturedWithCaption> {
 	return imageFeaturedObjects.map((item) => {
 		const caption = item.link ? getCaption(item.link) : undefined;
@@ -51,7 +51,7 @@ function enrichImageFeaturedObjects(
 			...item,
 			...(captionTitle
 				? {
-						captionMetadata: {
+						caption: {
 							title: captionTitle,
 							titleMultilingual: caption?.titleMultilingual,
 							...(caption ? { id: caption.id, url: caption.url } : {}),
@@ -68,7 +68,7 @@ export function getImageFeaturedGroup({
 	getCaption,
 }: {
 	imageFeatured: ImageFeatured | undefined;
-	getCaption: (id: string) => ContentCaption | undefined;
+	getCaption: (id: string) => CatalogCaption | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
@@ -86,7 +86,7 @@ export function getImageFeaturedHeroGroup({
 	getCaption,
 }: {
 	imageFeatured: ImageFeatured | undefined;
-	getCaption: (id: string) => ContentCaption | undefined;
+	getCaption: (id: string) => CatalogCaption | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
 
@@ -99,12 +99,12 @@ export function getImageFeaturedHeroGroup({
 	return enrichImageFeaturedObjects(imageHeroObjectGroup, getCaption);
 }
 
-// Rather than accepting image featured items directly from frontmatter this handles content metadata items
-export function getImageFeaturedGroupByContentMetadata({
+// Rather than accepting image featured items directly from frontmatter this handles catalog items
+export function getImageFeaturedGroupByCatalog({
 	items,
 	shuffle = false,
 }: {
-	items: Array<ContentMetadataItem> | undefined;
+	items: Array<CatalogItem> | undefined;
 	shuffle?: boolean;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!items || items.length === 0) return;
@@ -114,7 +114,7 @@ export function getImageFeaturedGroupByContentMetadata({
 		.map((item) => ({
 			id: item.imageId!,
 			title: item.title,
-			captionMetadata: {
+			caption: {
 				id: item.id,
 				title: item.title,
 				titleMultilingual: item.titleMultilingual,

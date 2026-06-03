@@ -4,6 +4,8 @@ import * as R from 'remeda';
 
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import {
@@ -15,8 +17,6 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { sortContentMetadataByDate } from '#lib/metadata/metadata-index-core.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
@@ -121,7 +121,7 @@ export async function getLocationSchemas(
 export async function createQueryLocationsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -136,16 +136,16 @@ export async function createQueryLocationsEntryFunction() {
 				: {}),
 		});
 
-		const metadataItems = R.pipe(
+		const catalogItems = R.pipe(
 			entry.data._posts ?? [],
 			getPostsByIds,
-			contentIndex.resolve,
-			R.sort(sortContentMetadataByDate),
+			catalog.resolve,
+			R.sort(sortCatalogByDate),
 		);
 
-		const backlinks = contentIndex.backlinksOf(entry.id);
+		const backlinks = catalog.backlinksOf(entry.id);
 
-		return { mapData, metadataItems, backlinks };
+		return { mapData, catalogItems, backlinks };
 	};
 }
 
@@ -184,14 +184,14 @@ export async function createLocationEntryDisplayFunction() {
 export async function queryLocationsIndex() {
 	const { entries } = await getLocationsCollection();
 
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return R.pipe(
 		entries,
 		R.filter((item) => !item.data.hideIndex),
 		R.filter((entry) => entry.data.entryQuality >= 2),
 		R.filter((item) => !!item.data.imageFeatured),
-		contentIndex.resolve,
-		R.sort(sortContentMetadataByDate),
+		catalog.resolve,
+		R.sort(sortCatalogByDate),
 	);
 }

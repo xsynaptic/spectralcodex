@@ -1,6 +1,6 @@
 ---
+import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
-import type { ImageFeaturedWithCaption } from '#lib/metadata/metadata-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
@@ -25,7 +25,7 @@ const {
 	index,
 	id: imageId,
 	title,
-	captionMetadata,
+	caption,
 	fallbackAlt,
 	withTitle = false,
 } = Astro.props;
@@ -88,12 +88,8 @@ const { imageProps, placeholderProps } = await getImageProps(
 				style={{ zIndex: zIndexScaleEnum.ImageBase }}
 				{...imageProps}
 			/>
-			{captionMetadata ? (
-				<ImageCarouselCaption
-					captionMetadata={captionMetadata}
-					isHero={true}
-					withTitle={withTitle}
-				/>
+			{caption ? (
+				<ImageCarouselCaption caption={caption} isHero={true} withTitle={withTitle} />
 			) : undefined}
 		</ImagePlaceholder>
 	) : undefined

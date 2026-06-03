@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -22,22 +22,22 @@ import SectionMetadataList from '#components/sections/section-metadata-list.astr
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'themes'>;
 	mapData: MapComponentData;
-	metadataItems: Array<ContentMetadataItem>;
-	metadataItemsCount: number;
+	catalogItems: Array<CatalogItem>;
+	catalogItemsCount: number;
 	relatedThemeIds: Array<string>;
-	page: Page<ContentMetadataItem>;
+	page: Page<CatalogItem>;
 }
 
-const { entry, mapData, metadataItems, metadataItemsCount, relatedThemeIds, page } = Astro.props;
+const { entry, mapData, catalogItems, catalogItemsCount, relatedThemeIds, page } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -45,11 +45,11 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
-const contentIndex = await getContentMetadataIndex();
+const catalog = await getCatalog();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
 	imageFeatured: entry.data.imageFeatured,
-	getCaption: contentIndex.getCaption,
+	getCaption: catalog.getCaption,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
@@ -97,8 +97,8 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<SectionThemes themeIds={allThemeIds} />
 		<SectionMetadataGrid page={page} />
 		{
-			page.currentPage === 1 && metadataItems.length > 0 ? (
-				<SectionMetadataList items={metadataItems} count={metadataItemsCount} />
+			page.currentPage === 1 && catalogItems.length > 0 ? (
+				<SectionMetadataList items={catalogItems} count={catalogItemsCount} />
 			) : undefined
 		}
 	</ContentArticle>

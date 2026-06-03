@@ -27,10 +27,10 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 
 {
 	seriesData.length > 0
-		? seriesData.map(async ({ entry, metadataItems }) => {
+		? seriesData.map(async ({ entry, catalogItems }) => {
 				const { Content } = await render(entry);
 
-				return metadataItems.length > 0 ? (
+				return catalogItems.length > 0 ? (
 					<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 						<Fragment slot="section-title">
 							{t('collection.series.labelPlural')}: <span>{entry.data.title}</span>
@@ -39,7 +39,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 							<Content />
 						</Prose>
 						<ListColumn class="mt-4 font-serif text-xs md:text-sm">
-							{metadataItems.map(({ url, title, titleMultilingual }) => (
+							{catalogItems.map(({ url, title, titleMultilingual }) => (
 								<ListColumnItem>
 									<Link href={url}>{title}</Link>
 									{titleMultilingual ? (

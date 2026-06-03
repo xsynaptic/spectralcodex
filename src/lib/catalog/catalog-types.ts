@@ -3,23 +3,18 @@ import type { CollectionKey } from 'astro:content';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-/**
- * Metadata
- */
-export type ContentMetadataCollectionKey = Extract<
+export type CatalogCollectionKey = Extract<
 	CollectionKey,
 	'notes' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
 >;
 
 // This is a subset of common properties of different content collections
-export interface ContentMetadataItem<
-	T extends ContentMetadataCollectionKey = ContentMetadataCollectionKey,
-> {
+export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionKey> {
 	collection: T;
 	id: string;
 	title: string;
 	titleMultilingual: MultilingualContent | undefined;
-	description?: string | undefined;
+	description: string | undefined;
 	url: string;
 	imageId: string | undefined;
 	regionPrimaryId: string | undefined;
@@ -34,13 +29,13 @@ export interface ContentMetadataItem<
 	entryQuality: number;
 }
 
+// Caption fields always resolve from a real item, so id/url are present (unlike a title-only caption)
+export type CatalogCaption = Pick<CatalogItem, 'title' | 'titleMultilingual' | 'id' | 'url'>;
+
 // Image featured data is sometimes displayed with a caption; title-only captions carry no id/url
-export type ImageFeaturedCaptionMetadata = Pick<
-	ContentMetadataItem,
-	'title' | 'titleMultilingual'
-> &
-	Partial<Pick<ContentMetadataItem, 'id' | 'url'>>;
+export type ImageFeaturedCaption = Pick<CatalogItem, 'title' | 'titleMultilingual'> &
+	Partial<Pick<CatalogItem, 'id' | 'url'>>;
 
 export type ImageFeaturedWithCaption = ImageFeaturedObject & {
-	captionMetadata?: ImageFeaturedCaptionMetadata | undefined;
+	caption?: ImageFeaturedCaption | undefined;
 };

@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentDescription from '#components/content/content-description.astro';
@@ -29,7 +29,7 @@ import { formatNumber } from '#lib/utils/text.ts';
 interface Props {
 	entry: CollectionEntry<'resources'>;
 	mapData: MapComponentData;
-	page: Page<ContentMetadataItem>;
+	page: Page<CatalogItem>;
 }
 
 const { entry, mapData, page } = Astro.props;

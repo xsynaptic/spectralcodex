@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'vitest';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createArchivesData } from '#lib/collections/archives/archives-core.ts';
 
 function makeItem(
-	overrides: Partial<ContentMetadataItem> & Pick<ContentMetadataItem, 'id' | 'collection'>,
-): ContentMetadataItem {
+	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'collection'>,
+): CatalogItem {
 	return {
 		title: overrides.id,
 		titleMultilingual: undefined,
+		description: undefined,
 		url: `/${overrides.id}`,
 		imageId: undefined,
 		regionPrimaryId: undefined,
@@ -27,7 +28,7 @@ function makeItem(
 	};
 }
 
-const ids = (items: ReadonlyArray<ContentMetadataItem>) => items.map((item) => item.id);
+const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
 const monthlyItem = (data: ReturnType<typeof createArchivesData>, id: string) => {
 	const item = data.archivesMonthlyData.find((entry) => entry.id === id);

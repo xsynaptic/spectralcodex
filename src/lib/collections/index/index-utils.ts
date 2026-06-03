@@ -1,42 +1,42 @@
 import * as R from 'remeda';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
 	filterHasFeaturedImage,
-	sortContentMetadataByDate,
-	sortContentMetadataByQuality,
-} from '#lib/metadata/metadata-index-core.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+	sortCatalogByDate,
+	sortCatalogByQuality,
+} from '#lib/catalog/catalog-utils.ts';
 
 export async function queryIndexData() {
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return {
-		featuredMetadataItems: R.pipe(
-			contentIndex.byCollection('locations', 'posts'),
+		featuredCatalogItems: R.pipe(
+			catalog.byCollection('locations', 'posts'),
 			R.filter((item) => item.entryQuality >= 4),
 			R.filter(filterHasFeaturedImage),
 			R.shuffle(),
 			R.take(5),
 		),
-		recentMetadataItems: R.pipe(
-			contentIndex.byCollection('locations', 'posts'),
+		recentCatalogItems: R.pipe(
+			catalog.byCollection('locations', 'posts'),
 			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
+			R.sort(sortCatalogByDate),
 			R.take(16),
 		),
-		seriesMetadataItems: R.pipe(
-			contentIndex.byCollection('series'),
+		seriesCatalogItems: R.pipe(
+			catalog.byCollection('series'),
 			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByQuality),
+			R.sort(sortCatalogByQuality),
 			R.take(4),
 		),
-		themesMetadataItems: R.pipe(
-			contentIndex.byCollection('themes'),
+		themesCatalogItems: R.pipe(
+			catalog.byCollection('themes'),
 			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByQuality),
+			R.sort(sortCatalogByQuality),
 			R.take(8),
 		),
 	};

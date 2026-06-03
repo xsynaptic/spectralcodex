@@ -2,8 +2,10 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { filterHasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -12,20 +14,18 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { filterHasFeaturedImage } from '#lib/metadata/metadata-index-core.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
-// Filter the content metadata index for series items by ID
-async function createSeriesContentMetadataItemsFunction() {
-	const contentIndex = await getContentMetadataIndex();
+// Filter the catalog for series items by ID
+async function createSeriesCatalogItemsFunction() {
+	const catalog = await getCatalog();
 
-	return function getSeriesContentMetadataItems(
+	return function getSeriesCatalogItems(
 		ids: Array<string> | undefined,
-	): Array<ContentMetadataItem> | undefined {
+	): Array<CatalogItem> | undefined {
 		if (!ids || ids.length === 0) return;
 
 		return ids
-			.map((id) => contentIndex.getById(id))
+			.map((id) => catalog.getById(id))
 			.filter((entry) => !!entry)
 			.filter(filterHasFeaturedImage);
 	};
@@ -75,11 +75,11 @@ export async function createLocationsBySeriesFunction() {
 	};
 }
 
-// Return all series containing a given entry; used to generate post and location metadata blocks
+// Return all series containing a given entry; used to generate post and location catalog item blocks
 export async function createSeriesByIdFunction() {
 	const { entries: series } = await getSeriesCollection();
 
-	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
+	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 
 	return function getSeriesById({
 		collection,
@@ -89,7 +89,7 @@ export async function createSeriesByIdFunction() {
 		id: string;
 	}): Array<{
 		entry: CollectionEntry<'series'>;
-		metadataItems: Array<ContentMetadataItem>;
+		catalogItems: Array<CatalogItem>;
 	}> {
 		// Note: a post or location may be in more than one series!
 		const entries = series.filter((entry: CollectionEntry<'series'>) =>
@@ -98,15 +98,15 @@ export async function createSeriesByIdFunction() {
 
 		const results: Array<{
 			entry: CollectionEntry<'series'>;
-			metadataItems: Array<ContentMetadataItem>;
+			catalogItems: Array<CatalogItem>;
 		}> = [];
 
 		for (const entry of entries) {
-			const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);
+			const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
 
 			// This avoids returning series for a post or location with an identical ID
-			if (metadataItems?.some((item) => item.id === id && item.collection === collection)) {
-				results.push({ entry, metadataItems });
+			if (catalogItems?.some((item) => item.id === id && item.collection === collection)) {
+				results.push({ entry, catalogItems });
 			}
 		}
 		return results;
@@ -114,22 +114,22 @@ export async function createSeriesByIdFunction() {
 }
 
 /**
- * Data for a single series entry page: metadata items, map data, and word count
+ * Data for a single series entry page: catalog items, map data, and word count
  */
 export async function createQuerySeriesEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
 
-	const contentIndex = await getContentMetadataIndex();
-	const getSeriesContentMetadataItems = await createSeriesContentMetadataItemsFunction();
+	const catalog = await getCatalog();
+	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
-	const seriesItemsMetadata = contentIndex.resolve(series);
+	const seriesCatalogItems = catalog.resolve(series);
 
 	return function querySeriesEntry(entry: CollectionEntry<'series'>) {
-		const metadataItems = getSeriesContentMetadataItems(entry.data.seriesItems);
+		const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
 
-		if (!metadataItems) return;
+		if (!catalogItems) return;
 
 		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -142,16 +142,16 @@ export async function createQuerySeriesEntryFunction() {
 				: {}),
 		});
 
-		const wordCount = seriesItemsMetadata.find((item) => item.id === entry.id)?.wordCount;
+		const wordCount = seriesCatalogItems.find((item) => item.id === entry.id)?.wordCount;
 
-		return { metadataItems, mapData, wordCount };
+		return { catalogItems, mapData, wordCount };
 	};
 }
 
 export async function querySeriesIndex() {
 	const { entries: series } = await getSeriesCollection();
 
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return R.pipe(
 		series,
@@ -161,6 +161,6 @@ export async function querySeriesIndex() {
 				? b.data.seriesItems.length - a.data.seriesItems.length
 				: 0,
 		),
-		contentIndex.resolve,
+		catalog.resolve,
 	);
 }

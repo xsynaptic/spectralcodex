@@ -3,7 +3,7 @@ import { stripDiacritics } from '@spectralcodex/shared/text';
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
 import type { MetadataGridOptions } from '#components/types.ts';
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -19,7 +19,7 @@ import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props extends MetadataGridOptions {
 	class?: string | undefined;
-	items: Array<ContentMetadataItem>;
+	items: Array<CatalogItem>;
 }
 
 const {

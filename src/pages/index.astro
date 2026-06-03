@@ -2,7 +2,7 @@
 import IndexLayout from '#layouts/index.astro';
 import { queryIndexData } from '#lib/collections/index/index-utils.ts';
 
-const metadataItems = await queryIndexData();
+const indexData = await queryIndexData();
 ---
 
-<IndexLayout {...metadataItems} />
+<IndexLayout {...indexData} />

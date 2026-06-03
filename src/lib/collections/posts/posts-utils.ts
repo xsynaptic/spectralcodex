@@ -4,13 +4,13 @@ import * as R from 'remeda';
 
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
@@ -41,7 +41,7 @@ export async function getPostSchema(
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -54,7 +54,7 @@ export async function createQueryPostsEntryFunction() {
 				: {}),
 		});
 
-		const backlinks = contentIndex.backlinksOf(entry.id);
+		const backlinks = catalog.backlinksOf(entry.id);
 
 		return { mapData, backlinks };
 	};

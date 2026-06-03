@@ -15,10 +15,10 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const results = [];
 
 	for (const entry of entriesPublic) {
-		const { metadataItems, mapData } = queryResourcesEntry(entry);
+		const { catalogItems, mapData } = queryResourcesEntry(entry);
 
 		results.push(
-			...paginate(metadataItems, {
+			...paginate(catalogItems, {
 				params: { id: entry.id },
 				props: { entry, mapData },
 				pageSize: 20,

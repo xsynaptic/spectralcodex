@@ -13,17 +13,17 @@ export const getStaticPaths = (async ({ paginate }) => {
 	const results = [];
 
 	for (const entry of entries) {
-		const { metadataItemsFiltered, mapData, metadataItems, metadataItemsCount, regionsOption } =
+		const { catalogItemsFiltered, mapData, catalogItems, catalogItemsCount, regionsOption } =
 			queryRegionsEntry(entry);
 
 		results.push(
-			...paginate(metadataItemsFiltered, {
+			...paginate(catalogItemsFiltered, {
 				params: { id: entry.id },
 				props: {
 					entry,
 					mapData,
-					metadataItems,
-					metadataItemsCount,
+					catalogItems,
+					catalogItemsCount,
 					regionsOption,
 				},
 				pageSize: 20,

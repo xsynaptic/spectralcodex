@@ -2,22 +2,19 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
+import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type {
 	ArchivesIndexData,
 	ArchivesMonthlyItem,
 } from '#lib/collections/archives/archives-types.ts';
-import type {
-	ContentMetadataCollectionKey,
-	ContentMetadataItem,
-} from '#lib/metadata/metadata-types.ts';
 
 interface ArchivesRawMonthData extends Pick<
 	ArchivesMonthlyItem,
 	'id' | 'year' | 'month' | 'monthName' | 'title'
 > {
-	created: Set<ContentMetadataItem>;
-	updated: Set<ContentMetadataItem>;
-	visited: Set<ContentMetadataItem>;
+	created: Set<CatalogItem>;
+	updated: Set<CatalogItem>;
+	visited: Set<CatalogItem>;
 }
 
 type ArchivesDataMap = Map<string, Map<string, ArchivesRawMonthData>>;
@@ -75,9 +72,7 @@ const highlightLimit = 5;
 function createHighlightSelector() {
 	const seen = new Set<string>();
 
-	return function selectHighlights(
-		items: Array<ContentMetadataItem>,
-	): Array<ContentMetadataItem> | undefined {
+	return function selectHighlights(items: Array<CatalogItem>): Array<CatalogItem> | undefined {
 		const highlights = R.pipe(
 			items,
 			R.filter(
@@ -98,9 +93,9 @@ function createHighlightSelector() {
 	};
 }
 
-const collectionsExcluded = ['pages'] satisfies Array<ContentMetadataCollectionKey>;
+const collectionsExcluded = ['pages'] satisfies Array<CatalogCollectionKey>;
 
-function buildArchivesDataMap(items: ReadonlyArray<ContentMetadataItem>): ArchivesDataMap {
+function buildArchivesDataMap(items: ReadonlyArray<CatalogItem>): ArchivesDataMap {
 	const archiveDataMap: ArchivesDataMap = new Map();
 
 	for (const item of items) {
@@ -139,12 +134,12 @@ function buildArchivesDataMap(items: ReadonlyArray<ContentMetadataItem>): Archiv
 
 // The three categories, as either raw buckets or the projected (filtered, capped, deduped) tier result
 interface ArchivesTierBuckets {
-	updated: Array<ContentMetadataItem>;
-	created: Array<ContentMetadataItem>;
-	visited: Array<ContentMetadataItem>;
+	updated: Array<CatalogItem>;
+	created: Array<CatalogItem>;
+	visited: Array<CatalogItem>;
 }
 
-function sortAndLimit(items: Array<ContentMetadataItem>, limit: number) {
+function sortAndLimit(items: Array<CatalogItem>, limit: number) {
 	return R.pipe(
 		items,
 		R.sortBy(
@@ -159,9 +154,9 @@ function sortAndLimit(items: Array<ContentMetadataItem>, limit: number) {
 
 // Deduplicate across categories within one scope: updated > created > visited
 function deduplicateCategories(
-	updated: Array<ContentMetadataItem>,
-	created: Array<ContentMetadataItem>,
-	visited: Array<ContentMetadataItem>,
+	updated: Array<CatalogItem>,
+	created: Array<CatalogItem>,
+	visited: Array<CatalogItem>,
 ): ArchivesTierBuckets {
 	const updatedIds = new Set(updated.map((item) => item.id));
 
@@ -218,7 +213,7 @@ function getBucketCounts(buckets: ArchivesTierBuckets) {
 	};
 }
 
-function passesYearlyFloor(item: ContentMetadataItem): boolean {
+function passesYearlyFloor(item: CatalogItem): boolean {
 	return item.entryQuality >= yearlyQualityFloor;
 }
 
@@ -244,7 +239,7 @@ function getYearlyWinningCategories(
 }
 
 export function createArchivesData(
-	items: ReadonlyArray<ContentMetadataItem>,
+	items: ReadonlyArray<CatalogItem>,
 	archiveEntries: Array<CollectionEntry<'archives'>>,
 ): ArchivesData {
 	const archivesDataMap = buildArchivesDataMap(items);

@@ -2,19 +2,19 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import NotesEntry from '#layouts/notes-entry.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getNotesCollection();
 
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 
 	return entries.map((entry) => ({
 		params: { note: entry.id },
 		props: {
 			entry,
-			backlinks: contentIndex.backlinksOf(entry.id),
+			backlinks: catalog.backlinksOf(entry.id),
 		},
 	}));
 }) satisfies GetStaticPaths;

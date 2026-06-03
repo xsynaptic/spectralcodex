@@ -3,10 +3,10 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 
 /**
  * A general file loading function that resolves the file path relative to the project root
@@ -65,7 +65,7 @@ async function loadSimilarContentData() {
 async function createSimilarContentFunction() {
 	const similarContentData = await loadSimilarContentData();
 
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getSimilarContent({
@@ -78,7 +78,7 @@ async function createSimilarContentFunction() {
 		limit?: number | undefined;
 		threshold?: number;
 		hasImageFeatured?: boolean;
-	}): Array<ContentMetadataItem> {
+	}): Array<CatalogItem> {
 		if (!similarContentData) return [];
 
 		const similarItem = similarContentData[id];
@@ -88,7 +88,7 @@ async function createSimilarContentFunction() {
 		return similarItem
 			.filter((item) => item.score >= threshold)
 			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
-			.map((item) => contentIndex.getById(item.id))
+			.map((item) => catalog.getById(item.id))
 			.filter((item) => item !== undefined)
 			.filter((item) => !!item.imageId === hasImageFeatured)
 			.slice(0, limit);

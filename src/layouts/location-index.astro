@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -15,7 +15,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	page: Page<ContentMetadataItem>;
+	page: Page<CatalogItem>;
 	pageTitle?: string;
 }
 

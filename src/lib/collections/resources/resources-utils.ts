@@ -2,6 +2,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { filterHasFeaturedImage, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
@@ -9,11 +11,6 @@ import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import {
-	filterHasFeaturedImage,
-	sortContentMetadataByDate,
-} from '#lib/metadata/metadata-index-core.ts';
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 /**
@@ -134,12 +131,12 @@ export async function createResolveResourceSourcesFunction() {
 }
 
 /**
- * Data for a single resource entry page: metadata items and map data
+ * Data for a single resource entry page: catalog items and map data
  */
 export async function createQueryResourcesEntryFunction() {
 	const getLocationsByResource = await createLocationsByResourceFunction();
 	const getPostsByResource = await createPostsByResourceFunction();
-	const contentIndex = await getContentMetadataIndex();
+	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
@@ -151,18 +148,18 @@ export async function createQueryResourcesEntryFunction() {
 		// Get posts associated with this link
 		const postsFiltered = getPostsByResource(entry);
 
-		// Metadata items are the posts and locations that are associated with the link
-		const metadataItems = R.pipe(
+		// Catalog items are the posts and locations that are associated with the link
+		const catalogItems = R.pipe(
 			[
 				...R.pipe(
 					locationsFiltered,
 					R.filter((entry) => entry.data.entryQuality >= 2),
-					contentIndex.resolve,
+					catalog.resolve,
 				),
-				...R.pipe(postsFiltered, contentIndex.resolve),
+				...R.pipe(postsFiltered, catalog.resolve),
 			],
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortContentMetadataByDate),
+			R.sort(sortCatalogByDate),
 		);
 
 		const mapData = getMapData({
@@ -173,7 +170,7 @@ export async function createQueryResourcesEntryFunction() {
 				: {}),
 		});
 
-		return { metadataItems, mapData };
+		return { catalogItems, mapData };
 	};
 }
 

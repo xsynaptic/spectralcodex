@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { getContentMetadataIndex } from '#lib/metadata/metadata-index.ts';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'a'> {
@@ -18,13 +18,13 @@ if (!id) {
 	throw new Error(`Link component requires an ID; rendering path: ${pathname}`);
 }
 
-const contentIndex = await getContentMetadataIndex();
-const contentMetadata = contentIndex.getById(id);
+const catalog = await getCatalog();
+const catalogItem = catalog.getById(id);
 ---
 
 {
-	contentMetadata?.url ? (
-		<a href={contentMetadata.url} {...props}>
+	catalogItem?.url ? (
+		<a href={catalogItem.url} {...props}>
 			<Fragment set:html={content} />
 		</a>
 	) : (

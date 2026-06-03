@@ -3,10 +3,12 @@ import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:c
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
-import type { ContentMetadataIndex } from '#lib/metadata/metadata-index-core.ts';
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { Catalog } from '#lib/catalog/catalog-factory.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
+import { createCatalog } from '#lib/catalog/catalog-factory.ts';
+import { getWordCount } from '#lib/catalog/catalog-word-count.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
@@ -17,14 +19,12 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { createContentMetadataIndex } from '#lib/metadata/metadata-index-core.ts';
-import { getWordCount } from '#lib/metadata/metadata-word-count.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { parseContentDate } from '#lib/utils/date.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
-// Find the common ancestor of a set of regions so there's only one in the content metadata index
+// Find the common ancestor of a set of regions so there's only one in the catalog
 async function getRegionPrimaryIdFunction() {
 	const getRegionCommonAncestor = await createRegionCommonAncestorFunction();
 
@@ -60,7 +60,7 @@ const backlinkLinkPattern = /<Link id="([^"]+)"/g;
 
 function generateContentBacklinksFromMdxComponents(
 	entry: CollectionEntry<CollectionKey>,
-	contentMetadataMap: Map<string, ContentMetadataItem>,
+	catalogItemsById: Map<string, CatalogItem>,
 ) {
 	if (!entry.body?.includes('<Link ')) return;
 
@@ -68,17 +68,17 @@ function generateContentBacklinksFromMdxComponents(
 		// Skip self-links and invalid backlinks
 		if (!backlinkId || backlinkId === entry.id) continue;
 
-		const backlinkSet = contentMetadataMap.get(backlinkId)?.backlinks;
+		const backlinkSet = catalogItemsById.get(backlinkId)?.backlinks;
 
 		if (backlinkSet) backlinkSet.add(entry.id);
 	}
 }
 
 // This function does all the heavy lifting and should only run once
-async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem>> {
+async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	const startTime = performance.now();
 
-	const contentMetadataMap = new Map<string, ContentMetadataItem>();
+	const catalogItemsById = new Map<string, CatalogItem>();
 
 	const { entries: notes } = await getNotesCollection();
 	const { entries: locations } = await getLocationsCollection();
@@ -94,9 +94,9 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 	// Note: name collisions between all these collections is prohibited and will throw an error
 	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
 		for (const entry of collection) {
-			if (contentMetadataMap.has(entry.id)) {
+			if (catalogItemsById.has(entry.id)) {
 				throw new Error(
-					`[Metadata] Duplicate ID found for "${entry.id}" across different collections!`,
+					`[Catalog] Duplicate ID found for "${entry.id}" across different collections!`,
 				);
 			}
 
@@ -106,7 +106,7 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 			})?.primary;
 			const regions = 'regions' in entry.data ? entry.data.regions : undefined;
 
-			contentMetadataMap.set(entry.id, {
+			catalogItemsById.set(entry.id, {
 				collection: entry.collection,
 				id: entry.id,
 				title: entry.data.title,
@@ -140,18 +140,18 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 	// Now run through everything again and generate backlinks from <Link> components
 	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
 		for (const entry of collection) {
-			generateContentBacklinksFromMdxComponents(entry, contentMetadataMap);
+			generateContentBacklinksFromMdxComponents(entry, catalogItemsById);
 		}
 	}
 
 	// Aggregate word count from series items
 	for (const entry of series) {
-		const seriesMetadata = contentMetadataMap.get(entry.id);
+		const seriesCatalogItem = catalogItemsById.get(entry.id);
 
-		if (seriesMetadata) {
-			seriesMetadata.wordCount = R.pipe(
+		if (seriesCatalogItem) {
+			seriesCatalogItem.wordCount = R.pipe(
 				entry.data.seriesItems ?? [],
-				R.map((seriesItem) => contentMetadataMap.get(seriesItem)?.wordCount ?? 0),
+				R.map((seriesItem) => catalogItemsById.get(seriesItem)?.wordCount ?? 0),
 				R.sum,
 				Number,
 			);
@@ -160,16 +160,16 @@ async function populateContentMetadataItems(): Promise<Array<ContentMetadataItem
 
 	const endTime = performance.now();
 
-	console.log(`[Metadata] Generated in ${(endTime - startTime).toFixed(5)}ms`);
+	console.log(`[Catalog] Generated in ${(endTime - startTime).toFixed(5)}ms`);
 
-	return [...contentMetadataMap.values()];
+	return [...catalogItemsById.values()];
 }
 
-let contentMetadataIndex: Promise<ContentMetadataIndex> | undefined;
+let catalogInstance: Promise<Catalog> | undefined;
 
-export async function getContentMetadataIndex(): Promise<ContentMetadataIndex> {
-	if (!contentMetadataIndex) {
-		contentMetadataIndex = populateContentMetadataItems().then(createContentMetadataIndex);
+export async function getCatalog(): Promise<Catalog> {
+	if (!catalogInstance) {
+		catalogInstance = buildCatalogItems().then(createCatalog);
 	}
-	return contentMetadataIndex;
+	return catalogInstance;
 }

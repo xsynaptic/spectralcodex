@@ -3,8 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import { transformMarkdown } from '@xsynaptic/unified-tools';
 
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ImageHero from '#components/image/image-hero.astro';
@@ -17,12 +17,12 @@ import Link from '#components/parts/link.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
 import Prose from '#components/parts/prose.astro';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { getCatalogStats } from '#lib/catalog/catalog-stats.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageFeaturedGroupByContentMetadata } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
-import { getContentStats } from '#lib/metadata/metadata-stats.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
@@ -30,10 +30,10 @@ import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate, sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props {
-	featuredMetadataItems: Array<ContentMetadataItem>;
-	recentMetadataItems: Array<ContentMetadataItem>;
-	themesMetadataItems: Array<ContentMetadataItem>;
-	seriesMetadataItems: Array<ContentMetadataItem>;
+	featuredCatalogItems: Array<CatalogItem>;
+	recentCatalogItems: Array<CatalogItem>;
+	themesCatalogItems: Array<CatalogItem>;
+	seriesCatalogItems: Array<CatalogItem>;
 }
 
 const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
@@ -75,13 +75,13 @@ async function getImageProps(): Promise<{
 
 const { imageProps, placeholderProps } = await getImageProps();
 
-const contentStats = await getContentStats();
+const contentStats = await getCatalogStats();
 
-const { featuredMetadataItems, recentMetadataItems, themesMetadataItems, seriesMetadataItems } =
+const { featuredCatalogItems, recentCatalogItems, themesCatalogItems, seriesCatalogItems } =
 	Astro.props;
 
-const imageFeaturedGroup = getImageFeaturedGroupByContentMetadata({
-	items: featuredMetadataItems,
+const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
+	items: featuredCatalogItems,
 	shuffle: true,
 });
 
@@ -148,7 +148,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	<ContentSection class="clear-both">
 		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
 		<MetadataGrid
-			items={recentMetadataItems}
+			items={recentCatalogItems}
 			showDate={true}
 			showRegion={true}
 			showTitleMultilingual={true}
@@ -165,7 +165,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			set:html={transformMarkdown({ input: t('index.themes') })}
 		/>
 		<MetadataGrid
-			items={themesMetadataItems}
+			items={themesCatalogItems}
 			showLocations={true}
 			showPosts={true}
 			showTitleMultilingual={true}
@@ -181,6 +181,6 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			slot="section-description"
 			set:html={transformMarkdown({ input: t('index.series') })}
 		/>
-		<MetadataGrid items={seriesMetadataItems} showLocations={true} showPosts={true} />
+		<MetadataGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 </MainSite>

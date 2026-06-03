@@ -2,7 +2,7 @@
 import type { Page } from 'astro';
 
 import type { MetadataGridOptions } from '#components/types.ts';
-import type { ContentMetadataItem } from '#lib/metadata/metadata-types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
@@ -11,8 +11,8 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	title?: string;
-	items?: Array<ContentMetadataItem>;
-	page?: Page<ContentMetadataItem>;
+	items?: Array<CatalogItem>;
+	page?: Page<CatalogItem>;
 	metadataGridOptions?: MetadataGridOptions | undefined;
 }
 
