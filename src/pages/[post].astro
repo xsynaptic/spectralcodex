@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import PostEntry from '#layouts/post-entry.astro';
+import PostDetail from '#layouts/post-detail.astro';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createQueryPostsEntryFunction } from '#lib/collections/posts/posts-utils.ts';
 
@@ -23,4 +23,4 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<PostEntry {...Astro.props} />
+<PostDetail {...Astro.props} />

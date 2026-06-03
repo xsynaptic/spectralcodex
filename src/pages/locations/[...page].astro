@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import LocationIndex from '#layouts/location-index.astro';
+import LocationList from '#layouts/location-list.astro';
 import { queryLocationsIndex } from '#lib/collections/locations/locations-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<LocationIndex {...Astro.props} />
+<LocationList {...Astro.props} />

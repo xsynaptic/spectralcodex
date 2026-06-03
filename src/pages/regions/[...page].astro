@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import RegionIndex from '#layouts/region-index.astro';
+import RegionList from '#layouts/region-list.astro';
 import { queryRegionsIndex } from '#lib/collections/regions/regions-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<RegionIndex {...Astro.props} />
+<RegionList {...Astro.props} />

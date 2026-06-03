@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import ThemeEntry from '#layouts/theme-entry.astro';
+import ThemeDetail from '#layouts/theme-detail.astro';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { createQueryThemesEntryFunction } from '#lib/collections/themes/themes-utils.ts';
 
@@ -30,4 +30,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<ThemeEntry {...Astro.props} />
+<ThemeDetail {...Astro.props} />

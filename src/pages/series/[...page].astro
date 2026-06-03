@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import SeriesIndex from '#layouts/series-index.astro';
+import SeriesList from '#layouts/series-list.astro';
 import { querySeriesIndex } from '#lib/collections/series/series-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<SeriesIndex {...Astro.props} />
+<SeriesList {...Astro.props} />

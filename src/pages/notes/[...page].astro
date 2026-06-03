@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import NotesIndex from '#layouts/notes-index.astro';
+import NotesList from '#layouts/notes-list.astro';
 import { queryNotesIndex } from '#lib/collections/notes/notes-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<NotesIndex {...Astro.props} />
+<NotesList {...Astro.props} />

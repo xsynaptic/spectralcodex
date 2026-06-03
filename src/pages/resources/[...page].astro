@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import ResourcesIndex from '#layouts/resources-index.astro';
+import ResourcesList from '#layouts/resources-list.astro';
 import { queryResourcesIndex } from '#lib/collections/resources/resources-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<ResourcesIndex {...Astro.props} />
+<ResourcesList {...Astro.props} />

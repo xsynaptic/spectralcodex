@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import PageEntry from '#layouts/page-entry.astro';
+import PageDetail from '#layouts/page-detail.astro';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 
 export const getStaticPaths = (async () => {
@@ -16,4 +16,4 @@ export const getStaticPaths = (async () => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<PageEntry {...Astro.props} />
+<PageDetail {...Astro.props} />

@@ -1,7 +1,7 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import PostIndex from '#layouts/post-index.astro';
+import PostList from '#layouts/post-list.astro';
 import { queryPostsIndex } from '#lib/collections/posts/posts-utils.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
@@ -13,4 +13,4 @@ export const getStaticPaths = (async ({ paginate }) => {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 ---
 
-<PostIndex {...Astro.props} />
+<PostList {...Astro.props} />
