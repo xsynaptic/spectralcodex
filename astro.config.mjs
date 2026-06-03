@@ -6,9 +6,9 @@ import react from '@astrojs/react';
 import buildLogger from '@spectralcodex/astro-build-logger';
 import pagefind from '@spectralcodex/astro-pagefind';
 import sitemap from '@spectralcodex/astro-sitemap';
+import { remarkAutoImport } from '@spectralcodex/remark-auto-import';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
-import autoImport from 'astro-auto-import';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
@@ -136,7 +136,23 @@ export default defineConfig({
 	},
 	markdown: {
 		processor: unified({
-			remarkPlugins: [remarkImgGroup],
+			remarkPlugins: [
+				remarkImgGroup,
+				remarkAutoImport({
+					imports: [
+						{
+							'./src/components/mdx/img.astro': [['default', 'Img']],
+							'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
+							'./src/components/mdx/email.astro': [['default', 'Email']],
+							'./src/components/mdx/hide.astro': [['default', 'Hide']],
+							'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
+							'./src/components/mdx/link.astro': [['default', 'Link']],
+							'./src/components/mdx/map.astro': [['default', 'Map']],
+							'./src/components/mdx/more.astro': [['default', 'More']],
+						},
+					],
+				}),
+			],
 			rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
 			remarkRehype: { footnoteLabelTagName: 'h3' },
 		}),
@@ -144,21 +160,6 @@ export default defineConfig({
 	integrations: [
 		react({
 			include: ['packages/react**/*'],
-		}),
-		// AutoImport *must* appear before the MDX integration
-		autoImport({
-			imports: [
-				{
-					'./src/components/mdx/img.astro': [['default', 'Img']],
-					'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
-					'./src/components/mdx/email.astro': [['default', 'Email']],
-					'./src/components/mdx/hide.astro': [['default', 'Hide']],
-					'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
-					'./src/components/mdx/link.astro': [['default', 'Link']],
-					'./src/components/mdx/map.astro': [['default', 'Map']],
-					'./src/components/mdx/more.astro': [['default', 'More']],
-				},
-			],
 		}),
 		mdx({
 			optimize: true,
