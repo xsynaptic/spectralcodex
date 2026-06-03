@@ -48,11 +48,15 @@ const { values } = parseArgs({
 		},
 		'character-limit': {
 			type: 'string',
-			default: '5000',
+			default: '2500',
 		},
 		'result-count': {
 			type: 'string',
 			default: '20',
+		},
+		'min-score': {
+			type: 'string',
+			default: '0.4',
 		},
 		'clear-cache': {
 			type: 'boolean',
@@ -91,6 +95,8 @@ type SimilarContentResult = Record<string, Array<SimilarContentItem>>;
 
 /**
  * Models; a small sampling of some options; more complex models are more accurate but slower
+ * Note 1: changing models will regenerate all embeddings (cache is namespaced by model)
+ * Note 2: different models have different dimensionalities and input limitations
  */
 const ModelsEnum = {
 	'mini-lm': 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
@@ -100,7 +106,7 @@ const ModelsEnum = {
 	gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
 } as const;
 
-// Note: changing models will regenerate all embeddings (cache is model-specific)
+// English-only but fast; truncates input after 512 tokens (roughly 2500 characters)
 const modelKey = 'mpnet' satisfies keyof typeof ModelsEnum;
 
 /**
@@ -111,42 +117,35 @@ function cleanContent(body: string, data: Record<string, unknown>): string {
 	const description = typeof data.description === 'string' ? data.description : '';
 	const content = body && body.length > 0 ? sanitizeMdx(body) : '';
 
-	// Combine title, description, and content; the model will consume it as-is
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
 }
 
-/**
- * Extract only the metadata fields needed for relatedness calculation
- */
 function toStringArray(value: unknown): Array<string> {
 	if (Array.isArray(value)) return value.map(String);
 	if (typeof value === 'string') return [value];
 	return [];
 }
 
+const boostTheme = 0.15; // weight per shared theme
+const boostRegion = 0.1; // weight per shared region
+const boostLimit = 0.3; // ceiling on the combined boost
+
 /**
- * Calculate metadata boost based on shared regions and themes
+ * Boost from shared taxonomy
  */
 function calculateMetadataBoost(
 	current: SimilarContentEmbedding,
 	other: SimilarContentEmbedding,
 ): number {
-	let boost = 0;
-
-	// Theme alignment boost
 	const currentThemes = new Set(current.metadata.themes);
-	const otherThemes = new Set(other.metadata.themes);
-	const sharedThemes = [...currentThemes].filter((theme) => otherThemes.has(theme));
-	boost += sharedThemes.length * 0.15; // % boost per shared theme
+	const sharedThemes = other.metadata.themes.filter((theme) => currentThemes.has(theme));
 
-	// Region alignment boost
 	const currentRegions = new Set(current.metadata.regions);
-	const otherRegions = new Set(other.metadata.regions);
-	const sharedRegions = [...currentRegions].filter((region) => otherRegions.has(region));
-	boost += sharedRegions.length * 0.1; // % boost per shared region
+	const sharedRegions = other.metadata.regions.filter((region) => currentRegions.has(region));
 
-	// Cap the total boost; applied multiplicatively as similarity * (1 + boost)
-	return Math.min(boost, 0.3);
+	const boost = sharedThemes.length * boostTheme + sharedRegions.length * boostRegion;
+
+	return Math.min(boost, boostLimit);
 }
 
 function getCacheNamespace(cacheName: string, modelKey: string): string {
@@ -248,6 +247,13 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		keyToEmbedding.set(key, embedding);
 	}
 
+	const resultCount = Number(values['result-count']);
+	const minScore = Number(values['min-score']);
+
+	// Over-fetch candidates so the metadata re-ranking has room to reorder before we slice to resultCount
+	// expansion_search must be at least as large as the number we request (candidateCount) or usearch silently returns lower-recall results
+	const candidateCount = Math.max(resultCount * 3, 50);
+
 	// Create and populate the index
 	const index = new Index({
 		metric: MetricKind.Cos,
@@ -255,7 +261,7 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		connectivity: 16,
 		quantization: ScalarKind.F32,
 		expansion_add: 128,
-		expansion_search: 64,
+		expansion_search: candidateCount,
 		multi: false,
 	});
 
@@ -270,8 +276,6 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 
 	const queryStart = performance.now();
 	const result: SimilarContentResult = {};
-	const resultCount = Number(values['result-count']);
-	const candidateCount = Math.max(resultCount * 5, 50); // Fetch extra for re-ranking
 
 	for (const current of embeddings) {
 		const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
@@ -286,19 +290,26 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 			if (!other || other.id === current.id) continue;
 
 			// Convert cosine distance to similarity (usearch returns distance, not similarity)
-			const similarity = distance === undefined ? 0 : 1 - distance;
+			const similarity = Math.max(0, distance === undefined ? 0 : 1 - distance);
+
+			// Apply the taxonomy boost additively within the remaining headroom below 1.0
+			// // Shared themes and regions nudge an item toward a perfect match without ever saturating the score
 			const boost = calculateMetadataBoost(current, other);
+			const score = similarity + (1 - similarity) * boost;
 
 			candidates.push({
 				id: other.id,
 				collection: other.collection,
-				score: Math.min(similarity * (1 + boost), 1),
+				score,
 			});
 		}
 
-		// Sort by score and take top results
+		// Sort by score, drop anything below the retention floor, then keep the top results
 		candidates.sort((a, b) => b.score - a.score);
-		result[current.id] = candidates.slice(0, resultCount);
+
+		result[current.id] = candidates
+			.filter((candidate) => candidate.score >= minScore)
+			.slice(0, resultCount);
 	}
 
 	console.log(

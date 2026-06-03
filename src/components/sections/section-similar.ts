@@ -71,7 +71,7 @@ async function createSimilarContentFunction() {
 	return function getSimilarContent({
 		id,
 		limit = 10,
-		threshold = 0.6,
+		threshold = 0.5,
 		hasImageFeatured = true,
 	}: {
 		id: string;
@@ -90,7 +90,7 @@ async function createSimilarContentFunction() {
 			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
 			.map((item) => catalog.getById(item.id))
 			.filter((item) => item !== undefined)
-			.filter((item) => !!item.imageId === hasImageFeatured)
+			.filter((item) => (hasImageFeatured ? !!item.imageId : !item.imageId))
 			.slice(0, limit);
 	};
 }
