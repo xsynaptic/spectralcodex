@@ -13,7 +13,7 @@ import { TitleSchema } from '#lib/schemas/index.ts';
  * @param schema - Optional custom Zod schema that produces a string type
  * @returns Object with language-suffixed Zod schema properties
  */
-function createMultilingualSchemas<T extends string>(
+export function createMultilingualSchemas<T extends string>(
 	key: T,
 	schema: z.ZodType<string> = z.string(),
 ): Record<
@@ -35,9 +35,3 @@ function createMultilingualSchemas<T extends string>(
  * Multilingual content schemas for this project
  */
 export const titleMultilingualSchema = createMultilingualSchemas('title', TitleSchema);
-
-export const nameMultilingualSchema = createMultilingualSchemas('name');
-
-export const publisherMultilingualSchema = createMultilingualSchemas('publisher');
-
-export const publishedDetailsMultilingualSchema = createMultilingualSchemas('publishedDetails');

@@ -1,11 +1,6 @@
 import { z } from 'zod';
 
-import {
-	nameMultilingualSchema,
-	publishedDetailsMultilingualSchema,
-	publisherMultilingualSchema,
-	titleMultilingualSchema,
-} from '#lib/i18n/i18n-schemas.ts';
+import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 
 /**
  * Links
@@ -40,6 +35,14 @@ export function getMatchingLinkUrl(
 /**
  * Sources
  */
+const nameMultilingualSchema = createMultilingualSchemas('name');
+
+const publisherMultilingualSchema = createMultilingualSchemas('publisher');
+
+const publishedContainerMultilingualSchema = createMultilingualSchemas('publishedContainer');
+
+const publishedDetailsMultilingualSchema = createMultilingualSchemas('publishedDetails');
+
 const SourceAuthorSchema = z.object({
 	name: z.string(),
 	...nameMultilingualSchema,
@@ -50,10 +53,12 @@ export const SourceItemSchema = z.object({
 	...titleMultilingualSchema,
 	description: z.string().optional(),
 	url: z.url().optional(),
-	resourceType: z.enum(['webpage', 'book', 'article', 'report']),
+	resourceType: z.enum(['webpage', 'book', 'chapter', 'article', 'report']),
 	authors: SourceAuthorSchema.array().optional(),
 	publisher: z.string().optional(),
 	...publisherMultilingualSchema,
+	publishedContainer: z.string().optional(),
+	...publishedContainerMultilingualSchema,
 	publishedDate: z.string().optional(),
 	publishedDetails: z.string().optional(),
 	...publishedDetailsMultilingualSchema,
