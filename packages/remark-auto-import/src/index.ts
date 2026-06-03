@@ -30,9 +30,14 @@ function resolveModulePath(path: string): string {
 	return path;
 }
 
-// Strips punctuation, so 'complex-component.astro' => 'coolcomponent'
+// PascalCase the filename so it is a valid MDX component name, e.g. 'complex-component.astro' => 'ComplexComponent'
 function getDefaultImportName(path: string): string {
-	return nodePath.parse(path).name.replaceAll(/[^\w\d]/g, '');
+	return nodePath
+		.parse(path)
+		.name.split(/[^\w\d]+/)
+		.filter(Boolean)
+		.map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+		.join('');
 }
 
 function formatImport(imported: string, module: string): string {

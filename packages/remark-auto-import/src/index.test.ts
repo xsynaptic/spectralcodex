@@ -76,13 +76,13 @@ describe('remarkAutoImport', () => {
 		]);
 	});
 
-	test('a bare path becomes a default import named after the file', () => {
+	test('a bare path becomes a PascalCased default import named after the file', () => {
 		const tree = inject({ imports: ['./src/components/mdx/complex-component.astro'] }, 'post.mdx');
 
 		expect(injectedImports(tree)).toEqual([
 			{
 				source: nodePath.resolve('./src/components/mdx/complex-component.astro'),
-				specifiers: ['coolcomponent'],
+				specifiers: ['ComplexComponent'],
 			},
 		]);
 	});
