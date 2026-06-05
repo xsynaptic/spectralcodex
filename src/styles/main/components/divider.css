@@ -1,78 +1,64 @@
 /* Divider styles; extracted here to avoid repetition in the divided-item component */
-.d-all {
+.divided {
 	display: inline;
 
 	@media (width >= 40rem) {
 		display: inline-flex;
 		gap: calc(var(--spacing) * 1);
 	}
-
-	&:last-child::after {
-		--tw-content: none;
-
-		content: none;
-	}
 }
 
-.d-default::after {
-	color: var(--color-primary-400);
-
-	[data-mode='dark'] & {
-		color: var(--color-primary-500);
-	}
+.divided::after {
+	color: var(--divider-color, var(--color-primary-400));
+	content: var(--divider-glyph, var(--content-slash));
 }
 
-.d-darker::after {
-	color: var(--color-primary-500);
-
-	[data-mode='dark'] & {
-		color: var(--color-primary-700);
-	}
+[data-mode='dark'] .divided::after {
+	color: var(--divider-color-dark, var(--color-primary-500));
 }
 
-.d-lighter::after {
-	color: var(--color-primary-300);
-
-	[data-mode='dark'] & {
-		color: var(--color-primary-600);
-	}
+.divided:last-child::after {
+	content: none;
 }
 
-@media (width >= 40rem) {
-	.d-has-hero::after,
-	[data-mode='dark'] .d-has-hero::after {
-		color: var(--color-primary-300);
-		opacity: 0.8;
-	}
+.divided-bar {
+	--divider-glyph: var(--content-bar);
 }
 
-.d-bar::after {
-	--tw-content: var(--content-bar);
-
-	content: var(--content-bar);
+.divided-bullet {
+	--divider-glyph: var(--content-bullet);
 }
 
-.d-bullet::after {
-	--tw-content: var(--content-bullet);
-
-	content: var(--content-bullet);
+.divided-chevron {
+	--divider-glyph: var(--content-chevron);
 }
 
-.d-chevron::after {
-	--tw-content: var(--content-chevron);
-
-	content: var(--content-chevron);
+.divided-chevron::after {
 	translate: 0 -1px;
 }
 
-.d-dot::after {
-	--tw-content: var(--content-dot);
-
-	content: var(--content-dot);
+.divided-dot {
+	--divider-glyph: var(--content-dot);
 }
 
-.d-slash::after {
-	--tw-content: var(--content-slash);
+.divided-thin::after {
+	font-weight: var(--font-weight-light);
+}
 
-	content: var(--content-slash);
+.divided-lighter {
+	--divider-color: var(--color-primary-300);
+	--divider-color-dark: var(--color-primary-600);
+}
+
+.divided-darker {
+	--divider-color: var(--color-primary-500);
+	--divider-color-dark: var(--color-primary-700);
+}
+
+@media (width >= 40rem) {
+	.divided-hero .divided::after,
+	[data-mode='dark'] .divided-hero .divided::after {
+		color: var(--color-primary-300);
+		opacity: 0.8;
+	}
 }

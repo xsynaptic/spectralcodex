@@ -33,7 +33,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 		<div
 			class:list={[
 				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
-				hasHeroImage ? 'mb-8 sm:mb-0' : '',
+				hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
 				className,
 			]}
 			{...props}
@@ -45,12 +45,12 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 				]}
 			>
 				{indexSlot ? (
-					<DividedItem hasHeroImage={hasHeroImage} dividerContent={DividerContentEnum.Chevron}>
+					<DividedItem dividerContent={DividerContentEnum.Chevron}>
 						<Fragment set:html={indexSlot} />
 					</DividedItem>
 				) : undefined}
 				{archivesYears.map((archivesYear) => (
-					<DividedItem hasHeroImage={hasHeroImage}>
+					<DividedItem>
 						{!currentMonth && currentYear === archivesYear ? (
 							<span
 								class:list={[
@@ -87,7 +87,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 							});
 
 							return (
-								<DividedItem hasHeroImage={hasHeroImage}>
+								<DividedItem>
 									{currentMonth === monthNumber ? (
 										<span
 											class:list={[

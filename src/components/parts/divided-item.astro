@@ -10,7 +10,6 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	class?: string | undefined;
 	dividerColor?: DividerColor | undefined;
 	dividerContent?: DividerContent | undefined;
-	hasHeroImage?: boolean | undefined;
 }>;
 
 const {
@@ -18,17 +17,15 @@ const {
 	class: className,
 	dividerColor = DividerColorEnum.Default,
 	dividerContent = DividerContentEnum.Slash,
-	hasHeroImage = false,
 	...props
 } = Astro.props;
 ---
 
 <Tag
 	class:list={[
-		'd-all',
-		`d-${dividerColor}`,
-		`d-${dividerContent}`,
-		hasHeroImage ? 'd-has-hero' : undefined,
+		'divided',
+		dividerContent === DividerContentEnum.Slash ? undefined : `divided-${dividerContent}`,
+		dividerColor === DividerColorEnum.Default ? undefined : `divided-${dividerColor}`,
 		className,
 	]}
 	{...props}

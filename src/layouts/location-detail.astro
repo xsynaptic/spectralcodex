@@ -112,12 +112,12 @@ const t = getTranslations();
 					<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
-					<DividedItem hasHeroImage={hasHeroImage}>
+					<DividedItem>
 						<ContentCollectionLink collection="locations" hasHeroImage={hasHeroImage} />
 					</DividedItem>
 					{
 						regionPrimary ? (
-							<DividedItem hasHeroImage={hasHeroImage}>
+							<DividedItem>
 								<RegionsBreadcrumbs
 									entry={regionPrimary}
 									showCurrentLink={true}
@@ -126,7 +126,7 @@ const t = getTranslations();
 							</DividedItem>
 						) : undefined
 					}
-					<DividedItem hasHeroImage={hasHeroImage}>
+					<DividedItem>
 						<ContentDate
 							date={entry.data.dateCreated}
 							datePreset={DatePresetEnum.Medium}
@@ -135,7 +135,7 @@ const t = getTranslations();
 					</DividedItem>
 					{
 						entry.data.dateUpdated ? (
-							<DividedItem hasHeroImage={hasHeroImage}>
+							<DividedItem>
 								<ContentDate
 									date={entry.data.dateUpdated}
 									datePreset={DatePresetEnum.Medium}

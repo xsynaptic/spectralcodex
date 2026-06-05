@@ -73,7 +73,7 @@ const { Content } = await render(entry);
 					<TextMultilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
-					<DividedItem hasHeroImage={hasHeroImage}>
+					<DividedItem>
 						<ContentDate
 							date={entry.data.dateCreated}
 							datePreset={DatePresetEnum.Medium}
@@ -82,7 +82,7 @@ const { Content } = await render(entry);
 					</DividedItem>
 					{
 						entry.data.dateUpdated ? (
-							<DividedItem hasHeroImage={hasHeroImage}>
+							<DividedItem>
 								<ContentDate
 									date={entry.data.dateUpdated}
 									datePreset={DatePresetEnum.Medium}
