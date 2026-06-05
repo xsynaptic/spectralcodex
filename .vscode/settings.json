@@ -126,9 +126,12 @@
 		"markdown",
 		"mdx"
 	],
+	"stylelint.validate": ["css", "postcss", "tailwindcss", "astro"],
+	"css.lint.unknownAtRules": "ignore",
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "always",
-		"source.fixAll.eslint": "always"
+		"source.fixAll.eslint": "always",
+		"source.fixAll.stylelint": "explicit"
 	},
 	"editor.colorDecorators": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
