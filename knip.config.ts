@@ -16,11 +16,12 @@ export default {
 		},
 		'packages/content-demo': {
 			ignore: ['collections/**'],
+			ignoreBinaries: ['check-content-demo', 'format-content-demo'],
 		},
 		'packages/content': {
-			entry: ['format-content.mjs', 'global.d.ts'],
+			entry: ['global.d.ts'],
 			ignore: ['collections/**'],
-			ignoreBinaries: ['validate-content'],
+			ignoreBinaries: ['check-content', 'format-content', 'validate-content'],
 			ignoreDependencies: [
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
 				'textlint-rule-diacritics',

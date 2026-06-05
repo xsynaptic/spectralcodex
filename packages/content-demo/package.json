@@ -4,7 +4,8 @@
 	"description": "Spectral Codex demo content",
 	"private": true,
 	"scripts": {
-		"check": "mdxlint 'collections/**/*.mdx' --frail --quiet"
+		"check": "pnpm -w run check-content-demo",
+		"format": "pnpm -w run format-content-demo"
 	},
 	"devDependencies": {
 		"astro": "^6.4.2",
