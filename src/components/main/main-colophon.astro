@@ -73,28 +73,32 @@ const t = getTranslations();
 <style>
 	.colophon-rss-link {
 		display: flex;
-		align-items: center;
 		flex-wrap: nowrap;
 		gap: calc(var(--spacing) * 1);
+		align-items: center;
 	}
+
 	.colophon-rss-icon {
-		background-color: var(--color-white);
 		position: relative;
-		margin-left: 0.5;
-		height: 10px;
 		width: 10px;
+		height: 10px;
+		margin-left: 0.25rem;
+		background-color: var(--color-white);
 	}
+
 	.colophon-rss-icon svg {
-		color: var(--color-orange-400);
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
-		height: 16px;
 		width: 16px;
+		height: 16px;
+		color: var(--color-orange-400);
+		transform: translate(-50%, -50%);
 	}
+
 	.colophon-rss-icon svg:hover,
-	.colophon-rss-link:hover .colophon-rss-icon svg {
+	.colophon-rss-link:hover .colophon-rss-icon svg,
+	.colophon-rss-link:focus-visible .colophon-rss-icon svg {
 		color: var(--color-orange-300);
 	}
 </style>

@@ -5,15 +5,16 @@
  * All element selectors are wrapped in :where() so prose rules have specificity (0,1,0)
  */
 .prose-x {
-	color: var(--color-primary-700);
 	font-family: var(--font-serif);
 	font-size: 1rem;
 	line-height: 1.75;
+	color: var(--color-primary-700);
 
 	@media (width >= 64rem) {
 		font-size: 1.125rem;
 		line-height: calc(32 / 18);
 	}
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-300);
 	}
@@ -22,61 +23,69 @@
 	& > :where(:first-child) {
 		margin-top: 0;
 	}
+
 	& > :where(:last-child) {
 		margin-bottom: 0;
 	}
 
 	/* Headings */
 	& :where(h1) {
-		color: var(--color-primary-900);
-		font-weight: var(--font-weight-extrabold);
-		font-size: 2em;
-		line-height: 1.25;
 		margin-top: 0;
 		margin-bottom: calc(var(--spacing) * 3);
-	}
-	& :where(h2) {
+		font-size: 2em;
+		font-weight: var(--font-weight-extrabold);
+		line-height: 1.25;
 		color: var(--color-primary-900);
-		font-weight: var(--font-weight-bold);
-		font-size: 1.5em;
-		line-height: 1.333;
+	}
+
+	& :where(h2) {
 		margin-top: calc(var(--spacing) * 8);
 		margin-bottom: calc(var(--spacing) * 4);
+		font-size: 1.5em;
+		font-weight: var(--font-weight-bold);
+		line-height: 1.333;
+		color: var(--color-primary-900);
 	}
+
 	& :where(h3) {
-		color: var(--color-primary-900);
-		font-weight: var(--font-weight-semibold);
+		margin-top: calc(var(--spacing) * 6);
+		margin-bottom: calc(var(--spacing) * 2);
 		font-size: 1.25em;
-		line-height: 1.4;
-		margin-top: calc(var(--spacing) * 6);
-		margin-bottom: calc(var(--spacing) * 2);
-	}
-	& :where(h4) {
-		color: var(--color-primary-900);
 		font-weight: var(--font-weight-semibold);
-		font-size: 1em;
-		line-height: 1.5;
+		line-height: 1.4;
+		color: var(--color-primary-900);
+	}
+
+	& :where(h4) {
 		margin-top: calc(var(--spacing) * 6);
 		margin-bottom: calc(var(--spacing) * 2);
+		font-size: 1em;
+		font-weight: var(--font-weight-semibold);
+		line-height: 1.5;
+		color: var(--color-primary-900);
 	}
+
 	& :where(:is(h1, h2, h3, h4) + *) {
 		margin-top: 0;
 	}
+
 	& :where(:is(h1, h2, h3, h4) strong) {
-		color: inherit;
 		font-weight: var(--font-weight-extrabold);
+		color: inherit;
 	}
+
 	& :where(:is(h1, h2, h3, h4) code) {
 		color: inherit;
 	}
+
 	[data-mode='dark'] & :where(:is(h1, h2, h3, h4)) {
 		color: var(--color-white);
 	}
 
 	/* Links: accent color + halo matching page bg */
 	& :where(a) {
-		color: var(--color-accent-500);
 		font-weight: var(--font-weight-medium);
+		color: var(--color-accent-500);
 		text-decoration-line: underline;
 		text-decoration-color: var(--color-accent-200);
 		text-underline-offset: 2px;
@@ -88,20 +97,30 @@
 		transition:
 			color 150ms ease-in,
 			text-decoration-color 150ms ease-in;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
 	}
-	& :where(a):hover {
+
+	& :where(a):hover,
+	& :where(a):focus-visible {
 		color: var(--color-accent-300);
 		text-decoration-color: var(--color-accent-100);
 	}
+
 	& :where(a strong),
 	& :where(a code) {
 		color: inherit;
 	}
+
 	[data-mode='dark'] & :where(a) {
 		color: var(--color-accent-300);
 		text-decoration-color: var(--color-accent-500);
 	}
-	[data-mode='dark'] & :where(a):hover {
+
+	[data-mode='dark'] & :where(a):hover,
+	[data-mode='dark'] & :where(a):focus-visible {
 		color: var(--color-accent-200);
 		text-decoration-color: var(--color-accent-400);
 	}
@@ -111,59 +130,70 @@
 		margin-top: 0;
 		margin-bottom: calc(var(--spacing) * 5);
 	}
+
 	& :where(strong) {
-		color: var(--color-primary-900);
 		font-weight: var(--font-weight-semibold);
+		color: var(--color-primary-900);
 	}
+
 	& :where(blockquote strong),
 	& :where(thead th strong) {
 		color: inherit;
 	}
+
 	[data-mode='dark'] & :where(strong) {
 		color: var(--color-white);
 	}
 
 	/* Lists */
 	& :where(ul) {
+		padding: 0;
+		margin: 0 0 calc(var(--spacing) * 5);
 		list-style-type: disc;
-		margin: 0 0 calc(var(--spacing) * 5);
-		padding: 0;
 	}
+
 	& :where(ol) {
-		list-style-type: decimal;
-		margin: 0 0 calc(var(--spacing) * 5);
 		padding: 0;
+		margin: 0 0 calc(var(--spacing) * 5);
+		list-style-type: decimal;
 	}
+
 	& :where(li) {
 		margin: 0 0 calc(var(--spacing) * 2) calc(var(--spacing) * 4);
 	}
+
 	& :where(ul > li)::marker {
 		color: var(--color-accent-200);
 	}
+
 	& :where(ol > li)::marker {
-		color: var(--color-accent-300);
 		font-weight: var(--font-weight-normal);
+		color: var(--color-accent-300);
 	}
+
 	& :where(:is(ul, ol) :is(ul, ol)) {
 		margin-top: calc(var(--spacing) * 2);
 		margin-bottom: calc(var(--spacing) * 2);
 	}
+
 	[data-mode='dark'] & :where(ul > li)::marker {
 		color: var(--color-primary-600);
 	}
+
 	[data-mode='dark'] & :where(ol > li)::marker {
 		color: var(--color-primary-400);
 	}
 
 	/* Blockquote */
 	& :where(blockquote) {
-		margin: calc(var(--spacing) * 6) 0;
 		padding-inline-start: calc(var(--spacing) * 5);
-		border-inline-start: 0.25rem solid var(--color-primary-200);
-		color: var(--color-primary-500);
+		margin: calc(var(--spacing) * 6) 0;
 		font-style: italic;
 		font-weight: var(--font-weight-normal);
+		color: var(--color-primary-500);
+		border-inline-start: 0.25rem solid var(--color-primary-200);
 	}
+
 	[data-mode='dark'] & :where(blockquote) {
 		color: var(--color-primary-300);
 		border-inline-start-color: var(--color-primary-700);
@@ -171,24 +201,26 @@
 
 	/* Inline code */
 	& :where(code) {
-		color: var(--color-primary-900);
-		font-weight: var(--font-weight-semibold);
 		font-size: 0.875em;
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-primary-900);
 	}
+
 	[data-mode='dark'] & :where(code) {
 		color: var(--color-white);
 	}
 
 	/* Highlight */
 	& :where(mark) {
-		background-color: var(--color-highlight-100);
-		color: var(--color-primary-900);
 		padding-inline: 0.2em;
+		color: var(--color-primary-900);
+		background-color: var(--color-highlight-100);
 		border-radius: 0.125rem;
 	}
+
 	[data-mode='dark'] & :where(mark) {
-		background-color: var(--color-highlight-800);
 		color: var(--color-white);
+		background-color: var(--color-highlight-800);
 	}
 
 	/* Horizontal rule */
@@ -197,9 +229,11 @@
 		border: 0;
 		border-top: 1px solid var(--color-primary-300);
 	}
+
 	& :where(hr + *) {
 		margin-top: 0;
 	}
+
 	[data-mode='dark'] & :where(hr) {
 		border-top-color: var(--color-primary-700);
 	}
@@ -209,47 +243,57 @@
 		font-size: var(--text-sm);
 		line-height: calc(28 / 14);
 	}
+
 	@media (width >= 64rem) {
 		& > :where(.footnotes) ol {
 			font-size: var(--text-sm);
 			line-height: calc(24 / 14);
 		}
 	}
+
 	& > :where(.footnotes) ol li::marker {
 		font-size: var(--text-xs);
 		font-style: italic;
 	}
+
 	& :where(.footnotes li p) {
 		margin: 0;
 	}
+
 	& :where([data-footnote-ref]),
 	& :where([data-footnote-backref]) {
 		font-weight: var(--font-weight-medium);
 		text-decoration-line: none;
 		user-select: none;
 	}
+
 	& :where([data-footnote-ref])::before {
-		content: '[';
-		color: var(--color-accent-300);
-		font-weight: var(--font-weight-light);
 		margin-inline-start: 1px;
-	}
-	& :where([data-footnote-ref])::after {
-		content: ']';
-		color: var(--color-accent-300);
 		font-weight: var(--font-weight-light);
+		color: var(--color-accent-300);
+		content: '[';
 	}
+
+	& :where([data-footnote-ref])::after {
+		font-weight: var(--font-weight-light);
+		color: var(--color-accent-300);
+		content: ']';
+	}
+
 	[data-mode='dark'] & :where([data-footnote-ref])::before,
 	[data-mode='dark'] & :where([data-footnote-ref])::after {
 		color: var(--color-accent-400);
 	}
 }
 
-/* Compact size variant; body shrinks but rem-based margins stay constant */
-/* If compact ends up looking too airy, override individual margins here */
+/**
+ * Compact size variant; body shrinks but rem-based margins stay constant
+ * If compact ends up looking too airy, override individual margins here 
+ */
 .prose-compact {
 	font-size: 0.875rem;
 	line-height: 1.75;
+
 	@media (width >= 64rem) {
 		font-size: 1rem;
 	}

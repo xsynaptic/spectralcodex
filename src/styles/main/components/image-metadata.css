@@ -1,6 +1,7 @@
 /* Image meta wrapper */
 .i-meta {
 	--z-meta: 10;
+
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
@@ -9,13 +10,18 @@
 /* Show button (triggers metadata display on focus-within) */
 .i-meta-show {
 	@apply transition-opacity delay-200 duration-300;
+
 	opacity: 0.8;
+
 	&:focus {
 		opacity: 1;
 	}
+
 	@media (width >= 40rem) {
 		opacity: 0;
-		&:hover {
+
+		&:hover,
+		&:focus {
 			opacity: 1;
 		}
 	}
@@ -24,15 +30,17 @@
 /* Eye icon */
 .i-meta-show-icon {
 	@apply transition-opacity duration-200;
-	color: var(--color-primary-50);
-	cursor: pointer;
-	padding: calc(var(--spacing) * 2);
+
 	position: absolute;
 	right: 0;
 	bottom: 0;
 	z-index: var(--z-meta);
+	padding: calc(var(--spacing) * 2);
+	color: var(--color-primary-50);
+	cursor: pointer;
 	transition-delay: 500ms;
 }
+
 .i-meta-show:focus-within .i-meta-show-icon {
 	pointer-events: none;
 	opacity: 0;
@@ -42,27 +50,31 @@
 /* Metadata panel (slides in from the bottom on focus) */
 .i-meta-panel {
 	@apply translate-x-full transition-[opacity,translate];
-	font-family: var(--font-sans);
-	pointer-events: none;
+
 	position: absolute;
 	inset: 0;
 	display: flex;
 	align-items: flex-end;
+	width: 100%;
 	height: 100%;
 	max-height: 100%;
-	width: 100%;
 	overflow-y: auto;
+	font-family: var(--font-sans);
+	pointer-events: none;
 	opacity: 0;
 	translate: 100% 0;
 	transition-delay: 100ms, 300ms;
 	transition-duration: 200ms, 0ms;
+
 	@media (width >= 40rem) {
-		border-bottom-left-radius: var(--radius-xs);
 		border-bottom-right-radius: var(--radius-xs);
+		border-bottom-left-radius: var(--radius-xs);
 	}
 }
+
 .i-meta-show:focus-within .i-meta-panel {
 	@apply translate-x-0;
+
 	pointer-events: auto;
 	opacity: 1;
 	transition-delay: 100ms, 0ms;
@@ -71,27 +83,35 @@
 /* EXIF data grid */
 .i-meta-grid {
 	@apply gap-1 bg-primary-50/75 px-4 py-2 backdrop-grayscale dark:bg-primary-800/75;
+
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	max-height: 100%;
 	width: 100%;
+	max-height: 100%;
 	overflow-y: auto;
+
 	@media (width >= 40rem) {
 		@apply gap-2;
+
 		grid-template-columns: repeat(8, minmax(0, 1fr));
 	}
+
 	@media (width >= 48rem) {
 		@apply gap-4;
+
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 	}
+
 	@container (width < 32rem) {
 		@media (width >= 40rem) {
 			@apply gap-1;
 		}
+
 		@media (width >= 48rem) {
 			grid-template-columns: repeat(8, minmax(0, 1fr));
 		}
 	}
+
 	@container (width < 24rem) {
 		@media (width >= 40rem) {
 			grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -102,22 +122,26 @@
 /* Close button (sibling of show button; appears on show's focus-within) */
 .i-meta-close {
 	@apply transition-opacity;
+
 	pointer-events: none;
 	opacity: 0;
 	transition-duration: 100ms;
 }
+
 .i-meta-show:focus-within ~ .i-meta-close {
 	pointer-events: auto;
 	opacity: 1;
 }
+
 .i-meta-close-icon {
-	padding: calc(var(--spacing) * 2);
-	color: var(--color-accent-700);
-	cursor: pointer;
 	position: absolute;
 	right: 0;
 	bottom: 0;
 	z-index: calc(var(--z-meta) + 1);
+	padding: calc(var(--spacing) * 2);
+	color: var(--color-accent-700);
+	cursor: pointer;
+
 	[data-mode='dark'] & {
 		color: var(--color-accent-400);
 	}
@@ -131,20 +155,23 @@
 .i-meta-item {
 	text-align: left;
 }
+
 .i-meta-item.i-span-2 {
 	grid-column: span 2 / span 2;
 }
+
 .i-meta-item.i-span-4 {
 	grid-column: span 4 / span 4;
 }
 
 .i-meta-item-title {
 	@apply text-xs font-semibold;
+
 	display: block;
-	color: var(--color-primary-800);
 	margin: 0;
-	-webkit-user-select: none;
+	color: var(--color-primary-800);
 	user-select: none;
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-400);
 	}
@@ -152,10 +179,11 @@
 
 .i-meta-item-value {
 	@apply text-sm;
+
 	color: var(--color-primary-700);
 	cursor: text;
-	-webkit-user-select: text;
 	user-select: text;
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-200);
 	}

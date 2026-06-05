@@ -1,44 +1,60 @@
 .g-item .i-placeholder {
 	@apply overflow-hidden rounded-xs shadow-sm;
 }
+
 .g-item .i-image {
 	@apply aspect-3/2 text-sm text-transparent;
 }
+
 .g-item-title {
 	@apply text-xl;
+
 	display: flex;
 	flex-wrap: wrap;
 	column-gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 1);
 }
+
 .g-item-title-ml {
 	@apply font-semibold;
-	color: var(--color-primary-500);
+
 	display: inline-flex;
+	color: var(--color-primary-500);
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-400);
 	}
 }
+
 .g-item-title-link {
 	@apply font-display font-bold transition-colors ease-in;
+
 	color: var(--color-primary-700);
-	&:hover {
+
+	&:hover,
+	&:focus-visible {
 		color: var(--color-accent-500);
 	}
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-300);
-		&:hover {
+
+		&:hover,
+		&:focus-visible {
 			color: var(--color-accent-400);
 		}
 	}
 }
+
 .g-item-subtitle {
 	@apply text-sm;
-	color: var(--color-primary-500);
+
 	display: flex;
 	flex-wrap: wrap;
 	gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 0.5);
+	color: var(--color-primary-500);
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-400);
 	}

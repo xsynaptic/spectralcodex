@@ -30,10 +30,10 @@
 .p-button {
 	top: 50%;
 	left: 100%;
-	transform: translateY(-50%);
 	visibility: hidden;
-	opacity: 0;
 	pointer-events: none;
+	opacity: 0;
+	transform: translateY(-50%);
 	transition:
 		opacity 120ms cubic-bezier(0.22, 1, 0.36, 1),
 		visibility 120ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -41,8 +41,8 @@
 
 	&[data-visible] {
 		visibility: visible;
-		opacity: 1;
 		pointer-events: auto;
+		opacity: 1;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -62,9 +62,9 @@
 	}
 
 	.p-control option::checkmark {
+		order: 1;
 		color: var(--color-accent-400);
 		content: var(--content-bullet);
-		order: 1;
 	}
 
 	.p-control:open {
@@ -84,27 +84,32 @@
 		max-height: 240px;
 		overflow-y: auto;
 		overscroll-behavior: none;
+		scrollbar-color: color-mix(in srgb, var(--color-primary-400) 40%, transparent) transparent;
+		scrollbar-width: thin;
+		background-color: var(--color-primary-50);
 		border: 1px solid var(--color-primary-300);
 		border-radius: var(--radius-sm);
-		background-color: var(--color-primary-50);
-		box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
-		scrollbar-width: thin;
-		scrollbar-color: color-mix(in srgb, var(--color-primary-400) 40%, transparent) transparent;
+		box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+
+		@media (width >= 768px) {
+			max-height: 300px;
+		}
 	}
 
 	[data-mode='dark'] .p-control::picker(select) {
-		border-color: var(--color-primary-600);
-		background-color: var(--color-primary-900);
 		scrollbar-color: color-mix(in srgb, var(--color-primary-400) 45%, transparent) transparent;
+		background-color: var(--color-primary-900);
+		border-color: var(--color-primary-600);
 	}
 
 	.p-control option {
 		display: flex;
 		align-items: center;
+		height: 30px;
 		padding-block: 0;
 		padding-inline: calc(var(--spacing) * 2);
-		color: var(--color-primary-800);
 		font-variant-numeric: tabular-nums;
+		color: var(--color-primary-800);
 		cursor: pointer;
 	}
 
@@ -114,16 +119,17 @@
 
 	.p-control option:hover,
 	.p-control option:focus {
-		background-color: var(--color-accent-100);
 		color: var(--color-accent-800);
+		background-color: var(--color-accent-100);
 	}
 
 	[data-mode='dark'] .p-control option:hover,
 	[data-mode='dark'] .p-control option:focus {
-		background-color: var(--color-accent-900);
 		color: var(--color-accent-50);
+		background-color: var(--color-accent-900);
 	}
 
+	/* stylelint-disable-next-line no-descending-specificity -- checked color intentionally yields to the dark-mode hover rule above when both states match */
 	.p-control option:checked {
 		font-weight: 600;
 		color: var(--color-accent-700);

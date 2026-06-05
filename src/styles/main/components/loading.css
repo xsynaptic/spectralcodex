@@ -1,11 +1,11 @@
 /** Loading; adapted from Daisy UI */
 .loading-animation {
-	aspect-ratio: 1/1;
-	background-color: currentColor;
 	display: inline-block;
-	mask-image: url('/loading.svg');
-	mask-position: center;
-	mask-repeat: no-repeat;
-	mask-size: 100%;
+	aspect-ratio: 1/1;
 	pointer-events: none;
+	background-color: currentcolor;
+	mask-image: url('/loading.svg');
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 100%;
 }

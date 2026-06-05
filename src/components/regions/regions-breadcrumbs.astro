@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import DividedItem from '#components/parts/divided-item.astro';
 import Link from '#components/parts/link.astro';
 import ListRow from '#components/parts/list-row.astro';
+import { DividerContentEnum } from '#components/types.ts';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -35,7 +36,7 @@ const t = getTranslations();
 				{termAncestors.map((termAncestor) => (
 					<DividedItem
 						as="li"
-						dividerContent="chevron"
+						dividerContent={DividerContentEnum.Chevron}
 						hasHeroImage={hasHeroImage}
 						aria-current={termAncestor.id === entry.id ? 'page' : undefined}
 					>

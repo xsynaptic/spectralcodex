@@ -2,6 +2,7 @@
 .title-ml [lang^='zh'] {
 	font-weight: var(--font-weight-semibold);
 }
+
 .title-ml [lang^='ja'] {
 	font-weight: var(--font-weight-medium);
 }

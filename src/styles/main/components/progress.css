@@ -1,9 +1,9 @@
 .progress-bar {
-	pointer-events: none;
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
+	pointer-events: none;
 	opacity: 0;
 	transform: translate3d(0, 0, 0) scaleX(var(--progress-bar, 0));
 	transform-origin: 0;
@@ -11,4 +11,8 @@
 		background-color 100ms 100ms ease-in-out,
 		opacity 150ms 150ms ease-in,
 		transform 300ms ease-out;
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
 }

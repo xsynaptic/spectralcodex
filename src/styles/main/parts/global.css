@@ -4,22 +4,24 @@ html:not([lang^='ja']) [lang^='ja'],
 html:not([lang^='ko']) [lang^='ko'] {
 	font-style: normal !important; /* Never italicize CJK characters */
 	font-variant: normal !important;
+	text-transform: none !important;
 	letter-spacing: normal !important;
 	line-break: strict !important;
+	word-break: keep-all !important; /* Keep CJK runs intact; pairs with overflow-wrap above */
 	overflow-wrap: anywhere !important; /* Allow mid-run breaks only when content would overflow */
 	text-decoration: none !important;
-	text-transform: none !important;
-	word-break: keep-all !important; /* Keep CJK runs intact; pairs with overflow-wrap above */
 }
+
 html:not([lang^='ja']) [lang^='ja'] {
 	word-break: auto-phrase !important; /* Chromium-only phrase-level breaks for Japanese */
 }
+
 html:not([lang^='th']) [lang^='th'] {
 	font-style: normal !important; /* Never italicize CJK characters */
 	font-variant: normal !important;
+	text-transform: none !important;
 	letter-spacing: normal !important;
 	line-break: auto !important;
+	overflow-wrap: break-word !important;
 	text-decoration: none !important;
-	text-transform: none !important;
-	word-break: break-word !important;
 }

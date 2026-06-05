@@ -9,15 +9,17 @@
 <style is:inline>
 	@layer base {
 		:root {
-			--color-body-bg: oklch(96.7% 0.001 286.375);
+			--color-body-bg: oklch(96.7% 0.001 286.375deg);
 		}
+
 		[data-mode='dark'] {
-			--color-body-bg: oklch(27.4% 0.006 286.033);
+			--color-body-bg: oklch(27.4% 0.006 286.033deg);
 		}
+
 		body {
-			background-color: var(--color-body-bg);
-			overflow: hidden;
 			visibility: hidden;
+			overflow: hidden;
+			background-color: var(--color-body-bg);
 		}
 	}
 </style>

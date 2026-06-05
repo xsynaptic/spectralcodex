@@ -1,32 +1,43 @@
 /* Divider styles; extracted here to avoid repetition in the divided-item component */
 .d-all {
 	display: inline;
+
 	@media (width >= 40rem) {
 		display: inline-flex;
 		gap: calc(var(--spacing) * 1);
 	}
+
 	&:last-child::after {
+		--tw-content: none;
+
 		content: none;
 	}
 }
+
 .d-default::after {
 	color: var(--color-primary-400);
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-500);
 	}
 }
+
 .d-darker::after {
 	color: var(--color-primary-500);
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-700);
 	}
 }
+
 .d-lighter::after {
 	color: var(--color-primary-300);
+
 	[data-mode='dark'] & {
 		color: var(--color-primary-600);
 	}
 }
+
 @media (width >= 40rem) {
 	.d-has-hero::after,
 	[data-mode='dark'] .d-has-hero::after {
@@ -35,20 +46,33 @@
 	}
 }
 
-/** Divider content styles */
 .d-bar::after {
+	--tw-content: var(--content-bar);
+
 	content: var(--content-bar);
 }
+
 .d-bullet::after {
+	--tw-content: var(--content-bullet);
+
 	content: var(--content-bullet);
 }
+
 .d-chevron::after {
+	--tw-content: var(--content-chevron);
+
 	content: var(--content-chevron);
 	translate: 0 -1px;
 }
+
 .d-dot::after {
+	--tw-content: var(--content-dot);
+
 	content: var(--content-dot);
 }
+
 .d-slash::after {
+	--tw-content: var(--content-slash);
+
 	content: var(--content-slash);
 }

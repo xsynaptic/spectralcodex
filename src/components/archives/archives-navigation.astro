@@ -44,7 +44,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 				]}
 			>
 				{indexSlot ? (
-					<DividedItem hasHeroImage={hasHeroImage} dividerContent="chevron">
+					<DividedItem hasHeroImage={hasHeroImage} dividerContent={DividerContentEnum.Chevron}>
 						<Fragment set:html={indexSlot} />
 					</DividedItem>
 				) : undefined}
