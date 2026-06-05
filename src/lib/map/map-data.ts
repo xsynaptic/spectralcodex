@@ -30,8 +30,8 @@ interface MapDataBoundsProps {
 	targetId?: string | undefined; // Optional: use for centering on a specific point
 }
 
-const BOUNDS_BUFFER_MIN = 0.1;
-const LIMITS_BUFFER_MIN = 10;
+const mapBoundsBufferMin = 1;
+const mapLimitsBufferMin = 10;
 
 const defaultMapDataProps = {
 	hasGeodata: false,
@@ -102,16 +102,8 @@ function getMapBounds({
 	} else {
 		// Note: single points will have a fixed buffer
 		if (featureCollection.features.length === 1) {
-			boundsBufferCollection = buffer(
-				featureCollection,
-				boundsBuffer ??
-					Math.max(BOUNDS_BUFFER_MIN, BOUNDS_BUFFER_MIN * (boundsBufferPercentage / 100)),
-			);
-			limitsBufferCollection = buffer(
-				featureCollection,
-				limitsBuffer ??
-					Math.max(LIMITS_BUFFER_MIN, LIMITS_BUFFER_MIN * (limitsBufferPercentage / 100)),
-			);
+			boundsBufferCollection = buffer(featureCollection, boundsBuffer ?? mapBoundsBufferMin);
+			limitsBufferCollection = buffer(featureCollection, limitsBuffer ?? mapLimitsBufferMin);
 		} else {
 			const naturalBounds = bbox(featureCollection);
 			const spanX = distance(
@@ -126,11 +118,11 @@ function getMapBounds({
 
 			boundsBufferCollection = buffer(
 				featureCollection,
-				boundsBuffer ?? Math.max(BOUNDS_BUFFER_MIN, spanMax * (boundsBufferPercentage / 100)),
+				boundsBuffer ?? Math.max(mapBoundsBufferMin, spanMax * (boundsBufferPercentage / 100)),
 			);
 			limitsBufferCollection = buffer(
 				featureCollection,
-				limitsBuffer ?? Math.max(LIMITS_BUFFER_MIN, spanMax * (limitsBufferPercentage / 100)),
+				limitsBuffer ?? Math.max(mapLimitsBufferMin, spanMax * (limitsBufferPercentage / 100)),
 			);
 		}
 	}

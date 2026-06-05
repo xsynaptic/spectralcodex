@@ -2,6 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
+import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
@@ -115,6 +116,21 @@ export async function getLocationSchemas(
 	];
 }
 
+const locationNearbyRadiusKmMin = 1;
+const locationNearbyRadiusKmMax = 3;
+const locationNearbyRadiusNeighborCount = 5;
+
+// Center the location map on the target, sizing the frame to neighbor density
+// Dense areas keep the minimum radius, remote ones widen toward the maximum
+function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
+	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
+
+	const index = Math.min(locationNearbyRadiusNeighborCount, nearby.length) - 1;
+	const neighborDistance = nearby[index]?.distance ?? locationNearbyRadiusKmMin;
+
+	return Math.min(Math.max(neighborDistance, locationNearbyRadiusKmMin), locationNearbyRadiusKmMax);
+}
+
 /**
  * Data for a single location entry page: map data, related posts, and backlinks
  */
@@ -130,7 +146,7 @@ export async function createQueryLocationsEntryFunction() {
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection([entry]),
 			targetId: entry.data._uuid ?? entry.id,
-			boundsBuffer: 1, // 1km fixed buffer
+			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
 			...(regionPrimary?.data._langCode?.startsWith('zh')
 				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
 				: {}),
