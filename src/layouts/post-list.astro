@@ -12,7 +12,7 @@ import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
-import Pagination from '#components/parts/pagination.astro';
+import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -86,6 +86,6 @@ const description = t('collection.posts.description');
 			: undefined
 	}
 	<ContentSection>
-		<Pagination class="mt-4 md:mt-8" page={page} />
+		<PaginationSelect class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

@@ -2,18 +2,25 @@
 import type { Page } from 'astro';
 import type { HTMLAttributes } from 'astro/types';
 
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
+
 interface Props extends HTMLAttributes<'div'> {
 	page: Page;
 }
 
 const { class: className, page, ...props } = Astro.props;
+
+const t = getTranslations();
 ---
 
 {
 	page.currentPage > 1 ? (
-		<div
-			class:list={[className, 'text-sm', 'text-primary-500 dark:text-primary-600']}
-			{...props}
-		>{`Page ${String(page.currentPage)} of ${String(page.lastPage)}`}</div>
+		<div class:list={[className, 'text-sm', 'text-primary-500 dark:text-primary-600']} {...props}>
+			{formatStringTemplate(t('site.pagination.counter.label'), {
+				current: page.currentPage,
+				total: page.lastPage,
+			})}
+		</div>
 	) : undefined
 }

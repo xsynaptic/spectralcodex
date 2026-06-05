@@ -10,7 +10,7 @@ import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import MetadataGrid from '#components/parts/metadata-grid.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
-import Pagination from '#components/parts/pagination.astro';
+import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -53,6 +53,6 @@ const description = t('collection.locations.description');
 			showRegion={true}
 			showTitleMultilingual={true}
 		/>
-		<Pagination class="mt-4 md:mt-8" page={page} />
+		<PaginationSelect class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

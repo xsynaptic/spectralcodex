@@ -193,6 +193,9 @@ const translationStrings = {
 		'site.search.toggle.title': 'Search',
 		'site.pagination.label': 'Pagination',
 		'site.pagination.pageNumber.label': 'Page {page}',
+		'site.pagination.counter.label': 'Page {current} of {total}',
+		'site.pagination.select.label': 'Go to page',
+		'site.pagination.select.submit': 'Go',
 
 		// Menu items
 		'menu.archive.label': 'Archives',

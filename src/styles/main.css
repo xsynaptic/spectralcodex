@@ -43,5 +43,6 @@
 @import './main/components/loading.css' layer(components);
 @import './main/components/metadata-grid-item.css' layer(components);
 @import './main/components/nav-menu.css' layer(components);
+@import './main/components/pagination.css' layer(components);
 @import './main/components/progress.css' layer(components);
 @import './main/components/prose.css' layer(components);
