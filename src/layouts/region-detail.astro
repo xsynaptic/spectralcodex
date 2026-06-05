@@ -84,12 +84,12 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem>
-						<ContentCollectionLink collection={entry.collection} hasHeroImage={hasHeroImage} />
+						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
 					{
 						entry.data.parent ? (
 							<DividedItem>
-								<RegionsBreadcrumbs entry={entry} hasHeroImage={hasHeroImage} />
+								<RegionsBreadcrumbs entry={entry} />
 							</DividedItem>
 						) : undefined
 					}

@@ -22,7 +22,7 @@ const t = getTranslations();
 				<li class="text-xs font-medium sm:text-sm">
 					<Link
 						linkColor="primary"
-						class:list={[isActiveMenuItem(item, pathname) ? 'l-active' : undefined]}
+						isActive={isActiveMenuItem(item, pathname)}
 						href={item.url}
 						{...(item.rel ? { rel: item.rel } : undefined)}
 					>

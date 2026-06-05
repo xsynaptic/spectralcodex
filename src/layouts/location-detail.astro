@@ -90,7 +90,6 @@ const t = getTranslations();
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
-	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}
@@ -113,16 +112,12 @@ const t = getTranslations();
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<DividedItem>
-						<ContentCollectionLink collection="locations" hasHeroImage={hasHeroImage} />
+						<ContentCollectionLink collection="locations" />
 					</DividedItem>
 					{
 						regionPrimary ? (
 							<DividedItem>
-								<RegionsBreadcrumbs
-									entry={regionPrimary}
-									showCurrentLink={true}
-									hasHeroImage={hasHeroImage}
-								/>
+								<RegionsBreadcrumbs entry={regionPrimary} showCurrentLink={true} />
 							</DividedItem>
 						) : undefined
 					}

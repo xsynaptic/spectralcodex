@@ -87,7 +87,7 @@ function renderSuggestions(items: Array<ScoredEntry>): void {
 		const link = document.createElement('a');
 
 		link.href = item.url;
-		link.className = 'l-all l-accent l-dark';
+		link.className = 'link link-accent';
 		link.textContent = item.title;
 		link.dataset.astroHistory = 'replace';
 

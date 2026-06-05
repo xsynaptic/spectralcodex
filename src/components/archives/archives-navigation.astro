@@ -33,7 +33,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 		<div
 			class:list={[
 				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
-				hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
+				hasHeroImage ? 'divided-hero link-hero mb-8 sm:mb-0' : '',
 				className,
 			]}
 			{...props}
@@ -64,7 +64,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 							<Link
 								class={currentMonth && currentYear === archivesYear ? 'font-semibold' : undefined}
 								href={getSiteUrl('archives', archivesYear)}
-								linkColor={hasHeroImage ? 'accent-featured' : 'accent'}
+								linkColor="accent"
 							>
 								{archivesYear}
 							</Link>
@@ -100,7 +100,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 									) : (
 										<Link
 											href={getSiteUrl('archives', currentYear, monthNumber)}
-											linkColor={hasHeroImage ? 'highlight-featured' : 'highlight'}
+											linkColor="highlight"
 										>
 											{monthName}
 										</Link>

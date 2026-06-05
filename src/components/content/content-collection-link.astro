@@ -7,19 +7,15 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	collection: CatalogCollectionKey;
-	hasHeroImage?: boolean;
 }
 
-const { collection, hasHeroImage, ...props } = Astro.props;
+const { collection, ...props } = Astro.props;
 
 const collectionUrl = getSiteUrl(collection);
 
 const t = getTranslations();
 ---
 
-<Link
-	class="font-semibold"
-	href={collectionUrl}
-	linkColor={hasHeroImage ? 'highlight-featured' : 'highlight'}
-	{...props}>{t(`collection.${collection}.labelPlural`)}</Link
+<Link class="font-semibold" href={collectionUrl} linkColor="highlight" {...props}
+	>{t(`collection.${collection}.labelPlural`)}</Link
 >

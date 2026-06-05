@@ -6,11 +6,8 @@ import { renderSlot } from '#lib/utils/astro.ts';
 const LinkColorEnum = {
 	Primary: 'primary',
 	PrimaryBright: 'primary-bright',
-	PrimaryFeatured: 'primary-featured',
 	Highlight: 'highlight',
-	HighlightFeatured: 'highlight-featured',
 	Accent: 'accent',
-	AccentFeatured: 'accent-featured',
 } as const;
 
 type LinkColor = (typeof LinkColorEnum)[keyof typeof LinkColorEnum];
@@ -36,10 +33,10 @@ const children = await renderSlot(Astro.slots, 'default');
 <a
 	href={href}
 	class:list={[
-		'l-all',
-		`l-${linkColor}`,
-		isActive ? 'l-active' : undefined,
-		showDarkMode ? 'l-dark' : undefined,
+		'link',
+		`link-${linkColor}`,
+		isActive ? 'link-active' : undefined,
+		showDarkMode ? undefined : 'link-static',
 		className,
 	]}
 	{...props}><Fragment set:html={children} /></a

@@ -12,10 +12,9 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 interface Props {
 	entry: CollectionEntry<'regions'>;
 	showCurrentLink?: boolean;
-	hasHeroImage?: boolean;
 }
 
-const { entry, showCurrentLink = false, hasHeroImage = false, ...props } = Astro.props;
+const { entry, showCurrentLink = false, ...props } = Astro.props;
 
 const getRegionAncestors = await createRegionAncestorsFunction();
 
@@ -42,10 +41,7 @@ const t = getTranslations();
 						{!showCurrentLink && termAncestor.id === entry.id ? (
 							termAncestor.data.title
 						) : (
-							<Link
-								href={getContentUrl('regions', termAncestor.id)}
-								linkColor={hasHeroImage ? 'accent-featured' : 'accent'}
-							>
+							<Link href={getContentUrl('regions', termAncestor.id)} linkColor="accent">
 								{termAncestor.data.title}
 							</Link>
 						)}
