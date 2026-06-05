@@ -7,28 +7,19 @@ declare global {
 		// Note: we can't import Astro components direct, nor would we really want to
 		// Since we use custom remark transformers to include import statements
 		// So here we manually type the components, but that's OK, there aren't too many of them
-		Email: (props: {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- MDX component children are intentionally untyped for the MDX language server
-			children: any;
-		}) => React.JSX.Element;
+		Email: (props: { children: React.ReactNode }) => React.JSX.Element;
 		Img: (props: {
 			alt?: string;
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- MDX component children are intentionally untyped for the MDX language server
-			children?: any;
+			children?: React.ReactNode;
 			layout?: 'wide' | 'full';
 			src: string;
 		}) => React.JSX.Element;
 		ImgGroup: (props: {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- MDX component children are intentionally untyped for the MDX language server
-			children: any;
+			children: React.ReactNode;
 			columns?: number | string;
 			layout?: 'wide' | 'full';
 		}) => React.JSX.Element;
-		Hide: (props: {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any -- MDX component children are intentionally untyped for the MDX language server
-			children: any;
-			char?: string;
-		}) => React.JSX.Element;
+		Hide: (props: { children: React.ReactNode; char?: string }) => React.JSX.Element;
 		Link: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
 		LocationsTable: (props: { id: string }) => React.JSX.Element;
 		Map: (props: {

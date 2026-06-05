@@ -79,21 +79,18 @@ export function generateManifest(options: {
 	const existingCount = sortedUrls.length - newUrls.length;
 
 	// Write full manifest
-	// eslint-disable-next-line unicorn/no-null -- null is the replacer argument for JSON.stringify
-	writeFileSync(outputPath, JSON.stringify(sortedUrls, null, 2));
+	writeFileSync(outputPath, JSON.stringify(sortedUrls, undefined, 2));
 
 	// Write new-only manifest
 	const newOutputPath = outputPath.replace('cache-manifest.json', 'cache-manifest-new.json');
 
-	// eslint-disable-next-line unicorn/no-null -- null is the replacer argument for JSON.stringify
-	writeFileSync(newOutputPath, JSON.stringify(newUrls, null, 2));
+	writeFileSync(newOutputPath, JSON.stringify(newUrls, undefined, 2));
 
 	// Update main manifest with all URLs (merge new into main)
 	if (mainPath) {
 		const mainDir = path.dirname(mainPath);
 		safelyCreateDirectory(mainDir);
-		// eslint-disable-next-line unicorn/no-null -- null is the replacer argument for JSON.stringify
-		writeFileSync(mainPath, JSON.stringify(sortedUrls, null, 2));
+		writeFileSync(mainPath, JSON.stringify(sortedUrls, undefined, 2));
 	}
 
 	const elapsed = Math.round(performance.now() - startTime);

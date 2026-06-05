@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method -- Temporary fix for some type issues */
 import type { Loader, LoaderContext } from 'astro/loaders';
 
 import fastGlob from 'fast-glob';
@@ -151,6 +150,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 	return {
 		name: '@spectralcodex/astro-image-loader',
 		load: async function load(context: LoaderContext): Promise<void> {
+			// eslint-disable-next-line @typescript-eslint/unbound-method -- Astro's LoaderContext is meant to be destructured
 			const { config, store, parseData, generateDigest, logger, watcher } = context;
 
 			const pattern =
