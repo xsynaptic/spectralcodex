@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- the @ts-nocheck below is deliberate; see its own reason
 // @ts-nocheck -- KnipConfig is very expensive and we only need this when modifying the config
 import type { KnipConfig } from 'knip';
 

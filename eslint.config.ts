@@ -1,5 +1,6 @@
 import type { ESLint } from 'eslint';
 
+import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import { getConfig } from '@xsynaptic/eslint-config';
 import astroPlugin from 'eslint-plugin-astro';
@@ -25,15 +26,22 @@ export default getConfig(
 			],
 		},
 		{
+			plugins: {
+				'@eslint-community/eslint-comments': eslintCommentsPlugin,
+			},
 			rules: {
-				// Conflicts with Remeda's sort function
-				'unicorn/no-array-sort': 'off',
-				// Conflicts with Prettier, which always uppercases hex digits and is not configurable
-				'unicorn/number-literal-case': 'off',
+				'@eslint-community/eslint-comments/require-description': [
+					'error',
+					{ ignore: ['eslint-enable'] },
+				],
 				// Expensive type-aware rules; only run in strict mode
 				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-misused-promises': isStrictLint ? 'error' : 'off',
+				// Conflicts with Remeda's sort function
+				'unicorn/no-array-sort': 'off',
+				// Conflicts with Prettier, which always uppercases hex digits and is not configurable
+				'unicorn/number-literal-case': 'off',
 			},
 		},
 		/**

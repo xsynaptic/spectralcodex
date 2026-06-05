@@ -61,6 +61,7 @@
 		"@astrojs/react": "^5.0.6",
 		"@astrojs/rss": "^4.0.18",
 		"@double-great/stylelint-a11y": "^3.4.14",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.2",
 		"@pagefind/component-ui": "^1.5.2",
 		"@playwright/test": "^1.60.0",
 		"@spectralcodex/astro-build-logger": "workspace:*",

@@ -395,7 +395,7 @@ async function similarContent() {
 		const similarContentItems = calculateSimilarities(embeddings);
 		const outputPath = path.join(rootPath, values['output-path'], values['output-name']);
 
-		// eslint-disable-next-line unicorn/no-null
+		// eslint-disable-next-line unicorn/no-null -- null is the replacer argument for JSON.stringify
 		writeFileSync(outputPath, JSON.stringify(similarContentItems, null, 2));
 
 		const totalTime = ((performance.now() - totalStart) / 1000).toFixed(2);

@@ -95,7 +95,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 				// Null overrides the main `imageFeatured` and shows no thumbnail
 				// This is used in cases where there is no image for the sub-location
 				if (geometry.imageFeatured === null) {
-					// eslint-disable-next-line unicorn/no-null
+					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
 					entry.data.geometry[index]._imageThumbnail = null;
 					continue;
 				}

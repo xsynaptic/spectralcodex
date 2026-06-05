@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/no-null */
+/* eslint-disable unicorn/no-null -- react and react-map-gl APIs use null throughout this control wrapper */
 import type { ReactElement } from 'react';
 import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
 

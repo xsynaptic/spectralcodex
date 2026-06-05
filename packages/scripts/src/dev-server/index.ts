@@ -48,7 +48,7 @@ $`docker compose -f ${composePath} --project-directory ${rootPath} up -d --remov
 	.then(() => {
 		log(chalk.green('Containers ready'));
 	})
-	// eslint-disable-next-line unicorn/prefer-top-level-await
+	// eslint-disable-next-line unicorn/prefer-top-level-await -- fire-and-forget container startup; awaiting would block the dev server
 	.catch((error: unknown) => {
 		const message = error instanceof Error ? error.message : String(error);
 		log(chalk.red(`Container error: ${message}`));

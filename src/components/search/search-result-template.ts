@@ -6,7 +6,7 @@
  * string literal doesn't confuse knip's Astro parser (which counts raw `<script>` occurrences
  * when extracting script blocks from .astro files)
  */
-/* eslint-disable no-useless-escape */
+/* eslint-disable no-useless-escape -- the <\/script> escape below keeps the template from closing its host script tag */
 export const pagefindResultTemplate = `<script type="text/pagefind-template">
 <li class="pf-result">
 	<div class="pf-result-card">

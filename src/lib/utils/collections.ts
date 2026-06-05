@@ -33,7 +33,7 @@ export function sortByContentCount<T extends CollectionEntryWithContentCount>(
 }
 
 // Filter out terms that do *not* have any associated posts or locations
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
 export function filterWithContent<T extends CollectionEntryWithContentCount>(entry: T) {
 	if (entry.data._locationCount && entry.data._locationCount > 0) return true;
 	if (entry.data._postCount && entry.data._postCount > 0) return true;

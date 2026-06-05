@@ -34,6 +34,6 @@ export async function saveDivisionDataCache(
 
 	const cacheFilePath = path.join(cacheDir, `${divisionId}.geojson`);
 
-	// eslint-disable-next-line unicorn/no-null
+	// eslint-disable-next-line unicorn/no-null -- null is the replacer argument for JSON.stringify
 	await fs.writeFile(cacheFilePath, JSON.stringify(geometry, null, 2));
 }

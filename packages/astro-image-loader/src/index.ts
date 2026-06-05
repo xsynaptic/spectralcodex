@@ -71,7 +71,7 @@ function getSyncDataFunction({
 			if (existingEntry.assetImports?.length) {
 				// Add asset imports for existing entries
 				// @ts-expect-error -- This exists but isn't properly exported
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-call -- addAssetImports exists at runtime but isn't typed; see the @ts-expect-error above
 				store.addAssetImports(existingEntry.assetImports, existingEntry.filePath);
 			}
 			return;
