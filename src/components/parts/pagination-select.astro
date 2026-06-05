@@ -49,10 +49,7 @@ const t = getTranslations();
 					</span>
 				) : undefined}
 				<div class="p-center flex items-center">
-					<span
-						class="text-sm text-primary-500 md:text-xs dark:text-primary-600"
-						data-pagination-counter
-					>
+					<span class="text-primary-500 dark:text-primary-600" data-pagination-counter>
 						{formatStringTemplate(t('site.pagination.counter.label'), {
 							current: currentPage,
 							total: lastPage,
@@ -65,12 +62,12 @@ const t = getTranslations();
 					>
 						<span class="relative inline-flex items-center">
 							<select
-								class="p-control rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-sm tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 md:text-xs dark:border-primary-600 dark:hover:border-primary-500"
+								class="p-control rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:hover:border-primary-500"
 								aria-label={t('site.pagination.select.label')}
 								data-pagination-control
 							/>
 							<span
-								class="p-arrow r-2 pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
+								class="p-arrow pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
 								aria-hidden="true"
 							>
 								<svg height="16" width="16" viewBox="0 0 24 24">
@@ -79,7 +76,7 @@ const t = getTranslations();
 							</span>
 						</span>
 						<button
-							class="p-button absolute ml-2 cursor-pointer rounded px-2 py-2 text-sm font-medium text-accent-600 hover:text-accent-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 md:text-xs dark:text-accent-400 dark:hover:text-accent-300"
+							class="p-button absolute ml-2 cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:text-accent-400 dark:hover:text-accent-300"
 							type="submit"
 							data-pagination-submit
 						>
