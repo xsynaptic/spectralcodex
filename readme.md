@@ -31,10 +31,10 @@ This repository contains the working Astro project used to generate the [Spectra
 Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service.
 
 - Keep original image assets in the media folder specified in `.env`; high-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended, and the current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom
-- [@unjs/ipx](https://github.com/unjs/ipx)-based image server handles on-demand resizing, format conversion, and quality adjustment
+- [imagor](https://github.com/cshum/imagor) image server (MozJPEG build) handles on-demand resizing, format conversion, and quality adjustment
 - Nginx reverse proxy with aggressive caching ensures images are only processed once
-- URL-based transformations (e.g., `/q_80,f_webp,s_1200x800/path/to/image.jpg`) allow flexible sizing without pre-generating variants
-- URL signing (MD5-based) and rate limiting protect against cache-busting attacks
+- URL-based transformations (e.g., `/{signature}/fit-in/1200x800/filters:format(webp):quality(80)/path/to/image.jpg`) allow flexible sizing without pre-generating variants
+- Purpose-built typed imagor URL builder and HMAC-SHA256 signer (the `unpic-imagor` package) generates signed URLs at build time; signing plus rate limiting protects against cache-busting attacks
 - Incremental cache warming with manifest tracking and remote SSH execution; only warms newly discovered URLs
 - Docker Compose orchestration for easy deployment and updates
 
@@ -63,7 +63,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### User Experience
 
-- Native web components for interactive elements (dark mode toggle, progress bars, image carousels)
+- Native web components for interactive elements (dark mode toggle, reading progress, image carousels, pagination controls)
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Visual reading progress indicator for long-form content
 - Loading progress bar during navigation
@@ -76,27 +76,18 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Hierarchical deterministic fallback system for entries without a featured image
 - Digest-based caching; only regenerates when content or source image changes
 - Comprehensive meta tags and structured data
-- Dynamic sitemap via [@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)
+- Custom sitemap integration with accurate per-URL `lastmod` dates derived from git commit history, so change dates survive content moves and rebuilds
 - Full RSS feeds with server-side rendered MDX content via Astro's Container API
+- Webmention support via [webmention.io](https://webmention.io/) (optional, env-gated)
 
 ### Analytics
 
 - Self-hosted [Umami](https://umami.is/) site analytics monitoring web vitals performance metrics
 - Custom event tracking for search queries, map filter changes, dark mode toggling, and image metadata interactions
 
-## Usage
+## Build & Deployment
 
-### Development
-
-Standard Astro commands apply:
-
-- `pnpm dev` - start the development server with Docker-orchestrated local image serving
-- `pnpm build` - generate a production build
-- `pnpm preview` - preview the production build locally
-
-### Deployment
-
-Deployment is handled by custom scripts. These are specific to this project's infrastructure but demonstrate some useful patterns. The full pipeline runs:
+Deployment is handled by custom TypeScript scripts. These are specific to this project's infrastructure but demonstrate some useful patterns. The full pipeline runs:
 
 1. Content sync and validation
 2. Redirect generation from former content IDs
@@ -113,39 +104,6 @@ Deployment is handled by custom scripts. These are specific to this project's in
 13. New image cache warming
 
 The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
-
-## Project Structure
-
-- `./deploy`: Deployment configuration split into `infra/` (analytics) and `site/` (Caddy, TLS certs)
-- `./services/image-server`: Self-hosted IPX image server with Nginx reverse proxy (Docker Compose)
-- `./public`: contains a favicon, fallback Open Graph images, and map division data
-- `./src`: primary project source files
-- `./src/components`: Astro components organized by functionality
-- `./src/layouts`: layouts for different content types and page structures
-- `./src/lib`: TypeScript utility code organized by feature area
-- `./src/lib/collections`: Content Layer API configuration and data handling
-- `./src/pages`: Astro routes including static API endpoints
-- `./src/styles`: CSS files including Tailwind configuration and custom styles
-
-### Packages
-
-- `./packages/astro-build-logger`: build timestamps and durations
-- `./packages/astro-image-loader`: Content Layer loader for image files with EXIF extraction and LQIP generation
-- `./packages/content`: primary content collection (private, not included in repo)
-- `./packages/content-demo`: example content for testing and demonstration
-- `./packages/react-map-component`: interactive map component
-- `./packages/remark-img-group`: remark plugin for image groups in MDX
-- `./packages/scripts`: content validation, semantic similarity, OG images, map divisions, link checking, deployment
-- `./packages/shared`: shared utilities, Keyv-based caching (SQLite/file backends), common types and schemas
-- `./packages/word-count`: multilingual word count utility (fork of [alfaaz](https://github.com/thecodrr/alfaaz))
-
-## Cloudflare Configuration
-
-The site is proxied through Cloudflare. HTML caching requires these dashboard settings:
-
-- **Caching > Configuration**: Browser Cache TTL set to "Respect Existing Headers"
-- **Caching > Cache Rules**: "Cache HTML" rule with hostname `spectralcodex.com`, eligible for cache, edge TTL respects origin headers
-- **Cache purge**: API credentials in `deploy/.env` (`CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_API_TOKEN`), runs during `pnpm deploy-site`
 
 ## License
 
