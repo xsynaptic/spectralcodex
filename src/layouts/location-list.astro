@@ -8,9 +8,9 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import MetadataGrid from '#components/parts/metadata-grid.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
+import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -47,12 +47,7 @@ const description = t('collection.locations.description');
 			slot="section-description"
 			set:html={page.currentPage === 1 ? transformMarkdown({ input: description }) : undefined}
 		/>
-		<MetadataGrid
-			items={page.data}
-			showDate={true}
-			showRegion={true}
-			showTitleMultilingual={true}
-		/>
+		<PreviewGrid items={page.data} showDate={true} showRegion={true} showTitleMultilingual={true} />
 		<PaginationSelect class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

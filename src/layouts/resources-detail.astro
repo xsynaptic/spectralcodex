@@ -16,7 +16,7 @@ import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
-import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
+import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -101,6 +101,6 @@ const t = getTranslations();
 		<SectionLinks entry={entry} />
 		<SectionRegions regionIds={regionIds} />
 		<SectionThemes themeIds={themeIds} />
-		<SectionMetadataGrid page={page} />
+		<SectionPreviews page={page} />
 	</ContentArticle>
 </MainSite>

@@ -1,12 +1,12 @@
-.g-item .i-placeholder {
+.pc .i-placeholder {
 	@apply overflow-hidden rounded-xs shadow-sm;
 }
 
-.g-item .i-image {
+.pc .i-image {
 	@apply aspect-3/2 text-sm text-transparent;
 }
 
-.g-item-title {
+.pc-title {
 	@apply text-xl;
 
 	display: flex;
@@ -15,7 +15,7 @@
 	margin-top: calc(var(--spacing) * 1);
 }
 
-.g-item-title-ml {
+.pc-title-ml {
 	@apply font-semibold;
 
 	display: inline-flex;
@@ -26,7 +26,7 @@
 	}
 }
 
-.g-item-title-link {
+.pc-title-link {
 	@apply font-display font-bold transition-colors ease-in;
 
 	color: var(--color-primary-700);
@@ -46,7 +46,7 @@
 	}
 }
 
-.g-item-subtitle {
+.pc-subtitle {
 	@apply text-sm;
 
 	display: flex;

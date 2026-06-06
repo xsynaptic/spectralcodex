@@ -7,8 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
-import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
-import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
@@ -68,12 +67,12 @@ async function getImageProps(): Promise<{
 
 const { imageProps, placeholderProps } = await getImageProps();
 
-const titleMultilingual = await renderSlot(Astro.slots, 'grid-item-title-multilingual');
-const subtitle = await renderSlot(Astro.slots, 'grid-item-subtitle');
-const description = await renderSlot(Astro.slots, 'grid-item-description');
+const titleMultilingual = await renderSlot(Astro.slots, 'preview-title-multilingual');
+const subtitle = await renderSlot(Astro.slots, 'preview-subtitle');
+const description = await renderSlot(Astro.slots, 'preview-description');
 ---
 
-<CardFrame class="g-item" {...props}>
+<CardFrame class="pc" {...props}>
 	{
 		imageProps ? (
 			<ImagePlaceholder placeholderProps={placeholderProps}>
@@ -85,13 +84,13 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 			<div class="bg-fallback aspect-3/2 w-full rounded-xs text-sm text-transparent shadow-inner" />
 		)
 	}
-	<h2 class="g-item-title">
-		<a href={linkUrl} class="g-item-title-link">
-			<slot name="grid-item-title" />
+	<h2 class="pc-title">
+		<a href={linkUrl} class="pc-title-link">
+			<slot name="preview-title" />
 		</a>
 		{
 			titleMultilingual ? (
-				<div class="g-item-title-ml">
+				<div class="pc-title-ml">
 					<span class="font-light">(</span>
 					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
@@ -101,7 +100,7 @@ const description = await renderSlot(Astro.slots, 'grid-item-description');
 	</h2>
 	{
 		subtitle ? (
-			<div class="g-item-subtitle">
+			<div class="pc-subtitle">
 				<Fragment set:html={subtitle} />
 			</div>
 		) : undefined

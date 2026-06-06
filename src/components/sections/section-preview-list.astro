@@ -2,7 +2,7 @@
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import MetadataList from '#components/parts/metadata-list.astro';
+import PreviewList from '#components/parts/preview-list.astro';
 import Prose from '#components/parts/prose.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -23,7 +23,7 @@ const t = getTranslations();
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('section.itemsList')}</Fragment>
 			<Prose>
-				<MetadataList items={items} count={count} />
+				<PreviewList items={items} count={count} />
 			</Prose>
 		</ContentSection>
 	) : undefined

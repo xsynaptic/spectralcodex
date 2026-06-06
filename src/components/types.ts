@@ -53,9 +53,9 @@ export const DividerContentEnum = {
 export type DividerContent = (typeof DividerContentEnum)[keyof typeof DividerContentEnum];
 
 /**
- * Metadata item props
+ * Preview display options
  */
-export interface MetadataGridOptions {
+export interface PreviewOptions {
 	showCollection?: boolean | undefined;
 	showDate?: boolean | undefined;
 	showDescription?: boolean | undefined;

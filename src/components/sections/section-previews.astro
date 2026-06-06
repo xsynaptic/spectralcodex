@@ -1,24 +1,24 @@
 ---
 import type { Page } from 'astro';
 
-import type { MetadataGridOptions } from '#components/types.ts';
+import type { PreviewOptions } from '#components/types.ts';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import MetadataGrid from '#components/parts/metadata-grid.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
+import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
 	title?: string;
 	items?: Array<CatalogItem>;
 	page?: Page<CatalogItem>;
-	metadataGridOptions?: MetadataGridOptions | undefined;
+	previewOptions?: PreviewOptions | undefined;
 }
 
-const { title, items, page, metadataGridOptions, ...props } = Astro.props;
+const { title, items, page, previewOptions, ...props } = Astro.props;
 
-const defaultPreviewItemProps: MetadataGridOptions = {
+const defaultPreviewOptions: PreviewOptions = {
 	showDate: true,
 	showRegion: true,
 	showTitleMultilingual: true,
@@ -35,12 +35,12 @@ const t = getTranslations();
 			<Fragment slot="section-title">{title ?? t('section.content')}</Fragment>
 			{page ? (
 				<>
-					<MetadataGrid items={page.data} {...defaultPreviewItemProps} {...metadataGridOptions} />
+					<PreviewGrid items={page.data} {...defaultPreviewOptions} {...previewOptions} />
 					<PaginationSelect class="mt-4 md:mt-8" page={page} />
 				</>
 			) : undefined}
 			{hasItems ? (
-				<MetadataGrid items={items} {...defaultPreviewItemProps} {...metadataGridOptions} />
+				<PreviewGrid items={items} {...defaultPreviewOptions} {...previewOptions} />
 			) : undefined}
 		</ContentSection>
 	) : undefined

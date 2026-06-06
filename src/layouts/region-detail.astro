@@ -21,8 +21,8 @@ import RegionsDivision from '#components/regions/regions-division.astro';
 import RegionsRelated from '#components/regions/regions-related.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
-import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
-import SectionMetadataList from '#components/sections/section-metadata-list.astro';
+import SectionPreviewList from '#components/sections/section-preview-list.astro';
+import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getRegionSchema } from '#lib/collections/regions/regions-utils.ts';
@@ -112,10 +112,10 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />
-		<SectionMetadataGrid page={page} />
+		<SectionPreviews page={page} />
 		{
 			page.currentPage === 1 && catalogItems.length > 0 ? (
-				<SectionMetadataList items={catalogItems} count={catalogItemsCount} />
+				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
 			) : undefined
 		}
 		<RegionsDivision entryId={entry.id} />

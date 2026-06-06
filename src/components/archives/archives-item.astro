@@ -1,7 +1,7 @@
 ---
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import MetadataList from '#components/parts/metadata-list.astro';
+import PreviewList from '#components/parts/preview-list.astro';
 import Prose from '#components/parts/prose.astro';
 
 interface Props {
@@ -18,7 +18,7 @@ const { title, items, count, class: className, ...props } = Astro.props;
 	items.length > 0 ? (
 		<Prose class={className} {...props}>
 			<span class="font-medium">{title}</span>:
-			<MetadataList items={items} count={count} />
+			<PreviewList items={items} count={count} />
 		</Prose>
 	) : undefined
 }

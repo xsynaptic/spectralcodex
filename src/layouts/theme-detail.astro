@@ -17,8 +17,8 @@ import DividedItem from '#components/parts/divided-item.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
-import SectionMetadataGrid from '#components/sections/section-metadata-grid.astro';
-import SectionMetadataList from '#components/sections/section-metadata-list.astro';
+import SectionPreviewList from '#components/sections/section-preview-list.astro';
+import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
@@ -95,10 +95,10 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<SectionSources entry={entry} />
 		<SectionRegions regionIds={regionIds} />
 		<SectionThemes themeIds={allThemeIds} />
-		<SectionMetadataGrid page={page} />
+		<SectionPreviews page={page} />
 		{
 			page.currentPage === 1 && catalogItems.length > 0 ? (
-				<SectionMetadataList items={catalogItems} count={catalogItemsCount} />
+				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
 			) : undefined
 		}
 	</ContentArticle>
