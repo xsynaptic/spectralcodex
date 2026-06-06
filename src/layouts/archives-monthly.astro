@@ -88,11 +88,15 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 			currentMonth={archivesMonthlyItem.month}
 			archivesYears={archivesYears}
 			archivesMonths={archivesMonths}
-		/>
+		>
+			<Link href={getSiteUrl('archives')} linkColor="accent" class="font-semibold">
+				{t('archives.index.label')}
+			</Link>
+		</ArchivesNavigation>
 	</ContentSection>
 	{
 		archiveRenderResult ? (
-			<Prose class:list={['pb-4']} showBlocks={true}>
+			<Prose showBlocks={true}>
 				<archiveRenderResult.Content />
 			</Prose>
 		) : undefined
