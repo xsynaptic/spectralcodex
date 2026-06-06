@@ -5,6 +5,7 @@ export const zIndexScaleEnum = {
 	ImageCaption: 15,
 	ImageNavigation: 15,
 	MainHeader: 40,
+	MainTopButton: 45,
 	MainProgress: 60,
 	MainSkipLink: 70,
 } as const;

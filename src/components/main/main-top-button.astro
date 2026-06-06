@@ -1,0 +1,44 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
+
+const t = getTranslations();
+---
+
+<top-button
+	class="fixed right-2 bottom-2 flex cursor-pointer items-center justify-center rounded-full border border-primary-200 bg-white shadow-lg transition-colors duration-200 hover:bg-primary-50 sm:hidden dark:bg-primary-700 dark:hover:bg-primary-900"
+	inert={true}
+	style={{ zIndex: zIndexScaleEnum.MainTopButton }}
+>
+	<button
+		type="button"
+		class="flex p-3 text-primary-600 transition-colors duration-200 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-300"
+		aria-label={t('site.topButton.label')}
+	>
+		<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+			<use href="#icon:chevron-up"></use>
+		</svg>
+	</button>
+</top-button>
+
+<script>
+	import '#components/main/main-top-button.ts';
+</script>
+
+<style>
+	top-button {
+		translate: 0 150%;
+		transition:
+			translate 200ms ease-out,
+			opacity 200ms ease-out;
+	}
+
+	top-button:not([inert]) {
+		translate: 0 0;
+	}
+
+	top-button:not(:defined) {
+		pointer-events: none;
+		opacity: 0;
+	}
+</style>

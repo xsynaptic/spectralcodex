@@ -15,6 +15,7 @@ import Meta from '#components/main/main-meta.astro';
 import SkipLink from '#components/main/main-skip-link.astro';
 import Sprites from '#components/main/main-sprites.astro';
 import Stylesheet from '#components/main/main-stylesheet.astro';
+import TopButton from '#components/main/main-top-button.astro';
 import MenuFooter from '#components/menu/menu-footer.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
 import ModeManager from '#components/mode-manager/mode-manager.astro';
@@ -175,6 +176,7 @@ const t = getTranslations();
 				<Colophon />
 			</div>
 		</Container>
+		<TopButton />
 		{
 			schemas && schemas.length > 0 ? (
 				<script type="application/ld+json" is:inline set:html={serializeGraph(schemas)} />

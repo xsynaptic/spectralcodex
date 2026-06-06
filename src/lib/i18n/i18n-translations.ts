@@ -176,6 +176,7 @@ const translationStrings = {
 		'site.description':
 			'Photo essays, road trips, and a geospatial database with a particular emphasis on the history and culture of Taiwan.',
 		'site.skip.label': 'Skip to content',
+		'site.topButton.label': 'Back to top',
 		'site.footer.copyright.label': '©{year}–{currentYear}',
 		'site.footer.updated.label': 'Site updated on',
 		'site.footer.powered.label': 'Powered by',
