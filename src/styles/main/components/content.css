@@ -12,11 +12,6 @@
 
 	font-size: var(--text-sm);
 	line-height: calc(24 / 14);
-
-	@media (width >= 64rem) {
-		font-size: var(--text-sm);
-		line-height: calc(24 / 14);
-	}
 }
 
 .c-wrap.c-default {
@@ -84,7 +79,6 @@
 	@apply mx-auto max-w-content sm:px-4 md:px-8;
 }
 
-/* Note: "c-none" is applied to images in groups */
 .c-image-group {
 	@apply mb-2 sm:px-4 md:mb-4 md:px-8;
 }

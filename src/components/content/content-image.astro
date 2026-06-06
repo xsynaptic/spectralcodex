@@ -119,7 +119,10 @@ const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 				) : undefined}
 			</figure>
 		) : (
-			<figure class:list={['c-wrap c-escape', `c-${layout}`]} {...props}>
+			<figure
+				class:list={['c-wrap c-escape', layout === ImageLayoutEnum.None ? undefined : `c-${layout}`]}
+				{...props}
+			>
 				<ImagePlaceholder placeholderProps={placeholderProps}>
 					<Image
 						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
