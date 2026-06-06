@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import Link from '#components/parts/link.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { joinUrl } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
@@ -15,9 +15,8 @@ const { class: className, page, ...props } = Astro.props;
 
 const { currentPage, lastPage, url } = page;
 
-// Remove the page number (and only the page number) from the end of the current URL
-const pageBasePath = getSiteUrl(url.current.replace(new RegExp(`/${String(currentPage)}$`), ''));
-
+// Root-relative base path for client-side, same-origin navigation
+const pageBasePath = joinUrl(url.current.replace(new RegExp(`/${String(currentPage)}$`), ''), '/');
 const pagePrevLink = url.prev ?? undefined;
 const pageNextLink = url.next ?? undefined;
 
