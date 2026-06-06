@@ -7,12 +7,14 @@ verifyDepsBeforeRun: error
 strictDepBuilds: true
 
 minimumReleaseAgeExclude:
+  - '@xsynaptic/astro-build-logger'
   - '@xsynaptic/eslint-config'
   - '@xsynaptic/rehype-wrap-cjk'
   - '@xsynaptic/remark-auto-import'
   - '@xsynaptic/stylelint-config'
   - '@xsynaptic/unified-tools'
   - '@xsynaptic/unpic-imagor'
+  - '@xsynaptic/word-count'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
