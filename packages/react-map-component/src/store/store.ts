@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useStore } from 'zustand';
 
-import type { MapDataStore } from './store-provider';
+import type { MapDataStore } from './store-factory';
 
 import { MapStoreContext } from './store-provider';
 

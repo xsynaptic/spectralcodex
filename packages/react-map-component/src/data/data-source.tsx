@@ -1,67 +1,8 @@
-import type { UseQueryResult } from '@tanstack/react-query';
-import type { FC, ReactNode } from 'react';
-
-import { useQuery } from '@tanstack/react-query';
-import { createContext, useContext } from 'react';
-
-import type { MapComponentProps, MapSourceItemParsed } from '../types';
-
 import { MapSourceItemSchema } from '../types';
+import { createMapDataQuery } from './data-query-factory';
 
-function parseSourceData(sourceDataRaw: unknown) {
-	const parsedResponse = MapSourceItemSchema.array().safeParse(sourceDataRaw);
-
-	if (!parsedResponse.success) {
-		console.error('[Map] Source data parse error:', parsedResponse.error);
-		throw new Error('[Map] Failed to parse source data');
-	}
-	return parsedResponse.data;
-}
-
-const SourceDataContext = createContext<
-	UseQueryResult<Array<MapSourceItemParsed> | undefined> | undefined
->(undefined);
-
-export const useSourceDataQuery = () => {
-	const context = useContext(SourceDataContext);
-
-	if (!context) {
-		throw new Error('useSourceDataQuery must be used within a SourceDataContextProvider');
-	}
-	return context;
-};
-
-export const SourceDataContextProvider: FC<
-	Pick<MapComponentProps, 'apiSourceUrl' | 'sourceData' | 'version' | 'isDev'> & {
-		children: ReactNode;
-	}
-> = function SourceDataContextProvider({ apiSourceUrl, sourceData, version, isDev, children }) {
-	const sourceDataQuery = useQuery<Array<MapSourceItemParsed> | undefined>({
-		queryKey: ['source-data', apiSourceUrl, !!sourceData, version, isDev],
-		queryFn: async () => {
-			// Use data passed directly to this component
-			if (sourceData) {
-				return parseSourceData(sourceData);
-			}
-
-			// Otherwise fetch via API
-			if (apiSourceUrl) {
-				const response = await fetch(
-					apiSourceUrl,
-					isDev ? {} : { signal: AbortSignal.timeout(10_000) },
-				);
-				if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
-				const rawData: unknown = await response.json();
-
-				return parseSourceData(rawData);
-			}
-			throw new Error('[Map] Either sourceData or apiSourceUrl must be provided');
-		},
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
+export const { DataProvider: SourceDataContextProvider, useDataQuery: useSourceDataQuery } =
+	createMapDataQuery({
+		name: 'source-data',
+		schema: MapSourceItemSchema,
 	});
-
-	return (
-		<SourceDataContext.Provider value={sourceDataQuery}>{children}</SourceDataContext.Provider>
-	);
-};

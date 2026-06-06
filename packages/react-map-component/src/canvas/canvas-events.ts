@@ -13,7 +13,7 @@ import * as R from 'remeda';
 import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
-import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
+import { MAP_QUERYABLE_LAYER_IDS, MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
 import { useMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
 import { writeSavedViewport } from '../store/store-viewport';
 
@@ -25,12 +25,6 @@ const isMapCoordinates = (input: unknown): input is [number, number] =>
 	input.length === 2 &&
 	typeof input[0] === 'number' &&
 	typeof input[1] === 'number';
-
-const queryableLayerIds = [
-	MapLayerIdEnum.Clusters,
-	MapLayerIdEnum.Points,
-	MapLayerIdEnum.PointsTarget,
-];
 
 export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
@@ -144,12 +138,12 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			const { point, target: mapInstance } = event;
 
 			// Ensure all queryable layers have been loaded by MapLibre
-			for (const layerId of queryableLayerIds) {
+			for (const layerId of MAP_QUERYABLE_LAYER_IDS) {
 				if (!mapInstance.getLayer(layerId)) return;
 			}
 
 			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
-				layers: queryableLayerIds,
+				layers: [...MAP_QUERYABLE_LAYER_IDS],
 			});
 
 			// Note: this only queries the first matching feature, but that is sufficient

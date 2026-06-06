@@ -10,22 +10,13 @@ import { PopupDataContextProvider } from '../data/data-popup';
 import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
-import { MapLayerIdEnum } from '../source/source-config';
+import { MAP_INTERACTIVE_LAYER_IDS } from '../source/source-config';
 import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
 import { useMapCanvasEvents } from './canvas-events';
 import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
 import { MapPopup } from './canvas-popup';
-
-// Layers where pointer events are triggered (whether in interactive mode or not)
-// All other layers do not trigger pointer events
-const interactiveLayerIds = [
-	MapLayerIdEnum.Clusters,
-	MapLayerIdEnum.PointsTarget,
-	MapLayerIdEnum.Points,
-	MapLayerIdEnum.PointsImage,
-] as const;
 
 const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (
@@ -116,7 +107,7 @@ const MapCanvasContainer: FC<
 			styleDiffing={false}
 			hash={hash ?? false}
 			interactive={canvasInteractive}
-			interactiveLayerIds={[...interactiveLayerIds]}
+			interactiveLayerIds={[...MAP_INTERACTIVE_LAYER_IDS]}
 			maxZoom={19}
 			minZoom={4}
 			fadeDuration={0}
@@ -127,8 +118,8 @@ const MapCanvasContainer: FC<
 			{...canvasEvents}
 		>
 			<PopupDataContextProvider
-				apiPopupUrl={apiPopupUrl}
-				popupData={popupData}
+				apiUrl={apiPopupUrl}
+				data={popupData}
 				version={version}
 				isDev={isDev}
 			>
@@ -155,8 +146,8 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 
 	return (
 		<SourceDataContextProvider
-			apiSourceUrl={apiSourceUrl}
-			sourceData={sourceData}
+			apiUrl={apiSourceUrl}
+			data={sourceData}
 			version={version}
 			isDev={isDev}
 		>
