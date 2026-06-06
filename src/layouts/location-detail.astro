@@ -96,6 +96,7 @@ const t = getTranslations();
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
+	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}
