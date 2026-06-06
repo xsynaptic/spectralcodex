@@ -8,6 +8,7 @@ strictDepBuilds: true
 
 minimumReleaseAgeExclude:
   - '@xsynaptic/eslint-config'
+  - '@xsynaptic/stylelint-config'
   - '@xsynaptic/unified-tools'
   - rehype-wrap-cjk
 
