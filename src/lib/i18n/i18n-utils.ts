@@ -2,6 +2,15 @@ import type { LanguageCode, MultilingualContent } from '#lib/i18n/i18n-types.ts'
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
+export function isCjkLanguage(lang: LanguageCode): boolean {
+	return (
+		lang === LanguageCodeEnum.ChineseTraditional ||
+		lang === LanguageCodeEnum.ChineseSimplified ||
+		lang === LanguageCodeEnum.Japanese ||
+		lang === LanguageCodeEnum.Korean
+	);
+}
+
 interface MultilingualContentOptions {
 	data: Record<string, unknown> | undefined;
 	prop: string;

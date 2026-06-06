@@ -10,7 +10,7 @@ import {
 	LocationsNearbyItemSchema,
 	LocationTwHeritageSchema,
 } from '#lib/collections/locations/locations-schemas.ts';
-import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
+import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
@@ -37,6 +37,7 @@ export const locations = defineCollection({
 			sources: SourceSchema.array().optional(),
 			notes: z.string().optional(),
 			address: z.string().optional(),
+			...createMultilingualSchemas('address'),
 			precision: NumericScaleSchema,
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
 			dateCreated: DateStringSchema,

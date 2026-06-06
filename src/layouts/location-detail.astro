@@ -55,8 +55,14 @@ interface Props {
 const { entry, mapData, catalogItems, backlinks } = Astro.props;
 
 const getLocationEntryDisplay = await createLocationEntryDisplayFunction();
-const { regionPrimary, regionLangCode, titleMultilingual, titleMultilingualAdditional } =
-	getLocationEntryDisplay(entry);
+const {
+	regionPrimary,
+	regionLangCode,
+	titleMultilingual,
+	titleMultilingualAdditional,
+	addressBase,
+	addressMultilingual,
+} = getLocationEntryDisplay(entry);
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
@@ -162,7 +168,7 @@ const t = getTranslations();
 		{
 			hideLocation ? undefined : (
 				<SectionMap mapData={mapData}>
-					<LocationsAddress address={entry.data.address} />
+					<LocationsAddress address={addressBase} content={addressMultilingual} />
 				</SectionMap>
 			)
 		}

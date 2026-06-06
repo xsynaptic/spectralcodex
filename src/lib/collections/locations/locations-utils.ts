@@ -188,11 +188,19 @@ export async function createLocationEntryDisplayFunction() {
 			...(langCodeAdditional ? { langCodeAdditional } : {}),
 		});
 
+		const addressResult = getMultilingualContent({
+			data: entry.data,
+			prop: 'address',
+			...(regionLangCode ? { langCode: regionLangCode } : {}),
+		});
+
 		return {
 			regionPrimary,
 			regionLangCode,
 			titleMultilingual: titleResult?.primary,
 			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
+			addressBase: entry.data.address,
+			addressMultilingual: addressResult?.primary,
 		};
 	};
 }

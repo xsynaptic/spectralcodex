@@ -1,29 +1,44 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { wrapCjk } from '@xsynaptic/unified-tools';
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 
 interface Props extends HTMLAttributes<'address'> {
 	address?: string | undefined;
+	content?: MultilingualContent | undefined;
 	class?: string | undefined;
 }
 
-const { address, class: className, ...props } = Astro.props;
+const { address, content, class: className, ...props } = Astro.props;
 
-const output = address ? wrapCjk({ input: address, wrapCjkOptions: {} }) : undefined;
+const hasAddress = address !== undefined || content !== undefined;
 
 const t = getTranslations();
 ---
 
 {
-	output ? (
+	hasAddress ? (
 		<address
 			class:list={[className, 'mt-1 px-4 text-xs font-normal text-primary-400 sm:px-0']}
 			{...props}
 		>
-			{t('locations.address.label')}: <span set:html={output} />
+			{t('locations.address.label')}:
+			{address ? (
+				<span lang="en" class="block">
+					{address}
+				</span>
+			) : undefined}
+			{content ? (
+				<span
+					lang={content.lang}
+					class:list={['block', isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+				>
+					{content.value}
+				</span>
+			) : undefined}
 		</address>
 	) : undefined
 }

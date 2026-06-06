@@ -5,6 +5,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 // Title fields to check for duplicates (kept DRY as array)
 const TITLE_FIELDS = ['title', 'title_zh', 'title_ja'] as const;
+const ADDRESS_FIELDS = ['address', 'address_zh', 'address_ja'] as const;
 
 function getGoogleMapsLink(links: unknown): string | undefined {
 	const parsed = z
@@ -26,12 +27,14 @@ function getGoogleMapsLink(links: unknown): string | undefined {
 
 export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 	const titles = new Map<string, Set<string>>(); // field -> values
-	const addresses = new Set<string>();
+	const addresses = new Map<string, Set<string>>(); // field -> values
 	const googleMapsLinks = new Set<string>();
 
-	// Initialize title sets
 	for (const field of TITLE_FIELDS) {
 		titles.set(field, new Set());
+	}
+	for (const field of ADDRESS_FIELDS) {
+		addresses.set(field, new Set());
 	}
 
 	let duplicateCount = 0;
@@ -53,15 +56,19 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 			}
 		}
 
-		// Check address
-		const address = entry.data.address;
+		// Check address fields
+		for (const field of ADDRESS_FIELDS) {
+			const value = entry.data[field];
 
-		if (typeof address === 'string') {
-			if (addresses.has(address)) {
-				console.log(chalk.red(`${entry.id}: duplicate address "${address}"`));
-				duplicateCount++;
-			} else {
-				addresses.add(address);
+			if (typeof value === 'string') {
+				const addressSet = addresses.get(field)!;
+
+				if (addressSet.has(value)) {
+					console.log(chalk.red(`${entry.id}: duplicate ${field} "${value}"`));
+					duplicateCount++;
+				} else {
+					addressSet.add(value);
+				}
 			}
 		}
 
