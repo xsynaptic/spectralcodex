@@ -12,7 +12,7 @@ interface Props extends HTMLAttributes<'address'> {
 
 const { address, class: className, ...props } = Astro.props;
 
-const output = address ? wrapCjk({ input: address }) : undefined;
+const output = address ? wrapCjk({ input: address, wrapCjkOptions: {} }) : undefined;
 
 const t = getTranslations();
 ---

@@ -8,9 +8,9 @@ import pagefind from '@spectralcodex/astro-pagefind';
 import sitemap from '@spectralcodex/astro-sitemap';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
+import { rehypeWrapCjk } from '@xsynaptic/rehype-wrap-cjk';
 import { remarkAutoImport } from '@xsynaptic/remark-auto-import';
 import { defineConfig, envField, fontProviders } from 'astro/config';
-import rehypeWrapCjk from 'rehype-wrap-cjk';
 import { loadEnv } from 'vite';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1

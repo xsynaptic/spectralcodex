@@ -8,9 +8,11 @@ strictDepBuilds: true
 
 minimumReleaseAgeExclude:
   - '@xsynaptic/eslint-config'
+  - '@xsynaptic/rehype-wrap-cjk'
+  - '@xsynaptic/remark-auto-import'
   - '@xsynaptic/stylelint-config'
   - '@xsynaptic/unified-tools'
-  - rehype-wrap-cjk
+  - '@xsynaptic/unpic-imagor'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
