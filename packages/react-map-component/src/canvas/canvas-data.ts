@@ -1,7 +1,4 @@
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useMemo } from 'react';
-
-import type { MapGeometry, MapSourceFeatureCollection, MapSourceItemParsed } from '../types';
 
 import { useSourceDataQuery } from '../data/data-source';
 import {
@@ -10,70 +7,20 @@ import {
 	useMapRatingFilter,
 	useMapStatusFilter,
 } from '../store/store';
+import { getMapCanvasData } from './canvas-data-filter';
 
-// Reconstitute a valid GeoJSON object at the point of use
-function getGeojsonData(sourceItems: Array<MapSourceItemParsed>) {
-	return sourceItems.length > 0
-		? ({
-				type: 'FeatureCollection' as const,
-				features: sourceItems.map(({ geometry, ...item }) => ({
-					type: 'Feature' as const,
-					...item,
-					geometry: geometry as MapGeometry,
-				})),
-			} satisfies MapSourceFeatureCollection)
-		: undefined;
-}
+const EMPTY_ITEMS = [] as const;
 
 export function useMapCanvasData() {
 	const { data: sourceData } = useSourceDataQuery();
 
-	const statusFilter = useMapStatusFilter();
-	const qualityFilter = useMapQualityFilter();
-	const ratingFilter = useMapRatingFilter();
-	const objectiveFilter = useMapObjectiveFilter();
+	const status = useMapStatusFilter();
+	const quality = useMapQualityFilter();
+	const rating = useMapRatingFilter();
+	const objective = useMapObjectiveFilter();
 
-	const filteredData = useMemo(
-		() =>
-			sourceData?.filter((item) => {
-				const { status, quality, rating, objective } = item.properties;
-
-				if (statusFilter.includes(status)) return false;
-				if (quality < qualityFilter) return false;
-				if (rating < ratingFilter) return false;
-				if (objective && objective < objectiveFilter) return false;
-				return true;
-			}) ?? [],
-		[sourceData, statusFilter, qualityFilter, ratingFilter, objectiveFilter],
+	return useMemo(
+		() => getMapCanvasData(sourceData ?? EMPTY_ITEMS, { status, quality, rating, objective }),
+		[sourceData, status, quality, rating, objective],
 	);
-
-	const pointCollection = useMemo(
-		() =>
-			getGeojsonData(filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Point)),
-		[filteredData],
-	);
-
-	const lineStringCollection = useMemo(
-		() =>
-			getGeojsonData(
-				filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.LineString),
-			),
-		[filteredData],
-	);
-
-	const polygonCollection = useMemo(
-		() =>
-			getGeojsonData(
-				filteredData.filter((item) => item.geometry.type === GeometryTypeEnum.Polygon),
-			),
-		[filteredData],
-	);
-
-	return {
-		filteredCount: filteredData.length,
-		totalCount: sourceData?.length ?? 0,
-		pointCollection,
-		lineStringCollection,
-		polygonCollection,
-	};
 }
