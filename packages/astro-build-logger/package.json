@@ -11,6 +11,6 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
-		"astro": "^6.4.2"
+		"astro": "^6.4.4"
 	}
 }

@@ -8,7 +8,7 @@
 		"format": "pnpm -w run format-content-demo"
 	},
 	"devDependencies": {
-		"astro": "^6.4.2",
+		"astro": "^6.4.4",
 		"mdxlint": "^1.0.0",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
