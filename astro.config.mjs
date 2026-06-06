@@ -154,7 +154,6 @@ export default defineConfig({
 				}),
 			],
 			rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
-			remarkRehype: { footnoteLabelTagName: 'h3' },
 		}),
 	},
 	integrations: [

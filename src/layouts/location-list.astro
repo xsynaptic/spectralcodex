@@ -47,7 +47,13 @@ const description = t('collection.locations.description');
 			slot="section-description"
 			set:html={page.currentPage === 1 ? transformMarkdown({ input: description }) : undefined}
 		/>
-		<PreviewGrid items={page.data} showDate={true} showRegion={true} showTitleMultilingual={true} />
+		<PreviewGrid
+			items={page.data}
+			showDate={true}
+			showRegion={true}
+			showTitleMultilingual={true}
+			titleAs="h2"
+		/>
 		<PaginationSelect class="mt-4 md:mt-8" page={page} />
 	</ContentSection>
 </MainSite>

@@ -21,11 +21,13 @@ import { formatNumber } from '#lib/utils/text.ts';
 interface Props extends PreviewOptions {
 	class?: string | undefined;
 	items: Array<CatalogItem>;
+	titleAs?: 'h2' | 'h3' | undefined;
 }
 
 const {
 	class: className,
 	items,
+	titleAs,
 	showCollection,
 	showLocations,
 	showDate,
@@ -52,7 +54,7 @@ const t = getTranslations();
 						: undefined;
 
 				return (
-					<PreviewCard imageId={item.imageId} linkUrl={item.url} alt={item.title}>
+					<PreviewCard imageId={item.imageId} linkUrl={item.url} alt={item.title} titleAs={titleAs}>
 						<Fragment slot="preview-title">{stripDiacritics(item.title)}</Fragment>
 						{showTitleMultilingual && item.titleMultilingual ? (
 							<Fragment slot="preview-title-multilingual">

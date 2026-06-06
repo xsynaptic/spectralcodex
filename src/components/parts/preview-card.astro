@@ -19,9 +19,12 @@ interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;
 	linkUrl: string;
 	alt: string;
+	titleAs?: 'h2' | 'h3' | undefined;
 }
 
-const { imageId, linkUrl, alt, ...props } = Astro.props;
+const { imageId, linkUrl, alt, titleAs, ...props } = Astro.props;
+
+const TitleTag = titleAs ?? 'h3';
 
 async function getImageProps(): Promise<{
 	imageProps: ImageComponentProps | undefined;
@@ -84,7 +87,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 			<div class="bg-fallback aspect-3/2 w-full rounded-xs text-sm text-transparent shadow-inner" />
 		)
 	}
-	<h2 class="pc-title">
+	<TitleTag class="pc-title">
 		<a href={linkUrl} class="pc-title-link">
 			<slot name="preview-title" />
 		</a>
@@ -97,7 +100,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 				</div>
 			) : undefined
 		}
-	</h2>
+	</TitleTag>
 	{
 		subtitle ? (
 			<div class="pc-subtitle">

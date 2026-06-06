@@ -143,7 +143,7 @@ const t = getTranslations();
 							</Link>
 						</h1>
 					) : (
-						<h2 class="flex grow items-center gap-1">
+						<div class="flex grow items-center gap-1">
 							<Link
 								href={siteUrl}
 								class="text-xl font-semibold md:text-2xl lg:text-3xl"
@@ -151,7 +151,7 @@ const t = getTranslations();
 							>
 								{t('site.title')}
 							</Link>
-						</h2>
+						</div>
 					)
 				}
 				<ModeToggle />
