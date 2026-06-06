@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 
 interface Props extends HTMLAttributes<'address'> {
@@ -14,31 +15,35 @@ interface Props extends HTMLAttributes<'address'> {
 
 const { address, content, class: className, ...props } = Astro.props;
 
-const hasAddress = address !== undefined || content !== undefined;
+const parts: Array<MultilingualContent> = [];
+
+if (address !== undefined) {
+	parts.push({ lang: LanguageCodeEnum.English, value: address });
+}
+
+if (content !== undefined) {
+	parts.push(content);
+}
+
+// Built as a single string and injected with set:html so the ／ separator stays tight
+const output = parts
+	.map((part) => {
+		const cjkClass = isCjkLanguage(part.lang) ? ' class="cjk"' : '';
+
+		return `<span lang="${part.lang}"${cjkClass}>${part.value}</span>`;
+	})
+	.join('／');
 
 const t = getTranslations();
 ---
 
 {
-	hasAddress ? (
+	parts.length > 0 ? (
 		<address
 			class:list={[className, 'mt-1 px-4 text-xs font-normal text-primary-400 sm:px-0']}
 			{...props}
 		>
-			{t('locations.address.label')}:
-			{address ? (
-				<span lang="en" class="block">
-					{address}
-				</span>
-			) : undefined}
-			{content ? (
-				<span
-					lang={content.lang}
-					class:list={['block', isCjkLanguage(content.lang) ? 'cjk' : undefined]}
-				>
-					{content.value}
-				</span>
-			) : undefined}
+			{t('locations.address.label')}: <Fragment set:html={output} />
 		</address>
 	) : undefined
 }
