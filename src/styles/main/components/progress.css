@@ -11,8 +11,4 @@
 		background-color 100ms 100ms ease-in-out,
 		opacity 150ms 150ms ease-in,
 		transform 300ms ease-out;
-
-	@media (prefers-reduced-motion: reduce) {
-		transition: none;
-	}
 }

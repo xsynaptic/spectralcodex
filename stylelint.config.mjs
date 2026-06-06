@@ -29,7 +29,6 @@ export default {
 		'defensive-css/no-mixed-vendor-prefixes': true,
 		'defensive-css/no-unsafe-will-change': true,
 		'defensive-css/require-background-repeat': true,
-		'a11y/media-prefers-reduced-motion': true,
 		'a11y/no-outline-none': true,
 		'a11y/selector-pseudo-class-focus': true,
 	},

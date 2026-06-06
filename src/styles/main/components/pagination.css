@@ -44,10 +44,6 @@
 		pointer-events: auto;
 		opacity: 1;
 	}
-
-	@media (prefers-reduced-motion: reduce) {
-		transition: none;
-	}
 }
 
 @supports (appearance: base-select) {

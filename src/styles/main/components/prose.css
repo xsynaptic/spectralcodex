@@ -97,10 +97,6 @@
 		transition:
 			color 150ms ease-in,
 			text-decoration-color 150ms ease-in;
-
-		@media (prefers-reduced-motion: reduce) {
-			transition: none;
-		}
 	}
 
 	& :where(a):hover,
