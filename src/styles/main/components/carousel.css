@@ -4,7 +4,6 @@
 	overflow-x: scroll;
 	scroll-behavior: smooth;
 	scroll-snap-type: x mandatory;
-	scroll-snap-align: start;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }

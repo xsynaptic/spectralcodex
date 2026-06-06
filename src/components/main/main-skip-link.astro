@@ -35,10 +35,4 @@ const { class: className, parentClass, target = '#main-content', label, ...props
 	:where(.skip-link a:focus-visible) {
 		translate: 0 0;
 	}
-
-	@media (prefers-reduced-motion: reduce) {
-		:where(.skip-link a) {
-			transition: none;
-		}
-	}
 </style>

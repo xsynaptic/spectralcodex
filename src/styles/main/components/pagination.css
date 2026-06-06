@@ -58,7 +58,12 @@
 	}
 
 	.p-control option::checkmark {
+		display: none;
+	}
+
+	.p-control option[data-current-page]::after {
 		order: 1;
+		margin-inline-start: calc(var(--spacing) * 2);
 		color: var(--color-accent-400);
 		content: var(--content-bullet);
 	}

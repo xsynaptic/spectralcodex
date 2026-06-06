@@ -58,6 +58,7 @@ class PaginationSelect extends HTMLElement {
 			option.value = String(pageNumber);
 			option.textContent = pageLabel.replace('{page}', String(pageNumber));
 			option.selected = pageNumber === currentPage;
+			if (pageNumber === currentPage) option.dataset.currentPage = '';
 			select.append(option);
 		}
 

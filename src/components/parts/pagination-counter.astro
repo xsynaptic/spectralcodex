@@ -16,7 +16,7 @@ const t = getTranslations();
 
 {
 	page.currentPage > 1 ? (
-		<div class:list={[className, 'text-sm', 'text-primary-500 dark:text-primary-600']} {...props}>
+		<div class:list={[className]} {...props}>
 			{formatStringTemplate(t('site.pagination.counter.label'), {
 				current: page.currentPage,
 				total: page.lastPage,
