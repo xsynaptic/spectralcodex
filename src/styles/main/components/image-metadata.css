@@ -1,4 +1,4 @@
-/* Image meta wrapper */
+/* Per-image EXIF overlay; pure-CSS focus-within state machine (no JS) */
 .i-meta {
 	--z-meta: 10;
 
@@ -7,7 +7,6 @@
 	overflow: hidden;
 }
 
-/* Show button (triggers metadata display on focus-within) */
 .i-meta-show {
 	@apply transition-opacity delay-200 duration-300;
 
@@ -27,7 +26,6 @@
 	}
 }
 
-/* Eye icon */
 .i-meta-show-icon {
 	@apply transition-opacity duration-200;
 
@@ -47,9 +45,9 @@
 	transition-delay: 100ms;
 }
 
-/* Metadata panel (slides in from the bottom on focus) */
+/* Slides in from the right on focus-within; sizes the EXIF grid's query container */
 .i-meta-panel {
-	@apply translate-x-full transition-[opacity,translate];
+	@apply transition-[opacity,translate];
 
 	position: absolute;
 	inset: 0;
@@ -58,6 +56,7 @@
 	width: 100%;
 	height: 100%;
 	max-height: 100%;
+	container-type: inline-size;
 	overflow-y: auto;
 	font-family: var(--font-sans);
 	pointer-events: none;
@@ -73,16 +72,14 @@
 }
 
 .i-meta-show:focus-within .i-meta-panel {
-	@apply translate-x-0;
-
 	pointer-events: auto;
 	opacity: 1;
-	transition-delay: 100ms, 0ms;
+	translate: 0;
 }
 
-/* EXIF data grid */
+/* EXIF grid; columns track the panel's own width via container queries */
 .i-meta-grid {
-	@apply gap-1 bg-primary-50/75 px-4 py-2 backdrop-grayscale dark:bg-primary-800/75;
+	@apply gap-1 bg-primary-50/75 px-4 py-2 backdrop-grayscale;
 
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -90,36 +87,24 @@
 	max-height: 100%;
 	overflow-y: auto;
 
-	@media (width >= 40rem) {
+	[data-mode='dark'] & {
+		@apply bg-primary-800/75;
+	}
+
+	@container (width >= 32rem) {
 		@apply gap-2;
 
 		grid-template-columns: repeat(8, minmax(0, 1fr));
 	}
 
-	@media (width >= 48rem) {
+	@container (width >= 40rem) {
 		@apply gap-4;
 
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 	}
-
-	@container (width < 32rem) {
-		@media (width >= 40rem) {
-			@apply gap-1;
-		}
-
-		@media (width >= 48rem) {
-			grid-template-columns: repeat(8, minmax(0, 1fr));
-		}
-	}
-
-	@container (width < 24rem) {
-		@media (width >= 40rem) {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-		}
-	}
 }
 
-/* Close button (sibling of show button; appears on show's focus-within) */
+/* Close button: sibling of show; clicking it moves focus out of show, collapsing the panel via :focus-within */
 .i-meta-close {
 	@apply transition-opacity;
 
@@ -147,7 +132,6 @@
 	}
 }
 
-/* Shared SVG icon style */
 .i-meta-svg {
 	@apply drop-shadow-md;
 }
