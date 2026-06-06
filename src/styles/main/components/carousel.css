@@ -22,7 +22,7 @@
 }
 
 .carousel-nav {
-	@apply rounded-full bg-white/25 text-white opacity-75 grayscale transition-all duration-200;
+	@apply rounded-full bg-white/25 text-white grayscale transition-all duration-200;
 
 	position: absolute;
 	top: 50%;

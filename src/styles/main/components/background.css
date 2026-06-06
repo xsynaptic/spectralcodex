@@ -1,41 +1,27 @@
 /* A little texture for the header */
 .bg-header-fade {
+	--bg-fade-lightness: 96%;
+
 	background-image: linear-gradient(
 		180deg,
-		hsl(0deg 0% 96% / 90%),
-		hsl(0deg 0% 96% / 89.6%) 22.97%,
-		hsl(0deg 0% 96% / 88.5%) 42.13%,
-		hsl(0deg 0% 96% / 86.9%) 57.81%,
-		hsl(0deg 0% 96% / 84.8%) 70.37%,
-		hsl(0deg 0% 96% / 82.5%) 80.15%,
-		hsl(0deg 0% 96% / 80%) 87.5%,
-		hsl(0deg 0% 96% / 77.5%) 92.77%,
-		hsl(0deg 0% 96% / 75.2%) 96.3%,
-		hsl(0deg 0% 96% / 73.1%) 98.44%,
-		hsl(0deg 0% 96% / 71.5%) 99.54%,
-		hsl(0deg 0% 96% / 70.4%) 99.94%,
-		hsl(0deg 0% 96% / 70%)
+		hsl(0deg 0% var(--bg-fade-lightness) / 90%),
+		hsl(0deg 0% var(--bg-fade-lightness) / 89.6%) 22.97%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 88.5%) 42.13%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 86.9%) 57.81%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 84.8%) 70.37%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 82.5%) 80.15%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 80%) 87.5%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 77.5%) 92.77%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 75.2%) 96.3%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 73.1%) 98.44%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 71.5%) 99.54%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 70.4%) 99.94%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 70%)
 	);
 	background-repeat: no-repeat;
 
 	[data-mode='dark'] & {
-		background-image: linear-gradient(
-			180deg,
-			hsl(0deg 0% 18% / 90%),
-			hsl(0deg 0% 18% / 89.6%) 22.97%,
-			hsl(0deg 0% 18% / 88.5%) 42.13%,
-			hsl(0deg 0% 18% / 86.9%) 57.81%,
-			hsl(0deg 0% 18% / 84.8%) 70.37%,
-			hsl(0deg 0% 18% / 82.5%) 80.15%,
-			hsl(0deg 0% 18% / 80%) 87.5%,
-			hsl(0deg 0% 18% / 77.5%) 92.77%,
-			hsl(0deg 0% 18% / 75.2%) 96.3%,
-			hsl(0deg 0% 18% / 73.1%) 98.44%,
-			hsl(0deg 0% 18% / 71.5%) 99.54%,
-			hsl(0deg 0% 18% / 70.4%) 99.94%,
-			hsl(0deg 0% 18% / 70%)
-		);
-		background-repeat: no-repeat;
+		--bg-fade-lightness: 18%;
 	}
 }
 
