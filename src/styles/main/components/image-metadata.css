@@ -79,16 +79,17 @@
 
 /* EXIF grid; columns track the panel's own width via container queries */
 .i-meta-grid {
-	@apply gap-1 bg-primary-50/75 px-4 py-2 backdrop-grayscale;
+	@apply gap-1 px-4 py-2 backdrop-grayscale;
 
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
 	width: 100%;
 	max-height: 100%;
 	overflow-y: auto;
+	background-color: color-mix(in oklab, var(--color-primary-50) 75%, transparent);
 
 	[data-mode='dark'] & {
-		@apply bg-primary-800/75;
+		background-color: color-mix(in oklab, var(--color-primary-800) 75%, transparent);
 	}
 
 	@container (width >= 32rem) {
