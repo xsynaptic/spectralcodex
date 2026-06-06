@@ -86,7 +86,7 @@
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^0.1.0",
-		"@xsynaptic/eslint-config": "^3.4.1",
+		"@xsynaptic/eslint-config": "^3.5.0",
 		"@xsynaptic/rehype-wrap-cjk": "^3.0.0",
 		"@xsynaptic/remark-auto-import": "^1.0.0",
 		"@xsynaptic/stylelint-config": "^0.1.1",

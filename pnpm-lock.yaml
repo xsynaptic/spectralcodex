@@ -113,8 +113,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(astro@6.4.4(@types/node@25.6.0)(idb-keyval@6.2.5)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.22.4)(yaml@2.9.0))
       '@xsynaptic/eslint-config':
-        specifier: ^3.4.1
-        version: 3.4.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+        specifier: ^3.5.0
+        version: 3.5.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       '@xsynaptic/rehype-wrap-cjk':
         specifier: ^3.0.0
         version: 3.0.0(unified@11.0.5)
@@ -2983,8 +2983,8 @@ packages:
     peerDependencies:
       astro: ^6.0.0
 
-  '@xsynaptic/eslint-config@3.4.1':
-    resolution: {integrity: sha512-j3jOrrATbJ8+gULvr/WY4XfSMeXgBTVXvJzDyJJ2aR0bxM2OFbkl8GkSks7IvW7hR/JGzWNMjtrjleTWxXtxUA==}
+  '@xsynaptic/eslint-config@3.5.0':
+    resolution: {integrity: sha512-29tL1xk2zmpQdnOAlyPzIXBmto7sSzvQeNqXXzpP7ovwt/9nhlYv6uuvWkMlhoVLIxZO+k5IBhu6fjLeBWwm1g==}
 
   '@xsynaptic/rehype-wrap-cjk@3.0.0':
     resolution: {integrity: sha512-Apg0Iw+GBIo5ZVlozNDf97jf1GLNoQbaaOEMHzVqOm5W+BuhY6QsZ9owKMFmgaLS1QVQDcgDPouKfdF2gbAwAA==}
@@ -10672,7 +10672,7 @@ snapshots:
       astro: 6.4.4(@types/node@25.6.0)(idb-keyval@6.2.5)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.53.3)(tsx@4.22.4)(yaml@2.9.0)
       zod: 4.4.3
 
-  '@xsynaptic/eslint-config@3.4.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
+  '@xsynaptic/eslint-config@3.5.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint/config-helpers': 0.6.0
       '@eslint/js': 9.39.4
