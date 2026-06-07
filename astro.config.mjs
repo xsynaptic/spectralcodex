@@ -3,13 +3,13 @@ import { unified } from '@astrojs/markdown-remark';
 import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
-import pagefind from '@spectralcodex/astro-pagefind';
 import sitemap from '@spectralcodex/astro-sitemap';
 import remarkImgGroup from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { rehypeWrapCjk } from '@xsynaptic/rehype-wrap-cjk';
 import { remarkAutoImport } from '@xsynaptic/remark-auto-import';
+import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
