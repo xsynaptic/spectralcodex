@@ -24,7 +24,10 @@ const t = getTranslations();
 	document.addEventListener('astro:before-swap', () => {
 		const modal = document.querySelector('pagefind-modal') as
 			| (Element & {
-					instance?: { components: unknown[]; componentsByType: Record<string, unknown[]> };
+					instance?: {
+						components: Array<unknown>;
+						componentsByType: Record<string, Array<unknown>>;
+					};
 			  })
 			| null;
 		const instance = modal?.instance;

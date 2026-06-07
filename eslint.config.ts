@@ -1,15 +1,14 @@
 import type { ESLint } from 'eslint';
 
-import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
-import { getConfig } from '@xsynaptic/eslint-config';
+import { getAstroConfig, getConfig, getWebComponentConfig } from '@xsynaptic/eslint-config';
 import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import { configs as wcConfigs } from 'eslint-plugin-wc';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
 const isStrictLint = process.env.ESLINT_STRICT === '1';
+
+const webComponentConfig = getWebComponentConfig(['src/components/**/*.ts']);
 
 export default getConfig(
 	[
@@ -26,14 +25,7 @@ export default getConfig(
 			],
 		},
 		{
-			plugins: {
-				'@eslint-community/eslint-comments': eslintCommentsPlugin,
-			},
 			rules: {
-				'@eslint-community/eslint-comments/require-description': [
-					'error',
-					{ ignore: ['eslint-enable'] },
-				],
 				// Expensive type-aware rules; only run in strict mode
 				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
 				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
@@ -67,23 +59,6 @@ export default getConfig(
 				'perfectionist/sort-switch-case': 'off',
 				'perfectionist/sort-union-types': 'off',
 				'perfectionist/sort-variable-declarations': 'off',
-			},
-		},
-		/**
-		 * JSX
-		 */
-		{
-			files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts', '**/*.astro'],
-			rules: {
-				'no-restricted-syntax': [
-					'error',
-					{
-						message:
-							'Use a ternary returning undefined (condition ? <Element /> : undefined) instead of && for conditional rendering.',
-						selector:
-							':matches(JSXElement, JSXFragment) > JSXExpressionContainer > LogicalExpression[operator="&&"]',
-					},
-				],
 			},
 		},
 		/**
@@ -133,16 +108,9 @@ export default getConfig(
 		 * Native web components
 		 */
 		{
-			...wcConfigs['flat/best-practice'],
-			files: ['src/components/**/*.ts'],
+			...webComponentConfig,
 			rules: {
-				...wcConfigs['flat/best-practice'].rules,
-				'wc/define-tag-after-class-definition': 'error',
-				'wc/guard-define-call': 'error',
-				'wc/max-elements-per-file': 'error',
-				'wc/no-constructor': 'error',
-				'wc/no-exports-with-element': 'error',
-				'wc/no-method-prefixed-with-on': 'error',
+				...webComponentConfig.rules,
 				// Redundant under strict TS; the project avoids custom-element inheritance entirely
 				'wc/guard-super-call': 'off',
 			},
@@ -150,24 +118,7 @@ export default getConfig(
 		/**
 		 * Astro
 		 */
-		...astroPlugin.configs['flat/recommended'],
-		...astroPlugin.configs['jsx-a11y-strict'],
-		// Split into two blocks so disableTypeChecked doesn't clobber our parserOptions
-		{
-			files: ['**/*.astro'],
-			languageOptions: {
-				parserOptions: {
-					parser: tseslint.parser,
-					extraFileExtensions: ['.astro'],
-				},
-			},
-		},
-		// Type-aware rules can't properly resolve types in .astro files; `astro check` handles this
-		// Keep frontmatter thin and push logic into .ts files for full lint coverage
-		{
-			files: ['**/*.astro'],
-			...tseslint.configs.disableTypeChecked,
-		},
+		...getAstroConfig({ a11y: astroPlugin.configs['jsx-a11y-strict'] }),
 	],
 	{
 		customGlobals: { mode: 'readonly' },

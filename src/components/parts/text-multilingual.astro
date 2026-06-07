@@ -1,8 +1,9 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+
 import TextParenthesis from '#components/parts/text-parenthesis.astro';
-import { type MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
