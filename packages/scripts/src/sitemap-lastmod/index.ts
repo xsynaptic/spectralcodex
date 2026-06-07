@@ -3,10 +3,10 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
-import { $ } from 'zx';
 
 import { getPublicId, loadDataStore } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
+import { getGitFileDates } from './git-file-dates.js';
 
 interface SitemapLastmodOptions {
 	rootPath: string;
@@ -28,37 +28,6 @@ function buildContentUrl(siteUrl: string, collection: string, id: string): strin
 	return joinUrl(siteUrl, collectionSegment, id, '/');
 }
 
-async function generateLastmodMap(
-	contentPathAbs: string,
-	keyPrefix: string,
-): Promise<Map<string, string>> {
-	const result = await $({
-		cwd: contentPathAbs,
-	})`git log --name-only --pretty=format:${'\u0001%cI'} -- collections/`;
-
-	const lastmodMap = new Map<string, string>();
-
-	let currentDate = '';
-
-	for (const line of result.stdout.split('\n')) {
-		if (line.startsWith('\u0001')) {
-			currentDate = line.slice(1);
-			continue;
-		}
-
-		if (!line || !currentDate) continue;
-
-		// Log is newest-first, so first-seen wins
-		const key = keyPrefix ? `${keyPrefix}/${line}` : line;
-
-		if (!lastmodMap.has(key)) {
-			lastmodMap.set(key, currentDate);
-		}
-	}
-
-	return lastmodMap;
-}
-
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
@@ -75,7 +44,11 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 
 	console.log(chalk.blue('Reading git log...'));
 
-	const gitMap = await generateLastmodMap(contentPathAbs, contentPathRelative);
+	const gitMap = await getGitFileDates({
+		cwd: contentPathAbs,
+		pathspec: 'collections/',
+		keyPrefix: contentPathRelative,
+	});
 
 	console.log(chalk.blue('Loading data store...'));
 
