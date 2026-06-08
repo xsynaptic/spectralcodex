@@ -122,8 +122,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       '@xsynaptic/unpic-imagor':
-        specifier: ^0.1.0
-        version: 0.1.0(unpic@4.2.2)
+        specifier: ^0.2.0
+        version: 0.2.0(unpic@4.2.2)
       '@xsynaptic/word-count':
         specifier: ^0.1.0
         version: 0.1.0
@@ -182,8 +182,8 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0(prettier-plugin-astro@0.14.1)(prettier@3.8.3)
       remeda:
-        specifier: ^2.37.0
-        version: 2.37.0
+        specifier: ^2.38.0
+        version: 2.38.0
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -364,8 +364,8 @@ importers:
         specifier: ^8.1.1
         version: 8.1.1(maplibre-gl@5.24.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       remeda:
-        specifier: ^2.37.0
-        version: 2.37.0
+        specifier: ^2.38.0
+        version: 2.38.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -467,8 +467,8 @@ importers:
         specifier: ^7.3.0
         version: 7.3.0
       remeda:
-        specifier: ^2.37.0
-        version: 2.37.0
+        specifier: ^2.38.0
+        version: 2.38.0
       satori:
         specifier: ^0.26.0
         version: 0.26.0
@@ -2979,8 +2979,8 @@ packages:
   '@xsynaptic/unified-tools@5.0.0':
     resolution: {integrity: sha512-frwEM0foCBGlcFhOrhIXBKuKDlDmAOCRR5vHVoIxng2qCHVoeSqWjLn4Lna26R4uemg7x9Ox5Q8PJSfyv9APBg==}
 
-  '@xsynaptic/unpic-imagor@0.1.0':
-    resolution: {integrity: sha512-nrsa1iGdX7M1CMkcw4QbWeSisOlGyllBMJIkw8aGCbhR9eoiy1r6HWkMQREgJV7lo30T6umPvOpiaO4xeA7FkA==}
+  '@xsynaptic/unpic-imagor@0.2.0':
+    resolution: {integrity: sha512-vFlrBAYiqdKXvnUylzAPwRlRzGHONLbznqmbjU56XEfqsxeLjL7XMOhByb1IHQqvIDN8awc0Q4HQrmIjt6WwoQ==}
     peerDependencies:
       unpic: ^4.2.2
 
@@ -6185,8 +6185,8 @@ packages:
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
 
-  remeda@2.37.0:
-    resolution: {integrity: sha512-wN6BXWua0t4o7vDamqc27J3VRxnokG9cDezsFN2nOnt2JD/IkJQHTYqM6UvmEctAZETAoviwEFQZJO3kZ4Ohew==}
+  remeda@2.38.0:
+    resolution: {integrity: sha512-yhZjp7dd+L0NWS8gn4caKOHI6ALfbN3/2H5WNBCnFyzPYcG5vOw5b30FVpDFdQ+7Ui62QiCWKubJhG9Y5SqF5A==}
     engines: {node: '>=18.0.0'}
 
   repeat-string@1.6.1:
@@ -10710,7 +10710,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@xsynaptic/unpic-imagor@0.1.0(unpic@4.2.2)':
+  '@xsynaptic/unpic-imagor@0.2.0(unpic@4.2.2)':
     dependencies:
       unpic: 4.2.2
 
@@ -14968,7 +14968,7 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
 
-  remeda@2.37.0: {}
+  remeda@2.38.0: {}
 
   repeat-string@1.6.1: {}
 
