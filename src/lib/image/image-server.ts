@@ -18,11 +18,15 @@ export function createSignedImagePathFunction({
 	signatureLength?: number;
 }) {
 	return function getSignedImagePath(src: string | URL, operations: ImagorOperations): string {
-		const unsignedPath = generate(src, {
-			...operations,
-			quality: imageQuality,
-			format: imageFormat,
-		});
+		const unsignedPath = generate(
+			src,
+			{
+				...operations,
+				quality: imageQuality,
+				format: imageFormat,
+			},
+			{ unsafe: false },
+		);
 
 		return `/${signImageServerPath(unsignedPath, serverSecret, signatureLength)}/${unsignedPath}`;
 	};

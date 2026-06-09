@@ -14,7 +14,7 @@ const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_
 const TEST_IMAGE = 'example-folder-1/example-image-1.jpg';
 
 function signedUrl(source: string, width: number, format: ImagorFormats, quality: number): string {
-	const unsignedPath = generate(source, { width, format, quality });
+	const unsignedPath = generate(source, { width, format, quality }, { unsafe: false });
 	const signature = signImageServerPath(
 		unsignedPath,
 		IMAGE_SERVER_SECRET,
@@ -44,7 +44,11 @@ describe('image server integration', () => {
 	});
 
 	test('tampered signature is rejected', async () => {
-		const unsignedPath = generate(TEST_IMAGE, { width: 450, quality: 85, format: 'jpg' });
+		const unsignedPath = generate(
+			TEST_IMAGE,
+			{ width: 450, quality: 85, format: 'jpg' },
+			{ unsafe: false },
+		);
 		const response = await fetch(
 			`${IMAGE_SERVER_URL}/notavalidhash00000000000000000000000000/${unsignedPath}`,
 		);
