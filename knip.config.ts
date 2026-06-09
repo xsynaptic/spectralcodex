@@ -7,6 +7,7 @@ export default {
 		'.': {
 			// MDX auto-import components; referenced via remark-auto-import, not static imports
 			entry: ['src/components/mdx/*.astro'],
+			ignore: ['src/components/parts/pagination.astro'], // leftover component
 			ignoreBinaries: ['down', 'up', 'ssh-add'],
 			ignoreDependencies: [
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
