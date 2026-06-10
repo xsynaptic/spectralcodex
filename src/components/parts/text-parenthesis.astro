@@ -17,10 +17,6 @@ const content = await renderSlot(Astro.slots, 'default');
 
 {
 	content ? (
-		<Tag class={className} {...props}>
-			{before}
-			<slot />
-			{after}
-		</Tag>
+		<Tag class={className} {...props} set:html={`${before}${content}${after}`} />
 	) : undefined
 }

@@ -82,8 +82,20 @@ class SearchToggle extends HTMLElement {
 				return;
 			}
 
-			link.addEventListener('load', () => { resolve(); }, { once: true });
-			link.addEventListener('error', () => { resolve(); }, { once: true });
+			link.addEventListener(
+				'load',
+				() => {
+					resolve();
+				},
+				{ once: true },
+			);
+			link.addEventListener(
+				'error',
+				() => {
+					resolve();
+				},
+				{ once: true },
+			);
 		});
 
 		return this.#cssReady;

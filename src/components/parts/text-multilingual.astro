@@ -25,41 +25,37 @@ const {
 ---
 
 {
-	content ? (
+	content && parenthesis ? (
+		<TextParenthesis as={Tag} class={className}>
+			<Tag
+				lang={content.lang}
+				class:list={[isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+				{...props}
+				set:html={content.value.trim()}
+			/>
+		</TextParenthesis>
+	) : undefined
+}
+{
+	content && !parenthesis ? (
 		<>
-			{parenthesis ? (
-				<TextParenthesis as={Tag} class={className}>
-					<Tag
-						lang={content.lang}
-						class:list={[isCjkLanguage(content.lang) ? 'cjk' : undefined]}
-						{...props}
-					>
-						<Fragment set:html={content.value} />
-					</Tag>
-				</TextParenthesis>
-			) : (
+			<Tag
+				lang={content.lang}
+				class:list={[className, isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+				{...props}
+				set:html={content.value.trim()}
+			/>
+			{additional?.map((item) => (
 				<>
+					{'／'}
 					<Tag
-						lang={content.lang}
-						class:list={[className, isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+						lang={item.lang}
+						class:list={[className, isCjkLanguage(item.lang) ? 'cjk' : undefined]}
 						{...props}
-					>
-						<Fragment set:html={content.value} />
-					</Tag>
-					{additional?.map((item) => (
-						<>
-							{'／'}
-							<Tag
-								lang={item.lang}
-								class:list={[className, isCjkLanguage(item.lang) ? 'cjk' : undefined]}
-								{...props}
-							>
-								<Fragment set:html={item.value} />
-							</Tag>
-						</>
-					))}
+						set:html={item.value.trim()}
+					/>
 				</>
-			)}
+			))}
 		</>
 	) : undefined
 }
