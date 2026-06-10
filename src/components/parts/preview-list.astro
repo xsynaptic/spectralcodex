@@ -11,9 +11,10 @@ interface Props {
 	items: Array<CatalogItem>;
 	count?: number | undefined;
 	countThreshold?: number | undefined;
+	url?: string | undefined;
 }
 
-const { items, count, countThreshold = 10, ...props } = Astro.props;
+const { items, count, countThreshold = 10, url, ...props } = Astro.props;
 
 const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
 
@@ -27,7 +28,8 @@ function getCountText() {
 			title: formatStringTemplate(t('parts.textSeparatedList.more'), {
 				count: numberFormatter.format(count - items.length),
 			}),
-			url: undefined,
+			titleMultilingual: undefined,
+			url,
 		};
 	}
 	return;

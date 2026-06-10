@@ -60,32 +60,22 @@ describe('createArchivesData', () => {
 		expect(ids(month.visited)).toEqual([]);
 	});
 
-	test('counts are full bucket totals while lists are the filtered projection', () => {
-		const data = createArchivesData(
-			[
-				makeCatalogItem({ id: 'q3', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
-				makeCatalogItem({
-					id: 'q1',
-					collection: 'posts',
-					dateCreated: new Date(2024, 2, 11),
-					entryQuality: 1,
-				}),
-				// Below the monthly quality floor (>= 1): counted, but absent from the list
-				makeCatalogItem({
-					id: 'q0',
-					collection: 'posts',
-					dateCreated: new Date(2024, 2, 12),
-					entryQuality: 0,
-				}),
-			],
-			[],
+	test('the monthly view is the complete record with no cap', () => {
+		const items = Array.from({ length: 50 }, (_, index) =>
+			makeCatalogItem({
+				id: `item-${String(index)}`,
+				collection: 'posts',
+				dateCreated: new Date(2024, 2, 10),
+			}),
 		);
+
+		const data = createArchivesData(items, []);
 
 		const month = monthlyItem(data, '2024/03');
 
-		expect(month.createdCount).toBe(3);
-		// Sorted by quality descending, so q3 precedes q1; q0 is below the monthly floor
-		expect(ids(month.created)).toEqual(['q3', 'q1']);
+		// Every entry appears; the old 40-item cap no longer truncates the monthly record
+		expect(month.createdCount).toBe(50);
+		expect(month.created).toHaveLength(50);
 	});
 
 	test('within a quality level, a featured image sorts an entry ahead of one without', () => {
@@ -173,7 +163,7 @@ describe('createArchivesData', () => {
 
 	test('a year with no yearly view contributes no month pages (no orphans)', () => {
 		const data = createArchivesData(
-			// Quality 1 clears the monthly floor but not the yearly floor, so 2019 gets no yearly view
+			// Quality 1 is in the complete monthly record but below the yearly floor, so 2019 gets no yearly view
 			[
 				makeCatalogItem({
 					id: 'low',
@@ -230,7 +220,7 @@ describe('createArchivesData', () => {
 			[],
 		);
 
-		// Present in monthly (>= 1) and yearly (>= 2), absent from the index (>= 3)
+		// Present in monthly (complete record) and yearly (>= 2), absent from the index (>= 3)
 		expect(belowThreshold.archivesMonthlyData).toHaveLength(1);
 		expect(belowThreshold.archivesIndexData['2024']).toBeUndefined();
 

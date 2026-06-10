@@ -102,20 +102,8 @@ const title = formatStringTemplate(t('archives.monthly.title'), {
 		) : undefined
 	}
 	<ContentSection class="flex flex-col gap-2">
-		<ArchivesItem
-			title={t('archives.updated.label')}
-			items={archivesMonthlyItem.updated}
-			count={archivesMonthlyItem.updatedCount}
-		/>
-		<ArchivesItem
-			title={t('archives.created.label')}
-			items={archivesMonthlyItem.created}
-			count={archivesMonthlyItem.createdCount}
-		/>
-		<ArchivesItem
-			title={t('archives.visited.label')}
-			items={archivesMonthlyItem.visited}
-			count={archivesMonthlyItem.visitedCount}
-		/>
+		<ArchivesItem title={t('archives.updated.label')} items={archivesMonthlyItem.updated} />
+		<ArchivesItem title={t('archives.created.label')} items={archivesMonthlyItem.created} />
+		<ArchivesItem title={t('archives.visited.label')} items={archivesMonthlyItem.visited} />
 	</ContentSection>
 </MainSite>

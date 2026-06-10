@@ -139,17 +139,16 @@ interface ArchivesTierBuckets {
 	visited: Array<CatalogItem>;
 }
 
-function sortAndLimit(items: Array<CatalogItem>, limit: number) {
-	return R.pipe(
+function sortAndLimit(items: Array<CatalogItem>, limit?: number) {
+	const sorted = R.sortBy(
 		items,
-		R.sortBy(
-			[R.prop('entryQuality'), 'desc'],
-			// Surface entries with a featured image ahead of those without within a given quality tier
-			[(item) => (item.imageId ? 1 : 0), 'desc'],
-			[R.prop('title'), 'asc'],
-		),
-		R.take(limit),
+		[R.prop('entryQuality'), 'desc'],
+		// Surface entries with a featured image ahead of those without within a given quality tier
+		[(item) => (item.imageId ? 1 : 0), 'desc'],
+		[R.prop('title'), 'asc'],
 	);
+
+	return limit === undefined ? sorted : sorted.slice(0, limit);
 }
 
 // Deduplicate across categories within one scope: updated > created > visited
@@ -172,10 +171,10 @@ function deduplicateCategories(
 
 interface ArchivesTierOptions {
 	quality: number;
-	limit: number;
+	limit?: number | undefined;
 }
 
-const monthlyTierOptions: ArchivesTierOptions = { quality: 1, limit: 40 };
+const monthlyTierOptions: ArchivesTierOptions = { quality: 1 };
 const indexTierOptions: ArchivesTierOptions = { quality: 3, limit: 20 };
 const yearlyQualityFloor = 2;
 const yearlyLimit = 20;

@@ -8,17 +8,18 @@ interface Props {
 	title: string;
 	items: Array<CatalogItem>;
 	count?: number | undefined;
+	url?: string | undefined;
 	class?: string | undefined;
 }
 
-const { title, items, count, class: className, ...props } = Astro.props;
+const { title, items, count, url, class: className, ...props } = Astro.props;
 ---
 
 {
 	items.length > 0 ? (
 		<Prose class={className} {...props}>
 			<span class="font-medium">{title}</span>:
-			<PreviewList items={items} count={count} />
+			<PreviewList items={items} count={count} url={url} />
 		</Prose>
 	) : undefined
 }
