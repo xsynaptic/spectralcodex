@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isProd = process.env.TEST_ENV === 'prod';
-const localURL = 'http://localhost:4321';
+
+// Obscure port to avoid colliding with other projects' dev servers on Astro's default 4321
+const localPort = 47321;
+const localURL = `http://localhost:${localPort}`;
 
 function getBaseURL(): string {
 	if (!isProd) return localURL;
@@ -13,11 +16,15 @@ function getBaseURL(): string {
 
 const baseURL = getBaseURL();
 
+const isCI = !!process.env.CI;
+
 export default defineConfig({
 	testDir: './tests/e2e',
 	outputDir: './temp/playwright-results',
 	timeout: 15_000,
-	retries: 3,
+	retries: isCI ? 3 : 0,
+	// Locally, bail early so a systemic failure surfaces fast instead of retrying every test
+	maxFailures: isCI ? 0 : 3,
 	reporter: 'list',
 	use: {
 		baseURL,
@@ -32,7 +39,7 @@ export default defineConfig({
 		? {}
 		: {
 				webServer: {
-					command: 'pnpm astro preview',
+					command: `pnpm astro preview --port ${String(localPort)}`,
 					url: localURL,
 					reuseExistingServer: true,
 				},
