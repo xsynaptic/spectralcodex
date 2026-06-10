@@ -4,12 +4,9 @@ import { getInstanceManager } from '@pagefind/component-ui';
 
 const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent);
 
-/** Wait for the user to stop typing before recording their query */
-const SEARCH_QUERY_DEBOUNCE_MS = 1500;
-const SEARCH_QUERY_MIN_LENGTH = 2;
-
-/** Cap the value sent to analytics */
-const SEARCH_QUERY_MAX_LENGTH = 100;
+const searchQueryDebounceMs = 1500; // Wait for the user to stop typing before recording their query
+const searchQueryMinLength = 2;
+const searchQueryMaxLength = 100; // Cap the value sent to analytics
 
 let searchAnalyticsRegistered = false;
 
@@ -35,12 +32,9 @@ function registerSearchAnalytics(instance: Instance) {
 	instance.on('results', (result: unknown) => {
 		clearTimeout(debounceTimer);
 
-		const query = instance.searchTerm
-			.replaceAll(/\s+/g, ' ')
-			.trim()
-			.slice(0, SEARCH_QUERY_MAX_LENGTH);
+		const query = instance.searchTerm.replaceAll(/\s+/g, ' ').trim().slice(0, searchQueryMaxLength);
 
-		if (query.length < SEARCH_QUERY_MIN_LENGTH) return;
+		if (query.length < searchQueryMinLength) return;
 
 		const resultCount = getResultCount(result);
 		const queryWithCount =
@@ -48,11 +42,11 @@ function registerSearchAnalytics(instance: Instance) {
 
 		debounceTimer = setTimeout(() => {
 			window.umami?.track('search-query', { query, queryWithCount });
-		}, SEARCH_QUERY_DEBOUNCE_MS);
+		}, searchQueryDebounceMs);
 	});
 }
 
-/* An icon-based modal trigger integrating with Pagefind's instance API */
+// An icon-based modal trigger integrating with Pagefind's instance API
 class SearchToggle extends HTMLElement {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
@@ -62,7 +56,42 @@ class SearchToggle extends HTMLElement {
 		return this.querySelector<HTMLButtonElement>('button');
 	}
 
-	#handleClick = () => {
+	#cssReady?: Promise<void>;
+
+	// Load the deferred stylesheet on intent; resolves once applied
+	#ensurePagefindCss = (): Promise<void> => {
+		if (this.#cssReady) return this.#cssReady;
+
+		const href = this.dataset.pagefindCssUrl;
+
+		if (!href) return Promise.resolve();
+
+		this.#cssReady = new Promise((resolve) => {
+			let link = document.querySelector<HTMLLinkElement>('link[data-pagefind-css]');
+
+			if (!link) {
+				link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = href;
+				link.dataset.pagefindCss = '';
+				document.head.append(link);
+			}
+
+			if (link.sheet) {
+				resolve();
+				return;
+			}
+
+			link.addEventListener('load', () => { resolve(); }, { once: true });
+			link.addEventListener('error', () => { resolve(); }, { once: true });
+		});
+
+		return this.#cssReady;
+	};
+
+	// Await the stylesheet so the modal never opens unstyled
+	#handleClick = async () => {
+		await this.#ensurePagefindCss();
 		const [modal] = (this.instance?.getUtilities('modal') ?? []) as Array<PagefindModal>;
 		modal?.open();
 	};
@@ -79,10 +108,10 @@ class SearchToggle extends HTMLElement {
 		}
 
 		event.preventDefault();
-		this.#handleClick();
+		void this.#handleClick();
 	};
 
-	/** Called by <pagefind-modal> when it closes. Matches the built-in trigger's contract. */
+	// Called by <pagefind-modal> when it closes. Matches the built-in trigger's contract
 	handleModalClose() {
 		this.buttonEl?.setAttribute('aria-expanded', 'false');
 		this.buttonEl?.focus();
@@ -107,12 +136,18 @@ class SearchToggle extends HTMLElement {
 			this,
 		);
 
+		// Hover or focus the toggle and the stylesheet starts loading, so it's ready before the modal opens
+		this.addEventListener('pointerenter', this.#ensurePagefindCss, { once: true });
+		this.addEventListener('focusin', this.#ensurePagefindCss, { once: true });
+
 		this.addEventListener('click', this.#handleClick);
 		document.addEventListener('keydown', this.#handleKeydown);
 	}
 
 	disconnectedCallback() {
 		this.instance?.deregisterAllShortcuts(this);
+		this.removeEventListener('pointerenter', this.#ensurePagefindCss);
+		this.removeEventListener('focusin', this.#ensurePagefindCss);
 		this.removeEventListener('click', this.#handleClick);
 		document.removeEventListener('keydown', this.#handleKeydown);
 	}

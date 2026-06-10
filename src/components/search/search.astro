@@ -39,14 +39,13 @@ const t = getTranslations();
 	});
 </script>
 
-<link rel="stylesheet" href={pagefindCssUrl} />
-
 <pagefind-config bundle-path={bundlePath} preload={false}></pagefind-config>
 
 <search-toggle
 	class:list={[
 		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100',
 	]}
+	data-pagefind-css-url={pagefindCssUrl}
 	{...props}
 >
 	<button
@@ -91,6 +90,15 @@ const t = getTranslations();
 	search-toggle:not(:defined) {
 		pointer-events: none;
 		opacity: 0.3;
+	}
+
+	/* Eager layout rules so the header never shifts while the deferred stylesheet loads */
+	pagefind-config {
+		display: none;
+	}
+
+	pagefind-modal {
+		display: contents;
 	}
 
 	pagefind-modal:not(:defined) {

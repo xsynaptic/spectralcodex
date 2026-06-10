@@ -42,11 +42,6 @@ pagefind-searchbox button {
 	font-family: var(--pf-font) !important;
 }
 
-/* Prevent modal component from taking up space in a flexbox layout */
-pagefind-modal {
-	display: contents;
-}
-
 /* Backdrop blur when modal is open */
 dialog.pf-modal::backdrop {
 	backdrop-filter: blur(4px);
