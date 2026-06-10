@@ -4,7 +4,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@spectralcodex/astro-sitemap';
-import remarkImgGroup from '@spectralcodex/remark-img-group';
+import { remarkImgGroup } from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { rehypeWrapCjk } from '@xsynaptic/rehype-wrap-cjk';

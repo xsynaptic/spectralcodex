@@ -12,11 +12,13 @@ declare global {
 			alt?: string;
 			children?: React.ReactNode;
 			layout?: 'wide' | 'full';
+			showMetadata?: boolean;
 			src: string;
 		}) => React.JSX.Element;
 		ImgGroup: (props: {
 			children: React.ReactNode;
 			columns?: number | string;
+			display?: 'grid' | 'carousel';
 			layout?: 'wide' | 'full';
 		}) => React.JSX.Element;
 		Hide: (props: { children: React.ReactNode; char?: string }) => React.JSX.Element;

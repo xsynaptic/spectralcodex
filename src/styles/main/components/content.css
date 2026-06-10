@@ -75,12 +75,19 @@
 	}
 }
 
-.c-wrap.c-full .c-caption {
+.c-wrap.c-full .c-caption,
+.c-image-group.c-full .c-caption {
 	@apply mx-auto max-w-content sm:px-4 md:px-8;
 }
 
+/* Shared by grid and carousel groups */
 .c-image-group {
 	@apply mb-2 sm:px-4 md:mb-4 md:px-8;
+}
+
+/* Custom elements default to inline; the carousel host needs block */
+image-carousel.c-image-group {
+	display: block;
 }
 
 .c-image-group.c-default {
@@ -89,4 +96,54 @@
 
 .c-image-group.c-wide {
 	width: 100%;
+}
+
+/* Full-bleed is carousel-only; drop the padding so slides reach the viewport edge */
+.c-image-group.c-full {
+	@apply px-0;
+
+	width: 100%;
+}
+
+/* Anchors the nav to the image edge rather than the padded host */
+.c-carousel-viewport {
+	position: relative;
+}
+
+.c-carousel-viewport .carousel-container {
+	/* Top-align so a stray orientation mismatch leaves space below rather than stretching slides */
+	align-items: flex-start;
+
+	@media (width >= 40rem) {
+		border-radius: var(--radius-xs);
+	}
+}
+
+.c-image-group.c-full .carousel-container {
+	@media (width >= 40rem) {
+		border-radius: 0;
+	}
+}
+
+.c-carousel-item {
+	flex: none;
+	width: 100%;
+	margin-bottom: 0;
+	scroll-snap-align: start;
+}
+
+.c-carousel-item.c-wrap .i-placeholder {
+	border-radius: 0;
+}
+
+/* The generic carousel only shows nav at lg; content carousels keep it at every width */
+.c-carousel-viewport .carousel-nav {
+	display: flex;
+}
+
+/* Touch has no hover to reveal the nav, so keep it visible */
+@media (hover: none) {
+	.c-carousel-viewport .carousel-nav {
+		opacity: 1;
+	}
 }

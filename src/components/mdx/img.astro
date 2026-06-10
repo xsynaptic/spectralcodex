@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageLayout } from '#lib/image/image-types.ts';
+import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 
 import ContentImage from '#components/content/content-image.astro';
 
@@ -9,14 +9,16 @@ interface Props extends HTMLAttributes<'figure'> {
 	src: string;
 	alt?: string;
 	layout?: ImageLayout;
+	context?: ImageContext;
+	showMetadata?: boolean;
 }
 
-const { src: imageId, ...props } = Astro.props;
+const { src: imageId, showMetadata = true, ...props } = Astro.props;
 ---
 
 {
 	imageId ? (
-		<ContentImage imageId={imageId} showMetadata={true} {...props}>
+		<ContentImage imageId={imageId} showMetadata={showMetadata} {...props}>
 			<slot />
 		</ContentImage>
 	) : undefined

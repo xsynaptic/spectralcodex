@@ -1,4 +1,4 @@
-import type { ImageLayout, ImageOrientation } from '#lib/image/image-types.ts';
+import type { ImageContext, ImageLayout, ImageOrientation } from '#lib/image/image-types.ts';
 
 import {
 	TAILWIND_BREAKPOINT_CONTENT,
@@ -7,7 +7,12 @@ import {
 	TAILWIND_CONTENT_PADDING_MD,
 	TAILWIND_CONTENT_PADDING_SM,
 } from '#constants.ts';
-import { ImageOrientationEnum, ImageSizeEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
+import {
+	ImageContextEnum,
+	ImageOrientationEnum,
+	ImageSizeEnum,
+	ImageLayoutEnum,
+} from '#lib/image/image-types.ts';
 
 // A simple check for image orientation
 function getImageOrientation({
@@ -48,84 +53,73 @@ export function getImageBreakpoints({
 	return widths.filter((width) => width <= maxWidth);
 }
 
-// Infer a width from layout and orientation
-// This ultimately selects which image is used for the `src` prop
 export function getImageInferredWidth({
 	width,
 	height,
 	layout,
+	context = ImageContextEnum.Single,
 }: {
 	width: number;
 	height?: number | undefined;
 	layout?: ImageLayout | undefined;
+	context?: ImageContext | undefined;
 }) {
-	const imageOrientation = getImageOrientation({ width, height });
+	// Images inside a group fill a cell or slide, so size them by orientation rather than layout
+	if (context !== ImageContextEnum.Single) {
+		switch (getImageOrientation({ width, height })) {
+			case ImageOrientationEnum.Portrait: {
+				return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
+			}
+			case ImageOrientationEnum.Square: {
+				return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
+			}
+			default: {
+				return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
+			}
+		}
+	}
 
 	switch (layout) {
-		case ImageLayoutEnum.Default: {
-			return {
-				width: ImageSizeEnum.Large,
-				height: ImageSizeEnum.Medium,
-			};
-		}
-		case ImageLayoutEnum.Wide: {
-			return {
-				width: ImageSizeEnum.ExtraLarge,
-				height: ImageSizeEnum.Large,
-			};
-		}
+		case ImageLayoutEnum.Wide:
 		case ImageLayoutEnum.Full: {
-			return {
-				width: ImageSizeEnum.ExtraLarge,
-				height: ImageSizeEnum.Large,
-			};
+			return { width: ImageSizeEnum.ExtraLarge, height: ImageSizeEnum.Large };
 		}
-		// No layout prop; typically seen in images in groups
-		// Ultimately we're just guessing here
 		default: {
-			switch (imageOrientation) {
-				case ImageOrientationEnum.Portrait: {
-					return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
-				}
-				case ImageOrientationEnum.Square: {
-					return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
-				}
-				default: {
-					return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
-				}
-			}
+			return { width: ImageSizeEnum.Large, height: ImageSizeEnum.Medium };
 		}
 	}
 }
 
-export function getImageLayoutSizesProp(layout?: ImageLayout, priority?: boolean) {
+export function getImageLayoutSizesProp(
+	layout?: ImageLayout,
+	priority?: boolean,
+	context: ImageContext = ImageContextEnum.Single,
+) {
 	let sizes: Array<string> = [];
 
-	switch (layout) {
-		case ImageLayoutEnum.Default: {
-			sizes = [
-				`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
-				`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
-				`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
-				`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
-			];
-			break;
-		}
-		case ImageLayoutEnum.Wide: {
-			sizes = [`calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`];
-			break;
-		}
-		case ImageLayoutEnum.Full: {
-			sizes = ['100vw'];
-			break;
-		}
-		// No layout prop; typically seen in images in groups
-		default: {
-			break;
+	// Grouped images defer their width to the container, so they only get the `auto` hint below
+	if (context === ImageContextEnum.Single) {
+		switch (layout) {
+			case ImageLayoutEnum.Wide: {
+				sizes = [`calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`];
+				break;
+			}
+			case ImageLayoutEnum.Full: {
+				sizes = ['100vw'];
+				break;
+			}
+			default: {
+				sizes = [
+					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
+					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
+					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
+					`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
+				];
+				break;
+			}
 		}
 	}
 
-	// This handles the default case where images are grouped in an arbitrary grid
 	if (!priority) sizes.unshift('auto');
 
 	return sizes.join(', ');

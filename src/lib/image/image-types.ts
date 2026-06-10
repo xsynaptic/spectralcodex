@@ -17,10 +17,17 @@ export const ImageLayoutEnum = {
 	Default: 'default',
 	Wide: 'wide',
 	Full: 'full',
-	None: 'none', // A special case for images in groups
 } as const;
 
 export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
+
+export const ImageContextEnum = {
+	Single: 'single',
+	Grid: 'grid',
+	Carousel: 'carousel',
+} as const;
+
+export type ImageContext = (typeof ImageContextEnum)[keyof typeof ImageContextEnum];
 
 export const ImageOrientationEnum = {
 	Landscape: 'landscape',

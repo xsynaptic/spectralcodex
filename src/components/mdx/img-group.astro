@@ -3,15 +3,25 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { ImageLayout } from '#lib/image/image-types.ts';
 
+import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
+// `display` and `imageCount` are both injected by the remark-img-group plugin
 interface Props extends HTMLAttributes<'div'> {
-	layout?: Extract<ImageLayout, 'medium' | 'wide'>;
+	layout?: ImageLayout;
+	display?: 'grid' | 'carousel';
 	columns?: number | string;
+	imageCount?: number | string;
 }
 
-const { layout, columns: columnsProp, ...props } = Astro.props;
+const {
+	layout,
+	display = 'grid',
+	columns: columnsProp,
+	imageCount: imageCountProp,
+	...props
+} = Astro.props;
 
 // This conditional controls whether slot contents are just passed through
 const { isFeed } = Astro.locals;
@@ -19,11 +29,9 @@ const { isFeed } = Astro.locals;
 // This outputs MDX components already transformed into HTML
 const slotContents = await renderSlot(Astro.slots, 'default');
 
-const imageCount = slotContents?.match(/<img/g)?.length ?? 0;
+const imageCount = imageCountProp ? Number(imageCountProp) : 0;
 
-if (imageCount === 0) {
-	console.warn(`[MDX] ImgGroup component has no images! (${Astro.url.pathname})`);
-}
+const isCarousel = display === 'carousel';
 
 function getGridColumnCount(itemCount: number) {
 	if (itemCount % 5 === 0) return 5;
@@ -33,16 +41,35 @@ function getGridColumnCount(itemCount: number) {
 	return 1;
 }
 
+function getLayoutClass() {
+	if (layout === ImageLayoutEnum.Wide) return 'c-wide';
+	if (layout === ImageLayoutEnum.Full) return 'c-full';
+	return 'c-default';
+}
+
+const layoutClass = getLayoutClass();
 const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCount);
 ---
 
 {imageCount > 0 && isFeed ? <Fragment set:html={slotContents} /> : undefined}
 {
-	imageCount > 0 && !isFeed ? (
+	imageCount > 0 && !isFeed && isCarousel ? (
+		<image-carousel class:list={['c-image-group c-escape carousel-group', layoutClass]} {...props}>
+			<div class="c-carousel-viewport">
+				<div class="carousel-container">
+					<Fragment set:html={slotContents} />
+				</div>
+				<ImageCarouselNavigation />
+			</div>
+		</image-carousel>
+	) : undefined
+}
+{
+	imageCount > 0 && !isFeed && !isCarousel ? (
 		<div
 			class:list={[
 				'c-image-group c-escape',
-				layout === ImageLayoutEnum.Wide ? 'c-wide' : 'c-default',
+				layoutClass,
 				columns > 1 ? 'grid grid-cols-1 gap-2 md:gap-4' : undefined,
 				columns === 2 ? 'sm:grid-cols-2' : undefined,
 				columns === 3 ? 'md:grid-cols-3' : undefined,

@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
-import type { ImageLayout } from '#lib/image/image-types.ts';
+import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImageMetadata from '#components/image-metadata/image-metadata.astro';
@@ -15,7 +15,7 @@ import {
 	getImageBreakpoints,
 	getImageInferredWidth,
 } from '#lib/image/image-layout.ts';
-import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
+import { ImageContextEnum, ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeImageAltAttribute, sanitizeImageCaption } from '#lib/utils/text.ts';
 
@@ -23,6 +23,7 @@ interface Props extends HTMLAttributes<'figure'> {
 	imageId: string;
 	alt?: string;
 	layout?: ImageLayout;
+	context?: ImageContext;
 	priority?: boolean;
 	showMetadata?: boolean;
 }
@@ -31,6 +32,7 @@ const {
 	imageId,
 	alt: altProp,
 	layout = ImageLayoutEnum.Default,
+	context = ImageContextEnum.Single,
 	priority = false,
 	showMetadata = false,
 	...props
@@ -73,6 +75,7 @@ async function getImageProps(): Promise<{
 		width: imageEntry.data.width,
 		height: imageEntry.data.height,
 		layout,
+		context,
 	});
 	const feedWidth =
 		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
@@ -83,7 +86,7 @@ async function getImageProps(): Promise<{
 		imageProps: {
 			src: imageId,
 			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
-			sizes: getImageLayoutSizesProp(layout, priority),
+			sizes: getImageLayoutSizesProp(layout, priority, context),
 			width: primaryWidth,
 			...(isFeed
 				? { height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width) }
@@ -105,40 +108,44 @@ async function getImageProps(): Promise<{
 const { imageEntry, imageProps, placeholderProps, aspectRatioString } = await getImageProps();
 
 const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
+
+// Standalone images take their layout width; grouped images defer to their container
+function getFigureClass() {
+	if (context === ImageContextEnum.Carousel) return 'c-carousel-item';
+	if (context === ImageContextEnum.Grid) return;
+	return `c-${layout}`;
+}
 ---
 
 {
-	imageProps ? (
-		isFeed ? (
-			<figure {...props}>
-				<Image {...imageProps} />
-				{caption ? (
-					<figcaption>
-						<Fragment set:html={caption} />
-					</figcaption>
+	imageProps && !isFeed ? (
+		<figure class:list={['c-wrap c-escape', getFigureClass()]} {...props}>
+			<ImagePlaceholder placeholderProps={placeholderProps}>
+				<Image
+					{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
+					{...imageProps}
+				/>
+				{showMetadata && context !== ImageContextEnum.Carousel && imageEntry ? (
+					<ImageMetadata entry={imageEntry} />
 				) : undefined}
-			</figure>
-		) : (
-			<figure
-				class:list={[
-					'c-wrap c-escape',
-					layout === ImageLayoutEnum.None ? undefined : `c-${layout}`,
-				]}
-				{...props}
-			>
-				<ImagePlaceholder placeholderProps={placeholderProps}>
-					<Image
-						{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
-						{...imageProps}
-					/>
-					{showMetadata && imageEntry ? <ImageMetadata entry={imageEntry} /> : undefined}
-				</ImagePlaceholder>
-				{caption ? (
-					<figcaption class="c-caption">
-						<Fragment set:html={caption} />
-					</figcaption>
-				) : undefined}
-			</figure>
-		)
+			</ImagePlaceholder>
+			{caption ? (
+				<figcaption class="c-caption">
+					<Fragment set:html={caption} />
+				</figcaption>
+			) : undefined}
+		</figure>
+	) : undefined
+}
+{
+	imageProps && isFeed ? (
+		<figure {...props}>
+			<Image {...imageProps} />
+			{caption ? (
+				<figcaption>
+					<Fragment set:html={caption} />
+				</figcaption>
+			) : undefined}
+		</figure>
 	) : undefined
 }
