@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const isProd = process.env.TEST_ENV === 'prod';
 
 // Obscure port to avoid colliding with other projects' dev servers on Astro's default 4321
-const localPort = 47321;
+const localPort = 47_321;
 const localURL = `http://localhost:${localPort}`;
 
 function getBaseURL(): string {
