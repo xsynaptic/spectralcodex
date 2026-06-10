@@ -33,35 +33,23 @@ const t = getTranslations();
 		>
 			<nav
 				class:list={[
-					'p-nav grid items-center gap-4 text-base font-medium tabular-nums select-none md:text-sm',
+					'p-nav flex items-center justify-between gap-4 text-base font-medium tabular-nums select-none md:text-sm',
 					className,
 				]}
 				aria-label={t('site.pagination.label')}
 				{...props}
 			>
-				{pagePrevLink ? (
-					<span class="p-prev flex flex-wrap gap-1">
-						<span class="text-accent-300 select-none dark:text-accent-400">&lsaquo;</span>
-						<Link href={pagePrevLink} aria-label={t('pagination.previous')}>
-							{t('pagination.previous')}
-						</Link>
-					</span>
-				) : undefined}
-				<div class="p-center flex items-center">
+				<div class="p-pages flex items-center">
 					<span class="text-primary-500 dark:text-primary-600" data-pagination-counter>
 						{formatStringTemplate(t('site.pagination.counter.label'), {
 							current: currentPage,
 							total: lastPage,
 						})}
 					</span>
-					<form
-						class="relative flex items-center justify-center"
-						hidden={true}
-						data-pagination-form
-					>
+					<form class="relative flex items-center" hidden={true} data-pagination-form>
 						<span class="relative inline-flex items-center">
 							<select
-								class="p-control rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:hover:border-primary-500"
+								class="p-control rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500"
 								aria-label={t('site.pagination.select.label')}
 								data-pagination-control
 							/>
@@ -83,14 +71,24 @@ const t = getTranslations();
 						</button>
 					</form>
 				</div>
-				{pageNextLink ? (
-					<span class="p-next flex flex-wrap gap-1">
-						<Link href={pageNextLink} aria-label={t('pagination.next')}>
-							{t('pagination.next')}
-						</Link>
-						<span class="text-accent-300 select-none dark:text-accent-400">&rsaquo;</span>
-					</span>
-				) : undefined}
+				<div class="p-steps flex items-center gap-6">
+					{pagePrevLink ? (
+						<span class="p-prev flex flex-wrap gap-1">
+							<span class="text-accent-300 select-none dark:text-accent-400">&lsaquo;</span>
+							<Link href={pagePrevLink} aria-label={t('pagination.previous')}>
+								{t('pagination.previous')}
+							</Link>
+						</span>
+					) : undefined}
+					{pageNextLink ? (
+						<span class="p-next flex flex-wrap gap-1">
+							<Link href={pageNextLink} aria-label={t('pagination.next')}>
+								{t('pagination.next')}
+							</Link>
+							<span class="text-accent-300 select-none dark:text-accent-400">&rsaquo;</span>
+						</span>
+					) : undefined}
+				</div>
 			</nav>
 		</pagination-select>
 	) : undefined

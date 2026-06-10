@@ -65,10 +65,32 @@ class PaginationSelect extends HTMLElement {
 		if (counter) counter.hidden = true;
 		form.hidden = false;
 
+		this.#lockSelectWidth(select, lastPage);
+
 		this.#form = form;
 		this.#select = select;
 		this.#submit = form.querySelector<HTMLButtonElement>('[data-pagination-submit]') ?? undefined;
 		this.#syncSubmit();
+	}
+
+	// Pin the select to its widest option so switching page choices never resizes the control
+	#lockSelectWidth(select: HTMLSelectElement, lastPage: number) {
+		const lockWidth = () => {
+			const selectedValue = select.value;
+
+			select.value = String(lastPage);
+			const width = Math.ceil(select.getBoundingClientRect().width);
+			select.value = selectedValue;
+
+			if (width > 0) select.style.inlineSize = `${String(width)}px`;
+		};
+
+		lockWidth();
+
+		// Fallback metrics mis-size the lock and clip the label, so re-measure once webfonts settle
+		if (document.fonts.status !== 'loaded') {
+			void document.fonts.ready.then(lockWidth);
+		}
 	}
 
 	#syncSubmit() {
