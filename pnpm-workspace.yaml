@@ -7,10 +7,16 @@ verifyDepsBeforeRun: error
 strictDepBuilds: true
 
 minimumReleaseAgeExclude:
+  # Astro 7 beta spike: these prereleases are <24h old; temporary exclusion
+  - 'astro'
+  - '@astrojs/mdx'
+  - '@astrojs/markdown-satteri'
+  - 'satteri'
   - '@xsynaptic/astro-build-logger'
   - '@xsynaptic/eslint-config'
-  - '@xsynaptic/rehype-wrap-cjk'
-  - '@xsynaptic/remark-auto-import'
+  - '@xsynaptic/satteri-auto-import'
+  - '@xsynaptic/satteri-img-group'
+  - '@xsynaptic/satteri-wrap-cjk'
   - '@xsynaptic/stylelint-config'
   - '@xsynaptic/unified-tools'
   - '@xsynaptic/unpic-imagor'
@@ -23,6 +29,12 @@ injectWorkspacePackages: true
 # via vite.ssr.external; hoist it so Node can resolve it from the root scope
 publicHoistPattern:
   - '@keyv/sqlite'
+
+# Astro 7 beta spike: astro-pagefind@2.0.0 caps its astro peer at ^6, which makes
+# auto-install-peers pull a phantom astro 6 (+ vite 7). The integration works on 7.
+peerDependencyRules:
+  allowedVersions:
+    'astro-pagefind>astro': '7'
 
 allowBuilds:
   '@tailwindcss/oxide': true

@@ -1,14 +1,14 @@
 // @ts-check
-import { unified } from '@astrojs/markdown-remark';
+import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@spectralcodex/astro-sitemap';
-import { remarkImgGroup } from '@spectralcodex/remark-img-group';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
-import { rehypeWrapCjk } from '@xsynaptic/rehype-wrap-cjk';
-import { remarkAutoImport } from '@xsynaptic/remark-auto-import';
+import { autoImport } from '@xsynaptic/satteri-auto-import';
+import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
+import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
@@ -135,10 +135,9 @@ export default defineConfig({
 		},
 	},
 	markdown: {
-		processor: unified({
-			remarkPlugins: [
-				remarkImgGroup,
-				remarkAutoImport({
+		processor: satteri({
+			mdastPlugins: [
+				autoImport({
 					imports: [
 						{
 							'./src/components/mdx/img.astro': [['default', 'Img']],
@@ -152,17 +151,16 @@ export default defineConfig({
 						},
 					],
 				}),
+				imgGroupSatteriPlugin(),
 			],
-			rehypePlugins: [[rehypeWrapCjk, { attribute: 'class', value: 'cjk' }]],
+			hastPlugins: [wrapCjk({ value: 'cjk' })],
 		}),
 	},
 	integrations: [
 		react({
 			include: ['packages/react**/*'],
 		}),
-		mdx({
-			optimize: true,
-		}),
+		mdx(),
 		sitemap({
 			excludePrefixes: ['/objectives', '/planning', '/taiwan-theater-project', '/archives'],
 		}),

@@ -7,7 +7,7 @@ import ImageCarouselNavigation from '#components/image/image-carousel-navigation
 import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
-// `display` and `imageCount` are both injected by the remark-img-group plugin
+// `layout` and `imageCount` are both injected by the satteri-img-group plugin
 interface Props extends HTMLAttributes<'div'> {
 	layout?: ImageLayout;
 	display?: 'grid' | 'carousel';
