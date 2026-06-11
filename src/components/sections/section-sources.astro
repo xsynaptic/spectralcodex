@@ -77,13 +77,10 @@ const SourcesFormattingMap = {
 
 					if (source.title) {
 						if (source.authors) {
-							Authors = (
-								<span>
-									{source.authors
-										.map((author) => author.name)
-										.join(SourcesFormattingMap[LanguageCodeEnum.English].authorsDelimiter)}
-								</span>
-							);
+							const authorNames = source.authors
+								.map((author) => author.name)
+								.join(SourcesFormattingMap[LanguageCodeEnum.English].authorsDelimiter);
+							Authors = <span>{authorNames}</span>;
 						}
 						Title =
 							'id' in source && 'showPage' in source && source.showPage ? (
@@ -119,43 +116,29 @@ const SourcesFormattingMap = {
 							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional)) &&
 						titleMultilingual?.value
 					) {
+						const chineseFormatting = SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional];
 						if (source.authors) {
 							const authorNames = source.authors
 								.map((author) => author.name_zh)
 								.filter((name) => name !== undefined);
 
 							if (authorNames.length > 0) {
-								AuthorsMultilingual = (
-									<span>
-										{authorNames.join(
-											SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].authorsDelimiter,
-										)}
-									</span>
-								);
+								const authorsJoined = authorNames.join(chineseFormatting.authorsDelimiter);
+								AuthorsMultilingual = <span>{authorsJoined}</span>;
 							}
 						}
+						const titleQuoted =
+							chineseFormatting.quoteStart + titleMultilingual.value + chineseFormatting.quoteEnd;
 						TitleMultilingual =
 							'id' in source && 'showPage' in source && source.showPage ? (
-								<Link href={getContentUrl('resources', source.id)}>
-									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteStart}
-									{titleMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteEnd}
-								</Link>
+								<Link href={getContentUrl('resources', source.id)}>{titleQuoted}</Link>
 							) : (
-								<span>
-									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteStart}
-									{titleMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].quoteEnd}
-								</span>
+								<span>{titleQuoted}</span>
 							);
 						if (publisherMultilingual?.value && source.publishedDate) {
-							PublisherMultilingual = (
-								<span>
-									{publisherMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional].delimiter}
-									{source.publishedDate}
-								</span>
-							);
+							const publisherFormatted =
+								publisherMultilingual.value + chineseFormatting.delimiter + source.publishedDate;
+							PublisherMultilingual = <span>{publisherFormatted}</span>;
 						} else if (publisherMultilingual?.value) {
 							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
 						} else if (source.publishedDate) {
@@ -169,43 +152,29 @@ const SourcesFormattingMap = {
 							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese)) &&
 						titleMultilingual?.value
 					) {
+						const japaneseFormatting = SourcesFormattingMap[LanguageCodeEnum.Japanese];
 						if (source.authors) {
 							const authorNames = source.authors
 								.map((author) => author.name_ja)
 								.filter((name) => name !== undefined);
 
 							if (authorNames.length > 0) {
-								AuthorsMultilingual = (
-									<span>
-										{authorNames.join(
-											SourcesFormattingMap[LanguageCodeEnum.Japanese].authorsDelimiter,
-										)}
-									</span>
-								);
+								const authorsJoined = authorNames.join(japaneseFormatting.authorsDelimiter);
+								AuthorsMultilingual = <span>{authorsJoined}</span>;
 							}
 						}
+						const titleQuoted =
+							japaneseFormatting.quoteStart + titleMultilingual.value + japaneseFormatting.quoteEnd;
 						TitleMultilingual =
 							'id' in source && 'showPage' in source && source.showPage ? (
-								<Link href={getContentUrl('resources', source.id)}>
-									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteStart}
-									{titleMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteEnd}
-								</Link>
+								<Link href={getContentUrl('resources', source.id)}>{titleQuoted}</Link>
 							) : (
-								<span>
-									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteStart}
-									{titleMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.Japanese].quoteEnd}
-								</span>
+								<span>{titleQuoted}</span>
 							);
 						if (publisherMultilingual?.value && source.publishedDate) {
-							PublisherMultilingual = (
-								<span>
-									{publisherMultilingual.value}
-									{SourcesFormattingMap[LanguageCodeEnum.Japanese].delimiter}
-									{source.publishedDate}
-								</span>
-							);
+							const publisherFormatted =
+								publisherMultilingual.value + japaneseFormatting.delimiter + source.publishedDate;
+							PublisherMultilingual = <span>{publisherFormatted}</span>;
 						} else if (publisherMultilingual?.value) {
 							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
 						} else if (source.publishedDate) {

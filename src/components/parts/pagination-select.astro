@@ -40,12 +40,14 @@ const t = getTranslations();
 				{...props}
 			>
 				<div class="p-pages flex items-center">
-					<span class="text-primary-500 dark:text-primary-600" data-pagination-counter>
-						{formatStringTemplate(t('site.pagination.counter.label'), {
+					<span
+						class="text-primary-500 dark:text-primary-600"
+						data-pagination-counter
+						set:html={formatStringTemplate(t('site.pagination.counter.label'), {
 							current: currentPage,
 							total: lastPage,
 						})}
-					</span>
+					/>
 					<form class="relative flex items-center" hidden={true} data-pagination-form>
 						<span class="relative inline-flex items-center">
 							<select

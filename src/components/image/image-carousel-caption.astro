@@ -48,9 +48,10 @@ const t = getTranslations();
 					withTitle ? 'w-full px-4 sm:max-w-[70%] sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
 				]}
 			>
-				<span class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}>
-					{t('content.meta.imageFeatured.label')}
-				</span>
+				<span
+					class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}
+					set:html={t('content.meta.imageFeatured.label')}
+				/>
 				{url ? (
 					<Link
 						href={url}

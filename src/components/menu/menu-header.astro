@@ -43,9 +43,11 @@ const t = getTranslations();
 									</Link>
 								) : undefined}
 								{!item.url && children?.length ? (
-									<button type="button" class:list={['link link-accent', ...triggerClasses]}>
-										{item.title}
-									</button>
+									<button
+										type="button"
+										class:list={['link link-accent', ...triggerClasses]}
+										set:html={item.title}
+									/>
 								) : undefined}
 								{!item.url && !children?.length ? (
 									<span class:list={triggerClasses}>{item.title}</span>

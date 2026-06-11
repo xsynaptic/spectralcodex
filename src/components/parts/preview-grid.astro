@@ -88,17 +88,16 @@ const t = getTranslations();
 							) : undefined}
 							{showLocations && item.locationCount && item.locationCount > 0 ? (
 								<DividedItem>
-									<span>
-										{t('collection.locations.labelPlural')}:{' '}
-										{formatNumber({ number: item.locationCount })}
-									</span>
+									<span
+										set:html={`${t('collection.locations.labelPlural')}: ${formatNumber({ number: item.locationCount })}`}
+									/>
 								</DividedItem>
 							) : undefined}
 							{showPosts && item.postCount && item.postCount > 0 ? (
 								<DividedItem>
-									<span>
-										{t('collection.posts.labelPlural')}: {formatNumber({ number: item.postCount })}
-									</span>
+									<span
+										set:html={`${t('collection.posts.labelPlural')}: ${formatNumber({ number: item.postCount })}`}
+									/>
 								</DividedItem>
 							) : undefined}
 							{showDate ? (

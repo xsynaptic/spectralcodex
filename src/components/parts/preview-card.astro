@@ -88,9 +88,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 		)
 	}
 	<TitleTag class="pc-title">
-		<a href={linkUrl} class="pc-title-link">
-			<slot name="preview-title" />
-		</a>
+		<a href={linkUrl} class="pc-title-link"><slot name="preview-title" /></a>
 		{
 			titleMultilingual ? (
 				<div class="pc-title-ml">

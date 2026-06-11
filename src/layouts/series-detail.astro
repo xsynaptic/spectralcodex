@@ -82,9 +82,9 @@ const t = getTranslations();
 					{
 						wordCount && wordCount > 0 ? (
 							<DividedItem>
-								<span>
-									{t('content.meta.wordCount.label')}: {formatNumber({ number: wordCount })}
-								</span>
+								<span
+									set:html={`${t('content.meta.wordCount.label')}: ${formatNumber({ number: wordCount })}`}
+								/>
 							</DividedItem>
 						) : undefined
 					}

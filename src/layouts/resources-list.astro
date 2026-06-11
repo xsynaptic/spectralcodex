@@ -54,9 +54,10 @@ const description = t(`collection.resources.description`);
 							<ListColumnItem>
 								<Link href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Link>{' '}
 								{entry.data._locationCount || entry.data._postCount ? (
-									<span class="text-sm text-gray-500">
-										({Number(entry.data._locationCount) + Number(entry.data._postCount)})
-									</span>
+									<span
+										class="text-sm text-gray-500"
+										set:html={`(${Number(entry.data._locationCount) + Number(entry.data._postCount)})`}
+									/>
 								) : undefined}
 							</ListColumnItem>
 						))}
