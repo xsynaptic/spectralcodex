@@ -2,8 +2,6 @@
 import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
-import { transformMarkdown } from '@xsynaptic/unified-tools';
-
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -18,6 +16,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
@@ -95,7 +94,7 @@ const { imageProps, placeholderProps } = await getImageProps();
 			<AuthorCard />
 		</CardFrame>
 		<Prose>
-			<Fragment set:html={transformMarkdown({ input: t('author.description') })} />
+			<Fragment set:html={renderMarkdownInline(t('author.description'))} />
 		</Prose>
 	</div>
 </ContentSection>

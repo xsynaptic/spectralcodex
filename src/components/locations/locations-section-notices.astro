@@ -2,7 +2,6 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
-import { transformMarkdown } from '@xsynaptic/unified-tools';
 import * as R from 'remeda';
 
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
@@ -10,6 +9,7 @@ import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 import ContentSection from '#components/content/content-section.astro';
 import AlertBox from '#components/parts/alert-box.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -38,25 +38,25 @@ const t = getTranslations();
 		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
 			{showVanishedNotice ? (
 				<AlertBox status="warning">
-					<Fragment set:html={transformMarkdown({ input: t('notice.vanished') })} />
+					<Fragment set:html={renderMarkdownInline(t('notice.vanished'))} />
 					{showChinese ? (
-						<Fragment set:html={transformMarkdown({ input: t('notice.vanished', langCode) })} />
+						<Fragment set:html={renderMarkdownInline(t('notice.vanished', langCode))} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}
 			{showDangerNotice && !showVanishedNotice ? (
 				<AlertBox status="warning">
-					<Fragment set:html={transformMarkdown({ input: t('notice.danger') })} />
+					<Fragment set:html={renderMarkdownInline(t('notice.danger'))} />
 					{showChinese ? (
-						<Fragment set:html={transformMarkdown({ input: t('notice.danger', langCode) })} />
+						<Fragment set:html={renderMarkdownInline(t('notice.danger', langCode))} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}
 			{entry.data.entryQuality <= 1 ? (
 				<AlertBox status="warning">
-					<Fragment set:html={transformMarkdown({ input: t('notice.quality') })} />
+					<Fragment set:html={renderMarkdownInline(t('notice.quality'))} />
 					{showChinese ? (
-						<Fragment set:html={transformMarkdown({ input: t('notice.quality', langCode) })} />
+						<Fragment set:html={renderMarkdownInline(t('notice.quality', langCode))} />
 					) : undefined}
 				</AlertBox>
 			) : undefined}

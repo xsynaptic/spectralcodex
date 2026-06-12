@@ -1,5 +1,6 @@
-import { stylizeText } from '@xsynaptic/unified-tools';
 import { z } from 'zod';
+
+import { refineTypography } from '#lib/utils/text.ts';
 
 // Title schema; stylized text with a reasonable upper limit
 const TITLE_CHARACTER_LENGTH = 80;
@@ -9,7 +10,7 @@ export const TitleSchema = z
 	.max(TITLE_CHARACTER_LENGTH, {
 		message: `Titles must be ${String(TITLE_CHARACTER_LENGTH)} characters or fewer.`,
 	})
-	.transform((value) => stylizeText(value).trim());
+	.transform((value) => refineTypography(value).trim());
 
 /**
  * Date schema

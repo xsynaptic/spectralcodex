@@ -82,3 +82,17 @@ export function formatStringTemplate(
 ): string {
 	return template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
 }
+
+// Typographic refinement for short text: smart quotes, en/em dashes, ellipses
+// This negates the need for a full-blown unified pipeline for titles and such
+export function refineTypography(input: string): string {
+	let value = input;
+	// Dashes: --- to em, -- to en (longest first)
+	value = value.replaceAll('---', '—').replaceAll('--', '–');
+	value = value.replaceAll('...', '…');
+	// Double quotes: opening after start/space/bracket/dash, otherwise closing
+	value = value.replaceAll(/(^|[\s([{<–—])"/g, '$1“').replaceAll('"', '”');
+	// Single quotes: opening in the same positions, otherwise apostrophe or closing
+	value = value.replaceAll(/(^|[\s([{<–—])'/g, '$1‘').replaceAll("'", '’');
+	return value;
+}

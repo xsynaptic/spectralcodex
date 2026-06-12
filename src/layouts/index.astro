@@ -1,8 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import { transformMarkdown } from '@xsynaptic/unified-tools';
-
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
@@ -23,6 +21,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
@@ -124,14 +123,10 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			<AuthorCard />
 		</CardFrame>
 		<Prose>
+			<p set:html={renderMarkdownInline(t('index.introduction'))} />
 			<p
-				set:html={transformMarkdown({
-					input: t('index.introduction'),
-				})}
-			/>
-			<p
-				set:html={transformMarkdown({
-					input: formatStringTemplate(t('index.overview'), {
+				set:html={renderMarkdownInline(
+					formatStringTemplate(t('index.overview'), {
 						locationsCount: contentStats.locations.itemCount,
 						locationsWithImagesCount: contentStats.locations.withImages,
 						postsCount: contentStats.posts.itemCount,
@@ -141,7 +136,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 						linksCount: contentStats.links.itemCount,
 						totalWordCount: contentStats.total.wordCount,
 					}),
-				})}
+				)}
 			/>
 		</Prose>
 	</ContentSection>
@@ -160,10 +155,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				>{t('collection.themes.labelPlural')}</Link
 			></Fragment
 		>
-		<Fragment
-			slot="section-description"
-			set:html={transformMarkdown({ input: t('index.themes') })}
-		/>
+		<Fragment slot="section-description" set:html={renderMarkdownInline(t('index.themes'))} />
 		<PreviewGrid
 			items={themesCatalogItems}
 			showLocations={true}
@@ -177,10 +169,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				>{t('collection.series.labelPlural')}</Link
 			></Fragment
 		>
-		<Fragment
-			slot="section-description"
-			set:html={transformMarkdown({ input: t('index.series') })}
-		/>
+		<Fragment slot="section-description" set:html={renderMarkdownInline(t('index.series'))} />
 		<PreviewGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 </MainSite>

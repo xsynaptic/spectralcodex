@@ -1,12 +1,11 @@
 ---
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 
-import { transformMarkdown } from '@xsynaptic/unified-tools';
-
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import SectionMap from '#components/sections/section-map.astro';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { getSeoHideSearch } from '#lib/utils/seo.ts';
 
 type Props = MapComponentData;
@@ -22,7 +21,7 @@ const description = 'Points in the database that still require visitation and do
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description" set:html={transformMarkdown({ input: description })} />
+		<Fragment slot="section-description" set:html={renderMarkdownInline(description)} />
 	</ContentSection>
 	<SectionMap mapData={mapData} />
 </MainSite>

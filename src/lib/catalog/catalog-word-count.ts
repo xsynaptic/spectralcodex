@@ -2,12 +2,13 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
-import { stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { stripTags } from '@xsynaptic/unified-tools';
 import { countWords } from '@xsynaptic/word-count';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS } from '#constants.ts';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
@@ -22,7 +23,7 @@ function computeWordCount(body: string): number {
 	return R.pipe(
 		body,
 		(body) => stripMdxComponents(body, MDX_COMPONENTS),
-		(body) => transformMarkdown({ input: body }),
+		(body) => renderMarkdownInline(body),
 		stripTags,
 		countWords,
 	);

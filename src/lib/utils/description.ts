@@ -1,10 +1,11 @@
 import { hashShort } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
-import { sanitizeHtml, stripTags, transformMarkdown } from '@xsynaptic/unified-tools';
+import { sanitizeHtml, stripTags } from '@xsynaptic/unified-tools';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS } from '#constants.ts';
+import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
 interface DescriptionRendered {
@@ -19,10 +20,11 @@ interface DescriptionRendered {
 const wordCountBuffer = 150;
 const wordCountFinal = 100;
 
-/**
- * Tags to allow in description HTML
- */
-const descriptionTagNames = ['em', 'strong'] satisfies Array<string>;
+// Allow em/strong plus span so CJK wrapping survives in the rendered excerpt (shown in the map)
+const descriptionSchema = {
+	tagNames: ['em', 'strong', 'span'],
+	attributes: { span: ['className'] },
+};
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'description-rendered');
 
@@ -58,15 +60,15 @@ export async function getDescriptionRendered(entry: {
 
 	if (!source) return undefined;
 
-	const cacheKey = hashShort({ data: { id: entry.id, source } });
+	const cacheKey = hashShort({ data: { id: entry.id, source, version: 2 } });
 
 	const cached = await cacheInstance.get<DescriptionRendered>(cacheKey);
 
 	if (cached) return cached;
 
-	const rawHtml = transformMarkdown({ input: source });
+	const rawHtml = renderMarkdownInline(source);
 
-	const html = sanitizeHtml(rawHtml, { tagNames: descriptionTagNames });
+	const html = sanitizeHtml(rawHtml, descriptionSchema);
 	const stripped = stripTags(rawHtml).replaceAll(/\s+/g, ' ').trim();
 	const text = textClipper(stripped, { wordCount: wordCountFinal });
 

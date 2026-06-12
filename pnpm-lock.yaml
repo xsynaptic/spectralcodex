@@ -113,8 +113,8 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(satteri@0.8.1)
       '@xsynaptic/satteri-wrap-cjk':
-        specifier: ^0.1.0
-        version: 0.1.0(satteri@0.8.1)
+        specifier: ^0.1.1
+        version: 0.1.1(satteri@0.8.1)
       '@xsynaptic/stylelint-config':
         specifier: ^0.1.1
         version: 0.1.1(stylelint-order@8.1.1(stylelint@17.13.0(typescript@6.0.3)))(stylelint@17.13.0(typescript@6.0.3))
@@ -2787,8 +2787,8 @@ packages:
     peerDependencies:
       satteri: ^0.8.1
 
-  '@xsynaptic/satteri-wrap-cjk@0.1.0':
-    resolution: {integrity: sha512-aEn130WVrg3fNlcvMQhrMWbRHgOmAhNIgXOuPmKW20lHetwtbZfMKbnOQIMTLwkWD9x7hncHLC7ryNnS2EEJ0Q==}
+  '@xsynaptic/satteri-wrap-cjk@0.1.1':
+    resolution: {integrity: sha512-gDgKK1Tzt1oGYITYSSZzqOllUl9BvsQINnLNJGDV4ar584QdTYeWOAC+fb/CuqVuO+vURHfiLbYsZIVVVKf1sA==}
     peerDependencies:
       satteri: ^0.8.1
 
@@ -10396,7 +10396,7 @@ snapshots:
       satteri: 0.8.1
       zod: 4.4.3
 
-  '@xsynaptic/satteri-wrap-cjk@0.1.0(satteri@0.8.1)':
+  '@xsynaptic/satteri-wrap-cjk@0.1.1(satteri@0.8.1)':
     dependencies:
       '@types/hast': 3.0.4
       hastscript: 9.0.1
