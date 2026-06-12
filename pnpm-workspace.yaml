@@ -21,6 +21,9 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/unified-tools'
   - '@xsynaptic/unpic-imagor'
   - '@xsynaptic/word-count'
+  # 0.35.1 fixes the broken types export from 0.35.0; <24h old at time of upgrade
+  - 'sharp'
+  - '@img/sharp-*'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true

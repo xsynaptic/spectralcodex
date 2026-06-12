@@ -16,14 +16,14 @@ function validateCoordinates(coordinates: [number, number]) {
 			message: `Coordinates should be an array of two numbers.`,
 		};
 	}
-	if (coordinates[0] < -180 || coordinates[0] > 180) {
+	if (Math.abs(coordinates[0]) > 180) {
 		return {
 			code: 'custom' as const,
 			input: coordinates,
 			message: `Longitude should be between 180 and -180; value was "${String(coordinates[0])}".`,
 		};
 	}
-	if (coordinates[1] < -90 || coordinates[1] > 90) {
+	if (Math.abs(coordinates[1]) > 90) {
 		return {
 			code: 'custom' as const,
 			input: coordinates,

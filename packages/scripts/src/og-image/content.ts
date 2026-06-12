@@ -78,8 +78,8 @@ function getImageFeaturedData({
 const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
 
 function getArchivesTitle(id: string): string {
-	const year = Number(id.split('-')[0]);
-	const monthPart = id.split('-')[1];
+	const year = Number(id.split('-', 1)[0]);
+	const monthPart = id.split('-', 2)[1];
 
 	if (!monthPart) return `Archives: ${String(year)}`;
 

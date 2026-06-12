@@ -404,7 +404,6 @@ if (!customElements.get('menu-navigation')) {
 	customElements.define('menu-navigation', NavMenu);
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
 
 declare global {

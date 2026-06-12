@@ -43,7 +43,6 @@ if (!customElements.get('image-carousel')) {
 	customElements.define('image-carousel', ImageCarousel);
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
 
 declare global {

@@ -32,6 +32,8 @@ export default getConfig(
 				'@typescript-eslint/no-misused-promises': isStrictLint ? 'error' : 'off',
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
+				// `WebSite` etc. intentionally mirror schema.org's canonical type names
+				'unicorn/consistent-compound-words': 'off',
 			},
 		},
 		// Opt out of recommended-natural sort rules to avoid churn in this mature project;

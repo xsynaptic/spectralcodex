@@ -32,5 +32,4 @@ declare global {
 	}
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers -- this must be here for the previous declarations to be picked up by the MDX language server
 export {};

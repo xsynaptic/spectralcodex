@@ -20,10 +20,9 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 			// localStorage unavailable
 		}
 
-		let mode =
-			stored === 'auto' || stored === 'light' || stored === 'dark'
-				? stored
-				: (document.currentScript.dataset.defaultMode ?? 'auto');
+		let mode = ['auto', 'light', 'dark'].includes(stored)
+			? stored
+			: (document.currentScript.dataset.defaultMode ?? 'auto');
 
 		if (mode === 'auto') {
 			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';

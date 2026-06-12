@@ -114,10 +114,12 @@ export const MapPopupItemSchema = z
 		[MapDataKeys.Safety]: value[MapDataKeyMap[MapDataKeys.Safety]],
 		[MapDataKeys.GoogleMapsUrl]: value[MapDataKeyMap[MapDataKeys.GoogleMapsUrl]],
 		[MapDataKeys.WikipediaUrl]: value[MapDataKeyMap[MapDataKeys.WikipediaUrl]],
-		...(value[MapDataKeyMap[MapDataKeys.ImageSrc]] === undefined ||
-		value[MapDataKeyMap[MapDataKeys.ImageSrcSet]] === undefined ||
-		value[MapDataKeyMap[MapDataKeys.ImageHeight]] === undefined ||
-		value[MapDataKeyMap[MapDataKeys.ImageWidth]] === undefined
+		...([
+			value[MapDataKeyMap[MapDataKeys.ImageSrc]],
+			value[MapDataKeyMap[MapDataKeys.ImageSrcSet]],
+			value[MapDataKeyMap[MapDataKeys.ImageHeight]],
+			value[MapDataKeyMap[MapDataKeys.ImageWidth]],
+		].includes(undefined)
 			? { [MapDataKeys.Image]: undefined }
 			: {
 					[MapDataKeys.Image]: {

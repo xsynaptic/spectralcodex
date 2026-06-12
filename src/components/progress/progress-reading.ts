@@ -85,7 +85,6 @@ if (!customElements.get('progress-reading')) {
 	customElements.define('progress-reading', ProgressReading);
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
 export {};
 
 declare global {
