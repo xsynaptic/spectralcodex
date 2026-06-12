@@ -20,6 +20,7 @@ import SectionBacklinks from '#components/sections/section-backlinks.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { getNoteSchema } from '#lib/collections/notes/notes-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -49,6 +50,8 @@ const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeat
 const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
 
 const { Content } = await render(entry);
+
+const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 ---
 
 <MainSite
@@ -57,16 +60,14 @@ const { Content } = await render(entry);
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		description: await getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			id: entry.id,
-			alt: entry.data.title,
-		}),
+		image: seoImage,
 		...getSeoArticleProps({
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
+	schemas={await getNoteSchema(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
 	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
