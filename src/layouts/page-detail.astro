@@ -9,6 +9,7 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
+import { menuFooterItems } from '#components/menu/menu-footer.ts';
 import DividedItem from '#components/parts/divided-item.astro';
 import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
@@ -19,6 +20,7 @@ import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { MicroformatClassNames } from '#lib/utils/microformats.ts';
+import { buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
@@ -26,6 +28,16 @@ interface Props {
 }
 
 const { entry } = Astro.props;
+
+// The about page is the canonical home of the Person entity, so emit it with sameAs links
+const schemas =
+	entry.id === 'about'
+		? [
+				buildAuthorSchema({
+					sameAs: menuFooterItems.filter((item) => item.rel === 'me').map((item) => item.url),
+				}),
+			]
+		: [];
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -51,6 +63,7 @@ const { Content } = await render(entry);
 		}),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
+	schemas={schemas}
 	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle

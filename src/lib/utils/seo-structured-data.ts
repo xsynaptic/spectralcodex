@@ -40,6 +40,7 @@ interface Person extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['Person'];
 	name: string;
 	url: string;
+	sameAs?: ReadonlyArray<string>;
 }
 
 interface Place extends IdReference {
@@ -94,7 +95,7 @@ export function buildWebSiteSchema(): WebSite {
 	};
 }
 
-export function buildAuthorSchema(): Person {
+export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }): Person {
 	const t = getTranslations();
 
 	return {
@@ -102,6 +103,7 @@ export function buildAuthorSchema(): Person {
 		'@id': ids.person,
 		name: t('author.name'),
 		url: aboutUrl,
+		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
 	};
 }
 
