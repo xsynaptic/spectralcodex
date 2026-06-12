@@ -1,6 +1,6 @@
 services:
   image-cache:
-    image: nginx:1.31.1-alpine
+    image: nginx:1.30.2-alpine
     container_name: dev-image-cache
     ports:
       - '3100:80'
