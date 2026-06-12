@@ -3,7 +3,7 @@
 services:
   # One-shot sidecar: chowns named volumes so non-root caddy can use them; only used once
   caddy-init:
-    image: alpine:3.23
+    image: alpine:3.24
     command: chown -R 1000:1000 /data /config
     volumes:
       - caddy_data:/data
@@ -11,7 +11,7 @@ services:
     restart: 'no'
 
   caddy:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.11.4-alpine
     user: '1000:1000'
     depends_on:
       caddy-init:

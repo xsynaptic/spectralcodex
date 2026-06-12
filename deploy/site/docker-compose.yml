@@ -1,6 +1,6 @@
 services:
   image-cache:
-    image: nginx:1.29.8-alpine
+    image: nginx:1.31.1-alpine
     container_name: spectralcodex-image-cache
     init: true
     read_only: true
