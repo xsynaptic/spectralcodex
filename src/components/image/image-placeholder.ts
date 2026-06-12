@@ -88,7 +88,7 @@ async function createImagePlaceholderFunction() {
 		const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
 
 		const cacheKey = hash({
-			data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime },
+			data: { imageId, aspectRatio: normalizedRatio, fit, position, highQuality, mtime, version: 1 },
 		});
 
 		const cached = await cache.get<string | undefined>(cacheKey);

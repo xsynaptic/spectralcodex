@@ -41,6 +41,7 @@ export async function getWordCount(
 			id: entry.id,
 			body: entry.body,
 			description: 'description' in entry.data ? entry.data.description : '',
+			version: 1,
 		},
 	});
 

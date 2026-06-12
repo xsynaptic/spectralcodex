@@ -158,7 +158,7 @@ export const images = defineCollection({
 			await exiftool.end();
 		},
 		dataHandler: async ({ id, filePathRelative, modifiedTime }) => {
-			const cacheKey = hash({ filePath: filePathRelative, mtime: modifiedTime });
+			const cacheKey = hash({ filePath: filePathRelative, mtime: modifiedTime, version: 1 });
 			const cached = await imageMetadataCache.get<ImageMetadataCached>(cacheKey);
 
 			let dimensions: { width: number; height: number };

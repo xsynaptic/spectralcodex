@@ -68,6 +68,7 @@ function generateCacheKey({
 				id: entry.id,
 				regions: entry.data.regions?.map(({ id }) => id),
 			})),
+			version: 1,
 		},
 	});
 }
