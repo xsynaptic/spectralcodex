@@ -1,11 +1,9 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
 import { getPublicId, loadDataStore } from '../shared/data-store.js';
-import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
+import { safelyCreateDirectory } from '../shared/utils.js';
 import { getGitFileDates } from './git-file-dates.js';
 
 interface SitemapLastmodOptions {
@@ -95,34 +93,4 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 	}
 
 	console.log(chalk.gray(`Output: ${outputPath}`));
-}
-
-// CLI entry point
-const scriptPath = process.argv[1] ?? '';
-
-if (scriptPath.includes('sitemap-lastmod')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'content-path': { type: 'string', default: 'packages/content' },
-			'data-store-path': { type: 'string', default: '.astro/data-store.json' },
-			'output-path': { type: 'string', default: '.cache/sitemap-lastmod.json' },
-			'site-url': { type: 'string' },
-		},
-	});
-
-	const siteUrl = values['site-url'] ?? process.env.PROD_SERVER_URL;
-
-	if (!siteUrl) {
-		console.error(chalk.red('Missing site URL: pass --site-url or set PROD_SERVER_URL'));
-		process.exit(1);
-	}
-
-	await generateSitemapLastmod({
-		rootPath: findWorkspaceRoot(),
-		siteUrl,
-		contentPath: values['content-path'],
-		dataStorePath: values['data-store-path'],
-		outputPath: values['output-path'],
-	});
 }

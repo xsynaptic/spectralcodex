@@ -1,4 +1,3 @@
-#!/usr/bin/env tsx
 /**
  * Extract image URLs from built HTML for cache warming
  * Run after `astro build` to generate a manifest of all image URLs
@@ -10,7 +9,6 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
 import { safelyCreateDirectory } from '../shared/utils.js';
 
@@ -106,32 +104,4 @@ export function generateManifest(options: {
 	}
 
 	return { total: sortedUrls.length, newCount: newUrls.length, existingCount };
-}
-
-// CLI entry point
-if (process.argv[1]?.endsWith('manifest.ts')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'dist-path': { type: 'string', default: 'dist' },
-			'output-path': { type: 'string', default: 'dist/cache-manifest.json' },
-			'url-pattern': { type: 'string' },
-			'main-path': { type: 'string' },
-		},
-	});
-
-	const urlPattern = values['url-pattern'] ?? process.env.IMAGE_SERVER_URL;
-	if (!urlPattern) {
-		console.error(
-			'Error: URL pattern required. Set IMAGE_SERVER_URL in .env or pass --url-pattern',
-		);
-		process.exit(1);
-	}
-
-	generateManifest({
-		distPath: values['dist-path'],
-		outputPath: values['output-path'],
-		urlPattern,
-		...(values['main-path'] && { mainPath: values['main-path'] }),
-	});
 }

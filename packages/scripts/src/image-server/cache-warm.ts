@@ -1,10 +1,8 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
-import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 import { loadDeployConfig } from '../deploy/deploy-config.js';
-import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
+import { ensureSshKeychain } from '../shared/utils.js';
 
 interface CacheWarmOptions {
 	rootPath: string;
@@ -114,25 +112,4 @@ export async function warmImageCacheNew(options: CacheWarmOptions): Promise<void
 	if (config.dryRun) console.log(chalk.yellow('  DRY RUN'));
 
 	await runWarmScript(config, 'cache-manifest-new.json');
-}
-
-// CLI entry point
-if (process.argv[1]?.endsWith('cache-warm.ts')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'nginx-url': { type: 'string', default: 'http://localhost:3100' },
-			concurrency: { type: 'string', default: '2' },
-			random: { type: 'boolean', default: false },
-			'dry-run': { type: 'boolean', default: false },
-		},
-	});
-
-	await warmImageCache({
-		rootPath: findWorkspaceRoot(),
-		nginxUrl: values['nginx-url'],
-		concurrency: Number(values.concurrency),
-		random: values.random,
-		dryRun: values['dry-run'],
-	});
 }

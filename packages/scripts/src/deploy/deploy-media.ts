@@ -1,10 +1,7 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
-import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 import { rsyncTo } from './rsync-exec.js';
 
@@ -50,25 +47,4 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
-}
-
-// CLI entry point
-const scriptPath = process.argv[1] ?? '';
-
-if (scriptPath.includes('deploy-media')) {
-	const { values, positionals } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'dry-run': { type: 'boolean', default: false },
-		},
-		allowPositionals: true,
-	});
-
-	await ensureSshKeychain();
-
-	await deployMedia({
-		rootPath: findWorkspaceRoot(),
-		dryRun: values['dry-run'],
-		fast: positionals[0] === 'fast',
-	});
 }

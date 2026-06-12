@@ -170,10 +170,12 @@ export function recordCheckResult(
 	},
 ): void {
 	const now = new Date().toISOString();
-	const incrementsCount =
-		result.status === UrlStatusEnum.Missing ||
-		result.status === UrlStatusEnum.Error ||
-		result.status === UrlStatusEnum.Blocked;
+	const incrementStatuses: ReadonlyArray<UrlStatus> = [
+		UrlStatusEnum.Missing,
+		UrlStatusEnum.Error,
+		UrlStatusEnum.Blocked,
+	];
+	const incrementsCount = incrementStatuses.includes(result.status);
 	const checkCount = incrementsCount ? 'check_count + 1' : '0';
 
 	db.prepare(

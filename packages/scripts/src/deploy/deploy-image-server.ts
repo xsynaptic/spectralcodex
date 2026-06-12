@@ -9,7 +9,7 @@ import { rsyncTo, sshExec } from './rsync-exec.js';
 
 const PROJECT_SLUG = 'spectralcodex';
 
-export async function deployImageServer({
+async function deployImageServer({
 	rootPath,
 	dryRun = false,
 }: {
@@ -86,20 +86,16 @@ export async function deployImageServer({
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }
 
-const scriptPath = process.argv[1] ?? '';
+const { values } = parseArgs({
+	args: process.argv.slice(2),
+	options: {
+		'dry-run': { type: 'boolean', default: false },
+	},
+});
 
-if (scriptPath.includes('deploy-image-server')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'dry-run': { type: 'boolean', default: false },
-		},
-	});
+await ensureSshKeychain();
 
-	await ensureSshKeychain();
-
-	await deployImageServer({
-		rootPath: findWorkspaceRoot(),
-		dryRun: values['dry-run'],
-	});
-}
+await deployImageServer({
+	rootPath: findWorkspaceRoot(),
+	dryRun: values['dry-run'],
+});

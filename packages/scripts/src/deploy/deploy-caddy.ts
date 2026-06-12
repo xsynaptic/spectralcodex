@@ -1,9 +1,6 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
-import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { loadDeployConfig } from './deploy-config.js';
 import { rsyncTo, sshExec } from './rsync-exec.js';
 
@@ -54,23 +51,4 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 	}
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
-}
-
-// CLI entry point
-const scriptPath = process.argv[1] ?? '';
-
-if (scriptPath.includes('deploy-caddy')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'dry-run': { type: 'boolean', default: false },
-		},
-	});
-
-	await ensureSshKeychain();
-
-	await deployCaddy({
-		rootPath: findWorkspaceRoot(),
-		dryRun: values['dry-run'],
-	});
 }

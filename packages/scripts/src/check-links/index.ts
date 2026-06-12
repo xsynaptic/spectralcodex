@@ -52,7 +52,7 @@ const { values } = parseArgs({
 /**
  * Collections that may contain external links
  */
-export const LINK_COLLECTIONS = [
+const LINK_COLLECTIONS = [
 	'locations',
 	'notes',
 	'pages',

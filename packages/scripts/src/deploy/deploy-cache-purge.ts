@@ -1,8 +1,4 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
-import { parseArgs } from 'node:util';
-
-import { findWorkspaceRoot } from '../shared/utils.js';
 
 interface PurgeCacheOptions {
 	rootPath: string;
@@ -54,21 +50,4 @@ export async function purgeCache(options: PurgeCacheOptions): Promise<void> {
 	}
 
 	console.log(chalk.green('Cache purged'));
-}
-
-// CLI entry point
-const scriptPath = process.argv[1] ?? '';
-
-if (scriptPath.includes('deploy-cache-purge')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'dry-run': { type: 'boolean', default: false },
-		},
-	});
-
-	await purgeCache({
-		rootPath: findWorkspaceRoot(),
-		dryRun: values['dry-run'],
-	});
 }

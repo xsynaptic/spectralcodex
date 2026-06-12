@@ -1,6 +1,4 @@
-#!/usr/bin/env tsx
 import chalk from 'chalk';
-import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
 const USER_AGENT = 'SCXCacheWarmer/1.0 (+https://spectralcodex.com)';
@@ -161,26 +159,4 @@ export async function warmCache(options: WarmCacheOptions = {}): Promise<void> {
 		console.log(chalk.yellow('Non-200 responses:'));
 		console.log(failures.join('\n'));
 	}
-}
-
-// CLI entry point
-const scriptPath = process.argv[1] ?? '';
-
-if (scriptPath.includes('deploy-cache-warm')) {
-	const { values } = parseArgs({
-		args: process.argv.slice(2),
-		options: {
-			'base-url': { type: 'string' },
-			concurrency: { type: 'string', default: '12' },
-			limit: { type: 'string' },
-			'dry-run': { type: 'boolean', default: false },
-		},
-	});
-
-	await warmCache({
-		...(values['base-url'] ? { baseUrl: values['base-url'] } : {}),
-		concurrency: Number(values.concurrency),
-		...(values.limit ? { limit: Number(values.limit) } : {}),
-		dryRun: values['dry-run'],
-	});
 }
