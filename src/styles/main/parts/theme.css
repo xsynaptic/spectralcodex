@@ -48,18 +48,18 @@
 	--color-accent-900: #2b434e;
 	--color-accent-950: #182a34;
 
-	/* Highlight colors: cumin */
-	--color-highlight-50: #fef9ec;
-	--color-highlight-100: #faeecb;
-	--color-highlight-200: #f4da93;
-	--color-highlight-300: #efc15a;
-	--color-highlight-400: #ebab34;
-	--color-highlight-500: #e48b1c;
-	--color-highlight-600: #c96916;
-	--color-highlight-700: #a74a16;
-	--color-highlight-800: #8f3d19;
-	--color-highlight-900: #703017;
-	--color-highlight-950: #401708;
+	/* Highlight colors: honey */
+	--color-highlight-50: #fdf7f0;
+	--color-highlight-100: #fff3e1;
+	--color-highlight-200: #f8dcb9;
+	--color-highlight-300: #e9bc84;
+	--color-highlight-400: #d59e56;
+	--color-highlight-500: #bf8432;
+	--color-highlight-600: #ab711e;
+	--color-highlight-700: #8e5b13;
+	--color-highlight-800: #744a11;
+	--color-highlight-900: #603e14;
+	--color-highlight-950: #3d260c;
 
 	/* Alternate colors: lima */
 	--color-alternate-50: #f5fee7;
