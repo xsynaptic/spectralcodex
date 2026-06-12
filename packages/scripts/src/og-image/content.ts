@@ -1,12 +1,5 @@
-import type { ImageFeatured } from '@spectralcodex/shared/schemas';
-
 import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
-import {
-	ContentCollectionsEnum,
-	ImageFeaturedSchema,
-	RegionsSchema,
-	ThemesSchema,
-} from '@spectralcodex/shared/schemas';
+import { ContentCollectionsEnum, RegionsSchema, ThemesSchema } from '@spectralcodex/shared/schemas';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -21,37 +14,30 @@ import {
 	getPublicId,
 	loadDataStore,
 } from '../shared/data-store.js';
+import { extractImageFeaturedIds } from '../shared/images.js';
+import { buildArchiveImageIndex, getArchivesTitle } from './archives.js';
 import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
-
-/**
- * Featured image handling
- */
-function getImageFeaturedId(imageFeatured: ImageFeatured | undefined): string | undefined {
-	if (!imageFeatured) return undefined;
-
-	if (typeof imageFeatured === 'string') return imageFeatured;
-
-	const firstItem = imageFeatured[0];
-
-	if (!firstItem) return undefined;
-
-	return typeof firstItem === 'object' && 'id' in firstItem ? firstItem.id : firstItem;
-}
 
 function getImageFeaturedData({
 	entry,
 	collection,
 	regionParentMap,
+	archiveImageIndex,
 }: {
 	entry: DataStoreEntry;
 	collection: string;
 	regionParentMap?: RegionParentMap;
+	archiveImageIndex?: Map<string, string>;
 }): { imageFeaturedId: string; isFallback: boolean } {
-	const imageFeatured = ImageFeaturedSchema.optional().parse(entry.data.imageFeatured);
-
-	const imageFeaturedId = getImageFeaturedId(imageFeatured);
+	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
 
 	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
+
+	if (collection === ContentCollectionsEnum.Archives && archiveImageIndex) {
+		const derivedImageId = archiveImageIndex.get(getPublicId(entry).replace('/', '-'));
+
+		if (derivedImageId) return { imageFeaturedId: derivedImageId, isFallback: false };
+	}
 
 	return {
 		imageFeaturedId: getFallbackImageId({
@@ -70,22 +56,6 @@ function getImageFeaturedData({
 		}),
 		isFallback: true,
 	};
-}
-
-/**
- * Archives title format: "Archives: March 2024" or "Archives: 2024"
- */
-const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
-
-function getArchivesTitle(id: string): string {
-	const year = Number(id.split('-', 1)[0]);
-	const monthPart = id.split('-', 2)[1];
-
-	if (!monthPart) return `Archives: ${String(year)}`;
-
-	const month = Number(monthPart);
-
-	return `Archives: ${monthFormatter.format(new Date(year, month - 1))} ${String(year)}`;
 }
 
 /**
@@ -127,8 +97,13 @@ function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 /**
  * Build a map from OG image filename (entry id) to fully-resolved entry derived from the data store
  */
-function buildDataStoreEntries(dataStorePath: string): Map<string, OpenGraphContentEntry> {
+function buildDataStoreEntries(dataStorePath: string): {
+	entries: Map<string, OpenGraphContentEntry>;
+	archiveImageIndex: Map<string, string>;
+} {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
+
+	const archiveImageIndex = buildArchiveImageIndex(collections);
 
 	const entries = new Map<string, OpenGraphContentEntry>();
 
@@ -166,7 +141,12 @@ function buildDataStoreEntries(dataStorePath: string): Map<string, OpenGraphCont
 				continue;
 			}
 
-			const imageFeaturedData = getImageFeaturedData({ entry, collection, regionParentMap });
+			const imageFeaturedData = getImageFeaturedData({
+				entry,
+				collection,
+				regionParentMap,
+				archiveImageIndex,
+			});
 
 			entries.set(id, {
 				collection,
@@ -190,7 +170,7 @@ function buildDataStoreEntries(dataStorePath: string): Map<string, OpenGraphCont
 		}
 	}
 
-	return entries;
+	return { entries, archiveImageIndex };
 }
 
 /**
@@ -246,10 +226,12 @@ function resolveEntry({
 	filename,
 	dataStoreEntries,
 	indexEntries,
+	archiveImageIndex,
 }: {
 	filename: string;
 	dataStoreEntries: Map<string, OpenGraphContentEntry>;
 	indexEntries: Map<string, OpenGraphContentEntry>;
+	archiveImageIndex: Map<string, string>;
 }): OpenGraphContentEntry | undefined {
 	const fromDataStore = dataStoreEntries.get(filename);
 
@@ -261,16 +243,20 @@ function resolveEntry({
 
 	// Synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
 	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
+		const derivedImageId = archiveImageIndex.get(filename);
+
 		return {
 			id: filename,
 			collection: ContentCollectionsEnum.Archives,
 			digest: `archives-${filename}`,
 			title: getArchivesTitle(filename),
-			imageFeaturedId: getFallbackImageId({
-				id: filename,
-				collection: ContentCollectionsEnum.Archives,
-			}),
-			isFallback: true,
+			imageFeaturedId:
+				derivedImageId ??
+				getFallbackImageId({
+					id: filename,
+					collection: ContentCollectionsEnum.Archives,
+				}),
+			isFallback: !derivedImageId,
 		};
 	}
 
@@ -288,7 +274,7 @@ export function getBuiltEntries({
 	dataStorePath: string;
 	distPath: string;
 }): { entries: Array<OpenGraphContentEntry>; unresolved: Array<string> } {
-	const dataStoreEntries = buildDataStoreEntries(dataStorePath);
+	const { entries: dataStoreEntries, archiveImageIndex } = buildDataStoreEntries(dataStorePath);
 	const indexEntries = buildIndexEntries();
 	const distFilenames = extractBuiltFilenames(distPath);
 
@@ -296,7 +282,7 @@ export function getBuiltEntries({
 	const unresolved: Array<string> = [];
 
 	for (const filename of distFilenames) {
-		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries });
+		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries, archiveImageIndex });
 
 		if (entry) {
 			entries.push(entry);
