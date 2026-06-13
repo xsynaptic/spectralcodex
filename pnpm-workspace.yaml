@@ -11,6 +11,8 @@ minimumReleaseAgeExclude:
   - 'astro'
   - '@astrojs/mdx'
   - '@astrojs/markdown-satteri'
+  - '@astrojs/node'
+  - '@astrojs/react'
   - 'satteri'
   - '@xsynaptic/astro-build-logger'
   - '@xsynaptic/eslint-config'
