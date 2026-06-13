@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deploy shared infra: root Caddyfile, Umami, Docker Compose services
-# Site-specific Caddy and image server live in deploy/site/scripts/deploy.sh
+# Site-specific Caddy and image server deploy via pnpm deploy-caddy / deploy-image-server
 set -euo pipefail
 
 # Load deploy/.env

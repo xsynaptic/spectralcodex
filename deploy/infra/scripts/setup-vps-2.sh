@@ -55,7 +55,7 @@ UMAMI_APP_SECRET=$(openssl rand -hex 32)
 EOF
   echo "Created /opt/server/.env with generated secrets"
   echo ""
-  echo "IMPORTANT: Copy these values to your local astro-infra/.env"
+  echo "IMPORTANT: Copy these values to your local deploy/.env"
   cat /opt/server/.env
 fi
 
@@ -63,6 +63,6 @@ echo ""
 echo "=== Phase 2 Complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Copy the secrets above to local astro-infra/.env"
-echo "  2. Deploy astro-infra: cd astro-infra && ./scripts/deploy.sh"
+echo "  1. Copy the secrets above to local deploy/.env"
+echo "  2. Deploy infra: bash deploy/infra/scripts/deploy.sh"
 echo "  3. Deploy projects (each project creates its own directories)"
