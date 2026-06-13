@@ -7,7 +7,7 @@ verifyDepsBeforeRun: error
 strictDepBuilds: true
 
 minimumReleaseAgeExclude:
-  # Astro 7 beta spike: these prereleases are <24h old; temporary exclusion
+  # Bypass the 24h guard while Astro 7 prereleases and @xsynaptic packages still churn
   - 'astro'
   - '@astrojs/mdx'
   - '@astrojs/markdown-satteri'
@@ -21,9 +21,6 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/unified-tools'
   - '@xsynaptic/unpic-imagor'
   - '@xsynaptic/word-count'
-  # 0.35.1 fixes the broken types export from 0.35.0; <24h old at time of upgrade
-  - 'sharp'
-  - '@img/sharp-*'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
