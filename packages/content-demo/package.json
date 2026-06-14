@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"check": "pnpm -w run check-content-demo",
-		"format": "pnpm -w run format-content-demo"
+		"fix": "pnpm -w run fix-content-demo"
 	},
 	"devDependencies": {
 		"astro": "7.0.0-beta.3",
