@@ -5,3 +5,9 @@ export const OPEN_GRAPH_IMAGE_FORMAT = 'jpg';
 
 // Destination path for Open Graph images
 export const OPEN_GRAPH_BASE_PATH = 'og';
+
+// Local build output directory for generated Open Graph images
+export const OPEN_GRAPH_OUTPUT_PATH = '.cache/og-image';
+
+// Keyv namespace (and JSON filename stem) for the Open Graph generation cache
+export const OPEN_GRAPH_CACHE_NAMESPACE = 'og-image-cache';

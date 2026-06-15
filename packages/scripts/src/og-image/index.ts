@@ -1,9 +1,11 @@
 #!/usr/bin/env tsx
 import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import {
+	OPEN_GRAPH_CACHE_NAMESPACE,
 	OPEN_GRAPH_IMAGE_FORMAT,
 	OPEN_GRAPH_IMAGE_HEIGHT,
 	OPEN_GRAPH_IMAGE_WIDTH,
+	OPEN_GRAPH_OUTPUT_PATH,
 } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import { rmSync } from 'node:fs';
@@ -39,7 +41,7 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: './.cache/og-image',
+			default: OPEN_GRAPH_OUTPUT_PATH,
 		},
 		'cache-path': {
 			type: 'string',
@@ -112,7 +114,11 @@ async function main() {
 
 	if (values['clear-cache']) {
 		const outputPath = path.resolve(rootPath, values['output-path']);
-		const cacheFile = path.resolve(rootPath, values['cache-path'], 'og-image-cache.json');
+		const cacheFile = path.resolve(
+			rootPath,
+			values['cache-path'],
+			`${OPEN_GRAPH_CACHE_NAMESPACE}.json`,
+		);
 		rmSync(outputPath, { force: true, recursive: true });
 		rmSync(cacheFile, { force: true });
 		console.log(chalk.yellow(`🗑️  Cleared OG image output and cache file`));
@@ -159,7 +165,7 @@ async function main() {
 	safelyCreateDirectory(outputPath);
 	safelyCreateDirectory(cachePath);
 
-	const cache = getFileCacheInstance(cachePath, 'og-image-cache');
+	const cache = getFileCacheInstance(cachePath, OPEN_GRAPH_CACHE_NAMESPACE);
 
 	// How many images should be processed concurrently?
 	const concurrencyLimit = pLimit(10);

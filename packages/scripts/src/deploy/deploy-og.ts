@@ -1,4 +1,8 @@
-import { OPEN_GRAPH_BASE_PATH, OPEN_GRAPH_IMAGE_FORMAT } from '@spectralcodex/shared/constants';
+import {
+	OPEN_GRAPH_BASE_PATH,
+	OPEN_GRAPH_IMAGE_FORMAT,
+	OPEN_GRAPH_OUTPUT_PATH,
+} from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 
@@ -16,7 +20,7 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 
 	const config = loadDeployConfig();
 
-	const ogImagePath = path.join(rootPath, '.cache/og-image');
+	const ogImagePath = path.join(rootPath, OPEN_GRAPH_OUTPUT_PATH);
 	const remoteOgPath = `${config.sitePath}/${OPEN_GRAPH_BASE_PATH}`;
 
 	console.log(chalk.blue('Syncing OpenGraph images...'));
