@@ -17,12 +17,11 @@ import { IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
-import { DateStringSchema } from '#lib/schemas/index.ts';
 
 const ImageExifDataSchema = z.object({
 	title: z.string(),
 	description: z.string(),
-	dateCreated: DateStringSchema.optional(),
+	dateCreated: z.coerce.date().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
 	lens: z.string().optional(),
