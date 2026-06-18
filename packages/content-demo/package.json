@@ -8,7 +8,7 @@
 		"fix": "pnpm -w run fix-content-demo"
 	},
 	"devDependencies": {
-		"astro": "7.0.0-beta.3",
+		"astro": "7.0.0-beta.5",
 		"mdxlint": "^1.0.0",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",

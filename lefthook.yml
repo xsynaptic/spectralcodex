@@ -1,0 +1,5 @@
+# Git hooks. Run `pnpm exec lefthook install` once to wire them into .git/hooks.
+pre-push:
+  commands:
+    quality-gate:
+      run: pnpm check
