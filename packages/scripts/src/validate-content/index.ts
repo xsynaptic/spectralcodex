@@ -92,7 +92,7 @@ switch (command) {
 	case 'location-overlap': {
 		checkLocationsOverlap(
 			getDataStoreCollection(collections, ['locations']),
-			Number.parseInt(values.threshold, 10),
+			Number(values.threshold),
 		);
 		break;
 	}
@@ -153,7 +153,7 @@ switch (command) {
 			checkLocationsRegions(getDataStoreCollection(collections, ['locations'])),
 			checkLocationsOverlap(
 				getDataStoreCollection(collections, ['locations']),
-				Number.parseInt(values.threshold, 10),
+				Number(values.threshold),
 			),
 			checkDivisionIds(getDataStoreCollection(collections, ['regions'])),
 		];

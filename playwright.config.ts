@@ -35,13 +35,11 @@ export default defineConfig({
 			name: 'chromium',
 		},
 	],
-	...(isProd
-		? {}
-		: {
-				webServer: {
-					command: `pnpm astro preview --port ${String(localPort)}`,
-					url: localURL,
-					reuseExistingServer: true,
-				},
-			}),
+	...(!isProd && {
+		webServer: {
+			command: `pnpm astro preview --port ${String(localPort)}`,
+			url: localURL,
+			reuseExistingServer: true,
+		},
+	}),
 });

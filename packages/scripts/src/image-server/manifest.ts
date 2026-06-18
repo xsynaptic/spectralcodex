@@ -61,7 +61,7 @@ export function generateManifest(options: {
 		}
 	}
 
-	const sortedUrls = [...imageUrls].sort();
+	const sortedUrls = [...imageUrls].sort((urlA, urlB) => urlA.localeCompare(urlB));
 
 	// Load main manifest for incremental comparison
 	let mainUrls = new Set<string>();

@@ -101,11 +101,21 @@ class SearchToggle extends HTMLElement {
 		return this.#cssReady;
 	};
 
+	// Void-returning wrapper so the listener ignores the preload promise
+	#preloadPagefindCss = () => {
+		void this.#ensurePagefindCss();
+	};
+
 	// Await the stylesheet so the modal never opens unstyled
 	#handleClick = async () => {
 		await this.#ensurePagefindCss();
 		const [modal] = (this.instance?.getUtilities('modal') ?? []) as Array<PagefindModal>;
 		modal?.open();
+	};
+
+	// Void-returning wrapper for use as a click listener
+	#handleClickEvent = () => {
+		void this.#handleClick();
 	};
 
 	#handleKeydown = (event: KeyboardEvent) => {
@@ -149,18 +159,18 @@ class SearchToggle extends HTMLElement {
 		);
 
 		// Hover or focus the toggle and the stylesheet starts loading, so it's ready before the modal opens
-		this.addEventListener('pointerenter', this.#ensurePagefindCss, { once: true });
-		this.addEventListener('focusin', this.#ensurePagefindCss, { once: true });
+		this.addEventListener('pointerenter', this.#preloadPagefindCss, { once: true });
+		this.addEventListener('focusin', this.#preloadPagefindCss, { once: true });
 
-		this.addEventListener('click', this.#handleClick);
+		this.addEventListener('click', this.#handleClickEvent);
 		document.addEventListener('keydown', this.#handleKeydown);
 	}
 
 	disconnectedCallback() {
 		this.instance?.deregisterAllShortcuts(this);
-		this.removeEventListener('pointerenter', this.#ensurePagefindCss);
-		this.removeEventListener('focusin', this.#ensurePagefindCss);
-		this.removeEventListener('click', this.#handleClick);
+		this.removeEventListener('pointerenter', this.#preloadPagefindCss);
+		this.removeEventListener('focusin', this.#preloadPagefindCss);
+		this.removeEventListener('click', this.#handleClickEvent);
 		document.removeEventListener('keydown', this.#handleKeydown);
 	}
 }

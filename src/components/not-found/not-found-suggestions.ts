@@ -34,9 +34,10 @@ function normalize(pathname: string): string {
 
 export async function runNotFoundSuggestions(): Promise<void> {
 	const container = document.querySelector<HTMLElement>('#not-found-suggestions');
-	const loading = document.querySelector<HTMLElement>('#not-found-loading');
 
 	if (!container) return;
+
+	const loading = document.querySelector<HTMLElement>('#not-found-loading');
 
 	try {
 		const current = normalize(window.location.pathname);
@@ -44,11 +45,9 @@ export async function runNotFoundSuggestions(): Promise<void> {
 		if (current.length < minPathLength) return;
 
 		const suggestionsUrl = container.dataset.suggestionsUrl ?? '/content-manifest.json';
-		const threshold = Number.parseFloat(container.dataset.threshold ?? '0.5');
-		const autoRedirectThreshold = Number.parseFloat(
-			container.dataset.autoRedirectThreshold ?? '0.92',
-		);
-		const maxSuggestions = Number.parseInt(container.dataset.maxSuggestions ?? '5', 10);
+		const threshold = Number(container.dataset.threshold ?? '0.5');
+		const autoRedirectThreshold = Number(container.dataset.autoRedirectThreshold ?? '0.92');
+		const maxSuggestions = Number(container.dataset.maxSuggestions ?? '5');
 
 		const response = await fetch(suggestionsUrl);
 		if (!response.ok) return;

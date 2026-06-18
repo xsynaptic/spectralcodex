@@ -3,6 +3,6 @@
 export function stripDiacritics(input: string): string {
 	return input
 		.normalize('NFD')
-		.replaceAll(/[\u0300-\u036F]/g, '')
+		.replaceAll(/[\u{300}-\u{36F}]/gu, '')
 		.normalize('NFC');
 }

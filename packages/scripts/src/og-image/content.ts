@@ -182,7 +182,9 @@ function extractBuiltFilenames(distPath: string): Set<string> {
 	const filenames = new Set<string>();
 
 	function walkDir(dir: string): void {
-		for (const dirent of readdirSync(dir, { withFileTypes: true })) {
+		const dirents = readdirSync(dir, { withFileTypes: true });
+
+		for (const dirent of dirents) {
 			const fullPath = path.join(dir, dirent.name);
 
 			if (dirent.isDirectory()) {

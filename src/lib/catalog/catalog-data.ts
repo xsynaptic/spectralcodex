@@ -167,9 +167,12 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 
 let catalogInstance: Promise<Catalog> | undefined;
 
+async function loadCatalog(): Promise<Catalog> {
+	const items = await buildCatalogItems();
+	return createCatalog(items);
+}
+
 export async function getCatalog(): Promise<Catalog> {
-	if (!catalogInstance) {
-		catalogInstance = buildCatalogItems().then(createCatalog);
-	}
+	catalogInstance ??= loadCatalog();
 	return catalogInstance;
 }

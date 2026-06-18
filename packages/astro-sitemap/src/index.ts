@@ -50,7 +50,7 @@ export default function sitemapIntegration(options?: Options): AstroIntegration 
 				return false;
 			}
 
-			return !excludePrefixes.some((prefix) => path === prefix || path.startsWith(prefix + '/'));
+			return excludePrefixes.every((prefix) => !(path === prefix || path.startsWith(prefix + '/')));
 		},
 		serialize(item) {
 			item.lastmod = sitemapLastmod.urls[item.url] ?? sitemapLastmod.generatedAt;

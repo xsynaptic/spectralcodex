@@ -33,7 +33,7 @@ function getMenuItemData({
 		title: entry.data.title,
 		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
 		url: getSiteUrl(`${collection}/${entry.id}`),
-		...(ancestor ? { ancestor } : {}),
+		...(ancestor && { ancestor }),
 	};
 }
 
@@ -66,26 +66,24 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => ({
 			...getMenuItemData({ entry, collection: 'regions' }),
-			...(entry.data._children && maxDepth > 1
-				? {
-						children: getRegionsByIds(entry.data._children)
-							.filter(filterMenuItemContentCount(2))
-							.sort(sortByContentCount)
-							.slice(0, 15)
-							.map((entry) => ({
-								...getMenuItemData({ entry, collection: 'regions' }),
-								...(entry.data._children && maxDepth > 2
-									? {
-											children: getRegionsByIds(entry.data._children)
-												.filter(filterMenuItemContentCount(3))
-												.sort(sortByContentCount)
-												.slice(0, 8)
-												.map((entry) => getMenuItemData({ entry, collection: 'regions' })),
-										}
-									: {}),
-							})),
-					}
-				: {}),
+			...(entry.data._children &&
+				maxDepth > 1 && {
+					children: getRegionsByIds(entry.data._children)
+						.filter(filterMenuItemContentCount(2))
+						.sort(sortByContentCount)
+						.slice(0, 15)
+						.map((entry) => ({
+							...getMenuItemData({ entry, collection: 'regions' }),
+							...(entry.data._children &&
+								maxDepth > 2 && {
+									children: getRegionsByIds(entry.data._children)
+										.filter(filterMenuItemContentCount(3))
+										.sort(sortByContentCount)
+										.slice(0, 8)
+										.map((entry) => getMenuItemData({ entry, collection: 'regions' })),
+								}),
+						})),
+				}),
 		}));
 
 	const seriesMenu = series

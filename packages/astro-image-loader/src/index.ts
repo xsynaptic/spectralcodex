@@ -91,16 +91,15 @@ function getSyncDataFunction({
 					data: {
 						src: filePathRelative,
 						modifiedTime,
-						...(options.dataHandler
-							? await options.dataHandler({
-									id,
-									filePath,
-									filePathRelative,
-									fileUrl,
-									modifiedTime,
-									logger,
-								})
-							: {}),
+						...(options.dataHandler &&
+							(await options.dataHandler({
+								id,
+								filePath,
+								filePathRelative,
+								fileUrl,
+								modifiedTime,
+								logger,
+							}))),
 					},
 				});
 
@@ -114,7 +113,9 @@ function getSyncDataFunction({
 				logger.info(`Updated store: ${filePath}`);
 			} catch (error) {
 				// TODO: better error handling; this block likely catches an AstroError
-				throw new Error(`Error adding to store: ${filePath}: ${JSON.stringify(error)}`);
+				throw new Error(`Error adding to store: ${filePath}: ${JSON.stringify(error)}`, {
+					cause: error,
+				});
 			}
 		});
 	};

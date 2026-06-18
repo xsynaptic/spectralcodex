@@ -103,7 +103,7 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 		'@id': ids.person,
 		name: t('author.name'),
 		url: aboutUrl,
-		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
+		...(options?.sameAs && options.sameAs.length > 0 && { sameAs: options.sameAs }),
 	};
 }
 
@@ -119,10 +119,10 @@ export function buildArticleSchema(props: {
 		'@type': SchemaTypeEnum.Article,
 		'@id': ids.article(props.url),
 		headline: props.title,
-		...(props.description ? { description: props.description } : {}),
-		...(props.imageUrl ? { image: props.imageUrl } : {}),
+		...(props.description && { description: props.description }),
+		...(props.imageUrl && { image: props.imageUrl }),
 		datePublished: props.dateCreated.toISOString(),
-		...(props.dateUpdated ? { dateModified: props.dateUpdated.toISOString() } : {}),
+		...(props.dateUpdated && { dateModified: props.dateUpdated.toISOString() }),
 		author: { '@id': ids.person },
 	};
 }
@@ -138,7 +138,7 @@ export function buildBreadcrumbSchema(
 			'@type': SchemaTypeEnum.ListItem,
 			position: index + 1,
 			name: item.name,
-			...(item.url ? { item: item.url } : {}),
+			...(item.url && { item: item.url }),
 		})),
 	};
 }
@@ -153,17 +153,15 @@ export function buildPlaceSchema(props: {
 		'@type': SchemaTypeEnum.Place,
 		'@id': ids.place(props.url),
 		name: props.title,
-		...(props.description ? { description: props.description } : {}),
+		...(props.description && { description: props.description }),
 		url: props.url,
-		...(props.coordinates
-			? {
-					geo: {
-						'@type': SchemaTypeEnum.GeoCoordinates,
-						latitude: props.coordinates[1],
-						longitude: props.coordinates[0],
-					},
-				}
-			: {}),
+		...(props.coordinates && {
+			geo: {
+				'@type': SchemaTypeEnum.GeoCoordinates,
+				latitude: props.coordinates[1],
+				longitude: props.coordinates[0],
+			},
+		}),
 	};
 }
 

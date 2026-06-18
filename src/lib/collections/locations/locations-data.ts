@@ -89,14 +89,12 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 	// Add image data to sub-locations; same as above
 	for (const entry of locations) {
 		if (Array.isArray(entry.data.geometry)) {
-			for (const [index, geometry] of entry.data.geometry.entries()) {
-				if (!entry.data.geometry[index]) continue;
-
+			for (const geometry of entry.data.geometry) {
 				// Null overrides the main `imageFeatured` and shows no thumbnail
 				// This is used in cases where there is no image for the sub-location
 				if (geometry.imageFeatured === null) {
 					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
-					entry.data.geometry[index]._imageThumbnail = null;
+					geometry._imageThumbnail = null;
 					continue;
 				}
 
@@ -104,7 +102,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 					const imageEntry = getImageById(geometry.imageFeatured);
 
 					if (imageEntry) {
-						entry.data.geometry[index]._imageThumbnail = getLocationThumbnailProps(
+						geometry._imageThumbnail = getLocationThumbnailProps(
 							imageEntry.id,
 							imageEntry.data.width,
 						);

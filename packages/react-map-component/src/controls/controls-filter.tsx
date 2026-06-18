@@ -283,8 +283,8 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							style={{
 								height: '20px',
 								width: '20px',
-								...(filterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
-								...(isLoading ? { opacity: '0.6' } : {}),
+								...(filterOpen && { marginTop: '1px', opacity: '0.6' }),
+								...(isLoading && { opacity: '0.6' }),
 							}}
 							aria-hidden="true"
 						>

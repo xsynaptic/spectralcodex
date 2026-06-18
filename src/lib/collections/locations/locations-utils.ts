@@ -147,9 +147,9 @@ export async function createQueryLocationsEntryFunction() {
 			featureCollection: getLocationsFeatureCollection([entry]),
 			targetId: entry.data._uuid ?? entry.id,
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
+			...(regionPrimary?.data._langCode?.startsWith('zh') && {
+				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+			}),
 		});
 
 		const catalogItems = R.pipe(
@@ -184,14 +184,14 @@ export async function createLocationEntryDisplayFunction() {
 		const titleResult = getMultilingualContent({
 			data: entry.data,
 			prop: 'title',
-			...(regionLangCode ? { langCode: regionLangCode } : {}),
-			...(langCodeAdditional ? { langCodeAdditional } : {}),
+			...(regionLangCode && { langCode: regionLangCode }),
+			...(langCodeAdditional && { langCodeAdditional }),
 		});
 
 		const addressResult = getMultilingualContent({
 			data: entry.data,
 			prop: 'address',
-			...(regionLangCode ? { langCode: regionLangCode } : {}),
+			...(regionLangCode && { langCode: regionLangCode }),
 		});
 
 		return {

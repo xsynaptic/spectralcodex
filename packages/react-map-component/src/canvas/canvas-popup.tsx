@@ -87,7 +87,7 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	url.searchParams.set('api', '1');
 	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
 
-	return url.toString();
+	return url.href;
 }
 
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
@@ -115,12 +115,10 @@ function useMapCanvasPopup() {
 		return {
 			...defaultPopupItem,
 			...popupData?.find((popupItem) => popupItem.id === selectedId),
-			...(selectedSourceItem
-				? {
-						precision: selectedSourceItem.properties.precision,
-						popupCoordinates: getPopupCoordinates(selectedSourceItem),
-					}
-				: {}),
+			...(selectedSourceItem && {
+				precision: selectedSourceItem.properties.precision,
+				popupCoordinates: getPopupCoordinates(selectedSourceItem),
+			}),
 		} satisfies MapPopupItemExtended;
 	}, [selectedId, popupData, sourceData]);
 }

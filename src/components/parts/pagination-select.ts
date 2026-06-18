@@ -42,21 +42,21 @@ class PaginationSelect extends HTMLElement {
 		const lastPage = Number(this.dataset.lastPage);
 		const currentPage = Number(this.dataset.currentPage);
 
-		if (!Number.isInteger(lastPage) || lastPage <= 1) return;
+		if (!Number.isSafeInteger(lastPage) || lastPage <= 1) return;
 
 		const form = this.querySelector<HTMLFormElement>('[data-pagination-form]');
 		const select = this.querySelector<HTMLSelectElement>('[data-pagination-control]');
-		const counter = this.querySelector<HTMLElement>('[data-pagination-counter]');
 
 		if (!form || !select) return;
 
+		const counter = this.querySelector<HTMLElement>('[data-pagination-counter]');
 		const pageLabel = this.dataset.pageLabel ?? 'Page {page}';
 
 		for (let pageNumber = 1; pageNumber <= lastPage; pageNumber++) {
 			const option = document.createElement('option');
 
 			option.value = String(pageNumber);
-			option.textContent = pageLabel.replace('{page}', String(pageNumber));
+			option.textContent = pageLabel.replace('{page}', () => String(pageNumber));
 			option.selected = pageNumber === currentPage;
 			if (pageNumber === currentPage) option.dataset.currentPage = '';
 			select.append(option);
@@ -89,7 +89,10 @@ class PaginationSelect extends HTMLElement {
 
 		// Fallback metrics mis-size the lock and clip the label, so re-measure once webfonts settle
 		if (document.fonts.status !== 'loaded') {
-			void document.fonts.ready.then(lockWidth);
+			void (async () => {
+				await document.fonts.ready;
+				lockWidth();
+			})();
 		}
 	}
 
@@ -113,7 +116,7 @@ class PaginationSelect extends HTMLElement {
 		const pageNumber = Number(this.#select.value);
 		const currentPage = Number(this.dataset.currentPage);
 
-		if (!Number.isInteger(pageNumber) || pageNumber === currentPage) return;
+		if (!Number.isSafeInteger(pageNumber) || pageNumber === currentPage) return;
 
 		// Using the navigate function (not location.assign) for compatibility with Astro's view transitions
 		void navigate(this.#getPageUrl(pageNumber));

@@ -12,7 +12,9 @@ export const getThemesCollection = createCollectionData({
 		const locationsByThemeMap = new Map<string, Array<string>>();
 
 		for (const location of locations) {
-			for (const { id: themeId } of location.data.themes ?? []) {
+			const locationThemes = location.data.themes ?? [];
+
+			for (const { id: themeId } of locationThemes) {
 				if (!locationsByThemeMap.has(themeId)) locationsByThemeMap.set(themeId, []);
 				locationsByThemeMap.get(themeId)!.push(location.id);
 			}
@@ -21,7 +23,9 @@ export const getThemesCollection = createCollectionData({
 		const postsByThemeMap = new Map<string, Array<string>>();
 
 		for (const post of posts) {
-			for (const { id: themeId } of post.data.themes ?? []) {
+			const postThemes = post.data.themes ?? [];
+
+			for (const { id: themeId } of postThemes) {
 				if (!postsByThemeMap.has(themeId)) postsByThemeMap.set(themeId, []);
 				postsByThemeMap.get(themeId)!.push(post.id);
 			}

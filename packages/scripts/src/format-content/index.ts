@@ -62,7 +62,9 @@ function reportMessages(relativePath: string, messages: ReadonlyArray<{ message:
 	}
 }
 
-for await (const match of glob('collections/**/*.mdx', { cwd: targetPath })) {
+const mdxMatches = glob('collections/**/*.mdx', { cwd: targetPath });
+
+for await (const match of mdxMatches) {
 	const filePath = path.join(targetPath, match);
 	const relativePath = path.relative(rootPath, filePath);
 	const original = await readFile(filePath, 'utf8');

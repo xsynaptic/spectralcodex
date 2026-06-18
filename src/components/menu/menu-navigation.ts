@@ -280,9 +280,7 @@ class NavMenu extends HTMLElement {
 		if (currentIndex === -1) return;
 
 		const nextIndex =
-			direction === 'next'
-				? (currentIndex + 1) % items.length
-				: (currentIndex - 1 + items.length) % items.length;
+			(direction === 'next' ? currentIndex + 1 : currentIndex - 1 + items.length) % items.length;
 
 		const nextItem = items[nextIndex];
 		const nextTrigger = nextItem ? this.#getTrigger(nextItem) : undefined;
@@ -339,14 +337,14 @@ class NavMenu extends HTMLElement {
 	}
 
 	#injectAria() {
-		let submenuId = 0;
-
 		// Root <ul> becomes menubar
 		const menubar = this.querySelector<HTMLElement>(':scope > nav > ul');
 
 		if (!menubar) return;
 
 		menubar.setAttribute('role', 'menubar');
+
+		let submenuId = 0;
 
 		for (const li of this.querySelectorAll<HTMLElement>('li')) {
 			li.setAttribute('role', 'none');

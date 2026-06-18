@@ -49,15 +49,13 @@ function enrichImageFeaturedObjects(
 
 		return {
 			...item,
-			...(captionTitle
-				? {
-						caption: {
-							title: captionTitle,
-							titleMultilingual: caption?.titleMultilingual,
-							...(caption ? { id: caption.id, url: caption.url } : {}),
-						},
-					}
-				: {}),
+			...(captionTitle && {
+				caption: {
+					title: captionTitle,
+					titleMultilingual: caption?.titleMultilingual,
+					...(caption && { id: caption.id, url: caption.url }),
+				},
+			}),
 		};
 	});
 }

@@ -84,7 +84,7 @@ if (!check) {
 	process.exit(1);
 }
 
-const explicitLimit = values.limit ? Number.parseInt(values.limit, 10) : undefined;
+const explicitLimit = values.limit ? Number(values.limit) : undefined;
 const effectiveLimit = explicitLimit ?? (values.random ? RANDOM_DEFAULT_LIMIT : undefined);
 
 const dataStorePath = path.join(rootPath, values['data-store-path']);
@@ -92,7 +92,7 @@ const { collections } = loadDataStore(dataStorePath);
 
 const entries = getDataStoreCollection(collections, ['locations']);
 
-const matched = check(entries, { threshold: Number.parseInt(values.threshold, 10) });
+const matched = check(entries, { threshold: Number(values.threshold) });
 
 let selected = values.random ? R.shuffle(matched) : matched;
 

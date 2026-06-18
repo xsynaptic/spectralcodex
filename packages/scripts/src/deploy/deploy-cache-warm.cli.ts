@@ -14,8 +14,8 @@ const { values } = parseArgs({
 });
 
 await warmCache({
-	...(values['base-url'] ? { baseUrl: values['base-url'] } : {}),
+	...(values['base-url'] && { baseUrl: values['base-url'] }),
 	concurrency: Number(values.concurrency),
-	...(values.limit ? { limit: Number(values.limit) } : {}),
+	...(values.limit && { limit: Number(values.limit) }),
 	dryRun: values['dry-run'],
 });

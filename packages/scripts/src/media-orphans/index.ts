@@ -82,7 +82,7 @@ for (const file of mediaFiles) {
 	}
 }
 
-orphanedFiles.sort();
+orphanedFiles.sort((fileA, fileB) => fileA.localeCompare(fileB));
 
 for (const file of orphanedFiles) {
 	console.log(file);

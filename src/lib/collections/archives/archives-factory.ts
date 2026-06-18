@@ -224,14 +224,14 @@ function getYearlyWinningCategories(
 	const winning = new Map<string, keyof ArchivesTierBuckets>();
 
 	// Set in reverse precedence so a later write wins: updated overrides created overrides visited
-	for (const item of yearBuckets.visited.filter(passesYearlyFloor)) {
-		winning.set(item.id, 'visited');
+	for (const item of yearBuckets.visited) {
+		if (passesYearlyFloor(item)) winning.set(item.id, 'visited');
 	}
-	for (const item of yearBuckets.created.filter(passesYearlyFloor)) {
-		winning.set(item.id, 'created');
+	for (const item of yearBuckets.created) {
+		if (passesYearlyFloor(item)) winning.set(item.id, 'created');
 	}
-	for (const item of yearBuckets.updated.filter(passesYearlyFloor)) {
-		winning.set(item.id, 'updated');
+	for (const item of yearBuckets.updated) {
+		if (passesYearlyFloor(item)) winning.set(item.id, 'updated');
 	}
 
 	return winning;
@@ -258,9 +258,7 @@ export function createArchivesData(
 	// Iterate newest-first so the most recent year keeps a featured image shared across years
 	const selectIndexHighlights = createHighlightSelector();
 
-	const yearEntries = [...archivesDataMap.entries()].sort(([yearA], [yearB]) =>
-		yearB.localeCompare(yearA),
-	);
+	const yearEntries = [...archivesDataMap].sort(([yearA], [yearB]) => yearB.localeCompare(yearA));
 
 	for (const [year, yearlyData] of yearEntries) {
 		const months = [...yearlyData.values()].map((raw) => ({
@@ -295,7 +293,9 @@ export function createArchivesData(
 		// Monthly highlights; chronological so the earliest month wins a shared featured image
 		const selectMonthlyHighlights = createHighlightSelector();
 
-		for (const monthlyItem of R.sortBy(yearMonthlyItems, (item) => item.month)) {
+		const sortedMonthlyItems = R.sortBy(yearMonthlyItems, (item) => item.month);
+
+		for (const monthlyItem of sortedMonthlyItems) {
 			monthlyItem.highlights = selectMonthlyHighlights([
 				...monthlyItem.created,
 				...monthlyItem.updated,
@@ -336,9 +336,7 @@ export function createArchivesData(
 
 			if (!tierHasData(tier)) continue;
 
-			if (!archivesYearlyData[year]) archivesYearlyData[year] = [];
-
-			archivesYearlyData[year].push({
+			(archivesYearlyData[year] ??= []).push({
 				...month.raw,
 				highlights: monthlyHighlightsById.get(month.raw.id),
 				...getBucketCounts(month),

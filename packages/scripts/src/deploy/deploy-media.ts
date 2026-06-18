@@ -19,11 +19,16 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 	const mediaPath = path.join(rootPath, mediaPathRelative);
 
-	const stats = await fs.stat(mediaPath).catch(() => {
-		// stat throws if the path is absent; the guard below handles it
-	});
+	let isDirectory = false;
 
-	if (!stats?.isDirectory()) {
+	try {
+		const stats = await fs.stat(mediaPath);
+		isDirectory = stats.isDirectory();
+	} catch {
+		// stat throws if the path is absent; the guard below handles it
+	}
+
+	if (!isDirectory) {
 		throw new Error(`Media path not found: ${mediaPath}`);
 	}
 

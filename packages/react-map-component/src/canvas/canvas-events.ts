@@ -80,18 +80,19 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 					if (!featureCenter) return;
 
 					// Expand clusters by zooming; note that this returns a promise, complicating this callback
-					featureSource
-						.getClusterExpansionZoom(Number(clusterId))
-						.then((zoom) => {
+					void (async () => {
+						try {
+							const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
+
 							mapInstance.easeTo({
 								center: featureCenter,
 								duration: 200,
 								zoom,
 							});
-						})
-						.catch(() => {
+						} catch {
 							console.warn('[Map] Could not get cluster expansion zoom!');
-						});
+						}
+					})();
 					break;
 				}
 
@@ -288,19 +289,15 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			// Initialize the position of the filter control on interactive maps
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
-		...(isInteractive
-			? {
-					onResize: debouncedFilterControlSetup.call,
-					onClick,
-					onMouseDown,
-					onMouseUp,
-					onMoveEnd,
-					...(isSourceDataLoading
-						? {}
-						: {
-								onMouseMove: throttledOnMouseMove.call,
-							}),
-				}
-			: {}),
+		...(isInteractive && {
+			onResize: debouncedFilterControlSetup.call,
+			onClick,
+			onMouseDown,
+			onMouseUp,
+			onMoveEnd,
+			...(!isSourceDataLoading && {
+				onMouseMove: throttledOnMouseMove.call,
+			}),
+		}),
 	} satisfies MapCallbacks;
 }

@@ -1,4 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
+import type { Position } from 'geojson';
 
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { centroid } from '@turf/centroid';
@@ -16,6 +17,17 @@ interface LocationPoint {
 	status: string;
 }
 
+// Single Point geometries use their own coordinates; MultiPoint geometries use their centroid
+function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geometry']): Position {
+	if (Array.isArray(geometry)) {
+		return centroid({
+			type: GeometryTypeEnum.MultiPoint,
+			coordinates: geometry.map((point) => point.coordinates),
+		}).geometry.coordinates;
+	}
+	return geometry.coordinates;
+}
+
 /**
  * Extract coordinates from location entries; handles both single Point and MultiPoint geometries
  */
@@ -27,12 +39,7 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 	const pointsIndex: Array<LocationPoint> = [];
 
 	for (const entry of locations) {
-		const coordinates = Array.isArray(entry.data.geometry)
-			? centroid({
-					type: GeometryTypeEnum.MultiPoint,
-					coordinates: entry.data.geometry.map((point) => point.coordinates),
-				}).geometry.coordinates
-			: entry.data.geometry.coordinates;
+		const coordinates = getEntryCoordinates(entry.data.geometry);
 
 		const lng = coordinates[0];
 		const lat = coordinates[1];

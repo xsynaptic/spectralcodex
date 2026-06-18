@@ -149,9 +149,9 @@ export async function warmCache(options: WarmCacheOptions = {}): Promise<void> {
 
 	console.log(chalk.blue(`\nWarmed ${String(urls.length)} URLs in ${durationSeconds}s:`));
 
-	for (const [label, count] of [...counts.entries()].sort(
-		(first, second) => second[1] - first[1],
-	)) {
+	const sortedCounts = [...counts].sort((first, second) => second[1] - first[1]);
+
+	for (const [label, count] of sortedCounts) {
 		console.log(`  ${label}: ${String(count)}`);
 	}
 

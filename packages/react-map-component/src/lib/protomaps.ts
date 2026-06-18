@@ -25,7 +25,7 @@ export function useProtomaps({
 	const languages = useMapLanguages();
 
 	const flavor = useMemo(() => {
-		return baseMapTheme ?? (isDarkMode ? namedFlavor('dark') : namedFlavor('light'));
+		return baseMapTheme ?? namedFlavor(isDarkMode ? 'dark' : 'light');
 	}, [baseMapTheme, isDarkMode]);
 
 	const protomapsStyleSpec = useMemo(

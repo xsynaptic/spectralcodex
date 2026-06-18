@@ -20,12 +20,12 @@ class ProgressReading extends HTMLElement {
 		if (!this.#target) return;
 
 		const rect = this.#target.getBoundingClientRect();
-		const scrollable = Math.max(1, rect.height - globalThis.window.innerHeight);
+		const scrollable = Math.max(1, rect.height - window.innerHeight);
 		const progress = Math.min(Math.max(0, -rect.top / scrollable), 1);
 
 		if (progress === 1) {
 			this.#setProgress(1);
-			globalThis.window.setTimeout(() => {
+			window.setTimeout(() => {
 				this.#setOpacity(0);
 			}, animationDuration / 2);
 		} else {
@@ -54,12 +54,12 @@ class ProgressReading extends HTMLElement {
 			(entries) => {
 				for (const entry of entries) {
 					if (entry.isIntersecting) {
-						globalThis.window.addEventListener('resize', this.#onScroll, { passive: true });
-						globalThis.window.addEventListener('scroll', this.#onScroll, { passive: true });
+						window.addEventListener('resize', this.#onScroll, { passive: true });
+						window.addEventListener('scroll', this.#onScroll, { passive: true });
 						this.#onScroll();
 					} else {
-						globalThis.window.removeEventListener('resize', this.#onScroll);
-						globalThis.window.removeEventListener('scroll', this.#onScroll);
+						window.removeEventListener('resize', this.#onScroll);
+						window.removeEventListener('scroll', this.#onScroll);
 					}
 				}
 			},
@@ -71,8 +71,8 @@ class ProgressReading extends HTMLElement {
 
 	disconnectedCallback() {
 		this.#observer?.disconnect();
-		globalThis.window.removeEventListener('resize', this.#onScroll);
-		globalThis.window.removeEventListener('scroll', this.#onScroll);
+		window.removeEventListener('resize', this.#onScroll);
+		window.removeEventListener('scroll', this.#onScroll);
 
 		if (this.#frame !== undefined) {
 			cancelAnimationFrame(this.#frame);

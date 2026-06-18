@@ -18,47 +18,47 @@ type CustomControlProps = Pick<CustomControlConfig, 'position' | 'className'> & 
 };
 
 class CustomControl implements IControl {
-	_className = 'maplibregl-ctrl maplibregl-ctrl-group';
-	_container: HTMLElement | null = null;
-	_map: MapInstance | null = null;
-	_position: ControlPosition = 'top-left';
-	_redraw?: () => void;
+	#className = 'maplibregl-ctrl maplibregl-ctrl-group';
+	#container: HTMLElement | null = null;
+	#map: MapInstance | null = null;
+	#position: ControlPosition = 'top-left';
+	#redraw?: () => void;
 
 	constructor({ map, position, className, redraw }: CustomControlConfig) {
-		this._map = map;
-		this._position = position;
-		if (className !== undefined) this._className = className;
-		if (redraw !== undefined) this._redraw = redraw;
+		this.#map = map;
+		this.#position = position;
+		if (className !== undefined) this.#className = className;
+		if (redraw !== undefined) this.#redraw = redraw;
 	}
 
 	getDefaultPosition?() {
-		return this._position;
+		return this.#position;
 	}
 
 	getElement() {
-		return this._container;
+		return this.#container;
 	}
 
 	getMap() {
-		return this._map;
+		return this.#map;
 	}
 
 	onAdd(map: MapInstance) {
-		this._container = document.createElement('div');
-		this._container.className = this._className;
+		this.#container = document.createElement('div');
+		this.#container.className = this.#className;
 
-		if (this._redraw !== undefined) {
-			map.on('move', this._redraw);
-			this._redraw();
+		if (this.#redraw !== undefined) {
+			map.on('move', this.#redraw);
+			this.#redraw();
 		}
-		return this._container;
+		return this.#container;
 	}
 
 	onRemove() {
-		if (this._map === null || this._container === null) return;
-		this._container.remove();
-		if (this._redraw !== undefined) this._map.off('move', this._redraw);
-		this._map = null;
+		if (this.#map === null || this.#container === null) return;
+		this.#container.remove();
+		if (this.#redraw !== undefined) this.#map.off('move', this.#redraw);
+		this.#map = null;
 	}
 }
 

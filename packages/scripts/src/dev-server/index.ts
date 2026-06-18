@@ -43,16 +43,18 @@ process.on('SIGTERM', cleanup);
 
 log('Starting containers...');
 
-$`docker compose -f ${composePath} --project-directory ${rootPath} up -d --remove-orphans`
-	.quiet()
-	.then(() => {
+async function startContainers() {
+	try {
+		await $`docker compose -f ${composePath} --project-directory ${rootPath} up -d --remove-orphans`.quiet();
 		log(chalk.green('Containers ready'));
-	})
-	// eslint-disable-next-line unicorn/prefer-top-level-await -- fire-and-forget container startup; awaiting would block the dev server
-	.catch((error: unknown) => {
+	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		log(chalk.red(`Container error: ${message}`));
-	});
+	}
+}
+
+// eslint-disable-next-line unicorn/prefer-top-level-await -- fire-and-forget container startup; awaiting would block the dev server
+void startContainers();
 
 try {
 	await $({ stdio: 'inherit', cwd: rootPath })`npx astro dev`;

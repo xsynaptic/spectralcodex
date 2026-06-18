@@ -82,10 +82,11 @@ export async function createRegionCommonAncestorFunction() {
 		if (regions.length === 0) return;
 
 		const regionAncestors = regions.map(getRegionAncestors);
+		const firstRegionAncestors = regionAncestors[0];
 
-		if (!regionAncestors[0]) return;
+		if (!firstRegionAncestors) return;
 
-		for (const ancestor of regionAncestors[0]) {
+		for (const ancestor of firstRegionAncestors) {
 			if (regionAncestors.every((regionAncestor) => regionAncestor.includes(ancestor))) {
 				return ancestor.id;
 			}
@@ -186,12 +187,13 @@ export async function createQueryRegionsEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
-			...(entry.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
-			...(entry.data.divisionId && !entry.data.hideDivision
-				? { apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`) }
-				: {}),
+			...(entry.data._langCode?.startsWith('zh') && {
+				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+			}),
+			...(entry.data.divisionId &&
+				!entry.data.hideDivision && {
+					apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`),
+				}),
 		});
 
 		return { catalogItemsFiltered, catalogItems, catalogItemsCount, mapData, regionsOption };

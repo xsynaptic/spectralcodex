@@ -38,9 +38,7 @@ export const getResourcesCollection = createCollectionData({
 				const hasLinkMatch =
 					matchPattern &&
 					contentEntry.data.links?.some((link) =>
-						typeof link === 'string'
-							? matchLinkUrl(link, matchPattern)
-							: matchLinkUrl(link.url, matchPattern),
+						matchLinkUrl(typeof link === 'string' ? link : link.url, matchPattern),
 					);
 
 				// Check ID match via sources field (for publication-type resources)

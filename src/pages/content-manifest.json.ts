@@ -17,8 +17,8 @@ function shouldIncludeUrl(pathname: string): boolean {
 
 	if (/\/\d+$/.test(normalized)) return false;
 
-	return !excludePrefixes.some(
-		(prefix) => normalized === prefix || normalized.startsWith(prefix + '/'),
+	return excludePrefixes.every(
+		(prefix) => !(normalized === prefix || normalized.startsWith(prefix + '/')),
 	);
 }
 

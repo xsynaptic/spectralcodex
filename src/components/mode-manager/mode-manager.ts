@@ -34,7 +34,7 @@ class ModeManager extends HTMLElement {
 
 		const defaultMode = this.#getDefaultMode();
 
-		this.#mediaMatcher = globalThis.matchMedia(`(prefers-color-scheme: ${ModeTypeEnum.Light})`);
+		this.#mediaMatcher = matchMedia(`(prefers-color-scheme: ${ModeTypeEnum.Light})`);
 		this.#systemMode = this.#mediaMatcher.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
 
 		this.#handleMediaChange = (event: MediaQueryListEvent) => {

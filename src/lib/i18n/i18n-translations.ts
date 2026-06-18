@@ -245,14 +245,14 @@ export function getTranslations() {
 		const langTranslations = translationStrings[langCode] as Partial<
 			Record<TranslationKey, string>
 		>;
+		if (Object.hasOwn(langTranslations, key) && langTranslations[key] !== undefined) {
+			return langTranslations[key];
+		}
+
 		const defaultTranslations = translationStrings[defaultLanguage] as Record<
 			TranslationKey,
 			string
 		>;
-
-		if (key in langTranslations && langTranslations[key] !== undefined) {
-			return langTranslations[key];
-		}
 		return defaultTranslations[key];
 	};
 }

@@ -64,9 +64,9 @@ const LINK_COLLECTIONS = [
 
 const dataStorePath = path.resolve(rootPath, values['data-store-path']);
 const dbPath = path.resolve(rootPath, values['db-path']);
-const concurrency = Number.parseInt(values.concurrency, 10);
-const domainLimit = Number.parseInt(values['domain-limit'], 10);
-const maxMissing = Number.parseInt(values['max-missing'], 10);
+const concurrency = Number(values.concurrency);
+const domainLimit = Number(values['domain-limit']);
+const maxMissing = Number(values['max-missing']);
 
 /**
  * Ignore patterns

@@ -41,6 +41,7 @@ async function loadRegionGeometry(
 	} catch (error) {
 		throw new Error(
 			`Failed to load FGB file for region "${regionId}": ${error instanceof Error ? error.message : String(error)}`,
+			{ cause: error },
 		);
 	}
 }
@@ -166,14 +167,18 @@ export async function checkLocationsCoordinates(
 			),
 		);
 		return true;
-	} else if (checkedCount === 0) {
+	}
+	if (checkedCount === 0) {
 		console.log(chalk.yellow('⚠️  No locations could be checked'));
 		return false;
-	} else {
-		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
-		if (missingFgbRegions.size > 0) {
-			console.log(chalk.gray(`Missing FGB regions: ${[...missingFgbRegions].sort().join(', ')}`));
-		}
-		return false;
 	}
+	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
+	if (missingFgbRegions.size > 0) {
+		console.log(
+			chalk.gray(
+				`Missing FGB regions: ${[...missingFgbRegions].sort((regionA, regionB) => regionA.localeCompare(regionB)).join(', ')}`,
+			),
+		);
+	}
+	return false;
 }

@@ -4,17 +4,22 @@ class CitationButton extends HTMLElement {
 	#timeouts = new Map<HTMLButtonElement, number>();
 
 	connectedCallback() {
-		this.addEventListener('click', this.#handleClick);
+		this.addEventListener('click', this.#handleClickEvent);
 	}
 
 	disconnectedCallback() {
-		this.removeEventListener('click', this.#handleClick);
+		this.removeEventListener('click', this.#handleClickEvent);
 
 		for (const timeoutId of this.#timeouts.values()) {
-			globalThis.window.clearTimeout(timeoutId);
+			window.clearTimeout(timeoutId);
 		}
 		this.#timeouts.clear();
 	}
+
+	// Void-returning wrapper for use as a click listener
+	#handleClickEvent = (event: Event) => {
+		void this.#handleClick(event);
+	};
 
 	#handleClick = async (event: Event) => {
 		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
@@ -66,11 +71,11 @@ class CitationButton extends HTMLElement {
 
 		const existing = this.#timeouts.get(button);
 
-		if (existing !== undefined) globalThis.window.clearTimeout(existing);
+		if (existing !== undefined) window.clearTimeout(existing);
 
 		button.textContent = copiedLabel;
 
-		const timeoutId = globalThis.window.setTimeout(() => {
+		const timeoutId = window.setTimeout(() => {
 			button.textContent = original;
 			this.#timeouts.delete(button);
 		}, COPIED_FEEDBACK_DURATION);

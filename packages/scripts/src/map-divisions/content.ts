@@ -53,20 +53,18 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
 
 		const divisionIdValue = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
 
-		let divisionIds: Array<string> = [];
+		const divisionIdValues = Array.isArray(divisionIdValue) ? divisionIdValue : [divisionIdValue];
 
-		if (divisionIdValue) {
-			divisionIds = Array.isArray(divisionIdValue)
-				? divisionIdValue.filter((id): id is string => typeof id === 'string')
-				: [divisionIdValue].filter((id): id is string => typeof id === 'string');
-		}
+		const divisionIds = divisionIdValue
+			? divisionIdValues.filter((id): id is string => typeof id === 'string')
+			: [];
 
 		regions.push({
 			id,
 			divisionIds,
 			regionPathIds,
-			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
-			...(divisionClippingBBox ? { divisionClippingBBox } : {}),
+			...(divisionSelectionBBox && { divisionSelectionBBox }),
+			...(divisionClippingBBox && { divisionClippingBBox }),
 		});
 	}
 
@@ -91,8 +89,9 @@ export function resolveBoundingBox(
 ): GeometryBoundingBox | undefined {
 	for (const ancestorId of region.regionPathIds) {
 		const ancestor = regionsById.get(ancestorId);
+		const bbox = ancestor?.[bboxField];
 
-		if (ancestor?.[bboxField]) return ancestor[bboxField];
+		if (bbox) return bbox;
 	}
 	return undefined;
 }

@@ -14,7 +14,7 @@ interface GitFileDatesOptions {
 }
 
 // Prefixes each date line so it can't be confused with a file path
-const DATE_LINE_MARKER = '\u0001';
+const DATE_LINE_MARKER = '\u{1}';
 
 async function isShallowRepository(cwd: string): Promise<boolean> {
 	const result = await $({ cwd })`git rev-parse --is-shallow-repository`;

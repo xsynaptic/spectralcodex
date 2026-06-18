@@ -53,8 +53,7 @@ export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
 	if (mismatchCount === 0) {
 		console.log(chalk.green(`✓ ${entries.length.toString()} location regions valid`));
 		return true;
-	} else {
-		console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} region mismatch(es)`));
-		return false;
 	}
+	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} region mismatch(es)`));
+	return false;
 }

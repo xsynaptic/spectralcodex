@@ -24,6 +24,15 @@ import { createGenerator } from './generate.js';
 
 const rootPath = findWorkspaceRoot();
 
+async function getFileExists(filePath: string): Promise<boolean> {
+	try {
+		await fs.stat(filePath);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
@@ -187,10 +196,7 @@ async function main() {
 					const [cached, imageMtime, outputExists] = await Promise.all([
 						cache.get<CacheEntry>(entry.id),
 						getImageModifiedTime(imageId),
-						fs.stat(outputFilePath).then(
-							() => true,
-							() => false,
-						),
+						getFileExists(outputFilePath),
 					]);
 
 					// Cache hit: digest matches, same image used, and image hasn't changed

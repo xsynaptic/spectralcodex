@@ -80,10 +80,10 @@ export function syncUrlSources(
 ): number {
 	const sync = db.transaction(() => {
 		// Delete sources only for entries we re-extracted
-		const deleteStmt = db.prepare('DELETE FROM url_sources WHERE content_id = ?');
+		const deletionStatement = db.prepare('DELETE FROM url_sources WHERE content_id = ?');
 
 		for (const contentId of extractedEntries) {
-			deleteStmt.run(contentId);
+			deletionStatement.run(contentId);
 		}
 
 		// Re-insert extracted sources
@@ -104,7 +104,7 @@ export function syncUrlSources(
 
 		for (const row of existingSources) {
 			if (!allContentIds.has(row.content_id)) {
-				deleteStmt.run(row.content_id);
+				deletionStatement.run(row.content_id);
 			}
 		}
 
@@ -247,7 +247,7 @@ export function getStats(): LinkCheckStats {
 	};
 
 	for (const row of rows) {
-		if (row.status in stats) {
+		if (Object.hasOwn(stats, row.status)) {
 			stats[row.status as keyof Omit<LinkCheckStats, 'total'>] = row.count;
 		}
 

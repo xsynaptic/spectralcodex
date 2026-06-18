@@ -30,9 +30,7 @@ export async function createLocationsByResourceFunction() {
 			const hasLinkMatch =
 				matchPattern &&
 				location.data.links?.some((link) =>
-					typeof link === 'string'
-						? matchLinkUrl(link, matchPattern)
-						: matchLinkUrl(link.url, matchPattern),
+					matchLinkUrl(typeof link === 'string' ? link : link.url, matchPattern),
 				);
 
 			// Check ID match via sources field (for publication-type resources)
@@ -62,9 +60,7 @@ async function createPostsByResourceFunction() {
 			const hasLinkMatch =
 				matchPattern &&
 				entry.data.links?.some((link) =>
-					typeof link === 'string'
-						? matchLinkUrl(link, matchPattern)
-						: matchLinkUrl(link.url, matchPattern),
+					matchLinkUrl(typeof link === 'string' ? link : link.url, matchPattern),
 				);
 
 			// Check ID match via sources field (for publication-type resources)
@@ -165,9 +161,9 @@ export async function createQueryResourcesEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
+			...(regionPrimary?.data._langCode?.startsWith('zh') && {
+				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+			}),
 		});
 
 		return { catalogItems, mapData };

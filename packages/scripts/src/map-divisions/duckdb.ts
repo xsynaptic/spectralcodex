@@ -36,7 +36,7 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 }
 
 function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: GeometryBoundingBox) {
-	const setBBoxVars = boundingBox
+	const bboxVariablesSql = boundingBox
 		? `
 		SET VARIABLE xmin = ${String(boundingBox.lngMin)};
 		SET VARIABLE xmax = ${String(boundingBox.lngMax)};
@@ -73,7 +73,7 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 	query += `
 		WHERE ${conditions.join('\n\t\t\tAND ')}`;
 
-	return setBBoxVars + query + ';';
+	return bboxVariablesSql + query + ';';
 }
 
 export async function fetchDivisionData({

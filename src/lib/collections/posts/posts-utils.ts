@@ -49,9 +49,9 @@ export async function createQueryPostsEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: R.pipe(entry, getLocationsByPosts, getLocationsFeatureCollection),
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
+			...(regionPrimary?.data._langCode?.startsWith('zh') && {
+				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+			}),
 		});
 
 		const backlinks = catalog.backlinksOf(entry.id);

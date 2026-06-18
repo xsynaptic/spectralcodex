@@ -103,11 +103,13 @@ async function createImagePlaceholderFunction() {
 
 		if (cached) return cached;
 
-		const imageBuffer = await fs.readFile(imageEntry.data.path).catch(() => {
-			// Do nothing
-		});
+		let imageBuffer: Buffer;
 
-		if (!imageBuffer) return;
+		try {
+			imageBuffer = await fs.readFile(imageEntry.data.path);
+		} catch {
+			return;
+		}
 
 		const imageObject = sharp(imageBuffer, { failOn: 'error' });
 

@@ -79,9 +79,9 @@ export async function createQueryThemesEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
-				: {}),
+			...(regionPrimary?.data._langCode?.startsWith('zh') && {
+				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+			}),
 		});
 
 		// Related themes are those that reference the current theme

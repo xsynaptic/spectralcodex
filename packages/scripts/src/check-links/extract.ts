@@ -83,11 +83,7 @@ function extractBodyLinks(body: string): Array<string> {
 export function extractLinksFromEntry(entry: DataStoreEntry) {
 	const links: Array<{
 		url: string;
-	}> = [];
-
-	for (const url of extractFrontmatterLinks(entry.data)) {
-		links.push({ url });
-	}
+	}> = Array.from(extractFrontmatterLinks(entry.data), (url) => ({ url }));
 
 	if (entry.body) {
 		for (const url of extractBodyLinks(entry.body)) {

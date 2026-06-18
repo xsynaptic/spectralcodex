@@ -16,9 +16,9 @@ class ProgressLoading extends HTMLElement {
 	#handlePreparation = () => {
 		this.#progress = 0;
 		this.#setProgress(0);
-		this.#thresholdTimeout = globalThis.window.setTimeout(() => {
+		this.#thresholdTimeout = window.setTimeout(() => {
 			this.#setOpacity(1);
-			this.#trickleInterval = globalThis.window.setInterval(() => {
+			this.#trickleInterval = window.setInterval(() => {
 				this.#progress += Math.random() * 0.03;
 				this.#setProgress(this.#progress);
 			}, animationDuration);
@@ -28,18 +28,18 @@ class ProgressLoading extends HTMLElement {
 	#handleSwap = () => {
 		if (!this.#thresholdTimeout) return;
 
-		globalThis.window.clearTimeout(this.#thresholdTimeout);
-		globalThis.window.clearInterval(this.#trickleInterval);
+		window.clearTimeout(this.#thresholdTimeout);
+		window.clearInterval(this.#trickleInterval);
 		this.#trickleInterval = undefined;
 
 		this.#progress = 1;
 		this.#setProgress(1);
 
-		globalThis.window.setTimeout(() => {
+		window.setTimeout(() => {
 			this.#setOpacity(0);
 		}, animationDuration / 2);
 
-		globalThis.window.setTimeout(() => {
+		window.setTimeout(() => {
 			this.#progress = 0.2;
 			this.#setProgress(0.2);
 		}, animationDuration * 2);
@@ -54,8 +54,8 @@ class ProgressLoading extends HTMLElement {
 	disconnectedCallback() {
 		document.removeEventListener('astro:before-preparation', this.#handlePreparation);
 		document.removeEventListener('astro:before-swap', this.#handleSwap);
-		globalThis.window.clearTimeout(this.#thresholdTimeout);
-		globalThis.window.clearInterval(this.#trickleInterval);
+		window.clearTimeout(this.#thresholdTimeout);
+		window.clearInterval(this.#trickleInterval);
 	}
 }
 

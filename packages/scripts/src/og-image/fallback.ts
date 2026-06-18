@@ -136,9 +136,6 @@ export function getFallbackImageId({
 	regions?: Array<string> | undefined;
 	themes?: Array<string> | undefined;
 }): string {
-	const regionAncestor = regions?.[0];
-	const regionParent = regions?.[1];
-
 	if (collection === 'resources') {
 		return resolveFallbackImageId('resources', id);
 	}
@@ -166,10 +163,13 @@ export function getFallbackImageId({
 		}
 	}
 
+	const regionAncestor = regions?.[0];
+	const regionParent = regions?.[1];
+
 	if (regionAncestor === 'taiwan') {
 		const parentKey = regionParent ? `taiwan/${regionParent}` : undefined;
 
-		if (parentKey && parentKey in fallbackImageIds) {
+		if (parentKey && Object.hasOwn(fallbackImageIds, parentKey)) {
 			return resolveFallbackImageId(parentKey, id);
 		}
 
@@ -178,7 +178,7 @@ export function getFallbackImageId({
 
 	if (category === 'temple') return resolveFallbackImageId('temple', id);
 
-	if (regionAncestor && regionAncestor in fallbackImageIds) {
+	if (regionAncestor && Object.hasOwn(fallbackImageIds, regionAncestor)) {
 		return resolveFallbackImageId(regionAncestor, id);
 	}
 

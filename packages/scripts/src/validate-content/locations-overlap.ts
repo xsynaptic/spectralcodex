@@ -60,7 +60,9 @@ export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdM
 			if (!nearby || nearby.locationId === point.locationId) continue;
 
 			// Create canonical pair key to avoid duplicates (A-B same as B-A)
-			const pairKey = [point.locationId, nearby.locationId].sort().join('|');
+			const pairKey = [point.locationId, nearby.locationId]
+				.sort((idA, idB) => idA.localeCompare(idB))
+				.join('|');
 
 			if (coordinatePairs.has(pairKey)) continue;
 

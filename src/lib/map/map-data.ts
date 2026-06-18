@@ -190,23 +190,23 @@ export function getMapData({
 				...props,
 				targetIds,
 			} satisfies MapComponentData;
-		} else {
-			const sourceData = getLocationsMapSourceData(featureCollection);
-			const popupData = getLocationsMapPopupData(featureCollection);
-
-			return {
-				...defaultMapDataProps,
-				hasGeodata: true,
-				sourceData,
-				popupData,
-				featureCount: featureCollection.features.length,
-				/** Extend the version to include source and popup hashes when passing data directly */
-				version: `${import.meta.env.BUILD_VERSION ?? 'unknown'}-${sourceHash}-${popupHash}`,
-				...mapBounds,
-				...props,
-				targetIds,
-			} satisfies MapComponentData;
 		}
+
+		const sourceData = getLocationsMapSourceData(featureCollection);
+		const popupData = getLocationsMapPopupData(featureCollection);
+
+		return {
+			...defaultMapDataProps,
+			hasGeodata: true,
+			sourceData,
+			popupData,
+			featureCount: featureCollection.features.length,
+			/** Extend the version to include source and popup hashes when passing data directly */
+			version: `${import.meta.env.BUILD_VERSION ?? 'unknown'}-${sourceHash}-${popupHash}`,
+			...mapBounds,
+			...props,
+			targetIds,
+		} satisfies MapComponentData;
 	}
 
 	return {

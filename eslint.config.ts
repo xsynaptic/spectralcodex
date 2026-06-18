@@ -6,8 +6,6 @@ import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
-const isStrictLint = process.env.ESLINT_STRICT === '1';
-
 const webComponentConfig = getWebComponentConfig(['src/components/**/*.ts']);
 
 export default getConfig(
@@ -26,14 +24,20 @@ export default getConfig(
 		},
 		{
 			rules: {
-				// Expensive type-aware rules; only run in strict mode
-				'@typescript-eslint/no-deprecated': isStrictLint ? 'error' : 'off',
-				'@typescript-eslint/no-unsafe-assignment': isStrictLint ? 'error' : 'off',
-				'@typescript-eslint/no-misused-promises': isStrictLint ? 'error' : 'off',
+				// Type-aware, but the type program is already built for the other TS rules so these are nearly free
+				'@typescript-eslint/no-deprecated': 'error',
+				'@typescript-eslint/no-unsafe-assignment': 'error',
+				'@typescript-eslint/no-misused-promises': 'error',
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
 				'unicorn/consistent-compound-words': 'off',
+				// @TODO: re-enable and fix; currently there are 80+ issues reported by this rule
+				'unicorn/consistent-boolean-name': 'off',
+				// Refactor-heavy: wants nested loops extracted into functions
+				'unicorn/no-break-in-nested-loop': 'off',
+				// False positives: map glyph URLs, i18n tokens, and shell format strings use literal braces
+				'unicorn/no-incorrect-template-string-interpolation': 'off',
 			},
 		},
 		// Opt out of recommended-natural sort rules to avoid churn in this mature project;
@@ -97,7 +101,7 @@ export default getConfig(
 			files: ['src/components/**/*'],
 			languageOptions: {
 				globals: {
-					...Object.fromEntries(Object.entries(globals.node).map(([key]) => [key, 'off'])),
+					...Object.fromEntries(Object.keys(globals.node).map((key) => [key, 'off'])),
 					...globals.browser,
 				},
 			},
@@ -109,14 +113,7 @@ export default getConfig(
 		/**
 		 * Native web components
 		 */
-		{
-			...webComponentConfig,
-			rules: {
-				...webComponentConfig.rules,
-				// Redundant under strict TS; the project avoids custom-element inheritance entirely
-				'wc/guard-super-call': 'off',
-			},
-		},
+		webComponentConfig,
 		/**
 		 * Astro
 		 */

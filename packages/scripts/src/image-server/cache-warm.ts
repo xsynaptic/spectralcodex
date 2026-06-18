@@ -34,7 +34,7 @@ function loadCacheWarmConfig(options: CacheWarmOptions): CacheWarmConfig {
 
 	return {
 		remoteHost,
-		...(sshKeyPath && sshKeyPath !== '' ? { sshKeyPath } : {}),
+		...(sshKeyPath && sshKeyPath !== '' && { sshKeyPath }),
 		sitePath,
 		nginxUrl,
 		concurrency,

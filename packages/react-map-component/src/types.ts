@@ -60,9 +60,9 @@ export const MapSourceItemSchema = z
 			[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
 			[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
 			[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
-			...(value[MapDataKeyMap[MapDataKeys.Objective]]
-				? { [MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]] }
-				: {}),
+			...(value[MapDataKeyMap[MapDataKeys.Objective]] && {
+				[MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]],
+			}),
 			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]],
 			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]],
 		},

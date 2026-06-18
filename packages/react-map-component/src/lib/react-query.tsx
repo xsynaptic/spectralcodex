@@ -53,7 +53,7 @@ export const ReactQueryProvider = ({ children, isDev, version }: ReactQueryProvi
 			persistOptions={{
 				persister: createIdbPersister('spectralcodex-map-data-cache'),
 				maxAge: TIME_24_HOURS,
-				...(version ? { buster: version } : {}),
+				...(version && { buster: version }),
 			}}
 		>
 			{children}

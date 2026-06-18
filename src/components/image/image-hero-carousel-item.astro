@@ -59,7 +59,7 @@ async function getImageProps(
 			operations: { fit },
 			imageQuality: IMAGE_HERO_QUALITY,
 			imageFormat: IMAGE_HERO_FORMAT,
-			...(priority ? { priority: true } : {}),
+			...(priority && { priority: true }),
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,

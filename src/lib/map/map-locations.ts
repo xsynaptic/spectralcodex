@@ -29,9 +29,7 @@ function getRelativePath(url: string | undefined): string | undefined {
 }
 
 function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
-	const truncatedCoordinates = coordinates
-		.slice(0, 2)
-		.map((value) => Number.parseFloat(value.toFixed(6)));
+	const truncatedCoordinates = coordinates.slice(0, 2).map((value) => Number(value.toFixed(6)));
 
 	return [truncatedCoordinates[0] ?? 0, truncatedCoordinates[1] ?? 0];
 }
@@ -125,24 +123,20 @@ export function getLocationsFeatureCollection(
 					: undefined;
 
 				// Image thumbnails can be nulled by sub-locations
-				const image =
-					geometry._imageThumbnail === undefined
-						? entry.data._imageThumbnail
-						: geometry._imageThumbnail;
+				const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)
+					._imageThumbnail;
 
 				return {
 					type: 'Feature' as const,
 					id,
 					properties: {
 						title,
-						...(entryTitleMultilingual
-							? {
-									titleMultilingualLang: entryTitleMultilingual.lang,
-									titleMultilingualValue: geometryTitleMultilingual
-										? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
-										: entryTitleMultilingual.value,
-								}
-							: {}),
+						...(entryTitleMultilingual && {
+							titleMultilingualLang: entryTitleMultilingual.lang,
+							titleMultilingualValue: geometryTitleMultilingual
+								? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
+								: entryTitleMultilingual.value,
+						}),
 						url: getRelativePath(entry.data._url),
 						description: geometry.description ?? entry.data._descriptionHtml,
 						category: geometry.category ?? entry.data.category,
@@ -155,7 +149,7 @@ export function getLocationsFeatureCollection(
 						safety: entry.data.safety,
 						googleMapsUrl,
 						wikipediaUrl,
-						...(image === null ? {} : { image }),
+						...(image !== null && { image }),
 					},
 					geometry: {
 						type: GeometryTypeEnum.Point,
@@ -189,15 +183,13 @@ export function getLocationsMapSourceData(
 				[MapDataKeysCompressed.Precision]: feature.properties.precision,
 				[MapDataKeysCompressed.Quality]: feature.properties.quality,
 				[MapDataKeysCompressed.Rating]: feature.properties.rating,
-				...(feature.properties.objective === undefined
-					? {}
-					: { [MapDataKeysCompressed.Objective]: feature.properties.objective }),
-				...(feature.properties.outlier === undefined
-					? {}
-					: { [MapDataKeysCompressed.Outlier]: feature.properties.outlier }),
-				...(feature.properties.image === undefined
-					? {}
-					: { [MapDataKeysCompressed.HasImage]: true }),
+				...(feature.properties.objective !== undefined && {
+					[MapDataKeysCompressed.Objective]: feature.properties.objective,
+				}),
+				...(feature.properties.outlier !== undefined && {
+					[MapDataKeysCompressed.Outlier]: feature.properties.outlier,
+				}),
+				...(feature.properties.image !== undefined && { [MapDataKeysCompressed.HasImage]: true }),
 				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 			};
 		})
@@ -224,14 +216,12 @@ export function getLocationsMapPopupData(
 				[MapDataKeysCompressed.Safety]: feature.properties.safety,
 				[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
 				[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
-				...(feature.properties.image === undefined
-					? {}
-					: {
-							[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
-							[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
-							[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
-							[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
-						}),
+				...(feature.properties.image !== undefined && {
+					[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
+					[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
+					[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
+					[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
+				}),
 			};
 		})
 		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));

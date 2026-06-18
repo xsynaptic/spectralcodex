@@ -73,7 +73,7 @@ const openGraphImage = generateOpenGraphImageUrl({
 			siteName: siteTitle,
 		},
 		image: openGraphImage,
-		...(ogType === 'article' && article !== undefined ? { article } : {}),
+		...(ogType === 'article' && article !== undefined && { article }),
 	}}
 	twitter={{
 		card: 'summary_large_image',
@@ -84,9 +84,9 @@ const openGraphImage = generateOpenGraphImageUrl({
 		imageAlt: openGraphImage.alt,
 	}}
 	extend={{
-		...(prefetchUrls?.length
-			? { link: prefetchUrls.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl })) }
-			: {}),
+		...(prefetchUrls?.length && {
+			link: prefetchUrls.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl })),
+		}),
 		meta: [{ name: 'generator', content: Astro.generator }],
 	}}
 	noindex={noIndex ?? false}
