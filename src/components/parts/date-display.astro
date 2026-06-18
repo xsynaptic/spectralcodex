@@ -7,6 +7,7 @@ import { DatePresetEnum, parseContentDate } from '#lib/utils/date.ts';
 
 interface Props extends HTMLAttributes<'time'> {
 	date: string | Date;
+	dateEnd?: string | Date | undefined;
 	datePreset?: DatePreset;
 	dateOptions?: Intl.DateTimeFormatOptions | undefined;
 }
@@ -38,18 +39,21 @@ const datePresets = {
 	},
 } satisfies Record<DatePreset, Intl.DateTimeFormatOptions>;
 
-const { date, datePreset = DatePresetEnum.Medium, dateOptions, ...props } = Astro.props;
+const { date, dateEnd, datePreset = DatePresetEnum.Medium, dateOptions, ...props } = Astro.props;
 
 const dateRaw = parseContentDate(date);
 
 if (!dateRaw) throw new Error(`Invalid date: "${JSON.stringify(date)}"`);
 
+const dateEndRaw = parseContentDate(dateEnd);
+
 const dateTimeAttribute = dateRaw.toISOString();
 
-const dateDisplay = dateRaw.toLocaleDateString('en-US', {
-	...datePresets[datePreset],
-	...dateOptions,
-});
+const formatOptions = { ...datePresets[datePreset], ...dateOptions };
+
+const dateDisplay = dateEndRaw
+	? new Intl.DateTimeFormat('en-US', formatOptions).formatRange(dateRaw, dateEndRaw)
+	: dateRaw.toLocaleDateString('en-US', formatOptions);
 ---
 
 <time datetime={dateTimeAttribute} {...props}>{dateDisplay}</time>

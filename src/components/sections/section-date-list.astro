@@ -1,0 +1,58 @@
+---
+import ContentSection from '#components/content/content-section.astro';
+import DateDisplay from '#components/parts/date-display.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+
+interface Props {
+	dates: Date | Array<Date> | undefined;
+	title: string;
+}
+
+const { dates, title, ...props } = Astro.props;
+
+function getUtcDayNumber(date: Date) {
+	return Math.floor(
+		Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86_400_000,
+	);
+}
+
+// Group ascending-sorted dates into runs of consecutive calendar days
+function getDateRanges(input: Array<Date>) {
+	const sorted = [...input].sort((a, b) => a.valueOf() - b.valueOf());
+	const ranges: Array<{ start: Date; end: Date }> = [];
+	for (const date of sorted) {
+		const previous = ranges.at(-1);
+		const dayDelta = previous ? getUtcDayNumber(date) - getUtcDayNumber(previous.end) : undefined;
+		if (dayDelta === 0) continue;
+		if (previous && dayDelta === 1) {
+			previous.end = date;
+			continue;
+		}
+		ranges.push({ start: date, end: date });
+	}
+	return ranges;
+}
+
+const dateRanges = dates ? getDateRanges(Array.isArray(dates) ? dates : [dates]) : [];
+---
+
+{
+	dateRanges.length > 0 ? (
+		<ContentSection data-pagefind-ignore {...props}>
+			<Fragment slot="section-title">{title}</Fragment>
+			<ListColumn class="font-serif text-xs sm:text-sm">
+				{dateRanges.map((range) => (
+					<ListColumnItem>
+						<DateDisplay
+							date={range.start}
+							dateEnd={range.start.valueOf() === range.end.valueOf() ? undefined : range.end}
+							datePreset={DatePresetEnum.Medium}
+						/>
+					</ListColumnItem>
+				))}
+			</ListColumn>
+		</ContentSection>
+	) : undefined
+}

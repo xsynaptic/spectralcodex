@@ -18,6 +18,7 @@ export const series = defineCollection({
 			seriesItems: z.string().array().optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
+			dateRecorded: DateStringSchema.array().optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),

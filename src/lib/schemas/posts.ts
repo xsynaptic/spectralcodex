@@ -19,6 +19,7 @@ export const postSchema = z
 		sources: SourceSchema.array().optional(),
 		dateCreated: DateStringSchema,
 		dateUpdated: DateStringSchema.optional(),
+		dateRecorded: DateStringSchema.array().optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
 		hideSearch: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,

@@ -108,6 +108,7 @@ const translationStrings = {
 		'section.backlinks': 'Connections',
 		'section.similar': 'Similar Content',
 		'section.dateVisited': 'Visitation Log',
+		'section.dateRecorded': 'Recorded',
 		'section.webmentions': 'Webmentions',
 
 		// Citations

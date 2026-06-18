@@ -17,10 +17,12 @@ import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
+import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getNoteSchema } from '#lib/collections/notes/notes-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -34,6 +36,8 @@ interface Props {
 }
 
 const { entry, backlinks } = Astro.props;
+
+const t = getTranslations();
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -121,6 +125,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		<SectionThemes themeIds={themeIds} />
 		<SectionRegions regionIds={regionIds} />
 		<SectionBacklinks backlinks={backlinks} />
+		<SectionDateList dates={entry.data.dateRecorded} title={t('section.dateRecorded')} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>
 </MainSite>

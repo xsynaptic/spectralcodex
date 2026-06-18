@@ -19,6 +19,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
 import SectionCitation from '#components/sections/section-citation.astro';
+import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
@@ -28,6 +29,7 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -42,6 +44,8 @@ interface Props {
 }
 
 const { entry, mapData, backlinks } = Astro.props;
+
+const t = getTranslations();
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -135,6 +139,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
+		<SectionDateList dates={entry.data.dateRecorded} title={t('section.dateRecorded')} />
 		<SectionAuthor showAuthor={false} />
 		{import.meta.env.DEV ? <SectionCitation entry={entry} /> : undefined}
 	</ContentArticle>
