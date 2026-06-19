@@ -64,3 +64,35 @@ export interface PreviewOptions {
 	showPosts?: boolean | undefined;
 	showTitleMultilingual?: boolean | undefined;
 }
+
+/**
+ * Microformats used in this project are defined here as an enum
+ */
+export const MicroformatClassNames = {
+	Author: 'p-author',
+	Card: 'h-card',
+	Category: 'p-category',
+	DatePublished: 'dt-published',
+	DateUpdated: 'dt-updated',
+	Entry: 'h-entry',
+	Name: 'p-name',
+	Organization: 'p-org',
+	Photo: 'u-photo',
+	Role: 'p-role',
+	Url: 'u-url',
+} as const;
+
+/**
+ * An enum to help keep z-index values in check
+ */
+export const zIndexScaleEnum = {
+	ImageBase: 10,
+	ImageShadow: 11,
+	ImageHeader: 12,
+	ImageCaption: 15,
+	ImageNavigation: 15,
+	MainHeader: 40,
+	MainTopButton: 45,
+	MainProgress: 60,
+	MainSkipLink: 70,
+} as const;

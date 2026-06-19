@@ -5,7 +5,7 @@ import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
-import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
+import { zIndexScaleEnum } from '#components/types.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;

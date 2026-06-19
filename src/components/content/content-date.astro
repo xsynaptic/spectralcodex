@@ -4,8 +4,8 @@ import type { HTMLAttributes } from 'astro/types';
 import type { DatePreset } from '#lib/utils/date.ts';
 
 import DateDisplay from '#components/parts/date-display.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	date: string | Date | undefined;

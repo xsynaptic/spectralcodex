@@ -5,13 +5,13 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
+import { zIndexScaleEnum } from '#components/types.ts';
 import { IMAGE_HERO_FORMAT, IMAGE_HERO_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
-import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
 interface Props extends ImageFeaturedWithCaption {
 	class?: string | undefined;

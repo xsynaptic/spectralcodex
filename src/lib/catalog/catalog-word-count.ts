@@ -8,7 +8,7 @@ import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS } from '#constants.ts';
-import { renderMarkdownInline } from '#lib/utils/markdown.ts';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');

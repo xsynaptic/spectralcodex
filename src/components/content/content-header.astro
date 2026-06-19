@@ -5,8 +5,8 @@ import { stripTags } from '@xsynaptic/unified-tools';
 
 import Container from '#components/parts/container.astro';
 import TextGradient from '#components/parts/text-gradient.astro';
+import { zIndexScaleEnum } from '#components/types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { zIndexScaleEnum } from '#lib/utils/z-index.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	class?: string | undefined;

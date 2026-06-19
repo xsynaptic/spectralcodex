@@ -14,12 +14,12 @@ import DividedItem from '#components/parts/divided-item.astro';
 import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
-import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 

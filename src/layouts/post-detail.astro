@@ -27,6 +27,7 @@ import SectionSeries from '#components/sections/section-series.astro';
 import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -34,7 +35,6 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
-import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {

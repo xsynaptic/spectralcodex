@@ -31,6 +31,7 @@ import SectionSeries from '#components/sections/section-series.astro';
 import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
 	createLocationEntryDisplayFunction,
@@ -42,7 +43,6 @@ import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
-import { MicroformatClassNames } from '#lib/utils/microformats.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {

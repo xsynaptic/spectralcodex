@@ -14,9 +14,9 @@ import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
-import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
 	page: Page<CollectionEntry<'notes'>>;

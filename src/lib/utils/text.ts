@@ -1,4 +1,6 @@
+import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import { stripTags } from '@xsynaptic/unified-tools';
+import { markdownToHtml } from 'satteri';
 
 export function textClipper(
 	input: string,
@@ -95,4 +97,24 @@ export function refineTypography(input: string): string {
 	// Single quotes: opening in the same positions, otherwise apostrophe or closing
 	value = value.replaceAll(/(^|[\s([{<–—])'/g, '$1‘').replaceAll("'", '’');
 	return value;
+}
+
+// Render a short markdown string (descriptions, notices, teasers) to inline HTML
+// CJK wrapping is plugged into the parser; stripping or sanitizing is left to callers that need it
+const markdownCache = new Map<string, string>();
+
+export function renderMarkdownInline(input: string): string {
+	const cached = markdownCache.get(input);
+
+	if (cached !== undefined) return cached;
+
+	const { html } = markdownToHtml(input, {
+		features: { smartPunctuation: true },
+		hastPlugins: [wrapCjk({ value: 'cjk' })],
+	});
+	const result = html.trim();
+
+	markdownCache.set(input, result);
+
+	return result;
 }

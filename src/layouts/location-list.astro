@@ -10,8 +10,8 @@ import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { renderMarkdownInline } from '#lib/utils/markdown.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
 	page: Page<CatalogItem>;
