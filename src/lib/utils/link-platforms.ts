@@ -11,6 +11,7 @@ const linkPlatforms: Array<LinkPlatform> = [
 	{ match: 'x.com', title: 'X' },
 	{ match: 'instagram.com', title: 'Instagram' },
 	{ match: 'matters.town', title: 'Matters' },
+	{ match: 'medium.com', title: 'Medium' },
 	{ match: 'threads.com', title: 'Threads' },
 	{ match: 'reddit.com', title: 'Reddit' },
 	{ match: 'hiking.biji.co', title: 'Hiking Note', title_zh: '健康筆記' },
