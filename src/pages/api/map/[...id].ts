@@ -3,7 +3,7 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import * as R from 'remeda';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getObjectiveLocations } from '#lib/collections/locations/locations-utils-objectives.ts';
+import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
 import {
 	createLocationsByIdsFunction,
 	createLocationsByPostsFunction,
