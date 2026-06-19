@@ -8,6 +8,8 @@ import type {
 	ArchivesMonthlyItem,
 } from '#lib/collections/archives/archives-types.ts';
 
+import { getDateRanges } from '#lib/utils/date.ts';
+
 interface ArchivesRawMonthData extends Pick<
 	ArchivesMonthlyItem,
 	'id' | 'year' | 'month' | 'monthName' | 'title'
@@ -114,16 +116,18 @@ function buildArchivesDataMap(items: ReadonlyArray<CatalogItem>): ArchivesDataMa
 
 		getOrCreateMonthData(archiveDataMap, dateCreatedData).created.add(item);
 
-		if (item.dateVisited) {
-			const yearsVisited = new Set<string>();
-			const dateVisitedArray = [...item.dateVisited].sort((a, b) => b.getTime() - a.getTime());
+		if (item.dateRecorded) {
+			const yearsRecorded = new Set<string>();
+			const recordedDates = getDateRanges(item.dateRecorded)
+				.map((range) => range.start.date)
+				.sort((a, b) => b.getTime() - a.getTime());
 
-			for (const dateVisited of dateVisitedArray) {
-				const dateVisitedData = getDateData(dateVisited);
+			for (const recordedDate of recordedDates) {
+				const recordedDateData = getDateData(recordedDate);
 
-				if (!yearsVisited.has(dateVisitedData.year)) {
-					yearsVisited.add(dateVisitedData.year);
-					getOrCreateMonthData(archiveDataMap, dateVisitedData).visited.add(item);
+				if (!yearsRecorded.has(recordedDateData.year)) {
+					yearsRecorded.add(recordedDateData.year);
+					getOrCreateMonthData(archiveDataMap, recordedDateData).visited.add(item);
 				}
 			}
 		}

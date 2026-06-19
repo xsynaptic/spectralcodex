@@ -39,7 +39,7 @@ describe('createArchivesData', () => {
 					id: 'created-and-visited',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 10),
-					dateVisited: [new Date(2024, 2, 20)],
+					dateRecorded: [{ date: new Date(2024, 2, 20), hasTime: false }],
 				}),
 				// Updated (from a different create month) and visited in the same month -> kept as updated
 				makeCatalogItem({
@@ -47,7 +47,7 @@ describe('createArchivesData', () => {
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 5),
 					dateUpdated: new Date(2024, 2, 15),
-					dateVisited: [new Date(2024, 2, 25)],
+					dateRecorded: [{ date: new Date(2024, 2, 25), hasTime: false }],
 				}),
 			],
 			[],

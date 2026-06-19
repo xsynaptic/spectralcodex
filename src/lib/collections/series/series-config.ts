@@ -5,7 +5,12 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import {
+	DateRecordedSchema,
+	DateStringSchema,
+	NumericScaleSchema,
+	TitleSchema,
+} from '#lib/schemas/index.ts';
 
 export const series = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/series` }),
@@ -18,7 +23,7 @@ export const series = defineCollection({
 			seriesItems: z.string().array().optional(),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			dateRecorded: DateStringSchema.array().optional(),
+			dateRecorded: DateRecordedSchema.optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),

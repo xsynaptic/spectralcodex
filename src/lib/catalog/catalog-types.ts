@@ -2,6 +2,7 @@ import type { ImageFeaturedObject } from '@spectralcodex/shared/schemas';
 import type { CollectionKey } from 'astro:content';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 export type CatalogCollectionKey = Extract<
 	CollectionKey,
@@ -25,7 +26,7 @@ export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionK
 	backlinks: Set<string>;
 	dateCreated: Date;
 	dateUpdated: Date | undefined;
-	dateVisited: Array<Date> | undefined;
+	dateRecorded: Array<DateRecordedEntry> | undefined;
 	entryQuality: number;
 }
 

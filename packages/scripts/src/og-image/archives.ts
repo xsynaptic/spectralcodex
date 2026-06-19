@@ -55,6 +55,29 @@ function parseArchiveDate(value: unknown): Date | undefined {
 	return undefined;
 }
 
+// dateRecorded entries are ContentDate objects or [start, end] tuples; pull the date from each
+function extractRecordedDates(value: unknown): Array<Date> {
+	if (!Array.isArray(value)) return [];
+
+	const dates: Array<Date> = [];
+
+	for (const entry of value) {
+		const contentDates = Array.isArray(entry) ? entry : [entry];
+
+		for (const contentDate of contentDates) {
+			const raw =
+				contentDate && typeof contentDate === 'object' && 'date' in contentDate
+					? (contentDate as { date: unknown }).date
+					: undefined;
+			const date = parseArchiveDate(raw);
+
+			if (date) dates.push(date);
+		}
+	}
+
+	return dates;
+}
+
 function getArchivePeriodKeys(date: Date): Array<string> {
 	const year = String(date.getFullYear()).padStart(4, '0');
 	const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -114,12 +137,8 @@ export function buildArchiveImageIndex(
 
 			if (dateUpdated) dated.push({ date: dateUpdated, category: 'updated' });
 
-			if (Array.isArray(entry.data.dateVisited)) {
-				for (const value of entry.data.dateVisited) {
-					const date = parseArchiveDate(value);
-
-					if (date) dated.push({ date, category: 'visited' });
-				}
+			for (const date of extractRecordedDates(entry.data.dateRecorded)) {
+				dated.push({ date, category: 'visited' });
 			}
 
 			for (const { date, category } of dated) {

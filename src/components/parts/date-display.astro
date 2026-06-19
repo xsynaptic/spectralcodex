@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { DatePreset } from '#lib/utils/date.ts';
 
-import { DatePresetEnum, parseContentDate } from '#lib/utils/date.ts';
+import { DatePresetEnum, getDateDisplay, parseContentDate } from '#lib/utils/date.ts';
 
 interface Props extends HTMLAttributes<'time'> {
 	date: string | Date;
@@ -51,9 +51,7 @@ const dateTimeAttribute = dateRaw.toISOString();
 
 const formatOptions = { ...datePresets[datePreset], ...dateOptions };
 
-const dateDisplay = dateEndRaw
-	? new Intl.DateTimeFormat('en-US', formatOptions).formatRange(dateRaw, dateEndRaw)
-	: dateRaw.toLocaleDateString('en-US', formatOptions);
+const dateDisplay = getDateDisplay(dateRaw, dateEndRaw, formatOptions);
 ---
 
 <time datetime={dateTimeAttribute} {...props}>{dateDisplay}</time>

@@ -176,7 +176,7 @@ const t = getTranslations();
 		<SectionHeritage heritage={entry.data.heritage} />
 		{
 			hideLocation ? undefined : (
-				<SectionDateList dates={entry.data.dateVisited} title={t('section.dateVisited')} />
+				<SectionDateList dates={entry.data.dateRecorded} title={t('section.dateRecorded')} />
 			)
 		}
 		{hideLocation ? undefined : <SectionLinks entry={entry} />}

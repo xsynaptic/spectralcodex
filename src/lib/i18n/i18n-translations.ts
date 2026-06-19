@@ -107,8 +107,7 @@ const translationStrings = {
 		'section.locationsNearby': 'Nearby Locations',
 		'section.backlinks': 'Connections',
 		'section.similar': 'Similar Content',
-		'section.dateVisited': 'Visitation Log',
-		'section.dateRecorded': 'Recorded',
+		'section.dateRecorded': 'Recorded On',
 		'section.webmentions': 'Webmentions',
 
 		// Citations

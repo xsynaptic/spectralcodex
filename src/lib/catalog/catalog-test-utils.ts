@@ -19,7 +19,7 @@ export function makeCatalogItem(
 		// Local-time constructor (not an ISO string) so date-bucketing tests stay timezone stable
 		dateCreated: new Date(2020, 0, 1),
 		dateUpdated: undefined,
-		dateVisited: undefined,
+		dateRecorded: undefined,
 		entryQuality: 3,
 		...overrides,
 	};

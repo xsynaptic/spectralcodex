@@ -15,13 +15,13 @@ export const TitleSchema = z
 // Content dates are wall-clock values: `YYYY/MM/DD` with an optional `HH:mm` (24-hour) time
 const contentDateRegex = /^\d{4}\/\d{2}\/\d{2}( \d{2}:\d{2})?$/;
 
-export const DateStringSchema = z.string().transform((value, ctx) => {
+function parseContentDateString(value: string, ctx: z.RefinementCtx) {
 	if (!contentDateRegex.test(value)) {
 		ctx.addIssue({
 			code: 'custom',
 			message: `Use YYYY/MM/DD or YYYY/MM/DD HH:mm (24-hour): "${value}"`,
 		});
-		return z.NEVER;
+		return;
 	}
 
 	const [datePart = '', timePart] = value.split(' ');
@@ -29,11 +29,27 @@ export const DateStringSchema = z.string().transform((value, ctx) => {
 
 	if (Number.isNaN(date.getTime())) {
 		ctx.addIssue({ code: 'custom', message: `Invalid date: "${value}"` });
-		return z.NEVER;
+		return;
 	}
 
-	return date;
+	return { date, hasTime: timePart !== undefined };
+}
+
+export const DateStringSchema = z.string().transform((value, ctx) => {
+	const result = parseContentDateString(value, ctx);
+	if (!result) return z.NEVER;
+	return result.date;
 });
+
+const DateValueSchema = z.string().transform((value, ctx) => {
+	const result = parseContentDateString(value, ctx);
+	if (!result) return z.NEVER;
+	return result;
+});
+
+export const DateRecordedSchema = z
+	.union([DateValueSchema, z.tuple([DateValueSchema, DateValueSchema])])
+	.array();
 
 // Numeric scale schema, from 1 to 5; used by locations and archives
 export const NumericScaleSchema = z.number().int().min(1).max(5);

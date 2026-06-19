@@ -128,9 +128,9 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 				dateUpdated: parseContentDate(
 					'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,
 				),
-				dateVisited:
-					'dateVisited' in entry.data && entry.data.dateVisited
-						? entry.data.dateVisited.map(parseContentDate).filter((date) => date !== undefined)
+				dateRecorded:
+					'dateRecorded' in entry.data && entry.data.dateRecorded
+						? entry.data.dateRecorded
 						: undefined,
 				entryQuality: entry.data.entryQuality,
 			});

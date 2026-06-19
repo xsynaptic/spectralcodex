@@ -13,7 +13,12 @@ import {
 import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import {
+	DateRecordedSchema,
+	DateStringSchema,
+	NumericScaleSchema,
+	TitleSchema,
+} from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
@@ -42,7 +47,7 @@ export const locations = defineCollection({
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
 			dateCreated: DateStringSchema,
 			dateUpdated: DateStringSchema.optional(),
-			dateVisited: DateStringSchema.array().optional(),
+			dateRecorded: DateRecordedSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			rating: NumericScaleSchema,
 			safety: NumericScaleSchema.optional(),

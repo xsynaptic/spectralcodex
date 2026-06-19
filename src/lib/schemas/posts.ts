@@ -3,7 +3,12 @@ import { reference } from 'astro:content';
 import { z } from 'zod';
 
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import {
+	DateRecordedSchema,
+	DateStringSchema,
+	NumericScaleSchema,
+	TitleSchema,
+} from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 // Used by notes and posts
@@ -19,7 +24,7 @@ export const postSchema = z
 		sources: SourceSchema.array().optional(),
 		dateCreated: DateStringSchema,
 		dateUpdated: DateStringSchema.optional(),
-		dateRecorded: DateStringSchema.array().optional(),
+		dateRecorded: DateRecordedSchema.optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
 		hideSearch: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
