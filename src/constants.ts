@@ -47,6 +47,7 @@ export const MDX_COMPONENTS = [
 	'LocationsTable',
 	'Map',
 	'More',
+	'Resource',
 ];
 
 /**

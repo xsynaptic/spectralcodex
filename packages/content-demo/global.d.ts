@@ -23,6 +23,7 @@ declare global {
 		}) => React.JSX.Element;
 		Hide: (props: { children: React.ReactNode; char?: string }) => React.JSX.Element;
 		Link: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
+		Resource: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
 		LocationsTable: (props: { id: string }) => React.JSX.Element;
 		Map: (props: {
 			locations: Array<string>;

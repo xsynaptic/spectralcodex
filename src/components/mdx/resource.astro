@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
+import { renderSlot } from '#lib/utils/astro.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
+
+interface Props extends HTMLAttributes<'a'> {
+	id: string | undefined;
+}
+
+const { id, ...props } = Astro.props;
+
+const content = await renderSlot(Astro.slots, 'default');
+
+const pathname = Astro.url.pathname;
+
+if (!id) {
+	throw new Error(`Resource component requires an ID; rendering path: ${pathname}`);
+}
+
+const { entriesMap } = await getResourcesCollection();
+const resource = entriesMap.get(id);
+
+if (!resource && import.meta.env.DEV) {
+	console.warn(`[Resource] Referenced resource "${id}" not found; rendering path: ${pathname}`);
+}
+
+// Only showPage resources have a routed page; page-less ones render as plain text
+const href = resource?.data.showPage ? getContentUrl('resources', resource.id) : undefined;
+---
+
+{href ? <a href={href} {...props} set:html={content} /> : <Fragment set:html={content} />}
