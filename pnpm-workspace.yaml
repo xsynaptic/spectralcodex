@@ -1,29 +1,22 @@
 packages:
   - packages/**
 
+# @astrojs/markdown-satteri@0.3.1-beta.1 still caps satteri at ^0.8.0, pulling a second
+# copy alongside our 0.9.0; the duplicate brands break type-checking in astro.config.mjs
+overrides:
+  satteri: 0.9.0
+
 # Intended to mitigate supply chain attacks
 minimumReleaseAge: 1440
 verifyDepsBeforeRun: error
 strictDepBuilds: true
 
 minimumReleaseAgeExclude:
-  # Bypass the 24h guard while Astro 7 prereleases and @xsynaptic packages still churn
   - 'astro'
-  - '@astrojs/mdx'
-  - '@astrojs/markdown-satteri'
-  - '@astrojs/node'
-  - '@astrojs/react'
   - 'satteri'
-  - '@xsynaptic/astro-build-logger'
-  - '@xsynaptic/eslint-config'
-  - '@xsynaptic/rehype-wrap-cjk'
-  - '@xsynaptic/satteri-auto-import'
-  - '@xsynaptic/satteri-img-group'
-  - '@xsynaptic/satteri-wrap-cjk'
-  - '@xsynaptic/stylelint-config'
-  - '@xsynaptic/unified-tools'
-  - '@xsynaptic/unpic-imagor'
-  - '@xsynaptic/word-count'
+  - '@astrojs/*'
+  - '@bruits/*'
+  - '@xsynaptic/*'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true

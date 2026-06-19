@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
   injectWorkspacePackages: true
 
+overrides:
+  satteri: 0.9.0
+
 importers:
 
   .:
@@ -107,14 +110,14 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
       '@xsynaptic/satteri-auto-import':
-        specifier: ^0.1.0
-        version: 0.1.0(satteri@0.8.1)
+        specifier: ^0.1.1
+        version: 0.1.1(satteri@0.9.0)
       '@xsynaptic/satteri-img-group':
-        specifier: ^0.2.0
-        version: 0.2.0(satteri@0.8.1)
+        specifier: ^0.2.1
+        version: 0.2.1(satteri@0.9.0)
       '@xsynaptic/satteri-wrap-cjk':
         specifier: ^0.1.1
-        version: 0.1.1(satteri@0.8.1)
+        version: 0.1.1(satteri@0.9.0)
       '@xsynaptic/stylelint-config':
         specifier: ^0.1.1
         version: 0.1.1(stylelint-order@8.1.1(stylelint@17.13.0(typescript@6.0.3)))(stylelint@17.13.0(typescript@6.0.3))
@@ -188,8 +191,8 @@ importers:
         specifier: ^2.38.0
         version: 2.39.0
       satteri:
-        specifier: 0.8.1
-        version: 0.8.1
+        specifier: 0.9.0
+        version: 0.9.0
       sharp:
         specifier: ^0.35.1
         version: 0.35.1
@@ -382,8 +385,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       '@duckdb/node-api':
-        specifier: ^1.5.3-r.3
-        version: 1.5.3-r.3
+        specifier: ^1.5.4-r.1
+        version: 1.5.4-r.1
       '@fontsource/lora':
         specifier: ^5.2.8
         version: 5.2.8
@@ -731,29 +734,29 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@bruits/satteri-darwin-arm64@0.8.1':
-    resolution: {integrity: sha512-9R8icJLGP8e3LOh8qLTZP1wdSGti6+OzGu3RCuSinMHUdPhTEDU3kbPV35vTGxUHghDGKYXPZBP+jDsbvKdf6A==}
+  '@bruits/satteri-darwin-arm64@0.9.0':
+    resolution: {integrity: sha512-fJtb3K+D8OvtjeZO2CB58gS50F6wV2Ve/BHoyp8D4d7sUhaSVoKqn0ma5wWLlIFAjdWDfLr5wx/KTukT7lgpQA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@bruits/satteri-darwin-x64@0.8.1':
-    resolution: {integrity: sha512-UY5qDOoPXFsSnmfU6Qwi7h0hrtwlU8brwDrgZ4C1GSjcBVV01kQ96iXX+JIDoyO1Lnps0Wola0ar+iwkL2sAtg==}
+  '@bruits/satteri-darwin-x64@0.9.0':
+    resolution: {integrity: sha512-jj6Y9Hnwi1y276QqOK/aNUltDbKJqzuJw62yisRPkYSA4FHE6Di0LDsSAwK4n7S//jP0sn1Q2KsDNYhCQ9WNIw==}
     cpu: [x64]
     os: [darwin]
 
-  '@bruits/satteri-linux-x64-gnu@0.8.1':
-    resolution: {integrity: sha512-OnOyNWEgUVFiDlaVuzd56GSucKY2F+1GMUT9lBqHb4TI0OQgZRP4fCfwxfz+2Rb1hQXuEGSTRJjyhPGQ5ft6kQ==}
+  '@bruits/satteri-linux-x64-gnu@0.9.0':
+    resolution: {integrity: sha512-AwBHO06U1eFqS1UoqZM9qowFDdisnf355JuahAby9LN/p9R7swlQV9QqIRPPHeFEm5ECoDNlCI5TPNWqP34+6Q==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@bruits/satteri-wasm32-wasi@0.8.1':
-    resolution: {integrity: sha512-FKgKMIplotnCobQwfVd81YSakgiUBSn+truqElYFX9O+sinePlJXmLuDECNS1Utj8/59t0ryOZ2Sv1ThfAfaNA==}
+  '@bruits/satteri-wasm32-wasi@0.9.0':
+    resolution: {integrity: sha512-/6ga1dnKqWEeZ387eBmlfhOqAn1BPx/93UQrp1dpHtFM9brvQCZT3RBe5Gazd4BcloRebvXZW6vvnePVhcaKGw==}
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
 
-  '@bruits/satteri-win32-x64-msvc@0.8.1':
-    resolution: {integrity: sha512-YgNvyaW5MLsrcnlwLdjk7/wSdER15+8cGdCHVkJY3KuaBdEW6XnfA35Svf88Ar+gBG+QsHEb8JE42DEJUiw22g==}
+  '@bruits/satteri-win32-x64-msvc@0.9.0':
+    resolution: {integrity: sha512-k3U1EHIr5sNCsBxmXvLUj1xZT3Pf3gLXabWUT4iH4W9CLIbzAMu1lYF3c4pKS6GRYPMsSNfz78/vNjEkRW396A==}
     cpu: [x64]
     os: [win32]
 
@@ -825,55 +828,55 @@ packages:
     peerDependencies:
       stylelint: '>=16.0.0'
 
-  '@duckdb/node-api@1.5.3-r.3':
-    resolution: {integrity: sha512-FzuL6sevuFfEFwkgiUMRMUAj4TaVqV//L0oo2FVZ9s9oYpLpALF9qZyQv2ucclTNQZwDCkm8+e6yLMc6t8IjlA==}
+  '@duckdb/node-api@1.5.4-r.1':
+    resolution: {integrity: sha512-3PYk/4//svuYmb9RYVM71cCoNa6ngoYWwrMhJaqbm010txzIMWbJCbxrFeqDl+krdIug+Hc/MNCeS0gHsTXSIw==}
 
-  '@duckdb/node-bindings-darwin-arm64@1.5.3-r.3':
-    resolution: {integrity: sha512-ttD8QBesgzHu7Sc4qouuIGLM7PWedLW8GvFbnZEyMqk24mQz1HWFgaT0ivw6nDRaDPUQLB9QnAOq8MZUh1zWHQ==}
+  '@duckdb/node-bindings-darwin-arm64@1.5.4-r.1':
+    resolution: {integrity: sha512-fl8EC5xdmI7VAI7bX4W6D7lOGNtxyLvSxGjOY8Ov7viVEKwIcBXXKlMPgh3sw+PiVlwZhKlknuCI8BL5xXpSDg==}
     cpu: [arm64]
     os: [darwin]
 
-  '@duckdb/node-bindings-darwin-x64@1.5.3-r.3':
-    resolution: {integrity: sha512-Vp9MYtoYf6zUWHdCmHXwUcJlHq3YaaIeULWeSiPUM1hsDflLiZKXtz5i250Ulz03VsfWBjpO4wdM99sjjrYKkg==}
+  '@duckdb/node-bindings-darwin-x64@1.5.4-r.1':
+    resolution: {integrity: sha512-E8bECZ6abJqunPqVR1NA0Zho7qxanfDWWFuJrKMsU1NCUqyGLyhXqZwsRHAx7J6jrM+lhQ7wOZj1x/N4OVml3A==}
     cpu: [x64]
     os: [darwin]
 
-  '@duckdb/node-bindings-linux-arm64-musl@1.5.3-r.3':
-    resolution: {integrity: sha512-IadRyx+98FEynKLXAk2MzReinFgduiDXgNd5Z8c5VKch+8FgBfqkEUYGOnBMMUPT8kuheKdLj23vpWXaCzOgoQ==}
+  '@duckdb/node-bindings-linux-arm64-musl@1.5.4-r.1':
+    resolution: {integrity: sha512-96Pyk5Syy18S5DSN0CKkOQ7/CsyVGRML8ewox1qpFDjYvPH1VsULlQoIRwbpw7mkFEy17wuWmbwzb7oKu/nGMw==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@duckdb/node-bindings-linux-arm64@1.5.3-r.3':
-    resolution: {integrity: sha512-3HLcrzQE83947JS51UVR7C9qnXQMltCOk4Dnhiz1CD+9u32DGLMgPTIIxclk7O+Q7EwfqzD8JV86Ud+LT1crcQ==}
+  '@duckdb/node-bindings-linux-arm64@1.5.4-r.1':
+    resolution: {integrity: sha512-4EsB+cgRqOE++mdPQ2ZoGJCg4ylmuqdbLDtmo3L19B+C5OzGmrhxlKD4o75eGEtfO52M+w+TdL0qhy0H5XvaKQ==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@duckdb/node-bindings-linux-x64-musl@1.5.3-r.3':
-    resolution: {integrity: sha512-5bulS16YhftXcarki4tvCufVslntpQDLOEF6RZ+FSMOGiv5d7SDXqklmVRy4DKW3C5ekgN7S2oYzuGL/ss9BuA==}
+  '@duckdb/node-bindings-linux-x64-musl@1.5.4-r.1':
+    resolution: {integrity: sha512-tWgnttlKfWTktyv+m9YbxaedKBon5wmUoJ9DaIbE3D98KhhUaqmJhnjzso9O8hp6WUeRmwXR//hpT/X6Ft9nYA==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@duckdb/node-bindings-linux-x64@1.5.3-r.3':
-    resolution: {integrity: sha512-TXndAL0ZoETq17Df6wB+SUZjLGDmOsKuDSySxB+wy6sHfpRtbDgQibyXRlajVeUkRDwSzBFC5ymy16YG0Fl4iw==}
+  '@duckdb/node-bindings-linux-x64@1.5.4-r.1':
+    resolution: {integrity: sha512-IldapRydno5kf4VkPCe8yK+j4pCg+j6Qs46UmLnKex/mtIdJa7ifhMYRkvdc5KIAFEC0eEL5c830QeuwcUROyg==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@duckdb/node-bindings-win32-arm64@1.5.3-r.3':
-    resolution: {integrity: sha512-55Vu13S0jUudiAGlNWJd7UvlW1iKjwWehD8s93jBCNm0AdE/EJN4nz5rQ0IuWzPWXpMjAYuKu00yE7NdtbTyug==}
+  '@duckdb/node-bindings-win32-arm64@1.5.4-r.1':
+    resolution: {integrity: sha512-77apmuNo51bPZzv8xjdeCp+hlU6JLwMPtS1CMViy83ONTsah+CGnpBx1lCnEqPL5Va0meufZyjSdZCVCijLdDA==}
     cpu: [arm64]
     os: [win32]
 
-  '@duckdb/node-bindings-win32-x64@1.5.3-r.3':
-    resolution: {integrity: sha512-rlOc9ltWQNHuDq99Ah8XaD80nN1ucrSK5AcH/7ibSp9ogX/jswPYlRVE7ODFJAjnQNf8bVvs++Mp+wyGvuG7ag==}
+  '@duckdb/node-bindings-win32-x64@1.5.4-r.1':
+    resolution: {integrity: sha512-Wme7dScBGqjn2PUJ+RLFiFAblW1qQRBraX7SJc4uKtftZiUJJWZapEUh+doGfb68Qxvw8JhlMBSdaUsSUDJYsw==}
     cpu: [x64]
     os: [win32]
 
-  '@duckdb/node-bindings@1.5.3-r.3':
-    resolution: {integrity: sha512-Dphw1a9kKXZnCiWX1YCEAJsQ7WJQO2Ikgxy7m8jy0QVXqAwB9esr5NGsuEL3vMKL7velZHeZCjGOMnHZEcIsdg==}
+  '@duckdb/node-bindings@1.5.4-r.1':
+    resolution: {integrity: sha512-v834OZZKQ59yAvh8GOEmM+R1foPNgdMGL0VTBgHywgblgQNyq11HvWgT4QGJIUFfo/cQ9WFyf1MFhK0+hV1aiA==}
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -2971,20 +2974,20 @@ packages:
     peerDependencies:
       unified: ^11.0.0
 
-  '@xsynaptic/satteri-auto-import@0.1.0':
-    resolution: {integrity: sha512-CUw42GTc1/LVN6Tq/iQoHY6JQ2Ed3ZA2E1wNLSTImG8Pm2gThs7AsuD7jYIsIKGqOJziJFvkSU1mTithijt77g==}
+  '@xsynaptic/satteri-auto-import@0.1.1':
+    resolution: {integrity: sha512-C0utDXyooFG7ZvTXiIszSQU704Yy5zOv8qyWCfFyoDsUExPWd+OXvCCHLGJFjHz5UBJ+PCY/5grsOXp5cMoFOw==}
     peerDependencies:
-      satteri: ^0.8.1
+      satteri: 0.9.0
 
-  '@xsynaptic/satteri-img-group@0.2.0':
-    resolution: {integrity: sha512-KvramX9skGVEj2DUDwPCOlv2Ffor1OI8fYfZReTETktqQK/Yd7yAhHlCDYXIb9rwKnf1ktKJiuluq/fROe8uyA==}
+  '@xsynaptic/satteri-img-group@0.2.1':
+    resolution: {integrity: sha512-LAYNHbyGx7NHybdEarGU0iIfopaAN5GOa8zD41HvWBZfw0bE27IH9HXMxOUV+ok9/d0gYCV+NRw8ABhgOen2uA==}
     peerDependencies:
-      satteri: ^0.8.1
+      satteri: 0.9.0
 
   '@xsynaptic/satteri-wrap-cjk@0.1.1':
     resolution: {integrity: sha512-gDgKK1Tzt1oGYITYSSZzqOllUl9BvsQINnLNJGDV4ar584QdTYeWOAC+fb/CuqVuO+vURHfiLbYsZIVVVKf1sA==}
     peerDependencies:
-      satteri: ^0.8.1
+      satteri: 0.9.0
 
   '@xsynaptic/stylelint-config@0.1.1':
     resolution: {integrity: sha512-yozYUwI3u7glmdpjA18/W/jbLv7PnBlE0l9Z3wNIkDN+eO6xoQnNWquXJy4ycy+4gfW1v7rlN0Gv9DJUYqltAQ==}
@@ -4393,8 +4396,8 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
-  hono@4.12.25:
-    resolution: {integrity: sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==}
+  hono@4.12.26:
+    resolution: {integrity: sha512-uyZtpnYxM9CmQ7QsQknM4zN8EftNqhON1qYeIKM0Se67CCEe2c44xyGURwB0axX2fBDu1dqHrHAc1hmNT8ITkw==}
     engines: {node: '>=16.9.0'}
 
   hookified@1.15.1:
@@ -6353,8 +6356,8 @@ packages:
     resolution: {integrity: sha512-tkMFrfIs3l2mQ2JEcyW0ADTy3zGggFRFzi6Ef8YozQSFsFKEqaSO1Y8F9wJg4//PJGQauMalHGTUEkPrFwhVPA==}
     engines: {node: '>=16'}
 
-  satteri@0.8.1:
-    resolution: {integrity: sha512-B3dPc3RsWN+CIrwJHk6KnPQjdN7cg9mnSgfs7AUEXITlIYRnSMleOZQPgpmm759pGZ/vpnsXciNfJKXKME2rrg==}
+  satteri@0.9.0:
+    resolution: {integrity: sha512-+MA67ZhGYSrMvEFCciKKnyB6XeH1SJ7xeYJkTah4qzRjuo1ZehrCIn2ksysks/XA6Ez2gnH0SnKeMEAVVK+g+Q==}
 
   sax@1.6.0:
     resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
@@ -7654,7 +7657,7 @@ snapshots:
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/prism': 4.0.2
       github-slugger: 2.0.0
-      satteri: 0.8.1
+      satteri: 0.9.0
 
   '@astrojs/mdx@7.0.0-beta.3(@astrojs/markdown-satteri@0.3.1-beta.1)(astro@7.0.0-beta.5(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.10.0)(@emnapi/runtime@1.11.0)(@types/node@25.9.2)(idb-keyval@6.2.5)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
@@ -7859,23 +7862,23 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@bruits/satteri-darwin-arm64@0.8.1':
+  '@bruits/satteri-darwin-arm64@0.9.0':
     optional: true
 
-  '@bruits/satteri-darwin-x64@0.8.1':
+  '@bruits/satteri-darwin-x64@0.9.0':
     optional: true
 
-  '@bruits/satteri-linux-x64-gnu@0.8.1':
+  '@bruits/satteri-linux-x64-gnu@0.9.0':
     optional: true
 
-  '@bruits/satteri-wasm32-wasi@0.8.1':
+  '@bruits/satteri-wasm32-wasi@0.9.0':
     dependencies:
       '@emnapi/core': 1.9.1
       '@emnapi/runtime': 1.9.1
       '@napi-rs/wasm-runtime': 1.1.5(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
     optional: true
 
-  '@bruits/satteri-win32-x64-msvc@0.8.1':
+  '@bruits/satteri-win32-x64-msvc@0.9.0':
     optional: true
 
   '@cacheable/memory@2.0.9':
@@ -7939,46 +7942,46 @@ snapshots:
       postcss: 8.5.15
       stylelint: 17.13.0(typescript@6.0.3)
 
-  '@duckdb/node-api@1.5.3-r.3':
+  '@duckdb/node-api@1.5.4-r.1':
     dependencies:
-      '@duckdb/node-bindings': 1.5.3-r.3
+      '@duckdb/node-bindings': 1.5.4-r.1
 
-  '@duckdb/node-bindings-darwin-arm64@1.5.3-r.3':
+  '@duckdb/node-bindings-darwin-arm64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-darwin-x64@1.5.3-r.3':
+  '@duckdb/node-bindings-darwin-x64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64-musl@1.5.3-r.3':
+  '@duckdb/node-bindings-linux-arm64-musl@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-arm64@1.5.3-r.3':
+  '@duckdb/node-bindings-linux-arm64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-x64-musl@1.5.3-r.3':
+  '@duckdb/node-bindings-linux-x64-musl@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-linux-x64@1.5.3-r.3':
+  '@duckdb/node-bindings-linux-x64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-win32-arm64@1.5.3-r.3':
+  '@duckdb/node-bindings-win32-arm64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings-win32-x64@1.5.3-r.3':
+  '@duckdb/node-bindings-win32-x64@1.5.4-r.1':
     optional: true
 
-  '@duckdb/node-bindings@1.5.3-r.3':
+  '@duckdb/node-bindings@1.5.4-r.1':
     dependencies:
       detect-libc: 2.1.2
     optionalDependencies:
-      '@duckdb/node-bindings-darwin-arm64': 1.5.3-r.3
-      '@duckdb/node-bindings-darwin-x64': 1.5.3-r.3
-      '@duckdb/node-bindings-linux-arm64': 1.5.3-r.3
-      '@duckdb/node-bindings-linux-arm64-musl': 1.5.3-r.3
-      '@duckdb/node-bindings-linux-x64': 1.5.3-r.3
-      '@duckdb/node-bindings-linux-x64-musl': 1.5.3-r.3
-      '@duckdb/node-bindings-win32-arm64': 1.5.3-r.3
-      '@duckdb/node-bindings-win32-x64': 1.5.3-r.3
+      '@duckdb/node-bindings-darwin-arm64': 1.5.4-r.1
+      '@duckdb/node-bindings-darwin-x64': 1.5.4-r.1
+      '@duckdb/node-bindings-linux-arm64': 1.5.4-r.1
+      '@duckdb/node-bindings-linux-arm64-musl': 1.5.4-r.1
+      '@duckdb/node-bindings-linux-x64': 1.5.4-r.1
+      '@duckdb/node-bindings-linux-x64-musl': 1.5.4-r.1
+      '@duckdb/node-bindings-win32-arm64': 1.5.4-r.1
+      '@duckdb/node-bindings-win32-x64': 1.5.4-r.1
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -8169,9 +8172,9 @@ snapshots:
   '@gar/promisify@1.1.3':
     optional: true
 
-  '@hono/node-server@1.19.14(hono@4.12.25)':
+  '@hono/node-server@1.19.14(hono@4.12.26)':
     dependencies:
-      hono: 4.12.25
+      hono: 4.12.26
 
   '@huggingface/jinja@0.5.9': {}
 
@@ -8527,7 +8530,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.25)
+      '@hono/node-server': 1.19.14(hono@4.12.26)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -8537,7 +8540,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1
       express-rate-limit: 8.5.2(express@5.2.1)
-      hono: 4.12.25
+      hono: 4.12.26
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -10767,21 +10770,21 @@ snapshots:
       unified: 11.0.5
       unist-util-visit-parents: 6.0.2
 
-  '@xsynaptic/satteri-auto-import@0.1.0(satteri@0.8.1)':
+  '@xsynaptic/satteri-auto-import@0.1.1(satteri@0.9.0)':
     dependencies:
-      satteri: 0.8.1
+      satteri: 0.9.0
       zod: 4.4.3
 
-  '@xsynaptic/satteri-img-group@0.2.0(satteri@0.8.1)':
+  '@xsynaptic/satteri-img-group@0.2.1(satteri@0.9.0)':
     dependencies:
-      satteri: 0.8.1
+      satteri: 0.9.0
       zod: 4.4.3
 
-  '@xsynaptic/satteri-wrap-cjk@0.1.1(satteri@0.8.1)':
+  '@xsynaptic/satteri-wrap-cjk@0.1.1(satteri@0.9.0)':
     dependencies:
       '@types/hast': 3.0.4
       hastscript: 9.0.1
-      satteri: 0.8.1
+      satteri: 0.9.0
       zod: 4.4.3
 
   '@xsynaptic/stylelint-config@0.1.1(stylelint-order@8.1.1(stylelint@17.13.0(typescript@6.0.3)))(stylelint@17.13.0(typescript@6.0.3))':
@@ -12595,7 +12598,7 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
-  hono@4.12.25: {}
+  hono@4.12.26: {}
 
   hookified@1.15.1: {}
 
@@ -15225,18 +15228,18 @@ snapshots:
       postcss-value-parser: 4.2.0
       yoga-layout: 3.2.1
 
-  satteri@0.8.1:
+  satteri@0.9.0:
     dependencies:
       '@types/estree-jsx': 1.0.5
       '@types/hast': 3.0.4
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
     optionalDependencies:
-      '@bruits/satteri-darwin-arm64': 0.8.1
-      '@bruits/satteri-darwin-x64': 0.8.1
-      '@bruits/satteri-linux-x64-gnu': 0.8.1
-      '@bruits/satteri-wasm32-wasi': 0.8.1
-      '@bruits/satteri-win32-x64-msvc': 0.8.1
+      '@bruits/satteri-darwin-arm64': 0.9.0
+      '@bruits/satteri-darwin-x64': 0.9.0
+      '@bruits/satteri-linux-x64-gnu': 0.9.0
+      '@bruits/satteri-wasm32-wasi': 0.9.0
+      '@bruits/satteri-win32-x64-msvc': 0.9.0
 
   sax@1.6.0: {}
 

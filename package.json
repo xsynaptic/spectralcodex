@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.0.2",
+	"version": "7.1.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"src/**/*.{css,astro}\" && prettier --check . && eslint && tsc --noEmit --extendedDiagnostics && knip",
@@ -84,8 +84,8 @@
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^0.1.0",
 		"@xsynaptic/eslint-config": "^4.0.1",
-		"@xsynaptic/satteri-auto-import": "^0.1.0",
-		"@xsynaptic/satteri-img-group": "^0.2.0",
+		"@xsynaptic/satteri-auto-import": "^0.1.1",
+		"@xsynaptic/satteri-img-group": "^0.2.1",
 		"@xsynaptic/satteri-wrap-cjk": "^0.1.1",
 		"@xsynaptic/stylelint-config": "^0.1.1",
 		"@xsynaptic/unified-tools": "^5.1.1",
@@ -111,7 +111,7 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"remeda": "^2.38.0",
-		"satteri": "0.8.1",
+		"satteri": "0.9.0",
 		"sharp": "^0.35.1",
 		"stylelint": "^17.13.0",
 		"tailwindcss": "^4.3.1",
