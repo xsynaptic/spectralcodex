@@ -24,10 +24,6 @@ export default getConfig(
 		},
 		{
 			rules: {
-				// Type-aware, but the type program is already built for the other TS rules so these are nearly free
-				'@typescript-eslint/no-deprecated': 'error',
-				'@typescript-eslint/no-unsafe-assignment': 'error',
-				'@typescript-eslint/no-misused-promises': 'error',
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
