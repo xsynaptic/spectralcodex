@@ -73,21 +73,23 @@ class PaginationSelect extends HTMLElement {
 		this.#syncSubmit();
 	}
 
-	// Pin the select to its widest option so switching page choices never resizes the control
+	// Pin a width floor to the widest label (lastPage) so changing pages never resizes the control
+	// The 0.5ch buffer absorbs per-digit width variance and font slack, so exact measurement isn't needed
 	#lockSelectWidth(select: HTMLSelectElement, lastPage: number) {
 		const lockWidth = () => {
 			const selectedValue = select.value;
 
+			select.style.minInlineSize = '';
 			select.value = String(lastPage);
 			const width = Math.ceil(select.getBoundingClientRect().width);
 			select.value = selectedValue;
 
-			if (width > 0) select.style.inlineSize = `${String(width)}px`;
+			if (width > 0) select.style.minInlineSize = `calc(${String(width)}px + 0.5ch)`;
 		};
 
 		lockWidth();
 
-		// Fallback metrics mis-size the lock and clip the label, so re-measure once webfonts settle
+		// Fallback metrics mis-size the floor, so re-measure once webfonts settle
 		if (document.fonts.status !== 'loaded') {
 			void (async () => {
 				await document.fonts.ready;

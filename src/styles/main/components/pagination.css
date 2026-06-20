@@ -62,7 +62,7 @@
 	}
 
 	.p-control::picker(select) {
-		min-inline-size: 96px;
+		min-inline-size: anchor-size(width);
 		max-height: 240px;
 		overflow-y: auto;
 		overscroll-behavior: none;
