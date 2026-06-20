@@ -50,14 +50,14 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "7.0.0-beta.5",
+		"astro": "7.0.0-beta.6",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@astrojs/markdown-satteri": "0.3.1-beta.1",
-		"@astrojs/mdx": "7.0.0-beta.3",
+		"@astrojs/markdown-satteri": "0.3.1-beta.2",
+		"@astrojs/mdx": "7.0.0-beta.4",
 		"@astrojs/node": "11.0.0-beta.1",
 		"@astrojs/react": "6.0.0-beta.2",
 		"@astrojs/rss": "^4.0.18",
@@ -86,7 +86,7 @@
 		"@xsynaptic/eslint-config": "^4.0.1",
 		"@xsynaptic/satteri-auto-import": "^0.1.1",
 		"@xsynaptic/satteri-img-group": "^0.2.1",
-		"@xsynaptic/satteri-wrap-cjk": "^0.1.1",
+		"@xsynaptic/satteri-wrap-cjk": "^0.2.0",
 		"@xsynaptic/stylelint-config": "^0.1.1",
 		"@xsynaptic/unified-tools": "^5.1.1",
 		"@xsynaptic/unpic-imagor": "^0.2.0",
@@ -111,7 +111,7 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"remeda": "^2.38.0",
-		"satteri": "0.9.0",
+		"satteri": "0.9.1",
 		"sharp": "^0.35.1",
 		"stylelint": "^17.13.0",
 		"tailwindcss": "^4.3.1",

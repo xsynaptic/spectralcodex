@@ -1,11 +1,6 @@
 packages:
   - packages/**
 
-# @astrojs/markdown-satteri@0.3.1-beta.1 still caps satteri at ^0.8.0, pulling a second
-# copy alongside our 0.9.0; the duplicate brands break type-checking in astro.config.mjs
-overrides:
-  satteri: 0.9.0
-
 # Intended to mitigate supply chain attacks
 minimumReleaseAge: 1440
 verifyDepsBeforeRun: error
