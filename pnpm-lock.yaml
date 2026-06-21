@@ -417,6 +417,9 @@ importers:
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
+      '@xsynaptic/og-image-generator':
+        specifier: ^0.1.0
+        version: 0.1.0(sharp@0.35.1)
       '@xsynaptic/unified-tools':
         specifier: ^5.1.1
         version: 5.1.1
@@ -2928,6 +2931,11 @@ packages:
 
   '@xsynaptic/eslint-config@4.0.1':
     resolution: {integrity: sha512-vrMMHXQw4brG4XxzdNqkAM5LHRP3nSc/AbskofHBhKNsfZ5650YzyhW+Ndpd5A63jT63+nukuO9RcVUWviuW3w==}
+
+  '@xsynaptic/og-image-generator@0.1.0':
+    resolution: {integrity: sha512-4rVsBSAiF+jolsck34Se1ntYYgiLNKl7loJ36me3dYQont+3Wr8Ey4LjqiyxEwYaKQW/wH5M0KLAiVn5lGa/ZQ==}
+    peerDependencies:
+      sharp: ^0.35.0
 
   '@xsynaptic/rehype-wrap-cjk@3.0.1':
     resolution: {integrity: sha512-6QoZHDNEWb2gXVExzpOlJLf93xextV3OK5H/6jiytZEbRztqxPG23JA94KvyZ8oCyN5MXX3gztK9lBqOz2QBXA==}
@@ -10671,6 +10679,11 @@ snapshots:
       - eslint
       - supports-color
       - typescript
+
+  '@xsynaptic/og-image-generator@0.1.0(sharp@0.35.1)':
+    dependencies:
+      satori: 0.26.0
+      sharp: 0.35.1
 
   '@xsynaptic/rehype-wrap-cjk@3.0.1(unified@11.0.5)':
     dependencies:

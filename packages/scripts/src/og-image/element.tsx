@@ -1,3 +1,7 @@
+/** @jsxRuntime automatic */
+/** @jsxImportSource satori/jsx */
+import type { OgElement } from '@xsynaptic/og-image-generator';
+
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
 
 import type { OpenGraphMetadataItem } from './types.js';
@@ -226,7 +230,7 @@ export function getOpenGraphElement(
 		/** Luminance of bottom zone (70%-90%), 0-255 */
 		luminanceBottom?: number | undefined;
 	},
-) {
+): OgElement {
 	return (
 		<div
 			style={{

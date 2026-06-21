@@ -1,49 +1,23 @@
-import type { SatoriOptions } from 'satori';
+import type { Font } from 'satori';
 
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
-import satori from 'satori';
-import sharp from 'sharp';
+import {
+	analyzeLuminance,
+	createOgRenderer,
+	encodeDataUrl,
+	resizeCover,
+} from '@xsynaptic/og-image-generator';
 
 import type { OpenGraphMetadataItem } from './types.js';
 
 import { getOpenGraphElement } from './element.js';
 
-/**
- * Analyze luminance of a horizontal band within an image
- * Returns perceived brightness (0-255) using standard luminance formula
- */
-async function getZoneLuminance(
-	imageBuffer: Buffer,
-	fullHeight: number,
-	fullWidth: number,
-	startPercent: number,
-	endPercent: number,
-): Promise<number> {
-	const topOffset = Math.floor(fullHeight * startPercent);
-	const zoneHeight = Math.floor(fullHeight * (endPercent - startPercent));
-
-	// Extract to buffer first; chaining extract().stats() doesn't work correctly
-	const extractedBuffer = await sharp(imageBuffer)
-		.extract({ left: 0, top: topOffset, width: fullWidth, height: zoneHeight })
-		.toBuffer();
-
-	const { channels } = await sharp(extractedBuffer).stats();
-
-	const r = channels[0]?.mean ?? 0;
-	const g = channels[1]?.mean ?? 0;
-	const b = channels[2]?.mean ?? 0;
-
-	// Perceived luminance formula (ITU-R BT.601)
-	return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-}
-
 async function processImage({
-	imageObject,
+	imageInput,
 	height,
 	width,
 	isFallback,
 }: {
-	imageObject: sharp.Sharp;
+	imageInput: string;
 	height: number;
 	width: number;
 	isFallback: boolean;
@@ -52,26 +26,21 @@ async function processImage({
 	luminanceTop: number;
 	luminanceBottom: number;
 }> {
-	const imagePipeline = imageObject.resize({
-		fit: 'cover',
-		position: 'top',
-		height,
-		width,
-	});
+	const pipeline = resizeCover(imageInput, { height, position: 'top', width });
 
 	if (isFallback) {
-		imagePipeline.blur(16);
+		pipeline.blur(16);
 	}
 
-	const imageBuffer = await imagePipeline.toBuffer({ resolveWithObject: true });
+	const { data, info } = await pipeline.toBuffer({ resolveWithObject: true });
 
 	// Analyze luminance zones (10%-20% for top, 70%-90% for bottom)
-	const [luminanceTop, luminanceBottom] = await Promise.all([
-		getZoneLuminance(imageBuffer.data, height, width, 0.1, 0.2),
-		getZoneLuminance(imageBuffer.data, height, width, 0.7, 0.9),
+	const [luminanceTop = 0, luminanceBottom = 0] = await analyzeLuminance(data, [
+		[0.1, 0.2],
+		[0.7, 0.9],
 	]);
 
-	const dataUrl = `data:image/${imageBuffer.info.format};base64,${imageBuffer.data.toString('base64')}`;
+	const dataUrl = encodeDataUrl(data, info.format === 'png' ? 'png' : 'jpeg');
 
 	return { dataUrl, luminanceTop, luminanceBottom };
 }
@@ -82,11 +51,16 @@ async function processImage({
  */
 export function createGenerator({
 	fonts,
+	width,
+	height,
 	jpegQuality = 90,
-	...satoriOptions
-}: SatoriOptions & { jpegQuality?: number }) {
-	const height = 'height' in satoriOptions ? satoriOptions.height : OPEN_GRAPH_IMAGE_HEIGHT;
-	const width = 'width' in satoriOptions ? satoriOptions.width : OPEN_GRAPH_IMAGE_WIDTH;
+}: {
+	fonts: Array<Font>;
+	width: number;
+	height: number;
+	jpegQuality?: number;
+}) {
+	const render = createOgRenderer({ fonts, format: 'jpeg', height, quality: jpegQuality, width });
 
 	// Cache processed image data since source imagery is sometimes reused
 	const processedImageCache = new Map<
@@ -97,15 +71,15 @@ export function createGenerator({
 	return async function generateOpenGraphImage({
 		entry,
 		imageId,
-		imageObject,
+		imageInput,
 	}: {
 		entry: OpenGraphMetadataItem;
 		imageId?: string;
-		imageObject?: sharp.Sharp | undefined;
+		imageInput?: string | undefined;
 	}): Promise<Buffer> {
 		let processed: { dataUrl: string; luminanceTop: number; luminanceBottom: number } | undefined;
 
-		if (imageObject) {
+		if (imageInput) {
 			const cacheKey = imageId ? `${imageId}:${String(entry.isFallback)}` : undefined;
 			const cached = cacheKey ? processedImageCache.get(cacheKey) : undefined;
 
@@ -113,7 +87,7 @@ export function createGenerator({
 				processed = cached;
 			} else {
 				processed = await processImage({
-					imageObject,
+					imageInput,
 					height,
 					width,
 					isFallback: entry.isFallback,
@@ -132,11 +106,6 @@ export function createGenerator({
 			luminanceBottom: processed?.luminanceBottom,
 		});
 
-		const satoriSvg = await satori(element, { ...satoriOptions, fonts });
-
-		// Convert SVG to JPEG
-		return sharp(Buffer.from(satoriSvg), { failOn: 'error' })
-			.jpeg({ quality: jpegQuality })
-			.toBuffer();
+		return render(element);
 	};
 }
