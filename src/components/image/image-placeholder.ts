@@ -1,3 +1,5 @@
+import type { Sharp } from 'sharp';
+
 import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
@@ -33,7 +35,7 @@ async function generatePlaceholderDataUrl({
 	position = 'center',
 	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
 }: {
-	imageObject: sharp.Sharp;
+	imageObject: Sharp;
 	aspectRatio: number;
 	fit?: ImageFitOption;
 	position?: string;
