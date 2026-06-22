@@ -7,6 +7,7 @@ import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
+import { checkImageAspectRatios } from './image-aspect-ratios';
 import { checkImageFeaturedInBody } from './image-featured-in-body';
 import { checkImageFeaturedLinks } from './image-featured-links';
 import { checkImageReferences } from './images';
@@ -135,6 +136,11 @@ switch (command) {
 		checkImageReferences(allEntries, path.join(rootPath, values['media-path']));
 		break;
 	}
+	// Check for images with non-standard aspect ratios (*e.g.* 3:2, 2:3, 1:1)
+	case 'image-aspect-ratios': {
+		checkImageAspectRatios(getDataStoreCollection(collections, ['images']));
+		break;
+	}
 	default: {
 		if (command) {
 			console.log(chalk.red('Unknown command: ' + command));
@@ -147,6 +153,7 @@ switch (command) {
 			checkLinkIds(allEntries, metadataEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),
 			checkImageReferences(allEntries, path.join(rootPath, values['media-path'])),
+			checkImageAspectRatios(getDataStoreCollection(collections, ['images'])),
 			checkImageFeaturedInBody(bodyContentEntries),
 			checkImageFeaturedLinks(allEntries, metadataEntries),
 			checkLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),
