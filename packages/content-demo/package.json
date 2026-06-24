@@ -8,6 +8,7 @@
 		"fix": "pnpm -w run fix-content-demo"
 	},
 	"devDependencies": {
+		"@textlint-rule/textlint-rule-pattern": "^2.0.2",
 		"astro": "7.0.0",
 		"mdxlint": "^1.0.0",
 		"remark-frontmatter": "^5.0.0",
@@ -15,6 +16,8 @@
 		"remark-lint-list-item-indent": "^4.0.1",
 		"remark-preset-lint-consistent": "^6.0.1",
 		"remark-preset-lint-recommended": "^7.0.1",
-		"remark-smartypants": "^3.0.2"
+		"remark-smartypants": "^3.0.2",
+		"textlint-plugin-mdx": "^1.1.0",
+		"textlint-rule-diacritics": "^2.1.4"
 	}
 }

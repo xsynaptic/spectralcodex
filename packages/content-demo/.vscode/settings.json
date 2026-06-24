@@ -1,0 +1,10 @@
+{
+	"[mdx]": {
+		"editor.defaultFormatter": "remcohaszing.vscode-mdxlint",
+		"editor.formatOnSave": true,
+		"files.autoSave": "afterDelay",
+		"files.autoSaveDelay": 5000,
+		"typescript.suggest.enabled": false
+	},
+	"mdx.validate.validateReferences": "ignore"
+}

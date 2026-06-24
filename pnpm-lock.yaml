@@ -285,6 +285,9 @@ importers:
 
   packages/content-demo:
     devDependencies:
+      '@textlint-rule/textlint-rule-pattern':
+        specifier: ^2.0.2
+        version: 2.0.2
       astro:
         specifier: 7.0.0
         version: 7.0.0(@astrojs/markdown-remark@7.2.0)(@emnapi/core@1.10.0)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.2.5)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
@@ -309,6 +312,12 @@ importers:
       remark-smartypants:
         specifier: ^3.0.2
         version: 3.0.2
+      textlint-plugin-mdx:
+        specifier: ^1.1.0
+        version: 1.1.0(typescript@6.0.3)
+      textlint-rule-diacritics:
+        specifier: ^2.1.4
+        version: 2.1.4(textlint@15.7.1)
 
   packages/react-map-component:
     devDependencies:
@@ -418,8 +427,8 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       '@xsynaptic/og-image-generator':
-        specifier: ^0.1.0
-        version: 0.1.0(sharp@0.35.2)
+        specifier: ^0.1.1
+        version: 0.1.1(sharp@0.35.2)
       '@xsynaptic/unified-tools':
         specifier: ^5.1.1
         version: 5.1.1
@@ -2932,8 +2941,8 @@ packages:
   '@xsynaptic/eslint-config@4.0.1':
     resolution: {integrity: sha512-vrMMHXQw4brG4XxzdNqkAM5LHRP3nSc/AbskofHBhKNsfZ5650YzyhW+Ndpd5A63jT63+nukuO9RcVUWviuW3w==}
 
-  '@xsynaptic/og-image-generator@0.1.0':
-    resolution: {integrity: sha512-4rVsBSAiF+jolsck34Se1ntYYgiLNKl7loJ36me3dYQont+3Wr8Ey4LjqiyxEwYaKQW/wH5M0KLAiVn5lGa/ZQ==}
+  '@xsynaptic/og-image-generator@0.1.1':
+    resolution: {integrity: sha512-GZzak5xD1vuTXPJtr26nES/kq1uSzgqxqqpl9Wh3hoFDIlcNgxBO4/8qjjtLBgtCQ0N8+mjo9x6bhvAsIOr+ug==}
     peerDependencies:
       sharp: ^0.35.0
 
@@ -10685,7 +10694,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@xsynaptic/og-image-generator@0.1.0(sharp@0.35.2)':
+  '@xsynaptic/og-image-generator@0.1.1(sharp@0.35.2)':
     dependencies:
       satori: 0.26.0
       sharp: 0.35.2

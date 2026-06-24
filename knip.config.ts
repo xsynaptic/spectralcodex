@@ -18,6 +18,11 @@ export default {
 		'packages/content-demo': {
 			ignore: ['collections/**'],
 			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
+			ignoreDependencies: [
+				'textlint-plugin-mdx', // referenced in .textlintrc.json
+				'textlint-rule-diacritics',
+				'@textlint-rule/textlint-rule-pattern',
+			],
 		},
 		'packages/content': {
 			entry: ['global.d.ts'],

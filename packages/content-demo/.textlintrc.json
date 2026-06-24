@@ -1,0 +1,17 @@
+{
+	"plugins": {
+		"mdx": true
+	},
+	"rules": {
+		"diacritics": true,
+		"@textlint-rule/pattern": {
+			"patterns": [
+				{
+					"message": "Use `--` (renders en-dash) for number ranges instead of a hyphen",
+					"pattern": "/(\\d)-(\\d)/",
+					"replace": "$1--$2"
+				}
+			]
+		}
+	}
+}
