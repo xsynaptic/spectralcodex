@@ -23,5 +23,5 @@ generateManifest({
 	distPath: values['dist-path'],
 	outputPath: values['output-path'],
 	urlPattern,
-	...(values['main-path'] && { mainPath: values['main-path'] }),
+	...(values['main-path'] ? { mainPath: values['main-path'] } : {}),
 });

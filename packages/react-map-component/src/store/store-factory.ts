@@ -92,7 +92,7 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 					set({
 						selectedId,
 						filterOpen: false,
-						...(selectedId === undefined && { popupVisible: true }),
+						...(selectedId === undefined ? { popupVisible: true } : {}),
 					});
 				},
 				setPopupVisible: (popupVisible) => {

@@ -22,7 +22,7 @@ export function getSeoArticleProps({
 		ogType: 'article' as const,
 		article: {
 			publishedTime,
-			...(modifiedTime && { modifiedTime }),
+			...(modifiedTime ? { modifiedTime } : {}),
 		},
 	};
 }

@@ -29,16 +29,18 @@ const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 export default defineConfig({
 	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
 	build: {
-		...(BUILD_ASSETS_PATH && { assets: BUILD_ASSETS_PATH }),
+		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
 	// Use .astro for data-store (matching dev server behavior)
 	cacheDir: './.astro',
 	// Still having some trouble getting this working as expected due to memory issues
-	...(isSsr && {
-		adapter: node({
-			mode: 'standalone',
-		}),
-	}),
+	...(isSsr
+		? {
+				adapter: node({
+					mode: 'standalone',
+				}),
+			}
+		: {}),
 	env: {
 		schema: {
 			CONTENT_DATA_PATH: envField.string({

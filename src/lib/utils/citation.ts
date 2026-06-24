@@ -43,7 +43,7 @@ export function buildCitation(entry: CitableEntry): CitationItem {
 		type: 'webpage',
 		id: `${entry.collection}-${entry.id}`,
 		title: entry.data.title,
-		...(titleAdditional && { titleAdditional }),
+		...(titleAdditional ? { titleAdditional } : {}),
 		author: [{ literal: t('author.name') }],
 		issued: toIsoDate(entry.data.dateCreated),
 		URL: getContentUrl(entry.collection, entry.id),

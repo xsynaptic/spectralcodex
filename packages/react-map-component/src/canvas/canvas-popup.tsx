@@ -115,10 +115,12 @@ function useMapCanvasPopup() {
 		return {
 			...defaultPopupItem,
 			...popupData?.find((popupItem) => popupItem.id === selectedId),
-			...(selectedSourceItem && {
-				precision: selectedSourceItem.properties.precision,
-				popupCoordinates: getPopupCoordinates(selectedSourceItem),
-			}),
+			...(selectedSourceItem
+				? {
+						precision: selectedSourceItem.properties.precision,
+						popupCoordinates: getPopupCoordinates(selectedSourceItem),
+					}
+				: {}),
 		} satisfies MapPopupItemExtended;
 	}, [selectedId, popupData, sourceData]);
 }

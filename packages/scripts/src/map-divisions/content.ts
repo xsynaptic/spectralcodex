@@ -63,8 +63,8 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
 			id,
 			divisionIds,
 			regionPathIds,
-			...(divisionSelectionBBox && { divisionSelectionBBox }),
-			...(divisionClippingBBox && { divisionClippingBBox }),
+			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
+			...(divisionClippingBBox ? { divisionClippingBBox } : {}),
 		});
 	}
 

@@ -372,11 +372,10 @@ async function similarContent() {
 			}
 			if (cacheFiles.length > 0) {
 				console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
-				process.exit(0);
 			} else {
 				console.log(chalk.green('🗑️  No cache files to clear'));
-				process.exit(0);
 			}
+			process.exit(0);
 		}
 
 		const entries = getContentEntries(dataStorePath);

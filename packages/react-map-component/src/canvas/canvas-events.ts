@@ -289,15 +289,19 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			// Initialize the position of the filter control on interactive maps
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
-		...(isInteractive && {
-			onResize: debouncedFilterControlSetup.call,
-			onClick,
-			onMouseDown,
-			onMouseUp,
-			onMoveEnd,
-			...(!isSourceDataLoading && {
-				onMouseMove: throttledOnMouseMove.call,
-			}),
-		}),
+		...(isInteractive
+			? {
+					onResize: debouncedFilterControlSetup.call,
+					onClick,
+					onMouseDown,
+					onMouseUp,
+					onMoveEnd,
+					...(isSourceDataLoading
+						? {}
+						: {
+								onMouseMove: throttledOnMouseMove.call,
+							}),
+				}
+			: {}),
 	} satisfies MapCallbacks;
 }

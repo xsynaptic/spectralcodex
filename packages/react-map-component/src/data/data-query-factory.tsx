@@ -85,7 +85,7 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 			},
 			refetchOnWindowFocus: false,
 			refetchOnMount: false,
-			...(optional && { enabled: !!apiUrl || !!data }),
+			...(optional ? { enabled: !!apiUrl || !!data } : {}),
 		});
 
 		return <DataContext.Provider value={query}>{children}</DataContext.Provider>;

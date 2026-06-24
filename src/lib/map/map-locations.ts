@@ -131,12 +131,14 @@ export function getLocationsFeatureCollection(
 					id,
 					properties: {
 						title,
-						...(entryTitleMultilingual && {
-							titleMultilingualLang: entryTitleMultilingual.lang,
-							titleMultilingualValue: geometryTitleMultilingual
-								? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
-								: entryTitleMultilingual.value,
-						}),
+						...(entryTitleMultilingual
+							? {
+									titleMultilingualLang: entryTitleMultilingual.lang,
+									titleMultilingualValue: geometryTitleMultilingual
+										? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
+										: entryTitleMultilingual.value,
+								}
+							: {}),
 						url: getRelativePath(entry.data._url),
 						description: geometry.description ?? entry.data._descriptionHtml,
 						category: geometry.category ?? entry.data.category,
@@ -149,7 +151,7 @@ export function getLocationsFeatureCollection(
 						safety: entry.data.safety,
 						googleMapsUrl,
 						wikipediaUrl,
-						...(image !== null && { image }),
+						...(image === null ? {} : { image }),
 					},
 					geometry: {
 						type: GeometryTypeEnum.Point,
@@ -183,13 +185,19 @@ export function getLocationsMapSourceData(
 				[MapDataKeysCompressed.Precision]: feature.properties.precision,
 				[MapDataKeysCompressed.Quality]: feature.properties.quality,
 				[MapDataKeysCompressed.Rating]: feature.properties.rating,
-				...(feature.properties.objective !== undefined && {
-					[MapDataKeysCompressed.Objective]: feature.properties.objective,
-				}),
-				...(feature.properties.outlier !== undefined && {
-					[MapDataKeysCompressed.Outlier]: feature.properties.outlier,
-				}),
-				...(feature.properties.image !== undefined && { [MapDataKeysCompressed.HasImage]: true }),
+				...(feature.properties.objective === undefined
+					? {}
+					: {
+							[MapDataKeysCompressed.Objective]: feature.properties.objective,
+						}),
+				...(feature.properties.outlier === undefined
+					? {}
+					: {
+							[MapDataKeysCompressed.Outlier]: feature.properties.outlier,
+						}),
+				...(feature.properties.image === undefined
+					? {}
+					: { [MapDataKeysCompressed.HasImage]: true }),
 				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
 			};
 		})
@@ -216,12 +224,14 @@ export function getLocationsMapPopupData(
 				[MapDataKeysCompressed.Safety]: feature.properties.safety,
 				[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
 				[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
-				...(feature.properties.image !== undefined && {
-					[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
-					[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
-					[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
-					[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
-				}),
+				...(feature.properties.image === undefined
+					? {}
+					: {
+							[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
+							[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
+							[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
+							[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
+						}),
 			};
 		})
 		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));

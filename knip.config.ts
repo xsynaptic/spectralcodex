@@ -11,7 +11,6 @@ export default {
 			ignoreBinaries: ['down', 'up', 'ssh-add'],
 			ignoreDependencies: [
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
-				'eslint-plugin-jsx-a11y', // transitive dep required by eslint-plugin-astro jsx-a11y-strict
 				'p-limit', // used in workspace packages (image-loader, scripts)
 			],
 		},
@@ -37,9 +36,6 @@ export default {
 		},
 		'packages/react-map-component': {
 			ignoreDependencies: ['astro'],
-		},
-		'packages/remark-img-group': {
-			ignoreDependencies: ['@types/unist'], // ambient types for unist ecosystem
 		},
 		'packages/scripts': {
 			ignoreDependencies: [

@@ -137,9 +137,11 @@ export async function createQuerySeriesEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
-			...(regionPrimary?.data._langCode?.startsWith('zh') && {
-				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
-			}),
+			...(regionPrimary?.data._langCode?.startsWith('zh')
+				? {
+						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+					}
+				: {}),
 		});
 
 		const wordCount = seriesCatalogItems.find((item) => item.id === entry.id)?.wordCount;

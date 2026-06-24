@@ -139,11 +139,10 @@ class NavMenu extends HTMLElement {
 				break;
 			}
 			case 'ArrowLeft': {
+				event.preventDefault();
 				if (isMenubar) {
-					event.preventDefault();
 					this.#focusSibling(li, 'prev');
 				} else {
-					event.preventDefault();
 					this.#closeAndFocusTrigger(li);
 				}
 				break;

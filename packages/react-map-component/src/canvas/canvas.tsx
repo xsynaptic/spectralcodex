@@ -72,13 +72,13 @@ const MapCanvasContainer: FC<
 
 		if (saved) {
 			return {
-				...(maxBounds && { maxBounds }),
+				...(maxBounds ? { maxBounds } : {}),
 				...saved,
 			} satisfies MapInitialViewState;
 		}
 
 		const viewState = {
-			...(maxBounds && { maxBounds }),
+			...(maxBounds ? { maxBounds } : {}),
 			fitBoundsOptions: {
 				padding: { top: 20, bottom: 20, left: 50, right: 50 },
 			},
@@ -153,9 +153,9 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 		>
 			<MapStoreProvider
 				initialState={{
-					...(showObjectiveFilter && { showObjectiveFilter: true }),
-					...(interactive === false && { canvasInteractive: false }),
-					...(languages && { languages }),
+					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
+					...(interactive === false ? { canvasInteractive: false } : {}),
+					...(languages ? { languages } : {}),
 				}}
 			>
 				<MapCanvasContainer {...props} />

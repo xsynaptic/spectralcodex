@@ -18,7 +18,7 @@ const { items, count, countThreshold = 10, url, ...props } = Astro.props;
 
 const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
 
-const numberFormatter = Intl.NumberFormat('en', { maximumFractionDigits: 0 });
+const numberFormatter = new Intl.NumberFormat('en', { maximumFractionDigits: 0 });
 
 const t = getTranslations();
 

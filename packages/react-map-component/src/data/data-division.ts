@@ -50,15 +50,17 @@ export function useMapApiDivisionData({
 
 				for await (const feature of featuresIterator) {
 					if (
-						R.isIncludedIn(feature.geometry.type, [
+						!R.isIncludedIn(feature.geometry.type, [
 							GeometryTypeEnum.MultiPolygon,
 							GeometryTypeEnum.Polygon,
 						])
 					) {
-						const invertedFeature = createFeatureMask(feature as Feature<Polygon | MultiPolygon>);
-
-						if (invertedFeature) features.push(invertedFeature);
+						continue;
 					}
+
+					const invertedFeature = createFeatureMask(feature as Feature<Polygon | MultiPolygon>);
+
+					if (invertedFeature) features.push(invertedFeature);
 				}
 
 				return {

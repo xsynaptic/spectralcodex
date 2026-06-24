@@ -187,13 +187,16 @@ export async function createQueryRegionsEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
-			...(entry.data._langCode?.startsWith('zh') && {
-				languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
-			}),
-			...(entry.data.divisionId &&
-				!entry.data.hideDivision && {
-					apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`),
-				}),
+			...(entry.data._langCode?.startsWith('zh')
+				? {
+						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
+					}
+				: {}),
+			...(entry.data.divisionId && !entry.data.hideDivision
+				? {
+						apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`),
+					}
+				: {}),
 		});
 
 		return { catalogItemsFiltered, catalogItems, catalogItemsCount, mapData, regionsOption };

@@ -91,15 +91,16 @@ function getSyncDataFunction({
 					data: {
 						src: filePathRelative,
 						modifiedTime,
-						...(options.dataHandler &&
-							(await options.dataHandler({
-								id,
-								filePath,
-								filePathRelative,
-								fileUrl,
-								modifiedTime,
-								logger,
-							}))),
+						...(options.dataHandler
+							? await options.dataHandler({
+									id,
+									filePath,
+									filePathRelative,
+									fileUrl,
+									modifiedTime,
+									logger,
+								})
+							: {}),
 					},
 				});
 
@@ -223,7 +224,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 			// Create a debounced queue for file changes
 			const changeQueue = new Map<string, FileChangeQueueItem>();
 
-			let changeTimeout: NodeJS.Timeout | undefined = undefined;
+			let changeTimeout: NodeJS.Timeout | undefined;
 
 			function queueChange(changedPath: string, type: 'change' | 'add' | 'unlink') {
 				const filePath = filePathMatches(changedPath);

@@ -76,8 +76,8 @@ const generateFeedItem = async ({
 			: entry.data.title,
 		link: getContentUrl(entry.collection, getPublicId(entry)),
 		pubDate: parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated),
-		...(description && { description }),
-		...(contentSanitized && { content: contentSanitized }),
+		...(description ? { description } : {}),
+		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
 
 	if (debug) {

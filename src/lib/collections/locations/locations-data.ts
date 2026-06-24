@@ -72,17 +72,16 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 
 	// Add image data to locations; for use with the mapping system
 	for (const entry of locations) {
-		if (entry.data.imageFeatured) {
-			const imageEntry = getImageById(
-				getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
-			);
+		if (!entry.data.imageFeatured) {
+			continue;
+		}
 
-			if (imageEntry) {
-				entry.data._imageThumbnail = getLocationThumbnailProps(
-					imageEntry.id,
-					imageEntry.data.width,
-				);
-			}
+		const imageEntry = getImageById(
+			getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
+		);
+
+		if (imageEntry) {
+			entry.data._imageThumbnail = getLocationThumbnailProps(imageEntry.id, imageEntry.data.width);
 		}
 	}
 

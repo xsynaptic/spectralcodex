@@ -125,13 +125,14 @@ async function extractExifData(
 		focalLength: getTagString(tags.FocalLength),
 		iso: getTagString(tags.ISO),
 		exposureValue: getImageExposureValue({ aperture, shutterSpeed }),
-		...(tags.GPSLatitude &&
-			tags.GPSLongitude && {
-				geometry: {
-					type: GeometryTypeEnum.Point,
-					coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
-				},
-			}),
+		...(tags.GPSLatitude && tags.GPSLongitude
+			? {
+					geometry: {
+						type: GeometryTypeEnum.Point,
+						coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
+					},
+				}
+			: {}),
 	};
 }
 

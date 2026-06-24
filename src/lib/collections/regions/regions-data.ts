@@ -127,25 +127,27 @@ function extractComputedData(regions: Array<CollectionEntry<'regions'>>): Region
 function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
 	// Calculate ancestors
 	for (const entry of regions) {
-		if (entry.data.parent) {
-			if (entry.id === entry.data.parent) {
-				throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
+		if (!entry.data.parent) {
+			continue;
+		}
+
+		if (entry.id === entry.data.parent) {
+			throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
+		}
+
+		let current = entry;
+
+		while (current.data.parent) {
+			const parent = regions.find(({ id }) => id === current.data.parent);
+
+			if (!parent) break;
+
+			if (entry.data._ancestors) {
+				entry.data._ancestors.push(parent.id);
+			} else {
+				entry.data._ancestors = [parent.id];
 			}
-
-			let current = entry;
-
-			while (current.data.parent) {
-				const parent = regions.find(({ id }) => id === current.data.parent);
-
-				if (!parent) break;
-
-				if (entry.data._ancestors) {
-					entry.data._ancestors.push(parent.id);
-				} else {
-					entry.data._ancestors = [parent.id];
-				}
-				current = parent;
-			}
+			current = parent;
 		}
 	}
 

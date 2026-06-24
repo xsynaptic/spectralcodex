@@ -88,13 +88,15 @@ async function getImageProps(): Promise<{
 			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
 			sizes: getImageLayoutSizesProp(layout, priority, context),
 			width: primaryWidth,
-			...(isFeed && {
-				height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width),
-			}),
+			...(isFeed
+				? {
+						height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width),
+					}
+				: {}),
 			unstyled: true,
 			imageQuality: IMAGE_HQ_QUALITY,
 			imageFormat: IMAGE_HQ_FORMAT,
-			...(priority && { priority: true }),
+			...(priority ? { priority: true } : {}),
 			alt: sanitizeImageAltAttribute(altProp ?? slotContents ?? imageEntry.data.title),
 		},
 		placeholderProps: {
