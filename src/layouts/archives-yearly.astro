@@ -6,7 +6,6 @@ import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
-import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import { createArchivesImageFeaturedGroupFunction } from '#lib/collections/archives/archives-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -58,7 +57,7 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 				const monthlyUrl = getSiteUrl('archives', monthlyData.year, monthlyData.month);
 
 				return (
-					<Container class="mb-8" fillViewport={true}>
+					<div class="content-column-fill mb-8">
 						<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
 								<Link href={monthlyUrl} linkColor="highlight">
@@ -89,7 +88,7 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 						{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
 							<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
 						) : undefined}
-					</Container>
+					</div>
 				);
 			})
 	}

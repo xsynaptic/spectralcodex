@@ -1,7 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import Container from '#components/parts/container.astro';
 import Prose from '#components/parts/prose.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
 
@@ -21,9 +20,12 @@ const children = await renderSlot(Astro.slots, 'default');
 
 {
 	description || children ? (
-		<Container
-			class:list={[marginSmall ? 'mb-4' : 'mb-8', className]}
-			fillViewport={fillViewport}
+		<div
+			class:list={[
+				fillViewport ? 'content-column-fill' : 'content-column',
+				marginSmall ? 'mb-4' : 'mb-8',
+				className,
+			]}
 			{...props}
 		>
 			{title || subtitle || description ? (
@@ -59,6 +61,6 @@ const children = await renderSlot(Astro.slots, 'default');
 				</header>
 			) : undefined}
 			<Fragment set:html={children} />
-		</Container>
+		</div>
 	) : undefined
 }

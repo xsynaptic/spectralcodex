@@ -4,7 +4,6 @@ import type { HTMLAttributes } from 'astro/types';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import Container from '#components/parts/container.astro';
 import Image from '#components/parts/image.astro';
 import Link from '#components/parts/link.astro';
 import Prose from '#components/parts/prose.astro';
@@ -83,7 +82,7 @@ const t = getTranslations();
 ---
 
 <article class={className} {...props}>
-	<Container as="header" class:list={[description ? undefined : 'mb-2']}>
+	<header class:list={['content-column', description ? undefined : 'mb-2']}>
 		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
 			<a
 				href={entryUrl}
@@ -114,10 +113,10 @@ const t = getTranslations();
 				</Prose>
 			) : undefined
 		}
-	</Container>
+	</header>
 	{
 		imageProps && placeholderProps ? (
-			<Container class="mb-2 md:mb-4">
+			<div class="content-column mb-2 md:mb-4">
 				<ImagePlaceholder
 					class="relative overflow-hidden rounded-xs"
 					placeholderProps={placeholderProps}
@@ -126,22 +125,22 @@ const t = getTranslations();
 						<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
 					</a>
 				</ImagePlaceholder>
-			</Container>
+			</div>
 		) : undefined
 	}
 	<Prose class:list={['pb-4']} showBlocks={true}><Fragment set:html={excerptContent} /></Prose>
 	{
 		hasExcerpt ? (
-			<Container as="div" class="text-right font-serif font-medium italic">
+			<div class="content-column text-right font-serif font-medium italic">
 				<Link href={entryUrl}>{t('content.more.label')}</Link>&nbsp;&raquo;
-			</Container>
+			</div>
 		) : undefined
 	}
 </article>
 {
 	showDivider ? (
-		<Container as="div">
+		<div class="content-column">
 			<hr class="mt-8 mb-8 text-primary-200 dark:text-primary-700" />
-		</Container>
+		</div>
 	) : undefined
 }

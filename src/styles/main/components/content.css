@@ -3,7 +3,7 @@
  * Images and image groups can have wide or full layout, spanning the viewport 
  */
 .c-block > *:not(.c-escape) {
-	@apply mx-auto max-w-content px-4 md:px-8;
+	@apply content-column;
 }
 
 /* Standard content image component */
@@ -15,7 +15,7 @@
 }
 
 .c-wrap.c-default {
-	@apply mx-auto max-w-content sm:px-4 md:mb-4 md:px-8;
+	@apply content-column-fill md:mb-4;
 }
 
 .c-wrap.c-wide {
@@ -77,7 +77,7 @@
 
 .c-wrap.c-full .c-caption,
 .c-image-group.c-full .c-caption {
-	@apply mx-auto max-w-content sm:px-4 md:px-8;
+	@apply content-column-fill;
 }
 
 /* Shared by grid and carousel groups */

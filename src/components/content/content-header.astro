@@ -3,7 +3,6 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { stripTags } from '@xsynaptic/unified-tools';
 
-import Container from '#components/parts/container.astro';
 import TextGradient from '#components/parts/text-gradient.astro';
 import { zIndexScaleEnum } from '#components/types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
@@ -23,9 +22,9 @@ const caption = await renderSlot(Astro.slots, 'header-caption');
 const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).trim() : undefined;
 ---
 
-<Container
-	as="div"
+<div
 	class:list={[
+		'content-column',
 		hasHeroImage
 			? 'flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:mb-0 sm:pt-0'
 			: 'mb-2 pt-4',
@@ -90,4 +89,4 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			</div>
 		) : undefined
 	}
-</Container>
+</div>

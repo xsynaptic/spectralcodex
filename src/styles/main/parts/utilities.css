@@ -1,3 +1,13 @@
+/** Content column: constrains to the content width with horizontal padding */
+@utility content-column {
+	@apply mx-auto max-w-content px-4 md:px-8;
+}
+
+/* Full-bleed variant: drops the base padding so content reaches the edge on mobile */
+@utility content-column-fill {
+	@apply mx-auto max-w-content sm:px-4 md:px-8;
+}
+
 /** Fade from the top */
 @utility bg-gradient-a {
 	background-image: linear-gradient(

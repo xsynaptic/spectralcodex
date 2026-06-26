@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import Container from '#components/parts/container.astro';
 import RegionsList from '#components/regions/regions-list.astro';
 import { createQueryRegionsRelatedFunction } from '#lib/collections/regions/regions-utils.ts';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
@@ -31,9 +30,8 @@ const t = getTranslations();
 
 {
 	regionChildren.length > 0 || regionSiblings.length > 0 ? (
-		<Container
-			as="div"
-			class="mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
+		<div
+			class="content-column mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
 			data-pagefind-ignore
 			data-nosnippet
 		>
@@ -63,6 +61,6 @@ const t = getTranslations();
 					<RegionsList terms={regionSiblings} showTitleMultilingual={depth >= showTitleAltDepth} />
 				</div>
 			) : undefined}
-		</Container>
+		</div>
 	) : undefined
 }

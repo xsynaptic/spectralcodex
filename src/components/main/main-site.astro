@@ -20,7 +20,6 @@ import MenuFooter from '#components/menu/menu-footer.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
 import ModeManager from '#components/mode-manager/mode-manager.astro';
 import ModeToggle from '#components/mode-manager/mode-toggle.astro';
-import Container from '#components/parts/container.astro';
 import Link from '#components/parts/link.astro';
 import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
@@ -132,10 +131,10 @@ const t = getTranslations();
 				target="#main-content"
 				label={t('site.skip.label')}
 			/>
-			<Container
-				as="div"
-				class="flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"
-				>{
+			<div
+				class="content-column flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"
+			>
+				{
 					isHomepage ? (
 						<h1 class="flex grow items-center gap-1">
 							<Link
@@ -160,15 +159,15 @@ const t = getTranslations();
 				}
 				<ModeToggle />
 				<Search />
-			</Container>
-			<Container class="w-full overflow-x-clip" fillViewport={true}>
+			</div>
+			<div class="content-column-fill w-full overflow-x-clip">
 				<MenuHeader hasHeroImage={hasHeroImage} />
-			</Container>
+			</div>
 		</header>
 		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
 			<slot />
 		</main>
-		<Container as="footer" class="mt-8 mb-8 w-full pt-4">
+		<footer class="content-column mt-8 mb-8 w-full pt-4">
 			<div
 				class:list={[
 					'border-t pt-4 pb-8',
@@ -178,7 +177,7 @@ const t = getTranslations();
 				<MenuFooter />
 				<Colophon />
 			</div>
-		</Container>
+		</footer>
 		<TopButton />
 		{
 			schemas && schemas.length > 0 ? (

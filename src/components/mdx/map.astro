@@ -4,7 +4,6 @@ import type { HTMLAttributes } from 'astro/types';
 import * as R from 'remeda';
 
 import MapComponent from '#components/map/map-component.astro';
-import Container from '#components/parts/container.astro';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -41,14 +40,8 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 
 {
 	hasGeodata && !isFeed ? (
-		<Container
-			as="div"
-			fillViewport={true}
-			{...props}
-			class:list={['not-prose', className]}
-			data-pagefind-ignore
-		>
+		<div {...props} class:list={['not-prose content-column-fill', className]} data-pagefind-ignore>
 			<MapComponent mapComponentProps={mapComponentProps} />
-		</Container>
+		</div>
 	) : undefined
 }
