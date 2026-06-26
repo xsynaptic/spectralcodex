@@ -31,8 +31,6 @@ export default defineConfig({
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
-	// Use .astro for data-store (matching dev server behavior)
-	cacheDir: './.astro',
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
