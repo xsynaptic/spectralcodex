@@ -50,7 +50,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.0.2",
+		"astro": "^7.0.3",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7"
 	},
@@ -94,7 +94,7 @@
 		"astro-pagefind": "^2.0.0",
 		"astro-seo": "^1.1.0",
 		"eslint": "^10.5.0",
-		"eslint-plugin-astro": "^2.0.0",
+		"eslint-plugin-astro": "^2.1.1",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^36.0.0",
@@ -102,7 +102,7 @@
 		"geokdbush": "^2.1.0",
 		"globals": "^17.7.0",
 		"kdbush": "^4.1.0",
-		"knip": "^6.18.0",
+		"knip": "^6.20.0",
 		"lefthook": "^2.1.9",
 		"maplibre-gl": "^5.24.0",
 		"p-limit": "^7.3.0",
@@ -111,9 +111,9 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
 		"remeda": "^2.38.0",
-		"satteri": "^0.9.2",
+		"satteri": "^0.9.3",
 		"sharp": "^0.35.2",
-		"stylelint": "^17.13.0",
+		"stylelint": "^17.14.0",
 		"tailwindcss": "^4.3.1",
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3",
