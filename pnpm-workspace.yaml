@@ -7,10 +7,6 @@ verifyDepsBeforeRun: error
 strictDepBuilds: true
 
 minimumReleaseAgeExclude:
-  - 'astro'
-  - 'satteri'
-  - '@astrojs/*'
-  - '@bruits/*'
   - '@xsynaptic/*'
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
