@@ -17,6 +17,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
+import { getDataStorePath } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { getBuiltEntries } from './content.js';
 import { createGenerator } from './generate.js';
@@ -28,7 +29,7 @@ const { values } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		'dist-path': {
 			type: 'string',

@@ -4,7 +4,12 @@ import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { getDataStoreCollection, getPublicId, loadDataStore } from '../shared/data-store';
+import {
+	getDataStoreCollection,
+	getDataStorePath,
+	getPublicId,
+	loadDataStore,
+} from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 
 const rootPath = findWorkspaceRoot();
@@ -14,7 +19,7 @@ const { values } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 	},
 });

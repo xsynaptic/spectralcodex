@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
@@ -25,7 +25,7 @@ const { values, positionals } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		'divisions-path': {
 			type: 'string',

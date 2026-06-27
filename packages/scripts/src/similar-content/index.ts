@@ -11,7 +11,7 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../shared/data-store.js';
 
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
+import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 
 const rootPath = findWorkspaceRoot();
@@ -24,7 +24,7 @@ const { values } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		'cache-path': {
 			type: 'string',

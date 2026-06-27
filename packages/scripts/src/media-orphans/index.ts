@@ -6,7 +6,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { fallbackImageIds } from '../og-image/fallback.js';
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 import { findWorkspaceRoot } from '../shared/utils.js';
 
@@ -17,7 +17,7 @@ const { values } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		'media-path': {
 			type: 'string',

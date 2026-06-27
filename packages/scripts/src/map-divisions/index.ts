@@ -21,7 +21,7 @@ async function resolveLatestRelease(): Promise<string> {
 	return `${S3_BASE}/${version}/`;
 }
 
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
 import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
@@ -42,7 +42,7 @@ const { values } = parseArgs({
 		'data-store-path': {
 			type: 'string',
 			short: 'd',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		'cache-path': {
 			type: 'string',

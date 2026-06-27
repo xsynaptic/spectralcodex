@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { getPublicId, loadDataStore } from '../shared/data-store.js';
+import { getDataStorePath, getPublicId, loadDataStore } from '../shared/data-store.js';
 import { safelyCreateDirectory } from '../shared/utils.js';
 import { getGitFileDates } from './git-file-dates.js';
 
@@ -31,10 +31,7 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 
 	const contentPathRelative = options.contentPath ?? 'packages/content';
 	const contentPathAbs = path.resolve(options.rootPath, contentPathRelative);
-	const dataStorePath = path.resolve(
-		options.rootPath,
-		options.dataStorePath ?? '.astro/data-store.json',
-	);
+	const dataStorePath = path.resolve(options.rootPath, options.dataStorePath ?? getDataStorePath());
 	const outputPath = path.resolve(
 		options.rootPath,
 		options.outputPath ?? '.cache/sitemap-lastmod.json',

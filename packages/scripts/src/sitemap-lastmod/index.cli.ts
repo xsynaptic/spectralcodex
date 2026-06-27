@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import { parseArgs } from 'node:util';
 
+import { getDataStorePath } from '../shared/data-store.js';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { generateSitemapLastmod } from './index.js';
 
@@ -9,7 +10,7 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'content-path': { type: 'string', default: 'packages/content' },
-		'data-store-path': { type: 'string', default: '.astro/data-store.json' },
+		'data-store-path': { type: 'string', default: getDataStorePath() },
 		'output-path': { type: 'string', default: '.cache/sitemap-lastmod.json' },
 		'site-url': { type: 'string' },
 	},

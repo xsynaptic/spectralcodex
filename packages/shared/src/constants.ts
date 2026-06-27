@@ -11,3 +11,6 @@ export const OPEN_GRAPH_OUTPUT_PATH = '.cache/og-image';
 
 // Keyv namespace (and JSON filename stem) for the Open Graph generation cache
 export const OPEN_GRAPH_CACHE_NAMESPACE = 'og-image-cache';
+
+// Astro's cache directory, set explicitly so build-time scripts read the data store where Astro writes it
+export const ASTRO_CACHE_DIR = './node_modules/.astro';

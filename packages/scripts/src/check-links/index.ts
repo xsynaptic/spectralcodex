@@ -6,7 +6,7 @@ import pLimit from 'p-limit';
 
 import type { UrlStatus } from './types.ts';
 
-import { loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
+import { getDataStorePath, loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
 import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
@@ -36,7 +36,7 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': { type: 'string', default: '.astro/data-store.json' },
+		'data-store-path': { type: 'string', default: getDataStorePath() },
 		'db-path': { type: 'string', default: '.cache/check-links.db' },
 		recheck: { type: 'string' },
 		'recheck-all': { type: 'boolean', default: false },

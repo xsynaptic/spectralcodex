@@ -9,8 +9,16 @@
  *
  * @see https://github.com/withastro/astro/blob/main/packages/astro/src/content/data-store.ts
  */
+import { ASTRO_CACHE_DIR } from '@spectralcodex/shared/constants';
 import * as devalue from 'devalue';
 import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
+export function getDataStorePath(): string {
+	const dir = process.env.NODE_ENV === 'production' ? ASTRO_CACHE_DIR : '.astro';
+
+	return path.join(dir, 'data-store.json');
+}
 
 export interface DataStoreEntry {
 	id: string;

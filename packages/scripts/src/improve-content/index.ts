@@ -9,7 +9,7 @@ import * as R from 'remeda';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-import { getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checks } from './checks';
 
@@ -52,7 +52,7 @@ const { values, positionals } = parseArgs({
 	options: {
 		'data-store-path': {
 			type: 'string',
-			default: '.astro/data-store.json',
+			default: getDataStorePath(),
 		},
 		limit: {
 			type: 'string',

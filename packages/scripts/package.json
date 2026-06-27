@@ -14,7 +14,7 @@
 		"deploy-image-server": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-image-server.ts",
 		"deploy-media": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-media.cli.ts",
 		"deploy-og": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-og.cli.ts",
-		"deploy-site": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy.ts",
+		"deploy-site": "NODE_ENV=production tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy.ts",
 		"dev-server": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../.env.development ./src/dev-server/index.ts",
 		"format-content": "tsx ./src/format-content/index.ts",
 		"generate-redirects": "tsx ./src/generate-redirects/index.ts",

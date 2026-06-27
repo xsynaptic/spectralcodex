@@ -4,6 +4,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@spectralcodex/astro-sitemap';
+import { ASTRO_CACHE_DIR } from '@spectralcodex/shared/constants';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
@@ -31,6 +32,8 @@ export default defineConfig({
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
+	// Astro's default; set explicitly so build-time scripts resolve the data store identically
+	cacheDir: ASTRO_CACHE_DIR,
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
