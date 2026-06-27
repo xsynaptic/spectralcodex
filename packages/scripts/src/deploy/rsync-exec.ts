@@ -51,3 +51,12 @@ export async function sshExec(
 
 	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${command}`;
 }
+
+// Like sshExec but captures and returns stdout
+export async function sshCapture(config: DeployConfig, command: string): Promise<string> {
+	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+
+	const result = await $`ssh ${sshArgs} ${command}`;
+
+	return result.stdout;
+}

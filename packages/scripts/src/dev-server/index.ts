@@ -11,7 +11,7 @@ const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 
 process.env.CONTENT_MEDIA_PATH = path.resolve(rootPath, mediaPathRelative);
-process.env.IMAGE_SERVER_NGINX_CONFIG = path.resolve(rootPath, 'deploy/site/nginx.conf.template');
+process.env.IMAGE_SERVER_NGINX_CONFIG = path.resolve(rootPath, 'deploy/nginx.conf.template');
 
 $.verbose = false;
 

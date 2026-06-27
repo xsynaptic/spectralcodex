@@ -14,30 +14,28 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 
 	const config = loadDeployConfig();
 
-	const siteDir = path.join(rootPath, 'deploy/site');
-	const remoteCaddySitesPath = `${config.remotePath}/caddy/sites`;
+	const deployDir = path.join(rootPath, 'deploy');
+	const remoteCaddyPath = `${config.remotePath}/caddy`;
 	const remoteCertsPath = `${config.remotePath}/certs`;
 
 	console.log(chalk.blue('Deploying Caddy config...'));
 	console.log(
-		chalk.gray(
-			`  Caddy sites: ${siteDir}/caddy/sites/ -> ${config.remoteHost}:${remoteCaddySitesPath}/`,
-		),
+		chalk.gray(`  Caddy: ${deployDir}/caddy/ -> ${config.remoteHost}:${remoteCaddyPath}/`),
 	);
 	console.log(
-		chalk.gray(`  Certs:       ${siteDir}/certs/ -> ${config.remoteHost}:${remoteCertsPath}/`),
+		chalk.gray(`  Certs: ${deployDir}/certs/ -> ${config.remoteHost}:${remoteCertsPath}/`),
 	);
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
 	const start = Date.now();
 
-	await rsyncTo(`${siteDir}/caddy/sites/`, `${config.remoteHost}:${remoteCaddySitesPath}/`, {
+	await rsyncTo(`${deployDir}/caddy/`, `${config.remoteHost}:${remoteCaddyPath}/`, {
 		config,
 		dryRun,
 	});
 
-	await rsyncTo(`${siteDir}/certs/`, `${config.remoteHost}:${remoteCertsPath}/`, {
+	await rsyncTo(`${deployDir}/certs/`, `${config.remoteHost}:${remoteCertsPath}/`, {
 		config,
 		dryRun,
 	});

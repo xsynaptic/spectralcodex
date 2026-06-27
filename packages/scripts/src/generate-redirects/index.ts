@@ -25,10 +25,7 @@ const { values } = parseArgs({
 });
 
 const dataStorePath = path.join(rootPath, values['data-store-path']);
-const outputPath = path.join(
-	rootPath,
-	'deploy/site/caddy/sites/spectralcodex-redirects-generated.conf',
-);
+const outputPath = path.join(rootPath, 'deploy/caddy/spectralcodex-redirects-generated.conf');
 
 const { collections } = loadDataStore(dataStorePath);
 

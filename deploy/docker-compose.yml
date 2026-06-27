@@ -1,10 +1,12 @@
-# Shared infrastructure for Astro projects
-# Contains only Caddy reverse proxy and Umami analytics
+# Caddy reverse proxy, Umami analytics, and the imagor image pipeline with nginx cache
+# Deployed to /opt/server by `pnpm deploy-infra`
 services:
   # One-shot sidecar: chowns named volumes so non-root caddy can use them; only used once
   caddy-init:
     image: alpine:3.24
     command: chown -R 1000:1000 /data /config
+    # no network needed; keeps compose from creating an unused default network
+    network_mode: none
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -157,6 +159,85 @@ services:
     networks:
       - backend
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  # nginx cache in front of imagor; serves via Caddy
+  image-cache:
+    image: nginx:1.30.2-alpine
+    container_name: image-cache
+    init: true
+    read_only: true
+    tmpfs:
+      - /var/run
+      - /var/cache/nginx:size=64m
+      - /etc/nginx/conf.d
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+    mem_limit: 256m
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '--quiet', 'http://127.0.0.1/health']
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    ports:
+      - '127.0.0.1:3100:80'
+    volumes:
+      - ./nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ${DEPLOY_MEDIA_PATH}/cache:/var/cache/nginx/imagor
+    depends_on:
+      image-server:
+        condition: service_started
+    networks:
+      - astro-frontend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  image-server:
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.1
+    container_name: image-server
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - ${DEPLOY_MEDIA_PATH}/media:/media:ro
+    environment:
+      - IMAGOR_SECRET=${IMAGE_SERVER_SECRET}
+      - IMAGOR_SIGNER_TYPE=sha256
+      - IMAGOR_SIGNER_TRUNCATE=${IMAGE_SERVER_SIGNATURE_LENGTH:-20}
+      - VIPS_STRIP_METADATA=1
+      - VIPS_MOZJPEG=1
+      - FILE_LOADER_BASE_DIR=/media
+      - HTTP_LOADER_DISABLE=1
+      - IMAGOR_CACHE_HEADER_TTL=8760h
+      - IMAGOR_DISABLE_PARAMS_ENDPOINT=1
+      - IMAGOR_DISABLE_ERROR_BODY=1
+      - VIPS_MAX_RESOLUTION=16800000
+      - VIPS_MAX_WIDTH=5000
+      - VIPS_MAX_HEIGHT=5000
+    networks:
+      - astro-frontend
+    restart: unless-stopped
+    mem_limit: 768m
     logging:
       driver: json-file
       options:

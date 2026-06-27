@@ -34,10 +34,10 @@ temp/
 deploy/.env
 
 # certificates
-deploy/site/certs/
+deploy/certs/
 
 # generated caddy config
-deploy/site/caddy/sites/spectralcodex-redirects-generated.conf
+deploy/caddy/spectralcodex-redirects-generated.conf
 
 # public generated files
 public/divisions/

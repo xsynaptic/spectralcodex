@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Phase 2: Deploy user setup - Shared infrastructure directories
+# Phase 2: Deploy user setup (server directories)
 #
 # Run as deploy user after setup-vps-1.sh:
 #   ssh deploy@<ip>
@@ -14,7 +14,7 @@ if [ "$EUID" -eq 0 ]; then
   exit 1
 fi
 
-echo "=== Phase 2: Shared Infrastructure Setup (as $USER) ==="
+echo "=== Phase 2: Server Setup (as $USER) ==="
 echo ""
 
 # Find attached volume
@@ -28,9 +28,9 @@ fi
 
 echo "Found volume: $VOLUME_PATH"
 
-# Create shared infrastructure directories
+# Create server directories
 echo "Creating directories..."
-sudo mkdir -p /opt/server/caddy/sites
+sudo mkdir -p /opt/server/caddy
 sudo mkdir -p /opt/server/certs
 sudo mkdir -p "$VOLUME_PATH/data/umami"
 sudo mkdir -p "$VOLUME_PATH/backups"
@@ -41,28 +41,19 @@ sudo chown -R $USER:$USER /opt/server
 sudo chown -R $USER:$USER "$VOLUME_PATH/data"
 sudo chown -R $USER:$USER "$VOLUME_PATH/backups"
 
-# Generate .env file
-echo "Creating /opt/server/.env..."
-if [ -f /opt/server/.env ]; then
-  echo "Warning: /opt/server/.env already exists"
-  cat /opt/server/.env
-else
-  cat > /opt/server/.env << EOF
-UMAMI_DATA_PATH=$VOLUME_PATH/data/umami
-
-UMAMI_DB_PASSWORD=$(openssl rand -hex 32)
-UMAMI_APP_SECRET=$(openssl rand -hex 32)
-EOF
-  echo "Created /opt/server/.env with generated secrets"
-  echo ""
-  echo "IMPORTANT: Copy these values to your local deploy/.env"
-  cat /opt/server/.env
-fi
+# Generate Umami secrets for local deploy/.env
+# The server .env is owned by `pnpm deploy-infra`, which overwrites on every deploy, so we only emit secrets to copy locally
+echo "Generating Umami secrets..."
+echo ""
+echo "IMPORTANT: Copy these into your local deploy/.env"
+echo "UMAMI_DATA_PATH=$VOLUME_PATH/data/umami"
+echo "UMAMI_BACKUP_PATH=$VOLUME_PATH/backups"
+echo "UMAMI_DB_PASSWORD=$(openssl rand -hex 32)"
+echo "UMAMI_APP_SECRET=$(openssl rand -hex 32)"
 
 echo ""
 echo "=== Phase 2 Complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Copy the secrets above to local deploy/.env"
-echo "  2. Deploy infra: bash deploy/infra/scripts/deploy.sh"
-echo "  3. Deploy projects (each project creates its own directories)"
+echo "  1. Copy the secrets above into local deploy/.env"
+echo "  2. Deploy: pnpm deploy-infra"

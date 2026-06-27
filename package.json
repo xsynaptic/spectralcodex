@@ -11,7 +11,7 @@
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --output-path=packages/content",
 		"deploy-app": "pnpm -F @spectralcodex/scripts deploy-app",
 		"deploy-caddy": "pnpm -F @spectralcodex/scripts deploy-caddy",
-		"deploy-image-server": "pnpm -F @spectralcodex/scripts deploy-image-server",
+		"deploy-infra": "pnpm -F @spectralcodex/scripts deploy-infra",
 		"deploy-media": "pnpm -F @spectralcodex/scripts deploy-media",
 		"deploy-og": "pnpm -F @spectralcodex/scripts deploy-og",
 		"deploy-site": "pnpm -F @spectralcodex/scripts deploy-site",

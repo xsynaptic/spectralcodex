@@ -66,7 +66,7 @@ export async function setup() {
 					...process.env,
 					// Absolute paths required for Docker
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/site/nginx.conf.template'),
+					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/nginx.conf.template'),
 					IMAGE_SERVER_SECRET,
 				},
 			},
@@ -113,7 +113,7 @@ export function teardown() {
 				env: {
 					...process.env,
 					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/site/nginx.conf.template'),
+					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/nginx.conf.template'),
 				},
 			},
 		);

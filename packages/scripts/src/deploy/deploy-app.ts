@@ -29,7 +29,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 	await rsyncTo(`${distPath}/`, `${config.remoteHost}:${config.sitePath}/`, {
 		config,
 		dryRun,
-		excludes: [`/${OPEN_GRAPH_BASE_PATH}/`, '/shrine-app/', '/ruin-app/'],
+		excludes: [`/${OPEN_GRAPH_BASE_PATH}/`],
 		extraFlags: skipDelete ? [] : ['--delete-after'],
 	});
 

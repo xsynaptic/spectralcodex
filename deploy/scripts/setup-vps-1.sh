@@ -68,6 +68,9 @@ fi
 systemctl reload ssh
 
 echo "Configuring firewall..."
+# DO Docker droplets ship with `ufw allow 2375/2376` (Docker API); remove them first or the deny below is shadowed
+ufw delete allow 2375/tcp >/dev/null 2>&1 || true
+ufw delete allow 2376/tcp >/dev/null 2>&1 || true
 ufw deny 2375 >/dev/null 2>&1 || true
 ufw deny 2376 >/dev/null 2>&1 || true
 ufw allow ssh

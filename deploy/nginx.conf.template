@@ -1,4 +1,4 @@
-proxy_cache_path /var/cache/nginx/imagor levels=1:2 keys_zone=imagor_cache:50m max_size=60g inactive=365d use_temp_path=off;
+proxy_cache_path /var/cache/nginx/imagor levels=1:2 keys_zone=imagor_cache:50m max_size=50g inactive=365d use_temp_path=off;
 
 limit_req_zone $binary_remote_addr zone=imagor_limit:10m rate=100r/s;
 

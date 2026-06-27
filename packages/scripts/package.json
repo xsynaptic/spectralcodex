@@ -11,7 +11,7 @@
 		"deploy-cache-purge": "tsx --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-cache-purge.cli.ts",
 		"deploy-cache-warm": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-cache-warm.cli.ts",
 		"deploy-caddy": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-caddy.cli.ts",
-		"deploy-image-server": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-image-server.ts",
+		"deploy-infra": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-infra.cli.ts",
 		"deploy-media": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-media.cli.ts",
 		"deploy-og": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-og.cli.ts",
 		"deploy-site": "NODE_ENV=production tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy.ts",
