@@ -6,7 +6,7 @@ import pLimit from 'p-limit';
 
 import type { UrlStatus } from './types.ts';
 
-import { getDataStorePath, loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
+import { DATA_STORE_PATH, loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
 import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
@@ -36,7 +36,6 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': { type: 'string', default: getDataStorePath() },
 		'db-path': { type: 'string', default: '.cache/check-links.db' },
 		recheck: { type: 'string' },
 		'recheck-all': { type: 'boolean', default: false },
@@ -62,7 +61,7 @@ const LINK_COLLECTIONS = [
 	'themes',
 ] as const;
 
-const dataStorePath = path.resolve(rootPath, values['data-store-path']);
+const dataStorePath = path.resolve(rootPath, DATA_STORE_PATH);
 const dbPath = path.resolve(rootPath, values['db-path']);
 const concurrency = Number(values.concurrency);
 const domainLimit = Number(values['domain-limit']);

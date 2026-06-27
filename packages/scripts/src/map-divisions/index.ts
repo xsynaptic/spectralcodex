@@ -21,7 +21,7 @@ async function resolveLatestRelease(): Promise<string> {
 	return `${S3_BASE}/${version}/`;
 }
 
-import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
+import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
@@ -38,11 +38,6 @@ const { values } = parseArgs({
 			type: 'string',
 			short: 'o',
 			default: 'public/divisions',
-		},
-		'data-store-path': {
-			type: 'string',
-			short: 'd',
-			default: getDataStorePath(),
 		},
 		'cache-path': {
 			type: 'string',
@@ -246,7 +241,7 @@ async function mapDivisions() {
 
 	try {
 		// Load region data from data-store
-		const { collections } = loadDataStore(path.join(rootPath, values['data-store-path']));
+		const { collections } = loadDataStore(path.join(rootPath, DATA_STORE_PATH));
 		const regionEntries = getDataStoreCollection(collections, ['regions']);
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);

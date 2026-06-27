@@ -17,7 +17,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
-import { getDataStorePath } from '../shared/data-store.js';
+import { DATA_STORE_PATH } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { getBuiltEntries } from './content.js';
 import { createGenerator } from './generate.js';
@@ -27,10 +27,6 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
 		'dist-path': {
 			type: 'string',
 			default: './dist',
@@ -136,7 +132,7 @@ async function main() {
 	});
 
 	const { entries, unresolved } = getBuiltEntries({
-		dataStorePath: path.resolve(rootPath, values['data-store-path']),
+		dataStorePath: path.resolve(rootPath, DATA_STORE_PATH),
 		distPath: path.resolve(rootPath, values['dist-path']),
 	});
 

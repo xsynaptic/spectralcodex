@@ -9,7 +9,7 @@ import * as R from 'remeda';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
+import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checks } from './checks';
 
@@ -50,10 +50,6 @@ function printAvailableChecks(stream: 'stdout' | 'stderr') {
 const { values, positionals } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
 		limit: {
 			type: 'string',
 		},
@@ -87,7 +83,7 @@ if (!check) {
 const explicitLimit = values.limit ? Number(values.limit) : undefined;
 const effectiveLimit = explicitLimit ?? (values.random ? RANDOM_DEFAULT_LIMIT : undefined);
 
-const dataStorePath = path.join(rootPath, values['data-store-path']);
+const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
 const { collections } = loadDataStore(dataStorePath);
 
 const entries = getDataStoreCollection(collections, ['locations']);

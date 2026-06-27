@@ -6,7 +6,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { fallbackImageIds } from '../og-image/fallback.js';
-import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
+import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 import { findWorkspaceRoot } from '../shared/utils.js';
 
@@ -15,10 +15,6 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
 		'media-path': {
 			type: 'string',
 			default: 'packages/content/media',
@@ -31,7 +27,7 @@ const { values } = parseArgs({
 	},
 });
 
-const dataStorePath = path.join(rootPath, values['data-store-path']);
+const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
 const mediaPath = path.join(rootPath, values['media-path']);
 
 const { collections } = loadDataStore(dataStorePath);

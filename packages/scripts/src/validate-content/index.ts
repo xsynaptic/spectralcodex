@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store';
+import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
@@ -23,10 +23,6 @@ const rootPath = findWorkspaceRoot();
 const { values, positionals } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
 		'divisions-path': {
 			type: 'string',
 			default: './public/divisions',
@@ -43,7 +39,7 @@ const { values, positionals } = parseArgs({
 	allowPositionals: true,
 });
 
-const dataStorePath = path.join(rootPath, values['data-store-path']);
+const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
 const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];

@@ -11,7 +11,7 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../shared/data-store.js';
 
-import { getDataStoreCollection, getDataStorePath, loadDataStore } from '../shared/data-store.js';
+import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 
 const rootPath = findWorkspaceRoot();
@@ -22,10 +22,6 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
 		'cache-path': {
 			type: 'string',
 			default: './.cache',
@@ -357,7 +353,7 @@ async function similarContent() {
 	try {
 		console.log(chalk.magenta('=== Similar Content Generator ==='));
 
-		const dataStorePath = path.join(rootPath, values['data-store-path']);
+		const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
 
 		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
 

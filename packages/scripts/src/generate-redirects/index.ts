@@ -2,11 +2,10 @@
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
 import {
+	DATA_STORE_PATH,
 	getDataStoreCollection,
-	getDataStorePath,
 	getPublicId,
 	loadDataStore,
 } from '../shared/data-store';
@@ -14,17 +13,7 @@ import { findWorkspaceRoot } from '../shared/utils.js';
 
 const rootPath = findWorkspaceRoot();
 
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'data-store-path': {
-			type: 'string',
-			default: getDataStorePath(),
-		},
-	},
-});
-
-const dataStorePath = path.join(rootPath, values['data-store-path']);
+const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
 const outputPath = path.join(rootPath, 'deploy/caddy/spectralcodex-redirects-generated.conf');
 
 const { collections } = loadDataStore(dataStorePath);
