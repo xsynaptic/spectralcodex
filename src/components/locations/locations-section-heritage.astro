@@ -1,33 +1,50 @@
 ---
-import type { LocationTwHeritage } from '#lib/collections/locations/locations-schemas.ts';
+import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { LocationTwHeritageRecords } from '#lib/collections/locations/locations-schemas.ts';
+import { getLocationHeritage } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
-	heritage: LocationTwHeritage | undefined;
+	entry: CollectionEntry<'locations'>;
 }
 
-const { heritage, ...props } = Astro.props;
+const { entry, ...props } = Astro.props;
 
-const titleMultilingual = heritage
-	? getMultilingualContent({ data: LocationTwHeritageRecords[heritage], prop: 'title' })?.primary
-	: undefined;
+const heritage = getLocationHeritage(entry);
 
 const t = getTranslations();
 ---
 
-<ContentSection data-pagefind-ignore {...props}>
-	<Fragment slot="section-title">{t('section.heritage')}</Fragment>
-	{
-		heritage ? (
-			<div class="flex flex-wrap items-center gap-1 text-xs sm:text-sm">
-				<span>{LocationTwHeritageRecords[heritage].title}</span>
-				<TextMultilingual content={titleMultilingual} parenthesis={true} />
-			</div>
-		) : undefined
-	}
-</ContentSection>
+{
+	heritage.length > 0 ? (
+		<ContentSection data-pagefind-ignore {...props}>
+			<Fragment slot="section-title">{t('section.heritage')}</Fragment>
+			<ListRow>
+				{heritage.map((key) => {
+					const titleMultilingual = getMultilingualContent({
+						data: LocationTwHeritageRecords[key],
+						prop: 'title',
+					})?.primary;
+
+					return (
+						<DividedItem as="li" class="divided-thin font-serif text-sm">
+							{LocationTwHeritageRecords[key].title}
+							{titleMultilingual ? (
+								<>
+									{' '}
+									<TextMultilingual content={titleMultilingual} parenthesis={true} />
+								</>
+							) : undefined}
+						</DividedItem>
+					);
+				})}
+			</ListRow>
+		</ContentSection>
+	) : undefined
+}

@@ -2,7 +2,10 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
+import type {
+	LocationsNearbyItem,
+	LocationTwHeritage,
+} from '#lib/collections/locations/locations-schemas.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
@@ -64,6 +67,19 @@ function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, numb
 	if (!point) return undefined;
 
 	return [point.coordinates[0], point.coordinates[1]];
+}
+
+// Union the top-level heritage with any per-point heritage, deduped
+export function getLocationHeritage(
+	entry: CollectionEntry<'locations'>,
+): Array<LocationTwHeritage> {
+	const { heritage, geometry } = entry.data;
+	const points = Array.isArray(geometry) ? geometry : [geometry];
+	const values = [
+		...(heritage ? [heritage] : []),
+		...points.flatMap((point) => (point.heritage ? [point.heritage] : [])),
+	];
+	return [...new Set(values)];
 }
 
 export function sortLocationsByLatitude(
