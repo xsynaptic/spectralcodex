@@ -247,7 +247,8 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	const resultCount = Number(values['result-count']);
 	const minScore = Number(values['min-score']);
 
-	// Over-fetch candidates for re-ranking; expansion_search must be >= candidateCount or usearch silently loses recall
+	// Over-fetch candidates for re-ranking
+	// expansion_search must be >= candidateCount or usearch silently loses recall
 	const candidateCount = Math.max(resultCount * 3, 50);
 
 	const index = new Index({
@@ -256,7 +257,7 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		connectivity: 16,
 		quantization: ScalarKind.F32,
 		expansion_add: 128,
-		expansion_search: candidateCount,
+		expansion_search: candidateCount * 2, // 2x improves recall without significant slowdown
 		multi: false,
 	});
 
@@ -288,7 +289,8 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 
 			// Blend the boost into the headroom below 1.0 so strong matches never saturate
 			const boost = calculateMetadataBoost(current, other);
-			const score = similarity + (1 - similarity) * boost;
+			// Round to 4 decimals; full float precision just bloats the output JSON
+			const score = Math.round((similarity + (1 - similarity) * boost) * 10_000) / 10_000;
 
 			candidates.push({
 				id: other.id,
@@ -390,7 +392,7 @@ async function similarContent() {
 		const similarContentItems = calculateSimilarities(embeddings);
 		const outputPath = path.join(rootPath, values['output-path'], values['output-name']);
 
-		writeFileSync(outputPath, JSON.stringify(similarContentItems, undefined, 2));
+		writeFileSync(outputPath, JSON.stringify(similarContentItems));
 
 		const totalTime = ((performance.now() - totalStart) / 1000).toFixed(2);
 
