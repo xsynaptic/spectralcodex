@@ -54,8 +54,7 @@ export function closeDatabase(): void {
 
 export function getEntryDigest(contentId: string): string | undefined {
 	const row = db.prepare('SELECT digest FROM entry_digests WHERE content_id = ?').get(contentId) as
-		| { digest: string }
-		| undefined;
+		{ digest: string } | undefined;
 
 	return row?.digest;
 }

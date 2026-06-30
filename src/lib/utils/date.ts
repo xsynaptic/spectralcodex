@@ -26,9 +26,8 @@ export interface DateRange {
 
 export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRange> {
 	return entries
-		.map(
-			(entry): DateRange =>
-				Array.isArray(entry) ? { start: entry[0], end: entry[1] } : { start: entry },
+		.map((entry): DateRange =>
+			Array.isArray(entry) ? { start: entry[0], end: entry[1] } : { start: entry },
 		)
 		.sort((a, b) => a.start.date.valueOf() - b.start.date.valueOf());
 }
