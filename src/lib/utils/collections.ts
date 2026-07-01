@@ -2,7 +2,7 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
-import pMemoize from 'p-memoize';
+import pMemoize, { pMemoizeClear } from 'p-memoize';
 
 interface CollectionEntryWithContentCount {
 	data: {
@@ -54,7 +54,7 @@ export function createCollectionData<K extends CollectionKey>(config: {
 		entriesMap: Map<string, CollectionEntry<K>>,
 	) => Promise<void> | void;
 }) {
-	return pMemoize(async (): Promise<CollectionResult<K>> => {
+	const getData = pMemoize(async (): Promise<CollectionResult<K>> => {
 		const startTime = performance.now();
 
 		const entries = await getCollection(config.collection);
@@ -75,6 +75,18 @@ export function createCollectionData<K extends CollectionKey>(config: {
 
 		return { entries, entriesMap };
 	});
+
+	// In dev the content store can load empty if Astro's data-store module fails to parse
+	// Memoizing that empty result would strand it for the whole session; evict empties to allow for recovery
+	return async function (): Promise<CollectionResult<K>> {
+		const result = await getData();
+
+		if (import.meta.env.DEV && result.entries.length === 0) {
+			pMemoizeClear(getData);
+		}
+
+		return result;
+	};
 }
 
 // Factory function to create a lookup function for collection entries by ID
