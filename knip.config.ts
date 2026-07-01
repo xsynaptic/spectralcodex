@@ -15,6 +15,7 @@ export default {
 			],
 		},
 		'packages/content-demo': {
+			entry: ['.mdxlintrc.mjs'],
 			ignore: ['collections/**'],
 			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
 			ignoreDependencies: [
@@ -24,7 +25,7 @@ export default {
 			],
 		},
 		'packages/content': {
-			entry: ['global.d.ts'],
+			entry: ['.mdxlintrc.mjs', 'global.d.ts'],
 			ignore: ['collections/**'],
 			ignoreBinaries: ['check-content', 'content-schemas', 'fix-content', 'validate-content'],
 			ignoreDependencies: [

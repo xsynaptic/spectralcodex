@@ -4,8 +4,8 @@
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"src/**/*.{css,astro}\" && prettier --check . && eslint && astro check && tsc --noEmit --extendedDiagnostics && knip",
-		"check-content": "pnpm -F @spectralcodex/scripts format-content packages/content",
-		"check-content-demo": "pnpm -F @spectralcodex/scripts format-content packages/content-demo",
+		"check-content": "mdxlint-content packages/content --root-path=$PWD",
+		"check-content-demo": "mdxlint-content packages/content-demo --root-path=$PWD",
 		"check-links": "pnpm -F @spectralcodex/scripts check-links",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"content-schemas": "pnpm --filter @spectralcodex/scripts content-schemas --output-path=packages/content",
@@ -17,8 +17,8 @@
 		"deploy-site": "pnpm -F @spectralcodex/scripts deploy-site",
 		"dev": "pnpm -F @spectralcodex/scripts dev-server",
 		"fix": "stylelint \"src/**/*.{css,astro}\" --fix --cache --cache-location node_modules/.cache/stylelint/ && prettier --write . --cache && eslint --fix --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip",
-		"fix-content": "pnpm -F @spectralcodex/scripts format-content packages/content --fix",
-		"fix-content-demo": "pnpm -F @spectralcodex/scripts format-content packages/content-demo --fix",
+		"fix-content": "mdxlint-content packages/content --fix --root-path=$PWD",
+		"fix-content-demo": "mdxlint-content packages/content-demo --fix --root-path=$PWD",
 		"generate-redirects": "pnpm -F @spectralcodex/scripts generate-redirects",
 		"image-server-warm": "pnpm -F @spectralcodex/scripts image-server-warm",
 		"image-server-warm-new": "pnpm -F @spectralcodex/scripts image-server-warm-new",
@@ -50,7 +50,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.0.3",
+		"astro": "^7.0.4",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7"
 	},
@@ -60,7 +60,7 @@
 		"@astrojs/mdx": "7.0.0",
 		"@astrojs/node": "11.0.0",
 		"@astrojs/react": "6.0.0",
-		"@astrojs/rss": "^4.0.18",
+		"@astrojs/rss": "^4.0.19",
 		"@pagefind/component-ui": "^1.5.2",
 		"@playwright/test": "^1.61.1",
 		"@spectralcodex/astro-image-loader": "workspace:*",
@@ -84,6 +84,7 @@
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^0.2.0",
 		"@xsynaptic/eslint-config": "^5.1.0",
+		"@xsynaptic/mdxlint-config": "^0.2.0",
 		"@xsynaptic/satteri-auto-import": "^0.1.1",
 		"@xsynaptic/satteri-img-group": "^0.2.1",
 		"@xsynaptic/satteri-wrap-cjk": "^0.2.0",
@@ -118,7 +119,7 @@
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
-		"vite": "^8.1.0",
+		"vite": "^8.1.1",
 		"vitest": "^4.1.9",
 		"zod": "^4.4.3"
 	},
