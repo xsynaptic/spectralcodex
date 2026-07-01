@@ -46,10 +46,7 @@ const countText = getCountText();
 						<>
 							<Link href={item.url}>{item.title}</Link>
 							{item.titleMultilingual ? (
-								<>
-									{' '}
-									<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-								</>
+								<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
 							) : undefined}
 						</>
 					) : (
@@ -61,10 +58,7 @@ const countText = getCountText();
 				<TextSeparated index={index} total={items.length} {...props}>
 					<Link href={item.url}>{item.title}</Link>
 					{item.titleMultilingual ? (
-						<>
-							{' '}
-							<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-						</>
+						<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
 					) : undefined}
 				</TextSeparated>
 			))

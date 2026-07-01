@@ -43,10 +43,7 @@ const t = getTranslations();
 						<ListColumnItem>
 							<Link href={getContentUrl('locations', location.id)}>{location.data.title}</Link>
 							{titleMultilingual ? (
-								<>
-									{' '}
-									<TextMultilingual content={titleMultilingual} parenthesis={true} />
-								</>
+								<TextMultilingual content={titleMultilingual} parenthesis={true} />
 							) : undefined}
 							{distanceDisplay ? (
 								<>

@@ -45,10 +45,7 @@ const t = getTranslations();
 								<Link href={getContentUrl(item.collection, item.id)}>{item.data.title}</Link>
 							) : undefined}
 							{titleMultilingual ? (
-								<>
-									{' '}
-									<TextMultilingual content={titleMultilingual} parenthesis={true} />
-								</>
+								<TextMultilingual content={titleMultilingual} parenthesis={true} />
 							) : undefined}
 						</DividedItem>
 					);

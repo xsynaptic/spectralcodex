@@ -26,14 +26,17 @@ const {
 
 {
 	content && parenthesis ? (
-		<TextParenthesis as={Tag} class={className}>
-			<Tag
-				lang={content.lang}
-				class:list={[isCjkLanguage(content.lang) ? 'cjk' : undefined]}
-				{...props}
-				set:html={content.value.trim()}
-			/>
-		</TextParenthesis>
+		<>
+			{' '}
+			<TextParenthesis as={Tag} class={className}>
+				<Tag
+					lang={content.lang}
+					class:list={[isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+					{...props}
+					set:html={content.value.trim()}
+				/>
+			</TextParenthesis>
+		</>
 	) : undefined
 }
 {

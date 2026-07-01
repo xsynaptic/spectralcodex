@@ -51,7 +51,7 @@ const description = t(`collection.resources.description`);
 					<ListColumn>
 						{page.data.map((entry) => (
 							<ListColumnItem>
-								<Link href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Link>{' '}
+								<Link href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Link>
 								{entry.data._locationCount || entry.data._postCount ? (
 									<span
 										class="text-sm text-gray-500"

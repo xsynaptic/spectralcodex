@@ -54,14 +54,11 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 							</Link>
 						) : undefined}
 						{titleMultilingual ? (
-							<>
-								{' '}
-								<TextMultilingual
-									content={titleMultilingual}
-									class="text-primary-600 dark:text-primary-400"
-									parenthesis={true}
-								/>
-							</>
+							<TextMultilingual
+								content={titleMultilingual}
+								class="text-primary-600 dark:text-primary-400"
+								parenthesis={true}
+							/>
 						) : undefined}
 					</DividedItem>
 				);
