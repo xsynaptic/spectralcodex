@@ -12,6 +12,12 @@ minimumReleaseAgeExclude:
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
 
+# Pin vite/rolldown: rolldown 1.1.3 (via vite 8.1.1) regressed oxc import-analysis on the large data-store
+# Symptom is empty content collections in dev; remove once fixed upstream
+overrides:
+  vite: 8.1.0
+  rolldown: 1.1.2
+
 # Astro emits prerender chunks under <root>/dist/ that runtime-import @keyv/sqlite
 # via vite.ssr.external; hoist it so Node can resolve it from the root scope
 publicHoistPattern:
