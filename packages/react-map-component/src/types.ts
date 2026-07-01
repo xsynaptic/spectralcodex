@@ -101,38 +101,28 @@ export const MapPopupItemSchema = z
 		[MapDataKeysCompressed.Safety]: z.number().int().optional(),
 		[MapDataKeysCompressed.GoogleMapsUrl]: z.string().optional(),
 		[MapDataKeysCompressed.WikipediaUrl]: z.string().optional(),
-		[MapDataKeysCompressed.ImageSrc]: z.string().optional(),
 		[MapDataKeysCompressed.ImageSrcSet]: z.string().optional(),
-		[MapDataKeysCompressed.ImageHeight]: z.string().optional(),
-		[MapDataKeysCompressed.ImageWidth]: z.string().optional(),
 	})
 	.strict()
-	.transform((value) => ({
-		[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
-		[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
-		[MapDataKeys.TitleMultilingualLang]: value[MapDataKeyMap[MapDataKeys.TitleMultilingualLang]],
-		[MapDataKeys.TitleMultilingualValue]: value[MapDataKeyMap[MapDataKeys.TitleMultilingualValue]],
-		[MapDataKeys.Url]: value[MapDataKeyMap[MapDataKeys.Url]],
-		[MapDataKeys.Description]: value[MapDataKeyMap[MapDataKeys.Description]],
-		[MapDataKeys.Safety]: value[MapDataKeyMap[MapDataKeys.Safety]],
-		[MapDataKeys.GoogleMapsUrl]: value[MapDataKeyMap[MapDataKeys.GoogleMapsUrl]],
-		[MapDataKeys.WikipediaUrl]: value[MapDataKeyMap[MapDataKeys.WikipediaUrl]],
-		...([
-			value[MapDataKeyMap[MapDataKeys.ImageSrc]],
-			value[MapDataKeyMap[MapDataKeys.ImageSrcSet]],
-			value[MapDataKeyMap[MapDataKeys.ImageHeight]],
-			value[MapDataKeyMap[MapDataKeys.ImageWidth]],
-		].includes(undefined)
-			? { [MapDataKeys.Image]: undefined }
-			: {
-					[MapDataKeys.Image]: {
-						[MapDataKeys.ImageSrc]: value[MapDataKeyMap[MapDataKeys.ImageSrc]],
-						[MapDataKeys.ImageSrcSet]: value[MapDataKeyMap[MapDataKeys.ImageSrcSet]],
-						[MapDataKeys.ImageHeight]: value[MapDataKeyMap[MapDataKeys.ImageHeight]],
-						[MapDataKeys.ImageWidth]: value[MapDataKeyMap[MapDataKeys.ImageWidth]],
-					},
-				}),
-	}));
+	.transform((value) => {
+		const srcSet = value[MapDataKeyMap[MapDataKeys.ImageSrcSet]];
+
+		const image = srcSet ? { [MapDataKeys.ImageSrcSet]: srcSet } : undefined;
+
+		return {
+			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
+			[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
+			[MapDataKeys.TitleMultilingualLang]: value[MapDataKeyMap[MapDataKeys.TitleMultilingualLang]],
+			[MapDataKeys.TitleMultilingualValue]:
+				value[MapDataKeyMap[MapDataKeys.TitleMultilingualValue]],
+			[MapDataKeys.Url]: value[MapDataKeyMap[MapDataKeys.Url]],
+			[MapDataKeys.Description]: value[MapDataKeyMap[MapDataKeys.Description]],
+			[MapDataKeys.Safety]: value[MapDataKeyMap[MapDataKeys.Safety]],
+			[MapDataKeys.GoogleMapsUrl]: value[MapDataKeyMap[MapDataKeys.GoogleMapsUrl]],
+			[MapDataKeys.WikipediaUrl]: value[MapDataKeyMap[MapDataKeys.WikipediaUrl]],
+			[MapDataKeys.Image]: image,
+		};
+	});
 
 export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
 

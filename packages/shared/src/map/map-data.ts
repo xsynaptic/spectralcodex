@@ -21,10 +21,7 @@ export const MapDataKeys = {
 	GoogleMapsUrl: 'googleMapsUrl',
 	WikipediaUrl: 'wikipediaUrl',
 	Image: 'image',
-	ImageSrc: 'src',
 	ImageSrcSet: 'srcSet',
-	ImageHeight: 'height',
-	ImageWidth: 'width',
 	HasImage: 'hasImage',
 } as const;
 
@@ -49,10 +46,7 @@ export const MapDataKeysCompressed = {
 	GoogleMapsUrl: 'm',
 	WikipediaUrl: 'w',
 	Image: 'e',
-	ImageSrc: 'b',
 	ImageSrcSet: 'y',
-	ImageHeight: 'h',
-	ImageWidth: 'z',
 	HasImage: 'n',
 } as const satisfies Record<keyof typeof MapDataKeys, string>;
 
@@ -77,10 +71,7 @@ export const MapDataKeyMap = {
 	[MapDataKeys.GoogleMapsUrl]: MapDataKeysCompressed.GoogleMapsUrl,
 	[MapDataKeys.WikipediaUrl]: MapDataKeysCompressed.WikipediaUrl,
 	[MapDataKeys.Image]: MapDataKeysCompressed.Image,
-	[MapDataKeys.ImageSrc]: MapDataKeysCompressed.ImageSrc,
 	[MapDataKeys.ImageSrcSet]: MapDataKeysCompressed.ImageSrcSet,
-	[MapDataKeys.ImageHeight]: MapDataKeysCompressed.ImageHeight,
-	[MapDataKeys.ImageWidth]: MapDataKeysCompressed.ImageWidth,
 	[MapDataKeys.HasImage]: MapDataKeysCompressed.HasImage,
 } as const satisfies Record<
 	(typeof MapDataKeys)[keyof typeof MapDataKeys],

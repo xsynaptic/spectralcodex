@@ -227,10 +227,7 @@ export function getLocationsMapPopupData(
 				...(feature.properties.image === undefined
 					? {}
 					: {
-							[MapDataKeysCompressed.ImageSrc]: feature.properties.image.src,
 							[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
-							[MapDataKeysCompressed.ImageHeight]: feature.properties.image.height,
-							[MapDataKeysCompressed.ImageWidth]: feature.properties.image.width,
 						}),
 			};
 		})

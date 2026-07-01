@@ -56,10 +56,7 @@ export const NumericScaleSchema = z.number().int().min(1).max(5);
 
 // Image thumbnail schema
 export const ImageThumbnailSchema = z.object({
-	src: z.string(),
 	srcSet: z.string(),
-	height: z.string(),
-	width: z.string(),
 });
 
 export type ImageThumbnail = z.infer<typeof ImageThumbnailSchema>;

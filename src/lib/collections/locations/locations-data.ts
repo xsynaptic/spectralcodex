@@ -49,21 +49,19 @@ function getLocationThumbnailProps(imageSrc: string, sourceWidth: number): Image
 	const { aspectRatio, width, widths } = imageThumbnailOptions;
 	const fit = ImageFitOptionEnum.Cover;
 
-	// Filter widths to avoid upscaling
-	const clampedWidths = widths.filter((width) => width <= sourceWidth);
-	const clampedWidth = Math.min(width, sourceWidth);
-	const clampedHeight = Math.round(clampedWidth / aspectRatio);
+	const buildCandidate = (candidateWidth: number) => {
+		const height = Math.round(candidateWidth / aspectRatio);
+		const path = getSignedImagePath(imageSrc, { width: candidateWidth, height, fit });
+		return `${path} ${String(candidateWidth)}w`;
+	};
+
+	// Never upscale; fall back to the (clamped) source width when it is below our smallest target
+	const candidateWidths = widths.filter((candidate) => candidate <= sourceWidth);
+	const resolvedWidths =
+		candidateWidths.length > 0 ? candidateWidths : [Math.min(width, sourceWidth)];
 
 	return {
-		src: getSignedImagePath(imageSrc, { width: clampedWidth, height: clampedHeight, fit }),
-		srcSet: clampedWidths
-			.map((width) => {
-				const height = Math.round(width / aspectRatio);
-				return `${getSignedImagePath(imageSrc, { width, height, fit })} ${String(width)}w`;
-			})
-			.join(', '),
-		height: String(clampedHeight),
-		width: String(clampedWidth),
+		srcSet: resolvedWidths.map(buildCandidate).join(', '),
 	};
 }
 

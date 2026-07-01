@@ -70,33 +70,24 @@ describe('MapSourceItemSchema', () => {
 });
 
 describe('MapPopupItemSchema', () => {
-	test('assembles the image object when all four image fields are present', () => {
+	test('assembles the image object when srcSet is present', () => {
 		const result = MapPopupItemSchema.parse({
 			[MapDataKeysCompressed.Id]: 'location-1',
 			[MapDataKeysCompressed.Title]: 'Location',
 			[MapDataKeysCompressed.Url]: '/location-1',
-			[MapDataKeysCompressed.ImageSrc]: '/image.jpg',
 			[MapDataKeysCompressed.ImageSrcSet]: '/image.jpg 1x',
-			[MapDataKeysCompressed.ImageHeight]: '600',
-			[MapDataKeysCompressed.ImageWidth]: '400',
 		});
 
 		expect(result.url).toBe('/location-1');
 		expect(result.image).toEqual({
-			src: '/image.jpg',
 			srcSet: '/image.jpg 1x',
-			height: '600',
-			width: '400',
 		});
 	});
 
-	test('leaves image undefined when any image field is missing', () => {
+	test('leaves image undefined when srcSet is absent', () => {
 		const result = MapPopupItemSchema.parse({
 			[MapDataKeysCompressed.Id]: 'location-1',
 			[MapDataKeysCompressed.Title]: 'Location',
-			[MapDataKeysCompressed.ImageSrc]: '/image.jpg',
-			[MapDataKeysCompressed.ImageSrcSet]: '/image.jpg 1x',
-			[MapDataKeysCompressed.ImageHeight]: '600',
 		});
 
 		expect(result.image).toBeUndefined();

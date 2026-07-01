@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import maplibregl from 'maplibre-gl';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
@@ -14,7 +14,12 @@ import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { translations } from '../lib/translations';
-import { useMapPopupVisible, useMapSelectedId, useMapStoreActions } from '../store/store';
+import {
+	useMapHoveredId,
+	useMapPopupVisible,
+	useMapSelectedId,
+	useMapStoreActions,
+} from '../store/store';
 
 type MapPopupItemExtended = MapPopupItemParsed & {
 	precision: number;
@@ -97,6 +102,56 @@ function getGoogleMapsHref(value: string) {
 	return `https://maps.app.goo.gl/${value}`;
 }
 
+function getPopupImageSizes(isMobile: boolean): string {
+	return isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw';
+}
+
+function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
+	return srcSet
+		.split(', ')
+		.map((entry) => `${imageServerUrl}${entry}`)
+		.join(', ');
+}
+
+// Display src is the first (smallest) srcSet candidate, stripped of its width descriptor
+function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
+	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
+}
+
+// Preload a point's popup image once the pointer dwells over it, so it is cached before the popup opens
+const mapImagePreloadDelayMs = 100;
+
+function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
+	const hoveredId = useMapHoveredId();
+	const { data: popupData } = usePopupDataQuery();
+	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+
+	const preloadedRef = useRef<Set<string>>(new Set());
+
+	useEffect(() => {
+		if (!hoveredId || hoveredId.startsWith('cluster-')) return;
+		if (preloadedRef.current.has(hoveredId)) return;
+
+		const srcSet = popupData?.find((item) => item.id === hoveredId)?.image?.srcSet;
+
+		if (!srcSet) return;
+
+		const timer = setTimeout(() => {
+			preloadedRef.current.add(hoveredId);
+
+			// Setting srcset/sizes on a detached image runs the same responsive selection as the popup and warms the cache
+			const preloadImage = new Image();
+
+			preloadImage.sizes = getPopupImageSizes(isMobile);
+			preloadImage.srcset = getPopupImageSrcSet(srcSet, imageServerUrl);
+		}, mapImagePreloadDelayMs);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [hoveredId, popupData, imageServerUrl, isMobile]);
+}
+
 // Popup data is incomplete; we need to assemble some props from source data
 // Default data is also provided in case of errors and other issues
 function useMapCanvasPopup() {
@@ -146,17 +201,14 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 
 		return (
 			<>
-				{image?.src ? (
+				{image?.srcSet ? (
 					<div>
 						<img
 							className="bg-fallback w-full object-cover select-none"
 							style={{ aspectRatio: '3/2' }}
-							src={`${imageServerUrl}${image.src}`}
-							srcSet={image.srcSet
-								?.split(', ')
-								.map((entry) => `${imageServerUrl}${entry}`)
-								.join(', ')}
-							sizes={isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw'}
+							src={getPopupImageSrc(image.srcSet, imageServerUrl)}
+							srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
+							sizes={getPopupImageSizes(isMobile)}
 							loading="eager"
 							alt={title}
 						/>
@@ -263,6 +315,8 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
 	const { setSelectedId } = useMapStoreActions();
+
+	useMapImagePreload({ imageServerUrl });
 
 	const onClose = useCallback(
 		function onClose() {
