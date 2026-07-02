@@ -10,13 +10,14 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
+import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
 /**
  * Get locations associated with a resource (via links URL match or sources ID match)
  */
-export async function createLocationsByResourceFunction() {
+async function createLocationsByResourceFunction() {
 	const { entries } = await getLocationsCollection();
 
 	return function getLocationsByResource(
@@ -134,6 +135,7 @@ export async function createQueryResourcesEntryFunction() {
 	const getPostsByResource = await createPostsByResourceFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const { chunkKeyById } = await getMapIndexData();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -161,6 +163,8 @@ export async function createQueryResourcesEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
+			locationCount: locationsFiltered.length,
+			chunkKeyById,
 			...(regionPrimary?.data._langCode?.startsWith('zh')
 				? {
 						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],

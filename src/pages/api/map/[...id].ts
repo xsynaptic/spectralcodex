@@ -1,131 +1,51 @@
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import * as R from 'remeda';
-
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
+import { getMapIndexData } from '#lib/map/map-index.ts';
 import {
-	createLocationsByIdsFunction,
-	createLocationsByPostsFunction,
-} from '#lib/collections/locations/locations-utils.ts';
-import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-import { createLocationsByResourceFunction } from '#lib/collections/resources/resources-utils.ts';
-import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { createLocationsBySeriesFunction } from '#lib/collections/series/series-utils.ts';
-import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { createLocationsByThemeFunction } from '#lib/collections/themes/themes-utils.ts';
-import { getLocationsMapApiData } from '#lib/map/map-locations.ts';
+	getLocationsFeatureCollection,
+	getLocationsMapApiHashes,
+	getLocationsMapPopupData,
+	getLocationsMapSourceData,
+} from '#lib/map/map-locations.ts';
+import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
-// Note: map API is served in two parts, suffixed to the endpoint URL:
-// 1) a highly optimized endpoint with only essential point data
-// 2) all the other metadata required for displaying popup items
-// This somewhat awkward arrangement is meant to solve the issue of increasingly large payloads
-// While reducing round trips to the server and ensuring popups still work instantaneously
+// Shared map delivery: one global point index plus demand-fetched popup chunks
+// Objectives keeps a dedicated source/popup pair (includes hidden points, noindex)
 export const getStaticPaths = (async () => {
-	const { entries: locations } = await getLocationsCollection();
-	const { entries: posts } = await getPostsCollection();
-	const { entries: regions } = await getRegionsCollection();
-	const { entries: resources } = await getResourcesCollection();
-	const { entries: series } = await getSeriesCollection();
-	const { entries: themes } = await getThemesCollection();
-
-	const getLocationsByIds = await createLocationsByIdsFunction();
-	const getLocationsByPosts = await createLocationsByPostsFunction();
-	const getLocationsByResource = await createLocationsByResourceFunction();
-	const getLocationsByTheme = await createLocationsByThemeFunction();
-	const getLocationsBySeries = await createLocationsBySeriesFunction();
-
-	const locationsData = R.pipe(
-		locations,
-		R.flatMap((entry) =>
-			R.pipe(
-				[
-					entry.id,
-					...(entry.data._nearby ? entry.data._nearby.map(({ locationId }) => locationId) : []),
-				],
-				getLocationsByIds,
-				(locations) => getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
-
-	const postsData = R.pipe(
-		posts,
-		R.filter((entry) => getLocationsByPosts(entry).length > 0),
-		R.flatMap((entry) =>
-			R.pipe(entry, getLocationsByPosts, (locations) =>
-				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
-
-	const regionsData = R.pipe(
-		regions,
-		R.filter((entry) => !!entry.data._locations && entry.data._locations.length > 0),
-		R.flatMap((entry) =>
-			R.pipe(entry.data._locations ?? [], getLocationsByIds, (locations) =>
-				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
-
-	// Note: for series we have to filter *after* gathering location data
-	const seriesData = R.pipe(
-		series,
-		R.flatMap((entry) =>
-			R.pipe(
-				entry.data.seriesItems ?? [],
-				getLocationsBySeries,
-				R.filter(R.isDefined),
-				(locations) => getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
-
-	const themesData = R.pipe(
-		themes,
-		R.filter((entry) => !!entry.data._locationCount && entry.data._locationCount > 0),
-		R.flatMap((entry) =>
-			R.pipe(entry, getLocationsByTheme, (locations) =>
-				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
-
-	const resourcesData = R.pipe(
-		resources,
-		R.filter((entry) =>
-			entry.data.showPage && entry.data._locationCount && entry.data._locationCount > 0
-				? true
-				: false,
-		),
-		R.flatMap((entry) =>
-			R.pipe(entry, getLocationsByResource, (locations) =>
-				getLocationsMapApiData(locations, `${entry.collection}/${entry.id}`),
-			),
-		),
-	);
+	const { index, chunks } = await getMapIndexData();
+	const version = import.meta.env.BUILD_VERSION ?? 'unknown';
 
 	const objectiveLocations = await getObjectiveLocations();
+	const objectivesCollection = getLocationsFeatureCollection(objectiveLocations, {
+		showAllLocations: true,
+	});
+	const { sourceHash, popupHash } = getLocationsMapApiHashes(objectivesCollection);
 
-	const objectivesData = R.pipe(objectiveLocations, (locations) =>
-		getLocationsMapApiData(locations, 'objectives', { showAllLocations: true }),
-	);
+	// Exact versioned URLs for deploy-cache-warm to prefetch; not used by the map island
+	const manifestUrls = [
+		`/api/map/index.json?v=${version}`,
+		...[...chunks.keys()].map((chunkKey) => `/api/map/${chunkKey}.json?v=${version}`),
+		`/api/map/objectives/${MapApiDataEnum.Source}?v=${sourceHash}`,
+		`/api/map/objectives/${MapApiDataEnum.Popup}?v=${popupHash}`,
+	];
 
-	return R.pipe(
-		[
-			...locationsData,
-			...postsData,
-			...regionsData,
-			...resourcesData,
-			...seriesData,
-			...themesData,
-			...(objectivesData ?? []),
-		],
-		R.filter(R.isDefined),
-	);
+	return [
+		{ params: { id: 'index.json' }, props: { data: index } },
+		...[...chunks].map(([chunkKey, popupItems]) => ({
+			params: { id: `${chunkKey}.json` },
+			props: { data: popupItems },
+		})),
+		{
+			params: { id: `objectives/${MapApiDataEnum.Source}` },
+			props: { data: getLocationsMapSourceData(objectivesCollection) ?? [] },
+		},
+		{
+			params: { id: `objectives/${MapApiDataEnum.Popup}` },
+			props: { data: getLocationsMapPopupData(objectivesCollection) ?? [] },
+		},
+		{ params: { id: 'map-manifest.json' }, props: { data: manifestUrls } },
+	];
 }) satisfies GetStaticPaths;
 
 export const GET = (({ props: { data } }) => {

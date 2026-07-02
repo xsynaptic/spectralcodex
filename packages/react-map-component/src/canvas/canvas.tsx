@@ -7,6 +7,7 @@ import type { MapComponentProps, MapInitialViewState } from '../types';
 
 import { MapControls } from '../controls/controls';
 import { PopupDataContextProvider } from '../data/data-popup';
+import { ChunkConfigProvider } from '../data/data-popup-chunks';
 import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
@@ -49,6 +50,8 @@ const MapCanvasContainer: FC<
 	spritesId,
 	apiPopupUrl,
 	popupData,
+	popupDataKey,
+	apiChunkBaseUrl,
 	targetIds,
 	version,
 	isDev,
@@ -117,15 +120,18 @@ const MapCanvasContainer: FC<
 			style={{ height: 'auto', ...style }}
 			{...canvasEvents}
 		>
-			<PopupDataContextProvider
-				apiUrl={apiPopupUrl}
-				data={popupData}
-				version={version}
-				isDev={isDev}
-			>
-				<MapControls />
-				<MapPopup imageServerUrl={imageServerUrl} />
-			</PopupDataContextProvider>
+			<ChunkConfigProvider chunkUrlBase={apiChunkBaseUrl} version={version} isDev={isDev}>
+				<PopupDataContextProvider
+					apiUrl={apiPopupUrl}
+					data={popupData}
+					dataKey={popupDataKey}
+					version={version}
+					isDev={isDev}
+				>
+					<MapControls />
+					<MapPopup imageServerUrl={imageServerUrl} />
+				</PopupDataContextProvider>
+			</ChunkConfigProvider>
 			<MapSource
 				apiDivisionUrl={apiDivisionUrl}
 				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
@@ -141,13 +147,23 @@ const MapCanvasContainer: FC<
 };
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
-	const { interactive, showObjectiveFilter, apiSourceUrl, sourceData, languages, version, isDev } =
-		props;
+	const {
+		interactive,
+		showObjectiveFilter,
+		apiSourceUrl,
+		sourceData,
+		sourceDataKey,
+		scope,
+		languages,
+		version,
+		isDev,
+	} = props;
 
 	return (
 		<SourceDataContextProvider
 			apiUrl={apiSourceUrl}
 			data={sourceData}
+			dataKey={sourceDataKey}
 			version={version}
 			isDev={isDev}
 		>
@@ -156,6 +172,7 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
 					...(interactive === false ? { canvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),
+					...(scope ? { scope } : {}),
 				}}
 			>
 				<MapCanvasContainer {...props} />

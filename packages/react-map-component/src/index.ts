@@ -4,5 +4,6 @@ export type {
 	MapComponentProps,
 	MapGeometry,
 	MapPopupItemInput,
+	MapScope,
 	MapSourceItemInput,
 } from './types';

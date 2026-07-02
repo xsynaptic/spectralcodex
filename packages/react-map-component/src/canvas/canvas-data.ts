@@ -5,6 +5,7 @@ import {
 	useMapObjectiveFilter,
 	useMapQualityFilter,
 	useMapRatingFilter,
+	useMapScope,
 	useMapStatusFilter,
 } from '../store/store';
 import { getMapCanvasData } from './canvas-data-filter';
@@ -18,9 +19,11 @@ export function useMapCanvasData() {
 	const quality = useMapQualityFilter();
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
+	const mapScope = useMapScope();
 
 	return useMemo(
-		() => getMapCanvasData(sourceData ?? EMPTY_ITEMS, { status, quality, rating, objective }),
-		[sourceData, status, quality, rating, objective],
+		() =>
+			getMapCanvasData(sourceData ?? EMPTY_ITEMS, { status, quality, rating, objective }, mapScope),
+		[sourceData, status, quality, rating, objective, mapScope],
 	);
 }

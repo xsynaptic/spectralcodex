@@ -13,6 +13,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
+import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
 // Filter the catalog for series items by ID
@@ -32,7 +33,7 @@ async function createSeriesCatalogItemsFunction() {
 }
 
 // Generate geodata for series items; combines posts with multiple locations and individual locations
-export async function createLocationsBySeriesFunction() {
+async function createLocationsBySeriesFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 	const { entriesMap: postsMap } = await getPostsCollection();
 
@@ -123,6 +124,7 @@ export async function createQuerySeriesEntryFunction() {
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const { chunkKeyById } = await getMapIndexData();
 
 	const seriesCatalogItems = catalog.resolve(series);
 
@@ -137,6 +139,8 @@ export async function createQuerySeriesEntryFunction() {
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
+			locationCount: seriesLocations.length,
+			chunkKeyById,
 			...(regionPrimary?.data._langCode?.startsWith('zh')
 				? {
 						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],

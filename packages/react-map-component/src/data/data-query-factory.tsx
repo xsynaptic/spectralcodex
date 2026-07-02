@@ -5,7 +5,7 @@ import type { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
-const FETCH_TIMEOUT_MS = 10_000;
+import { FETCH_TIMEOUT_MS } from '../constants';
 
 interface MapDataQueryConfig<TSchema extends z.ZodType> {
 	name: string;
@@ -17,6 +17,8 @@ interface MapDataQueryConfig<TSchema extends z.ZodType> {
 interface MapDataProviderProps<TInput> {
 	apiUrl: string | undefined;
 	data: Array<TInput> | undefined;
+	// Per-map content hash that cache-keys the inline dataset
+	dataKey: string | undefined;
 	version: string | undefined;
 	isDev: boolean | undefined;
 	children: ReactNode;
@@ -58,13 +60,14 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 	const DataProvider: FC<MapDataProviderProps<TInput>> = function DataProvider({
 		apiUrl,
 		data,
+		dataKey,
 		version,
 		isDev,
 		children,
 	}) {
 		// eslint-disable-next-line @tanstack/query/exhaustive-deps -- parse/schema are stable per factory instance; the queryKey inputs fully determine the result
 		const query = useQuery<Array<TParsed> | undefined>({
-			queryKey: [name, apiUrl, !!data, version, isDev],
+			queryKey: [name, apiUrl, dataKey ?? !!data, version, isDev],
 			queryFn: async () => {
 				if (data) return parse(data);
 

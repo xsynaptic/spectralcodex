@@ -35,7 +35,7 @@ const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'regions-collect
 /**
  * Resolve the regions a location belongs to; overrides apply only in production
  */
-function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
+export function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
 	if (import.meta.env.PROD && entry.data.override?.regions) return entry.data.override.regions;
 	return entry.data.regions;
 }

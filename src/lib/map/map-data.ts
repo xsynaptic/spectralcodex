@@ -1,7 +1,13 @@
-import type { MapComponentData, MapComponentProps } from '@spectralcodex/react-map-component';
+import type {
+	MapComponentData,
+	MapComponentProps,
+	MapScope,
+	MapSourceItemInput,
+} from '@spectralcodex/react-map-component';
 import type { BBox } from 'geojson';
 import type { LngLatBoundsLike } from 'maplibre-gl';
 
+import { MapDataKeysCompressed } from '@spectralcodex/shared/map';
 import { bbox } from '@turf/bbox';
 import { buffer } from '@turf/buffer';
 import { center as turfCenter } from '@turf/center';
@@ -12,6 +18,7 @@ import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
+import { MAP_SOURCE_INLINE_LIMIT } from '#constants.ts';
 import {
 	getLocationsMapApiHashes,
 	getLocationsMapPopupData,
@@ -20,6 +27,24 @@ import {
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { getBaseUrl } from '#lib/utils/routing.ts';
+
+// Region and theme maps pass a membership hint; other big maps fall back to an id list
+type MapScopeHint =
+	{ type: 'region'; interval: [number, number] } | { type: 'theme'; index: number };
+
+// Stamp each inline source row with its shared popup-chunk key so hover/click can fetch the chunk
+function getInlineSourceData(
+	featureCollection: MapFeatureCollection,
+	chunkKeyById: Map<string, string> | undefined,
+): Array<MapSourceItemInput> | undefined {
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	if (!sourceData || !chunkKeyById) return sourceData;
+
+	return sourceData.map((item) => {
+		const chunkKey = chunkKeyById.get(item[MapDataKeysCompressed.Id]);
+		return chunkKey ? { ...item, [MapDataKeysCompressed.ChunkKey]: chunkKey } : item;
+	});
+}
 
 interface MapDataBoundsProps {
 	featureCollection: MapFeatureCollection | undefined;
@@ -151,14 +176,36 @@ export function getMapData({
 	boundsBufferPercentage,
 	limitsBuffer,
 	limitsBufferPercentage,
+	locationCount,
+	scope,
+	chunkKeyById,
+	boundsFeatureCollection,
 	...props
 }: Omit<
 	MapComponentProps,
-	'bounds' | 'maxBounds' | 'center' | 'apiSourceUrl' | 'apiPopupUrl' | 'protomapsApiKey'
+	| 'bounds'
+	| 'maxBounds'
+	| 'center'
+	| 'apiSourceUrl'
+	| 'apiPopupUrl'
+	| 'protomapsApiKey'
+	| 'scope'
+	| 'apiChunkBaseUrl'
+	| 'sourceData'
+	| 'popupData'
+	| 'sourceDataKey'
+	| 'popupDataKey'
+	| 'version'
 > &
-	MapDataBoundsProps) {
+	MapDataBoundsProps & {
+		locationCount?: number | undefined;
+		scope?: MapScopeHint | undefined;
+		chunkKeyById?: Map<string, string> | undefined;
+		// Frame from a different set than the inlined data (e.g. center on the target while inlining its neighbors)
+		boundsFeatureCollection?: MapFeatureCollection | undefined;
+	}) {
 	const mapBounds = getMapBounds({
-		featureCollection,
+		featureCollection: boundsFeatureCollection ?? featureCollection,
 		boundsBuffer,
 		boundsBufferPercentage,
 		limitsBuffer,
@@ -166,51 +213,119 @@ export function getMapData({
 		targetId,
 	});
 
-	if (featureCollection && mapBounds) {
+	if (!featureCollection || !mapBounds) {
+		return {
+			...defaultMapDataProps,
+			...props,
+		} satisfies MapComponentData;
+	}
+
+	const targetIds = targetId
+		? featureCollection.features
+				.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
+				.map(({ id }) => String(id))
+		: undefined;
+
+	const featureCount = featureCollection.features.length;
+
+	// MDX inline maps (no mapId): inline both source and popup, no chunks
+	if (!mapId) {
 		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
-		const targetIds = targetId
-			? featureCollection.features
-					.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
-					.map(({ id }) => String(id))
-			: undefined;
-
-		if (mapId) {
-			const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
-			const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}?v=${popupHash}`);
-
-			return {
-				...defaultMapDataProps,
-				hasGeodata: true,
-				mapId,
-				apiSourceUrl,
-				apiPopupUrl,
-				prefetchUrls: [apiSourceUrl, apiPopupUrl],
-				featureCount: featureCollection.features.length,
-				...mapBounds,
-				...props,
-				targetIds,
-			} satisfies MapComponentData;
-		}
-
-		const sourceData = getLocationsMapSourceData(featureCollection);
-		const popupData = getLocationsMapPopupData(featureCollection);
 
 		return {
 			...defaultMapDataProps,
 			hasGeodata: true,
-			sourceData,
-			popupData,
-			featureCount: featureCollection.features.length,
-			/** Extend the version to include source and popup hashes when passing data directly */
-			version: `${import.meta.env.BUILD_VERSION ?? 'unknown'}-${sourceHash}-${popupHash}`,
+			sourceData: getLocationsMapSourceData(featureCollection),
+			popupData: getLocationsMapPopupData(featureCollection),
+			sourceDataKey: sourceHash,
+			popupDataKey: popupHash,
+			featureCount,
 			...mapBounds,
 			...props,
 			targetIds,
 		} satisfies MapComponentData;
 	}
 
+	// All other maps: popups come from the shared, demand-fetched chunks
+	const apiChunkBaseUrl = getBaseUrl('api/map/');
+	const count = locationCount ?? featureCount;
+
+	// Small maps inline their points, each carrying its chunk key
+	if (count <= MAP_SOURCE_INLINE_LIMIT) {
+		const { sourceHash } = getLocationsMapApiHashes(featureCollection);
+
+		return {
+			...defaultMapDataProps,
+			hasGeodata: true,
+			mapId,
+			sourceData: getInlineSourceData(featureCollection, chunkKeyById),
+			sourceDataKey: sourceHash,
+			apiChunkBaseUrl,
+			featureCount,
+			...mapBounds,
+			...props,
+			targetIds,
+		} satisfies MapComponentData;
+	}
+
+	// Big maps fetch the shared index and keep only the rows their scope selects
+	const apiSourceUrl = getBaseUrl(
+		'api/map',
+		`index.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
+	);
+
+	// No membership hint resolves to this map's explicit, order-preserving id list
+	const resolvedScope: MapScope = scope ?? {
+		type: 'ids',
+		ids: featureCollection.features.map((feature) => String(feature.id)),
+	};
+
 	return {
 		...defaultMapDataProps,
+		hasGeodata: true,
+		mapId,
+		apiSourceUrl,
+		scope: resolvedScope,
+		apiChunkBaseUrl,
+		prefetchUrls: [apiSourceUrl],
+		featureCount,
+		...mapBounds,
+		...props,
+		targetIds,
+	} satisfies MapComponentData;
+}
+
+// Dedicated per-map source/popup endpoints; objectives uses this to keep hidden points off the shared index
+export function getMapDataDedicated({
+	mapId,
+	featureCollection,
+	...props
+}: {
+	mapId: string;
+	featureCollection: MapFeatureCollection | undefined;
+} & Pick<MapComponentProps, 'showObjectiveFilter'>): MapComponentData {
+	const mapBounds = getMapBounds({ featureCollection });
+
+	if (!featureCollection || !mapBounds) {
+		return {
+			...defaultMapDataProps,
+			...props,
+		} satisfies MapComponentData;
+	}
+
+	const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+	const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
+	const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}?v=${popupHash}`);
+
+	return {
+		...defaultMapDataProps,
+		hasGeodata: true,
+		mapId,
+		apiSourceUrl,
+		apiPopupUrl,
+		prefetchUrls: [apiSourceUrl, apiPopupUrl],
+		featureCount: featureCollection.features.length,
+		...mapBounds,
 		...props,
 	} satisfies MapComponentData;
 }

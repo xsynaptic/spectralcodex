@@ -37,6 +37,10 @@ export const MapSourceItemSchema = z
 		[MapDataKeysCompressed.Objective]: z.number().int().optional(),
 		[MapDataKeysCompressed.Outlier]: z.boolean().optional().default(false),
 		[MapDataKeysCompressed.HasImage]: z.boolean().optional().default(false),
+		// Shared-index membership columns; region/theme values scope the index before parsing, chunk key survives for popup lookup
+		[MapDataKeysCompressed.RegionOrdinals]: z.number().int().array().optional(),
+		[MapDataKeysCompressed.ThemeIndices]: z.number().int().array().optional(),
+		[MapDataKeysCompressed.ChunkKey]: z.string().optional(),
 		[MapDataKeysCompressed.Geometry]: z.object({
 			[MapDataKeysCompressed.GeometryType]: z.enum(MapDataGeometryTypeNumericMapping),
 			[MapDataKeysCompressed.GeometryCoordinates]: z.union([
@@ -47,36 +51,44 @@ export const MapSourceItemSchema = z
 		}),
 	})
 	.strict()
-	.transform((value) => ({
-		properties: {
-			[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
-			[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
-			[MapDataKeys.Category]:
-				R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
-				LocationCategoryEnum.Unknown,
-			[MapDataKeys.Status]:
-				R.invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
-				LocationStatusEnum.Unknown,
-			[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
-			[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
-			[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
-			// eslint-disable-next-line unicorn/no-computed-property-existence-check -- truthiness gate on the value, not key existence
-			...(value[MapDataKeyMap[MapDataKeys.Objective]]
-				? {
-						[MapDataKeys.Objective]: value[MapDataKeyMap[MapDataKeys.Objective]],
-					}
-				: {}),
-			[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]],
-			[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]],
-		},
-		[MapDataKeys.Geometry]: {
-			[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[
-				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryType]]
-			],
-			[MapDataKeys.GeometryCoordinates]:
-				value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryCoordinates]],
-		},
-	}));
+	.transform((value) => {
+		const objective = value[MapDataKeyMap[MapDataKeys.Objective]];
+		// Membership columns; region/theme values drive the per-map scope, chunk key drives popup lookup
+		const regionOrdinals = value[MapDataKeyMap[MapDataKeys.RegionOrdinals]];
+		const themeIndices = value[MapDataKeyMap[MapDataKeys.ThemeIndices]];
+		const chunkKey = value[MapDataKeyMap[MapDataKeys.ChunkKey]];
+
+		return {
+			properties: {
+				[MapDataKeys.Id]: value[MapDataKeyMap[MapDataKeys.Id]],
+				[MapDataKeys.Title]: value[MapDataKeyMap[MapDataKeys.Title]],
+				[MapDataKeys.Category]:
+					R.invert(LocationCategoryNumericMapping)[value[MapDataKeyMap[MapDataKeys.Category]]] ??
+					LocationCategoryEnum.Unknown,
+				[MapDataKeys.Status]:
+					R.invert(LocationStatusNumericMapping)[value[MapDataKeyMap[MapDataKeys.Status]]] ??
+					LocationStatusEnum.Unknown,
+				[MapDataKeys.Precision]: value[MapDataKeyMap[MapDataKeys.Precision]],
+				[MapDataKeys.Quality]: value[MapDataKeyMap[MapDataKeys.Quality]],
+				[MapDataKeys.Rating]: value[MapDataKeyMap[MapDataKeys.Rating]],
+				...(objective ? { [MapDataKeys.Objective]: objective } : {}),
+				[MapDataKeys.Outlier]: value[MapDataKeyMap[MapDataKeys.Outlier]],
+				[MapDataKeys.HasImage]: value[MapDataKeyMap[MapDataKeys.HasImage]],
+				...(regionOrdinals ? { [MapDataKeys.RegionOrdinals]: regionOrdinals } : {}),
+				...(themeIndices ? { [MapDataKeys.ThemeIndices]: themeIndices } : {}),
+				...(chunkKey ? { [MapDataKeys.ChunkKey]: chunkKey } : {}),
+			},
+			[MapDataKeys.Geometry]: {
+				[MapDataKeys.GeometryType]: R.invert(MapDataGeometryTypeNumericMapping)[
+					value[MapDataKeyMap[MapDataKeys.Geometry]][MapDataKeyMap[MapDataKeys.GeometryType]]
+				],
+				[MapDataKeys.GeometryCoordinates]:
+					value[MapDataKeyMap[MapDataKeys.Geometry]][
+						MapDataKeyMap[MapDataKeys.GeometryCoordinates]
+					],
+			},
+		};
+	});
 
 export type MapSourceItemInput = z.input<typeof MapSourceItemSchema>;
 
@@ -129,6 +141,17 @@ export type MapPopupItemInput = z.input<typeof MapPopupItemSchema>;
 export type MapPopupItemParsed = z.output<typeof MapPopupItemSchema>;
 
 /**
+ * Per-map scope over the shared global index; a big map keeps only the rows its scope selects
+ * - region: keep points whose region ordinal falls inside the subtree interval
+ * - theme: keep points carrying the theme index
+ * - ids: keep the explicit, order-preserving feature-id list
+ */
+export type MapScope =
+	| { type: 'region'; interval: [number, number] }
+	| { type: 'theme'; index: number }
+	| { type: 'ids'; ids: Array<string> };
+
+/**
  * Map component props
  */
 export interface MapComponentProps extends Partial<
@@ -141,6 +164,13 @@ export interface MapComponentProps extends Partial<
 	imageServerUrl?: string | undefined;
 	sourceData?: Array<MapSourceItemInput> | undefined;
 	popupData?: Array<MapPopupItemInput> | undefined;
+	// Big maps fetch the shared index and keep only the rows their scope selects
+	scope?: MapScope | undefined;
+	// Base URL for demand-fetched popup chunks (e.g. `/api/map/`); paired with version
+	apiChunkBaseUrl?: string | undefined;
+	// Per-map content hashes that cache-key inline source/popup datasets
+	sourceDataKey?: string | undefined;
+	popupDataKey?: string | undefined;
 	baseMapTheme?: Flavor | undefined;
 	center?: [number, number];
 	showObjectiveFilter?: boolean | undefined;

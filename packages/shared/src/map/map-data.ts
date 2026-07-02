@@ -23,6 +23,9 @@ export const MapDataKeys = {
 	Image: 'image',
 	ImageSrcSet: 'srcSet',
 	HasImage: 'hasImage',
+	RegionOrdinals: 'regionOrdinals',
+	ThemeIndices: 'themeIndices',
+	ChunkKey: 'chunkKey',
 } as const;
 
 export const MapDataKeysCompressed = {
@@ -48,6 +51,9 @@ export const MapDataKeysCompressed = {
 	Image: 'e',
 	ImageSrcSet: 'y',
 	HasImage: 'n',
+	RegionOrdinals: 'b',
+	ThemeIndices: 'h',
+	ChunkKey: 'k',
 } as const satisfies Record<keyof typeof MapDataKeys, string>;
 
 export const MapDataKeyMap = {
@@ -73,6 +79,9 @@ export const MapDataKeyMap = {
 	[MapDataKeys.Image]: MapDataKeysCompressed.Image,
 	[MapDataKeys.ImageSrcSet]: MapDataKeysCompressed.ImageSrcSet,
 	[MapDataKeys.HasImage]: MapDataKeysCompressed.HasImage,
+	[MapDataKeys.RegionOrdinals]: MapDataKeysCompressed.RegionOrdinals,
+	[MapDataKeys.ThemeIndices]: MapDataKeysCompressed.ThemeIndices,
+	[MapDataKeys.ChunkKey]: MapDataKeysCompressed.ChunkKey,
 } as const satisfies Record<
 	(typeof MapDataKeys)[keyof typeof MapDataKeys],
 	(typeof MapDataKeysCompressed)[keyof typeof MapDataKeysCompressed]

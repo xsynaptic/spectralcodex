@@ -20,7 +20,6 @@ import { featureCollection } from '@turf/helpers';
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 function getRelativePath(url: string | undefined): string | undefined {
 	if (!url) return undefined;
@@ -74,6 +73,18 @@ interface LocationsFeatureCollectionOptions {
 	showAllLocations?: boolean | undefined;
 }
 
+// Canonical feature ids for a location; multi-geometry locations expand to one `uuid-N` per sub-geometry
+export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
+	const uuid = entry.data._uuid ?? entry.id;
+	const geometryArray = Array.isArray(entry.data.geometry)
+		? entry.data.geometry
+		: [entry.data.geometry];
+
+	return geometryArray.length > 1
+		? [...geometryArray.keys()].map((index) => `${uuid}-${String(index)}`)
+		: [uuid];
+}
+
 // Generate canonical map feature data for a set of locations
 export function getLocationsFeatureCollection(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
@@ -98,14 +109,14 @@ export function getLocationsFeatureCollection(
 			const geometryArray = Array.isArray(entry.data.geometry)
 				? entry.data.geometry
 				: [entry.data.geometry];
+			const featureIds = getLocationFeatureIds(entry);
 			const entryTitleMultilingual = getMultilingualContent({
 				data: entry.data,
 				prop: 'title',
 			})?.primary;
 
 			return geometryArray.map((geometry, index) => {
-				const uuid = entry.data._uuid ?? entry.id;
-				const id = geometryArray.length > 1 ? `${uuid}-${String(index)}` : uuid;
+				const id = featureIds[index] ?? entry.id;
 				const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
 				const geometryTitleMultilingual = getMultilingualContent({
 					data: geometry,
@@ -243,28 +254,4 @@ export function getLocationsMapApiHashes(featureCollection: MapFeatureCollection
 		sourceHash: hashShort({ data: sourceData }),
 		popupHash: hashShort({ data: popupData }),
 	};
-}
-
-export function getLocationsMapApiData(
-	locations: Array<CollectionEntry<'locations'>> | undefined,
-	basePath: string,
-	options?: LocationsFeatureCollectionOptions,
-):
-	| Array<{
-			params: { id: string };
-			props: { data: Array<MapSourceItemInput> | Array<MapPopupItemInput> };
-	  }>
-	| undefined {
-	const featureCollection = getLocationsFeatureCollection(locations, options);
-	const sourceData = getLocationsMapSourceData(featureCollection);
-	const popupData = getLocationsMapPopupData(featureCollection);
-
-	if (!sourceData || !popupData) return;
-
-	return [MapApiDataEnum.Source, MapApiDataEnum.Popup].map((key) => ({
-		params: {
-			id: `${basePath}/${key}`,
-		},
-		props: { data: key === MapApiDataEnum.Source ? sourceData : popupData },
-	}));
 }

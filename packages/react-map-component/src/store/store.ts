@@ -60,6 +60,8 @@ export const useMapObjectiveFilter = () => useMapDataStore((state) => state.obje
 export const useMapShowObjectiveFilter = () =>
 	useMapDataStore((state) => state.showObjectiveFilter);
 
+export const useMapScope = () => useMapDataStore((state) => state.scope);
+
 /**
  * Map language settings
  */

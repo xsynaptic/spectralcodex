@@ -10,6 +10,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
+import { getMapIndexData, getMapThemeIndexById } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
@@ -31,7 +32,7 @@ async function createPostsByThemeFunction() {
 }
 
 // Get locations that have a term
-export async function createLocationsByThemeFunction() {
+async function createLocationsByThemeFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 
 	return function getLocationsByTheme(
@@ -51,6 +52,8 @@ export async function createQueryThemesEntryFunction() {
 	const getPostsByTheme = await createPostsByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const { chunkKeyById } = await getMapIndexData();
+	const themeIndexById = await getMapThemeIndexById();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -76,9 +79,14 @@ export async function createQueryThemesEntryFunction() {
 			restCandidates,
 		);
 
+		const themeIndex = themeIndexById.get(entry.id);
+
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
+			locationCount: locationsFiltered.length,
+			chunkKeyById,
+			...(themeIndex === undefined ? {} : { scope: { type: 'theme', index: themeIndex } }),
 			...(regionPrimary?.data._langCode?.startsWith('zh')
 				? {
 						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],

@@ -4,7 +4,7 @@ import * as R from 'remeda';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { sortLocationsByLatitude } from '#lib/collections/locations/locations-utils.ts';
 import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
+import { getMapDataDedicated } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
 // Saved queries for use in MDX and other places
@@ -29,7 +29,8 @@ export async function getObjectiveLocations() {
 export async function getObjectiveMapData() {
 	const objectiveLocations = await getObjectiveLocations();
 
-	return getMapData({
+	// Dedicated source/popup endpoints keep hidden points off the shared index
+	return getMapDataDedicated({
 		mapId: 'objectives',
 		featureCollection: getLocationsFeatureCollection(objectiveLocations, {
 			showAllLocations: true,

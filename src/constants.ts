@@ -23,6 +23,11 @@ export const IMAGE_HQ_FORMAT = 'jpg' as const;
 // Max number of locations returned
 export const LOCATIONS_NEARBY_COUNT_LIMIT = 20;
 
+// Maps at or under this many locations inline their points instead of fetching the shared index
+// Counts locations, not features; multi-geometry locations expand to several features
+// Sized so nearby maps (target + up to LOCATIONS_NEARBY_COUNT_LIMIT neighbors) always inline
+export const MAP_SOURCE_INLINE_LIMIT = LOCATIONS_NEARBY_COUNT_LIMIT + 1;
+
 // Maximum distance in kilometers for nearby locations
 export const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // km
 

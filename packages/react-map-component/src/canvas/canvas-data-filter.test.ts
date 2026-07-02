@@ -140,3 +140,61 @@ describe('getMapCanvasData', () => {
 		expect(result.totalCount).toBe(0);
 	});
 });
+
+describe('getMapCanvasData scope', () => {
+	const inside = makeItem({ id: 'inside', regionOrdinals: [5], themeIndices: [2] });
+	const outside = makeItem({ id: 'outside', regionOrdinals: [99], themeIndices: [7] });
+
+	test('region scope keeps only points whose ordinal is inside the interval', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			type: 'region',
+			interval: [1, 10],
+		});
+
+		expect(result.totalCount).toBe(1);
+		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
+	});
+
+	test('theme scope keeps only points carrying the theme index', () => {
+		const result = getMapCanvasData([inside, outside], passAll, { type: 'theme', index: 2 });
+
+		expect(result.totalCount).toBe(1);
+		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
+	});
+
+	test('ids scope keeps only the listed ids', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			type: 'ids',
+			ids: ['outside'],
+		});
+
+		expect(result.totalCount).toBe(1);
+		expect(result.pointCollection?.features[0]?.properties.id).toBe('outside');
+	});
+
+	test('ids scope preserves the list order', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			type: 'ids',
+			ids: ['outside', 'inside'],
+		});
+
+		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
+			'outside',
+			'inside',
+		]);
+	});
+
+	test('points missing the relevant column are excluded by a scope', () => {
+		const bare = makeItem({ id: 'bare' });
+
+		const result = getMapCanvasData([bare], passAll, { type: 'region', interval: [1, 10] });
+
+		expect(result.totalCount).toBe(0);
+	});
+
+	test('no scope leaves every point in scope', () => {
+		const result = getMapCanvasData([inside, outside], passAll);
+
+		expect(result.totalCount).toBe(2);
+	});
+});

@@ -61,11 +61,18 @@ async function getSitemapUrls(baseUrl: string): Promise<Array<string>> {
 	return urls;
 }
 
-/**
- * Request a single URL through the public hostname
- * Manual redirect handling captures the real 3xx status (a sitemap URL should resolve to 200)
- * The body is consumed so the edge serves the full response and the connection can be reused
- */
+// Map data URLs aren't in the sitemap; the build emits the exact versioned list at map-manifest.json
+// Per-build cache busting means an un-warmed shared index costs the first visitor an origin round-trip
+async function getMapApiUrls(baseUrl: string): Promise<Array<string>> {
+	const manifestUrl = new URL('/api/map/map-manifest.json', baseUrl).href;
+	const paths = JSON.parse(await fetchText(manifestUrl)) as Array<string>;
+
+	return paths.map((path) => new URL(path, baseUrl).href);
+}
+
+// Request a single URL through the public hostname
+// Manual redirect handling captures the real 3xx status (a sitemap URL should resolve to 200)
+// Consume the body so the edge serves the full response and the connection can be reused
 async function warmUrl(url: string): Promise<WarmResult> {
 	const start = Date.now();
 
@@ -106,10 +113,16 @@ export async function warmCache(options: WarmCacheOptions = {}): Promise<void> {
 
 	console.log(chalk.blue('Warming Cloudflare edge cache...'));
 
-	const allUrls = await getSitemapUrls(baseUrl);
+	const sitemapUrls = await getSitemapUrls(baseUrl);
+	const mapApiUrls = await getMapApiUrls(baseUrl);
+	const allUrls = [...sitemapUrls, ...mapApiUrls];
 	const urls = limit ? allUrls.slice(0, limit) : allUrls;
 
-	console.log(chalk.gray(`  ${String(urls.length)} URLs from sitemap`));
+	console.log(
+		chalk.gray(
+			`  ${String(sitemapUrls.length)} URLs from sitemap, ${String(mapApiUrls.length)} from map API`,
+		),
+	);
 
 	if (dryRun) {
 		console.log(chalk.yellow('  DRY RUN: no requests sent'));

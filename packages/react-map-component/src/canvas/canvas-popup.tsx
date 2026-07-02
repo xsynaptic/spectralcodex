@@ -11,6 +11,7 @@ import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
 
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
+import { useChunkPopup } from '../data/data-popup-chunks';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { translations } from '../lib/translations';
@@ -123,8 +124,14 @@ const mapImagePreloadDelayMs = 100;
 
 function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 	const hoveredId = useMapHoveredId();
-	const { data: popupData } = usePopupDataQuery();
+	const { data: sourceData } = useSourceDataQuery();
+	const { data: inlinePopupData } = usePopupDataQuery();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+
+	// A point carries a chunk key; hovering warms its chunk and preloads its image
+	const hoveredSourceItem = sourceData?.find((item) => item.properties.id === hoveredId);
+	const hoverChunkKey = hoveredSourceItem?.properties.chunkKey;
+	const { data: hoverChunkData } = useChunkPopup(hoverChunkKey);
 
 	const preloadedRef = useRef<Set<string>>(new Set());
 
@@ -132,7 +139,8 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 		if (!hoveredId || hoveredId.startsWith('cluster-')) return;
 		if (preloadedRef.current.has(hoveredId)) return;
 
-		const srcSet = popupData?.find((item) => item.id === hoveredId)?.image?.srcSet;
+		const popupSource = hoverChunkKey ? hoverChunkData : inlinePopupData;
+		const srcSet = popupSource?.find((item) => item.id === hoveredId)?.image?.srcSet;
 
 		if (!srcSet) return;
 
@@ -149,27 +157,37 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 		return () => {
 			clearTimeout(timer);
 		};
-	}, [hoveredId, popupData, imageServerUrl, isMobile]);
+	}, [hoveredId, hoverChunkKey, inlinePopupData, hoverChunkData, imageServerUrl, isMobile]);
 }
 
-// Popup data is incomplete; we need to assemble some props from source data
-// Default data is also provided in case of errors and other issues
+// Popup data is incomplete; we assemble some props from source data, the rest from chunks fetched on demand
 function useMapCanvasPopup() {
 	const selectedId = useMapSelectedId();
 
 	const { data: sourceData } = useSourceDataQuery();
-	const { data: popupData } = usePopupDataQuery();
+	const inlinePopupQuery = usePopupDataQuery();
+	const inlinePopupData = inlinePopupQuery.data;
 
-	return useMemo(() => {
+	const selectedSourceItem = sourceData?.find(
+		(sourceItem) => sourceItem.properties.id === selectedId,
+	);
+
+	// A chunk key means the popup comes from a chunk; its absence means an inline popup (objectives/MDX)
+	const chunkKey = selectedSourceItem?.properties.chunkKey;
+	const chunkQuery = useChunkPopup(chunkKey);
+
+	const isLoading = (chunkKey ? chunkQuery : inlinePopupQuery).isLoading;
+
+	const popupItem = useMemo(() => {
 		if (!selectedId) return;
 
-		const selectedSourceItem = sourceData?.find(
-			(sourceItem) => sourceItem.properties.id === selectedId,
-		);
+		const popupSource = chunkKey ? chunkQuery.data : inlinePopupData;
 
 		return {
 			...defaultPopupItem,
-			...popupData?.find((popupItem) => popupItem.id === selectedId),
+			// Seed the title from source data so a failed chunk fetch degrades to a title-only popup
+			...(selectedSourceItem ? { title: selectedSourceItem.properties.title } : {}),
+			...popupSource?.find((item) => item.id === selectedId),
 			...(selectedSourceItem
 				? {
 						precision: selectedSourceItem.properties.precision,
@@ -177,7 +195,10 @@ function useMapCanvasPopup() {
 					}
 				: {}),
 		} satisfies MapPopupItemExtended;
-	}, [selectedId, popupData, sourceData]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceData + selectedId
+	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceData]);
+
+	return { popupItem, isLoading };
 }
 
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
@@ -307,10 +328,8 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function MapPopup({
 	imageServerUrl = '',
 }) {
-	const popupItem = useMapCanvasPopup();
+	const { popupItem, isLoading: isPopupDataLoading } = useMapCanvasPopup();
 	const popupVisible = useMapPopupVisible();
-
-	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
 
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 

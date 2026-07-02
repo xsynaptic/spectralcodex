@@ -4,6 +4,8 @@ import type { CSSProperties } from 'react';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
+import type { MapScope } from '../types';
+
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 
 interface MapDataState {
@@ -21,6 +23,7 @@ interface MapDataState {
 	objectiveFilter: number;
 	showObjectiveFilter: boolean;
 	languages: Array<string>;
+	scope: MapScope | undefined;
 }
 
 export type MapDataConfigurableState = Pick<
@@ -36,6 +39,7 @@ export type MapDataConfigurableState = Pick<
 	| 'objectiveFilter'
 	| 'showObjectiveFilter'
 	| 'languages'
+	| 'scope'
 >;
 
 export interface MapDataStore extends MapDataState {
@@ -74,6 +78,7 @@ const defaultMapDataState = {
 	objectiveFilter: 1,
 	showObjectiveFilter: false,
 	languages: ['en'],
+	scope: undefined,
 } satisfies MapDataState;
 
 export function createMapStore(initialState?: Partial<MapDataConfigurableState>) {
