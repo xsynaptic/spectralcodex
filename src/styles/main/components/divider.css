@@ -13,6 +13,13 @@
 	content: var(--divider-glyph, var(--content-slash));
 }
 
+/* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
+@media (width < 40rem) {
+	.divided::after {
+		margin-inline: calc(var(--spacing) * 1);
+	}
+}
+
 [data-mode='dark'] .divided::after {
 	color: var(--divider-color-dark, var(--color-primary-500));
 }
