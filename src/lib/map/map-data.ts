@@ -48,6 +48,7 @@ function getInlineSourceData(
 
 interface MapDataBoundsProps {
 	featureCollection: MapFeatureCollection | undefined;
+	limitsFeatureCollection?: MapFeatureCollection | undefined; // Optional: used by individual location maps
 	boundsBuffer?: number | undefined;
 	boundsBufferPercentage?: number | undefined;
 	limitsBuffer?: number | undefined;
@@ -81,12 +82,50 @@ function isLngLatBoundsLike(input: unknown): input is LngLatBoundsLike {
 	);
 }
 
+function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureCollection {
+	return {
+		...featureCollection,
+		features: featureCollection.features.filter((item) => item.properties.outlier !== true),
+	} satisfies MapFeatureCollection;
+}
+
+function getBufferedBbox(
+	featureCollection: MapFeatureCollection,
+	explicitBuffer: number | undefined,
+	bufferPercentage: number,
+	minBuffer: number,
+): BBox | undefined {
+	let bufferRadius = explicitBuffer;
+
+	if (bufferRadius === undefined) {
+		if (featureCollection.features.length === 1) {
+			bufferRadius = minBuffer;
+		} else {
+			const naturalBounds = bbox(featureCollection);
+			const spanX = distance(
+				[naturalBounds[0], naturalBounds[1]],
+				[naturalBounds[2], naturalBounds[1]],
+			);
+			const spanY = distance(
+				[naturalBounds[0], naturalBounds[1]],
+				[naturalBounds[0], naturalBounds[3]],
+			);
+			const spanMax = Math.max(spanX, spanY);
+			bufferRadius = Math.max(minBuffer, spanMax * (bufferPercentage / 100));
+		}
+	}
+
+	const buffered = buffer(featureCollection, bufferRadius);
+	return buffered ? bbox(buffered) : undefined;
+}
+
 // Calculate map bounds based on geodata and some parameters; should not include outliers
-// By default there is a 10% buffer added to the bounding box
-// The overall limit of the map is set to 100% of the maximum span
+// bounds/center frame featureCollection; maxBounds spans limitsFeatureCollection (the rendered set)
+// By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
 // But these values can be overridden on a case-by-case basis
 function getMapBounds({
 	featureCollection: featureCollectionRaw,
+	limitsFeatureCollection: limitsFeatureCollectionRaw,
 	boundsBuffer,
 	boundsBufferPercentage = 10,
 	limitsBuffer,
@@ -101,14 +140,13 @@ function getMapBounds({
 	| undefined {
 	if (!featureCollectionRaw) return;
 
-	// Filter the feature collection for outliers
-	// This can be set in frontmatter to avoid skewing calculations
-	const featureCollection = {
-		...featureCollectionRaw,
-		features: featureCollectionRaw.features.filter((item) => item.properties.outlier !== true),
-	} satisfies MapFeatureCollection;
+	const featureCollection = filterMapOutliers(featureCollectionRaw);
 
 	if (featureCollection.features.length === 0) return;
+
+	const limitsFeatureCollection = limitsFeatureCollectionRaw
+		? filterMapOutliers(limitsFeatureCollectionRaw)
+		: featureCollection;
 
 	const targetFeature = targetId
 		? featureCollection.features.find(({ id }) => id === targetId)
@@ -116,46 +154,18 @@ function getMapBounds({
 
 	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
 
-	let bounds: BBox | undefined;
-	let maxBounds: BBox | undefined;
-	let boundsBufferCollection: ReturnType<typeof buffer>;
-	let limitsBufferCollection: ReturnType<typeof buffer>;
-
-	if (boundsBuffer && limitsBuffer) {
-		boundsBufferCollection = buffer(featureCollection, boundsBuffer);
-		limitsBufferCollection = buffer(featureCollection, limitsBuffer);
-	} else {
-		// Note: single points will have a fixed buffer
-		if (featureCollection.features.length === 1) {
-			boundsBufferCollection = buffer(featureCollection, boundsBuffer ?? mapBoundsBufferMin);
-			limitsBufferCollection = buffer(featureCollection, limitsBuffer ?? mapLimitsBufferMin);
-		} else {
-			const naturalBounds = bbox(featureCollection);
-			const spanX = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[2], naturalBounds[1]],
-			);
-			const spanY = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[0], naturalBounds[3]],
-			);
-			const spanMax = Math.max(spanX, spanY);
-
-			boundsBufferCollection = buffer(
-				featureCollection,
-				boundsBuffer ?? Math.max(mapBoundsBufferMin, spanMax * (boundsBufferPercentage / 100)),
-			);
-			limitsBufferCollection = buffer(
-				featureCollection,
-				limitsBuffer ?? Math.max(mapLimitsBufferMin, spanMax * (limitsBufferPercentage / 100)),
-			);
-		}
-	}
-
-	if (boundsBufferCollection && limitsBufferCollection) {
-		bounds = bbox(boundsBufferCollection);
-		maxBounds = bbox(limitsBufferCollection);
-	}
+	const bounds = getBufferedBbox(
+		featureCollection,
+		boundsBuffer,
+		boundsBufferPercentage,
+		mapBoundsBufferMin,
+	);
+	const maxBounds = getBufferedBbox(
+		limitsFeatureCollection,
+		limitsBuffer,
+		limitsBufferPercentage,
+		mapLimitsBufferMin,
+	);
 
 	if (bounds && maxBounds && isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
 		return {
@@ -206,6 +216,7 @@ export function getMapData({
 	}) {
 	const mapBounds = getMapBounds({
 		featureCollection: boundsFeatureCollection ?? featureCollection,
+		limitsFeatureCollection: featureCollection,
 		boundsBuffer,
 		boundsBufferPercentage,
 		limitsBuffer,
