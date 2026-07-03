@@ -8,10 +8,10 @@ This repository contains the working Astro project used to generate the [Spectra
 
 - All content authored in MDX using the Content Layer API
 - Quality scoring system (0-5 scale) drives site-wide content prioritization
-- Comprehensive validation: frontmatter checks, cross-reference verification, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference validation
+- Comprehensive validation: frontmatter checks, cross-reference verification, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference and aspect ratio validation
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
-- Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) with remark plugins
+- Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) and textlint with remark plugins
 - Automatic redirect generation from `formerIds` frontmatter into Caddy config
 - Media orphan detection for unreferenced images
 - Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling
@@ -46,10 +46,11 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
 - Persistent storage of map data via IndexedDB
 - Distance-based discovery via nearby locations, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
+- Chunked popup data payloads with image preloading, keeping interaction responsive across thousands of points
 
 ### Search & Discovery
 
-- Client-side full-text search via [Pagefind](https://pagefind.app/) with a custom Astro integration (fork of [shishkin/astro-pagefind](https://github.com/shishkin/astro-pagefind)), a modal interface via [@pagefind/component-ui](https://pagefind.app/docs/ui-usage/), keyboard shortcuts, and retina-ready thumbnails
+- Client-side full-text search via [Pagefind](https://pagefind.app/) and the [astro-pagefind](https://github.com/shishkin/astro-pagefind) integration, a modal interface via [@pagefind/component-ui](https://pagefind.app/docs/ui-usage/), keyboard shortcuts, and retina-ready thumbnails
 - Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
 - Hierarchical navigation through regions, themes, and series
 - Client-side fuzzy 404 suggestions via [fastest-levenshtein](https://github.com/ka-weihe/fastest-levenshtein) with substring-bonus scoring against a build-time content manifest; auto-redirects on near-exact matches
@@ -63,7 +64,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### User Experience
 
-- Native web components for interactive elements (dark mode toggle, reading progress, image carousels, pagination controls)
+- Native web components for interactive elements (dark mode toggle, reading progress, image carousels, pagination controls, back-to-top button)
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Visual reading progress indicator for long-form content
 - Loading progress bar during navigation
