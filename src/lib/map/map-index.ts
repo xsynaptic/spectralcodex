@@ -148,7 +148,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 				? { [MapDataKeysCompressed.RegionOrdinals]: regionOrdinals }
 				: {}),
 			...(themeIndices.length > 0 ? { [MapDataKeysCompressed.ThemeIndices]: themeIndices } : {}),
-			[MapDataKeysCompressed.ChunkKey]: chunkKeyById.get(id) ?? '0-0-0',
+			[MapDataKeysCompressed.ChunkKey]: chunkKeyById.get(id) ?? '0',
 		} satisfies MapSourceItemInput;
 	});
 

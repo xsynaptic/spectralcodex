@@ -8,64 +8,106 @@ function makeItem(id: string, lng: number, lat: number, popupBytes = 10): ChunkI
 	return { id, lng, lat, popupBytes };
 }
 
+// Mirror of the packer's byte accounting: brackets + items + comma separators
+function payloadBytes(items: Array<ChunkInputItem>): number {
+	const sum = items.reduce((total, item) => total + item.popupBytes, 0);
+	return 2 + sum + Math.max(0, items.length - 1);
+}
+
+function itemsForChunk(
+	ids: Array<string>,
+	byId: Map<string, ChunkInputItem>,
+): Array<ChunkInputItem> {
+	return ids.map((id) => byId.get(id)!);
+}
+
+// Spread-out point set whose ids are permuted by seed, so different seeds feed the same
+// items in a different input order
+function makeSeededItems(seed: number): Array<ChunkInputItem> {
+	return Array.from({ length: 30 }, (_, index) => {
+		const id = `q${String((index * 7 + seed) % 30)}`;
+		return makeItem(id, -150 + index * 10, -60 + ((index * 13) % 120), 80);
+	});
+}
+
 describe('assignChunks', () => {
-	test('keeps everything in the root cell when under the cap', () => {
+	test('keeps everything in one bin when under the cap', () => {
 		const items = [makeItem('a', 121, 25), makeItem('b', -73, 45)];
 
 		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 1000 });
 
-		expect(chunkKeyById.get('a')).toBe('0-0-0');
-		expect(chunkKeyById.get('b')).toBe('0-0-0');
-		expect([...chunkIds.keys()]).toEqual(['0-0-0']);
-		expect(chunkIds.get('0-0-0')).toEqual(['a', 'b']);
+		expect([...chunkIds.keys()]).toEqual(['0']);
+		expect(chunkKeyById.get('a')).toBe('0');
+		expect(chunkKeyById.get('b')).toBe('0');
+		expect(chunkIds.get('0')).toEqual(['a', 'b']);
 	});
 
-	test('splits the root when the payload exceeds the cap and separates by hemisphere', () => {
-		// Two far-apart points, each large enough that together they exceed the cap
-		const items = [makeItem('east', 121, 25, 200), makeItem('west', -73, 45, 200)];
-
-		const { chunkKeyById } = assignChunks(items, { capBytes: 300 });
-
-		// East (lng 121 > 0) and west (lng -73 < 0) fall into different z=1 columns
-		expect(chunkKeyById.get('east')).toBe('1-1-0');
-		expect(chunkKeyById.get('west')).toBe('1-0-0');
-	});
-
-	test('recurses deeper for spread-out points until each cell fits', () => {
-		// Points spread widely enough to separate at moderate zoom
-		const items = Array.from({ length: 8 }, (_, index) =>
-			makeItem(`p${String(index)}`, -140 + index * 40, -60 + index * 15, 100),
-		);
+	test('every bin stays within the cap and every item is assigned', () => {
+		const byId = new Map<string, ChunkInputItem>();
+		const items = Array.from({ length: 40 }, (_, index) => {
+			const item = makeItem(`p${String(index)}`, -160 + index * 8, -70 + index * 3, 90);
+			byId.set(item.id, item);
+			return item;
+		});
 
 		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 250 });
 
-		// Every item is assigned and each resulting chunk is within the cap (at most two 100-byte items)
-		expect(chunkKeyById.size).toBe(8);
+		expect(chunkKeyById.size).toBe(40);
+		let seen = 0;
 		for (const [, ids] of chunkIds) {
-			const bytes = 2 + ids.length * 100 + Math.max(0, ids.length - 1);
-			expect(bytes).toBeLessThanOrEqual(250);
+			seen += ids.length;
+			expect(payloadBytes(itemsForChunk(ids, byId))).toBeLessThanOrEqual(250);
 		}
+		expect(seen).toBe(40);
 	});
 
-	test('stops at maxDepth even when coincident points cannot be separated', () => {
-		const items = Array.from({ length: 4 }, (_, index) =>
-			makeItem(`same${String(index)}`, 120, 24, 500),
+	test('isolates a lone item larger than the cap in its own bin', () => {
+		const items = [
+			makeItem('small-1', 100, 10, 40),
+			makeItem('huge', 101, 11, 5000),
+			makeItem('small-2', 102, 12, 40),
+		];
+
+		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 100 });
+
+		const hugeKey = chunkKeyById.get('huge')!;
+		expect(chunkIds.get(hugeKey)).toEqual(['huge']);
+		expect(chunkKeyById.get('small-1')).not.toBe(hugeKey);
+		expect(chunkKeyById.get('small-2')).not.toBe(hugeKey);
+	});
+
+	test('is deterministic regardless of input order', () => {
+		const byId = (result: ReturnType<typeof assignChunks>) =>
+			[...result.chunkKeyById].sort((a, b) => a[0].localeCompare(b[0]));
+
+		const forward = assignChunks(makeSeededItems(0), { capBytes: 300 });
+		const shuffled = assignChunks(makeSeededItems(0).toReversed(), { capBytes: 300 });
+
+		expect(byId(shuffled)).toEqual(byId(forward));
+	});
+
+	test('keeps geographically distant clusters spatially coherent', () => {
+		// Two tight clusters on opposite sides of the world; next-fit may straddle at most one
+		// boundary bin, but must not scatter either cluster or interleave the two
+		const east = Array.from({ length: 5 }, (_, index) =>
+			makeItem(`east-${String(index)}`, 121 + index * 0.01, 25 + index * 0.01, 40),
+		);
+		const west = Array.from({ length: 5 }, (_, index) =>
+			makeItem(`west-${String(index)}`, -73 + index * 0.01, 45 + index * 0.01, 40),
 		);
 
-		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 100, maxDepth: 3 });
+		const { chunkKeyById } = assignChunks([...east, ...west], { capBytes: 250 });
 
-		// All share one coordinate, so they land together in a single deepest cell
-		expect(new Set(chunkKeyById.values()).size).toBe(1);
-		const [key] = [...chunkIds.keys()];
-		expect(key?.startsWith('3-')).toBe(true);
+		const eastKeys = new Set(east.map((item) => chunkKeyById.get(item.id)));
+		const westKeys = new Set(west.map((item) => chunkKeyById.get(item.id)));
+		expect(eastKeys.intersection(westKeys).size).toBeLessThanOrEqual(1);
 	});
 
-	test('clamps out-of-range coordinates into the grid', () => {
-		const items = [makeItem('edge', 180, -90), makeItem('corner', -180, 90)];
+	test('clamps out-of-range coordinates without throwing', () => {
+		const items = [makeItem('edge', 999, -999), makeItem('corner', -999, 999)];
 
 		const { chunkKeyById } = assignChunks(items, { capBytes: 1000 });
 
-		expect(chunkKeyById.get('edge')).toBe('0-0-0');
-		expect(chunkKeyById.get('corner')).toBe('0-0-0');
+		expect(chunkKeyById.size).toBe(2);
 	});
 });
