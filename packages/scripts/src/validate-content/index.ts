@@ -17,6 +17,7 @@ import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
+import { checkRegionsParents } from './regions-parent';
 
 const rootPath = findWorkspaceRoot();
 
@@ -103,6 +104,11 @@ switch (command) {
 		checkDivisionIds(getDataStoreCollection(collections, ['regions']));
 		break;
 	}
+	// Check for regions whose parent does not reference an existing region
+	case 'region-parents': {
+		checkRegionsParents(getDataStoreCollection(collections, ['regions']));
+		break;
+	}
 	// Check for malformed MDX components
 	case 'mdx': {
 		checkMdxComponents(allEntries);
@@ -159,6 +165,7 @@ switch (command) {
 				Number(values.threshold),
 			),
 			checkDivisionIds(getDataStoreCollection(collections, ['regions'])),
+			checkRegionsParents(getDataStoreCollection(collections, ['regions'])),
 		];
 
 		const asyncResults = await checkLocationsCoordinates(
