@@ -21,7 +21,7 @@ export function matchLinkUrl(
 export const getResourcesCollection = createCollectionData({
 	collection: 'resources',
 	label: 'Resources',
-	async augment(entries) {
+	async mutate(entries) {
 		const locations = await getCollection('locations');
 		const posts = await getCollection('posts');
 

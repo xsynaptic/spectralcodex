@@ -7,9 +7,11 @@ import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
+import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { createCollectionData } from '#lib/utils/collections.ts';
+import { createHierarchy } from '#lib/utils/hierarchy.ts';
 
 /**
  * Computed data cache
@@ -19,7 +21,6 @@ type RegionComputedData = Pick<
 	| '_ancestors'
 	| '_children'
 	| '_siblings'
-	| '_descendants'
 	| '_langCode'
 	| '_locations'
 	| '_locationCount'
@@ -67,7 +68,7 @@ function generateCacheKey({
 				id: entry.id,
 				regions: entry.data.regions?.map(({ id }) => id),
 			})),
-			version: 1,
+			version: 2,
 		},
 	});
 }
@@ -98,7 +99,6 @@ function extractComputedData(regions: Array<CollectionEntry<'regions'>>): Region
 			_ancestors,
 			_children,
 			_siblings,
-			_descendants,
 			_langCode,
 			_locations,
 			_locationCount,
@@ -110,7 +110,6 @@ function extractComputedData(regions: Array<CollectionEntry<'regions'>>): Region
 			_ancestors,
 			_children,
 			_siblings,
-			_descendants,
 			_langCode,
 			_locations,
 			_locationCount,
@@ -122,68 +121,24 @@ function extractComputedData(regions: Array<CollectionEntry<'regions'>>): Region
 }
 
 /**
- * Computed data functions
+ * Computed data functions; populate the materialized closure fields onto entries from the hierarchy
  */
-function populateRegionsHierarchy(regions: Array<CollectionEntry<'regions'>>) {
-	// Calculate ancestors
+function populateRegionsHierarchy(
+	regions: Array<CollectionEntry<'regions'>>,
+	regionsTree: Hierarchy,
+) {
 	for (const entry of regions) {
-		if (!entry.data.parent) {
-			continue;
-		}
+		const ancestors = regionsTree.ancestorsOf(entry.id);
 
-		if (entry.id === entry.data.parent) {
-			throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
-		}
+		if (ancestors.length > 0) entry.data._ancestors = [...ancestors];
 
-		let current = entry;
+		const children = regionsTree.childrenOf(entry.id);
 
-		while (current.data.parent) {
-			const parent = regions.find(({ id }) => id === current.data.parent);
+		if (children.length > 0) entry.data._children = [...children];
 
-			if (!parent) break;
+		const siblings = regionsTree.siblingsOf(entry.id);
 
-			if (entry.data._ancestors) {
-				entry.data._ancestors.push(parent.id);
-			} else {
-				entry.data._ancestors = [parent.id];
-			}
-			current = parent;
-		}
-	}
-
-	// Calculate children, siblings, and descendants
-	for (const entry of regions) {
-		const children = regions.filter(({ data }) => data.parent === entry.id);
-
-		if (children.length > 0) {
-			entry.data._children = children.map(({ id }) => id);
-		}
-
-		// Do not include the current term, and also handle ancestral terms
-		const siblings = regions.filter(({ id, data }) => {
-			if (id === entry.id) return false;
-
-			return entry.data.parent ? data.parent === entry.data.parent : data.parent === undefined;
-		});
-
-		if (siblings.length > 0) {
-			entry.data._siblings = siblings.map(({ id }) => id);
-		}
-
-		// Calculate descendants
-		if (entry.data._ancestors) {
-			for (const ancestorId of entry.data._ancestors) {
-				const ancestor = regions.find(({ id }) => id === ancestorId);
-
-				if (!ancestor || ancestor.id === entry.id) continue;
-
-				if (ancestor.data._descendants) {
-					ancestor.data._descendants.push(entry.id);
-				} else {
-					ancestor.data._descendants = [entry.id];
-				}
-			}
-		}
+		if (siblings.length > 0) entry.data._siblings = [...siblings];
 	}
 }
 
@@ -215,10 +170,12 @@ function populateRegionsContent({
 	entries,
 	locations,
 	posts,
+	regionsTree,
 }: {
 	entries: Array<CollectionEntry<'regions'>>;
 	locations: Array<CollectionEntry<'locations'>>;
 	posts: Array<CollectionEntry<'posts'>>;
+	regionsTree: Hierarchy;
 }) {
 	// Generate locations and posts by region maps; this will make subsequent calculations faster
 	const locationsByRegionMap = new Map<string, Array<string>>();
@@ -247,7 +204,7 @@ function populateRegionsContent({
 
 	// Calculate cumulative post and location count
 	for (const entry of entries) {
-		const entries = entry.data._descendants ? [entry.id, ...entry.data._descendants] : [entry.id];
+		const entries = [entry.id, ...regionsTree.descendantsOf(entry.id)];
 
 		entry.data._locations = [
 			...new Set(entries.flatMap((id) => locationsByRegionMap.get(id))),
@@ -263,11 +220,26 @@ function populateRegionsContent({
 export const getRegionsCollection = createCollectionData({
 	collection: 'regions',
 	label: 'Regions',
-	async augment(entries) {
-		const augmentStart = performance.now();
+	async extend(entries) {
+		const extendStart = performance.now();
 
 		const locations = await getCollection('locations');
 		const posts = await getCollection('posts');
+
+		for (const entry of entries) {
+			if (entry.data.parent === entry.id) {
+				throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
+			}
+		}
+
+		// One tree drives both the materialized closure fields and the map nested-set; needed on cache hit too
+		const regionsTree = createHierarchy(
+			entries.map((entry) =>
+				entry.data.parent === undefined
+					? { id: entry.id }
+					: { id: entry.id, parentId: entry.data.parent },
+			),
+		);
 
 		// Generate cache key from current content graph state
 		const cacheKey = generateCacheKey({ regions: entries, locations, posts });
@@ -277,20 +249,22 @@ export const getRegionsCollection = createCollectionData({
 			applyComputedDataCache(entries, cacheData);
 
 			console.log(
-				`[Regions] Hierarchy loaded from cache in ${(performance.now() - augmentStart).toFixed(5)}ms`,
+				`[Regions] Hierarchy loaded from cache in ${(performance.now() - extendStart).toFixed(5)}ms`,
 			);
 		} else {
-			populateRegionsHierarchy(entries);
+			populateRegionsHierarchy(entries, regionsTree);
 			populateRegionsLangCode(entries);
-			populateRegionsContent({ entries, locations, posts });
+			populateRegionsContent({ entries, locations, posts, regionsTree: regionsTree });
 
 			// Clear old cache entries before setting new one (prevents unbounded growth)
 			await cacheInstance.clear();
 			await cacheInstance.set(cacheKey, extractComputedData(entries));
 
 			console.log(
-				`[Regions] Hierarchy computed in ${(performance.now() - augmentStart).toFixed(5)}ms`,
+				`[Regions] Hierarchy computed in ${(performance.now() - extendStart).toFixed(5)}ms`,
 			);
 		}
+
+		return { regionsTree };
 	},
 });

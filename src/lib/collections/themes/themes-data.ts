@@ -5,7 +5,7 @@ import { createCollectionData } from '#lib/utils/collections.ts';
 export const getThemesCollection = createCollectionData({
 	collection: 'themes',
 	label: 'Themes',
-	async augment(entries) {
+	async mutate(entries) {
 		const locations = await getCollection('locations');
 		const posts = await getCollection('posts');
 

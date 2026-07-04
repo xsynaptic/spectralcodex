@@ -14,7 +14,6 @@ import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { createRegionCommonAncestorFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -26,12 +25,12 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Find the common ancestor of a set of regions so there's only one in the catalog
 async function getRegionPrimaryIdFunction() {
-	const getRegionCommonAncestor = await createRegionCommonAncestorFunction();
+	const { regionsTree } = await getRegionsCollection();
 
 	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
 		if (regions && regions.length > 0) {
 			return regions.length > 1
-				? getRegionCommonAncestor(regions.map(({ id }) => id))
+				? regionsTree.commonAncestorOf(regions.map(({ id }) => id))
 				: regions.at(0)?.id;
 		}
 		return;

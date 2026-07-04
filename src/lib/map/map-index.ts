@@ -19,7 +19,6 @@ import {
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
-import { computeRegionOrdinals } from '#lib/map/map-region-ordinals.ts';
 
 interface MapIndexData {
 	// One row per non-hidden feature: source shape plus region ordinals, theme indices, chunk key
@@ -30,13 +29,11 @@ interface MapIndexData {
 	chunkKeyById: Map<string, string>;
 }
 
-// Memoized region nested-set numbering; region maps read their own interval to build a scope
+// Region nested-set numbering from the shared hierarchy; region maps read their own interval to build a scope
 export const getMapRegionOrdinals = pMemoize(async () => {
-	const { entries: regions } = await getRegionsCollection();
+	const { regionsTree } = await getRegionsCollection();
 
-	return computeRegionOrdinals(
-		regions.map((entry) => ({ id: entry.id, parent: entry.data.parent })),
-	);
+	return { ordinalById: regionsTree.ordinalById, intervalById: regionsTree.intervalById };
 });
 
 // Memoized theme → index map; theme maps read their own index to build a scope
@@ -81,7 +78,7 @@ function buildLocationByFeatureId(
 // Unique, ascending membership indices for a set of content references
 function getMembershipIndices(
 	references: ReadonlyArray<{ id: string }>,
-	indexById: Map<string, number>,
+	indexById: ReadonlyMap<string, number>,
 ): Array<number> {
 	return R.pipe(
 		references,
@@ -153,6 +150,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 	});
 
 	const chunks = new Map<string, Array<MapPopupItemInput>>();
+
 	for (const [chunkKey, ids] of chunkIds) {
 		chunks.set(
 			chunkKey,

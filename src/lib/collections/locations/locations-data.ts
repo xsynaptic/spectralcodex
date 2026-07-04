@@ -140,7 +140,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	label: 'Locations',
-	async augment(entries) {
+	async mutate(entries) {
 		// Flatten overrides onto entry.data in production so downstream code never needs to know
 		if (import.meta.env.PROD) {
 			for (const entry of entries) {

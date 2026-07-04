@@ -71,31 +71,6 @@ export async function createRegionAncestorsByIdFunction() {
 	};
 }
 
-// A utility function to find the common ancestor ID from an arbitrary set of regions
-// Used when generating catalog items
-export async function createRegionCommonAncestorFunction() {
-	const getRegionsById = await createRegionsByIdsFunction();
-	const getRegionAncestors = await createRegionAncestorsFunction();
-
-	return function getRegionCommonAncestor(regionIds: Array<string>): string | undefined {
-		const regions = getRegionsById(regionIds);
-
-		if (regions.length === 0) return;
-
-		const regionAncestors = regions.map(getRegionAncestors);
-		const firstRegionAncestors = regionAncestors[0];
-
-		if (!firstRegionAncestors) return;
-
-		for (const ancestor of firstRegionAncestors) {
-			if (regionAncestors.every((regionAncestor) => regionAncestor.includes(ancestor))) {
-				return ancestor.id;
-			}
-		}
-		return;
-	};
-}
-
 /**
  * Primary region
  */

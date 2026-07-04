@@ -37,7 +37,6 @@ export const regions = defineCollection({
 			_ancestors: z.string().array().optional(),
 			_siblings: z.string().array().optional(),
 			_children: z.string().array().optional(),
-			_descendants: z.string().array().optional(),
 			_locations: z.string().array().optional(),
 			_locationCount: z.number().int().optional(),
 			_posts: z.string().array().optional(),

@@ -45,16 +45,26 @@ interface CollectionResult<K extends CollectionKey> {
 	entriesMap: Map<string, CollectionEntry<K>>;
 }
 
-// Factory function to create collection data, optionally augmenting the data with additional computed properties
-export function createCollectionData<K extends CollectionKey>(config: {
+// Per-entry mutation over the loaded entries; stamps computed fields onto entry.data in place
+type CollectionMutateFunction<K extends CollectionKey> = (
+	entries: Array<CollectionEntry<K>>,
+	entriesMap: Map<string, CollectionEntry<K>>,
+) => Promise<void> | void;
+
+// Collection-level derivation; its return is merged into the result so consumers can read the artifact
+type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
+	entries: Array<CollectionEntry<K>>,
+	entriesMap: Map<string, CollectionEntry<K>>,
+) => Promise<A> | A;
+
+// Factory function to create memoized collection data
+export function createCollectionData<K extends CollectionKey, A extends object = object>(config: {
 	collection: K;
 	label?: string;
-	augment?: (
-		entries: Array<CollectionEntry<K>>,
-		entriesMap: Map<string, CollectionEntry<K>>,
-	) => Promise<void> | void;
+	mutate?: CollectionMutateFunction<K>;
+	extend?: CollectionExtendFunction<K, A>;
 }) {
-	const getData = pMemoize(async (): Promise<CollectionResult<K>> => {
+	const getData = pMemoize(async (): Promise<CollectionResult<K> & A> => {
 		const startTime = performance.now();
 
 		const entries = await getCollection(config.collection);
@@ -65,20 +75,20 @@ export function createCollectionData<K extends CollectionKey>(config: {
 			entriesMap.set(entry.id, entry);
 		}
 
-		if (config.augment) {
-			await config.augment(entries, entriesMap);
-		}
+		await config.mutate?.(entries, entriesMap);
+
+		const extra = (await config.extend?.(entries, entriesMap)) ?? ({} as A);
 
 		console.log(
 			`[${config.label ?? config.collection}] Collection data generated in ${(performance.now() - startTime).toFixed(4)}ms`,
 		);
 
-		return { entries, entriesMap };
+		return { entries, entriesMap, ...extra };
 	});
 
 	// In dev the content store can load empty if Astro's data-store module fails to parse
 	// Memoizing that empty result would strand it for the whole session; evict empties to allow for recovery
-	return async function (): Promise<CollectionResult<K>> {
+	return async function (): Promise<CollectionResult<K> & A> {
 		const result = await getData();
 
 		if (import.meta.env.DEV && result.entries.length === 0) {
