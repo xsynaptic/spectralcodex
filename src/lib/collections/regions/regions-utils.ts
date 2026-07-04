@@ -16,31 +16,21 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
+import {
+	createCollectionLookupByIds,
+	filterWithContent,
+	sortByContentCount,
+} from '#lib/utils/collections.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
 /**
  * Transform an array of strings into collection entries
  */
-export async function createRegionsByIdsFunction() {
-	const { entriesMap } = await getRegionsCollection();
-
-	return function getRegionsById(ids: Array<string>) {
-		return ids
-			.map((id) => {
-				const entry = entriesMap.get(id);
-
-				if (!entry && import.meta.env.DEV) {
-					console.warn(`[Regions] Requested entry "${id}" not found!`);
-				}
-				return entry;
-			})
-			.filter((entry): entry is CollectionEntry<'regions'> => !!entry) satisfies Array<
-			CollectionEntry<'regions'>
-		>;
-	};
-}
+export const createRegionsByIdsFunction = createCollectionLookupByIds<'regions'>(
+	'Regions',
+	getRegionsCollection,
+);
 
 /**
  * Hierarchical functions
