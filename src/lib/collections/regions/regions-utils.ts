@@ -14,7 +14,7 @@ import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData, getMapRegionOrdinals } from '#lib/map/map-index.ts';
+import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
@@ -125,7 +125,7 @@ export async function createQueryRegionsEntryFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
 	const { chunkKeyById } = await getMapIndexData();
-	const { intervalById } = await getMapRegionOrdinals();
+	const { regionsTree } = await getRegionsCollection();
 
 	// Note: this is temporary code to limit map display to specified regions
 	const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
@@ -162,7 +162,7 @@ export async function createQueryRegionsEntryFunction() {
 
 		const regionsOption = getRegionsOptions(ancestors.length);
 
-		const regionInterval = intervalById.get(entry.id);
+		const regionInterval = regionsTree.intervalById.get(entry.id);
 
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,

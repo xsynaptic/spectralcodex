@@ -29,13 +29,6 @@ interface MapIndexData {
 	chunkKeyById: Map<string, string>;
 }
 
-// Region nested-set numbering from the shared hierarchy; region maps read their own interval to build a scope
-export const getMapRegionOrdinals = pMemoize(async () => {
-	const { regionsTree } = await getRegionsCollection();
-
-	return { ordinalById: regionsTree.ordinalById, intervalById: regionsTree.intervalById };
-});
-
 // Memoized theme → index map; theme maps read their own index to build a scope
 export const getMapThemeIndexById = pMemoize(async () => {
 	const { entries: themes } = await getThemesCollection();
@@ -92,7 +85,7 @@ function getMembershipIndices(
 // Memoized so a single build computes the shared artifacts once
 export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 	const { entries: locations } = await getLocationsCollection();
-	const { ordinalById } = await getMapRegionOrdinals();
+	const { regionsTree } = await getRegionsCollection();
 	const themeIndexById = await getMapThemeIndexById();
 
 	const featureCollection = getLocationsFeatureCollection(locations);
@@ -133,7 +126,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 		const location = locationByFeatureId.get(id);
 
 		const regionOrdinals = location
-			? getMembershipIndices(resolveLocationRegions(location), ordinalById)
+			? getMembershipIndices(resolveLocationRegions(location), regionsTree.ordinalById)
 			: [];
 		const themeIndices = location
 			? getMembershipIndices(location.data.themes ?? [], themeIndexById)
