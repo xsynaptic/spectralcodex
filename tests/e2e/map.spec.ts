@@ -1,10 +1,9 @@
-import { expect, test } from '@playwright/test';
-
-const POST_PATH = '/xinyi-taipei-101/';
+import { PATHS } from './constants.ts';
+import { expect, test } from './fixtures.ts';
 
 test.describe('map', () => {
 	test('map loads on Taipei 101 location page', async ({ page }) => {
-		await page.goto(POST_PATH);
+		await page.goto(PATHS.locationDetail, { waitUntil: 'domcontentloaded' });
 
 		// MapLibre GL creates a canvas element when it hydrates via client:visible
 		const canvas = page.locator('canvas.maplibregl-canvas');

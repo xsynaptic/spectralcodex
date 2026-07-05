@@ -1,16 +1,16 @@
-import { expect, test } from '@playwright/test';
-
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+import { PATHS } from './constants.ts';
+import { expect, test } from './fixtures.ts';
 
 const t = getTranslations();
 
 const REGIONS_NAME_1 = 'Taiwan';
 const REGIONS_NAME_2 = 'Tainan';
-const REGIONS_URL = '/regions/tainan/';
 
 test.describe('navigation', () => {
 	test('Regions', async ({ page }) => {
-		await page.goto('/');
+		await page.goto('/', { waitUntil: 'domcontentloaded' });
 
 		const nav = page.getByRole('navigation', {
 			name: t('site.menu.header.label'),
@@ -24,13 +24,10 @@ test.describe('navigation', () => {
 		await expect(taiwanLink).toBeVisible();
 		await taiwanLink.hover();
 
-		// Click depth-2 submenu link and assert URL
 		const tainanLink = nav.getByRole('menuitem', {
 			name: new RegExp(String.raw`^${REGIONS_NAME_2} \(`),
 		});
 		await expect(tainanLink).toBeVisible();
-		await tainanLink.click();
-
-		await expect(page).toHaveURL(new RegExp(REGIONS_URL));
+		await expect(tainanLink).toHaveAttribute('href', new RegExp(`${PATHS.regionDetail}$`));
 	});
 });

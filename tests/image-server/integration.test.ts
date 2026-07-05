@@ -1,6 +1,7 @@
 import type { ImagorFormats } from '@xsynaptic/unpic-imagor';
 
 import { generate } from '@xsynaptic/unpic-imagor';
+import sharp from 'sharp';
 import { describe, expect, test } from 'vitest';
 
 import { signImageServerPath } from '#lib/image/image-sign.ts';
@@ -73,5 +74,15 @@ describe('image server integration', () => {
 		const webpResponse = await fetch(signedUrl(TEST_IMAGE, 451, 'webp', 70));
 		expect(webpResponse.status).toBe(200);
 		expect(webpResponse.headers.get('content-type')).toBe('image/webp');
+	});
+
+	// A malformed op silently returns the unresized original, which every other test here would pass
+	test('requested width is honored in the output image', async () => {
+		const width = 375;
+		const response = await fetch(signedUrl(TEST_IMAGE, width, 'jpg', 85));
+		expect(response.status).toBe(200);
+
+		const metadata = await sharp(Buffer.from(await response.arrayBuffer())).metadata();
+		expect(metadata.width).toBe(width);
 	});
 });

@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures.ts';
 
 const SEARCH_TERM = 'Huadong Valley Ride 2018: Taitung City';
 
 test.describe('search', () => {
 	test('Pagefind returns results for a known post', async ({ page }) => {
-		await page.goto('/');
+		await page.goto('/', { waitUntil: 'domcontentloaded' });
 
 		const trigger = page.locator('search-toggle button');
 		await expect(trigger).toBeVisible();
