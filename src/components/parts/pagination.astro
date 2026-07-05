@@ -138,8 +138,8 @@ function getPaginationData({
 
 	return {
 		getPageNumberLink,
-		pagePrevLink: url.prev ?? undefined,
-		pageNextLink: url.next ?? undefined,
+		pagePrevLink: url.prev ? joinUrl(url.prev, '/') : undefined,
+		pageNextLink: url.next ? joinUrl(url.next, '/') : undefined,
 		pageArray,
 	};
 }

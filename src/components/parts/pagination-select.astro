@@ -17,8 +17,8 @@ const { currentPage, lastPage, url } = page;
 
 // Root-relative base path for client-side, same-origin navigation
 const pageBasePath = joinUrl(url.current.replace(new RegExp(`/${String(currentPage)}$`), ''), '/');
-const pagePrevLink = url.prev ?? undefined;
-const pageNextLink = url.next ?? undefined;
+const pagePrevLink = url.prev ? joinUrl(url.prev, '/') : undefined;
+const pageNextLink = url.next ? joinUrl(url.next, '/') : undefined;
 
 const t = getTranslations();
 ---
