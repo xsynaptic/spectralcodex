@@ -20,8 +20,6 @@
 		"fix-content": "mdxlint-content packages/content --fix --root-path=$PWD",
 		"fix-content-demo": "mdxlint-content packages/content-demo --fix --root-path=$PWD",
 		"generate-redirects": "pnpm -F @spectralcodex/scripts generate-redirects",
-		"image-server-warm": "pnpm -F @spectralcodex/scripts image-server-warm",
-		"image-server-warm-new": "pnpm -F @spectralcodex/scripts image-server-warm-new",
 		"improve-content": "pnpm -F @spectralcodex/scripts improve-content",
 		"knip": "knip",
 		"lint": "eslint",

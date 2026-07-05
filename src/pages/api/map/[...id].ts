@@ -22,7 +22,7 @@ export const getStaticPaths = (async () => {
 	});
 	const { sourceHash, popupHash } = getLocationsMapApiHashes(objectivesCollection);
 
-	// Exact versioned URLs for deploy-cache-warm to prefetch; not used by the map island
+	// Exact versioned URLs for the cache warmer to prefetch; not used by the map island
 	const manifestUrls = [
 		`/api/map/index.json?v=${version}`,
 		...[...chunks.keys()].map((chunkKey) => `/api/map/${chunkKey}.json?v=${version}`),

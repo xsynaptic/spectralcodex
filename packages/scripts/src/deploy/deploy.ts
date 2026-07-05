@@ -4,13 +4,10 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { warmImageCacheNew } from '../image-server/cache-warm.js';
-import { generateManifest } from '../image-server/manifest.js';
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { generateSitemapLastmod } from '../sitemap-lastmod/index.js';
 import { deployApp } from './deploy-app.js';
-import { purgeCache } from './deploy-cache-purge.js';
-import { warmCache } from './deploy-cache-warm.js';
+import { invokeCacheRefresh } from './deploy-cache-refresh.js';
 import { deployCaddy } from './deploy-caddy.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
@@ -21,13 +18,11 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'cache-path': { type: 'string', default: './.cache' },
 		'dry-run': { type: 'boolean', default: false },
 		'skip-build': { type: 'boolean', default: false },
 	},
 });
 
-const cachePath = path.join(rootPath, values['cache-path']);
 const dryRun = values['dry-run'];
 const skipBuild = values['skip-build'];
 
@@ -90,16 +85,6 @@ async function test() {
 	await $({ stdio: 'inherit', cwd: rootPath })`pnpm test-e2e`;
 }
 
-function manifest() {
-	console.log(chalk.blue('Generating cache manifest...'));
-	generateManifest({
-		distPath,
-		outputPath: path.join(distPath, 'cache-manifest.json'),
-		urlPattern: config.imageServerUrl,
-		mainPath: path.join(cachePath, 'cache-manifest-main.json'),
-	});
-}
-
 async function media() {
 	try {
 		await deployMedia({ rootPath, dryRun });
@@ -141,7 +126,6 @@ try {
 	await build();
 	await generateOpenGraph();
 	await test();
-	manifest();
 
 	// Transfer to server
 	await media();
@@ -151,9 +135,7 @@ try {
 
 	// Verify & refresh caches
 	await healthCheck();
-	await warmImageCacheNew({ rootPath, dryRun });
-	await purgeCache({ rootPath, dryRun });
-	await warmCache({ baseUrl: config.siteUrl, dryRun });
+	await invokeCacheRefresh({ dryRun });
 
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {

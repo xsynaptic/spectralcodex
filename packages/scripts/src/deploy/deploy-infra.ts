@@ -17,8 +17,8 @@ function requireEnv(name: string): string {
 	return value;
 }
 
-// Builds the single server-side .env consumed by deploy/docker-compose.yml (umami + image vars)
-function buildServerEnv(mediaPath: string): string {
+// Builds the single server-side .env consumed by deploy/docker-compose.yml (umami, image, cache-warmer)
+function buildServerEnv(mediaPath: string, siteUrl: string): string {
 	const signatureLength = process.env.IMAGE_SERVER_SIGNATURE_LENGTH ?? '20';
 
 	return [
@@ -29,6 +29,10 @@ function buildServerEnv(mediaPath: string): string {
 		`DEPLOY_MEDIA_PATH=${mediaPath}`,
 		`IMAGE_SERVER_SECRET=${requireEnv('IMAGE_SERVER_SECRET')}`,
 		`IMAGE_SERVER_SIGNATURE_LENGTH=${signatureLength}`,
+		`SITE_URL=${siteUrl}`,
+		`CLOUDFLARE_ZONE_ID=${requireEnv('CLOUDFLARE_ZONE_ID')}`,
+		`CLOUDFLARE_API_TOKEN=${requireEnv('CLOUDFLARE_API_TOKEN')}`,
+		`CACHE_WARM_CONCURRENCY=${process.env.CACHE_WARM_CONCURRENCY ?? '8'}`,
 	].join('\n');
 }
 
@@ -36,7 +40,7 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	const { rootPath, dryRun = false } = options;
 
 	const config = loadDeployConfig();
-	const serverEnv = buildServerEnv(config.mediaPath);
+	const serverEnv = buildServerEnv(config.mediaPath, config.siteUrl);
 
 	const deployDir = path.join(rootPath, 'deploy');
 	const remotePath = config.remotePath;
@@ -75,6 +79,11 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 			extraFlags: ['--mkpath'],
 		},
 	);
+	await rsyncTo(`${deployDir}/cache-warmer/`, `${config.remoteHost}:${remotePath}/cache-warmer/`, {
+		config,
+		dryRun,
+		extraFlags: ['--mkpath'],
+	});
 
 	if (dryRun) {
 		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
@@ -91,8 +100,9 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	console.log(chalk.gray('Pulling images...'));
 	await sshExec(config, `${composeCmd} pull`);
 
+	// cache-warmer is under the `jobs` profile; --profile ensures it builds alongside the rest
 	console.log(chalk.gray('Building local images...'));
-	await sshExec(config, `${composeCmd} build`);
+	await sshExec(config, `${composeCmd} --profile jobs build`);
 
 	console.log(chalk.gray('Recreating containers...'));
 	await sshExec(config, `${composeCmd} up -d --remove-orphans --wait --wait-timeout 120`);

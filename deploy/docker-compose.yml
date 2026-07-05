@@ -238,6 +238,34 @@ services:
       - astro-frontend
     restart: unless-stopped
     mem_limit: 768m
+    cpus: 0.7
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  cache-warmer:
+    build: ./cache-warmer
+    profiles: ['jobs']
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    environment:
+      # Node sizes its heap from host RAM, ignoring mem_limit; cap it so V8 GCs within budget
+      - NODE_OPTIONS=--max-old-space-size=160
+      - SITE_URL=${SITE_URL}
+      - CLOUDFLARE_ZONE_ID=${CLOUDFLARE_ZONE_ID}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - CACHE_WARM_CONCURRENCY=${CACHE_WARM_CONCURRENCY:-8}
+    networks:
+      - warmer
     logging:
       driver: json-file
       options:
@@ -251,6 +279,9 @@ networks:
   backend:
     driver: bridge
     internal: true
+  # Egress-only; the warmer never touches internal services
+  warmer:
+    driver: bridge
 
 volumes:
   caddy_data:
