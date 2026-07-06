@@ -17,6 +17,8 @@ export default getConfig(
 				'**/.cache/**/*',
 				'**/dist/**/*',
 				'deploy/**/*',
+				'!deploy/cache-warmer',
+				'!deploy/cache-warmer/cache-warm.ts',
 				'packages/content/**/*',
 				'**/.mdxlintrc.mjs',
 				'**/temp/**/*',

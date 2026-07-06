@@ -35,7 +35,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Nginx reverse proxy with aggressive caching ensures images are only processed once
 - URL-based transformations (e.g., `/{signature}/fit-in/1200x800/filters:format(webp):quality(80)/path/to/image.jpg`) allow flexible sizing without pre-generating variants
 - Purpose-built typed imagor URL builder and HMAC-SHA256 signer (the `unpic-imagor` package) generates signed URLs at build time; signing plus rate limiting protects against cache-busting attacks
-- Incremental cache warming with manifest tracking and remote SSH execution; only warms newly discovered URLs
+- Incremental cache warming service with optional email alerts
 - Docker Compose orchestration for easy deployment and updates
 
 ### Interactive Maps

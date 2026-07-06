@@ -261,9 +261,16 @@ services:
       # Node sizes its heap from host RAM, ignoring mem_limit; cap it so V8 GCs within budget
       - NODE_OPTIONS=--max-old-space-size=160
       - SITE_URL=${SITE_URL}
+      - IMAGE_SERVER_URL=${IMAGE_SERVER_URL}
       - CLOUDFLARE_ZONE_ID=${CLOUDFLARE_ZONE_ID}
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - CACHE_WARM_CONCURRENCY=${CACHE_WARM_CONCURRENCY:-8}
+      - JMAP_SESSION_URL=${JMAP_SESSION_URL}
+      - JMAP_API_TOKEN=${JMAP_API_TOKEN}
+      - ALERT_EMAIL_TO=${ALERT_EMAIL_TO}
+      - ALERT_EMAIL_FROM=${ALERT_EMAIL_FROM:-}
+      - ALERT_ALWAYS=${ALERT_ALWAYS:-}
+      - ALERT_MIN_FAILURES=${ALERT_MIN_FAILURES:-1}
     networks:
       - warmer
     logging:

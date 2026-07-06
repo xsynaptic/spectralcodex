@@ -1,9 +1,7 @@
-FROM node:22.23.1-alpine
+FROM node:24.18.0-alpine
 
 WORKDIR /app
-COPY package.json ./
-RUN npm install --no-audit --no-fund
-COPY cache-warm.ts ./
+COPY package.json cache-warm.ts ./
 
 USER node
-ENTRYPOINT ["node", "--import", "tsx", "cache-warm.ts"]
+ENTRYPOINT ["node", "cache-warm.ts"]
