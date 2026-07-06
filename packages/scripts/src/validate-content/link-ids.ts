@@ -4,45 +4,66 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 const LINK_ID_REGEX = /<Link\s[^>]*id="([^"]+)"/g;
 
-export function checkLinkIds(entries: Array<DataStoreEntry>, validTargets: Array<DataStoreEntry>) {
+interface LinkIdIssue {
+	location: string;
+	lineNumber: number;
+	id: string | undefined;
+}
+
+export function collectLinkIdIssues(
+	entries: Array<DataStoreEntry>,
+	validTargets: Array<DataStoreEntry>,
+) {
 	const validIds = new Set<string>();
 
 	for (const entry of validTargets) {
 		validIds.add(entry.id);
 	}
 
-	let overallErrorCount = 0;
+	const issues: Array<LinkIdIssue> = [];
 
 	for (const entry of entries) {
 		if (!entry.body?.includes('<Link ')) continue;
 
 		LINK_ID_REGEX.lastIndex = 0;
 		let match: RegExpExecArray | null;
-		let entryHeaderPrinted = false;
 
 		while ((match = LINK_ID_REGEX.exec(entry.body)) !== null) {
 			const id = match[1];
 
 			if (!id || !validIds.has(id)) {
-				if (!entryHeaderPrinted) {
-					console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
-					entryHeaderPrinted = true;
-				}
-
 				const lineNumber = entry.body.slice(0, match.index).split('\n').length;
-				console.log(
-					chalk.red(`   Line ${lineNumber.toString()}: broken link ID "${id ?? 'undefined'}"`),
-				);
-				overallErrorCount++;
+
+				issues.push({ location: entry.filePath ?? entry.id, lineNumber, id });
 			}
 		}
 	}
 
-	if (overallErrorCount === 0) {
-		console.log(chalk.green('✓ Link IDs valid'));
-	} else {
-		console.log(chalk.yellow(`⚠️  Found ${overallErrorCount.toString()} broken link ID(s)`));
+	return issues;
+}
+
+export function checkLinkIds(entries: Array<DataStoreEntry>, validTargets: Array<DataStoreEntry>) {
+	const issues = collectLinkIdIssues(entries, validTargets);
+	let previousLocation: string | undefined;
+
+	for (const issue of issues) {
+		if (issue.location !== previousLocation) {
+			console.log(chalk.red(`❌ ${issue.location}`));
+			previousLocation = issue.location;
+		}
+
+		console.log(
+			chalk.red(
+				`   Line ${issue.lineNumber.toString()}: broken link ID "${issue.id ?? 'undefined'}"`,
+			),
+		);
 	}
 
-	return overallErrorCount === 0;
+	if (issues.length === 0) {
+		console.log(chalk.green('✓ Link IDs valid'));
+	} else {
+		console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} broken link ID(s)`));
+	}
+
+	return issues.length === 0;
 }

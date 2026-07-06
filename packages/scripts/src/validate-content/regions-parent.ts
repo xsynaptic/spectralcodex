@@ -4,7 +4,7 @@ import type { DataStoreEntry } from '../shared/data-store';
 
 // A region `parent` must reference an existing region id and never itself
 // A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
-export function checkRegionsParents(entries: Array<DataStoreEntry>) {
+export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 	const regionIds = new Set(entries.map((entry) => entry.id));
 	const issues: Array<string> = [];
 
@@ -21,6 +21,12 @@ export function checkRegionsParents(entries: Array<DataStoreEntry>) {
 			issues.push(`${location} (parent "${parent}" not found)`);
 		}
 	}
+
+	return issues;
+}
+
+export function checkRegionsParents(entries: Array<DataStoreEntry>) {
+	const issues = collectRegionsParentsIssues(entries);
 
 	if (issues.length === 0) {
 		console.log(chalk.green(`✓ ${entries.length.toString()} region parents valid`));

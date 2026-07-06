@@ -39,15 +39,17 @@ function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number 
 	return { allowed: nearest, delta: smallestDelta };
 }
 
-export function checkImageAspectRatios(entries: Array<DataStoreEntry>) {
-	const flagged: Array<{
-		id: string;
-		width: number;
-		height: number;
-		ratio: number;
-		nearest: string;
-		delta: number;
-	}> = [];
+interface FlaggedImage {
+	id: string;
+	width: number;
+	height: number;
+	ratio: number;
+	nearest: string;
+	delta: number;
+}
+
+export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
+	const flagged: Array<FlaggedImage> = [];
 
 	let checkedCount = 0;
 
@@ -70,12 +72,18 @@ export function checkImageAspectRatios(entries: Array<DataStoreEntry>) {
 		flagged.push({ id: entry.id, width, height, ratio, nearest: allowed.label, delta });
 	}
 
+	flagged.sort((a, b) => a.id.localeCompare(b.id));
+
+	return { flagged, checkedCount };
+}
+
+export function checkImageAspectRatios(entries: Array<DataStoreEntry>) {
+	const { flagged, checkedCount } = collectAspectRatioIssues(entries);
+
 	if (flagged.length === 0) {
 		console.log(chalk.green(`✓ ${checkedCount.toString()} image aspect ratios valid`));
 		return true;
 	}
-
-	flagged.sort((a, b) => a.id.localeCompare(b.id));
 
 	for (const item of flagged) {
 		console.log(

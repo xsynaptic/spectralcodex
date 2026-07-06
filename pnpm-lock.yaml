@@ -467,6 +467,9 @@ importers:
       usearch:
         specifier: ^2.25.3
         version: 2.25.3
+      vitest:
+        specifier: ^4.1.9
+        version: 4.1.9(@types/node@25.9.2)(vite@8.1.0(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.0)(yaml@2.9.0))
       zod:
         specifier: ^4.4.3
         version: 4.4.3

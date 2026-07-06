@@ -22,16 +22,30 @@ function getHierarchy(filePath: string, collection: string): Array<string> {
 	return relativePath.replace(ext, '').split('/');
 }
 
-export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
-	let mismatchCount = 0;
+interface LocationRegionMissingIssue {
+	type: 'missing-regions';
+	filename: string;
+}
+
+interface LocationRegionMismatchIssue {
+	type: 'mismatch';
+	filename: string;
+	expectedRegion: string;
+	foundRegion: string;
+	hierarchy: Array<string>;
+}
+
+type LocationRegionIssue = LocationRegionMissingIssue | LocationRegionMismatchIssue;
+
+export function collectLocationsRegionsIssues(entries: Array<DataStoreEntry>) {
+	const issues: Array<LocationRegionIssue> = [];
 
 	for (const entry of entries) {
 		const regions = RegionsSchema.optional().parse(entry.data.regions);
+		const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
 
 		if (!regions?.[0]) {
-			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
-			console.log(chalk.red(`❌ ${filename}`));
-			console.log(chalk.red('   ERROR: No regions field found'));
+			issues.push({ type: 'missing-regions', filename });
 			continue;
 		}
 
@@ -42,13 +56,38 @@ export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
 		const expectedRegion = hierarchy.at(-2) ?? 'unknown';
 
 		if (firstRegion !== expectedRegion) {
-			const filename = entry.filePath ? path.basename(entry.filePath) : entry.id;
-			console.log(chalk.red(`❌ ${filename}`));
-			console.log(chalk.red(`   Expected region: ${expectedRegion}, Found: ${firstRegion}`));
-			console.log(chalk.red(`   Directory path: ${hierarchy.join(' → ')}`));
-			mismatchCount++;
+			issues.push({
+				type: 'mismatch',
+				filename,
+				expectedRegion,
+				foundRegion: firstRegion,
+				hierarchy,
+			});
 		}
 	}
+
+	return issues;
+}
+
+export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
+	const issues = collectLocationsRegionsIssues(entries);
+
+	for (const issue of issues) {
+		console.log(chalk.red(`❌ ${issue.filename}`));
+
+		if (issue.type === 'missing-regions') {
+			console.log(chalk.red('   ERROR: No regions field found'));
+			continue;
+		}
+
+		console.log(
+			chalk.red(`   Expected region: ${issue.expectedRegion}, Found: ${issue.foundRegion}`),
+		);
+		console.log(chalk.red(`   Directory path: ${issue.hierarchy.join(' → ')}`));
+	}
+
+	// Missing regions are report-only; only mismatches fail the check
+	const mismatchCount = issues.filter((issue) => issue.type === 'mismatch').length;
 
 	if (mismatchCount === 0) {
 		console.log(chalk.green(`✓ ${entries.length.toString()} location regions valid`));
