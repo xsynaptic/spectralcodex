@@ -1,9 +1,8 @@
-import type { UseQueryResult } from '@tanstack/react-query';
 import type { FC, ReactNode } from 'react';
 import type { z } from 'zod';
 
 import { useQuery } from '@tanstack/react-query';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import { FETCH_TIMEOUT_MS } from '../constants';
 
@@ -32,6 +31,15 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 	type TParsed = z.output<TSchema>;
 	type TInput = z.input<TSchema>;
 
+	// Consumers run useQuery themselves so property tracking stays per consumer
+	interface DataQueryConfigValue {
+		apiUrl: string | undefined;
+		data: Array<TInput> | undefined;
+		dataKey: string | undefined;
+		version: string | undefined;
+		isDev: boolean | undefined;
+	}
+
 	function parse(raw: unknown) {
 		const result = schema.array().safeParse(raw);
 
@@ -43,37 +51,21 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 		return result.data as Array<TParsed>;
 	}
 
-	const DataContext = createContext<UseQueryResult<Array<TParsed> | undefined> | undefined>(
-		undefined,
-	);
+	const DataContext = createContext<DataQueryConfigValue | undefined>(undefined);
 
 	const useDataQuery = () => {
-		const context = useContext(DataContext);
+		const config = useContext(DataContext);
 
-		if (!context) {
+		if (!config) {
 			throw new Error(`[Map] ${name} query used outside its provider`);
 		}
 
-		return context;
-	};
+		const { apiUrl, data, dataKey, version, isDev } = config;
 
-	const DataProvider: FC<MapDataProviderProps<TInput>> = function DataProvider({
-		apiUrl,
-		data,
-		dataKey,
-		version,
-		isDev,
-		children,
-	}) {
-		// Inline data without a key would collide across maps sharing this query name
-		if (data && dataKey === undefined && isDev) {
-			throw new Error(`[Map] ${name} inline data requires a dataKey`);
-		}
-
-		// eslint-disable-next-line @tanstack/query/exhaustive-deps -- parse/schema are stable per factory instance; the queryKey inputs fully determine the result
-		const query = useQuery<Array<TParsed> | undefined>({
+		// eslint-disable-next-line @tanstack/query/exhaustive-deps -- queryKey inputs fully determine the result
+		return useQuery<Array<TParsed> | undefined>({
 			queryKey: [name, apiUrl, dataKey ?? (data ? 'inline' : false), version, isDev],
-			// Inline data ships in the page HTML; persisting it to IndexedDB is pure overhead
+			// Inline data ships in the HTML; skip IndexedDB persistence
 			meta: { persist: !data },
 			queryFn: async () => {
 				if (data) return parse(data);
@@ -97,8 +89,27 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 			refetchOnMount: false,
 			...(optional ? { enabled: !!apiUrl || !!data } : {}),
 		});
+	};
 
-		return <DataContext.Provider value={query}>{children}</DataContext.Provider>;
+	const DataProvider: FC<MapDataProviderProps<TInput>> = function DataProvider({
+		apiUrl,
+		data,
+		dataKey,
+		version,
+		isDev,
+		children,
+	}) {
+		// Keyless inline data would collide across maps sharing this query name
+		if (data && dataKey === undefined && isDev) {
+			throw new Error(`[Map] ${name} inline data requires a dataKey`);
+		}
+
+		const config = useMemo(
+			() => ({ apiUrl, data, dataKey, version, isDev }),
+			[apiUrl, data, dataKey, version, isDev],
+		);
+
+		return <DataContext.Provider value={config}>{children}</DataContext.Provider>;
 	};
 
 	return { DataProvider, useDataQuery };
