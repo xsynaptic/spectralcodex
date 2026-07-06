@@ -2,19 +2,26 @@ import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import { stripTags } from '@xsynaptic/unified-tools';
 import { markdownToHtml } from 'satteri';
 
+// Locale-independent word segmentation; split(' ') counts space-free scripts (CJK, Thai) as one word
+const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+
 export function textClipper(
 	input: string,
 	options: { wordCount: number; trailer?: string | undefined },
 ): string {
-	const words = input.split(' ');
+	let wordIndex = 0;
 
-	if (words.length <= options.wordCount) {
-		return input;
+	for (const segment of wordSegmenter.segment(input)) {
+		if (!segment.isWordLike) continue;
+
+		if (wordIndex === options.wordCount) {
+			return input.slice(0, segment.index).trimEnd() + (options.trailer ?? '...');
+		}
+
+		wordIndex += 1;
 	}
 
-	const trailer = options.trailer ?? '...';
-
-	return words.slice(0, options.wordCount).join(' ') + trailer;
+	return input;
 }
 
 // Function to remove specified MDX components from text

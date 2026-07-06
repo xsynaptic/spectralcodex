@@ -57,8 +57,8 @@ function getSyncDataFunction({
 			options, // Note: if options handling changes ALL entries will be regenerated
 		});
 
-		// Does this entry already exist?
-		const existingEntry = store.get(filePath);
+		// Does this entry already exist? The store is keyed by id, not filePath
+		const existingEntry = store.get(id);
 
 		// If the data entry is already in the store and seems current, skip further processing
 		if (existingEntry?.digest === digest && existingEntry.filePath) {

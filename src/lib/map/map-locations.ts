@@ -27,14 +27,22 @@ function getRelativePath(url: string | undefined): string | undefined {
 	return new URL(url).pathname;
 }
 
-function getMapGeometryCoordinatesOptimized(coordinates: Position): [number, number] {
-	const truncatedCoordinates = coordinates.slice(0, 2).map((value) => Number(value.toFixed(6)));
+function getMapGeometryCoordinatesOptimized(
+	coordinates: Position,
+	featureId: string,
+): [number, number] {
+	const [lng, lat] = coordinates;
 
-	return [truncatedCoordinates[0] ?? 0, truncatedCoordinates[1] ?? 0];
+	// A malformed position must fail the build rather than ship a marker at null island
+	if (typeof lng !== 'number' || typeof lat !== 'number') {
+		throw new TypeError(`Malformed coordinates for map feature "${featureId}"`);
+	}
+
+	return [Number(lng.toFixed(6)), Number(lat.toFixed(6))];
 }
 
 // An alternative to using Turf's truncate function
-function getMapGeometryOptimized(geometry: MapGeometry) {
+function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	const geometryType = geometry.type;
 
 	switch (geometryType) {
@@ -43,14 +51,15 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
 				[MapDataKeysCompressed.GeometryCoordinates]: getMapGeometryCoordinatesOptimized(
 					geometry.coordinates,
+					featureId,
 				),
 			};
 		}
 		case GeometryTypeEnum.LineString: {
 			return {
 				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
-				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map(
-					getMapGeometryCoordinatesOptimized,
+				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map((position) =>
+					getMapGeometryCoordinatesOptimized(position, featureId),
 				),
 			};
 		}
@@ -58,7 +67,7 @@ function getMapGeometryOptimized(geometry: MapGeometry) {
 			return {
 				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
 				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map((ring) =>
-					ring.map(getMapGeometryCoordinatesOptimized),
+					ring.map((position) => getMapGeometryCoordinatesOptimized(position, featureId)),
 				),
 			};
 		}
@@ -209,7 +218,7 @@ export function getLocationsMapSourceData(
 				...(feature.properties.image === undefined
 					? {}
 					: { [MapDataKeysCompressed.HasImage]: true }),
-				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry)!,
+				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry, featureId)!,
 			};
 		})
 		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));

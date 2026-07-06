@@ -26,6 +26,14 @@ spectralcodex.com {
 		file_server
 	}
 
+	# Split by query presence so the no-query redirect never emits a bare trailing "?"
+	@no_trailing_slash_query {
+		path_regexp notrailq ^(.+[^/])$
+		not path_regexp \.[a-zA-Z0-9_-]+$
+		expression {query} != ''
+	}
+	redir @no_trailing_slash_query {re.notrailq.1}/?{query} 301
+
 	@no_trailing_slash {
 		path_regexp notrail ^(.+[^/])$
 		not path_regexp \.[a-zA-Z0-9_-]+$

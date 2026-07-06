@@ -42,7 +42,7 @@ export const getMapThemeIndexById = pMemoize(async () => {
 });
 
 // Drill into a coordinate position to the first [lng, lat] pair
-function getFirstLngLat(coordinates: unknown): [number, number] {
+function getFirstLngLat(coordinates: unknown, featureId: string): [number, number] {
 	let current: unknown = coordinates;
 	while (Array.isArray(current) && Array.isArray(current[0])) {
 		current = current[0];
@@ -50,7 +50,8 @@ function getFirstLngLat(coordinates: unknown): [number, number] {
 	if (Array.isArray(current) && typeof current[0] === 'number' && typeof current[1] === 'number') {
 		return [current[0], current[1]];
 	}
-	return [0, 0];
+	// A feature without a numeric pair must fail the build rather than bin a chunk at null island
+	throw new Error(`No numeric coordinate pair found for map feature "${featureId}"`);
 }
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
@@ -111,7 +112,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 	// Assign chunk keys by binning every feature, weighted by its serialized popup size
 	const chunkInputs = sourceData.map((sourceItem) => {
 		const id = sourceItem[MapDataKeysCompressed.Id];
-		const [lng, lat] = getFirstLngLat(coordinatesById.get(id));
+		const [lng, lat] = getFirstLngLat(coordinatesById.get(id), id);
 		const popupItem = popupById.get(id);
 		const popupBytes = popupItem ? Buffer.byteLength(JSON.stringify(popupItem)) : 0;
 

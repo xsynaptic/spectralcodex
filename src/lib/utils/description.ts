@@ -60,7 +60,7 @@ export async function getDescriptionRendered(entry: {
 
 	if (!source) return undefined;
 
-	const cacheKey = hashShort({ data: { id: entry.id, source, version: 2 } });
+	const cacheKey = hashShort({ data: { id: entry.id, source, version: 3 } });
 
 	const cached = await cacheInstance.get<DescriptionRendered>(cacheKey);
 
