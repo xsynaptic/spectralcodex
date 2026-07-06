@@ -36,9 +36,7 @@ export const MapSource: FC<
 	 */
 	return (
 		<>
-			{divisionData === false ? undefined : (
-				<MapSourceDivisions data={divisionData ?? EMPTY_FEATURE_COLLECTION} />
-			)}
+			<MapSourceDivisions data={divisionData ?? EMPTY_FEATURE_COLLECTION} />
 			<MapSourceLines data={lineStringCollection ?? EMPTY_FEATURE_COLLECTION} />
 			<MapSourcePoints
 				data={pointCollection ?? EMPTY_FEATURE_COLLECTION}

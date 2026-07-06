@@ -65,9 +65,16 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 		isDev,
 		children,
 	}) {
+		// Inline data without a key would collide across maps sharing this query name
+		if (data && dataKey === undefined && isDev) {
+			throw new Error(`[Map] ${name} inline data requires a dataKey`);
+		}
+
 		// eslint-disable-next-line @tanstack/query/exhaustive-deps -- parse/schema are stable per factory instance; the queryKey inputs fully determine the result
 		const query = useQuery<Array<TParsed> | undefined>({
-			queryKey: [name, apiUrl, dataKey ?? !!data, version, isDev],
+			queryKey: [name, apiUrl, dataKey ?? (data ? 'inline' : false), version, isDev],
+			// Inline data ships in the page HTML; persisting it to IndexedDB is pure overhead
+			meta: { persist: !data },
 			queryFn: async () => {
 				if (data) return parse(data);
 

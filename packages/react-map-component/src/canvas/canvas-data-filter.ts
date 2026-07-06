@@ -19,7 +19,6 @@ export interface MapFilterState {
 export interface MapCanvasData {
 	pointCollection: MapSourceFeatureCollection | undefined;
 	lineStringCollection: MapSourceFeatureCollection | undefined;
-	polygonCollection: MapSourceFeatureCollection | undefined;
 	filteredCount: number;
 	totalCount: number;
 }
@@ -92,7 +91,6 @@ export function getMapCanvasData(
 
 	const points: Array<MapSourceItemParsed> = [];
 	const lineStrings: Array<MapSourceItemParsed> = [];
-	const polygons: Array<MapSourceItemParsed> = [];
 
 	for (const item of scopedItems) {
 		if (!isLocationVisible(item.properties, filter)) continue;
@@ -106,8 +104,8 @@ export function getMapCanvasData(
 				lineStrings.push(item);
 				break;
 			}
+			// Polygons are not rendered anywhere yet; no collection is built for them
 			case GeometryTypeEnum.Polygon: {
-				polygons.push(item);
 				break;
 			}
 		}
@@ -116,8 +114,7 @@ export function getMapCanvasData(
 	return {
 		pointCollection: toFeatureCollection(points),
 		lineStringCollection: toFeatureCollection(lineStrings),
-		polygonCollection: toFeatureCollection(polygons),
-		// Polygons are not rendered yet; count only what is drawn
+		// Count only what is drawn
 		filteredCount: points.length + lineStrings.length,
 		totalCount: scopedItems.length,
 	};

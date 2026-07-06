@@ -15,6 +15,7 @@ import { MAP_INTERACTIVE_LAYER_IDS } from '../source/source-config';
 import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
+import { CanvasDataProvider } from './canvas-data';
 import { useMapCanvasEvents } from './canvas-events';
 import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
 import { MapPopup } from './canvas-popup';
@@ -175,7 +176,9 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(scope ? { scope } : {}),
 				}}
 			>
-				<MapCanvasContainer {...props} />
+				<CanvasDataProvider>
+					<MapCanvasContainer {...props} />
+				</CanvasDataProvider>
 			</MapStoreProvider>
 		</SourceDataContextProvider>
 	);

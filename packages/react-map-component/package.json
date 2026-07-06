@@ -5,7 +5,7 @@
 	"type": "module",
 	"exports": "./src/index.ts",
 	"private": true,
-	"devDependencies": {
+	"dependencies": {
 		"@protomaps/basemaps": "^5.7.2",
 		"@spectralcodex/shared": "workspace:*",
 		"@tanstack/react-query": "^5.101.2",
@@ -13,10 +13,6 @@
 		"@turf/bbox-polygon": "^7.3.5",
 		"@turf/difference": "^7.3.5",
 		"@turf/helpers": "^7.3.5",
-		"@types/geojson": "^7946.0.16",
-		"@types/react": "^19.2.17",
-		"@types/react-dom": "^19.2.3",
-		"astro": "^7.0.6",
 		"flatgeobuf": "^4.4.0",
 		"idb-keyval": "^6.2.6",
 		"maplibre-gl": "^5.24.0",
@@ -27,5 +23,11 @@
 		"remeda": "^2.38.0",
 		"zod": "^4.4.3",
 		"zustand": "^5.0.14"
+	},
+	"devDependencies": {
+		"@types/geojson": "^7946.0.16",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"astro": "^7.0.6"
 	}
 }

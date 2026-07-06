@@ -23,56 +23,52 @@ export function useMapApiDivisionData({
 	apiDivisionUrl,
 	isDev,
 }: Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'>) {
-	return useQuery<FeatureCollection<Polygon | MultiPolygon> | false>({
+	// Errors must propagate so React Query retries instead of caching a permanent empty result
+	return useQuery<FeatureCollection<Polygon | MultiPolygon>>({
 		queryKey: ['division-data', apiDivisionUrl, isDev],
 		queryFn: async () => {
-			if (!apiDivisionUrl) return false;
+			if (!apiDivisionUrl) throw new Error('[Map] Division data query enabled without a URL');
 
-			try {
-				// Fetch FlatGeobuf file
-				const response = await fetch(
-					apiDivisionUrl,
-					isDev ? {} : { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
-				);
-				if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
-				const arrayBuffer = await response.arrayBuffer();
+			// Fetch FlatGeobuf file
+			const response = await fetch(
+				apiDivisionUrl,
+				isDev ? {} : { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
+			);
+			if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
+			const arrayBuffer = await response.arrayBuffer();
 
-				// Convert ArrayBuffer to ReadableStream for FlatGeobuf
-				const uint8Array = new Uint8Array(arrayBuffer);
-				const stream = new ReadableStream({
-					start(controller) {
-						controller.enqueue(uint8Array);
-						controller.close();
-					},
-				});
+			// Convert ArrayBuffer to ReadableStream for FlatGeobuf
+			const uint8Array = new Uint8Array(arrayBuffer);
+			const stream = new ReadableStream({
+				start(controller) {
+					controller.enqueue(uint8Array);
+					controller.close();
+				},
+			});
 
-				// Deserialize FlatGeobuf to GeoJSON features
-				const featuresIterator = geojson.deserialize(stream);
-				const features: Array<Feature<Polygon | MultiPolygon>> = [];
+			// Deserialize FlatGeobuf to GeoJSON features
+			const featuresIterator = geojson.deserialize(stream);
+			const features: Array<Feature<Polygon | MultiPolygon>> = [];
 
-				for await (const feature of featuresIterator) {
-					if (
-						!R.isIncludedIn(feature.geometry.type, [
-							GeometryTypeEnum.MultiPolygon,
-							GeometryTypeEnum.Polygon,
-						])
-					) {
-						continue;
-					}
-
-					const invertedFeature = createFeatureMask(feature as Feature<Polygon | MultiPolygon>);
-
-					if (invertedFeature) features.push(invertedFeature);
+			for await (const feature of featuresIterator) {
+				if (
+					!R.isIncludedIn(feature.geometry.type, [
+						GeometryTypeEnum.MultiPolygon,
+						GeometryTypeEnum.Polygon,
+					])
+				) {
+					continue;
 				}
 
-				return {
-					type: 'FeatureCollection',
-					features,
-				} satisfies FeatureCollection<Polygon | MultiPolygon>;
-			} catch (error) {
-				console.warn('[Map] Failed to process FlatGeobuf division data:', error);
-				return false;
+				const invertedFeature = createFeatureMask(feature as Feature<Polygon | MultiPolygon>);
+
+				if (invertedFeature) features.push(invertedFeature);
 			}
+
+			return {
+				type: 'FeatureCollection',
+				features,
+			} satisfies FeatureCollection<Polygon | MultiPolygon>;
 		},
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,

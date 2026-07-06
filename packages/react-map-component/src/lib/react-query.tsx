@@ -1,7 +1,11 @@
 import type { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
 import type { PropsWithChildren } from 'react';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+	defaultShouldDehydrateQuery,
+	QueryClient,
+	QueryClientProvider,
+} from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { del, get, set } from 'idb-keyval';
 import { useState } from 'react';
@@ -54,6 +58,11 @@ export const ReactQueryProvider = ({ children, isDev, version }: ReactQueryProvi
 				persister: createIdbPersister('spectralcodex-map-data-cache'),
 				maxAge: TIME_24_HOURS,
 				...(version ? { buster: version } : {}),
+				dehydrateOptions: {
+					// Queries opting out via meta (inline data shipped in the HTML) skip IndexedDB
+					shouldDehydrateQuery: (query) =>
+						defaultShouldDehydrateQuery(query) && query.meta?.persist !== false,
+				},
 			}}
 		>
 			{children}

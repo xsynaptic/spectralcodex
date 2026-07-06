@@ -96,7 +96,7 @@ describe('isLocationVisible', () => {
 });
 
 describe('getMapCanvasData', () => {
-	test('partitions point, line, and polygon into their own collections', () => {
+	test('partitions point and line into their own collections; polygons build nothing', () => {
 		const result = getMapCanvasData(
 			[makeItem(), makeItem({}, lineGeometry), makeItem({}, polygonGeometry)],
 			passAll,
@@ -104,7 +104,7 @@ describe('getMapCanvasData', () => {
 
 		expect(result.pointCollection?.features).toHaveLength(1);
 		expect(result.lineStringCollection?.features).toHaveLength(1);
-		expect(result.polygonCollection?.features).toHaveLength(1);
+		expect('polygonCollection' in result).toBe(false);
 	});
 
 	test('filteredCount counts drawn features only; totalCount counts every survivor', () => {
@@ -135,7 +135,6 @@ describe('getMapCanvasData', () => {
 
 		expect(result.pointCollection).toBeUndefined();
 		expect(result.lineStringCollection).toBeUndefined();
-		expect(result.polygonCollection).toBeUndefined();
 		expect(result.filteredCount).toBe(0);
 		expect(result.totalCount).toBe(0);
 	});
