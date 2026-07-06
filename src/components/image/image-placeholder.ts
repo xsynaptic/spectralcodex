@@ -14,6 +14,11 @@ import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
 
+interface ImagePlaceholderCached {
+	hash: string;
+	dataUrl: string;
+}
+
 /**
  * Generate placeholder dimensions from aspect ratio and pixel budget
  */
@@ -54,7 +59,8 @@ async function generatePlaceholderDataUrl({
 
 /**
  * Get a placeholder for an image with specified aspect ratio
- * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality + mtime
+ * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality
+ * The stored mtime hash invalidates stale entries when the source image changes
  *
  * For source aspect ratio placeholders, pass the image's native width/height ratio
  * For cropped placeholders, pass the target display aspect ratio
@@ -96,14 +102,13 @@ async function createImagePlaceholderFunction() {
 				fit,
 				position,
 				highQuality,
-				mtime,
-				version: 1,
 			},
 		});
+		const contentHash = hash({ mtime, version: 1 });
 
-		const cached = await cache.get<string | undefined>(cacheKey);
+		const cached = await cache.get<ImagePlaceholderCached>(cacheKey);
 
-		if (cached) return cached;
+		if (cached?.hash === contentHash) return cached.dataUrl;
 
 		let imageBuffer: Buffer;
 
@@ -124,7 +129,10 @@ async function createImagePlaceholderFunction() {
 		});
 
 		if (placeholder) {
-			await cache.set(cacheKey, placeholder);
+			await cache.set(cacheKey, {
+				hash: contentHash,
+				dataUrl: placeholder,
+			} satisfies ImagePlaceholderCached);
 		}
 
 		return placeholder;

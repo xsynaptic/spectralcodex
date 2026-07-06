@@ -13,6 +13,10 @@ interface DescriptionRendered {
 	text: string;
 }
 
+interface DescriptionCached extends DescriptionRendered {
+	hash: string;
+}
+
 /**
  * Count of words to feed into the markdown transformer
  * This is buffered so any orphan markdown syntax falls outside the clip boundary
@@ -60,11 +64,15 @@ export async function getDescriptionRendered(entry: {
 
 	if (!source) return undefined;
 
-	const cacheKey = hashShort({ data: { id: entry.id, source, version: 3 } });
+	// Key by entry ID so edits overwrite the old row; the hash validates cached content
+	// MDX component names participate so render-affecting code changes self-invalidate
+	const sourceHash = hashShort({
+		data: { source, mdxComponents: MDX_COMPONENTS, version: 3 },
+	});
 
-	const cached = await cacheInstance.get<DescriptionRendered>(cacheKey);
+	const cached = await cacheInstance.get<DescriptionCached>(entry.id);
 
-	if (cached) return cached;
+	if (cached?.hash === sourceHash) return { html: cached.html, text: cached.text };
 
 	const rawHtml = renderMarkdownInline(source);
 
@@ -74,7 +82,7 @@ export async function getDescriptionRendered(entry: {
 
 	const rendered: DescriptionRendered = { html, text };
 
-	await cacheInstance.set(cacheKey, rendered);
+	await cacheInstance.set(entry.id, { hash: sourceHash, ...rendered } satisfies DescriptionCached);
 
 	return rendered;
 }

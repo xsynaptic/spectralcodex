@@ -130,10 +130,6 @@ export default defineConfig({
 				'@turf/truncate',
 			],
 		},
-		// Required since Astro 6.3; the prerender chunks runtime-import @keyv/sqlite which must be externalized
-		ssr: {
-			external: ['@keyv/sqlite', 'sqlite3', 'bindings'],
-		},
 	},
 	markdown: {
 		processor: satteri({

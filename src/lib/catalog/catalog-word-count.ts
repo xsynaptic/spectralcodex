@@ -13,6 +13,11 @@ import { stripMdxComponents } from '#lib/utils/text.ts';
 
 const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
 
+interface WordCountCached {
+	hash: string;
+	count: number;
+}
+
 /**
  * Generate word count from content body
  * Strips MDX components, transforms markdown to HTML, strips tags, then counts words
@@ -36,20 +41,22 @@ function computeWordCount(body: string): number {
 export async function getWordCount(
 	entry: CollectionEntry<CollectionKey>,
 ): Promise<number | undefined> {
-	const hashValue = hash({
+	// Key by entry ID so edits overwrite the old row; the hash validates cached content
+	// MDX component names participate so render-affecting code changes self-invalidate
+	const contentHash = hash({
 		data: {
-			id: entry.id,
 			body: entry.body,
 			description: 'description' in entry.data ? entry.data.description : '',
+			mdxComponents: MDX_COMPONENTS,
 			version: 1,
 		},
 	});
 
-	const cachedCount = await cacheInstance.get<number>(hashValue);
+	const cached = await cacheInstance.get<WordCountCached>(entry.id);
 
 	// Check cache first
-	if (cachedCount !== undefined) {
-		return cachedCount;
+	if (cached?.hash === contentHash) {
+		return cached.count;
 	}
 
 	// Compute and cache
@@ -65,7 +72,10 @@ export async function getWordCount(
 		wordCount = computeWordCount(entry.data.description);
 	}
 
-	await cacheInstance.set(hashValue, wordCount);
+	await cacheInstance.set(entry.id, {
+		hash: contentHash,
+		count: wordCount,
+	} satisfies WordCountCached);
 
 	return wordCount;
 }

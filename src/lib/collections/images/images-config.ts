@@ -57,6 +57,7 @@ type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
  * If your image library shifts around or changes a lot you can nuke the sqlite file in the cache folder
  */
 interface ImageMetadataCached {
+	hash: string;
 	width: number;
 	height: number;
 	exif?: ImageExifDataInput | undefined;
@@ -157,13 +158,14 @@ export const images = defineCollection({
 			await exiftool.end();
 		},
 		dataHandler: async ({ id, filePathRelative, modifiedTime }) => {
-			const cacheKey = hash({ filePath: filePathRelative, mtime: modifiedTime, version: 1 });
-			const cached = await imageMetadataCache.get<ImageMetadataCached>(cacheKey);
+			// Key by file path so re-edited images overwrite the old row; the hash validates mtime
+			const contentHash = hash({ mtime: modifiedTime?.getTime(), version: 1 });
+			const cached = await imageMetadataCache.get<ImageMetadataCached>(filePathRelative);
 
 			let dimensions: { width: number; height: number };
 			let exif: ImageExifDataInput | undefined;
 
-			if (cached) {
+			if (cached?.hash === contentHash) {
 				dimensions = { width: cached.width, height: cached.height };
 
 				if (cached.exif) exif = cached.exif;
@@ -171,7 +173,8 @@ export const images = defineCollection({
 				dimensions = await getImageDimensions(filePathRelative);
 				exif = await extractExifData(filePathRelative, exiftool);
 
-				await imageMetadataCache.set(cacheKey, {
+				await imageMetadataCache.set(filePathRelative, {
+					hash: contentHash,
 					...dimensions,
 					exif,
 				} satisfies ImageMetadataCached);

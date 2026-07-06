@@ -68,6 +68,8 @@ function generateCacheKey({
 				id: entry.id,
 				regions: entry.data.regions?.map(({ id }) => id),
 			})),
+			// Language codes are computed data, so changes to the map must invalidate the cache
+			regionLanguageMap: RegionLanguageMap,
 			version: 2,
 		},
 	});
