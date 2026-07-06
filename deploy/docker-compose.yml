@@ -271,6 +271,9 @@ services:
       - ALERT_EMAIL_FROM=${ALERT_EMAIL_FROM:-}
       - ALERT_ALWAYS=${ALERT_ALWAYS:-}
       - ALERT_MIN_FAILURES=${ALERT_MIN_FAILURES:-1}
+      # One-off test knobs; pass at run time (docker compose run -e), never set in .env
+      - SKIP_PURGE=${SKIP_PURGE:-}
+      - WARM_LIMIT=${WARM_LIMIT:-}
     networks:
       - warmer
     logging:

@@ -127,15 +127,22 @@ async function getSitemapUrls(): Promise<Array<string>> {
 	return urls;
 }
 
-async function getMapUrls(): Promise<Array<string>> {
+interface MapUrlsResult {
+	urls: Array<string>;
+	skipReason?: string;
+}
+
+// A skipped manifest silently unwarms /api/map/*, so the reason must reach the run report
+async function getMapUrls(): Promise<MapUrlsResult> {
 	try {
 		const paths = JSON.parse(
 			await fetchText(`${SITE_URL}/api/map/map-manifest.json`),
 		) as Array<string>;
-		return paths.map((path) => new URL(path, SITE_URL).href);
+		return { urls: paths.map((path) => new URL(path, SITE_URL).href) };
 	} catch (error) {
-		console.log(`Skipping map URLs: ${messageOf(error)}`);
-		return [];
+		const skipReason = messageOf(error);
+		console.log(`Skipping map URLs: ${skipReason}`);
+		return { urls: [], skipReason };
 	}
 }
 
@@ -181,9 +188,15 @@ interface Stats {
 
 function record(stats: Stats, result: WarmResult): void {
 	stats.total++;
+
 	const key = result.status === 0 ? 'ERR' : String(result.status);
+
 	stats.counts.set(key, (stats.counts.get(key) ?? 0) + 1);
-	if (result.status !== 200) stats.failures.push(result);
+
+	// Redirects are legitimate (moved pages, trailing slashes); only 4xx/5xx/network fail
+	const isRedirect = result.status >= 300 && result.status < 400;
+
+	if (result.status !== 200 && !isRedirect) stats.failures.push(result);
 }
 
 function failureLine(result: WarmResult): string {
@@ -205,6 +218,8 @@ function summarize(label: string, stats: Stats): string {
 		.map(([key, count]) => {
 			if (key === '200') return `${String(count)} ok`;
 			if (key === 'ERR') return `${String(count)} network error`;
+			const status = Number(key);
+			if (status >= 300 && status < 400) return `${String(count)} redirected (HTTP ${key})`;
 			return `${String(count)} HTTP ${key}`;
 		})
 		.join(', ');
@@ -332,16 +347,18 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 interface RunReport {
 	phases: Array<[string, Stats]>;
 	failures: Array<WarmResult>;
+	notes: Array<string>;
 	retriedCount: number;
 	totalUrls: number;
 	seconds: string;
 }
 
 async function sendRunReport(run: RunReport): Promise<void> {
-	const { phases, failures, retriedCount, totalUrls, seconds } = run;
+	const { phases, failures, notes, retriedCount, totalUrls, seconds } = run;
 
 	if (failures.length > 0) process.exitCode = 2;
-	if (failures.length < ALERT_MIN_FAILURES && !ALERT_ALWAYS) return;
+	// Notes (like a skipped map manifest) force the digest even on a clean run
+	if (failures.length < ALERT_MIN_FAILURES && notes.length === 0 && !ALERT_ALWAYS) return;
 
 	const hasFailures = failures.length > 0;
 	const retryNote =
@@ -354,15 +371,19 @@ async function sendRunReport(run: RunReport): Promise<void> {
 	if (failures.length > MAX_ALERT_FAILURES) {
 		failureLines.push(`  (+${String(failures.length - MAX_ALERT_FAILURES)} more)`);
 	}
-	const subject = hasFailures
-		? `[SpectralCodex] cache warm: ${String(failures.length)} failed`
-		: `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
+	let subject = `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
+	if (hasFailures) {
+		subject = `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
+	} else if (notes.length > 0) {
+		subject = '[SpectralCodex] cache warm: completed with warnings';
+	}
 	const body = [
 		hasFailures
 			? `${String(failures.length)} of ${String(totalUrls)} URLs failed to warm${retryNote}`
 			: `All ${String(totalUrls)} URLs warmed${retryNote}`,
 		'',
 		...phases.map(([label, stats]) => summarize(label, stats)),
+		...notes,
 		...failureLines,
 		'',
 		`Duration: ${seconds}s`,
@@ -388,13 +409,17 @@ async function main(): Promise<void> {
 	report('Pages', pageStats);
 	phases.push(['Pages', pageStats]);
 
-	const mapUrls = await getMapUrls();
+	const notes: Array<string> = [];
+	const mapResult = await getMapUrls();
+	if (mapResult.skipReason !== undefined) {
+		notes.push(`Map URLs skipped: ${mapResult.skipReason}`);
+	}
 	console.log(
-		`Warming ${String(assets.size)} images/assets + ${String(mapUrls.length)} map URLs...`,
+		`Warming ${String(assets.size)} images/assets + ${String(mapResult.urls.length)} map URLs...`,
 	);
 	// Fonts (and any images) referenced from CSS only surface once the CSS itself is warmed
 	const cssAssets = new Set<string>();
-	const assetStats = await warmAll(chain(assets, mapUrls), cssAssets);
+	const assetStats = await warmAll(chain(assets, mapResult.urls), cssAssets);
 	report('Assets', assetStats);
 	phases.push(['Assets', assetStats]);
 
@@ -421,7 +446,14 @@ async function main(): Promise<void> {
 	const seconds = ((Date.now() - start) / 1000).toFixed(1);
 	console.log(`Done in ${seconds}s`);
 
-	await sendRunReport({ phases, failures, retriedCount: firstFailures.length, totalUrls, seconds });
+	await sendRunReport({
+		phases,
+		failures,
+		notes,
+		retriedCount: firstFailures.length,
+		totalUrls,
+		seconds,
+	});
 }
 
 try {

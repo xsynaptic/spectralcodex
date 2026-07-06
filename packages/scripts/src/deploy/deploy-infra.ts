@@ -92,13 +92,14 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 		{
 			config,
 			dryRun,
-			extraFlags: ['--mkpath'],
+			extraFlags: ['--mkpath', '--delete'],
 		},
 	);
 	await rsyncTo(`${deployDir}/cache-warmer/`, `${config.remoteHost}:${remotePath}/cache-warmer/`, {
 		config,
 		dryRun,
-		extraFlags: ['--mkpath'],
+		excludes: ['node_modules'],
+		extraFlags: ['--mkpath', '--delete', '--delete-excluded'],
 	});
 
 	if (dryRun) {

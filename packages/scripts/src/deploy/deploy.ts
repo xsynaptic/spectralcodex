@@ -106,12 +106,18 @@ async function caddy() {
 }
 
 async function healthCheck() {
-	console.log(chalk.blue(`Health check: ${config.siteUrl}`));
-	const response = await fetch(config.siteUrl);
-	if (!response.ok) {
-		throw new Error(`Health check failed: ${String(response.status)} ${response.statusText}`);
+	// Unique query busts the Cloudflare cache key so checks reach the origin, not a stale edge copy
+	const cacheBust = `deploy-check=${Date.now().toString()}`;
+	const baseUrl = config.siteUrl.replace(/\/$/, '');
+	const urls = [`${baseUrl}/?${cacheBust}`, `${baseUrl}/api/map/map-manifest.json?${cacheBust}`];
+	for (const url of urls) {
+		console.log(chalk.blue(`Health check: ${url}`));
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`Health check failed: ${String(response.status)} ${response.statusText}`);
+		}
 	}
-	console.log(chalk.green(`Health check passed (${String(response.status)})`));
+	console.log(chalk.green('Health check passed'));
 }
 
 try {
