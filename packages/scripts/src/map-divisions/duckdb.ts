@@ -48,6 +48,7 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 	let query = `
 		SELECT
 			id,
+			division_id,
 			ST_AsGeoJSON(geometry) as geometry_geojson
 		FROM read_parquet('${baseUrl.replace(/\/$/, '')}/theme=divisions/type=division_area/*', hive_partitioning=1)`;
 
@@ -62,13 +63,12 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 		);
 	}
 
-	if (divisionIds.size === 1) {
-		const id = [...divisionIds][0] ?? '';
-		conditions.push(`id = '${id}'`);
-	} else {
-		const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
-		conditions.push(`id IN (${quotedIds})`);
-	}
+	// Exclude maritime areas; coastal divisions have a second territorial-waters polygon
+	conditions.push(`class = 'land'`);
+
+	// Match division_area IDs (legacy content) and division IDs (what the Explorer provides in 2026)
+	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
+	conditions.push(`(id IN (${quotedIds}) OR division_id IN (${quotedIds}))`);
 
 	query += `
 		WHERE ${conditions.join('\n\t\t\tAND ')}`;
@@ -135,17 +135,17 @@ export async function fetchDivisionData({
 		console.log(chalk.green(`Found ${chalk.cyan(String(result.rowCount))} rows`));
 
 		// Extract data from DuckDB result using getChunk
-		const rows: Array<Record<string, unknown>> = [];
+		const rows: Array<{ areaId: string; parentDivisionId: string; geometryGeojson: string }> = [];
 
 		for (let i = 0; i < result.chunkCount; i++) {
 			const chunk = result.getChunk(i);
 			const rowArrays = chunk.getRows();
 
-			// With simplified query, we only have 2 columns: id (col_0) and geometry_geojson (col_1)
 			for (const row of rowArrays) {
 				rows.push({
-					id: row[0],
-					geometry_geojson: row[1],
+					areaId: row[0] as string,
+					parentDivisionId: row[1] as string,
+					geometryGeojson: row[2] as string,
 				});
 			}
 		}
@@ -160,7 +160,8 @@ export async function fetchDivisionData({
 
 		// Process fetched data and add to cache
 		for (const [index, row] of rows.entries()) {
-			const id = (row.id ?? row.col_0) as string;
+			// Key results and cache by the ID from content, whichever column it matched
+			const id = uncachedDivisionIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
 
 			// Log found matches for debugging
 			console.log(chalk.gray(`  Match ${chalk.cyan(String(index + 1))}: ${chalk.cyan(id)}`));
@@ -169,9 +170,7 @@ export async function fetchDivisionData({
 			let geometry: Geometry | undefined;
 
 			try {
-				const geometryJson = (row.geometry_geojson ?? row.col_1) as string;
-
-				geometry = JSON.parse(geometryJson) as Geometry;
+				geometry = JSON.parse(row.geometryGeojson) as Geometry;
 			} catch (error) {
 				console.warn(chalk.yellow(`Failed to parse geometry for ${chalk.cyan(id)}:`), error);
 				geometry = undefined;
