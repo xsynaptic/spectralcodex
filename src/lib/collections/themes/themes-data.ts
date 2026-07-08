@@ -1,13 +1,11 @@
-import { getCollection } from 'astro:content';
-
-import { createCollectionData } from '#lib/utils/collections.ts';
+import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
 
 export const getThemesCollection = createCollectionData({
 	collection: 'themes',
 	label: 'Themes',
 	async mutate(entries) {
-		const locations = await getCollection('locations');
-		const posts = await getCollection('posts');
+		const locations = await getRawCollection('locations');
+		const posts = await getRawCollection('posts');
 
 		const locationsByThemeMap = new Map<string, Array<string>>();
 

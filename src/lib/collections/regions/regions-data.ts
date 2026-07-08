@@ -1,5 +1,4 @@
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
-import { getCollection } from 'astro:content';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 
@@ -14,7 +13,7 @@ import {
 	populateRegionsHierarchy,
 	populateRegionsLangCode,
 } from '#lib/collections/regions/regions-factory.ts';
-import { createCollectionData } from '#lib/utils/collections.ts';
+import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
 
 export { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
 
@@ -26,8 +25,8 @@ export const getRegionsCollection = createCollectionData({
 	async extend(entries) {
 		const extendStart = performance.now();
 
-		const locations = await getCollection('locations');
-		const posts = await getCollection('posts');
+		const locations = await getRawCollection('locations');
+		const posts = await getRawCollection('posts');
 
 		// The tree is needed even on cache hit
 		const regionsTree = createRegionsTree(entries);

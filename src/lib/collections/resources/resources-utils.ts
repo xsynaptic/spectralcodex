@@ -8,7 +8,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -165,11 +165,7 @@ export async function createQueryResourcesEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
 			chunkKeyById,
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? {
-						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
-					}
-				: {}),
+			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
 		return { catalogItems, mapData };

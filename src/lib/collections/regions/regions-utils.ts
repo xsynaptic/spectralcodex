@@ -12,7 +12,7 @@ import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts'
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -160,11 +160,7 @@ export async function createQueryRegionsEntryFunction() {
 			locationCount: entryLocations.length,
 			chunkKeyById,
 			...(regionInterval ? { scope: { type: 'region', interval: regionInterval } } : {}),
-			...(entry.data._langCode?.startsWith('zh')
-				? {
-						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
-					}
-				: {}),
+			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {
 						apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`),

@@ -8,7 +8,7 @@ import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -55,11 +55,7 @@ export async function createQueryPostsEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(postLocations),
 			locationCount: postLocations.length,
 			chunkKeyById,
-			...(regionPrimary?.data._langCode?.startsWith('zh')
-				? {
-						languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional],
-					}
-				: {}),
+			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
 		const backlinks = catalog.backlinksOf(entry.id);

@@ -1,6 +1,4 @@
-import { getCollection } from 'astro:content';
-
-import { createCollectionData } from '#lib/utils/collections.ts';
+import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
 
 /**
  * Match a given string against a match pattern (either a single string or an array of strings)
@@ -22,8 +20,8 @@ export const getResourcesCollection = createCollectionData({
 	collection: 'resources',
 	label: 'Resources',
 	async mutate(entries) {
-		const locations = await getCollection('locations');
-		const posts = await getCollection('posts');
+		const locations = await getRawCollection('locations');
+		const posts = await getRawCollection('posts');
 
 		for (const entry of entries) {
 			const resourceId = entry.id;

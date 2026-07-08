@@ -57,7 +57,10 @@ type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
 	entriesMap: Map<string, CollectionEntry<K>>,
 ) => Promise<A> | A;
 
-// Factory function to create memoized collection data
+// Factory for memoized, enriched collection data
+// mutate() stamps computed `_` fields onto entry.data in place; extend() derives collection-level artifacts
+// Ordering contract: raw reads via getRawCollection() see pristine frontmatter, never computed `_` fields
+// A bypass that observes a computed field depends on which wrapper ran first; that order is not guaranteed
 export function createCollectionData<K extends CollectionKey, A extends object = object>(config: {
 	collection: K;
 	label?: string;
@@ -97,6 +100,33 @@ export function createCollectionData<K extends CollectionKey, A extends object =
 
 		return result;
 	};
+}
+
+// Explicit raw read for cross-collection assembly; bypasses the enriched wrappers to avoid circular init
+// Per the ordering contract above: use for pristine frontmatter only, never computed `_` fields
+const rawCollectionPromises = new Map<
+	CollectionKey,
+	Promise<Array<CollectionEntry<CollectionKey>>>
+>();
+
+export async function getRawCollection<K extends CollectionKey>(
+	collection: K,
+): Promise<Array<CollectionEntry<K>>> {
+	let promise = rawCollectionPromises.get(collection);
+
+	if (!promise) {
+		promise = getCollection(collection);
+		rawCollectionPromises.set(collection, promise);
+	}
+
+	const entries = (await promise) as Array<CollectionEntry<K>>;
+
+	// Mirror createCollectionData: evict an empty dev load so the content store can recover next call
+	if (import.meta.env.DEV && entries.length === 0) {
+		rawCollectionPromises.delete(collection);
+	}
+
+	return entries;
 }
 
 // Factory function to create a lookup function for collection entries by ID

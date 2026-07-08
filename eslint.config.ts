@@ -1,7 +1,12 @@
 import type { ESLint } from 'eslint';
 
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
-import { getAstroConfig, getConfig, getWebComponentConfig } from '@xsynaptic/eslint-config';
+import {
+	getAstroConfig,
+	getConfig,
+	getWebComponentConfig,
+	restrictedSyntaxDefaults,
+} from '@xsynaptic/eslint-config';
 import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
@@ -26,6 +31,8 @@ export default getConfig(
 		},
 		{
 			rules: {
+				// Ban logical-assignment shorthand (??=, ||=, &&=); the expanded form reads more clearly
+				'logical-assignment-operators': ['error', 'never'],
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
@@ -63,6 +70,22 @@ export default getConfig(
 				'perfectionist/sort-switch-case': 'off',
 				'perfectionist/sort-union-types': 'off',
 				'perfectionist/sort-variable-declarations': 'off',
+			},
+		},
+		// Foreign collections are read through getRawCollection() from utils/collections.ts
+		// Direct getCollection() here bypasses the raw-vs-enriched access path and its ordering contract
+		{
+			files: ['src/lib/collections/**/*.ts'],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntaxDefaults,
+					{
+						message:
+							'Use getRawCollection() from #lib/utils/collections.ts instead of getCollection() inside src/lib/collections.',
+						selector: "CallExpression[callee.name='getCollection']",
+					},
+				],
 			},
 		},
 		/**

@@ -172,6 +172,8 @@ async function loadCatalog(): Promise<Catalog> {
 }
 
 export async function getCatalog(): Promise<Catalog> {
-	catalogInstance ??= loadCatalog();
+	if (!catalogInstance) {
+		catalogInstance = loadCatalog();
+	}
 	return catalogInstance;
 }

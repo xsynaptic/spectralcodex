@@ -13,6 +13,13 @@ export function isCjkLanguage(lang: LanguageCode): boolean {
 	return CJK_LANGUAGES.has(lang);
 }
 
+// Map data shows English + Traditional Chinese for zh-language regions
+export function getMapLanguages(langCode: string | undefined) {
+	return langCode?.startsWith('zh')
+		? { languages: [LanguageCodeEnum.English, LanguageCodeEnum.ChineseTraditional] }
+		: {};
+}
+
 interface MultilingualContentOptions {
 	data: Record<string, unknown> | undefined;
 	prop: string;

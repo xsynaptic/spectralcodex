@@ -340,7 +340,14 @@ export function createArchivesData(
 
 			if (!tierHasData(tier)) continue;
 
-			(archivesYearlyData[year] ??= []).push({
+			let yearData = archivesYearlyData[year];
+
+			if (!yearData) {
+				yearData = [];
+				archivesYearlyData[year] = yearData;
+			}
+
+			yearData.push({
 				...month.raw,
 				highlights: monthlyHighlightsById.get(month.raw.id),
 				...getBucketCounts(month),

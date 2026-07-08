@@ -1,7 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { hashShort } from '@spectralcodex/shared/cache';
-import { getCollection } from 'astro:content';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 
 import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
@@ -14,7 +13,7 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
+import { createCollectionData, getPublicId, getRawCollection } from '#lib/utils/collections.ts';
 import { getDescription, getDescriptionRendered } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -122,7 +121,7 @@ export const getLocationsCollection = createCollectionData({
 			? entries
 			: entries.filter((location) => !location.data.hideLocation);
 
-		const posts = await getCollection('posts');
+		const posts = await getRawCollection('posts');
 		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
 		const generateNearbyItems = createGenerateNearbyItemsFunction(locationsFiltered);
 
