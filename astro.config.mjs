@@ -127,6 +127,8 @@ export default defineConfig({
 				'@turf/distance',
 				'@turf/helpers',
 				'@turf/truncate',
+				// UMD dist under a "type": "module" package; force pre-bundling so a default export exists
+				'maplibre-gl',
 			],
 		},
 	},
