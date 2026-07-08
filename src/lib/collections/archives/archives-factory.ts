@@ -35,12 +35,17 @@ interface ArchivesData {
 	archivesMonths: Record<string, Array<string>>;
 }
 
-function getDateData(date: Date): ArchivesDateData {
+// Content dates are UTC instants; bucket in UTC so archive membership matches displayed dates
+export function getDateData(date: Date): ArchivesDateData {
 	return {
 		date,
-		month: String(date.getMonth() + 1).padStart(2, '0'),
-		year: String(date.getFullYear()).padStart(4, '0'),
+		month: String(date.getUTCMonth() + 1).padStart(2, '0'),
+		year: String(date.getUTCFullYear()).padStart(4, '0'),
 	};
+}
+
+export function getMonthName(date: Date): string {
+	return date.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });
 }
 
 function getOrCreateMonthData(archiveDataMap: ArchivesDataMap, dateData: ArchivesDateData) {
@@ -51,7 +56,7 @@ function getOrCreateMonthData(archiveDataMap: ArchivesDataMap, dateData: Archive
 	const yearMap = archiveDataMap.get(dateData.year)!;
 
 	if (!yearMap.has(dateData.month)) {
-		const monthName = dateData.date.toLocaleDateString('en-US', { month: 'long' });
+		const monthName = getMonthName(dateData.date);
 
 		yearMap.set(dateData.month, {
 			id: `${dateData.year}/${dateData.month}`,

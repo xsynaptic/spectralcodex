@@ -214,7 +214,7 @@ const translationStrings = {
 		// Author
 		'author.name': 'Alexander Synaptic',
 		'author.role': 'Curator',
-		'author.description': `I am a web application developer, photojournalist, urban explorer, and history enthusiast passionate about the open web and documenting my experiences on this planet. This project was founded in the early 2010s and has evolved into a sort of personal Wikipedia of places that interest me (and often the photographs I've taken there). I'm originally from Toronto, Canada, but spend most of my time residing in [Taiwan](/regions/taiwan]).`,
+		'author.description': `I am a web application developer, photojournalist, urban explorer, and history enthusiast passionate about the open web and documenting my experiences on this planet. This project was founded in the early 2010s and has evolved into a sort of personal Wikipedia of places that interest me (and often the photographs I've taken there). I'm originally from Toronto, Canada, but spend most of my time residing in [Taiwan](/regions/taiwan/).`,
 		'author.photo.alt': 'Profile photo of Alexander Synaptic, founder of Spectral Codex',
 
 		// 404

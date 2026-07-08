@@ -78,9 +78,10 @@ function extractRecordedDates(value: unknown): Array<Date> {
 	return dates;
 }
 
-function getArchivePeriodKeys(date: Date): Array<string> {
-	const year = String(date.getFullYear()).padStart(4, '0');
-	const month = String(date.getMonth() + 1).padStart(2, '0');
+// Content dates are UTC instants; key periods in UTC so buckets match displayed dates
+export function getArchivePeriodKeys(date: Date): Array<string> {
+	const year = String(date.getUTCFullYear()).padStart(4, '0');
+	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
 
 	return [year, `${year}-${month}`];
 }

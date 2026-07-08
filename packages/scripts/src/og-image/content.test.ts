@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import type { OpenGraphContentEntry } from './types';
 
-import { buildIndexEntries, extractBuiltFilenames, resolveEntry } from './content';
+import { buildIndexEntries, extractBuiltFilenames, resolveEntry, resolveOgRegions } from './content';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {
@@ -127,6 +127,47 @@ describe('resolveEntry', () => {
 			expect(resolve(filename)).toBeUndefined();
 		},
 	);
+});
+
+function makeRegionRefs(ids: Array<string>) {
+	return ids.map((id) => ({ id, collection: ContentCollectionsEnum.Regions }));
+}
+
+describe('resolveOgRegions', () => {
+	test('resolves raw regions when there is no override', () => {
+		expect(resolveOgRegions({ regions: makeRegionRefs(['taipei']) })).toEqual(['taipei']);
+	});
+
+	test('override regions win over raw regions', () => {
+		expect(
+			resolveOgRegions({
+				regions: makeRegionRefs(['taipei']),
+				override: { regions: makeRegionRefs(['taiwan']) },
+			}),
+		).toEqual(['taiwan']);
+	});
+
+	test('an override without regions falls back to raw regions', () => {
+		expect(
+			resolveOgRegions({
+				regions: makeRegionRefs(['taipei']),
+				override: { title: 'Sanitized Title' },
+			}),
+		).toEqual(['taipei']);
+	});
+
+	test('an empty override regions array falls back to raw regions', () => {
+		expect(
+			resolveOgRegions({
+				regions: makeRegionRefs(['taipei']),
+				override: { regions: [] },
+			}),
+		).toEqual(['taipei']);
+	});
+
+	test('returns undefined when nothing is set', () => {
+		expect(resolveOgRegions({})).toBeUndefined();
+	});
 });
 
 describe('extractBuiltFilenames', () => {

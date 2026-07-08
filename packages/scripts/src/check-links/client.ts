@@ -36,8 +36,12 @@ export async function checkUrl(row: UrlRow): Promise<CheckResult> {
 
 		// Fall back to GET if HEAD is not allowed or blocked
 		if (response.status === 405 || response.status === 403) {
+			void response.body?.cancel();
 			response = await fetchWithTimeout(row.url, 'GET');
 		}
+
+		// Status/headers are all we read; cancel the body so undici releases the connection
+		void response.body?.cancel();
 
 		// Redirect; capture the real status code and Location header
 		if (response.status >= 300 && response.status < 400) {

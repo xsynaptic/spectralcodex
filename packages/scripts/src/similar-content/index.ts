@@ -10,9 +10,11 @@ import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { DataStoreEntry } from '../shared/data-store.js';
+import type { SimilarContentMetadata } from './metadata.js';
 
 import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
+import { calculateMetadataBoost, toReferenceIdArray } from './metadata.js';
 
 const rootPath = findWorkspaceRoot();
 
@@ -68,11 +70,6 @@ interface ContentEntry extends DataStoreEntry {
 	collection: string;
 }
 
-interface SimilarContentMetadata {
-	themes: Array<string>;
-	regions: Array<string>;
-}
-
 interface SimilarContentEmbedding {
 	id: string;
 	digest: string;
@@ -116,37 +113,9 @@ function cleanContent(body: string, data: Record<string, unknown>): string {
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
 }
 
-function toStringArray(value: unknown): Array<string> {
-	if (Array.isArray(value)) return value.map(String);
-	if (typeof value === 'string') return [value];
-	return [];
-}
-
-const boostTheme = 0.15; // weight per shared theme
-const boostRegion = 0.1; // weight per shared region
-const boostLimit = 0.3; // ceiling on the combined boost
-
-/**
- * Boost from shared taxonomy
- */
-function calculateMetadataBoost(
-	current: SimilarContentEmbedding,
-	other: SimilarContentEmbedding,
-): number {
-	const currentThemes = new Set(current.metadata.themes);
-	const sharedThemes = other.metadata.themes.filter((theme) => currentThemes.has(theme));
-
-	const currentRegions = new Set(current.metadata.regions);
-	const sharedRegions = other.metadata.regions.filter((region) => currentRegions.has(region));
-
-	const boost = sharedThemes.length * boostTheme + sharedRegions.length * boostRegion;
-
-	return Math.min(boost, boostLimit);
-}
-
 // Cache is keyed by model and character limit so changing either invalidates it
 function getCacheNamespace(): string {
-	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}`;
+	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
 }
 
 /**
@@ -190,8 +159,8 @@ async function generateEmbeddings(
 					digest: entry.digest,
 					collection: entry.collection,
 					metadata: {
-						themes: toStringArray(entry.data.themes),
-						regions: toStringArray(entry.data.regions),
+						themes: toReferenceIdArray(entry.data.themes),
+						regions: toReferenceIdArray(entry.data.regions),
 					},
 					vector,
 				};

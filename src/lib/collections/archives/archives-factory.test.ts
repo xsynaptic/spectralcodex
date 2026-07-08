@@ -3,7 +3,11 @@ import { describe, expect, test } from 'vitest';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
-import { createArchivesData } from '#lib/collections/archives/archives-factory.ts';
+import {
+	createArchivesData,
+	getDateData,
+	getMonthName,
+} from '#lib/collections/archives/archives-factory.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
@@ -237,5 +241,27 @@ describe('createArchivesData', () => {
 		);
 
 		expect(ids(atThreshold.archivesIndexData['2024']?.created ?? [])).toEqual(['q3']);
+	});
+});
+
+describe('getDateData', () => {
+	test('buckets a late-evening UTC instant in its UTC month', () => {
+		expect(getDateData(new Date('2024-05-31T20:00:00Z'))).toMatchObject({
+			month: '05',
+			year: '2024',
+		});
+	});
+
+	test('buckets UTC midnight at a month boundary in the new month', () => {
+		expect(getDateData(new Date('2024-06-01T00:00:00Z'))).toMatchObject({
+			month: '06',
+			year: '2024',
+		});
+	});
+});
+
+describe('getMonthName', () => {
+	test('names the UTC month regardless of local timezone', () => {
+		expect(getMonthName(new Date('2024-05-31T20:00:00Z'))).toBe('May');
 	});
 });

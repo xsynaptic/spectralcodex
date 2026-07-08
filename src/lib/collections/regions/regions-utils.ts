@@ -4,7 +4,7 @@ import * as R from 'remeda';
 
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
-import { MAP_DIVISION_DATA_PATH } from '#constants.ts';
+import { MAP_DISPLAY_REGION_IDS, MAP_DIVISION_DATA_PATH } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
@@ -117,15 +117,12 @@ export async function createQueryRegionsEntryFunction() {
 	const { chunkKeyById } = await getMapIndexData();
 	const { regionsTree } = await getRegionsCollection();
 
-	// Note: this is temporary code to limit map display to specified regions
-	const displayRegionMapIds = new Set(['taiwan', 'hong-kong', 'thailand', 'vietnam', 'canada']);
-
 	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
 		const ancestors = getRegionAncestors(entry);
 
 		const showRegionMap =
-			displayRegionMapIds.has(entry.id) ||
-			ancestors.some((ancestor) => displayRegionMapIds.has(ancestor.id));
+			MAP_DISPLAY_REGION_IDS.has(entry.id) ||
+			ancestors.some((ancestor) => MAP_DISPLAY_REGION_IDS.has(ancestor.id));
 
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
 		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);

@@ -40,6 +40,15 @@ export const MAP_GEOMETRY_COORDINATES_PRECISION = 6;
 // Public folder for map division data
 export const MAP_DIVISION_DATA_PATH = 'divisions';
 
+// Root regions (self or ancestor) whose pages display maps; content policy, edit deliberately
+export const MAP_DISPLAY_REGION_IDS = new Set([
+	'taiwan',
+	'hong-kong',
+	'thailand',
+	'vietnam',
+	'canada',
+]);
+
 /**
  * MDX
  */

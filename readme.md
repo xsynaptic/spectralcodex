@@ -86,23 +86,38 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Self-hosted [Umami](https://umami.is/) site analytics monitoring web vitals performance metrics
 - Custom event tracking for search queries, map filter changes, dark mode toggling, and image metadata interactions
 
+## Development
+
+Requirements: current Node LTS, pnpm 11 (see the `packageManager` field in `package.json`), and Docker Desktop (`pnpm dev` boots an imagor/nginx image stack alongside the Astro dev server).
+
+```sh
+pnpm install
+cp .env.example .env
+pnpm dev
+```
+
+Without a private content checkout the site runs against the demo content in `packages/content-demo`; leaving the content path variables unset in `.env` defaults there, which is what makes this public repository runnable as-is.
+
+Install the git hooks once with `pnpm exec lefthook install`. The pre-push hook runs `pnpm check`, the repository's quality gate (stylelint, prettier, eslint, types, `astro check`, knip, vitest), which can also be run standalone.
+
 ## Build & Deployment
 
 Deployment is handled by custom TypeScript scripts. These are specific to this project's infrastructure but demonstrate some useful patterns. The full pipeline runs:
 
-1. Content sync and validation
-2. Redirect generation from former content IDs
-3. Related content generation (semantic similarity)
-4. OG image generation with Satori and Sharp
-5. Astro production build
-6. E2E smoke tests
-7. Image cache warming manifest generation from built HTML
-8. Media sync to remote storage
-9. Static file transfer via rsync
-10. OG image deployment
-11. Caddy config and TLS cert sync with reload
-12. CDN cache purge (Cloudflare)
-13. New image cache warming
+1. Astro content sync (builds the data store later steps read)
+2. Content validation
+3. Redirect generation from former content IDs
+4. Related content generation (semantic similarity)
+5. Sitemap `lastmod` generation from git commit history
+6. Astro production build
+7. OG image generation with Satori and Sharp (reads built HTML)
+8. E2E smoke tests
+9. Media sync to remote storage
+10. Static file transfer via rsync
+11. OG image deployment
+12. Caddy config and TLS cert sync with reload
+13. Health check against the live site
+14. CDN cache purge and image cache warming (detached run on the server)
 
 The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
 

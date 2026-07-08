@@ -18,6 +18,19 @@ import { extractImageFeaturedIds } from '../shared/images.js';
 import { buildArchiveImageIndex, getArchivesTitle } from './archives.js';
 import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
 
+// Sensitive locations present override regions; fallback imagery must not leak the true region
+export function resolveOgRegions(data: Record<string, unknown>): Array<string> | undefined {
+	const override = z
+		.object({ regions: RegionsSchema.optional() })
+		.optional()
+		.catch(undefined)
+		.parse(data.override);
+
+	if (override?.regions && override.regions.length > 0) return override.regions;
+
+	return RegionsSchema.optional().parse(data.regions);
+}
+
 function getImageFeaturedData({
 	entry,
 	collection,
@@ -48,7 +61,7 @@ function getImageFeaturedData({
 				? getDataStoreRegionParentsById(
 						collection === ContentCollectionsEnum.Regions
 							? z.string().optional().parse(entry.data.parent)
-							: RegionsSchema.optional().parse(entry.data.regions)?.[0],
+							: resolveOgRegions(entry.data)?.[0],
 						regionParentMap,
 					)
 				: undefined,
