@@ -62,7 +62,7 @@ function getImageFeaturedData({
  * Static metadata for index pages (homepage, not-found, per-collection
  * landings), keyed by the OG image filename Astro emits.
  */
-function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
+export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
 		{ suffix: ContentCollectionsEnum.Archives, title: 'Archives', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Notes, title: 'Notes', isFallback: true },
@@ -176,7 +176,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 /**
  * Walk built HTML files and extract the set of OG image filenames referenced
  */
-function extractBuiltFilenames(distPath: string): Set<string> {
+export function extractBuiltFilenames(distPath: string): Set<string> {
 	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
 	const ogPathSegment = `/${OPEN_GRAPH_BASE_PATH}/`;
 	const filenames = new Set<string>();
@@ -224,7 +224,7 @@ function extractBuiltFilenames(distPath: string): Set<string> {
  * 2) static index entries
  * 3) synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
  */
-function resolveEntry({
+export function resolveEntry({
 	filename,
 	dataStoreEntries,
 	indexEntries,

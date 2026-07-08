@@ -45,7 +45,7 @@ export function getPublicId(entry: DataStoreEntry): string {
 /**
  * The full data store is a map of collection names to collections (which are maps of entry IDs to entries)
  */
-type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;
+export type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;
 
 /**
  * Maps each region ID to its parent ID (undefined for root regions)

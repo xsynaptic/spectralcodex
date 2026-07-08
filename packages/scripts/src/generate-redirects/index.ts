@@ -3,13 +3,9 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import {
-	DATA_STORE_PATH,
-	getDataStoreCollection,
-	getPublicId,
-	loadDataStore,
-} from '../shared/data-store';
+import { DATA_STORE_PATH, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
+import { buildRedirectPairs } from './build-redirect-pairs';
 
 const rootPath = findWorkspaceRoot();
 
@@ -18,50 +14,7 @@ const outputPath = path.join(rootPath, 'deploy/caddy/spectralcodex-redirects-gen
 
 const { collections } = loadDataStore(dataStorePath);
 
-interface RedirectPair {
-	fromPath: string;
-	toPath: string;
-}
-
-// Collections where page URL = /{id}/
-const FLAT_COLLECTIONS = ['locations', 'posts', 'notes', 'pages'];
-
-// Collections where page URL = /{collection}/{id}/
-const PREFIXED_COLLECTIONS: Record<string, string> = {
-	themes: 'themes',
-	series: 'series',
-	regions: 'regions',
-	resources: 'resources',
-};
-
-const redirects: Array<RedirectPair> = [];
-
-for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLECTIONS)]) {
-	const entries = getDataStoreCollection(collections, [collectionName]);
-
-	for (const entry of entries) {
-		const formerIds = entry.data.formerIds as Array<string> | undefined;
-
-		if (!formerIds?.length) continue;
-
-		const prefix = PREFIXED_COLLECTIONS[collectionName];
-		const canonicalId = getPublicId(entry);
-
-		for (const formerId of formerIds) {
-			// Avoid infinite loops
-			if (formerId === canonicalId) continue;
-
-			const formerPath = prefix ? `/${prefix}/${formerId}/` : `/${formerId}/`;
-			const currentPath = prefix ? `/${prefix}/${canonicalId}/` : `/${canonicalId}/`;
-
-			// Page redirect
-			redirects.push(
-				{ fromPath: formerPath, toPath: currentPath },
-				{ fromPath: `/og/${formerId}.jpg`, toPath: `/og/${canonicalId}.jpg` },
-			);
-		}
-	}
-}
+const redirects = buildRedirectPairs(collections);
 
 if (redirects.length === 0) {
 	console.log(chalk.yellow('No formerIds found, writing empty redirect file'));
