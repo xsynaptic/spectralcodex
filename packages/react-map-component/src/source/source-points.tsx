@@ -16,8 +16,22 @@ import {
 	statusStrokeColorDarkArray,
 } from '../lib/location-status';
 import { tailwindColors } from '../lib/tailwind-colors';
-import { useMapHoveredId, useMapSelectedId } from '../store/store';
+import { useMapHoveredId } from '../store/store';
 import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
+
+// Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
+// feature-state is paint-only, so the label layers below still key off the store hoveredId
+const isHoveredExpression = [
+	'boolean',
+	['feature-state', 'hover'],
+	false,
+] satisfies ExpressionSpecification;
+
+const isSelectedExpression = [
+	'boolean',
+	['feature-state', 'select'],
+	false,
+] satisfies ExpressionSpecification;
 
 function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
@@ -28,27 +42,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
 } {
 	const isDarkMode = useDarkMode();
-
-	const selectedId = useMapSelectedId();
 	const hoveredId = useMapHoveredId();
-
-	const isSelectedIdExpression = useMemo(
-		() => ['==', ['get', 'id'], selectedId ?? ''] satisfies ExpressionSpecification,
-		[selectedId],
-	);
-	const isHoveredIdExpression = useMemo(
-		() => ['==', ['get', 'id'], hoveredId ?? ''] satisfies ExpressionSpecification,
-		[hoveredId],
-	);
-	const isHoveredClusterIdExpression = useMemo(
-		() =>
-			[
-				'==',
-				['concat', 'cluster-', ['get', 'cluster_id']],
-				hoveredId ?? '',
-			] satisfies ExpressionSpecification,
-		[hoveredId],
-	);
 
 	const clustersLayerStyle = useMemo(
 		() =>
@@ -80,11 +74,11 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['get', 'point_count'],
 						0, // Point count
-						['case', isHoveredClusterIdExpression, 9, 7],
+						['case', isHoveredExpression, 9, 7],
 						20,
-						['case', isHoveredClusterIdExpression, 11, 9],
+						['case', isHoveredExpression, 11, 9],
 						60,
-						['case', isHoveredClusterIdExpression, 14, 12],
+						['case', isHoveredExpression, 14, 12],
 					],
 					'circle-stroke-width': 1,
 					'circle-stroke-color': [
@@ -102,7 +96,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isDarkMode, isHoveredClusterIdExpression],
+		[isDarkMode],
 	);
 
 	// Numeric labels for clusters
@@ -116,7 +110,12 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 				layout: {
 					'text-field': '{point_count_abbreviated}',
 					'text-font': ['Noto Sans Medium'],
-					'text-size': ['case', isHoveredClusterIdExpression, 12, 10],
+					'text-size': [
+						'case',
+						['==', ['concat', 'cluster-', ['get', 'cluster_id']], hoveredId ?? ''],
+						12,
+						10,
+					],
 					'text-allow-overlap': true,
 					'text-ignore-placement': true,
 				},
@@ -126,7 +125,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 					'text-halo-width': 1,
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isDarkMode, isHoveredClusterIdExpression],
+		[isDarkMode, hoveredId],
 	);
 
 	// Visual points for unfiltered (zoomed-in) points
@@ -149,15 +148,15 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						['case', isSelectedIdExpression, 5, isHoveredIdExpression, 3, 2],
+						['case', isSelectedExpression, 5, isHoveredExpression, 3, 2],
 						8,
-						['case', isSelectedIdExpression, 6, isHoveredIdExpression, 5, 4],
+						['case', isSelectedExpression, 6, isHoveredExpression, 5, 4],
 						12,
-						['case', isSelectedIdExpression, 8, isHoveredIdExpression, 6, 5],
+						['case', isSelectedExpression, 8, isHoveredExpression, 6, 5],
 						15,
-						['case', isSelectedIdExpression, 10, isHoveredIdExpression, 8, 7],
+						['case', isSelectedExpression, 10, isHoveredExpression, 8, 7],
 						18,
-						['case', isSelectedIdExpression, 12, isHoveredIdExpression, 9, 8],
+						['case', isSelectedExpression, 12, isHoveredExpression, 9, 8],
 					],
 					'circle-stroke-width': 1,
 					'circle-stroke-color': [
@@ -168,7 +167,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isDarkMode, isSelectedIdExpression, isHoveredIdExpression],
+		[isDarkMode],
 	);
 
 	// Visually obscured tap targets for all visible points; this makes the mobile experience better
@@ -193,19 +192,19 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						['case', isSelectedIdExpression, 9, isHoveredIdExpression, 6, 5],
+						['case', isSelectedExpression, 9, isHoveredExpression, 6, 5],
 						8,
-						['case', isSelectedIdExpression, 14, isHoveredIdExpression, 11, 10],
+						['case', isSelectedExpression, 14, isHoveredExpression, 11, 10],
 						12,
-						['case', isSelectedIdExpression, 16, isHoveredIdExpression, 13, 12],
+						['case', isSelectedExpression, 16, isHoveredExpression, 13, 12],
 						15,
-						['case', isSelectedIdExpression, 20, isHoveredIdExpression, 16, 15],
+						['case', isSelectedExpression, 20, isHoveredExpression, 16, 15],
 						18,
-						['case', isSelectedIdExpression, 24, isHoveredIdExpression, 21, 20],
+						['case', isSelectedExpression, 24, isHoveredExpression, 21, 20],
 					],
 				},
 			}) satisfies CircleLayerSpecification,
-		[isDarkMode, isSelectedIdExpression, isHoveredIdExpression],
+		[isDarkMode],
 	);
 
 	// Featured image overlay for points with images
@@ -242,13 +241,13 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 				paint: {
 					'icon-color': [
 						'case',
-						isSelectedIdExpression,
+						isSelectedExpression,
 						tailwindColors.red500,
 						tailwindColors.red600,
 					],
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isSelectedIdExpression, spritesPrefix],
+		[spritesPrefix],
 	);
 
 	// Text labels for individual points on hover
@@ -261,7 +260,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 				filter: [
 					'all',
 					['!', ['has', 'point_count']], // Not a cluster
-					isHoveredIdExpression, // Only show when hovered
+					['==', ['get', 'id'], hoveredId ?? ''], // Only when hovered; filters can't read feature-state
 				],
 				layout: {
 					'text-field': ['get', 'title'],
@@ -280,7 +279,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 					'text-halo-width': 1.2,
 				},
 			}) satisfies SymbolLayerSpecification,
-		[isHoveredIdExpression, isDarkMode],
+		[isDarkMode, hoveredId],
 	);
 
 	return {
@@ -338,7 +337,7 @@ export const MapSourcePoints: FC<{
 			id={MapSourceIdEnum.PointCollection}
 			type="geojson"
 			data={data}
-			generateId={true}
+			promoteId="id"
 			{...clusterConfig}
 		>
 			{interactive ? (

@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import maplibregl from 'maplibre-gl';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
@@ -122,14 +122,52 @@ function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
 // Preload a point's popup image once the pointer dwells over it, so it is cached before the popup opens
 const mapImagePreloadDelayMs = 100;
 
+// Index by id so hover/selection lookups avoid an O(n) scan per render
+function useSourceDataIndex(): Map<string, MapSourceItemParsed> {
+	const { data: sourceData } = useSourceDataQuery();
+
+	return useMemo(() => {
+		const index = new Map<string, MapSourceItemParsed>();
+
+		if (sourceData) {
+			for (const item of sourceData) {
+				index.set(item.properties.id, item);
+			}
+		}
+
+		return index;
+	}, [sourceData]);
+}
+
+function useDebouncedValue<T>(value: T, delayMs: number): T {
+	const [debouncedValue, setDebouncedValue] = useState(value);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, delayMs);
+
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [value, delayMs]);
+
+	return debouncedValue;
+}
+
 function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 	const hoveredId = useMapHoveredId();
-	const { data: sourceData } = useSourceDataQuery();
+	const sourceDataIndex = useSourceDataIndex();
 	const { data: inlinePopupData } = usePopupDataQuery();
 	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
 
-	// A point carries a chunk key; hovering warms its chunk and preloads its image
-	const hoveredSourceItem = sourceData?.find((item) => item.properties.id === hoveredId);
+	// Debounce so sweeping a dense cluster doesn't fire a chunk request per point crossed
+	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
+
+	// A point carries a chunk key; dwelling on it warms its chunk and preloads its image
+	const hoveredSourceItem = debouncedHoveredId
+		? sourceDataIndex.get(debouncedHoveredId)
+		: undefined;
 	const hoverChunkKey = hoveredSourceItem?.properties.chunkKey;
 	const { data: hoverChunkData } = useChunkPopup(hoverChunkKey);
 
@@ -164,13 +202,11 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 function useMapCanvasPopup() {
 	const selectedId = useMapSelectedId();
 
-	const { data: sourceData } = useSourceDataQuery();
+	const sourceDataIndex = useSourceDataIndex();
 	const inlinePopupQuery = usePopupDataQuery();
 	const inlinePopupData = inlinePopupQuery.data;
 
-	const selectedSourceItem = sourceData?.find(
-		(sourceItem) => sourceItem.properties.id === selectedId,
-	);
+	const selectedSourceItem = selectedId ? sourceDataIndex.get(selectedId) : undefined;
 
 	// A chunk key means the popup comes from a chunk; its absence means an inline popup (objectives/MDX)
 	const chunkKey = selectedSourceItem?.properties.chunkKey;
@@ -195,8 +231,8 @@ function useMapCanvasPopup() {
 					}
 				: {}),
 		} satisfies MapPopupItemExtended;
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceData + selectedId
-	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceData]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceDataIndex + selectedId
+	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceDataIndex]);
 
 	return { popupItem, isLoading };
 }

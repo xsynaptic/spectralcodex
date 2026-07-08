@@ -36,8 +36,6 @@ export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId)
 /**
  * Map canvas state
  */
-export const useMapCanvasCursor = () => useMapDataStore((state) => state.canvasCursor);
-
 export const useMapCanvasInteractive = () => useMapDataStore((state) => state.canvasInteractive);
 
 export const useMapCanvasLoading = () => useMapDataStore((state) => state.canvasLoading);

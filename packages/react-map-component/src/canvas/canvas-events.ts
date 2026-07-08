@@ -7,7 +7,7 @@ import type {
 } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
 import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
@@ -34,9 +34,11 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 
 	const mapStoreInstance = useMapStoreInstance();
 
+	// Kept in a ref, not the store, so hover updates never trigger a React render
+	const hoveredFeatureIdRef = useRef<string | number | undefined>(undefined);
+
 	const {
 		setCanvasLoading,
-		setCanvasCursor,
 		setSelectedId,
 		setPopupVisible,
 		setHoveredId,
@@ -150,45 +152,73 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			// Note: this only queries the first matching feature, but that is sufficient
 			const feature = renderedFeatures[0];
 
+			const canvas = mapInstance.getCanvas();
+
+			// promoteId maps feature.id to the point id, or the cluster_id for clusters
+			const applyHover = (nextId: string | number | undefined) => {
+				const previousId = hoveredFeatureIdRef.current;
+
+				if (previousId === nextId) return;
+
+				if (previousId !== undefined) {
+					mapInstance.setFeatureState(
+						{ source: MapSourceIdEnum.PointCollection, id: previousId },
+						{ hover: false },
+					);
+				}
+				if (nextId !== undefined) {
+					mapInstance.setFeatureState(
+						{ source: MapSourceIdEnum.PointCollection, id: nextId },
+						{ hover: true },
+					);
+				}
+				hoveredFeatureIdRef.current = nextId;
+			};
+
+			// Store hoveredId feeds the popup preload; only write when it changes
+			const setStoreHoveredId = (nextId: string | undefined) => {
+				if (nextId !== mapStoreInstance.getState().hoveredId) setHoveredId(nextId);
+			};
+
 			// Nothing under the mouse, clear hover state
 			if (!feature) {
-				setHoveredId(undefined);
-				setCanvasCursor('grab');
+				applyHover(undefined);
+				setStoreHoveredId(undefined);
+				canvas.style.cursor = 'grab';
 				return;
 			}
 
 			switch (feature.layer.id) {
 				case MapLayerIdEnum.Clusters: {
-					setCanvasCursor('zoom-in');
+					canvas.style.cursor = 'zoom-in';
+					applyHover(feature.id);
 
 					// Cluster IDs are not the same as point IDs
 					if (typeof feature.properties.cluster_id === 'number') {
-						setHoveredId(`cluster-${String(feature.properties.cluster_id)}`);
+						setStoreHoveredId(`cluster-${String(feature.properties.cluster_id)}`);
 					}
 					break;
 				}
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
 				case MapLayerIdEnum.PointsImage: {
-					setCanvasCursor('pointer');
+					canvas.style.cursor = 'pointer';
+					applyHover(feature.id);
 
-					// Only update if it's different from current hovered ID
-					if (
-						typeof feature.properties.id === 'string' &&
-						feature.properties.id !== mapStoreInstance.getState().hoveredId
-					) {
-						setHoveredId(feature.properties.id);
+					if (typeof feature.properties.id === 'string') {
+						setStoreHoveredId(feature.properties.id);
 					}
 					break;
 				}
 				default: {
-					setHoveredId(undefined);
-					setCanvasCursor('grab');
+					applyHover(undefined);
+					setStoreHoveredId(undefined);
+					canvas.style.cursor = 'grab';
 					break;
 				}
 			}
 		},
-		[setCanvasCursor, setHoveredId, mapStoreInstance],
+		[setHoveredId, mapStoreInstance],
 	);
 
 	// Create throttled version using funnel
@@ -207,25 +237,25 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	);
 
 	const onMouseDown = useCallback<NonNullable<MapCallbacks['onMouseDown']>>(
-		({ features }) => {
+		({ features, target: mapInstance }) => {
 			const feature = features?.[0];
 
 			if (feature?.layer.id === undefined) {
-				setCanvasCursor('grabbing');
+				mapInstance.getCanvas().style.cursor = 'grabbing';
 			}
 		},
-		[setCanvasCursor],
+		[],
 	);
 
 	const onMouseUp = useCallback<NonNullable<MapCallbacks['onMouseUp']>>(
-		({ features }) => {
+		({ features, target: mapInstance }) => {
 			const feature = features?.[0];
 
 			if (feature?.layer.id === undefined) {
-				setCanvasCursor('grab');
+				mapInstance.getCanvas().style.cursor = 'grab';
 			}
 		},
-		[setCanvasCursor],
+		[],
 	);
 
 	const onMoveEnd = useCallback(

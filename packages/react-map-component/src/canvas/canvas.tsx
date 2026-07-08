@@ -12,11 +12,12 @@ import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-sour
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
 import { MAP_INTERACTIVE_LAYER_IDS } from '../source/source-config';
-import { useMapCanvasCursor, useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
+import { useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
 import { CanvasDataProvider } from './canvas-data';
 import { useMapCanvasEvents } from './canvas-events';
+import { MapSelectionFeatureState } from './canvas-feature-state';
 import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
 import { MapPopup } from './canvas-popup';
 
@@ -67,7 +68,6 @@ const MapCanvasContainer: FC<
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const canvasEvents = useMapCanvasEvents({ mapId });
-	const canvasCursor = useMapCanvasCursor();
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
 
@@ -117,7 +117,6 @@ const MapCanvasContainer: FC<
 			fadeDuration={0}
 			renderWorldCopies={false}
 			attributionControl={false}
-			cursor={canvasInteractive ? canvasCursor : 'auto'}
 			style={{ height: 'auto', ...style }}
 			{...canvasEvents}
 		>
@@ -142,6 +141,7 @@ const MapCanvasContainer: FC<
 			/>
 			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
 			<MapSelectedMarker targetIds={targetIds} />
+			<MapSelectionFeatureState />
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);

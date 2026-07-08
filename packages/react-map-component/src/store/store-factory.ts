@@ -1,5 +1,4 @@
 import type { LocationStatus } from '@spectralcodex/shared/map';
-import type { CSSProperties } from 'react';
 
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
@@ -12,7 +11,6 @@ interface MapDataState {
 	selectedId: string | undefined;
 	hoveredId: string | undefined;
 	popupVisible: boolean;
-	canvasCursor: NonNullable<CSSProperties['cursor']>;
 	canvasInteractive: boolean;
 	canvasLoading: boolean;
 	filterPosition: DOMCoordinates | undefined;
@@ -30,7 +28,6 @@ export type MapDataConfigurableState = Pick<
 	MapDataState,
 	| 'selectedId'
 	| 'hoveredId'
-	| 'canvasCursor'
 	| 'canvasInteractive'
 	| 'filterOpen'
 	| 'statusFilter'
@@ -47,7 +44,6 @@ export interface MapDataStore extends MapDataState {
 		setSelectedId: (selectedId: string | undefined) => void;
 		setPopupVisible: (popupVisible: boolean) => void;
 		setHoveredId: (hoveredId: string | undefined) => void;
-		setCanvasCursor: (canvasCursor: NonNullable<CSSProperties['cursor']>) => void;
 		setCanvasInteractive: (canvasInteractive: boolean) => void;
 		setCanvasLoading: (canvasLoading: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
@@ -67,7 +63,6 @@ const defaultMapDataState = {
 	selectedId: undefined,
 	hoveredId: undefined,
 	popupVisible: true,
-	canvasCursor: 'grab',
 	canvasInteractive: true,
 	canvasLoading: true,
 	filterPosition: undefined,
@@ -105,9 +100,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setHoveredId: (hoveredId) => {
 					set({ hoveredId });
-				},
-				setCanvasCursor: (canvasCursor) => {
-					set({ canvasCursor });
 				},
 				setCanvasInteractive: (canvasInteractive) => {
 					set({ canvasInteractive });

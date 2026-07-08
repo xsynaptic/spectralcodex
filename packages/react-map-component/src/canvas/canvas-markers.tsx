@@ -105,8 +105,11 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			setVisible(true);
 		}
 
-		function onSourceData(event: { sourceId: string }) {
-			if (event.sourceId === MapSourceIdEnum.PointCollection) updateMarkers();
+		// Gate on isSourceLoaded so markers recompute once settled, not per intermediate tick
+		function onSourceData(event: { sourceId: string; isSourceLoaded: boolean }) {
+			if (event.sourceId === MapSourceIdEnum.PointCollection && event.isSourceLoaded) {
+				updateMarkers();
+			}
 		}
 
 		map.on('zoomstart', hideMarkers);
