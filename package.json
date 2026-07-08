@@ -69,7 +69,6 @@
 		"@tailwindcss/vite": "^4.3.2",
 		"@tanstack/eslint-plugin-query": "^5.101.2",
 		"@turf/bbox": "^7.3.5",
-		"@turf/buffer": "^7.3.5",
 		"@turf/center": "^7.3.5",
 		"@turf/centroid": "^7.3.5",
 		"@turf/distance": "^7.3.5",
@@ -118,7 +117,7 @@
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
 		"vite": "8.1.0",
-		"vitest": "^4.1.9",
+		"vitest": "^4.1.10",
 		"zod": "^4.4.3"
 	},
 	"packageManager": "pnpm@11.9.0"

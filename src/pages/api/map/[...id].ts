@@ -4,9 +4,10 @@ import { getObjectiveLocations } from '#lib/collections/locations/locations-quer
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import {
 	getLocationsFeatureCollection,
-	getLocationsMapApiHashes,
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
+	hashMapPopupData,
+	hashMapSourceData,
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
@@ -20,7 +21,10 @@ export const getStaticPaths = (async () => {
 	const objectivesCollection = getLocationsFeatureCollection(objectiveLocations, {
 		showAllLocations: true,
 	});
-	const { sourceHash, popupHash } = getLocationsMapApiHashes(objectivesCollection);
+	const objectivesSourceData = getLocationsMapSourceData(objectivesCollection);
+	const objectivesPopupData = getLocationsMapPopupData(objectivesCollection);
+	const sourceHash = hashMapSourceData(objectivesSourceData);
+	const popupHash = hashMapPopupData(objectivesPopupData);
 
 	// Exact versioned URLs for the cache warmer to prefetch; not used by the map island
 	const manifestUrls = [
@@ -38,11 +42,11 @@ export const getStaticPaths = (async () => {
 		})),
 		{
 			params: { id: `objectives/${MapApiDataEnum.Source}` },
-			props: { data: getLocationsMapSourceData(objectivesCollection) ?? [] },
+			props: { data: objectivesSourceData ?? [] },
 		},
 		{
 			params: { id: `objectives/${MapApiDataEnum.Popup}` },
-			props: { data: getLocationsMapPopupData(objectivesCollection) ?? [] },
+			props: { data: objectivesPopupData ?? [] },
 		},
 		{ params: { id: 'map-manifest.json' }, props: { data: manifestUrls } },
 	];

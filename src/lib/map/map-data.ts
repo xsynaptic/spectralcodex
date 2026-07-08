@@ -4,28 +4,23 @@ import type {
 	MapScope,
 	MapSourceItemInput,
 } from '@spectralcodex/react-map-component';
-import type { BBox } from 'geojson';
-import type { LngLatBoundsLike } from 'maplibre-gl';
 
 import { MapDataKeysCompressed } from '@spectralcodex/shared/map';
-import { bbox } from '@turf/bbox';
-import { buffer } from '@turf/buffer';
-import { center as turfCenter } from '@turf/center';
-import { distance } from '@turf/distance';
-import { truncate } from '@turf/truncate';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 import { IMAGE_SERVER_URL } from 'astro:env/server';
 
+import type { MapDataBoundsProps } from '#lib/map/map-bounds.ts';
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { MAP_SOURCE_INLINE_LIMIT } from '#constants.ts';
+import { getMapBounds } from '#lib/map/map-bounds.ts';
 import {
-	getLocationsMapApiHashes,
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
+	hashMapPopupData,
+	hashMapSourceData,
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
-import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { getBaseUrl } from '#lib/utils/routing.ts';
 
 // Region and theme maps pass a membership hint; other big maps fall back to an id list
@@ -34,10 +29,9 @@ type MapScopeHint =
 
 // Stamp each inline source row with its shared popup-chunk key so hover/click can fetch the chunk
 function getInlineSourceData(
-	featureCollection: MapFeatureCollection,
+	sourceData: Array<MapSourceItemInput> | undefined,
 	chunkKeyById: Map<string, string> | undefined,
 ): Array<MapSourceItemInput> | undefined {
-	const sourceData = getLocationsMapSourceData(featureCollection);
 	if (!sourceData || !chunkKeyById) return sourceData;
 
 	return sourceData.map((item) => {
@@ -45,19 +39,6 @@ function getInlineSourceData(
 		return chunkKey ? { ...item, [MapDataKeysCompressed.ChunkKey]: chunkKey } : item;
 	});
 }
-
-interface MapDataBoundsProps {
-	featureCollection: MapFeatureCollection | undefined;
-	limitsFeatureCollection?: MapFeatureCollection | undefined; // Optional: used by individual location maps
-	boundsBuffer?: number | undefined;
-	boundsBufferPercentage?: number | undefined;
-	limitsBuffer?: number | undefined;
-	limitsBufferPercentage?: number | undefined;
-	targetId?: string | undefined; // Optional: use for centering on a specific point
-}
-
-const mapBoundsBufferMin = 1;
-const mapLimitsBufferMin = 10;
 
 const defaultMapDataProps = {
 	hasGeodata: false,
@@ -71,111 +52,6 @@ const defaultMapDataProps = {
 	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
-
-// GeoJSON bounding boxes can have 6 items in the array; MapLibre only supports 4
-function isLngLatBoundsLike(input: unknown): input is LngLatBoundsLike {
-	return (
-		!!input &&
-		Array.isArray(input) &&
-		input.length === 4 &&
-		input.every((item) => typeof item === 'number')
-	);
-}
-
-function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureCollection {
-	return {
-		...featureCollection,
-		features: featureCollection.features.filter((item) => item.properties.outlier !== true),
-	} satisfies MapFeatureCollection;
-}
-
-function getBufferedBbox(
-	featureCollection: MapFeatureCollection,
-	explicitBuffer: number | undefined,
-	bufferPercentage: number,
-	minBuffer: number,
-): BBox | undefined {
-	let bufferRadius = explicitBuffer;
-
-	if (bufferRadius === undefined) {
-		if (featureCollection.features.length === 1) {
-			bufferRadius = minBuffer;
-		} else {
-			const naturalBounds = bbox(featureCollection);
-			const spanX = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[2], naturalBounds[1]],
-			);
-			const spanY = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[0], naturalBounds[3]],
-			);
-			const spanMax = Math.max(spanX, spanY);
-			bufferRadius = Math.max(minBuffer, spanMax * (bufferPercentage / 100));
-		}
-	}
-
-	const buffered = buffer(featureCollection, bufferRadius);
-	return buffered ? bbox(buffered) : undefined;
-}
-
-// Calculate map bounds based on geodata and some parameters; should not include outliers
-// bounds/center frame featureCollection; maxBounds spans limitsFeatureCollection (the rendered set)
-// By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
-// But these values can be overridden on a case-by-case basis
-function getMapBounds({
-	featureCollection: featureCollectionRaw,
-	limitsFeatureCollection: limitsFeatureCollectionRaw,
-	boundsBuffer,
-	boundsBufferPercentage = 10,
-	limitsBuffer,
-	limitsBufferPercentage = 100,
-	targetId,
-}: MapDataBoundsProps):
-	| {
-			center: [number, number];
-			bounds: [number, number, number, number];
-			maxBounds: [number, number, number, number];
-	  }
-	| undefined {
-	if (!featureCollectionRaw) return;
-
-	const featureCollection = filterMapOutliers(featureCollectionRaw);
-
-	if (featureCollection.features.length === 0) return;
-
-	const limitsFeatureCollection = limitsFeatureCollectionRaw
-		? filterMapOutliers(limitsFeatureCollectionRaw)
-		: featureCollection;
-
-	const targetFeature = targetId
-		? featureCollection.features.find(({ id }) => id === targetId)
-		: undefined;
-
-	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
-
-	const bounds = getBufferedBbox(
-		featureCollection,
-		boundsBuffer,
-		boundsBufferPercentage,
-		mapBoundsBufferMin,
-	);
-	const maxBounds = getBufferedBbox(
-		limitsFeatureCollection,
-		limitsBuffer,
-		limitsBufferPercentage,
-		mapLimitsBufferMin,
-	);
-
-	if (bounds && maxBounds && isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
-		return {
-			center: getTruncatedLngLat(center.geometry.coordinates),
-			bounds,
-			maxBounds,
-		};
-	}
-	return;
-}
 
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
@@ -241,15 +117,16 @@ export function getMapData({
 
 	// MDX inline maps (no mapId): inline both source and popup, no chunks
 	if (!mapId) {
-		const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+		const sourceData = getLocationsMapSourceData(featureCollection);
+		const popupData = getLocationsMapPopupData(featureCollection);
 
 		return {
 			...defaultMapDataProps,
 			hasGeodata: true,
-			sourceData: getLocationsMapSourceData(featureCollection),
-			popupData: getLocationsMapPopupData(featureCollection),
-			sourceDataKey: sourceHash,
-			popupDataKey: popupHash,
+			sourceData,
+			popupData,
+			sourceDataKey: hashMapSourceData(sourceData),
+			popupDataKey: hashMapPopupData(popupData),
 			featureCount,
 			...mapBounds,
 			...props,
@@ -263,14 +140,15 @@ export function getMapData({
 
 	// Small maps inline their points, each carrying its chunk key
 	if (count <= MAP_SOURCE_INLINE_LIMIT) {
-		const { sourceHash } = getLocationsMapApiHashes(featureCollection);
+		// Hash the un-stamped rows so inline keys match the equivalent API payload
+		const sourceData = getLocationsMapSourceData(featureCollection);
 
 		return {
 			...defaultMapDataProps,
 			hasGeodata: true,
 			mapId,
-			sourceData: getInlineSourceData(featureCollection, chunkKeyById),
-			sourceDataKey: sourceHash,
+			sourceData: getInlineSourceData(sourceData, chunkKeyById),
+			sourceDataKey: hashMapSourceData(sourceData),
 			apiChunkBaseUrl,
 			featureCount,
 			...mapBounds,
@@ -324,7 +202,8 @@ export function getMapDataDedicated({
 		} satisfies MapComponentData;
 	}
 
-	const { sourceHash, popupHash } = getLocationsMapApiHashes(featureCollection);
+	const sourceHash = hashMapSourceData(getLocationsMapSourceData(featureCollection));
+	const popupHash = hashMapPopupData(getLocationsMapPopupData(featureCollection));
 	const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
 	const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}?v=${popupHash}`);
 

@@ -4,14 +4,15 @@ import { hashShort } from '@spectralcodex/shared/cache';
 import { getCollection } from 'astro:content';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 
-import type { ImageThumbnail } from '#lib/schemas/index.ts';
-
 import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import {
+	createGenerateLocationPostDataFunction,
+	getLocationThumbnailProps,
+} from '#lib/collections/locations/locations-factory.ts';
 import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId } from '#lib/utils/collections.ts';
 import { getDescription, getDescriptionRendered } from '#lib/utils/description.ts';
@@ -23,47 +24,6 @@ const getSignedImagePath = createSignedImagePathFunction({
 	imageFormat: IMAGE_LQ_FORMAT,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
-
-async function generateLocationPostDataFunction() {
-	const posts = await getCollection('posts');
-
-	return function getLocationPostData(entry: CollectionEntry<'locations'>) {
-		entry.data._posts = posts
-			.filter((post) => post.data.locations?.some((location) => location.id === entry.id))
-			.map(({ id }) => id);
-		entry.data._postCount = entry.data._posts.length;
-	};
-}
-
-/**
- * Generate thumbnail data with srcSet for map popups
- * We pass this data via the API so URLs can be signed at build time
- */
-const imageThumbnailOptions = {
-	width: 350,
-	aspectRatio: 3 / 2,
-	widths: [350, 700],
-};
-
-function getLocationThumbnailProps(imageSrc: string, sourceWidth: number): ImageThumbnail {
-	const { aspectRatio, width, widths } = imageThumbnailOptions;
-	const fit = ImageFitOptionEnum.Cover;
-
-	const buildCandidate = (candidateWidth: number) => {
-		const height = Math.round(candidateWidth / aspectRatio);
-		const path = getSignedImagePath(imageSrc, { width: candidateWidth, height, fit });
-		return `${path} ${String(candidateWidth)}w`;
-	};
-
-	// Never upscale; fall back to the (clamped) source width when it is below our smallest target
-	const candidateWidths = widths.filter((candidate) => candidate <= sourceWidth);
-	const resolvedWidths =
-		candidateWidths.length > 0 ? candidateWidths : [Math.min(width, sourceWidth)];
-
-	return {
-		srcSet: resolvedWidths.map(buildCandidate).join(', '),
-	};
-}
 
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
@@ -79,7 +39,11 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 		);
 
 		if (imageEntry) {
-			entry.data._imageThumbnail = getLocationThumbnailProps(imageEntry.id, imageEntry.data.width);
+			entry.data._imageThumbnail = getLocationThumbnailProps(
+				imageEntry.id,
+				imageEntry.data.width,
+				getSignedImagePath,
+			);
 		}
 	}
 
@@ -102,6 +66,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 						geometry._imageThumbnail = getLocationThumbnailProps(
 							imageEntry.id,
 							imageEntry.data.width,
+							getSignedImagePath,
 						);
 					}
 				}
@@ -157,7 +122,8 @@ export const getLocationsCollection = createCollectionData({
 			? entries
 			: entries.filter((location) => !location.data.hideLocation);
 
-		const generateLocationPostData = await generateLocationPostDataFunction();
+		const posts = await getCollection('posts');
+		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
 		const generateNearbyItems = createGenerateNearbyItemsFunction(locationsFiltered);
 
 		// Loop through every item in the collection and add metadata

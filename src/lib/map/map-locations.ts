@@ -254,13 +254,11 @@ export function getLocationsMapPopupData(
 		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));
 }
 
-// Hash the contents of each API endpoint
-export function getLocationsMapApiHashes(featureCollection: MapFeatureCollection | undefined) {
-	const sourceData = getLocationsMapSourceData(featureCollection);
-	const popupData = getLocationsMapPopupData(featureCollection);
+// Endpoint URLs derive from these hashes; the { data } wrapper is part of the key
+export function hashMapSourceData(sourceData: Array<MapSourceItemInput> | undefined) {
+	return hashShort({ data: sourceData });
+}
 
-	return {
-		sourceHash: hashShort({ data: sourceData }),
-		popupHash: hashShort({ data: popupData }),
-	};
+export function hashMapPopupData(popupData: Array<MapPopupItemInput> | undefined) {
+	return hashShort({ data: popupData });
 }
