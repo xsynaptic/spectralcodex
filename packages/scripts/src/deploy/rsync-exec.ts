@@ -52,6 +52,17 @@ export async function sshExec(
 	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${command}`;
 }
 
+// Feed the payload over stdin so secrets never appear on the remote command line (visible in `ps`)
+export async function sshExecWithInput(
+	config: DeployConfig,
+	command: string,
+	input: string,
+): Promise<void> {
+	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+
+	await $({ stdio: ['pipe', 'inherit', 'inherit'], input })`ssh ${sshArgs} ${command}`;
+}
+
 // Like sshExec but captures and returns stdout
 export async function sshCapture(config: DeployConfig, command: string): Promise<string> {
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];

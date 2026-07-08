@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { DeployConfig } from './deploy-config.js';
 
 import { loadDeployConfig } from './deploy-config.js';
-import { rsyncTo, sshCapture, sshExec } from './rsync-exec.js';
+import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from './rsync-exec.js';
 
 interface DeployInfraOptions {
 	rootPath: string;
@@ -110,7 +110,11 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	}
 
 	console.log(chalk.gray('Writing server environment...'));
-	await sshExec(config, `cat > ${remotePath}/.env << 'ENVEOF'\n${serverEnv}\nENVEOF`);
+	await sshExecWithInput(
+		config,
+		`umask 077 && cat > ${remotePath}/.env && chmod 600 ${remotePath}/.env`,
+		`${serverEnv}\n`,
+	);
 
 	const composeCmd = `cd ${remotePath} && docker compose`;
 
