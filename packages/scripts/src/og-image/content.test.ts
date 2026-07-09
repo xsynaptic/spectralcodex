@@ -6,7 +6,12 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import type { OpenGraphContentEntry } from './types';
 
-import { buildIndexEntries, extractBuiltFilenames, resolveEntry, resolveOgRegions } from './content';
+import {
+	buildIndexEntries,
+	extractBuiltFilenames,
+	resolveEntry,
+	resolveOgRegions,
+} from './content';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {

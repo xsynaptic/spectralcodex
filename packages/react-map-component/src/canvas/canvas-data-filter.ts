@@ -30,7 +30,7 @@ export function isLocationVisible(
 	if (filter.status.includes(properties.status)) return false;
 	if (properties.quality < filter.quality) return false;
 	if (properties.rating < filter.rating) return false;
-	return !(properties.objective !== undefined && properties.objective < filter.objective);
+	return properties.objective === undefined || !(properties.objective < filter.objective);
 }
 
 function toFeatureCollection(
