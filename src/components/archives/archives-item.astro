@@ -18,7 +18,7 @@ const { title, items, count, url, class: className, ...props } = Astro.props;
 {
 	items.length > 0 ? (
 		<Prose class={className} {...props}>
-			<span class="font-medium">{title}</span>:
+			<span class="font-medium">{title}</span>:{' '}
 			<PreviewList items={items} count={count} url={url} />
 		</Prose>
 	) : undefined
