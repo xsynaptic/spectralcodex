@@ -9,6 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
+import { trailingSlash } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
@@ -152,7 +153,7 @@ export default defineConfig({
 				}),
 				imgGroupSatteriPlugin(),
 			],
-			hastPlugins: [wrapCjk({ value: 'cjk' })],
+			hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlash({ trailingSlash: 'always' })],
 		}),
 	},
 	integrations: [

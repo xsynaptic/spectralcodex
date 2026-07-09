@@ -1,3 +1,4 @@
+import { trailingSlash } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import { stripTags } from '@xsynaptic/unified-tools';
 import { markdownToHtml } from 'satteri';
@@ -117,7 +118,7 @@ export function renderMarkdownInline(input: string): string {
 
 	const { html } = markdownToHtml(input, {
 		features: { smartPunctuation: true },
-		hastPlugins: [wrapCjk({ value: 'cjk' })],
+		hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlash({ trailingSlash: 'always' })],
 	});
 	const result = html.trim();
 
