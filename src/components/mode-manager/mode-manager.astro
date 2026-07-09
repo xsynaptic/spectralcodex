@@ -11,7 +11,7 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 ---
 
 <script is:inline data-default-mode={defaultMode}>
-	(function () {
+	{
 		let stored;
 
 		try {
@@ -20,9 +20,9 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 			// localStorage unavailable
 		}
 
-		let mode = ['auto', 'light', 'dark'].includes(stored)
-			? stored
-			: (document.currentScript.dataset.defaultMode ?? 'auto');
+		const { defaultMode } = document.currentScript.dataset;
+
+		let mode = ['auto', 'light', 'dark'].includes(stored) ? stored : (defaultMode ?? 'auto');
 
 		if (mode === 'auto') {
 			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
@@ -30,7 +30,13 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 
 		document.documentElement.dataset.mode = mode;
 		document.documentElement.style.colorScheme = mode;
-	})();
+
+		const themeColor = getComputedStyle(document.documentElement)
+			.getPropertyValue('--color-body-bg')
+			.trim();
+		const meta = document.querySelector('meta[name="theme-color"]');
+		if (meta && themeColor) meta.setAttribute('content', themeColor);
+	}
 </script>
 
 <script>

@@ -85,6 +85,8 @@ class ModeManager extends HTMLElement {
 		document.documentElement.dataset.mode = resolvedMode;
 		document.documentElement.style.colorScheme = resolvedMode;
 
+		this.#applyThemeColor();
+
 		queueMicrotask(() => {
 			document.dispatchEvent(
 				new CustomEvent('mode-changed', {
@@ -97,6 +99,14 @@ class ModeManager extends HTMLElement {
 				}) satisfies ModeChangedEvent,
 			);
 		});
+	}
+
+	#applyThemeColor() {
+		const themeColor = getComputedStyle(document.documentElement)
+			.getPropertyValue('--color-body-bg')
+			.trim();
+		if (!themeColor) return;
+		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
 	}
 }
 
