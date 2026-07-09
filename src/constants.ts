@@ -87,6 +87,11 @@ export const TAILWIND_CONTENT_PADDING_SM = '2rem'; // 32px equivalent
 export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent
 
 /**
+ * Time
+ */
+export const MILLISECONDS_PER_DAY = 86_400_000;
+
+/**
  * Various settings
  */
 // A string representing the year the site was founded; will default to the current year

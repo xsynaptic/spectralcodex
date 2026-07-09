@@ -148,6 +148,9 @@ const translationStrings = {
 		'archives.created.label': 'Created',
 		'archives.updated.label': 'Updated',
 		'archives.visited.label': 'Visited',
+		'archives.activity.label': 'Activity',
+		'archives.activity.aria':
+			'Activity for {year}: {created} created, {updated} updated, {visited} visited',
 
 		// Pagination
 		'pagination.next': 'Next',
@@ -155,6 +158,10 @@ const translationStrings = {
 
 		// Parts
 		'parts.textSeparatedList.more': '{count} more',
+
+		// Activity graph
+		'activityGraph.tooltip.singular': '1 event: {date}',
+		'activityGraph.tooltip.plural': '{count} events: {date}',
 
 		// Carousel
 		'carousel.nav.previous': 'Previous image',

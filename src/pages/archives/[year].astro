@@ -5,7 +5,7 @@ import ArchivesYearly from '#layouts/archives-yearly.astro';
 import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
 
 export const getStaticPaths = (async () => {
-	const { archivesYearlyData, archivesYears } = await getArchivesData();
+	const { archivesYearlyData, archivesYears, archivesDailyData } = await getArchivesData();
 
 	return Object.entries(archivesYearlyData).map(([archivesYear, archivesMonthlyData]) => ({
 		params: { year: archivesYear },
@@ -13,6 +13,7 @@ export const getStaticPaths = (async () => {
 			archivesMonthlyData,
 			archivesYear,
 			archivesYears,
+			archivesDailyData: archivesDailyData[archivesYear] ?? {},
 		},
 	}));
 }) satisfies GetStaticPaths;

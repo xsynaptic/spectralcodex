@@ -1,0 +1,75 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { buildActivityGraph } from '#lib/utils/activity-graph.ts';
+import { getDateDisplay } from '#lib/utils/date.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
+
+interface Props {
+	year: string;
+	values: Record<string, number>;
+	ariaLabel: string;
+}
+
+const { year, values, ariaLabel } = Astro.props;
+
+const t = getTranslations();
+
+const { days, monthLabels, padCount, weekCount } = buildActivityGraph({
+	year,
+	values,
+	referenceDate: new Date(),
+});
+
+const tooltipDateOptions = {
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+	timeZone: 'UTC',
+} as const satisfies Intl.DateTimeFormatOptions;
+
+function getDayTitle(value: number, date: Date): string {
+	const dateDisplay = getDateDisplay(date, undefined, tooltipDateOptions);
+	const key = value === 1 ? 'activityGraph.tooltip.singular' : 'activityGraph.tooltip.plural';
+
+	return formatStringTemplate(t(key), { count: value, date: dateDisplay });
+}
+
+const hasCaption = Astro.slots.has('default');
+---
+
+<figure class="activity-graph" role="img" aria-label={ariaLabel}>
+	<div class="activity-scroll">
+		<div class="activity-plot" style={`--ag-weeks:${String(weekCount)}`}>
+			<div class="activity-months">
+				{
+					monthLabels.map((monthLabel) => (
+						<span class="activity-month" style={`--ag-week:${String(monthLabel.week)}`}>
+							{monthLabel.name}
+						</span>
+					))
+				}
+			</div>
+			<div class="activity-grid">
+				{Array.from({ length: padCount }, () => <span class="activity-pad" aria-hidden="true" />)}
+				{
+					days.map((day) => (
+						<span
+							class="activity-cell"
+							data-level={String(day.level)}
+							data-future={day.future ? true : undefined}
+							title={day.future ? undefined : getDayTitle(day.value, day.date)}
+							aria-hidden="true"
+						/>
+					))
+				}
+			</div>
+		</div>
+	</div>
+	{
+		hasCaption ? (
+			<figcaption class="activity-caption mt-3 text-xs text-primary-600 dark:text-primary-400">
+				<slot />
+			</figcaption>
+		) : undefined
+	}
+</figure>

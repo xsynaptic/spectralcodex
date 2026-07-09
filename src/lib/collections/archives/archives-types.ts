@@ -24,3 +24,11 @@ export interface ArchivesMonthlyItem extends ArchivesYearSummary {
 }
 
 export type ArchivesIndexData = Record<string, ArchivesYearSummary>;
+
+export interface ArchivesDailyCounts {
+	created: number;
+	updated: number;
+	visited: number;
+}
+
+export type ArchivesDailyData = Record<string, Record<string, ArchivesDailyCounts>>;

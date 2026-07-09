@@ -1,0 +1,50 @@
+---
+import type { ArchivesDailyCounts } from '#lib/collections/archives/archives-types.ts';
+
+import ActivityGraph from '#components/parts/activity-graph.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import { getArchivesActivityData } from '#lib/collections/archives/archives-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
+
+interface Props {
+	year: string;
+	dailyData: Record<string, ArchivesDailyCounts>;
+}
+
+const { year, dailyData } = Astro.props;
+
+const t = getTranslations();
+
+const { values, totals } = getArchivesActivityData(dailyData);
+
+const ariaLabel = formatStringTemplate(t('archives.activity.aria'), {
+	year,
+	created: formatNumber({ number: totals.created }),
+	updated: formatNumber({ number: totals.updated }),
+	visited: formatNumber({ number: totals.visited }),
+});
+---
+
+<div class="content-column-fill mb-8">
+	<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+		<h2
+			class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700"
+		>
+			{t('archives.activity.label')}
+		</h2>
+		<ActivityGraph year={year} values={values} ariaLabel={ariaLabel}>
+			<div class="flex flex-wrap gap-x-1 text-sm">
+				<DividedItem>
+					{`${formatNumber({ number: totals.created })} ${t('archives.created.label')}`}
+				</DividedItem>
+				<DividedItem>
+					{`${formatNumber({ number: totals.updated })} ${t('archives.updated.label')}`}
+				</DividedItem>
+				<DividedItem>
+					{`${formatNumber({ number: totals.visited })} ${t('archives.visited.label')}`}
+				</DividedItem>
+			</div>
+		</ActivityGraph>
+	</div>
+</div>

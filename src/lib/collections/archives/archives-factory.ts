@@ -4,11 +4,14 @@ import * as R from 'remeda';
 
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type {
+	ArchivesDailyCounts,
+	ArchivesDailyData,
 	ArchivesIndexData,
 	ArchivesMonthlyItem,
 } from '#lib/collections/archives/archives-types.ts';
 
-import { getDateRanges } from '#lib/utils/date.ts';
+import { MILLISECONDS_PER_DAY } from '#constants.ts';
+import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
 interface ArchivesRawMonthData extends Pick<
 	ArchivesMonthlyItem,
@@ -33,6 +36,7 @@ interface ArchivesData {
 	archivesYearlyData: Record<string, Array<ArchivesMonthlyItem>>;
 	archivesYears: Array<string>;
 	archivesMonths: Record<string, Array<string>>;
+	archivesDailyData: ArchivesDailyData;
 }
 
 // Content dates are UTC instants; bucket in UTC so archive membership matches displayed dates
@@ -42,6 +46,72 @@ export function getDateData(date: Date): ArchivesDateData {
 		month: String(date.getUTCMonth() + 1).padStart(2, '0'),
 		year: String(date.getUTCFullYear()).padStart(4, '0'),
 	};
+}
+
+// Every UTC day covered by a recorded range, start to end inclusive
+// A single date yields one day
+function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
+	const startDay = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+	const endSource = end ?? start;
+	const endDay = Math.max(
+		startDay,
+		Date.UTC(endSource.getUTCFullYear(), endSource.getUTCMonth(), endSource.getUTCDate()),
+	);
+
+	const days: Array<Date> = [];
+
+	for (let time = startDay; time <= endDay; time += MILLISECONDS_PER_DAY) {
+		days.push(new Date(time));
+	}
+
+	return days;
+}
+
+export function buildArchivesDailyData(items: ReadonlyArray<CatalogItem>): ArchivesDailyData {
+	const dailyData: ArchivesDailyData = {};
+
+	function addEvent(date: Date, category: keyof ArchivesDailyCounts): void {
+		const year = String(date.getUTCFullYear()).padStart(4, '0');
+		const dayKey = getDayKey(date);
+
+		let yearData = dailyData[year];
+
+		if (!yearData) {
+			yearData = {};
+			dailyData[year] = yearData;
+		}
+
+		let counts = yearData[dayKey];
+
+		if (!counts) {
+			counts = { created: 0, updated: 0, visited: 0 };
+			yearData[dayKey] = counts;
+		}
+
+		counts[category] += 1;
+	}
+
+	for (const item of items) {
+		if (R.isIncludedIn(item.collection, collectionsExcluded)) continue;
+
+		addEvent(item.dateCreated, 'created');
+
+		if (item.dateUpdated && getDayKey(item.dateUpdated) !== getDayKey(item.dateCreated)) {
+			addEvent(item.dateUpdated, 'updated');
+		}
+
+		if (item.dateRecorded) {
+			for (const range of getDateRanges(item.dateRecorded)) {
+				const rangeDays = expandRangeDays(range.start.date, range.end?.date);
+
+				for (const day of rangeDays) {
+					addEvent(day, 'visited');
+				}
+			}
+		}
+	}
+
+	return dailyData;
 }
 
 export function getMonthName(date: Date): string {
@@ -382,6 +452,8 @@ export function createArchivesData(
 	const archivesYears = Object.keys(archivesYearlyData).sort((a, b) => b.localeCompare(a));
 	const yearHasView = new Set(archivesYears);
 
+	const archivesDailyData = buildArchivesDailyData(items);
+
 	return {
 		archivesIndexData,
 		archivesYearlyData,
@@ -389,6 +461,9 @@ export function createArchivesData(
 		archivesYears,
 		archivesMonths: Object.fromEntries(
 			Object.entries(archivesMonths).filter(([year]) => yearHasView.has(year)),
+		),
+		archivesDailyData: Object.fromEntries(
+			Object.entries(archivesDailyData).filter(([year]) => yearHasView.has(year)),
 		),
 	};
 }

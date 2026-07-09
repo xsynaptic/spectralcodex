@@ -1,6 +1,10 @@
 ---
-import type { ArchivesMonthlyItem } from '#lib/collections/archives/archives-types.ts';
+import type {
+	ArchivesDailyCounts,
+	ArchivesMonthlyItem,
+} from '#lib/collections/archives/archives-types.ts';
 
+import ArchivesActivity from '#components/archives/archives-activity.astro';
 import ArchivesItem from '#components/archives/archives-item.astro';
 import ArchivesNavigation from '#components/archives/archives-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -17,9 +21,10 @@ interface Props {
 	archivesMonthlyData: Array<ArchivesMonthlyItem>;
 	archivesYear: string;
 	archivesYears: Array<string>;
+	archivesDailyData: Record<string, ArchivesDailyCounts>;
 }
 
-const { archivesMonthlyData, archivesYear, archivesYears } = Astro.props;
+const { archivesMonthlyData, archivesYear, archivesYears, archivesDailyData } = Astro.props;
 
 const getArchivesImageFeaturedGroup = await createArchivesImageFeaturedGroupFunction();
 
@@ -92,4 +97,5 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 				);
 			})
 	}
+	<ArchivesActivity year={archivesYear} dailyData={archivesDailyData} />
 </MainSite>

@@ -4,6 +4,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
 import {
+	buildArchivesDailyData,
 	createArchivesData,
 	getDateData,
 	getMonthName,
@@ -263,5 +264,105 @@ describe('getDateData', () => {
 describe('getMonthName', () => {
 	test('names the UTC month regardless of local timezone', () => {
 		expect(getMonthName(new Date('2024-05-31T20:00:00Z'))).toBe('May');
+	});
+});
+
+describe('buildArchivesDailyData', () => {
+	// UTC-instant literals so day bucketing stays timezone stable (getUTC* reads)
+	test('tallies a creation on its UTC day', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2024-03-10T12:00:00Z'),
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 1, updated: 0, visited: 0 });
+	});
+
+	test('buckets a late-evening UTC instant on its UTC day, not the local one', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2024-05-31T20:00:00Z'),
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-05-31']).toMatchObject({ created: 1 });
+	});
+
+	test('does not count an update made on the same UTC day as creation', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2024-03-10T02:00:00Z'),
+				dateUpdated: new Date('2024-03-10T20:00:00Z'),
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 1, updated: 0, visited: 0 });
+	});
+
+	test('counts an update made on a different UTC day from creation', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2024-03-10T12:00:00Z'),
+				dateUpdated: new Date('2024-03-12T12:00:00Z'),
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-10']).toMatchObject({ created: 1, updated: 0 });
+		expect(daily['2024']?.['2024-03-12']).toMatchObject({ created: 0, updated: 1 });
+	});
+
+	test('expands a recorded range so every day start-to-end inclusive is visited', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2023-01-01T12:00:00Z'),
+				dateRecorded: [
+					[
+						{ date: new Date('2024-03-10T12:00:00Z'), hasTime: false },
+						{ date: new Date('2024-03-12T12:00:00Z'), hasTime: false },
+					],
+				],
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-10']?.visited).toBe(1);
+		expect(daily['2024']?.['2024-03-11']?.visited).toBe(1);
+		expect(daily['2024']?.['2024-03-12']?.visited).toBe(1);
+		expect(daily['2024']?.['2024-03-13']).toBeUndefined();
+	});
+
+	test('treats a single recorded date as one visited day', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a',
+				collection: 'posts',
+				dateCreated: new Date('2023-01-01T12:00:00Z'),
+				dateRecorded: [{ date: new Date('2024-03-15T12:00:00Z'), hasTime: false }],
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-15']).toEqual({ created: 0, updated: 0, visited: 1 });
+	});
+
+	test('excludes the pages collection', () => {
+		const daily = buildArchivesDailyData([
+			makeCatalogItem({
+				id: 'a-page',
+				collection: 'pages',
+				dateCreated: new Date('2024-03-10T12:00:00Z'),
+			}),
+		]);
+
+		expect(daily['2024']).toBeUndefined();
 	});
 });
