@@ -52,7 +52,7 @@ services:
 
   # Umami analytics
   umami:
-    image: ghcr.io/umami-software/umami:3.1.0
+    image: ghcr.io/umami-software/umami:3.2.0
     container_name: umami
     init: true
     mem_limit: 512m
@@ -88,7 +88,7 @@ services:
 
   # Umami PostgreSQL database (internal network only)
   umami-db:
-    image: postgres:15.16-alpine
+    image: postgres:15.18-alpine
     container_name: umami-db
     init: true
     mem_limit: 384m
@@ -167,7 +167,7 @@ services:
 
   # nginx cache in front of imagor; serves via Caddy
   image-cache:
-    image: nginx:1.30.2-alpine
+    image: nginx:1.30.3-alpine
     container_name: image-cache
     init: true
     read_only: true
@@ -208,7 +208,7 @@ services:
         max-file: '3'
 
   image-server:
-    image: ghcr.io/cshum/imagor-mozjpeg:1.9.1
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.2
     container_name: image-server
     init: true
     read_only: true

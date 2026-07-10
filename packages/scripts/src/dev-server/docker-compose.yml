@@ -1,6 +1,6 @@
 services:
   image-cache:
-    image: nginx:1.30.2-alpine
+    image: nginx:1.30.3-alpine
     container_name: dev-image-cache
     ports:
       - '3100:80'
@@ -11,7 +11,7 @@ services:
         condition: service_started
 
   image-server:
-    image: ghcr.io/cshum/imagor-mozjpeg:1.9.1
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.2
     container_name: dev-image-server
     volumes:
       - ${CONTENT_MEDIA_PATH}:/media:ro
