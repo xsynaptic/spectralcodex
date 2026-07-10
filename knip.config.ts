@@ -11,7 +11,7 @@ export default {
 				'src/components/parts/pagination.astro', // leftover component
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported
 			],
-			ignoreBinaries: ['down', 'up', 'ssh-add'],
+			ignoreBinaries: ['ssh-add'],
 			ignoreDependencies: [
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
 				'p-limit', // used in workspace packages (image-loader, scripts)
