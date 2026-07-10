@@ -30,16 +30,20 @@ try {
 
 let cleanedUp = false;
 
-function cleanup() {
+async function cleanup() {
 	if (cleanedUp) return;
 	cleanedUp = true;
 	log(chalk.gray('Stopping containers...'));
-	void $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
+	try {
+		await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
+	} catch {
+		// already shutting down; teardown errors are not actionable
+	}
 	process.exit(0);
 }
 
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);
+process.on('SIGINT', () => void cleanup());
+process.on('SIGTERM', () => void cleanup());
 
 log('Starting containers...');
 
@@ -59,5 +63,7 @@ void startContainers();
 try {
 	await $({ stdio: 'inherit', cwd: rootPath })`npx astro dev`;
 } catch {
-	cleanup();
+	// astro dev exited (Ctrl+C or crash); fall through to teardown
 }
+
+await cleanup();
