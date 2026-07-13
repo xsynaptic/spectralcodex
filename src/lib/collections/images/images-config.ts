@@ -1,4 +1,4 @@
-import { imageLoader } from '@spectralcodex/astro-image-loader';
+import { defineImageCollection } from '@spectralcodex/astro-image-loader';
 import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
@@ -51,10 +51,8 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
 
 /**
- * Image metadata schema
- * Astro caches everything in the data store but rebuilding EXIF data is slow so we cache it here as well
- * This allows for use to rebuild Astro's content cache as needed without taking several extra minutes
- * If your image library shifts around or changes a lot you can nuke the sqlite file in the cache folder
+ * Astro persists entry data in its own store but rebuilding EXIF data is slow, so we cache it here as well
+ * This survives Astro content cache wipes; dead keys are pruned after every full load
  */
 interface ImageMetadataCached {
 	hash: string;
@@ -64,6 +62,13 @@ interface ImageMetadataCached {
 }
 
 const imageMetadataCache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-metadata');
+
+// Schema changes invalidate both the store digest and the EXIF cache automatically
+// Bump rev for logic-only changes; coerced/transformed fields are unrepresentable in JSON Schema and also need a rev bump
+const invalidationKey = hash({
+	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
+	rev: 1,
+});
 
 // Extract image dimensions from the image object
 async function getImageDimensions(imagePath: string) {
@@ -147,19 +152,26 @@ const getSignedImagePath = createSignedImagePathFunction({
 // Initialize ExifTool instance so it can be reused
 let exiftool: ExifTool;
 
-export const images = defineCollection({
-	loader: imageLoader({
+export const images = defineCollection(
+	defineImageCollection({
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
+		invalidationKey,
+		schema: ImageMetadataSchema.strict(),
 		beforeLoad: () => {
 			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
 		},
-		afterLoad: async () => {
+		afterLoad: async ({ filePathsRelative }) => {
 			await exiftool.end();
+
+			// Full loads report every live path; evict cache rows for deleted or renamed files
+			if (filePathsRelative) {
+				imageMetadataCache.prune(filePathsRelative);
+			}
 		},
 		dataHandler: async ({ id, filePathRelative, modifiedTime }) => {
 			// Key by file path so re-edited images overwrite the old row; the hash validates mtime
-			const contentHash = hash({ mtime: modifiedTime?.getTime(), version: 1 });
+			const contentHash = hash({ mtime: modifiedTime.getTime(), invalidationKey });
 			const cached = await imageMetadataCache.get<ImageMetadataCached>(filePathRelative);
 
 			let dimensions: { width: number; height: number };
@@ -200,5 +212,4 @@ export const images = defineCollection({
 			} satisfies ImageMetadataInput;
 		},
 	}),
-	schema: ImageMetadataSchema.strict(),
-});
+);
