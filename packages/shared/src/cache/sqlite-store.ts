@@ -32,6 +32,11 @@ export function createSqliteStore({
 	);
 	const deletionStatement = database.prepare(`DELETE FROM ${table} WHERE key = ?`);
 	const hasStatement = database.prepare(`SELECT 1 FROM ${table} WHERE key = ?`);
+	// json_each avoids the SQLite bound-variable limit when the valid set is large
+	// The LIKE scope means a key-format mismatch prunes nothing rather than everything
+	const pruneStatement = database.prepare(
+		`DELETE FROM ${table} WHERE key LIKE ? AND key NOT IN (SELECT value FROM json_each(?))`,
+	);
 
 	return {
 		get(key: string) {
@@ -50,6 +55,13 @@ export function createSqliteStore({
 		},
 		has(key: string) {
 			return hasStatement.get(key) !== undefined;
+		},
+		// Delete every keyPrefix-scoped row whose key is not in the valid set; returns rows removed
+		// An empty valid set is refused: a scan that found nothing should never evict everything
+		prune(validKeys: Array<string>, keyPrefix = '') {
+			if (validKeys.length === 0) return 0;
+
+			return Number(pruneStatement.run(`${keyPrefix}%`, JSON.stringify(validKeys)).changes);
 		},
 	};
 }
