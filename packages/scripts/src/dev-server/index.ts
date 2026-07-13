@@ -61,7 +61,7 @@ async function startContainers() {
 void startContainers();
 
 try {
-	await $({ stdio: 'inherit', cwd: rootPath })`npx astro dev`;
+	await $({ stdio: 'inherit', cwd: rootPath })`pnpm exec astro dev`;
 } catch {
 	// astro dev exited (Ctrl+C or crash); fall through to teardown
 }
