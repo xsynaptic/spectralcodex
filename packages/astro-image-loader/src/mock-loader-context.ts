@@ -8,6 +8,7 @@ interface MockDataEntry {
 	data: Record<string, unknown>;
 	filePath?: string;
 	digest?: string;
+	assetImports?: Array<string>;
 }
 
 interface MockLoaderContextOptions {
@@ -19,6 +20,7 @@ interface MockLoaderContextOptions {
 export function createMockLoaderContext({ root, parseData }: MockLoaderContextOptions) {
 	const entries = new Map<string, MockDataEntry>();
 	const logs: Array<{ level: 'info' | 'warn' | 'error'; message: string }> = [];
+	const addAssetImports = vi.fn();
 
 	// eslint-disable-next-line unicorn/prefer-event-target -- mimics chokidar's FSWatcher, which is an EventEmitter
 	const watcher = Object.assign(new EventEmitter(), { add: vi.fn() });
@@ -38,6 +40,7 @@ export function createMockLoaderContext({ root, parseData }: MockLoaderContextOp
 				entries.delete(id);
 			},
 			keys: () => [...entries.keys()],
+			addAssetImports,
 		},
 		logger: {
 			info: (message: string) => {
@@ -50,7 +53,7 @@ export function createMockLoaderContext({ root, parseData }: MockLoaderContextOp
 				logs.push({ level: 'error', message });
 			},
 		},
-		config: { root },
+		config: { root, cacheDir: new URL('.astro-cache/', root) },
 		parseData: parseData ?? defaultParseData,
 		// Mimics Astro's implementation: JSON.stringify silently drops function values
 		generateDigest: (data: Record<string, unknown> | string) =>
@@ -58,5 +61,5 @@ export function createMockLoaderContext({ root, parseData }: MockLoaderContextOp
 		watcher,
 	} as unknown as LoaderContext;
 
-	return { context, entries, logs, watcher };
+	return { context, entries, logs, watcher, addAssetImports };
 }

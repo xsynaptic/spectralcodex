@@ -1,10 +1,13 @@
 import type { LoaderContext } from 'astro/loaders';
 
+import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, stat, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { describe, expect, test, vi } from 'vitest';
+
+import type { ImageLoaderCacheValue } from './types';
 
 import { defineImageCollection, ImageLoaderBaseSchema, imageLoader } from './index';
 import { createMockLoaderContext } from './mock-loader-context';
@@ -24,6 +27,21 @@ async function createFixtureDir(files: Array<string>) {
 	const root = new URL(`${pathToFileURL(dir).href}/`);
 
 	return { dir, root };
+}
+
+function createMockCache() {
+	const values = new Map<string, ImageLoaderCacheValue>();
+
+	return {
+		values,
+		cache: {
+			get: (key: string) => values.get(key),
+			set: vi.fn((key: string, value: ImageLoaderCacheValue) => {
+				values.set(key, value);
+			}),
+			prune: vi.fn(),
+		},
+	};
 }
 
 describe('imageLoader', () => {
@@ -73,8 +91,8 @@ describe('imageLoader', () => {
 		);
 	});
 
-	test('discovers matching files, ignoring underscore prefixes and other extensions', async () => {
-		const { root } = await createFixtureDir(['a.jpg', '_draft.jpg', 'notes.txt', 'nested/b.png']);
+	test('discovers matching files, ignoring other extensions and svg by default', async () => {
+		const { root } = await createFixtureDir(['a.jpg', 'notes.txt', 'icon.svg', 'nested/b.png']);
 		const { context, entries } = createMockLoaderContext({ root });
 
 		await imageLoader({}).load(context);
@@ -85,6 +103,25 @@ describe('imageLoader', () => {
 		]);
 		expect(entries.get('a.jpg')?.data).toMatchObject({ src: 'a.jpg' });
 		expect(entries.get('a.jpg')?.data.modifiedTime).toBeInstanceOf(Date);
+	});
+
+	test('re-registers persisted asset imports on the digest-skip path', async () => {
+		const { root } = await createFixtureDir(['a.jpg']);
+		const { context, entries, addAssetImports } = createMockLoaderContext({ root });
+
+		const loader = imageLoader({});
+
+		await loader.load(context);
+		expect(addAssetImports).not.toHaveBeenCalled();
+
+		// Simulate a persisted entry whose image() fields produced asset imports
+		const entry = entries.get('a.jpg');
+
+		if (entry) entry.assetImports = ['./a.jpg'];
+
+		await loader.load(context);
+
+		expect(addAssetImports).toHaveBeenCalledWith(['./a.jpg'], 'a.jpg');
 	});
 
 	test('uses a custom generateId and merges dataHandler output', async () => {
@@ -125,24 +162,83 @@ describe('imageLoader', () => {
 		expect(dataHandler).toHaveBeenCalledTimes(5);
 	});
 
-	test('removes deleted files from the store and reports live paths to afterLoad', async () => {
+	test('removes deleted files from the store and prunes the cache to live keys', async () => {
 		const { dir, root } = await createFixtureDir(['a.jpg', 'b.jpg']);
 		const { context, entries } = createMockLoaderContext({ root });
 
-		const afterLoad = vi.fn();
-		const loader = imageLoader({ afterLoad });
+		const prune = vi.fn();
+		const cache = { get: vi.fn(), set: vi.fn(), prune };
+		const loader = imageLoader({ cache, dataHandler: () => ({}) });
 
 		await loader.load(context);
 		expect(entries.size).toBe(2);
-		expect(afterLoad).toHaveBeenLastCalledWith({
-			filePathsRelative: expect.arrayContaining(['a.jpg', 'b.jpg']) as Array<string>,
-		});
+		expect(prune).toHaveBeenLastCalledWith(expect.arrayContaining(['a.jpg', 'b.jpg']));
 
 		await rm(path.join(dir, 'b.jpg'));
 		await loader.load(context);
 
 		expect(entries.has('b.jpg')).toBe(false);
-		expect(afterLoad).toHaveBeenLastCalledWith({ filePathsRelative: ['a.jpg'] });
+		expect(prune).toHaveBeenLastCalledWith(['a.jpg']);
+	});
+
+	describe('cache', () => {
+		test('a warm cache repopulates a fresh store without running the dataHandler', async () => {
+			const { root } = await createFixtureDir(['a.jpg']);
+			const { cache } = createMockCache();
+			const dataHandler = vi.fn(() => ({ title: 'cached' }));
+			const loader = imageLoader({ cache, dataHandler });
+
+			await loader.load(createMockLoaderContext({ root }).context);
+			expect(dataHandler).toHaveBeenCalledTimes(1);
+			expect(cache.set).toHaveBeenCalledWith('a.jpg', {
+				digest: expect.any(String) as string,
+				data: { title: 'cached' },
+			});
+
+			// Fresh context = simulated Astro data store wipe; same cache carries the data over
+			const { context, entries } = createMockLoaderContext({ root });
+
+			await loader.load(context);
+
+			expect(dataHandler).toHaveBeenCalledTimes(1);
+			expect(entries.get('a.jpg')?.data.title).toBe('cached');
+		});
+
+		test('a stale cached digest re-runs the dataHandler and overwrites the cache', async () => {
+			const { root } = await createFixtureDir(['a.jpg']);
+			const { values, cache } = createMockCache();
+
+			values.set('a.jpg', { digest: 'stale', data: { title: 'old' } });
+
+			const dataHandler = vi.fn(() => ({ title: 'fresh' }));
+			const { context, entries } = createMockLoaderContext({ root });
+
+			await imageLoader({ cache, dataHandler }).load(context);
+
+			expect(dataHandler).toHaveBeenCalledTimes(1);
+			expect(entries.get('a.jpg')?.data.title).toBe('fresh');
+			expect(values.get('a.jpg')?.data).toEqual({ title: 'fresh' });
+		});
+
+		test('cache: false disables the built-in cache entirely', async () => {
+			const { dir, root } = await createFixtureDir(['a.jpg']);
+			const { context } = createMockLoaderContext({ root });
+
+			await imageLoader({ cache: false, dataHandler: () => ({}) }).load(context);
+
+			expect(existsSync(path.join(dir, '.astro-cache'))).toBe(false);
+		});
+
+		test('the built-in JSONL cache is created under cacheDir by default', async () => {
+			const { dir, root } = await createFixtureDir(['a.jpg']);
+			const { context } = createMockLoaderContext({ root });
+
+			await imageLoader({ dataHandler: () => ({}) }).load(context);
+
+			expect(existsSync(path.join(dir, '.astro-cache', 'astro-image-loader', 'images.jsonl'))).toBe(
+				true,
+			);
+		});
 	});
 
 	test('propagates parseData failures with their message intact', async () => {
@@ -160,20 +256,14 @@ describe('imageLoader', () => {
 	});
 
 	describe('watch mode', () => {
-		test('registers the base directory with the watcher', async () => {
-			const { root } = await createFixtureDir(['a.jpg']);
-			const { context, watcher } = createMockLoaderContext({ root });
-
-			await imageLoader({}).load(context);
-
-			expect(watcher.add).toHaveBeenCalledTimes(1);
-		});
-
 		test('handles add, change, and unlink events with real file mtimes', async () => {
 			const { dir, root } = await createFixtureDir(['a.jpg']);
-			const { context, entries } = createMockLoaderContext({ root });
+			const { context, entries, watcher } = createMockLoaderContext({ root });
 
-			await imageLoader({}).load(context);
+			await imageLoader({ debounceMs: 25 }).load(context);
+
+			// The base directory may sit outside the default watch root
+			expect(watcher.add).toHaveBeenCalledTimes(1);
 
 			// Added file appears in the store with its actual mtime
 			const addedPath = path.join(dir, 'new.jpg');
@@ -202,24 +292,25 @@ describe('imageLoader', () => {
 			const { dir, root } = await createFixtureDir(['a.jpg']);
 			const { context, entries } = createMockLoaderContext({ root });
 
-			await imageLoader({}).load(context);
+			await imageLoader({ debounceMs: 25 }).load(context);
 
 			await writeFile(path.join(dir, 'readme.txt'), 'not an image');
 			watcherEmit(context, 'add', path.join(dir, 'readme.txt'));
 
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			// Absence check: wait past the debounce window, then confirm nothing landed
+			await new Promise((resolve) => setTimeout(resolve, 100));
 
 			expect(entries.has('readme.txt')).toBe(false);
 			expect(entries.size).toBe(1);
 		});
 
-		test('watch batches call afterLoad without live paths', async () => {
+		test('watch batches bracket processing with the lifecycle hooks', async () => {
 			const { dir, root } = await createFixtureDir(['a.jpg']);
 			const { context } = createMockLoaderContext({ root });
 
 			const afterLoad = vi.fn();
 
-			await imageLoader({ afterLoad }).load(context);
+			await imageLoader({ afterLoad, debounceMs: 25 }).load(context);
 			expect(afterLoad).toHaveBeenCalledTimes(1);
 
 			const touchedPath = path.join(dir, 'a.jpg');
@@ -231,7 +322,6 @@ describe('imageLoader', () => {
 			await vi.waitFor(() => {
 				expect(afterLoad).toHaveBeenCalledTimes(2);
 			});
-			expect(afterLoad).toHaveBeenLastCalledWith({});
 		});
 	});
 });

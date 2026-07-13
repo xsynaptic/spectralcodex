@@ -10,14 +10,21 @@ import picomatch from 'picomatch';
 import { glob } from 'tinyglobby';
 import { z } from 'zod';
 
-import type { ImageLoaderOptions } from './types';
+import type { ImageLoaderCache, ImageLoaderOptions } from './types';
 
 import { createChangeQueue } from './change-queue';
+import { createJsonlCache } from './jsonl-cache';
 import { VALID_INPUT_FORMATS } from './types';
+
+export type { ImageLoaderCache, ImageLoaderCacheValue, ImageLoaderOptions } from './types';
+
+export { createJsonlCache } from './jsonl-cache';
+
+const defaultPatternFormats = VALID_INPUT_FORMATS.filter((format) => format !== 'svg');
 
 const defaultOptions = {
 	base: '.',
-	pattern: `**/[^_]*.{${VALID_INPUT_FORMATS.join(',')}}`,
+	pattern: `**/*.{${defaultPatternFormats.join(',')}}`,
 	concurrency: 50,
 	debounceMs: 300,
 	generateId: ({ filePath }) => filePath,
@@ -30,6 +37,7 @@ function getErrorMessage(error: unknown) {
 function getSyncDataFunction({
 	baseDir,
 	options,
+	cache,
 	store,
 	parseData,
 	generateDigest,
@@ -37,6 +45,7 @@ function getSyncDataFunction({
 }: Pick<LoaderContext, 'store' | 'parseData' | 'generateDigest' | 'logger'> & {
 	baseDir: URL;
 	options: ImageLoaderOptions;
+	cache?: ImageLoaderCache | undefined;
 }) {
 	// Limit the concurrency of files processed to reduce memory usage
 	const limit = pLimit(options.concurrency);
@@ -70,10 +79,40 @@ function getSyncDataFunction({
 			// The store is keyed by id, not filePath
 			const existingEntry = store.get(id);
 
-			if (existingEntry?.digest === digest && existingEntry.filePath) return;
+			if (existingEntry?.digest === digest && existingEntry.filePath) {
+				// Asset imports from image() schema fields are only registered by store.set on fresh writes
+				// Re-register on the skip path or those fields lose their Vite modules on incremental builds
+				if (existingEntry.assetImports?.length) {
+					// @ts-expect-error -- addAssetImports exists at runtime but isn't typed on DataStore
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see the @ts-expect-error above
+					store.addAssetImports(existingEntry.assetImports, existingEntry.filePath);
+				}
+				return;
+			}
 
 			// Relative to the project root, where is this image found; it needs to be importable
 			const filePathRelative = path.join(options.base, filePath);
+
+			let handlerData: Record<string, unknown> = {};
+
+			if (options.dataHandler) {
+				const cached = await cache?.get(filePathRelative);
+
+				if (cached?.digest === digest) {
+					handlerData = cached.data;
+				} else {
+					handlerData = await options.dataHandler({
+						id,
+						filePath,
+						filePathRelative,
+						fileUrl,
+						modifiedTime,
+						logger,
+					});
+
+					await cache?.set(filePathRelative, { digest, data: handlerData });
+				}
+			}
 
 			// parseData throws a well-formatted AstroError on schema validation failure
 			const parsedData = await parseData({
@@ -82,16 +121,7 @@ function getSyncDataFunction({
 				data: {
 					src: filePathRelative,
 					modifiedTime,
-					...(options.dataHandler
-						? await options.dataHandler({
-								id,
-								filePath,
-								filePathRelative,
-								fileUrl,
-								modifiedTime,
-								logger,
-							})
-						: {}),
+					...handlerData,
 				},
 			});
 
@@ -146,7 +176,19 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 		name: '@spectralcodex/astro-image-loader',
 		load: async function load(context: LoaderContext): Promise<void> {
 			// eslint-disable-next-line @typescript-eslint/unbound-method -- Astro's LoaderContext is meant to be destructured
-			const { config, store, parseData, generateDigest, logger, watcher } = context;
+			const { collection, config, store, parseData, generateDigest, logger, watcher } = context;
+
+			let cache: ImageLoaderCache | undefined;
+
+			if (options.cache) {
+				cache = options.cache;
+			} else if (options.cache !== false && options.dataHandler) {
+				cache = createJsonlCache({
+					filePath: fileURLToPath(
+						new URL(`astro-image-loader/${collection}.jsonl`, config.cacheDir),
+					),
+				});
+			}
 
 			const baseDir = new URL(options.base, config.root);
 
@@ -180,6 +222,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 			const syncData = getSyncDataFunction({
 				baseDir,
 				options,
+				cache,
 				store,
 				parseData,
 				generateDigest,
@@ -206,10 +249,11 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 				store.delete(id);
 			}
 
-			// Run the after load hook; live paths allow consumers to prune external caches
-			await options.afterLoad?.({
-				filePathsRelative: filePaths.map((filePath) => path.join(options.base, filePath)),
-			});
+			// Evict cache rows for deleted or renamed files
+			await cache?.prune?.(filePaths.map((filePath) => path.join(options.base, filePath)));
+
+			// Run the after load hook
+			await options.afterLoad?.();
 
 			if (!watcher) return;
 
@@ -233,7 +277,7 @@ export function imageLoader(optionsPartial: Partial<ImageLoaderOptions>) {
 					await options.beforeLoad?.();
 				},
 				onBatchEnd: async () => {
-					await options.afterLoad?.({});
+					await options.afterLoad?.();
 				},
 				onError: (error, change) => {
 					if (change) {

@@ -1,3 +1,5 @@
+import type { ImageLoaderCache, ImageLoaderCacheValue } from '@spectralcodex/astro-image-loader';
+
 import { defineImageCollection } from '@spectralcodex/astro-image-loader';
 import { hash } from '@spectralcodex/shared/cache';
 import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
@@ -50,23 +52,26 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
 
-/**
- * Astro persists entry data in its own store but rebuilding EXIF data is slow, so we cache it here as well
- * This survives Astro content cache wipes; dead keys are pruned after every full load
- */
-interface ImageMetadataCached {
-	hash: string;
-	width: number;
-	height: number;
-	exif?: ImageExifDataInput | undefined;
-}
-
+// Rebuilding EXIF data is slow, so dataHandler output is cached outside the Astro store
+// The loader orchestrates; sqlite in ./.cache survives both store wipes and node_modules reinstalls
 const imageMetadataCache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-metadata');
 
-// Schema changes invalidate both the store digest and the EXIF cache automatically
+const imageLoaderCache = {
+	get: (key: string) => imageMetadataCache.get<ImageLoaderCacheValue>(key),
+	set: async (key: string, value: ImageLoaderCacheValue) => {
+		await imageMetadataCache.set(key, value);
+	},
+	prune: (liveKeys: Array<string>) => {
+		imageMetadataCache.prune(liveKeys);
+	},
+} satisfies ImageLoaderCache;
+
+// Schema changes invalidate both the store digest and the cached dataHandler output automatically
 // Bump rev for logic-only changes; coerced/transformed fields are unrepresentable in JSON Schema and also need a rev bump
+// Env inputs participate because cached output embeds signed image URLs
 const invalidationKey = hash({
 	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
+	env: { IMAGE_SERVER_URL, IMAGE_SERVER_SECRET, IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY },
 	rev: 1,
 });
 
@@ -157,40 +162,17 @@ export const images = defineCollection(
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
 		invalidationKey,
+		cache: imageLoaderCache,
 		schema: ImageMetadataSchema.strict(),
 		beforeLoad: () => {
 			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
 		},
-		afterLoad: async ({ filePathsRelative }) => {
+		afterLoad: async () => {
 			await exiftool.end();
-
-			// Full loads report every live path; evict cache rows for deleted or renamed files
-			if (filePathsRelative) {
-				imageMetadataCache.prune(filePathsRelative);
-			}
 		},
-		dataHandler: async ({ id, filePathRelative, modifiedTime }) => {
-			// Key by file path so re-edited images overwrite the old row; the hash validates mtime
-			const contentHash = hash({ mtime: modifiedTime.getTime(), invalidationKey });
-			const cached = await imageMetadataCache.get<ImageMetadataCached>(filePathRelative);
-
-			let dimensions: { width: number; height: number };
-			let exif: ImageExifDataInput | undefined;
-
-			if (cached?.hash === contentHash) {
-				dimensions = { width: cached.width, height: cached.height };
-
-				if (cached.exif) exif = cached.exif;
-			} else {
-				dimensions = await getImageDimensions(filePathRelative);
-				exif = await extractExifData(filePathRelative, exiftool);
-
-				await imageMetadataCache.set(filePathRelative, {
-					hash: contentHash,
-					...dimensions,
-					exif,
-				} satisfies ImageMetadataCached);
-			}
+		dataHandler: async ({ id, filePathRelative }) => {
+			const dimensions = await getImageDimensions(filePathRelative);
+			const exif = await extractExifData(filePathRelative, exiftool);
 
 			// Clamp source width to avoid upscaling
 			const srcWidth = Math.min(1800, dimensions.width);
