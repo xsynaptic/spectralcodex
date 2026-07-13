@@ -191,7 +191,7 @@ const t = getTranslations();
 		<TopButton />
 		{
 			schemas && schemas.length > 0 ? (
-				<script type="application/ld+json" is:inline set:html={serializeGraph(schemas)} />
+				<script type="application/ld+json" is:inline set:html={serializeGraph(schemas)}></script>
 			) : undefined
 		}
 	</body>

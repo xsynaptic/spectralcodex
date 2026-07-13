@@ -7,7 +7,6 @@ import {
 	getWebComponentConfig,
 	restrictedSyntaxDefaults,
 } from '@xsynaptic/eslint-config';
-import astroPlugin from 'eslint-plugin-astro';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
@@ -138,7 +137,7 @@ export default getConfig(
 		/**
 		 * Astro
 		 */
-		...getAstroConfig({ a11y: astroPlugin.configs['jsx-a11y-strict'] }),
+		...getAstroConfig({ a11y: 'strict' }),
 	],
 	{
 		customGlobals: { mode: 'readonly' },
