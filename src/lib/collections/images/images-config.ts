@@ -1,9 +1,6 @@
-import type { ImageLoaderCache, ImageLoaderCacheValue } from '@spectralcodex/astro-image-loader';
-
-import { defineImageCollection } from '@spectralcodex/astro-image-loader';
 import { hash } from '@spectralcodex/shared/cache';
-import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import { createJsonlCache, defineImageCollection } from '@xsynaptic/astro-image-loader';
 import { defineCollection } from 'astro:content';
 import {
 	CONTENT_MEDIA_PATH,
@@ -12,6 +9,7 @@ import {
 	IMAGE_SERVER_URL,
 } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
+import path from 'node:path';
 import sharp from 'sharp';
 import { z } from 'zod';
 
@@ -53,18 +51,11 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
 
 // Rebuilding EXIF data is slow, so dataHandler output is cached outside the Astro store
-// The loader orchestrates; sqlite in ./.cache survives both store wipes and node_modules reinstalls
-const imageMetadataCache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-metadata');
-
-const imageLoaderCache = {
-	get: (key: string) => imageMetadataCache.get<ImageLoaderCacheValue>(key),
-	set: async (key: string, value: ImageLoaderCacheValue) => {
-		await imageMetadataCache.set(key, value);
-	},
-	prune: (liveKeys: Array<string>) => {
-		imageMetadataCache.prune(liveKeys);
-	},
-} satisfies ImageLoaderCache;
+// JSONL in ./.cache survives both store wipes and node_modules reinstalls
+// The explicit filePath (vs the package default under node_modules/.astro) is what buys that durability
+const imageLoaderCache = createJsonlCache({
+	filePath: path.join(CUSTOM_CACHE_PATH, 'image-metadata.jsonl'),
+});
 
 // Schema changes invalidate both the store digest and the cached dataHandler output automatically
 // Bump rev for logic-only changes; coerced/transformed fields are unrepresentable in JSON Schema and also need a rev bump
