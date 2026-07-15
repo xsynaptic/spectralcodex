@@ -14,12 +14,12 @@ export default {
 			ignoreBinaries: ['ssh-add'],
 			ignoreDependencies: [
 				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
-				'p-limit', // used in workspace packages (image-loader, scripts)
+				'eslint-plugin-jsx-a11y', // peer of eslint-plugin-astro's flat/jsx-a11y-strict config; referenced by string, not import
+				'p-limit', // used in workspace scripts packages
 			],
 		},
 		'packages/content-demo': {
 			entry: ['.mdxlintrc.mjs'],
-			ignore: ['collections/**'],
 			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
 			ignoreDependencies: [
 				'textlint-plugin-mdx', // referenced in .textlintrc.json
@@ -29,7 +29,6 @@ export default {
 		},
 		'packages/content': {
 			entry: ['.mdxlintrc.mjs', 'global.d.ts'],
-			ignore: ['collections/**'],
 			ignoreBinaries: ['check-content', 'content-schemas', 'fix-content', 'validate-content'],
 			ignoreDependencies: [
 				'textlint-plugin-mdx', // referenced in .textlintrc.json

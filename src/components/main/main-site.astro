@@ -1,6 +1,6 @@
 ---
 import { Font } from 'astro:assets';
-import { WEBMENTION_DOMAIN } from 'astro:env/client';
+import { UMAMI_DOMAIN, UMAMI_ID, WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import '#styles/main.css';
 import { IMAGE_SERVER_URL } from 'astro:env/server';
@@ -14,6 +14,7 @@ import Colophon from '#components/main/main-colophon.astro';
 import Meta from '#components/main/main-meta.astro';
 import SkipLink from '#components/main/main-skip-link.astro';
 import Sprites from '#components/main/main-sprites.astro';
+import StructuredData from '#components/main/main-structured-data.astro';
 import Stylesheet from '#components/main/main-stylesheet.astro';
 import TopButton from '#components/main/main-top-button.astro';
 import MenuFooter from '#components/menu/menu-footer.astro';
@@ -27,7 +28,6 @@ import Search from '#components/search/search.astro';
 import { zIndexScaleEnum } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
-import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {
 	meta?: MetaProps;
@@ -73,7 +73,11 @@ const t = getTranslations();
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
 		<ModeManager defaultMode="auto" />
 		<Meta {...meta} />
-		<Analytics isViewTransitionsEnabled={true} />
+		{
+			import.meta.env.PROD && UMAMI_ID && UMAMI_DOMAIN ? (
+				<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
+			) : undefined
+		}
 		<ClientRouter />
 		<meta name="build-version" content={import.meta.env.BUILD_VERSION} />
 		<script is:inline>
@@ -189,10 +193,6 @@ const t = getTranslations();
 			</div>
 		</footer>
 		<TopButton />
-		{
-			schemas && schemas.length > 0 ? (
-				<script type="application/ld+json" is:inline set:html={serializeGraph(schemas)}></script>
-			) : undefined
-		}
+		{schemas && schemas.length > 0 ? <StructuredData schemas={schemas} /> : undefined}
 	</body>
 </html>
