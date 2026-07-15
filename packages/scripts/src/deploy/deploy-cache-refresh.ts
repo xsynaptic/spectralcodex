@@ -16,8 +16,8 @@ export async function invokeCacheRefresh(options: InvokeCacheRefreshOptions): Pr
 
 	console.log(chalk.blue('Firing cache refresh on server (detached)...'));
 
-	// Remove a prior run first so the container name is free; latest deploy wins
-	const command = `cd ${config.remotePath} && (docker rm -f cache-warmer-run 2>/dev/null || true) && docker compose run -d --name cache-warmer-run cache-warmer`;
+	// Gracefully stop any prior run (SIGTERM for a clean exit), then free the name; latest deploy wins
+	const command = `cd ${config.remotePath} && (docker stop cache-warmer-run 2>/dev/null; docker rm -f cache-warmer-run 2>/dev/null; true) && docker compose run -d --name cache-warmer-run cache-warmer`;
 
 	await sshExec(config, command, { dryRun });
 

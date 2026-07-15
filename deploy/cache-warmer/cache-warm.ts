@@ -456,6 +456,12 @@ async function main(): Promise<void> {
 	});
 }
 
+// A newer deploy sends SIGTERM to supersede this run; exit cleanly, not as a SIGKILL crash
+process.on('SIGTERM', () => {
+	console.log('Superseded by a newer deploy; exiting');
+	process.exit(0);
+});
+
 try {
 	await main();
 } catch (error) {
