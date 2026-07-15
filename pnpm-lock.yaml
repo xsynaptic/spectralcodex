@@ -102,8 +102,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(astro@7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
       '@xsynaptic/astro-image-loader':
-        specifier: ^0.1.1
-        version: 0.1.1(astro@7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@36.1.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)
+        specifier: ^0.1.2
+        version: 0.1.2(astro@7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@36.1.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)
       '@xsynaptic/eslint-config':
         specifier: ^6.0.0
         version: 6.0.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@typescript-eslint/parser@8.63.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.7.0(jiti@2.7.0)))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3)
@@ -2955,8 +2955,8 @@ packages:
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0-beta.0
 
-  '@xsynaptic/astro-image-loader@0.1.1':
-    resolution: {integrity: sha512-CZQRNGUIoxyzMK8YPPfRx6p1NWWvLCRpv5AOt8zqnRkQZX3rD6riT+II1RaOfR0Y1tR1lXKoPKHEa6CzgUFuVw==}
+  '@xsynaptic/astro-image-loader@0.1.2':
+    resolution: {integrity: sha512-Z2N38JZxYw1ugVqQnO8Bddb6YC0XoqOYECOnMzyrlOlagVLF1zes0CnKSzbXrCR67z2YQ2r4dgNv1r4vyUSy2A==}
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0
       exiftool-vendored: ^36.0.0
@@ -10603,7 +10603,7 @@ snapshots:
       astro: 7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
       zod: 4.4.3
 
-  '@xsynaptic/astro-image-loader@0.1.1(astro@7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@36.1.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)':
+  '@xsynaptic/astro-image-loader@0.1.2(astro@7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@36.1.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)':
     dependencies:
       astro: 7.0.9(@astrojs/markdown-remark@7.2.1)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
       p-limit: 7.3.0
