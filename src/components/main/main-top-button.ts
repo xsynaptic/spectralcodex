@@ -1,8 +1,7 @@
 const hideThresholdPixels = 16;
 const revealThresholdPixels = 64;
 
-// Eligibility gate: stay hidden until the reader is genuinely deep into a long page,
-// at least this many viewport heights down OR this fraction through the page, whichever is further
+// Eligibility gate: stay hidden until the reader is genuinely deep into a long page
 const minViewportMultiple = 2;
 const minPageFraction = 0.2;
 

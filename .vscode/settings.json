@@ -146,7 +146,8 @@
 		"*.caddy": "caddyfile"
 	},
 	"npm.packageManager": "pnpm",
-	"typescript.preferences.importModuleSpecifier": "non-relative", // Suggest import mapped paths over others
+	"js/ts.preferences.importModuleSpecifier": "non-relative", // Prefer import mapped paths
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
 	"workbench.editor.labelFormat": "short",
 	"[astro]": {
 		"editor.defaultFormatter": "astro-build.astro-vscode"
@@ -161,7 +162,6 @@
 	"[typescriptreact]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
-	"typescript.tsdk": "node_modules/typescript/lib",
 	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
