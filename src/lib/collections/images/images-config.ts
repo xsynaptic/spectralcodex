@@ -50,18 +50,20 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
 
-// Rebuilding EXIF data is slow, so dataHandler output is cached outside the Astro store
-// JSONL in ./.cache survives both store wipes and node_modules reinstalls
-// The explicit filePath (vs the package default under node_modules/.astro) is what buys that durability
+// EXIF extraction is slow; a JSONL cache in ./.cache survives store wipes and node_modules reinstalls
+// Explicit filePath because the package default lives under node_modules/.astro
 const imageLoaderCache = createJsonlCache({
 	filePath: path.join(CUSTOM_CACHE_PATH, 'image-metadata.jsonl'),
 });
 
-// Schema changes invalidate both the store digest and the cached dataHandler output automatically
-// Bump rev for logic-only changes; coerced/transformed fields are unrepresentable in JSON Schema and also need a rev bump
-// Env inputs participate because cached output embeds signed image URLs
-const invalidationKey = hash({
+// Schema shape versions the cached payload; bump rev for changes invisible to z.toJSONSchema (coercions, extraction logic)
+const extractionVersion = hash({
 	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
+	rev: 1,
+});
+
+// Env feeds the src transform; changes re-derive entries without re-running exiftool
+const derivationVersion = hash({
 	env: { IMAGE_SERVER_URL, IMAGE_SERVER_SECRET, IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY },
 	rev: 1,
 });
@@ -145,6 +147,18 @@ const getSignedImagePath = createSignedImagePathFunction({
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 
+// Replaces the loader-injected src (root-relative path) with the signed URL
+const ImageCollectionSchema = ImageMetadataSchema.strict().transform((data) => ({
+	...data,
+	src: `${IMAGE_SERVER_URL}${getSignedImagePath(
+		path.posix.relative(CONTENT_MEDIA_PATH, data.path),
+		{
+			// Clamp source width to avoid upscaling
+			width: Math.min(1800, data.width),
+		},
+	)}`,
+}));
+
 // Initialize ExifTool instance so it can be reused
 let exiftool: ExifTool;
 
@@ -152,25 +166,25 @@ export const images = defineCollection(
 	defineImageCollection({
 		base: CONTENT_MEDIA_PATH,
 		concurrency: 80,
-		invalidationKey,
+		extractionVersion,
+		derivationVersion,
+		showProgress: true,
 		cache: imageLoaderCache,
-		schema: ImageMetadataSchema.strict(),
+		schema: ImageCollectionSchema,
 		beforeLoad: () => {
 			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
 		},
 		afterLoad: async () => {
 			await exiftool.end();
 		},
-		dataHandler: async ({ id, filePathRelative }) => {
+		dataHandler: async ({ filePathRelative }) => {
 			const dimensions = await getImageDimensions(filePathRelative);
 			const exif = await extractExifData(filePathRelative, exiftool);
 
-			// Clamp source width to avoid upscaling
-			const srcWidth = Math.min(1800, dimensions.width);
 			const defaultAspectRatio = 3 / 2;
 
+			// Intrinsic data only; env-dependent values would poison the cross-context cache
 			const defaultMetadata = {
-				src: `${IMAGE_SERVER_URL}${getSignedImagePath(id, { width: srcWidth })}`,
 				path: filePathRelative,
 				width: ImageSizeEnum.Large,
 				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
@@ -178,11 +192,12 @@ export const images = defineCollection(
 				description: '',
 			};
 
+			// The loader injects src (root-relative path) and modifiedTime before parsing
 			return {
 				...defaultMetadata,
 				...dimensions,
 				...exif,
-			} satisfies ImageMetadataInput;
+			} satisfies Omit<ImageMetadataInput, 'src'>;
 		},
 	}),
 );
