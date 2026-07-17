@@ -49,7 +49,7 @@ Reads region metadata to extract Overture division IDs, queries Parquet datasets
 
 ### `dev-server`
 
-Starts a containerized image server alongside the Astro dev server. Loads `.env.development` for dev-specific overrides.
+Starts a containerized image server alongside the Astro dev server. Loads `.env.development` for dev-specific overrides. Run with `pnpm dev` from the workspace root.
 
 ## Deployment
 

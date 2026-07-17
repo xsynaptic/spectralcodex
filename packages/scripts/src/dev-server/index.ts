@@ -10,7 +10,8 @@ const composePath = path.join(import.meta.dirname, 'docker-compose.yml');
 
 const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
 
-process.env.CONTENT_MEDIA_PATH = path.resolve(rootPath, mediaPathRelative);
+// Docker needs an absolute host path; don't mutate CONTENT_MEDIA_PATH itself, the astro dev child inherits it
+process.env.CONTENT_MEDIA_PATH_HOST = path.resolve(rootPath, mediaPathRelative);
 process.env.IMAGE_SERVER_NGINX_CONFIG = path.resolve(rootPath, 'deploy/nginx.conf.template');
 
 $.verbose = false;
@@ -60,8 +61,11 @@ async function startContainers() {
 // eslint-disable-next-line unicorn/prefer-top-level-await -- fire-and-forget container startup; awaiting would block the dev server
 void startContainers();
 
+// Run the bin directly; `npx` warns about deprecations and `pnpm exec` prints a spurious error when exiting
+const astroBinPath = path.join(rootPath, 'node_modules', '.bin', 'astro');
+
 try {
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm exec astro dev`;
+	await $({ stdio: 'inherit', cwd: rootPath })`${astroBinPath} dev`;
 } catch {
 	// astro dev exited (Ctrl+C or crash); fall through to teardown
 }

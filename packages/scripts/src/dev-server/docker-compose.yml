@@ -14,7 +14,7 @@ services:
     image: ghcr.io/cshum/imagor-mozjpeg:1.9.2
     container_name: dev-image-server
     volumes:
-      - ${CONTENT_MEDIA_PATH}:/media:ro
+      - ${CONTENT_MEDIA_PATH_HOST}:/media:ro
     environment:
       - IMAGOR_SECRET=${IMAGE_SERVER_SECRET:-dev-secret-do-not-use-in-production}
       - IMAGOR_SIGNER_TYPE=sha256

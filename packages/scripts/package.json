@@ -13,7 +13,6 @@
 		"deploy-media": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-media.cli.ts",
 		"deploy-og": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-og.cli.ts",
 		"deploy-site": "NODE_ENV=production tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy.ts",
-		"dev-server": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../.env.development ./src/dev-server/index.ts",
 		"generate-redirects": "tsx ./src/generate-redirects/index.ts",
 		"improve-content": "tsx ./src/improve-content/index.ts",
 		"map-divisions": "tsx ./src/map-divisions/index.ts",
