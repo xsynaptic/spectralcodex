@@ -51,10 +51,6 @@
 	}
 }
 
-.nav-item-link.nav-active {
-	@apply font-semibold;
-}
-
 /* Top-level icon */
 .nav-icon {
 	@apply transition-transform transition-discrete duration-100;
@@ -160,10 +156,6 @@
 	text-overflow: ellipsis;
 	text-align: left;
 	white-space: nowrap;
-}
-
-.nav-sub-link.nav-active {
-	@apply font-semibold;
 }
 
 /* Multilingual text annotation */

@@ -52,15 +52,16 @@
 	--link-hover-dark: var(--color-highlight-700);
 }
 
+/* Hero context; divided-hero also retunes divider glyph color in divider.css */
 @media (width >= 40rem) {
-	.link-hero .link-accent {
+	.divided-hero .link-accent {
 		--link-color: var(--color-accent-300);
 		--link-hover: var(--color-accent-200);
 		--link-color-dark: var(--color-accent-300);
 		--link-hover-dark: var(--color-accent-200);
 	}
 
-	.link-hero .link-highlight {
+	.divided-hero .link-highlight {
 		--link-color: var(--color-highlight-300);
 		--link-hover: var(--color-highlight-200);
 		--link-color-dark: var(--color-highlight-400);

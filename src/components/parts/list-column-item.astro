@@ -14,15 +14,8 @@ const children = await renderSlot(Astro.slots, 'default');
 
 {
 	children ? (
-		<li class="marker:text-accent-200 dark:marker:text-accent-500">
-			<div
-				class:list={[
-					'flex flex-wrap items-center gap-1',
-					'text-primary-700 dark:text-primary-400',
-					className,
-				]}
-				{...props}
-			>
+		<li class="lc-item">
+			<div class:list={['lc-item-body', className]} {...props}>
 				<Fragment set:html={children} />
 			</div>
 		</li>

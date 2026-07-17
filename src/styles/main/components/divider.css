@@ -28,14 +28,6 @@
 	content: none;
 }
 
-.divided-bar {
-	--divider-glyph: var(--content-bar);
-}
-
-.divided-bullet {
-	--divider-glyph: var(--content-bullet);
-}
-
 .divided-chevron {
 	--divider-glyph: var(--content-chevron);
 }
@@ -57,9 +49,8 @@
 	--divider-color-dark: var(--color-primary-600);
 }
 
-.divided-darker {
-	--divider-color: var(--color-primary-500);
-	--divider-color-dark: var(--color-primary-700);
+.divided-row {
+	@apply inline items-start gap-x-1 gap-y-1 sm:inline-flex sm:flex-wrap sm:gap-y-2;
 }
 
 @media (width >= 40rem) {

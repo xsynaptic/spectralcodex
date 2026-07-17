@@ -32,25 +32,13 @@ export interface MetaProps {
 }
 
 /**
- * Divider component types
+ * Divider component types; values map onto divided-* classes in divider.css
  */
-export const DividerColorEnum = {
-	Default: 'default',
-	Lighter: 'lighter',
-	Darker: 'darker',
-} as const;
+export type DividerColor = 'default' | 'lighter';
 
-export type DividerColor = (typeof DividerColorEnum)[keyof typeof DividerColorEnum];
+export type DividerContent = 'chevron' | 'dot' | 'slash';
 
-export const DividerContentEnum = {
-	Bar: 'bar',
-	Bullet: 'bullet',
-	Chevron: 'chevron',
-	Dot: 'dot',
-	Slash: 'slash',
-} as const;
-
-export type DividerContent = (typeof DividerContentEnum)[keyof typeof DividerContentEnum];
+export type DividerWeight = 'thin';
 
 /**
  * Preview display options

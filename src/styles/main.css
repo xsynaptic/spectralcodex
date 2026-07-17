@@ -41,6 +41,7 @@
 @import './main/components/i18n.css' layer(components);
 @import './main/components/image-metadata.css' layer(components);
 @import './main/components/link.css' layer(components);
+@import './main/components/list-column.css' layer(components);
 @import './main/components/loading.css' layer(components);
 @import './main/components/nav-menu.css' layer(components);
 @import './main/components/pagination.css' layer(components);

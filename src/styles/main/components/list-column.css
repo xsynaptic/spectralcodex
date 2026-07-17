@@ -1,0 +1,28 @@
+/* List column styles; extracted here to avoid repetition in the list-column components */
+.lc {
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--spacing) * 2);
+	padding-left: calc(var(--spacing) * 4);
+}
+
+ul.lc {
+	list-style-type: disc;
+}
+
+ol.lc {
+	list-style-type: decimal;
+}
+
+.lc-item {
+	@apply marker:text-accent-200 dark:marker:text-accent-500;
+}
+
+.lc-item-body {
+	@apply text-primary-700 dark:text-primary-400;
+
+	display: flex;
+	flex-wrap: wrap;
+	gap: calc(var(--spacing) * 1);
+	align-items: center;
+}

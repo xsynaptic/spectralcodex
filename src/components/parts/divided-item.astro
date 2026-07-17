@@ -1,22 +1,22 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
-import type { DividerColor, DividerContent } from '#components/types.ts';
-
-import { DividerColorEnum, DividerContentEnum } from '#components/types.ts';
+import type { DividerColor, DividerContent, DividerWeight } from '#components/types.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	class?: string | undefined;
 	dividerColor?: DividerColor | undefined;
 	dividerContent?: DividerContent | undefined;
+	dividerWeight?: DividerWeight | undefined;
 }>;
 
 const {
 	as: Tag = 'div',
 	class: className,
-	dividerColor = DividerColorEnum.Default,
-	dividerContent = DividerContentEnum.Slash,
+	dividerColor = 'default',
+	dividerContent = 'slash',
+	dividerWeight,
 	...props
 } = Astro.props;
 ---
@@ -24,8 +24,9 @@ const {
 <Tag
 	class:list={[
 		'divided',
-		dividerContent === DividerContentEnum.Slash ? undefined : `divided-${dividerContent}`,
-		dividerColor === DividerColorEnum.Default ? undefined : `divided-${dividerColor}`,
+		dividerContent === 'slash' ? undefined : `divided-${dividerContent}`,
+		dividerColor === 'default' ? undefined : `divided-${dividerColor}`,
+		dividerWeight ? `divided-${dividerWeight}` : undefined,
 		className,
 	]}
 	{...props}

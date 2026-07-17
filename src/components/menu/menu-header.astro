@@ -27,7 +27,7 @@ const t = getTranslations();
 				menuItems.map((item) => {
 					const children = item.children;
 					const isActive = isActiveMenuItem(item, pathname);
-					const triggerClasses = ['nav-item-link', isActive ? 'nav-active' : undefined];
+					const triggerClasses = ['nav-item-link', isActive ? 'link-active' : undefined];
 
 					return (
 						<li class="nav-item">

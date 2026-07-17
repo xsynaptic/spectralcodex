@@ -3,14 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { renderSlot } from '#lib/utils/astro.ts';
 
-const LinkColorEnum = {
-	Primary: 'primary',
-	PrimaryBright: 'primary-bright',
-	Highlight: 'highlight',
-	Accent: 'accent',
-} as const;
-
-type LinkColor = (typeof LinkColorEnum)[keyof typeof LinkColorEnum];
+type LinkColor = 'accent' | 'highlight' | 'primary' | 'primary-bright';
 
 interface Props extends HTMLAttributes<'a'> {
 	linkColor?: LinkColor | undefined;
@@ -21,7 +14,7 @@ interface Props extends HTMLAttributes<'a'> {
 const {
 	class: className,
 	href,
-	linkColor = LinkColorEnum.Accent,
+	linkColor = 'accent',
 	isActive = false,
 	showDarkMode = true,
 	...props
