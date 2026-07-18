@@ -1,3 +1,5 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
+
 import {
 	GeometryTypeEnum,
 	LocationCategoryEnum,
@@ -5,7 +7,6 @@ import {
 } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapSourceItemParsed } from '../types';
 import type { MapFilterState } from './canvas-data-filter';
 
 import { getMapCanvasData, isLocationVisible } from './canvas-data-filter';
@@ -20,12 +21,12 @@ const passAll: MapFilterState = {
 const pointGeometry = {
 	type: GeometryTypeEnum.Point,
 	coordinates: [0, 0],
-} satisfies MapSourceItemParsed['geometry'];
+} satisfies MapSourceItem['geometry'];
 
 function makeItem(
-	properties: Partial<MapSourceItemParsed['properties']> = {},
-	geometry: MapSourceItemParsed['geometry'] = pointGeometry,
-): MapSourceItemParsed {
+	properties: Partial<MapSourceItem['properties']> = {},
+	geometry: MapSourceItem['geometry'] = pointGeometry,
+): MapSourceItem {
 	return {
 		properties: {
 			id: 'location-id',
@@ -49,7 +50,7 @@ const lineGeometry = {
 		[0, 0],
 		[1, 1],
 	],
-} satisfies MapSourceItemParsed['geometry'];
+} satisfies MapSourceItem['geometry'];
 
 const polygonGeometry = {
 	type: GeometryTypeEnum.Polygon,
@@ -61,7 +62,7 @@ const polygonGeometry = {
 			[0, 0],
 		],
 	],
-} satisfies MapSourceItemParsed['geometry'];
+} satisfies MapSourceItem['geometry'];
 
 describe('isLocationVisible', () => {
 	test('status is an exclude-list', () => {

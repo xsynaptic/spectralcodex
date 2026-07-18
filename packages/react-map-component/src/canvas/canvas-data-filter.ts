@@ -1,13 +1,9 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
-import type {
-	MapGeometry,
-	MapScope,
-	MapSourceFeatureCollection,
-	MapSourceItemParsed,
-} from '../types';
+import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '../types';
 
 export interface MapFilterState {
 	status: ReadonlyArray<LocationStatus>;
@@ -24,7 +20,7 @@ export interface MapCanvasData {
 }
 
 export function isLocationVisible(
-	properties: MapSourceItemParsed['properties'],
+	properties: MapSourceItem['properties'],
 	filter: MapFilterState,
 ): boolean {
 	if (filter.status.includes(properties.status)) return false;
@@ -34,7 +30,7 @@ export function isLocationVisible(
 }
 
 function toFeatureCollection(
-	items: Array<MapSourceItemParsed>,
+	items: Array<MapSourceItem>,
 ): MapSourceFeatureCollection | undefined {
 	if (items.length === 0) return undefined;
 
@@ -50,7 +46,7 @@ function toFeatureCollection(
 
 // Restrict the shared index to this map's rows before any visibility filtering
 function isInMapScope(
-	properties: MapSourceItemParsed['properties'],
+	properties: MapSourceItem['properties'],
 	scope: MapScope,
 	idSet: ReadonlySet<string> | undefined,
 ): boolean {
@@ -71,7 +67,7 @@ function isInMapScope(
 }
 
 export function getMapCanvasData(
-	items: ReadonlyArray<MapSourceItemParsed>,
+	items: ReadonlyArray<MapSourceItem>,
 	filter: MapFilterState,
 	scope?: MapScope,
 ): MapCanvasData {
@@ -89,8 +85,8 @@ export function getMapCanvasData(
 		);
 	}
 
-	const points: Array<MapSourceItemParsed> = [];
-	const lineStrings: Array<MapSourceItemParsed> = [];
+	const points: Array<MapSourceItem> = [];
+	const lineStrings: Array<MapSourceItem> = [];
 
 	for (const item of scopedItems) {
 		if (!isLocationVisible(item.properties, filter)) continue;

@@ -1,4 +1,5 @@
-import { MapSourceItemSchema } from '../types';
+import { MapSourceItemSchema } from '@spectralcodex/map-codec';
+
 import { createMapDataQuery } from './data-query-factory';
 
 export const { DataProvider: SourceDataContextProvider, useDataQuery: useSourceDataQuery } =

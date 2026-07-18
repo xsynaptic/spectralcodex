@@ -1,12 +1,11 @@
+import type { MapPopupItem } from '@spectralcodex/map-codec';
 import type { FC, ReactNode } from 'react';
 
+import { MapPopupItemSchema } from '@spectralcodex/map-codec';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
-import type { MapPopupItemParsed } from '../types';
-
 import { FETCH_TIMEOUT_MS } from '../constants';
-import { MapPopupItemSchema } from '../types';
 
 interface ChunkConfig {
 	chunkUrlBase: string | undefined;
@@ -29,7 +28,7 @@ export const ChunkConfigProvider: FC<ChunkConfig & { children: ReactNode }> =
 		);
 	};
 
-function parseChunk(raw: unknown): Array<MapPopupItemParsed> {
+function parseChunk(raw: unknown): Array<MapPopupItem> {
 	const result = MapPopupItemSchema.array().safeParse(raw);
 
 	if (!result.success) {
@@ -50,7 +49,7 @@ export function useChunkPopup(chunkKey: string | undefined) {
 			? `${chunkUrlBase}${chunkKey}.json?v=${version ?? 'unknown'}`
 			: undefined;
 
-	return useQuery<Array<MapPopupItemParsed>>({
+	return useQuery<Array<MapPopupItem>>({
 		queryKey: ['popup-chunk', url, isDev],
 		queryFn: async () => {
 			// Guarded by `enabled`, so a URL is always present when this runs

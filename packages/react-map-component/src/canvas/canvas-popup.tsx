@@ -1,13 +1,11 @@
+import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { MapSpritesEnum } from '@spectralcodex/shared/map';
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, MapSpritesEnum } from '@spectralcodex/shared/map';
 import maplibregl from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
-
-import type { MapPopupItemParsed, MapSourceItemParsed } from '../types';
 
 import { MEDIA_QUERY_MOBILE } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
@@ -22,7 +20,7 @@ import {
 	useMapStoreActions,
 } from '../store/store';
 
-type MapPopupItemExtended = MapPopupItemParsed & {
+type MapPopupItemExtended = MapPopupItem & {
 	precision: number;
 	popupCoordinates: LngLat;
 };
@@ -48,7 +46,7 @@ const defaultPopupItem = {
  * - LineString: use first point
  * - Polygon: use first point of outer ring
  */
-function getPopupCoordinates({ geometry }: MapSourceItemParsed): maplibregl.LngLat {
+function getPopupCoordinates({ geometry }: MapSourceItem): maplibregl.LngLat {
 	switch (geometry.type) {
 		case GeometryTypeEnum.Point: {
 			const [lng, lat] = geometry.coordinates as [number, number];
@@ -123,11 +121,11 @@ function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
 const mapImagePreloadDelayMs = 100;
 
 // Index by id so hover/selection lookups avoid an O(n) scan per render
-function useSourceDataIndex(): Map<string, MapSourceItemParsed> {
+function useSourceDataIndex(): Map<string, MapSourceItem> {
 	const { data: sourceData } = useSourceDataQuery();
 
 	return useMemo(() => {
-		const index = new Map<string, MapSourceItemParsed>();
+		const index = new Map<string, MapSourceItem>();
 
 		if (sourceData) {
 			for (const item of sourceData) {
