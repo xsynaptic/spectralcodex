@@ -1,0 +1,12 @@
+{
+	"name": "@spectralcodex/map-codec",
+	"version": "1.0.0",
+	"description": "Map data codec for Spectral Codex",
+	"type": "module",
+	"exports": "./src/index.ts",
+	"private": true,
+	"dependencies": {
+		"@spectralcodex/shared": "workspace:*",
+		"zod": "^4.4.3"
+	}
+}
