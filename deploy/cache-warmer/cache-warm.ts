@@ -14,7 +14,6 @@ interface PurgeResult {
 
 const SKIP_PURGE = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
 const SITE_URL = requireEnv('SITE_URL').replace(/\/$/, '');
-const IMAGE_SERVER_URL = requireEnv('IMAGE_SERVER_URL');
 const ZONE_ID = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
 const API_TOKEN = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
 const CONCURRENCY = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
@@ -43,14 +42,8 @@ const HEADERS: Record<string, string> = {
 	'Accept-Encoding': 'br, gzip',
 };
 
-// Absolute image URLs scraped from HTML and CSS bodies
-const IMAGE_REGEX = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]*)?/gi;
-
 // Site-relative build assets (CSS, JS, fonts) under the custom assets dir
 const ASSET_REGEX = /\/_x\/[^\s"'<>()]+/g;
-
-// Content pages link external images too; only warm hosts we serve
-const ALLOWED_HOSTS = new Set([new URL(SITE_URL).host, new URL(IMAGE_SERVER_URL).host]);
 
 function requireEnv(name: string): string {
 	const value = process.env[name];
@@ -97,13 +90,16 @@ function extractLocations(xml: string): Array<string> {
 }
 
 async function purge(): Promise<void> {
-	console.log('Purging Cloudflare cache (purge_everything)...');
+	// Image URLs are immutable (HMAC of the transform path, no content hash)
+	// The purge is scoped to the site host; image server remains warm at the edge through a deploy
+	const host = new URL(SITE_URL).host;
+	console.log(`Purging Cloudflare cache (hostname ${host})...`);
 	const response = await fetch(
 		`https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache`,
 		{
 			method: 'POST',
 			headers: { Authorization: `Bearer ${API_TOKEN}`, 'Content-Type': 'application/json' },
-			body: JSON.stringify({ purge_everything: true }),
+			body: JSON.stringify({ hosts: [host] }),
 			signal: AbortSignal.timeout(TIMEOUT_MS),
 		},
 	);
@@ -147,13 +143,7 @@ async function getMapUrls(): Promise<MapUrlsResult> {
 }
 
 function scrape(text: string, assets: Set<string>): void {
-	for (const match of text.matchAll(IMAGE_REGEX)) {
-		// canParse guards odd matches from throwing
-		// href is also a fresh string, unpinning the source HTML that V8 would otherwise retain via match slices
-		if (!match[0] || !URL.canParse(match[0])) continue;
-		const url = new URL(match[0]);
-		if (ALLOWED_HOSTS.has(url.host)) assets.add(url.href);
-	}
+	// .href yields a fresh string, unpinning the source HTML that V8 would otherwise retain via a match slice
 	for (const match of text.matchAll(ASSET_REGEX)) {
 		if (match[0]) assets.add(new URL(match[0], SITE_URL).href);
 	}
@@ -421,7 +411,7 @@ async function main(): Promise<void> {
 		notes.push(`Map URLs skipped: ${mapResult.skipReason}`);
 	}
 	console.log(
-		`Warming ${String(assets.size)} images/assets + ${String(mapResult.urls.length)} map URLs...`,
+		`Warming ${String(assets.size)} assets + ${String(mapResult.urls.length)} map URLs...`,
 	);
 	// Fonts (and any images) referenced from CSS only surface once the CSS itself is warmed
 	const cssAssets = new Set<string>();
