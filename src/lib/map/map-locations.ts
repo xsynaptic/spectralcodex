@@ -1,19 +1,10 @@
-import type {
-	MapGeometry,
-	MapPopupItemInput,
-	MapSourceItemInput,
-} from '@spectralcodex/react-map-component';
+import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 import type { FeatureCollection, Position } from 'geojson';
 
 import { hashShort } from '@spectralcodex/shared/cache';
-import {
-	GeometryTypeEnum,
-	LocationCategoryNumericMapping,
-	LocationStatusNumericMapping,
-	MapDataGeometryTypeNumericMapping,
-	MapDataKeysCompressed,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
 
@@ -48,25 +39,22 @@ function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	switch (geometryType) {
 		case GeometryTypeEnum.Point: {
 			return {
-				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
-				[MapDataKeysCompressed.GeometryCoordinates]: getMapGeometryCoordinatesOptimized(
-					geometry.coordinates,
-					featureId,
-				),
+				type: geometryType,
+				coordinates: getMapGeometryCoordinatesOptimized(geometry.coordinates, featureId),
 			};
 		}
 		case GeometryTypeEnum.LineString: {
 			return {
-				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
-				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map((position) =>
+				type: geometryType,
+				coordinates: geometry.coordinates.map((position) =>
 					getMapGeometryCoordinatesOptimized(position, featureId),
 				),
 			};
 		}
 		case GeometryTypeEnum.Polygon: {
 			return {
-				[MapDataKeysCompressed.GeometryType]: MapDataGeometryTypeNumericMapping[geometryType],
-				[MapDataKeysCompressed.GeometryCoordinates]: geometry.coordinates.map((ring) =>
+				type: geometryType,
+				coordinates: geometry.coordinates.map((ring) =>
 					ring.map((position) => getMapGeometryCoordinatesOptimized(position, featureId)),
 				),
 			};
@@ -183,10 +171,10 @@ export function getLocationsFeatureCollection(
 	) satisfies MapFeatureCollection;
 }
 
-// Optimized geodata for the map component; it will be reassembled into GeoJSON on the client
+// Source data for the map component; encoded to the compressed form at serialization edges
 export function getLocationsMapSourceData(
 	featureCollection: MapFeatureCollection | undefined,
-): Array<MapSourceItemInput> | undefined {
+): Array<MapSourceItem> | undefined {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
 	return featureCollection.features
@@ -197,37 +185,32 @@ export function getLocationsMapSourceData(
 				: feature.properties.title;
 
 			return {
-				[MapDataKeysCompressed.Id]: featureId,
-				[MapDataKeysCompressed.Title]: stripDiacritics(title),
-				[MapDataKeysCompressed.Category]:
-					LocationCategoryNumericMapping[feature.properties.category],
-				[MapDataKeysCompressed.Status]: LocationStatusNumericMapping[feature.properties.status],
-				[MapDataKeysCompressed.Precision]: feature.properties.precision,
-				[MapDataKeysCompressed.Quality]: feature.properties.quality,
-				[MapDataKeysCompressed.Rating]: feature.properties.rating,
-				...(feature.properties.objective === undefined
-					? {}
-					: {
-							[MapDataKeysCompressed.Objective]: feature.properties.objective,
-						}),
-				...(feature.properties.outlier === undefined
-					? {}
-					: {
-							[MapDataKeysCompressed.Outlier]: feature.properties.outlier,
-						}),
-				...(feature.properties.image === undefined
-					? {}
-					: { [MapDataKeysCompressed.HasImage]: true }),
-				[MapDataKeysCompressed.Geometry]: getMapGeometryOptimized(feature.geometry, featureId)!,
-			};
+				properties: {
+					id: featureId,
+					title: stripDiacritics(title),
+					category: feature.properties.category,
+					status: feature.properties.status,
+					precision: feature.properties.precision,
+					quality: feature.properties.quality,
+					rating: feature.properties.rating,
+					...(feature.properties.objective === undefined
+						? {}
+						: { objective: feature.properties.objective }),
+					...(feature.properties.outlier === undefined
+						? {}
+						: { outlier: feature.properties.outlier }),
+					hasImage: feature.properties.image !== undefined,
+				},
+				geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
+			} satisfies MapSourceItem;
 		})
-		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));
+		.sort((a, b) => a.properties.id.localeCompare(b.properties.id));
 }
 
 // Extended locations metadata for popups
 export function getLocationsMapPopupData(
 	featureCollection: MapFeatureCollection | undefined,
-): Array<MapPopupItemInput> | undefined {
+): Array<MapPopupItem> | undefined {
 	if (!featureCollection || featureCollection.features.length === 0) return;
 
 	return featureCollection.features
@@ -235,30 +218,28 @@ export function getLocationsMapPopupData(
 			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 
 			return {
-				[MapDataKeysCompressed.Id]: featureId,
-				[MapDataKeysCompressed.Title]: stripDiacritics(feature.properties.title),
-				[MapDataKeysCompressed.TitleMultilingualLang]: feature.properties.titleMultilingualLang,
-				[MapDataKeysCompressed.TitleMultilingualValue]: feature.properties.titleMultilingualValue,
-				[MapDataKeysCompressed.Url]: feature.properties.url,
-				[MapDataKeysCompressed.Description]: feature.properties.description,
-				[MapDataKeysCompressed.Safety]: feature.properties.safety,
-				[MapDataKeysCompressed.GoogleMapsUrl]: feature.properties.googleMapsUrl,
-				[MapDataKeysCompressed.WikipediaUrl]: feature.properties.wikipediaUrl,
+				id: featureId,
+				title: stripDiacritics(feature.properties.title),
+				titleMultilingualLang: feature.properties.titleMultilingualLang,
+				titleMultilingualValue: feature.properties.titleMultilingualValue,
+				url: feature.properties.url,
+				description: feature.properties.description,
+				safety: feature.properties.safety,
+				googleMapsUrl: feature.properties.googleMapsUrl,
+				wikipediaUrl: feature.properties.wikipediaUrl,
 				...(feature.properties.image === undefined
 					? {}
-					: {
-							[MapDataKeysCompressed.ImageSrcSet]: feature.properties.image.srcSet,
-						}),
-			};
+					: { image: { srcSet: feature.properties.image.srcSet } }),
+			} satisfies MapPopupItem;
 		})
-		.sort((a, b) => a[MapDataKeysCompressed.Id].localeCompare(b[MapDataKeysCompressed.Id]));
+		.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-// Endpoint URLs derive from these hashes; the { data } wrapper is part of the key
-export function hashMapSourceData(sourceData: Array<MapSourceItemInput> | undefined) {
+// Endpoint URLs and inline cache keys derive from these hashes; the { data } wrapper is part of the key
+export function hashMapSourceData(sourceData: Array<MapSourceItem> | undefined) {
 	return hashShort({ data: sourceData });
 }
 
-export function hashMapPopupData(popupData: Array<MapPopupItemInput> | undefined) {
+export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
 	return hashShort({ data: popupData });
 }

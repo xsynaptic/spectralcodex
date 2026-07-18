@@ -1,5 +1,7 @@
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
+import { encodeMapPopupData, encodeMapSourceData } from '@spectralcodex/map-codec';
+
 import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
 import { getMapIndexData } from '#lib/map/map-index.ts';
 import {
@@ -35,18 +37,18 @@ export const getStaticPaths = (async () => {
 	];
 
 	return [
-		{ params: { id: 'index.json' }, props: { data: index } },
+		{ params: { id: 'index.json' }, props: { data: encodeMapSourceData(index) } },
 		...[...chunks].map(([chunkKey, popupItems]) => ({
 			params: { id: `${chunkKey}.json` },
-			props: { data: popupItems },
+			props: { data: encodeMapPopupData(popupItems) },
 		})),
 		{
 			params: { id: `objectives/${MapApiDataEnum.Source}` },
-			props: { data: objectivesSourceData ?? [] },
+			props: { data: encodeMapSourceData(objectivesSourceData ?? []) },
 		},
 		{
 			params: { id: `objectives/${MapApiDataEnum.Popup}` },
-			props: { data: objectivesPopupData ?? [] },
+			props: { data: encodeMapPopupData(objectivesPopupData ?? []) },
 		},
 		{ params: { id: 'map-manifest.json' }, props: { data: manifestUrls } },
 	];

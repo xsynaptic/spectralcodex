@@ -1,10 +1,4 @@
 export {
-	MapDataGeometryTypeNumericMapping,
-	MapDataKeyMap,
-	MapDataKeys,
-	MapDataKeysCompressed,
-} from './map-data';
-export {
 	GeometryBoundingBoxSchema,
 	GeometryDivisionIdSchema,
 	GeometrySchema,

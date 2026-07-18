@@ -1,11 +1,11 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type {
 	MapComponentData,
 	MapComponentProps,
 	MapScope,
-	MapSourceItemInput,
 } from '@spectralcodex/react-map-component';
 
-import { MapDataKeysCompressed } from '@spectralcodex/shared/map';
+import { encodeMapPopupData, encodeMapSourceData } from '@spectralcodex/map-codec';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 import { IMAGE_SERVER_URL } from 'astro:env/server';
 
@@ -29,14 +29,14 @@ type MapScopeHint =
 
 // Stamp each inline source row with its shared popup-chunk key so hover/click can fetch the chunk
 function getInlineSourceData(
-	sourceData: Array<MapSourceItemInput> | undefined,
+	sourceData: Array<MapSourceItem> | undefined,
 	chunkKeyById: Map<string, string> | undefined,
-): Array<MapSourceItemInput> | undefined {
+): Array<MapSourceItem> | undefined {
 	if (!sourceData || !chunkKeyById) return sourceData;
 
 	return sourceData.map((item) => {
-		const chunkKey = chunkKeyById.get(item[MapDataKeysCompressed.Id]);
-		return chunkKey ? { ...item, [MapDataKeysCompressed.ChunkKey]: chunkKey } : item;
+		const chunkKey = chunkKeyById.get(item.properties.id);
+		return chunkKey ? { ...item, properties: { ...item.properties, chunkKey } } : item;
 	});
 }
 
@@ -123,8 +123,8 @@ export function getMapData({
 		return {
 			...defaultMapDataProps,
 			hasGeodata: true,
-			sourceData,
-			popupData,
+			sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
+			popupData: popupData ? encodeMapPopupData(popupData) : undefined,
 			sourceDataKey: hashMapSourceData(sourceData),
 			popupDataKey: hashMapPopupData(popupData),
 			featureCount,
@@ -142,12 +142,13 @@ export function getMapData({
 	if (count <= MAP_SOURCE_INLINE_LIMIT) {
 		// Hash the un-stamped rows so inline keys match the equivalent API payload
 		const sourceData = getLocationsMapSourceData(featureCollection);
+		const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);
 
 		return {
 			...defaultMapDataProps,
 			hasGeodata: true,
 			mapId,
-			sourceData: getInlineSourceData(sourceData, chunkKeyById),
+			sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
 			sourceDataKey: hashMapSourceData(sourceData),
 			apiChunkBaseUrl,
 			featureCount,

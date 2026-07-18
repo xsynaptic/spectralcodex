@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { MapDataKeysCompressed } from '@spectralcodex/shared/map';
+import { MapDataKeysCompressed } from '@spectralcodex/map-codec';
 
 const ID = MapDataKeysCompressed.Id;
 const CHUNK_KEY = MapDataKeysCompressed.ChunkKey;

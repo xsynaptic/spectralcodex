@@ -37,7 +37,7 @@ const coordinatesSchema = z.union([
 ]);
 
 /**
- * Map source item: compressed wire form <-> rich form
+ * Map source item: compressed form <-> standard form
  */
 const sourceCompressedSchema = z
 	.object({
@@ -156,7 +156,7 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 });
 
 /**
- * Map popup item: compressed wire form <-> rich form
+ * Map popup item: compressed form <-> standard form
  */
 const popupCompressedSchema = z
 	.object({

@@ -1,8 +1,8 @@
-import type { MapPopupItemInput, MapSourceItemInput } from '@spectralcodex/react-map-component';
+import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
-import { MapDataKeysCompressed } from '@spectralcodex/shared/map';
+import { encodeMapPopupData, MapDataKeysCompressed } from '@spectralcodex/map-codec';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
@@ -21,10 +21,10 @@ import {
 } from '#lib/map/map-locations.ts';
 
 interface MapIndexData {
-	// One row per non-hidden feature: source shape plus region ordinals, theme indices, chunk key
-	index: Array<MapSourceItemInput>;
+	// One row per non-hidden feature: standard source shape plus region ordinals, theme indices, chunk key
+	index: Array<MapSourceItem>;
 	// Popup entries grouped by chunk key, each array sorted by id
-	chunks: Map<string, Array<MapPopupItemInput>>;
+	chunks: Map<string, Array<MapPopupItem>>;
 	// Every feature id → its popup chunk key; small inline maps stamp this onto their points
 	chunkKeyById: Map<string, string>;
 }
@@ -96,7 +96,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 	const locationByFeatureId = buildLocationByFeatureId(locations);
 
 	const coordinatesById = new Map<string, Position>();
-	const popupById = new Map<string, MapPopupItemInput>();
+	const popupById = new Map<string, MapPopupItem>();
 
 	if (featureCollection) {
 		for (const feature of featureCollection.features) {
@@ -106,15 +106,23 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 		}
 	}
 	for (const popupItem of popupData) {
-		popupById.set(popupItem[MapDataKeysCompressed.Id], popupItem);
+		popupById.set(popupItem.id, popupItem);
+	}
+
+	// Weight chunk balancing by the serialized size (what actually ships), not the standard size
+	const popupBytesById = new Map<string, number>();
+	for (const compressedItem of encodeMapPopupData(popupData)) {
+		popupBytesById.set(
+			compressedItem[MapDataKeysCompressed.Id],
+			Buffer.byteLength(JSON.stringify(compressedItem)),
+		);
 	}
 
 	// Assign chunk keys by binning every feature, weighted by its serialized popup size
 	const chunkInputs = sourceData.map((sourceItem) => {
-		const id = sourceItem[MapDataKeysCompressed.Id];
+		const id = sourceItem.properties.id;
 		const [lng, lat] = getFirstLngLat(coordinatesById.get(id), id);
-		const popupItem = popupById.get(id);
-		const popupBytes = popupItem ? Buffer.byteLength(JSON.stringify(popupItem)) : 0;
+		const popupBytes = popupBytesById.get(id) ?? 0;
 
 		return { id, lng, lat, popupBytes };
 	});
@@ -123,7 +131,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 
 	// Attach membership columns; omit empty arrays to save bytes
 	const index = sourceData.map((sourceItem) => {
-		const id = sourceItem[MapDataKeysCompressed.Id];
+		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
 		const regionOrdinals = location
@@ -135,22 +143,23 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 
 		return {
 			...sourceItem,
-			...(regionOrdinals.length > 0
-				? { [MapDataKeysCompressed.RegionOrdinals]: regionOrdinals }
-				: {}),
-			...(themeIndices.length > 0 ? { [MapDataKeysCompressed.ThemeIndices]: themeIndices } : {}),
-			[MapDataKeysCompressed.ChunkKey]: chunkKeyById.get(id) ?? '0',
-		} satisfies MapSourceItemInput;
+			properties: {
+				...sourceItem.properties,
+				...(regionOrdinals.length > 0 ? { regionOrdinals } : {}),
+				...(themeIndices.length > 0 ? { themeIndices } : {}),
+				chunkKey: chunkKeyById.get(id) ?? '0',
+			},
+		} satisfies MapSourceItem;
 	});
 
-	const chunks = new Map<string, Array<MapPopupItemInput>>();
+	const chunks = new Map<string, Array<MapPopupItem>>();
 
 	for (const [chunkKey, ids] of chunkIds) {
 		chunks.set(
 			chunkKey,
 			ids
 				.map((id) => popupById.get(id))
-				.filter((popupItem): popupItem is MapPopupItemInput => popupItem !== undefined),
+				.filter((popupItem): popupItem is MapPopupItem => popupItem !== undefined),
 		);
 	}
 

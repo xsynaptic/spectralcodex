@@ -46,6 +46,9 @@ importers:
       '@spectralcodex/astro-sitemap':
         specifier: workspace:*
         version: link:packages/astro-sitemap
+      '@spectralcodex/map-codec':
+        specifier: workspace:*
+        version: link:packages/map-codec
       '@spectralcodex/react-map-component':
         specifier: workspace:*
         version: link:packages/react-map-component
@@ -285,11 +288,23 @@ importers:
         specifier: ^2.1.4
         version: 2.1.4(textlint@15.7.1)
 
+  packages/map-codec:
+    dependencies:
+      '@spectralcodex/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+
   packages/react-map-component:
     dependencies:
       '@protomaps/basemaps':
         specifier: ^5.7.2
         version: 5.7.2
+      '@spectralcodex/map-codec':
+        specifier: workspace:*
+        version: link:../map-codec
       '@spectralcodex/shared':
         specifier: workspace:*
         version: link:../shared
