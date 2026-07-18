@@ -3,9 +3,9 @@ import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import type { HTMLAttributes } from 'astro/types';
 
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
+import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
-import mapCssUrl from '#styles/map-component.css?url';
 
 interface Props extends HTMLAttributes<'div'> {
 	mapComponentProps: MapComponentProps;

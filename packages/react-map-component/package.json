@@ -3,7 +3,10 @@
 	"version": "2.1.0",
 	"description": "React map component for Spectral Codex",
 	"type": "module",
-	"exports": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./styles/map-component.css": "./styles/map-component.css"
+	},
 	"private": true,
 	"dependencies": {
 		"@protomaps/basemaps": "^5.7.2",

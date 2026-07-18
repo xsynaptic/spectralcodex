@@ -9,6 +9,9 @@ import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
 
+import type { MapDarkModeOptions } from './lib/dark-mode';
+import type { MapMessages } from './lib/messages';
+
 export type MapInitialViewState = MapProps['initialViewState'];
 
 // Supported geometry for use with this component
@@ -61,6 +64,10 @@ export interface MapComponentProps extends Partial<
 	style?: CSSProperties | undefined;
 	version?: string | undefined;
 	isDev?: boolean | undefined;
+	// Host-overridable UI strings; merged over English defaults
+	messages?: Partial<MapMessages> | undefined;
+	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
+	darkMode?: MapDarkModeOptions | undefined;
 }
 
 // Used within Astro to determine whether a map should be rendered

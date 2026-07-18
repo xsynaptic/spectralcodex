@@ -29,9 +29,7 @@ export function isLocationVisible(
 	return properties.objective === undefined || properties.objective >= filter.objective;
 }
 
-function toFeatureCollection(
-	items: Array<MapSourceItem>,
-): MapSourceFeatureCollection | undefined {
+function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureCollection | undefined {
 	if (items.length === 0) return undefined;
 
 	return {

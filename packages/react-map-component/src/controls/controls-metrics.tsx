@@ -3,7 +3,7 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { useMapCanvasData } from '../canvas/canvas-data';
 import { useSourceDataQuery } from '../data/data-source';
-import { translations } from '../lib/translations';
+import { useMapMessages } from '../lib/messages';
 import { CustomControlPortal } from './controls-custom';
 
 const formatNumber = new Intl.NumberFormat('en');
@@ -12,6 +12,7 @@ export const MetricsControl: FC<{
 	position: ControlPosition;
 }> = function MetricsControl({ position }) {
 	const { filteredCount, totalCount } = useMapCanvasData();
+	const messages = useMapMessages();
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
@@ -27,7 +28,7 @@ export const MetricsControl: FC<{
 					<span>{formatNumber.format(filteredCount)}</span>
 					<span className="maplibregl-ctrl-metrics-divider">/</span>
 					<span>
-						{formatNumber.format(totalCount)} {translations.points}
+						{formatNumber.format(totalCount)} {messages.points}
 					</span>
 				</div>
 			)}

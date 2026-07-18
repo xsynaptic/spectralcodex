@@ -12,7 +12,7 @@ import { CONTROL_FILTER_ID } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
-import { translations } from '../lib/translations';
+import { useMapMessages } from '../lib/messages';
 import {
 	useMapCanvasLoading,
 	useMapChineseLabels,
@@ -25,6 +25,12 @@ import {
 	useMapStoreActions,
 } from '../store/store';
 import { CustomControlPortal } from './controls-custom';
+
+// Bilingual secondary labels; kept local pending the deferred map-portability work
+const chineseShowHideLabels = {
+	showAll: '顯示全部',
+	hideAll: '隱藏全部',
+} as const;
 
 const MapFilterMenuItem: FC<
 	PropsWithChildren<{
@@ -115,6 +121,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 
 const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 	const showChinese = useMapChineseLabels();
+	const messages = useMapMessages();
 
 	const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
 
@@ -127,13 +134,13 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 			>
 				{showChinese ? (
 					<>
-						<span>{translations.showAll}</span>
+						<span>{messages.showAll}</span>
 						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
-							{translations.showAllAlt}
+							{chineseShowHideLabels.showAll}
 						</span>
 					</>
 				) : (
-					translations.showAll
+					messages.showAll
 				)}
 			</MapFilterStatusShowHideMenuItem>
 			<MapFilterStatusShowHideMenuItem
@@ -143,13 +150,13 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 			>
 				{showChinese ? (
 					<>
-						<span>{translations.hideAll}</span>
+						<span>{messages.hideAll}</span>
 						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
-							{translations.hideAllAlt}
+							{chineseShowHideLabels.hideAll}
 						</span>
 					</>
 				) : (
-					translations.hideAll
+					messages.hideAll
 				)}
 			</MapFilterStatusShowHideMenuItem>
 		</>
@@ -256,6 +263,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 }) {
 	const isCanvasLoading = useMapCanvasLoading();
 	const filterOpen = useMapFilterOpen();
+	const messages = useMapMessages();
 
 	const { setFilterOpen } = useMapStoreActions();
 
@@ -273,7 +281,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					onClick={() => {
 						if (!isLoading) setFilterOpen(!filterOpen);
 					}}
-					aria-label={translations.filterMenuAriaLabel}
+					aria-label={messages.filterMenuAriaLabel}
 					{...(filterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="flex items-center justify-center">

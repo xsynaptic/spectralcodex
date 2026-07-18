@@ -12,7 +12,7 @@ import { usePopupDataQuery } from '../data/data-popup';
 import { useChunkPopup } from '../data/data-popup-chunks';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
-import { translations } from '../lib/translations';
+import { useMapMessages } from '../lib/messages';
 import {
 	useMapHoveredId,
 	useMapPopupVisible,
@@ -238,6 +238,7 @@ function useMapCanvasPopup() {
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
 	function MapPopupContent({ popupItem, imageServerUrl }) {
 		const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+		const messages = useMapMessages();
 
 		const {
 			title,
@@ -288,7 +289,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 								<use href={`#${MapSpritesEnum.Warning}`}></use>
 							</svg>
 							<span className="text-highlight-400 italic">
-								{precision === 2 ? translations.precisionWarning : translations.precisionError}
+								{precision === 2 ? messages.precisionWarning : messages.precisionError}
 							</span>
 						</div>
 					) : undefined}

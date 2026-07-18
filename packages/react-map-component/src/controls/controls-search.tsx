@@ -6,7 +6,7 @@ import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { CONTROL_SEARCH_ID } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
-import { translations } from '../lib/translations';
+import { useMapMessages } from '../lib/messages';
 import { useMapCanvasLoading } from '../store/store';
 import { CustomControlPortal } from './controls-custom';
 
@@ -14,6 +14,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 	position,
 }) {
 	const isCanvasLoading = useMapCanvasLoading();
+	const messages = useMapMessages();
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
@@ -24,14 +25,14 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 		<CustomControlPortal position={position}>
 			<div className="maplibregl-ctrl-search flex items-center gap-1" style={{ width: '300px' }}>
 				<label htmlFor="search-control-input" className="sr-only mb-2 p-1 text-sm">
-					{translations.searchAriaLabel}
+					{messages.searchAriaLabel}
 				</label>
 				<input
 					type="search"
 					id="search-control-input"
 					className="grow rounded-e-sm p-1 text-sm"
 					style={{ outline: '0' }}
-					placeholder={translations.searchPlaceholder}
+					placeholder={messages.searchPlaceholder}
 					required={true}
 				/>
 				<button
@@ -41,7 +42,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 					onClick={() => {
 						if (!isLoading) console.log('search');
 					}}
-					aria-label={translations.searchAriaLabel}
+					aria-label={messages.searchAriaLabel}
 				>
 					<span className="flex items-center justify-center">
 						<svg
