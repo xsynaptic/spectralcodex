@@ -48,7 +48,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.1.0",
+		"astro": "^7.1.1",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7"
 	},
@@ -66,7 +66,7 @@
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
-		"@tailwindcss/vite": "^4.3.2",
+		"@tailwindcss/vite": "^4.3.3",
 		"@tanstack/eslint-plugin-query": "^5.101.2",
 		"@turf/bbox": "^7.3.5",
 		"@turf/center": "^7.3.5",
@@ -113,11 +113,11 @@
 		"satteri": "^0.9.5",
 		"sharp": "^0.35.3",
 		"stylelint": "^17.14.0",
-		"tailwindcss": "^4.3.2",
+		"tailwindcss": "^4.3.3",
 		"tsx": "^4.23.1",
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
-		"vite": "^8.1.4",
+		"vite": "^8.1.5",
 		"vitest": "^4.1.10",
 		"zod": "^4.4.3"
 	},
