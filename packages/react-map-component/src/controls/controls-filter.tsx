@@ -39,7 +39,9 @@ const MapFilterMenuItem: FC<
 > = function MapFilterMenuItem({ isActive, children }) {
 	return (
 		<li
-			className={`rounded-sm transition-colors ${isActive ? 'bg-primary-200 hover:bg-primary-300 dark:bg-primary-800 dark:hover:bg-primary-700' : 'bg-primary-50 hover:bg-primary-100 dark:bg-primary-900 dark:hover:bg-primary-800'}`}
+			className={
+				isActive ? 'map-filter-menu-item map-filter-menu-item-active' : 'map-filter-menu-item'
+			}
 		>
 			{children}
 		</li>
@@ -60,13 +62,13 @@ const MapFilterStatusMenuItem: FC<{
 	return (
 		<MapFilterMenuItem isActive={isFiltered}>
 			<button
-				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
+				className="map-filter-button"
 				onClick={() => {
 					toggleStatusFilter(status);
 				}}
 			>
 				<span
-					className={`h-2 w-2 rounded-full border ${isFiltered ? 'opacity-60' : ''}`}
+					className="map-filter-swatch"
 					style={{
 						backgroundColor: isDarkMode
 							? LocationStatusRecords[status].colorDark
@@ -74,16 +76,21 @@ const MapFilterStatusMenuItem: FC<{
 						borderColor: isDarkMode
 							? LocationStatusRecords[status].strokeDark
 							: LocationStatusRecords[status].stroke,
+						...(isFiltered ? { opacity: 0.6 } : {}),
 					}}
 				></span>
 				<span
-					className={`flex w-full flex-nowrap items-center justify-between gap-2 font-display text-xs sm:text-sm ${isFiltered ? 'text-primary-500 dark:text-primary-400' : 'text-primary-700 dark:text-primary-300'}`}
+					className={isFiltered ? 'map-filter-label map-filter-label-active' : 'map-filter-label'}
 				>
 					{showChinese ? (
 						<>
 							<span>{data.title}</span>
 							<span
-								className={`font-sans font-medium sm:text-xs ${isFiltered ? 'text-primary-400 dark:text-primary-500' : 'text-primary-600 dark:text-primary-400'}`}
+								className={
+									isFiltered
+										? 'map-filter-label-zh map-filter-label-zh-active'
+										: 'map-filter-label-zh'
+								}
 							>
 								{data.title_zh}
 							</span>
@@ -104,16 +111,9 @@ const MapFilterStatusShowHideMenuItem: FC<
 > = memo(function MapFilterStatusShowHideMenuItem({ onClick, children }) {
 	return (
 		<MapFilterMenuItem>
-			<button
-				className="flex w-full cursor-pointer items-center gap-1 px-1 py-1 select-none sm:py-0.5"
-				onClick={onClick}
-			>
-				<span className={`h-2 w-2 rounded-full border border-primary-500 bg-primary-200`}></span>
-				<span
-					className={`flex w-full flex-nowrap items-center justify-between gap-2 font-display text-xs text-primary-700 sm:text-sm dark:text-primary-300`}
-				>
-					{children}
-				</span>
+			<button className="map-filter-button" onClick={onClick}>
+				<span className="map-filter-swatch-showhide"></span>
+				<span className="map-filter-label">{children}</span>
 			</button>
 		</MapFilterMenuItem>
 	);
@@ -135,9 +135,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 				{showChinese ? (
 					<>
 						<span>{messages.showAll}</span>
-						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
-							{chineseShowHideLabels.showAll}
-						</span>
+						<span className="map-filter-label-zh">{chineseShowHideLabels.showAll}</span>
 					</>
 				) : (
 					messages.showAll
@@ -151,9 +149,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 				{showChinese ? (
 					<>
 						<span>{messages.hideAll}</span>
-						<span className="font-sans font-medium text-primary-600 sm:text-xs dark:text-primary-400">
-							{chineseShowHideLabels.hideAll}
-						</span>
+						<span className="map-filter-label-zh">{chineseShowHideLabels.hideAll}</span>
 					</>
 				) : (
 					messages.hideAll
@@ -170,13 +166,15 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 
 	return (
 		<li>
-			<span className="flex h-[20px] w-full items-center justify-center gap-2 px-1 select-none md:h-[24px]">
+			<span className="map-filter-rating">
 				{R.range(1, 6).map((value) => (
 					<svg
 						key={`rating-${String(value)}`}
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 36 36"
-						className={`cursor-pointer transition-colors duration-200 ${ratingFilterValue >= value ? 'text-highlight-500 hover:text-highlight-300 focus:text-highlight-500' : 'text-primary-300 hover:text-highlight-300 focus:text-primary-300 dark:text-primary-600 dark:focus:text-primary-400'}`}
+						className={
+							ratingFilterValue >= value ? 'map-filter-star-filled' : 'map-filter-star-empty'
+						}
 						style={{ width: '16px' }}
 						onClick={() => {
 							if (ratingFilterValue === value) {
@@ -199,12 +197,25 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 	const { setObjectiveFilter } = useMapStoreActions();
 
 	return (
-		<li className="rounded-sm transition-colors">
-			<div className="flex w-full cursor-pointer items-center gap-1 select-none">
+		<li style={{ borderRadius: 'var(--map-radius-sm)' }}>
+			<div
+				style={{
+					display: 'flex',
+					width: '100%',
+					cursor: 'pointer',
+					alignItems: 'center',
+					gap: '0.25rem',
+					userSelect: 'none',
+				}}
+			>
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
 						key={`objective-${String(value)}`}
-						className={`flex-1 rounded-full border font-display text-xs text-primary-700 ${objectiveFilter === value ? 'border-primary-400 bg-primary-300' : 'border-primary-300 bg-primary-200'}`}
+						className={
+							objectiveFilter === value
+								? 'map-filter-objective-button map-filter-objective-button-active'
+								: 'map-filter-objective-button'
+						}
 						onClick={() => {
 							setObjectiveFilter(value);
 						}}
@@ -240,7 +251,14 @@ const MapControlsFilterMenu: FC<{
 				className="maplibregl-popup-content"
 				style={{ boxShadow: '0 0 0 2px rgba(0, 0, 0, .1)' }}
 			>
-				<ul className="flex flex-col gap-1 px-1 py-1">
+				<ul
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '0.25rem',
+						padding: '0.25rem',
+					}}
+				>
 					{R.entries(LocationStatusRecords).map(([status, data]) => (
 						<MapFilterStatusMenuItem
 							key={status}
@@ -284,7 +302,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					aria-label={messages.filterMenuAriaLabel}
 					{...(filterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
-					<span className="flex items-center justify-center">
+					<span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"

@@ -6,7 +6,7 @@ MapLibre GL JS component for rendering geographic location data with dynamic fil
 
 Built on [react-map-gl](https://visgl.github.io/react-map-gl/) with [Protomaps](https://protomaps.com/) basemap tiles and PMTiles protocol. The component consumes compressed JSON for point/line geometries and streams FlatGeobuf files for administrative divisions, enabling low-bandwidth map initialization with thousands of features.
 
-**Data compression**: Location properties use numeric enums and single-letter keys to reduce payload size. Zod schemas transform compressed data to developer-friendly structures at runtime, achieving ~60% size reduction compared to verbose GeoJSON while maintaining type safety.
+**Data compression**: Location properties use numeric enums and single-letter keys to reduce payload size. Zod schemas transform compressed data to developer-friendly structures at runtime while maintaining type safety.
 
 **Streaming boundaries**: Administrative divisions are fetched as FlatGeobuf files and geometrically inverted using Turf.js to create "mask" layers that highlight regions by dimming everything outside their boundaries. FlatGeobuf's column-oriented format enables progressive decoding without loading entire datasets into memory.
 

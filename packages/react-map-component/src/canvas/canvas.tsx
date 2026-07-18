@@ -20,13 +20,18 @@ import { useMapCanvasEvents } from './canvas-events';
 import { MapSelectionFeatureState } from './canvas-feature-state';
 import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
 import { MapPopup } from './canvas-popup';
+import { MapRootMarker } from './canvas-root-marker';
 
 const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (
-		<div className="flex h-full justify-center">
+		<div style={{ display: 'flex', height: '100%', justifyContent: 'center' }}>
 			<div
-				className="loading-animation transition-opacity duration-500"
-				style={{ width: '20%', opacity: loading ? 1 : 0 }}
+				className="map-loading-animation"
+				style={{
+					width: '20%',
+					opacity: loading ? 1 : 0,
+					transition: 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+				}}
 			/>
 		</div>
 	);
@@ -142,6 +147,7 @@ const MapCanvasContainer: FC<
 			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
 			<MapSelectedMarker targetIds={targetIds} />
 			<MapSelectionFeatureState />
+			<MapRootMarker />
 			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);

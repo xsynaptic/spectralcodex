@@ -260,7 +260,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 				{image?.srcSet ? (
 					<div>
 						<img
-							className="bg-fallback w-full object-cover select-none"
+							className="map-popup-image"
 							style={{ aspectRatio: '3/2' }}
 							src={getPopupImageSrc(image.srcSet, imageServerUrl)}
 							srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
@@ -270,60 +270,63 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 						/>
 					</div>
 				) : undefined}
-				<div className="flex flex-col px-2 pt-1 pb-2">
+				<div className="map-popup-body">
 					{titleMultilingualLang && titleMultilingualValue ? (
-						<div className="bg-linear-to-b from-accent-500 to-accent-600 bg-clip-text text-sm leading-snug font-medium text-transparent dark:from-accent-400 dark:to-accent-500">
+						<div className="map-popup-title-alt">
 							<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 						</div>
 					) : undefined}
-					<div className="border-b border-b-primary-300 pb-1 text-base leading-snug font-semibold text-primary-800 dark:border-b-primary-700 dark:text-primary-300">
+					<div className="map-popup-title">
 						<a href={url}>{title}</a>
 					</div>
 					{precision <= 2 ? (
-						<div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
+						<div className="map-popup-precision">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 36 36"
-								className="h-[20px] text-highlight-500 md:h-[16px]"
+								className="map-popup-warning-icon"
 							>
 								<use href={`#${MapSpritesEnum.Warning}`}></use>
 							</svg>
-							<span className="text-highlight-400 italic">
+							<span className="map-popup-warning-text">
 								{precision === 2 ? messages.precisionWarning : messages.precisionError}
 							</span>
 						</div>
 					) : undefined}
 					{description ? (
 						<div
-							className="mt-1 mb-2 text-sm"
-							style={{ maxHeight: '119px', overflowX: 'auto' }}
+							style={{
+								marginTop: '0.25rem',
+								marginBottom: '0.5rem',
+								fontSize: '0.875rem',
+								lineHeight: '1.25rem',
+								maxHeight: '119px',
+								overflowX: 'auto',
+							}}
 							dangerouslySetInnerHTML={{ __html: description }}
 						/>
 					) : undefined}
-					<div className="m-0 flex justify-between text-xs text-primary-700 select-none dark:text-primary-600">
+					<div className="map-popup-footer">
 						<div
-							className="group flex cursor-pointer items-center gap-1"
+							className="map-popup-coord"
 							onClick={() => {
-								// Copy coordinates to clipboard by clicking on them
 								void navigator.clipboard.writeText(coordinatesString);
 							}}
 						>
-							<div className="text-primary-400 transition-colors duration-300 group-hover:text-highlight-300 dark:text-primary-500">
-								{coordinatesString}
-							</div>
+							<div className="map-popup-coord-text">{coordinatesString}</div>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								className="text-primary-500 transition-colors duration-300 group-hover:text-highlight-400 dark:text-primary-400"
+								className="map-popup-copy-icon"
 								style={{ height: '14px' }}
 								viewBox="0 0 24 24"
 							>
 								<use href={`#${MapSpritesEnum.Copy}`}></use>
 							</svg>
 						</div>
-						<div className="flex gap-2 select-none">
+						<div className="map-popup-links">
 							{wikipediaUrl ? (
 								<a
-									className="cursor-pointer"
+									style={{ cursor: 'pointer' }}
 									href={
 										wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`
 									}
@@ -332,7 +335,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
-										className="h-[20px] md:h-[16px] dark:text-primary-400"
+										className="map-popup-link-icon map-popup-link-icon-wiki"
 									>
 										<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
 									</svg>
@@ -340,14 +343,14 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 							) : undefined}
 							{googleMapsUrl ? (
 								<a
-									className="cursor-pointer"
+									style={{ cursor: 'pointer' }}
 									href={getGoogleMapsHref(googleMapsUrl)}
 									target="_blank"
 								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 256 367"
-										className="h-[20px] md:h-[16px]"
+										className="map-popup-link-icon"
 									>
 										<use href={`#${MapSpritesEnum.Google}`}></use>
 									</svg>
@@ -399,11 +402,33 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 			onClose={onClose}
 			style={{ visibility: popupVisible ? 'visible' : 'hidden' }}
 		>
-			<div className="relative flex flex-col" style={{ minWidth: '200px', minHeight: '80px' }}>
-				<div className="pointer-events-none absolute flex h-full w-full justify-center p-4">
+			<div
+				style={{
+					position: 'relative',
+					display: 'flex',
+					flexDirection: 'column',
+					minWidth: '200px',
+					minHeight: '80px',
+				}}
+			>
+				<div
+					style={{
+						pointerEvents: 'none',
+						position: 'absolute',
+						display: 'flex',
+						height: '100%',
+						width: '100%',
+						justifyContent: 'center',
+						padding: '1rem',
+					}}
+				>
 					<div
-						className="loading-animation transition-opacity duration-500"
-						style={{ maxWidth: '100%', opacity: isPopupDataLoading ? 1 : 0 }}
+						className="map-loading-animation"
+						style={{
+							maxWidth: '100%',
+							opacity: isPopupDataLoading ? 1 : 0,
+							transition: 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+						}}
 					/>
 				</div>
 				<div style={{ opacity: isPopupDataLoading ? 0 : 1 }}>

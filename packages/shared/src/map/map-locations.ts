@@ -1,7 +1,3 @@
-/**
- * Note: these enums are duplicated into the main project due to an Astro/Vite bug
- * Because the location collection config uses these enums in the schema it must appear in both spaces
- */
 export const LocationCategoryEnum = {
 	/** Civic */
 	Civic: 'civic',

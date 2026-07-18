@@ -23,28 +23,40 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 
 	return (
 		<CustomControlPortal position={position}>
-			<div className="maplibregl-ctrl-search flex items-center gap-1" style={{ width: '300px' }}>
-				<label htmlFor="search-control-input" className="sr-only mb-2 p-1 text-sm">
+			<div
+				className="maplibregl-ctrl-search"
+				style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', width: '300px' }}
+			>
+				<label htmlFor="search-control-input" className="map-sr-only">
 					{messages.searchAriaLabel}
 				</label>
 				<input
 					type="search"
 					id="search-control-input"
-					className="grow rounded-e-sm p-1 text-sm"
-					style={{ outline: '0' }}
+					style={{
+						flexGrow: 1,
+						padding: '0.25rem',
+						fontSize: '0.875rem',
+						borderStartEndRadius: 'var(--map-radius-sm)',
+						borderEndEndRadius: 'var(--map-radius-sm)',
+						outline: '0',
+					}}
 					placeholder={messages.searchPlaceholder}
 					required={true}
 				/>
 				<button
 					id={CONTROL_SEARCH_ID}
-					className="rounded-s-sm"
+					style={{
+						borderStartStartRadius: 'var(--map-radius-sm)',
+						borderEndStartRadius: 'var(--map-radius-sm)',
+					}}
 					disabled={isLoading}
 					onClick={() => {
 						if (!isLoading) console.log('search');
 					}}
 					aria-label={messages.searchAriaLabel}
 				>
-					<span className="flex items-center justify-center">
+					<span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"

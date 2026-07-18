@@ -1,0 +1,30 @@
+/*
+ * Maps this site's palette onto the component's --map-* neutral/accent/highlight tokens
+ * No dark block: the component owns dark mode (per-element ramp-step choice)
+ * Unlayered on purpose: the package stylesheet is unlayered, so a layered override would lose to it
+ */
+[data-map-root] {
+	--map-color-neutral-50: var(--color-primary-50);
+	--map-color-neutral-100: var(--color-primary-100);
+	--map-color-neutral-200: var(--color-primary-200);
+	--map-color-neutral-300: var(--color-primary-300);
+	--map-color-neutral-400: var(--color-primary-400);
+	--map-color-neutral-500: var(--color-primary-500);
+	--map-color-neutral-600: var(--color-primary-600);
+	--map-color-neutral-700: var(--color-primary-700);
+	--map-color-neutral-800: var(--color-primary-800);
+	--map-color-neutral-900: var(--color-primary-900);
+	--map-color-accent-400: var(--color-accent-400);
+	--map-color-accent-500: var(--color-accent-500);
+	--map-color-accent-600: var(--color-accent-600);
+	--map-color-highlight-300: var(--color-highlight-300);
+	--map-color-highlight-400: var(--color-highlight-400);
+	--map-color-highlight-500: var(--color-highlight-500);
+	--map-radius-xs: var(--radius-xs, 0.125rem);
+	--map-radius-sm: var(--radius-sm, 0.25rem);
+	--map-font-display: var(--font-display);
+	--map-font-sans: var(--font-sans);
+	--map-loading-mask: url('/loading.svg');
+	--map-image-fallback: url('/seigaiha-light.svg');
+	--map-image-fallback-dark: url('/seigaiha-dark.svg');
+}

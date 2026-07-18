@@ -5,11 +5,9 @@
  * For performance reasons we're explicitly naming paths and file types here:
  * 1) CSS files, for which we need to check @apply rules and CSS variable names
  * 2) Astro files
- * 3) React component files
  */
 @source './main/**/*.css';
 @source '../**/*.astro';
-@source '../../packages/react-map-component/src/**/*.tsx';
 
 /** Safelist utilities applied to HTML we don't author directly */
 @source inline('sr-only');
@@ -48,3 +46,6 @@
 @import './main/components/preview-card.css' layer(components);
 @import './main/components/progress.css' layer(components);
 @import './main/components/prose.css' layer(components);
+
+/** Unlayered */
+@import './main/components/map.css';
