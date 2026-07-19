@@ -58,11 +58,7 @@
 	padding-block: calc(var(--spacing) * 1);
 	padding-inline: calc(var(--spacing) * 4);
 	font-style: italic;
-	color: var(--color-primary-500);
-}
-
-[data-mode='dark'] .c-caption {
-	color: var(--color-primary-400);
+	color: light-dark(var(--color-primary-500), var(--color-primary-400));
 }
 
 .c-caption em {

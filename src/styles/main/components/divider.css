@@ -9,7 +9,10 @@
 }
 
 .divided::after {
-	color: var(--divider-color, var(--color-primary-400));
+	color: light-dark(
+		var(--divider-color, var(--color-primary-400)),
+		var(--divider-color-dark, var(--color-primary-500))
+	);
 	content: var(--divider-glyph, var(--content-slash));
 }
 
@@ -18,10 +21,6 @@
 	.divided::after {
 		margin-inline: calc(var(--spacing) * 1);
 	}
-}
-
-[data-mode='dark'] .divided::after {
-	color: var(--divider-color-dark, var(--color-primary-500));
 }
 
 .divided:last-child::after {
@@ -54,8 +53,7 @@
 }
 
 @media (width >= 40rem) {
-	.divided-hero .divided::after,
-	[data-mode='dark'] .divided-hero .divided::after {
+	.divided-hero .divided::after {
 		color: var(--color-primary-300);
 		opacity: 0.8;
 	}

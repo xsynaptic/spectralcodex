@@ -5,3 +5,12 @@
 	--content-dot: '\00B7';
 	--content-slash: '/';
 }
+
+/** Anchor color-scheme to the mode attribute so light-dark() resolves off the same source of truth */
+[data-mode='light'] {
+	color-scheme: light;
+}
+
+[data-mode='dark'] {
+	color-scheme: dark;
+}

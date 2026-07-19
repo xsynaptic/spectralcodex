@@ -9,12 +9,12 @@
 .activity-scroll {
 	overflow-x: auto;
 	overscroll-behavior-x: contain;
-	scrollbar-color: color-mix(in srgb, var(--color-primary-400) 40%, transparent) transparent;
+	scrollbar-color: light-dark(
+			color-mix(in srgb, var(--color-primary-400) 40%, transparent),
+			color-mix(in srgb, var(--color-primary-500) 45%, transparent)
+		)
+		transparent;
 	scrollbar-width: thin;
-}
-
-[data-mode='dark'] .activity-scroll {
-	scrollbar-color: color-mix(in srgb, var(--color-primary-500) 45%, transparent) transparent;
 }
 
 .activity-plot {
@@ -60,55 +60,29 @@
 	visibility: hidden;
 }
 
-/* Empty days keep a faint zinc tint; intensity ascends the accent ramp in light mode */
+/* Empty days keep a faint zinc tint; intensity ascends the accent ramp; dark lifts it off the near-black field */
 .activity-cell {
-	background-color: var(--color-primary-200);
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 }
 
 .activity-cell[data-level='1'] {
-	background-color: var(--color-accent-200);
+	background-color: light-dark(var(--color-accent-200), var(--color-accent-700));
 }
 
 .activity-cell[data-level='2'] {
-	background-color: var(--color-accent-400);
+	background-color: light-dark(var(--color-accent-400), var(--color-accent-500));
 }
 
 .activity-cell[data-level='3'] {
-	background-color: var(--color-accent-600);
+	background-color: light-dark(var(--color-accent-600), var(--color-accent-400));
 }
 
 .activity-cell[data-level='4'] {
-	background-color: var(--color-accent-700);
-}
-
-/* Dark mode lifts the ramp off the near-black field: empty recedes, intensity climbs to a bright teal */
-[data-mode='dark'] .activity-cell {
-	background-color: var(--color-primary-700);
-}
-
-[data-mode='dark'] .activity-cell[data-level='1'] {
-	background-color: var(--color-accent-700);
-}
-
-[data-mode='dark'] .activity-cell[data-level='2'] {
-	background-color: var(--color-accent-500);
-}
-
-[data-mode='dark'] .activity-cell[data-level='3'] {
-	background-color: var(--color-accent-400);
-}
-
-[data-mode='dark'] .activity-cell[data-level='4'] {
-	background-color: var(--color-accent-200);
+	background-color: light-dark(var(--color-accent-700), var(--color-accent-200));
 }
 
 /* Days past the reference date have no history yet; a hollow ghost of the empty-day tint */
 .activity-cell[data-future] {
 	background-color: transparent;
-	box-shadow: inset 0 0 0 1px var(--color-primary-200);
-}
-
-[data-mode='dark'] .activity-cell[data-future] {
-	background-color: transparent;
-	box-shadow: inset 0 0 0 1px var(--color-primary-600);
+	box-shadow: inset 0 0 0 1px light-dark(var(--color-primary-200), var(--color-primary-600));
 }

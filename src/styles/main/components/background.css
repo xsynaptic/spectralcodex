@@ -27,12 +27,12 @@
 
 /* This fallback pattern is a seamless seigaiha (青海波) pattern */
 .bg-fallback {
-	background-color: var(--color-primary-200);
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 	background-image: url('/seigaiha-light.svg');
 	background-repeat: repeat;
 
+	/* Image swap stays attribute-driven; light-dark() is color-only */
 	[data-mode='dark'] & {
-		background-color: var(--color-primary-700);
 		background-image: url('/seigaiha-dark.svg');
 		background-repeat: repeat;
 	}
@@ -41,11 +41,7 @@
 /* Placeholder image; used in many places in this project */
 .bg-placeholder {
 	image-rendering: pixelated;
-	background-color: var(--color-primary-200);
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 	background-position: center;
 	background-size: cover;
-
-	[data-mode='dark'] & {
-		background-color: var(--color-primary-700);
-	}
 }

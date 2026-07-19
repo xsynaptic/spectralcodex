@@ -14,15 +14,14 @@ ol.lc {
 	list-style-type: decimal;
 }
 
-.lc-item {
-	@apply marker:text-accent-200 dark:marker:text-accent-500;
+.lc-item::marker {
+	color: light-dark(var(--color-accent-200), var(--color-accent-500));
 }
 
 .lc-item-body {
-	@apply text-primary-700 dark:text-primary-400;
-
 	display: flex;
 	flex-wrap: wrap;
 	gap: calc(var(--spacing) * 1);
 	align-items: center;
+	color: light-dark(var(--color-primary-700), var(--color-primary-400));
 }

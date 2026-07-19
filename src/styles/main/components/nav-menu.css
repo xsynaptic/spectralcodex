@@ -18,11 +18,7 @@
 }
 
 .nav-ul.nav-no-hero {
-	border-bottom: 1px solid var(--color-primary-200);
-
-	[data-mode='dark'] & {
-		border-bottom-color: var(--color-primary-700);
-	}
+	border-bottom: 1px solid light-dark(var(--color-primary-200), var(--color-primary-700));
 }
 
 /* Top-level menu item */
@@ -63,7 +59,7 @@
 
 /* Submenu base element */
 .nav-sub-menu {
-	@apply divide-y transition-[opacity,visibility] transition-discrete;
+	@apply transition-[opacity,visibility] transition-discrete;
 
 	--z-sub-menu: 50;
 
@@ -84,12 +80,15 @@
 }
 
 .nav-sub-menu-d1 {
-	@apply divide-primary-100 bg-primary-50 shadow-md duration-200 dark:divide-primary-800 dark:bg-primary-900;
+	@apply shadow-md duration-200;
+
+	--nav-divide: light-dark(var(--color-primary-100), var(--color-primary-800));
 
 	top: 100%;
 	left: 0;
 	z-index: var(--z-sub-menu);
 	margin-bottom: -1px;
+	background-color: light-dark(var(--color-primary-50), var(--color-primary-900));
 
 	@media (width >= 40rem) {
 		left: -0.5rem;
@@ -104,16 +103,22 @@
 }
 
 .nav-sub-menu-d2 {
-	@apply divide-primary-200 bg-primary-100 shadow-md duration-50 dark:divide-primary-700 dark:bg-primary-800;
+	@apply shadow-md duration-50;
+
+	--nav-divide: light-dark(var(--color-primary-200), var(--color-primary-700));
 
 	z-index: calc(var(--z-sub-menu) + 1);
+	background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
 }
 
 /* Depth 3+ submenu */
 .nav-sub-menu-d3 {
-	@apply divide-primary-300 bg-primary-200 duration-50 dark:divide-primary-600 dark:bg-primary-700;
+	@apply duration-50;
+
+	--nav-divide: light-dark(var(--color-primary-300), var(--color-primary-600));
 
 	z-index: calc(var(--z-sub-menu) + 2);
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 }
 
 /* Shared positioning for depth 2 and 3+ submenus */
@@ -133,6 +138,11 @@
 /* Submenu item (all depths) */
 .nav-sub-item {
 	position: relative;
+}
+
+/* Divider between items; --nav-divide set per depth so the color folds into light-dark */
+.nav-sub-item + .nav-sub-item {
+	border-top: 1px solid var(--nav-divide);
 }
 
 /* Trigger area inside submenu item */
@@ -160,7 +170,9 @@
 
 /* Multilingual text annotation */
 .nav-ml {
-	@apply text-xs text-primary-700 dark:text-primary-400;
+	@apply text-xs;
+
+	color: light-dark(var(--color-primary-700), var(--color-primary-400));
 }
 
 /* Right chevron (submenu items with children) */

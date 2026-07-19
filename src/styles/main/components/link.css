@@ -11,45 +11,28 @@
 	color: var(--link-hover);
 }
 
-[data-mode='dark'] .link {
-	color: var(--link-color-dark, var(--link-color));
-}
-
-[data-mode='dark'] .link:hover,
-[data-mode='dark'] .link:focus-visible {
-	color: var(--link-hover-dark, var(--link-hover));
-}
-
 .link-active {
 	@apply font-semibold;
 }
 
 .link-accent {
-	--link-color: var(--color-accent-500);
-	--link-hover: var(--color-accent-300);
-	--link-color-dark: var(--color-accent-400);
-	--link-hover-dark: var(--color-accent-200);
+	--link-color: light-dark(var(--color-accent-500), var(--color-accent-400));
+	--link-hover: light-dark(var(--color-accent-300), var(--color-accent-200));
 }
 
 .link-primary {
-	--link-color: var(--color-primary-800);
-	--link-hover: var(--color-primary-600);
-	--link-color-dark: var(--color-primary-200);
-	--link-hover-dark: var(--color-primary-50);
+	--link-color: light-dark(var(--color-primary-800), var(--color-primary-200));
+	--link-hover: light-dark(var(--color-primary-600), var(--color-primary-50));
 }
 
 .link-primary-bright {
-	--link-color: var(--color-primary-300);
-	--link-hover: var(--color-primary-100);
-	--link-color-dark: var(--color-primary-600);
-	--link-hover-dark: var(--color-primary-300);
+	--link-color: light-dark(var(--color-primary-300), var(--color-primary-600));
+	--link-hover: light-dark(var(--color-primary-100), var(--color-primary-300));
 }
 
 .link-highlight {
-	--link-color: var(--color-highlight-500);
-	--link-hover: var(--color-highlight-300);
-	--link-color-dark: var(--color-highlight-400);
-	--link-hover-dark: var(--color-highlight-700);
+	--link-color: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+	--link-hover: light-dark(var(--color-highlight-300), var(--color-highlight-700));
 }
 
 /* Hero context; divided-hero also retunes divider glyph color in divider.css */
@@ -57,19 +40,15 @@
 	.divided-hero .link-accent {
 		--link-color: var(--color-accent-300);
 		--link-hover: var(--color-accent-200);
-		--link-color-dark: var(--color-accent-300);
-		--link-hover-dark: var(--color-accent-200);
 	}
 
 	.divided-hero .link-highlight {
-		--link-color: var(--color-highlight-300);
+		--link-color: light-dark(var(--color-highlight-300), var(--color-highlight-400));
 		--link-hover: var(--color-highlight-200);
-		--link-color-dark: var(--color-highlight-400);
-		--link-hover-dark: var(--color-highlight-200);
 	}
 }
 
+/* Pin to the light ramp; keeps links on always-light surfaces from inverting in dark mode */
 .link-static {
-	--link-color-dark: var(--link-color);
-	--link-hover-dark: var(--link-hover);
+	color-scheme: light;
 }
