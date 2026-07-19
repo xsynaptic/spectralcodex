@@ -3,7 +3,7 @@
 
 /*
  * Theme tokens; neutral defaults render standalone, a host overrides the ramp on [data-map-root]
- * Dark mode is a per-element ramp-step choice under [data-map-mode='dark'], so values never flip
+ * Dark mode is a per-element ramp-step choice via light-dark(), so the ramp tokens never flip
  */
 :where([data-map-root]) {
 	--map-color-neutral-50: #fafafa;
@@ -24,8 +24,18 @@
 	--map-color-highlight-500: #f59e0b;
 	--map-radius-xs: 0.125rem;
 	--map-radius-sm: 0.25rem;
+	--map-radius-full: 9999px;
 	--map-font-display: ui-sans-serif, system-ui, sans-serif;
 	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
+[data-map-root] {
+	color-scheme: light;
+}
+
+[data-map-root][data-map-mode='dark'] {
+	color-scheme: dark;
 }
 
 /** Popup (vendor overrides) */
@@ -36,6 +46,7 @@
 div.maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
+	background-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 
 	/* stylelint-disable-next-line a11y/no-outline-none -- deliberate vendor focus-outline override */
 	& a:focus {
@@ -62,24 +73,20 @@ button.maplibregl-popup-close-button {
 	}
 }
 
-[data-map-mode='dark'] .maplibregl-popup-content {
-	background-color: var(--map-color-neutral-900);
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+	border-right-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
-[data-map-mode='dark'] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	border-right-color: var(--map-color-neutral-900);
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+	border-left-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
-[data-map-mode='dark'] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	border-left-color: var(--map-color-neutral-900);
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+	border-bottom-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
-[data-map-mode='dark'] .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	border-bottom-color: var(--map-color-neutral-900);
-}
-
-[data-map-mode='dark'] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	border-top-color: var(--map-color-neutral-900);
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+	border-top-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
 /** Popup content */
@@ -106,13 +113,12 @@ button.maplibregl-popup-close-button {
 	aspect-ratio: 3/2;
 	user-select: none;
 	object-fit: cover;
-	background-color: var(--map-color-neutral-200);
+	background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-700));
 	background-image: var(--map-image-fallback);
 	background-repeat: repeat;
 }
 
 [data-map-mode='dark'] .map-popup-image {
-	background-color: var(--map-color-neutral-700);
 	background-image: var(--map-image-fallback-dark);
 	background-repeat: repeat;
 }
@@ -130,20 +136,11 @@ button.maplibregl-popup-close-button {
 	color: transparent;
 	background-image: linear-gradient(
 		to bottom,
-		var(--map-color-accent-500),
-		var(--map-color-accent-600)
+		light-dark(var(--map-color-accent-500), var(--map-color-accent-400)),
+		light-dark(var(--map-color-accent-600), var(--map-color-accent-500))
 	);
 	background-repeat: no-repeat;
 	background-clip: text;
-}
-
-[data-map-mode='dark'] .map-popup-title-alt {
-	background-image: linear-gradient(
-		to bottom,
-		var(--map-color-accent-400),
-		var(--map-color-accent-500)
-	);
-	background-repeat: no-repeat;
 }
 
 .map-popup-title {
@@ -151,18 +148,13 @@ button.maplibregl-popup-close-button {
 	font-size: 1rem;
 	font-weight: 600;
 	line-height: 1.375;
-	color: var(--map-color-neutral-800);
-	border-bottom: 1px solid var(--map-color-neutral-300);
+	color: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
+	border-bottom: 1px solid light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
 
 	/* stylelint-disable-next-line no-descending-specificity -- unrelated popup-link rules; reordering would scatter the vendor-override grouping */
 	& a {
 		color: inherit;
 	}
-}
-
-[data-map-mode='dark'] .map-popup-title {
-	color: var(--map-color-neutral-300);
-	border-bottom-color: var(--map-color-neutral-700);
 }
 
 .map-popup-precision {
@@ -200,12 +192,8 @@ button.maplibregl-popup-close-button {
 	margin: 0;
 	font-size: 0.75rem;
 	line-height: 1rem;
-	color: var(--map-color-neutral-700);
+	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-600));
 	user-select: none;
-}
-
-[data-map-mode='dark'] .map-popup-footer {
-	color: var(--map-color-neutral-600);
 }
 
 .map-popup-coord {
@@ -216,12 +204,8 @@ button.maplibregl-popup-close-button {
 }
 
 .map-popup-coord-text {
-	color: var(--map-color-neutral-400);
+	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 	transition: color 300ms;
-}
-
-[data-map-mode='dark'] .map-popup-coord-text {
-	color: var(--map-color-neutral-500);
 }
 
 .map-popup-coord:hover .map-popup-coord-text,
@@ -231,12 +215,8 @@ button.maplibregl-popup-close-button {
 
 .map-popup-copy-icon {
 	height: 14px;
-	color: var(--map-color-neutral-500);
+	color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
 	transition: color 300ms;
-}
-
-[data-map-mode='dark'] .map-popup-copy-icon {
-	color: var(--map-color-neutral-400);
 }
 
 .map-popup-coord:hover .map-popup-copy-icon,
@@ -254,8 +234,8 @@ button.maplibregl-popup-close-button {
 	height: 20px;
 }
 
-[data-map-mode='dark'] .map-popup-link-icon-wiki {
-	color: var(--map-color-neutral-400);
+.map-popup-link-icon-wiki {
+	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-400));
 }
 
 .map-filter-menu {
@@ -276,41 +256,23 @@ button.maplibregl-popup-close-button {
 }
 
 .map-filter-menu-item {
-	background-color: var(--map-color-neutral-50);
+	background-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 	border-radius: var(--map-radius-sm);
 	transition: background-color 150ms;
 }
 
 .map-filter-menu-item:hover,
 .map-filter-menu-item:focus-visible {
-	background-color: var(--map-color-neutral-100);
-}
-
-[data-map-mode='dark'] .map-filter-menu-item {
-	background-color: var(--map-color-neutral-900);
-}
-
-[data-map-mode='dark'] .map-filter-menu-item:hover,
-[data-map-mode='dark'] .map-filter-menu-item:focus-visible {
-	background-color: var(--map-color-neutral-800);
+	background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
 }
 
 .map-filter-menu-item-active {
-	background-color: var(--map-color-neutral-200);
+	background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-800));
 }
 
 .map-filter-menu-item-active:hover,
 .map-filter-menu-item-active:focus-visible {
-	background-color: var(--map-color-neutral-300);
-}
-
-[data-map-mode='dark'] .map-filter-menu-item-active {
-	background-color: var(--map-color-neutral-800);
-}
-
-[data-map-mode='dark'] .map-filter-menu-item-active:hover,
-[data-map-mode='dark'] .map-filter-menu-item-active:focus-visible {
-	background-color: var(--map-color-neutral-700);
+	background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
 }
 
 .map-filter-button {
@@ -329,7 +291,7 @@ button.maplibregl-popup-close-button {
 	height: 0.5rem;
 	border-style: solid;
 	border-width: 1px;
-	border-radius: 9999px;
+	border-radius: var(--map-radius-full);
 }
 
 .map-filter-swatch-showhide {
@@ -346,37 +308,21 @@ button.maplibregl-popup-close-button {
 	width: 100%;
 	font-family: var(--map-font-display);
 	font-size: 0.75rem;
-	color: var(--map-color-neutral-700);
-}
-
-[data-map-mode='dark'] .map-filter-label {
-	color: var(--map-color-neutral-300);
+	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-300));
 }
 
 .map-filter-label-active {
-	color: var(--map-color-neutral-500);
-}
-
-[data-map-mode='dark'] .map-filter-label-active {
-	color: var(--map-color-neutral-400);
+	color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
 }
 
 .map-filter-label-zh {
 	font-family: var(--map-font-sans);
 	font-weight: 500;
-	color: var(--map-color-neutral-600);
-}
-
-[data-map-mode='dark'] .map-filter-label-zh {
-	color: var(--map-color-neutral-400);
+	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
 }
 
 .map-filter-label-zh-active {
-	color: var(--map-color-neutral-400);
-}
-
-[data-map-mode='dark'] .map-filter-label-zh-active {
-	color: var(--map-color-neutral-500);
+	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 }
 
 .map-filter-rating {
@@ -393,13 +339,9 @@ button.maplibregl-popup-close-button {
 
 .map-filter-star-empty {
 	width: 16px;
-	color: var(--map-color-neutral-300);
+	color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-600));
 	cursor: pointer;
 	transition: color 200ms;
-}
-
-[data-map-mode='dark'] .map-filter-star-empty {
-	color: var(--map-color-neutral-600);
 }
 
 .map-filter-star-empty:hover,
@@ -426,7 +368,7 @@ button.maplibregl-popup-close-button {
 	color: var(--map-color-neutral-700);
 	background-color: var(--map-color-neutral-200);
 	border: 1px solid var(--map-color-neutral-300);
-	border-radius: 9999px;
+	border-radius: var(--map-radius-full);
 }
 
 .map-filter-objective-button-active {
@@ -498,7 +440,7 @@ button.maplibregl-popup-close-button {
 	height: 2rem;
 	border-style: solid;
 	border-width: 2px;
-	border-radius: 9999px;
+	border-radius: var(--map-radius-full);
 	animation: target-pulse-ring 2s ease-out infinite;
 }
 
@@ -562,33 +504,20 @@ button.maplibregl-popup-close-button {
 	gap: 2px;
 	align-items: center;
 	height: 100%;
-	color: var(--map-color-neutral-600);
-}
-
-[data-map-mode='dark'] .maplibregl-ctrl-metrics {
-	color: var(--map-color-neutral-300);
+	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-300));
 }
 
 .maplibregl-ctrl-metrics-divider {
-	color: var(--map-color-neutral-400);
-}
-
-[data-map-mode='dark'] .maplibregl-ctrl-metrics-divider {
-	color: var(--map-color-neutral-500);
+	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 }
 
 .maplibregl-ctrl-scale {
-	color: var(--map-color-neutral-600);
+	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-300));
 	background-color: transparent;
-	border-color: var(--map-color-neutral-400);
+	border-color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 	border-width: 0 1px 1px;
 	border-bottom-right-radius: var(--map-radius-xs);
 	border-bottom-left-radius: var(--map-radius-xs);
-}
-
-[data-map-mode='dark'] .maplibregl-ctrl-scale {
-	color: var(--map-color-neutral-300);
-	border-color: var(--map-color-neutral-500);
 }
 
 /** Visually-hidden accessible label */
