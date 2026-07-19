@@ -110,14 +110,6 @@ const translationStrings = {
 		'section.dateRecorded': 'Recorded On',
 		'section.webmentions': 'Webmentions',
 
-		// Citations
-		'section.citation.heading': 'Cite this page',
-		'section.citation.copyText': 'Copy citation',
-		'section.citation.copyJson': 'Copy as JSON',
-		'section.citation.copied': 'Copied',
-		'section.citation.format': '{authors}. "{title}." {container}, {date}. <{url}>',
-		'section.citation.titleMultilingual': '{title} ({titleAdditional})',
-
 		// Webmentions
 		'webmentions.likes': 'Likes',
 		'webmentions.reposts': 'Reposts',
