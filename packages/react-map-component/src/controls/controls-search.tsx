@@ -23,44 +23,31 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 
 	return (
 		<CustomControlPortal position={position}>
-			<div
-				className="maplibregl-ctrl-search"
-				style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', width: '300px' }}
-			>
+			<div className="maplibregl-ctrl-search map-search">
 				<label htmlFor="search-control-input" className="map-sr-only">
 					{messages.searchAriaLabel}
 				</label>
 				<input
 					type="search"
 					id="search-control-input"
-					style={{
-						flexGrow: 1,
-						padding: '0.25rem',
-						fontSize: '0.875rem',
-						borderStartEndRadius: 'var(--map-radius-sm)',
-						borderEndEndRadius: 'var(--map-radius-sm)',
-						outline: '0',
-					}}
+					className="map-search-input"
 					placeholder={messages.searchPlaceholder}
 					required={true}
 				/>
 				<button
 					id={CONTROL_SEARCH_ID}
-					style={{
-						borderStartStartRadius: 'var(--map-radius-sm)',
-						borderEndStartRadius: 'var(--map-radius-sm)',
-					}}
+					className="map-search-button"
 					disabled={isLoading}
 					onClick={() => {
 						if (!isLoading) console.log('search');
 					}}
 					aria-label={messages.searchAriaLabel}
 				>
-					<span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<span className="map-ctrl-icon-frame">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
-							style={{ height: '20px', width: '20px' }}
+							className="map-ctrl-icon"
 							aria-hidden="true"
 						>
 							<use href={`#${MapSpritesEnum.Search}`}></use>

@@ -133,26 +133,8 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ longitude, latitude, color }) {
 	return (
 		<Marker longitude={longitude} latitude={latitude} anchor="center">
-			<div
-				style={{
-					pointerEvents: 'none',
-					position: 'relative',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<span
-					style={{
-						width: '2rem',
-						height: '2rem',
-						borderRadius: '9999px',
-						borderWidth: '2px',
-						borderStyle: 'solid',
-						borderColor: color,
-						animation: 'target-pulse-ring 2s ease-out infinite',
-					}}
-				/>
+			<div className="map-pulse-ring-frame">
+				<span className="map-pulse-ring" style={{ borderColor: color }} />
 			</div>
 		</Marker>
 	);

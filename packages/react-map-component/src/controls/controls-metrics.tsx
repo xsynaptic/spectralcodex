@@ -21,7 +21,7 @@ export const MetricsControl: FC<{
 		<CustomControlPortal className="maplibregl-ctrl" position={position}>
 			{isSourceDataLoading ? (
 				<div className="maplibregl-ctrl-metrics-loading">
-					<div className="map-loading-animation" style={{ width: '15px' }} />
+					<div className="map-loading-animation" />
 				</div>
 			) : (
 				<div className="maplibregl-ctrl-metrics">

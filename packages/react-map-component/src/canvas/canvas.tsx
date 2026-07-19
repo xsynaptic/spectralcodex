@@ -24,15 +24,8 @@ import { MapRootMarker } from './canvas-root-marker';
 
 const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (
-		<div style={{ display: 'flex', height: '100%', justifyContent: 'center' }}>
-			<div
-				className="map-loading-animation"
-				style={{
-					width: '20%',
-					opacity: loading ? 1 : 0,
-					transition: 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)',
-				}}
-			/>
+		<div className="map-canvas-loading">
+			<div className="map-loading-animation" style={{ opacity: loading ? 1 : 0 }} />
 		</div>
 	);
 };

@@ -175,7 +175,6 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 						className={
 							ratingFilterValue >= value ? 'map-filter-star-filled' : 'map-filter-star-empty'
 						}
-						style={{ width: '16px' }}
 						onClick={() => {
 							if (ratingFilterValue === value) {
 								setRatingFilter(1);
@@ -197,17 +196,8 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 	const { setObjectiveFilter } = useMapStoreActions();
 
 	return (
-		<li style={{ borderRadius: 'var(--map-radius-sm)' }}>
-			<div
-				style={{
-					display: 'flex',
-					width: '100%',
-					cursor: 'pointer',
-					alignItems: 'center',
-					gap: '0.25rem',
-					userSelect: 'none',
-				}}
-			>
+		<li>
+			<div className="map-filter-objective-row">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
 						key={`objective-${String(value)}`}
@@ -238,27 +228,14 @@ const MapControlsFilterMenu: FC<{
 
 	return filterOpen && filterPosition ? (
 		<div
-			className="maplibregl-popup maplibregl-popup-anchor-left"
+			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
 			style={{
-				maxHeight: 'calc(100% - 40px)',
-				maxWidth: 'min(350px, 80vw)',
 				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
-				zIndex: 10,
 			}}
 		>
 			<div className="maplibregl-popup-tip"></div>
-			<div
-				className="maplibregl-popup-content"
-				style={{ boxShadow: '0 0 0 2px rgba(0, 0, 0, .1)' }}
-			>
-				<ul
-					style={{
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '0.25rem',
-						padding: '0.25rem',
-					}}
-				>
+			<div className="maplibregl-popup-content">
+				<ul className="map-filter-menu-list">
 					{R.entries(LocationStatusRecords).map(([status, data]) => (
 						<MapFilterStatusMenuItem
 							key={status}
@@ -302,13 +279,12 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					aria-label={messages.filterMenuAriaLabel}
 					{...(filterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
-					<span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<span className="map-ctrl-icon-frame">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 24 24"
+							className="map-ctrl-icon"
 							style={{
-								height: '20px',
-								width: '20px',
 								...(filterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
 								...(isLoading ? { opacity: '0.6' } : {}),
 							}}

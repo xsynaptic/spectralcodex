@@ -261,7 +261,6 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 					<div>
 						<img
 							className="map-popup-image"
-							style={{ aspectRatio: '3/2' }}
 							src={getPopupImageSrc(image.srcSet, imageServerUrl)}
 							srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
 							sizes={getPopupImageSizes(isMobile)}
@@ -295,14 +294,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 					) : undefined}
 					{description ? (
 						<div
-							style={{
-								marginTop: '0.25rem',
-								marginBottom: '0.5rem',
-								fontSize: '0.875rem',
-								lineHeight: '1.25rem',
-								maxHeight: '119px',
-								overflowX: 'auto',
-							}}
+							className="map-popup-description"
 							dangerouslySetInnerHTML={{ __html: description }}
 						/>
 					) : undefined}
@@ -317,7 +309,6 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								className="map-popup-copy-icon"
-								style={{ height: '14px' }}
 								viewBox="0 0 24 24"
 							>
 								<use href={`#${MapSpritesEnum.Copy}`}></use>
@@ -326,7 +317,6 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 						<div className="map-popup-links">
 							{wikipediaUrl ? (
 								<a
-									style={{ cursor: 'pointer' }}
 									href={
 										wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`
 									}
@@ -342,11 +332,7 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 								</a>
 							) : undefined}
 							{googleMapsUrl ? (
-								<a
-									style={{ cursor: 'pointer' }}
-									href={getGoogleMapsHref(googleMapsUrl)}
-									target="_blank"
-								>
+								<a href={getGoogleMapsHref(googleMapsUrl)} target="_blank">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 256 367"
@@ -402,34 +388,9 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 			onClose={onClose}
 			style={{ visibility: popupVisible ? 'visible' : 'hidden' }}
 		>
-			<div
-				style={{
-					position: 'relative',
-					display: 'flex',
-					flexDirection: 'column',
-					minWidth: '200px',
-					minHeight: '80px',
-				}}
-			>
-				<div
-					style={{
-						pointerEvents: 'none',
-						position: 'absolute',
-						display: 'flex',
-						height: '100%',
-						width: '100%',
-						justifyContent: 'center',
-						padding: '1rem',
-					}}
-				>
-					<div
-						className="map-loading-animation"
-						style={{
-							maxWidth: '100%',
-							opacity: isPopupDataLoading ? 1 : 0,
-							transition: 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)',
-						}}
-					/>
+			<div className="map-popup-frame">
+				<div className="map-popup-loading">
+					<div className="map-loading-animation" style={{ opacity: isPopupDataLoading ? 1 : 0 }} />
 				</div>
 				<div style={{ opacity: isPopupDataLoading ? 0 : 1 }}>
 					{isPopupDataLoading ? undefined : (
