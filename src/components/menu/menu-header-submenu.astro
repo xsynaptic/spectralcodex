@@ -44,7 +44,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 		depth === 1 ? 'nav-sub-menu-d1' : undefined,
 		depth === 2 ? 'nav-sub-menu-d2' : undefined,
 		depth > 2 ? 'nav-sub-menu-d3' : undefined,
-		depth > 1 && !isFirstMenuItem ? 'sm:rounded-tr-md' : undefined,
+		!isFirstMenuItem && depth > 1 ? 'sm:rounded-tr-md' : undefined,
 	]}
 	aria-label={ariaLabel}
 	{...props}

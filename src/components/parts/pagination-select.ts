@@ -118,7 +118,7 @@ class PaginationSelect extends HTMLElement {
 		const pageNumber = Number(this.#select.value);
 		const currentPage = Number(this.dataset.currentPage);
 
-		if (!Number.isSafeInteger(pageNumber) || pageNumber === currentPage) return;
+		if (pageNumber === currentPage || !Number.isSafeInteger(pageNumber)) return;
 
 		// Using the navigate function (not location.assign) for compatibility with Astro's view transitions
 		void navigate(this.#getPageUrl(pageNumber));

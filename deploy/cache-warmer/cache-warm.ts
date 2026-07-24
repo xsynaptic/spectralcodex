@@ -159,7 +159,7 @@ async function warm(url: string, collect?: Set<string>): Promise<WarmResult> {
 		});
 		const contentType = response.headers.get('content-type') ?? '';
 		const isScrapable = contentType.includes('text/html') || contentType.includes('text/css');
-		if (collect && response.ok && isScrapable) {
+		if (collect && isScrapable && response.ok) {
 			scrape(await response.text(), collect);
 		} else {
 			await response.arrayBuffer();
@@ -186,7 +186,7 @@ function record(stats: Stats, result: WarmResult): void {
 	// Redirects are legitimate (moved pages, trailing slashes); only 4xx/5xx/network fail
 	const isRedirect = result.status >= 300 && result.status < 400;
 
-	if (result.status !== 200 && !isRedirect) stats.failures.push(result);
+	if (!isRedirect && result.status !== 200) stats.failures.push(result);
 }
 
 function failureLine(result: WarmResult): string {
@@ -348,7 +348,7 @@ async function sendRunReport(run: RunReport): Promise<void> {
 
 	if (failures.length > 0) process.exitCode = 2;
 	// Notes (like a skipped map manifest) force the digest even on a clean run
-	if (failures.length < ALERT_MIN_FAILURES && notes.length === 0 && !ALERT_ALWAYS) return;
+	if (!ALERT_ALWAYS && notes.length === 0 && failures.length < ALERT_MIN_FAILURES) return;
 
 	const hasFailures = failures.length > 0;
 	const retryNote =

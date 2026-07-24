@@ -127,7 +127,7 @@ function getFigureClass() {
 					{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
 					{...imageProps}
 				/>
-				{showMetadata && context !== ImageContextEnum.Carousel && imageEntry ? (
+				{showMetadata && imageEntry && context !== ImageContextEnum.Carousel ? (
 					<ImageMetadata entry={imageEntry} />
 				) : undefined}
 			</ImagePlaceholder>

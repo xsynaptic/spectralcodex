@@ -74,7 +74,7 @@ const t = getTranslations();
 		<ModeManager defaultMode="auto" />
 		<Meta {...meta} />
 		{
-			import.meta.env.PROD && UMAMI_ID && UMAMI_DOMAIN ? (
+			UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
 				<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
 			) : undefined
 		}

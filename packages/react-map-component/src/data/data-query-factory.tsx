@@ -62,7 +62,6 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 
 		const { apiUrl, data, dataKey, version, isDev } = config;
 
-		// eslint-disable-next-line @tanstack/query/exhaustive-deps -- queryKey inputs fully determine the result
 		return useQuery<Array<TParsed> | undefined>({
 			queryKey: [name, apiUrl, dataKey ?? (data ? 'inline' : false), version, isDev],
 			// Inline data ships in the HTML; skip IndexedDB persistence

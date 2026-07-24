@@ -46,7 +46,7 @@ function getImageFeaturedData({
 
 	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
 
-	if (collection === ContentCollectionsEnum.Archives && archiveImageIndex) {
+	if (archiveImageIndex && collection === ContentCollectionsEnum.Archives) {
 		const derivedImageId = archiveImageIndex.get(getPublicId(entry).replace('/', '-'));
 
 		if (derivedImageId) return { imageFeaturedId: derivedImageId, isFallback: false };
@@ -147,7 +147,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 			if (collection === ContentCollectionsEnum.Archives) {
 				title = getArchivesTitle(id);
 			} else if (collection === ContentCollectionsEnum.Resources) {
-				if (!('showPage' in entry.data) || !entry.data.showPage || !title) {
+				if (!title || !('showPage' in entry.data) || !entry.data.showPage) {
 					continue;
 				}
 			} else if (!title) {

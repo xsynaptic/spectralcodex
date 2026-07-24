@@ -58,7 +58,6 @@ async function startContainers() {
 	}
 }
 
-// eslint-disable-next-line unicorn/prefer-top-level-await -- fire-and-forget container startup; awaiting would block the dev server
 void startContainers();
 
 // Run the bin directly; `npx` warns about deprecations and `pnpm exec` prints a spurious error when exiting

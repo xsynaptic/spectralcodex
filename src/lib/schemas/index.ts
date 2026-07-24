@@ -24,7 +24,7 @@ function parseContentDateString(value: string, ctx: z.RefinementCtx) {
 		return;
 	}
 
-	const [datePart = '', timePart] = value.split(' ');
+	const [datePart = '', timePart] = value.split(' ', 2);
 	const date = new Date(`${datePart.replaceAll('/', '-')}T${timePart ?? '00:00'}:00Z`);
 
 	if (Number.isNaN(date.getTime())) {
