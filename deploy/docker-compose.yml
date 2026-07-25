@@ -238,7 +238,7 @@ services:
       - astro-frontend
     restart: unless-stopped
     mem_limit: 768m
-    cpus: 0.7
+    cpus: 0.8
     logging:
       driver: json-file
       options:
@@ -257,10 +257,14 @@ services:
     cap_drop:
       - ALL
     mem_limit: 256m
+    volumes:
+      # Survives the run container so image warming stays incremental across deploys
+      - cache_warmer_state:/state
     environment:
       # Node sizes its heap from host RAM, ignoring mem_limit; cap it so V8 GCs within budget
       - NODE_OPTIONS=--max-old-space-size=160
       - SITE_URL=${SITE_URL}
+      - IMAGE_SERVER_URL=${IMAGE_SERVER_URL}
       - CLOUDFLARE_ZONE_ID=${CLOUDFLARE_ZONE_ID}
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
       - CACHE_WARM_CONCURRENCY=${CACHE_WARM_CONCURRENCY:-8}
@@ -295,3 +299,4 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
+  cache_warmer_state:

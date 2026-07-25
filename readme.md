@@ -117,7 +117,7 @@ Deployment is handled by custom TypeScript scripts. These are specific to this p
 11. OG image deployment
 12. Caddy config and TLS cert sync with reload
 13. Health check against the live site
-14. CDN cache purge and image cache warming (detached run on the server)
+14. CDN cache purge and cache warming (detached run on the server)
 
 The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
 

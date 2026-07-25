@@ -59,24 +59,23 @@ Full deployment pipeline:
 
 1. `astro sync` - sync content
 2. `validate-content` - validate content
-3. `similar-content` - generate similarity data
-4. `og-image` - generate OG images
-5. `astro build` - build site
-6. `image-server-manifest` - extract image URLs
-7. `deploy-media` - sync media to remote
-8. `deploy-app` - transfer built app
-9. `image-server-warm` - warm image cache
+3. `generate-redirects` - build redirect pairs
+4. `similar-content` - generate similarity data
+5. `sitemap-lastmod` - stamp sitemap timestamps
+6. `astro build` - build site
+7. `og-image` - generate OG images
+8. `test-e2e` - smoke tests
+9. `deploy-media` - sync media to remote
+10. `deploy-app` - transfer built app
+11. `deploy-og` - transfer OG images
+12. `deploy-caddy` - sync Caddy config and certs
+13. health check against the live site
+14. cache refresh - detached cache-warmer run on the server
 
 ### `deploy-app` / `deploy-media`
 
 Individual deployment scripts for app files and media assets via rsync.
 
-## Image Server
+## Cache Warming
 
-### `image-server-manifest`
-
-Extracts image URLs from built HTML for cache warming. Supports incremental manifests to track new vs existing URLs across deploys.
-
-### `image-server-warm` / `image-server-warm-new`
-
-Warms the image cache on remote server by requesting all URLs (or only new URLs) from the manifest. Runs via SSH with configurable concurrency.
+The warmer purges the site hostname, warms pages, assets, and map URLs, then scrapes image URLs from the bodies it already fetched. Image warming is incremental; only URLs not warmed by a previous deploy are requested. Imagor URLs are HMAC signatures of the transform path, so they are stable across builds and survive the host-scoped purge.
