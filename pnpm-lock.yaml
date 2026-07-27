@@ -98,17 +98,17 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3
       '@xsynaptic/astro-build-logger':
-        specifier: ^0.2.0
-        version: 0.2.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
+        specifier: ^1.0.0
+        version: 1.0.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
       '@xsynaptic/astro-image-loader':
-        specifier: ^0.2.0
-        version: 0.2.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@37.0.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)
+        specifier: ^1.0.0
+        version: 1.0.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@37.0.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)
       '@xsynaptic/eslint-config':
-        specifier: ^6.1.0
-        version: 6.1.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: ^6.1.1
+        version: 6.1.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       '@xsynaptic/mdxlint-config':
-        specifier: ^0.2.0
-        version: 0.2.0(supports-color@10.2.2)
+        specifier: ^1.0.0
+        version: 1.0.0(supports-color@10.2.2)
       '@xsynaptic/satteri-auto-import':
         specifier: ^0.1.1
         version: 0.1.1(satteri@0.9.5)
@@ -122,17 +122,17 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(satteri@0.9.5)
       '@xsynaptic/stylelint-config':
-        specifier: ^0.1.2
-        version: 0.1.2(stylelint-order@8.1.1(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))
+        specifier: ^1.0.0
+        version: 1.0.0(stylelint-order@8.1.1(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))
       '@xsynaptic/unified-tools':
-        specifier: ^5.1.2
-        version: 5.1.2(supports-color@10.2.2)
+        specifier: ^5.1.3
+        version: 5.1.3(supports-color@10.2.2)
       '@xsynaptic/unpic-imagor':
-        specifier: ^0.2.0
-        version: 0.2.0(unpic@4.2.2)
+        specifier: ^1.0.0
+        version: 1.0.0(unpic@4.2.2)
       '@xsynaptic/word-count':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^1.0.0
+        version: 1.0.0
       astro-pagefind:
         specifier: ^2.0.1
         version: 2.0.1(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
@@ -240,8 +240,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       '@xsynaptic/mdxlint-config':
-        specifier: ^0.2.0
-        version: 0.2.0(supports-color@10.2.2)
+        specifier: ^1.0.0
+        version: 1.0.0(supports-color@10.2.2)
       remark-frontmatter:
         specifier: ^5.0.0
         version: 5.0.0(supports-color@10.2.2)
@@ -267,8 +267,8 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       '@xsynaptic/mdxlint-config':
-        specifier: ^0.2.0
-        version: 0.2.0(supports-color@10.2.2)
+        specifier: ^1.0.0
+        version: 1.0.0(supports-color@10.2.2)
       astro:
         specifier: ^7.1.3
         version: 7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
@@ -409,11 +409,11 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       '@xsynaptic/og-image-generator':
-        specifier: ^0.2.0
-        version: 0.2.0(sharp@0.35.3(@types/node@25.9.2))
+        specifier: ^1.0.0
+        version: 1.0.0(sharp@0.35.3(@types/node@25.9.2))
       '@xsynaptic/unified-tools':
-        specifier: ^5.1.2
-        version: 5.1.2(supports-color@10.2.2)
+        specifier: ^5.1.3
+        version: 5.1.3(supports-color@10.2.2)
       astro:
         specifier: ^7.1.3
         version: 7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
@@ -1091,10 +1091,6 @@ packages:
 
   '@eslint/config-array@0.23.5':
     resolution: {integrity: sha512-Y3kKLvC1dvTOT+oGlqNQ1XLqK6D1HU2YXPc52NmAlJZbMMWDzGYXMiPRJ8TYD39muD/OTjlZmNJ4ib7dvSrMBA==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
-
-  '@eslint/config-helpers@0.6.0':
-    resolution: {integrity: sha512-ii6Bw9jJ2zi2cWA2Z+9/QZ/+3DX6kwaV5Q986D/CdP3Lap3w/pgQZ373FV7byY/i7L4IRH/G43I5dz1ClsCbpA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   '@eslint/config-helpers@0.7.0':
@@ -2935,13 +2931,13 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@xsynaptic/astro-build-logger@0.2.0':
-    resolution: {integrity: sha512-NdU5Na3wpUP3FsMhpIaM54A6KI6a5lCflZ64jyjm/J4LDDiALGZIyJS2IOi2kHRUWJ2WXBNKft0XvOQWLQR8Vg==}
+  '@xsynaptic/astro-build-logger@1.0.0':
+    resolution: {integrity: sha512-4nawH/Pos9+CJeV+Fxj+mCeF7NUh8lAOmX96OVRSNeXC4JARUTeersiFFvmgIWRBeB52fe8erl/KGg5QXviHEw==}
     peerDependencies:
-      astro: ^6.0.0 || ^7.0.0-beta.0
+      astro: ^6.0.0 || ^7.0.0
 
-  '@xsynaptic/astro-image-loader@0.2.0':
-    resolution: {integrity: sha512-IvbBa7MCws+kNJjhEEC96QOJsB8pq3yaS3VEKD+feAzXCsaGYJNhbzSinj7MY2d5tiYFg6Mgkq7nb1PZlzmCcg==}
+  '@xsynaptic/astro-image-loader@1.0.0':
+    resolution: {integrity: sha512-7Vy53HZSOXja1bD4dlcSrexMZ8f1MxVssIydgVrVOajfoI9qc6HoH6eo06m7VgR3XZyhJhYfGMDiB91G6B25VA==}
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0
       exiftool-vendored: ^36.0.0
@@ -2953,16 +2949,16 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/eslint-config@6.1.0':
-    resolution: {integrity: sha512-VjcubvZhDvNg/JoEyhVuTggbYWIFUalv3TSTBWfnLfgIHE1ASWRj6kBHXNIPSZ25ordqR1NxFAZc/wVZrX/Zaw==}
+  '@xsynaptic/eslint-config@6.1.1':
+    resolution: {integrity: sha512-ZfPcNbAgcw1ChueyV3aeK3WVOIDVz4ALQfvS9vqc0/eIk1nfzXDp47RqlxmjisrW74aO+NYkPCqWN+PVprCLxQ==}
 
-  '@xsynaptic/mdxlint-config@0.2.0':
-    resolution: {integrity: sha512-Bz3FQx30V+sH5XRCT3rkVotFPi8jJovIzCgw+cKLaOS8QjsuHGxMEU/GkIFqpUEjGcwpgaQrQLmQW9Z40rEMsA==}
+  '@xsynaptic/mdxlint-config@1.0.0':
+    resolution: {integrity: sha512-QCL3HcPciJSeIuZqsYG518qSwclWKozpTsYivQbsZmL3gZecOfK5WpzQgmWFIl2Ul4ou6xS58M8ymwxClNBBmg==}
     engines: {node: '>=24'}
     hasBin: true
 
-  '@xsynaptic/og-image-generator@0.2.0':
-    resolution: {integrity: sha512-hZGrvu27GaK4x+XUqisWT2kYqbce3kT4bes1wfc3G32d/HWK7qMqXAI+pVRhIeL/oDKvm0YUEuOl0npISh4S7A==}
+  '@xsynaptic/og-image-generator@1.0.0':
+    resolution: {integrity: sha512-W3ZtRT31vfFsp6sX8g+ZjAAkt8uciROjr/Gum7Tq60H4RuCPfusLnY5tcjNpYu9W5LV1lKkcGP9L7P/NyZcMjg==}
     peerDependencies:
       sharp: ^0.35.2
 
@@ -2991,21 +2987,21 @@ packages:
     peerDependencies:
       satteri: ^0.9.0
 
-  '@xsynaptic/stylelint-config@0.1.2':
-    resolution: {integrity: sha512-tsepJcdEJwr+AlLYQDc6ZhN0JrfDlTeNNWnPF0Vg8Qk4YBc+I6B2QnJN48XuPhn0+o6bvWgpoaAhlYGn7QkYrA==}
+  '@xsynaptic/stylelint-config@1.0.0':
+    resolution: {integrity: sha512-qGZ9cxs612kJtxwhlxnZWHPg+weYH7PZBXmHwa35dG00zzRYiIoRBvTq32mp3VeywUBiMzzaj248C/fw9mguBg==}
     peerDependencies:
       stylelint: '>=17.0.0'
 
-  '@xsynaptic/unified-tools@5.1.2':
-    resolution: {integrity: sha512-BU9SnMXDFH/vADYUW1+NW/qCRFcYf3JGplXI0YNJfunUpbXQXfrdkWPvStQoCSNSoIIVfu4eTm8u7hp3eOlmRA==}
+  '@xsynaptic/unified-tools@5.1.3':
+    resolution: {integrity: sha512-sSVEfcAdFPND8QzT2Ka+nbWLFJ4ggiNhnkHqQJQYNXPTM0lqvaycpvnEv/t3wug9MKwX1lPPUcrpZgcuhK716Q==}
 
-  '@xsynaptic/unpic-imagor@0.2.0':
-    resolution: {integrity: sha512-vFlrBAYiqdKXvnUylzAPwRlRzGHONLbznqmbjU56XEfqsxeLjL7XMOhByb1IHQqvIDN8awc0Q4HQrmIjt6WwoQ==}
+  '@xsynaptic/unpic-imagor@1.0.0':
+    resolution: {integrity: sha512-JpCAuRf2lPT8xiu7uOdb72sXUFbSUQoBUrR9b8Jz3BYvrpHacP5wwjH7ABpudkvMom1U5ZQOZZ+HssYuw+VC9Q==}
     peerDependencies:
       unpic: ^4.2.2
 
-  '@xsynaptic/word-count@0.2.0':
-    resolution: {integrity: sha512-u/ufSV1yChvBSeMMX4cjYO5aRvUz8Sy35bGljVO/zpQ7DIgE6pgrDMd3UYGbx8TkZLFPlAn/99R8ZqCk1xHJ6g==}
+  '@xsynaptic/word-count@1.0.0':
+    resolution: {integrity: sha512-fpWM+G6dNGPhzoftFs1HNs+9o0nTQriXNJ+4MaD0CzVlgYwahHHnBN+ciKsDeV+8hRvRFWmKqB4tdRslAQfJ5w==}
 
   '@zarrita/storage@0.2.0':
     resolution: {integrity: sha512-855ZXqtnds7spnT8vNvD+MXa3QExP1m2GqShe8yt7uZXHnQLgJHgkpVwFjE1B0KDDRO0ki09hmk6OboTaIfPsQ==}
@@ -6120,10 +6116,6 @@ packages:
   sass-formatter@0.7.9:
     resolution: {integrity: sha512-CWZ8XiSim+fJVG0cFLStwDvft1VI7uvXdCNJYXhDvowiv+DsbD1nXLiQ4zrE5UBvj5DWZJ93cwN0NX5PMsr1Pw==}
 
-  satori@0.28.2:
-    resolution: {integrity: sha512-AZBuptlBvlMf+EC/WI6Ss5MJwSEstrC6Pf1o5b2keg6h1QbvjStmrnJXUDGWOrfC1KSU0FApyGhF2xnBwmJRgA==}
-    engines: {node: '>=16'}
-
   satori@0.29.0:
     resolution: {integrity: sha512-fPAfrwNaIQ7EsJLhY382STEqpczN6ZEH9NsKXDQgRcxUXNNPB73iAjSshzFwTaaScT68pxV0pmG6TBzDQ4sEGw==}
     engines: {node: '>=16'}
@@ -7886,10 +7878,6 @@ snapshots:
       minimatch: 10.2.5
     transitivePeerDependencies:
       - supports-color
-
-  '@eslint/config-helpers@0.6.0':
-    dependencies:
-      '@eslint/core': 1.2.1
 
   '@eslint/config-helpers@0.7.0':
     dependencies:
@@ -10455,12 +10443,12 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@xsynaptic/astro-build-logger@0.2.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))':
+  '@xsynaptic/astro-build-logger@1.0.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
       astro: 7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
       zod: 4.4.3
 
-  '@xsynaptic/astro-image-loader@0.2.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@37.0.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)':
+  '@xsynaptic/astro-image-loader@1.0.0(astro@7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))(exiftool-vendored@37.0.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)':
     dependencies:
       astro: 7.1.3(@astrojs/markdown-remark@7.2.1(supports-color@10.2.2))(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
       p-limit: 7.3.1
@@ -10471,10 +10459,10 @@ snapshots:
       exiftool-vendored: 37.0.0
       sharp: 0.35.3(@types/node@25.9.2)
 
-  '@xsynaptic/eslint-config@6.1.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@xsynaptic/eslint-config@6.1.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))
-      '@eslint/config-helpers': 0.6.0
+      '@eslint/config-helpers': 0.7.0
       '@eslint/js': 10.0.1(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))
       eslint-plugin-astro: 3.0.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.65.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       eslint-plugin-perfectionist: 5.10.0(eslint@10.8.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -10491,7 +10479,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@xsynaptic/mdxlint-config@0.2.0(supports-color@10.2.2)':
+  '@xsynaptic/mdxlint-config@1.0.0(supports-color@10.2.2)':
     dependencies:
       chalk: 5.6.2
       mdxlint: 1.0.0(supports-color@10.2.2)
@@ -10507,9 +10495,9 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@xsynaptic/og-image-generator@0.2.0(sharp@0.35.3(@types/node@25.9.2))':
+  '@xsynaptic/og-image-generator@1.0.0(sharp@0.35.3(@types/node@25.9.2))':
     dependencies:
-      satori: 0.28.2
+      satori: 0.29.0
       sharp: 0.35.3(@types/node@25.9.2)
 
   '@xsynaptic/rehype-wrap-cjk@3.0.2(unified@11.0.5)':
@@ -10542,7 +10530,7 @@ snapshots:
       satteri: 0.9.5
       zod: 4.4.3
 
-  '@xsynaptic/stylelint-config@0.1.2(stylelint-order@8.1.1(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))':
+  '@xsynaptic/stylelint-config@1.0.0(stylelint-order@8.1.1(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))':
     dependencies:
       '@double-great/stylelint-a11y': 3.5.0(stylelint@17.14.1(supports-color@10.2.2)(typescript@6.0.3))
       postcss-html: 1.8.1
@@ -10553,7 +10541,7 @@ snapshots:
     transitivePeerDependencies:
       - stylelint-order
 
-  '@xsynaptic/unified-tools@5.1.2(supports-color@10.2.2)':
+  '@xsynaptic/unified-tools@5.1.3(supports-color@10.2.2)':
     dependencies:
       '@xsynaptic/rehype-wrap-cjk': 3.0.2(unified@11.0.5)
       ohash: 2.0.11
@@ -10570,11 +10558,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@xsynaptic/unpic-imagor@0.2.0(unpic@4.2.2)':
+  '@xsynaptic/unpic-imagor@1.0.0(unpic@4.2.2)':
     dependencies:
       unpic: 4.2.2
 
-  '@xsynaptic/word-count@0.2.0': {}
+  '@xsynaptic/word-count@1.0.0': {}
 
   '@zarrita/storage@0.2.0':
     dependencies:
@@ -13943,12 +13931,12 @@ snapshots:
     dependencies:
       htmlparser2: 8.0.2
       js-tokens: 9.0.1
-      postcss: 8.5.16
-      postcss-safe-parser: 6.0.0(postcss@8.5.16)
+      postcss: 8.5.19
+      postcss-safe-parser: 6.0.0(postcss@8.5.19)
 
-  postcss-safe-parser@6.0.0(postcss@8.5.16):
+  postcss-safe-parser@6.0.0(postcss@8.5.19):
     dependencies:
-      postcss: 8.5.16
+      postcss: 8.5.19
 
   postcss-safe-parser@7.0.1(postcss@8.5.16):
     dependencies:
@@ -14728,20 +14716,6 @@ snapshots:
   sass-formatter@0.7.9:
     dependencies:
       suf-log: 2.5.3
-
-  satori@0.28.2:
-    dependencies:
-      '@shuding/opentype.js': 1.4.0-beta.0
-      css-background-parser: 0.1.0
-      css-box-shadow: 1.0.0-3
-      css-gradient-parser: 0.0.17
-      css-to-react-native: 3.2.0
-      emoji-regex-xs: 2.0.1
-      escape-html: 1.0.3
-      linebreak: 1.1.0
-      parse-css-color: 0.2.1
-      postcss-value-parser: 4.2.0
-      yoga-layout: 3.2.1
 
   satori@0.29.0:
     dependencies:
