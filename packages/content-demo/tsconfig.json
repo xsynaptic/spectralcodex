@@ -12,6 +12,10 @@
 	// Note 2: MDX server crashes when plugins are not installed directly in this repo
 	"mdx": {
 		"checkMdx": true,
-		"plugins": [["remark-frontmatter", ["yaml"]], "remark-gfm", "remark-smartypants"]
+		"plugins": [
+			["remark-frontmatter", ["yaml"]],
+			"remark-gfm",
+			["remark-smartypants", { "dashes": "oldschool" }]
+		]
 	}
 }
