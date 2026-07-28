@@ -4,7 +4,7 @@
 		"git-commit": true,
 		"html": true,
 		"javascript": true,
-		"javascriptract": true,
+		"javascriptreact": true,
 		"json": true,
 		"jsonc": true,
 		"markdown": true,
@@ -153,9 +153,6 @@
 		"editor.defaultFormatter": "astro-build.astro-vscode"
 	},
 	"astro.content-intellisense": true,
-	"[md]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
 	"[markdown]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
