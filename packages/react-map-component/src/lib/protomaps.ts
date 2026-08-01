@@ -1,7 +1,7 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
 import { layers, namedFlavor } from '@protomaps/basemaps';
-import maplibregl from 'maplibre-gl';
+import { addProtocol, removeProtocol } from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
@@ -61,7 +61,7 @@ export function useProtomaps({
 	useEffect(function loadProtomapsProtocol() {
 		const protocol = new Protocol();
 
-		maplibregl.addProtocol('pmtiles', (request) => {
+		addProtocol('pmtiles', (request) => {
 			return new Promise((resolve, reject) => {
 				protocol.tile(request, (err: unknown, data: unknown) => {
 					if (err) {
@@ -74,7 +74,7 @@ export function useProtomaps({
 		});
 
 		return () => {
-			maplibregl.removeProtocol('pmtiles');
+			removeProtocol('pmtiles');
 		};
 	}, []);
 

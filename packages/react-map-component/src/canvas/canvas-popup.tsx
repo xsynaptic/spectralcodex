@@ -1,9 +1,8 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
-import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
 import { GeometryTypeEnum, MapSpritesEnum } from '@spectralcodex/shared/map';
-import maplibregl from 'maplibre-gl';
+import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
@@ -37,7 +36,7 @@ const defaultPopupItem = {
 	wikipediaUrl: undefined,
 	image: undefined,
 	precision: 1,
-	popupCoordinates: new maplibregl.LngLat(0, 0),
+	popupCoordinates: new LngLat(0, 0),
 } satisfies MapPopupItemExtended;
 
 /**
@@ -46,40 +45,40 @@ const defaultPopupItem = {
  * - LineString: use first point
  * - Polygon: use first point of outer ring
  */
-function getPopupCoordinates({ geometry }: MapSourceItem): maplibregl.LngLat {
+function getPopupCoordinates({ geometry }: MapSourceItem): LngLat {
 	switch (geometry.type) {
 		case GeometryTypeEnum.Point: {
 			const [lng, lat] = geometry.coordinates as [number, number];
 
-			return new maplibregl.LngLat(lng, lat);
+			return new LngLat(lng, lat);
 		}
 
 		case GeometryTypeEnum.LineString: {
 			const coordinates = geometry.coordinates as Array<[number, number]>;
 
-			if (!coordinates[0]) return new maplibregl.LngLat(0, 0);
+			if (!coordinates[0]) return new LngLat(0, 0);
 
 			const [lng, lat] = coordinates[0];
 
-			return new maplibregl.LngLat(lng, lat);
+			return new LngLat(lng, lat);
 		}
 
 		case GeometryTypeEnum.Polygon: {
 			const coordinates = geometry.coordinates as Array<Array<[number, number]>>;
 
-			if (!coordinates[0]) return new maplibregl.LngLat(0, 0);
-			if (!coordinates[0][0]) return new maplibregl.LngLat(0, 0);
+			if (!coordinates[0]) return new LngLat(0, 0);
+			if (!coordinates[0][0]) return new LngLat(0, 0);
 
 			const [lng, lat] = coordinates[0][0];
 
-			return new maplibregl.LngLat(lng, lat);
+			return new LngLat(lng, lat);
 		}
 
 		// Should never reach here due to MapGeometry type constraint
 		default: {
 			console.warn(`[Map] Unsupported geometry type for popup:`, geometry);
 
-			return new maplibregl.LngLat(0, 0);
+			return new LngLat(0, 0);
 		}
 	}
 }

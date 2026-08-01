@@ -319,6 +319,11 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			// Initialize the position of the filter control on interactive maps
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
+		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
+		onError: ({ error }) => {
+			setCanvasLoading(false);
+			console.warn('[Map]', error.message);
+		},
 		...(isInteractive
 			? {
 					onResize: debouncedFilterControlSetup.call,

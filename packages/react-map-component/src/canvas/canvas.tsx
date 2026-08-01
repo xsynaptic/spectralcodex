@@ -5,6 +5,7 @@ import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps, MapInitialViewState } from '../types';
 
+import './canvas-worker';
 import { MapControls } from '../controls/controls';
 import { PopupDataContextProvider } from '../data/data-popup';
 import { ChunkConfigProvider } from '../data/data-popup-chunks';
