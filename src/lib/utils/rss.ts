@@ -9,6 +9,7 @@ import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
+import { MILLISECONDS_PER_HOUR, SITE_TIMEZONE_OFFSET_HOURS } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -64,18 +65,26 @@ const generateFeedItem = async ({
 		excludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
 		{
 			...defaultSchema,
-			tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'],
+			// Feed readers ship no stylesheet, so CJK wrapper spans unwrap to plain text
+			tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'].filter(
+				(tagName) => tagName !== 'span',
+			),
 		},
 	);
 
 	const description = await getDescriptionRenderedText(entry);
+
+	const pubDate = parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated);
 
 	const feedItem = {
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
 		link: getContentUrl(entry.collection, getPublicId(entry)),
-		pubDate: parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated),
+		// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
+		pubDate: pubDate
+			? new Date(pubDate.getTime() - SITE_TIMEZONE_OFFSET_HOURS * MILLISECONDS_PER_HOUR)
+			: undefined,
 		...(description ? { description } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;

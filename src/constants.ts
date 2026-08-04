@@ -90,9 +90,13 @@ export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent
  * Time
  */
 export const MILLISECONDS_PER_DAY = 86_400_000;
+export const MILLISECONDS_PER_HOUR = 3_600_000;
 
 /**
  * Various settings
  */
 // A string representing the year the site was founded; will default to the current year
 export const SITE_YEAR_FOUNDED = 2009;
+
+// Wall-clock content dates belong to this timezone; used to anchor them to real instants
+export const SITE_TIMEZONE_OFFSET_HOURS = 8;

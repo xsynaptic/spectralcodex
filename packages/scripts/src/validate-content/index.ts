@@ -5,6 +5,7 @@ import { parseArgs } from 'node:util';
 
 import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
+import { checkContentDates } from './content-dates';
 import { checkDivisionIds } from './divisions';
 import { checkFrontmatterLinks } from './frontmatter-links';
 import { checkImageAspectRatios } from './image-aspect-ratios';
@@ -109,6 +110,11 @@ switch (command) {
 		checkRegionsParents(getDataStoreCollection(collections, ['regions']));
 		break;
 	}
+	// Check for entry dates in the future
+	case 'content-dates': {
+		checkContentDates(allEntries);
+		break;
+	}
 	// Check for malformed MDX components
 	case 'mdx': {
 		checkMdxComponents(allEntries);
@@ -151,6 +157,7 @@ switch (command) {
 
 		// Run all validations for deployment and report all problems at once
 		const syncResults: Array<boolean> = [
+			checkContentDates(allEntries),
 			checkMdxComponents(allEntries),
 			checkLinkIds(allEntries, metadataEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),

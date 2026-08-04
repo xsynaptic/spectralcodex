@@ -90,6 +90,8 @@ async function getImageProps(): Promise<{
 			width: primaryWidth,
 			...(isFeed
 				? {
+						// Unpic drops width/height for constrained and fullWidth layouts; feeds need them to reserve space
+						layout: 'fixed' as const,
 						height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width),
 					}
 				: {}),
