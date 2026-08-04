@@ -146,7 +146,7 @@ switch (command) {
 	}
 	// Check for images with non-standard aspect ratios (*e.g.* 3:2, 2:3, 1:1)
 	case 'image-aspect-ratios': {
-		checkImageAspectRatios(getDataStoreCollection(collections, ['images']));
+		checkImageAspectRatios(getDataStoreCollection(collections, ['images']), { showStats: true });
 		break;
 	}
 	default: {
@@ -162,7 +162,7 @@ switch (command) {
 			checkLinkIds(allEntries, metadataEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),
 			checkImageReferences(allEntries, path.join(rootPath, values['media-path'])),
-			checkImageAspectRatios(getDataStoreCollection(collections, ['images'])),
+			checkImageAspectRatios(getDataStoreCollection(collections, ['images']), { showStats: true }),
 			checkImageFeaturedInBody(bodyContentEntries),
 			checkImageFeaturedLinks(allEntries, metadataEntries),
 			checkLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),

@@ -23,6 +23,13 @@ const RATIO_TOLERANCE = 0.01;
 // This folder also contains old photos yet to be redone
 const EXEMPT_PREFIXES = ['errata/'];
 
+function getOrientation(value: number) {
+	if (value > 1) return 'landscape';
+	if (value < 1) return 'portrait';
+
+	return 'square';
+}
+
 function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number } {
 	let nearest: AllowedRatio = ALLOWED_RATIOS[0];
 	let smallestDelta = Math.abs(ratio - nearest.value);
@@ -48,13 +55,27 @@ interface FlaggedImage {
 	delta: number;
 }
 
+interface RatioTallyRow {
+	label: string;
+	value: number;
+	orientation: string;
+	count: number;
+}
+
 export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 	const flagged: Array<FlaggedImage> = [];
 
+	// Conforming images only; flagged ones are reported separately
+	const tally = new Map<string, number>(ALLOWED_RATIOS.map((allowed) => [allowed.label, 0]));
+
 	let checkedCount = 0;
+	let exemptCount = 0;
 
 	for (const entry of entries) {
-		if (EXEMPT_PREFIXES.some((prefix) => entry.id.startsWith(prefix))) continue;
+		if (EXEMPT_PREFIXES.some((prefix) => entry.id.startsWith(prefix))) {
+			exemptCount += 1;
+			continue;
+		}
 
 		const { width, height } = entry.data;
 
@@ -67,38 +88,71 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 		const ratio = width / height;
 		const { allowed, delta } = getNearestRatio(ratio);
 
-		if (delta <= RATIO_TOLERANCE) continue;
+		if (delta <= RATIO_TOLERANCE) {
+			tally.set(allowed.label, (tally.get(allowed.label) ?? 0) + 1);
+			continue;
+		}
 
 		flagged.push({ id: entry.id, width, height, ratio, nearest: allowed.label, delta });
 	}
 
 	flagged.sort((a, b) => a.id.localeCompare(b.id));
 
-	return { flagged, checkedCount };
+	const tallyRows = ALLOWED_RATIOS.map((allowed) => ({
+		label: allowed.label,
+		value: allowed.value,
+		orientation: getOrientation(allowed.value),
+		count: tally.get(allowed.label) ?? 0,
+	})) satisfies Array<RatioTallyRow>;
+
+	return { flagged, checkedCount, exemptCount, tally: tallyRows };
 }
 
-export function checkImageAspectRatios(entries: Array<DataStoreEntry>) {
-	const { flagged, checkedCount } = collectAspectRatioIssues(entries);
+function printRatioTally(tally: Array<RatioTallyRow>) {
+	const rows = [...tally].sort((a, b) => b.count - a.count);
 
-	if (flagged.length === 0) {
-		console.log(chalk.green(`✓ ${checkedCount.toString()} image aspect ratios valid`));
-		return true;
-	}
+	const countWidth = Math.max(...rows.map((row) => String(row.count).length));
+	const labelWidth = Math.max(...rows.map((row) => row.label.length));
 
-	for (const item of flagged) {
+	for (const row of rows) {
 		console.log(
-			chalk.red(
-				`❌ ${item.id}: ${item.width.toString()}×${item.height.toString()} ` +
-					`(ratio ${item.ratio.toFixed(3)}, nearest ${item.nearest} off by ${item.delta.toFixed(3)})`,
+			chalk.dim(
+				`   ${String(row.count).padStart(countWidth)}  ` +
+					`${row.label.padEnd(labelWidth)}  ${row.value.toFixed(3)}  ${row.orientation}`,
+			),
+		);
+	}
+}
+
+export function checkImageAspectRatios(
+	entries: Array<DataStoreEntry>,
+	{ showStats = false }: { showStats?: boolean } = {},
+) {
+	const { flagged, checkedCount, exemptCount, tally } = collectAspectRatioIssues(entries);
+
+	const exemptNote = exemptCount > 0 ? ` (${exemptCount.toString()} exempt)` : '';
+	const isValid = flagged.length === 0;
+
+	if (isValid) {
+		console.log(chalk.green(`✓ ${checkedCount.toString()} image aspect ratios valid${exemptNote}`));
+	} else {
+		for (const item of flagged) {
+			console.log(
+				chalk.red(
+					`❌ ${item.id}: ${item.width.toString()}×${item.height.toString()} ` +
+						`(ratio ${item.ratio.toFixed(3)}, nearest ${item.nearest} off by ${item.delta.toFixed(3)})`,
+				),
+			);
+		}
+
+		console.log(
+			chalk.yellow(
+				`⚠️  Found ${flagged.length.toString()} of ${checkedCount.toString()} image(s) with non-standard aspect ratios${exemptNote}`,
 			),
 		);
 	}
 
-	console.log(
-		chalk.yellow(
-			`⚠️  Found ${flagged.length.toString()} of ${checkedCount.toString()} image(s) with non-standard aspect ratios`,
-		),
-	);
+	if (showStats) printRatioTally(tally);
 
-	return false;
+	return isValid;
 }

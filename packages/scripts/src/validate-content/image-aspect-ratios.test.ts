@@ -36,11 +36,15 @@ describe('collectAspectRatioIssues', () => {
 		expect(result.flagged[0]).toMatchObject({ id: 'off-ratio', nearest: '4:3' });
 	});
 
-	test('exempts the errata prefix', () => {
-		const result = collectAspectRatioIssues([makeImage('errata/screenshot', 1215, 900)]);
+	test('exempts the errata prefix and counts it separately', () => {
+		const result = collectAspectRatioIssues([
+			makeImage('errata/screenshot', 1215, 900),
+			makeImage('taiwan/photo', 1800, 1200),
+		]);
 
 		expect(result.flagged).toEqual([]);
-		expect(result.checkedCount).toBe(0);
+		expect(result.checkedCount).toBe(1);
+		expect(result.exemptCount).toBe(1);
 	});
 
 	test('skips entries with missing or non-positive dimensions', () => {
@@ -51,6 +55,32 @@ describe('collectAspectRatioIssues', () => {
 
 		expect(result.flagged).toEqual([]);
 		expect(result.checkedCount).toBe(0);
+	});
+
+	test('tallies conforming images per ratio and excludes flagged ones', () => {
+		const result = collectAspectRatioIssues([
+			makeImage('wide-1', 1800, 1200),
+			makeImage('wide-2', 1800, 1200),
+			makeImage('square', 1200, 1200),
+			makeImage('off-ratio', 1215, 900),
+		]);
+
+		const counts = Object.fromEntries(result.tally.map((row) => [row.label, row.count]));
+
+		expect(counts).toMatchObject({ '3:2': 2, '1:1': 1, '4:3': 0 });
+		expect(result.flagged).toHaveLength(1);
+	});
+
+	test('labels orientation from the ratio value', () => {
+		const { tally } = collectAspectRatioIssues([]);
+
+		const orientations = Object.fromEntries(tally.map((row) => [row.label, row.orientation]));
+
+		expect(orientations).toMatchObject({
+			'3:2': 'landscape',
+			'2:3': 'portrait',
+			'1:1': 'square',
+		});
 	});
 
 	test('sorts flagged images by id', () => {
