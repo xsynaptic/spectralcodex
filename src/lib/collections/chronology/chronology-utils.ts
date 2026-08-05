@@ -1,7 +1,7 @@
 import type {
-	ArchivesDailyCounts,
-	ArchivesMonthlyItem,
-} from '#lib/collections/archives/archives-types.ts';
+	ChronologyDailyCounts,
+	ChronologyMonthlyItem,
+} from '#lib/collections/chronology/chronology-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
@@ -10,12 +10,12 @@ import {
 } from '#lib/image/image-featured.ts';
 
 // Adapt per-category daily counts to the generic activity graph: summed values plus year totals
-export function getArchivesActivityData(dailyData: Record<string, ArchivesDailyCounts>): {
+export function getChronologyActivityData(dailyData: Record<string, ChronologyDailyCounts>): {
 	values: Record<string, number>;
-	totals: ArchivesDailyCounts;
+	totals: ChronologyDailyCounts;
 } {
 	const values: Record<string, number> = {};
-	const totals: ArchivesDailyCounts = { created: 0, updated: 0, visited: 0 };
+	const totals: ChronologyDailyCounts = { created: 0, updated: 0, visited: 0 };
 
 	for (const [dayKey, counts] of Object.entries(dailyData)) {
 		values[dayKey] = counts.created + counts.updated + counts.visited;
@@ -28,16 +28,16 @@ export function getArchivesActivityData(dailyData: Record<string, ArchivesDailyC
 }
 
 /**
- * Resolve the image featured group for an archive item
- * Uses a custom imageFeatured from the archive entry if available, otherwise generates from highlights
+ * Resolve the image featured group for a chronology item
+ * Uses a custom imageFeatured from the chronology entry if available, otherwise generates from highlights
  */
-export async function createArchivesImageFeaturedGroupFunction() {
+export async function createChronologyImageFeaturedGroupFunction() {
 	const catalog = await getCatalog();
 
-	return function getArchivesImageFeaturedGroup(item: ArchivesMonthlyItem) {
-		return item.archiveEntry?.data.imageFeatured
+	return function getChronologyImageFeaturedGroup(item: ChronologyMonthlyItem) {
+		return item.chronologyEntry?.data.imageFeatured
 			? getImageFeaturedGroup({
-					imageFeatured: item.archiveEntry.data.imageFeatured,
+					imageFeatured: item.chronologyEntry.data.imageFeatured,
 					getCaption: catalog.getCaption,
 				})
 			: getImageFeaturedGroupByCatalog({ items: item.highlights });

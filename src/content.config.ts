@@ -1,4 +1,4 @@
-import { archives } from '#lib/collections/archives/archives-config.ts';
+import { chronology } from '#lib/collections/chronology/chronology-config.ts';
 import { images } from '#lib/collections/images/images-config.ts';
 import { locations } from '#lib/collections/locations/locations-config.ts';
 import { notes } from '#lib/collections/notes/notes-config.ts';
@@ -10,7 +10,7 @@ import { series } from '#lib/collections/series/series-config.ts';
 import { themes } from '#lib/collections/themes/themes-config.ts';
 
 export const collections = {
-	archives,
+	chronology,
 	notes,
 	images,
 	locations,

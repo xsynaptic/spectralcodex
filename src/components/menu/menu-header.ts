@@ -4,7 +4,7 @@ import pMemoize from 'p-memoize';
 
 import type { MenuItem } from '#components/menu/menu-types.ts';
 
-import { getArchivesData } from '#lib/collections/archives/archives-data.ts';
+import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
@@ -102,7 +102,7 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, collection: 'themes' }));
 
-	const archivesData = await getArchivesData();
+	const chronologyData = await getChronologyData();
 
 	return [
 		{
@@ -135,11 +135,11 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 		},
 		*/
 		{
-			title: t('menu.archive.label'),
-			url: getSiteUrl('archives'),
-			children: archivesData.archivesYears.slice(0, 12).map((year) => ({
+			title: t('menu.chronology.label'),
+			url: getSiteUrl('chronology'),
+			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
 				title: year,
-				url: getSiteUrl('archives', year),
+				url: getSiteUrl('chronology', year),
 			})),
 		},
 		{

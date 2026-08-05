@@ -85,7 +85,7 @@ export function sanitizeImageAltAttribute(input: string): string {
 	return encodeHtmlEntities(stripTags(input));
 }
 
-// Interpolate named placeholders in a string *e.g.* "{year}/{month} Archives"
+// Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"
 export function formatStringTemplate(
 	template: string,
 	values: Record<string, string | number> = {},

@@ -2,9 +2,9 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-// Fields shared by both archive views
+// Fields shared by both chronology views
 // A year summary (index view) carries exactly these; a monthly item adds the month-specific fields below
-interface ArchivesYearSummary {
+interface ChronologyYearSummary {
 	id: string;
 	title: string;
 	year: string;
@@ -17,18 +17,18 @@ interface ArchivesYearSummary {
 	visited: Array<CatalogItem>;
 }
 
-export interface ArchivesMonthlyItem extends ArchivesYearSummary {
+export interface ChronologyMonthlyItem extends ChronologyYearSummary {
 	month: string;
 	monthName: string;
-	archiveEntry?: CollectionEntry<'archives'> | undefined;
+	chronologyEntry?: CollectionEntry<'chronology'> | undefined;
 }
 
-export type ArchivesIndexData = Record<string, ArchivesYearSummary>;
+export type ChronologyIndexData = Record<string, ChronologyYearSummary>;
 
-export interface ArchivesDailyCounts {
+export interface ChronologyDailyCounts {
 	created: number;
 	updated: number;
 	visited: number;
 }
 
-export type ArchivesDailyData = Record<string, Record<string, ArchivesDailyCounts>>;
+export type ChronologyDailyData = Record<string, Record<string, ChronologyDailyCounts>>;

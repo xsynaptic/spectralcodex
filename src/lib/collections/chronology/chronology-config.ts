@@ -5,13 +5,13 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 
-const archivesSchema = z
+const chronologySchema = z
 	.object({
 		imageFeatured: ImageFeaturedSchema.optional(),
 	})
 	.strict();
 
-export const archives = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/archives` }),
-	schema: archivesSchema,
+export const chronology = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `${CONTENT_COLLECTIONS_PATH}/chronology` }),
+	schema: chronologySchema,
 });

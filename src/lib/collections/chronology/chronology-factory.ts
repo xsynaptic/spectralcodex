@@ -4,17 +4,17 @@ import * as R from 'remeda';
 
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type {
-	ArchivesDailyCounts,
-	ArchivesDailyData,
-	ArchivesIndexData,
-	ArchivesMonthlyItem,
-} from '#lib/collections/archives/archives-types.ts';
+	ChronologyDailyCounts,
+	ChronologyDailyData,
+	ChronologyIndexData,
+	ChronologyMonthlyItem,
+} from '#lib/collections/chronology/chronology-types.ts';
 
 import { MILLISECONDS_PER_DAY } from '#constants.ts';
 import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
-interface ArchivesRawMonthData extends Pick<
-	ArchivesMonthlyItem,
+interface ChronologyRawMonthData extends Pick<
+	ChronologyMonthlyItem,
 	'id' | 'year' | 'month' | 'monthName' | 'title'
 > {
 	created: Set<CatalogItem>;
@@ -22,25 +22,25 @@ interface ArchivesRawMonthData extends Pick<
 	visited: Set<CatalogItem>;
 }
 
-type ArchivesDataMap = Map<string, Map<string, ArchivesRawMonthData>>;
+type ChronologyDataMap = Map<string, Map<string, ChronologyRawMonthData>>;
 
-interface ArchivesDateData {
+interface ChronologyDateData {
 	date: Date;
 	month: string;
 	year: string;
 }
 
-interface ArchivesData {
-	archivesIndexData: ArchivesIndexData;
-	archivesMonthlyData: Array<ArchivesMonthlyItem>;
-	archivesYearlyData: Record<string, Array<ArchivesMonthlyItem>>;
-	archivesYears: Array<string>;
-	archivesMonths: Record<string, Array<string>>;
-	archivesDailyData: ArchivesDailyData;
+interface ChronologyData {
+	chronologyIndexData: ChronologyIndexData;
+	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
+	chronologyYearlyData: Record<string, Array<ChronologyMonthlyItem>>;
+	chronologyYears: Array<string>;
+	chronologyMonths: Record<string, Array<string>>;
+	chronologyDailyData: ChronologyDailyData;
 }
 
-// Content dates are UTC instants; bucket in UTC so archive membership matches displayed dates
-export function getDateData(date: Date): ArchivesDateData {
+// Content dates are UTC instants; bucket in UTC so chronology membership matches displayed dates
+export function getDateData(date: Date): ChronologyDateData {
 	return {
 		date,
 		month: String(date.getUTCMonth() + 1).padStart(2, '0'),
@@ -67,10 +67,10 @@ function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
 	return days;
 }
 
-export function buildArchivesDailyData(items: ReadonlyArray<CatalogItem>): ArchivesDailyData {
-	const dailyData: ArchivesDailyData = {};
+export function buildChronologyDailyData(items: ReadonlyArray<CatalogItem>): ChronologyDailyData {
+	const dailyData: ChronologyDailyData = {};
 
-	function addEvent(date: Date, category: keyof ArchivesDailyCounts): void {
+	function addEvent(date: Date, category: keyof ChronologyDailyCounts): void {
 		const year = String(date.getUTCFullYear()).padStart(4, '0');
 		const dayKey = getDayKey(date);
 
@@ -118,12 +118,12 @@ export function getMonthName(date: Date): string {
 	return date.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });
 }
 
-function getOrCreateMonthData(archiveDataMap: ArchivesDataMap, dateData: ArchivesDateData) {
-	if (!archiveDataMap.has(dateData.year)) {
-		archiveDataMap.set(dateData.year, new Map());
+function getOrCreateMonthData(chronologyDataMap: ChronologyDataMap, dateData: ChronologyDateData) {
+	if (!chronologyDataMap.has(dateData.year)) {
+		chronologyDataMap.set(dateData.year, new Map());
 	}
 
-	const yearMap = archiveDataMap.get(dateData.year)!;
+	const yearMap = chronologyDataMap.get(dateData.year)!;
 
 	if (!yearMap.has(dateData.month)) {
 		const monthName = getMonthName(dateData.date);
@@ -172,8 +172,8 @@ function createHighlightSelector() {
 
 const collectionsExcluded = ['pages'] satisfies Array<CatalogCollectionKey>;
 
-function buildArchivesDataMap(items: ReadonlyArray<CatalogItem>): ArchivesDataMap {
-	const archiveDataMap: ArchivesDataMap = new Map();
+function buildChronologyDataMap(items: ReadonlyArray<CatalogItem>): ChronologyDataMap {
+	const chronologyDataMap: ChronologyDataMap = new Map();
 
 	for (const item of items) {
 		if (R.isIncludedIn(item.collection, collectionsExcluded)) continue;
@@ -186,10 +186,10 @@ function buildArchivesDataMap(items: ReadonlyArray<CatalogItem>): ArchivesDataMa
 			(dateUpdatedData.year !== dateCreatedData.year ||
 				dateUpdatedData.month !== dateCreatedData.month)
 		) {
-			getOrCreateMonthData(archiveDataMap, dateUpdatedData).updated.add(item);
+			getOrCreateMonthData(chronologyDataMap, dateUpdatedData).updated.add(item);
 		}
 
-		getOrCreateMonthData(archiveDataMap, dateCreatedData).created.add(item);
+		getOrCreateMonthData(chronologyDataMap, dateCreatedData).created.add(item);
 
 		if (item.dateRecorded) {
 			const yearsRecorded = new Set<string>();
@@ -202,17 +202,17 @@ function buildArchivesDataMap(items: ReadonlyArray<CatalogItem>): ArchivesDataMa
 
 				if (!yearsRecorded.has(recordedDateData.year)) {
 					yearsRecorded.add(recordedDateData.year);
-					getOrCreateMonthData(archiveDataMap, recordedDateData).visited.add(item);
+					getOrCreateMonthData(chronologyDataMap, recordedDateData).visited.add(item);
 				}
 			}
 		}
 	}
 
-	return archiveDataMap;
+	return chronologyDataMap;
 }
 
 // The three categories, as either raw buckets or the projected (filtered, capped, deduped) tier result
-interface ArchivesTierBuckets {
+interface ChronologyTierBuckets {
 	updated: Array<CatalogItem>;
 	created: Array<CatalogItem>;
 	visited: Array<CatalogItem>;
@@ -235,7 +235,7 @@ function deduplicateCategories(
 	updated: Array<CatalogItem>,
 	created: Array<CatalogItem>,
 	visited: Array<CatalogItem>,
-): ArchivesTierBuckets {
+): ChronologyTierBuckets {
 	const updatedIds = new Set(updated.map((item) => item.id));
 
 	const createdFiltered = created.filter((item) => !updatedIds.has(item.id));
@@ -248,20 +248,20 @@ function deduplicateCategories(
 	return { updated, created: createdFiltered, visited: visitedFiltered };
 }
 
-interface ArchivesTierOptions {
+interface ChronologyTierOptions {
 	entryQuality: number;
 	limit?: number | undefined;
 }
 
-const monthlyTierOptions: ArchivesTierOptions = { entryQuality: 1 };
-const indexTierOptions: ArchivesTierOptions = { entryQuality: 3, limit: 20 };
+const monthlyTierOptions: ChronologyTierOptions = { entryQuality: 1 };
+const indexTierOptions: ChronologyTierOptions = { entryQuality: 3, limit: 20 };
 const yearlyQualityFloor = 2;
 const yearlyLimit = 20;
 
-function projectArchiveTier(
-	buckets: ArchivesTierBuckets,
-	{ entryQuality, limit }: ArchivesTierOptions,
-): ArchivesTierBuckets {
+function projectChronologyTier(
+	buckets: ChronologyTierBuckets,
+	{ entryQuality, limit }: ChronologyTierOptions,
+): ChronologyTierBuckets {
 	return deduplicateCategories(
 		sortAndLimit(
 			buckets.updated.filter((item) => item.entryQuality >= entryQuality),
@@ -278,12 +278,12 @@ function projectArchiveTier(
 	);
 }
 
-function tierHasData(tier: ArchivesTierBuckets): boolean {
+function tierHasData(tier: ChronologyTierBuckets): boolean {
 	return tier.updated.length > 0 || tier.created.length > 0 || tier.visited.length > 0;
 }
 
 // Counts reflect the full bucket totals (before the entry quality floor and cap), unlike the tier lists
-function getBucketCounts(buckets: ArchivesTierBuckets) {
+function getBucketCounts(buckets: ChronologyTierBuckets) {
 	return {
 		updatedCount: buckets.updated.length,
 		createdCount: buckets.created.length,
@@ -298,9 +298,9 @@ function passesYearlyFloor(item: CatalogItem): boolean {
 // Across a year an entry occupies one category by precedence
 // It appears once in the yearly view regardless of month processing order
 function getYearlyWinningCategories(
-	yearBuckets: ArchivesTierBuckets,
-): Map<string, keyof ArchivesTierBuckets> {
-	const winning = new Map<string, keyof ArchivesTierBuckets>();
+	yearBuckets: ChronologyTierBuckets,
+): Map<string, keyof ChronologyTierBuckets> {
+	const winning = new Map<string, keyof ChronologyTierBuckets>();
 
 	// Set in reverse precedence so a later write wins: updated overrides created overrides visited
 	for (const item of yearBuckets.visited) {
@@ -316,28 +316,28 @@ function getYearlyWinningCategories(
 	return winning;
 }
 
-export function createArchivesData(
+export function createChronologyData(
 	items: ReadonlyArray<CatalogItem>,
-	archiveEntries: Array<CollectionEntry<'archives'>>,
-): ArchivesData {
-	const archivesDataMap = buildArchivesDataMap(items);
+	chronologyEntries: Array<CollectionEntry<'chronology'>>,
+): ChronologyData {
+	const chronologyDataMap = buildChronologyDataMap(items);
 
-	const archivesMap = new Map<string, CollectionEntry<'archives'>>();
+	const chronologyMap = new Map<string, CollectionEntry<'chronology'>>();
 
-	for (const entry of archiveEntries) {
-		archivesMap.set(entry.id, entry);
+	for (const entry of chronologyEntries) {
+		chronologyMap.set(entry.id, entry);
 	}
 
-	const archivesMonthlyData: ArchivesData['archivesMonthlyData'] = [];
-	const archivesYearlyData: ArchivesData['archivesYearlyData'] = {};
-	const archivesIndexData: ArchivesData['archivesIndexData'] = {};
-	const archivesMonths: Record<string, Array<string>> = {};
+	const chronologyMonthlyData: ChronologyData['chronologyMonthlyData'] = [];
+	const chronologyYearlyData: ChronologyData['chronologyYearlyData'] = {};
+	const chronologyIndexData: ChronologyData['chronologyIndexData'] = {};
+	const chronologyMonths: Record<string, Array<string>> = {};
 
 	// Index highlights span all years
 	// Iterate newest-first so the most recent year keeps a featured image shared across years
 	const selectIndexHighlights = createHighlightSelector();
 
-	const yearEntries = [...archivesDataMap].sort(([yearA], [yearB]) => yearB.localeCompare(yearA));
+	const yearEntries = [...chronologyDataMap].sort(([yearA], [yearB]) => yearB.localeCompare(yearA));
 
 	for (const [year, yearlyData] of yearEntries) {
 		const months = [...yearlyData.values()].map((raw) => ({
@@ -348,26 +348,26 @@ export function createArchivesData(
 		}));
 
 		// Monthly view data
-		const yearMonthlyItems: Array<ArchivesMonthlyItem> = [];
+		const yearMonthlyItems: Array<ChronologyMonthlyItem> = [];
 
 		for (const month of months) {
-			const tier = projectArchiveTier(month, monthlyTierOptions);
+			const tier = projectChronologyTier(month, monthlyTierOptions);
 
 			if (!tierHasData(tier)) continue;
 
-			const monthlyItem: ArchivesMonthlyItem = {
+			const monthlyItem: ChronologyMonthlyItem = {
 				...month.raw,
 				highlights: undefined, // Set below
 				...getBucketCounts(month),
 				...tier,
-				archiveEntry: archivesMap.get(month.raw.id),
+				chronologyEntry: chronologyMap.get(month.raw.id),
 			};
 
-			archivesMonthlyData.push(monthlyItem);
+			chronologyMonthlyData.push(monthlyItem);
 			yearMonthlyItems.push(monthlyItem);
 		}
 
-		archivesMonths[year] = yearMonthlyItems.map((item) => item.month);
+		chronologyMonths[year] = yearMonthlyItems.map((item) => item.month);
 
 		// Monthly highlights; chronological so the earliest month wins a shared featured image
 		const selectMonthlyHighlights = createHighlightSelector();
@@ -388,7 +388,7 @@ export function createArchivesData(
 		);
 
 		// Aggregate the year's buckets once; reused by the yearly precedence map and the index view
-		const yearBuckets: ArchivesTierBuckets = {
+		const yearBuckets: ChronologyTierBuckets = {
 			updated: months.flatMap((month) => month.updated),
 			created: months.flatMap((month) => month.created),
 			visited: months.flatMap((month) => month.visited),
@@ -398,7 +398,7 @@ export function createArchivesData(
 		const yearlyWinningCategory = getYearlyWinningCategories(yearBuckets);
 
 		for (const month of months) {
-			const tier: ArchivesTierBuckets = {
+			const tier: ChronologyTierBuckets = {
 				updated: sortAndLimit(
 					month.updated.filter((item) => yearlyWinningCategory.get(item.id) === 'updated'),
 					yearlyLimit,
@@ -415,11 +415,11 @@ export function createArchivesData(
 
 			if (!tierHasData(tier)) continue;
 
-			let yearData = archivesYearlyData[year];
+			let yearData = chronologyYearlyData[year];
 
 			if (!yearData) {
 				yearData = [];
-				archivesYearlyData[year] = yearData;
+				chronologyYearlyData[year] = yearData;
 			}
 
 			yearData.push({
@@ -431,11 +431,11 @@ export function createArchivesData(
 		}
 
 		// Index view; year-level aggregation
-		const indexTier = projectArchiveTier(yearBuckets, indexTierOptions);
+		const indexTier = projectChronologyTier(yearBuckets, indexTierOptions);
 
 		if (!tierHasData(indexTier)) continue;
 
-		archivesIndexData[year] = {
+		chronologyIndexData[year] = {
 			id: year,
 			year,
 			title: year,
@@ -449,21 +449,21 @@ export function createArchivesData(
 		};
 	}
 
-	const archivesYears = Object.keys(archivesYearlyData).sort((a, b) => b.localeCompare(a));
-	const yearHasView = new Set(archivesYears);
+	const chronologyYears = Object.keys(chronologyYearlyData).sort((a, b) => b.localeCompare(a));
+	const yearHasView = new Set(chronologyYears);
 
-	const archivesDailyData = buildArchivesDailyData(items);
+	const chronologyDailyData = buildChronologyDailyData(items);
 
 	return {
-		archivesIndexData,
-		archivesYearlyData,
-		archivesMonthlyData: archivesMonthlyData.filter((item) => yearHasView.has(item.year)),
-		archivesYears,
-		archivesMonths: Object.fromEntries(
-			Object.entries(archivesMonths).filter(([year]) => yearHasView.has(year)),
+		chronologyIndexData,
+		chronologyYearlyData,
+		chronologyMonthlyData: chronologyMonthlyData.filter((item) => yearHasView.has(item.year)),
+		chronologyYears,
+		chronologyMonths: Object.fromEntries(
+			Object.entries(chronologyMonths).filter(([year]) => yearHasView.has(year)),
 		),
-		archivesDailyData: Object.fromEntries(
-			Object.entries(archivesDailyData).filter(([year]) => yearHasView.has(year)),
+		chronologyDailyData: Object.fromEntries(
+			Object.entries(chronologyDailyData).filter(([year]) => yearHasView.has(year)),
 		),
 	};
 }

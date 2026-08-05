@@ -47,7 +47,7 @@ const { collections } = loadDataStore(dataStorePath);
 const command = positionals[0];
 
 const allEntries = getDataStoreCollection(collections, [
-	'archives',
+	'chronology',
 	'notes',
 	'locations',
 	'pages',

@@ -1,44 +1,44 @@
 ---
 import type {
-	ArchivesDailyCounts,
-	ArchivesMonthlyItem,
-} from '#lib/collections/archives/archives-types.ts';
+	ChronologyDailyCounts,
+	ChronologyMonthlyItem,
+} from '#lib/collections/chronology/chronology-types.ts';
 
-import ArchivesActivity from '#components/archives/archives-activity.astro';
-import ArchivesItem from '#components/archives/archives-item.astro';
-import ArchivesNavigation from '#components/archives/archives-navigation.astro';
+import ChronologyActivity from '#components/chronology/chronology-activity.astro';
+import ChronologyItem from '#components/chronology/chronology-item.astro';
+import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
 import Link from '#components/parts/link.astro';
-import { createArchivesImageFeaturedGroupFunction } from '#lib/collections/archives/archives-utils.ts';
+import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
-	archivesMonthlyData: Array<ArchivesMonthlyItem>;
-	archivesYear: string;
-	archivesYears: Array<string>;
-	archivesDailyData: Record<string, ArchivesDailyCounts>;
+	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
+	chronologyYear: string;
+	chronologyYears: Array<string>;
+	chronologyDailyData: Record<string, ChronologyDailyCounts>;
 }
 
-const { archivesMonthlyData, archivesYear, archivesYears, archivesDailyData } = Astro.props;
+const { chronologyMonthlyData, chronologyYear, chronologyYears, chronologyDailyData } = Astro.props;
 
-const getArchivesImageFeaturedGroup = await createArchivesImageFeaturedGroupFunction();
+const getChronologyImageFeaturedGroup = await createChronologyImageFeaturedGroupFunction();
 
 const t = getTranslations();
 
-const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesYear });
+const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronologyYear });
 ---
 
 <MainSite
 	meta={{
 		title,
-		description: formatStringTemplate(t('archives.yearly.description'), { date: archivesYear }),
+		description: formatStringTemplate(t('chronology.yearly.description'), { date: chronologyYear }),
 		image: getSeoImageProps({
-			id: archivesYear,
+			id: chronologyYear,
 			alt: title,
 		}),
 		...getSeoHideSearch(true),
@@ -47,19 +47,19 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-subtitle"
-			><ArchivesNavigation currentYear={archivesYear} archivesYears={archivesYears}
-				><Link href={getSiteUrl('archives')} linkColor="accent" class="font-semibold"
-					>{t('archives.index.label')}</Link
-				></ArchivesNavigation
+			><ChronologyNavigation currentYear={chronologyYear} chronologyYears={chronologyYears}
+				><Link href={getSiteUrl('chronology')} linkColor="accent" class="font-semibold"
+					>{t('chronology.index.label')}</Link
+				></ChronologyNavigation
 			></Fragment
 		>
 	</ContentHeader>
 	{
-		archivesMonthlyData
+		chronologyMonthlyData
 			.sort((a, b) => Number(a.month) - Number(b.month))
 			.map((monthlyData) => {
-				const imageFeaturedGroup = getArchivesImageFeaturedGroup(monthlyData);
-				const monthlyUrl = getSiteUrl('archives', monthlyData.year, monthlyData.month);
+				const imageFeaturedGroup = getChronologyImageFeaturedGroup(monthlyData);
+				const monthlyUrl = getSiteUrl('chronology', monthlyData.year, monthlyData.month);
 
 				return (
 					<div class="content-column-fill mb-8">
@@ -70,20 +70,20 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 								</Link>
 							</h2>
 							<div class="flex flex-col gap-2">
-								<ArchivesItem
-									title={t('archives.updated.label')}
+								<ChronologyItem
+									title={t('chronology.updated.label')}
 									items={monthlyData.updated}
 									count={monthlyData.updatedCount}
 									url={monthlyUrl}
 								/>
-								<ArchivesItem
-									title={t('archives.created.label')}
+								<ChronologyItem
+									title={t('chronology.created.label')}
 									items={monthlyData.created}
 									count={monthlyData.createdCount}
 									url={monthlyUrl}
 								/>
-								<ArchivesItem
-									title={t('archives.visited.label')}
+								<ChronologyItem
+									title={t('chronology.visited.label')}
 									items={monthlyData.visited}
 									count={monthlyData.visitedCount}
 									url={monthlyUrl}
@@ -97,5 +97,5 @@ const title = formatStringTemplate(t('archives.yearly.title'), { date: archivesY
 				);
 			})
 	}
-	<ArchivesActivity year={archivesYear} dailyData={archivesDailyData} />
+	<ChronologyActivity year={chronologyYear} dailyData={chronologyDailyData} />
 </MainSite>

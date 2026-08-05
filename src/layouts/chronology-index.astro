@@ -1,8 +1,8 @@
 ---
-import type { ArchivesIndexData } from '#lib/collections/archives/archives-types.ts';
+import type { ChronologyIndexData } from '#lib/collections/chronology/chronology-types.ts';
 
-import ArchivesItem from '#components/archives/archives-item.astro';
-import ArchivesNavigation from '#components/archives/archives-navigation.astro';
+import ChronologyItem from '#components/chronology/chronology-item.astro';
+import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
@@ -13,23 +13,23 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	archivesIndexData: ArchivesIndexData;
-	archivesYears: Array<string>;
+	chronologyIndexData: ChronologyIndexData;
+	chronologyYears: Array<string>;
 }
 
-const { archivesIndexData, archivesYears } = Astro.props;
+const { chronologyIndexData, chronologyYears } = Astro.props;
 
 const t = getTranslations();
 
-const title = t('archives.index.title');
+const title = t('chronology.index.title');
 ---
 
 <MainSite
 	meta={{
 		title,
-		description: t('archives.index.description'),
+		description: t('chronology.index.description'),
 		image: getSeoImageProps({
-			id: 'index-archives',
+			id: 'index-chronology',
 			alt: title,
 		}),
 		...getSeoHideSearch(true),
@@ -37,10 +37,12 @@ const title = t('archives.index.title');
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
-		<Fragment slot="header-subtitle"><ArchivesNavigation archivesYears={archivesYears} /></Fragment>
+		<Fragment slot="header-subtitle"
+			><ChronologyNavigation chronologyYears={chronologyYears} /></Fragment
+		>
 	</ContentHeader>
 	{
-		Object.entries(archivesIndexData)
+		Object.entries(chronologyIndexData)
 			.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
 			.map(([year, monthlyData]) => {
 				const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
@@ -51,23 +53,23 @@ const title = t('archives.index.title');
 					<div class="content-column-fill mb-8">
 						<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-								<Link href={getSiteUrl('archives', year)} linkColor="primary">
+								<Link href={getSiteUrl('chronology', year)} linkColor="primary">
 									{year}
 								</Link>
 							</h2>
 							<div class="flex flex-col gap-2">
-								<ArchivesItem
-									title={t('archives.updated.label')}
+								<ChronologyItem
+									title={t('chronology.updated.label')}
 									items={monthlyData.updated}
 									count={monthlyData.updatedCount}
 								/>
-								<ArchivesItem
-									title={t('archives.created.label')}
+								<ChronologyItem
+									title={t('chronology.created.label')}
 									items={monthlyData.created}
 									count={monthlyData.createdCount}
 								/>
-								<ArchivesItem
-									title={t('archives.visited.label')}
+								<ChronologyItem
+									title={t('chronology.visited.label')}
 									items={monthlyData.visited}
 									count={monthlyData.visitedCount}
 								/>

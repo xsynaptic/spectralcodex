@@ -51,7 +51,7 @@ export const DateRecordedSchema = z
 	.union([DateValueSchema, z.tuple([DateValueSchema, DateValueSchema])])
 	.array();
 
-// Numeric scale schema, from 1 to 5; used by locations and archives
+// Numeric scale schema, from 1 to 5; used by locations and chronology
 export const NumericScaleSchema = z.number().int().min(1).max(5);
 
 // Image thumbnail schema

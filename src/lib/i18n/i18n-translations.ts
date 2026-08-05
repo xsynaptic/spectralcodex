@@ -128,20 +128,20 @@ const translationStrings = {
 		'terms.related.children.label': 'Subterms',
 		'terms.related.siblings.label': 'Other Terms',
 
-		// Archives
-		'archives.index.label': 'Index',
-		'archives.index.title': 'Archives',
-		'archives.index.description':
-			'High level overview of all content on this site by year. Monthly data is also available after clicking on a year.',
-		'archives.yearly.title': '{date} Archives',
-		'archives.yearly.description': 'Monthly content archives for the year {date}.',
-		'archives.monthly.title': '{date} Archives',
-		'archives.monthly.description': 'Content archives for {date}.',
-		'archives.created.label': 'Created',
-		'archives.updated.label': 'Updated',
-		'archives.visited.label': 'Visited',
-		'archives.activity.label': 'Activity',
-		'archives.activity.aria':
+		// Chronology
+		'chronology.index.label': 'Index',
+		'chronology.index.title': 'Chronology',
+		'chronology.index.description':
+			'Fieldwork and publishing on this site, year by year. Select a year for the monthly view.',
+		'chronology.yearly.title': 'Chronology: {date}',
+		'chronology.yearly.description': 'Fieldwork and publishing across {date}, month by month.',
+		'chronology.monthly.title': 'Chronology: {date}',
+		'chronology.monthly.description': 'Fieldwork and publishing during {date}.',
+		'chronology.created.label': 'Created',
+		'chronology.updated.label': 'Updated',
+		'chronology.visited.label': 'Visited',
+		'chronology.activity.label': 'Activity',
+		'chronology.activity.aria':
 			'Activity for {year}: {created} created, {updated} updated, {visited} visited',
 
 		// Pagination
@@ -198,7 +198,7 @@ const translationStrings = {
 		'site.pagination.select.submit': 'Go',
 
 		// Menu items
-		'menu.archive.label': 'Archives',
+		'menu.chronology.label': 'Chronology',
 		'menu.about.label': 'About',
 		'menu.contact.label': 'Contact',
 		'menu.terms.label': 'Terms of Use',

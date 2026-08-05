@@ -160,7 +160,7 @@ export default defineConfig({
 		}),
 		mdx(),
 		sitemap({
-			excludePrefixes: ['/objectives', '/planning', '/taiwan-theater-project', '/archives'],
+			excludePrefixes: ['/objectives', '/planning', '/taiwan-theater-project', '/chronology'],
 		}),
 		pagefind({
 			indexConfig: {

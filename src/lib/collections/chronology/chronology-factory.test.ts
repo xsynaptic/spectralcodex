@@ -4,25 +4,25 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
 import {
-	buildArchivesDailyData,
-	createArchivesData,
+	buildChronologyDailyData,
+	createChronologyData,
 	getDateData,
 	getMonthName,
-} from '#lib/collections/archives/archives-factory.ts';
+} from '#lib/collections/chronology/chronology-factory.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
-const monthlyItem = (data: ReturnType<typeof createArchivesData>, id: string) => {
-	const item = data.archivesMonthlyData.find((entry) => entry.id === id);
+const monthlyItem = (data: ReturnType<typeof createChronologyData>, id: string) => {
+	const item = data.chronologyMonthlyData.find((entry) => entry.id === id);
 
 	if (!item) throw new Error(`No monthly item for "${id}"`);
 
 	return item;
 };
 
-describe('createArchivesData', () => {
+describe('createChronologyData', () => {
 	test('excludes the pages collection from every tier', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				makeCatalogItem({ id: 'a-page', collection: 'pages', dateCreated: new Date(2024, 2, 10) }),
 				makeCatalogItem({ id: 'a-post', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
@@ -33,11 +33,11 @@ describe('createArchivesData', () => {
 		const month = monthlyItem(data, '2024/03');
 
 		expect(ids(month.created)).toEqual(['a-post']);
-		expect(ids(data.archivesIndexData['2024']?.created ?? [])).toEqual(['a-post']);
+		expect(ids(data.chronologyIndexData['2024']?.created ?? [])).toEqual(['a-post']);
 	});
 
 	test('dedup precedence within a month is updated > created > visited', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				// Created and visited in the same month -> kept as created
 				makeCatalogItem({
@@ -74,7 +74,7 @@ describe('createArchivesData', () => {
 			}),
 		);
 
-		const data = createArchivesData(items, []);
+		const data = createChronologyData(items, []);
 
 		const month = monthlyItem(data, '2024/03');
 
@@ -84,7 +84,7 @@ describe('createArchivesData', () => {
 	});
 
 	test('within a quality level, a featured image sorts an entry ahead of one without', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				makeCatalogItem({
 					id: 'aaa-no-image',
@@ -108,7 +108,7 @@ describe('createArchivesData', () => {
 	});
 
 	test('monthly highlights do not repeat within a year', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				// Candidate in 2024/01 (created) and 2024/02 (updated) -> highlight in only one
 				makeCatalogItem({
@@ -140,7 +140,7 @@ describe('createArchivesData', () => {
 	});
 
 	test('the yearly view places a multi-month entry in its highest-precedence slot', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				// Created in 2024/01, updated in 2024/02 -> shows under Feb/updated (updated > created)
 				makeCatalogItem({
@@ -158,7 +158,7 @@ describe('createArchivesData', () => {
 			[],
 		);
 
-		const yearly = data.archivesYearlyData['2024'] ?? [];
+		const yearly = data.chronologyYearlyData['2024'] ?? [];
 		const january = yearly.find((month) => month.month === '01');
 		const february = yearly.find((month) => month.month === '02');
 
@@ -167,7 +167,7 @@ describe('createArchivesData', () => {
 	});
 
 	test('a year with no yearly view contributes no month pages (no orphans)', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			// Quality 1 is in the complete monthly record but below the yearly floor, so 2019 gets no yearly view
 			[
 				makeCatalogItem({
@@ -180,14 +180,14 @@ describe('createArchivesData', () => {
 			[],
 		);
 
-		expect(data.archivesYearlyData['2019']).toBeUndefined();
+		expect(data.chronologyYearlyData['2019']).toBeUndefined();
 		// So it must not leave behind month items or a month list that would generate orphan pages
-		expect(data.archivesMonthlyData.some((item) => item.year === '2019')).toBe(false);
-		expect(data.archivesMonths['2019']).toBeUndefined();
+		expect(data.chronologyMonthlyData.some((item) => item.year === '2019')).toBe(false);
+		expect(data.chronologyMonths['2019']).toBeUndefined();
 	});
 
 	test('an index highlight shared across years goes to the most recent year', () => {
-		const data = createArchivesData(
+		const data = createChronologyData(
 			[
 				// Anchor populates 2023 in the data map before 2024 (oldest-first insertion order)
 				// Test fails unless the year loop deliberately iterates newest-first
@@ -208,12 +208,12 @@ describe('createArchivesData', () => {
 			[],
 		);
 
-		expect(ids(data.archivesIndexData['2024']?.highlights ?? [])).toContain('shared');
-		expect(ids(data.archivesIndexData['2023']?.highlights ?? [])).not.toContain('shared');
+		expect(ids(data.chronologyIndexData['2024']?.highlights ?? [])).toContain('shared');
+		expect(ids(data.chronologyIndexData['2023']?.highlights ?? [])).not.toContain('shared');
 	});
 
 	test('the index tier requires quality >= 3', () => {
-		const belowThreshold = createArchivesData(
+		const belowThreshold = createChronologyData(
 			[
 				makeCatalogItem({
 					id: 'q2',
@@ -226,10 +226,10 @@ describe('createArchivesData', () => {
 		);
 
 		// Present in monthly (complete record) and yearly (>= 2), absent from the index (>= 3)
-		expect(belowThreshold.archivesMonthlyData).toHaveLength(1);
-		expect(belowThreshold.archivesIndexData['2024']).toBeUndefined();
+		expect(belowThreshold.chronologyMonthlyData).toHaveLength(1);
+		expect(belowThreshold.chronologyIndexData['2024']).toBeUndefined();
 
-		const atThreshold = createArchivesData(
+		const atThreshold = createChronologyData(
 			[
 				makeCatalogItem({
 					id: 'q3',
@@ -241,7 +241,7 @@ describe('createArchivesData', () => {
 			[],
 		);
 
-		expect(ids(atThreshold.archivesIndexData['2024']?.created ?? [])).toEqual(['q3']);
+		expect(ids(atThreshold.chronologyIndexData['2024']?.created ?? [])).toEqual(['q3']);
 	});
 });
 
@@ -267,10 +267,10 @@ describe('getMonthName', () => {
 	});
 });
 
-describe('buildArchivesDailyData', () => {
+describe('buildChronologyDailyData', () => {
 	// UTC-instant literals so day bucketing stays timezone stable (getUTC* reads)
 	test('tallies a creation on its UTC day', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -282,7 +282,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('buckets a late-evening UTC instant on its UTC day, not the local one', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -294,7 +294,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('does not count an update made on the same UTC day as creation', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -307,7 +307,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('counts an update made on a different UTC day from creation', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -321,7 +321,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('expands a recorded range so every day start-to-end inclusive is visited', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -342,7 +342,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('treats a single recorded date as one visited day', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a',
 				collection: 'posts',
@@ -355,7 +355,7 @@ describe('buildArchivesDailyData', () => {
 	});
 
 	test('excludes the pages collection', () => {
-		const daily = buildArchivesDailyData([
+		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				id: 'a-page',
 				collection: 'pages',

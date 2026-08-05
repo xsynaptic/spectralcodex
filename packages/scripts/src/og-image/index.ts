@@ -144,7 +144,7 @@ async function main() {
 		}
 		console.log(
 			chalk.red(
-				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a data-store entry, index page, or archive pattern.`,
+				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a data-store entry, index page, or chronology pattern.`,
 			),
 		);
 		process.exit(1);

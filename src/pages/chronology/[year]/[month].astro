@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+
+import ChronologyMonthly from '#layouts/chronology-monthly.astro';
+import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
+
+export const getStaticPaths = (async () => {
+	const { chronologyMonthlyData, chronologyYears, chronologyMonths } = await getChronologyData();
+
+	return chronologyMonthlyData.map((chronologyMonthlyItem) => ({
+		params: { year: chronologyMonthlyItem.year, month: chronologyMonthlyItem.month },
+		props: {
+			chronologyMonthlyItem,
+			chronologyYears,
+			chronologyMonths: chronologyMonths[chronologyMonthlyItem.year],
+		},
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+---
+
+<ChronologyMonthly {...Astro.props} />

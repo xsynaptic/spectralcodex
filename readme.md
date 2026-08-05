@@ -55,7 +55,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Hierarchical navigation through regions, themes, and series
 - Client-side fuzzy 404 suggestions via [fastest-levenshtein](https://github.com/ka-weihe/fastest-levenshtein) with substring-bonus scoring against a build-time content manifest; auto-redirects on near-exact matches
 
-### Timeline & Archives
+### Chronology
 
 - Chronological content browsing with yearly, monthly, and daily views
 - Intelligent content deduplication across time periods based on created, updated, and visited dates

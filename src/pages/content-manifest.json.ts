@@ -9,7 +9,7 @@ const excludePrefixes = [
 	'/objectives',
 	'/planning',
 	'/taiwan-theater-project',
-	'/archives',
+	'/chronology',
 ] as const;
 
 function shouldIncludeUrl(pathname: string): boolean {

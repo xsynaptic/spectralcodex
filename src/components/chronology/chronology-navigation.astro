@@ -9,8 +9,8 @@ import { getSiteUrl } from '#lib/utils/routing.ts';
 interface Props extends HTMLAttributes<'div'> {
 	currentYear?: string | undefined;
 	currentMonth?: string | undefined;
-	archivesYears: Array<string>;
-	archivesMonths?: Array<string> | undefined;
+	chronologyYears: Array<string>;
+	chronologyMonths?: Array<string> | undefined;
 	hasHeroImage?: boolean | undefined;
 }
 
@@ -18,8 +18,8 @@ const {
 	class: className,
 	currentYear,
 	currentMonth,
-	archivesYears,
-	archivesMonths,
+	chronologyYears,
+	chronologyMonths,
 	hasHeroImage = false,
 	...props
 } = Astro.props;
@@ -28,7 +28,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 ---
 
 {
-	archivesYears.length > 0 ? (
+	chronologyYears.length > 0 ? (
 		<div
 			class:list={[
 				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
@@ -48,37 +48,37 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 						<Fragment set:html={indexSlot} />
 					</DividedItem>
 				) : undefined}
-				{archivesYears.map((archivesYear) => (
+				{chronologyYears.map((chronologyYear) => (
 					<DividedItem>
-						{!currentMonth && currentYear === archivesYear ? (
+						{!currentMonth && currentYear === chronologyYear ? (
 							<span
 								class:list={[
 									'font-semibold text-primary-600 dark:text-primary-400',
 									hasHeroImage ? 'sm:text-accent-200' : '',
 								]}
 							>
-								{archivesYear}
+								{chronologyYear}
 							</span>
 						) : (
 							<Link
-								class={currentMonth && currentYear === archivesYear ? 'font-semibold' : undefined}
-								href={getSiteUrl('archives', archivesYear)}
+								class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
+								href={getSiteUrl('chronology', chronologyYear)}
 								linkColor="accent"
 							>
-								{archivesYear}
+								{chronologyYear}
 							</Link>
 						)}
 					</DividedItem>
 				))}
 			</div>
-			{currentYear && currentMonth && archivesMonths && archivesMonths.length > 0 ? (
+			{currentYear && currentMonth && chronologyMonths && chronologyMonths.length > 0 ? (
 				<div
 					class:list={[
 						'flex gap-1',
 						hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 					]}
 				>
-					{archivesMonths
+					{chronologyMonths
 						.sort((monthA, monthB) => monthA.localeCompare(monthB))
 						.map((monthNumber) => {
 							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('en-US', {
@@ -98,7 +98,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 										</span>
 									) : (
 										<Link
-											href={getSiteUrl('archives', currentYear, monthNumber)}
+											href={getSiteUrl('chronology', currentYear, monthNumber)}
 											linkColor="highlight"
 										>
 											{monthName}

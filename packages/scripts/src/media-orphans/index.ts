@@ -33,7 +33,7 @@ const mediaPath = path.join(rootPath, values['media-path']);
 const { collections } = loadDataStore(dataStorePath);
 
 const allEntries = getDataStoreCollection(collections, [
-	'archives',
+	'chronology',
 	'notes',
 	'locations',
 	'pages',

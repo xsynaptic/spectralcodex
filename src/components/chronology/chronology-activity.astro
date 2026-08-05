@@ -1,24 +1,24 @@
 ---
-import type { ArchivesDailyCounts } from '#lib/collections/archives/archives-types.ts';
+import type { ChronologyDailyCounts } from '#lib/collections/chronology/chronology-types.ts';
 
 import ActivityGraph from '#components/parts/activity-graph.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import { getArchivesActivityData } from '#lib/collections/archives/archives-utils.ts';
+import { getChronologyActivityData } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	year: string;
-	dailyData: Record<string, ArchivesDailyCounts>;
+	dailyData: Record<string, ChronologyDailyCounts>;
 }
 
 const { year, dailyData } = Astro.props;
 
 const t = getTranslations();
 
-const { values, totals } = getArchivesActivityData(dailyData);
+const { values, totals } = getChronologyActivityData(dailyData);
 
-const ariaLabel = formatStringTemplate(t('archives.activity.aria'), {
+const ariaLabel = formatStringTemplate(t('chronology.activity.aria'), {
 	year,
 	created: formatNumber({ number: totals.created }),
 	updated: formatNumber({ number: totals.updated }),
@@ -31,18 +31,18 @@ const ariaLabel = formatStringTemplate(t('archives.activity.aria'), {
 		<h2
 			class="mb-1 border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700"
 		>
-			{t('archives.activity.label')}
+			{t('chronology.activity.label')}
 		</h2>
 		<ActivityGraph year={year} values={values} ariaLabel={ariaLabel}>
 			<div class="flex flex-wrap gap-x-1 text-sm">
 				<DividedItem>
-					{`${formatNumber({ number: totals.created })} ${t('archives.created.label')}`}
+					{`${formatNumber({ number: totals.created })} ${t('chronology.created.label')}`}
 				</DividedItem>
 				<DividedItem>
-					{`${formatNumber({ number: totals.updated })} ${t('archives.updated.label')}`}
+					{`${formatNumber({ number: totals.updated })} ${t('chronology.updated.label')}`}
 				</DividedItem>
 				<DividedItem>
-					{`${formatNumber({ number: totals.visited })} ${t('archives.visited.label')}`}
+					{`${formatNumber({ number: totals.visited })} ${t('chronology.visited.label')}`}
 				</DividedItem>
 			</div>
 		</ActivityGraph>

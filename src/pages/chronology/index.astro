@@ -1,0 +1,13 @@
+---
+import ChronologyIndex from '#layouts/chronology-index.astro';
+import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
+
+const { chronologyIndexData, chronologyYears } = await getChronologyData();
+
+const data = {
+	chronologyIndexData,
+	chronologyYears,
+};
+---
+
+<ChronologyIndex {...data} />

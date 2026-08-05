@@ -15,7 +15,7 @@ import {
 	loadDataStore,
 } from '../shared/data-store.js';
 import { extractImageFeaturedIds } from '../shared/images.js';
-import { buildArchiveImageIndex, getArchivesTitle } from './archives.js';
+import { buildChronologyImageIndex, getChronologyTitle } from './chronology.js';
 import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
@@ -35,19 +35,19 @@ function getImageFeaturedData({
 	entry,
 	collection,
 	regionParentMap,
-	archiveImageIndex,
+	chronologyImageIndex,
 }: {
 	entry: DataStoreEntry;
 	collection: string;
 	regionParentMap?: RegionParentMap;
-	archiveImageIndex?: Map<string, string>;
+	chronologyImageIndex?: Map<string, string>;
 }): { imageFeaturedId: string; isFallback: boolean } {
 	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
 
 	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
 
-	if (archiveImageIndex && collection === ContentCollectionsEnum.Archives) {
-		const derivedImageId = archiveImageIndex.get(getPublicId(entry).replace('/', '-'));
+	if (chronologyImageIndex && collection === ContentCollectionsEnum.Chronology) {
+		const derivedImageId = chronologyImageIndex.get(getPublicId(entry).replace('/', '-'));
 
 		if (derivedImageId) return { imageFeaturedId: derivedImageId, isFallback: false };
 	}
@@ -77,7 +77,7 @@ function getImageFeaturedData({
  */
 export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
-		{ suffix: ContentCollectionsEnum.Archives, title: 'Archives', isFallback: true },
+		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Notes, title: 'Notes', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Posts, title: 'Posts', isFallback: true },
@@ -112,11 +112,11 @@ export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
  */
 function buildDataStoreEntries(dataStorePath: string): {
 	entries: Map<string, OpenGraphContentEntry>;
-	archiveImageIndex: Map<string, string>;
+	chronologyImageIndex: Map<string, string>;
 } {
 	const { collections, regionParentMap } = loadDataStore(dataStorePath);
 
-	const archiveImageIndex = buildArchiveImageIndex(collections);
+	const chronologyImageIndex = buildChronologyImageIndex(collections);
 
 	const entries = new Map<string, OpenGraphContentEntry>();
 
@@ -144,8 +144,8 @@ function buildDataStoreEntries(dataStorePath: string): {
 
 			let title = titleRaw;
 
-			if (collection === ContentCollectionsEnum.Archives) {
-				title = getArchivesTitle(id);
+			if (collection === ContentCollectionsEnum.Chronology) {
+				title = getChronologyTitle(id);
 			} else if (collection === ContentCollectionsEnum.Resources) {
 				if (!title || !('showPage' in entry.data) || !entry.data.showPage) {
 					continue;
@@ -158,7 +158,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 				entry,
 				collection,
 				regionParentMap,
-				archiveImageIndex,
+				chronologyImageIndex,
 			});
 
 			entries.set(id, {
@@ -183,7 +183,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 		}
 	}
 
-	return { entries, archiveImageIndex };
+	return { entries, chronologyImageIndex };
 }
 
 /**
@@ -235,18 +235,18 @@ export function extractBuiltFilenames(distPath: string): Set<string> {
  * Resolve a filename emitted by Astro to a full OG entry in this order:
  * 1) data-store.json
  * 2) static index entries
- * 3) synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
+ * 3) synthesize chronology IDs for any remaining `YYYY` or `YYYY-MM` pattern
  */
 export function resolveEntry({
 	filename,
 	dataStoreEntries,
 	indexEntries,
-	archiveImageIndex,
+	chronologyImageIndex,
 }: {
 	filename: string;
 	dataStoreEntries: Map<string, OpenGraphContentEntry>;
 	indexEntries: Map<string, OpenGraphContentEntry>;
-	archiveImageIndex: Map<string, string>;
+	chronologyImageIndex: Map<string, string>;
 }): OpenGraphContentEntry | undefined {
 	const fromDataStore = dataStoreEntries.get(filename);
 
@@ -256,20 +256,20 @@ export function resolveEntry({
 
 	if (fromIndex) return fromIndex;
 
-	// Synthesize archive IDs for any remaining `YYYY` or `YYYY-MM` pattern
+	// Synthesize chronology IDs for any remaining `YYYY` or `YYYY-MM` pattern
 	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
-		const derivedImageId = archiveImageIndex.get(filename);
+		const derivedImageId = chronologyImageIndex.get(filename);
 
 		return {
 			id: filename,
-			collection: ContentCollectionsEnum.Archives,
-			digest: `archives-${filename}`,
-			title: getArchivesTitle(filename),
+			collection: ContentCollectionsEnum.Chronology,
+			digest: `chronology-${filename}`,
+			title: getChronologyTitle(filename),
 			imageFeaturedId:
 				derivedImageId ??
 				getFallbackImageId({
 					id: filename,
-					collection: ContentCollectionsEnum.Archives,
+					collection: ContentCollectionsEnum.Chronology,
 				}),
 			isFallback: !derivedImageId,
 		};
@@ -289,7 +289,7 @@ export function getBuiltEntries({
 	dataStorePath: string;
 	distPath: string;
 }): { entries: Array<OpenGraphContentEntry>; unresolved: Array<string> } {
-	const { entries: dataStoreEntries, archiveImageIndex } = buildDataStoreEntries(dataStorePath);
+	const { entries: dataStoreEntries, chronologyImageIndex } = buildDataStoreEntries(dataStorePath);
 	const indexEntries = buildIndexEntries();
 	const distFilenames = extractBuiltFilenames(distPath);
 
@@ -297,7 +297,7 @@ export function getBuiltEntries({
 	const unresolved: Array<string> = [];
 
 	for (const filename of distFilenames) {
-		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries, archiveImageIndex });
+		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries, chronologyImageIndex });
 
 		if (entry) {
 			entries.push(entry);

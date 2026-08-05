@@ -34,7 +34,7 @@ describe('buildIndexEntries', () => {
 
 	test('produces one entry per index page, keyed index-{suffix}', () => {
 		expect([...entries.keys()].sort((a, b) => a.localeCompare(b))).toEqual([
-			'index-archives',
+			'index-chronology',
 			'index-homepage',
 			'index-locations',
 			'index-not-found',
@@ -48,10 +48,10 @@ describe('buildIndexEntries', () => {
 	});
 
 	test('pins titles and fallback flags', () => {
-		expect(entries.get('index-archives')).toMatchObject({
+		expect(entries.get('index-chronology')).toMatchObject({
 			collection: 'index',
-			digest: 'index-archives',
-			title: 'Archives',
+			digest: 'index-chronology',
+			title: 'Chronology',
 			isFallback: true,
 		});
 		expect(entries.get('index-regions')).toMatchObject({ title: 'Regions', isFallback: false });
@@ -75,10 +75,10 @@ describe('resolveEntry', () => {
 
 	const dataStoreEntries = new Map([[dataStoreEntry.id, dataStoreEntry]]);
 	const indexEntries = new Map([[indexEntry.id, indexEntry]]);
-	const archiveImageIndex = new Map([['2020', 'archives/2020-derived.jpg']]);
+	const chronologyImageIndex = new Map([['2020', 'chronology/2020-derived.jpg']]);
 
 	function resolve(filename: string) {
-		return resolveEntry({ filename, dataStoreEntries, indexEntries, archiveImageIndex });
+		return resolveEntry({ filename, dataStoreEntries, indexEntries, chronologyImageIndex });
 	}
 
 	test('data store wins first', () => {
@@ -89,7 +89,7 @@ describe('resolveEntry', () => {
 		expect(resolve('index-posts')).toBe(indexEntry);
 	});
 
-	test('a data-store id shaped like an archive is not synthesized', () => {
+	test('a data-store id shaped like a chronology period is not synthesized', () => {
 		const withYear = new Map([['2020', dataStoreEntry]]);
 
 		expect(
@@ -97,37 +97,37 @@ describe('resolveEntry', () => {
 				filename: '2020',
 				dataStoreEntries: withYear,
 				indexEntries,
-				archiveImageIndex,
+				chronologyImageIndex,
 			}),
 		).toBe(dataStoreEntry);
 	});
 
-	test('synthesizes a YYYY archive entry with its derived image', () => {
+	test('synthesizes a YYYY chronology entry with its derived image', () => {
 		expect(resolve('2020')).toEqual({
 			id: '2020',
-			collection: ContentCollectionsEnum.Archives,
-			digest: 'archives-2020',
-			title: 'Archives: 2020',
-			imageFeaturedId: 'archives/2020-derived.jpg',
+			collection: ContentCollectionsEnum.Chronology,
+			digest: 'chronology-2020',
+			title: 'Chronology: 2020',
+			imageFeaturedId: 'chronology/2020-derived.jpg',
 			isFallback: false,
 		});
 	});
 
-	test('synthesizes a YYYY-MM archive entry with a month title and fallback image', () => {
+	test('synthesizes a YYYY-MM chronology entry with a month title and fallback image', () => {
 		const result = resolve('2019-03');
 
 		expect(result).toMatchObject({
 			id: '2019-03',
-			collection: ContentCollectionsEnum.Archives,
-			digest: 'archives-2019-03',
-			title: 'Archives: March 2019',
+			collection: ContentCollectionsEnum.Chronology,
+			digest: 'chronology-2019-03',
+			title: 'Chronology: March 2019',
 			isFallback: true,
 		});
 		expect(result?.imageFeaturedId.length).toBeGreaterThan(0);
 	});
 
 	test.each(['201', '2019-3', '2019-03-01', 'abcd', 'index-unknown'])(
-		'returns undefined for non-archive filename %s',
+		'returns undefined for non-chronology filename %s',
 		(filename) => {
 			expect(resolve(filename)).toBeUndefined();
 		},

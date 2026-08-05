@@ -1,0 +1,111 @@
+---
+import { render } from 'astro:content';
+
+import type { ChronologyMonthlyItem } from '#lib/collections/chronology/chronology-types.ts';
+
+import ChronologyItem from '#components/chronology/chronology-item.astro';
+import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import ImageHero from '#components/image/image-hero.astro';
+import MainSite from '#components/main/main-site.astro';
+import Link from '#components/parts/link.astro';
+import Prose from '#components/parts/prose.astro';
+import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
+
+interface Props {
+	chronologyMonthlyItem: ChronologyMonthlyItem;
+	chronologyYears: Array<string>;
+	chronologyMonths?: Array<string> | undefined;
+}
+
+const { chronologyMonthlyItem, chronologyYears, chronologyMonths } = Astro.props;
+
+const getChronologyImageFeaturedGroup = await createChronologyImageFeaturedGroupFunction();
+
+const imageFeaturedGroup = getChronologyImageFeaturedGroup(chronologyMonthlyItem);
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+// Render chronology entry MDX content if available
+const chronologyRenderResult = chronologyMonthlyItem.chronologyEntry
+	? await render(chronologyMonthlyItem.chronologyEntry)
+	: undefined;
+
+const t = getTranslations();
+
+const title = formatStringTemplate(t('chronology.monthly.title'), {
+	date: chronologyMonthlyItem.title,
+});
+---
+
+<MainSite
+	meta={{
+		title,
+		description: formatStringTemplate(t('chronology.monthly.description'), {
+			date: chronologyMonthlyItem.title,
+		}),
+		image: getSeoImageProps({
+			id: chronologyMonthlyItem.id,
+			alt: title,
+		}),
+		...getSeoHideSearch(true),
+	}}
+	hasHeroImage={hasHeroImage}
+>
+	<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
+		<ContentHeader hasHeroImage={hasHeroImage}>
+			<Fragment slot="header-title">{title}</Fragment>
+			<Fragment slot="header-subtitle">
+				{
+					hasHeroImage ? (
+						<Link
+							class="font-semibold"
+							href={getSiteUrl('chronology', chronologyMonthlyItem.year)}
+							linkColor="highlight"
+						>
+							{formatStringTemplate(t('chronology.yearly.title'), {
+								date: chronologyMonthlyItem.year,
+							})}
+						</Link>
+					) : (
+						<ChronologyNavigation
+							currentYear={chronologyMonthlyItem.year}
+							currentMonth={chronologyMonthlyItem.month}
+							chronologyYears={chronologyYears}
+							chronologyMonths={chronologyMonths}
+						/>
+					)
+				}
+			</Fragment>
+		</ContentHeader>
+	</ImageHero>
+	<ContentSection marginSmall={true}>
+		<ChronologyNavigation
+			class="border-b border-primary-300 pb-4 dark:border-primary-700"
+			currentYear={chronologyMonthlyItem.year}
+			currentMonth={chronologyMonthlyItem.month}
+			chronologyYears={chronologyYears}
+			chronologyMonths={chronologyMonths}
+		>
+			<Link href={getSiteUrl('chronology')} linkColor="accent" class="font-semibold">
+				{t('chronology.index.label')}
+			</Link>
+		</ChronologyNavigation>
+	</ContentSection>
+	{
+		chronologyRenderResult ? (
+			<Prose showBlocks={true}>
+				<chronologyRenderResult.Content />
+			</Prose>
+		) : undefined
+	}
+	<ContentSection class="flex flex-col gap-2">
+		<ChronologyItem title={t('chronology.updated.label')} items={chronologyMonthlyItem.updated} />
+		<ChronologyItem title={t('chronology.created.label')} items={chronologyMonthlyItem.created} />
+		<ChronologyItem title={t('chronology.visited.label')} items={chronologyMonthlyItem.visited} />
+	</ContentSection>
+</MainSite>
