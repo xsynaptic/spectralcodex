@@ -1,7 +1,4 @@
 #!/usr/bin/env tsx
-/**
- * Surface content entries with room for improvement.
- */
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
@@ -15,7 +12,6 @@ import { checks } from './checks';
 
 const rootPath = findWorkspaceRoot();
 
-const RANDOM_DEFAULT_LIMIT = 50;
 const COLLECTIONS_ROOT = path.join('packages', 'content', 'collections');
 
 function getDisplayPath(entry: DataStoreEntry): string {
@@ -79,6 +75,8 @@ if (!check) {
 	printAvailableChecks('stderr');
 	process.exit(1);
 }
+
+const RANDOM_DEFAULT_LIMIT = 50;
 
 const explicitLimit = values.limit ? Number(values.limit) : undefined;
 const effectiveLimit = explicitLimit ?? (values.random ? RANDOM_DEFAULT_LIMIT : undefined);

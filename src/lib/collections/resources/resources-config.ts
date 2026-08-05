@@ -21,7 +21,7 @@ export const resources = defineCollection({
 		showPage: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
 		formerIds: z.string().array().optional(),
-		/** Computed properties, for internal use only! */
+		// Computed properties, for internal use only!
 		_locationCount: z.number().optional(),
 		_postCount: z.number().optional(),
 	}).strict(),

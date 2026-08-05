@@ -3,7 +3,7 @@ import type { LocationCategory } from './map-locations';
 import { LocationCategoryEnum } from './map-locations';
 
 export const mapLocationCategoryIcons = {
-	/** Civic */
+	// Civic
 	[LocationCategoryEnum.Civic]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Cemetery]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Government]: 'mingcute:government-line',
@@ -17,7 +17,7 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.School]: 'material-symbols-light:school',
 	[LocationCategoryEnum.Viewpoint]: 'mdi:binoculars',
 	[LocationCategoryEnum.Water]: 'mdi:water',
-	/** Commercial */
+	// Commercial
 	[LocationCategoryEnum.Cafe]: 'material-symbols:local-cafe',
 	[LocationCategoryEnum.Commercial]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Hotel]: 'material-symbols:question-mark-rounded',
@@ -27,11 +27,11 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Shophouse]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Theater]: 'material-symbols-light:theaters-rounded',
 	[LocationCategoryEnum.AmusementPark]: 'mingcute:ferris-wheel-fill',
-	/** Historic */
+	// Historic
 	[LocationCategoryEnum.Historic]: 'mingcute:pavilion-fill',
 	[LocationCategoryEnum.Monument]: 'mingcute:palace-line',
 	[LocationCategoryEnum.Site]: 'material-symbols:question-mark-rounded',
-	/** Industrial */
+	// Industrial
 	[LocationCategoryEnum.Industrial]: 'mingcute:factory-2-fill',
 	[LocationCategoryEnum.Factory]: 'mdi:gear',
 	[LocationCategoryEnum.Forestry]: 'mingcute:tree-fill',
@@ -42,15 +42,15 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Salt]: 'mdi:warehouse',
 	[LocationCategoryEnum.Tobacco]: 'mdi:warehouse',
 	[LocationCategoryEnum.Warehouse]: 'mdi:warehouse',
-	/** Infrastructure */
+	// Infrastructure
 	[LocationCategoryEnum.Infrastructure]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Dam]: 'mdi:electricity',
 	[LocationCategoryEnum.Lighthouse]: 'mingcute:lighthouse-fill',
-	/** Military */
+	// Military
 	[LocationCategoryEnum.Military]: 'material-symbols:military-tech-outline-rounded',
 	[LocationCategoryEnum.Base]: 'material-symbols:military-tech-outline-rounded',
 	[LocationCategoryEnum.Fortification]: 'material-symbols:question-mark-rounded',
-	/** Natural */
+	// Natural
 	[LocationCategoryEnum.Natural]: 'mingcute:tree-fill',
 	[LocationCategoryEnum.Beach]: 'mingcute:umbrella-2-line',
 	[LocationCategoryEnum.Cave]: 'material-symbols:question-mark-rounded',
@@ -58,7 +58,7 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.HotSpring]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Tree]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Waterfall]: 'material-symbols:question-mark-rounded',
-	/** Religious */
+	// Religious
 	[LocationCategoryEnum.Religious]: 'mdi:temple-outline',
 	[LocationCategoryEnum.AncestralHall]: 'mdi:temple-outline',
 	[LocationCategoryEnum.Buddhist]: 'mdi:temple-outline',
@@ -68,7 +68,7 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Muslim]: 'mdi:religion-muslim',
 	[LocationCategoryEnum.Shinto]: 'mingcute:miyajima-torii-fill',
 	[LocationCategoryEnum.Temple]: 'mdi:temple-outline',
-	/** Transportation */
+	// Transportation
 	[LocationCategoryEnum.Transportation]: 'mingcute:bus-2-line',
 	[LocationCategoryEnum.Airport]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Bridge]: 'mingcute:bridge-line',
@@ -76,7 +76,7 @@ export const mapLocationCategoryIcons = {
 	[LocationCategoryEnum.Road]: 'mingcute:road-line',
 	[LocationCategoryEnum.Seaport]: 'mingcute:anchor-fill',
 	[LocationCategoryEnum.Tunnel]: 'mingcute:tunnel-line',
-	/** Various */
+	// Various
 	[LocationCategoryEnum.Building]: 'mingcute:building-2-line',
 	[LocationCategoryEnum.Community]: 'material-symbols:question-mark-rounded',
 	[LocationCategoryEnum.Residence]: 'material-symbols-light:house-rounded',

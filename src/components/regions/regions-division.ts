@@ -30,9 +30,7 @@ const loadRegionDivisionsSvgCache = pMemoize(async (): Promise<Map<string, strin
 	return cache;
 });
 
-/**
- * Get SVG content for a region division by ID
- */
+// Get SVG content for a region division by ID
 export async function getRegionsDivisionSvgContent(id: string) {
 	const cache = await loadRegionDivisionsSvgCache();
 

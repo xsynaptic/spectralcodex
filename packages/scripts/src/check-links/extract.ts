@@ -25,9 +25,7 @@ function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
 	return typeof link === 'string' ? link : link.url;
 }
 
-/**
- * Extract URLs from frontmatter fields: links, url, and sources
- */
+// Extract URLs from frontmatter fields: links, url, and sources
 function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 	const result = EntryDataSchema.safeParse(data);
 
@@ -61,9 +59,7 @@ function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 	return urls;
 }
 
-/**
- * Extract markdown link URLs from a body string
- */
+// Extract markdown link URLs from a body string
 function extractBodyLinks(body: string): Array<string> {
 	const urls: Array<string> = [];
 
@@ -77,9 +73,7 @@ function extractBodyLinks(body: string): Array<string> {
 	return urls;
 }
 
-/**
- * Extract all external URLs from a data store entry
- */
+// Extract all external URLs from a data store entry
 export function extractLinksFromEntry(entry: DataStoreEntry) {
 	const links: Array<{
 		url: string;

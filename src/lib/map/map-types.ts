@@ -13,8 +13,9 @@ export const MapApiDataEnum = {
 	Popup: 'p.json',
 } as const;
 
-/** @public Reserved for future runtime validation of map API payloads */
-export const MapFeaturePropertiesSchema = z.object({
+// Reserved for future runtime validation of map API payloads
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Needed for type generation
+const MapFeaturePropertiesSchema = z.object({
 	title: z.string(),
 	titleMultilingualLang: z.string().optional(),
 	titleMultilingualValue: z.string().optional(),

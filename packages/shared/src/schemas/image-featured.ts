@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Featured images
- */
 const ImageFeaturedObjectSchema = z.object({
 	id: z.string(),
 	title: z.string().optional(),

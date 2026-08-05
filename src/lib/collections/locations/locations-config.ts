@@ -69,11 +69,11 @@ export const locations = defineCollection({
 			objective: NumericScaleSchema.optional(), // Only for personal reference
 			incomplete: z.boolean().optional(), // Only for personal reference
 			hideSearch: z.boolean().optional(),
-			/** Computed properties, for internal use only! */
+			// Computed properties, for internal use only!
 			_nearby: LocationsNearbyItemSchema.array().optional(),
 			_posts: z.string().array().optional(),
 			_postCount: z.number().int().optional(),
-			/** Map properties, for internal use only! */
+			// Map properties, for internal use only!
 			_uuid: z.string().optional(),
 			_descriptionHtml: z.string().optional(),
 			_imageThumbnail: ImageThumbnailSchema.optional(),

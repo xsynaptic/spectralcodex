@@ -2,9 +2,7 @@ import type { APIRoute } from 'astro';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 
-/**
- * Note: this should be kept in sync with the exclude prefixes in `astro.config.mjs`.
- */
+// Note: this should be kept in sync with the exclude prefixes in `astro.config.mjs`.
 const excludePrefixes = [
 	'/objectives',
 	'/planning',
@@ -22,9 +20,7 @@ function shouldIncludeUrl(pathname: string): boolean {
 	);
 }
 
-/**
- * Generate JSON consumed by the "page not found" suggestions component
- */
+// Generate JSON consumed by the "page not found" suggestions component
 export const GET: APIRoute = async ({ site }) => {
 	if (!site) throw new Error('Astro `site` config is required for the content manifest.');
 

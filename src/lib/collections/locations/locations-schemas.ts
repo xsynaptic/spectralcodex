@@ -82,9 +82,7 @@ export const LocationTwHeritageRecords = {
 	},
 } as const satisfies Record<LocationTwHeritage, { title: string; title_zh: string }>;
 
-/**
- * Internal data structure for nearby locations
- */
+// Internal data structure for nearby locations
 export const LocationsNearbyItemSchema = z.object({
 	locationId: z.string(),
 	distance: z.number().int(),

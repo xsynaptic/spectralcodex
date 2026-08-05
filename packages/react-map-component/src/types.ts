@@ -33,9 +33,7 @@ export type MapScope =
 	| { type: 'theme'; index: number }
 	| { type: 'ids'; ids: Array<string> };
 
-/**
- * Map component props
- */
+// Map component props
 export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>
 > {

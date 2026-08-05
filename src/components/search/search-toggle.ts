@@ -21,7 +21,7 @@ function getResultCount(result: unknown): number | undefined {
 	return undefined;
 }
 
-/** Record settled search queries */
+// Record settled search queries
 function registerSearchAnalytics(instance: Instance) {
 	if (searchAnalyticsRegistered) return;
 
@@ -51,7 +51,7 @@ class SearchToggle extends HTMLElement {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
 
-	/** Pagefind reads this off the registered trigger to toggle aria-expanded and aria-controls */
+	// Pagefind reads this off the registered trigger to toggle aria-expanded and aria-controls
 	get buttonEl() {
 		return this.querySelector<HTMLButtonElement>('button');
 	}

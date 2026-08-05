@@ -1,5 +1,5 @@
 export const LocationCategoryEnum = {
-	/** Civic */
+	// Civic
 	Civic: 'civic',
 	Cemetery: 'cemetery',
 	Government: 'government',
@@ -13,7 +13,7 @@ export const LocationCategoryEnum = {
 	School: 'school',
 	Viewpoint: 'viewpoint',
 	Water: 'water', // Should relate to water supply technology
-	/** Commercial */
+	// Commercial
 	Commercial: 'commercial',
 	Hotel: 'hotel',
 	Market: 'market',
@@ -21,14 +21,14 @@ export const LocationCategoryEnum = {
 	Shophouse: 'shophouse',
 	Theater: 'theater',
 	AmusementPark: 'amusement-park',
-	/** Food and drink  */
+	// Food and drink
 	Cafe: 'cafe',
 	Restaurant: 'restaurant',
-	/** Historic */
+	// Historic
 	Historic: 'historic',
 	Monument: 'monument',
 	Site: 'site',
-	/** Industrial */
+	// Industrial
 	Industrial: 'industrial',
 	Factory: 'factory',
 	Forestry: 'forestry',
@@ -39,15 +39,15 @@ export const LocationCategoryEnum = {
 	Salt: 'salt',
 	Tobacco: 'tobacco',
 	Warehouse: 'warehouse',
-	/** Infrastructure */
+	// Infrastructure
 	Infrastructure: 'infrastructure',
 	Dam: 'dam',
 	Lighthouse: 'lighthouse',
-	/** Military */
+	// Military
 	Military: 'military',
 	Base: 'base',
 	Fortification: 'fortification',
-	/** Natural */
+	// Natural
 	Natural: 'natural',
 	Beach: 'beach',
 	Cave: 'cave',
@@ -55,7 +55,7 @@ export const LocationCategoryEnum = {
 	HotSpring: 'hot-spring',
 	Tree: 'tree',
 	Waterfall: 'waterfall',
-	/** Religious */
+	// Religious
 	Religious: 'religious',
 	AncestralHall: 'ancestral-hall',
 	Buddhist: 'buddhist',
@@ -65,7 +65,7 @@ export const LocationCategoryEnum = {
 	Muslim: 'muslim',
 	Shinto: 'shinto',
 	Temple: 'temple',
-	/** Transportation */
+	// Transportation
 	Transportation: 'transportation',
 	Airport: 'airport',
 	Bridge: 'bridge',
@@ -73,7 +73,7 @@ export const LocationCategoryEnum = {
 	Road: 'road',
 	Seaport: 'seaport',
 	Tunnel: 'tunnel',
-	/** Various */
+	// Various
 	Building: 'building',
 	Community: 'community',
 	Residence: 'residence',

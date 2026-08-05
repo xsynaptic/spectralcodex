@@ -24,9 +24,7 @@ const boostTheme = 0.15; // weight per shared theme
 const boostRegion = 0.1; // weight per shared region
 const boostLimit = 0.3; // ceiling on the combined boost
 
-/**
- * Boost from shared taxonomy
- */
+// Boost from shared taxonomy
 export function calculateMetadataBoost(
 	current: { metadata: SimilarContentMetadata },
 	other: { metadata: SimilarContentMetadata },

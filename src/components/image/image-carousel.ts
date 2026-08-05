@@ -1,6 +1,4 @@
-/**
- * Carousel slider element; this requires a container and some navigation buttons to work properly
- */
+// Carousel slider element; this requires a container and some navigation buttons to work properly
 class ImageCarousel extends HTMLElement {
 	#handleClick = (event: Event) => {
 		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-carousel-nav]');

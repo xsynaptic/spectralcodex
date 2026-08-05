@@ -5,9 +5,7 @@ import type { ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import { getImagePlaceholderFunction } from '#components/image/image-placeholder.ts';
 
-/**
- * A standardized image placeholder component with a fallback image when no placeholder is passed
- */
+// A standardized image placeholder component with a fallback image when no placeholder is passed
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	class?: string | undefined;

@@ -24,17 +24,12 @@ import {
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
-/**
- * Transform an array of strings into collection entries
- */
+// Transform an array of strings into collection entries
 export const createRegionsByIdsFunction = createCollectionLookupByIds<'regions'>(
 	'Regions',
 	getRegionsCollection,
 );
 
-/**
- * Hierarchical functions
- */
 // Get all ancestors of the specified region
 export async function createRegionAncestorsFunction() {
 	const getRegionsById = await createRegionsByIdsFunction();
@@ -61,9 +56,6 @@ export async function createRegionAncestorsByIdFunction() {
 	};
 }
 
-/**
- * Primary region
- */
 // Return the first region from an array of region references
 export async function createFirstRegionByReferenceFunction() {
 	const { entriesMap } = await getRegionsCollection();
@@ -79,9 +71,6 @@ export async function createFirstRegionByReferenceFunction() {
 	};
 }
 
-/**
- * Schema
- */
 export async function getRegionSchema(
 	entry: CollectionEntry<'regions'>,
 	props: { url: string },
@@ -106,9 +95,7 @@ export async function getRegionSchema(
 	return [buildBreadcrumbSchema(breadcrumbItems, props.url)];
 }
 
-/**
- * Data for a single region entry page: catalog items, map data, and display options
- */
+// Data for a single region entry page: catalog items, map data, and display options
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
@@ -169,9 +156,7 @@ export async function createQueryRegionsEntryFunction() {
 	};
 }
 
-/**
- * Filtered and sorted ancestral regions for the regions index page
- */
+// Filtered and sorted ancestral regions for the regions index page
 export async function queryRegionsIndex() {
 	const { entries } = await getRegionsCollection();
 	const catalog = await getCatalog();
@@ -185,9 +170,7 @@ export async function queryRegionsIndex() {
 	);
 }
 
-/**
- * Related regions (children/siblings) filtered by content and sorted by content count
- */
+// Related regions (children/siblings) filtered by content and sorted by content count
 export async function createQueryRegionsRelatedFunction() {
 	const getRegionsByIds = await createRegionsByIdsFunction();
 

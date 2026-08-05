@@ -71,10 +71,7 @@ function getImageFeaturedData({
 	};
 }
 
-/**
- * Static metadata for index pages (homepage, not-found, per-collection
- * landings), keyed by the OG image filename Astro emits.
- */
+// Static metadata for index pages, keyed by the OG image filename Astro emits
 export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
 		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
@@ -107,9 +104,7 @@ export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	return entries;
 }
 
-/**
- * Build a map from OG image filename (entry id) to fully-resolved entry derived from the data store
- */
+// Build a map from OG image filename (entry id) to fully-resolved entry derived from the data store
 function buildDataStoreEntries(dataStorePath: string): {
 	entries: Map<string, OpenGraphContentEntry>;
 	chronologyImageIndex: Map<string, string>;
@@ -186,9 +181,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 	return { entries, chronologyImageIndex };
 }
 
-/**
- * Walk built HTML files and extract the set of OG image filenames referenced
- */
+// Walk built HTML files and extract the set of OG image filenames referenced
 export function extractBuiltFilenames(distPath: string): Set<string> {
 	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
 	const ogPathSegment = `/${OPEN_GRAPH_BASE_PATH}/`;

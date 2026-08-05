@@ -1,15 +1,15 @@
 import { $ } from 'zx';
 
 interface GitFileDatesOptions {
-	/** Directory to run git in (repo root or a subdirectory) */
+	// Directory to run git in (repo root or a subdirectory)
 	cwd: string;
-	/** Limit the log to these paths (git pathspec) */
+	// Limit the log to these paths (git pathspec)
 	pathspec?: string | Array<string>;
-	/** Prepended to each key, to rebase paths onto a common root */
+	// Prepended to each key, to rebase paths onto a common root
 	keyPrefix?: string;
-	/** Commit timestamp to record (default: committer) */
+	// Commit timestamp to record (default: committer)
 	date?: 'committer' | 'author';
-	/** Behaviour on a shallow clone, where dates would be wrong (default: throw) */
+	// Behaviour on a shallow clone, where dates would be wrong (default: throw)
 	onShallow?: 'throw' | 'warn' | 'ignore';
 }
 

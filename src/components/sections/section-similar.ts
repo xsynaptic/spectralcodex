@@ -8,27 +8,21 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 
-/**
- * A general file loading function that resolves the file path relative to the project root
- */
+// A general file loading function that resolves the file path relative to the project root
 async function loadDataFile(filePath: string) {
 	const resolvedFilePath = path.join(process.cwd(), filePath);
 
 	return readFile(resolvedFilePath, 'utf8');
 }
 
-/**
- * Load JSON data from the configured content data path
- */
+// Load JSON data from the configured content data path
 async function loadJsonData(filePath: string) {
 	const fileContent = await loadDataFile(filePath);
 
 	return JSON.parse(fileContent) as unknown;
 }
 
-/**
- * Schema for similar content data
- */
+// Schema for similar content data
 const SimilarContentItemSchema = z
 	.record(
 		z.string(),

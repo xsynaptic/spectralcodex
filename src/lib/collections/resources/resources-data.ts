@@ -1,8 +1,6 @@
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
 
-/**
- * Match a given string against a match pattern (either a single string or an array of strings)
- */
+// Match a given string against a match pattern (either a single string or an array of strings)
 export function matchLinkUrl(
 	linkUrl: string,
 	matchPattern: string | Array<string> | undefined,

@@ -22,7 +22,7 @@ export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = 
 	locations: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
 	regions: 'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-1.jpg',
 	resources: [
-		'taiwan/series/suhua-highway-road-trip-2018-19.jpg',
+		'2018/suhua-highway-road-trip-2018-19.jpg',
 		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
 		'taiwan/taichung/wufeng/wufeng-beigou-forbidden-city-vault-4.jpg',
 	],
@@ -66,8 +66,8 @@ export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = 
 	'taiwan/chiayi': 'taiwan/chiayi/chiayi-east/chiayi-sun-shooting-tower-1.jpg',
 	'taiwan/hsinchu': 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg',
 	'taiwan/hualien': [
-		'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
-		'taiwan/series/huadong-valley-ride-2018-4-16.jpg',
+		'2018/huadong-valley-ride-2018-3-35.jpg',
+		'2018/huadong-valley-ride-2018-4-16.jpg',
 	],
 	'taiwan/kaohsiung': 'taiwan/kaohsiung/hunei/hunei-dahu-tomato-cannery-4.jpg',
 	'taiwan/keelung': 'taiwan/keelung/zhongzheng/keelung-agenna-shipyard-3.jpg',
@@ -82,10 +82,10 @@ export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = 
 	'taiwan/xinbei': 'taiwan/xinbei/wanli/wanli-yeliu-signal-station-1.jpg',
 	'taiwan/yilan': [
 		'taiwan/yilan/datong/datong-jianqing-huaigu-trail-1.jpg',
-		'taiwan/series/suhua-highway-road-trip-2018-21.jpg',
+		'2018/suhua-highway-road-trip-2018-21.jpg',
 	],
 	'taiwan/yunlin': 'taiwan/yunlin/xiluo/xiluo-bridge-4.jpg',
-	taiwan: 'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
+	taiwan: '2018/huadong-valley-ride-2018-3-35.jpg',
 	canada: 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg',
 	china: 'v/fallback-china-1.jpg',
 	'hong-kong': 'v/fallback-hong-kong-1.jpg',
@@ -98,11 +98,11 @@ export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = 
 	vietnam: 'v/fallback-vietnam-1.jpg',
 
 	// Specials
-	homepage: 'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
+	homepage: '2018/huadong-valley-ride-2018-3-35.jpg',
 	default: [
 		'v/v-random-1.jpg',
 		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
-		'taiwan/series/huadong-valley-ride-2018-3-35.jpg',
+		'2018/huadong-valley-ride-2018-3-35.jpg',
 		'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
 	],
 };

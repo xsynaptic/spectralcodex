@@ -36,9 +36,7 @@ export async function getPostSchema(
 	];
 }
 
-/**
- * Data for a single post entry page: map data and backlinks
- */
+// Data for a single post entry page: map data and backlinks
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();

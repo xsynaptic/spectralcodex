@@ -18,9 +18,6 @@ import { calculateMetadataBoost, toReferenceIdArray } from './metadata.js';
 
 const rootPath = findWorkspaceRoot();
 
-/**
- * Arguments
- */
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
@@ -63,9 +60,6 @@ const { values } = parseArgs({
 	},
 });
 
-/**
- * Types
- */
 interface ContentEntry extends DataStoreEntry {
 	collection: string;
 }
@@ -102,9 +96,7 @@ const ModelsEnum = {
 // English-only but fast; truncates input after 512 tokens (roughly 2500 characters)
 const modelKey = 'mpnet' satisfies keyof typeof ModelsEnum;
 
-/**
- * Clean content for embedding using unified tools
- */
+// Clean content for embedding using unified tools
 function cleanContent(body: string, data: Record<string, unknown>): string {
 	const title = typeof data.title === 'string' ? data.title : '';
 	const description = typeof data.description === 'string' ? data.description : '';
@@ -118,9 +110,7 @@ function getCacheNamespace(): string {
 	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
 }
 
-/**
- * Generate embeddings for all content entries
- */
+// Generate embeddings for all content entries
 async function generateEmbeddings(
 	entries: Array<ContentEntry>,
 ): Promise<Array<SimilarContentEmbedding>> {
@@ -192,9 +182,7 @@ async function generateEmbeddings(
 	return embeddings;
 }
 
-/**
- * Calculate similarities using usearch ANN index
- */
+// Calculate similarities using usearch ANN index
 function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
 	const firstVector = embeddings[0]?.vector;
 
@@ -284,9 +272,7 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	return result;
 }
 
-/**
- * Content handling
- */
+// Content handling
 function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 	const { collections, path: resolvedPath } = loadDataStore(dataStorePath);
 
@@ -317,9 +303,6 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 	return entries;
 }
 
-/**
- * Main function
- */
 async function similarContent() {
 	try {
 		console.log(chalk.magenta('=== Similar Content Generator ==='));

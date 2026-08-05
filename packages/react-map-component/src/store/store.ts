@@ -13,9 +13,7 @@ const useMapDataStore = <T>(selector: (state: MapDataStore) => T): T => {
 	return useStore(store, selector);
 };
 
-/**
- * Raw store access (for reading state in callbacks without subscribing to re-renders)
- */
+// Raw store access (for reading state in callbacks without subscribing to re-renders)
 export function useMapStoreInstance() {
 	const store = useContext(MapStoreContext);
 
@@ -24,25 +22,19 @@ export function useMapStoreInstance() {
 	return store;
 }
 
-/**
- * Feature state
- */
+// Feature state
 export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);
 
 export const useMapPopupVisible = () => useMapDataStore((state) => state.popupVisible);
 
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
 
-/**
- * Map canvas state
- */
+// Map canvas state
 export const useMapCanvasInteractive = () => useMapDataStore((state) => state.canvasInteractive);
 
 export const useMapCanvasLoading = () => useMapDataStore((state) => state.canvasLoading);
 
-/**
- * Map filters
- */
+// Map filters
 export const useMapFilterOpen = () => useMapDataStore((state) => state.filterOpen);
 
 export const useMapFilterPosition = () => useMapDataStore((state) => state.filterPosition);
@@ -60,15 +52,11 @@ export const useMapShowObjectiveFilter = () =>
 
 export const useMapScope = () => useMapDataStore((state) => state.scope);
 
-/**
- * Map language settings
- */
+// Map language settings
 export const useMapLanguages = () => useMapDataStore((state) => state.languages);
 
 export const useMapChineseLabels = () =>
 	useMapDataStore((state) => state.languages.some((lang) => lang.startsWith('zh')));
 
-/**
- * Map actions
- */
+// Map actions
 export const useMapStoreActions = () => useMapDataStore((state) => state.actions);

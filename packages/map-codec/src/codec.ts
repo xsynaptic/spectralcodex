@@ -36,9 +36,7 @@ const coordinatesSchema = z.union([
 	z.tuple([z.number(), z.number()]).array().array(), // Polygon
 ]);
 
-/**
- * Map source item: compressed form <-> standard form
- */
+// Map source item: compressed form <-> standard form
 const sourceCompressedSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),
@@ -155,9 +153,7 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 	},
 });
 
-/**
- * Map popup item: compressed form <-> standard form
- */
+// Map popup item: compressed form <-> standard form
 const popupCompressedSchema = z
 	.object({
 		[MapDataKeysCompressed.Id]: z.string(),

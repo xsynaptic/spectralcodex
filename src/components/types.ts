@@ -1,8 +1,6 @@
 // 2026Q1: TypeScript doesn't deal well with Astro files exporting types and interfaces
 
-/**
- * Meta component types
- */
+// Meta component types
 interface MetaImageProps {
 	url?: URL | string;
 	secureUrl?: URL | string;
@@ -31,18 +29,14 @@ export interface MetaProps {
 	noFollow?: boolean;
 }
 
-/**
- * Divider component types; values map onto divided-* classes in divider.css
- */
+// Divider component types; values map onto divided-* classes in divider.css
 export type DividerColor = 'default' | 'lighter';
 
 export type DividerContent = 'chevron' | 'dot' | 'slash';
 
 export type DividerWeight = 'thin';
 
-/**
- * Preview display options
- */
+// Preview display options
 export interface PreviewOptions {
 	showCollection?: boolean | undefined;
 	showDate?: boolean | undefined;
@@ -53,9 +47,7 @@ export interface PreviewOptions {
 	showTitleMultilingual?: boolean | undefined;
 }
 
-/**
- * Microformats used in this project are defined here as an enum
- */
+// Microformats used in this project are defined here as an enum
 export const MicroformatClassNames = {
 	Author: 'p-author',
 	Card: 'h-card',
@@ -70,9 +62,7 @@ export const MicroformatClassNames = {
 	Url: 'u-url',
 } as const;
 
-/**
- * An enum to help keep z-index values in check
- */
+// An enum to help keep z-index values in check
 export const zIndexScaleEnum = {
 	ImageBase: 10,
 	ImageShadow: 11,

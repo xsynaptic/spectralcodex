@@ -33,7 +33,7 @@ export const regions = defineCollection({
 			hideSearch: z.boolean().optional(),
 			formerIds: z.string().array().optional(),
 			entryQuality: NumericScaleSchema,
-			/** Computed properties, for internal use only! */
+			// Computed properties, for internal use only!
 			_ancestors: z.string().array().optional(),
 			_siblings: z.string().array().optional(),
 			_children: z.string().array().optional(),

@@ -34,9 +34,7 @@ function getRegionPathIds(filePath: string, id: string): Array<string> {
 	return regionPathIds;
 }
 
-/**
- * Parse region data from data-store entries
- */
+// Parse region data from data-store entries
 export function parseRegionData(entries: Array<DataStoreEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
@@ -79,9 +77,7 @@ export function parseRegionData(entries: Array<DataStoreEntry>) {
 	return { allRegions: regions, regionsWithDivisionIds };
 }
 
-/**
- * Resolve a bounding box hierarchically by walking up the ancestry chain
- */
+// Resolve a bounding box hierarchically by walking up the ancestry chain
 export function resolveBoundingBox(
 	region: RegionMetadata,
 	regionsById: Map<string, RegionMetadata>,

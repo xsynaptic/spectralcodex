@@ -85,9 +85,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 	);
 }
 
-/**
- * Multilingual title support requires different params and styles for each language
- */
+// Multilingual title support requires different params and styles for each language
 function TitleMultilingual({
 	titleZh,
 	titleJa,
@@ -225,9 +223,9 @@ export function getOpenGraphElement(
 		src: string;
 		height: number;
 		width: number;
-		/** Luminance of top zone (10%-20%), 0-255 */
+		// Luminance of top zone (10%-20%), 0-255
 		luminanceTop?: number | undefined;
-		/** Luminance of bottom zone (70%-90%), 0-255 */
+		// Luminance of bottom zone (70%-90%), 0-255
 		luminanceBottom?: number | undefined;
 	},
 ): OgElement {

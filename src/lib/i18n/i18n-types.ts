@@ -1,6 +1,3 @@
-/**
- * i18n
- */
 export const LanguageCodeEnum = {
 	English: 'en',
 	ChineseTraditional: 'zh',

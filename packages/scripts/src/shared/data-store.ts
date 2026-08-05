@@ -159,9 +159,7 @@ export function loadDataStore(dataStorePath: string): DataStoreResult {
 	};
 }
 
-/**
- * Get entries from a specific collection
- */
+// Get entries from a specific collection
 export function getDataStoreCollection(
 	collections: DataStoreCollections,
 	names: Array<string>,
@@ -181,10 +179,8 @@ export function getDataStoreCollection(
 	return entries;
 }
 
-/**
- * Get ancestors from root down to the region itself
- * [0] = root, [1] = second-most ancestral, ..., [last] = regionId
- */
+// Get ancestors from root down to the region itself
+// Note: [0] = root, [1] = second-most ancestral, ..., [last] = regionId
 export function getDataStoreRegionParentsById(
 	regionId: string | undefined,
 	parentMap: RegionParentMap,

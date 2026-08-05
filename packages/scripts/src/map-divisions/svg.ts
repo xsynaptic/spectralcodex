@@ -144,9 +144,7 @@ function generateSvg(
 	return { svg, pointCount, tolerance: adaptiveTolerance };
 }
 
-/**
- * Saves a GeoJSON FeatureCollection as an optimized SVG file
- */
+// Saves a GeoJSON FeatureCollection as an optimized SVG file
 export async function saveSvg({
 	geojsonData,
 	id,

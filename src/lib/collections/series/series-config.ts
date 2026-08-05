@@ -30,7 +30,7 @@ export const series = defineCollection({
 			hideSearch: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
-			/** Computed properties, for internal use only! */
+			// Computed properties, for internal use only!
 			_locationCount: z.number().int().optional(),
 			_postCount: z.number().int().optional(),
 		})

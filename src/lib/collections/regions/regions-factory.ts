@@ -26,9 +26,7 @@ type RegionComputedData = Pick<
 // Cache of all region computed data, keyed by region ID
 export type RegionComputedDataCache = Record<string, RegionComputedData>;
 
-/**
- * Resolve the regions a location belongs to; overrides apply only in production
- */
+// Resolve the regions a location belongs to; overrides apply only in production
 export function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
 	if (import.meta.env.PROD && entry.data.override?.regions) return entry.data.override.regions;
 	return entry.data.regions;

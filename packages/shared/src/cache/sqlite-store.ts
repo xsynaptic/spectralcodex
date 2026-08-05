@@ -4,34 +4,28 @@ import { DatabaseSync } from 'node:sqlite';
 
 interface SqliteStoreOptions {
 	filePath: string;
-	table?: string;
-	busyTimeoutMs?: number;
 }
 
 /**
  * Minimal synchronous Keyv store backed by node:sqlite
  * Keyv handles namespacing, JSON serialization, and TTL envelopes; this store only moves strings
  */
-export function createSqliteStore({
-	filePath,
-	table = 'cache',
-	busyTimeoutMs = 10_000,
-}: SqliteStoreOptions) {
+export function createSqliteStore({ filePath }: SqliteStoreOptions) {
 	fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
 	const database = new DatabaseSync(filePath);
 
 	// WAL for concurrent access during builds
 	database.exec('PRAGMA journal_mode = WAL');
-	database.exec(`PRAGMA busy_timeout = ${String(busyTimeoutMs)}`);
-	database.exec(`CREATE TABLE IF NOT EXISTS ${table} (key TEXT PRIMARY KEY, value TEXT)`);
+	database.exec('PRAGMA busy_timeout = 10000');
+	database.exec('CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT)');
 
-	const selectStatement = database.prepare(`SELECT value FROM ${table} WHERE key = ?`);
+	const selectStatement = database.prepare('SELECT value FROM cache WHERE key = ?');
 	const upsertStatement = database.prepare(
-		`INSERT INTO ${table} (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+		'INSERT INTO cache (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
 	);
-	const deletionStatement = database.prepare(`DELETE FROM ${table} WHERE key = ?`);
-	const hasStatement = database.prepare(`SELECT 1 FROM ${table} WHERE key = ?`);
+	const deletionStatement = database.prepare('DELETE FROM cache WHERE key = ?');
+	const hasStatement = database.prepare('SELECT 1 FROM cache WHERE key = ?');
 
 	return {
 		get(key: string) {
@@ -46,7 +40,7 @@ export function createSqliteStore({
 			return deletionStatement.run(key).changes > 0;
 		},
 		clear() {
-			database.exec(`DELETE FROM ${table}`);
+			database.exec('DELETE FROM cache');
 		},
 		has(key: string) {
 			return hasStatement.get(key) !== undefined;

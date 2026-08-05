@@ -31,7 +31,4 @@ export function createMultilingualSchemas<T extends string>(
 	return schemas;
 }
 
-/**
- * Multilingual content schemas for this project
- */
 export const titleMultilingualSchema = createMultilingualSchemas('title', TitleSchema);

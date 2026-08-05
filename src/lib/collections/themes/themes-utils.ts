@@ -42,9 +42,7 @@ async function createLocationsByThemeFunction() {
 	};
 }
 
-/**
- * Data for a single theme entry page: catalog items, map data, and related themes
- */
+// Data for a single theme entry page: catalog items, map data, and related themes
 export async function createQueryThemesEntryFunction() {
 	const { entries: themes } = await getThemesCollection();
 
@@ -110,7 +108,7 @@ export async function queryThemesIndex() {
 	return R.pipe(
 		entries,
 		R.filter(filterWithContent),
-		/** Only display themes with associated images */
+		// Only display themes with associated images
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByContentCount),
 		catalog.resolve,

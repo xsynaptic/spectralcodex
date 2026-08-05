@@ -18,9 +18,6 @@ const feedExcludeFootnotes = true as boolean;
 // How many items should be included in the feed?
 const feedItemCount = 20;
 
-/**
- * @link https://docs.astro.build/en/guides/rss/
- */
 export async function GET(context: APIContext): Promise<Response> {
 	const startTime = performance.now();
 

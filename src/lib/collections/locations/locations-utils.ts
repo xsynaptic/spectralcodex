@@ -137,9 +137,7 @@ function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined)
 	return Math.min(Math.max(neighborDistance, locationNearbyRadiusKmMin), locationNearbyRadiusKmMax);
 }
 
-/**
- * Data for a single location entry page: map data, related posts, and backlinks
- */
+// Data for a single location entry page: map data, related posts, and backlinks
 export async function createQueryLocationsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
@@ -179,9 +177,7 @@ export async function createQueryLocationsEntryFunction() {
 	};
 }
 
-/**
- * Resolve region, lang code, and multilingual title data for a location entry
- */
+// Resolve region, lang code, and multilingual title data for a location entry
 export async function createLocationEntryDisplayFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 

@@ -14,9 +14,7 @@ import { getMapIndexData } from '#lib/map/map-index.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
-/**
- * Get locations associated with a resource (via links URL match or sources ID match)
- */
+// Get locations associated with a resource (via links URL match or sources ID match)
 async function createLocationsByResourceFunction() {
 	const { entries } = await getLocationsCollection();
 
@@ -44,9 +42,7 @@ async function createLocationsByResourceFunction() {
 	};
 }
 
-/**
- * Get posts associated with a resource (via links URL match or sources ID match)
- */
+// Get posts associated with a resource (via links URL match or sources ID match)
 async function createPostsByResourceFunction() {
 	const { entries } = await getPostsCollection();
 
@@ -74,9 +70,7 @@ async function createPostsByResourceFunction() {
 	};
 }
 
-/**
- * Resolve links and sources
- */
+// Resolve links and sources
 export async function createResolveResourceLinksFunction() {
 	const { entries } = await getResourcesCollection();
 
@@ -127,9 +121,7 @@ export async function createResolveResourceSourcesFunction() {
 	};
 }
 
-/**
- * Data for a single resource entry page: catalog items and map data
- */
+// Data for a single resource entry page: catalog items and map data
 export async function createQueryResourcesEntryFunction() {
 	const getLocationsByResource = await createLocationsByResourceFunction();
 	const getPostsByResource = await createPostsByResourceFunction();

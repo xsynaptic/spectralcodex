@@ -2,9 +2,6 @@ import { z } from 'zod';
 
 import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 
-/**
- * Links
- */
 const LinkItemSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
@@ -32,9 +29,6 @@ export function getMatchingLinkUrl(
 	return;
 }
 
-/**
- * Sources
- */
 const nameMultilingualSchema = createMultilingualSchemas('name');
 
 const publisherMultilingualSchema = createMultilingualSchemas('publisher');

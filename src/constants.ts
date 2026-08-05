@@ -1,15 +1,9 @@
-/**
- * Content collections and schemas
- */
 // Path to content from the root; defaults *e.g.* `./packages/content-demo/collections`
 export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 
 // An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = '<!-- more -->';
 
-/**
- * Image configuration
- */
 export const IMAGE_LQ_QUALITY = 70 as const;
 export const IMAGE_HERO_QUALITY = 70 as const;
 export const IMAGE_HQ_QUALITY = 85 as const;
@@ -17,9 +11,6 @@ export const IMAGE_LQ_FORMAT = 'webp' as const;
 export const IMAGE_HERO_FORMAT = 'webp' as const;
 export const IMAGE_HQ_FORMAT = 'jpg' as const;
 
-/**
- * Location configuration
- */
 // Max number of locations returned
 export const LOCATIONS_NEARBY_COUNT_LIMIT = 20;
 
@@ -31,9 +22,6 @@ export const MAP_SOURCE_INLINE_LIMIT = LOCATIONS_NEARBY_COUNT_LIMIT + 1;
 // Maximum distance in kilometers for nearby locations
 export const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // km
 
-/**
- * Map configuration
- */
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
 export const MAP_GEOMETRY_COORDINATES_PRECISION = 6;
 
@@ -49,9 +37,6 @@ export const MAP_DISPLAY_REGION_IDS = new Set([
 	'canada',
 ]);
 
-/**
- * MDX
- */
 export const MDX_COMPONENTS = [
 	'Email',
 	'Hide',
@@ -64,9 +49,6 @@ export const MDX_COMPONENTS = [
 	'Resource',
 ];
 
-/**
- * Open Graph config
- */
 // How many fallback images are there? These should already be located in the `/public` folder
 export const OPEN_GRAPH_IMAGE_FALLBACK_COUNT = 5;
 export const OPEN_GRAPH_IMAGE_FALLBACK_PREFIX = 'og-image';
@@ -77,24 +59,17 @@ export const OPEN_GRAPH_IMAGE_DENSITY = 2;
 // Not sure how useful this is nowadays
 export const OPEN_GRAPH_TWITTER_USERNAME = '@spectralcodex';
 
-/**
- * Tailwind CSS V4 breakpoints and spacing
- */
+// Tailwind CSS V4 breakpoints and spacing
 export const TAILWIND_BREAKPOINT_SM = '40rem';
 export const TAILWIND_BREAKPOINT_MD = '48rem'; // Note: large is 64rem
 export const TAILWIND_BREAKPOINT_CONTENT = '60.25rem'; // This is a custom setting
 export const TAILWIND_CONTENT_PADDING_SM = '2rem'; // 32px equivalent
 export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent
 
-/**
- * Time
- */
+// Time
 export const MILLISECONDS_PER_DAY = 86_400_000;
 export const MILLISECONDS_PER_HOUR = 3_600_000;
 
-/**
- * Various settings
- */
 // A string representing the year the site was founded; will default to the current year
 export const SITE_YEAR_FOUNDED = 2009;
 

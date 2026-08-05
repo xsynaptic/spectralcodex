@@ -114,9 +114,7 @@ export async function createSeriesByIdFunction() {
 	};
 }
 
-/**
- * Data for a single series entry page: catalog items, map data, and word count
- */
+// Data for a single series entry page: catalog items, map data, and word count
 export async function createQuerySeriesEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
 

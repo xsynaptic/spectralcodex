@@ -19,9 +19,7 @@ interface ImagePlaceholderCached {
 	dataUrl: string;
 }
 
-/**
- * Generate placeholder dimensions from aspect ratio and pixel budget
- */
+// Generate placeholder dimensions from aspect ratio and pixel budget
 function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
 	const height = Math.sqrt(pixelCount / aspectRatio);
 	const width = pixelCount / height;

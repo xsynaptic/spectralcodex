@@ -1,7 +1,4 @@
 #!/usr/bin/env tsx
-/**
- * Find orphaned media files not referenced in any content
- */
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 

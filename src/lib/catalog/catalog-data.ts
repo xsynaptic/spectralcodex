@@ -37,9 +37,7 @@ async function getRegionPrimaryIdFunction() {
 	};
 }
 
-/**
- * Content links count
- */
+// Content links count
 function getLinksCount(entry: CollectionEntry<CollectionKey>): number {
 	let linksCount = 0;
 
@@ -52,9 +50,7 @@ function getLinksCount(entry: CollectionEntry<CollectionKey>): number {
 	return linksCount;
 }
 
-/**
- * Content backlinks; discovered from the <Link id="..."> MDX component in body content
- */
+// Content backlinks; discovered from the <Link id="..."> MDX component in body content
 const backlinkLinkPattern = /<Link id="([^"]+)"/g;
 
 function generateContentBacklinksFromMdxComponents(

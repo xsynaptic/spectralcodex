@@ -11,10 +11,8 @@ export function safelyCreateDirectory(dir: string) {
 	console.log(chalk.gray(`Created directory: ${chalk.cyan(dir)}`));
 }
 
-/**
- * Walk up the directory tree looking for `pnpm-workspace.yaml` to locate the monorepo root
- * Cached at module load: scripts only ever run from one place per invocation
- */
+// Walk up the directory tree looking for `pnpm-workspace.yaml` to locate the monorepo root
+// Cached at module load: scripts only ever run from one place per invocation
 let cachedWorkspaceRoot: string | undefined;
 
 export function findWorkspaceRoot(startDir: string = process.cwd()): string {

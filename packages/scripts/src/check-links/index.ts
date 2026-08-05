@@ -48,9 +48,7 @@ const { values } = parseArgs({
 	},
 });
 
-/**
- * Collections that may contain external links
- */
+// Collections that may contain external links
 const LINK_COLLECTIONS = [
 	'locations',
 	'notes',
@@ -67,9 +65,6 @@ const concurrency = Number(values.concurrency);
 const domainLimit = Number(values['domain-limit']);
 const maxMissing = Number(values['max-missing']);
 
-/**
- * Ignore patterns
- */
 const DEFAULT_IGNORE_PATTERNS = [
 	'maps.google.com',
 	'goo.gl/maps',

@@ -87,9 +87,7 @@ export default getConfig(
 				],
 			},
 		},
-		/**
-		 * React
-		 */
+		// React
 		{
 			files: ['packages/react-map-component/**/*.{js,jsx,ts,tsx}'],
 			plugins: {
@@ -130,13 +128,9 @@ export default getConfig(
 				'unicorn/prefer-global-this': 'off',
 			},
 		},
-		/**
-		 * Native web components
-		 */
+		// Native web components
 		webComponentConfig,
-		/**
-		 * Astro
-		 */
+		// Astro
 		...getAstroConfig({ a11y: 'strict' }),
 	],
 	{

@@ -28,9 +28,7 @@ function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geo
 	return geometry.coordinates;
 }
 
-/**
- * Extract coordinates from location entries; handles both single Point and MultiPoint geometries
- */
+// Extract coordinates from location entries; handles both single Point and MultiPoint geometries
 function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 	pointsMap: Map<string, LocationPoint>;
 	pointsIndex: Array<LocationPoint>;

@@ -22,7 +22,5 @@ if (!values['output-path']) {
 	process.exit(1);
 }
 
-/**
- * This simple script copies content collection schemas into the actual content package consumed by this project
- */
+// This script copies content collection schemas into the actual content package consumed by this project
 await $`cp ${path.join(rootPath, '.astro/collections')}/*.schema.json ${path.join(rootPath, values['output-path'], 'schemas')}`;
