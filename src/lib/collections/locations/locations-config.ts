@@ -1,5 +1,5 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
-import { LocationLayerEnum } from '@spectralcodex/shared/map';
+import { LocationMoodEnum } from '@spectralcodex/shared/map';
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
@@ -32,7 +32,7 @@ export const locations = defineCollection({
 			title: TitleSchema,
 			...titleMultilingualSchema,
 			description: z.string().optional(),
-			layer: z.enum(LocationLayerEnum).default(LocationLayerEnum.Neutral),
+			mood: z.enum(LocationMoodEnum).default(LocationMoodEnum.Neutral),
 			category: z.enum(LocationCategoryEnum),
 			status: z.enum(LocationStatusEnum),
 			heritage: LocationTwHeritageSchema.optional(),

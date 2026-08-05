@@ -9,9 +9,9 @@ export { mapIcons, mapLocationCategoryIcons } from './map-icons';
 export {
 	LocationCategoryEnum,
 	LocationCategoryNumericMapping,
-	LocationLayerEnum,
+	LocationMoodEnum,
 	LocationStatusEnum,
 	LocationStatusNumericMapping,
 } from './map-locations';
-export type { LocationCategory, LocationStatus, LocationLayer } from './map-locations';
+export type { LocationCategory, LocationStatus, LocationMood } from './map-locations';
 export { MapSpritesEnum } from './map-sprites';
