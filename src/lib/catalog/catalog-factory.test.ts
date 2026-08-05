@@ -4,7 +4,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
-import { sortCatalogByDate, sortCatalogByQuality } from '#lib/catalog/catalog-utils.ts';
+import { sortCatalogByDate, sortCatalogByEntryQuality } from '#lib/catalog/catalog-utils.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
@@ -69,8 +69,8 @@ describe('comparators', () => {
 		]);
 	});
 
-	test('sortCatalogByQuality is highest quality first, newest on ties', () => {
-		expect(ids([lowNew, highOld, highNew].sort(sortCatalogByQuality))).toEqual([
+	test('sortCatalogByEntryQuality is highest quality first, newest on ties', () => {
+		expect(ids([lowNew, highOld, highNew].sort(sortCatalogByEntryQuality))).toEqual([
 			'high-new',
 			'high-old',
 			'low-new',

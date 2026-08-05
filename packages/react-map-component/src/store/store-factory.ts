@@ -16,7 +16,7 @@ interface MapDataState {
 	filterPosition: DOMCoordinates | undefined;
 	filterOpen: boolean;
 	statusFilter: Array<LocationStatus>;
-	qualityFilter: number;
+	entryQualityFilter: number;
 	ratingFilter: number;
 	objectiveFilter: number;
 	showObjectiveFilter: boolean;
@@ -31,7 +31,7 @@ export type MapDataConfigurableState = Pick<
 	| 'canvasInteractive'
 	| 'filterOpen'
 	| 'statusFilter'
-	| 'qualityFilter'
+	| 'entryQualityFilter'
 	| 'ratingFilter'
 	| 'objectiveFilter'
 	| 'showObjectiveFilter'
@@ -52,7 +52,7 @@ export interface MapDataStore extends MapDataState {
 		toggleStatusFilter: (status: LocationStatus) => void;
 		showAllStatusFilter: () => void;
 		hideAllStatusFilter: () => void;
-		setQualityFilter: (qualityFilter: number) => void;
+		setEntryQualityFilter: (entryQualityFilter: number) => void;
 		setRatingFilter: (ratingFilter: number) => void;
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setLanguages: (languages: Array<string>) => void;
@@ -68,7 +68,7 @@ const defaultMapDataState = {
 	filterPosition: undefined,
 	filterOpen: false,
 	statusFilter: [],
-	qualityFilter: 1,
+	entryQualityFilter: 1,
 	ratingFilter: 1,
 	objectiveFilter: 1,
 	showObjectiveFilter: false,
@@ -131,8 +131,8 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				hideAllStatusFilter: () => {
 					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
 				},
-				setQualityFilter: (qualityFilter) => {
-					setAndClearSelection({ qualityFilter });
+				setEntryQualityFilter: (entryQualityFilter) => {
+					setAndClearSelection({ entryQualityFilter });
 				},
 				setRatingFilter: (ratingFilter) => {
 					setAndClearSelection({ ratingFilter });

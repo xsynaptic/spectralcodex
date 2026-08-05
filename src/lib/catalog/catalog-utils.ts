@@ -10,7 +10,7 @@ export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
 }
 
 // Highest quality first, newest first on ties
-export function sortCatalogByQuality(a: CatalogItem, b: CatalogItem): number {
+export function sortCatalogByEntryQuality(a: CatalogItem, b: CatalogItem): number {
 	return b.entryQuality - a.entryQuality || sortCatalogByDate(a, b);
 }
 

@@ -34,7 +34,7 @@ describe('createMapStore', () => {
 
 	test('filter changes clear the active selection', () => {
 		const store = createMapStore();
-		const { setSelectedId, toggleStatusFilter, setQualityFilter, setFilterOpen } =
+		const { setSelectedId, toggleStatusFilter, setEntryQualityFilter, setFilterOpen } =
 			store.getState().actions;
 
 		setSelectedId('location-1');
@@ -42,7 +42,7 @@ describe('createMapStore', () => {
 		expect(store.getState().selectedId).toBeUndefined();
 
 		setSelectedId('location-2');
-		setQualityFilter(3);
+		setEntryQualityFilter(3);
 		expect(store.getState().selectedId).toBeUndefined();
 
 		setSelectedId('location-3');

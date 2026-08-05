@@ -10,7 +10,7 @@ Built on [react-map-gl](https://visgl.github.io/react-map-gl/) with [Protomaps](
 
 **Streaming boundaries**: Administrative divisions are fetched as FlatGeobuf files and geometrically inverted using Turf.js to create "mask" layers that highlight regions by dimming everything outside their boundaries. FlatGeobuf's column-oriented format enables progressive decoding without loading entire datasets into memory.
 
-**State management**: [Zustand](https://zustand-demo.pmnd.rs/) store with [React Query](https://tanstack.com/query/latest) for async data fetching and IndexedDB persistence. Map filters (status, quality, rating, objective) trigger memoized GeoJSON reconstruction rather than mutating layer sources, preserving React's unidirectional data flow.
+**State management**: [Zustand](https://zustand-demo.pmnd.rs/) store with [React Query](https://tanstack.com/query/latest) for async data fetching and IndexedDB persistence. Map filters (status, entry quality, rating, objective) trigger memoized GeoJSON reconstruction rather than mutating layer sources, preserving React's unidirectional data flow.
 
 **Dynamic styling**: MapLibre layer specifications are generated via hooks that interpolate style properties based on zoom level, selection state, and dark mode. Expressions use feature properties to drive data-driven styling for status colors, cluster sizing, and hover effects.
 

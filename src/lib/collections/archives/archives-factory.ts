@@ -249,30 +249,30 @@ function deduplicateCategories(
 }
 
 interface ArchivesTierOptions {
-	quality: number;
+	entryQuality: number;
 	limit?: number | undefined;
 }
 
-const monthlyTierOptions: ArchivesTierOptions = { quality: 1 };
-const indexTierOptions: ArchivesTierOptions = { quality: 3, limit: 20 };
+const monthlyTierOptions: ArchivesTierOptions = { entryQuality: 1 };
+const indexTierOptions: ArchivesTierOptions = { entryQuality: 3, limit: 20 };
 const yearlyQualityFloor = 2;
 const yearlyLimit = 20;
 
 function projectArchiveTier(
 	buckets: ArchivesTierBuckets,
-	{ quality, limit }: ArchivesTierOptions,
+	{ entryQuality, limit }: ArchivesTierOptions,
 ): ArchivesTierBuckets {
 	return deduplicateCategories(
 		sortAndLimit(
-			buckets.updated.filter((item) => item.entryQuality >= quality),
+			buckets.updated.filter((item) => item.entryQuality >= entryQuality),
 			limit,
 		),
 		sortAndLimit(
-			buckets.created.filter((item) => item.entryQuality >= quality),
+			buckets.created.filter((item) => item.entryQuality >= entryQuality),
 			limit,
 		),
 		sortAndLimit(
-			buckets.visited.filter((item) => item.entryQuality >= quality),
+			buckets.visited.filter((item) => item.entryQuality >= entryQuality),
 			limit,
 		),
 	);
@@ -282,7 +282,7 @@ function tierHasData(tier: ArchivesTierBuckets): boolean {
 	return tier.updated.length > 0 || tier.created.length > 0 || tier.visited.length > 0;
 }
 
-// Counts reflect the full bucket totals (before the quality floor and cap), unlike the tier lists
+// Counts reflect the full bucket totals (before the entry quality floor and cap), unlike the tier lists
 function getBucketCounts(buckets: ArchivesTierBuckets) {
 	return {
 		updatedCount: buckets.updated.length,

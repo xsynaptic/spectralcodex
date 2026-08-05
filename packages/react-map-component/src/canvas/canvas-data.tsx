@@ -7,7 +7,7 @@ import type { MapCanvasData } from './canvas-data-filter';
 import { useSourceDataQuery } from '../data/data-source';
 import {
 	useMapObjectiveFilter,
-	useMapQualityFilter,
+	useMapEntryQualityFilter,
 	useMapRatingFilter,
 	useMapScope,
 	useMapStatusFilter,
@@ -23,15 +23,19 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const { data: sourceData } = useSourceDataQuery();
 
 	const status = useMapStatusFilter();
-	const quality = useMapQualityFilter();
+	const entryQuality = useMapEntryQualityFilter();
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
 	const mapScope = useMapScope();
 
 	const canvasData = useMemo(
 		() =>
-			getMapCanvasData(sourceData ?? EMPTY_ITEMS, { status, quality, rating, objective }, mapScope),
-		[sourceData, status, quality, rating, objective, mapScope],
+			getMapCanvasData(
+				sourceData ?? EMPTY_ITEMS,
+				{ status, entryQuality, rating, objective },
+				mapScope,
+			),
+		[sourceData, status, entryQuality, rating, objective, mapScope],
 	);
 
 	return <CanvasDataContext.Provider value={canvasData}>{children}</CanvasDataContext.Provider>;

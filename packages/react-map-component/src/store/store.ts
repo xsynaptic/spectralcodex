@@ -49,7 +49,7 @@ export const useMapFilterPosition = () => useMapDataStore((state) => state.filte
 
 export const useMapStatusFilter = () => useMapDataStore((state) => state.statusFilter);
 
-export const useMapQualityFilter = () => useMapDataStore((state) => state.qualityFilter);
+export const useMapEntryQualityFilter = () => useMapDataStore((state) => state.entryQualityFilter);
 
 export const useMapRatingFilter = () => useMapDataStore((state) => state.ratingFilter);
 

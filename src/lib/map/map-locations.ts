@@ -152,7 +152,7 @@ export function getLocationsFeatureCollection(
 						category: geometry.category ?? entry.data.category,
 						status: geometry.status ?? entry.data.status,
 						precision: geometry.precision ?? entry.data.precision,
-						quality: entry.data.entryQuality,
+						entryQuality: entry.data.entryQuality,
 						rating: entry.data.rating,
 						objective: entry.data.objective,
 						outlier: entry.data.outlier,
@@ -191,7 +191,7 @@ export function getLocationsMapSourceData(
 					category: feature.properties.category,
 					status: feature.properties.status,
 					precision: feature.properties.precision,
-					quality: feature.properties.quality,
+					entryQuality: feature.properties.entryQuality,
 					rating: feature.properties.rating,
 					...(feature.properties.objective === undefined
 						? {}

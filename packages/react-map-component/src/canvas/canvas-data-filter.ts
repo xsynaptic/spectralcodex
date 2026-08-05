@@ -7,7 +7,7 @@ import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '../types
 
 export interface MapFilterState {
 	status: ReadonlyArray<LocationStatus>;
-	quality: number;
+	entryQuality: number;
 	rating: number;
 	objective: number;
 }
@@ -24,7 +24,7 @@ export function isLocationVisible(
 	filter: MapFilterState,
 ): boolean {
 	if (filter.status.includes(properties.status)) return false;
-	if (properties.quality < filter.quality) return false;
+	if (properties.entryQuality < filter.entryQuality) return false;
 	if (properties.rating < filter.rating) return false;
 	return properties.objective === undefined || properties.objective >= filter.objective;
 }

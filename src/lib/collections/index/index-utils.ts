@@ -4,7 +4,7 @@ import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
 	filterHasFeaturedImage,
 	sortCatalogByDate,
-	sortCatalogByQuality,
+	sortCatalogByEntryQuality,
 } from '#lib/catalog/catalog-utils.ts';
 
 export async function queryIndexData() {
@@ -29,14 +29,14 @@ export async function queryIndexData() {
 			catalog.byCollection('series'),
 			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortCatalogByQuality),
+			R.sort(sortCatalogByEntryQuality),
 			R.take(4),
 		),
 		themesCatalogItems: R.pipe(
 			catalog.byCollection('themes'),
 			R.filter((item) => item.entryQuality >= 3),
 			R.filter(filterHasFeaturedImage),
-			R.sort(sortCatalogByQuality),
+			R.sort(sortCatalogByEntryQuality),
 			R.take(8),
 		),
 	};

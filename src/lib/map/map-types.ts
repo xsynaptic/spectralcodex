@@ -23,7 +23,7 @@ export const MapFeaturePropertiesSchema = z.object({
 	category: z.enum(LocationCategoryEnum),
 	status: z.enum(LocationStatusEnum),
 	precision: NumericScaleSchema,
-	quality: NumericScaleSchema,
+	entryQuality: NumericScaleSchema,
 	rating: NumericScaleSchema,
 	safety: NumericScaleSchema.optional(),
 	objective: NumericScaleSchema.optional(),

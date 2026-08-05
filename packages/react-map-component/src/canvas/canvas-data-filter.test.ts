@@ -13,7 +13,7 @@ import { getMapCanvasData, isLocationVisible } from './canvas-data-filter';
 
 const passAll: MapFilterState = {
 	status: [],
-	quality: 1,
+	entryQuality: 1,
 	rating: 1,
 	objective: 1,
 };
@@ -34,7 +34,7 @@ function makeItem(
 			category: LocationCategoryEnum.Unknown,
 			status: LocationStatusEnum.Abandoned,
 			precision: 3,
-			quality: 3,
+			entryQuality: 3,
 			rating: 3,
 			outlier: false,
 			hasImage: false,
@@ -76,10 +76,10 @@ describe('isLocationVisible', () => {
 		);
 	});
 
-	test('quality and rating are minimum thresholds', () => {
-		expect(isLocationVisible(makeItem({ quality: 2 }).properties, { ...passAll, quality: 3 })).toBe(
-			false,
-		);
+	test('entry quality and rating are minimum thresholds', () => {
+		expect(
+			isLocationVisible(makeItem({ entryQuality: 2 }).properties, { ...passAll, entryQuality: 3 }),
+		).toBe(false);
 		expect(isLocationVisible(makeItem({ rating: 4 }).properties, { ...passAll, rating: 3 })).toBe(
 			true,
 		);
