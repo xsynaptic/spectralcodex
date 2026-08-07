@@ -42,6 +42,7 @@ export default defineConfig({
 					command: `pnpm astro preview --port ${String(localPort)}`,
 					url: localURL,
 					reuseExistingServer: true,
+					env: { ASTRO_PREVIEW_BACKGROUND: '0' },
 				},
 			}),
 });
