@@ -4,12 +4,12 @@ import { parseArgs } from 'node:util';
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { deployMedia } from './deploy-media.js';
 
-const { values, positionals } = parseArgs({
+const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'dry-run': { type: 'boolean', default: false },
+		delete: { type: 'boolean', default: false },
 	},
-	allowPositionals: true,
 });
 
 await ensureSshKeychain();
@@ -17,5 +17,5 @@ await ensureSshKeychain();
 await deployMedia({
 	rootPath: findWorkspaceRoot(),
 	dryRun: values['dry-run'],
-	fast: positionals[0] === 'fast',
+	withDelete: values.delete,
 });

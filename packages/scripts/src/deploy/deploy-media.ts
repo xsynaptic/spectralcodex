@@ -2,17 +2,18 @@ import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { collectMediaFiles } from '../shared/images.js';
 import { loadDeployConfig } from './deploy-config.js';
 import { rsyncTo } from './rsync-exec.js';
 
 interface DeployMediaOptions {
 	rootPath: string;
 	dryRun?: boolean;
-	fast?: boolean;
+	withDelete?: boolean;
 }
 
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
-	const { rootPath, dryRun = false, fast = false } = options;
+	const { rootPath, dryRun = false, withDelete = false } = options;
 
 	const config = loadDeployConfig();
 
@@ -37,7 +38,20 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	console.log(chalk.blue('Syncing media...'));
 	console.log(chalk.gray(`  From: ${mediaPath}`));
 	console.log(chalk.gray(`  To:   ${config.remoteHost}:${remoteMediaPath}`));
-	console.log(chalk.gray(`  Mode: ${fast ? 'fast (size-only)' : 'checksum'}`));
+
+	if (withDelete) {
+		const localFileCount = collectMediaFiles(mediaPath).size;
+
+		if (localFileCount === 0) {
+			throw new Error(`No image files found in ${mediaPath}; refusing to delete`);
+		}
+
+		console.log(
+			chalk.yellow(
+				`  DELETE: remote files absent from the ${localFileCount.toString()} local files will be removed`,
+			),
+		);
+	}
 
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
@@ -47,7 +61,7 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 		config,
 		dryRun,
 		archive: 'av',
-		extraFlags: ['--partial', fast ? '--size-only' : '-c'],
+		extraFlags: withDelete ? ['--partial', '--size-only', '--delete-after'] : ['--partial', '-c'],
 		excludes: ['.DS_Store', '*.tmp', '.gitkeep'],
 	});
 
