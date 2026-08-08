@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.11.0",
+	"version": "7.12.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" && prettier --check . && eslint && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -114,10 +114,10 @@
 		"sharp": "^0.35.3",
 		"stylelint": "^17.14.1",
 		"tailwindcss": "^4.3.3",
-		"tsx": "^4.23.9",
+		"tsx": "^4.23.10",
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
-		"vite": "^8.2.0",
+		"vite": "^8.2.1",
 		"vitest": "^4.1.10",
 		"zod": "^4.4.3"
 	},
