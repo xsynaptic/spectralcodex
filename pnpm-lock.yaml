@@ -163,6 +163,9 @@ importers:
       kdbush:
         specifier: ^4.1.0
         version: 4.1.0
+      keyv:
+        specifier: ^5.6.0
+        version: 5.6.0
       knip:
         specifier: ^6.32.0
         version: 6.32.0
@@ -172,6 +175,9 @@ importers:
       maplibre-gl:
         specifier: ^6.2.0
         version: 6.2.0
+      ohash:
+        specifier: ^2.0.11
+        version: 2.0.11
       p-limit:
         specifier: ^7.3.1
         version: 7.3.1
@@ -438,6 +444,12 @@ importers:
       kdbush:
         specifier: ^4.1.0
         version: 4.1.0
+      keyv:
+        specifier: ^5.6.0
+        version: 5.6.0
+      keyv-file:
+        specifier: ^5.3.5
+        version: 5.3.5
       p-limit:
         specifier: ^7.3.1
         version: 7.3.1
@@ -471,18 +483,6 @@ importers:
 
   packages/shared:
     dependencies:
-      keyv:
-        specifier: ^5.6.0
-        version: 5.6.0
-      keyv-file:
-        specifier: ^5.3.5
-        version: 5.3.5
-      ohash:
-        specifier: ^2.0.11
-        version: 2.0.11
-      p-memoize:
-        specifier: ^8.0.0
-        version: 8.0.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3

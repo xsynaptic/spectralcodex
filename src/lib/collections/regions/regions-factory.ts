@@ -1,30 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { hash } from '@spectralcodex/shared/cache';
-
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { createHierarchy } from '#lib/utils/hierarchy.ts';
-
-/**
- * Computed data cache
- */
-type RegionComputedData = Pick<
-	CollectionEntry<'regions'>['data'],
-	| '_ancestors'
-	| '_children'
-	| '_siblings'
-	| '_langCode'
-	| '_locations'
-	| '_locationCount'
-	| '_posts'
-	| '_postCount'
->;
-
-// Cache of all region computed data, keyed by region ID
-export type RegionComputedDataCache = Record<string, RegionComputedData>;
 
 // Resolve the regions a location belongs to; overrides apply only in production
 export function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
@@ -50,89 +30,6 @@ export function createRegionsTree(entries: Array<CollectionEntry<'regions'>>): H
 				: { id: entry.id, parentId: entry.data.parent },
 		),
 	);
-}
-
-/**
- * Generate a stable cache key from the content graph state
- * This key changes when any region structure, location-region, or post-region relationship changes
- */
-export function generateCacheKey({
-	regions,
-	locations,
-	posts,
-}: {
-	regions: Array<CollectionEntry<'regions'>>;
-	locations: Array<CollectionEntry<'locations'>>;
-	posts: Array<CollectionEntry<'posts'>>;
-}) {
-	return hash({
-		data: {
-			regions: regions.map((entry) => ({
-				id: entry.id,
-				parent: entry.data.parent,
-			})),
-			locations: locations.map((entry) => ({
-				id: entry.id,
-				regions: resolveLocationRegions(entry).map(({ id }) => id),
-			})),
-			posts: posts.map((entry) => ({
-				id: entry.id,
-				regions: entry.data.regions?.map(({ id }) => id),
-			})),
-			// Language codes are computed data, so changes to the map must invalidate the cache
-			regionLanguageMap: RegionLanguageMap,
-			version: 2,
-		},
-	});
-}
-
-/**
- * Apply cache computed data back to fresh collection entries
- */
-export function applyComputedDataCache(
-	regions: Array<CollectionEntry<'regions'>>,
-	computedDataCache: RegionComputedDataCache,
-) {
-	for (const entry of regions) {
-		const entryComputedData = computedDataCache[entry.id];
-
-		// Merge all computed fields from cache into the entry
-		if (entryComputedData) Object.assign(entry.data, entryComputedData);
-	}
-}
-
-/**
- * Extract computed data from processed entries for caching
- */
-export function extractComputedData(
-	regions: Array<CollectionEntry<'regions'>>,
-): RegionComputedDataCache {
-	const computedDataCache: RegionComputedDataCache = {};
-
-	for (const entry of regions) {
-		const {
-			_ancestors,
-			_children,
-			_siblings,
-			_langCode,
-			_locations,
-			_locationCount,
-			_posts,
-			_postCount,
-		} = entry.data;
-
-		computedDataCache[entry.id] = {
-			_ancestors,
-			_children,
-			_siblings,
-			_langCode,
-			_locations,
-			_locationCount,
-			_posts,
-			_postCount,
-		};
-	}
-	return computedDataCache;
 }
 
 /**

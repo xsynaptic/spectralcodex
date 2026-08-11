@@ -3,13 +3,14 @@ import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 import type { FeatureCollection, Position } from 'geojson';
 
-import { hashShort } from '@spectralcodex/shared/cache';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
+import { hash } from 'ohash';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
+import { HASH_SHORT_LENGTH } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 function getRelativePath(url: string | undefined): string | undefined {
@@ -235,11 +236,11 @@ export function getLocationsMapPopupData(
 		.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-// Endpoint URLs and inline cache keys derive from these hashes; the { data } wrapper is part of the key
+// Endpoint URLs and inline cache keys derive from these hashes
 export function hashMapSourceData(sourceData: Array<MapSourceItem> | undefined) {
-	return hashShort({ data: sourceData });
+	return hash(sourceData).slice(0, HASH_SHORT_LENGTH);
 }
 
 export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
-	return hashShort({ data: popupData });
+	return hash(popupData).slice(0, HASH_SHORT_LENGTH);
 }

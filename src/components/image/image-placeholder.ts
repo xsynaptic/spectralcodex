@@ -1,15 +1,15 @@
 import type { Sharp } from 'sharp';
 
-import { hash } from '@spectralcodex/shared/cache';
-import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
+import { hash } from 'ohash';
 import sharp from 'sharp';
 
 import type { ImageFitOption, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
+import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
 const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;

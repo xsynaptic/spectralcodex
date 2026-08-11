@@ -1,4 +1,3 @@
-import { hash } from '@spectralcodex/shared/cache';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { createJsonlCache, defineImageCollection } from '@xsynaptic/astro-image-loader';
 import { defineCollection } from 'astro:content';
@@ -10,6 +9,7 @@ import {
 } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import path from 'node:path';
+import { hash } from 'ohash';
 import sharp from 'sharp';
 import { z } from 'zod';
 

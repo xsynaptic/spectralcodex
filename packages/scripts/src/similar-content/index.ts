@@ -1,6 +1,5 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
-import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
@@ -12,6 +11,7 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 import type { DataStoreEntry } from '../shared/data-store.js';
 import type { SimilarContentMetadata } from './metadata.js';
 
+import { getFileCacheInstance } from '../shared/cache-file.js';
 import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { calculateMetadataBoost, toReferenceIdArray } from './metadata.js';

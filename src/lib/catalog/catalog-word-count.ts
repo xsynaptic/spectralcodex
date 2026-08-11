@@ -1,13 +1,13 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
-import { hash } from '@spectralcodex/shared/cache';
-import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { stripTags } from '@xsynaptic/unified-tools';
 import { countWords } from '@xsynaptic/word-count';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import { hash } from 'ohash';
 import * as R from 'remeda';
 
 import { MDX_COMPONENTS } from '#constants.ts';
+import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 

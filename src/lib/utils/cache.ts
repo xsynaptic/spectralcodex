@@ -1,16 +1,10 @@
+import Keyv from 'keyv';
 import fs from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 
-interface SqliteStoreOptions {
-	filePath: string;
-}
-
-/**
- * Minimal synchronous Keyv store backed by node:sqlite
- * Keyv handles namespacing, JSON serialization, and TTL envelopes; this store only moves strings
- */
-export function createSqliteStore({ filePath }: SqliteStoreOptions) {
+// Keyv handles namespacing, JSON serialization, and TTL envelopes; this store only moves strings
+export function createSqliteStore({ filePath }: { filePath: string }) {
 	fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
 	const database = new DatabaseSync(filePath);
@@ -46,4 +40,10 @@ export function createSqliteStore({ filePath }: SqliteStoreOptions) {
 			return hasStatement.get(key) !== undefined;
 		},
 	};
+}
+
+export function getSqliteCacheInstance(cachePath: string, namespace: string) {
+	const store = createSqliteStore({ filePath: path.join(cachePath, `${namespace}.sqlite`) });
+
+	return new Keyv({ store, namespace });
 }

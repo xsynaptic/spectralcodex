@@ -3,10 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { describe, expect, test } from 'vitest';
 
 import {
-	applyComputedDataCache,
 	createRegionsTree,
-	extractComputedData,
-	generateCacheKey,
 	populateRegionsContent,
 	populateRegionsHierarchy,
 	populateRegionsLangCode,
@@ -141,56 +138,5 @@ describe('populateRegionsContent', () => {
 		expect(taipei.data._posts).toEqual(['post-taipei']);
 		expect(tainan.data._posts).toEqual([]);
 		expect(tainan.data._postCount).toBe(0);
-	});
-});
-
-describe('generateCacheKey', () => {
-	const regions = makeRegionsFixture();
-	const locations = [makeLocation('temple', ['taipei'])];
-	const posts = [makePost('post-taipei', ['taipei'])];
-
-	test('is stable for identical inputs', () => {
-		expect(generateCacheKey({ regions, locations, posts })).toBe(
-			generateCacheKey({ regions, locations, posts }),
-		);
-	});
-
-	test('changes when any region, location, or post relationship changes', () => {
-		const baseKey = generateCacheKey({ regions, locations, posts });
-
-		expect(
-			generateCacheKey({
-				regions: [...makeRegionsFixture().slice(0, 4), makeRegion('tainan', 'north-taiwan')],
-				locations,
-				posts,
-			}),
-		).not.toBe(baseKey);
-		expect(
-			generateCacheKey({ regions, locations: [makeLocation('temple', ['tainan'])], posts }),
-		).not.toBe(baseKey);
-		expect(
-			generateCacheKey({ regions, locations, posts: [makePost('post-taipei', ['taiwan'])] }),
-		).not.toBe(baseKey);
-	});
-});
-
-describe('computed data cache round-trip', () => {
-	test('extract then apply reproduces the computed fields on fresh entries', () => {
-		const regions = makeRegionsFixture();
-		const regionsTree = createRegionsTree(regions);
-		const locations = [makeLocation('temple', ['taipei'])];
-		const posts = [makePost('post-taipei', ['taipei'])];
-
-		populateRegionsHierarchy(regions, regionsTree);
-		populateRegionsLangCode(regions);
-		populateRegionsContent({ entries: regions, locations, posts, regionsTree });
-
-		const freshRegions = makeRegionsFixture();
-
-		applyComputedDataCache(freshRegions, extractComputedData(regions));
-
-		for (const [index, entry] of regions.entries()) {
-			expect(freshRegions[index]!.data).toEqual(entry.data);
-		}
 	});
 });

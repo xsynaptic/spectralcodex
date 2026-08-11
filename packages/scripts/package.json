@@ -46,6 +46,8 @@
 		"flatgeobuf": "^4.4.0",
 		"geokdbush": "^2.1.0",
 		"kdbush": "^4.1.0",
+		"keyv": "^5.6.0",
+		"keyv-file": "^5.3.5",
 		"p-limit": "^7.3.1",
 		"remeda": "^2.38.0",
 		"satori": "^0.29.0",

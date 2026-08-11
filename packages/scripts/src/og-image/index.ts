@@ -1,7 +1,6 @@
 #!/usr/bin/env tsx
 import type { CacheStore, FontsourceConfig } from '@xsynaptic/og-image-generator';
 
-import { getFileCacheInstance } from '@spectralcodex/shared/cache/file';
 import {
 	OPEN_GRAPH_CACHE_NAMESPACE,
 	OPEN_GRAPH_IMAGE_FORMAT,
@@ -17,6 +16,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
+import { getFileCacheInstance } from '../shared/cache-file.js';
 import { DATA_STORE_PATH } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { getBuiltEntries } from './content.js';

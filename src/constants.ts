@@ -4,6 +4,9 @@ export const CONTENT_COLLECTIONS_PATH = './packages/content/collections';
 // An arbitrary identified for the "more" excerpt, used internally
 export const CONTENT_EXCERPT_IDENTIFIER = '<!-- more -->';
 
+// Hashes that surface in endpoint URLs and rendered markup are truncated to this length
+export const HASH_SHORT_LENGTH = 12;
+
 export const IMAGE_LQ_QUALITY = 70 as const;
 export const IMAGE_HERO_QUALITY = 70 as const;
 export const IMAGE_HQ_QUALITY = 85 as const;

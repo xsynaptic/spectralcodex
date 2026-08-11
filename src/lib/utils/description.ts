@@ -1,10 +1,10 @@
-import { hashShort } from '@spectralcodex/shared/cache';
-import { getSqliteCacheInstance } from '@spectralcodex/shared/cache/sqlite';
 import { sanitizeHtml, stripTags } from '@xsynaptic/unified-tools';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import { hash } from 'ohash';
 import * as R from 'remeda';
 
-import { MDX_COMPONENTS } from '#constants.ts';
+import { HASH_SHORT_LENGTH, MDX_COMPONENTS } from '#constants.ts';
+import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
@@ -66,9 +66,10 @@ export async function getDescriptionRendered(entry: {
 
 	// Key by entry ID so edits overwrite the old row; the hash validates cached content
 	// MDX component names participate so render-affecting code changes self-invalidate
-	const sourceHash = hashShort({
-		data: { source, mdxComponents: MDX_COMPONENTS, version: 3 },
-	});
+	const sourceHash = hash({ source, mdxComponents: MDX_COMPONENTS, version: 3 }).slice(
+		0,
+		HASH_SHORT_LENGTH,
+	);
 
 	const cached = await cacheInstance.get<DescriptionCached>(entry.id);
 

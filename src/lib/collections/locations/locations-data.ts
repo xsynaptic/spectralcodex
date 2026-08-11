@@ -1,9 +1,9 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { hashShort } from '@spectralcodex/shared/cache';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
+import { hash } from 'ohash';
 
-import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
+import { HASH_SHORT_LENGTH, IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
 	createGenerateLocationPostDataFunction,
@@ -75,14 +75,12 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 }
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	const locationMapDataHash = hashShort({
-		data: {
-			id: entry.id,
-			title: entry.data.title,
-			description: getDescription(entry),
-			links: entry.data.links,
-		},
-	});
+	const locationMapDataHash = hash({
+		id: entry.id,
+		title: entry.data.title,
+		description: getDescription(entry),
+		links: entry.data.links,
+	}).slice(0, HASH_SHORT_LENGTH);
 
 	entry.data._uuid = locationMapDataHash;
 	entry.data._url = getContentUrl('locations', getPublicId(entry));

@@ -4,8 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
 
-import { getSqliteCacheInstance } from './sqlite';
-import { createSqliteStore } from './sqlite-store';
+import { createSqliteStore, getSqliteCacheInstance } from '#lib/utils/cache.ts';
 
 function getTempDbPath(name: string) {
 	return path.join(mkdtempSync(path.join(tmpdir(), 'sqlite-store-')), `${name}.sqlite`);

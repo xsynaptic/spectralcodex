@@ -1,7 +1,8 @@
 ---
-import { hashShort } from '@spectralcodex/shared/cache';
 import { stripTags } from '@xsynaptic/unified-tools';
+import { hash } from 'ohash';
 
+import { HASH_SHORT_LENGTH } from '#constants.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 const content = await renderSlot(Astro.slots, 'default');
@@ -12,7 +13,7 @@ const { isFeed } = Astro.locals;
 
 const decoyInterval = 5;
 const decoyLength = 3;
-const hashString = hashShort({ data: email });
+const hashString = hash(email).slice(0, HASH_SHORT_LENGTH);
 
 /**
  * Obfuscate email addresses using CSS display none prop and hashed characters (deterministic)
