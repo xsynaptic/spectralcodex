@@ -15,7 +15,7 @@ import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import {
 	DateRecordedSchema,
-	DateStringSchema,
+	DateSchema,
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/index.ts';
@@ -45,8 +45,8 @@ export const locations = defineCollection({
 			...createMultilingualSchemas('address'),
 			precision: NumericScaleSchema,
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
-			dateCreated: DateStringSchema,
-			dateUpdated: DateStringSchema.optional(),
+			dateCreated: DateSchema,
+			dateUpdated: DateSchema.optional(),
 			dateRecorded: DateRecordedSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			rating: NumericScaleSchema,

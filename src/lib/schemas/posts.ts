@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateRecordedSchema,
-	DateStringSchema,
+	DateSchema,
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/index.ts';
@@ -22,8 +22,8 @@ export const postSchema = z
 		themes: reference('themes').array().optional(),
 		links: LinkSchema.array().optional(),
 		sources: SourceSchema.array().optional(),
-		dateCreated: DateStringSchema,
-		dateUpdated: DateStringSchema.optional(),
+		dateCreated: DateSchema,
+		dateUpdated: DateSchema.optional(),
 		dateRecorded: DateRecordedSchema.optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
 		hideSearch: z.boolean().optional(),

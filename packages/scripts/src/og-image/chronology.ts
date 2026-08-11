@@ -44,15 +44,7 @@ interface ChronologyImageCandidate {
 }
 
 function parseChronologyDate(value: unknown): Date | undefined {
-	if (value instanceof Date) return value;
-
-	if (typeof value === 'string') {
-		const date = new Date(value);
-
-		return Number.isNaN(date.getTime()) ? undefined : date;
-	}
-
-	return undefined;
+	return value instanceof Date ? value : undefined;
 }
 
 // dateRecorded entries are ContentDate objects or [start, end] tuples; pull the date from each

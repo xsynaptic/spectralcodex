@@ -6,12 +6,6 @@ export const DatePresetEnum = {
 
 export type DatePreset = (typeof DatePresetEnum)[keyof typeof DatePresetEnum];
 
-export function parseContentDate(date: string | Date | undefined) {
-	if (!date) return;
-	if (date instanceof Date) return date;
-	return new Date(date);
-}
-
 // UTC 'YYYY-MM-DD' key; content dates are UTC instants, so bucket by day in UTC
 export function getDayKey(date: Date): string {
 	const year = String(date.getUTCFullYear()).padStart(4, '0');
@@ -100,8 +94,8 @@ export function getDateDisplay(
 
 interface CollectionEntryWithStandardDates {
 	data: {
-		dateCreated: string | Date;
-		dateUpdated?: string | Date | undefined;
+		dateCreated: Date;
+		dateUpdated?: Date | undefined;
 	};
 }
 
@@ -110,11 +104,8 @@ export function sortByDateReverseChronological(
 	a: CollectionEntryWithStandardDates,
 	b: CollectionEntryWithStandardDates,
 ) {
-	const aDate = parseContentDate(a.data.dateUpdated) ?? parseContentDate(a.data.dateCreated);
-	const bDate = parseContentDate(b.data.dateUpdated) ?? parseContentDate(b.data.dateCreated);
+	const aDate = a.data.dateUpdated ?? a.data.dateCreated;
+	const bDate = b.data.dateUpdated ?? b.data.dateCreated;
 
-	if (aDate && bDate) {
-		return bDate.getTime() - aDate.getTime();
-	}
-	return -1;
+	return bDate.getTime() - aDate.getTime();
 }

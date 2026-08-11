@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import { DateSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const themes = defineCollection({
@@ -19,8 +19,8 @@ export const themes = defineCollection({
 			sources: SourceSchema.array().optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),
-			dateCreated: DateStringSchema,
-			dateUpdated: DateStringSchema.optional(),
+			dateCreated: DateSchema,
+			dateUpdated: DateSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			hideSearch: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,

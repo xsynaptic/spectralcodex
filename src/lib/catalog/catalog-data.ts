@@ -6,7 +6,6 @@ import * as R from 'remeda';
 import type { Catalog } from '#lib/catalog/catalog-factory.ts';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import { SITE_YEAR_FOUNDED } from '#constants.ts';
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { getWordCount } from '#lib/catalog/catalog-word-count.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
@@ -19,7 +18,6 @@ import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
-import { parseContentDate } from '#lib/utils/date.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -118,11 +116,8 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 				wordCount: await getWordCount(entry),
 				linksCount: getLinksCount(entry),
 				backlinks: new Set<string>(), // Populated below
-				dateCreated:
-					parseContentDate(entry.data.dateCreated) ?? new Date(String(SITE_YEAR_FOUNDED)),
-				dateUpdated: parseContentDate(
-					'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,
-				),
+				dateCreated: entry.data.dateCreated,
+				dateUpdated: 'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,
 				dateRecorded:
 					'dateRecorded' in entry.data && entry.data.dateRecorded
 						? entry.data.dateRecorded

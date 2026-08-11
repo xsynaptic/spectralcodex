@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import { DateSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { LinkSchema } from '#lib/schemas/resources.ts';
 
 export const regions = defineCollection({
@@ -23,8 +23,8 @@ export const regions = defineCollection({
 			description: z.string().optional(),
 			parent: z.string().optional(),
 			links: LinkSchema.array().optional(),
-			dateCreated: DateStringSchema,
-			dateUpdated: DateStringSchema.optional(),
+			dateCreated: DateSchema,
+			dateUpdated: DateSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			divisionId: GeometryDivisionIdSchema,
 			divisionSelectionBBox: GeometryBoundingBoxSchema.optional(),

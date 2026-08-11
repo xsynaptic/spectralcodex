@@ -15,7 +15,7 @@ import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
-import { parseContentDate, sortByDateReverseChronological } from '#lib/utils/date.ts';
+import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { stripFootnotes } from '#lib/utils/text.ts';
@@ -74,7 +74,7 @@ const generateFeedItem = async ({
 
 	const description = await getDescriptionRenderedText(entry);
 
-	const pubDate = parseContentDate(entry.data.dateUpdated ?? entry.data.dateCreated);
+	const pubDate = entry.data.dateUpdated ?? entry.data.dateCreated;
 
 	const feedItem = {
 		title: titleMultilingual
@@ -82,9 +82,7 @@ const generateFeedItem = async ({
 			: entry.data.title,
 		link: getContentUrl(entry.collection, getPublicId(entry)),
 		// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
-		pubDate: pubDate
-			? new Date(pubDate.getTime() - SITE_TIMEZONE_OFFSET_HOURS * MILLISECONDS_PER_HOUR)
-			: undefined,
+		pubDate: new Date(pubDate.getTime() - SITE_TIMEZONE_OFFSET_HOURS * MILLISECONDS_PER_HOUR),
 		...(description ? { description } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
@@ -125,7 +123,7 @@ export async function generateFeedItems({
 					items.map((item) => generateFeedItem({ entry: item, excludeFootnotes, debug })),
 				),
 		),
-		R.sort((a, b) => (a.pubDate && b.pubDate ? b.pubDate.getTime() - a.pubDate.getTime() : -1)),
+		R.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),
 		R.take(itemCount),
 	);
 }

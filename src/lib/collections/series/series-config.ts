@@ -7,7 +7,7 @@ import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateRecordedSchema,
-	DateStringSchema,
+	DateSchema,
 	NumericScaleSchema,
 	TitleSchema,
 } from '#lib/schemas/index.ts';
@@ -21,8 +21,8 @@ export const series = defineCollection({
 			description: z.string().optional(),
 			// Strings, not references, because we mix content here (posts and locations)
 			seriesItems: z.string().array().optional(),
-			dateCreated: DateStringSchema,
-			dateUpdated: DateStringSchema.optional(),
+			dateCreated: DateSchema,
+			dateUpdated: DateSchema.optional(),
 			dateRecorded: DateRecordedSchema.optional(),
 			regions: reference('regions').array().optional(),
 			themes: reference('themes').array().optional(),

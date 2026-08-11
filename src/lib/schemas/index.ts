@@ -12,40 +12,13 @@ export const TitleSchema = z
 	})
 	.transform((value) => refineTypography(value).trim());
 
-// Content dates are wall-clock values: `YYYY/MM/DD` with an optional `HH:mm` (24-hour) time
-const contentDateRegex = /^\d{4}\/\d{2}\/\d{2}( \d{2}:\d{2})?$/;
+// YAML parses `YYYY-MM-DD` and `YYYY-MM-DD HH:mm:ss` into UTC dates
+// A time without seconds remains a string and will fail this check
+export const DateSchema = z.date();
 
-function parseContentDateString(value: string, ctx: z.RefinementCtx) {
-	if (!contentDateRegex.test(value)) {
-		ctx.addIssue({
-			code: 'custom',
-			message: `Use YYYY/MM/DD or YYYY/MM/DD HH:mm (24-hour): "${value}"`,
-		});
-		return;
-	}
-
-	const [datePart = '', timePart] = value.split(' ', 2);
-	const date = new Date(`${datePart.replaceAll('/', '-')}T${timePart ?? '00:00'}:00Z`);
-
-	if (Number.isNaN(date.getTime())) {
-		ctx.addIssue({ code: 'custom', message: `Invalid date: "${value}"` });
-		return;
-	}
-
-	return { date, hasTime: timePart !== undefined };
-}
-
-export const DateStringSchema = z.string().transform((value, ctx) => {
-	const result = parseContentDateString(value, ctx);
-	if (!result) return z.NEVER;
-	return result.date;
-});
-
-const DateValueSchema = z.string().transform((value, ctx) => {
-	const result = parseContentDateString(value, ctx);
-	if (!result) return z.NEVER;
-	return result;
-});
+const DateValueSchema = z
+	.date()
+	.transform((date) => ({ date, hasTime: date.getUTCHours() !== 0 || date.getUTCMinutes() !== 0 }));
 
 export const DateRecordedSchema = z
 	.union([DateValueSchema, z.tuple([DateValueSchema, DateValueSchema])])

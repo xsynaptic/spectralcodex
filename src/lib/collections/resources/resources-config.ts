@@ -4,7 +4,7 @@ import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
-import { DateStringSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
+import { DateSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { SourceItemSchema } from '#lib/schemas/resources.ts';
 
 export const resources = defineCollection({
@@ -15,8 +15,8 @@ export const resources = defineCollection({
 		match: z.union([z.string(), z.array(z.string())]).optional(),
 		regions: reference('regions').array().optional(),
 		themes: reference('themes').array().optional(),
-		dateCreated: DateStringSchema.optional(),
-		dateUpdated: DateStringSchema.optional(),
+		dateCreated: DateSchema.optional(),
+		dateUpdated: DateSchema.optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
 		showPage: z.boolean().optional(),
 		entryQuality: NumericScaleSchema,
