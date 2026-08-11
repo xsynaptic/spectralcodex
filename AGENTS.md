@@ -2,6 +2,8 @@
 
 Spectral Codex is a long-form, photo-heavy digital garden: an Astro SSG monorepo (pnpm workspaces) with React and native-web-component islands for maps and search, rendering mixed-script content (Latin, CJK, Vietnamese, Thai). The root is the app (`src/`); `packages/*` hold content, shared utilities, the map island, build integrations, and scripts. Reuse from `src/lib` before adding utilities.
 
+Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, and the 1-5 assessment scales) is defined in `.claude/context.md`. Read it before naming anything or writing user-facing copy.
+
 ## Commands
 
 Scripts live in `package.json`. Only the ones with a catch are worth stating here:
@@ -24,7 +26,3 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 ## Content subrepo
 
 `packages/content` is a separate repository with its own always-on rules covering MDX formatting, frontmatter schemas, and prose style. Read `packages/content/AGENTS.md` before writing or editing anything under that directory. For sustained content work, open `packages/content` as its own project so those rules load automatically.
-
-## Task tracking
-
-Tracked as markdown files under `.claude/`: `tasks/` (active), `tasks-backlog/` (proposals, deferred, superseded), `tasks-completed/` (done, delete anytime). Each file in `tasks/` and `tasks-backlog/` opens with YAML frontmatter: `status` (`proposal` | `accepted` | `deferred` | `superseded`), `created` (ISO date), and optional `area`. Converted plans may also carry `priority` / `effort` / `depends` / `source`. `completed` is implied by the folder. When a task is fully done, move it to `tasks-completed/`.
