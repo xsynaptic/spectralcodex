@@ -3,6 +3,7 @@
  */
 export default {
 	printWidth: 100,
+	proseWrap: 'never',
 	singleQuote: true,
 	useTabs: true,
 	plugins: ['prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
