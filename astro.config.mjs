@@ -149,7 +149,14 @@ export default defineConfig({
 						},
 					],
 				}),
-				imgGroupSatteriPlugin(),
+				imgGroupSatteriPlugin({
+					contexts: {
+						carousel: { disallowedAttributes: ['columns'], minImages: 2 },
+						grid: {},
+					},
+					defaultContext: 'grid',
+					layouts: ['default', 'wide', 'full'],
+				}),
 			],
 			hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlash({ trailingSlash: 'always' })],
 		}),

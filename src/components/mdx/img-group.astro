@@ -1,27 +1,21 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageLayout } from '#lib/image/image-types.ts';
+import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
-import { ImageLayoutEnum } from '#lib/image/image-types.ts';
+import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
-// `layout` and `imageCount` are both injected by the satteri-img-group plugin
+// `context` and `imageCount` are both injected by the satteri-img-group plugin
 interface Props extends HTMLAttributes<'div'> {
 	layout?: ImageLayout;
-	display?: 'grid' | 'carousel';
+	context?: ImageContext;
 	columns?: number | string;
 	imageCount?: number | string;
 }
 
-const {
-	layout,
-	display = 'grid',
-	columns: columnsProp,
-	imageCount: imageCountProp,
-	...props
-} = Astro.props;
+const { layout, context, columns: columnsProp, imageCount: imageCountProp, ...props } = Astro.props;
 
 // This conditional controls whether slot contents are just passed through
 const { isFeed } = Astro.locals;
@@ -31,7 +25,7 @@ const slotContents = await renderSlot(Astro.slots, 'default');
 
 const imageCount = imageCountProp ? Number(imageCountProp) : 0;
 
-const isCarousel = display === 'carousel';
+const isCarousel = context === ImageContextEnum.Carousel;
 
 function getGridColumnCount(itemCount: number) {
 	if (itemCount % 5 === 0) return 5;

@@ -104,8 +104,8 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(astro@7.2.0(@astrojs/markdown-remark@7.2.2(supports-color@10.2.2))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(exiftool-vendored@37.2.0)(sharp@0.35.3(@types/node@25.9.2))(zod@4.4.3)
       '@xsynaptic/eslint-config':
-        specifier: ^6.2.0
-        version: 6.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@typescript-eslint/parser@8.66.0(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: ^6.2.1
+        version: 6.2.1(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@typescript-eslint/parser@8.66.0(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       '@xsynaptic/mdxlint-config':
         specifier: ^1.0.2
         version: 1.0.2(supports-color@10.2.2)
@@ -113,8 +113,8 @@ importers:
         specifier: ^0.1.1
         version: 0.1.1(satteri@0.9.5)
       '@xsynaptic/satteri-img-group':
-        specifier: ^0.2.1
-        version: 0.2.1(satteri@0.9.5)
+        specifier: ^1.0.0
+        version: 1.0.0(satteri@0.9.5)
       '@xsynaptic/satteri-trailing-slash':
         specifier: ^0.1.0
         version: 0.1.0(satteri@0.9.5)
@@ -167,8 +167,8 @@ importers:
         specifier: ^5.6.0
         version: 5.6.0
       knip:
-        specifier: ^6.32.0
-        version: 6.32.0
+        specifier: ^6.32.1
+        version: 6.32.1
       lefthook:
         specifier: ^2.1.10
         version: 2.1.10
@@ -2942,8 +2942,8 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/eslint-config@6.2.0':
-    resolution: {integrity: sha512-xjOZAzhCgAy2oCAdtrIa9wg+CrmzAq2f5ltffVPMlwiuWfuIFiHB1euW6hcfUtaZB1ZrFOA3FwmeT80RR9NBWQ==}
+  '@xsynaptic/eslint-config@6.2.1':
+    resolution: {integrity: sha512-oL2XnrKLYEuL/ldoRtVQuhClqJx/MLnMhxGoNYEaf/SVde2e0sSkAn1etXqQKCq4wCsSKhWeYgkrusk2VxjDFQ==}
 
   '@xsynaptic/mdxlint-config@1.0.2':
     resolution: {integrity: sha512-+PFD5QM1xk/SkP75J+Onb8/tSBDo32OHNdnZyyAk3YplfYsnMk8ZnG/lA/ODs2diVvXY8dCJh6SbS+dOewz53Q==}
@@ -2965,8 +2965,8 @@ packages:
     peerDependencies:
       satteri: ^0.9.0
 
-  '@xsynaptic/satteri-img-group@0.2.1':
-    resolution: {integrity: sha512-LAYNHbyGx7NHybdEarGU0iIfopaAN5GOa8zD41HvWBZfw0bE27IH9HXMxOUV+ok9/d0gYCV+NRw8ABhgOen2uA==}
+  '@xsynaptic/satteri-img-group@1.0.0':
+    resolution: {integrity: sha512-8tp9Sdl0t25KHsKrnaXUNcKqoUQgo/IP3htKrmAdm2wyZ+A/Kucitf06Pu9Jmj+AMB+5yWb4ayTg6H7PFo/crg==}
     peerDependencies:
       satteri: ^0.9.0
 
@@ -4584,8 +4584,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.32.0:
-    resolution: {integrity: sha512-KDX9OmmOFmlvmxTkrx6Z0GHISMut+pXMSKR8eg84bovaxJKx2NdQD4JYCXveSbvieRe107W6vCD2xCpmz0qBYA==}
+  knip@6.32.1:
+    resolution: {integrity: sha512-mIiIHMTJVUgSlz0mxEgPt7wg8DmfbCp1Txqab3WpbMCJF7YHvHtC9jeAHHXfISMl72N8WzhyG71SQlaqCOGZtg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -10303,7 +10303,7 @@ snapshots:
       exiftool-vendored: 37.2.0
       sharp: 0.35.3(@types/node@25.9.2)
 
-  '@xsynaptic/eslint-config@6.2.0(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@typescript-eslint/parser@8.66.0(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@xsynaptic/eslint-config@6.2.1(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@typescript-eslint/parser@8.66.0(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-plugin-eslint-comments': 4.7.2(eslint@10.8.1(jiti@2.7.0)(supports-color@10.2.2))
       '@eslint/config-helpers': 0.7.0
@@ -10354,7 +10354,7 @@ snapshots:
       satteri: 0.9.5
       zod: 4.4.3
 
-  '@xsynaptic/satteri-img-group@0.2.1(satteri@0.9.5)':
+  '@xsynaptic/satteri-img-group@1.0.0(satteri@0.9.5)':
     dependencies:
       satteri: 0.9.5
       zod: 4.4.3
@@ -12259,7 +12259,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.32.0:
+  knip@6.32.1:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.5)
       formatly: 0.3.0
