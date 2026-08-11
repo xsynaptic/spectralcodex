@@ -47,5 +47,5 @@ public/icons/
 packages/content/
 
 # project directives
-.claude
-.impeccable
+.claude/tasks*
+.claude/settings*.json
