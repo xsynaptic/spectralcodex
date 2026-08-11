@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.12.0",
+	"version": "7.13.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" && prettier --check . && eslint && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -96,7 +96,7 @@
 		"eslint": "^10.8.1",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"exiftool-vendored": "^37.1.0",
+		"exiftool-vendored": "^37.2.0",
 		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.9.0",
@@ -116,7 +116,7 @@
 		"sharp": "^0.35.3",
 		"stylelint": "^17.14.1",
 		"tailwindcss": "^4.3.3",
-		"tsx": "^4.23.11",
+		"tsx": "^4.23.12",
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
 		"vite": "^8.2.1",
