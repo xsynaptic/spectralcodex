@@ -6,7 +6,7 @@ This file is a glossary of terms commonly used in this project.
 
 ### Content
 
-**Entry**: A single piece of authored content in a collection, sourced from one Markdown or MDX file. _Avoid_: document, record, node, item (reserve "item" for catalog rows).
+**Entry**: A single piece of authored content in a collection, sourced from one Markdown or MDX file. Images are the exception: they are Entries of the Images collection, but their data is read from embedded metadata rather than an authored file. _Avoid_: document, record, node, item (reserve "item" for catalog rows).
 
 **Collection**: A named set of Entries sharing one schema (e.g. Locations, Posts, Notes, Pages, etc.). _Avoid_: content type, model.
 
@@ -28,17 +28,19 @@ This file is a glossary of terms commonly used in this project.
 
 **Chronology**: The temporal view of the project's own fieldwork and publishing, browsed by year and month. Where Location organizes the work spatially, the Chronology organizes it temporally. A given month may carry authored commentary alongside its computed activity. _Avoid_: archive, archives, timeline, history, feed.
 
-**Catalog**: The unified, cross-collection view of every user-facing Entry reduced to a common shape, used for listing, counting, sorting, and discovery. _Avoid_: index, registry, manifest.
+**Catalog**: The unified, cross-collection view of user-facing Entries reduced to a common shape, used for listing, counting, sorting, and discovery. It covers Locations, Posts, Notes, Pages, Regions, Series, and Themes. Chronology and Images have pages of their own but are not catalogued. Neither are Resources, most of which are never published at all: the bulk of them exist only to name an external work so Entries can refer to it, and only a minority are written up as pages. _Avoid_: index, registry, manifest.
 
-**Backlink**: An inbound reference to an Entry, discovered from links embedded in another Entry's body. _Avoid_: reverse link, mention.
+**Backlink**: An inbound reference to an Entry, discovered from the `<Link id="...">` component in another Entry's body. Ordinary Markdown links in the body do not produce Backlinks; only that component does. _Avoid_: reverse link, mention.
 
 ### Attribution and reference
 
-**Resource**: A citable external work (a webpage, book, chapter, article, or report) that exists as its own Entry and can be drawn on by many other Entries. _Avoid_: reference, citation, bibliography entry.
+Nearly everything an Entry cites is written as either a Link or a Source, and the choice between them turns on the thing referred to, not on the relationship. A webpage that its address fully identifies becomes a Link; anything needing description (a book, a report, a journal article, a database, a work behind a paywall or since gone offline) becomes a Source. The two are listed separately because a column of addresses and a bibliography read differently.
 
-**Source**: A citation attached to an Entry, naming a Resource by identifier or written out inline for a one-off with no Resource of its own. _Avoid_: reference, footnote.
+**Resource**: An external work or site the project draws on, given its own Entry so it can be described once, referred to by many Entries, and gather what has been written from it. Books, reports, articles, databases, websites, and apps all qualify. _Avoid_: reference, citation, bibliography entry.
 
-**Link**: A plain outbound URL attached to an Entry. A Link whose address matches a Resource's URL pattern binds to that Resource automatically, so linking to a known site is also a way of citing it. _Avoid_: external link, url.
+**Source**: A work an Entry drew on that needs describing rather than merely addressing, listed in the Entry's bibliography. It either names a Resource or is written out inline for a one-off that has no Resource of its own. Both carry the same description; the only difference is whether the work earned an Entry of its own. _Avoid_: reference, footnote.
+
+**Link**: A plain outbound URL attached to an Entry, always external and always outbound; contrast Backlink, which is internal and inbound. Most Links are things consulted while writing, cited by address alone. The rest are pure pointers, sending a reader somewhere (a map pin, a photo gallery, an account) rather than recording something read. A Link whose address falls under a Resource's declared addresses binds to that Resource automatically, so linking to a known site is also a way of citing it. _Avoid_: external link, url.
 
 ### Assessment
 
@@ -58,6 +60,8 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Geometry**: The GeoJSON shape describing where a Location is: a point, a set of points, a line, or an area. _Avoid_: coordinates, geodata, position.
 
+**Point**: One entry in a Location's Geometry. A Point carries its own coordinates and may carry its own title, description, Category, Status, Heritage, Precision, and Featured Image, each falling back to the Location's when absent. Most Locations have one; a temple complex or a chain of stations along a rail line has several. _Avoid_: sub-location, sub-geometry, marker, node.
+
 **Division**: An Overture Maps administrative polygon that a Region borrows, both to draw its visible edges and to check that Locations filed under it actually fall inside it. A Region is editorial and holds content; a Division is external, administrative, and holds only a shape. _Avoid_: boundary, border, admin region, region.
 
 **Bounding Box**: The rectangle enclosing a set of features, used to frame a map on load. _Avoid_: viewport, extent, bbox in prose.
@@ -76,11 +80,11 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 ### Maps
 
-**Feature**: One Location as it appears on a map, carrying its Geometry and a trimmed set of display properties. _Avoid_: marker, pin, point, item.
+**Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point, keyed `uuid-N`. _Avoid_: marker, pin, item.
 
-**Map Index**: The single global dataset of every mappable Feature, built once and shared by every map on the site. _Avoid_: catalog (Catalog is content-side), dataset, registry.
+**Map Directory**: The single global dataset of every mappable Feature, built once and shared by every map on the site. One row per Feature, with membership columns a Scope can select on. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
-**Scope**: The rule a given map applies to the Map Index to keep only the Features it should show, expressed as a Region subtree, a Theme, or an explicit list. _Avoid_: filter, query, selection.
+**Scope**: The rule a given map applies to the Map Directory to keep only the Features it should show, expressed as a Region subtree, a Theme, or an explicit list. _Avoid_: filter, query, selection.
 
 **Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
 
@@ -94,7 +98,9 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Image**: A photograph in the media library, described by its own embedded metadata (capture settings, date, and sometimes coordinates) rather than by hand-authored frontmatter. _Avoid_: photo, asset, file, media.
 
-**Featured Image**: The single Image chosen to represent an Entry in listings, social previews, and page headers. _Avoid_: hero, cover, thumbnail, OG image.
+**Featured Image**: An Image chosen to represent an Entry in listings, social previews, and page headers. An Entry may carry several; the first is the most representative and is the one used wherever a single image is needed. _Avoid_: cover, thumbnail, OG image.
+
+**Hero**: The Featured Images promoted to the header display at the top of an Entry's page. Regions, Themes, and Series promote all of their Featured Images; Posts and the other editorial collections opt in per image, in authored order. _Avoid_: banner, splash, masthead.
 
 ### Multilingual
 

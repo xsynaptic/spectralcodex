@@ -158,10 +158,10 @@ export function getMapData({
 		} satisfies MapComponentData;
 	}
 
-	// Big maps fetch the shared index and keep only the rows their scope selects
+	// Big maps fetch the shared directory and keep only the rows their scope selects
 	const apiSourceUrl = getBaseUrl(
 		'api/map',
-		`index.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
+		`directory.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
 	);
 
 	// No membership hint resolves to this map's explicit, order-preserving id list

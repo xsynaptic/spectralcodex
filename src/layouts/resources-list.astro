@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
@@ -51,7 +51,7 @@ const description = t(`collection.resources.description`);
 					<ListColumn>
 						{page.data.map((entry) => (
 							<ListColumnItem>
-								<Link href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Link>
+								<Anchor href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Anchor>
 								{entry.data._locationCount || entry.data._postCount ? (
 									<span
 										class="text-sm text-gray-500"

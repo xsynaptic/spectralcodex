@@ -13,7 +13,7 @@ export function makeCatalogItem(
 		regionPrimaryId: undefined,
 		postCount: undefined,
 		locationCount: undefined,
-		linksCount: undefined,
+		linksExternalCount: undefined,
 		wordCount: undefined,
 		backlinks: new Set<string>(),
 		// Local-time constructor (not an ISO string) so date-bucketing tests stay timezone stable

@@ -20,7 +20,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapLanguages, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
@@ -143,7 +143,7 @@ export async function createQueryLocationsEntryFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 
 	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);

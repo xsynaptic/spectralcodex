@@ -23,7 +23,7 @@ export type MapSourceFeatureCollection = FeatureCollection<
 >;
 
 /**
- * Per-map scope over the shared global index; a big map keeps only the rows its scope selects
+ * Per-map scope over the shared global directory; a big map keeps only the rows its scope selects
  * - region: keep points whose region ordinal falls inside the subtree interval
  * - theme: keep points carrying the theme index
  * - ids: keep the explicit, order-preserving feature-id list
@@ -44,7 +44,7 @@ export interface MapComponentProps extends Partial<
 	imageServerUrl?: string | undefined;
 	sourceData?: Array<MapSourceItemCompressed> | undefined;
 	popupData?: Array<MapPopupItemCompressed> | undefined;
-	// Big maps fetch the shared index and keep only the rows their scope selects
+	// Big maps fetch the shared directory and keep only the rows their scope selects
 	scope?: MapScope | undefined;
 	// Base URL for demand-fetched popup chunks (e.g. `/api/map/`); paired with version
 	apiChunkBaseUrl?: string | undefined;

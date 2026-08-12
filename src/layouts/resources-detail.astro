@@ -11,8 +11,8 @@ import ContentArticle from '#components/content/content-article.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import MainSite from '#components/main/main-site.astro';
+import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import Link from '#components/parts/link.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
@@ -67,7 +67,7 @@ const t = getTranslations();
 				{
 					entry.data.url ? (
 						<DividedItem>
-							<Link href={entry.data.url}>{t('collection.resources.homepage.label')}</Link>
+							<Anchor href={entry.data.url}>{t('collection.resources.homepage.label')}</Anchor>
 						</DividedItem>
 					) : undefined
 				}

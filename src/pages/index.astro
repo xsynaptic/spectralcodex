@@ -1,8 +1,8 @@
 ---
-import IndexLayout from '#layouts/index.astro';
-import { queryIndexData } from '#lib/collections/index/index-utils.ts';
+import HomeLayout from '#layouts/home.astro';
+import { queryHomeData } from '#lib/collections/home/home-utils.ts';
 
-const indexData = await queryIndexData();
+const homeData = await queryHomeData();
 ---
 
-<IndexLayout {...indexData} />
+<HomeLayout {...homeData} />

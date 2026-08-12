@@ -21,7 +21,7 @@ export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionK
 	regionPrimaryId: string | undefined;
 	postCount: number | undefined;
 	locationCount: number | undefined;
-	linksCount: number | undefined;
+	linksExternalCount: number | undefined;
 	wordCount: number | undefined;
 	backlinks: Set<string>;
 	dateCreated: Date;

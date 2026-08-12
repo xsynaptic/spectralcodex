@@ -14,7 +14,7 @@ import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
@@ -101,7 +101,7 @@ export async function createQueryRegionsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 	const { regionsTree } = await getRegionsCollection();
 
 	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {

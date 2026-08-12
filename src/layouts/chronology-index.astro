@@ -6,7 +6,7 @@ import ChronologyNavigation from '#components/chronology/chronology-navigation.a
 import ContentHeader from '#components/content/content-header.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -53,9 +53,9 @@ const title = t('chronology.index.title');
 					<div class="content-column-fill mb-8">
 						<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-								<Link href={getSiteUrl('chronology', year)} linkColor="primary">
+								<Anchor href={getSiteUrl('chronology', year)} linkColor="primary">
 									{year}
-								</Link>
+								</Anchor>
 							</h2>
 							<div class="flex flex-col gap-2">
 								<ChronologyItem

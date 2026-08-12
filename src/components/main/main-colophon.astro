@@ -1,7 +1,7 @@
 ---
+import Anchor from '#components/parts/anchor.astro';
 import DateDisplay from '#components/parts/date-display.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import Link from '#components/parts/link.astro';
 import { SITE_YEAR_FOUNDED } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
@@ -32,22 +32,22 @@ const t = getTranslations();
 				})
 			}
 			{' '}
-			<Link href={siteUrl} linkColor="accent">{t('site.title')}</Link></span
+			<Anchor href={siteUrl} linkColor="accent">{t('site.title')}</Anchor></span
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
 		<span
 			>{t('site.footer.powered.label')}{' '}
-			<Link href="https://astro.build" linkColor="accent">Astro</Link></span
+			<Anchor href="https://astro.build" linkColor="accent">Astro</Anchor></span
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
-		<Link href="https://github.com/xsynaptic/spectralcodex" linkColor="accent"
-			>{t('site.footer.sourceCode.label')}</Link
+		<Anchor href="https://github.com/xsynaptic/spectralcodex" linkColor="accent"
+			>{t('site.footer.sourceCode.label')}</Anchor
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
-		<Link
+		<Anchor
 			class:list={['colophon-rss-link']}
 			href={`${getSiteUrl()}rss.xml`}
 			linkColor="accent"
@@ -67,7 +67,7 @@ const t = getTranslations();
 					></path><title id="colophon-rss-icon">{t('site.footer.feed.label')}</title></svg
 				>
 			</div>
-		</Link>
+		</Anchor>
 	</DividedItem>
 </nav>
 

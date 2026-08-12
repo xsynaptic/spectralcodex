@@ -21,7 +21,7 @@ import MenuFooter from '#components/menu/menu-footer.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
 import ModeManager from '#components/mode-manager/mode-manager.astro';
 import ModeToggle from '#components/mode-manager/mode-toggle.astro';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
 import Search from '#components/search/search.astro';
@@ -151,23 +151,23 @@ const t = getTranslations();
 				{
 					isHomepage ? (
 						<h1 class="flex grow items-center gap-1">
-							<Link
+							<Anchor
 								href={siteUrl}
 								class="text-xl font-semibold md:text-2xl lg:text-3xl"
 								linkColor="primary"
 							>
 								{t('site.title')}
-							</Link>
+							</Anchor>
 						</h1>
 					) : (
 						<div class="flex grow items-center gap-1">
-							<Link
+							<Anchor
 								href={siteUrl}
 								class="text-xl font-semibold md:text-2xl lg:text-3xl"
 								linkColor="primary"
 							>
 								{t('site.title')}
-							</Link>
+							</Anchor>
 						</div>
 					)
 				}

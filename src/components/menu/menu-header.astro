@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
 import { getMenuHeaderItems } from '#components/menu/menu-header.ts';
 import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
@@ -33,14 +33,14 @@ const t = getTranslations();
 						<li class="nav-item">
 							<div class="nav-item-trigger">
 								{item.url ? (
-									<Link
+									<Anchor
 										class:list={triggerClasses}
 										href={item.url}
 										linkColor="accent"
 										{...(item.rel ? { rel: item.rel } : undefined)}
 									>
 										{item.title}
-									</Link>
+									</Anchor>
 								) : undefined}
 								{!item.url && children?.length ? (
 									<button

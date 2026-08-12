@@ -40,10 +40,11 @@ export async function getCatalogStats() {
 		images: {
 			itemCount: formatNumber({ number: images.length }),
 		},
-		links: {
+		linksExternal: {
 			itemCount: formatNumber({
 				number: catalogItems.reduce(
-					(linksCountPrevious, { linksCount }) => linksCountPrevious + (linksCount ?? 0),
+					(linksExternalCountPrevious, { linksExternalCount }) =>
+						linksExternalCountPrevious + (linksExternalCount ?? 0),
 					0,
 				),
 			}),

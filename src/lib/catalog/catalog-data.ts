@@ -36,16 +36,16 @@ async function getRegionPrimaryIdFunction() {
 }
 
 // Content links count
-function getLinksCount(entry: CollectionEntry<CollectionKey>): number {
-	let linksCount = 0;
+function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
+	let linksExternalCount = 0;
 
 	if ('links' in entry.data) {
-		linksCount += entry.data.links?.length ?? 0;
+		linksExternalCount += entry.data.links?.length ?? 0;
 	}
 	if (entry.body) {
-		linksCount += (entry.body.match(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g) ?? []).length;
+		linksExternalCount += (entry.body.match(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g) ?? []).length;
 	}
-	return linksCount;
+	return linksExternalCount;
 }
 
 // Content backlinks; discovered from the <Link id="..."> MDX component in body content
@@ -114,7 +114,7 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 				locationCount: '_locationCount' in entry.data ? entry.data._locationCount : undefined,
 				postCount: '_postCount' in entry.data ? entry.data._postCount : undefined,
 				wordCount: await getWordCount(entry),
-				linksCount: getLinksCount(entry),
+				linksExternalCount: getLinksExternalCount(entry),
 				backlinks: new Set<string>(), // Populated below
 				dateCreated: entry.data.dateCreated,
 				dateUpdated: 'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,

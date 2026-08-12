@@ -13,7 +13,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
 // Filter the catalog for series items by ID
@@ -122,7 +122,7 @@ export async function createQuerySeriesEntryFunction() {
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 
 	const seriesCatalogItems = catalog.resolve(series);
 

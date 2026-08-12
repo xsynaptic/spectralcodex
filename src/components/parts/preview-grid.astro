@@ -5,9 +5,9 @@ import type { PreviewOptions } from '#components/types.ts';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
+import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Grid from '#components/parts/grid.astro';
-import Link from '#components/parts/link.astro';
 import PreviewCard from '#components/parts/preview-card.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { createRegionAncestorsByIdFunction } from '#lib/collections/regions/regions-utils.ts';
@@ -64,9 +64,9 @@ const t = getTranslations();
 							{showCollection ? (
 								<DividedItem>
 									{indexUrl ? (
-										<Link href={indexUrl} class="font-semibold" showDarkMode={false}>
+										<Anchor href={indexUrl} class="font-semibold" showDarkMode={false}>
 											{t(`collection.${item.collection}.labelSingular`)}
-										</Link>
+										</Anchor>
 									) : (
 										<div class="font-semibold">
 											{t(`collection.${item.collection}.labelSingular`)}
@@ -78,9 +78,9 @@ const t = getTranslations();
 								<DividedItem>
 									{regions.map((region) => (
 										<DividedItem dividerContent="chevron">
-											<Link href={getContentUrl('regions', region.id)} showDarkMode={false}>
+											<Anchor href={getContentUrl('regions', region.id)} showDarkMode={false}>
 												{region.data.title}
-											</Link>
+											</Anchor>
 										</DividedItem>
 									))}
 								</DividedItem>

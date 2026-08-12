@@ -8,10 +8,10 @@ import ContentSection from '#components/content/content-section.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
+import Anchor from '#components/parts/anchor.astro';
 import AuthorCard from '#components/parts/author-card.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
-import Link from '#components/parts/link.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
@@ -123,17 +123,17 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			<AuthorCard />
 		</CardFrame>
 		<Prose>
-			<p set:html={renderMarkdownInline(t('index.introduction'))} />
+			<p set:html={renderMarkdownInline(t('home.introduction'))} />
 			<p
 				set:html={renderMarkdownInline(
-					formatStringTemplate(t('index.overview'), {
+					formatStringTemplate(t('home.overview'), {
 						locationsCount: contentStats.locations.itemCount,
 						locationsWithImagesCount: contentStats.locations.withImages,
 						postsCount: contentStats.posts.itemCount,
 						regionsCount: contentStats.regions.itemCount,
 						themesCount: contentStats.themes.itemCount,
 						imagesCount: contentStats.images.itemCount,
-						linksCount: contentStats.links.itemCount,
+						linksExternalCount: contentStats.linksExternal.itemCount,
 						totalWordCount: contentStats.total.wordCount,
 					}),
 				)}
@@ -141,7 +141,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		</Prose>
 	</ContentSection>
 	<ContentSection class="clear-both">
-		<Fragment slot="section-title">{t('index.recent.label')}</Fragment>
+		<Fragment slot="section-title">{t('home.recent.label')}</Fragment>
 		<PreviewGrid
 			items={recentCatalogItems}
 			showDate={true}
@@ -151,11 +151,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title"
-			><Link href={getSiteUrl('themes')} linkColor="primary"
-				>{t('collection.themes.labelPlural')}</Link
+			><Anchor href={getSiteUrl('themes')} linkColor="primary"
+				>{t('collection.themes.labelPlural')}</Anchor
 			></Fragment
 		>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(t('index.themes'))} />
+		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.themes'))} />
 		<PreviewGrid
 			items={themesCatalogItems}
 			showLocations={true}
@@ -165,11 +165,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title"
-			><Link href={getSiteUrl('series')} linkColor="primary"
-				>{t('collection.series.labelPlural')}</Link
+			><Anchor href={getSiteUrl('series')} linkColor="primary"
+				>{t('collection.series.labelPlural')}</Anchor
 			></Fragment
 		>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(t('index.series'))} />
+		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.series'))} />
 		<PreviewGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 </MainSite>

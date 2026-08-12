@@ -10,7 +10,7 @@ import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
@@ -41,7 +41,7 @@ export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 
 	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);

@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import * as R from 'remeda';
 
 import ContentSection from '#components/content/content-section.astro';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import { createResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
@@ -84,9 +84,9 @@ const SourcesFormattingMap = {
 						}
 						Title =
 							'id' in source && 'showPage' in source && source.showPage ? (
-								<Link href={getContentUrl('resources', source.id)}>
+								<Anchor href={getContentUrl('resources', source.id)}>
 									<span class="italic">{source.title}</span>
-								</Link>
+								</Anchor>
 							) : (
 								<span class="italic">{source.title}</span>
 							);
@@ -131,7 +131,7 @@ const SourcesFormattingMap = {
 							chineseFormatting.quoteStart + titleMultilingual.value + chineseFormatting.quoteEnd;
 						TitleMultilingual =
 							'id' in source && 'showPage' in source && source.showPage ? (
-								<Link href={getContentUrl('resources', source.id)}>{titleQuoted}</Link>
+								<Anchor href={getContentUrl('resources', source.id)}>{titleQuoted}</Anchor>
 							) : (
 								<span>{titleQuoted}</span>
 							);
@@ -167,7 +167,7 @@ const SourcesFormattingMap = {
 							japaneseFormatting.quoteStart + titleMultilingual.value + japaneseFormatting.quoteEnd;
 						TitleMultilingual =
 							'id' in source && 'showPage' in source && source.showPage ? (
-								<Link href={getContentUrl('resources', source.id)}>{titleQuoted}</Link>
+								<Anchor href={getContentUrl('resources', source.id)}>{titleQuoted}</Anchor>
 							) : (
 								<span>{titleQuoted}</span>
 							);

@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import type { MenuItem } from '#components/menu/menu-types.ts';
 
 import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
-import Link from '#components/parts/link.astro';
+import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props extends HTMLAttributes<'ul'> {
@@ -63,7 +63,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 				<li class="nav-sub-item">
 					<div class="nav-sub-trigger">
 						{item.url ? (
-							<Link
+							<Anchor
 								class:list={triggerClasses}
 								href={item.url}
 								linkColor="accent"
@@ -71,7 +71,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 							>
 								<Fragment set:html={item.title} />
 								{multilingual}
-							</Link>
+							</Anchor>
 						) : undefined}
 						{!item.url && children?.length ? (
 							<button type="button" class:list={['link link-accent', ...triggerClasses]}>

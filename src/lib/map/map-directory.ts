@@ -20,9 +20,9 @@ import {
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
 
-interface MapIndexData {
+interface MapDirectoryData {
 	// One row per non-hidden feature: standard source shape plus region ordinals, theme indices, chunk key
-	index: Array<MapSourceItem>;
+	directory: Array<MapSourceItem>;
 	// Popup entries grouped by chunk key, each array sorted by id
 	chunks: Map<string, Array<MapPopupItem>>;
 	// Every feature id → its popup chunk key; small inline maps stamp this onto their points
@@ -84,7 +84,7 @@ function getMembershipIndices(
 }
 
 // Memoized so a single build computes the shared artifacts once
-export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
+export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> => {
 	const { entries: locations } = await getLocationsCollection();
 	const { regionsTree } = await getRegionsCollection();
 	const themeIndexById = await getMapThemeIndexById();
@@ -130,7 +130,7 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 	const { chunkKeyById, chunkIds } = assignChunks(chunkInputs);
 
 	// Attach membership columns; omit empty arrays to save bytes
-	const index = sourceData.map((sourceItem) => {
+	const directory = sourceData.map((sourceItem) => {
 		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
@@ -163,5 +163,5 @@ export const getMapIndexData = pMemoize(async (): Promise<MapIndexData> => {
 		);
 	}
 
-	return { index, chunks, chunkKeyById };
+	return { directory, chunks, chunkKeyById };
 });

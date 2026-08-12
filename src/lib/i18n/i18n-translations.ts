@@ -15,11 +15,11 @@ type TranslationsRecord<T extends Record<string, string>> = Partial<
 const translationStrings = {
 	[defaultLanguage]: {
 		// Homepage
-		'index.introduction': `Welcome to **Spectral Codex**, a digital garden, a travel journal, photography portfolio, and geospatial database curated by Alexander Synaptic. This site is completely ad-free and features no sponsored content, though you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex) if you like what you find here. Read a little more [about my background and motivations](/about), or start browsing the collection!`,
-		'index.overview': `Currently this project features {locationsCount} [locations](/locations) ({locationsWithImagesCount} with images), {postsCount} [posts](/posts), {regionsCount} [regions](/regions), {themesCount} [themes](/themes), {imagesCount} images, {linksCount} outbound links, and {totalWordCount} words, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the better and more recent links from around the site to get you started...`,
-		'index.recent.label': 'Recent Updates',
-		'index.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of nearly 1,200 [movie theaters across Taiwan](/themes/taiwan-theaters).`,
-		'index.series': `Complete series of photo essays and field notes from some of the many road trips and bicycle journeys I've undertaken over the years, mostly around Taiwan. If you prefer more of a narrative structure to explore the many places documented on this site you might like to start here.`,
+		'home.introduction': `Welcome to **Spectral Codex**, a digital garden, a travel journal, photography portfolio, and geospatial database curated by Alexander Synaptic. This site is completely ad-free and features no sponsored content, though you're welcome to support my work via [Patreon](https://www.patreon.com/spectralcodex) if you like what you find here. Read a little more [about my background and motivations](/about), or start browsing the collection!`,
+		'home.overview': `Currently this project features {locationsCount} [locations](/locations) ({locationsWithImagesCount} with images), {postsCount} [posts](/posts), {regionsCount} [regions](/regions), {themesCount} [themes](/themes), {imagesCount} images, {linksExternalCount} outbound links, and {totalWordCount} words, mostly covering topics related to [Taiwan](/regions/taiwan). Gathered below are some of the better and more recent links from around the site to get you started...`,
+		'home.recent.label': 'Recent Updates',
+		'home.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of nearly 1,200 [movie theaters across Taiwan](/themes/taiwan-theaters).`,
+		'home.series': `Complete series of photo essays and field notes from some of the many road trips and bicycle journeys I've undertaken over the years, mostly around Taiwan. If you prefer more of a narrative structure to explore the many places documented on this site you might like to start here.`,
 
 		// Images
 		'collection.images.labelSingular': 'Image',
@@ -102,7 +102,7 @@ const translationStrings = {
 		'section.links': 'Links',
 		'section.links.platform.label': '{platform}: {title}',
 		'section.sources': 'Sources',
-		'section.heritage': 'Heritage Status',
+		'section.heritage': 'Heritage Designation',
 		'section.map': 'Map',
 		'section.locationsNearby': 'Nearby Locations',
 		'section.backlinks': 'Connections',

@@ -3,7 +3,7 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 import { encodeMapPopupData, encodeMapSourceData } from '@spectralcodex/map-codec';
 
 import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import {
 	getLocationsFeatureCollection,
 	getLocationsMapPopupData,
@@ -13,10 +13,10 @@ import {
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
-// Shared map delivery: one global point index plus demand-fetched popup chunks
+// Shared map delivery: one global point directory plus demand-fetched popup chunks
 // Objectives keeps a dedicated source/popup pair (includes hidden points, noindex)
 export const getStaticPaths = (async () => {
-	const { index, chunks } = await getMapIndexData();
+	const { directory, chunks } = await getMapDirectoryData();
 	const version = import.meta.env.BUILD_VERSION ?? 'unknown';
 
 	const objectiveLocations = await getObjectiveLocations();
@@ -30,14 +30,14 @@ export const getStaticPaths = (async () => {
 
 	// Exact versioned URLs for the cache warmer to prefetch; not used by the map island
 	const manifestUrls = [
-		`/api/map/index.json?v=${version}`,
+		`/api/map/directory.json?v=${version}`,
 		...[...chunks.keys()].map((chunkKey) => `/api/map/${chunkKey}.json?v=${version}`),
 		`/api/map/objectives/${MapApiDataEnum.Source}?v=${sourceHash}`,
 		`/api/map/objectives/${MapApiDataEnum.Popup}?v=${popupHash}`,
 	];
 
 	return [
-		{ params: { id: 'index.json' }, props: { data: encodeMapSourceData(index) } },
+		{ params: { id: 'directory.json' }, props: { data: encodeMapSourceData(directory) } },
 		...[...chunks].map(([chunkKey, popupItems]) => ({
 			params: { id: `${chunkKey}.json` },
 			props: { data: encodeMapPopupData(popupItems) },

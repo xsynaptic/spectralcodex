@@ -71,7 +71,7 @@ interface LocationsFeatureCollectionOptions {
 	showAllLocations?: boolean | undefined;
 }
 
-// Canonical feature ids for a location; multi-geometry locations expand to one `uuid-N` per sub-geometry
+// Canonical feature ids for a location; multi-point locations expand to one `uuid-N` per point
 export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
 	const uuid = entry.data._uuid ?? entry.id;
 	const geometryArray = Array.isArray(entry.data.geometry)
@@ -131,7 +131,7 @@ export function getLocationsFeatureCollection(
 					? entry.data._wikipediaUrl.replace('https://', '')
 					: undefined;
 
-				// Image thumbnails can be nulled by sub-locations
+				// Image thumbnails can be nulled by individual points
 				const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)
 					._imageThumbnail;
 

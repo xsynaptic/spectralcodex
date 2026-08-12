@@ -10,7 +10,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData } from '#lib/map/map-index.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
 
@@ -127,7 +127,7 @@ export async function createQueryResourcesEntryFunction() {
 	const getPostsByResource = await createPostsByResourceFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);

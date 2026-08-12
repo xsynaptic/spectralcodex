@@ -10,7 +10,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
-import { getMapIndexData, getMapThemeIndexById } from '#lib/map/map-index.ts';
+import { getMapDirectoryData, getMapThemeIndexById } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
@@ -50,7 +50,7 @@ export async function createQueryThemesEntryFunction() {
 	const getPostsByTheme = await createPostsByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapIndexData();
+	const { chunkKeyById } = await getMapDirectoryData();
 	const themeIndexById = await getMapThemeIndexById();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {

@@ -7,7 +7,7 @@ import {
 	sortCatalogByEntryQuality,
 } from '#lib/catalog/catalog-utils.ts';
 
-export async function queryIndexData() {
+export async function queryHomeData() {
 	const catalog = await getCatalog();
 
 	return {
