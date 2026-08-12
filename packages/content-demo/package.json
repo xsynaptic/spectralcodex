@@ -8,13 +8,11 @@
 		"fix": "pnpm -w run fix-content-demo"
 	},
 	"devDependencies": {
-		"@textlint-rule/textlint-rule-pattern": "^2.0.2",
-		"@xsynaptic/mdxlint-config": "^1.0.2",
+		"@xsynaptic/mdxlint-config": "^2.0.0",
+		"@xsynaptic/remark-prose-rules": "^0.1.0",
 		"astro": "^7.2.1",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
-		"remark-smartypants": "^3.0.3",
-		"textlint-plugin-mdx": "^1.1.0",
-		"textlint-rule-diacritics": "^2.1.4"
+		"remark-smartypants": "^3.0.3"
 	}
 }

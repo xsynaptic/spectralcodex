@@ -82,7 +82,7 @@
 		"@xsynaptic/astro-build-logger": "^1.0.0",
 		"@xsynaptic/astro-image-loader": "^1.1.0",
 		"@xsynaptic/eslint-config": "^6.2.1",
-		"@xsynaptic/mdxlint-config": "^1.0.2",
+		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/satteri-auto-import": "^0.1.1",
 		"@xsynaptic/satteri-img-group": "^1.0.0",
 		"@xsynaptic/satteri-trailing-slash": "^0.1.0",

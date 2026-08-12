@@ -20,20 +20,12 @@ export default {
 		'packages/content-demo': {
 			entry: ['.mdxlintrc.mjs'],
 			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
-			ignoreDependencies: [
-				'textlint-plugin-mdx', // referenced in .textlintrc.json
-				'textlint-rule-diacritics',
-				'@textlint-rule/textlint-rule-pattern',
-			],
 		},
 		'packages/content': {
-			entry: ['.mdxlintrc.mjs', 'global.d.ts'],
+			entry: ['global.d.ts'],
 			ignoreBinaries: ['check-content', 'content-schemas', 'fix-content', 'validate-content'],
 			ignoreDependencies: [
-				'textlint-plugin-mdx', // referenced in .textlintrc.json
-				'textlint-rule-diacritics',
-				'textlint-rule-terminology',
-				'@textlint-rule/textlint-rule-pattern',
+				'mdxlint', // Enables knip's MDX plugin here (no `astro` devDep to do it)
 			],
 		},
 		'packages/react-map-component': {
