@@ -19,6 +19,7 @@ import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
 import { checkRegionsParents } from './regions-parent';
+import { checkSourceIds } from './source-ids';
 
 const rootPath = findWorkspaceRoot();
 
@@ -125,6 +126,11 @@ switch (command) {
 		checkLinkIds(allEntries, metadataEntries);
 		break;
 	}
+	// Check for shortform sources that do not name an existing resource
+	case 'source-ids': {
+		checkSourceIds(allEntries, resourceEntries);
+		break;
+	}
 	// Check for shortform links that do not match any resource
 	case 'frontmatter-links': {
 		checkFrontmatterLinks(allEntries, resourceEntries);
@@ -160,6 +166,7 @@ switch (command) {
 			checkContentDates(allEntries),
 			checkMdxComponents(allEntries),
 			checkLinkIds(allEntries, metadataEntries),
+			checkSourceIds(allEntries, resourceEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),
 			checkImageReferences(allEntries, path.join(rootPath, values['media-path'])),
 			checkImageAspectRatios(getDataStoreCollection(collections, ['images']), { showStats: true }),
