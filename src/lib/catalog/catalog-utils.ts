@@ -1,9 +1,12 @@
 import * as R from 'remeda';
 
-import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 // Cap on the shuffled "more from this entry" sample shown on region/theme entry pages
 const RELATED_CATALOG_ITEMS_LIMIT = 25;
+
+// Regions, themes, series, and pages link structurally; only these link editorially
+const EDITORIAL_COLLECTIONS = new Set<CatalogCollectionKey>(['notes', 'locations', 'posts']);
 
 export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
 	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();
@@ -16,6 +19,10 @@ export function sortCatalogByEntryQuality(a: CatalogItem, b: CatalogItem): numbe
 
 export function filterHasFeaturedImage(item: CatalogItem): boolean {
 	return !!item.imageId;
+}
+
+export function filterIsEditorialEntry(item: CatalogItem): boolean {
+	return EDITORIAL_COLLECTIONS.has(item.collection);
 }
 
 /**

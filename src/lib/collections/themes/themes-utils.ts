@@ -96,7 +96,16 @@ export async function createQueryThemesEntryFunction() {
 			R.map((theme) => theme.id),
 		);
 
-		return { catalogItemsFiltered, catalogItems, catalogItemsCount, mapData, relatedThemeIds };
+		const backlinksCount = catalog.backlinksOf(entry.id).length;
+
+		return {
+			catalogItemsFiltered,
+			catalogItems,
+			catalogItemsCount,
+			mapData,
+			relatedThemeIds,
+			backlinksCount,
+		};
 	};
 }
 

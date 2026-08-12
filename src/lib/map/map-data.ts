@@ -185,7 +185,7 @@ export function getMapData({
 	} satisfies MapComponentData;
 }
 
-// Dedicated per-map source/popup endpoints; objectives uses this to keep hidden points off the shared index
+// Dedicated per-map source/popup endpoints; objectives uses this to keep hidden points off the shared directory
 export function getMapDataDedicated({
 	mapId,
 	featureCollection,

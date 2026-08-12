@@ -29,7 +29,7 @@ export async function getObjectiveLocations() {
 export async function getObjectiveMapData() {
 	const objectiveLocations = await getObjectiveLocations();
 
-	// Dedicated source/popup endpoints keep hidden points off the shared index
+	// Dedicated source/popup endpoints keep hidden points off the shared directory
 	return getMapDataDedicated({
 		mapId: 'objectives',
 		featureCollection: getLocationsFeatureCollection(objectiveLocations, {

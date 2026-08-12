@@ -42,7 +42,7 @@ function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureColle
 	};
 }
 
-// Restrict the shared index to this map's rows before any visibility filtering
+// Restrict the shared directory to this map's rows before any visibility filtering
 function isInMapScope(
 	properties: MapSourceItem['properties'],
 	scope: MapScope,

@@ -22,22 +22,29 @@ import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { BACKLINKS_COUNT_DISPLAY_MINIMUM } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'themes'>;
 	mapData: MapComponentData;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
+	backlinksCount: number;
 	relatedThemeIds: Array<string>;
 	page: Page<CatalogItem>;
 }
 
-const { entry, mapData, catalogItems, catalogItemsCount, relatedThemeIds, page } = Astro.props;
+const { entry, mapData, catalogItems, catalogItemsCount, backlinksCount, relatedThemeIds, page } =
+	Astro.props;
+
+const t = getTranslations();
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -86,6 +93,15 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 					<DividedItem>
 						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
+					{
+						backlinksCount >= BACKLINKS_COUNT_DISPLAY_MINIMUM ? (
+							<DividedItem>
+								{formatStringTemplate(t('content.meta.backlinks.label'), {
+									count: formatNumber({ number: backlinksCount }),
+								})}
+							</DividedItem>
+						) : undefined
+					}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

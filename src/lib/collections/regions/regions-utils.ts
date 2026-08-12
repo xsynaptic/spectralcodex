@@ -152,7 +152,16 @@ export async function createQueryRegionsEntryFunction() {
 				: {}),
 		});
 
-		return { catalogItemsFiltered, catalogItems, catalogItemsCount, mapData, regionsOption };
+		const backlinksCount = catalog.backlinksOf(entry.id).length;
+
+		return {
+			catalogItemsFiltered,
+			catalogItems,
+			catalogItemsCount,
+			mapData,
+			regionsOption,
+			backlinksCount,
+		};
 	};
 }
 

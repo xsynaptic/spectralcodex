@@ -14,11 +14,14 @@ export const IMAGE_LQ_FORMAT = 'webp' as const;
 export const IMAGE_HERO_FORMAT = 'webp' as const;
 export const IMAGE_HQ_FORMAT = 'jpg' as const;
 
+// Region and theme subtitles only show a connection count once it means something
+export const BACKLINKS_COUNT_DISPLAY_MINIMUM = 3;
+
 // Max number of locations returned
 export const LOCATIONS_NEARBY_COUNT_LIMIT = 20;
 
-// Maps at or under this many locations inline their points instead of fetching the shared index
-// Counts locations, not features; multi-geometry locations expand to several features
+// Maps at or under this many locations inline their points instead of fetching the shared directory
+// Counts locations, not features; multi-point locations expand to several features
 // Sized so nearby maps (target + up to LOCATIONS_NEARBY_COUNT_LIMIT neighbors) always inline
 export const MAP_SOURCE_INLINE_LIMIT = LOCATIONS_NEARBY_COUNT_LIMIT + 1;
 

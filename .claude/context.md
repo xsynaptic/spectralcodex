@@ -30,7 +30,7 @@ This file is a glossary of terms commonly used in this project.
 
 **Catalog**: The unified, cross-collection view of user-facing Entries reduced to a common shape, used for listing, counting, sorting, and discovery. It covers Locations, Posts, Notes, Pages, Regions, Series, and Themes. Chronology and Images have pages of their own but are not catalogued. Neither are Resources, most of which are never published at all: the bulk of them exist only to name an external work so Entries can refer to it, and only a minority are written up as pages. _Avoid_: index, registry, manifest.
 
-**Backlink**: An inbound reference to an Entry, discovered from the `<Link id="...">` component in another Entry's body. Ordinary Markdown links in the body do not produce Backlinks; only that component does. _Avoid_: reverse link, mention.
+**Backlink**: An inbound reference to an Entry, discovered from the `<Link id="...">` component in another Entry's body. Ordinary Markdown links in the body do not produce Backlinks; only that component does. Shown to readers as "Connections", never as "Backlinks". _Avoid_: reverse link, mention.
 
 ### Attribution and reference
 

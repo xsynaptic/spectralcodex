@@ -91,6 +91,7 @@ const translationStrings = {
 		'content.meta.dateUpdated.label': 'Last updated',
 		'content.meta.locations.label': 'Mapped locations',
 		'content.meta.wordCount.label': 'Word count',
+		'content.meta.backlinks.label': '{count} Connections',
 		'content.meta.imageFeatured.label': 'Photo:',
 		'content.more.label': 'Read more',
 

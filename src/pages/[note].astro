@@ -3,6 +3,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import NotesDetail from '#layouts/notes-detail.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { filterIsEditorialEntry } from '#lib/catalog/catalog-utils.ts';
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 
 export const getStaticPaths = (async () => {
@@ -14,7 +15,7 @@ export const getStaticPaths = (async () => {
 		params: { note: entry.id },
 		props: {
 			entry,
-			backlinks: catalog.backlinksOf(entry.id),
+			backlinks: catalog.backlinksOf(entry.id).filter(filterIsEditorialEntry),
 		},
 	}));
 }) satisfies GetStaticPaths;

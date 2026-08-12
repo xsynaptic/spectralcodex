@@ -4,7 +4,11 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
-import { sortCatalogByDate, sortCatalogByEntryQuality } from '#lib/catalog/catalog-utils.ts';
+import {
+	filterIsEditorialEntry,
+	sortCatalogByDate,
+	sortCatalogByEntryQuality,
+} from '#lib/catalog/catalog-utils.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
@@ -116,12 +120,22 @@ describe('backlinksOf', () => {
 			collection: 'notes',
 			dateCreated: new Date('2024-01-01'),
 		}),
-		// Regions are not a linkable backlink collection, so this one is filtered out
 		makeCatalogItem({ id: 'linker-region', collection: 'regions' }),
 	]);
 
-	test('returns backlinks from linkable collections, newest first', () => {
-		expect(ids(catalog.backlinksOf('target'))).toEqual(['linker-note', 'linker-post']);
+	test('returns every inbound link, uncapped and unfiltered, newest first', () => {
+		expect(ids(catalog.backlinksOf('target'))).toEqual([
+			'linker-note',
+			'linker-post',
+			'linker-region',
+		]);
+	});
+
+	test('leaves narrowing to the caller', () => {
+		expect(ids(catalog.backlinksOf('target').filter(filterIsEditorialEntry))).toEqual([
+			'linker-note',
+			'linker-post',
+		]);
 	});
 
 	test('returns an empty array for an unknown or backlink-free id', () => {
