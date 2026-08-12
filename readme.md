@@ -11,7 +11,7 @@ This repository contains the working Astro project used to generate the [Spectra
 - Comprehensive validation: frontmatter checks, cross-reference verification, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference and aspect ratio validation
 - Automated excerpt generation for previews and listings
 - Metadata index with automatic backlinks discovery from internal links
-- Content linting and formatting via [mdxlint](https://github.com/nicholasgasior/mdxlint) and textlint with remark plugins
+- Content linting and formatting via [mdxlint](https://github.com/remcohaszing/mdxlint) with remark plugins
 - Automatic redirect generation from `formerIds` frontmatter into Caddy config
 - Media orphan detection for unreferenced images
 - Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling

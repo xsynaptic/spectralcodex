@@ -246,8 +246,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(supports-color@10.2.2)
       '@xsynaptic/remark-prose-rules':
-        specifier: ^0.1.0
-        version: 0.1.0(unified@11.0.5)
+        specifier: ^0.3.0
+        version: 0.3.0(unified@11.0.5)
       mdxlint:
         specifier: ^1.0.0
         version: 1.0.0(supports-color@10.2.2)
@@ -267,8 +267,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(supports-color@10.2.2)
       '@xsynaptic/remark-prose-rules':
-        specifier: ^0.1.0
-        version: 0.1.0(unified@11.0.5)
+        specifier: ^0.3.0
+        version: 0.3.0(unified@11.0.5)
       astro:
         specifier: ^7.2.1
         version: 7.2.1(@astrojs/markdown-remark@7.2.2(supports-color@10.2.2))(@emnapi/core@2.0.0-alpha.3)(@emnapi/runtime@2.0.0-alpha.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
@@ -2866,8 +2866,8 @@ packages:
     peerDependencies:
       unified: ^11.0.0
 
-  '@xsynaptic/remark-prose-rules@0.1.0':
-    resolution: {integrity: sha512-dJH8tmDptH9fCZ9OuY8KnHx6JwL5WXVrgxf3hgzDedGqXGFEDJgL/gaBoZ6UEaBz4wd/cyphXIC0b/KuWFpr0w==}
+  '@xsynaptic/remark-prose-rules@0.3.0':
+    resolution: {integrity: sha512-3srwpaWlYnUbPIHXGg0dHFTRZoFBMyu58Ss4eowgGSnPx8PPVS1KuGj3Gyh01Byd4T1kg0dyv1ZJBtIQTyo0jA==}
     peerDependencies:
       unified: ^11.0.0
 
@@ -4715,9 +4715,6 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
-
-  match-casing@2.0.1:
-    resolution: {integrity: sha512-LeCq9FI5u4nppJnt4hklxcchkH9qH9+uFjX17f74a99lLkRXfVE49iL0hCtM5DZolps483viAy5zjvlTz/JNoA==}
 
   matcher@3.0.0:
     resolution: {integrity: sha512-OkeDaAZ/bQCxeFAozM55PKcKU0yJMPGifLwV4Qgjitu+5MoAfSQN4lsLJeXZ1b8w0x+/Emda6MZgXS1jvsapng==}
@@ -9853,13 +9850,13 @@ snapshots:
       unified: 11.0.5
       unist-util-visit-parents: 6.0.2
 
-  '@xsynaptic/remark-prose-rules@0.1.0(unified@11.0.5)':
+  '@xsynaptic/remark-prose-rules@0.3.0(unified@11.0.5)':
     dependencies:
       '@types/mdast': 4.0.4
-      match-casing: 2.0.1
       unified: 11.0.5
       unist-util-visit-parents: 6.0.2
       vfile-location: 5.0.3
+      yaml: 2.9.0
       zod: 4.4.3
 
   '@xsynaptic/satteri-auto-import@0.1.1(satteri@0.9.5)':
@@ -11971,8 +11968,6 @@ snapshots:
   markdown-extensions@2.0.0: {}
 
   markdown-table@3.0.4: {}
-
-  match-casing@2.0.1: {}
 
   matcher@3.0.0:
     dependencies:

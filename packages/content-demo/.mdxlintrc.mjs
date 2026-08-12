@@ -1,5 +1,5 @@
 import base from '@xsynaptic/mdxlint-config';
-import { remarkProseRules } from '@xsynaptic/remark-prose-rules';
+import { diacriticsWords, remarkProseRules } from '@xsynaptic/remark-prose-rules';
 
 const numberRange = {
 	message: 'Use `--` (renders en-dash) for number ranges instead of a hyphen',
@@ -7,7 +7,16 @@ const numberRange = {
 	replace: '$1--$2',
 };
 
+const prose = { words: true };
+
 export default {
 	...base,
-	plugins: [...base.plugins, remarkProseRules({ patterns: [numberRange] })],
+	plugins: [
+		...base.plugins,
+		remarkProseRules({
+			frontmatter: { description: prose, title: prose },
+			patterns: [numberRange],
+			words: diacriticsWords,
+		}),
+	],
 };
