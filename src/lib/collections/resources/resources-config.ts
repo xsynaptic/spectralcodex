@@ -15,7 +15,7 @@ export const resources = defineCollection({
 		match: z.union([z.string(), z.array(z.string())]).optional(),
 		regions: reference('regions').array().optional(),
 		themes: reference('themes').array().optional(),
-		dateCreated: DateSchema.optional(),
+		dateCreated: DateSchema,
 		dateUpdated: DateSchema.optional(),
 		imageFeatured: ImageFeaturedSchema.optional(),
 		showPage: z.boolean().optional(),
