@@ -5,11 +5,11 @@ import { z } from 'zod';
 
 import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
 import { DateSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
-import { SourceItemSchema } from '#lib/schemas/resources.ts';
+import { ResourceSchema } from '#lib/schemas/resources.ts';
 
 export const resources = defineCollection({
 	loader: glob({ pattern: '**/*.mdx', base: `${CONTENT_COLLECTIONS_PATH}/resources` }),
-	schema: SourceItemSchema.extend({
+	schema: ResourceSchema.extend({
 		title: TitleSchema,
 		subtitle: z.string().optional(), // TODO: note that this is currently unused
 		match: z.union([z.string(), z.array(z.string())]).optional(),

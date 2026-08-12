@@ -37,18 +37,21 @@ const publishedContainerMultilingualSchema = createMultilingualSchemas('publishe
 
 const publishedDetailsMultilingualSchema = createMultilingualSchemas('publishedDetails');
 
-const SourceAuthorSchema = z.object({
+const ResourceAuthorSchema = z.object({
 	name: z.string(),
 	...nameMultilingualSchema,
 });
 
-export const SourceItemSchema = z.object({
+// The shared entity shape: an external work, whether it has an Entry of its own or is written inline
+export const ResourceSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
 	description: z.string().optional(),
 	url: z.url().optional(),
-	resourceType: z.enum(['webpage', 'book', 'chapter', 'article', 'report']),
-	authors: SourceAuthorSchema.array().optional(),
+	// Bibliographic kind; a subset of CSL 1.0.2 item types, so citation formatting can defer to CSL
+	// Anything on the web is a `webpage` at whatever granularity; its venue belongs in publishedContainer
+	resourceType: z.enum(['webpage', 'book', 'chapter', 'article', 'report', 'dataset', 'software']),
+	authors: ResourceAuthorSchema.array().optional(),
 	publisher: z.string().optional(),
 	...publisherMultilingualSchema,
 	publishedContainer: z.string().optional(),
@@ -59,5 +62,5 @@ export const SourceItemSchema = z.object({
 	links: LinkSchema.array().optional(),
 });
 
-// Sources schema; individual or predefined sources both work with this schema
-export const SourceSchema = z.union([SourceItemSchema, z.string()]);
+// The citation relation: either the ID of a Resource entry, or a Resource written out inline
+export const SourceSchema = z.union([ResourceSchema, z.string()]);
