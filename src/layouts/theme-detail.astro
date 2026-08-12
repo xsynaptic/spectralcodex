@@ -62,6 +62,8 @@ const imageFeaturedGroup = getImageFeaturedGroup({
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+const entryCount = entry.data._entryCount ?? 0;
 ---
 
 <MainSite
@@ -93,6 +95,15 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 					<DividedItem>
 						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
+					{
+						entryCount > 0 ? (
+							<DividedItem>
+								{formatStringTemplate(t('content.meta.entries.label'), {
+									count: formatNumber({ number: entryCount }),
+								})}
+							</DividedItem>
+						) : undefined
+					}
 					{
 						backlinksCount >= BACKLINKS_COUNT_DISPLAY_MINIMUM ? (
 							<DividedItem>

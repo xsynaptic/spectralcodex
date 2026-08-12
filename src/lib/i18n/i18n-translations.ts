@@ -74,7 +74,7 @@ const translationStrings = {
 			'Featured websites, blogs, and online resources that have informed or documented content on this site. Some entries also include maps generated from content cross-referenced in this project.',
 		'collection.resources.homepage.label': 'Visit Homepage',
 		'collection.resources.showPage.label': 'Resource Index',
-		'collection.resources.contentCount.label': 'Content Count',
+		'collection.resources.entryCount.label': 'Entry Count',
 
 		// Series
 		'collection.series.labelSingular': 'Series',
@@ -91,7 +91,8 @@ const translationStrings = {
 		'content.meta.dateUpdated.label': 'Last updated',
 		'content.meta.locations.label': 'Mapped locations',
 		'content.meta.wordCount.label': 'Word count',
-		'content.meta.backlinks.label': '{count} Connections',
+		'content.meta.entries.label': '{count} Entries',
+		'content.meta.backlinks.label': '{count} Backlinks',
 		'content.meta.imageFeatured.label': 'Photo:',
 		'content.more.label': 'Read more',
 
@@ -106,7 +107,7 @@ const translationStrings = {
 		'section.heritage': 'Heritage Designation',
 		'section.map': 'Map',
 		'section.locationsNearby': 'Nearby Locations',
-		'section.backlinks': 'Connections',
+		'section.backlinks': 'Backlinks',
 		'section.similar': 'Similar Content',
 		'section.dateRecorded': 'Recorded On',
 		'section.webmentions': 'Webmentions',

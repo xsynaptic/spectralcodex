@@ -11,7 +11,7 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { sortByContentCount } from '#lib/utils/collections.ts';
+import { sortByEntryCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 // Increase this to 3 to show subregions in the header menu
@@ -37,19 +37,19 @@ function getMenuItemData({
 	};
 }
 
-function filterMenuItemContentCount(depth: 1 | 2 | 3) {
-	let minContentCount: number;
+function filterMenuItemEntryCount(depth: 1 | 2 | 3) {
+	let minEntryCount: number;
 
 	if (depth === 1) {
-		minContentCount = 5;
+		minEntryCount = 5;
 	} else if (depth === 2) {
-		minContentCount = 2;
+		minEntryCount = 2;
 	} else {
-		minContentCount = 8;
+		minEntryCount = 8;
 	}
 
 	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
-		(entry.data._postCount ?? 0) + (entry.data._locationCount ?? 0) >= minContentCount;
+		(entry.data._entryCount ?? 0) >= minEntryCount;
 }
 
 async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
@@ -61,24 +61,24 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
-		.filter(filterMenuItemContentCount(1))
-		.sort(sortByContentCount)
+		.filter(filterMenuItemEntryCount(1))
+		.sort(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => ({
 			...getMenuItemData({ entry, collection: 'regions' }),
 			...(entry.data._children && maxDepth > 1
 				? {
 						children: getRegionsByIds(entry.data._children)
-							.filter(filterMenuItemContentCount(2))
-							.sort(sortByContentCount)
+							.filter(filterMenuItemEntryCount(2))
+							.sort(sortByEntryCount)
 							.slice(0, 15)
 							.map((entry) => ({
 								...getMenuItemData({ entry, collection: 'regions' }),
 								...(entry.data._children && maxDepth > 2
 									? {
 											children: getRegionsByIds(entry.data._children)
-												.filter(filterMenuItemContentCount(3))
-												.sort(sortByContentCount)
+												.filter(filterMenuItemEntryCount(3))
+												.sort(sortByEntryCount)
 												.slice(0, 8)
 												.map((entry) => getMenuItemData({ entry, collection: 'regions' })),
 										}
@@ -90,15 +90,15 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const seriesMenu = series
 		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterMenuItemContentCount(1))
-		.sort(sortByContentCount)
+		.filter(filterMenuItemEntryCount(1))
+		.sort(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, collection: 'series' }));
 
 	const themesMenu = themes
 		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterMenuItemContentCount(1))
-		.sort(sortByContentCount)
+		.filter(filterMenuItemEntryCount(1))
+		.sort(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => getMenuItemData({ entry, collection: 'themes' }));
 

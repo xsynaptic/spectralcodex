@@ -8,7 +8,7 @@ import { MicroformatClassNames } from '#components/types.ts';
 import { createThemesByIdsFunction } from '#lib/collections/themes/themes-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { sortByContentCount } from '#lib/utils/collections.ts';
+import { sortByEntryCount } from '#lib/utils/collections.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
@@ -19,7 +19,7 @@ const { themeIds, ...props } = Astro.props;
 
 const getThemesByIds = await createThemesByIdsFunction();
 
-const themes = themeIds ? getThemesByIds(themeIds).sort(sortByContentCount) : undefined;
+const themes = themeIds ? getThemesByIds(themeIds).sort(sortByEntryCount) : undefined;
 
 const t = getTranslations();
 ---

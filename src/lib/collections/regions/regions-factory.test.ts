@@ -40,6 +40,19 @@ function makePost(id: string, regionIds?: Array<string>): CollectionEntry<'posts
 	} as unknown as CollectionEntry<'posts'>;
 }
 
+function makeNote(id: string, regionIds?: Array<string>): CollectionEntry<'notes'> {
+	return {
+		id,
+		collection: 'notes',
+		data: {
+			title: id,
+			...(regionIds === undefined
+				? {}
+				: { regions: regionIds.map((regionId) => ({ id: regionId })) }),
+		},
+	} as unknown as CollectionEntry<'notes'>;
+}
+
 // taiwan > north-taiwan > (keelung, taipei); tainan directly under taiwan
 function makeRegionsFixture() {
 	return [
@@ -112,7 +125,7 @@ describe('populateRegionsLangCode', () => {
 });
 
 describe('populateRegionsContent', () => {
-	test('rolls up locations and posts through descendants with dedup', () => {
+	test('rolls up locations, posts, and notes through descendants with dedup', () => {
 		const regions = makeRegionsFixture();
 		const regionsTree = createRegionsTree(regions);
 		const locations = [
@@ -120,8 +133,9 @@ describe('populateRegionsContent', () => {
 			makeLocation('fort', ['taipei']),
 		];
 		const posts = [makePost('post-taipei', ['taipei']), makePost('post-taiwan', ['taiwan'])];
+		const notes = [makeNote('note-tainan', ['tainan'])];
 
-		populateRegionsContent({ entries: regions, locations, posts, regionsTree });
+		populateRegionsContent({ entries: regions, locations, posts, notes, regionsTree });
 
 		const taiwan = regions.find((entry) => entry.id === 'taiwan')!;
 		const taipei = regions.find((entry) => entry.id === 'taipei')!;
@@ -138,5 +152,28 @@ describe('populateRegionsContent', () => {
 		expect(taipei.data._posts).toEqual(['post-taipei']);
 		expect(tainan.data._posts).toEqual([]);
 		expect(tainan.data._postCount).toBe(0);
+
+		expect(taiwan.data._notes).toEqual(['note-tainan']);
+		expect(taipei.data._notes).toEqual([]);
+		expect(tainan.data._noteCount).toBe(1);
+	});
+
+	test('_entryCount totals every gathered collection', () => {
+		const regions = makeRegionsFixture();
+		const regionsTree = createRegionsTree(regions);
+
+		populateRegionsContent({
+			entries: regions,
+			locations: [makeLocation('temple', ['taipei'])],
+			posts: [makePost('post-taipei', ['taipei'])],
+			notes: [makeNote('note-taipei', ['taipei'])],
+			regionsTree,
+		});
+
+		const taiwan = regions.find((entry) => entry.id === 'taiwan')!;
+		const tainan = regions.find((entry) => entry.id === 'tainan')!;
+
+		expect(taiwan.data._entryCount).toBe(3);
+		expect(tainan.data._entryCount).toBe(0);
 	});
 });

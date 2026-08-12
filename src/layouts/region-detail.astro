@@ -61,6 +61,8 @@ const imageFeaturedGroup = getImageFeaturedGroup({
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+
+const entryCount = entry.data._entryCount ?? 0;
 ---
 
 <MainSite
@@ -97,6 +99,15 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 						entry.data.parent ? (
 							<DividedItem>
 								<RegionsBreadcrumbs entry={entry} />
+							</DividedItem>
+						) : undefined
+					}
+					{
+						entryCount > 0 ? (
+							<DividedItem>
+								{formatStringTemplate(t('content.meta.entries.label'), {
+									count: formatNumber({ number: entryCount }),
+								})}
 							</DividedItem>
 						) : undefined
 					}

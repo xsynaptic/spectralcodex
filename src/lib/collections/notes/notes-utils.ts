@@ -5,9 +5,12 @@ import * as R from 'remeda';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
+import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
+
+export const createNotesByIdsFunction = createCollectionLookupByIds('Notes', getNotesCollection);
 
 export async function getNoteSchema(
 	entry: CollectionEntry<'notes'>,

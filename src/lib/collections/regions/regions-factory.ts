@@ -78,18 +78,46 @@ export function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'
 	}
 }
 
+// Notes share the post schema, so they declare regions the same way posts do
+function mapReferencesByRegion(
+	entries: Array<CollectionEntry<'notes' | 'posts'>>,
+): Map<string, Array<string>> {
+	const map = new Map<string, Array<string>>();
+
+	for (const entry of entries) {
+		if (entry.data.regions) {
+			for (const { id: regionId } of entry.data.regions) {
+				if (!map.has(regionId)) {
+					map.set(regionId, []);
+				}
+				map.get(regionId)!.push(entry.id);
+			}
+		}
+	}
+
+	return map;
+}
+
+function collectByRegion(regionIds: Array<string>, map: Map<string, Array<string>>): Array<string> {
+	return [...new Set(regionIds.flatMap((id) => map.get(id)))].filter(
+		(item): item is string => !!item,
+	);
+}
+
 export function populateRegionsContent({
 	entries,
 	locations,
 	posts,
+	notes,
 	regionsTree,
 }: {
 	entries: Array<CollectionEntry<'regions'>>;
 	locations: Array<CollectionEntry<'locations'>>;
 	posts: Array<CollectionEntry<'posts'>>;
+	notes: Array<CollectionEntry<'notes'>>;
 	regionsTree: Hierarchy;
 }) {
-	// Generate locations and posts by region maps; this will make subsequent calculations faster
+	// Generate content by region maps; this will make subsequent calculations faster
 	const locationsByRegionMap = new Map<string, Array<string>>();
 
 	for (const entry of locations) {
@@ -101,30 +129,20 @@ export function populateRegionsContent({
 		}
 	}
 
-	const postsByRegionMap = new Map<string, Array<string>>();
+	const postsByRegionMap = mapReferencesByRegion(posts);
+	const notesByRegionMap = mapReferencesByRegion(notes);
 
-	for (const entry of posts) {
-		if (entry.data.regions) {
-			for (const { id: regionId } of entry.data.regions) {
-				if (!postsByRegionMap.has(regionId)) {
-					postsByRegionMap.set(regionId, []);
-				}
-				postsByRegionMap.get(regionId)!.push(entry.id);
-			}
-		}
-	}
-
-	// Calculate cumulative post and location count
+	// Calculate cumulative content counts, rolled up through descendants
 	for (const entry of entries) {
-		const entries = [entry.id, ...regionsTree.descendantsOf(entry.id)];
+		const regionIds = [entry.id, ...regionsTree.descendantsOf(entry.id)];
 
-		entry.data._locations = [
-			...new Set(entries.flatMap((id) => locationsByRegionMap.get(id))),
-		].filter((item): item is string => !!item);
+		entry.data._locations = collectByRegion(regionIds, locationsByRegionMap);
 		entry.data._locationCount = entry.data._locations.length;
-		entry.data._posts = [...new Set(entries.flatMap((id) => postsByRegionMap.get(id)))].filter(
-			(item): item is string => !!item,
-		);
+		entry.data._posts = collectByRegion(regionIds, postsByRegionMap);
 		entry.data._postCount = entry.data._posts.length;
+		entry.data._notes = collectByRegion(regionIds, notesByRegionMap);
+		entry.data._noteCount = entry.data._notes.length;
+		entry.data._entryCount =
+			entry.data._locationCount + entry.data._postCount + entry.data._noteCount;
 	}
 }

@@ -4,10 +4,10 @@ import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize, { pMemoizeClear } from 'p-memoize';
 
-interface CollectionEntryWithContentCount {
+// Stamped during collection provisioning; each collection decides what belongs to it
+interface CollectionEntryWithEntryCount {
 	data: {
-		_locationCount?: number | undefined;
-		_postCount?: number | undefined;
+		_entryCount?: number | undefined;
 	};
 }
 
@@ -21,22 +21,15 @@ export function getPublicId(entry: { id: string; data: Record<string, unknown> }
 	return override?.id ?? entry.id;
 }
 
-// Sort a collection by post and location count, from most to least
-export function sortByContentCount<T extends CollectionEntryWithContentCount>(
-	entryA: T,
-	entryB: T,
-) {
-	const aTotal = (entryA.data._locationCount ?? 0) + (entryA.data._postCount ?? 0);
-	const bTotal = (entryB.data._locationCount ?? 0) + (entryB.data._postCount ?? 0);
-
-	return bTotal - aTotal;
+// Sort a collection by entry count, from most to least
+export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA: T, entryB: T) {
+	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);
 }
 
-// Filter out terms that do *not* have any associated posts or locations
+// Filter out terms that gather no entries at all
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
-export function filterWithContent<T extends CollectionEntryWithContentCount>(entry: T) {
-	if (entry.data._locationCount && entry.data._locationCount > 0) return true;
-	return Boolean(entry.data._postCount && entry.data._postCount > 0);
+export function filterHasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
+	return (entry.data._entryCount ?? 0) > 0;
 }
 
 // Collection data factory utilities

@@ -12,7 +12,7 @@ import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { filterWithContent, sortByContentCount } from '#lib/utils/collections.ts';
+import { filterHasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 
 // Get locations associated with a resource (via links URL match or sources ID match)
 async function createLocationsByResourceFunction() {
@@ -170,7 +170,7 @@ export async function queryResourcesIndex() {
 	return R.pipe(
 		entries,
 		R.filter((entry) => !!entry.data.showPage),
-		R.filter(filterWithContent),
-		R.sort(sortByContentCount),
+		R.filter(filterHasEntries),
+		R.sort(sortByEntryCount),
 	);
 }

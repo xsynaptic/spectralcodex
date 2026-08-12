@@ -12,7 +12,7 @@ import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
-import { renderMarkdownInline } from '#lib/utils/text.ts';
+import { formatNumber, renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
 	page: Page<CollectionEntry<'resources'>>;
@@ -52,10 +52,10 @@ const description = t(`collection.resources.description`);
 						{page.data.map((entry) => (
 							<ListColumnItem>
 								<Anchor href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Anchor>
-								{entry.data._locationCount || entry.data._postCount ? (
+								{entry.data._entryCount ? (
 									<span
 										class="text-sm text-gray-500"
-										set:html={`(${Number(entry.data._locationCount) + Number(entry.data._postCount)})`}
+										set:html={`(${formatNumber({ number: entry.data._entryCount })})`}
 									/>
 								) : undefined}
 							</ListColumnItem>

@@ -72,10 +72,10 @@ const t = getTranslations();
 					) : undefined
 				}
 				{
-					entry.data._locationCount || entry.data._postCount ? (
+					entry.data._entryCount ? (
 						<DividedItem>
 							<span
-								set:html={`${t('collection.resources.contentCount.label')}: ${formatNumber({ number: Number(entry.data._locationCount) + Number(entry.data._postCount) })}`}
+								set:html={`${t('collection.resources.entryCount.label')}: ${formatNumber({ number: entry.data._entryCount })}`}
 							/>
 						</DividedItem>
 					) : undefined

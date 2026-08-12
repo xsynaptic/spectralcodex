@@ -5,6 +5,7 @@ import * as R from 'remeda';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createNotesByIdsFunction } from '#lib/collections/notes/notes-utils.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
@@ -14,8 +15,8 @@ import { getMapDirectoryData, getMapThemeIndexById } from '#lib/map/map-director
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
-	filterWithContent,
-	sortByContentCount,
+	filterHasEntries,
+	sortByEntryCount,
 } from '#lib/utils/collections.ts';
 
 export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
@@ -28,6 +29,17 @@ async function createPostsByThemeFunction() {
 		entry: CollectionEntry<'themes'>,
 	): Array<CollectionEntry<'posts'>> {
 		return getPostsByIds(entry.data._posts ?? []);
+	};
+}
+
+// Get notes that have a term
+async function createNotesByThemeFunction() {
+	const getNotesByIds = await createNotesByIdsFunction();
+
+	return function getNotesByTheme(
+		entry: CollectionEntry<'themes'>,
+	): Array<CollectionEntry<'notes'>> {
+		return getNotesByIds(entry.data._notes ?? []);
 	};
 }
 
@@ -48,6 +60,7 @@ export async function createQueryThemesEntryFunction() {
 
 	const getLocationsByTheme = await createLocationsByThemeFunction();
 	const getPostsByTheme = await createPostsByThemeFunction();
+	const getNotesByTheme = await createNotesByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const { chunkKeyById } = await getMapDirectoryData();
@@ -60,17 +73,23 @@ export async function createQueryThemesEntryFunction() {
 		const locationsListed = locationsFiltered.filter(({ data }) => !data.hideIndex);
 
 		const postsFiltered = getPostsByTheme(entry);
+		const notesFiltered = getNotesByTheme(entry);
 
-		// Catalog items are the posts and locations that are associated with the theme
+		// Catalog items are the posts, notes, and locations that are associated with the theme
 		const featuredCandidates = catalog.resolve([
 			...R.pipe(
 				locationsListed,
 				R.filter((location) => location.data.entryQuality >= 2),
 			),
 			...postsFiltered,
+			...notesFiltered,
 		]);
 
-		const restCandidates = catalog.resolve([...locationsListed, ...postsFiltered]);
+		const restCandidates = catalog.resolve([
+			...locationsListed,
+			...postsFiltered,
+			...notesFiltered,
+		]);
 
 		const { catalogItemsFiltered, catalogItems, catalogItemsCount } = buildEntryCatalogItems(
 			featuredCandidates,
@@ -92,7 +111,7 @@ export async function createQueryThemesEntryFunction() {
 		const relatedThemeIds = R.pipe(
 			themes,
 			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
-			R.sort(sortByContentCount),
+			R.sort(sortByEntryCount),
 			R.map((theme) => theme.id),
 		);
 
@@ -116,10 +135,10 @@ export async function queryThemesIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter(filterWithContent),
+		R.filter(filterHasEntries),
 		// Only display themes with associated images
 		R.filter((entry) => !!entry.data.imageFeatured),
-		R.sort(sortByContentCount),
+		R.sort(sortByEntryCount),
 		catalog.resolve,
 	);
 }
