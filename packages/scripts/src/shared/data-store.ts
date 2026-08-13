@@ -52,6 +52,27 @@ export function getPublicId(entry: DataStoreEntry): string {
 }
 
 /**
+ * Data store references are stored as `{id, collection}`; consumers typically want only the id
+ * Non-reference input yields an empty array, matching how optional reference fields read
+ */
+export function toReferenceIds(value: unknown): Array<string> {
+	if (!Array.isArray(value)) return [];
+
+	const ids: Array<string> = [];
+
+	// Array.isArray narrows unknown to any[], which defeats the checks below
+	for (const item of value as Array<unknown>) {
+		if (item === null || typeof item !== 'object') continue;
+
+		const { id } = item as { id?: unknown };
+
+		if (typeof id === 'string') ids.push(id);
+	}
+
+	return ids;
+}
+
+/**
  * The full data store is a map of collection names to collections (which are maps of entry IDs to entries)
  */
 export type DataStoreCollections = Map<string, Map<string, DataStoreEntry>>;

@@ -5,8 +5,7 @@ import { parseArgs } from 'node:util';
 
 import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
-import { checkContentDates } from './content-dates';
-import { checkDivisionIds } from './divisions';
+import { checkEntryIds } from './entry-ids';
 import { checkFrontmatterLinks } from './frontmatter-links';
 import { checkImageAspectRatios } from './image-aspect-ratios';
 import { checkImageFeaturedInBody } from './image-featured-in-body';
@@ -18,6 +17,7 @@ import { checkLocationsDuplicates } from './locations-duplicates';
 import { checkLocationsOverlap } from './locations-overlap';
 import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
+import { checkReferences } from './references';
 import { checkRegionsParents } from './regions-parent';
 import { checkSourceIds } from './source-ids';
 
@@ -47,7 +47,7 @@ const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];
 
-const allEntries = getDataStoreCollection(collections, [
+const contentCollectionNames = [
 	'chronology',
 	'notes',
 	'locations',
@@ -57,7 +57,9 @@ const allEntries = getDataStoreCollection(collections, [
 	'resources',
 	'series',
 	'themes',
-]);
+];
+
+const allEntries = getDataStoreCollection(collections, contentCollectionNames);
 
 const metadataEntries = getDataStoreCollection(collections, [
 	'notes',
@@ -101,19 +103,19 @@ switch (command) {
 		checkLocationsDuplicates(getDataStoreCollection(collections, ['locations']));
 		break;
 	}
-	// Check for regions without a divisionId
-	case 'divisions': {
-		checkDivisionIds(getDataStoreCollection(collections, ['regions']));
+	// Check that entry IDs are unique across every collection
+	case 'entry-ids': {
+		checkEntryIds(allEntries);
+		break;
+	}
+	// Check that reference fields point at entries that exist
+	case 'references': {
+		checkReferences(collections, contentCollectionNames);
 		break;
 	}
 	// Check for regions whose parent does not reference an existing region
 	case 'region-parents': {
 		checkRegionsParents(getDataStoreCollection(collections, ['regions']));
-		break;
-	}
-	// Check for entry dates in the future
-	case 'content-dates': {
-		checkContentDates(allEntries);
 		break;
 	}
 	// Check for malformed MDX components
@@ -163,7 +165,8 @@ switch (command) {
 
 		// Run all validations for deployment and report all problems at once
 		const syncResults: Array<boolean> = [
-			checkContentDates(allEntries),
+			checkEntryIds(allEntries),
+			checkReferences(collections, contentCollectionNames),
 			checkMdxComponents(allEntries),
 			checkLinkIds(allEntries, metadataEntries),
 			checkSourceIds(allEntries, resourceEntries),
@@ -178,7 +181,6 @@ switch (command) {
 				getDataStoreCollection(collections, ['locations']),
 				Number(values.threshold),
 			),
-			checkDivisionIds(getDataStoreCollection(collections, ['regions'])),
 			checkRegionsParents(getDataStoreCollection(collections, ['regions'])),
 		];
 

@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import type { DataStoreCollections, DataStoreEntry } from './data-store';
 
-import { loadDataStore } from './data-store';
+import { loadDataStore, toReferenceIds } from './data-store';
 
 function makeCollections(): DataStoreCollections {
 	const collections: DataStoreCollections = new Map();
@@ -123,5 +123,28 @@ describe('loadDataStore', () => {
 		expect(() => loadDataStore(path.join(cacheDir, 'data-store.json'))).toThrow(
 			/Data store not found/,
 		);
+	});
+});
+
+describe('toReferenceIds', () => {
+	test('extracts ids from data-store reference objects', () => {
+		const references = [
+			{ id: 'ruins', collection: 'themes' },
+			{ id: 'temples', collection: 'themes' },
+		];
+
+		expect(toReferenceIds(references)).toEqual(['ruins', 'temples']);
+	});
+
+	test('returns an empty array for anything that is not an array', () => {
+		expect(toReferenceIds(undefined)).toEqual([]);
+		expect(toReferenceIds('ruins')).toEqual([]);
+		expect(toReferenceIds({ id: 'ruins' })).toEqual([]);
+	});
+
+	test('drops items without a string id', () => {
+		const references = [{ id: 'ruins' }, { collection: 'themes' }, undefined, 42, { id: 7 }];
+
+		expect(toReferenceIds(references)).toEqual(['ruins']);
 	});
 });

@@ -1,44 +1,10 @@
 import { describe, expect, test } from 'vitest';
 
-import { calculateMetadataBoost, toReferenceIdArray } from './metadata';
+import { calculateMetadataBoost } from './metadata';
 
 function makeEmbedding(themes: Array<string>, regions: Array<string>) {
 	return { metadata: { themes, regions } };
 }
-
-describe('toReferenceIdArray', () => {
-	test('extracts ids from data-store reference objects', () => {
-		const references = [
-			{ id: 'ruins', collection: 'themes' },
-			{ id: 'temples', collection: 'themes' },
-		];
-
-		expect(toReferenceIdArray(references)).toEqual(['ruins', 'temples']);
-	});
-
-	test('passes plain strings through', () => {
-		expect(toReferenceIdArray(['ruins', 'temples'])).toEqual(['ruins', 'temples']);
-	});
-
-	test('returns an empty array for undefined', () => {
-		expect(toReferenceIdArray(undefined)).toEqual([]);
-	});
-
-	test('returns an empty array for non-array values', () => {
-		expect(toReferenceIdArray('ruins')).toEqual([]);
-		expect(toReferenceIdArray({ id: 'ruins' })).toEqual([]);
-	});
-
-	test('drops items without an id', () => {
-		expect(toReferenceIdArray([{ collection: 'themes' }, undefined, 42])).toEqual([]);
-	});
-
-	test('never emits "[object Object]"', () => {
-		const references = [{ id: 'ruins', collection: 'themes' }, { collection: 'themes' }];
-
-		expect(toReferenceIdArray(references)).not.toContain('[object Object]');
-	});
-});
 
 describe('calculateMetadataBoost', () => {
 	test('one shared theme scores 0.15', () => {

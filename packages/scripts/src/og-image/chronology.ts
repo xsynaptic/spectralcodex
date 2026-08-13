@@ -1,4 +1,4 @@
-import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
+import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { z } from 'zod';
 
 import type { DataStoreEntry } from '../shared/data-store.js';

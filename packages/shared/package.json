@@ -4,6 +4,7 @@
 	"description": "Shared code for Spectral Codex",
 	"type": "module",
 	"exports": {
+		"./collections": "./src/collections.ts",
 		"./constants": "./src/constants.ts",
 		"./map": "./src/map/index.ts",
 		"./schemas": "./src/schemas/index.ts",

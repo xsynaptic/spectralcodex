@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
-import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
+import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -12,9 +12,14 @@ import type { DataStoreEntry } from '../shared/data-store.js';
 import type { SimilarContentMetadata } from './metadata.js';
 
 import { getFileCacheInstance } from '../shared/cache-file.js';
-import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store.js';
+import {
+	DATA_STORE_PATH,
+	getDataStoreCollection,
+	loadDataStore,
+	toReferenceIds,
+} from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
-import { calculateMetadataBoost, toReferenceIdArray } from './metadata.js';
+import { calculateMetadataBoost } from './metadata.js';
 
 const rootPath = findWorkspaceRoot();
 
@@ -149,8 +154,8 @@ async function generateEmbeddings(
 					digest: entry.digest,
 					collection: entry.collection,
 					metadata: {
-						themes: toReferenceIdArray(entry.data.themes),
-						regions: toReferenceIdArray(entry.data.regions),
+						themes: toReferenceIds(entry.data.themes),
+						regions: toReferenceIds(entry.data.regions),
 					},
 					vector,
 				};

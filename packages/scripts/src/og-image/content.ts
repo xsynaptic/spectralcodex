@@ -1,5 +1,5 @@
+import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
-import { ContentCollectionsEnum, RegionsSchema, ThemesSchema } from '@spectralcodex/shared/schemas';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -13,22 +13,18 @@ import {
 	getDataStoreRegionParentsById,
 	getPublicId,
 	loadDataStore,
+	toReferenceIds,
 } from '../shared/data-store.js';
 import { extractImageFeaturedIds } from '../shared/images.js';
 import { buildChronologyImageIndex, getChronologyTitle } from './chronology.js';
 import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
-export function resolveOgRegions(data: Record<string, unknown>): Array<string> | undefined {
-	const override = z
-		.object({ regions: RegionsSchema.optional() })
-		.optional()
-		.catch(undefined)
-		.parse(data.override);
+export function resolveOgRegions(data: Record<string, unknown>): Array<string> {
+	const override = z.object({ regions: z.unknown() }).safeParse(data.override);
+	const overrideRegions = toReferenceIds(override.data?.regions);
 
-	if (override?.regions && override.regions.length > 0) return override.regions;
-
-	return RegionsSchema.optional().parse(data.regions);
+	return overrideRegions.length > 0 ? overrideRegions : toReferenceIds(data.regions);
 }
 
 function getImageFeaturedData({
@@ -61,11 +57,11 @@ function getImageFeaturedData({
 				? getDataStoreRegionParentsById(
 						collection === ContentCollectionsEnum.Regions
 							? z.string().optional().parse(entry.data.parent)
-							: resolveOgRegions(entry.data)?.[0],
+							: resolveOgRegions(entry.data)[0],
 						regionParentMap,
 					)
 				: undefined,
-			themes: ThemesSchema.optional().parse(entry.data.themes),
+			themes: toReferenceIds(entry.data.themes),
 		}),
 		isFallback: true,
 	};

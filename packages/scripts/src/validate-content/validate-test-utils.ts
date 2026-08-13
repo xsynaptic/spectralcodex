@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { DataStoreCollections, DataStoreEntry } from '../shared/data-store';
 
 export function makeEntry(
 	overrides: Partial<DataStoreEntry> & Pick<DataStoreEntry, 'id'>,
@@ -11,7 +11,21 @@ export function noop() {
 	// Intentionally empty
 }
 
-// Regions are stored as data-store references; RegionsSchema transforms them back to ids
+// Regions are stored as data-store references; toReferenceIds transforms them back to ids
 export function makeRegionRefs(regionIds: Array<string>) {
-	return regionIds.map((regionId) => ({ id: regionId, collection: 'regions' as const }));
+	return makeRefs('regions', regionIds);
+}
+
+export function makeRefs(collection: string, ids: Array<string>) {
+	return ids.map((id) => ({ id, collection }));
+}
+
+export function makeCollections(entriesByCollection: Record<string, Array<DataStoreEntry>>) {
+	const collections: DataStoreCollections = new Map();
+
+	for (const [name, entries] of Object.entries(entriesByCollection)) {
+		collections.set(name, new Map(entries.map((entry) => [entry.id, entry])));
+	}
+
+	return collections;
 }

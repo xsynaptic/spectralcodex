@@ -12,9 +12,18 @@ export const TitleSchema = z
 	})
 	.transform((value) => refineTypography(value).trim());
 
+// Dates are wall-clock days anchored to UTC; a day of slack covers authoring from any timezone
+function isNotFutureDate(date: Date) {
+	const now = new Date();
+
+	return date.getTime() < Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 2);
+}
+
 // YAML parses `YYYY-MM-DD` and `YYYY-MM-DD HH:mm:ss` into UTC dates
 // A time without seconds remains a string and will fail this check
-export const DateSchema = z.date();
+export const DateSchema = z.date().refine(isNotFutureDate, {
+	message: 'Dates must not be in the future.',
+});
 
 const DateValueSchema = z
 	.date()

@@ -3,23 +3,6 @@ export interface SimilarContentMetadata {
 	regions: Array<string>;
 }
 
-// Data-store taxonomy references are {id, collection} objects; extract the id
-export function toReferenceIdArray(value: unknown): Array<string> {
-	if (!Array.isArray(value)) return [];
-
-	const ids: Array<string> = [];
-
-	for (const item of value) {
-		if (typeof item === 'string') {
-			ids.push(item);
-		} else if (item && typeof item === 'object' && 'id' in item) {
-			ids.push(String((item as { id: unknown }).id));
-		}
-	}
-
-	return ids;
-}
-
 const boostTheme = 0.15; // weight per shared theme
 const boostRegion = 0.1; // weight per shared region
 const boostLimit = 0.3; // ceiling on the combined boost

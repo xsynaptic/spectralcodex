@@ -1,9 +1,10 @@
-import { GeometrySchema } from '@spectralcodex/shared/schemas';
 import chalk from 'chalk';
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { LocationGeometrySchema } from '../shared/geometry';
 
 interface IndexedPoint {
 	locationId: string;
@@ -20,7 +21,7 @@ export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdM
 	let locationCount = 0;
 
 	for (const entry of entries) {
-		const geometry = GeometrySchema.safeParse(entry.data.geometry);
+		const geometry = LocationGeometrySchema.safeParse(entry.data.geometry);
 
 		if (!geometry.success) continue;
 

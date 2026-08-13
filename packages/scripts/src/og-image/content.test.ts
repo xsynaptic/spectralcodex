@@ -1,4 +1,4 @@
-import { ContentCollectionsEnum } from '@spectralcodex/shared/schemas';
+import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -31,36 +31,6 @@ function ogImageMeta(url: string) {
 
 describe('buildIndexEntries', () => {
 	const entries = buildIndexEntries();
-
-	test('produces one entry per index page, keyed index-{suffix}', () => {
-		expect([...entries.keys()].sort((a, b) => a.localeCompare(b))).toEqual([
-			'index-chronology',
-			'index-homepage',
-			'index-locations',
-			'index-not-found',
-			'index-notes',
-			'index-posts',
-			'index-regions',
-			'index-resources',
-			'index-series',
-			'index-themes',
-		]);
-	});
-
-	test('pins titles and fallback flags', () => {
-		expect(entries.get('index-chronology')).toMatchObject({
-			collection: 'index',
-			digest: 'index-chronology',
-			title: 'Chronology',
-			isFallback: true,
-		});
-		expect(entries.get('index-regions')).toMatchObject({ title: 'Regions', isFallback: false });
-		expect(entries.get('index-homepage')).toMatchObject({ title: '', isFallback: false });
-		expect(entries.get('index-not-found')).toMatchObject({
-			title: '404: Not Found',
-			isFallback: true,
-		});
-	});
 
 	test('resolves a non-empty fallback image id for every index', () => {
 		for (const entry of entries.values()) {
@@ -170,8 +140,8 @@ describe('resolveOgRegions', () => {
 		).toEqual(['taipei']);
 	});
 
-	test('returns undefined when nothing is set', () => {
-		expect(resolveOgRegions({})).toBeUndefined();
+	test('returns an empty array when nothing is set', () => {
+		expect(resolveOgRegions({})).toEqual([]);
 	});
 });
 

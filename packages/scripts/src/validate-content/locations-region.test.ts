@@ -25,7 +25,6 @@ describe('collectLocationsRegionsIssues', () => {
 
 		expect(collectLocationsRegionsIssues(entries)).toEqual([
 			{
-				type: 'mismatch',
 				filename: 'some-place.mdx',
 				expectedRegion: 'taipei',
 				foundRegion: 'tainan',
@@ -34,12 +33,10 @@ describe('collectLocationsRegionsIssues', () => {
 		]);
 	});
 
-	test('flags an entry without a regions field', () => {
+	test('skips an entry without a regions field', () => {
 		const entries = [makeEntry({ id: 'some-place', filePath: taipeiPath })];
 
-		expect(collectLocationsRegionsIssues(entries)).toEqual([
-			{ type: 'missing-regions', filename: 'some-place.mdx' },
-		]);
+		expect(collectLocationsRegionsIssues(entries)).toEqual([]);
 	});
 
 	test('expects "unknown" when the entry has no file path', () => {
@@ -47,7 +44,6 @@ describe('collectLocationsRegionsIssues', () => {
 
 		expect(collectLocationsRegionsIssues(entries)).toEqual([
 			{
-				type: 'mismatch',
 				filename: 'some-place',
 				expectedRegion: 'unknown',
 				foundRegion: 'taipei',
@@ -58,14 +54,11 @@ describe('collectLocationsRegionsIssues', () => {
 });
 
 describe('checkLocationsRegions', () => {
-	test('fails on mismatches but passes when only regions fields are missing', () => {
+	test('fails on mismatches', () => {
 		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
 
 		expect(checkLocationsRegions([makeLocation('some-place', ['tainan'], taipeiPath)])).toBe(false);
-		// Pinned quirk: missing regions are reported but do not fail the check
-		expect(checkLocationsRegions([makeEntry({ id: 'some-place', filePath: taipeiPath })])).toBe(
-			true,
-		);
+		expect(checkLocationsRegions([makeLocation('some-place', ['taipei'], taipeiPath)])).toBe(true);
 
 		logSpy.mockRestore();
 	});

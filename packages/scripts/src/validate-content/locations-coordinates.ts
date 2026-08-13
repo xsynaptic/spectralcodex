@@ -1,6 +1,5 @@
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
-import { GeometrySchema, RegionsSchema } from '@spectralcodex/shared/schemas';
 import { booleanPointInPolygon, point } from '@turf/turf';
 import chalk from 'chalk';
 import { geojson } from 'flatgeobuf';
@@ -8,6 +7,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toReferenceIds } from '../shared/data-store';
+import { LocationGeometrySchema } from '../shared/geometry';
 
 async function loadRegionGeometry(
 	regionId: string,
@@ -78,15 +80,10 @@ export async function checkLocationsCoordinates(
 	for (const entry of entries) {
 		if (entry.data.skipCoordinateCheck === true) continue;
 
-		// Parse regions array (reference objects)
-		const regionsResult = RegionsSchema.safeParse(entry.data.regions);
-
-		if (!regionsResult.success) continue;
-
-		const regions = regionsResult.data;
+		const regions = toReferenceIds(entry.data.regions);
 
 		// Parse geometry coordinates
-		const geometryResult = GeometrySchema.safeParse(entry.data.geometry);
+		const geometryResult = LocationGeometrySchema.safeParse(entry.data.geometry);
 
 		if (!geometryResult.success) {
 			continue;
