@@ -48,7 +48,7 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 				const titleSet = titles.get(field)!;
 
 				if (titleSet.has(value)) {
-					console.log(chalk.red(`${entry.id}: duplicate ${field} "${value}"`));
+					console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
 					duplicateCount++;
 				} else {
 					titleSet.add(value);
@@ -64,7 +64,7 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 				const addressSet = addresses.get(field)!;
 
 				if (addressSet.has(value)) {
-					console.log(chalk.red(`${entry.id}: duplicate ${field} "${value}"`));
+					console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
 					duplicateCount++;
 				} else {
 					addressSet.add(value);
@@ -77,7 +77,7 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 
 		if (googleMapsLink) {
 			if (googleMapsLinks.has(googleMapsLink)) {
-				console.log(chalk.red(`${entry.id}: duplicate Google Maps link "${googleMapsLink}"`));
+				console.log(chalk.red(`❌ ${entry.id}: duplicate Google Maps link "${googleMapsLink}"`));
 				duplicateCount++;
 			} else {
 				googleMapsLinks.add(googleMapsLink);

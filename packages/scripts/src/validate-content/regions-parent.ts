@@ -2,12 +2,25 @@ import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
+type RegionParentIssue =
+	| { location: string; reason: 'cycle'; chain: Array<string> }
+	| { location: string; reason: 'not-found'; parent: string }
+	| { location: string; reason: 'self' };
+
+function formatIssue(issue: RegionParentIssue) {
+	if (issue.reason === 'self') return `${issue.location}: parent references itself`;
+
+	if (issue.reason === 'not-found') return `${issue.location}: parent "${issue.parent}" not found`;
+
+	return `${issue.location}: parent chain forms a cycle (${issue.chain.join(' -> ')})`;
+}
+
 // A region `parent` must reference an existing region id, never itself, and never form a cycle
 // A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
 // A cycle drops every member out of the hierarchy's root-driven walk, so subtrees silently vanish from rollups
 export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 	const regionIds = new Set(entries.map((entry) => entry.id));
-	const issues: Array<string> = [];
+	const issues: Array<RegionParentIssue> = [];
 
 	// Self edges are excluded so the cycle walk doesn't re-report them
 	const parentById = new Map<string, string>();
@@ -20,11 +33,11 @@ export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 		const location = entry.filePath ?? entry.id;
 
 		if (parent === entry.id) {
-			issues.push(`${location} (parent references itself)`);
+			issues.push({ location, reason: 'self' });
 		} else if (regionIds.has(parent)) {
 			parentById.set(entry.id, parent);
 		} else {
-			issues.push(`${location} (parent "${parent}" not found)`);
+			issues.push({ location, reason: 'not-found', parent });
 		}
 	}
 
@@ -53,7 +66,7 @@ export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 
 		const location = entry.filePath ?? entry.id;
 
-		issues.push(`${location} (parent chain forms a cycle: ${[...chain, entry.id].join(' -> ')})`);
+		issues.push({ location, reason: 'cycle', chain: [...chain, entry.id] });
 	}
 
 	return issues;
@@ -66,9 +79,11 @@ export function checkRegionsParents(entries: Array<DataStoreEntry>) {
 		console.log(chalk.green(`✓ ${entries.length.toString()} region parents valid`));
 		return true;
 	}
-	console.log(chalk.red(`✗ Found ${issues.length.toString()} regions with invalid parent:`));
 	for (const issue of issues) {
-		console.log(chalk.red(`  - ${issue}`));
+		console.log(chalk.red(`❌ ${formatIssue(issue)}`));
 	}
+	console.log(
+		chalk.yellow(`⚠️  Found ${issues.length.toString()} region(s) with an invalid parent`),
+	);
 	return false;
 }

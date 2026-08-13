@@ -117,7 +117,7 @@ export async function checkLocationsCoordinates(
 						// Only report warning if this is the only region
 						console.log(
 							chalk.yellow(
-								`WARNING: Could not load FGB file for region "${region}", skipping all other locations in this region`,
+								`⚠️  ${region}: could not load FGB file, skipping all other locations in this region`,
 							),
 						);
 					}
@@ -146,7 +146,7 @@ export async function checkLocationsCoordinates(
 			if (!isInside) {
 				console.log(
 					chalk.red(
-						`${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
+						`❌ ${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
 					),
 				);
 				hasInvalidCoordinate = true;

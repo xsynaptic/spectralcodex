@@ -19,6 +19,7 @@ import { checkLocationsRegions } from './locations-region';
 import { checkMdxComponents } from './mdx';
 import { checkReferences } from './references';
 import { checkRegionsParents } from './regions-parent';
+import { checkSeriesItems } from './series-items';
 import { checkSourceIds } from './source-ids';
 
 const rootPath = findWorkspaceRoot();
@@ -128,6 +129,11 @@ switch (command) {
 		checkLinkIds(allEntries, metadataEntries);
 		break;
 	}
+	// Check for series items that do not name an existing entry
+	case 'series-items': {
+		checkSeriesItems(getDataStoreCollection(collections, ['series']), metadataEntries);
+		break;
+	}
 	// Check for shortform sources that do not name an existing resource
 	case 'source-ids': {
 		checkSourceIds(allEntries, resourceEntries);
@@ -169,6 +175,7 @@ switch (command) {
 			checkReferences(collections, contentCollectionNames),
 			checkMdxComponents(allEntries),
 			checkLinkIds(allEntries, metadataEntries),
+			checkSeriesItems(getDataStoreCollection(collections, ['series']), metadataEntries),
 			checkSourceIds(allEntries, resourceEntries),
 			checkFrontmatterLinks(allEntries, resourceEntries),
 			checkImageReferences(allEntries, path.join(rootPath, values['media-path'])),

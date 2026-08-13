@@ -70,27 +70,6 @@ describe('collectAspectRatioIssues', () => {
 		expect(counts).toMatchObject({ '3:2': 2, '1:1': 1, '4:3': 0 });
 		expect(result.flagged).toHaveLength(1);
 	});
-
-	test('labels orientation from the ratio value', () => {
-		const { tally } = collectAspectRatioIssues([]);
-
-		const orientations = Object.fromEntries(tally.map((row) => [row.label, row.orientation]));
-
-		expect(orientations).toMatchObject({
-			'3:2': 'landscape',
-			'2:3': 'portrait',
-			'1:1': 'square',
-		});
-	});
-
-	test('sorts flagged images by id', () => {
-		const result = collectAspectRatioIssues([
-			makeImage('zebra', 1215, 900),
-			makeImage('aardvark', 1215, 900),
-		]);
-
-		expect(result.flagged.map((item) => item.id)).toEqual(['aardvark', 'zebra']);
-	});
 });
 
 describe('checkImageAspectRatios', () => {

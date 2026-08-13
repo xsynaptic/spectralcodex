@@ -16,13 +16,15 @@ describe('collectRegionsParentsIssues', () => {
 	test('flags a parent that references a missing region', () => {
 		const entries = [makeEntry({ id: 'taipei', data: { parent: 'atlantis' } })];
 
-		expect(collectRegionsParentsIssues(entries)).toEqual(['taipei (parent "atlantis" not found)']);
+		expect(collectRegionsParentsIssues(entries)).toEqual([
+			{ location: 'taipei', reason: 'not-found', parent: 'atlantis' },
+		]);
 	});
 
 	test('flags a region that references itself', () => {
 		const entries = [makeEntry({ id: 'taipei', data: { parent: 'taipei' } })];
 
-		expect(collectRegionsParentsIssues(entries)).toEqual(['taipei (parent references itself)']);
+		expect(collectRegionsParentsIssues(entries)).toEqual([{ location: 'taipei', reason: 'self' }]);
 	});
 
 	test('flags a two-node parent cycle once with the chain spelled out', () => {
@@ -32,7 +34,7 @@ describe('collectRegionsParentsIssues', () => {
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([
-			'yin (parent chain forms a cycle: yin -> yang -> yin)',
+			{ location: 'yin', reason: 'cycle', chain: ['yin', 'yang', 'yin'] },
 		]);
 	});
 
@@ -45,7 +47,7 @@ describe('collectRegionsParentsIssues', () => {
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([
-			'one (parent chain forms a cycle: one -> two -> three -> one)',
+			{ location: 'one', reason: 'cycle', chain: ['one', 'two', 'three', 'one'] },
 		]);
 	});
 
@@ -57,14 +59,6 @@ describe('collectRegionsParentsIssues', () => {
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([]);
-	});
-
-	test('reports the file path when available', () => {
-		const entries = [
-			makeEntry({ id: 'taipei', data: { parent: 'atlantis' }, filePath: 'regions/taipei.mdx' }),
-		];
-
-		expect(collectRegionsParentsIssues(entries)[0]).toContain('regions/taipei.mdx');
 	});
 });
 

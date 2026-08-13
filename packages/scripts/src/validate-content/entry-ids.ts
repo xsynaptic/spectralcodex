@@ -52,7 +52,11 @@ export function checkEntryIds(entries: Array<DataStoreEntry>) {
 	}
 
 	for (const { id, locations } of issues) {
-		console.log(chalk.red(`❌ duplicate entry ID "${id}": ${locations.join(', ')}`));
+		console.log(chalk.red(`❌ duplicate entry ID "${id}"`));
+
+		for (const location of locations) {
+			console.log(chalk.red(`   ${location}`));
+		}
 	}
 
 	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} duplicate entry ID(s)`));

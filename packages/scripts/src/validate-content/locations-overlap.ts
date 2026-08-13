@@ -97,15 +97,13 @@ export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdM
 
 	for (const overlap of overlapData) {
 		console.log(
-			chalk.yellow(
-				`Warning: overlap detected between ${overlap.idA} and ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
-			),
+			chalk.yellow(`⚠️  ${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`),
 		);
 	}
 
 	console.log(
-		chalk.blue(
-			`Checked ${String(locationCount)} locations (${String(points.length)} points), found ${String(overlapData.length)} overlaps`,
+		chalk.yellow(
+			`⚠️  Found ${String(overlapData.length)} overlap(s) (checked ${String(locationCount)} locations, ${String(points.length)} points)`,
 		),
 	);
 
