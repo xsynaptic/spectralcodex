@@ -30,14 +30,14 @@ export const getStaticPaths = (async () => {
 
 	// Exact versioned URLs for the cache warmer to prefetch; not used by the map island
 	const manifestUrls = [
-		`/api/map/directory.json?v=${version}`,
+		`/api/map/map-directory.json?v=${version}`,
 		...[...chunks.keys()].map((chunkKey) => `/api/map/${chunkKey}.json?v=${version}`),
 		`/api/map/objectives/${MapApiDataEnum.Source}?v=${sourceHash}`,
 		`/api/map/objectives/${MapApiDataEnum.Popup}?v=${popupHash}`,
 	];
 
 	return [
-		{ params: { id: 'directory.json' }, props: { data: encodeMapSourceData(directory) } },
+		{ params: { id: 'map-directory.json' }, props: { data: encodeMapSourceData(directory) } },
 		...[...chunks].map(([chunkKey, popupItems]) => ({
 			params: { id: `${chunkKey}.json` },
 			props: { data: encodeMapPopupData(popupItems) },

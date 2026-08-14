@@ -8,7 +8,7 @@ type MapApiItem = Record<string, unknown>;
 
 test.describe('map data API', () => {
 	test('global directory is built and every row carries a chunk key', async ({ request }) => {
-		const response = await request.get('/api/map/directory.json');
+		const response = await request.get('/api/map/map-directory.json');
 
 		expect(response.ok()).toBe(true);
 
@@ -19,7 +19,7 @@ test.describe('map data API', () => {
 	});
 
 	test('sampled popup chunks resolve and contain their features', async ({ request }) => {
-		const directoryResponse = await request.get('/api/map/directory.json');
+		const directoryResponse = await request.get('/api/map/map-directory.json');
 		const directory = (await directoryResponse.json()) as Array<MapApiItem>;
 
 		const sampled = [
@@ -46,12 +46,12 @@ test.describe('map data API', () => {
 		const manifestResponse = await request.get('/api/map/map-manifest.json');
 		const warmUrls = (await manifestResponse.json()) as Array<string>;
 
-		const directoryResponse = await request.get('/api/map/directory.json');
+		const directoryResponse = await request.get('/api/map/map-directory.json');
 		const directory = (await directoryResponse.json()) as Array<MapApiItem>;
 
 		const chunkKeys = new Set(directory.map((row) => String(row[CHUNK_KEY])));
 
-		expect(warmUrls.some((url) => url.startsWith('/api/map/directory.json?v='))).toBe(true);
+		expect(warmUrls.some((url) => url.startsWith('/api/map/map-directory.json?v='))).toBe(true);
 		for (const chunkKey of chunkKeys) {
 			expect(warmUrls.some((url) => url.startsWith(`/api/map/${chunkKey}.json?v=`))).toBe(true);
 		}

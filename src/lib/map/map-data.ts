@@ -161,7 +161,7 @@ export function getMapData({
 	// Big maps fetch the shared directory and keep only the rows their scope selects
 	const apiSourceUrl = getBaseUrl(
 		'api/map',
-		`directory.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
+		`map-directory.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
 	);
 
 	// No membership hint resolves to this map's explicit, order-preserving id list
