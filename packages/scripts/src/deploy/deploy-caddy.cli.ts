@@ -3,6 +3,7 @@ import { parseArgs } from 'node:util';
 
 import { ensureSshKeychain, findWorkspaceRoot } from '../shared/utils.js';
 import { deployCaddy } from './deploy-caddy.js';
+import { verifyEdge } from './verify-edge.js';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
@@ -11,9 +12,13 @@ const { values } = parseArgs({
 	},
 });
 
+const dryRun = values['dry-run'];
+
 await ensureSshKeychain();
 
 await deployCaddy({
 	rootPath: findWorkspaceRoot(),
-	dryRun: values['dry-run'],
+	dryRun,
 });
+
+if (!dryRun) await verifyEdge();

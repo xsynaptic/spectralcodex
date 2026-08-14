@@ -12,6 +12,7 @@ import { deployCaddy } from './deploy-caddy.js';
 import { loadDeployConfig, printDeployConfig } from './deploy-config.js';
 import { deployMedia } from './deploy-media.js';
 import { deployOg } from './deploy-og.js';
+import { verifyEdge } from './verify-edge.js';
 
 const rootPath = findWorkspaceRoot();
 
@@ -105,21 +106,6 @@ async function caddy() {
 	await deployCaddy({ rootPath, dryRun });
 }
 
-async function healthCheck() {
-	// Unique query busts the Cloudflare cache key so checks reach the origin, not a stale edge copy
-	const cacheBust = `deploy-check=${Date.now().toString()}`;
-	const baseUrl = config.siteUrl.replace(/\/$/, '');
-	const urls = [`${baseUrl}/?${cacheBust}`, `${baseUrl}/api/map/map-manifest.json?${cacheBust}`];
-	for (const url of urls) {
-		console.log(chalk.blue(`Health check: ${url}`));
-		const response = await fetch(url);
-		if (!response.ok) {
-			throw new Error(`Health check failed: ${String(response.status)} ${response.statusText}`);
-		}
-	}
-	console.log(chalk.green('Health check passed'));
-}
-
 try {
 	// Prepare content
 	await sync();
@@ -140,7 +126,7 @@ try {
 	await caddy();
 
 	// Verify & refresh caches
-	await healthCheck();
+	if (!dryRun) await verifyEdge();
 	await invokeCacheRefresh({ dryRun });
 
 	console.log(chalk.green('Deploy complete'));
