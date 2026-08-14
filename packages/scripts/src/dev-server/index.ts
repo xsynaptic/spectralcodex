@@ -14,6 +14,10 @@ const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/me
 process.env.CONTENT_MEDIA_PATH_HOST = path.resolve(rootPath, mediaPathRelative);
 process.env.IMAGE_SERVER_NGINX_CONFIG = path.resolve(rootPath, 'deploy/nginx.conf.template');
 
+// Astro daemonizes `astro dev` under agent detection
+// This script owns the container lifecycle; the server stays a foreground child
+process.env.ASTRO_DEV_BACKGROUND = '0';
+
 $.verbose = false;
 
 function log(message: string) {
