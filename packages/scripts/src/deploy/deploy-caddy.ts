@@ -30,9 +30,11 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 
 	const start = Date.now();
 
+	// rsync ignores gitignore, so stray tooling residue would otherwise land in the Caddy config dir
 	await rsyncTo(`${deployDir}/caddy/`, `${config.remoteHost}:${remoteCaddyPath}/`, {
 		config,
 		dryRun,
+		excludes: ['node_modules', '.astro'],
 	});
 
 	await rsyncTo(`${deployDir}/certs/`, `${config.remoteHost}:${remoteCertsPath}/`, {
