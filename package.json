@@ -48,7 +48,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.2.1",
+		"astro": "^7.2.2",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
@@ -56,7 +56,7 @@
 		"@astrojs/check": "^0.9.10",
 		"@astrojs/markdown-satteri": "^0.3.5",
 		"@astrojs/mdx": "^7.0.5",
-		"@astrojs/node": "^11.1.1",
+		"@astrojs/node": "^11.1.2",
 		"@astrojs/react": "^6.0.2",
 		"@astrojs/rss": "^4.0.19",
 		"@pagefind/component-ui": "^1.5.2",
@@ -99,19 +99,19 @@
 		"exiftool-vendored": "^37.2.0",
 		"fastest-levenshtein": "^1.0.16",
 		"geokdbush": "^2.1.0",
-		"globals": "^17.9.0",
+		"globals": "^17.11.0",
 		"kdbush": "^4.1.0",
 		"keyv": "^5.6.0",
-		"knip": "^6.32.1",
+		"knip": "^6.32.2",
 		"lefthook": "^2.1.10",
 		"maplibre-gl": "^6.3.0",
-		"ohash": "^2.0.11",
+		"ohash": "^2.0.12",
 		"p-limit": "^7.3.1",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"remeda": "^2.38.0",
+		"remeda": "^2.40.0",
 		"satteri": "^0.9.5",
 		"sharp": "^0.35.3",
 		"stylelint": "^17.14.1",
@@ -123,5 +123,5 @@
 		"vitest": "^4.1.10",
 		"zod": "^4.4.3"
 	},
-	"packageManager": "pnpm@11.16.0"
+	"packageManager": "pnpm@11.21.0"
 }

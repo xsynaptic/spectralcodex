@@ -1,4 +1,4 @@
-FROM postgres:15.18-alpine
+FROM postgres:15.19-alpine
 
 COPY backup.sh /usr/local/bin/backup.sh
 RUN chmod +x /usr/local/bin/backup.sh \
