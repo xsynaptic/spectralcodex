@@ -1,4 +1,9 @@
-import type { Instance, PagefindModal, PagefindSearchResult } from '@pagefind/component-ui';
+import type {
+	Instance,
+	PagefindModal,
+	PagefindModalTrigger,
+	PagefindSearchResult,
+} from '@pagefind/component-ui';
 
 import { getInstanceManager } from '@pagefind/component-ui';
 
@@ -8,17 +13,17 @@ const searchQueryDebounceMs = 1500; // Wait for the user to stop typing before r
 const searchQueryMinLength = 2;
 const searchQueryMaxLength = 100; // Cap the value sent to analytics
 
+// Pagefind reads these by name off a registered modal-trigger; a rename fails silently without this
+type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModalClose'>;
+
 let searchAnalyticsRegistered = false;
 
 function getResultCount(result: unknown): number | undefined {
-	if (
-		result &&
-		typeof result === 'object' &&
-		Array.isArray((result as PagefindSearchResult).results)
-	) {
-		return (result as PagefindSearchResult).results.length;
-	}
-	return undefined;
+	if (!result || typeof result !== 'object') return undefined;
+
+	const { results } = result as Partial<PagefindSearchResult>;
+
+	return Array.isArray(results) ? results.length : undefined;
 }
 
 // Record settled search queries
@@ -47,15 +52,15 @@ function registerSearchAnalytics(instance: Instance) {
 }
 
 // An icon-based modal trigger integrating with Pagefind's instance API
-class SearchToggle extends HTMLElement {
+class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
 
-	// Pagefind reads this off the registered trigger to toggle aria-expanded and aria-controls
 	get buttonEl() {
 		return this.querySelector<HTMLButtonElement>('button');
 	}
 
+	#controller: AbortController | undefined;
 	#cssReady?: Promise<void>;
 
 	// Load the deferred stylesheet on intent; resolves once applied
@@ -140,6 +145,10 @@ class SearchToggle extends HTMLElement {
 	}
 
 	connectedCallback() {
+		this.#controller = new AbortController();
+
+		const { signal } = this.#controller;
+
 		// Static props in markup; only the OS-dependent keyboard hint has to be set client-side
 		this.buttonEl?.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K');
 
@@ -159,19 +168,17 @@ class SearchToggle extends HTMLElement {
 		);
 
 		// Hover or focus the toggle and the stylesheet starts loading, so it's ready before the modal opens
-		this.addEventListener('pointerenter', this.#preloadPagefindCss, { once: true });
-		this.addEventListener('focusin', this.#preloadPagefindCss, { once: true });
+		this.addEventListener('pointerenter', this.#preloadPagefindCss, { once: true, signal });
+		this.addEventListener('focusin', this.#preloadPagefindCss, { once: true, signal });
 
-		this.addEventListener('click', this.#handleClickEvent);
-		document.addEventListener('keydown', this.#handleKeydown);
+		this.addEventListener('click', this.#handleClickEvent, { signal });
+		document.addEventListener('keydown', this.#handleKeydown, { signal });
 	}
 
 	disconnectedCallback() {
 		this.instance?.deregisterAllShortcuts(this);
-		this.removeEventListener('pointerenter', this.#preloadPagefindCss);
-		this.removeEventListener('focusin', this.#preloadPagefindCss);
-		this.removeEventListener('click', this.#handleClickEvent);
-		document.removeEventListener('keydown', this.#handleKeydown);
+		this.#controller?.abort();
+		this.#controller = undefined;
 	}
 }
 

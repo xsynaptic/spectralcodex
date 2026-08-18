@@ -9,23 +9,29 @@ const minPageFraction = 0.2;
 const desktopMediaQuery = '(min-width: 640px)';
 
 class TopButton extends HTMLElement {
+	#controller: AbortController | undefined;
 	#desktopQuery: MediaQueryList | undefined;
 	#lastScrollY = 0;
 	#scrollAccumulator = 0;
+	#scrollController: AbortController | undefined;
 	#animationFrameId: number | undefined;
 
 	connectedCallback() {
+		this.#controller = new AbortController();
+
+		const { signal } = this.#controller;
+
 		this.#setHidden(true);
-		this.addEventListener('click', this.#handleClick);
+		this.addEventListener('click', this.#handleClick, { signal });
 
 		this.#desktopQuery = window.matchMedia(desktopMediaQuery);
-		this.#desktopQuery.addEventListener('change', this.#handleViewportChange);
+		this.#desktopQuery.addEventListener('change', this.#handleViewportChange, { signal });
 		this.#handleViewportChange();
 	}
 
 	disconnectedCallback() {
-		this.removeEventListener('click', this.#handleClick);
-		this.#desktopQuery?.removeEventListener('change', this.#handleViewportChange);
+		this.#controller?.abort();
+		this.#controller = undefined;
 		this.#detachScroll();
 	}
 
@@ -40,13 +46,22 @@ class TopButton extends HTMLElement {
 	};
 
 	#attachScroll() {
+		if (this.#scrollController) return;
+
+		this.#scrollController = new AbortController();
 		this.#lastScrollY = window.scrollY;
 		this.#scrollAccumulator = 0;
-		window.addEventListener('scroll', this.#handleScroll, { passive: true });
+
+		window.addEventListener('scroll', this.#handleScroll, {
+			passive: true,
+			signal: this.#scrollController.signal,
+		});
 	}
 
 	#detachScroll() {
-		window.removeEventListener('scroll', this.#handleScroll);
+		this.#scrollController?.abort();
+		this.#scrollController = undefined;
+
 		if (this.#animationFrameId !== undefined) {
 			cancelAnimationFrame(this.#animationFrameId);
 			this.#animationFrameId = undefined;

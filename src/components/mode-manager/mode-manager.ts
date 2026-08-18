@@ -20,8 +20,12 @@ class ModeManager extends HTMLElement {
 	#storageKey = 'color-mode';
 	#mediaMatcher: MediaQueryList | undefined;
 	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
-	#handleMediaChange: ((event: MediaQueryListEvent) => void) | undefined;
 	#storage: Storage | undefined;
+
+	#handleMediaChange = (event: MediaQueryListEvent) => {
+		this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
+		this.#applyMode(this.getMode());
+	};
 
 	connectedCallback() {
 		this.#storageKey = this.getAttribute('storage-key') ?? this.#storageKey;
@@ -32,27 +36,17 @@ class ModeManager extends HTMLElement {
 			// Fail silently
 		}
 
-		const defaultMode = this.#getDefaultMode();
-
 		this.#mediaMatcher = matchMedia(`(prefers-color-scheme: ${ModeTypeEnum.Light})`);
 		this.#systemMode = this.#mediaMatcher.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-
-		this.#handleMediaChange = (event: MediaQueryListEvent) => {
-			this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-			this.#applyMode(this.getMode());
-		};
-
 		this.#mediaMatcher.addEventListener('change', this.#handleMediaChange);
 
 		const stored = this.#storage?.getItem(this.#storageKey);
-		const mode = stored && isModeValid(stored) ? stored : defaultMode;
+		const mode = stored && isModeValid(stored) ? stored : this.#getDefaultMode();
 		this.#applyMode(mode);
 	}
 
 	disconnectedCallback() {
-		if (this.#mediaMatcher && this.#handleMediaChange) {
-			this.#mediaMatcher.removeEventListener('change', this.#handleMediaChange);
-		}
+		this.#mediaMatcher?.removeEventListener('change', this.#handleMediaChange);
 	}
 
 	getMode(): ModeGeneralType {
