@@ -9,9 +9,9 @@ import { getInstanceManager } from '@pagefind/component-ui';
 
 const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent);
 
-const searchQueryDebounceMs = 1500; // Wait for the user to stop typing before recording their query
+const searchQueryDebounceMs = 1500;
 const searchQueryMinLength = 2;
-const searchQueryMaxLength = 100; // Cap the value sent to analytics
+const searchQueryMaxLength = 100;
 
 // Pagefind reads these by name off a registered modal-trigger; a rename fails silently without this
 type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModalClose'>;
@@ -26,7 +26,6 @@ function getResultCount(result: unknown): number | undefined {
 	return Array.isArray(results) ? results.length : undefined;
 }
 
-// Record settled search queries
 function registerSearchAnalytics(instance: Instance) {
 	if (searchAnalyticsRegistered) return;
 
@@ -51,7 +50,6 @@ function registerSearchAnalytics(instance: Instance) {
 	});
 }
 
-// An icon-based modal trigger integrating with Pagefind's instance API
 class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
@@ -63,7 +61,6 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	#controller: AbortController | undefined;
 	#cssReady?: Promise<void>;
 
-	// Load the deferred stylesheet on intent; resolves once applied
 	#ensurePagefindCss = (): Promise<void> => {
 		if (this.#cssReady) return this.#cssReady;
 
@@ -106,7 +103,6 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		return this.#cssReady;
 	};
 
-	// Void-returning wrapper so the listener ignores the preload promise
 	#preloadPagefindCss = () => {
 		void this.#ensurePagefindCss();
 	};
@@ -118,7 +114,6 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		modal?.open();
 	};
 
-	// Void-returning wrapper for use as a click listener
 	#handleClickEvent = () => {
 		void this.#handleClick();
 	};
@@ -138,7 +133,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		void this.#handleClick();
 	};
 
-	// Called by <pagefind-modal> when it closes. Matches the built-in trigger's contract
+	// Invoked by <pagefind-modal> on close, never from this file
 	handleModalClose() {
 		this.buttonEl?.setAttribute('aria-expanded', 'false');
 		this.buttonEl?.focus();
@@ -167,7 +162,6 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 			this,
 		);
 
-		// Hover or focus the toggle and the stylesheet starts loading, so it's ready before the modal opens
 		this.addEventListener('pointerenter', this.#preloadPagefindCss, { once: true, signal });
 		this.addEventListener('focusin', this.#preloadPagefindCss, { once: true, signal });
 

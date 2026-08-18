@@ -1,7 +1,7 @@
 const hideThresholdPixels = 16;
 const revealThresholdPixels = 64;
 
-// Eligibility gate: stay hidden until the reader is genuinely deep into a long page
+// Stay hidden until the reader is deep into a long page
 const minViewportMultiple = 2;
 const minPageFraction = 0.2;
 
@@ -35,7 +35,7 @@ class TopButton extends HTMLElement {
 		this.#detachScroll();
 	}
 
-	// Only do scroll work on viewports where the button can actually be shown
+	// No scroll work on viewports where the button is hidden
 	#handleViewportChange = () => {
 		if (this.#desktopQuery?.matches) {
 			this.#detachScroll();
@@ -91,7 +91,6 @@ class TopButton extends HTMLElement {
 			return;
 		}
 
-		// Past the gate, reveal on sustained upward scroll, hide on sustained downward
 		this.#scrollAccumulator -= delta;
 		if (this.#scrollAccumulator < -hideThresholdPixels) {
 			this.#setHidden(true);

@@ -21,6 +21,7 @@
 let instanceCount = 0;
 
 class NavMenu extends HTMLElement {
+	#controller: AbortController | undefined;
 	#lastPointerType = '';
 	#instanceId = `nav-${String(instanceCount++)}`;
 	#initialized = false;
@@ -383,17 +384,19 @@ class NavMenu extends HTMLElement {
 			this.#initialized = true;
 		}
 
-		this.addEventListener('pointerdown', this.#handlePointerDown);
-		this.addEventListener('click', this.#handleClick);
-		this.addEventListener('keydown', this.#handleKeydown);
-		document.addEventListener('click', this.#handleClickOutside);
+		this.#controller = new AbortController();
+
+		const { signal } = this.#controller;
+
+		this.addEventListener('pointerdown', this.#handlePointerDown, { signal });
+		this.addEventListener('click', this.#handleClick, { signal });
+		this.addEventListener('keydown', this.#handleKeydown, { signal });
+		document.addEventListener('click', this.#handleClickOutside, { signal });
 	}
 
 	disconnectedCallback() {
-		this.removeEventListener('pointerdown', this.#handlePointerDown);
-		this.removeEventListener('click', this.#handleClick);
-		this.removeEventListener('keydown', this.#handleKeydown);
-		document.removeEventListener('click', this.#handleClickOutside);
+		this.#controller?.abort();
+		this.#controller = undefined;
 	}
 }
 
