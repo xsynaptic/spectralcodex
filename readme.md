@@ -1,17 +1,18 @@
 # Spectral Codex
 
-This repository contains the working Astro project used to generate the [Spectral Codex](https://spectralcodex.com) website.
+This repository contains the working Astro project used to generate the [Spectral Codex](https://spectralcodex.com) website, a digital garden documenting historical sites, abandoned places, cultural assets, and oddball attractions in Taiwan and the broader region of East and Southeast Asia.
 
 ## Features
 
 ### Content Management
 
-- All content authored in MDX using the Content Layer API
-- Quality scoring system (0-5 scale) drives site-wide content prioritization
-- Comprehensive validation: frontmatter checks, cross-reference verification, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference and aspect ratio validation
+- All content authored in MDX using the Content Layer API, with strict Zod schemas and generated JSON schemas for editor tooling
+- Entry quality scoring on a 1-5 scale, used to prioritize content in listings, chronology highlights, and image fallbacks
+- Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference and aspect ratio validation. Astro only logs bad references, so this runs as a separate script that exits non-zero
 - Automated excerpt generation for previews and listings
-- Metadata index with automatic backlinks discovery from internal links
-- Content linting and formatting via [mdxlint](https://github.com/remcohaszing/mdxlint) with remark plugins
+- Backlinks discovered from the internal `<Link>` component, plus entry counts computed across regions, themes, series, and resources
+- Markdown processed by [satteri](https://github.com/bruits/satteri) with plugins for component auto-import, image groups, CJK wrapping, and trailing slashes
+- Content linting and formatting via [mdxlint](https://github.com/remcohaszing/mdxlint)
 - Automatic redirect generation from `formerIds` frontmatter into Caddy config
 - Media orphan detection for unreferenced images
 - Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling
@@ -20,15 +21,15 @@ This repository contains the working Astro project used to generate the [Spectra
 
 **Content Layer Integration**
 
-- Experimental image loader treating individual images as first-class content with metadata extraction
+- Images are first-class content entries with metadata read from the files themselves, via [`@xsynaptic/astro-image-loader`](https://github.com/xsynaptic/astro-lab/tree/main/packages/astro-image-loader), written for this project and now maintained separately
 - Automatic extraction of camera settings, GPS coordinates, and other EXIF data from images
 - Automatic generation of data URI-encoded low-quality image placeholders (LQIPs)
-- Custom remark plugin for advanced image layout (groups, carousels, aspect ratio handling)
+- Satteri plugin for advanced image layout (groups, carousels, aspect ratio handling)
 - Hero image support with optional CSS-only image carousels
 
 **External Image Server**
 
-Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service.
+Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service, and reference images by URL rather than importing them.
 
 - Keep original image assets in the media folder specified in `.env`; high-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended, and the current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom
 - [imagor](https://github.com/cshum/imagor) image server (MozJPEG build) handles on-demand resizing, format conversion, and quality adjustment
@@ -41,12 +42,14 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 ### Interactive Maps
 
 - React-based map component built with [MapLibre](https://maplibre.org/), [react-map-gl](https://visgl.github.io/react-map-gl/), and [Protomaps](https://protomaps.com/)
-- Custom filter controls for adjusting what points are visible on the map
+- Every mappable feature goes into one global directory built once per compile; each map selects what it needs by region subtree, theme, or explicit list, and small maps skip the fetch and inline their points instead
+- Chunked popup data payloads with image preloading, keeping interaction responsive across thousands of points
+- Map payloads run through a key-compression codec in its own package, shared by the build script that writes them and the client that reads them
 - Popups, clustering, filtering by objectives, and responsive design
+- Custom filter controls for adjusting what points are visible on the map
 - Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
 - Persistent storage of map data via IndexedDB
 - Distance-based discovery via nearby locations, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
-- Chunked popup data payloads with image preloading, keeping interaction responsive across thousands of points
 
 ### Search & Discovery
 
@@ -57,18 +60,17 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### Chronology
 
-- Chronological content browsing with yearly, monthly, and daily views
+- Chronological content browsing by year and month, with a GitHub-style activity graph on each year page
 - Intelligent content deduplication across time periods based on created, updated, and visited dates
 - Automatic highlight selection using quality scores
 - Quality-based filtering with different thresholds for overview vs. detailed views
 
 ### User Experience
 
-- Native web components for interactive elements (dark mode toggle, reading progress, image carousels, pagination controls, back-to-top button)
+- Native web components for interactive elements (dark mode toggle, reading progress, navigation loading bar, image carousels, pagination, search toggle, back-to-top button)
 - Dark/light mode toggle with system preference detection and localStorage persistence
-- Visual reading progress indicator for long-form content
-- Loading progress bar during navigation
 - Custom CJK character handling and language-specific styling
+- Self-hosted variable fonts via Astro's fonts API
 - Not fully internationalized; the goal of the project is to display multiple scripts on the same page without compromising aesthetics
 
 ### SEO & Social
@@ -116,7 +118,7 @@ Deployment is handled by custom TypeScript scripts. These are specific to this p
 10. Static file transfer via rsync
 11. OG image deployment
 12. Caddy config and TLS cert sync with reload
-13. Health check against the live site
+13. Edge verification: one URL per cache tier checked against its expected `Cache-Control` header, cache-busted so requests reach Caddy instead of the CDN
 14. CDN cache purge and cache warming (detached run on the server)
 
 The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
