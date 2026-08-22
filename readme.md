@@ -75,7 +75,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### SEO & Social
 
-- Programmatic OG image generation via [Satori](https://github.com/vercel/satori) and Sharp with multilingual font subsetting (Latin, CJK, Thai, Japanese), luminance-aware adaptive text color, and concurrent processing
+- Programmatic OG image generation via [Takumi](https://takumi.kane.tw) and Sharp with multilingual font subsetting (Latin, CJK, Thai, Japanese), luminance-aware adaptive text color, and concurrent processing
 - Hierarchical deterministic fallback system for entries without a featured image
 - Digest-based caching; only regenerates when content or source image changes
 - Comprehensive meta tags and structured data

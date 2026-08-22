@@ -35,7 +35,7 @@ Copies generated Astro content collection schemas from `.astro/collections` to t
 
 ### `og-image`
 
-Advanced OG image generator using [Satori](https://github.com/vercel/satori) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Uses digest-based caching via Keyv.
+Advanced OG image generator using [Takumi](https://takumi.kane.tw) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Sharp decodes each source photo once per batch and hands Takumi raw pixels; output freshness is tracked per entry via Keyv.
 
 ## Map Data
 

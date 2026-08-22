@@ -1,9 +1,7 @@
-/** @jsxRuntime automatic */
-/** @jsxImportSource satori/jsx */
-import type { OgElement } from '@xsynaptic/og-image-generator';
-
 import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
+import { Bitmap } from 'takumi-js/helpers/jsx';
 
+import type { ProcessedImage } from './generate.js';
 import type { OpenGraphMetadataItem } from './types.js';
 
 const showBranding = true as boolean;
@@ -35,200 +33,155 @@ function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) 
 	);
 }
 
+function isInverted(luminance?: number): boolean {
+	return !!luminance && luminance >= LUMINANCE_THRESHOLD;
+}
+
+// Gradient text needs backgroundClip; a flat inverted fill is a plain color
+function fillStyles(inverted: boolean, color: string, gradient: string) {
+	return inverted
+		? { color }
+		: { backgroundClip: 'text' as const, backgroundImage: gradient, color: 'transparent' };
+}
+
+// Takumi floors the shadow blur radius and odd values lose their lower-right tail; keep every one even
 function TitleSite({ luminance }: { luminance?: number | undefined }) {
 	const brandLabel = 'Spectral Codex'.toUpperCase().trim();
 
 	// Letter spacing is also added AFTER characters
 	const letterSpacing = '56px';
 
-	const commonStyles = {
-		fontFamily: 'Lora',
-		fontSize: '26px',
-		fontWeight: 700,
-		letterSpacing,
-		lineHeight: 1.25,
-		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
-		paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
-	} as const;
-
-	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
+	const inverted = isInverted(luminance);
 
 	return (
 		<div
 			style={{
 				display: 'flex',
+				justifyContent: 'center',
 				position: 'absolute',
 				top: '60px',
+				left: '0px',
+				width: '100%',
+				color: inverted ? 'rgb(24, 24, 27)' : '#ffffff',
+				fontFamily: 'Lora',
+				fontSize: '26px',
+				fontWeight: 700,
+				letterSpacing,
+				lineHeight: 1.25,
+				paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
+				textShadow: inverted
+					? '0px 0px 4px rgb(220, 220, 225, 0.8)'
+					: '0px 0px 4px rgb(12, 12, 14, 0.8)',
 			}}
 		>
-			<div
-				style={{
-					color: 'transparent',
-					position: 'absolute',
-					textShadow: showInverted
-						? `0px 0px 3px rgb(220, 220, 225, 0.8)`
-						: `0px 0px 3px rgb(12, 12, 14, 0.8)`,
-					...commonStyles,
-				}}
-			>
-				{brandLabel}
-			</div>
-			<div
-				style={{
-					color: showInverted ? 'rgb(24, 24, 27)' : '#ffffff',
-					...commonStyles,
-				}}
-			>
-				{brandLabel}
-			</div>
+			{brandLabel}
 		</div>
 	);
 }
 
-// Multilingual title support requires different params and styles for each language
-function TitleMultilingual({
+// Each script gets its own face and optical size; `lang` also drives Han unification
+const SCRIPT_STYLES = {
+	zh: {
+		lang: 'zh-Hant',
+		fontFamily: 'Noto Serif TC',
+		fontSize: '48px',
+		fontWeight: 700,
+		lineHeight: 1.25,
+	},
+	ja: {
+		lang: 'ja',
+		fontFamily: 'Zen Antique',
+		fontSize: '48px',
+		fontWeight: 400,
+		lineHeight: 1.25,
+	},
+	th: {
+		lang: 'th',
+		fontFamily: 'Noto Serif Thai',
+		fontSize: '40px',
+		fontWeight: 500,
+		lineHeight: 1,
+	},
+} as const;
+
+function resolveScript({
 	titleZh,
 	titleJa,
 	titleTh,
+}: {
+	titleZh?: string | undefined;
+	titleJa?: string | undefined;
+	titleTh?: string | undefined;
+}) {
+	if (titleZh) return { ...SCRIPT_STYLES.zh, title: titleZh };
+	if (titleJa) return { ...SCRIPT_STYLES.ja, title: titleJa };
+	if (titleTh) return { ...SCRIPT_STYLES.th, title: titleTh };
+
+	return;
+}
+
+function TitleMultilingual({
 	luminance,
+	...titles
 }: {
 	titleZh?: string | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
 	luminance?: number | undefined;
 }) {
-	const commonStyles = {
-		display: 'block', // Necessary for line clamp
-		lineClamp: 1,
-		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
-		padding: '0 100px', // Looser side margins for longer text
-	} as const;
+	const script = resolveScript(titles);
 
-	const titleMultilingual = titleZh || titleJa || titleTh;
+	if (!script) return;
 
-	if (!titleMultilingual) return;
-
-	let langStyles = {};
-	let lang: string | undefined;
-
-	if (titleZh) {
-		langStyles = {
-			fontFamily: 'Noto Serif TC',
-			fontSize: '48px',
-			fontWeight: 700,
-			lineHeight: 1.25,
-		};
-		lang = 'zh-Hant';
-	} else if (titleJa) {
-		langStyles = {
-			fontFamily: 'Zen Antique',
-			fontSize: '48px',
-			fontWeight: 400,
-			lineHeight: 1.25,
-		};
-		lang = 'ja';
-	} else if (titleTh) {
-		langStyles = {
-			fontFamily: 'Noto Serif Thai',
-			fontSize: '40px',
-			fontWeight: 500,
-			lineHeight: 1,
-		};
-		lang = 'th';
-	}
-
-	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
+	const { lang, title, ...scriptStyles } = script;
+	const inverted = isInverted(luminance);
 
 	return (
-		<div style={{ display: 'flex' }}>
-			<div
-				style={{
-					color: 'transparent',
-					position: 'absolute',
-					textShadow: showInverted
-						? `0px 0px 4px rgb(220, 220, 225, 0.7)`
-						: `1px 1px 4px rgb(12, 12, 14, 0.6)`,
-					...langStyles,
-					...commonStyles,
-				}}
-				lang={lang}
-			>
-				{titleMultilingual}
-			</div>
-			<div
-				style={{
-					backgroundClip: 'text',
-					backgroundImage: showInverted
-						? 'rgb(12, 12, 14)'
-						: 'linear-gradient(to bottom, #fef9ec, #f4da93)',
-					color: 'transparent',
-					...langStyles,
-					...commonStyles,
-				}}
-				lang={lang}
-			>
-				{titleMultilingual}
-			</div>
+		<div
+			style={{
+				lineClamp: 1,
+				maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+				padding: '0 100px', // Looser side margins for longer text
+				textOverflow: 'ellipsis',
+				textShadow: inverted
+					? '0px 0px 4px rgb(220, 220, 225, 0.7)'
+					: '1px 1px 4px rgb(12, 12, 14, 0.6)',
+				...scriptStyles,
+				...fillStyles(inverted, 'rgb(12, 12, 14)', 'linear-gradient(to bottom, #fef9ec, #f4da93)'),
+			}}
+			lang={lang}
+		>
+			{title}
 		</div>
 	);
 }
 
 function Title({ title, luminance }: { title: string; luminance?: number | undefined }) {
-	const commonStyles = {
-		display: 'block', // Necessary for line clamp
-		fontFamily: 'Lora',
-		fontSize: '40px',
-		fontWeight: 700,
-		lineClamp: 2,
-		lineHeight: 1.15,
-		maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
-		padding: '0 100px 60px', // Looser side margins for longer text
-	} as const;
-
-	const showInverted = luminance && luminance >= LUMINANCE_THRESHOLD;
+	const inverted = isInverted(luminance);
 
 	return (
-		<div style={{ display: 'flex' }}>
-			<div
-				style={{
-					color: 'transparent',
-					position: 'absolute',
-					textShadow: showInverted
-						? `0px 0px 5px rgb(240, 240, 245, 0.8)`
-						: `1px 1px 6px rgb(24, 24, 27, 0.4)`,
-					...commonStyles,
-				}}
-			>
-				{title}
-			</div>
-			<div
-				style={{
-					backgroundClip: 'text',
-					backgroundImage: showInverted
-						? 'rgb(24, 24, 27)'
-						: 'linear-gradient(to bottom, #ffffff, #fef9ec)',
-					color: 'transparent',
-					...commonStyles,
-				}}
-			>
-				{title}
-			</div>
+		<div
+			style={{
+				fontFamily: 'Lora',
+				fontSize: '40px',
+				fontWeight: 700,
+				lineClamp: 2,
+				lineHeight: 1.15,
+				maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+				padding: '0 100px 60px', // Looser side margins for longer text
+				textOverflow: 'ellipsis',
+				textShadow: inverted
+					? '0px 0px 6px rgb(240, 240, 245, 0.8)'
+					: '1px 1px 6px rgb(24, 24, 27, 0.4)',
+				...fillStyles(inverted, 'rgb(24, 24, 27)', 'linear-gradient(to bottom, #ffffff, #fef9ec)'),
+			}}
+		>
+			{title}
 		</div>
 	);
 }
 
-export function getOpenGraphElement(
-	entry: OpenGraphMetadataItem,
-	image?: {
-		src: string;
-		height: number;
-		width: number;
-		// Luminance of top zone (10%-20%), 0-255
-		luminanceTop?: number | undefined;
-		// Luminance of bottom zone (70%-90%), 0-255
-		luminanceBottom?: number | undefined;
-	},
-): OgElement {
+export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: ProcessedImage) {
 	return (
 		<div
 			style={{
@@ -238,14 +191,12 @@ export function getOpenGraphElement(
 				height: `${String(OPEN_GRAPH_IMAGE_HEIGHT)}px`,
 			}}
 		>
-			{image && image.src.length > 0 ? (
-				<img
-					src={image.src}
+			{image ? (
+				<Bitmap
+					data={image.data}
 					height={image.height}
 					width={image.width}
-					style={{
-						position: 'absolute',
-					}}
+					style={{ position: 'absolute' }}
 				/>
 			) : undefined}
 			{/* Gradient overlay */}

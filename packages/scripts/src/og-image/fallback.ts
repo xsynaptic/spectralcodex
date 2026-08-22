@@ -18,7 +18,6 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = {
 	// Collections
 	chronology: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
-	notes: 'taiwan/miaoli/tongxiao/tongxiao-railway-granary-complex-3.jpg',
 	locations: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
 	regions: 'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-1.jpg',
 	resources: [

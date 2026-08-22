@@ -25,7 +25,6 @@ export function getChronologyTitle(id: string): string {
 // Collections contributing dated content to the chronology, mirroring the catalog (every collection except pages)
 const chronologyImageCollections: ReadonlyArray<string> = [
 	ContentCollectionsEnum.Posts,
-	ContentCollectionsEnum.Notes,
 	ContentCollectionsEnum.Locations,
 	ContentCollectionsEnum.Regions,
 	ContentCollectionsEnum.Series,

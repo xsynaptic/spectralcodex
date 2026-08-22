@@ -1,17 +1,55 @@
-import type { Font } from 'satori';
+import type { Font } from 'takumi-js';
 
-import {
-	analyzeLuminance,
-	createOgRenderer,
-	encodeDataUrl,
-	resizeCover,
-} from '@xsynaptic/og-image-generator';
+import sharp from 'sharp';
+import { render, setGlyphCacheMaxBytes } from 'takumi-js';
+import { Renderer } from 'takumi-js/node';
 
 import type { OpenGraphMetadataItem } from './types.js';
 
 import { getOpenGraphElement } from './element.js';
 
-async function processImage({
+// A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
+const GLYPH_CACHE_BYTES = 64 * 1024 * 1024;
+
+// A vertical band as [start, end] fractions of the height
+type LuminanceZone = [start: number, end: number];
+
+export interface ProcessedImage {
+	data: Buffer;
+	height: number;
+	width: number;
+	// Mean perceived luminance of the top zone, 0-255
+	luminanceTop: number;
+	// Mean perceived luminance of the bottom zone, 0-255
+	luminanceBottom: number;
+}
+
+// Samples every 16th pixel; the result only picks a text treatment, so precision is not the point
+function zoneLuminance(
+	pixels: Buffer,
+	width: number,
+	height: number,
+	[start, end]: LuminanceZone,
+): number {
+	const from = Math.floor(height * start) * width * 4;
+	const to = Math.floor(height * end) * width * 4;
+
+	let total = 0;
+	let count = 0;
+
+	for (let index = from; index < to; index += 4 * 16) {
+		total +=
+			0.299 * (pixels[index] ?? 0) +
+			0.587 * (pixels[index + 1] ?? 0) +
+			0.114 * (pixels[index + 2] ?? 0);
+		count++;
+	}
+
+	return count > 0 ? Math.round(total / count) : 0;
+}
+
+// Raw RGBA hands off to Takumi without an encode, and luminance reads the same buffer
+export async function processImage({
 	imageInput,
 	height,
 	width,
@@ -21,35 +59,26 @@ async function processImage({
 	height: number;
 	width: number;
 	isFallback: boolean;
-}): Promise<{
-	dataUrl: string;
-	luminanceTop: number;
-	luminanceBottom: number;
-}> {
-	const pipeline = resizeCover(imageInput, { height, position: 'top', width });
+}): Promise<ProcessedImage> {
+	const pipeline = sharp(imageInput).resize({ fit: 'cover', height, position: 'top', width });
 
 	if (isFallback) {
 		pipeline.blur(16);
 	}
 
-	const { data, info } = await pipeline.toBuffer({ resolveWithObject: true });
+	const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 
-	// Analyze luminance zones (10%-20% for top, 70%-90% for bottom)
-	const [luminanceTop = 0, luminanceBottom = 0] = await analyzeLuminance(data, [
-		[0.1, 0.2],
-		[0.7, 0.9],
-	]);
-
-	const dataUrl = encodeDataUrl(data, info.format === 'png' ? 'png' : 'jpeg');
-
-	return { dataUrl, luminanceTop, luminanceBottom };
+	return {
+		data,
+		height: info.height,
+		width: info.width,
+		luminanceTop: zoneLuminance(data, info.width, info.height, [0.1, 0.2]),
+		luminanceBottom: zoneLuminance(data, info.width, info.height, [0.7, 0.9]),
+	};
 }
 
-/**
- * Creates a generator function configured with fonts and dimensions
- * Call once at startup, reuse for all images (Satori best practice)
- */
-export function createGenerator({
+// Fonts and glyph outlines live on the renderer, so build one and reuse it for every card
+export function createRenderer({
 	fonts,
 	width,
 	height,
@@ -60,52 +89,22 @@ export function createGenerator({
 	height: number;
 	jpegQuality?: number;
 }) {
-	const render = createOgRenderer({ fonts, format: 'jpeg', height, quality: jpegQuality, width });
+	// Read when a cache is first used, so this has to run before the first render
+	setGlyphCacheMaxBytes(GLYPH_CACHE_BYTES);
 
-	// Cache processed image data since source imagery is sometimes reused
-	const processedImageCache = new Map<
-		string,
-		{ dataUrl: string; luminanceTop: number; luminanceBottom: number }
-	>();
+	const renderer = new Renderer();
 
-	return async function generateOpenGraphImage({
-		entry,
-		imageId,
-		imageInput,
-	}: {
-		entry: OpenGraphMetadataItem;
-		imageId?: string;
-		imageInput?: string | undefined;
-	}): Promise<Buffer> {
-		let processed: { dataUrl: string; luminanceTop: number; luminanceBottom: number } | undefined;
-
-		if (imageInput) {
-			const cacheKey = imageId ? `${imageId}:${String(entry.isFallback)}` : undefined;
-			const cached = cacheKey ? processedImageCache.get(cacheKey) : undefined;
-
-			if (cached) {
-				processed = cached;
-			} else {
-				processed = await processImage({
-					imageInput,
-					height,
-					width,
-					isFallback: entry.isFallback,
-				});
-				if (cacheKey) {
-					processedImageCache.set(cacheKey, processed);
-				}
-			}
-		}
-
-		const element = getOpenGraphElement(entry, {
-			src: processed?.dataUrl ?? '',
+	return async function renderOpenGraphImage(
+		entry: OpenGraphMetadataItem,
+		image?: ProcessedImage,
+	): Promise<Uint8Array> {
+		return render(getOpenGraphElement(entry, image), {
+			format: 'jpeg',
+			fonts,
 			height,
+			quality: jpegQuality,
+			renderer,
 			width,
-			luminanceTop: processed?.luminanceTop,
-			luminanceBottom: processed?.luminanceBottom,
 		});
-
-		return render(element);
 	};
 }

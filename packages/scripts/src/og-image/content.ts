@@ -71,7 +71,6 @@ function getImageFeaturedData({
 export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
 		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Notes, title: 'Notes', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Posts, title: 'Posts', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Regions, title: 'Regions' },
