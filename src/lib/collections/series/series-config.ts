@@ -33,7 +33,6 @@ export const series = defineCollection({
 			// Computed properties, for internal use only!
 			_locationCount: z.number().int().optional(),
 			_postCount: z.number().int().optional(),
-			_noteCount: z.number().int().optional(),
 			_entryCount: z.number().int().optional(),
 		})
 		.strict(),

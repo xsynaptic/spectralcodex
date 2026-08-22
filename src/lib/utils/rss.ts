@@ -11,7 +11,6 @@ import * as R from 'remeda';
 
 import { MILLISECONDS_PER_HOUR, SITE_TIMEZONE_OFFSET_HOURS } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
@@ -31,7 +30,7 @@ async function createRenderMdxFunction() {
 	container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
 
 	return async function (
-		entry: CollectionEntry<'notes' | 'locations' | 'pages' | 'posts'>,
+		entry: CollectionEntry<'locations' | 'pages' | 'posts'>,
 		options?: ContainerRenderOptions,
 	) {
 		const { Content } = await render(entry);
@@ -47,7 +46,7 @@ const generateFeedItem = async ({
 	excludeFootnotes,
 	debug,
 }: {
-	entry: CollectionEntry<'notes' | 'locations' | 'posts'>;
+	entry: CollectionEntry<'locations' | 'posts'>;
 	excludeFootnotes: boolean;
 	debug: boolean;
 }) => {
@@ -105,14 +104,12 @@ export async function generateFeedItems({
 	excludeFootnotes: boolean;
 	debug: boolean;
 }) {
-	const { entries: notes } = await getNotesCollection();
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 
 	return R.pipe(
 		await R.pipe(
 			[
-				...notes.filter((entry) => entry.data.entryQuality >= 3),
 				...posts.filter((entry) => entry.data.entryQuality >= 3),
 				...locations.filter((entry) => entry.data.entryQuality >= 3),
 			],

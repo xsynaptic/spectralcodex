@@ -25,7 +25,6 @@ export async function getCatalogStats() {
 	const { entries: images } = await getImagesCollection();
 
 	const stats = {
-		notes: getCatalogCounts(catalogGroups.notes),
 		locations: {
 			...getCatalogCounts(catalogGroups.locations),
 			withImages: formatNumber({

@@ -24,7 +24,6 @@ export const resources = defineCollection({
 		// Computed properties, for internal use only!
 		_locationCount: z.number().optional(),
 		_postCount: z.number().optional(),
-		_noteCount: z.number().optional(),
 		_entryCount: z.number().optional(),
 	}).strict(),
 });

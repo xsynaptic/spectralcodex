@@ -49,15 +49,7 @@ const { values } = parseArgs({
 });
 
 // Collections that may contain external links
-const LINK_COLLECTIONS = [
-	'locations',
-	'notes',
-	'pages',
-	'posts',
-	'regions',
-	'resources',
-	'themes',
-] as const;
+const LINK_COLLECTIONS = ['locations', 'pages', 'posts', 'regions', 'resources', 'themes'] as const;
 
 const dataStorePath = path.resolve(rootPath, DATA_STORE_PATH);
 const dbPath = path.resolve(rootPath, values['db-path']);

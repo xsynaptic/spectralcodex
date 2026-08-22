@@ -50,7 +50,6 @@ const command = positionals[0];
 
 const contentCollectionNames = [
 	'chronology',
-	'notes',
 	'locations',
 	'pages',
 	'posts',
@@ -63,7 +62,6 @@ const contentCollectionNames = [
 const allEntries = getDataStoreCollection(collections, contentCollectionNames);
 
 const metadataEntries = getDataStoreCollection(collections, [
-	'notes',
 	'locations',
 	'pages',
 	'posts',
@@ -72,7 +70,7 @@ const metadataEntries = getDataStoreCollection(collections, [
 	'themes',
 ]);
 
-const bodyContentEntries = getDataStoreCollection(collections, ['notes', 'locations', 'posts']);
+const bodyContentEntries = getDataStoreCollection(collections, ['locations', 'posts']);
 
 const resourceEntries = getDataStoreCollection(collections, ['resources']);
 

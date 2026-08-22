@@ -30,8 +30,6 @@ export const themes = defineCollection({
 			_locationCount: z.number().int().optional(),
 			_posts: z.string().array().optional(),
 			_postCount: z.number().int().optional(),
-			_notes: z.string().array().optional(),
-			_noteCount: z.number().int().optional(),
 			_entryCount: z.number().int().optional(),
 		})
 		.strict(),

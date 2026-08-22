@@ -128,12 +128,6 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 			url: getSiteUrl('themes'),
 			children: themesMenu,
 		},
-		/* @TODO: decide whether to keep notes or not
-		{
-			title: t('collection.notes.labelPlural'),
-			url: getSiteUrl('notes'),
-		},
-		*/
 		{
 			title: t('menu.chronology.label'),
 			url: getSiteUrl('chronology'),

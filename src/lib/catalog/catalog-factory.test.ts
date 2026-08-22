@@ -23,10 +23,6 @@ describe('byCollection', () => {
 		expect(ids(catalog.byCollection('posts'))).toEqual(['a', 'c']);
 		expect(ids(catalog.byCollection('posts', 'locations'))).toEqual(['a', 'b', 'c']);
 	});
-
-	test('returns an empty array when no collection matches', () => {
-		expect(catalog.byCollection('notes')).toEqual([]);
-	});
 });
 
 describe('comparators', () => {
@@ -108,32 +104,23 @@ describe('backlinksOf', () => {
 		makeCatalogItem({
 			id: 'target',
 			collection: 'posts',
-			backlinks: new Set(['linker-post', 'linker-region', 'linker-note']),
+			backlinks: new Set(['linker-post', 'linker-region']),
 		}),
 		makeCatalogItem({
 			id: 'linker-post',
 			collection: 'posts',
 			dateCreated: new Date('2023-01-01'),
 		}),
-		makeCatalogItem({
-			id: 'linker-note',
-			collection: 'notes',
-			dateCreated: new Date('2024-01-01'),
-		}),
+
 		makeCatalogItem({ id: 'linker-region', collection: 'regions' }),
 	]);
 
 	test('returns every inbound link, uncapped and unfiltered, newest first', () => {
-		expect(ids(catalog.backlinksOf('target'))).toEqual([
-			'linker-note',
-			'linker-post',
-			'linker-region',
-		]);
+		expect(ids(catalog.backlinksOf('target'))).toEqual(['linker-post', 'linker-region']);
 	});
 
 	test('leaves narrowing to the caller', () => {
 		expect(ids(catalog.backlinksOf('target').filter(filterIsEditorialEntry))).toEqual([
-			'linker-note',
 			'linker-post',
 		]);
 	});

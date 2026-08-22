@@ -9,7 +9,6 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { getWordCount } from '#lib/catalog/catalog-word-count.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getNotesCollection } from '#lib/collections/notes/notes-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
@@ -73,7 +72,6 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 
 	const catalogItemsById = new Map<string, CatalogItem>();
 
-	const { entries: notes } = await getNotesCollection();
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: pages } = await getPagesCollection();
 	const { entries: posts } = await getPostsCollection();
@@ -85,7 +83,7 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
 
 	// Note: name collisions between all these collections is prohibited and will throw an error
-	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
+	for (const collection of [pages, posts, locations, regions, themes, series]) {
 		for (const entry of collection) {
 			if (catalogItemsById.has(entry.id)) {
 				throw new Error(
@@ -128,7 +126,7 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	}
 
 	// Now run through everything again and generate backlinks from <Link> components
-	for (const collection of [pages, posts, notes, locations, regions, themes, series]) {
+	for (const collection of [pages, posts, locations, regions, themes, series]) {
 		for (const entry of collection) {
 			generateContentBacklinksFromMdxComponents(entry, catalogItemsById);
 		}

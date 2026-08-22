@@ -6,16 +6,7 @@ import { makeEntry } from '../validate-content/validate-test-utils';
 import { buildRedirectPairs } from './build-redirect-pairs';
 
 // Fixtures must carry all collections; getDataStoreCollection throws on a missing one
-const ALL_COLLECTIONS = [
-	'locations',
-	'posts',
-	'notes',
-	'pages',
-	'themes',
-	'series',
-	'regions',
-	'resources',
-];
+const ALL_COLLECTIONS = ['locations', 'posts', 'pages', 'themes', 'series', 'regions', 'resources'];
 
 function makeCollections(
 	populated: Record<string, Array<DataStoreEntry>> = {},

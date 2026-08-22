@@ -18,13 +18,12 @@ export const getRegionsCollection = createCollectionData({
 
 		const locations = await getRawCollection('locations');
 		const posts = await getRawCollection('posts');
-		const notes = await getRawCollection('notes');
 
 		const regionsTree = createRegionsTree(entries);
 
 		populateRegionsHierarchy(entries, regionsTree);
 		populateRegionsLangCode(entries);
-		populateRegionsContent({ entries, locations, posts, notes, regionsTree });
+		populateRegionsContent({ entries, locations, posts, regionsTree });
 
 		console.log(
 			`[Regions] Hierarchy computed in ${(performance.now() - extendStart).toFixed(5)}ms`,

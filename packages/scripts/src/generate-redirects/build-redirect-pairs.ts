@@ -8,7 +8,7 @@ interface RedirectPair {
 }
 
 // Collections where page URL = /{id}/
-const FLAT_COLLECTIONS = ['locations', 'posts', 'notes', 'pages'];
+const FLAT_COLLECTIONS = ['locations', 'posts', 'pages'];
 
 // Collections where page URL = /{collection}/{id}/
 const PREFIXED_COLLECTIONS: Record<string, string> = {

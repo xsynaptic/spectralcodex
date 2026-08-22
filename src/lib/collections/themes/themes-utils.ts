@@ -5,7 +5,6 @@ import * as R from 'remeda';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
-import { createNotesByIdsFunction } from '#lib/collections/notes/notes-utils.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
@@ -32,17 +31,6 @@ async function createPostsByThemeFunction() {
 	};
 }
 
-// Get notes that have a term
-async function createNotesByThemeFunction() {
-	const getNotesByIds = await createNotesByIdsFunction();
-
-	return function getNotesByTheme(
-		entry: CollectionEntry<'themes'>,
-	): Array<CollectionEntry<'notes'>> {
-		return getNotesByIds(entry.data._notes ?? []);
-	};
-}
-
 // Get locations that have a term
 async function createLocationsByThemeFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
@@ -60,7 +48,6 @@ export async function createQueryThemesEntryFunction() {
 
 	const getLocationsByTheme = await createLocationsByThemeFunction();
 	const getPostsByTheme = await createPostsByThemeFunction();
-	const getNotesByTheme = await createNotesByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const { chunkKeyById } = await getMapDirectoryData();
@@ -73,7 +60,6 @@ export async function createQueryThemesEntryFunction() {
 		const locationsListed = locationsFiltered.filter(({ data }) => !data.hideIndex);
 
 		const postsFiltered = getPostsByTheme(entry);
-		const notesFiltered = getNotesByTheme(entry);
 
 		// Catalog items are the posts, notes, and locations that are associated with the theme
 		const featuredCandidates = catalog.resolve([
@@ -82,14 +68,9 @@ export async function createQueryThemesEntryFunction() {
 				R.filter((location) => location.data.entryQuality >= 2),
 			),
 			...postsFiltered,
-			...notesFiltered,
 		]);
 
-		const restCandidates = catalog.resolve([
-			...locationsListed,
-			...postsFiltered,
-			...notesFiltered,
-		]);
+		const restCandidates = catalog.resolve([...locationsListed, ...postsFiltered]);
 
 		const { catalogItemsFiltered, catalogItems, catalogItemsCount } = buildEntryCatalogItems(
 			featuredCandidates,

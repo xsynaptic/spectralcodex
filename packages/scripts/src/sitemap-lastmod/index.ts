@@ -13,7 +13,7 @@ interface SitemapLastmodOptions {
 	outputPath?: string;
 }
 
-const ROOT_COLLECTIONS = new Set(['notes', 'locations', 'pages', 'posts']);
+const ROOT_COLLECTIONS = new Set(['locations', 'pages', 'posts']);
 
 function joinUrl(...parts: Array<string>): string {
 	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');

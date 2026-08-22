@@ -78,9 +78,8 @@ export function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'
 	}
 }
 
-// Notes share the post schema, so they declare regions the same way posts do
 function mapReferencesByRegion(
-	entries: Array<CollectionEntry<'notes' | 'posts'>>,
+	entries: Array<CollectionEntry<'posts'>>,
 ): Map<string, Array<string>> {
 	const map = new Map<string, Array<string>>();
 
@@ -108,13 +107,11 @@ export function populateRegionsContent({
 	entries,
 	locations,
 	posts,
-	notes,
 	regionsTree,
 }: {
 	entries: Array<CollectionEntry<'regions'>>;
 	locations: Array<CollectionEntry<'locations'>>;
 	posts: Array<CollectionEntry<'posts'>>;
-	notes: Array<CollectionEntry<'notes'>>;
 	regionsTree: Hierarchy;
 }) {
 	// Generate content by region maps; this will make subsequent calculations faster
@@ -130,7 +127,6 @@ export function populateRegionsContent({
 	}
 
 	const postsByRegionMap = mapReferencesByRegion(posts);
-	const notesByRegionMap = mapReferencesByRegion(notes);
 
 	// Calculate cumulative content counts, rolled up through descendants
 	for (const entry of entries) {
@@ -140,9 +136,6 @@ export function populateRegionsContent({
 		entry.data._locationCount = entry.data._locations.length;
 		entry.data._posts = collectByRegion(regionIds, postsByRegionMap);
 		entry.data._postCount = entry.data._posts.length;
-		entry.data._notes = collectByRegion(regionIds, notesByRegionMap);
-		entry.data._noteCount = entry.data._notes.length;
-		entry.data._entryCount =
-			entry.data._locationCount + entry.data._postCount + entry.data._noteCount;
+		entry.data._entryCount = entry.data._locationCount + entry.data._postCount;
 	}
 }

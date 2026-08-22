@@ -51,11 +51,6 @@ const translationStrings = {
 		'collection.posts.labelPlural': 'Posts',
 		'collection.posts.description': `The posts section primarily features long-form content: photo essays and galleries, road trip reports, geospatial narratives, and other writing forming the connective tissue between the other sections of this site. Posts are presented in reverse chronological order, with the most recent posts appearing at the top, adhering to the general principles of old-fashioned blogging.`,
 
-		// Notes
-		'collection.notes.labelSingular': 'Note',
-		'collection.notes.labelPlural': 'Notes',
-		'collection.notes.description': `This section gathers more casual content: photo galleries, opinion pieces, administrative announcements, and other miscellaneous stuff. Think of this as the old-fashioned blog within the wider site, much less polished and generally less serious.`,
-
 		// Regions
 		'collection.regions.labelSingular': 'Region',
 		'collection.regions.labelPlural': 'Regions',

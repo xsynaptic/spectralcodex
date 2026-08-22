@@ -8,7 +8,6 @@ import { MAP_DISPLAY_REGION_IDS, MAP_DIVISION_DATA_PATH } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
-import { createNotesByIdsFunction } from '#lib/collections/notes/notes-utils.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
@@ -100,7 +99,7 @@ export async function getRegionSchema(
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
-	const getNotesByIds = await createNotesByIdsFunction();
+
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
 	const { chunkKeyById } = await getMapDirectoryData();
@@ -123,7 +122,6 @@ export async function createQueryRegionsEntryFunction() {
 				catalog.resolve,
 			),
 			...R.pipe(entry.data._posts ?? [], getPostsByIds, catalog.resolve),
-			...R.pipe(entry.data._notes ?? [], getNotesByIds, catalog.resolve),
 		];
 
 		const restCandidates = R.pipe(

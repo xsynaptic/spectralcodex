@@ -31,7 +31,6 @@ const { collections } = loadDataStore(dataStorePath);
 
 const allEntries = getDataStoreCollection(collections, [
 	'chronology',
-	'notes',
 	'locations',
 	'pages',
 	'posts',

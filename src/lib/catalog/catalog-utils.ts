@@ -6,7 +6,7 @@ import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-typ
 const RELATED_CATALOG_ITEMS_LIMIT = 25;
 
 // Regions, themes, series, and pages link structurally; only these link editorially
-const EDITORIAL_COLLECTIONS = new Set<CatalogCollectionKey>(['notes', 'locations', 'posts']);
+const EDITORIAL_COLLECTIONS = new Set<CatalogCollectionKey>(['locations', 'posts']);
 
 export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
 	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();

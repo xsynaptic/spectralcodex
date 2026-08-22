@@ -20,7 +20,6 @@ export const getResourcesCollection = createCollectionData({
 	async mutate(entries) {
 		const locations = await getRawCollection('locations');
 		const posts = await getRawCollection('posts');
-		const notes = await getRawCollection('notes');
 
 		for (const entry of entries) {
 			const resourceId = entry.id;
@@ -28,10 +27,9 @@ export const getResourcesCollection = createCollectionData({
 
 			let locationCount = 0;
 			let postCount = 0;
-			let noteCount = 0;
 
 			// Count content referencing this resource
-			for (const contentEntry of [...locations, ...posts, ...notes]) {
+			for (const contentEntry of [...locations, ...posts]) {
 				// Check URL match via links field (for website-type resources with match field)
 				const hasLinkMatch =
 					matchPattern &&
@@ -47,8 +45,6 @@ export const getResourcesCollection = createCollectionData({
 				if (hasLinkMatch || hasSourceMatch) {
 					if (contentEntry.collection === 'locations') {
 						locationCount++;
-					} else if (contentEntry.collection === 'notes') {
-						noteCount++;
 					} else {
 						postCount++;
 					}
@@ -57,8 +53,7 @@ export const getResourcesCollection = createCollectionData({
 
 			entry.data._locationCount = locationCount;
 			entry.data._postCount = postCount;
-			entry.data._noteCount = noteCount;
-			entry.data._entryCount = locationCount + postCount + noteCount;
+			entry.data._entryCount = locationCount + postCount;
 		}
 	},
 });

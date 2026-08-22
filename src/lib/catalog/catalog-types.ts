@@ -6,7 +6,7 @@ import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 export type CatalogCollectionKey = Extract<
 	CollectionKey,
-	'notes' | 'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
+	'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
 >;
 
 // This is a subset of common properties of different content collections

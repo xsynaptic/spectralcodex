@@ -6,7 +6,7 @@ import { navigate } from 'astro:transitions/client';
  * <pagination-select
  *   data-current-page="3"
  *   data-last-page="100"
- *   data-base-path="/notes/"        <-- normalized, trailing slash
+ *   data-base-path="/themes/"        <-- normalized, trailing slash
  *   data-page-label="Page {page}">  <-- option text template
  *   <nav aria-label="Pagination">
  *     <a>Previous</a>                                   <-- optional
