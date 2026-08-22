@@ -99,7 +99,6 @@ export async function getRegionSchema(
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
-
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
 	const { chunkKeyById } = await getMapDirectoryData();

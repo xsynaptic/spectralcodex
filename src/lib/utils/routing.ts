@@ -14,7 +14,7 @@ export const getBaseUrl = (...routeParts: Array<string>): string =>
 export const getSiteUrl = (...routeParts: Array<string>): string =>
 	joinUrl(PROD ? SITE : BASE_URL, ...routeParts, '/');
 
-const rootCollectionIds = new Set(['notes', 'locations', 'pages', 'posts']);
+const rootCollectionIds = new Set(['locations', 'pages', 'posts']);
 
 // Example: /base/{collection}/{routeParts}
 export const getContentUrl = (collection: CollectionKey, ...routeParts: Array<string>): string =>

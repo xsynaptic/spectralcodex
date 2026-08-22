@@ -8,13 +8,11 @@ This file is a glossary of terms commonly used in this project.
 
 **Entry**: A single piece of authored content in a collection, sourced from one Markdown or MDX file. Images are the exception: they are Entries of the Images collection, but their data is read from embedded metadata rather than an authored file. _Avoid_: document, record, node, item (reserve "item" for catalog rows).
 
-**Collection**: A named set of Entries sharing one schema (e.g. Locations, Posts, Notes, Pages, etc.). _Avoid_: content type, model.
+**Collection**: A named set of Entries sharing one schema (e.g. Locations, Posts, Pages, etc.). _Avoid_: content type, model.
 
 **Location**: A specific real-world place with coordinates, a category, and a condition. The central noun of the project; almost everything else exists to describe, group, or connect Locations. _Avoid_: place, site, POI, marker, pin.
 
-**Post**: A long-form article about one or more Locations, a journey, or a subject. _Avoid_: article, blog post, story.
-
-**Note**: A short Post. The distinction is length and ambition, not kind: an observation that does not justify a full article. _Avoid_: snippet, micropost, aside.
+**Post**: An article about one or more Locations, a journey, or a subject. Length and ambition vary freely, from a short observation to a full photo essay; there is no separate short-form collection. _Avoid_: article, blog post, story, note.
 
 **Page**: A standalone Entry that is not part of the editorial stream (about, colophon, FAQs). Unlike other collections, its URL mirrors its position on the file system. _Avoid_: static page.
 
@@ -28,7 +26,7 @@ This file is a glossary of terms commonly used in this project.
 
 **Chronology**: The temporal view of the project's own fieldwork and publishing, browsed by year and month. Where Location organizes the work spatially, the Chronology organizes it temporally. A given month may carry authored commentary alongside its computed activity. _Avoid_: archive, archives, timeline, history, feed.
 
-**Catalog**: The unified, cross-collection view of user-facing Entries reduced to a common shape, used for listing, counting, sorting, and discovery. It covers Locations, Posts, Notes, Pages, Regions, Series, and Themes. Chronology and Images have pages of their own but are not catalogued. Neither are Resources, most of which are never published at all: the bulk of them exist only to name an external work so Entries can refer to it, and only a minority are written up as pages. _Avoid_: index, registry, manifest.
+**Catalog**: The unified, cross-collection view of user-facing Entries reduced to a common shape, used for listing, counting, sorting, and discovery. It covers Locations, Posts, Pages, Regions, Series, and Themes. Chronology and Images have pages of their own but are not catalogued. Neither are Resources, most of which are never published at all: the bulk of them exist only to name an external work so Entries can refer to it, and only a minority are written up as pages. _Avoid_: index, registry, manifest.
 
 **Backlink**: An inbound reference to an Entry, discovered from the `<Link id="...">` component in another Entry's body. Ordinary Markdown links in the body do not produce Backlinks; only that component does. _Avoid_: reverse link, mention, connection.
 

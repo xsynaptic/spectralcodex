@@ -111,7 +111,6 @@ describe('backlinksOf', () => {
 			collection: 'posts',
 			dateCreated: new Date('2023-01-01'),
 		}),
-
 		makeCatalogItem({ id: 'linker-region', collection: 'regions' }),
 	]);
 

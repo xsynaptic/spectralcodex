@@ -61,7 +61,7 @@ export async function createQueryThemesEntryFunction() {
 
 		const postsFiltered = getPostsByTheme(entry);
 
-		// Catalog items are the posts, notes, and locations that are associated with the theme
+		// Catalog items are the posts and locations that are associated with the theme
 		const featuredCandidates = catalog.resolve([
 			...R.pipe(
 				locationsListed,
