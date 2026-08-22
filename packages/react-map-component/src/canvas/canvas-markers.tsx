@@ -12,6 +12,7 @@ import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
 import { useMapPopupVisible, useMapSelectedId } from '../store/store';
 
 interface TargetMarker {
+	id: string;
 	longitude: number;
 	latitude: number;
 	color: string;
@@ -19,6 +20,7 @@ interface TargetMarker {
 
 function markersEqual(previous: TargetMarker, next: TargetMarker): boolean {
 	return (
+		previous.id === next.id &&
 		previous.longitude === next.longitude &&
 		previous.latitude === next.latitude &&
 		previous.color === next.color
@@ -54,10 +56,11 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			setVisible(false);
 		}
 
-		function updateMarkers() {
+		function refreshMarkers() {
 			if (!map) return;
 
-			const results: Array<TargetMarker> = [];
+			// Keyed by feature id; queryRenderedFeatures repeats a feature once per tile it renders in
+			const results = new Map<string, TargetMarker>();
 
 			// Check for unclustered target points
 			if (map.getLayer(MapLayerIdEnum.Points)) {
@@ -69,9 +72,19 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 				for (const feature of points) {
 					if (feature.geometry.type !== 'Point') continue;
 
+					const pointId =
+						typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
+
+					if (!pointId) continue;
+
 					const [lng, lat] = feature.geometry.coordinates as [number, number];
 
-					results.push({ longitude: lng, latitude: lat, color: getMarkerColor(feature, isDark) });
+					results.set(pointId, {
+						id: pointId,
+						longitude: lng,
+						latitude: lat,
+						color: getMarkerColor(feature, isDark),
+					});
 				}
 			}
 
@@ -85,42 +98,61 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 				for (const feature of clusters) {
 					if (feature.geometry.type !== 'Point') continue;
 
-					const [lng, lat] = feature.geometry.coordinates as [number, number];
+					const clusterId =
+						typeof feature.properties.cluster_id === 'number'
+							? feature.properties.cluster_id
+							: undefined;
 
-					results.push({ longitude: lng, latitude: lat, color: clusterColor });
+					if (clusterId === undefined) continue;
+
+					const [lng, lat] = feature.geometry.coordinates as [number, number];
+					const markerId = `cluster-${String(clusterId)}`;
+
+					results.set(markerId, {
+						id: markerId,
+						longitude: lng,
+						latitude: lat,
+						color: clusterColor,
+					});
 				}
 			}
 
-			setMarkers((previous) => {
-				if (previous.length !== results.length) return results;
+			const nextMarkers = [...results.values()];
 
-				for (const [index, current] of results.entries()) {
+			setMarkers((previous) => {
+				if (previous.length !== nextMarkers.length) return nextMarkers;
+
+				for (const [index, current] of nextMarkers.entries()) {
 					const before = previous[index];
 
-					if (!before || !markersEqual(before, current)) return results;
+					if (!before || !markersEqual(before, current)) return nextMarkers;
 				}
 
 				return previous;
 			});
+		}
+
+		function showMarkers() {
+			refreshMarkers();
 			setVisible(true);
 		}
 
-		// Gate on isSourceLoaded so markers recompute once settled, not per intermediate tick
+		// Position refresh only; revealing after a zoom is moveend's job
 		function onSourceData(event: { sourceId: string; isSourceLoaded: boolean }) {
 			if (event.sourceId === MapSourceIdEnum.PointCollection && event.isSourceLoaded) {
-				updateMarkers();
+				refreshMarkers();
 			}
 		}
 
 		map.on('zoomstart', hideMarkers);
-		map.on('moveend', updateMarkers);
+		map.on('moveend', showMarkers);
 		map.on('sourcedata', onSourceData);
 
-		updateMarkers();
+		refreshMarkers();
 
 		return () => {
 			map.off('zoomstart', hideMarkers);
-			map.off('moveend', updateMarkers);
+			map.off('moveend', showMarkers);
 			map.off('sourcedata', onSourceData);
 		};
 	}, [map, targetIds, isDark]);
@@ -147,17 +179,8 @@ export const MapTargetMarkers: FC<{
 
 	if (markers.length === 0) return;
 
-	return markers.map((marker) => (
-		<MapPulseRing
-			key={`target-${String(marker.longitude)}-${String(marker.latitude)}`}
-			{...marker}
-		/>
-	));
+	return markers.map((marker) => <MapPulseRing key={marker.id} {...marker} />);
 };
-
-interface SelectedMarkerState extends TargetMarker {
-	id: string;
-}
 
 function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker | undefined {
 	const { current: map } = useMap();
@@ -168,7 +191,7 @@ function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker |
 	const isAlreadyTarget = selectedId !== undefined && targetIds?.includes(selectedId);
 	const enabled = Boolean(map && selectedId && popupVisible && !isAlreadyTarget);
 
-	const [marker, setMarker] = useState<SelectedMarkerState | undefined>();
+	const [marker, setMarker] = useState<TargetMarker | undefined>();
 
 	useEffect(() => {
 		if (!enabled || !map || !selectedId) return;
@@ -193,7 +216,7 @@ function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker |
 
 			const [lng, lat] = feature.geometry.coordinates as [number, number];
 
-			const next: SelectedMarkerState = {
+			const next: TargetMarker = {
 				id: selectedId,
 				longitude: lng,
 				latitude: lat,
@@ -201,7 +224,7 @@ function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker |
 			};
 
 			setMarker((previous) => {
-				if (previous?.id === next.id && markersEqual(previous, next)) return previous;
+				if (previous && markersEqual(previous, next)) return previous;
 
 				return next;
 			});
