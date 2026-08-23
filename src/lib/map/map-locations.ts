@@ -1,7 +1,7 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
-import type { FeatureCollection, Position } from 'geojson';
+import type { Feature, FeatureCollection, Position } from 'geojson';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
@@ -83,6 +83,89 @@ export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Arra
 		: [uuid];
 }
 
+// One location renders on the map of every ancestor region and every theme it belongs to
+// Safe to share because output depends on nothing but the entry; per-page variation would break it
+const locationFeaturesCache = new WeakMap<
+	CollectionEntry<'locations'>,
+	Array<Feature<MapGeometry, MapFeatureProperties>>
+>();
+
+function buildLocationFeatures(
+	entry: CollectionEntry<'locations'>,
+): Array<Feature<MapGeometry, MapFeatureProperties>> {
+	const cached = locationFeaturesCache.get(entry);
+
+	if (cached) return cached;
+
+	const geometryArray = Array.isArray(entry.data.geometry)
+		? entry.data.geometry
+		: [entry.data.geometry];
+	const featureIds = getLocationFeatureIds(entry);
+	const entryTitleMultilingual = getMultilingualContent({
+		data: entry.data,
+		prop: 'title',
+	})?.primary;
+
+	const features = geometryArray.map((geometry, index) => {
+		const id = featureIds[index] ?? entry.id;
+		const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
+		const geometryTitleMultilingual = getMultilingualContent({
+			data: geometry,
+			prop: 'title',
+		})?.primary;
+		const googleMapsUrlRaw =
+			geometry.googleMapsUrl || entry.data._googleMapsUrl
+				? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
+				: undefined;
+		const googleMapsUrl = googleMapsUrlRaw?.startsWith('maps.app.goo.gl/')
+			? googleMapsUrlRaw.slice('maps.app.goo.gl/'.length)
+			: googleMapsUrlRaw;
+		const wikipediaUrl = entry.data._wikipediaUrl
+			? entry.data._wikipediaUrl.replace('https://', '')
+			: undefined;
+
+		// Image thumbnails can be nulled by individual points
+		const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
+
+		return {
+			type: 'Feature' as const,
+			id,
+			properties: {
+				title,
+				...(entryTitleMultilingual
+					? {
+							titleMultilingualLang: entryTitleMultilingual.lang,
+							titleMultilingualValue: geometryTitleMultilingual
+								? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
+								: entryTitleMultilingual.value,
+						}
+					: {}),
+				url: getRelativePath(entry.data._url),
+				description: geometry.description ?? entry.data._descriptionHtml,
+				category: geometry.category ?? entry.data.category,
+				status: geometry.status ?? entry.data.status,
+				precision: geometry.precision ?? entry.data.precision,
+				entryQuality: entry.data.entryQuality,
+				rating: entry.data.rating,
+				objective: entry.data.objective,
+				outlier: entry.data.outlier,
+				safety: entry.data.safety,
+				googleMapsUrl,
+				wikipediaUrl,
+				...(image === null ? {} : { image }),
+			},
+			geometry: {
+				type: GeometryTypeEnum.Point,
+				coordinates: geometry.coordinates,
+			},
+		};
+	});
+
+	locationFeaturesCache.set(entry, features);
+
+	return features;
+}
+
 // Generate canonical map feature data for a set of locations
 export function getLocationsFeatureCollection(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
@@ -103,72 +186,7 @@ export function getLocationsFeatureCollection(
 			: locations.filter((entry) => !entry.data.hideLocation);
 
 	return featureCollection<MapGeometry, MapFeatureProperties>(
-		locationsFiltered.flatMap((entry) => {
-			const geometryArray = Array.isArray(entry.data.geometry)
-				? entry.data.geometry
-				: [entry.data.geometry];
-			const featureIds = getLocationFeatureIds(entry);
-			const entryTitleMultilingual = getMultilingualContent({
-				data: entry.data,
-				prop: 'title',
-			})?.primary;
-
-			return geometryArray.map((geometry, index) => {
-				const id = featureIds[index] ?? entry.id;
-				const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
-				const geometryTitleMultilingual = getMultilingualContent({
-					data: geometry,
-					prop: 'title',
-				})?.primary;
-				const googleMapsUrlRaw =
-					geometry.googleMapsUrl || entry.data._googleMapsUrl
-						? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
-						: undefined;
-				const googleMapsUrl = googleMapsUrlRaw?.startsWith('maps.app.goo.gl/')
-					? googleMapsUrlRaw.slice('maps.app.goo.gl/'.length)
-					: googleMapsUrlRaw;
-				const wikipediaUrl = entry.data._wikipediaUrl
-					? entry.data._wikipediaUrl.replace('https://', '')
-					: undefined;
-
-				// Image thumbnails can be nulled by individual points
-				const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)
-					._imageThumbnail;
-
-				return {
-					type: 'Feature' as const,
-					id,
-					properties: {
-						title,
-						...(entryTitleMultilingual
-							? {
-									titleMultilingualLang: entryTitleMultilingual.lang,
-									titleMultilingualValue: geometryTitleMultilingual
-										? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
-										: entryTitleMultilingual.value,
-								}
-							: {}),
-						url: getRelativePath(entry.data._url),
-						description: geometry.description ?? entry.data._descriptionHtml,
-						category: geometry.category ?? entry.data.category,
-						status: geometry.status ?? entry.data.status,
-						precision: geometry.precision ?? entry.data.precision,
-						entryQuality: entry.data.entryQuality,
-						rating: entry.data.rating,
-						objective: entry.data.objective,
-						outlier: entry.data.outlier,
-						safety: entry.data.safety,
-						googleMapsUrl,
-						wikipediaUrl,
-						...(image === null ? {} : { image }),
-					},
-					geometry: {
-						type: GeometryTypeEnum.Point,
-						coordinates: geometry.coordinates,
-					},
-				};
-			});
-		}),
+		locationsFiltered.flatMap((entry) => buildLocationFeatures(entry)),
 	) satisfies MapFeatureCollection;
 }
 

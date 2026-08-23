@@ -7,7 +7,11 @@ import { filterHasFeaturedImage, sortCatalogByDate } from '#lib/catalog/catalog-
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
-import { getResourcesCollection, matchLinkUrl } from '#lib/collections/resources/resources-data.ts';
+import { matchLinkUrl } from '#lib/collections/resources/resources-association.ts';
+import {
+	getResourceAssociation,
+	getResourcesCollection,
+} from '#lib/collections/resources/resources-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
@@ -16,57 +20,29 @@ import { filterHasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 
 // Get locations associated with a resource (via links URL match or sources ID match)
 async function createLocationsByResourceFunction() {
-	const { entries } = await getLocationsCollection();
+	const { entriesMap } = await getLocationsCollection();
+	const { locationIdsByResourceId } = await getResourceAssociation();
 
 	return function getLocationsByResource(
 		resource: CollectionEntry<'resources'>,
 	): Array<CollectionEntry<'locations'>> {
-		const resourceId = resource.id;
-		const matchPattern = resource.data.match;
+		const locationIds = locationIdsByResourceId.get(resource.id) ?? [];
 
-		return entries.filter((location) => {
-			// Check URL match via links field (for website-type resources with match field)
-			const hasLinkMatch =
-				matchPattern &&
-				location.data.links?.some((link) =>
-					matchLinkUrl(typeof link === 'string' ? link : link.url, matchPattern),
-				);
-
-			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = location.data.sources?.some((source) =>
-				typeof source === 'string' ? source === resourceId : false,
-			);
-
-			return hasLinkMatch || hasSourceMatch;
-		});
+		return locationIds.map((locationId) => entriesMap.get(locationId)).filter((entry) => !!entry);
 	};
 }
 
 // Get posts associated with a resource (via links URL match or sources ID match)
 async function createPostsByResourceFunction() {
-	const { entries } = await getPostsCollection();
+	const { entriesMap } = await getPostsCollection();
+	const { postIdsByResourceId } = await getResourceAssociation();
 
 	return function getPostsByResource(
 		resource: CollectionEntry<'resources'>,
 	): Array<CollectionEntry<'posts'>> {
-		const resourceId = resource.id;
-		const matchPattern = resource.data.match;
+		const postIds = postIdsByResourceId.get(resource.id) ?? [];
 
-		return entries.filter((entry) => {
-			// Check URL match via links field (for website-type resources with match field)
-			const hasLinkMatch =
-				matchPattern &&
-				entry.data.links?.some((link) =>
-					matchLinkUrl(typeof link === 'string' ? link : link.url, matchPattern),
-				);
-
-			// Check ID match via sources field (for publication-type resources)
-			const hasSourceMatch = entry.data.sources?.some((source) =>
-				typeof source === 'string' ? source === resourceId : false,
-			);
-
-			return hasLinkMatch || hasSourceMatch;
-		});
+		return postIds.map((postId) => entriesMap.get(postId)).filter((entry) => !!entry);
 	};
 }
 
