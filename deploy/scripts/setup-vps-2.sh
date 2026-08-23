@@ -51,6 +51,11 @@ echo "UMAMI_BACKUP_PATH=$VOLUME_PATH/backups"
 echo "UMAMI_DB_PASSWORD=$(openssl rand -hex 32)"
 echo "UMAMI_APP_SECRET=$(openssl rand -hex 32)"
 
+# Revokes the grant setup-vps-1.sh wrote; needs sudo itself, so no sudo command may follow it
+echo ""
+echo "Removing provisioning sudo grant..."
+sudo rm -f /etc/sudoers.d/$DEPLOY_USER
+
 echo ""
 echo "=== Phase 2 Complete ==="
 echo ""

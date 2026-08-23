@@ -15,14 +15,27 @@ import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
+const IMAGE_SERVER_SECRET_PLACEHOLDER = 'dev-secret-do-not-use-in-production';
+
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
 const {
 	DEV_SERVER_URL = 'http://localhost:4321/',
 	PROD_SERVER_URL,
 	BUILD_ASSETS_PATH,
+	IMAGE_SERVER_SECRET,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+if (
+	isProduction &&
+	(!IMAGE_SERVER_SECRET || IMAGE_SERVER_SECRET === IMAGE_SERVER_SECRET_PLACEHOLDER)
+) {
+	throw new Error(
+		'IMAGE_SERVER_SECRET is unset or still the dev placeholder; production builds must sign image URLs with the real secret',
+	);
+}
+
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
 /**
@@ -76,7 +89,7 @@ export default defineConfig({
 			IMAGE_SERVER_SECRET: envField.string({
 				context: 'server',
 				access: 'secret',
-				default: 'dev-secret-do-not-use-in-production',
+				default: IMAGE_SERVER_SECRET_PLACEHOLDER,
 			}),
 			IMAGE_SERVER_SIGNATURE_LENGTH: envField.number({
 				context: 'server',

@@ -81,9 +81,9 @@ ufw --force enable
 if ! id "$DEPLOY_USER" &>/dev/null; then
   echo "Creating deploy user..."
   adduser --disabled-password --gecos "" "$DEPLOY_USER"
-  usermod -aG sudo "$DEPLOY_USER"
   usermod -aG docker "$DEPLOY_USER"
 
+  # Provisioning-only grant; setup-vps-2.sh removes it after the one-time directory setup
   echo "$DEPLOY_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$DEPLOY_USER
   chmod 440 /etc/sudoers.d/$DEPLOY_USER
 

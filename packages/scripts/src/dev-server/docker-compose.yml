@@ -3,7 +3,7 @@ services:
     image: nginx:1.30.4-alpine
     container_name: dev-image-cache
     ports:
-      - '3100:80'
+      - '127.0.0.1:3100:80'
     volumes:
       - ${IMAGE_SERVER_NGINX_CONFIG}:/etc/nginx/templates/default.conf.template:ro
     depends_on:
@@ -25,6 +25,7 @@ services:
       - HTTP_LOADER_DISABLE=1
       - IMAGOR_CACHE_HEADER_TTL=8760h
       - IMAGOR_DISABLE_PARAMS_ENDPOINT=1
+      - IMAGOR_DISABLE_ERROR_BODY=1
       - VIPS_MAX_RESOLUTION=16800000
       - VIPS_MAX_WIDTH=5000
       - VIPS_MAX_HEIGHT=5000
