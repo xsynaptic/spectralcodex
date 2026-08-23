@@ -47,5 +47,6 @@ public/icons/
 packages/content/
 
 # project directives
+.claude/docs
 .claude/tasks*
 .claude/settings*.json
