@@ -143,7 +143,7 @@ export async function createQueryLocationsEntryFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 
 	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -159,6 +159,7 @@ export async function createQueryLocationsEntryFunction() {
 			boundsFeatureCollection: getLocationsFeatureCollection([entry]),
 			locationCount: mapLocations.length,
 			chunkKeyById,
+			version,
 			targetId: entry.data._uuid ?? entry.id,
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
 			...getMapLanguages(regionPrimary?.data._langCode),

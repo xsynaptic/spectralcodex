@@ -103,7 +103,7 @@ export async function createQueryResourcesEntryFunction() {
 	const getPostsByResource = await createPostsByResourceFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -133,6 +133,7 @@ export async function createQueryResourcesEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
 			chunkKeyById,
+			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

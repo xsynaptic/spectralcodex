@@ -3,9 +3,11 @@ import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
 import { encodeMapPopupData, MapDataKeysCompressed } from '@spectralcodex/map-codec';
+import { hash } from 'ohash';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
+import { HASH_SHORT_LENGTH } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
 	getRegionsCollection,
@@ -27,6 +29,8 @@ interface MapDirectoryData {
 	chunks: Map<string, Array<MapPopupItem>>;
 	// Every feature id → its popup chunk key; small inline maps stamp this onto their points
 	chunkKeyById: Map<string, string>;
+	// Cache key for the directory and chunk endpoints, which Caddy serves as immutable
+	version: string;
 }
 
 // Memoized theme → index map; theme maps read their own index to build a scope
@@ -81,6 +85,14 @@ function getMembershipIndices(
 		R.unique(),
 		R.sortBy(R.identity()),
 	);
+}
+
+// Chunk payloads must be part of the key: popup text changes without touching a directory row
+export function hashMapDirectoryData(
+	directory: Array<MapSourceItem>,
+	chunks: Map<string, Array<MapPopupItem>>,
+): string {
+	return hash({ directory, chunks: [...chunks] }).slice(0, HASH_SHORT_LENGTH);
 }
 
 // Memoized so a single build computes the shared artifacts once
@@ -163,5 +175,5 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		);
 	}
 
-	return { directory, chunks, chunkKeyById };
+	return { directory, chunks, chunkKeyById, version: hashMapDirectoryData(directory, chunks) };
 });

@@ -42,7 +42,7 @@ export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 
 	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -54,6 +54,7 @@ export async function createQueryPostsEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(postLocations),
 			locationCount: postLocations.length,
 			chunkKeyById,
+			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

@@ -31,6 +31,8 @@ const getLocationsByReference = await createLocationsByIdsFunction();
 // We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, ...mapComponentProps } = getMapData({
 	mapId: undefined,
+	// Inline maps ship their popups in the props and never fetch a chunk
+	version: undefined,
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
 		getLocationsFeatureCollection(locations, { showAllLocations: showHidden }),
 	),

@@ -101,7 +101,7 @@ export async function createQueryRegionsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 	const { regionsTree } = await getRegionsCollection();
 
 	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
@@ -143,6 +143,7 @@ export async function createQueryRegionsEntryFunction() {
 			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
 			locationCount: entryLocations.length,
 			chunkKeyById,
+			version,
 			...(regionInterval ? { scope: { type: 'region', interval: regionInterval } } : {}),
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision

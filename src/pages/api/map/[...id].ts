@@ -16,8 +16,7 @@ import { MapApiDataEnum } from '#lib/map/map-types.ts';
 // Shared map delivery: one global point directory plus demand-fetched popup chunks
 // Objectives keeps a dedicated source/popup pair (includes hidden points, noindex)
 export const getStaticPaths = (async () => {
-	const { directory, chunks } = await getMapDirectoryData();
-	const version = import.meta.env.BUILD_VERSION ?? 'unknown';
+	const { directory, chunks, version } = await getMapDirectoryData();
 
 	const objectiveLocations = await getObjectiveLocations();
 	const objectivesCollection = getLocationsFeatureCollection(objectiveLocations, {

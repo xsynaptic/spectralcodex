@@ -122,7 +122,7 @@ export async function createQuerySeriesEntryFunction() {
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 
 	const seriesCatalogItems = catalog.resolve(series);
 
@@ -139,6 +139,7 @@ export async function createQuerySeriesEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
 			locationCount: seriesLocations.length,
 			chunkKeyById,
+			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

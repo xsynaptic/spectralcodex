@@ -49,7 +49,6 @@ const defaultMapDataProps = {
 	featureCount: 0,
 	imageServerUrl: IMAGE_SERVER_URL,
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
-	version: import.meta.env.BUILD_VERSION,
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
 
@@ -65,6 +64,7 @@ export function getMapData({
 	locationCount,
 	scope,
 	chunkKeyById,
+	version,
 	boundsFeatureCollection,
 	...props
 }: Omit<
@@ -87,6 +87,8 @@ export function getMapData({
 		locationCount?: number | undefined;
 		scope?: MapScopeHint | undefined;
 		chunkKeyById?: Map<string, string> | undefined;
+		// Not optional, so a new call site cannot skip the cache version by accident
+		version: string | undefined;
 		// Frame from a different set than the inlined data (e.g. center on the target while inlining its neighbors)
 		boundsFeatureCollection?: MapFeatureCollection | undefined;
 	}) {
@@ -151,6 +153,7 @@ export function getMapData({
 			sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
 			sourceDataKey: hashMapSourceData(sourceData),
 			apiChunkBaseUrl,
+			version,
 			featureCount,
 			...mapBounds,
 			...props,
@@ -159,10 +162,7 @@ export function getMapData({
 	}
 
 	// Big maps fetch the shared directory and keep only the rows their scope selects
-	const apiSourceUrl = getBaseUrl(
-		'api/map',
-		`map-directory.json?v=${import.meta.env.BUILD_VERSION ?? 'unknown'}`,
-	);
+	const apiSourceUrl = getBaseUrl('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
 
 	// No membership hint resolves to this map's explicit, order-preserving id list
 	const resolvedScope: MapScope = scope ?? {
@@ -177,6 +177,7 @@ export function getMapData({
 		apiSourceUrl,
 		scope: resolvedScope,
 		apiChunkBaseUrl,
+		version,
 		prefetchUrls: [apiSourceUrl],
 		featureCount,
 		...mapBounds,

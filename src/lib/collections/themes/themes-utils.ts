@@ -50,7 +50,7 @@ export async function createQueryThemesEntryFunction() {
 	const getPostsByTheme = await createPostsByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById } = await getMapDirectoryData();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 	const themeIndexById = await getMapThemeIndexById();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
@@ -84,6 +84,7 @@ export async function createQueryThemesEntryFunction() {
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
 			chunkKeyById,
+			version,
 			...(themeIndex === undefined ? {} : { scope: { type: 'theme', index: themeIndex } }),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
