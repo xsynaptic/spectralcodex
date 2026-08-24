@@ -14,9 +14,10 @@ interface Props {
 	items?: Array<CatalogItem>;
 	page?: Page<CatalogItem>;
 	previewOptions?: PreviewOptions | undefined;
+	showMicroformats?: boolean | undefined;
 }
 
-const { title, items, page, previewOptions, ...props } = Astro.props;
+const { title, items, page, previewOptions, showMicroformats = false, ...props } = Astro.props;
 
 const defaultPreviewOptions: PreviewOptions = {
 	showDate: true,
@@ -35,12 +36,22 @@ const t = getTranslations();
 			<Fragment slot="section-title">{title ?? t('section.content')}</Fragment>
 			{page ? (
 				<>
-					<PreviewGrid items={page.data} {...defaultPreviewOptions} {...previewOptions} />
+					<PreviewGrid
+						items={page.data}
+						showMicroformats={showMicroformats}
+						{...defaultPreviewOptions}
+						{...previewOptions}
+					/>
 					<PaginationSelect class="mt-4 md:mt-8" page={page} />
 				</>
 			) : undefined}
 			{hasItems ? (
-				<PreviewGrid items={items} {...defaultPreviewOptions} {...previewOptions} />
+				<PreviewGrid
+					items={items}
+					showMicroformats={showMicroformats}
+					{...defaultPreviewOptions}
+					{...previewOptions}
+				/>
 			) : undefined}
 		</ContentSection>
 	) : undefined

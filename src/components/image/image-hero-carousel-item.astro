@@ -5,7 +5,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
-import { zIndexScaleEnum } from '#components/types.ts';
+import { MicroformatClassNames, zIndexScaleEnum } from '#components/types.ts';
 import { IMAGE_HERO_FORMAT, IMAGE_HERO_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -17,6 +17,7 @@ interface Props extends ImageFeaturedWithCaption {
 	class?: string | undefined;
 	index: number;
 	fallbackAlt?: string | undefined;
+	showMicroformats?: boolean | undefined;
 	withTitle?: boolean | undefined;
 }
 
@@ -27,6 +28,7 @@ const {
 	title,
 	caption,
 	fallbackAlt,
+	showMicroformats = false,
 	withTitle = false,
 } = Astro.props;
 
@@ -84,6 +86,7 @@ const { imageProps, placeholderProps } = await getImageProps(
 				class:list={[
 					'max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
+					showMicroformats ? MicroformatClassNames.Photo : undefined,
 				]}
 				style={{ zIndex: zIndexScaleEnum.ImageBase }}
 				{...imageProps}

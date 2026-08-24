@@ -122,7 +122,7 @@ const entryCount = entry.data._entryCount ?? 0;
 		<SectionSources entry={entry} />
 		<SectionRegions regionIds={regionIds} />
 		<SectionThemes themeIds={allThemeIds} />
-		<SectionPreviews page={page} />
+		<SectionPreviews page={page} showMicroformats={true} />
 		{
 			page.currentPage === 1 && catalogItems.length > 0 ? (
 				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />

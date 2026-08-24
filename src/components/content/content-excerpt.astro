@@ -7,6 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Anchor from '#components/parts/anchor.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { CONTENT_EXCERPT_IDENTIFIER, IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -81,7 +82,7 @@ const { imageProps, placeholderProps } = await getImageProps(imageId);
 const t = getTranslations();
 ---
 
-<article class={className} {...props}>
+<article class:list={[className, MicroformatClassNames.Entry]} {...props}>
 	<header class:list={['content-column', description ? undefined : 'mb-2']}>
 		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
 			<a
@@ -89,6 +90,8 @@ const t = getTranslations();
 				class:list={[
 					'transition-colors ease-in',
 					'text-primary-700 hover:text-accent-500 dark:text-primary-300 dark:hover:text-accent-300',
+					MicroformatClassNames.Url,
+					MicroformatClassNames.Name,
 				]}
 			>
 				<slot name="excerpt-title" />
@@ -122,13 +125,18 @@ const t = getTranslations();
 					placeholderProps={placeholderProps}
 				>
 					<a href={entryUrl}>
-						<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
+						<Image
+							class:list={['m-0 aspect-3/2 text-sm text-transparent', MicroformatClassNames.Photo]}
+							{...imageProps}
+						/>
 					</a>
 				</ImagePlaceholder>
 			</div>
 		) : undefined
 	}
-	<Prose class:list={['pb-4']} showBlocks={true}><Fragment set:html={excerptContent} /></Prose>
+	<Prose class:list={['pb-4', 'e-content']} showBlocks={true}>
+		<Fragment set:html={excerptContent} />
+	</Prose>
 	{
 		hasExcerpt ? (
 			<div class="content-column text-right font-serif font-medium italic">

@@ -75,11 +75,15 @@ const { Content } = await render(entry);
 			class="sm:mb-4"
 			imageFeaturedGroup={imageFeaturedHeroGroup}
 			fallbackAlt={entry.data.title}
+			showMicroformats={true}
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
-					<a href={Astro.url.toString()} class="p-name p-url" aria-hidden="true" tabindex="-1"
-						>{stripDiacritics(entry.data.title)}</a
+					<a
+						href={Astro.url.toString()}
+						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
+						aria-hidden="true"
+						tabindex="-1">{stripDiacritics(entry.data.title)}</a
 					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">

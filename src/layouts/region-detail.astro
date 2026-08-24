@@ -139,7 +139,7 @@ const entryCount = entry.data._entryCount ?? 0;
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />
-		<SectionPreviews page={page} />
+		<SectionPreviews page={page} showMicroformats={true} />
 		{
 			page.currentPage === 1 && catalogItems.length > 0 ? (
 				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />

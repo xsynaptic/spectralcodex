@@ -55,10 +55,12 @@ export const MicroformatClassNames = {
 	DatePublished: 'dt-published',
 	DateUpdated: 'dt-updated',
 	Entry: 'h-entry',
+	Feed: 'h-feed',
 	Name: 'p-name',
 	Organization: 'p-org',
 	Photo: 'u-photo',
 	Role: 'p-role',
+	Summary: 'p-summary',
 	Url: 'u-url',
 } as const;
 

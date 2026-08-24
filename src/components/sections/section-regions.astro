@@ -21,7 +21,12 @@ const t = getTranslations();
 	regions && regions.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('collection.regions.labelPlural')}</Fragment>
-			<RegionsList terms={regions} dividerContent="chevron" showSingleRegionAncestors={true} />
+			<RegionsList
+				terms={regions}
+				dividerContent="chevron"
+				showMicroformats={true}
+				showSingleRegionAncestors={true}
+			/>
 		</ContentSection>
 	) : undefined
 }

@@ -12,6 +12,7 @@ import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
@@ -53,8 +54,9 @@ const description = t('collection.posts.description');
 		/>
 	</ContentSection>
 	{
-		page.data.length > 0
-			? page.data.map(async (entry, index) => {
+		page.data.length > 0 ? (
+			<div class={MicroformatClassNames.Feed}>
+				{page.data.map(async (entry, index) => {
 					const { Content } = await render(entry);
 					const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
@@ -67,13 +69,18 @@ const description = t('collection.posts.description');
 							<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
 							<Fragment slot="excerpt-subtitle">
 								<DividedItem>
-									<ContentDate date={entry.data.dateCreated} datePreset={DatePresetEnum.Medium} />
+									<ContentDate
+										date={entry.data.dateCreated}
+										datePreset={DatePresetEnum.Medium}
+										showMicroformats={true}
+									/>
 								</DividedItem>
 								{entry.data.dateUpdated ? (
 									<DividedItem>
 										<ContentDate
 											date={entry.data.dateUpdated}
 											datePreset={DatePresetEnum.Medium}
+											showMicroformats={true}
 											showUpdated={true}
 										/>
 									</DividedItem>
@@ -82,8 +89,9 @@ const description = t('collection.posts.description');
 							<Content />
 						</ContentExcerpt>
 					);
-				})
-			: undefined
+				})}
+			</div>
+		) : undefined
 	}
 	<ContentSection>
 		<PaginationSelect class="mt-4 md:mt-8" page={page} />

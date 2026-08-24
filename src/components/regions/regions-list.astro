@@ -7,6 +7,7 @@ import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -14,6 +15,7 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 interface Props {
 	terms: Array<CollectionEntry<'regions'>> | undefined;
 	dividerContent?: DividerContent;
+	showMicroformats?: boolean;
 	showSingleRegionAncestors?: boolean;
 	showTitleMultilingual?: boolean;
 }
@@ -21,6 +23,7 @@ interface Props {
 const {
 	terms,
 	dividerContent = 'dot',
+	showMicroformats = false,
 	showSingleRegionAncestors,
 	showTitleMultilingual = true,
 } = Astro.props;
@@ -46,7 +49,12 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 					: undefined;
 
 				return (
-					<DividedItem as="li" dividerContent={dividerContent} data-pagefind-filter="region">
+					<DividedItem
+						as="li"
+						dividerContent={dividerContent}
+						class:list={[showMicroformats ? MicroformatClassNames.Category : undefined]}
+						data-pagefind-filter="region"
+					>
 						{entry.data.title ? (
 							<Anchor href={getContentUrl(entry.collection, entry.id)}>
 								<Fragment set:html={entry.data.title} />

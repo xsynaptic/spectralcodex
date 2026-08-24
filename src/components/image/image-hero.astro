@@ -10,6 +10,7 @@ import { zIndexScaleEnum } from '#components/types.ts';
 interface Props extends HTMLAttributes<'div'> {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 	fallbackAlt?: string | undefined;
+	showMicroformats?: boolean | undefined;
 	withTitle?: boolean | undefined;
 	class?: string | undefined;
 }
@@ -17,6 +18,7 @@ interface Props extends HTMLAttributes<'div'> {
 const {
 	imageFeaturedGroup,
 	fallbackAlt,
+	showMicroformats = false,
 	withTitle = true,
 	class: className,
 	...props
@@ -53,6 +55,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 								class="carousel-item"
 								index={index}
 								fallbackAlt={fallbackAlt}
+								showMicroformats={showMicroformats}
 								withTitle={withTitle}
 							/>
 						))}
@@ -65,6 +68,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 					{...imageFeaturedGroup[0]}
 					index={0}
 					fallbackAlt={fallbackAlt}
+					showMicroformats={showMicroformats}
 					withTitle={withTitle}
 				/>
 			) : undefined}

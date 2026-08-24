@@ -7,6 +7,7 @@ import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
+import { MicroformatClassNames } from '#components/types.ts';
 import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -19,10 +20,11 @@ interface Props extends HTMLAttributes<'div'> {
 	imageId?: string | undefined;
 	linkUrl: string;
 	alt: string;
+	showMicroformats?: boolean | undefined;
 	titleAs?: 'h2' | 'h3' | undefined;
 }
 
-const { imageId, linkUrl, alt, titleAs, ...props } = Astro.props;
+const { imageId, linkUrl, alt, showMicroformats = false, titleAs, ...props } = Astro.props;
 
 const TitleTag = titleAs ?? 'h3';
 
@@ -75,12 +77,18 @@ const subtitle = await renderSlot(Astro.slots, 'preview-subtitle');
 const description = await renderSlot(Astro.slots, 'preview-description');
 ---
 
-<CardFrame class="pc" {...props}>
+<CardFrame
+	class:list={['pc', showMicroformats ? MicroformatClassNames.Entry : undefined]}
+	{...props}
+>
 	{
 		imageProps ? (
 			<ImagePlaceholder placeholderProps={placeholderProps}>
 				<a href={linkUrl}>
-					<Image {...imageProps} />
+					<Image
+						class:list={[showMicroformats ? MicroformatClassNames.Photo : undefined]}
+						{...imageProps}
+					/>
 				</a>
 			</ImagePlaceholder>
 		) : (
@@ -88,7 +96,13 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 		)
 	}
 	<TitleTag class="pc-title">
-		<a href={linkUrl} class="link pc-title-link"><slot name="preview-title" /></a>
+		<a
+			href={linkUrl}
+			class:list={[
+				'link pc-title-link',
+				showMicroformats ? [MicroformatClassNames.Url, MicroformatClassNames.Name] : undefined,
+			]}><slot name="preview-title" /></a
+		>
 		{
 			titleMultilingual ? (
 				<div class="pc-title-ml">
@@ -108,7 +122,10 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 	}
 	{
 		description ? (
-			<Prose class="mt-1" showCompact={true}>
+			<Prose
+				class:list={['mt-1', showMicroformats ? MicroformatClassNames.Summary : undefined]}
+				showCompact={true}
+			>
 				<Fragment set:html={description} />
 			</Prose>
 		) : undefined
