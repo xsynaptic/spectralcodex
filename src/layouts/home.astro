@@ -14,6 +14,7 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import Prose from '#components/parts/prose.astro';
+import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
 import { getCatalogStats } from '#lib/catalog/catalog-stats.ts';
@@ -173,4 +174,5 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.series'))} />
 		<PreviewGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>
+	<SectionWebmentions entry={undefined} />
 </MainSite>

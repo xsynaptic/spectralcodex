@@ -82,8 +82,7 @@ const { Content } = await render(entry);
 					<a
 						href={Astro.url.toString()}
 						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						aria-hidden="true"
-						tabindex="-1">{stripDiacritics(entry.data.title)}</a
+						rel="bookmark">{stripDiacritics(entry.data.title)}</a
 					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">

@@ -18,6 +18,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
+import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -106,6 +107,7 @@ const t = getTranslations();
 		<ContentDescription entry={entry} />
 		<SectionMap mapData={mapData} />
 		<SectionDateList dates={entry.data.dateRecorded} title={t('section.dateRecorded')} />
+		<SectionWebmentions entry={entry} />
 		<SectionPreviews page={page} showMicroformats={true} />
 	</ContentArticle>
 </MainSite>

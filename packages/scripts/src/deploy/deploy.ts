@@ -60,6 +60,24 @@ async function similar() {
 	})`pnpm similar-content`;
 }
 
+// A webmention.io outage must not block a deploy; the build falls back to the committed data
+async function webmentions() {
+	if (process.env.WEBMENTIONS_SHOW !== 'true') {
+		console.log(chalk.gray('Skipping webmentions; `WEBMENTIONS_SHOW` is off'));
+		return;
+	}
+
+	console.log(chalk.blue('Fetching webmentions...'));
+	try {
+		await $({
+			stdio: 'inherit',
+			cwd: rootPath,
+		})`pnpm webmentions`;
+	} catch {
+		console.log(chalk.yellow('Webmention fetch failed, continuing with existing data'));
+	}
+}
+
 async function generateOpenGraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
@@ -112,6 +130,7 @@ try {
 	await validate();
 	await generateRedirects();
 	await similar();
+	await webmentions();
 	await generateSitemapLastmod({ rootPath, siteUrl: config.siteUrl });
 
 	// Build & verify

@@ -31,6 +31,7 @@ import SectionSeries from '#components/sections/section-series.astro';
 import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
@@ -114,8 +115,7 @@ const t = getTranslations();
 					<a
 						href={Astro.url.toString()}
 						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						aria-hidden="true"
-						tabindex="-1">{stripDiacritics(entry.data.title)}</a
+						rel="bookmark">{stripDiacritics(entry.data.title)}</a
 					>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
@@ -188,6 +188,7 @@ const t = getTranslations();
 		<SectionThemes themeIds={themeIds} />
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
+		<SectionWebmentions entry={entry} />
 		<SectionNearbyList entry={entry} limit={12} />
 		<SectionPreviews title={t('section.content.locations')} items={catalogItems} />
 		<SectionSimilar entry={entry} showPreviews={true} limit={8} />

@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.15.0",
+	"version": "7.16.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -33,7 +33,8 @@
 		"test-e2e": "playwright test",
 		"test-e2e-prod": "TEST_ENV=prod node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
 		"test-image-server": "vitest run --config vitest.integration.config.ts",
-		"validate-content": "astro sync && pnpm -F @spectralcodex/scripts validate-content"
+		"validate-content": "astro sync && pnpm -F @spectralcodex/scripts validate-content",
+		"webmentions": "pnpm -F @spectralcodex/scripts webmentions"
 	},
 	"type": "module",
 	"license": "MIT",

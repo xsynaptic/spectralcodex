@@ -106,6 +106,11 @@ export default defineConfig({
 				access: 'public',
 				optional: true,
 			}),
+			WEBMENTIONS_SHOW: envField.boolean({
+				context: 'server',
+				access: 'public',
+				default: false,
+			}),
 		},
 	},
 	vite: {

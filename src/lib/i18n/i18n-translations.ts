@@ -113,8 +113,6 @@ const translationStrings = {
 		'webmentions.bookmarks': 'Bookmarks',
 		'webmentions.replies': 'Replies',
 		'webmentions.mentions': 'Mentions',
-		'webmentions.loading': 'Loading mentions...',
-		'webmentions.error': 'Could not load mentions',
 
 		// Locations
 		'locations.status.vanished': 'Vanished',
