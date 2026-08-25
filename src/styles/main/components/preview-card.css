@@ -18,7 +18,7 @@
 .pc-title-ml {
 	@apply font-semibold;
 
-	display: inline-flex;
+	display: inline;
 	color: light-dark(var(--color-primary-500), var(--color-primary-400));
 }
 

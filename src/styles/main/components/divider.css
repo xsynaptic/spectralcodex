@@ -49,7 +49,7 @@
 }
 
 .divided-row {
-	@apply inline items-start gap-x-1 gap-y-1 sm:inline-flex sm:flex-wrap sm:gap-y-2;
+	@apply inline-flex flex-wrap items-start gap-x-0 gap-y-1 sm:gap-x-1 sm:gap-y-2;
 }
 
 @media (width >= 40rem) {
