@@ -19,6 +19,7 @@ import Stylesheet from '#components/main/main-stylesheet.astro';
 import TopButton from '#components/main/main-top-button.astro';
 import MenuFooter from '#components/menu/menu-footer.astro';
 import MenuHeader from '#components/menu/menu-header.astro';
+import ModeManagerSetup from '#components/mode-manager/mode-manager-setup.astro';
 import ModeManager from '#components/mode-manager/mode-manager.astro';
 import ModeToggle from '#components/mode-manager/mode-toggle.astro';
 import Anchor from '#components/parts/anchor.astro';
@@ -49,7 +50,7 @@ const t = getTranslations();
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
-		<meta name="theme-color" />
+		<meta name="theme-color" content="#f4f4f5" />
 		<link
 			rel="icon"
 			type="image/svg+xml"
@@ -71,7 +72,7 @@ const t = getTranslations();
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
-		<ModeManager defaultMode="auto" />
+		<ModeManagerSetup defaultMode="auto" />
 		<Meta {...meta} />
 		{
 			UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
@@ -110,6 +111,7 @@ const t = getTranslations();
 			'visible flex min-h-screen min-w-[350px] flex-col overflow-visible overscroll-contain transition-colors',
 		]}
 	>
+		<ModeManager defaultMode="auto" />
 		<Sprites />
 		<ProgressLoading
 			class:list={[

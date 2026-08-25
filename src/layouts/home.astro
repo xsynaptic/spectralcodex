@@ -124,8 +124,8 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			<AuthorCard />
 		</CardFrame>
 		<Prose>
-			<p set:html={renderMarkdownInline(t('home.introduction'))} />
-			<p
+			<Fragment set:html={renderMarkdownInline(t('home.introduction'))} />
+			<Fragment
 				set:html={renderMarkdownInline(
 					formatStringTemplate(t('home.overview'), {
 						locationsCount: contentStats.locations.itemCount,

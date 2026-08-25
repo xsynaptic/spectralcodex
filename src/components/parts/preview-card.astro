@@ -105,11 +105,11 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 		>
 		{
 			titleMultilingual ? (
-				<div class="pc-title-ml">
+				<span class="pc-title-ml">
 					<span class="font-light">(</span>
 					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
-				</div>
+				</span>
 			) : undefined
 		}
 	</TitleTag>

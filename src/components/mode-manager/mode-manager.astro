@@ -10,35 +10,6 @@ interface Props {
 const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 ---
 
-<script is:inline data-default-mode={defaultMode}>
-	{
-		let stored;
-
-		try {
-			stored = localStorage.getItem('scx-mode');
-		} catch {
-			// localStorage unavailable
-		}
-
-		const { defaultMode } = document.currentScript.dataset;
-
-		let mode = ['auto', 'light', 'dark'].includes(stored) ? stored : (defaultMode ?? 'auto');
-
-		if (mode === 'auto') {
-			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-		}
-
-		document.documentElement.dataset.mode = mode;
-		document.documentElement.style.colorScheme = mode;
-
-		const themeColor = getComputedStyle(document.documentElement)
-			.getPropertyValue('--color-body-bg')
-			.trim();
-		const meta = document.querySelector('meta[name="theme-color"]');
-		if (meta && themeColor) meta.setAttribute('content', themeColor);
-	}
-</script>
-
 <script>
 	import '#components/mode-manager/mode-manager.ts';
 </script>
