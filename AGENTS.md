@@ -9,7 +9,7 @@ Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, and the
 Scripts live in `package.json`. Only the ones with a catch are worth stating here:
 
 - **`pnpm build`: run it sparingly.** it can take 3+ minutes under memory pressure; the maintainer builds manually.
-- `pnpm check`: report-only quality gate (stylelint, prettier, eslint, types, `astro check`, knip). Mutates nothing.
+- `pnpm check`: report-only quality gate. Mutates nothing, so run it freely.
 - `pnpm fix`: the mutating twin of `pnpm check` (autofixes, then reports what it could not fix). Slow; run once after a chunk of work, not repeatedly.
 - `pnpm dev` boots a Docker image stack alongside the dev server.
 
