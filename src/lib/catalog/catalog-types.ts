@@ -18,6 +18,7 @@ export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionK
 	description: string | undefined;
 	url: string;
 	imageId: string | undefined;
+	imageHeroId: string | undefined;
 	regionPrimaryId: string | undefined;
 	postCount: number | undefined;
 	locationCount: number | undefined;

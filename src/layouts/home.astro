@@ -83,6 +83,7 @@ const { featuredCatalogItems, recentCatalogItems, themesCatalogItems, seriesCata
 const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
 	items: featuredCatalogItems,
 	shuffle: true,
+	hero: true,
 });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;

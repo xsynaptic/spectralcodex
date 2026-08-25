@@ -37,6 +37,21 @@ export function getImageFeaturedId({
 	return isImageFeaturedObject(items[0]) ? items[0].id : items[0];
 }
 
+function isImageHeroObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
+	return isImageFeaturedObject(item) && item.hero === true;
+}
+
+// The hero-flagged image is not necessarily the first featured image
+export function getImageHeroId({
+	imageFeatured,
+}: {
+	imageFeatured: ImageFeatured | undefined;
+}): string | undefined {
+	if (!imageFeatured || !Array.isArray(imageFeatured)) return;
+
+	return imageFeatured.find(isImageHeroObject)?.id;
+}
+
 function enrichImageFeaturedObjects(
 	imageFeaturedObjects: Array<ImageFeaturedObject>,
 	getCaption: (id: string) => CatalogCaption | undefined,
@@ -90,9 +105,7 @@ export function getImageFeaturedHeroGroup({
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
 
-	const imageHeroObjectGroup = imageFeatured.filter(
-		(item): item is ImageFeaturedObject => isImageFeaturedObject(item) && item.hero === true,
-	);
+	const imageHeroObjectGroup = imageFeatured.filter(isImageHeroObject);
 
 	if (imageHeroObjectGroup.length === 0) return undefined;
 
@@ -103,24 +116,32 @@ export function getImageFeaturedHeroGroup({
 export function getImageFeaturedGroupByCatalog({
 	items,
 	shuffle = false,
+	hero = false,
 }: {
 	items: Array<CatalogItem> | undefined;
 	shuffle?: boolean;
+	hero?: boolean;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!items || items.length === 0) return;
 
-	const itemsWithImages = items
-		.filter((item) => !!item.imageId)
-		.map((item) => ({
-			id: item.imageId!,
-			title: item.title,
-			caption: {
-				id: item.id,
+	const itemsWithImages = items.flatMap((item) => {
+		const id = hero ? item.imageHeroId : item.imageId;
+
+		if (!id) return [];
+
+		return [
+			{
+				id,
 				title: item.title,
-				titleMultilingual: item.titleMultilingual,
-				url: item.url,
+				caption: {
+					id: item.id,
+					title: item.title,
+					titleMultilingual: item.titleMultilingual,
+					url: item.url,
+				},
 			},
-		}));
+		];
+	});
 
 	return shuffle ? R.shuffle(itemsWithImages) : itemsWithImages;
 }

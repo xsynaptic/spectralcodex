@@ -10,6 +10,7 @@ export function makeCatalogItem(
 		description: undefined,
 		url: `/${overrides.id}`,
 		imageId: undefined,
+		imageHeroId: undefined,
 		regionPrimaryId: undefined,
 		postCount: undefined,
 		locationCount: undefined,

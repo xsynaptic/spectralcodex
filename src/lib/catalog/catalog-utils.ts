@@ -21,6 +21,10 @@ export function filterHasFeaturedImage(item: CatalogItem): boolean {
 	return !!item.imageId;
 }
 
+export function filterHasHeroImage(item: CatalogItem): boolean {
+	return !!item.imageHeroId;
+}
+
 export function filterIsEditorialEntry(item: CatalogItem): boolean {
 	return editorialCollections.has(item.collection);
 }

@@ -15,7 +15,7 @@ import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
@@ -107,6 +107,10 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 				imageId:
 					'imageFeatured' in entry.data
 						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })
+						: undefined,
+				imageHeroId:
+					'imageFeatured' in entry.data
+						? getImageHeroId({ imageFeatured: entry.data.imageFeatured })
 						: undefined,
 				regionPrimaryId: getRegionPrimaryId(regions),
 				locationCount: '_locationCount' in entry.data ? entry.data._locationCount : undefined,
