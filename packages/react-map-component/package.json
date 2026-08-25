@@ -19,7 +19,7 @@
 		"@turf/helpers": "^7.4.0",
 		"flatgeobuf": "^4.4.0",
 		"idb-keyval": "^6.3.0",
-		"maplibre-gl": "^6.5.0",
+		"maplibre-gl": "^6.6.0",
 		"pmtiles": "^4.5.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",

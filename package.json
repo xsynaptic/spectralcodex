@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.16.0",
+	"version": "7.17.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -98,7 +98,7 @@
 		"astro-seo": "^1.1.0",
 		"d3-scale": "^4.0.2",
 		"d3-time": "^3.1.0",
-		"eslint": "^10.9.0",
+		"eslint": "^10.9.1",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^37.2.0",
@@ -109,7 +109,7 @@
 		"keyv": "^5.6.0",
 		"knip": "^6.32.2",
 		"lefthook": "^2.1.10",
-		"maplibre-gl": "^6.5.0",
+		"maplibre-gl": "^6.6.0",
 		"ohash": "^2.0.12",
 		"p-limit": "^7.3.1",
 		"p-memoize": "^8.0.0",
