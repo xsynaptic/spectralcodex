@@ -6,6 +6,7 @@
 	--bs-annotation: light-dark(var(--color-primary-400), var(--color-primary-500));
 	--bs-duration: light-dark(var(--color-accent-500), var(--color-accent-400));
 	--bs-pages: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+
 	display: block;
 	font-family: var(--font-sans);
 	font-size: var(--text-base);
