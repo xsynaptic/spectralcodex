@@ -10,10 +10,10 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
-import { CONTROL_FILTER_ID, MEDIA_QUERY_MOBILE } from '../constants';
+import { controlFilterId, mediaQueryMobile } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
-import { MAP_QUERYABLE_LAYER_IDS, MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
+import { mapQueryableLayerIds, MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
 import { useMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
 import { writeSavedViewport } from '../store/store-viewport';
 
@@ -30,7 +30,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const isInteractive = useMapCanvasInteractive();
-	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
 	const mapStoreInstance = useMapStoreInstance();
 
@@ -141,12 +141,12 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			const { point, target: mapInstance } = event;
 
 			// Ensure all queryable layers have been loaded by MapLibre
-			for (const layerId of MAP_QUERYABLE_LAYER_IDS) {
+			for (const layerId of mapQueryableLayerIds) {
 				if (!mapInstance.getLayer(layerId)) return;
 			}
 
 			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
-				layers: [...MAP_QUERYABLE_LAYER_IDS],
+				layers: [...mapQueryableLayerIds],
 			});
 
 			// Note: this only queries the first matching feature, but that is sufficient
@@ -280,7 +280,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 						return;
 					}
 
-					const filterControl = container.querySelector<HTMLButtonElement>(`#${CONTROL_FILTER_ID}`);
+					const filterControl = container.querySelector<HTMLButtonElement>(`#${controlFilterId}`);
 
 					if (!filterControl) {
 						console.warn('[Map] Filter control not found!');

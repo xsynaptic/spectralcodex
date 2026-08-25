@@ -10,7 +10,7 @@ import { hash } from 'ohash';
 
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
-import { HASH_SHORT_LENGTH } from '#constants.ts';
+import { hashShortLength } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 function getRelativePath(url: string | undefined): string | undefined {
@@ -256,9 +256,9 @@ export function getLocationsMapPopupData(
 
 // Endpoint URLs and inline cache keys derive from these hashes
 export function hashMapSourceData(sourceData: Array<MapSourceItem> | undefined) {
-	return hash(sourceData).slice(0, HASH_SHORT_LENGTH);
+	return hash(sourceData).slice(0, hashShortLength);
 }
 
 export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
-	return hash(popupData).slice(0, HASH_SHORT_LENGTH);
+	return hash(popupData).slice(0, hashShortLength);
 }

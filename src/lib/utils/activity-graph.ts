@@ -1,4 +1,4 @@
-import { MILLISECONDS_PER_DAY } from '#constants.ts';
+import { millisecondsPerDay } from '#constants.ts';
 import { getDayKey } from '#lib/utils/date.ts';
 
 interface ActivityGraphDay {
@@ -59,7 +59,7 @@ export function buildActivityGraph({
 	const days: Array<ActivityGraphDay> = [];
 	let max = 0;
 
-	for (let time = yearStart; time < yearEnd; time += MILLISECONDS_PER_DAY) {
+	for (let time = yearStart; time < yearEnd; time += millisecondsPerDay) {
 		const date = new Date(time);
 		const value = values[getDayKey(date)] ?? 0;
 		const future = time > todayUtc;
@@ -82,7 +82,7 @@ export function buildActivityGraph({
 	// Month labels sit at the week line where each month begins (1-based grid line)
 	const monthLabels = Array.from({ length: 12 }, (_, month): ActivityGraphMonthLabel => {
 		const firstOfMonth = Date.UTC(yearNumber, month, 1);
-		const dayIndex = Math.round((firstOfMonth - yearStart) / MILLISECONDS_PER_DAY);
+		const dayIndex = Math.round((firstOfMonth - yearStart) / millisecondsPerDay);
 
 		return {
 			name: new Date(firstOfMonth).toLocaleDateString('en-US', {

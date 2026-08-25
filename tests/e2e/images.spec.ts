@@ -1,6 +1,6 @@
 import type { Locator } from '@playwright/test';
 
-import { PATHS } from './constants.ts';
+import { paths } from './constants.ts';
 import { expect, test } from './fixtures.ts';
 
 // currentSrc reflects the browser's per-viewport selection without fetching bytes; stays hermetic
@@ -21,7 +21,7 @@ test.describe('images - desktop (1280x720)', () => {
 	test.use({ viewport: { width: 1280, height: 720 } });
 
 	test('hero selects an optimized width', async ({ page }) => {
-		await page.goto(PATHS.postDetail, { waitUntil: 'domcontentloaded' });
+		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
 
 		const width = await getSelectedWidth(page.locator('img').first());
 
@@ -29,7 +29,7 @@ test.describe('images - desktop (1280x720)', () => {
 	});
 
 	test('first content image selects an optimized width', async ({ page }) => {
-		await page.goto(PATHS.postDetail, { waitUntil: 'domcontentloaded' });
+		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
 
 		const width = await getSelectedWidth(page.locator('article img, main img').nth(1));
 
@@ -41,7 +41,7 @@ test.describe('images - mobile (390x844)', () => {
 	test.use({ viewport: { width: 390, height: 844 } });
 
 	test('hero selects a smaller width than desktop', async ({ page }) => {
-		await page.goto(PATHS.postDetail, { waitUntil: 'domcontentloaded' });
+		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
 
 		const width = await getSelectedWidth(page.locator('img').first());
 
@@ -49,7 +49,7 @@ test.describe('images - mobile (390x844)', () => {
 	});
 
 	test('first content image selects a smaller width than desktop', async ({ page }) => {
-		await page.goto(PATHS.postDetail, { waitUntil: 'domcontentloaded' });
+		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
 
 		const width = await getSelectedWidth(page.locator('article img, main img').nth(1));
 

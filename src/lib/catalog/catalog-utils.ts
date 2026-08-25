@@ -3,10 +3,10 @@ import * as R from 'remeda';
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 // Cap on the shuffled "more from this entry" sample shown on region/theme entry pages
-const RELATED_CATALOG_ITEMS_LIMIT = 25;
+const relatedCatalogItemsLimit = 25;
 
 // Regions, themes, series, and pages link structurally; only these link editorially
-const EDITORIAL_COLLECTIONS = new Set<CatalogCollectionKey>(['locations', 'posts']);
+const editorialCollections = new Set<CatalogCollectionKey>(['locations', 'posts']);
 
 export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
 	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();
@@ -22,7 +22,7 @@ export function filterHasFeaturedImage(item: CatalogItem): boolean {
 }
 
 export function filterIsEditorialEntry(item: CatalogItem): boolean {
-	return EDITORIAL_COLLECTIONS.has(item.collection);
+	return editorialCollections.has(item.collection);
 }
 
 /**
@@ -33,7 +33,7 @@ export function filterIsEditorialEntry(item: CatalogItem): boolean {
 export function buildEntryCatalogItems(
 	featured: ReadonlyArray<CatalogItem>,
 	rest: ReadonlyArray<CatalogItem>,
-	limit = RELATED_CATALOG_ITEMS_LIMIT,
+	limit = relatedCatalogItemsLimit,
 ): {
 	catalogItemsFiltered: Array<CatalogItem>;
 	catalogItems: Array<CatalogItem>;

@@ -5,7 +5,7 @@ import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
-import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { contentCollectionsPath } from '#constants.ts';
 import {
 	LocationsNearbyItemSchema,
 	LocationTwHeritageSchema,
@@ -24,7 +24,7 @@ import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 export const locations = defineCollection({
 	loader: glob({
 		pattern: '**/[^_]*.(md|mdx)',
-		base: `${CONTENT_COLLECTIONS_PATH}/locations`,
+		base: `${contentCollectionsPath}/locations`,
 		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
 	}),
 	schema: z

@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
-import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
+import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
@@ -16,9 +16,9 @@ interface Props extends HTMLAttributes<'article'> {
 const { imageId, hideSearch, ...props } = Astro.props;
 
 // Pagefind renders result thumbnails at 64×48 (4:3) via `--pf-image-width` / `--pf-image-height`
-const SEARCH_THUMBNAIL_WIDTH = 64;
-const SEARCH_THUMBNAIL_WIDTH_2X = SEARCH_THUMBNAIL_WIDTH * 2;
-const SEARCH_THUMBNAIL_ASPECT_RATIO = 4 / 3;
+const searchThumbnailWidth = 64;
+const searchThumbnailWidth2x = searchThumbnailWidth * 2;
+const searchThumbnailAspectRatio = 4 / 3;
 
 async function getThumbnailUrls() {
 	if (!imageId) return;
@@ -29,8 +29,8 @@ async function getThumbnailUrls() {
 	if (!imageEntry) return;
 
 	const getSignedImagePath = createSignedImagePathFunction({
-		imageQuality: IMAGE_LQ_QUALITY,
-		imageFormat: IMAGE_LQ_FORMAT,
+		imageQuality: imageLowQualityValue,
+		imageFormat: imageLowQualityFormat,
 		serverSecret: IMAGE_SERVER_SECRET,
 	});
 
@@ -38,13 +38,13 @@ async function getThumbnailUrls() {
 
 	return {
 		url1x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
-			width: SEARCH_THUMBNAIL_WIDTH,
-			height: Math.round(SEARCH_THUMBNAIL_WIDTH / SEARCH_THUMBNAIL_ASPECT_RATIO),
+			width: searchThumbnailWidth,
+			height: Math.round(searchThumbnailWidth / searchThumbnailAspectRatio),
 			fit,
 		})}`,
 		url2x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
-			width: SEARCH_THUMBNAIL_WIDTH_2X,
-			height: Math.round(SEARCH_THUMBNAIL_WIDTH_2X / SEARCH_THUMBNAIL_ASPECT_RATIO),
+			width: searchThumbnailWidth2x,
+			height: Math.round(searchThumbnailWidth2x / searchThumbnailAspectRatio),
 			fit,
 		})}`,
 	};

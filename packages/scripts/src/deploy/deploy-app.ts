@@ -1,4 +1,4 @@
-import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
+import { openGraphBasePath } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import path from 'node:path';
 
@@ -29,7 +29,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 	await rsyncTo(`${distPath}/`, `${config.remoteHost}:${config.sitePath}/`, {
 		config,
 		dryRun,
-		excludes: [`/${OPEN_GRAPH_BASE_PATH}/`],
+		excludes: [`/${openGraphBasePath}/`],
 		extraFlags: skipDelete ? [] : ['--delete-after'],
 	});
 

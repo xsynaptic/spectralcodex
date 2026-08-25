@@ -10,7 +10,7 @@ import * as R from 'remeda';
 
 import type { MapComponentProps } from '../types';
 
-import { FETCH_TIMEOUT_MS } from '../constants';
+import { fetchTimeoutMs } from '../constants';
 
 // This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
 function createFeatureMask(feature: Feature<Polygon | MultiPolygon>) {
@@ -32,7 +32,7 @@ export function useMapApiDivisionData({
 			// Fetch FlatGeobuf file
 			const response = await fetch(
 				apiDivisionUrl,
-				isDev ? {} : { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
+				isDev ? {} : { signal: AbortSignal.timeout(fetchTimeoutMs) },
 			);
 			if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
 			const arrayBuffer = await response.arrayBuffer();

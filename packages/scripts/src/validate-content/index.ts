@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checkEntryIds } from './entry-ids';
 import { checkFrontmatterLinks } from './frontmatter-links';
@@ -43,7 +43,7 @@ const { values, positionals } = parseArgs({
 	allowPositionals: true,
 });
 
-const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
+const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const { collections } = loadDataStore(dataStorePath);
 
 const command = positionals[0];

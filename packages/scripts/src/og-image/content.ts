@@ -1,5 +1,5 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
-import { OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
+import { openGraphBasePath } from '@spectralcodex/shared/constants';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -179,7 +179,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 // Walk built HTML files and extract the set of OG image filenames referenced
 export function extractBuiltFilenames(distPath: string): Set<string> {
 	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
-	const ogPathSegment = `/${OPEN_GRAPH_BASE_PATH}/`;
+	const ogPathSegment = `/${openGraphBasePath}/`;
 	const filenames = new Set<string>();
 
 	function walkDir(dir: string): void {

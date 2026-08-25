@@ -4,7 +4,7 @@ import * as R from 'remeda';
 
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
-import { MAP_DISPLAY_REGION_IDS, MAP_DIVISION_DATA_PATH } from '#constants.ts';
+import { mapDisplayRegionIds, mapDivisionsDataPath } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
@@ -108,8 +108,8 @@ export async function createQueryRegionsEntryFunction() {
 		const ancestors = getRegionAncestors(entry);
 
 		const showRegionMap =
-			MAP_DISPLAY_REGION_IDS.has(entry.id) ||
-			ancestors.some((ancestor) => MAP_DISPLAY_REGION_IDS.has(ancestor.id));
+			mapDisplayRegionIds.has(entry.id) ||
+			ancestors.some((ancestor) => mapDisplayRegionIds.has(ancestor.id));
 
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
 		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);
@@ -148,7 +148,7 @@ export async function createQueryRegionsEntryFunction() {
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {
-						apiDivisionUrl: getBaseUrl(MAP_DIVISION_DATA_PATH, `${entry.id}.fgb`),
+						apiDivisionUrl: getBaseUrl(mapDivisionsDataPath, `${entry.id}.fgb`),
 					}
 				: {}),
 		});

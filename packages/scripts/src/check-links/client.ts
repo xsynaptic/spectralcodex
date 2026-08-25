@@ -2,11 +2,11 @@ import type { UrlRow, UrlStatus } from './types.ts';
 
 import { UrlStatusEnum } from './types.ts';
 
-const USER_AGENT = 'SpectralCodex-LinkChecker/1.0 (+https://spectralcodex.com)';
-const TIMEOUT_MS = 30_000;
+const userAgent = 'SpectralCodex-LinkChecker/1.0 (+https://spectralcodex.com)';
+const timeoutMs = 30_000;
 
-const REQUEST_HEADERS: Record<string, string> = {
-	'User-Agent': USER_AGENT,
+const requestHeaders: Record<string, string> = {
+	'User-Agent': userAgent,
 	Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 	'Accept-Language': 'en-US,en;q=0.9',
 	'Accept-Encoding': 'gzip, deflate, br',
@@ -14,7 +14,7 @@ const REQUEST_HEADERS: Record<string, string> = {
 
 // 403 = bot blocking (page likely exists but server might reject us)
 // 429 = rate limited (definitely exists, we're just hitting too fast)
-const BLOCKED_STATUS_CODES = new Set([403, 429]);
+const blockedStatusCodes = new Set([403, 429]);
 
 interface CheckResult {
 	urlId: number;
@@ -61,7 +61,7 @@ export async function checkUrl(row: UrlRow): Promise<CheckResult> {
 		}
 
 		// Bot blocking; server rejects us but page likely exists
-		if (BLOCKED_STATUS_CODES.has(response.status)) {
+		if (blockedStatusCodes.has(response.status)) {
 			return {
 				...base,
 				httpStatus: response.status,
@@ -96,8 +96,8 @@ export async function checkUrl(row: UrlRow): Promise<CheckResult> {
 function fetchWithTimeout(url: string, method: string): Promise<Response> {
 	return fetch(url, {
 		method,
-		headers: REQUEST_HEADERS,
+		headers: requestHeaders,
 		redirect: 'manual',
-		signal: AbortSignal.timeout(TIMEOUT_MS),
+		signal: AbortSignal.timeout(timeoutMs),
 	});
 }

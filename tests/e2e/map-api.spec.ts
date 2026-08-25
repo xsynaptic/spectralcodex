@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { MapDataKeysCompressed } from '@spectralcodex/map-codec';
 
-const ID = MapDataKeysCompressed.Id;
-const CHUNK_KEY = MapDataKeysCompressed.ChunkKey;
+const id = MapDataKeysCompressed.Id;
+const chunkKey = MapDataKeysCompressed.ChunkKey;
 
 type MapApiItem = Record<string, unknown>;
 
@@ -15,7 +15,7 @@ test.describe('map data API', () => {
 		const directory = (await response.json()) as Array<MapApiItem>;
 
 		expect(directory.length).toBeGreaterThan(1000);
-		expect(directory.every((row) => typeof row[CHUNK_KEY] === 'string')).toBe(true);
+		expect(directory.every((row) => typeof row[chunkKey] === 'string')).toBe(true);
 	});
 
 	test('sampled popup chunks resolve and contain their features', async ({ request }) => {
@@ -32,13 +32,13 @@ test.describe('map data API', () => {
 			expect(row).toBeDefined();
 			if (!row) continue;
 
-			const response = await request.get(`/api/map/${String(row[CHUNK_KEY])}.json`);
+			const response = await request.get(`/api/map/${String(row[chunkKey])}.json`);
 
 			expect(response.ok()).toBe(true);
 
 			const chunk = (await response.json()) as Array<MapApiItem>;
 
-			expect(chunk.some((item) => item[ID] === row[ID])).toBe(true);
+			expect(chunk.some((item) => item[id] === row[id])).toBe(true);
 		}
 	});
 
@@ -49,7 +49,7 @@ test.describe('map data API', () => {
 		const directoryResponse = await request.get('/api/map/map-directory.json');
 		const directory = (await directoryResponse.json()) as Array<MapApiItem>;
 
-		const chunkKeys = new Set(directory.map((row) => String(row[CHUNK_KEY])));
+		const chunkKeys = new Set(directory.map((row) => String(row[chunkKey])));
 
 		expect(warmUrls.some((url) => url.startsWith('/api/map/map-directory.json?v='))).toBe(true);
 		for (const chunkKey of chunkKeys) {

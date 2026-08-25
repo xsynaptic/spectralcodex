@@ -8,20 +8,20 @@ import { parseArgs } from 'node:util';
 
 import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
 
-const STAC_CATALOG_URL = 'https://stac.overturemaps.org/catalog.json';
-const S3_BASE = 's3://overturemaps-us-west-2/release';
+const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';
+const s3Base = 's3://overturemaps-us-west-2/release';
 
 async function resolveLatestRelease(): Promise<string> {
-	const response = await fetch(STAC_CATALOG_URL);
+	const response = await fetch(stacCatalogUrl);
 	const catalog = (await response.json()) as { latest: string };
 	const version = catalog.latest;
 
 	console.log(chalk.green(`Resolved latest Overture Maps release: ${chalk.cyan(version)}`));
 
-	return `${S3_BASE}/${version}/`;
+	return `${s3Base}/${version}/`;
 }
 
-import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
@@ -241,7 +241,7 @@ async function mapDivisions() {
 
 	try {
 		// Load region data from data-store
-		const { collections } = loadDataStore(path.join(rootPath, DATA_STORE_PATH));
+		const { collections } = loadDataStore(path.join(rootPath, dataStoreRelativePath));
 		const regionEntries = getDataStoreCollection(collections, ['regions']);
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);

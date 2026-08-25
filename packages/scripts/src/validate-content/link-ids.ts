@@ -2,7 +2,7 @@ import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-const LINK_ID_REGEX = /<Link\s[^>]*id="([^"]+)"/g;
+const linkIdRegex = /<Link\s[^>]*id="([^"]+)"/g;
 
 interface LinkIdIssue {
 	location: string;
@@ -25,10 +25,10 @@ export function collectLinkIdIssues(
 	for (const entry of entries) {
 		if (!entry.body?.includes('<Link ')) continue;
 
-		LINK_ID_REGEX.lastIndex = 0;
+		linkIdRegex.lastIndex = 0;
 		let match: RegExpExecArray | null;
 
-		while ((match = LINK_ID_REGEX.exec(entry.body)) !== null) {
+		while ((match = linkIdRegex.exec(entry.body)) !== null) {
 			const id = match[1];
 
 			if (!id || !validIds.has(id)) {

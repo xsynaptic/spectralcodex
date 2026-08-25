@@ -6,7 +6,7 @@ import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { hash } from 'ohash';
 import * as R from 'remeda';
 
-import { MDX_COMPONENTS } from '#constants.ts';
+import { mdxComponents } from '#constants.ts';
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
@@ -27,7 +27,7 @@ interface WordCountCached {
 function computeWordCount(body: string): number {
 	return R.pipe(
 		body,
-		(body) => stripMdxComponents(body, MDX_COMPONENTS),
+		(body) => stripMdxComponents(body, mdxComponents),
 		(body) => renderMarkdownInline(body),
 		stripTags,
 		countWords,
@@ -47,7 +47,7 @@ export async function getWordCount(
 		data: {
 			body: entry.body,
 			description: 'description' in entry.data ? entry.data.description : '',
-			mdxComponents: MDX_COMPONENTS,
+			mdxComponents,
 			version: 1,
 		},
 	});

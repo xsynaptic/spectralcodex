@@ -98,13 +98,13 @@ function generateSvg(
 
 	// Scale simplification tolerance based on geometry complexity
 	// Complex boundaries get progressively more aggressive simplification (up to 5x)
-	const POINT_THRESHOLD = 5000;
-	const MAX_TOLERANCE_MULTIPLIER = 5;
+	const pointThreshold = 5000;
+	const maxToleranceMultiplier = 5;
 
 	const pointCount = coordAll(corrected).length;
 	const adaptiveTolerance =
-		pointCount > POINT_THRESHOLD
-			? tolerance * Math.min(MAX_TOLERANCE_MULTIPLIER, pointCount / POINT_THRESHOLD)
+		pointCount > pointThreshold
+			? tolerance * Math.min(maxToleranceMultiplier, pointCount / pointThreshold)
 			: tolerance;
 
 	const simplified = simplify(corrected, {

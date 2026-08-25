@@ -8,7 +8,7 @@ import * as R from 'remeda';
 
 import type { LocationStatusMetadata } from '../lib/location-status';
 
-import { CONTROL_FILTER_ID } from '../constants';
+import { controlFilterId } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
@@ -270,7 +270,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 		<>
 			<CustomControlPortal position={position}>
 				<button
-					id={CONTROL_FILTER_ID}
+					id={controlFilterId}
 					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
 					onClick={() => {

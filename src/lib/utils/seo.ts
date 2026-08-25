@@ -1,7 +1,7 @@
-import { OPEN_GRAPH_IMAGE_FORMAT, OPEN_GRAPH_BASE_PATH } from '@spectralcodex/shared/constants';
+import { openGraphImageFormat, openGraphBasePath } from '@spectralcodex/shared/constants';
 import * as R from 'remeda';
 
-import { OPEN_GRAPH_IMAGE_FALLBACK_COUNT, OPEN_GRAPH_IMAGE_FALLBACK_PREFIX } from '#constants.ts';
+import { openGraphImageFallbackCount, openGraphImageFallbackPrefix } from '#constants.ts';
 import { joinUrl } from '#lib/utils/routing.ts';
 
 const { BASE_URL, PROD, SITE } = import.meta.env;
@@ -30,16 +30,16 @@ export function getSeoArticleProps({
 export function getSeoImageFallback() {
 	return joinUrl(
 		PROD ? SITE : BASE_URL,
-		`${OPEN_GRAPH_IMAGE_FALLBACK_PREFIX}-${String(R.randomInteger(1, OPEN_GRAPH_IMAGE_FALLBACK_COUNT))}.${OPEN_GRAPH_IMAGE_FORMAT}`,
+		`${openGraphImageFallbackPrefix}-${String(R.randomInteger(1, openGraphImageFallbackCount))}.${openGraphImageFormat}`,
 	);
 }
 
 export function getSeoImageProps({ id, alt }: { id?: string; alt: string }) {
 	if (id) {
-		const filename = `${id.replace('/', '-')}.${OPEN_GRAPH_IMAGE_FORMAT}`;
+		const filename = `${id.replace('/', '-')}.${openGraphImageFormat}`;
 
 		return {
-			url: joinUrl(PROD ? SITE : BASE_URL, OPEN_GRAPH_BASE_PATH, filename),
+			url: joinUrl(PROD ? SITE : BASE_URL, openGraphBasePath, filename),
 			alt,
 		};
 	}

@@ -4,8 +4,8 @@ import { z } from 'zod';
 import type { DataStoreEntry } from '../shared/data-store';
 
 // Title fields to check for duplicates (kept DRY as array)
-const TITLE_FIELDS = ['title', 'title_zh', 'title_ja'] as const;
-const ADDRESS_FIELDS = ['address', 'address_zh', 'address_ja'] as const;
+const titleFields = ['title', 'title_zh', 'title_ja'] as const;
+const addressFields = ['address', 'address_zh', 'address_ja'] as const;
 
 function getGoogleMapsLink(links: unknown): string | undefined {
 	const parsed = z
@@ -30,10 +30,10 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 	const addresses = new Map<string, Set<string>>(); // field -> values
 	const googleMapsLinks = new Set<string>();
 
-	for (const field of TITLE_FIELDS) {
+	for (const field of titleFields) {
 		titles.set(field, new Set());
 	}
-	for (const field of ADDRESS_FIELDS) {
+	for (const field of addressFields) {
 		addresses.set(field, new Set());
 	}
 
@@ -41,7 +41,7 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 
 	for (const entry of entries) {
 		// Check title fields
-		for (const field of TITLE_FIELDS) {
+		for (const field of titleFields) {
 			const value = entry.data[field];
 
 			if (typeof value === 'string') {
@@ -57,7 +57,7 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 		}
 
 		// Check address fields
-		for (const field of ADDRESS_FIELDS) {
+		for (const field of addressFields) {
 			const value = entry.data[field];
 
 			if (typeof value === 'string') {

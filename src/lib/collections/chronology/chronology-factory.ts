@@ -10,7 +10,7 @@ import type {
 	ChronologyMonthlyItem,
 } from '#lib/collections/chronology/chronology-types.ts';
 
-import { MILLISECONDS_PER_DAY } from '#constants.ts';
+import { millisecondsPerDay } from '#constants.ts';
 import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
 interface ChronologyRawMonthData extends Pick<
@@ -60,7 +60,7 @@ function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
 
 	const days: Array<Date> = [];
 
-	for (let time = startDay; time <= endDay; time += MILLISECONDS_PER_DAY) {
+	for (let time = startDay; time <= endDay; time += millisecondsPerDay) {
 		days.push(new Date(time));
 	}
 

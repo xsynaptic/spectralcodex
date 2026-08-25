@@ -25,7 +25,7 @@ import SectionPreviewList from '#components/sections/section-preview-list.astro'
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { BACKLINKS_COUNT_DISPLAY_MINIMUM } from '#constants.ts';
+import { backlinksDisplayCountMinimum } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getRegionSchema } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -113,7 +113,7 @@ const entryCount = entry.data._entryCount ?? 0;
 						) : undefined
 					}
 					{
-						backlinksCount >= BACKLINKS_COUNT_DISPLAY_MINIMUM ? (
+						backlinksCount >= backlinksDisplayCountMinimum ? (
 							<DividedItem>
 								{formatStringTemplate(t('content.meta.backlinks.label'), {
 									count: formatNumber({ number: backlinksCount }),

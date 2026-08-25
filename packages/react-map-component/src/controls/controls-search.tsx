@@ -3,7 +3,7 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
 
-import { CONTROL_SEARCH_ID } from '../constants';
+import { controlSearchId } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMapMessages } from '../lib/messages';
@@ -35,7 +35,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 					required={true}
 				/>
 				<button
-					id={CONTROL_SEARCH_ID}
+					id={controlSearchId}
 					className="map-search-button"
 					disabled={isLoading}
 					onClick={() => {

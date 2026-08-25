@@ -6,14 +6,14 @@ import { makeEntry } from '../validate-content/validate-test-utils';
 import { buildRedirectPairs } from './build-redirect-pairs';
 
 // Fixtures must carry all collections; getDataStoreCollection throws on a missing one
-const ALL_COLLECTIONS = ['locations', 'posts', 'pages', 'themes', 'series', 'regions', 'resources'];
+const allCollections = ['locations', 'posts', 'pages', 'themes', 'series', 'regions', 'resources'];
 
 function makeCollections(
 	populated: Record<string, Array<DataStoreEntry>> = {},
 ): DataStoreCollections {
 	const collections: DataStoreCollections = new Map();
 
-	for (const name of ALL_COLLECTIONS) {
+	for (const name of allCollections) {
 		const entries = new Map<string, DataStoreEntry>();
 		const populatedEntries = populated[name] ?? [];
 

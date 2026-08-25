@@ -8,7 +8,7 @@ interface AllowedRatio {
 }
 
 // Canonical aspect ratios for the photo library
-const ALLOWED_RATIOS = [
+const allowedRatios = [
 	{ label: '4:3', value: 4 / 3 },
 	{ label: '3:4', value: 3 / 4 },
 	{ label: '3:2', value: 3 / 2 },
@@ -17,11 +17,11 @@ const ALLOWED_RATIOS = [
 ] as const satisfies ReadonlyArray<AllowedRatio>;
 
 // Decimal tolerance on width/height; tight enough to surface mis-cropped photos
-const RATIO_TOLERANCE = 0.01;
+const ratioTolerance = 0.01;
 
 // Screenshots and demo captures have arbitrary dimensions by nature
 // This folder also contains old photos yet to be redone
-const EXEMPT_PREFIXES = ['errata/'];
+const exemptPrefixes = ['errata/'];
 
 function getOrientation(value: number) {
 	if (value > 1) return 'landscape';
@@ -31,10 +31,10 @@ function getOrientation(value: number) {
 }
 
 function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number } {
-	let nearest: AllowedRatio = ALLOWED_RATIOS[0];
+	let nearest: AllowedRatio = allowedRatios[0];
 	let smallestDelta = Math.abs(ratio - nearest.value);
 
-	for (const candidate of ALLOWED_RATIOS) {
+	for (const candidate of allowedRatios) {
 		const delta = Math.abs(ratio - candidate.value);
 
 		if (delta < smallestDelta) {
@@ -66,13 +66,13 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 	const flagged: Array<FlaggedImage> = [];
 
 	// Conforming images only; flagged ones are reported separately
-	const tally = new Map<string, number>(ALLOWED_RATIOS.map((allowed) => [allowed.label, 0]));
+	const tally = new Map<string, number>(allowedRatios.map((allowed) => [allowed.label, 0]));
 
 	let checkedCount = 0;
 	let exemptCount = 0;
 
 	for (const entry of entries) {
-		if (EXEMPT_PREFIXES.some((prefix) => entry.id.startsWith(prefix))) {
+		if (exemptPrefixes.some((prefix) => entry.id.startsWith(prefix))) {
 			exemptCount += 1;
 			continue;
 		}
@@ -88,7 +88,7 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 		const ratio = width / height;
 		const { allowed, delta } = getNearestRatio(ratio);
 
-		if (delta <= RATIO_TOLERANCE) {
+		if (delta <= ratioTolerance) {
 			tally.set(allowed.label, (tally.get(allowed.label) ?? 0) + 1);
 			continue;
 		}
@@ -98,7 +98,7 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 
 	flagged.sort((a, b) => a.id.localeCompare(b.id));
 
-	const tallyRows = ALLOWED_RATIOS.map((allowed) => ({
+	const tallyRows = allowedRatios.map((allowed) => ({
 		label: allowed.label,
 		value: allowed.value,
 		orientation: getOrientation(allowed.value),

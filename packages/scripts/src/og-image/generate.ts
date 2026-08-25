@@ -9,7 +9,7 @@ import type { OpenGraphMetadataItem } from './types.js';
 import { getOpenGraphElement } from './element.js';
 
 // A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
-const GLYPH_CACHE_BYTES = 64 * 1024 * 1024;
+const glyphCacheBytes = 64 * 1024 * 1024;
 
 // A vertical band as [start, end] fractions of the height
 type LuminanceZone = [start: number, end: number];
@@ -90,7 +90,7 @@ export function createRenderer({
 	jpegQuality?: number;
 }) {
 	// Read when a cache is first used, so this has to run before the first render
-	setGlyphCacheMaxBytes(GLYPH_CACHE_BYTES);
+	setGlyphCacheMaxBytes(glyphCacheBytes);
 
 	const renderer = new Renderer();
 

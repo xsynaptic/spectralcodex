@@ -9,9 +9,9 @@ export interface MapDarkModeOptions {
 	darkValue?: string | undefined;
 }
 
-const DEFAULT_ATTRIBUTE_NAME = 'data-mode';
-const DEFAULT_EVENT_NAME = 'mode-changed';
-const DEFAULT_DARK_VALUE = 'dark';
+const defaultAttributeName = 'data-mode';
+const defaultEventName = 'mode-changed';
+const defaultDarkValue = 'dark';
 
 const DarkModeContext = createContext(false);
 
@@ -23,9 +23,9 @@ export function DarkModeProvider({
 	darkMode,
 	children,
 }: PropsWithChildren<{ darkMode?: MapDarkModeOptions | undefined }>) {
-	const attributeName = darkMode?.attributeName ?? DEFAULT_ATTRIBUTE_NAME;
-	const eventName = darkMode?.eventName ?? DEFAULT_EVENT_NAME;
-	const darkValue = darkMode?.darkValue ?? DEFAULT_DARK_VALUE;
+	const attributeName = darkMode?.attributeName ?? defaultAttributeName;
+	const eventName = darkMode?.eventName ?? defaultEventName;
+	const darkValue = darkMode?.darkValue ?? defaultDarkValue;
 
 	const subscribe = useCallback(
 		(callback: () => void) => {

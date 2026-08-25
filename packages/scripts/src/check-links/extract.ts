@@ -5,7 +5,7 @@ import type { DataStoreEntry } from '../shared/data-store.ts';
 // Matches markdown links: [text](https://...)
 // Excludes image references ![alt](url) via negative lookbehind
 // Handles escaped parens in URLs like \(Taiwan\)
-const MARKDOWN_LINK_REGEX = /(?<!!)\[(?:[^\]]*)\]\((https?:\/\/(?:[^)\\]|\\.)+)\)/g;
+const markdownLinkRegex = /(?<!!)\[(?:[^\]]*)\]\((https?:\/\/(?:[^)\\]|\\.)+)\)/g;
 
 // Minimal extraction schemas; only the fields needed to pull URLs
 const LinkExtractSchema = z.union([z.string(), z.object({ url: z.string() })]);
@@ -63,7 +63,7 @@ function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 function extractBodyLinks(body: string): Array<string> {
 	const urls: Array<string> = [];
 
-	for (const match of body.matchAll(MARKDOWN_LINK_REGEX)) {
+	for (const match of body.matchAll(markdownLinkRegex)) {
 		if (match[1]) {
 			// Unescape markdown-escaped characters (e.g. \( \) in Wikipedia URLs)
 			urls.push(match[1].replaceAll('\\', ''));

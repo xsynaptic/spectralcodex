@@ -13,7 +13,7 @@ import { hash } from 'ohash';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY } from '#constants.ts';
+import { imageHighQualityFormat, imageHighQualityValue } from '#constants.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
@@ -64,7 +64,12 @@ const extractionVersion = hash({
 
 // Env feeds the src transform; changes re-derive entries without re-running exiftool
 const derivationVersion = hash({
-	env: { IMAGE_SERVER_URL, IMAGE_SERVER_SECRET, IMAGE_HQ_FORMAT, IMAGE_HQ_QUALITY },
+	env: {
+		IMAGE_SERVER_URL,
+		IMAGE_SERVER_SECRET,
+		imageHighQualityFormat,
+		imageHighQualityValue,
+	},
 	rev: 1,
 });
 
@@ -142,8 +147,8 @@ async function extractExifData(
 
 // Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
 const getSignedImagePath = createSignedImagePathFunction({
-	imageQuality: IMAGE_HQ_QUALITY,
-	imageFormat: IMAGE_HQ_FORMAT,
+	imageQuality: imageHighQualityValue,
+	imageFormat: imageHighQualityFormat,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 

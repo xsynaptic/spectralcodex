@@ -6,13 +6,13 @@ import { describe, expect, test } from 'vitest';
 
 import { signImageServerPath } from '#lib/image/image-sign.ts';
 
-const IMAGE_SERVER_URL = 'http://localhost:3100';
+const imageServerUrl = 'http://localhost:3100';
 const IMAGE_SERVER_SECRET =
 	process.env.IMAGE_SERVER_SECRET ?? 'dev-secret-do-not-use-in-production';
 
 // Empty or unset both fall back to 20, matching the container's `${…:-20}` and Astro's default
 const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_LENGTH) || 20;
-const TEST_IMAGE = 'example-folder-1/example-image-1.jpg';
+const testImage = 'example-folder-1/example-image-1.jpg';
 
 function signedUrl(source: string, width: number, format: ImagorFormats, quality: number): string {
 	const unsignedPath = generate(source, { width, format, quality }, { unsafe: false });
@@ -21,17 +21,17 @@ function signedUrl(source: string, width: number, format: ImagorFormats, quality
 		IMAGE_SERVER_SECRET,
 		IMAGE_SERVER_SIGNATURE_LENGTH,
 	);
-	return `${IMAGE_SERVER_URL}/${signature}/${unsignedPath}`;
+	return `${imageServerUrl}/${signature}/${unsignedPath}`;
 }
 
 describe('image server integration', () => {
 	test('health check returns 200', async () => {
-		const response = await fetch(`${IMAGE_SERVER_URL}/health`);
+		const response = await fetch(`${imageServerUrl}/health`);
 		expect(response.status).toBe(200);
 	});
 
 	test('signed request returns image bytes', async () => {
-		const response = await fetch(signedUrl(TEST_IMAGE, 450, 'jpg', 85));
+		const response = await fetch(signedUrl(testImage, 450, 'jpg', 85));
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-type')).toMatch(/^image\//);
 	});
@@ -39,19 +39,19 @@ describe('image server integration', () => {
 	test('unsigned request is rejected', async () => {
 		// No hash segment at all
 		const response = await fetch(
-			`${IMAGE_SERVER_URL}/450x0/filters:quality(85):format(jpg)/${TEST_IMAGE}`,
+			`${imageServerUrl}/450x0/filters:quality(85):format(jpg)/${testImage}`,
 		);
 		expect([401, 403]).toContain(response.status);
 	});
 
 	test('tampered signature is rejected', async () => {
 		const unsignedPath = generate(
-			TEST_IMAGE,
+			testImage,
 			{ width: 450, quality: 85, format: 'jpg' },
 			{ unsafe: false },
 		);
 		const response = await fetch(
-			`${IMAGE_SERVER_URL}/notavalidhash00000000000000000000000000/${unsignedPath}`,
+			`${imageServerUrl}/notavalidhash00000000000000000000000000/${unsignedPath}`,
 		);
 		expect([401, 403]).toContain(response.status);
 	});
@@ -63,7 +63,7 @@ describe('image server integration', () => {
 
 	test('second hit on same URL is a cache HIT', async () => {
 		// Use a unique width so this test does not collide with the first signed-request test
-		const url = signedUrl(TEST_IMAGE, 612, 'webp', 70);
+		const url = signedUrl(testImage, 612, 'webp', 70);
 		await fetch(url);
 		const response = await fetch(url);
 		expect(response.status).toBe(200);
@@ -71,7 +71,7 @@ describe('image server integration', () => {
 	});
 
 	test('format filter actually changes output content-type', async () => {
-		const webpResponse = await fetch(signedUrl(TEST_IMAGE, 451, 'webp', 70));
+		const webpResponse = await fetch(signedUrl(testImage, 451, 'webp', 70));
 		expect(webpResponse.status).toBe(200);
 		expect(webpResponse.headers.get('content-type')).toBe('image/webp');
 	});
@@ -79,7 +79,7 @@ describe('image server integration', () => {
 	// A malformed op silently returns the unresized original, which every other test here would pass
 	test('requested width is honored in the output image', async () => {
 		const width = 375;
-		const response = await fetch(signedUrl(TEST_IMAGE, width, 'jpg', 85));
+		const response = await fetch(signedUrl(testImage, width, 'jpg', 85));
 		expect(response.status).toBe(200);
 
 		const metadata = await sharp(Buffer.from(await response.arrayBuffer())).metadata();

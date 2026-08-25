@@ -14,7 +14,7 @@ interface GitFileDatesOptions {
 }
 
 // Prefixes each date line so it can't be confused with a file path
-const DATE_LINE_MARKER = '\u{1}';
+const dateLineMarker = '\u{1}';
 
 async function isShallowRepository(cwd: string): Promise<boolean> {
 	const result = await $({ cwd })`git rev-parse --is-shallow-repository`;
@@ -52,7 +52,7 @@ export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map
 
 	const result = await $({
 		cwd,
-	})`git log --name-only --pretty=format:${DATE_LINE_MARKER + dateFormat} -- ${pathspecArgs}`;
+	})`git log --name-only --pretty=format:${dateLineMarker + dateFormat} -- ${pathspecArgs}`;
 
 	const fileDates = new Map<string, string>();
 
@@ -60,8 +60,8 @@ export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map
 
 	// Log is newest-first, so the first date seen for a file wins
 	for (const line of result.stdout.split('\n')) {
-		if (line.startsWith(DATE_LINE_MARKER)) {
-			currentDate = line.slice(DATE_LINE_MARKER.length);
+		if (line.startsWith(dateLineMarker)) {
+			currentDate = line.slice(dateLineMarker.length);
 			continue;
 		}
 

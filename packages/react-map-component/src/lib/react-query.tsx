@@ -10,9 +10,9 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { del, get, set } from 'idb-keyval';
 import { useState } from 'react';
 
-import { MAP_CACHE_SCHEMA_VERSION } from '../constants';
+import { mapCacheSchemaVersion } from '../constants';
 
-const TIME_24_HOURS = 1000 * 60 * 60 * 24;
+const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
 interface ReactQueryProviderProps extends PropsWithChildren {
 	isDev?: boolean | undefined;
@@ -41,8 +41,8 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 		return new QueryClient({
 			defaultOptions: {
 				queries: {
-					staleTime: isDev ? 0 : TIME_24_HOURS,
-					gcTime: isDev ? 0 : TIME_24_HOURS,
+					staleTime: isDev ? 0 : millisecondsPerDay,
+					gcTime: isDev ? 0 : millisecondsPerDay,
 				},
 			},
 		});
@@ -57,9 +57,9 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 			client={queryClient}
 			persistOptions={{
 				persister: createIdbPersister('spectralcodex-map-data-cache'),
-				maxAge: TIME_24_HOURS,
+				maxAge: millisecondsPerDay,
 				// Content changes are keyed by the query itself, not by the buster
-				buster: MAP_CACHE_SCHEMA_VERSION,
+				buster: mapCacheSchemaVersion,
 				dehydrateOptions: {
 					// Queries opting out via meta (inline data shipped in the HTML) skip IndexedDB
 					shouldDehydrateQuery: (query) =>

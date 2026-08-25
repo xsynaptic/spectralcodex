@@ -1,16 +1,16 @@
 // Minimum dimensions recommended by Facebook (1.91:1 aspect ratio)
-export const OPEN_GRAPH_IMAGE_WIDTH = 1200;
-export const OPEN_GRAPH_IMAGE_HEIGHT = 630;
-export const OPEN_GRAPH_IMAGE_FORMAT = 'jpg';
+export const openGraphImageWidth = 1200;
+export const openGraphImageHeight = 630;
+export const openGraphImageFormat = 'jpg';
 
 // Destination path for Open Graph images
-export const OPEN_GRAPH_BASE_PATH = 'og';
+export const openGraphBasePath = 'og';
 
 // Local build output directory for generated Open Graph images
-export const OPEN_GRAPH_OUTPUT_PATH = '.cache/og-image';
+export const openGraphOutputPath = '.cache/og-image';
 
 // Keyv namespace (and JSON filename stem) for the Open Graph generation cache
-export const OPEN_GRAPH_CACHE_NAMESPACE = 'og-image-cache';
+export const openGraphCacheNamespace = 'og-image-cache';
 
 // Astro's cache directory, set explicitly so build-time scripts read the data store where Astro writes it
-export const ASTRO_CACHE_DIR = './node_modules/.astro';
+export const astroCacheDir = './node_modules/.astro';

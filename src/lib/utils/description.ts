@@ -3,7 +3,7 @@ import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { hash } from 'ohash';
 import * as R from 'remeda';
 
-import { HASH_SHORT_LENGTH, MDX_COMPONENTS } from '#constants.ts';
+import { hashShortLength, mdxComponents } from '#constants.ts';
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
@@ -46,7 +46,7 @@ export function getDescription(
 	if (entry.body) {
 		return R.pipe(
 			entry.body,
-			(body) => stripMdxComponents(body, MDX_COMPONENTS),
+			(body) => stripMdxComponents(body, mdxComponents),
 			stripFootnoteReferences,
 			(text) => textClipper(text.trim(), { wordCount: options.wordCount ?? 100 }),
 		);
@@ -66,10 +66,7 @@ export async function getDescriptionRendered(entry: {
 
 	// Key by entry ID so edits overwrite the old row; the hash validates cached content
 	// MDX component names participate so render-affecting code changes self-invalidate
-	const sourceHash = hash({ source, mdxComponents: MDX_COMPONENTS, version: 3 }).slice(
-		0,
-		HASH_SHORT_LENGTH,
-	);
+	const sourceHash = hash({ source, mdxComponents, version: 3 }).slice(0, hashShortLength);
 
 	const cached = await cacheInstance.get<DescriptionCached>(entry.id);
 

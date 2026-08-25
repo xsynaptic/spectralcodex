@@ -6,7 +6,7 @@ import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import { MEDIA_QUERY_MOBILE } from '../constants';
+import { mediaQueryMobile } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
 import { useChunkPopup } from '../data/data-popup-chunks';
 import { useSourceDataQuery } from '../data/data-source';
@@ -156,7 +156,7 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 	const hoveredId = useMapHoveredId();
 	const sourceDataIndex = useSourceDataIndex();
 	const { data: inlinePopupData } = usePopupDataQuery();
-	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
 	// Debounce so sweeping a dense cluster doesn't fire a chunk request per point crossed
 	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
@@ -236,7 +236,7 @@ function useMapCanvasPopup() {
 
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
 	function MapPopupContent({ popupItem, imageServerUrl }) {
-		const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+		const isMobile = useMediaQuery({ below: mediaQueryMobile });
 		const messages = useMapMessages();
 
 		const {
@@ -354,7 +354,7 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 	const { popupItem, isLoading: isPopupDataLoading } = useMapCanvasPopup();
 	const popupVisible = useMapPopupVisible();
 
-	const isMobile = useMediaQuery({ below: MEDIA_QUERY_MOBILE });
+	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
 	const { setSelectedId } = useMapStoreActions();
 

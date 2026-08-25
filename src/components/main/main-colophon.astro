@@ -2,7 +2,7 @@
 import Anchor from '#components/parts/anchor.astro';
 import DateDisplay from '#components/parts/date-display.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import { SITE_YEAR_FOUNDED } from '#constants.ts';
+import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -27,7 +27,7 @@ const t = getTranslations();
 		><span>
 			{
 				formatStringTemplate(t('site.footer.copyright.label'), {
-					year: SITE_YEAR_FOUNDED,
+					year: siteYearFounded,
 					currentYear,
 				})
 			}

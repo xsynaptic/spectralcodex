@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 import {
-	OPEN_GRAPH_CACHE_NAMESPACE,
-	OPEN_GRAPH_IMAGE_FORMAT,
-	OPEN_GRAPH_IMAGE_HEIGHT,
-	OPEN_GRAPH_IMAGE_WIDTH,
-	OPEN_GRAPH_OUTPUT_PATH,
+	openGraphCacheNamespace,
+	openGraphImageFormat,
+	openGraphImageHeight,
+	openGraphImageWidth,
+	openGraphOutputPath,
 } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import { rmSync } from 'node:fs';
@@ -19,7 +19,7 @@ import type { OutputCacheStore } from './output-cache.js';
 import type { OpenGraphContentEntry } from './types.js';
 
 import { getFileCacheInstance } from '../shared/cache-file.js';
-import { DATA_STORE_PATH } from '../shared/data-store.js';
+import { dataStoreRelativePath } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.js';
 import { getBuiltEntries } from './content.js';
@@ -42,7 +42,7 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			type: 'string',
-			default: OPEN_GRAPH_OUTPUT_PATH,
+			default: openGraphOutputPath,
 		},
 		'cache-path': {
 			type: 'string',
@@ -56,7 +56,7 @@ const { values } = parseArgs({
 });
 
 // Font configuration
-const FONT_CONFIGS: Array<FontsourceConfig> = [
+const fontConfigs: Array<FontsourceConfig> = [
 	{
 		package: 'lora',
 		name: 'Lora',
@@ -80,7 +80,7 @@ const FONT_CONFIGS: Array<FontsourceConfig> = [
 ];
 
 // Bump when the OG template (element.tsx) changes, to regenerate every card.
-const OG_TEMPLATE_VERSION = '2';
+const ogTemplateVersion = '2';
 
 // Resolve the readable source image path from the media path
 async function getSourceImagePath(imageId: string): Promise<string | undefined> {
@@ -115,7 +115,7 @@ async function main() {
 		const cacheFile = path.resolve(
 			rootPath,
 			values['cache-path'],
-			`${OPEN_GRAPH_CACHE_NAMESPACE}.json`,
+			`${openGraphCacheNamespace}.json`,
 		);
 		rmSync(outputPath, { force: true, recursive: true });
 		rmSync(cacheFile, { force: true });
@@ -125,19 +125,19 @@ async function main() {
 
 	console.log(chalk.blue('Loading fonts...'));
 
-	const fonts = await fontsourceFonts(FONT_CONFIGS);
+	const fonts = await fontsourceFonts(fontConfigs);
 
 	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
 
 	const renderCard = createRenderer({
 		fonts,
-		width: OPEN_GRAPH_IMAGE_WIDTH,
-		height: OPEN_GRAPH_IMAGE_HEIGHT,
+		width: openGraphImageWidth,
+		height: openGraphImageHeight,
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
 	const { entries, unresolved } = getBuiltEntries({
-		dataStorePath: path.resolve(rootPath, DATA_STORE_PATH),
+		dataStorePath: path.resolve(rootPath, dataStoreRelativePath),
 		distPath: path.resolve(rootPath, values['dist-path']),
 	});
 
@@ -163,7 +163,7 @@ async function main() {
 	safelyCreateDirectory(outputPath);
 	safelyCreateDirectory(cachePath);
 
-	const keyv = getFileCacheInstance(cachePath, OPEN_GRAPH_CACHE_NAMESPACE);
+	const keyv = getFileCacheInstance(cachePath, openGraphCacheNamespace);
 	const store: OutputCacheStore = {
 		get: (id) => keyv.get<string>(id),
 		set: async (id, key) => {
@@ -172,9 +172,9 @@ async function main() {
 	};
 	const outputCache = createOutputCache({
 		dir: outputPath,
-		extension: OPEN_GRAPH_IMAGE_FORMAT,
+		extension: openGraphImageFormat,
 		store,
-		version: OG_TEMPLATE_VERSION,
+		version: ogTemplateVersion,
 	});
 
 	// Decoding is bounded by memory (a 3 MB buffer per slot), rendering by CPU
@@ -227,8 +227,8 @@ async function main() {
 
 		const image = await processImage({
 			imageInput: imagePath,
-			height: OPEN_GRAPH_IMAGE_HEIGHT,
-			width: OPEN_GRAPH_IMAGE_WIDTH,
+			height: openGraphImageHeight,
+			width: openGraphImageWidth,
 			isFallback: batch.isFallback,
 		});
 

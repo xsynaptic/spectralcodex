@@ -4,7 +4,7 @@ import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@spectralcodex/astro-sitemap';
-import { ASTRO_CACHE_DIR } from '@spectralcodex/shared/constants';
+import { astroCacheDir } from '@spectralcodex/shared/constants';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
@@ -15,7 +15,7 @@ import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
-const IMAGE_SERVER_SECRET_PLACEHOLDER = 'dev-secret-do-not-use-in-production';
+const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
 const {
@@ -29,7 +29,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 if (
 	isProduction &&
-	(!IMAGE_SERVER_SECRET || IMAGE_SERVER_SECRET === IMAGE_SERVER_SECRET_PLACEHOLDER)
+	(!IMAGE_SERVER_SECRET || IMAGE_SERVER_SECRET === imageServerSecretPlaceholder)
 ) {
 	throw new Error(
 		'IMAGE_SERVER_SECRET is unset or still the dev placeholder; production builds must sign image URLs with the real secret',
@@ -47,7 +47,7 @@ export default defineConfig({
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
 	// Astro's default; set explicitly so build-time scripts resolve the data store identically
-	cacheDir: ASTRO_CACHE_DIR,
+	cacheDir: astroCacheDir,
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
@@ -89,7 +89,7 @@ export default defineConfig({
 			IMAGE_SERVER_SECRET: envField.string({
 				context: 'server',
 				access: 'secret',
-				default: IMAGE_SERVER_SECRET_PLACEHOLDER,
+				default: imageServerSecretPlaceholder,
 			}),
 			IMAGE_SERVER_SIGNATURE_LENGTH: envField.number({
 				context: 'server',

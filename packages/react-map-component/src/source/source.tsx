@@ -11,9 +11,9 @@ import { MapSourceDivisions } from './source-divisions';
 import { MapSourceLines } from './source-lines';
 import { MapSourcePoints } from './source-points';
 
-const IS_DEBUG = false as boolean;
+const isDebug = false as boolean;
 
-const EMPTY_FEATURE_COLLECTION: FeatureCollection<never, never> = {
+const emptyFeatureCollection: FeatureCollection<never, never> = {
 	type: 'FeatureCollection',
 	features: [],
 };
@@ -36,15 +36,15 @@ export const MapSource: FC<
 	 */
 	return (
 		<>
-			<MapSourceDivisions data={divisionData ?? EMPTY_FEATURE_COLLECTION} />
-			<MapSourceLines data={lineStringCollection ?? EMPTY_FEATURE_COLLECTION} />
+			<MapSourceDivisions data={divisionData ?? emptyFeatureCollection} />
+			<MapSourceLines data={lineStringCollection ?? emptyFeatureCollection} />
 			<MapSourcePoints
-				data={pointCollection ?? EMPTY_FEATURE_COLLECTION}
+				data={pointCollection ?? emptyFeatureCollection}
 				interactive={interactive}
 				hasMapIcons={hasMapIcons}
 				targetIds={targetIds}
 			/>
-			{IS_DEBUG && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
+			{isDebug && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
 		</>
 	);
 };

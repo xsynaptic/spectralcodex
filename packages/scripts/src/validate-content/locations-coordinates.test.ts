@@ -7,8 +7,8 @@ import { makeEntry, makeRegionRefs, noop } from './validate-test-utils';
 // Real Taipei boundary copied from public/divisions
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');
 
-const TAIPEI_COORDINATES: [number, number] = [121.5654, 25.033];
-const TAINAN_COORDINATES: [number, number] = [120.2027, 22.9917];
+const taipeiCoordinates: [number, number] = [121.5654, 25.033];
+const tainanCoordinates: [number, number] = [120.2027, 22.9917];
 
 function makeLocation(id: string, regionIds: Array<string>, coordinates: [number, number]) {
 	return makeEntry({
@@ -27,13 +27,13 @@ describe('checkLocationsCoordinates', () => {
 	});
 
 	test('passes a point inside its assigned region', async () => {
-		const entries = [makeLocation('inside', ['taipei'], TAIPEI_COORDINATES)];
+		const entries = [makeLocation('inside', ['taipei'], taipeiCoordinates)];
 
 		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(true);
 	});
 
 	test('fails a point outside its assigned region', async () => {
-		const entries = [makeLocation('outside', ['taipei'], TAINAN_COORDINATES)];
+		const entries = [makeLocation('outside', ['taipei'], tainanCoordinates)];
 
 		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
 	});
@@ -44,7 +44,7 @@ describe('checkLocationsCoordinates', () => {
 				id: 'multi-point',
 				data: {
 					regions: makeRegionRefs(['taipei']),
-					geometry: [{ coordinates: TAIPEI_COORDINATES }, { coordinates: TAINAN_COORDINATES }],
+					geometry: [{ coordinates: taipeiCoordinates }, { coordinates: tainanCoordinates }],
 				},
 			}),
 		];
@@ -59,7 +59,7 @@ describe('checkLocationsCoordinates', () => {
 				data: {
 					skipCoordinateCheck: true,
 					regions: makeRegionRefs(['taipei']),
-					geometry: { coordinates: TAINAN_COORDINATES },
+					geometry: { coordinates: tainanCoordinates },
 				},
 			}),
 		];
@@ -69,15 +69,15 @@ describe('checkLocationsCoordinates', () => {
 	});
 
 	test('fails when the only region has no division file', async () => {
-		const entries = [makeLocation('unmapped', ['atlantis'], TAIPEI_COORDINATES)];
+		const entries = [makeLocation('unmapped', ['atlantis'], taipeiCoordinates)];
 
 		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
 	});
 
 	test('passes when a missing division file is skipped alongside a valid entry', async () => {
 		const entries = [
-			makeLocation('unmapped', ['atlantis'], TAIPEI_COORDINATES),
-			makeLocation('inside', ['taipei'], TAIPEI_COORDINATES),
+			makeLocation('unmapped', ['atlantis'], taipeiCoordinates),
+			makeLocation('inside', ['taipei'], taipeiCoordinates),
 		];
 
 		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(true);

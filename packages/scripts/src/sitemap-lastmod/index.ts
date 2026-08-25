@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { DATA_STORE_PATH, getPublicId, loadDataStore } from '../shared/data-store.js';
+import { dataStoreRelativePath, getPublicId, loadDataStore } from '../shared/data-store.js';
 import { safelyCreateDirectory } from '../shared/utils.js';
 import { getGitFileDates } from './git-file-dates.js';
 
@@ -13,14 +13,14 @@ interface SitemapLastmodOptions {
 	outputPath?: string;
 }
 
-const ROOT_COLLECTIONS = new Set(['locations', 'pages', 'posts']);
+const rootCollections = new Set(['locations', 'pages', 'posts']);
 
 function joinUrl(...parts: Array<string>): string {
 	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
 }
 
 function buildContentUrl(siteUrl: string, collection: string, id: string): string {
-	const collectionSegment = ROOT_COLLECTIONS.has(collection) ? '' : collection;
+	const collectionSegment = rootCollections.has(collection) ? '' : collection;
 
 	return joinUrl(siteUrl, collectionSegment, id, '/');
 }
@@ -30,7 +30,7 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 
 	const contentPathRelative = options.contentPath ?? 'packages/content';
 	const contentPathAbs = path.resolve(options.rootPath, contentPathRelative);
-	const dataStorePath = path.resolve(options.rootPath, DATA_STORE_PATH);
+	const dataStorePath = path.resolve(options.rootPath, dataStoreRelativePath);
 	const outputPath = path.resolve(
 		options.rootPath,
 		options.outputPath ?? '.cache/sitemap-lastmod.json',

@@ -1,4 +1,4 @@
-export const PATHS = {
+export const paths = {
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
 	postDetail: '/huadong-valley-ride-2018-taitung-city/',

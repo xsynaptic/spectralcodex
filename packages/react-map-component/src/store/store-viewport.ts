@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const STALE_TIME_MS = 30 * 60 * 1000;
+const staleTimeMs = 30 * 60 * 1000;
 
 const SavedViewportSchema = z.object({
 	longitude: z.number(),
@@ -27,7 +27,7 @@ export function readSavedViewport(mapId: string | undefined): SavedViewport | un
 
 		if (!result.success) return;
 
-		if (Date.now() - result.data.timestamp > STALE_TIME_MS) return;
+		if (Date.now() - result.data.timestamp > staleTimeMs) return;
 
 		return result.data;
 	} catch {

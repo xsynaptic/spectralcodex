@@ -11,7 +11,7 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
+import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -26,7 +26,7 @@ type Props = HTMLAttributes<'div'> & {
 
 const { class: className, showAuthor = false, ...props } = Astro.props;
 
-const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+const imageSrc = 'v/a-synaptic-2025-1.jpg';
 
 const t = getTranslations();
 
@@ -37,7 +37,7 @@ async function getImageProps(): Promise<{
 }> {
 	const getImageById = await getImageByIdFunction();
 
-	const imageEntry = getImageById(IMAGE_SRC);
+	const imageEntry = getImageById(imageSrc);
 
 	if (!imageEntry)
 		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
@@ -47,17 +47,17 @@ async function getImageProps(): Promise<{
 	return {
 		imageEntry,
 		imageProps: {
-			src: IMAGE_SRC,
+			src: imageSrc,
 			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
 			sizes: 'auto, (max-width: 640px) 150px, 150px',
 			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			operations: { fit },
-			imageQuality: IMAGE_LQ_QUALITY,
-			imageFormat: IMAGE_LQ_FORMAT,
+			imageQuality: imageLowQualityValue,
+			imageFormat: imageLowQualityFormat,
 		},
 		placeholderProps: {
-			imageId: IMAGE_SRC,
+			imageId: imageSrc,
 			aspectRatio: 1,
 			fit,
 		},

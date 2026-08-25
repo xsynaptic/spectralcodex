@@ -8,7 +8,7 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY, TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { imageLowQualityFormat, imageLowQualityValue, tailwindBreakpointSm } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
@@ -53,14 +53,14 @@ async function getImageProps(): Promise<{
 					ImageSizeEnum.Large,
 				],
 			}),
-			sizes: `auto, (max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw, 425px`,
+			sizes: `auto, (max-width: ${tailwindBreakpointSm}) 100vw, 425px`,
 			width: ImageSizeEnum.Medium,
 			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			alt: sanitizeImageAltAttribute(alt),
 			unstyled: true,
 			operations: { fit },
-			imageQuality: IMAGE_LQ_QUALITY,
-			imageFormat: IMAGE_LQ_FORMAT,
+			imageQuality: imageLowQualityValue,
+			imageFormat: imageLowQualityFormat,
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,

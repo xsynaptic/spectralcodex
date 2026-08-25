@@ -6,16 +6,16 @@ import * as R from 'remeda';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { checks } from './checks';
 
 const rootPath = findWorkspaceRoot();
 
-const COLLECTIONS_ROOT = path.join('packages', 'content', 'collections');
+const collectionsRoot = path.join('packages', 'content', 'collections');
 
 function getDisplayPath(entry: DataStoreEntry): string {
-	return path.relative(COLLECTIONS_ROOT, entry.filePath ?? entry.id);
+	return path.relative(collectionsRoot, entry.filePath ?? entry.id);
 }
 
 function formatEntryLine(entry: DataStoreEntry): string {
@@ -76,12 +76,12 @@ if (!check) {
 	process.exit(1);
 }
 
-const RANDOM_DEFAULT_LIMIT = 50;
+const randomDefaultLimit = 50;
 
 const explicitLimit = values.limit ? Number(values.limit) : undefined;
-const effectiveLimit = explicitLimit ?? (values.random ? RANDOM_DEFAULT_LIMIT : undefined);
+const effectiveLimit = explicitLimit ?? (values.random ? randomDefaultLimit : undefined);
 
-const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
+const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const { collections } = loadDataStore(dataStorePath);
 
 const entries = getDataStoreCollection(collections, ['locations']);

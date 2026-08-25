@@ -13,7 +13,7 @@ import type { SimilarContentMetadata } from './metadata.js';
 
 import { getFileCacheInstance } from '../shared/cache-file.js';
 import {
-	DATA_STORE_PATH,
+	dataStoreRelativePath,
 	getDataStoreCollection,
 	loadDataStore,
 	toReferenceIds,
@@ -312,7 +312,7 @@ async function similarContent() {
 	try {
 		console.log(chalk.magenta('=== Similar Content Generator ==='));
 
-		const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
+		const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 
 		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
 

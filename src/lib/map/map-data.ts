@@ -12,7 +12,7 @@ import { IMAGE_SERVER_URL } from 'astro:env/server';
 import type { MapDataBoundsProps } from '#lib/map/map-bounds.ts';
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
-import { MAP_SOURCE_INLINE_LIMIT } from '#constants.ts';
+import { mapSourceInlineLimit } from '#constants.ts';
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 import {
 	getLocationsMapPopupData,
@@ -141,7 +141,7 @@ export function getMapData({
 	const count = locationCount ?? featureCount;
 
 	// Small maps inline their points, each carrying its chunk key
-	if (count <= MAP_SOURCE_INLINE_LIMIT) {
+	if (count <= mapSourceInlineLimit) {
 		// Hash the un-stamped rows so inline keys match the equivalent API payload
 		const sourceData = getLocationsMapSourceData(featureCollection);
 		const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);

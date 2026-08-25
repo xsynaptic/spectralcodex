@@ -6,7 +6,11 @@ import pLimit from 'p-limit';
 
 import type { UrlStatus } from './types.ts';
 
-import { DATA_STORE_PATH, loadDataStore, getDataStoreCollection } from '../shared/data-store.ts';
+import {
+	dataStoreRelativePath,
+	loadDataStore,
+	getDataStoreCollection,
+} from '../shared/data-store.ts';
 import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
@@ -22,7 +26,7 @@ import { extractLinksFromEntry } from './extract.ts';
 import { printList, printSessionSummary, printStatus } from './report.ts';
 import { UrlStatusEnum } from './types.ts';
 
-const STATUS_LABELS: Record<UrlStatus, string> = {
+const statusLabels: Record<UrlStatus, string> = {
 	[UrlStatusEnum.Pending]: chalk.gray('Pending'),
 	[UrlStatusEnum.Healthy]: chalk.green('Healthy'),
 	[UrlStatusEnum.Blocked]: chalk.cyan('Blocked'),
@@ -49,15 +53,15 @@ const { values } = parseArgs({
 });
 
 // Collections that may contain external links
-const LINK_COLLECTIONS = ['locations', 'pages', 'posts', 'regions', 'resources', 'themes'] as const;
+const linkCollections = ['locations', 'pages', 'posts', 'regions', 'resources', 'themes'] as const;
 
-const dataStorePath = path.resolve(rootPath, DATA_STORE_PATH);
+const dataStorePath = path.resolve(rootPath, dataStoreRelativePath);
 const dbPath = path.resolve(rootPath, values['db-path']);
 const concurrency = Number(values.concurrency);
 const domainLimit = Number(values['domain-limit']);
 const maxMissing = Number(values['max-missing']);
 
-const DEFAULT_IGNORE_PATTERNS = [
+const defaultIgnorePatterns = [
 	'maps.google.com',
 	'goo.gl/maps',
 	'google.com/maps',
@@ -66,7 +70,7 @@ const DEFAULT_IGNORE_PATTERNS = [
 	'127.0.0.1',
 ];
 
-const ignorePatterns = [...DEFAULT_IGNORE_PATTERNS, ...(values.ignore ?? [])];
+const ignorePatterns = [...defaultIgnorePatterns, ...(values.ignore ?? [])];
 
 function shouldIgnoreUrl(url: string): boolean {
 	return ignorePatterns.some((pattern) => url.includes(pattern));
@@ -121,7 +125,7 @@ try {
 	const allEntryDigests: Array<{ contentId: string; digest: string }> = [];
 	let skipped = 0;
 
-	for (const collectionName of LINK_COLLECTIONS) {
+	for (const collectionName of linkCollections) {
 		const entries = getDataStoreCollection(collections, [collectionName]);
 
 		for (const entry of entries) {
@@ -231,7 +235,7 @@ try {
 
 				if (isIssue || isRecovery) {
 					console.log(
-						`  [${String(checked)}/${String(urlsToCheck.length)}] ${STATUS_LABELS[result.status]} ${chalk.gray(row.url)}`,
+						`  [${String(checked)}/${String(urlsToCheck.length)}] ${statusLabels[result.status]} ${chalk.gray(row.url)}`,
 					);
 				} else if (checked % 100 === 0) {
 					console.log(chalk.gray(`  [${String(checked)}/${String(urlsToCheck.length)}] ...`));

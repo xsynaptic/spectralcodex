@@ -4,14 +4,14 @@ import path from 'node:path';
 const IMAGE_SERVER_SECRET =
 	process.env.IMAGE_SERVER_SECRET ?? 'dev-secret-do-not-use-in-production';
 
-const PROJECT_ROOT = path.resolve(import.meta.dirname, '../..');
-const DOCKER_COMPOSE_FILE = path.resolve(
-	PROJECT_ROOT,
+const projectRoot = path.resolve(import.meta.dirname, '../..');
+const dockerComposeFile = path.resolve(
+	projectRoot,
 	'packages/scripts/src/dev-server/docker-compose.yml',
 );
-const HEALTH_URL = 'http://localhost:3100/health';
-const MAX_WAIT_MS = 30_000;
-const POLL_INTERVAL_MS = 500;
+const healthUrl = 'http://localhost:3100/health';
+const maxWaitMs = 30_000;
+const pollIntervalMs = 500;
 
 async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();
@@ -25,7 +25,7 @@ async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 		} catch {
 			// Server not ready yet
 		}
-		await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+		await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
 	}
 
 	return false;
@@ -33,7 +33,7 @@ async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
 
 async function isDockerRunning(): Promise<boolean> {
 	try {
-		const response = await fetch(HEALTH_URL);
+		const response = await fetch(healthUrl);
 		return response.ok;
 	} catch {
 		return false;
@@ -58,15 +58,15 @@ export async function setup() {
 	// Note: --project-directory is required because docker-compose.yml uses relative paths
 	try {
 		execSync(
-			`docker compose -f "${DOCKER_COMPOSE_FILE}" --project-directory "${PROJECT_ROOT}" up -d`,
+			`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" up -d`,
 			{
-				cwd: PROJECT_ROOT,
+				cwd: projectRoot,
 				stdio: 'pipe',
 				env: {
 					...process.env,
 					// Absolute paths required for Docker
-					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/nginx.conf.template'),
+					CONTENT_MEDIA_PATH: path.resolve(projectRoot, 'packages/content-demo/media'),
+					IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
 					IMAGE_SERVER_SECRET,
 				},
 			},
@@ -79,14 +79,14 @@ export async function setup() {
 	// Wait for health check
 	console.log('[Test] Waiting for health check...');
 
-	const healthy = await waitForHealth(HEALTH_URL, MAX_WAIT_MS);
+	const healthy = await waitForHealth(healthUrl, maxWaitMs);
 
 	if (!healthy) {
 		try {
 			const logs = execSync(
-				`docker compose -f "${DOCKER_COMPOSE_FILE}" --project-directory "${PROJECT_ROOT}" logs --tail=50`,
+				`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" logs --tail=50`,
 				{
-					cwd: PROJECT_ROOT,
+					cwd: projectRoot,
 					encoding: 'utf8',
 				},
 			);
@@ -95,7 +95,7 @@ export async function setup() {
 			// Ignore log errors
 		}
 
-		throw new Error(`[Test] Health check failed after ${String(MAX_WAIT_MS)}ms`);
+		throw new Error(`[Test] Health check failed after ${String(maxWaitMs)}ms`);
 	}
 
 	console.log('[Test] Docker containers ready');
@@ -105,18 +105,15 @@ export function teardown() {
 	console.log('[Test] Stopping Docker containers...');
 
 	try {
-		execSync(
-			`docker compose -f "${DOCKER_COMPOSE_FILE}" --project-directory "${PROJECT_ROOT}" down`,
-			{
-				cwd: PROJECT_ROOT,
-				stdio: 'pipe',
-				env: {
-					...process.env,
-					CONTENT_MEDIA_PATH: path.resolve(PROJECT_ROOT, 'packages/content-demo/media'),
-					IMAGE_SERVER_NGINX_CONFIG: path.resolve(PROJECT_ROOT, 'deploy/nginx.conf.template'),
-				},
+		execSync(`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" down`, {
+			cwd: projectRoot,
+			stdio: 'pipe',
+			env: {
+				...process.env,
+				CONTENT_MEDIA_PATH: path.resolve(projectRoot, 'packages/content-demo/media'),
+				IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
 			},
-		);
+		});
 		console.log('[Test] Docker containers stopped');
 	} catch {
 		console.error('[Test] Failed to stop Docker containers');

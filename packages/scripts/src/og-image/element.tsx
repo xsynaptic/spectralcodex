@@ -1,4 +1,4 @@
-import { OPEN_GRAPH_IMAGE_HEIGHT, OPEN_GRAPH_IMAGE_WIDTH } from '@spectralcodex/shared/constants';
+import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
 import { Bitmap } from 'takumi-js/helpers/jsx';
 
 import type { ProcessedImage } from './generate.js';
@@ -6,10 +6,10 @@ import type { OpenGraphMetadataItem } from './types.js';
 
 const showBranding = true as boolean;
 
-const SHOW_SAFE_ZONE_OVERLAY = false as boolean;
+const showSafeZoneOverlay = false as boolean;
 
 // Threshold at which to show inverted text
-const LUMINANCE_THRESHOLD = 190;
+const luminanceThreshold = 190;
 
 // Safe zone (10% inset): 120px left/right, 63px top/bottom
 // Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
@@ -34,7 +34,7 @@ function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) 
 }
 
 function isInverted(luminance?: number): boolean {
-	return !!luminance && luminance >= LUMINANCE_THRESHOLD;
+	return !!luminance && luminance >= luminanceThreshold;
 }
 
 // Gradient text needs backgroundClip; a flat inverted fill is a plain color
@@ -80,7 +80,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 }
 
 // Each script gets its own face and optical size; `lang` also drives Han unification
-const SCRIPT_STYLES = {
+const scriptStyles = {
 	zh: {
 		lang: 'zh-Hant',
 		fontFamily: 'Noto Serif TC',
@@ -113,9 +113,9 @@ function resolveScript({
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
 }) {
-	if (titleZh) return { ...SCRIPT_STYLES.zh, title: titleZh };
-	if (titleJa) return { ...SCRIPT_STYLES.ja, title: titleJa };
-	if (titleTh) return { ...SCRIPT_STYLES.th, title: titleTh };
+	if (titleZh) return { ...scriptStyles.zh, title: titleZh };
+	if (titleJa) return { ...scriptStyles.ja, title: titleJa };
+	if (titleTh) return { ...scriptStyles.th, title: titleTh };
 
 	return;
 }
@@ -140,7 +140,7 @@ function TitleMultilingual({
 		<div
 			style={{
 				lineClamp: 1,
-				maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
 				textShadow: inverted
@@ -167,7 +167,7 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 				fontWeight: 700,
 				lineClamp: 2,
 				lineHeight: 1.15,
-				maxWidth: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
+				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px 60px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
 				textShadow: inverted
@@ -187,8 +187,8 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 			style={{
 				background: '#18181b',
 				display: 'flex',
-				width: `${String(OPEN_GRAPH_IMAGE_WIDTH)}px`,
-				height: `${String(OPEN_GRAPH_IMAGE_HEIGHT)}px`,
+				width: `${String(openGraphImageWidth)}px`,
+				height: `${String(openGraphImageHeight)}px`,
 			}}
 		>
 			{image ? (
@@ -211,7 +211,7 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 						'linear-gradient(to bottom, rgb(24, 24, 27, 0) 75%, rgb(24, 24, 27, 0.4) 88%, rgb(12, 12, 14, 0.6) 100%)',
 				}}
 			/>
-			{SHOW_SAFE_ZONE_OVERLAY ? <SafeZoneOverlay /> : undefined}
+			{showSafeZoneOverlay ? <SafeZoneOverlay /> : undefined}
 			<div
 				style={{
 					display: 'flex',

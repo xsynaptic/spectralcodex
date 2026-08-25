@@ -7,7 +7,7 @@ import { hash } from 'ohash';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
-import { HASH_SHORT_LENGTH } from '#constants.ts';
+import { hashShortLength } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
 	getRegionsCollection,
@@ -92,7 +92,7 @@ export function hashMapDirectoryData(
 	directory: Array<MapSourceItem>,
 	chunks: Map<string, Array<MapPopupItem>>,
 ): string {
-	return hash({ directory, chunks: [...chunks] }).slice(0, HASH_SHORT_LENGTH);
+	return hash({ directory, chunks: [...chunks] }).slice(0, hashShortLength);
 }
 
 // Memoized so a single build computes the shared artifacts once

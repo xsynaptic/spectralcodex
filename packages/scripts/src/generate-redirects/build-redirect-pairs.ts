@@ -8,10 +8,10 @@ interface RedirectPair {
 }
 
 // Collections where page URL = /{id}/
-const FLAT_COLLECTIONS = ['locations', 'posts', 'pages'];
+const flatCollections = ['locations', 'posts', 'pages'];
 
 // Collections where page URL = /{collection}/{id}/
-const PREFIXED_COLLECTIONS: Record<string, string> = {
+const prefixedCollections: Record<string, string> = {
 	themes: 'themes',
 	series: 'series',
 	regions: 'regions',
@@ -22,7 +22,7 @@ const PREFIXED_COLLECTIONS: Record<string, string> = {
 export function buildRedirectPairs(collections: DataStoreCollections) {
 	const redirects: Array<RedirectPair> = [];
 
-	for (const collectionName of [...FLAT_COLLECTIONS, ...Object.keys(PREFIXED_COLLECTIONS)]) {
+	for (const collectionName of [...flatCollections, ...Object.keys(prefixedCollections)]) {
 		const entries = getDataStoreCollection(collections, [collectionName]);
 
 		for (const entry of entries) {
@@ -30,7 +30,7 @@ export function buildRedirectPairs(collections: DataStoreCollections) {
 
 			if (!formerIds?.length) continue;
 
-			const prefix = PREFIXED_COLLECTIONS[collectionName];
+			const prefix = prefixedCollections[collectionName];
 			const canonicalId = getPublicId(entry);
 
 			for (const formerId of formerIds) {

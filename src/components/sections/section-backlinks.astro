@@ -9,14 +9,14 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 // Well-connected entries have hundreds of backlinks; the list is a sample, not an inventory
-const BACKLINKS_DISPLAY_LIMIT = 10;
+const backlinksDisplayLimit = 10;
 
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
 	limit?: number;
 }
 
-const { backlinks: backlinksAll, limit = BACKLINKS_DISPLAY_LIMIT, ...props } = Astro.props;
+const { backlinks: backlinksAll, limit = backlinksDisplayLimit, ...props } = Astro.props;
 
 const backlinks = backlinksAll?.slice(0, limit);
 

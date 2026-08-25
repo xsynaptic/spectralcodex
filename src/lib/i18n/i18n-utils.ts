@@ -2,7 +2,7 @@ import type { LanguageCode, MultilingualContent } from '#lib/i18n/i18n-types.ts'
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
-const CJK_LANGUAGES: ReadonlySet<LanguageCode> = new Set([
+const cjkLanguages: ReadonlySet<LanguageCode> = new Set([
 	LanguageCodeEnum.ChineseTraditional,
 	LanguageCodeEnum.ChineseSimplified,
 	LanguageCodeEnum.Japanese,
@@ -10,7 +10,7 @@ const CJK_LANGUAGES: ReadonlySet<LanguageCode> = new Set([
 ]);
 
 export function isCjkLanguage(lang: LanguageCode): boolean {
-	return CJK_LANGUAGES.has(lang);
+	return cjkLanguages.has(lang);
 }
 
 // Map data shows English + Traditional Chinese for zh-language regions

@@ -12,7 +12,7 @@ import { ChunkConfigProvider } from '../data/data-popup-chunks';
 import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
-import { MAP_INTERACTIVE_LAYER_IDS } from '../source/source-config';
+import { mapInteractiveLayerIds } from '../source/source-config';
 import { useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
 import { readSavedViewport } from '../store/store-viewport';
@@ -110,7 +110,7 @@ const MapCanvasContainer: FC<
 			styleDiffing={false}
 			hash={hash ?? false}
 			interactive={canvasInteractive}
-			interactiveLayerIds={[...MAP_INTERACTIVE_LAYER_IDS]}
+			interactiveLayerIds={[...mapInteractiveLayerIds]}
 			maxZoom={19}
 			minZoom={4}
 			fadeDuration={0}

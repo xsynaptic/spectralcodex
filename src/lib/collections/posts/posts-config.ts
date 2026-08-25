@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
-import { CONTENT_COLLECTIONS_PATH } from '#constants.ts';
+import { contentCollectionsPath } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateRecordedSchema,
@@ -16,7 +16,7 @@ import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 export const posts = defineCollection({
 	loader: glob({
 		pattern: '**/[^_]*.(md|mdx)',
-		base: `${CONTENT_COLLECTIONS_PATH}/posts`,
+		base: `${contentCollectionsPath}/posts`,
 		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
 	}),
 	schema: z

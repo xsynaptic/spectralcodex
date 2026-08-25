@@ -23,13 +23,13 @@ const CONCURRENCY = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
 const WARM_LIMIT = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
 
 // New image URLs trigger vips transforms; keep below the page rate so imagor's cpu cap serves traffic
-const IMAGE_CONCURRENCY = 4;
+const imageConcurrency = 4;
 
 // Persisted across runs in a Docker volume; the container filesystem is otherwise read-only
-const IMAGE_STATE_FILE = '/state/warmed-images.txt';
+const imageStateFile = '/state/warmed-images.txt';
 
 // Per-request timeout for warm, purge, and JMAP calls
-const TIMEOUT_MS = 30_000;
+const timeoutMs = 30_000;
 
 // Alert email rides JMAP over HTTPS; outbound SMTP is blocked on the VPS
 const JMAP_SESSION_URL = requireEnv('JMAP_SESSION_URL');
@@ -40,26 +40,26 @@ const ALERT_ALWAYS = process.env.ALERT_ALWAYS === '1' || process.env.ALERT_ALWAY
 const ALERT_MIN_FAILURES = Number(process.env.ALERT_MIN_FAILURES ?? '1') || 1;
 
 // Cap the failure list in the email body
-const MAX_ALERT_FAILURES = 50;
+const maxAlertFailures = 50;
 
-const JMAP_MAIL_URN = 'urn:ietf:params:jmap:mail';
-const JMAP_SUBMISSION_URN = 'urn:ietf:params:jmap:submission';
+const jmapMailUrn = 'urn:ietf:params:jmap:mail';
+const jmapSubmissionUrn = 'urn:ietf:params:jmap:submission';
 
-const HEADERS: Record<string, string> = {
+const requestHeaders: Record<string, string> = {
 	'User-Agent': 'SCXCacheWarmer/1.0 (+https://spectralcodex.com)',
 	// Request brotli so we warm the same compressed variant browsers receive
 	'Accept-Encoding': 'br, gzip',
 };
 
 // Site-relative build assets (CSS, JS, fonts) under the custom assets dir
-const ASSET_REGEX = /\/_x\/[^\s"'<>()]+/g;
+const assetRegex = /\/_x\/[^\s"'<>()]+/g;
 
 // Absolute image URLs scraped from HTML and CSS bodies
-const IMAGE_REGEX = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]*)?/gi;
+const imageRegex = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]*)?/gi;
 
 // Content pages link external images, and OG images on the site host are purged every deploy
 // Only the imagor host is warmed incrementally; its URLs are immutable and survive the purge
-const IMAGE_HOST = new URL(IMAGE_SERVER_URL).host;
+const imageHost = new URL(IMAGE_SERVER_URL).host;
 
 interface ScrapeTargets {
 	assets: Set<string>;
@@ -97,7 +97,10 @@ function* chain<Item>(...iterables: Array<Iterable<Item>>): Generator<Item> {
 }
 
 async function fetchText(url: string): Promise<string> {
-	const response = await fetch(url, { headers: HEADERS, signal: AbortSignal.timeout(TIMEOUT_MS) });
+	const response = await fetch(url, {
+		headers: requestHeaders,
+		signal: AbortSignal.timeout(timeoutMs),
+	});
 	if (!response.ok) throw new Error(`HTTP ${String(response.status)} for ${url}`);
 	return response.text();
 }
@@ -121,7 +124,7 @@ async function purge(): Promise<void> {
 			method: 'POST',
 			headers: { Authorization: `Bearer ${API_TOKEN}`, 'Content-Type': 'application/json' },
 			body: JSON.stringify({ hosts: [host] }),
-			signal: AbortSignal.timeout(TIMEOUT_MS),
+			signal: AbortSignal.timeout(timeoutMs),
 		},
 	);
 	let result: PurgeResult;
@@ -165,13 +168,13 @@ async function getMapUrls(): Promise<MapUrlsResult> {
 
 // .href yields a fresh string, unpinning the source HTML that V8 would otherwise retain via a match slice
 function scrape(text: string, targets: ScrapeTargets): void {
-	for (const match of text.matchAll(IMAGE_REGEX)) {
+	for (const match of text.matchAll(imageRegex)) {
 		// canParse guards odd matches from throwing
 		if (!match[0] || !URL.canParse(match[0])) continue;
 		const url = new URL(match[0]);
-		if (url.host === IMAGE_HOST) targets.images.add(url.href);
+		if (url.host === imageHost) targets.images.add(url.href);
 	}
-	for (const match of text.matchAll(ASSET_REGEX)) {
+	for (const match of text.matchAll(assetRegex)) {
 		if (match[0]) targets.assets.add(new URL(match[0], SITE_URL).href);
 	}
 }
@@ -180,9 +183,9 @@ async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
 	const start = Date.now();
 	try {
 		const response = await fetch(url, {
-			headers: HEADERS,
+			headers: requestHeaders,
 			redirect: 'manual',
-			signal: AbortSignal.timeout(TIMEOUT_MS),
+			signal: AbortSignal.timeout(timeoutMs),
 		});
 		const contentType = response.headers.get('content-type') ?? '';
 		const isScrapable = contentType.includes('text/html') || contentType.includes('text/css');
@@ -256,7 +259,7 @@ function report(label: string, stats: Stats): void {
 // A lost volume must surface in the report; silently re-warming 50k+ URLs looks like a normal run
 function loadWarmedImages(): { seen: Set<string>; missing: boolean } {
 	try {
-		const contents = readFileSync(IMAGE_STATE_FILE, 'utf8');
+		const contents = readFileSync(imageStateFile, 'utf8');
 		return { seen: new Set(contents.split('\n').filter(Boolean)), missing: false };
 	} catch (error) {
 		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
@@ -267,9 +270,9 @@ function loadWarmedImages(): { seen: Set<string>; missing: boolean } {
 
 // Temp file sits in the same directory so the rename is atomic
 function saveWarmedImages(urls: Set<string>): void {
-	const temporaryFile = `${IMAGE_STATE_FILE}.tmp`;
+	const temporaryFile = `${imageStateFile}.tmp`;
 	writeFileSync(temporaryFile, [...urls].join('\n'), 'utf8');
-	renameSync(temporaryFile, IMAGE_STATE_FILE);
+	renameSync(temporaryFile, imageStateFile);
 }
 
 interface JmapSession {
@@ -298,7 +301,7 @@ async function jmapRequest(url: string, body?: string): Promise<unknown> {
 			Authorization: `Bearer ${JMAP_API_TOKEN}`,
 			'Content-Type': 'application/json',
 		},
-		signal: AbortSignal.timeout(TIMEOUT_MS),
+		signal: AbortSignal.timeout(timeoutMs),
 	};
 	if (body !== undefined) {
 		init.method = 'POST';
@@ -315,7 +318,7 @@ async function jmapCall(
 ): Promise<Array<JmapInvocation>> {
 	const result = (await jmapRequest(
 		apiUrl,
-		JSON.stringify({ using: [JMAP_MAIL_URN, JMAP_SUBMISSION_URN], methodCalls }),
+		JSON.stringify({ using: [jmapMailUrn, jmapSubmissionUrn], methodCalls }),
 	)) as { methodResponses: Array<JmapInvocation> };
 	return result.methodResponses;
 }
@@ -331,7 +334,7 @@ function jmapResult(responses: Array<JmapInvocation>, callId: string): unknown {
 async function sendAlert(subject: string, text: string): Promise<void> {
 	try {
 		const session = (await jmapRequest(JMAP_SESSION_URL)) as JmapSession;
-		const accountId = session.primaryAccounts[JMAP_MAIL_URN];
+		const accountId = session.primaryAccounts[jmapMailUrn];
 		if (!accountId) throw new Error('token has no JMAP mail account');
 
 		const lookup = await jmapCall(session.apiUrl, [
@@ -407,10 +410,10 @@ async function sendRunReport(run: RunReport): Promise<void> {
 			? ` (${String(retriedCount)} retried, ${String(retriedCount - failures.length)} recovered)`
 			: '';
 	const failureLines = hasFailures
-		? ['', ...failures.slice(0, MAX_ALERT_FAILURES).map(failureLine)]
+		? ['', ...failures.slice(0, maxAlertFailures).map(failureLine)]
 		: [];
-	if (failures.length > MAX_ALERT_FAILURES) {
-		failureLines.push(`  (+${String(failures.length - MAX_ALERT_FAILURES)} more)`);
+	if (failures.length > maxAlertFailures) {
+		failureLines.push(`  (+${String(failures.length - maxAlertFailures)} more)`);
 	}
 	let subject = `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
 	if (hasFailures) {
@@ -489,9 +492,9 @@ async function main(): Promise<void> {
 	// Runs last so every scraped body has contributed to the image set
 	const newImages = [...targets.images.difference(seen)];
 	console.log(
-		`Warming ${String(newImages.length)} new images of ${String(targets.images.size)} referenced (concurrency ${String(IMAGE_CONCURRENCY)})...`,
+		`Warming ${String(newImages.length)} new images of ${String(targets.images.size)} referenced (concurrency ${String(imageConcurrency)})...`,
 	);
-	const imageStats = await warmAll(newImages, { concurrency: IMAGE_CONCURRENCY });
+	const imageStats = await warmAll(newImages, { concurrency: imageConcurrency });
 	report('Images (new)', imageStats);
 	phases.push(['Images (new)', imageStats]);
 

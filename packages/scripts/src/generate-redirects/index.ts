@@ -3,13 +3,13 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { DATA_STORE_PATH, loadDataStore } from '../shared/data-store';
+import { dataStoreRelativePath, loadDataStore } from '../shared/data-store';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { buildRedirectPairs } from './build-redirect-pairs';
 
 const rootPath = findWorkspaceRoot();
 
-const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
+const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const outputPath = path.join(rootPath, 'deploy/caddy/spectralcodex-redirects-generated.conf');
 
 const { collections } = loadDataStore(dataStorePath);

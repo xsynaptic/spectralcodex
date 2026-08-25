@@ -11,8 +11,8 @@ import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 
-const IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ = 1600;
-const IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ = 250;
+const imagePlaceholderPixelCountHighQuality = 1600;
+const imagePlaceholderPixelCountLowQuality = 250;
 
 interface ImagePlaceholderCached {
 	hash: string;
@@ -36,7 +36,7 @@ async function generatePlaceholderDataUrl({
 	aspectRatio,
 	fit = ImageFitOptionEnum.Cover,
 	position = 'center',
-	pixelCount = IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+	pixelCount = imagePlaceholderPixelCountLowQuality,
 }: {
 	imageObject: Sharp;
 	aspectRatio: number;
@@ -123,7 +123,9 @@ async function createImagePlaceholderFunction() {
 			aspectRatio,
 			fit,
 			position,
-			pixelCount: highQuality ? IMAGE_PLACEHOLDER_PIXEL_COUNT_HQ : IMAGE_PLACEHOLDER_PIXEL_COUNT_LQ,
+			pixelCount: highQuality
+				? imagePlaceholderPixelCountHighQuality
+				: imagePlaceholderPixelCountLowQuality,
 		});
 
 		if (placeholder) {

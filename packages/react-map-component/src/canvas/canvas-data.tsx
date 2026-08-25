@@ -14,7 +14,7 @@ import {
 } from '../store/store';
 import { getMapCanvasData } from './canvas-data-filter';
 
-const EMPTY_ITEMS = [] as const;
+const emptyItems = [] as const;
 
 const CanvasDataContext = createContext<MapCanvasData | undefined>(undefined);
 
@@ -31,7 +31,7 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const canvasData = useMemo(
 		() =>
 			getMapCanvasData(
-				sourceData ?? EMPTY_ITEMS,
+				sourceData ?? emptyItems,
 				{ status, entryQuality, rating, objective },
 				mapScope,
 			),

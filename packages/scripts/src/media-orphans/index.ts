@@ -3,7 +3,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { fallbackImageIds } from '../og-image/fallback.js';
-import { DATA_STORE_PATH, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 import { findWorkspaceRoot } from '../shared/utils.js';
 
@@ -24,7 +24,7 @@ const { values } = parseArgs({
 	},
 });
 
-const dataStorePath = path.join(rootPath, DATA_STORE_PATH);
+const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const mediaPath = path.join(rootPath, values['media-path']);
 
 const { collections } = loadDataStore(dataStorePath);

@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 import { hash } from 'ohash';
 
-import { HASH_SHORT_LENGTH, IMAGE_LQ_FORMAT, IMAGE_LQ_QUALITY } from '#constants.ts';
+import { hashShortLength, imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
 	createGenerateLocationPostDataFunction,
@@ -19,8 +19,8 @@ import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedImagePath = createSignedImagePathFunction({
-	imageQuality: IMAGE_LQ_QUALITY,
-	imageFormat: IMAGE_LQ_FORMAT,
+	imageQuality: imageLowQualityValue,
+	imageFormat: imageLowQualityFormat,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 
@@ -80,7 +80,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 		title: entry.data.title,
 		description: getDescription(entry),
 		links: entry.data.links,
-	}).slice(0, HASH_SHORT_LENGTH);
+	}).slice(0, hashShortLength);
 
 	entry.data._uuid = locationMapDataHash;
 	entry.data._url = getContentUrl('locations', getPublicId(entry));

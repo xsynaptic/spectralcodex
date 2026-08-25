@@ -5,7 +5,7 @@ import { MapPopupItemSchema } from '@spectralcodex/map-codec';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
-import { FETCH_TIMEOUT_MS } from '../constants';
+import { fetchTimeoutMs } from '../constants';
 
 interface ChunkConfig {
 	chunkUrlBase: string | undefined;
@@ -57,7 +57,7 @@ export function useChunkPopup(chunkKey: string | undefined) {
 
 			const response = await fetch(
 				url,
-				isDev ? {} : { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
+				isDev ? {} : { signal: AbortSignal.timeout(fetchTimeoutMs) },
 			);
 
 			if (!response.ok) {

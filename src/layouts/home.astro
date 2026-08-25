@@ -16,7 +16,7 @@ import PreviewGrid from '#components/parts/preview-grid.astro';
 import Prose from '#components/parts/prose.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { TAILWIND_BREAKPOINT_SM } from '#constants.ts';
+import { tailwindBreakpointSm } from '#constants.ts';
 import { getCatalogStats } from '#lib/catalog/catalog-stats.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -36,7 +36,7 @@ interface Props {
 	seriesCatalogItems: Array<CatalogItem>;
 }
 
-const IMAGE_SRC = 'v/a-synaptic-2025-1.jpg';
+const imageSrc = 'v/a-synaptic-2025-1.jpg';
 
 const t = getTranslations();
 
@@ -47,7 +47,7 @@ async function getImageProps(): Promise<{
 }> {
 	const getImageById = await getImageByIdFunction();
 
-	const imageEntry = getImageById(IMAGE_SRC);
+	const imageEntry = getImageById(imageSrc);
 
 	if (!imageEntry)
 		return {
@@ -59,15 +59,15 @@ async function getImageProps(): Promise<{
 	return {
 		imageEntry,
 		imageProps: {
-			src: IMAGE_SRC,
+			src: imageSrc,
 			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
-			sizes: `(min-width: 360px) 180px, (min-width: ${TAILWIND_BREAKPOINT_SM}) 300px, 300px`,
+			sizes: `(min-width: 360px) 180px, (min-width: ${tailwindBreakpointSm}) 300px, 300px`,
 			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
 			unstyled: true,
 			priority: true,
 		},
 		placeholderProps: {
-			imageId: IMAGE_SRC,
+			imageId: imageSrc,
 			aspectRatio: 1,
 		},
 	};

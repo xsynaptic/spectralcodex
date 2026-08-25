@@ -1,11 +1,11 @@
 import type { ImageContext, ImageLayout, ImageOrientation } from '#lib/image/image-types.ts';
 
 import {
-	TAILWIND_BREAKPOINT_CONTENT,
-	TAILWIND_BREAKPOINT_MD,
-	TAILWIND_BREAKPOINT_SM,
-	TAILWIND_CONTENT_PADDING_MD,
-	TAILWIND_CONTENT_PADDING_SM,
+	tailwindBreakpointContent,
+	tailwindBreakpointMd,
+	tailwindBreakpointSm,
+	tailwindContentPaddingMd,
+	tailwindContentPaddingSm,
 } from '#constants.ts';
 import {
 	ImageContextEnum,
@@ -101,7 +101,7 @@ export function getImageLayoutSizesProp(
 	if (context === ImageContextEnum.Single) {
 		switch (layout) {
 			case ImageLayoutEnum.Wide: {
-				sizes = [`calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`];
+				sizes = [`calc(100vw - ${tailwindContentPaddingMd})`];
 				break;
 			}
 			case ImageLayoutEnum.Full: {
@@ -110,10 +110,10 @@ export function getImageLayoutSizesProp(
 			}
 			default: {
 				sizes = [
-					`(max-width: ${TAILWIND_BREAKPOINT_SM}) 100vw`,
-					`(max-width: ${TAILWIND_BREAKPOINT_MD}) calc(100vw - ${TAILWIND_CONTENT_PADDING_SM})`,
-					`(max-width: ${TAILWIND_BREAKPOINT_CONTENT}) calc(100vw - ${TAILWIND_CONTENT_PADDING_MD})`,
-					`calc(${TAILWIND_BREAKPOINT_CONTENT} - ${TAILWIND_CONTENT_PADDING_MD})`,
+					`(max-width: ${tailwindBreakpointSm}) 100vw`,
+					`(max-width: ${tailwindBreakpointMd}) calc(100vw - ${tailwindContentPaddingSm})`,
+					`(max-width: ${tailwindBreakpointContent}) calc(100vw - ${tailwindContentPaddingMd})`,
+					`calc(${tailwindBreakpointContent} - ${tailwindContentPaddingMd})`,
 				];
 				break;
 			}

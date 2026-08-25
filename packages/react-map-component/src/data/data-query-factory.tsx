@@ -4,7 +4,7 @@ import type { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext, useMemo } from 'react';
 
-import { FETCH_TIMEOUT_MS } from '../constants';
+import { fetchTimeoutMs } from '../constants';
 
 interface MapDataQueryConfig<TSchema extends z.ZodType> {
 	name: string;
@@ -72,7 +72,7 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 				if (apiUrl) {
 					const response = await fetch(
 						apiUrl,
-						isDev ? {} : { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) },
+						isDev ? {} : { signal: AbortSignal.timeout(fetchTimeoutMs) },
 					);
 
 					if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);

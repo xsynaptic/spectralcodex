@@ -10,14 +10,14 @@ interface EdgeExpectation {
 }
 
 // Node's fetch has no default timeout, so a hung connection would stall the deploy indefinitely
-const REQUEST_TIMEOUT_MS = 10_000;
+const requestTimeoutMs = 10_000;
 
 function request(url: string, method: 'GET' | 'HEAD') {
 	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
 	return fetch(url, {
 		method,
 		redirect: 'manual',
-		signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+		signal: AbortSignal.timeout(requestTimeoutMs),
 	});
 }
 

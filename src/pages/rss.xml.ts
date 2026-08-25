@@ -3,7 +3,7 @@ import type { APIContext } from 'astro';
 import rss from '@astrojs/rss';
 import { performance } from 'node:perf_hooks';
 
-import { SITE_YEAR_FOUNDED } from '#constants.ts';
+import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 import { generateFeedItems } from '#lib/utils/rss.ts';
@@ -35,7 +35,7 @@ export async function GET(context: APIContext): Promise<Response> {
 	const lastBuildDate = items[0]?.pubDate;
 
 	const copyright = `${formatStringTemplate(t('site.footer.copyright.label'), {
-		year: SITE_YEAR_FOUNDED,
+		year: siteYearFounded,
 		currentYear: new Date().getFullYear(),
 	})} ${t('site.title')}`;
 

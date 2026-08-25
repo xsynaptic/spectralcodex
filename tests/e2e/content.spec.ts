@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { PATHS } from './constants.ts';
+import { paths } from './constants.ts';
 import { expect, test } from './fixtures.ts';
 
 async function expectDetailPageRenders(page: Page, path: string) {
@@ -21,10 +21,10 @@ async function expectDetailPageRenders(page: Page, path: string) {
 
 test.describe('detail pages', () => {
 	test('post renders', async ({ page }) => {
-		await expectDetailPageRenders(page, PATHS.postDetail);
+		await expectDetailPageRenders(page, paths.postDetail);
 	});
 
 	test('location renders', async ({ page }) => {
-		await expectDetailPageRenders(page, PATHS.locationDetail);
+		await expectDetailPageRenders(page, paths.locationDetail);
 	});
 });

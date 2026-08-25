@@ -8,7 +8,7 @@ import GeospatialIndex from 'kdbush';
 
 import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
 
-import { LOCATIONS_NEARBY_COUNT_LIMIT, LOCATIONS_NEARBY_DISTANCE_LIMIT } from '#constants.ts';
+import { locationsNearbyCountLimit, locationsNearbyDistanceLimit } from '#constants.ts';
 
 interface LocationPoint {
 	id: string;
@@ -84,8 +84,8 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 			index,
 			entryPoint.lng,
 			entryPoint.lat,
-			LOCATIONS_NEARBY_COUNT_LIMIT * 2,
-			LOCATIONS_NEARBY_DISTANCE_LIMIT,
+			locationsNearbyCountLimit * 2,
+			locationsNearbyDistanceLimit,
 		);
 
 		const nearby: Array<LocationsNearbyItem> = [];
@@ -109,7 +109,7 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 				});
 			}
 
-			if (nearby.length >= LOCATIONS_NEARBY_COUNT_LIMIT) break;
+			if (nearby.length >= locationsNearbyCountLimit) break;
 		}
 
 		if (nearby.length > 0) {

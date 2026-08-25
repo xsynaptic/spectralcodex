@@ -6,14 +6,14 @@ import type {
 
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
-const VALID_MODES: ReadonlySet<string> = new Set([
+const validModes: ReadonlySet<string> = new Set([
 	ModeTypeEnum.Auto,
 	ModeTypeEnum.Dark,
 	ModeTypeEnum.Light,
 ]);
 
 function isModeValid(mode: string | undefined): mode is ModeGeneralType {
-	return mode !== undefined && VALID_MODES.has(mode);
+	return mode !== undefined && validModes.has(mode);
 }
 
 class ModeManager extends HTMLElement {

@@ -1,43 +1,41 @@
 import { CONTENT_DATA_PATH } from 'astro:env/server';
 
 // Path to content from the root; defaults to `packages/content-demo/collections`
-export const CONTENT_COLLECTIONS_PATH = `./${CONTENT_DATA_PATH}`;
+export const contentCollectionsPath = `./${CONTENT_DATA_PATH}`;
 
 // An arbitrary identified for the "more" excerpt, used internally
-export const CONTENT_EXCERPT_IDENTIFIER = '<!-- more -->';
+export const contentExcerptIdentifier = '<!-- more -->';
 
 // Hashes that surface in endpoint URLs and rendered markup are truncated to this length
-export const HASH_SHORT_LENGTH = 12;
+export const hashShortLength = 12;
 
-export const IMAGE_LQ_QUALITY = 70 as const;
-export const IMAGE_HERO_QUALITY = 70 as const;
-export const IMAGE_HQ_QUALITY = 85 as const;
-export const IMAGE_LQ_FORMAT = 'webp' as const;
-export const IMAGE_HERO_FORMAT = 'webp' as const;
-export const IMAGE_HQ_FORMAT = 'jpg' as const;
+export const imageLowQualityValue = 70 as const;
+export const imageHeroQualityValue = 70 as const;
+export const imageHighQualityValue = 85 as const;
+export const imageLowQualityFormat = 'webp' as const;
+export const imageHeroQualityFormat = 'webp' as const;
+export const imageHighQualityFormat = 'jpg' as const;
 
 // Region and theme subtitles only show a connection count once it means something
-export const BACKLINKS_COUNT_DISPLAY_MINIMUM = 3;
+export const backlinksDisplayCountMinimum = 3;
 
-// Max number of locations returned
-export const LOCATIONS_NEARBY_COUNT_LIMIT = 20;
+// Max number of locations returned and maximum distance in kilometers
+export const locationsNearbyCountLimit = 20;
+export const locationsNearbyDistanceLimit = 10;
 
 // Maps at or under this many locations inline their points instead of fetching the shared directory
 // Counts locations, not features; multi-point locations expand to several features
-// Sized so nearby maps (target + up to LOCATIONS_NEARBY_COUNT_LIMIT neighbors) always inline
-export const MAP_SOURCE_INLINE_LIMIT = LOCATIONS_NEARBY_COUNT_LIMIT + 1;
-
-// Maximum distance in kilometers for nearby locations
-export const LOCATIONS_NEARBY_DISTANCE_LIMIT = 10; // km
+// Sized so nearby maps (target + up to locationsNearbyCountLimit neighbors) always inline
+export const mapSourceInlineLimit = locationsNearbyCountLimit + 1;
 
 // Limit precision of coordinate data; may be superseded by Turf's truncate function
-export const MAP_GEOMETRY_COORDINATES_PRECISION = 6;
+export const mapGeometryCoordinatesPrecision = 6;
 
 // Public folder for map division data
-export const MAP_DIVISION_DATA_PATH = 'divisions';
+export const mapDivisionsDataPath = 'divisions';
 
 // Root regions (self or ancestor) whose pages display maps; content policy, edit deliberately
-export const MAP_DISPLAY_REGION_IDS = new Set([
+export const mapDisplayRegionIds = new Set([
 	'taiwan',
 	'hong-kong',
 	'thailand',
@@ -45,7 +43,7 @@ export const MAP_DISPLAY_REGION_IDS = new Set([
 	'canada',
 ]);
 
-export const MDX_COMPONENTS = [
+export const mdxComponents = [
 	'Email',
 	'Hide',
 	'Img',
@@ -58,28 +56,28 @@ export const MDX_COMPONENTS = [
 ];
 
 // How many fallback images are there? These should already be located in the `/public` folder
-export const OPEN_GRAPH_IMAGE_FALLBACK_COUNT = 5;
-export const OPEN_GRAPH_IMAGE_FALLBACK_PREFIX = 'og-image';
+export const openGraphImageFallbackCount = 5;
+export const openGraphImageFallbackPrefix = 'og-image';
 
 // Generate high DPI Open Graph images
-export const OPEN_GRAPH_IMAGE_DENSITY = 2;
+export const openGraphImageDensity = 2;
 
 // Not sure how useful this is nowadays
-export const OPEN_GRAPH_TWITTER_USERNAME = '@spectralcodex';
+export const openGraphTwitterUsername = '@spectralcodex';
 
 // Tailwind CSS V4 breakpoints and spacing
-export const TAILWIND_BREAKPOINT_SM = '40rem';
-export const TAILWIND_BREAKPOINT_MD = '48rem'; // Note: large is 64rem
-export const TAILWIND_BREAKPOINT_CONTENT = '60.25rem'; // This is a custom setting
-export const TAILWIND_CONTENT_PADDING_SM = '2rem'; // 32px equivalent
-export const TAILWIND_CONTENT_PADDING_MD = '4rem'; // 64px equivalent
+export const tailwindBreakpointSm = '40rem';
+export const tailwindBreakpointMd = '48rem'; // Note: large is 64rem
+export const tailwindBreakpointContent = '60.25rem'; // This is a custom setting
+export const tailwindContentPaddingSm = '2rem'; // 32px equivalent
+export const tailwindContentPaddingMd = '4rem'; // 64px equivalent
 
 // Time
-export const MILLISECONDS_PER_DAY = 86_400_000;
-export const MILLISECONDS_PER_HOUR = 3_600_000;
+export const millisecondsPerDay = 86_400_000;
+export const millisecondsPerHour = 3_600_000;
 
 // A string representing the year the site was founded; will default to the current year
-export const SITE_YEAR_FOUNDED = 2009;
+export const siteYearFounded = 2009;
 
 // Wall-clock content dates belong to this timezone; used to anchor them to real instants
-export const SITE_TIMEZONE_OFFSET_HOURS = 8;
+export const siteTimezoneOffsetHours = 8;
