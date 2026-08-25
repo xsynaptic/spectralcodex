@@ -49,14 +49,14 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.2.4",
+		"astro": "^7.2.6",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@astrojs/markdown-satteri": "^0.3.7",
-		"@astrojs/mdx": "^7.0.7",
+		"@astrojs/markdown-satteri": "^0.3.8",
+		"@astrojs/mdx": "^7.0.8",
 		"@astrojs/node": "^11.1.4",
 		"@astrojs/react": "^6.0.4",
 		"@astrojs/rss": "^4.0.19",
@@ -68,7 +68,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.102.1",
+		"@tanstack/eslint-plugin-query": "^5.102.2",
 		"@turf/bbox": "^7.4.0",
 		"@turf/center": "^7.4.0",
 		"@turf/centroid": "^7.4.0",
@@ -77,7 +77,7 @@
 		"@turf/truncate": "^7.4.0",
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19.2.4",
+		"@types/react-dom": "^19.2.5",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^1.0.0",
