@@ -26,6 +26,9 @@ const { width, marginLeft, marginRight, headingY, monthLabelOffset, yearLabelOff
 
 const plotRight = width - marginRight;
 
+const hitLeft = points.at(0)?.x ?? marginLeft;
+const hitRight = points.at(-1)?.x ?? plotRight;
+
 // Escaped so no value can close the script tag it is injected into
 const tooltipData = JSON.stringify(points)
 	.replaceAll('<', String.raw`\u003c`)
@@ -103,14 +106,14 @@ const tooltipData = JSON.stringify(points)
 				></circle>
 			</g>
 			<rect
-				x={marginLeft}
+				x={hitLeft}
 				y={frame.top}
-				width={plotRight - marginLeft}
+				width={hitRight - hitLeft}
 				height={frame.bottom - frame.top}
 				fill="transparent"
 				data-chart-hit></rect>
 		</svg>
-		<div class="bs-tooltip" data-chart-tooltip aria-hidden="true">
+		<div class="bs-tooltip" data-chart-tooltip>
 			<div class="bs-tooltip-date" data-tooltip-date></div>
 			{
 				tooltipRows.map((row) => (

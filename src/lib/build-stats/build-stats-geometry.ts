@@ -18,8 +18,8 @@ import { formatNumber } from '#lib/utils/text.ts';
 
 export const buildStatsLayout = {
 	width: 900,
-	marginLeft: 58,
-	marginRight: 72,
+	marginLeft: 48,
+	marginRight: 62,
 	headingY: 13,
 	top: 26,
 	durationHeight: 250,

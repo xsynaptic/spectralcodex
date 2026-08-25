@@ -51,6 +51,8 @@ class BuildStatsChart extends HTMLElement {
 	}
 
 	#handlePointerMove = (event: PointerEvent) => {
+		if (event.pointerType === 'touch') return;
+
 		if (!this.#svg || !this.#crosshair) return;
 
 		const box = this.#svg.getBoundingClientRect();
@@ -102,7 +104,13 @@ class BuildStatsChart extends HTMLElement {
 
 		const data = this.querySelector('[data-chart-tooltips]')?.textContent;
 
-		if (data) this.#points = JSON.parse(data) as Array<TooltipPoint>;
+		if (data) {
+			try {
+				this.#points = JSON.parse(data) as Array<TooltipPoint>;
+			} catch {
+				this.#points = [];
+			}
+		}
 
 		const hit = this.querySelector<SVGRectElement>('[data-chart-hit]');
 
