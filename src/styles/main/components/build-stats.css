@@ -1,0 +1,191 @@
+.build-stats {
+	--bs-ink: light-dark(var(--color-primary-900), var(--color-primary-100));
+	--bs-ink-muted: light-dark(var(--color-primary-500), var(--color-primary-400));
+	--bs-grid: light-dark(var(--color-primary-200), var(--color-primary-700));
+	--bs-axis: light-dark(var(--color-primary-300), var(--color-primary-600));
+	--bs-annotation: light-dark(var(--color-primary-400), var(--color-primary-500));
+	--bs-duration: light-dark(var(--color-accent-500), var(--color-accent-400));
+	--bs-pages: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+	display: block;
+	font-family: var(--font-sans);
+	font-size: var(--text-base);
+	line-height: 1.5;
+	color: var(--bs-ink);
+}
+
+.build-stats + .build-stats {
+	margin-block-start: calc(var(--spacing) * 8);
+}
+
+/* Anchors the absolutely positioned tooltip */
+.bs-frame {
+	position: relative;
+}
+
+/* Scales to whatever column it lands in; nothing here may force the page to scroll */
+.bs-plot {
+	display: block;
+	width: 100%;
+	height: auto;
+	font-family: var(--font-sans);
+}
+
+.bs-chart-label {
+	font-size: 13px;
+	font-weight: 600;
+	fill: var(--bs-ink);
+}
+
+.bs-note {
+	font-size: 11px;
+	fill: var(--bs-ink-muted);
+}
+
+.bs-tick {
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	fill: var(--bs-ink-muted);
+}
+
+.bs-endpoint-label {
+	font-size: 12px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	fill: var(--bs-ink);
+}
+
+.bs-grid,
+.bs-axis {
+	stroke-width: 1;
+}
+
+.bs-grid {
+	stroke: var(--bs-grid);
+}
+
+.bs-grid-month {
+	opacity: 0.55;
+}
+
+.bs-axis {
+	stroke: var(--bs-axis);
+}
+
+/* Distinct from the gridlines it crosses */
+.bs-annotation {
+	stroke: var(--bs-annotation);
+	stroke-width: 1;
+	stroke-dasharray: 3 3;
+}
+
+/* Darker than its own line, so the two do not read as one mark where they meet */
+.bs-annotation-label {
+	font-size: 11px;
+	font-weight: 500;
+	fill: var(--bs-ink-muted);
+}
+
+/* Marks overlap heavily in the fast era; density does the shading, not a binned heatmap */
+.bs-dots circle {
+	fill: var(--bs-duration);
+	fill-opacity: 0.28;
+}
+
+.bs-line {
+	fill: none;
+	stroke: var(--bs-series);
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.bs-area {
+	fill: var(--bs-series);
+	fill-opacity: 0.1;
+	stroke: none;
+}
+
+.bs-endpoint {
+	fill: var(--bs-series);
+	stroke: var(--color-body-bg);
+	stroke-width: 2;
+}
+
+.bs-series-duration {
+	--bs-series: var(--bs-duration);
+}
+
+.bs-series-pages {
+	--bs-series: var(--bs-pages);
+}
+
+.bs-crosshair {
+	pointer-events: none;
+	opacity: 0;
+}
+
+.bs-tooltip {
+	position: absolute;
+	top: 0;
+	left: 0;
+	min-width: 150px;
+	padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+	font-size: var(--text-xs);
+	line-height: 1.5;
+	color: var(--bs-ink-muted);
+	pointer-events: none;
+	background-color: var(--color-body-bg);
+	border: 1px solid var(--bs-grid);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	opacity: 0;
+	transform: translateX(-50%);
+	transition: opacity 100ms linear;
+}
+
+.bs-tooltip[data-visible] {
+	opacity: 1;
+}
+
+.bs-tooltip-date {
+	margin-block-end: calc(var(--spacing) * 1);
+	color: var(--bs-ink-muted);
+}
+
+.bs-tooltip-row {
+	display: flex;
+	gap: calc(var(--spacing) * 3);
+	align-items: center;
+	justify-content: space-between;
+}
+
+.bs-tooltip-row b {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	color: var(--bs-ink);
+}
+
+.bs-tooltip-key {
+	display: flex;
+	gap: calc(var(--spacing) * 1);
+	align-items: center;
+}
+
+.bs-swatch {
+	flex: none;
+	inline-size: 7px;
+	block-size: 7px;
+	border-radius: 50%;
+}
+
+.bs-swatch-duration {
+	background-color: color-mix(in srgb, var(--bs-duration) 35%, transparent);
+}
+
+.bs-swatch-median {
+	background-color: var(--bs-duration);
+}
+
+.bs-swatch-pages {
+	background-color: var(--bs-pages);
+}

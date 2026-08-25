@@ -1,0 +1,37 @@
+---
+import type { AxisTick, PagesGeometry } from '#lib/build-stats/build-stats-geometry.ts';
+
+import BuildStatsChart from '#components/build-stats/build-stats-chart.astro';
+import { pagesFrame } from '#lib/build-stats/build-stats-geometry.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	geometry: PagesGeometry;
+	axisTicks: Array<AxisTick>;
+}
+
+const { geometry, axisTicks } = Astro.props;
+
+const t = getTranslations();
+
+const tooltipRows = [{ label: t('buildStats.tooltip.pages'), series: 'pages' }];
+---
+
+<BuildStatsChart
+	series="pages"
+	label={t('buildStats.chart.pages.label')}
+	ariaLabel={t('buildStats.chart.pages.aria')}
+	frame={pagesFrame}
+	axisTicks={axisTicks}
+	valueTicks={geometry.ticks}
+	tooltipRows={tooltipRows}
+	points={geometry.points}
+>
+	<path class="bs-area bs-series-pages" d={geometry.areaPath}></path>
+	<path class="bs-line bs-series-pages" d={geometry.linePath}></path>
+	<circle class="bs-endpoint bs-series-pages" cx={geometry.end.cx} cy={geometry.end.cy} r="4"
+	></circle>
+	<text class="bs-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
+		{geometry.end.label}
+	</text>
+</BuildStatsChart>

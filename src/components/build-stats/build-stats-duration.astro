@@ -1,0 +1,76 @@
+---
+import type { AxisTick, DurationGeometry } from '#lib/build-stats/build-stats-geometry.ts';
+
+import BuildStatsChart from '#components/build-stats/build-stats-chart.astro';
+import { durationFrame } from '#lib/build-stats/build-stats-geometry.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	geometry: DurationGeometry;
+	axisTicks: Array<AxisTick>;
+}
+
+const { geometry, axisTicks } = Astro.props;
+
+const t = getTranslations();
+
+const tooltipRows = [
+	{ label: t('buildStats.tooltip.duration'), series: 'duration' },
+	{ label: t('buildStats.tooltip.median'), series: 'median' },
+];
+---
+
+<BuildStatsChart
+	series="duration"
+	label={t('buildStats.chart.duration.label')}
+	ariaLabel={t('buildStats.chart.duration.aria')}
+	frame={durationFrame}
+	axisTicks={axisTicks}
+	valueTicks={geometry.ticks}
+	tooltipRows={tooltipRows}
+	points={geometry.points}
+>
+	{
+		geometry.annotations.map((annotation) => (
+			<Fragment>
+				<line
+					class="bs-annotation"
+					x1={annotation.x}
+					y1={durationFrame.top}
+					x2={annotation.x}
+					y2={durationFrame.bottom}
+				/>
+				<text
+					class="bs-annotation-label"
+					x={annotation.labelX}
+					y={annotation.labelY}
+					text-anchor="end"
+				>
+					{annotation.label}
+				</text>
+			</Fragment>
+		))
+	}
+	<g class="bs-dots">
+		{geometry.points.map((point) => <circle cx={point.x} cy={point.y} r="2" />)}
+	</g>
+	<path class="bs-line bs-series-duration" d={geometry.trendPath}></path>
+	{
+		geometry.end ? (
+			<Fragment>
+				<circle
+					class="bs-endpoint bs-series-duration"
+					cx={geometry.end.cx}
+					cy={geometry.end.cy}
+					r="4"
+				/>
+				<text class="bs-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
+					{geometry.end.label}
+				</text>
+				<text class="bs-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
+					{t('buildStats.trend.label')}
+				</text>
+			</Fragment>
+		) : undefined
+	}
+</BuildStatsChart>

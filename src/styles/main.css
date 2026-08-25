@@ -33,6 +33,7 @@
 /** Component layer */
 @import './main/components/activity-graph.css' layer(components);
 @import './main/components/background.css' layer(components);
+@import './main/components/build-stats.css' layer(components);
 @import './main/components/carousel.css' layer(components);
 @import './main/components/content.css' layer(components);
 @import './main/components/divider.css' layer(components);

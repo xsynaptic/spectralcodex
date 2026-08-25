@@ -159,6 +159,17 @@ const translationStrings = {
 		'objectives.description':
 			'This is a custom map tracking points in the geospatial database that still require verification and documentation. It is not intended for external consumption.',
 
+		// Build stats
+		'buildStats.empty': 'No data available yet.',
+		'buildStats.chart.duration.label': 'Build duration',
+		'buildStats.chart.duration.aria': 'Build duration over time',
+		'buildStats.chart.pages.label': 'Pages built',
+		'buildStats.chart.pages.aria': 'Pages built over time',
+		'buildStats.trend.label': 'median',
+		'buildStats.tooltip.duration': 'This build',
+		'buildStats.tooltip.median': 'Median',
+		'buildStats.tooltip.pages': 'Pages',
+
 		// Notices
 		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
 		'notice.vanished': `**Note**: this location has vanished. Any information presented here is only for reference.`,
@@ -174,6 +185,7 @@ const translationStrings = {
 		'site.footer.copyright.label': '©{year}–{currentYear}',
 		'site.footer.updated.label': 'Site updated on',
 		'site.footer.powered.label': 'Powered by',
+		'site.footer.buildStats.label': 'Build Stats',
 		'site.footer.sourceCode.label': 'Source Code',
 		'site.footer.feed.label': 'RSS Feed',
 		'site.breadcrumbs.label': 'Breadcrumb Navigation',

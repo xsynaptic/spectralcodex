@@ -1,0 +1,129 @@
+---
+import type {
+	AxisTick,
+	ChartFrame,
+	TooltipPoint,
+	ValueTick,
+} from '#lib/build-stats/build-stats-geometry.ts';
+
+import { buildStatsLayout } from '#lib/build-stats/build-stats-geometry.ts';
+
+interface Props {
+	series: 'duration' | 'pages';
+	label: string;
+	ariaLabel: string;
+	frame: ChartFrame;
+	axisTicks: Array<AxisTick>;
+	valueTicks: Array<ValueTick>;
+	tooltipRows: Array<{ label: string; series: string }>;
+	points: Array<TooltipPoint>;
+}
+
+const { series, label, ariaLabel, frame, axisTicks, valueTicks, tooltipRows, points } = Astro.props;
+
+const { width, marginLeft, marginRight, headingY, monthLabelOffset, yearLabelOffset } =
+	buildStatsLayout;
+
+const plotRight = width - marginRight;
+
+// Escaped so no value can close the script tag it is injected into
+const tooltipData = JSON.stringify(points)
+	.replaceAll('<', String.raw`\u003c`)
+	.replaceAll('>', String.raw`\u003e`)
+	.replaceAll('&', String.raw`\u0026`);
+---
+
+<script>
+	import '#components/build-stats/build-stats-chart.ts';
+</script>
+
+<build-stats-chart class="not-prose build-stats">
+	<div class="bs-frame">
+		<svg
+			class="bs-plot"
+			viewBox={`0 0 ${String(width)} ${String(frame.height)}`}
+			width={width}
+			height={frame.height}
+			role="img"
+			aria-label={ariaLabel}
+		>
+			<text class="bs-chart-label" x={marginLeft} y={headingY}>{label}</text>
+			{
+				axisTicks.map((tick) => (
+					<line
+						class="bs-grid bs-grid-month"
+						x1={tick.x}
+						y1={frame.top}
+						x2={tick.x}
+						y2={frame.bottom}
+					/>
+				))
+			}
+			{
+				valueTicks.map((tick) => (
+					<Fragment>
+						<line class="bs-grid" x1={marginLeft} y1={tick.y} x2={plotRight} y2={tick.y} />
+						<text class="bs-tick" x={marginLeft - 10} y={tick.y + 3.5} text-anchor="end">
+							{tick.label}
+						</text>
+					</Fragment>
+				))
+			}
+			<slot />
+			<line class="bs-axis" x1={marginLeft} y1={frame.bottom} x2={plotRight} y2={frame.bottom}
+			></line>
+			{
+				axisTicks.map((tick) => (
+					<Fragment>
+						<line class="bs-grid" x1={tick.x} y1={frame.bottom} x2={tick.x} y2={frame.bottom + 5} />
+						<text
+							class="bs-tick"
+							x={tick.x}
+							y={frame.bottom + monthLabelOffset}
+							text-anchor="middle"
+						>
+							{tick.label}
+						</text>
+						{tick.yearLabel ? (
+							<text
+								class="bs-tick"
+								x={tick.x}
+								y={frame.bottom + yearLabelOffset}
+								text-anchor="middle"
+							>
+								{tick.yearLabel}
+							</text>
+						) : undefined}
+					</Fragment>
+				))
+			}
+			<g class="bs-crosshair" data-chart-crosshair aria-hidden="true">
+				<line class="bs-axis" y1={frame.top} y2={frame.bottom} data-crosshair-line></line>
+				<circle class:list={['bs-endpoint', `bs-series-${series}`]} r="4" data-crosshair-dot
+				></circle>
+			</g>
+			<rect
+				x={marginLeft}
+				y={frame.top}
+				width={plotRight - marginLeft}
+				height={frame.bottom - frame.top}
+				fill="transparent"
+				data-chart-hit></rect>
+		</svg>
+		<div class="bs-tooltip" data-chart-tooltip aria-hidden="true">
+			<div class="bs-tooltip-date" data-tooltip-date></div>
+			{
+				tooltipRows.map((row) => (
+					<div class="bs-tooltip-row" data-tooltip-row>
+						<span class="bs-tooltip-key">
+							<span class:list={['bs-swatch', `bs-swatch-${row.series}`]} />
+							{row.label}
+						</span>
+						<b data-tooltip-value />
+					</div>
+				))
+			}
+		</div>
+		<script type="application/json" data-chart-tooltips is:inline set:html={tooltipData} />
+	</div>
+</build-stats-chart>
