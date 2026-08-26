@@ -86,6 +86,18 @@ export async function verifyEdge(): Promise<void> {
 			cacheControl: 'no-store',
 		},
 		{
+			label: 'objectives gate',
+			path: '/objectives/',
+			status: 401,
+			cacheControl: 'private, no-store',
+		},
+		{
+			label: 'objectives data gate',
+			path: '/api/map/objectives/s.json',
+			status: 401,
+			cacheControl: 'private, no-store',
+		},
+		{
 			label: 'robots',
 			path: '/robots.txt',
 			status: 200,

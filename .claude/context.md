@@ -6,7 +6,7 @@ This file is a glossary of terms commonly used in this project.
 
 ### Content
 
-**Entry**: A single piece of authored content in a collection, sourced from one Markdown or MDX file. Images are the exception: they are Entries of the Images collection, but their data is read from embedded metadata rather than an authored file. _Avoid_: document, record, node, item (reserve "item" for catalog rows).
+**Entry**: A single piece of authored content in a collection. Images are the exception: they are Entries of the Images collection, but described by their own embedded metadata rather than by authored prose. _Avoid_: document, record, node, item (reserve "item" for catalog rows).
 
 **Collection**: A named set of Entries sharing one schema (e.g. Locations, Posts, Pages, etc.). _Avoid_: content type, model.
 
@@ -14,7 +14,7 @@ This file is a glossary of terms commonly used in this project.
 
 **Post**: An article about one or more Locations, a journey, or a subject. Length and ambition vary freely, from a short observation to a full photo essay; there is no separate short-form collection. _Avoid_: article, blog post, story, note.
 
-**Page**: A standalone Entry that is not part of the editorial stream (about, colophon, FAQs). Unlike other collections, its URL mirrors its position on the file system. _Avoid_: static page.
+**Page**: A standalone Entry that is not part of the editorial stream (about, colophon, FAQs). _Avoid_: static page.
 
 **Region**: An editorial geographic container, arranged in a hierarchy/tree, that a Location belongs to. Membership is cumulative: an Entry filed under a Region also belongs to every Region above it. Regions are the project's own geography, not necessarily an officially-sanctioned administrative one. _Avoid_: place, area, locale, geography.
 
@@ -28,7 +28,7 @@ This file is a glossary of terms commonly used in this project.
 
 **Catalog**: The unified, cross-collection view of user-facing Entries reduced to a common shape, used for listing, counting, sorting, and discovery. It covers Locations, Posts, Pages, Regions, Series, and Themes. Chronology and Images have pages of their own but are not catalogued. Neither are Resources, most of which are never published at all: the bulk of them exist only to name an external work so Entries can refer to it, and only a minority are written up as pages. _Avoid_: index, registry, manifest.
 
-**Backlink**: An inbound reference to an Entry, discovered from the `<Link id="...">` component in another Entry's body. Ordinary Markdown links in the body do not produce Backlinks; only that component does. _Avoid_: reverse link, mention, connection.
+**Backlink**: An inbound reference to an Entry from another Entry's body. Only a deliberate internal reference creates one; an ordinary Markdown link does not. _Avoid_: reverse link, mention, connection.
 
 ### Attribution and reference
 
@@ -56,11 +56,11 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 ### Geography
 
-**Geometry**: The GeoJSON shape describing where a Location is: a point, a set of points, a line, or an area. _Avoid_: coordinates, geodata, position.
+**Geometry**: The shape describing where a Location is: a point, a set of points, a line, or an area. _Avoid_: coordinates, geodata, position.
 
 **Point**: One entry in a Location's Geometry. A Point carries its own coordinates and may carry its own title, description, Category, Status, Heritage, Precision, and Featured Image, each falling back to the Location's when absent. Most Locations have one; a temple complex or a chain of stations along a rail line has several. _Avoid_: sub-location, sub-geometry, marker, node.
 
-**Division**: An Overture Maps administrative polygon that a Region borrows, both to draw its visible edges and to check that Locations filed under it actually fall inside it. A Region is editorial and holds content; a Division is external, administrative, and holds only a shape. _Avoid_: boundary, border, admin region, region.
+**Division**: An external administrative polygon that a Region borrows, both to draw its visible edges and to check that Locations filed under it actually fall inside it. A Region is editorial and holds content; a Division is external, administrative, and holds only a shape. _Avoid_: boundary, border, admin region, region.
 
 **Bounding Box**: The rectangle enclosing a set of features, used to frame a map on load. _Avoid_: viewport, extent, bbox in prose.
 
@@ -78,9 +78,9 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 ### Maps
 
-**Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point, keyed `uuid-N`. _Avoid_: marker, pin, item.
+**Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point. _Avoid_: marker, pin, item.
 
-**Map Directory**: The single global dataset of every mappable Feature, built once and shared by every map on the site. One row per Feature, with membership columns a Scope can select on. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
+**Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site and narrowed by a Scope. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
 **Scope**: The rule a given map applies to the Map Directory to keep only the Features it should show, expressed as a Region subtree, a Theme, or an explicit list. _Avoid_: filter, query, selection.
 
@@ -112,4 +112,4 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Override**: An alternative title, identifier, or Region set published in place of the real ones for a sensitive Location, so it can be written about without being findable. _Avoid_: alias, mask, pseudonym.
 
-**Content Policy**: The rule that sensitive Locations are obfuscated in published output: Overrides stand in for the real title, identifier, and Regions, and hidden Locations are dropped from maps, catalogs, and structured data. Development builds show everything so entries can be worked on. _Avoid_: privacy mode, redaction, censorship, feature flag.
+**Content Policy**: The rule that sensitive Locations are obfuscated in published output: Overrides stand in for the real title, identifier, and Regions, and hidden Locations are dropped from maps, catalogs, and structured data. _Avoid_: privacy mode, redaction, censorship, feature flag.

@@ -9,7 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
-import { trailingSlash } from '@xsynaptic/satteri-trailing-slash';
+import { trailingSlash as trailingSlashPlugin } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
@@ -38,11 +38,14 @@ if (
 
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
+const trailingSlash = 'always';
+
 /**
  * @link https://astro.build/config
  */
 export default defineConfig({
 	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
+	trailingSlash,
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
@@ -177,7 +180,7 @@ export default defineConfig({
 					layouts: ['default', 'wide', 'full'],
 				}),
 			],
-			hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlash({ trailingSlash: 'always' })],
+			hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlashPlugin({ trailingSlash })],
 		}),
 	},
 	integrations: [

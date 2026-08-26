@@ -21,9 +21,8 @@ spectralcodex.com {
 	file_server
 	encode gzip
 
-	handle_errors {
+	handle_errors 404 {
 		rewrite * /404.html
-		# Edge absorbs scanner traffic; browsers always revalidate so a published URL is never masked
 		header Cache-Control "public, max-age=0, s-maxage=600"
 		file_server
 	}
@@ -83,6 +82,10 @@ spectralcodex.com {
 	@html path *.html */
 	header @html Cache-Control "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400"
 	header @html No-Vary-Search `params=("utm_source" "utm_medium" "utm_campaign" "utm_content" "utm_term" "utm_id" "gclid" "fbclid" "mc_cid" "mc_eid"), key-order`
+
+	@gated path /objectives /objectives/* /api/map/objectives/*
+	import spectralcodex-auth.conf
+	header @gated Cache-Control "private, no-store"
 }
 
 u.spectralcodex.com {

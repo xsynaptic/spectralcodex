@@ -8,13 +8,10 @@ import {
 	getLocationsFeatureCollection,
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
-	hashMapPopupData,
-	hashMapSourceData,
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 // Shared map delivery: one global point directory plus demand-fetched popup chunks
-// Objectives keeps a dedicated source/popup pair (includes hidden points, noindex)
 export const getStaticPaths = (async () => {
 	const { directory, chunks, version } = await getMapDirectoryData();
 
@@ -24,15 +21,11 @@ export const getStaticPaths = (async () => {
 	});
 	const objectivesSourceData = getLocationsMapSourceData(objectivesCollection);
 	const objectivesPopupData = getLocationsMapPopupData(objectivesCollection);
-	const sourceHash = hashMapSourceData(objectivesSourceData);
-	const popupHash = hashMapPopupData(objectivesPopupData);
 
 	// Exact versioned URLs for the cache warmer to prefetch; not used by the map island
 	const manifestUrls = [
 		`/api/map/map-directory.json?v=${version}`,
 		...[...chunks.keys()].map((chunkKey) => `/api/map/${chunkKey}.json?v=${version}`),
-		`/api/map/objectives/${MapApiDataEnum.Source}?v=${sourceHash}`,
-		`/api/map/objectives/${MapApiDataEnum.Popup}?v=${popupHash}`,
 	];
 
 	return [

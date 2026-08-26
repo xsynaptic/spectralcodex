@@ -36,7 +36,8 @@ deploy/.env
 # certificates
 deploy/certs/
 
-# generated caddy config
+# caddy config
+deploy/caddy/spectralcodex-auth.conf
 deploy/caddy/spectralcodex-redirects-generated.conf
 
 # public generated files

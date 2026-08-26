@@ -7,6 +7,7 @@ interface ImportMetaEnv {
 // Astro.locals typing; must be in a global ambient .d.ts file under the App namespace
 declare namespace App {
 	interface Locals {
-		isFeed: boolean;
+		// Only the feed path sets this, via the Container API; page renders leave locals empty
+		isFeed?: boolean;
 	}
 }
