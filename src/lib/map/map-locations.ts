@@ -12,6 +12,7 @@ import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-ty
 
 import { hashShortLength } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 
 function getRelativePath(url: string | undefined): string | undefined {
 	if (!url) return undefined;
@@ -68,7 +69,7 @@ function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 }
 
 interface LocationsFeatureCollectionOptions {
-	showAllLocations?: boolean | undefined;
+	hideSensitiveLocations?: boolean | undefined;
 }
 
 // Canonical feature ids for a location; multi-point locations expand to one `uuid-N` per point
@@ -173,17 +174,12 @@ export function getLocationsFeatureCollection(
 ): FeatureCollection<MapGeometry, MapFeatureProperties> | undefined {
 	if (!locations || locations.length === 0) return;
 
-	const { showAllLocations } = Object.assign(
-		{
-			showAllLocations: false,
-		},
-		options ?? {},
-	);
+	const hideSensitiveLocations =
+		options?.hideSensitiveLocations ?? contentPolicy.hideSensitiveLocations;
 
-	const locationsFiltered =
-		showAllLocations || import.meta.env.DEV
-			? locations
-			: locations.filter((entry) => !entry.data.hideLocation);
+	const locationsFiltered = hideSensitiveLocations
+		? locations.filter((entry) => !entry.data.hideLocation)
+		: locations;
 
 	return featureCollection<MapGeometry, MapFeatureProperties>(
 		locationsFiltered.flatMap((entry) => buildLocationFeatures(entry)),

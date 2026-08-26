@@ -33,7 +33,7 @@ export async function getObjectiveMapData() {
 	return getMapDataDedicated({
 		mapId: 'objectives',
 		featureCollection: getLocationsFeatureCollection(objectiveLocations, {
-			showAllLocations: true,
+			hideSensitiveLocations: false,
 		}),
 		showObjectiveFilter: true,
 	});

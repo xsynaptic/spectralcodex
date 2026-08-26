@@ -21,6 +21,7 @@ import {
 	filterHasEntries,
 	sortByEntryCount,
 } from '#lib/utils/collections.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
@@ -125,7 +126,7 @@ export async function createQueryRegionsEntryFunction() {
 
 		const restCandidates = R.pipe(
 			entryLocationsListed,
-			R.filter(({ data }) => !data.hideLocation),
+			R.filter(({ data }) => !(contentPolicy.hideSensitiveLocations && data.hideLocation)),
 			catalog.resolve,
 		);
 

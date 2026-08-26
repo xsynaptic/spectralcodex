@@ -42,6 +42,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getHasContent } from '#lib/utils/astro.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
@@ -79,7 +80,7 @@ const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
 
 const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
 
-const hideLocation = entry.data.hideLocation && !import.meta.env.DEV;
+const hideLocation = entry.data.hideLocation && contentPolicy.hideSensitiveLocations;
 
 const t = getTranslations();
 ---

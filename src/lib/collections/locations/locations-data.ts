@@ -14,6 +14,7 @@ import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId, getRawCollection } from '#lib/utils/collections.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescription, getDescriptionRendered } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
@@ -103,8 +104,8 @@ export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	label: 'Locations',
 	async mutate(entries) {
-		// Flatten overrides onto entry.data in production so downstream code never needs to know
-		if (import.meta.env.PROD) {
+		// Flatten overrides onto entry.data so downstream code never needs to know
+		if (contentPolicy.applyOverrides) {
 			for (const entry of entries) {
 				if (!entry.data.override) continue;
 
@@ -115,13 +116,14 @@ export const getLocationsCollection = createCollectionData({
 			}
 		}
 
-		const locationsFiltered = import.meta.env.DEV
-			? entries
-			: entries.filter((location) => !location.data.hideLocation);
+		// Narrows nearby-item candidates only; `mutate` cannot drop entries from the collection
+		const nearbyCandidates = contentPolicy.hideSensitiveLocations
+			? entries.filter((location) => !location.data.hideLocation)
+			: entries;
 
 		const posts = await getRawCollection('posts');
 		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
-		const generateNearbyItems = createGenerateNearbyItemsFunction(locationsFiltered);
+		const generateNearbyItems = createGenerateNearbyItemsFunction(nearbyCandidates);
 
 		// Loop through every item in the collection and add metadata
 		for (const entry of entries) {

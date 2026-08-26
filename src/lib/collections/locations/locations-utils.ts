@@ -23,6 +23,7 @@ import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
@@ -89,7 +90,7 @@ export async function getLocationSchemas(
 	entry: CollectionEntry<'locations'>,
 	props: { url: string },
 ): Promise<Array<Thing>> {
-	if (entry.data.override || (entry.data.hideLocation && !import.meta.env.DEV)) {
+	if (entry.data.override || (entry.data.hideLocation && contentPolicy.hideSensitiveLocations)) {
 		return [];
 	}
 

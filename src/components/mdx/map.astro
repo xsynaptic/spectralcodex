@@ -34,7 +34,9 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 	// Inline maps ship their popups in the props and never fetch a chunk
 	version: undefined,
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, { showAllLocations: showHidden }),
+		getLocationsFeatureCollection(locations, {
+			...(showHidden ? { hideSensitiveLocations: false } : {}),
+		}),
 	),
 	languages,
 });

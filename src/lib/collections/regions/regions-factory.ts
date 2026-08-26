@@ -4,11 +4,13 @@ import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { createHierarchy } from '#lib/utils/hierarchy.ts';
 
-// Resolve the regions a location belongs to; overrides apply only in production
 export function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
-	if (import.meta.env.PROD && entry.data.override?.regions) return entry.data.override.regions;
+	if (contentPolicy.applyOverrides && entry.data.override?.regions) {
+		return entry.data.override.regions;
+	}
 	return entry.data.regions;
 }
 

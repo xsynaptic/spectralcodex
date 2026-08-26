@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { getLocationFeatureIds, getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
@@ -26,10 +26,6 @@ function makeLocation(
 function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {
 	return { type: 'Point', coordinates: [longitude, latitude], ...extra };
 }
-
-afterEach(() => {
-	vi.unstubAllEnvs();
-});
 
 describe('getLocationFeatureIds', () => {
 	test('uses the map uuid for a single-geometry location', () => {
@@ -120,21 +116,7 @@ describe('getLocationsFeatureCollection', () => {
 		expect(result?.features[0]?.properties.titleMultilingualValue).toBe('剝皮寮：北街');
 	});
 
-	test('keeps hidden locations in dev', () => {
-		const result = getLocationsFeatureCollection([
-			makeLocation('sensitive-site', {
-				title: 'Sensitive Site',
-				hideLocation: true,
-				geometry: makePoint(121.5, 25),
-			}),
-		]);
-
-		expect(result?.features).toHaveLength(1);
-	});
-
-	test('drops hidden locations outside dev unless showAllLocations is set', () => {
-		vi.stubEnv('DEV', false);
-
+	test('hideSensitiveLocations filters hidden locations, and false keeps them', () => {
 		const locations = [
 			makeLocation('sensitive-site', {
 				title: 'Sensitive Site',
@@ -147,9 +129,11 @@ describe('getLocationsFeatureCollection', () => {
 			}),
 		];
 
-		expect(getLocationsFeatureCollection(locations)?.features).toHaveLength(1);
 		expect(
-			getLocationsFeatureCollection(locations, { showAllLocations: true })?.features,
+			getLocationsFeatureCollection(locations, { hideSensitiveLocations: true })?.features,
+		).toHaveLength(1);
+		expect(
+			getLocationsFeatureCollection(locations, { hideSensitiveLocations: false })?.features,
 		).toHaveLength(2);
 	});
 

@@ -20,7 +20,7 @@ export const getStaticPaths = (async () => {
 
 	const objectiveLocations = await getObjectiveLocations();
 	const objectivesCollection = getLocationsFeatureCollection(objectiveLocations, {
-		showAllLocations: true,
+		hideSensitiveLocations: false,
 	});
 	const objectivesSourceData = getLocationsMapSourceData(objectivesCollection);
 	const objectivesPopupData = getLocationsMapPopupData(objectivesCollection);
