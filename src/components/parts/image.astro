@@ -1,13 +1,11 @@
 ---
-import type { ImagorOperations } from '@xsynaptic/unpic-imagor';
-
 import { Image as UnpicImage } from '@unpic/astro/base';
 import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { ImageComponentProps } from '#lib/image/image-types.ts';
 
 import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
+import { createImageUrlFunction } from '#lib/image/image-server.ts';
 
 type Props = ImageComponentProps;
 
@@ -18,15 +16,12 @@ const {
 	...props
 } = Astro.props;
 
-const getSignedImagePath = createSignedImagePathFunction({
+const transformer = createImageUrlFunction({
 	imageQuality,
 	imageFormat,
+	serverUrl: IMAGE_SERVER_URL,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
-
-function transformer(src: string | URL, operations: ImagorOperations) {
-	return `${IMAGE_SERVER_URL}${getSignedImagePath(src, operations)}`;
-}
 ---
 
 <UnpicImage

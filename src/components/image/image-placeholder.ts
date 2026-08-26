@@ -1,3 +1,4 @@
+import type Keyv from 'keyv';
 import type { Sharp } from 'sharp';
 
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
@@ -63,9 +64,7 @@ async function generatePlaceholderDataUrl({
  * For source aspect ratio placeholders, pass the image's native width/height ratio
  * For cropped placeholders, pass the target display aspect ratio
  */
-async function createImagePlaceholderFunction() {
-	const cache = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders');
-
+async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 	const getImageById = await getImageByIdFunction();
 
 	return async function getImagePlaceholder({
@@ -143,7 +142,9 @@ let imagePlaceholderFunction: ReturnType<typeof createImagePlaceholderFunction> 
 
 export async function getImagePlaceholderFunction() {
 	if (!imagePlaceholderFunction) {
-		imagePlaceholderFunction = createImagePlaceholderFunction();
+		imagePlaceholderFunction = createImagePlaceholderFunction({
+			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'image-placeholders'),
+		});
 	}
 	return imagePlaceholderFunction;
 }

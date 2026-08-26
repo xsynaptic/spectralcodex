@@ -5,7 +5,7 @@ import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
 import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
+import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 interface Props extends HTMLAttributes<'article'> {
@@ -28,25 +28,26 @@ async function getThumbnailUrls() {
 
 	if (!imageEntry) return;
 
-	const getSignedImagePath = createSignedImagePathFunction({
+	const getImageUrl = createImageUrlFunction({
 		imageQuality: imageLowQualityValue,
 		imageFormat: imageLowQualityFormat,
+		serverUrl: IMAGE_SERVER_URL,
 		serverSecret: IMAGE_SERVER_SECRET,
 	});
 
 	const fit = ImageFitOptionEnum.Cover;
 
 	return {
-		url1x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
+		url1x: getImageUrl(imageId, {
 			width: searchThumbnailWidth,
 			height: Math.round(searchThumbnailWidth / searchThumbnailAspectRatio),
 			fit,
-		})}`,
-		url2x: `${IMAGE_SERVER_URL}${getSignedImagePath(imageId, {
+		}),
+		url2x: getImageUrl(imageId, {
 			width: searchThumbnailWidth2x,
 			height: Math.round(searchThumbnailWidth2x / searchThumbnailAspectRatio),
 			fit,
-		})}`,
+		}),
 	};
 }
 

@@ -31,3 +31,25 @@ export function createSignedImagePathFunction({
 		return `/${signImageServerPath(unsignedPath, serverSecret, signatureLength)}/${unsignedPath}`;
 	};
 }
+
+export function createImageUrlFunction({
+	imageQuality,
+	imageFormat,
+	serverUrl,
+	serverSecret,
+}: {
+	imageQuality: number;
+	imageFormat: ImageFormat;
+	serverUrl: string;
+	serverSecret: string;
+}) {
+	const getSignedImagePath = createSignedImagePathFunction({
+		imageQuality,
+		imageFormat,
+		serverSecret,
+	});
+
+	return function getImageUrl(src: string | URL, operations: ImagorOperations): string {
+		return `${serverUrl}${getSignedImagePath(src, operations)}`;
+	};
+}

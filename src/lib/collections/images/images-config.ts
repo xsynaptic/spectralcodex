@@ -14,7 +14,7 @@ import sharp from 'sharp';
 import { z } from 'zod';
 
 import { imageHighQualityFormat, imageHighQualityValue } from '#constants.ts';
-import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
+import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 
@@ -146,22 +146,20 @@ async function extractExifData(
 }
 
 // Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
-const getSignedImagePath = createSignedImagePathFunction({
+const getImageUrl = createImageUrlFunction({
 	imageQuality: imageHighQualityValue,
 	imageFormat: imageHighQualityFormat,
+	serverUrl: IMAGE_SERVER_URL,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 
 // Replaces the loader-injected src (root-relative path) with the signed URL
 const ImageCollectionSchema = ImageMetadataSchema.strict().transform((data) => ({
 	...data,
-	src: `${IMAGE_SERVER_URL}${getSignedImagePath(
-		path.posix.relative(CONTENT_MEDIA_PATH, data.path),
-		{
-			// Clamp source width to avoid upscaling
-			width: Math.min(1800, data.width),
-		},
-	)}`,
+	src: getImageUrl(path.posix.relative(CONTENT_MEDIA_PATH, data.path), {
+		// Clamp source width to avoid upscaling
+		width: Math.min(1800, data.width),
+	}),
 }));
 
 // Initialize ExifTool instance so it can be reused
