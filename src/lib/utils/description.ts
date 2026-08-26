@@ -1,3 +1,5 @@
+import type Keyv from 'keyv';
+
 import { sanitizeHtml, stripTags } from '@xsynaptic/unified-tools';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { hash } from 'ohash';
@@ -17,6 +19,12 @@ interface DescriptionCached extends DescriptionRendered {
 	hash: string;
 }
 
+interface DescriptionEntry {
+	id: string;
+	data: { description?: string | undefined };
+	body?: string | undefined;
+}
+
 /**
  * Count of words to feed into the markdown transformer
  * This is buffered so any orphan markdown syntax falls outside the clip boundary
@@ -29,8 +37,6 @@ const descriptionSchema = {
 	tagNames: ['em', 'strong', 'span'],
 	attributes: { span: ['className'] },
 };
-
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'description-rendered');
 
 // Return the frontmatter description or derive a clipped excerpt from the body
 export function getDescription(
@@ -54,43 +60,60 @@ export function getDescription(
 	return undefined;
 }
 
-// Render and cache both HTML and plain-text forms of an entry's description in a single parse
-export async function getDescriptionRendered(entry: {
-	id: string;
-	data: { description?: string | undefined };
-	body?: string | undefined;
-}): Promise<DescriptionRendered | undefined> {
-	const source = getDescription(entry, { wordCount: wordCountBuffer });
+export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
+	// Render and cache both HTML and plain-text forms of an entry's description in a single parse
+	async function getDescriptionRendered(
+		entry: DescriptionEntry,
+	): Promise<DescriptionRendered | undefined> {
+		const source = getDescription(entry, { wordCount: wordCountBuffer });
 
-	if (!source) return undefined;
+		if (!source) return undefined;
 
-	// Key by entry ID so edits overwrite the old row; the hash validates cached content
-	// MDX component names participate so render-affecting code changes self-invalidate
-	const sourceHash = hash({ source, mdxComponents, version: 3 }).slice(0, hashShortLength);
+		// Key by entry ID so edits overwrite the old row; the hash validates cached content
+		// MDX component names participate so render-affecting code changes self-invalidate
+		const sourceHash = hash({ source, mdxComponents, version: 3 }).slice(0, hashShortLength);
 
-	const cached = await cacheInstance.get<DescriptionCached>(entry.id);
+		const cached = await cache.get<DescriptionCached>(entry.id);
 
-	if (cached?.hash === sourceHash) return { html: cached.html, text: cached.text };
+		if (cached?.hash === sourceHash) return { html: cached.html, text: cached.text };
 
-	const rawHtml = renderMarkdownInline(source);
+		const rawHtml = renderMarkdownInline(source);
 
-	const html = sanitizeHtml(rawHtml, descriptionSchema);
-	const stripped = stripTags(rawHtml).replaceAll(/\s+/g, ' ').trim();
-	const text = textClipper(stripped, { wordCount: wordCountFinal });
+		const html = sanitizeHtml(rawHtml, descriptionSchema);
+		const stripped = stripTags(rawHtml).replaceAll(/\s+/g, ' ').trim();
+		const text = textClipper(stripped, { wordCount: wordCountFinal });
 
-	const rendered: DescriptionRendered = { html, text };
+		const rendered: DescriptionRendered = { html, text };
 
-	await cacheInstance.set(entry.id, { hash: sourceHash, ...rendered } satisfies DescriptionCached);
+		await cache.set(entry.id, { hash: sourceHash, ...rendered } satisfies DescriptionCached);
 
-	return rendered;
+		return rendered;
+	}
+
+	async function getDescriptionRenderedText(entry: DescriptionEntry): Promise<string | undefined> {
+		const rendered = await getDescriptionRendered(entry);
+
+		return rendered?.text;
+	}
+
+	return { getDescriptionRendered, getDescriptionRenderedText };
 }
 
-export async function getDescriptionRenderedText(entry: {
-	id: string;
-	data: { description?: string | undefined };
-	body?: string | undefined;
-}): Promise<string | undefined> {
-	const rendered = await getDescriptionRendered(entry);
+let descriptionRenderers: ReturnType<typeof createDescriptionRenderers> | undefined;
 
-	return rendered?.text;
+function getDescriptionRenderers() {
+	if (!descriptionRenderers) {
+		descriptionRenderers = createDescriptionRenderers({
+			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'description-rendered'),
+		});
+	}
+	return descriptionRenderers;
+}
+
+export async function getDescriptionRendered(entry: DescriptionEntry) {
+	return getDescriptionRenderers().getDescriptionRendered(entry);
+}
+
+export async function getDescriptionRenderedText(entry: DescriptionEntry) {
+	return getDescriptionRenderers().getDescriptionRenderedText(entry);
 }

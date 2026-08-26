@@ -1,4 +1,5 @@
 import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type Keyv from 'keyv';
 
 import { stripTags } from '@xsynaptic/unified-tools';
 import { countWords } from '@xsynaptic/word-count';
@@ -10,8 +11,6 @@ import { mdxComponents } from '#constants.ts';
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
-
-const cacheInstance = getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts');
 
 interface WordCountCached {
 	hash: string;
@@ -34,48 +33,61 @@ function computeWordCount(body: string): number {
 	);
 }
 
-/**
- * Get word count with caching
- * Returns function that computes or retrieves cached word count for entry body content
- */
-export async function getWordCount(
-	entry: CollectionEntry<CollectionKey>,
-): Promise<number | undefined> {
-	// Key by entry ID so edits overwrite the old row; the hash validates cached content
-	// MDX component names participate so render-affecting code changes self-invalidate
-	const contentHash = hash({
-		data: {
-			body: entry.body,
-			description: 'description' in entry.data ? entry.data.description : '',
-			mdxComponents,
-			version: 1,
-		},
-	});
+export function createWordCountFunction({ cache }: { cache: Keyv }) {
+	return async function getWordCount(
+		entry: CollectionEntry<CollectionKey>,
+	): Promise<number | undefined> {
+		// Key by entry ID so edits overwrite the old row; the hash validates cached content
+		// MDX component names participate so render-affecting code changes self-invalidate
+		const contentHash = hash({
+			data: {
+				body: entry.body,
+				description: 'description' in entry.data ? entry.data.description : '',
+				mdxComponents,
+				version: 1,
+			},
+		});
 
-	const cached = await cacheInstance.get<WordCountCached>(entry.id);
+		const cached = await cache.get<WordCountCached>(entry.id);
 
-	// Check cache first
-	if (cached?.hash === contentHash) {
-		return cached.count;
+		// Check cache first
+		if (cached?.hash === contentHash) {
+			return cached.count;
+		}
+
+		// Compute and cache
+		let wordCount = 0;
+
+		if (entry.body && entry.body.length > 0) {
+			wordCount = computeWordCount(entry.body);
+		} else if (
+			'description' in entry.data &&
+			entry.data.description &&
+			entry.data.description.length > 0
+		) {
+			wordCount = computeWordCount(entry.data.description);
+		}
+
+		await cache.set(entry.id, {
+			hash: contentHash,
+			count: wordCount,
+		} satisfies WordCountCached);
+
+		return wordCount;
+	};
+}
+
+let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
+
+function getWordCountFunction() {
+	if (!wordCountFunction) {
+		wordCountFunction = createWordCountFunction({
+			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
+		});
 	}
+	return wordCountFunction;
+}
 
-	// Compute and cache
-	let wordCount = 0;
-
-	if (entry.body && entry.body.length > 0) {
-		wordCount = computeWordCount(entry.body);
-	} else if (
-		'description' in entry.data &&
-		entry.data.description &&
-		entry.data.description.length > 0
-	) {
-		wordCount = computeWordCount(entry.data.description);
-	}
-
-	await cacheInstance.set(entry.id, {
-		hash: contentHash,
-		count: wordCount,
-	} satisfies WordCountCached);
-
-	return wordCount;
+export async function getWordCount(entry: CollectionEntry<CollectionKey>) {
+	return getWordCountFunction()(entry);
 }
