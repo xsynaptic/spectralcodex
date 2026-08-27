@@ -12,9 +12,7 @@ interface ScoredEntry extends ContentManifestEntry {
 
 const minPathLength = 3;
 
-// Bonus applied when one string is a substring of the other, so that truncated
-// URLs (e.g. "/sanwan-yue" for "/sanwan-yuemei-suspension-bridge") rank above
-// length-similar but less relevant candidates.
+// Lifts a truncated URL ("/sanwan-yue" for "/sanwan-yuemei-suspension-bridge") above length-similar candidates
 const substringBonus = 0.3;
 
 function similarity(a: string, b: string): number {
@@ -32,6 +30,29 @@ function normalize(pathname: string): string {
 	return pathname.replace(/\/+$/, '') || '/';
 }
 
+function getOptions(container: HTMLElement) {
+	return {
+		suggestionsUrl: container.dataset.suggestionsUrl ?? '/content-manifest.json',
+		threshold: Number(container.dataset.threshold ?? '0.5'),
+		autoRedirectThreshold: Number(container.dataset.autoRedirectThreshold ?? '0.92'),
+		maxSuggestions: Number(container.dataset.maxSuggestions ?? '5'),
+	};
+}
+
+async function fetchManifest(url: string): Promise<Array<ContentManifestEntry> | undefined> {
+	const response = await fetch(url);
+
+	if (!response.ok) return;
+
+	return (await response.json()) as Array<ContentManifestEntry>;
+}
+
+function scoreEntries(entries: Array<ContentManifestEntry>, current: string): Array<ScoredEntry> {
+	return entries
+		.map((entry) => ({ ...entry, score: similarity(current, normalize(entry.url)) }))
+		.sort((entryA, entryB) => entryB.score - entryA.score);
+}
+
 export async function runNotFoundSuggestions(): Promise<void> {
 	const container = document.querySelector<HTMLElement>('#not-found-suggestions');
 
@@ -44,21 +65,16 @@ export async function runNotFoundSuggestions(): Promise<void> {
 
 		if (current.length < minPathLength) return;
 
-		const suggestionsUrl = container.dataset.suggestionsUrl ?? '/content-manifest.json';
-		const threshold = Number(container.dataset.threshold ?? '0.5');
-		const autoRedirectThreshold = Number(container.dataset.autoRedirectThreshold ?? '0.92');
-		const maxSuggestions = Number(container.dataset.maxSuggestions ?? '5');
+		const { suggestionsUrl, threshold, autoRedirectThreshold, maxSuggestions } =
+			getOptions(container);
 
-		const response = await fetch(suggestionsUrl);
-		if (!response.ok) return;
+		const entries = await fetchManifest(suggestionsUrl);
 
-		const entries = (await response.json()) as Array<ContentManifestEntry>;
+		if (!entries) return;
 
-		const scored: Array<ScoredEntry> = entries
-			.map((entry) => ({ ...entry, score: similarity(current, normalize(entry.url)) }))
-			.sort((entryA, entryB) => entryB.score - entryA.score);
-
+		const scored = scoreEntries(entries, current);
 		const best = scored[0];
+
 		if (!best || best.score < threshold) return;
 
 		if (best.score >= autoRedirectThreshold && normalize(best.url) !== current) {
@@ -66,9 +82,7 @@ export async function runNotFoundSuggestions(): Promise<void> {
 			return;
 		}
 
-		const top = scored.filter((entry) => entry.score >= threshold).slice(0, maxSuggestions);
-
-		renderSuggestions(top);
+		renderSuggestions(scored.filter((entry) => entry.score >= threshold).slice(0, maxSuggestions));
 		container.hidden = false;
 	} finally {
 		loading?.remove();

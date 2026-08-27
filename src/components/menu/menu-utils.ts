@@ -14,3 +14,11 @@ export function getMenuItemAriaLabel(item: MenuItem) {
 
 	return formatStringTemplate(t('site.menu.header.submenu.label'), { title: item.title });
 }
+
+// Anchors are navigable, buttons open a submenu, spans are plain labels
+export function getMenuItemTriggerType(item: MenuItem) {
+	if (item.url) return 'anchor';
+	if (item.children?.length) return 'button';
+
+	return 'span';
+}

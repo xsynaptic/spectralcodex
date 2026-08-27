@@ -3,7 +3,11 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { MenuItem } from '#components/menu/menu-types.ts';
 
-import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
+import {
+	getMenuItemAriaLabel,
+	getMenuItemTriggerType,
+	isActiveMenuItem,
+} from '#components/menu/menu-utils.ts';
 import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
@@ -36,14 +40,6 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 		}
 	}
 }
-
-// Anchors are navigable, buttons open a submenu, spans are plain labels
-function getTriggerType(item: MenuItem) {
-	if (item.url) return 'anchor';
-	if (item.children?.length) return 'button';
-
-	return 'span';
-}
 ---
 
 <ul
@@ -63,7 +59,7 @@ function getTriggerType(item: MenuItem) {
 			const hasChildren = children.length > 0;
 			const isActive = isActiveMenuItem(item, pathname);
 			const triggerClasses = ['nav-sub-link', isActive ? 'link-active' : undefined];
-			const triggerType = getTriggerType(item);
+			const triggerType = getMenuItemTriggerType(item);
 			const label = (
 				<Fragment>
 					<Fragment set:html={item.title} />

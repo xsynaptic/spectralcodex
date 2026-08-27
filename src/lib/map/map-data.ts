@@ -52,6 +52,56 @@ const defaultMapDataProps = {
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
 
+function getTargetIds(featureCollection: MapFeatureCollection, targetId: string | undefined) {
+	if (!targetId) return;
+
+	return featureCollection.features
+		.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
+		.map(({ id }) => String(id));
+}
+
+function getInlineData(featureCollection: MapFeatureCollection) {
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	const popupData = getLocationsMapPopupData(featureCollection);
+
+	return {
+		sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
+		popupData: popupData ? encodeMapPopupData(popupData) : undefined,
+		sourceDataKey: hashMapSourceData(sourceData),
+		popupDataKey: hashMapPopupData(popupData),
+	};
+}
+
+function getChunkedInlineData(
+	featureCollection: MapFeatureCollection,
+	chunkKeyById: Map<string, string> | undefined,
+) {
+	// Hash the un-stamped rows so inline keys match the equivalent API payload
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);
+
+	return {
+		sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
+		sourceDataKey: hashMapSourceData(sourceData),
+	};
+}
+
+function getDirectoryData(
+	featureCollection: MapFeatureCollection,
+	scope: MapScopeHint | undefined,
+	version: string | undefined,
+) {
+	const apiSourceUrl = getBaseUrl('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
+
+	// No membership hint resolves to this map's explicit, order-preserving id list
+	const resolvedScope: MapScope = scope ?? {
+		type: 'ids',
+		ids: featureCollection.features.map((feature) => String(feature.id)),
+	};
+
+	return { apiSourceUrl, scope: resolvedScope, prefetchUrls: [apiSourceUrl] };
+}
+
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
 	mapId,
@@ -109,80 +159,43 @@ export function getMapData({
 		} satisfies MapComponentData;
 	}
 
-	const targetIds = targetId
-		? featureCollection.features
-				.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
-				.map(({ id }) => String(id))
-		: undefined;
-
 	const featureCount = featureCollection.features.length;
+
+	const baseData = {
+		...defaultMapDataProps,
+		hasGeodata: true,
+		featureCount,
+		...mapBounds,
+		...props,
+		targetIds: getTargetIds(featureCollection, targetId),
+	};
 
 	// MDX inline maps (no mapId): inline both source and popup, no chunks
 	if (!mapId) {
-		const sourceData = getLocationsMapSourceData(featureCollection);
-		const popupData = getLocationsMapPopupData(featureCollection);
-
-		return {
-			...defaultMapDataProps,
-			hasGeodata: true,
-			sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
-			popupData: popupData ? encodeMapPopupData(popupData) : undefined,
-			sourceDataKey: hashMapSourceData(sourceData),
-			popupDataKey: hashMapPopupData(popupData),
-			featureCount,
-			...mapBounds,
-			...props,
-			targetIds,
-		} satisfies MapComponentData;
+		return { ...baseData, ...getInlineData(featureCollection) } satisfies MapComponentData;
 	}
 
 	// All other maps: popups come from the shared, demand-fetched chunks
 	const apiChunkBaseUrl = getBaseUrl('api/map/');
-	const count = locationCount ?? featureCount;
 
 	// Small maps inline their points, each carrying its chunk key
-	if (count <= mapSourceInlineLimit) {
-		// Hash the un-stamped rows so inline keys match the equivalent API payload
-		const sourceData = getLocationsMapSourceData(featureCollection);
-		const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);
-
+	if ((locationCount ?? featureCount) <= mapSourceInlineLimit) {
 		return {
-			...defaultMapDataProps,
-			hasGeodata: true,
+			...baseData,
 			mapId,
-			sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
-			sourceDataKey: hashMapSourceData(sourceData),
+			...getChunkedInlineData(featureCollection, chunkKeyById),
 			apiChunkBaseUrl,
 			version,
-			featureCount,
-			...mapBounds,
-			...props,
-			targetIds,
 		} satisfies MapComponentData;
 	}
 
 	// Big maps fetch the shared directory and keep only the rows their scope selects
-	const apiSourceUrl = getBaseUrl('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
-
-	// No membership hint resolves to this map's explicit, order-preserving id list
-	const resolvedScope: MapScope = scope ?? {
-		type: 'ids',
-		ids: featureCollection.features.map((feature) => String(feature.id)),
-	};
-
 	return {
-		...defaultMapDataProps,
-		hasGeodata: true,
+		...baseData,
 		mapId,
-		apiSourceUrl,
-		scope: resolvedScope,
+		...getDirectoryData(featureCollection, scope, version),
 		apiChunkBaseUrl,
 		version,
-		prefetchUrls: [apiSourceUrl],
-		featureCount,
-		...mapBounds,
-		...props,
-		targetIds,
 	} satisfies MapComponentData;
 }
 

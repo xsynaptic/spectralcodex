@@ -179,6 +179,14 @@ export async function createQueryLocationsEntryFunction() {
 	};
 }
 
+// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
+function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
+	const isTaiwan =
+		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
+
+	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
+}
+
 // Resolve region, lang code, and multilingual title data for a location entry
 export async function createLocationEntryDisplayFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
@@ -187,17 +195,11 @@ export async function createLocationEntryDisplayFunction() {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 		const regionLangCode = regionPrimary?.data._langCode;
 
-		// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
-		const langCodeAdditional =
-			regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan')
-				? LanguageCodeEnum.Japanese
-				: undefined;
-
 		const titleResult = getMultilingualContent({
 			data: entry.data,
 			prop: 'title',
 			...(regionLangCode ? { langCode: regionLangCode } : {}),
-			...(langCodeAdditional ? { langCodeAdditional } : {}),
+			...getLangCodeAdditional(regionPrimary),
 		});
 
 		const addressResult = getMultilingualContent({

@@ -3,7 +3,11 @@ import type { HTMLAttributes } from 'astro/types';
 
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
 import { getMenuHeaderItems } from '#components/menu/menu-header.ts';
-import { getMenuItemAriaLabel, isActiveMenuItem } from '#components/menu/menu-utils.ts';
+import {
+	getMenuItemAriaLabel,
+	getMenuItemTriggerType,
+	isActiveMenuItem,
+} from '#components/menu/menu-utils.ts';
 import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -25,14 +29,16 @@ const t = getTranslations();
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{
 				menuItems.map((item) => {
-					const children = item.children;
+					const children = item.children ?? [];
+					const hasChildren = children.length > 0;
 					const isActive = isActiveMenuItem(item, pathname);
 					const triggerClasses = ['nav-item-link', isActive ? 'link-active' : undefined];
+					const triggerType = getMenuItemTriggerType(item);
 
 					return (
 						<li class="nav-item">
 							<div class="nav-item-trigger">
-								{item.url ? (
+								{triggerType === 'anchor' ? (
 									<Anchor
 										class:list={triggerClasses}
 										href={item.url}
@@ -42,17 +48,17 @@ const t = getTranslations();
 										{item.title}
 									</Anchor>
 								) : undefined}
-								{!item.url && children?.length ? (
+								{triggerType === 'button' ? (
 									<button
 										type="button"
 										class:list={['link link-accent', ...triggerClasses]}
 										set:html={item.title}
 									/>
 								) : undefined}
-								{!item.url && !children?.length ? (
+								{triggerType === 'span' ? (
 									<span class:list={triggerClasses}>{item.title}</span>
 								) : undefined}
-								{children?.length ? (
+								{hasChildren ? (
 									<svg
 										width="24"
 										height="24"
@@ -64,7 +70,7 @@ const t = getTranslations();
 									</svg>
 								) : undefined}
 							</div>
-							{children?.length ? (
+							{hasChildren ? (
 								<MenuHeaderSubmenu
 									menuItems={children}
 									depth={1}
