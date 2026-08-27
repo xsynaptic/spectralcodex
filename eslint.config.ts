@@ -30,7 +30,10 @@ export default getConfig(
 		},
 		{
 			rules: {
-				// Ban logical-assignment shorthand (??=, ||=, &&=); the expanded form reads more clearly
+				complexity: ['warn', { max: 12, variant: 'modified' }],
+				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
+				'max-depth': ['warn', 4],
+				// The expanded form reads more clearly than ??=, ||=, and &&=
 				'logical-assignment-operators': ['error', 'never'],
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
@@ -87,7 +90,6 @@ export default getConfig(
 				],
 			},
 		},
-		// React
 		{
 			files: ['packages/react-map-component/**/*.{js,jsx,ts,tsx}'],
 			plugins: {
@@ -128,9 +130,7 @@ export default getConfig(
 				'unicorn/prefer-global-this': 'off',
 			},
 		},
-		// Native web components
 		webComponentConfig,
-		// Astro
 		...getAstroConfig({ a11y: 'strict' }),
 	],
 	{
