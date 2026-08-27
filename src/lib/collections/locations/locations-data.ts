@@ -3,6 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 import { hash } from 'ohash';
 
+import type { ImageThumbnail } from '#lib/schemas/index.ts';
+
 import { hashShortLength, imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
@@ -25,53 +27,58 @@ const getSignedImagePath = createSignedImagePathFunction({
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 
-async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
-	const getImageById = await getImageByIdFunction();
+type GetThumbnailFunction = (imageId: string | undefined) => ImageThumbnail | undefined;
 
-	// Add image data to locations; for use with the mapping system
-	for (const entry of locations) {
-		if (!entry.data.imageFeatured) {
+function setEntryThumbnail(
+	entry: CollectionEntry<'locations'>,
+	getThumbnail: GetThumbnailFunction,
+) {
+	if (!entry.data.imageFeatured) return;
+
+	const thumbnail = getThumbnail(getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }));
+
+	if (thumbnail) {
+		entry.data._imageThumbnail = thumbnail;
+	}
+}
+
+function setGeometryThumbnails(
+	entry: CollectionEntry<'locations'>,
+	getThumbnail: GetThumbnailFunction,
+) {
+	if (!Array.isArray(entry.data.geometry)) return;
+
+	for (const geometry of entry.data.geometry) {
+		if (geometry.imageFeatured === null) {
+			// eslint-disable-next-line unicorn/no-null -- overrides the entry `imageFeatured` to render no thumbnail
+			geometry._imageThumbnail = null;
 			continue;
 		}
 
-		const imageEntry = getImageById(
-			getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }),
-		);
+		if (!geometry.imageFeatured) continue;
 
-		if (imageEntry) {
-			entry.data._imageThumbnail = getLocationThumbnailProps(
-				imageEntry.id,
-				imageEntry.data.width,
-				getSignedImagePath,
-			);
+		const thumbnail = getThumbnail(geometry.imageFeatured);
+
+		if (thumbnail) {
+			geometry._imageThumbnail = thumbnail;
 		}
 	}
+}
 
-	// Add image data to individual points; same as above
+async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
+	const getImageById = await getImageByIdFunction();
+
+	const getThumbnail: GetThumbnailFunction = (imageId) => {
+		const imageEntry = getImageById(imageId);
+
+		return imageEntry
+			? getLocationThumbnailProps(imageEntry.id, imageEntry.data.width, getSignedImagePath)
+			: undefined;
+	};
+
 	for (const entry of locations) {
-		if (Array.isArray(entry.data.geometry)) {
-			for (const geometry of entry.data.geometry) {
-				// Null overrides the main `imageFeatured` and shows no thumbnail
-				// This is used in cases where there is no image for the point
-				if (geometry.imageFeatured === null) {
-					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
-					geometry._imageThumbnail = null;
-					continue;
-				}
-
-				if (geometry.imageFeatured) {
-					const imageEntry = getImageById(geometry.imageFeatured);
-
-					if (imageEntry) {
-						geometry._imageThumbnail = getLocationThumbnailProps(
-							imageEntry.id,
-							imageEntry.data.width,
-							getSignedImagePath,
-						);
-					}
-				}
-			}
-		}
+		setEntryThumbnail(entry, getThumbnail);
+		setGeometryThumbnails(entry, getThumbnail);
 	}
 }
 
@@ -95,11 +102,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	}
 }
 
-/**
- * Nearby location data is expensive to calculate
- * To reduce the cost we use buffer zones to reduce the overall number of operations performed
- * We also stash distance pairs in a Map to further cut calculations by half
- */
+// Nearby data is expensive; buffer zones cut the candidate set and a distance-pair Map halves the rest
 export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	label: 'Locations',
@@ -125,7 +128,6 @@ export const getLocationsCollection = createCollectionData({
 		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
 		const generateNearbyItems = createGenerateNearbyItemsFunction(nearbyCandidates);
 
-		// Loop through every item in the collection and add metadata
 		for (const entry of entries) {
 			generateLocationPostData(entry);
 			await generateLocationMapData(entry);

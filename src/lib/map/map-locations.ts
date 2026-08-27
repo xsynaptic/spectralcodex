@@ -8,6 +8,7 @@ import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
 import { hash } from 'ohash';
 
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
 import { hashShortLength } from '#constants.ts';
@@ -34,7 +35,6 @@ function getMapGeometryCoordinatesOptimized(
 	return [Number(lng.toFixed(6)), Number(lat.toFixed(6))];
 }
 
-// An alternative to using Turf's truncate function
 function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	const geometryType = geometry.type;
 
@@ -72,7 +72,7 @@ interface LocationsFeatureCollectionOptions {
 	hideSensitiveLocations?: boolean | undefined;
 }
 
-// Canonical feature ids for a location; multi-point locations expand to one `uuid-N` per point
+// Multi-point locations expand to one `uuid-N` per point
 export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
 	const uuid = entry.data._uuid ?? entry.id;
 	const geometryArray = Array.isArray(entry.data.geometry)
@@ -84,12 +84,37 @@ export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Arra
 		: [uuid];
 }
 
-// One location renders on the map of every ancestor region and every theme it belongs to
-// Safe to share because output depends on nothing but the entry; per-page variation would break it
+// Shared across every region and theme map; safe only because output depends on nothing but the entry
 const locationFeaturesCache = new WeakMap<
 	CollectionEntry<'locations'>,
 	Array<Feature<MapGeometry, MapFeatureProperties>>
 >();
+
+const googleMapsHostPrefix = 'maps.app.goo.gl/';
+
+function getShortenedUrl(url: string | undefined, hostPrefix?: string): string | undefined {
+	if (!url) return undefined;
+
+	const withoutScheme = url.replace('https://', '');
+
+	return hostPrefix && withoutScheme.startsWith(hostPrefix)
+		? withoutScheme.slice(hostPrefix.length)
+		: withoutScheme;
+}
+
+function getMultilingualTitleProperties(
+	entryTitle: MultilingualContent | undefined,
+	geometryTitle: MultilingualContent | undefined,
+) {
+	if (!entryTitle) return {};
+
+	return {
+		titleMultilingualLang: entryTitle.lang,
+		titleMultilingualValue: geometryTitle
+			? `${entryTitle.value}：${geometryTitle.value}`
+			: entryTitle.value,
+	};
+}
 
 function buildLocationFeatures(
 	entry: CollectionEntry<'locations'>,
@@ -106,6 +131,7 @@ function buildLocationFeatures(
 		data: entry.data,
 		prop: 'title',
 	})?.primary;
+	const wikipediaUrl = getShortenedUrl(entry.data._wikipediaUrl);
 
 	const features = geometryArray.map((geometry, index) => {
 		const id = featureIds[index] ?? entry.id;
@@ -114,16 +140,10 @@ function buildLocationFeatures(
 			data: geometry,
 			prop: 'title',
 		})?.primary;
-		const googleMapsUrlRaw =
-			geometry.googleMapsUrl || entry.data._googleMapsUrl
-				? (geometry.googleMapsUrl ?? entry.data._googleMapsUrl ?? '').replace('https://', '')
-				: undefined;
-		const googleMapsUrl = googleMapsUrlRaw?.startsWith('maps.app.goo.gl/')
-			? googleMapsUrlRaw.slice('maps.app.goo.gl/'.length)
-			: googleMapsUrlRaw;
-		const wikipediaUrl = entry.data._wikipediaUrl
-			? entry.data._wikipediaUrl.replace('https://', '')
-			: undefined;
+		const googleMapsUrl = getShortenedUrl(
+			geometry.googleMapsUrl ?? entry.data._googleMapsUrl,
+			googleMapsHostPrefix,
+		);
 
 		// Image thumbnails can be nulled by individual points
 		const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
@@ -133,14 +153,7 @@ function buildLocationFeatures(
 			id,
 			properties: {
 				title,
-				...(entryTitleMultilingual
-					? {
-							titleMultilingualLang: entryTitleMultilingual.lang,
-							titleMultilingualValue: geometryTitleMultilingual
-								? `${entryTitleMultilingual.value}：${geometryTitleMultilingual.value}`
-								: entryTitleMultilingual.value,
-						}
-					: {}),
+				...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
 				url: getRelativePath(entry.data._url),
 				description: geometry.description ?? entry.data._descriptionHtml,
 				category: geometry.category ?? entry.data.category,
@@ -167,7 +180,6 @@ function buildLocationFeatures(
 	return features;
 }
 
-// Generate canonical map feature data for a set of locations
 export function getLocationsFeatureCollection(
 	locations: Array<CollectionEntry<'locations'>> | undefined,
 	options?: LocationsFeatureCollectionOptions,
@@ -186,7 +198,7 @@ export function getLocationsFeatureCollection(
 	) satisfies MapFeatureCollection;
 }
 
-// Source data for the map component; encoded to the compressed form at serialization edges
+// Encoded to the compressed form at serialization edges
 export function getLocationsMapSourceData(
 	featureCollection: MapFeatureCollection | undefined,
 ): Array<MapSourceItem> | undefined {
@@ -222,7 +234,6 @@ export function getLocationsMapSourceData(
 		.sort((a, b) => a.properties.id.localeCompare(b.properties.id));
 }
 
-// Extended locations metadata for popups
 export function getLocationsMapPopupData(
 	featureCollection: MapFeatureCollection | undefined,
 ): Array<MapPopupItem> | undefined {
