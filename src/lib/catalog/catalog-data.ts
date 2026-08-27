@@ -4,7 +4,7 @@ import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
 import type { Catalog } from '#lib/catalog/catalog-factory.ts';
-import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { getWordCount } from '#lib/catalog/catalog-word-count.ts';
@@ -19,6 +19,10 @@ import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts
 import { getPublicId } from '#lib/utils/collections.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+
+type CatalogEntry = CollectionEntry<CatalogCollectionKey>;
+
+type RegionPrimaryIdFunction = Awaited<ReturnType<typeof getRegionPrimaryIdFunction>>;
 
 // Find the common ancestor of a set of regions so there's only one in the catalog
 async function getRegionPrimaryIdFunction() {
@@ -66,11 +70,57 @@ function generateContentBacklinksFromMdxComponents(
 	}
 }
 
+function aggregateSeriesWordCounts(
+	series: Array<CollectionEntry<'series'>>,
+	catalogItemsById: Map<string, CatalogItem>,
+) {
+	for (const entry of series) {
+		const seriesCatalogItem = catalogItemsById.get(entry.id);
+
+		if (!seriesCatalogItem) continue;
+
+		seriesCatalogItem.wordCount = R.pipe(
+			entry.data.seriesItems ?? [],
+			R.map((seriesItem) => catalogItemsById.get(seriesItem)?.wordCount ?? 0),
+			R.sum,
+			Number,
+		);
+	}
+}
+
+async function createCatalogItem(
+	entry: CatalogEntry,
+	getRegionPrimaryId: RegionPrimaryIdFunction,
+): Promise<CatalogItem> {
+	const { data } = entry;
+
+	const imageFeatured = 'imageFeatured' in data ? data.imageFeatured : undefined;
+
+	return {
+		collection: entry.collection,
+		id: entry.id,
+		title: data.title,
+		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
+		description: getDescription(entry),
+		url: getContentUrl(entry.collection, getPublicId(entry)),
+		imageId: getImageFeaturedId({ imageFeatured }),
+		imageHeroId: getImageHeroId({ imageFeatured }),
+		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),
+		locationCount: '_locationCount' in data ? data._locationCount : undefined,
+		postCount: '_postCount' in data ? data._postCount : undefined,
+		wordCount: await getWordCount(entry),
+		linksExternalCount: getLinksExternalCount(entry),
+		backlinks: new Set<string>(), // Populated by the backlink pass
+		dateCreated: data.dateCreated,
+		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
+		dateRecorded: 'dateRecorded' in data ? data.dateRecorded : undefined,
+		entryQuality: data.entryQuality,
+	};
+}
+
 // This function does all the heavy lifting and should only run once
 async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	const startTime = performance.now();
-
-	const catalogItemsById = new Map<string, CatalogItem>();
 
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: pages } = await getPagesCollection();
@@ -79,76 +129,37 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	const { entries: series } = await getSeriesCollection();
 	const { entries: themes } = await getThemesCollection();
 
+	const catalogEntries: Array<CatalogEntry> = [
+		...pages,
+		...posts,
+		...locations,
+		...regions,
+		...themes,
+		...series,
+	];
+
 	// Regions require some special handling; this will calculate a common ancestor if necessary
 	const getRegionPrimaryId = await getRegionPrimaryIdFunction();
 
+	const catalogItemsById = new Map<string, CatalogItem>();
+
 	// Note: name collisions between all these collections is prohibited and will throw an error
-	for (const collection of [pages, posts, locations, regions, themes, series]) {
-		for (const entry of collection) {
-			if (catalogItemsById.has(entry.id)) {
-				throw new Error(
-					`[Catalog] Duplicate ID found for "${entry.id}" across different collections!`,
-				);
-			}
-
-			const titleMultilingual = getMultilingualContent({
-				data: entry.data,
-				prop: 'title',
-			})?.primary;
-			const regions = 'regions' in entry.data ? entry.data.regions : undefined;
-
-			catalogItemsById.set(entry.id, {
-				collection: entry.collection,
-				id: entry.id,
-				title: entry.data.title,
-				titleMultilingual,
-				description: getDescription(entry),
-				url: getContentUrl(entry.collection, getPublicId(entry)),
-				imageId:
-					'imageFeatured' in entry.data
-						? getImageFeaturedId({ imageFeatured: entry.data.imageFeatured })
-						: undefined,
-				imageHeroId:
-					'imageFeatured' in entry.data
-						? getImageHeroId({ imageFeatured: entry.data.imageFeatured })
-						: undefined,
-				regionPrimaryId: getRegionPrimaryId(regions),
-				locationCount: '_locationCount' in entry.data ? entry.data._locationCount : undefined,
-				postCount: '_postCount' in entry.data ? entry.data._postCount : undefined,
-				wordCount: await getWordCount(entry),
-				linksExternalCount: getLinksExternalCount(entry),
-				backlinks: new Set<string>(), // Populated below
-				dateCreated: entry.data.dateCreated,
-				dateUpdated: 'dateUpdated' in entry.data ? entry.data.dateUpdated : undefined,
-				dateRecorded:
-					'dateRecorded' in entry.data && entry.data.dateRecorded
-						? entry.data.dateRecorded
-						: undefined,
-				entryQuality: entry.data.entryQuality,
-			});
+	for (const entry of catalogEntries) {
+		if (catalogItemsById.has(entry.id)) {
+			throw new Error(
+				`[Catalog] Duplicate ID found for "${entry.id}" across different collections!`,
+			);
 		}
+
+		catalogItemsById.set(entry.id, await createCatalogItem(entry, getRegionPrimaryId));
 	}
 
 	// Now run through everything again and generate backlinks from <Link> components
-	for (const collection of [pages, posts, locations, regions, themes, series]) {
-		for (const entry of collection) {
-			generateContentBacklinksFromMdxComponents(entry, catalogItemsById);
-		}
+	for (const entry of catalogEntries) {
+		generateContentBacklinksFromMdxComponents(entry, catalogItemsById);
 	}
 
-	// Aggregate word count from series items
-	for (const entry of series) {
-		const seriesCatalogItem = catalogItemsById.get(entry.id);
-
-		if (seriesCatalogItem) {
-			seriesCatalogItem.wordCount = R.pipe(
-				entry.data.seriesItems ?? [],
-				R.map((seriesItem) => catalogItemsById.get(seriesItem)?.wordCount ?? 0),
-				R.sum,
-				Number,
-			);
-		}
-	}
+	aggregateSeriesWordCounts(series, catalogItemsById);
 
 	const endTime = performance.now();
 
