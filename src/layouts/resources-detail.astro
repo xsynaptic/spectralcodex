@@ -19,7 +19,9 @@ import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { formatCitation } from '#lib/collections/resources/resources-citation.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
@@ -35,6 +37,20 @@ interface Props {
 const { entry, mapData, page } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
+
+// The header carries a short citation; the full one, with publishedDetails, lives in Sources
+const citation = formatCitation({
+	lang: LanguageCodeEnum.English,
+	title: entry.data.title,
+	authorNames: entry.data.authors?.map((author) => author.name),
+	publisher: entry.data.publisher,
+	publishedDate: entry.data.publishedDate,
+	publishedDetails: undefined,
+});
+
+const citationLine = [citation.authors, citation.published]
+	.filter((part) => part !== undefined)
+	.join(citation.delimiter);
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
@@ -80,17 +96,7 @@ const t = getTranslations();
 						</DividedItem>
 					) : undefined
 				}
-				{
-					entry.data.authors || entry.data.publisher || entry.data.publishedDate ? (
-						<DividedItem>
-							{entry.data.authors?.map((author) => author.name).join(' & ')}
-							{entry.data.authors && (entry.data.publisher || entry.data.publishedDate) ? ', ' : ''}
-							{entry.data.publisher}
-							{entry.data.publisher && entry.data.publishedDate ? ', ' : ''}
-							{entry.data.publishedDate}
-						</DividedItem>
-					) : undefined
-				}
+				{citationLine ? <DividedItem>{citationLine}</DividedItem> : undefined}
 			</Fragment>
 		</ContentHeader>
 		<ContentDescription entry={entry} />

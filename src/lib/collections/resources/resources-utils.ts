@@ -18,7 +18,7 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { filterHasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 
-// Get locations associated with a resource (via links URL match or sources ID match)
+// Matched via links URL or sources ID
 async function createLocationsByResourceFunction() {
 	const { entriesMap } = await getLocationsCollection();
 	const { locationIdsByResourceId } = await getResourceAssociation();
@@ -32,7 +32,7 @@ async function createLocationsByResourceFunction() {
 	};
 }
 
-// Get posts associated with a resource (via links URL match or sources ID match)
+// Matched via links URL or sources ID
 async function createPostsByResourceFunction() {
 	const { entriesMap } = await getPostsCollection();
 	const { postIdsByResourceId } = await getResourceAssociation();
@@ -46,7 +46,6 @@ async function createPostsByResourceFunction() {
 	};
 }
 
-// Resolve links and sources
 export async function createResolveResourceLinksFunction() {
 	const { entries } = await getResourcesCollection();
 
@@ -97,7 +96,11 @@ export async function createResolveResourceSourcesFunction() {
 	};
 }
 
-// Data for a single resource entry page: catalog items and map data
+type ResolveResourceSources = Awaited<ReturnType<typeof createResolveResourceSourcesFunction>>;
+
+// A cited work, either a Resource entry flattened onto its ID or one written inline in frontmatter
+export type ResourceSource = NonNullable<ReturnType<ResolveResourceSources>>[number];
+
 export async function createQueryResourcesEntryFunction() {
 	const getLocationsByResource = await createLocationsByResourceFunction();
 	const getPostsByResource = await createPostsByResourceFunction();
@@ -108,13 +111,10 @@ export async function createQueryResourcesEntryFunction() {
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-		// Get locations associated with this link
 		const locationsFiltered = getLocationsByResource(entry);
 
-		// Get posts associated with this link
 		const postsFiltered = getPostsByResource(entry);
 
-		// Catalog items are the posts and locations that are associated with the link
 		const catalogItems = R.pipe(
 			[
 				...R.pipe(

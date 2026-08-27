@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getResourceUrl } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'a'> {
 	id: string | undefined;
@@ -26,8 +26,7 @@ if (!resource && import.meta.env.DEV) {
 	console.warn(`[Resource] Referenced resource "${id}" not found; rendering path: ${pathname}`);
 }
 
-// Only showPage resources have a routed page; page-less ones render as plain text
-const href = resource?.data.showPage ? getContentUrl('resources', resource.id) : undefined;
+const href = resource ? getResourceUrl(resource.id, resource.data.showPage) : undefined;
 ---
 
 {href ? <a href={href} {...props} set:html={content} /> : <Fragment set:html={content} />}

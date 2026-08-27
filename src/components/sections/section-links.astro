@@ -11,7 +11,7 @@ import { createResolveResourceLinksFunction } from '#lib/collections/resources/r
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getLinkPlatform } from '#lib/utils/link-platforms.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getResourceUrl } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
@@ -35,8 +35,10 @@ const t = getTranslations();
 				{links.map((link) => {
 					const titleMultilingual = getMultilingualContent({ data: link, prop: 'title' })?.primary;
 
-					// Handle content on various platforms; in these cases the title is the account
+					// For platform links the title is the account, not the page
 					const platform = 'id' in link ? undefined : getLinkPlatform(link.url);
+					const resourceUrl =
+						'id' in link && 'showPage' in link ? getResourceUrl(link.id, link.showPage) : undefined;
 					const linkText = platform
 						? formatStringTemplate(t('section.links.platform.label'), {
 								platform,
@@ -46,7 +48,7 @@ const t = getTranslations();
 
 					return (
 						<ListColumnItem>
-							{'showPage' in link && link.showPage ? (
+							{resourceUrl ? (
 								<>
 									<DividedItem>
 										<Anchor href={link.url}>{link.title}</Anchor>
@@ -55,7 +57,7 @@ const t = getTranslations();
 										) : undefined}
 									</DividedItem>
 									<DividedItem>
-										<Anchor class="italic" href={getContentUrl('resources', link.id)}>
+										<Anchor class="italic" href={resourceUrl}>
 											{t('collection.resources.showPage.label')}
 										</Anchor>
 									</DividedItem>

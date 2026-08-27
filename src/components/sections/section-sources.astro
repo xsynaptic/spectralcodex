@@ -1,17 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
-import * as R from 'remeda';
-
 import ContentSection from '#components/content/content-section.astro';
 import Anchor from '#components/parts/anchor.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
+import { buildSourceCitations } from '#lib/collections/resources/resources-citation.ts';
 import { createResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'themes'>;
@@ -24,30 +20,6 @@ const getResolveResourceSources = await createResolveResourceSourcesFunction();
 const sources = getResolveResourceSources(entry);
 
 const t = getTranslations();
-
-const SourcesFormattingMap = {
-	[LanguageCodeEnum.English]: {
-		authorsDelimiter: ' & ',
-		delimiter: ', ',
-		quoteStart: '',
-		quoteEnd: '',
-		sentenceDelimiter: '.',
-	},
-	[LanguageCodeEnum.ChineseTraditional]: {
-		authorsDelimiter: '，',
-		delimiter: '，',
-		quoteStart: '《',
-		quoteEnd: '》',
-		sentenceDelimiter: '。',
-	},
-	[LanguageCodeEnum.Japanese]: {
-		authorsDelimiter: '、',
-		delimiter: '、',
-		quoteStart: '『',
-		quoteEnd: '』',
-		sentenceDelimiter: '。',
-	},
-} as const;
 ---
 
 {
@@ -56,173 +28,29 @@ const SourcesFormattingMap = {
 			<Fragment slot="section-title">{t('section.sources')}</Fragment>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{sources.map((source) => {
-					// Get multilingual content for each field
-					const titleMultilingual = getMultilingualContent({
-						data: source,
-						prop: 'title',
-					})?.primary;
-					const publisherMultilingual = getMultilingualContent({
-						data: source,
-						prop: 'publisher',
-					})?.primary;
-					const publishedDetailsMultilingual = getMultilingualContent({
-						data: source,
-						prop: 'publishedDetails',
-					})?.primary;
-
-					let Authors: Node | undefined;
-					let Title: Node | undefined;
-					let Publisher: Node | undefined;
-					let PublishedDetails: Node | undefined;
-
-					if (source.title) {
-						if (source.authors) {
-							const authorNames = source.authors
-								.map((author) => author.name)
-								.join(SourcesFormattingMap[LanguageCodeEnum.English].authorsDelimiter);
-							Authors = <span>{authorNames}</span>;
-						}
-						Title =
-							'id' in source && 'showPage' in source && source.showPage ? (
-								<Anchor href={getContentUrl('resources', source.id)}>
-									<span class="italic">{source.title}</span>
-								</Anchor>
-							) : (
-								<span class="italic">{source.title}</span>
-							);
-						if (source.publisher && source.publishedDate) {
-							Publisher = (
-								<span>
-									{source.publisher}, {source.publishedDate}
-								</span>
-							);
-						} else if (source.publisher) {
-							Publisher = <span>{source.publisher}</span>;
-						} else if (source.publishedDate) {
-							Publisher = <span>{source.publishedDate}</span>;
-						}
-						if (source.publishedDetails) {
-							PublishedDetails = <span>{source.publishedDetails}</span>;
-						}
-					}
-
-					let AuthorsMultilingual: Node | undefined;
-					let TitleMultilingual: Node | undefined;
-					let PublisherMultilingual: Node | undefined;
-					let PublishedDetailsMultilingual: Node | undefined;
-
-					if (
-						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional) ||
-							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.ChineseTraditional)) &&
-						titleMultilingual?.value
-					) {
-						const chineseFormatting = SourcesFormattingMap[LanguageCodeEnum.ChineseTraditional];
-						if (source.authors) {
-							const authorNames = source.authors
-								.map((author) => author.name_zh)
-								.filter((name) => name !== undefined);
-
-							if (authorNames.length > 0) {
-								const authorsJoined = authorNames.join(chineseFormatting.authorsDelimiter);
-								AuthorsMultilingual = <span>{authorsJoined}</span>;
-							}
-						}
-						const titleQuoted =
-							chineseFormatting.quoteStart + titleMultilingual.value + chineseFormatting.quoteEnd;
-						TitleMultilingual =
-							'id' in source && 'showPage' in source && source.showPage ? (
-								<Anchor href={getContentUrl('resources', source.id)}>{titleQuoted}</Anchor>
-							) : (
-								<span>{titleQuoted}</span>
-							);
-						if (publisherMultilingual?.value && source.publishedDate) {
-							const publisherFormatted =
-								publisherMultilingual.value + chineseFormatting.delimiter + source.publishedDate;
-							PublisherMultilingual = <span>{publisherFormatted}</span>;
-						} else if (publisherMultilingual?.value) {
-							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
-						} else if (source.publishedDate) {
-							PublisherMultilingual = <span>{source.publishedDate}</span>;
-						}
-						if (publishedDetailsMultilingual?.value) {
-							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;
-						}
-					} else if (
-						(titleMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese) ||
-							publisherMultilingual?.lang.startsWith(LanguageCodeEnum.Japanese)) &&
-						titleMultilingual?.value
-					) {
-						const japaneseFormatting = SourcesFormattingMap[LanguageCodeEnum.Japanese];
-						if (source.authors) {
-							const authorNames = source.authors
-								.map((author) => author.name_ja)
-								.filter((name) => name !== undefined);
-
-							if (authorNames.length > 0) {
-								const authorsJoined = authorNames.join(japaneseFormatting.authorsDelimiter);
-								AuthorsMultilingual = <span>{authorsJoined}</span>;
-							}
-						}
-						const titleQuoted =
-							japaneseFormatting.quoteStart + titleMultilingual.value + japaneseFormatting.quoteEnd;
-						TitleMultilingual =
-							'id' in source && 'showPage' in source && source.showPage ? (
-								<Anchor href={getContentUrl('resources', source.id)}>{titleQuoted}</Anchor>
-							) : (
-								<span>{titleQuoted}</span>
-							);
-						if (publisherMultilingual?.value && source.publishedDate) {
-							const publisherFormatted =
-								publisherMultilingual.value + japaneseFormatting.delimiter + source.publishedDate;
-							PublisherMultilingual = <span>{publisherFormatted}</span>;
-						} else if (publisherMultilingual?.value) {
-							PublisherMultilingual = <span>{publisherMultilingual.value}</span>;
-						} else if (source.publishedDate) {
-							PublisherMultilingual = <span>{source.publishedDate}</span>;
-						}
-						if (publishedDetailsMultilingual?.value) {
-							PublishedDetailsMultilingual = <span>{publishedDetailsMultilingual.value}</span>;
-						}
-					}
+					const { url, primary, multilingual } = buildSourceCitations(source);
 
 					return (
 						<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
-							<span>
-								{Authors}
-								{Authors && Title
-									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
-									: undefined}
-								{Title}
-								{Title && Publisher
-									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
-									: undefined}
-								{Publisher}
-								{Publisher && PublishedDetails
-									? SourcesFormattingMap[LanguageCodeEnum.English].delimiter
-									: undefined}
-								{PublishedDetails}
-								{TitleMultilingual ? ' ' : undefined}
-							</span>
-							{TitleMultilingual &&
-							titleMultilingual?.lang &&
-							R.isIncludedIn(titleMultilingual.lang, [
-								LanguageCodeEnum.ChineseTraditional,
-								LanguageCodeEnum.Japanese,
-							]) ? (
-								<span lang={titleMultilingual.lang}>
-									{AuthorsMultilingual}
-									{AuthorsMultilingual
-										? SourcesFormattingMap[titleMultilingual.lang].delimiter
+							{primary ? (
+								<span>
+									{primary.authors ? `${primary.authors}${primary.delimiter}` : undefined}
+									<span class="italic">
+										{url ? <Anchor href={url}>{primary.title}</Anchor> : primary.title}
+									</span>
+									{primary.published ? `${primary.delimiter}${primary.published}` : undefined}
+									{multilingual ? ' ' : undefined}
+								</span>
+							) : undefined}
+							{multilingual ? (
+								<span lang={multilingual.lang}>
+									{multilingual.authors
+										? `${multilingual.authors}${multilingual.delimiter}`
 										: undefined}
-									{TitleMultilingual}
-									{PublisherMultilingual
-										? SourcesFormattingMap[titleMultilingual.lang].delimiter
+									{url ? <Anchor href={url}>{multilingual.title}</Anchor> : multilingual.title}
+									{multilingual.published
+										? `${multilingual.delimiter}${multilingual.published}`
 										: undefined}
-									{PublisherMultilingual}
-									{PublisherMultilingual && PublishedDetailsMultilingual
-										? SourcesFormattingMap[titleMultilingual.lang].delimiter
-										: undefined}
-									{PublishedDetailsMultilingual}
 								</span>
 							) : undefined}
 						</ListColumnItem>
