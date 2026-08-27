@@ -397,42 +397,56 @@ interface RunReport {
 	seconds: string;
 }
 
-async function sendRunReport(run: RunReport): Promise<void> {
+// Notes (like a skipped map manifest) force the digest even on a clean run
+function isReportWorthSending({ failures, notes }: RunReport): boolean {
+	return ALERT_ALWAYS || notes.length > 0 || failures.length >= ALERT_MIN_FAILURES;
+}
+
+function getReportSubject({ failures, notes, totalUrls, seconds }: RunReport): string {
+	if (failures.length > 0) return `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
+	if (notes.length > 0) return '[SpectralCodex] cache warm: completed with warnings';
+
+	return `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
+}
+
+function getFailureLines(failures: Array<WarmResult>): Array<string> {
+	if (failures.length === 0) return [];
+
+	const lines = ['', ...failures.slice(0, maxAlertFailures).map(failureLine)];
+
+	if (failures.length > maxAlertFailures) {
+		lines.push(`  (+${String(failures.length - maxAlertFailures)} more)`);
+	}
+
+	return lines;
+}
+
+function getReportBody(run: RunReport): string {
 	const { phases, failures, notes, retriedCount, totalUrls, seconds } = run;
 
-	if (failures.length > 0) process.exitCode = 2;
-	// Notes (like a skipped map manifest) force the digest even on a clean run
-	if (!ALERT_ALWAYS && notes.length === 0 && failures.length < ALERT_MIN_FAILURES) return;
-
-	const hasFailures = failures.length > 0;
 	const retryNote =
 		retriedCount > 0
 			? ` (${String(retriedCount)} retried, ${String(retriedCount - failures.length)} recovered)`
 			: '';
-	const failureLines = hasFailures
-		? ['', ...failures.slice(0, maxAlertFailures).map(failureLine)]
-		: [];
-	if (failures.length > maxAlertFailures) {
-		failureLines.push(`  (+${String(failures.length - maxAlertFailures)} more)`);
-	}
-	let subject = `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
-	if (hasFailures) {
-		subject = `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
-	} else if (notes.length > 0) {
-		subject = '[SpectralCodex] cache warm: completed with warnings';
-	}
-	const body = [
-		hasFailures
+
+	return [
+		failures.length > 0
 			? `${String(failures.length)} of ${String(totalUrls)} URLs failed to warm${retryNote}`
 			: `All ${String(totalUrls)} URLs warmed${retryNote}`,
 		'',
 		...phases.map(([label, stats]) => summarize(label, stats)),
 		...notes,
-		...failureLines,
+		...getFailureLines(failures),
 		'',
 		`Duration: ${seconds}s`,
 	].join('\n');
-	await sendAlert(subject, body);
+}
+
+async function sendRunReport(run: RunReport): Promise<void> {
+	if (run.failures.length > 0) process.exitCode = 2;
+	if (!isReportWorthSending(run)) return;
+
+	await sendAlert(getReportSubject(run), getReportBody(run));
 }
 
 async function main(): Promise<void> {

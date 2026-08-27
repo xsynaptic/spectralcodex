@@ -3,7 +3,7 @@ import type { CSSProperties, FC } from 'react';
 import { memo, useState } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps, MapInitialViewState } from '../types';
+import type { MapComponentProps } from '../types';
 
 import './canvas-worker';
 import { MapControls } from '../controls/controls';
@@ -15,7 +15,7 @@ import { MapSource } from '../source/source';
 import { mapInteractiveLayerIds } from '../source/source-config';
 import { useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
-import { readSavedViewport } from '../store/store-viewport';
+import { getInitialViewState } from '../store/store-viewport';
 import { CanvasDataProvider } from './canvas-data';
 import { useMapCanvasEvents } from './canvas-events';
 import { MapSelectionFeatureState } from './canvas-feature-state';
@@ -70,38 +70,9 @@ const MapCanvasContainer: FC<
 	const canvasInteractive = useMapCanvasInteractive();
 	const canvasLoading = useMapCanvasLoading();
 
-	const [initialViewState] = useState(() => {
-		const saved = readSavedViewport(mapId);
-
-		if (saved) {
-			return {
-				...(maxBounds ? { maxBounds } : {}),
-				...saved,
-			} satisfies MapInitialViewState;
-		}
-
-		const viewState = {
-			...(maxBounds ? { maxBounds } : {}),
-			fitBoundsOptions: {
-				padding: { top: 20, bottom: 20, left: 50, right: 50 },
-			},
-		};
-
-		if (bounds) {
-			return {
-				...viewState,
-				bounds,
-				zoom: zoom ?? 12,
-			} satisfies MapInitialViewState;
-		}
-
-		return {
-			...viewState,
-			longitude: center?.[0] ?? 0,
-			latitude: center?.[1] ?? 0,
-			zoom: zoom ?? 12,
-		} satisfies MapInitialViewState;
-	});
+	const [initialViewState] = useState(() =>
+		getInitialViewState({ bounds, center, mapId, maxBounds, zoom }),
+	);
 
 	return (
 		<ReactMapGlMap

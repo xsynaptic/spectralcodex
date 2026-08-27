@@ -143,18 +143,25 @@ function getSourceHostname(sourceUrl: string) {
 	return new URL(sourceUrl).hostname.replace(/^www\./, '');
 }
 
+function trimToUndefined(value: string | null | undefined): string | undefined {
+	const trimmed = value?.trim();
+
+	return trimmed === '' ? undefined : trimmed;
+}
+
 function toReply(mention: Webmention): WebmentionReply | undefined {
-	const authorName = mention.author?.name?.trim() || getSourceHostname(mention['wm-source']);
+	const authorName =
+		trimToUndefined(mention.author?.name) ?? getSourceHostname(mention['wm-source']);
 
 	if (!authorName) return undefined;
 
 	return {
 		id: mention['wm-id'],
 		authorName,
-		authorUrl: mention.author?.url?.trim() || undefined,
+		authorUrl: trimToUndefined(mention.author?.url),
 		sourceUrl: mention['wm-source'],
 		dateReceived: new Date(mention['wm-received']),
-		text: mention.content?.text?.trim() || undefined,
+		text: trimToUndefined(mention.content?.text),
 	};
 }
 

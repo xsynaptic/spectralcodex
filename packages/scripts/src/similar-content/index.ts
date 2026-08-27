@@ -187,23 +187,85 @@ async function generateEmbeddings(
 	return embeddings;
 }
 
+interface SimilarContentIndex {
+	index: Index;
+	keyToEmbedding: Map<bigint, SimilarContentEmbedding>;
+}
+
+// usearch needs numeric BigInt keys, so an embedding is addressed by its position in the array
+function buildSimilarContentIndex(
+	embeddings: Array<SimilarContentEmbedding>,
+	options: { dimensions: number; candidateCount: number },
+): SimilarContentIndex {
+	const index = new Index({
+		metric: MetricKind.Cos,
+		dimensions: options.dimensions,
+		connectivity: 16,
+		quantization: ScalarKind.F32,
+		expansion_add: 128,
+		expansion_search: options.candidateCount * 2, // 2x improves recall without significant slowdown
+		multi: false,
+	});
+	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
+
+	for (const [position, embedding] of embeddings.entries()) {
+		const key = BigInt(position);
+
+		keyToEmbedding.set(key, embedding);
+		index.add(key, new Float32Array(embedding.vector));
+	}
+
+	return { index, keyToEmbedding };
+}
+
+interface SimilarContentQueryOptions extends SimilarContentIndex {
+	candidateCount: number;
+	minScore: number;
+	resultCount: number;
+}
+
+function querySimilarItems(
+	current: SimilarContentEmbedding,
+	options: SimilarContentQueryOptions,
+): Array<SimilarContentItem> {
+	const { index, keyToEmbedding, candidateCount, minScore, resultCount } = options;
+
+	const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
+
+	const candidates: Array<SimilarContentItem> = [];
+
+	for (const [position, key] of keys.entries()) {
+		const distance = distances[position];
+		const other = keyToEmbedding.get(key);
+
+		if (!other || other.id === current.id) continue;
+
+		// Convert usearch's cosine distance to a similarity score
+		const similarity = Math.max(0, distance === undefined ? 0 : 1 - distance);
+
+		// Blend the boost into the headroom below 1.0 so strong matches never saturate
+		const boost = calculateMetadataBoost(current, other);
+		// Round to 4 decimals; full float precision just bloats the output JSON
+		const score = Math.round((similarity + (1 - similarity) * boost) * 10_000) / 10_000;
+
+		candidates.push({
+			id: other.id,
+			collection: other.collection,
+			score,
+		});
+	}
+
+	candidates.sort((a, b) => b.score - a.score);
+
+	return candidates.filter((candidate) => candidate.score >= minScore).slice(0, resultCount);
+}
+
 // Calculate similarities using usearch ANN index
 function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
 	const firstVector = embeddings[0]?.vector;
 
 	if (!firstVector) {
 		throw new Error('No embeddings to process');
-	}
-
-	// Build ID mappings (usearch needs numeric BigInt keys)
-	const idToKey = new Map<string, bigint>();
-	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
-
-	for (const [index, embedding] of embeddings.entries()) {
-		const key = BigInt(index);
-
-		idToKey.set(embedding.id, key);
-		keyToEmbedding.set(key, embedding);
 	}
 
 	const resultCount = Number(values['result-count']);
@@ -213,21 +275,10 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	// expansion_search must be >= candidateCount or usearch silently loses recall
 	const candidateCount = Math.max(resultCount * 3, 50);
 
-	const index = new Index({
-		metric: MetricKind.Cos,
+	const { index, keyToEmbedding } = buildSimilarContentIndex(embeddings, {
 		dimensions: firstVector.length,
-		connectivity: 16,
-		quantization: ScalarKind.F32,
-		expansion_add: 128,
-		expansion_search: candidateCount * 2, // 2x improves recall without significant slowdown
-		multi: false,
+		candidateCount,
 	});
-
-	for (const emb of embeddings) {
-		const key = idToKey.get(emb.id);
-
-		if (key !== undefined) index.add(key, new Float32Array(emb.vector));
-	}
 
 	console.log(chalk.blue('Querying for similar content...'));
 
@@ -235,37 +286,13 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	const result: SimilarContentResult = {};
 
 	for (const current of embeddings) {
-		const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
-
-		const candidates: Array<SimilarContentItem> = [];
-
-		for (const [i, key] of keys.entries()) {
-			const distance = distances[i];
-
-			const other = keyToEmbedding.get(key);
-
-			if (!other || other.id === current.id) continue;
-
-			// Convert usearch's cosine distance to a similarity score
-			const similarity = Math.max(0, distance === undefined ? 0 : 1 - distance);
-
-			// Blend the boost into the headroom below 1.0 so strong matches never saturate
-			const boost = calculateMetadataBoost(current, other);
-			// Round to 4 decimals; full float precision just bloats the output JSON
-			const score = Math.round((similarity + (1 - similarity) * boost) * 10_000) / 10_000;
-
-			candidates.push({
-				id: other.id,
-				collection: other.collection,
-				score,
-			});
-		}
-
-		candidates.sort((a, b) => b.score - a.score);
-
-		result[current.id] = candidates
-			.filter((candidate) => candidate.score >= minScore)
-			.slice(0, resultCount);
+		result[current.id] = querySimilarItems(current, {
+			index,
+			keyToEmbedding,
+			candidateCount,
+			minScore,
+			resultCount,
+		});
 	}
 
 	console.log(

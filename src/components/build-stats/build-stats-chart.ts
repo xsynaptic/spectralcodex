@@ -50,10 +50,37 @@ class BuildStatsChart extends HTMLElement {
 		this.#tooltip.toggleAttribute('data-visible', true);
 	}
 
+	#moveCrosshair(point: TooltipPoint) {
+		if (!this.#crosshair) return;
+
+		const x = String(point.x);
+
+		this.#crosshairLine?.setAttribute('x1', x);
+		this.#crosshairLine?.setAttribute('x2', x);
+		this.#crosshairDot?.setAttribute('cx', x);
+		this.#crosshairDot?.setAttribute('cy', String(point.y));
+		this.#crosshair.setAttribute('opacity', '1');
+	}
+
+	#positionTooltip(point: TooltipPoint, box: DOMRect, scale: number) {
+		if (!this.#tooltip) return;
+
+		const left = box.left - this.getBoundingClientRect().left + point.x * scale;
+		// Nudged back only where it would otherwise hang off the window and widen the page
+		const halfWidth = this.#tooltip.offsetWidth / 2;
+		const center = box.left + point.x * scale;
+		const overflowRight =
+			center + halfWidth + tooltipEdgeGap - document.documentElement.clientWidth;
+		const overflowLeft = tooltipEdgeGap - (center - halfWidth);
+
+		this.#tooltip.style.left = `${String(left - Math.max(overflowRight, 0) + Math.max(overflowLeft, 0))}px`;
+		this.#tooltip.style.top = `${String(point.y * scale + 18)}px`;
+	}
+
 	#handlePointerMove = (event: PointerEvent) => {
 		if (event.pointerType === 'touch') return;
 
-		if (!this.#svg || !this.#crosshair) return;
+		if (!this.#svg) return;
 
 		const box = this.#svg.getBoundingClientRect();
 		const scale = box.width / this.#svg.viewBox.baseVal.width;
@@ -64,28 +91,9 @@ class BuildStatsChart extends HTMLElement {
 
 		if (!point) return;
 
-		const x = String(point.x);
-
-		this.#crosshairLine?.setAttribute('x1', x);
-		this.#crosshairLine?.setAttribute('x2', x);
-		this.#crosshairDot?.setAttribute('cx', x);
-		this.#crosshairDot?.setAttribute('cy', String(point.y));
-		this.#crosshair.setAttribute('opacity', '1');
-
+		this.#moveCrosshair(point);
 		this.#showTooltip(point);
-
-		if (this.#tooltip) {
-			const left = box.left - this.getBoundingClientRect().left + point.x * scale;
-			// Nudged back only where it would otherwise hang off the window and widen the page
-			const halfWidth = this.#tooltip.offsetWidth / 2;
-			const center = box.left + point.x * scale;
-			const overflowRight =
-				center + halfWidth + tooltipEdgeGap - document.documentElement.clientWidth;
-			const overflowLeft = tooltipEdgeGap - (center - halfWidth);
-
-			this.#tooltip.style.left = `${String(left - Math.max(overflowRight, 0) + Math.max(overflowLeft, 0))}px`;
-			this.#tooltip.style.top = `${String(point.y * scale + 18)}px`;
-		}
+		this.#positionTooltip(point, box, scale);
 	};
 
 	#handlePointerLeave = () => {

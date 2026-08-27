@@ -92,6 +92,40 @@ function isBetterChronologyCandidate(
 	return next.id < current.id;
 }
 
+function extractDatedCategories(
+	data: DataStoreEntry['data'],
+): Array<{ date: Date; category: ChronologyCategory }> {
+	const dated: Array<{ date: Date; category: ChronologyCategory }> = [];
+
+	const dateCreated = parseChronologyDate(data.dateCreated);
+
+	if (dateCreated) dated.push({ date: dateCreated, category: 'created' });
+
+	const dateUpdated = parseChronologyDate(data.dateUpdated);
+
+	if (dateUpdated) dated.push({ date: dateUpdated, category: 'updated' });
+
+	for (const date of extractRecordedDates(data.dateRecorded)) {
+		dated.push({ date, category: 'visited' });
+	}
+
+	return dated;
+}
+
+function extractEntryCandidate(
+	entry: DataStoreEntry,
+): Omit<ChronologyImageCandidate, 'category'> | undefined {
+	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
+
+	if (!imageFeaturedId) return undefined;
+
+	return {
+		imageFeaturedId,
+		entryQuality: z.number().optional().parse(entry.data.entryQuality) ?? 0,
+		id: getPublicId(entry),
+	};
+}
+
 // Maps each chronology period to its best content image; one image may represent both a year and a month
 export function buildChronologyImageIndex(
 	collections: Map<string, Map<string, DataStoreEntry>>,
@@ -112,29 +146,12 @@ export function buildChronologyImageIndex(
 		if (!collection) continue;
 
 		for (const entry of collection.values()) {
-			const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
+			const entryCandidate = extractEntryCandidate(entry);
 
-			if (!imageFeaturedId) continue;
+			if (!entryCandidate) continue;
 
-			const entryQuality = z.number().optional().parse(entry.data.entryQuality) ?? 0;
-			const id = getPublicId(entry);
-
-			const dated: Array<{ date: Date; category: ChronologyCategory }> = [];
-
-			const dateCreated = parseChronologyDate(entry.data.dateCreated);
-
-			if (dateCreated) dated.push({ date: dateCreated, category: 'created' });
-
-			const dateUpdated = parseChronologyDate(entry.data.dateUpdated);
-
-			if (dateUpdated) dated.push({ date: dateUpdated, category: 'updated' });
-
-			for (const date of extractRecordedDates(entry.data.dateRecorded)) {
-				dated.push({ date, category: 'visited' });
-			}
-
-			for (const { date, category } of dated) {
-				const candidate: ChronologyImageCandidate = { imageFeaturedId, entryQuality, category, id };
+			for (const { date, category } of extractDatedCategories(entry.data)) {
+				const candidate = { ...entryCandidate, category };
 
 				for (const key of getChronologyPeriodKeys(date)) addCandidate(key, candidate);
 			}

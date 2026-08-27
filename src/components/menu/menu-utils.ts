@@ -22,3 +22,22 @@ export function getMenuItemTriggerType(item: MenuItem) {
 
 	return 'span';
 }
+
+const multilingualRegions = new Set(['taiwan', 'hong-kong']);
+
+export function shouldShowMenuItemMultilingual(item: MenuItem, depth: number): boolean {
+	if (!item.titleMultilingual) return false;
+
+	switch (item.collection) {
+		case 'regions': {
+			return depth > 1 && multilingualRegions.has(item.ancestor ?? '');
+		}
+		case 'series':
+		case 'themes': {
+			return true;
+		}
+		default: {
+			return false;
+		}
+	}
+}

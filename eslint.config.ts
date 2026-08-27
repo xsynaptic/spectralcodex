@@ -30,7 +30,7 @@ export default getConfig(
 		},
 		{
 			rules: {
-				complexity: ['warn', { max: 12, variant: 'modified' }],
+				complexity: ['warn', { max: 10, variant: 'modified' }],
 				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
 				'max-depth': ['warn', 4],
 				// The expanded form reads more clearly than ??=, ||=, and &&=

@@ -3,12 +3,11 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { MenuItem } from '#components/menu/menu-types.ts';
 
+import MenuHeaderSubmenuTrigger from '#components/menu/menu-header-submenu-trigger.astro';
 import {
 	getMenuItemAriaLabel,
-	getMenuItemTriggerType,
-	isActiveMenuItem,
+	shouldShowMenuItemMultilingual,
 } from '#components/menu/menu-utils.ts';
-import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props extends HTMLAttributes<'ul'> {
@@ -19,27 +18,6 @@ interface Props extends HTMLAttributes<'ul'> {
 }
 
 const { menuItems, depth, isFirstMenuItem = true, ariaLabel, ...props } = Astro.props;
-
-const { pathname } = Astro.url;
-
-const multilingualRegions = new Set(['taiwan', 'hong-kong']);
-
-function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number }) {
-	switch (item.collection) {
-		case 'regions': {
-			return item.titleMultilingual && depth > 1 && multilingualRegions.has(item.ancestor ?? '');
-		}
-		case 'series': {
-			return !!item.titleMultilingual;
-		}
-		case 'themes': {
-			return !!item.titleMultilingual;
-		}
-		default: {
-			return false;
-		}
-	}
-}
 ---
 
 <ul
@@ -57,49 +35,19 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 		menuItems.map((item, index) => {
 			const children = item.children ?? [];
 			const hasChildren = children.length > 0;
-			const isActive = isActiveMenuItem(item, pathname);
-			const triggerClasses = ['nav-sub-link', isActive ? 'link-active' : undefined];
-			const triggerType = getMenuItemTriggerType(item);
-			const label = (
-				<Fragment>
-					<Fragment set:html={item.title} />
-					{shouldShowMultilingual({ item, depth }) ? (
-						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
-					) : undefined}
-				</Fragment>
-			);
 
 			return (
 				<li class="nav-sub-item">
-					<div class="nav-sub-trigger">
-						{triggerType === 'anchor' ? (
-							<Anchor
-								class:list={triggerClasses}
-								href={item.url}
-								linkColor="accent"
-								{...(item.rel ? { rel: item.rel } : undefined)}
-							>
-								{label}
-							</Anchor>
+					<MenuHeaderSubmenuTrigger item={item} hasChildren={hasChildren}>
+						<Fragment set:html={item.title} />
+						{shouldShowMenuItemMultilingual(item, depth) ? (
+							<TextMultilingual
+								class="nav-ml"
+								content={item.titleMultilingual}
+								parenthesis={true}
+							/>
 						) : undefined}
-						{triggerType === 'button' ? (
-							<button type="button" class:list={['link link-accent', ...triggerClasses]}>
-								{label}
-							</button>
-						) : undefined}
-						{triggerType === 'span' ? <span class:list={triggerClasses}>{label}</span> : undefined}
-						{hasChildren ? (
-							<svg
-								class="nav-sub-icon"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								aria-hidden="true"
-							>
-								<use href="#icon:chevron-right" />
-							</svg>
-						) : undefined}
-					</div>
+					</MenuHeaderSubmenuTrigger>
 					{hasChildren ? (
 						<Astro.self
 							menuItems={children}

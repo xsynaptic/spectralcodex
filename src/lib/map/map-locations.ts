@@ -68,6 +68,8 @@ function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	}
 }
 
+type LocationGeometry = Exclude<CollectionEntry<'locations'>['data']['geometry'], Array<unknown>>;
+
 interface LocationsFeatureCollectionOptions {
 	hideSensitiveLocations?: boolean | undefined;
 }
@@ -116,6 +118,54 @@ function getMultilingualTitleProperties(
 	};
 }
 
+function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
+	return {
+		url: getRelativePath(entry.data._url),
+		wikipediaUrl: getShortenedUrl(entry.data._wikipediaUrl),
+		entryQuality: entry.data.entryQuality,
+		rating: entry.data.rating,
+		objective: entry.data.objective,
+		outlier: entry.data.outlier,
+		safety: entry.data.safety,
+	};
+}
+
+function getFeatureTitleProperties(
+	entry: CollectionEntry<'locations'>,
+	geometry: LocationGeometry,
+	entryTitleMultilingual: MultilingualContent | undefined,
+) {
+	const geometryTitleMultilingual = getMultilingualContent({
+		data: geometry,
+		prop: 'title',
+	})?.primary;
+
+	return {
+		title: geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title,
+		...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
+	};
+}
+
+function getGeometryFeatureProperties(
+	entry: CollectionEntry<'locations'>,
+	geometry: LocationGeometry,
+) {
+	// Image thumbnails can be nulled by individual points
+	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
+
+	return {
+		description: geometry.description ?? entry.data._descriptionHtml,
+		category: geometry.category ?? entry.data.category,
+		status: geometry.status ?? entry.data.status,
+		precision: geometry.precision ?? entry.data.precision,
+		googleMapsUrl: getShortenedUrl(
+			geometry.googleMapsUrl ?? entry.data._googleMapsUrl,
+			googleMapsHostPrefix,
+		),
+		...(image === null ? {} : { image }),
+	};
+}
+
 function buildLocationFeatures(
 	entry: CollectionEntry<'locations'>,
 ): Array<Feature<MapGeometry, MapFeatureProperties>> {
@@ -131,49 +181,21 @@ function buildLocationFeatures(
 		data: entry.data,
 		prop: 'title',
 	})?.primary;
-	const wikipediaUrl = getShortenedUrl(entry.data._wikipediaUrl);
+	const entryProperties = getEntryFeatureProperties(entry);
 
-	const features = geometryArray.map((geometry, index) => {
-		const id = featureIds[index] ?? entry.id;
-		const title = geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title;
-		const geometryTitleMultilingual = getMultilingualContent({
-			data: geometry,
-			prop: 'title',
-		})?.primary;
-		const googleMapsUrl = getShortenedUrl(
-			geometry.googleMapsUrl ?? entry.data._googleMapsUrl,
-			googleMapsHostPrefix,
-		);
-
-		// Image thumbnails can be nulled by individual points
-		const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
-
-		return {
-			type: 'Feature' as const,
-			id,
-			properties: {
-				title,
-				...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
-				url: getRelativePath(entry.data._url),
-				description: geometry.description ?? entry.data._descriptionHtml,
-				category: geometry.category ?? entry.data.category,
-				status: geometry.status ?? entry.data.status,
-				precision: geometry.precision ?? entry.data.precision,
-				entryQuality: entry.data.entryQuality,
-				rating: entry.data.rating,
-				objective: entry.data.objective,
-				outlier: entry.data.outlier,
-				safety: entry.data.safety,
-				googleMapsUrl,
-				wikipediaUrl,
-				...(image === null ? {} : { image }),
-			},
-			geometry: {
-				type: GeometryTypeEnum.Point,
-				coordinates: geometry.coordinates,
-			},
-		};
-	});
+	const features = geometryArray.map((geometry, index) => ({
+		type: 'Feature' as const,
+		id: featureIds[index] ?? entry.id,
+		properties: {
+			...entryProperties,
+			...getFeatureTitleProperties(entry, geometry, entryTitleMultilingual),
+			...getGeometryFeatureProperties(entry, geometry),
+		},
+		geometry: {
+			type: GeometryTypeEnum.Point,
+			coordinates: geometry.coordinates,
+		},
+	}));
 
 	locationFeaturesCache.set(entry, features);
 
