@@ -56,6 +56,17 @@ async function generatePlaceholderDataUrl({
 	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString('base64')}`;
 }
 
+// `stat` is authoritative; the collection's stored time covers a source that has since moved
+async function getImageMtime(path: string, storedTime: Date | undefined) {
+	try {
+		const stats = await fs.stat(path);
+
+		return stats.mtimeMs;
+	} catch {
+		return storedTime?.getTime();
+	}
+}
+
 /**
  * Get a placeholder for an image with specified aspect ratio
  * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality
@@ -78,16 +89,7 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 
 		if (!imageEntry) return;
 
-		// Get mtime for cache invalidation
-		let mtime: number | undefined;
-
-		try {
-			const stats = await fs.stat(imageEntry.data.path);
-
-			mtime = stats.mtimeMs;
-		} catch {
-			mtime = imageEntry.data.modifiedTime?.getTime();
-		}
+		const mtime = await getImageMtime(imageEntry.data.path, imageEntry.data.modifiedTime);
 
 		// Normalize aspect ratio for consistent cache keys
 		const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;

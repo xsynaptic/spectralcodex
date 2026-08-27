@@ -15,15 +15,11 @@ function formatIssue(issue: RegionParentIssue) {
 	return `${issue.location}: parent chain forms a cycle (${issue.chain.join(' -> ')})`;
 }
 
-// A region `parent` must reference an existing region id, never itself, and never form a cycle
-// A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
-// A cycle drops every member out of the hierarchy's root-driven walk, so subtrees silently vanish from rollups
-export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
+// Self edges are excluded so the cycle walk doesn't re-report them
+function collectParentEdges(entries: Array<DataStoreEntry>) {
 	const regionIds = new Set(entries.map((entry) => entry.id));
-	const issues: Array<RegionParentIssue> = [];
-
-	// Self edges are excluded so the cycle walk doesn't re-report them
 	const parentById = new Map<string, string>();
+	const issues: Array<RegionParentIssue> = [];
 
 	for (const entry of entries) {
 		const parent = entry.data.parent;
@@ -41,8 +37,13 @@ export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 		}
 	}
 
-	// Walk each entry's parent chain; a return to the starting entry is a cycle, reported once per cycle
+	return { parentById, issues };
+}
+
+// Walk each entry's parent chain; a return to the starting entry is a cycle, reported once per cycle
+function collectCycleIssues(entries: Array<DataStoreEntry>, parentById: Map<string, string>) {
 	const reportedCycles = new Set<string>();
+	const issues: Array<RegionParentIssue> = [];
 
 	for (const entry of entries) {
 		const seen = new Set<string>([entry.id]);
@@ -64,12 +65,23 @@ export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 
 		reportedCycles.add(cycleKey);
 
-		const location = entry.filePath ?? entry.id;
-
-		issues.push({ location, reason: 'cycle', chain: [...chain, entry.id] });
+		issues.push({
+			location: entry.filePath ?? entry.id,
+			reason: 'cycle',
+			chain: [...chain, entry.id],
+		});
 	}
 
 	return issues;
+}
+
+// A region `parent` must reference an existing region id, never itself, and never form a cycle
+// A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
+// A cycle drops every member out of the hierarchy's root-driven walk, so subtrees silently vanish from rollups
+export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
+	const { parentById, issues } = collectParentEdges(entries);
+
+	return [...issues, ...collectCycleIssues(entries, parentById)];
 }
 
 export function checkRegionsParents(entries: Array<DataStoreEntry>) {

@@ -1,6 +1,7 @@
 import type { LocationStatus } from '@spectralcodex/shared/map';
 import type { MapGeoJSONFeature } from 'maplibre-gl';
 import type { FC } from 'react';
+import type { MapRef } from 'react-map-gl/maplibre';
 
 import { useEffect, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
@@ -39,6 +40,71 @@ function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
 	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
 }
 
+function collectPointMarkers(
+	map: MapRef,
+	targetIds: Array<string>,
+	isDark: boolean,
+): Array<TargetMarker> {
+	if (!map.getLayer(MapLayerIdEnum.Points)) return [];
+
+	const points = map.queryRenderedFeatures(undefined, {
+		layers: [MapLayerIdEnum.Points],
+		filter: ['in', ['get', 'id'], ['literal', targetIds]],
+	});
+
+	const markers: Array<TargetMarker> = [];
+
+	for (const feature of points) {
+		if (feature.geometry.type !== 'Point') continue;
+
+		const pointId = typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
+
+		if (!pointId) continue;
+
+		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+
+		markers.push({
+			id: pointId,
+			longitude,
+			latitude,
+			color: getMarkerColor(feature, isDark),
+		});
+	}
+
+	return markers;
+}
+
+function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> {
+	if (!map.getLayer(MapLayerIdEnum.Clusters)) return [];
+
+	const clusters = map.queryRenderedFeatures(undefined, {
+		layers: [MapLayerIdEnum.Clusters],
+		filter: ['>', ['get', 'hasTarget'], 0],
+	});
+
+	const markers: Array<TargetMarker> = [];
+
+	for (const feature of clusters) {
+		if (feature.geometry.type !== 'Point') continue;
+
+		const clusterId =
+			typeof feature.properties.cluster_id === 'number' ? feature.properties.cluster_id : undefined;
+
+		if (clusterId === undefined) continue;
+
+		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+
+		markers.push({
+			id: `cluster-${String(clusterId)}`,
+			longitude,
+			latitude,
+			color,
+		});
+	}
+
+	return markers;
+}
+
 function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	const { current: map } = useMap();
 
@@ -62,59 +128,11 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			// Keyed by feature id; queryRenderedFeatures repeats a feature once per tile it renders in
 			const results = new Map<string, TargetMarker>();
 
-			// Check for unclustered target points
-			if (map.getLayer(MapLayerIdEnum.Points)) {
-				const points = map.queryRenderedFeatures(undefined, {
-					layers: [MapLayerIdEnum.Points],
-					filter: ['in', ['get', 'id'], ['literal', targetIds]],
-				});
-
-				for (const feature of points) {
-					if (feature.geometry.type !== 'Point') continue;
-
-					const pointId =
-						typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
-
-					if (!pointId) continue;
-
-					const [lng, lat] = feature.geometry.coordinates as [number, number];
-
-					results.set(pointId, {
-						id: pointId,
-						longitude: lng,
-						latitude: lat,
-						color: getMarkerColor(feature, isDark),
-					});
-				}
-			}
-
-			// Check for clusters containing target points
-			if (map.getLayer(MapLayerIdEnum.Clusters)) {
-				const clusters = map.queryRenderedFeatures(undefined, {
-					layers: [MapLayerIdEnum.Clusters],
-					filter: ['>', ['get', 'hasTarget'], 0],
-				});
-
-				for (const feature of clusters) {
-					if (feature.geometry.type !== 'Point') continue;
-
-					const clusterId =
-						typeof feature.properties.cluster_id === 'number'
-							? feature.properties.cluster_id
-							: undefined;
-
-					if (clusterId === undefined) continue;
-
-					const [lng, lat] = feature.geometry.coordinates as [number, number];
-					const markerId = `cluster-${String(clusterId)}`;
-
-					results.set(markerId, {
-						id: markerId,
-						longitude: lng,
-						latitude: lat,
-						color: clusterColor,
-					});
-				}
+			for (const marker of [
+				...collectPointMarkers(map, targetIds, isDark),
+				...collectClusterMarkers(map, clusterColor),
+			]) {
+				results.set(marker.id, marker);
 			}
 
 			const nextMarkers = [...results.values()];

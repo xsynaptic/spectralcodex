@@ -1,6 +1,3 @@
-import type { BBox } from 'geojson';
-import type { LngLatBoundsLike } from 'maplibre-gl';
-
 import { bbox } from '@turf/bbox';
 import { center as turfCenter } from '@turf/center';
 import { distance } from '@turf/distance';
@@ -24,16 +21,6 @@ export interface MapDataBoundsProps {
 const mapBoundsBufferMin = 1;
 const mapLimitsBufferMin = 10;
 
-// GeoJSON bounding boxes can have 6 items in the array; MapLibre only supports 4
-function isLngLatBoundsLike(input: unknown): input is LngLatBoundsLike {
-	return (
-		!!input &&
-		Array.isArray(input) &&
-		input.length === 4 &&
-		input.every((item) => typeof item === 'number')
-	);
-}
-
 function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureCollection {
 	return {
 		...featureCollection,
@@ -46,7 +33,7 @@ function getBufferedBbox(
 	explicitBuffer: number | undefined,
 	bufferPercentage: number,
 	minBuffer: number,
-): BBox | undefined {
+): [number, number, number, number] | undefined {
 	if (featureCollection.features.length === 0) return undefined;
 
 	const naturalBounds = bbox(featureCollection);
@@ -131,12 +118,11 @@ export function getMapBounds({
 		mapLimitsBufferMin,
 	);
 
-	if (bounds && maxBounds && isLngLatBoundsLike(bounds) && isLngLatBoundsLike(maxBounds)) {
-		return {
-			center: getTruncatedLngLat(center.geometry.coordinates),
-			bounds,
-			maxBounds,
-		};
-	}
-	return;
+	if (!bounds || !maxBounds) return;
+
+	return {
+		center: getTruncatedLngLat(center.geometry.coordinates),
+		bounds,
+		maxBounds,
+	};
 }

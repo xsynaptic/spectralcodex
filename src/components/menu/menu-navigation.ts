@@ -60,6 +60,15 @@ class NavMenu extends HTMLElement {
 		this.#lastPointerType = event.pointerType;
 	};
 
+	// Touch taps on an anchor menuitem: first tap opens, second tap navigates
+	#handleTouchAnchorClick(event: Event, li: HTMLElement, inTrigger: boolean) {
+		if (!inTrigger || li.dataset.open !== undefined) return;
+
+		event.preventDefault();
+		this.#closeSiblings(li);
+		this.#open(li);
+	}
+
 	#handleClick = (event: Event) => {
 		const target = event.target as Element;
 		const li = target.closest<HTMLElement>('li[data-has-submenu]');
@@ -75,13 +84,8 @@ class NavMenu extends HTMLElement {
 		const isTouch = this.#lastPointerType === 'touch';
 		const isAnchor = trigger instanceof HTMLAnchorElement;
 
-		// Touch taps on an anchor menuitem: first tap opens, second tap navigates
 		if (onTrigger && isTouch && isAnchor) {
-			if (inTrigger && li.dataset.open === undefined) {
-				event.preventDefault();
-				this.#closeSiblings(li);
-				this.#open(li);
-			}
+			this.#handleTouchAnchorClick(event, li, inTrigger);
 			return;
 		}
 

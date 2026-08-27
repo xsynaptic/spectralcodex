@@ -93,7 +93,7 @@ class BuildStatsChart extends HTMLElement {
 		this.#tooltip?.toggleAttribute('data-visible', false);
 	};
 
-	connectedCallback() {
+	#resolveElements() {
 		this.#svg = this.querySelector('svg') ?? undefined;
 		this.#crosshair = this.querySelector<SVGGElement>('[data-chart-crosshair]') ?? undefined;
 		this.#crosshairLine = this.querySelector<SVGLineElement>('[data-crosshair-line]') ?? undefined;
@@ -101,6 +101,10 @@ class BuildStatsChart extends HTMLElement {
 		this.#tooltip = this.querySelector<HTMLElement>('[data-chart-tooltip]') ?? undefined;
 		this.#tooltipDate = this.querySelector<HTMLElement>('[data-tooltip-date]') ?? undefined;
 		this.#tooltipRows = [...this.querySelectorAll<HTMLElement>('[data-tooltip-row]')];
+	}
+
+	connectedCallback() {
+		this.#resolveElements();
 
 		const data = this.querySelector('[data-chart-tooltips]')?.textContent;
 

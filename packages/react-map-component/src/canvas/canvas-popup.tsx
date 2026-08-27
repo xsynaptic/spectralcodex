@@ -93,6 +93,10 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	return url.href;
 }
 
+function getWikipediaHref(value: string) {
+	return value.includes('https://') ? value : `https://${value}`;
+}
+
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
 function getGoogleMapsHref(value: string) {
 	if (value.includes('://')) return value;
@@ -234,6 +238,53 @@ function useMapCanvasPopup() {
 	return { popupItem, isLoading };
 }
 
+const MapPopupFooter: FC<{
+	popupCoordinates: LngLat;
+	wikipediaUrl: string | undefined;
+	googleMapsUrl: string | undefined;
+}> = function MapPopupFooter({ popupCoordinates, wikipediaUrl, googleMapsUrl }) {
+	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
+	const mapsUrl = googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
+
+	return (
+		<div className="map-popup-footer">
+			<div
+				className="map-popup-coord"
+				onClick={() => {
+					void navigator.clipboard.writeText(coordinatesString);
+				}}
+			>
+				<div className="map-popup-coord-text">{coordinatesString}</div>
+				<svg xmlns="http://www.w3.org/2000/svg" className="map-popup-copy-icon" viewBox="0 0 24 24">
+					<use href={`#${MapSpritesEnum.Copy}`}></use>
+				</svg>
+			</div>
+			<div className="map-popup-links">
+				{wikipediaUrl ? (
+					<a href={getWikipediaHref(wikipediaUrl)} target="_blank">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							className="map-popup-link-icon map-popup-link-icon-wiki"
+						>
+							<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
+						</svg>
+					</a>
+				) : undefined}
+				<a href={getGoogleMapsHref(mapsUrl)} target="_blank">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 256 367"
+						className="map-popup-link-icon"
+					>
+						<use href={`#${MapSpritesEnum.Google}`}></use>
+					</svg>
+				</a>
+			</div>
+		</div>
+	);
+};
+
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
 	function MapPopupContent({ popupItem, imageServerUrl }) {
 		const isMobile = useMediaQuery({ below: mediaQueryMobile });
@@ -250,9 +301,6 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 			image,
 			popupCoordinates,
 		} = popupItem;
-
-		const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
-		const googleMapsUrl = popupItem.googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
 
 		return (
 			<>
@@ -297,52 +345,11 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: str
 							dangerouslySetInnerHTML={{ __html: description }}
 						/>
 					) : undefined}
-					<div className="map-popup-footer">
-						<div
-							className="map-popup-coord"
-							onClick={() => {
-								void navigator.clipboard.writeText(coordinatesString);
-							}}
-						>
-							<div className="map-popup-coord-text">{coordinatesString}</div>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="map-popup-copy-icon"
-								viewBox="0 0 24 24"
-							>
-								<use href={`#${MapSpritesEnum.Copy}`}></use>
-							</svg>
-						</div>
-						<div className="map-popup-links">
-							{wikipediaUrl ? (
-								<a
-									href={
-										wikipediaUrl.includes('https://') ? wikipediaUrl : `https://${wikipediaUrl}`
-									}
-									target="_blank"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										className="map-popup-link-icon map-popup-link-icon-wiki"
-									>
-										<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
-									</svg>
-								</a>
-							) : undefined}
-							{googleMapsUrl ? (
-								<a href={getGoogleMapsHref(googleMapsUrl)} target="_blank">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 256 367"
-										className="map-popup-link-icon"
-									>
-										<use href={`#${MapSpritesEnum.Google}`}></use>
-									</svg>
-								</a>
-							) : undefined}
-						</div>
-					</div>
+					<MapPopupFooter
+						popupCoordinates={popupCoordinates}
+						wikipediaUrl={wikipediaUrl}
+						googleMapsUrl={popupItem.googleMapsUrl}
+					/>
 				</div>
 			</>
 		);
