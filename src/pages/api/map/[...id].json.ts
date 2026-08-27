@@ -29,9 +29,9 @@ export const getStaticPaths = (async () => {
 	];
 
 	return [
-		{ params: { id: 'map-directory.json' }, props: { data: encodeMapSourceData(directory) } },
+		{ params: { id: 'map-directory' }, props: { data: encodeMapSourceData(directory) } },
 		...[...chunks].map(([chunkKey, popupItems]) => ({
-			params: { id: `${chunkKey}.json` },
+			params: { id: chunkKey },
 			props: { data: encodeMapPopupData(popupItems) },
 		})),
 		{
@@ -42,7 +42,7 @@ export const getStaticPaths = (async () => {
 			params: { id: `objectives/${MapApiDataEnum.Popup}` },
 			props: { data: encodeMapPopupData(objectivesPopupData ?? []) },
 		},
-		{ params: { id: 'map-manifest.json' }, props: { data: manifestUrls } },
+		{ params: { id: 'map-manifest' }, props: { data: manifestUrls } },
 	];
 }) satisfies GetStaticPaths;
 

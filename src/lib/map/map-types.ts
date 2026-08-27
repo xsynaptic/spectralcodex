@@ -7,10 +7,10 @@ import { z } from 'zod';
 import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { NumericScaleSchema } from '#lib/schemas/index.ts';
 
-// This is used to form map API endpoint URLs
+// Route params for `/api/map/[...id].json`
 export const MapApiDataEnum = {
-	Source: 's.json',
-	Popup: 'p.json',
+	Source: 's',
+	Popup: 'p',
 } as const;
 
 // Reserved for future runtime validation of map API payloads

@@ -219,8 +219,12 @@ export function getMapDataDedicated({
 
 	const sourceHash = hashMapSourceData(getLocationsMapSourceData(featureCollection));
 	const popupHash = hashMapPopupData(getLocationsMapPopupData(featureCollection));
-	const apiSourceUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Source}?v=${sourceHash}`);
-	const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}?v=${popupHash}`);
+	const apiSourceUrl = getBaseUrl(
+		'api/map',
+		mapId,
+		`${MapApiDataEnum.Source}.json?v=${sourceHash}`,
+	);
+	const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}.json?v=${popupHash}`);
 
 	return {
 		...defaultMapDataProps,
