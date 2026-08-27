@@ -48,7 +48,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Popups, clustering, filtering by objectives, and responsive design
 - Custom filter controls for adjusting what points are visible on the map
 - Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
-- Persistent storage of map data via IndexedDB
+- Persistent storage of map data via IndexedDB, keyed by build version so a deploy invalidates client-cached payloads instead of serving stale points
 - Distance-based discovery via nearby locations, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
 
 ### Search & Discovery
@@ -67,7 +67,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### User Experience
 
-- Native web components for interactive elements (dark mode toggle, reading progress, navigation loading bar, image carousels, pagination, search toggle, back-to-top button)
+- Native web components for interactive elements (dark mode toggle, reading progress, loading bar, navigation menu, image carousels, pagination, search toggle, back-to-top button)
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Custom CJK character handling and language-specific styling
 - Self-hosted variable fonts via Astro's fonts API
@@ -77,11 +77,10 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 - Programmatic OG image generation via [Takumi](https://takumi.kane.tw) and Sharp with multilingual font subsetting (Latin, CJK, Thai, Japanese), luminance-aware adaptive text color, and concurrent processing
 - Hierarchical deterministic fallback system for entries without a featured image
-- Digest-based caching; only regenerates when content or source image changes
+- Digest-based caching keyed on content, source image, and template version
 - Comprehensive meta tags and structured data
 - Custom sitemap integration with accurate per-URL `lastmod` dates derived from git commit history, so change dates survive content moves and rebuilds
 - Full RSS feeds with server-side rendered MDX content via Astro's Container API
-- Webmention support via [webmention.io](https://webmention.io/) (optional, env-gated)
 
 ### Analytics
 
@@ -112,7 +111,7 @@ Deployment is handled by custom TypeScript scripts. These are specific to this p
 4. Related content generation (semantic similarity)
 5. Sitemap `lastmod` generation from git commit history
 6. Astro production build
-7. OG image generation with Satori and Sharp (reads built HTML)
+7. OG image generation with Takumi and Sharp (reads built HTML)
 8. E2E smoke tests
 9. Media sync to remote storage
 10. Static file transfer via rsync
