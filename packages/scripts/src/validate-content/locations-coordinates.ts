@@ -18,11 +18,9 @@ async function loadRegionGeometry(
 	const fgbPath = path.join(divisionsPath, `${regionId}.fgb`);
 
 	try {
-		// Read FGB file as buffer
 		const buffer = await fs.readFile(fgbPath);
 		const uint8Array = new Uint8Array(buffer);
 
-		// Create ReadableStream using Web API
 		const stream = new ReadableStream<Uint8Array>({
 			start(controller) {
 				controller.enqueue(uint8Array);
@@ -30,7 +28,6 @@ async function loadRegionGeometry(
 			},
 		});
 
-		// Deserialize FlatGeobuf to GeoJSON features
 		const featuresIterator = geojson.deserialize(stream);
 		const features: Array<Feature<Polygon | MultiPolygon>> = [];
 
@@ -63,6 +60,42 @@ function isPointInRegion(
 	return false;
 }
 
+// A missing FGB file disqualifies that region for the whole run
+function createRegionGeometryLoader(divisionsPath: string) {
+	const cache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
+	const missingRegions = new Set<string>();
+
+	async function getRegionFeatures(regionId: string, reportMissing: boolean) {
+		if (missingRegions.has(regionId)) return;
+
+		const cached = cache.get(regionId);
+
+		if (cached) return cached;
+
+		try {
+			const features = await loadRegionGeometry(regionId, divisionsPath);
+
+			cache.set(regionId, features);
+
+			return features;
+		} catch {
+			if (reportMissing) {
+				console.log(
+					chalk.yellow(
+						`⚠️  ${regionId}: could not load FGB file, skipping all other locations in this region`,
+					),
+				);
+			}
+
+			missingRegions.add(regionId);
+
+			return;
+		}
+	}
+
+	return { getRegionFeatures, missingRegions };
+}
+
 export async function checkLocationsCoordinates(
 	entries: Array<DataStoreEntry>,
 	divisionsPath: string,
@@ -71,72 +104,41 @@ export async function checkLocationsCoordinates(
 	let missingFgbCount = 0;
 	let checkedCount = 0;
 
-	// Cache loaded region geometries to avoid re-reading files
-	const regionGeometryCache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
-
-	// Track regions with missing FGB files to skip them entirely
-	const missingFgbRegions = new Set<string>();
+	const { getRegionFeatures, missingRegions } = createRegionGeometryLoader(divisionsPath);
 
 	for (const entry of entries) {
 		if (entry.data.skipCoordinateCheck === true) continue;
 
 		const regions = toReferenceIds(entry.data.regions);
 
-		// Parse geometry coordinates
 		const geometryResult = LocationGeometrySchema.safeParse(entry.data.geometry);
 
 		if (!geometryResult.success) {
 			continue;
 		}
 
-		// Normalize geometry to array format
 		const geometries = Array.isArray(geometryResult.data)
 			? geometryResult.data
 			: [geometryResult.data];
 
-		// Load region geometries for all assigned regions
 		const validRegions: Array<string> = [];
 		const allRegionFeatures: Array<Feature<Polygon | MultiPolygon>> = [];
 
 		for (const region of regions) {
-			// Skip if we already know this region's FGB file is missing
-			if (missingFgbRegions.has(region)) {
-				continue;
-			}
+			// Only warn when the entry has no other region to check against
+			const regionFeatures = await getRegionFeatures(region, regions.length === 1);
 
-			let regionFeatures: Array<Feature<Polygon | MultiPolygon>>;
-
-			if (regionGeometryCache.has(region)) {
-				regionFeatures = regionGeometryCache.get(region)!;
-			} else {
-				try {
-					regionFeatures = await loadRegionGeometry(region, divisionsPath);
-					regionGeometryCache.set(region, regionFeatures);
-				} catch {
-					if (regions.length === 1) {
-						// Only report warning if this is the only region
-						console.log(
-							chalk.yellow(
-								`⚠️  ${region}: could not load FGB file, skipping all other locations in this region`,
-							),
-						);
-					}
-					missingFgbRegions.add(region);
-					continue;
-				}
-			}
+			if (!regionFeatures) continue;
 
 			validRegions.push(region);
 			allRegionFeatures.push(...regionFeatures);
 		}
 
-		// Skip if no valid regions found
 		if (validRegions.length === 0) {
 			missingFgbCount++;
 			continue;
 		}
 
-		// Check each coordinate against all valid regions
 		let hasInvalidCoordinate = false;
 
 		for (const geometry of geometries) {
@@ -170,10 +172,10 @@ export async function checkLocationsCoordinates(
 		return false;
 	}
 	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
-	if (missingFgbRegions.size > 0) {
+	if (missingRegions.size > 0) {
 		console.log(
 			chalk.gray(
-				`Missing FGB regions: ${[...missingFgbRegions].sort((regionA, regionB) => regionA.localeCompare(regionB)).join(', ')}`,
+				`Missing FGB regions: ${[...missingRegions].sort((regionA, regionB) => regionA.localeCompare(regionB)).join(', ')}`,
 			),
 		);
 	}

@@ -67,7 +67,7 @@ function getImageFeaturedData({
 	};
 }
 
-// Static metadata for index pages, keyed by the OG image filename Astro emits
+// Keyed by the OG image filename Astro emits
 export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
 		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
@@ -99,7 +99,60 @@ export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	return entries;
 }
 
-// Build a map from OG image filename (entry id) to fully-resolved entry derived from the data store
+const TitleOverrideSchema = z
+	.object({
+		title: z.string().optional(),
+		title_zh: z.string().optional(),
+		title_ja: z.string().optional(),
+		title_th: z.string().optional(),
+	})
+	.optional();
+
+type TitleOverride = z.infer<typeof TitleOverrideSchema>;
+
+function parseTitleOverride(collection: string, data: Record<string, unknown>): TitleOverride {
+	if (collection !== ContentCollectionsEnum.Locations) return undefined;
+
+	return TitleOverrideSchema.parse(data.override);
+}
+
+// `undefined` marks an entry that gets no OG image at all
+function resolveEntryTitle({
+	collection,
+	id,
+	data,
+	override,
+}: {
+	collection: string;
+	id: string;
+	data: Record<string, unknown>;
+	override: TitleOverride;
+}): string | undefined {
+	if (collection === ContentCollectionsEnum.Chronology) return getChronologyTitle(id);
+
+	const title = override?.title ?? z.string().optional().parse(data.title);
+
+	if (!title) return undefined;
+
+	// A resource without `showPage` has no page, so no OG image
+	if (collection === ContentCollectionsEnum.Resources && !data.showPage) return undefined;
+
+	return title;
+}
+
+function parseOptionalString(value: unknown) {
+	return z.string().optional().parse(value);
+}
+
+function getMultilingualTitles(data: Record<string, unknown>, override: TitleOverride) {
+	return {
+		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
+		titleJa: parseOptionalString(override?.title_ja ?? data.title_ja),
+		titleTh: parseOptionalString(override?.title_th ?? data.title_th),
+	};
+}
+
+// Keyed by the OG image filename, same as the index entries
 function buildDataStoreEntries(dataStorePath: string): {
 	entries: Map<string, OpenGraphContentEntry>;
 	chronologyImageIndex: Map<string, string>;
@@ -116,33 +169,11 @@ function buildDataStoreEntries(dataStorePath: string): {
 		for (const entry of collectionEntries) {
 			if (!entry.digest) continue;
 
-			const override =
-				collection === ContentCollectionsEnum.Locations
-					? z
-							.object({
-								title: z.string().optional(),
-								title_zh: z.string().optional(),
-								title_ja: z.string().optional(),
-								title_th: z.string().optional(),
-							})
-							.optional()
-							.parse(entry.data.override)
-					: undefined;
-
 			const id = getPublicId(entry).replace('/', '-');
-			const titleRaw = override?.title ?? z.string().optional().parse(entry.data.title);
+			const override = parseTitleOverride(collection, entry.data);
+			const title = resolveEntryTitle({ collection, id, data: entry.data, override });
 
-			let title = titleRaw;
-
-			if (collection === ContentCollectionsEnum.Chronology) {
-				title = getChronologyTitle(id);
-			} else if (collection === ContentCollectionsEnum.Resources) {
-				if (!title || !('showPage' in entry.data) || !entry.data.showPage) {
-					continue;
-				}
-			} else if (!title) {
-				continue;
-			}
+			if (title === undefined) continue;
 
 			const imageFeaturedData = getImageFeaturedData({
 				entry,
@@ -156,18 +187,7 @@ function buildDataStoreEntries(dataStorePath: string): {
 				id,
 				digest: entry.digest,
 				title: stripDiacritics(title),
-				titleZh: z
-					.string()
-					.optional()
-					.parse(override?.title_zh ?? entry.data.title_zh),
-				titleJa: z
-					.string()
-					.optional()
-					.parse(override?.title_ja ?? entry.data.title_ja),
-				titleTh: z
-					.string()
-					.optional()
-					.parse(override?.title_th ?? entry.data.title_th),
+				...getMultilingualTitles(entry.data, override),
 				...imageFeaturedData,
 			});
 		}
@@ -176,7 +196,6 @@ function buildDataStoreEntries(dataStorePath: string): {
 	return { entries, chronologyImageIndex };
 }
 
-// Walk built HTML files and extract the set of OG image filenames referenced
 export function extractBuiltFilenames(distPath: string): Set<string> {
 	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
 	const ogPathSegment = `/${openGraphBasePath}/`;
@@ -219,12 +238,7 @@ export function extractBuiltFilenames(distPath: string): Set<string> {
 	return filenames;
 }
 
-/**
- * Resolve a filename emitted by Astro to a full OG entry in this order:
- * 1) data-store.json
- * 2) static index entries
- * 3) synthesize chronology IDs for any remaining `YYYY` or `YYYY-MM` pattern
- */
+// Resolution order: data store, then static index entries, then synthesized chronology ids
 export function resolveEntry({
 	filename,
 	dataStoreEntries,
@@ -244,7 +258,6 @@ export function resolveEntry({
 
 	if (fromIndex) return fromIndex;
 
-	// Synthesize chronology IDs for any remaining `YYYY` or `YYYY-MM` pattern
 	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
 		const derivedImageId = chronologyImageIndex.get(filename);
 
@@ -266,10 +279,7 @@ export function resolveEntry({
 	return undefined;
 }
 
-/**
- * Enumerate OG image entries by reading the rendered dist output
- * We treat built HTML as the source of truth for which OG images should exist
- */
+// Built HTML is the source of truth for which OG images should exist
 export function getBuiltEntries({
 	dataStorePath,
 	distPath,

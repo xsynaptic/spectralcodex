@@ -52,7 +52,6 @@ const { values } = parseArgs({
 	},
 });
 
-// Collections that may contain external links
 const linkCollections = ['locations', 'pages', 'posts', 'regions', 'resources', 'themes'] as const;
 
 const dataStorePath = path.resolve(rootPath, dataStoreRelativePath);
@@ -96,26 +95,7 @@ process.on('SIGINT', () => {
 	console.log(chalk.yellow('\nShutting down... waiting for in-flight requests'));
 });
 
-try {
-	openDatabase(dbPath);
-
-	// Status-only mode: --status
-	if (values.status) {
-		printStatus();
-		closeDatabase();
-		process.exit(0);
-	}
-
-	// List mode: --list or --list=redirect,missing,...
-	if (values.list !== undefined) {
-		const filter = values.list === '' ? undefined : values.list;
-
-		printStatus();
-		printList(filter);
-		closeDatabase();
-		process.exit(0);
-	}
-
+function syncLinks() {
 	console.log(chalk.blue('Loading data store...'));
 
 	const { collections } = loadDataStore(dataStorePath);
@@ -134,7 +114,6 @@ try {
 
 			allEntryDigests.push({ contentId, digest });
 
-			// Skip extraction if digest hasn't changed
 			if (digest && getEntryDigest(contentId) === digest) {
 				skipped++;
 				continue;
@@ -161,8 +140,28 @@ try {
 			`Synced ${String(extractedEntries.size)} entries (${String(skipped)} unchanged). ${String(orphanedUrls)} orphaned URLs pruned.`,
 		),
 	);
+}
 
-	// === Check phase ===
+try {
+	openDatabase(dbPath);
+
+	if (values.status) {
+		printStatus();
+		closeDatabase();
+		process.exit(0);
+	}
+
+	if (values.list !== undefined) {
+		const filter = values.list === '' ? undefined : values.list;
+
+		printStatus();
+		printList(filter);
+		closeDatabase();
+		process.exit(0);
+	}
+
+	syncLinks();
+
 	const recheckFilter =
 		values.recheck && values.recheck !== ''
 			? { recheckStatuses: values.recheck.split(',') as Array<UrlStatus> }
@@ -227,7 +226,6 @@ try {
 					issueCount++;
 				}
 
-				// Log issues, recoveries, and periodic progress
 				const isIssue =
 					result.status !== UrlStatusEnum.Healthy && result.status !== UrlStatusEnum.Blocked;
 				const isRecovery =
