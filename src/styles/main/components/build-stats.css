@@ -7,6 +7,7 @@
 	--bs-duration: light-dark(var(--color-accent-500), var(--color-accent-400));
 	--bs-pages: light-dark(var(--color-highlight-500), var(--color-highlight-400));
 
+	position: relative;
 	display: block;
 	font-family: var(--font-sans);
 	font-size: var(--text-base);
@@ -18,16 +19,26 @@
 	margin-block-start: calc(var(--spacing) * 8);
 }
 
-/* Anchors the absolutely positioned tooltip */
+/* Bleeds past the page padding so a scrolled plot runs off the edge rather than ending at a hard crop */
 .bs-frame {
-	position: relative;
+	margin-inline-end: calc(var(--spacing) * -4);
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scrollbar-color: light-dark(
+			color-mix(in srgb, var(--color-primary-400) 40%, transparent),
+			color-mix(in srgb, var(--color-primary-500) 45%, transparent)
+		)
+		transparent;
+	scrollbar-width: thin;
+
+	@media (width >= 48rem) {
+		margin-inline-end: calc(var(--spacing) * -8);
+	}
 }
 
-/* Scales to whatever column it lands in; nothing here may force the page to scroll */
+/* Sized by its own width and height attributes; scaling down to a phone puts every tick label below legibility */
 .bs-plot {
 	display: block;
-	width: 100%;
-	height: auto;
 	font-family: var(--font-sans);
 }
 

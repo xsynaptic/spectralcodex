@@ -113,20 +113,20 @@ const tooltipData = JSON.stringify(points)
 				fill="transparent"
 				data-chart-hit></rect>
 		</svg>
-		<div class="bs-tooltip" data-chart-tooltip>
-			<div class="bs-tooltip-date" data-tooltip-date></div>
-			{
-				tooltipRows.map((row) => (
-					<div class="bs-tooltip-row" data-tooltip-row>
-						<span class="bs-tooltip-key">
-							<span class:list={['bs-swatch', `bs-swatch-${row.series}`]} />
-							{row.label}
-						</span>
-						<b data-tooltip-value />
-					</div>
-				))
-			}
-		</div>
-		<script type="application/json" data-chart-tooltips is:inline set:html={tooltipData} />
 	</div>
+	<div class="bs-tooltip" data-chart-tooltip>
+		<div class="bs-tooltip-date" data-tooltip-date></div>
+		{
+			tooltipRows.map((row) => (
+				<div class="bs-tooltip-row" data-tooltip-row>
+					<span class="bs-tooltip-key">
+						<span class:list={['bs-swatch', `bs-swatch-${row.series}`]} />
+						{row.label}
+					</span>
+					<b data-tooltip-value />
+				</div>
+			))
+		}
+	</div>
+	<script type="application/json" data-chart-tooltips is:inline set:html={tooltipData} />
 </build-stats-chart>

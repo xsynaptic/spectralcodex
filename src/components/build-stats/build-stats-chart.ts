@@ -75,10 +75,10 @@ class BuildStatsChart extends HTMLElement {
 		this.#showTooltip(point);
 
 		if (this.#tooltip) {
+			const left = box.left - this.getBoundingClientRect().left + point.x * scale;
 			// Nudged back only where it would otherwise hang off the window and widen the page
-			const left = point.x * scale;
 			const halfWidth = this.#tooltip.offsetWidth / 2;
-			const center = box.left + left;
+			const center = box.left + point.x * scale;
 			const overflowRight =
 				center + halfWidth + tooltipEdgeGap - document.documentElement.clientWidth;
 			const overflowLeft = tooltipEdgeGap - (center - halfWidth);
