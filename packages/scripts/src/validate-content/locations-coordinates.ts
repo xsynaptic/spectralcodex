@@ -96,6 +96,99 @@ function createRegionGeometryLoader(divisionsPath: string) {
 	return { getRegionFeatures, missingRegions };
 }
 
+type RegionFeatures = Array<Feature<Polygon | MultiPolygon>>;
+
+function getEntryGeometries(entry: DataStoreEntry) {
+	const result = LocationGeometrySchema.safeParse(entry.data.geometry);
+
+	if (!result.success) return;
+
+	return Array.isArray(result.data) ? result.data : [result.data];
+}
+
+async function collectRegionFeatures(
+	regions: Array<string>,
+	getRegionFeatures: (
+		regionId: string,
+		reportMissing: boolean,
+	) => Promise<RegionFeatures | undefined>,
+) {
+	const validRegions: Array<string> = [];
+	const features: RegionFeatures = [];
+
+	for (const region of regions) {
+		// Only warn when the entry has no other region to check against
+		const regionFeatures = await getRegionFeatures(region, regions.length === 1);
+
+		if (!regionFeatures) continue;
+
+		validRegions.push(region);
+		features.push(...regionFeatures);
+	}
+
+	return { validRegions, features };
+}
+
+function reportEntryMismatches(
+	entry: DataStoreEntry,
+	geometries: Array<{ coordinates: [number, number] }>,
+	features: RegionFeatures,
+	validRegions: Array<string>,
+): boolean {
+	let hasMismatch = false;
+
+	for (const { coordinates } of geometries) {
+		if (isPointInRegion(coordinates, features)) continue;
+
+		console.log(
+			chalk.red(
+				`❌ ${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
+			),
+		);
+		hasMismatch = true;
+	}
+
+	return hasMismatch;
+}
+
+function reportResults({
+	checkedCount,
+	mismatchCount,
+	missingFgbCount,
+	missingRegions,
+}: {
+	checkedCount: number;
+	mismatchCount: number;
+	missingFgbCount: number;
+	missingRegions: Set<string>;
+}): boolean {
+	if (checkedCount === 0) {
+		console.log(chalk.yellow('⚠️  No locations could be checked'));
+
+		return false;
+	}
+
+	if (mismatchCount === 0) {
+		console.log(
+			chalk.green(
+				`✓ ${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
+			),
+		);
+
+		return true;
+	}
+
+	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
+
+	if (missingRegions.size > 0) {
+		const sorted = [...missingRegions].sort((regionA, regionB) => regionA.localeCompare(regionB));
+
+		console.log(chalk.gray(`Missing FGB regions: ${sorted.join(', ')}`));
+	}
+
+	return false;
+}
+
 export async function checkLocationsCoordinates(
 	entries: Array<DataStoreEntry>,
 	divisionsPath: string,
@@ -109,75 +202,22 @@ export async function checkLocationsCoordinates(
 	for (const entry of entries) {
 		if (entry.data.skipCoordinateCheck === true) continue;
 
+		const geometries = getEntryGeometries(entry);
+
+		if (!geometries) continue;
+
 		const regions = toReferenceIds(entry.data.regions);
-
-		const geometryResult = LocationGeometrySchema.safeParse(entry.data.geometry);
-
-		if (!geometryResult.success) {
-			continue;
-		}
-
-		const geometries = Array.isArray(geometryResult.data)
-			? geometryResult.data
-			: [geometryResult.data];
-
-		const validRegions: Array<string> = [];
-		const allRegionFeatures: Array<Feature<Polygon | MultiPolygon>> = [];
-
-		for (const region of regions) {
-			// Only warn when the entry has no other region to check against
-			const regionFeatures = await getRegionFeatures(region, regions.length === 1);
-
-			if (!regionFeatures) continue;
-
-			validRegions.push(region);
-			allRegionFeatures.push(...regionFeatures);
-		}
+		const { validRegions, features } = await collectRegionFeatures(regions, getRegionFeatures);
 
 		if (validRegions.length === 0) {
 			missingFgbCount++;
 			continue;
 		}
 
-		let hasInvalidCoordinate = false;
+		if (reportEntryMismatches(entry, geometries, features, validRegions)) mismatchCount++;
 
-		for (const geometry of geometries) {
-			const coordinates = geometry.coordinates;
-			const isInside = isPointInRegion(coordinates, allRegionFeatures);
-
-			if (!isInside) {
-				console.log(
-					chalk.red(
-						`❌ ${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
-					),
-				);
-				hasInvalidCoordinate = true;
-			}
-		}
-
-		if (hasInvalidCoordinate) mismatchCount++;
 		checkedCount++;
 	}
 
-	if (mismatchCount === 0 && checkedCount > 0) {
-		console.log(
-			chalk.green(
-				`✓ ${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
-			),
-		);
-		return true;
-	}
-	if (checkedCount === 0) {
-		console.log(chalk.yellow('⚠️  No locations could be checked'));
-		return false;
-	}
-	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
-	if (missingRegions.size > 0) {
-		console.log(
-			chalk.gray(
-				`Missing FGB regions: ${[...missingRegions].sort((regionA, regionB) => regionA.localeCompare(regionB)).join(', ')}`,
-			),
-		);
-	}
-	return false;
+	return reportResults({ checkedCount, mismatchCount, missingFgbCount, missingRegions });
 }

@@ -3,9 +3,14 @@ import { z } from 'zod';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-// Title fields to check for duplicates (kept DRY as array)
-const titleFields = ['title', 'title_zh', 'title_ja'] as const;
-const addressFields = ['address', 'address_zh', 'address_ja'] as const;
+const duplicateFields = [
+	'title',
+	'title_zh',
+	'title_ja',
+	'address',
+	'address_zh',
+	'address_ja',
+] as const;
 
 function getGoogleMapsLink(links: unknown): string | undefined {
 	const parsed = z
@@ -25,71 +30,47 @@ function getGoogleMapsLink(links: unknown): string | undefined {
 	return;
 }
 
-export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
-	const titles = new Map<string, Set<string>>(); // field -> values
-	const addresses = new Map<string, Set<string>>(); // field -> values
-	const googleMapsLinks = new Set<string>();
+// Records the value as seen, so the first occurrence is never the duplicate
+function isDuplicate(seen: Set<string>, value: string): boolean {
+	if (seen.has(value)) return true;
 
-	for (const field of titleFields) {
-		titles.set(field, new Set());
-	}
-	for (const field of addressFields) {
-		addresses.set(field, new Set());
-	}
+	seen.add(value);
+
+	return false;
+}
+
+export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
+	const seenByField = new Map(duplicateFields.map((field) => [field, new Set<string>()]));
+	const seenGoogleMapsLinks = new Set<string>();
 
 	let duplicateCount = 0;
 
 	for (const entry of entries) {
-		// Check title fields
-		for (const field of titleFields) {
+		for (const field of duplicateFields) {
 			const value = entry.data[field];
 
-			if (typeof value === 'string') {
-				const titleSet = titles.get(field)!;
+			if (typeof value !== 'string') continue;
+			if (!isDuplicate(seenByField.get(field)!, value)) continue;
 
-				if (titleSet.has(value)) {
-					console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
-					duplicateCount++;
-				} else {
-					titleSet.add(value);
-				}
-			}
+			console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
+			duplicateCount++;
 		}
 
-		// Check address fields
-		for (const field of addressFields) {
-			const value = entry.data[field];
-
-			if (typeof value === 'string') {
-				const addressSet = addresses.get(field)!;
-
-				if (addressSet.has(value)) {
-					console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
-					duplicateCount++;
-				} else {
-					addressSet.add(value);
-				}
-			}
-		}
-
-		// Check Google Maps link
 		const googleMapsLink = getGoogleMapsLink(entry.data.links);
 
-		if (googleMapsLink) {
-			if (googleMapsLinks.has(googleMapsLink)) {
-				console.log(chalk.red(`❌ ${entry.id}: duplicate Google Maps link "${googleMapsLink}"`));
-				duplicateCount++;
-			} else {
-				googleMapsLinks.add(googleMapsLink);
-			}
+		if (googleMapsLink && isDuplicate(seenGoogleMapsLinks, googleMapsLink)) {
+			console.log(chalk.red(`❌ ${entry.id}: duplicate Google Maps link "${googleMapsLink}"`));
+			duplicateCount++;
 		}
 	}
 
 	if (duplicateCount === 0) {
 		console.log(chalk.green(`✓ No duplicates found (checked ${String(entries.length)} locations)`));
+
 		return true;
 	}
 
 	console.log(chalk.yellow(`⚠️  Found ${String(duplicateCount)} duplicate(s)`));
+
 	return false;
 }

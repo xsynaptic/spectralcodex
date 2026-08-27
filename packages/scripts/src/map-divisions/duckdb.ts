@@ -76,6 +76,82 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 	return bboxVariablesSql + query + ';';
 }
 
+interface DivisionRow {
+	areaId: string;
+	parentDivisionId: string;
+	geometryGeojson: string;
+}
+
+async function readCachedDivisions(divisionIds: Set<string>, cachePath: string) {
+	const cached = new Map<string, DivisionItem>();
+	const uncachedIds = new Set<string>();
+
+	for (const divisionId of divisionIds) {
+		const item = await getDivisionDataCache(divisionId, cachePath);
+
+		if (item) {
+			console.log(chalk.gray(`  Using cached data for ${chalk.cyan(divisionId)}`));
+			cached.set(divisionId, item);
+		} else {
+			uncachedIds.add(divisionId);
+		}
+	}
+
+	return { cached, uncachedIds };
+}
+
+async function runDivisionQuery(db: DuckDBConnection, query: string): Promise<Array<DivisionRow>> {
+	console.log(chalk.blue(`Running query against Overture Maps...`));
+
+	try {
+		const result = await db.run(query);
+
+		console.log(chalk.green(`Found ${chalk.cyan(String(result.rowCount))} rows`));
+
+		const rows: Array<DivisionRow> = [];
+
+		for (let index = 0; index < result.chunkCount; index++) {
+			for (const row of result.getChunk(index).getRows()) {
+				rows.push({
+					areaId: row[0] as string,
+					parentDivisionId: row[1] as string,
+					geometryGeojson: row[2] as string,
+				});
+			}
+		}
+
+		return rows;
+	} catch (error) {
+		console.log(chalk.red(`\nQuery failed`));
+		console.error(chalk.red(`Error fetching batch data:`), error);
+		throw error;
+	}
+}
+
+function parseDivisionGeometry(row: DivisionRow, id: string): DivisionGeometry | undefined {
+	try {
+		const geometry = JSON.parse(row.geometryGeojson) as Geometry;
+
+		if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') return geometry;
+
+		return;
+	} catch (error) {
+		console.warn(chalk.yellow(`Failed to parse geometry for ${chalk.cyan(id)}:`), error);
+
+		return;
+	}
+}
+
+async function cacheDivisionGeometry(id: string, geometry: DivisionGeometry, cachePath: string) {
+	try {
+		await saveDivisionDataCache(id, geometry, cachePath);
+
+		console.log(chalk.gray(`  Cached ${chalk.cyan(id)}`));
+	} catch (error) {
+		console.warn(chalk.yellow(`Failed to cache ${chalk.cyan(id)}:`), error);
+	}
+}
+
 export async function fetchDivisionData({
 	db,
 	divisionIds,
@@ -95,23 +171,9 @@ export async function fetchDivisionData({
 		),
 	);
 
-	// Check cache for each division ID first
-	const divisionsById = new Map<string, DivisionItem>();
-	const uncachedDivisionIds = new Set<string>();
+	const { cached: divisionsById, uncachedIds } = await readCachedDivisions(divisionIds, cachePath);
 
-	for (const divisionId of divisionIds) {
-		const cached = await getDivisionDataCache(divisionId, cachePath);
-
-		if (cached) {
-			console.log(chalk.gray(`  Using cached data for ${chalk.cyan(divisionId)}`));
-			divisionsById.set(divisionId, cached);
-		} else {
-			uncachedDivisionIds.add(divisionId);
-		}
-	}
-
-	// If all divisions are cached, return early
-	if (uncachedDivisionIds.size === 0) {
+	if (uncachedIds.size === 0) {
 		console.log(
 			chalk.green(`All ${chalk.cyan(String(divisionIds.size))} divisions found in cache`),
 		);
@@ -121,84 +183,34 @@ export async function fetchDivisionData({
 
 	console.log(
 		chalk.blue(
-			`Fetching ${chalk.cyan(String(uncachedDivisionIds.size))} uncached divisions from Overture Maps...`,
+			`Fetching ${chalk.cyan(String(uncachedIds.size))} uncached divisions from Overture Maps...`,
 		),
 	);
 
-	const query = buildQuery(overtureUrl, uncachedDivisionIds, selectionBBox);
+	const rows = await runDivisionQuery(db, buildQuery(overtureUrl, uncachedIds, selectionBBox));
 
-	console.log(chalk.blue(`Running query against Overture Maps...`));
+	console.log(chalk.green(`Found ${chalk.cyan(String(rows.length))} total divisions`));
 
-	try {
-		const result = await db.run(query);
-
-		console.log(chalk.green(`Found ${chalk.cyan(String(result.rowCount))} rows`));
-
-		// Extract data from DuckDB result using getChunk
-		const rows: Array<{ areaId: string; parentDivisionId: string; geometryGeojson: string }> = [];
-
-		for (let i = 0; i < result.chunkCount; i++) {
-			const chunk = result.getChunk(i);
-			const rowArrays = chunk.getRows();
-
-			for (const row of rowArrays) {
-				rows.push({
-					areaId: row[0] as string,
-					parentDivisionId: row[1] as string,
-					geometryGeojson: row[2] as string,
-				});
-			}
-		}
-
-		console.log(chalk.green(`Found ${chalk.cyan(String(rows.length))} total divisions`));
-
-		if (rows.length === 0) {
-			console.warn(chalk.yellow(`No division data found for any division IDs`));
-
-			return divisionsById;
-		}
-
-		// Process fetched data and add to cache
-		for (const [index, row] of rows.entries()) {
-			// Key results and cache by the ID from content, whichever column it matched
-			const id = uncachedDivisionIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
-
-			// Log found matches for debugging
-			console.log(chalk.gray(`  Match ${chalk.cyan(String(index + 1))}: ${chalk.cyan(id)}`));
-
-			// Parse the GeoJSON geometry string
-			let geometry: Geometry | undefined;
-
-			try {
-				geometry = JSON.parse(row.geometryGeojson) as Geometry;
-			} catch (error) {
-				console.warn(chalk.yellow(`Failed to parse geometry for ${chalk.cyan(id)}:`), error);
-				geometry = undefined;
-			}
-
-			if (geometry && ['MultiPolygon', 'Polygon'].includes(geometry.type)) {
-				const divisionItem = {
-					divisionId: id,
-					geometry: geometry as DivisionGeometry,
-				};
-
-				divisionsById.set(id, divisionItem);
-
-				// Save to cache
-				try {
-					await saveDivisionDataCache(id, geometry as DivisionGeometry, cachePath);
-
-					console.log(chalk.gray(`  Cached ${chalk.cyan(id)}`));
-				} catch (error) {
-					console.warn(chalk.yellow(`Failed to cache ${chalk.cyan(id)}:`), error);
-				}
-			}
-		}
+	if (rows.length === 0) {
+		console.warn(chalk.yellow(`No division data found for any division IDs`));
 
 		return divisionsById;
-	} catch (error) {
-		console.log(chalk.red(`\nQuery failed`));
-		console.error(chalk.red(`Error fetching batch data:`), error);
-		throw error;
 	}
+
+	for (const [index, row] of rows.entries()) {
+		// Key results and cache by the ID from content, whichever column it matched
+		const id = uncachedIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
+
+		console.log(chalk.gray(`  Match ${chalk.cyan(String(index + 1))}: ${chalk.cyan(id)}`));
+
+		const geometry = parseDivisionGeometry(row, id);
+
+		if (!geometry) continue;
+
+		divisionsById.set(id, { divisionId: id, geometry });
+
+		await cacheDivisionGeometry(id, geometry, cachePath);
+	}
+
+	return divisionsById;
 }

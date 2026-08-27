@@ -22,44 +22,30 @@ async function isShallowRepository(cwd: string): Promise<boolean> {
 	return result.stdout.trim() === 'true';
 }
 
-/**
- * Map each git-tracked file to its most recent commit date
- * Keys are paths as git prints them, relative to the repo root (not `cwd`); use `keyPrefix` to rebase them
- */
-export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map<string, string>> {
-	const { cwd, pathspec, keyPrefix } = options;
-	const dateFormat = options.date === 'author' ? '%aI' : '%cI';
-	const onShallow = options.onShallow ?? 'throw';
+async function warnOrThrowOnShallow(cwd: string, onShallow: 'throw' | 'warn' | 'ignore') {
+	if (onShallow === 'ignore' || !(await isShallowRepository(cwd))) return;
 
-	if (onShallow !== 'ignore' && (await isShallowRepository(cwd))) {
-		const message =
-			'Shallow clone detected: git history is truncated, so file dates will be missing or wrong. Fetch full history first (`git fetch --unshallow`, or checkout with fetch-depth 0).';
+	const message =
+		'Shallow clone detected: git history is truncated, so file dates will be missing or wrong. Fetch full history first (`git fetch --unshallow`, or checkout with fetch-depth 0).';
 
-		if (onShallow === 'throw') {
-			throw new Error(message);
-		}
+	if (onShallow === 'throw') throw new Error(message);
 
-		console.warn(message);
-	}
+	console.warn(message);
+}
 
-	let pathspecArgs: Array<string> = [];
+function toPathspecArgs(pathspec: string | Array<string> | undefined): Array<string> {
+	if (pathspec === undefined) return [];
 
-	if (Array.isArray(pathspec)) {
-		pathspecArgs = pathspec;
-	} else if (pathspec !== undefined) {
-		pathspecArgs = [pathspec];
-	}
+	return Array.isArray(pathspec) ? pathspec : [pathspec];
+}
 
-	const result = await $({
-		cwd,
-	})`git log --name-only --pretty=format:${dateLineMarker + dateFormat} -- ${pathspecArgs}`;
-
+function parseFileDates(stdout: string, keyPrefix: string | undefined): Map<string, string> {
 	const fileDates = new Map<string, string>();
 
 	let currentDate = '';
 
 	// Log is newest-first, so the first date seen for a file wins
-	for (const line of result.stdout.split('\n')) {
+	for (const line of stdout.split('\n')) {
 		if (line.startsWith(dateLineMarker)) {
 			currentDate = line.slice(dateLineMarker.length);
 			continue;
@@ -75,4 +61,20 @@ export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map
 	}
 
 	return fileDates;
+}
+
+// Keys are paths as git prints them, relative to the repo root (not `cwd`); use `keyPrefix` to rebase them
+export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map<string, string>> {
+	const { cwd, pathspec, keyPrefix } = options;
+	const dateFormat = options.date === 'author' ? '%aI' : '%cI';
+
+	await warnOrThrowOnShallow(cwd, options.onShallow ?? 'throw');
+
+	const pathspecArgs = toPathspecArgs(pathspec);
+
+	const result = await $({
+		cwd,
+	})`git log --name-only --pretty=format:${dateLineMarker + dateFormat} -- ${pathspecArgs}`;
+
+	return parseFileDates(result.stdout, keyPrefix);
 }

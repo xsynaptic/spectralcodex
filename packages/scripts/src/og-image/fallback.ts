@@ -1,6 +1,4 @@
-/**
- * Deterministically pick an item from an array based on a string ID
- */
+// Deterministic pick, so the same ID always resolves to the same option
 function pickFrom(id: string, options: ReadonlyArray<string>): string {
 	if (options.length === 1) return options[0]!;
 
@@ -11,10 +9,7 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 	return options[hash % options.length]!;
 }
 
-/**
- * Single source of truth for fallback image IDs
- * Consumed by media-orphans and og-image scripts
- */
+// Single source of truth, consumed by the media-orphans and og-image scripts
 export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = {
 	// Collections
 	chronology: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
@@ -106,10 +101,6 @@ export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = 
 	],
 };
 
-/**
- * Resolve a fallback image ID by key, with deterministic pick for arrays
- * Falls back to the `default` key if the requested key is missing
- */
 export function resolveFallbackImageId(key: string, id: string): string {
 	const value = fallbackImageIds[key] ?? fallbackImageIds.default;
 
@@ -118,10 +109,59 @@ export function resolveFallbackImageId(key: string, id: string): string {
 	return pickFrom(id, value!);
 }
 
-/**
- * Return a fallback image ID based on entry properties
- * Priority: collection → themes → region (ancestor/parent) → category → region (ancestor) → default
- */
+// Ordered by specificity, so a niche theme wins over a broad one
+const themePriority = [
+	'thailand-theaters',
+	'taiwan-theaters',
+	'taiwan-shinto-shrines',
+	'taiwan-railways',
+	'taiwan-military-villages',
+	'taiwan-police-history',
+	'taiwan-sanheyuan',
+	'taiwan-ghost-island',
+	'taiwan-waterworks',
+	'alishan-forest-railway',
+	'taiwan-temple-culture',
+	'taiwan-japanese-colonial-era',
+	'taiwan-qing-dynasty-era',
+	'taiwan-urban-exploration',
+];
+
+function getTaiwanRegionKey(regionParent: string | undefined): string {
+	const parentKey = regionParent ? `taiwan/${regionParent}` : undefined;
+
+	return parentKey && Object.hasOwn(fallbackImageIds, parentKey) ? parentKey : 'taiwan';
+}
+
+// Priority: collection → themes → region (ancestor/parent) → category → region (ancestor) → default
+function getFallbackKey({
+	collection,
+	category,
+	regions,
+	themes,
+}: {
+	collection: string;
+	category: string | undefined;
+	regions: Array<string> | undefined;
+	themes: Array<string> | undefined;
+}): string {
+	if (collection === 'resources') return 'resources';
+
+	const themeKey = themePriority.find((theme) => themes?.includes(theme));
+
+	if (themeKey) return themeKey;
+
+	const [regionAncestor, regionParent] = regions ?? [];
+
+	if (regionAncestor === 'taiwan') return getTaiwanRegionKey(regionParent);
+
+	if (category === 'temple') return 'temple';
+
+	if (regionAncestor && Object.hasOwn(fallbackImageIds, regionAncestor)) return regionAncestor;
+
+	return 'default';
+}
+
 export function getFallbackImageId({
 	id,
 	collection,
@@ -135,51 +175,5 @@ export function getFallbackImageId({
 	regions?: Array<string> | undefined;
 	themes?: Array<string> | undefined;
 }): string {
-	if (collection === 'resources') {
-		return resolveFallbackImageId('resources', id);
-	}
-
-	const themePriority = [
-		'thailand-theaters',
-		'taiwan-theaters',
-		'taiwan-shinto-shrines',
-		'taiwan-railways',
-		'taiwan-military-villages',
-		'taiwan-police-history',
-		'taiwan-sanheyuan',
-		'taiwan-ghost-island',
-		'taiwan-waterworks',
-		'alishan-forest-railway',
-		'taiwan-temple-culture',
-		'taiwan-japanese-colonial-era',
-		'taiwan-qing-dynasty-era',
-		'taiwan-urban-exploration',
-	];
-
-	if (themes) {
-		for (const theme of themePriority) {
-			if (themes.includes(theme)) return resolveFallbackImageId(theme, id);
-		}
-	}
-
-	const regionAncestor = regions?.[0];
-	const regionParent = regions?.[1];
-
-	if (regionAncestor === 'taiwan') {
-		const parentKey = regionParent ? `taiwan/${regionParent}` : undefined;
-
-		if (parentKey && Object.hasOwn(fallbackImageIds, parentKey)) {
-			return resolveFallbackImageId(parentKey, id);
-		}
-
-		return resolveFallbackImageId('taiwan', id);
-	}
-
-	if (category === 'temple') return resolveFallbackImageId('temple', id);
-
-	if (regionAncestor && Object.hasOwn(fallbackImageIds, regionAncestor)) {
-		return resolveFallbackImageId(regionAncestor, id);
-	}
-
-	return resolveFallbackImageId('default', id);
+	return resolveFallbackImageId(getFallbackKey({ collection, category, regions, themes }), id);
 }
