@@ -38,6 +38,9 @@ const excerptSplit = content?.split(contentExcerptIdentifier) ?? [];
 const excerptContent = excerptSplit[0] ? stripFootnotes(excerptSplit[0]) : undefined;
 const hasExcerpt = excerptSplit.length > 1;
 
+// Entries carrying an inline image supply their own, otherwise display a featured image where available
+const hasExcerptImage = excerptContent?.includes('<img') ?? false;
+
 async function getImageProps(imageId: string | undefined): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
@@ -81,7 +84,7 @@ async function getImageProps(imageId: string | undefined): Promise<{
 	};
 }
 
-const { imageProps, placeholderProps } = await getImageProps(imageId);
+const { imageProps, placeholderProps } = await getImageProps(hasExcerptImage ? undefined : imageId);
 
 const t = getTranslations();
 ---
