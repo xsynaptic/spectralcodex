@@ -1,0 +1,88 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import type { PreviewOptions } from '#components/types.ts';
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+
+import ContentDate from '#components/content/content-date.astro';
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { formatNumber } from '#lib/utils/text.ts';
+
+interface Props extends PreviewOptions {
+	item: CatalogItem;
+	regions?: Array<CollectionEntry<'regions'>> | undefined;
+	showMicroformats?: boolean | undefined;
+}
+
+const {
+	item,
+	regions,
+	showMicroformats = false,
+	showCollection,
+	showDate,
+	showLocations,
+	showPosts,
+} = Astro.props;
+
+const indexUrl = getSiteUrl(item.collection);
+
+const t = getTranslations();
+---
+
+{
+	showCollection ? (
+		<DividedItem>
+			{indexUrl ? (
+				<Anchor href={indexUrl} class="font-semibold" showDarkMode={false}>
+					{t(`collection.${item.collection}.labelSingular`)}
+				</Anchor>
+			) : (
+				<div class="font-semibold">{t(`collection.${item.collection}.labelSingular`)}</div>
+			)}
+		</DividedItem>
+	) : undefined
+}
+{
+	regions && regions.length > 0 ? (
+		<DividedItem>
+			{regions.map((region) => (
+				<DividedItem dividerContent="chevron">
+					<Anchor href={getContentUrl('regions', region.id)} showDarkMode={false}>
+						{region.data.title}
+					</Anchor>
+				</DividedItem>
+			))}
+		</DividedItem>
+	) : undefined
+}
+{
+	showLocations && item.locationCount && item.locationCount > 0 ? (
+		<DividedItem>
+			<span
+				set:html={`${t('collection.locations.labelPlural')}: ${formatNumber({ number: item.locationCount })}`}
+			/>
+		</DividedItem>
+	) : undefined
+}
+{
+	showPosts && item.postCount && item.postCount > 0 ? (
+		<DividedItem>
+			<span
+				set:html={`${t('collection.posts.labelPlural')}: ${formatNumber({ number: item.postCount })}`}
+			/>
+		</DividedItem>
+	) : undefined
+}
+{
+	showDate ? (
+		<ContentDate
+			date={item.dateUpdated ?? item.dateCreated}
+			datePreset={DatePresetEnum.Medium}
+			showMicroformats={showMicroformats}
+		/>
+	) : undefined
+}
