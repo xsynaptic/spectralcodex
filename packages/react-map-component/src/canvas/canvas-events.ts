@@ -26,6 +26,44 @@ const isMapCoordinates = (input: unknown): input is [number, number] =>
 	typeof input[0] === 'number' &&
 	typeof input[1] === 'number';
 
+type MapClickEvent = Parameters<NonNullable<MapCallbacks['onClick']>>[0];
+
+type MapClickFeature = NonNullable<MapClickEvent['features']>[number];
+
+async function expandCluster(mapInstance: MapClickEvent['target'], feature: MapClickFeature) {
+	const clusterId =
+		typeof feature.properties.cluster_id === 'string' ||
+		typeof feature.properties.cluster_id === 'number'
+			? feature.properties.cluster_id
+			: undefined;
+
+	if (!clusterId) return;
+
+	const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
+
+	if (!isMapGeojsonSource(featureSource)) return;
+
+	const { geometry } = feature;
+
+	if (geometry.type !== GeometryTypeEnum.Point) return;
+
+	if (!isMapCoordinates(geometry.coordinates)) return;
+
+	const featureCenter = geometry.coordinates;
+
+	try {
+		const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
+
+		mapInstance.easeTo({
+			center: featureCenter,
+			duration: 200,
+			zoom,
+		});
+	} catch {
+		console.warn('[Map] Could not get cluster expansion zoom!');
+	}
+}
+
 export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
@@ -62,42 +100,9 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 
 			switch (feature.layer.id) {
 				case MapLayerIdEnum.Clusters: {
-					const clusterId =
-						typeof feature.properties.cluster_id === 'string' ||
-						typeof feature.properties.cluster_id === 'number'
-							? feature.properties.cluster_id
-							: undefined;
-
-					if (!clusterId) return;
-
-					const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
-
-					if (!isMapGeojsonSource(featureSource)) return;
-
-					// This is broken out here to avoid some complicated async logic
-					const featureCenter = isMapCoordinates(feature.geometry.coordinates)
-						? feature.geometry.coordinates
-						: undefined;
-
-					if (!featureCenter) return;
-
-					// Expand clusters by zooming; note that this returns a promise, complicating this callback
-					void (async () => {
-						try {
-							const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
-
-							mapInstance.easeTo({
-								center: featureCenter,
-								duration: 200,
-								zoom,
-							});
-						} catch {
-							console.warn('[Map] Could not get cluster expansion zoom!');
-						}
-					})();
+					void expandCluster(mapInstance, feature);
 					break;
 				}
-
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
 				case MapLayerIdEnum.PointsImage: {
