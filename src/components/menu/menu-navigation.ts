@@ -122,58 +122,27 @@ class NavMenu extends HTMLElement {
 
 		const li = menuitem.closest<HTMLElement>('li');
 
-		if (!li) return;
+		if (li) this.#handleMenuitemKeydown(event, li);
+	};
 
-		const parentUl = li.closest<HTMLElement>('ul');
-		const isMenubar = parentUl?.getAttribute('role') === 'menubar';
+	#handleMenuitemKeydown(event: KeyboardEvent, li: HTMLElement) {
+		const isMenubar = li.closest<HTMLElement>('ul')?.getAttribute('role') === 'menubar';
 
 		switch (event.key) {
 			case 'ArrowRight': {
-				if (isMenubar) {
-					event.preventDefault();
-					this.#focusSibling(li, 'next');
-				} else if (li.dataset.hasSubmenu !== undefined) {
-					event.preventDefault();
-					this.#open(li);
-					this.#focusFirstItem(li);
-				}
+				this.#handleArrowRight(event, li, isMenubar);
 				break;
 			}
 			case 'ArrowLeft': {
-				event.preventDefault();
-				if (isMenubar) {
-					this.#focusSibling(li, 'prev');
-				} else {
-					this.#closeAndFocusTrigger(li);
-				}
+				this.#handleArrowLeft(event, li, isMenubar);
 				break;
 			}
 			case 'ArrowDown': {
-				event.preventDefault();
-
-				if (isMenubar) {
-					if (li.dataset.hasSubmenu !== undefined) {
-						this.#open(li);
-						this.#focusFirstItem(li);
-					}
-				} else {
-					this.#focusSibling(li, 'next');
-				}
+				this.#handleArrowDown(event, li, isMenubar);
 				break;
 			}
 			case 'ArrowUp': {
-				event.preventDefault();
-
-				if (!isMenubar) {
-					const siblings = this.#getSiblingItems(li);
-					const isFirst = siblings[0] === li;
-
-					if (isFirst) {
-						this.#closeAndFocusTrigger(li);
-					} else {
-						this.#focusSibling(li, 'prev');
-					}
-				}
+				this.#handleArrowUp(event, li, isMenubar);
 				break;
 			}
 			case 'Escape': {
@@ -183,17 +152,7 @@ class NavMenu extends HTMLElement {
 			}
 			case 'Enter':
 			case ' ': {
-				if (li.dataset.hasSubmenu !== undefined) {
-					event.preventDefault();
-
-					if (li.dataset.open === undefined) {
-						this.#open(li);
-						this.#focusFirstItem(li);
-					} else {
-						this.#close(li);
-					}
-				}
-				// Enter without children: default trigger behavior (link navigation or button click)
+				this.#handleActivate(event, li);
 				break;
 			}
 			case 'Home': {
@@ -207,7 +166,73 @@ class NavMenu extends HTMLElement {
 				break;
 			}
 		}
-	};
+	}
+
+	#handleArrowRight(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+		if (isMenubar) {
+			event.preventDefault();
+			this.#focusSibling(li, 'next');
+			return;
+		}
+
+		if (li.dataset.hasSubmenu === undefined) return;
+
+		event.preventDefault();
+		this.#open(li);
+		this.#focusFirstItem(li);
+	}
+
+	#handleArrowLeft(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+		event.preventDefault();
+
+		if (isMenubar) {
+			this.#focusSibling(li, 'prev');
+			return;
+		}
+
+		this.#closeAndFocusTrigger(li);
+	}
+
+	#handleArrowDown(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+		event.preventDefault();
+
+		if (!isMenubar) {
+			this.#focusSibling(li, 'next');
+			return;
+		}
+
+		if (li.dataset.hasSubmenu === undefined) return;
+
+		this.#open(li);
+		this.#focusFirstItem(li);
+	}
+
+	#handleArrowUp(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+		event.preventDefault();
+
+		if (isMenubar) return;
+
+		if (this.#getSiblingItems(li)[0] === li) {
+			this.#closeAndFocusTrigger(li);
+			return;
+		}
+
+		this.#focusSibling(li, 'prev');
+	}
+
+	#handleActivate(event: KeyboardEvent, li: HTMLElement) {
+		if (li.dataset.hasSubmenu === undefined) return;
+
+		event.preventDefault();
+
+		if (li.dataset.open !== undefined) {
+			this.#close(li);
+			return;
+		}
+
+		this.#open(li);
+		this.#focusFirstItem(li);
+	}
 
 	#resetItem(li: HTMLElement) {
 		delete li.dataset.open;

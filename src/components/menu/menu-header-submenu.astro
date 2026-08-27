@@ -36,6 +36,14 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 		}
 	}
 }
+
+// Anchors are navigable, buttons open a submenu, spans are plain labels
+function getTriggerType(item: MenuItem) {
+	if (item.url) return 'anchor';
+	if (item.children?.length) return 'button';
+
+	return 'span';
+}
 ---
 
 <ul
@@ -51,41 +59,40 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 >
 	{
 		menuItems.map((item, index) => {
-			const children = item.children;
-			const showMultilingual = shouldShowMultilingual({ item, depth });
+			const children = item.children ?? [];
+			const hasChildren = children.length > 0;
 			const isActive = isActiveMenuItem(item, pathname);
 			const triggerClasses = ['nav-sub-link', isActive ? 'link-active' : undefined];
-			const multilingual = showMultilingual ? (
-				<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
-			) : undefined;
+			const triggerType = getTriggerType(item);
+			const label = (
+				<Fragment>
+					<Fragment set:html={item.title} />
+					{shouldShowMultilingual({ item, depth }) ? (
+						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
+					) : undefined}
+				</Fragment>
+			);
 
 			return (
 				<li class="nav-sub-item">
 					<div class="nav-sub-trigger">
-						{item.url ? (
+						{triggerType === 'anchor' ? (
 							<Anchor
 								class:list={triggerClasses}
 								href={item.url}
 								linkColor="accent"
 								{...(item.rel ? { rel: item.rel } : undefined)}
 							>
-								<Fragment set:html={item.title} />
-								{multilingual}
+								{label}
 							</Anchor>
 						) : undefined}
-						{!item.url && children?.length ? (
+						{triggerType === 'button' ? (
 							<button type="button" class:list={['link link-accent', ...triggerClasses]}>
-								<Fragment set:html={item.title} />
-								{multilingual}
+								{label}
 							</button>
 						) : undefined}
-						{!item.url && !children?.length ? (
-							<span class:list={triggerClasses}>
-								<Fragment set:html={item.title} />
-								{multilingual}
-							</span>
-						) : undefined}
-						{children?.length ? (
+						{triggerType === 'span' ? <span class:list={triggerClasses}>{label}</span> : undefined}
+						{hasChildren ? (
 							<svg
 								class="nav-sub-icon"
 								width="24"
@@ -97,7 +104,7 @@ function shouldShowMultilingual({ item, depth }: { item: MenuItem; depth: number
 							</svg>
 						) : undefined}
 					</div>
-					{children?.length ? (
+					{hasChildren ? (
 						<Astro.self
 							menuItems={children}
 							depth={depth + 1}
