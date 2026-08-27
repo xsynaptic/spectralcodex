@@ -10,6 +10,8 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/*'
   - '@astrojs/*'
   - astro
+  - '@img/sharp-*'
+  - sharp@0.35.4
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
