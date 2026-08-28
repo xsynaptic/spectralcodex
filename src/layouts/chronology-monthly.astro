@@ -104,8 +104,20 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 		) : undefined
 	}
 	<ContentSection class="flex flex-col gap-2">
-		<ChronologyItem title={t('chronology.updated.label')} items={chronologyMonthlyItem.updated} />
-		<ChronologyItem title={t('chronology.created.label')} items={chronologyMonthlyItem.created} />
-		<ChronologyItem title={t('chronology.visited.label')} items={chronologyMonthlyItem.visited} />
+		<ChronologyItem
+			title={t('chronology.updated.label')}
+			items={chronologyMonthlyItem.updated}
+			showItemCount={true}
+		/>
+		<ChronologyItem
+			title={t('chronology.created.label')}
+			items={chronologyMonthlyItem.created}
+			showItemCount={true}
+		/>
+		<ChronologyItem
+			title={t('chronology.visited.label')}
+			items={chronologyMonthlyItem.visited}
+			showItemCount={true}
+		/>
 	</ContentSection>
 </MainSite>

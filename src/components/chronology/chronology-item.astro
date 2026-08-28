@@ -8,18 +8,25 @@ interface Props {
 	title: string;
 	items: Array<CatalogItem>;
 	count?: number | undefined;
+	showItemCount?: boolean | undefined;
 	url?: string | undefined;
 	class?: string | undefined;
 }
 
-const { title, items, count, url, class: className, ...props } = Astro.props;
+const { title, items, count, showItemCount = false, url, class: className, ...props } = Astro.props;
+
+const itemCountLabel =
+	showItemCount && items.length >= 10 ? ` (${String(items.length)})` : undefined;
 ---
 
 {
 	items.length > 0 ? (
 		<Prose class={className} {...props}>
-			<span class="font-medium">{title}</span>:{' '}
-			<PreviewList items={items} count={count} url={url} />
+			<span class="font-medium">
+				{title}
+				{itemCountLabel}
+			</span>
+			: <PreviewList items={items} count={count} url={url} />
 		</Prose>
 	) : undefined
 }
