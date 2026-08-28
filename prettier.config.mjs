@@ -14,6 +14,14 @@ export default {
 				parser: 'astro',
 			},
 		},
+		{
+			// Zed formats this as JSONC, which makes prettier add trailing commas the CLI then strips
+			files: ['.zed/*.json'],
+			options: {
+				parser: 'json',
+				trailingComma: 'none',
+			},
+		},
 	],
 	tailwindStylesheet: './src/styles/main.css',
 };

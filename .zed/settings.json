@@ -2,7 +2,7 @@
 	"languages": {
 		"Astro": { "language_servers": ["...", "eslint"] },
 		"CSS": {
-			"language_servers": ["tailwindcss-intellisense-css", "!vscode-css-language-server", "..."],
-		},
-	},
+			"language_servers": ["tailwindcss-intellisense-css", "!vscode-css-language-server", "..."]
+		}
+	}
 }

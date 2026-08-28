@@ -1,12 +1,8 @@
 declare global {
-	/**
-	 * Consumed by the MDX language server to provide type-hinting in VS Code
-	 * @link https://github.com/mdx-js/mdx-analyzer
-	 */
+	// Read by the MDX language server for type-hinting in `.mdx` files
+	// https://github.com/mdx-js/mdx-analyzer
 	interface MDXProvidedComponents {
-		// Note: we can't import Astro components direct, nor would we really want to
-		// Since we use custom remark transformers to include import statements
-		// So here we manually type the components, but that's OK, there aren't too many of them
+		// Remark transformers inject the component imports, so these are typed by hand
 		Email: (props: { children: React.ReactNode }) => React.JSX.Element;
 		Img: (props: {
 			alt?: string;
@@ -33,4 +29,5 @@ declare global {
 	}
 }
 
+// The MDX language server only picks up the declarations above from a module
 export {};

@@ -6,7 +6,6 @@
 		"jsxImportSource": "react"
 	},
 	"include": ["../../.astro/types.d.ts", "global.d.ts", "collections/**/*"],
-	// MDXProvidedComponents needs to be globally defined in a file with an `export {}`
 	"mdx": {
 		"checkMdx": true
 	}
