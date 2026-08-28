@@ -21,6 +21,7 @@ const ZONE_ID = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
 const API_TOKEN = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
 const CONCURRENCY = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
 const WARM_LIMIT = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
+const WARM_ALL = process.env.WARM_ALL === '1' || process.env.WARM_ALL === 'true';
 
 // New image URLs trigger vips transforms; keep below the page rate so imagor's cpu cap serves traffic
 const imageConcurrency = 4;
@@ -256,15 +257,23 @@ function report(label: string, stats: Stats): void {
 	if (stats.failures.length > 0) console.log(stats.failures.map(failureLine).join('\n'));
 }
 
-// A lost volume must surface in the report; silently re-warming 50k+ URLs looks like a normal run
-function loadWarmedImages(): { seen: Set<string>; missing: boolean } {
+function getWarmedImages(): { seen: Set<string>; note?: string } {
+	if (WARM_ALL) {
+		return {
+			seen: new Set(),
+			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
+		};
+	}
 	try {
 		const contents = readFileSync(imageStateFile, 'utf8');
-		return { seen: new Set(contents.split('\n').filter(Boolean)), missing: false };
+		return { seen: new Set(contents.split('\n').filter(Boolean)) };
 	} catch (error) {
 		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
 		if (!isMissing) throw error;
-		return { seen: new Set(), missing: true };
+		return {
+			seen: new Set(),
+			note: 'Image state missing: cold start, every referenced image is new',
+		};
 	}
 }
 
@@ -461,11 +470,11 @@ async function main(): Promise<void> {
 	const notes: Array<string> = [];
 
 	// Read before warming so an unreadable volume fails fast rather than after the page phase
-	const { seen, missing } = loadWarmedImages();
-	if (missing) {
-		const coldStart = 'Image state missing: cold start, every referenced image is new';
-		console.log(coldStart);
-		notes.push(coldStart);
+	const { seen, note } = getWarmedImages();
+
+	if (note !== undefined) {
+		console.log(note);
+		notes.push(note);
 	}
 
 	if (SKIP_PURGE) console.log('SKIP_PURGE set: warming without purging');

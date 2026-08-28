@@ -277,6 +277,7 @@ services:
       # One-off test knobs; pass at run time (docker compose run -e), never set in .env
       - SKIP_PURGE=${SKIP_PURGE:-}
       - WARM_LIMIT=${WARM_LIMIT:-}
+      - WARM_ALL=${WARM_ALL:-}
     networks:
       - warmer
     logging:
