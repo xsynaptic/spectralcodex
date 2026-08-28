@@ -49,7 +49,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.2.8",
+		"astro": "^7.2.9",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
@@ -68,7 +68,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.102.4",
+		"@tanstack/eslint-plugin-query": "^5.102.6",
 		"@turf/bbox": "^7.4.0",
 		"@turf/center": "^7.4.0",
 		"@turf/centroid": "^7.4.0",
@@ -107,7 +107,7 @@
 		"globals": "^17.11.0",
 		"kdbush": "^4.1.0",
 		"keyv": "^5.6.0",
-		"knip": "^6.32.2",
+		"knip": "^6.32.3",
 		"lefthook": "^2.1.10",
 		"ohash": "^2.0.12",
 		"p-limit": "^7.3.1",

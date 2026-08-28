@@ -10,8 +10,8 @@ importers:
   .:
     dependencies:
       astro:
-        specifier: ^7.2.8
-        version: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+        specifier: ^7.2.9
+        version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -27,10 +27,10 @@ importers:
         version: 0.3.8
       '@astrojs/mdx':
         specifier: ^7.0.8
-        version: 7.0.8(@astrojs/markdown-satteri@0.3.8)(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)
+        version: 7.0.8(@astrojs/markdown-satteri@0.3.8)(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)
       '@astrojs/node':
         specifier: ^11.1.4
-        version: 11.1.4(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)
+        version: 11.1.4(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)
       '@astrojs/react':
         specifier: ^6.0.4
         version: 6.0.4(@types/node@25.9.2)(@types/react-dom@19.2.5(@types/react@19.2.18))(@types/react@19.2.18)(esbuild@0.28.0)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@10.2.2)(tsx@4.23.12)(yaml@2.9.0)
@@ -62,8 +62,8 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3(vite@8.2.2(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@tanstack/eslint-plugin-query':
-        specifier: ^5.102.4
-        version: 5.102.4(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: ^5.102.6
+        version: 5.102.6(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       '@turf/bbox':
         specifier: ^7.4.0
         version: 7.4.0
@@ -99,16 +99,16 @@ importers:
         version: 19.2.5(@types/react@19.2.18)
       '@unpic/astro':
         specifier: ^1.0.2
-        version: 1.0.2(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 1.0.2(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@unpic/core':
         specifier: ^1.0.3
         version: 1.0.3
       '@xsynaptic/astro-build-logger':
         specifier: ^1.0.0
-        version: 1.0.0(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 1.0.0(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       '@xsynaptic/astro-image-loader':
         specifier: ^1.1.0
-        version: 1.1.0(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(exiftool-vendored@37.2.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.4.3)
+        version: 1.1.0(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(exiftool-vendored@37.2.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.4.3)
       '@xsynaptic/eslint-config':
         specifier: ^6.2.1
         version: 6.2.1(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@typescript-eslint/parser@8.66.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -141,7 +141,7 @@ importers:
         version: 1.0.0
       astro-pagefind:
         specifier: ^2.0.1
-        version: 2.0.1(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 2.0.1(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
       astro-seo:
         specifier: ^1.1.0
         version: 1.1.0(prettier-plugin-astro@0.14.1)(prettier@3.9.6)(typescript@6.0.3)
@@ -179,8 +179,8 @@ importers:
         specifier: ^5.6.0
         version: 5.6.0
       knip:
-        specifier: ^6.32.2
-        version: 6.32.2
+        specifier: ^6.32.3
+        version: 6.32.3
       lefthook:
         specifier: ^2.1.10
         version: 2.1.10
@@ -246,8 +246,8 @@ importers:
         version: 4.4.3
     devDependencies:
       astro:
-        specifier: ^7.2.8
-        version: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+        specifier: ^7.2.9
+        version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
   packages/content:
     devDependencies:
@@ -279,8 +279,8 @@ importers:
         specifier: ^0.3.0
         version: 0.3.0(unified@11.0.5)
       astro:
-        specifier: ^7.2.8
-        version: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+        specifier: ^7.2.9
+        version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       remark-frontmatter:
         specifier: ^5.0.0
         version: 5.0.0(supports-color@10.2.2)
@@ -312,11 +312,11 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@tanstack/react-query':
-        specifier: ^5.102.4
-        version: 5.102.4(react@19.2.8)
+        specifier: ^5.102.6
+        version: 5.102.6(react@19.2.8)
       '@tanstack/react-query-persist-client':
-        specifier: ^5.102.4
-        version: 5.102.4(@tanstack/react-query@5.102.4(react@19.2.8))(react@19.2.8)
+        specifier: ^5.102.6
+        version: 5.102.6(@tanstack/react-query@5.102.6(react@19.2.8))(react@19.2.8)
       '@turf/bbox-polygon':
         specifier: ^7.4.0
         version: 7.4.0
@@ -367,8 +367,8 @@ importers:
         specifier: ^19.2.5
         version: 19.2.5(@types/react@19.2.18)
       astro:
-        specifier: ^7.2.8
-        version: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+        specifier: ^7.2.9
+        version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
 
   packages/scripts:
     devDependencies:
@@ -418,8 +418,8 @@ importers:
         specifier: ^5.1.3
         version: 5.1.3(supports-color@10.2.2)
       astro:
-        specifier: ^7.2.8
-        version: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+        specifier: ^7.2.9
+        version: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       better-sqlite3:
         specifier: ^13.0.3
         version: 13.0.3
@@ -2301,8 +2301,8 @@ packages:
       csstype:
         optional: true
 
-  '@tanstack/eslint-plugin-query@5.102.4':
-    resolution: {integrity: sha512-d5mJDbMoSbPKv6kOzoCOcc3xvoLhmlscyOSvLsAdXClKVPc9l1sKjg7n3yBYdn6PHan2Ny7psZnRvHe9GRguVg==}
+  '@tanstack/eslint-plugin-query@5.102.6':
+    resolution: {integrity: sha512-MR0K43xmC8KwM9j1bjwjEubgmD3jJ3JgG7MWFzkjQ3LzDhrptOImIFOTQO9mMdlTWMi7FopCOFm7j9A9PSt/Xg==}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: ^5.6.0 || ^6.0.0 || ^7.0.0
@@ -2310,20 +2310,20 @@ packages:
       typescript:
         optional: true
 
-  '@tanstack/query-core@5.102.4':
-    resolution: {integrity: sha512-6eXkL+KFyVAZdpKoThCjPQQylZK8/ZOMYTJEVoPtHLkLs2PYks6vUiim9qzgvFXakSkRIAZwAZTeZLIJmpgRpQ==}
+  '@tanstack/query-core@5.102.6':
+    resolution: {integrity: sha512-jp+GucyQ+fel2ILb8ZLQeqMaAqZL/Bzaj+dKOQiPk4vPdf2rQPEV7heUyEVIhatpY42j4AFHav4DzBa1oTIp/A==}
 
-  '@tanstack/query-persist-client-core@5.102.4':
-    resolution: {integrity: sha512-o2lIjZf+tUYdcw6dtUEHU1fINbFpg6qLSE7TS1yYRB4ufWG1u0Ry4/1PJZROV+iZ0Tm5JAqjuzM1pYItxApj9A==}
+  '@tanstack/query-persist-client-core@5.102.6':
+    resolution: {integrity: sha512-F9YKO76vFSBZfUVZxZjr/4xIUjnnYKO+pHfbhkrsIp1je5A1/L/UhIUb4A3VmLGnLJYxJWJmADSx2TAVZVRYsA==}
 
-  '@tanstack/react-query-persist-client@5.102.4':
-    resolution: {integrity: sha512-/COhUrQWFibfBIR5wCVmwYyb4ZsIZhyoyhF/iPeBbX9b/8xefonw3stfubdELSI1VEVfwT7qFXgvTGo1PDlbGQ==}
+  '@tanstack/react-query-persist-client@5.102.6':
+    resolution: {integrity: sha512-l1prWH9kMq8cprv9qvrEPKxKHBvKG4XAM8lknoaBA1tqOx3H2BTPn1jIQNSDr0sfFbkFaYqDl/G1GxPUYxQtAQ==}
     peerDependencies:
-      '@tanstack/react-query': ^5.102.4
+      '@tanstack/react-query': ^5.102.6
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.102.4':
-    resolution: {integrity: sha512-Cn6X2eqFHjCtA/sfM/3eiT6/YmcPqo30twNHUlqkfz9LBqRzdt8GN/mFMWXn/qTacYUo3d4nycMzn3LWZmJ7MQ==}
+  '@tanstack/react-query@5.102.6':
+    resolution: {integrity: sha512-ANz4KZ8z80D85fiz5IAHjpb8XBPLrjOb/0natlD9Ascyy/3p96V86Zw8UbOfA0HDLcvK/A4gNd95r723y5UT2w==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -3219,8 +3219,8 @@ packages:
   astro-seo@1.1.0:
     resolution: {integrity: sha512-G6LDNDyga30o+52v58jU7C35n3cORUzk7RSuY+xf/ZRbW6JiNplyaOO1VoYVKO+xzYNaBcxqNln2RFRR/wgJNQ==}
 
-  astro@7.2.8:
-    resolution: {integrity: sha512-19nfgzl1IHNYzIfamUIr4dYSQcovWfMO5JGlN7Ahlg6Q6R+nzSPWAh+VO/mSg0hhcea35JHY0wL5ADZUi0WiYQ==}
+  astro@7.2.9:
+    resolution: {integrity: sha512-o5nZFo/bieF6rp4x9sQSLhI7GO7Bahpld38Y4LvX27nFoxNiuttjI+Hea81w5ksORLHgdPUlQpU9obPz5QRa8g==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
     peerDependencies:
@@ -4640,8 +4640,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.32.2:
-    resolution: {integrity: sha512-WXTXbmocrw7gqm1A1TQvFN0OgJ7hUSU6E1g6SPRIzzHFogUBhXByc7cYeOFVtJ2uODg7DP4VbESYBYnfbtBYsg==}
+  knip@6.32.3:
+    resolution: {integrity: sha512-wOJ1Av8PwKqFO0wU7F64vzIcUjxhrieA3Tc2lmeK9C9prpxq+TeG2ewNH5tCaBVZwXNPp6lJkrr+IhZ20iqkMA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -7205,13 +7205,13 @@ snapshots:
       github-slugger: 2.0.0
       satteri: 0.10.5
 
-  '@astrojs/mdx@7.0.8(@astrojs/markdown-satteri@0.3.8)(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)':
+  '@astrojs/mdx@7.0.8(@astrojs/markdown-satteri@0.3.8)(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.4
       '@astrojs/markdown-remark': 7.2.4(supports-color@10.2.2)
       '@mdx-js/mdx': 3.1.1(supports-color@10.2.2)
       acorn: 8.16.0
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       es-module-lexer: 2.1.0
       estree-util-visit: 2.0.0
       hast-util-to-html: 9.0.5
@@ -7227,10 +7227,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@11.1.4(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)':
+  '@astrojs/node@11.1.4(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(supports-color@10.2.2)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.4
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       send: 1.2.1(supports-color@10.2.2)
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -8561,7 +8561,7 @@ snapshots:
       - preact
       - react
 
-  '@tanstack/eslint-plugin-query@5.102.4(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@tanstack/eslint-plugin-query@5.102.6(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/utils': 8.65.0(eslint@10.9.1(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       eslint: 10.9.1(jiti@2.7.0)(supports-color@10.2.2)
@@ -8570,21 +8570,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/query-core@5.102.4': {}
+  '@tanstack/query-core@5.102.6': {}
 
-  '@tanstack/query-persist-client-core@5.102.4':
+  '@tanstack/query-persist-client-core@5.102.6':
     dependencies:
-      '@tanstack/query-core': 5.102.4
+      '@tanstack/query-core': 5.102.6
 
-  '@tanstack/react-query-persist-client@5.102.4(@tanstack/react-query@5.102.4(react@19.2.8))(react@19.2.8)':
+  '@tanstack/react-query-persist-client@5.102.6(@tanstack/react-query@5.102.6(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@tanstack/query-persist-client-core': 5.102.4
-      '@tanstack/react-query': 5.102.4(react@19.2.8)
+      '@tanstack/query-persist-client-core': 5.102.6
+      '@tanstack/react-query': 5.102.6(react@19.2.8)
       react: 19.2.8
 
-  '@tanstack/react-query@5.102.4(react@19.2.8)':
+  '@tanstack/react-query@5.102.6(react@19.2.8)':
     dependencies:
-      '@tanstack/query-core': 5.102.4
+      '@tanstack/query-core': 5.102.6
       react: 19.2.8
 
   '@turf/along@7.4.0':
@@ -10000,12 +10000,12 @@ snapshots:
 
   '@ungap/structured-clone@1.3.2': {}
 
-  '@unpic/astro@1.0.2(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))':
+  '@unpic/astro@1.0.2(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))':
     dependencies:
       '@unpic/core': 1.0.3
       '@unpic/pixels': 1.3.0
       '@unpic/placeholder': 0.1.2
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       blurhash: 2.0.5
 
   '@unpic/core@1.0.3':
@@ -10144,14 +10144,14 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@xsynaptic/astro-build-logger@1.0.0(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))':
+  '@xsynaptic/astro-build-logger@1.0.0(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))':
     dependencies:
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       zod: 4.4.3
 
-  '@xsynaptic/astro-image-loader@1.1.0(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(exiftool-vendored@37.2.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.4.3)':
+  '@xsynaptic/astro-image-loader@1.1.0(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))(exiftool-vendored@37.2.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.4.3)':
     dependencies:
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       p-limit: 7.3.1
       picomatch: 4.0.5
       tinyglobby: 0.2.17
@@ -10402,10 +10402,10 @@ snapshots:
       - '@emnapi/runtime'
       - supports-color
 
-  astro-pagefind@2.0.1(astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)):
+  astro-pagefind@2.0.1(astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)):
     dependencies:
       '@pagefind/component-ui': 1.5.2
-      astro: 7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+      astro: 7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
       pagefind: 1.5.2
       sirv: 3.0.2
 
@@ -10417,7 +10417,7 @@ snapshots:
       - prettier-plugin-astro
       - typescript
 
-  astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0):
+  astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler-rs': 0.4.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
       '@astrojs/internal-helpers': 0.10.4
@@ -10509,7 +10509,7 @@ snapshots:
       - uploadthing
       - yaml
 
-  astro@7.2.8(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0):
+  astro@7.2.9(@astrojs/markdown-remark@7.2.4(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler-rs': 0.4.0(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)
       '@astrojs/internal-helpers': 0.10.4
@@ -12205,7 +12205,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.32.2:
+  knip@6.32.3:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.5)
       formatly: 0.3.0

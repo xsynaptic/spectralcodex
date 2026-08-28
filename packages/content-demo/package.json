@@ -10,7 +10,7 @@
 	"devDependencies": {
 		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/remark-prose-rules": "^0.3.0",
-		"astro": "^7.2.8",
+		"astro": "^7.2.9",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-smartypants": "^3.0.3"
