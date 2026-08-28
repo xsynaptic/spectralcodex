@@ -8,12 +8,6 @@
 		"jsxImportSource": "react",
 		"types": ["vitest/globals"]
 	},
-	"include": [
-		".astro/types.d.ts",
-		"**/*",
-		"**/*.astro",
-		"packages/content/.remarkrc.mjs",
-		"packages/content-demo/.remarkrc.mjs"
-	],
-	"exclude": [".vscode", ".cache", "dist", "node_modules", "**/*/temp"]
+	"include": [".astro/types.d.ts", "**/*", "**/*.astro"],
+	"exclude": [".cache", "dist", "node_modules", "**/*/temp"]
 }
