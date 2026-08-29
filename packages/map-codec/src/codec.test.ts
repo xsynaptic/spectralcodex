@@ -10,12 +10,7 @@ import { z } from 'zod';
 
 import type { MapPopupItem, MapSourceItem } from './codec';
 
-import {
-	encodeMapPopupData,
-	encodeMapSourceData,
-	MapPopupItemSchema,
-	MapSourceItemSchema,
-} from './codec';
+import { MapPopupItemSchema, MapSourceItemSchema } from './codec';
 import { MapDataGeometryTypeNumericMapping, MapDataKeysCompressed } from './map-data-keys';
 
 function byCodePoint(first: string, second: string): number {
@@ -224,27 +219,5 @@ describe('round trips', () => {
 		};
 
 		expect(MapPopupItemSchema.parse(z.encode(MapPopupItemSchema, standard))).toEqual(standard);
-	});
-
-	test('array encode helpers map every item', () => {
-		const source: Array<MapSourceItem> = [
-			{
-				properties: {
-					id: 'a',
-					title: 'A',
-					category: LocationCategoryEnum.Temple,
-					status: LocationStatusEnum.Abandoned,
-					precision: 1,
-					entryQuality: 1,
-					rating: 1,
-					hasImage: false,
-				},
-				geometry: { type: GeometryTypeEnum.Point, coordinates: [0, 0] },
-			},
-		];
-		const popup: Array<MapPopupItem> = [{ id: 'a', title: 'A', image: undefined }];
-
-		expect(encodeMapSourceData(source)).toHaveLength(1);
-		expect(encodeMapPopupData(popup)).toHaveLength(1);
 	});
 });

@@ -11,12 +11,8 @@ describe('getActivityLevel', () => {
 		expect(getActivityLevel(3, 0)).toBe(0);
 	});
 
-	test('a lone event in a quiet year is the busiest day', () => {
-		expect(getActivityLevel(1, 1)).toBe(4);
-	});
-
 	test('the busiest day is always level 4', () => {
-		expect(getActivityLevel(4, 4)).toBe(4);
+		expect(getActivityLevel(1, 1)).toBe(4);
 		expect(getActivityLevel(100, 100)).toBe(4);
 	});
 

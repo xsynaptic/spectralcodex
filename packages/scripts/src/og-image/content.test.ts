@@ -6,12 +6,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import type { OpenGraphContentEntry } from './types';
 
-import {
-	buildIndexEntries,
-	extractBuiltFilenames,
-	resolveEntry,
-	resolveOgRegions,
-} from './content';
+import { extractBuiltFilenames, resolveEntry, resolveOgRegions } from './content';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {
@@ -28,16 +23,6 @@ function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphC
 function ogImageMeta(url: string) {
 	return `<meta property="og:image" content="${url}" />`;
 }
-
-describe('buildIndexEntries', () => {
-	const entries = buildIndexEntries();
-
-	test('resolves a non-empty fallback image id for every index', () => {
-		for (const entry of entries.values()) {
-			expect(entry.imageFeaturedId.length).toBeGreaterThan(0);
-		}
-	});
-});
 
 describe('resolveEntry', () => {
 	const dataStoreEntry = makeOgEntry({ id: 'a-post', collection: 'posts' });

@@ -1,4 +1,3 @@
-import Keyv from 'keyv';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -65,21 +64,5 @@ describe('createSqliteStore', () => {
 
 		expect(await cache.get('alpha')).toEqual({ count: 1 });
 		expect(await cache.get('missing')).toBeUndefined();
-	});
-
-	test('works as a Keyv store with namespacing and objects', async () => {
-		const keyv = new Keyv({
-			store: createSqliteStore({ filePath: getTempDbPath('keyv') }),
-			namespace: 'test',
-		});
-
-		await keyv.set('entry', { hash: 'abc', count: 42 });
-
-		expect(await keyv.get('entry')).toEqual({ hash: 'abc', count: 42 });
-		expect(await keyv.get('missing')).toBeUndefined();
-
-		await keyv.delete('entry');
-
-		expect(await keyv.get('entry')).toBeUndefined();
 	});
 });

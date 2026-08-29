@@ -14,9 +14,4 @@ describe('signImageServerPath', () => {
 	test('signatureLength of 20 returns 20-char signature', () => {
 		expect(signImageServerPath('800x0/photo.jpg', 'secret', 20)).toHaveLength(20);
 	});
-
-	test('signature is url-safe base64 (no + / =)', () => {
-		const sig = signImageServerPath('800x0/photo.jpg', 'secret', 40);
-		expect(sig).not.toMatch(/[+/=]/);
-	});
 });

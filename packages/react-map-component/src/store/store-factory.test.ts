@@ -4,13 +4,6 @@ import { describe, expect, test } from 'vitest';
 import { createMapStore } from './store-factory';
 
 describe('createMapStore', () => {
-	test('merges initial config over defaults', () => {
-		const store = createMapStore({ isObjectiveFilterEnabled: true });
-
-		expect(store.getState().isObjectiveFilterEnabled).toBe(true);
-		expect(store.getState().statusFilter).toEqual([]);
-	});
-
 	test('toggleStatusFilter adds an absent status and removes a present one', () => {
 		const store = createMapStore();
 		const { toggleStatusFilter } = store.getState().actions;

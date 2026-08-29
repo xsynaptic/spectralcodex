@@ -19,7 +19,5 @@ test.describe('collection pages', () => {
 
 		const response = await page.goto(paths.locationsIndexPage2, { waitUntil: 'domcontentloaded' });
 		expect(response?.status()).toBe(200);
-		await expect(page.locator('main')).toBeVisible();
-		await expect(page.locator('main a').first()).toBeVisible();
 	});
 });

@@ -68,7 +68,7 @@ function getImageFeaturedData({
 }
 
 // Keyed by the OG image filename Astro emits
-export function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
+function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
 		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
