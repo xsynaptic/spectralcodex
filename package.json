@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.18.0",
+	"version": "7.19.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -68,7 +68,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.102.6",
+		"@tanstack/eslint-plugin-query": "^5.102.8",
 		"@turf/bbox": "^7.4.0",
 		"@turf/center": "^7.4.0",
 		"@turf/centroid": "^7.4.0",

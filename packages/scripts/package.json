@@ -43,7 +43,7 @@
 		"better-sqlite3": "^13.0.3",
 		"chalk": "^6.0.0",
 		"d3-geo": "^3.1.1",
-		"devalue": "^5.9.1",
+		"devalue": "^5.9.2",
 		"flatgeobuf": "^4.4.0",
 		"geokdbush": "^2.1.0",
 		"kdbush": "^4.1.0",
