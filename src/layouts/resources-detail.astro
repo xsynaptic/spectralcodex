@@ -10,6 +10,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import ContentArticle from '#components/content/content-article.astro';
 import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -19,11 +20,12 @@ import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { formatCitation } from '#lib/collections/resources/resources-citation.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
@@ -55,7 +57,16 @@ const citationLine = [citation.authors, citation.published]
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 
+const catalog = await getCatalog();
+
+const imageFeaturedGroup = getImageFeaturedGroup({
+	imageFeatured: entry.data.imageFeatured,
+	getCaption: catalog.getCaption,
+});
+
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 
 const t = getTranslations();
 ---
@@ -72,33 +83,36 @@ const t = getTranslations();
 		}),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
+	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle imageId={imageFeaturedId} hideSearch={page.currentPage !== 1}>
-		<ContentHeader>
-			<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
-			<Fragment slot="header-title-multilingual">
-				<TextMultilingual content={titleMultilingual} />
-			</Fragment>
-			<Fragment slot="header-subtitle">
-				{
-					entry.data.url ? (
-						<DividedItem>
-							<Anchor href={entry.data.url}>{t('collection.resources.homepage.label')}</Anchor>
-						</DividedItem>
-					) : undefined
-				}
-				{
-					entry.data._entryCount ? (
-						<DividedItem>
-							<span
-								set:html={`${t('collection.resources.entryCount.label')}: ${formatNumber({ number: entry.data._entryCount })}`}
-							/>
-						</DividedItem>
-					) : undefined
-				}
-				{citationLine ? <DividedItem>{citationLine}</DividedItem> : undefined}
-			</Fragment>
-		</ContentHeader>
+		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
+			<ContentHeader hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<TextMultilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					{
+						entry.data.url ? (
+							<DividedItem>
+								<Anchor href={entry.data.url}>{t('collection.resources.homepage.label')}</Anchor>
+							</DividedItem>
+						) : undefined
+					}
+					{
+						entry.data._entryCount ? (
+							<DividedItem>
+								<span
+									set:html={`${t('collection.resources.entryCount.label')}: ${formatNumber({ number: entry.data._entryCount })}`}
+								/>
+							</DividedItem>
+						) : undefined
+					}
+					{citationLine ? <DividedItem>{citationLine}</DividedItem> : undefined}
+				</Fragment>
+			</ContentHeader>
+		</ImageHero>
 		<ContentDescription entry={entry} />
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
