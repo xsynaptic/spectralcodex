@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
+import CitationLine from '#components/parts/citation-line.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import { buildSourceCitations } from '#lib/collections/resources/resources-citation.ts';
@@ -33,25 +33,10 @@ const t = getTranslations();
 					return (
 						<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
 							{primary ? (
-								<span>
-									{primary.authors ? `${primary.authors}${primary.delimiter}` : undefined}
-									<span class="italic">
-										{url ? <Anchor href={url}>{primary.title}</Anchor> : primary.title}
-									</span>
-									{primary.published ? `${primary.delimiter}${primary.published}` : undefined}
-									{multilingual ? ' ' : undefined}
-								</span>
+								<CitationLine citation={primary} url={url} titleClass="italic" />
 							) : undefined}
 							{multilingual ? (
-								<span lang={multilingual.lang}>
-									{multilingual.authors
-										? `${multilingual.authors}${multilingual.delimiter}`
-										: undefined}
-									{url ? <Anchor href={url}>{multilingual.title}</Anchor> : multilingual.title}
-									{multilingual.published
-										? `${multilingual.delimiter}${multilingual.published}`
-										: undefined}
-								</span>
+								<CitationLine citation={multilingual} url={url} lang={multilingual.lang} />
 							) : undefined}
 						</ListColumnItem>
 					);

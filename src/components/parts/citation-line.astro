@@ -1,0 +1,22 @@
+---
+import type { Citation } from '#lib/collections/resources/resources-citation.ts';
+
+import Anchor from '#components/parts/anchor.astro';
+
+interface Props {
+	citation: Citation;
+	url?: string | undefined;
+	lang?: string | undefined;
+	titleClass?: string | undefined;
+}
+
+const { citation, url, lang, titleClass } = Astro.props;
+---
+
+<span lang={lang}>
+	{citation.authors ? `${citation.authors}${citation.delimiter}` : undefined}
+	<span class={titleClass}>
+		{url ? <Anchor href={url}>{citation.title}</Anchor> : citation.title}
+	</span>
+	{citation.published ? `${citation.delimiter}${citation.published}` : undefined}
+</span>

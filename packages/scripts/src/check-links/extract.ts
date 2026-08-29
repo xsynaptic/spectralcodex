@@ -25,6 +25,12 @@ function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
 	return typeof link === 'string' ? link : link.url;
 }
 
+function extractUrlsFromSource(source: z.infer<typeof SourceExtractSchema>): Array<string> {
+	if (typeof source === 'string' || !source.links) return [];
+
+	return source.links.map(extractUrlFromLink);
+}
+
 // Extract URLs from frontmatter fields: links, url, and sources
 function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 	const result = EntryDataSchema.safeParse(data);
@@ -33,30 +39,13 @@ function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 		return [];
 	}
 
-	const urls: Array<string> = [];
 	const { links, url, sources } = result.data;
 
-	if (links) {
-		for (const link of links) {
-			urls.push(extractUrlFromLink(link));
-		}
-	}
-
-	if (url) {
-		urls.push(url);
-	}
-
-	if (sources) {
-		for (const source of sources) {
-			if (typeof source !== 'string' && source.links) {
-				for (const link of source.links) {
-					urls.push(extractUrlFromLink(link));
-				}
-			}
-		}
-	}
-
-	return urls;
+	return [
+		...(links?.map(extractUrlFromLink) ?? []),
+		...(url ? [url] : []),
+		...(sources?.flatMap(extractUrlsFromSource) ?? []),
+	];
 }
 
 // Extract markdown link URLs from a body string

@@ -69,6 +69,19 @@ function getBufferedBbox(
 	];
 }
 
+function getMapCenter(
+	featureCollection: MapFeatureCollection,
+	targetId: string | undefined,
+): [number, number] {
+	const targetFeature = targetId
+		? featureCollection.features.find(({ id }) => id === targetId)
+		: undefined;
+
+	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
+
+	return getTruncatedLngLat(center.geometry.coordinates);
+}
+
 // Calculate map bounds based on geodata and some parameters
 // This should not include outliers; bounds/center frame featureCollection
 // maxBounds spans limitsFeatureCollection (the rendered set)
@@ -99,12 +112,6 @@ export function getMapBounds({
 		? filterMapOutliers(limitsFeatureCollectionRaw)
 		: featureCollection;
 
-	const targetFeature = targetId
-		? featureCollection.features.find(({ id }) => id === targetId)
-		: undefined;
-
-	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
-
 	const bounds = getBufferedBbox(
 		featureCollection,
 		boundsBuffer,
@@ -121,7 +128,7 @@ export function getMapBounds({
 	if (!bounds || !maxBounds) return;
 
 	return {
-		center: getTruncatedLngLat(center.geometry.coordinates),
+		center: getMapCenter(featureCollection, targetId),
 		bounds,
 		maxBounds,
 	};

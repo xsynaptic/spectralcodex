@@ -172,6 +172,24 @@ function createHighlightSelector() {
 
 const collectionsExcluded = ['pages'] satisfies Array<CatalogCollectionKey>;
 
+function addRecordedVisits(chronologyDataMap: ChronologyDataMap, item: CatalogItem): void {
+	if (!item.dateRecorded) return;
+
+	const yearsRecorded = new Set<string>();
+	const recordedDates = getDateRanges(item.dateRecorded)
+		.map((range) => range.start.date)
+		.sort((a, b) => b.getTime() - a.getTime());
+
+	for (const recordedDate of recordedDates) {
+		const recordedDateData = getDateData(recordedDate);
+
+		if (yearsRecorded.has(recordedDateData.year)) continue;
+
+		yearsRecorded.add(recordedDateData.year);
+		getOrCreateMonthData(chronologyDataMap, recordedDateData).visited.add(item);
+	}
+}
+
 function buildChronologyDataMap(items: ReadonlyArray<CatalogItem>): ChronologyDataMap {
 	const chronologyDataMap: ChronologyDataMap = new Map();
 
@@ -191,21 +209,7 @@ function buildChronologyDataMap(items: ReadonlyArray<CatalogItem>): ChronologyDa
 
 		getOrCreateMonthData(chronologyDataMap, dateCreatedData).created.add(item);
 
-		if (item.dateRecorded) {
-			const yearsRecorded = new Set<string>();
-			const recordedDates = getDateRanges(item.dateRecorded)
-				.map((range) => range.start.date)
-				.sort((a, b) => b.getTime() - a.getTime());
-
-			for (const recordedDate of recordedDates) {
-				const recordedDateData = getDateData(recordedDate);
-
-				if (!yearsRecorded.has(recordedDateData.year)) {
-					yearsRecorded.add(recordedDateData.year);
-					getOrCreateMonthData(chronologyDataMap, recordedDateData).visited.add(item);
-				}
-			}
-		}
+		addRecordedVisits(chronologyDataMap, item);
 	}
 
 	return chronologyDataMap;
@@ -316,6 +320,77 @@ function getYearlyWinningCategories(
 	return winning;
 }
 
+interface ChronologyMonthBuckets extends ChronologyTierBuckets {
+	raw: ChronologyRawMonthData;
+}
+
+function toMonthBuckets(raw: ChronologyRawMonthData): ChronologyMonthBuckets {
+	return {
+		raw,
+		updated: [...raw.updated],
+		created: [...raw.created],
+		visited: [...raw.visited],
+	};
+}
+
+function buildMonthlyItems(
+	months: Array<ChronologyMonthBuckets>,
+	chronologyMap: Map<string, CollectionEntry<'chronology'>>,
+): Array<ChronologyMonthlyItem> {
+	const monthlyItems: Array<ChronologyMonthlyItem> = [];
+
+	for (const month of months) {
+		const tier = projectChronologyTier(month, monthlyTierOptions);
+
+		if (!tierHasData(tier)) continue;
+
+		monthlyItems.push({
+			...month.raw,
+			highlights: undefined,
+			...getBucketCounts(month),
+			...tier,
+			chronologyEntry: chronologyMap.get(month.raw.id),
+		});
+	}
+
+	return monthlyItems;
+}
+
+// An entry occupies its highest-precedence category for the year; the monthly highlights carry over
+function buildYearlyItems(
+	months: Array<ChronologyMonthBuckets>,
+	yearBuckets: ChronologyTierBuckets,
+	monthlyHighlightsById: ReadonlyMap<string, ChronologyMonthlyItem['highlights']>,
+): Array<ChronologyMonthlyItem> {
+	const winningCategory = getYearlyWinningCategories(yearBuckets);
+	const yearlyItems: Array<ChronologyMonthlyItem> = [];
+
+	for (const month of months) {
+		const takeWinners = (category: keyof ChronologyTierBuckets) =>
+			sortAndLimit(
+				month[category].filter((item) => winningCategory.get(item.id) === category),
+				yearlyLimit,
+			);
+
+		const tier: ChronologyTierBuckets = {
+			updated: takeWinners('updated'),
+			created: takeWinners('created'),
+			visited: takeWinners('visited'),
+		};
+
+		if (!tierHasData(tier)) continue;
+
+		yearlyItems.push({
+			...month.raw,
+			highlights: monthlyHighlightsById.get(month.raw.id),
+			...getBucketCounts(month),
+			...tier,
+		});
+	}
+
+	return yearlyItems;
+}
+
 export function createChronologyData(
 	items: ReadonlyArray<CatalogItem>,
 	chronologyEntries: Array<CollectionEntry<'chronology'>>,
@@ -340,33 +415,12 @@ export function createChronologyData(
 	const yearEntries = [...chronologyDataMap].sort(([yearA], [yearB]) => yearB.localeCompare(yearA));
 
 	for (const [year, yearlyData] of yearEntries) {
-		const months = [...yearlyData.values()].map((raw) => ({
-			raw,
-			updated: [...raw.updated],
-			created: [...raw.created],
-			visited: [...raw.visited],
-		}));
+		const months = [...yearlyData.values()].map(toMonthBuckets);
 
 		// Monthly view data
-		const yearMonthlyItems: Array<ChronologyMonthlyItem> = [];
+		const yearMonthlyItems = buildMonthlyItems(months, chronologyMap);
 
-		for (const month of months) {
-			const tier = projectChronologyTier(month, monthlyTierOptions);
-
-			if (!tierHasData(tier)) continue;
-
-			const monthlyItem: ChronologyMonthlyItem = {
-				...month.raw,
-				highlights: undefined, // Set below
-				...getBucketCounts(month),
-				...tier,
-				chronologyEntry: chronologyMap.get(month.raw.id),
-			};
-
-			chronologyMonthlyData.push(monthlyItem);
-			yearMonthlyItems.push(monthlyItem);
-		}
-
+		chronologyMonthlyData.push(...yearMonthlyItems);
 		chronologyMonths[year] = yearMonthlyItems.map((item) => item.month);
 
 		// Monthly highlights; chronological so the earliest month wins a shared featured image
@@ -394,41 +448,9 @@ export function createChronologyData(
 			visited: months.flatMap((month) => month.visited),
 		};
 
-		// Yearly view data; an entry occupies its highest-precedence category for the year
-		const yearlyWinningCategory = getYearlyWinningCategories(yearBuckets);
+		const yearlyItems = buildYearlyItems(months, yearBuckets, monthlyHighlightsById);
 
-		for (const month of months) {
-			const tier: ChronologyTierBuckets = {
-				updated: sortAndLimit(
-					month.updated.filter((item) => yearlyWinningCategory.get(item.id) === 'updated'),
-					yearlyLimit,
-				),
-				created: sortAndLimit(
-					month.created.filter((item) => yearlyWinningCategory.get(item.id) === 'created'),
-					yearlyLimit,
-				),
-				visited: sortAndLimit(
-					month.visited.filter((item) => yearlyWinningCategory.get(item.id) === 'visited'),
-					yearlyLimit,
-				),
-			};
-
-			if (!tierHasData(tier)) continue;
-
-			let yearData = chronologyYearlyData[year];
-
-			if (!yearData) {
-				yearData = [];
-				chronologyYearlyData[year] = yearData;
-			}
-
-			yearData.push({
-				...month.raw,
-				highlights: monthlyHighlightsById.get(month.raw.id),
-				...getBucketCounts(month),
-				...tier,
-			});
-		}
+		if (yearlyItems.length > 0) chronologyYearlyData[year] = yearlyItems;
 
 		// Index view; year-level aggregation
 		const indexTier = projectChronologyTier(yearBuckets, indexTierOptions);

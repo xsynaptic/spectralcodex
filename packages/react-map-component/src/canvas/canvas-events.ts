@@ -84,6 +84,30 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		setFilterOpen,
 	} = useMapStoreActions();
 
+	const selectPoint = useCallback(
+		(mapInstance: MapClickEvent['target'], pointId: unknown, coordinates: unknown) => {
+			if (typeof pointId !== 'string') return;
+
+			setSelectedId(pointId);
+			setHoveredId(undefined);
+
+			if (!isMapCoordinates(coordinates)) return;
+
+			setPopupVisible(false);
+
+			mapInstance.easeTo({
+				center: coordinates,
+				duration: 150,
+				padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
+			});
+
+			void mapInstance.once('moveend', () => {
+				setPopupVisible(true);
+			});
+		},
+		[isMobile, setSelectedId, setHoveredId, setPopupVisible],
+	);
+
 	const onClick = useCallback<NonNullable<MapCallbacks['onClick']>>(
 		({ features, target: mapInstance }) => {
 			const feature = features?.[0];
@@ -106,29 +130,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 				case MapLayerIdEnum.Points:
 				case MapLayerIdEnum.PointsTarget:
 				case MapLayerIdEnum.PointsImage: {
-					const pointId =
-						typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
-
-					if (!pointId) break;
-
-					if (isMapCoordinates(feature.geometry.coordinates)) {
-						setPopupVisible(false);
-						setSelectedId(pointId);
-						setHoveredId(undefined);
-
-						mapInstance.easeTo({
-							center: feature.geometry.coordinates,
-							duration: 150,
-							padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
-						});
-
-						void mapInstance.once('moveend', () => {
-							setPopupVisible(true);
-						});
-					} else {
-						setSelectedId(pointId);
-						setHoveredId(undefined);
-					}
+					selectPoint(mapInstance, feature.properties.id, feature.geometry.coordinates);
 					break;
 				}
 				default: {
@@ -136,7 +138,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 				}
 			}
 		},
-		[isMobile, setFilterOpen, setSelectedId, setPopupVisible, setHoveredId],
+		[selectPoint, setFilterOpen, setSelectedId, setHoveredId],
 	);
 
 	const onMouseMove = useCallback(

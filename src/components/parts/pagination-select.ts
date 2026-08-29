@@ -50,6 +50,21 @@ class PaginationSelect extends HTMLElement {
 		if (!form || !select) return;
 
 		const counter = this.querySelector<HTMLElement>('[data-pagination-counter]');
+
+		this.#populate(select, lastPage, currentPage);
+
+		if (counter) counter.hidden = true;
+		form.hidden = false;
+
+		this.#lockSelectWidth(select, lastPage);
+
+		this.#form = form;
+		this.#select = select;
+		this.#submit = form.querySelector<HTMLButtonElement>('[data-pagination-submit]') ?? undefined;
+		this.#syncSubmit();
+	}
+
+	#populate(select: HTMLSelectElement, lastPage: number, currentPage: number) {
 		const pageLabel = this.dataset.pageLabel ?? 'Page {page}';
 
 		for (let pageNumber = 1; pageNumber <= lastPage; pageNumber++) {
@@ -61,16 +76,6 @@ class PaginationSelect extends HTMLElement {
 			if (pageNumber === currentPage) option.dataset.currentPage = '';
 			select.append(option);
 		}
-
-		if (counter) counter.hidden = true;
-		form.hidden = false;
-
-		this.#lockSelectWidth(select, lastPage);
-
-		this.#form = form;
-		this.#select = select;
-		this.#submit = form.querySelector<HTMLButtonElement>('[data-pagination-submit]') ?? undefined;
-		this.#syncSubmit();
 	}
 
 	// Pin a width floor to the widest label (lastPage) so changing pages never resizes the control

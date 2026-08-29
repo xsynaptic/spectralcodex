@@ -94,13 +94,14 @@ function buildPrimaryCitation(source: ResourceSource) {
 	});
 }
 
+function getPrimaryContent(source: ResourceSource, prop: string) {
+	return getMultilingualContent({ data: source, prop })?.primary;
+}
+
 function buildMultilingualCitation(source: ResourceSource) {
-	const title = getMultilingualContent({ data: source, prop: 'title' })?.primary;
-	const publisher = getMultilingualContent({ data: source, prop: 'publisher' })?.primary;
-	const publishedDetails = getMultilingualContent({
-		data: source,
-		prop: 'publishedDetails',
-	})?.primary;
+	const title = getPrimaryContent(source, 'title');
+	const publisher = getPrimaryContent(source, 'publisher');
+	const publishedDetails = getPrimaryContent(source, 'publishedDetails');
 
 	// Regional variants such as `zh-Hans` share the base language's punctuation
 	const lang = citationLanguagesMultilingual.find(

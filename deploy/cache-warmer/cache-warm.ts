@@ -284,6 +284,38 @@ function saveWarmedImages(urls: Set<string>): void {
 	renameSync(temporaryFile, imageStateFile);
 }
 
+interface PersistWarmedImagesOptions {
+	referenced: ReadonlySet<string>;
+	seen: ReadonlySet<string>;
+	warmed: Array<string>;
+	failures: Array<WarmResult>;
+}
+
+function persistWarmedImages({
+	referenced,
+	seen,
+	warmed,
+	failures,
+}: PersistWarmedImagesOptions): string | undefined {
+	const failedUrls = new Set(failures.map((failure) => failure.url));
+	const nextSeen = referenced.intersection(seen);
+
+	for (const url of warmed) {
+		if (!failedUrls.has(url)) nextSeen.add(url);
+	}
+
+	try {
+		saveWarmedImages(nextSeen);
+		console.log(`Image state: ${String(nextSeen.size)} URLs recorded`);
+		return undefined;
+	} catch (error) {
+		const message = `Image state save failed: ${messageOf(error)}`;
+
+		console.error(message);
+		return message;
+	}
+}
+
 interface JmapSession {
 	apiUrl: string;
 	primaryAccounts: Record<string, string>;
@@ -534,21 +566,14 @@ async function main(): Promise<void> {
 		failures = retryStats.failures;
 	}
 
-	// Keep what is still referenced and warm, add what this run warmed; everything else drops out
-	// Dropping unreferenced URLs bounds the file to the live site; failures stay out so they retry
-	const failedUrls = new Set(failures.map((failure) => failure.url));
-	const nextSeen = targets.images.intersection(seen);
-	for (const url of newImages) {
-		if (!failedUrls.has(url)) nextSeen.add(url);
-	}
-	try {
-		saveWarmedImages(nextSeen);
-		console.log(`Image state: ${String(nextSeen.size)} URLs recorded`);
-	} catch (error) {
-		const message = messageOf(error);
-		console.error(`Image state save failed: ${message}`);
-		notes.push(`Image state save failed: ${message}`);
-	}
+	const stateNote = persistWarmedImages({
+		referenced: targets.images,
+		seen,
+		warmed: newImages,
+		failures,
+	});
+
+	if (stateNote !== undefined) notes.push(stateNote);
 
 	const seconds = ((Date.now() - start) / 1000).toFixed(1);
 	console.log(`Done in ${seconds}s`);

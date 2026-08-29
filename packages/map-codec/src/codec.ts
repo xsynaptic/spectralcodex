@@ -30,6 +30,10 @@ const categoryByCode = invertNumericMapping(LocationCategoryNumericMapping);
 const statusByCode = invertNumericMapping(LocationStatusNumericMapping);
 const geometryTypeByCode = invertNumericMapping<GeometryType>(MapDataGeometryTypeNumericMapping);
 
+function withoutUndefined<T extends object>(object: T): T {
+	return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined)) as T;
+}
+
 const coordinatesSchema = z.union([
 	z.tuple([z.number(), z.number()]), // Point
 	z.tuple([z.number(), z.number()]).array(), // LineString
@@ -84,51 +88,38 @@ const sourceStandardSchema = z.object({
 });
 
 export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandardSchema, {
-	decode: (data) => {
-		const objective = data[MapDataKeysCompressed.Objective];
-		const outlier = data[MapDataKeysCompressed.Outlier];
-		const regionOrdinals = data[MapDataKeysCompressed.RegionOrdinals];
-		const themeIndices = data[MapDataKeysCompressed.ThemeIndices];
-		const chunkKey = data[MapDataKeysCompressed.ChunkKey];
-
-		return {
-			properties: {
-				[MapDataKeys.Id]: data[MapDataKeysCompressed.Id],
-				[MapDataKeys.Title]: data[MapDataKeysCompressed.Title],
-				[MapDataKeys.Category]:
-					categoryByCode[data[MapDataKeysCompressed.Category]] ?? LocationCategoryEnum.Unknown,
-				[MapDataKeys.Status]:
-					statusByCode[data[MapDataKeysCompressed.Status]] ?? LocationStatusEnum.Unknown,
-				[MapDataKeys.Precision]: data[MapDataKeysCompressed.Precision],
-				[MapDataKeys.EntryQuality]: data[MapDataKeysCompressed.EntryQuality],
-				[MapDataKeys.Rating]: data[MapDataKeysCompressed.Rating],
-				...(objective === undefined ? {} : { [MapDataKeys.Objective]: objective }),
-				...(outlier === undefined ? {} : { [MapDataKeys.Outlier]: outlier }),
-				[MapDataKeys.HasImage]: data[MapDataKeysCompressed.HasImage] ?? false,
-				...(regionOrdinals ? { [MapDataKeys.RegionOrdinals]: regionOrdinals } : {}),
-				...(themeIndices ? { [MapDataKeys.ThemeIndices]: themeIndices } : {}),
-				...(chunkKey ? { [MapDataKeys.ChunkKey]: chunkKey } : {}),
-			},
-			[MapDataKeys.Geometry]: {
-				[MapDataKeys.GeometryType]:
-					geometryTypeByCode[
-						data[MapDataKeysCompressed.Geometry][MapDataKeysCompressed.GeometryType]
-					] ?? GeometryTypeEnum.Point,
-				[MapDataKeys.GeometryCoordinates]:
-					data[MapDataKeysCompressed.Geometry][MapDataKeysCompressed.GeometryCoordinates],
-			},
-		};
-	},
+	decode: (data) => ({
+		properties: withoutUndefined({
+			[MapDataKeys.Id]: data[MapDataKeysCompressed.Id],
+			[MapDataKeys.Title]: data[MapDataKeysCompressed.Title],
+			[MapDataKeys.Category]:
+				categoryByCode[data[MapDataKeysCompressed.Category]] ?? LocationCategoryEnum.Unknown,
+			[MapDataKeys.Status]:
+				statusByCode[data[MapDataKeysCompressed.Status]] ?? LocationStatusEnum.Unknown,
+			[MapDataKeys.Precision]: data[MapDataKeysCompressed.Precision],
+			[MapDataKeys.EntryQuality]: data[MapDataKeysCompressed.EntryQuality],
+			[MapDataKeys.Rating]: data[MapDataKeysCompressed.Rating],
+			[MapDataKeys.Objective]: data[MapDataKeysCompressed.Objective],
+			[MapDataKeys.Outlier]: data[MapDataKeysCompressed.Outlier],
+			[MapDataKeys.HasImage]: data[MapDataKeysCompressed.HasImage] ?? false,
+			[MapDataKeys.RegionOrdinals]: data[MapDataKeysCompressed.RegionOrdinals],
+			[MapDataKeys.ThemeIndices]: data[MapDataKeysCompressed.ThemeIndices],
+			[MapDataKeys.ChunkKey]: data[MapDataKeysCompressed.ChunkKey],
+		}),
+		[MapDataKeys.Geometry]: {
+			[MapDataKeys.GeometryType]:
+				geometryTypeByCode[
+					data[MapDataKeysCompressed.Geometry][MapDataKeysCompressed.GeometryType]
+				] ?? GeometryTypeEnum.Point,
+			[MapDataKeys.GeometryCoordinates]:
+				data[MapDataKeysCompressed.Geometry][MapDataKeysCompressed.GeometryCoordinates],
+		},
+	}),
 	encode: (data) => {
 		const properties = data.properties;
-		const objective = properties[MapDataKeys.Objective];
-		const outlier = properties[MapDataKeys.Outlier];
-		const hasImage = properties[MapDataKeys.HasImage];
-		const regionOrdinals = properties[MapDataKeys.RegionOrdinals];
-		const themeIndices = properties[MapDataKeys.ThemeIndices];
-		const chunkKey = properties[MapDataKeys.ChunkKey];
+		const geometry = data[MapDataKeys.Geometry];
 
-		return {
+		return withoutUndefined({
 			[MapDataKeysCompressed.Id]: properties[MapDataKeys.Id],
 			[MapDataKeysCompressed.Title]: properties[MapDataKeys.Title],
 			[MapDataKeysCompressed.Category]:
@@ -137,19 +128,18 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 			[MapDataKeysCompressed.Precision]: properties[MapDataKeys.Precision],
 			[MapDataKeysCompressed.EntryQuality]: properties[MapDataKeys.EntryQuality],
 			[MapDataKeysCompressed.Rating]: properties[MapDataKeys.Rating],
-			...(objective === undefined ? {} : { [MapDataKeysCompressed.Objective]: objective }),
-			...(outlier === undefined ? {} : { [MapDataKeysCompressed.Outlier]: outlier }),
-			...(hasImage ? { [MapDataKeysCompressed.HasImage]: true } : {}),
-			...(regionOrdinals ? { [MapDataKeysCompressed.RegionOrdinals]: regionOrdinals } : {}),
-			...(themeIndices ? { [MapDataKeysCompressed.ThemeIndices]: themeIndices } : {}),
-			...(chunkKey ? { [MapDataKeysCompressed.ChunkKey]: chunkKey } : {}),
+			[MapDataKeysCompressed.Objective]: properties[MapDataKeys.Objective],
+			[MapDataKeysCompressed.Outlier]: properties[MapDataKeys.Outlier],
+			[MapDataKeysCompressed.HasImage]: properties[MapDataKeys.HasImage] ? true : undefined,
+			[MapDataKeysCompressed.RegionOrdinals]: properties[MapDataKeys.RegionOrdinals],
+			[MapDataKeysCompressed.ThemeIndices]: properties[MapDataKeys.ThemeIndices],
+			[MapDataKeysCompressed.ChunkKey]: properties[MapDataKeys.ChunkKey],
 			[MapDataKeysCompressed.Geometry]: {
 				[MapDataKeysCompressed.GeometryType]:
-					MapDataGeometryTypeNumericMapping[data[MapDataKeys.Geometry][MapDataKeys.GeometryType]],
-				[MapDataKeysCompressed.GeometryCoordinates]:
-					data[MapDataKeys.Geometry][MapDataKeys.GeometryCoordinates],
+					MapDataGeometryTypeNumericMapping[geometry[MapDataKeys.GeometryType]],
+				[MapDataKeysCompressed.GeometryCoordinates]: geometry[MapDataKeys.GeometryCoordinates],
 			},
-		};
+		});
 	},
 });
 
@@ -199,24 +189,18 @@ export const MapPopupItemSchema = z.codec(popupCompressedSchema, popupStandardSc
 			[MapDataKeys.Image]: srcSet ? { [MapDataKeys.ImageSrcSet]: srcSet } : undefined,
 		};
 	},
-	encode: (data) => {
-		const image = data[MapDataKeys.Image];
-
-		return {
-			[MapDataKeysCompressed.Id]: data[MapDataKeys.Id],
-			[MapDataKeysCompressed.Title]: data[MapDataKeys.Title],
-			[MapDataKeysCompressed.TitleMultilingualLang]: data[MapDataKeys.TitleMultilingualLang],
-			[MapDataKeysCompressed.TitleMultilingualValue]: data[MapDataKeys.TitleMultilingualValue],
-			[MapDataKeysCompressed.Url]: data[MapDataKeys.Url],
-			[MapDataKeysCompressed.Description]: data[MapDataKeys.Description],
-			[MapDataKeysCompressed.Safety]: data[MapDataKeys.Safety],
-			[MapDataKeysCompressed.GoogleMapsUrl]: data[MapDataKeys.GoogleMapsUrl],
-			[MapDataKeysCompressed.WikipediaUrl]: data[MapDataKeys.WikipediaUrl],
-			...(image === undefined
-				? {}
-				: { [MapDataKeysCompressed.ImageSrcSet]: image[MapDataKeys.ImageSrcSet] }),
-		};
-	},
+	encode: (data) => ({
+		[MapDataKeysCompressed.Id]: data[MapDataKeys.Id],
+		[MapDataKeysCompressed.Title]: data[MapDataKeys.Title],
+		[MapDataKeysCompressed.TitleMultilingualLang]: data[MapDataKeys.TitleMultilingualLang],
+		[MapDataKeysCompressed.TitleMultilingualValue]: data[MapDataKeys.TitleMultilingualValue],
+		[MapDataKeysCompressed.Url]: data[MapDataKeys.Url],
+		[MapDataKeysCompressed.Description]: data[MapDataKeys.Description],
+		[MapDataKeysCompressed.Safety]: data[MapDataKeys.Safety],
+		[MapDataKeysCompressed.GoogleMapsUrl]: data[MapDataKeys.GoogleMapsUrl],
+		[MapDataKeysCompressed.WikipediaUrl]: data[MapDataKeys.WikipediaUrl],
+		[MapDataKeysCompressed.ImageSrcSet]: data[MapDataKeys.Image]?.[MapDataKeys.ImageSrcSet],
+	}),
 });
 
 // Compressed input types

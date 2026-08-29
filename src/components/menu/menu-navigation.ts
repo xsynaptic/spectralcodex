@@ -79,18 +79,12 @@ class NavMenu extends HTMLElement {
 		}
 
 		const trigger = this.#getTrigger(li);
-		const onTrigger = trigger ? trigger.contains(target) : false;
 		const inTrigger = this.#triggerContains(li, target);
-		const isTouch = this.#lastPointerType === 'touch';
-		const isAnchor = trigger instanceof HTMLAnchorElement;
 
-		if (onTrigger && isTouch && isAnchor) {
-			this.#handleTouchAnchorClick(event, li, inTrigger);
+		if (trigger instanceof HTMLAnchorElement && trigger.contains(target)) {
+			if (this.#lastPointerType === 'touch') this.#handleTouchAnchorClick(event, li, inTrigger);
 			return;
 		}
-
-		// Non-touch click on an anchor: let it navigate normally
-		if (onTrigger && isAnchor) return;
 
 		// Button triggers, chevron clicks, or anything else in the trigger zone: toggle
 		if (!inTrigger) return;
