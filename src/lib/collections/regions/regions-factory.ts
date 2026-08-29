@@ -80,19 +80,20 @@ export function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'
 	}
 }
 
-function mapReferencesByRegion(
-	entries: Array<CollectionEntry<'posts'>>,
-): Map<string, Array<string>> {
+function mapEntriesByRegion<T extends { id: string }>(
+	entries: Array<T>,
+	getRegions: (entry: T) => Array<{ id: string }> | undefined,
+) {
 	const map = new Map<string, Array<string>>();
 
 	for (const entry of entries) {
-		if (entry.data.regions) {
-			for (const { id: regionId } of entry.data.regions) {
-				if (!map.has(regionId)) {
-					map.set(regionId, []);
-				}
-				map.get(regionId)!.push(entry.id);
-			}
+		const regions = getRegions(entry) ?? [];
+
+		for (const { id: regionId } of regions) {
+			const entryIds = map.get(regionId) ?? [];
+
+			entryIds.push(entry.id);
+			map.set(regionId, entryIds);
 		}
 	}
 
@@ -117,18 +118,8 @@ export function populateRegionsContent({
 	regionsTree: Hierarchy;
 }) {
 	// Generate content by region maps; this will make subsequent calculations faster
-	const locationsByRegionMap = new Map<string, Array<string>>();
-
-	for (const entry of locations) {
-		for (const { id: regionId } of resolveLocationRegions(entry)) {
-			if (!locationsByRegionMap.has(regionId)) {
-				locationsByRegionMap.set(regionId, []);
-			}
-			locationsByRegionMap.get(regionId)!.push(entry.id);
-		}
-	}
-
-	const postsByRegionMap = mapReferencesByRegion(posts);
+	const locationsByRegionMap = mapEntriesByRegion(locations, resolveLocationRegions);
+	const postsByRegionMap = mapEntriesByRegion(posts, (entry) => entry.data.regions);
 
 	// Calculate cumulative content counts, rolled up through descendants
 	for (const entry of entries) {

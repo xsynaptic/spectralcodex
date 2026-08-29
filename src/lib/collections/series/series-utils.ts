@@ -50,26 +50,17 @@ async function createLocationsBySeriesFunction() {
 			const location = locationsMap.get(seriesItemId);
 
 			if (location) {
-				if (!seriesLocationsMap.has(seriesItemId)) {
-					seriesLocationsMap.set(seriesItemId, location);
-				}
+				seriesLocationsMap.set(seriesItemId, location);
 				continue;
 			}
 
 			const post = postsMap.get(seriesItemId);
 
-			if (post) {
-				const seriesPostsLocations = getLocationsByPosts(post);
+			if (!post) throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
 
-				for (const seriesPostLocation of seriesPostsLocations) {
-					if (!seriesLocationsMap.has(seriesPostLocation.id))
-						seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
-				}
-				continue;
+			for (const seriesPostLocation of getLocationsByPosts(post)) {
+				seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
 			}
-
-			// In case nothing came up!
-			throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
 		}
 
 		return [...seriesLocationsMap.values()];

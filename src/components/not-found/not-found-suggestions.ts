@@ -39,6 +39,8 @@ function getOptions(container: HTMLElement) {
 	};
 }
 
+type SuggestionsOptions = ReturnType<typeof getOptions>;
+
 async function fetchManifest(url: string): Promise<Array<ContentManifestEntry> | undefined> {
 	const response = await fetch(url);
 
@@ -53,6 +55,35 @@ function scoreEntries(entries: Array<ContentManifestEntry>, current: string): Ar
 		.sort((entryA, entryB) => entryB.score - entryA.score);
 }
 
+type SuggestionsOutcome =
+	{ type: 'redirect'; url: string } | { type: 'list'; items: Array<ScoredEntry> };
+
+function resolveSuggestions({
+	entries,
+	current,
+	options,
+}: {
+	entries: Array<ContentManifestEntry>;
+	current: string;
+	options: SuggestionsOptions;
+}): SuggestionsOutcome | undefined {
+	const scored = scoreEntries(entries, current);
+	const best = scored[0];
+
+	if (!best || best.score < options.threshold) return;
+
+	if (best.score >= options.autoRedirectThreshold && normalize(best.url) !== current) {
+		return { type: 'redirect', url: best.url };
+	}
+
+	return {
+		type: 'list',
+		items: scored
+			.filter((entry) => entry.score >= options.threshold)
+			.slice(0, options.maxSuggestions),
+	};
+}
+
 export async function runNotFoundSuggestions(): Promise<void> {
 	const container = document.querySelector<HTMLElement>('#not-found-suggestions');
 
@@ -65,24 +96,22 @@ export async function runNotFoundSuggestions(): Promise<void> {
 
 		if (current.length < minPathLength) return;
 
-		const { suggestionsUrl, threshold, autoRedirectThreshold, maxSuggestions } =
-			getOptions(container);
+		const options = getOptions(container);
 
-		const entries = await fetchManifest(suggestionsUrl);
+		const entries = await fetchManifest(options.suggestionsUrl);
 
 		if (!entries) return;
 
-		const scored = scoreEntries(entries, current);
-		const best = scored[0];
+		const outcome = resolveSuggestions({ entries, current, options });
 
-		if (!best || best.score < threshold) return;
+		if (!outcome) return;
 
-		if (best.score >= autoRedirectThreshold && normalize(best.url) !== current) {
-			void navigate(best.url, { history: 'replace' });
+		if (outcome.type === 'redirect') {
+			void navigate(outcome.url, { history: 'replace' });
 			return;
 		}
 
-		renderSuggestions(scored.filter((entry) => entry.score >= threshold).slice(0, maxSuggestions));
+		renderSuggestions(outcome.items);
 		container.hidden = false;
 	} finally {
 		loading?.remove();

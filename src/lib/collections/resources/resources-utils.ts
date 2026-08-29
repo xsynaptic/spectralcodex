@@ -71,6 +71,11 @@ export async function createResolveResourceLinksFunction() {
 	};
 }
 
+type ResolveResourceLinks = Awaited<ReturnType<typeof createResolveResourceLinksFunction>>;
+
+// Either a Resource entry flattened onto its id, or a link written inline in frontmatter
+export type ResourceLink = NonNullable<ReturnType<ResolveResourceLinks>>[number];
+
 export async function createResolveResourceSourcesFunction() {
 	const { entriesMap } = await getResourcesCollection();
 

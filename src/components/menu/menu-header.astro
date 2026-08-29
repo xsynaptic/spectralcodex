@@ -2,13 +2,9 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import MenuHeaderSubmenu from '#components/menu/menu-header-submenu.astro';
+import MenuHeaderTrigger from '#components/menu/menu-header-trigger.astro';
 import { getMenuHeaderItems } from '#components/menu/menu-header.ts';
-import {
-	getMenuItemAriaLabel,
-	getMenuItemTriggerType,
-	isActiveMenuItem,
-} from '#components/menu/menu-utils.ts';
-import Anchor from '#components/parts/anchor.astro';
+import { getMenuItemAriaLabel } from '#components/menu/menu-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
@@ -16,8 +12,6 @@ interface Props extends HTMLAttributes<'nav'> {
 }
 
 const { hasHeroImage, ...props } = Astro.props;
-
-const { pathname } = Astro.url;
 
 const menuItems = await getMenuHeaderItems();
 
@@ -31,45 +25,10 @@ const t = getTranslations();
 				menuItems.map((item) => {
 					const children = item.children ?? [];
 					const hasChildren = children.length > 0;
-					const isActive = isActiveMenuItem(item, pathname);
-					const triggerClasses = ['nav-item-link', isActive ? 'link-active' : undefined];
-					const triggerType = getMenuItemTriggerType(item);
 
 					return (
 						<li class="nav-item">
-							<div class="nav-item-trigger">
-								{triggerType === 'anchor' ? (
-									<Anchor
-										class:list={triggerClasses}
-										href={item.url}
-										linkColor="accent"
-										{...(item.rel ? { rel: item.rel } : undefined)}
-									>
-										{item.title}
-									</Anchor>
-								) : undefined}
-								{triggerType === 'button' ? (
-									<button
-										type="button"
-										class:list={['link link-accent', ...triggerClasses]}
-										set:html={item.title}
-									/>
-								) : undefined}
-								{triggerType === 'span' ? (
-									<span class:list={triggerClasses}>{item.title}</span>
-								) : undefined}
-								{hasChildren ? (
-									<svg
-										width="24"
-										height="24"
-										viewBox="0 0 24 24"
-										class="nav-icon"
-										aria-hidden="true"
-									>
-										<use href="#icon:chevron-down" />
-									</svg>
-								) : undefined}
-							</div>
+							<MenuHeaderTrigger item={item} hasChildren={hasChildren} />
 							{hasChildren ? (
 								<MenuHeaderSubmenu
 									menuItems={children}

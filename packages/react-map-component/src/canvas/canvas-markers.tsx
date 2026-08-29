@@ -40,6 +40,18 @@ function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
 	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
 }
 
+function toPointMarker(
+	feature: MapGeoJSONFeature,
+	id: string,
+	isDark: boolean,
+): TargetMarker | undefined {
+	if (feature.geometry.type !== 'Point') return undefined;
+
+	const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+
+	return { id, longitude, latitude, color: getMarkerColor(feature, isDark) };
+}
+
 function collectPointMarkers(
 	map: MapRef,
 	targetIds: Array<string>,
@@ -55,20 +67,13 @@ function collectPointMarkers(
 	const markers: Array<TargetMarker> = [];
 
 	for (const feature of points) {
-		if (feature.geometry.type !== 'Point') continue;
-
 		const pointId = typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
 
 		if (!pointId) continue;
 
-		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+		const marker = toPointMarker(feature, pointId, isDark);
 
-		markers.push({
-			id: pointId,
-			longitude,
-			latitude,
-			color: getMarkerColor(feature, isDark),
-		});
+		if (marker) markers.push(marker);
 	}
 
 	return markers;
@@ -200,53 +205,36 @@ export const MapTargetMarkers: FC<{
 	return markers.map((marker) => <MapPulseRing key={marker.id} {...marker} />);
 };
 
+function findPointMarker(map: MapRef, id: string, isDark: boolean): TargetMarker | undefined {
+	if (!map.getLayer(MapLayerIdEnum.Points)) return undefined;
+
+	const [feature] = map.queryRenderedFeatures(undefined, {
+		layers: [MapLayerIdEnum.Points],
+		filter: ['==', ['get', 'id'], id],
+	});
+
+	return feature ? toPointMarker(feature, id, isDark) : undefined;
+}
+
 function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker | undefined {
 	const { current: map } = useMap();
 	const isDark = useDarkMode();
 	const selectedId = useMapSelectedId();
 	const popupVisible = useMapPopupVisible();
 
-	const isAlreadyTarget = selectedId !== undefined && targetIds?.includes(selectedId);
-	const enabled = Boolean(map && selectedId && popupVisible && !isAlreadyTarget);
+	const trackedId =
+		popupVisible && selectedId && !targetIds?.includes(selectedId) ? selectedId : undefined;
 
 	const [marker, setMarker] = useState<TargetMarker | undefined>();
 
 	useEffect(() => {
-		if (!enabled || !map || !selectedId) return;
+		if (!map || !trackedId) return;
 
-		function updateMarker() {
-			if (!map || !selectedId) return;
+		const updateMarker = () => {
+			const next = findPointMarker(map, trackedId, isDark);
 
-			if (!map.getLayer(MapLayerIdEnum.Points)) return;
-
-			const features = map.queryRenderedFeatures(undefined, {
-				layers: [MapLayerIdEnum.Points],
-				filter: ['==', ['get', 'id'], selectedId],
-			});
-
-			const feature = features[0];
-
-			if (feature?.geometry.type !== 'Point') {
-				setMarker(undefined);
-
-				return;
-			}
-
-			const [lng, lat] = feature.geometry.coordinates as [number, number];
-
-			const next: TargetMarker = {
-				id: selectedId,
-				longitude: lng,
-				latitude: lat,
-				color: getMarkerColor(feature, isDark),
-			};
-
-			setMarker((previous) => {
-				if (previous && markersEqual(previous, next)) return previous;
-
-				return next;
-			});
-		}
+			setMarker((previous) => (previous && next && markersEqual(previous, next) ? previous : next));
+		};
 
 		map.on('moveend', updateMarker);
 
@@ -255,11 +243,9 @@ function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker |
 		return () => {
 			map.off('moveend', updateMarker);
 		};
-	}, [enabled, map, selectedId, isDark]);
+	}, [map, trackedId, isDark]);
 
-	if (!enabled || marker?.id !== selectedId) return undefined;
-
-	return marker;
+	return marker?.id === trackedId ? marker : undefined;
 }
 
 export const MapSelectedMarker: FC<{ targetIds?: Array<string> | undefined }> =

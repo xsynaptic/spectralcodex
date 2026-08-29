@@ -43,23 +43,29 @@ function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureColle
 }
 
 // Restrict the shared directory to this map's rows before any visibility filtering
-function isInMapScope(
-	properties: MapSourceItem['properties'],
+function getScopedItems(
+	items: ReadonlyArray<MapSourceItem>,
 	scope: MapScope,
-	idSet: ReadonlySet<string> | undefined,
-): boolean {
+): ReadonlyArray<MapSourceItem> {
 	switch (scope.type) {
 		case 'region': {
 			const [left, right] = scope.interval;
-			return (
-				properties.regionOrdinals?.some((ordinal) => ordinal >= left && ordinal <= right) ?? false
+
+			return items.filter(
+				({ properties }) =>
+					properties.regionOrdinals?.some((ordinal) => ordinal >= left && ordinal <= right) ??
+					false,
 			);
 		}
 		case 'theme': {
-			return properties.themeIndices?.includes(scope.index) ?? false;
+			return items.filter(
+				({ properties }) => properties.themeIndices?.includes(scope.index) ?? false,
+			);
 		}
 		case 'ids': {
-			return idSet?.has(properties.id) ?? false;
+			const itemById = new Map(items.map((item) => [item.properties.id, item] as const));
+
+			return scope.ids.map((id) => itemById.get(id)).filter((item) => item !== undefined);
 		}
 	}
 }
@@ -69,19 +75,7 @@ export function getMapCanvasData(
 	filter: MapFilterState,
 	scope?: MapScope,
 ): MapCanvasData {
-	const idSet = scope?.type === 'ids' ? new Set(scope.ids) : undefined;
-	let scopedItems = scope
-		? items.filter((item) => isInMapScope(item.properties, scope, idSet))
-		: items;
-
-	// Id-list maps keep the scope's order; a future series LineString depends on it
-	if (scope?.type === 'ids') {
-		const positionById = new Map(scope.ids.map((id, index) => [id, index] as const));
-		scopedItems = [...scopedItems].sort(
-			(itemA, itemB) =>
-				(positionById.get(itemA.properties.id) ?? 0) - (positionById.get(itemB.properties.id) ?? 0),
-		);
-	}
+	const scopedItems = scope ? getScopedItems(items, scope) : items;
 
 	const points: Array<MapSourceItem> = [];
 	const lineStrings: Array<MapSourceItem> = [];

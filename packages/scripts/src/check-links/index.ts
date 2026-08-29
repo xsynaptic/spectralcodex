@@ -75,6 +75,10 @@ function shouldIgnoreUrl(url: string): boolean {
 	return ignorePatterns.some((pattern) => url.includes(pattern));
 }
 
+function isHealthyStatus(status: UrlStatus): boolean {
+	return status === UrlStatusEnum.Healthy || status === UrlStatusEnum.Blocked;
+}
+
 function getDomain(url: string): string {
 	try {
 		return new URL(url).hostname;
@@ -121,14 +125,10 @@ function syncLinks() {
 
 			extractedEntries.add(contentId);
 
-			const links = extractLinksFromEntry(entry);
+			const links = extractLinksFromEntry(entry).filter((link) => !shouldIgnoreUrl(link.url));
 
 			for (const link of links) {
-				if (shouldIgnoreUrl(link.url)) continue;
-
-				const urlId = upsertUrl(link.url);
-
-				extractedSources.push({ urlId, contentId });
+				extractedSources.push({ urlId: upsertUrl(link.url), contentId });
 			}
 		}
 	}
@@ -220,14 +220,14 @@ try {
 
 				checked++;
 
-				if (result.status === UrlStatusEnum.Healthy || result.status === UrlStatusEnum.Blocked) {
-					healthyCount++;
-				} else {
+				const isIssue = !isHealthyStatus(result.status);
+
+				if (isIssue) {
 					issueCount++;
+				} else {
+					healthyCount++;
 				}
 
-				const isIssue =
-					result.status !== UrlStatusEnum.Healthy && result.status !== UrlStatusEnum.Blocked;
 				const isRecovery =
 					result.status === UrlStatusEnum.Healthy && row.status !== UrlStatusEnum.Pending;
 

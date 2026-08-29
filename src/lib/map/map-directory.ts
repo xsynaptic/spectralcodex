@@ -7,6 +7,8 @@ import { hash } from 'ohash';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
+import type { MapFeatureCollection } from '#lib/map/map-types.ts';
+
 import { hashShortLength } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
@@ -73,6 +75,50 @@ function buildLocationByFeatureId(
 	return locationByFeatureId;
 }
 
+function buildCoordinatesById(
+	featureCollection: MapFeatureCollection | undefined,
+): Map<string, Position> {
+	const coordinatesById = new Map<string, Position>();
+	const features = featureCollection?.features ?? [];
+
+	for (const feature of features) {
+		if (typeof feature.id === 'string') {
+			coordinatesById.set(feature.id, feature.geometry.coordinates as Position);
+		}
+	}
+
+	return coordinatesById;
+}
+
+function buildPopupBytesById(popupData: Array<MapPopupItem>): Map<string, number> {
+	const popupBytesById = new Map<string, number>();
+
+	for (const compressedItem of encodeMapPopupData(popupData)) {
+		popupBytesById.set(
+			compressedItem[MapDataKeysCompressed.Id],
+			Buffer.byteLength(JSON.stringify(compressedItem)),
+		);
+	}
+
+	return popupBytesById;
+}
+
+function buildChunks(
+	chunkIds: Map<string, Array<string>>,
+	popupById: ReadonlyMap<string, MapPopupItem>,
+): Map<string, Array<MapPopupItem>> {
+	const chunks = new Map<string, Array<MapPopupItem>>();
+
+	for (const [chunkKey, ids] of chunkIds) {
+		chunks.set(
+			chunkKey,
+			ids.map((id) => popupById.get(id)).filter((popupItem) => popupItem !== undefined),
+		);
+	}
+
+	return chunks;
+}
+
 // Unique, ascending membership indices for a set of content references
 function getMembershipIndices(
 	references: ReadonlyArray<{ id: string }>,
@@ -106,29 +152,9 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const popupData = getLocationsMapPopupData(featureCollection) ?? [];
 
 	const locationByFeatureId = buildLocationByFeatureId(locations);
-
-	const coordinatesById = new Map<string, Position>();
-	const popupById = new Map<string, MapPopupItem>();
-
-	if (featureCollection) {
-		for (const feature of featureCollection.features) {
-			if (typeof feature.id === 'string') {
-				coordinatesById.set(feature.id, feature.geometry.coordinates as Position);
-			}
-		}
-	}
-	for (const popupItem of popupData) {
-		popupById.set(popupItem.id, popupItem);
-	}
-
-	// Weight chunk balancing by the serialized size (what actually ships), not the standard size
-	const popupBytesById = new Map<string, number>();
-	for (const compressedItem of encodeMapPopupData(popupData)) {
-		popupBytesById.set(
-			compressedItem[MapDataKeysCompressed.Id],
-			Buffer.byteLength(JSON.stringify(compressedItem)),
-		);
-	}
+	const coordinatesById = buildCoordinatesById(featureCollection);
+	const popupById = new Map(popupData.map((popupItem) => [popupItem.id, popupItem]));
+	const popupBytesById = buildPopupBytesById(popupData);
 
 	// Assign chunk keys by binning every feature, weighted by its serialized popup size
 	const chunkInputs = sourceData.map((sourceItem) => {
@@ -164,16 +190,7 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		} satisfies MapSourceItem;
 	});
 
-	const chunks = new Map<string, Array<MapPopupItem>>();
-
-	for (const [chunkKey, ids] of chunkIds) {
-		chunks.set(
-			chunkKey,
-			ids
-				.map((id) => popupById.get(id))
-				.filter((popupItem): popupItem is MapPopupItem => popupItem !== undefined),
-		);
-	}
+	const chunks = buildChunks(chunkIds, popupById);
 
 	return { directory, chunks, chunkKeyById, version: hashMapDirectoryData(directory, chunks) };
 });

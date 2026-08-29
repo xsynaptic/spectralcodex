@@ -46,6 +46,12 @@ function parseChronologyDate(value: unknown): Date | undefined {
 	return value instanceof Date ? value : undefined;
 }
 
+function getContentDate(value: unknown): Date | undefined {
+	if (!value || typeof value !== 'object' || !('date' in value)) return undefined;
+
+	return parseChronologyDate(value.date);
+}
+
 // dateRecorded entries are ContentDate objects or [start, end] tuples; pull the date from each
 function extractRecordedDates(value: unknown): Array<Date> {
 	if (!Array.isArray(value)) return [];
@@ -56,11 +62,7 @@ function extractRecordedDates(value: unknown): Array<Date> {
 		const contentDates = Array.isArray(entry) ? entry : [entry];
 
 		for (const contentDate of contentDates) {
-			const raw =
-				contentDate && typeof contentDate === 'object' && 'date' in contentDate
-					? (contentDate as { date: unknown }).date
-					: undefined;
-			const date = parseChronologyDate(raw);
+			const date = getContentDate(contentDate);
 
 			if (date) dates.push(date);
 		}
@@ -132,11 +134,13 @@ export function buildChronologyImageIndex(
 ): Map<string, string> {
 	const candidates = new Map<string, ChronologyImageCandidate>();
 
-	function addCandidate(key: string, candidate: ChronologyImageCandidate): void {
-		const current = candidates.get(key);
+	function addCandidate(date: Date, candidate: ChronologyImageCandidate): void {
+		for (const key of getChronologyPeriodKeys(date)) {
+			const current = candidates.get(key);
 
-		if (!current || isBetterChronologyCandidate(candidate, current)) {
-			candidates.set(key, candidate);
+			if (!current || isBetterChronologyCandidate(candidate, current)) {
+				candidates.set(key, candidate);
+			}
 		}
 	}
 
@@ -151,9 +155,7 @@ export function buildChronologyImageIndex(
 			if (!entryCandidate) continue;
 
 			for (const { date, category } of extractDatedCategories(entry.data)) {
-				const candidate = { ...entryCandidate, category };
-
-				for (const key of getChronologyPeriodKeys(date)) addCandidate(key, candidate);
+				addCandidate(date, { ...entryCandidate, category });
 			}
 		}
 	}

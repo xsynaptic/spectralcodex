@@ -2,22 +2,29 @@ import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
-/**
- * Check that all shortform (bare string) links in frontmatter match a resource
- * Longform links (objects with title and url) are always valid and skipped
- */
-export function checkFrontmatterLinks(
+interface FrontmatterLinkIssue {
+	location: string;
+	url: string;
+}
+
+function getResourcePatterns(resourceEntries: Array<DataStoreEntry>) {
+	return resourceEntries.flatMap((entry) => {
+		const match = entry.data.match as string | Array<string> | undefined;
+
+		if (match === undefined) return [];
+
+		return typeof match === 'string' ? [match] : match;
+	});
+}
+
+// Longform links carry their own title and url, so only bare strings need a resource to match
+function collectFrontmatterLinkIssues(
 	entries: Array<DataStoreEntry>,
 	resourceEntries: Array<DataStoreEntry>,
-): boolean {
-	const resourcePatterns = resourceEntries
-		.map((entry) => ({
-			id: entry.id,
-			match: entry.data.match as string | Array<string> | undefined,
-		}))
-		.filter((resource) => resource.match !== undefined);
+) {
+	const patterns = getResourcePatterns(resourceEntries);
 
-	const unmatchedLinks: Array<{ file: string; url: string }> = [];
+	const issues: Array<FrontmatterLinkIssue> = [];
 
 	for (const entry of entries) {
 		const links = entry.data.links as Array<string | { url: string }> | undefined;
@@ -27,32 +34,31 @@ export function checkFrontmatterLinks(
 		for (const link of links) {
 			if (typeof link !== 'string') continue;
 
-			const hasMatch = resourcePatterns.some((resource) => {
-				if (typeof resource.match === 'string') {
-					return link.includes(resource.match);
-				}
+			if (patterns.some((pattern) => link.includes(pattern))) continue;
 
-				return resource.match!.some((pattern) => link.includes(pattern));
-			});
-
-			if (!hasMatch) {
-				unmatchedLinks.push({ file: entry.filePath ?? entry.id, url: link });
-			}
+			issues.push({ location: entry.filePath ?? entry.id, url: link });
 		}
 	}
 
-	if (unmatchedLinks.length === 0) {
+	return issues;
+}
+
+export function checkFrontmatterLinks(
+	entries: Array<DataStoreEntry>,
+	resourceEntries: Array<DataStoreEntry>,
+): boolean {
+	const issues = collectFrontmatterLinkIssues(entries, resourceEntries);
+
+	if (issues.length === 0) {
 		console.log(chalk.green('✓ All shortform frontmatter links match existing resources'));
 		return true;
 	}
 
-	for (const { file, url } of unmatchedLinks) {
-		console.log(chalk.red(`❌ ${file}: unmatched link "${url}"`));
+	for (const { location, url } of issues) {
+		console.log(chalk.red(`❌ ${location}: unmatched link "${url}"`));
 	}
 
-	console.log(
-		chalk.yellow(`⚠️  Found ${unmatchedLinks.length.toString()} unmatched frontmatter link(s)`),
-	);
+	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} unmatched frontmatter link(s)`));
 
 	return false;
 }

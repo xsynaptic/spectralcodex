@@ -91,6 +91,16 @@ export function buildChronologyDailyData(items: ReadonlyArray<CatalogItem>): Chr
 		counts[category] += 1;
 	}
 
+	function addRecordedDays(dateRecorded: NonNullable<CatalogItem['dateRecorded']>): void {
+		for (const range of getDateRanges(dateRecorded)) {
+			const rangeDays = expandRangeDays(range.start.date, range.end?.date);
+
+			for (const day of rangeDays) {
+				addEvent(day, 'visited');
+			}
+		}
+	}
+
 	for (const item of items) {
 		if (R.isIncludedIn(item.collection, collectionsExcluded)) continue;
 
@@ -100,15 +110,7 @@ export function buildChronologyDailyData(items: ReadonlyArray<CatalogItem>): Chr
 			addEvent(item.dateUpdated, 'updated');
 		}
 
-		if (item.dateRecorded) {
-			for (const range of getDateRanges(item.dateRecorded)) {
-				const rangeDays = expandRangeDays(range.start.date, range.end?.date);
-
-				for (const day of rangeDays) {
-					addEvent(day, 'visited');
-				}
-			}
-		}
+		if (item.dateRecorded) addRecordedDays(item.dateRecorded);
 	}
 
 	return dailyData;

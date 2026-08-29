@@ -10,36 +10,37 @@ interface LinkIdIssue {
 	id: string | undefined;
 }
 
+function collectEntryLinkIdIssues(entry: DataStoreEntry, validIds: ReadonlySet<string>) {
+	const body = entry.body;
+
+	if (!body?.includes('<Link ')) return [];
+
+	const location = entry.filePath ?? entry.id;
+
+	const issues: Array<LinkIdIssue> = [];
+
+	for (const match of body.matchAll(linkIdRegex)) {
+		const id = match[1];
+
+		if (id && validIds.has(id)) continue;
+
+		issues.push({
+			location,
+			lineNumber: body.slice(0, match.index).split('\n').length,
+			id,
+		});
+	}
+
+	return issues;
+}
+
 export function collectLinkIdIssues(
 	entries: Array<DataStoreEntry>,
 	validTargets: Array<DataStoreEntry>,
 ) {
-	const validIds = new Set<string>();
+	const validIds = new Set(validTargets.map((entry) => entry.id));
 
-	for (const entry of validTargets) {
-		validIds.add(entry.id);
-	}
-
-	const issues: Array<LinkIdIssue> = [];
-
-	for (const entry of entries) {
-		if (!entry.body?.includes('<Link ')) continue;
-
-		linkIdRegex.lastIndex = 0;
-		let match: RegExpExecArray | null;
-
-		while ((match = linkIdRegex.exec(entry.body)) !== null) {
-			const id = match[1];
-
-			if (!id || !validIds.has(id)) {
-				const lineNumber = entry.body.slice(0, match.index).split('\n').length;
-
-				issues.push({ location: entry.filePath ?? entry.id, lineNumber, id });
-			}
-		}
-	}
-
-	return issues;
+	return entries.flatMap((entry) => collectEntryLinkIdIssues(entry, validIds));
 }
 
 export function checkLinkIds(entries: Array<DataStoreEntry>, validTargets: Array<DataStoreEntry>) {

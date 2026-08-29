@@ -115,6 +115,28 @@ function getCacheNamespace(): string {
 	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
 }
 
+type FeatureExtractor = Awaited<ReturnType<typeof pipeline<'feature-extraction'>>>;
+
+async function createEmbedding(
+	embedder: FeatureExtractor,
+	entry: ContentEntry,
+	digest: string,
+): Promise<SimilarContentEmbedding> {
+	const plainTextContent = cleanContent(entry.body ?? '', entry.data);
+	const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
+
+	return {
+		id: entry.id,
+		digest,
+		collection: entry.collection,
+		metadata: {
+			themes: toReferenceIds(entry.data.themes),
+			regions: toReferenceIds(entry.data.regions),
+		},
+		vector: [...output.data] as Array<number>,
+	};
+}
+
 // Generate embeddings for all content entries
 async function generateEmbeddings(
 	entries: Array<ContentEntry>,
@@ -133,10 +155,8 @@ async function generateEmbeddings(
 	let cacheHits = 0;
 	let generated = 0;
 
-	for (let i = 0; i < entries.length; i++) {
-		const entry = entries[i];
-
-		if (!entry?.digest) continue;
+	for (const [index, entry] of entries.entries()) {
+		if (!entry.digest) continue;
 
 		try {
 			const cachedEmbedding = await cache.get<SimilarContentEmbedding>(entry.id);
@@ -145,20 +165,7 @@ async function generateEmbeddings(
 				embeddings.push(cachedEmbedding);
 				cacheHits++;
 			} else {
-				const plainTextContent = cleanContent(entry.body ?? '', entry.data);
-				const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
-				const vector = [...output.data] as Array<number>;
-
-				const embedding: SimilarContentEmbedding = {
-					id: entry.id,
-					digest: entry.digest,
-					collection: entry.collection,
-					metadata: {
-						themes: toReferenceIds(entry.data.themes),
-						regions: toReferenceIds(entry.data.regions),
-					},
-					vector,
-				};
+				const embedding = await createEmbedding(embedder, entry, entry.digest);
 
 				embeddings.push(embedding);
 
@@ -166,10 +173,10 @@ async function generateEmbeddings(
 				generated++;
 			}
 
-			if ((i + 1) % Number(values['progress-count']) === 0) {
+			if ((index + 1) % Number(values['progress-count']) === 0) {
 				console.log(
 					chalk.blue(
-						`Processed ${chalk.cyan(String(i + 1))}/${chalk.cyan(String(entries.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
+						`Processed ${chalk.cyan(String(index + 1))}/${chalk.cyan(String(entries.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
 					),
 				);
 			}

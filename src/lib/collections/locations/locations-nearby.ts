@@ -74,11 +74,7 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 
 	index.finish();
 
-	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
-		const entryPoint = pointsMap.get(entry.id);
-
-		if (!entryPoint) return;
-
+	function collectNearbyItems(entryPoint: LocationPoint): Array<LocationsNearbyItem> {
 		// Query for more than we need to account for post-filtering
 		const pointsAroundIds = getPointsAround(
 			index,
@@ -94,7 +90,7 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 			const point = pointsIndex[pointsAroundId];
 
 			// Skip invalid points and self
-			if (!point || point.id === entry.id) continue;
+			if (!point || point.id === entryPoint.id) continue;
 
 			// Post-index filtering: skip vanished locations
 			if (point.status === LocationStatusEnum.Vanished) continue;
@@ -111,6 +107,16 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 
 			if (nearby.length >= locationsNearbyCountLimit) break;
 		}
+
+		return nearby;
+	}
+
+	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
+		const entryPoint = pointsMap.get(entry.id);
+
+		if (!entryPoint) return;
+
+		const nearby = collectNearbyItems(entryPoint);
 
 		if (nearby.length > 0) {
 			entry.data._nearby = nearby;

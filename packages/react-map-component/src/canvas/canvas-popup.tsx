@@ -123,6 +123,16 @@ function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
 // Preload a point's popup image once the pointer dwells over it, so it is cached before the popup opens
 const mapImagePreloadDelayMs = 100;
 
+function findPopupImageSrcSet(
+	popupSource: Array<MapPopupItem> | undefined,
+	id: string,
+): string | undefined {
+	// Clusters have no popup entry of their own
+	if (id.startsWith('cluster-')) return undefined;
+
+	return popupSource?.find((item) => item.id === id)?.image?.srcSet;
+}
+
 // Index by id so hover/selection lookups avoid an O(n) scan per render
 function useSourceDataIndex(): Map<string, MapSourceItem> {
 	const { data: sourceData } = useSourceDataQuery();
@@ -175,11 +185,12 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 	const preloadedRef = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
-		if (!hoveredId || hoveredId.startsWith('cluster-')) return;
-		if (preloadedRef.current.has(hoveredId)) return;
+		if (!hoveredId || preloadedRef.current.has(hoveredId)) return;
 
-		const popupSource = hoverChunkKey ? hoverChunkData : inlinePopupData;
-		const srcSet = popupSource?.find((item) => item.id === hoveredId)?.image?.srcSet;
+		const srcSet = findPopupImageSrcSet(
+			hoverChunkKey ? hoverChunkData : inlinePopupData,
+			hoveredId,
+		);
 
 		if (!srcSet) return;
 

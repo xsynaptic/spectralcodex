@@ -33,6 +33,34 @@ const isSelectedExpression = [
 	false,
 ] satisfies ExpressionSpecification;
 
+const clusterRampBright = [
+	'interpolate',
+	['linear'],
+	['get', 'point_count'],
+	0,
+	tailwindColors.sky600,
+	10,
+	tailwindColors.sky500,
+	80,
+	tailwindColors.sky400,
+	150,
+	tailwindColors.sky300,
+] satisfies ExpressionSpecification;
+
+const clusterRampDeep = [
+	'interpolate',
+	['linear'],
+	['get', 'point_count'],
+	0,
+	tailwindColors.sky700,
+	10,
+	tailwindColors.sky600,
+	80,
+	tailwindColors.sky500,
+	150,
+	tailwindColors.sky400,
+] satisfies ExpressionSpecification;
+
 function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
 	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
@@ -56,19 +84,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 					'circle-sort-key': ['-', ['get', 'point_count']],
 				},
 				paint: {
-					'circle-color': [
-						'interpolate',
-						['linear'],
-						['get', 'point_count'],
-						0,
-						isDarkMode ? tailwindColors.sky700 : tailwindColors.sky600,
-						10,
-						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky500,
-						80,
-						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky400,
-						150,
-						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky300,
-					],
+					'circle-color': isDarkMode ? clusterRampDeep : clusterRampBright,
 					'circle-radius': [
 						'interpolate',
 						['linear'],
@@ -81,19 +97,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['case', isHoveredExpression, 14, 12],
 					],
 					'circle-stroke-width': 1,
-					'circle-stroke-color': [
-						'interpolate',
-						['linear'],
-						['get', 'point_count'],
-						0,
-						isDarkMode ? tailwindColors.sky600 : tailwindColors.sky700,
-						10,
-						isDarkMode ? tailwindColors.sky500 : tailwindColors.sky600,
-						80,
-						isDarkMode ? tailwindColors.sky400 : tailwindColors.sky500,
-						150,
-						isDarkMode ? tailwindColors.sky300 : tailwindColors.sky400,
-					],
+					'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
 				},
 			}) satisfies CircleLayerSpecification,
 		[isDarkMode],

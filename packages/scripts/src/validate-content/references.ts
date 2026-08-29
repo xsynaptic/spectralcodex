@@ -12,6 +12,15 @@ interface ReferenceIssue extends EntryReference {
 	location: string;
 }
 
+function toEntryReference(
+	record: Record<string, unknown>,
+	field: string,
+): EntryReference | undefined {
+	if (typeof record.collection !== 'string' || typeof record.id !== 'string') return undefined;
+
+	return { field, collection: record.collection, id: record.id };
+}
+
 /**
  * `reference()` stores pointers as `{id, collection}`, so the data declares which fields point at other entries
  * Walking for that shape keeps this check free of any hand-maintained list of reference fields
@@ -27,9 +36,10 @@ function collectEntryReferences(value: unknown, field: string, references: Array
 	}
 
 	const record = value as Record<string, unknown>;
+	const reference = toEntryReference(record, field);
 
-	if (typeof record.collection === 'string' && typeof record.id === 'string') {
-		references.push({ field, collection: record.collection, id: record.id });
+	if (reference) {
+		references.push(reference);
 		return;
 	}
 
@@ -38,14 +48,7 @@ function collectEntryReferences(value: unknown, field: string, references: Array
 	}
 }
 
-/**
- * Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
- * The declared collection is checked rather than a global ID lookup: a `reference('regions')` naming a theme resolves either way but is still an authoring error
- */
-export function collectReferenceIssues(
-	collections: DataStoreCollections,
-	collectionNames: Array<string>,
-) {
+function getEntriesByCollection(collections: DataStoreCollections, collectionNames: Array<string>) {
 	const entriesByCollection = new Map<string, Map<string, DataStoreEntry>>();
 
 	for (const name of collectionNames) {
@@ -56,22 +59,44 @@ export function collectReferenceIssues(
 		entriesByCollection.set(name, collection);
 	}
 
+	return entriesByCollection;
+}
+
+function getEntryReferenceIssues(
+	entry: DataStoreEntry,
+	entriesByCollection: Map<string, Map<string, DataStoreEntry>>,
+) {
+	const references: Array<EntryReference> = [];
+
+	collectEntryReferences(entry.data, '', references);
+
+	const issues: Array<ReferenceIssue> = [];
+
+	for (const reference of references) {
+		const target = entriesByCollection.get(reference.collection);
+
+		// References into collections outside this check's scope are left alone
+		if (!target || target.has(reference.id)) continue;
+
+		issues.push({ location: entry.filePath ?? entry.id, ...reference });
+	}
+
+	return issues;
+}
+
+// Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
+// Checking the declared collection catches a `reference('regions')` that names a theme, which a global id lookup would accept
+export function collectReferenceIssues(
+	collections: DataStoreCollections,
+	collectionNames: Array<string>,
+) {
+	const entriesByCollection = getEntriesByCollection(collections, collectionNames);
+
 	const issues: Array<ReferenceIssue> = [];
 
 	for (const collection of entriesByCollection.values()) {
 		for (const entry of collection.values()) {
-			const references: Array<EntryReference> = [];
-
-			collectEntryReferences(entry.data, '', references);
-
-			for (const reference of references) {
-				const target = entriesByCollection.get(reference.collection);
-
-				// References into collections outside this check's scope are left alone
-				if (!target || target.has(reference.id)) continue;
-
-				issues.push({ location: entry.filePath ?? entry.id, ...reference });
-			}
+			issues.push(...getEntryReferenceIssues(entry, entriesByCollection));
 		}
 	}
 

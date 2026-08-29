@@ -41,6 +41,21 @@ async function createRenderMdxFunction() {
 
 const renderMdx = await createRenderMdxFunction();
 
+const feedSanitizeSchema = {
+	...defaultSchema,
+	// Feed readers ship no stylesheet, so CJK wrapper spans unwrap to plain text
+	tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'].filter(
+		(tagName) => tagName !== 'span',
+	),
+};
+
+function sanitizeFeedContent(contentHtml: string, excludeFootnotes: boolean) {
+	return sanitizeHtml(
+		excludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
+		feedSanitizeSchema,
+	);
+}
+
 const generateFeedItem = async ({
 	entry,
 	excludeFootnotes,
@@ -60,16 +75,7 @@ const generateFeedItem = async ({
 		},
 	});
 
-	const contentSanitized = sanitizeHtml(
-		excludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
-		{
-			...defaultSchema,
-			// Feed readers ship no stylesheet, so CJK wrapper spans unwrap to plain text
-			tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'].filter(
-				(tagName) => tagName !== 'span',
-			),
-		},
-	);
+	const contentSanitized = sanitizeFeedContent(contentHtml, excludeFootnotes);
 
 	const description = await getDescriptionRenderedText(entry);
 

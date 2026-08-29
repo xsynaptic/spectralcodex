@@ -25,16 +25,21 @@ function buildContentUrl(siteUrl: string, collection: string, id: string): strin
 	return joinUrl(siteUrl, collectionSegment, id, '/');
 }
 
+function resolvePaths(options: SitemapLastmodOptions) {
+	const contentPathRelative = options.contentPath ?? 'packages/content';
+
+	return {
+		contentPathRelative,
+		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
+		dataStorePath: path.resolve(options.rootPath, dataStoreRelativePath),
+		outputPath: path.resolve(options.rootPath, options.outputPath ?? '.cache/sitemap-lastmod.json'),
+	};
+}
+
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
-	const contentPathRelative = options.contentPath ?? 'packages/content';
-	const contentPathAbs = path.resolve(options.rootPath, contentPathRelative);
-	const dataStorePath = path.resolve(options.rootPath, dataStoreRelativePath);
-	const outputPath = path.resolve(
-		options.rootPath,
-		options.outputPath ?? '.cache/sitemap-lastmod.json',
-	);
+	const { contentPathRelative, contentPathAbs, dataStorePath, outputPath } = resolvePaths(options);
 
 	console.log(chalk.blue('Reading git log...'));
 

@@ -201,6 +201,21 @@ export function extractBuiltFilenames(distPath: string): Set<string> {
 	const ogPathSegment = `/${openGraphBasePath}/`;
 	const filenames = new Set<string>();
 
+	function collectFromHtml(filePath: string): void {
+		const content = readFileSync(filePath, 'utf8');
+
+		for (const match of content.matchAll(ogImageRegex)) {
+			const url = match[1] ?? '';
+			const index = url.indexOf(ogPathSegment);
+
+			if (index === -1) continue;
+
+			const filename = url.slice(index + ogPathSegment.length).replace(/\.[^.]+$/, '');
+
+			if (filename) filenames.add(filename);
+		}
+	}
+
 	function walkDir(dir: string): void {
 		const dirents = readdirSync(dir, { withFileTypes: true });
 
@@ -212,24 +227,7 @@ export function extractBuiltFilenames(distPath: string): Set<string> {
 				continue;
 			}
 
-			if (!dirent.isFile() || !dirent.name.endsWith('.html')) continue;
-
-			const content = readFileSync(fullPath, 'utf8');
-
-			ogImageRegex.lastIndex = 0;
-
-			let match: RegExpExecArray | null;
-
-			while ((match = ogImageRegex.exec(content)) !== null) {
-				const url = match[1] ?? '';
-				const idx = url.indexOf(ogPathSegment);
-
-				if (idx === -1) continue;
-
-				const filename = url.slice(idx + ogPathSegment.length).replace(/\.[^.]+$/, '');
-
-				if (filename) filenames.add(filename);
-			}
+			if (dirent.isFile() && dirent.name.endsWith('.html')) collectFromHtml(fullPath);
 		}
 	}
 

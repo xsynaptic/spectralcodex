@@ -33,16 +33,23 @@ function computeWordCount(body: string): number {
 	);
 }
 
+// `''` rather than `undefined` for a missing field, so cached content hashes stay stable
+function getDescription(entry: CollectionEntry<CollectionKey>): string | undefined {
+	return 'description' in entry.data ? entry.data.description : '';
+}
+
 export function createWordCountFunction({ cache }: { cache: Keyv }) {
 	return async function getWordCount(
 		entry: CollectionEntry<CollectionKey>,
 	): Promise<number | undefined> {
+		const description = getDescription(entry);
+
 		// Key by entry ID so edits overwrite the old row; the hash validates cached content
 		// MDX component names participate so render-affecting code changes self-invalidate
 		const contentHash = hash({
 			data: {
 				body: entry.body,
-				description: 'description' in entry.data ? entry.data.description : '',
+				description,
 				mdxComponents,
 				version: 1,
 			},
@@ -50,23 +57,12 @@ export function createWordCountFunction({ cache }: { cache: Keyv }) {
 
 		const cached = await cache.get<WordCountCached>(entry.id);
 
-		// Check cache first
 		if (cached?.hash === contentHash) {
 			return cached.count;
 		}
 
-		// Compute and cache
-		let wordCount = 0;
-
-		if (entry.body && entry.body.length > 0) {
-			wordCount = computeWordCount(entry.body);
-		} else if (
-			'description' in entry.data &&
-			entry.data.description &&
-			entry.data.description.length > 0
-		) {
-			wordCount = computeWordCount(entry.data.description);
-		}
+		const source = entry.body || description;
+		const wordCount = source ? computeWordCount(source) : 0;
 
 		await cache.set(entry.id, {
 			hash: contentHash,

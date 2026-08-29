@@ -1,0 +1,51 @@
+---
+import type { MenuItem } from '#components/menu/menu-types.ts';
+
+import { getMenuItemTriggerType, isActiveMenuItem } from '#components/menu/menu-utils.ts';
+import Anchor from '#components/parts/anchor.astro';
+
+interface Props {
+	item: MenuItem;
+	hasChildren: boolean;
+}
+
+const { item, hasChildren } = Astro.props;
+
+const triggerType = getMenuItemTriggerType(item);
+const triggerClasses = [
+	'nav-item-link',
+	isActiveMenuItem(item, Astro.url.pathname) ? 'link-active' : undefined,
+];
+---
+
+<div class="nav-item-trigger">
+	{
+		triggerType === 'anchor' ? (
+			<Anchor
+				class:list={triggerClasses}
+				href={item.url}
+				linkColor="accent"
+				{...(item.rel ? { rel: item.rel } : undefined)}
+			>
+				{item.title}
+			</Anchor>
+		) : undefined
+	}
+	{
+		triggerType === 'button' ? (
+			<button
+				type="button"
+				class:list={['link link-accent', ...triggerClasses]}
+				set:html={item.title}
+			/>
+		) : undefined
+	}
+	{triggerType === 'span' ? <span class:list={triggerClasses}>{item.title}</span> : undefined}
+	{
+		hasChildren ? (
+			<svg width="24" height="24" viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+				<use href="#icon:chevron-down" />
+			</svg>
+		) : undefined
+	}
+</div>

@@ -29,9 +29,9 @@ export default getConfig(
 		},
 		{
 			rules: {
-				complexity: ['warn', { max: 9, variant: 'modified' }],
+				complexity: ['warn', { max: 8, variant: 'modified' }],
 				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
-				'max-depth': ['warn', 4],
+				'max-depth': ['warn', 3],
 				// The expanded form reads more clearly than ??=, ||=, and &&=
 				'logical-assignment-operators': ['error', 'never'],
 				// Conflicts with Remeda's sort function

@@ -46,6 +46,21 @@ function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number 
 	return { allowed: nearest, delta: smallestDelta };
 }
 
+interface ImageDimensions {
+	width: number;
+	height: number;
+	ratio: number;
+}
+
+function getImageDimensions(entry: DataStoreEntry): ImageDimensions | undefined {
+	const { width, height } = entry.data;
+
+	if (typeof width !== 'number' || typeof height !== 'number') return undefined;
+	if (width <= 0 || height <= 0) return undefined;
+
+	return { width, height, ratio: width / height };
+}
+
 interface FlaggedImage {
 	id: string;
 	width: number;
@@ -77,15 +92,13 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 			continue;
 		}
 
-		const { width, height } = entry.data;
+		const dimensions = getImageDimensions(entry);
 
-		if (typeof width !== 'number' || typeof height !== 'number' || width <= 0 || height <= 0) {
-			continue;
-		}
+		if (!dimensions) continue;
 
 		checkedCount += 1;
 
-		const ratio = width / height;
+		const { width, height, ratio } = dimensions;
 		const { allowed, delta } = getNearestRatio(ratio);
 
 		if (delta <= ratioTolerance) {
