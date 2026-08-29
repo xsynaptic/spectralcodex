@@ -284,7 +284,7 @@ function projectChronologyTier(
 	);
 }
 
-function tierHasData(tier: ChronologyTierBuckets): boolean {
+function hasTierData(tier: ChronologyTierBuckets): boolean {
 	return tier.updated.length > 0 || tier.created.length > 0 || tier.visited.length > 0;
 }
 
@@ -297,7 +297,7 @@ function getBucketCounts(buckets: ChronologyTierBuckets) {
 	};
 }
 
-function passesYearlyFloor(item: CatalogItem): boolean {
+function isAboveYearlyFloor(item: CatalogItem): boolean {
 	return item.entryQuality >= yearlyQualityFloor;
 }
 
@@ -310,13 +310,13 @@ function getYearlyWinningCategories(
 
 	// Set in reverse precedence so a later write wins: updated overrides created overrides visited
 	for (const item of yearBuckets.visited) {
-		if (passesYearlyFloor(item)) winning.set(item.id, 'visited');
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'visited');
 	}
 	for (const item of yearBuckets.created) {
-		if (passesYearlyFloor(item)) winning.set(item.id, 'created');
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'created');
 	}
 	for (const item of yearBuckets.updated) {
-		if (passesYearlyFloor(item)) winning.set(item.id, 'updated');
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'updated');
 	}
 
 	return winning;
@@ -344,7 +344,7 @@ function buildMonthlyItems(
 	for (const month of months) {
 		const tier = projectChronologyTier(month, monthlyTierOptions);
 
-		if (!tierHasData(tier)) continue;
+		if (!hasTierData(tier)) continue;
 
 		monthlyItems.push({
 			...month.raw,
@@ -380,7 +380,7 @@ function buildYearlyItems(
 			visited: takeWinners('visited'),
 		};
 
-		if (!tierHasData(tier)) continue;
+		if (!hasTierData(tier)) continue;
 
 		yearlyItems.push({
 			...month.raw,
@@ -457,7 +457,7 @@ export function createChronologyData(
 		// Index view; year-level aggregation
 		const indexTier = projectChronologyTier(yearBuckets, indexTierOptions);
 
-		if (!tierHasData(indexTier)) continue;
+		if (!hasTierData(indexTier)) continue;
 
 		chronologyIndexData[year] = {
 			id: year,

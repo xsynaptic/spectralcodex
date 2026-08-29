@@ -1,8 +1,7 @@
 import type { AstroGlobal } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-// Used to conditionally render descriptions or body contents of an entry
-export function getHasContent(
+export function hasEntryContent(
 	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
 ) {
 	return 'body' in entry && typeof entry.body === 'string' && entry.body.trim().length > 0;

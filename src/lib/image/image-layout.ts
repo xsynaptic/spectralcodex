@@ -92,7 +92,7 @@ export function getImageInferredWidth({
 
 export function getImageLayoutSizesProp(
 	layout?: ImageLayout,
-	priority?: boolean,
+	isPriority?: boolean,
 	context: ImageContext = ImageContextEnum.Single,
 ) {
 	let sizes: Array<string> = [];
@@ -120,7 +120,7 @@ export function getImageLayoutSizesProp(
 		}
 	}
 
-	if (!priority) sizes.unshift('auto');
+	if (!isPriority) sizes.unshift('auto');
 
 	return sizes.join(', ');
 }

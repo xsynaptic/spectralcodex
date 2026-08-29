@@ -25,17 +25,18 @@ export function useMapStoreInstance() {
 // Feature state
 export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);
 
-export const useMapPopupVisible = () => useMapDataStore((state) => state.popupVisible);
+export const useIsMapPopupVisible = () => useMapDataStore((state) => state.isPopupVisible);
 
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
 
 // Map canvas state
-export const useMapCanvasInteractive = () => useMapDataStore((state) => state.canvasInteractive);
+export const useIsMapCanvasInteractive = () =>
+	useMapDataStore((state) => state.isCanvasInteractive);
 
-export const useMapCanvasLoading = () => useMapDataStore((state) => state.canvasLoading);
+export const useIsMapCanvasLoading = () => useMapDataStore((state) => state.isCanvasLoading);
 
 // Map filters
-export const useMapFilterOpen = () => useMapDataStore((state) => state.filterOpen);
+export const useIsMapFilterOpen = () => useMapDataStore((state) => state.isFilterOpen);
 
 export const useMapFilterPosition = () => useMapDataStore((state) => state.filterPosition);
 
@@ -47,15 +48,15 @@ export const useMapRatingFilter = () => useMapDataStore((state) => state.ratingF
 
 export const useMapObjectiveFilter = () => useMapDataStore((state) => state.objectiveFilter);
 
-export const useMapShowObjectiveFilter = () =>
-	useMapDataStore((state) => state.showObjectiveFilter);
+export const useIsMapObjectiveFilterEnabled = () =>
+	useMapDataStore((state) => state.isObjectiveFilterEnabled);
 
 export const useMapScope = () => useMapDataStore((state) => state.scope);
 
 // Map language settings
 export const useMapLanguages = () => useMapDataStore((state) => state.languages);
 
-export const useMapChineseLabels = () =>
+export const useHasMapChineseLabels = () =>
 	useMapDataStore((state) => state.languages.some((lang) => lang.startsWith('zh')));
 
 // Map actions

@@ -15,6 +15,7 @@ const defaultDarkValue = 'dark';
 
 const DarkModeContext = createContext(false);
 
+// eslint-disable-next-line unicorn/consistent-boolean-name -- named for its useSyncExternalStore slot, not for what it returns
 function getServerSnapshot() {
 	return false;
 }
@@ -48,6 +49,6 @@ export function DarkModeProvider({
 	return <DarkModeContext.Provider value={isDarkMode}>{children}</DarkModeContext.Provider>;
 }
 
-export function useDarkMode() {
+export function useIsDarkMode() {
 	return useContext(DarkModeContext);
 }

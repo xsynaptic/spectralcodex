@@ -13,7 +13,7 @@ const healthUrl = 'http://localhost:3100/health';
 const maxWaitMs = 30_000;
 const pollIntervalMs = 500;
 
-async function waitForHealth(url: string, maxWait: number): Promise<boolean> {
+async function didBecomeHealthy(url: string, maxWait: number): Promise<boolean> {
 	const start = Date.now();
 
 	while (Date.now() - start < maxWait) {
@@ -76,12 +76,11 @@ export async function setup() {
 		throw error;
 	}
 
-	// Wait for health check
 	console.log('[Test] Waiting for health check...');
 
-	const healthy = await waitForHealth(healthUrl, maxWaitMs);
+	const isHealthy = await didBecomeHealthy(healthUrl, maxWaitMs);
 
-	if (!healthy) {
+	if (!isHealthy) {
 		try {
 			const logs = execSync(
 				`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" logs --tail=50`,

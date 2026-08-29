@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { filterHasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
+import { hasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -28,7 +28,7 @@ async function createSeriesCatalogItemsFunction() {
 		return ids
 			.map((id) => catalog.getById(id))
 			.filter((entry) => !!entry)
-			.filter(filterHasFeaturedImage);
+			.filter(hasFeaturedImage);
 	};
 }
 

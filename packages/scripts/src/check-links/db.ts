@@ -174,8 +174,8 @@ export function recordCheckResult(
 		UrlStatusEnum.Error,
 		UrlStatusEnum.Blocked,
 	];
-	const incrementsCount = incrementStatuses.includes(result.status);
-	const checkCount = incrementsCount ? 'check_count + 1' : '0';
+	const shouldIncrementCount = incrementStatuses.includes(result.status);
+	const checkCount = shouldIncrementCount ? 'check_count + 1' : '0';
 
 	db.prepare(
 		`UPDATE urls

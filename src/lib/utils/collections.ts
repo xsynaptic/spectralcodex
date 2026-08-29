@@ -26,9 +26,8 @@ export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA
 	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);
 }
 
-// Filter out terms that gather no entries at all
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
-export function filterHasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
+export function hasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
 	return (entry.data._entryCount ?? 0) > 0;
 }
 

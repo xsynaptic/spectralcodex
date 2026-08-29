@@ -189,12 +189,12 @@ switch (command) {
 			checkRegionsParents(getDataStoreCollection(collections, ['regions'])),
 		];
 
-		const asyncResults = await checkLocationsCoordinates(
+		const hasValidCoordinates = await checkLocationsCoordinates(
 			getDataStoreCollection(collections, ['locations']),
 			path.join(rootPath, values['divisions-path']),
 		);
 
-		if ([...syncResults, asyncResults].some((success) => !success)) process.exit(1);
+		if ([...syncResults, hasValidCoordinates].some((success) => !success)) process.exit(1);
 
 		break;
 	}

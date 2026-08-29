@@ -14,14 +14,14 @@ interface PurgeResult {
 	errors?: Array<{ message: string }>;
 }
 
-const SKIP_PURGE = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
-const SITE_URL = requireEnv('SITE_URL').replace(/\/$/, '');
-const IMAGE_SERVER_URL = requireEnv('IMAGE_SERVER_URL');
-const ZONE_ID = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
-const API_TOKEN = SKIP_PURGE ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
-const CONCURRENCY = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
-const WARM_LIMIT = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
-const WARM_ALL = process.env.WARM_ALL === '1' || process.env.WARM_ALL === 'true';
+const shouldSkipPurge = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
+const siteUrl = requireEnv('SITE_URL').replace(/\/$/, '');
+const imageServerUrl = requireEnv('IMAGE_SERVER_URL');
+const cloudflareZoneId = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
+const cloudflareApiToken = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
+const defaultConcurrency = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
+const warmLimit = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
+const shouldWarmAll = process.env.WARM_ALL === '1' || process.env.WARM_ALL === 'true';
 
 // New image URLs trigger vips transforms; keep below the page rate so imagor's cpu cap serves traffic
 const imageConcurrency = 4;
@@ -33,12 +33,12 @@ const imageStateFile = '/state/warmed-images.txt';
 const timeoutMs = 30_000;
 
 // Alert email rides JMAP over HTTPS; outbound SMTP is blocked on the VPS
-const JMAP_SESSION_URL = requireEnv('JMAP_SESSION_URL');
-const JMAP_API_TOKEN = requireEnv('JMAP_API_TOKEN');
-const ALERT_EMAIL_TO = requireEnv('ALERT_EMAIL_TO');
-const ALERT_EMAIL_FROM = process.env.ALERT_EMAIL_FROM || ALERT_EMAIL_TO;
-const ALERT_ALWAYS = process.env.ALERT_ALWAYS === '1' || process.env.ALERT_ALWAYS === 'true';
-const ALERT_MIN_FAILURES = Number(process.env.ALERT_MIN_FAILURES ?? '1') || 1;
+const jmapSessionUrl = requireEnv('JMAP_SESSION_URL');
+const jmapApiToken = requireEnv('JMAP_API_TOKEN');
+const alertEmailTo = requireEnv('ALERT_EMAIL_TO');
+const alertEmailFrom = process.env.ALERT_EMAIL_FROM || alertEmailTo;
+const shouldAlertAlways = process.env.ALERT_ALWAYS === '1' || process.env.ALERT_ALWAYS === 'true';
+const alertMinFailures = Number(process.env.ALERT_MIN_FAILURES ?? '1') || 1;
 
 // Cap the failure list in the email body
 const maxAlertFailures = 50;
@@ -60,7 +60,7 @@ const imageRegex = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]
 
 // Content pages link external images, and OG images on the site host are purged every deploy
 // Only the imagor host is warmed incrementally; its URLs are immutable and survive the purge
-const imageHost = new URL(IMAGE_SERVER_URL).host;
+const imageHost = new URL(imageServerUrl).host;
 
 interface ScrapeTargets {
 	assets: Set<string>;
@@ -117,13 +117,16 @@ function extractLocations(xml: string): Array<string> {
 async function purge(): Promise<void> {
 	// Image URLs are immutable (HMAC of the transform path, no content hash)
 	// The purge is scoped to the site host; image server remains warm at the edge through a deploy
-	const host = new URL(SITE_URL).host;
+	const host = new URL(siteUrl).host;
 	console.log(`Purging Cloudflare cache (hostname ${host})...`);
 	const response = await fetch(
-		`https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache`,
+		`https://api.cloudflare.com/client/v4/zones/${cloudflareZoneId}/purge_cache`,
 		{
 			method: 'POST',
-			headers: { Authorization: `Bearer ${API_TOKEN}`, 'Content-Type': 'application/json' },
+			headers: {
+				Authorization: `Bearer ${cloudflareApiToken}`,
+				'Content-Type': 'application/json',
+			},
 			body: JSON.stringify({ hosts: [host] }),
 			signal: AbortSignal.timeout(timeoutMs),
 		},
@@ -142,7 +145,7 @@ async function purge(): Promise<void> {
 }
 
 async function getSitemapUrls(): Promise<Array<string>> {
-	const sitemaps = extractLocations(await fetchText(`${SITE_URL}/sitemap-index.xml`));
+	const sitemaps = extractLocations(await fetchText(`${siteUrl}/sitemap-index.xml`));
 	const urls: Array<string> = [];
 	for (const sitemap of sitemaps) urls.push(...extractLocations(await fetchText(sitemap)));
 	return urls;
@@ -157,9 +160,9 @@ interface MapUrlsResult {
 async function getMapUrls(): Promise<MapUrlsResult> {
 	try {
 		const paths = JSON.parse(
-			await fetchText(`${SITE_URL}/api/map/map-manifest.json`),
+			await fetchText(`${siteUrl}/api/map/map-manifest.json`),
 		) as Array<string>;
-		return { urls: paths.map((path) => new URL(path, SITE_URL).href) };
+		return { urls: paths.map((path) => new URL(path, siteUrl).href) };
 	} catch (error) {
 		const skipReason = messageOf(error);
 		console.log(`Skipping map URLs: ${skipReason}`);
@@ -176,7 +179,7 @@ function scrape(text: string, targets: ScrapeTargets): void {
 		if (url.host === imageHost) targets.images.add(url.href);
 	}
 	for (const match of text.matchAll(assetRegex)) {
-		if (match[0]) targets.assets.add(new URL(match[0], SITE_URL).href);
+		if (match[0]) targets.assets.add(new URL(match[0], siteUrl).href);
 	}
 }
 
@@ -232,7 +235,7 @@ interface WarmAllOptions {
 
 async function warmAll(urls: Iterable<string>, options: WarmAllOptions = {}): Promise<Stats> {
 	const stats: Stats = { total: 0, counts: new Map(), failures: [] };
-	await pool(urls, options.concurrency ?? CONCURRENCY, async (url) => {
+	await pool(urls, options.concurrency ?? defaultConcurrency, async (url) => {
 		record(stats, await warm(url, options.collect));
 	});
 	return stats;
@@ -258,7 +261,7 @@ function report(label: string, stats: Stats): void {
 }
 
 function getWarmedImages(): { seen: Set<string>; note?: string } {
-	if (WARM_ALL) {
+	if (shouldWarmAll) {
 		return {
 			seen: new Set(),
 			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
@@ -339,7 +342,7 @@ interface JmapSetResult {
 async function jmapRequest(url: string, body?: string): Promise<unknown> {
 	const init: RequestInit = {
 		headers: {
-			Authorization: `Bearer ${JMAP_API_TOKEN}`,
+			Authorization: `Bearer ${jmapApiToken}`,
 			'Content-Type': 'application/json',
 		},
 		signal: AbortSignal.timeout(timeoutMs),
@@ -374,7 +377,7 @@ function jmapResult(responses: Array<JmapInvocation>, callId: string): unknown {
 // Log-only on error; a broken alert must never crash or re-trigger the run
 async function sendAlert(subject: string, text: string): Promise<void> {
 	try {
-		const session = (await jmapRequest(JMAP_SESSION_URL)) as JmapSession;
+		const session = (await jmapRequest(jmapSessionUrl)) as JmapSession;
 		const accountId = session.primaryAccounts[jmapMailUrn];
 		if (!accountId) throw new Error('token has no JMAP mail account');
 
@@ -384,9 +387,9 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 		]);
 		const identities = (jmapResult(lookup, 'identities') as JmapIdentityList).list;
 		const identity = identities.find(
-			(entry) => entry.email.toLowerCase() === ALERT_EMAIL_FROM.toLowerCase(),
+			(entry) => entry.email.toLowerCase() === alertEmailFrom.toLowerCase(),
 		);
-		if (!identity) throw new Error(`no sending identity for ${ALERT_EMAIL_FROM}`);
+		if (!identity) throw new Error(`no sending identity for ${alertEmailFrom}`);
 		const draftsMailboxId = (jmapResult(lookup, 'drafts') as JmapMailboxQuery).ids[0];
 		if (!draftsMailboxId) throw new Error('no drafts mailbox');
 
@@ -399,8 +402,8 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 						alert: {
 							mailboxIds: { [draftsMailboxId]: true },
 							keywords: { $draft: true },
-							from: [{ name: 'Spectral Codex Cache Warmer Bot', email: ALERT_EMAIL_FROM }],
-							to: [{ email: ALERT_EMAIL_TO }],
+							from: [{ name: 'Spectral Codex Cache Warmer Bot', email: alertEmailFrom }],
+							to: [{ email: alertEmailTo }],
 							subject,
 							bodyValues: { body: { value: text } },
 							textBody: [{ partId: 'body', type: 'text/plain' }],
@@ -440,7 +443,7 @@ interface RunReport {
 
 // Notes (like a skipped map manifest) force the digest even on a clean run
 function isReportWorthSending({ failures, notes }: RunReport): boolean {
-	return ALERT_ALWAYS || notes.length > 0 || failures.length >= ALERT_MIN_FAILURES;
+	return shouldAlertAlways || notes.length > 0 || failures.length >= alertMinFailures;
 }
 
 function getReportSubject({ failures, notes, totalUrls, seconds }: RunReport): string {
@@ -509,15 +512,17 @@ async function main(): Promise<void> {
 		notes.push(note);
 	}
 
-	if (SKIP_PURGE) console.log('SKIP_PURGE set: warming without purging');
+	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
 	else await purge();
 
 	let pages = await getSitemapUrls();
-	if (WARM_LIMIT !== undefined) {
-		pages = pages.slice(0, WARM_LIMIT);
-		console.log(`WARM_LIMIT set: capping to ${String(WARM_LIMIT)} pages`);
+	if (warmLimit !== undefined) {
+		pages = pages.slice(0, warmLimit);
+		console.log(`WARM_LIMIT set: capping to ${String(warmLimit)} pages`);
 	}
-	console.log(`Warming ${String(pages.length)} pages (concurrency ${String(CONCURRENCY)})...`);
+	console.log(
+		`Warming ${String(pages.length)} pages (concurrency ${String(defaultConcurrency)})...`,
+	);
 	const targets: ScrapeTargets = { assets: new Set(), images: new Set() };
 	const pageStats = await warmAll(pages, { collect: targets });
 	report('Pages', pageStats);

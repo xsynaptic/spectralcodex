@@ -14,7 +14,7 @@ import { controlFilterId, mediaQueryMobile } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMediaQuery } from '../lib/media-query';
 import { mapQueryableLayerIds, MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
-import { useMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
+import { useIsMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
 import { writeSavedViewport } from '../store/store-viewport';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
@@ -67,7 +67,7 @@ async function expandCluster(mapInstance: MapClickEvent['target'], feature: MapC
 export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
-	const isInteractive = useMapCanvasInteractive();
+	const isInteractive = useIsMapCanvasInteractive();
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
 	const mapStoreInstance = useMapStoreInstance();

@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import { useDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '../lib/dark-mode';
 
 // Commit the marker before paint to avoid a first-frame flash; SSR has no layout effect
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
@@ -11,7 +11,7 @@ const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : us
 // One marker on the map container reaches all chrome; portaled controls and popups are its descendants
 export const MapRootMarker: FC = function MapRootMarker() {
 	const { current: map } = useMap();
-	const isDarkMode = useDarkMode();
+	const isDarkMode = useIsDarkMode();
 
 	useIsomorphicLayoutEffect(() => {
 		if (!map) return;

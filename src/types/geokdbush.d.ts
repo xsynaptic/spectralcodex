@@ -9,6 +9,7 @@ declare module 'geokdbush' {
 		lat: number,
 		maxResults?: number,
 		maxDistance?: number,
+		// eslint-disable-next-line unicorn/consistent-boolean-name -- geokdbush's own parameter name; a predicate callback, not a boolean
 		predicate?: (id: number) => boolean,
 	): Array<number>;
 

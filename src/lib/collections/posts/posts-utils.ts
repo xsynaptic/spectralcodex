@@ -5,7 +5,7 @@ import * as R from 'remeda';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { filterIsEditorialEntry } from '#lib/catalog/catalog-utils.ts';
+import { isEditorialEntry } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
@@ -58,7 +58,7 @@ export async function createQueryPostsEntryFunction() {
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
-		const backlinks = catalog.backlinksOf(entry.id).filter(filterIsEditorialEntry);
+		const backlinks = catalog.backlinksOf(entry.id).filter(isEditorialEntry);
 
 		return { mapData, backlinks };
 	};

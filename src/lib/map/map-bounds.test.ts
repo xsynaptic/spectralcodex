@@ -4,11 +4,11 @@ import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 
-function makeFeature(id: string, lng: number, lat: number, outlier?: boolean) {
+function makeFeature(id: string, lng: number, lat: number, isOutlier?: boolean) {
 	return {
 		type: 'Feature' as const,
 		id,
-		properties: { title: id, ...(outlier === undefined ? {} : { outlier }) },
+		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
 		geometry: { type: 'Point' as const, coordinates: [lng, lat] },
 	};
 }

@@ -143,11 +143,11 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 		// Any common ancestor must span `first`, so it lies on its self-inclusive path; nearest-first wins
 		for (const candidate of [first, ...ancestorsOf(first)]) {
 			const interval = intervalById.get(candidate)!;
-			const spansAll = known.every((id) => {
+			const isSpansAll = known.every((id) => {
 				const ordinal = ordinalById.get(id)!;
 				return ordinal >= interval[0] && ordinal <= interval[1];
 			});
-			if (spansAll) return candidate;
+			if (isSpansAll) return candidate;
 		}
 		return undefined;
 	}

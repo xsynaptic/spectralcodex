@@ -65,7 +65,7 @@ function createRegionGeometryLoader(divisionsPath: string) {
 	const cache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
 	const missingRegions = new Set<string>();
 
-	async function getRegionFeatures(regionId: string, reportMissing: boolean) {
+	async function getRegionFeatures(regionId: string, shouldReportMissing: boolean) {
 		if (missingRegions.has(regionId)) return;
 
 		const cached = cache.get(regionId);
@@ -79,7 +79,7 @@ function createRegionGeometryLoader(divisionsPath: string) {
 
 			return features;
 		} catch {
-			if (reportMissing) {
+			if (shouldReportMissing) {
 				console.log(
 					chalk.yellow(
 						`⚠️  ${regionId}: could not load FGB file, skipping all other locations in this region`,
@@ -110,7 +110,7 @@ async function collectRegionFeatures(
 	regions: Array<string>,
 	getRegionFeatures: (
 		regionId: string,
-		reportMissing: boolean,
+		shouldReportMissing: boolean,
 	) => Promise<RegionFeatures | undefined>,
 ) {
 	const validRegions: Array<string> = [];
@@ -129,7 +129,7 @@ async function collectRegionFeatures(
 	return { validRegions, features };
 }
 
-function reportEntryMismatches(
+function hasEntryMismatches(
 	entry: DataStoreEntry,
 	geometries: Array<{ coordinates: [number, number] }>,
 	features: RegionFeatures,
@@ -161,11 +161,11 @@ function reportResults({
 	mismatchCount: number;
 	missingFgbCount: number;
 	missingRegions: Set<string>;
-}): boolean {
+}): void {
 	if (checkedCount === 0) {
 		console.log(chalk.yellow('⚠️  No locations could be checked'));
 
-		return false;
+		return;
 	}
 
 	if (mismatchCount === 0) {
@@ -175,7 +175,7 @@ function reportResults({
 			),
 		);
 
-		return true;
+		return;
 	}
 
 	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
@@ -185,10 +185,9 @@ function reportResults({
 
 		console.log(chalk.gray(`Missing FGB regions: ${sorted.join(', ')}`));
 	}
-
-	return false;
 }
 
+// eslint-disable-next-line unicorn/consistent-boolean-name -- one of the sixteen `check*` validators run from index.ts
 export async function checkLocationsCoordinates(
 	entries: Array<DataStoreEntry>,
 	divisionsPath: string,
@@ -214,10 +213,12 @@ export async function checkLocationsCoordinates(
 			continue;
 		}
 
-		if (reportEntryMismatches(entry, geometries, features, validRegions)) mismatchCount++;
+		if (hasEntryMismatches(entry, geometries, features, validRegions)) mismatchCount++;
 
 		checkedCount++;
 	}
 
-	return reportResults({ checkedCount, mismatchCount, missingFgbCount, missingRegions });
+	reportResults({ checkedCount, mismatchCount, missingFgbCount, missingRegions });
+
+	return checkedCount > 0 && mismatchCount === 0;
 }

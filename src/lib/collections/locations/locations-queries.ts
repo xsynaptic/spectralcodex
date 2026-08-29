@@ -35,7 +35,7 @@ export async function getObjectiveMapData() {
 		featureCollection: getLocationsFeatureCollection(objectiveLocations, {
 			hideSensitiveLocations: false,
 		}),
-		showObjectiveFilter: true,
+		isObjectiveFilterEnabled: true,
 	});
 }
 

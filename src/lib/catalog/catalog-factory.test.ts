@@ -5,7 +5,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
 import {
-	filterIsEditorialEntry,
+	isEditorialEntry,
 	sortCatalogByDate,
 	sortCatalogByEntryQuality,
 } from '#lib/catalog/catalog-utils.ts';
@@ -119,9 +119,7 @@ describe('backlinksOf', () => {
 	});
 
 	test('leaves narrowing to the caller', () => {
-		expect(ids(catalog.backlinksOf('target').filter(filterIsEditorialEntry))).toEqual([
-			'linker-post',
-		]);
+		expect(ids(catalog.backlinksOf('target').filter(isEditorialEntry))).toEqual(['linker-post']);
 	});
 
 	test('returns an empty array for an unknown or backlink-free id', () => {

@@ -17,15 +17,15 @@ export function sortCatalogByEntryQuality(a: CatalogItem, b: CatalogItem): numbe
 	return b.entryQuality - a.entryQuality || sortCatalogByDate(a, b);
 }
 
-export function filterHasFeaturedImage(item: CatalogItem): boolean {
+export function hasFeaturedImage(item: CatalogItem): boolean {
 	return !!item.imageId;
 }
 
-export function filterHasHeroImage(item: CatalogItem): boolean {
+export function hasHeroImage(item: CatalogItem): boolean {
 	return !!item.imageHeroId;
 }
 
-export function filterIsEditorialEntry(item: CatalogItem): boolean {
+export function isEditorialEntry(item: CatalogItem): boolean {
 	return editorialCollections.has(item.collection);
 }
 
@@ -45,7 +45,7 @@ export function buildEntryCatalogItems(
 } {
 	const catalogItemsFiltered = R.pipe(
 		featured,
-		R.filter(filterHasFeaturedImage),
+		R.filter(hasFeaturedImage),
 		R.sort(sortCatalogByDate),
 	);
 

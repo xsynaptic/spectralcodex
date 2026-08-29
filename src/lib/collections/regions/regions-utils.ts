@@ -18,7 +18,7 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
-	filterHasEntries,
+	hasEntries,
 	sortByEntryCount,
 } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
@@ -108,7 +108,7 @@ export async function createQueryRegionsEntryFunction() {
 	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
 		const ancestors = getRegionAncestors(entry);
 
-		const showRegionMap =
+		const shouldShowRegionMap =
 			mapDisplayRegionIds.has(entry.id) ||
 			ancestors.some((ancestor) => mapDisplayRegionIds.has(ancestor.id));
 
@@ -141,7 +141,9 @@ export async function createQueryRegionsEntryFunction() {
 
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: showRegionMap ? getLocationsFeatureCollection(entryLocations) : undefined,
+			featureCollection: shouldShowRegionMap
+				? getLocationsFeatureCollection(entryLocations)
+				: undefined,
 			locationCount: entryLocations.length,
 			chunkKeyById,
 			version,
@@ -175,7 +177,7 @@ export async function queryRegionsIndex() {
 	return R.pipe(
 		entries,
 		R.filter(({ data }) => data.parent === undefined),
-		R.filter(filterHasEntries),
+		R.filter(hasEntries),
 		R.sort(sortByEntryCount),
 		catalog.resolve,
 	);
@@ -187,13 +189,7 @@ export async function createQueryRegionsRelatedFunction() {
 
 	return function queryRegionsRelated(ids: Array<string> | undefined, limit: number) {
 		return ids
-			? R.pipe(
-					ids,
-					getRegionsByIds,
-					R.filter(filterHasEntries),
-					R.sort(sortByEntryCount),
-					R.take(limit),
-				)
+			? R.pipe(ids, getRegionsByIds, R.filter(hasEntries), R.sort(sortByEntryCount), R.take(limit))
 			: [];
 	};
 }

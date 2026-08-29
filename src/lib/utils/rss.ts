@@ -49,20 +49,20 @@ const feedSanitizeSchema = {
 	),
 };
 
-function sanitizeFeedContent(contentHtml: string, excludeFootnotes: boolean) {
+function sanitizeFeedContent(contentHtml: string, shouldExcludeFootnotes: boolean) {
 	return sanitizeHtml(
-		excludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
+		shouldExcludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
 		feedSanitizeSchema,
 	);
 }
 
 const generateFeedItem = async ({
 	entry,
-	excludeFootnotes,
+	shouldExcludeFootnotes,
 	debug,
 }: {
 	entry: CollectionEntry<'locations' | 'posts'>;
-	excludeFootnotes: boolean;
+	shouldExcludeFootnotes: boolean;
 	debug: boolean;
 }) => {
 	const startTime = performance.now();
@@ -75,7 +75,7 @@ const generateFeedItem = async ({
 		},
 	});
 
-	const contentSanitized = sanitizeFeedContent(contentHtml, excludeFootnotes);
+	const contentSanitized = sanitizeFeedContent(contentHtml, shouldExcludeFootnotes);
 
 	const description = await getDescriptionRenderedText(entry);
 
@@ -103,11 +103,11 @@ const generateFeedItem = async ({
 
 export async function generateFeedItems({
 	itemCount,
-	excludeFootnotes,
+	shouldExcludeFootnotes,
 	debug,
 }: {
 	itemCount: number;
-	excludeFootnotes: boolean;
+	shouldExcludeFootnotes: boolean;
 	debug: boolean;
 }) {
 	const { entries: locations } = await getLocationsCollection();
@@ -123,7 +123,7 @@ export async function generateFeedItems({
 			R.take(itemCount),
 			(items) =>
 				Promise.all(
-					items.map((item) => generateFeedItem({ entry: item, excludeFootnotes, debug })),
+					items.map((item) => generateFeedItem({ entry: item, shouldExcludeFootnotes, debug })),
 				),
 		),
 		R.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),

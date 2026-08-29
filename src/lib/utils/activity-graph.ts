@@ -62,12 +62,12 @@ export function buildActivityGraph({
 	for (let time = yearStart; time < yearEnd; time += millisecondsPerDay) {
 		const date = new Date(time);
 		const value = values[getDayKey(date)] ?? 0;
-		const future = time > todayUtc;
+		const isFuture = time > todayUtc;
 
 		// Future days can't set the scale; it should reflect actual past activity
-		if (!future && value > max) max = value;
+		if (!isFuture && value > max) max = value;
 
-		days.push({ date, value, level: 0, future });
+		days.push({ date, value, level: 0, future: isFuture });
 	}
 
 	for (const day of days) {

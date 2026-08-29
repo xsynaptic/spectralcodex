@@ -35,7 +35,7 @@ const {
 async function getImageProps(
 	imageId: string | undefined,
 	alt: string,
-	priority: boolean,
+	isPriority: boolean,
 ): Promise<{
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
@@ -61,13 +61,13 @@ async function getImageProps(
 			operations: { fit },
 			imageQuality: imageHeroQualityValue,
 			imageFormat: imageHeroQualityFormat,
-			...(priority ? { priority: true } : {}),
+			...(isPriority ? { priority: true } : {}),
 		} satisfies ImageComponentProps,
 		placeholderProps: {
 			imageId,
 			aspectRatio,
 			fit,
-			highQuality: priority,
+			highQuality: isPriority,
 		},
 	};
 }

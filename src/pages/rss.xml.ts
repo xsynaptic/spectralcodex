@@ -10,10 +10,10 @@ import { generateFeedItems } from '#lib/utils/rss.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 // Provide some helpful info while debugging feed generation
-const feedDebug = false as boolean;
+const isFeedDebug = false as boolean;
 
 // Should footnotes be excluded from feed content?
-const feedExcludeFootnotes = true as boolean;
+const isFeedExcludeFootnotes = true as boolean;
 
 // How many items should be included in the feed?
 const feedItemCount = 20;
@@ -21,12 +21,12 @@ const feedItemCount = 20;
 export async function GET(context: APIContext): Promise<Response> {
 	const startTime = performance.now();
 
-	if (feedDebug) console.log(`[RSS] Initializing feed...`);
+	if (isFeedDebug) console.log(`[RSS] Initializing feed...`);
 
 	const items = await generateFeedItems({
 		itemCount: feedItemCount,
-		excludeFootnotes: feedExcludeFootnotes,
-		debug: feedDebug,
+		shouldExcludeFootnotes: isFeedExcludeFootnotes,
+		debug: isFeedDebug,
 	});
 
 	const t = getTranslations();
@@ -53,7 +53,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		items,
 	});
 
-	if (feedDebug) {
+	if (isFeedDebug) {
 		console.log(`[RSS] Generated in ${(performance.now() - startTime).toFixed(5)}ms`);
 
 		if (items.length > 0) {

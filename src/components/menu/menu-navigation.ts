@@ -61,8 +61,8 @@ class NavMenu extends HTMLElement {
 	};
 
 	// Touch taps on an anchor menuitem: first tap opens, second tap navigates
-	#handleTouchAnchorClick(event: Event, li: HTMLElement, inTrigger: boolean) {
-		if (!inTrigger || li.dataset.open !== undefined) return;
+	#handleTouchAnchorClick(event: Event, li: HTMLElement, isInTrigger: boolean) {
+		if (!isInTrigger || li.dataset.open !== undefined) return;
 
 		event.preventDefault();
 		this.#closeSiblings(li);
@@ -79,15 +79,15 @@ class NavMenu extends HTMLElement {
 		}
 
 		const trigger = this.#getTrigger(li);
-		const inTrigger = this.#triggerContains(li, target);
+		const isInTrigger = this.#triggerContains(li, target);
 
 		if (trigger instanceof HTMLAnchorElement && trigger.contains(target)) {
-			if (this.#lastPointerType === 'touch') this.#handleTouchAnchorClick(event, li, inTrigger);
+			if (this.#lastPointerType === 'touch') this.#handleTouchAnchorClick(event, li, isInTrigger);
 			return;
 		}
 
 		// Button triggers, chevron clicks, or anything else in the trigger zone: toggle
-		if (!inTrigger) return;
+		if (!isInTrigger) return;
 
 		event.preventDefault();
 

@@ -18,7 +18,7 @@ interface Props {
 
 const { entry, langCode, ...props } = Astro.props;
 
-const showDangerNotice = entry.data.safety
+const shouldShowDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
 	: R.isIncludedIn(entry.data.status, [
 			LocationStatusEnum.Abandoned,
@@ -26,7 +26,7 @@ const showDangerNotice = entry.data.safety
 			LocationStatusEnum.Remnants,
 		]);
 
-const showVanishedNotice = entry.data.status === LocationStatusEnum.Vanished;
+const shouldShowVanishedNotice = entry.data.status === LocationStatusEnum.Vanished;
 
 const showChinese = langCode?.startsWith('zh');
 
@@ -34,9 +34,9 @@ const t = getTranslations();
 ---
 
 {
-	showDangerNotice || showVanishedNotice ? (
+	shouldShowDangerNotice || shouldShowVanishedNotice ? (
 		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
-			{showVanishedNotice ? (
+			{shouldShowVanishedNotice ? (
 				<AlertBox status="warning">
 					<Fragment set:html={renderMarkdownInline(t('notice.vanished'))} />
 					{showChinese ? (
@@ -44,7 +44,7 @@ const t = getTranslations();
 					) : undefined}
 				</AlertBox>
 			) : undefined}
-			{showDangerNotice && !showVanishedNotice ? (
+			{shouldShowDangerNotice && !shouldShowVanishedNotice ? (
 				<AlertBox status="warning">
 					<Fragment set:html={renderMarkdownInline(t('notice.danger'))} />
 					{showChinese ? (

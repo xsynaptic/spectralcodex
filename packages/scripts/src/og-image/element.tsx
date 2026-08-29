@@ -4,9 +4,9 @@ import { Bitmap } from 'takumi-js/helpers/jsx';
 import type { ProcessedImage } from './generate.js';
 import type { OpenGraphMetadataItem } from './types.js';
 
-const showBranding = true as boolean;
+const isShowBranding = true as boolean;
 
-const showSafeZoneOverlay = false as boolean;
+const isShowSafeZoneOverlay = false as boolean;
 
 // Threshold at which to show inverted text
 const luminanceThreshold = 190;
@@ -33,13 +33,13 @@ function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) 
 	);
 }
 
-function isInverted(luminance?: number): boolean {
+function isBrightBackground(luminance?: number): boolean {
 	return !!luminance && luminance >= luminanceThreshold;
 }
 
 // Gradient text needs backgroundClip; a flat inverted fill is a plain color
-function fillStyles(inverted: boolean, color: string, gradient: string) {
-	return inverted
+function fillStyles(isInverted: boolean, color: string, gradient: string) {
+	return isInverted
 		? { color }
 		: { backgroundClip: 'text' as const, backgroundImage: gradient, color: 'transparent' };
 }
@@ -51,7 +51,7 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 	// Letter spacing is also added AFTER characters
 	const letterSpacing = '56px';
 
-	const inverted = isInverted(luminance);
+	const isInverted = isBrightBackground(luminance);
 
 	return (
 		<div
@@ -62,14 +62,14 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 				top: '60px',
 				left: '0px',
 				width: '100%',
-				color: inverted ? 'rgb(24, 24, 27)' : '#ffffff',
+				color: isInverted ? 'rgb(24, 24, 27)' : '#ffffff',
 				fontFamily: 'Lora',
 				fontSize: '26px',
 				fontWeight: 700,
 				letterSpacing,
 				lineHeight: 1.25,
 				paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
-				textShadow: inverted
+				textShadow: isInverted
 					? '0px 0px 4px rgb(220, 220, 225, 0.8)'
 					: '0px 0px 4px rgb(12, 12, 14, 0.8)',
 			}}
@@ -134,7 +134,7 @@ function TitleMultilingual({
 	if (!script) return;
 
 	const { lang, title, ...scriptStyles } = script;
-	const inverted = isInverted(luminance);
+	const isInverted = isBrightBackground(luminance);
 
 	return (
 		<div
@@ -143,11 +143,15 @@ function TitleMultilingual({
 				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
-				textShadow: inverted
+				textShadow: isInverted
 					? '0px 0px 4px rgb(220, 220, 225, 0.7)'
 					: '1px 1px 4px rgb(12, 12, 14, 0.6)',
 				...scriptStyles,
-				...fillStyles(inverted, 'rgb(12, 12, 14)', 'linear-gradient(to bottom, #fef9ec, #f4da93)'),
+				...fillStyles(
+					isInverted,
+					'rgb(12, 12, 14)',
+					'linear-gradient(to bottom, #fef9ec, #f4da93)',
+				),
 			}}
 			lang={lang}
 		>
@@ -157,7 +161,7 @@ function TitleMultilingual({
 }
 
 function Title({ title, luminance }: { title: string; luminance?: number | undefined }) {
-	const inverted = isInverted(luminance);
+	const isInverted = isBrightBackground(luminance);
 
 	return (
 		<div
@@ -170,10 +174,14 @@ function Title({ title, luminance }: { title: string; luminance?: number | undef
 				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px 60px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
-				textShadow: inverted
+				textShadow: isInverted
 					? '0px 0px 6px rgb(240, 240, 245, 0.8)'
 					: '1px 1px 6px rgb(24, 24, 27, 0.4)',
-				...fillStyles(inverted, 'rgb(24, 24, 27)', 'linear-gradient(to bottom, #ffffff, #fef9ec)'),
+				...fillStyles(
+					isInverted,
+					'rgb(24, 24, 27)',
+					'linear-gradient(to bottom, #ffffff, #fef9ec)',
+				),
 			}}
 		>
 			{title}
@@ -211,7 +219,7 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 						'linear-gradient(to bottom, rgb(24, 24, 27, 0) 75%, rgb(24, 24, 27, 0.4) 88%, rgb(12, 12, 14, 0.6) 100%)',
 				}}
 			/>
-			{showSafeZoneOverlay ? <SafeZoneOverlay /> : undefined}
+			{isShowSafeZoneOverlay ? <SafeZoneOverlay /> : undefined}
 			<div
 				style={{
 					display: 'flex',
@@ -223,7 +231,7 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 					width: '100%',
 				}}
 			>
-				{showBranding ? <TitleSite luminance={image?.luminanceTop} /> : undefined}
+				{isShowBranding ? <TitleSite luminance={image?.luminanceTop} /> : undefined}
 				<TitleMultilingual
 					titleZh={entry.titleZh}
 					titleJa={entry.titleJa}

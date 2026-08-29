@@ -12,13 +12,13 @@ const { values } = parseArgs({
 	},
 });
 
-const dryRun = values['dry-run'];
+const isDryRun = values['dry-run'];
 
 await ensureSshKeychain();
 
 await deployCaddy({
 	rootPath: findWorkspaceRoot(),
-	dryRun,
+	dryRun: isDryRun,
 });
 
-if (!dryRun) await verifyEdge();
+if (!isDryRun) await verifyEdge();

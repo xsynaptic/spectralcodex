@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
-import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
+import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '../shared/utils.js';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';
 const userAgent = 'SpectralCodex-Webmentions/1.0 (+https://spectralcodex.com)';
@@ -49,7 +49,7 @@ const outputPath = path.join(outputDirectory, 'webmentions.jsonl');
 async function readExistingMentions() {
 	const mentions = new Map<number, Webmention>();
 
-	if (!(await fileExists(outputPath))) return mentions;
+	if (!(await isExistingFile(outputPath))) return mentions;
 
 	const fileContents = await readFile(outputPath, 'utf8');
 

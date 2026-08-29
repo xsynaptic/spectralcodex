@@ -32,7 +32,7 @@ export function findWorkspaceRoot(startDir: string = process.cwd()): string {
 	throw new Error(`Could not locate pnpm-workspace.yaml above ${startDir}`);
 }
 
-export async function fileExists(filePath: string) {
+export async function isExistingFile(filePath: string) {
 	try {
 		await fs.access(filePath);
 		return true;

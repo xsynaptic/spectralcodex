@@ -167,8 +167,8 @@ describe('buildResourceAssociation', () => {
 			return content
 				.filter((contentEntry) => {
 					const hasLinkMatch =
-						matchPattern &&
-						contentEntry.data.links?.some((link) => {
+						!!matchPattern &&
+						!!contentEntry.data.links?.some((link) => {
 							const linkUrl = typeof link === 'string' ? link : link.url;
 
 							return typeof matchPattern === 'string'

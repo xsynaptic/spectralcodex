@@ -22,7 +22,7 @@ async function resolveLatestRelease(): Promise<string> {
 }
 
 import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
-import { fileExists, findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils';
+import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
 import { saveFlatgeobuf } from './flatgeobuf';
@@ -63,11 +63,11 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 		const fgbPath = path.join(outputPath, `${region.id}.fgb`);
 		const svgPath = path.join(cachePath, `${region.id}.svg`);
 
-		const needsFgb = !(await fileExists(fgbPath));
-		const needsSvg = !(await fileExists(svgPath));
+		const isNeedsFgb = !(await isExistingFile(fgbPath));
+		const isNeedsSvg = !(await isExistingFile(svgPath));
 
-		if (needsFgb || needsSvg) {
-			processingNeeds.push({ region, needsFgb, needsSvg });
+		if (isNeedsFgb || isNeedsSvg) {
+			processingNeeds.push({ region, needsFgb: isNeedsFgb, needsSvg: isNeedsSvg });
 		}
 	}
 
@@ -104,7 +104,7 @@ function groupNeedsBySelectionBBox(
 	return needsBySelectionBBox;
 }
 
-async function processRegion({
+async function didProcessRegion({
 	needs,
 	divisionsById,
 	regionsById,
@@ -194,7 +194,7 @@ async function processBBoxGroup({
 
 		// One bad region should not abort the run
 		try {
-			if (await processRegion({ needs, divisionsById, regionsById })) {
+			if (await didProcessRegion({ needs, divisionsById, regionsById })) {
 				successCount++;
 			}
 		} catch (error) {

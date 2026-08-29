@@ -208,10 +208,10 @@ export function getLocationsFeatureCollection(
 ): FeatureCollection<MapGeometry, MapFeatureProperties> | undefined {
 	if (!locations || locations.length === 0) return;
 
-	const hideSensitiveLocations =
+	const shouldHideSensitiveLocations =
 		options?.hideSensitiveLocations ?? contentPolicy.hideSensitiveLocations;
 
-	const locationsFiltered = hideSensitiveLocations
+	const locationsFiltered = shouldHideSensitiveLocations
 		? locations.filter((entry) => !entry.data.hideLocation)
 		: locations;
 

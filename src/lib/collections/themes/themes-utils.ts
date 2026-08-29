@@ -14,7 +14,7 @@ import { getMapDirectoryData, getMapThemeIndexById } from '#lib/map/map-director
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
-	filterHasEntries,
+	hasEntries,
 	sortByEntryCount,
 } from '#lib/utils/collections.ts';
 
@@ -117,7 +117,7 @@ export async function queryThemesIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter(filterHasEntries),
+		R.filter(hasEntries),
 		// Only display themes with associated images
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByEntryCount),

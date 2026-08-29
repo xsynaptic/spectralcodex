@@ -87,15 +87,15 @@ function getDomain(url: string): string {
 	}
 }
 
-let shuttingDown = false;
+let isShuttingDown = false;
 
 process.on('SIGINT', () => {
-	if (shuttingDown) {
+	if (isShuttingDown) {
 		console.log(chalk.yellow('\nForce quit!'));
 		process.exit(1);
 	}
 
-	shuttingDown = true;
+	isShuttingDown = true;
 	console.log(chalk.yellow('\nShutting down... waiting for in-flight requests'));
 });
 
@@ -202,13 +202,13 @@ try {
 
 	const promises = urlsToCheck.map((row) =>
 		globalLimit(async () => {
-			if (shuttingDown) return;
+			if (isShuttingDown) return;
 
 			const domain = getDomain(row.url);
 			const perDomainLimit = getDomainLimit(domain);
 
 			await perDomainLimit(async () => {
-				if (shuttingDown) return;
+				if (isShuttingDown) return;
 
 				const result = await checkUrl(row);
 

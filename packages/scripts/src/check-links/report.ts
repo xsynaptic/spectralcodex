@@ -59,9 +59,9 @@ export function printStatus(): void {
 
 export function printList(filter?: string): void {
 	const filterSet = filter ? new Set(filter.split(',')) : undefined;
-	const show = (status: string) => !filterSet || filterSet.has(status);
+	const shouldShow = (status: string) => !filterSet || filterSet.has(status);
 
-	if (show(UrlStatusEnum.Redirect)) {
+	if (shouldShow(UrlStatusEnum.Redirect)) {
 		printSection(
 			UrlStatusEnum.Redirect,
 			'Redirected',
@@ -70,7 +70,7 @@ export function printList(filter?: string): void {
 		);
 	}
 
-	if (show(UrlStatusEnum.Missing)) {
+	if (shouldShow(UrlStatusEnum.Missing)) {
 		printSection(
 			UrlStatusEnum.Missing,
 			'Missing',
@@ -79,7 +79,7 @@ export function printList(filter?: string): void {
 		);
 	}
 
-	if (show(UrlStatusEnum.Blocked)) {
+	if (shouldShow(UrlStatusEnum.Blocked)) {
 		printSection(
 			UrlStatusEnum.Blocked,
 			'Blocked; needs manual verification',
@@ -89,7 +89,7 @@ export function printList(filter?: string): void {
 		);
 	}
 
-	if (show(UrlStatusEnum.Error)) {
+	if (shouldShow(UrlStatusEnum.Error)) {
 		printSection(UrlStatusEnum.Error, 'Error', chalk.red, (row) => row.url);
 	}
 

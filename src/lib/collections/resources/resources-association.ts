@@ -19,7 +19,7 @@ export interface ResourceAssociation {
 	postIdsByResourceId: Map<string, Array<string>>;
 }
 
-export function matchLinkUrl(
+export function isLinkUrlMatch(
 	linkUrl: string,
 	matchPattern: string | Array<string> | undefined,
 ): boolean {
@@ -72,7 +72,9 @@ export function buildResourceAssociation(
 			if (linkUrls.length === 0 && sourceIds.size === 0) continue;
 
 			for (const resource of resources) {
-				const hasLinkMatch = linkUrls.some((linkUrl) => matchLinkUrl(linkUrl, resource.data.match));
+				const hasLinkMatch = linkUrls.some((linkUrl) =>
+					isLinkUrlMatch(linkUrl, resource.data.match),
+				);
 
 				if (hasLinkMatch || sourceIds.has(resource.id)) {
 					idsByResourceId.get(resource.id)?.push(entry.id);

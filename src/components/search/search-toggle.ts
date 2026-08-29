@@ -16,7 +16,7 @@ const searchQueryMaxLength = 100;
 // Pagefind reads these by name off a registered modal-trigger; a rename fails silently without this
 type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModalClose'>;
 
-let searchAnalyticsRegistered = false;
+let isSearchAnalyticsRegistered = false;
 
 function getResultCount(result: unknown): number | undefined {
 	if (!result || typeof result !== 'object') return undefined;
@@ -27,9 +27,9 @@ function getResultCount(result: unknown): number | undefined {
 }
 
 function registerSearchAnalytics(instance: Instance) {
-	if (searchAnalyticsRegistered) return;
+	if (isSearchAnalyticsRegistered) return;
 
-	searchAnalyticsRegistered = true;
+	isSearchAnalyticsRegistered = true;
 
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -119,9 +119,9 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	};
 
 	#handleKeydown = (event: KeyboardEvent) => {
-		const modifier = isMac ? event.metaKey : event.ctrlKey;
+		const isModifier = isMac ? event.metaKey : event.ctrlKey;
 
-		if (!modifier || event.key.toLowerCase() !== 'k') return;
+		if (!isModifier || event.key.toLowerCase() !== 'k') return;
 
 		const target = event.target as HTMLElement;
 

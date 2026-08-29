@@ -19,7 +19,7 @@ export function createSqliteStore({ filePath }: { filePath: string }) {
 		'INSERT INTO cache (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
 	);
 	const deletionStatement = database.prepare('DELETE FROM cache WHERE key = ?');
-	const hasStatement = database.prepare('SELECT 1 FROM cache WHERE key = ?');
+	const existsStatement = database.prepare('SELECT 1 FROM cache WHERE key = ?');
 
 	return {
 		get(key: string) {
@@ -37,7 +37,7 @@ export function createSqliteStore({ filePath }: { filePath: string }) {
 			database.exec('DELETE FROM cache');
 		},
 		has(key: string) {
-			return hasStatement.get(key) !== undefined;
+			return existsStatement.get(key) !== undefined;
 		},
 	};
 }

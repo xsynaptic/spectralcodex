@@ -43,6 +43,7 @@ function collectFrontmatterLinkIssues(
 	return issues;
 }
 
+// eslint-disable-next-line unicorn/consistent-boolean-name -- one of the sixteen `check*` validators run from index.ts
 export function checkFrontmatterLinks(
 	entries: Array<DataStoreEntry>,
 	resourceEntries: Array<DataStoreEntry>,

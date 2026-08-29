@@ -207,7 +207,7 @@ export function getMapDataDedicated({
 }: {
 	mapId: string;
 	featureCollection: MapFeatureCollection | undefined;
-} & Pick<MapComponentProps, 'showObjectiveFilter'>): MapComponentData {
+} & Pick<MapComponentProps, 'isObjectiveFilterEnabled'>): MapComponentData {
 	const mapBounds = getMapBounds({ featureCollection });
 
 	if (!featureCollection || !mapBounds) {

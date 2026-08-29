@@ -13,7 +13,7 @@ import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-sour
 import { useProtomaps } from '../lib/protomaps';
 import { MapSource } from '../source/source';
 import { mapInteractiveLayerIds } from '../source/source-config';
-import { useMapCanvasInteractive, useMapCanvasLoading } from '../store/store';
+import { useIsMapCanvasInteractive, useIsMapCanvasLoading } from '../store/store';
 import { MapStoreProvider } from '../store/store-provider';
 import { getInitialViewState } from '../store/store-viewport';
 import { CanvasDataProvider } from './canvas-data';
@@ -32,7 +32,7 @@ const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ l
 };
 
 const MapCanvasContainer: FC<
-	Omit<MapComponentProps, 'geodata' | 'showObjectiveFilter' | 'apiSourceUrl'> & {
+	Omit<MapComponentProps, 'geodata' | 'isObjectiveFilterEnabled' | 'apiSourceUrl'> & {
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
@@ -67,8 +67,8 @@ const MapCanvasContainer: FC<
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const canvasEvents = useMapCanvasEvents({ mapId });
-	const canvasInteractive = useMapCanvasInteractive();
-	const canvasLoading = useMapCanvasLoading();
+	const isCanvasInteractive = useIsMapCanvasInteractive();
+	const isCanvasLoading = useIsMapCanvasLoading();
 
 	const [initialViewState] = useState(() =>
 		getInitialViewState({ bounds, center, mapId, maxBounds, zoom }),
@@ -80,7 +80,7 @@ const MapCanvasContainer: FC<
 			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
 			styleDiffing={false}
 			hash={hash ?? false}
-			interactive={canvasInteractive}
+			interactive={isCanvasInteractive}
 			interactiveLayerIds={[...mapInteractiveLayerIds]}
 			maxZoom={19}
 			minZoom={4}
@@ -113,7 +113,7 @@ const MapCanvasContainer: FC<
 			<MapSelectedMarker targetIds={targetIds} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
-			<MapCanvasLoading loading={canvasLoading || isSourceDataLoading} />
+			<MapCanvasLoading loading={isCanvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);
 };
@@ -121,7 +121,7 @@ const MapCanvasContainer: FC<
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 	const {
 		interactive,
-		showObjectiveFilter,
+		isObjectiveFilterEnabled,
 		apiSourceUrl,
 		sourceData,
 		sourceDataKey,
@@ -141,8 +141,8 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 		>
 			<MapStoreProvider
 				initialState={{
-					...(showObjectiveFilter ? { showObjectiveFilter: true } : {}),
-					...(interactive === false ? { canvasInteractive: false } : {}),
+					...(isObjectiveFilterEnabled ? { isObjectiveFilterEnabled: true } : {}),
+					...(interactive === false ? { isCanvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),
 					...(scope ? { scope } : {}),
 				}}

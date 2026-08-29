@@ -10,16 +10,16 @@ type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 interface MapDataState {
 	selectedId: string | undefined;
 	hoveredId: string | undefined;
-	popupVisible: boolean;
-	canvasInteractive: boolean;
-	canvasLoading: boolean;
+	isPopupVisible: boolean;
+	isCanvasInteractive: boolean;
+	isCanvasLoading: boolean;
 	filterPosition: DOMCoordinates | undefined;
-	filterOpen: boolean;
+	isFilterOpen: boolean;
 	statusFilter: Array<LocationStatus>;
 	entryQualityFilter: number;
 	ratingFilter: number;
 	objectiveFilter: number;
-	showObjectiveFilter: boolean;
+	isObjectiveFilterEnabled: boolean;
 	languages: Array<string>;
 	scope: MapScope | undefined;
 }
@@ -28,13 +28,13 @@ export type MapDataConfigurableState = Pick<
 	MapDataState,
 	| 'selectedId'
 	| 'hoveredId'
-	| 'canvasInteractive'
-	| 'filterOpen'
+	| 'isCanvasInteractive'
+	| 'isFilterOpen'
 	| 'statusFilter'
 	| 'entryQualityFilter'
 	| 'ratingFilter'
 	| 'objectiveFilter'
-	| 'showObjectiveFilter'
+	| 'isObjectiveFilterEnabled'
 	| 'languages'
 	| 'scope'
 >;
@@ -42,12 +42,12 @@ export type MapDataConfigurableState = Pick<
 export interface MapDataStore extends MapDataState {
 	actions: {
 		setSelectedId: (selectedId: string | undefined) => void;
-		setPopupVisible: (popupVisible: boolean) => void;
+		setPopupVisible: (isPopupVisible: boolean) => void;
 		setHoveredId: (hoveredId: string | undefined) => void;
-		setCanvasInteractive: (canvasInteractive: boolean) => void;
-		setCanvasLoading: (canvasLoading: boolean) => void;
+		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
+		setCanvasLoading: (isCanvasLoading: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
-		setFilterOpen: (filterOpen: boolean) => void;
+		setFilterOpen: (isFilterOpen: boolean) => void;
 		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
 		toggleStatusFilter: (status: LocationStatus) => void;
 		showAllStatusFilter: () => void;
@@ -62,16 +62,16 @@ export interface MapDataStore extends MapDataState {
 const defaultMapDataState = {
 	selectedId: undefined,
 	hoveredId: undefined,
-	popupVisible: true,
-	canvasInteractive: true,
-	canvasLoading: true,
+	isPopupVisible: true,
+	isCanvasInteractive: true,
+	isCanvasLoading: true,
 	filterPosition: undefined,
-	filterOpen: false,
+	isFilterOpen: false,
 	statusFilter: [],
 	entryQualityFilter: 1,
 	ratingFilter: 1,
 	objectiveFilter: 1,
-	showObjectiveFilter: false,
+	isObjectiveFilterEnabled: false,
 	languages: ['en'],
 	scope: undefined,
 } satisfies MapDataState;
@@ -91,27 +91,27 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				setSelectedId: (selectedId) => {
 					set({
 						selectedId,
-						filterOpen: false,
-						...(selectedId === undefined ? { popupVisible: true } : {}),
+						isFilterOpen: false,
+						...(selectedId === undefined ? { isPopupVisible: true } : {}),
 					});
 				},
-				setPopupVisible: (popupVisible) => {
-					set({ popupVisible });
+				setPopupVisible: (isPopupVisible) => {
+					set({ isPopupVisible });
 				},
 				setHoveredId: (hoveredId) => {
 					set({ hoveredId });
 				},
-				setCanvasInteractive: (canvasInteractive) => {
-					set({ canvasInteractive });
+				setCanvasInteractive: (isCanvasInteractive) => {
+					set({ isCanvasInteractive });
 				},
-				setCanvasLoading: (canvasLoading) => {
-					set({ canvasLoading });
+				setCanvasLoading: (isCanvasLoading) => {
+					set({ isCanvasLoading });
 				},
 				setFilterPosition: (filterPosition) => {
 					set({ filterPosition });
 				},
-				setFilterOpen: (filterOpen) => {
-					setAndClearSelection({ filterOpen });
+				setFilterOpen: (isFilterOpen) => {
+					setAndClearSelection({ isFilterOpen });
 				},
 				setStatusFilter: (statusFilter) => {
 					setAndClearSelection({ statusFilter });

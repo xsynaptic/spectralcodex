@@ -5,7 +5,7 @@ import type { MapComponentProps } from '../types';
 
 import { useMapCanvasData } from '../canvas/canvas-data';
 import { useMapApiDivisionData } from '../data/data-division';
-import { useMapCanvasInteractive } from '../store/store';
+import { useIsMapCanvasInteractive } from '../store/store';
 import { MapSourceDebug } from './source-debug';
 import { MapSourceDivisions } from './source-divisions';
 import { MapSourceLines } from './source-lines';
@@ -24,7 +24,7 @@ export const MapSource: FC<
 		hasMapIcons: boolean;
 	}
 > = function MapSource({ apiDivisionUrl, hasMapIcons, bounds, isDev, targetIds }) {
-	const interactive = useMapCanvasInteractive();
+	const isInteractive = useIsMapCanvasInteractive();
 
 	const { pointCollection, lineStringCollection } = useMapCanvasData();
 	const { data: divisionData } = useMapApiDivisionData({ apiDivisionUrl, isDev });
@@ -40,7 +40,7 @@ export const MapSource: FC<
 			<MapSourceLines data={lineStringCollection ?? emptyFeatureCollection} />
 			<MapSourcePoints
 				data={pointCollection ?? emptyFeatureCollection}
-				interactive={interactive}
+				interactive={isInteractive}
 				hasMapIcons={hasMapIcons}
 				targetIds={targetIds}
 			/>

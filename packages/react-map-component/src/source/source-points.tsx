@@ -8,7 +8,7 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '../types';
 
-import { useDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '../lib/dark-mode';
 import {
 	statusColorArray,
 	statusColorDarkArray,
@@ -21,13 +21,13 @@ import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 // feature-state is paint-only, so the label layers below still key off the store hoveredId
-const isHoveredExpression = [
+const hoverStateExpression = [
 	'boolean',
 	['feature-state', 'hover'],
 	false,
 ] satisfies ExpressionSpecification;
 
-const isSelectedExpression = [
+const selectStateExpression = [
 	'boolean',
 	['feature-state', 'select'],
 	false,
@@ -69,7 +69,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.PointsImage]: SymbolLayerSpecification;
 	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
 } {
-	const isDarkMode = useDarkMode();
+	const isDarkMode = useIsDarkMode();
 	const hoveredId = useMapHoveredId();
 
 	const clustersLayerStyle = useMemo(
@@ -90,11 +90,11 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['get', 'point_count'],
 						0, // Point count
-						['case', isHoveredExpression, 9, 7],
+						['case', hoverStateExpression, 9, 7],
 						20,
-						['case', isHoveredExpression, 11, 9],
+						['case', hoverStateExpression, 11, 9],
 						60,
-						['case', isHoveredExpression, 14, 12],
+						['case', hoverStateExpression, 14, 12],
 					],
 					'circle-stroke-width': 1,
 					'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
@@ -152,15 +152,15 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						['case', isSelectedExpression, 5, isHoveredExpression, 3, 2],
+						['case', selectStateExpression, 5, hoverStateExpression, 3, 2],
 						8,
-						['case', isSelectedExpression, 6, isHoveredExpression, 5, 4],
+						['case', selectStateExpression, 6, hoverStateExpression, 5, 4],
 						12,
-						['case', isSelectedExpression, 8, isHoveredExpression, 6, 5],
+						['case', selectStateExpression, 8, hoverStateExpression, 6, 5],
 						15,
-						['case', isSelectedExpression, 10, isHoveredExpression, 8, 7],
+						['case', selectStateExpression, 10, hoverStateExpression, 8, 7],
 						18,
-						['case', isSelectedExpression, 12, isHoveredExpression, 9, 8],
+						['case', selectStateExpression, 12, hoverStateExpression, 9, 8],
 					],
 					'circle-stroke-width': 1,
 					'circle-stroke-color': [
@@ -196,15 +196,15 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 						['linear'],
 						['zoom'],
 						0, // Zoom level followed by radius (repeated)
-						['case', isSelectedExpression, 9, isHoveredExpression, 6, 5],
+						['case', selectStateExpression, 9, hoverStateExpression, 6, 5],
 						8,
-						['case', isSelectedExpression, 14, isHoveredExpression, 11, 10],
+						['case', selectStateExpression, 14, hoverStateExpression, 11, 10],
 						12,
-						['case', isSelectedExpression, 16, isHoveredExpression, 13, 12],
+						['case', selectStateExpression, 16, hoverStateExpression, 13, 12],
 						15,
-						['case', isSelectedExpression, 20, isHoveredExpression, 16, 15],
+						['case', selectStateExpression, 20, hoverStateExpression, 16, 15],
 						18,
-						['case', isSelectedExpression, 24, isHoveredExpression, 21, 20],
+						['case', selectStateExpression, 24, hoverStateExpression, 21, 20],
 					],
 				},
 			}) satisfies CircleLayerSpecification,
@@ -245,7 +245,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 				paint: {
 					'icon-color': [
 						'case',
-						isSelectedExpression,
+						selectStateExpression,
 						tailwindColors.red500,
 						tailwindColors.red600,
 					],

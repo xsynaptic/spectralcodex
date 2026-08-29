@@ -24,8 +24,8 @@ const { values } = parseArgs({
 	},
 });
 
-const dryRun = values['dry-run'];
-const skipBuild = values['skip-build'];
+const isDryRun = values['dry-run'];
+const isSkipBuild = values['skip-build'];
 
 // Load and validate deploy configuration
 const config = loadDeployConfig();
@@ -87,11 +87,11 @@ async function generateOpenGraph() {
 }
 
 async function transferOpenGraph() {
-	await deployOg({ rootPath, dryRun });
+	await deployOg({ rootPath, dryRun: isDryRun });
 }
 
 async function build() {
-	if (skipBuild) {
+	if (isSkipBuild) {
 		console.log(chalk.yellow('Skipping build'));
 		return;
 	}
@@ -106,7 +106,7 @@ async function test() {
 
 async function media() {
 	try {
-		await deployMedia({ rootPath, dryRun });
+		await deployMedia({ rootPath, dryRun: isDryRun });
 	} catch (error) {
 		if (error instanceof Error && error.message.includes('not found')) {
 			console.log(chalk.yellow('Media path not found, skipping'));
@@ -117,11 +117,11 @@ async function media() {
 }
 
 async function transfer() {
-	await deployApp({ rootPath, dryRun });
+	await deployApp({ rootPath, dryRun: isDryRun });
 }
 
 async function caddy() {
-	await deployCaddy({ rootPath, dryRun });
+	await deployCaddy({ rootPath, dryRun: isDryRun });
 }
 
 try {
@@ -145,8 +145,8 @@ try {
 	await caddy();
 
 	// Verify & refresh caches
-	if (!dryRun) await verifyEdge();
-	await invokeCacheRefresh({ dryRun });
+	if (!isDryRun) await verifyEdge();
+	await invokeCacheRefresh({ dryRun: isDryRun });
 
 	console.log(chalk.green('Deploy complete'));
 } catch (error) {

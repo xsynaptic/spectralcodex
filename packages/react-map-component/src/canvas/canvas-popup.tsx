@@ -14,7 +14,7 @@ import { useMediaQuery } from '../lib/media-query';
 import { useMapMessages } from '../lib/messages';
 import {
 	useMapHoveredId,
-	useMapPopupVisible,
+	useIsMapPopupVisible,
 	useMapSelectedId,
 	useMapStoreActions,
 } from '../store/store';
@@ -370,7 +370,7 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 	imageServerUrl = '',
 }) {
 	const { popupItem, isLoading: isPopupDataLoading } = useMapCanvasPopup();
-	const popupVisible = useMapPopupVisible();
+	const isPopupVisible = useIsMapPopupVisible();
 
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
@@ -403,7 +403,7 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 					})}
 			closeOnClick={false}
 			onClose={onClose}
-			style={{ visibility: popupVisible ? 'visible' : 'hidden' }}
+			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
 		>
 			<div className="map-popup-frame">
 				<div className="map-popup-loading">

@@ -10,17 +10,17 @@ import type { LocationStatusMetadata } from '../lib/location-status';
 
 import { controlFilterId } from '../constants';
 import { useSourceDataQuery } from '../data/data-source';
-import { useDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
 import { useMapMessages } from '../lib/messages';
 import {
-	useMapCanvasLoading,
-	useMapChineseLabels,
-	useMapFilterOpen,
+	useIsMapCanvasLoading,
+	useHasMapChineseLabels,
+	useIsMapFilterOpen,
 	useMapFilterPosition,
 	useMapObjectiveFilter,
 	useMapRatingFilter,
-	useMapShowObjectiveFilter,
+	useIsMapObjectiveFilterEnabled,
 	useMapStatusFilter,
 	useMapStoreActions,
 } from '../store/store';
@@ -53,9 +53,9 @@ const MapFilterStatusMenuItem: FC<{
 	isFiltered: boolean;
 	data: LocationStatusMetadata;
 }> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
-	const isDarkMode = useDarkMode();
+	const isDarkMode = useIsDarkMode();
 
-	const showChinese = useMapChineseLabels();
+	const isShowChinese = useHasMapChineseLabels();
 
 	const { toggleStatusFilter } = useMapStoreActions();
 
@@ -82,7 +82,7 @@ const MapFilterStatusMenuItem: FC<{
 				<span
 					className={isFiltered ? 'map-filter-label map-filter-label-active' : 'map-filter-label'}
 				>
-					{showChinese ? (
+					{isShowChinese ? (
 						<>
 							<span>{data.title}</span>
 							<span
@@ -120,7 +120,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 });
 
 const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
-	const showChinese = useMapChineseLabels();
+	const isShowChinese = useHasMapChineseLabels();
 	const messages = useMapMessages();
 
 	const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
@@ -132,7 +132,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 					showAllStatusFilter();
 				}}
 			>
-				{showChinese ? (
+				{isShowChinese ? (
 					<>
 						<span>{messages.showAll}</span>
 						<span className="map-filter-label-zh">{chineseShowHideLabels.showAll}</span>
@@ -146,7 +146,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 					hideAllStatusFilter();
 				}}
 			>
-				{showChinese ? (
+				{isShowChinese ? (
 					<>
 						<span>{messages.hideAll}</span>
 						<span className="map-filter-label-zh">{chineseShowHideLabels.hideAll}</span>
@@ -222,11 +222,11 @@ const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
 }> = function MapControlsFilterMenu({ filterPopupOffset = 8 }) {
 	const filterPosition = useMapFilterPosition();
-	const filterOpen = useMapFilterOpen();
+	const isFilterOpen = useIsMapFilterOpen();
 	const statusFilter = useMapStatusFilter();
-	const showObjectiveFilter = useMapShowObjectiveFilter();
+	const isObjectiveFilterEnabled = useIsMapObjectiveFilterEnabled();
 
-	return filterOpen && filterPosition ? (
+	return isFilterOpen && filterPosition ? (
 		<div
 			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
 			style={{
@@ -246,7 +246,7 @@ const MapControlsFilterMenu: FC<{
 					))}
 					<MapFilterStatusShowHideMenu />
 					<MapFilterRatingMenuItem />
-					{showObjectiveFilter ? <MapFilterObjectiveMenuItem /> : undefined}
+					{isObjectiveFilterEnabled ? <MapFilterObjectiveMenuItem /> : undefined}
 				</ul>
 			</div>
 		</div>
@@ -256,8 +256,8 @@ const MapControlsFilterMenu: FC<{
 export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
 	position,
 }) {
-	const isCanvasLoading = useMapCanvasLoading();
-	const filterOpen = useMapFilterOpen();
+	const isCanvasLoading = useIsMapCanvasLoading();
+	const isFilterOpen = useIsMapFilterOpen();
 	const messages = useMapMessages();
 
 	const { setFilterOpen } = useMapStoreActions();
@@ -274,10 +274,10 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
 					onClick={() => {
-						if (!isLoading) setFilterOpen(!filterOpen);
+						if (!isLoading) setFilterOpen(!isFilterOpen);
 					}}
 					aria-label={messages.filterMenuAriaLabel}
-					{...(filterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
+					{...(isFilterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="map-ctrl-icon-frame">
 						<svg
@@ -285,7 +285,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							viewBox="0 0 24 24"
 							className="map-ctrl-icon"
 							style={{
-								...(filterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
+								...(isFilterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
 								...(isLoading ? { opacity: '0.6' } : {}),
 							}}
 							aria-hidden="true"

@@ -16,14 +16,14 @@ interface Props {
 
 const { items, count, countThreshold = 10, url, ...props } = Astro.props;
 
-const showCount = count ? Math.abs(items.length - count) > countThreshold : false;
+const shouldShowCount = count ? Math.abs(items.length - count) > countThreshold : false;
 
 const numberFormatter = new Intl.NumberFormat('en', { maximumFractionDigits: 0 });
 
 const t = getTranslations();
 
 function getCountText() {
-	if (showCount && count) {
+	if (shouldShowCount && count) {
 		return {
 			title: formatStringTemplate(t('parts.textSeparatedList.more'), {
 				count: numberFormatter.format(count - items.length),

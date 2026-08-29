@@ -137,16 +137,16 @@ function round(value: number): number {
 // `undefined` lifts the pen, so a gap in the series breaks the line rather than bridging it
 function getPolylinePath(points: Array<{ x: number; y: number } | undefined>): string {
 	let path = '';
-	let penDown = false;
+	let isPenDown = false;
 
 	for (const point of points) {
 		if (!point) {
-			penDown = false;
+			isPenDown = false;
 			continue;
 		}
 
-		path += `${penDown ? 'L' : 'M'}${String(round(point.x))},${String(round(point.y))}`;
-		penDown = true;
+		path += `${isPenDown ? 'L' : 'M'}${String(round(point.x))},${String(round(point.y))}`;
+		isPenDown = true;
 	}
 
 	return path;

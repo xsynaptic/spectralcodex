@@ -6,11 +6,11 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { useEffect, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
-import { useDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '../lib/dark-mode';
 import { LocationStatusRecords } from '../lib/location-status';
 import { tailwindColors } from '../lib/tailwind-colors';
 import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
-import { useMapPopupVisible, useMapSelectedId } from '../store/store';
+import { useIsMapPopupVisible, useMapSelectedId } from '../store/store';
 
 interface TargetMarker {
 	id: string;
@@ -19,7 +19,7 @@ interface TargetMarker {
 	color: string;
 }
 
-function markersEqual(previous: TargetMarker, next: TargetMarker): boolean {
+function areMarkersEqual(previous: TargetMarker, next: TargetMarker): boolean {
 	return (
 		previous.id === next.id &&
 		previous.longitude === next.longitude &&
@@ -113,7 +113,7 @@ function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> 
 function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	const { current: map } = useMap();
 
-	const isDark = useDarkMode();
+	const isDark = useIsDarkMode();
 
 	const [markers, setMarkers] = useState<Array<TargetMarker>>([]);
 	const [visible, setVisible] = useState(true);
@@ -148,7 +148,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 				for (const [index, current] of nextMarkers.entries()) {
 					const before = previous[index];
 
-					if (!before || !markersEqual(before, current)) return nextMarkers;
+					if (!before || !areMarkersEqual(before, current)) return nextMarkers;
 				}
 
 				return previous;
@@ -218,12 +218,12 @@ function findPointMarker(map: MapRef, id: string, isDark: boolean): TargetMarker
 
 function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker | undefined {
 	const { current: map } = useMap();
-	const isDark = useDarkMode();
+	const isDark = useIsDarkMode();
 	const selectedId = useMapSelectedId();
-	const popupVisible = useMapPopupVisible();
+	const isPopupVisible = useIsMapPopupVisible();
 
 	const trackedId =
-		popupVisible && selectedId && !targetIds?.includes(selectedId) ? selectedId : undefined;
+		isPopupVisible && selectedId && !targetIds?.includes(selectedId) ? selectedId : undefined;
 
 	const [marker, setMarker] = useState<TargetMarker | undefined>();
 
@@ -233,7 +233,9 @@ function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker |
 		const updateMarker = () => {
 			const next = findPointMarker(map, trackedId, isDark);
 
-			setMarker((previous) => (previous && next && markersEqual(previous, next) ? previous : next));
+			setMarker((previous) =>
+				previous && next && areMarkersEqual(previous, next) ? previous : next,
+			);
 		};
 
 		map.on('moveend', updateMarker);

@@ -33,11 +33,11 @@ try {
 	process.exit(1);
 }
 
-let cleanedUp = false;
+let isCleanedUp = false;
 
 async function cleanup() {
-	if (cleanedUp) return;
-	cleanedUp = true;
+	if (isCleanedUp) return;
+	isCleanedUp = true;
 	log(chalk.gray('Stopping containers...'));
 	try {
 		await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();

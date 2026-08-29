@@ -5,9 +5,9 @@ import { createMapStore } from './store-factory';
 
 describe('createMapStore', () => {
 	test('merges initial config over defaults', () => {
-		const store = createMapStore({ showObjectiveFilter: true });
+		const store = createMapStore({ isObjectiveFilterEnabled: true });
 
-		expect(store.getState().showObjectiveFilter).toBe(true);
+		expect(store.getState().isObjectiveFilterEnabled).toBe(true);
 		expect(store.getState().statusFilter).toEqual([]);
 	});
 
@@ -58,6 +58,6 @@ describe('createMapStore', () => {
 		setPopupVisible(false);
 
 		setSelectedId(undefined);
-		expect(store.getState().popupVisible).toBe(true);
+		expect(store.getState().isPopupVisible).toBe(true);
 	});
 });

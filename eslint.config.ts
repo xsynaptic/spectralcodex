@@ -38,8 +38,6 @@ export default getConfig(
 				'unicorn/no-array-sort': 'off',
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
 				'unicorn/consistent-compound-words': 'off',
-				// @TODO: re-enable and fix; currently there are 80+ issues reported by this rule
-				'unicorn/consistent-boolean-name': 'off',
 				// Refactor-heavy: wants nested loops extracted into functions
 				'unicorn/no-break-in-nested-loop': 'off',
 				// False positives: map glyph URLs, i18n tokens, and shell format strings use literal braces

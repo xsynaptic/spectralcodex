@@ -6,12 +6,12 @@ import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { useDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '../lib/dark-mode';
 import { tailwindColors } from '../lib/tailwind-colors';
 import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
 
 function useMapSourceDivisionStyle() {
-	const isDarkMode = useDarkMode();
+	const isDarkMode = useIsDarkMode();
 
 	const divisionMaskLayerStyle = useMemo(
 		() =>

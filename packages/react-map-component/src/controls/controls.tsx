@@ -8,21 +8,21 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
-import { useMapCanvasInteractive } from '../store/store';
+import { useIsMapCanvasInteractive } from '../store/store';
 import { FilterControl } from './controls-filter';
 import { MetricsControl } from './controls-metrics';
 import { SearchControl } from './controls-search';
 
-const featureSearchControl = false as boolean;
+const isFeatureSearchControl = false as boolean;
 
 export const MapControls: FC = function MapControls() {
-	const canvasInteractive = useMapCanvasInteractive();
+	const isCanvasInteractive = useIsMapCanvasInteractive();
 
 	return (
 		<>
 			<ScaleControl position="bottom-left" maxWidth={120} />
 			<AttributionControl position="bottom-right" compact={true} />
-			{canvasInteractive ? (
+			{isCanvasInteractive ? (
 				<>
 					<FullscreenControl position="top-left" />
 					<GeolocateControl
@@ -32,7 +32,7 @@ export const MapControls: FC = function MapControls() {
 					/>
 					<NavigationControl position="top-left" showCompass={true} />
 					<FilterControl position="top-left" />
-					{featureSearchControl ? <SearchControl position="top-right" /> : undefined}
+					{isFeatureSearchControl ? <SearchControl position="top-right" /> : undefined}
 					<MetricsControl position="bottom-left" />
 				</>
 			) : undefined}

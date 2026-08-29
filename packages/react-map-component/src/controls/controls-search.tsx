@@ -7,13 +7,13 @@ import { controlSearchId } from '../constants';
 import { usePopupDataQuery } from '../data/data-popup';
 import { useSourceDataQuery } from '../data/data-source';
 import { useMapMessages } from '../lib/messages';
-import { useMapCanvasLoading } from '../store/store';
+import { useIsMapCanvasLoading } from '../store/store';
 import { CustomControlPortal } from './controls-custom';
 
 export const SearchControl: FC<{ position: ControlPosition }> = function SearchControl({
 	position,
 }) {
-	const isCanvasLoading = useMapCanvasLoading();
+	const isCanvasLoading = useIsMapCanvasLoading();
 	const messages = useMapMessages();
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();

@@ -9,7 +9,7 @@ import type {
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { filterIsEditorialEntry, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
+import { isEditorialEntry, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import {
@@ -173,7 +173,7 @@ export async function createQueryLocationsEntryFunction() {
 			R.sort(sortCatalogByDate),
 		);
 
-		const backlinks = catalog.backlinksOf(entry.id).filter(filterIsEditorialEntry);
+		const backlinks = catalog.backlinksOf(entry.id).filter(isEditorialEntry);
 
 		return { mapData, catalogItems, backlinks };
 	};
