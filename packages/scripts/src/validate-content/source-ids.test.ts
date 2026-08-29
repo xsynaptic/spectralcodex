@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkSourceIds, collectSourceIdIssues } from './source-ids';
-import { makeEntry, noop } from './validate-test-utils';
+import { collectSourceIdIssues } from './source-ids';
+import { makeEntry } from './validate-test-utils';
 
 const resourceEntries = [makeEntry({ id: 'existing-resource' })];
 
@@ -57,18 +57,5 @@ describe('collectSourceIdIssues', () => {
 		const entries = [makeEntry({ id: 'a-location' })];
 
 		expect(collectSourceIdIssues(entries, resourceEntries)).toEqual([]);
-	});
-});
-
-describe('checkSourceIds', () => {
-	test('returns true when all source ids resolve and false otherwise', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-		const valid = [makeEntry({ id: 'a-location', data: { sources: ['existing-resource'] } })];
-		const broken = [makeEntry({ id: 'a-location', data: { sources: ['missing-resource'] } })];
-
-		expect(checkSourceIds(valid, resourceEntries)).toBe(true);
-		expect(checkSourceIds(broken, resourceEntries)).toBe(false);
-
-		logSpy.mockRestore();
 	});
 });

@@ -1,6 +1,7 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+import type { ValidationIssue } from './validation-result';
+
+import { toValidationResult } from './validation-result';
 
 interface ComponentError {
 	line: number;
@@ -8,7 +9,7 @@ interface ComponentError {
 	context: string;
 }
 
-function validateLinkComponents(content: string): Array<ComponentError> {
+function collectLinkComponentErrors(content: string): Array<ComponentError> {
 	const errors: Array<ComponentError> = [];
 	const lines = content.split('\n');
 
@@ -37,7 +38,7 @@ function validateLinkComponents(content: string): Array<ComponentError> {
 	return errors;
 }
 
-function validateImgComponents(content: string): Array<ComponentError> {
+function collectImgComponentErrors(content: string): Array<ComponentError> {
 	const errors: Array<ComponentError> = [];
 	const lines = content.split('\n');
 
@@ -66,33 +67,34 @@ function validateImgComponents(content: string): Array<ComponentError> {
 	return errors;
 }
 
-export function checkMdxComponents(entries: Array<DataStoreEntry>) {
-	let overallErrorCount = 0;
+export function validateMdxComponents(entries: Array<DataStoreEntry>) {
+	const issues: Array<ValidationIssue> = [];
+
+	let errorCount = 0;
 
 	for (const entry of entries) {
 		if (!entry.body) continue;
 
-		const linkErrors = validateLinkComponents(entry.body);
-		const imgErrors = validateImgComponents(entry.body);
-		const allErrors = [...linkErrors, ...imgErrors];
+		const errors = [
+			...collectLinkComponentErrors(entry.body),
+			...collectImgComponentErrors(entry.body),
+		];
 
-		if (allErrors.length > 0) {
-			console.log(chalk.red(`❌ ${entry.filePath ?? entry.id}`));
+		if (errors.length === 0) continue;
 
-			for (const error of allErrors) {
-				console.log(chalk.red(`   Line ${error.line.toString()}: ${error.message}`));
-				console.log(chalk.gray(`   ${error.context.trim()}`));
-			}
+		issues.push({
+			message: entry.filePath ?? entry.id,
+			details: errors.flatMap((error) => [
+				`Line ${error.line.toString()}: ${error.message}`,
+				error.context.trim(),
+			]),
+		});
 
-			overallErrorCount += allErrors.length;
-		}
+		errorCount += errors.length;
 	}
 
-	if (overallErrorCount === 0) {
-		console.log(chalk.green('✓ MDX components valid'));
-	} else {
-		console.log(chalk.yellow(`⚠️  Found ${overallErrorCount.toString()} invalid component(s)`));
-	}
-
-	return overallErrorCount === 0;
+	return toValidationResult(issues, {
+		pass: 'MDX components valid',
+		fail: `Found ${errorCount.toString()} invalid component(s)`,
+	});
 }

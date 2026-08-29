@@ -1,10 +1,9 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
 
 import { extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
+import { toValidationResult } from './validation-result';
 
-export function checkImageFeaturedInBody(entries: Array<DataStoreEntry>) {
+export function validateImageFeaturedInBody(entries: Array<DataStoreEntry>) {
 	const orphans: Array<{ file: string; missingIds: Array<string> }> = [];
 
 	for (const entry of entries) {
@@ -21,20 +20,13 @@ export function checkImageFeaturedInBody(entries: Array<DataStoreEntry>) {
 		}
 	}
 
-	if (orphans.length === 0) {
-		console.log(chalk.green('✓ Featured images present in body content'));
-		return true;
-	}
-
-	for (const { file, missingIds } of orphans) {
-		console.log(chalk.red(`❌ ${file}: featured image(s) not in body: ${missingIds.join(', ')}`));
-	}
-
-	console.log(
-		chalk.red(
-			`❌ ${orphans.length.toString()} entries have featured images missing from body content`,
-		),
+	return toValidationResult(
+		orphans.map(({ file, missingIds }) => ({
+			message: `${file}: featured image(s) not in body: ${missingIds.join(', ')}`,
+		})),
+		{
+			pass: 'Featured images present in body content',
+			fail: `Found ${orphans.length.toString()} entries with featured images missing from body content`,
+		},
 	);
-
-	return false;
 }

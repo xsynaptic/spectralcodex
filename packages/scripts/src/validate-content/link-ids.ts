@@ -1,6 +1,6 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 const linkIdRegex = /<Link\s[^>]*id="([^"]+)"/g;
 
@@ -43,28 +43,27 @@ export function collectLinkIdIssues(
 	return entries.flatMap((entry) => collectEntryLinkIdIssues(entry, validIds));
 }
 
-export function checkLinkIds(entries: Array<DataStoreEntry>, validTargets: Array<DataStoreEntry>) {
+export function validateLinkIds(
+	entries: Array<DataStoreEntry>,
+	validTargets: Array<DataStoreEntry>,
+) {
 	const issues = collectLinkIdIssues(entries, validTargets);
-	let previousLocation: string | undefined;
+	const detailsByLocation = new Map<string, Array<string>>();
 
 	for (const issue of issues) {
-		if (issue.location !== previousLocation) {
-			console.log(chalk.red(`❌ ${issue.location}`));
-			previousLocation = issue.location;
-		}
+		const details = detailsByLocation.get(issue.location) ?? [];
 
-		console.log(
-			chalk.red(
-				`   Line ${issue.lineNumber.toString()}: broken link ID "${issue.id ?? 'undefined'}"`,
-			),
+		details.push(
+			`Line ${issue.lineNumber.toString()}: broken link ID "${issue.id ?? 'undefined'}"`,
 		);
+		detailsByLocation.set(issue.location, details);
 	}
 
-	if (issues.length === 0) {
-		console.log(chalk.green('✓ Link IDs valid'));
-	} else {
-		console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} broken link ID(s)`));
-	}
-
-	return issues.length === 0;
+	return toValidationResult(
+		[...detailsByLocation].map(([location, details]) => ({ message: location, details })),
+		{
+			pass: 'Link IDs valid',
+			fail: `Found ${issues.length.toString()} broken link ID(s)`,
+		},
+	);
 }

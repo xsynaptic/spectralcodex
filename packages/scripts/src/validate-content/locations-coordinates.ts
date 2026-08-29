@@ -1,12 +1,12 @@
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import { booleanPointInPolygon, point } from '@turf/turf';
-import chalk from 'chalk';
 import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../shared/data-store';
+import type { ValidationResult } from './validation-result';
 
 import { toReferenceIds } from '../shared/data-store';
 import { LocationGeometrySchema } from '../shared/geometry';
@@ -64,6 +64,7 @@ function isPointInRegion(
 function createRegionGeometryLoader(divisionsPath: string) {
 	const cache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
 	const missingRegions = new Set<string>();
+	const unloadableRegions: Array<string> = [];
 
 	async function getRegionFeatures(regionId: string, shouldReportMissing: boolean) {
 		if (missingRegions.has(regionId)) return;
@@ -79,13 +80,7 @@ function createRegionGeometryLoader(divisionsPath: string) {
 
 			return features;
 		} catch {
-			if (shouldReportMissing) {
-				console.log(
-					chalk.yellow(
-						`⚠️  ${regionId}: could not load FGB file, skipping all other locations in this region`,
-					),
-				);
-			}
+			if (shouldReportMissing) unloadableRegions.push(regionId);
 
 			missingRegions.add(regionId);
 
@@ -93,7 +88,7 @@ function createRegionGeometryLoader(divisionsPath: string) {
 		}
 	}
 
-	return { getRegionFeatures, missingRegions };
+	return { getRegionFeatures, missingRegions, unloadableRegions };
 }
 
 type RegionFeatures = Array<Feature<Polygon | MultiPolygon>>;
@@ -129,74 +124,34 @@ async function collectRegionFeatures(
 	return { validRegions, features };
 }
 
-function hasEntryMismatches(
+function collectEntryMismatches(
 	entry: DataStoreEntry,
 	geometries: Array<{ coordinates: [number, number] }>,
 	features: RegionFeatures,
 	validRegions: Array<string>,
-): boolean {
-	let hasMismatch = false;
+): Array<string> {
+	const mismatches: Array<string> = [];
 
 	for (const { coordinates } of geometries) {
 		if (isPointInRegion(coordinates, features)) continue;
 
-		console.log(
-			chalk.red(
-				`❌ ${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
-			),
+		mismatches.push(
+			`${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
 		);
-		hasMismatch = true;
 	}
 
-	return hasMismatch;
+	return mismatches;
 }
 
-function reportResults({
-	checkedCount,
-	mismatchCount,
-	missingFgbCount,
-	missingRegions,
-}: {
-	checkedCount: number;
-	mismatchCount: number;
-	missingFgbCount: number;
-	missingRegions: Set<string>;
-}): void {
-	if (checkedCount === 0) {
-		console.log(chalk.yellow('⚠️  No locations could be checked'));
+async function collectCoordinateFindings(entries: Array<DataStoreEntry>, divisionsPath: string) {
+	const mismatches: Array<string> = [];
 
-		return;
-	}
-
-	if (mismatchCount === 0) {
-		console.log(
-			chalk.green(
-				`✓ ${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
-			),
-		);
-
-		return;
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${mismatchCount.toString()} coordinate mismatch(es)`));
-
-	if (missingRegions.size > 0) {
-		const sorted = [...missingRegions].sort((regionA, regionB) => regionA.localeCompare(regionB));
-
-		console.log(chalk.gray(`Missing FGB regions: ${sorted.join(', ')}`));
-	}
-}
-
-// eslint-disable-next-line unicorn/consistent-boolean-name -- one of the sixteen `check*` validators run from index.ts
-export async function checkLocationsCoordinates(
-	entries: Array<DataStoreEntry>,
-	divisionsPath: string,
-) {
 	let mismatchCount = 0;
 	let missingFgbCount = 0;
 	let checkedCount = 0;
 
-	const { getRegionFeatures, missingRegions } = createRegionGeometryLoader(divisionsPath);
+	const { getRegionFeatures, missingRegions, unloadableRegions } =
+		createRegionGeometryLoader(divisionsPath);
 
 	for (const entry of entries) {
 		if (entry.data.skipCoordinateCheck === true) continue;
@@ -213,12 +168,73 @@ export async function checkLocationsCoordinates(
 			continue;
 		}
 
-		if (hasEntryMismatches(entry, geometries, features, validRegions)) mismatchCount++;
+		const entryMismatches = collectEntryMismatches(entry, geometries, features, validRegions);
+
+		if (entryMismatches.length > 0) {
+			mismatches.push(...entryMismatches);
+			mismatchCount++;
+		}
 
 		checkedCount++;
 	}
 
-	reportResults({ checkedCount, mismatchCount, missingFgbCount, missingRegions });
+	return {
+		mismatches,
+		mismatchCount,
+		missingFgbCount,
+		checkedCount,
+		missingRegions,
+		unloadableRegions,
+	};
+}
 
-	return checkedCount > 0 && mismatchCount === 0;
+export async function validateLocationsCoordinates(
+	entries: Array<DataStoreEntry>,
+	divisionsPath: string,
+) {
+	const {
+		mismatches,
+		mismatchCount,
+		missingFgbCount,
+		checkedCount,
+		missingRegions,
+		unloadableRegions,
+	} = await collectCoordinateFindings(entries, divisionsPath);
+
+	const notes = unloadableRegions.map(
+		(regionId) =>
+			`${regionId}: could not load FGB file, skipping all other locations in this region`,
+	);
+
+	if (checkedCount === 0) {
+		return {
+			status: 'fail',
+			summary: 'No locations could be checked',
+			issues: [],
+			notes,
+		} satisfies ValidationResult;
+	}
+
+	if (mismatchCount === 0) {
+		return {
+			status: 'pass',
+			summary: `${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
+			issues: [],
+			notes,
+		} satisfies ValidationResult;
+	}
+
+	const sortedMissingRegions = [...missingRegions].sort((regionA, regionB) =>
+		regionA.localeCompare(regionB),
+	);
+
+	return {
+		status: 'fail',
+		summary: `Found ${mismatchCount.toString()} coordinate mismatch(es)`,
+		issues: mismatches.map((message) => ({ message })),
+		notes:
+			sortedMissingRegions.length > 0
+				? [...notes, `Missing FGB regions: ${sortedMissingRegions.join(', ')}`]
+				: notes,
+	} satisfies ValidationResult;
 }

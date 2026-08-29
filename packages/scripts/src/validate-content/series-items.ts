@@ -1,12 +1,12 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 /**
  * Series items are plain strings because a series mixes collections, so `reference()` cannot serve them
  * An unresolved item is dropped silently at render (`series-utils.ts` filters the catalog lookup)
  */
-export function checkSeriesItems(
+export function validateSeriesItems(
 	entries: Array<DataStoreEntry>,
 	validTargets: Array<DataStoreEntry>,
 ) {
@@ -24,16 +24,11 @@ export function checkSeriesItems(
 		}
 	}
 
-	if (issues.length === 0) {
-		console.log(chalk.green('✓ Series items valid'));
-		return true;
-	}
-
-	for (const { location, id } of issues) {
-		console.log(chalk.red(`❌ ${location}: unknown series item "${id}"`));
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} unknown series item(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ location, id }) => ({ message: `${location}: unknown series item "${id}"` })),
+		{
+			pass: 'Series items valid',
+			fail: `Found ${issues.length.toString()} unknown series item(s)`,
+		},
+	);
 }

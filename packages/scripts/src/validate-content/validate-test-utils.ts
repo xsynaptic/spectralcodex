@@ -6,11 +6,6 @@ export function makeEntry(
 	return { data: {}, ...overrides };
 }
 
-// For silencing check wrappers via mockImplementation; inline () => {} trips no-empty-function
-export function noop() {
-	// Intentionally empty
-}
-
 // Regions are stored as data-store references; toReferenceIds transforms them back to ids
 export function makeRegionRefs(regionIds: Array<string>) {
 	return makeRefs('regions', regionIds);

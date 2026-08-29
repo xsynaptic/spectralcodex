@@ -1,8 +1,8 @@
 import path from 'node:path';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkLocationsCoordinates } from './locations-coordinates';
-import { makeEntry, makeRegionRefs, noop } from './validate-test-utils';
+import { validateLocationsCoordinates } from './locations-coordinates';
+import { makeEntry, makeRegionRefs } from './validate-test-utils';
 
 // Real Taipei boundary copied from public/divisions
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');
@@ -17,25 +17,21 @@ function makeLocation(id: string, regionIds: Array<string>, coordinates: [number
 	});
 }
 
-describe('checkLocationsCoordinates', () => {
-	beforeEach(() => {
-		vi.spyOn(console, 'log').mockImplementation(noop);
-	});
-
-	afterEach(() => {
-		vi.restoreAllMocks();
-	});
-
+describe('validateLocationsCoordinates', () => {
 	test('passes a point inside its assigned region', async () => {
 		const entries = [makeLocation('inside', ['taipei'], taipeiCoordinates)];
 
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(true);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'pass',
+		});
 	});
 
 	test('fails a point outside its assigned region', async () => {
 		const entries = [makeLocation('outside', ['taipei'], tainanCoordinates)];
 
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'fail',
+		});
 	});
 
 	test('checks every geometry when an array is provided', async () => {
@@ -49,7 +45,9 @@ describe('checkLocationsCoordinates', () => {
 			}),
 		];
 
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'fail',
+		});
 	});
 
 	test('skips entries flagged with skipCoordinateCheck and fails when nothing was checked', async () => {
@@ -65,13 +63,17 @@ describe('checkLocationsCoordinates', () => {
 		];
 
 		// Pinned: zero checked locations counts as failure
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'fail',
+		});
 	});
 
 	test('fails when the only region has no division file', async () => {
 		const entries = [makeLocation('unmapped', ['atlantis'], taipeiCoordinates)];
 
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(false);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'fail',
+		});
 	});
 
 	test('passes when a missing division file is skipped alongside a valid entry', async () => {
@@ -80,6 +82,8 @@ describe('checkLocationsCoordinates', () => {
 			makeLocation('inside', ['taipei'], taipeiCoordinates),
 		];
 
-		await expect(checkLocationsCoordinates(entries, divisionsPath)).resolves.toBe(true);
+		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toMatchObject({
+			status: 'pass',
+		});
 	});
 });

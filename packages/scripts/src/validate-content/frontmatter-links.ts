@@ -1,6 +1,6 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 interface FrontmatterLinkIssue {
 	location: string;
@@ -43,23 +43,17 @@ function collectFrontmatterLinkIssues(
 	return issues;
 }
 
-// eslint-disable-next-line unicorn/consistent-boolean-name -- one of the sixteen `check*` validators run from index.ts
-export function checkFrontmatterLinks(
+export function validateFrontmatterLinks(
 	entries: Array<DataStoreEntry>,
 	resourceEntries: Array<DataStoreEntry>,
-): boolean {
+) {
 	const issues = collectFrontmatterLinkIssues(entries, resourceEntries);
 
-	if (issues.length === 0) {
-		console.log(chalk.green('✓ All shortform frontmatter links match existing resources'));
-		return true;
-	}
-
-	for (const { location, url } of issues) {
-		console.log(chalk.red(`❌ ${location}: unmatched link "${url}"`));
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} unmatched frontmatter link(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ location, url }) => ({ message: `${location}: unmatched link "${url}"` })),
+		{
+			pass: 'All shortform frontmatter links match existing resources',
+			fail: `Found ${issues.length.toString()} unmatched frontmatter link(s)`,
+		},
+	);
 }

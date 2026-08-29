@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkReferences, collectReferenceIssues } from './references';
-import { makeCollections, makeEntry, makeRefs, noop } from './validate-test-utils';
+import { collectReferenceIssues } from './references';
+import { makeCollections, makeEntry, makeRefs } from './validate-test-utils';
 
 const collectionNames = ['locations', 'regions', 'themes'];
 
@@ -93,23 +93,5 @@ describe('collectReferenceIssues', () => {
 
 	test('throws on an unknown collection name', () => {
 		expect(() => collectReferenceIssues(makeStore([]), ['nope'])).toThrow('Unknown collection');
-	});
-});
-
-describe('checkReferences', () => {
-	test('fails on broken references', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-
-		const broken = makeStore([
-			makeEntry({ id: 'some-place', data: { regions: makeRefs('regions', ['atlantis']) } }),
-		]);
-		const valid = makeStore([
-			makeEntry({ id: 'some-place', data: { regions: makeRefs('regions', ['taipei']) } }),
-		]);
-
-		expect(checkReferences(broken, collectionNames)).toBe(false);
-		expect(checkReferences(valid, collectionNames)).toBe(true);
-
-		logSpy.mockRestore();
 	});
 });

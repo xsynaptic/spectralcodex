@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkImageAspectRatios, collectAspectRatioIssues } from './image-aspect-ratios';
-import { makeEntry, noop } from './validate-test-utils';
+import { collectAspectRatioIssues } from './image-aspect-ratios';
+import { makeEntry } from './validate-test-utils';
 
 function makeImage(id: string, width: number, height: number) {
 	return makeEntry({ id, data: { width, height } });
@@ -69,16 +69,5 @@ describe('collectAspectRatioIssues', () => {
 
 		expect(counts).toMatchObject({ '3:2': 2, '1:1': 1, '4:3': 0 });
 		expect(result.flagged).toHaveLength(1);
-	});
-});
-
-describe('checkImageAspectRatios', () => {
-	test('returns true when all ratios are canonical and false otherwise', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-
-		expect(checkImageAspectRatios([makeImage('good', 1600, 1200)])).toBe(true);
-		expect(checkImageAspectRatios([makeImage('bad', 1215, 900)])).toBe(false);
-
-		logSpy.mockRestore();
 	});
 });

@@ -1,8 +1,8 @@
-import chalk from 'chalk';
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
 import type { DataStoreEntry } from '../shared/data-store';
+import type { ValidationResult } from './validation-result';
 
 import { LocationGeometrySchema } from '../shared/geometry';
 
@@ -93,26 +93,25 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 	return overlaps.sort((overlapA, overlapB) => overlapA.distance - overlapB.distance);
 }
 
-// Overlaps are reported as warnings, so this always returns true
-export function checkLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
+export function validateLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
 	const { points, locationCount } = collectPoints(entries);
 	const overlaps = findOverlaps(points, thresholdMeters);
 
 	const scope = `checked ${String(locationCount)} locations, ${String(points.length)} points`;
 
 	if (overlaps.length === 0) {
-		console.log(chalk.green(`✓ No overlapping locations found (${scope})`));
-
-		return true;
+		return {
+			status: 'pass',
+			summary: `No overlapping locations found (${scope})`,
+			issues: [],
+		} satisfies ValidationResult;
 	}
 
-	for (const overlap of overlaps) {
-		console.log(
-			chalk.yellow(`⚠️  ${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`),
-		);
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${String(overlaps.length)} overlap(s) (${scope})`));
-
-	return true;
+	return {
+		status: 'warn',
+		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,
+		issues: overlaps.map((overlap) => ({
+			message: `${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
+		})),
+	} satisfies ValidationResult;
 }

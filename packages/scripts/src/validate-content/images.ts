@@ -1,8 +1,8 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+import type { ValidationResult } from './validation-result';
 
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
+import { toValidationResult } from './validation-result';
 
 interface MissingImageIssue {
 	location: string;
@@ -30,26 +30,24 @@ function collectMissingImageIssues(
 	return issues;
 }
 
-export function checkImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
+export function validateImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
 	const mediaFiles = collectMediaFiles(mediaPath);
 
 	if (mediaFiles.size === 0) {
-		console.log(chalk.yellow(`No image files found in ${mediaPath}`));
-		return true;
+		return {
+			status: 'warn',
+			summary: `No image files found in ${mediaPath}`,
+			issues: [],
+		} satisfies ValidationResult;
 	}
 
 	const issues = collectMissingImageIssues(entries, mediaFiles);
 
-	if (issues.length === 0) {
-		console.log(chalk.green(`✓ ${mediaFiles.size.toString()} image references valid`));
-		return true;
-	}
-
-	for (const { location, imageId } of issues) {
-		console.log(chalk.red(`❌ ${location}: missing image "${imageId}"`));
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} missing image reference(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ location, imageId }) => ({ message: `${location}: missing image "${imageId}"` })),
+		{
+			pass: `${mediaFiles.size.toString()} image references valid`,
+			fail: `Found ${issues.length.toString()} missing image reference(s)`,
+		},
+	);
 }

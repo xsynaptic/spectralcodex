@@ -1,9 +1,9 @@
-import chalk from 'chalk';
 import path from 'node:path';
 
 import type { DataStoreEntry } from '../shared/data-store';
 
 import { toReferenceIds } from '../shared/data-store';
+import { toValidationResult } from './validation-result';
 
 /**
  * Derive hierarchy from filePath
@@ -11,7 +11,6 @@ import { toReferenceIds } from '../shared/data-store';
  * → ["south-korea", "busan", "file"]
  */
 function getHierarchy(filePath: string, collection: string): Array<string> {
-	// Find the collection folder and get everything after it
 	const collectionMarker = `collections/${collection}/`;
 	const idx = filePath.indexOf(collectionMarker);
 
@@ -53,21 +52,20 @@ export function collectLocationsRegionsIssues(entries: Array<DataStoreEntry>) {
 	return issues;
 }
 
-export function checkLocationsRegions(entries: Array<DataStoreEntry>) {
+export function validateLocationsRegions(entries: Array<DataStoreEntry>) {
 	const issues = collectLocationsRegionsIssues(entries);
 
-	for (const issue of issues) {
-		console.log(chalk.red(`❌ ${issue.filename}`));
-		console.log(
-			chalk.red(`   Expected region: ${issue.expectedRegion}, Found: ${issue.foundRegion}`),
-		);
-		console.log(chalk.red(`   Directory path: ${issue.hierarchy.join(' → ')}`));
-	}
-
-	if (issues.length === 0) {
-		console.log(chalk.green(`✓ ${entries.length.toString()} location regions valid`));
-		return true;
-	}
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} region mismatch(es)`));
-	return false;
+	return toValidationResult(
+		issues.map((issue) => ({
+			message: issue.filename,
+			details: [
+				`Expected region: ${issue.expectedRegion}, Found: ${issue.foundRegion}`,
+				`Directory path: ${issue.hierarchy.join(' → ')}`,
+			],
+		})),
+		{
+			pass: `${entries.length.toString()} location regions valid`,
+			fail: `Found ${issues.length.toString()} region mismatch(es)`,
+		},
+	);
 }

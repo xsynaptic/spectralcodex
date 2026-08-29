@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkRegionsParents, collectRegionsParentsIssues } from './regions-parent';
-import { makeEntry, noop } from './validate-test-utils';
+import { collectRegionsParentsIssues } from './regions-parent';
+import { makeEntry } from './validate-test-utils';
 
 describe('collectRegionsParentsIssues', () => {
 	test('accepts valid parents and entries without a parent', () => {
@@ -59,18 +59,5 @@ describe('collectRegionsParentsIssues', () => {
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([]);
-	});
-});
-
-describe('checkRegionsParents', () => {
-	test('returns true when all parents are valid and false otherwise', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-
-		expect(checkRegionsParents([makeEntry({ id: 'taiwan' })])).toBe(true);
-		expect(checkRegionsParents([makeEntry({ id: 'taipei', data: { parent: 'missing' } })])).toBe(
-			false,
-		);
-
-		logSpy.mockRestore();
 	});
 });

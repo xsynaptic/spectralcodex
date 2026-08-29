@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkLocationsRegions, collectLocationsRegionsIssues } from './locations-region';
-import { makeEntry, makeRegionRefs, noop } from './validate-test-utils';
+import { collectLocationsRegionsIssues } from './locations-region';
+import { makeEntry, makeRegionRefs } from './validate-test-utils';
 
 function makeLocation(id: string, regionIds: Array<string>, filePath?: string) {
 	return makeEntry({
@@ -50,16 +50,5 @@ describe('collectLocationsRegionsIssues', () => {
 				hierarchy: [],
 			},
 		]);
-	});
-});
-
-describe('checkLocationsRegions', () => {
-	test('fails on mismatches', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-
-		expect(checkLocationsRegions([makeLocation('some-place', ['tainan'], taipeiPath)])).toBe(false);
-		expect(checkLocationsRegions([makeLocation('some-place', ['taipei'], taipeiPath)])).toBe(true);
-
-		logSpy.mockRestore();
 	});
 });

@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkLinkIds, collectLinkIdIssues } from './link-ids';
-import { makeEntry, noop } from './validate-test-utils';
+import { collectLinkIdIssues, validateLinkIds } from './link-ids';
+import { makeEntry } from './validate-test-utils';
 
 const validTargets = [makeEntry({ id: 'existing-post' })];
 
@@ -45,15 +45,16 @@ describe('collectLinkIdIssues', () => {
 	});
 });
 
-describe('checkLinkIds', () => {
-	test('returns true when all link ids resolve and false otherwise', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-		const validBody = '<Link id="existing-post" />';
-		const brokenBody = '<Link id="missing-post" />';
+describe('validateLinkIds', () => {
+	test('groups every broken link in one entry under a single issue', () => {
+		const body = ['<Link id="missing-one" />', '<Link id="missing-two" />'].join('\n');
+		const result = validateLinkIds([makeEntry({ id: 'a-post', body })], validTargets);
 
-		expect(checkLinkIds([makeEntry({ id: 'a-post', body: validBody })], validTargets)).toBe(true);
-		expect(checkLinkIds([makeEntry({ id: 'a-post', body: brokenBody })], validTargets)).toBe(false);
-
-		logSpy.mockRestore();
+		expect(result.issues).toEqual([
+			{
+				message: 'a-post',
+				details: ['Line 1: broken link ID "missing-one"', 'Line 2: broken link ID "missing-two"'],
+			},
+		]);
 	});
 });

@@ -1,16 +1,13 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 interface SourceIdIssue {
 	location: string;
 	id: string;
 }
 
-/**
- * Check that all shortform (bare string) sources in frontmatter name an existing resource
- * Longform sources (inline objects) describe a resource with no entry of its own and are skipped
- */
+// Longform sources (inline objects) describe a resource with no entry of its own and are skipped
 export function collectSourceIdIssues(
 	entries: Array<DataStoreEntry>,
 	resourceEntries: Array<DataStoreEntry>,
@@ -40,22 +37,17 @@ export function collectSourceIdIssues(
 	return issues;
 }
 
-export function checkSourceIds(
+export function validateSourceIds(
 	entries: Array<DataStoreEntry>,
 	resourceEntries: Array<DataStoreEntry>,
 ) {
 	const issues = collectSourceIdIssues(entries, resourceEntries);
 
-	if (issues.length === 0) {
-		console.log(chalk.green('✓ Source IDs valid'));
-		return true;
-	}
-
-	for (const { location, id } of issues) {
-		console.log(chalk.red(`❌ ${location}: unknown source ID "${id}"`));
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} broken source ID(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ location, id }) => ({ message: `${location}: unknown source ID "${id}"` })),
+		{
+			pass: 'Source IDs valid',
+			fail: `Found ${issues.length.toString()} broken source ID(s)`,
+		},
+	);
 }

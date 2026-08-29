@@ -1,7 +1,9 @@
-import chalk from 'chalk';
 import { z } from 'zod';
 
 import type { DataStoreEntry } from '../shared/data-store';
+import type { ValidationIssue } from './validation-result';
+
+import { toValidationResult } from './validation-result';
 
 const duplicateFields = [
 	'title',
@@ -39,11 +41,11 @@ function isDuplicate(seen: Set<string>, value: string): boolean {
 	return false;
 }
 
-export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
+export function validateLocationsDuplicates(entries: Array<DataStoreEntry>) {
 	const seenByField = new Map(duplicateFields.map((field) => [field, new Set<string>()]));
 	const seenGoogleMapsLinks = new Set<string>();
 
-	let duplicateCount = 0;
+	const issues: Array<ValidationIssue> = [];
 
 	for (const entry of entries) {
 		for (const field of duplicateFields) {
@@ -52,25 +54,18 @@ export function checkLocationsDuplicates(entries: Array<DataStoreEntry>) {
 			if (typeof value !== 'string') continue;
 			if (!isDuplicate(seenByField.get(field)!, value)) continue;
 
-			console.log(chalk.red(`❌ ${entry.id}: duplicate ${field} "${value}"`));
-			duplicateCount++;
+			issues.push({ message: `${entry.id}: duplicate ${field} "${value}"` });
 		}
 
 		const googleMapsLink = getGoogleMapsLink(entry.data.links);
 
 		if (googleMapsLink && isDuplicate(seenGoogleMapsLinks, googleMapsLink)) {
-			console.log(chalk.red(`❌ ${entry.id}: duplicate Google Maps link "${googleMapsLink}"`));
-			duplicateCount++;
+			issues.push({ message: `${entry.id}: duplicate Google Maps link "${googleMapsLink}"` });
 		}
 	}
 
-	if (duplicateCount === 0) {
-		console.log(chalk.green(`✓ No duplicates found (checked ${String(entries.length)} locations)`));
-
-		return true;
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${String(duplicateCount)} duplicate(s)`));
-
-	return false;
+	return toValidationResult(issues, {
+		pass: `No duplicates found (checked ${String(entries.length)} locations)`,
+		fail: `Found ${String(issues.length)} duplicate(s)`,
+	});
 }

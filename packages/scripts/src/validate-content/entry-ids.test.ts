@@ -1,7 +1,7 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { checkEntryIds, collectDuplicateIdIssues } from './entry-ids';
-import { makeEntry, noop } from './validate-test-utils';
+import { collectDuplicateIdIssues } from './entry-ids';
+import { makeEntry } from './validate-test-utils';
 
 describe('collectDuplicateIdIssues', () => {
 	test('accepts distinct IDs', () => {
@@ -47,16 +47,5 @@ describe('collectDuplicateIdIssues', () => {
 		expect(collectDuplicateIdIssues(entries)).toEqual([
 			{ id: 'taipei', locations: ['taipei', 'taipei'] },
 		]);
-	});
-});
-
-describe('checkEntryIds', () => {
-	test('fails on duplicates', () => {
-		const logSpy = vi.spyOn(console, 'log').mockImplementation(noop);
-
-		expect(checkEntryIds([makeEntry({ id: 'taipei' }), makeEntry({ id: 'taipei' })])).toBe(false);
-		expect(checkEntryIds([makeEntry({ id: 'taipei' }), makeEntry({ id: 'tainan' })])).toBe(true);
-
-		logSpy.mockRestore();
 	});
 });

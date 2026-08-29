@@ -1,6 +1,6 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 type RegionParentIssue =
 	| { location: string; reason: 'cycle'; chain: Array<string> }
@@ -84,18 +84,14 @@ export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
 	return [...issues, ...collectCycleIssues(entries, parentById)];
 }
 
-export function checkRegionsParents(entries: Array<DataStoreEntry>) {
+export function validateRegionsParents(entries: Array<DataStoreEntry>) {
 	const issues = collectRegionsParentsIssues(entries);
 
-	if (issues.length === 0) {
-		console.log(chalk.green(`✓ ${entries.length.toString()} region parents valid`));
-		return true;
-	}
-	for (const issue of issues) {
-		console.log(chalk.red(`❌ ${formatIssue(issue)}`));
-	}
-	console.log(
-		chalk.yellow(`⚠️  Found ${issues.length.toString()} region(s) with an invalid parent`),
+	return toValidationResult(
+		issues.map((issue) => ({ message: formatIssue(issue) })),
+		{
+			pass: `${entries.length.toString()} region parents valid`,
+			fail: `Found ${issues.length.toString()} region(s) with an invalid parent`,
+		},
 	);
-	return false;
 }

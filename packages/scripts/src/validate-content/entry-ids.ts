@@ -1,8 +1,7 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
 
 import { getPublicId } from '../shared/data-store';
+import { toValidationResult } from './validation-result';
 
 interface DuplicateIdIssue {
 	id: string;
@@ -43,23 +42,17 @@ export function collectDuplicateIdIssues(entries: Array<DataStoreEntry>) {
 	return issues;
 }
 
-export function checkEntryIds(entries: Array<DataStoreEntry>) {
+export function validateEntryIds(entries: Array<DataStoreEntry>) {
 	const issues = collectDuplicateIdIssues(entries);
 
-	if (issues.length === 0) {
-		console.log(chalk.green(`✓ ${entries.length.toString()} entry IDs unique`));
-		return true;
-	}
-
-	for (const { id, locations } of issues) {
-		console.log(chalk.red(`❌ duplicate entry ID "${id}"`));
-
-		for (const location of locations) {
-			console.log(chalk.red(`   ${location}`));
-		}
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} duplicate entry ID(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ id, locations }) => ({
+			message: `duplicate entry ID "${id}"`,
+			details: locations,
+		})),
+		{
+			pass: `${entries.length.toString()} entry IDs unique`,
+			fail: `Found ${issues.length.toString()} duplicate entry ID(s)`,
+		},
+	);
 }

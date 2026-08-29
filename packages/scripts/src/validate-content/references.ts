@@ -1,6 +1,6 @@
-import chalk from 'chalk';
-
 import type { DataStoreCollections, DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 interface EntryReference {
 	field: string;
@@ -103,21 +103,19 @@ export function collectReferenceIssues(
 	return issues;
 }
 
-export function checkReferences(collections: DataStoreCollections, collectionNames: Array<string>) {
+export function validateReferences(
+	collections: DataStoreCollections,
+	collectionNames: Array<string>,
+) {
 	const issues = collectReferenceIssues(collections, collectionNames);
 
-	if (issues.length === 0) {
-		console.log(chalk.green('✓ Entry references valid'));
-		return true;
-	}
-
-	for (const { location, field, collection, id } of issues) {
-		console.log(
-			chalk.red(`❌ ${location}: ${field} references "${id}", missing from "${collection}"`),
-		);
-	}
-
-	console.log(chalk.yellow(`⚠️  Found ${issues.length.toString()} broken reference(s)`));
-
-	return false;
+	return toValidationResult(
+		issues.map(({ location, field, collection, id }) => ({
+			message: `${location}: ${field} references "${id}", missing from "${collection}"`,
+		})),
+		{
+			pass: 'Entry references valid',
+			fail: `Found ${issues.length.toString()} broken reference(s)`,
+		},
+	);
 }

@@ -1,13 +1,12 @@
-import chalk from 'chalk';
-
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 interface AllowedRatio {
 	label: string;
 	value: number;
 }
 
-// Canonical aspect ratios for the photo library
 const allowedRatios = [
 	{ label: '4:3', value: 4 / 3 },
 	{ label: '3:4', value: 3 / 4 },
@@ -121,51 +120,39 @@ export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
 	return { flagged, checkedCount, exemptCount, tally: tallyRows };
 }
 
-function printRatioTally(tally: Array<RatioTallyRow>) {
-	const rows = [...tally].sort((a, b) => b.count - a.count);
+function formatRatioTally(tally: Array<RatioTallyRow>) {
+	const rows = [...tally].sort((rowA, rowB) => rowB.count - rowA.count);
 
 	const countWidth = Math.max(...rows.map((row) => String(row.count).length));
 	const labelWidth = Math.max(...rows.map((row) => row.label.length));
 
-	for (const row of rows) {
-		console.log(
-			chalk.dim(
-				`   ${String(row.count).padStart(countWidth)}  ` +
-					`${row.label.padEnd(labelWidth)}  ${row.value.toFixed(3)}  ${row.orientation}`,
-			),
-		);
-	}
+	return rows.map(
+		(row) =>
+			`   ${String(row.count).padStart(countWidth)}  ` +
+			`${row.label.padEnd(labelWidth)}  ${row.value.toFixed(3)}  ${row.orientation}`,
+	);
 }
 
-export function checkImageAspectRatios(
+export function validateImageAspectRatios(
 	entries: Array<DataStoreEntry>,
 	{ showStats = false }: { showStats?: boolean } = {},
 ) {
 	const { flagged, checkedCount, exemptCount, tally } = collectAspectRatioIssues(entries);
 
 	const exemptNote = exemptCount > 0 ? ` (${exemptCount.toString()} exempt)` : '';
-	const isValid = flagged.length === 0;
 
-	if (isValid) {
-		console.log(chalk.green(`✓ ${checkedCount.toString()} image aspect ratios valid${exemptNote}`));
-	} else {
-		for (const item of flagged) {
-			console.log(
-				chalk.red(
-					`❌ ${item.id}: ${item.width.toString()}×${item.height.toString()} ` +
-						`(ratio ${item.ratio.toFixed(3)}, nearest ${item.nearest} off by ${item.delta.toFixed(3)})`,
-				),
-			);
-		}
-
-		console.log(
-			chalk.yellow(
-				`⚠️  Found ${flagged.length.toString()} of ${checkedCount.toString()} image(s) with non-standard aspect ratios${exemptNote}`,
-			),
-		);
-	}
-
-	if (showStats) printRatioTally(tally);
-
-	return isValid;
+	return {
+		...toValidationResult(
+			flagged.map((item) => ({
+				message:
+					`${item.id}: ${item.width.toString()}×${item.height.toString()} ` +
+					`(ratio ${item.ratio.toFixed(3)}, nearest ${item.nearest} off by ${item.delta.toFixed(3)})`,
+			})),
+			{
+				pass: `${checkedCount.toString()} image aspect ratios valid${exemptNote}`,
+				fail: `Found ${flagged.length.toString()} of ${checkedCount.toString()} image(s) with non-standard aspect ratios${exemptNote}`,
+			},
+		),
+		notes: showStats ? formatRatioTally(tally) : [],
+	};
 }

@@ -1,7 +1,8 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import chalk from 'chalk';
 
 import type { DataStoreEntry } from '../shared/data-store';
+
+import { toValidationResult } from './validation-result';
 
 function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<string> {
 	const imageFeatured = frontmatter.imageFeatured;
@@ -27,7 +28,7 @@ function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<
 	return links;
 }
 
-export function checkImageFeaturedLinks(
+export function validateImageFeaturedLinks(
 	entries: Array<DataStoreEntry>,
 	validTargets: Array<DataStoreEntry>,
 ) {
@@ -49,18 +50,13 @@ export function checkImageFeaturedLinks(
 		}
 	}
 
-	if (unmatchedLinks.length === 0) {
-		console.log(chalk.green('✓ Featured image links resolve to existing content'));
-		return true;
-	}
-
-	for (const { file, link } of unmatchedLinks) {
-		console.log(chalk.red(`❌ ${file}: unmatched imageFeatured link "${link}"`));
-	}
-
-	console.log(
-		chalk.yellow(`⚠️  Found ${unmatchedLinks.length.toString()} unmatched imageFeatured link(s)`),
+	return toValidationResult(
+		unmatchedLinks.map(({ file, link }) => ({
+			message: `${file}: unmatched imageFeatured link "${link}"`,
+		})),
+		{
+			pass: 'Featured image links resolve to existing content',
+			fail: `Found ${unmatchedLinks.length.toString()} unmatched imageFeatured link(s)`,
+		},
 	);
-
-	return false;
 }
