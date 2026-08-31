@@ -16,21 +16,21 @@ const { entry, ...props } = Astro.props;
 const t = getTranslations();
 ---
 
-<div class="i-meta" data-pagefind-ignore {...props}>
+<div class="meta-overlay" data-pagefind-ignore {...props}>
 	<button
-		class="i-meta-show"
+		class="meta-show"
 		aria-label={t('collection.images.metadata.title')}
 		data-umami-event="image-metadata-open"
 		data-umami-event-image={entry.id}
 	>
-		<span class="i-meta-show-icon">
-			<svg width="24" height="24" viewBox="0 0 24 24" class="i-meta-svg" aria-hidden="true">
+		<span class="meta-show-icon">
+			<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
 				<use href="#icon:eye-open"></use>
 			</svg>
 		</span>
-		<span class="i-meta-panel">
-			<span class="i-meta-grid">
-				<ImageMetadataItem class="i-span-4">
+		<span class="meta-panel">
+			<span class="meta-grid">
+				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.dateCreated.label')}
 					</Fragment>
@@ -40,19 +40,19 @@ const t = getTranslations();
 						) : undefined
 					}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-4">
+				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.cameraModel.label')}
 					</Fragment>
 					{entry.data.camera}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-4">
+				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.lensModel.label')}
 					</Fragment>
 					{entry.data.lens}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.aperture.label')}
 					</Fragment>
@@ -64,25 +64,25 @@ const t = getTranslations();
 						) : undefined
 					}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.shutterSpeed.label')}
 					</Fragment>
 					{entry.data.shutterSpeed ? `${entry.data.shutterSpeed} sec` : undefined}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.focalLength.label')}
 					</Fragment>
 					{entry.data.focalLength}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.iso.label')}
 					</Fragment>
 					{entry.data.iso}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.exposureValue.label')}
 					</Fragment>
@@ -95,7 +95,7 @@ const t = getTranslations();
 						) : undefined
 					}
 				</ImageMetadataItem>
-				<ImageMetadataItem class="i-span-2">
+				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title"
 						>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
 					>
@@ -106,9 +106,9 @@ const t = getTranslations();
 			</span>
 		</span>
 	</button>
-	<button class="i-meta-close" aria-label={t('collection.images.metadata.close.title')}
-		><span class="i-meta-close-icon">
-			<svg width="24" height="24" viewBox="0 0 24 24" class="i-meta-svg" aria-hidden="true">
+	<button class="meta-close" aria-label={t('collection.images.metadata.close.title')}
+		><span class="meta-close-icon">
+			<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
 				<use href="#icon:eye-closed"></use>
 			</svg>
 		</span></button

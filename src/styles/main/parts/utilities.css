@@ -1,14 +1,13 @@
-/** Content column: constrains to the content width with horizontal padding */
 @utility content-column {
 	@apply mx-auto max-w-content px-4 md:px-8;
 }
 
-/* Full-bleed variant: drops the base padding so content reaches the edge on mobile */
+/* Drops the base padding so content reaches the viewport edge on mobile */
 @utility content-column-fill {
 	@apply mx-auto max-w-content sm:px-4 md:px-8;
 }
 
-/** Fade from the top */
+/* Fade from the top */
 @utility bg-gradient-a {
 	background-image: linear-gradient(
 		180deg,
@@ -46,4 +45,50 @@
 		rgb(38 38 38 / 3.5%) 90.39%,
 		rgb(38 38 38 / 0%)
 	);
+}
+
+@utility bg-header-fade {
+	--bg-fade-lightness: 96%;
+
+	background-image: linear-gradient(
+		180deg,
+		hsl(0deg 0% var(--bg-fade-lightness) / 90%),
+		hsl(0deg 0% var(--bg-fade-lightness) / 89.6%) 22.97%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 88.5%) 42.13%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 86.9%) 57.81%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 84.8%) 70.37%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 82.5%) 80.15%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 80%) 87.5%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 77.5%) 92.77%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 75.2%) 96.3%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 73.1%) 98.44%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 71.5%) 99.54%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 70.4%) 99.94%,
+		hsl(0deg 0% var(--bg-fade-lightness) / 70%)
+	);
+	background-repeat: no-repeat;
+
+	[data-mode='dark'] & {
+		--bg-fade-lightness: 18%;
+	}
+}
+
+/* This fallback pattern is a seamless seigaiha (青海波) pattern */
+@utility bg-fallback {
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+	background-image: url('/seigaiha-light.svg');
+	background-repeat: repeat;
+
+	/* Image swap stays attribute-driven; light-dark() is color-only */
+	[data-mode='dark'] & {
+		background-image: url('/seigaiha-dark.svg');
+		background-repeat: repeat;
+	}
+}
+
+@utility bg-placeholder {
+	image-rendering: pixelated;
+	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+	background-position: center;
+	background-size: cover;
 }

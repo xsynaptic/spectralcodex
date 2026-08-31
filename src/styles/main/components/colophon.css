@@ -1,0 +1,35 @@
+.colophon-rss-link {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: calc(var(--spacing) * 1);
+	align-items: center;
+}
+
+.colophon-rss-icon {
+	position: relative;
+	width: 10px;
+	height: 10px;
+	margin-left: 0.25rem;
+	background-color: var(--color-white);
+}
+
+.colophon-rss-icon svg {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 16px;
+	height: 16px;
+	color: var(--color-orange-400);
+	transform: translate(-50%, -50%);
+}
+
+.colophon-rss-link:focus-visible .colophon-rss-icon svg {
+	color: var(--color-orange-300);
+}
+
+@media (hover: hover) {
+	.colophon-rss-icon svg:hover,
+	.colophon-rss-link:hover .colophon-rss-icon svg {
+		color: var(--color-orange-300);
+	}
+}

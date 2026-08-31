@@ -13,6 +13,7 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { mapComponentProps, ...props } = Astro.props;
 
+// Local to the map's own stacking context; the React component needs a number, not a class
 const zIndex = 10;
 ---
 
@@ -21,17 +22,16 @@ const zIndex = 10;
 <div
 	class:list={[
 		'bg-fallback',
-		'max-h-100vh relative flex h-[100%] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
+		'max-h-100vh relative flex h-full min-h-[min(600px,100vh)] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
 		'shadow-primary-300 dark:shadow-primary-900',
 	]}
-	style={{ minHeight: 'min(600px,100vh)' }}
 	{...props}
 	data-pagefind-ignore
 >
 	<ReactMapComponent {...mapComponentProps} style={{ zIndex: zIndex + 1 }} client:visible />
 	<div
 		class:list={[
-			'absolute flex h-[100%] w-full justify-center',
+			'absolute flex h-full w-full justify-center',
 			'text-primary-700 dark:text-highlight-400',
 		]}
 		style={{ zIndex }}

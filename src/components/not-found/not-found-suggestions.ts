@@ -129,7 +129,7 @@ function renderSuggestions(items: Array<ScoredEntry>): void {
 		const link = document.createElement('a');
 
 		link.href = item.url;
-		link.className = 'link link-accent';
+		link.className = 'anchor anchor-accent';
 		link.textContent = item.title;
 		link.dataset.astroHistory = 'replace';
 

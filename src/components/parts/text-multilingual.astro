@@ -31,7 +31,7 @@ const {
 			<TextParenthesis as={Tag} class={className}>
 				<Tag
 					lang={content.lang}
-					class:list={[isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+					class:list={[isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
 					{...props}
 					set:html={content.value.trim()}
 				/>
@@ -44,7 +44,7 @@ const {
 		<>
 			<Tag
 				lang={content.lang}
-				class:list={[className, isCjkLanguage(content.lang) ? 'cjk' : undefined]}
+				class:list={[className, isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
 				{...props}
 				set:html={content.value.trim()}
 			/>
@@ -53,7 +53,7 @@ const {
 					{'／'}
 					<Tag
 						lang={item.lang}
-						class:list={[className, isCjkLanguage(item.lang) ? 'cjk' : undefined]}
+						class:list={[className, isCjkLanguage(item.lang) ? 'cjk-text' : undefined]}
 						{...props}
 						set:html={item.value.trim()}
 					/>

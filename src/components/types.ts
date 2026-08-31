@@ -29,7 +29,7 @@ export interface MetaProps {
 	noFollow?: boolean;
 }
 
-// Divider component types; values map onto divided-* classes in divider.css
+// Values map onto divided-* classes in text.css
 export type DividerColor = 'default' | 'lighter';
 
 export type DividerContent = 'chevron' | 'dot' | 'slash';
@@ -62,17 +62,4 @@ export const MicroformatClassNames = {
 	Role: 'p-role',
 	Summary: 'p-summary',
 	Url: 'u-url',
-} as const;
-
-// An enum to help keep z-index values in check
-export const zIndexScaleEnum = {
-	ImageBase: 10,
-	ImageShadow: 11,
-	ImageHeader: 12,
-	ImageCaption: 15,
-	ImageNavigation: 15,
-	MainHeader: 40,
-	MainTopButton: 45,
-	MainProgress: 60,
-	MainSkipLink: 70,
 } as const;

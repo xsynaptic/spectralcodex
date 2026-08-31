@@ -1,0 +1,33 @@
+search-toggle {
+	opacity: 0.6;
+	transition: opacity var(--default-transition-duration) var(--default-transition-timing-function);
+}
+
+search-toggle:focus-within {
+	opacity: 1;
+}
+
+@media (hover: hover) {
+	search-toggle:hover {
+		opacity: 1;
+	}
+}
+
+/* Beats both rules above; the undefined element takes no pointer or focus events */
+search-toggle:not(:defined) {
+	pointer-events: none;
+	opacity: 0.3;
+}
+
+/* Eager layout rules so the header never shifts while the deferred stylesheet loads */
+pagefind-config {
+	display: none;
+}
+
+pagefind-modal {
+	display: contents;
+}
+
+pagefind-modal:not(:defined) {
+	display: none;
+}

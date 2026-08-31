@@ -21,7 +21,7 @@ const t = getTranslations();
 			menuFooterItems.map((item) => (
 				<li class="text-xs font-medium sm:text-sm">
 					<Anchor
-						linkColor="primary"
+						anchorColor="primary"
 						isActive={isActiveMenuItem(item, pathname)}
 						href={item.url}
 						{...(item.rel ? { rel: item.rel } : undefined)}

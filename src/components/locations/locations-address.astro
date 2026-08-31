@@ -28,7 +28,7 @@ if (content !== undefined) {
 // Built as a single string and injected with set:html so the ／ separator stays tight
 const output = parts
 	.map((part) => {
-		const cjkClass = isCjkLanguage(part.lang) ? ' class="cjk"' : '';
+		const cjkClass = isCjkLanguage(part.lang) ? ' class="cjk-text"' : '';
 
 		return `<span lang="${part.lang}"${cjkClass}>${part.value}</span>`;
 	})

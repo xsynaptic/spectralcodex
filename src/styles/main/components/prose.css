@@ -4,7 +4,7 @@
  * Hand-rolled replacement for @tailwindcss/typography
  * All element selectors are wrapped in :where() so prose rules have specificity (0,1,0)
  */
-.prose-x {
+.prose-base {
 	font-family: var(--font-serif);
 	font-size: 1rem;
 	line-height: 1.75;
@@ -15,7 +15,6 @@
 		line-height: calc(32 / 18);
 	}
 
-	/* First/last child margin reset */
 	& > :where(:first-child) {
 		margin-top: 0;
 	}
@@ -24,7 +23,6 @@
 		margin-bottom: 0;
 	}
 
-	/* Headings */
 	& :where(h1) {
 		margin-top: 0;
 		margin-bottom: calc(var(--spacing) * 3);
@@ -74,7 +72,7 @@
 		color: inherit;
 	}
 
-	/* Links: accent color + halo matching page bg */
+	/* Halo in the page background colour, so a link stays legible over a busy hero */
 	& :where(a) {
 		font-weight: var(--font-weight-medium);
 		color: light-dark(var(--color-accent-500), var(--color-accent-300));
@@ -91,10 +89,16 @@
 			text-decoration-color 150ms ease-in;
 	}
 
-	& :where(a):hover,
 	& :where(a):focus-visible {
 		color: light-dark(var(--color-accent-300), var(--color-accent-200));
 		text-decoration-color: light-dark(var(--color-accent-100), var(--color-accent-400));
+	}
+
+	@media (hover: hover) {
+		& :where(a):hover {
+			color: light-dark(var(--color-accent-300), var(--color-accent-200));
+			text-decoration-color: light-dark(var(--color-accent-100), var(--color-accent-400));
+		}
 	}
 
 	& :where(a strong),
@@ -102,7 +106,6 @@
 		color: inherit;
 	}
 
-	/* Text elements */
 	& :where(p) {
 		margin-top: 0;
 		margin-bottom: calc(var(--spacing) * 5);
@@ -118,7 +121,6 @@
 		color: inherit;
 	}
 
-	/* Lists */
 	& :where(ul) {
 		padding: 0;
 		margin: 0 0 calc(var(--spacing) * 5);
@@ -149,7 +151,6 @@
 		margin-bottom: calc(var(--spacing) * 2);
 	}
 
-	/* Blockquote */
 	& :where(blockquote) {
 		padding-inline-start: calc(var(--spacing) * 5);
 		margin: calc(var(--spacing) * 6) 0;
@@ -160,14 +161,12 @@
 			light-dark(var(--color-primary-200), var(--color-primary-700));
 	}
 
-	/* Inline code */
 	& :where(code) {
 		font-size: 0.875em;
 		font-weight: var(--font-weight-semibold);
 		color: light-dark(var(--color-primary-900), var(--color-white));
 	}
 
-	/* Highlight */
 	& :where(mark) {
 		padding-inline: 0.2em;
 		color: light-dark(var(--color-primary-900), var(--color-white));
@@ -175,7 +174,6 @@
 		border-radius: var(--radius-xs, 0.125rem);
 	}
 
-	/* Horizontal rule */
 	& :where(hr) {
 		margin: calc(var(--spacing) * 10) 0;
 		border: 0;
@@ -186,7 +184,7 @@
 		margin-top: 0;
 	}
 
-	/* Footnotes (rendered by remark-rehype) */
+	/* Footnote markup comes from remark-rehype */
 	& > :where(.footnotes) ol {
 		font-size: var(--text-sm);
 		line-height: calc(28 / 14);
@@ -229,10 +227,7 @@
 	}
 }
 
-/**
- * Compact size variant; body shrinks but rem-based margins stay constant
- * If compact ends up looking too airy, override individual margins here 
- */
+/* Body shrinks but rem-based margins stay constant */
 .prose-compact {
 	font-size: 0.875rem;
 	line-height: 1.75;
@@ -240,4 +235,8 @@
 	@media (width >= 64rem) {
 		font-size: 1rem;
 	}
+}
+
+.prose-block > *:not(.prose-escape) {
+	@apply content-column;
 }

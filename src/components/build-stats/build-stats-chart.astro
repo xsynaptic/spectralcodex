@@ -40,21 +40,21 @@ const tooltipData = JSON.stringify(points)
 	import '#components/build-stats/build-stats-chart.ts';
 </script>
 
-<build-stats-chart class="not-prose build-stats">
-	<div class="bs-frame">
+<build-stats-chart class="stats-chart">
+	<div class="stats-frame">
 		<svg
-			class="bs-plot"
+			class="stats-plot"
 			viewBox={`0 0 ${String(width)} ${String(frame.height)}`}
 			width={width}
 			height={frame.height}
 			role="img"
 			aria-label={ariaLabel}
 		>
-			<text class="bs-chart-label" x={marginLeft} y={headingY}>{label}</text>
+			<text class="stats-chart-label" x={marginLeft} y={headingY}>{label}</text>
 			{
 				axisTicks.map((tick) => (
 					<line
-						class="bs-grid bs-grid-month"
+						class="stats-grid stats-grid-month"
 						x1={tick.x}
 						y1={frame.top}
 						x2={tick.x}
@@ -65,22 +65,28 @@ const tooltipData = JSON.stringify(points)
 			{
 				valueTicks.map((tick) => (
 					<Fragment>
-						<line class="bs-grid" x1={marginLeft} y1={tick.y} x2={plotRight} y2={tick.y} />
-						<text class="bs-tick" x={marginLeft - 10} y={tick.y + 3.5} text-anchor="end">
+						<line class="stats-grid" x1={marginLeft} y1={tick.y} x2={plotRight} y2={tick.y} />
+						<text class="stats-tick" x={marginLeft - 10} y={tick.y + 3.5} text-anchor="end">
 							{tick.label}
 						</text>
 					</Fragment>
 				))
 			}
 			<slot />
-			<line class="bs-axis" x1={marginLeft} y1={frame.bottom} x2={plotRight} y2={frame.bottom}
+			<line class="stats-axis" x1={marginLeft} y1={frame.bottom} x2={plotRight} y2={frame.bottom}
 			></line>
 			{
 				axisTicks.map((tick) => (
 					<Fragment>
-						<line class="bs-grid" x1={tick.x} y1={frame.bottom} x2={tick.x} y2={frame.bottom + 5} />
+						<line
+							class="stats-grid"
+							x1={tick.x}
+							y1={frame.bottom}
+							x2={tick.x}
+							y2={frame.bottom + 5}
+						/>
 						<text
-							class="bs-tick"
+							class="stats-tick"
 							x={tick.x}
 							y={frame.bottom + monthLabelOffset}
 							text-anchor="middle"
@@ -89,7 +95,7 @@ const tooltipData = JSON.stringify(points)
 						</text>
 						{tick.yearLabel ? (
 							<text
-								class="bs-tick"
+								class="stats-tick"
 								x={tick.x}
 								y={frame.bottom + yearLabelOffset}
 								text-anchor="middle"
@@ -100,9 +106,9 @@ const tooltipData = JSON.stringify(points)
 					</Fragment>
 				))
 			}
-			<g class="bs-crosshair" data-chart-crosshair aria-hidden="true">
-				<line class="bs-axis" y1={frame.top} y2={frame.bottom} data-crosshair-line></line>
-				<circle class:list={['bs-endpoint', `bs-series-${series}`]} r="4" data-crosshair-dot
+			<g class="stats-crosshair" data-chart-crosshair aria-hidden="true">
+				<line class="stats-axis" y1={frame.top} y2={frame.bottom} data-crosshair-line></line>
+				<circle class:list={['stats-endpoint', `stats-series-${series}`]} r="4" data-crosshair-dot
 				></circle>
 			</g>
 			<rect
@@ -114,13 +120,13 @@ const tooltipData = JSON.stringify(points)
 				data-chart-hit></rect>
 		</svg>
 	</div>
-	<div class="bs-tooltip" data-chart-tooltip>
-		<div class="bs-tooltip-date" data-tooltip-date></div>
+	<div class="stats-tooltip" data-chart-tooltip>
+		<div class="stats-tooltip-date" data-tooltip-date></div>
 		{
 			tooltipRows.map((row) => (
-				<div class="bs-tooltip-row" data-tooltip-row>
-					<span class="bs-tooltip-key">
-						<span class:list={['bs-swatch', `bs-swatch-${row.series}`]} />
+				<div class="stats-tooltip-row" data-tooltip-row>
+					<span class="stats-tooltip-key">
+						<span class:list={['stats-swatch', `stats-swatch-${row.series}`]} />
 						{row.label}
 					</span>
 					<b data-tooltip-value />

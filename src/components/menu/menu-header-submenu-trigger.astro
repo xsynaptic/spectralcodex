@@ -14,7 +14,7 @@ const { item, hasChildren } = Astro.props;
 const triggerType = getMenuItemTriggerType(item);
 const triggerClasses = [
 	'nav-sub-link',
-	isActiveMenuItem(item, Astro.url.pathname) ? 'link-active' : undefined,
+	isActiveMenuItem(item, Astro.url.pathname) ? 'anchor-active' : undefined,
 ];
 ---
 
@@ -24,7 +24,7 @@ const triggerClasses = [
 			<Anchor
 				class:list={triggerClasses}
 				href={item.url}
-				linkColor="accent"
+				anchorColor="accent"
 				{...(item.rel ? { rel: item.rel } : undefined)}
 			>
 				<slot />
@@ -33,7 +33,7 @@ const triggerClasses = [
 	}
 	{
 		triggerType === 'button' ? (
-			<button type="button" class:list={['link link-accent', ...triggerClasses]}>
+			<button type="button" class:list={['anchor anchor-accent', ...triggerClasses]}>
 				<slot />
 			</button>
 		) : undefined

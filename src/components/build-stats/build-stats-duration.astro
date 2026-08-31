@@ -34,14 +34,14 @@ const tooltipRows = [
 		geometry.annotations.map((annotation) => (
 			<Fragment>
 				<line
-					class="bs-annotation"
+					class="stats-annotation"
 					x1={annotation.x}
 					y1={durationFrame.top}
 					x2={annotation.x}
 					y2={durationFrame.bottom}
 				/>
 				<text
-					class="bs-annotation-label"
+					class="stats-annotation-label"
 					x={annotation.labelX}
 					y={annotation.labelY}
 					text-anchor="end"
@@ -51,23 +51,23 @@ const tooltipRows = [
 			</Fragment>
 		))
 	}
-	<g class="bs-dots">
+	<g class="stats-dots">
 		{geometry.points.map((point) => <circle cx={point.x} cy={point.y} r="2" />)}
 	</g>
-	<path class="bs-line bs-series-duration" d={geometry.trendPath}></path>
+	<path class="stats-line stats-series-duration" d={geometry.trendPath}></path>
 	{
 		geometry.end ? (
 			<Fragment>
 				<circle
-					class="bs-endpoint bs-series-duration"
+					class="stats-endpoint stats-series-duration"
 					cx={geometry.end.cx}
 					cy={geometry.end.cy}
 					r="4"
 				/>
-				<text class="bs-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
+				<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
 					{geometry.end.label}
 				</text>
-				<text class="bs-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
+				<text class="stats-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
 					{t('buildStats.trend.label')}
 				</text>
 			</Fragment>

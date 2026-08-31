@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Anchor from '#components/parts/anchor.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
@@ -78,7 +79,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 ---
 
 <CardFrame
-	class:list={['pc', showMicroformats ? MicroformatClassNames.Entry : undefined]}
+	class:list={['card-preview', showMicroformats ? MicroformatClassNames.Entry : undefined]}
 	{...props}
 >
 	{
@@ -92,20 +93,21 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 				</a>
 			</ImagePlaceholder>
 		) : (
-			<div class="bg-fallback aspect-3/2 w-full rounded-xs text-sm text-transparent shadow-inner" />
+			<div class="aspect-3/2 w-full rounded-xs bg-fallback text-sm text-transparent shadow-inner" />
 		)
 	}
-	<TitleTag class="pc-title">
-		<a
+	<TitleTag class="card-title">
+		<Anchor
 			href={linkUrl}
+			anchorColor="title"
 			class:list={[
-				'link pc-title-link',
+				'card-title-link',
 				showMicroformats ? [MicroformatClassNames.Url, MicroformatClassNames.Name] : undefined,
-			]}><slot name="preview-title" /></a
+			]}><slot name="preview-title" /></Anchor
 		>
 		{
 			titleMultilingual ? (
-				<span class="pc-title-ml">
+				<span class="card-title-ml">
 					<span class="font-light">(</span>
 					<Fragment set:html={titleMultilingual} />
 					<span class="font-light">)</span>
@@ -115,7 +117,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 	</TitleTag>
 	{
 		subtitle ? (
-			<div class="pc-subtitle">
+			<div class="card-subtitle">
 				<Fragment set:html={subtitle} />
 			</div>
 		) : undefined

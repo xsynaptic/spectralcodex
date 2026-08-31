@@ -1,10 +1,8 @@
-/* Custom spacing */
 @theme {
 	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
 	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
 }
 
-/* Custom fonts */
 @theme {
 	--font-display:
 		var(--font-geologica), ui-sans-serif, system-ui, 'Noto Sans TC', 'Heiti TC',
@@ -20,7 +18,6 @@
 		serif;
 }
 
-/* Custom colors */
 @theme {
 	/* Primary colors: zinc */
 	--color-primary-50: var(--color-zinc-50);
@@ -73,4 +70,20 @@
 	--color-alternate-800: #396311;
 	--color-alternate-900: #315314;
 	--color-alternate-950: #172e05;
+}
+
+/* Stacking order; image chrome sits under the header so the site chrome overlaps a hero */
+@theme {
+	--z-index-image: 10;
+	--z-index-image-shadow: 11;
+	--z-index-image-header: 12;
+	--z-index-image-caption: 15;
+	--z-index-image-navigation: 15;
+	--z-index-meta: 10;
+	--z-index-header: 40;
+	--z-index-top-button: 45;
+	--z-index-submenu: 50;
+	--z-index-progress: 60;
+	--z-index-progress-loading: 61;
+	--z-index-skip-link: 70;
 }

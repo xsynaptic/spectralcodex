@@ -1,0 +1,68 @@
+/* Hook prefix: figure- */
+.figure-frame {
+	margin-bottom: calc(var(--spacing) * 2);
+	font-size: var(--text-sm);
+	line-height: calc(24 / 14);
+}
+
+/* Default layout; grouped figures take their width from the group instead */
+.figure-frame:not(.figure-wide, .figure-full, .img-group *) {
+	@apply content-column-fill md:mb-4;
+}
+
+.figure-frame.figure-wide {
+	@apply sm:px-4 md:px-8;
+
+	width: 100%;
+}
+
+.figure-frame.figure-full {
+	width: 100%;
+}
+
+.figure-frame,
+.figure-frame + p {
+	margin-top: 0;
+}
+
+.figure-frame .image-placeholder {
+	position: relative;
+	overflow: hidden;
+
+	@media (width >= 40rem) {
+		border-radius: var(--radius-xs);
+	}
+}
+
+.figure-frame.figure-full .image-placeholder {
+	@media (width >= 40rem) {
+		border-radius: 0;
+	}
+}
+
+.figure-frame .image-element {
+	margin: 0;
+	color: transparent;
+}
+
+.figure-caption {
+	padding-block: calc(var(--spacing) * 1);
+	padding-inline: calc(var(--spacing) * 4);
+	font-style: italic;
+	color: light-dark(var(--color-primary-500), var(--color-primary-400));
+}
+
+.figure-caption em {
+	font-style: normal;
+}
+
+.figure-frame .figure-caption {
+	@media (width >= 40rem) {
+		padding-inline: 0;
+	}
+}
+
+.figure-frame.figure-full .figure-caption,
+.img-group.img-group-full .figure-caption {
+	@apply content-column-fill;
+}

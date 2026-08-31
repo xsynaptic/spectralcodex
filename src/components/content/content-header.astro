@@ -3,8 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { stripTags } from '@xsynaptic/unified-tools';
 
-import TextGradient from '#components/parts/text-gradient.astro';
-import { zIndexScaleEnum } from '#components/types.ts';
+import TextWash from '#components/parts/text-wash.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -26,48 +25,45 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 	class:list={[
 		'content-column',
 		hasHeroImage
-			? 'flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:mb-0 sm:pt-0'
+			? 'z-image-header flex flex-col justify-end pt-2 sm:absolute sm:right-0 sm:bottom-0 sm:left-0 sm:mb-0 sm:pt-0'
 			: 'mb-2 pt-4',
 		className,
 	]}
-	{...hasHeroImage ? { style: { zIndex: zIndexScaleEnum.ImageHeader } } : {}}
 	{...props}
 >
 	{
 		titleMultilingual ? (
-			<TextGradient
+			<TextWash
 				as="div"
-				gradientColor={hasHeroImage ? 'accent-featured' : 'accent'}
+				washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 				class:list={[
-					'title-ml pb-1 text-base leading-snug font-medium',
+					'title-ml -ml-0.5 pb-1 text-base leading-snug font-medium',
 					hasHeroImage
 						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 						: 'text-lg md:text-xl lg:text-2xl',
 				]}
-				style={{ marginLeft: '-0.125rem' }}
 				{...(titleMultilingualText
 					? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
 					: undefined)}
 				data-pagefind-ignore
 			>
 				<Fragment set:html={titleMultilingual} />
-			</TextGradient>
+			</TextWash>
 		) : undefined
 	}
 	<div class="bg-clip-padding pb-0 sm:pb-2" {...hasHeroImage ? { id: 'main-content' } : {}}>
-		<TextGradient
+		<TextWash
 			as="h1"
-			gradientColor={hasHeroImage ? 'primary-featured' : 'primary'}
+			washColor={hasHeroImage ? 'primary-featured' : 'primary'}
 			class:list={[
-				'pb-2 font-display text-2xl font-semibold',
+				'-ml-0.5 pb-2 font-display text-2xl leading-[1.125] font-semibold',
 				hasHeroImage
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
-			style={{ lineHeight: '1.125', marginLeft: '-0.125rem' }}
 		>
 			{title ? <Fragment set:html={title} /> : undefined}
-		</TextGradient>
+		</TextWash>
 	</div>
 	{
 		subtitle || caption ? (

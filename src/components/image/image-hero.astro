@@ -5,7 +5,6 @@ import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
-import { zIndexScaleEnum } from '#components/types.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
@@ -41,10 +40,9 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 		>
 			<div
 				class:list={[
-					'pointer-events-none top-0 right-0 left-0 block h-0 w-full text-transparent select-none sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',
+					'pointer-events-none top-0 right-0 left-0 z-image-shadow block h-0 w-full text-transparent select-none sm:absolute sm:h-[15vh] md:h-[20vh] lg:h-[25vh]',
 					'sm:bg-gradient-a',
 				]}
-				style={{ zIndex: zIndexScaleEnum.ImageShadow }}
 			/>
 			{hasHeroCarousel ? (
 				<image-carousel class="block">
@@ -75,11 +73,10 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 			<slot />
 			<div
 				class:list={[
-					'pointer-events-none right-0 bottom-0 left-0 block h-0 w-full select-none sm:absolute',
+					'pointer-events-none right-0 bottom-0 left-0 z-image-shadow block h-0 w-full select-none sm:absolute',
 					withTitle ? 'sm:min-h-[20vh] md:h-[25vh] lg:h-[30vh]' : 'sm:min-h-[50px]',
 					'sm:bg-gradient-b',
 				]}
-				style={{ zIndex: zIndexScaleEnum.ImageShadow }}
 			/>
 		</div>
 	) : (

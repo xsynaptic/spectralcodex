@@ -1,0 +1,67 @@
+/* Shared by grid and carousel groups */
+.img-group {
+	@apply mb-2 sm:px-4 md:mb-4 md:px-8;
+}
+
+/* Custom elements default to inline; the carousel host needs block */
+image-carousel.img-group {
+	display: block;
+}
+
+.img-group:not(.img-group-wide, .img-group-full) {
+	max-width: var(--spacing-content);
+	margin-inline: auto;
+}
+
+.img-group.img-group-wide {
+	width: 100%;
+}
+
+/* Full-bleed is carousel-only; drop the padding so slides reach the viewport edge */
+.img-group.img-group-full {
+	width: 100%;
+	padding-inline: 0;
+}
+
+/* Anchors the nav to the image edge rather than the padded host */
+.img-group-viewport {
+	position: relative;
+}
+
+.img-group-viewport .carousel-container {
+	/* Top-align so a stray orientation mismatch leaves space below rather than stretching slides */
+	align-items: flex-start;
+
+	@media (width >= 40rem) {
+		border-radius: var(--radius-xs);
+	}
+}
+
+.img-group.img-group-full .carousel-container {
+	@media (width >= 40rem) {
+		border-radius: 0;
+	}
+}
+
+.img-group-item {
+	flex: none;
+	width: 100%;
+	margin-bottom: 0;
+	scroll-snap-align: start;
+}
+
+.img-group-item.figure-frame .image-placeholder {
+	border-radius: 0;
+}
+
+/* The generic carousel only shows nav at lg; content carousels keep it at every width */
+.img-group-viewport .carousel-nav {
+	display: flex;
+}
+
+/* Touch has no hover to reveal the nav, so keep it visible */
+@media (hover: none) {
+	.img-group-viewport .carousel-nav {
+		opacity: 1;
+	}
+}

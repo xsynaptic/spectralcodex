@@ -5,7 +5,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
-import { MicroformatClassNames, zIndexScaleEnum } from '#components/types.ts';
+import { MicroformatClassNames } from '#components/types.ts';
 import { imageHeroQualityFormat, imageHeroQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
@@ -84,11 +84,10 @@ const { imageProps, placeholderProps } = await getImageProps(
 		<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
 			<Image
 				class:list={[
-					'max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
+					'z-image max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
 					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
 					showMicroformats ? MicroformatClassNames.Photo : undefined,
 				]}
-				style={{ zIndex: zIndexScaleEnum.ImageBase }}
 				{...imageProps}
 			/>
 			{caption ? (

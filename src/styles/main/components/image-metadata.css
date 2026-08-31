@@ -1,16 +1,13 @@
-/* Per-image EXIF overlay; pure-CSS focus-within state machine (no JS) */
-.i-meta {
-	--z-meta: 10;
-
+/* Per-image EXIF overlay; hook prefix: meta-; pure-CSS focus-within state machine (no JS) */
+.meta-overlay {
 	position: absolute;
 	inset: 0;
 	overflow: hidden;
 }
 
-.i-meta-show {
-	@apply transition-opacity delay-200 duration-300;
-
+.meta-show {
 	opacity: 0.8;
+	transition: opacity 300ms var(--default-transition-timing-function) 200ms;
 
 	&:focus {
 		opacity: 1;
@@ -19,36 +16,38 @@
 	@media (width >= 40rem) {
 		opacity: 0;
 
-		&:hover,
 		&:focus {
 			opacity: 1;
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				opacity: 1;
+			}
 		}
 	}
 }
 
-.i-meta-show-icon {
-	@apply transition-opacity duration-200;
-
+.meta-show-icon {
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	z-index: var(--z-meta);
+	z-index: var(--z-index-meta);
 	padding: calc(var(--spacing) * 2);
 	color: var(--color-primary-50);
 	cursor: pointer;
+	transition: opacity 200ms var(--default-transition-timing-function);
 	transition-delay: 500ms;
 }
 
-.i-meta-show:focus-within .i-meta-show-icon {
+.meta-show:focus-within .meta-show-icon {
 	pointer-events: none;
 	opacity: 0;
 	transition-delay: 100ms;
 }
 
 /* Slides in from the right on focus-within; sizes the EXIF grid's query container */
-.i-meta-panel {
-	@apply transition-[opacity,translate];
-
+.meta-panel {
 	position: absolute;
 	inset: 0;
 	display: flex;
@@ -62,8 +61,9 @@
 	pointer-events: none;
 	opacity: 0;
 	translate: 100% 0;
-	transition-delay: 100ms, 300ms;
-	transition-duration: 200ms, 0ms;
+	transition:
+		opacity 200ms var(--default-transition-timing-function) 100ms,
+		translate 0ms var(--default-transition-timing-function) 300ms;
 
 	@media (width >= 40rem) {
 		border-bottom-right-radius: var(--radius-xs);
@@ -71,91 +71,92 @@
 	}
 }
 
-.i-meta-show:focus-within .i-meta-panel {
+.meta-show:focus-within .meta-panel {
 	pointer-events: auto;
 	opacity: 1;
 	translate: 0;
 }
 
 /* EXIF grid; columns track the panel's own width via container queries */
-.i-meta-grid {
-	@apply gap-1 px-4 py-2 backdrop-grayscale;
-
+.meta-grid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: calc(var(--spacing) * 1);
 	width: 100%;
 	max-height: 100%;
+	padding-block: calc(var(--spacing) * 2);
+	padding-inline: calc(var(--spacing) * 4);
 	overflow-y: auto;
 	background-color: light-dark(
 		color-mix(in oklab, var(--color-primary-50) 75%, transparent),
 		color-mix(in oklab, var(--color-primary-800) 75%, transparent)
 	);
+	backdrop-filter: grayscale(100%);
 
 	@container (width >= 32rem) {
-		@apply gap-2;
-
 		grid-template-columns: repeat(8, minmax(0, 1fr));
+		gap: calc(var(--spacing) * 2);
 	}
 
 	@container (width >= 40rem) {
-		@apply gap-4;
-
 		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: calc(var(--spacing) * 4);
 	}
 }
 
 /* Close button: sibling of show; clicking it moves focus out of show, collapsing the panel via :focus-within */
-.i-meta-close {
-	@apply transition-opacity;
-
+.meta-close {
 	pointer-events: none;
 	opacity: 0;
+	transition-timing-function: var(--default-transition-timing-function);
 	transition-duration: 100ms;
+	transition-property: opacity;
 }
 
-.i-meta-show:focus-within ~ .i-meta-close {
+.meta-show:focus-within ~ .meta-close {
 	pointer-events: auto;
 	opacity: 1;
 }
 
-.i-meta-close-icon {
+.meta-close-icon {
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	z-index: calc(var(--z-meta) + 1);
+	z-index: calc(var(--z-index-meta) + 1);
 	padding: calc(var(--spacing) * 2);
 	color: light-dark(var(--color-accent-700), var(--color-accent-400));
 	cursor: pointer;
 }
 
-.i-meta-svg {
-	@apply drop-shadow-md;
+.meta-svg {
+	filter: drop-shadow(var(--drop-shadow-md));
 }
 
-.i-meta-item {
+.meta-item {
 	text-align: left;
 }
 
-.i-meta-item.i-span-2 {
+.meta-item.meta-span-2 {
 	grid-column: span 2 / span 2;
 }
 
-.i-meta-item.i-span-4 {
+.meta-item.meta-span-4 {
 	grid-column: span 4 / span 4;
 }
 
-.i-meta-item-title {
-	@apply text-xs font-semibold;
-
+.meta-item-title {
 	display: block;
 	margin: 0;
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--text-xs--line-height);
 	color: light-dark(var(--color-primary-800), var(--color-primary-400));
 	user-select: none;
 }
 
-.i-meta-item-value {
-	@apply text-sm;
-
+.meta-item-value {
+	font-size: var(--text-sm);
+	line-height: var(--text-sm--line-height);
 	color: light-dark(var(--color-primary-700), var(--color-primary-200));
 	cursor: text;
 	user-select: text;

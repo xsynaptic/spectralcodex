@@ -1,40 +1,43 @@
-.pc .i-placeholder {
-	@apply overflow-hidden rounded-xs shadow-sm;
+/* Hook prefix: card- */
+.card-preview .image-placeholder {
+	overflow: hidden;
+	border-radius: var(--radius-xs);
+	box-shadow: var(--shadow-sm);
 }
 
-.pc .i-image {
-	@apply aspect-3/2 text-sm text-transparent;
+.card-preview .image-element {
+	aspect-ratio: 3 / 2;
+	font-size: var(--text-sm);
+	line-height: var(--text-sm--line-height);
+	color: transparent;
 }
 
-.pc-title {
-	@apply text-xl;
-
+.card-title {
 	display: flex;
 	flex-wrap: wrap;
 	column-gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 1);
+	font-size: var(--text-xl);
+	line-height: var(--text-xl--line-height);
 }
 
-.pc-title-ml {
-	@apply font-semibold;
-
+.card-title-ml {
 	display: inline;
+	font-weight: var(--font-weight-semibold);
 	color: light-dark(var(--color-primary-500), var(--color-primary-400));
 }
 
-.pc-title-link {
-	@apply font-display font-bold;
-
-	--link-color: light-dark(var(--color-primary-700), var(--color-primary-300));
-	--link-hover: light-dark(var(--color-accent-500), var(--color-accent-400));
+.card-title-link {
+	font-family: var(--font-display);
+	font-weight: var(--font-weight-bold);
 }
 
-.pc-subtitle {
-	@apply text-sm;
-
+.card-subtitle {
 	display: flex;
 	flex-wrap: wrap;
 	gap: calc(var(--spacing) * 1);
 	margin-top: calc(var(--spacing) * 0.5);
+	font-size: var(--text-sm);
+	line-height: var(--text-sm--line-height);
 	color: light-dark(var(--color-primary-500), var(--color-primary-400));
 }

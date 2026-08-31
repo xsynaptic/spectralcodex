@@ -1,0 +1,140 @@
+/* Inline text treatments; hooks: .wash-base, .title-ml, .divided-item */
+
+/* Gradient-filled text */
+.wash-base {
+	/* Empty by default; Tailwind's gradient utilities interpolate in oklab where supported */
+	--wash-interpolation: ;
+
+	color: transparent;
+	background-image: linear-gradient(
+		to bottom var(--wash-interpolation),
+		var(--wash-from) 0%,
+		var(--wash-to) 100%
+	);
+	background-repeat: no-repeat;
+	background-clip: text;
+
+	@supports (background-image: linear-gradient(in lab, red, red)) {
+		--wash-interpolation: in oklab;
+	}
+}
+
+.wash-primary {
+	--wash-from: light-dark(var(--color-primary-800), var(--color-primary-100));
+	--wash-to: light-dark(var(--color-primary-600), var(--color-primary-300));
+}
+
+.wash-primary-bright {
+	--wash-from: var(--color-primary-50);
+	--wash-to: var(--color-primary-200);
+}
+
+.wash-primary-featured {
+	--wash-from: light-dark(var(--color-primary-800), var(--color-primary-100));
+	--wash-to: light-dark(var(--color-primary-600), var(--color-primary-300));
+
+	@media (width >= 40rem) {
+		--wash-from: var(--color-primary-50);
+		--wash-to: light-dark(var(--color-primary-300), var(--color-primary-200));
+	}
+}
+
+.wash-highlight {
+	--wash-from: var(--color-highlight-600);
+	--wash-to: var(--color-highlight-800);
+}
+
+.wash-highlight-bright {
+	--wash-from: var(--color-highlight-50);
+	--wash-to: var(--color-highlight-200);
+}
+
+.wash-accent {
+	--wash-from: light-dark(var(--color-accent-500), var(--color-accent-300));
+	--wash-to: light-dark(var(--color-accent-600), var(--color-accent-500));
+}
+
+.wash-accent-bright {
+	--wash-from: var(--color-accent-100);
+	--wash-to: var(--color-accent-300);
+}
+
+.wash-accent-featured {
+	--wash-from: light-dark(var(--color-accent-500), var(--color-accent-300));
+	--wash-to: light-dark(var(--color-accent-600), var(--color-accent-200));
+
+	@media (width >= 40rem) {
+		--wash-from: var(--color-accent-100);
+		--wash-to: var(--color-accent-300);
+	}
+}
+
+/* Pin to the light ramp; matches the anchor-static technique */
+.wash-static {
+	color-scheme: light;
+}
+
+.title-ml [lang^='zh'] {
+	font-weight: var(--font-weight-semibold);
+}
+
+.title-ml [lang^='ja'] {
+	font-weight: var(--font-weight-medium);
+}
+
+/* Glyph separator between inline items; avoids repetition in the divided-item component */
+.divided-item {
+	display: inline;
+
+	@media (width >= 40rem) {
+		display: inline-flex;
+		gap: calc(var(--spacing) * 1);
+	}
+}
+
+.divided-item::after {
+	color: light-dark(
+		var(--divider-color, var(--color-primary-400)),
+		var(--divider-color-dark, var(--color-primary-500))
+	);
+	content: var(--divider-glyph, var(--content-slash));
+}
+
+/* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
+@media (width < 40rem) {
+	.divided-item::after {
+		margin-inline: calc(var(--spacing) * 1);
+	}
+}
+
+.divided-item:last-child::after {
+	content: none;
+}
+
+.divided-chevron {
+	--divider-glyph: var(--content-chevron);
+}
+
+.divided-chevron::after {
+	translate: 0 -1px;
+}
+
+.divided-dot {
+	--divider-glyph: var(--content-dot);
+}
+
+.divided-thin::after {
+	font-weight: var(--font-weight-light);
+}
+
+.divided-lighter {
+	--divider-color: var(--color-primary-300);
+	--divider-color-dark: var(--color-primary-600);
+}
+
+@media (width >= 40rem) {
+	.divided-hero .divided-item::after {
+		color: var(--color-primary-300);
+		opacity: 0.8;
+	}
+}

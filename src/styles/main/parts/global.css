@@ -1,4 +1,4 @@
-.cjk,
+.cjk-text,
 html:not([lang^='zh']) [lang^='zh'],
 html:not([lang^='ja']) [lang^='ja'],
 html:not([lang^='ko']) [lang^='ko'] {

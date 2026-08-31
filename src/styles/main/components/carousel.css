@@ -21,8 +21,6 @@
 }
 
 .carousel-nav {
-	@apply rounded-full text-white grayscale;
-
 	position: absolute;
 	top: 50%;
 	display: none;
@@ -30,10 +28,13 @@
 	justify-content: center;
 	width: calc(var(--spacing) * 12);
 	height: calc(var(--spacing) * 12);
+	color: var(--color-white);
 	pointer-events: auto;
 	cursor: pointer;
 	background-color: color-mix(in oklab, var(--color-white) 25%, transparent);
+	border-radius: calc(infinity * 1px);
 	opacity: 0;
+	filter: grayscale(100%);
 	translate: 0 -50%;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 200ms;
@@ -43,10 +44,16 @@
 		display: flex;
 	}
 
-	&:hover,
 	&:focus-visible {
 		color: color-mix(in oklab, var(--color-white) 80%, transparent);
 		background-color: color-mix(in oklab, var(--color-white) 50%, transparent);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			color: color-mix(in oklab, var(--color-white) 80%, transparent);
+			background-color: color-mix(in oklab, var(--color-white) 50%, transparent);
+		}
 	}
 
 	&:active {
@@ -54,9 +61,14 @@
 	}
 }
 
-.carousel-group:focus-within .carousel-nav,
-.carousel-group:hover .carousel-nav {
+.carousel-group:focus-within .carousel-nav {
 	opacity: 1;
+}
+
+@media (hover: hover) {
+	.carousel-group:hover .carousel-nav {
+		opacity: 1;
+	}
 }
 
 .carousel-nav svg {
@@ -69,7 +81,7 @@
 }
 
 .carousel-nav-prev svg {
-	@apply -translate-x-0.5;
+	translate: -0.125rem 0;
 }
 
 .carousel-nav-next {
@@ -77,5 +89,5 @@
 }
 
 .carousel-nav-next svg {
-	@apply translate-x-0.5;
+	translate: 0.125rem 0;
 }

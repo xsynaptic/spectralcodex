@@ -1,0 +1,40 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+
+const WashColorEnum = {
+	Primary: 'primary',
+	PrimaryBright: 'primary-bright',
+	PrimaryFeatured: 'primary-featured',
+	Highlight: 'highlight',
+	HighlightBright: 'highlight-bright',
+	Accent: 'accent',
+	AccentBright: 'accent-bright',
+	AccentFeatured: 'accent-featured',
+} as const;
+
+type WashColor = (typeof WashColorEnum)[keyof typeof WashColorEnum];
+
+type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
+	as: Tag;
+	washColor?: WashColor;
+	showDarkMode?: boolean | undefined;
+}>;
+
+const {
+	as: Tag = 'div',
+	class: className,
+	washColor = WashColorEnum.Primary,
+	showDarkMode = true,
+	...props
+} = Astro.props;
+---
+
+<Tag
+	class:list={[
+		'wash-base',
+		`wash-${washColor}`,
+		showDarkMode ? undefined : 'wash-static',
+		className,
+	]}
+	{...props}><slot /></Tag
+>

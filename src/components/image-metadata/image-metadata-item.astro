@@ -13,11 +13,11 @@ const contents = await renderSlot(Astro.slots, 'default');
 
 {
 	title && contents ? (
-		<span class:list={[className, 'i-meta-item']} {...props}>
-			<span class="i-meta-item-title">
+		<span class:list={[className, 'meta-item']} {...props}>
+			<span class="meta-item-title">
 				<slot name="image-metadata-item-title" />
 			</span>
-			<span class="i-meta-item-value">
+			<span class="meta-item-value">
 				<slot />
 			</span>
 		</span>

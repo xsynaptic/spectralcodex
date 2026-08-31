@@ -40,7 +40,7 @@ const t = getTranslations();
 						{!showCurrentLink && termAncestor.id === entry.id ? (
 							termAncestor.data.title
 						) : (
-							<Anchor href={getContentUrl('regions', termAncestor.id)} linkColor="accent">
+							<Anchor href={getContentUrl('regions', termAncestor.id)} anchorColor="accent">
 								{termAncestor.data.title}
 							</Anchor>
 						)}

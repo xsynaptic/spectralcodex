@@ -9,44 +9,32 @@
 @source './main/**/*.css';
 @source '../**/*.astro';
 
-/** Safelist utilities applied to HTML we don't author directly */
+/* Safelist utilities applied to HTML we don't author directly */
 @source inline('sr-only');
 
-/** Enable dark mode with a custom selector */
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
-/** Theme styling */
 @import './main/parts/theme.css';
-
-/** Tailwind utilities */
 @import './main/parts/utilities.css';
-
-/** Root variables */
 @import './main/parts/root.css';
-
-/** Global overrides */
 @import './main/parts/global.css';
-
-/** Base layer */
 @import './main/parts/base.css' layer(base);
-
-/** Component layer */
 @import './main/components/activity-graph.css' layer(components);
-@import './main/components/background.css' layer(components);
+@import './main/components/anchor.css' layer(components);
 @import './main/components/build-stats.css' layer(components);
 @import './main/components/carousel.css' layer(components);
-@import './main/components/content.css' layer(components);
-@import './main/components/divider.css' layer(components);
-@import './main/components/i18n.css' layer(components);
+@import './main/components/chrome.css' layer(components);
+@import './main/components/colophon.css' layer(components);
+@import './main/components/content-image.css' layer(components);
 @import './main/components/image-metadata.css' layer(components);
-@import './main/components/link.css' layer(components);
+@import './main/components/img-group.css' layer(components);
 @import './main/components/list-column.css' layer(components);
-@import './main/components/loading.css' layer(components);
-@import './main/components/nav-menu.css' layer(components);
+@import './main/components/menu-header.css' layer(components);
 @import './main/components/pagination.css' layer(components);
 @import './main/components/preview-card.css' layer(components);
-@import './main/components/progress.css' layer(components);
 @import './main/components/prose.css' layer(components);
+@import './main/components/search.css' layer(components);
+@import './main/components/text.css' layer(components);
 
-/** Unlayered */
+/* The package stylesheet is unlayered, so a layered override would lose to it */
 @import './main/components/map.css';

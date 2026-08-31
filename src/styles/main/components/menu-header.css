@@ -1,4 +1,4 @@
-/* Nav element */
+/* Header menu; hook prefix: nav-, styling only; menu-navigation.ts selects by data attributes */
 .nav-menu {
 	position: relative;
 	padding-inline: calc(var(--spacing) * 4);
@@ -8,7 +8,6 @@
 	}
 }
 
-/* Top-level list element */
 .nav-ul {
 	@apply gap-x-4 md:gap-x-2;
 
@@ -21,54 +20,50 @@
 	border-bottom: 1px solid light-dark(var(--color-primary-200), var(--color-primary-700));
 }
 
-/* Top-level menu item */
 .nav-item {
-	@apply py-2;
+	padding-block: calc(var(--spacing) * 2);
 
 	@media (width >= 40rem) {
 		position: relative;
 	}
 }
 
-/* Trigger area inside top-level item */
 .nav-item-trigger {
-	@apply gap-x-1;
-
 	display: flex;
+	column-gap: calc(var(--spacing) * 1);
 	align-items: center;
 }
 
-/* Top-level menu link */
 .nav-item-link {
-	@apply text-sm font-medium;
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-medium);
+	line-height: var(--text-sm--line-height);
 
 	@media (width >= 40rem) {
-		@apply text-base;
+		font-size: var(--text-base);
+		line-height: var(--text-base--line-height);
 	}
 }
 
-/* Top-level icon */
 .nav-icon {
-	@apply transition-transform transition-discrete duration-100;
-
 	width: 18px;
 	height: 100%;
 	color: var(--color-primary-500);
 	opacity: 1;
+	transition: transform 100ms var(--default-transition-timing-function) allow-discrete;
 }
 
-/* Submenu base element */
 .nav-sub-menu {
-	@apply transition-[opacity,visibility] transition-discrete;
-
-	--z-sub-menu: 50;
-
 	position: absolute;
 	visibility: hidden;
 	width: 100%;
 	max-width: 100%;
 	pointer-events: none;
 	opacity: 0;
+	transition-timing-function: var(--default-transition-timing-function);
+	transition-duration: var(--default-transition-duration);
+	transition-property: opacity, visibility;
+	transition-behavior: allow-discrete;
 
 	@media (width >= 40rem) {
 		width: fit-content;
@@ -80,15 +75,15 @@
 }
 
 .nav-sub-menu-d1 {
-	@apply shadow-md duration-200;
-
 	--nav-divide: light-dark(var(--color-primary-100), var(--color-primary-800));
 
 	top: 100%;
 	left: 0;
-	z-index: var(--z-sub-menu);
+	z-index: var(--z-index-submenu);
 	margin-bottom: -1px;
 	background-color: light-dark(var(--color-primary-50), var(--color-primary-900));
+	box-shadow: var(--shadow-md);
+	transition-duration: 200ms;
 
 	@media (width >= 40rem) {
 		left: -0.5rem;
@@ -103,25 +98,22 @@
 }
 
 .nav-sub-menu-d2 {
-	@apply shadow-md duration-50;
-
 	--nav-divide: light-dark(var(--color-primary-200), var(--color-primary-700));
 
-	z-index: calc(var(--z-sub-menu) + 1);
+	z-index: calc(var(--z-index-submenu) + 1);
 	background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
+	box-shadow: var(--shadow-md);
+	transition-duration: 50ms;
 }
 
-/* Depth 3+ submenu */
 .nav-sub-menu-d3 {
-	@apply duration-50;
-
 	--nav-divide: light-dark(var(--color-primary-300), var(--color-primary-600));
 
-	z-index: calc(var(--z-sub-menu) + 2);
+	z-index: calc(var(--z-index-submenu) + 2);
 	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+	transition-duration: 50ms;
 }
 
-/* Shared positioning for depth 2 and 3+ submenus */
 .nav-sub-menu-d2,
 .nav-sub-menu-d3 {
 	left: 0;
@@ -135,7 +127,6 @@
 	}
 }
 
-/* Submenu item (all depths) */
 .nav-sub-item {
 	position: relative;
 }
@@ -145,21 +136,22 @@
 	border-top: 1px solid var(--nav-divide);
 }
 
-/* Trigger area inside submenu item */
 .nav-sub-trigger {
-	@apply gap-x-1 px-4 py-1 text-sm;
-
 	display: flex;
+	column-gap: calc(var(--spacing) * 1);
 	align-items: center;
 	justify-content: space-between;
 	width: 100%;
+	padding-block: calc(var(--spacing) * 1);
+	padding-inline: calc(var(--spacing) * 4);
+	font-size: var(--text-sm);
+	line-height: var(--text-sm--line-height);
 
 	@media (width >= 40rem) {
-		@apply px-2;
+		padding-inline: calc(var(--spacing) * 2);
 	}
 }
 
-/* Submenu item link */
 .nav-sub-link {
 	width: 100%;
 	overflow: hidden;
@@ -168,14 +160,12 @@
 	white-space: nowrap;
 }
 
-/* Multilingual text annotation */
 .nav-ml {
-	@apply text-xs;
-
+	font-size: var(--text-xs);
+	line-height: var(--text-xs--line-height);
 	color: light-dark(var(--color-primary-700), var(--color-primary-400));
 }
 
-/* Right chevron (submenu items with children) */
 .nav-sub-icon {
 	visibility: hidden;
 	width: 14px;
@@ -187,40 +177,47 @@
 	}
 }
 
-/**
- * Hover/focus interactions (replaces Tailwind group pattern)
- *
- * Depth 1: active at all breakpoints
- * Depth 2+: active at sm (40rem) and above
- */
-
-/* Depth 1: show submenu on hover/focus-within */
-.nav-item:hover > .nav-sub-menu-d1,
+/* Depth 1 opens at every breakpoint; depth 2+ only at sm and above, where there is room to fly out */
 .nav-item:focus-within > .nav-sub-menu-d1 {
 	visibility: visible;
 	pointer-events: auto;
 	opacity: 1;
 }
 
-/* Depth 1: flip chevron on hover/focus-within */
-.nav-item:hover > .nav-item-trigger > .nav-icon,
 .nav-item:focus-within > .nav-item-trigger > .nav-icon {
 	transform: scaleY(-1);
 }
 
-/* Depth 2 and 3+: show submenu on hover/focus-within (sm+ only) */
+@media (hover: hover) {
+	.nav-item:hover > .nav-sub-menu-d1 {
+		visibility: visible;
+		pointer-events: auto;
+		opacity: 1;
+	}
+
+	.nav-item:hover > .nav-item-trigger > .nav-icon {
+		transform: scaleY(-1);
+	}
+}
+
 @media (width >= 40rem) {
-	.nav-sub-item:hover > .nav-sub-menu-d2,
 	.nav-sub-item:focus-within > .nav-sub-menu-d2,
-	.nav-sub-item:hover > .nav-sub-menu-d3,
 	.nav-sub-item:focus-within > .nav-sub-menu-d3 {
 		visibility: visible;
 		pointer-events: auto;
 		opacity: 1;
 	}
+
+	@media (hover: hover) {
+		.nav-sub-item:hover > .nav-sub-menu-d2,
+		.nav-sub-item:hover > .nav-sub-menu-d3 {
+			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
+		}
+	}
 }
 
-/* JS-driven open state (keyboard, touch, click) */
 /* stylelint-disable-next-line no-descending-specificity -- same shown-state as the hover/focus rules above; grouped by state, not specificity */
 [data-open] > .nav-sub-menu-d1,
 [data-open] > .nav-sub-menu-d2,

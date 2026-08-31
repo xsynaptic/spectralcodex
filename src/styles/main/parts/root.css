@@ -1,4 +1,4 @@
-/** These custom properties are defined outside Tailwind's system */
+/* These custom properties are defined outside Tailwind's system */
 :root {
 	--content-bullet: '\2022';
 	--content-chevron: '\203A';
@@ -6,7 +6,7 @@
 	--content-slash: '/';
 }
 
-/** Anchor color-scheme to the mode attribute so light-dark() resolves off the same source of truth */
+/* Anchor color-scheme to the mode attribute so light-dark() resolves off the same source of truth */
 [data-mode='light'] {
 	color-scheme: light;
 }

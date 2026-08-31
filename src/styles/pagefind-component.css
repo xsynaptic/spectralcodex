@@ -1,4 +1,4 @@
-/** Note: this CSS file does not import Tailwind but relies on variables in the global context */
+/* Note: this CSS file does not import Tailwind but relies on variables in the global context */
 @import '@pagefind/component-ui/css/pagefind-component-ui.css';
 
 :root {
@@ -42,7 +42,6 @@ pagefind-searchbox button {
 	font-family: var(--pf-font) !important;
 }
 
-/* Backdrop blur when modal is open */
 dialog.pf-modal::backdrop {
 	backdrop-filter: blur(4px);
 }
@@ -62,7 +61,6 @@ dialog.pf-modal::backdrop {
 	object-fit: cover;
 }
 
-/** Result link colors */
 .pf-result-link {
 	--pf-text: var(--color-accent-500);
 	&:hover {
@@ -76,7 +74,6 @@ dialog.pf-modal::backdrop {
 	}
 }
 
-/* Sub-result link colors */
 .pf-heading-link {
 	--pf-text: var(--color-primary-600);
 	&:hover {

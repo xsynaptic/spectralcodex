@@ -1,0 +1,62 @@
+/* Site furniture anchored to the viewport; hooks: .skip-link, top-button, .progress-bar, .loading-animation */
+.skip-link a {
+	inset-inline-start: 0;
+	translate: 0 -100vh;
+	transition:
+		translate 0.2s ease-in-out,
+		color 0.2s ease-in-out;
+}
+
+.skip-link a:focus-visible {
+	translate: 0 0;
+}
+
+@media (hover: hover) {
+	.skip-link a:hover {
+		translate: 0 0;
+	}
+}
+
+top-button {
+	translate: 0 150%;
+	transition:
+		translate 200ms ease-out,
+		opacity 200ms ease-out,
+		background-color 200ms ease-out;
+}
+
+top-button:not([inert]) {
+	translate: 0 0;
+}
+
+top-button:not(:defined) {
+	pointer-events: none;
+	opacity: 0;
+}
+
+.progress-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	pointer-events: none;
+	opacity: 0;
+	transform: translate3d(0, 0, 0) scaleX(var(--progress-bar, 0));
+	transform-origin: 0;
+	transition:
+		background-color 100ms 100ms ease-in-out,
+		opacity 150ms 150ms ease-in,
+		transform 300ms ease-out;
+}
+
+/* Adapted from Daisy UI */
+.loading-animation {
+	display: inline-block;
+	aspect-ratio: 1/1;
+	pointer-events: none;
+	background-color: currentcolor;
+	mask-image: url('/loading.svg');
+	mask-repeat: no-repeat;
+	mask-position: center;
+	mask-size: 100%;
+}

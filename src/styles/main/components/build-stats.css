@@ -1,26 +1,27 @@
-.build-stats {
-	--bs-ink: light-dark(var(--color-primary-900), var(--color-primary-100));
-	--bs-ink-muted: light-dark(var(--color-primary-500), var(--color-primary-400));
-	--bs-grid: light-dark(var(--color-primary-200), var(--color-primary-700));
-	--bs-axis: light-dark(var(--color-primary-300), var(--color-primary-600));
-	--bs-annotation: light-dark(var(--color-primary-400), var(--color-primary-500));
-	--bs-duration: light-dark(var(--color-accent-500), var(--color-accent-400));
-	--bs-pages: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+/* Hook prefix: stats- */
+.stats-chart {
+	--stats-ink: light-dark(var(--color-primary-900), var(--color-primary-100));
+	--stats-ink-muted: light-dark(var(--color-primary-500), var(--color-primary-400));
+	--stats-grid: light-dark(var(--color-primary-200), var(--color-primary-700));
+	--stats-axis: light-dark(var(--color-primary-300), var(--color-primary-600));
+	--stats-annotation: light-dark(var(--color-primary-400), var(--color-primary-500));
+	--stats-duration: light-dark(var(--color-accent-500), var(--color-accent-400));
+	--stats-pages: light-dark(var(--color-highlight-500), var(--color-highlight-400));
 
 	position: relative;
 	display: block;
 	font-family: var(--font-sans);
 	font-size: var(--text-base);
 	line-height: 1.5;
-	color: var(--bs-ink);
+	color: var(--stats-ink);
 }
 
-.build-stats + .build-stats {
+.stats-chart + .stats-chart {
 	margin-block-start: calc(var(--spacing) * 8);
 }
 
 /* Bleeds past the page padding so a scrolled plot runs off the edge rather than ending at a hard crop */
-.bs-frame {
+.stats-frame {
 	margin-inline-end: calc(var(--spacing) * -4);
 	overflow-x: auto;
 	overscroll-behavior-x: contain;
@@ -37,106 +38,106 @@
 }
 
 /* Sized by its own width and height attributes; scaling down to a phone puts every tick label below legibility */
-.bs-plot {
+.stats-plot {
 	display: block;
 	font-family: var(--font-sans);
 }
 
-.bs-chart-label {
+.stats-chart-label {
 	font-size: 13px;
 	font-weight: 600;
-	fill: var(--bs-ink);
+	fill: var(--stats-ink);
 }
 
-.bs-note {
+.stats-note {
 	font-size: 11px;
-	fill: var(--bs-ink-muted);
+	fill: var(--stats-ink-muted);
 }
 
-.bs-tick {
+.stats-tick {
 	font-size: 11px;
 	font-variant-numeric: tabular-nums;
-	fill: var(--bs-ink-muted);
+	fill: var(--stats-ink-muted);
 }
 
-.bs-endpoint-label {
+.stats-endpoint-label {
 	font-size: 12px;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
-	fill: var(--bs-ink);
+	fill: var(--stats-ink);
 }
 
-.bs-grid,
-.bs-axis {
+.stats-grid,
+.stats-axis {
 	stroke-width: 1;
 }
 
-.bs-grid {
-	stroke: var(--bs-grid);
+.stats-grid {
+	stroke: var(--stats-grid);
 }
 
-.bs-grid-month {
+.stats-grid-month {
 	opacity: 0.55;
 }
 
-.bs-axis {
-	stroke: var(--bs-axis);
+.stats-axis {
+	stroke: var(--stats-axis);
 }
 
 /* Distinct from the gridlines it crosses */
-.bs-annotation {
-	stroke: var(--bs-annotation);
+.stats-annotation {
+	stroke: var(--stats-annotation);
 	stroke-width: 1;
 	stroke-dasharray: 3 3;
 }
 
-/* Darker than its own line, so the two do not read as one mark where they meet */
-.bs-annotation-label {
+/* Stronger than its own line, so the two do not read as one mark where they meet */
+.stats-annotation-label {
 	font-size: 11px;
 	font-weight: 500;
-	fill: var(--bs-ink-muted);
+	fill: var(--stats-ink-muted);
 }
 
 /* Marks overlap heavily in the fast era; density does the shading, not a binned heatmap */
-.bs-dots circle {
-	fill: var(--bs-duration);
+.stats-dots circle {
+	fill: var(--stats-duration);
 	fill-opacity: 0.28;
 }
 
-.bs-line {
+.stats-line {
 	fill: none;
-	stroke: var(--bs-series);
+	stroke: var(--stats-series);
 	stroke-width: 2;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 }
 
-.bs-area {
-	fill: var(--bs-series);
+.stats-area {
+	fill: var(--stats-series);
 	fill-opacity: 0.1;
 	stroke: none;
 }
 
-.bs-endpoint {
-	fill: var(--bs-series);
+.stats-endpoint {
+	fill: var(--stats-series);
 	stroke: var(--color-body-bg);
 	stroke-width: 2;
 }
 
-.bs-series-duration {
-	--bs-series: var(--bs-duration);
+.stats-series-duration {
+	--stats-series: var(--stats-duration);
 }
 
-.bs-series-pages {
-	--bs-series: var(--bs-pages);
+.stats-series-pages {
+	--stats-series: var(--stats-pages);
 }
 
-.bs-crosshair {
+.stats-crosshair {
 	pointer-events: none;
 	opacity: 0;
 }
 
-.bs-tooltip {
+.stats-tooltip {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -144,10 +145,10 @@
 	padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
 	font-size: var(--text-xs);
 	line-height: 1.5;
-	color: var(--bs-ink-muted);
+	color: var(--stats-ink-muted);
 	pointer-events: none;
 	background-color: var(--color-body-bg);
-	border: 1px solid var(--bs-grid);
+	border: 1px solid var(--stats-grid);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
 	opacity: 0;
@@ -155,49 +156,49 @@
 	transition: opacity 100ms linear;
 }
 
-.bs-tooltip[data-visible] {
+.stats-tooltip[data-visible] {
 	opacity: 1;
 }
 
-.bs-tooltip-date {
+.stats-tooltip-date {
 	margin-block-end: calc(var(--spacing) * 1);
-	color: var(--bs-ink-muted);
+	color: var(--stats-ink-muted);
 }
 
-.bs-tooltip-row {
+.stats-tooltip-row {
 	display: flex;
 	gap: calc(var(--spacing) * 3);
 	align-items: center;
 	justify-content: space-between;
 }
 
-.bs-tooltip-row b {
+.stats-tooltip-row b {
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
-	color: var(--bs-ink);
+	color: var(--stats-ink);
 }
 
-.bs-tooltip-key {
+.stats-tooltip-key {
 	display: flex;
 	gap: calc(var(--spacing) * 1);
 	align-items: center;
 }
 
-.bs-swatch {
+.stats-swatch {
 	flex: none;
 	inline-size: 7px;
 	block-size: 7px;
 	border-radius: 50%;
 }
 
-.bs-swatch-duration {
-	background-color: color-mix(in srgb, var(--bs-duration) 35%, transparent);
+.stats-swatch-duration {
+	background-color: color-mix(in srgb, var(--stats-duration) 35%, transparent);
 }
 
-.bs-swatch-median {
-	background-color: var(--bs-duration);
+.stats-swatch-median {
+	background-color: var(--stats-duration);
 }
 
-.bs-swatch-pages {
-	background-color: var(--bs-pages);
+.stats-swatch-pages {
+	background-color: var(--stats-pages);
 }

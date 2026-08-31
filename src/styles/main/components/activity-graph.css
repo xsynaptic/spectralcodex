@@ -1,11 +1,10 @@
-/* Activity graph: one chronological run of day-cells that the grid flows into week columns */
-
-/* A flourish, so on narrow screens the plot scrolls horizontally rather than reflowing */
+/* One chronological run of day-cells that the grid flows into week columns */
 .activity-graph {
 	--ag-cell: 8px;
 	--ag-gap: 2px;
 }
 
+/* A flourish, so on narrow screens the plot scrolls horizontally rather than reflowing */
 .activity-scroll {
 	overflow-x: auto;
 	overscroll-behavior-x: contain;

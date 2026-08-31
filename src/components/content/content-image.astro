@@ -115,15 +115,16 @@ const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 
 // Standalone images take their layout width; grouped images defer to their container
 function getFigureClass() {
-	if (context === ImageContextEnum.Carousel) return 'c-carousel-item';
+	if (context === ImageContextEnum.Carousel) return 'img-group-item';
 	if (context === ImageContextEnum.Grid) return;
-	return `c-${layout}`;
+	if (layout === ImageLayoutEnum.Default) return;
+	return `figure-${layout}`;
 }
 ---
 
 {
 	imageProps && !isFeed ? (
-		<figure class:list={['c-wrap c-escape', getFigureClass()]} {...props}>
+		<figure class:list={['figure-frame prose-escape', getFigureClass()]} {...props}>
 			<ImagePlaceholder placeholderProps={placeholderProps}>
 				<Image
 					{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
@@ -134,7 +135,7 @@ function getFigureClass() {
 				) : undefined}
 			</ImagePlaceholder>
 			{caption ? (
-				<figcaption class="c-caption">
+				<figcaption class="figure-caption">
 					<Fragment set:html={caption} />
 				</figcaption>
 			) : undefined}

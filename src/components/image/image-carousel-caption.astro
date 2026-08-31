@@ -5,7 +5,6 @@ import type { ImageFeaturedCaption } from '#lib/catalog/catalog-types.ts';
 
 import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { zIndexScaleEnum } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -32,11 +31,10 @@ const t = getTranslations();
 		<div
 			class:list={[
 				'bg-gradient-b',
-				'pointer-events-none absolute right-0 bottom-0 left-0 mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
+				'pointer-events-none absolute right-0 bottom-0 left-0 z-image-caption mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
 				// Note: the min-height spreads the background gradient
 				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
 			]}
-			style={{ zIndex: zIndexScaleEnum.ImageCaption }}
 			data-pagefind-ignore
 			{...props}
 		>
@@ -55,7 +53,7 @@ const t = getTranslations();
 				{url ? (
 					<Anchor
 						href={url}
-						linkColor="primary-bright"
+						anchorColor="primary-bright"
 						showDarkMode={false}
 						class:list={[
 							'truncate font-medium sm:font-semibold',

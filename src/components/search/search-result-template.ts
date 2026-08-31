@@ -17,7 +17,7 @@ export const pagefindResultTemplate = `<script type="text/pagefind-template">
 		{{/if}}
 		<div class="pf-result-content">
 			<p class="pf-result-title">
-				<a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}{{#if meta.title_ml}} (<span class="cjk">{{ meta.title_ml }}</span>){{/if}}</a>
+				<a class="pf-result-link" href="{{ meta.url | default(url) | safeUrl }}">{{ meta.title }}{{#if meta.title_ml}} (<span class="cjk-text">{{ meta.title_ml }}</span>){{/if}}</a>
 			</p>
 			{{#if excerpt}}<p class="pf-result-excerpt">{{+ excerpt +}}</p>{{/if}}
 		</div>

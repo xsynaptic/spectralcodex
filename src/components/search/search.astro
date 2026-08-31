@@ -12,8 +12,6 @@ const props = Astro.props;
 const bundlePath = `${import.meta.env.BASE_URL}pagefind/`;
 
 const t = getTranslations();
-
-// Note: the styles at the bottom apply before web component JS loads
 ---
 
 <script>
@@ -42,9 +40,7 @@ const t = getTranslations();
 <pagefind-config bundle-path={bundlePath} preload={false}></pagefind-config>
 
 <search-toggle
-	class:list={[
-		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100',
-	]}
+	class:list={['flex cursor-pointer items-center justify-center rounded-full']}
 	data-pagefind-css-url={pagefindCssUrl}
 	{...props}
 >
@@ -85,23 +81,3 @@ const t = getTranslations();
 		<pagefind-keyboard-hints></pagefind-keyboard-hints>
 	</pagefind-modal-footer>
 </pagefind-modal>
-
-<style>
-	search-toggle:not(:defined) {
-		pointer-events: none;
-		opacity: 0.3;
-	}
-
-	/* Eager layout rules so the header never shifts while the deferred stylesheet loads */
-	pagefind-config {
-		display: none;
-	}
-
-	pagefind-modal {
-		display: contents;
-	}
-
-	pagefind-modal:not(:defined) {
-		display: none;
-	}
-</style>

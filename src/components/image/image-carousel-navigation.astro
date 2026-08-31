@@ -1,5 +1,4 @@
 ---
-import { zIndexScaleEnum } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 const t = getTranslations();
@@ -7,8 +6,7 @@ const t = getTranslations();
 
 <button
 	type="button"
-	class:list={['carousel-nav carousel-nav-prev']}
-	style={{ zIndex: zIndexScaleEnum.ImageNavigation }}
+	class:list={['carousel-nav carousel-nav-prev z-image-navigation']}
 	data-carousel-nav="prev"
 	aria-label={t('carousel.nav.previous')}
 >
@@ -30,8 +28,7 @@ const t = getTranslations();
 </button>
 <button
 	type="button"
-	class:list={['carousel-nav carousel-nav-next']}
-	style={{ zIndex: zIndexScaleEnum.ImageNavigation }}
+	class:list={['carousel-nav carousel-nav-next z-image-navigation']}
 	data-carousel-nav="next"
 	aria-label={t('carousel.nav.next')}
 >

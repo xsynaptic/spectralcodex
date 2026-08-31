@@ -65,7 +65,7 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 						<Anchor
 							class="font-semibold"
 							href={getSiteUrl('chronology', chronologyMonthlyItem.year)}
-							linkColor="highlight"
+							anchorColor="highlight"
 						>
 							{formatStringTemplate(t('chronology.yearly.title'), {
 								date: chronologyMonthlyItem.year,
@@ -91,7 +91,7 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 			chronologyYears={chronologyYears}
 			chronologyMonths={chronologyMonths}
 		>
-			<Anchor href={getSiteUrl('chronology')} linkColor="accent" class="font-semibold">
+			<Anchor href={getSiteUrl('chronology')} anchorColor="accent" class="font-semibold">
 				{t('chronology.index.label')}
 			</Anchor>
 		</ChronologyNavigation>

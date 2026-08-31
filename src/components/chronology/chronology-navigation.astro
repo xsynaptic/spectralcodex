@@ -63,7 +63,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 							<Anchor
 								class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
 								href={getSiteUrl('chronology', chronologyYear)}
-								linkColor="accent"
+								anchorColor="accent"
 							>
 								{chronologyYear}
 							</Anchor>
@@ -99,7 +99,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 									) : (
 										<Anchor
 											href={getSiteUrl('chronology', currentYear, monthNumber)}
-											linkColor="highlight"
+											anchorColor="highlight"
 										>
 											{monthName}
 										</Anchor>

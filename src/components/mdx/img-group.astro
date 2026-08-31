@@ -36,9 +36,9 @@ function getGridColumnCount(itemCount: number) {
 }
 
 function getLayoutClass() {
-	if (layout === ImageLayoutEnum.Wide) return 'c-wide';
-	if (layout === ImageLayoutEnum.Full) return 'c-full';
-	return 'c-default';
+	if (layout === ImageLayoutEnum.Wide) return 'img-group-wide';
+	if (layout === ImageLayoutEnum.Full) return 'img-group-full';
+	return;
 }
 
 const layoutClass = getLayoutClass();
@@ -48,8 +48,8 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 {isFeed && imageCount > 0 ? <Fragment set:html={slotContents} /> : undefined}
 {
 	!isFeed && isCarousel && imageCount > 0 ? (
-		<image-carousel class:list={['c-image-group c-escape carousel-group', layoutClass]} {...props}>
-			<div class="c-carousel-viewport">
+		<image-carousel class:list={['img-group prose-escape carousel-group', layoutClass]} {...props}>
+			<div class="img-group-viewport">
 				<div class="carousel-container">
 					<Fragment set:html={slotContents} />
 				</div>
@@ -62,7 +62,7 @@ const columns = getGridColumnCount(columnsProp ? Number(columnsProp) : imageCoun
 	!isFeed && !isCarousel && imageCount > 0 ? (
 		<div
 			class:list={[
-				'c-image-group c-escape',
+				'img-group prose-escape',
 				layoutClass,
 				columns > 1 ? 'grid grid-cols-1 gap-2 md:gap-4' : undefined,
 				columns === 2 ? 'sm:grid-cols-2' : undefined,

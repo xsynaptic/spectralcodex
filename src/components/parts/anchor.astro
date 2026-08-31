@@ -3,10 +3,10 @@ import type { HTMLAttributes } from 'astro/types';
 
 import { renderSlot } from '#lib/utils/astro.ts';
 
-type LinkColor = 'accent' | 'highlight' | 'primary' | 'primary-bright';
+type AnchorColor = 'accent' | 'highlight' | 'primary' | 'primary-bright' | 'title';
 
 interface Props extends HTMLAttributes<'a'> {
-	linkColor?: LinkColor | undefined;
+	anchorColor?: AnchorColor | undefined;
 	isActive?: boolean | undefined;
 	showDarkMode?: boolean | undefined;
 }
@@ -14,7 +14,7 @@ interface Props extends HTMLAttributes<'a'> {
 const {
 	class: className,
 	href,
-	linkColor = 'accent',
+	anchorColor = 'accent',
 	isActive = false,
 	showDarkMode = true,
 	...props
@@ -26,10 +26,10 @@ const children = await renderSlot(Astro.slots, 'default');
 <a
 	href={href}
 	class:list={[
-		'link',
-		`link-${linkColor}`,
-		isActive ? 'link-active' : undefined,
-		showDarkMode ? undefined : 'link-static',
+		'anchor-base',
+		`anchor-${anchorColor}`,
+		isActive ? 'anchor-active' : undefined,
+		showDarkMode ? undefined : 'anchor-static',
 		className,
 	]}
 	{...props}><Fragment set:html={children} /></a

@@ -32,22 +32,22 @@ const t = getTranslations();
 				})
 			}
 			{' '}
-			<Anchor href={siteUrl} linkColor="accent">{t('site.title')}</Anchor></span
+			<Anchor href={siteUrl} anchorColor="accent">{t('site.title')}</Anchor></span
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
 		<span
 			>{t('site.footer.powered.label')}{' '}
-			<Anchor href="https://astro.build" linkColor="accent">Astro</Anchor></span
+			<Anchor href="https://astro.build" anchorColor="accent">Astro</Anchor></span
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
-		<Anchor href={getSiteUrl('build-stats')} linkColor="accent"
+		<Anchor href={getSiteUrl('build-stats')} anchorColor="accent"
 			>{t('site.footer.buildStats.label')}</Anchor
 		>
 	</DividedItem>
 	<DividedItem dividerColor="lighter">
-		<Anchor href="https://github.com/xsynaptic/spectralcodex" linkColor="accent"
+		<Anchor href="https://github.com/xsynaptic/spectralcodex" anchorColor="accent"
 			>{t('site.footer.sourceCode.label')}</Anchor
 		>
 	</DividedItem>
@@ -55,7 +55,7 @@ const t = getTranslations();
 		<Anchor
 			class:list={['colophon-rss-link']}
 			href={`${getSiteUrl()}rss.xml`}
-			linkColor="accent"
+			anchorColor="accent"
 			rel="feed"
 			><span>{t('site.footer.feed.label')}</span>
 			<div class="colophon-rss-icon">
@@ -75,36 +75,3 @@ const t = getTranslations();
 		</Anchor>
 	</DividedItem>
 </nav>
-
-<style>
-	.colophon-rss-link {
-		display: flex;
-		flex-wrap: nowrap;
-		gap: calc(var(--spacing) * 1);
-		align-items: center;
-	}
-
-	.colophon-rss-icon {
-		position: relative;
-		width: 10px;
-		height: 10px;
-		margin-left: 0.25rem;
-		background-color: var(--color-white);
-	}
-
-	.colophon-rss-icon svg {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 16px;
-		height: 16px;
-		color: var(--color-orange-400);
-		transform: translate(-50%, -50%);
-	}
-
-	.colophon-rss-icon svg:hover,
-	.colophon-rss-link:hover .colophon-rss-icon svg,
-	.colophon-rss-link:focus-visible .colophon-rss-icon svg {
-		color: var(--color-orange-300);
-	}
-</style>

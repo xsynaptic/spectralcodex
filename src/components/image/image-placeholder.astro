@@ -20,7 +20,7 @@ const placeholder = placeholderProps ? await getImagePlaceholder(placeholderProp
 ---
 
 <Tag
-	class:list={['i-placeholder', placeholder ? 'bg-placeholder' : 'bg-fallback', className]}
+	class:list={['image-placeholder', placeholder ? 'bg-placeholder' : 'bg-fallback', className]}
 	style={placeholder ? `background-image: url(${placeholder});` : undefined}
 	{...props}
 >

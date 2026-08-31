@@ -1,0 +1,63 @@
+/* Role colours; extracted here to avoid repetition in the Anchor component */
+.anchor-base {
+	color: var(--anchor-color);
+	cursor: pointer;
+	transition: color var(--default-transition-duration) linear;
+}
+
+.anchor-base:focus-visible {
+	color: var(--anchor-hover);
+}
+
+@media (hover: hover) {
+	.anchor-base:hover {
+		color: var(--anchor-hover);
+	}
+}
+
+.anchor-active {
+	font-weight: var(--font-weight-semibold);
+}
+
+.anchor-accent {
+	--anchor-color: light-dark(var(--color-accent-500), var(--color-accent-400));
+	--anchor-hover: light-dark(var(--color-accent-300), var(--color-accent-200));
+}
+
+.anchor-primary {
+	--anchor-color: light-dark(var(--color-primary-800), var(--color-primary-200));
+	--anchor-hover: light-dark(var(--color-primary-600), var(--color-primary-50));
+}
+
+.anchor-primary-bright {
+	--anchor-color: light-dark(var(--color-primary-300), var(--color-primary-600));
+	--anchor-hover: light-dark(var(--color-primary-100), var(--color-primary-300));
+}
+
+.anchor-highlight {
+	--anchor-color: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+	--anchor-hover: light-dark(var(--color-highlight-300), var(--color-highlight-700));
+}
+
+.anchor-title {
+	--anchor-color: light-dark(var(--color-primary-700), var(--color-primary-300));
+	--anchor-hover: light-dark(var(--color-accent-500), var(--color-accent-400));
+}
+
+/* Hero context; divided-hero also retunes the divider glyph color in text.css */
+@media (width >= 40rem) {
+	.divided-hero .anchor-accent {
+		--anchor-color: var(--color-accent-300);
+		--anchor-hover: var(--color-accent-200);
+	}
+
+	.divided-hero .anchor-highlight {
+		--anchor-color: light-dark(var(--color-highlight-300), var(--color-highlight-400));
+		--anchor-hover: var(--color-highlight-200);
+	}
+}
+
+/* Pin to the light ramp; keeps links on always-light surfaces from inverting in dark mode */
+.anchor-static {
+	color-scheme: light;
+}
