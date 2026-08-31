@@ -8,6 +8,9 @@ const relatedCatalogItemsLimit = 25;
 // Regions, themes, series, and pages link structurally; only these link editorially
 const editorialCollections = new Set<CatalogCollectionKey>(['locations', 'posts']);
 
+// Pre-migration originals; too small to hold up at hero scale
+const legacyImagePrefix = 'errata/';
+
 export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
 	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();
 }
@@ -21,8 +24,8 @@ export function hasFeaturedImage(item: CatalogItem): boolean {
 	return !!item.imageId;
 }
 
-export function hasHeroImage(item: CatalogItem): boolean {
-	return !!item.imageHeroId;
+export function hasHighResolutionHeroImage(item: CatalogItem): boolean {
+	return !!item.imageHeroId && !item.imageHeroId.startsWith(legacyImagePrefix);
 }
 
 export function isEditorialEntry(item: CatalogItem): boolean {

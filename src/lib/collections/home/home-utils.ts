@@ -3,7 +3,7 @@ import * as R from 'remeda';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import {
 	hasFeaturedImage,
-	hasHeroImage,
+	hasHighResolutionHeroImage,
 	sortCatalogByDate,
 	sortCatalogByEntryQuality,
 } from '#lib/catalog/catalog-utils.ts';
@@ -15,7 +15,7 @@ export async function queryHomeData() {
 		featuredCatalogItems: R.pipe(
 			catalog.byCollection('locations', 'posts'),
 			R.filter((item) => item.entryQuality >= 3),
-			R.filter(hasHeroImage),
+			R.filter(hasHighResolutionHeroImage),
 			R.shuffle(),
 			R.take(5),
 		),
