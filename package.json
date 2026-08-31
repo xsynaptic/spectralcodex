@@ -90,7 +90,7 @@
 		"@xsynaptic/satteri-img-group": "^2.0.1",
 		"@xsynaptic/satteri-trailing-slash": "^0.2.0",
 		"@xsynaptic/satteri-wrap-cjk": "^0.3.0",
-		"@xsynaptic/stylelint-config": "^1.1.2",
+		"@xsynaptic/stylelint-config": "^1.1.4",
 		"@xsynaptic/unified-tools": "^5.1.3",
 		"@xsynaptic/unpic-imagor": "^1.0.0",
 		"@xsynaptic/word-count": "^1.0.0",
