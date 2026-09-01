@@ -12,7 +12,7 @@ describe('isIndexableUrlPath', () => {
 	});
 
 	it('rejects excluded prefixes, bare and with a child path', () => {
-		for (const prefix of ['/objectives', '/planning', '/taiwan-theater-project', '/chronology']) {
+		for (const prefix of ['/objectives', '/taiwan-theater-project', '/chronology']) {
 			expect(isIndexableUrlPath(prefix)).toBe(false);
 			expect(isIndexableUrlPath(`${prefix}/`)).toBe(false);
 			expect(isIndexableUrlPath(`${prefix}/child/`)).toBe(false);
@@ -20,12 +20,12 @@ describe('isIndexableUrlPath', () => {
 	});
 
 	it('accepts a path that merely looks like an excluded prefix', () => {
-		expect(isIndexableUrlPath('/planningx/')).toBe(true);
+		expect(isIndexableUrlPath('/chronologyx/')).toBe(true);
 		expect(isIndexableUrlPath('/objectives-archive/')).toBe(true);
 	});
 
 	it('treats trailing-slash and bare forms identically', () => {
 		expect(isIndexableUrlPath('/posts/some-post/')).toBe(isIndexableUrlPath('/posts/some-post'));
-		expect(isIndexableUrlPath('/planning/')).toBe(isIndexableUrlPath('/planning'));
+		expect(isIndexableUrlPath('/chronology/')).toBe(isIndexableUrlPath('/chronology'));
 	});
 });
