@@ -1,3 +1,4 @@
+import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -32,7 +33,7 @@ function resolvePaths(options: SitemapLastmodOptions) {
 		contentPathRelative,
 		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
 		dataStorePath: path.resolve(options.rootPath, dataStoreRelativePath),
-		outputPath: path.resolve(options.rootPath, options.outputPath ?? '.cache/sitemap-lastmod.json'),
+		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
 	};
 }
 

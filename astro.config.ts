@@ -1,10 +1,10 @@
-// @ts-check
 import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
-import sitemap from '@spectralcodex/astro-sitemap';
+import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
+import { isIndexableUrlPath, readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
@@ -39,6 +39,9 @@ if (
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
 const trailingSlash = 'always';
+
+// Git-derived per-URL dates, written by the sitemap-lastmod deploy step before the build
+const sitemapLastmod = readSitemapLastmod();
 
 /**
  * @link https://astro.build/config
@@ -189,7 +192,11 @@ export default defineConfig({
 		}),
 		mdx(),
 		sitemap({
-			excludePrefixes: ['/objectives', '/planning', '/taiwan-theater-project', '/chronology'],
+			filter: (page) => isIndexableUrlPath(new URL(page).pathname),
+			serialize: (item) => ({
+				...item,
+				lastmod: sitemapLastmod.urls[item.url] ?? sitemapLastmod.generatedAt,
+			}),
 		}),
 		pagefind({
 			indexConfig: {

@@ -1,24 +1,8 @@
 import type { APIRoute } from 'astro';
 
+import { isIndexableUrlPath } from '@spectralcodex/shared/sitemap';
+
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-
-// Note: this should be kept in sync with the exclude prefixes in `astro.config.mjs`.
-const excludePrefixes = [
-	'/objectives',
-	'/planning',
-	'/taiwan-theater-project',
-	'/chronology',
-] as const;
-
-function shouldIncludeUrl(pathname: string): boolean {
-	const normalized = pathname.replace(/\/$/, '');
-
-	if (/\/\d+$/.test(normalized)) return false;
-
-	return excludePrefixes.every(
-		(prefix) => !(normalized === prefix || normalized.startsWith(prefix + '/')),
-	);
-}
 
 // Generate JSON consumed by the "page not found" suggestions component
 export const GET: APIRoute = async ({ site }) => {
@@ -29,7 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
 	// Content manifest includes relative URLs so we need to normalize output before filtering
 	const entries = [...catalog.all()]
 		.map(({ url, title }) => ({ url: new URL(url, site).pathname, title }))
-		.filter(({ url }) => shouldIncludeUrl(url));
+		.filter(({ url }) => isIndexableUrlPath(url));
 
 	return Response.json(entries, {
 		headers: { 'Content-Type': 'application/json' },

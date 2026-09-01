@@ -37,15 +37,15 @@ importers:
       '@astrojs/rss':
         specifier: ^4.0.19
         version: 4.0.19
+      '@astrojs/sitemap':
+        specifier: ^3.7.4
+        version: 3.7.4
       '@pagefind/component-ui':
         specifier: ^1.5.2
         version: 1.5.2
       '@playwright/test':
         specifier: ^1.62.1
         version: 1.62.1
-      '@spectralcodex/astro-sitemap':
-        specifier: workspace:*
-        version: link:packages/astro-sitemap
       '@spectralcodex/map-codec':
         specifier: workspace:*
         version: link:packages/map-codec
@@ -235,19 +235,6 @@ importers:
       zod:
         specifier: ^4.5.4
         version: 4.5.4
-
-  packages/astro-sitemap:
-    dependencies:
-      '@astrojs/sitemap':
-        specifier: ^3.7.4
-        version: 3.7.4
-      zod:
-        specifier: ^4.5.4
-        version: 4.5.4
-    devDependencies:
-      astro:
-        specifier: ^7.2.10
-        version: 7.2.10(@astrojs/markdown-remark@7.3.0(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
 
   packages/content:
     devDependencies:

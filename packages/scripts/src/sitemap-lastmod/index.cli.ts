@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import { parseArgs } from 'node:util';
 
@@ -9,7 +10,7 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'content-path': { type: 'string', default: 'packages/content' },
-		'output-path': { type: 'string', default: '.cache/sitemap-lastmod.json' },
+		'output-path': { type: 'string', default: sitemapLastmodPath },
 		'site-url': { type: 'string' },
 	},
 });

@@ -8,6 +8,7 @@
 		"./constants": "./src/constants.ts",
 		"./map": "./src/map/index.ts",
 		"./schemas": "./src/schemas/index.ts",
+		"./sitemap": "./src/sitemap.ts",
 		"./text": "./src/text.ts"
 	},
 	"private": true,
