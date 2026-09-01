@@ -4,6 +4,8 @@ Spectral Codex is a long-form, photo-heavy digital garden: an Astro SSG monorepo
 
 Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, etc.) is defined in `.claude/context.md`. Read it before naming anything or writing user-facing copy.
 
+Avoid adding anything to this file unless it is important and relevant.
+
 ## Commands
 
 Scripts live in `package.json`. Only the ones with a catch are worth stating here:
@@ -24,7 +26,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 
 ## Styling
 
-- Tailwind v4, CSS-first.
+- Tailwind v4 provides the base and should be used when prototyping anything new but we prefer to avoid the more arcane and convoluted syntax where possible. If an atomic class isn't already in the main CSS output consider writing vanilla CSS.
 - Utilities inline by default; a rule in `src/styles/main/components/<component>.css` (registered in `main.css` under `layer(components)`) only when the selector or value cannot sit on the element: content not authored here (MDX, pagefind, maplibre), structural and state selectors, pseudo-elements carrying `content`, values with no theme step.
 - A decoration applied like a utility typically becomes a `@utility` in `parts/utilities.css`.
 - No `<style>` blocks (they bundle into the same file, sit outside the cascade layers, and stop at the component's own template); `main-stylesheet.astro` is the one `is:inline` exception (FOUC guard).
@@ -32,8 +34,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - Colour in a stylesheet is `light-dark()`; a non-colour dark swap is `[data-mode='dark'] &`; a utility is `dark:` where dark mode is used.
 - Stylesheets read tokens as `var(--…)`; `@apply` where it replaces a media query or composes a project `@utility`.
 - Stacking order is `--z-index-*` applied as `z-*` utilities or `var()`.
-- Every `hover:` on a focusable element has its `focus-visible:` twin where relevant.
-- A stylesheet `:hover` sits under `@media (hover: hover)`, as Tailwind's `hover:` does; its `:focus-visible` partner stays outside it.
+- Every `hover:` on a focusable element has its `focus-visible:` twin where relevant. A stylesheet `:hover` sits under `@media (hover: hover)`, as Tailwind's `hover:` does; its `:focus-visible` partner stays outside it.
 
 ## Content subrepo
 
