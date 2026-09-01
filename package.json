@@ -49,16 +49,16 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.2.9",
+		"astro": "^7.2.10",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@astrojs/markdown-satteri": "^0.3.8",
-		"@astrojs/mdx": "^7.0.8",
-		"@astrojs/node": "^11.1.4",
-		"@astrojs/react": "^6.0.4",
+		"@astrojs/markdown-satteri": "^0.4.0",
+		"@astrojs/mdx": "^8.0.0",
+		"@astrojs/node": "^11.1.5",
+		"@astrojs/react": "^6.0.5",
 		"@astrojs/rss": "^4.0.19",
 		"@pagefind/component-ui": "^1.5.2",
 		"@playwright/test": "^1.62.1",
@@ -84,7 +84,7 @@
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^1.0.0",
 		"@xsynaptic/astro-image-loader": "^1.1.1",
-		"@xsynaptic/eslint-config": "^6.2.2",
+		"@xsynaptic/eslint-config": "^6.3.0",
 		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/satteri-auto-import": "^0.2.1",
 		"@xsynaptic/satteri-img-group": "^2.0.1",
