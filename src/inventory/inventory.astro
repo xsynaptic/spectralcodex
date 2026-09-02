@@ -1,0 +1,1137 @@
+---
+import type { ComponentProps } from 'astro/types';
+
+import ContentCollectionLink from '#components/content/content-collection-link.astro';
+import ContentDate from '#components/content/content-date.astro';
+import ContentExcerpt from '#components/content/content-excerpt.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ContentImage from '#components/content/content-image.astro';
+import ContentProse from '#components/content/content-prose.astro';
+import ContentSection from '#components/content/content-section.astro';
+import ImageMetadata from '#components/image-metadata/image-metadata.astro';
+import ImageCarousel from '#components/image/image-carousel.astro';
+import ImageHero from '#components/image/image-hero.astro';
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import MainSite from '#components/main/main-site.astro';
+import MapComponent from '#components/map/map-component.astro';
+import ImgGroup from '#components/mdx/img-group.astro';
+import Img from '#components/mdx/img.astro';
+import ActivityGraph from '#components/parts/activity-graph.astro';
+import AlertBox from '#components/parts/alert-box.astro';
+import Anchor from '#components/parts/anchor.astro';
+import AuthorCard from '#components/parts/author-card.astro';
+import CardFrame from '#components/parts/card-frame.astro';
+import CitationLine from '#components/parts/citation-line.astro';
+import DateDisplay from '#components/parts/date-display.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import Grid from '#components/parts/grid.astro';
+import Image from '#components/parts/image.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import ListRow from '#components/parts/list-row.astro';
+import PaginationCounter from '#components/parts/pagination-counter.astro';
+import PaginationSelect from '#components/parts/pagination-select.astro';
+import PreviewCard from '#components/parts/preview-card.astro';
+import PreviewColumn from '#components/parts/preview-column.astro';
+import PreviewGrid from '#components/parts/preview-grid.astro';
+import PreviewList from '#components/parts/preview-list.astro';
+import PreviewSubtitle from '#components/parts/preview-subtitle.astro';
+import Prose from '#components/parts/prose.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import TextParenthesis from '#components/parts/text-parenthesis.astro';
+import TextSeparated from '#components/parts/text-separated.astro';
+import TextWash from '#components/parts/text-wash.astro';
+import ResourcesLinks from '#components/resources/resources-links.astro';
+import ResourcesSources from '#components/resources/resources-sources.astro';
+import SectionAuthor from '#components/sections/section-author.astro';
+import SectionBacklinks from '#components/sections/section-backlinks.astro';
+import SectionDateList from '#components/sections/section-date-list.astro';
+import SectionPreviewList from '#components/sections/section-preview-list.astro';
+import SectionPreviews from '#components/sections/section-previews.astro';
+import SectionRegions from '#components/sections/section-regions.astro';
+import SectionThemes from '#components/sections/section-themes.astro';
+import SeriesSection from '#components/series/series-section.astro';
+import WebmentionsList from '#components/webmentions/webmentions-list.astro';
+import {
+	createSampleActivityValues,
+	createSampleCatalogItems,
+	createSampleImageFeaturedGroup,
+	createSampleImageProps,
+	createSampleMapData,
+	createSamplePage,
+	getSampleImages,
+	getSampleRegionId,
+	getSampleRegionIds,
+	getSampleResources,
+	getSampleThemeIds,
+	sampleLinkInline,
+	samplePlaces,
+	sampleCitation,
+	sampleCitationMultilingual,
+	sampleDate,
+	sampleDateEnd,
+	sampleDatesRecorded,
+	sampleDateUpdated,
+	sampleTitleChinese,
+	sampleTitleChineseSimplified,
+	sampleTitleJapanese,
+	sampleTitleKorean,
+	sampleTitleThai,
+	sampleSourceInline,
+	sampleTitleVietnamese,
+	sampleUrl,
+	sampleWebmentionCounts,
+	sampleWebmentionReplies,
+} from '#inventory/inventory-fixtures.ts';
+import ProseSample from '#inventory/inventory-prose-sample.mdx';
+import Section from '#inventory/inventory-section.astro';
+import Specimen from '#inventory/inventory-specimen.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
+
+import './inventory.css';
+
+const t = getTranslations();
+
+const sampleImages = await getSampleImages();
+const sampleRegionId = await getSampleRegionId();
+const sampleRegionIds = await getSampleRegionIds();
+const sampleThemeIds = await getSampleThemeIds();
+const sampleResources = await getSampleResources();
+const sampleMapData = await createSampleMapData();
+
+const sampleImage = sampleImages.landscape[0]
+	? { entry: sampleImages.landscape[0], ...createSampleImageProps(sampleImages.landscape[0]) }
+	: undefined;
+const sampleImageIds = sampleImages.landscape.map((entry) => entry.id);
+const sampleImageFeaturedGroup = createSampleImageFeaturedGroup(sampleImages.landscape.slice(0, 3));
+
+const sampleItems = createSampleCatalogItems({
+	imageIds: sampleImageIds,
+	regionId: sampleRegionId,
+});
+const sampleItem = sampleItems[0];
+
+const samplePageFirst = createSamplePage({ items: sampleItems, currentPage: 1, lastPage: 1 });
+const samplePageMiddle = createSamplePage({ items: sampleItems, currentPage: 3, lastPage: 12 });
+
+const sampleYear = String(new Date().getUTCFullYear());
+const sampleActivityValues = createSampleActivityValues(sampleYear);
+
+const noMedia = 'The Images collection is empty, so nothing here can resolve a photograph.';
+
+const sections = ['Foundations', 'Prose', 'Text', 'Parts', 'Images', 'Content', 'Sections'];
+
+const colorRamps = [
+	{ name: 'primary', source: 'zinc' },
+	{ name: 'accent', source: 'calypso' },
+	{ name: 'highlight', source: 'honey' },
+	{ name: 'alternate', source: 'lima' },
+];
+
+const colorSteps = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+const typeSteps = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl'];
+
+const fontFamilies = [
+	{ name: 'font-display', note: 'Geologica, 300 to 700; headings and card titles' },
+	{ name: 'font-sans', note: 'Commissioner, 300 to 700; the body default' },
+	{ name: 'font-serif', note: 'Lora, 300 to 700, normal and italic; prose and metadata lists' },
+];
+
+// Every script the content carries, so a font change can be judged against all of them at once
+const scriptSamples = [
+	{ label: 'Latin', lang: 'en', value: 'Sugar railway workshops, 1907' },
+	{ label: 'Vietnamese', ...sampleTitleVietnamese },
+	{ label: 'Chinese', ...sampleTitleChinese },
+	{ label: 'Japanese', ...sampleTitleJapanese },
+	{ label: 'Korean', ...sampleTitleKorean },
+	{ label: 'Thai', ...sampleTitleThai },
+];
+
+const backgroundUtilities = [
+	{ name: 'bg-fallback', note: 'Seigaiha pattern; stands in for a missing Image' },
+	{ name: 'bg-placeholder', note: 'LQIP frame; pixelated, cover, centered' },
+	{ name: 'bg-gradient-a', note: 'Fade from the top, over a hero' },
+	{ name: 'bg-gradient-b', note: 'Fade from the bottom, under a caption' },
+	{ name: 'bg-header-fade', note: 'Header scrim; swaps lightness in dark mode' },
+];
+
+type AnchorColor = NonNullable<ComponentProps<typeof Anchor>['anchorColor']>;
+
+const anchorColorsOnLight = [
+	'accent',
+	'highlight',
+	'primary',
+	'title',
+] satisfies Array<AnchorColor>;
+
+const anchorColorOnDark = 'primary-bright' satisfies AnchorColor;
+
+type WashColor = NonNullable<ComponentProps<typeof TextWash>['washColor']>;
+
+const washColorsOnLight = ['primary', 'accent', 'highlight'] as const satisfies Array<WashColor>;
+
+const washColorsOnDark = [
+	'primary-bright',
+	'accent-bright',
+	'highlight-bright',
+] as const satisfies Array<WashColor>;
+
+// Both featured variants swap at sm, so they are shown on the ground they resolve to above it
+const washColorsFeatured = [
+	'primary-featured',
+	'accent-featured',
+] as const satisfies Array<WashColor>;
+
+const datePresets = Object.values(DatePresetEnum);
+
+type AlertStatus = NonNullable<ComponentProps<typeof AlertBox>['status']>;
+
+const alertStatuses = [
+	'default',
+	'success',
+	'notice',
+	'warning',
+	'error',
+] as const satisfies Array<AlertStatus>;
+
+type DividerContent = NonNullable<ComponentProps<typeof DividedItem>['dividerContent']>;
+
+const dividerContents = ['slash', 'chevron', 'dot'] as const satisfies Array<DividerContent>;
+
+const imageLayouts = Object.values(ImageLayoutEnum);
+
+const captionClass = 'font-mono text-xs text-primary-500 dark:text-primary-400';
+
+const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-primary-700';
+---
+
+<MainSite meta={{ noIndex: true, title: 'Inventory' }}>
+	<div class="pb-16">
+		<div class="content-column pt-6">
+			<h1 class="font-display text-2xl font-semibold text-primary-800 dark:text-primary-200">
+				Inventory
+			</h1>
+			<p class="mt-2 max-w-prose text-sm text-primary-600 dark:text-primary-400">
+				Every common component, rendered from its real source with fixture props. Dev only: neither
+				the route nor a utility written here reaches a build.
+			</p>
+			<nav class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+				{sections.map((section) => <Anchor href={`#${section.toLowerCase()}`}>{section}</Anchor>)}
+			</nav>
+		</div>
+		<Section title="Foundations">
+			<Specimen
+				name="Color ramps"
+				note="Each ramp aliases a named primitive; only <code>primary</code> comes from Tailwind."
+				source="styles/main/parts/theme.css"
+			>
+				<div class="flex flex-col gap-5">
+					{
+						colorRamps.map((ramp) => (
+							<div>
+								<div class={captionClass}>
+									--color-{ramp.name}-* <span class="text-primary-400">({ramp.source})</span>
+								</div>
+								<div class="mt-2 grid grid-cols-[repeat(auto-fit,minmax(3.5rem,1fr))] gap-1">
+									{colorSteps.map((step) => (
+										<div>
+											<div
+												class="h-12 rounded-xs border border-primary-300 dark:border-primary-700"
+												style={`background-color: var(--color-${ramp.name}-${String(step)})`}
+											/>
+											<div class={`mt-1 ${captionClass}`}>{step}</div>
+										</div>
+									))}
+								</div>
+							</div>
+						))
+					}
+				</div>
+			</Specimen>
+			<Specimen
+				name="Type scale"
+				note="Prose headings size in <code>em</code>, so they sit under Prose rather than here."
+				source="styles/main/parts/theme.css"
+			>
+				<div class="flex flex-col gap-4">
+					{
+						typeSteps.map((step) => (
+							<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
+								<div class={captionClass}>text-{step}</div>
+								<div style={`font-size: var(--text-${step})`}>
+									The quick brown fox jumps over the lazy dog
+								</div>
+							</div>
+						))
+					}
+				</div>
+			</Specimen>
+			<Specimen
+				name="Font families"
+				note="Latin and Vietnamese subsets only; CJK and Thai fall through to the platform stack."
+				source="styles/main/parts/theme.css"
+			>
+				<div class="flex flex-col gap-6">
+					{
+						fontFamilies.map((family) => (
+							<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
+								<div class={captionClass}>
+									{family.name}, {family.note}
+								</div>
+								<div class="mt-2 flex flex-col gap-1" style={`font-family: var(--${family.name})`}>
+									<div style="font-size: var(--text-xl)">
+										Spectral Codex 0123456789 <em>italic</em> <strong>bold</strong>
+									</div>
+									{scriptSamples.map((script) => (
+										<div class="flex flex-wrap items-baseline gap-x-3">
+											<span class={`w-24 shrink-0 ${captionClass}`}>{script.label}</span>
+											<span lang={script.lang} style="font-size: var(--text-lg)">
+												{script.value}
+											</span>
+										</div>
+									))}
+								</div>
+							</div>
+						))
+					}
+				</div>
+			</Specimen>
+			<Specimen name="Background utilities" source="styles/main/parts/utilities.css">
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{
+						backgroundUtilities.map((utility) => (
+							<div>
+								<div
+									class:list={[
+										'h-24 rounded-xs border border-primary-300 dark:border-primary-700',
+										utility.name,
+									]}
+								/>
+								<div class={`mt-1 ${captionClass}`}>{utility.name}</div>
+								<div class="text-xs text-primary-500 dark:text-primary-400">{utility.note}</div>
+							</div>
+						))
+					}
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="content-column / content-column-fill"
+				note="<code>content-column-fill</code> drops the base padding below <code>sm</code>."
+				source="styles/main/parts/utilities.css"
+			>
+				{
+					/* No flex wrapper: `mx-auto` on a flex child shrink-wraps it, so neither box shows its width */
+				}
+				<div class="content-column">
+					<div class="rounded-xs bg-accent-100 py-3 text-center text-sm dark:bg-accent-900">
+						content-column
+					</div>
+				</div>
+				<div class="content-column-fill mt-2">
+					<div class="rounded-xs bg-highlight-100 py-3 text-center text-sm dark:bg-highlight-900">
+						content-column-fill
+					</div>
+				</div>
+			</Specimen>
+		</Section>
+		<Section title="Prose">
+			<Specimen
+				bleed={true}
+				name="prose (default)"
+				note="Rendered from MDX through the real satteri pipeline. Carries <code>data-reading-frame</code>, so the reading bar tracks this block."
+				source="components/parts/prose.astro"
+			>
+				<Prose class="content-column" data-reading-frame>
+					<ProseSample />
+				</Prose>
+			</Specimen>
+			<Specimen
+				name="prose (showCompact)"
+				note="Descriptions, card summaries, Series blurbs."
+				source="components/parts/prose.astro"
+			>
+				<Prose showCompact={true}>
+					<p>
+						A Description renders inline markdown only: <em>emphasis</em>, <strong>strong</strong>,
+						and a <a href={sampleUrl}>link</a>. Block content is stripped before it reaches here.
+					</p>
+				</Prose>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="prose (showBlocks)"
+				note="Every direct child is pushed into <code>content-column</code>, so <code>prose-escape</code> breaks the measure."
+				source="components/parts/prose.astro"
+			>
+				<Prose showBlocks={true}>
+					<p>A paragraph inside a blocked prose surface, held to the measure.</p>
+					<div
+						class="prose-escape rounded-xs bg-accent-100 py-3 text-center text-sm dark:bg-accent-900"
+					>
+						A child marked <code>prose-escape</code>, reaching past it
+					</div>
+					<p>And the text picks the measure back up on the far side.</p>
+				</Prose>
+			</Specimen>
+		</Section>
+		<Section title="Text">
+			<Specimen
+				name="anchor"
+				note="Tab through: every hover has its <code>focus-visible</code> twin."
+				source="components/parts/anchor.astro"
+			>
+				<div class="flex flex-col gap-4">
+					<div class="flex flex-wrap items-baseline gap-x-6 gap-y-3">
+						{
+							anchorColorsOnLight.map((anchorColor) => (
+								<Anchor anchorColor={anchorColor} href={sampleUrl}>
+									{anchorColor}
+								</Anchor>
+							))
+						}
+						<Anchor href={sampleUrl} isActive={true}>accent, isActive</Anchor>
+					</div>
+					<div class="rounded-xs bg-primary-800 px-5 py-4">
+						<Anchor anchorColor={anchorColorOnDark} href={sampleUrl}>{anchorColorOnDark}</Anchor>
+					</div>
+					<div class="rounded-xs bg-primary-100 px-5 py-4">
+						<Anchor href={sampleUrl} showDarkMode={false}>accent, showDarkMode false</Anchor>
+					</div>
+				</div>
+			</Specimen>
+			<Specimen
+				name="text-wash"
+				note="Bright variants want a dark ground; the featured pair swaps at <code>sm</code>."
+				source="components/parts/text-wash.astro"
+			>
+				<div class="flex flex-col gap-4">
+					<div class="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+						{
+							washColorsOnLight.map((washColor) => (
+								<TextWash class="text-2xl font-semibold" washColor={washColor}>
+									{washColor}
+								</TextWash>
+							))
+						}
+					</div>
+					<div
+						class="flex flex-wrap items-baseline gap-x-6 gap-y-2 rounded-xs bg-primary-800 px-5 py-4"
+					>
+						{
+							washColorsOnDark.map((washColor) => (
+								<TextWash class="text-2xl font-semibold" washColor={washColor}>
+									{washColor}
+								</TextWash>
+							))
+						}
+						{
+							washColorsFeatured.map((washColor) => (
+								<TextWash class="text-2xl font-semibold" washColor={washColor}>
+									{washColor}
+								</TextWash>
+							))
+						}
+					</div>
+				</div>
+			</Specimen>
+			<Specimen
+				name="divided-item / list-row"
+				note="The glyph is dropped on the last item."
+				source="components/parts/"
+			>
+				<div class="flex flex-col gap-3">
+					{
+						dividerContents.map((dividerContent) => (
+							<ListRow>
+								<DividedItem as="li" dividerContent={dividerContent}>
+									{dividerContent}
+								</DividedItem>
+								<DividedItem as="li" dividerContent={dividerContent}>
+									divider
+								</DividedItem>
+								<DividedItem as="li" dividerContent={dividerContent}>
+									glyph
+								</DividedItem>
+							</ListRow>
+						))
+					}
+					<ListRow>
+						<DividedItem as="li" dividerWeight="thin">Thin</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">divider</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">weight</DividedItem>
+					</ListRow>
+					<ListRow>
+						<DividedItem as="li" dividerColor="lighter">Lighter</DividedItem>
+						<DividedItem as="li" dividerColor="lighter">divider</DividedItem>
+						<DividedItem as="li" dividerColor="lighter">color</DividedItem>
+					</ListRow>
+				</div>
+			</Specimen>
+			<Specimen
+				name="list-column / list-column-item"
+				note="Polymorphic over <code>ul</code> and <code>ol</code>; an empty item renders nothing."
+				source="components/parts/"
+			>
+				<div class="flex flex-wrap items-start gap-x-12 gap-y-4 font-serif text-sm">
+					<ListColumn>
+						<ListColumnItem>An unordered item</ListColumnItem>
+						<ListColumnItem>
+							<Anchor href={sampleUrl}>A second item, carrying a link</Anchor>
+						</ListColumnItem>
+					</ListColumn>
+					<ListColumn as="ol">
+						<ListColumnItem>An ordered item</ListColumnItem>
+						<ListColumnItem>A second item</ListColumnItem>
+					</ListColumn>
+				</div>
+			</Specimen>
+			<Specimen
+				name="text-multilingual"
+				note="CJK runs pick up <code>cjk-text</code>: pinned style, phrase-level line breaking."
+				source="components/parts/text-multilingual.astro"
+			>
+				<div class="flex flex-col gap-2">
+					<div>
+						Taiwan Sugar Railway<TextMultilingual content={sampleTitleChinese} parenthesis={true} />
+					</div>
+					<div>
+						<TextMultilingual
+							content={sampleTitleChinese}
+							additional={[sampleTitleChineseSimplified, sampleTitleJapanese]}
+						/>
+					</div>
+					<div class="flex flex-wrap gap-x-6 gap-y-1">
+						<TextMultilingual content={sampleTitleKorean} />
+						<TextMultilingual content={sampleTitleThai} />
+						<TextMultilingual content={sampleTitleVietnamese} />
+					</div>
+				</div>
+			</Specimen>
+			<Specimen
+				name="text-parenthesis / text-separated"
+				note="<code>text-parenthesis</code> renders nothing when its slot is empty."
+				source="components/parts/"
+			>
+				<div class="flex flex-col gap-2">
+					<div>Before <TextParenthesis>a parenthesised run</TextParenthesis> after</div>
+					<div>
+						{
+							samplePlaces.map((place, index, places) => (
+								<TextSeparated index={index} total={places.length}>
+									{place}
+								</TextSeparated>
+							))
+						}
+					</div>
+				</div>
+			</Specimen>
+			<Specimen
+				name="date-display"
+				note="Presets read from <code>DatePresetEnum</code>. A range collapses the repeated year."
+				source="components/parts/date-display.astro"
+			>
+				<table class="w-full border-collapse text-sm">
+					<thead>
+						<tr>
+							<th class:list={[cellClass, captionClass, 'pr-3 text-start']}>Preset</th>
+							<th class:list={[cellClass, captionClass, 'pr-3 text-start']}>Single date</th>
+							<th class:list={[cellClass, captionClass, 'text-start']}>Range</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							datePresets.map((datePreset) => (
+								<tr>
+									<td class:list={[cellClass, 'pr-3']}>
+										<code>{datePreset}</code>
+									</td>
+									<td class:list={[cellClass, 'pr-3']}>
+										<DateDisplay date={sampleDate} datePreset={datePreset} />
+									</td>
+									<td class={cellClass}>
+										<DateDisplay
+											date={sampleDate}
+											dateEnd={sampleDateEnd}
+											datePreset={datePreset}
+										/>
+									</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</Specimen>
+			<Specimen
+				name="citation-line"
+				note="Punctuation follows the citation's own language."
+				source="components/parts/citation-line.astro"
+			>
+				<div class="flex flex-col gap-1 font-serif text-sm">
+					<CitationLine citation={sampleCitation} titleClass="italic" url={sampleUrl} />
+					<CitationLine
+						citation={sampleCitationMultilingual}
+						lang={sampleTitleChinese.lang}
+						url={sampleUrl}
+					/>
+				</div>
+			</Specimen>
+		</Section>
+		<Section title="Parts">
+			<Specimen name="alert-box" source="components/parts/alert-box.astro">
+				<div class="flex flex-col gap-3">
+					{
+						alertStatuses.map((status) => (
+							<AlertBox status={status}>
+								The <code>{status}</code> status, carrying a sentence long enough to wrap on a
+								narrow viewport and show how the body column holds beside the icon.
+							</AlertBox>
+						))
+					}
+					<AlertBox showIcon={false}>No icon rail on this one.</AlertBox>
+				</div>
+			</Specimen>
+			<Specimen
+				name="card-frame / grid"
+				note="One column, two from <code>md</code>; renders nothing when the slot is empty."
+				source="components/parts/"
+			>
+				<Grid>
+					<CardFrame>
+						<div class="text-sm">A framed panel</div>
+					</CardFrame>
+					<CardFrame>
+						<div class="text-sm">A second panel, to show the grid gap</div>
+					</CardFrame>
+				</Grid>
+			</Specimen>
+			<Specimen name="author-card" source="components/parts/author-card.astro">
+				<AuthorCard />
+			</Specimen>
+			<Specimen
+				name="pagination-counter"
+				note="Hides itself on the first page: 1 of 1, then 3 of 12."
+				source="components/parts/pagination-counter.astro"
+			>
+				<div class="flex flex-col gap-2 text-sm">
+					<PaginationCounter page={samplePageFirst} />
+					<PaginationCounter page={samplePageMiddle} />
+				</div>
+			</Specimen>
+			<Specimen
+				name="pagination-select"
+				note="Without JavaScript the counter and the previous/next links stand alone."
+				source="components/parts/pagination-select.astro"
+			>
+				<div class="flex flex-col gap-4">
+					<PaginationSelect page={samplePageFirst} />
+					<PaginationSelect page={samplePageMiddle} />
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="activity-graph"
+				note="Log-scaled bins, so one huge day cannot flatten the rest. Days after today are an empty future state."
+				source="components/parts/activity-graph.astro"
+			>
+				<div class="content-column-fill">
+					<div class="px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+						<ActivityGraph
+							ariaLabel={`Sample activity across ${sampleYear}`}
+							values={sampleActivityValues}
+							year={sampleYear}
+						>
+							<div class="flex flex-wrap gap-x-1">
+								<DividedItem>Fixture data, not the Chronology</DividedItem>
+								<DividedItem>{sampleYear}</DividedItem>
+							</div>
+						</ActivityGraph>
+					</div>
+				</div>
+			</Specimen>
+		</Section>
+		<Section
+			note="Ids resolve from the Images collection at render time, because a fixture cannot invent one."
+			title="Images"
+		>
+			{
+				sampleImage ? (
+					<>
+						<Specimen
+							name="image"
+							note="Unpic builds the <code>srcset</code>; the imagor URL is signed server-side."
+							source="components/parts/image.astro"
+						>
+							<Image {...sampleImage.imageProps} />
+						</Specimen>
+						<Specimen name="image-placeholder" source="components/image/image-placeholder.astro">
+							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+								<div>
+									<ImagePlaceholder
+										class="overflow-hidden rounded-xs"
+										placeholderProps={sampleImage.placeholderProps}
+									>
+										<div class="aspect-3/2" />
+									</ImagePlaceholder>
+									<div class={`mt-1 ${captionClass}`}>with placeholderProps</div>
+								</div>
+								<div>
+									<ImagePlaceholder class="overflow-hidden rounded-xs">
+										<div class="aspect-3/2" />
+									</ImagePlaceholder>
+									<div class={`mt-1 ${captionClass}`}>without</div>
+								</div>
+							</div>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="content-image"
+							note="The caption doubles as the alt text when no <code>alt</code> is given."
+							source="components/content/content-image.astro"
+						>
+							<Prose showBlocks={true}>
+								{imageLayouts.map((layout, index) => {
+									const entry = sampleImages.landscape[index] ?? sampleImage.entry;
+
+									return (
+										<ContentImage imageId={entry.id} layout={layout} showMetadata={false}>
+											The <code>{layout}</code> layout
+										</ContentImage>
+									);
+								})}
+							</Prose>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="content-image (portrait)"
+							note="The frame takes its aspect ratio from the Image's own dimensions rather than snapping to 3:2."
+							source="components/content/content-image.astro"
+						>
+							<Prose showBlocks={true}>
+								{sampleImages.portrait ? (
+									<ContentImage imageId={sampleImages.portrait.id} showMetadata={false}>
+										A portrait frame, measured from the source dimensions
+									</ContentImage>
+								) : (
+									<p class={captionClass}>
+										No portrait Image in the collection, so the orientation branch is unexercised.
+									</p>
+								)}
+							</Prose>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="mdx/img"
+							note="Auto-imported; delegates to <code>content-image</code> with metadata on by default."
+							source="components/mdx/img.astro"
+						>
+							<Prose showBlocks={true}>
+								<Img src={sampleImage.entry.id}>
+									A caption beneath the frame, with the metadata panel behind the eye icon
+								</Img>
+							</Prose>
+						</Specimen>
+						<Specimen
+							name="image-metadata"
+							note="EXIF from the photograph, revealed on hover or focus."
+							source="components/image-metadata/image-metadata.astro"
+						>
+							<ImagePlaceholder
+								class="relative overflow-hidden rounded-xs"
+								placeholderProps={sampleImage.placeholderProps}
+							>
+								<Image {...sampleImage.imageProps} />
+								<ImageMetadata entry={sampleImage.entry} />
+							</ImagePlaceholder>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="mdx/img-group (grid)"
+							note="The column count derives from the image count; the satteri plugin normally injects both props."
+							source="components/mdx/img-group.astro"
+						>
+							<Prose showBlocks={true}>
+								<ImgGroup
+									context={ImageContextEnum.Grid}
+									imageCount={sampleImages.landscape.length}
+								>
+									{sampleImages.landscape.map((entry) => (
+										<ContentImage
+											context={ImageContextEnum.Grid}
+											imageId={entry.id}
+											showMetadata={false}
+										/>
+									))}
+								</ImgGroup>
+							</Prose>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="mdx/img-group (carousel)"
+							note="Navigation stays visible at every width, unlike the generic carousel."
+							source="components/mdx/img-group.astro"
+						>
+							<Prose showBlocks={true}>
+								<ImgGroup
+									context={ImageContextEnum.Carousel}
+									imageCount={sampleImages.landscape.length}
+								>
+									{sampleImages.landscape.map((entry) => (
+										<ContentImage
+											context={ImageContextEnum.Carousel}
+											imageId={entry.id}
+											showMetadata={false}
+										>
+											{entry.data.title}
+										</ContentImage>
+									))}
+								</ImgGroup>
+							</Prose>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="image-carousel"
+							source="components/image/image-carousel.astro"
+						>
+							<div class="content-column-fill">
+								<ImageCarousel imageFeaturedGroup={sampleImageFeaturedGroup} />
+							</div>
+						</Specimen>
+						<Specimen
+							bleed={true}
+							name="image-hero"
+							note="The header overlays from <code>sm</code> up and drops beneath below it. Narrow the window for both states."
+							source="components/image/image-hero.astro"
+						>
+							<ImageHero
+								fallbackAlt="Fallback alt text"
+								imageFeaturedGroup={sampleImageFeaturedGroup}
+							>
+								<ContentHeader hasHeroImage={true}>
+									<Fragment slot="header-title">Taiwan Sugar Railway workshops</Fragment>
+									<Fragment slot="header-title-multilingual">
+										<TextMultilingual content={sampleTitleChinese} />
+									</Fragment>
+									<Fragment slot="header-subtitle">
+										<DividedItem>
+											<ContentCollectionLink collection="posts" />
+										</DividedItem>
+										<DividedItem>
+											<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
+										</DividedItem>
+									</Fragment>
+								</ContentHeader>
+							</ImageHero>
+						</Specimen>
+					</>
+				) : (
+					<Specimen name="Images" source="components/image/">
+						<p class={captionClass}>{noMedia}</p>
+					</Specimen>
+				)
+			}
+		</Section>
+		<Section title="Content">
+			<Specimen
+				bleed={true}
+				name="content-header"
+				note="Every part is a slot; the caption is pushed to the far end of the subtitle row."
+				source="components/content/content-header.astro"
+			>
+				<ContentHeader>
+					<Fragment slot="header-title">
+						An Entry title long enough to wrap and show the balance
+					</Fragment>
+					<Fragment slot="header-title-multilingual">
+						<TextMultilingual content={sampleTitleChinese} />
+					</Fragment>
+					<Fragment slot="header-subtitle">
+						<DividedItem>
+							<ContentCollectionLink collection="locations" />
+						</DividedItem>
+						<DividedItem>
+							<ContentDate
+								date={sampleDate}
+								datePreset={DatePresetEnum.Medium}
+								showMicroformats={true}
+							/>
+						</DividedItem>
+						<DividedItem>
+							<ContentDate
+								date={sampleDateUpdated}
+								datePreset={DatePresetEnum.Medium}
+								showMicroformats={true}
+								showUpdated={true}
+							/>
+						</DividedItem>
+					</Fragment>
+					<Fragment slot="header-caption">8 minute read</Fragment>
+				</ContentHeader>
+				<ContentHeader>
+					<Fragment slot="header-title">The same header, title only</Fragment>
+				</ContentHeader>
+			</Specimen>
+			<Specimen
+				name="content-date"
+				note="Renders nothing when the date is undefined."
+				source="components/content/content-date.astro"
+			>
+				<div class="flex flex-wrap items-baseline gap-x-6 gap-y-2 text-sm">
+					<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
+					<ContentDate
+						date={sampleDateUpdated}
+						datePreset={DatePresetEnum.Medium}
+						showUpdated={true}
+					/>
+					<span class={captionClass}>
+						undefined date: <ContentDate
+							date={undefined}
+							datePreset={DatePresetEnum.Medium}
+						/>(nothing)
+					</span>
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="content-section"
+				note="Every header part is an optional slot. Renders nothing without a description or children."
+				source="components/content/content-section.astro"
+			>
+				<ContentSection>
+					<Fragment slot="section-title">Default title</Fragment>
+					<Fragment slot="section-subtitle">A subtitle beneath it</Fragment>
+					<Fragment slot="section-description">
+						<p>A description, rendered through the prose surface.</p>
+					</Fragment>
+					<p class={captionClass}>Section children</p>
+				</ContentSection>
+				<ContentSection marginSmall={true} titleLarge={true}>
+					<Fragment slot="section-title">titleLarge with marginSmall</Fragment>
+					<p class={captionClass}>Section children</p>
+				</ContentSection>
+				<ContentSection fillViewport={true}>
+					<Fragment slot="section-title">fillViewport</Fragment>
+					<p class={captionClass}>Reaches the viewport edge below the sm breakpoint</p>
+				</ContentSection>
+			</Specimen>
+			<Specimen
+				name="content-prose"
+				note="Takes an Entry, or a body and description directly. Falls back to the description when there is no body."
+				source="components/content/content-prose.astro"
+			>
+				<ContentProse>
+					<p>The Entry body, rendered through the prose surface with block children allowed.</p>
+				</ContentProse>
+				<ContentProse
+					description="The description, standing in for a body the Entry does not have."
+				/>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="content-excerpt"
+				note="Cut at the author's <code>More</code> fold, footnotes stripped."
+				source="components/content/content-excerpt.astro"
+			>
+				<ContentExcerpt entryUrl={sampleUrl} imageId={sampleImageIds[1]} showDivider={true}>
+					<Fragment slot="excerpt-title">An excerpt title, linked to its Entry</Fragment>
+					<Fragment slot="excerpt-subtitle">
+						<DividedItem>
+							<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
+						</DividedItem>
+						<DividedItem>8 minute read</DividedItem>
+					</Fragment>
+					<ProseSample />
+				</ContentExcerpt>
+			</Specimen>
+			<Specimen
+				name="preview-card"
+				note="Driven by its slots rather than by a Catalog item."
+				source="components/parts/preview-card.astro"
+			>
+				<div class="max-w-md">
+					{
+						sampleItem ? (
+							<PreviewCard
+								alt={sampleItem.title}
+								imageId={sampleItem.imageId}
+								linkUrl={sampleItem.url}
+							>
+								<Fragment slot="preview-title">{sampleItem.title}</Fragment>
+								<Fragment slot="preview-title-multilingual">
+									<TextMultilingual content={sampleTitleChinese} />
+								</Fragment>
+								<Fragment slot="preview-subtitle">
+									<PreviewSubtitle
+										item={sampleItem}
+										showCollection={true}
+										showDate={true}
+										showLocations={true}
+									/>
+								</Fragment>
+								<Fragment slot="preview-description">
+									<Fragment set:html={renderMarkdownInline(sampleItem.description ?? '')} />
+								</Fragment>
+							</PreviewCard>
+						) : undefined
+					}
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="preview-grid"
+				note="The fourth item has no Featured Image and falls back to the seigaiha pattern."
+				source="components/parts/preview-grid.astro"
+			>
+				<div class="content-column">
+					<PreviewGrid
+						items={sampleItems}
+						showCollection={true}
+						showDescription={true}
+						showDate={true}
+						showLocations={true}
+						showRegion={true}
+						showTitleMultilingual={true}
+					/>
+				</div>
+			</Specimen>
+			<Specimen
+				name="preview-list"
+				note="Past the count threshold it appends a linked “and N more”."
+				source="components/parts/preview-list.astro"
+			>
+				<Prose showCompact={true}>
+					<p><PreviewList items={sampleItems} /></p>
+					<p><PreviewList count={64} items={sampleItems} url={sampleUrl} /></p>
+				</Prose>
+			</Specimen>
+			<Specimen
+				name="preview-column"
+				note="Backlinks, similar Entries, and Series contents all render through this."
+				source="components/parts/preview-column.astro"
+			>
+				<PreviewColumn items={sampleItems} />
+			</Specimen>
+			<Specimen
+				name="content-collection-link"
+				source="components/content/content-collection-link.astro"
+			>
+				<div class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+					<ContentCollectionLink collection="locations" />
+					<ContentCollectionLink collection="posts" />
+					<ContentCollectionLink collection="regions" />
+					<ContentCollectionLink collection="themes" />
+				</div>
+			</Specimen>
+		</Section>
+		<Section
+			note="Each resolves its own data, then hands the markup to the presentational component rendered here."
+			title="Sections"
+		>
+			<Specimen
+				bleed={true}
+				name="section-previews"
+				note="The body of every listing route."
+				source="components/sections/section-previews.astro"
+			>
+				<SectionPreviews page={samplePageMiddle} title="Recent Updates" />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-preview-list"
+				source="components/sections/section-preview-list.astro"
+			>
+				<SectionPreviewList count={64} items={sampleItems} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-backlinks"
+				note="Capped at ten."
+				source="components/sections/section-backlinks.astro"
+			>
+				<SectionBacklinks backlinks={sampleItems} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-date-list"
+				note="An entry authored without a time shows none."
+				source="components/sections/section-date-list.astro"
+			>
+				<SectionDateList dates={sampleDatesRecorded} title={t('section.dateRecorded')} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-regions"
+				source="components/sections/section-regions.astro"
+			>
+				<SectionRegions regionIds={sampleRegionIds} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-themes"
+				note="Sorted by how many Entries each holds."
+				source="components/sections/section-themes.astro"
+			>
+				<SectionThemes themeIds={sampleThemeIds} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-author"
+				note="Takes no Entry: a fixed photograph and the microformat, no visible text."
+				source="components/sections/section-author.astro"
+			>
+				<SectionAuthor showAuthor={true} />
+			</Specimen>
+			<Specimen
+				name="resources-links"
+				note="A real Resource links to its own page; one written inline in frontmatter has none."
+				source="components/resources/resources-links.astro"
+			>
+				<ResourcesLinks links={[...sampleResources.links, sampleLinkInline]} />
+			</Specimen>
+			<Specimen
+				name="resources-sources"
+				note="A Multilingual Title renders a second citation line beneath the first."
+				source="components/resources/resources-sources.astro"
+			>
+				<ResourcesSources sources={[...sampleResources.sources, sampleSourceInline]} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="series-section"
+				note="The description is a slot, so the container renders the Series body itself."
+				source="components/series/series-section.astro"
+			>
+				<SeriesSection items={sampleItems} seriesTitle="A Series title" seriesUrl={sampleUrl}>
+					<p>The Series description, rendered from its own Entry body.</p>
+				</SeriesSection>
+			</Specimen>
+			<Specimen
+				name="webmentions-list"
+				note="A reply runs to a forty-word clip; no author URL renders the name as plain text."
+				source="components/webmentions/webmentions-list.astro"
+			>
+				<WebmentionsList counts={sampleWebmentionCounts} replies={sampleWebmentionReplies} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="section-map"
+				note="The one React island here; source and popup data are inlined, so it draws without a chunk endpoint."
+				source="components/map/map-component.astro"
+			>
+				{
+					sampleMapData.hasGeodata ? (
+						<MapComponent mapComponentProps={sampleMapData} />
+					) : (
+						<p class={captionClass}>
+							No Location carries geometry, so the map has nothing to draw.
+						</p>
+					)
+				}
+			</Specimen>
+		</Section>
+	</div>
+</MainSite>

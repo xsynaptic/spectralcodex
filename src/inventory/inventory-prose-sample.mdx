@@ -1,0 +1,50 @@
+Every paragraph, list, and rule below is real MDX run through the configured satteri pipeline,
+so what renders here is what an Entry body renders. The opening run is deliberately long enough
+to show the measure, the leading, and how <Link id="ds-sample-post">an internal reference</Link>
+sits inside a line of body text. An id the Catalog does not hold falls back to plain text rather
+than throwing, which is the branch this sample exercises.
+
+<More />
+
+Ordinary [outbound links](https://example.com/) carry the halo treatment so they stay legible
+over a busy hero. Inline `code`, **strong emphasis**, *emphasis*, and <mark>a marked run</mark>
+all sit on the same baseline. Contact goes through <Email>nobody@example.com</Email>, and a
+sensitive detail is masked with <Hide>a redacted string</Hide>.
+
+## Heading level two
+
+Headings size in `em` against the body, so they scale with the prose step rather than the type
+scale. Vietnamese diacritics stack tall enough to test the leading: *Nhà thờ Đức Bà Sài Gòn, xây
+dựng từ năm 1863 đến 1880.* Chinese runs wrap by phrase rather than by character:
+<span lang="zh" class="cjk-text">臺灣糖業鐵路曾經是全世界規模最大的窄軌鐵道系統之一。</span>
+
+### Heading level three
+
+1. An ordered item, with the marker in the accent ramp
+2. A second item, long enough to wrap onto a second line and show that the hanging indent holds
+   its alignment against the marker
+   1. A nested ordered item
+   2. Another one
+3. A third item
+
+#### Heading level four
+
+- An unordered item
+- A second item
+  - A nested unordered item
+  - Another one
+- A third item, carrying a footnote[^1]
+
+> A blockquote, set in italics against a left rule. It inherits the prose measure and drops its
+> own margins at the ends of a run.
+
+---
+
+| Collection | Entries | Notes |
+| --- | ---: | --- |
+| Locations | 1,183 | The central noun |
+| Posts | 214 | Photo essays and field notes |
+| Regions | 96 | Hierarchical, cumulative membership |
+
+[^1]: Footnote markup comes from remark-rehype, and the reference is bracketed by generated
+content rather than by characters in the body.

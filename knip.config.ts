@@ -6,7 +6,8 @@ export default {
 	workspaces: {
 		'.': {
 			// MDX auto-import components; referenced via remark-auto-import, not static imports
-			entry: ['src/components/mdx/*.astro'],
+			// The inventory page is injected as a route under `astro dev`, never imported
+			entry: ['src/components/mdx/*.astro', 'src/inventory/inventory.astro'],
 			ignore: [
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported
 			],

@@ -1,0 +1,46 @@
+---
+import Prose from '#components/parts/prose.astro';
+
+interface Props {
+	bleed?: boolean | undefined;
+	name: string;
+	note?: string | undefined;
+	source?: string | undefined;
+}
+
+const { bleed = false, name, note, source } = Astro.props;
+---
+
+<section class="mt-10">
+	<div class="content-column">
+		<h3
+			class="flex flex-wrap items-baseline gap-x-3 font-display text-sm font-semibold text-accent-600 dark:text-accent-400"
+		>
+			{name}
+			{
+				source ? (
+					<span class="text-xs font-normal text-primary-400 dark:text-primary-500">{source}</span>
+				) : undefined
+			}
+		</h3>
+		{
+			note ? (
+				<Prose
+					class="mt-1 max-w-prose font-sans text-sm text-primary-500 dark:text-primary-400"
+					showCompact={true}
+				>
+					<p set:html={note} />
+				</Prose>
+			) : undefined
+		}
+	</div>
+	<div class:list={['mt-3', bleed ? undefined : 'content-column']}>
+		<div
+			class:list={bleed
+				? 'py-2'
+				: 'rounded-sm border border-primary-300 p-5 dark:border-primary-700'}
+		>
+			<slot />
+		</div>
+	</div>
+</section>

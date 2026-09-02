@@ -15,6 +15,8 @@ import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
+import inventory from './src/inventory/inventory-integration.ts';
+
 const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
@@ -208,6 +210,7 @@ export default defineConfig({
 			},
 		}),
 		buildLogger(),
+		inventory(),
 	],
 	fonts: [
 		{
