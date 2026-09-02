@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.20.0",
+	"version": "7.21.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -107,10 +107,10 @@
 		"globals": "^17.11.0",
 		"kdbush": "^4.1.0",
 		"keyv": "^5.6.0",
-		"knip": "^6.33.0",
+		"knip": "^6.34.0",
 		"lefthook": "^2.1.12",
 		"ohash": "^2.0.12",
-		"p-limit": "^7.3.1",
+		"p-limit": "^7.3.2",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
@@ -127,5 +127,5 @@
 		"vitest": "^4.1.11",
 		"zod": "^4.5.4"
 	},
-	"packageManager": "pnpm@11.24.0"
+	"packageManager": "pnpm@11.25.0"
 }
