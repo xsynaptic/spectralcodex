@@ -1,4 +1,7 @@
-/* Hook prefix: stats- */
+/*
+ * Linked by the MDX component rather than bundled into main.css; only one page renders a chart
+ * Unlayered as a result, so it outranks main.css's layered rules; nothing else targets these hooks
+ */
 .stats-chart {
 	--stats-ink: light-dark(var(--color-primary-900), var(--color-primary-100));
 	--stats-ink-muted: light-dark(var(--color-primary-500), var(--color-primary-400));

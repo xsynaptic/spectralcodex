@@ -4,6 +4,7 @@ import BuildStatsPages from '#components/build-stats/build-stats-pages.astro';
 import { getBuildStatsGeometry } from '#lib/build-stats/build-stats-geometry.ts';
 import { getBuildRecords } from '#lib/build-stats/build-stats-loader.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import buildStatsCssUrl from '#styles/build-stats.css?url';
 
 interface Props {
 	daysLimit?: number;
@@ -20,6 +21,7 @@ const geometry = getBuildStatsGeometry(await getBuildRecords(), { daysLimit, tre
 {
 	geometry ? (
 		<Fragment>
+			<link rel="stylesheet" href={buildStatsCssUrl} />
 			<BuildStatsDuration geometry={geometry.duration} axisTicks={geometry.axisTicks} />
 			{geometry.pages ? (
 				<BuildStatsPages geometry={geometry.pages} axisTicks={geometry.axisTicks} />

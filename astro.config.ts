@@ -126,6 +126,12 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		plugins: [tailwindcss()],
+		css: {
+			lightningcss: {
+				// MapLibre's logo control never mounts and its data-URI rules are half of maplibre-gl.css
+				unusedSymbols: ['maplibregl-ctrl-logo'],
+			},
+		},
 		build: {
 			rollupOptions: {
 				output: {
