@@ -7,9 +7,8 @@ import * as R from 'remeda';
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import AlertBox from '#components/parts/alert-box.astro';
+import LocationsNotices from '#components/locations/locations-notices.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -31,35 +30,23 @@ const shouldShowVanishedNotice = entry.data.status === LocationStatusEnum.Vanish
 const showChinese = langCode?.startsWith('zh');
 
 const t = getTranslations();
+
+const noticeKeys = [
+	...(shouldShowVanishedNotice ? (['notice.vanished'] as const) : []),
+	...(shouldShowDangerNotice && !shouldShowVanishedNotice ? (['notice.danger'] as const) : []),
+	...(entry.data.entryQuality <= 1 ? (['notice.quality'] as const) : []),
+];
+
+const notices = noticeKeys.map((key) => ({
+	text: t(key),
+	textAlt: showChinese ? t(key, langCode) : undefined,
+}));
 ---
 
 {
 	shouldShowDangerNotice || shouldShowVanishedNotice ? (
 		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
-			{shouldShowVanishedNotice ? (
-				<AlertBox status="warning">
-					<Fragment set:html={renderMarkdownInline(t('notice.vanished'))} />
-					{showChinese ? (
-						<Fragment set:html={renderMarkdownInline(t('notice.vanished', langCode))} />
-					) : undefined}
-				</AlertBox>
-			) : undefined}
-			{shouldShowDangerNotice && !shouldShowVanishedNotice ? (
-				<AlertBox status="warning">
-					<Fragment set:html={renderMarkdownInline(t('notice.danger'))} />
-					{showChinese ? (
-						<Fragment set:html={renderMarkdownInline(t('notice.danger', langCode))} />
-					) : undefined}
-				</AlertBox>
-			) : undefined}
-			{entry.data.entryQuality <= 1 ? (
-				<AlertBox status="warning">
-					<Fragment set:html={renderMarkdownInline(t('notice.quality'))} />
-					{showChinese ? (
-						<Fragment set:html={renderMarkdownInline(t('notice.quality', langCode))} />
-					) : undefined}
-				</AlertBox>
-			) : undefined}
+			<LocationsNotices notices={notices} />
 		</ContentSection>
 	) : undefined
 }

@@ -2,12 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
-import DividedItem from '#components/parts/divided-item.astro';
-import ListColumnItem from '#components/parts/list-column-item.astro';
-import ListColumn from '#components/parts/list-column.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { buildResourceLink } from '#components/sections/section-links.ts';
+import ResourcesLinks from '#components/resources/resources-links.astro';
 import { createResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -28,38 +23,7 @@ const t = getTranslations();
 	links && links.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('section.links')}</Fragment>
-			<ListColumn class="font-serif text-xs sm:text-sm">
-				{links.map((link) => {
-					const { url, title, titleMultilingual, resourceUrl } = buildResourceLink(link);
-
-					return (
-						<ListColumnItem>
-							{resourceUrl ? (
-								<>
-									<DividedItem>
-										<Anchor href={url}>{title}</Anchor>
-										{titleMultilingual ? (
-											<TextMultilingual content={titleMultilingual} parenthesis={true} />
-										) : undefined}
-									</DividedItem>
-									<DividedItem>
-										<Anchor class="italic" href={resourceUrl}>
-											{t('collection.resources.showPage.label')}
-										</Anchor>
-									</DividedItem>
-								</>
-							) : (
-								<>
-									<Anchor href={url}>{title}</Anchor>
-									{titleMultilingual ? (
-										<TextMultilingual content={titleMultilingual} parenthesis={true} />
-									) : undefined}
-								</>
-							)}
-						</ListColumnItem>
-					);
-				})}
-			</ListColumn>
+			<ResourcesLinks links={links} />
 		</ContentSection>
 	) : undefined
 }

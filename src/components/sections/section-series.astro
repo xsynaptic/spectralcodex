@@ -3,17 +3,9 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
-import ListColumnItem from '#components/parts/list-column-item.astro';
-import ListColumn from '#components/parts/list-column.astro';
-import Prose from '#components/parts/prose.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
+import SeriesSection from '#components/series/series-section.astro';
 import { createSeriesByIdFunction } from '#lib/collections/series/series-utils.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-
-const t = getTranslations();
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts'>;
@@ -27,33 +19,18 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 ---
 
 {
-	seriesData.length > 0
-		? seriesData.map(async ({ entry: seriesEntry, catalogItems }) => {
-				const { Content } = await render(seriesEntry);
+	seriesData.map(async ({ entry: seriesEntry, catalogItems }) => {
+		const { Content } = await render(seriesEntry);
 
-				return catalogItems.length > 0 ? (
-					<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-						<Fragment slot="section-title">
-							{t('collection.series.labelPlural')}:{' '}
-							<a href={getContentUrl(seriesEntry.collection, seriesEntry.id)}>
-								{seriesEntry.data.title}
-							</a>
-						</Fragment>
-						<Prose showCompact={true}>
-							<Content />
-						</Prose>
-						<ListColumn class="mt-4 font-serif text-xs md:text-sm">
-							{catalogItems.map(({ url, title, titleMultilingual }) => (
-								<ListColumnItem>
-									<Anchor href={url}>{title}</Anchor>
-									{titleMultilingual ? (
-										<TextMultilingual content={titleMultilingual} parenthesis={true} />
-									) : undefined}
-								</ListColumnItem>
-							))}
-						</ListColumn>
-					</ContentSection>
-				) : undefined;
-			})
-		: undefined
+		return catalogItems.length > 0 ? (
+			<SeriesSection
+				items={catalogItems}
+				title={seriesEntry.data.title}
+				url={getContentUrl(seriesEntry.collection, seriesEntry.id)}
+				{...props}
+			>
+				<Content />
+			</SeriesSection>
+		) : undefined;
+	})
 }

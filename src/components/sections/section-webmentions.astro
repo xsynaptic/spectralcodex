@@ -4,19 +4,9 @@ import type { CollectionEntry } from 'astro:content';
 import { WEBMENTIONS_SHOW } from 'astro:env/server';
 
 import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
-import DateDisplay from '#components/parts/date-display.astro';
-import DividedItem from '#components/parts/divided-item.astro';
-import ListColumnItem from '#components/parts/list-column-item.astro';
-import ListColumn from '#components/parts/list-column.astro';
-import ListRow from '#components/parts/list-row.astro';
-import { getWebmentionsFunction } from '#components/sections/section-webmentions.ts';
+import { getWebmentionsFunction } from '#components/webmentions/webmentions-data.ts';
+import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { DatePresetEnum } from '#lib/utils/date.ts';
-import { textClipper } from '#lib/utils/text.ts';
-
-// Replies run long; a clipped quote is enough to decide whether to follow the source
-const textWordLimit = 40;
 
 interface Props {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'> | undefined;
@@ -51,44 +41,7 @@ const counts = webmentions
 	webmentions && (counts.length > 0 || webmentions.replies.length > 0) ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('section.webmentions')}</Fragment>
-			{counts.length > 0 ? (
-				<ListRow class="mb-2">
-					{counts.map(({ label, count }) => (
-						<DividedItem as="li" dividerWeight="thin" class="font-serif text-xs sm:text-sm">
-							{label}: {count}
-						</DividedItem>
-					))}
-				</ListRow>
-			) : undefined}
-			{webmentions.replies.length > 0 ? (
-				<ListColumn class="font-serif text-xs sm:text-sm">
-					{webmentions.replies.map((reply) => (
-						<ListColumnItem>
-							<ListRow>
-								<DividedItem as="li" dividerWeight="thin">
-									{reply.authorUrl ? (
-										<Anchor href={reply.authorUrl} rel="nofollow ugc">
-											{reply.authorName}
-										</Anchor>
-									) : (
-										reply.authorName
-									)}
-								</DividedItem>
-								<DividedItem as="li" dividerWeight="thin">
-									<Anchor href={reply.sourceUrl} rel="nofollow ugc" anchorColor="primary">
-										<DateDisplay date={reply.dateReceived} datePreset={DatePresetEnum.Medium} />
-									</Anchor>
-								</DividedItem>
-							</ListRow>
-							{reply.text ? (
-								<span class="w-full text-primary-600 dark:text-primary-400">
-									{textClipper(reply.text, { wordCount: textWordLimit })}
-								</span>
-							) : undefined}
-						</ListColumnItem>
-					))}
-				</ListColumn>
-			) : undefined}
+			<WebmentionsList counts={counts} replies={webmentions.replies} />
 		</ContentSection>
 	) : undefined
 }

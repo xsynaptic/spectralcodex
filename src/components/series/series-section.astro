@@ -1,0 +1,30 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+
+import ContentSection from '#components/content/content-section.astro';
+import PreviewColumn from '#components/parts/preview-column.astro';
+import Prose from '#components/parts/prose.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props extends HTMLAttributes<'div'> {
+	items: Array<CatalogItem>;
+	title: string;
+	url: string;
+}
+
+const { items, title, url, ...props } = Astro.props;
+
+const t = getTranslations();
+---
+
+<ContentSection data-pagefind-ignore data-nosnippet {...props}>
+	<Fragment slot="section-title">
+		{t('collection.series.labelPlural')}: <a href={url}>{title}</a>
+	</Fragment>
+	<Prose showCompact={true}>
+		<slot />
+	</Prose>
+	<PreviewColumn class="mt-4" items={items} />
+</ContentSection>

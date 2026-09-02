@@ -29,9 +29,10 @@
 	--anchor-hover: light-dark(var(--color-primary-600), var(--color-primary-50));
 }
 
+/* Always on a dark ground (image captions), so it does not swap with the mode */
 .anchor-primary-bright {
-	--anchor-color: light-dark(var(--color-primary-300), var(--color-primary-600));
-	--anchor-hover: light-dark(var(--color-primary-100), var(--color-primary-300));
+	--anchor-color: var(--color-primary-300);
+	--anchor-hover: var(--color-primary-100);
 }
 
 .anchor-highlight {

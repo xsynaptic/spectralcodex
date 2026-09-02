@@ -1,0 +1,64 @@
+---
+import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
+
+import Anchor from '#components/parts/anchor.astro';
+import DateDisplay from '#components/parts/date-display.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import ListRow from '#components/parts/list-row.astro';
+import { DatePresetEnum } from '#lib/utils/date.ts';
+import { textClipper } from '#lib/utils/text.ts';
+
+// Replies run long; a clipped quote is enough to decide whether to follow the source
+const textWordLimit = 40;
+
+interface Props {
+	counts: Array<{ label: string; count: number }>;
+	replies: Array<WebmentionReply>;
+}
+
+const { counts, replies } = Astro.props;
+---
+
+{
+	counts.length > 0 ? (
+		<ListRow class="mb-2">
+			{counts.map(({ label, count }) => (
+				<DividedItem as="li" dividerWeight="thin" class="font-serif text-xs sm:text-sm">
+					{label}: {count}
+				</DividedItem>
+			))}
+		</ListRow>
+	) : undefined
+}{
+	replies.length > 0 ? (
+		<ListColumn class="font-serif text-xs sm:text-sm">
+			{replies.map((reply) => (
+				<ListColumnItem>
+					<ListRow>
+						<DividedItem as="li" dividerWeight="thin">
+							{reply.authorUrl ? (
+								<Anchor href={reply.authorUrl} rel="nofollow ugc">
+									{reply.authorName}
+								</Anchor>
+							) : (
+								reply.authorName
+							)}
+						</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">
+							<Anchor href={reply.sourceUrl} rel="nofollow ugc" anchorColor="primary">
+								<DateDisplay date={reply.dateReceived} datePreset={DatePresetEnum.Medium} />
+							</Anchor>
+						</DividedItem>
+					</ListRow>
+					{reply.text ? (
+						<span class="w-full text-primary-600 dark:text-primary-400">
+							{textClipper(reply.text, { wordCount: textWordLimit })}
+						</span>
+					) : undefined}
+				</ListColumnItem>
+			))}
+		</ListColumn>
+	) : undefined
+}

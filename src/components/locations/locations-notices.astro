@@ -1,0 +1,19 @@
+---
+import AlertBox from '#components/parts/alert-box.astro';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
+
+interface Props {
+	notices: Array<{ text: string; textAlt: string | undefined }>;
+}
+
+const { notices } = Astro.props;
+---
+
+{
+	notices.map(({ text, textAlt }) => (
+		<AlertBox status="warning">
+			<Fragment set:html={renderMarkdownInline(text)} />
+			{textAlt ? <Fragment set:html={renderMarkdownInline(textAlt)} /> : undefined}
+		</AlertBox>
+	))
+}

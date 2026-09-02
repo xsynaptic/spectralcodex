@@ -1,17 +1,24 @@
 ---
 import type { ComponentProps } from 'astro/types';
 
+import ChronologyActivity from '#components/chronology/chronology-activity.astro';
+import ChronologyItem from '#components/chronology/chronology-item.astro';
+import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentImage from '#components/content/content-image.astro';
-import ContentProse from '#components/content/content-prose.astro';
 import ContentSection from '#components/content/content-section.astro';
 import ImageMetadata from '#components/image-metadata/image-metadata.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import LocationsAddress from '#components/locations/locations-address.astro';
+import LocationsHeritageList from '#components/locations/locations-heritage-list.astro';
+import LocationsNotices from '#components/locations/locations-notices.astro';
+import SectionNearbyList from '#components/locations/locations-section-nearby-list.astro';
+import LocationsTable from '#components/locations/locations-table.astro';
 import MainSite from '#components/main/main-site.astro';
 import MapComponent from '#components/map/map-component.astro';
 import ImgGroup from '#components/mdx/img-group.astro';
@@ -41,6 +48,10 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import TextParenthesis from '#components/parts/text-parenthesis.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
 import TextWash from '#components/parts/text-wash.astro';
+import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
+import RegionsDivision from '#components/regions/regions-division.astro';
+import RegionsList from '#components/regions/regions-list.astro';
+import RegionsRelated from '#components/regions/regions-related.astro';
 import ResourcesLinks from '#components/resources/resources-links.astro';
 import ResourcesSources from '#components/resources/resources-sources.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
@@ -55,18 +66,26 @@ import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import {
 	createSampleActivityValues,
 	createSampleCatalogItems,
+	createSampleDailyData,
 	createSampleImageFeaturedGroup,
 	createSampleImageProps,
 	createSampleMapData,
+	createSampleNotices,
 	createSamplePage,
+	getSampleDivisionRegionId,
 	getSampleImages,
-	getSampleRegionId,
-	getSampleRegionIds,
+	getSampleLocations,
+	getSampleNearbyLocation,
+	getSampleRelatedRegion,
+	getSampleRegions,
 	getSampleResources,
 	getSampleThemeIds,
+	sampleChronologyMonths,
+	sampleChronologyYears,
 	sampleLinkInline,
 	samplePlaces,
 	sampleCitation,
+	sampleHeritage,
 	sampleCitationMultilingual,
 	sampleDate,
 	sampleDateEnd,
@@ -96,8 +115,13 @@ import './inventory.css';
 const t = getTranslations();
 
 const sampleImages = await getSampleImages();
-const sampleRegionId = await getSampleRegionId();
-const sampleRegionIds = await getSampleRegionIds();
+const sampleRegions = await getSampleRegions();
+const sampleRegionId = sampleRegions.deepest?.id;
+const sampleRegionIds = sampleRegions.nested.map((entry) => entry.id);
+const sampleDivisionRegionId = await getSampleDivisionRegionId();
+const sampleLocations = await getSampleLocations();
+const sampleNearbyLocation = await getSampleNearbyLocation();
+const sampleRelatedRegion = await getSampleRelatedRegion();
 const sampleThemeIds = await getSampleThemeIds();
 const sampleResources = await getSampleResources();
 const sampleMapData = await createSampleMapData();
@@ -119,10 +143,23 @@ const samplePageMiddle = createSamplePage({ items: sampleItems, currentPage: 3, 
 
 const sampleYear = String(new Date().getUTCFullYear());
 const sampleActivityValues = createSampleActivityValues(sampleYear);
+const sampleDailyData = createSampleDailyData(sampleYear);
+const sampleNotices = createSampleNotices();
+const sampleChronologyYear = sampleChronologyYears.at(-1) ?? sampleYear;
+const sampleChronologyMonth = sampleChronologyMonths[1];
 
 const noMedia = 'The Images collection is empty, so nothing here can resolve a photograph.';
 
-const sections = ['Foundations', 'Prose', 'Text', 'Parts', 'Images', 'Content', 'Sections'];
+const sections = [
+	'Foundations',
+	'Prose',
+	'Text',
+	'Parts',
+	'Images',
+	'Content',
+	'Sections',
+	'Domain',
+];
 
 const colorRamps = [
 	{ name: 'primary', source: 'zinc' },
@@ -869,7 +906,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 							/>
 						</DividedItem>
 					</Fragment>
-					<Fragment slot="header-caption">8 minute read</Fragment>
 				</ContentHeader>
 				<ContentHeader>
 					<Fragment slot="header-title">The same header, title only</Fragment>
@@ -917,18 +953,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<Fragment slot="section-title">fillViewport</Fragment>
 					<p class={captionClass}>Reaches the viewport edge below the sm breakpoint</p>
 				</ContentSection>
-			</Specimen>
-			<Specimen
-				name="content-prose"
-				note="Takes an Entry, or a body and description directly. Falls back to the description when there is no body."
-				source="components/content/content-prose.astro"
-			>
-				<ContentProse>
-					<p>The Entry body, rendered through the prose surface with block children allowed.</p>
-				</ContentProse>
-				<ContentProse
-					description="The description, standing in for a body the Entry does not have."
-				/>
 			</Specimen>
 			<Specimen
 				bleed={true}
@@ -1080,7 +1104,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="section-author"
-				note="Takes no Entry: a fixed photograph and the microformat, no visible text."
+				note="Takes no Entry: a fixed photograph, the microformat, and the bio from the translations. Rendered <code>sr-only</code> unless <code>showAuthor</code> is set."
 				source="components/sections/section-author.astro"
 			>
 				<SectionAuthor showAuthor={true} />
@@ -1105,7 +1129,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="The description is a slot, so the container renders the Series body itself."
 				source="components/series/series-section.astro"
 			>
-				<SeriesSection items={sampleItems} seriesTitle="A Series title" seriesUrl={sampleUrl}>
+				<SeriesSection items={sampleItems} title="A Series title" url={sampleUrl}>
 					<p>The Series description, rendered from its own Entry body.</p>
 				</SeriesSection>
 			</Specimen>
@@ -1128,6 +1152,170 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					) : (
 						<p class={captionClass}>
 							No Location carries geometry, so the map has nothing to draw.
+						</p>
+					)
+				}
+			</Specimen>
+		</Section>
+		<Section
+			note="Components tied to one collection: the Chronology, Locations, and Regions. Those resolving an Entry render a real one, found by predicate."
+			title="Domain"
+		>
+			<Specimen
+				name="chronology-navigation"
+				note="Years, then months once a year is current; the slot carries the index link back out."
+				source="components/chronology/chronology-navigation.astro"
+			>
+				<div class="flex flex-col gap-6">
+					<ChronologyNavigation
+						chronologyYears={sampleChronologyYears}
+						currentYear={sampleChronologyYear}
+					>
+						<Anchor class="font-semibold" href={sampleUrl}>{t('chronology.index.label')}</Anchor>
+					</ChronologyNavigation>
+					<ChronologyNavigation
+						chronologyMonths={sampleChronologyMonths}
+						chronologyYears={sampleChronologyYears}
+						currentMonth={sampleChronologyMonth}
+						currentYear={sampleChronologyYear}
+					/>
+				</div>
+			</Specimen>
+			<Specimen
+				name="chronology-item"
+				note="One line per activity kind; a count more than ten past the items becomes the linked “and N more”."
+				source="components/chronology/chronology-item.astro"
+			>
+				<div class="flex flex-col gap-2 text-sm text-primary-700 dark:text-primary-400">
+					<ChronologyItem items={sampleItems} title={t('chronology.updated.label')} />
+					<ChronologyItem
+						count={sampleItems.length + 24}
+						items={sampleItems}
+						title={t('chronology.created.label')}
+						url={sampleUrl}
+					/>
+					<ChronologyItem items={sampleItems.slice(0, 1)} title={t('chronology.visited.label')} />
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="chronology-activity"
+				note="The activity graph with its heading and totals line, as the yearly Chronology renders it."
+				source="components/chronology/chronology-activity.astro"
+			>
+				<ChronologyActivity dailyData={sampleDailyData} year={sampleYear} />
+			</Specimen>
+			<Specimen
+				name="locations-address"
+				note="Renders nothing without either part; the ／ separator is full-width on purpose."
+				source="components/locations/locations-address.astro"
+			>
+				<div class="flex flex-col gap-2">
+					<LocationsAddress
+						address="No. 1, Zhongshan Road, Xinying District, Tainan"
+						content={{ lang: sampleTitleChinese.lang, value: '臺南市新營區中山路1號' }}
+					/>
+					<LocationsAddress address="No. 1, Zhongshan Road, Xinying District, Tainan" />
+				</div>
+			</Specimen>
+			<Specimen
+				name="locations-table"
+				note="Real Locations; the Region column resolves each one's first Region."
+				source="components/locations/locations-table.astro"
+			>
+				<LocationsTable locations={sampleLocations} />
+			</Specimen>
+			<Specimen
+				name="regions-list"
+				note="A single Region with <code>showSingleRegionAncestors</code> expands to its ancestor run."
+				source="components/regions/regions-list.astro"
+			>
+				<div class="flex flex-col gap-2">
+					<RegionsList terms={sampleRegions.nested} />
+					<RegionsList dividerContent="chevron" terms={sampleRegions.nested} />
+					{
+						sampleRegions.deepest ? (
+							<RegionsList
+								dividerContent="chevron"
+								showSingleRegionAncestors={true}
+								terms={[sampleRegions.deepest]}
+							/>
+						) : undefined
+					}
+				</div>
+			</Specimen>
+			<Specimen
+				name="locations-heritage-list"
+				note="Every designation in the schema at once; a Location carries one or two."
+				source="components/locations/locations-heritage-list.astro"
+			>
+				<LocationsHeritageList heritage={sampleHeritage} />
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="locations-notices"
+				note="The only <code>alert-box warning</code> caller. All three stack here; a Location's own data can trigger at most two."
+				source="components/locations/locations-notices.astro"
+			>
+				<div class="content-column flex flex-col gap-2">
+					<LocationsNotices notices={sampleNotices} />
+				</div>
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="locations-section-nearby-list"
+				note="A real Location; distances come from the build-time neighbour pass, so nothing here is invented."
+				source="components/locations/locations-section-nearby-list.astro"
+			>
+				{
+					sampleNearbyLocation ? (
+						<SectionNearbyList entry={sampleNearbyLocation} limit={5} />
+					) : (
+						<p class={captionClass}>No Location has a resolved neighbour to list.</p>
+					)
+				}
+			</Specimen>
+			<Specimen
+				name="regions-breadcrumbs"
+				note="The deepest Region's ancestor run. The current term is plain text unless <code>showCurrentLink</code> is set."
+				source="components/regions/regions-breadcrumbs.astro"
+			>
+				{
+					sampleRegions.deepest ? (
+						<div class="flex flex-col gap-2">
+							<RegionsBreadcrumbs entry={sampleRegions.deepest} />
+							<RegionsBreadcrumbs entry={sampleRegions.deepest} showCurrentLink={true} />
+						</div>
+					) : (
+						<p class={captionClass}>No nested Region, so there is no ancestor run to walk.</p>
+					)
+				}
+			</Specimen>
+			<Specimen
+				bleed={true}
+				name="regions-related"
+				note="A column per relation, each heading an overridable slot; alternate titles appear below the second level."
+				source="components/regions/regions-related.astro"
+			>
+				{
+					sampleRelatedRegion ? (
+						<RegionsRelated entry={sampleRelatedRegion} limit={6} />
+					) : (
+						<p class={captionClass}>No Region has both children and siblings.</p>
+					)
+				}
+			</Specimen>
+			<Specimen
+				name="regions-division"
+				note="The cached Division outline for a Region; decorative, so it sits behind content and is hidden from assistive tech."
+				source="components/regions/regions-division.astro"
+			>
+				{
+					sampleDivisionRegionId ? (
+						<RegionsDivision entryId={sampleDivisionRegionId} />
+					) : (
+						<p class={captionClass}>
+							No Division SVG in the cache, so there is no outline to draw.
 						</p>
 					)
 				}

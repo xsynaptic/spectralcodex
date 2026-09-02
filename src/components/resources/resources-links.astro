@@ -1,0 +1,57 @@
+---
+import type { ResourceLink } from '#lib/collections/resources/resources-utils.ts';
+
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { buildResourceLink } from '#components/resources/resources-links.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	links: Array<ResourceLink>;
+	class?: string | undefined;
+}
+
+const { class: className, links } = Astro.props;
+
+const t = getTranslations();
+---
+
+{
+	links.length > 0 ? (
+		<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
+			{links.map((link) => {
+				const { url, title, titleMultilingual, resourceUrl } = buildResourceLink(link);
+
+				return (
+					<ListColumnItem>
+						{resourceUrl ? (
+							<>
+								<DividedItem>
+									<Anchor href={url}>{title}</Anchor>
+									{titleMultilingual ? (
+										<TextMultilingual content={titleMultilingual} parenthesis={true} />
+									) : undefined}
+								</DividedItem>
+								<DividedItem>
+									<Anchor class="italic" href={resourceUrl}>
+										{t('collection.resources.showPage.label')}
+									</Anchor>
+								</DividedItem>
+							</>
+						) : (
+							<>
+								<Anchor href={url}>{title}</Anchor>
+								{titleMultilingual ? (
+									<TextMultilingual content={titleMultilingual} parenthesis={true} />
+								) : undefined}
+							</>
+						)}
+					</ListColumnItem>
+				);
+			})}
+		</ListColumn>
+	) : undefined
+}

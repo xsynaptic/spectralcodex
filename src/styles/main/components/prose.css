@@ -184,6 +184,59 @@
 		margin-top: 0;
 	}
 
+	/* `display: block` makes the table its own scroll container; a wide one cannot push the page */
+	& :where(table) {
+		display: block;
+		width: max-content;
+		max-width: 100%;
+		margin: calc(var(--spacing) * 8) 0;
+		overflow-x: auto;
+		font-size: 0.875em;
+		line-height: 1.7;
+		text-align: start;
+		border-collapse: collapse;
+	}
+
+	& :where(thead) {
+		border-bottom: 1px solid light-dark(var(--color-primary-300), var(--color-primary-700));
+	}
+
+	& :where(thead th) {
+		padding: 0 calc(var(--spacing) * 2) calc(var(--spacing) * 2);
+		font-weight: var(--font-weight-semibold);
+		vertical-align: bottom;
+		color: light-dark(var(--color-primary-900), var(--color-white));
+	}
+
+	/* A column alignment arrives as an `align` attribute, which any author rule here would beat */
+	& :where(thead th:not([align])) {
+		text-align: start;
+	}
+
+	& :where(tbody tr) {
+		border-bottom: 1px solid light-dark(var(--color-primary-200), var(--color-primary-800));
+	}
+
+	& :where(tbody tr:last-child) {
+		border-bottom: 0;
+	}
+
+	& :where(tbody td) {
+		padding: calc(var(--spacing) * 2);
+		vertical-align: baseline;
+	}
+
+	/* The outer edges align with the text column rather than sitting inset by the cell padding */
+	& :where(thead th:first-child),
+	& :where(tbody td:first-child) {
+		padding-inline-start: 0;
+	}
+
+	& :where(thead th:last-child),
+	& :where(tbody td:last-child) {
+		padding-inline-end: 0;
+	}
+
 	/* Footnote markup comes from remark-rehype */
 	& > :where(.footnotes) ol {
 		font-size: var(--text-sm);

@@ -1,0 +1,37 @@
+---
+import type { LocationTwHeritage } from '#lib/collections/locations/locations-schemas.ts';
+
+import DividedItem from '#components/parts/divided-item.astro';
+import ListRow from '#components/parts/list-row.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { LocationTwHeritageRecords } from '#lib/collections/locations/locations-schemas.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+
+interface Props {
+	heritage: Array<LocationTwHeritage>;
+}
+
+const { heritage } = Astro.props;
+---
+
+{
+	heritage.length > 0 ? (
+		<ListRow>
+			{heritage.map((key) => {
+				const titleMultilingual = getMultilingualContent({
+					data: LocationTwHeritageRecords[key],
+					prop: 'title',
+				})?.primary;
+
+				return (
+					<DividedItem as="li" dividerWeight="thin" class="font-serif text-sm">
+						{LocationTwHeritageRecords[key].title}
+						{titleMultilingual ? (
+							<TextMultilingual content={titleMultilingual} parenthesis={true} />
+						) : undefined}
+					</DividedItem>
+				);
+			})}
+		</ListRow>
+	) : undefined
+}

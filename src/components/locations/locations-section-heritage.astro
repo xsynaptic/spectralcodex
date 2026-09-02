@@ -2,13 +2,9 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import DividedItem from '#components/parts/divided-item.astro';
-import ListRow from '#components/parts/list-row.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { LocationTwHeritageRecords } from '#lib/collections/locations/locations-schemas.ts';
+import LocationsHeritageList from '#components/locations/locations-heritage-list.astro';
 import { getLocationHeritage } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 interface Props {
 	entry: CollectionEntry<'locations'>;
@@ -25,23 +21,7 @@ const t = getTranslations();
 	heritage.length > 0 ? (
 		<ContentSection data-pagefind-ignore {...props}>
 			<Fragment slot="section-title">{t('section.heritage')}</Fragment>
-			<ListRow>
-				{heritage.map((key) => {
-					const titleMultilingual = getMultilingualContent({
-						data: LocationTwHeritageRecords[key],
-						prop: 'title',
-					})?.primary;
-
-					return (
-						<DividedItem as="li" dividerWeight="thin" class="font-serif text-sm">
-							{LocationTwHeritageRecords[key].title}
-							{titleMultilingual ? (
-								<TextMultilingual content={titleMultilingual} parenthesis={true} />
-							) : undefined}
-						</DividedItem>
-					);
-				})}
-			</ListRow>
+			<LocationsHeritageList heritage={heritage} />
 		</ContentSection>
 	) : undefined
 }

@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
@@ -8,30 +9,31 @@ import Prose from '#components/parts/prose.astro';
 import { hasEntryContent } from '#lib/utils/astro.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
-interface Props {
-	class?: string | undefined;
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>;
 }
 
 const { class: className, entry, ...props } = Astro.props;
 
-const hasContent = hasEntryContent(entry);
+const rendered = hasEntryContent(entry) ? await render(entry) : undefined;
 
-const { Content } = await render(entry);
+const Content = rendered?.Content;
+
+const description = Content ? undefined : entry.data.description;
 ---
 
 {
-	hasContent ? (
+	Content ? (
 		<Prose showBlocks={true} class:list={['pb-8', className]} data-pagefind-weight="2" {...props}>
 			<Content />
 		</Prose>
 	) : undefined
 }{
-	!hasContent && entry.data.description ? (
+	description ? (
 		<ContentSection {...props}>
 			<Fragment slot="section-description">
 				<Prose class:list={[className]} data-pagefind-weight="2">
-					<Fragment set:html={renderMarkdownInline(entry.data.description)} />
+					<Fragment set:html={renderMarkdownInline(description)} />
 				</Prose>
 			</Fragment>
 		</ContentSection>

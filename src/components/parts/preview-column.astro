@@ -1,0 +1,30 @@
+---
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+
+import Anchor from '#components/parts/anchor.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+
+interface Props {
+	items: Array<CatalogItem>;
+	class?: string | undefined;
+}
+
+const { class: className, items } = Astro.props;
+---
+
+{
+	items.length > 0 ? (
+		<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
+			{items.map(({ url, title, titleMultilingual }) => (
+				<ListColumnItem>
+					<Anchor href={url}>{title}</Anchor>
+					{titleMultilingual ? (
+						<TextMultilingual content={titleMultilingual} parenthesis={true} />
+					) : undefined}
+				</ListColumnItem>
+			))}
+		</ListColumn>
+	) : undefined
+}

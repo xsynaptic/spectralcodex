@@ -11,7 +11,7 @@ const selfAuthorUrls = new Set([
 	'https://indieweb.social/@spectralcodex',
 ]);
 
-interface WebmentionReply {
+export interface WebmentionReply {
 	id: number;
 	authorName: string;
 	authorUrl: string | undefined;

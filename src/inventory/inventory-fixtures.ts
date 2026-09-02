@@ -1,19 +1,24 @@
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import type { WebmentionReply } from '#components/sections/section-webmentions.ts';
+import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
 import type { CatalogItem, ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
+import type { ChronologyDailyCounts } from '#lib/collections/chronology/chronology-types.ts';
+import type { LocationTwHeritage } from '#lib/collections/locations/locations-schemas.ts';
 import type { Citation } from '#lib/collections/resources/resources-citation.ts';
 import type { ResourceLink, ResourceSource } from '#lib/collections/resources/resources-utils.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
+import { getRegionsDivisionSvgContent } from '#components/regions/regions-division.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
@@ -75,23 +80,64 @@ export async function getSampleImages() {
 }
 
 // A preview subtitle walks a Region's ancestors and throws on an id the collection does not hold
-export async function getSampleRegionId() {
+// The deepest Region also gives `regions-list` the longest ancestor run to expand
+export async function getSampleRegions() {
 	const { entries } = await getRegionsCollection();
 
-	const byDepth = entries
-		.map((entry) => ({ depth: entry.data._ancestors?.length ?? 0, id: entry.id }))
-		.sort((regionA, regionB) => regionB.depth - regionA.depth);
+	const nested = entries.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0);
 
-	return byDepth[0]?.id;
+	const deepest = [...nested].sort(
+		(regionA, regionB) =>
+			(regionB.data._ancestors?.length ?? 0) - (regionA.data._ancestors?.length ?? 0),
+	)[0];
+
+	return { deepest, nested: nested.slice(0, 3) };
 }
 
-export async function getSampleRegionIds() {
+// Division outlines are cached SVGs keyed by Region id, and not every Region has one
+export async function getSampleDivisionRegionId() {
 	const { entries } = await getRegionsCollection();
 
-	return entries
-		.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0)
-		.slice(0, 3)
-		.map((entry) => entry.id);
+	for (const entry of entries) {
+		if (await getRegionsDivisionSvgContent(entry.id)) return entry.id;
+	}
+
+	return;
+}
+
+export async function getSampleLocations() {
+	const { entries } = await getLocationsCollection();
+
+	return entries.filter((entry) => entry.data.regions.length > 0).slice(0, 5);
+}
+
+// The nearby list resolves each neighbour against the collection, so it needs a Location that has one
+export async function getSampleNearbyLocation() {
+	const { entries } = await getLocationsCollection();
+
+	return entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
+}
+
+// `regions-related` renders a column per relation, so the sample needs both filled
+export async function getSampleRelatedRegion() {
+	const { entries } = await getRegionsCollection();
+
+	return entries.find(
+		(entry) => (entry.data._children?.length ?? 0) > 0 && (entry.data._siblings?.length ?? 0) > 0,
+	);
+}
+
+// Every designation at once; a Location carries one or two, and the record is the closed set
+export const sampleHeritage = LocationTwHeritageSchema.options satisfies Array<LocationTwHeritage>;
+
+// All three warnings stacked; a Location's own data can only ever trigger two of them at once
+export function createSampleNotices() {
+	const t = getTranslations();
+
+	return (['notice.vanished', 'notice.danger', 'notice.quality'] as const).map((key) => ({
+		text: t(key),
+		textAlt: t(key, LanguageCodeEnum.ChineseTraditional),
+	}));
 }
 
 export async function getSampleThemeIds() {
@@ -354,6 +400,10 @@ export const sampleWebmentionReplies = [
 	},
 ] satisfies Array<WebmentionReply>;
 
+export const sampleChronologyYears = ['2019', '2021', '2023', '2024', '2025', '2026'];
+
+export const sampleChronologyMonths = ['02', '05', '09', '11'];
+
 // Heavy-tailed counts spread over all four intensity bins; a flat ramp renders as a single shade
 export function createSampleActivityValues(year: string) {
 	const values: Record<string, number> = {};
@@ -372,4 +422,19 @@ export function createSampleActivityValues(year: string) {
 	}
 
 	return values;
+}
+
+// Each day's total split three ways, so the activity totals line reads as three distinct counts
+export function createSampleDailyData(year: string) {
+	const dailyData: Record<string, ChronologyDailyCounts> = {};
+	const totals = Object.entries(createSampleActivityValues(year));
+
+	for (const [dayKey, total] of totals) {
+		const visited = Math.floor(total / 3);
+		const updated = Math.floor((total - visited) / 2);
+
+		dailyData[dayKey] = { created: total - visited - updated, updated, visited };
+	}
+
+	return dailyData;
 }

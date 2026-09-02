@@ -4,10 +4,12 @@
  * Tailwind usually scans everything for class names
  * For performance reasons we're explicitly naming paths and file types here:
  * 1) CSS files, for which we need to check @apply rules and CSS variable names
- * 2) Astro files
+ * 2) Astro files destined for the production build
  */
 @source './main/**/*.css';
-@source '../**/*.astro';
+@source '../components/**/*.astro';
+@source '../layouts/**/*.astro';
+@source '../pages/**/*.astro';
 
 /* Safelist utilities applied to HTML we don't author directly */
 @source inline('sr-only');

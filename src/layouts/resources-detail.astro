@@ -8,8 +8,8 @@ import { stripDiacritics } from '@spectralcodex/shared/text';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
-import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentProse from '#components/content/content-prose.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
@@ -113,7 +113,7 @@ const t = getTranslations();
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<ContentDescription entry={entry} />
+		<ContentProse entry={entry} />
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionRegions regionIds={regionIds} />

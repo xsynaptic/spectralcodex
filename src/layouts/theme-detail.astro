@@ -9,8 +9,8 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
-import ContentDescription from '#components/content/content-description.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentProse from '#components/content/content-prose.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -117,7 +117,7 @@ const entryCount = entry.data._entryCount ?? 0;
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		<ContentDescription entry={entry} />
+		<ContentProse entry={entry} />
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />

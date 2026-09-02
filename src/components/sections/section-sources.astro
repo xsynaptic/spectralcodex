@@ -2,10 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import CitationLine from '#components/parts/citation-line.astro';
-import ListColumnItem from '#components/parts/list-column-item.astro';
-import ListColumn from '#components/parts/list-column.astro';
-import { buildSourceCitations } from '#lib/collections/resources/resources-citation.ts';
+import ResourcesSources from '#components/resources/resources-sources.astro';
 import { createResolveResourceSourcesFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -26,22 +23,7 @@ const t = getTranslations();
 	sources && sources.length > 0 ? (
 		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
 			<Fragment slot="section-title">{t('section.sources')}</Fragment>
-			<ListColumn class="font-serif text-xs sm:text-sm">
-				{sources.map((source) => {
-					const { url, primary, multilingual } = buildSourceCitations(source);
-
-					return (
-						<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
-							{primary ? (
-								<CitationLine citation={primary} url={url} titleClass="italic" />
-							) : undefined}
-							{multilingual ? (
-								<CitationLine citation={multilingual} url={url} lang={multilingual.lang} />
-							) : undefined}
-						</ListColumnItem>
-					);
-				})}
-			</ListColumn>
+			<ResourcesSources sources={sources} />
 		</ContentSection>
 	) : undefined
 }
