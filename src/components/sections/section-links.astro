@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -6,7 +7,7 @@ import ResourcesLinks from '#components/resources/resources-links.astro';
 import { createResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>;
 }
 
@@ -14,16 +15,11 @@ const { entry, ...props } = Astro.props;
 
 const getResolveResourceLinks = await createResolveResourceLinksFunction();
 
-const links = getResolveResourceLinks(entry);
+const links = getResolveResourceLinks(entry) ?? [];
 
 const t = getTranslations();
 ---
 
-{
-	links && links.length > 0 ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.links')}</Fragment>
-			<ResourcesLinks links={links} />
-		</ContentSection>
-	) : undefined
-}
+<ContentSection sectionTitle={t('section.links')} data-pagefind-ignore data-nosnippet {...props}>
+	<ResourcesLinks links={links} />
+</ContentSection>

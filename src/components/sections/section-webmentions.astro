@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import { WEBMENTIONS_SHOW } from 'astro:env/server';
@@ -8,7 +9,7 @@ import { getWebmentionsFunction } from '#components/webmentions/webmentions-data
 import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'> | undefined;
 }
 
@@ -38,9 +39,13 @@ const counts = webmentions
 ---
 
 {
-	webmentions && (counts.length > 0 || webmentions.replies.length > 0) ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.webmentions')}</Fragment>
+	webmentions ? (
+		<ContentSection
+			sectionTitle={t('section.webmentions')}
+			data-pagefind-ignore
+			data-nosnippet
+			{...props}
+		>
 			<WebmentionsList counts={counts} replies={webmentions.replies} />
 		</ContentSection>
 	) : undefined

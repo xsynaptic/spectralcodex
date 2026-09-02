@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
@@ -10,7 +11,7 @@ import ContentSection from '#components/content/content-section.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
 	langCode?: Extract<LanguageCode, 'zh' | 'zh-Hans' | 'ja' | 'ko'> | undefined;
 }

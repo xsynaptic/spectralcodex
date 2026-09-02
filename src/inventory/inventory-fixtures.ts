@@ -20,6 +20,7 @@ import { getResourcesCollection } from '#lib/collections/resources/resources-dat
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
@@ -111,11 +112,26 @@ export async function getSampleLocations() {
 	return entries.filter((entry) => entry.data.regions.length > 0).slice(0, 5);
 }
 
-// The nearby list resolves each neighbour against the collection, so it needs a Location that has one
-export async function getSampleNearbyLocation() {
-	const { entries } = await getLocationsCollection();
+// Distances come from the build-time neighbour pass, so the sample needs a Location that has one
+export async function getSampleNearbyLocations() {
+	const { entries, entriesMap } = await getLocationsCollection();
 
-	return entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
+	const entry = entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
+
+	return (entry?.data._nearby?.slice(0, 5) ?? []).flatMap(({ locationId, distanceDisplay }) => {
+		const location = entriesMap.get(locationId);
+
+		if (!location) return [];
+
+		return [
+			{
+				url: getSampleUrl('locations-nearby-list'),
+				title: location.data.title,
+				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
+				distanceDisplay,
+			},
+		];
+	});
 }
 
 // `regions-related` renders a column per relation, so the sample needs both filled
@@ -140,10 +156,10 @@ export function createSampleNotices() {
 	}));
 }
 
-export async function getSampleThemeIds() {
+export async function getSampleThemes() {
 	const { entries } = await getThemesCollection();
 
-	return entries.slice(0, 4).map((entry) => entry.id);
+	return entries.slice(0, 4);
 }
 
 // Built from real entries so the flattened shape cannot drift from the Resource schema

@@ -1,5 +1,6 @@
 ---
 import type { Page } from 'astro';
+import type { HTMLAttributes } from 'astro/types';
 
 import type { PreviewOptions } from '#components/types.ts';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
@@ -9,15 +10,22 @@ import PaginationSelect from '#components/parts/pagination-select.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
-	title?: string;
+interface Props extends HTMLAttributes<'div'> {
+	sectionTitle?: string;
 	items?: Array<CatalogItem>;
 	page?: Page<CatalogItem>;
 	previewOptions?: PreviewOptions | undefined;
 	showMicroformats?: boolean | undefined;
 }
 
-const { title, items, page, previewOptions, showMicroformats = false, ...props } = Astro.props;
+const {
+	sectionTitle,
+	items,
+	page,
+	previewOptions,
+	showMicroformats = false,
+	...props
+} = Astro.props;
 
 const defaultPreviewOptions: PreviewOptions = {
 	showDate: true,
@@ -25,34 +33,36 @@ const defaultPreviewOptions: PreviewOptions = {
 	showTitleMultilingual: true,
 };
 
-const hasItems = items && items.length > 0;
-
 const t = getTranslations();
 ---
 
-{
-	hasItems || page ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{title ?? t('section.content')}</Fragment>
-			{page ? (
-				<>
-					<PreviewGrid
-						items={page.data}
-						showMicroformats={showMicroformats}
-						{...defaultPreviewOptions}
-						{...previewOptions}
-					/>
-					<PaginationSelect class="mt-4 md:mt-8" page={page} />
-				</>
-			) : undefined}
-			{hasItems ? (
+<ContentSection
+	sectionTitle={sectionTitle ?? t('section.content')}
+	data-pagefind-ignore
+	data-nosnippet
+	{...props}
+>
+	{
+		page ? (
+			<>
 				<PreviewGrid
-					items={items}
+					items={page.data}
 					showMicroformats={showMicroformats}
 					{...defaultPreviewOptions}
 					{...previewOptions}
 				/>
-			) : undefined}
-		</ContentSection>
-	) : undefined
-}
+				<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			</>
+		) : undefined
+	}
+	{
+		items ? (
+			<PreviewGrid
+				items={items}
+				showMicroformats={showMicroformats}
+				{...defaultPreviewOptions}
+				{...previewOptions}
+			/>
+		) : undefined
+	}
+</ContentSection>

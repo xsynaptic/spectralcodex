@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry, CollectionKey } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -7,7 +8,7 @@ import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getSimilarContentFunction } from '#components/sections/section-similar.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<CollectionKey>;
 	showPreviews?: boolean | undefined;
 	limit?: number | undefined;
@@ -27,20 +28,17 @@ const similarContentItems = getSimilarContent({
 const t = getTranslations();
 ---
 
-{
-	similarContentItems.length > 0 ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.similar')}</Fragment>
-			{showPreviews ? (
-				<PreviewGrid
-					items={similarContentItems}
-					showDate={true}
-					showRegion={true}
-					showTitleMultilingual={true}
-				/>
-			) : (
-				<PreviewColumn items={similarContentItems} />
-			)}
-		</ContentSection>
-	) : undefined
-}
+<ContentSection sectionTitle={t('section.similar')} data-pagefind-ignore data-nosnippet {...props}>
+	{
+		showPreviews ? (
+			<PreviewGrid
+				items={similarContentItems}
+				showDate={true}
+				showRegion={true}
+				showTitleMultilingual={true}
+			/>
+		) : (
+			<PreviewColumn items={similarContentItems} />
+		)
+	}
+</ContentSection>

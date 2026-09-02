@@ -1,4 +1,6 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -6,22 +8,24 @@ import PreviewList from '#components/parts/preview-list.astro';
 import Prose from '#components/parts/prose.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	items: Array<CatalogItem>;
 	count: number;
 }
 
 const { items, count, ...props } = Astro.props;
 
-const hasItems = items.length > 0;
-
 const t = getTranslations();
 ---
 
 {
-	hasItems ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.itemsList')}</Fragment>
+	items.length > 0 ? (
+		<ContentSection
+			sectionTitle={t('section.itemsList')}
+			data-pagefind-ignore
+			data-nosnippet
+			{...props}
+		>
 			<Prose>
 				<PreviewList items={items} count={count} />
 			</Prose>

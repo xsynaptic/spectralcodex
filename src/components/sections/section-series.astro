@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
@@ -7,7 +8,7 @@ import SeriesSection from '#components/series/series-section.astro';
 import { createSeriesByIdFunction } from '#lib/collections/series/series-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations' | 'posts'>;
 }
 
@@ -25,7 +26,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 		return catalogItems.length > 0 ? (
 			<SeriesSection
 				items={catalogItems}
-				title={seriesEntry.data.title}
+				seriesTitle={seriesEntry.data.title}
 				url={getContentUrl(seriesEntry.collection, seriesEntry.id)}
 				{...props}
 			>

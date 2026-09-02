@@ -68,6 +68,7 @@ const { imageProps, placeholderProps } = await getImageProps();
 ---
 
 <ContentSection
+	sectionTitle={t('section.author')}
 	class:list={[
 		showAuthor ? undefined : 'sr-only',
 		MicroformatClassNames.Card,
@@ -78,7 +79,6 @@ const { imageProps, placeholderProps } = await getImageProps();
 	data-nosnippet
 	{...props}
 >
-	<Fragment slot="section-title">{t('section.author')}</Fragment>
 	<div class="flex items-start gap-4">
 		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
 			{

@@ -1,0 +1,47 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListRow from '#components/parts/list-row.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { MicroformatClassNames } from '#components/types.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getContentUrl } from '#lib/utils/routing.ts';
+
+interface Props {
+	terms: Array<CollectionEntry<'themes'>> | undefined;
+	class?: string | undefined;
+}
+
+const { class: className, terms } = Astro.props;
+---
+
+{
+	terms && terms.length > 0 ? (
+		<ListRow class={className}>
+			{terms.map((entry) => {
+				const titleMultilingual = getMultilingualContent({
+					data: entry.data,
+					prop: 'title',
+				})?.primary;
+
+				return (
+					<DividedItem
+						as="li"
+						dividerWeight="thin"
+						class:list={['font-serif text-sm', MicroformatClassNames.Category]}
+						data-pagefind-filter="theme"
+					>
+						{entry.data.title ? (
+							<Anchor href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Anchor>
+						) : undefined}
+						{titleMultilingual ? (
+							<TextMultilingual content={titleMultilingual} parenthesis={true} />
+						) : undefined}
+					</DividedItem>
+				);
+			})}
+		</ListRow>
+	) : undefined
+}

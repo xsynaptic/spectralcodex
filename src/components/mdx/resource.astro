@@ -5,7 +5,7 @@ import { getResourcesCollection } from '#lib/collections/resources/resources-dat
 import { renderSlot } from '#lib/utils/astro.ts';
 import { getResourceUrl } from '#lib/utils/routing.ts';
 
-interface Props extends HTMLAttributes<'a'> {
+interface Props extends Omit<HTMLAttributes<'a'>, 'id'> {
 	id: string | undefined;
 }
 

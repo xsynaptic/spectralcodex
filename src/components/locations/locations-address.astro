@@ -10,7 +10,6 @@ import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 interface Props extends HTMLAttributes<'address'> {
 	address?: string | undefined;
 	content?: MultilingualContent | undefined;
-	class?: string | undefined;
 }
 
 const { address, content, class: className, ...props } = Astro.props;

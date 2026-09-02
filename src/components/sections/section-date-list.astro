@@ -1,4 +1,6 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -7,12 +9,12 @@ import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import { DatePresetEnum, getDateRanges } from '#lib/utils/date.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	dates: Array<DateRecordedEntry> | undefined;
-	title: string;
+	sectionTitle: string;
 }
 
-const { dates, title, ...props } = Astro.props;
+const { dates, sectionTitle, ...props } = Astro.props;
 
 const dateRanges = dates ? getDateRanges(dates) : [];
 
@@ -25,8 +27,7 @@ const timeOptions = {
 
 {
 	dateRanges.length > 0 ? (
-		<ContentSection data-pagefind-ignore {...props}>
-			<Fragment slot="section-title">{title}</Fragment>
+		<ContentSection sectionTitle={sectionTitle} data-pagefind-ignore data-nosnippet {...props}>
 			<ListColumn class="font-serif text-xs sm:text-sm">
 				{dateRanges.map((range) => (
 					<ListColumnItem>

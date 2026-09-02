@@ -16,8 +16,8 @@ import ImageHero from '#components/image/image-hero.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import LocationsAddress from '#components/locations/locations-address.astro';
 import LocationsHeritageList from '#components/locations/locations-heritage-list.astro';
+import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import LocationsNotices from '#components/locations/locations-notices.astro';
-import SectionNearbyList from '#components/locations/locations-section-nearby-list.astro';
 import LocationsTable from '#components/locations/locations-table.astro';
 import MainSite from '#components/main/main-site.astro';
 import MapComponent from '#components/map/map-component.astro';
@@ -60,8 +60,8 @@ import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
-import SectionThemes from '#components/sections/section-themes.astro';
 import SeriesSection from '#components/series/series-section.astro';
+import ThemesList from '#components/themes/themes-list.astro';
 import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import {
 	createSampleActivityValues,
@@ -75,11 +75,11 @@ import {
 	getSampleDivisionRegionId,
 	getSampleImages,
 	getSampleLocations,
-	getSampleNearbyLocation,
+	getSampleNearbyLocations,
 	getSampleRelatedRegion,
 	getSampleRegions,
 	getSampleResources,
-	getSampleThemeIds,
+	getSampleThemes,
 	sampleChronologyMonths,
 	sampleChronologyYears,
 	sampleLinkInline,
@@ -120,9 +120,9 @@ const sampleRegionId = sampleRegions.deepest?.id;
 const sampleRegionIds = sampleRegions.nested.map((entry) => entry.id);
 const sampleDivisionRegionId = await getSampleDivisionRegionId();
 const sampleLocations = await getSampleLocations();
-const sampleNearbyLocation = await getSampleNearbyLocation();
+const sampleNearbyLocations = await getSampleNearbyLocations();
 const sampleRelatedRegion = await getSampleRelatedRegion();
-const sampleThemeIds = await getSampleThemeIds();
+const sampleThemes = await getSampleThemes();
 const sampleResources = await getSampleResources();
 const sampleMapData = await createSampleMapData();
 
@@ -1061,7 +1061,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="The body of every listing route."
 				source="components/sections/section-previews.astro"
 			>
-				<SectionPreviews page={samplePageMiddle} title="Recent Updates" />
+				<SectionPreviews page={samplePageMiddle} sectionTitle="Recent Updates" />
 			</Specimen>
 			<Specimen
 				bleed={true}
@@ -1084,7 +1084,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="An entry authored without a time shows none."
 				source="components/sections/section-date-list.astro"
 			>
-				<SectionDateList dates={sampleDatesRecorded} title={t('section.dateRecorded')} />
+				<SectionDateList dates={sampleDatesRecorded} sectionTitle={t('section.dateRecorded')} />
 			</Specimen>
 			<Specimen
 				bleed={true}
@@ -1094,12 +1094,11 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				<SectionRegions regionIds={sampleRegionIds} />
 			</Specimen>
 			<Specimen
-				bleed={true}
-				name="section-themes"
-				note="Sorted by how many Entries each holds."
-				source="components/sections/section-themes.astro"
+				name="themes-list"
+				note="The container sorts by how many Entries each Theme holds."
+				source="components/themes/themes-list.astro"
 			>
-				<SectionThemes themeIds={sampleThemeIds} />
+				<ThemesList terms={sampleThemes} />
 			</Specimen>
 			<Specimen
 				bleed={true}
@@ -1129,7 +1128,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="The description is a slot, so the container renders the Series body itself."
 				source="components/series/series-section.astro"
 			>
-				<SeriesSection items={sampleItems} title="A Series title" url={sampleUrl}>
+				<SeriesSection items={sampleItems} seriesTitle="A Series title" url={sampleUrl}>
 					<p>The Series description, rendered from its own Entry body.</p>
 				</SeriesSection>
 			</Specimen>
@@ -1262,14 +1261,13 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				</div>
 			</Specimen>
 			<Specimen
-				bleed={true}
-				name="locations-section-nearby-list"
-				note="A real Location; distances come from the build-time neighbour pass, so nothing here is invented."
-				source="components/locations/locations-section-nearby-list.astro"
+				name="locations-nearby-list"
+				note="A real Location's neighbours; distances come from the build-time pass, so nothing here is invented."
+				source="components/locations/locations-nearby-list.astro"
 			>
 				{
-					sampleNearbyLocation ? (
-						<SectionNearbyList entry={sampleNearbyLocation} limit={5} />
+					sampleNearbyLocations.length > 0 ? (
+						<LocationsNearbyList locations={sampleNearbyLocations} />
 					) : (
 						<p class={captionClass}>No Location has a resolved neighbour to list.</p>
 					)

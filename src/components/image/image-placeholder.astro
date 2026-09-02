@@ -8,7 +8,6 @@ import { getImagePlaceholderFunction } from '#components/image/image-placeholder
 // A standardized image placeholder component with a fallback image when no placeholder is passed
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
-	class?: string | undefined;
 	placeholderProps?: ImagePlaceholderProps | undefined;
 }>;
 

@@ -1,17 +1,13 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
+
 import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
-import DividedItem from '#components/parts/divided-item.astro';
-import ListRow from '#components/parts/list-row.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
-import { MicroformatClassNames } from '#components/types.ts';
+import ThemesList from '#components/themes/themes-list.astro';
 import { createThemesByIdsFunction } from '#lib/collections/themes/themes-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByEntryCount } from '#lib/utils/collections.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	themeIds: Array<string> | undefined;
 }
 
@@ -24,34 +20,11 @@ const themes = themeIds ? getThemesByIds(themeIds).sort(sortByEntryCount) : unde
 const t = getTranslations();
 ---
 
-{
-	themes && themes.length > 0 ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('collection.themes.labelPlural')}</Fragment>
-			<ListRow>
-				{themes.map((item) => {
-					const titleMultilingual = getMultilingualContent({
-						data: item.data,
-						prop: 'title',
-					})?.primary;
-
-					return (
-						<DividedItem
-							as="li"
-							dividerWeight="thin"
-							class:list={['font-serif text-sm', MicroformatClassNames.Category]}
-							data-pagefind-filter="theme"
-						>
-							{item.data.title ? (
-								<Anchor href={getContentUrl(item.collection, item.id)}>{item.data.title}</Anchor>
-							) : undefined}
-							{titleMultilingual ? (
-								<TextMultilingual content={titleMultilingual} parenthesis={true} />
-							) : undefined}
-						</DividedItem>
-					);
-				})}
-			</ListRow>
-		</ContentSection>
-	) : undefined
-}
+<ContentSection
+	sectionTitle={t('collection.themes.labelPlural')}
+	data-pagefind-ignore
+	data-nosnippet
+	{...props}
+>
+	<ThemesList terms={themes} />
+</ContentSection>

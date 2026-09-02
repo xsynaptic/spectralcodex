@@ -1,11 +1,12 @@
 ---
 import type { MapComponentData } from '@spectralcodex/react-map-component';
+import type { HTMLAttributes } from 'astro/types';
 
 import ContentSection from '#components/content/content-section.astro';
 import MapComponent from '#components/map/map-component.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	mapData: MapComponentData;
 }
 
@@ -19,8 +20,13 @@ const t = getTranslations();
 
 {
 	hasGeodata ? (
-		<ContentSection fillViewport={true} data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.map')}</Fragment>
+		<ContentSection
+			sectionTitle={t('section.map')}
+			fillViewport={true}
+			data-pagefind-ignore
+			data-nosnippet
+			{...props}
+		>
 			<MapComponent mapComponentProps={mapComponentProps} />
 			<slot />
 		</ContentSection>

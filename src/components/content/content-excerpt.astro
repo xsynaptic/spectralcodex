@@ -21,7 +21,6 @@ import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeImageAltAttribute, stripFootnotes } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'article'> {
-	class?: string | undefined;
 	entryUrl: string;
 	imageId?: string | undefined;
 	showDivider?: boolean | undefined;

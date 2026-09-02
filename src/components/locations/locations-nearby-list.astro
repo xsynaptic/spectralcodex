@@ -1,0 +1,50 @@
+---
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+
+import Anchor from '#components/parts/anchor.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
+
+interface Props {
+	locations: Array<{
+		url: string;
+		title: string;
+		titleMultilingual: MultilingualContent | undefined;
+		distanceDisplay: string;
+	}>;
+	class?: string | undefined;
+}
+
+const { class: className, locations } = Astro.props;
+
+const t = getTranslations();
+---
+
+{
+	locations.length > 0 ? (
+		<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
+			{locations.map(({ url, title, titleMultilingual, distanceDisplay }) => (
+				<ListColumnItem>
+					<Anchor href={url}>{title}</Anchor>
+					{titleMultilingual ? (
+						<TextMultilingual content={titleMultilingual} parenthesis={true} />
+					) : undefined}
+					{distanceDisplay ? (
+						<>
+							<span class="text-primary-300 dark:text-primary-700">—</span>
+							<span
+								class:list={['text-primary-500 dark:text-primary-600', 'break-keep']}
+								set:html={formatStringTemplate(t('locations.unit.km'), {
+									distance: distanceDisplay,
+								})}
+							/>
+						</>
+					) : undefined}
+				</ListColumnItem>
+			))}
+		</ListColumn>
+	) : undefined
+}

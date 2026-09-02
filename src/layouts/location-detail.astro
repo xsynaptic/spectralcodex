@@ -181,7 +181,7 @@ const t = getTranslations();
 		<SectionHeritage entry={entry} />
 		{
 			hideLocation ? undefined : (
-				<SectionDateList dates={entry.data.dateRecorded} title={t('section.dateRecorded')} />
+				<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 			)
 		}
 		{hideLocation ? undefined : <SectionLinks entry={entry} />}
@@ -191,7 +191,7 @@ const t = getTranslations();
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionWebmentions entry={entry} />
 		<SectionNearbyList entry={entry} limit={12} />
-		<SectionPreviews title={t('section.content.locations')} items={catalogItems} />
+		<SectionPreviews sectionTitle={t('section.content.locations')} items={catalogItems} />
 		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>

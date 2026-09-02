@@ -1,19 +1,16 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
-import Anchor from '#components/parts/anchor.astro';
-import ListColumnItem from '#components/parts/list-column-item.astro';
-import ListColumn from '#components/parts/list-column.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
+import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import { locationsNearbyCountLimit } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
-import { formatStringTemplate } from '#lib/utils/text.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
 	limit?: number | undefined;
 }
@@ -22,44 +19,31 @@ const { entry, limit = locationsNearbyCountLimit, ...props } = Astro.props;
 
 const { entriesMap: locationsMap } = await getLocationsCollection();
 
-const locationsNearby = entry.data._nearby?.slice(0, limit) ?? [];
+const locations = (entry.data._nearby?.slice(0, limit) ?? []).flatMap(
+	({ locationId, distanceDisplay }) => {
+		const location = locationsMap.get(locationId);
+
+		if (!location) return [];
+
+		return [
+			{
+				url: getContentUrl('locations', location.id),
+				title: location.data.title,
+				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
+				distanceDisplay,
+			},
+		];
+	},
+);
 
 const t = getTranslations();
 ---
 
-{
-	locationsNearby.length > 0 ? (
-		<ContentSection data-pagefind-ignore data-nosnippet {...props}>
-			<Fragment slot="section-title">{t('section.locationsNearby')}</Fragment>
-			<ListColumn class="font-serif text-xs sm:text-sm">
-				{locationsNearby.map(({ locationId, distanceDisplay }) => {
-					const location = locationsMap.get(locationId);
-					const titleMultilingual = getMultilingualContent({
-						data: location?.data,
-						prop: 'title',
-					})?.primary;
-
-					return location ? (
-						<ListColumnItem>
-							<Anchor href={getContentUrl('locations', location.id)}>{location.data.title}</Anchor>
-							{titleMultilingual ? (
-								<TextMultilingual content={titleMultilingual} parenthesis={true} />
-							) : undefined}
-							{distanceDisplay ? (
-								<>
-									<span class="text-primary-300 dark:text-primary-700">—</span>
-									<span
-										class:list={['text-primary-500 dark:text-primary-600', 'break-keep']}
-										set:html={formatStringTemplate(t('locations.unit.km'), {
-											distance: distanceDisplay,
-										})}
-									/>
-								</>
-							) : undefined}
-						</ListColumnItem>
-					) : undefined;
-				})}
-			</ListColumn>
-		</ContentSection>
-	) : undefined
-}
+<ContentSection
+	sectionTitle={t('section.locationsNearby')}
+	data-pagefind-ignore
+	data-nosnippet
+	{...props}
+>
+	<LocationsNearbyList locations={locations} />
+</ContentSection>

@@ -1,4 +1,5 @@
 ---
+import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -6,7 +7,7 @@ import LocationsHeritageList from '#components/locations/locations-heritage-list
 import { getLocationHeritage } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
+interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
 }
 
@@ -17,11 +18,6 @@ const heritage = getLocationHeritage(entry);
 const t = getTranslations();
 ---
 
-{
-	heritage.length > 0 ? (
-		<ContentSection data-pagefind-ignore {...props}>
-			<Fragment slot="section-title">{t('section.heritage')}</Fragment>
-			<LocationsHeritageList heritage={heritage} />
-		</ContentSection>
-	) : undefined
-}
+<ContentSection sectionTitle={t('section.heritage')} data-pagefind-ignore data-nosnippet {...props}>
+	<LocationsHeritageList heritage={heritage} />
+</ContentSection>

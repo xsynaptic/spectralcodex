@@ -8,7 +8,6 @@ import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
-	class?: string | undefined;
 	content?: MultilingualContent | undefined;
 	additional?: Array<MultilingualContent> | undefined;
 	parenthesis?: boolean | undefined;
