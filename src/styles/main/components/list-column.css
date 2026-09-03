@@ -15,7 +15,11 @@ ol.list-column {
 }
 
 .list-item::marker {
-	color: light-dark(var(--color-accent-200), var(--color-accent-500));
+	color: light-dark(var(--color-accent-300), var(--color-accent-600));
+}
+
+ol.list-column > .list-item::marker {
+	font-size: 0.875em;
 }
 
 .list-item-body {

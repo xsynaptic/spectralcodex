@@ -125,7 +125,10 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 	{
 		description ? (
 			<Prose
-				class:list={['mt-1', showMicroformats ? MicroformatClassNames.Summary : undefined]}
+				class:list={[
+					'mt-1 font-sans',
+					showMicroformats ? MicroformatClassNames.Summary : undefined,
+				]}
 				showCompact={true}
 			>
 				<Fragment set:html={description} />

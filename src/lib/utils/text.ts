@@ -118,7 +118,7 @@ export function renderMarkdownInline(input: string): string {
 
 	const { html } = markdownToHtml(input, {
 		features: { smartPunctuation: true },
-		hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlash({ trailingSlash: 'always' })],
+		hastPlugins: [wrapCjk({ value: 'cjk-text' }), trailingSlash({ trailingSlash: 'always' })],
 	});
 	const result = html.trim();
 

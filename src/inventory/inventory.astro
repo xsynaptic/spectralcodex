@@ -417,12 +417,12 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					/* No flex wrapper: `mx-auto` on a flex child shrink-wraps it, so neither box shows its width */
 				}
 				<div class="content-column">
-					<div class="rounded-xs bg-accent-100 py-3 text-center text-sm dark:bg-accent-900">
+					<div class="rounded-xs bg-accent-200 py-3 text-center text-sm dark:bg-accent-800">
 						content-column
 					</div>
 				</div>
 				<div class="content-column-fill mt-2">
-					<div class="rounded-xs bg-highlight-100 py-3 text-center text-sm dark:bg-highlight-900">
+					<div class="rounded-xs bg-highlight-200 py-3 text-center text-sm dark:bg-highlight-800">
 						content-column-fill
 					</div>
 				</div>
@@ -1192,7 +1192,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				<WebmentionsList counts={sampleWebmentionCounts} replies={sampleWebmentionReplies} />
 			</Specimen>
 			<Specimen
-				bleed={true}
 				name="section-map"
 				note="The one React island here; source and popup data are inlined, so it draws without a chunk endpoint."
 				source="components/map/map-component.astro"

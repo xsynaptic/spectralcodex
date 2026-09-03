@@ -134,16 +134,18 @@
 	}
 
 	& :where(li) {
-		margin: 0 0 calc(var(--spacing) * 2) calc(var(--spacing) * 4);
+		margin: 0 0 calc(var(--spacing) * 2) calc(var(--spacing) * 6);
 	}
 
-	& :where(ul > li)::marker {
-		color: light-dark(var(--color-accent-200), var(--color-primary-600));
+	& :where(:is(ul, ol) > li)::marker {
+		color: light-dark(var(--color-primary-300), var(--color-primary-600));
 	}
 
+	/* Digit strokes read fainter than a solid disc at the same ramp step */
 	& :where(ol > li)::marker {
+		font-size: 0.875em;
 		font-weight: var(--font-weight-normal);
-		color: light-dark(var(--color-accent-300), var(--color-primary-400));
+		color: light-dark(var(--color-primary-400), var(--color-primary-500));
 	}
 
 	& :where(:is(ul, ol) :is(ul, ol)) {
@@ -170,7 +172,7 @@
 	& :where(mark) {
 		padding-inline: 0.2em;
 		color: light-dark(var(--color-primary-900), var(--color-white));
-		background-color: light-dark(var(--color-highlight-100), var(--color-highlight-800));
+		background-color: light-dark(var(--color-highlight-200), var(--color-highlight-900));
 		border-radius: var(--radius-xs, 0.125rem);
 	}
 
@@ -253,6 +255,7 @@
 	& > :where(.footnotes) ol li::marker {
 		font-size: var(--text-xs);
 		font-style: italic;
+		color: light-dark(var(--color-accent-300), var(--color-accent-400));
 	}
 
 	& :where(.footnotes li p) {
