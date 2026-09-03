@@ -15,6 +15,10 @@ export default function inventory({
 				if (command !== 'dev') return;
 
 				injectRoute({ entrypoint, pattern: route });
+				injectRoute({
+					entrypoint: './src/inventory/inventory-og-image.ts',
+					pattern: `${route}/og/[key].jpg`,
+				});
 			},
 		},
 		name: 'inventory',

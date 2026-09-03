@@ -7,13 +7,16 @@ export default {
 		'.': {
 			// MDX auto-import components; referenced via remark-auto-import, not static imports
 			// The inventory page is injected as a route under `astro dev`, never imported
-			entry: ['src/components/mdx/*.astro', 'src/inventory/inventory.astro'],
+			entry: [
+				'src/components/mdx/*.astro',
+				'src/inventory/inventory.astro',
+				'src/inventory/inventory-og-image.ts',
+			],
 			ignore: [
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported
 			],
 			ignoreBinaries: ['ssh-add'],
 			ignoreDependencies: [
-				'@spectralcodex/scripts', // used via pnpm --filter in scripts, not imported
 				'eslint-plugin-jsx-a11y', // peer of eslint-plugin-astro's flat/jsx-a11y-strict config; referenced by string, not import
 				'p-limit', // used in workspace scripts packages
 			],

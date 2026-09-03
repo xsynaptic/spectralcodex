@@ -1,4 +1,6 @@
 ---
+import { getSectionId } from '#inventory/inventory-utils.ts';
+
 interface Props {
 	note?: string | undefined;
 	title: string;
@@ -6,7 +8,7 @@ interface Props {
 
 const { note, title } = Astro.props;
 
-const id = title.toLowerCase();
+const id = getSectionId(title);
 ---
 
 <section class="mt-16 scroll-mt-8" id={id}>

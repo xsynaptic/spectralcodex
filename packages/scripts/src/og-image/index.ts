@@ -14,7 +14,6 @@ import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
 import type { ImageBatch } from './batch.js';
-import type { FontsourceConfig } from './fonts.js';
 import type { OutputCacheStore } from './output-cache.js';
 import type { OpenGraphContentEntry } from './types.js';
 
@@ -23,7 +22,7 @@ import { dataStoreRelativePath } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.js';
 import { getBuiltEntries } from './content.js';
-import { fontsourceFonts } from './fonts.js';
+import { loadOpenGraphFonts } from './fonts.js';
 import { createRenderer, processImage } from './generate.js';
 import { createOutputCache } from './output-cache.js';
 
@@ -54,30 +53,6 @@ const { values } = parseArgs({
 		},
 	},
 });
-
-// Font configuration
-const fontConfigs: Array<FontsourceConfig> = [
-	{
-		package: 'lora',
-		name: 'Lora',
-		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
-	},
-	{
-		package: 'noto-serif-tc',
-		name: 'Noto Serif TC',
-		variants: [{ weight: 700, style: 'normal', subset: 'chinese-traditional' }],
-	},
-	{
-		package: 'noto-serif-thai',
-		name: 'Noto Serif Thai',
-		variants: [{ weight: 500, style: 'normal', subset: 'thai' }],
-	},
-	{
-		package: 'zen-antique',
-		name: 'Zen Antique',
-		variants: [{ weight: 400, style: 'normal', subset: 'japanese' }],
-	},
-];
 
 // Bump when the OG template (element.tsx) changes, to regenerate every card.
 const ogTemplateVersion = '2';
@@ -125,7 +100,7 @@ async function main() {
 
 	console.log(chalk.blue('Loading fonts...'));
 
-	const fonts = await fontsourceFonts(fontConfigs);
+	const fonts = await loadOpenGraphFonts();
 
 	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
 

@@ -14,6 +14,9 @@ const glyphCacheBytes = 64 * 1024 * 1024;
 // A vertical band as [start, end] fractions of the height
 type LuminanceZone = [start: number, end: number];
 
+const luminanceZoneTop: LuminanceZone = [0.1, 0.2];
+const luminanceZoneBottom: LuminanceZone = [0.7, 0.9];
+
 export interface ProcessedImage {
 	data: Buffer;
 	height: number;
@@ -72,9 +75,23 @@ export async function processImage({
 		data,
 		height: info.height,
 		width: info.width,
-		luminanceTop: zoneLuminance(data, info.width, info.height, [0.1, 0.2]),
-		luminanceBottom: zoneLuminance(data, info.width, info.height, [0.7, 0.9]),
+		luminanceTop: zoneLuminance(data, info.width, info.height, luminanceZoneTop),
+		luminanceBottom: zoneLuminance(data, info.width, info.height, luminanceZoneBottom),
 	};
+}
+
+// Ranks candidates ahead of a render, reading the same zone at a thumbnail scale
+export async function probeLuminanceTop(imageInput: string): Promise<number> {
+	const width = 120;
+	const height = 64;
+
+	const { data, info } = await sharp(imageInput)
+		.resize({ fit: 'cover', height, position: 'top', width })
+		.ensureAlpha()
+		.raw()
+		.toBuffer({ resolveWithObject: true });
+
+	return zoneLuminance(data, info.width, info.height, luminanceZoneTop);
 }
 
 // Fonts and glyph outlines live on the renderer, so build one and reuse it for every card

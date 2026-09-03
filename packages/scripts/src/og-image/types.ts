@@ -8,7 +8,10 @@ export interface OpenGraphMetadataItem {
 	isFallback: boolean;
 }
 
-export interface OpenGraphContentEntry extends OpenGraphMetadataItem {
-	digest: string;
+export interface OpenGraphEntryItem extends OpenGraphMetadataItem {
 	imageFeaturedId: string;
+}
+
+export interface OpenGraphContentEntry extends OpenGraphEntryItem {
+	digest: string;
 }

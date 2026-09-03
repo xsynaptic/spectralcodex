@@ -1,5 +1,9 @@
+import type { OpenGraphMetadataItem } from '@spectralcodex/scripts/og-image';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
+
+import { probeLuminanceTop, toOpenGraphEntryItem } from '@spectralcodex/scripts/og-image';
+import path from 'node:path';
 
 import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
 import type { CatalogItem, ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
@@ -15,6 +19,7 @@ import { getRegionsDivisionSvgContent } from '#components/regions/regions-divisi
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
@@ -453,4 +458,108 @@ export function createSampleDailyData(year: string) {
 	}
 
 	return dailyData;
+}
+
+// The OG card is drawn by a batch script (`packages/scripts/src/og-image`), never by Astro
+// A key doubles as the route param, so `inventory-og-image.ts` resolves one back through this list
+interface OpenGraphCard {
+	entry: OpenGraphMetadataItem;
+	imagePath: string;
+}
+
+interface SampleOpenGraphCard extends OpenGraphCard {
+	key: string;
+}
+
+const openGraphLuminanceSampleCount = 24;
+
+// A card is a plain metadata object, and a found one changes subject as content changes
+const openGraphTitleSamples = [
+	{
+		key: 'title-long',
+		title:
+			'Former Taiwan Sugar Corporation Narrow-Gauge Locomotive Workshops and Cane Loading Sidings at Huwei',
+		titleZh: '臺灣糖業股份有限公司虎尾糖廠輕便鐵道機車工場與甘蔗裝載側線',
+	},
+	{
+		key: 'title-zh',
+		title: 'Taiwan Sugar Railway',
+		titleZh: sampleTitleChinese.value,
+	},
+	{
+		key: 'title-ja',
+		title: 'Monopoly Bureau of the Government-General of Taiwan',
+		// Shinjitai, because Zen Antique has no glyph for the traditional forms in sampleTitleJapanese
+		titleJa: '台湾総督府専売局',
+	},
+	{
+		key: 'title-th',
+		title: 'Bangkok Railway Station',
+		titleTh: sampleTitleThai.value,
+	},
+];
+
+function toOpenGraphCard(key: string, card: OpenGraphCard | undefined): Array<SampleOpenGraphCard> {
+	return card ? [{ key, ...card }] : [];
+}
+
+async function createSampleOpenGraphCards() {
+	const [posts, locations, images, sampleImages] = await Promise.all([
+		getPostsCollection(),
+		getLocationsCollection(),
+		getImagesCollection(),
+		getSampleImages(),
+	]);
+
+	// No region parent map, so a fallback resolves by collection or Theme, never by Region
+	const candidates = [...posts.entries, ...locations.entries].flatMap<OpenGraphCard>((entry) => {
+		const item = toOpenGraphEntryItem({ collection: entry.collection, entry });
+		const image = item ? images.entriesMap.get(item.imageFeaturedId) : undefined;
+
+		return item && image ? [{ entry: item, imagePath: path.resolve(image.data.path) }] : [];
+	});
+
+	// A fallback is blurred, and only a Latin title leaves the ground uncovered
+	const groundCandidates = candidates.filter(({ entry }) => !entry.isFallback && !entry.titleZh);
+
+	// Decoding every candidate would stall the page, and the two ends of a sample are enough
+	const ranked = await Promise.all(
+		groundCandidates.slice(0, openGraphLuminanceSampleCount).map(async (candidate) => ({
+			candidate,
+			luminance: await probeLuminanceTop(candidate.imagePath),
+		})),
+	);
+
+	ranked.sort((first, second) => second.luminance - first.luminance);
+
+	const titleImage = sampleImages.landscape[0];
+
+	const titleCards = titleImage
+		? openGraphTitleSamples.map(({ key, ...title }) => ({
+				key,
+				imagePath: path.resolve(titleImage.data.path),
+				entry: { collection: 'inventory', id: key, isFallback: false, ...title },
+			}))
+		: [];
+
+	return [
+		...toOpenGraphCard('ground-dark', ranked.at(-1)?.candidate),
+		...toOpenGraphCard('ground-bright', ranked[0]?.candidate),
+		...titleCards,
+		...toOpenGraphCard(
+			'image-fallback',
+			candidates.find(({ entry }) => entry.isFallback),
+		),
+	];
+}
+
+// The page renders one <img> per card and the route re-enters here for each, so sample once
+let sampleOpenGraphCards: Promise<Array<SampleOpenGraphCard>> | undefined;
+
+export function getSampleOpenGraphCards() {
+	if (!sampleOpenGraphCards) {
+		sampleOpenGraphCards = createSampleOpenGraphCards();
+	}
+
+	return sampleOpenGraphCards;
 }

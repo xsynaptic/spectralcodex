@@ -4,7 +4,7 @@ import { promises as fs } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-export interface FontsourceConfig {
+interface FontsourceConfig {
 	// Font family name as referenced by `fontFamily` in the template
 	name: string;
 	// @fontsource package without the scope (*e.g.* noto-serif-tc)
@@ -18,13 +18,36 @@ interface FontVariant {
 	weight: number;
 }
 
+const fontConfigs: Array<FontsourceConfig> = [
+	{
+		package: 'lora',
+		name: 'Lora',
+		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
+	},
+	{
+		package: 'noto-serif-tc',
+		name: 'Noto Serif TC',
+		variants: [{ weight: 700, style: 'normal', subset: 'chinese-traditional' }],
+	},
+	{
+		package: 'noto-serif-thai',
+		name: 'Noto Serif Thai',
+		variants: [{ weight: 500, style: 'normal', subset: 'thai' }],
+	},
+	{
+		package: 'zen-antique',
+		name: 'Zen Antique',
+		variants: [{ weight: 400, style: 'normal', subset: 'japanese' }],
+	},
+];
+
 // @fontsource packages are resolved by a computed path, so knip cannot see them; see knip.config.ts
 const resolver = createRequire(import.meta.url);
 
-export async function fontsourceFonts(configs: Array<FontsourceConfig>): Promise<Array<Font>> {
+export async function loadOpenGraphFonts(): Promise<Array<Font>> {
 	const fonts: Array<Font> = [];
 
-	for (const config of configs) {
+	for (const config of fontConfigs) {
 		for (const variant of config.variants) {
 			const filename = `${config.package}-${variant.subset}-${String(variant.weight)}-${variant.style}.woff2`;
 			const packageJson = resolver.resolve(`@fontsource/${config.package}/package.json`);

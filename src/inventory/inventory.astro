@@ -1,6 +1,8 @@
 ---
 import type { ComponentProps } from 'astro/types';
 
+import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
+
 import ChronologyActivity from '#components/chronology/chronology-activity.astro';
 import ChronologyItem from '#components/chronology/chronology-item.astro';
 import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
@@ -76,6 +78,7 @@ import {
 	getSampleImages,
 	getSampleLocations,
 	getSampleNearbyLocations,
+	getSampleOpenGraphCards,
 	getSampleRelatedRegion,
 	getSampleRegions,
 	getSampleResources,
@@ -105,12 +108,12 @@ import {
 import ProseSample from '#inventory/inventory-prose-sample.mdx';
 import Section from '#inventory/inventory-section.astro';
 import Specimen from '#inventory/inventory-specimen.astro';
+import { getSectionId } from '#inventory/inventory-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
-
-import './inventory.css';
+import '#inventory/inventory.css';
 
 const t = getTranslations();
 
@@ -125,6 +128,7 @@ const sampleRelatedRegion = await getSampleRelatedRegion();
 const sampleThemes = await getSampleThemes();
 const sampleResources = await getSampleResources();
 const sampleMapData = await createSampleMapData();
+const sampleOpenGraphCards = await getSampleOpenGraphCards();
 
 const sampleImage = sampleImages.landscape[0]
 	? { entry: sampleImages.landscape[0], ...createSampleImageProps(sampleImages.landscape[0]) }
@@ -150,6 +154,53 @@ const sampleChronologyMonth = sampleChronologyMonths[1];
 
 const noMedia = 'The Images collection is empty, so nothing here can resolve a photograph.';
 
+const noOpenGraphEntry = 'No Entry resolves an image, so there is no ground to draw on.';
+
+const openGraphSpecimens = [
+	{
+		key: 'ground-dark',
+		name: 'og-image',
+		note: 'A Latin title over a dark ground: gradient fill on the title, white branding line, scrim at the foot.',
+		missing: noOpenGraphEntry,
+	},
+	{
+		key: 'ground-bright',
+		name: 'og-image (bright ground)',
+		note: 'The branding line flips to dark above a mean luminance of 190, sampled from the top of the frame. The titles read the foot of the frame against the same threshold, which a photograph rarely crosses.',
+		missing: noOpenGraphEntry,
+	},
+	{
+		key: 'title-long',
+		name: 'og-image (long title)',
+		note: 'A written title long enough to overrun both clamps: the Latin line holds at two, the multilingual line above it at one.',
+		missing: noMedia,
+	},
+	{
+		key: 'title-zh',
+		name: 'og-image (Chinese title)',
+		note: 'Noto Serif TC, and a <code>lang</code> of <code>zh-Hant</code> so Han unification resolves the right glyphs.',
+		missing: noMedia,
+	},
+	{
+		key: 'title-ja',
+		name: 'og-image (Japanese title)',
+		note: 'Zen Antique at its own weight and optical size. Only the first title present is drawn, so a card reaches this face only without a Chinese title above it.',
+		missing: noMedia,
+	},
+	{
+		key: 'title-th',
+		name: 'og-image (Thai title)',
+		note: 'Noto Serif Thai, set tighter than the CJK faces to fit its ascenders and tone marks.',
+		missing: noMedia,
+	},
+	{
+		key: 'image-fallback',
+		name: 'og-image (fallback image)',
+		note: 'An Entry with no Featured Image draws a stand-in photograph, blurred, picked by collection and Theme. The batch script also reads the Entry Region, which this section does not.',
+		missing: 'No Entry falls back to a stand-in image.',
+	},
+];
+
 const sections = [
 	'Foundations',
 	'Prose',
@@ -159,6 +210,7 @@ const sections = [
 	'Content',
 	'Sections',
 	'Domain',
+	'Open Graph',
 ];
 
 const colorRamps = [
@@ -257,7 +309,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				the route nor a utility written here reaches a build.
 			</p>
 			<nav class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
-				{sections.map((section) => <Anchor href={`#${section.toLowerCase()}`}>{section}</Anchor>)}
+				{sections.map((section) => <Anchor href={`#${getSectionId(section)}`}>{section}</Anchor>)}
 			</nav>
 		</div>
 		<Section title="Foundations">
@@ -1318,6 +1370,33 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					)
 				}
 			</Specimen>
+		</Section>
+		<Section
+			note="Cards are drawn by a batch script rather than by Astro; the route behind this section renders that same template on demand."
+			title="Open Graph"
+		>
+			{
+				openGraphSpecimens.map(({ key, name, note, missing }) => {
+					const card = sampleOpenGraphCards.find((item) => item.key === key);
+
+					return (
+						<Specimen name={name} note={note} source="packages/scripts/src/og-image/element.tsx">
+							{card ? (
+								<img
+									alt={card.entry.title}
+									class="h-auto w-full rounded-xs"
+									height={openGraphImageHeight}
+									loading="lazy"
+									src={`/inventory/og/${card.key}.jpg`}
+									width={openGraphImageWidth}
+								/>
+							) : (
+								<p class={captionClass}>{missing}</p>
+							)}
+						</Specimen>
+					);
+				})
+			}
 		</Section>
 	</div>
 </MainSite>

@@ -3,6 +3,9 @@
 	"version": "1.1.1",
 	"description": "Scripts for Spectral Codex",
 	"type": "module",
+	"exports": {
+		"./og-image": "./src/og-image/inventory-exports.ts"
+	},
 	"private": true,
 	"scripts": {
 		"check-links": "tsx ./src/check-links/index.ts",

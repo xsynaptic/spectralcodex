@@ -6,7 +6,7 @@ import path from 'node:path';
 import { z } from 'zod';
 
 import type { DataStoreEntry, RegionParentMap } from '../shared/data-store.js';
-import type { OpenGraphContentEntry } from './types.js';
+import type { OpenGraphContentEntry, OpenGraphEntryItem } from './types.js';
 
 import {
 	getDataStoreCollection,
@@ -33,10 +33,10 @@ function getImageFeaturedData({
 	regionParentMap,
 	chronologyImageIndex,
 }: {
-	entry: DataStoreEntry;
+	entry: Pick<DataStoreEntry, 'data' | 'id'>;
 	collection: string;
-	regionParentMap?: RegionParentMap;
-	chronologyImageIndex?: Map<string, string>;
+	regionParentMap?: RegionParentMap | undefined;
+	chronologyImageIndex?: Map<string, string> | undefined;
 }): { imageFeaturedId: string; isFallback: boolean } {
 	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
 
@@ -152,6 +152,33 @@ function getMultilingualTitles(data: Record<string, unknown>, override: TitleOve
 	};
 }
 
+// The one place an entry becomes a card, shared with the dev-only Inventory route
+export function toOpenGraphEntryItem({
+	entry,
+	collection,
+	regionParentMap,
+	chronologyImageIndex,
+}: {
+	entry: Pick<DataStoreEntry, 'data' | 'id'>;
+	collection: string;
+	regionParentMap?: RegionParentMap | undefined;
+	chronologyImageIndex?: Map<string, string> | undefined;
+}): OpenGraphEntryItem | undefined {
+	const id = getPublicId(entry).replace('/', '-');
+	const override = parseTitleOverride(collection, entry.data);
+	const title = resolveEntryTitle({ collection, id, data: entry.data, override });
+
+	if (title === undefined) return undefined;
+
+	return {
+		collection,
+		id,
+		title: stripDiacritics(title),
+		...getMultilingualTitles(entry.data, override),
+		...getImageFeaturedData({ entry, collection, regionParentMap, chronologyImageIndex }),
+	};
+}
+
 // Keyed by the OG image filename, same as the index entries
 function buildDataStoreEntries(dataStorePath: string): {
 	entries: Map<string, OpenGraphContentEntry>;
@@ -169,27 +196,16 @@ function buildDataStoreEntries(dataStorePath: string): {
 		for (const entry of collectionEntries) {
 			if (!entry.digest) continue;
 
-			const id = getPublicId(entry).replace('/', '-');
-			const override = parseTitleOverride(collection, entry.data);
-			const title = resolveEntryTitle({ collection, id, data: entry.data, override });
-
-			if (title === undefined) continue;
-
-			const imageFeaturedData = getImageFeaturedData({
+			const item = toOpenGraphEntryItem({
 				entry,
 				collection,
 				regionParentMap,
 				chronologyImageIndex,
 			});
 
-			entries.set(id, {
-				collection,
-				id,
-				digest: entry.digest,
-				title: stripDiacritics(title),
-				...getMultilingualTitles(entry.data, override),
-				...imageFeaturedData,
-			});
+			if (!item) continue;
+
+			entries.set(item.id, { ...item, digest: entry.digest });
 		}
 	}
 
