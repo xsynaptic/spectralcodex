@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.21.0",
+	"version": "7.22.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -49,7 +49,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.2.10",
+		"astro": "^7.3.1",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
@@ -82,7 +82,7 @@
 		"@types/react-dom": "^19.2.5",
 		"@unpic/astro": "^1.0.2",
 		"@unpic/core": "^1.0.3",
-		"@xsynaptic/astro-build-logger": "^1.0.0",
+		"@xsynaptic/astro-build-logger": "^1.1.0",
 		"@xsynaptic/astro-image-loader": "^1.1.1",
 		"@xsynaptic/eslint-config": "^6.3.0",
 		"@xsynaptic/mdxlint-config": "^2.0.0",
