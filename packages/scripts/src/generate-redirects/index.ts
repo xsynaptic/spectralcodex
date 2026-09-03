@@ -3,18 +3,27 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { dataStoreRelativePath, loadDataStore } from '../shared/data-store';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { buildRedirectPairs } from './build-redirect-pairs';
 
 const rootPath = findWorkspaceRoot();
 
-const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const outputPath = path.join(rootPath, 'deploy/caddy/spectralcodex-redirects-generated.conf');
 
-const { collections } = loadDataStore(dataStorePath);
+const entries = await withAstroContent((content) =>
+	getCollectionEntries(content, [
+		'locations',
+		'posts',
+		'pages',
+		'themes',
+		'series',
+		'regions',
+		'resources',
+	]),
+);
 
-const redirects = buildRedirectPairs(collections);
+const redirects = buildRedirectPairs(entries);
 
 if (redirects.length === 0) {
 	console.log(chalk.yellow('No formerIds found, writing empty redirect file'));

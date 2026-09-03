@@ -1,28 +1,22 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { CollectionEntry } from 'astro:content';
+
+type LocationEntry = CollectionEntry<'locations'>;
 
 interface CheckOptions {
 	threshold: number;
 }
 
 export type CheckFn = (
-	entries: Array<DataStoreEntry>,
+	entries: Array<LocationEntry>,
 	options: CheckOptions,
-) => Array<DataStoreEntry>;
+) => Array<LocationEntry>;
 
-function hasMatchingLink(entry: DataStoreEntry, match: string): boolean {
+function hasMatchingLink(entry: LocationEntry, match: string): boolean {
 	const links = entry.data.links;
 
-	if (!Array.isArray(links)) return false;
+	if (!links) return false;
 
-	return links.some((link: unknown) => {
-		if (typeof link === 'string') return link.includes(match);
-
-		if (link && typeof link === 'object' && 'url' in link && typeof link.url === 'string') {
-			return link.url.includes(match);
-		}
-
-		return false;
-	});
+	return links.some((link) => (typeof link === 'string' ? link : link.url).includes(match));
 }
 
 export const checks: Record<string, CheckFn> = {
@@ -31,8 +25,7 @@ export const checks: Record<string, CheckFn> = {
 			(entry) =>
 				entry.data.entryQuality === 1 &&
 				(entry.body ?? '').trim().length >= 200 &&
-				Array.isArray(entry.data.themes) &&
-				entry.data.themes.length > 0 &&
+				(entry.data.themes?.length ?? 0) > 0 &&
 				/<Link[\s>]/.test(entry.body ?? ''),
 		),
 	'find-stubs': (entries, { threshold }) =>
@@ -42,6 +35,5 @@ export const checks: Record<string, CheckFn> = {
 			(entry) =>
 				(entry.body ?? '').trim().length < threshold && hasMatchingLink(entry, 'wikipedia.org'),
 		),
-	'theme-missing': (entries) =>
-		entries.filter((entry) => !Array.isArray(entry.data.themes) || entry.data.themes.length === 0),
+	'theme-missing': (entries) => entries.filter((entry) => !entry.data.themes?.length),
 };

@@ -4,7 +4,7 @@ import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralco
 import chalk from 'chalk';
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { RegionMetadata } from './types';
 
 /**
@@ -34,8 +34,7 @@ function getRegionPathIds(filePath: string, id: string): Array<string> {
 	return regionPathIds;
 }
 
-// Parse region data from data-store entries
-export function parseRegionData(entries: Array<DataStoreEntry>) {
+export function parseRegionData(entries: Array<ContentEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
 	for (const entry of entries) {

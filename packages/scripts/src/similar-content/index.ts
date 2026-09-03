@@ -8,16 +8,12 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
-import type { DataStoreEntry } from '../shared/data-store.js';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { SimilarContentMetadata } from './metadata.js';
 
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { getFileCacheInstance } from '../shared/cache-file.js';
-import {
-	dataStoreRelativePath,
-	getDataStoreCollection,
-	loadDataStore,
-	toReferenceIds,
-} from '../shared/data-store.js';
+import { toReferenceIds } from '../shared/entries.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { calculateMetadataBoost } from './metadata.js';
 
@@ -65,9 +61,8 @@ const { values } = parseArgs({
 	},
 });
 
-interface ContentEntry extends DataStoreEntry {
-	collection: string;
-}
+// Entries are filtered to those carrying a digest, which keys the embedding cache
+type EmbeddableEntry = ContentEntry & { digest: string };
 
 interface SimilarContentEmbedding {
 	id: string;
@@ -119,7 +114,7 @@ type FeatureExtractor = Awaited<ReturnType<typeof pipeline<'feature-extraction'>
 
 async function createEmbedding(
 	embedder: FeatureExtractor,
-	entry: ContentEntry,
+	entry: EmbeddableEntry,
 	digest: string,
 ): Promise<SimilarContentEmbedding> {
 	const plainTextContent = cleanContent(entry.body ?? '', entry.data);
@@ -139,7 +134,7 @@ async function createEmbedding(
 
 // Generate embeddings for all content entries
 async function generateEmbeddings(
-	entries: Array<ContentEntry>,
+	entries: Array<EmbeddableEntry>,
 ): Promise<Array<SimilarContentEmbedding>> {
 	const cachePath = path.join(rootPath, values['cache-path']);
 	const cacheNamespace = getCacheNamespace();
@@ -311,27 +306,19 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	return result;
 }
 
-// Content handling
-function getContentEntries(dataStorePath: string): Array<ContentEntry> {
-	const { collections, path: resolvedPath } = loadDataStore(dataStorePath);
+async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
+	const collectionEntries = await withAstroContent((content) =>
+		getCollectionEntries(content, [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]),
+	);
 
-	console.log(chalk.gray(`Loaded data store from: ${resolvedPath}`));
+	const entries: Array<EmbeddableEntry> = [];
 
-	const entries: Array<ContentEntry> = [];
+	for (const entry of collectionEntries) {
+		if (!entry.digest) continue;
 
-	for (const collectionName of [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]) {
-		const collectionEntries = getDataStoreCollection(collections, [collectionName]);
+		if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
 
-		for (const entry of collectionEntries) {
-			if (!entry.digest) continue;
-
-			if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
-
-			entries.push({
-				...entry,
-				collection: collectionName,
-			});
-		}
+		entries.push({ ...entry, digest: String(entry.digest) });
 	}
 
 	if (entries.length === 0) {
@@ -345,8 +332,6 @@ function getContentEntries(dataStorePath: string): Array<ContentEntry> {
 async function similarContent() {
 	try {
 		console.log(chalk.magenta('=== Similar Content Generator ==='));
-
-		const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 
 		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
 
@@ -367,9 +352,9 @@ async function similarContent() {
 			process.exit(0);
 		}
 
-		const entries = getContentEntries(dataStorePath);
+		const entries = await getContentEntries();
 
-		console.log(chalk.gray(`Processing ${String(entries.length)} entries from data store`));
+		console.log(chalk.gray(`Processing ${String(entries.length)} entries`));
 
 		const totalStart = performance.now();
 

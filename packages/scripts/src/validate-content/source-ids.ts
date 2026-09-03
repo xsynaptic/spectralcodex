@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -9,8 +9,8 @@ interface SourceIdIssue {
 
 // Longform sources (inline objects) describe a resource with no entry of its own and are skipped
 export function collectSourceIdIssues(
-	entries: Array<DataStoreEntry>,
-	resourceEntries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	resourceEntries: Array<ContentEntry>,
 ) {
 	const validIds = new Set<string>();
 
@@ -38,8 +38,8 @@ export function collectSourceIdIssues(
 }
 
 export function validateSourceIds(
-	entries: Array<DataStoreEntry>,
-	resourceEntries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	resourceEntries: Array<ContentEntry>,
 ) {
 	const issues = collectSourceIdIssues(entries, resourceEntries);
 

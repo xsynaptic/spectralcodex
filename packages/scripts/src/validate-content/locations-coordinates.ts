@@ -5,10 +5,10 @@ import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationResult } from './validation-result';
 
-import { toReferenceIds } from '../shared/data-store';
+import { toReferenceIds } from '../shared/entries.js';
 import { LocationGeometrySchema } from '../shared/geometry';
 
 async function loadRegionGeometry(
@@ -93,7 +93,7 @@ function createRegionGeometryLoader(divisionsPath: string) {
 
 type RegionFeatures = Array<Feature<Polygon | MultiPolygon>>;
 
-function getEntryGeometries(entry: DataStoreEntry) {
+function getEntryGeometries(entry: ContentEntry) {
 	const result = LocationGeometrySchema.safeParse(entry.data.geometry);
 
 	if (!result.success) return;
@@ -125,7 +125,7 @@ async function collectRegionFeatures(
 }
 
 function collectEntryMismatches(
-	entry: DataStoreEntry,
+	entry: ContentEntry,
 	geometries: Array<{ coordinates: [number, number] }>,
 	features: RegionFeatures,
 	validRegions: Array<string>,
@@ -143,7 +143,7 @@ function collectEntryMismatches(
 	return mismatches;
 }
 
-async function collectCoordinateFindings(entries: Array<DataStoreEntry>, divisionsPath: string) {
+async function collectCoordinateFindings(entries: Array<ContentEntry>, divisionsPath: string) {
 	const mismatches: Array<string> = [];
 
 	let mismatchCount = 0;
@@ -189,7 +189,7 @@ async function collectCoordinateFindings(entries: Array<DataStoreEntry>, divisio
 }
 
 export async function validateLocationsCoordinates(
-	entries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
 	divisionsPath: string,
 ) {
 	const {

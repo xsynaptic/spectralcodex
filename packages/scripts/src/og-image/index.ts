@@ -18,10 +18,9 @@ import type { OutputCacheStore } from './output-cache.js';
 import type { OpenGraphContentEntry } from './types.js';
 
 import { getFileCacheInstance } from '../shared/cache-file.js';
-import { dataStoreRelativePath } from '../shared/data-store.js';
 import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
 import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.js';
-import { getBuiltEntries } from './content.js';
+import { getBuiltEntries } from './built-entries.js';
 import { loadOpenGraphFonts } from './fonts.js';
 import { createRenderer, processImage } from './generate.js';
 import { createOutputCache } from './output-cache.js';
@@ -111,8 +110,7 @@ async function main() {
 		jpegQuality: 90, // High-quality output because platforms will re-encode
 	});
 
-	const { entries, unresolved } = getBuiltEntries({
-		dataStorePath: path.resolve(rootPath, dataStoreRelativePath),
+	const { entries, unresolved } = await getBuiltEntries({
 		distPath: path.resolve(rootPath, values['dist-path']),
 	});
 
@@ -124,7 +122,7 @@ async function main() {
 		}
 		console.log(
 			chalk.red(
-				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a data-store entry, index page, or chronology pattern.`,
+				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
 			),
 		);
 		process.exit(1);

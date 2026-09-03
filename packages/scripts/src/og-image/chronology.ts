@@ -1,9 +1,9 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { z } from 'zod';
 
-import type { DataStoreEntry } from '../shared/data-store.js';
+import type { ContentEntry } from '../shared/astro-content.js';
 
-import { getPublicId } from '../shared/data-store.js';
+import { getPublicId } from '../shared/entries.js';
 import { extractImageFeaturedIds } from '../shared/images.js';
 
 /**
@@ -95,7 +95,7 @@ function isBetterChronologyCandidate(
 }
 
 function extractDatedCategories(
-	data: DataStoreEntry['data'],
+	data: ContentEntry['data'],
 ): Array<{ date: Date; category: ChronologyCategory }> {
 	const dated: Array<{ date: Date; category: ChronologyCategory }> = [];
 
@@ -115,7 +115,7 @@ function extractDatedCategories(
 }
 
 function extractEntryCandidate(
-	entry: DataStoreEntry,
+	entry: ContentEntry,
 ): Omit<ChronologyImageCandidate, 'category'> | undefined {
 	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
 
@@ -129,9 +129,7 @@ function extractEntryCandidate(
 }
 
 // Maps each chronology period to its best content image; one image may represent both a year and a month
-export function buildChronologyImageIndex(
-	collections: Map<string, Map<string, DataStoreEntry>>,
-): Map<string, string> {
+export function buildChronologyImageIndex(entries: Array<ContentEntry>): Map<string, string> {
 	const candidates = new Map<string, ChronologyImageCandidate>();
 
 	function addCandidate(date: Date, candidate: ChronologyImageCandidate): void {
@@ -145,11 +143,9 @@ export function buildChronologyImageIndex(
 	}
 
 	for (const collectionName of chronologyImageCollections) {
-		const collection = collections.get(collectionName);
+		for (const entry of entries) {
+			if (entry.collection !== collectionName) continue;
 
-		if (!collection) continue;
-
-		for (const entry of collection.values()) {
 			const entryCandidate = extractEntryCandidate(entry);
 
 			if (!entryCandidate) continue;

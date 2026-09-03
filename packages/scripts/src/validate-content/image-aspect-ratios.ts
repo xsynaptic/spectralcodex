@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -51,7 +51,7 @@ interface ImageDimensions {
 	ratio: number;
 }
 
-function getImageDimensions(entry: DataStoreEntry): ImageDimensions | undefined {
+function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
 	const { width, height } = entry.data;
 
 	if (typeof width !== 'number' || typeof height !== 'number') return undefined;
@@ -76,7 +76,7 @@ interface RatioTallyRow {
 	count: number;
 }
 
-export function collectAspectRatioIssues(entries: Array<DataStoreEntry>) {
+export function collectAspectRatioIssues(entries: Array<ContentEntry>) {
 	const flagged: Array<FlaggedImage> = [];
 
 	// Conforming images only; flagged ones are reported separately
@@ -134,7 +134,7 @@ function formatRatioTally(tally: Array<RatioTallyRow>) {
 }
 
 export function validateImageAspectRatios(
-	entries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
 	{ showStats = false }: { showStats?: boolean } = {},
 ) {
 	const { flagged, checkedCount, exemptCount, tally } = collectAspectRatioIssues(entries);

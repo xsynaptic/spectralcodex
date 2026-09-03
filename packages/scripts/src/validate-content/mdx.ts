@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationIssue } from './validation-result';
 
 import { toValidationResult } from './validation-result';
@@ -67,7 +67,7 @@ function collectImgComponentErrors(content: string): Array<ComponentError> {
 	return errors;
 }
 
-export function validateMdxComponents(entries: Array<DataStoreEntry>) {
+export function validateMdxComponents(entries: Array<ContentEntry>) {
 	const issues: Array<ValidationIssue> = [];
 
 	let errorCount = 0;

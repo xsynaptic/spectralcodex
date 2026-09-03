@@ -37,9 +37,7 @@ export default {
 		},
 		'packages/scripts': {
 			ignoreDependencies: [
-				'@astrojs/markdown-remark', // peer dep
 				'@fontsource/.+', // loaded dynamically via require.resolve in og-image
-				'astro', // used via CLI, not imported
 			],
 		},
 	},

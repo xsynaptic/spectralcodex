@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationIssue } from './validation-result';
 
 import { toValidationResult } from './validation-result';
@@ -41,7 +41,7 @@ function isDuplicate(seen: Set<string>, value: string): boolean {
 	return false;
 }
 
-export function validateLocationsDuplicates(entries: Array<DataStoreEntry>) {
+export function validateLocationsDuplicates(entries: Array<ContentEntry>) {
 	const seenByField = new Map(duplicateFields.map((field) => [field, new Set<string>()]));
 	const seenGoogleMapsLinks = new Set<string>();
 

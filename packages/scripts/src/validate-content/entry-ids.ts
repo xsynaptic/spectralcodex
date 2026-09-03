@@ -1,6 +1,6 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
-import { getPublicId } from '../shared/data-store';
+import { getPublicId } from '../shared/entries.js';
 import { toValidationResult } from './validation-result';
 
 interface DuplicateIdIssue {
@@ -13,7 +13,7 @@ interface DuplicateIdIssue {
  * The link, source, and featured-image checks resolve targets against one flat ID set, so a collision would silently point at the wrong entry
  * A location override publishes a second ID into the same namespace, so both are claimed
  */
-export function collectDuplicateIdIssues(entries: Array<DataStoreEntry>) {
+export function collectDuplicateIdIssues(entries: Array<ContentEntry>) {
 	const locationsById = new Map<string, Array<string>>();
 
 	for (const entry of entries) {
@@ -42,7 +42,7 @@ export function collectDuplicateIdIssues(entries: Array<DataStoreEntry>) {
 	return issues;
 }
 
-export function validateEntryIds(entries: Array<DataStoreEntry>) {
+export function validateEntryIds(entries: Array<ContentEntry>) {
 	const issues = collectDuplicateIdIssues(entries);
 
 	return toValidationResult(

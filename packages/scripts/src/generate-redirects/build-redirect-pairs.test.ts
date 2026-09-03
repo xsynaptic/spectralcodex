@@ -1,61 +1,38 @@
 import { describe, expect, test } from 'vitest';
 
-import type { DataStoreCollections, DataStoreEntry } from '../shared/data-store';
-
-import { makeEntry } from '../validate-content/validate-test-utils';
 import { buildRedirectPairs } from './build-redirect-pairs';
 
-// Fixtures must carry all collections; getDataStoreCollection throws on a missing one
-const allCollections = ['locations', 'posts', 'pages', 'themes', 'series', 'regions', 'resources'];
-
-function makeCollections(
-	populated: Record<string, Array<DataStoreEntry>> = {},
-): DataStoreCollections {
-	const collections: DataStoreCollections = new Map();
-
-	for (const name of allCollections) {
-		const entries = new Map<string, DataStoreEntry>();
-		const populatedEntries = populated[name] ?? [];
-
-		for (const entry of populatedEntries) {
-			entries.set(entry.id, entry);
-		}
-
-		collections.set(name, entries);
-	}
-
-	return collections;
+function makeEntry(
+	id: string,
+	collection: string,
+	data: { formerIds?: Array<string>; override?: { id: string } } = {},
+) {
+	return { id, collection, data };
 }
 
 describe('buildRedirectPairs', () => {
 	test('emits a page redirect and an OG-image redirect per formerId (flat collection)', () => {
-		const collections = makeCollections({
-			locations: [makeEntry({ id: 'new-id', data: { formerIds: ['old-id'] } })],
-		});
-
-		expect(buildRedirectPairs(collections)).toEqual([
+		expect(
+			buildRedirectPairs([makeEntry('new-id', 'locations', { formerIds: ['old-id'] })]),
+		).toEqual([
 			{ fromPath: '/old-id/', toPath: '/new-id/' },
 			{ fromPath: '/og/old-id.jpg', toPath: '/og/new-id.jpg' },
 		]);
 	});
 
 	test('prefixes page paths for prefixed collections but keeps OG paths flat', () => {
-		const collections = makeCollections({
-			themes: [makeEntry({ id: 'new-theme', data: { formerIds: ['old-theme'] } })],
-		});
-
-		expect(buildRedirectPairs(collections)).toEqual([
+		expect(
+			buildRedirectPairs([makeEntry('new-theme', 'themes', { formerIds: ['old-theme'] })]),
+		).toEqual([
 			{ fromPath: '/themes/old-theme/', toPath: '/themes/new-theme/' },
 			{ fromPath: '/og/old-theme.jpg', toPath: '/og/new-theme.jpg' },
 		]);
 	});
 
 	test('emits a pair for each of several formerIds', () => {
-		const collections = makeCollections({
-			posts: [makeEntry({ id: 'current', data: { formerIds: ['old-a', 'old-b'] } })],
-		});
-
-		expect(buildRedirectPairs(collections)).toEqual([
+		expect(
+			buildRedirectPairs([makeEntry('current', 'posts', { formerIds: ['old-a', 'old-b'] })]),
+		).toEqual([
 			{ fromPath: '/old-a/', toPath: '/current/' },
 			{ fromPath: '/og/old-a.jpg', toPath: '/og/current.jpg' },
 			{ fromPath: '/old-b/', toPath: '/current/' },
@@ -64,37 +41,37 @@ describe('buildRedirectPairs', () => {
 	});
 
 	test('targets the override id for anonymized locations, never the real entry id', () => {
-		const collections = makeCollections({
-			locations: [
-				makeEntry({
-					id: 'real-name',
-					data: { formerIds: ['old-slug'], override: { id: 'anon-42' } },
+		expect(
+			buildRedirectPairs([
+				makeEntry('real-name', 'locations', {
+					formerIds: ['old-slug'],
+					override: { id: 'anon-42' },
 				}),
-			],
-		});
-
-		expect(buildRedirectPairs(collections)).toEqual([
+			]),
+		).toEqual([
 			{ fromPath: '/old-slug/', toPath: '/anon-42/' },
 			{ fromPath: '/og/old-slug.jpg', toPath: '/og/anon-42.jpg' },
 		]);
 	});
 
 	test('skips a formerId that equals the canonical (public) id', () => {
-		const collections = makeCollections({
-			locations: [
-				makeEntry({ id: 'self', data: { formerIds: ['self'] } }),
-				makeEntry({ id: 'real', data: { formerIds: ['anon'], override: { id: 'anon' } } }),
-			],
-		});
-
-		expect(buildRedirectPairs(collections)).toEqual([]);
+		expect(
+			buildRedirectPairs([
+				makeEntry('self', 'locations', { formerIds: ['self'] }),
+				makeEntry('real', 'locations', { formerIds: ['anon'], override: { id: 'anon' } }),
+			]),
+		).toEqual([]);
 	});
 
 	test('ignores entries without formerIds', () => {
-		const collections = makeCollections({
-			locations: [makeEntry({ id: 'plain', data: {} })],
-		});
+		expect(buildRedirectPairs([makeEntry('plain', 'locations')])).toEqual([]);
+	});
 
-		expect(buildRedirectPairs(collections)).toEqual([]);
+	// The caller chooses which collections to pass; an unprefixed one redirects flat
+	test('treats a collection outside the prefix map as flat', () => {
+		expect(buildRedirectPairs([makeEntry('img', 'images', { formerIds: ['old-img'] })])).toEqual([
+			{ fromPath: '/old-img/', toPath: '/img/' },
+			{ fromPath: '/og/old-img.jpg', toPath: '/og/img.jpg' },
+		]);
 	});
 });

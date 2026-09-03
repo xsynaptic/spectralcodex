@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -16,7 +16,7 @@ function formatIssue(issue: RegionParentIssue) {
 }
 
 // Self edges are excluded so the cycle walk doesn't re-report them
-function collectParentEdges(entries: Array<DataStoreEntry>) {
+function collectParentEdges(entries: Array<ContentEntry>) {
 	const regionIds = new Set(entries.map((entry) => entry.id));
 	const parentById = new Map<string, string>();
 	const issues: Array<RegionParentIssue> = [];
@@ -41,7 +41,7 @@ function collectParentEdges(entries: Array<DataStoreEntry>) {
 }
 
 // Walk each entry's parent chain; a return to the starting entry is a cycle, reported once per cycle
-function collectCycleIssues(entries: Array<DataStoreEntry>, parentById: Map<string, string>) {
+function collectCycleIssues(entries: Array<ContentEntry>, parentById: Map<string, string>) {
 	const reportedCycles = new Set<string>();
 	const issues: Array<RegionParentIssue> = [];
 
@@ -78,13 +78,13 @@ function collectCycleIssues(entries: Array<DataStoreEntry>, parentById: Map<stri
 // A region `parent` must reference an existing region id, never itself, and never form a cycle
 // A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
 // A cycle drops every member out of the hierarchy's root-driven walk, so subtrees silently vanish from rollups
-export function collectRegionsParentsIssues(entries: Array<DataStoreEntry>) {
+export function collectRegionsParentsIssues(entries: Array<ContentEntry>) {
 	const { parentById, issues } = collectParentEdges(entries);
 
 	return [...issues, ...collectCycleIssues(entries, parentById)];
 }
 
-export function validateRegionsParents(entries: Array<DataStoreEntry>) {
+export function validateRegionsParents(entries: Array<ContentEntry>) {
 	const issues = collectRegionsParentsIssues(entries);
 
 	return toValidationResult(

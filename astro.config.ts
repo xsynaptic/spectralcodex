@@ -43,7 +43,14 @@ const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 const trailingSlash = 'always';
 
 // Git-derived per-URL dates, written by the sitemap-lastmod deploy step before the build
-const sitemapLastmod = readSitemapLastmod();
+// Read on first use, so loading this config never depends on a file a content script writes
+let sitemapLastmodCache: ReturnType<typeof readSitemapLastmod> | undefined;
+
+function getSitemapLastmod() {
+	if (!sitemapLastmodCache) sitemapLastmodCache = readSitemapLastmod();
+
+	return sitemapLastmodCache;
+}
 
 /**
  * @link https://astro.build/config
@@ -191,7 +198,7 @@ export default defineConfig({
 					layouts: ['default', 'wide', 'full'],
 				}),
 			],
-			hastPlugins: [wrapCjk({ value: 'cjk' }), trailingSlashPlugin({ trailingSlash })],
+			hastPlugins: [wrapCjk({ value: 'cjk-text' }), trailingSlashPlugin({ trailingSlash })],
 		}),
 	},
 	integrations: [
@@ -201,10 +208,14 @@ export default defineConfig({
 		mdx(),
 		sitemap({
 			filter: (page) => isIndexableUrlPath(new URL(page).pathname),
-			serialize: (item) => ({
-				...item,
-				lastmod: sitemapLastmod.urls[item.url] ?? sitemapLastmod.generatedAt,
-			}),
+			serialize: (item) => {
+				const sitemapLastmod = getSitemapLastmod();
+
+				return {
+					...item,
+					lastmod: sitemapLastmod.urls[item.url] ?? sitemapLastmod.generatedAt,
+				};
+			},
 		}),
 		pagefind({
 			indexConfig: {

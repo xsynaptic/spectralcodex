@@ -1,7 +1,7 @@
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationResult } from './validation-result';
 
 import { LocationGeometrySchema } from '../shared/geometry';
@@ -18,7 +18,7 @@ interface LocationOverlap {
 	distance: number;
 }
 
-function collectPoints(entries: Array<DataStoreEntry>) {
+function collectPoints(entries: Array<ContentEntry>) {
 	const points: Array<IndexedPoint> = [];
 
 	let locationCount = 0;
@@ -93,7 +93,7 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 	return overlaps.sort((overlapA, overlapB) => overlapA.distance - overlapB.distance);
 }
 
-export function validateLocationsOverlap(entries: Array<DataStoreEntry>, thresholdMeters: number) {
+export function validateLocationsOverlap(entries: Array<ContentEntry>, thresholdMeters: number) {
 	const { points, locationCount } = collectPoints(entries);
 	const overlaps = findOverlaps(points, thresholdMeters);
 

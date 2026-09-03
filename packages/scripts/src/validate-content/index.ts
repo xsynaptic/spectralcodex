@@ -5,7 +5,7 @@ import { parseArgs } from 'node:util';
 
 import type { ValidationResult } from './validation-result';
 
-import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { findWorkspaceRoot } from '../shared/utils.js';
 import { validateEntryIds } from './entry-ids';
 import { validateFrontmatterLinks } from './frontmatter-links';
@@ -46,68 +46,51 @@ const { values, positionals } = parseArgs({
 	allowPositionals: true,
 });
 
-const dataStorePath = path.join(rootPath, dataStoreRelativePath);
-const { collections } = loadDataStore(dataStorePath);
-
 const command = positionals[0];
 
-const contentCollectionNames = [
-	'chronology',
-	'locations',
-	'pages',
-	'posts',
-	'regions',
-	'resources',
-	'series',
-	'themes',
-];
+const { allEntries, imageEntries } = await withAstroContent(async (content) => ({
+	allEntries: await getCollectionEntries(content, [
+		'chronology',
+		'locations',
+		'pages',
+		'posts',
+		'regions',
+		'resources',
+		'series',
+		'themes',
+	]),
+	imageEntries: await getCollectionEntries(content, ['images']),
+}));
 
-const allEntries = getDataStoreCollection(collections, contentCollectionNames);
+function entriesFrom(...collections: Array<string>) {
+	return allEntries.filter((entry) => collections.includes(entry.collection));
+}
 
-const metadataEntries = getDataStoreCollection(collections, [
-	'locations',
-	'pages',
-	'posts',
-	'regions',
-	'series',
-	'themes',
-]);
-
-const bodyContentEntries = getDataStoreCollection(collections, ['locations', 'posts']);
-
-const resourceEntries = getDataStoreCollection(collections, ['resources']);
+const metadataEntries = entriesFrom('locations', 'pages', 'posts', 'regions', 'series', 'themes');
+const bodyContentEntries = entriesFrom('locations', 'posts');
+const resourceEntries = entriesFrom('resources');
+const locationEntries = entriesFrom('locations');
 
 // Keys are the CLI subcommands; declaration order is the order a full run reports in
 // Note: there is no need for a help command
 const validations = {
 	'entry-ids': () => validateEntryIds(allEntries),
-	references: () => validateReferences(collections, contentCollectionNames),
+	references: () => validateReferences(allEntries),
 	mdx: () => validateMdxComponents(allEntries),
 	'link-ids': () => validateLinkIds(allEntries, metadataEntries),
-	'series-items': () =>
-		validateSeriesItems(getDataStoreCollection(collections, ['series']), metadataEntries),
+	'series-items': () => validateSeriesItems(entriesFrom('series'), metadataEntries),
 	'source-ids': () => validateSourceIds(allEntries, resourceEntries),
 	'frontmatter-links': () => validateFrontmatterLinks(allEntries, resourceEntries),
 	images: () => validateImageReferences(allEntries, path.join(rootPath, values['media-path'])),
-	'image-aspect-ratios': () =>
-		validateImageAspectRatios(getDataStoreCollection(collections, ['images']), { showStats: true }),
+	'image-aspect-ratios': () => validateImageAspectRatios(imageEntries, { showStats: true }),
 	'image-featured-in-body': () => validateImageFeaturedInBody(bodyContentEntries),
 	'image-featured-links': () => validateImageFeaturedLinks(allEntries, metadataEntries),
-	'location-duplicates': () =>
-		validateLocationsDuplicates(getDataStoreCollection(collections, ['locations'])),
-	'location-regions': () =>
-		validateLocationsRegions(getDataStoreCollection(collections, ['locations'])),
-	'location-overlap': () =>
-		validateLocationsOverlap(
-			getDataStoreCollection(collections, ['locations']),
-			Number(values.threshold),
-		),
-	'region-parents': () => validateRegionsParents(getDataStoreCollection(collections, ['regions'])),
+	'location-duplicates': () => validateLocationsDuplicates(locationEntries),
+	'location-regions': () => validateLocationsRegions(locationEntries),
+	'location-overlap': () => validateLocationsOverlap(locationEntries, Number(values.threshold)),
+	'region-parents': () => validateRegionsParents(entriesFrom('regions')),
 	'location-coordinates': () =>
-		validateLocationsCoordinates(
-			getDataStoreCollection(collections, ['locations']),
-			path.join(rootPath, values['divisions-path']),
-		),
+		validateLocationsCoordinates(locationEntries, path.join(rootPath, values['divisions-path'])),
 } satisfies Record<string, () => Promise<ValidationResult> | ValidationResult>;
 
 const selected = command

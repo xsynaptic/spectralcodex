@@ -1,4 +1,4 @@
-import type { DataStoreCollections, DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -48,24 +48,20 @@ function collectEntryReferences(value: unknown, field: string, references: Array
 	}
 }
 
-function getEntriesByCollection(collections: DataStoreCollections, collectionNames: Array<string>) {
-	const entriesByCollection = new Map<string, Map<string, DataStoreEntry>>();
+function getIdsByCollection(entries: Array<ContentEntry>) {
+	const idsByCollection = new Map<string, Set<string>>();
 
-	for (const name of collectionNames) {
-		const collection = collections.get(name);
+	for (const entry of entries) {
+		const ids = idsByCollection.get(entry.collection) ?? new Set<string>();
 
-		if (!collection) throw new Error(`Unknown collection: "${name}"`);
-
-		entriesByCollection.set(name, collection);
+		ids.add(entry.id);
+		idsByCollection.set(entry.collection, ids);
 	}
 
-	return entriesByCollection;
+	return idsByCollection;
 }
 
-function getEntryReferenceIssues(
-	entry: DataStoreEntry,
-	entriesByCollection: Map<string, Map<string, DataStoreEntry>>,
-) {
+function getEntryReferenceIssues(entry: ContentEntry, idsByCollection: Map<string, Set<string>>) {
 	const references: Array<EntryReference> = [];
 
 	collectEntryReferences(entry.data, '', references);
@@ -73,10 +69,10 @@ function getEntryReferenceIssues(
 	const issues: Array<ReferenceIssue> = [];
 
 	for (const reference of references) {
-		const target = entriesByCollection.get(reference.collection);
+		const ids = idsByCollection.get(reference.collection);
 
 		// References into collections outside this check's scope are left alone
-		if (!target || target.has(reference.id)) continue;
+		if (!ids || ids.has(reference.id)) continue;
 
 		issues.push({ location: entry.filePath ?? entry.id, ...reference });
 	}
@@ -86,28 +82,14 @@ function getEntryReferenceIssues(
 
 // Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
 // Checking the declared collection catches a `reference('regions')` that names a theme, which a global id lookup would accept
-export function collectReferenceIssues(
-	collections: DataStoreCollections,
-	collectionNames: Array<string>,
-) {
-	const entriesByCollection = getEntriesByCollection(collections, collectionNames);
+export function collectReferenceIssues(entries: Array<ContentEntry>) {
+	const idsByCollection = getIdsByCollection(entries);
 
-	const issues: Array<ReferenceIssue> = [];
-
-	for (const collection of entriesByCollection.values()) {
-		for (const entry of collection.values()) {
-			issues.push(...getEntryReferenceIssues(entry, entriesByCollection));
-		}
-	}
-
-	return issues;
+	return entries.flatMap((entry) => getEntryReferenceIssues(entry, idsByCollection));
 }
 
-export function validateReferences(
-	collections: DataStoreCollections,
-	collectionNames: Array<string>,
-) {
-	const issues = collectReferenceIssues(collections, collectionNames);
+export function validateReferences(entries: Array<ContentEntry>) {
+	const issues = collectReferenceIssues(entries);
 
 	return toValidationResult(
 		issues.map(({ location, field, collection, id }) => ({

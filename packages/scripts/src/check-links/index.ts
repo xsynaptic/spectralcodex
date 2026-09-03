@@ -6,11 +6,7 @@ import pLimit from 'p-limit';
 
 import type { UrlStatus } from './types.ts';
 
-import {
-	dataStoreRelativePath,
-	loadDataStore,
-	getDataStoreCollection,
-} from '../shared/data-store.ts';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
@@ -54,7 +50,6 @@ const { values } = parseArgs({
 
 const linkCollections = ['locations', 'pages', 'posts', 'regions', 'resources', 'themes'] as const;
 
-const dataStorePath = path.resolve(rootPath, dataStoreRelativePath);
 const dbPath = path.resolve(rootPath, values['db-path']);
 const concurrency = Number(values.concurrency);
 const domainLimit = Number(values['domain-limit']);
@@ -99,37 +94,35 @@ process.on('SIGINT', () => {
 	console.log(chalk.yellow('\nShutting down... waiting for in-flight requests'));
 });
 
-function syncLinks() {
-	console.log(chalk.blue('Loading data store...'));
+async function syncLinks() {
+	console.log(chalk.blue('Loading content...'));
 
-	const { collections } = loadDataStore(dataStorePath);
+	const collectionEntries = await withAstroContent((content) =>
+		getCollectionEntries(content, [...linkCollections]),
+	);
 
 	const extractedSources: Array<{ urlId: number; contentId: string }> = [];
 	const extractedEntries = new Set<string>();
 	const allEntryDigests: Array<{ contentId: string; digest: string }> = [];
 	let skipped = 0;
 
-	for (const collectionName of linkCollections) {
-		const entries = getDataStoreCollection(collections, [collectionName]);
+	for (const entry of collectionEntries) {
+		const contentId = `${entry.collection}/${entry.id}`;
+		const digest = entry.digest === undefined ? '' : String(entry.digest);
 
-		for (const entry of entries) {
-			const contentId = `${collectionName}/${entry.id}`;
-			const digest = entry.digest ?? '';
+		allEntryDigests.push({ contentId, digest });
 
-			allEntryDigests.push({ contentId, digest });
+		if (digest && getEntryDigest(contentId) === digest) {
+			skipped++;
+			continue;
+		}
 
-			if (digest && getEntryDigest(contentId) === digest) {
-				skipped++;
-				continue;
-			}
+		extractedEntries.add(contentId);
 
-			extractedEntries.add(contentId);
+		const links = extractLinksFromEntry(entry).filter((link) => !shouldIgnoreUrl(link.url));
 
-			const links = extractLinksFromEntry(entry).filter((link) => !shouldIgnoreUrl(link.url));
-
-			for (const link of links) {
-				extractedSources.push({ urlId: upsertUrl(link.url), contentId });
-			}
+		for (const link of links) {
+			extractedSources.push({ urlId: upsertUrl(link.url), contentId });
 		}
 	}
 
@@ -160,7 +153,7 @@ try {
 		process.exit(0);
 	}
 
-	syncLinks();
+	await syncLinks();
 
 	const recheckFilter =
 		values.recheck && values.recheck !== ''

@@ -1,8 +1,8 @@
 import path from 'node:path';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
-import { toReferenceIds } from '../shared/data-store';
+import { toReferenceIds } from '../shared/entries.js';
 import { toValidationResult } from './validation-result';
 
 /**
@@ -29,7 +29,7 @@ interface LocationRegionIssue {
 	hierarchy: Array<string>;
 }
 
-export function collectLocationsRegionsIssues(entries: Array<DataStoreEntry>) {
+export function collectLocationsRegionsIssues(entries: Array<ContentEntry>) {
 	const issues: Array<LocationRegionIssue> = [];
 
 	for (const entry of entries) {
@@ -52,7 +52,7 @@ export function collectLocationsRegionsIssues(entries: Array<DataStoreEntry>) {
 	return issues;
 }
 
-export function validateLocationsRegions(entries: Array<DataStoreEntry>) {
+export function validateLocationsRegions(entries: Array<ContentEntry>) {
 	const issues = collectLocationsRegionsIssues(entries);
 
 	return toValidationResult(

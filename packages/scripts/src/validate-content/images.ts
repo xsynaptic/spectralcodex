@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationResult } from './validation-result';
 
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
@@ -9,10 +9,7 @@ interface MissingImageIssue {
 	imageId: string;
 }
 
-function collectMissingImageIssues(
-	entries: Array<DataStoreEntry>,
-	mediaFiles: ReadonlySet<string>,
-) {
+function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: ReadonlySet<string>) {
 	const issues: Array<MissingImageIssue> = [];
 
 	for (const entry of entries) {
@@ -30,7 +27,7 @@ function collectMissingImageIssues(
 	return issues;
 }
 
-export function validateImageReferences(entries: Array<DataStoreEntry>, mediaPath: string) {
+export function validateImageReferences(entries: Array<ContentEntry>, mediaPath: string) {
 	const mediaFiles = collectMediaFiles(mediaPath);
 
 	if (mediaFiles.size === 0) {

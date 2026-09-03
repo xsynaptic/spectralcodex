@@ -21,7 +21,7 @@ async function resolveLatestRelease(): Promise<string> {
 	return `${s3Base}/${version}/`;
 }
 
-import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '../shared/utils';
 import { parseRegionData, resolveBoundingBox } from './content';
 import { fetchDivisionData, initializeDuckDB } from './duckdb';
@@ -266,9 +266,9 @@ async function mapDivisions() {
 	);
 
 	try {
-		// Load region data from data-store
-		const { collections } = loadDataStore(path.join(rootPath, dataStoreRelativePath));
-		const regionEntries = getDataStoreCollection(collections, ['regions']);
+		const regionEntries = await withAstroContent((content) =>
+			getCollectionEntries(content, ['regions']),
+		);
 
 		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
 

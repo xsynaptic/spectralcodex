@@ -36,7 +36,7 @@ const distPath = path.join(rootPath, 'dist');
 
 await ensureSshKeychain();
 
-// Note: because our content validation scripts rely on data-store.json we need to sync first
+// Content scripts read the store `astro sync` writes, so it has to run first
 async function sync() {
 	console.log(chalk.blue('Syncing content...'));
 	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro sync --mode production`;

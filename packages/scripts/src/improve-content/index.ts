@@ -1,24 +1,21 @@
 #!/usr/bin/env tsx
+import type { CollectionEntry } from 'astro:content';
+
 import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import * as R from 'remeda';
 
-import type { DataStoreEntry } from '../shared/data-store';
-
-import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
-import { findWorkspaceRoot } from '../shared/utils.js';
+import { withAstroContent } from '../shared/astro-content.js';
 import { checks } from './checks';
-
-const rootPath = findWorkspaceRoot();
 
 const collectionsRoot = path.join('packages', 'content', 'collections');
 
-function getDisplayPath(entry: DataStoreEntry): string {
+function getDisplayPath(entry: CollectionEntry<'locations'>): string {
 	return path.relative(collectionsRoot, entry.filePath ?? entry.id);
 }
 
-function formatEntryLine(entry: DataStoreEntry): string {
+function formatEntryLine(entry: CollectionEntry<'locations'>): string {
 	const displayPath = getDisplayPath(entry);
 	const directory = path.dirname(displayPath);
 	const filename = path.basename(displayPath);
@@ -28,7 +25,7 @@ function formatEntryLine(entry: DataStoreEntry): string {
 			? chalk.bold(filename)
 			: chalk.dim(directory + path.sep) + chalk.bold(filename);
 
-	const title = typeof entry.data.title === 'string' ? entry.data.title : undefined;
+	const { title } = entry.data;
 
 	return title ? `${formattedPath} ${chalk.dim('-')} ${title}` : formattedPath;
 }
@@ -81,10 +78,7 @@ const randomDefaultLimit = 50;
 const explicitLimit = values.limit ? Number(values.limit) : undefined;
 const effectiveLimit = explicitLimit ?? (values.random ? randomDefaultLimit : undefined);
 
-const dataStorePath = path.join(rootPath, dataStoreRelativePath);
-const { collections } = loadDataStore(dataStorePath);
-
-const entries = getDataStoreCollection(collections, ['locations']);
+const entries = await withAstroContent(({ getCollection }) => getCollection('locations'));
 
 const matched = check(entries, { threshold: Number(values.threshold) });
 

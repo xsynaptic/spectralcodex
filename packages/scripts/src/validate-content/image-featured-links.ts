@@ -1,6 +1,6 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -29,8 +29,8 @@ function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<
 }
 
 export function validateImageFeaturedLinks(
-	entries: Array<DataStoreEntry>,
-	validTargets: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	validTargets: Array<ContentEntry>,
 ) {
 	const validIds = new Set<string>();
 

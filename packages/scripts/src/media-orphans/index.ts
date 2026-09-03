@@ -3,7 +3,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { fallbackImageIds } from '../og-image/fallback.js';
-import { dataStoreRelativePath, getDataStoreCollection, loadDataStore } from '../shared/data-store';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 import { findWorkspaceRoot } from '../shared/utils.js';
 
@@ -24,21 +24,20 @@ const { values } = parseArgs({
 	},
 });
 
-const dataStorePath = path.join(rootPath, dataStoreRelativePath);
 const mediaPath = path.join(rootPath, values['media-path']);
 
-const { collections } = loadDataStore(dataStorePath);
-
-const allEntries = getDataStoreCollection(collections, [
-	'chronology',
-	'locations',
-	'pages',
-	'posts',
-	'regions',
-	'resources',
-	'series',
-	'themes',
-]);
+const allEntries = await withAstroContent((content) =>
+	getCollectionEntries(content, [
+		'chronology',
+		'locations',
+		'pages',
+		'posts',
+		'regions',
+		'resources',
+		'series',
+		'themes',
+	]),
+);
 
 const mediaFiles = collectMediaFiles(mediaPath, { ignore: values.ignore });
 const referencedImages = new Set<string>();

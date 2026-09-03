@@ -6,7 +6,8 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import type { OpenGraphContentEntry } from './types';
 
-import { extractBuiltFilenames, resolveEntry, resolveOgRegions } from './content';
+import { extractBuiltFilenames } from './built-entries';
+import { resolveEntry, resolveOgRegions } from './content';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {
@@ -25,36 +26,36 @@ function ogImageMeta(url: string) {
 }
 
 describe('resolveEntry', () => {
-	const dataStoreEntry = makeOgEntry({ id: 'a-post', collection: 'posts' });
+	const contentEntry = makeOgEntry({ id: 'a-post', collection: 'posts' });
 	const indexEntry = makeOgEntry({ id: 'index-posts', collection: 'index', isFallback: true });
 
-	const dataStoreEntries = new Map([[dataStoreEntry.id, dataStoreEntry]]);
+	const contentEntries = new Map([[contentEntry.id, contentEntry]]);
 	const indexEntries = new Map([[indexEntry.id, indexEntry]]);
 	const chronologyImageIndex = new Map([['2020', 'chronology/2020-derived.jpg']]);
 
 	function resolve(filename: string) {
-		return resolveEntry({ filename, dataStoreEntries, indexEntries, chronologyImageIndex });
+		return resolveEntry({ filename, contentEntries, indexEntries, chronologyImageIndex });
 	}
 
-	test('data store wins first', () => {
-		expect(resolve('a-post')).toBe(dataStoreEntry);
+	test('content entries win first', () => {
+		expect(resolve('a-post')).toBe(contentEntry);
 	});
 
 	test('falls through to index entries', () => {
 		expect(resolve('index-posts')).toBe(indexEntry);
 	});
 
-	test('a data-store id shaped like a chronology period is not synthesized', () => {
-		const withYear = new Map([['2020', dataStoreEntry]]);
+	test('a content id shaped like a chronology period is not synthesized', () => {
+		const withYear = new Map([['2020', contentEntry]]);
 
 		expect(
 			resolveEntry({
 				filename: '2020',
-				dataStoreEntries: withYear,
+				contentEntries: withYear,
 				indexEntries,
 				chronologyImageIndex,
 			}),
-		).toBe(dataStoreEntry);
+		).toBe(contentEntry);
 	});
 
 	test('synthesizes a YYYY chronology entry with its derived image', () => {

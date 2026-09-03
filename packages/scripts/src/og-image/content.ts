@@ -1,23 +1,15 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
-import { openGraphBasePath } from '@spectralcodex/shared/constants';
 import { stripDiacritics } from '@spectralcodex/shared/text';
-import { readdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 import { z } from 'zod';
 
-import type { DataStoreEntry, RegionParentMap } from '../shared/data-store.js';
+import type { ContentEntry } from '../shared/astro-content.js';
+import type { RegionParentMap } from '../shared/entries.js';
 import type { OpenGraphContentEntry, OpenGraphEntryItem } from './types.js';
 
-import {
-	getDataStoreCollection,
-	getDataStoreRegionParentsById,
-	getPublicId,
-	loadDataStore,
-	toReferenceIds,
-} from '../shared/data-store.js';
+import { getRegionParentsById, getPublicId, toReferenceIds } from '../shared/entries.js';
 import { extractImageFeaturedIds } from '../shared/images.js';
-import { buildChronologyImageIndex, getChronologyTitle } from './chronology.js';
-import { getFallbackImageId, resolveFallbackImageId } from './fallback.js';
+import { getChronologyTitle } from './chronology.js';
+import { getFallbackImageId } from './fallback.js';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
 export function resolveOgRegions(data: Record<string, unknown>): Array<string> {
@@ -33,7 +25,7 @@ function getImageFeaturedData({
 	regionParentMap,
 	chronologyImageIndex,
 }: {
-	entry: Pick<DataStoreEntry, 'data' | 'id'>;
+	entry: Pick<ContentEntry, 'data' | 'id'>;
 	collection: string;
 	regionParentMap?: RegionParentMap | undefined;
 	chronologyImageIndex?: Map<string, string> | undefined;
@@ -54,7 +46,7 @@ function getImageFeaturedData({
 			collection,
 			category: z.string().optional().parse(entry.data.category),
 			regions: regionParentMap
-				? getDataStoreRegionParentsById(
+				? getRegionParentsById(
 						collection === ContentCollectionsEnum.Regions
 							? z.string().optional().parse(entry.data.parent)
 							: resolveOgRegions(entry.data)[0],
@@ -65,38 +57,6 @@ function getImageFeaturedData({
 		}),
 		isFallback: true,
 	};
-}
-
-// Keyed by the OG image filename Astro emits
-function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
-	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
-		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Posts, title: 'Posts', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Regions, title: 'Regions' },
-		{ suffix: ContentCollectionsEnum.Resources, title: 'Resources', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Series, title: 'Series', isFallback: true },
-		{ suffix: ContentCollectionsEnum.Themes, title: 'Themes', isFallback: true },
-		{ suffix: 'homepage', title: '' }, // No duplicate branding
-		{ suffix: 'not-found', title: '404: Not Found', isFallback: true },
-	];
-
-	const entries = new Map<string, OpenGraphContentEntry>();
-
-	for (const { suffix, title, isFallback } of indexes) {
-		const id = `index-${suffix}`;
-
-		entries.set(id, {
-			id,
-			collection: 'index',
-			digest: id,
-			title,
-			imageFeaturedId: resolveFallbackImageId(suffix, id),
-			isFallback: isFallback ?? false,
-		});
-	}
-
-	return entries;
 }
 
 const TitleOverrideSchema = z
@@ -159,7 +119,7 @@ export function toOpenGraphEntryItem({
 	regionParentMap,
 	chronologyImageIndex,
 }: {
-	entry: Pick<DataStoreEntry, 'data' | 'id'>;
+	entry: Pick<ContentEntry, 'data' | 'id'>;
 	collection: string;
 	regionParentMap?: RegionParentMap | undefined;
 	chronologyImageIndex?: Map<string, string> | undefined;
@@ -179,94 +139,21 @@ export function toOpenGraphEntryItem({
 	};
 }
 
-// Keyed by the OG image filename, same as the index entries
-function buildDataStoreEntries(dataStorePath: string): {
-	entries: Map<string, OpenGraphContentEntry>;
-	chronologyImageIndex: Map<string, string>;
-} {
-	const { collections, regionParentMap } = loadDataStore(dataStorePath);
-
-	const chronologyImageIndex = buildChronologyImageIndex(collections);
-
-	const entries = new Map<string, OpenGraphContentEntry>();
-
-	for (const collection of Object.values(ContentCollectionsEnum)) {
-		const collectionEntries = getDataStoreCollection(collections, [collection]);
-
-		for (const entry of collectionEntries) {
-			if (!entry.digest) continue;
-
-			const item = toOpenGraphEntryItem({
-				entry,
-				collection,
-				regionParentMap,
-				chronologyImageIndex,
-			});
-
-			if (!item) continue;
-
-			entries.set(item.id, { ...item, digest: entry.digest });
-		}
-	}
-
-	return { entries, chronologyImageIndex };
-}
-
-export function extractBuiltFilenames(distPath: string): Set<string> {
-	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
-	const ogPathSegment = `/${openGraphBasePath}/`;
-	const filenames = new Set<string>();
-
-	function collectFromHtml(filePath: string): void {
-		const content = readFileSync(filePath, 'utf8');
-
-		for (const match of content.matchAll(ogImageRegex)) {
-			const url = match[1] ?? '';
-			const index = url.indexOf(ogPathSegment);
-
-			if (index === -1) continue;
-
-			const filename = url.slice(index + ogPathSegment.length).replace(/\.[^.]+$/, '');
-
-			if (filename) filenames.add(filename);
-		}
-	}
-
-	function walkDir(dir: string): void {
-		const dirents = readdirSync(dir, { withFileTypes: true });
-
-		for (const dirent of dirents) {
-			const fullPath = path.join(dir, dirent.name);
-
-			if (dirent.isDirectory()) {
-				walkDir(fullPath);
-				continue;
-			}
-
-			if (dirent.isFile() && dirent.name.endsWith('.html')) collectFromHtml(fullPath);
-		}
-	}
-
-	walkDir(distPath);
-
-	return filenames;
-}
-
-// Resolution order: data store, then static index entries, then synthesized chronology ids
+// Resolution order: content entries, then static index entries, then synthesized chronology ids
 export function resolveEntry({
 	filename,
-	dataStoreEntries,
+	contentEntries,
 	indexEntries,
 	chronologyImageIndex,
 }: {
 	filename: string;
-	dataStoreEntries: Map<string, OpenGraphContentEntry>;
+	contentEntries: Map<string, OpenGraphContentEntry>;
 	indexEntries: Map<string, OpenGraphContentEntry>;
 	chronologyImageIndex: Map<string, string>;
 }): OpenGraphContentEntry | undefined {
-	const fromDataStore = dataStoreEntries.get(filename);
+	const fromContent = contentEntries.get(filename);
 
-	if (fromDataStore) return fromDataStore;
+	if (fromContent) return fromContent;
 
 	const fromIndex = indexEntries.get(filename);
 
@@ -291,32 +178,4 @@ export function resolveEntry({
 	}
 
 	return undefined;
-}
-
-// Built HTML is the source of truth for which OG images should exist
-export function getBuiltEntries({
-	dataStorePath,
-	distPath,
-}: {
-	dataStorePath: string;
-	distPath: string;
-}): { entries: Array<OpenGraphContentEntry>; unresolved: Array<string> } {
-	const { entries: dataStoreEntries, chronologyImageIndex } = buildDataStoreEntries(dataStorePath);
-	const indexEntries = buildIndexEntries();
-	const distFilenames = extractBuiltFilenames(distPath);
-
-	const entries: Array<OpenGraphContentEntry> = [];
-	const unresolved: Array<string> = [];
-
-	for (const filename of distFilenames) {
-		const entry = resolveEntry({ filename, dataStoreEntries, indexEntries, chronologyImageIndex });
-
-		if (entry) {
-			entries.push(entry);
-		} else {
-			unresolved.push(filename);
-		}
-	}
-
-	return { entries, unresolved };
 }

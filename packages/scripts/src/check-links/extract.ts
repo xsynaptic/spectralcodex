@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { DataStoreEntry } from '../shared/data-store.ts';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 // Matches markdown links: [text](https://...)
 // Excludes image references ![alt](url) via negative lookbehind
@@ -63,7 +63,7 @@ function extractBodyLinks(body: string): Array<string> {
 }
 
 // Extract all external URLs from a data store entry
-export function extractLinksFromEntry(entry: DataStoreEntry) {
+export function extractLinksFromEntry(entry: ContentEntry) {
 	const links: Array<{
 		url: string;
 	}> = Array.from(extractFrontmatterLinks(entry.data), (url) => ({ url }));

@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -10,7 +10,7 @@ interface LinkIdIssue {
 	id: string | undefined;
 }
 
-function collectEntryLinkIdIssues(entry: DataStoreEntry, validIds: ReadonlySet<string>) {
+function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<string>) {
 	const body = entry.body;
 
 	if (!body?.includes('<Link ')) return [];
@@ -35,18 +35,15 @@ function collectEntryLinkIdIssues(entry: DataStoreEntry, validIds: ReadonlySet<s
 }
 
 export function collectLinkIdIssues(
-	entries: Array<DataStoreEntry>,
-	validTargets: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	validTargets: Array<ContentEntry>,
 ) {
 	const validIds = new Set(validTargets.map((entry) => entry.id));
 
 	return entries.flatMap((entry) => collectEntryLinkIdIssues(entry, validIds));
 }
 
-export function validateLinkIds(
-	entries: Array<DataStoreEntry>,
-	validTargets: Array<DataStoreEntry>,
-) {
+export function validateLinkIds(entries: Array<ContentEntry>, validTargets: Array<ContentEntry>) {
 	const issues = collectLinkIdIssues(entries, validTargets);
 	const detailsByLocation = new Map<string, Array<string>>();
 

@@ -3,7 +3,8 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { dataStoreRelativePath, getPublicId, loadDataStore } from '../shared/data-store.js';
+import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
+import { getPublicId } from '../shared/entries.js';
 import { safelyCreateDirectory } from '../shared/utils.js';
 import { getGitFileDates } from './git-file-dates.js';
 
@@ -32,7 +33,6 @@ function resolvePaths(options: SitemapLastmodOptions) {
 	return {
 		contentPathRelative,
 		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
-		dataStorePath: path.resolve(options.rootPath, dataStoreRelativePath),
 		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
 	};
 }
@@ -40,7 +40,7 @@ function resolvePaths(options: SitemapLastmodOptions) {
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
-	const { contentPathRelative, contentPathAbs, dataStorePath, outputPath } = resolvePaths(options);
+	const { contentPathRelative, contentPathAbs, outputPath } = resolvePaths(options);
 
 	console.log(chalk.blue('Reading git log...'));
 
@@ -50,9 +50,21 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 		keyPrefix: contentPathRelative,
 	});
 
-	console.log(chalk.blue('Loading data store...'));
+	console.log(chalk.blue('Loading content...'));
 
-	const { collections } = loadDataStore(dataStorePath);
+	// Only file-based content collections carry a `filePath` under the content directory
+	const entries = await withAstroContent((content) =>
+		getCollectionEntries(content, [
+			'chronology',
+			'locations',
+			'pages',
+			'posts',
+			'regions',
+			'resources',
+			'series',
+			'themes',
+		]),
+	);
 
 	const urls: Record<string, string> = {};
 	const contentPathPrefix = `${contentPathRelative}/collections/`;
@@ -60,23 +72,21 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 	let resolvedCount = 0;
 	let missingDateCount = 0;
 
-	for (const [collectionName, collection] of collections) {
-		for (const entry of collection.values()) {
-			if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
+	for (const entry of entries) {
+		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
 
-			const gitDate = gitMap.get(entry.filePath);
+		const gitDate = gitMap.get(entry.filePath);
 
-			if (!gitDate) {
-				missingDateCount++;
-				console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
-				continue;
-			}
-
-			const url = buildContentUrl(options.siteUrl, collectionName, getPublicId(entry));
-
-			urls[url] = gitDate;
-			resolvedCount++;
+		if (!gitDate) {
+			missingDateCount++;
+			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
+			continue;
 		}
+
+		const url = buildContentUrl(options.siteUrl, entry.collection, getPublicId(entry));
+
+		urls[url] = gitDate;
+		resolvedCount++;
 	}
 
 	safelyCreateDirectory(path.dirname(outputPath));

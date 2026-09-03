@@ -1,4 +1,4 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { toValidationResult } from './validation-result';
 
@@ -7,7 +7,7 @@ interface FrontmatterLinkIssue {
 	url: string;
 }
 
-function getResourcePatterns(resourceEntries: Array<DataStoreEntry>) {
+function getResourcePatterns(resourceEntries: Array<ContentEntry>) {
 	return resourceEntries.flatMap((entry) => {
 		const match = entry.data.match as string | Array<string> | undefined;
 
@@ -19,8 +19,8 @@ function getResourcePatterns(resourceEntries: Array<DataStoreEntry>) {
 
 // Longform links carry their own title and url, so only bare strings need a resource to match
 function collectFrontmatterLinkIssues(
-	entries: Array<DataStoreEntry>,
-	resourceEntries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	resourceEntries: Array<ContentEntry>,
 ) {
 	const patterns = getResourcePatterns(resourceEntries);
 
@@ -44,8 +44,8 @@ function collectFrontmatterLinkIssues(
 }
 
 export function validateFrontmatterLinks(
-	entries: Array<DataStoreEntry>,
-	resourceEntries: Array<DataStoreEntry>,
+	entries: Array<ContentEntry>,
+	resourceEntries: Array<ContentEntry>,
 ) {
 	const issues = collectFrontmatterLinkIssues(entries, resourceEntries);
 

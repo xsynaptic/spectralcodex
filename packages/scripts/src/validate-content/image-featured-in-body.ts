@@ -1,9 +1,9 @@
-import type { DataStoreEntry } from '../shared/data-store';
+import type { ContentEntry } from '../shared/astro-content.js';
 
 import { extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
 import { toValidationResult } from './validation-result';
 
-export function validateImageFeaturedInBody(entries: Array<DataStoreEntry>) {
+export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 	const orphans: Array<{ file: string; missingIds: Array<string> }> = [];
 
 	for (const entry of entries) {
