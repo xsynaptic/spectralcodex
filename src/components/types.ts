@@ -30,7 +30,7 @@ export interface MetaProps {
 }
 
 // Values map onto divided-* classes in text.css
-export type DividerColor = 'default' | 'lighter';
+export type DividerColor = 'default' | 'muted';
 
 export type DividerContent = 'chevron' | 'dot' | 'slash';
 

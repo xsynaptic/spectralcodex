@@ -19,11 +19,11 @@ const t = getTranslations();
 	class:list={['flex flex-wrap gap-x-1 gap-y-2 text-xs', 'text-primary-500 dark:text-primary-400']}
 	aria-label={t('site.colophon.label')}
 >
-	<DividedItem dividerColor="lighter"
+	<DividedItem dividerColor="muted"
 		><span class="text-primary-400 dark:text-primary-500">※</span>
 		<span>{t('site.footer.updated.label')} <DateDisplay date={dateBuild} /></span></DividedItem
 	>
-	<DividedItem dividerColor="lighter"
+	<DividedItem dividerColor="muted"
 		><span>
 			{
 				formatStringTemplate(t('site.footer.copyright.label'), {
@@ -35,28 +35,29 @@ const t = getTranslations();
 			<Anchor href={siteUrl} anchorColor="accent">{t('site.title')}</Anchor></span
 		>
 	</DividedItem>
-	<DividedItem dividerColor="lighter">
+	<DividedItem dividerColor="muted">
 		<span
 			>{t('site.footer.powered.label')}{' '}
 			<Anchor href="https://astro.build" anchorColor="accent">Astro</Anchor></span
 		>
 	</DividedItem>
-	<DividedItem dividerColor="lighter">
+	<DividedItem dividerColor="muted">
 		<Anchor href={getSiteUrl('build-stats')} anchorColor="accent"
 			>{t('site.footer.buildStats.label')}</Anchor
 		>
 	</DividedItem>
-	<DividedItem dividerColor="lighter">
+	<DividedItem dividerColor="muted">
 		<Anchor href="https://github.com/xsynaptic/spectralcodex" anchorColor="accent"
 			>{t('site.footer.sourceCode.label')}</Anchor
 		>
 	</DividedItem>
-	<DividedItem dividerColor="lighter">
+	<DividedItem dividerColor="muted">
 		<Anchor
 			class:list={['colophon-rss-link']}
 			href={`${getSiteUrl()}rss.xml`}
 			anchorColor="accent"
 			rel="feed"
+			data-astro-prefetch="false"
 			><span>{t('site.footer.feed.label')}</span>
 			<div class="colophon-rss-icon">
 				<svg
