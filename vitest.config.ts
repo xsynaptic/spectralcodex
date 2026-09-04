@@ -1,6 +1,6 @@
-import { getViteConfig } from 'astro/config';
+import { defineConfig } from 'vitest/config';
 
-export default getViteConfig({
+export default defineConfig({
 	test: {
 		exclude: ['**/node_modules/**', '**/integration.test.ts', 'tests/e2e/**'],
 	},

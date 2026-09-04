@@ -117,6 +117,8 @@ describe('createCollectionData', () => {
 	});
 
 	test('evicts an empty result in dev so the next call refetches', async () => {
+		vi.stubEnv('DEV', true);
+
 		const { createCollectionData } = await importCollections();
 
 		getCollectionMock.mockResolvedValueOnce([]).mockResolvedValueOnce([makePost('alpha')]);
@@ -160,6 +162,8 @@ describe('getRawCollection', () => {
 	});
 
 	test('evicts an empty result in dev so the next call refetches', async () => {
+		vi.stubEnv('DEV', true);
+
 		const { getRawCollection } = await importCollections();
 
 		getCollectionMock.mockResolvedValueOnce([]).mockResolvedValueOnce([makePost('alpha')]);
