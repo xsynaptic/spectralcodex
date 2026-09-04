@@ -202,6 +202,7 @@ const translationStrings = {
 		'site.pagination.pageNumber.label': 'Page {page}',
 		'site.pagination.counter.label': 'Page {current} of {total}',
 		'site.pagination.select.label': 'Go to page',
+		'site.pagination.select.total': 'of {total}',
 		'site.pagination.select.submit': 'Go',
 
 		// Menu items

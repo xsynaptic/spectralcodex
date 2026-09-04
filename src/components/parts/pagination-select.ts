@@ -14,6 +14,7 @@ import { navigate } from 'astro:transitions/client';
  *       <span data-pagination-counter>Page 3 of 100</span>
  *       <form data-pagination-form hidden>              <-- revealed + populated here
  *         <select data-pagination-control></select>
+ *         <span>of 100</span>
  *         <button type="submit">Go</button>
  *       </form>
  *     </div>
@@ -23,7 +24,7 @@ import { navigate } from 'astro:transitions/client';
  *
  * No JS: prev/next/counter links work, the empty form stays hidden
  * With JS: the <select> is filled from the data attributes (no per-page markup shipped), the form revealed, the counter hidden
- Navigation commits only via Go, never on `change`, so keyboard browsing is safe
+ * Navigation commits on `change` only for a pointer-driven pick on a fine pointer, otherwise via Go or Enter
  */
 class PaginationSelect extends HTMLElement {
 	#initialized = false;
@@ -31,6 +32,7 @@ class PaginationSelect extends HTMLElement {
 	#form: HTMLFormElement | undefined;
 	#select: HTMLSelectElement | undefined;
 	#submit: HTMLButtonElement | undefined;
+	#isPointerDriven = false;
 
 	#getPageUrl(pageNumber: number): string {
 		const basePath = this.dataset.basePath ?? '';
@@ -111,13 +113,7 @@ class PaginationSelect extends HTMLElement {
 		this.#submit.toggleAttribute('data-visible', isChanged);
 	}
 
-	#handleChange = () => {
-		this.#syncSubmit();
-	};
-
-	#handleSubmit = (event: SubmitEvent) => {
-		event.preventDefault();
-
+	#navigateToSelectedPage() {
 		if (!this.#select) return;
 
 		const pageNumber = Number(this.#select.value);
@@ -127,6 +123,35 @@ class PaginationSelect extends HTMLElement {
 
 		// Using the navigate function (not location.assign) for compatibility with Astro's view transitions
 		void navigate(this.#getPageUrl(pageNumber));
+	}
+
+	#handlePointerDown = () => {
+		this.#isPointerDriven = true;
+	};
+
+	#handleKeyDown = () => {
+		this.#isPointerDriven = false;
+	};
+
+	#handleChange = () => {
+		// A coarse-pointer picker is easy to mis-tap, so touch commits through Go
+		// Firefox changes a closed select on arrow keys and wheel, so keyboard changes never navigate
+		const shouldNavigate = this.#isPointerDriven && !matchMedia('(pointer: coarse)').matches;
+
+		this.#isPointerDriven = false;
+
+		// Syncing here would flash Go while the navigation resolves
+		if (shouldNavigate) {
+			this.#navigateToSelectedPage();
+			return;
+		}
+
+		this.#syncSubmit();
+	};
+
+	#handleSubmit = (event: SubmitEvent) => {
+		event.preventDefault();
+		this.#navigateToSelectedPage();
 	};
 
 	connectedCallback() {
@@ -142,6 +167,8 @@ class PaginationSelect extends HTMLElement {
 
 		this.#form.addEventListener('submit', this.#handleSubmit, { signal });
 		this.#select.addEventListener('change', this.#handleChange, { signal });
+		this.#select.addEventListener('pointerdown', this.#handlePointerDown, { signal });
+		this.#select.addEventListener('keydown', this.#handleKeyDown, { signal });
 	}
 
 	disconnectedCallback() {
