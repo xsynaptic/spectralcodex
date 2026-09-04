@@ -1,34 +1,32 @@
 import type { ContentEntry } from '../shared/astro-content.js';
+import type { ValidationIssue } from './validation-result';
 
+import { findComponentTags, getBodyLineOffset, getTagProp } from './component-tags';
 import { toValidationResult } from './validation-result';
-
-const linkIdRegex = /<Link\s[^>]*id="([^"]+)"/g;
 
 interface LinkIdIssue {
 	location: string;
 	lineNumber: number;
-	id: string | undefined;
+	id: string;
 }
 
 function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<string>) {
 	const body = entry.body;
 
-	if (!body?.includes('<Link ')) return [];
+	if (!body) return [];
 
 	const location = entry.filePath ?? entry.id;
 
 	const issues: Array<LinkIdIssue> = [];
+	const tags = findComponentTags(body, ['Link']);
 
-	for (const match of body.matchAll(linkIdRegex)) {
-		const id = match[1];
+	for (const tag of tags) {
+		const id = getTagProp(tag, 'id');
 
-		if (id && validIds.has(id)) continue;
+		// A Link with no id is the mdx check's finding, not this one's
+		if (!id || validIds.has(id)) continue;
 
-		issues.push({
-			location,
-			lineNumber: body.slice(0, match.index).split('\n').length,
-			id,
-		});
+		issues.push({ location, lineNumber: tag.lineNumber, id });
 	}
 
 	return issues;
@@ -43,24 +41,36 @@ export function collectLinkIdIssues(
 	return entries.flatMap((entry) => collectEntryLinkIdIssues(entry, validIds));
 }
 
-export function validateLinkIds(entries: Array<ContentEntry>, validTargets: Array<ContentEntry>) {
-	const issues = collectLinkIdIssues(entries, validTargets);
-	const detailsByLocation = new Map<string, Array<string>>();
+export function validateLinkIds(
+	entries: Array<ContentEntry>,
+	validTargets: Array<ContentEntry>,
+	rootPath: string,
+) {
+	const validIds = new Set(validTargets.map((entry) => entry.id));
+	const issues: Array<ValidationIssue> = [];
 
-	for (const issue of issues) {
-		const details = detailsByLocation.get(issue.location) ?? [];
+	let issueCount = 0;
 
-		details.push(
-			`Line ${issue.lineNumber.toString()}: broken link ID "${issue.id ?? 'undefined'}"`,
-		);
-		detailsByLocation.set(issue.location, details);
+	for (const entry of entries) {
+		const entryIssues = collectEntryLinkIdIssues(entry, validIds);
+
+		if (entryIssues.length === 0) continue;
+
+		const lineOffset = getBodyLineOffset(entry, rootPath);
+
+		issues.push({
+			message: entry.filePath ?? entry.id,
+			details: entryIssues.map(
+				(issue) =>
+					`Line ${(issue.lineNumber + lineOffset).toString()}: broken link ID "${issue.id}"`,
+			),
+		});
+
+		issueCount += entryIssues.length;
 	}
 
-	return toValidationResult(
-		[...detailsByLocation].map(([location, details]) => ({ message: location, details })),
-		{
-			pass: 'Link IDs valid',
-			fail: `Found ${issues.length.toString()} broken link ID(s)`,
-		},
-	);
+	return toValidationResult(issues, {
+		pass: 'Link IDs valid',
+		fail: `Found ${issueCount.toString()} broken link ID(s)`,
+	});
 }

@@ -3,6 +3,8 @@ import { describe, expect, test } from 'vitest';
 import { collectLinkIdIssues, validateLinkIds } from './link-ids';
 import { makeEntry } from './validate-test-utils';
 
+const rootPath = import.meta.dirname;
+
 const validTargets = [makeEntry({ id: 'existing-post' })];
 
 describe('collectLinkIdIssues', () => {
@@ -43,12 +45,26 @@ describe('collectLinkIdIssues', () => {
 
 		expect(collectLinkIdIssues(entries, validTargets)).toEqual([]);
 	});
+
+	test('reads a single-quoted id', () => {
+		const entries = [makeEntry({ id: 'a-post', body: "<Link id='missing-post' />" })];
+
+		expect(collectLinkIdIssues(entries, validTargets).map((issue) => issue.id)).toEqual([
+			'missing-post',
+		]);
+	});
+
+	test('does not read a `data-id` prop as a link id', () => {
+		const entries = [makeEntry({ id: 'a-post', body: '<Link data-id="missing-post">text</Link>' })];
+
+		expect(collectLinkIdIssues(entries, validTargets)).toEqual([]);
+	});
 });
 
 describe('validateLinkIds', () => {
 	test('groups every broken link in one entry under a single issue', () => {
 		const body = ['<Link id="missing-one" />', '<Link id="missing-two" />'].join('\n');
-		const result = validateLinkIds([makeEntry({ id: 'a-post', body })], validTargets);
+		const result = validateLinkIds([makeEntry({ id: 'a-post', body })], validTargets, rootPath);
 
 		expect(result.issues).toEqual([
 			{
@@ -56,5 +72,21 @@ describe('validateLinkIds', () => {
 				details: ['Line 1: broken link ID "missing-one"', 'Line 2: broken link ID "missing-two"'],
 			},
 		]);
+	});
+
+	test('reports a line number that points at the file, not the body', () => {
+		const body = [
+			'Prose above the component.',
+			'',
+			'<Link>no id here</Link>',
+			'',
+			'<Link id="a-missing-target">a dangling id</Link>',
+			'',
+		].join('\n');
+		const entries = [makeEntry({ id: 'a-post', filePath: 'fixtures/offset-sample.mdx', body })];
+
+		const result = validateLinkIds(entries, validTargets, rootPath);
+
+		expect(result.issues[0]?.details).toEqual(['Line 11: broken link ID "a-missing-target"']);
 	});
 });

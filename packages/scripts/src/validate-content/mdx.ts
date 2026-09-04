@@ -1,100 +1,66 @@
 import type { ContentEntry } from '../shared/astro-content.js';
 import type { ValidationIssue } from './validation-result';
 
+import { findComponentTags, getBodyLineOffset, getTagProp } from './component-tags';
 import { toValidationResult } from './validation-result';
 
-interface ComponentError {
-	line: number;
-	message: string;
+// A required prop missing here throws while the component renders, naming only the page path
+const requiredProps: Record<string, string> = { Link: 'id', Img: 'src' };
+
+const componentNames = Object.keys(requiredProps);
+
+interface ComponentIssue {
 	context: string;
+	lineNumber: number;
+	message: string;
 }
 
-function collectLinkComponentErrors(content: string): Array<ComponentError> {
-	const errors: Array<ComponentError> = [];
-	const lines = content.split('\n');
+export function collectComponentIssues(body: string): Array<ComponentIssue> {
+	const lines = body.split('\n');
+	const issues: Array<ComponentIssue> = [];
 
-	const linkRegex = /<Link(?:\s+([^>]*?))?(?:>|\/?>)/g;
-	const idPropRegex = /id=["']([^"']+)["']/;
+	for (const tag of findComponentTags(body, componentNames)) {
+		const prop = requiredProps[tag.name];
 
-	let match: RegExpExecArray | null;
+		if (!prop || getTagProp(tag, prop)) continue;
 
-	while ((match = linkRegex.exec(content)) !== null) {
-		const props = match[1] || '';
-		const idMatch = idPropRegex.exec(props);
-
-		if (!idMatch?.[1]) {
-			const beforeMatch = content.slice(0, match.index);
-			const lineNumber = beforeMatch.split('\n').length;
-			const lineContent = lines[lineNumber - 1];
-
-			errors.push({
-				line: lineNumber,
-				message: 'Link component missing id prop',
-				context: lineContent ?? '',
-			});
-		}
+		issues.push({
+			context: lines[tag.lineNumber - 1]?.trim() ?? '',
+			lineNumber: tag.lineNumber,
+			message: `${tag.name} component missing ${prop} prop`,
+		});
 	}
 
-	return errors;
+	return issues;
 }
 
-function collectImgComponentErrors(content: string): Array<ComponentError> {
-	const errors: Array<ComponentError> = [];
-	const lines = content.split('\n');
-
-	const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
-	const srcPropRegex = /src=["']([^"']+)["']/;
-
-	let match: RegExpExecArray | null;
-
-	while ((match = imgRegex.exec(content)) !== null) {
-		const props = match[1] || '';
-		const srcMatch = srcPropRegex.exec(props);
-
-		if (!srcMatch?.[1]) {
-			const beforeMatch = content.slice(0, match.index);
-			const lineNumber = beforeMatch.split('\n').length;
-			const lineContent = lines[lineNumber - 1];
-
-			errors.push({
-				line: lineNumber,
-				message: 'Img component missing src prop',
-				context: lineContent ?? '',
-			});
-		}
-	}
-
-	return errors;
-}
-
-export function validateMdxComponents(entries: Array<ContentEntry>) {
+export function validateMdxComponents(entries: Array<ContentEntry>, rootPath: string) {
 	const issues: Array<ValidationIssue> = [];
 
-	let errorCount = 0;
+	let issueCount = 0;
 
 	for (const entry of entries) {
 		if (!entry.body) continue;
 
-		const errors = [
-			...collectLinkComponentErrors(entry.body),
-			...collectImgComponentErrors(entry.body),
-		];
+		const componentIssues = collectComponentIssues(entry.body);
 
-		if (errors.length === 0) continue;
+		if (componentIssues.length === 0) continue;
+
+		const lineOffset = getBodyLineOffset(entry, rootPath);
 
 		issues.push({
 			message: entry.filePath ?? entry.id,
-			details: errors.flatMap((error) => [
-				`Line ${error.line.toString()}: ${error.message}`,
-				error.context.trim(),
+			details: componentIssues.flatMap((issue) => [
+				`Line ${(issue.lineNumber + lineOffset).toString()}: ${issue.message}`,
+				issue.context,
 			]),
 		});
 
-		errorCount += errors.length;
+		issueCount += componentIssues.length;
 	}
 
 	return toValidationResult(issues, {
 		pass: 'MDX components valid',
-		fail: `Found ${errorCount.toString()} invalid component(s)`,
+		fail: `Found ${issueCount.toString()} invalid component(s)`,
 	});
 }
