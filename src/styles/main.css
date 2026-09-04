@@ -31,6 +31,7 @@
 @import './main/components/img-group.css' layer(components);
 @import './main/components/list-column.css' layer(components);
 @import './main/components/menu-header.css' layer(components);
+@import './main/components/not-found.css' layer(components);
 @import './main/components/pagination.css' layer(components);
 @import './main/components/preview-card.css' layer(components);
 @import './main/components/prose.css' layer(components);

@@ -115,6 +115,9 @@ importers:
       '@xsynaptic/mdxlint-config':
         specifier: ^2.0.0
         version: 2.0.0(supports-color@10.2.2)
+      '@xsynaptic/path-suggestions':
+        specifier: ^0.2.0
+        version: 0.2.0
       '@xsynaptic/satteri-auto-import':
         specifier: ^0.2.1
         version: 0.2.1(satteri@0.10.5)
@@ -163,9 +166,6 @@ importers:
       exiftool-vendored:
         specifier: ^37.2.0
         version: 37.2.0
-      fastest-levenshtein:
-        specifier: ^1.0.16
-        version: 1.0.16
       geokdbush:
         specifier: ^2.1.0
         version: 2.1.0
@@ -3017,6 +3017,9 @@ packages:
     resolution: {integrity: sha512-PQOslLtF39pdr2FVeWFMlOxZrDgFi2JJ8tTwxTgU/Ls5a3JZQ+zRunPcgLWDM/zGlImAErKdJBAhET92IqRAmw==}
     engines: {node: '>=24'}
     hasBin: true
+
+  '@xsynaptic/path-suggestions@0.2.0':
+    resolution: {integrity: sha512-4vlqUz2lTREvFpgwxlbwOqMZH3Uty41sipcqIFcKG635xL2kEMYghw5zzgZ3epJVL+PDQIAfwbUzWaHkfrpS/w==}
 
   '@xsynaptic/rehype-wrap-cjk@3.0.2':
     resolution: {integrity: sha512-Wf/+BwVsV+JSWCJoZRSk9g8urFIqNEppA9otR1Fg+Xq54kXkmWrzlXbVncPa79xK6qm9qD7VMUXGM7LtHVHOmw==}
@@ -10212,6 +10215,10 @@ snapshots:
     transitivePeerDependencies:
       - bluebird
       - supports-color
+
+  '@xsynaptic/path-suggestions@0.2.0':
+    dependencies:
+      fastest-levenshtein: 1.0.16
 
   '@xsynaptic/rehype-wrap-cjk@3.0.2(unified@11.0.5)':
     dependencies:

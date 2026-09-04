@@ -1,0 +1,9 @@
+/* Suggestion states set by <path-suggestions>; hooks: .suggestions-heading, .suggestions-loading */
+path-suggestions:not([data-state='list']) .suggestions-heading {
+	display: none;
+}
+
+/* `data-state` only exists once the element runs, so a JS-less page shows no stranded spinner */
+path-suggestions:not([data-state='loading']) .suggestions-loading {
+	display: none;
+}

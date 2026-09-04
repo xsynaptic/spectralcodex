@@ -1,40 +1,26 @@
 ---
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props {
-	threshold?: number;
-	autoRedirectThreshold?: number;
-	maxSuggestions?: number;
-	suggestionsUrl?: string;
-}
-
-const {
-	threshold = 0.5,
-	autoRedirectThreshold = 0.92,
-	maxSuggestions = 5,
-	suggestionsUrl = '/content-manifest.json',
-} = Astro.props;
-
 const t = getTranslations();
 ---
 
-<div
-	id="not-found-suggestions"
-	data-threshold={threshold}
-	data-auto-redirect-threshold={autoRedirectThreshold}
-	data-max-suggestions={maxSuggestions}
-	data-suggestions-url={suggestionsUrl}
-	hidden
+<path-suggestions
+	src="/content-manifest.json"
+	link-class="anchor anchor-accent"
+	link-data-astro-history="replace"
 >
-	{t('notFound.suggestions')}
-</div>
-<div id="not-found-loading" class="text-primary-700 dark:text-highlight-400" aria-hidden="true">
-	<div class="loading-animation w-6"></div>
-</div>
-<ul id="not-found-suggestions-list"></ul>
+	<p class="suggestions-heading">{t('notFound.suggestions')}</p>
+	<div class="suggestions-loading text-primary-700 dark:text-highlight-400" aria-hidden="true">
+		<div class="loading-animation w-6"></div>
+	</div>
+</path-suggestions>
 
 <script>
-	import { runNotFoundSuggestions } from '#components/not-found/not-found-suggestions.ts';
+	import { navigate } from 'astro:transitions/client';
+	import '@xsynaptic/path-suggestions/element';
 
-	void runNotFoundSuggestions();
+	document.addEventListener('path-suggestions:redirect', (event) => {
+		event.preventDefault();
+		void navigate(event.detail.url, { history: 'replace' });
+	});
 </script>

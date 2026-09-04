@@ -56,7 +56,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Client-side full-text search via [Pagefind](https://pagefind.app/) and the [astro-pagefind](https://github.com/shishkin/astro-pagefind) integration, a modal interface via [@pagefind/component-ui](https://pagefind.app/docs/ui-usage/), keyboard shortcuts, and retina-ready thumbnails
 - Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
 - Hierarchical navigation through regions, themes, and series
-- Client-side fuzzy 404 suggestions via [fastest-levenshtein](https://github.com/ka-weihe/fastest-levenshtein) with substring-bonus scoring against a build-time content manifest; auto-redirects on near-exact matches
+- Client-side fuzzy 404 suggestions via [@xsynaptic/path-suggestions](https://github.com/xsynaptic/astro-lab/tree/main/packages/path-suggestions) scored against a build-time content manifest; auto-redirects on near-exact matches
 
 ### Chronology
 
