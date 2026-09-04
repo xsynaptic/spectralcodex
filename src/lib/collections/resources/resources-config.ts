@@ -1,14 +1,14 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
+import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { z } from 'zod';
 
-import { contentCollectionsPath } from '#constants.ts';
 import { DateSchema, NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 import { ResourceSchema } from '#lib/schemas/resources.ts';
 
 export const resources = defineCollection({
-	loader: glob({ pattern: '**/*.mdx', base: `${contentCollectionsPath}/resources` }),
+	loader: glob({ pattern: '**/*.mdx', base: `./${CONTENT_DATA_PATH}/resources` }),
 	schema: ResourceSchema.extend({
 		title: TitleSchema,
 		subtitle: z.string().optional(), // TODO: note that this is currently unused

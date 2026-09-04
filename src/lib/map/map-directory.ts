@@ -3,13 +3,11 @@ import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
 import { encodeMapPopupData, MapDataKeysCompressed } from '@spectralcodex/map-codec';
-import { hash } from 'ohash';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
-import { hashShortLength } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import {
 	getRegionsCollection,
@@ -17,6 +15,7 @@ import {
 } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
+import { hashMapDirectoryData } from '#lib/map/map-directory-hash.ts';
 import {
 	getLocationFeatureIds,
 	getLocationsFeatureCollection,
@@ -131,14 +130,6 @@ function getMembershipIndices(
 		R.unique(),
 		R.sortBy(R.identity()),
 	);
-}
-
-// Chunk payloads must be part of the key: popup text changes without touching a directory row
-export function hashMapDirectoryData(
-	directory: Array<MapSourceItem>,
-	chunks: Map<string, Array<MapPopupItem>>,
-): string {
-	return hash({ directory, chunks: [...chunks] }).slice(0, hashShortLength);
 }
 
 // Memoized so a single build computes the shared artifacts once

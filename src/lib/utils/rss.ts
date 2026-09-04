@@ -15,7 +15,7 @@ import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 import { stripFootnotes } from '#lib/utils/text.ts';
 

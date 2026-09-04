@@ -1,9 +1,9 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
+import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { z } from 'zod';
 
-import { contentCollectionsPath } from '#constants.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateRecordedSchema,
@@ -16,7 +16,7 @@ import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 export const posts = defineCollection({
 	loader: glob({
 		pattern: '**/[^_]*.(md|mdx)',
-		base: `${contentCollectionsPath}/posts`,
+		base: `./${CONTENT_DATA_PATH}/posts`,
 		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
 	}),
 	schema: z

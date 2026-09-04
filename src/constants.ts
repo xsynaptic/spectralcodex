@@ -1,8 +1,3 @@
-import { CONTENT_DATA_PATH } from 'astro:env/server';
-
-// Path to content from the root; defaults to `packages/content-demo/collections`
-export const contentCollectionsPath = `./${CONTENT_DATA_PATH}`;
-
 // An arbitrary identified for the "more" excerpt, used internally
 export const contentExcerptIdentifier = '<!-- more -->';
 

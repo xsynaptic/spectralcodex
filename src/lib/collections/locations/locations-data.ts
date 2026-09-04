@@ -17,7 +17,8 @@ import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import { createCollectionData, getPublicId, getRawCollection } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
-import { getDescription, getDescriptionRendered } from '#lib/utils/description.ts';
+import { getDescriptionRendered } from '#lib/utils/description-data.ts';
+import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time

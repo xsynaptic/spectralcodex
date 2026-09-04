@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { textClipper } from './text';
+import { stripMdxComponents, textClipper } from './text';
 
 describe('textClipper', () => {
 	test('returns short input untouched', () => {
@@ -42,5 +42,19 @@ describe('textClipper', () => {
 
 	test('returns short CJK input untouched', () => {
 		expect(textClipper('臺北', { wordCount: 100 })).toBe('臺北');
+	});
+});
+
+describe('stripMdxComponents', () => {
+	test('strips the named tags, paired and self-closing', () => {
+		expect(stripMdxComponents('One <Img src="a.jpg" /> two <More />three', ['Img', 'More'])).toBe(
+			'One  two three',
+		);
+	});
+
+	test('leaves a component whose name merely starts with a stripped name', () => {
+		expect(stripMdxComponents('a <ImgGroup cols={2}>x</ImgGroup> b', ['Img'])).toBe(
+			'a <ImgGroup cols={2}>x</ImgGroup> b',
+		);
 	});
 });

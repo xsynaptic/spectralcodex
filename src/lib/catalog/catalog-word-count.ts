@@ -3,12 +3,10 @@ import type Keyv from 'keyv';
 
 import { stripTags } from '@xsynaptic/unified-tools';
 import { countWords } from '@xsynaptic/word-count';
-import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { hash } from 'ohash';
 import * as R from 'remeda';
 
 import { mdxComponents } from '#constants.ts';
-import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
@@ -17,12 +15,7 @@ interface WordCountCached {
 	count: number;
 }
 
-/**
- * Generate word count from content body
- * Strips MDX components, transforms markdown to HTML, strips tags, then counts words
- * This method won't work if your MDX components introduce text from outside sources
- * But for this project MDX mainly adds decorative classes so we can get away with this
- */
+// Only correct because MDX components add decoration, not text from outside sources
 function computeWordCount(body: string): number {
 	return R.pipe(
 		body,
@@ -71,19 +64,4 @@ export function createWordCountFunction({ cache }: { cache: Keyv }) {
 
 		return wordCount;
 	};
-}
-
-let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
-
-function getWordCountFunction() {
-	if (!wordCountFunction) {
-		wordCountFunction = createWordCountFunction({
-			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
-		});
-	}
-	return wordCountFunction;
-}
-
-export async function getWordCount(entry: CollectionEntry<CollectionKey>) {
-	return getWordCountFunction()(entry);
 }

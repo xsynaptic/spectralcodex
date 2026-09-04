@@ -1,5 +1,6 @@
 import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
 
@@ -7,7 +8,7 @@ import type { Catalog } from '#lib/catalog/catalog-factory.ts';
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
-import { getWordCount } from '#lib/catalog/catalog-word-count.ts';
+import { createWordCountFunction } from '#lib/catalog/catalog-word-count.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -16,9 +17,21 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
+import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentUrl } from '#lib/utils/routing.ts';
+
+let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
+
+function getWordCount(entry: CollectionEntry<CollectionKey>) {
+	if (!wordCountFunction) {
+		wordCountFunction = createWordCountFunction({
+			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
+		});
+	}
+	return wordCountFunction(entry);
+}
 
 type CatalogEntry = CollectionEntry<CatalogCollectionKey>;
 

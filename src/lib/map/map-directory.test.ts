@@ -2,7 +2,7 @@ import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 
 import { describe, expect, test } from 'vitest';
 
-import { hashMapDirectoryData } from '#lib/map/map-directory.ts';
+import { hashMapDirectoryData } from '#lib/map/map-directory-hash.ts';
 
 function makeSourceItem(id: string): MapSourceItem {
 	return {

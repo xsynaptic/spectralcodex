@@ -15,7 +15,7 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 
 export const createPostsByIdsFunction = createCollectionLookupByIds('Posts', getPostsCollection);

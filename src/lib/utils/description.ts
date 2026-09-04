@@ -1,12 +1,10 @@
 import type Keyv from 'keyv';
 
 import { sanitizeHtml, stripTags } from '@xsynaptic/unified-tools';
-import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { hash } from 'ohash';
 import * as R from 'remeda';
 
 import { hashShortLength, mdxComponents } from '#constants.ts';
-import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
@@ -19,16 +17,13 @@ interface DescriptionCached extends DescriptionRendered {
 	hash: string;
 }
 
-interface DescriptionEntry {
+export interface DescriptionEntry {
 	id: string;
 	data: { description?: string | undefined };
 	body?: string | undefined;
 }
 
-/**
- * Count of words to feed into the markdown transformer
- * This is buffered so any orphan markdown syntax falls outside the clip boundary
- */
+// Buffered past wordCountFinal so orphan markdown syntax falls outside the clip boundary
 const wordCountBuffer = 150;
 const wordCountFinal = 100;
 
@@ -97,23 +92,4 @@ export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 	}
 
 	return { getDescriptionRendered, getDescriptionRenderedText };
-}
-
-let descriptionRenderers: ReturnType<typeof createDescriptionRenderers> | undefined;
-
-function getDescriptionRenderers() {
-	if (!descriptionRenderers) {
-		descriptionRenderers = createDescriptionRenderers({
-			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'description-rendered'),
-		});
-	}
-	return descriptionRenderers;
-}
-
-export async function getDescriptionRendered(entry: DescriptionEntry) {
-	return getDescriptionRenderers().getDescriptionRendered(entry);
-}
-
-export async function getDescriptionRenderedText(entry: DescriptionEntry) {
-	return getDescriptionRenderers().getDescriptionRenderedText(entry);
 }
