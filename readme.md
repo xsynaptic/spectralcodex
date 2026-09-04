@@ -1,6 +1,6 @@
 # Spectral Codex
 
-This repository contains the working Astro project used to generate the [Spectral Codex](https://spectralcodex.com) website, a digital garden documenting historical sites, abandoned places, cultural assets, and oddball attractions in Taiwan and the broader region of East and Southeast Asia.
+This repository contains the working [Astro](https://astro.build) project used to generate the [Spectral Codex](https://spectralcodex.com) website, a digital garden documenting historical sites, abandoned places, cultural assets, and often obscure attractions in Taiwan and the broader region of East and Southeast Asia.
 
 ## Features
 
@@ -8,14 +8,14 @@ This repository contains the working Astro project used to generate the [Spectra
 
 - All content authored in MDX using the Content Layer API, with strict Zod schemas and generated JSON schemas for editor tooling
 - Entry quality scoring on a 1-5 scale, used to prioritize content in listings, chronology highlights, and image fallbacks
-- Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking (Turf.js + FlatGeobuf), proximity-based duplicate detection (KDBush), image reference and aspect ratio validation. Astro only logs bad references, so this runs as a separate script that exits non-zero
+- Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking (Turf.js and FlatGeobuf), proximity-based duplicate detection ([KDBush](https://github.com/mourner/kdbush)), image reference and aspect ratio validation
+- Build scripts read `astro:content` outside the Astro runtime via a Vite module runner, so validation, redirects, OG images, and sitemap dates see the same parsed collections the site does
 - Automated excerpt generation for previews and listings
 - Backlinks discovered from the internal `<Link>` component, plus entry counts computed across regions, themes, series, and resources
-- Markdown processed by [satteri](https://github.com/bruits/satteri) with plugins for component auto-import, image groups, CJK wrapping, and trailing slashes
+- Markdown processed by [Sätteri](https://github.com/bruits/satteri) with plugins for component auto-import, image groups, CJK wrapping, and trailing slashes
 - Content linting and formatting via [mdxlint](https://github.com/remcohaszing/mdxlint)
-- Automatic redirect generation from `formerIds` frontmatter into Caddy config
+- Automatic redirect generation from `formerIds` frontmatter into [Caddy](https://github.com/caddyserver/caddy) config
 - Media orphan detection for unreferenced images
-- Link checker with SQLite persistence, per-domain rate limiting, auto-retry with staleness rechecking, digest-based change detection, and graceful shutdown handling
 
 ### Image Handling
 
@@ -34,7 +34,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Keep original image assets in the media folder specified in `.env`; high-quality JPG or lossless PNG format images at 2400+ pixels on the long edge are recommended, and the current standard is mostly based on 3,600 pixel JPGs saved at maximum quality in Lightroom
 - [imagor](https://github.com/cshum/imagor) image server (MozJPEG build) handles on-demand resizing, format conversion, and quality adjustment
 - Nginx reverse proxy with aggressive caching ensures images are only processed once
-- URL-based transformations (e.g., `/{signature}/fit-in/1200x800/filters:format(webp):quality(80)/path/to/image.jpg`) allow flexible sizing without pre-generating variants
+- URL-based transformations (_e.g._, `/{signature}/fit-in/1200x800/filters:format(webp):quality(80)/path/to/image.jpg`) allow flexible sizing without pre-generating variants
 - Purpose-built typed imagor URL builder and HMAC-SHA256 signer (the `unpic-imagor` package) generates signed URLs at build time; signing plus rate limiting protects against cache-busting attacks
 - Incremental cache warming service with optional email alerts
 - Docker Compose orchestration for easy deployment and updates
@@ -54,7 +54,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 ### Search & Discovery
 
 - Client-side full-text search via [Pagefind](https://pagefind.app/) and the [astro-pagefind](https://github.com/shishkin/astro-pagefind) integration, a modal interface via [@pagefind/component-ui](https://pagefind.app/docs/ui-usage/), keyboard shortcuts, and retina-ready thumbnails
-- Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic + metadata ranking
+- Related content recommendations via Transformers.js embeddings (MiniLM, MPNet, BGE-M3), USearch ANN indexing, and hybrid semantic and metadata ranking
 - Hierarchical navigation through regions, themes, and series
 - Client-side fuzzy 404 suggestions via [@xsynaptic/path-suggestions](https://github.com/xsynaptic/astro-lab/tree/main/packages/path-suggestions) scored against a build-time content manifest; auto-redirects on near-exact matches
 
@@ -68,6 +68,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 ### User Experience
 
 - Native web components for interactive elements (dark mode toggle, reading progress, loading bar, navigation menu, image carousels, pagination, search toggle, back-to-top button)
+- [Build history charts](http://spectralcodoex.com/build-stats): SVG rendered at build time from a JSONL log, with log-scaled durations, a rolling median, and page counts on a second track
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Custom CJK character handling and language-specific styling
 - Self-hosted variable fonts via Astro's fonts API
@@ -79,7 +80,8 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Hierarchical deterministic fallback system for entries without a featured image
 - Digest-based caching keyed on content, source image, and template version
 - Comprehensive meta tags and structured data
-- Custom sitemap integration with accurate per-URL `lastmod` dates derived from git commit history, so change dates survive content moves and rebuilds
+- Sitemap with per-URL `lastmod` dates derived from git commit history, so change dates survive content moves and rebuilds; the indexable-path rule is shared with the content manifest so the two cannot disagree
+- Microformats2 markup (`h-entry`, `h-feed`, `h-card`) applied from a single class map across listings and detail pages
 - Full RSS feeds with server-side rendered MDX content via Astro's Container API
 
 ### Analytics
@@ -100,6 +102,8 @@ pnpm dev
 Without a private content checkout the site runs against the demo content in `packages/content-demo`; leaving the content path variables unset in `.env` defaults there, which is what makes this public repository runnable as-is.
 
 Install the git hooks once with `pnpm exec lefthook install`. The pre-push hook runs `pnpm check`, the repository's quality gate (stylelint, prettier, eslint, types, `astro check`, knip, vitest), which can also be run standalone.
+
+A dev-only `/inventory` route, injected by a local integration, renders the design tokens and most of the component library from real source against fixture data, including live Open Graph cards from the deploy script's own renderer.
 
 ## Build & Deployment
 
