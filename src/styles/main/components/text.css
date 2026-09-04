@@ -88,7 +88,7 @@
 
 	@media (width >= 40rem) {
 		display: inline-flex;
-		gap: calc(var(--spacing) * 1);
+		gap: var(--divider-space, calc(var(--spacing) * 1));
 	}
 }
 
@@ -103,7 +103,7 @@
 /* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
 @media (width < 40rem) {
 	.divided-item::after {
-		margin-inline: calc(var(--spacing) * 1);
+		margin-inline: var(--divider-space, calc(var(--spacing) * 1));
 	}
 }
 
