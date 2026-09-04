@@ -2,8 +2,7 @@ import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-const imgRegex = /<Img(?:\s+([^>]*?))?(?:>|\/?>)/g;
-const srcPropRegex = /src=["']([^"']+)["']/;
+import { findComponentTags, getTagProp } from './component-tags';
 
 export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
 	const imageFeatured = frontmatter.imageFeatured;
@@ -22,19 +21,9 @@ export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): A
 }
 
 export function extractMdxImageIds(content: string): Array<string> {
-	const ids: Array<string> = [];
-	let match: RegExpExecArray | null;
-
-	while ((match = imgRegex.exec(content)) !== null) {
-		const props = match[1] || '';
-		const srcMatch = srcPropRegex.exec(props);
-
-		if (srcMatch?.[1]) {
-			ids.push(srcMatch[1]);
-		}
-	}
-
-	return ids;
+	return findComponentTags(content, ['Img'])
+		.map((tag) => getTagProp(tag, 'src'))
+		.filter((src) => src !== undefined);
 }
 
 export function collectMediaFiles(
