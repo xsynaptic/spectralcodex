@@ -61,7 +61,6 @@ export default defineConfig({
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
-	// Astro's default; set explicitly so build-time scripts resolve the data store identically
 	cacheDir: astroCacheDir,
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr

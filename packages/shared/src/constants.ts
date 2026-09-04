@@ -12,8 +12,9 @@ export const openGraphOutputPath = '.cache/og-image';
 // Keyv namespace (and JSON filename stem) for the Open Graph generation cache
 export const openGraphCacheNamespace = 'og-image-cache';
 
-// Astro's cache directory, set explicitly so build-time scripts read the data store where Astro writes it
-export const astroCacheDir = './node_modules/.astro';
+// `getViteConfig` scripts run Vite in serve mode, where Astro reads the store from `.astro`
+// Pointing the cache here is what makes `astro sync` and `astro build` write the file those scripts read
+export const astroCacheDir = './.astro';
 
 // Written by the sitemap-lastmod deploy step, read back when the Astro config loads
 export const sitemapLastmodPath = '.cache/sitemap-lastmod.json';

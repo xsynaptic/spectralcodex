@@ -79,6 +79,13 @@ export async function getCollectionEntries<C extends CollectionKey>(
 	collections: Array<C>,
 ) {
 	const entries = await Promise.all(collections.map((collection) => getCollection(collection)));
+	const flattened = entries.flat();
 
-	return entries.flat();
+	if (flattened.length === 0) {
+		throw new Error(
+			`No entries found in: ${collections.join(', ')}. Run \`astro sync\` to write the content store.`,
+		);
+	}
+
+	return flattened;
 }
