@@ -8,9 +8,9 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { optimize } from 'svgo';
 
-import type { DivisionFeatureCollection, DivisionGeometry } from './types';
+import { safelyCreateDirectory } from '#shared/utils.ts';
 
-import { safelyCreateDirectory } from '../shared/utils';
+import type { DivisionFeatureCollection, DivisionGeometry } from './types.ts';
 
 interface SvgOptions {
 	// Tolerance for geometry simplification (lower = more detail)

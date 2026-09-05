@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
 // `entry.body` drops the frontmatter, so a file line number needs its length added back
 export function getBodyLineOffset(entry: ContentEntry, rootPath: string) {

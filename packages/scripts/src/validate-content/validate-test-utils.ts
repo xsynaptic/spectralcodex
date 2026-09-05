@@ -1,4 +1,4 @@
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
 export function makeEntry(
 	overrides: Partial<ContentEntry> & Pick<ContentEntry, 'id'>,

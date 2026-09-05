@@ -8,10 +8,10 @@ import {
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 
-import type { MapPopupItem, MapSourceItem } from './codec';
+import type { MapPopupItem, MapSourceItem } from './codec.ts';
 
-import { MapPopupItemSchema, MapSourceItemSchema } from './codec';
-import { MapDataGeometryTypeNumericMapping, MapDataKeysCompressed } from './map-data-keys';
+import { MapPopupItemSchema, MapSourceItemSchema } from './codec.ts';
+import { MapDataGeometryTypeNumericMapping, MapDataKeysCompressed } from './map-data-keys.ts';
 
 function byCodePoint(first: string, second: string): number {
 	return first.localeCompare(second);

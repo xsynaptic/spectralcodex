@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 
-import { loadDeployConfig } from './deploy-config.js';
+import { loadDeployConfig } from './deploy-config.ts';
 
 interface EdgeExpectation {
 	label: string;

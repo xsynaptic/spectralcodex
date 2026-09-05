@@ -1,6 +1,6 @@
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toValidationResult } from './validation-result';
+import { toValidationResult } from './validation-result.ts';
 
 interface EntryReference {
 	field: string;

@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { $ } from 'zx';
 
-import { findWorkspaceRoot } from '../shared/utils.js';
+import { findWorkspaceRoot } from '#shared/utils.ts';
 
 const rootPath = findWorkspaceRoot();
 const composePath = path.join(import.meta.dirname, 'docker-compose.yml');

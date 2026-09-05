@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectRegionsParentsIssues } from './regions-parent';
-import { makeEntry } from './validate-test-utils';
+import { collectRegionsParentsIssues } from './regions-parent.ts';
+import { makeEntry } from './validate-test-utils.ts';
 
 describe('collectRegionsParentsIssues', () => {
 	test('accepts valid parents and entries without a parent', () => {

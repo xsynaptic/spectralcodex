@@ -1,8 +1,8 @@
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
 import { Bitmap } from 'takumi-js/helpers/jsx';
 
-import type { ProcessedImage } from './generate.js';
-import type { OpenGraphMetadataItem } from './types.js';
+import type { ProcessedImage } from './generate.ts';
+import type { OpenGraphMetadataItem } from './types.ts';
 
 const isShowBranding = true as boolean;
 

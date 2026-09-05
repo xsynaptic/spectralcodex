@@ -5,11 +5,12 @@ import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import type { MapSourceFeatureCollection } from '../types';
+import type { MapSourceFeatureCollection } from '#types.ts';
 
-import { useIsDarkMode } from '../lib/dark-mode';
-import { statusColorArray, statusColorDarkArray } from '../lib/location-status';
-import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { statusColorArray, statusColorDarkArray } from '#lib/location-status.ts';
+
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config.ts';
 
 function useMapSourceLinesStyle(): {
 	[MapLayerIdEnum.LineString]: LineLayerSpecification;

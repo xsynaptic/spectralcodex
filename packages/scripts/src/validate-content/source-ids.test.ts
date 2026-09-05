@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectSourceIdIssues } from './source-ids';
-import { makeEntry } from './validate-test-utils';
+import { collectSourceIdIssues } from './source-ids.ts';
+import { makeEntry } from './validate-test-utils.ts';
 
 const resourceEntries = [makeEntry({ id: 'existing-resource' })];
 

@@ -6,18 +6,19 @@ import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import type { MapSourceFeatureCollection } from '../types';
+import type { MapSourceFeatureCollection } from '#types.ts';
 
-import { useIsDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import {
 	statusColorArray,
 	statusColorDarkArray,
 	statusStrokeColorArray,
 	statusStrokeColorDarkArray,
-} from '../lib/location-status';
-import { tailwindColors } from '../lib/tailwind-colors';
-import { useMapHoveredId } from '../store/store';
-import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
+} from '#lib/location-status.ts';
+import { tailwindColors } from '#lib/tailwind-colors.ts';
+import { useMapHoveredId } from '#store/store.ts';
+
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 // feature-state is paint-only, so the label layers below still key off the store hoveredId

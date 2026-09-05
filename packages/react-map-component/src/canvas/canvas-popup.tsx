@@ -6,18 +6,18 @@ import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import { mediaQueryMobile } from '../constants';
-import { usePopupDataQuery } from '../data/data-popup';
-import { useChunkPopup } from '../data/data-popup-chunks';
-import { useSourceDataQuery } from '../data/data-source';
-import { useMediaQuery } from '../lib/media-query';
-import { useMapMessages } from '../lib/messages';
+import { mediaQueryMobile } from '#constants.ts';
+import { useChunkPopup } from '#data/data-popup-chunks.tsx';
+import { usePopupDataQuery } from '#data/data-popup.tsx';
+import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useMediaQuery } from '#lib/media-query.ts';
+import { useMapMessages } from '#lib/messages.tsx';
 import {
 	useMapHoveredId,
 	useIsMapPopupVisible,
 	useMapSelectedId,
 	useMapStoreActions,
-} from '../store/store';
+} from '#store/store.ts';
 
 type MapPopupItemExtended = MapPopupItem & {
 	precision: number;

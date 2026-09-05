@@ -2,14 +2,16 @@ import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { z } from 'zod';
 
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { RegionParentMap } from '../shared/entries.js';
-import type { OpenGraphContentEntry, OpenGraphEntryItem } from './types.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
+import type { RegionParentMap } from '#shared/entries.ts';
 
-import { getRegionParentsById, getPublicId, toReferenceIds } from '../shared/entries.js';
-import { extractImageFeaturedIds } from '../shared/images.js';
-import { getChronologyTitle } from './chronology.js';
-import { getFallbackImageId } from './fallback.js';
+import { getRegionParentsById, getPublicId, toReferenceIds } from '#shared/entries.ts';
+import { extractImageFeaturedIds } from '#shared/images.ts';
+
+import type { OpenGraphContentEntry, OpenGraphEntryItem } from './types.ts';
+
+import { getChronologyTitle } from './chronology.ts';
+import { getFallbackImageId } from './fallback.ts';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
 export function resolveOgRegions(data: Record<string, unknown>): Array<string> {

@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
-import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '../types';
+import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '#types.ts';
 
 export interface MapFilterState {
 	status: ReadonlyArray<LocationStatus>;

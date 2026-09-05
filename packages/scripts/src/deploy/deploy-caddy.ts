@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import path from 'node:path';
 
-import { loadDeployConfig } from './deploy-config.js';
-import { rsyncTo, sshExec } from './rsync-exec.js';
+import { loadDeployConfig } from './deploy-config.ts';
+import { rsyncTo, sshExec } from './rsync-exec.ts';
 
 interface DeployCaddyOptions {
 	rootPath: string;

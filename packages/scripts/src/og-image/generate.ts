@@ -4,9 +4,9 @@ import sharp from 'sharp';
 import { render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
 
-import type { OpenGraphMetadataItem } from './types.js';
+import type { OpenGraphMetadataItem } from './types.ts';
 
-import { getOpenGraphElement } from './element.js';
+import { getOpenGraphElement } from './element.tsx';
 
 // A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
 const glyphCacheBytes = 64 * 1024 * 1024;

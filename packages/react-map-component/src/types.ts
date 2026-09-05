@@ -9,8 +9,8 @@ import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
 
-import type { MapDarkModeOptions } from './lib/dark-mode';
-import type { MapMessages } from './lib/messages';
+import type { MapDarkModeOptions } from './lib/dark-mode.tsx';
+import type { MapMessages } from './lib/messages.tsx';
 
 export type MapInitialViewState = MapProps['initialViewState'];
 

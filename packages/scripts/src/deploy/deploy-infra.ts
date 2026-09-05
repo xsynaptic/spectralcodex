@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 import path from 'node:path';
 
-import type { DeployConfig } from './deploy-config.js';
+import type { DeployConfig } from './deploy-config.ts';
 
-import { loadDeployConfig } from './deploy-config.js';
-import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from './rsync-exec.js';
+import { loadDeployConfig } from './deploy-config.ts';
+import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from './rsync-exec.ts';
 
 interface DeployInfraOptions {
 	rootPath: string;

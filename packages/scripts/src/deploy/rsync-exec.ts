@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { $ } from 'zx';
 
-import type { DeployConfig } from './deploy-config.js';
+import type { DeployConfig } from './deploy-config.ts';
 
 interface RsyncOptions {
 	config: DeployConfig;

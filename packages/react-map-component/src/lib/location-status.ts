@@ -2,7 +2,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 
-import { tailwindColors } from './tailwind-colors';
+import { tailwindColors } from './tailwind-colors.ts';
 
 export interface LocationStatusMetadata {
 	title: string;

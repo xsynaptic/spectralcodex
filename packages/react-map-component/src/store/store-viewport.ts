@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { MapComponentProps, MapInitialViewState } from '../types';
+import type { MapComponentProps, MapInitialViewState } from '#types.ts';
 
 const staleTimeMs = 30 * 60 * 1000;
 const defaultZoom = 12;

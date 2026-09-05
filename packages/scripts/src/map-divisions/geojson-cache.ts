@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { DivisionGeometry, DivisionItem } from './types';
+import { safelyCreateDirectory } from '#shared/utils.ts';
 
-import { safelyCreateDirectory } from '../shared/utils';
+import type { DivisionGeometry, DivisionItem } from './types.ts';
 
 export async function getDivisionDataCache(
 	divisionId: string,

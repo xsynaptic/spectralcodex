@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types';
+import type { DivisionFeatureCollection, DivisionItem, RegionMetadata } from './types.ts';
 
 const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';
 const s3Base = 's3://overturemaps-us-west-2/release';
@@ -21,13 +21,14 @@ async function resolveLatestRelease(): Promise<string> {
 	return `${s3Base}/${version}/`;
 }
 
-import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
-import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '../shared/utils';
-import { parseRegionData, resolveBoundingBox } from './content';
-import { fetchDivisionData, initializeDuckDB } from './duckdb';
-import { saveFlatgeobuf } from './flatgeobuf';
-import { convertToFeatureCollection } from './geojson';
-import { saveSvg } from './svg';
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
+
+import { parseRegionData, resolveBoundingBox } from './content.ts';
+import { fetchDivisionData, initializeDuckDB } from './duckdb.ts';
+import { saveFlatgeobuf } from './flatgeobuf.ts';
+import { convertToFeatureCollection } from './geojson.ts';
+import { saveSvg } from './svg.ts';
 
 const rootPath = findWorkspaceRoot();
 

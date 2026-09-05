@@ -5,11 +5,12 @@ import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { ValidationResult } from './validation-result';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toReferenceIds } from '../shared/entries.js';
-import { LocationGeometrySchema } from '../shared/geometry';
+import { toReferenceIds } from '#shared/entries.ts';
+import { LocationGeometrySchema } from '#shared/geometry.ts';
+
+import type { ValidationResult } from './validation-result.ts';
 
 async function loadRegionGeometry(
 	regionId: string,

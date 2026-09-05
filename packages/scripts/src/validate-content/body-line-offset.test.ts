@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { getBodyLineOffset } from './body-line-offset';
-import { makeEntry } from './validate-test-utils';
+import { getBodyLineOffset } from './body-line-offset.ts';
+import { makeEntry } from './validate-test-utils.ts';
 
 const rootPath = import.meta.dirname;
 

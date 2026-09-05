@@ -6,13 +6,13 @@ import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { memo } from 'react';
 import * as R from 'remeda';
 
-import type { LocationStatusMetadata } from '../lib/location-status';
+import type { LocationStatusMetadata } from '#lib/location-status.ts';
 
-import { controlFilterId } from '../constants';
-import { useSourceDataQuery } from '../data/data-source';
-import { useIsDarkMode } from '../lib/dark-mode';
-import { LocationStatusRecords } from '../lib/location-status';
-import { useMapMessages } from '../lib/messages';
+import { controlFilterId } from '#constants.ts';
+import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { LocationStatusRecords } from '#lib/location-status.ts';
+import { useMapMessages } from '#lib/messages.tsx';
 import {
 	useIsMapCanvasLoading,
 	useHasMapChineseLabels,
@@ -23,8 +23,9 @@ import {
 	useIsMapObjectiveFilterEnabled,
 	useMapStatusFilter,
 	useMapStoreActions,
-} from '../store/store';
-import { CustomControlPortal } from './controls-custom';
+} from '#store/store.ts';
+
+import { CustomControlPortal } from './controls-custom.tsx';
 
 // Bilingual secondary labels; kept local pending the deferred map-portability work
 const chineseShowHideLabels = {

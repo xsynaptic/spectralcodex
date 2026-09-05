@@ -3,27 +3,28 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type { ValidationResult } from './validation-result';
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { findWorkspaceRoot } from '#shared/utils.ts';
 
-import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
-import { findWorkspaceRoot } from '../shared/utils.js';
-import { validateEntryIds } from './entry-ids';
-import { validateFrontmatterLinks } from './frontmatter-links';
-import { validateImageAspectRatios } from './image-aspect-ratios';
-import { validateImageFeaturedInBody } from './image-featured-in-body';
-import { validateImageFeaturedLinks } from './image-featured-links';
-import { validateImageReferences } from './images';
-import { validateLinkIds } from './link-ids';
-import { validateLocationsCoordinates } from './locations-coordinates';
-import { validateLocationsDuplicates } from './locations-duplicates';
-import { validateLocationsOverlap } from './locations-overlap';
-import { validateLocationsRegions } from './locations-region';
-import { validateMdxComponents } from './mdx';
-import { validateReferences } from './references';
-import { validateRegionsParents } from './regions-parent';
-import { validateSeriesItems } from './series-items';
-import { validateSourceIds } from './source-ids';
-import { reportValidationResult } from './validation-result';
+import type { ValidationResult } from './validation-result.ts';
+
+import { validateEntryIds } from './entry-ids.ts';
+import { validateFrontmatterLinks } from './frontmatter-links.ts';
+import { validateImageAspectRatios } from './image-aspect-ratios.ts';
+import { validateImageFeaturedInBody } from './image-featured-in-body.ts';
+import { validateImageFeaturedLinks } from './image-featured-links.ts';
+import { validateImageReferences } from './images.ts';
+import { validateLinkIds } from './link-ids.ts';
+import { validateLocationsCoordinates } from './locations-coordinates.ts';
+import { validateLocationsDuplicates } from './locations-duplicates.ts';
+import { validateLocationsOverlap } from './locations-overlap.ts';
+import { validateLocationsRegions } from './locations-region.ts';
+import { validateMdxComponents } from './mdx.ts';
+import { validateReferences } from './references.ts';
+import { validateRegionsParents } from './regions-parent.ts';
+import { validateSeriesItems } from './series-items.ts';
+import { validateSourceIds } from './source-ids.ts';
+import { reportValidationResult } from './validation-result.ts';
 
 const rootPath = findWorkspaceRoot();
 

@@ -10,12 +10,16 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
-import { controlFilterId, mediaQueryMobile } from '../constants';
-import { useSourceDataQuery } from '../data/data-source';
-import { useMediaQuery } from '../lib/media-query';
-import { mapQueryableLayerIds, MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
-import { useIsMapCanvasInteractive, useMapStoreActions, useMapStoreInstance } from '../store/store';
-import { writeSavedViewport } from '../store/store-viewport';
+import { controlFilterId, mediaQueryMobile } from '#constants.ts';
+import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useMediaQuery } from '#lib/media-query.ts';
+import { mapQueryableLayerIds, MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { writeSavedViewport } from '#store/store-viewport.ts';
+import {
+	useIsMapCanvasInteractive,
+	useMapStoreActions,
+	useMapStoreInstance,
+} from '#store/store.ts';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 

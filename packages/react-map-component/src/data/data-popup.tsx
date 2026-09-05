@@ -1,6 +1,6 @@
 import { MapPopupItemSchema } from '@spectralcodex/map-codec';
 
-import { createMapDataQuery } from './data-query-factory';
+import { createMapDataQuery } from './data-query-factory.tsx';
 
 export const { DataProvider: PopupDataContextProvider, useDataQuery: usePopupDataQuery } =
 	createMapDataQuery({

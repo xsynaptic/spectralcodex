@@ -10,7 +10,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { del, get, set } from 'idb-keyval';
 import { useState } from 'react';
 
-import { mapCacheSchemaVersion } from '../constants';
+import { mapCacheSchemaVersion } from '#constants.ts';
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 

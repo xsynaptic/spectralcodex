@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapScope } from '../types';
+import type { MapScope } from '#types.ts';
 
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 

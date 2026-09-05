@@ -1,10 +1,11 @@
 import { around as getPointsAround, distance as getDistance } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { ValidationResult } from './validation-result';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { LocationGeometrySchema } from '../shared/geometry';
+import { LocationGeometrySchema } from '#shared/geometry.ts';
+
+import type { ValidationResult } from './validation-result.ts';
 
 interface IndexedPoint {
 	locationId: string;

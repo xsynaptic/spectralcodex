@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { ValidationIssue } from './validation-result';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toValidationResult } from './validation-result';
+import type { ValidationIssue } from './validation-result.ts';
+
+import { toValidationResult } from './validation-result.ts';
 
 const duplicateFields = [
 	'title',

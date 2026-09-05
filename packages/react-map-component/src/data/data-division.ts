@@ -8,9 +8,9 @@ import { featureCollection } from '@turf/helpers';
 import { geojson } from 'flatgeobuf';
 import * as R from 'remeda';
 
-import type { MapComponentProps } from '../types';
+import type { MapComponentProps } from '#types.ts';
 
-import { fetchTimeoutMs } from '../constants';
+import { fetchTimeoutMs } from '#constants.ts';
 
 // This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
 function createFeatureMask(feature: Feature<Polygon | MultiPolygon>) {

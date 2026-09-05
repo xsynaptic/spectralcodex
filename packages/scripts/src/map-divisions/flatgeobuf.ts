@@ -5,7 +5,7 @@ import { geojson } from 'flatgeobuf';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { safelyCreateDirectory } from '../shared/utils';
+import { safelyCreateDirectory } from '#shared/utils.ts';
 
 export async function saveFlatgeobuf(
 	geojsonData: FeatureCollection,

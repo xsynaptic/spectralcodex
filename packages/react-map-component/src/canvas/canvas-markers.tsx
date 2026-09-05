@@ -6,11 +6,11 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { useEffect, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
-import { useIsDarkMode } from '../lib/dark-mode';
-import { LocationStatusRecords } from '../lib/location-status';
-import { tailwindColors } from '../lib/tailwind-colors';
-import { MapLayerIdEnum, MapSourceIdEnum } from '../source/source-config';
-import { useIsMapPopupVisible, useMapSelectedId } from '../store/store';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { LocationStatusRecords } from '#lib/location-status.ts';
+import { tailwindColors } from '#lib/tailwind-colors.ts';
+import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
 
 interface TargetMarker {
 	id: string;

@@ -1,10 +1,10 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { z } from 'zod';
 
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { getPublicId } from '../shared/entries.js';
-import { extractImageFeaturedIds } from '../shared/images.js';
+import { getPublicId } from '#shared/entries.ts';
+import { extractImageFeaturedIds } from '#shared/images.ts';
 
 /**
  * Chronology title format: "Chronology: March 2024" or "Chronology: 2024"

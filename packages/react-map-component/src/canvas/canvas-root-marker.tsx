@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { useEffect, useLayoutEffect } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import { useIsDarkMode } from '../lib/dark-mode';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
 
 // Commit the marker before paint to avoid a first-frame flash; SSR has no layout effect
 const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;

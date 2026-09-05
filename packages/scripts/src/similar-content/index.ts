@@ -8,14 +8,16 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { SimilarContentMetadata } from './metadata.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
-import { getFileCacheInstance } from '../shared/cache-file.js';
-import { toReferenceIds } from '../shared/entries.js';
-import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
-import { calculateMetadataBoost } from './metadata.js';
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { getFileCacheInstance } from '#shared/cache-file.ts';
+import { toReferenceIds } from '#shared/entries.ts';
+import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
+
+import type { SimilarContentMetadata } from './metadata.ts';
+
+import { calculateMetadataBoost } from './metadata.ts';
 
 const rootPath = findWorkspaceRoot();
 

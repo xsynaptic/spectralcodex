@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { getChronologyPeriodKeys } from './chronology';
+import { getChronologyPeriodKeys } from './chronology.ts';
 
 describe('getChronologyPeriodKeys', () => {
 	test('keys a late-evening UTC instant in its UTC month', () => {

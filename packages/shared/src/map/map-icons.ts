@@ -1,6 +1,6 @@
-import type { LocationCategory } from './map-locations';
+import type { LocationCategory } from './map-locations.ts';
 
-import { LocationCategoryEnum } from './map-locations';
+import { LocationCategoryEnum } from './map-locations.ts';
 
 export const mapLocationCategoryIcons = {
 	// Civic

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectLinkIdIssues, validateLinkIds } from './link-ids';
-import { makeEntry } from './validate-test-utils';
+import { collectLinkIdIssues, validateLinkIds } from './link-ids.ts';
+import { makeEntry } from './validate-test-utils.ts';
 
 const rootPath = import.meta.dirname;
 

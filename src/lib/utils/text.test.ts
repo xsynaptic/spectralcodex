@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { stripMdxComponents, textClipper } from './text';
+import { stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
 describe('textClipper', () => {
 	test('returns short input untouched', () => {

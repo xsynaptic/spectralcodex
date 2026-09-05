@@ -4,10 +4,11 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { findWorkspaceRoot } from '#shared/utils.ts';
+
 import type { UrlStatus } from './types.ts';
 
-import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
-import { findWorkspaceRoot } from '../shared/utils.ts';
 import { checkUrl } from './client.ts';
 import {
 	closeDatabase,

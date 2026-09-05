@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
 // Matches markdown links: [text](https://...)
 // Excludes image references ![alt](url) via negative lookbehind

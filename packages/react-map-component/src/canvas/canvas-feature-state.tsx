@@ -3,8 +3,8 @@ import type { FC } from 'react';
 import { useEffect, useRef } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import { MapSourceIdEnum } from '../source/source-config';
-import { useMapSelectedId } from '../store/store';
+import { MapSourceIdEnum } from '#source/source-config.ts';
+import { useMapSelectedId } from '#store/store.ts';
 
 // Mirror selectedId into feature-state so the paint layers read ['feature-state','select']
 // Selection changes on click, not per hover, so a store-subscribed effect is cheap here

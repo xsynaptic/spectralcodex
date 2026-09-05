@@ -6,9 +6,10 @@ import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import { useIsDarkMode } from '../lib/dark-mode';
-import { tailwindColors } from '../lib/tailwind-colors';
-import { MapLayerIdEnum, MapSourceIdEnum } from './source-config';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { tailwindColors } from '#lib/tailwind-colors.ts';
+
+import { MapLayerIdEnum, MapSourceIdEnum } from './source-config.ts';
 
 function useMapSourceDivisionStyle() {
 	const isDarkMode = useIsDarkMode();

@@ -1,4 +1,4 @@
-import { getPublicId } from '../shared/entries.js';
+import { getPublicId } from '#shared/entries.ts';
 
 interface RedirectPair {
 	fromPath: string;

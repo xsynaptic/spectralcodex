@@ -1,7 +1,7 @@
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import { createMapStore } from './store-factory';
+import { createMapStore } from './store-factory.ts';
 
 describe('createMapStore', () => {
 	test('toggleStatusFilter adds an absent status and removes a present one', () => {

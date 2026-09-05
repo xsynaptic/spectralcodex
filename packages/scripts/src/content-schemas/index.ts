@@ -3,7 +3,7 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
-import { findWorkspaceRoot } from '../shared/utils.js';
+import { findWorkspaceRoot } from '#shared/utils.ts';
 
 const rootPath = findWorkspaceRoot();
 

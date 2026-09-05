@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
-import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '../shared/utils.js';
+import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';
 const userAgent = 'SpectralCodex-Webmentions/1.0 (+https://spectralcodex.com)';

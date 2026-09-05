@@ -2,10 +2,10 @@
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import { fallbackImageIds } from '../og-image/fallback.js';
-import { getCollectionEntries, withAstroContent } from '../shared/astro-content.js';
-import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '../shared/images';
-import { findWorkspaceRoot } from '../shared/utils.js';
+import { fallbackImageIds } from '#og-image/fallback.ts';
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
+import { findWorkspaceRoot } from '#shared/utils.ts';
 
 const rootPath = findWorkspaceRoot();
 

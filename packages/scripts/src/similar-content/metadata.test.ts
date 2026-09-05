@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { calculateMetadataBoost } from './metadata';
+import { calculateMetadataBoost } from './metadata.ts';
 
 function makeEmbedding(themes: Array<string>, regions: Array<string>) {
 	return { metadata: { themes, regions } };

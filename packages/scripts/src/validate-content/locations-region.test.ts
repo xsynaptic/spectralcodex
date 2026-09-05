@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectLocationsRegionsIssues } from './locations-region';
-import { makeEntry, makeRegionRefs } from './validate-test-utils';
+import { collectLocationsRegionsIssues } from './locations-region.ts';
+import { makeEntry, makeRegionRefs } from './validate-test-utils.ts';
 
 function makeLocation(id: string, regionIds: Array<string>, filePath?: string) {
 	return makeEntry({

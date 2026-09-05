@@ -13,17 +13,18 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
-import type { ImageBatch } from './batch.js';
-import type { OutputCacheStore } from './output-cache.js';
-import type { OpenGraphContentEntry } from './types.js';
+import { getFileCacheInstance } from '#shared/cache-file.ts';
+import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
 
-import { getFileCacheInstance } from '../shared/cache-file.js';
-import { findWorkspaceRoot, safelyCreateDirectory } from '../shared/utils.js';
-import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.js';
-import { getBuiltEntries } from './built-entries.js';
-import { loadOpenGraphFonts } from './fonts.js';
-import { createRenderer, processImage } from './generate.js';
-import { createOutputCache } from './output-cache.js';
+import type { ImageBatch } from './batch.ts';
+import type { OutputCacheStore } from './output-cache.ts';
+import type { OpenGraphContentEntry } from './types.ts';
+
+import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.ts';
+import { getBuiltEntries } from './built-entries.ts';
+import { loadOpenGraphFonts } from './fonts.ts';
+import { createRenderer, processImage } from './generate.ts';
+import { createOutputCache } from './output-cache.ts';
 
 const rootPath = findWorkspaceRoot();
 

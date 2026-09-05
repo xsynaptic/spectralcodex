@@ -2,9 +2,10 @@ import chalk from 'chalk';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { collectMediaFiles } from '../shared/images.js';
-import { loadDeployConfig } from './deploy-config.js';
-import { rsyncTo } from './rsync-exec.js';
+import { collectMediaFiles } from '#shared/images.ts';
+
+import { loadDeployConfig } from './deploy-config.ts';
+import { rsyncTo } from './rsync-exec.ts';
 
 interface DeployMediaOptions {
 	rootPath: string;

@@ -7,9 +7,9 @@ import {
 } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapFilterState } from './canvas-data-filter';
+import type { MapFilterState } from './canvas-data-filter.ts';
 
-import { getMapCanvasData, isLocationVisible } from './canvas-data-filter';
+import { getMapCanvasData, isLocationVisible } from './canvas-data-filter.ts';
 
 const passAll: MapFilterState = {
 	status: [],

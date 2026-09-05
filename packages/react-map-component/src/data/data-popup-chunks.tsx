@@ -5,7 +5,7 @@ import { MapPopupItemSchema } from '@spectralcodex/map-codec';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext } from 'react';
 
-import { fetchTimeoutMs } from '../constants';
+import { fetchTimeoutMs } from '#constants.ts';
 
 interface ChunkConfig {
 	chunkUrlBase: string | undefined;

@@ -11,7 +11,7 @@ import {
 	createGenerateLocationPostDataFunction,
 	getLocationThumbnailProps,
 } from '#lib/collections/locations/locations-factory.ts';
-import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.js';
+import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';

@@ -3,25 +3,26 @@ import type { CSSProperties, FC } from 'react';
 import { memo, useState } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps } from '../types';
+import type { MapComponentProps } from '#types.ts';
 
-import './canvas-worker';
-import { MapControls } from '../controls/controls';
-import { PopupDataContextProvider } from '../data/data-popup';
-import { ChunkConfigProvider } from '../data/data-popup-chunks';
-import { SourceDataContextProvider, useSourceDataQuery } from '../data/data-source';
-import { useProtomaps } from '../lib/protomaps';
-import { MapSource } from '../source/source';
-import { mapInteractiveLayerIds } from '../source/source-config';
-import { useIsMapCanvasInteractive, useIsMapCanvasLoading } from '../store/store';
-import { MapStoreProvider } from '../store/store-provider';
-import { getInitialViewState } from '../store/store-viewport';
-import { CanvasDataProvider } from './canvas-data';
-import { useMapCanvasEvents } from './canvas-events';
-import { MapSelectionFeatureState } from './canvas-feature-state';
-import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers';
-import { MapPopup } from './canvas-popup';
-import { MapRootMarker } from './canvas-root-marker';
+import './canvas-worker.ts';
+import { MapControls } from '#controls/controls.tsx';
+import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
+import { PopupDataContextProvider } from '#data/data-popup.tsx';
+import { SourceDataContextProvider, useSourceDataQuery } from '#data/data-source.tsx';
+import { useProtomaps } from '#lib/protomaps.ts';
+import { mapInteractiveLayerIds } from '#source/source-config.ts';
+import { MapSource } from '#source/source.tsx';
+import { MapStoreProvider } from '#store/store-provider.tsx';
+import { getInitialViewState } from '#store/store-viewport.ts';
+import { useIsMapCanvasInteractive, useIsMapCanvasLoading } from '#store/store.ts';
+
+import { CanvasDataProvider } from './canvas-data.tsx';
+import { useMapCanvasEvents } from './canvas-events.ts';
+import { MapSelectionFeatureState } from './canvas-feature-state.tsx';
+import { MapSelectedMarker, MapTargetMarkers } from './canvas-markers.tsx';
+import { MapPopup } from './canvas-popup.tsx';
+import { MapRootMarker } from './canvas-root-marker.tsx';
 
 const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (

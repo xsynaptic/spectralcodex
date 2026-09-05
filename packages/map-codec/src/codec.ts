@@ -11,7 +11,7 @@ import {
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeys,
 	MapDataKeysCompressed,
-} from './map-data-keys';
+} from './map-data-keys.ts';
 
 type GeometryType = (typeof GeometryTypeEnum)[keyof typeof GeometryTypeEnum];
 

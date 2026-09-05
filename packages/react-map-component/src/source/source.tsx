@@ -1,15 +1,16 @@
 import type { FeatureCollection } from 'geojson';
 import type { FC } from 'react';
 
-import type { MapComponentProps } from '../types';
+import type { MapComponentProps } from '#types.ts';
 
-import { useMapCanvasData } from '../canvas/canvas-data';
-import { useMapApiDivisionData } from '../data/data-division';
-import { useIsMapCanvasInteractive } from '../store/store';
-import { MapSourceDebug } from './source-debug';
-import { MapSourceDivisions } from './source-divisions';
-import { MapSourceLines } from './source-lines';
-import { MapSourcePoints } from './source-points';
+import { useMapCanvasData } from '#canvas/canvas-data.tsx';
+import { useMapApiDivisionData } from '#data/data-division.ts';
+import { useIsMapCanvasInteractive } from '#store/store.ts';
+
+import { MapSourceDebug } from './source-debug.tsx';
+import { MapSourceDivisions } from './source-divisions.tsx';
+import { MapSourceLines } from './source-lines.tsx';
+import { MapSourcePoints } from './source-points.tsx';
 
 const isDebug = false as boolean;
 

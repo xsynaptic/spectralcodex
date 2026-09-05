@@ -1,9 +1,11 @@
-import type { ContentEntry } from '../shared/astro-content.js';
-import type { ValidationIssue } from './validation-result';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { findComponentTags, getTagProp } from '../shared/component-tags';
-import { getBodyLineOffset } from './body-line-offset';
-import { toValidationResult } from './validation-result';
+import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
+
+import type { ValidationIssue } from './validation-result.ts';
+
+import { getBodyLineOffset } from './body-line-offset.ts';
+import { toValidationResult } from './validation-result.ts';
 
 interface LinkIdIssue {
 	location: string;

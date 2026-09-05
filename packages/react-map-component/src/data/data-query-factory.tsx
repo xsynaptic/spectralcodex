@@ -4,7 +4,7 @@ import type { z } from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, useContext, useMemo } from 'react';
 
-import { fetchTimeoutMs } from '../constants';
+import { fetchTimeoutMs } from '#constants.ts';
 
 interface MapDataQueryConfig<TSchema extends z.ZodType> {
 	name: string;

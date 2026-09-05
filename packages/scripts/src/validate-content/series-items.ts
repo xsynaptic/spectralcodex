@@ -1,6 +1,6 @@
-import type { ContentEntry } from '../shared/astro-content.js';
+import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toValidationResult } from './validation-result';
+import { toValidationResult } from './validation-result.ts';
 
 /**
  * Series items are plain strings because a series mixes collections, so `reference()` cannot serve them
