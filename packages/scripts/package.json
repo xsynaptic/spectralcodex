@@ -6,6 +6,9 @@
 	"exports": {
 		"./og-image": "./src/og-image/inventory-exports.ts"
 	},
+	"imports": {
+		"#*": "./src/*"
+	},
 	"private": true,
 	"scripts": {
 		"check-links": "tsx ./src/check-links/index.ts",
