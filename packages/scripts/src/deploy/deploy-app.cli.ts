@@ -1,9 +1,8 @@
 #!/usr/bin/env tsx
 import { parseArgs } from 'node:util';
 
+import { deployApp } from '#deploy/deploy-app.ts';
 import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
-
-import { deployApp } from './deploy-app.ts';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),

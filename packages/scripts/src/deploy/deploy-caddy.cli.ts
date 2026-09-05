@@ -1,10 +1,9 @@
 #!/usr/bin/env tsx
 import { parseArgs } from 'node:util';
 
+import { deployCaddy } from '#deploy/deploy-caddy.ts';
+import { verifyEdge } from '#deploy/verify-edge.ts';
 import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
-
-import { deployCaddy } from './deploy-caddy.ts';
-import { verifyEdge } from './verify-edge.ts';
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),

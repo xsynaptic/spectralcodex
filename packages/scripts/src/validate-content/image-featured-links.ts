@@ -2,7 +2,7 @@ import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toValidationResult } from './validation-result.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<string> {
 	const imageFeatured = frontmatter.imageFeatured;

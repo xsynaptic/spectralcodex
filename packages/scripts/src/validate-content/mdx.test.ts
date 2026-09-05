@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectComponentIssues, validateMdxComponents } from './mdx.ts';
-import { makeEntry } from './validate-test-utils.ts';
+import { collectComponentIssues, validateMdxComponents } from '#validate-content/mdx.ts';
+import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 const rootPath = import.meta.dirname;
 

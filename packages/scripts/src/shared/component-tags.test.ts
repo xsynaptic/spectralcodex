@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { findComponentTags, getTagProp } from './component-tags.ts';
+import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 
 describe('findComponentTags', () => {
 	test('matches a name exactly, so LinkList is not Link', () => {

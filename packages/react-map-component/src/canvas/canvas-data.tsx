@@ -2,6 +2,9 @@ import type { FC, PropsWithChildren } from 'react';
 
 import { createContext, useContext, useMemo } from 'react';
 
+import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
+
+import { getMapCanvasData } from '#canvas/canvas-data-filter.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
 	useMapObjectiveFilter,
@@ -10,10 +13,6 @@ import {
 	useMapScope,
 	useMapStatusFilter,
 } from '#store/store.ts';
-
-import type { MapCanvasData } from './canvas-data-filter.ts';
-
-import { getMapCanvasData } from './canvas-data-filter.ts';
 
 const emptyItems = [] as const;
 

@@ -4,16 +4,15 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
+import { deployApp } from '#deploy/deploy-app.ts';
+import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
+import { deployCaddy } from '#deploy/deploy-caddy.ts';
+import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
+import { deployMedia } from '#deploy/deploy-media.ts';
+import { deployOg } from '#deploy/deploy-og.ts';
+import { verifyEdge } from '#deploy/verify-edge.ts';
 import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
-
-import { deployApp } from './deploy-app.ts';
-import { invokeCacheRefresh } from './deploy-cache-refresh.ts';
-import { deployCaddy } from './deploy-caddy.ts';
-import { loadDeployConfig, printDeployConfig } from './deploy-config.ts';
-import { deployMedia } from './deploy-media.ts';
-import { deployOg } from './deploy-og.ts';
-import { verifyEdge } from './verify-edge.ts';
 
 const rootPath = findWorkspaceRoot();
 

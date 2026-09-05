@@ -8,11 +8,10 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
+import { FilterControl } from '#controls/controls-filter.tsx';
+import { MetricsControl } from '#controls/controls-metrics.tsx';
+import { SearchControl } from '#controls/controls-search.tsx';
 import { useIsMapCanvasInteractive } from '#store/store.ts';
-
-import { FilterControl } from './controls-filter.tsx';
-import { MetricsControl } from './controls-metrics.tsx';
-import { SearchControl } from './controls-search.tsx';
 
 const isFeatureSearchControl = false as boolean;
 

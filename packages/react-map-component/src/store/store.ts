@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { useStore } from 'zustand';
 
-import type { MapDataStore } from './store-factory.ts';
+import type { MapDataStore } from '#store/store-factory.ts';
 
-import { MapStoreContext } from './store-provider.tsx';
+import { MapStoreContext } from '#store/store-provider.tsx';
 
 const useMapDataStore = <T>(selector: (state: MapDataStore) => T): T => {
 	const store = useContext(MapStoreContext);

@@ -4,12 +4,11 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
 
 import { controlSearchId } from '#constants.ts';
+import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useIsMapCanvasLoading } from '#store/store.ts';
-
-import { CustomControlPortal } from './controls-custom.tsx';
 
 export const SearchControl: FC<{ position: ControlPosition }> = function SearchControl({
 	position,

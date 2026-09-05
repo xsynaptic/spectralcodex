@@ -1,6 +1,6 @@
 import { MapSourceItemSchema } from '@spectralcodex/map-codec';
 
-import { createMapDataQuery } from './data-query-factory.tsx';
+import { createMapDataQuery } from '#data/data-query-factory.tsx';
 
 export const { DataProvider: SourceDataContextProvider, useDataQuery: useSourceDataQuery } =
 	createMapDataQuery({

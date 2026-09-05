@@ -6,9 +6,8 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import * as R from 'remeda';
 
+import { checks } from '#improve-content/checks.ts';
 import { withAstroContent } from '#shared/astro-content.ts';
-
-import { checks } from './checks.ts';
 
 const collectionsRoot = path.join('packages', 'content', 'collections');
 

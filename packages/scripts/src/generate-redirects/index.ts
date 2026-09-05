@@ -3,10 +3,9 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { buildRedirectPairs } from '#generate-redirects/build-redirect-pairs.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { findWorkspaceRoot } from '#shared/utils.ts';
-
-import { buildRedirectPairs } from './build-redirect-pairs.ts';
 
 const rootPath = findWorkspaceRoot();
 

@@ -1,8 +1,7 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
 
 import { extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
-
-import { toValidationResult } from './validation-result.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 	const orphans: Array<{ file: string; missingIds: Array<string> }> = [];

@@ -6,8 +6,7 @@ import path from 'node:path';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { getPublicId } from '#shared/entries.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
-
-import { getGitFileDates } from './git-file-dates.ts';
+import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {
 	rootPath: string;

@@ -4,10 +4,10 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import type { OpenGraphContentEntry } from './types.ts';
+import type { OpenGraphContentEntry } from '#og-image/types.ts';
 
-import { extractBuiltFilenames } from './built-entries.ts';
-import { resolveEntry, resolveOgRegions } from './content.ts';
+import { extractBuiltFilenames } from '#og-image/built-entries.ts';
+import { resolveEntry, resolveOgRegions } from '#og-image/content.ts';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {

@@ -2,7 +2,7 @@ import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { findComponentTags, getTagProp } from './component-tags.ts';
+import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 
 export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
 	const imageFeatured = frontmatter.imageFeatured;

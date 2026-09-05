@@ -6,8 +6,8 @@ import {
 import chalk from 'chalk';
 import path from 'node:path';
 
-import { loadDeployConfig } from './deploy-config.ts';
-import { rsyncTo } from './rsync-exec.ts';
+import { loadDeployConfig } from '#deploy/deploy-config.ts';
+import { rsyncTo } from '#deploy/rsync-exec.ts';
 
 interface DeployOgOptions {
 	rootPath: string;

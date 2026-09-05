@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { z } from 'zod';
 
-import { sitemapLastmodPath } from './constants.ts';
+import { sitemapLastmodPath } from '#constants.ts';
 
 // Shared by the sitemap filter and the content manifest; they must agree on what is indexable
 const sitemapExcludePrefixes = ['/objectives', '/taiwan-theater-project', '/chronology'];

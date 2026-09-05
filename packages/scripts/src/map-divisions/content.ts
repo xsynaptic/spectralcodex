@@ -4,9 +4,8 @@ import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralco
 import chalk from 'chalk';
 import path from 'node:path';
 
+import type { RegionMetadata } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
-
-import type { RegionMetadata } from './types.ts';
 
 /**
  * Derive regionPathIds (ancestor chain) from filePath

@@ -1,4 +1,4 @@
-import type { OpenGraphContentEntry } from './types.ts';
+import type { OpenGraphContentEntry } from '#og-image/types.ts';
 
 export interface ImageBatch {
 	imageId: string;

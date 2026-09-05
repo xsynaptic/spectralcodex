@@ -1,11 +1,9 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { ValidationIssue } from '#validate-content/validation-result.ts';
 
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
-
-import type { ValidationIssue } from './validation-result.ts';
-
-import { getBodyLineOffset } from './body-line-offset.ts';
-import { toValidationResult } from './validation-result.ts';
+import { getBodyLineOffset } from '#validate-content/body-line-offset.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface LinkIdIssue {
 	location: string;

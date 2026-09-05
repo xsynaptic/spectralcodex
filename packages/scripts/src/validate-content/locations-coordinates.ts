@@ -6,11 +6,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { toReferenceIds } from '#shared/entries.ts';
 import { LocationGeometrySchema } from '#shared/geometry.ts';
-
-import type { ValidationResult } from './validation-result.ts';
 
 async function loadRegionGeometry(
 	regionId: string,

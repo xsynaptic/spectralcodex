@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { isIndexableUrlPath } from './sitemap.ts';
+import { isIndexableUrlPath } from '#sitemap.ts';
 
 describe('isIndexableUrlPath', () => {
 	test('accepts an ordinary content path', () => {

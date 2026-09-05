@@ -4,12 +4,9 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { findWorkspaceRoot } from '#shared/utils.ts';
+import type { UrlStatus } from '#check-links/types.ts';
 
-import type { UrlStatus } from './types.ts';
-
-import { checkUrl } from './client.ts';
+import { checkUrl } from '#check-links/client.ts';
 import {
 	closeDatabase,
 	getEntryDigest,
@@ -18,10 +15,12 @@ import {
 	recordCheckResult,
 	syncUrlSources,
 	upsertUrl,
-} from './db.ts';
-import { extractLinksFromEntry } from './extract.ts';
-import { printList, printSessionSummary, printStatus } from './report.ts';
-import { UrlStatusEnum } from './types.ts';
+} from '#check-links/db.ts';
+import { extractLinksFromEntry } from '#check-links/extract.ts';
+import { printList, printSessionSummary, printStatus } from '#check-links/report.ts';
+import { UrlStatusEnum } from '#check-links/types.ts';
+import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { findWorkspaceRoot } from '#shared/utils.ts';
 
 const statusLabels: Record<UrlStatus, string> = {
 	[UrlStatusEnum.Pending]: chalk.gray('Pending'),

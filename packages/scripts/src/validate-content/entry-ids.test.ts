@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectDuplicateIdIssues } from './entry-ids.ts';
-import { makeEntry } from './validate-test-utils.ts';
+import { collectDuplicateIdIssues } from '#validate-content/entry-ids.ts';
+import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 describe('collectDuplicateIdIssues', () => {
 	test('accepts distinct IDs', () => {

@@ -2,9 +2,9 @@ import Database from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
-import type { UrlStatus, UrlRow } from './types.ts';
+import type { UrlStatus, UrlRow } from '#check-links/types.ts';
 
-import { UrlStatusEnum } from './types.ts';
+import { UrlStatusEnum } from '#check-links/types.ts';
 
 const healthyMaxAgeDays = 90;
 

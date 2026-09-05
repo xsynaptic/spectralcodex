@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 
-import type { UrlStatus } from './types.ts';
+import type { UrlStatus } from '#check-links/types.ts';
 
-import { getStats, getUrlsByStatusGroupedByContent } from './db.ts';
-import { UrlStatusEnum } from './types.ts';
+import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
+import { UrlStatusEnum } from '#check-links/types.ts';
 
 function entryId(contentId: string): string {
 	// content_id is "collection/entry-id", we only need the entry ID

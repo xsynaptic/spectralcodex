@@ -1,10 +1,8 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
-
-import type { ValidationResult } from './validation-result.ts';
-
-import { toValidationResult } from './validation-result.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface MissingImageIssue {
 	location: string;

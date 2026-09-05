@@ -1,7 +1,7 @@
 import { feature, featureCollection } from '@turf/helpers';
 import { union } from '@turf/turf';
 
-import type { DivisionFeatureCollection, DivisionItem } from './types.ts';
+import type { DivisionFeatureCollection, DivisionItem } from '#map-divisions/types.ts';
 
 export function convertToFeatureCollection(divisionItems: Array<DivisionItem>) {
 	const divisionFeatureCollection = (() => {

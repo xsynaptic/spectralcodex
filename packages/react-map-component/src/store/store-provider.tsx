@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 
 import { createContext, useState } from 'react';
 
-import type { MapDataConfigurableState } from './store-factory.ts';
+import type { MapDataConfigurableState } from '#store/store-factory.ts';
 
-import { createMapStore } from './store-factory.ts';
+import { createMapStore } from '#store/store-factory.ts';
 
 export const MapStoreContext = createContext<ReturnType<typeof createMapStore> | undefined>(
 	undefined,

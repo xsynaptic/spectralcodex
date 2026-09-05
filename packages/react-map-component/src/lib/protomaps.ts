@@ -8,9 +8,8 @@ import { useEffect } from 'react';
 
 import type { MapComponentProps } from '#types.ts';
 
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { useMapLanguages } from '#store/store.ts';
-
-import { useIsDarkMode } from './dark-mode.tsx';
 
 export function useProtomaps({
 	protomapsApiKey,

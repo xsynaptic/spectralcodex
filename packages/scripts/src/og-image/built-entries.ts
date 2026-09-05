@@ -3,16 +3,14 @@ import { openGraphBasePath } from '@spectralcodex/shared/constants';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { RegionParentMap } from '#shared/entries.ts';
 
+import { buildChronologyImageIndex } from '#og-image/chronology.ts';
+import { resolveEntry, toOpenGraphEntryItem } from '#og-image/content.ts';
+import { resolveFallbackImageId } from '#og-image/fallback.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-
-import type { OpenGraphContentEntry } from './types.ts';
-
-import { buildChronologyImageIndex } from './chronology.ts';
-import { resolveEntry, toOpenGraphEntryItem } from './content.ts';
-import { resolveFallbackImageId } from './fallback.ts';
 
 // Keyed by the OG image filename Astro emits
 function buildIndexEntries(): Map<string, OpenGraphContentEntry> {

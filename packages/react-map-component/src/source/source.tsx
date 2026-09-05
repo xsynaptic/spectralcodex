@@ -5,12 +5,11 @@ import type { MapComponentProps } from '#types.ts';
 
 import { useMapCanvasData } from '#canvas/canvas-data.tsx';
 import { useMapApiDivisionData } from '#data/data-division.ts';
+import { MapSourceDebug } from '#source/source-debug.tsx';
+import { MapSourceDivisions } from '#source/source-divisions.tsx';
+import { MapSourceLines } from '#source/source-lines.tsx';
+import { MapSourcePoints } from '#source/source-points.tsx';
 import { useIsMapCanvasInteractive } from '#store/store.ts';
-
-import { MapSourceDebug } from './source-debug.tsx';
-import { MapSourceDivisions } from './source-divisions.tsx';
-import { MapSourceLines } from './source-lines.tsx';
-import { MapSourcePoints } from './source-points.tsx';
 
 const isDebug = false as boolean;
 

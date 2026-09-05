@@ -2,10 +2,9 @@ import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { useMapCanvasData } from '#canvas/canvas-data.tsx';
+import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
-
-import { CustomControlPortal } from './controls-custom.tsx';
 
 const formatNumber = new Intl.NumberFormat('en');
 

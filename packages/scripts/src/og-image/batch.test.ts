@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
-import type { OpenGraphContentEntry } from './types.ts';
+import type { OpenGraphContentEntry } from '#og-image/types.ts';
 
-import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.ts';
+import { batchEntriesBySourceImage, getOutputCacheKey } from '#og-image/batch.ts';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {

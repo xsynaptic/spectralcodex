@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 
-import { loadDeployConfig } from './deploy-config.ts';
-import { sshExec } from './rsync-exec.ts';
+import { loadDeployConfig } from '#deploy/deploy-config.ts';
+import { sshExec } from '#deploy/rsync-exec.ts';
 
 interface InvokeCacheRefreshOptions {
 	dryRun?: boolean;

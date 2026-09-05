@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { reportValidationResult, toValidationResult } from './validation-result.ts';
+import { reportValidationResult, toValidationResult } from '#validate-content/validation-result.ts';
 
 describe('toValidationResult', () => {
 	test('passes with the pass summary when nothing is flagged', () => {

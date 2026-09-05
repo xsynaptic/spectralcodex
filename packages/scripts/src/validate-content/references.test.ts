@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectReferenceIssues } from './references.ts';
-import { makeEntry, makeRefs } from './validate-test-utils.ts';
+import { collectReferenceIssues } from '#validate-content/references.ts';
+import { makeEntry, makeRefs } from '#validate-content/validate-test-utils.ts';
 
 // The checked set is whatever collections the passed entries belong to
 function makeEntries(locations: Array<ReturnType<typeof makeEntry>>) {

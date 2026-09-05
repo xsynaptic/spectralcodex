@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import { collectAspectRatioIssues } from './image-aspect-ratios.ts';
-import { makeEntry } from './validate-test-utils.ts';
+import { collectAspectRatioIssues } from '#validate-content/image-aspect-ratios.ts';
+import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 function makeImage(id: string, width: number, height: number) {
 	return makeEntry({ id, data: { width, height } });

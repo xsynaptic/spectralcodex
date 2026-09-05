@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { buildRedirectPairs } from './build-redirect-pairs.ts';
+import { buildRedirectPairs } from '#generate-redirects/build-redirect-pairs.ts';
 
 function makeEntry(
 	id: string,

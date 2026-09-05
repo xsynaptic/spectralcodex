@@ -1,6 +1,6 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { toValidationResult } from './validation-result.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 type RegionParentIssue =
 	| { location: string; reason: 'cycle'; chain: Array<string> }

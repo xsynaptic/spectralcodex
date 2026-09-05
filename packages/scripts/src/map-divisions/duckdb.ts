@@ -5,9 +5,9 @@ import type { Geometry } from 'geojson';
 import { DuckDBInstance } from '@duckdb/node-api';
 import chalk from 'chalk';
 
-import type { DivisionGeometry, DivisionItem } from './types.ts';
+import type { DivisionGeometry, DivisionItem } from '#map-divisions/types.ts';
 
-import { getDivisionDataCache, saveDivisionDataCache } from './geojson-cache.ts';
+import { getDivisionDataCache, saveDivisionDataCache } from '#map-divisions/geojson-cache.ts';
 
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	try {

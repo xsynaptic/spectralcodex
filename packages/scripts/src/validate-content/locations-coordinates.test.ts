@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { describe, expect, test } from 'vitest';
 
-import { validateLocationsCoordinates } from './locations-coordinates.ts';
-import { makeEntry, makeRegionRefs } from './validate-test-utils.ts';
+import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
+import { makeEntry, makeRegionRefs } from '#validate-content/validate-test-utils.ts';
 
 // Real Taipei boundary copied from public/divisions
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');

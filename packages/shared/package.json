@@ -11,6 +11,9 @@
 		"./sitemap": "./src/sitemap.ts",
 		"./text": "./src/text.ts"
 	},
+	"imports": {
+		"#*": "./src/*"
+	},
 	"private": true,
 	"dependencies": {
 		"zod": "^4.5.4"

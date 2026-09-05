@@ -1,6 +1,6 @@
-import type { UrlRow, UrlStatus } from './types.ts';
+import type { UrlRow, UrlStatus } from '#check-links/types.ts';
 
-import { UrlStatusEnum } from './types.ts';
+import { UrlStatusEnum } from '#check-links/types.ts';
 
 const userAgent = 'SpectralCodex-LinkChecker/1.0 (+https://spectralcodex.com)';
 const timeoutMs = 30_000;

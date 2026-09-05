@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { getPublicId, getRegionParentsById, toReferenceIds } from './entries.ts';
+import { getPublicId, getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
 
 describe('toReferenceIds', () => {
 	test('extracts ids from reference objects', () => {

@@ -9,6 +9,7 @@ import * as R from 'remeda';
 import type { LocationStatusMetadata } from '#lib/location-status.ts';
 
 import { controlFilterId } from '#constants.ts';
+import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { LocationStatusRecords } from '#lib/location-status.ts';
@@ -24,8 +25,6 @@ import {
 	useMapStatusFilter,
 	useMapStoreActions,
 } from '#store/store.ts';
-
-import { CustomControlPortal } from './controls-custom.tsx';
 
 // Bilingual secondary labels; kept local pending the deferred map-portability work
 const chineseShowHideLabels = {

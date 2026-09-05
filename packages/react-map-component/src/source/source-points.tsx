@@ -16,9 +16,8 @@ import {
 	statusStrokeColorDarkArray,
 } from '#lib/location-status.ts';
 import { tailwindColors } from '#lib/tailwind-colors.ts';
+import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapHoveredId } from '#store/store.ts';
-
-import { MapLayerIdEnum, MapSourceIdEnum } from './source-config.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 // feature-state is paint-only, so the label layers below still key off the store hoveredId

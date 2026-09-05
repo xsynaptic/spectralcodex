@@ -13,18 +13,17 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
+import type { ImageBatch } from '#og-image/batch.ts';
+import type { OutputCacheStore } from '#og-image/output-cache.ts';
+import type { OpenGraphContentEntry } from '#og-image/types.ts';
+
+import { batchEntriesBySourceImage, getOutputCacheKey } from '#og-image/batch.ts';
+import { getBuiltEntries } from '#og-image/built-entries.ts';
+import { loadOpenGraphFonts } from '#og-image/fonts.ts';
+import { createRenderer, processImage } from '#og-image/generate.ts';
+import { createOutputCache } from '#og-image/output-cache.ts';
 import { getFileCacheInstance } from '#shared/cache-file.ts';
 import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
-
-import type { ImageBatch } from './batch.ts';
-import type { OutputCacheStore } from './output-cache.ts';
-import type { OpenGraphContentEntry } from './types.ts';
-
-import { batchEntriesBySourceImage, getOutputCacheKey } from './batch.ts';
-import { getBuiltEntries } from './built-entries.ts';
-import { loadOpenGraphFonts } from './fonts.ts';
-import { createRenderer, processImage } from './generate.ts';
-import { createOutputCache } from './output-cache.ts';
 
 const rootPath = findWorkspaceRoot();
 

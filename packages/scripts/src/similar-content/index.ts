@@ -9,15 +9,13 @@ import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { SimilarContentMetadata } from '#similar-content/metadata.ts';
 
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { getFileCacheInstance } from '#shared/cache-file.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
-
-import type { SimilarContentMetadata } from './metadata.ts';
-
-import { calculateMetadataBoost } from './metadata.ts';
+import { calculateMetadataBoost } from '#similar-content/metadata.ts';
 
 const rootPath = findWorkspaceRoot();
 

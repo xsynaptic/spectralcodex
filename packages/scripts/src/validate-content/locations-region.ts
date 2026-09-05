@@ -3,8 +3,7 @@ import path from 'node:path';
 import type { ContentEntry } from '#shared/astro-content.ts';
 
 import { toReferenceIds } from '#shared/entries.ts';
-
-import { toValidationResult } from './validation-result.ts';
+import { toValidationResult } from '#validate-content/validation-result.ts';
 
 /**
  * Derive hierarchy from filePath

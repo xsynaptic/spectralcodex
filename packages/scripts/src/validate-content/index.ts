@@ -3,28 +3,27 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
+import type { ValidationResult } from '#validate-content/validation-result.ts';
+
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { findWorkspaceRoot } from '#shared/utils.ts';
-
-import type { ValidationResult } from './validation-result.ts';
-
-import { validateEntryIds } from './entry-ids.ts';
-import { validateFrontmatterLinks } from './frontmatter-links.ts';
-import { validateImageAspectRatios } from './image-aspect-ratios.ts';
-import { validateImageFeaturedInBody } from './image-featured-in-body.ts';
-import { validateImageFeaturedLinks } from './image-featured-links.ts';
-import { validateImageReferences } from './images.ts';
-import { validateLinkIds } from './link-ids.ts';
-import { validateLocationsCoordinates } from './locations-coordinates.ts';
-import { validateLocationsDuplicates } from './locations-duplicates.ts';
-import { validateLocationsOverlap } from './locations-overlap.ts';
-import { validateLocationsRegions } from './locations-region.ts';
-import { validateMdxComponents } from './mdx.ts';
-import { validateReferences } from './references.ts';
-import { validateRegionsParents } from './regions-parent.ts';
-import { validateSeriesItems } from './series-items.ts';
-import { validateSourceIds } from './source-ids.ts';
-import { reportValidationResult } from './validation-result.ts';
+import { validateEntryIds } from '#validate-content/entry-ids.ts';
+import { validateFrontmatterLinks } from '#validate-content/frontmatter-links.ts';
+import { validateImageAspectRatios } from '#validate-content/image-aspect-ratios.ts';
+import { validateImageFeaturedInBody } from '#validate-content/image-featured-in-body.ts';
+import { validateImageFeaturedLinks } from '#validate-content/image-featured-links.ts';
+import { validateImageReferences } from '#validate-content/images.ts';
+import { validateLinkIds } from '#validate-content/link-ids.ts';
+import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
+import { validateLocationsDuplicates } from '#validate-content/locations-duplicates.ts';
+import { validateLocationsOverlap } from '#validate-content/locations-overlap.ts';
+import { validateLocationsRegions } from '#validate-content/locations-region.ts';
+import { validateMdxComponents } from '#validate-content/mdx.ts';
+import { validateReferences } from '#validate-content/references.ts';
+import { validateRegionsParents } from '#validate-content/regions-parent.ts';
+import { validateSeriesItems } from '#validate-content/series-items.ts';
+import { validateSourceIds } from '#validate-content/source-ids.ts';
+import { reportValidationResult } from '#validate-content/validation-result.ts';
 
 const rootPath = findWorkspaceRoot();
 
