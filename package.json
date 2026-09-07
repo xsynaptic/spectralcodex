@@ -62,7 +62,7 @@
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"@pagefind/component-ui": "^1.5.2",
-		"@playwright/test": "^1.62.1",
+		"@playwright/test": "^1.63.0",
 		"@spectralcodex/map-codec": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
