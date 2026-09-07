@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.22.0",
+	"version": "7.23.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
@@ -115,7 +115,7 @@
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"remeda": "^2.45.0",
+		"remeda": "^2.46.0",
 		"satteri": "^0.10.5",
 		"sharp": "^0.35.4",
 		"stylelint": "^17.15.0",
@@ -127,5 +127,5 @@
 		"vitest": "^4.1.11",
 		"zod": "^4.5.4"
 	},
-	"packageManager": "pnpm@11.25.0"
+	"packageManager": "pnpm@12.3.4"
 }
