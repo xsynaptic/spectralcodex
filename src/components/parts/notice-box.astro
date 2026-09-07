@@ -1,21 +1,31 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-const AlertBoxStatusEnum = {
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const NoticeBoxSeverityEnum = {
 	Default: 'default',
 	Success: 'success',
-	Notice: 'notice',
+	Info: 'info',
 	Warning: 'warning',
 	Error: 'error',
 } as const;
 
+const severityLabelKeys = {
+	[NoticeBoxSeverityEnum.Default]: 'notice.severity.default',
+	[NoticeBoxSeverityEnum.Success]: 'notice.severity.success',
+	[NoticeBoxSeverityEnum.Info]: 'notice.severity.info',
+	[NoticeBoxSeverityEnum.Warning]: 'notice.severity.warning',
+	[NoticeBoxSeverityEnum.Error]: 'notice.severity.error',
+} as const;
+
 interface Props extends HTMLAttributes<'div'> {
-	status?: (typeof AlertBoxStatusEnum)[keyof typeof AlertBoxStatusEnum];
+	severity?: (typeof NoticeBoxSeverityEnum)[keyof typeof NoticeBoxSeverityEnum];
 	showIcon?: boolean;
 }
 
 const {
-	status = AlertBoxStatusEnum.Default,
+	severity = NoticeBoxSeverityEnum.Default,
 	class: className,
 	showIcon = true,
 	role = 'note',
@@ -23,24 +33,26 @@ const {
 } = Astro.props;
 
 const iconSize = 20;
+
+const t = getTranslations();
 ---
 
 <div
 	class:list={[
 		'flex gap-x-1 overflow-clip rounded-sm border',
-		status === AlertBoxStatusEnum.Default
+		severity === NoticeBoxSeverityEnum.Default
 			? 'border-primary-300 bg-primary-100 text-primary-600 dark:border-primary-900 dark:bg-primary-600 dark:text-primary-200'
 			: undefined,
-		status === AlertBoxStatusEnum.Success
+		severity === NoticeBoxSeverityEnum.Success
 			? 'border-green-300 bg-green-100 text-green-600 dark:border-green-900 dark:bg-green-600 dark:text-green-200'
 			: undefined,
-		status === AlertBoxStatusEnum.Notice
+		severity === NoticeBoxSeverityEnum.Info
 			? 'border-cyan-300 bg-cyan-100 text-cyan-600 dark:border-cyan-900 dark:bg-cyan-600 dark:text-cyan-200'
 			: undefined,
-		status === AlertBoxStatusEnum.Warning
+		severity === NoticeBoxSeverityEnum.Warning
 			? 'border-amber-300 bg-amber-100 text-amber-700 dark:border-amber-600 dark:bg-amber-700 dark:text-amber-200'
 			: undefined,
-		status === AlertBoxStatusEnum.Error
+		severity === NoticeBoxSeverityEnum.Error
 			? 'border-orange-300 bg-orange-100 text-orange-700 dark:border-orange-600 dark:bg-orange-700 dark:text-orange-200'
 			: undefined,
 		className,
@@ -53,26 +65,27 @@ const iconSize = 20;
 			<div
 				class:list={[
 					'border-r px-1 py-1',
-					status === AlertBoxStatusEnum.Default
+					severity === NoticeBoxSeverityEnum.Default
 						? 'border-primary-200 bg-primary-50 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300'
 						: undefined,
-					status === AlertBoxStatusEnum.Success
+					severity === NoticeBoxSeverityEnum.Success
 						? 'border-green-200 bg-green-50 text-green-500 dark:border-green-600 dark:bg-green-600 dark:text-green-300'
 						: undefined,
-					status === AlertBoxStatusEnum.Notice
+					severity === NoticeBoxSeverityEnum.Info
 						? 'border-cyan-200 bg-cyan-50 text-cyan-500 dark:border-cyan-600 dark:bg-cyan-600 dark:text-cyan-300'
 						: undefined,
-					status === AlertBoxStatusEnum.Warning
+					severity === NoticeBoxSeverityEnum.Warning
 						? 'border-amber-200 bg-amber-50 text-amber-500 dark:border-amber-600 dark:bg-amber-600 dark:text-amber-300'
 						: undefined,
-					status === AlertBoxStatusEnum.Error
+					severity === NoticeBoxSeverityEnum.Error
 						? 'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300'
 						: undefined,
 				]}
 			>
+				<span class="sr-only">{t(severityLabelKeys[severity])}</span>
 				{(() => {
-					switch (status) {
-						case AlertBoxStatusEnum.Default: {
+					switch (severity) {
+						case NoticeBoxSeverityEnum.Default: {
 							return (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +122,7 @@ const iconSize = 20;
 								</svg>
 							);
 						}
-						case AlertBoxStatusEnum.Success: {
+						case NoticeBoxSeverityEnum.Success: {
 							// iconamoon:check-circle-1-duotone
 							return (
 								<svg
@@ -141,7 +154,7 @@ const iconSize = 20;
 								</svg>
 							);
 						}
-						case AlertBoxStatusEnum.Notice: {
+						case NoticeBoxSeverityEnum.Info: {
 							// iconamoon:information-circle-duotone
 							return (
 								<svg
@@ -179,7 +192,7 @@ const iconSize = 20;
 								</svg>
 							);
 						}
-						case AlertBoxStatusEnum.Warning: {
+						case NoticeBoxSeverityEnum.Warning: {
 							// iconamoon:attention-circle-duotone
 							return (
 								<svg
@@ -217,7 +230,7 @@ const iconSize = 20;
 								</svg>
 							);
 						}
-						case AlertBoxStatusEnum.Error: {
+						case NoticeBoxSeverityEnum.Error: {
 							// iconamoon:close-circle-1-duotone
 							return (
 								<svg
@@ -250,7 +263,7 @@ const iconSize = 20;
 							);
 						}
 						default: {
-							status satisfies never;
+							severity satisfies never;
 							return;
 						}
 					}

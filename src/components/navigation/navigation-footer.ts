@@ -1,56 +1,56 @@
-import type { MenuItem } from '#components/menu/menu-types.ts';
+import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
 
-export const menuFooterItems = [
+export const navigationFooterItems = [
 	{
-		title: t('menu.threads.label'),
+		title: t('navigation.threads.label'),
 		url: 'https://www.threads.com/@synapticx',
 		rel: 'me',
 	},
 	{
-		title: t('menu.bluesky.label'),
+		title: t('navigation.bluesky.label'),
 		url: 'https://bsky.app/profile/spectralcodex.com',
 		rel: 'me',
 	},
 	{
-		title: t('menu.facebook.label'),
+		title: t('navigation.facebook.label'),
 		url: 'https://www.facebook.com/SpectralCodex/',
 		rel: 'me',
 	},
 	{
-		title: t('menu.instagram.label'),
+		title: t('navigation.instagram.label'),
 		url: 'https://www.instagram.com/spectralcodex',
 		rel: 'me',
 	},
 	{
-		title: t('menu.mastodon.label'),
+		title: t('navigation.mastodon.label'),
 		url: 'https://indieweb.social/@SpectralCodex',
 		rel: 'me',
 	},
 	{
-		title: t('menu.flickr.label'),
+		title: t('navigation.flickr.label'),
 		url: 'https://www.flickr.com/photos/spectralcodex/',
 		rel: 'me',
 	},
 	{
-		title: t('menu.patreon.label'),
+		title: t('navigation.patreon.label'),
 		url: 'https://www.patreon.com/spectralcodex',
 		rel: 'me',
 	},
 	{
-		title: t('menu.terms.label'),
+		title: t('navigation.terms.label'),
 		url: getSiteUrl('terms-of-use'),
 	},
 	{
-		title: t('menu.contact.label'),
+		title: t('navigation.contact.label'),
 		url: getSiteUrl('contact'),
 	},
 	{
-		title: t('menu.about.label'),
+		title: t('navigation.about.label'),
 		url: getSiteUrl('about'),
 	},
-] satisfies Array<MenuItem>;
+] satisfies Array<NavigationItem>;

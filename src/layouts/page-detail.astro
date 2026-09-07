@@ -9,7 +9,7 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
-import { menuFooterItems } from '#components/menu/menu-footer.ts';
+import { navigationFooterItems } from '#components/navigation/navigation-footer.ts';
 import DividedItem from '#components/parts/divided-item.astro';
 import Prose from '#components/parts/prose.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
@@ -34,7 +34,7 @@ const schemas =
 	entry.id === 'about'
 		? [
 				buildAuthorSchema({
-					sameAs: menuFooterItems.filter((item) => item.rel === 'me').map((item) => item.url),
+					sameAs: navigationFooterItems.filter((item) => item.rel === 'me').map((item) => item.url),
 				}),
 			]
 		: [];

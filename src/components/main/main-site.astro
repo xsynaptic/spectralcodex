@@ -17,11 +17,11 @@ import Sprites from '#components/main/main-sprites.astro';
 import StructuredData from '#components/main/main-structured-data.astro';
 import Stylesheet from '#components/main/main-stylesheet.astro';
 import TopButton from '#components/main/main-top-button.astro';
-import MenuFooter from '#components/menu/menu-footer.astro';
-import MenuHeader from '#components/menu/menu-header.astro';
 import ModeManagerSetup from '#components/mode-manager/mode-manager-setup.astro';
 import ModeManager from '#components/mode-manager/mode-manager.astro';
 import ModeToggle from '#components/mode-manager/mode-toggle.astro';
+import NavigationFooter from '#components/navigation/navigation-footer.astro';
+import NavigationHeader from '#components/navigation/navigation-header.astro';
 import Anchor from '#components/parts/anchor.astro';
 import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
@@ -173,7 +173,7 @@ const t = getTranslations();
 				<Search />
 			</div>
 			<div class="content-column-fill w-full overflow-x-clip">
-				<MenuHeader hasHeroImage={hasHeroImage} />
+				<NavigationHeader hasHeroImage={hasHeroImage} />
 			</div>
 		</header>
 		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
@@ -186,7 +186,7 @@ const t = getTranslations();
 					'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
 				]}
 			>
-				<MenuFooter />
+				<NavigationFooter />
 				<Colophon />
 			</div>
 		</footer>

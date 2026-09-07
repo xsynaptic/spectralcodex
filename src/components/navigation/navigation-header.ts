@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
 
-import type { MenuItem } from '#components/menu/menu-types.ts';
+import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
@@ -14,12 +14,12 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByEntryCount } from '#lib/utils/collections.ts';
 import { getSiteUrl } from '#lib/utils/routing.ts';
 
-// Increase this to 3 to show subregions in the header menu
+// Increase this to 3 to show subregions in the header navigation
 const maxDepth = 2 as number;
 
 const t = getTranslations();
 
-function getMenuItemData({
+function getNavigationItemData({
 	entry,
 	collection,
 }: {
@@ -37,7 +37,7 @@ function getMenuItemData({
 	};
 }
 
-function filterMenuItemEntryCount(depth: 1 | 2 | 3) {
+function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
 	let minEntryCount: number;
 
 	if (depth === 1) {
@@ -52,7 +52,7 @@ function filterMenuItemEntryCount(depth: 1 | 2 | 3) {
 		(entry.data._entryCount ?? 0) >= minEntryCount;
 }
 
-async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
+async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 	const { entries: regions } = await getRegionsCollection();
 	const getRegionsByIds = await createRegionsByIdsFunction();
 
@@ -61,26 +61,26 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
-		.filter(filterMenuItemEntryCount(1))
+		.filter(filterNavigationItemEntryCount(1))
 		.sort(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => ({
-			...getMenuItemData({ entry, collection: 'regions' }),
+			...getNavigationItemData({ entry, collection: 'regions' }),
 			...(entry.data._children && maxDepth > 1
 				? {
 						children: getRegionsByIds(entry.data._children)
-							.filter(filterMenuItemEntryCount(2))
+							.filter(filterNavigationItemEntryCount(2))
 							.sort(sortByEntryCount)
 							.slice(0, 15)
 							.map((entry) => ({
-								...getMenuItemData({ entry, collection: 'regions' }),
+								...getNavigationItemData({ entry, collection: 'regions' }),
 								...(entry.data._children && maxDepth > 2
 									? {
 											children: getRegionsByIds(entry.data._children)
-												.filter(filterMenuItemEntryCount(3))
+												.filter(filterNavigationItemEntryCount(3))
 												.sort(sortByEntryCount)
 												.slice(0, 8)
-												.map((entry) => getMenuItemData({ entry, collection: 'regions' })),
+												.map((entry) => getNavigationItemData({ entry, collection: 'regions' })),
 										}
 									: {}),
 							})),
@@ -90,17 +90,17 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 
 	const seriesMenu = series
 		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterMenuItemEntryCount(1))
+		.filter(filterNavigationItemEntryCount(1))
 		.sort(sortByEntryCount)
 		.slice(0, 12)
-		.map((entry) => getMenuItemData({ entry, collection: 'series' }));
+		.map((entry) => getNavigationItemData({ entry, collection: 'series' }));
 
 	const themesMenu = themes
 		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterMenuItemEntryCount(1))
+		.filter(filterNavigationItemEntryCount(1))
 		.sort(sortByEntryCount)
 		.slice(0, 12)
-		.map((entry) => getMenuItemData({ entry, collection: 'themes' }));
+		.map((entry) => getNavigationItemData({ entry, collection: 'themes' }));
 
 	const chronologyData = await getChronologyData();
 
@@ -129,7 +129,7 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 			children: themesMenu,
 		},
 		{
-			title: t('menu.chronology.label'),
+			title: t('navigation.chronology.label'),
 			url: getSiteUrl('chronology'),
 			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
 				title: year,
@@ -137,10 +137,10 @@ async function createMenuHeaderItems(): Promise<Array<MenuItem>> {
 			})),
 		},
 		{
-			title: t('menu.about.label'),
+			title: t('navigation.about.label'),
 			url: getSiteUrl('about'),
 		},
 	];
 }
 
-export const getMenuHeaderItems = pMemoize(createMenuHeaderItems);
+export const getNavigationHeaderItems = pMemoize(createNavigationHeaderItems);

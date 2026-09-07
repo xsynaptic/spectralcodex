@@ -70,7 +70,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Category**: What kind of place a Location is (temple, factory, lighthouse, waterfall). _Avoid_: type, kind, class, tag.
 
-**Status**: The present condition or accessibility of a Location (active, converted, abandoned, remnants, vanished). Answers "what has become of it". _Avoid_: state, condition, availability.
+**Status**: The present condition or accessibility of a Location (active, converted, abandoned, remnants, vanished). Answers "what has become of it". It never means the severity of a Notice. _Avoid_: state, condition, availability.
 
 **Mood**: How a Location feels, on a scale from light to dark. A subjective register distinct from Status; it mostly concerns whether a Location is upbeat and family-friendly or more of a "dark tourism" destination. _Avoid_: layer, atmosphere, tone, vibe.
 
@@ -113,6 +113,14 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 **Override**: An alternative title, identifier, or Region set published in place of the real ones for a sensitive Location, so it can be written about without being findable. _Avoid_: alias, mask, pseudonym.
 
 **Content Policy**: The rule that sensitive Locations are obfuscated in published output: Overrides stand in for the real title, identifier, and Regions, and hidden Locations are dropped from maps, catalogs, and structured data. _Avoid_: privacy mode, redaction, censorship, feature flag.
+
+### Interface
+
+**Preview**: A Catalog Entry rendered as a summary for listing. _Avoid_: teaser, snippet, summary card, tile.
+
+**Navigation**: The site's own link structure, in the header and the footer. _Avoid_: menu, menubar, nav bar.
+
+**Notice**: A derived advisory on a Location page, computed from its Safety, Status, and Entry Quality rather than authored (see `locations-section-notices.astro:35`). Its severity is a separate axis and never a Status. _Avoid_: alert, warning, callout, banner.
 
 ### Development
 

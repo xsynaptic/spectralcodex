@@ -10,7 +10,9 @@ test.describe('homepage', () => {
 
 		expect(response?.status()).toBe(200);
 		await expect(page).toHaveTitle(new RegExp(t('site.title')));
-		await expect(page.getByRole('navigation', { name: t('site.menu.header.label') })).toBeVisible();
+		await expect(
+			page.getByRole('navigation', { name: t('site.navigation.header.label') }),
+		).toBeVisible();
 		await expect(page.locator('main')).toBeVisible();
 	});
 });

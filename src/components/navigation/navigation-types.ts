@@ -2,12 +2,12 @@ import type { CollectionKey } from 'astro:content';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-export interface MenuItem {
+export interface NavigationItem {
 	collection?: CollectionKey | undefined;
 	title: string;
 	titleMultilingual?: MultilingualContent | undefined;
 	url?: string | undefined;
 	rel?: string | undefined;
 	ancestor?: string | undefined;
-	children?: Array<MenuItem>;
+	children?: Array<NavigationItem>;
 }

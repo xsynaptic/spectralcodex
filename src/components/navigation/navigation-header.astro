@@ -1,0 +1,49 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import NavigationHeaderSubmenu from '#components/navigation/navigation-header-submenu.astro';
+import NavigationHeaderTrigger from '#components/navigation/navigation-header-trigger.astro';
+import { getNavigationHeaderItems } from '#components/navigation/navigation-header.ts';
+import { getNavigationItemAriaLabel } from '#components/navigation/navigation-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props extends HTMLAttributes<'nav'> {
+	hasHeroImage: boolean;
+}
+
+const { hasHeroImage, ...props } = Astro.props;
+
+const navigationItems = await getNavigationHeaderItems();
+
+const t = getTranslations();
+---
+
+<site-navigation>
+	<nav class="nav-menu" aria-label={t('site.navigation.header.label')} data-nosnippet {...props}>
+		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
+			{
+				navigationItems.map((item) => {
+					const children = item.children ?? [];
+					const hasChildren = children.length > 0;
+
+					return (
+						<li class="nav-item">
+							<NavigationHeaderTrigger item={item} hasChildren={hasChildren} />
+							{hasChildren ? (
+								<NavigationHeaderSubmenu
+									navigationItems={children}
+									depth={1}
+									ariaLabel={getNavigationItemAriaLabel(item)}
+								/>
+							) : undefined}
+						</li>
+					);
+				})
+			}
+		</ul>
+	</nav>
+</site-navigation>
+
+<script>
+	import '#components/navigation/navigation-site.ts';
+</script>

@@ -1,8 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { menuFooterItems } from '#components/menu/menu-footer.ts';
-import { isActiveMenuItem } from '#components/menu/menu-utils.ts';
+import { navigationFooterItems } from '#components/navigation/navigation-footer.ts';
+import {
+	isActiveNavigationItem,
+	isCurrentNavigationItem,
+} from '#components/navigation/navigation-utils.ts';
 import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -15,15 +18,18 @@ const { pathname } = Astro.url;
 const t = getTranslations();
 ---
 
-<nav class="pb-4 text-sm" aria-label={t('site.menu.footer.label')} data-nosnippet {...props}>
+<nav class="pb-4 text-sm" aria-label={t('site.navigation.footer.label')} data-nosnippet {...props}>
 	<ul class="flex flex-wrap gap-x-4 gap-y-2">
 		{
-			menuFooterItems.map((item) => (
+			navigationFooterItems.map((item) => (
 				<li class="text-xs font-medium sm:text-sm">
 					<Anchor
 						anchorColor="primary"
-						isActive={isActiveMenuItem(item, pathname)}
+						isActive={isActiveNavigationItem(item, pathname)}
 						href={item.url}
+						{...(isCurrentNavigationItem(item, pathname)
+							? { 'aria-current': 'page' as const }
+							: undefined)}
 						{...(item.rel ? { rel: item.rel } : undefined)}
 					>
 						{item.title}

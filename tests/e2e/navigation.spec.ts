@@ -13,18 +13,18 @@ test.describe('navigation', () => {
 		await page.goto('/', { waitUntil: 'domcontentloaded' });
 
 		const nav = page.getByRole('navigation', {
-			name: t('site.menu.header.label'),
+			name: t('site.navigation.header.label'),
 		});
 
 		// Hover to reveal depth-1 submenu
-		await nav.getByRole('menuitem', { name: t('collection.regions.labelPlural') }).hover();
+		await nav.getByRole('link', { name: t('collection.regions.labelPlural') }).hover();
 
 		// Hover to reveal depth-2 submenu
-		const taiwanLink = nav.getByRole('menuitem', { name: regionsName1, exact: true });
+		const taiwanLink = nav.getByRole('link', { name: regionsName1, exact: true });
 		await expect(taiwanLink).toBeVisible();
 		await taiwanLink.hover();
 
-		const tainanLink = nav.getByRole('menuitem', {
+		const tainanLink = nav.getByRole('link', {
 			name: new RegExp(String.raw`^${regionsName2} \(`),
 		});
 		await expect(tainanLink).toBeVisible();

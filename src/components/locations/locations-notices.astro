@@ -1,5 +1,5 @@
 ---
-import AlertBox from '#components/parts/alert-box.astro';
+import NoticeBox from '#components/parts/notice-box.astro';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
@@ -11,9 +11,9 @@ const { notices } = Astro.props;
 
 {
 	notices.map(({ text, textAlt }) => (
-		<AlertBox status="warning">
+		<NoticeBox severity="warning">
 			<Fragment set:html={renderMarkdownInline(text)} />
 			{textAlt ? <Fragment set:html={renderMarkdownInline(textAlt)} /> : undefined}
-		</AlertBox>
+		</NoticeBox>
 	))
 }

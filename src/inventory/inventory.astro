@@ -26,7 +26,6 @@ import MapComponent from '#components/map/map-component.astro';
 import ImgGroup from '#components/mdx/img-group.astro';
 import Img from '#components/mdx/img.astro';
 import ActivityGraph from '#components/parts/activity-graph.astro';
-import AlertBox from '#components/parts/alert-box.astro';
 import Anchor from '#components/parts/anchor.astro';
 import AuthorCard from '#components/parts/author-card.astro';
 import CardFrame from '#components/parts/card-frame.astro';
@@ -38,6 +37,7 @@ import Image from '#components/parts/image.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
 import ListRow from '#components/parts/list-row.astro';
+import NoticeBox from '#components/parts/notice-box.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import PreviewCard from '#components/parts/preview-card.astro';
@@ -277,15 +277,15 @@ const washColorsFeatured = [
 
 const datePresets = Object.values(DatePresetEnum);
 
-type AlertStatus = NonNullable<ComponentProps<typeof AlertBox>['status']>;
+type NoticeSeverity = NonNullable<ComponentProps<typeof NoticeBox>['severity']>;
 
-const alertStatuses = [
+const noticeSeverities = [
 	'default',
 	'success',
-	'notice',
+	'info',
 	'warning',
 	'error',
-] as const satisfies Array<AlertStatus>;
+] as const satisfies Array<NoticeSeverity>;
 
 type DividerContent = NonNullable<ComponentProps<typeof DividedItem>['dividerContent']>;
 
@@ -671,17 +671,17 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 		</Section>
 		<Section title="Parts">
-			<Specimen name="alert-box" source="components/parts/alert-box.astro">
+			<Specimen name="notice-box" source="components/parts/notice-box.astro">
 				<div class="flex flex-col gap-3">
 					{
-						alertStatuses.map((status) => (
-							<AlertBox status={status}>
-								The <code>{status}</code> status, carrying a sentence long enough to wrap on a
+						noticeSeverities.map((severity) => (
+							<NoticeBox severity={severity}>
+								The <code>{severity}</code> severity, carrying a sentence long enough to wrap on a
 								narrow viewport and show how the body column holds beside the icon.
-							</AlertBox>
+							</NoticeBox>
 						))
 					}
-					<AlertBox showIcon={false}>No icon rail on this one.</AlertBox>
+					<NoticeBox showIcon={false}>No icon rail on this one.</NoticeBox>
 				</div>
 			</Specimen>
 			<Specimen
@@ -1304,7 +1304,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="locations-notices"
-				note="The only <code>alert-box warning</code> caller. All three stack here; a Location's own data can trigger at most two."
+				note="The only <code>notice-box warning</code> caller. All three stack here; a Location's own data can trigger at most two."
 				source="components/locations/locations-notices.astro"
 			>
 				<div class="content-column flex flex-col gap-2">

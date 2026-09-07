@@ -1,16 +1,16 @@
 /**
- * An accessible nested menu web component; DOM contract:
+ * An accessible nested navigation web component; DOM contract:
  *
- * <menu-navigation>
+ * <site-navigation>
  *   <nav>
- *     <ul>                  <-- becomes role="menubar"
- *       <li>                <-- a menu item
+ *     <ul>                  <-- the root list
+ *       <li>                <-- a navigation item
  *         <a|button|span>   <-- first element in the <li> that is NOT inside the submenu
  *         <ul>...</ul>      <-- optional submenu; must be a direct child of the <li>
  *       </li>
  *     </ul>
  *   </nav>
- * </menu-navigation>
+ * </site-navigation>
  *
  * Note: use <a> for navigable triggers, <button> for text-only labels with children, <span> for text-only
  *
@@ -20,7 +20,7 @@
  */
 let instanceCount = 0;
 
-class NavMenu extends HTMLElement {
+class SiteNavigation extends HTMLElement {
 	#controller: AbortController | undefined;
 	#lastPointerType = '';
 	#instanceId = `nav-${String(instanceCount++)}`;
@@ -40,15 +40,15 @@ class NavMenu extends HTMLElement {
 		return undefined;
 	}
 
-	#getMenuitems(ul: HTMLElement): Array<HTMLElement> {
-		const menuitems: Array<HTMLElement> = [];
+	#getTriggers(ul: HTMLElement): Array<HTMLElement> {
+		const triggers: Array<HTMLElement> = [];
 
 		for (const li of ul.querySelectorAll<HTMLElement>(':scope > li')) {
 			const trigger = this.#getTrigger(li);
-			if (trigger) menuitems.push(trigger);
+			if (trigger) triggers.push(trigger);
 		}
 
-		return menuitems;
+		return triggers;
 	}
 
 	#triggerContains(li: HTMLElement, target: Node): boolean {
@@ -60,7 +60,7 @@ class NavMenu extends HTMLElement {
 		this.#lastPointerType = event.pointerType;
 	};
 
-	// Touch taps on an anchor menuitem: first tap opens, second tap navigates
+	// Touch taps on an anchor trigger: first tap opens, second tap navigates
 	#handleTouchAnchorClick(event: Event, li: HTMLElement, isInTrigger: boolean) {
 		if (!isInTrigger || li.dataset.open !== undefined) return;
 
@@ -111,36 +111,35 @@ class NavMenu extends HTMLElement {
 
 		if (!this.contains(target)) return;
 
-		const menuitem = target.closest<HTMLElement>('[role="menuitem"]');
+		const li = target.closest<HTMLElement>('li');
+		const trigger = li ? this.#getTrigger(li) : undefined;
 
-		if (!menuitem) {
+		if (!li || !trigger?.contains(target)) {
 			if (event.key === 'Escape') this.#closeAll();
 			return;
 		}
 
-		const li = menuitem.closest<HTMLElement>('li');
-
-		if (li) this.#handleMenuitemKeydown(event, li);
+		this.#handleItemKeydown(event, li);
 	};
 
-	#handleMenuitemKeydown(event: KeyboardEvent, li: HTMLElement) {
-		const isMenubar = li.closest<HTMLElement>('ul')?.getAttribute('role') === 'menubar';
+	#handleItemKeydown(event: KeyboardEvent, li: HTMLElement) {
+		const isRootLevel = li.parentElement === this.querySelector(':scope > nav > ul');
 
 		switch (event.key) {
 			case 'ArrowRight': {
-				this.#handleArrowRight(event, li, isMenubar);
+				this.#handleArrowRight(event, li, isRootLevel);
 				break;
 			}
 			case 'ArrowLeft': {
-				this.#handleArrowLeft(event, li, isMenubar);
+				this.#handleArrowLeft(event, li, isRootLevel);
 				break;
 			}
 			case 'ArrowDown': {
-				this.#handleArrowDown(event, li, isMenubar);
+				this.#handleArrowDown(event, li, isRootLevel);
 				break;
 			}
 			case 'ArrowUp': {
-				this.#handleArrowUp(event, li, isMenubar);
+				this.#handleArrowUp(event, li, isRootLevel);
 				break;
 			}
 			case 'Escape': {
@@ -166,8 +165,8 @@ class NavMenu extends HTMLElement {
 		}
 	}
 
-	#handleArrowRight(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
-		if (isMenubar) {
+	#handleArrowRight(event: KeyboardEvent, li: HTMLElement, isRootLevel: boolean) {
+		if (isRootLevel) {
 			event.preventDefault();
 			this.#focusSibling(li, 'next');
 			return;
@@ -180,10 +179,10 @@ class NavMenu extends HTMLElement {
 		this.#focusFirstItem(li);
 	}
 
-	#handleArrowLeft(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+	#handleArrowLeft(event: KeyboardEvent, li: HTMLElement, isRootLevel: boolean) {
 		event.preventDefault();
 
-		if (isMenubar) {
+		if (isRootLevel) {
 			this.#focusSibling(li, 'prev');
 			return;
 		}
@@ -191,10 +190,10 @@ class NavMenu extends HTMLElement {
 		this.#closeAndFocusTrigger(li);
 	}
 
-	#handleArrowDown(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+	#handleArrowDown(event: KeyboardEvent, li: HTMLElement, isRootLevel: boolean) {
 		event.preventDefault();
 
-		if (!isMenubar) {
+		if (!isRootLevel) {
 			this.#focusSibling(li, 'next');
 			return;
 		}
@@ -205,10 +204,10 @@ class NavMenu extends HTMLElement {
 		this.#focusFirstItem(li);
 	}
 
-	#handleArrowUp(event: KeyboardEvent, li: HTMLElement, isMenubar: boolean) {
+	#handleArrowUp(event: KeyboardEvent, li: HTMLElement, isRootLevel: boolean) {
 		event.preventDefault();
 
-		if (isMenubar) return;
+		if (isRootLevel) return;
 
 		if (this.#getSiblingItems(li)[0] === li) {
 			this.#closeAndFocusTrigger(li);
@@ -275,25 +274,19 @@ class NavMenu extends HTMLElement {
 	}
 
 	#closeAndFocusTrigger(li: HTMLElement) {
-		const parentUl = li.closest<HTMLElement>('ul[role="menu"]');
+		// A submenu <ul> is a child of the <li> that opens it, so the root list has no ancestor <li>
+		const triggerLi = li.parentElement?.closest<HTMLElement>('li');
 
-		if (!parentUl) {
+		if (!triggerLi) {
 			this.#closeAll();
 			return;
 		}
 
-		const triggerLi = parentUl.closest<HTMLElement>('li');
+		this.#close(triggerLi);
 
-		if (triggerLi) {
-			this.#close(triggerLi);
+		const triggerElement = this.#getTrigger(triggerLi);
 
-			const triggerElement = this.#getTrigger(triggerLi);
-
-			if (triggerElement) {
-				this.#setRovingTabindex(triggerElement);
-				triggerElement.focus();
-			}
-		}
+		if (triggerElement) triggerElement.focus();
 	}
 
 	#focusSibling(li: HTMLElement, direction: 'next' | 'prev') {
@@ -308,10 +301,7 @@ class NavMenu extends HTMLElement {
 		const nextItem = items[nextIndex];
 		const nextTrigger = nextItem ? this.#getTrigger(nextItem) : undefined;
 
-		if (nextTrigger) {
-			this.#setRovingTabindex(nextTrigger);
-			nextTrigger.focus();
-		}
+		if (nextTrigger) nextTrigger.focus();
 	}
 
 	#focusFirstItem(li: HTMLElement) {
@@ -319,12 +309,9 @@ class NavMenu extends HTMLElement {
 
 		if (!submenu) return;
 
-		const firstTrigger = this.#getMenuitems(submenu)[0];
+		const firstTrigger = this.#getTriggers(submenu)[0];
 
-		if (firstTrigger) {
-			this.#setRovingTabindex(firstTrigger);
-			firstTrigger.focus();
-		}
+		if (firstTrigger) firstTrigger.focus();
 	}
 
 	#focusEdgeItem(li: HTMLElement, edge: 'first' | 'last') {
@@ -332,13 +319,10 @@ class NavMenu extends HTMLElement {
 
 		if (!parentUl) return;
 
-		const menuitems = this.#getMenuitems(parentUl);
-		const trigger = edge === 'first' ? menuitems[0] : menuitems.at(-1);
+		const triggers = this.#getTriggers(parentUl);
+		const trigger = edge === 'first' ? triggers[0] : triggers.at(-1);
 
-		if (trigger) {
-			this.#setRovingTabindex(trigger);
-			trigger.focus();
-		}
+		if (trigger) trigger.focus();
 	}
 
 	#getSiblingItems(li: HTMLElement) {
@@ -349,54 +333,26 @@ class NavMenu extends HTMLElement {
 		return [...parentUl.querySelectorAll<HTMLElement>(':scope > li')];
 	}
 
-	#setRovingTabindex(activeTrigger: HTMLElement) {
-		const parentUl = activeTrigger.closest<HTMLElement>('ul');
-
-		if (!parentUl) return;
-
-		for (const trigger of this.#getMenuitems(parentUl)) {
-			trigger.setAttribute('tabindex', trigger === activeTrigger ? '0' : '-1');
-		}
-	}
-
 	#injectAria() {
-		// Root <ul> becomes menubar
-		const menubar = this.querySelector<HTMLElement>(':scope > nav > ul');
-
-		if (!menubar) return;
-
-		menubar.setAttribute('role', 'menubar');
-
 		let submenuId = 0;
 
 		for (const li of this.querySelectorAll<HTMLElement>('li')) {
-			li.setAttribute('role', 'none');
+			const submenu = this.#getSubmenu(li);
+
+			if (!submenu) continue;
+
+			li.dataset.hasSubmenu = '';
+
+			const id = `${this.#instanceId}-sub-menu-${String(submenuId++)}`;
+
+			submenu.id = id;
 
 			const trigger = this.#getTrigger(li);
 
-			if (trigger) trigger.setAttribute('role', 'menuitem');
-
-			const submenu = this.#getSubmenu(li);
-
-			if (submenu) {
-				li.dataset.hasSubmenu = '';
-
-				const id = `${this.#instanceId}-sub-menu-${String(submenuId++)}`;
-
-				submenu.id = id;
-				submenu.setAttribute('role', 'menu');
-
-				if (trigger) {
-					trigger.setAttribute('aria-haspopup', 'true');
-					trigger.setAttribute('aria-expanded', 'false');
-					trigger.setAttribute('aria-controls', id);
-				}
+			if (trigger) {
+				trigger.setAttribute('aria-expanded', 'false');
+				trigger.setAttribute('aria-controls', id);
 			}
-		}
-
-		// Roving tabindex on menubar items
-		for (const [index, trigger] of this.#getMenuitems(menubar).entries()) {
-			trigger.setAttribute('tabindex', index === 0 ? '0' : '-1');
 		}
 	}
 
@@ -423,14 +379,14 @@ class NavMenu extends HTMLElement {
 	}
 }
 
-if (!customElements.get('menu-navigation')) {
-	customElements.define('menu-navigation', NavMenu);
+if (!customElements.get('site-navigation')) {
+	customElements.define('site-navigation', SiteNavigation);
 }
 
 export {};
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'menu-navigation': NavMenu;
+		'site-navigation': SiteNavigation;
 	}
 }
