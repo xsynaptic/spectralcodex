@@ -4,7 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	currentYear?: string | undefined;
@@ -62,7 +62,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 						) : (
 							<Anchor
 								class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
-								href={getSiteUrl('chronology', chronologyYear)}
+								href={getSitePath('chronology', chronologyYear)}
 								anchorColor="accent"
 							>
 								{chronologyYear}
@@ -98,7 +98,7 @@ const indexSlot = await renderSlot(Astro.slots, 'default');
 										</span>
 									) : (
 										<Anchor
-											href={getSiteUrl('chronology', currentYear, monthNumber)}
+											href={getSitePath('chronology', currentYear, monthNumber)}
 											anchorColor="highlight"
 										>
 											{monthName}

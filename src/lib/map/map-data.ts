@@ -21,7 +21,7 @@ import {
 	hashMapSourceData,
 } from '#lib/map/map-locations.ts';
 import { MapApiDataEnum } from '#lib/map/map-types.ts';
-import { getBaseUrl } from '#lib/utils/routing.ts';
+import { getBasePath } from '#lib/utils/routing.ts';
 
 // Region and theme maps pass a membership hint; other big maps fall back to an id list
 type MapScopeHint =
@@ -91,7 +91,7 @@ function getDirectoryData(
 	scope: MapScopeHint | undefined,
 	version: string | undefined,
 ) {
-	const apiSourceUrl = getBaseUrl('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
+	const apiSourceUrl = getBasePath('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
 
 	// No membership hint resolves to this map's explicit, order-preserving id list
 	const resolvedScope: MapScope = scope ?? {
@@ -176,7 +176,7 @@ export function getMapData({
 	}
 
 	// All other maps: popups come from the shared, demand-fetched chunks
-	const apiChunkBaseUrl = getBaseUrl('api/map/');
+	const apiChunkBaseUrl = getBasePath('api/map/');
 
 	// Small maps inline their points, each carrying its chunk key
 	if ((locationCount ?? featureCount) <= mapSourceInlineLimit) {
@@ -219,12 +219,12 @@ export function getMapDataDedicated({
 
 	const sourceHash = hashMapSourceData(getLocationsMapSourceData(featureCollection));
 	const popupHash = hashMapPopupData(getLocationsMapPopupData(featureCollection));
-	const apiSourceUrl = getBaseUrl(
+	const apiSourceUrl = getBasePath(
 		'api/map',
 		mapId,
 		`${MapApiDataEnum.Source}.json?v=${sourceHash}`,
 	);
-	const apiPopupUrl = getBaseUrl('api/map', mapId, `${MapApiDataEnum.Popup}.json?v=${popupHash}`);
+	const apiPopupUrl = getBasePath('api/map', mapId, `${MapApiDataEnum.Popup}.json?v=${popupHash}`);
 
 	return {
 		...defaultMapDataProps,

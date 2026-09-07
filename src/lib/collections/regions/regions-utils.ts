@@ -22,7 +22,7 @@ import {
 	sortByEntryCount,
 } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
-import { getBaseUrl, getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { getBasePath, getContentPath, getSitePath } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
 // Transform an array of strings into collection entries
@@ -84,11 +84,11 @@ export async function getRegionSchema(
 	const ancestors = allAncestors.slice(1).toReversed();
 
 	const breadcrumbItems = [
-		{ name: t('site.title'), url: getSiteUrl() },
-		{ name: t('collection.regions.labelPlural'), url: getSiteUrl('regions') },
+		{ name: t('site.title'), url: getSitePath() },
+		{ name: t('collection.regions.labelPlural'), url: getSitePath('regions') },
 		...ancestors.map((region) => ({
 			name: region.data.title,
-			url: getContentUrl('regions', region.id),
+			url: getContentPath('regions', region.id),
 		})),
 		{ name: entry.data.title },
 	];
@@ -151,7 +151,7 @@ export async function createQueryRegionsEntryFunction() {
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {
-						apiDivisionUrl: getBaseUrl(mapDivisionsDataPath, `${entry.id}.fgb`),
+						apiDivisionUrl: getBasePath(mapDivisionsDataPath, `${entry.id}.fgb`),
 					}
 				: {}),
 		});

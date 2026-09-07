@@ -7,7 +7,7 @@ import ListRow from '#components/parts/list-row.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {
 	terms: Array<CollectionEntry<'themes'>> | undefined;
@@ -34,7 +34,7 @@ const { class: className, terms } = Astro.props;
 						data-pagefind-filter="theme"
 					>
 						{entry.data.title ? (
-							<Anchor href={getContentUrl(entry.collection, entry.id)}>{entry.data.title}</Anchor>
+							<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
 						) : undefined}
 						{titleMultilingual ? (
 							<TextMultilingual content={titleMultilingual} parenthesis={true} />

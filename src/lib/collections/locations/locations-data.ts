@@ -19,7 +19,7 @@ import { createCollectionData, getPublicId, getRawCollection } from '#lib/utils/
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedImagePath = createSignedImagePathFunction({
@@ -92,7 +92,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	}).slice(0, hashShortLength);
 
 	entry.data._uuid = locationMapDataHash;
-	entry.data._url = getContentUrl('locations', getPublicId(entry));
+	entry.data._url = getContentPath('locations', getPublicId(entry));
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 

@@ -13,7 +13,7 @@ import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
 import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -48,7 +48,7 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-subtitle"
 			><ChronologyNavigation currentYear={chronologyYear} chronologyYears={chronologyYears}
-				><Anchor href={getSiteUrl('chronology')} anchorColor="accent" class="font-semibold"
+				><Anchor href={getSitePath('chronology')} anchorColor="accent" class="font-semibold"
 					>{t('chronology.index.label')}</Anchor
 				></ChronologyNavigation
 			></Fragment
@@ -59,7 +59,7 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 			.sort((a, b) => Number(a.month) - Number(b.month))
 			.map((monthlyData) => {
 				const imageFeaturedGroup = getChronologyImageFeaturedGroup(monthlyData);
-				const monthlyUrl = getSiteUrl('chronology', monthlyData.year, monthlyData.month);
+				const monthlyUrl = getSitePath('chronology', monthlyData.year, monthlyData.month);
 
 				return (
 					<div class="content-column-fill mb-8">

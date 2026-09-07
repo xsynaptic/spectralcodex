@@ -16,7 +16,7 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 import { stripFootnotes } from '#lib/utils/text.ts';
 
 /**
@@ -85,7 +85,7 @@ const generateFeedItem = async ({
 		title: titleMultilingual
 			? `${entry.data.title} (${titleMultilingual.value})`
 			: entry.data.title,
-		link: getContentUrl(entry.collection, getPublicId(entry)),
+		link: getContentPath(entry.collection, getPublicId(entry)),
 		// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
 		pubDate: new Date(pubDate.getTime() - siteTimezoneOffsetHours * millisecondsPerHour),
 		...(description ? { description } : {}),

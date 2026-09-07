@@ -1,9 +1,9 @@
 import type { APIRoute } from 'astro';
 
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
 
 export const GET = (() => {
-	const sitemapUrl = `${getSiteUrl()}sitemap-index.xml`;
+	const sitemapUrl = getAbsoluteUrl(getBasePath('sitemap-index.xml'));
 
 	return new Response(`User-agent: *
 Disallow: /_x/

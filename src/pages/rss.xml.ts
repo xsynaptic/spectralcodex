@@ -5,7 +5,7 @@ import { performance } from 'node:perf_hooks';
 
 import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
 import { generateFeedItems } from '#lib/utils/rss.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -43,7 +43,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		xmlns: { atom: 'http://www.w3.org/2005/Atom' },
 		customData: [
 			'<language>en-us</language>',
-			`<atom:link href="${getSiteUrl()}rss.xml" rel="self" type="application/rss+xml"/>`,
+			`<atom:link href="${getAbsoluteUrl(getBasePath('rss.xml'))}" rel="self" type="application/rss+xml"/>`,
 			...(lastBuildDate ? [`<lastBuildDate>${lastBuildDate.toUTCString()}</lastBuildDate>`] : []),
 			`<copyright>${copyright}</copyright>`,
 		].join(''),

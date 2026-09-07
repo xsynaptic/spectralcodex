@@ -27,7 +27,7 @@ import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
 import Search from '#components/search/search.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getBasePath, getSitePath } from '#lib/utils/routing.ts';
 
 interface Props {
 	meta?: MetaProps;
@@ -38,7 +38,7 @@ interface Props {
 
 const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
 
-const siteUrl = getSiteUrl();
+const siteUrl = getSitePath();
 
 const t = getTranslations();
 ---
@@ -53,13 +53,13 @@ const t = getTranslations();
 		<link
 			rel="icon"
 			type="image/svg+xml"
-			href={`${getSiteUrl()}favicon.svg`}
+			href={getBasePath('favicon.svg')}
 			media="(prefers-color-scheme: light)"
 		/>
 		<link
 			rel="icon"
 			type="image/svg+xml"
-			href={`${getSiteUrl()}favicon.svg`}
+			href={getBasePath('favicon.svg')}
 			media="(prefers-color-scheme: dark)"
 		/>
 		{
@@ -94,9 +94,9 @@ const t = getTranslations();
 			rel="alternate"
 			type="application/rss+xml"
 			title={t('site.title')}
-			href={`${getSiteUrl()}rss.xml`}
+			href={getBasePath('rss.xml')}
 		/>
-		<link rel="sitemap" href={`${getSiteUrl()}sitemap-index.xml`} />
+		<link rel="sitemap" href={getBasePath('sitemap-index.xml')} />
 		{
 			WEBMENTION_DOMAIN ? (
 				<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />

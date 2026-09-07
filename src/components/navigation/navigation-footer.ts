@@ -1,7 +1,7 @@
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
 
@@ -43,14 +43,14 @@ export const navigationFooterItems = [
 	},
 	{
 		title: t('navigation.terms.label'),
-		url: getSiteUrl('terms-of-use'),
+		url: getSitePath('terms-of-use'),
 	},
 	{
 		title: t('navigation.contact.label'),
-		url: getSiteUrl('contact'),
+		url: getSitePath('contact'),
 	},
 	{
 		title: t('navigation.about.label'),
-		url: getSiteUrl('about'),
+		url: getSitePath('about'),
 	},
 ] satisfies Array<NavigationItem>;

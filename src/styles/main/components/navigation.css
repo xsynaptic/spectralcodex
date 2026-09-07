@@ -225,6 +225,7 @@
 	visibility: visible;
 	pointer-events: auto;
 	opacity: 1;
+	transition-property: opacity;
 }
 
 /* stylelint-disable-next-line no-descending-specificity -- chevron flip, same outcome as the hover rule above */

@@ -9,7 +9,7 @@ import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
-import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { getContentPath, getSitePath } from '#lib/utils/routing.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props extends PreviewOptions {
@@ -28,7 +28,7 @@ const {
 	showPosts,
 } = Astro.props;
 
-const indexUrl = getSiteUrl(item.collection);
+const indexUrl = getSitePath(item.collection);
 
 const t = getTranslations();
 ---
@@ -51,7 +51,7 @@ const t = getTranslations();
 		<DividedItem>
 			{regions.map((region) => (
 				<DividedItem dividerContent="chevron">
-					<Anchor href={getContentUrl('regions', region.id)} showDarkMode={false}>
+					<Anchor href={getContentPath('regions', region.id)} showDarkMode={false}>
 						{region.data.title}
 					</Anchor>
 				</DividedItem>

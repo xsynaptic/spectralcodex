@@ -4,4 +4,5 @@ export const paths = {
 	postDetail: '/huadong-valley-ride-2018-taitung-city/',
 	locationDetail: '/xinyi-taipei-101/',
 	regionDetail: '/regions/tainan/',
+	regionDetailAncestor: '/regions/taiwan/',
 } as const;

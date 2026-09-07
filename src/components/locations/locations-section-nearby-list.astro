@@ -8,7 +8,7 @@ import { locationsNearbyCountLimit } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
@@ -27,7 +27,7 @@ const locations = (entry.data._nearby?.slice(0, limit) ?? []).flatMap(
 
 		return [
 			{
-				url: getContentUrl('locations', location.id),
+				url: getContentPath('locations', location.id),
 				title: location.data.title,
 				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
 				distanceDisplay,

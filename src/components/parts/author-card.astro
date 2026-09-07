@@ -2,7 +2,7 @@
 import Anchor from '#components/parts/anchor.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 
 const t = getTranslations();
 ---
@@ -10,14 +10,14 @@ const t = getTranslations();
 <div class="mt-1 flex flex-col gap-1 font-serif">
 	<Anchor
 		class:list={['text-sm font-semibold', MicroformatClassNames.Url]}
-		href={getSiteUrl('/about')}
+		href={getSitePath('/about')}
 		rel="me"><span class={MicroformatClassNames.Name}>{t('author.name')}</span></Anchor
 	>
 	{' '}
 	<div class="text-xs">
 		<span class={MicroformatClassNames.Role}>{t('author.role')}</span>, <Anchor
 			class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
-			href={getSiteUrl()}
+			href={getSitePath()}
 			anchorColor="primary">{t('site.title')}</Anchor
 		>
 	</div>

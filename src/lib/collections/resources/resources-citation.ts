@@ -3,7 +3,7 @@ import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getResourceUrl } from '#lib/utils/routing.ts';
+import { getResourcePath } from '#lib/utils/routing.ts';
 
 interface CitationFormatting {
 	authorsDelimiter: string;
@@ -128,7 +128,7 @@ export function buildSourceCitations(source: ResourceSource) {
 	return {
 		url:
 			'id' in source && 'showPage' in source
-				? getResourceUrl(source.id, source.showPage)
+				? getResourcePath(source.id, source.showPage)
 				: undefined,
 		primary: buildPrimaryCitation(source),
 		multilingual: buildMultilingualCitation(source),

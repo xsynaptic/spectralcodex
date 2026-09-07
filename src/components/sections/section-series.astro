@@ -6,7 +6,7 @@ import { render } from 'astro:content';
 
 import SeriesSection from '#components/series/series-section.astro';
 import { createSeriesByIdFunction } from '#lib/collections/series/series-utils.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations' | 'posts'>;
@@ -27,7 +27,7 @@ const seriesData = getSeriesById({ collection: entry.collection, id: entry.id })
 			<SeriesSection
 				items={catalogItems}
 				seriesTitle={seriesEntry.data.title}
-				url={getContentUrl(seriesEntry.collection, seriesEntry.id)}
+				url={getContentPath(seriesEntry.collection, seriesEntry.id)}
 				{...props}
 			>
 				<Content />

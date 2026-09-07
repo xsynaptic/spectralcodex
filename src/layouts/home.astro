@@ -23,7 +23,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
@@ -154,7 +154,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title"
-			><Anchor href={getSiteUrl('themes')} anchorColor="primary"
+			><Anchor href={getSitePath('themes')} anchorColor="primary"
 				>{t('collection.themes.labelPlural')}</Anchor
 			></Fragment
 		>
@@ -168,7 +168,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title"
-			><Anchor href={getSiteUrl('series')} anchorColor="primary"
+			><Anchor href={getSitePath('series')} anchorColor="primary"
 				>{t('collection.series.labelPlural')}</Anchor
 			></Fragment
 		>

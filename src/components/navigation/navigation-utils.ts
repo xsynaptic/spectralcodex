@@ -5,7 +5,7 @@ import { formatStringTemplate } from '#lib/utils/text.ts';
 
 // Exact match only; aria-current="page" must not land on an ancestor of the current page
 export function isCurrentNavigationItem(item: NavigationItem, pathname: string): boolean {
-	return item.url === pathname || item.url === pathname.replace(/\/$/, '');
+	return item.url === pathname;
 }
 
 export function isActiveNavigationItem(item: NavigationItem, pathname: string): boolean {

@@ -16,7 +16,7 @@ import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
@@ -62,7 +62,7 @@ const description = t('collection.posts.description');
 
 					return (
 						<ContentExcerpt
-							entryUrl={getContentUrl(entry.collection, entry.id)}
+							entryUrl={getContentPath(entry.collection, entry.id)}
 							imageId={imageFeaturedId}
 							showDivider={index + 1 < page.data.length}
 						>

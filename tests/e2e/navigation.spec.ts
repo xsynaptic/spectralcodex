@@ -28,6 +28,26 @@ test.describe('navigation', () => {
 			name: new RegExp(String.raw`^${regionsName2} \(`),
 		});
 		await expect(tainanLink).toBeVisible();
-		await expect(tainanLink).toHaveAttribute('href', new RegExp(`${paths.regionDetail}$`));
+		await expect(tainanLink).toHaveAttribute('href', paths.regionDetail);
+	});
+
+	test('Current page', async ({ page }) => {
+		await page.goto(paths.regionDetailAncestor, { waitUntil: 'domcontentloaded' });
+
+		const nav = page.getByRole('navigation', {
+			name: t('site.navigation.header.label'),
+		});
+
+		const regionsLink = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
+
+		await expect(regionsLink).toHaveClass(/anchor-active/);
+		await expect(regionsLink).not.toHaveAttribute('aria-current');
+
+		await regionsLink.hover();
+
+		const taiwanLink = nav.getByRole('link', { name: regionsName1, exact: true });
+
+		await expect(taiwanLink).toHaveClass(/anchor-active/);
+		await expect(taiwanLink).toHaveAttribute('aria-current', 'page');
 	});
 });

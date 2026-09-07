@@ -13,7 +13,7 @@ import Anchor from '#components/parts/anchor.astro';
 import Prose from '#components/parts/prose.astro';
 import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -64,7 +64,7 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 					hasHeroImage ? (
 						<Anchor
 							class="font-semibold"
-							href={getSiteUrl('chronology', chronologyMonthlyItem.year)}
+							href={getSitePath('chronology', chronologyMonthlyItem.year)}
 							anchorColor="highlight"
 						>
 							{formatStringTemplate(t('chronology.yearly.title'), {
@@ -91,7 +91,7 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 			chronologyYears={chronologyYears}
 			chronologyMonths={chronologyMonths}
 		>
-			<Anchor href={getSiteUrl('chronology')} anchorColor="accent" class="font-semibold">
+			<Anchor href={getSitePath('chronology')} anchorColor="accent" class="font-semibold">
 				{t('chronology.index.label')}
 			</Anchor>
 		</ChronologyNavigation>

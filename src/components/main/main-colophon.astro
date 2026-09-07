@@ -4,10 +4,10 @@ import DateDisplay from '#components/parts/date-display.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getBasePath, getSitePath } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
-const siteUrl = getSiteUrl();
+const siteUrl = getSitePath();
 
 const dateBuild = new Date();
 const currentYear = dateBuild.getFullYear();
@@ -45,7 +45,7 @@ const t = getTranslations();
 		>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<Anchor href={getSiteUrl('build-stats')} anchorColor="accent"
+		<Anchor href={getSitePath('build-stats')} anchorColor="accent"
 			>{t('site.footer.buildStats.label')}</Anchor
 		>
 	</DividedItem>
@@ -57,7 +57,7 @@ const t = getTranslations();
 	<DividedItem dividerColor="muted">
 		<Anchor
 			class:list={['colophon-rss-link']}
-			href={`${getSiteUrl()}rss.xml`}
+			href={getBasePath('rss.xml')}
 			anchorColor="accent"
 			rel="feed"
 			data-astro-prefetch="false"

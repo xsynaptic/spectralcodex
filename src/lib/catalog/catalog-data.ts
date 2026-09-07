@@ -20,7 +20,7 @@ import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { getPublicId } from '#lib/utils/collections.ts';
 import { getDescription } from '#lib/utils/description.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
 
@@ -115,7 +115,7 @@ async function createCatalogItem(
 		title: data.title,
 		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
 		description: getDescription(entry),
-		url: getContentUrl(entry.collection, getPublicId(entry)),
+		url: getContentPath(entry.collection, getPublicId(entry)),
 		imageId: getImageFeaturedId({ imageFeatured }),
 		imageHeroId: getImageHeroId({ imageFeatured }),
 		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),

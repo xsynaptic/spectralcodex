@@ -12,7 +12,7 @@ import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByEntryCount } from '#lib/utils/collections.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 
 // Increase this to 3 to show subregions in the header navigation
 const maxDepth = 2 as number;
@@ -32,7 +32,7 @@ function getNavigationItemData({
 		collection: entry.collection,
 		title: entry.data.title,
 		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
-		url: getSiteUrl(`${collection}/${entry.id}`),
+		url: getSitePath(`${collection}/${entry.id}`),
 		...(ancestor ? { ancestor } : {}),
 	};
 }
@@ -107,38 +107,38 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 	return [
 		{
 			title: t('collection.posts.labelPlural'),
-			url: getSiteUrl('posts'),
+			url: getSitePath('posts'),
 		},
 		{
 			title: t('collection.locations.labelPlural'),
-			url: getSiteUrl('locations'),
+			url: getSitePath('locations'),
 		},
 		{
 			title: 'Regions',
-			url: getSiteUrl('regions'),
+			url: getSitePath('regions'),
 			children: regionsMenu,
 		},
 		{
 			title: t('collection.series.labelPlural'),
-			url: getSiteUrl('series'),
+			url: getSitePath('series'),
 			children: seriesMenu,
 		},
 		{
 			title: t('collection.themes.labelPlural'),
-			url: getSiteUrl('themes'),
+			url: getSitePath('themes'),
 			children: themesMenu,
 		},
 		{
 			title: t('navigation.chronology.label'),
-			url: getSiteUrl('chronology'),
+			url: getSitePath('chronology'),
 			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
 				title: year,
-				url: getSiteUrl('chronology', year),
+				url: getSitePath('chronology', year),
 			})),
 		},
 		{
 			title: t('navigation.about.label'),
-			url: getSiteUrl('about'),
+			url: getSitePath('about'),
 		},
 	];
 }

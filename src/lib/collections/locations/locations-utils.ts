@@ -25,7 +25,7 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getContentUrl, getSiteUrl } from '#lib/utils/routing.ts';
+import { getContentPath, getSitePath } from '#lib/utils/routing.ts';
 import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 
 // Transform IDs into entries (and emit a warning when an ID doesn't match)
@@ -103,11 +103,11 @@ export async function getLocationSchemas(
 	const regionAncestors = regionPrimary ? getRegionAncestors(regionPrimary).toReversed() : [];
 
 	const breadcrumbItems = [
-		{ name: t('site.title'), url: getSiteUrl() },
-		{ name: t('collection.locations.labelPlural'), url: getSiteUrl('locations') },
+		{ name: t('site.title'), url: getSitePath() },
+		{ name: t('collection.locations.labelPlural'), url: getSitePath('locations') },
 		...regionAncestors.map((region) => ({
 			name: region.data.title,
-			url: getContentUrl('regions', region.id),
+			url: getContentPath('regions', region.id),
 		})),
 		{ name: entry.data.title },
 	];

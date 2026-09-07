@@ -1,5 +1,5 @@
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSiteUrl } from '#lib/utils/routing.ts';
+import { getAbsoluteUrl, getSitePath } from '#lib/utils/routing.ts';
 
 const SchemaTypeEnum = {
 	Article: 'Article',
@@ -70,16 +70,16 @@ interface Graph {
 	'@graph': ReadonlyArray<Thing>;
 }
 
-const siteUrl = getSiteUrl();
-const aboutUrl = getSiteUrl('/about');
+const siteUrl = getAbsoluteUrl(getSitePath());
+const aboutUrl = getAbsoluteUrl(getSitePath('/about'));
 
 // @id scheme: long form for singletons, short fragment for per-page entities
 const ids = {
 	website: `${siteUrl}#/schema.org/${SchemaTypeEnum.WebSite}`,
 	person: `${aboutUrl}#/schema.org/${SchemaTypeEnum.Person}`,
-	article: (pageUrl: string) => `${pageUrl}#article`,
-	breadcrumb: (pageUrl: string) => `${pageUrl}#breadcrumb`,
-	place: (pageUrl: string) => `${pageUrl}#place`,
+	article: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#article`,
+	breadcrumb: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#breadcrumb`,
+	place: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#place`,
 };
 
 export function buildWebSiteSchema(): WebSite {
@@ -138,7 +138,7 @@ export function buildBreadcrumbSchema(
 			'@type': SchemaTypeEnum.ListItem,
 			position: index + 1,
 			name: item.name,
-			...(item.url ? { item: item.url } : {}),
+			...(item.url ? { item: getAbsoluteUrl(item.url) } : {}),
 		})),
 	};
 }
@@ -154,7 +154,7 @@ export function buildPlaceSchema(props: {
 		'@id': ids.place(props.url),
 		name: props.title,
 		...(props.description ? { description: props.description } : {}),
-		url: props.url,
+		url: getAbsoluteUrl(props.url),
 		...(props.coordinates
 			? {
 					geo: {

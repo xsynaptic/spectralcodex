@@ -10,7 +10,7 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getContentUrl } from '#lib/utils/routing.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {
 	terms: Array<CollectionEntry<'regions'>> | undefined;
@@ -56,7 +56,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 						data-pagefind-filter="region"
 					>
 						{entry.data.title ? (
-							<Anchor href={getContentUrl(entry.collection, entry.id)}>
+							<Anchor href={getContentPath(entry.collection, entry.id)}>
 								<Fragment set:html={entry.data.title} />
 							</Anchor>
 						) : undefined}
