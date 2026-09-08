@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 import { hash } from 'ohash';
 
@@ -15,7 +16,7 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { createCollectionData, getPublicId, getRawCollection } from '#lib/utils/collections.ts';
+import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';

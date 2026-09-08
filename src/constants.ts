@@ -50,13 +50,6 @@ export const mdxComponents = [
 	'Resource',
 ];
 
-// How many fallback images are there? These should already be located in the `/public` folder
-export const openGraphImageFallbackCount = 5;
-export const openGraphImageFallbackPrefix = 'og-image';
-
-// Generate high DPI Open Graph images
-export const openGraphImageDensity = 2;
-
 // Not sure how useful this is nowadays
 export const openGraphTwitterUsername = '@spectralcodex';
 

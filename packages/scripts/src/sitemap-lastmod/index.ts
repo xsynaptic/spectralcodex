@@ -1,10 +1,10 @@
 import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
+import { getPublicId } from '@spectralcodex/shared/entries';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { getPublicId } from '#shared/entries.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 

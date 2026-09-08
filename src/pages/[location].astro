@@ -1,10 +1,11 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
+
 import LocationDetail from '#layouts/location-detail.astro';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createQueryLocationsEntryFunction } from '#lib/collections/locations/locations-utils.ts';
-import { getPublicId } from '#lib/utils/collections.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getLocationsCollection();

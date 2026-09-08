@@ -1,7 +1,5 @@
-import { openGraphImageFormat, openGraphBasePath } from '@spectralcodex/shared/constants';
-import * as R from 'remeda';
+import { getOpenGraphPath } from '@spectralcodex/shared/open-graph';
 
-import { openGraphImageFallbackCount, openGraphImageFallbackPrefix } from '#constants.ts';
 import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
 
 // Generate some common props for posts and post-like content
@@ -24,26 +22,11 @@ export function getSeoArticleProps({
 	};
 }
 
-// These fallback images should already exist in the public folder
-export function getSeoImageFallback() {
-	return getAbsoluteUrl(
-		getBasePath(
-			`${openGraphImageFallbackPrefix}-${String(R.randomInteger(1, openGraphImageFallbackCount))}.${openGraphImageFormat}`,
-		),
-	);
-}
-
-export function getSeoImageProps({ id, alt }: { id?: string; alt: string }) {
-	if (id) {
-		const filename = `${id.replace('/', '-')}.${openGraphImageFormat}`;
-
-		return {
-			url: getAbsoluteUrl(getBasePath(openGraphBasePath, filename)),
-			alt,
-		};
-	}
-
-	return { url: getSeoImageFallback(), alt };
+export function getSeoImageProps({ id, alt }: { id: string; alt: string }) {
+	return {
+		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
+		alt,
+	};
 }
 
 export function getSeoHideSearch(shouldHide: boolean | undefined) {

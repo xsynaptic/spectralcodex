@@ -1,11 +1,5 @@
 #!/usr/bin/env tsx
-import {
-	openGraphCacheNamespace,
-	openGraphImageFormat,
-	openGraphImageHeight,
-	openGraphImageWidth,
-	openGraphOutputPath,
-} from '@spectralcodex/shared/constants';
+import { openGraphOutputPath } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
@@ -14,15 +8,13 @@ import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
 import type { ImageBatch } from '#og-image/batch.ts';
-import type { OutputCacheStore } from '#og-image/output-cache.ts';
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 
-import { batchEntriesBySourceImage, getOutputCacheKey } from '#og-image/batch.ts';
+import { batchEntriesBySourceImage } from '#og-image/batch.ts';
 import { getBuiltEntries } from '#og-image/built-entries.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
-import { createOutputCache } from '#og-image/output-cache.ts';
-import { getFileCacheInstance } from '#shared/cache-file.ts';
+import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
 import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
 
 const rootPath = findWorkspaceRoot();
@@ -42,19 +34,12 @@ const { values } = parseArgs({
 			type: 'string',
 			default: openGraphOutputPath,
 		},
-		'cache-path': {
-			type: 'string',
-			default: './.cache',
-		},
 		'clear-cache': {
 			type: 'boolean',
 			default: false,
 		},
 	},
 });
-
-// Bump when the OG template (element.tsx) changes, to regenerate every card.
-const ogTemplateVersion = '2';
 
 // Resolve the readable source image path from the media path
 async function getSourceImagePath(imageId: string): Promise<string | undefined> {
@@ -81,20 +66,33 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 	}
 }
 
+function logSummary(counts: {
+	generated: number;
+	skipped: number;
+	pruned: number;
+	errors: number;
+}) {
+	console.log(chalk.magenta(`\n=== Summary ===`));
+	console.log(chalk.green(`Generated: ${String(counts.generated)} images`));
+	if (counts.skipped > 0) {
+		console.log(chalk.blue(`Skipped: ${String(counts.skipped)} (cached)`));
+	}
+	if (counts.pruned > 0) {
+		console.log(chalk.yellow(`Pruned: ${String(counts.pruned)} orphaned images`));
+	}
+	if (counts.errors > 0) {
+		console.log(chalk.red(`Errors: ${String(counts.errors)}`));
+	}
+}
+
 async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
 
+	const outputPath = path.resolve(rootPath, values['output-path']);
+
 	if (values['clear-cache']) {
-		const outputPath = path.resolve(rootPath, values['output-path']);
-		const cacheFile = path.resolve(
-			rootPath,
-			values['cache-path'],
-			`${openGraphCacheNamespace}.json`,
-		);
 		rmSync(outputPath, { force: true, recursive: true });
-		rmSync(cacheFile, { force: true });
-		console.log(chalk.yellow(`🗑️  Cleared OG image output and cache file`));
-		process.exit(0);
+		console.log(chalk.yellow(`🗑️  Cleared OG image output and manifest\n`));
 	}
 
 	console.log(chalk.blue('Loading fonts...'));
@@ -103,12 +101,7 @@ async function main() {
 
 	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
 
-	const renderCard = createRenderer({
-		fonts,
-		width: openGraphImageWidth,
-		height: openGraphImageHeight,
-		jpegQuality: 90, // High-quality output because platforms will re-encode
-	});
+	const renderCard = createRenderer({ fonts });
 
 	const { entries, unresolved } = await getBuiltEntries({
 		distPath: path.resolve(rootPath, values['dist-path']),
@@ -130,25 +123,9 @@ async function main() {
 
 	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
 
-	const outputPath = path.resolve(rootPath, values['output-path']);
-	const cachePath = path.resolve(rootPath, values['cache-path']);
-
 	safelyCreateDirectory(outputPath);
-	safelyCreateDirectory(cachePath);
 
-	const keyv = getFileCacheInstance(cachePath, openGraphCacheNamespace);
-	const store: OutputCacheStore = {
-		get: (id) => keyv.get<string>(id),
-		set: async (id, key) => {
-			await keyv.set(id, key);
-		},
-	};
-	const outputCache = createOutputCache({
-		dir: outputPath,
-		extension: openGraphImageFormat,
-		store,
-		version: ogTemplateVersion,
-	});
+	const outputCache = await createOutputCache(outputPath);
 
 	// Decoding is bounded by memory (a 3 MB buffer per slot), rendering by CPU
 	const decodeLimit = pLimit(10);
@@ -169,7 +146,7 @@ async function main() {
 				imageModifiedTime,
 			});
 
-			if (await outputCache.isFresh(entry.id, key)) {
+			if (outputCache.isFresh(entry.id, key)) {
 				skippedCount++;
 				continue;
 			}
@@ -198,12 +175,7 @@ async function main() {
 			return;
 		}
 
-		const image = await processImage({
-			imageInput: imagePath,
-			height: openGraphImageHeight,
-			width: openGraphImageWidth,
-			isFallback: batch.isFallback,
-		});
+		const image = await processImage({ imageInput: imagePath, isFallback: batch.isFallback });
 
 		await Promise.all(
 			stale.map(({ entry, key }) =>
@@ -229,14 +201,16 @@ async function main() {
 
 	await Promise.all(batches.map((batch) => decodeLimit(() => renderBatch(batch))));
 
-	console.log(chalk.magenta(`\n=== Summary ===`));
-	console.log(chalk.green(`Generated: ${String(generatedCount)} images`));
-	if (skippedCount > 0) {
-		console.log(chalk.blue(`Skipped: ${String(skippedCount)} (cached)`));
-	}
-	if (errorCount > 0) {
-		console.log(chalk.red(`Errors: ${String(errorCount)}`));
-	}
+	const prunedCount = await outputCache.prune(new Set(entries.map((entry) => entry.id)));
+
+	await outputCache.save();
+
+	logSummary({
+		generated: generatedCount,
+		skipped: skippedCount,
+		pruned: prunedCount,
+		errors: errorCount,
+	});
 	console.log(chalk.gray(`Output: ${outputPath}`));
 
 	if (errorCount > 0) process.exit(1);

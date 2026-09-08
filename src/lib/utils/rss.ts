@@ -3,6 +3,7 @@ import type { ContainerRenderOptions } from 'astro/container';
 import type { CollectionEntry } from 'astro:content';
 
 import mdxRenderer from '@astrojs/mdx/server.js';
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { defaultSchema, sanitizeHtml } from '@xsynaptic/unified-tools';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
@@ -13,7 +14,6 @@ import { millisecondsPerHour, siteTimezoneOffsetHours } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getPublicId } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';

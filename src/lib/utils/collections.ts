@@ -11,16 +11,6 @@ interface CollectionEntryWithEntryCount {
 	};
 }
 
-/**
- * Resolve the public-facing ID for a content entry
- * Locations with overrides return the override ID; all other entries return entry.id
- */
-export function getPublicId(entry: { id: string; data: Record<string, unknown> }): string {
-	const override = entry.data.override as { id?: string } | undefined;
-
-	return override?.id ?? entry.id;
-}
-
 // Sort a collection by entry count, from most to least
 export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA: T, entryB: T) {
 	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);

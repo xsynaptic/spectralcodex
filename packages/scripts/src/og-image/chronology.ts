@@ -1,9 +1,9 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { z } from 'zod';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { getPublicId } from '#shared/entries.ts';
 import { extractImageFeaturedIds } from '#shared/images.ts';
 
 /**

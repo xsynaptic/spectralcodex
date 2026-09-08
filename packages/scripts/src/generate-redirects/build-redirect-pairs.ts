@@ -1,4 +1,4 @@
-import { getPublicId } from '#shared/entries.ts';
+import { getPublicId } from '@spectralcodex/shared/entries';
 
 interface RedirectPair {
 	fromPath: string;

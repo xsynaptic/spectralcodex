@@ -9,8 +9,8 @@ export const openGraphBasePath = 'og';
 // Local build output directory for generated Open Graph images
 export const openGraphOutputPath = '.cache/og-image';
 
-// Keyv namespace (and JSON filename stem) for the Open Graph generation cache
-export const openGraphCacheNamespace = 'og-image-cache';
+// Freshness ledger, written beside the generated cards
+export const openGraphManifestFile = 'manifest.json';
 
 // `getViteConfig` scripts run Vite in serve mode, where Astro reads the store from `.astro`
 // Pointing the cache here is what makes `astro sync` and `astro build` write the file those scripts read

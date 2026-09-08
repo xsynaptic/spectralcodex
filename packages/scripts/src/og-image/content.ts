@@ -1,4 +1,6 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
+import { getPublicId } from '@spectralcodex/shared/entries';
+import { getOpenGraphId } from '@spectralcodex/shared/open-graph';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { z } from 'zod';
 
@@ -8,7 +10,7 @@ import type { RegionParentMap } from '#shared/entries.ts';
 
 import { getChronologyTitle } from '#og-image/chronology.ts';
 import { getFallbackImageId } from '#og-image/fallback.ts';
-import { getRegionParentsById, getPublicId, toReferenceIds } from '#shared/entries.ts';
+import { getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
 import { extractImageFeaturedIds } from '#shared/images.ts';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
@@ -35,7 +37,7 @@ function getImageFeaturedData({
 	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
 
 	if (chronologyImageIndex && collection === ContentCollectionsEnum.Chronology) {
-		const derivedImageId = chronologyImageIndex.get(getPublicId(entry).replace('/', '-'));
+		const derivedImageId = chronologyImageIndex.get(getOpenGraphId(getPublicId(entry)));
 
 		if (derivedImageId) return { imageFeaturedId: derivedImageId, isFallback: false };
 	}
@@ -124,7 +126,7 @@ export function toOpenGraphEntryItem({
 	regionParentMap?: RegionParentMap | undefined;
 	chronologyImageIndex?: Map<string, string> | undefined;
 }): OpenGraphEntryItem | undefined {
-	const id = getPublicId(entry).replace('/', '-');
+	const id = getOpenGraphId(getPublicId(entry));
 	const override = parseTitleOverride(collection, entry.data);
 	const title = resolveEntryTitle({ collection, id, data: entry.data, override });
 

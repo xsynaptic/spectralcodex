@@ -1,6 +1,7 @@
 import {
 	openGraphBasePath,
 	openGraphImageFormat,
+	openGraphManifestFile,
 	openGraphOutputPath,
 } from '@spectralcodex/shared/constants';
 import chalk from 'chalk';
@@ -44,6 +45,7 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 		config,
 		dryRun,
 		archive: 'av',
+		excludes: [openGraphManifestFile],
 		extraFlags: ['--checksum'],
 	});
 

@@ -30,16 +30,3 @@ export function batchEntriesBySourceImage(
 
 	return [...batches.values()];
 }
-
-// A card goes stale when its content, its source image, or the template changes
-export function getOutputCacheKey({
-	digest,
-	imageId,
-	imageModifiedTime,
-}: {
-	digest: string;
-	imageId: string;
-	imageModifiedTime: number | undefined;
-}): string {
-	return `${digest}:${imageId}:${String(imageModifiedTime ?? '')}`;
-}

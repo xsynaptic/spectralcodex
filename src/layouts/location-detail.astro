@@ -2,6 +2,7 @@
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
@@ -41,7 +42,6 @@ import {
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
-import { getPublicId } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';

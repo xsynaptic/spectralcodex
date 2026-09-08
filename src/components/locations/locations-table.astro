@@ -1,13 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
 import * as R from 'remeda';
 
 import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getPublicId } from '#lib/utils/collections.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {

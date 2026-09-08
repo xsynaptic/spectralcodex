@@ -1,6 +1,7 @@
+import { getPublicId } from '@spectralcodex/shared/entries';
+
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { getPublicId } from '#shared/entries.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface DuplicateIdIssue {

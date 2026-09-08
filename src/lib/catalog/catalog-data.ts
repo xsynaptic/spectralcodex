@@ -1,5 +1,6 @@
 import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
@@ -18,7 +19,6 @@ import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
-import { getPublicId } from '#lib/utils/collections.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 

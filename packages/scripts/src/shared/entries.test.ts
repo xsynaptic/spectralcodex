@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { getPublicId, getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
+import { getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
 
 describe('toReferenceIds', () => {
 	test('extracts ids from reference objects', () => {
@@ -22,18 +22,6 @@ describe('toReferenceIds', () => {
 		const references = [{ id: 'ruins' }, { collection: 'themes' }, undefined, 42, { id: 7 }];
 
 		expect(toReferenceIds(references)).toEqual(['ruins']);
-	});
-});
-
-describe('getPublicId', () => {
-	test('returns the entry id when there is no override', () => {
-		expect(getPublicId({ id: 'real-place', data: {} })).toBe('real-place');
-	});
-
-	test('returns the override id for an anonymized entry', () => {
-		expect(getPublicId({ id: 'real-place', data: { override: { id: 'anon-42' } } })).toBe(
-			'anon-42',
-		);
 	});
 });
 

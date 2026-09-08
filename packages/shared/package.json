@@ -6,7 +6,9 @@
 	"exports": {
 		"./collections": "./src/collections.ts",
 		"./constants": "./src/constants.ts",
+		"./entries": "./src/entries.ts",
 		"./map": "./src/map/index.ts",
+		"./open-graph": "./src/open-graph.ts",
 		"./schemas": "./src/schemas/index.ts",
 		"./sitemap": "./src/sitemap.ts",
 		"./text": "./src/text.ts"

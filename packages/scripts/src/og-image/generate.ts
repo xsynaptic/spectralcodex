@@ -1,5 +1,6 @@
 import type { Font } from 'takumi-js';
 
+import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
 import sharp from 'sharp';
 import { render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
@@ -10,6 +11,9 @@ import { getOpenGraphElement } from '#og-image/element.tsx';
 
 // A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
 const glyphCacheBytes = 64 * 1024 * 1024;
+
+// High-quality output because platforms will re-encode
+const jpegQuality = 90;
 
 // A vertical band as [start, end] fractions of the height
 type LuminanceZone = [start: number, end: number];
@@ -54,16 +58,17 @@ function zoneLuminance(
 // Raw RGBA hands off to Takumi without an encode, and luminance reads the same buffer
 export async function processImage({
 	imageInput,
-	height,
-	width,
 	isFallback,
 }: {
 	imageInput: string;
-	height: number;
-	width: number;
 	isFallback: boolean;
 }): Promise<ProcessedImage> {
-	const pipeline = sharp(imageInput).resize({ fit: 'cover', height, position: 'top', width });
+	const pipeline = sharp(imageInput).resize({
+		fit: 'cover',
+		height: openGraphImageHeight,
+		position: 'top',
+		width: openGraphImageWidth,
+	});
 
 	if (isFallback) {
 		pipeline.blur(16);
@@ -95,17 +100,7 @@ export async function probeLuminanceTop(imageInput: string): Promise<number> {
 }
 
 // Fonts and glyph outlines live on the renderer, so build one and reuse it for every card
-export function createRenderer({
-	fonts,
-	width,
-	height,
-	jpegQuality = 90,
-}: {
-	fonts: Array<Font>;
-	width: number;
-	height: number;
-	jpegQuality?: number;
-}) {
+export function createRenderer({ fonts }: { fonts: Array<Font> }) {
 	// Read when a cache is first used, so this has to run before the first render
 	setGlyphCacheMaxBytes(glyphCacheBytes);
 
@@ -118,10 +113,10 @@ export function createRenderer({
 		return render(getOpenGraphElement(entry, image), {
 			format: 'jpeg',
 			fonts,
-			height,
+			height: openGraphImageHeight,
 			quality: jpegQuality,
 			renderer,
-			width,
+			width: openGraphImageWidth,
 		});
 	};
 }
