@@ -139,6 +139,7 @@ export default defineConfig({
 			},
 		},
 		build: {
+			assetsInlineLimit: 1024,
 			rollupOptions: {
 				output: {
 					entryFileNames: 'js/a-[hash].js',
