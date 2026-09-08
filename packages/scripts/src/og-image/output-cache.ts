@@ -36,8 +36,8 @@ export async function createOutputCache(directory: string) {
 		},
 
 		// A card outlives the entry that asked for it; built HTML is the authority on what should exist
-		// An empty set means a stale or missing `dist/`, which must not read as "delete everything"
 		async prune(ids: Set<string>): Promise<number> {
+			// An empty set means a stale or missing `dist/`, never "delete everything"
 			if (ids.size === 0) return 0;
 
 			const suffix = `.${openGraphImageFormat}`;
@@ -90,8 +90,7 @@ export function getOutputCacheKey({
 	return [templateVersion, digest, imageId, imageModifiedTime ?? ''].join(':');
 }
 
-// A template edit restages every card, but the render is deterministic and most come out identical;
-// rewriting those bytes only churns the mtime the deploy syncs on
+// Rewriting identical bytes only churns the mtime the deploy syncs on
 async function hasChanged(target: string, data: Uint8Array): Promise<boolean> {
 	try {
 		const existing = await fs.readFile(target);
