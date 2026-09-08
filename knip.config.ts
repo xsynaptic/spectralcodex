@@ -9,8 +9,8 @@ export default {
 			// The inventory page is injected as a route under `astro dev`, never imported
 			entry: [
 				'src/components/mdx/*.astro',
-				'src/inventory/inventory.astro',
-				'src/inventory/inventory-og-image.ts',
+				'src/dev/inventory/inventory.astro',
+				'src/dev/inventory/inventory-og-image.ts',
 			],
 			ignore: [
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported

@@ -2,7 +2,7 @@ import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import { createRenderer, loadOpenGraphFonts, processImage } from '@spectralcodex/scripts/og-image';
 
-import { getSampleOpenGraphCards } from '#inventory/inventory-fixtures.ts';
+import { getSampleOpenGraphCards } from '#dev/inventory/inventory-fixtures.ts';
 
 // Fonts and glyph outlines live on the renderer, so build one and hold it for the dev server
 let renderCard: Promise<ReturnType<typeof createRenderer>> | undefined;

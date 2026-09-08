@@ -15,7 +15,7 @@ import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
-import inventory from '#inventory/inventory-integration.ts';
+import devInventory from '#dev/inventory/inventory-integration.ts';
 
 const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
 
@@ -227,7 +227,7 @@ export default defineConfig({
 			},
 		}),
 		buildLogger(),
-		inventory(),
+		devInventory(),
 	],
 	fonts: [
 		{

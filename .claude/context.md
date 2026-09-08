@@ -124,6 +124,6 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 ### Development
 
-**Inventory**: The dev-only page enumerating what the site is built from: every design token and every common component, rendered from its real source against fixture props. Injected at `/inventory` under `astro dev` only, from `src/inventory/`, and absent from the build. Descriptive, never normative: it records what the code renders rather than prescribing what it should. _Avoid_: design system, style guide, pattern library, kitchen sink, storybook.
+**Inventory**: The dev-only page enumerating what the site is built from: every design token and every common component, rendered from its real source against fixture props. Injected at `/inventory` under `astro dev` only, from `src/dev/inventory/`, and absent from the build. Descriptive, never normative: it records what the code renders rather than prescribing what it should. _Avoid_: design system, style guide, pattern library, kitchen sink, storybook.
 
 **Specimen**: One labeled entry in the Inventory: a single component or token set shown with its name, its source path, and an optional note. _Avoid_: example, demo, sample (a sample is the fixture data a Specimen renders with).

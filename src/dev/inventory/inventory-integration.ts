@@ -5,8 +5,8 @@ interface InventoryOptions {
 	route?: string;
 }
 
-export default function inventory({
-	entrypoint = './src/inventory/inventory.astro',
+export default function devInventory({
+	entrypoint = './src/dev/inventory/inventory.astro',
 	route = '/inventory',
 }: InventoryOptions = {}): AstroIntegration {
 	return {
@@ -16,11 +16,11 @@ export default function inventory({
 
 				injectRoute({ entrypoint, pattern: route });
 				injectRoute({
-					entrypoint: './src/inventory/inventory-og-image.ts',
+					entrypoint: './src/dev/inventory/inventory-og-image.ts',
 					pattern: `${route}/og/[key].jpg`,
 				});
 			},
 		},
-		name: 'inventory',
+		name: 'dev-inventory',
 	};
 }
