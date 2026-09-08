@@ -4,7 +4,7 @@ Spectral Codex is a long-form, photo-heavy digital garden: an Astro SSG monorepo
 
 Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, etc.) is defined in `.claude/context.md`. Read it before naming anything or writing user-facing copy.
 
-Avoid adding anything to this file unless it is important and relevant.
+Avoid adding anything to this file unless it is something important agents wouldn't already infer from the codebase.
 
 ## Commands
 
