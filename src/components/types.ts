@@ -36,6 +36,15 @@ export type DividerContent = 'chevron' | 'dot' | 'slash';
 
 export type DividerWeight = 'thin';
 
+export const NoticeBoxSeverityEnum = {
+	Info: 'info',
+	Success: 'success',
+	Warning: 'warning',
+	Error: 'error',
+} as const;
+
+export type NoticeBoxSeverity = (typeof NoticeBoxSeverityEnum)[keyof typeof NoticeBoxSeverityEnum];
+
 // Preview display options
 export interface PreviewOptions {
 	showCollection?: boolean | undefined;

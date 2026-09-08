@@ -93,7 +93,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 				</a>
 			</ImagePlaceholder>
 		) : (
-			<div class="aspect-3/2 w-full rounded-xs bg-fallback text-sm text-transparent shadow-inner" />
+			<div class="aspect-3/2 w-full rounded-xs border border-primary-300 bg-fallback text-sm text-transparent shadow-inner dark:border-primary-700" />
 		)
 	}
 	<TitleTag class="card-title">

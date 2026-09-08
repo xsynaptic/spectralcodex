@@ -1,17 +1,19 @@
 ---
+import type { NoticeBoxSeverity } from '#components/types.ts';
+
 import NoticeBox from '#components/parts/notice-box.astro';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
-	notices: Array<{ text: string; textAlt: string | undefined }>;
+	notices: Array<{ text: string; textAlt: string | undefined; severity: NoticeBoxSeverity }>;
 }
 
 const { notices } = Astro.props;
 ---
 
 {
-	notices.map(({ text, textAlt }) => (
-		<NoticeBox severity="warning">
+	notices.map(({ text, textAlt, severity }) => (
+		<NoticeBox severity={severity}>
 			<Fragment set:html={renderMarkdownInline(text)} />
 			{textAlt ? <Fragment set:html={renderMarkdownInline(textAlt)} /> : undefined}
 		</NoticeBox>

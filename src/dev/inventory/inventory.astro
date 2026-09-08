@@ -23,7 +23,6 @@ import MainSite from '#components/main/main-site.astro';
 import MapComponent from '#components/map/map-component.astro';
 import ImgGroup from '#components/mdx/img-group.astro';
 import Img from '#components/mdx/img.astro';
-import ActivityGraph from '#components/parts/activity-graph.astro';
 import Anchor from '#components/parts/anchor.astro';
 import AuthorCard from '#components/parts/author-card.astro';
 import CardFrame from '#components/parts/card-frame.astro';
@@ -58,10 +57,10 @@ import SectionAuthor from '#components/sections/section-author.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
 import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
-import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SeriesSection from '#components/series/series-section.astro';
 import ThemesList from '#components/themes/themes-list.astro';
+import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import {
 	createSampleActivityValues,
@@ -259,7 +258,7 @@ const washColorsFeatured = ['primary-featured', 'accent-featured'] as const;
 
 const datePresets = Object.values(DatePresetEnum);
 
-const noticeSeverities = ['default', 'success', 'info', 'warning', 'error'] as const;
+const noticeSeverities = Object.values(NoticeBoxSeverityEnum);
 
 const dividerContents = ['slash', 'chevron', 'dot'] as const;
 
@@ -372,22 +371,37 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					}
 				</div>
 			</Specimen>
-			<Specimen name="Background utilities" source="styles/main/parts/utilities.css">
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{
-						backgroundUtilities.map((utility) => (
-							<div>
-								<div
-									class:list={[
-										'h-24 rounded-xs border border-primary-300 dark:border-primary-700',
-										utility.name,
-									]}
-								/>
-								<div class={`mt-1 ${captionClass}`}>{utility.name}</div>
-								<div class="text-xs text-primary-500 dark:text-primary-400">{utility.note}</div>
-							</div>
-						))
-					}
+			<Specimen
+				name="Background utilities"
+				note="Every swatch sits over the same image, because the three gradients only ever resolve against one. Hide it to read a fade on its own; the two opaque utilities cover it either way."
+				source="styles/main/parts/utilities.css"
+			>
+				<div class="group flex flex-col gap-4">
+					<label
+						class="flex w-fit items-center gap-2 text-xs text-primary-500 dark:text-primary-400"
+					>
+						<input class="accent-accent-600" type="checkbox" />
+						Hide the image
+					</label>
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{
+							backgroundUtilities.map((utility) => (
+								<div>
+									<div class="relative h-24 overflow-clip rounded-xs border border-primary-300 dark:border-primary-700">
+										{sampleImage ? (
+											<Image
+												{...sampleImage.imageProps}
+												class="absolute inset-0 h-full group-has-checked:opacity-0"
+											/>
+										) : undefined}
+										<div class:list={['absolute inset-0', utility.name]} />
+									</div>
+									<div class={`mt-1 ${captionClass}`}>{utility.name}</div>
+									<div class="text-xs text-primary-500 dark:text-primary-400">{utility.note}</div>
+								</div>
+							))
+						}
+					</div>
 				</div>
 			</Specimen>
 			<Specimen
@@ -664,7 +678,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 							</NoticeBox>
 						))
 					}
-					<NoticeBox showIcon={false}>No icon rail on this one.</NoticeBox>
 				</div>
 			</Specimen>
 			<Specimen
@@ -702,27 +715,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				<div class="flex flex-col gap-4">
 					<PaginationSelect page={samplePageFirst} />
 					<PaginationSelect page={samplePageMiddle} />
-				</div>
-			</Specimen>
-			<Specimen
-				bleed={true}
-				name="activity-graph"
-				note="Log-scaled bins, so one huge day cannot flatten the rest. Days after today are an empty future state."
-				source="components/parts/activity-graph.astro"
-			>
-				<div class="content-column-fill">
-					<div class="px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
-						<ActivityGraph
-							ariaLabel={`Sample activity across ${sampleYear}`}
-							values={sampleActivityValues}
-							year={sampleYear}
-						>
-							<div class="flex flex-wrap gap-x-1">
-								<DividedItem>Fixture data, not the Chronology</DividedItem>
-								<DividedItem>{sampleYear}</DividedItem>
-							</div>
-						</ActivityGraph>
-					</div>
 				</div>
 			</Specimen>
 		</Section>
@@ -1057,14 +1049,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 		>
 			<Specimen
 				bleed={true}
-				name="section-previews"
-				note="The body of every listing route."
-				source="components/sections/section-previews.astro"
-			>
-				<SectionPreviews page={samplePageMiddle} sectionTitle="Recent Updates" />
-			</Specimen>
-			<Specimen
-				bleed={true}
 				name="section-preview-list"
 				source="components/sections/section-preview-list.astro"
 			>
@@ -1252,7 +1236,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="locations-notices"
-				note="The only <code>notice-box warning</code> caller. All three stack here; a Location's own data can trigger at most two."
+				note="The only <code>notice-box</code> caller: danger raises a <code>warning</code>, vanished and low quality stay <code>info</code>. All three stack here; a Location's own data can trigger at most two."
 				source="components/locations/locations-notices.astro"
 			>
 				<div class="content-column flex flex-col gap-2">

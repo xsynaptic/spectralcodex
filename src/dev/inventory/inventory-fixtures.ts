@@ -16,6 +16,7 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 import { getRegionsDivisionSvgContent } from '#components/regions/regions-division.ts';
+import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
@@ -147,13 +148,20 @@ export async function getSampleRelatedRegion() {
 // Every designation at once; a Location carries one or two, and the record is the closed set
 export const sampleHeritage = LocationTwHeritageSchema.options satisfies Array<LocationTwHeritage>;
 
-// All three warnings stacked; a Location's own data can only ever trigger two of them at once
+// All three notices stacked; a Location's own data can only ever trigger two of them at once
 export function createSampleNotices() {
 	const t = getTranslations();
+
+	const severities = {
+		'notice.vanished': NoticeBoxSeverityEnum.Info,
+		'notice.danger': NoticeBoxSeverityEnum.Warning,
+		'notice.quality': NoticeBoxSeverityEnum.Info,
+	} as const;
 
 	return (['notice.vanished', 'notice.danger', 'notice.quality'] as const).map((key) => ({
 		text: t(key),
 		textAlt: t(key, LanguageCodeEnum.ChineseTraditional),
+		severity: severities[key],
 	}));
 }
 

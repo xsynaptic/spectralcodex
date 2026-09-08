@@ -174,9 +174,8 @@ const translationStrings = {
 		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
 		'notice.vanished': `**Note**: this location has vanished. Any information presented here is only for reference.`,
 		'notice.quality': `**Note**: this entry contains only basic information and may be out of date, inaccurate, or even wrong. Additional research is strongly recommended.`,
-		'notice.severity.default': 'Note:',
-		'notice.severity.success': 'Success:',
 		'notice.severity.info': 'Info:',
+		'notice.severity.success': 'Success:',
 		'notice.severity.warning': 'Warning:',
 		'notice.severity.error': 'Error:',
 
