@@ -1,6 +1,4 @@
 ---
-import type { ComponentProps } from 'astro/types';
-
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
 
 import ChronologyActivity from '#components/chronology/chronology-activity.astro';
@@ -147,7 +145,7 @@ const samplePageMiddle = createSamplePage({ items: sampleItems, currentPage: 3, 
 
 const sampleYear = String(new Date().getUTCFullYear());
 const sampleActivityValues = createSampleActivityValues(sampleYear);
-const sampleDailyData = createSampleDailyData(sampleYear);
+const sampleDailyData = createSampleDailyData(sampleActivityValues);
 const sampleNotices = createSampleNotices();
 const sampleChronologyYear = sampleChronologyYears.at(-1) ?? sampleYear;
 const sampleChronologyMonth = sampleChronologyMonths[1];
@@ -248,50 +246,35 @@ const backgroundUtilities = [
 	{ name: 'bg-header-fade', note: 'Header scrim; swaps lightness in dark mode' },
 ];
 
-type AnchorColor = NonNullable<ComponentProps<typeof Anchor>['anchorColor']>;
+const anchorColorsOnLight = ['accent', 'highlight', 'primary', 'title'] as const;
 
-const anchorColorsOnLight = [
-	'accent',
-	'highlight',
-	'primary',
-	'title',
-] satisfies Array<AnchorColor>;
+const anchorColorOnDark = 'primary-bright';
 
-const anchorColorOnDark = 'primary-bright' satisfies AnchorColor;
+const washColorsOnLight = ['primary', 'accent', 'highlight'] as const;
 
-type WashColor = NonNullable<ComponentProps<typeof TextWash>['washColor']>;
-
-const washColorsOnLight = ['primary', 'accent', 'highlight'] as const satisfies Array<WashColor>;
-
-const washColorsOnDark = [
-	'primary-bright',
-	'accent-bright',
-	'highlight-bright',
-] as const satisfies Array<WashColor>;
+const washColorsOnDark = ['primary-bright', 'accent-bright', 'highlight-bright'] as const;
 
 // Both featured variants swap at sm, so they are shown on the ground they resolve to above it
-const washColorsFeatured = [
-	'primary-featured',
-	'accent-featured',
-] as const satisfies Array<WashColor>;
+const washColorsFeatured = ['primary-featured', 'accent-featured'] as const;
 
 const datePresets = Object.values(DatePresetEnum);
 
-type NoticeSeverity = NonNullable<ComponentProps<typeof NoticeBox>['severity']>;
+const noticeSeverities = ['default', 'success', 'info', 'warning', 'error'] as const;
 
-const noticeSeverities = [
-	'default',
-	'success',
-	'info',
-	'warning',
-	'error',
-] as const satisfies Array<NoticeSeverity>;
-
-type DividerContent = NonNullable<ComponentProps<typeof DividedItem>['dividerContent']>;
-
-const dividerContents = ['slash', 'chevron', 'dot'] as const satisfies Array<DividerContent>;
+const dividerContents = ['slash', 'chevron', 'dot'] as const;
 
 const imageLayouts = Object.values(ImageLayoutEnum);
+
+const imageGroupContexts = [
+	{
+		context: ImageContextEnum.Grid,
+		note: 'The column count derives from the image count; the satteri plugin normally injects both props.',
+	},
+	{
+		context: ImageContextEnum.Carousel,
+		note: 'Navigation stays visible at every width, unlike the generic carousel.',
+	},
+];
 
 const captionClass = 'font-mono text-xs text-primary-500 dark:text-primary-400';
 
@@ -779,7 +762,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						<Specimen
 							bleed={true}
 							name="content-image"
-							note="The caption doubles as the alt text when no <code>alt</code> is given."
+							note="The caption doubles as the alt text when no <code>alt</code> is given; the portrait frame takes its ratio from the Image's own dimensions rather than snapping to 3:2."
 							source="components/content/content-image.astro"
 						>
 							<Prose showBlocks={true}>
@@ -792,15 +775,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 										</ContentImage>
 									);
 								})}
-							</Prose>
-						</Specimen>
-						<Specimen
-							bleed={true}
-							name="content-image (portrait)"
-							note="The frame takes its aspect ratio from the Image's own dimensions rather than snapping to 3:2."
-							source="components/content/content-image.astro"
-						>
-							<Prose showBlocks={true}>
 								{sampleImages.portrait ? (
 									<ContentImage imageId={sampleImages.portrait.id} showMetadata={false}>
 										A portrait frame, measured from the source dimensions
@@ -837,50 +811,24 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 								<ImageMetadata entry={sampleImage.entry} />
 							</ImagePlaceholder>
 						</Specimen>
-						<Specimen
-							bleed={true}
-							name="mdx/img-group (grid)"
-							note="The column count derives from the image count; the satteri plugin normally injects both props."
-							source="components/mdx/img-group.astro"
-						>
-							<Prose showBlocks={true}>
-								<ImgGroup
-									context={ImageContextEnum.Grid}
-									imageCount={sampleImages.landscape.length}
-								>
-									{sampleImages.landscape.map((entry) => (
-										<ContentImage
-											context={ImageContextEnum.Grid}
-											imageId={entry.id}
-											showMetadata={false}
-										/>
-									))}
-								</ImgGroup>
-							</Prose>
-						</Specimen>
-						<Specimen
-							bleed={true}
-							name="mdx/img-group (carousel)"
-							note="Navigation stays visible at every width, unlike the generic carousel."
-							source="components/mdx/img-group.astro"
-						>
-							<Prose showBlocks={true}>
-								<ImgGroup
-									context={ImageContextEnum.Carousel}
-									imageCount={sampleImages.landscape.length}
-								>
-									{sampleImages.landscape.map((entry) => (
-										<ContentImage
-											context={ImageContextEnum.Carousel}
-											imageId={entry.id}
-											showMetadata={false}
-										>
-											{entry.data.title}
-										</ContentImage>
-									))}
-								</ImgGroup>
-							</Prose>
-						</Specimen>
+						{imageGroupContexts.map(({ context, note }) => (
+							<Specimen
+								bleed={true}
+								name={`mdx/img-group (${context})`}
+								note={note}
+								source="components/mdx/img-group.astro"
+							>
+								<Prose showBlocks={true}>
+									<ImgGroup context={context} imageCount={sampleImages.landscape.length}>
+										{sampleImages.landscape.map((entry) => (
+											<ContentImage context={context} imageId={entry.id} showMetadata={false}>
+												{context === ImageContextEnum.Carousel ? entry.data.title : undefined}
+											</ContentImage>
+										))}
+									</ImgGroup>
+								</Prose>
+							</Specimen>
+						))}
 						<Specimen
 							bleed={true}
 							name="image-carousel"

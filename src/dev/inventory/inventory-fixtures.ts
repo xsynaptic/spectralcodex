@@ -45,16 +45,12 @@ async function getSampleFeaturedImageIds() {
 	const [themes, regions] = await Promise.all([getThemesCollection(), getRegionsCollection()]);
 
 	return [...themes.entries, ...regions.entries]
-		.map((entry) => {
-			const { imageFeatured } = entry.data;
-
-			return {
-				ids: Array.isArray(imageFeatured)
-					? imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
-					: [],
-				entryQuality: entry.data.entryQuality,
-			};
-		})
+		.map((entry) => ({
+			ids: Array.isArray(entry.data.imageFeatured)
+				? entry.data.imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
+				: [],
+			entryQuality: entry.data.entryQuality,
+		}))
 		.sort(
 			(candidateA, candidateB) =>
 				candidateB.ids.length - candidateA.ids.length ||
@@ -222,7 +218,7 @@ export function createSampleImageFeaturedGroup(entries: Array<CollectionEntry<'i
 		hero: true,
 		id: entry.id,
 		caption: {
-			title: sampleCaptions[index % sampleCaptions.length] ?? entry.data.title,
+			title: sampleCaptions[index] ?? entry.data.title,
 			titleMultilingual: index === 0 ? sampleTitleChinese : undefined,
 			url: getSampleUrl('image-hero'),
 		},
@@ -446,11 +442,10 @@ export function createSampleActivityValues(year: string) {
 }
 
 // Each day's total split three ways, so the activity totals line reads as three distinct counts
-export function createSampleDailyData(year: string) {
+export function createSampleDailyData(values: Record<string, number>) {
 	const dailyData: Record<string, ChronologyDailyCounts> = {};
-	const totals = Object.entries(createSampleActivityValues(year));
 
-	for (const [dayKey, total] of totals) {
+	for (const [dayKey, total] of Object.entries(values)) {
 		const visited = Math.floor(total / 3);
 		const updated = Math.floor((total - visited) / 2);
 
