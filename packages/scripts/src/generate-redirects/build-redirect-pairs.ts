@@ -1,4 +1,5 @@
 import { getPublicId } from '@spectralcodex/shared/entries';
+import { getOpenGraphId } from '@spectralcodex/shared/open-graph';
 
 interface RedirectPair {
 	fromPath: string;
@@ -39,7 +40,10 @@ function getEntryRedirects(entry: RedirectableEntry) {
 
 		redirects.push(
 			{ fromPath: getEntryPath(prefix, formerId), toPath: getEntryPath(prefix, canonicalId) },
-			{ fromPath: `/og/${formerId}.jpg`, toPath: `/og/${canonicalId}.jpg` },
+			{
+				fromPath: `/og/${getOpenGraphId(formerId)}.jpg`,
+				toPath: `/og/${getOpenGraphId(canonicalId)}.jpg`,
+			},
 		);
 	}
 
