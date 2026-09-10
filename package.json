@@ -1,9 +1,9 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.23.0",
+	"version": "7.24.0",
 	"scripts": {
 		"build": "astro check && astro build",
-		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
+		"check": "stylelint \"{src,packages}/**/*.{css,astro}\" --cache --cache-location node_modules/.cache/stylelint/ && prettier --check . --cache --log-level warn && eslint --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip && vitest run",
 		"check-content": "mdxlint-content packages/content --root-path=$PWD",
 		"check-content-demo": "mdxlint-content packages/content-demo --root-path=$PWD",
 		"check-links": "pnpm -F @spectralcodex/scripts check-links",
@@ -16,7 +16,7 @@
 		"deploy-og": "pnpm -F @spectralcodex/scripts deploy-og",
 		"deploy-site": "pnpm -F @spectralcodex/scripts deploy-site",
 		"dev": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.development ./packages/scripts/src/dev-server/index.ts",
-		"fix": "stylelint \"{src,packages}/**/*.{css,astro}\" --fix --cache --cache-location node_modules/.cache/stylelint/ && prettier --write . --cache && eslint --fix --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip",
+		"fix": "stylelint \"{src,packages}/**/*.{css,astro}\" --fix --cache --cache-location node_modules/.cache/stylelint/ && prettier --write . --cache --list-different && eslint --fix --cache --cache-location node_modules/.cache/eslint/ && astro check && tsc --noEmit --extendedDiagnostics && knip",
 		"fix-content": "mdxlint-content packages/content --fix --root-path=$PWD",
 		"fix-content-demo": "mdxlint-content packages/content-demo --fix --root-path=$PWD",
 		"generate-redirects": "pnpm -F @spectralcodex/scripts generate-redirects",
