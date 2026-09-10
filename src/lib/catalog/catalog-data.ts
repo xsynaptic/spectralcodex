@@ -51,7 +51,8 @@ async function getRegionPrimaryIdFunction() {
 	};
 }
 
-// Content links count
+// Counts only; check-links owns the URL-capturing twin and the two agree on every entry
+// Escaped parens truncate a match without splitting it, so a truncated URL cannot skew the count
 function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
 	let linksExternalCount = 0;
 
@@ -59,7 +60,7 @@ function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
 		linksExternalCount += entry.data.links?.length ?? 0;
 	}
 	if (entry.body) {
-		linksExternalCount += (entry.body.match(/\[[^\]]*\]\(https?:\/\/[^)]+\)/g) ?? []).length;
+		linksExternalCount += (entry.body.match(/(?<!!)\[[^\]]*\]\(https?:\/\/[^)]+\)/g) ?? []).length;
 	}
 	return linksExternalCount;
 }

@@ -19,6 +19,7 @@ export function toReferenceIds(value: unknown): Array<string> {
 	return ids;
 }
 
+// Scripts-only on purpose; the app derives ancestry from its nested-set Hierarchy over enriched collections
 // Ancestors from root down to the region itself: [0] = root, [last] = regionId
 export function getRegionParentsById(
 	regionId: string | undefined,
