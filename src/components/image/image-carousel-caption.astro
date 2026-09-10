@@ -26,59 +26,57 @@ const t = getTranslations();
 // TODO: allow caption to be positioned at the top of the image?
 ---
 
-{
-	title ? (
+{title ? (
+	<div
+		class:list={[
+			'bg-gradient-b',
+			'pointer-events-none absolute right-0 bottom-0 left-0 z-image-caption mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
+			// Note: the min-height spreads the background gradient
+			isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
+		]}
+		data-pagefind-ignore
+		{...props}
+	>
 		<div
 			class:list={[
-				'bg-gradient-b',
-				'pointer-events-none absolute right-0 bottom-0 left-0 z-image-caption mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
-				// Note: the min-height spreads the background gradient
-				isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
+				'text-primary-300',
+				'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm',
+				isHero && !withTitle ? 'md:px-8' : undefined,
+				withTitle ? 'w-full px-4 sm:max-w-[70%] sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
 			]}
-			data-pagefind-ignore
-			{...props}
 		>
-			<div
-				class:list={[
-					'text-primary-300',
-					'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm',
-					isHero && !withTitle ? 'md:px-8' : undefined,
-					withTitle ? 'w-full px-4 sm:max-w-[70%] sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
-				]}
-			>
+			<span
+				class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}
+				set:html={t('content.meta.imageFeatured.label')}
+			/>
+			{url ? (
+				<Anchor
+					href={url}
+					anchorColor="primary-bright"
+					class:list={[
+						'truncate font-medium sm:font-semibold',
+						withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
+					]}
+				>
+					{title}
+				</Anchor>
+			) : (
 				<span
-					class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}
-					set:html={t('content.meta.imageFeatured.label')}
+					class:list={[
+						'truncate font-medium sm:font-semibold',
+						withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
+					]}
+				>
+					{title}
+				</span>
+			)}
+			{titleMultilingual ? (
+				<TextMultilingual
+					content={titleMultilingual}
+					class:list={[withTitle ? 'block shrink-0 sm:hidden md:block' : undefined]}
+					parenthesis={true}
 				/>
-				{url ? (
-					<Anchor
-						href={url}
-						anchorColor="primary-bright"
-						class:list={[
-							'truncate font-medium sm:font-semibold',
-							withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
-						]}
-					>
-						{title}
-					</Anchor>
-				) : (
-					<span
-						class:list={[
-							'truncate font-medium sm:font-semibold',
-							withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
-						]}
-					>
-						{title}
-					</span>
-				)}
-				{titleMultilingual ? (
-					<TextMultilingual
-						content={titleMultilingual}
-						class:list={[withTitle ? 'block shrink-0 sm:hidden md:block' : undefined]}
-						parenthesis={true}
-					/>
-				) : undefined}
-			</div>
+			) : undefined}
 		</div>
-	) : undefined
-}
+	</div>
+) : undefined}
