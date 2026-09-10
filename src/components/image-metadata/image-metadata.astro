@@ -17,28 +17,33 @@ const t = getTranslations();
 ---
 
 <div class="meta-overlay" data-pagefind-ignore {...props}>
-	<button
-		class="meta-show"
-		aria-label={t('collection.images.metadata.title')}
-		data-umami-event="image-metadata-open"
-		data-umami-event-image={entry.id}
-	>
-		<span class="meta-show-icon">
-			<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
-				<use href="#icon:eye-open"></use>
-			</svg>
-		</span>
+	<details class="meta-details">
+		<summary
+			class="meta-show"
+			aria-label={t('collection.images.metadata.title')}
+			data-umami-event="image-metadata-open"
+			data-umami-event-image={entry.id}
+		>
+			<span class="meta-show-icon">
+				<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
+					<use href="#icon:eye-open"></use>
+				</svg>
+			</span>
+			<span class="meta-close-icon">
+				<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
+					<use href="#icon:eye-closed"></use>
+				</svg>
+			</span>
+		</summary>
 		<span class="meta-panel">
 			<span class="meta-grid">
 				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.dateCreated.label')}
 					</Fragment>
-					{
-						entry.data.dateCreated ? (
-							<DateDisplay date={entry.data.dateCreated} datePreset={DatePresetEnum.Long} />
-						) : undefined
-					}
+					{entry.data.dateCreated ? (
+						<DateDisplay date={entry.data.dateCreated} datePreset={DatePresetEnum.Long} />
+					) : undefined}
 				</ImageMetadataItem>
 				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
@@ -56,13 +61,11 @@ const t = getTranslations();
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.aperture.label')}
 					</Fragment>
-					{
-						entry.data.aperture ? (
-							<>
-								<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
-							</>
-						) : undefined
-					}
+					{entry.data.aperture ? (
+						<>
+							<em>&#402;</em>&#8202;/&#8202;{entry.data.aperture}
+						</>
+					) : undefined}
 				</ImageMetadataItem>
 				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
@@ -86,31 +89,22 @@ const t = getTranslations();
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.exposureValue.label')}
 					</Fragment>
-					{
-						entry.data.exposureValue ? (
-							<>
-								{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
-								{t('collection.images.metadata.ev.label')}
-							</>
-						) : undefined
-					}
+					{entry.data.exposureValue ? (
+						<>
+							{Number(entry.data.exposureValue).toFixed(1)}&nbsp;
+							{t('collection.images.metadata.ev.label')}
+						</>
+					) : undefined}
 				</ImageMetadataItem>
 				<ImageMetadataItem class="meta-span-2">
-					<Fragment slot="image-metadata-item-title"
-						>{t('collection.images.metadata.sourceDimensions.label')}</Fragment
-					>
+					<Fragment slot="image-metadata-item-title">
+						{t('collection.images.metadata.sourceDimensions.label')}
+					</Fragment>
 					<Fragment
 						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
 					/>
 				</ImageMetadataItem>
 			</span>
 		</span>
-	</button>
-	<button class="meta-close" aria-label={t('collection.images.metadata.close.title')}
-		><span class="meta-close-icon">
-			<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
-				<use href="#icon:eye-closed"></use>
-			</svg>
-		</span></button
-	>
+	</details>
 </div>

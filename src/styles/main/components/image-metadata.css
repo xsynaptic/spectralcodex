@@ -1,4 +1,4 @@
-/* Per-image EXIF overlay; hook prefix: meta-; pure-CSS focus-within state machine (no JS) */
+/* Per-image EXIF overlay; hook prefix: meta- */
 .meta-overlay {
 	position: absolute;
 	inset: 0;
@@ -6,8 +6,13 @@
 }
 
 .meta-show {
+	list-style: none;
 	opacity: 0.8;
 	transition: opacity 300ms var(--default-transition-timing-function) 200ms;
+
+	&::-webkit-details-marker {
+		display: none;
+	}
 
 	&:focus {
 		opacity: 1;
@@ -28,25 +33,48 @@
 	}
 }
 
-.meta-show-icon {
+/* Desktop idles the summary at opacity 0; the close icon inside it has to survive that while open */
+.meta-details[open] .meta-show {
+	opacity: 1;
+}
+
+.meta-show-icon,
+.meta-close-icon {
 	position: absolute;
 	right: 0;
 	bottom: 0;
-	z-index: var(--z-index-meta);
 	padding: calc(var(--spacing) * 2);
-	color: var(--color-primary-50);
 	cursor: pointer;
+}
+
+.meta-show-icon {
+	z-index: var(--z-index-meta);
+	color: var(--color-primary-50);
 	transition: opacity 200ms var(--default-transition-timing-function);
 	transition-delay: 500ms;
 }
 
-.meta-show:focus-within .meta-show-icon {
+.meta-close-icon {
+	z-index: calc(var(--z-index-meta) + 1);
+	color: light-dark(var(--color-accent-700), var(--color-accent-400));
 	pointer-events: none;
 	opacity: 0;
-	transition-delay: 100ms;
+	transition: opacity 100ms var(--default-transition-timing-function);
 }
 
-/* Slides in from the right on focus-within; sizes the EXIF grid's query container */
+.meta-details[open] {
+	& .meta-show-icon {
+		pointer-events: none;
+		opacity: 0;
+		transition-delay: 100ms;
+	}
+
+	& .meta-close-icon {
+		pointer-events: auto;
+		opacity: 1;
+	}
+}
+
 .meta-panel {
 	position: absolute;
 	inset: 0;
@@ -60,10 +88,7 @@
 	font-family: var(--font-sans);
 	pointer-events: none;
 	opacity: 0;
-	translate: 100% 0;
-	transition:
-		opacity 200ms var(--default-transition-timing-function) 100ms,
-		translate 0ms var(--default-transition-timing-function) 300ms;
+	transition: opacity 200ms var(--default-transition-timing-function);
 
 	@media (width >= 40rem) {
 		border-bottom-right-radius: var(--radius-xs);
@@ -71,10 +96,14 @@
 	}
 }
 
-.meta-show:focus-within .meta-panel {
+.meta-details[open] .meta-panel {
 	pointer-events: auto;
 	opacity: 1;
-	translate: 0;
+}
+
+/* A closed details element skips its content; hold it rendered so the panel can fade out */
+.meta-details::details-content {
+	transition: content-visibility 200ms allow-discrete;
 }
 
 /* EXIF grid; columns track the panel's own width via container queries */
@@ -102,30 +131,6 @@
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 		gap: calc(var(--spacing) * 4);
 	}
-}
-
-/* Close button: sibling of show; clicking it moves focus out of show, collapsing the panel via :focus-within */
-.meta-close {
-	pointer-events: none;
-	opacity: 0;
-	transition-timing-function: var(--default-transition-timing-function);
-	transition-duration: 100ms;
-	transition-property: opacity;
-}
-
-.meta-show:focus-within ~ .meta-close {
-	pointer-events: auto;
-	opacity: 1;
-}
-
-.meta-close-icon {
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	z-index: calc(var(--z-index-meta) + 1);
-	padding: calc(var(--spacing) * 2);
-	color: light-dark(var(--color-accent-700), var(--color-accent-400));
-	cursor: pointer;
 }
 
 .meta-svg {
