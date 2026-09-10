@@ -225,9 +225,14 @@ button.maplibregl-popup-close-button {
 	transition: color 300ms;
 }
 
-.map-popup-coord:hover .map-popup-coord-text,
 .map-popup-coord:focus-visible .map-popup-coord-text {
 	color: var(--map-color-highlight-300);
+}
+
+@media (hover: hover) {
+	.map-popup-coord:hover .map-popup-coord-text {
+		color: var(--map-color-highlight-300);
+	}
 }
 
 .map-popup-copy-icon {
@@ -236,9 +241,14 @@ button.maplibregl-popup-close-button {
 	transition: color 300ms;
 }
 
-.map-popup-coord:hover .map-popup-copy-icon,
 .map-popup-coord:focus-visible .map-popup-copy-icon {
 	color: var(--map-color-highlight-400);
+}
+
+@media (hover: hover) {
+	.map-popup-coord:hover .map-popup-copy-icon {
+		color: var(--map-color-highlight-400);
+	}
 }
 
 .map-popup-links {
@@ -278,18 +288,28 @@ button.maplibregl-popup-close-button {
 	transition: background-color 150ms;
 }
 
-.map-filter-menu-item:hover,
 .map-filter-menu-item:focus-visible {
 	background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
+}
+
+@media (hover: hover) {
+	.map-filter-menu-item:hover {
+		background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
+	}
 }
 
 .map-filter-menu-item-active {
 	background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-800));
 }
 
-.map-filter-menu-item-active:hover,
 .map-filter-menu-item-active:focus-visible {
 	background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+}
+
+@media (hover: hover) {
+	.map-filter-menu-item-active:hover {
+		background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+	}
 }
 
 .map-filter-button {
@@ -361,9 +381,14 @@ button.maplibregl-popup-close-button {
 	transition: color 200ms;
 }
 
-.map-filter-star-empty:hover,
 .map-filter-star-empty:focus-visible {
 	color: var(--map-color-highlight-300);
+}
+
+@media (hover: hover) {
+	.map-filter-star-empty:hover {
+		color: var(--map-color-highlight-300);
+	}
 }
 
 .map-filter-star-filled {
@@ -373,9 +398,14 @@ button.maplibregl-popup-close-button {
 	transition: color 200ms;
 }
 
-.map-filter-star-filled:hover,
 .map-filter-star-filled:focus-visible {
 	color: var(--map-color-highlight-300);
+}
+
+@media (hover: hover) {
+	.map-filter-star-filled:hover {
+		color: var(--map-color-highlight-300);
+	}
 }
 
 .map-filter-objective-button {
