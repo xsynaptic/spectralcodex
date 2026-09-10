@@ -1,4 +1,4 @@
-import type { GeoJSONSource, Source } from 'maplibre-gl';
+import type { GeoJSONSource, MapGeoJSONFeature, Source } from 'maplibre-gl';
 import type {
 	MapCallbacks,
 	MapEvent,
@@ -10,10 +10,13 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
+import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
+
+import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
 import { controlFilterId, mediaQueryMobile } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
-import { mapQueryableLayerIds, MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { mapQueryableLayerIds, MapSourceIdEnum } from '#source/source-config.ts';
 import { writeSavedViewport } from '#store/store-viewport.ts';
 import {
 	useIsMapCanvasInteractive,
@@ -23,43 +26,51 @@ import {
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 
-const isMapCoordinates = (input: unknown): input is [number, number] =>
-	!!input &&
-	Array.isArray(input) &&
-	input.length === 2 &&
-	typeof input[0] === 'number' &&
-	typeof input[1] === 'number';
-
 type MapClickEvent = Parameters<NonNullable<MapCallbacks['onClick']>>[0];
 
 type MapClickFeature = NonNullable<MapClickEvent['features']>[number];
 
-async function expandCluster(mapInstance: MapClickEvent['target'], feature: MapClickFeature) {
-	const clusterId =
-		typeof feature.properties.cluster_id === 'string' ||
-		typeof feature.properties.cluster_id === 'number'
-			? feature.properties.cluster_id
-			: undefined;
+function getClickInput(feature: MapClickFeature | undefined): MapClickInput {
+	const geometry = feature?.geometry;
 
-	if (!clusterId) return;
+	return {
+		layerId: feature?.layer.id,
+		geometryType: geometry?.type,
+		coordinates: geometry?.type === GeometryTypeEnum.Point ? geometry.coordinates : undefined,
+		pointId: feature?.properties.id,
+		clusterId: feature?.properties.cluster_id,
+	};
+}
 
+function getHoverInput(
+	feature: MapGeoJSONFeature | undefined,
+	hoveredFeatureId: string | number | undefined,
+	storeHoveredId: string | undefined,
+): MapHoverInput {
+	return {
+		layerId: feature?.layer.id,
+		featureId: feature?.id,
+		pointId: feature?.properties.id,
+		clusterId: feature?.properties.cluster_id,
+		hoveredFeatureId,
+		storeHoveredId,
+	};
+}
+
+async function expandCluster(
+	mapInstance: MapClickEvent['target'],
+	clusterId: string | number,
+	center: [number, number],
+) {
 	const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
 
 	if (!isMapGeojsonSource(featureSource)) return;
-
-	const { geometry } = feature;
-
-	if (geometry.type !== GeometryTypeEnum.Point) return;
-
-	if (!isMapCoordinates(geometry.coordinates)) return;
-
-	const featureCenter = geometry.coordinates;
 
 	try {
 		const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
 
 		mapInstance.easeTo({
-			center: featureCenter,
+			center,
 			duration: 200,
 			zoom,
 		});
@@ -89,18 +100,20 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	} = useMapStoreActions();
 
 	const selectPoint = useCallback(
-		(mapInstance: MapClickEvent['target'], pointId: unknown, coordinates: unknown) => {
-			if (typeof pointId !== 'string') return;
-
+		(
+			mapInstance: MapClickEvent['target'],
+			pointId: string,
+			center: [number, number] | undefined,
+		) => {
 			setSelectedId(pointId);
 			setHoveredId(undefined);
 
-			if (!isMapCoordinates(coordinates)) return;
+			if (!center) return;
 
 			setPopupVisible(false);
 
 			mapInstance.easeTo({
-				center: coordinates,
+				center,
 				duration: 150,
 				padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
 			});
@@ -114,31 +127,27 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 
 	const onClick = useCallback<NonNullable<MapCallbacks['onClick']>>(
 		({ features, target: mapInstance }) => {
-			const feature = features?.[0];
+			const actions = decideClickActions(getClickInput(features?.[0]));
 
-			// If the click event is not within interactive layers close any open popup and exit early
-			if (!feature?.layer.id || feature.geometry.type !== GeometryTypeEnum.Point) {
-				setSelectedId(undefined);
-				setHoveredId(undefined);
-				return;
-			}
-
-			// Close the filter if it's open; the map registered a click
-			setFilterOpen(false);
-
-			switch (feature.layer.id) {
-				case MapLayerIdEnum.Clusters: {
-					void expandCluster(mapInstance, feature);
-					break;
-				}
-				case MapLayerIdEnum.Points:
-				case MapLayerIdEnum.PointsTarget:
-				case MapLayerIdEnum.PointsImage: {
-					selectPoint(mapInstance, feature.properties.id, feature.geometry.coordinates);
-					break;
-				}
-				default: {
-					break;
+			for (const action of actions) {
+				switch (action.kind) {
+					case 'clear-selection': {
+						setSelectedId(undefined);
+						setHoveredId(undefined);
+						break;
+					}
+					case 'close-filter': {
+						setFilterOpen(false);
+						break;
+					}
+					case 'expand-cluster': {
+						void expandCluster(mapInstance, action.clusterId, action.center);
+						break;
+					}
+					case 'select-point': {
+						selectPoint(mapInstance, action.pointId, action.center);
+						break;
+					}
 				}
 			}
 		},
@@ -163,71 +172,23 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			// Note: this only queries the first matching feature, but that is sufficient
 			const feature = renderedFeatures[0];
 
-			const canvas = mapInstance.getCanvas();
+			const intent = decideHoverIntent(
+				getHoverInput(feature, hoveredFeatureIdRef.current, mapStoreInstance.getState().hoveredId),
+			);
 
-			// promoteId maps feature.id to the point id, or the cluster_id for clusters
-			const applyHover = (nextId: string | number | undefined) => {
-				const previousId = hoveredFeatureIdRef.current;
-
-				if (previousId === nextId) return;
-
-				if (previousId !== undefined) {
-					mapInstance.setFeatureState(
-						{ source: MapSourceIdEnum.PointCollection, id: previousId },
-						{ hover: false },
-					);
-				}
-				if (nextId !== undefined) {
-					mapInstance.setFeatureState(
-						{ source: MapSourceIdEnum.PointCollection, id: nextId },
-						{ hover: true },
-					);
-				}
-				hoveredFeatureIdRef.current = nextId;
-			};
-
-			// Store hoveredId feeds the popup preload; only write when it changes
-			const setStoreHoveredId = (nextId: string | undefined) => {
-				if (nextId !== mapStoreInstance.getState().hoveredId) setHoveredId(nextId);
-			};
-
-			// Nothing under the mouse, clear hover state
-			if (!feature) {
-				applyHover(undefined);
-				setStoreHoveredId(undefined);
-				canvas.style.cursor = 'grab';
-				return;
+			for (const { featureId, hover } of intent.featureStateChanges) {
+				mapInstance.setFeatureState(
+					{ source: MapSourceIdEnum.PointCollection, id: featureId },
+					{ hover },
+				);
 			}
 
-			switch (feature.layer.id) {
-				case MapLayerIdEnum.Clusters: {
-					canvas.style.cursor = 'zoom-in';
-					applyHover(feature.id);
+			hoveredFeatureIdRef.current = intent.hoveredFeatureId;
 
-					// Cluster IDs are not the same as point IDs
-					if (typeof feature.properties.cluster_id === 'number') {
-						setStoreHoveredId(`cluster-${String(feature.properties.cluster_id)}`);
-					}
-					break;
-				}
-				case MapLayerIdEnum.Points:
-				case MapLayerIdEnum.PointsTarget:
-				case MapLayerIdEnum.PointsImage: {
-					canvas.style.cursor = 'pointer';
-					applyHover(feature.id);
+			// Store hoveredId feeds the popup preload
+			if (intent.storeHoveredIdUpdate) setHoveredId(intent.storeHoveredIdUpdate.hoveredId);
 
-					if (typeof feature.properties.id === 'string') {
-						setStoreHoveredId(feature.properties.id);
-					}
-					break;
-				}
-				default: {
-					applyHover(undefined);
-					setStoreHoveredId(undefined);
-					canvas.style.cursor = 'grab';
-					break;
-				}
-			}
+			mapInstance.getCanvas().style.cursor = intent.cursor;
 		},
 		[setHoveredId, mapStoreInstance],
 	);
