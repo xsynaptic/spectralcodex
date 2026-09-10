@@ -186,7 +186,6 @@
 		margin-top: 0;
 	}
 
-	/* `display: block` makes the table its own scroll container; a wide one cannot push the page */
 	& :where(table) {
 		display: block;
 		width: max-content;
