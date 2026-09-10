@@ -21,6 +21,7 @@ import {
 
 type MapPopupItemExtended = MapPopupItem & {
 	precision: number;
+	objective: number | undefined;
 	popupCoordinates: LngLat;
 };
 
@@ -36,6 +37,7 @@ const defaultPopupItem = {
 	wikipediaUrl: undefined,
 	image: undefined,
 	precision: 1,
+	objective: undefined,
 	popupCoordinates: new LngLat(0, 0),
 } satisfies MapPopupItemExtended;
 
@@ -239,6 +241,7 @@ function useMapCanvasPopup() {
 			...(selectedSourceItem
 				? {
 						precision: selectedSourceItem.properties.precision,
+						objective: selectedSourceItem.properties.objective,
 						popupCoordinates: getPopupCoordinates(selectedSourceItem),
 					}
 				: {}),
@@ -296,79 +299,87 @@ const MapPopupFooter: FC<{
 	);
 };
 
-const MapPopupContent: FC<{ popupItem: MapPopupItemExtended; imageServerUrl: string }> =
-	function MapPopupContent({ popupItem, imageServerUrl }) {
-		const isMobile = useMediaQuery({ below: mediaQueryMobile });
-		const messages = useMapMessages();
+const MapPopupContent: FC<{
+	popupItem: MapPopupItemExtended;
+	imageServerUrl: string;
+	isDev: boolean | undefined;
+}> = function MapPopupContent({ popupItem, imageServerUrl, isDev }) {
+	const isMobile = useMediaQuery({ below: mediaQueryMobile });
+	const messages = useMapMessages();
 
-		const {
-			title,
-			titleMultilingualLang,
-			titleMultilingualValue,
-			url,
-			description,
-			precision,
-			wikipediaUrl,
-			image,
-			popupCoordinates,
-		} = popupItem;
+	const {
+		title,
+		titleMultilingualLang,
+		titleMultilingualValue,
+		url,
+		description,
+		precision,
+		objective,
+		wikipediaUrl,
+		image,
+		popupCoordinates,
+	} = popupItem;
 
-		return (
-			<>
-				{image?.srcSet ? (
-					<div>
-						<img
-							className="map-popup-image"
-							src={getPopupImageSrc(image.srcSet, imageServerUrl)}
-							srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
-							sizes={getPopupImageSizes(isMobile)}
-							loading="eager"
-							alt={title}
-						/>
-					</div>
-				) : undefined}
-				<div className="map-popup-body">
-					{titleMultilingualLang && titleMultilingualValue ? (
-						<div className="map-popup-title-alt">
-							<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
-						</div>
-					) : undefined}
-					<div className="map-popup-title">
-						<a href={url}>{title}</a>
-					</div>
-					{precision <= 2 ? (
-						<div className="map-popup-precision">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 36 36"
-								className="map-popup-warning-icon"
-							>
-								<use href={`#${MapSpritesEnum.Warning}`}></use>
-							</svg>
-							<span className="map-popup-warning-text">
-								{precision === 2 ? messages.precisionWarning : messages.precisionError}
-							</span>
-						</div>
-					) : undefined}
-					{description ? (
-						<div
-							className="map-popup-description"
-							dangerouslySetInnerHTML={{ __html: description }}
-						/>
-					) : undefined}
-					<MapPopupFooter
-						popupCoordinates={popupCoordinates}
-						wikipediaUrl={wikipediaUrl}
-						googleMapsUrl={popupItem.googleMapsUrl}
+	return (
+		<>
+			{image?.srcSet ? (
+				<div>
+					<img
+						className="map-popup-image"
+						src={getPopupImageSrc(image.srcSet, imageServerUrl)}
+						srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
+						sizes={getPopupImageSizes(isMobile)}
+						loading="eager"
+						alt={title}
 					/>
 				</div>
-			</>
-		);
-	};
+			) : undefined}
+			<div className="map-popup-body">
+				{titleMultilingualLang && titleMultilingualValue ? (
+					<div className="map-popup-title-alt">
+						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
+					</div>
+				) : undefined}
+				<div className="map-popup-title">
+					<a href={url}>{title}</a>
+					{isDev && objective ? (
+						<span className="map-popup-objective">{objective}</span>
+					) : undefined}
+				</div>
+				{precision <= 2 ? (
+					<div className="map-popup-precision">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 36 36"
+							className="map-popup-warning-icon"
+						>
+							<use href={`#${MapSpritesEnum.Warning}`}></use>
+						</svg>
+						<span className="map-popup-warning-text">
+							{precision === 2 ? messages.precisionWarning : messages.precisionError}
+						</span>
+					</div>
+				) : undefined}
+				{description ? (
+					<div
+						className="map-popup-description"
+						dangerouslySetInnerHTML={{ __html: description }}
+					/>
+				) : undefined}
+				<MapPopupFooter
+					popupCoordinates={popupCoordinates}
+					wikipediaUrl={wikipediaUrl}
+					googleMapsUrl={popupItem.googleMapsUrl}
+				/>
+			</div>
+		</>
+	);
+};
 
-export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function MapPopup({
-	imageServerUrl = '',
-}) {
+export const MapPopup: FC<{
+	imageServerUrl?: string | undefined;
+	isDev?: boolean | undefined;
+}> = function MapPopup({ imageServerUrl = '', isDev }) {
 	const { popupItem, isLoading: isPopupDataLoading } = useMapCanvasPopup();
 	const isPopupVisible = useIsMapPopupVisible();
 
@@ -415,6 +426,7 @@ export const MapPopup: FC<{ imageServerUrl?: string | undefined }> = function Ma
 							key={popupItem.id}
 							popupItem={popupItem}
 							imageServerUrl={imageServerUrl}
+							isDev={isDev}
 						/>
 					)}
 				</div>

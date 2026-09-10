@@ -99,7 +99,7 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 				>
 					<MapControls />
-					<MapPopup imageServerUrl={imageServerUrl} />
+					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
 			<MapSource

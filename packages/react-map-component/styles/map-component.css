@@ -157,6 +157,23 @@ button.maplibregl-popup-close-button {
 	}
 }
 
+.map-popup-objective {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.125rem;
+	height: 1.125rem;
+	margin-left: 0.25rem;
+	font-family: var(--map-font-display);
+	font-size: 0.6875rem;
+	line-height: 1;
+	vertical-align: text-bottom;
+	color: var(--map-color-neutral-700);
+	background-color: var(--map-color-neutral-200);
+	border: 1px solid var(--map-color-neutral-300);
+	border-radius: var(--map-radius-full);
+}
+
 .map-popup-precision {
 	display: flex;
 	flex-wrap: wrap;
