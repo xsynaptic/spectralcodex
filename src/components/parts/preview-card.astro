@@ -82,20 +82,18 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 	class:list={['card-preview', showMicroformats ? MicroformatClassNames.Entry : undefined]}
 	{...props}
 >
-	{
-		imageProps ? (
-			<ImagePlaceholder placeholderProps={placeholderProps}>
-				<a href={linkUrl}>
-					<Image
-						class:list={[showMicroformats ? MicroformatClassNames.Photo : undefined]}
-						{...imageProps}
-					/>
-				</a>
-			</ImagePlaceholder>
-		) : (
-			<div class="aspect-3/2 w-full rounded-xs border border-primary-300 bg-fallback text-sm text-transparent shadow-inner dark:border-primary-700" />
-		)
-	}
+	{imageProps ? (
+		<ImagePlaceholder placeholderProps={placeholderProps}>
+			<a href={linkUrl}>
+				<Image
+					class:list={[showMicroformats ? MicroformatClassNames.Photo : undefined]}
+					{...imageProps}
+				/>
+			</a>
+		</ImagePlaceholder>
+	) : (
+		<div class="aspect-3/2 w-full rounded-xs border border-primary-300 bg-fallback text-sm text-transparent shadow-inner dark:border-primary-700" />
+	)}
 	<TitleTag class="card-title">
 		<Anchor
 			href={linkUrl}
@@ -103,36 +101,29 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 			class:list={[
 				'card-title-link',
 				showMicroformats ? [MicroformatClassNames.Url, MicroformatClassNames.Name] : undefined,
-			]}><slot name="preview-title" /></Anchor
+			]}
 		>
-		{
-			titleMultilingual ? (
-				<span class="card-title-ml">
-					<span class="font-light">(</span>
-					<Fragment set:html={titleMultilingual} />
-					<span class="font-light">)</span>
-				</span>
-			) : undefined
-		}
+			<slot name="preview-title" />
+		</Anchor>
+		{titleMultilingual ? (
+			<span class="card-title-ml">
+				<span class="font-light">(</span>
+				<Fragment set:html={titleMultilingual} />
+				<span class="font-light">)</span>
+			</span>
+		) : undefined}
 	</TitleTag>
-	{
-		subtitle ? (
-			<div class="card-subtitle">
-				<Fragment set:html={subtitle} />
-			</div>
-		) : undefined
-	}
-	{
-		description ? (
-			<Prose
-				class:list={[
-					'mt-1 font-sans',
-					showMicroformats ? MicroformatClassNames.Summary : undefined,
-				]}
-				showCompact={true}
-			>
-				<Fragment set:html={description} />
-			</Prose>
-		) : undefined
-	}
+	{subtitle ? (
+		<div class="card-subtitle">
+			<Fragment set:html={subtitle} />
+		</div>
+	) : undefined}
+	{description ? (
+		<Prose
+			class:list={['mt-1 font-sans', showMicroformats ? MicroformatClassNames.Summary : undefined]}
+			showCompact={true}
+		>
+			<Fragment set:html={description} />
+		</Prose>
+	) : undefined}
 </CardFrame>

@@ -79,20 +79,18 @@ const { imageProps, placeholderProps } = await getImageProps(
 );
 ---
 
-{
-	imageProps ? (
-		<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
-			<Image
-				class:list={[
-					'z-image max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
-					'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
-					showMicroformats ? MicroformatClassNames.Photo : undefined,
-				]}
-				{...imageProps}
-			/>
-			{caption ? (
-				<ImageCarouselCaption caption={caption} isHero={true} withTitle={withTitle} />
-			) : undefined}
-		</ImagePlaceholder>
-	) : undefined
-}
+{imageProps ? (
+	<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
+		<Image
+			class:list={[
+				'z-image max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
+				'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
+				showMicroformats ? MicroformatClassNames.Photo : undefined,
+			]}
+			{...imageProps}
+		/>
+		{caption ? (
+			<ImageCarouselCaption caption={caption} isHero={true} withTitle={withTitle} />
+		) : undefined}
+	</ImagePlaceholder>
+) : undefined}

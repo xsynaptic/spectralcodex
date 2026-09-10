@@ -28,39 +28,37 @@ const depth = getRegionAncestors(entry).length;
 const t = getTranslations();
 ---
 
-{
-	regionChildren.length > 0 || regionSiblings.length > 0 ? (
-		<div
-			class="content-column mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
-			data-pagefind-ignore
-			data-nosnippet
-		>
-			{regionChildren.length > 0 ? (
-				<div class="flex-1">
-					<h2
-						class:list={[
-							'mb-1 text-xs font-semibold uppercase',
-							'text-primary-700 dark:text-highlight-400',
-						]}
-					>
-						<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
-					</h2>
-					<RegionsList terms={regionChildren} showTitleMultilingual={depth >= showTitleAltDepth} />
-				</div>
-			) : undefined}
-			{regionSiblings.length > 0 ? (
-				<div class="flex-1">
-					<h2
-						class:list={[
-							'mb-1 text-xs font-semibold uppercase',
-							'text-primary-700 dark:text-highlight-400',
-						]}
-					>
-						<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
-					</h2>
-					<RegionsList terms={regionSiblings} showTitleMultilingual={depth >= showTitleAltDepth} />
-				</div>
-			) : undefined}
-		</div>
-	) : undefined
-}
+{regionChildren.length > 0 || regionSiblings.length > 0 ? (
+	<div
+		class="content-column mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
+		data-pagefind-ignore
+		data-nosnippet
+	>
+		{regionChildren.length > 0 ? (
+			<div class="flex-1">
+				<h2
+					class:list={[
+						'mb-1 text-xs font-semibold uppercase',
+						'text-primary-700 dark:text-highlight-400',
+					]}
+				>
+					<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
+				</h2>
+				<RegionsList terms={regionChildren} showTitleMultilingual={depth >= showTitleAltDepth} />
+			</div>
+		) : undefined}
+		{regionSiblings.length > 0 ? (
+			<div class="flex-1">
+				<h2
+					class:list={[
+						'mb-1 text-xs font-semibold uppercase',
+						'text-primary-700 dark:text-highlight-400',
+					]}
+				>
+					<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
+				</h2>
+				<RegionsList terms={regionSiblings} showTitleMultilingual={depth >= showTitleAltDepth} />
+			</div>
+		) : undefined}
+	</div>
+) : undefined}

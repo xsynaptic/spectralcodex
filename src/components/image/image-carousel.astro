@@ -12,21 +12,19 @@ interface Props {
 const { imageFeaturedGroup, class: className } = Astro.props;
 ---
 
-{
-	imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-		<image-carousel
-			class:list={[
-				'carousel-group',
-				'relative block max-w-content overflow-hidden sm:rounded-xs',
-				className,
-			]}
-		>
-			<div class="carousel-container">
-				{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
-					<ImageCarouselItem {...imageFeaturedGroupItem} />
-				))}
-			</div>
-			{imageFeaturedGroup.length > 1 ? <ImageCarouselNavigation /> : undefined}
-		</image-carousel>
-	) : undefined
-}
+{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
+	<image-carousel
+		class:list={[
+			'carousel-group',
+			'relative block max-w-content overflow-hidden sm:rounded-xs',
+			className,
+		]}
+	>
+		<div class="carousel-container">
+			{imageFeaturedGroup.map((imageFeaturedGroupItem) => (
+				<ImageCarouselItem {...imageFeaturedGroupItem} />
+			))}
+		</div>
+		{imageFeaturedGroup.length > 1 ? <ImageCarouselNavigation /> : undefined}
+	</image-carousel>
+) : undefined}

@@ -83,24 +83,20 @@ const t = getTranslations();
 					<DividedItem>
 						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
-					{
-						entryCount > 0 ? (
-							<DividedItem>
-								{formatStringTemplate(t('content.meta.entries.label'), {
-									count: formatNumber({ number: entryCount }),
-								})}
-							</DividedItem>
-						) : undefined
-					}
-					{
-						wordCount && wordCount > 0 ? (
-							<DividedItem>
-								<span
-									set:html={`${t('content.meta.wordCount.label')}: ${formatNumber({ number: wordCount })}`}
-								/>
-							</DividedItem>
-						) : undefined
-					}
+					{entryCount > 0 ? (
+						<DividedItem>
+							{formatStringTemplate(t('content.meta.entries.label'), {
+								count: formatNumber({ number: entryCount }),
+							})}
+						</DividedItem>
+					) : undefined}
+					{wordCount && wordCount > 0 ? (
+						<DividedItem>
+							<span
+								set:html={`${t('content.meta.wordCount.label')}: ${formatNumber({ number: wordCount })}`}
+							/>
+						</DividedItem>
+					) : undefined}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

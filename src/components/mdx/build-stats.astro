@@ -18,16 +18,14 @@ const t = getTranslations();
 const geometry = getBuildStatsGeometry(await getBuildRecords(), { daysLimit, trendWindowDays });
 ---
 
-{
-	geometry ? (
-		<Fragment>
-			<link rel="stylesheet" href={buildStatsCssUrl} />
-			<BuildStatsDuration geometry={geometry.duration} axisTicks={geometry.axisTicks} />
-			{geometry.pages ? (
-				<BuildStatsPages geometry={geometry.pages} axisTicks={geometry.axisTicks} />
-			) : undefined}
-		</Fragment>
-	) : (
-		<p class="text-sm text-primary-500 dark:text-primary-400">{t('buildStats.empty')}</p>
-	)
-}
+{geometry ? (
+	<Fragment>
+		<link rel="stylesheet" href={buildStatsCssUrl} />
+		<BuildStatsDuration geometry={geometry.duration} axisTicks={geometry.axisTicks} />
+		{geometry.pages ? (
+			<BuildStatsPages geometry={geometry.pages} axisTicks={geometry.axisTicks} />
+		) : undefined}
+	</Fragment>
+) : (
+	<p class="text-sm text-primary-500 dark:text-primary-400">{t('buildStats.empty')}</p>
+)}

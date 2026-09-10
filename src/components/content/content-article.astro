@@ -54,16 +54,14 @@ async function getThumbnailUrls() {
 const thumbnails = await getThumbnailUrls();
 ---
 
-<article {...props} {...hideSearch ? {} : { 'data-pagefind-body': '' }}>
+<article {...props} {...(hideSearch ? {} : { 'data-pagefind-body': '' })}>
 	<slot />
-	{
-		thumbnails ? (
-			<>
-				<meta data-pagefind-meta="image[content]" content={thumbnails.url1x} />
-				<meta data-pagefind-meta="image_2x[content]" content={thumbnails.url2x} />
-			</>
-		) : (
-			<meta data-pagefind-meta="image[content]" content="" />
-		)
-	}
+	{thumbnails ? (
+		<>
+			<meta data-pagefind-meta="image[content]" content={thumbnails.url1x} />
+			<meta data-pagefind-meta="image_2x[content]" content={thumbnails.url2x} />
+		</>
+	) : (
+		<meta data-pagefind-meta="image[content]" content="" />
+	)}
 </article>

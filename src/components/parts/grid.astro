@@ -10,16 +10,14 @@ const { class: className, ...props } = Astro.props;
 const children = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	children ? (
-		<div
-			class:list={[
-				'grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-2 lg:grid-cols-2 lg:gap-5',
-				className,
-			]}
-			{...props}
-		>
-			<Fragment set:html={children} />
-		</div>
-	) : undefined
-}
+{children ? (
+	<div
+		class:list={[
+			'grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-2 lg:grid-cols-2 lg:gap-5',
+			className,
+		]}
+		{...props}
+	>
+		<Fragment set:html={children} />
+	</div>
+) : undefined}

@@ -93,22 +93,18 @@ const t = getTranslations();
 					<TextMultilingual content={titleMultilingual} />
 				</Fragment>
 				<Fragment slot="header-subtitle">
-					{
-						entry.data.url ? (
-							<DividedItem>
-								<Anchor href={entry.data.url}>{t('collection.resources.homepage.label')}</Anchor>
-							</DividedItem>
-						) : undefined
-					}
-					{
-						entry.data._entryCount ? (
-							<DividedItem>
-								<span
-									set:html={`${t('collection.resources.entryCount.label')}: ${formatNumber({ number: entry.data._entryCount })}`}
-								/>
-							</DividedItem>
-						) : undefined
-					}
+					{entry.data.url ? (
+						<DividedItem>
+							<Anchor href={entry.data.url}>{t('collection.resources.homepage.label')}</Anchor>
+						</DividedItem>
+					) : undefined}
+					{entry.data._entryCount ? (
+						<DividedItem>
+							<span
+								set:html={`${t('collection.resources.entryCount.label')}: ${formatNumber({ number: entry.data._entryCount })}`}
+							/>
+						</DividedItem>
+					) : undefined}
 					{citationLine ? <DividedItem>{citationLine}</DividedItem> : undefined}
 				</Fragment>
 			</ContentHeader>

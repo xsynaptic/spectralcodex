@@ -22,20 +22,17 @@ const Content = rendered?.Content;
 const description = Content ? undefined : entry.data.description;
 ---
 
-{
-	Content ? (
-		<Prose showBlocks={true} class:list={['pb-8', className]} data-pagefind-weight="2" {...props}>
-			<Content />
-		</Prose>
-	) : undefined
-}{
-	description ? (
-		<ContentSection {...props}>
-			<Fragment slot="section-description">
-				<Prose class:list={[className]} data-pagefind-weight="2">
-					<Fragment set:html={renderMarkdownInline(description)} />
-				</Prose>
-			</Fragment>
-		</ContentSection>
-	) : undefined
-}
+{Content ? (
+	<Prose showBlocks={true} class:list={['pb-8', className]} data-pagefind-weight="2" {...props}>
+		<Content />
+	</Prose>
+) : undefined}
+{description ? (
+	<ContentSection {...props}>
+		<Fragment slot="section-description">
+			<Prose class:list={[className]} data-pagefind-weight="2">
+				<Fragment set:html={renderMarkdownInline(description)} />
+			</Prose>
+		</Fragment>
+	</ContentSection>
+) : undefined}

@@ -14,24 +14,22 @@ interface Props {
 const { heritage } = Astro.props;
 ---
 
-{
-	heritage.length > 0 ? (
-		<ListRow>
-			{heritage.map((key) => {
-				const titleMultilingual = getMultilingualContent({
-					data: LocationTwHeritageRecords[key],
-					prop: 'title',
-				})?.primary;
+{heritage.length > 0 ? (
+	<ListRow>
+		{heritage.map((key) => {
+			const titleMultilingual = getMultilingualContent({
+				data: LocationTwHeritageRecords[key],
+				prop: 'title',
+			})?.primary;
 
-				return (
-					<DividedItem as="li" dividerWeight="thin" class="font-serif text-sm">
-						{LocationTwHeritageRecords[key].title}
-						{titleMultilingual ? (
-							<TextMultilingual content={titleMultilingual} parenthesis={true} />
-						) : undefined}
-					</DividedItem>
-				);
-			})}
-		</ListRow>
-	) : undefined
-}
+			return (
+				<DividedItem as="li" dividerWeight="thin" class="font-serif text-sm">
+					{LocationTwHeritageRecords[key].title}
+					{titleMultilingual ? (
+						<TextMultilingual content={titleMultilingual} parenthesis={true} />
+					) : undefined}
+				</DividedItem>
+			);
+		})}
+	</ListRow>
+) : undefined}

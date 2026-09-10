@@ -19,23 +19,21 @@ const { date, datePreset, showMicroformats = false, showUpdated = false } = Astr
 const t = getTranslations();
 ---
 
-{
-	date ? (
-		showUpdated ? (
-			<>
-				{t('content.meta.dateUpdated.label')}{' '}
-				<DateDisplay
-					class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
-					date={date}
-					datePreset={datePreset}
-				/>
-			</>
-		) : (
+{date ? (
+	showUpdated ? (
+		<>
+			{t('content.meta.dateUpdated.label')}{' '}
 			<DateDisplay
-				class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
+				class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
 				date={date}
 				datePreset={datePreset}
 			/>
-		)
-	) : undefined
-}
+		</>
+	) : (
+		<DateDisplay
+			class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
+			date={date}
+			datePreset={datePreset}
+		/>
+	)
+) : undefined}

@@ -60,26 +60,24 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 		<ContentHeader hasHeroImage={hasHeroImage}>
 			<Fragment slot="header-title">{title}</Fragment>
 			<Fragment slot="header-subtitle">
-				{
-					hasHeroImage ? (
-						<Anchor
-							class="font-semibold"
-							href={getSitePath('chronology', chronologyMonthlyItem.year)}
-							anchorColor="highlight"
-						>
-							{formatStringTemplate(t('chronology.yearly.title'), {
-								date: chronologyMonthlyItem.year,
-							})}
-						</Anchor>
-					) : (
-						<ChronologyNavigation
-							currentYear={chronologyMonthlyItem.year}
-							currentMonth={chronologyMonthlyItem.month}
-							chronologyYears={chronologyYears}
-							chronologyMonths={chronologyMonths}
-						/>
-					)
-				}
+				{hasHeroImage ? (
+					<Anchor
+						class="font-semibold"
+						href={getSitePath('chronology', chronologyMonthlyItem.year)}
+						anchorColor="highlight"
+					>
+						{formatStringTemplate(t('chronology.yearly.title'), {
+							date: chronologyMonthlyItem.year,
+						})}
+					</Anchor>
+				) : (
+					<ChronologyNavigation
+						currentYear={chronologyMonthlyItem.year}
+						currentMonth={chronologyMonthlyItem.month}
+						chronologyYears={chronologyYears}
+						chronologyMonths={chronologyMonths}
+					/>
+				)}
 			</Fragment>
 		</ContentHeader>
 	</ImageHero>
@@ -96,13 +94,11 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 			</Anchor>
 		</ChronologyNavigation>
 	</ContentSection>
-	{
-		chronologyRenderResult ? (
-			<Prose showBlocks={true}>
-				<chronologyRenderResult.Content />
-			</Prose>
-		) : undefined
-	}
+	{chronologyRenderResult ? (
+		<Prose showBlocks={true}>
+			<chronologyRenderResult.Content />
+		</Prose>
+	) : undefined}
 	<ContentSection class="flex flex-col gap-2">
 		<ChronologyItem
 			title={t('chronology.updated.label')}

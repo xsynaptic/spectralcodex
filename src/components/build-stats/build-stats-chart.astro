@@ -50,65 +50,69 @@ const tooltipData = JSON.stringify(points)
 			role="img"
 			aria-label={ariaLabel}
 		>
-			<text class="stats-chart-label" x={marginLeft} y={headingY}>{label}</text>
-			{
-				axisTicks.map((tick) => (
-					<line
-						class="stats-grid stats-grid-month"
-						x1={tick.x}
-						y1={frame.top}
-						x2={tick.x}
-						y2={frame.bottom}
-					/>
-				))
-			}
-			{
-				valueTicks.map((tick) => (
-					<Fragment>
-						<line class="stats-grid" x1={marginLeft} y1={tick.y} x2={plotRight} y2={tick.y} />
-						<text class="stats-tick" x={marginLeft - 10} y={tick.y + 3.5} text-anchor="end">
-							{tick.label}
-						</text>
-					</Fragment>
-				))
-			}
+			<text class="stats-chart-label" x={marginLeft} y={headingY}>
+				{label}
+			</text>
+			{axisTicks.map((tick) => (
+				<line
+					class="stats-grid stats-grid-month"
+					x1={tick.x}
+					y1={frame.top}
+					x2={tick.x}
+					y2={frame.bottom}
+				/>
+			))}
+			{valueTicks.map((tick) => (
+				<Fragment>
+					<line class="stats-grid" x1={marginLeft} y1={tick.y} x2={plotRight} y2={tick.y} />
+					<text class="stats-tick" x={marginLeft - 10} y={tick.y + 3.5} text-anchor="end">
+						{tick.label}
+					</text>
+				</Fragment>
+			))}
 			<slot />
-			<line class="stats-axis" x1={marginLeft} y1={frame.bottom} x2={plotRight} y2={frame.bottom}
+			<line
+				class="stats-axis"
+				x1={marginLeft}
+				y1={frame.bottom}
+				x2={plotRight}
+				y2={frame.bottom}
 			></line>
-			{
-				axisTicks.map((tick) => (
-					<Fragment>
-						<line
-							class="stats-grid"
-							x1={tick.x}
-							y1={frame.bottom}
-							x2={tick.x}
-							y2={frame.bottom + 5}
-						/>
+			{axisTicks.map((tick) => (
+				<Fragment>
+					<line
+						class="stats-grid"
+						x1={tick.x}
+						y1={frame.bottom}
+						x2={tick.x}
+						y2={frame.bottom + 5}
+					/>
+					<text
+						class="stats-tick"
+						x={tick.x}
+						y={frame.bottom + monthLabelOffset}
+						text-anchor="middle"
+					>
+						{tick.label}
+					</text>
+					{tick.yearLabel ? (
 						<text
 							class="stats-tick"
 							x={tick.x}
-							y={frame.bottom + monthLabelOffset}
+							y={frame.bottom + yearLabelOffset}
 							text-anchor="middle"
 						>
-							{tick.label}
+							{tick.yearLabel}
 						</text>
-						{tick.yearLabel ? (
-							<text
-								class="stats-tick"
-								x={tick.x}
-								y={frame.bottom + yearLabelOffset}
-								text-anchor="middle"
-							>
-								{tick.yearLabel}
-							</text>
-						) : undefined}
-					</Fragment>
-				))
-			}
+					) : undefined}
+				</Fragment>
+			))}
 			<g class="stats-crosshair" data-chart-crosshair aria-hidden="true">
 				<line class="stats-axis" y1={frame.top} y2={frame.bottom} data-crosshair-line></line>
-				<circle class:list={['stats-endpoint', `stats-series-${series}`]} r="4" data-crosshair-dot
+				<circle
+					class:list={['stats-endpoint', `stats-series-${series}`]}
+					r="4"
+					data-crosshair-dot
 				></circle>
 			</g>
 			<rect
@@ -117,22 +121,21 @@ const tooltipData = JSON.stringify(points)
 				width={hitRight - hitLeft}
 				height={frame.bottom - frame.top}
 				fill="transparent"
-				data-chart-hit></rect>
+				data-chart-hit
+			></rect>
 		</svg>
 	</div>
 	<div class="stats-tooltip" data-chart-tooltip>
 		<div class="stats-tooltip-date" data-tooltip-date></div>
-		{
-			tooltipRows.map((row) => (
-				<div class="stats-tooltip-row" data-tooltip-row>
-					<span class="stats-tooltip-key">
-						<span class:list={['stats-swatch', `stats-swatch-${row.series}`]} />
-						{row.label}
-					</span>
-					<b data-tooltip-value />
-				</div>
-			))
-		}
+		{tooltipRows.map((row) => (
+			<div class="stats-tooltip-row" data-tooltip-row>
+				<span class="stats-tooltip-key">
+					<span class:list={['stats-swatch', `stats-swatch-${row.series}`]} />
+					{row.label}
+				</span>
+				<b data-tooltip-value />
+			</div>
+		))}
 	</div>
-	<script type="application/json" data-chart-tooltips is:inline set:html={tooltipData} />
+	<script type="application/json" data-chart-tooltips is:inline set:html={tooltipData}></script>
 </build-stats-chart>

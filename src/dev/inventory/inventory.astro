@@ -291,7 +291,9 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				the route nor a utility written here reaches a build.
 			</p>
 			<nav class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
-				{sections.map((section) => <Anchor href={`#${getSectionId(section)}`}>{section}</Anchor>)}
+				{sections.map((section) => (
+					<Anchor href={`#${getSectionId(section)}`}>{section}</Anchor>
+				))}
 			</nav>
 		</div>
 		<Section title="Foundations">
@@ -301,26 +303,24 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="styles/main/parts/theme.css"
 			>
 				<div class="flex flex-col gap-5">
-					{
-						colorRamps.map((ramp) => (
-							<div>
-								<div class={captionClass}>
-									--color-{ramp.name}-* <span class="text-primary-400">({ramp.source})</span>
-								</div>
-								<div class="mt-2 grid grid-cols-[repeat(auto-fit,minmax(3.5rem,1fr))] gap-1">
-									{colorSteps.map((step) => (
-										<div>
-											<div
-												class="h-12 rounded-xs border border-primary-300 dark:border-primary-700"
-												style={`background-color: var(--color-${ramp.name}-${String(step)})`}
-											/>
-											<div class={`mt-1 ${captionClass}`}>{step}</div>
-										</div>
-									))}
-								</div>
+					{colorRamps.map((ramp) => (
+						<div>
+							<div class={captionClass}>
+								--color-{ramp.name}-* <span class="text-primary-400">({ramp.source})</span>
 							</div>
-						))
-					}
+							<div class="mt-2 grid grid-cols-[repeat(auto-fit,minmax(3.5rem,1fr))] gap-1">
+								{colorSteps.map((step) => (
+									<div>
+										<div
+											class="h-12 rounded-xs border border-primary-300 dark:border-primary-700"
+											style={`background-color: var(--color-${ramp.name}-${String(step)})`}
+										/>
+										<div class={`mt-1 ${captionClass}`}>{step}</div>
+									</div>
+								))}
+							</div>
+						</div>
+					))}
 				</div>
 			</Specimen>
 			<Specimen
@@ -329,16 +329,14 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="styles/main/parts/theme.css"
 			>
 				<div class="flex flex-col gap-4">
-					{
-						typeSteps.map((step) => (
-							<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
-								<div class={captionClass}>text-{step}</div>
-								<div style={`font-size: var(--text-${step})`}>
-									The quick brown fox jumps over the lazy dog
-								</div>
+					{typeSteps.map((step) => (
+						<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
+							<div class={captionClass}>text-{step}</div>
+							<div style={`font-size: var(--text-${step})`}>
+								The quick brown fox jumps over the lazy dog
 							</div>
-						))
-					}
+						</div>
+					))}
 				</div>
 			</Specimen>
 			<Specimen
@@ -347,28 +345,26 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="styles/main/parts/theme.css"
 			>
 				<div class="flex flex-col gap-6">
-					{
-						fontFamilies.map((family) => (
-							<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
-								<div class={captionClass}>
-									{family.name}, {family.note}
-								</div>
-								<div class="mt-2 flex flex-col gap-1" style={`font-family: var(--${family.name})`}>
-									<div style="font-size: var(--text-xl)">
-										Spectral Codex 0123456789 <em>italic</em> <strong>bold</strong>
-									</div>
-									{scriptSamples.map((script) => (
-										<div class="flex flex-wrap items-baseline gap-x-3">
-											<span class={`w-24 shrink-0 ${captionClass}`}>{script.label}</span>
-											<span lang={script.lang} style="font-size: var(--text-lg)">
-												{script.value}
-											</span>
-										</div>
-									))}
-								</div>
+					{fontFamilies.map((family) => (
+						<div class="border-t border-primary-200 pt-4 first:border-0 first:pt-0 dark:border-primary-700">
+							<div class={captionClass}>
+								{family.name}, {family.note}
 							</div>
-						))
-					}
+							<div class="mt-2 flex flex-col gap-1" style={`font-family: var(--${family.name})`}>
+								<div style="font-size: var(--text-xl)">
+									Spectral Codex 0123456789 <em>italic</em> <strong>bold</strong>
+								</div>
+								{scriptSamples.map((script) => (
+									<div class="flex flex-wrap items-baseline gap-x-3">
+										<span class={`w-24 shrink-0 ${captionClass}`}>{script.label}</span>
+										<span lang={script.lang} style="font-size: var(--text-lg)">
+											{script.value}
+										</span>
+									</div>
+								))}
+							</div>
+						</div>
+					))}
 				</div>
 			</Specimen>
 			<Specimen
@@ -377,30 +373,26 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="styles/main/parts/utilities.css"
 			>
 				<div class="group flex flex-col gap-4">
-					<label
-						class="flex w-fit items-center gap-2 text-xs text-primary-500 dark:text-primary-400"
-					>
+					<label class="flex w-fit items-center gap-2 text-xs text-primary-500 dark:text-primary-400">
 						<input class="accent-accent-600" type="checkbox" />
 						Hide the image
 					</label>
 					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-						{
-							backgroundUtilities.map((utility) => (
-								<div>
-									<div class="relative h-24 overflow-clip rounded-xs border border-primary-300 dark:border-primary-700">
-										{sampleImage ? (
-											<Image
-												{...sampleImage.imageProps}
-												class="absolute inset-0 h-full group-has-checked:opacity-0"
-											/>
-										) : undefined}
-										<div class:list={['absolute inset-0', utility.name]} />
-									</div>
-									<div class={`mt-1 ${captionClass}`}>{utility.name}</div>
-									<div class="text-xs text-primary-500 dark:text-primary-400">{utility.note}</div>
+						{backgroundUtilities.map((utility) => (
+							<div>
+								<div class="relative h-24 overflow-clip rounded-xs border border-primary-300 dark:border-primary-700">
+									{sampleImage ? (
+										<Image
+											{...sampleImage.imageProps}
+											class="absolute inset-0 h-full group-has-checked:opacity-0"
+										/>
+									) : undefined}
+									<div class:list={['absolute inset-0', utility.name]} />
 								</div>
-							))
-						}
+								<div class={`mt-1 ${captionClass}`}>{utility.name}</div>
+								<div class="text-xs text-primary-500 dark:text-primary-400">{utility.note}</div>
+							</div>
+						))}
 					</div>
 				</div>
 			</Specimen>
@@ -410,9 +402,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="<code>content-column-fill</code> drops the base padding below <code>sm</code>."
 				source="styles/main/parts/utilities.css"
 			>
-				{
-					/* No flex wrapper: `mx-auto` on a flex child shrink-wraps it, so neither box shows its width */
-				}
+				{/* No flex wrapper: `mx-auto` on a flex child shrink-wraps it, so neither box shows its width */}
 				<div class="content-column">
 					<div class="rounded-xs bg-accent-200 py-3 text-center text-sm dark:bg-accent-800">
 						content-column
@@ -456,9 +446,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			>
 				<Prose showBlocks={true}>
 					<p>A paragraph inside a blocked prose surface, held to the measure.</p>
-					<div
-						class="prose-escape rounded-xs bg-accent-100 py-3 text-center text-sm dark:bg-accent-900"
-					>
+					<div class="prose-escape rounded-xs bg-accent-100 py-3 text-center text-sm dark:bg-accent-900">
 						A child marked <code>prose-escape</code>, reaching past it
 					</div>
 					<p>And the text picks the measure back up on the far side.</p>
@@ -473,20 +461,24 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-wrap items-baseline gap-x-6 gap-y-3">
-						{
-							anchorColorsOnLight.map((anchorColor) => (
-								<Anchor anchorColor={anchorColor} href={sampleUrl}>
-									{anchorColor}
-								</Anchor>
-							))
-						}
-						<Anchor href={sampleUrl} isActive={true}>accent, isActive</Anchor>
+						{anchorColorsOnLight.map((anchorColor) => (
+							<Anchor anchorColor={anchorColor} href={sampleUrl}>
+								{anchorColor}
+							</Anchor>
+						))}
+						<Anchor href={sampleUrl} isActive={true}>
+							accent, isActive
+						</Anchor>
 					</div>
 					<div class="rounded-xs bg-primary-800 px-5 py-4">
-						<Anchor anchorColor={anchorColorOnDark} href={sampleUrl}>{anchorColorOnDark}</Anchor>
+						<Anchor anchorColor={anchorColorOnDark} href={sampleUrl}>
+							{anchorColorOnDark}
+						</Anchor>
 					</div>
 					<div class="rounded-xs bg-primary-100 px-5 py-4">
-						<Anchor href={sampleUrl} showDarkMode={false}>accent, showDarkMode false</Anchor>
+						<Anchor href={sampleUrl} showDarkMode={false}>
+							accent, showDarkMode false
+						</Anchor>
 					</div>
 				</div>
 			</Specimen>
@@ -497,31 +489,23 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			>
 				<div class="flex flex-col gap-4">
 					<div class="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-						{
-							washColorsOnLight.map((washColor) => (
-								<TextWash class="text-2xl font-semibold" washColor={washColor}>
-									{washColor}
-								</TextWash>
-							))
-						}
+						{washColorsOnLight.map((washColor) => (
+							<TextWash class="text-2xl font-semibold" washColor={washColor}>
+								{washColor}
+							</TextWash>
+						))}
 					</div>
-					<div
-						class="flex flex-wrap items-baseline gap-x-6 gap-y-2 rounded-xs bg-primary-800 px-5 py-4"
-					>
-						{
-							washColorsOnDark.map((washColor) => (
-								<TextWash class="text-2xl font-semibold" washColor={washColor}>
-									{washColor}
-								</TextWash>
-							))
-						}
-						{
-							washColorsFeatured.map((washColor) => (
-								<TextWash class="text-2xl font-semibold" washColor={washColor}>
-									{washColor}
-								</TextWash>
-							))
-						}
+					<div class="flex flex-wrap items-baseline gap-x-6 gap-y-2 rounded-xs bg-primary-800 px-5 py-4">
+						{washColorsOnDark.map((washColor) => (
+							<TextWash class="text-2xl font-semibold" washColor={washColor}>
+								{washColor}
+							</TextWash>
+						))}
+						{washColorsFeatured.map((washColor) => (
+							<TextWash class="text-2xl font-semibold" washColor={washColor}>
+								{washColor}
+							</TextWash>
+						))}
 					</div>
 				</div>
 			</Specimen>
@@ -531,30 +515,40 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/parts/"
 			>
 				<div class="flex flex-col gap-3">
-					{
-						dividerContents.map((dividerContent) => (
-							<ListRow>
-								<DividedItem as="li" dividerContent={dividerContent}>
-									{dividerContent}
-								</DividedItem>
-								<DividedItem as="li" dividerContent={dividerContent}>
-									divider
-								</DividedItem>
-								<DividedItem as="li" dividerContent={dividerContent}>
-									glyph
-								</DividedItem>
-							</ListRow>
-						))
-					}
+					{dividerContents.map((dividerContent) => (
+						<ListRow>
+							<DividedItem as="li" dividerContent={dividerContent}>
+								{dividerContent}
+							</DividedItem>
+							<DividedItem as="li" dividerContent={dividerContent}>
+								divider
+							</DividedItem>
+							<DividedItem as="li" dividerContent={dividerContent}>
+								glyph
+							</DividedItem>
+						</ListRow>
+					))}
 					<ListRow>
-						<DividedItem as="li" dividerWeight="thin">Thin</DividedItem>
-						<DividedItem as="li" dividerWeight="thin">divider</DividedItem>
-						<DividedItem as="li" dividerWeight="thin">weight</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">
+							Thin
+						</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">
+							divider
+						</DividedItem>
+						<DividedItem as="li" dividerWeight="thin">
+							weight
+						</DividedItem>
 					</ListRow>
 					<ListRow>
-						<DividedItem as="li" dividerColor="muted">Muted</DividedItem>
-						<DividedItem as="li" dividerColor="muted">divider</DividedItem>
-						<DividedItem as="li" dividerColor="muted">color</DividedItem>
+						<DividedItem as="li" dividerColor="muted">
+							Muted
+						</DividedItem>
+						<DividedItem as="li" dividerColor="muted">
+							divider
+						</DividedItem>
+						<DividedItem as="li" dividerColor="muted">
+							color
+						</DividedItem>
 					</ListRow>
 				</div>
 			</Specimen>
@@ -583,7 +577,8 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			>
 				<div class="flex flex-col gap-2">
 					<div>
-						Taiwan Sugar Railway<TextMultilingual content={sampleTitleChinese} parenthesis={true} />
+						Taiwan Sugar Railway
+						<TextMultilingual content={sampleTitleChinese} parenthesis={true} />
 					</div>
 					<div>
 						<TextMultilingual
@@ -604,15 +599,15 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/parts/"
 			>
 				<div class="flex flex-col gap-2">
-					<div>Before <TextParenthesis>a parenthesised run</TextParenthesis> after</div>
 					<div>
-						{
-							samplePlaces.map((place, index, places) => (
-								<TextSeparated index={index} total={places.length}>
-									{place}
-								</TextSeparated>
-							))
-						}
+						Before <TextParenthesis>a parenthesised run</TextParenthesis> after
+					</div>
+					<div>
+						{samplePlaces.map((place, index, places) => (
+							<TextSeparated index={index} total={places.length}>
+								{place}
+							</TextSeparated>
+						))}
 					</div>
 				</div>
 			</Specimen>
@@ -630,25 +625,19 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						</tr>
 					</thead>
 					<tbody>
-						{
-							datePresets.map((datePreset) => (
-								<tr>
-									<td class:list={[cellClass, 'pr-3']}>
-										<code>{datePreset}</code>
-									</td>
-									<td class:list={[cellClass, 'pr-3']}>
-										<DateDisplay date={sampleDate} datePreset={datePreset} />
-									</td>
-									<td class={cellClass}>
-										<DateDisplay
-											date={sampleDate}
-											dateEnd={sampleDateEnd}
-											datePreset={datePreset}
-										/>
-									</td>
-								</tr>
-							))
-						}
+						{datePresets.map((datePreset) => (
+							<tr>
+								<td class:list={[cellClass, 'pr-3']}>
+									<code>{datePreset}</code>
+								</td>
+								<td class:list={[cellClass, 'pr-3']}>
+									<DateDisplay date={sampleDate} datePreset={datePreset} />
+								</td>
+								<td class={cellClass}>
+									<DateDisplay date={sampleDate} dateEnd={sampleDateEnd} datePreset={datePreset} />
+								</td>
+							</tr>
+						))}
 					</tbody>
 				</table>
 			</Specimen>
@@ -670,14 +659,12 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 		<Section title="Parts">
 			<Specimen name="notice-box" source="components/parts/notice-box.astro">
 				<div class="flex flex-col gap-3">
-					{
-						noticeSeverities.map((severity) => (
-							<NoticeBox severity={severity}>
-								The <code>{severity}</code> severity, carrying a sentence long enough to wrap on a
-								narrow viewport and show how the body column holds beside the icon.
-							</NoticeBox>
-						))
-					}
+					{noticeSeverities.map((severity) => (
+						<NoticeBox severity={severity}>
+							The <code>{severity}</code> severity, carrying a sentence long enough to wrap on a
+							narrow viewport and show how the body column holds beside the icon.
+						</NoticeBox>
+					))}
 				</div>
 			</Specimen>
 			<Specimen
@@ -722,147 +709,145 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			note="Ids resolve from the Images collection at render time, because a fixture cannot invent one."
 			title="Images"
 		>
-			{
-				sampleImage ? (
-					<>
-						<Specimen
-							name="image"
-							note="Unpic builds the <code>srcset</code>; the imagor URL is signed server-side."
-							source="components/parts/image.astro"
+			{sampleImage ? (
+				<>
+					<Specimen
+						name="image"
+						note="Unpic builds the <code>srcset</code>; the imagor URL is signed server-side."
+						source="components/parts/image.astro"
+					>
+						<Image {...sampleImage.imageProps} />
+					</Specimen>
+					<Specimen name="image-placeholder" source="components/image/image-placeholder.astro">
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<div>
+								<ImagePlaceholder
+									class="overflow-hidden rounded-xs"
+									placeholderProps={sampleImage.placeholderProps}
+								>
+									<div class="aspect-3/2" />
+								</ImagePlaceholder>
+								<div class={`mt-1 ${captionClass}`}>with placeholderProps</div>
+							</div>
+							<div>
+								<ImagePlaceholder class="overflow-hidden rounded-xs">
+									<div class="aspect-3/2" />
+								</ImagePlaceholder>
+								<div class={`mt-1 ${captionClass}`}>without</div>
+							</div>
+						</div>
+					</Specimen>
+					<Specimen
+						bleed={true}
+						name="content-image"
+						note="The caption doubles as the alt text when no <code>alt</code> is given; the portrait frame takes its ratio from the Image's own dimensions rather than snapping to 3:2."
+						source="components/content/content-image.astro"
+					>
+						<Prose showBlocks={true}>
+							{imageLayouts.map((layout, index) => {
+								const entry = sampleImages.landscape[index] ?? sampleImage.entry;
+
+								return (
+									<ContentImage imageId={entry.id} layout={layout} showMetadata={false}>
+										The <code>{layout}</code> layout
+									</ContentImage>
+								);
+							})}
+							{sampleImages.portrait ? (
+								<ContentImage imageId={sampleImages.portrait.id} showMetadata={false}>
+									A portrait frame, measured from the source dimensions
+								</ContentImage>
+							) : (
+								<p class={captionClass}>
+									No portrait Image in the collection, so the orientation branch is unexercised.
+								</p>
+							)}
+						</Prose>
+					</Specimen>
+					<Specimen
+						bleed={true}
+						name="mdx/img"
+						note="Auto-imported; delegates to <code>content-image</code> with metadata on by default."
+						source="components/mdx/img.astro"
+					>
+						<Prose showBlocks={true}>
+							<Img src={sampleImage.entry.id}>
+								A caption beneath the frame, with the metadata panel behind the eye icon
+							</Img>
+						</Prose>
+					</Specimen>
+					<Specimen
+						name="image-metadata"
+						note="EXIF from the photograph, revealed on hover or focus."
+						source="components/image-metadata/image-metadata.astro"
+					>
+						<ImagePlaceholder
+							class="relative overflow-hidden rounded-xs"
+							placeholderProps={sampleImage.placeholderProps}
 						>
 							<Image {...sampleImage.imageProps} />
-						</Specimen>
-						<Specimen name="image-placeholder" source="components/image/image-placeholder.astro">
-							<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-								<div>
-									<ImagePlaceholder
-										class="overflow-hidden rounded-xs"
-										placeholderProps={sampleImage.placeholderProps}
-									>
-										<div class="aspect-3/2" />
-									</ImagePlaceholder>
-									<div class={`mt-1 ${captionClass}`}>with placeholderProps</div>
-								</div>
-								<div>
-									<ImagePlaceholder class="overflow-hidden rounded-xs">
-										<div class="aspect-3/2" />
-									</ImagePlaceholder>
-									<div class={`mt-1 ${captionClass}`}>without</div>
-								</div>
-							</div>
-						</Specimen>
-						<Specimen
-							bleed={true}
-							name="content-image"
-							note="The caption doubles as the alt text when no <code>alt</code> is given; the portrait frame takes its ratio from the Image's own dimensions rather than snapping to 3:2."
-							source="components/content/content-image.astro"
-						>
-							<Prose showBlocks={true}>
-								{imageLayouts.map((layout, index) => {
-									const entry = sampleImages.landscape[index] ?? sampleImage.entry;
-
-									return (
-										<ContentImage imageId={entry.id} layout={layout} showMetadata={false}>
-											The <code>{layout}</code> layout
-										</ContentImage>
-									);
-								})}
-								{sampleImages.portrait ? (
-									<ContentImage imageId={sampleImages.portrait.id} showMetadata={false}>
-										A portrait frame, measured from the source dimensions
-									</ContentImage>
-								) : (
-									<p class={captionClass}>
-										No portrait Image in the collection, so the orientation branch is unexercised.
-									</p>
-								)}
-							</Prose>
-						</Specimen>
-						<Specimen
-							bleed={true}
-							name="mdx/img"
-							note="Auto-imported; delegates to <code>content-image</code> with metadata on by default."
-							source="components/mdx/img.astro"
-						>
-							<Prose showBlocks={true}>
-								<Img src={sampleImage.entry.id}>
-									A caption beneath the frame, with the metadata panel behind the eye icon
-								</Img>
-							</Prose>
-						</Specimen>
-						<Specimen
-							name="image-metadata"
-							note="EXIF from the photograph, revealed on hover or focus."
-							source="components/image-metadata/image-metadata.astro"
-						>
-							<ImagePlaceholder
-								class="relative overflow-hidden rounded-xs"
-								placeholderProps={sampleImage.placeholderProps}
-							>
-								<Image {...sampleImage.imageProps} />
-								<ImageMetadata entry={sampleImage.entry} />
-							</ImagePlaceholder>
-						</Specimen>
-						{imageGroupContexts.map(({ context, note }) => (
-							<Specimen
-								bleed={true}
-								name={`mdx/img-group (${context})`}
-								note={note}
-								source="components/mdx/img-group.astro"
-							>
-								<Prose showBlocks={true}>
-									<ImgGroup context={context} imageCount={sampleImages.landscape.length}>
-										{sampleImages.landscape.map((entry) => (
-											<ContentImage context={context} imageId={entry.id} showMetadata={false}>
-												{context === ImageContextEnum.Carousel ? entry.data.title : undefined}
-											</ContentImage>
-										))}
-									</ImgGroup>
-								</Prose>
-							</Specimen>
-						))}
-						<Specimen
-							bleed={true}
-							name="image-carousel"
-							source="components/image/image-carousel.astro"
-						>
-							<div class="content-column-fill">
-								<ImageCarousel imageFeaturedGroup={sampleImageFeaturedGroup} />
-							</div>
-						</Specimen>
-						<Specimen
-							bleed={true}
-							name="image-hero"
-							note="The header overlays from <code>sm</code> up and drops beneath below it. Narrow the window for both states."
-							source="components/image/image-hero.astro"
-						>
-							<ImageHero
-								fallbackAlt="Fallback alt text"
-								imageFeaturedGroup={sampleImageFeaturedGroup}
-							>
-								<ContentHeader hasHeroImage={true}>
-									<Fragment slot="header-title">Taiwan Sugar Railway workshops</Fragment>
-									<Fragment slot="header-title-multilingual">
-										<TextMultilingual content={sampleTitleChinese} />
-									</Fragment>
-									<Fragment slot="header-subtitle">
-										<DividedItem>
-											<ContentCollectionLink collection="posts" />
-										</DividedItem>
-										<DividedItem>
-											<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
-										</DividedItem>
-									</Fragment>
-								</ContentHeader>
-							</ImageHero>
-						</Specimen>
-					</>
-				) : (
-					<Specimen name="Images" source="components/image/">
-						<p class={captionClass}>{noMedia}</p>
+							<ImageMetadata entry={sampleImage.entry} />
+						</ImagePlaceholder>
 					</Specimen>
-				)
-			}
+					{imageGroupContexts.map(({ context, note }) => (
+						<Specimen
+							bleed={true}
+							name={`mdx/img-group (${context})`}
+							note={note}
+							source="components/mdx/img-group.astro"
+						>
+							<Prose showBlocks={true}>
+								<ImgGroup context={context} imageCount={sampleImages.landscape.length}>
+									{sampleImages.landscape.map((entry) => (
+										<ContentImage context={context} imageId={entry.id} showMetadata={false}>
+											{context === ImageContextEnum.Carousel ? entry.data.title : undefined}
+										</ContentImage>
+									))}
+								</ImgGroup>
+							</Prose>
+						</Specimen>
+					))}
+					<Specimen
+						bleed={true}
+						name="image-carousel"
+						source="components/image/image-carousel.astro"
+					>
+						<div class="content-column-fill">
+							<ImageCarousel imageFeaturedGroup={sampleImageFeaturedGroup} />
+						</div>
+					</Specimen>
+					<Specimen
+						bleed={true}
+						name="image-hero"
+						note="The header overlays from <code>sm</code> up and drops beneath below it. Narrow the window for both states."
+						source="components/image/image-hero.astro"
+					>
+						<ImageHero
+							fallbackAlt="Fallback alt text"
+							imageFeaturedGroup={sampleImageFeaturedGroup}
+						>
+							<ContentHeader hasHeroImage={true}>
+								<Fragment slot="header-title">Taiwan Sugar Railway workshops</Fragment>
+								<Fragment slot="header-title-multilingual">
+									<TextMultilingual content={sampleTitleChinese} />
+								</Fragment>
+								<Fragment slot="header-subtitle">
+									<DividedItem>
+										<ContentCollectionLink collection="posts" />
+									</DividedItem>
+									<DividedItem>
+										<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
+									</DividedItem>
+								</Fragment>
+							</ContentHeader>
+						</ImageHero>
+					</Specimen>
+				</>
+			) : (
+				<Specimen name="Images" source="components/image/">
+					<p class={captionClass}>{noMedia}</p>
+				</Specimen>
+			)}
 		</Section>
 		<Section title="Content">
 			<Specimen
@@ -916,10 +901,8 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						showUpdated={true}
 					/>
 					<span class={captionClass}>
-						undefined date: <ContentDate
-							date={undefined}
-							datePreset={DatePresetEnum.Medium}
-						/>(nothing)
+						undefined date: <ContentDate date={undefined} datePreset={DatePresetEnum.Medium} />
+						(nothing)
 					</span>
 				</div>
 			</Specimen>
@@ -969,31 +952,29 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/parts/preview-card.astro"
 			>
 				<div class="max-w-md">
-					{
-						sampleItem ? (
-							<PreviewCard
-								alt={sampleItem.title}
-								imageId={sampleItem.imageId}
-								linkUrl={sampleItem.url}
-							>
-								<Fragment slot="preview-title">{sampleItem.title}</Fragment>
-								<Fragment slot="preview-title-multilingual">
-									<TextMultilingual content={sampleTitleChinese} />
-								</Fragment>
-								<Fragment slot="preview-subtitle">
-									<PreviewSubtitle
-										item={sampleItem}
-										showCollection={true}
-										showDate={true}
-										showLocations={true}
-									/>
-								</Fragment>
-								<Fragment slot="preview-description">
-									<Fragment set:html={renderMarkdownInline(sampleItem.description ?? '')} />
-								</Fragment>
-							</PreviewCard>
-						) : undefined
-					}
+					{sampleItem ? (
+						<PreviewCard
+							alt={sampleItem.title}
+							imageId={sampleItem.imageId}
+							linkUrl={sampleItem.url}
+						>
+							<Fragment slot="preview-title">{sampleItem.title}</Fragment>
+							<Fragment slot="preview-title-multilingual">
+								<TextMultilingual content={sampleTitleChinese} />
+							</Fragment>
+							<Fragment slot="preview-subtitle">
+								<PreviewSubtitle
+									item={sampleItem}
+									showCollection={true}
+									showDate={true}
+									showLocations={true}
+								/>
+							</Fragment>
+							<Fragment slot="preview-description">
+								<Fragment set:html={renderMarkdownInline(sampleItem.description ?? '')} />
+							</Fragment>
+						</PreviewCard>
+					) : undefined}
 				</div>
 			</Specimen>
 			<Specimen
@@ -1020,8 +1001,12 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/parts/preview-list.astro"
 			>
 				<Prose showCompact={true}>
-					<p><PreviewList items={sampleItems} /></p>
-					<p><PreviewList count={64} items={sampleItems} url={sampleUrl} /></p>
+					<p>
+						<PreviewList items={sampleItems} />
+					</p>
+					<p>
+						<PreviewList count={64} items={sampleItems} url={sampleUrl} />
+					</p>
 				</Prose>
 			</Specimen>
 			<Specimen
@@ -1128,15 +1113,11 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="The one React island here; source and popup data are inlined, so it draws without a chunk endpoint."
 				source="components/map/map-component.astro"
 			>
-				{
-					sampleMapData.hasGeodata ? (
-						<MapComponent mapComponentProps={sampleMapData} />
-					) : (
-						<p class={captionClass}>
-							No Location carries geometry, so the map has nothing to draw.
-						</p>
-					)
-				}
+				{sampleMapData.hasGeodata ? (
+					<MapComponent mapComponentProps={sampleMapData} />
+				) : (
+					<p class={captionClass}>No Location carries geometry, so the map has nothing to draw.</p>
+				)}
 			</Specimen>
 		</Section>
 		<Section
@@ -1153,7 +1134,9 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						chronologyYears={sampleChronologyYears}
 						currentYear={sampleChronologyYear}
 					>
-						<Anchor class="font-semibold" href={sampleUrl}>{t('chronology.index.label')}</Anchor>
+						<Anchor class="font-semibold" href={sampleUrl}>
+							{t('chronology.index.label')}
+						</Anchor>
 					</ChronologyNavigation>
 					<ChronologyNavigation
 						chronologyMonths={sampleChronologyMonths}
@@ -1215,15 +1198,13 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				<div class="flex flex-col gap-2">
 					<RegionsList terms={sampleRegions.nested} />
 					<RegionsList dividerContent="chevron" terms={sampleRegions.nested} />
-					{
-						sampleRegions.deepest ? (
-							<RegionsList
-								dividerContent="chevron"
-								showSingleRegionAncestors={true}
-								terms={[sampleRegions.deepest]}
-							/>
-						) : undefined
-					}
+					{sampleRegions.deepest ? (
+						<RegionsList
+							dividerContent="chevron"
+							showSingleRegionAncestors={true}
+							terms={[sampleRegions.deepest]}
+						/>
+					) : undefined}
 				</div>
 			</Specimen>
 			<Specimen
@@ -1248,29 +1229,25 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="A real Location's neighbours; distances come from the build-time pass, so nothing here is invented."
 				source="components/locations/locations-nearby-list.astro"
 			>
-				{
-					sampleNearbyLocations.length > 0 ? (
-						<LocationsNearbyList locations={sampleNearbyLocations} />
-					) : (
-						<p class={captionClass}>No Location has a resolved neighbour to list.</p>
-					)
-				}
+				{sampleNearbyLocations.length > 0 ? (
+					<LocationsNearbyList locations={sampleNearbyLocations} />
+				) : (
+					<p class={captionClass}>No Location has a resolved neighbour to list.</p>
+				)}
 			</Specimen>
 			<Specimen
 				name="regions-breadcrumbs"
 				note="The deepest Region's ancestor run. The current term is plain text unless <code>showCurrentLink</code> is set."
 				source="components/regions/regions-breadcrumbs.astro"
 			>
-				{
-					sampleRegions.deepest ? (
-						<div class="flex flex-col gap-2">
-							<RegionsBreadcrumbs entry={sampleRegions.deepest} />
-							<RegionsBreadcrumbs entry={sampleRegions.deepest} showCurrentLink={true} />
-						</div>
-					) : (
-						<p class={captionClass}>No nested Region, so there is no ancestor run to walk.</p>
-					)
-				}
+				{sampleRegions.deepest ? (
+					<div class="flex flex-col gap-2">
+						<RegionsBreadcrumbs entry={sampleRegions.deepest} />
+						<RegionsBreadcrumbs entry={sampleRegions.deepest} showCurrentLink={true} />
+					</div>
+				) : (
+					<p class={captionClass}>No nested Region, so there is no ancestor run to walk.</p>
+				)}
 			</Specimen>
 			<Specimen
 				bleed={true}
@@ -1278,56 +1255,48 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="A column per relation, each heading an overridable slot; alternate titles appear below the second level."
 				source="components/regions/regions-related.astro"
 			>
-				{
-					sampleRelatedRegion ? (
-						<RegionsRelated entry={sampleRelatedRegion} limit={6} />
-					) : (
-						<p class={captionClass}>No Region has both children and siblings.</p>
-					)
-				}
+				{sampleRelatedRegion ? (
+					<RegionsRelated entry={sampleRelatedRegion} limit={6} />
+				) : (
+					<p class={captionClass}>No Region has both children and siblings.</p>
+				)}
 			</Specimen>
 			<Specimen
 				name="regions-division"
 				note="The cached Division outline for a Region; decorative, so it sits behind content and is hidden from assistive tech."
 				source="components/regions/regions-division.astro"
 			>
-				{
-					sampleDivisionRegionId ? (
-						<RegionsDivision entryId={sampleDivisionRegionId} />
-					) : (
-						<p class={captionClass}>
-							No Division SVG in the cache, so there is no outline to draw.
-						</p>
-					)
-				}
+				{sampleDivisionRegionId ? (
+					<RegionsDivision entryId={sampleDivisionRegionId} />
+				) : (
+					<p class={captionClass}>No Division SVG in the cache, so there is no outline to draw.</p>
+				)}
 			</Specimen>
 		</Section>
 		<Section
 			note="Cards are drawn by a batch script rather than by Astro; the route behind this section renders that same template on demand."
 			title="Open Graph"
 		>
-			{
-				openGraphSpecimens.map(({ key, name, note, missing }) => {
-					const card = sampleOpenGraphCards.find((item) => item.key === key);
+			{openGraphSpecimens.map(({ key, name, note, missing }) => {
+				const card = sampleOpenGraphCards.find((item) => item.key === key);
 
-					return (
-						<Specimen name={name} note={note} source="packages/scripts/src/og-image/element.tsx">
-							{card ? (
-								<img
-									alt={card.entry.title}
-									class="h-auto w-full rounded-xs"
-									height={openGraphImageHeight}
-									loading="lazy"
-									src={`/inventory/og/${card.key}.jpg`}
-									width={openGraphImageWidth}
-								/>
-							) : (
-								<p class={captionClass}>{missing}</p>
-							)}
-						</Specimen>
-					);
-				})
-			}
+				return (
+					<Specimen name={name} note={note} source="packages/scripts/src/og-image/element.tsx">
+						{card ? (
+							<img
+								alt={card.entry.title}
+								class="h-auto w-full rounded-xs"
+								height={openGraphImageHeight}
+								loading="lazy"
+								src={`/inventory/og/${card.key}.jpg`}
+								width={openGraphImageWidth}
+							/>
+						) : (
+							<p class={captionClass}>{missing}</p>
+						)}
+					</Specimen>
+				);
+			})}
 		</Section>
 	</div>
 </MainSite>

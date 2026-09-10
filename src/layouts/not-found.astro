@@ -29,9 +29,9 @@ const description = t('notFound.description');
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description"
-			><Fragment set:html={renderMarkdownInline(description)} />
-			<NotFoundSuggestions /></Fragment
-		>
+		<Fragment slot="section-description">
+			<Fragment set:html={renderMarkdownInline(description)} />
+			<NotFoundSuggestions />
+		</Fragment>
 	</ContentSection>
 </MainSite>

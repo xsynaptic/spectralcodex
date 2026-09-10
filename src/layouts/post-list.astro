@@ -45,7 +45,9 @@ const description = t('collection.posts.description');
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
-		<Fragment slot="header-subtitle"><PaginationCounter page={page} /></Fragment>
+		<Fragment slot="header-subtitle">
+			<PaginationCounter page={page} />
+		</Fragment>
 	</ContentHeader>
 	<ContentSection>
 		<Fragment
@@ -53,46 +55,44 @@ const description = t('collection.posts.description');
 			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
 		/>
 	</ContentSection>
-	{
-		page.data.length > 0 ? (
-			<div class={MicroformatClassNames.Feed}>
-				{page.data.map(async (entry, index) => {
-					const { Content } = await render(entry);
-					const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+	{page.data.length > 0 ? (
+		<div class={MicroformatClassNames.Feed}>
+			{page.data.map(async (entry, index) => {
+				const { Content } = await render(entry);
+				const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
-					return (
-						<ContentExcerpt
-							entryUrl={getContentPath(entry.collection, entry.id)}
-							imageId={imageFeaturedId}
-							showDivider={index + 1 < page.data.length}
-						>
-							<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
-							<Fragment slot="excerpt-subtitle">
+				return (
+					<ContentExcerpt
+						entryUrl={getContentPath(entry.collection, entry.id)}
+						imageId={imageFeaturedId}
+						showDivider={index + 1 < page.data.length}
+					>
+						<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
+						<Fragment slot="excerpt-subtitle">
+							<DividedItem>
+								<ContentDate
+									date={entry.data.dateCreated}
+									datePreset={DatePresetEnum.Medium}
+									showMicroformats={true}
+								/>
+							</DividedItem>
+							{entry.data.dateUpdated ? (
 								<DividedItem>
 									<ContentDate
-										date={entry.data.dateCreated}
+										date={entry.data.dateUpdated}
 										datePreset={DatePresetEnum.Medium}
 										showMicroformats={true}
+										showUpdated={true}
 									/>
 								</DividedItem>
-								{entry.data.dateUpdated ? (
-									<DividedItem>
-										<ContentDate
-											date={entry.data.dateUpdated}
-											datePreset={DatePresetEnum.Medium}
-											showMicroformats={true}
-											showUpdated={true}
-										/>
-									</DividedItem>
-								) : undefined}
-							</Fragment>
-							<Content />
-						</ContentExcerpt>
-					);
-				})}
-			</div>
-		) : undefined
-	}
+							) : undefined}
+						</Fragment>
+						<Content />
+					</ContentExcerpt>
+				);
+			})}
+		</div>
+	) : undefined}
 	<ContentSection>
 		<PaginationSelect class="mt-4 md:mt-8" page={page} />
 	</ContentSection>

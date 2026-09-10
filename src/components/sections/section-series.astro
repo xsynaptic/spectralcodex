@@ -19,19 +19,17 @@ const getSeriesById = await createSeriesByIdFunction();
 const seriesData = getSeriesById({ collection: entry.collection, id: entry.id });
 ---
 
-{
-	seriesData.map(async ({ entry: seriesEntry, catalogItems }) => {
-		const { Content } = await render(seriesEntry);
+{seriesData.map(async ({ entry: seriesEntry, catalogItems }) => {
+	const { Content } = await render(seriesEntry);
 
-		return catalogItems.length > 0 ? (
-			<SeriesSection
-				items={catalogItems}
-				seriesTitle={seriesEntry.data.title}
-				url={getContentPath(seriesEntry.collection, seriesEntry.id)}
-				{...props}
-			>
-				<Content />
-			</SeriesSection>
-		) : undefined;
-	})
-}
+	return catalogItems.length > 0 ? (
+		<SeriesSection
+			items={catalogItems}
+			seriesTitle={seriesEntry.data.title}
+			url={getContentPath(seriesEntry.collection, seriesEntry.id)}
+			{...props}
+		>
+			<Content />
+		</SeriesSection>
+	) : undefined;
+})}

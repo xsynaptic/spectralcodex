@@ -45,177 +45,175 @@ const t = getTranslations();
 	role={role}
 	{...props}
 >
-	{
-		showIcon ? (
-			<div
-				class:list={[
-					'border-r px-1 py-1',
-					severity === NoticeBoxSeverityEnum.Info
-						? 'border-primary-300 bg-primary-100 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300'
-						: undefined,
-					severity === NoticeBoxSeverityEnum.Success
-						? 'border-green-200 bg-green-50 text-green-500 dark:border-green-600 dark:bg-green-600 dark:text-green-300'
-						: undefined,
-					severity === NoticeBoxSeverityEnum.Warning
-						? 'border-highlight-200 bg-highlight-50 text-highlight-500 dark:border-highlight-600 dark:bg-highlight-600 dark:text-highlight-300'
-						: undefined,
-					severity === NoticeBoxSeverityEnum.Error
-						? 'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300'
-						: undefined,
-				]}
-			>
-				<span class="sr-only">{t(severityLabelKeys[severity])}</span>
-				{(() => {
-					switch (severity) {
-						case NoticeBoxSeverityEnum.Info: {
-							// iconamoon:information-circle-duotone
-							return (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width={iconSize}
-									height={iconSize}
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<g fill="none">
-										<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
-										<circle
-											cx="12"
-											cy="12"
-											r="9"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M12 8h.01v.01H12z"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 12v4"
-										/>
-									</g>
-								</svg>
-							);
-						}
-						case NoticeBoxSeverityEnum.Success: {
-							// iconamoon:check-circle-1-duotone
-							return (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width={iconSize}
-									height={iconSize}
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<g fill="none">
-										<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
-										<circle
-											cx="12"
-											cy="12"
-											r="9"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="m15 10l-4 4l-2-2"
-										/>
-									</g>
-								</svg>
-							);
-						}
-						case NoticeBoxSeverityEnum.Warning: {
-							// iconamoon:attention-circle-duotone
-							return (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width={iconSize}
-									height={iconSize}
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<g fill="none">
-										<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
-										<circle
-											cx="12"
-											cy="12"
-											r="9"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linejoin="round"
-											stroke-width="3"
-											d="M12 16h.01v.01H12z"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 12V8"
-										/>
-									</g>
-								</svg>
-							);
-						}
-						case NoticeBoxSeverityEnum.Error: {
-							// iconamoon:close-circle-1-duotone
-							return (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width={iconSize}
-									height={iconSize}
-									viewBox="0 0 24 24"
-									aria-hidden="true"
-								>
-									<g fill="none">
-										<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
-										<circle
-											cx="12"
-											cy="12"
-											r="9"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-										/>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="m14 10l-4 4m0-4l4 4"
-										/>
-									</g>
-								</svg>
-							);
-						}
-						default: {
-							severity satisfies never;
-							return;
-						}
+	{showIcon ? (
+		<div
+			class:list={[
+				'border-r px-1 py-1',
+				severity === NoticeBoxSeverityEnum.Info
+					? 'border-primary-300 bg-primary-100 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300'
+					: undefined,
+				severity === NoticeBoxSeverityEnum.Success
+					? 'border-green-200 bg-green-50 text-green-500 dark:border-green-600 dark:bg-green-600 dark:text-green-300'
+					: undefined,
+				severity === NoticeBoxSeverityEnum.Warning
+					? 'border-highlight-200 bg-highlight-50 text-highlight-500 dark:border-highlight-600 dark:bg-highlight-600 dark:text-highlight-300'
+					: undefined,
+				severity === NoticeBoxSeverityEnum.Error
+					? 'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300'
+					: undefined,
+			]}
+		>
+			<span class="sr-only">{t(severityLabelKeys[severity])}</span>
+			{(() => {
+				switch (severity) {
+					case NoticeBoxSeverityEnum.Info: {
+						// iconamoon:information-circle-duotone
+						return (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width={iconSize}
+								height={iconSize}
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<g fill="none">
+									<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
+									<circle
+										cx="12"
+										cy="12"
+										r="9"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linejoin="round"
+										stroke-width="3"
+										d="M12 8h.01v.01H12z"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 12v4"
+									/>
+								</g>
+							</svg>
+						);
 					}
-				})()}
-			</div>
-		) : undefined
-	}
+					case NoticeBoxSeverityEnum.Success: {
+						// iconamoon:check-circle-1-duotone
+						return (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width={iconSize}
+								height={iconSize}
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<g fill="none">
+									<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
+									<circle
+										cx="12"
+										cy="12"
+										r="9"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="m15 10l-4 4l-2-2"
+									/>
+								</g>
+							</svg>
+						);
+					}
+					case NoticeBoxSeverityEnum.Warning: {
+						// iconamoon:attention-circle-duotone
+						return (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width={iconSize}
+								height={iconSize}
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<g fill="none">
+									<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
+									<circle
+										cx="12"
+										cy="12"
+										r="9"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linejoin="round"
+										stroke-width="3"
+										d="M12 16h.01v.01H12z"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 12V8"
+									/>
+								</g>
+							</svg>
+						);
+					}
+					case NoticeBoxSeverityEnum.Error: {
+						// iconamoon:close-circle-1-duotone
+						return (
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width={iconSize}
+								height={iconSize}
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<g fill="none">
+									<circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.2" />
+									<circle
+										cx="12"
+										cy="12"
+										r="9"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+									/>
+									<path
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="m14 10l-4 4m0-4l4 4"
+									/>
+								</g>
+							</svg>
+						);
+					}
+					default: {
+						severity satisfies never;
+						return;
+					}
+				}
+			})()}
+		</div>
+	) : undefined}
 	<div class="py-1 pr-2 pl-1 text-sm">
 		<slot />
 	</div>

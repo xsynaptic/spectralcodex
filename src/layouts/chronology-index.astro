@@ -37,49 +37,47 @@ const title = t('chronology.index.title');
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
-		<Fragment slot="header-subtitle"
-			><ChronologyNavigation chronologyYears={chronologyYears} /></Fragment
-		>
+		<Fragment slot="header-subtitle">
+			<ChronologyNavigation chronologyYears={chronologyYears} />
+		</Fragment>
 	</ContentHeader>
-	{
-		Object.entries(chronologyIndexData)
-			.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
-			.map(([year, monthlyData]) => {
-				const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
-					items: monthlyData.highlights,
-				});
+	{Object.entries(chronologyIndexData)
+		.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
+		.map(([year, monthlyData]) => {
+			const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
+				items: monthlyData.highlights,
+			});
 
-				return (
-					<div class="content-column-fill mb-8">
-						<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
-							<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-								<Anchor href={getSitePath('chronology', year)} anchorColor="primary">
-									{year}
-								</Anchor>
-							</h2>
-							<div class="flex flex-col gap-2">
-								<ChronologyItem
-									title={t('chronology.updated.label')}
-									items={monthlyData.updated}
-									count={monthlyData.updatedCount}
-								/>
-								<ChronologyItem
-									title={t('chronology.created.label')}
-									items={monthlyData.created}
-									count={monthlyData.createdCount}
-								/>
-								<ChronologyItem
-									title={t('chronology.visited.label')}
-									items={monthlyData.visited}
-									count={monthlyData.visitedCount}
-								/>
-							</div>
+			return (
+				<div class="content-column-fill mb-8">
+					<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+						<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
+							<Anchor href={getSitePath('chronology', year)} anchorColor="primary">
+								{year}
+							</Anchor>
+						</h2>
+						<div class="flex flex-col gap-2">
+							<ChronologyItem
+								title={t('chronology.updated.label')}
+								items={monthlyData.updated}
+								count={monthlyData.updatedCount}
+							/>
+							<ChronologyItem
+								title={t('chronology.created.label')}
+								items={monthlyData.created}
+								count={monthlyData.createdCount}
+							/>
+							<ChronologyItem
+								title={t('chronology.visited.label')}
+								items={monthlyData.visited}
+								count={monthlyData.visitedCount}
+							/>
 						</div>
-						{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-							<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
-						) : undefined}
 					</div>
-				);
-			})
-	}
+					{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
+						<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
+					) : undefined}
+				</div>
+			);
+		})}
 </MainSite>

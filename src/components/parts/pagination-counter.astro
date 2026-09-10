@@ -14,13 +14,11 @@ const { class: className, page, ...props } = Astro.props;
 const t = getTranslations();
 ---
 
-{
-	page.currentPage > 1 ? (
-		<div class:list={[className]} {...props}>
-			{formatStringTemplate(t('site.pagination.counter.label'), {
-				current: page.currentPage,
-				total: page.lastPage,
-			})}
-		</div>
-	) : undefined
-}
+{page.currentPage > 1 ? (
+	<div class:list={[className]} {...props}>
+		{formatStringTemplate(t('site.pagination.counter.label'), {
+			current: page.currentPage,
+			total: page.lastPage,
+		})}
+	</div>
+) : undefined}

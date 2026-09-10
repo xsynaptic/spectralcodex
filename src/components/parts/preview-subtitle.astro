@@ -33,56 +33,46 @@ const indexUrl = getSitePath(item.collection);
 const t = getTranslations();
 ---
 
-{
-	showCollection ? (
-		<DividedItem>
-			{indexUrl ? (
-				<Anchor href={indexUrl} class="font-semibold" showDarkMode={false}>
-					{t(`collection.${item.collection}.labelSingular`)}
+{showCollection ? (
+	<DividedItem>
+		{indexUrl ? (
+			<Anchor href={indexUrl} class="font-semibold" showDarkMode={false}>
+				{t(`collection.${item.collection}.labelSingular`)}
+			</Anchor>
+		) : (
+			<div class="font-semibold">{t(`collection.${item.collection}.labelSingular`)}</div>
+		)}
+	</DividedItem>
+) : undefined}
+{regions && regions.length > 0 ? (
+	<DividedItem>
+		{regions.map((region) => (
+			<DividedItem dividerContent="chevron">
+				<Anchor href={getContentPath('regions', region.id)} showDarkMode={false}>
+					{region.data.title}
 				</Anchor>
-			) : (
-				<div class="font-semibold">{t(`collection.${item.collection}.labelSingular`)}</div>
-			)}
-		</DividedItem>
-	) : undefined
-}
-{
-	regions && regions.length > 0 ? (
-		<DividedItem>
-			{regions.map((region) => (
-				<DividedItem dividerContent="chevron">
-					<Anchor href={getContentPath('regions', region.id)} showDarkMode={false}>
-						{region.data.title}
-					</Anchor>
-				</DividedItem>
-			))}
-		</DividedItem>
-	) : undefined
-}
-{
-	showLocations && item.locationCount && item.locationCount > 0 ? (
-		<DividedItem>
-			<span
-				set:html={`${t('collection.locations.labelPlural')}: ${formatNumber({ number: item.locationCount })}`}
-			/>
-		</DividedItem>
-	) : undefined
-}
-{
-	showPosts && item.postCount && item.postCount > 0 ? (
-		<DividedItem>
-			<span
-				set:html={`${t('collection.posts.labelPlural')}: ${formatNumber({ number: item.postCount })}`}
-			/>
-		</DividedItem>
-	) : undefined
-}
-{
-	showDate ? (
-		<ContentDate
-			date={item.dateUpdated ?? item.dateCreated}
-			datePreset={DatePresetEnum.Medium}
-			showMicroformats={showMicroformats}
+			</DividedItem>
+		))}
+	</DividedItem>
+) : undefined}
+{showLocations && item.locationCount && item.locationCount > 0 ? (
+	<DividedItem>
+		<span
+			set:html={`${t('collection.locations.labelPlural')}: ${formatNumber({ number: item.locationCount })}`}
 		/>
-	) : undefined
-}
+	</DividedItem>
+) : undefined}
+{showPosts && item.postCount && item.postCount > 0 ? (
+	<DividedItem>
+		<span
+			set:html={`${t('collection.posts.labelPlural')}: ${formatNumber({ number: item.postCount })}`}
+		/>
+	</DividedItem>
+) : undefined}
+{showDate ? (
+	<ContentDate
+		date={item.dateUpdated ?? item.dateCreated}
+		datePreset={DatePresetEnum.Medium}
+		showMicroformats={showMicroformats}
+	/>
+) : undefined}

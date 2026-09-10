@@ -99,58 +99,48 @@ const t = getTranslations();
 				<slot name="excerpt-title" />
 			</Anchor>
 		</h2>
-		{
-			subtitle ? (
-				<h3
-					class:list={[
-						'mb-1 text-xs font-medium md:text-sm',
-						'text-primary-400 dark:text-primary-500',
-					]}
-				>
-					<Fragment set:html={subtitle} />
-				</h3>
-			) : undefined
-		}
-		{
-			description ? (
-				<Prose>
-					<Fragment set:html={description} />
-				</Prose>
-			) : undefined
-		}
+		{subtitle ? (
+			<h3
+				class:list={[
+					'mb-1 text-xs font-medium md:text-sm',
+					'text-primary-400 dark:text-primary-500',
+				]}
+			>
+				<Fragment set:html={subtitle} />
+			</h3>
+		) : undefined}
+		{description ? (
+			<Prose>
+				<Fragment set:html={description} />
+			</Prose>
+		) : undefined}
 	</header>
-	{
-		imageProps && placeholderProps ? (
-			<div class="content-column mb-2 md:mb-4">
-				<ImagePlaceholder
-					class="relative overflow-hidden rounded-xs"
-					placeholderProps={placeholderProps}
-				>
-					<a href={entryUrl}>
-						<Image
-							class:list={['m-0 aspect-3/2 text-sm text-transparent', MicroformatClassNames.Photo]}
-							{...imageProps}
-						/>
-					</a>
-				</ImagePlaceholder>
-			</div>
-		) : undefined
-	}
+	{imageProps && placeholderProps ? (
+		<div class="content-column mb-2 md:mb-4">
+			<ImagePlaceholder
+				class="relative overflow-hidden rounded-xs"
+				placeholderProps={placeholderProps}
+			>
+				<a href={entryUrl}>
+					<Image
+						class:list={['m-0 aspect-3/2 text-sm text-transparent', MicroformatClassNames.Photo]}
+						{...imageProps}
+					/>
+				</a>
+			</ImagePlaceholder>
+		</div>
+	) : undefined}
 	<Prose class:list={['pb-4', 'e-content']} showBlocks={true}>
 		<Fragment set:html={excerptContent} />
 	</Prose>
-	{
-		hasExcerpt ? (
-			<div class="content-column text-right font-serif font-medium italic">
-				<Anchor href={entryUrl}>{t('content.more.label')}</Anchor>&nbsp;&raquo;
-			</div>
-		) : undefined
-	}
-</article>
-{
-	showDivider ? (
-		<div class="content-column">
-			<hr class="mt-8 mb-8 text-primary-200 dark:text-primary-700" />
+	{hasExcerpt ? (
+		<div class="content-column text-right font-serif font-medium italic">
+			<Anchor href={entryUrl}>{t('content.more.label')}</Anchor>&nbsp;&raquo;
 		</div>
-	) : undefined
-}
+	) : undefined}
+</article>
+{showDivider ? (
+	<div class="content-column">
+		<hr class="mt-8 mb-8 text-primary-200 dark:text-primary-700" />
+	</div>
+) : undefined}

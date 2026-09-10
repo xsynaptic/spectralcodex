@@ -106,7 +106,7 @@
 		"p-limit": "^7.3.2",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.6",
-		"prettier-plugin-astro": "^0.14.1",
+		"prettier-plugin-astro": "^1.0.0",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"remeda": "^2.47.0",
 		"satteri": "^0.10.5",

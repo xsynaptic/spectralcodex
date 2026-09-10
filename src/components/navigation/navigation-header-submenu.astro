@@ -31,33 +31,27 @@ const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...prop
 	aria-label={ariaLabel}
 	{...props}
 >
-	{
-		navigationItems.map((item, index) => {
-			const children = item.children ?? [];
-			const hasChildren = children.length > 0;
+	{navigationItems.map((item, index) => {
+		const children = item.children ?? [];
+		const hasChildren = children.length > 0;
 
-			return (
-				<li class="nav-sub-item">
-					<NavigationHeaderSubmenuTrigger item={item} hasChildren={hasChildren}>
-						<Fragment set:html={item.title} />
-						{shouldShowNavigationItemMultilingual(item, depth) ? (
-							<TextMultilingual
-								class="nav-ml"
-								content={item.titleMultilingual}
-								parenthesis={true}
-							/>
-						) : undefined}
-					</NavigationHeaderSubmenuTrigger>
-					{hasChildren ? (
-						<Astro.self
-							navigationItems={children}
-							depth={depth + 1}
-							isFirstNavigationItem={isFirstNavigationItem && index === 0}
-							ariaLabel={getNavigationItemAriaLabel(item)}
-						/>
+		return (
+			<li class="nav-sub-item">
+				<NavigationHeaderSubmenuTrigger item={item} hasChildren={hasChildren}>
+					<Fragment set:html={item.title} />
+					{shouldShowNavigationItemMultilingual(item, depth) ? (
+						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
 					) : undefined}
-				</li>
-			);
-		})
-	}
+				</NavigationHeaderSubmenuTrigger>
+				{hasChildren ? (
+					<Astro.self
+						navigationItems={children}
+						depth={depth + 1}
+						isFirstNavigationItem={isFirstNavigationItem && index === 0}
+						ariaLabel={getNavigationItemAriaLabel(item)}
+					/>
+				) : undefined}
+			</li>
+		);
+	})}
 </ul>

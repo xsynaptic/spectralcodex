@@ -38,15 +38,13 @@ const counts = webmentions
 	: [];
 ---
 
-{
-	webmentions ? (
-		<ContentSection
-			sectionTitle={t('section.webmentions')}
-			data-pagefind-ignore
-			data-nosnippet
-			{...props}
-		>
-			<WebmentionsList counts={counts} replies={webmentions.replies} />
-		</ContentSection>
-	) : undefined
-}
+{webmentions ? (
+	<ContentSection
+		sectionTitle={t('section.webmentions')}
+		data-pagefind-ignore
+		data-nosnippet
+		{...props}
+	>
+		<WebmentionsList counts={counts} replies={webmentions.replies} />
+	</ContentSection>
+) : undefined}

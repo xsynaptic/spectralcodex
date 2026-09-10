@@ -27,88 +27,86 @@ const {
 const indexSlot = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	chronologyYears.length > 0 ? (
+{chronologyYears.length > 0 ? (
+	<div
+		class:list={[
+			'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
+			hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
+			className,
+		]}
+		{...props}
+	>
 		<div
 			class:list={[
-				'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
-				hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
-				className,
+				'flex gap-1',
+				hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 			]}
-			{...props}
 		>
+			{indexSlot ? (
+				<DividedItem dividerContent="chevron">
+					<Fragment set:html={indexSlot} />
+				</DividedItem>
+			) : undefined}
+			{chronologyYears.map((chronologyYear) => (
+				<DividedItem>
+					{!currentMonth && currentYear === chronologyYear ? (
+						<span
+							class:list={[
+								'font-semibold text-primary-600 dark:text-primary-400',
+								hasHeroImage ? 'sm:text-accent-200' : '',
+							]}
+						>
+							{chronologyYear}
+						</span>
+					) : (
+						<Anchor
+							class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
+							href={getSitePath('chronology', chronologyYear)}
+							anchorColor="accent"
+						>
+							{chronologyYear}
+						</Anchor>
+					)}
+				</DividedItem>
+			))}
+		</div>
+		{currentYear && currentMonth && chronologyMonths && chronologyMonths.length > 0 ? (
 			<div
 				class:list={[
 					'flex gap-1',
 					hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 				]}
 			>
-				{indexSlot ? (
-					<DividedItem dividerContent="chevron">
-						<Fragment set:html={indexSlot} />
-					</DividedItem>
-				) : undefined}
-				{chronologyYears.map((chronologyYear) => (
-					<DividedItem>
-						{!currentMonth && currentYear === chronologyYear ? (
-							<span
-								class:list={[
-									'font-semibold text-primary-600 dark:text-primary-400',
-									hasHeroImage ? 'sm:text-accent-200' : '',
-								]}
-							>
-								{chronologyYear}
-							</span>
-						) : (
-							<Anchor
-								class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
-								href={getSitePath('chronology', chronologyYear)}
-								anchorColor="accent"
-							>
-								{chronologyYear}
-							</Anchor>
-						)}
-					</DividedItem>
-				))}
-			</div>
-			{currentYear && currentMonth && chronologyMonths && chronologyMonths.length > 0 ? (
-				<div
-					class:list={[
-						'flex gap-1',
-						hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
-					]}
-				>
-					{chronologyMonths
-						.sort((monthA, monthB) => monthA.localeCompare(monthB))
-						.map((monthNumber) => {
-							const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('en-US', {
-								month: 'long',
-							});
+				{chronologyMonths
+					.sort((monthA, monthB) => monthA.localeCompare(monthB))
+					.map((monthNumber) => {
+						const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('en-US', {
+							month: 'long',
+						});
 
-							return (
-								<DividedItem>
-									{currentMonth === monthNumber ? (
-										<span
-											class:list={[
-												'font-semibold text-highlight-600',
-												hasHeroImage ? 'sm:text-highlight-200' : '',
-											]}
-										>
-											{monthName}
-										</span>
-									) : (
-										<Anchor
-											href={getSitePath('chronology', currentYear, monthNumber)}
-											anchorColor="highlight"
-										>
-											{monthName}
-										</Anchor>
-									)}
-								</DividedItem>
-							);
-						})}
-				</div>
-			) : undefined}
-		</div>
-	) : undefined
-}
+						return (
+							<DividedItem>
+								{currentMonth === monthNumber ? (
+									<span
+										class:list={[
+											'font-semibold text-highlight-600',
+											hasHeroImage ? 'sm:text-highlight-200' : '',
+										]}
+									>
+										{monthName}
+									</span>
+								) : (
+									<Anchor
+										href={getSitePath('chronology', currentYear, monthNumber)}
+										anchorColor="highlight"
+									>
+										{monthName}
+									</Anchor>
+								)}
+							</DividedItem>
+						);
+					})}
+			</div>
+		) : undefined}
+	</div>
+) : undefined}

@@ -14,17 +14,15 @@ interface Props {
 const { class: className, items } = Astro.props;
 ---
 
-{
-	items.length > 0 ? (
-		<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
-			{items.map(({ url, title, titleMultilingual }) => (
-				<ListColumnItem>
-					<Anchor href={url}>{title}</Anchor>
-					{titleMultilingual ? (
-						<TextMultilingual content={titleMultilingual} parenthesis={true} />
-					) : undefined}
-				</ListColumnItem>
-			))}
-		</ListColumn>
-	) : undefined
-}
+{items.length > 0 ? (
+	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
+		{items.map(({ url, title, titleMultilingual }) => (
+			<ListColumnItem>
+				<Anchor href={url}>{title}</Anchor>
+				{titleMultilingual ? (
+					<TextMultilingual content={titleMultilingual} parenthesis={true} />
+				) : undefined}
+			</ListColumnItem>
+		))}
+	</ListColumn>
+) : undefined}

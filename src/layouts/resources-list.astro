@@ -45,27 +45,23 @@ const description = t(`collection.resources.description`);
 			slot="section-description"
 			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
 		/>
-		{
-			page.data.length > 0 ? (
-				<>
-					<ListColumn>
-						{page.data.map((entry) => (
-							<ListColumnItem>
-								<Anchor href={getContentPath(entry.collection, entry.id)}>
-									{entry.data.title}
-								</Anchor>
-								{entry.data._entryCount ? (
-									<span
-										class="text-sm text-gray-500"
-										set:html={`(${formatNumber({ number: entry.data._entryCount })})`}
-									/>
-								) : undefined}
-							</ListColumnItem>
-						))}
-					</ListColumn>
-					<PaginationSelect class="mt-4 md:mt-8" page={page} />
-				</>
-			) : undefined
-		}
+		{page.data.length > 0 ? (
+			<>
+				<ListColumn>
+					{page.data.map((entry) => (
+						<ListColumnItem>
+							<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
+							{entry.data._entryCount ? (
+								<span
+									class="text-sm text-gray-500"
+									set:html={`(${formatNumber({ number: entry.data._entryCount })})`}
+								/>
+							) : undefined}
+						</ListColumnItem>
+					))}
+				</ListColumn>
+				<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			</>
+		) : undefined}
 	</ContentSection>
 </MainSite>

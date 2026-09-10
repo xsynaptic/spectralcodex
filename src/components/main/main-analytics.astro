@@ -17,6 +17,7 @@ const { umamiDomain, umamiId, isViewTransitionsEnabled, ...props } = Astro.props
 	data-exclude-hash={true}
 	data-do-not-track={true}
 	{...props}
-	{...isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {}}
+	{...(isViewTransitionsEnabled ? { 'data-astro-rerun': '' } : {})}
 	defer
-	is:inline></script>
+	is:inline
+></script>

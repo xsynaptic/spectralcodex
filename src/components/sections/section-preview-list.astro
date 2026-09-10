@@ -18,17 +18,15 @@ const { items, count, ...props } = Astro.props;
 const t = getTranslations();
 ---
 
-{
-	items.length > 0 ? (
-		<ContentSection
-			sectionTitle={t('section.itemsList')}
-			data-pagefind-ignore
-			data-nosnippet
-			{...props}
-		>
-			<Prose>
-				<PreviewList items={items} count={count} />
-			</Prose>
-		</ContentSection>
-	) : undefined
-}
+{items.length > 0 ? (
+	<ContentSection
+		sectionTitle={t('section.itemsList')}
+		data-pagefind-ignore
+		data-nosnippet
+		{...props}
+	>
+		<Prose>
+			<PreviewList items={items} count={count} />
+		</Prose>
+	</ContentSection>
+) : undefined}

@@ -62,22 +62,18 @@ const t = getTranslations();
 			href={getBasePath('favicon.svg')}
 			media="(prefers-color-scheme: dark)"
 		/>
-		{
-			IMAGE_SERVER_URL.startsWith('http') ? (
-				<link rel="preconnect" href={IMAGE_SERVER_URL} crossorigin />
-			) : undefined
-		}
+		{IMAGE_SERVER_URL.startsWith('http') ? (
+			<link rel="preconnect" href={IMAGE_SERVER_URL} crossorigin />
+		) : undefined}
 		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
 		<ModeManagerSetup defaultMode="auto" />
 		<Meta {...meta} />
-		{
-			UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
-				<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
-			) : undefined
-		}
+		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
+			<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
+		) : undefined}
 		<ClientRouter />
 		<meta name="build-version" content={import.meta.env.BUILD_VERSION} />
 		<script is:inline>
@@ -97,11 +93,9 @@ const t = getTranslations();
 			href={getBasePath('rss.xml')}
 		/>
 		<link rel="sitemap" href={getBasePath('sitemap-index.xml')} />
-		{
-			WEBMENTION_DOMAIN ? (
-				<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
-			) : undefined
-		}
+		{WEBMENTION_DOMAIN ? (
+			<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
+		) : undefined}
 	</head>
 	<body
 		class:list={[
@@ -143,32 +137,28 @@ const t = getTranslations();
 				target="#main-content"
 				label={t('site.skip.label')}
 			/>
-			<div
-				class="content-column flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1"
-			>
-				{
-					isHomepage ? (
-						<h1 class="flex grow items-center gap-1">
-							<Anchor
-								href={siteUrl}
-								class="text-xl font-semibold md:text-2xl lg:text-3xl"
-								anchorColor="primary"
-							>
-								{t('site.title')}
-							</Anchor>
-						</h1>
-					) : (
-						<div class="flex grow items-center gap-1">
-							<Anchor
-								href={siteUrl}
-								class="text-xl font-semibold md:text-2xl lg:text-3xl"
-								anchorColor="primary"
-							>
-								{t('site.title')}
-							</Anchor>
-						</div>
-					)
-				}
+			<div class="content-column flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1">
+				{isHomepage ? (
+					<h1 class="flex grow items-center gap-1">
+						<Anchor
+							href={siteUrl}
+							class="text-xl font-semibold md:text-2xl lg:text-3xl"
+							anchorColor="primary"
+						>
+							{t('site.title')}
+						</Anchor>
+					</h1>
+				) : (
+					<div class="flex grow items-center gap-1">
+						<Anchor
+							href={siteUrl}
+							class="text-xl font-semibold md:text-2xl lg:text-3xl"
+							anchorColor="primary"
+						>
+							{t('site.title')}
+						</Anchor>
+					</div>
+				)}
 				<ModeToggle />
 				<Search />
 			</div>
@@ -176,7 +166,7 @@ const t = getTranslations();
 				<NavigationHeader hasHeroImage={hasHeroImage} />
 			</div>
 		</header>
-		<main class="flex-1" {...hasHeroImage ? {} : { id: 'main-content' }}>
+		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content' })}>
 			<slot />
 		</main>
 		<footer class="content-column mt-8 mb-8 w-full pt-4">

@@ -100,28 +100,24 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	hasHeroImage={hasHeroImage}
 	isHomepage={true}
 >
-	{
-		hasHeroImage ? (
-			<ImageHero imageFeaturedGroup={imageFeaturedGroup} withTitle={false} />
-		) : undefined
-	}
-	<ContentSection class="mt-4" {...hasHeroImage ? { id: 'main-content' } : {}}>
+	{hasHeroImage ? (
+		<ImageHero imageFeaturedGroup={imageFeaturedGroup} withTitle={false} />
+	) : undefined}
+	<ContentSection class="mt-4" {...(hasHeroImage ? { id: 'main-content' } : {})}>
 		<CardFrame
 			class:list={[
 				'mb-4 min-w-[180px] xs:float-end xs:mt-1 xs:mb-1 xs:ml-4 xs:w-[30%] xs:max-w-[300px] lg:mt-2 lg:mb-2',
 				MicroformatClassNames.Card,
 			]}
 		>
-			{
-				imageProps ? (
-					<ImagePlaceholder
-						class="relative overflow-hidden rounded-xs grayscale"
-						placeholderProps={placeholderProps}
-					>
-						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
-					</ImagePlaceholder>
-				) : undefined
-			}
+			{imageProps ? (
+				<ImagePlaceholder
+					class="relative overflow-hidden rounded-xs grayscale"
+					placeholderProps={placeholderProps}
+				>
+					<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
+				</ImagePlaceholder>
+			) : undefined}
 			<AuthorCard />
 		</CardFrame>
 		<Prose>
@@ -153,11 +149,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		/>
 	</ContentSection>
 	<ContentSection>
-		<Fragment slot="section-title"
-			><Anchor href={getSitePath('themes')} anchorColor="primary"
-				>{t('collection.themes.labelPlural')}</Anchor
-			></Fragment
-		>
+		<Fragment slot="section-title">
+			<Anchor href={getSitePath('themes')} anchorColor="primary">
+				{t('collection.themes.labelPlural')}
+			</Anchor>
+		</Fragment>
 		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.themes'))} />
 		<PreviewGrid
 			items={themesCatalogItems}
@@ -167,11 +163,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		/>
 	</ContentSection>
 	<ContentSection>
-		<Fragment slot="section-title"
-			><Anchor href={getSitePath('series')} anchorColor="primary"
-				>{t('collection.series.labelPlural')}</Anchor
-			></Fragment
-		>
+		<Fragment slot="section-title">
+			<Anchor href={getSitePath('series')} anchorColor="primary">
+				{t('collection.series.labelPlural')}
+			</Anchor>
+		</Fragment>
 		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.series'))} />
 		<PreviewGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>

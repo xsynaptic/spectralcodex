@@ -14,23 +14,19 @@ interface Props {
 const { class: className, sources } = Astro.props;
 ---
 
-{
-	sources.length > 0 ? (
-		<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
-			{sources.map((source) => {
-				const { url, primary, multilingual } = buildSourceCitations(source);
+{sources.length > 0 ? (
+	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
+		{sources.map((source) => {
+			const { url, primary, multilingual } = buildSourceCitations(source);
 
-				return (
-					<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
-						{primary ? (
-							<CitationLine citation={primary} url={url} titleClass="italic" />
-						) : undefined}
-						{multilingual ? (
-							<CitationLine citation={multilingual} url={url} lang={multilingual.lang} />
-						) : undefined}
-					</ListColumnItem>
-				);
-			})}
-		</ListColumn>
-	) : undefined
-}
+			return (
+				<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
+					{primary ? <CitationLine citation={primary} url={url} titleClass="italic" /> : undefined}
+					{multilingual ? (
+						<CitationLine citation={multilingual} url={url} lang={multilingual.lang} />
+					) : undefined}
+				</ListColumnItem>
+			);
+		})}
+	</ListColumn>
+) : undefined}

@@ -32,5 +32,7 @@ const children = await renderSlot(Astro.slots, 'default');
 		showDarkMode ? undefined : 'anchor-static',
 		className,
 	]}
-	{...props}><Fragment set:html={children} /></a
+	{...props}
 >
+	<Fragment set:html={children} />
+</a>

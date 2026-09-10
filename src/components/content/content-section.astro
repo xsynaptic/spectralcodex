@@ -26,49 +26,47 @@ const description = await renderSlot(Astro.slots, 'section-description');
 const children = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	description || children ? (
-		<div
-			class:list={[
-				fillViewport ? 'content-column-fill' : 'content-column',
-				marginSmall ? 'mb-4' : 'mb-8',
-				className,
-			]}
-			{...props}
-		>
-			{title || subtitle || description ? (
-				<header
-					class:list={[description ? undefined : 'mb-2', fillViewport ? 'px-4 sm:px-0' : undefined]}
-				>
-					{title ? (
-						<h2
-							class:list={[
-								'mb-1 font-semibold',
-								'text-primary-700 dark:text-primary-200',
-								titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
-							]}
-						>
-							<Fragment set:html={title} />
-						</h2>
-					) : undefined}
-					{subtitle ? (
-						<h3
-							class:list={[
-								'mb-1 text-xs font-medium md:text-sm',
-								'text-primary-400 dark:text-primary-600',
-							]}
-						>
-							<Fragment set:html={subtitle} />
-						</h3>
-					) : undefined}
-					{description ? (
-						<Prose class:list={['mb-4']}>
-							<Fragment set:html={description} />
-						</Prose>
-					) : undefined}
-				</header>
-			) : undefined}
-			<Fragment set:html={children} />
-		</div>
-	) : undefined
-}
+{description || children ? (
+	<div
+		class:list={[
+			fillViewport ? 'content-column-fill' : 'content-column',
+			marginSmall ? 'mb-4' : 'mb-8',
+			className,
+		]}
+		{...props}
+	>
+		{title || subtitle || description ? (
+			<header
+				class:list={[description ? undefined : 'mb-2', fillViewport ? 'px-4 sm:px-0' : undefined]}
+			>
+				{title ? (
+					<h2
+						class:list={[
+							'mb-1 font-semibold',
+							'text-primary-700 dark:text-primary-200',
+							titleLarge ? 'text-xl md:text-2xl' : 'text-xs uppercase md:text-sm',
+						]}
+					>
+						<Fragment set:html={title} />
+					</h2>
+				) : undefined}
+				{subtitle ? (
+					<h3
+						class:list={[
+							'mb-1 text-xs font-medium md:text-sm',
+							'text-primary-400 dark:text-primary-600',
+						]}
+					>
+						<Fragment set:html={subtitle} />
+					</h3>
+				) : undefined}
+				{description ? (
+					<Prose class:list={['mb-4']}>
+						<Fragment set:html={description} />
+					</Prose>
+				) : undefined}
+			</header>
+		) : undefined}
+		<Fragment set:html={children} />
+	</div>
+) : undefined}

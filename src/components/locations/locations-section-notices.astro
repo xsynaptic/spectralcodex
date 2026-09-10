@@ -52,10 +52,8 @@ const notices = noticeKeys.map((key) => ({
 }));
 ---
 
-{
-	shouldShowDangerNotice || shouldShowVanishedNotice ? (
-		<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
-			<LocationsNotices notices={notices} />
-		</ContentSection>
-	) : undefined
-}
+{shouldShowDangerNotice || shouldShowVanishedNotice ? (
+	<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
+		<LocationsNotices notices={notices} />
+	</ContentSection>
+) : undefined}

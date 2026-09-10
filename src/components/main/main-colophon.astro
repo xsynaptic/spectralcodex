@@ -22,37 +22,40 @@ const t = getTranslations();
 	]}
 	aria-label={t('site.colophon.label')}
 >
-	<DividedItem dividerColor="muted"
-		><span class="text-primary-400 dark:text-primary-500">※</span>
-		<span>{t('site.footer.updated.label')} <DateDisplay date={dateBuild} /></span></DividedItem
-	>
-	<DividedItem dividerColor="muted"
-		><span>
-			{
-				formatStringTemplate(t('site.footer.copyright.label'), {
-					year: siteYearFounded,
-					currentYear,
-				})
-			}
-			{' '}
-			<Anchor href={siteUrl} anchorColor="accent">{t('site.title')}</Anchor></span
-		>
+	<DividedItem dividerColor="muted">
+		<span class="text-primary-400 dark:text-primary-500">※</span>
+		<span>
+			{t('site.footer.updated.label')} <DateDisplay date={dateBuild} />
+		</span>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<span
-			>{t('site.footer.powered.label')}{' '}
-			<Anchor href="https://astro.build" anchorColor="accent">Astro</Anchor></span
-		>
+		<span>
+			{formatStringTemplate(t('site.footer.copyright.label'), {
+				year: siteYearFounded,
+				currentYear,
+			})}{' '}
+			<Anchor href={siteUrl} anchorColor="accent">
+				{t('site.title')}
+			</Anchor>
+		</span>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<Anchor href={getSitePath('build-stats')} anchorColor="accent"
-			>{t('site.footer.buildStats.label')}</Anchor
-		>
+		<span>
+			{t('site.footer.powered.label')}{' '}
+			<Anchor href="https://astro.build" anchorColor="accent">
+				Astro
+			</Anchor>
+		</span>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<Anchor href="https://github.com/xsynaptic/spectralcodex" anchorColor="accent"
-			>{t('site.footer.sourceCode.label')}</Anchor
-		>
+		<Anchor href={getSitePath('build-stats')} anchorColor="accent">
+			{t('site.footer.buildStats.label')}
+		</Anchor>
+	</DividedItem>
+	<DividedItem dividerColor="muted">
+		<Anchor href="https://github.com/xsynaptic/spectralcodex" anchorColor="accent">
+			{t('site.footer.sourceCode.label')}
+		</Anchor>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
 		<Anchor
@@ -61,7 +64,8 @@ const t = getTranslations();
 			anchorColor="accent"
 			rel="feed"
 			data-astro-prefetch="false"
-			><span>{t('site.footer.feed.label')}</span>
+		>
+			<span>{t('site.footer.feed.label')}</span>
 			<div class="colophon-rss-icon">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -70,11 +74,13 @@ const t = getTranslations();
 					height="1em"
 					viewBox="0 0 24 24"
 					aria-labelledby="colophon-rss-icon"
-					><path
+				>
+					<path
 						fill="currentColor"
 						d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2.5 12A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 18A1.5 1.5 0 0 0 9 16.5A1.5 1.5 0 0 0 7.5 15M6 10v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8m0-4v2a10 10 0 0 1 10 10h2A12 12 0 0 0 6 6"
-					></path><title id="colophon-rss-icon">{t('site.footer.feed.label')}</title></svg
-				>
+					></path>
+					<title id="colophon-rss-icon">{t('site.footer.feed.label')}</title>
+				</svg>
 			</div>
 		</Anchor>
 	</DividedItem>

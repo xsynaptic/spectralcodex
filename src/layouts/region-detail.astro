@@ -96,57 +96,45 @@ const entryCount = entry.data._entryCount ?? 0;
 					<DividedItem>
 						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
-					{
-						entry.data.parent ? (
-							<DividedItem>
-								<RegionsBreadcrumbs entry={entry} />
-							</DividedItem>
-						) : undefined
-					}
-					{
-						entryCount > 0 ? (
-							<DividedItem>
-								{formatStringTemplate(t('content.meta.entries.label'), {
-									count: formatNumber({ number: entryCount }),
-								})}
-							</DividedItem>
-						) : undefined
-					}
-					{
-						backlinksCount >= backlinksDisplayCountMinimum ? (
-							<DividedItem>
-								{formatStringTemplate(t('content.meta.backlinks.label'), {
-									count: formatNumber({ number: backlinksCount }),
-								})}
-							</DividedItem>
-						) : undefined
-					}
+					{entry.data.parent ? (
+						<DividedItem>
+							<RegionsBreadcrumbs entry={entry} />
+						</DividedItem>
+					) : undefined}
+					{entryCount > 0 ? (
+						<DividedItem>
+							{formatStringTemplate(t('content.meta.entries.label'), {
+								count: formatNumber({ number: entryCount }),
+							})}
+						</DividedItem>
+					) : undefined}
+					{backlinksCount >= backlinksDisplayCountMinimum ? (
+						<DividedItem>
+							{formatStringTemplate(t('content.meta.backlinks.label'), {
+								count: formatNumber({ number: backlinksCount }),
+							})}
+						</DividedItem>
+					) : undefined}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
 		<ContentProse entry={entry} />
 		<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
-			{
-				regionsOption?.termsChildrenLabel ? (
-					<Fragment slot="regions-children-title">{regionsOption.termsChildrenLabel}</Fragment>
-				) : undefined
-			}
-			{
-				regionsOption?.termsSiblingsLabel ? (
-					<Fragment slot="regions-siblings-title">{regionsOption.termsSiblingsLabel}</Fragment>
-				) : undefined
-			}
+			{regionsOption?.termsChildrenLabel ? (
+				<Fragment slot="regions-children-title">{regionsOption.termsChildrenLabel}</Fragment>
+			) : undefined}
+			{regionsOption?.termsSiblingsLabel ? (
+				<Fragment slot="regions-siblings-title">{regionsOption.termsSiblingsLabel}</Fragment>
+			) : undefined}
 		</RegionsRelated>
 		<SectionMap mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />
 		<SectionWebmentions entry={entry} />
 		<SectionPreviews page={page} showMicroformats={true} />
-		{
-			page.currentPage === 1 && catalogItems.length > 0 ? (
-				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
-			) : undefined
-		}
+		{page.currentPage === 1 && catalogItems.length > 0 ? (
+			<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
+		) : undefined}
 		<RegionsDivision entryId={entry.id} />
 	</ContentArticle>
 </MainSite>

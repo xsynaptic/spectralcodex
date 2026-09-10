@@ -82,8 +82,10 @@ const { Content } = await render(entry);
 					<a
 						href={Astro.url.toString()}
 						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						rel="bookmark">{stripDiacritics(entry.data.title)}</a
+						rel="bookmark"
 					>
+						{stripDiacritics(entry.data.title)}
+					</a>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
@@ -96,18 +98,16 @@ const { Content } = await render(entry);
 							showMicroformats={true}
 						/>
 					</DividedItem>
-					{
-						entry.data.dateUpdated ? (
-							<DividedItem>
-								<ContentDate
-									date={entry.data.dateUpdated}
-									datePreset={DatePresetEnum.Medium}
-									showMicroformats={true}
-									showUpdated={true}
-								/>
-							</DividedItem>
-						) : undefined
-					}
+					{entry.data.dateUpdated ? (
+						<DividedItem>
+							<ContentDate
+								date={entry.data.dateUpdated}
+								datePreset={DatePresetEnum.Medium}
+								showMicroformats={true}
+								showUpdated={true}
+							/>
+						</DividedItem>
+					) : undefined}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

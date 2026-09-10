@@ -299,13 +299,33 @@ const MapPopupFooter: FC<{
 	);
 };
 
+const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision({ precision }) {
+	const messages = useMapMessages();
+
+	if (precision > 2) return;
+
+	return (
+		<div className="map-popup-precision">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 36 36"
+				className="map-popup-warning-icon"
+			>
+				<use href={`#${MapSpritesEnum.Warning}`}></use>
+			</svg>
+			<span className="map-popup-warning-text">
+				{precision === 2 ? messages.precisionWarning : messages.precisionError}
+			</span>
+		</div>
+	);
+};
+
 const MapPopupContent: FC<{
 	popupItem: MapPopupItemExtended;
 	imageServerUrl: string;
 	isDev: boolean | undefined;
 }> = function MapPopupContent({ popupItem, imageServerUrl, isDev }) {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
-	const messages = useMapMessages();
 
 	const {
 		title,
@@ -346,20 +366,7 @@ const MapPopupContent: FC<{
 						<span className="map-popup-objective">{objective}</span>
 					) : undefined}
 				</div>
-				{precision <= 2 ? (
-					<div className="map-popup-precision">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 36 36"
-							className="map-popup-warning-icon"
-						>
-							<use href={`#${MapSpritesEnum.Warning}`}></use>
-						</svg>
-						<span className="map-popup-warning-text">
-							{precision === 2 ? messages.precisionWarning : messages.precisionError}
-						</span>
-					</div>
-				) : undefined}
+				<MapPopupPrecision precision={precision} />
 				{description ? (
 					<div
 						className="map-popup-description"

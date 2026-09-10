@@ -14,8 +14,6 @@ const { as: Tag = 'span', class: className, before = '(', after = ')', ...props 
 const content = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	content ? (
-		<Tag class={className} {...props} set:html={`${before}${content}${after}`} />
-	) : undefined
-}
+{content ? (
+	<Tag class={className} {...props} set:html={`${before}${content}${after}`} />
+) : undefined}

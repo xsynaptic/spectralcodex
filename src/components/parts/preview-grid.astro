@@ -37,38 +37,36 @@ function getRegions(item: CatalogItem) {
 }
 ---
 
-{
-	items.length > 0 ? (
-		<Grid class:list={[className, showMicroformats ? MicroformatClassNames.Feed : undefined]}>
-			{items.map((item) => (
-				<PreviewCard
-					imageId={item.imageId}
-					linkUrl={item.url}
-					alt={item.title}
-					showMicroformats={showMicroformats}
-					titleAs={titleAs}
-				>
-					<Fragment slot="preview-title">{stripDiacritics(item.title)}</Fragment>
-					{previewOptions.showTitleMultilingual && item.titleMultilingual ? (
-						<Fragment slot="preview-title-multilingual">
-							<TextMultilingual content={item.titleMultilingual} />
-						</Fragment>
-					) : undefined}
-					<Fragment slot="preview-subtitle">
-						<PreviewSubtitle
-							item={item}
-							regions={getRegions(item)}
-							showMicroformats={showMicroformats}
-							{...previewOptions}
-						/>
+{items.length > 0 ? (
+	<Grid class:list={[className, showMicroformats ? MicroformatClassNames.Feed : undefined]}>
+		{items.map((item) => (
+			<PreviewCard
+				imageId={item.imageId}
+				linkUrl={item.url}
+				alt={item.title}
+				showMicroformats={showMicroformats}
+				titleAs={titleAs}
+			>
+				<Fragment slot="preview-title">{stripDiacritics(item.title)}</Fragment>
+				{previewOptions.showTitleMultilingual && item.titleMultilingual ? (
+					<Fragment slot="preview-title-multilingual">
+						<TextMultilingual content={item.titleMultilingual} />
 					</Fragment>
-					{previewOptions.showDescription && item.description ? (
-						<Fragment slot="preview-description">
-							<Fragment set:html={renderMarkdownInline(item.description)} />
-						</Fragment>
-					) : undefined}
-				</PreviewCard>
-			))}
-		</Grid>
-	) : undefined
-}
+				) : undefined}
+				<Fragment slot="preview-subtitle">
+					<PreviewSubtitle
+						item={item}
+						regions={getRegions(item)}
+						showMicroformats={showMicroformats}
+						{...previewOptions}
+					/>
+				</Fragment>
+				{previewOptions.showDescription && item.description ? (
+					<Fragment slot="preview-description">
+						<Fragment set:html={renderMarkdownInline(item.description)} />
+					</Fragment>
+				) : undefined}
+			</PreviewCard>
+		))}
+	</Grid>
+) : undefined}

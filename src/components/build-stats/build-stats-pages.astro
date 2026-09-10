@@ -29,7 +29,11 @@ const tooltipRows = [{ label: t('buildStats.tooltip.pages'), series: 'pages' }];
 >
 	<path class="stats-area stats-series-pages" d={geometry.areaPath}></path>
 	<path class="stats-line stats-series-pages" d={geometry.linePath}></path>
-	<circle class="stats-endpoint stats-series-pages" cx={geometry.end.cx} cy={geometry.end.cy} r="4"
+	<circle
+		class="stats-endpoint stats-series-pages"
+		cx={geometry.end.cx}
+		cy={geometry.end.cy}
+		r="4"
 	></circle>
 	<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
 		{geometry.end.label}

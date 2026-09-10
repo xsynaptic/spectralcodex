@@ -23,41 +23,37 @@ const {
 } = Astro.props;
 ---
 
-{
-	content && parenthesis ? (
-		<>
-			{' '}
-			<TextParenthesis as={Tag} class={className}>
-				<Tag
-					lang={content.lang}
-					class:list={[isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
-					{...props}
-					set:html={content.value.trim()}
-				/>
-			</TextParenthesis>
-		</>
-	) : undefined
-}
-{
-	content && !parenthesis ? (
-		<>
+{content && parenthesis ? (
+	<>
+		{' '}
+		<TextParenthesis as={Tag} class={className}>
 			<Tag
 				lang={content.lang}
-				class:list={[className, isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
+				class:list={[isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
 				{...props}
 				set:html={content.value.trim()}
 			/>
-			{additional?.map((item) => (
-				<>
-					{'／'}
-					<Tag
-						lang={item.lang}
-						class:list={[className, isCjkLanguage(item.lang) ? 'cjk-text' : undefined]}
-						{...props}
-						set:html={item.value.trim()}
-					/>
-				</>
-			))}
-		</>
-	) : undefined
-}
+		</TextParenthesis>
+	</>
+) : undefined}
+{content && !parenthesis ? (
+	<>
+		<Tag
+			lang={content.lang}
+			class:list={[className, isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
+			{...props}
+			set:html={content.value.trim()}
+		/>
+		{additional?.map((item) => (
+			<>
+				{'／'}
+				<Tag
+					lang={item.lang}
+					class:list={[className, isCjkLanguage(item.lang) ? 'cjk-text' : undefined]}
+					{...props}
+					set:html={item.value.trim()}
+				/>
+			</>
+		))}
+	</>
+) : undefined}

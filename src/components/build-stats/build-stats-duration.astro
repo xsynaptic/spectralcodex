@@ -30,47 +30,45 @@ const tooltipRows = [
 	tooltipRows={tooltipRows}
 	points={geometry.points}
 >
-	{
-		geometry.annotations.map((annotation) => (
-			<Fragment>
-				<line
-					class="stats-annotation"
-					x1={annotation.x}
-					y1={durationFrame.top}
-					x2={annotation.x}
-					y2={durationFrame.bottom}
-				/>
-				<text
-					class="stats-annotation-label"
-					x={annotation.labelX}
-					y={annotation.labelY}
-					text-anchor="end"
-				>
-					{annotation.label}
-				</text>
-			</Fragment>
-		))
-	}
+	{geometry.annotations.map((annotation) => (
+		<Fragment>
+			<line
+				class="stats-annotation"
+				x1={annotation.x}
+				y1={durationFrame.top}
+				x2={annotation.x}
+				y2={durationFrame.bottom}
+			/>
+			<text
+				class="stats-annotation-label"
+				x={annotation.labelX}
+				y={annotation.labelY}
+				text-anchor="end"
+			>
+				{annotation.label}
+			</text>
+		</Fragment>
+	))}
 	<g class="stats-dots">
-		{geometry.points.map((point) => <circle cx={point.x} cy={point.y} r="2" />)}
+		{geometry.points.map((point) => (
+			<circle cx={point.x} cy={point.y} r="2" />
+		))}
 	</g>
 	<path class="stats-line stats-series-duration" d={geometry.trendPath}></path>
-	{
-		geometry.end ? (
-			<Fragment>
-				<circle
-					class="stats-endpoint stats-series-duration"
-					cx={geometry.end.cx}
-					cy={geometry.end.cy}
-					r="4"
-				/>
-				<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
-					{geometry.end.label}
-				</text>
-				<text class="stats-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
-					{t('buildStats.trend.label')}
-				</text>
-			</Fragment>
-		) : undefined
-	}
+	{geometry.end ? (
+		<Fragment>
+			<circle
+				class="stats-endpoint stats-series-duration"
+				cx={geometry.end.cx}
+				cy={geometry.end.cy}
+				r="4"
+			/>
+			<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
+				{geometry.end.label}
+			</text>
+			<text class="stats-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
+				{t('buildStats.trend.label')}
+			</text>
+		</Fragment>
+	) : undefined}
 </BuildStatsChart>

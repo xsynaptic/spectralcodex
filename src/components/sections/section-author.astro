@@ -81,16 +81,14 @@ const { imageProps, placeholderProps } = await getImageProps();
 >
 	<div class="flex items-start gap-4">
 		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
-			{
-				imageProps ? (
-					<ImagePlaceholder
-						class="relative overflow-hidden rounded-xs grayscale"
-						placeholderProps={placeholderProps}
-					>
-						<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
-					</ImagePlaceholder>
-				) : undefined
-			}
+			{imageProps ? (
+				<ImagePlaceholder
+					class="relative overflow-hidden rounded-xs grayscale"
+					placeholderProps={placeholderProps}
+				>
+					<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
+				</ImagePlaceholder>
+			) : undefined}
 			<AuthorCard />
 		</CardFrame>
 		<Prose>

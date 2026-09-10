@@ -16,10 +16,8 @@ interface Props extends HTMLAttributes<'figure'> {
 const { src: imageId, showMetadata = true, ...props } = Astro.props;
 ---
 
-{
-	imageId ? (
-		<ContentImage imageId={imageId} showMetadata={showMetadata} {...props}>
-			<slot />
-		</ContentImage>
-	) : undefined
-}
+{imageId ? (
+	<ContentImage imageId={imageId} showMetadata={showMetadata} {...props}>
+		<slot />
+	</ContentImage>
+) : undefined}

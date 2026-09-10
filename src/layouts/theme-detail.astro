@@ -96,24 +96,20 @@ const entryCount = entry.data._entryCount ?? 0;
 					<DividedItem>
 						<ContentCollectionLink collection={entry.collection} />
 					</DividedItem>
-					{
-						entryCount > 0 ? (
-							<DividedItem>
-								{formatStringTemplate(t('content.meta.entries.label'), {
-									count: formatNumber({ number: entryCount }),
-								})}
-							</DividedItem>
-						) : undefined
-					}
-					{
-						backlinksCount >= backlinksDisplayCountMinimum ? (
-							<DividedItem>
-								{formatStringTemplate(t('content.meta.backlinks.label'), {
-									count: formatNumber({ number: backlinksCount }),
-								})}
-							</DividedItem>
-						) : undefined
-					}
+					{entryCount > 0 ? (
+						<DividedItem>
+							{formatStringTemplate(t('content.meta.entries.label'), {
+								count: formatNumber({ number: entryCount }),
+							})}
+						</DividedItem>
+					) : undefined}
+					{backlinksCount >= backlinksDisplayCountMinimum ? (
+						<DividedItem>
+							{formatStringTemplate(t('content.meta.backlinks.label'), {
+								count: formatNumber({ number: backlinksCount }),
+							})}
+						</DividedItem>
+					) : undefined}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
@@ -125,10 +121,8 @@ const entryCount = entry.data._entryCount ?? 0;
 		<SectionThemes themeIds={allThemeIds} />
 		<SectionWebmentions entry={entry} />
 		<SectionPreviews page={page} showMicroformats={true} />
-		{
-			page.currentPage === 1 && catalogItems.length > 0 ? (
-				<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
-			) : undefined
-		}
+		{page.currentPage === 1 && catalogItems.length > 0 ? (
+			<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
+		) : undefined}
 	</ContentArticle>
 </MainSite>

@@ -10,12 +10,10 @@ const { class: className, ...props } = Astro.props;
 const children = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	children ? (
-		<li class="list-item">
-			<div class:list={['list-item-body', className]} {...props}>
-				<Fragment set:html={children} />
-			</div>
-		</li>
-	) : undefined
-}
+{children ? (
+	<li class="list-item">
+		<div class:list={['list-item-body', className]} {...props}>
+			<Fragment set:html={children} />
+		</div>
+	</li>
+) : undefined}

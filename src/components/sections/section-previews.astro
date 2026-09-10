@@ -42,27 +42,23 @@ const t = getTranslations();
 	data-nosnippet
 	{...props}
 >
-	{
-		page ? (
-			<>
-				<PreviewGrid
-					items={page.data}
-					showMicroformats={showMicroformats}
-					{...defaultPreviewOptions}
-					{...previewOptions}
-				/>
-				<PaginationSelect class="mt-4 md:mt-8" page={page} />
-			</>
-		) : undefined
-	}
-	{
-		items ? (
+	{page ? (
+		<>
 			<PreviewGrid
-				items={items}
+				items={page.data}
 				showMicroformats={showMicroformats}
 				{...defaultPreviewOptions}
 				{...previewOptions}
 			/>
-		) : undefined
-	}
+			<PaginationSelect class="mt-4 md:mt-8" page={page} />
+		</>
+	) : undefined}
+	{items ? (
+		<PreviewGrid
+			items={items}
+			showMicroformats={showMicroformats}
+			{...defaultPreviewOptions}
+			{...previewOptions}
+		/>
+	) : undefined}
 </ContentSection>

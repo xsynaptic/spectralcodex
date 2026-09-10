@@ -13,7 +13,8 @@ const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 	style={{ height, ...style }}
 	aria-hidden="true"
 	transition:persist
-	{...props}></progress-loading>
+	{...props}
+></progress-loading>
 
 <script>
 	import '#components/progress/progress-loading.ts';

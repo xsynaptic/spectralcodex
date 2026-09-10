@@ -30,27 +30,25 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 	]}
 	{...props}
 >
-	{
-		titleMultilingual ? (
-			<TextWash
-				as="div"
-				washColor={hasHeroImage ? 'accent-featured' : 'accent'}
-				class:list={[
-					'title-ml -ml-0.5 pb-1 text-base leading-snug font-medium',
-					hasHeroImage
-						? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
-						: 'text-lg md:text-xl lg:text-2xl',
-				]}
-				{...(titleMultilingualText
-					? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
-					: undefined)}
-				data-pagefind-ignore
-			>
-				<Fragment set:html={titleMultilingual} />
-			</TextWash>
-		) : undefined
-	}
-	<div class="bg-clip-padding pb-0 sm:pb-2" {...hasHeroImage ? { id: 'main-content' } : {}}>
+	{titleMultilingual ? (
+		<TextWash
+			as="div"
+			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
+			class:list={[
+				'title-ml -ml-0.5 pb-1 text-base leading-snug font-medium',
+				hasHeroImage
+					? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
+					: 'text-lg md:text-xl lg:text-2xl',
+			]}
+			{...(titleMultilingualText
+				? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
+				: undefined)}
+			data-pagefind-ignore
+		>
+			<Fragment set:html={titleMultilingual} />
+		</TextWash>
+	) : undefined}
+	<div class="bg-clip-padding pb-0 sm:pb-2" {...(hasHeroImage ? { id: 'main-content' } : {})}>
 		<TextWash
 			as="h1"
 			washColor={hasHeroImage ? 'primary-featured' : 'primary'}
@@ -64,24 +62,22 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			{title ? <Fragment set:html={title} /> : undefined}
 		</TextWash>
 	</div>
-	{
-		subtitle || caption ? (
-			<div
-				class:list={[
-					'items-start gap-1 pb-2 text-sm sm:flex sm:flex-wrap',
-					hasHeroImage
-						? 'divided-hero text-primary-500 sm:text-primary-300 dark:text-primary-400 dark:sm:text-primary-300'
-						: 'text-primary-500 dark:text-primary-400',
-				]}
-				data-pagefind-ignore
-			>
-				{subtitle ? <Fragment set:html={subtitle} /> : undefined}
-				{caption ? (
-					<div class="flex flex-1 flex-nowrap items-end justify-end gap-1">
-						<Fragment set:html={caption} />
-					</div>
-				) : undefined}
-			</div>
-		) : undefined
-	}
+	{subtitle || caption ? (
+		<div
+			class:list={[
+				'items-start gap-1 pb-2 text-sm sm:flex sm:flex-wrap',
+				hasHeroImage
+					? 'divided-hero text-primary-500 sm:text-primary-300 dark:text-primary-400 dark:sm:text-primary-300'
+					: 'text-primary-500 dark:text-primary-400',
+			]}
+			data-pagefind-ignore
+		>
+			{subtitle ? <Fragment set:html={subtitle} /> : undefined}
+			{caption ? (
+				<div class="flex flex-1 flex-nowrap items-end justify-end gap-1">
+					<Fragment set:html={caption} />
+				</div>
+			) : undefined}
+		</div>
+	) : undefined}
 </div>

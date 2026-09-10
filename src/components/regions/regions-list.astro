@@ -40,36 +40,34 @@ async function getRegions() {
 const regions = showSingleRegionAncestors ? await getRegions() : terms;
 ---
 
-{
-	regions && regions.length > 0 ? (
-		<ListRow class="font-serif text-sm">
-			{regions.map((entry) => {
-				const titleMultilingual = showTitleMultilingual
-					? getMultilingualContent({ data: entry.data, prop: 'title' })?.primary
-					: undefined;
+{regions && regions.length > 0 ? (
+	<ListRow class="font-serif text-sm">
+		{regions.map((entry) => {
+			const titleMultilingual = showTitleMultilingual
+				? getMultilingualContent({ data: entry.data, prop: 'title' })?.primary
+				: undefined;
 
-				return (
-					<DividedItem
-						as="li"
-						dividerContent={dividerContent}
-						class:list={[showMicroformats ? MicroformatClassNames.Category : undefined]}
-						data-pagefind-filter="region"
-					>
-						{entry.data.title ? (
-							<Anchor href={getContentPath(entry.collection, entry.id)}>
-								<Fragment set:html={entry.data.title} />
-							</Anchor>
-						) : undefined}
-						{titleMultilingual ? (
-							<TextMultilingual
-								content={titleMultilingual}
-								class="text-primary-600 dark:text-primary-400"
-								parenthesis={true}
-							/>
-						) : undefined}
-					</DividedItem>
-				);
-			})}
-		</ListRow>
-	) : undefined
-}
+			return (
+				<DividedItem
+					as="li"
+					dividerContent={dividerContent}
+					class:list={[showMicroformats ? MicroformatClassNames.Category : undefined]}
+					data-pagefind-filter="region"
+				>
+					{entry.data.title ? (
+						<Anchor href={getContentPath(entry.collection, entry.id)}>
+							<Fragment set:html={entry.data.title} />
+						</Anchor>
+					) : undefined}
+					{titleMultilingual ? (
+						<TextMultilingual
+							content={titleMultilingual}
+							class="text-primary-600 dark:text-primary-400"
+							parenthesis={true}
+						/>
+					) : undefined}
+				</DividedItem>
+			);
+		})}
+	</ListRow>
+) : undefined}

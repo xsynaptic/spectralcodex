@@ -24,38 +24,30 @@ const triggerClasses = [
 ---
 
 <div class="nav-sub-trigger">
-	{
-		triggerType === 'anchor' ? (
-			<Anchor
-				class:list={triggerClasses}
-				href={item.url}
-				anchorColor="accent"
-				{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
-				{...(item.rel ? { rel: item.rel } : undefined)}
-			>
-				<slot />
-			</Anchor>
-		) : undefined
-	}
-	{
-		triggerType === 'button' ? (
-			<button type="button" class:list={['anchor anchor-accent', ...triggerClasses]}>
-				<slot />
-			</button>
-		) : undefined
-	}
-	{
-		triggerType === 'span' ? (
-			<span class:list={triggerClasses}>
-				<slot />
-			</span>
-		) : undefined
-	}
-	{
-		hasChildren ? (
-			<svg class="nav-sub-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-				<use href="#icon:chevron-right" />
-			</svg>
-		) : undefined
-	}
+	{triggerType === 'anchor' ? (
+		<Anchor
+			class:list={triggerClasses}
+			href={item.url}
+			anchorColor="accent"
+			{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
+			{...(item.rel ? { rel: item.rel } : undefined)}
+		>
+			<slot />
+		</Anchor>
+	) : undefined}
+	{triggerType === 'button' ? (
+		<button type="button" class:list={['anchor anchor-accent', ...triggerClasses]}>
+			<slot />
+		</button>
+	) : undefined}
+	{triggerType === 'span' ? (
+		<span class:list={triggerClasses}>
+			<slot />
+		</span>
+	) : undefined}
+	{hasChildren ? (
+		<svg class="nav-sub-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+			<use href="#icon:chevron-right" />
+		</svg>
+	) : undefined}
 </div>

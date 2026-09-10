@@ -21,25 +21,23 @@ const t = getTranslations();
 <site-navigation>
 	<nav class="nav-menu" aria-label={t('site.navigation.header.label')} data-nosnippet {...props}>
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
-			{
-				navigationItems.map((item) => {
-					const children = item.children ?? [];
-					const hasChildren = children.length > 0;
+			{navigationItems.map((item) => {
+				const children = item.children ?? [];
+				const hasChildren = children.length > 0;
 
-					return (
-						<li class="nav-item">
-							<NavigationHeaderTrigger item={item} hasChildren={hasChildren} />
-							{hasChildren ? (
-								<NavigationHeaderSubmenu
-									navigationItems={children}
-									depth={1}
-									ariaLabel={getNavigationItemAriaLabel(item)}
-								/>
-							) : undefined}
-						</li>
-					);
-				})
-			}
+				return (
+					<li class="nav-item">
+						<NavigationHeaderTrigger item={item} hasChildren={hasChildren} />
+						{hasChildren ? (
+							<NavigationHeaderSubmenu
+								navigationItems={children}
+								depth={1}
+								ariaLabel={getNavigationItemAriaLabel(item)}
+							/>
+						) : undefined}
+					</li>
+				);
+			})}
 		</ul>
 	</nav>
 </site-navigation>

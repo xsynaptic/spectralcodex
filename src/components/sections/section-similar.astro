@@ -29,16 +29,14 @@ const t = getTranslations();
 ---
 
 <ContentSection sectionTitle={t('section.similar')} data-pagefind-ignore data-nosnippet {...props}>
-	{
-		showPreviews ? (
-			<PreviewGrid
-				items={similarContentItems}
-				showDate={true}
-				showRegion={true}
-				showTitleMultilingual={true}
-			/>
-		) : (
-			<PreviewColumn items={similarContentItems} />
-		)
-	}
+	{showPreviews ? (
+		<PreviewGrid
+			items={similarContentItems}
+			showDate={true}
+			showRegion={true}
+			showTitleMultilingual={true}
+		/>
+	) : (
+		<PreviewColumn items={similarContentItems} />
+	)}
 </ContentSection>

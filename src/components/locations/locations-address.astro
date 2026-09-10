@@ -36,13 +36,11 @@ const output = parts
 const t = getTranslations();
 ---
 
-{
-	parts.length > 0 ? (
-		<address
-			class:list={[className, 'mt-1 px-4 text-xs font-normal text-primary-400 sm:px-0']}
-			{...props}
-		>
-			{t('locations.address.label')}: <Fragment set:html={output} />
-		</address>
-	) : undefined
-}
+{parts.length > 0 ? (
+	<address
+		class:list={[className, 'mt-1 px-4 text-xs font-normal text-primary-400 sm:px-0']}
+		{...props}
+	>
+		{t('locations.address.label')}: <Fragment set:html={output} />
+	</address>
+) : undefined}

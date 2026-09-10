@@ -43,19 +43,17 @@ const description = t(`collection.themes.description`);
 			slot="section-description"
 			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
 		/>
-		{
-			page.data.length > 0 ? (
-				<>
-					<PreviewGrid
-						items={page.data}
-						showLocations={true}
-						showPosts={true}
-						showTitleMultilingual={true}
-						titleAs="h2"
-					/>
-					<PaginationSelect class="mt-4 md:mt-8" page={page} />
-				</>
-			) : undefined
-		}
+		{page.data.length > 0 ? (
+			<>
+				<PreviewGrid
+					items={page.data}
+					showLocations={true}
+					showPosts={true}
+					showTitleMultilingual={true}
+					titleAs="h2"
+				/>
+				<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			</>
+		) : undefined}
 	</ContentSection>
 </MainSite>

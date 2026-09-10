@@ -116,8 +116,10 @@ const t = getTranslations();
 					<a
 						href={Astro.url.toString()}
 						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						rel="bookmark">{stripDiacritics(entry.data.title)}</a
+						rel="bookmark"
 					>
+						{stripDiacritics(entry.data.title)}
+					</a>
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
@@ -126,13 +128,11 @@ const t = getTranslations();
 					<DividedItem>
 						<ContentCollectionLink collection="locations" />
 					</DividedItem>
-					{
-						regionPrimary ? (
-							<DividedItem>
-								<RegionsBreadcrumbs entry={regionPrimary} showCurrentLink={true} />
-							</DividedItem>
-						) : undefined
-					}
+					{regionPrimary ? (
+						<DividedItem>
+							<RegionsBreadcrumbs entry={regionPrimary} showCurrentLink={true} />
+						</DividedItem>
+					) : undefined}
 					<DividedItem>
 						<ContentDate
 							date={entry.data.dateCreated}
@@ -140,50 +140,42 @@ const t = getTranslations();
 							showMicroformats={true}
 						/>
 					</DividedItem>
-					{
-						entry.data.dateUpdated ? (
-							<DividedItem>
-								<ContentDate
-									date={entry.data.dateUpdated}
-									datePreset={DatePresetEnum.Medium}
-									showMicroformats={true}
-									showUpdated={true}
-								/>
-							</DividedItem>
-						) : undefined
-					}
+					{entry.data.dateUpdated ? (
+						<DividedItem>
+							<ContentDate
+								date={entry.data.dateUpdated}
+								datePreset={DatePresetEnum.Medium}
+								showMicroformats={true}
+								showUpdated={true}
+							/>
+						</DividedItem>
+					) : undefined}
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>
-		{
-			!hasContent && !hasHeroImage && imageFeaturedId ? (
-				<ContentImage
-					imageId={imageFeaturedId}
-					alt={entry.data.title}
-					priority={true}
-					showMetadata={true}
-				/>
-			) : undefined
-		}
+		{!hasContent && !hasHeroImage && imageFeaturedId ? (
+			<ContentImage
+				imageId={imageFeaturedId}
+				alt={entry.data.title}
+				priority={true}
+				showMetadata={true}
+			/>
+		) : undefined}
 		<ContentProse
 			class="e-content"
 			entry={entry}
-			{...hasContent ? { 'data-reading-frame': '' } : {}}
+			{...(hasContent ? { 'data-reading-frame': '' } : {})}
 		/>
 		<SectionNotices entry={entry} langCode={regionLangCode} />
-		{
-			hideLocation ? undefined : (
-				<SectionMap mapData={mapData}>
-					<LocationsAddress address={addressBase} content={addressMultilingual} />
-				</SectionMap>
-			)
-		}
+		{hideLocation ? undefined : (
+			<SectionMap mapData={mapData}>
+				<LocationsAddress address={addressBase} content={addressMultilingual} />
+			</SectionMap>
+		)}
 		<SectionHeritage entry={entry} />
-		{
-			hideLocation ? undefined : (
-				<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
-			)
-		}
+		{hideLocation ? undefined : (
+			<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
+		)}
 		{hideLocation ? undefined : <SectionLinks entry={entry} />}
 		{hideLocation ? undefined : <SectionSources entry={entry} />}
 		<SectionThemes themeIds={themeIds} />

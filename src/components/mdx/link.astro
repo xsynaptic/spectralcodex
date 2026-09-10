@@ -22,10 +22,8 @@ const catalog = await getCatalog();
 const catalogItem = catalog.getById(id);
 ---
 
-{
-	catalogItem?.url ? (
-		<a href={catalogItem.url} {...props} set:html={content} />
-	) : (
-		<Fragment set:html={content} />
-	)
-}
+{catalogItem?.url ? (
+	<a href={catalogItem.url} {...props} set:html={content} />
+) : (
+	<Fragment set:html={content} />
+)}

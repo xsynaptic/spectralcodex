@@ -18,17 +18,15 @@ const {
 const t = getTranslations();
 ---
 
-{
-	hasGeodata ? (
-		<ContentSection
-			sectionTitle={t('section.map')}
-			fillViewport={true}
-			data-pagefind-ignore
-			data-nosnippet
-			{...props}
-		>
-			<MapComponent mapComponentProps={mapComponentProps} />
-			<slot />
-		</ContentSection>
-	) : undefined
-}
+{hasGeodata ? (
+	<ContentSection
+		sectionTitle={t('section.map')}
+		fillViewport={true}
+		data-pagefind-ignore
+		data-nosnippet
+		{...props}
+	>
+		<MapComponent mapComponentProps={mapComponentProps} />
+		<slot />
+	</ContentSection>
+) : undefined}

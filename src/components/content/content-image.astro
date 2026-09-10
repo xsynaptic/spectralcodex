@@ -122,35 +122,31 @@ function getFigureClass() {
 }
 ---
 
-{
-	imageProps && !isFeed ? (
-		<figure class:list={['figure-frame prose-escape', getFigureClass()]} {...props}>
-			<ImagePlaceholder placeholderProps={placeholderProps}>
-				<Image
-					{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
-					{...imageProps}
-				/>
-				{showMetadata && imageEntry && context !== ImageContextEnum.Carousel ? (
-					<ImageMetadata entry={imageEntry} />
-				) : undefined}
-			</ImagePlaceholder>
-			{caption ? (
-				<figcaption class="figure-caption">
-					<Fragment set:html={caption} />
-				</figcaption>
+{imageProps && !isFeed ? (
+	<figure class:list={['figure-frame prose-escape', getFigureClass()]} {...props}>
+		<ImagePlaceholder placeholderProps={placeholderProps}>
+			<Image
+				{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
+				{...imageProps}
+			/>
+			{showMetadata && imageEntry && context !== ImageContextEnum.Carousel ? (
+				<ImageMetadata entry={imageEntry} />
 			) : undefined}
-		</figure>
-	) : undefined
-}
-{
-	imageProps && isFeed ? (
-		<figure {...props}>
-			<Image {...imageProps} />
-			{caption ? (
-				<figcaption>
-					<Fragment set:html={caption} />
-				</figcaption>
-			) : undefined}
-		</figure>
-	) : undefined
-}
+		</ImagePlaceholder>
+		{caption ? (
+			<figcaption class="figure-caption">
+				<Fragment set:html={caption} />
+			</figcaption>
+		) : undefined}
+	</figure>
+) : undefined}
+{imageProps && isFeed ? (
+	<figure {...props}>
+		<Image {...imageProps} />
+		{caption ? (
+			<figcaption>
+				<Fragment set:html={caption} />
+			</figcaption>
+		) : undefined}
+	</figure>
+) : undefined}

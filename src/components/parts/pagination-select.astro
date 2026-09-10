@@ -20,82 +20,80 @@ const pageBasePath = url.first ?? url.current;
 const t = getTranslations();
 ---
 
-{
-	lastPage > 1 ? (
-		<pagination-select
-			data-page-label={t('site.pagination.pageNumber.label')}
-			data-current-page={String(currentPage)}
-			data-last-page={String(lastPage)}
-			data-base-path={pageBasePath}
+{lastPage > 1 ? (
+	<pagination-select
+		data-page-label={t('site.pagination.pageNumber.label')}
+		data-current-page={String(currentPage)}
+		data-last-page={String(lastPage)}
+		data-base-path={pageBasePath}
+	>
+		<nav
+			class:list={[
+				'flex flex-wrap items-center justify-between gap-4 text-base font-medium tabular-nums select-none md:text-sm',
+				className,
+			]}
+			aria-label={t('site.pagination.label')}
+			{...props}
 		>
-			<nav
-				class:list={[
-					'flex flex-wrap items-center justify-between gap-4 text-base font-medium tabular-nums select-none md:text-sm',
-					className,
-				]}
-				aria-label={t('site.pagination.label')}
-				{...props}
-			>
-				<div class="flex items-center">
-					<span
-						class="text-primary-500 dark:text-primary-600"
-						data-pagination-counter
-						set:html={formatStringTemplate(t('site.pagination.counter.label'), {
-							current: currentPage,
-							total: lastPage,
-						})}
-					/>
-					<form class="flex items-center gap-2" hidden={true} data-pagination-form>
-						<span class="relative inline-flex items-center">
-							<select
-								class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
-								aria-label={t('site.pagination.select.label')}
-								name="page"
-								data-pagination-control
-							/>
-							<span
-								class="pagination-arrow pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
-								aria-hidden="true"
-							>
-								<svg height="16" width="16" viewBox="0 0 24 24">
-									<use href="#icon:chevron-down" />
-								</svg>
-							</span>
-						</span>
-						<span class="text-primary-500 dark:text-primary-600">
-							{formatStringTemplate(t('site.pagination.select.total'), { total: lastPage })}
-						</span>
-						<button
-							class="pagination-button cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:text-accent-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
-							type="submit"
-							data-pagination-submit
+			<div class="flex items-center">
+				<span
+					class="text-primary-500 dark:text-primary-600"
+					data-pagination-counter
+					set:html={formatStringTemplate(t('site.pagination.counter.label'), {
+						current: currentPage,
+						total: lastPage,
+					})}
+				/>
+				<form class="flex items-center gap-2" hidden={true} data-pagination-form>
+					<span class="relative inline-flex items-center">
+						<select
+							class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
+							aria-label={t('site.pagination.select.label')}
+							name="page"
+							data-pagination-control
+						/>
+						<span
+							class="pagination-arrow pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
+							aria-hidden="true"
 						>
-							{t('site.pagination.select.submit')}
-						</button>
-					</form>
-				</div>
-				<div class="flex items-center gap-6">
-					{url.prev ? (
-						<span class="flex flex-wrap gap-1">
-							<span class="text-accent-300 select-none dark:text-accent-400">&lsaquo;</span>
-							<Anchor href={url.prev} aria-label={t('pagination.previous')}>
-								{t('pagination.previous')}
-							</Anchor>
+							<svg height="16" width="16" viewBox="0 0 24 24">
+								<use href="#icon:chevron-down" />
+							</svg>
 						</span>
-					) : undefined}
-					{url.next ? (
-						<span class="flex flex-wrap gap-1">
-							<Anchor href={url.next} aria-label={t('pagination.next')}>
-								{t('pagination.next')}
-							</Anchor>
-							<span class="text-accent-300 select-none dark:text-accent-400">&rsaquo;</span>
-						</span>
-					) : undefined}
-				</div>
-			</nav>
-		</pagination-select>
-	) : undefined
-}
+					</span>
+					<span class="text-primary-500 dark:text-primary-600">
+						{formatStringTemplate(t('site.pagination.select.total'), { total: lastPage })}
+					</span>
+					<button
+						class="pagination-button cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:text-accent-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
+						type="submit"
+						data-pagination-submit
+					>
+						{t('site.pagination.select.submit')}
+					</button>
+				</form>
+			</div>
+			<div class="flex items-center gap-6">
+				{url.prev ? (
+					<span class="flex flex-wrap gap-1">
+						<span class="text-accent-300 select-none dark:text-accent-400">&lsaquo;</span>
+						<Anchor href={url.prev} aria-label={t('pagination.previous')}>
+							{t('pagination.previous')}
+						</Anchor>
+					</span>
+				) : undefined}
+				{url.next ? (
+					<span class="flex flex-wrap gap-1">
+						<Anchor href={url.next} aria-label={t('pagination.next')}>
+							{t('pagination.next')}
+						</Anchor>
+						<span class="text-accent-300 select-none dark:text-accent-400">&rsaquo;</span>
+					</span>
+				) : undefined}
+			</div>
+		</nav>
+	</pagination-select>
+) : undefined}
 
 <script>
 	import '#components/parts/pagination-select.ts';

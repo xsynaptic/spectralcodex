@@ -19,14 +19,12 @@ const itemCountLabel =
 	showItemCount && items.length >= 10 ? ` (${String(items.length)})` : undefined;
 ---
 
-{
-	items.length > 0 ? (
-		<Prose class={className} {...props}>
-			<span class="font-medium">
-				{title}
-				{itemCountLabel}
-			</span>
-			: <PreviewList items={items} count={count} url={url} />
-		</Prose>
-	) : undefined
-}
+{items.length > 0 ? (
+	<Prose class={className} {...props}>
+		<span class="font-medium">
+			{title}
+			{itemCountLabel}
+		</span>
+		: <PreviewList items={items} count={count} url={url} />
+	</Prose>
+) : undefined}

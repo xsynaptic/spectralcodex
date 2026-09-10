@@ -38,28 +38,26 @@ function getCountText() {
 const countText = getCountText();
 ---
 
-{
-	countText
-		? [...items, countText].map((item, index) => (
-				<TextSeparated index={index} total={items.length + 1} {...props}>
-					{item.url ? (
-						<>
-							<Anchor href={item.url}>{item.title}</Anchor>
-							{item.titleMultilingual ? (
-								<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-							) : undefined}
-						</>
-					) : (
-						item.title
-					)}
-				</TextSeparated>
-			))
-		: items.map((item, index) => (
-				<TextSeparated index={index} total={items.length} {...props}>
-					<Anchor href={item.url}>{item.title}</Anchor>
-					{item.titleMultilingual ? (
-						<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-					) : undefined}
-				</TextSeparated>
-			))
-}
+{countText
+	? [...items, countText].map((item, index) => (
+			<TextSeparated index={index} total={items.length + 1} {...props}>
+				{item.url ? (
+					<>
+						<Anchor href={item.url}>{item.title}</Anchor>
+						{item.titleMultilingual ? (
+							<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
+						) : undefined}
+					</>
+				) : (
+					item.title
+				)}
+			</TextSeparated>
+		))
+	: items.map((item, index) => (
+			<TextSeparated index={index} total={items.length} {...props}>
+				<Anchor href={item.url}>{item.title}</Anchor>
+				{item.titleMultilingual ? (
+					<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
+				) : undefined}
+			</TextSeparated>
+		))}

@@ -48,4 +48,6 @@ const formatOptions = { ...datePresets[datePreset], ...dateOptions };
 const dateDisplay = getDateDisplay(date, dateEnd, formatOptions);
 ---
 
-<time datetime={dateTimeAttribute} {...props}>{dateDisplay}</time>
+<time datetime={dateTimeAttribute} {...props}>
+	{dateDisplay}
+</time>

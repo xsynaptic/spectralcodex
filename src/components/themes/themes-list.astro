@@ -17,31 +17,29 @@ interface Props {
 const { class: className, terms } = Astro.props;
 ---
 
-{
-	terms && terms.length > 0 ? (
-		<ListRow class={className}>
-			{terms.map((entry) => {
-				const titleMultilingual = getMultilingualContent({
-					data: entry.data,
-					prop: 'title',
-				})?.primary;
+{terms && terms.length > 0 ? (
+	<ListRow class={className}>
+		{terms.map((entry) => {
+			const titleMultilingual = getMultilingualContent({
+				data: entry.data,
+				prop: 'title',
+			})?.primary;
 
-				return (
-					<DividedItem
-						as="li"
-						dividerWeight="thin"
-						class:list={['font-serif text-sm', MicroformatClassNames.Category]}
-						data-pagefind-filter="theme"
-					>
-						{entry.data.title ? (
-							<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
-						) : undefined}
-						{titleMultilingual ? (
-							<TextMultilingual content={titleMultilingual} parenthesis={true} />
-						) : undefined}
-					</DividedItem>
-				);
-			})}
-		</ListRow>
-	) : undefined
-}
+			return (
+				<DividedItem
+					as="li"
+					dividerWeight="thin"
+					class:list={['font-serif text-sm', MicroformatClassNames.Category]}
+					data-pagefind-filter="theme"
+				>
+					{entry.data.title ? (
+						<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
+					) : undefined}
+					{titleMultilingual ? (
+						<TextMultilingual content={titleMultilingual} parenthesis={true} />
+					) : undefined}
+				</DividedItem>
+			);
+		})}
+	</ListRow>
+) : undefined}

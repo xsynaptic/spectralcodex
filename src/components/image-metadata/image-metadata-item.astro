@@ -11,15 +11,13 @@ const title = await renderSlot(Astro.slots, 'image-metadata-item-title');
 const contents = await renderSlot(Astro.slots, 'default');
 ---
 
-{
-	title && contents ? (
-		<span class:list={[className, 'meta-item']} {...props}>
-			<span class="meta-item-title">
-				<slot name="image-metadata-item-title" />
-			</span>
-			<span class="meta-item-value">
-				<slot />
-			</span>
+{title && contents ? (
+	<span class:list={[className, 'meta-item']} {...props}>
+		<span class="meta-item-title">
+			<slot name="image-metadata-item-title" />
 		</span>
-	) : undefined
-}
+		<span class="meta-item-value">
+			<slot />
+		</span>
+	</span>
+) : undefined}

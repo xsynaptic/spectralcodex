@@ -42,10 +42,8 @@ const { hasGeodata, ...mapComponentProps } = getMapData({
 });
 ---
 
-{
-	hasGeodata && !isFeed ? (
-		<div {...props} class:list={['content-column-fill', className]} data-pagefind-ignore>
-			<MapComponent mapComponentProps={mapComponentProps} />
-		</div>
-	) : undefined
-}
+{hasGeodata && !isFeed ? (
+	<div {...props} class:list={['content-column-fill', className]} data-pagefind-ignore>
+		<MapComponent mapComponentProps={mapComponentProps} />
+	</div>
+) : undefined}
