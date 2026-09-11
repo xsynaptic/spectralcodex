@@ -4,9 +4,9 @@ import * as R from 'remeda';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
-import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
-import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
+import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';

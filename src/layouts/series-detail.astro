@@ -24,6 +24,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -67,6 +68,13 @@ const t = getTranslations();
 		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
+	schemas={[
+		buildEntryBreadcrumbSchema({
+			collection: entry.collection,
+			title: entry.data.title,
+			url: Astro.url.toString(),
+		}),
+	]}
 	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle

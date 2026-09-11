@@ -55,7 +55,9 @@ const { Content } = await render(entry);
 
 <MainSite
 	meta={{
-		title: entry.data.title,
+		title: titleMultilingual
+			? `${entry.data.title} (${titleMultilingual.value})`
+			: entry.data.title,
 		description: await getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
 			id: entry.id,

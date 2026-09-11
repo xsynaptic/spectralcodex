@@ -6,10 +6,12 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
+import {
+	createLocationsByPostsFunction,
+	getLocationsCollection,
+} from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';

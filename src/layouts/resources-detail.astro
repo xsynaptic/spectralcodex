@@ -27,6 +27,7 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -83,6 +84,13 @@ const t = getTranslations();
 		}),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
+	schemas={[
+		buildEntryBreadcrumbSchema({
+			collection: entry.collection,
+			title: entry.data.title,
+			url: Astro.url.toString(),
+		}),
+	]}
 	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle imageId={imageFeaturedId} hideSearch={page.currentPage !== 1}>

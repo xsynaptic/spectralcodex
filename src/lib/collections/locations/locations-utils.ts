@@ -10,46 +10,21 @@ import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
 import {
-	createFirstRegionByReferenceFunction,
-	createRegionAncestorsFunction,
-} from '#lib/collections/regions/regions-utils.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+	createLocationsByIdsFunction,
+	getLocationsCollection,
+} from '#lib/collections/locations/locations-data.ts';
+import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
+import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapLanguages, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getContentPath, getSitePath } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
-
-// Transform IDs into entries (and emit a warning when an ID doesn't match)
-export const createLocationsByIdsFunction = createCollectionLookupByIds(
-	'Locations',
-	getLocationsCollection,
-);
-
-// Get all locations referenced by a set of posts
-export async function createLocationsByPostsFunction() {
-	const { entriesMap: locationsMap } = await getLocationsCollection();
-
-	return function getLocationsByPosts(
-		...posts: Array<CollectionEntry<'posts'>>
-	): Array<CollectionEntry<'locations'>> {
-		const ids = [
-			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
-		];
-
-		return ids
-			.map((id) => locationsMap.get(id))
-			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
-	};
-}
+import { buildEntryBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 
 function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, number] | undefined {
 	const geometry = entry.data.geometry;
@@ -94,26 +69,19 @@ export async function getLocationSchemas(
 		return [];
 	}
 
-	const t = getTranslations();
-
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	const regionPrimary = getFirstRegionByReference(entry.data.regions);
 	const regionAncestors = regionPrimary ? getRegionAncestors(regionPrimary).toReversed() : [];
 
-	const breadcrumbItems = [
-		{ name: t('site.title'), url: getSitePath() },
-		{ name: t('collection.locations.labelPlural'), url: getSitePath('locations') },
-		...regionAncestors.map((region) => ({
-			name: region.data.title,
-			url: getContentPath('regions', region.id),
-		})),
-		{ name: entry.data.title },
-	];
-
 	return [
-		buildBreadcrumbSchema(breadcrumbItems, props.url),
+		buildEntryBreadcrumbSchema({
+			collection: 'locations',
+			title: entry.data.title,
+			url: props.url,
+			regions: regionAncestors,
+		}),
 		buildPlaceSchema({
 			title: entry.data.title,
 			description: await getDescriptionRenderedText(entry),

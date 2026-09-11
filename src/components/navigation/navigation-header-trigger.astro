@@ -32,7 +32,7 @@ const triggerClasses = [
 			{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
 			{...(item.rel ? { rel: item.rel } : undefined)}
 		>
-			{item.title}
+			<Fragment set:html={item.title} />
 		</Anchor>
 	) : undefined}
 	{triggerType === 'button' ? (
@@ -42,7 +42,7 @@ const triggerClasses = [
 			set:html={item.title}
 		/>
 	) : undefined}
-	{triggerType === 'span' ? <span class:list={triggerClasses}>{item.title}</span> : undefined}
+	{triggerType === 'span' ? <span class:list={triggerClasses} set:html={item.title} /> : undefined}
 	{hasChildren ? (
 		<svg width="24" height="24" viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
 			<use href="#icon:chevron-down" />

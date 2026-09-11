@@ -383,6 +383,18 @@ const MapPopupContent: FC<{
 	);
 };
 
+const popupPlacementMobile = {
+	anchor: 'top',
+	offset: 10,
+	maxWidth: `calc(min(300px, 80vw))`,
+} as const;
+
+const popupPlacementDesktop = {
+	anchor: 'left',
+	offset: 16,
+	maxWidth: `calc(min(350px, 80vw))`,
+} as const;
+
 export const MapPopup: FC<{
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
@@ -391,6 +403,7 @@ export const MapPopup: FC<{
 	const isPopupVisible = useIsMapPopupVisible();
 
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
+	const popupPlacement = isMobile ? popupPlacementMobile : popupPlacementDesktop;
 
 	const { setSelectedId } = useMapStoreActions();
 
@@ -403,22 +416,14 @@ export const MapPopup: FC<{
 		[setSelectedId],
 	);
 
+	if (!popupItem) return;
+
 	// Note: `closeOnClick` must be false to better control popup display with custom events
-	return popupItem ? (
+	return (
 		<Popup
 			longitude={popupItem.popupCoordinates.lng}
 			latitude={popupItem.popupCoordinates.lat}
-			{...(isMobile
-				? {
-						anchor: 'top',
-						offset: 10,
-						maxWidth: `calc(min(300px, 80vw))`,
-					}
-				: {
-						anchor: 'left',
-						offset: 16,
-						maxWidth: `calc(min(350px, 80vw))`,
-					})}
+			{...popupPlacement}
 			closeOnClick={false}
 			onClose={onClose}
 			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
@@ -439,5 +444,5 @@ export const MapPopup: FC<{
 				</div>
 			</div>
 		</Popup>
-	) : undefined;
+	);
 };

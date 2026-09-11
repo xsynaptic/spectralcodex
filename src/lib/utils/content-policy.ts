@@ -1,4 +1,4 @@
-export interface ContentPolicy {
+interface ContentPolicy {
 	applyOverrides: boolean;
 	hideSensitiveLocations: boolean;
 }

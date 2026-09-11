@@ -1,5 +1,7 @@
+import type { CollectionEntry } from 'astro:content';
+
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getAbsoluteUrl, getSitePath } from '#lib/utils/routing.ts';
+import { getAbsoluteUrl, getContentPath, getSitePath } from '#lib/utils/routing.ts';
 
 const SchemaTypeEnum = {
 	Article: 'Article',
@@ -127,7 +129,7 @@ export function buildArticleSchema(props: {
 	};
 }
 
-export function buildBreadcrumbSchema(
+function buildBreadcrumbSchema(
 	items: ReadonlyArray<{ name: string; url?: string }>,
 	pageUrl: string,
 ): BreadcrumbList {
@@ -141,6 +143,29 @@ export function buildBreadcrumbSchema(
 			...(item.url ? { item: getAbsoluteUrl(item.url) } : {}),
 		})),
 	};
+}
+
+// `regions` must be ordered root first; breadcrumb positions follow array order
+export function buildEntryBreadcrumbSchema(props: {
+	collection: 'locations' | 'regions' | 'resources' | 'series' | 'themes';
+	title: string;
+	url: string;
+	regions?: ReadonlyArray<CollectionEntry<'regions'>>;
+}): BreadcrumbList {
+	const t = getTranslations();
+
+	return buildBreadcrumbSchema(
+		[
+			{ name: t('site.title'), url: getSitePath() },
+			{ name: t(`collection.${props.collection}.labelPlural`), url: getSitePath(props.collection) },
+			...(props.regions ?? []).map((region) => ({
+				name: region.data.title,
+				url: getContentPath('regions', region.id),
+			})),
+			{ name: props.title },
+		],
+		props.url,
+	);
 }
 
 export function buildPlaceSchema(props: {

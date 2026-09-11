@@ -13,5 +13,5 @@ export {
 	LocationStatusEnum,
 	LocationStatusNumericMapping,
 } from '#map/map-locations.ts';
-export type { LocationCategory, LocationStatus, LocationMood } from '#map/map-locations.ts';
+export type { LocationStatus, LocationMood } from '#map/map-locations.ts';
 export { MapSpritesEnum } from '#map/map-sprites.ts';

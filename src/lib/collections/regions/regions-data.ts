@@ -1,3 +1,5 @@
+import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
+
 import { performance } from 'node:perf_hooks';
 
 import {
@@ -6,7 +8,11 @@ import {
 	populateRegionsHierarchy,
 	populateRegionsLangCode,
 } from '#lib/collections/regions/regions-factory.ts';
-import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import {
+	createCollectionData,
+	createCollectionLookupByIds,
+	getRawCollection,
+} from '#lib/utils/collections.ts';
 
 export { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
 
@@ -32,3 +38,24 @@ export const getRegionsCollection = createCollectionData({
 		return { regionsTree };
 	},
 });
+
+// Transform an array of strings into collection entries
+export const createRegionsByIdsFunction = createCollectionLookupByIds<'regions'>(
+	'Regions',
+	getRegionsCollection,
+);
+
+// Return the first region from an array of region references
+export async function createFirstRegionByReferenceFunction() {
+	const { entriesMap } = await getRegionsCollection();
+
+	return function getFirstRegionByReference(
+		regions: Array<ReferenceDataEntry<'regions'>> | undefined,
+	): CollectionEntry<'regions'> | undefined {
+		if (!regions) return;
+
+		const regionId = regions.at(0)?.id;
+
+		return regionId ? entriesMap.get(regionId) : undefined;
+	};
+}

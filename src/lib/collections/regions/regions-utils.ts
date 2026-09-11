@@ -1,4 +1,4 @@
-import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
@@ -7,29 +7,21 @@ import type { Thing } from '#lib/utils/seo-structured-data.ts';
 import { mapDisplayRegionIds, mapDivisionsDataPath } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
-import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-utils.ts';
-import { createPostsByIdsFunction } from '#lib/collections/posts/posts-utils.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
+import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
+import {
+	createRegionsByIdsFunction,
+	getRegionsCollection,
+} from '#lib/collections/regions/regions-data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import {
-	createCollectionLookupByIds,
-	hasEntries,
-	sortByEntryCount,
-} from '#lib/utils/collections.ts';
+import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
-import { getBasePath, getContentPath, getSitePath } from '#lib/utils/routing.ts';
-import { buildBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
-
-// Transform an array of strings into collection entries
-export const createRegionsByIdsFunction = createCollectionLookupByIds<'regions'>(
-	'Regions',
-	getRegionsCollection,
-);
+import { getBasePath } from '#lib/utils/routing.ts';
+import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
 // Get all ancestors of the specified region
 export async function createRegionAncestorsFunction() {
@@ -57,43 +49,23 @@ export async function createRegionAncestorsByIdFunction() {
 	};
 }
 
-// Return the first region from an array of region references
-export async function createFirstRegionByReferenceFunction() {
-	const { entriesMap } = await getRegionsCollection();
-
-	return function getFirstRegionByReference(
-		regions: Array<ReferenceDataEntry<'regions'>> | undefined,
-	): CollectionEntry<'regions'> | undefined {
-		if (!regions) return;
-
-		const regionId = regions.at(0)?.id;
-
-		return regionId ? entriesMap.get(regionId) : undefined;
-	};
-}
-
 export async function getRegionSchema(
 	entry: CollectionEntry<'regions'>,
 	props: { url: string },
 ): Promise<Array<Thing>> {
-	const t = getTranslations();
-
 	const getRegionAncestors = await createRegionAncestorsFunction();
 
 	const allAncestors = getRegionAncestors(entry);
 	const ancestors = allAncestors.slice(1).toReversed();
 
-	const breadcrumbItems = [
-		{ name: t('site.title'), url: getSitePath() },
-		{ name: t('collection.regions.labelPlural'), url: getSitePath('regions') },
-		...ancestors.map((region) => ({
-			name: region.data.title,
-			url: getContentPath('regions', region.id),
-		})),
-		{ name: entry.data.title },
+	return [
+		buildEntryBreadcrumbSchema({
+			collection: 'regions',
+			title: entry.data.title,
+			url: props.url,
+			regions: ancestors,
+		}),
 	];
-
-	return [buildBreadcrumbSchema(breadcrumbItems, props.url)];
 }
 
 // Data for a single region entry page: catalog items, map data, and display options

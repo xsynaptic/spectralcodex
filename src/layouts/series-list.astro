@@ -39,8 +39,15 @@ const description = t('collection.series.description');
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(description)} />
-		<PreviewGrid items={page.data} showDescription={true} titleAs="h2" />
-		<PaginationSelect class="mt-4 md:mt-8" page={page} />
+		<Fragment
+			slot="section-description"
+			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
+		/>
+		{page.data.length > 0 ? (
+			<>
+				<PreviewGrid items={page.data} showDescription={true} titleAs="h2" />
+				<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			</>
+		) : undefined}
 	</ContentSection>
 </MainSite>

@@ -16,7 +16,11 @@ import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/lo
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
-import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import {
+	createCollectionData,
+	createCollectionLookupByIds,
+	getRawCollection,
+} from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';
@@ -139,3 +143,26 @@ export const getLocationsCollection = createCollectionData({
 		await generateLocationImageData(entries);
 	},
 });
+
+// Transform IDs into entries (and emit a warning when an ID doesn't match)
+export const createLocationsByIdsFunction = createCollectionLookupByIds(
+	'Locations',
+	getLocationsCollection,
+);
+
+// Get all locations referenced by a set of posts
+export async function createLocationsByPostsFunction() {
+	const { entriesMap: locationsMap } = await getLocationsCollection();
+
+	return function getLocationsByPosts(
+		...posts: Array<CollectionEntry<'posts'>>
+	): Array<CollectionEntry<'locations'>> {
+		const ids = [
+			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
+		];
+
+		return ids
+			.map((id) => locationsMap.get(id))
+			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
+	};
+}

@@ -6,7 +6,7 @@ import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { isLinkUrlMatch } from '#lib/collections/resources/resources-association.ts';
 import {
 	getResourceAssociation,

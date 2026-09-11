@@ -1,8 +1,4 @@
-export {
-	MapDataGeometryTypeNumericMapping,
-	MapDataKeys,
-	MapDataKeysCompressed,
-} from '#map-data-keys.ts';
+export { MapDataKeysCompressed } from '#map-data-keys.ts';
 export {
 	encodeMapPopupData,
 	encodeMapSourceData,

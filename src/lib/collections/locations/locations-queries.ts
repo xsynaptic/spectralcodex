@@ -3,7 +3,7 @@ import * as R from 'remeda';
 
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { sortLocationsByLatitude } from '#lib/collections/locations/locations-utils.ts';
-import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-data.ts';
 import { getMapDataDedicated } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 

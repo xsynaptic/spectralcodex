@@ -6,19 +6,16 @@ import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry } from '#lib/catalog/catalog-utils.ts';
-import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-utils.ts';
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-import { createCollectionLookupByIds } from '#lib/utils/collections.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
-
-export const createPostsByIdsFunction = createCollectionLookupByIds('Posts', getPostsCollection);
 
 export async function getPostSchema(
 	entry: CollectionEntry<'posts'>,

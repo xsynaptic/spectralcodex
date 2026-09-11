@@ -32,7 +32,7 @@ const t = getTranslations();
 			'bg-gradient-b',
 			'pointer-events-none absolute right-0 bottom-0 left-0 z-image-caption mx-auto flex max-w-content flex-col justify-end sm:min-h-0',
 			// Note: the min-height spreads the background gradient
-			isHero ? 'min-h-[80px] sm:bg-none' : 'min-h-[50px]',
+			isHero ? 'min-h-image-gradient-hero sm:bg-none' : 'min-h-image-gradient',
 		]}
 		data-pagefind-ignore
 		{...props}
@@ -42,7 +42,7 @@ const t = getTranslations();
 				'text-primary-300',
 				'pointer-events-auto ml-auto flex flex-nowrap items-end justify-end gap-1 pb-2 text-sm',
 				isHero && !withTitle ? 'md:px-8' : undefined,
-				withTitle ? 'w-full px-4 sm:max-w-[70%] sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
+				withTitle ? 'w-full px-4 sm:max-w-image-caption sm:pr-4 sm:pl-0 md:pr-8' : 'px-4',
 			]}
 		>
 			<span
@@ -55,7 +55,9 @@ const t = getTranslations();
 					anchorColor="primary-bright"
 					class:list={[
 						'truncate font-medium sm:font-semibold',
-						withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
+						withTitle
+							? 'max-w-image-caption sm:max-w-image-caption-narrow lg:max-w-image-caption'
+							: undefined,
 					]}
 				>
 					{title}
@@ -64,7 +66,9 @@ const t = getTranslations();
 				<span
 					class:list={[
 						'truncate font-medium sm:font-semibold',
-						withTitle ? 'max-w-[70%] sm:max-w-[55%] lg:max-w-[70%]' : undefined,
+						withTitle
+							? 'max-w-image-caption sm:max-w-image-caption-narrow lg:max-w-image-caption'
+							: undefined,
 					]}
 				>
 					{title}
