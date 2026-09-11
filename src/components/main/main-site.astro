@@ -14,7 +14,6 @@ import Colophon from '#components/main/main-colophon.astro';
 import Meta from '#components/main/main-meta.astro';
 import SkipLink from '#components/main/main-skip-link.astro';
 import Sprites from '#components/main/main-sprites.astro';
-import StructuredData from '#components/main/main-structured-data.astro';
 import Stylesheet from '#components/main/main-stylesheet.astro';
 import TopButton from '#components/main/main-top-button.astro';
 import ModeManagerSetup from '#components/mode-manager/mode-manager-setup.astro';
@@ -28,6 +27,7 @@ import ProgressReading from '#components/progress/progress-reading.astro';
 import Search from '#components/search/search.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getBasePath, getSitePath } from '#lib/utils/routing.ts';
+import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {
 	meta?: MetaProps;
@@ -181,6 +181,8 @@ const t = getTranslations();
 			</div>
 		</footer>
 		<TopButton />
-		{schemas && schemas.length > 0 ? <StructuredData schemas={schemas} /> : undefined}
+		{schemas && schemas.length > 0 ? (
+			<script is:inline set:html={serializeGraph(schemas)} type="application/ld+json"></script>
+		) : undefined}
 	</body>
 </html>

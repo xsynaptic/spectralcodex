@@ -184,7 +184,7 @@ export function recordCheckResult(
 	).run(result.status, result.httpStatus, result.redirectUrl, now, urlId);
 }
 
-interface UrlByContentRow {
+export interface UrlByContentRow {
 	content_id: string;
 	url: string;
 	redirect_url: string | null;

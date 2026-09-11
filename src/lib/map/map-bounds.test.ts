@@ -4,12 +4,12 @@ import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 
-function makeFeature(id: string, lng: number, lat: number, isOutlier?: boolean) {
+function makeFeature(id: string, coordinates: [number, number], isOutlier?: boolean) {
 	return {
 		type: 'Feature' as const,
 		id,
 		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
-		geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+		geometry: { type: 'Point' as const, coordinates },
 	};
 }
 
@@ -33,13 +33,13 @@ describe('getMapBounds', () => {
 		expect(getMapBounds({ featureCollection: undefined })).toBeUndefined();
 		expect(getMapBounds({ featureCollection: makeCollection([]) })).toBeUndefined();
 		expect(
-			getMapBounds({ featureCollection: makeCollection([makeFeature('far', 150, 50, true)]) }),
+			getMapBounds({ featureCollection: makeCollection([makeFeature('far', [150, 50], true)]) }),
 		).toBeUndefined();
 	});
 
 	test('single point: bounds pad by the 1km minimum, limits by the 10km minimum', () => {
 		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('temple', 121.5, 25)]),
+			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
 		});
 
 		expect(result).toBeDefined();
@@ -65,7 +65,9 @@ describe('getMapBounds', () => {
 			['c', 121.4, 24.7],
 		];
 		const result = getMapBounds({
-			featureCollection: makeCollection(points.map(([id, lng, lat]) => makeFeature(id, lng, lat))),
+			featureCollection: makeCollection(
+				points.map(([id, lng, lat]) => makeFeature(id, [lng, lat])),
+			),
 		});
 
 		expect(result).toBeDefined();
@@ -88,9 +90,9 @@ describe('getMapBounds', () => {
 	test('outliers are excluded from center, bounds, and limits', () => {
 		const result = getMapBounds({
 			featureCollection: makeCollection([
-				makeFeature('a', 121, 24),
-				makeFeature('b', 121.1, 24.1),
-				makeFeature('far', 150, 50, true),
+				makeFeature('a', [121, 24]),
+				makeFeature('b', [121.1, 24.1]),
+				makeFeature('far', [150, 50], true),
 			]),
 		});
 
@@ -105,7 +107,7 @@ describe('getMapBounds', () => {
 
 	test('targetId centers on the target while bounds still span the collection', () => {
 		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('a', 121, 24), makeFeature('b', 122, 25)]),
+			featureCollection: makeCollection([makeFeature('a', [121, 24]), makeFeature('b', [122, 25])]),
 			targetId: 'b',
 		});
 
@@ -117,7 +119,7 @@ describe('getMapBounds', () => {
 
 	test('explicit buffers override the computed radius', () => {
 		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('temple', 121.5, 25)]),
+			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
 			boundsBuffer: 100,
 		});
 

@@ -1,4 +1,4 @@
-import type { ImagorFormats } from '@xsynaptic/unpic-imagor';
+import type { ImagorOperations } from '@xsynaptic/unpic-imagor';
 
 import { generate } from '@xsynaptic/unpic-imagor';
 import sharp from 'sharp';
@@ -14,8 +14,8 @@ const IMAGE_SERVER_SECRET =
 const IMAGE_SERVER_SIGNATURE_LENGTH = Number(process.env.IMAGE_SERVER_SIGNATURE_LENGTH) || 20;
 const testImage = 'example-folder-1/example-image-1.jpg';
 
-function signedUrl(source: string, width: number, format: ImagorFormats, quality: number): string {
-	const unsignedPath = generate(source, { width, format, quality }, { unsafe: false });
+function signedUrl(source: string, operations: ImagorOperations): string {
+	const unsignedPath = generate(source, operations, { unsafe: false });
 	const signature = signImageServerPath(
 		unsignedPath,
 		IMAGE_SERVER_SECRET,
@@ -31,7 +31,7 @@ describe('image server integration', () => {
 	});
 
 	test('signed request returns image bytes', async () => {
-		const response = await fetch(signedUrl(testImage, 450, 'jpg', 85));
+		const response = await fetch(signedUrl(testImage, { width: 450, format: 'jpg', quality: 85 }));
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-type')).toMatch(/^image\//);
 	});
@@ -57,13 +57,15 @@ describe('image server integration', () => {
 	});
 
 	test('missing image returns 404', async () => {
-		const response = await fetch(signedUrl('does/not/exist.jpg', 450, 'jpg', 85));
+		const response = await fetch(
+			signedUrl('does/not/exist.jpg', { width: 450, format: 'jpg', quality: 85 }),
+		);
 		expect(response.status).toBe(404);
 	});
 
 	test('second hit on same URL is a cache HIT', async () => {
 		// Use a unique width so this test does not collide with the first signed-request test
-		const url = signedUrl(testImage, 612, 'webp', 70);
+		const url = signedUrl(testImage, { width: 612, format: 'webp', quality: 70 });
 		await fetch(url);
 		const response = await fetch(url);
 		expect(response.status).toBe(200);
@@ -71,7 +73,9 @@ describe('image server integration', () => {
 	});
 
 	test('format filter actually changes output content-type', async () => {
-		const webpResponse = await fetch(signedUrl(testImage, 451, 'webp', 70));
+		const webpResponse = await fetch(
+			signedUrl(testImage, { width: 451, format: 'webp', quality: 70 }),
+		);
 		expect(webpResponse.status).toBe(200);
 		expect(webpResponse.headers.get('content-type')).toBe('image/webp');
 	});
@@ -79,7 +83,7 @@ describe('image server integration', () => {
 	// A malformed op silently returns the unresized original, which every other test here would pass
 	test('requested width is honored in the output image', async () => {
 		const width = 375;
-		const response = await fetch(signedUrl(testImage, width, 'jpg', 85));
+		const response = await fetch(signedUrl(testImage, { width, format: 'jpg', quality: 85 }));
 		expect(response.status).toBe(200);
 
 		const metadata = await sharp(Buffer.from(await response.arrayBuffer())).metadata();

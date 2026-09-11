@@ -31,24 +31,22 @@ export interface ProcessedImage {
 	luminanceBottom: number;
 }
 
+interface RawImage {
+	data: Buffer;
+	info: { height: number; width: number };
+}
+
 // Samples every 16th pixel; the result only picks a text treatment, so precision is not the point
-function zoneLuminance(
-	pixels: Buffer,
-	width: number,
-	height: number,
-	[start, end]: LuminanceZone,
-): number {
-	const from = Math.floor(height * start) * width * 4;
-	const to = Math.floor(height * end) * width * 4;
+function zoneLuminance({ data, info }: RawImage, [start, end]: LuminanceZone): number {
+	const from = Math.floor(info.height * start) * info.width * 4;
+	const to = Math.floor(info.height * end) * info.width * 4;
 
 	let total = 0;
 	let count = 0;
 
 	for (let index = from; index < to; index += 4 * 16) {
 		total +=
-			0.299 * (pixels[index] ?? 0) +
-			0.587 * (pixels[index + 1] ?? 0) +
-			0.114 * (pixels[index + 2] ?? 0);
+			0.299 * (data[index] ?? 0) + 0.587 * (data[index + 1] ?? 0) + 0.114 * (data[index + 2] ?? 0);
 		count++;
 	}
 
@@ -80,8 +78,8 @@ export async function processImage({
 		data,
 		height: info.height,
 		width: info.width,
-		luminanceTop: zoneLuminance(data, info.width, info.height, luminanceZoneTop),
-		luminanceBottom: zoneLuminance(data, info.width, info.height, luminanceZoneBottom),
+		luminanceTop: zoneLuminance({ data, info }, luminanceZoneTop),
+		luminanceBottom: zoneLuminance({ data, info }, luminanceZoneBottom),
 	};
 }
 
@@ -90,13 +88,13 @@ export async function probeLuminanceTop(imageInput: string): Promise<number> {
 	const width = 120;
 	const height = 64;
 
-	const { data, info } = await sharp(imageInput)
+	const image = await sharp(imageInput)
 		.resize({ fit: 'cover', height, position: 'top', width })
 		.ensureAlpha()
 		.raw()
 		.toBuffer({ resolveWithObject: true });
 
-	return zoneLuminance(data, info.width, info.height, luminanceZoneTop);
+	return zoneLuminance(image, luminanceZoneTop);
 }
 
 // Fonts and glyph outlines live on the renderer, so build one and reuse it for every card

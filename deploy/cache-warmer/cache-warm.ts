@@ -493,28 +493,31 @@ async function sendRunReport(run: RunReport): Promise<void> {
 	await sendAlert(getReportSubject(run), getReportBody(run));
 }
 
-async function main(): Promise<void> {
-	// A newer deploy sends SIGTERM to supersede this run; exit cleanly, not as a SIGKILL crash
-	process.on('SIGTERM', () => {
-		console.log('Superseded by a newer deploy; exiting');
-		process.exit(0);
-	});
+interface WarmRun {
+	phases: Array<[string, Stats]>;
+	notes: Array<string>;
+	warmPhase: (label: string, urls: Iterable<string>, options?: WarmAllOptions) => Promise<Stats>;
+}
 
-	const start = Date.now();
+function createWarmRun(): WarmRun {
 	const phases: Array<[string, Stats]> = [];
 	const notes: Array<string> = [];
 
-	// Read before warming so an unreadable volume fails fast rather than after the page phase
-	const { seen, note } = getWarmedImages();
-
-	if (note !== undefined) {
-		console.log(note);
-		notes.push(note);
+	async function warmPhase(
+		label: string,
+		urls: Iterable<string>,
+		options?: WarmAllOptions,
+	): Promise<Stats> {
+		const stats = await warmAll(urls, options);
+		report(label, stats);
+		phases.push([label, stats]);
+		return stats;
 	}
 
-	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
-	else await purge();
+	return { phases, notes, warmPhase };
+}
 
+async function warmPages(run: WarmRun): Promise<ScrapeTargets> {
 	let pages = await getSitemapUrls();
 	if (warmLimit !== undefined) {
 		pages = pages.slice(0, warmLimit);
@@ -524,13 +527,14 @@ async function main(): Promise<void> {
 		`Warming ${String(pages.length)} pages (concurrency ${String(defaultConcurrency)})...`,
 	);
 	const targets: ScrapeTargets = { assets: new Set(), images: new Set() };
-	const pageStats = await warmAll(pages, { collect: targets });
-	report('Pages', pageStats);
-	phases.push(['Pages', pageStats]);
+	await run.warmPhase('Pages', pages, { collect: targets });
+	return targets;
+}
 
+async function warmAssets(run: WarmRun, targets: ScrapeTargets): Promise<void> {
 	const mapResult = await getMapUrls();
 	if (mapResult.skipReason !== undefined) {
-		notes.push(`Map URLs skipped: ${mapResult.skipReason}`);
+		run.notes.push(`Map URLs skipped: ${mapResult.skipReason}`);
 	}
 	console.log(
 		`Warming ${String(targets.assets.size)} assets + ${String(mapResult.urls.length)} map URLs...`,
@@ -538,38 +542,73 @@ async function main(): Promise<void> {
 	// Fonts and images referenced from CSS only surface once the CSS itself is warmed
 	// Images share one set across phases; assets are collected separately to avoid re-warming them
 	const cssTargets: ScrapeTargets = { assets: new Set(), images: targets.images };
-	const assetStats = await warmAll(chain(targets.assets, mapResult.urls), { collect: cssTargets });
-	report('Assets', assetStats);
-	phases.push(['Assets', assetStats]);
+	await run.warmPhase('Assets', chain(targets.assets, mapResult.urls), { collect: cssTargets });
 
 	if (cssTargets.assets.size > 0) {
 		console.log(`Warming ${String(cssTargets.assets.size)} CSS-referenced assets...`);
-		const cssStats = await warmAll(cssTargets.assets);
-		report('CSS assets', cssStats);
-		phases.push(['CSS assets', cssStats]);
+		await run.warmPhase('CSS assets', cssTargets.assets);
 	}
+}
+
+async function warmNewImages(
+	run: WarmRun,
+	images: Set<string>,
+	seen: ReadonlySet<string>,
+): Promise<Array<string>> {
+	const newImages = [...images.difference(seen)];
+	console.log(
+		`Warming ${String(newImages.length)} new images of ${String(images.size)} referenced (concurrency ${String(imageConcurrency)})...`,
+	);
+	await run.warmPhase('Images (new)', newImages, { concurrency: imageConcurrency });
+	return newImages;
+}
+
+// One retry over everything that failed; most failures are transient origin pressure
+async function retryFailures(
+	run: WarmRun,
+	failures: Array<WarmResult>,
+): Promise<Array<WarmResult>> {
+	if (failures.length === 0) return failures;
+
+	console.log(`Retrying ${String(failures.length)} failed URLs...`);
+	const retryStats = await run.warmPhase(
+		'Retry',
+		failures.map((failure) => failure.url),
+	);
+	return retryStats.failures;
+}
+
+async function main(): Promise<void> {
+	// A newer deploy sends SIGTERM to supersede this run; exit cleanly, not as a SIGKILL crash
+	process.on('SIGTERM', () => {
+		console.log('Superseded by a newer deploy; exiting');
+		process.exit(0);
+	});
+
+	const start = Date.now();
+	const run = createWarmRun();
+
+	// Read before warming so an unreadable volume fails fast rather than after the page phase
+	const { seen, note } = getWarmedImages();
+
+	if (note !== undefined) {
+		console.log(note);
+		run.notes.push(note);
+	}
+
+	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
+	else await purge();
+
+	const targets = await warmPages(run);
+	await warmAssets(run, targets);
 
 	// Runs last so every scraped body has contributed to the image set
-	const newImages = [...targets.images.difference(seen)];
-	console.log(
-		`Warming ${String(newImages.length)} new images of ${String(targets.images.size)} referenced (concurrency ${String(imageConcurrency)})...`,
-	);
-	const imageStats = await warmAll(newImages, { concurrency: imageConcurrency });
-	report('Images (new)', imageStats);
-	phases.push(['Images (new)', imageStats]);
+	const newImages = await warmNewImages(run, targets.images, seen);
 
-	// One retry over everything that failed; most failures are transient origin pressure
 	// totalUrls is fixed first so retried URLs are not double-counted
-	const totalUrls = phases.reduce((total, [, stats]) => total + stats.total, 0);
-	const firstFailures = phases.flatMap(([, stats]) => stats.failures);
-	let failures = firstFailures;
-	if (firstFailures.length > 0) {
-		console.log(`Retrying ${String(firstFailures.length)} failed URLs...`);
-		const retryStats = await warmAll(firstFailures.map((failure) => failure.url));
-		report('Retry', retryStats);
-		phases.push(['Retry', retryStats]);
-		failures = retryStats.failures;
-	}
+	const totalUrls = run.phases.reduce((total, [, stats]) => total + stats.total, 0);
+	const firstFailures = run.phases.flatMap(([, stats]) => stats.failures);
+	const failures = await retryFailures(run, firstFailures);
 
 	const stateNote = persistWarmedImages({
 		referenced: targets.images,
@@ -578,15 +617,15 @@ async function main(): Promise<void> {
 		failures,
 	});
 
-	if (stateNote !== undefined) notes.push(stateNote);
+	if (stateNote !== undefined) run.notes.push(stateNote);
 
 	const seconds = ((Date.now() - start) / 1000).toFixed(1);
 	console.log(`Done in ${seconds}s`);
 
 	await sendRunReport({
-		phases,
+		phases: run.phases,
 		failures,
-		notes,
+		notes: run.notes,
 		retriedCount: firstFailures.length,
 		totalUrls,
 		seconds,

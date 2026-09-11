@@ -34,10 +34,8 @@ export interface Hierarchy {
 
 const byId = (idA: string, idB: string): number => idA.localeCompare(idB);
 
-export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
-	const idSet = new Set(nodes.map((node) => node.id));
-
-	// Only edges whose parent exists in the set; a missing, dangling, or self parent makes a root
+// Only edges whose parent exists in the set; a missing, dangling, or self parent makes a root
+function indexAdjacency(nodes: Array<HierarchyNode>, idSet: ReadonlySet<string>) {
 	const parentById = new Map<string, string>();
 	const childrenByParent = new Map<string, Array<string>>();
 	const roots: Array<string> = [];
@@ -67,6 +65,13 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 		siblings.sort(byId);
 	}
 
+	return { parentById, childrenByParent, roots };
+}
+
+function numberNestedSets(
+	roots: ReadonlyArray<string>,
+	childrenByParent: ReadonlyMap<string, Array<string>>,
+) {
 	const ordinalById = new Map<string, number>();
 	const intervalById = new Map<string, [number, number]>();
 	const depthById = new Map<string, number>();
@@ -105,6 +110,17 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 	for (const rootId of roots) {
 		visit(rootId, 0);
 	}
+
+	return { ordinalById, intervalById, depthById, descendantsById };
+}
+
+export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
+	const idSet = new Set(nodes.map((node) => node.id));
+	const { parentById, childrenByParent, roots } = indexAdjacency(nodes, idSet);
+	const { ordinalById, intervalById, depthById, descendantsById } = numberNestedSets(
+		roots,
+		childrenByParent,
+	);
 
 	function ancestorsOf(id: string): Array<string> {
 		const ancestors: Array<string> = [];

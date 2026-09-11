@@ -85,6 +85,22 @@ function logSummary(counts: {
 	}
 }
 
+function exitOnUnresolvedEntries(unresolved: Array<string>) {
+	if (unresolved.length === 0) return;
+
+	console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
+
+	for (const filename of unresolved) {
+		console.log(chalk.red(`✗ ${filename}`));
+	}
+	console.log(
+		chalk.red(
+			`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
+		),
+	);
+	process.exit(1);
+}
+
 async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
 
@@ -107,19 +123,7 @@ async function main() {
 		distPath: path.resolve(rootPath, values['dist-path']),
 	});
 
-	if (unresolved.length > 0) {
-		console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
-
-		for (const filename of unresolved) {
-			console.log(chalk.red(`✗ ${filename}`));
-		}
-		console.log(
-			chalk.red(
-				`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
-			),
-		);
-		process.exit(1);
-	}
+	exitOnUnresolvedEntries(unresolved);
 
 	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
 
@@ -131,9 +135,7 @@ async function main() {
 	const decodeLimit = pLimit(10);
 	const renderLimit = pLimit(16);
 
-	let generatedCount = 0;
-	let skippedCount = 0;
-	let errorCount = 0;
+	const counts = { generated: 0, skipped: 0, errors: 0 };
 
 	async function selectStaleEntries(batch: ImageBatch) {
 		const imageModifiedTime = await getImageModifiedTime(batch.imageId);
@@ -147,7 +149,7 @@ async function main() {
 			});
 
 			if (outputCache.isFresh(entry.id, key)) {
-				skippedCount++;
+				counts.skipped++;
 				continue;
 			}
 
@@ -170,7 +172,7 @@ async function main() {
 				console.log(
 					chalk.red(`✗ Missing image: ${batch.imageId} (used by ${entry.collection}/${entry.id})`),
 				);
-				errorCount++;
+				counts.errors++;
 			}
 			return;
 		}
@@ -184,11 +186,11 @@ async function main() {
 						await outputCache.write(entry.id, key, await renderCard(entry, image));
 
 						console.log(chalk.green(`✓ ${entry.collection}/${entry.id}`));
-						generatedCount++;
+						counts.generated++;
 					} catch (error) {
 						console.log(chalk.red(`✗ ${entry.collection}/${entry.id}`));
 						console.log(chalk.red(`  ${error instanceof Error ? error.message : String(error)}`));
-						errorCount++;
+						counts.errors++;
 					}
 				}),
 			),
@@ -205,15 +207,10 @@ async function main() {
 
 	await outputCache.save();
 
-	logSummary({
-		generated: generatedCount,
-		skipped: skippedCount,
-		pruned: prunedCount,
-		errors: errorCount,
-	});
+	logSummary({ ...counts, pruned: prunedCount });
 	console.log(chalk.gray(`Output: ${outputPath}`));
 
-	if (errorCount > 0) process.exit(1);
+	if (counts.errors > 0) process.exit(1);
 }
 
 await main();

@@ -61,6 +61,203 @@ const clusterRampDeep = [
 	tailwindColors.sky400,
 ] satisfies ExpressionSpecification;
 
+function getClustersLayerStyle(isDarkMode: boolean) {
+	return {
+		id: MapLayerIdEnum.Clusters,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
+		filter: ['has', 'point_count'],
+		layout: {
+			// Sort clusters by point count, descending
+			'circle-sort-key': ['-', ['get', 'point_count']],
+		},
+		paint: {
+			'circle-color': isDarkMode ? clusterRampDeep : clusterRampBright,
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'point_count'],
+				0, // Point count
+				['case', hoverStateExpression, 9, 7],
+				20,
+				['case', hoverStateExpression, 11, 9],
+				60,
+				['case', hoverStateExpression, 14, 12],
+			],
+			'circle-stroke-width': 1,
+			'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
+		},
+	} satisfies CircleLayerSpecification;
+}
+
+// Numeric labels for clusters
+function getClustersLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
+	return {
+		id: MapLayerIdEnum.ClustersLabel,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['Noto Sans Medium'],
+			'text-size': [
+				'case',
+				['==', ['concat', 'cluster-', ['get', 'cluster_id']], hoveredId ?? ''],
+				12,
+				10,
+			],
+			'text-allow-overlap': true,
+			'text-ignore-placement': true,
+		},
+		paint: {
+			'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
+			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
+			'text-halo-width': 1,
+		},
+	} satisfies SymbolLayerSpecification;
+}
+
+// Visual points for unfiltered (zoomed-in) points
+function getPointsLayerStyle(isDarkMode: boolean) {
+	return {
+		id: MapLayerIdEnum.Points,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+			'circle-color': [
+				'match',
+				['string', ['get', 'status']],
+				...(isDarkMode ? statusColorDarkArray : statusColorArray),
+				'gray',
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0, // Zoom level followed by radius (repeated)
+				['case', selectStateExpression, 5, hoverStateExpression, 3, 2],
+				8,
+				['case', selectStateExpression, 6, hoverStateExpression, 5, 4],
+				12,
+				['case', selectStateExpression, 8, hoverStateExpression, 6, 5],
+				15,
+				['case', selectStateExpression, 10, hoverStateExpression, 8, 7],
+				18,
+				['case', selectStateExpression, 12, hoverStateExpression, 9, 8],
+			],
+			'circle-stroke-width': 1,
+			'circle-stroke-color': [
+				'match',
+				['string', ['get', 'status']],
+				...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
+				'gray',
+			],
+		},
+	} satisfies CircleLayerSpecification;
+}
+
+// Visually obscured tap targets for all visible points; this makes the mobile experience better
+// Note: this has to be instantiated first to be underneath the main point
+function getPointsTargetLayerStyle(isDarkMode: boolean) {
+	return {
+		id: MapLayerIdEnum.PointsTarget,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
+		filter: ['!', ['has', 'point_count']],
+		paint: {
+			'circle-color': [
+				'match',
+				['string', ['get', 'status']],
+				...(isDarkMode ? statusColorDarkArray : statusColorArray),
+				'gray',
+			],
+			'circle-opacity': 0.2,
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0, // Zoom level followed by radius (repeated)
+				['case', selectStateExpression, 9, hoverStateExpression, 6, 5],
+				8,
+				['case', selectStateExpression, 14, hoverStateExpression, 11, 10],
+				12,
+				['case', selectStateExpression, 16, hoverStateExpression, 13, 12],
+				15,
+				['case', selectStateExpression, 20, hoverStateExpression, 16, 15],
+				18,
+				['case', selectStateExpression, 24, hoverStateExpression, 21, 20],
+			],
+		},
+	} satisfies CircleLayerSpecification;
+}
+
+// Featured image overlay for points with images
+// TODO: this still needs to be implemented but we haven't yet come up with a good design
+function getPointsImageLayerStyle(spritesPrefix: string) {
+	return {
+		id: MapLayerIdEnum.PointsImage,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
+		filter: [
+			'all',
+			['!', ['has', 'point_count']], // Not a cluster
+			['boolean', ['get', 'hasImage']], // Has featured image
+		],
+		layout: {
+			'icon-image': ['concat', spritesPrefix, ':', 'diamond'],
+			'icon-size': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0, // Zoom level followed by radius (repeated)
+				0.5,
+				8,
+				0.5,
+				12,
+				0.5,
+				15,
+				0.5,
+				18,
+				0.5,
+			],
+		},
+		paint: {
+			'icon-color': ['case', selectStateExpression, tailwindColors.red500, tailwindColors.red600],
+		},
+	} satisfies SymbolLayerSpecification;
+}
+
+// Text labels for individual points on hover
+function getPointsLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
+	return {
+		id: MapLayerIdEnum.PointsLabel,
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
+		filter: [
+			'all',
+			['!', ['has', 'point_count']], // Not a cluster
+			['==', ['get', 'id'], hoveredId ?? ''], // Only when hovered; filters can't read feature-state
+		],
+		layout: {
+			'text-field': ['get', 'title'],
+			'text-font': ['Noto Sans Medium'],
+			'text-size': 11,
+			'text-ignore-placement': true,
+			'text-justify': 'auto',
+			'text-max-width': 20,
+			'text-variable-anchor': ['bottom', 'right'],
+			// We'd like to interpolate these values but there is a type issue with MapLibre
+			'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
+		},
+		paint: {
+			'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
+			'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+			'text-halo-width': 1.2,
+		},
+	} satisfies SymbolLayerSpecification;
+}
+
 function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
 	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
@@ -72,217 +269,24 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	const isDarkMode = useIsDarkMode();
 	const hoveredId = useMapHoveredId();
 
-	const clustersLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.Clusters,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'circle',
-				filter: ['has', 'point_count'],
-				layout: {
-					// Sort clusters by point count, descending
-					'circle-sort-key': ['-', ['get', 'point_count']],
-				},
-				paint: {
-					'circle-color': isDarkMode ? clusterRampDeep : clusterRampBright,
-					'circle-radius': [
-						'interpolate',
-						['linear'],
-						['get', 'point_count'],
-						0, // Point count
-						['case', hoverStateExpression, 9, 7],
-						20,
-						['case', hoverStateExpression, 11, 9],
-						60,
-						['case', hoverStateExpression, 14, 12],
-					],
-					'circle-stroke-width': 1,
-					'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
-				},
-			}) satisfies CircleLayerSpecification,
-		[isDarkMode],
-	);
+	const clustersLayerStyle = useMemo(() => getClustersLayerStyle(isDarkMode), [isDarkMode]);
 
-	// Numeric labels for clusters
 	const clustersLabelLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.ClustersLabel,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'symbol',
-				filter: ['has', 'point_count'],
-				layout: {
-					'text-field': '{point_count_abbreviated}',
-					'text-font': ['Noto Sans Medium'],
-					'text-size': [
-						'case',
-						['==', ['concat', 'cluster-', ['get', 'cluster_id']], hoveredId ?? ''],
-						12,
-						10,
-					],
-					'text-allow-overlap': true,
-					'text-ignore-placement': true,
-				},
-				paint: {
-					'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
-					'text-halo-color': 'rgba(0, 0, 0, 0.2)',
-					'text-halo-width': 1,
-				},
-			}) satisfies SymbolLayerSpecification,
+		() => getClustersLabelLayerStyle(isDarkMode, hoveredId),
 		[isDarkMode, hoveredId],
 	);
 
-	// Visual points for unfiltered (zoomed-in) points
-	const pointsLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.Points,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'circle',
-				filter: ['!', ['has', 'point_count']],
-				paint: {
-					'circle-color': [
-						'match',
-						['string', ['get', 'status']],
-						...(isDarkMode ? statusColorDarkArray : statusColorArray),
-						'gray',
-					],
-					'circle-radius': [
-						'interpolate',
-						['linear'],
-						['zoom'],
-						0, // Zoom level followed by radius (repeated)
-						['case', selectStateExpression, 5, hoverStateExpression, 3, 2],
-						8,
-						['case', selectStateExpression, 6, hoverStateExpression, 5, 4],
-						12,
-						['case', selectStateExpression, 8, hoverStateExpression, 6, 5],
-						15,
-						['case', selectStateExpression, 10, hoverStateExpression, 8, 7],
-						18,
-						['case', selectStateExpression, 12, hoverStateExpression, 9, 8],
-					],
-					'circle-stroke-width': 1,
-					'circle-stroke-color': [
-						'match',
-						['string', ['get', 'status']],
-						...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
-						'gray',
-					],
-				},
-			}) satisfies CircleLayerSpecification,
-		[isDarkMode],
-	);
+	const pointsLayerStyle = useMemo(() => getPointsLayerStyle(isDarkMode), [isDarkMode]);
 
-	// Visually obscured tap targets for all visible points; this makes the mobile experience better
-	// Note: this has to be instantiated first to be underneath the main point
-	const pointsTargetLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.PointsTarget,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'circle',
-				filter: ['!', ['has', 'point_count']],
-				paint: {
-					'circle-color': [
-						'match',
-						['string', ['get', 'status']],
-						...(isDarkMode ? statusColorDarkArray : statusColorArray),
-						'gray',
-					],
-					'circle-opacity': 0.2,
-					'circle-radius': [
-						'interpolate',
-						['linear'],
-						['zoom'],
-						0, // Zoom level followed by radius (repeated)
-						['case', selectStateExpression, 9, hoverStateExpression, 6, 5],
-						8,
-						['case', selectStateExpression, 14, hoverStateExpression, 11, 10],
-						12,
-						['case', selectStateExpression, 16, hoverStateExpression, 13, 12],
-						15,
-						['case', selectStateExpression, 20, hoverStateExpression, 16, 15],
-						18,
-						['case', selectStateExpression, 24, hoverStateExpression, 21, 20],
-					],
-				},
-			}) satisfies CircleLayerSpecification,
-		[isDarkMode],
-	);
+	const pointsTargetLayerStyle = useMemo(() => getPointsTargetLayerStyle(isDarkMode), [isDarkMode]);
 
-	// Featured image overlay for points with images
-	// TODO: this still needs to be implemented but we haven't yet come up with a good design
 	const pointsImageLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.PointsImage,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'symbol',
-				filter: [
-					'all',
-					['!', ['has', 'point_count']], // Not a cluster
-					['boolean', ['get', 'hasImage']], // Has featured image
-				],
-				layout: {
-					'icon-image': ['concat', spritesPrefix, ':', 'diamond'],
-					'icon-size': [
-						'interpolate',
-						['linear'],
-						['zoom'],
-						0, // Zoom level followed by radius (repeated)
-						0.5,
-						8,
-						0.5,
-						12,
-						0.5,
-						15,
-						0.5,
-						18,
-						0.5,
-					],
-				},
-				paint: {
-					'icon-color': [
-						'case',
-						selectStateExpression,
-						tailwindColors.red500,
-						tailwindColors.red600,
-					],
-				},
-			}) satisfies SymbolLayerSpecification,
+		() => getPointsImageLayerStyle(spritesPrefix),
 		[spritesPrefix],
 	);
 
-	// Text labels for individual points on hover
 	const pointsLabelLayerStyle = useMemo(
-		() =>
-			({
-				id: MapLayerIdEnum.PointsLabel,
-				source: MapSourceIdEnum.PointCollection,
-				type: 'symbol',
-				filter: [
-					'all',
-					['!', ['has', 'point_count']], // Not a cluster
-					['==', ['get', 'id'], hoveredId ?? ''], // Only when hovered; filters can't read feature-state
-				],
-				layout: {
-					'text-field': ['get', 'title'],
-					'text-font': ['Noto Sans Medium'],
-					'text-size': 11,
-					'text-ignore-placement': true,
-					'text-justify': 'auto',
-					'text-max-width': 20,
-					'text-variable-anchor': ['bottom', 'right'],
-					// We'd like to interpolate these values but there is a type issue with MapLibre
-					'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
-				},
-				paint: {
-					'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
-					'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
-					'text-halo-width': 1.2,
-				},
-			}) satisfies SymbolLayerSpecification,
+		() => getPointsLabelLayerStyle(isDarkMode, hoveredId),
 		[isDarkMode, hoveredId],
 	);
 

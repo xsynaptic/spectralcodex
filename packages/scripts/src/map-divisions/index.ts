@@ -209,12 +209,17 @@ async function processBBoxGroup({
 	return successCount;
 }
 
-async function processRegions(
-	db: DuckDBConnection,
-	regions: Array<RegionMetadata>,
-	regionsById: Map<string, RegionMetadata>,
-	overtureUrl: string,
-) {
+async function processRegions({
+	db,
+	regions,
+	regionsById,
+	overtureUrl,
+}: {
+	db: DuckDBConnection;
+	regions: Array<RegionMetadata>;
+	regionsById: Map<string, RegionMetadata>;
+	overtureUrl: string;
+}) {
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
 
 	safelyCreateDirectory(outputPath);
@@ -291,12 +296,12 @@ async function mapDivisions() {
 		const totalCount = regionsWithDivisionIds.length;
 
 		// Process only regions with division IDs
-		const successCount = await processRegions(
-			connection,
-			regionsWithDivisionIds,
+		const successCount = await processRegions({
+			db: connection,
+			regions: regionsWithDivisionIds,
 			regionsById,
 			overtureUrl,
-		);
+		});
 
 		connection.disconnectSync();
 

@@ -79,25 +79,25 @@ async function expandCluster(
 	}
 }
 
-export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+function createGrabCursorHandler(
+	cursor: 'grab' | 'grabbing',
+): NonNullable<MapCallbacks['onMouseDown']> {
+	return ({ features, target: mapInstance }) => {
+		const feature = features?.[0];
 
-	const isInteractive = useIsMapCanvasInteractive();
+		if (feature?.layer.id !== undefined) return;
+
+		mapInstance.getCanvas().style.cursor = cursor;
+	};
+}
+
+const onMouseDown = createGrabCursorHandler('grabbing');
+const onMouseUp = createGrabCursorHandler('grab');
+
+function useClickHandler() {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
-	const mapStoreInstance = useMapStoreInstance();
-
-	// Kept in a ref, not the store, so hover updates never trigger a React render
-	const hoveredFeatureIdRef = useRef<string | number | undefined>(undefined);
-
-	const {
-		setCanvasLoading,
-		setSelectedId,
-		setPopupVisible,
-		setHoveredId,
-		setFilterPosition,
-		setFilterOpen,
-	} = useMapStoreActions();
+	const { setSelectedId, setPopupVisible, setHoveredId, setFilterOpen } = useMapStoreActions();
 
 	const selectPoint = useCallback(
 		(
@@ -125,7 +125,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		[isMobile, setSelectedId, setHoveredId, setPopupVisible],
 	);
 
-	const onClick = useCallback<NonNullable<MapCallbacks['onClick']>>(
+	return useCallback<NonNullable<MapCallbacks['onClick']>>(
 		({ features, target: mapInstance }) => {
 			const actions = decideClickActions(getClickInput(features?.[0]));
 
@@ -153,6 +153,15 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		},
 		[selectPoint, setFilterOpen, setSelectedId, setHoveredId],
 	);
+}
+
+function useThrottledMouseMoveHandler() {
+	const mapStoreInstance = useMapStoreInstance();
+
+	const { setHoveredId } = useMapStoreActions();
+
+	// Kept in a ref, not the store, so hover updates never trigger a React render
+	const hoveredFeatureIdRef = useRef<string | number | undefined>(undefined);
 
 	const onMouseMove = useCallback(
 		(event: MapLayerMouseEvent | undefined) => {
@@ -193,8 +202,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		[setHoveredId, mapStoreInstance],
 	);
 
-	// Create throttled version using funnel
-	const throttledOnMouseMove = useMemo(
+	return useMemo(
 		() =>
 			R.funnel(onMouseMove, {
 				reducer: (_, ...args: Array<MapLayerMouseEvent>) => {
@@ -207,43 +215,12 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			}),
 		[onMouseMove],
 	);
+}
 
-	const onMouseDown = useCallback<NonNullable<MapCallbacks['onMouseDown']>>(
-		({ features, target: mapInstance }) => {
-			const feature = features?.[0];
+function useDebouncedFilterControlSetup() {
+	const { setFilterPosition } = useMapStoreActions();
 
-			if (feature?.layer.id === undefined) {
-				mapInstance.getCanvas().style.cursor = 'grabbing';
-			}
-		},
-		[],
-	);
-
-	const onMouseUp = useCallback<NonNullable<MapCallbacks['onMouseUp']>>(
-		({ features, target: mapInstance }) => {
-			const feature = features?.[0];
-
-			if (feature?.layer.id === undefined) {
-				mapInstance.getCanvas().style.cursor = 'grab';
-			}
-		},
-		[],
-	);
-
-	const onMoveEnd = useCallback(
-		(event: ViewStateChangeEvent) => {
-			if (!mapId) return;
-
-			writeSavedViewport(mapId, {
-				longitude: event.viewState.longitude,
-				latitude: event.viewState.latitude,
-				zoom: event.viewState.zoom,
-			});
-		},
-		[mapId],
-	);
-
-	const debouncedFilterControlSetup = useMemo(
+	return useMemo(
 		() =>
 			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
 				(container) => {
@@ -282,6 +259,31 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 				},
 			),
 		[setFilterPosition],
+	);
+}
+
+export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
+	const isInteractive = useIsMapCanvasInteractive();
+
+	const { setCanvasLoading } = useMapStoreActions();
+
+	const onClick = useClickHandler();
+	const throttledOnMouseMove = useThrottledMouseMoveHandler();
+	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
+
+	const onMoveEnd = useCallback(
+		(event: ViewStateChangeEvent) => {
+			if (!mapId) return;
+
+			writeSavedViewport(mapId, {
+				longitude: event.viewState.longitude,
+				latitude: event.viewState.latitude,
+				zoom: event.viewState.zoom,
+			});
+		},
+		[mapId],
 	);
 
 	return {

@@ -93,6 +93,11 @@ function createRegionGeometryLoader(divisionsPath: string) {
 
 type RegionFeatures = Array<Feature<Polygon | MultiPolygon>>;
 
+interface RegionCoverage {
+	validRegions: Array<string>;
+	features: RegionFeatures;
+}
+
 function getEntryGeometries(entry: ContentEntry) {
 	const result = LocationGeometrySchema.safeParse(entry.data.geometry);
 
@@ -127,8 +132,7 @@ async function collectRegionFeatures(
 function collectEntryMismatches(
 	entry: ContentEntry,
 	geometries: Array<{ coordinates: [number, number] }>,
-	features: RegionFeatures,
-	validRegions: Array<string>,
+	{ features, validRegions }: RegionCoverage,
 ): Array<string> {
 	const mismatches: Array<string> = [];
 
@@ -161,14 +165,14 @@ async function collectCoordinateFindings(entries: Array<ContentEntry>, divisions
 		if (!geometries) continue;
 
 		const regions = toReferenceIds(entry.data.regions);
-		const { validRegions, features } = await collectRegionFeatures(regions, getRegionFeatures);
+		const coverage = await collectRegionFeatures(regions, getRegionFeatures);
 
-		if (validRegions.length === 0) {
+		if (coverage.validRegions.length === 0) {
 			missingFgbCount++;
 			continue;
 		}
 
-		const entryMismatches = collectEntryMismatches(entry, geometries, features, validRegions);
+		const entryMismatches = collectEntryMismatches(entry, geometries, coverage);
 
 		if (entryMismatches.length > 0) {
 			mismatches.push(...entryMismatches);

@@ -4,7 +4,7 @@ import type { ChunkInputItem } from '#lib/map/map-chunks.ts';
 
 import { assignChunks } from '#lib/map/map-chunks.ts';
 
-function makeItem(id: string, lng: number, lat: number, popupBytes = 10): ChunkInputItem {
+function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): ChunkInputItem {
 	return { id, lng, lat, popupBytes };
 }
 
@@ -26,13 +26,13 @@ function itemsForChunk(
 function makeSeededItems(seed: number): Array<ChunkInputItem> {
 	return Array.from({ length: 30 }, (_, index) => {
 		const id = `q${String((index * 7 + seed) % 30)}`;
-		return makeItem(id, -150 + index * 10, -60 + ((index * 13) % 120), 80);
+		return makeItem(id, [-150 + index * 10, -60 + ((index * 13) % 120)], 80);
 	});
 }
 
 describe('assignChunks', () => {
 	test('keeps everything in one bin when under the cap', () => {
-		const items = [makeItem('a', 121, 25), makeItem('b', -73, 45)];
+		const items = [makeItem('a', [121, 25]), makeItem('b', [-73, 45])];
 
 		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 1000 });
 
@@ -45,7 +45,7 @@ describe('assignChunks', () => {
 	test('every bin stays within the cap and every item is assigned', () => {
 		const byId = new Map<string, ChunkInputItem>();
 		const items = Array.from({ length: 40 }, (_, index) => {
-			const item = makeItem(`p${String(index)}`, -160 + index * 8, -70 + index * 3, 90);
+			const item = makeItem(`p${String(index)}`, [-160 + index * 8, -70 + index * 3], 90);
 			byId.set(item.id, item);
 			return item;
 		});
@@ -63,9 +63,9 @@ describe('assignChunks', () => {
 
 	test('isolates a lone item larger than the cap in its own bin', () => {
 		const items = [
-			makeItem('small-1', 100, 10, 40),
-			makeItem('huge', 101, 11, 5000),
-			makeItem('small-2', 102, 12, 40),
+			makeItem('small-1', [100, 10], 40),
+			makeItem('huge', [101, 11], 5000),
+			makeItem('small-2', [102, 12], 40),
 		];
 
 		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 100 });
@@ -90,10 +90,10 @@ describe('assignChunks', () => {
 		// Two tight clusters on opposite sides of the world; next-fit may straddle at most one
 		// boundary bin, but must not scatter either cluster or interleave the two
 		const east = Array.from({ length: 5 }, (_, index) =>
-			makeItem(`east-${String(index)}`, 121 + index * 0.01, 25 + index * 0.01, 40),
+			makeItem(`east-${String(index)}`, [121 + index * 0.01, 25 + index * 0.01], 40),
 		);
 		const west = Array.from({ length: 5 }, (_, index) =>
-			makeItem(`west-${String(index)}`, -73 + index * 0.01, 45 + index * 0.01, 40),
+			makeItem(`west-${String(index)}`, [-73 + index * 0.01, 45 + index * 0.01], 40),
 		);
 
 		const { chunkKeyById } = assignChunks([...east, ...west], { capBytes: 250 });
@@ -104,7 +104,7 @@ describe('assignChunks', () => {
 	});
 
 	test('clamps out-of-range coordinates without throwing', () => {
-		const items = [makeItem('edge', 999, -999), makeItem('corner', -999, 999)];
+		const items = [makeItem('edge', [999, -999]), makeItem('corner', [-999, 999])];
 
 		const { chunkKeyById } = assignChunks(items, { capBytes: 1000 });
 

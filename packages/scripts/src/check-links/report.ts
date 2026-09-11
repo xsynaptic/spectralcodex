@@ -1,9 +1,45 @@
 import chalk from 'chalk';
 
+import type { UrlByContentRow } from '#check-links/db.ts';
 import type { UrlStatus } from '#check-links/types.ts';
 
 import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
+
+interface ReportSection {
+	status: UrlStatus;
+	label: string;
+	color: (text: string) => string;
+	formatUrl: (row: UrlByContentRow) => string;
+}
+
+const reportSections: Array<ReportSection> = [
+	{
+		status: UrlStatusEnum.Redirect,
+		label: 'Redirected',
+		color: chalk.yellow,
+		formatUrl: (row) => `${row.url} -> ${row.redirect_url ?? 'unknown'}`,
+	},
+	{
+		status: UrlStatusEnum.Missing,
+		label: 'Missing',
+		color: chalk.magenta,
+		formatUrl: (row) => `${row.url} ${chalk.gray(`[${String(row.check_count)}x]`)}`,
+	},
+	{
+		status: UrlStatusEnum.Blocked,
+		label: 'Blocked; needs manual verification',
+		color: chalk.cyan,
+		formatUrl: (row) =>
+			`${row.url} ${chalk.gray(`[HTTP ${String(row.last_http_status ?? '?')}, ${String(row.check_count)}x]`)}`,
+	},
+	{
+		status: UrlStatusEnum.Error,
+		label: 'Error',
+		color: chalk.red,
+		formatUrl: (row) => row.url,
+	},
+];
 
 function entryId(contentId: string): string {
 	// content_id is "collection/entry-id", we only need the entry ID
@@ -14,17 +50,7 @@ function entryId(contentId: string): string {
 	return contentId.slice(slash + 1);
 }
 
-function printSection(
-	status: UrlStatus,
-	label: string,
-	color: (s: string) => string,
-	formatUrl: (row: {
-		url: string;
-		redirect_url: string | null;
-		last_http_status: number | null;
-		check_count: number;
-	}) => string,
-): void {
+function printSection({ status, label, color, formatUrl }: ReportSection): void {
 	const grouped = getUrlsByStatusGroupedByContent(status);
 
 	if (grouped.size === 0) return;
@@ -59,38 +85,11 @@ export function printStatus(): void {
 
 export function printList(filter?: string): void {
 	const filterSet = filter ? new Set(filter.split(',')) : undefined;
-	const shouldShow = (status: string) => !filterSet || filterSet.has(status);
 
-	if (shouldShow(UrlStatusEnum.Redirect)) {
-		printSection(
-			UrlStatusEnum.Redirect,
-			'Redirected',
-			chalk.yellow,
-			(row) => `${row.url} -> ${row.redirect_url ?? 'unknown'}`,
-		);
-	}
+	for (const section of reportSections) {
+		if (filterSet && !filterSet.has(section.status)) continue;
 
-	if (shouldShow(UrlStatusEnum.Missing)) {
-		printSection(
-			UrlStatusEnum.Missing,
-			'Missing',
-			chalk.magenta,
-			(row) => `${row.url} ${chalk.gray(`[${String(row.check_count)}x]`)}`,
-		);
-	}
-
-	if (shouldShow(UrlStatusEnum.Blocked)) {
-		printSection(
-			UrlStatusEnum.Blocked,
-			'Blocked; needs manual verification',
-			chalk.cyan,
-			(row) =>
-				`${row.url} ${chalk.gray(`[HTTP ${String(row.last_http_status ?? '?')}, ${String(row.check_count)}x]`)}`,
-		);
-	}
-
-	if (shouldShow(UrlStatusEnum.Error)) {
-		printSection(UrlStatusEnum.Error, 'Error', chalk.red, (row) => row.url);
+		printSection(section);
 	}
 
 	console.log('');

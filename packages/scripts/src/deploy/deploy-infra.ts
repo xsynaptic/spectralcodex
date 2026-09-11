@@ -52,62 +52,51 @@ function buildServerEnv(config: DeployConfig): string {
 	return lines.join('\n');
 }
 
-export async function deployInfra(options: DeployInfraOptions): Promise<void> {
-	const { rootPath, dryRun = false } = options;
+interface InfraSyncTarget {
+	source: string;
+	destination?: string;
+	extraFlags?: Array<string>;
+	excludes?: Array<string>;
+}
 
-	const config = loadDeployConfig();
-	const serverEnv = buildServerEnv(config);
-
-	const deployDir = path.join(rootPath, 'deploy');
-	const remotePath = config.remotePath;
-
-	console.log(chalk.blue('Deploying infrastructure...'));
-	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
-
-	const start = Date.now();
-
-	await rsyncTo(`${deployDir}/docker-compose.yml`, `${config.remoteHost}:${remotePath}/`, {
-		config,
-		dryRun,
-		extraFlags: ['--mkpath'],
-	});
-	await rsyncTo(`${deployDir}/nginx.conf.template`, `${config.remoteHost}:${remotePath}/`, {
-		config,
-		dryRun,
-	});
-	await rsyncTo(`${deployDir}/caddy/`, `${config.remoteHost}:${remotePath}/caddy/`, {
-		config,
-		dryRun,
+const infraSyncTargets: Array<InfraSyncTarget> = [
+	{ source: 'docker-compose.yml', extraFlags: ['--mkpath'] },
+	{ source: 'nginx.conf.template' },
+	{ source: 'caddy/', destination: 'caddy/', extraFlags: ['--mkpath', '--delete'] },
+	{ source: 'certs/', destination: 'certs/', extraFlags: ['--mkpath'] },
+	{
+		source: 'umami-db-backup/',
+		destination: 'umami-db-backup/',
 		extraFlags: ['--mkpath', '--delete'],
-	});
-	await rsyncTo(`${deployDir}/certs/`, `${config.remoteHost}:${remotePath}/certs/`, {
-		config,
-		dryRun,
-		extraFlags: ['--mkpath'],
-	});
-	await rsyncTo(
-		`${deployDir}/umami-db-backup/`,
-		`${config.remoteHost}:${remotePath}/umami-db-backup/`,
-		{
-			config,
-			dryRun,
-			extraFlags: ['--mkpath', '--delete'],
-		},
-	);
-	await rsyncTo(`${deployDir}/cache-warmer/`, `${config.remoteHost}:${remotePath}/cache-warmer/`, {
-		config,
-		dryRun,
+	},
+	{
+		source: 'cache-warmer/',
+		destination: 'cache-warmer/',
 		excludes: ['node_modules'],
 		extraFlags: ['--mkpath', '--delete', '--delete-excluded'],
-	});
+	},
+];
 
-	if (dryRun) {
-		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
-		console.log(chalk.yellow(`DRY RUN write ${remotePath}/.env`));
-		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
-		return;
+async function syncInfraFiles({
+	config,
+	deployDir,
+	dryRun,
+}: {
+	config: DeployConfig;
+	deployDir: string;
+	dryRun: boolean;
+}): Promise<void> {
+	for (const { source, destination = '', ...rsyncFlags } of infraSyncTargets) {
+		await rsyncTo(
+			`${deployDir}/${source}`,
+			`${config.remoteHost}:${config.remotePath}/${destination}`,
+			{ config, dryRun, ...rsyncFlags },
+		);
 	}
+}
+
+async function updateRemoteServices(config: DeployConfig, serverEnv: string): Promise<void> {
+	const remotePath = config.remotePath;
 
 	console.log(chalk.gray('Writing server environment...'));
 	await sshExecWithInput(
@@ -147,6 +136,33 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	} catch {
 		console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
 	}
+}
+
+export async function deployInfra(options: DeployInfraOptions): Promise<void> {
+	const { rootPath, dryRun = false } = options;
+
+	const config = loadDeployConfig();
+	const serverEnv = buildServerEnv(config);
+
+	const deployDir = path.join(rootPath, 'deploy');
+	const remotePath = config.remotePath;
+
+	console.log(chalk.blue('Deploying infrastructure...'));
+	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
+	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
+
+	const start = Date.now();
+
+	await syncInfraFiles({ config, deployDir, dryRun });
+
+	if (dryRun) {
+		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
+		console.log(chalk.yellow(`DRY RUN write ${remotePath}/.env`));
+		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+		return;
+	}
+
+	await updateRemoteServices(config, serverEnv);
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

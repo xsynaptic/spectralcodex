@@ -129,7 +129,7 @@ describe('decideClickActions', () => {
 	});
 });
 
-describe('decideHoverIntent', () => {
+describe('decideHoverIntent over a feature', () => {
 	test('sets hover state on a newly hovered point', () => {
 		expect(decideHoverIntent(makeHoverInput())).toEqual({
 			cursor: 'pointer',
@@ -213,7 +213,9 @@ describe('decideHoverIntent', () => {
 			storeHoveredIdUpdate: undefined,
 		});
 	});
+});
 
+describe('decideHoverIntent clearing hover', () => {
 	test('clears hover when nothing is under the cursor', () => {
 		expect(
 			decideHoverIntent(

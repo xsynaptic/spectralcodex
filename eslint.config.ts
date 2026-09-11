@@ -32,6 +32,9 @@ export default getConfig(
 				complexity: ['warn', { max: 8, variant: 'modified' }],
 				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
 				'max-depth': ['warn', 3],
+				'max-params': ['warn', 3],
+				'max-lines-per-function': ['warn', { max: 120, skipBlankLines: true, skipComments: true }],
+				'max-statements': ['warn', 30],
 				// The expanded form reads more clearly than ??=, ||=, and &&=
 				'logical-assignment-operators': ['error', 'never'],
 				// Conflicts with Remeda's sort function
@@ -69,6 +72,13 @@ export default getConfig(
 				'perfectionist/sort-switch-case': 'off',
 				'perfectionist/sort-union-types': 'off',
 				'perfectionist/sort-variable-declarations': 'off',
+			},
+		},
+		// Ambient declarations mirror third-party signatures
+		{
+			files: ['**/*.d.ts'],
+			rules: {
+				'max-params': 'off',
 			},
 		},
 		// Foreign collections are read through getRawCollection() from utils/collections.ts

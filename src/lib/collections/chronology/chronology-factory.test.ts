@@ -35,7 +35,9 @@ describe('createChronologyData', () => {
 		expect(ids(month.created)).toEqual(['a-post']);
 		expect(ids(data.chronologyIndexData['2024']?.created ?? [])).toEqual(['a-post']);
 	});
+});
 
+describe('createChronologyData monthly tier', () => {
 	test('dedup precedence within a month is updated > created > visited', () => {
 		const data = createChronologyData(
 			[
@@ -138,7 +140,9 @@ describe('createChronologyData', () => {
 		expect(ids(monthlyItem(data, '2024/01').highlights ?? [])).toContain('shared');
 		expect(ids(monthlyItem(data, '2024/02').highlights ?? [])).not.toContain('shared');
 	});
+});
 
+describe('createChronologyData yearly and index tiers', () => {
 	test('the yearly view places a multi-month entry in its highest-precedence slot', () => {
 		const data = createChronologyData(
 			[

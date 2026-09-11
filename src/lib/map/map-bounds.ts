@@ -28,11 +28,15 @@ function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureC
 	} satisfies MapFeatureCollection;
 }
 
+interface BboxBufferOptions {
+	explicitBuffer: number | undefined;
+	bufferPercentage: number;
+	minBuffer: number;
+}
+
 function getBufferedBbox(
 	featureCollection: MapFeatureCollection,
-	explicitBuffer: number | undefined,
-	bufferPercentage: number,
-	minBuffer: number,
+	{ explicitBuffer, bufferPercentage, minBuffer }: BboxBufferOptions,
 ): [number, number, number, number] | undefined {
 	if (featureCollection.features.length === 0) return undefined;
 
@@ -112,18 +116,16 @@ export function getMapBounds({
 		? filterMapOutliers(limitsFeatureCollectionRaw)
 		: featureCollection;
 
-	const bounds = getBufferedBbox(
-		featureCollection,
-		boundsBuffer,
-		boundsBufferPercentage,
-		mapBoundsBufferMin,
-	);
-	const maxBounds = getBufferedBbox(
-		limitsFeatureCollection,
-		limitsBuffer,
-		limitsBufferPercentage,
-		mapLimitsBufferMin,
-	);
+	const bounds = getBufferedBbox(featureCollection, {
+		explicitBuffer: boundsBuffer,
+		bufferPercentage: boundsBufferPercentage,
+		minBuffer: mapBoundsBufferMin,
+	});
+	const maxBounds = getBufferedBbox(limitsFeatureCollection, {
+		explicitBuffer: limitsBuffer,
+		bufferPercentage: limitsBufferPercentage,
+		minBuffer: mapLimitsBufferMin,
+	});
 
 	if (!bounds || !maxBounds) return;
 
