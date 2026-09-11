@@ -10,19 +10,10 @@ minimumReleaseAgeExclude:
   - '@xsynaptic/*'
   - '@astrojs/*'
   - astro
-  - '@img/sharp-*'
-  - sharp@0.35.4
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
 
-# Astro emits prerender chunks under <root>/dist/ that runtime-import @keyv/sqlite
-# via vite.ssr.external; hoist it so Node can resolve it from the root scope
-publicHoistPattern:
-  - '@keyv/sqlite'
-
-# Astro 7 beta spike: astro-pagefind@2.0.0 caps its astro peer at ^6, which makes
-# auto-install-peers pull a phantom astro 6 (+ vite 7). The integration works on 7.
 peerDependencyRules:
   allowedVersions:
     'astro-pagefind>astro': '7'
