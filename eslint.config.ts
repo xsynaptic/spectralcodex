@@ -33,8 +33,8 @@ export default getConfig(
 				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
 				'max-depth': ['warn', 3],
 				'max-params': ['warn', 3],
-				'max-lines-per-function': ['warn', { max: 120, skipBlankLines: true, skipComments: true }],
-				'max-statements': ['warn', 30],
+				'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
+				'max-statements': ['warn', 25],
 				// The expanded form reads more clearly than ??=, ||=, and &&=
 				'logical-assignment-operators': ['error', 'never'],
 				// Conflicts with Remeda's sort function

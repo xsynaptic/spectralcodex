@@ -101,6 +101,16 @@ function exitOnUnresolvedEntries(unresolved: Array<string>) {
 	process.exit(1);
 }
 
+async function loadRenderer() {
+	console.log(chalk.blue('Loading fonts...'));
+
+	const fonts = await loadOpenGraphFonts();
+
+	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
+
+	return createRenderer({ fonts });
+}
+
 async function main() {
 	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
 
@@ -111,13 +121,7 @@ async function main() {
 		console.log(chalk.yellow(`🗑️  Cleared OG image output and manifest\n`));
 	}
 
-	console.log(chalk.blue('Loading fonts...'));
-
-	const fonts = await loadOpenGraphFonts();
-
-	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
-
-	const renderCard = createRenderer({ fonts });
+	const renderCard = await loadRenderer();
 
 	const { entries, unresolved } = await getBuiltEntries({
 		distPath: path.resolve(rootPath, values['dist-path']),

@@ -358,6 +358,21 @@ function buildMonthlyItems(
 	return monthlyItems;
 }
 
+// Chronological so the earliest month wins a shared featured image
+function assignMonthlyHighlights(monthlyItems: Array<ChronologyMonthlyItem>): void {
+	const selectMonthlyHighlights = createHighlightSelector();
+
+	const sortedMonthlyItems = R.sortBy(monthlyItems, (item) => item.month);
+
+	for (const monthlyItem of sortedMonthlyItems) {
+		monthlyItem.highlights = selectMonthlyHighlights([
+			...monthlyItem.created,
+			...monthlyItem.updated,
+			...monthlyItem.visited,
+		]);
+	}
+}
+
 // An entry occupies its highest-precedence category for the year; the monthly highlights carry over
 function buildYearlyItems(
 	months: Array<ChronologyMonthBuckets>,
@@ -399,11 +414,7 @@ export function createChronologyData(
 ): ChronologyData {
 	const chronologyDataMap = buildChronologyDataMap(items);
 
-	const chronologyMap = new Map<string, CollectionEntry<'chronology'>>();
-
-	for (const entry of chronologyEntries) {
-		chronologyMap.set(entry.id, entry);
-	}
+	const chronologyMap = new Map(chronologyEntries.map((entry) => [entry.id, entry]));
 
 	const chronologyMonthlyData: ChronologyData['chronologyMonthlyData'] = [];
 	const chronologyYearlyData: ChronologyData['chronologyYearlyData'] = {};
@@ -425,18 +436,7 @@ export function createChronologyData(
 		chronologyMonthlyData.push(...yearMonthlyItems);
 		chronologyMonths[year] = yearMonthlyItems.map((item) => item.month);
 
-		// Monthly highlights; chronological so the earliest month wins a shared featured image
-		const selectMonthlyHighlights = createHighlightSelector();
-
-		const sortedMonthlyItems = R.sortBy(yearMonthlyItems, (item) => item.month);
-
-		for (const monthlyItem of sortedMonthlyItems) {
-			monthlyItem.highlights = selectMonthlyHighlights([
-				...monthlyItem.created,
-				...monthlyItem.updated,
-				...monthlyItem.visited,
-			]);
-		}
+		assignMonthlyHighlights(yearMonthlyItems);
 
 		// Reuse the monthly highlights in the yearly view
 		const monthlyHighlightsById = new Map(

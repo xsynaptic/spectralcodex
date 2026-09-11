@@ -137,6 +137,21 @@ describe('getLocationsFeatureCollection', () => {
 		).toHaveLength(2);
 	});
 
+	test('reuses the same feature objects when a location is mapped again', () => {
+		const entry = makeLocation('longshan-temple', {
+			title: 'Longshan Temple',
+			_uuid: 'abc123',
+			geometry: makePoint(121.5, 25),
+		});
+
+		const first = getLocationsFeatureCollection([entry]);
+		const second = getLocationsFeatureCollection([entry]);
+
+		expect(second?.features[0]).toBe(first?.features[0]);
+	});
+});
+
+describe('getLocationsFeatureCollection properties', () => {
 	test('reduces urls to relative paths and strips url scheme from external links', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('longshan-temple', {
@@ -169,19 +184,6 @@ describe('getLocationsFeatureCollection', () => {
 		expect(properties?.description).toBe('Point description');
 		expect(properties?.precision).toBe(2);
 		expect(properties?.category).toBe('temple');
-	});
-
-	test('reuses the same feature objects when a location is mapped again', () => {
-		const entry = makeLocation('longshan-temple', {
-			title: 'Longshan Temple',
-			_uuid: 'abc123',
-			geometry: makePoint(121.5, 25),
-		});
-
-		const first = getLocationsFeatureCollection([entry]);
-		const second = getLocationsFeatureCollection([entry]);
-
-		expect(second?.features[0]).toBe(first?.features[0]);
 	});
 
 	test('omits the image when a point nulls the entry thumbnail', () => {

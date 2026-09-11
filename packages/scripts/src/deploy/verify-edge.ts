@@ -21,52 +21,8 @@ function request(url: string, method: 'GET' | 'HEAD') {
 	});
 }
 
-export async function verifyEdge(): Promise<void> {
-	const config = loadDeployConfig();
-
-	const baseUrl = config.siteUrl.replace(/\/$/, '');
-
-	// Unique query busts the Cloudflare cache key so every assertion reaches Caddy at the origin
-	const token = Date.now().toString();
-	const cacheBust = `edge-check=${token}`;
-
-	console.log(chalk.blue('Verifying edge cache tiers...'));
-
-	const failures: Array<string> = [];
-
-	function check(expectation: EdgeExpectation, response: Response) {
-		const { label, path, status, cacheControl } = expectation;
-
-		if (response.status !== status) {
-			failures.push(
-				`${label} (${path}): expected status ${String(status)}, got ${String(response.status)}`,
-			);
-			return;
-		}
-
-		const actual = response.headers.get('cache-control') ?? '(absent)';
-
-		if (actual !== cacheControl) {
-			failures.push(`${label} (${path}): expected "${cacheControl}", got "${actual}"`);
-			return;
-		}
-
-		console.log(chalk.gray(`  ok  ${label}: ${path}`));
-	}
-
-	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET');
-
-	check(
-		{
-			label: 'document',
-			path: '/',
-			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
-		},
-		documentResponse,
-	);
-
-	const expectations: Array<EdgeExpectation> = [
+function getExpectations(token: string): Array<EdgeExpectation> {
+	return [
 		{
 			label: 'static file',
 			path: '/favicon.svg',
@@ -116,6 +72,54 @@ export async function verifyEdge(): Promise<void> {
 			cacheControl: 'public, max-age=0, s-maxage=600',
 		},
 	];
+}
+
+export async function verifyEdge(): Promise<void> {
+	const config = loadDeployConfig();
+
+	const baseUrl = config.siteUrl.replace(/\/$/, '');
+
+	// Unique query busts the Cloudflare cache key so every assertion reaches Caddy at the origin
+	const token = Date.now().toString();
+	const cacheBust = `edge-check=${token}`;
+
+	console.log(chalk.blue('Verifying edge cache tiers...'));
+
+	const failures: Array<string> = [];
+
+	function check(expectation: EdgeExpectation, response: Response) {
+		const { label, path, status, cacheControl } = expectation;
+
+		if (response.status !== status) {
+			failures.push(
+				`${label} (${path}): expected status ${String(status)}, got ${String(response.status)}`,
+			);
+			return;
+		}
+
+		const actual = response.headers.get('cache-control') ?? '(absent)';
+
+		if (actual !== cacheControl) {
+			failures.push(`${label} (${path}): expected "${cacheControl}", got "${actual}"`);
+			return;
+		}
+
+		console.log(chalk.gray(`  ok  ${label}: ${path}`));
+	}
+
+	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET');
+
+	check(
+		{
+			label: 'document',
+			path: '/',
+			status: 200,
+			cacheControl: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
+		},
+		documentResponse,
+	);
+
+	const expectations = getExpectations(token);
 
 	// Hashed asset names change every build, so take one from the document we already fetched
 	if (documentResponse.status === 200) {

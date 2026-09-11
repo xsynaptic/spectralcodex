@@ -329,6 +329,22 @@ async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
 	return entries;
 }
 
+function clearCache() {
+	const cacheDir = path.join(rootPath, values['cache-path']);
+	const cacheName = values['cache-name'];
+	const cacheFiles = readdirSync(cacheDir).filter(
+		(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
+	);
+	for (const file of cacheFiles) {
+		rmSync(path.join(cacheDir, file));
+	}
+	if (cacheFiles.length > 0) {
+		console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
+	} else {
+		console.log(chalk.green('🗑️  No cache files to clear'));
+	}
+}
+
 async function similarContent() {
 	try {
 		console.log(chalk.magenta('=== Similar Content Generator ==='));
@@ -336,19 +352,7 @@ async function similarContent() {
 		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
 
 		if (values['clear-cache']) {
-			const cacheDir = path.join(rootPath, values['cache-path']);
-			const cacheName = values['cache-name'];
-			const cacheFiles = readdirSync(cacheDir).filter(
-				(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
-			);
-			for (const file of cacheFiles) {
-				rmSync(path.join(cacheDir, file));
-			}
-			if (cacheFiles.length > 0) {
-				console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
-			} else {
-				console.log(chalk.green('🗑️  No cache files to clear'));
-			}
+			clearCache();
 			process.exit(0);
 		}
 

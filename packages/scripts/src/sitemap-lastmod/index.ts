@@ -4,6 +4,8 @@ import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import type { ContentEntry } from '#shared/astro-content.ts';
+
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
@@ -37,6 +39,36 @@ function resolvePaths(options: SitemapLastmodOptions) {
 	};
 }
 
+function resolveUrls(
+	entries: Array<ContentEntry>,
+	gitMap: Map<string, string>,
+	{ siteUrl, contentPathPrefix }: { siteUrl: string; contentPathPrefix: string },
+) {
+	const urls: Record<string, string> = {};
+
+	let resolvedCount = 0;
+	let missingDateCount = 0;
+
+	for (const entry of entries) {
+		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
+
+		const gitDate = gitMap.get(entry.filePath);
+
+		if (!gitDate) {
+			missingDateCount++;
+			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
+			continue;
+		}
+
+		const url = buildContentUrl(siteUrl, entry.collection, getPublicId(entry));
+
+		urls[url] = gitDate;
+		resolvedCount++;
+	}
+
+	return { urls, resolvedCount, missingDateCount };
+}
+
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
@@ -66,28 +98,10 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 		]),
 	);
 
-	const urls: Record<string, string> = {};
-	const contentPathPrefix = `${contentPathRelative}/collections/`;
-
-	let resolvedCount = 0;
-	let missingDateCount = 0;
-
-	for (const entry of entries) {
-		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
-
-		const gitDate = gitMap.get(entry.filePath);
-
-		if (!gitDate) {
-			missingDateCount++;
-			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
-			continue;
-		}
-
-		const url = buildContentUrl(options.siteUrl, entry.collection, getPublicId(entry));
-
-		urls[url] = gitDate;
-		resolvedCount++;
-	}
+	const { urls, resolvedCount, missingDateCount } = resolveUrls(entries, gitMap, {
+		siteUrl: options.siteUrl,
+		contentPathPrefix: `${contentPathRelative}/collections/`,
+	});
 
 	safelyCreateDirectory(path.dirname(outputPath));
 
