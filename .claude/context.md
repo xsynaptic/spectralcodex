@@ -120,7 +120,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Navigation**: The site's own link structure, in the header and the footer. _Avoid_: menu, menubar, nav bar.
 
-**Notice**: A derived advisory on a Location page, computed from its Safety, Status, and Entry Quality rather than authored (see `locations-section-notices.astro:35`). Its severity is a separate axis and never a Status. _Avoid_: alert, warning, callout, banner.
+**Notice**: A derived advisory on a Location page, computed from its Safety, Status, and Entry Quality rather than authored (see `noticeKeys` in `locations-section-notices.astro`). Its severity is a separate axis and never a Status. _Avoid_: alert, warning, callout, banner.
 
 ### Development
 
