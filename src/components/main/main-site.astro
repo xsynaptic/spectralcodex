@@ -69,7 +69,7 @@ const t = getTranslations();
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
-		<ModeManagerSetup defaultMode="auto" />
+		<ModeManagerSetup />
 		<Meta {...meta} />
 		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
 			<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
@@ -104,7 +104,7 @@ const t = getTranslations();
 			'visible flex min-h-screen min-w-[350px] flex-col overflow-visible overscroll-contain transition-colors',
 		]}
 	>
-		<ModeManager defaultMode="auto" />
+		<ModeManager />
 		<Sprites />
 		<ProgressLoading
 			class:list={[

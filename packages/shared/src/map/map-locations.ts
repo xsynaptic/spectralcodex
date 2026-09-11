@@ -81,12 +81,6 @@ export const LocationCategoryEnum = {
 	Unknown: 'unknown',
 } as const satisfies Record<string, string>;
 
-export type LocationCategory = (typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum];
-
-export const LocationCategoryNumericMapping = Object.fromEntries(
-	Object.values(LocationCategoryEnum).map((value, i) => [value, i]),
-) as Record<(typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum], number>;
-
 export const LocationStatusEnum = {
 	Active: 'active',
 	Public: 'public',
@@ -100,15 +94,3 @@ export const LocationStatusEnum = {
 } as const satisfies Record<string, string>;
 
 export type LocationStatus = (typeof LocationStatusEnum)[keyof typeof LocationStatusEnum];
-
-export const LocationMoodEnum = {
-	Light: 'light',
-	Neutral: 'neutral',
-	Dark: 'dark',
-} as const satisfies Record<string, string>;
-
-export type LocationMood = (typeof LocationMoodEnum)[keyof typeof LocationMoodEnum];
-
-export const LocationStatusNumericMapping = Object.fromEntries(
-	Object.values(LocationStatusEnum).map((value, i) => [value, i]),
-) as Record<(typeof LocationStatusEnum)[keyof typeof LocationStatusEnum], number>;

@@ -1,16 +1,4 @@
----
-import type { ModeGeneralType } from '#components/mode-manager/mode-types.ts';
-
-import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
-
-interface Props {
-	defaultMode?: ModeGeneralType | undefined;
-}
-
-const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
----
-
-<script is:inline data-default-mode={defaultMode}>
+<script is:inline>
 	{
 		let stored;
 
@@ -20,9 +8,7 @@ const { defaultMode = ModeTypeEnum.Auto } = Astro.props;
 			// localStorage unavailable
 		}
 
-		const { defaultMode } = document.currentScript.dataset;
-
-		let mode = ['auto', 'light', 'dark'].includes(stored) ? stored : (defaultMode ?? 'auto');
+		let mode = ['auto', 'light', 'dark'].includes(stored) ? stored : 'auto';
 
 		if (mode === 'auto') {
 			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';

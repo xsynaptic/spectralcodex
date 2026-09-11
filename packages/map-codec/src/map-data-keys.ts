@@ -1,4 +1,8 @@
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import {
+	GeometryTypeEnum,
+	LocationCategoryEnum,
+	LocationStatusEnum,
+} from '@spectralcodex/shared/map';
 
 export const MapDataKeys = {
 	Id: 'id',
@@ -63,3 +67,11 @@ export const MapDataGeometryTypeNumericMapping = {
 	[GeometryTypeEnum.Polygon]: 3,
 	[GeometryTypeEnum.MultiPolygon]: 4,
 } as const;
+
+export const LocationCategoryNumericMapping = Object.fromEntries(
+	Object.values(LocationCategoryEnum).map((value, i) => [value, i]),
+) as Record<(typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum], number>;
+
+export const LocationStatusNumericMapping = Object.fromEntries(
+	Object.values(LocationStatusEnum).map((value, i) => [value, i]),
+) as Record<(typeof LocationStatusEnum)[keyof typeof LocationStatusEnum], number>;

@@ -1,9 +1,7 @@
 import {
 	GeometryTypeEnum,
 	LocationCategoryEnum,
-	LocationCategoryNumericMapping,
 	LocationStatusEnum,
-	LocationStatusNumericMapping,
 } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
@@ -11,7 +9,12 @@ import { z } from 'zod';
 import type { MapPopupItem, MapSourceItem } from '#codec.ts';
 
 import { MapPopupItemSchema, MapSourceItemSchema } from '#codec.ts';
-import { MapDataGeometryTypeNumericMapping, MapDataKeysCompressed } from '#map-data-keys.ts';
+import {
+	LocationCategoryNumericMapping,
+	LocationStatusNumericMapping,
+	MapDataGeometryTypeNumericMapping,
+	MapDataKeysCompressed,
+} from '#map-data-keys.ts';
 
 function byCodePoint(first: string, second: string): number {
 	return first.localeCompare(second);

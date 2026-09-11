@@ -3,6 +3,18 @@
 	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
 }
 
+/* Image shadow and caption sizes; caption min heights spread the gradient behind the text */
+@theme {
+	--spacing-image-shadow-sm: 15vh;
+	--spacing-image-shadow-md: 20vh;
+	--spacing-image-shadow-lg: 25vh;
+	--spacing-image-shadow-xl: 30vh;
+	--spacing-image-gradient: 50px;
+	--spacing-image-gradient-hero: 80px;
+	--spacing-image-caption: 70%;
+	--spacing-image-caption-narrow: 55%;
+}
+
 @theme {
 	--font-display:
 		var(--font-geologica), ui-sans-serif, system-ui, 'Noto Sans TC', 'Heiti TC',

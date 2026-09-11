@@ -41,7 +41,7 @@ class ModeManager extends HTMLElement {
 		this.#mediaMatcher.addEventListener('change', this.#handleMediaChange);
 
 		const stored = this.#storage?.getItem(this.#storageKey);
-		const mode = stored && isModeValid(stored) ? stored : this.#getDefaultMode();
+		const mode = stored && isModeValid(stored) ? stored : ModeTypeEnum.Auto;
 		this.#applyMode(mode);
 	}
 
@@ -51,26 +51,13 @@ class ModeManager extends HTMLElement {
 
 	getMode(): ModeGeneralType {
 		const stored = this.#storage?.getItem(this.#storageKey);
-		return stored && isModeValid(stored) ? stored : this.#getDefaultMode();
+		return stored && isModeValid(stored) ? stored : ModeTypeEnum.Auto;
 	}
 
 	setMode(mode: ModeGeneralType) {
 		if (!isModeValid(mode)) return;
 		this.#storage?.setItem(this.#storageKey, mode);
 		this.#applyMode(mode);
-	}
-
-	getSystemMode(): ModeSystemType {
-		return this.#systemMode;
-	}
-
-	getDefaultMode(): ModeGeneralType {
-		return this.#getDefaultMode();
-	}
-
-	#getDefaultMode(): ModeGeneralType {
-		const raw = this.getAttribute('default-mode');
-		return raw && isModeValid(raw) ? raw : ModeTypeEnum.Auto;
 	}
 
 	#applyMode(mode: ModeGeneralType) {
@@ -87,7 +74,6 @@ class ModeManager extends HTMLElement {
 					detail: {
 						mode,
 						systemMode: this.#systemMode,
-						defaultMode: this.#getDefaultMode(),
 						resolvedMode,
 					},
 				}) satisfies ModeChangedEvent,

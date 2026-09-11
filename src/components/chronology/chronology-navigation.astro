@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import Anchor from '#components/parts/anchor.astro';
+import ChronologyNavigationItem from '#components/chronology/chronology-navigation-item.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
@@ -25,88 +25,62 @@ const {
 } = Astro.props;
 
 const indexSlot = await renderSlot(Astro.slots, 'default');
+
+const months = chronologyMonths?.toSorted((monthA, monthB) => monthA.localeCompare(monthB)) ?? [];
+
+function getMonthName(month: string) {
+	return new Date(0, Number(month) - 1).toLocaleDateString('en-US', { month: 'long' });
+}
 ---
 
-{chronologyYears.length > 0 ? (
+<div
+	class:list={[
+		'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
+		hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
+		className,
+	]}
+	{...props}
+>
 	<div
 		class:list={[
-			'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
-			hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
-			className,
+			'flex gap-1',
+			hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 		]}
-		{...props}
 	>
+		{indexSlot ? (
+			<DividedItem dividerContent="chevron">
+				<Fragment set:html={indexSlot} />
+			</DividedItem>
+		) : undefined}
+		{chronologyYears.map((year) => (
+			<ChronologyNavigationItem
+				href={getSitePath('chronology', year)}
+				period="year"
+				hasHeroImage={hasHeroImage}
+				isCurrent={!currentMonth && currentYear === year}
+				isActive={Boolean(currentMonth) && currentYear === year}
+			>
+				{year}
+			</ChronologyNavigationItem>
+		))}
+	</div>
+	{currentYear && currentMonth && months.length > 0 ? (
 		<div
 			class:list={[
 				'flex gap-1',
 				hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 			]}
 		>
-			{indexSlot ? (
-				<DividedItem dividerContent="chevron">
-					<Fragment set:html={indexSlot} />
-				</DividedItem>
-			) : undefined}
-			{chronologyYears.map((chronologyYear) => (
-				<DividedItem>
-					{!currentMonth && currentYear === chronologyYear ? (
-						<span
-							class:list={[
-								'font-semibold text-primary-600 dark:text-primary-400',
-								hasHeroImage ? 'sm:text-accent-200' : '',
-							]}
-						>
-							{chronologyYear}
-						</span>
-					) : (
-						<Anchor
-							class={currentMonth && currentYear === chronologyYear ? 'font-semibold' : undefined}
-							href={getSitePath('chronology', chronologyYear)}
-							anchorColor="accent"
-						>
-							{chronologyYear}
-						</Anchor>
-					)}
-				</DividedItem>
+			{months.map((month) => (
+				<ChronologyNavigationItem
+					href={getSitePath('chronology', currentYear, month)}
+					period="month"
+					hasHeroImage={hasHeroImage}
+					isCurrent={currentMonth === month}
+				>
+					{getMonthName(month)}
+				</ChronologyNavigationItem>
 			))}
 		</div>
-		{currentYear && currentMonth && chronologyMonths && chronologyMonths.length > 0 ? (
-			<div
-				class:list={[
-					'flex gap-1',
-					hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
-				]}
-			>
-				{chronologyMonths
-					.sort((monthA, monthB) => monthA.localeCompare(monthB))
-					.map((monthNumber) => {
-						const monthName = new Date(0, Number(monthNumber) - 1).toLocaleDateString('en-US', {
-							month: 'long',
-						});
-
-						return (
-							<DividedItem>
-								{currentMonth === monthNumber ? (
-									<span
-										class:list={[
-											'font-semibold text-highlight-600',
-											hasHeroImage ? 'sm:text-highlight-200' : '',
-										]}
-									>
-										{monthName}
-									</span>
-								) : (
-									<Anchor
-										href={getSitePath('chronology', currentYear, monthNumber)}
-										anchorColor="highlight"
-									>
-										{monthName}
-									</Anchor>
-								)}
-							</DividedItem>
-						);
-					})}
-			</div>
-		) : undefined}
-	</div>
-) : undefined}
+	) : undefined}
+</div>

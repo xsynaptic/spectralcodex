@@ -8,41 +8,6 @@ export const GeometryTypeEnum = {
 	MultiPolygon: 'MultiPolygon',
 } as const;
 
-const PositionSchema = z.tuple([z.number(), z.number()]);
-
-const GeometryPointSchema = z.object({
-	type: z.literal(GeometryTypeEnum.Point),
-	coordinates: PositionSchema,
-});
-
-const GeometryMultiPointSchema = z.object({
-	type: z.literal(GeometryTypeEnum.MultiPoint),
-	coordinates: PositionSchema.array().nonempty().min(2),
-});
-
-const GeometryLineStringSchema = z.object({
-	type: z.literal(GeometryTypeEnum.LineString),
-	coordinates: PositionSchema.array().nonempty().min(2),
-});
-
-const GeometryPolygonSchema = z.object({
-	type: z.literal(GeometryTypeEnum.Polygon),
-	coordinates: z.array(z.array(PositionSchema)).min(1),
-});
-
-const GeometryMultiPolygonSchema = z.object({
-	type: z.literal(GeometryTypeEnum.MultiPolygon),
-	coordinates: z.array(z.array(z.array(PositionSchema))).min(1),
-});
-
-export const GeometrySchema = z.discriminatedUnion('type', [
-	GeometryPointSchema,
-	GeometryMultiPointSchema,
-	GeometryLineStringSchema,
-	GeometryPolygonSchema,
-	GeometryMultiPolygonSchema,
-]);
-
 export const GeometryDivisionIdSchema = z.union([z.string(), z.string().array()]).nullable();
 
 export const GeometryBoundingBoxSchema = z.object({

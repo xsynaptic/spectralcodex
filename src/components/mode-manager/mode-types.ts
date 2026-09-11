@@ -10,7 +10,6 @@ export type ModeSystemType = Extract<ModeGeneralType, 'light' | 'dark'>;
 
 export type ModeChangedEvent = CustomEvent<{
 	mode: ModeGeneralType;
-	defaultMode: ModeGeneralType;
 	systemMode: ModeSystemType;
 	resolvedMode: ModeSystemType;
 }>;

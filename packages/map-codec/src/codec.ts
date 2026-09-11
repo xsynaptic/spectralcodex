@@ -1,13 +1,13 @@
 import {
 	GeometryTypeEnum,
 	LocationCategoryEnum,
-	LocationCategoryNumericMapping,
 	LocationStatusEnum,
-	LocationStatusNumericMapping,
 } from '@spectralcodex/shared/map';
 import { z } from 'zod';
 
 import {
+	LocationCategoryNumericMapping,
+	LocationStatusNumericMapping,
 	MapDataGeometryTypeNumericMapping,
 	MapDataKeys,
 	MapDataKeysCompressed,

@@ -36,7 +36,7 @@ const imageLoaderCache = createJsonlCache({
 // Schema shape versions the cached payload; bump rev for changes invisible to z.toJSONSchema (coercions, extraction logic)
 const extractionVersion = hash({
 	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
-	rev: 1,
+	rev: 2,
 });
 
 // Env feeds the src transform; changes re-derive entries without re-running exiftool

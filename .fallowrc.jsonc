@@ -1,0 +1,59 @@
+{
+	"entry": ["deploy/cache-warmer/cache-warm.ts", "src/dev/inventory/inventory-og-image.ts"],
+	"dynamicallyLoaded": ["packages/content-demo/collections/**/*.mdx"],
+	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**"],
+	// Referenced by string or computed path, or used only by the gitignored content subrepo
+	"ignoreDependencies": [
+		"@xsynaptic/stylelint-config",
+		"eslint-plugin-jsx-a11y",
+		"@fontsource/lora",
+		"@fontsource/noto-serif-tc",
+		"@fontsource/noto-serif-thai",
+		"@fontsource/zen-antique",
+		"mdxlint",
+		"@xsynaptic/remark-prose-rules",
+	],
+	// Removal override; its target never reaches the lockfile
+	"ignoreDependencyOverrides": [
+		{ "package": "fallow-type-aware", "source": "pnpm-workspace.yaml" },
+	],
+	"rules": { "dev-dependencies-in-production": "off" },
+	"health": {
+		// Disabled; coverage is only estimated and cannot see e2e specs
+		"maxCrap": 0,
+		"ignore": ["src/dev/**"],
+		"thresholdOverrides": [
+			{
+				"files": [
+					"src/components/content/content-section.astro",
+					"src/components/content/content-header.astro",
+					"src/components/image/image-carousel-caption.astro",
+					"src/components/navigation/navigation-header-submenu.astro",
+				],
+				"functions": ["<template>"],
+				"maxCognitive": 30,
+				"reason": "Flat optional slots and class switches",
+			},
+			{
+				"files": ["packages/react-map-component/src/canvas/canvas.tsx"],
+				"functions": ["MapCanvasContainer"],
+				"maxCognitive": 26,
+				"reason": "Flat provider tree; JSX depth read as nesting",
+			},
+		],
+	},
+	"duplicates": { "minTokens": 70 },
+	"boundaries": {
+		"zones": [
+			{ "name": "packages", "patterns": ["packages/**"] },
+			{ "name": "lib", "patterns": ["src/lib/**"] },
+			{ "name": "components", "patterns": ["src/components/**", "src/layouts/**", "src/pages/**"] },
+		],
+		"rules": [
+			// Vite/Rolldown build breaks when packages import the app
+			{ "from": "packages", "allow": ["packages"] },
+			{ "from": "lib", "allow": ["lib", "packages"] },
+			{ "from": "components", "allow": ["components", "lib", "packages"] },
+		],
+	},
+}

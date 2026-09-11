@@ -49,7 +49,9 @@ export function getImageExposureValue({
 		shutterTime = Number(shutterSpeed);
 	}
 
-	return String(Math.log2(Number(aperture) ** 2 / shutterTime));
+	const exposureValue = Math.log2(Number(aperture) ** 2 / shutterTime);
+
+	return Number.isFinite(exposureValue) ? String(exposureValue) : undefined;
 }
 
 // Coerce an EXIF tag to a string, preserving absence as undefined

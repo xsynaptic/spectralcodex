@@ -1,0 +1,37 @@
+---
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+
+interface Props {
+	href: string;
+	period: 'year' | 'month';
+	hasHeroImage: boolean;
+	isCurrent: boolean;
+	isActive?: boolean | undefined;
+}
+
+const { href, period, hasHeroImage, isCurrent, isActive = false } = Astro.props;
+---
+
+<DividedItem>
+	{isCurrent ? (
+		<span
+			class:list={[
+				'font-semibold',
+				period === 'year' ? 'text-primary-600 dark:text-primary-400' : 'text-highlight-600',
+				hasHeroImage && period === 'year' ? 'sm:text-accent-200' : undefined,
+				hasHeroImage && period === 'month' ? 'sm:text-highlight-200' : undefined,
+			]}
+		>
+			<slot />
+		</span>
+	) : (
+		<Anchor
+			href={href}
+			anchorColor={period === 'year' ? 'accent' : 'highlight'}
+			isActive={isActive}
+		>
+			<slot />
+		</Anchor>
+	)}
+</DividedItem>

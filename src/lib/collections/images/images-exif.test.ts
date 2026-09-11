@@ -25,6 +25,13 @@ describe('getImageExposureValue', () => {
 		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '0/250' })).toBeUndefined();
 		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '1/x' })).toBeUndefined();
 	});
+
+	test('returns undefined when the result is not a finite number', () => {
+		expect(getImageExposureValue({ aperture: 'wide', shutterSpeed: '1/250' })).toBeUndefined();
+		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: 'bulb' })).toBeUndefined();
+		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '0' })).toBeUndefined();
+		expect(getImageExposureValue({ aperture: '0', shutterSpeed: '1/250' })).toBeUndefined();
+	});
 });
 
 describe('extractExifData', () => {
