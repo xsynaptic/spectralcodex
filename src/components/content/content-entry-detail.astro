@@ -1,0 +1,78 @@
+---
+import type { Page } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+
+import { stripDiacritics } from '@spectralcodex/shared/text';
+
+import ContentArticle from '#components/content/content-article.astro';
+import ContentHeader from '#components/content/content-header.astro';
+import ImageHero from '#components/image/image-hero.astro';
+import MainSite from '#components/main/main-site.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
+import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+
+interface Props {
+	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
+	page: Page;
+	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
+	prefetchUrls: Array<string> | undefined;
+	hideSearch?: boolean | undefined;
+}
+
+const { entry, page, breadcrumbRegions, prefetchUrls, hideSearch } = Astro.props;
+
+const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
+
+const catalog = await getCatalog();
+
+const imageFeaturedGroup = getImageFeaturedGroup({
+	imageFeatured: entry.data.imageFeatured,
+	getCaption: catalog.getCaption,
+});
+
+const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+---
+
+<MainSite
+	meta={{
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
+		description: await getDescriptionRenderedText(entry),
+		image: getSeoImageProps({
+			id: entry.id,
+			alt: entry.data.title,
+		}),
+		...getSeoHideSearch(hideSearch),
+		prefetchUrls,
+	}}
+	schemas={[
+		buildEntryBreadcrumbSchema({
+			collection: entry.collection,
+			title: entry.data.title,
+			url: Astro.url.toString(),
+			regions: breadcrumbRegions,
+		}),
+	]}
+	hasHeroImage={hasHeroImage}
+>
+	<ContentArticle imageId={imageFeaturedId} hideSearch={!!hideSearch || page.currentPage !== 1}>
+		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
+			<ContentHeader hasHeroImage={hasHeroImage}>
+				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
+				<Fragment slot="header-title-multilingual">
+					<TextMultilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-subtitle">
+					<slot name="header-subtitle" />
+				</Fragment>
+			</ContentHeader>
+		</ImageHero>
+		<slot />
+	</ContentArticle>
+</MainSite>

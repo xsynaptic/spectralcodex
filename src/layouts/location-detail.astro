@@ -3,7 +3,6 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
-import { stripDiacritics } from '@spectralcodex/shared/text';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
@@ -13,6 +12,7 @@ import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentImage from '#components/content/content-image.astro';
 import ContentProse from '#components/content/content-prose.astro';
+import ContentTitlePermalink from '#components/content/content-title-permalink.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import LocationsAddress from '#components/locations/locations-address.astro';
 import SectionHeritage from '#components/locations/locations-section-heritage.astro';
@@ -40,10 +40,10 @@ import {
 	getLocationSchemas,
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
-import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -87,9 +87,7 @@ const t = getTranslations();
 
 <MainSite
 	meta={{
-		title: titleMultilingual
-			? `${entry.data.title} (${titleMultilingual.value})`
-			: entry.data.title,
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
 			id: getPublicId(entry),
@@ -113,13 +111,7 @@ const t = getTranslations();
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
-					<a
-						href={Astro.url.toString()}
-						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						rel="bookmark"
-					>
-						{stripDiacritics(entry.data.title)}
-					</a>
+					<ContentTitlePermalink title={entry.data.title} />
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
@@ -133,23 +125,7 @@ const t = getTranslations();
 							<RegionsBreadcrumbs entry={regionPrimary} showCurrentLink={true} />
 						</DividedItem>
 					) : undefined}
-					<DividedItem>
-						<ContentDate
-							date={entry.data.dateCreated}
-							datePreset={DatePresetEnum.Medium}
-							showMicroformats={true}
-						/>
-					</DividedItem>
-					{entry.data.dateUpdated ? (
-						<DividedItem>
-							<ContentDate
-								date={entry.data.dateUpdated}
-								datePreset={DatePresetEnum.Medium}
-								showMicroformats={true}
-								showUpdated={true}
-							/>
-						</DividedItem>
-					) : undefined}
+					<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

@@ -3,18 +3,13 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import { stripDiacritics } from '@spectralcodex/shared/text';
-
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
-import ContentHeader from '#components/content/content-header.astro';
+import ContentEntryCounts from '#components/content/content-entry-counts.astro';
+import ContentEntryDetail from '#components/content/content-entry-detail.astro';
 import ContentProse from '#components/content/content-prose.astro';
-import ImageHero from '#components/image/image-hero.astro';
-import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
@@ -23,15 +18,6 @@ import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { backlinksDisplayCountMinimum } from '#constants.ts';
-import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
-import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'themes'>;
@@ -46,91 +32,32 @@ interface Props {
 const { entry, mapData, catalogItems, catalogItemsCount, backlinksCount, relatedThemeIds, page } =
 	Astro.props;
 
-const t = getTranslations();
-
-const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
-
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
-
-const catalog = await getCatalog();
-
-const imageFeaturedGroup = getImageFeaturedGroup({
-	imageFeatured: entry.data.imageFeatured,
-	getCaption: catalog.getCaption,
-});
-
-const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
-
-const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
-
-const entryCount = entry.data._entryCount ?? 0;
 ---
 
-<MainSite
-	meta={{
-		title: titleMultilingual
-			? `${entry.data.title} (${titleMultilingual.value})`
-			: entry.data.title,
-		description: await getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			id: entry.id,
-			alt: entry.data.title,
-		}),
-		...getSeoHideSearch(entry.data.hideSearch),
-		prefetchUrls: mapData.prefetchUrls,
-	}}
-	schemas={[
-		buildEntryBreadcrumbSchema({
-			collection: entry.collection,
-			title: entry.data.title,
-			url: Astro.url.toString(),
-		}),
-	]}
-	hasHeroImage={hasHeroImage}
+<ContentEntryDetail
+	entry={entry}
+	page={page}
+	prefetchUrls={mapData.prefetchUrls}
+	hideSearch={entry.data.hideSearch}
 >
-	<ContentArticle
-		imageId={imageFeaturedId}
-		hideSearch={!!entry.data.hideSearch || page.currentPage !== 1}
-	>
-		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
-			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
-				<Fragment slot="header-title-multilingual">
-					<TextMultilingual content={titleMultilingual} />
-				</Fragment>
-				<Fragment slot="header-subtitle">
-					<DividedItem>
-						<ContentCollectionLink collection={entry.collection} />
-					</DividedItem>
-					{entryCount > 0 ? (
-						<DividedItem>
-							{formatStringTemplate(t('content.meta.entries.label'), {
-								count: formatNumber({ number: entryCount }),
-							})}
-						</DividedItem>
-					) : undefined}
-					{backlinksCount >= backlinksDisplayCountMinimum ? (
-						<DividedItem>
-							{formatStringTemplate(t('content.meta.backlinks.label'), {
-								count: formatNumber({ number: backlinksCount }),
-							})}
-						</DividedItem>
-					) : undefined}
-				</Fragment>
-			</ContentHeader>
-		</ImageHero>
-		<ContentProse entry={entry} />
-		<SectionMap mapData={mapData} />
-		<SectionLinks entry={entry} />
-		<SectionSources entry={entry} />
-		<SectionRegions regionIds={regionIds} />
-		<SectionThemes themeIds={allThemeIds} />
-		<SectionWebmentions entry={entry} />
-		<SectionPreviews page={page} showMicroformats={true} />
-		{page.currentPage === 1 && catalogItems.length > 0 ? (
-			<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
-		) : undefined}
-	</ContentArticle>
-</MainSite>
+	<Fragment slot="header-subtitle">
+		<DividedItem>
+			<ContentCollectionLink collection={entry.collection} />
+		</DividedItem>
+		<ContentEntryCounts entryCount={entry.data._entryCount ?? 0} backlinksCount={backlinksCount} />
+	</Fragment>
+	<ContentProse entry={entry} />
+	<SectionMap mapData={mapData} />
+	<SectionLinks entry={entry} />
+	<SectionSources entry={entry} />
+	<SectionRegions regionIds={regionIds} />
+	<SectionThemes themeIds={allThemeIds} />
+	<SectionWebmentions entry={entry} />
+	<SectionPreviews page={page} showMicroformats={true} />
+	{page.currentPage === 1 && catalogItems.length > 0 ? (
+		<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
+	) : undefined}
+</ContentEntryDetail>

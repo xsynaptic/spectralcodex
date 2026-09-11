@@ -9,13 +9,11 @@ import ContentExcerpt from '#components/content/content-excerpt.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
-import DividedItem from '#components/parts/divided-item.astro';
 import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
@@ -69,23 +67,10 @@ const description = t('collection.posts.description');
 					>
 						<Fragment slot="excerpt-title">{entry.data.title}</Fragment>
 						<Fragment slot="excerpt-subtitle">
-							<DividedItem>
-								<ContentDate
-									date={entry.data.dateCreated}
-									datePreset={DatePresetEnum.Medium}
-									showMicroformats={true}
-								/>
-							</DividedItem>
-							{entry.data.dateUpdated ? (
-								<DividedItem>
-									<ContentDate
-										date={entry.data.dateUpdated}
-										datePreset={DatePresetEnum.Medium}
-										showMicroformats={true}
-										showUpdated={true}
-									/>
-								</DividedItem>
-							) : undefined}
+							<ContentDate
+								dateCreated={entry.data.dateCreated}
+								dateUpdated={entry.data.dateUpdated}
+							/>
 						</Fragment>
 						<Content />
 					</ContentExcerpt>

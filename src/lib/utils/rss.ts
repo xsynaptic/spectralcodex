@@ -13,7 +13,7 @@ import * as R from 'remeda';
 import { millisecondsPerHour, siteTimezoneOffsetHours } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
@@ -82,9 +82,7 @@ const generateFeedItem = async ({
 	const pubDate = entry.data.dateUpdated ?? entry.data.dateCreated;
 
 	const feedItem = {
-		title: titleMultilingual
-			? `${entry.data.title} (${titleMultilingual.value})`
-			: entry.data.title,
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		link: getContentPath(entry.collection, getPublicId(entry)),
 		// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
 		pubDate: new Date(pubDate.getTime() - siteTimezoneOffsetHours * millisecondsPerHour),

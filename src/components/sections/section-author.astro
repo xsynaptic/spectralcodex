@@ -1,24 +1,15 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
-
-import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
-import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import AuthorCard from '#components/parts/author-card.astro';
+import AuthorPhoto from '#components/parts/author-photo.astro';
 import CardFrame from '#components/parts/card-frame.astro';
-import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageBreakpoints } from '#lib/image/image-layout.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
-import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 type Props = HTMLAttributes<'div'> & {
 	showAuthor?: boolean | undefined;
@@ -26,45 +17,7 @@ type Props = HTMLAttributes<'div'> & {
 
 const { class: className, showAuthor = false, ...props } = Astro.props;
 
-const imageSrc = 'v/a-synaptic-2025-1.jpg';
-
 const t = getTranslations();
-
-async function getImageProps(): Promise<{
-	imageEntry: CollectionEntry<'images'> | undefined;
-	imageProps: ImageComponentProps | undefined;
-	placeholderProps: ImagePlaceholderProps | undefined;
-}> {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = getImageById(imageSrc);
-
-	if (!imageEntry)
-		return { imageEntry: undefined, imageProps: undefined, placeholderProps: undefined };
-
-	const fit = ImageFitOptionEnum.Cover;
-
-	return {
-		imageEntry,
-		imageProps: {
-			src: imageSrc,
-			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
-			sizes: 'auto, (max-width: 640px) 150px, 150px',
-			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
-			unstyled: true,
-			operations: { fit },
-			imageQuality: imageLowQualityValue,
-			imageFormat: imageLowQualityFormat,
-		},
-		placeholderProps: {
-			imageId: imageSrc,
-			aspectRatio: 1,
-			fit,
-		},
-	};
-}
-
-const { imageProps, placeholderProps } = await getImageProps();
 ---
 
 <ContentSection
@@ -81,14 +34,10 @@ const { imageProps, placeholderProps } = await getImageProps();
 >
 	<div class="flex items-start gap-4">
 		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
-			{imageProps ? (
-				<ImagePlaceholder
-					class="relative overflow-hidden rounded-xs grayscale"
-					placeholderProps={placeholderProps}
-				>
-					<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
-				</ImagePlaceholder>
-			) : undefined}
+			<AuthorPhoto
+				sizes="auto, (max-width: 640px) 150px, 150px"
+				operations={{ fit: ImageFitOptionEnum.Cover }}
+			/>
 			<AuthorCard />
 		</CardFrame>
 		<Prose>

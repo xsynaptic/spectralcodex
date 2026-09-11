@@ -3,29 +3,17 @@ import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import { stripDiacritics } from '@spectralcodex/shared/text';
-
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
-import ContentHeader from '#components/content/content-header.astro';
+import ContentEntryDetail from '#components/content/content-entry-detail.astro';
 import ContentProse from '#components/content/content-prose.astro';
-import ImageHero from '#components/image/image-hero.astro';
-import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
@@ -37,81 +25,39 @@ interface Props {
 
 const { entry, mapData, page, wordCount } = Astro.props;
 
-const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
-
-const catalog = await getCatalog();
-
-const imageFeaturedGroup = getImageFeaturedGroup({
-	imageFeatured: entry.data.imageFeatured,
-	getCaption: catalog.getCaption,
-});
-
-const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
-
-const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
-
 const entryCount = entry.data._entryCount ?? 0;
 
 const t = getTranslations();
 ---
 
-<MainSite
-	meta={{
-		title: titleMultilingual
-			? `${entry.data.title} (${titleMultilingual.value})`
-			: entry.data.title,
-		description: await getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			id: entry.id,
-			alt: entry.data.title,
-		}),
-		...getSeoHideSearch(entry.data.hideSearch),
-		prefetchUrls: mapData.prefetchUrls,
-	}}
-	schemas={[
-		buildEntryBreadcrumbSchema({
-			collection: entry.collection,
-			title: entry.data.title,
-			url: Astro.url.toString(),
-		}),
-	]}
-	hasHeroImage={hasHeroImage}
+<ContentEntryDetail
+	entry={entry}
+	page={page}
+	prefetchUrls={mapData.prefetchUrls}
+	hideSearch={entry.data.hideSearch}
 >
-	<ContentArticle
-		imageId={imageFeaturedId}
-		hideSearch={!!entry.data.hideSearch || page.currentPage !== 1}
-	>
-		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
-			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
-				<Fragment slot="header-title-multilingual">
-					<TextMultilingual content={titleMultilingual} />
-				</Fragment>
-				<Fragment slot="header-subtitle">
-					<DividedItem>
-						<ContentCollectionLink collection={entry.collection} />
-					</DividedItem>
-					{entryCount > 0 ? (
-						<DividedItem>
-							{formatStringTemplate(t('content.meta.entries.label'), {
-								count: formatNumber({ number: entryCount }),
-							})}
-						</DividedItem>
-					) : undefined}
-					{wordCount && wordCount > 0 ? (
-						<DividedItem>
-							<span
-								set:html={`${t('content.meta.wordCount.label')}: ${formatNumber({ number: wordCount })}`}
-							/>
-						</DividedItem>
-					) : undefined}
-				</Fragment>
-			</ContentHeader>
-		</ImageHero>
-		<ContentProse entry={entry} />
-		<SectionMap mapData={mapData} />
-		<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
-		<SectionWebmentions entry={entry} />
-		<SectionPreviews page={page} showMicroformats={true} />
-	</ContentArticle>
-</MainSite>
+	<Fragment slot="header-subtitle">
+		<DividedItem>
+			<ContentCollectionLink collection={entry.collection} />
+		</DividedItem>
+		{entryCount > 0 ? (
+			<DividedItem>
+				{formatStringTemplate(t('content.meta.entries.label'), {
+					count: formatNumber({ number: entryCount }),
+				})}
+			</DividedItem>
+		) : undefined}
+		{wordCount && wordCount > 0 ? (
+			<DividedItem>
+				<span
+					set:html={`${t('content.meta.wordCount.label')}: ${formatNumber({ number: wordCount })}`}
+				/>
+			</DividedItem>
+		) : undefined}
+	</Fragment>
+	<ContentProse entry={entry} />
+	<SectionMap mapData={mapData} />
+	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
+	<SectionWebmentions entry={entry} />
+	<SectionPreviews page={page} showMicroformats={true} />
+</ContentEntryDetail>

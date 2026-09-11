@@ -1,33 +1,26 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
-import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ImageHero from '#components/image/image-hero.astro';
-import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
 import AuthorCard from '#components/parts/author-card.astro';
+import AuthorPhoto from '#components/parts/author-photo.astro';
 import CardFrame from '#components/parts/card-frame.astro';
-import Image from '#components/parts/image.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import Prose from '#components/parts/prose.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { tailwindBreakpointSm } from '#constants.ts';
 import { getCatalogStats } from '#lib/catalog/catalog-stats.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
-import { getImageBreakpoints } from '#lib/image/image-layout.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
-import { formatStringTemplate, sanitizeImageAltAttribute } from '#lib/utils/text.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	featuredCatalogItems: Array<CatalogItem>;
@@ -36,44 +29,7 @@ interface Props {
 	seriesCatalogItems: Array<CatalogItem>;
 }
 
-const imageSrc = 'v/a-synaptic-2025-1.jpg';
-
 const t = getTranslations();
-
-async function getImageProps(): Promise<{
-	imageEntry: CollectionEntry<'images'> | undefined;
-	imageProps: ImageComponentProps | undefined;
-	placeholderProps: ImagePlaceholderProps | undefined;
-}> {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = getImageById(imageSrc);
-
-	if (!imageEntry)
-		return {
-			imageEntry: undefined,
-			imageProps: undefined,
-			placeholderProps: undefined,
-		};
-
-	return {
-		imageEntry,
-		imageProps: {
-			src: imageSrc,
-			breakpoints: getImageBreakpoints({ maxWidth: ImageSizeEnum.Large }),
-			sizes: `(min-width: 360px) 180px, (min-width: ${tailwindBreakpointSm}) 300px, 300px`,
-			alt: sanitizeImageAltAttribute(t('author.photo.alt')),
-			unstyled: true,
-			priority: true,
-		},
-		placeholderProps: {
-			imageId: imageSrc,
-			aspectRatio: 1,
-		},
-	};
-}
-
-const { imageProps, placeholderProps } = await getImageProps();
 
 const contentStats = await getCatalogStats();
 
@@ -110,14 +66,9 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				MicroformatClassNames.Card,
 			]}
 		>
-			{imageProps ? (
-				<ImagePlaceholder
-					class="relative overflow-hidden rounded-xs grayscale"
-					placeholderProps={placeholderProps}
-				>
-					<Image class:list={['aspect-square', MicroformatClassNames.Photo]} {...imageProps} />
-				</ImagePlaceholder>
-			) : undefined}
+			<AuthorPhoto
+				sizes={`(min-width: 360px) 180px, (min-width: ${tailwindBreakpointSm}) 300px, 300px`}
+			/>
 			<AuthorCard />
 		</CardFrame>
 		<Prose>

@@ -835,9 +835,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 									<DividedItem>
 										<ContentCollectionLink collection="posts" />
 									</DividedItem>
-									<DividedItem>
-										<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
-									</DividedItem>
+									<ContentDate dateCreated={sampleDate} />
 								</Fragment>
 							</ContentHeader>
 						</ImageHero>
@@ -867,21 +865,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						<DividedItem>
 							<ContentCollectionLink collection="locations" />
 						</DividedItem>
-						<DividedItem>
-							<ContentDate
-								date={sampleDate}
-								datePreset={DatePresetEnum.Medium}
-								showMicroformats={true}
-							/>
-						</DividedItem>
-						<DividedItem>
-							<ContentDate
-								date={sampleDateUpdated}
-								datePreset={DatePresetEnum.Medium}
-								showMicroformats={true}
-								showUpdated={true}
-							/>
-						</DividedItem>
+						<ContentDate dateCreated={sampleDate} dateUpdated={sampleDateUpdated} />
 					</Fragment>
 				</ContentHeader>
 				<ContentHeader>
@@ -890,20 +874,16 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="content-date"
-				note="Renders nothing when the date is undefined."
+				note="The created date, then the updated date when present, each in its own divided item."
 				source="components/content/content-date.astro"
 			>
-				<div class="flex flex-wrap items-baseline gap-x-6 gap-y-2 text-sm">
-					<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
-					<ContentDate
-						date={sampleDateUpdated}
-						datePreset={DatePresetEnum.Medium}
-						showUpdated={true}
-					/>
-					<span class={captionClass}>
-						undefined date: <ContentDate date={undefined} datePreset={DatePresetEnum.Medium} />
-						(nothing)
-					</span>
+				<div class="flex flex-col gap-2 text-sm">
+					<div>
+						<ContentDate dateCreated={sampleDate} />
+					</div>
+					<div>
+						<ContentDate dateCreated={sampleDate} dateUpdated={sampleDateUpdated} />
+					</div>
 				</div>
 			</Specimen>
 			<Specimen
@@ -938,9 +918,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				<ContentExcerpt entryUrl={sampleUrl} imageId={sampleImageIds[1]} showDivider={true}>
 					<Fragment slot="excerpt-title">An excerpt title, linked to its Entry</Fragment>
 					<Fragment slot="excerpt-subtitle">
-						<DividedItem>
-							<ContentDate date={sampleDate} datePreset={DatePresetEnum.Medium} />
-						</DividedItem>
+						<ContentDate dateCreated={sampleDate} />
 						<DividedItem>8 minute read</DividedItem>
 					</Fragment>
 					<ProseSample />

@@ -1,39 +1,25 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-
-import type { DatePreset } from '#lib/utils/date.ts';
-
 import DateDisplay from '#components/parts/date-display.astro';
+import DividedItem from '#components/parts/divided-item.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
-interface Props extends HTMLAttributes<'div'> {
-	date: Date | undefined;
-	datePreset: DatePreset;
-	showMicroformats?: boolean | undefined;
-	showUpdated?: boolean | undefined;
+interface Props {
+	dateCreated: Date;
+	dateUpdated?: Date | undefined;
 }
 
-const { date, datePreset, showMicroformats = false, showUpdated = false } = Astro.props;
+const { dateCreated, dateUpdated } = Astro.props;
 
 const t = getTranslations();
 ---
 
-{date ? (
-	showUpdated ? (
-		<>
-			{t('content.meta.dateUpdated.label')}{' '}
-			<DateDisplay
-				class:list={[showMicroformats ? MicroformatClassNames.DateUpdated : undefined]}
-				date={date}
-				datePreset={datePreset}
-			/>
-		</>
-	) : (
-		<DateDisplay
-			class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
-			date={date}
-			datePreset={datePreset}
-		/>
-	)
+<DividedItem>
+	<DateDisplay class={MicroformatClassNames.DatePublished} date={dateCreated} />
+</DividedItem>
+{dateUpdated ? (
+	<DividedItem>
+		{t('content.meta.dateUpdated.label')}{' '}
+		<DateDisplay class={MicroformatClassNames.DateUpdated} date={dateUpdated} />
+	</DividedItem>
 ) : undefined}

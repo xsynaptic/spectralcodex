@@ -2,66 +2,32 @@
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-import ContentHeader from '#components/content/content-header.astro';
-import ContentSection from '#components/content/content-section.astro';
-import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
+import CollectionList from '#components/parts/collection-list.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
-import PaginationSelect from '#components/parts/pagination-select.astro';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
-import { formatNumber, renderMarkdownInline } from '#lib/utils/text.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
 	page: Page<CollectionEntry<'resources'>>;
 }
 
 const { page } = Astro.props;
-
-const t = getTranslations();
-
-const title = t(`collection.resources.labelPlural`);
-const description = t(`collection.resources.description`);
 ---
 
-<MainSite
-	meta={{
-		title,
-		description,
-		image: getSeoImageProps({
-			id: 'index-resources',
-			alt: title,
-		}),
-		noIndex: page.currentPage > 1,
-	}}
->
-	<ContentHeader>
-		<Fragment slot="header-title">{title}</Fragment>
-	</ContentHeader>
-	<ContentSection>
-		<Fragment
-			slot="section-description"
-			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
-		/>
-		{page.data.length > 0 ? (
-			<>
-				<ListColumn>
-					{page.data.map((entry) => (
-						<ListColumnItem>
-							<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
-							{entry.data._entryCount ? (
-								<span
-									class="text-sm text-gray-500"
-									set:html={`(${formatNumber({ number: entry.data._entryCount })})`}
-								/>
-							) : undefined}
-						</ListColumnItem>
-					))}
-				</ListColumn>
-				<PaginationSelect class="mt-4 md:mt-8" page={page} />
-			</>
-		) : undefined}
-	</ContentSection>
-</MainSite>
+<CollectionList collection="resources" page={page}>
+	<ListColumn>
+		{page.data.map((entry) => (
+			<ListColumnItem>
+				<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
+				{entry.data._entryCount ? (
+					<span
+						class="text-sm text-gray-500"
+						set:html={`(${formatNumber({ number: entry.data._entryCount })})`}
+					/>
+				) : undefined}
+			</ListColumnItem>
+		))}
+	</ListColumn>
+</CollectionList>

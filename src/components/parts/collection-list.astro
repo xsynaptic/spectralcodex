@@ -1,0 +1,51 @@
+---
+import type { Page } from 'astro';
+
+import ContentHeader from '#components/content/content-header.astro';
+import ContentSection from '#components/content/content-section.astro';
+import MainSite from '#components/main/main-site.astro';
+import PaginationSelect from '#components/parts/pagination-select.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { renderMarkdownInline } from '#lib/utils/text.ts';
+
+interface Props {
+	collection: 'regions' | 'resources' | 'series' | 'themes';
+	page: Page;
+}
+
+const { collection, page } = Astro.props;
+
+const t = getTranslations();
+
+const title = t(`collection.${collection}.labelPlural`);
+const description = t(`collection.${collection}.description`);
+---
+
+<MainSite
+	meta={{
+		title,
+		description,
+		image: getSeoImageProps({
+			id: `index-${collection}`,
+			alt: title,
+		}),
+		noIndex: page.currentPage > 1,
+	}}
+>
+	<ContentHeader>
+		<Fragment slot="header-title">{title}</Fragment>
+	</ContentHeader>
+	<ContentSection>
+		<Fragment
+			slot="section-description"
+			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
+		/>
+		{page.data.length > 0 ? (
+			<>
+				<slot />
+				<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			</>
+		) : undefined}
+	</ContentSection>
+</MainSite>

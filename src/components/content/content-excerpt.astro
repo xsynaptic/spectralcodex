@@ -1,8 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
-
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Anchor from '#components/parts/anchor.astro';
 import Image from '#components/parts/image.astro';
@@ -13,12 +11,12 @@ import {
 	imageHighQualityFormat,
 	imageHighQualityValue,
 } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
-import { ImageFitOptionEnum, ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
+import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
+import { getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
+import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
-import { sanitizeImageAltAttribute, stripFootnotes } from '#lib/utils/text.ts';
+import { stripFootnotes } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'article'> {
 	entryUrl: string;
@@ -40,50 +38,20 @@ const hasExcerpt = excerptSplit.length > 1;
 // Entries carrying an inline image supply their own, otherwise display a featured image where available
 const hasExcerptImage = excerptContent?.includes('<img') ?? false;
 
-async function getImageProps(imageId: string | undefined): Promise<{
-	imageProps: ImageComponentProps | undefined;
-	placeholderProps: ImagePlaceholderProps | undefined;
-}> {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = getImageById(imageId);
-
-	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
-
-	const aspectRatio = 3 / 2;
-	const fit = ImageFitOptionEnum.Cover;
-
-	return {
-		imageProps: {
-			src: imageId,
-			breakpoints: getImageBreakpoints({
-				maxWidth: imageEntry.data.width,
-				widths: [
-					ImageSizeEnum.ExtraSmall,
-					ImageSizeEnum.Small,
-					ImageSizeEnum.Medium,
-					ImageSizeEnum.Large,
-					ImageSizeEnum.ExtraLarge,
-				],
-			}),
-			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-			width: ImageSizeEnum.Large,
-			height: Math.round(ImageSizeEnum.Large / aspectRatio),
-			alt: sanitizeImageAltAttribute(imageEntry.data.title),
-			unstyled: true,
-			operations: { fit },
-			imageQuality: imageHighQualityValue,
-			imageFormat: imageHighQualityFormat,
-		},
-		placeholderProps: {
-			imageId,
-			aspectRatio,
-			fit,
-		},
-	};
-}
-
-const { imageProps, placeholderProps } = await getImageProps(hasExcerptImage ? undefined : imageId);
+const { imageProps, placeholderProps } = await getImageFeaturedProps({
+	imageId: hasExcerptImage ? undefined : imageId,
+	widths: [
+		ImageSizeEnum.ExtraSmall,
+		ImageSizeEnum.Small,
+		ImageSizeEnum.Medium,
+		ImageSizeEnum.Large,
+		ImageSizeEnum.ExtraLarge,
+	],
+	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+	width: ImageSizeEnum.Large,
+	imageQuality: imageHighQualityValue,
+	imageFormat: imageHighQualityFormat,
+});
 
 const t = getTranslations();
 ---

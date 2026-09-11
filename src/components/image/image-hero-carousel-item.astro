@@ -1,17 +1,13 @@
 ---
 import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
-import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { imageHeroQualityFormat, imageHeroQualityValue } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
-import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
-import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 interface Props extends ImageFeaturedWithCaption {
 	class?: string | undefined;
@@ -32,51 +28,15 @@ const {
 	withTitle = false,
 } = Astro.props;
 
-async function getImageProps(
-	imageId: string | undefined,
-	alt: string,
-	isPriority: boolean,
-): Promise<{
-	imageProps: ImageComponentProps | undefined;
-	placeholderProps: ImagePlaceholderProps | undefined;
-}> {
-	const getImageById = await getImageByIdFunction();
-
-	const imageEntry = getImageById(imageId);
-
-	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
-
-	const aspectRatio = 3 / 2;
-	const fit = ImageFitOptionEnum.Cover;
-
-	return {
-		imageProps: {
-			src: imageId,
-			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
-			sizes: '100vw',
-			width: ImageSizeEnum.ExtraExtraLarge,
-			height: Math.round(ImageSizeEnum.ExtraExtraLarge / aspectRatio),
-			alt: sanitizeImageAltAttribute(alt),
-			unstyled: true,
-			operations: { fit },
-			imageQuality: imageHeroQualityValue,
-			imageFormat: imageHeroQualityFormat,
-			...(isPriority ? { priority: true } : {}),
-		} satisfies ImageComponentProps,
-		placeholderProps: {
-			imageId,
-			aspectRatio,
-			fit,
-			highQuality: isPriority,
-		},
-	};
-}
-
-const { imageProps, placeholderProps } = await getImageProps(
+const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	imageId,
-	title ?? fallbackAlt ?? '',
-	index === 0,
-);
+	alt: title ?? fallbackAlt ?? '',
+	sizes: '100vw',
+	width: ImageSizeEnum.ExtraExtraLarge,
+	imageQuality: imageHeroQualityValue,
+	imageFormat: imageHeroQualityFormat,
+	priority: index === 0,
+});
 ---
 
 {imageProps ? (

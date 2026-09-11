@@ -80,3 +80,10 @@ export function getMultilingualContent({
 
 	return additional ? { primary, additional } : { primary };
 }
+
+export function formatTitleMultilingual(
+	title: string,
+	titleMultilingual: MultilingualContent | undefined,
+) {
+	return titleMultilingual ? `${title} (${titleMultilingual.value})` : title;
+}

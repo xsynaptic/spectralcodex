@@ -2,7 +2,6 @@
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
-import { stripDiacritics } from '@spectralcodex/shared/text';
 import { render } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
@@ -11,6 +10,7 @@ import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentDate from '#components/content/content-date.astro';
 import ContentHeader from '#components/content/content-header.astro';
+import ContentTitlePermalink from '#components/content/content-title-permalink.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -31,9 +31,8 @@ import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { DatePresetEnum } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
@@ -68,9 +67,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 
 <MainSite
 	meta={{
-		title: titleMultilingual
-			? `${entry.data.title} (${titleMultilingual.value})`
-			: entry.data.title,
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: seoImage,
 		...getSeoArticleProps({
@@ -96,13 +93,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">
-					<a
-						href={Astro.url.toString()}
-						class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
-						rel="bookmark"
-					>
-						{stripDiacritics(entry.data.title)}
-					</a>
+					<ContentTitlePermalink title={entry.data.title} />
 				</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
@@ -111,23 +102,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 					<DividedItem>
 						<ContentCollectionLink collection="posts" />
 					</DividedItem>
-					<DividedItem>
-						<ContentDate
-							date={entry.data.dateCreated}
-							datePreset={DatePresetEnum.Medium}
-							showMicroformats={true}
-						/>
-					</DividedItem>
-					{entry.data.dateUpdated ? (
-						<DividedItem>
-							<ContentDate
-								date={entry.data.dateUpdated}
-								datePreset={DatePresetEnum.Medium}
-								showMicroformats={true}
-								showUpdated={true}
-							/>
-						</DividedItem>
-					) : undefined}
+					<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
 				</Fragment>
 			</ContentHeader>
 		</ImageHero>

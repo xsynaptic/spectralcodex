@@ -2,8 +2,6 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { Thing } from '#lib/utils/seo-structured-data.ts';
-
 import { mapDisplayRegionIds, mapDivisionsDataPath } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
@@ -21,7 +19,6 @@ import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
-import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 
 // Get all ancestors of the specified region
 export async function createRegionAncestorsFunction() {
@@ -47,25 +44,6 @@ export async function createRegionAncestorsByIdFunction() {
 
 		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
 	};
-}
-
-export async function getRegionSchema(
-	entry: CollectionEntry<'regions'>,
-	props: { url: string },
-): Promise<Array<Thing>> {
-	const getRegionAncestors = await createRegionAncestorsFunction();
-
-	const allAncestors = getRegionAncestors(entry);
-	const ancestors = allAncestors.slice(1).toReversed();
-
-	return [
-		buildEntryBreadcrumbSchema({
-			collection: 'regions',
-			title: entry.data.title,
-			url: props.url,
-			regions: ancestors,
-		}),
-	];
 }
 
 // Data for a single region entry page: catalog items, map data, and display options

@@ -150,7 +150,7 @@ export function buildEntryBreadcrumbSchema(props: {
 	collection: 'locations' | 'regions' | 'resources' | 'series' | 'themes';
 	title: string;
 	url: string;
-	regions?: ReadonlyArray<CollectionEntry<'regions'>>;
+	regions?: ReadonlyArray<CollectionEntry<'regions'>> | undefined;
 }): BreadcrumbList {
 	const t = getTranslations();
 

@@ -1,0 +1,30 @@
+---
+import DividedItem from '#components/parts/divided-item.astro';
+import { backlinksDisplayCountMinimum } from '#constants.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
+
+interface Props {
+	entryCount: number;
+	backlinksCount: number;
+}
+
+const { entryCount, backlinksCount } = Astro.props;
+
+const t = getTranslations();
+---
+
+{entryCount > 0 ? (
+	<DividedItem>
+		{formatStringTemplate(t('content.meta.entries.label'), {
+			count: formatNumber({ number: entryCount }),
+		})}
+	</DividedItem>
+) : undefined}
+{backlinksCount >= backlinksDisplayCountMinimum ? (
+	<DividedItem>
+		{formatStringTemplate(t('content.meta.backlinks.label'), {
+			count: formatNumber({ number: backlinksCount }),
+		})}
+	</DividedItem>
+) : undefined}

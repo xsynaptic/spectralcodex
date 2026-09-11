@@ -1,0 +1,19 @@
+---
+import { stripDiacritics } from '@spectralcodex/shared/text';
+
+import { MicroformatClassNames } from '#components/types.ts';
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<a
+	href={Astro.url.toString()}
+	class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
+	rel="bookmark"
+>
+	{stripDiacritics(title)}
+</a>

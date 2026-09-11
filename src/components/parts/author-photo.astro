@@ -1,0 +1,43 @@
+---
+import type { ImageComponentProps } from '#lib/image/image-types.ts';
+
+import ImagePlaceholder from '#components/image/image-placeholder.astro';
+import Image from '#components/parts/image.astro';
+import { MicroformatClassNames } from '#components/types.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { ImageSizeEnum } from '#lib/image/image-types.ts';
+import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
+
+interface Props extends Pick<ImageComponentProps, 'operations'> {
+	sizes: string;
+}
+
+const { sizes, ...props } = Astro.props;
+
+const imageSrc = 'v/a-synaptic-2025-1.jpg';
+
+const t = getTranslations();
+
+const getImageById = await getImageByIdFunction();
+
+const imageEntry = getImageById(imageSrc);
+---
+
+{imageEntry ? (
+	<ImagePlaceholder
+		class="relative overflow-hidden rounded-xs grayscale"
+		placeholderProps={{ imageId: imageSrc, aspectRatio: 1 }}
+	>
+		<Image
+			class:list={['aspect-square', MicroformatClassNames.Photo]}
+			src={imageSrc}
+			breakpoints={getImageBreakpoints({ maxWidth: ImageSizeEnum.Large })}
+			sizes={sizes}
+			alt={sanitizeImageAltAttribute(t('author.photo.alt'))}
+			unstyled={true}
+			{...props}
+		/>
+	</ImagePlaceholder>
+) : undefined}
