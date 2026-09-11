@@ -5,13 +5,10 @@ import { render } from 'astro:content';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentDate from '#components/content/content-date.astro';
-import ContentHeader from '#components/content/content-header.astro';
-import ContentTitlePermalink from '#components/content/content-title-permalink.astro';
-import ImageHero from '#components/image/image-hero.astro';
+import ContentEntryHeader from '#components/content/content-entry-header.astro';
 import MainSite from '#components/main/main-site.astro';
 import { navigationFooterItems } from '#components/navigation/navigation-footer.ts';
 import Prose from '#components/parts/prose.astro';
-import TextMultilingual from '#components/parts/text-multilingual.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
@@ -69,24 +66,15 @@ const { Content } = await render(entry);
 		imageId={imageFeaturedId}
 		hideSearch={entry.data.hideSearch}
 	>
-		<ImageHero
-			class="sm:mb-4"
+		<ContentEntryHeader
+			title={entry.data.title}
+			titleMultilingual={titleMultilingual}
 			imageFeaturedGroup={imageFeaturedHeroGroup}
-			fallbackAlt={entry.data.title}
-			showMicroformats={true}
 		>
-			<ContentHeader hasHeroImage={hasHeroImage}>
-				<Fragment slot="header-title">
-					<ContentTitlePermalink title={entry.data.title} />
-				</Fragment>
-				<Fragment slot="header-title-multilingual">
-					<TextMultilingual content={titleMultilingual} />
-				</Fragment>
-				<Fragment slot="header-subtitle">
-					<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
-				</Fragment>
-			</ContentHeader>
-		</ImageHero>
+			<Fragment slot="header-subtitle">
+				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
+			</Fragment>
+		</ContentEntryHeader>
 		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
 			<Content />
 		</Prose>

@@ -1,0 +1,39 @@
+---
+import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+
+import ContentHeader from '#components/content/content-header.astro';
+import ContentTitlePermalink from '#components/content/content-title-permalink.astro';
+import ImageHero from '#components/image/image-hero.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+
+interface Props {
+	title: string;
+	titleMultilingual: MultilingualContent | undefined;
+	titleMultilingualAdditional?: Array<MultilingualContent> | undefined;
+	imageFeaturedGroup: Array<ImageFeaturedWithCaption> | undefined;
+}
+
+const { title, titleMultilingual, titleMultilingualAdditional, imageFeaturedGroup } = Astro.props;
+
+const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
+---
+
+<ImageHero
+	class="sm:mb-4"
+	imageFeaturedGroup={imageFeaturedGroup}
+	fallbackAlt={title}
+	showMicroformats={true}
+>
+	<ContentHeader hasHeroImage={hasHeroImage}>
+		<Fragment slot="header-title">
+			<ContentTitlePermalink title={title} />
+		</Fragment>
+		<Fragment slot="header-title-multilingual">
+			<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
+		</Fragment>
+		<Fragment slot="header-subtitle">
+			<slot name="header-subtitle" />
+		</Fragment>
+	</ContentHeader>
+</ImageHero>
