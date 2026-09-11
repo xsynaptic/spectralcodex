@@ -6,6 +6,8 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 import { collectMediaFiles } from '#shared/images.ts';
 
+export class MediaPathMissingError extends Error {}
+
 interface DeployMediaOptions {
 	rootPath: string;
 	dryRun?: boolean;
@@ -27,7 +29,7 @@ async function resolveMediaPath(rootPath: string): Promise<string> {
 	const mediaPath = path.join(rootPath, mediaPathRelative);
 
 	if (!(await isDirectory(mediaPath))) {
-		throw new Error(`Media path not found: ${mediaPath}`);
+		throw new MediaPathMissingError(`Media path not found: ${mediaPath}`);
 	}
 
 	return mediaPath;

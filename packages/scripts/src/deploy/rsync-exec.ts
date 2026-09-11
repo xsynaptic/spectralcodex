@@ -11,7 +11,7 @@ interface RsyncOptions {
 	excludes?: Array<string>;
 }
 
-function buildRsyncArgs(
+export function buildRsyncArgs(
 	source: string | Array<string>,
 	destination: string,
 	{ config, dryRun = false, archive = 'avz', extraFlags = [], excludes = [] }: RsyncOptions,

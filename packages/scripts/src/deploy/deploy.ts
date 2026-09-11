@@ -8,7 +8,7 @@ import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
 import { deployCaddy } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
-import { deployMedia } from '#deploy/deploy-media.ts';
+import { deployMedia, MediaPathMissingError } from '#deploy/deploy-media.ts';
 import { deployOg } from '#deploy/deploy-og.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
 import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
@@ -108,7 +108,7 @@ async function media() {
 	try {
 		await deployMedia({ rootPath, dryRun: isDryRun });
 	} catch (error) {
-		if (error instanceof Error && error.message.includes('not found')) {
+		if (error instanceof MediaPathMissingError) {
 			console.log(chalk.yellow('Media path not found, skipping'));
 			return;
 		}
