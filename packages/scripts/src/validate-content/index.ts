@@ -12,6 +12,7 @@ import { validateFrontmatterLinks } from '#validate-content/frontmatter-links.ts
 import { validateImageAspectRatios } from '#validate-content/image-aspect-ratios.ts';
 import { validateImageFeaturedInBody } from '#validate-content/image-featured-in-body.ts';
 import { validateImageFeaturedLinks } from '#validate-content/image-featured-links.ts';
+import { validateImageFeaturedMissing } from '#validate-content/image-featured-missing.ts';
 import { validateImageReferences } from '#validate-content/images.ts';
 import { validateLinkIds } from '#validate-content/link-ids.ts';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
@@ -85,6 +86,7 @@ const validations = {
 	'image-aspect-ratios': () => validateImageAspectRatios(imageEntries, { showStats: true }),
 	'image-featured-in-body': () => validateImageFeaturedInBody(bodyContentEntries),
 	'image-featured-links': () => validateImageFeaturedLinks(allEntries, metadataEntries),
+	'image-featured-missing': () => validateImageFeaturedMissing(bodyContentEntries),
 	'location-duplicates': () => validateLocationsDuplicates(locationEntries),
 	'location-regions': () => validateLocationsRegions(locationEntries),
 	'location-overlap': () => validateLocationsOverlap(locationEntries, Number(values.threshold)),
