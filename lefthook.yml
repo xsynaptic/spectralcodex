@@ -1,5 +1,51 @@
 # Git hooks. Run `pnpm exec lefthook install` once to wire them into .git/hooks.
 pre-push:
-  commands:
-    quality-gate:
-      run: pnpm check
+  jobs:
+    - name: quality-gate
+      run: lefthook run check
+
+check:
+  piped: true
+  jobs:
+    - name: astro
+      run: astro check
+    - name: verify
+      group:
+        parallel: true
+        jobs:
+          - name: css
+            run: stylelint "{src,packages}/**/*.{css,astro}" --cache --cache-location node_modules/.cache/stylelint/
+          - name: format
+            run: prettier --check . --cache --log-level warn
+          - name: js
+            run: eslint --cache --cache-location node_modules/.cache/eslint/
+          - name: types
+            run: tsc --noEmit --extendedDiagnostics
+          - name: unused
+            run: knip
+          - name: test
+            run: vitest run
+
+fix:
+  piped: true
+  jobs:
+    - name: autofix
+      group:
+        piped: true
+        jobs:
+          - name: css
+            run: stylelint "{src,packages}/**/*.{css,astro}" --fix --cache --cache-location node_modules/.cache/stylelint/
+          - name: format
+            run: prettier --write . --cache --list-different
+          - name: js
+            run: eslint --fix --cache --cache-location node_modules/.cache/eslint/
+    - name: astro
+      run: astro check
+    - name: verify
+      group:
+        parallel: true
+        jobs:
+          - name: types
+            run: tsc --noEmit --extendedDiagnostics
+          - name: unused
+            run: knip

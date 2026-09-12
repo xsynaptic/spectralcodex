@@ -57,7 +57,7 @@ function getSitemapLastmod() {
  */
 export default defineConfig({
 	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
-	trailingSlash,
+	trailingSlash: isProduction ? trailingSlash : 'ignore',
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},

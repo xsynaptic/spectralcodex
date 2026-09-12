@@ -101,7 +101,7 @@ pnpm dev
 
 Without a private content checkout the site runs against the demo content in `packages/content-demo`; leaving the content path variables unset in `.env` defaults there, which is what makes this public repository runnable as-is.
 
-Install the git hooks once with `pnpm exec lefthook install`. The pre-push hook runs `pnpm check`, the repository's quality gate (stylelint, prettier, eslint, types, `astro check`, knip, vitest), which can also be run standalone.
+Install the git hooks once with `pnpm exec lefthook install`. The pre-push hook runs the `check` group defined in `lefthook.yml`, the repository's quality gate (stylelint, prettier, eslint, types, `astro check`, knip, vitest), which can also be run standalone as `pnpm check`.
 
 A dev-only `/inventory` route, injected by a local integration, renders the design tokens and most of the component library from real source against fixture data, including live Open Graph cards from the deploy script's own renderer.
 
