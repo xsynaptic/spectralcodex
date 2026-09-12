@@ -351,13 +351,13 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 								{family.name}, {family.note}
 							</div>
 							<div class="mt-2 flex flex-col gap-1" style={`font-family: var(--${family.name})`}>
-								<div style="font-size: var(--text-xl)">
+								<div class="text-xl">
 									Spectral Codex 0123456789 <em>italic</em> <strong>bold</strong>
 								</div>
 								{scriptSamples.map((script) => (
 									<div class="flex flex-wrap items-baseline gap-x-3">
 										<span class={`w-24 shrink-0 ${captionClass}`}>{script.label}</span>
-										<span lang={script.lang} style="font-size: var(--text-lg)">
+										<span class="text-lg" lang={script.lang}>
 											{script.value}
 										</span>
 									</div>
