@@ -22,6 +22,8 @@ const {
 
 const t = getTranslations();
 
+const TitleElement = url ? Anchor : 'span';
+
 // Note: captions are relative to the full-width image, not including a scrollbar
 // TODO: allow caption to be positioned at the top of the image?
 ---
@@ -49,31 +51,17 @@ const t = getTranslations();
 				class:list={[withTitle ? 'block sm:hidden md:block' : 'hidden sm:block']}
 				set:html={t('content.meta.imageFeatured.label')}
 			/>
-			{url ? (
-				<Anchor
-					href={url}
-					anchorColor="primary-bright"
-					class:list={[
-						'truncate font-medium sm:font-semibold',
-						withTitle
-							? 'max-w-image-caption sm:max-w-image-caption-narrow lg:max-w-image-caption'
-							: undefined,
-					]}
-				>
-					{title}
-				</Anchor>
-			) : (
-				<span
-					class:list={[
-						'truncate font-medium sm:font-semibold',
-						withTitle
-							? 'max-w-image-caption sm:max-w-image-caption-narrow lg:max-w-image-caption'
-							: undefined,
-					]}
-				>
-					{title}
-				</span>
-			)}
+			<TitleElement
+				{...(url ? { href: url, anchorColor: 'primary-bright' } : {})}
+				class:list={[
+					'truncate font-medium sm:font-semibold',
+					withTitle
+						? 'max-w-image-caption sm:max-w-image-caption-narrow lg:max-w-image-caption'
+						: undefined,
+				]}
+			>
+				{title}
+			</TitleElement>
 			{titleMultilingual ? (
 				<TextMultilingual
 					content={titleMultilingual}

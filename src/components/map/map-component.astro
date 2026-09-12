@@ -22,7 +22,7 @@ const zIndex = 10;
 <div
 	class:list={[
 		'bg-fallback',
-		'max-h-100vh relative flex h-full min-h-[min(600px,100vh)] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
+		'relative flex h-full max-h-screen min-h-[min(600px,100vh)] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
 		'shadow-primary-300 dark:shadow-primary-900',
 	]}
 	{...props}
@@ -36,6 +36,6 @@ const zIndex = 10;
 		]}
 		style={{ zIndex }}
 	>
-		<div class="loading-animation w-[20%]"></div>
+		<div class="loading-animation w-1/5"></div>
 	</div>
 </div>

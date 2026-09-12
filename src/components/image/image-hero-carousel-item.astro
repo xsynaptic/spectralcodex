@@ -43,7 +43,7 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
 		<Image
 			class:list={[
-				'z-image max-h-screen min-h-[400px] w-full text-sm text-transparent xl:min-h-screen',
+				'z-image max-h-screen min-h-100 w-full text-sm text-transparent xl:min-h-screen',
 				'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
 				showMicroformats ? MicroformatClassNames.Photo : undefined,
 			]}
