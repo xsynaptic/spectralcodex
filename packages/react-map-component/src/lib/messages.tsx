@@ -6,6 +6,7 @@ import { createContext, useContext, useMemo } from 'react';
 export interface MapMessages {
 	showAll: string;
 	hideAll: string;
+	point: string;
 	points: string;
 	precisionWarning: string;
 	precisionError: string;
@@ -17,6 +18,7 @@ export interface MapMessages {
 const defaultMapMessages: MapMessages = {
 	showAll: 'Show All',
 	hideAll: 'Hide All',
+	point: 'Point',
 	points: 'Points',
 	precisionWarning: 'Coordinates for this point are imprecise!',
 	precisionError: 'Coordinates for this point are only a guess!',

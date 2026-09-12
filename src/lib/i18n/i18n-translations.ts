@@ -1,6 +1,7 @@
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 const defaultLanguage = LanguageCodeEnum.English;
 
@@ -83,10 +84,11 @@ const translationStrings = {
 
 		// Content
 		'content.meta.dateUpdated.label': 'Last updated',
-		'content.meta.locations.label': 'Mapped locations',
 		'content.meta.wordCount.label': 'Word count',
-		'content.meta.entries.label': '{count} Entries',
-		'content.meta.backlinks.label': '{count} Backlinks',
+		'content.meta.entries.label.one': '{count} Entry',
+		'content.meta.entries.label.other': '{count} Entries',
+		'content.meta.backlinks.label.one': '{count} Backlink',
+		'content.meta.backlinks.label.other': '{count} Backlinks',
 		'content.meta.imageFeatured.label': 'Photo:',
 		'content.more.label': 'Read more',
 
@@ -146,8 +148,8 @@ const translationStrings = {
 		'parts.textSeparatedList.more': '{count} more',
 
 		// Activity graph
-		'activityGraph.tooltip.singular': '1 event: {date}',
-		'activityGraph.tooltip.plural': '{count} events: {date}',
+		'activityGraph.tooltip.one': '{count} event: {date}',
+		'activityGraph.tooltip.other': '{count} events: {date}',
 
 		// Carousel
 		'carousel.nav.previous': 'Previous image',
@@ -249,8 +251,38 @@ type TranslationKey = {
 	[L in keyof typeof translationStrings]: keyof (typeof translationStrings)[L];
 }[keyof typeof translationStrings];
 
+// Plural forms are keyed by CLDR category; `.other` is the one required form, so it anchors this type
+type TranslationKeyPlural<K extends string = TranslationKey> = K extends `${infer Base}.other`
+	? Base
+	: never;
+
+type PluralValues = Record<string, string | number> & { langCode?: LanguageCode };
+
+const pluralRulesCache = new Map<LanguageCode, Intl.PluralRules>();
+
+function getPluralCategory(count: number, langCode: LanguageCode) {
+	let pluralRules = pluralRulesCache.get(langCode);
+
+	if (!pluralRules) {
+		pluralRules = new Intl.PluralRules(langCode);
+		pluralRulesCache.set(langCode, pluralRules);
+	}
+
+	return pluralRules.select(count);
+}
+
+// Languages carrying only `.other` still resolve; English anchors the fallback
+function resolvePluralKey(key: TranslationKeyPlural, count: number, langCode: LanguageCode) {
+	const categoryKey = `${key}.${getPluralCategory(count, langCode)}`;
+	const hasCategoryKey = [langCode, defaultLanguage].some((code) =>
+		Object.hasOwn(translationStrings[code], categoryKey),
+	);
+
+	return (hasCategoryKey ? categoryKey : `${key}.other`) as TranslationKey;
+}
+
 export function getTranslations() {
-	return function t(key: TranslationKey, langCode: LanguageCode = defaultLanguage) {
+	function t(key: TranslationKey, langCode: LanguageCode = defaultLanguage) {
 		const langTranslations = translationStrings[langCode] as Partial<
 			Record<TranslationKey, string>
 		>;
@@ -263,5 +295,19 @@ export function getTranslations() {
 			string
 		>;
 		return defaultTranslations[key];
-	};
+	}
+
+	// Remaining placeholders ride alongside `langCode`; `{count}` comes from the count itself
+	function tPlural(
+		key: TranslationKeyPlural,
+		count: number,
+		{ langCode = defaultLanguage, ...values }: PluralValues = {},
+	) {
+		return formatStringTemplate(t(resolvePluralKey(key, count, langCode), langCode), {
+			...values,
+			count: formatNumber({ number: count, locales: langCode }),
+		});
+	}
+
+	return Object.assign(t, { plural: tPlural });
 }

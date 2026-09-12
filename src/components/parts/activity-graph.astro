@@ -2,7 +2,6 @@
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { buildActivityGraph } from '#lib/utils/activity-graph.ts';
 import { getDateDisplay } from '#lib/utils/date.ts';
-import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	year: string;
@@ -29,9 +28,8 @@ const tooltipDateOptions = {
 
 function getDayTitle(value: number, date: Date): string {
 	const dateDisplay = getDateDisplay(date, undefined, tooltipDateOptions);
-	const key = value === 1 ? 'activityGraph.tooltip.singular' : 'activityGraph.tooltip.plural';
 
-	return formatStringTemplate(t(key), { count: value, date: dateDisplay });
+	return t.plural('activityGraph.tooltip', value, { date: dateDisplay });
 }
 
 const hasCaption = Astro.slots.has('default');

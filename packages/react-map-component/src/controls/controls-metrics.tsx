@@ -28,7 +28,7 @@ export const MetricsControl: FC<{
 					<span>{formatNumber.format(filteredCount)}</span>
 					<span className="maplibregl-ctrl-metrics-divider">/</span>
 					<span>
-						{formatNumber.format(totalCount)} {messages.points}
+						{formatNumber.format(totalCount)} {totalCount === 1 ? messages.point : messages.points}
 					</span>
 				</div>
 			)}

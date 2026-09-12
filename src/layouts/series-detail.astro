@@ -14,7 +14,7 @@ import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
+import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
 	entry: CollectionEntry<'series'>;
@@ -41,11 +41,7 @@ const t = getTranslations();
 			<ContentCollectionLink collection={entry.collection} />
 		</DividedItem>
 		{entryCount > 0 ? (
-			<DividedItem>
-				{formatStringTemplate(t('content.meta.entries.label'), {
-					count: formatNumber({ number: entryCount }),
-				})}
-			</DividedItem>
+			<DividedItem>{t.plural('content.meta.entries.label', entryCount)}</DividedItem>
 		) : undefined}
 		{wordCount && wordCount > 0 ? (
 			<DividedItem>
