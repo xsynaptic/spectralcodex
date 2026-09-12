@@ -40,6 +40,7 @@
 				"maxCognitive": 26,
 				"reason": "Flat provider tree; JSX depth read as nesting",
 			},
+			// Unit size never gates; these two curate the advisory large-functions list (82 to 25)
 			{
 				"files": ["src/**/*.astro"],
 				"functions": ["<template>"],

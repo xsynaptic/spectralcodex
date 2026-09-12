@@ -4,11 +4,6 @@ dist/
 # dependencies
 node_modules/
 
-# environment variables
-.env
-.env.development
-.env.production
-
 # macOS-specific files
 .DS_Store
 
@@ -30,24 +25,28 @@ astro-error.log*
 .cache/
 temp/
 
-# deploy secrets
+# environment variables
+.env
+.env.development
+.env.production
 deploy/.env
-
-# certificates
-deploy/certs/
 
 # caddy config
 deploy/caddy/spectralcodex-auth.conf
 deploy/caddy/spectralcodex-redirects-generated.conf
 
+# certificates
+deploy/certs/
+
 # public generated files
 public/divisions/
 public/icons/
 
-# ignore content and media
+# content and media
 packages/content/
 
-# project directives
+# tooling
 .claude/docs
 .claude/tasks*
 .claude/settings*.json
+.fallow

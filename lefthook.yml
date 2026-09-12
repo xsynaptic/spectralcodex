@@ -23,6 +23,10 @@ check:
             run: tsc --noEmit --extendedDiagnostics
           - name: unused
             run: knip
+          - name: fallow
+            run: fallow --skip health --quiet
+          - name: complexity
+            run: fallow health --complexity --quiet
           - name: test
             run: vitest run
 
@@ -49,3 +53,7 @@ fix:
             run: tsc --noEmit --extendedDiagnostics
           - name: unused
             run: knip
+          - name: fallow
+            run: fallow --skip health --quiet
+          - name: complexity
+            run: fallow health --complexity --quiet
