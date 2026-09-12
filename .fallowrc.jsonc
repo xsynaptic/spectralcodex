@@ -40,6 +40,17 @@
 				"maxCognitive": 26,
 				"reason": "Flat provider tree; JSX depth read as nesting",
 			},
+			{
+				"files": ["src/**/*.astro"],
+				"functions": ["<template>"],
+				"maxUnitSize": 200,
+				"reason": "Astro markup scores as one synthetic unit; length is structural",
+			},
+			{
+				"files": ["**/*.test.ts"],
+				"maxUnitSize": 150,
+				"reason": "Suites are tables of cases; describe and it blocks read as long functions",
+			},
 		],
 	},
 	"duplicates": { "minTokens": 70 },
