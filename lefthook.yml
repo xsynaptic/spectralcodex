@@ -2,7 +2,7 @@
 pre-push:
   jobs:
     - name: quality-gate
-      run: lefthook run check
+      run: pnpm check
 
 check:
   piped: true
