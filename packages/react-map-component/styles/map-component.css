@@ -38,6 +38,17 @@
 	color-scheme: dark;
 }
 
+/* Mirrors the host's global focus ring so the map stands alone */
+[data-map-root] :focus-visible {
+	outline: 2px solid light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	outline-offset: 2px;
+}
+
+/* The canvas fills a clipped frame, so an outset ring would be cut off */
+[data-map-root] .maplibregl-canvas:focus-visible {
+	outline-offset: -2px;
+}
+
 /** Popup (vendor overrides) */
 .maplibregl-popup {
 	z-index: 5;
@@ -47,11 +58,6 @@ div.maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
 	background-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
-
-	/* stylelint-disable-next-line a11y/no-outline-none -- deliberate vendor focus-outline override */
-	& a:focus {
-		outline: none;
-	}
 }
 
 button.maplibregl-popup-close-button {
@@ -65,11 +71,6 @@ button.maplibregl-popup-close-button {
 		width: 25px;
 		height: 25px;
 		font-size: 18px;
-	}
-
-	/* stylelint-disable-next-line a11y/no-outline-none -- deliberate vendor focus-outline override */
-	&:focus {
-		outline: none;
 	}
 }
 
@@ -381,6 +382,11 @@ button.maplibregl-popup-close-button {
 	transition: color 200ms;
 }
 
+.map-filter-star-icon {
+	display: block;
+	width: 100%;
+}
+
 .map-filter-star-empty:focus-visible {
 	color: var(--map-color-highlight-300);
 }
@@ -491,8 +497,27 @@ button.maplibregl-popup-close-button {
 	animation: target-pulse-ring 2s ease-out infinite;
 }
 
-.maplibregl-ctrl-group {
-	overflow: hidden;
+@media (prefers-reduced-motion: reduce) {
+	.map-pulse-ring {
+		animation: none;
+	}
+}
+
+/* Rounded end buttons stand in for clipping the group, which would cut off the focus ring */
+.maplibregl-ctrl-group button:first-child {
+	border-start-start-radius: inherit;
+	border-start-end-radius: inherit;
+}
+
+.maplibregl-ctrl-group button:last-child {
+	border-end-start-radius: inherit;
+	border-end-end-radius: inherit;
+}
+
+/* MapLibre's blue focus glow would stack with the ring; compound class outranks its `:focus:focus-visible` */
+[data-map-root] .maplibregl-ctrl.maplibregl-ctrl-group button:focus,
+[data-map-root] .maplibregl-ctrl-attrib-button:focus {
+	box-shadow: none;
 }
 
 .maplibregl-ctrl-attrib,

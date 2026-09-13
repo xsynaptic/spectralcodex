@@ -3,7 +3,7 @@ import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { MapSpritesEnum } from '@spectralcodex/shared/map';
-import { memo } from 'react';
+import { memo, useEffect, useId, useRef } from 'react';
 import * as R from 'remeda';
 
 import type { LocationStatusMetadata } from '#lib/location-status.ts';
@@ -62,7 +62,9 @@ const MapFilterStatusMenuItem: FC<{
 	return (
 		<MapFilterMenuItem isActive={isFiltered}>
 			<button
+				type="button"
 				className="map-filter-button"
+				aria-pressed={!isFiltered}
 				onClick={() => {
 					toggleStatusFilter(status);
 				}}
@@ -161,6 +163,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 
 const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 	const ratingFilterValue = useMapRatingFilter();
+	const messages = useMapMessages();
 
 	const { setRatingFilter } = useMapStoreActions();
 
@@ -168,13 +171,14 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 		<li>
 			<span className="map-filter-rating">
 				{R.range(1, 6).map((value) => (
-					<svg
+					<button
 						key={`rating-${String(value)}`}
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 36 36"
+						type="button"
 						className={
 							ratingFilterValue >= value ? 'map-filter-star-filled' : 'map-filter-star-empty'
 						}
+						aria-pressed={ratingFilterValue === value}
+						aria-label={`${messages.ratingFilterAriaLabel} ${String(value)}`}
 						onClick={() => {
 							if (ratingFilterValue === value) {
 								setRatingFilter(1);
@@ -183,8 +187,15 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 							}
 						}}
 					>
-						<use href={`#${MapSpritesEnum.Rating}`}></use>
-					</svg>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 36 36"
+							className="map-filter-star-icon"
+							aria-hidden="true"
+						>
+							<use href={`#${MapSpritesEnum.Rating}`}></use>
+						</svg>
+					</button>
 				))}
 			</span>
 		</li>
@@ -201,6 +212,8 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
 						key={`objective-${String(value)}`}
+						type="button"
+						aria-pressed={objectiveFilter === value}
 						className={
 							objectiveFilter === value
 								? 'map-filter-objective-button map-filter-objective-button-active'
@@ -219,8 +232,9 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 };
 
 const MapControlsFilterMenu: FC<{
+	id: string;
 	filterPopupOffset?: number;
-}> = function MapControlsFilterMenu({ filterPopupOffset = 8 }) {
+}> = function MapControlsFilterMenu({ id, filterPopupOffset = 8 }) {
 	const filterPosition = useMapFilterPosition();
 	const isFilterOpen = useIsMapFilterOpen();
 	const statusFilter = useMapStatusFilter();
@@ -228,6 +242,7 @@ const MapControlsFilterMenu: FC<{
 
 	return isFilterOpen && filterPosition ? (
 		<div
+			id={id}
 			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
 			style={{
 				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
@@ -266,17 +281,46 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 
 	const isLoading = isSourceDataLoading || isCanvasLoading;
 
+	const panelId = useId();
+	const buttonRef = useRef<HTMLButtonElement>(null);
+
+	useEffect(() => {
+		if (!isFilterOpen) return;
+
+		function onKeyDown(event: KeyboardEvent) {
+			if (event.key !== 'Escape') return;
+
+			// Focus returns only from inside this map; Escape elsewhere on the page leaves focus alone
+			const mapRoot = buttonRef.current?.closest('[data-map-root]');
+			const isFocusInMap = mapRoot?.contains(document.activeElement) ?? false;
+
+			setFilterOpen(false);
+
+			if (isFocusInMap) buttonRef.current?.focus();
+		}
+
+		document.addEventListener('keydown', onKeyDown);
+
+		return () => {
+			document.removeEventListener('keydown', onKeyDown);
+		};
+	}, [isFilterOpen, setFilterOpen]);
+
 	return (
 		<>
 			<CustomControlPortal position={position}>
 				<button
+					ref={buttonRef}
 					id={controlFilterId}
+					type="button"
 					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
 					onClick={() => {
 						if (!isLoading) setFilterOpen(!isFilterOpen);
 					}}
 					aria-label={messages.filterMenuAriaLabel}
+					aria-expanded={isFilterOpen}
+					aria-controls={panelId}
 					{...(isFilterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="map-ctrl-icon-frame">
@@ -295,7 +339,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					</span>
 				</button>
 			</CustomControlPortal>
-			<MapControlsFilterMenu />
+			<MapControlsFilterMenu id={panelId} />
 		</>
 	);
 };

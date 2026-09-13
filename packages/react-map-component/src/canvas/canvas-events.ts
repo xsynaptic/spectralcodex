@@ -112,14 +112,15 @@ function useClickHandler() {
 
 			setPopupVisible(false);
 
+			// Under reduced motion MapLibre zeroes the duration and fires `moveend` synchronously inside `easeTo`
+			void mapInstance.once('moveend', () => {
+				setPopupVisible(true);
+			});
+
 			mapInstance.easeTo({
 				center,
 				duration: 150,
 				padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
-			});
-
-			void mapInstance.once('moveend', () => {
-				setPopupVisible(true);
 			});
 		},
 		[isMobile, setSelectedId, setHoveredId, setPopupVisible],

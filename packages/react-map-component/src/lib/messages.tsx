@@ -11,6 +11,11 @@ export interface MapMessages {
 	precisionWarning: string;
 	precisionError: string;
 	filterMenuAriaLabel: string;
+	ratingFilterAriaLabel: string;
+	copyCoordinatesLabel: string;
+	wikipediaAriaLabel: string;
+	googleMapsAriaLabel: string;
+	popupDescriptionAriaLabel: string;
 	searchAriaLabel: string;
 	searchPlaceholder: string;
 }
@@ -23,6 +28,11 @@ const defaultMapMessages: MapMessages = {
 	precisionWarning: 'Coordinates for this point are imprecise!',
 	precisionError: 'Coordinates for this point are only a guess!',
 	filterMenuAriaLabel: 'Filter Menu',
+	ratingFilterAriaLabel: 'Minimum rating',
+	copyCoordinatesLabel: 'Copy coordinates',
+	wikipediaAriaLabel: 'Wikipedia',
+	googleMapsAriaLabel: 'Google Maps',
+	popupDescriptionAriaLabel: 'Description',
 	searchAriaLabel: 'Search',
 	searchPlaceholder: 'Search text or coordinates...',
 };

@@ -24,7 +24,7 @@ export const MetricsControl: FC<{
 					<div className="map-loading-animation" />
 				</div>
 			) : (
-				<div className="maplibregl-ctrl-metrics">
+				<div className="maplibregl-ctrl-metrics" role="status">
 					<span>{formatNumber.format(filteredCount)}</span>
 					<span className="maplibregl-ctrl-metrics-divider">/</span>
 					<span>
