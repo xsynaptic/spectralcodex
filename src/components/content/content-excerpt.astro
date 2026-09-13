@@ -74,14 +74,14 @@ const readMoreHtml = title
 			</Anchor>
 		</h2>
 		{subtitle ? (
-			<p
+			<div
 				class:list={[
 					'mb-1 text-xs font-medium md:text-sm',
 					'text-primary-400 dark:text-primary-500',
 				]}
 			>
 				<Fragment set:html={subtitle} />
-			</p>
+			</div>
 		) : undefined}
 		{description ? (
 			<Prose>

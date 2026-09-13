@@ -13,15 +13,22 @@ import {
 import { getSitePath } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
-export function getChronologyYearPagination(years: Array<string>, currentYear?: string) {
+export function getChronologyYearPagination(
+	years: Array<string>,
+	currentYear?: string,
+	currentMonth?: string,
+) {
 	const t = getTranslations();
+
+	// A select cannot re-pick its selected option, so a month page selects nothing to keep its year reachable
+	const selectedYear = currentMonth ? undefined : currentYear;
 
 	const pagination: Pagination = {
 		label: t('chronology.yearly.label'),
 		options: years
 			.toSorted((yearA, yearB) => yearB.localeCompare(yearA))
 			.map((year) => ({
-				isCurrent: year === currentYear,
+				isCurrent: year === selectedYear,
 				label: year,
 				url: getSitePath('chronology', year),
 			})),
@@ -29,12 +36,13 @@ export function getChronologyYearPagination(years: Array<string>, currentYear?: 
 		submitLabel: t('site.pagination.select.submit'),
 	};
 
-	const currentIndex = pagination.options.findIndex((option) => option.isCurrent);
-
-	if (currentIndex === -1) {
+	if (pagination.options.every((option) => !option.isCurrent)) {
 		pagination.placeholder = t('chronology.yearly.select.placeholder');
-		return pagination;
 	}
+
+	const currentIndex = pagination.options.findIndex((option) => option.label === currentYear);
+
+	if (currentIndex === -1) return pagination;
 
 	const olderOption = pagination.options[currentIndex + 1];
 	const newerOption = pagination.options[currentIndex - 1];

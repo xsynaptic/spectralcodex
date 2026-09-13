@@ -20,4 +20,14 @@ describe('getLinkPlatform', () => {
 	test('an unlisted host is unlabelled rather than guessed', () => {
 		expect(getLinkPlatform('https://en.wikipedia.org/wiki/Taiwan')).toBeUndefined();
 	});
+
+	test('a host merely containing a platform domain is unlabelled', () => {
+		expect(getLinkPlatform('https://spectralcodex.com/posts/abc')).toBeUndefined();
+		expect(getLinkPlatform('https://www.e-flux.com/journal/abc')).toBeUndefined();
+		expect(getLinkPlatform('https://kaokao12.nidbox.com/p/1')).toBeUndefined();
+	});
+
+	test('host casing does not affect the match', () => {
+		expect(getLinkPlatform('https://WWW.Facebook.COM/story.php?id=1')).toBe('Facebook');
+	});
 });

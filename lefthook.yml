@@ -23,6 +23,7 @@ check:
             run: tsc --noEmit --extendedDiagnostics
           - name: unused
             run: knip
+          # Keep these two separate: any two fallow analyses together print the hotspot report even at zero findings
           - name: fallow
             run: fallow --skip health --quiet
           - name: complexity
@@ -53,6 +54,7 @@ fix:
             run: tsc --noEmit --extendedDiagnostics
           - name: unused
             run: knip
+          # Keep these two separate: any two fallow analyses together print the hotspot report even at zero findings
           - name: fallow
             run: fallow --skip health --quiet
           - name: complexity

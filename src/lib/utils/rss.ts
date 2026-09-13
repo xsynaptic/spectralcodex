@@ -39,7 +39,7 @@ async function createRenderMdxFunction() {
 	};
 }
 
-const renderMdx = await createRenderMdxFunction();
+type RenderMdx = Awaited<ReturnType<typeof createRenderMdxFunction>>;
 
 const feedSanitizeSchema = {
 	...defaultSchema,
@@ -58,10 +58,12 @@ function sanitizeFeedContent(contentHtml: string, shouldExcludeFootnotes: boolea
 
 const generateFeedItem = async ({
 	entry,
+	renderMdx,
 	shouldExcludeFootnotes,
 	debug,
 }: {
 	entry: CollectionEntry<'locations' | 'posts'>;
+	renderMdx: RenderMdx;
 	shouldExcludeFootnotes: boolean;
 	debug: boolean;
 }) => {
@@ -108,6 +110,8 @@ export async function generateFeedItems({
 	shouldExcludeFootnotes: boolean;
 	debug: boolean;
 }) {
+	const renderMdx = await createRenderMdxFunction();
+
 	const { entries: locations } = await getLocationsCollection();
 	const { entries: posts } = await getPostsCollection();
 
@@ -121,7 +125,9 @@ export async function generateFeedItems({
 			R.take(itemCount),
 			(items) =>
 				Promise.all(
-					items.map((item) => generateFeedItem({ entry: item, shouldExcludeFootnotes, debug })),
+					items.map((item) =>
+						generateFeedItem({ entry: item, renderMdx, shouldExcludeFootnotes, debug }),
+					),
 				),
 		),
 		R.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime()),

@@ -1,6 +1,7 @@
 export const paths = {
 	chronologyIndex: '/chronology/',
 	chronologyYear: '/chronology/2019/',
+	chronologyMonth: '/chronology/2019/02/',
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
 	postDetail: '/huadong-valley-ride-2018-taitung-city/',

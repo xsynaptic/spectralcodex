@@ -2,6 +2,8 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import ChronologyNavigationItem from '#components/chronology/chronology-navigation-item.astro';
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getChronologyYearPagination } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -25,7 +27,7 @@ const {
 
 const t = getTranslations();
 
-const yearPagination = getChronologyYearPagination(chronologyYears, currentYear);
+const yearPagination = getChronologyYearPagination(chronologyYears, currentYear, currentMonth);
 
 const months = chronologyMonths?.toSorted((monthA, monthB) => monthA.localeCompare(monthB)) ?? [];
 
@@ -46,15 +48,22 @@ function getMonthName(month: string) {
 		<slot />
 	</PaginationSelect>
 	{currentYear && currentMonth && months.length > 0 ? (
-		<ul class="flex flex-wrap gap-1">
-			{months.map((month) => (
-				<ChronologyNavigationItem
-					href={getSitePath('chronology', currentYear, month)}
-					isCurrent={currentMonth === month}
-				>
-					{getMonthName(month)}
-				</ChronologyNavigationItem>
-			))}
-		</ul>
+		<div class="flex gap-1">
+			<DividedItem class="shrink-0" dividerContent="chevron">
+				<Anchor href={getSitePath('chronology', currentYear)} anchorColor="highlight">
+					{currentYear}
+				</Anchor>
+			</DividedItem>
+			<ul class="flex flex-wrap gap-1">
+				{months.map((month) => (
+					<ChronologyNavigationItem
+						href={getSitePath('chronology', currentYear, month)}
+						isCurrent={currentMonth === month}
+					>
+						{getMonthName(month)}
+					</ChronologyNavigationItem>
+				))}
+			</ul>
+		</div>
 	) : undefined}
 </nav>

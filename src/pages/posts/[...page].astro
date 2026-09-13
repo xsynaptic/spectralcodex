@@ -7,7 +7,7 @@ import { queryPostsIndex } from '#lib/collections/posts/posts-utils.ts';
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryPostsIndex();
 
-	return paginate(results, { pageSize: 20 });
+	return paginate(results, { pageSize: 10 });
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

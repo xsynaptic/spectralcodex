@@ -56,6 +56,20 @@ test.describe('pagination select', () => {
 
 		await expect(page).toHaveURL(paths.chronologyYear);
 	});
+
+	test('a pointer-driven pick of its own year on a Chronology month navigates to that year', async ({
+		page,
+	}) => {
+		await page.goto(paths.chronologyMonth, { waitUntil: 'domcontentloaded' });
+
+		const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
+
+		await expect(select).toBeVisible();
+		await select.dispatchEvent('pointerdown');
+		await select.selectOption({ value: paths.chronologyYear });
+
+		await expect(page).toHaveURL(paths.chronologyYear);
+	});
 });
 
 test.describe('pagination select on a coarse pointer', () => {

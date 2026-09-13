@@ -66,6 +66,15 @@ describe('getChronologyYearPagination', () => {
 			url: '/chronology/2024/',
 		});
 	});
+
+	test('a month selects no year so its own year stays pickable, yet still steps to adjacent years', () => {
+		const pagination = getChronologyYearPagination(years, '2024', '02');
+
+		expect(pagination.options.some((option) => option.isCurrent)).toBe(false);
+		expect(pagination.placeholder).toBe('Year');
+		expect(pagination.previous?.url).toBe('/chronology/2019/');
+		expect(pagination.next?.url).toBe('/chronology/2026/');
+	});
 });
 
 describe('getChronologyActivityData', () => {

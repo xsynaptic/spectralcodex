@@ -21,11 +21,20 @@ const linkPlatforms: Array<LinkPlatform> = [
 	{ match: 'pixnet.net', title: 'Pixnet', title_zh: '痞客邦' },
 ];
 
+// Suffix match, not substring: `spectralcodex.com` and `www.e-flux.com` both contain `x.com`
+function isPlatformHost(host: string, match: string) {
+	return host === match || host.endsWith(`.${match}`);
+}
+
 export function getLinkPlatform(url: string): string | undefined {
+	const host = URL.parse(url)?.hostname;
+
+	if (!host) return;
+
 	const platform = linkPlatforms.find((platform) =>
 		typeof platform.match === 'string'
-			? url.includes(platform.match)
-			: platform.match.some((pattern) => url.includes(pattern)),
+			? isPlatformHost(host, platform.match)
+			: platform.match.some((pattern) => isPlatformHost(host, pattern)),
 	);
 
 	return platform?.title;
