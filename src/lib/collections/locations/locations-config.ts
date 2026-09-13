@@ -1,10 +1,9 @@
 import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
-import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { z } from 'zod';
 
+import { createEntryGlobLoader } from '#lib/collections/collections-loader.ts';
 import {
 	LocationsNearbyItemSchema,
 	LocationTwHeritageSchema,
@@ -21,11 +20,7 @@ import {
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
-	loader: glob({
-		pattern: '**/[^_]*.(md|mdx)',
-		base: `./${CONTENT_DATA_PATH}/locations`,
-		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
-	}),
+	loader: createEntryGlobLoader('locations', { flatIds: true }),
 	schema: z
 		.object({
 			title: TitleSchema,

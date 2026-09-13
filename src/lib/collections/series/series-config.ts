@@ -1,9 +1,8 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import { glob } from 'astro/loaders';
 import { defineCollection, reference } from 'astro:content';
-import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { z } from 'zod';
 
+import { createEntryGlobLoader } from '#lib/collections/collections-loader.ts';
 import { titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import {
 	DateRecordedSchema,
@@ -13,7 +12,7 @@ import {
 } from '#lib/schemas/index.ts';
 
 export const series = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.(md|mdx)', base: `./${CONTENT_DATA_PATH}/series` }),
+	loader: createEntryGlobLoader('series'),
 	schema: z
 		.object({
 			title: TitleSchema,
