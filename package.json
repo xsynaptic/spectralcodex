@@ -79,7 +79,7 @@
 		"@unpic/core": "^1.0.3",
 		"@xsynaptic/astro-build-logger": "^1.1.0",
 		"@xsynaptic/astro-image-loader": "^1.1.1",
-		"@xsynaptic/eslint-config": "^6.3.0",
+		"@xsynaptic/eslint-config": "^6.3.1",
 		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/path-suggestions": "^0.2.0",
 		"@xsynaptic/satteri-auto-import": "^0.2.1",
