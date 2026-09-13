@@ -50,7 +50,7 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 		<ContentEntryCounts entryCount={entry.data._entryCount ?? 0} backlinksCount={backlinksCount} />
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap mapData={mapData} />
+	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionRegions regionIds={regionIds} />

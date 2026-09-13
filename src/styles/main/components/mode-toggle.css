@@ -1,0 +1,4 @@
+/* Until the element upgrades the button does nothing and its static label may name the wrong mode */
+mode-toggle:not(:defined) {
+	visibility: hidden;
+}

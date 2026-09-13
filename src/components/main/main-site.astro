@@ -101,7 +101,7 @@ const t = getTranslations();
 		class:list={[
 			'bg-(--color-body-bg)',
 			'text-primary-700 dark:text-primary-400',
-			'visible flex min-h-screen min-w-[350px] flex-col overflow-visible overscroll-contain transition-colors',
+			'visible flex min-h-screen flex-col overflow-visible overscroll-contain transition-colors',
 		]}
 	>
 		<ModeManager />
@@ -166,7 +166,7 @@ const t = getTranslations();
 				<NavigationHeader hasHeroImage={hasHeroImage} />
 			</div>
 		</header>
-		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content' })}>
+		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content', tabindex: -1 })}>
 			<slot />
 		</main>
 		<footer class="content-column mt-8 mb-8 w-full pt-4">

@@ -30,6 +30,7 @@ const t = getTranslations();
 	]}
 	data-pagefind-ignore
 	data-nosnippet
+	{...(showAuthor ? {} : { inert: true })}
 	{...props}
 >
 	<div class="flex items-start gap-4">

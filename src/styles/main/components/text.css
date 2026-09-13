@@ -17,6 +17,12 @@
 	@supports (background-image: linear-gradient(in lab, red, red)) {
 		--wash-interpolation: in oklab;
 	}
+
+	@media (forced-colors: active) {
+		color: inherit;
+		background: none;
+		background-clip: border-box;
+	}
 }
 
 .wash-primary {

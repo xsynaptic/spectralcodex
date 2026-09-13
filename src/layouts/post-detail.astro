@@ -97,7 +97,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
 			<Content />
 		</Prose>
-		<SectionMap mapData={mapData} />
+		<SectionMap mapData={mapData} entryTitle={entry.data.title} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />
 		<SectionThemes themeIds={themeIds} />

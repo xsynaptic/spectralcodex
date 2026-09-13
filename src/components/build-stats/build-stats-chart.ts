@@ -101,6 +101,10 @@ class BuildStatsChart extends HTMLElement {
 		this.#tooltip?.toggleAttribute('data-visible', false);
 	};
 
+	#handleKeydown = (event: KeyboardEvent) => {
+		if (event.key === 'Escape') this.#handlePointerLeave();
+	};
+
 	#resolveElements() {
 		this.#svg = this.querySelector('svg') ?? undefined;
 		this.#crosshair = this.querySelector<SVGGElement>('[data-chart-crosshair]') ?? undefined;
@@ -133,6 +137,7 @@ class BuildStatsChart extends HTMLElement {
 
 		hit.addEventListener('pointermove', this.#handlePointerMove, { signal });
 		hit.addEventListener('pointerleave', this.#handlePointerLeave, { signal });
+		document.addEventListener('keydown', this.#handleKeydown, { signal });
 	}
 
 	disconnectedCallback() {

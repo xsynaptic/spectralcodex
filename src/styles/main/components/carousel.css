@@ -23,13 +23,13 @@
 .carousel-nav {
 	position: absolute;
 	top: 50%;
-	display: none;
+	display: flex;
 	align-items: center;
 	justify-content: center;
 	width: calc(var(--spacing) * 12);
 	height: calc(var(--spacing) * 12);
 	color: var(--color-white);
-	pointer-events: auto;
+	pointer-events: none;
 	cursor: pointer;
 	background-color: color-mix(in oklab, var(--color-white) 25%, transparent);
 	border-radius: calc(infinity * 1px);
@@ -39,10 +39,6 @@
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 200ms;
 	transition-property: color, background-color, opacity, scale;
-
-	@media (width >= 64rem) {
-		display: flex;
-	}
 
 	&:focus-visible {
 		color: color-mix(in oklab, var(--color-white) 80%, transparent);
@@ -61,12 +57,20 @@
 	}
 }
 
+/* Buttons do nothing until the element upgrades, so keep them out of the tab order */
+image-carousel:not(:defined) .carousel-nav {
+	visibility: hidden;
+}
+
+/* Hidden buttons ignore taps so they cannot swallow a touch swipe on the slide */
 .carousel-group:focus-within .carousel-nav {
+	pointer-events: auto;
 	opacity: 1;
 }
 
 @media (hover: hover) {
 	.carousel-group:hover .carousel-nav {
+		pointer-events: auto;
 		opacity: 1;
 	}
 }

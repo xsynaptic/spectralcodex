@@ -48,7 +48,10 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			<Fragment set:html={titleMultilingual} />
 		</TextWash>
 	) : undefined}
-	<div class="bg-clip-padding pb-0 sm:pb-2" {...(hasHeroImage ? { id: 'main-content' } : {})}>
+	<div
+		class="bg-clip-padding pb-0 sm:pb-2"
+		{...(hasHeroImage ? { id: 'main-content', tabindex: -1 } : {})}
+	>
 		<TextWash
 			as="h1"
 			washColor={hasHeroImage ? 'primary-featured' : 'primary'}

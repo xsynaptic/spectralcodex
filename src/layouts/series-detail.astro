@@ -52,7 +52,7 @@ const t = getTranslations();
 		) : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap mapData={mapData} />
+	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
 	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 	<SectionWebmentions entry={entry} />
 	<SectionPreviews page={page} showMicroformats={true} />

@@ -56,28 +56,19 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 	}}
 	hasHeroImage={hasHeroImage}
 >
-	<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
+	<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup} alt={title}>
 		<ContentHeader hasHeroImage={hasHeroImage}>
 			<Fragment slot="header-title">{title}</Fragment>
 			<Fragment slot="header-subtitle">
-				{hasHeroImage ? (
-					<Anchor
-						class="font-semibold"
-						href={getSitePath('chronology', chronologyMonthlyItem.year)}
-						anchorColor="highlight"
-					>
-						{formatStringTemplate(t('chronology.yearly.title'), {
-							date: chronologyMonthlyItem.year,
-						})}
-					</Anchor>
-				) : (
-					<ChronologyNavigation
-						currentYear={chronologyMonthlyItem.year}
-						currentMonth={chronologyMonthlyItem.month}
-						chronologyYears={chronologyYears}
-						chronologyMonths={chronologyMonths}
-					/>
-				)}
+				<Anchor
+					class="font-semibold"
+					href={getSitePath('chronology', chronologyMonthlyItem.year)}
+					anchorColor="highlight"
+				>
+					{formatStringTemplate(t('chronology.yearly.title'), {
+						date: chronologyMonthlyItem.year,
+					})}
+				</Anchor>
 			</Fragment>
 		</ContentHeader>
 	</ImageHero>

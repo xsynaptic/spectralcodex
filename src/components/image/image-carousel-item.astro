@@ -31,7 +31,7 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 ---
 
 {imageProps ? (
-	<ImagePlaceholder class="carousel-item relative" placeholderProps={placeholderProps}>
+	<ImagePlaceholder as="figure" class="carousel-item relative" placeholderProps={placeholderProps}>
 		<Image class:list={['m-0 aspect-3/2 text-sm text-transparent']} {...imageProps} />
 		{caption ? (
 			<ImageCarouselCaption caption={caption} isHero={false} withTitle={false} />

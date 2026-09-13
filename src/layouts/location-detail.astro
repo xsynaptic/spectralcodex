@@ -133,7 +133,7 @@ const t = getTranslations();
 		/>
 		<SectionNotices entry={entry} langCode={regionLangCode} />
 		{hideLocation ? undefined : (
-			<SectionMap mapData={mapData}>
+			<SectionMap mapData={mapData} entryTitle={entry.data.title}>
 				<LocationsAddress address={addressBase} content={addressMultilingual} />
 			</SectionMap>
 		)}

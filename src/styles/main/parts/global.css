@@ -9,7 +9,16 @@ html:not([lang^='ko']) [lang^='ko'] {
 	line-break: strict !important;
 	word-break: keep-all !important; /* Keep CJK runs intact; pairs with overflow-wrap above */
 	overflow-wrap: anywhere !important; /* Allow mid-run breaks only when content would overflow */
-	text-decoration: none !important;
+}
+
+html:not([lang^='th']) [lang^='th'],
+.cjk-text,
+html:not([lang^='zh']) [lang^='zh'],
+html:not([lang^='ja']) [lang^='ja'],
+html:not([lang^='ko']) [lang^='ko'] {
+	&:not(a, a *) {
+		text-decoration: none !important;
+	}
 }
 
 html:not([lang^='ja']) [lang^='ja'] {
@@ -23,5 +32,4 @@ html:not([lang^='th']) [lang^='th'] {
 	letter-spacing: normal !important;
 	line-break: auto !important;
 	overflow-wrap: break-word !important;
-	text-decoration: none !important;
 }

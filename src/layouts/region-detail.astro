@@ -65,7 +65,7 @@ const getRegionAncestors = await createRegionAncestorsFunction();
 			<Fragment slot="regions-siblings-title">{regionsOption.termsSiblingsLabel}</Fragment>
 		) : undefined}
 	</RegionsRelated>
-	<SectionMap mapData={mapData} />
+	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionWebmentions entry={entry} />

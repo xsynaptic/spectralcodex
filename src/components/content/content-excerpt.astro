@@ -26,6 +26,7 @@ interface Props extends HTMLAttributes<'article'> {
 
 const { class: className, entryUrl, imageId, showDivider, ...props } = Astro.props;
 
+const title = await renderSlot(Astro.slots, 'excerpt-title');
 const subtitle = await renderSlot(Astro.slots, 'excerpt-subtitle');
 const description = await renderSlot(Astro.slots, 'excerpt-description');
 const content = await renderSlot(Astro.slots, 'default');
@@ -54,6 +55,11 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 });
 
 const t = getTranslations();
+
+// One string; Prettier wraps inline markup and the line break renders as a space inside the link
+const readMoreHtml = title
+	? `${t('content.more.label')}<span class="sr-only">: ${title}</span>`
+	: t('content.more.label');
 ---
 
 <article class:list={[className, MicroformatClassNames.Entry]} {...props}>
@@ -64,18 +70,18 @@ const t = getTranslations();
 				anchorColor="title"
 				class:list={[MicroformatClassNames.Url, MicroformatClassNames.Name]}
 			>
-				<slot name="excerpt-title" />
+				<Fragment set:html={title} />
 			</Anchor>
 		</h2>
 		{subtitle ? (
-			<h3
+			<p
 				class:list={[
 					'mb-1 text-xs font-medium md:text-sm',
 					'text-primary-400 dark:text-primary-500',
 				]}
 			>
 				<Fragment set:html={subtitle} />
-			</h3>
+			</p>
 		) : undefined}
 		{description ? (
 			<Prose>
@@ -103,7 +109,10 @@ const t = getTranslations();
 	</Prose>
 	{hasExcerpt ? (
 		<div class="content-column text-right font-serif font-medium italic">
-			<Anchor href={entryUrl}>{t('content.more.label')}</Anchor>&nbsp;&raquo;
+			<Anchor href={entryUrl}>
+				<Fragment set:html={readMoreHtml} />
+			</Anchor>
+			{'\u{A0}»'}
 		</div>
 	) : undefined}
 </article>

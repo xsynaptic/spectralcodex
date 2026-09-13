@@ -71,18 +71,26 @@ export function sanitizeImageCaption(input: string): string {
 	return input.replaceAll('<p>', '').replaceAll('</p>', '');
 }
 
-// Another rough function to do 80% of what is needed here
-function encodeHtmlEntities(input: string): string {
-	return input
-		.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('"', '&quot;');
+const namedHtmlEntities: Record<string, string> = {
+	amp: '&',
+	lt: '<',
+	gt: '>',
+	quot: '"',
+	apos: "'",
+	nbsp: ' ',
+};
+
+function decodeHtmlEntities(input: string): string {
+	return input.replaceAll(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
+		if (/^#x/i.test(code)) return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
+		if (code.startsWith('#')) return String.fromCodePoint(Number(code.slice(1)));
+		return namedHtmlEntities[code.toLowerCase()] ?? entity;
+	});
 }
 
-// Sanitize alt attributes before returning them for display
+// Plain text only; Astro escapes attributes itself, so encoding here would double-escape
 export function sanitizeImageAltAttribute(input: string): string {
-	return encodeHtmlEntities(stripTags(input));
+	return decodeHtmlEntities(stripTags(input)).replaceAll(/\s+/g, ' ').trim();
 }
 
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"

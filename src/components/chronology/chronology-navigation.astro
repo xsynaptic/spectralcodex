@@ -3,10 +3,11 @@ import type { HTMLAttributes } from 'astro/types';
 
 import ChronologyNavigationItem from '#components/chronology/chronology-navigation-item.astro';
 import DividedItem from '#components/parts/divided-item.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
-interface Props extends HTMLAttributes<'div'> {
+interface Props extends HTMLAttributes<'nav'> {
 	currentYear?: string | undefined;
 	currentMonth?: string | undefined;
 	chronologyYears: Array<string>;
@@ -24,6 +25,8 @@ const {
 	...props
 } = Astro.props;
 
+const t = getTranslations();
+
 const indexSlot = await renderSlot(Astro.slots, 'default');
 
 const months = chronologyMonths?.toSorted((monthA, monthB) => monthA.localeCompare(monthB)) ?? [];
@@ -33,22 +36,23 @@ function getMonthName(month: string) {
 }
 ---
 
-<div
+<nav
 	class:list={[
 		'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
 		hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
 		className,
 	]}
+	aria-label={t('chronology.index.title')}
 	{...props}
 >
-	<div
+	<ul
 		class:list={[
 			'flex gap-1',
 			hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
 		]}
 	>
 		{indexSlot ? (
-			<DividedItem dividerContent="chevron">
+			<DividedItem as="li" dividerContent="chevron">
 				<Fragment set:html={indexSlot} />
 			</DividedItem>
 		) : undefined}
@@ -63,9 +67,9 @@ function getMonthName(month: string) {
 				{year}
 			</ChronologyNavigationItem>
 		))}
-	</div>
+	</ul>
 	{currentYear && currentMonth && months.length > 0 ? (
-		<div
+		<ul
 			class:list={[
 				'flex gap-1',
 				hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
@@ -81,6 +85,6 @@ function getMonthName(month: string) {
 					{getMonthName(month)}
 				</ChronologyNavigationItem>
 			))}
-		</div>
+		</ul>
 	) : undefined}
-</div>
+</nav>

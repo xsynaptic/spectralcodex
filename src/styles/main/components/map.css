@@ -28,3 +28,8 @@
 	--map-image-fallback: url('/seigaiha-light.svg');
 	--map-image-fallback-dark: url('/seigaiha-dark.svg');
 }
+
+/* Astro removes `ssr` from the island after hydration, when the loading text goes stale */
+astro-island:not([ssr]) + .map-loading .map-loading-label {
+	display: none;
+}

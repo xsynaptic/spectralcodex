@@ -35,9 +35,14 @@ function getDayTitle(value: number, date: Date): string {
 const hasCaption = Astro.slots.has('default');
 ---
 
-<figure class="activity-graph" role="img" aria-label={ariaLabel}>
+<figure class="activity-graph">
 	<div class="activity-scroll">
-		<div class="activity-plot" style={`--ag-weeks:${String(weekCount)}`}>
+		<div
+			class="activity-plot"
+			style={`--ag-weeks:${String(weekCount)}`}
+			role="img"
+			aria-label={ariaLabel}
+		>
 			<div class="activity-months">
 				{monthLabels.map((monthLabel) => (
 					<span class="activity-month" style={`--ag-week:${String(monthLabel.week)}`}>

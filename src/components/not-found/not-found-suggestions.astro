@@ -6,8 +6,9 @@ const t = getTranslations();
 
 <path-suggestions
 	src="/content-manifest.json"
-	link-class="anchor anchor-accent"
+	link-class="anchor-base anchor-accent"
 	link-data-astro-history="replace"
+	aria-live="polite"
 >
 	<p class="suggestions-heading">{t('notFound.suggestions')}</p>
 	<div class="suggestions-loading text-primary-700 dark:text-highlight-400" aria-hidden="true">

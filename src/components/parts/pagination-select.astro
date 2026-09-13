@@ -47,7 +47,7 @@ const t = getTranslations();
 				<form class="flex items-center gap-2" hidden={true} data-pagination-form>
 					<span class="relative inline-flex items-center">
 						<select
-							class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
+							class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
 							aria-label={t('site.pagination.select.label')}
 							name="page"
 							data-pagination-control
@@ -65,7 +65,7 @@ const t = getTranslations();
 						{formatStringTemplate(t('site.pagination.select.total'), { total: lastPage })}
 					</span>
 					<button
-						class="pagination-button cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:text-accent-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent-500 md:py-1 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
+						class="pagination-button cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:text-accent-300 md:py-1 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
 						type="submit"
 						data-pagination-submit
 					>
@@ -77,16 +77,12 @@ const t = getTranslations();
 				{url.prev ? (
 					<span class="flex flex-wrap gap-1">
 						<span class="text-accent-300 select-none dark:text-accent-400">&lsaquo;</span>
-						<Anchor href={url.prev} aria-label={t('pagination.previous')}>
-							{t('pagination.previous')}
-						</Anchor>
+						<Anchor href={url.prev}>{t('pagination.previous')}</Anchor>
 					</span>
 				) : undefined}
 				{url.next ? (
 					<span class="flex flex-wrap gap-1">
-						<Anchor href={url.next} aria-label={t('pagination.next')}>
-							{t('pagination.next')}
-						</Anchor>
+						<Anchor href={url.next}>{t('pagination.next')}</Anchor>
 						<span class="text-accent-300 select-none dark:text-accent-400">&rsaquo;</span>
 					</span>
 				) : undefined}

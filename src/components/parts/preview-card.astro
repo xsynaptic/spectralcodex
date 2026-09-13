@@ -50,7 +50,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 >
 	{imageProps ? (
 		<ImagePlaceholder placeholderProps={placeholderProps}>
-			<a href={linkUrl}>
+			<a href={linkUrl} aria-hidden="true" tabindex="-1">
 				<Image
 					class:list={[showMicroformats ? MicroformatClassNames.Photo : undefined]}
 					{...imageProps}

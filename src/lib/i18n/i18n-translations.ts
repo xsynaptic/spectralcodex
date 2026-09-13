@@ -26,6 +26,7 @@ const translationStrings = {
 		'collection.images.labelSingular': 'Image',
 		'collection.images.labelPlural': 'Images',
 		'collection.images.metadata.title': 'Image Metadata',
+		'collection.images.metadata.label': 'Image Metadata: {title}',
 		'collection.images.metadata.dateCreated.label': 'Date Captured',
 		'collection.images.metadata.cameraModel.label': 'Camera',
 		'collection.images.metadata.lensModel.label': 'Lens',
@@ -91,6 +92,7 @@ const translationStrings = {
 		'content.meta.backlinks.label.other': '{count} Backlinks',
 		'content.meta.imageFeatured.label': 'Photo:',
 		'content.more.label': 'Read more',
+		'content.redacted.label': 'redacted',
 
 		// Content sections
 		'section.author': 'Author',
@@ -102,6 +104,8 @@ const translationStrings = {
 		'section.sources': 'Sources',
 		'section.heritage': 'Heritage Designation',
 		'section.map': 'Map',
+		'section.map.label': 'Map of {title}',
+		'section.map.loading': 'Loading map',
 		'section.locationsNearby': 'Nearby Locations',
 		'section.backlinks': 'Backlinks',
 		'section.similar': 'Similar Content',
@@ -154,6 +158,10 @@ const translationStrings = {
 		// Carousel
 		'carousel.nav.previous': 'Previous image',
 		'carousel.nav.next': 'Next image',
+		'carousel.label': '{title} images',
+		'carousel.roledescription': 'carousel',
+		'carousel.slide.label': '{current} of {total}',
+		'carousel.slide.roledescription': 'slide',
 
 		// Objectives
 		'objectives.title': 'Objectives',
@@ -195,11 +203,11 @@ const translationStrings = {
 		'site.footer.feed.label': 'RSS Feed',
 		'site.breadcrumbs.label': 'Breadcrumb Navigation',
 		'site.colophon.label': 'Colophon',
-		'site.navigation.footer.label': 'Footer Navigation',
-		'site.navigation.header.label': 'Header Navigation',
+		'site.navigation.footer.label': 'Footer',
+		'site.navigation.header.label': 'Header',
 		'site.navigation.header.submenu.label': 'Submenu for {title}',
-		'site.mode.toggle.label': 'Toggle dark mode',
-		'site.mode.toggle.title': 'Dark mode',
+		'site.mode.toggle.dark.label': 'Switch to dark mode',
+		'site.mode.toggle.light.label': 'Switch to light mode',
 		'site.search.placeholder': 'Search...',
 		'site.search.toggle.label': 'Open search',
 		'site.search.toggle.title': 'Search',

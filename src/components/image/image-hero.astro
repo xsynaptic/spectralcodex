@@ -5,22 +5,26 @@ import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 
 import ImageCarouselNavigation from '#components/image/image-carousel-navigation.astro';
 import ImageHeroCarouselItem from '#components/image/image-hero-carousel-item.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
-	fallbackAlt?: string | undefined;
+	alt: string;
 	showMicroformats?: boolean | undefined;
 	withTitle?: boolean | undefined;
 }
 
 const {
 	imageFeaturedGroup,
-	fallbackAlt,
+	alt,
 	showMicroformats = false,
 	withTitle = true,
 	class: className,
 	...props
 } = Astro.props;
+
+const t = getTranslations();
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
@@ -43,14 +47,21 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 			]}
 		/>
 		{hasHeroCarousel ? (
-			<image-carousel class="block">
+			<image-carousel
+				class="block"
+				role="group"
+				aria-roledescription={t('carousel.roledescription')}
+				aria-label={formatStringTemplate(t('carousel.label'), { title: alt })}
+				data-slide-label={t('carousel.slide.label')}
+				data-slide-roledescription={t('carousel.slide.roledescription')}
+			>
 				<div class="carousel-container">
 					{imageFeaturedGroup.map((heroImage, index) => (
 						<ImageHeroCarouselItem
 							{...heroImage}
 							class="carousel-item"
 							index={index}
-							fallbackAlt={fallbackAlt}
+							alt={alt}
 							showMicroformats={showMicroformats}
 							withTitle={withTitle}
 						/>
@@ -63,7 +74,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 			<ImageHeroCarouselItem
 				{...imageFeaturedGroup[0]}
 				index={0}
-				fallbackAlt={fallbackAlt}
+				alt={alt}
 				showMicroformats={showMicroformats}
 				withTitle={withTitle}
 			/>

@@ -108,15 +108,12 @@ class TopButton extends HTMLElement {
 
 	#handleClick = () => {
 		const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		window.scrollTo({ top: 0, behavior: isReducedMotion ? 'auto' : 'smooth' });
+		window.scrollTo({ top: 0, behavior: isReducedMotion ? 'instant' : 'smooth' });
 
 		// Land keyboard and screen reader users at the top, matching the skip link target
 		const target = document.querySelector('#main-content');
 
-		if (target instanceof HTMLElement) {
-			target.setAttribute('tabindex', '-1');
-			target.focus({ preventScroll: true });
-		}
+		if (target instanceof HTMLElement) target.focus({ preventScroll: true });
 	};
 }
 

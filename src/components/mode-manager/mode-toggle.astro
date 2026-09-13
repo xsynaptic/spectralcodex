@@ -15,12 +15,15 @@ const t = getTranslations();
 		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-opacity focus-within:opacity-100 hover:opacity-100',
 	]}
 	transition:persist
+	data-label-dark={t('site.mode.toggle.dark.label')}
+	data-label-light={t('site.mode.toggle.light.label')}
 	{...props}
 >
 	<button
+		type="button"
 		class="text-primary-700 dark:text-primary-300"
-		aria-label={t('site.mode.toggle.label')}
-		title={t('site.mode.toggle.title')}
+		aria-label={t('site.mode.toggle.dark.label')}
+		title={t('site.mode.toggle.dark.label')}
 		data-umami-event="mode-toggle"
 	>
 		<svg

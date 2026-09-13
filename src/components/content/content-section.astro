@@ -51,14 +51,14 @@ const children = await renderSlot(Astro.slots, 'default');
 					</h2>
 				) : undefined}
 				{subtitle ? (
-					<h3
+					<p
 						class:list={[
 							'mb-1 text-xs font-medium md:text-sm',
 							'text-primary-400 dark:text-primary-600',
 						]}
 					>
 						<Fragment set:html={subtitle} />
-					</h3>
+					</p>
 				) : undefined}
 				{description ? (
 					<Prose class:list={['mb-4']}>

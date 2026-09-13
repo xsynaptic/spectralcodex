@@ -6,12 +6,17 @@ import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
 import MapComponentSprites from '#components/map/map-component-sprites.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	mapComponentProps: MapComponentProps;
+	entryTitle?: string | undefined;
 }
 
-const { mapComponentProps, ...props } = Astro.props;
+const { mapComponentProps, entryTitle, ...props } = Astro.props;
+
+const t = getTranslations();
 
 // Local to the map's own stacking context; the React component needs a number, not a class
 const zIndex = 10;
@@ -25,17 +30,23 @@ const zIndex = 10;
 		'relative flex h-full max-h-screen min-h-[min(600px,100vh)] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
 		'shadow-primary-300 dark:shadow-primary-900',
 	]}
+	role={entryTitle ? 'group' : undefined}
+	aria-label={
+		entryTitle ? formatStringTemplate(t('section.map.label'), { title: entryTitle }) : undefined
+	}
 	{...props}
 	data-pagefind-ignore
 >
 	<ReactMapComponent {...mapComponentProps} style={{ zIndex: zIndex + 1 }} client:visible />
 	<div
 		class:list={[
-			'absolute flex h-full w-full justify-center',
+			'map-loading absolute flex h-full w-full justify-center',
 			'text-primary-700 dark:text-highlight-400',
 		]}
 		style={{ zIndex }}
+		role="status"
 	>
+		<span class="map-loading-label sr-only">{t('section.map.loading')}</span>
 		<div class="loading-animation w-1/5"></div>
 	</div>
 </div>

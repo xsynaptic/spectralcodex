@@ -6,6 +6,7 @@ import ImageMetadataItem from '#components/image-metadata/image-metadata-item.as
 import DateDisplay from '#components/parts/date-display.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'images'>;
@@ -20,7 +21,11 @@ const t = getTranslations();
 	<details class="meta-details">
 		<summary
 			class="meta-show"
-			aria-label={t('collection.images.metadata.title')}
+			aria-label={
+				entry.data.title
+					? formatStringTemplate(t('collection.images.metadata.label'), { title: entry.data.title })
+					: t('collection.images.metadata.title')
+			}
 			data-umami-event="image-metadata-open"
 			data-umami-event-image={entry.id}
 		>
@@ -35,8 +40,8 @@ const t = getTranslations();
 				</svg>
 			</span>
 		</summary>
-		<span class="meta-panel">
-			<span class="meta-grid">
+		<div class="meta-panel">
+			<dl class="meta-grid">
 				<ImageMetadataItem class="meta-span-4">
 					<Fragment slot="image-metadata-item-title">
 						{t('collection.images.metadata.dateCreated.label')}
@@ -104,7 +109,7 @@ const t = getTranslations();
 						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
 					/>
 				</ImageMetadataItem>
-			</span>
-		</span>
+			</dl>
+		</div>
 	</details>
 </div>

@@ -22,7 +22,7 @@ const termAncestors = getRegionAncestors(entry).toReversed();
 const t = getTranslations();
 ---
 
-{termAncestors.length > 0 ? (
+{termAncestors.length > 1 ? (
 	<nav
 		class="inline sm:flex"
 		aria-label={t('site.breadcrumbs.label')}
@@ -30,21 +30,25 @@ const t = getTranslations();
 		{...props}
 	>
 		<ListRow as="ol" class="text-sm">
-			{termAncestors.map((termAncestor) => (
-				<DividedItem
-					as="li"
-					dividerContent="chevron"
-					aria-current={termAncestor.id === entry.id ? 'page' : undefined}
-				>
-					{!showCurrentLink && termAncestor.id === entry.id ? (
-						termAncestor.data.title
-					) : (
-						<Anchor href={getContentPath('regions', termAncestor.id)} anchorColor="accent">
-							{termAncestor.data.title}
-						</Anchor>
-					)}
-				</DividedItem>
-			))}
+			{termAncestors.map((termAncestor) => {
+				const isCurrent = termAncestor.id === entry.id;
+
+				return (
+					<DividedItem as="li" dividerContent="chevron">
+						{!showCurrentLink && isCurrent ? (
+							<span aria-current="page">{termAncestor.data.title}</span>
+						) : (
+							<Anchor
+								href={getContentPath('regions', termAncestor.id)}
+								anchorColor="accent"
+								{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
+							>
+								{termAncestor.data.title}
+							</Anchor>
+						)}
+					</DividedItem>
+				);
+			})}
 		</ListRow>
 	</nav>
 ) : undefined}

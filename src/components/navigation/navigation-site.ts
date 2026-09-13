@@ -23,6 +23,7 @@ let instanceCount = 0;
 class SiteNavigation extends HTMLElement {
 	#controller: AbortController | undefined;
 	#lastPointerType = '';
+	#hoverOpened: HTMLElement | undefined;
 	#instanceId = `nav-${String(instanceCount++)}`;
 	#initialized = false;
 
@@ -56,8 +57,53 @@ class SiteNavigation extends HTMLElement {
 		return !submenu?.contains(target);
 	}
 
+	#isRootLevel(li: HTMLElement) {
+		return li.parentElement === this.querySelector(':scope > nav > ul');
+	}
+
 	#handlePointerDown = (event: PointerEvent) => {
 		this.#lastPointerType = event.pointerType;
+	};
+
+	#handlePointerEnter = (event: PointerEvent) => {
+		const li = event.currentTarget;
+
+		if (event.pointerType !== 'mouse' || !(li instanceof HTMLElement)) return;
+
+		// Depth 2+ flies out sideways, which only fits at sm and above
+		if (!this.#isRootLevel(li) && !matchMedia('(width >= 40rem)').matches) return;
+
+		this.#closeSiblings(li);
+		this.#open(li);
+		this.#hoverOpened = li;
+	};
+
+	#handlePointerLeave = (event: PointerEvent) => {
+		const li = event.currentTarget;
+
+		if (event.pointerType !== 'mouse' || !(li instanceof HTMLElement)) return;
+
+		// A passing cursor must not hide a menu whose trigger or items hold keyboard focus
+		if (li.querySelector(':focus-visible')) return;
+
+		this.#close(li);
+	};
+
+	#handleFocusOut = (event: FocusEvent) => {
+		const target = event.target as Node;
+		const next = event.relatedTarget instanceof Node ? event.relatedTarget : undefined;
+
+		for (const li of this.querySelectorAll<HTMLElement>('li[data-open]')) {
+			if (!li.contains(target) || (next && li.contains(next)) || li.matches(':hover')) continue;
+
+			this.#close(li);
+		}
+	};
+
+	#handleDocumentKeydown = (event: KeyboardEvent) => {
+		if (event.key !== 'Escape' || this.contains(event.target as Node)) return;
+
+		this.#closeAll();
 	};
 
 	// Touch taps on an anchor trigger: first tap opens, second tap navigates
@@ -93,8 +139,10 @@ class SiteNavigation extends HTMLElement {
 
 		this.#closeSiblings(li);
 
-		if (li.dataset.open === undefined) {
+		// The first click after hover opened it must not shut it under the cursor; later clicks toggle
+		if (li.dataset.open === undefined || li === this.#hoverOpened) {
 			this.#open(li);
+			this.#hoverOpened = undefined;
 		} else {
 			this.#close(li);
 		}
@@ -111,6 +159,9 @@ class SiteNavigation extends HTMLElement {
 
 		if (!this.contains(target)) return;
 
+		// A keyboard-synthesised click must not take the touch path left over from an earlier tap
+		this.#lastPointerType = '';
+
 		const li = target.closest<HTMLElement>('li');
 		const trigger = li ? this.#getTrigger(li) : undefined;
 
@@ -123,7 +174,7 @@ class SiteNavigation extends HTMLElement {
 	};
 
 	#handleItemKeydown(event: KeyboardEvent, li: HTMLElement) {
-		const isRootLevel = li.parentElement === this.querySelector(':scope > nav > ul');
+		const isRootLevel = this.#isRootLevel(li);
 
 		switch (event.key) {
 			case 'ArrowRight': {
@@ -205,9 +256,9 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#handleArrowUp(event: KeyboardEvent, li: HTMLElement, isRootLevel: boolean) {
-		event.preventDefault();
-
 		if (isRootLevel) return;
+
+		event.preventDefault();
 
 		if (this.#getSiblingItems(li)[0] === li) {
 			this.#closeAndFocusTrigger(li);
@@ -219,6 +270,8 @@ class SiteNavigation extends HTMLElement {
 
 	#handleActivate(event: KeyboardEvent, li: HTMLElement) {
 		if (li.dataset.hasSubmenu === undefined) return;
+
+		if (event.key === 'Enter' && this.#getTrigger(li)?.matches('a[href]')) return;
 
 		event.preventDefault();
 
@@ -233,6 +286,8 @@ class SiteNavigation extends HTMLElement {
 
 	#resetItem(li: HTMLElement) {
 		delete li.dataset.open;
+
+		if (li === this.#hoverOpened) this.#hoverOpened = undefined;
 
 		const trigger = this.#getTrigger(li);
 
@@ -370,7 +425,14 @@ class SiteNavigation extends HTMLElement {
 		this.addEventListener('pointerdown', this.#handlePointerDown, { signal });
 		this.addEventListener('click', this.#handleClick, { signal });
 		this.addEventListener('keydown', this.#handleKeydown, { signal });
+		this.addEventListener('focusout', this.#handleFocusOut, { signal });
 		document.addEventListener('click', this.#handleClickOutside, { signal });
+		document.addEventListener('keydown', this.#handleDocumentKeydown, { signal });
+
+		for (const li of this.querySelectorAll<HTMLElement>('li[data-has-submenu]')) {
+			li.addEventListener('pointerenter', this.#handlePointerEnter, { signal });
+			li.addEventListener('pointerleave', this.#handlePointerLeave, { signal });
+		}
 	}
 
 	disconnectedCallback() {

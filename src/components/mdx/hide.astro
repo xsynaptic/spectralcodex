@@ -1,6 +1,7 @@
 ---
 import { stripTags } from '@xsynaptic/unified-tools';
 
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props {
@@ -18,6 +19,11 @@ const content = await renderSlot(Astro.slots, 'default');
 const contentStripped = stripTags(content ?? '').trim();
 
 const contentHidden = character.repeat(contentStripped.length);
+
+const t = getTranslations();
+
+// One string; Prettier wraps adjacent spans and the line break renders as a space
+const redactedHtml = `<span class="content-hidden" aria-hidden="true">${contentHidden}</span><span class="sr-only">${t('content.redacted.label')}</span>`;
 ---
 
-<span class="content-hidden">{contentHidden}</span>
+<Fragment set:html={redactedHtml} />

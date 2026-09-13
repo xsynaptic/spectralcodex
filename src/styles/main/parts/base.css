@@ -1,3 +1,9 @@
 html {
 	scrollbar-gutter: stable;
 }
+
+/* Layered so a component can still retune its own ring */
+:focus-visible {
+	outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
+	outline-offset: 2px;
+}

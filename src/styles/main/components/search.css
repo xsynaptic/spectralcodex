@@ -13,10 +13,9 @@ search-toggle:focus-within {
 	}
 }
 
-/* Beats both rules above; the undefined element takes no pointer or focus events */
+/* Hidden rather than dimmed so the inert button leaves the tab order until the element upgrades */
 search-toggle:not(:defined) {
-	pointer-events: none;
-	opacity: 0.3;
+	visibility: hidden;
 }
 
 /* Eager layout rules so the header never shifts while the deferred stylesheet loads */

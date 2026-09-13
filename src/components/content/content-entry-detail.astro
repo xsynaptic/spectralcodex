@@ -62,7 +62,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle imageId={imageFeaturedId} hideSearch={!!hideSearch || page.currentPage !== 1}>
-		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
+		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup} alt={entry.data.title}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">

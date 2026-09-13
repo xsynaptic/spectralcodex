@@ -177,48 +177,7 @@
 	}
 }
 
-/* Depth 1 opens at every breakpoint; depth 2+ only at sm and above, where there is room to fly out */
-.nav-item:focus-within > .nav-sub-menu-d1 {
-	visibility: visible;
-	pointer-events: auto;
-	opacity: 1;
-}
-
-.nav-item:focus-within > .nav-item-trigger > .nav-icon {
-	transform: scaleY(-1);
-}
-
-@media (hover: hover) {
-	.nav-item:hover > .nav-sub-menu-d1 {
-		visibility: visible;
-		pointer-events: auto;
-		opacity: 1;
-	}
-
-	.nav-item:hover > .nav-item-trigger > .nav-icon {
-		transform: scaleY(-1);
-	}
-}
-
-@media (width >= 40rem) {
-	.nav-sub-item:focus-within > .nav-sub-menu-d2,
-	.nav-sub-item:focus-within > .nav-sub-menu-d3 {
-		visibility: visible;
-		pointer-events: auto;
-		opacity: 1;
-	}
-
-	@media (hover: hover) {
-		.nav-sub-item:hover > .nav-sub-menu-d2,
-		.nav-sub-item:hover > .nav-sub-menu-d3 {
-			visibility: visible;
-			pointer-events: auto;
-			opacity: 1;
-		}
-	}
-}
-
-/* stylelint-disable-next-line no-descending-specificity -- same shown-state as the hover/focus rules above; grouped by state, not specificity */
+/* Open state is owned by navigation-site.ts so aria-expanded always matches what is shown */
 [data-open] > .nav-sub-menu-d1,
 [data-open] > .nav-sub-menu-d2,
 [data-open] > .nav-sub-menu-d3 {
@@ -228,7 +187,47 @@
 	transition-property: opacity;
 }
 
-/* stylelint-disable-next-line no-descending-specificity -- chevron flip, same outcome as the hover rule above */
 [data-open] > .nav-item-trigger > .nav-icon {
 	transform: scaleY(-1);
+}
+
+/* Submenus still open on hover and focus before the element upgrades or if its script fails */
+site-navigation:not(:defined) {
+	.nav-item:focus-within > .nav-sub-menu-d1 {
+		visibility: visible;
+		pointer-events: auto;
+		opacity: 1;
+	}
+
+	.nav-item:focus-within > .nav-item-trigger > .nav-icon {
+		transform: scaleY(-1);
+	}
+
+	@media (hover: hover) {
+		.nav-item:hover > .nav-sub-menu-d1 {
+			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
+		}
+
+		.nav-item:hover > .nav-item-trigger > .nav-icon {
+			transform: scaleY(-1);
+		}
+	}
+
+	@media (width >= 40rem) {
+		.nav-sub-item:focus-within > :is(.nav-sub-menu-d2, .nav-sub-menu-d3) {
+			visibility: visible;
+			pointer-events: auto;
+			opacity: 1;
+		}
+
+		@media (hover: hover) {
+			.nav-sub-item:hover > :is(.nav-sub-menu-d2, .nav-sub-menu-d3) {
+				visibility: visible;
+				pointer-events: auto;
+				opacity: 1;
+			}
+		}
+	}
 }

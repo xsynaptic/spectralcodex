@@ -5,7 +5,14 @@
 	overflow: hidden;
 }
 
+/* Sized to the icon box; the icons are absolutely positioned and would leave it zero-height */
 .meta-show {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	display: block;
+	width: calc(var(--spacing) * 10);
+	height: calc(var(--spacing) * 10);
 	list-style: none;
 	opacity: 0.8;
 	transition: opacity 300ms var(--default-transition-timing-function) 200ms;
@@ -156,7 +163,6 @@
 	font-weight: var(--font-weight-semibold);
 	line-height: var(--text-xs--line-height);
 	color: light-dark(var(--color-primary-800), var(--color-primary-400));
-	user-select: none;
 }
 
 .meta-item-value {

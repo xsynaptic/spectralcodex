@@ -13,9 +13,10 @@ interface Props {
 const { href, period, hasHeroImage, isCurrent, isActive = false } = Astro.props;
 ---
 
-<DividedItem>
+<DividedItem as="li">
 	{isCurrent ? (
 		<span
+			aria-current="page"
 			class:list={[
 				'font-semibold',
 				period === 'year' ? 'text-primary-600 dark:text-primary-400' : 'text-highlight-600',

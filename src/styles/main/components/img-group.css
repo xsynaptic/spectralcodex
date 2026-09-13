@@ -54,14 +54,10 @@ image-carousel.img-group {
 	border-radius: 0;
 }
 
-/* The generic carousel only shows nav at lg; content carousels keep it at every width */
-.img-group-viewport .carousel-nav {
-	display: flex;
-}
-
 /* Touch has no hover to reveal the nav, so keep it visible */
 @media (hover: none) {
 	.img-group-viewport .carousel-nav {
+		pointer-events: auto;
 		opacity: 1;
 	}
 }

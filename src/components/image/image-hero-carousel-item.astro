@@ -12,7 +12,7 @@ import { ImageSizeEnum } from '#lib/image/image-types.ts';
 interface Props extends ImageFeaturedWithCaption {
 	class?: string | undefined;
 	index: number;
-	fallbackAlt?: string | undefined;
+	alt: string;
 	showMicroformats?: boolean | undefined;
 	withTitle?: boolean | undefined;
 }
@@ -21,16 +21,15 @@ const {
 	class: className,
 	index,
 	id: imageId,
-	title,
 	caption,
-	fallbackAlt,
+	alt,
 	showMicroformats = false,
 	withTitle = false,
 } = Astro.props;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	imageId,
-	alt: title ?? fallbackAlt ?? '',
+	alt,
 	sizes: '100vw',
 	width: ImageSizeEnum.ExtraExtraLarge,
 	imageQuality: imageHeroQualityValue,
@@ -40,7 +39,11 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 ---
 
 {imageProps ? (
-	<ImagePlaceholder class:list={['relative', className]} placeholderProps={placeholderProps}>
+	<ImagePlaceholder
+		as="figure"
+		class:list={['relative', className]}
+		placeholderProps={placeholderProps}
+	>
 		<Image
 			class:list={[
 				'z-image max-h-screen min-h-100 w-full text-sm text-transparent xl:min-h-screen',
