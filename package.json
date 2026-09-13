@@ -35,6 +35,7 @@
 		"test-e2e-prod": "TEST_ENV=prod node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
 		"test-image-server": "vitest run --config vitest.integration.config.ts",
 		"validate-content": "astro sync && pnpm -F @spectralcodex/scripts validate-content",
+		"validate-image-alt": "astro sync && pnpm -F @spectralcodex/scripts validate-image-alt",
 		"webmentions": "pnpm -F @spectralcodex/scripts webmentions"
 	},
 	"type": "module",

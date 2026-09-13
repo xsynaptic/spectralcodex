@@ -27,6 +27,7 @@
 		"similar-content": "tsx ./src/similar-content/index.ts",
 		"sitemap-lastmod": "tsx --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/sitemap-lastmod/index.cli.ts",
 		"validate-content": "tsx ./src/validate-content/index.ts",
+		"validate-image-alt": "tsx ./src/validate-content/image-alt.cli.ts",
 		"webmentions": "tsx --env-file-if-exists=../../.env ./src/webmentions/index.ts"
 	},
 	"devDependencies": {
