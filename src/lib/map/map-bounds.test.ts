@@ -128,3 +128,62 @@ describe('getMapBounds', () => {
 		expect(result!.bounds[3]).toBeCloseTo(25.89932, 5);
 	});
 });
+
+describe('getMapBounds at world scale', () => {
+	test('a set crossing the antimeridian frames across the Pacific, not around the world', () => {
+		const result = getMapBounds({
+			featureCollection: makeCollection([
+				makeFeature('fiji', [175, -15]),
+				makeFeature('samoa', [-165, -10]),
+			]),
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.bounds[0]).toBeLessThan(175);
+		expect(result!.bounds[2]).toBeGreaterThan(195);
+		expect(result!.bounds[2] - result!.bounds[0]).toBeLessThan(60);
+		expect(result!.center).toEqual([-175, -12.5]);
+	});
+
+	test('a pan limit padded past a full world clamps to one world', () => {
+		const result = getMapBounds({
+			featureCollection: makeCollection([
+				makeFeature('a', [-150, 0]),
+				makeFeature('b', [-30, 0]),
+				makeFeature('c', [90, 0]),
+			]),
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.maxBounds[0]).toBe(-180);
+		expect(result!.maxBounds[2]).toBe(180);
+	});
+
+	test('polygons bound by their vertices regardless of winding', () => {
+		const ring = [
+			[121, 24],
+			[122, 24],
+			[122, 25],
+			[121, 25],
+			[121, 24],
+		];
+		const result = getMapBounds({
+			featureCollection: {
+				type: 'FeatureCollection',
+				features: [
+					{
+						type: 'Feature',
+						id: 'area',
+						properties: { title: 'area' },
+						geometry: { type: 'Polygon', coordinates: [ring] },
+					},
+				],
+			} as unknown as MapFeatureCollection,
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.bounds[0]).toBeGreaterThan(120);
+		expect(result!.bounds[2]).toBeLessThan(123);
+		expect(result!.center).toEqual([121.5, 24.5]);
+	});
+});

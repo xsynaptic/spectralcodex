@@ -1,8 +1,10 @@
-import { bbox } from '@turf/bbox';
+import type { Position } from 'geojson';
+
 import { center as turfCenter } from '@turf/center';
 import { distance } from '@turf/distance';
 import { degreesToRadians, lengthToDegrees } from '@turf/helpers';
 import { truncate } from '@turf/truncate';
+import { geoBounds } from 'd3-geo';
 
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
@@ -28,6 +30,27 @@ function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureC
 	} satisfies MapFeatureCollection;
 }
 
+function getVertices(featureCollection: MapFeatureCollection): Array<Position> {
+	return featureCollection.features.flatMap(({ geometry }) => {
+		if (geometry.type === 'Point') return [geometry.coordinates];
+		if (geometry.type === 'LineString') return geometry.coordinates;
+		return geometry.coordinates.flat();
+	});
+}
+
+// Vertices only: d3 reads GeoJSON polygon winding as inverted and bulges edges along great circles
+// East passes 180 when the shortest span crosses the antimeridian; MapLibre accepts this form
+function getNaturalBounds(
+	featureCollection: MapFeatureCollection,
+): [number, number, number, number] {
+	const [[west, south], [east, north]] = geoBounds({
+		type: 'MultiPoint',
+		coordinates: getVertices(featureCollection),
+	});
+
+	return [west, south, west > east ? east + 360 : east, north];
+}
+
 interface BboxBufferOptions {
 	explicitBuffer: number | undefined;
 	bufferPercentage: number;
@@ -40,7 +63,7 @@ function getBufferedBbox(
 ): [number, number, number, number] | undefined {
 	if (featureCollection.features.length === 0) return undefined;
 
-	const naturalBounds = bbox(featureCollection);
+	const naturalBounds = getNaturalBounds(featureCollection);
 
 	let bufferRadius = explicitBuffer;
 
@@ -65,12 +88,15 @@ function getBufferedBbox(
 	const latPad = lengthToDegrees(bufferRadius);
 	const lngPad = latPad / Math.cos(degreesToRadians((naturalBounds[1] + naturalBounds[3]) / 2));
 
-	return [
-		naturalBounds[0] - lngPad,
-		Math.max(naturalBounds[1] - latPad, -85),
-		naturalBounds[2] + lngPad,
-		Math.min(naturalBounds[3] + latPad, 85),
-	];
+	const west = naturalBounds[0] - lngPad;
+	const south = Math.max(naturalBounds[1] - latPad, -85);
+	const east = naturalBounds[2] + lngPad;
+	const north = Math.min(naturalBounds[3] + latPad, 85);
+
+	// MapLibre wraps each pan limit into one world, so a wider range would fold onto itself
+	if (east - west >= 360) return [-180, south, 180, north];
+
+	return [west, south, east, north];
 }
 
 function getMapCenter(
@@ -81,9 +107,16 @@ function getMapCenter(
 		? featureCollection.features.find(({ id }) => id === targetId)
 		: undefined;
 
-	const center = truncate(turfCenter(targetFeature ? targetFeature.geometry : featureCollection));
+	if (targetFeature) {
+		const center = truncate(turfCenter(targetFeature.geometry));
 
-	return getTruncatedLngLat(center.geometry.coordinates);
+		return getTruncatedLngLat(center.geometry.coordinates);
+	}
+
+	const [west, south, east, north] = getNaturalBounds(featureCollection);
+	const longitude = (((west + east) / 2 + 180) % 360) - 180;
+
+	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
 // Calculate map bounds based on geodata and some parameters

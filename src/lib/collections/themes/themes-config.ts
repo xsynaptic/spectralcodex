@@ -22,6 +22,7 @@ export const themes = defineCollection({
 			dateUpdated: DateSchema.optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			hideSearch: z.boolean().optional(),
+			hideMap: z.boolean().optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			// Computed properties, for internal use only!

@@ -1,5 +1,6 @@
 import type { CSSProperties, FC } from 'react';
 
+import { LngLatBounds } from 'maplibre-gl';
 import { memo, useState } from 'react';
 import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
 
@@ -22,6 +23,15 @@ import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store-provider.tsx';
 import { getInitialViewState } from '#store/store-viewport.ts';
 import { useIsMapCanvasInteractive, useIsMapCanvasLoading } from '#store/store.ts';
+
+// Features past the antimeridian only draw with world copies on
+function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
+	if (!bounds) return false;
+
+	const lngLatBounds = LngLatBounds.convert(bounds);
+
+	return lngLatBounds.getWest() < -180 || lngLatBounds.getEast() > 180;
+}
 
 const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
 	return (
@@ -85,7 +95,7 @@ const MapCanvasContainer: FC<
 			maxZoom={19}
 			minZoom={4}
 			fadeDuration={0}
-			renderWorldCopies={false}
+			renderWorldCopies={isBeyondAntimeridian(bounds) || isBeyondAntimeridian(maxBounds)}
 			attributionControl={false}
 			style={{ height: 'auto', ...style }}
 			{...canvasEvents}

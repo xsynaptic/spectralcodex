@@ -81,7 +81,9 @@ export async function createQueryThemesEntryFunction() {
 
 		const mapData = getMapData({
 			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: getLocationsFeatureCollection(locationsFiltered),
+			featureCollection: entry.data.hideMap
+				? undefined
+				: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
 			chunkKeyById,
 			version,
