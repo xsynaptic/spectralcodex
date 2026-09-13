@@ -1,19 +1,17 @@
 import type { CollectionKey } from 'astro:content';
 
-const { BASE_URL, SITE } = import.meta.env;
-
 // Drop-in replacement for the url-join package
 function joinUrl(...parts: Array<string>): string {
 	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
 }
 
 export const getBasePath = (...routeParts: Array<string>): string =>
-	joinUrl(BASE_URL, ...routeParts);
+	joinUrl(import.meta.env.BASE_URL, ...routeParts);
 
 export const getSitePath = (...routeParts: Array<string>): string =>
-	joinUrl(BASE_URL, ...routeParts, '/');
+	joinUrl(import.meta.env.BASE_URL, ...routeParts, '/');
 
-export const getAbsoluteUrl = (path: string): string => new URL(path, SITE).href;
+export const getAbsoluteUrl = (path: string): string => new URL(path, import.meta.env.SITE).href;
 
 const rootCollectionIds = new Set(['locations', 'pages', 'posts']);
 

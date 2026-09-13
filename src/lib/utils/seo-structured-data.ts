@@ -72,13 +72,14 @@ interface Graph {
 	'@graph': ReadonlyArray<Thing>;
 }
 
-const siteUrl = getAbsoluteUrl(getSitePath());
-const aboutUrl = getAbsoluteUrl(getSitePath('/about'));
+// Built per call; hoisting these to module scope makes the import itself fail wherever SITE is unset
+const getSiteUrl = () => getAbsoluteUrl(getSitePath());
+const getAboutUrl = () => getAbsoluteUrl(getSitePath('/about'));
 
 // @id scheme: long form for singletons, short fragment for per-page entities
 const ids = {
-	website: `${siteUrl}#/schema.org/${SchemaTypeEnum.WebSite}`,
-	person: `${aboutUrl}#/schema.org/${SchemaTypeEnum.Person}`,
+	website: () => `${getSiteUrl()}#/schema.org/${SchemaTypeEnum.WebSite}`,
+	person: () => `${getAboutUrl()}#/schema.org/${SchemaTypeEnum.Person}`,
 	article: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#article`,
 	breadcrumb: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#breadcrumb`,
 	place: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#place`,
@@ -89,10 +90,10 @@ export function buildWebSiteSchema(): WebSite {
 
 	return {
 		'@type': SchemaTypeEnum.WebSite,
-		'@id': ids.website,
-		url: siteUrl,
+		'@id': ids.website(),
+		url: getSiteUrl(),
 		name: t('site.title'),
-		publisher: { '@id': ids.person },
+		publisher: { '@id': ids.person() },
 		description: t('site.description'),
 	};
 }
@@ -102,9 +103,9 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 
 	return {
 		'@type': SchemaTypeEnum.Person,
-		'@id': ids.person,
+		'@id': ids.person(),
 		name: t('author.name'),
-		url: aboutUrl,
+		url: getAboutUrl(),
 		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
 	};
 }
@@ -125,7 +126,7 @@ export function buildArticleSchema(props: {
 		...(props.imageUrl ? { image: props.imageUrl } : {}),
 		datePublished: props.dateCreated.toISOString(),
 		...(props.dateUpdated ? { dateModified: props.dateUpdated.toISOString() } : {}),
-		author: { '@id': ids.person },
+		author: { '@id': ids.person() },
 	};
 }
 

@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
 import LocationsHeritageList from '#components/locations/locations-heritage-list.astro';
-import { getLocationHeritage } from '#lib/collections/locations/locations-utils.ts';
+import { getLocationHeritage } from '#lib/collections/locations/locations-geometry.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
