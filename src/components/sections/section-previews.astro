@@ -9,6 +9,7 @@ import ContentSection from '#components/content/content-section.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getPagination } from '#lib/utils/pagination.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	sectionTitle?: string;
@@ -50,7 +51,7 @@ const t = getTranslations();
 				{...defaultPreviewOptions}
 				{...previewOptions}
 			/>
-			<PaginationSelect class="mt-4 md:mt-8" page={page} />
+			<PaginationSelect class="mt-4 md:mt-8" pagination={getPagination(page)} />
 		</>
 	) : undefined}
 	{items ? (

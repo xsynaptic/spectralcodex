@@ -9,8 +9,64 @@ const { getCatalogMock } = vi.hoisted(() => ({ getCatalogMock: vi.fn() }));
 
 vi.mock('#lib/catalog/catalog-data.ts', () => ({ getCatalog: getCatalogMock }));
 
-const { createChronologyImageFeaturedGroupFunction, getChronologyActivityData } =
-	await import('#lib/collections/chronology/chronology-utils.ts');
+const {
+	createChronologyImageFeaturedGroupFunction,
+	getChronologyActivityData,
+	getChronologyYearPagination,
+} = await import('#lib/collections/chronology/chronology-utils.ts');
+
+describe('getChronologyYearPagination', () => {
+	const years = ['2026', '2024', '2019'];
+
+	test('without a current year nothing is current, nothing links outward, and the select shows a placeholder', () => {
+		const pagination = getChronologyYearPagination(years);
+
+		expect(pagination.options.map((option) => option.url)).toStrictEqual([
+			'/chronology/2026/',
+			'/chronology/2024/',
+			'/chronology/2019/',
+		]);
+		expect(pagination.options.some((option) => option.isCurrent)).toBe(false);
+		expect(pagination.previous).toBeUndefined();
+		expect(pagination.next).toBeUndefined();
+		expect(pagination.placeholder).toBe('Year');
+	});
+
+	test('the oldest year has no previous and points next to the newer year', () => {
+		const pagination = getChronologyYearPagination(years, '2019');
+
+		expect(pagination.previous).toBeUndefined();
+		expect(pagination.next).toStrictEqual({
+			ariaLabel: 'Newer: 2024',
+			label: '2024',
+			url: '/chronology/2024/',
+		});
+		expect(pagination.placeholder).toBeUndefined();
+	});
+
+	test('years given oldest first still sort newest first and keep the older year as previous', () => {
+		const pagination = getChronologyYearPagination(years.toReversed(), '2024');
+
+		expect(pagination.options.map((option) => option.label)).toStrictEqual([
+			'2026',
+			'2024',
+			'2019',
+		]);
+		expect(pagination.previous?.url).toBe('/chronology/2019/');
+		expect(pagination.next?.url).toBe('/chronology/2026/');
+	});
+
+	test('the newest year has no next and points previous to the older year', () => {
+		const pagination = getChronologyYearPagination(years, '2026');
+
+		expect(pagination.next).toBeUndefined();
+		expect(pagination.previous).toStrictEqual({
+			ariaLabel: 'Older: 2024',
+			label: '2024',
+			url: '/chronology/2024/',
+		});
+	});
+});
 
 describe('getChronologyActivityData', () => {
 	test('a day value sums all three activity kinds', () => {

@@ -14,6 +14,7 @@ import PaginationSelect from '#components/parts/pagination-select.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getPagination } from '#lib/utils/pagination.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
@@ -79,6 +80,6 @@ const description = t('collection.posts.description');
 		</div>
 	) : undefined}
 	<ContentSection>
-		<PaginationSelect class="mt-4 md:mt-8" page={page} />
+		<PaginationSelect class="mt-4 md:mt-8" pagination={getPagination(page)} />
 	</ContentSection>
 </MainSite>

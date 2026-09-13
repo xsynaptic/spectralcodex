@@ -38,7 +38,7 @@
 		display: none;
 	}
 
-	.pagination-control option[data-current-page]::after {
+	.pagination-control option[data-current]::after {
 		order: 1;
 		margin-inline-start: calc(var(--spacing) * 2);
 		color: var(--color-accent-400);

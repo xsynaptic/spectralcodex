@@ -48,7 +48,7 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-subtitle">
 			<ChronologyNavigation currentYear={chronologyYear} chronologyYears={chronologyYears}>
-				<Anchor href={getSitePath('chronology')} anchorColor="accent" class="font-semibold">
+				<Anchor href={getSitePath('chronology')} anchorColor="accent">
 					{t('chronology.index.label')}
 				</Anchor>
 			</ChronologyNavigation>

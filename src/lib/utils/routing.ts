@@ -8,8 +8,12 @@ function joinUrl(...parts: Array<string>): string {
 export const getBasePath = (...routeParts: Array<string>): string =>
 	joinUrl(import.meta.env.BASE_URL, ...routeParts);
 
+// For paths that already carry the base, such as Astro's paginate URLs
+export const getPathWithTrailingSlash = (...routeParts: Array<string>): string =>
+	joinUrl(...routeParts, '/');
+
 export const getSitePath = (...routeParts: Array<string>): string =>
-	joinUrl(import.meta.env.BASE_URL, ...routeParts, '/');
+	getPathWithTrailingSlash(import.meta.env.BASE_URL, ...routeParts);
 
 export const getAbsoluteUrl = (path: string): string => new URL(path, import.meta.env.SITE).href;
 

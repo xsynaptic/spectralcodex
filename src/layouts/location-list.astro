@@ -10,6 +10,7 @@ import PaginationCounter from '#components/parts/pagination-counter.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getPagination } from '#lib/utils/pagination.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
@@ -56,6 +57,6 @@ const description = t('collection.locations.description');
 			showTitleMultilingual={true}
 			titleAs="h2"
 		/>
-		<PaginationSelect class="mt-4 md:mt-8" page={page} />
+		<PaginationSelect class="mt-4 md:mt-8" pagination={getPagination(page)} />
 	</ContentSection>
 </MainSite>

@@ -106,9 +106,11 @@ import ProseSample from '#dev/inventory/inventory-prose-sample.mdx';
 import Section from '#dev/inventory/inventory-section.astro';
 import Specimen from '#dev/inventory/inventory-specimen.astro';
 import { getSectionId } from '#dev/inventory/inventory-utils.ts';
+import { getChronologyYearPagination } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
+import { getPagination } from '#lib/utils/pagination.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import '#dev/inventory/inventory.css';
 
@@ -696,12 +698,19 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="pagination-select"
-				note="Without JavaScript the counter and the previous/next links stand alone."
+				note="Pages 1 of 1 (renders nothing) and 3 of 12, then years without and with a current year. Without JavaScript the counter and the previous/next links stand alone."
 				source="components/parts/pagination-select.astro"
 			>
 				<div class="flex flex-col gap-4">
-					<PaginationSelect page={samplePageFirst} />
-					<PaginationSelect page={samplePageMiddle} />
+					<PaginationSelect pagination={getPagination(samplePageFirst)} />
+					<PaginationSelect pagination={getPagination(samplePageMiddle)} />
+					<PaginationSelect pagination={getChronologyYearPagination(sampleChronologyYears)} />
+					<PaginationSelect
+						pagination={getChronologyYearPagination(
+							sampleChronologyYears,
+							sampleChronologyYears.at(2),
+						)}
+					/>
 				</div>
 			</Specimen>
 		</Section>
@@ -1104,7 +1113,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 		>
 			<Specimen
 				name="chronology-navigation"
-				note="Years, then months once a year is current; the slot carries the index link back out."
+				note="The year select, then months once a month is current; the slot carries the index link back out."
 				source="components/chronology/chronology-navigation.astro"
 			>
 				<div class="flex flex-col gap-6">
@@ -1112,9 +1121,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						chronologyYears={sampleChronologyYears}
 						currentYear={sampleChronologyYear}
 					>
-						<Anchor class="font-semibold" href={sampleUrl}>
-							{t('chronology.index.label')}
-						</Anchor>
+						<Anchor href={sampleUrl}>{t('chronology.index.label')}</Anchor>
 					</ChronologyNavigation>
 					<ChronologyNavigation
 						chronologyMonths={sampleChronologyMonths}

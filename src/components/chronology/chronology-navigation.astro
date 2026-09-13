@@ -2,9 +2,9 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import ChronologyNavigationItem from '#components/chronology/chronology-navigation-item.astro';
-import DividedItem from '#components/parts/divided-item.astro';
+import PaginationSelect from '#components/parts/pagination-select.astro';
+import { getChronologyYearPagination } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { renderSlot } from '#lib/utils/astro.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
@@ -12,7 +12,6 @@ interface Props extends HTMLAttributes<'nav'> {
 	currentMonth?: string | undefined;
 	chronologyYears: Array<string>;
 	chronologyMonths?: Array<string> | undefined;
-	hasHeroImage?: boolean | undefined;
 }
 
 const {
@@ -21,13 +20,12 @@ const {
 	currentMonth,
 	chronologyYears,
 	chronologyMonths,
-	hasHeroImage = false,
 	...props
 } = Astro.props;
 
 const t = getTranslations();
 
-const indexSlot = await renderSlot(Astro.slots, 'default');
+const yearPagination = getChronologyYearPagination(chronologyYears, currentYear);
 
 const months = chronologyMonths?.toSorted((monthA, monthB) => monthA.localeCompare(monthB)) ?? [];
 
@@ -38,48 +36,20 @@ function getMonthName(month: string) {
 
 <nav
 	class:list={[
-		'flex flex-col gap-1 overflow-hidden text-sm text-primary-500 dark:text-primary-400',
-		hasHeroImage ? 'divided-hero mb-8 sm:mb-0' : '',
+		'flex w-full flex-col gap-2 text-sm text-primary-500 dark:text-primary-400',
 		className,
 	]}
 	aria-label={t('chronology.index.title')}
 	{...props}
 >
-	<ul
-		class:list={[
-			'flex gap-1',
-			hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
-		]}
-	>
-		{indexSlot ? (
-			<DividedItem as="li" dividerContent="chevron">
-				<Fragment set:html={indexSlot} />
-			</DividedItem>
-		) : undefined}
-		{chronologyYears.map((year) => (
-			<ChronologyNavigationItem
-				href={getSitePath('chronology', year)}
-				period="year"
-				hasHeroImage={hasHeroImage}
-				isCurrent={!currentMonth && currentYear === year}
-				isActive={Boolean(currentMonth) && currentYear === year}
-			>
-				{year}
-			</ChronologyNavigationItem>
-		))}
-	</ul>
+	<PaginationSelect pagination={yearPagination}>
+		<slot />
+	</PaginationSelect>
 	{currentYear && currentMonth && months.length > 0 ? (
-		<ul
-			class:list={[
-				'flex gap-1',
-				hasHeroImage ? 'flex-wrap sm:flex-nowrap sm:overflow-x-scroll' : 'flex-wrap',
-			]}
-		>
+		<ul class="flex flex-wrap gap-1">
 			{months.map((month) => (
 				<ChronologyNavigationItem
 					href={getSitePath('chronology', currentYear, month)}
-					period="month"
-					hasHeroImage={hasHeroImage}
 					isCurrent={currentMonth === month}
 				>
 					{getMonthName(month)}

@@ -2,12 +2,61 @@ import type {
 	ChronologyDailyCounts,
 	ChronologyMonthlyItem,
 } from '#lib/collections/chronology/chronology-types.ts';
+import type { Pagination } from '#lib/utils/pagination-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import {
 	getImageFeaturedGroup,
 	getImageFeaturedGroupByCatalog,
 } from '#lib/image/image-featured.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
+import { formatStringTemplate } from '#lib/utils/text.ts';
+
+export function getChronologyYearPagination(years: Array<string>, currentYear?: string) {
+	const t = getTranslations();
+
+	const pagination: Pagination = {
+		label: t('chronology.yearly.label'),
+		options: years
+			.toSorted((yearA, yearB) => yearB.localeCompare(yearA))
+			.map((year) => ({
+				isCurrent: year === currentYear,
+				label: year,
+				url: getSitePath('chronology', year),
+			})),
+		selectLabel: t('chronology.yearly.select.label'),
+		submitLabel: t('site.pagination.select.submit'),
+	};
+
+	const currentIndex = pagination.options.findIndex((option) => option.isCurrent);
+
+	if (currentIndex === -1) {
+		pagination.placeholder = t('chronology.yearly.select.placeholder');
+		return pagination;
+	}
+
+	const olderOption = pagination.options[currentIndex + 1];
+	const newerOption = pagination.options[currentIndex - 1];
+
+	if (olderOption) {
+		pagination.previous = {
+			ariaLabel: formatStringTemplate(t('chronology.yearly.older'), { year: olderOption.label }),
+			label: olderOption.label,
+			url: olderOption.url,
+		};
+	}
+
+	if (newerOption) {
+		pagination.next = {
+			ariaLabel: formatStringTemplate(t('chronology.yearly.newer'), { year: newerOption.label }),
+			label: newerOption.label,
+			url: newerOption.url,
+		};
+	}
+
+	return pagination;
+}
 
 // Adapt per-category daily counts to the generic activity graph: summed values plus year totals
 export function getChronologyActivityData(dailyData: Record<string, ChronologyDailyCounts>): {
