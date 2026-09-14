@@ -23,38 +23,67 @@ export interface MapDataBoundsProps {
 const mapBoundsBufferMin = 1;
 const mapLimitsBufferMin = 10;
 
+interface BboxBufferOptions {
+	bufferPercentage: number;
+	explicitBuffer: number | undefined;
+	minBuffer: number;
+}
+
+// Calculate map bounds based on geodata and some parameters
+// This should not include outliers; bounds/center frame featureCollection
+// maxBounds spans limitsFeatureCollection (the rendered set)
+// By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
+// But these values can be overridden on a case-by-case basis
+export function getMapBounds({
+	featureCollection: featureCollectionRaw,
+	limitsFeatureCollection: limitsFeatureCollectionRaw,
+	boundsBuffer,
+	boundsBufferPercentage = 10,
+	limitsBuffer,
+	limitsBufferPercentage = 100,
+	targetId,
+}: MapDataBoundsProps):
+	| undefined
+	| {
+			bounds: [number, number, number, number];
+			center: [number, number];
+			maxBounds: [number, number, number, number];
+	  } {
+	if (!featureCollectionRaw) return;
+
+	const featureCollection = filterMapOutliers(featureCollectionRaw);
+
+	if (featureCollection.features.length === 0) return;
+
+	const limitsFeatureCollection = limitsFeatureCollectionRaw
+		? filterMapOutliers(limitsFeatureCollectionRaw)
+		: featureCollection;
+
+	const bounds = getBufferedBbox(featureCollection, {
+		explicitBuffer: boundsBuffer,
+		bufferPercentage: boundsBufferPercentage,
+		minBuffer: mapBoundsBufferMin,
+	});
+	const maxBounds = getBufferedBbox(limitsFeatureCollection, {
+		explicitBuffer: limitsBuffer,
+		bufferPercentage: limitsBufferPercentage,
+		minBuffer: mapLimitsBufferMin,
+	});
+
+	if (!bounds || !maxBounds) return;
+
+	return {
+		center: getMapCenter(featureCollection, targetId),
+		bounds,
+		maxBounds,
+	};
+}
+
 function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureCollection {
 	return {
 		...featureCollection,
 		features: featureCollection.features.filter((item) => item.properties.outlier !== true),
 	} satisfies MapFeatureCollection;
-}
-
-function getVertices(featureCollection: MapFeatureCollection): Array<Position> {
-	return featureCollection.features.flatMap(({ geometry }) => {
-		if (geometry.type === 'Point') return [geometry.coordinates];
-		if (geometry.type === 'LineString') return geometry.coordinates;
-		return geometry.coordinates.flat();
-	});
-}
-
-// Vertices only: d3 reads GeoJSON polygon winding as inverted and bulges edges along great circles
-// East passes 180 when the shortest span crosses the antimeridian; MapLibre accepts this form
-function getNaturalBounds(
-	featureCollection: MapFeatureCollection,
-): [number, number, number, number] {
-	const [[west, south], [east, north]] = geoBounds({
-		type: 'MultiPoint',
-		coordinates: getVertices(featureCollection),
-	});
-
-	return [west, south, west > east ? east + 360 : east, north];
-}
-
-interface BboxBufferOptions {
-	bufferPercentage: number;
-	explicitBuffer: number | undefined;
-	minBuffer: number;
 }
 
 function getBufferedBbox(
@@ -119,52 +148,23 @@ function getMapCenter(
 	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
-// Calculate map bounds based on geodata and some parameters
-// This should not include outliers; bounds/center frame featureCollection
-// maxBounds spans limitsFeatureCollection (the rendered set)
-// By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
-// But these values can be overridden on a case-by-case basis
-export function getMapBounds({
-	featureCollection: featureCollectionRaw,
-	limitsFeatureCollection: limitsFeatureCollectionRaw,
-	boundsBuffer,
-	boundsBufferPercentage = 10,
-	limitsBuffer,
-	limitsBufferPercentage = 100,
-	targetId,
-}: MapDataBoundsProps):
-	| undefined
-	| {
-			bounds: [number, number, number, number];
-			center: [number, number];
-			maxBounds: [number, number, number, number];
-	  } {
-	if (!featureCollectionRaw) return;
-
-	const featureCollection = filterMapOutliers(featureCollectionRaw);
-
-	if (featureCollection.features.length === 0) return;
-
-	const limitsFeatureCollection = limitsFeatureCollectionRaw
-		? filterMapOutliers(limitsFeatureCollectionRaw)
-		: featureCollection;
-
-	const bounds = getBufferedBbox(featureCollection, {
-		explicitBuffer: boundsBuffer,
-		bufferPercentage: boundsBufferPercentage,
-		minBuffer: mapBoundsBufferMin,
-	});
-	const maxBounds = getBufferedBbox(limitsFeatureCollection, {
-		explicitBuffer: limitsBuffer,
-		bufferPercentage: limitsBufferPercentage,
-		minBuffer: mapLimitsBufferMin,
+// Vertices only: d3 reads GeoJSON polygon winding as inverted and bulges edges along great circles
+// East passes 180 when the shortest span crosses the antimeridian; MapLibre accepts this form
+function getNaturalBounds(
+	featureCollection: MapFeatureCollection,
+): [number, number, number, number] {
+	const [[west, south], [east, north]] = geoBounds({
+		type: 'MultiPoint',
+		coordinates: getVertices(featureCollection),
 	});
 
-	if (!bounds || !maxBounds) return;
+	return [west, south, west > east ? east + 360 : east, north];
+}
 
-	return {
-		center: getMapCenter(featureCollection, targetId),
-		bounds,
-		maxBounds,
-	};
+function getVertices(featureCollection: MapFeatureCollection): Array<Position> {
+	return featureCollection.features.flatMap(({ geometry }) => {
+		if (geometry.type === 'Point') return [geometry.coordinates];
+		if (geometry.type === 'LineString') return geometry.coordinates;
+		return geometry.coordinates.flat();
+	});
 }

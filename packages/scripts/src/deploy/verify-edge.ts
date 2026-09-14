@@ -12,68 +12,6 @@ interface EdgeExpectation {
 // Node's fetch has no default timeout, so a hung connection would stall the deploy indefinitely
 const requestTimeoutMs = 10_000;
 
-function request(url: string, method: 'GET' | 'HEAD') {
-	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
-	return fetch(url, {
-		method,
-		redirect: 'manual',
-		signal: AbortSignal.timeout(requestTimeoutMs),
-	});
-}
-
-function getExpectations(token: string): Array<EdgeExpectation> {
-	return [
-		{
-			label: 'static file',
-			path: '/favicon.svg',
-			status: 200,
-			cacheControl: 'public, max-age=31536000',
-		},
-		{
-			label: 'map chunk',
-			path: '/api/map/map-directory.json',
-			status: 200,
-			cacheControl: 'public, max-age=31536000, immutable',
-		},
-		{
-			label: 'map manifest',
-			path: '/api/map/map-manifest.json',
-			status: 200,
-			cacheControl: 'no-store',
-		},
-		{
-			label: 'objectives gate',
-			path: '/objectives/',
-			status: 401,
-			cacheControl: 'private, no-store',
-		},
-		{
-			label: 'objectives data gate',
-			path: '/api/map/objectives/s.json',
-			status: 401,
-			cacheControl: 'private, no-store',
-		},
-		{
-			label: 'robots',
-			path: '/robots.txt',
-			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400',
-		},
-		{
-			label: 'sitemap',
-			path: '/sitemap-index.xml',
-			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400',
-		},
-		{
-			label: 'not found',
-			path: `/edge-check-${token}/`,
-			status: 404,
-			cacheControl: 'public, max-age=0, s-maxage=600',
-		},
-	];
-}
-
 export async function verifyEdge(): Promise<void> {
 	const config = loadDeployConfig();
 
@@ -159,4 +97,66 @@ export async function verifyEdge(): Promise<void> {
 	}
 
 	console.log(chalk.green('Edge verification passed'));
+}
+
+function getExpectations(token: string): Array<EdgeExpectation> {
+	return [
+		{
+			label: 'static file',
+			path: '/favicon.svg',
+			status: 200,
+			cacheControl: 'public, max-age=31536000',
+		},
+		{
+			label: 'map chunk',
+			path: '/api/map/map-directory.json',
+			status: 200,
+			cacheControl: 'public, max-age=31536000, immutable',
+		},
+		{
+			label: 'map manifest',
+			path: '/api/map/map-manifest.json',
+			status: 200,
+			cacheControl: 'no-store',
+		},
+		{
+			label: 'objectives gate',
+			path: '/objectives/',
+			status: 401,
+			cacheControl: 'private, no-store',
+		},
+		{
+			label: 'objectives data gate',
+			path: '/api/map/objectives/s.json',
+			status: 401,
+			cacheControl: 'private, no-store',
+		},
+		{
+			label: 'robots',
+			path: '/robots.txt',
+			status: 200,
+			cacheControl: 'public, max-age=3600, s-maxage=86400',
+		},
+		{
+			label: 'sitemap',
+			path: '/sitemap-index.xml',
+			status: 200,
+			cacheControl: 'public, max-age=3600, s-maxage=86400',
+		},
+		{
+			label: 'not found',
+			path: `/edge-check-${token}/`,
+			status: 404,
+			cacheControl: 'public, max-age=0, s-maxage=600',
+		},
+	];
+}
+
+function request(url: string, method: 'GET' | 'HEAD') {
+	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
+	return fetch(url, {
+		method,
+		redirect: 'manual',
+		signal: AbortSignal.timeout(requestTimeoutMs),
+	});
 }

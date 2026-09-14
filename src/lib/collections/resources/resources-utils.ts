@@ -18,93 +18,15 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 
-// Matched via links URL or sources ID
-async function createLocationsByResourceFunction() {
-	const { entriesMap } = await getLocationsCollection();
-	const { locationIdsByResourceId } = await getResourceAssociation();
-
-	return function getLocationsByResource(
-		resource: CollectionEntry<'resources'>,
-	): Array<CollectionEntry<'locations'>> {
-		const locationIds = locationIdsByResourceId.get(resource.id) ?? [];
-
-		return locationIds.map((locationId) => entriesMap.get(locationId)).filter((entry) => !!entry);
-	};
-}
-
-// Matched via links URL or sources ID
-async function createPostsByResourceFunction() {
-	const { entriesMap } = await getPostsCollection();
-	const { postIdsByResourceId } = await getResourceAssociation();
-
-	return function getPostsByResource(
-		resource: CollectionEntry<'resources'>,
-	): Array<CollectionEntry<'posts'>> {
-		const postIds = postIdsByResourceId.get(resource.id) ?? [];
-
-		return postIds.map((postId) => entriesMap.get(postId)).filter((entry) => !!entry);
-	};
-}
-
-export async function createResolveResourceLinksFunction() {
-	const { entries } = await getResourcesCollection();
-
-	return function resolveResourceLinks(
-		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
-	) {
-		const entryLinks =
-			'links' in entry.data && entry.data.links && entry.data.links.length > 0
-				? entry.data.links
-				: undefined;
-
-		return entryLinks
-			?.map((entryLink) => {
-				if (typeof entryLink === 'string') {
-					const resource = entries.find((entry) => isLinkUrlMatch(entryLink, entry.data.match));
-
-					return resource ? { id: resource.id, ...resource.data, url: entryLink } : undefined;
-				}
-
-				return entryLink;
-			})
-			.filter((link) => !!link);
-	};
-}
-
-type ResolveResourceLinks = Awaited<ReturnType<typeof createResolveResourceLinksFunction>>;
-
 // Either a Resource entry flattened onto its id, or a link written inline in frontmatter
 export type ResourceLink = NonNullable<ReturnType<ResolveResourceLinks>>[number];
 
-export async function createResolveResourceSourcesFunction() {
-	const { entriesMap } = await getResourcesCollection();
-
-	return function resolveResourceSources(
-		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
-	) {
-		const entrySources =
-			'sources' in entry.data && entry.data.sources && entry.data.sources.length > 0
-				? entry.data.sources
-				: undefined;
-
-		return entrySources
-			?.map((entrySource) => {
-				if (typeof entrySource === 'string') {
-					const resource = entriesMap.get(entrySource);
-
-					return resource ? { id: resource.id, ...resource.data } : undefined;
-				}
-
-				return entrySource;
-			})
-			.filter((source) => !!source);
-	};
-}
-
-type ResolveResourceSources = Awaited<ReturnType<typeof createResolveResourceSourcesFunction>>;
-
 // A cited work, either a Resource entry flattened onto its ID or one written inline in frontmatter
 export type ResourceSource = NonNullable<ReturnType<ResolveResourceSources>>[number];
+
+type ResolveResourceLinks = Awaited<ReturnType<typeof createResolveResourceLinksFunction>>;
+
+type ResolveResourceSources = Awaited<ReturnType<typeof createResolveResourceSourcesFunction>>;
 
 export async function createQueryResourcesEntryFunction() {
 	const getLocationsByResource = await createLocationsByResourceFunction();
@@ -146,6 +68,56 @@ export async function createQueryResourcesEntryFunction() {
 	};
 }
 
+export async function createResolveResourceLinksFunction() {
+	const { entries } = await getResourcesCollection();
+
+	return function resolveResourceLinks(
+		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
+	) {
+		const entryLinks =
+			'links' in entry.data && entry.data.links && entry.data.links.length > 0
+				? entry.data.links
+				: undefined;
+
+		return entryLinks
+			?.map((entryLink) => {
+				if (typeof entryLink === 'string') {
+					const resource = entries.find((entry) => isLinkUrlMatch(entryLink, entry.data.match));
+
+					return resource ? { id: resource.id, ...resource.data, url: entryLink } : undefined;
+				}
+
+				return entryLink;
+			})
+			.filter((link) => !!link);
+	};
+}
+
+export async function createResolveResourceSourcesFunction() {
+	const { entriesMap } = await getResourcesCollection();
+
+	return function resolveResourceSources(
+		entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>,
+	) {
+		const entrySources =
+			'sources' in entry.data && entry.data.sources && entry.data.sources.length > 0
+				? entry.data.sources
+				: undefined;
+
+		return entrySources
+			?.map((entrySource) => {
+				if (typeof entrySource === 'string') {
+					const resource = entriesMap.get(entrySource);
+
+					return resource ? { id: resource.id, ...resource.data } : undefined;
+				}
+
+				return entrySource;
+			})
+			.filter((source) => !!source);
+	};
+}
+
 export async function queryResourcesIndex() {
 	const { entries } = await getResourcesCollection();
 
@@ -155,4 +127,32 @@ export async function queryResourcesIndex() {
 		R.filter(hasEntries),
 		R.sort(sortByEntryCount),
 	);
+}
+
+// Matched via links URL or sources ID
+async function createLocationsByResourceFunction() {
+	const { entriesMap } = await getLocationsCollection();
+	const { locationIdsByResourceId } = await getResourceAssociation();
+
+	return function getLocationsByResource(
+		resource: CollectionEntry<'resources'>,
+	): Array<CollectionEntry<'locations'>> {
+		const locationIds = locationIdsByResourceId.get(resource.id) ?? [];
+
+		return locationIds.map((locationId) => entriesMap.get(locationId)).filter((entry) => !!entry);
+	};
+}
+
+// Matched via links URL or sources ID
+async function createPostsByResourceFunction() {
+	const { entriesMap } = await getPostsCollection();
+	const { postIdsByResourceId } = await getResourceAssociation();
+
+	return function getPostsByResource(
+		resource: CollectionEntry<'resources'>,
+	): Array<CollectionEntry<'posts'>> {
+		const postIds = postIdsByResourceId.get(resource.id) ?? [];
+
+		return postIds.map((postId) => entriesMap.get(postId)).filter((entry) => !!entry);
+	};
 }

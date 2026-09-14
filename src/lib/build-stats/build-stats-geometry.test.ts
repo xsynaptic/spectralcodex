@@ -11,16 +11,16 @@ import {
 
 const dayZero = Date.UTC(2026, 0, 1);
 
+function buildGeometry(records: Array<BuildRecord>) {
+	return getBuildStatsGeometry(records, { daysLimit: Infinity, trendWindowDays: 14 });
+}
+
 function buildRecord(dayOffset: number, durationSeconds: number, rest: Partial<BuildRecord> = {}) {
 	return {
 		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
 		durationSeconds,
 		...rest,
 	} satisfies BuildRecord;
-}
-
-function buildGeometry(records: Array<BuildRecord>) {
-	return getBuildStatsGeometry(records, { daysLimit: Infinity, trendWindowDays: 14 });
 }
 
 describe('getBuildStatsGeometry', () => {

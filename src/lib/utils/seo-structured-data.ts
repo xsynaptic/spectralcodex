@@ -13,10 +13,7 @@ const SchemaTypeEnum = {
 	WebSite: 'WebSite',
 } as const;
 
-// Schema.org entity types adapted from schema-dts, pared down to what this project emits
-interface IdReference {
-	'@id': string;
-}
+export type Thing = Article | BreadcrumbList | Person | Place | WebSite;
 
 interface Article extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['Article'];
@@ -36,6 +33,16 @@ interface BreadcrumbList extends IdReference {
 		name: string;
 		position: number;
 	}>;
+}
+
+interface Graph {
+	'@context': 'https://schema.org';
+	'@graph': ReadonlyArray<Thing>;
+}
+
+// Schema.org entity types adapted from schema-dts, pared down to what this project emits
+interface IdReference {
+	'@id': string;
 }
 
 interface Person extends IdReference {
@@ -65,13 +72,6 @@ interface WebSite extends IdReference {
 	url: string;
 }
 
-export type Thing = Article | BreadcrumbList | Person | Place | WebSite;
-
-interface Graph {
-	'@context': 'https://schema.org';
-	'@graph': ReadonlyArray<Thing>;
-}
-
 // Built per call; hoisting these to module scope makes the import itself fail wherever SITE is unset
 const getSiteUrl = () => getAbsoluteUrl(getSitePath());
 const getAboutUrl = () => getAbsoluteUrl(getSitePath('/about'));
@@ -84,31 +84,6 @@ const ids = {
 	breadcrumb: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#breadcrumb`,
 	place: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#place`,
 };
-
-export function buildWebSiteSchema(): WebSite {
-	const t = getTranslations();
-
-	return {
-		'@type': SchemaTypeEnum.WebSite,
-		'@id': ids.website(),
-		url: getSiteUrl(),
-		name: t('site.title'),
-		publisher: { '@id': ids.person() },
-		description: t('site.description'),
-	};
-}
-
-export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }): Person {
-	const t = getTranslations();
-
-	return {
-		'@type': SchemaTypeEnum.Person,
-		'@id': ids.person(),
-		name: t('author.name'),
-		url: getAboutUrl(),
-		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
-	};
-}
 
 export function buildArticleSchema(props: {
 	dateCreated: Date;
@@ -130,19 +105,15 @@ export function buildArticleSchema(props: {
 	};
 }
 
-function buildBreadcrumbSchema(
-	items: ReadonlyArray<{ name: string; url?: string }>,
-	pageUrl: string,
-): BreadcrumbList {
+export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }): Person {
+	const t = getTranslations();
+
 	return {
-		'@type': SchemaTypeEnum.BreadcrumbList,
-		'@id': ids.breadcrumb(pageUrl),
-		itemListElement: items.map((item, index) => ({
-			'@type': SchemaTypeEnum.ListItem,
-			position: index + 1,
-			name: item.name,
-			...(item.url ? { item: getAbsoluteUrl(item.url) } : {}),
-		})),
+		'@type': SchemaTypeEnum.Person,
+		'@id': ids.person(),
+		name: t('author.name'),
+		url: getAboutUrl(),
+		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
 	};
 }
 
@@ -193,6 +164,19 @@ export function buildPlaceSchema(props: {
 	};
 }
 
+export function buildWebSiteSchema(): WebSite {
+	const t = getTranslations();
+
+	return {
+		'@type': SchemaTypeEnum.WebSite,
+		'@id': ids.website(),
+		url: getSiteUrl(),
+		name: t('site.title'),
+		publisher: { '@id': ids.person() },
+		description: t('site.description'),
+	};
+}
+
 /**
  * Serialize a page's graph entities for injection via <script type="application/ld+json">
  * Escapes `<`, `>`, `&` to prevent breaking out of the script tag
@@ -207,4 +191,20 @@ export function serializeGraph(entities: ReadonlyArray<Thing>): string {
 		.replaceAll('<', String.raw`\u003c`)
 		.replaceAll('>', String.raw`\u003e`)
 		.replaceAll('&', String.raw`\u0026`);
+}
+
+function buildBreadcrumbSchema(
+	items: ReadonlyArray<{ name: string; url?: string }>,
+	pageUrl: string,
+): BreadcrumbList {
+	return {
+		'@type': SchemaTypeEnum.BreadcrumbList,
+		'@id': ids.breadcrumb(pageUrl),
+		itemListElement: items.map((item, index) => ({
+			'@type': SchemaTypeEnum.ListItem,
+			position: index + 1,
+			name: item.name,
+			...(item.url ? { item: getAbsoluteUrl(item.url) } : {}),
+		})),
+	};
 }

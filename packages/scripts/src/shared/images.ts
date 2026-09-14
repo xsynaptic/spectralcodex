@@ -4,28 +4,6 @@ import path from 'node:path';
 
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 
-export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
-	const imageFeatured = frontmatter.imageFeatured;
-
-	if (!imageFeatured) return [];
-
-	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
-
-	if (!parsed.success) return [];
-
-	const data = parsed.data;
-
-	if (typeof data === 'string') return [data];
-
-	return data.map((item) => (typeof item === 'string' ? item : item.id));
-}
-
-export function extractMdxImageIds(content: string): Array<string> {
-	return findComponentTags(content, ['Img'])
-		.map((tag) => getTagProp(tag, 'src'))
-		.filter((src) => src !== undefined);
-}
-
 export function collectMediaFiles(
 	mediaPath: string,
 	options?: { ignore?: ReadonlyArray<string> },
@@ -53,4 +31,26 @@ export function collectMediaFiles(
 	processDirectory(mediaPath);
 
 	return files;
+}
+
+export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
+	const imageFeatured = frontmatter.imageFeatured;
+
+	if (!imageFeatured) return [];
+
+	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
+
+	if (!parsed.success) return [];
+
+	const data = parsed.data;
+
+	if (typeof data === 'string') return [data];
+
+	return data.map((item) => (typeof item === 'string' ? item : item.id));
+}
+
+export function extractMdxImageIds(content: string): Array<string> {
+	return findComponentTags(content, ['Img'])
+		.map((tag) => getTagProp(tag, 'src'))
+		.filter((src) => src !== undefined);
 }

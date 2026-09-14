@@ -11,21 +11,11 @@ interface CollectionEntryWithEntryCount {
 	};
 }
 
-// Sort a collection by entry count, from most to least
-export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA: T, entryB: T) {
-	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
-export function hasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
-	return (entry.data._entryCount ?? 0) > 0;
-}
-
-// Collection data factory utilities
-interface CollectionResult<K extends CollectionKey> {
-	entries: Array<CollectionEntry<K>>;
-	entriesMap: Map<string, CollectionEntry<K>>;
-}
+// Collection-level derivation; its return is merged into the result so consumers can read the artifact
+type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
+	entries: Array<CollectionEntry<K>>,
+	entriesMap: Map<string, CollectionEntry<K>>,
+) => A | Promise<A>;
 
 // Per-entry mutation over the loaded entries; stamps computed fields onto entry.data in place
 type CollectionMutateFunction<K extends CollectionKey> = (
@@ -33,11 +23,11 @@ type CollectionMutateFunction<K extends CollectionKey> = (
 	entriesMap: Map<string, CollectionEntry<K>>,
 ) => Promise<void> | void;
 
-// Collection-level derivation; its return is merged into the result so consumers can read the artifact
-type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
-	entries: Array<CollectionEntry<K>>,
-	entriesMap: Map<string, CollectionEntry<K>>,
-) => A | Promise<A>;
+// Collection data factory utilities
+interface CollectionResult<K extends CollectionKey> {
+	entries: Array<CollectionEntry<K>>;
+	entriesMap: Map<string, CollectionEntry<K>>;
+}
 
 // Factory for memoized, enriched collection data
 // mutate() stamps computed `_` fields onto entry.data in place; extend() derives collection-level artifacts
@@ -84,32 +74,22 @@ export function createCollectionData<K extends CollectionKey, A extends object =
 	};
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
+export function hasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
+	return (entry.data._entryCount ?? 0) > 0;
+}
+
+// Sort a collection by entry count, from most to least
+export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA: T, entryB: T) {
+	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);
+}
+
 // Explicit raw read for cross-collection assembly; bypasses the enriched wrappers to avoid circular init
 // Per the ordering contract above: use for pristine frontmatter only, never computed `_` fields
 const rawCollectionPromises = new Map<
 	CollectionKey,
 	Promise<Array<CollectionEntry<CollectionKey>>>
 >();
-
-export async function getRawCollection<K extends CollectionKey>(
-	collection: K,
-): Promise<Array<CollectionEntry<K>>> {
-	let promise = rawCollectionPromises.get(collection);
-
-	if (!promise) {
-		promise = getCollection(collection);
-		rawCollectionPromises.set(collection, promise);
-	}
-
-	const entries = (await promise) as Array<CollectionEntry<K>>;
-
-	// Mirror createCollectionData: evict an empty dev load so the content store can recover next call
-	if (import.meta.env.DEV && entries.length === 0) {
-		rawCollectionPromises.delete(collection);
-	}
-
-	return entries;
-}
 
 // Factory function to create a lookup function for collection entries by ID
 export function createCollectionLookupByIds<K extends CollectionKey>(
@@ -132,4 +112,24 @@ export function createCollectionLookupByIds<K extends CollectionKey>(
 				.filter((entry): entry is CollectionEntry<K> => !!entry);
 		};
 	};
+}
+
+export async function getRawCollection<K extends CollectionKey>(
+	collection: K,
+): Promise<Array<CollectionEntry<K>>> {
+	let promise = rawCollectionPromises.get(collection);
+
+	if (!promise) {
+		promise = getCollection(collection);
+		rawCollectionPromises.set(collection, promise);
+	}
+
+	const entries = (await promise) as Array<CollectionEntry<K>>;
+
+	// Mirror createCollectionData: evict an empty dev load so the content store can recover next call
+	if (import.meta.env.DEV && entries.length === 0) {
+		rawCollectionPromises.delete(collection);
+	}
+
+	return entries;
 }

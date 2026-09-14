@@ -9,8 +9,17 @@ const cjkLanguages: ReadonlySet<LanguageCode> = new Set([
 	LanguageCodeEnum.Korean,
 ]);
 
-export function isCjkLanguage(lang: LanguageCode): boolean {
-	return cjkLanguages.has(lang);
+interface MultilingualContentOptions {
+	data: Record<string, unknown> | undefined;
+	langCode?: LanguageCode;
+	prop: string;
+}
+
+export function formatTitleMultilingual(
+	title: string,
+	titleMultilingual: MultilingualContent | undefined,
+) {
+	return titleMultilingual ? `${title} (${titleMultilingual.value})` : title;
 }
 
 // Map data shows English + Traditional Chinese for zh-language regions
@@ -20,10 +29,34 @@ export function getMapLanguages(langCode: string | undefined) {
 		: {};
 }
 
-interface MultilingualContentOptions {
-	data: Record<string, unknown> | undefined;
-	langCode?: LanguageCode;
-	prop: string;
+export function getMultilingualContent({
+	langCodeAdditional,
+	...options
+}: MultilingualContentOptions & { langCodeAdditional?: LanguageCode }):
+	| undefined
+	| {
+			additional?: MultilingualContent;
+			primary: MultilingualContent;
+	  } {
+	const multilingualContent = getAllMultilingualContent(options);
+
+	if (!multilingualContent) return;
+
+	const primary = multilingualContent[0];
+
+	if (!primary) return;
+
+	const additional = langCodeAdditional
+		? multilingualContent.find(
+				(item) => item.lang === langCodeAdditional && item.lang !== primary.lang,
+			)
+		: undefined;
+
+	return additional ? { primary, additional } : { primary };
+}
+
+export function isCjkLanguage(lang: LanguageCode): boolean {
+	return cjkLanguages.has(lang);
 }
 
 function getAllMultilingualContent({
@@ -53,37 +86,4 @@ function getAllMultilingualContent({
 	}
 
 	return multilingualContent.length > 0 ? multilingualContent : undefined;
-}
-
-export function getMultilingualContent({
-	langCodeAdditional,
-	...options
-}: MultilingualContentOptions & { langCodeAdditional?: LanguageCode }):
-	| undefined
-	| {
-			additional?: MultilingualContent;
-			primary: MultilingualContent;
-	  } {
-	const multilingualContent = getAllMultilingualContent(options);
-
-	if (!multilingualContent) return;
-
-	const primary = multilingualContent[0];
-
-	if (!primary) return;
-
-	const additional = langCodeAdditional
-		? multilingualContent.find(
-				(item) => item.lang === langCodeAdditional && item.lang !== primary.lang,
-			)
-		: undefined;
-
-	return additional ? { primary, additional } : { primary };
-}
-
-export function formatTitleMultilingual(
-	title: string,
-	titleMultilingual: MultilingualContent | undefined,
-) {
-	return titleMultilingual ? `${title} (${titleMultilingual.value})` : title;
 }

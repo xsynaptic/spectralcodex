@@ -13,13 +13,13 @@ import type {
 import { millisecondsPerDay } from '#constants.ts';
 import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
-interface ChronologyRawMonthData extends Pick<
-	ChronologyMonthlyItem,
-	'id' | 'month' | 'monthName' | 'title' | 'year'
-> {
-	created: Set<CatalogItem>;
-	updated: Set<CatalogItem>;
-	visited: Set<CatalogItem>;
+interface ChronologyData {
+	chronologyDailyData: ChronologyDailyData;
+	chronologyIndexData: ChronologyIndexData;
+	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
+	chronologyMonths: Record<string, Array<string>>;
+	chronologyYearlyData: Record<string, Array<ChronologyMonthlyItem>>;
+	chronologyYears: Array<string>;
 }
 
 type ChronologyDataMap = Map<string, Map<string, ChronologyRawMonthData>>;
@@ -30,41 +30,13 @@ interface ChronologyDateData {
 	year: string;
 }
 
-interface ChronologyData {
-	chronologyDailyData: ChronologyDailyData;
-	chronologyIndexData: ChronologyIndexData;
-	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
-	chronologyMonths: Record<string, Array<string>>;
-	chronologyYearlyData: Record<string, Array<ChronologyMonthlyItem>>;
-	chronologyYears: Array<string>;
-}
-
-// Content dates are UTC instants; bucket in UTC so chronology membership matches displayed dates
-export function getDateData(date: Date): ChronologyDateData {
-	return {
-		date,
-		month: String(date.getUTCMonth() + 1).padStart(2, '0'),
-		year: String(date.getUTCFullYear()).padStart(4, '0'),
-	};
-}
-
-// Every UTC day covered by a recorded range, start to end inclusive
-// A single date yields one day
-function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
-	const startDay = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
-	const endSource = end ?? start;
-	const endDay = Math.max(
-		startDay,
-		Date.UTC(endSource.getUTCFullYear(), endSource.getUTCMonth(), endSource.getUTCDate()),
-	);
-
-	const days: Array<Date> = [];
-
-	for (let time = startDay; time <= endDay; time += millisecondsPerDay) {
-		days.push(new Date(time));
-	}
-
-	return days;
+interface ChronologyRawMonthData extends Pick<
+	ChronologyMonthlyItem,
+	'id' | 'month' | 'monthName' | 'title' | 'year'
+> {
+	created: Set<CatalogItem>;
+	updated: Set<CatalogItem>;
+	visited: Set<CatalogItem>;
 }
 
 export function buildChronologyDailyData(items: ReadonlyArray<CatalogItem>): ChronologyDailyData {
@@ -116,8 +88,36 @@ export function buildChronologyDailyData(items: ReadonlyArray<CatalogItem>): Chr
 	return dailyData;
 }
 
+// Content dates are UTC instants; bucket in UTC so chronology membership matches displayed dates
+export function getDateData(date: Date): ChronologyDateData {
+	return {
+		date,
+		month: String(date.getUTCMonth() + 1).padStart(2, '0'),
+		year: String(date.getUTCFullYear()).padStart(4, '0'),
+	};
+}
+
 export function getMonthName(date: Date): string {
 	return date.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });
+}
+
+// Every UTC day covered by a recorded range, start to end inclusive
+// A single date yields one day
+function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
+	const startDay = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+	const endSource = end ?? start;
+	const endDay = Math.max(
+		startDay,
+		Date.UTC(endSource.getUTCFullYear(), endSource.getUTCMonth(), endSource.getUTCDate()),
+	);
+
+	const days: Array<Date> = [];
+
+	for (let time = startDay; time <= endDay; time += millisecondsPerDay) {
+		days.push(new Date(time));
+	}
+
+	return days;
 }
 
 function getOrCreateMonthData(chronologyDataMap: ChronologyDataMap, dateData: ChronologyDateData) {
@@ -174,6 +174,18 @@ function createHighlightSelector() {
 
 const collectionsExcluded = ['pages'] satisfies Array<CatalogCollectionKey>;
 
+// The three categories, as either raw buckets or the projected (filtered, capped, deduped) tier result
+interface ChronologyTierBuckets {
+	created: Array<CatalogItem>;
+	updated: Array<CatalogItem>;
+	visited: Array<CatalogItem>;
+}
+
+interface ChronologyTierOptions {
+	entryQuality: number;
+	limit?: number | undefined;
+}
+
 function addRecordedVisits(chronologyDataMap: ChronologyDataMap, item: CatalogItem): void {
 	if (!item.dateRecorded) return;
 
@@ -217,25 +229,6 @@ function buildChronologyDataMap(items: ReadonlyArray<CatalogItem>): ChronologyDa
 	return chronologyDataMap;
 }
 
-// The three categories, as either raw buckets or the projected (filtered, capped, deduped) tier result
-interface ChronologyTierBuckets {
-	created: Array<CatalogItem>;
-	updated: Array<CatalogItem>;
-	visited: Array<CatalogItem>;
-}
-
-function sortAndLimit(items: Array<CatalogItem>, limit?: number) {
-	const sorted = R.sortBy(
-		items,
-		[R.prop('entryQuality'), 'desc'],
-		// Surface entries with a featured image ahead of those without within a given quality tier
-		[(item) => (item.imageId ? 1 : 0), 'desc'],
-		[R.prop('title'), 'asc'],
-	);
-
-	return limit === undefined ? sorted : sorted.slice(0, limit);
-}
-
 // Deduplicate across categories within one scope: updated > created > visited
 function deduplicateCategories(
 	updated: Array<CatalogItem>,
@@ -254,9 +247,16 @@ function deduplicateCategories(
 	return { updated, created: createdFiltered, visited: visitedFiltered };
 }
 
-interface ChronologyTierOptions {
-	entryQuality: number;
-	limit?: number | undefined;
+function sortAndLimit(items: Array<CatalogItem>, limit?: number) {
+	const sorted = R.sortBy(
+		items,
+		[R.prop('entryQuality'), 'desc'],
+		// Surface entries with a featured image ahead of those without within a given quality tier
+		[(item) => (item.imageId ? 1 : 0), 'desc'],
+		[R.prop('title'), 'asc'],
+	);
+
+	return limit === undefined ? sorted : sorted.slice(0, limit);
 }
 
 const monthlyTierOptions: ChronologyTierOptions = { entryQuality: 1 };
@@ -264,148 +264,8 @@ const indexTierOptions: ChronologyTierOptions = { entryQuality: 3, limit: 20 };
 const yearlyQualityFloor = 2;
 const yearlyLimit = 20;
 
-function projectChronologyTier(
-	buckets: ChronologyTierBuckets,
-	{ entryQuality, limit }: ChronologyTierOptions,
-): ChronologyTierBuckets {
-	return deduplicateCategories(
-		sortAndLimit(
-			buckets.updated.filter((item) => item.entryQuality >= entryQuality),
-			limit,
-		),
-		sortAndLimit(
-			buckets.created.filter((item) => item.entryQuality >= entryQuality),
-			limit,
-		),
-		sortAndLimit(
-			buckets.visited.filter((item) => item.entryQuality >= entryQuality),
-			limit,
-		),
-	);
-}
-
-function hasTierData(tier: ChronologyTierBuckets): boolean {
-	return tier.updated.length > 0 || tier.created.length > 0 || tier.visited.length > 0;
-}
-
-// Counts reflect the full bucket totals (before the entry quality floor and cap), unlike the tier lists
-function getBucketCounts(buckets: ChronologyTierBuckets) {
-	return {
-		updatedCount: buckets.updated.length,
-		createdCount: buckets.created.length,
-		visitedCount: buckets.visited.length,
-	};
-}
-
-function isAboveYearlyFloor(item: CatalogItem): boolean {
-	return item.entryQuality >= yearlyQualityFloor;
-}
-
-// Across a year an entry occupies one category by precedence
-// It appears once in the yearly view regardless of month processing order
-function getYearlyWinningCategories(
-	yearBuckets: ChronologyTierBuckets,
-): Map<string, keyof ChronologyTierBuckets> {
-	const winning = new Map<string, keyof ChronologyTierBuckets>();
-
-	// Set in reverse precedence so a later write wins: updated overrides created overrides visited
-	for (const item of yearBuckets.visited) {
-		if (isAboveYearlyFloor(item)) winning.set(item.id, 'visited');
-	}
-	for (const item of yearBuckets.created) {
-		if (isAboveYearlyFloor(item)) winning.set(item.id, 'created');
-	}
-	for (const item of yearBuckets.updated) {
-		if (isAboveYearlyFloor(item)) winning.set(item.id, 'updated');
-	}
-
-	return winning;
-}
-
 interface ChronologyMonthBuckets extends ChronologyTierBuckets {
 	raw: ChronologyRawMonthData;
-}
-
-function toMonthBuckets(raw: ChronologyRawMonthData): ChronologyMonthBuckets {
-	return {
-		raw,
-		updated: [...raw.updated],
-		created: [...raw.created],
-		visited: [...raw.visited],
-	};
-}
-
-function buildMonthlyItems(
-	months: Array<ChronologyMonthBuckets>,
-	chronologyMap: Map<string, CollectionEntry<'chronology'>>,
-): Array<ChronologyMonthlyItem> {
-	const monthlyItems: Array<ChronologyMonthlyItem> = [];
-
-	for (const month of months) {
-		const tier = projectChronologyTier(month, monthlyTierOptions);
-
-		if (!hasTierData(tier)) continue;
-
-		monthlyItems.push({
-			...month.raw,
-			highlights: undefined,
-			...getBucketCounts(month),
-			...tier,
-			chronologyEntry: chronologyMap.get(month.raw.id),
-		});
-	}
-
-	return monthlyItems;
-}
-
-// Chronological so the earliest month wins a shared featured image
-function assignMonthlyHighlights(monthlyItems: Array<ChronologyMonthlyItem>): void {
-	const selectMonthlyHighlights = createHighlightSelector();
-
-	const sortedMonthlyItems = R.sortBy(monthlyItems, (item) => item.month);
-
-	for (const monthlyItem of sortedMonthlyItems) {
-		monthlyItem.highlights = selectMonthlyHighlights([
-			...monthlyItem.created,
-			...monthlyItem.updated,
-			...monthlyItem.visited,
-		]);
-	}
-}
-
-// An entry occupies its highest-precedence category for the year; the monthly highlights carry over
-function buildYearlyItems(
-	months: Array<ChronologyMonthBuckets>,
-	yearBuckets: ChronologyTierBuckets,
-	monthlyHighlightsById: ReadonlyMap<string, ChronologyMonthlyItem['highlights']>,
-): Array<ChronologyMonthlyItem> {
-	const winningCategory = getYearlyWinningCategories(yearBuckets);
-	const yearlyItems: Array<ChronologyMonthlyItem> = [];
-
-	for (const month of months) {
-		const takeWinners = (category: keyof ChronologyTierBuckets) =>
-			sortAndLimit(
-				month[category].filter((item) => winningCategory.get(item.id) === category),
-				yearlyLimit,
-			);
-
-		const tier: ChronologyTierBuckets = {
-			updated: takeWinners('updated'),
-			created: takeWinners('created'),
-			visited: takeWinners('visited'),
-		};
-
-		if (!hasTierData(tier)) continue;
-
-		yearlyItems.push({
-			...month.raw,
-			highlights: monthlyHighlightsById.get(month.raw.id),
-			...getBucketCounts(month),
-			...tier,
-		});
-	}
-
-	return yearlyItems;
 }
 
 export function createChronologyData(
@@ -489,5 +349,145 @@ export function createChronologyData(
 		chronologyDailyData: Object.fromEntries(
 			Object.entries(chronologyDailyData).filter(([year]) => yearHasView.has(year)),
 		),
+	};
+}
+
+// Chronological so the earliest month wins a shared featured image
+function assignMonthlyHighlights(monthlyItems: Array<ChronologyMonthlyItem>): void {
+	const selectMonthlyHighlights = createHighlightSelector();
+
+	const sortedMonthlyItems = R.sortBy(monthlyItems, (item) => item.month);
+
+	for (const monthlyItem of sortedMonthlyItems) {
+		monthlyItem.highlights = selectMonthlyHighlights([
+			...monthlyItem.created,
+			...monthlyItem.updated,
+			...monthlyItem.visited,
+		]);
+	}
+}
+
+function buildMonthlyItems(
+	months: Array<ChronologyMonthBuckets>,
+	chronologyMap: Map<string, CollectionEntry<'chronology'>>,
+): Array<ChronologyMonthlyItem> {
+	const monthlyItems: Array<ChronologyMonthlyItem> = [];
+
+	for (const month of months) {
+		const tier = projectChronologyTier(month, monthlyTierOptions);
+
+		if (!hasTierData(tier)) continue;
+
+		monthlyItems.push({
+			...month.raw,
+			highlights: undefined,
+			...getBucketCounts(month),
+			...tier,
+			chronologyEntry: chronologyMap.get(month.raw.id),
+		});
+	}
+
+	return monthlyItems;
+}
+
+// An entry occupies its highest-precedence category for the year; the monthly highlights carry over
+function buildYearlyItems(
+	months: Array<ChronologyMonthBuckets>,
+	yearBuckets: ChronologyTierBuckets,
+	monthlyHighlightsById: ReadonlyMap<string, ChronologyMonthlyItem['highlights']>,
+): Array<ChronologyMonthlyItem> {
+	const winningCategory = getYearlyWinningCategories(yearBuckets);
+	const yearlyItems: Array<ChronologyMonthlyItem> = [];
+
+	for (const month of months) {
+		const takeWinners = (category: keyof ChronologyTierBuckets) =>
+			sortAndLimit(
+				month[category].filter((item) => winningCategory.get(item.id) === category),
+				yearlyLimit,
+			);
+
+		const tier: ChronologyTierBuckets = {
+			updated: takeWinners('updated'),
+			created: takeWinners('created'),
+			visited: takeWinners('visited'),
+		};
+
+		if (!hasTierData(tier)) continue;
+
+		yearlyItems.push({
+			...month.raw,
+			highlights: monthlyHighlightsById.get(month.raw.id),
+			...getBucketCounts(month),
+			...tier,
+		});
+	}
+
+	return yearlyItems;
+}
+
+// Counts reflect the full bucket totals (before the entry quality floor and cap), unlike the tier lists
+function getBucketCounts(buckets: ChronologyTierBuckets) {
+	return {
+		updatedCount: buckets.updated.length,
+		createdCount: buckets.created.length,
+		visitedCount: buckets.visited.length,
+	};
+}
+
+// Across a year an entry occupies one category by precedence
+// It appears once in the yearly view regardless of month processing order
+function getYearlyWinningCategories(
+	yearBuckets: ChronologyTierBuckets,
+): Map<string, keyof ChronologyTierBuckets> {
+	const winning = new Map<string, keyof ChronologyTierBuckets>();
+
+	// Set in reverse precedence so a later write wins: updated overrides created overrides visited
+	for (const item of yearBuckets.visited) {
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'visited');
+	}
+	for (const item of yearBuckets.created) {
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'created');
+	}
+	for (const item of yearBuckets.updated) {
+		if (isAboveYearlyFloor(item)) winning.set(item.id, 'updated');
+	}
+
+	return winning;
+}
+
+function hasTierData(tier: ChronologyTierBuckets): boolean {
+	return tier.updated.length > 0 || tier.created.length > 0 || tier.visited.length > 0;
+}
+
+function isAboveYearlyFloor(item: CatalogItem): boolean {
+	return item.entryQuality >= yearlyQualityFloor;
+}
+
+function projectChronologyTier(
+	buckets: ChronologyTierBuckets,
+	{ entryQuality, limit }: ChronologyTierOptions,
+): ChronologyTierBuckets {
+	return deduplicateCategories(
+		sortAndLimit(
+			buckets.updated.filter((item) => item.entryQuality >= entryQuality),
+			limit,
+		),
+		sortAndLimit(
+			buckets.created.filter((item) => item.entryQuality >= entryQuality),
+			limit,
+		),
+		sortAndLimit(
+			buckets.visited.filter((item) => item.entryQuality >= entryQuality),
+			limit,
+		),
+	);
+}
+
+function toMonthBuckets(raw: ChronologyRawMonthData): ChronologyMonthBuckets {
+	return {
+		raw,
+		updated: [...raw.updated],
+		created: [...raw.created],
+		visited: [...raw.visited],
 	};
 }

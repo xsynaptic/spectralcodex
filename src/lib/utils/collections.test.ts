@@ -6,6 +6,11 @@ const { getCollectionMock } = vi.hoisted(() => ({ getCollectionMock: vi.fn() }))
 
 vi.mock('astro:content', () => ({ getCollection: getCollectionMock }));
 
+// The raw collection cache is module scoped; every test needs its own module instance
+async function importCollections() {
+	return import('#lib/utils/collections.ts');
+}
+
 // Minimal fixtures; only the fields the factory reads, cast to the collection entry type
 function makePost(id: string): CollectionEntry<'posts'> {
 	return {
@@ -17,11 +22,6 @@ function makePost(id: string): CollectionEntry<'posts'> {
 
 function noop() {
 	// Intentionally empty
-}
-
-// The raw collection cache is module scoped; every test needs its own module instance
-async function importCollections() {
-	return import('#lib/utils/collections.ts');
 }
 
 beforeEach(() => {

@@ -1,16 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-// eslint-disable-next-line unicorn/consistent-boolean-name -- named for its useSyncExternalStore slot, not for what it returns
-function getServerSnapshot() {
-	return false;
-}
-
-function buildMediaQuery(above?: string, below?: string, query?: string): string {
-	if (above) return `(min-width: ${above})`;
-	if (below) return `(max-width: ${below})`;
-	return query ?? '';
-}
-
 // eslint-disable-next-line unicorn/consistent-boolean-name -- the conventional name for this hook; call sites bind the result to an `is` variable
 export function useMediaQuery({
 	query,
@@ -41,4 +30,15 @@ export function useMediaQuery({
 	}, [mediaQuery]);
 
 	return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+function buildMediaQuery(above?: string, below?: string, query?: string): string {
+	if (above) return `(min-width: ${above})`;
+	if (below) return `(max-width: ${below})`;
+	return query ?? '';
+}
+
+// eslint-disable-next-line unicorn/consistent-boolean-name -- named for its useSyncExternalStore slot, not for what it returns
+function getServerSnapshot() {
+	return false;
 }

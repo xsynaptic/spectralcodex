@@ -3,17 +3,6 @@ import type { NavigationItem } from '#components/navigation/navigation-types.ts'
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
-// Exact match only; aria-current="page" must not land on an ancestor of the current page
-export function isCurrentNavigationItem(item: NavigationItem, pathname: string): boolean {
-	return item.url === pathname;
-}
-
-export function isActiveNavigationItem(item: NavigationItem, pathname: string): boolean {
-	if (isCurrentNavigationItem(item, pathname)) return true;
-
-	return item.children?.some((child) => isActiveNavigationItem(child, pathname)) ?? false;
-}
-
 export function getNavigationItemAriaLabel(item: NavigationItem) {
 	const t = getTranslations();
 
@@ -26,6 +15,17 @@ export function getNavigationItemTriggerType(item: NavigationItem) {
 	if (item.children?.length) return 'button';
 
 	return 'span';
+}
+
+export function isActiveNavigationItem(item: NavigationItem, pathname: string): boolean {
+	if (isCurrentNavigationItem(item, pathname)) return true;
+
+	return item.children?.some((child) => isActiveNavigationItem(child, pathname)) ?? false;
+}
+
+// Exact match only; aria-current="page" must not land on an ancestor of the current page
+export function isCurrentNavigationItem(item: NavigationItem, pathname: string): boolean {
+	return item.url === pathname;
 }
 
 const multilingualRegions = new Set(['hong-kong', 'taiwan']);

@@ -47,6 +47,12 @@ export const ImageSizeEnum = {
 	ExtraExtraExtraLarge: 3600,
 } as const;
 
+export type ImageComponentProps = HTMLAttributes<'img'> &
+	Omit<UnpicBaseImageProps<ImagorOperations, ImagorOptions, CoreImageAttributes>, 'transformer'> & {
+		imageFormat?: ImageFormat;
+		imageQuality?: number;
+	};
+
 export interface ImagePlaceholderProps {
 	aspectRatio: number;
 	fit?: ImageFitOption;
@@ -54,9 +60,3 @@ export interface ImagePlaceholderProps {
 	imageId: string;
 	position?: string;
 }
-
-export type ImageComponentProps = HTMLAttributes<'img'> &
-	Omit<UnpicBaseImageProps<ImagorOperations, ImagorOptions, CoreImageAttributes>, 'transformer'> & {
-		imageFormat?: ImageFormat;
-		imageQuality?: number;
-	};

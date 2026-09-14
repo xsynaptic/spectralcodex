@@ -12,13 +12,13 @@ const WashColorEnum = {
 	AccentFeatured: 'accent-featured',
 } as const;
 
-type WashColor = (typeof WashColorEnum)[keyof typeof WashColorEnum];
-
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
 	showDarkMode?: boolean | undefined;
 	washColor?: WashColor;
 }>;
+
+type WashColor = (typeof WashColorEnum)[keyof typeof WashColorEnum];
 
 const {
 	as: Tag = 'div',

@@ -5,25 +5,6 @@ import { createStore } from 'zustand';
 
 import type { MapScope } from '#types.ts';
 
-type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
-
-interface MapDataState {
-	entryQualityFilter: number;
-	filterPosition: DOMCoordinates | undefined;
-	hoveredId: string | undefined;
-	isCanvasInteractive: boolean;
-	isCanvasLoading: boolean;
-	isFilterOpen: boolean;
-	isObjectiveFilterEnabled: boolean;
-	isPopupVisible: boolean;
-	languages: Array<string>;
-	objectiveFilter: number;
-	ratingFilter: number;
-	scope: MapScope | undefined;
-	selectedId: string | undefined;
-	statusFilter: Array<LocationStatus>;
-}
-
 export type MapDataConfigurableState = Pick<
 	MapDataState,
 	| 'entryQualityFilter'
@@ -57,6 +38,25 @@ export interface MapDataStore extends MapDataState {
 		showAllStatusFilter: () => void;
 		toggleStatusFilter: (status: LocationStatus) => void;
 	};
+}
+
+type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
+
+interface MapDataState {
+	entryQualityFilter: number;
+	filterPosition: DOMCoordinates | undefined;
+	hoveredId: string | undefined;
+	isCanvasInteractive: boolean;
+	isCanvasLoading: boolean;
+	isFilterOpen: boolean;
+	isObjectiveFilterEnabled: boolean;
+	isPopupVisible: boolean;
+	languages: Array<string>;
+	objectiveFilter: number;
+	ratingFilter: number;
+	scope: MapScope | undefined;
+	selectedId: string | undefined;
+	statusFilter: Array<LocationStatus>;
 }
 
 const defaultMapDataState = {

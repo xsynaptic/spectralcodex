@@ -6,24 +6,16 @@ export const DatePresetEnum = {
 
 export type DatePreset = (typeof DatePresetEnum)[keyof typeof DatePresetEnum];
 
-// UTC 'YYYY-MM-DD' key; content dates are UTC instants, so bucket by day in UTC
-export function getDayKey(date: Date): string {
-	const year = String(date.getUTCFullYear()).padStart(4, '0');
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const day = String(date.getUTCDate()).padStart(2, '0');
-	return `${year}-${month}-${day}`;
-}
-
-interface ContentDate {
-	date: Date;
-	hasTime: boolean;
+export interface DateRange {
+	end?: ContentDate;
+	start: ContentDate;
 }
 
 export type DateRecordedEntry = [ContentDate, ContentDate] | ContentDate;
 
-export interface DateRange {
-	end?: ContentDate;
-	start: ContentDate;
+interface ContentDate {
+	date: Date;
+	hasTime: boolean;
 }
 
 export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRange> {
@@ -32,6 +24,14 @@ export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRang
 			Array.isArray(entry) ? { start: entry[0], end: entry[1] } : { start: entry },
 		)
 		.sort((a, b) => a.start.date.valueOf() - b.start.date.valueOf());
+}
+
+// UTC 'YYYY-MM-DD' key; content dates are UTC instants, so bucket by day in UTC
+export function getDayKey(date: Date): string {
+	const year = String(date.getUTCFullYear()).padStart(4, '0');
+	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+	const day = String(date.getUTCDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
 }
 
 const ordinalRules = new Intl.PluralRules('en-US', { type: 'ordinal' });
@@ -45,30 +45,11 @@ const ordinalSuffixes: Record<Intl.LDMLPluralRule, string> = {
 	other: 'th',
 };
 
-function getOrdinalDay(day: number): string {
-	return `${String(day)}${ordinalSuffixes[ordinalRules.select(day)]}`;
-}
-
-// Ordinal day suffixes only read correctly alongside a month name, not a numeric date
-function isMonthNameFormat(options: Intl.DateTimeFormatOptions): boolean {
-	return options.month === 'long' || options.month === 'short';
-}
-
-function formatDateOrdinal(date: Date, options: Intl.DateTimeFormatOptions): string {
-	const formatter = new Intl.DateTimeFormat('en-US', options);
-
-	if (!isMonthNameFormat(options)) return formatter.format(date);
-
-	return formatter
-		.formatToParts(date)
-		.map((part) => (part.type === 'day' ? getOrdinalDay(Number(part.value)) : part.value))
-		.join('');
-}
-
-function getYearPart(date: Date, options: Intl.DateTimeFormatOptions): string | undefined {
-	return new Intl.DateTimeFormat('en-US', options)
-		.formatToParts(date)
-		.find((part) => part.type === 'year')?.value;
+interface CollectionEntryWithStandardDates {
+	data: {
+		dateCreated: Date;
+		dateUpdated?: Date | undefined;
+	};
 }
 
 // "May 13th to May 15th, 2018": month repeated, year shown once when both ends share it
@@ -92,13 +73,6 @@ export function getDateDisplay(
 	return `${formatDateOrdinal(date, startOptions)} to ${formatDateOrdinal(dateEnd, options)}`;
 }
 
-interface CollectionEntryWithStandardDates {
-	data: {
-		dateCreated: Date;
-		dateUpdated?: Date | undefined;
-	};
-}
-
 // Intended to be a generic sort function for any collection entry with these standard date values
 export function sortByDateReverseChronological(
 	a: CollectionEntryWithStandardDates,
@@ -108,4 +82,30 @@ export function sortByDateReverseChronological(
 	const bDate = b.data.dateUpdated ?? b.data.dateCreated;
 
 	return bDate.getTime() - aDate.getTime();
+}
+
+function formatDateOrdinal(date: Date, options: Intl.DateTimeFormatOptions): string {
+	const formatter = new Intl.DateTimeFormat('en-US', options);
+
+	if (!isMonthNameFormat(options)) return formatter.format(date);
+
+	return formatter
+		.formatToParts(date)
+		.map((part) => (part.type === 'day' ? getOrdinalDay(Number(part.value)) : part.value))
+		.join('');
+}
+
+function getOrdinalDay(day: number): string {
+	return `${String(day)}${ordinalSuffixes[ordinalRules.select(day)]}`;
+}
+
+function getYearPart(date: Date, options: Intl.DateTimeFormatOptions): string | undefined {
+	return new Intl.DateTimeFormat('en-US', options)
+		.formatToParts(date)
+		.find((part) => part.type === 'year')?.value;
+}
+
+// Ordinal day suffixes only read correctly alongside a month name, not a numeric date
+function isMonthNameFormat(options: Intl.DateTimeFormatOptions): boolean {
+	return options.month === 'long' || options.month === 'short';
 }

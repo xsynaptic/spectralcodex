@@ -7,14 +7,19 @@ interface FrontmatterLinkIssue {
 	url: string;
 }
 
-function getResourcePatterns(resourceEntries: Array<ContentEntry>) {
-	return resourceEntries.flatMap((entry) => {
-		const match = entry.data.match as Array<string> | string | undefined;
+export function validateFrontmatterLinks(
+	entries: Array<ContentEntry>,
+	resourceEntries: Array<ContentEntry>,
+) {
+	const issues = collectFrontmatterLinkIssues(entries, resourceEntries);
 
-		if (match === undefined) return [];
-
-		return typeof match === 'string' ? [match] : match;
-	});
+	return toValidationResult(
+		issues.map(({ location, url }) => ({ message: `${location}: unmatched link "${url}"` })),
+		{
+			pass: 'All shortform frontmatter links match existing resources',
+			fail: `Found ${issues.length.toString()} unmatched frontmatter link(s)`,
+		},
+	);
 }
 
 // Longform links carry their own title and url, so only bare strings need a resource to match
@@ -43,17 +48,12 @@ function collectFrontmatterLinkIssues(
 	return issues;
 }
 
-export function validateFrontmatterLinks(
-	entries: Array<ContentEntry>,
-	resourceEntries: Array<ContentEntry>,
-) {
-	const issues = collectFrontmatterLinkIssues(entries, resourceEntries);
+function getResourcePatterns(resourceEntries: Array<ContentEntry>) {
+	return resourceEntries.flatMap((entry) => {
+		const match = entry.data.match as Array<string> | string | undefined;
 
-	return toValidationResult(
-		issues.map(({ location, url }) => ({ message: `${location}: unmatched link "${url}"` })),
-		{
-			pass: 'All shortform frontmatter links match existing resources',
-			fail: `Found ${issues.length.toString()} unmatched frontmatter link(s)`,
-		},
-	);
+		if (match === undefined) return [];
+
+		return typeof match === 'string' ? [match] : match;
+	});
 }

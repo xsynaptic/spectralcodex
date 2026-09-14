@@ -57,6 +57,17 @@ interface CitationInput {
 	title: string;
 }
 
+export function buildSourceCitations(source: ResourceSource) {
+	return {
+		url:
+			'id' in source && 'showPage' in source
+				? getResourcePath(source.id, source.showPage)
+				: undefined,
+		primary: buildPrimaryCitation(source),
+		multilingual: buildMultilingualCitation(source),
+	};
+}
+
 // Publisher, date and details all share the language's delimiter, so they collapse into one run
 export function formatCitation({
 	lang,
@@ -79,23 +90,6 @@ export function formatCitation({
 		title: `${formatting.quoteStart}${title}${formatting.quoteEnd}`,
 		published: publishedParts.length > 0 ? publishedParts.join(formatting.delimiter) : undefined,
 	};
-}
-
-function buildPrimaryCitation(source: ResourceSource) {
-	if (!source.title) return;
-
-	return formatCitation({
-		lang: LanguageCodeEnum.English,
-		title: source.title,
-		authorNames: source.authors?.map((author) => author.name),
-		publisher: source.publisher,
-		publishedDate: source.publishedDate,
-		publishedDetails: source.publishedDetails,
-	});
-}
-
-function getPrimaryContent(source: ResourceSource, prop: string) {
-	return getMultilingualContent({ data: source, prop })?.primary;
 }
 
 function buildMultilingualCitation(source: ResourceSource) {
@@ -124,13 +118,19 @@ function buildMultilingualCitation(source: ResourceSource) {
 	};
 }
 
-export function buildSourceCitations(source: ResourceSource) {
-	return {
-		url:
-			'id' in source && 'showPage' in source
-				? getResourcePath(source.id, source.showPage)
-				: undefined,
-		primary: buildPrimaryCitation(source),
-		multilingual: buildMultilingualCitation(source),
-	};
+function buildPrimaryCitation(source: ResourceSource) {
+	if (!source.title) return;
+
+	return formatCitation({
+		lang: LanguageCodeEnum.English,
+		title: source.title,
+		authorNames: source.authors?.map((author) => author.name),
+		publisher: source.publisher,
+		publishedDate: source.publishedDate,
+		publishedDetails: source.publishedDetails,
+	});
+}
+
+function getPrimaryContent(source: ResourceSource, prop: string) {
+	return getMultilingualContent({ data: source, prop })?.primary;
 }

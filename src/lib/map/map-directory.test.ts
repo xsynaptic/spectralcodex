@@ -4,19 +4,19 @@ import { describe, expect, test } from 'vitest';
 
 import { hashMapDirectoryData } from '#lib/map/map-directory-hash.ts';
 
-function makeSourceItem(id: string): MapSourceItem {
-	return {
-		properties: { id, title: id, category: 'other', chunkKey: '0' },
-		geometry: { type: 'Point', coordinates: [100, 10] },
-	} as unknown as MapSourceItem;
+function makeChunks(title: string): Map<string, Array<MapPopupItem>> {
+	return new Map([['0', [makePopupItem('alpha', title)]]]);
 }
 
 function makePopupItem(id: string, title: string): MapPopupItem {
 	return { id, title };
 }
 
-function makeChunks(title: string): Map<string, Array<MapPopupItem>> {
-	return new Map([['0', [makePopupItem('alpha', title)]]]);
+function makeSourceItem(id: string): MapSourceItem {
+	return {
+		properties: { id, title: id, category: 'other', chunkKey: '0' },
+		geometry: { type: 'Point', coordinates: [100, 10] },
+	} as unknown as MapSourceItem;
 }
 
 describe('hashMapDirectoryData', () => {

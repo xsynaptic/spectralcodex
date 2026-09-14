@@ -16,27 +16,26 @@ interface GitFileDatesOptions {
 // Prefixes each date line so it can't be confused with a file path
 const dateLineMarker = '\u{1}';
 
+// Keys are paths as git prints them, relative to the repo root (not `cwd`); use `keyPrefix` to rebase them
+export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map<string, string>> {
+	const { cwd, pathspec, keyPrefix } = options;
+	const dateFormat = options.date === 'author' ? '%aI' : '%cI';
+
+	await warnOrThrowOnShallow(cwd, options.onShallow ?? 'throw');
+
+	const pathspecArgs = toPathspecArgs(pathspec);
+
+	const result = await $({
+		cwd,
+	})`git log --name-only --pretty=format:${dateLineMarker + dateFormat} -- ${pathspecArgs}`;
+
+	return parseFileDates(result.stdout, keyPrefix);
+}
+
 async function isShallowRepository(cwd: string): Promise<boolean> {
 	const result = await $({ cwd })`git rev-parse --is-shallow-repository`;
 
 	return result.stdout.trim() === 'true';
-}
-
-async function warnOrThrowOnShallow(cwd: string, onShallow: 'ignore' | 'throw' | 'warn') {
-	if (onShallow === 'ignore' || !(await isShallowRepository(cwd))) return;
-
-	const message =
-		'Shallow clone detected: git history is truncated, so file dates will be missing or wrong. Fetch full history first (`git fetch --unshallow`, or checkout with fetch-depth 0).';
-
-	if (onShallow === 'throw') throw new Error(message);
-
-	console.warn(message);
-}
-
-function toPathspecArgs(pathspec: Array<string> | string | undefined): Array<string> {
-	if (pathspec === undefined) return [];
-
-	return Array.isArray(pathspec) ? pathspec : [pathspec];
 }
 
 function parseFileDates(stdout: string, keyPrefix: string | undefined): Map<string, string> {
@@ -63,18 +62,19 @@ function parseFileDates(stdout: string, keyPrefix: string | undefined): Map<stri
 	return fileDates;
 }
 
-// Keys are paths as git prints them, relative to the repo root (not `cwd`); use `keyPrefix` to rebase them
-export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map<string, string>> {
-	const { cwd, pathspec, keyPrefix } = options;
-	const dateFormat = options.date === 'author' ? '%aI' : '%cI';
+function toPathspecArgs(pathspec: Array<string> | string | undefined): Array<string> {
+	if (pathspec === undefined) return [];
 
-	await warnOrThrowOnShallow(cwd, options.onShallow ?? 'throw');
+	return Array.isArray(pathspec) ? pathspec : [pathspec];
+}
 
-	const pathspecArgs = toPathspecArgs(pathspec);
+async function warnOrThrowOnShallow(cwd: string, onShallow: 'ignore' | 'throw' | 'warn') {
+	if (onShallow === 'ignore' || !(await isShallowRepository(cwd))) return;
 
-	const result = await $({
-		cwd,
-	})`git log --name-only --pretty=format:${dateLineMarker + dateFormat} -- ${pathspecArgs}`;
+	const message =
+		'Shallow clone detected: git history is truncated, so file dates will be missing or wrong. Fetch full history first (`git fetch --unshallow`, or checkout with fetch-depth 0).';
 
-	return parseFileDates(result.stdout, keyPrefix);
+	if (onShallow === 'throw') throw new Error(message);
+
+	console.warn(message);
 }

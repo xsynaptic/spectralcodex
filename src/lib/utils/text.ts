@@ -6,6 +6,52 @@ import { markdownToHtml } from 'satteri';
 // Locale-independent word segmentation; split(' ') counts space-free scripts (CJK, Thai) as one word
 const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 
+export function formatNumber({
+	number,
+	locales,
+	options,
+}: {
+	locales?: Intl.LocalesArgument | undefined;
+	number: number | string;
+	options?: Intl.NumberFormatOptions | undefined;
+}) {
+	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
+}
+
+// Sanitize image captions before returning them for display
+export function sanitizeImageCaption(input: string): string {
+	return input.replaceAll('<p>', '').replaceAll('</p>', '');
+}
+
+// Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
+export function stripFootnoteReferences(input: string) {
+	return input.replaceAll(/\[\^[^\]]+\]/g, '');
+}
+
+/**
+ * Strips GFM-style footnotes from HTML content using a simple regex approach
+ */
+export function stripFootnotes(input: string): string {
+	// Remove footnote references (`sup` elements with footnote links)
+	let result = input.replaceAll(/<sup><a[^>]*data-footnote-ref[^>]*>.*?<\/a><\/sup>/gi, '');
+
+	// Remove the entire footnotes section
+	result = result.replaceAll(/<section[^>]*data-footnotes[^>]*>.*?<\/section>/gis, '');
+
+	return result;
+}
+
+// Function to remove specified MDX components from text
+// Lookahead on the opening tag prevents prefix collisions (e.g. "Img" matching "<ImgGroup>")
+export function stripMdxComponents(input: string, componentNames: Array<string>): string {
+	const regex = new RegExp(
+		componentNames.map((name) => String.raw`<${name}(?=[\s/>])[^>]*>|</${name}>`).join('|'),
+		'gm',
+	);
+
+	return input.replace(regex, '').trim();
+}
+
 export function textClipper(
 	input: string,
 	options: { trailer?: string | undefined; wordCount: number },
@@ -25,52 +71,6 @@ export function textClipper(
 	return input;
 }
 
-// Function to remove specified MDX components from text
-// Lookahead on the opening tag prevents prefix collisions (e.g. "Img" matching "<ImgGroup>")
-export function stripMdxComponents(input: string, componentNames: Array<string>): string {
-	const regex = new RegExp(
-		componentNames.map((name) => String.raw`<${name}(?=[\s/>])[^>]*>|</${name}>`).join('|'),
-		'gm',
-	);
-
-	return input.replace(regex, '').trim();
-}
-
-export function formatNumber({
-	number,
-	locales,
-	options,
-}: {
-	locales?: Intl.LocalesArgument | undefined;
-	number: number | string;
-	options?: Intl.NumberFormatOptions | undefined;
-}) {
-	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
-}
-
-/**
- * Strips GFM-style footnotes from HTML content using a simple regex approach
- */
-export function stripFootnotes(input: string): string {
-	// Remove footnote references (`sup` elements with footnote links)
-	let result = input.replaceAll(/<sup><a[^>]*data-footnote-ref[^>]*>.*?<\/a><\/sup>/gi, '');
-
-	// Remove the entire footnotes section
-	result = result.replaceAll(/<section[^>]*data-footnotes[^>]*>.*?<\/section>/gis, '');
-
-	return result;
-}
-
-// Strip footnote references from text (*e.g.*, [^1], [^foo], [^123])
-export function stripFootnoteReferences(input: string) {
-	return input.replaceAll(/\[\^[^\]]+\]/g, '');
-}
-
-// Sanitize image captions before returning them for display
-export function sanitizeImageCaption(input: string): string {
-	return input.replaceAll('<p>', '').replaceAll('</p>', '');
-}
-
 const namedHtmlEntities: Record<string, string> = {
 	amp: '&',
 	lt: '<',
@@ -79,19 +79,6 @@ const namedHtmlEntities: Record<string, string> = {
 	apos: "'",
 	nbsp: ' ',
 };
-
-function decodeHtmlEntities(input: string): string {
-	return input.replaceAll(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
-		if (/^#x/i.test(code)) return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
-		if (code.startsWith('#')) return String.fromCodePoint(Number(code.slice(1)));
-		return namedHtmlEntities[code.toLowerCase()] ?? entity;
-	});
-}
-
-// Plain text only; Astro escapes attributes itself, so encoding here would double-escape
-export function sanitizeImageAltAttribute(input: string): string {
-	return decodeHtmlEntities(stripTags(input)).replaceAll(/\s+/g, ' ').trim();
-}
 
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"
 export function formatStringTemplate(
@@ -113,6 +100,19 @@ export function refineTypography(input: string): string {
 	// Single quotes: opening in the same positions, otherwise apostrophe or closing
 	value = value.replaceAll(/(^|[\s([{<–—])'/g, '$1‘').replaceAll("'", '’');
 	return value;
+}
+
+// Plain text only; Astro escapes attributes itself, so encoding here would double-escape
+export function sanitizeImageAltAttribute(input: string): string {
+	return decodeHtmlEntities(stripTags(input)).replaceAll(/\s+/g, ' ').trim();
+}
+
+function decodeHtmlEntities(input: string): string {
+	return input.replaceAll(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
+		if (/^#x/i.test(code)) return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
+		if (code.startsWith('#')) return String.fromCodePoint(Number(code.slice(1)));
+		return namedHtmlEntities[code.toLowerCase()] ?? entity;
+	});
 }
 
 // Render a short markdown string (descriptions, notices, teasers) to inline HTML

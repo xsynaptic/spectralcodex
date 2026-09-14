@@ -11,10 +11,6 @@ import { withAstroContent } from '#shared/astro-content.ts';
 
 const collectionsRoot = path.join('packages', 'content', 'collections');
 
-function getDisplayPath(entry: CollectionEntry<'locations'>): string {
-	return path.relative(collectionsRoot, entry.filePath ?? entry.id);
-}
-
 function formatEntryLine(entry: CollectionEntry<'locations'>): string {
 	const displayPath = getDisplayPath(entry);
 	const directory = path.dirname(displayPath);
@@ -28,6 +24,10 @@ function formatEntryLine(entry: CollectionEntry<'locations'>): string {
 	const { title } = entry.data;
 
 	return title ? `${formattedPath} ${chalk.dim('-')} ${title}` : formattedPath;
+}
+
+function getDisplayPath(entry: CollectionEntry<'locations'>): string {
+	return path.relative(collectionsRoot, entry.filePath ?? entry.id);
 }
 
 function printAvailableChecks(stream: 'stderr' | 'stdout') {

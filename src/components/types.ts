@@ -1,15 +1,13 @@
 // 2026Q1: TypeScript doesn't deal well with Astro files exporting types and interfaces
 
-// Meta component types
-interface MetaImageProps {
-	alt?: string;
-	height?: number;
-	secureUrl?: string | URL;
-	type?: string;
-	url?: string | URL;
-	width?: number;
-}
+// Values map onto divided-* classes in text.css
+export type DividerColor = 'default' | 'muted';
 
+export type DividerContent = 'chevron' | 'dot' | 'slash';
+
+export type DividerWeight = 'thin';
+
+// Meta component types
 export interface MetaProps {
 	article?: {
 		authors?: Array<string>;
@@ -29,12 +27,14 @@ export interface MetaProps {
 	title?: string | undefined;
 }
 
-// Values map onto divided-* classes in text.css
-export type DividerColor = 'default' | 'muted';
-
-export type DividerContent = 'chevron' | 'dot' | 'slash';
-
-export type DividerWeight = 'thin';
+interface MetaImageProps {
+	alt?: string;
+	height?: number;
+	secureUrl?: string | URL;
+	type?: string;
+	url?: string | URL;
+	width?: number;
+}
 
 export const NoticeBoxSeverityEnum = {
 	Info: 'info',

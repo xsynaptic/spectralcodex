@@ -21,39 +21,6 @@ const maxDepth = 2 as number;
 
 const t = getTranslations();
 
-function getNavigationItemData({
-	entry,
-	collection,
-}: {
-	collection: 'regions' | 'series' | 'themes';
-	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
-}) {
-	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
-
-	return {
-		collection: entry.collection,
-		title: entry.data.title,
-		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
-		url: getSitePath(`${collection}/${entry.id}`),
-		...(ancestor ? { ancestor } : {}),
-	};
-}
-
-function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
-	let minEntryCount: number;
-
-	if (depth === 1) {
-		minEntryCount = 5;
-	} else if (depth === 2) {
-		minEntryCount = 2;
-	} else {
-		minEntryCount = 8;
-	}
-
-	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
-		(entry.data._entryCount ?? 0) >= minEntryCount;
-}
-
 async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 	const { entries: regions } = await getRegionsCollection();
 	const getRegionsByIds = await createRegionsByIdsFunction();
@@ -143,6 +110,39 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('about'),
 		},
 	];
+}
+
+function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
+	let minEntryCount: number;
+
+	if (depth === 1) {
+		minEntryCount = 5;
+	} else if (depth === 2) {
+		minEntryCount = 2;
+	} else {
+		minEntryCount = 8;
+	}
+
+	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
+		(entry.data._entryCount ?? 0) >= minEntryCount;
+}
+
+function getNavigationItemData({
+	entry,
+	collection,
+}: {
+	collection: 'regions' | 'series' | 'themes';
+	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
+}) {
+	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
+
+	return {
+		collection: entry.collection,
+		title: entry.data.title,
+		titleMultilingual: getMultilingualContent({ data: entry.data, prop: 'title' })?.primary,
+		url: getSitePath(`${collection}/${entry.id}`),
+		...(ancestor ? { ancestor } : {}),
+	};
 }
 
 export const getNavigationHeaderItems = pMemoize(createNavigationHeaderItems);

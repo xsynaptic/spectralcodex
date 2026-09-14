@@ -6,13 +6,6 @@ import { createContext, useContext, useMemo } from 'react';
 
 import { fetchTimeoutMs } from '#constants.ts';
 
-interface MapDataQueryConfig<TSchema extends z.ZodType> {
-	name: string;
-	// Optional sources stay disabled until a URL or inline data is provided
-	optional?: boolean;
-	schema: TSchema;
-}
-
 interface MapDataProviderProps<TInput> {
 	apiUrl: string | undefined;
 	children: ReactNode;
@@ -21,6 +14,13 @@ interface MapDataProviderProps<TInput> {
 	dataKey: string | undefined;
 	isDev: boolean | undefined;
 	version: string | undefined;
+}
+
+interface MapDataQueryConfig<TSchema extends z.ZodType> {
+	name: string;
+	// Optional sources stay disabled until a URL or inline data is provided
+	optional?: boolean;
+	schema: TSchema;
 }
 
 export function createMapDataQuery<TSchema extends z.ZodType>({

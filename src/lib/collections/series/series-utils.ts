@@ -18,54 +18,38 @@ import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
-// Filter the catalog for series items by ID
-async function createSeriesCatalogItemsFunction() {
+// Data for a single series entry page: catalog items, map data, and word count
+export async function createQuerySeriesEntryFunction() {
+	const { entries: series } = await getSeriesCollection();
+
 	const catalog = await getCatalog();
+	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
+	const getSeriesLocations = await createLocationsBySeriesFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const { chunkKeyById, version } = await getMapDirectoryData();
 
-	return function getSeriesCatalogItems(
-		ids: Array<string> | undefined,
-	): Array<CatalogItem> | undefined {
-		if (!ids || ids.length === 0) return;
+	const seriesCatalogItems = catalog.resolve(series);
 
-		return ids
-			.map((id) => catalog.getById(id))
-			.filter((entry) => !!entry)
-			.filter(hasFeaturedImage);
-	};
-}
+	return function querySeriesEntry(entry: CollectionEntry<'series'>) {
+		const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
 
-// Generate geodata for series items; combines posts with multiple locations and individual locations
-async function createLocationsBySeriesFunction() {
-	const { entriesMap: locationsMap } = await getLocationsCollection();
-	const { entriesMap: postsMap } = await getPostsCollection();
+		if (!catalogItems) return;
 
-	const getLocationsByPosts = await createLocationsByPostsFunction();
+		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-	return function getLocationsBySeries(
-		seriesItemIds: Array<string> | undefined,
-	): Array<CollectionEntry<'locations'>> {
-		if (!seriesItemIds || seriesItemIds.length === 0) return [];
+		const mapData = getMapData({
+			mapId: `${entry.collection}/${entry.id}`,
+			featureCollection: getLocationsFeatureCollection(seriesLocations),
+			locationCount: seriesLocations.length,
+			chunkKeyById,
+			version,
+			...getMapLanguages(regionPrimary?.data._langCode),
+		});
 
-		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
+		const wordCount = seriesCatalogItems.find((item) => item.id === entry.id)?.wordCount;
 
-		for (const seriesItemId of seriesItemIds) {
-			const location = locationsMap.get(seriesItemId);
-
-			if (location) {
-				seriesLocationsMap.set(seriesItemId, location);
-				continue;
-			}
-
-			const post = postsMap.get(seriesItemId);
-
-			if (!post) throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
-
-			for (const seriesPostLocation of getLocationsByPosts(post)) {
-				seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
-			}
-		}
-
-		return [...seriesLocationsMap.values()];
+		return { catalogItems, mapData, wordCount };
 	};
 }
 
@@ -107,41 +91,6 @@ export async function createSeriesByIdFunction() {
 	};
 }
 
-// Data for a single series entry page: catalog items, map data, and word count
-export async function createQuerySeriesEntryFunction() {
-	const { entries: series } = await getSeriesCollection();
-
-	const catalog = await getCatalog();
-	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
-	const getSeriesLocations = await createLocationsBySeriesFunction();
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById, version } = await getMapDirectoryData();
-
-	const seriesCatalogItems = catalog.resolve(series);
-
-	return function querySeriesEntry(entry: CollectionEntry<'series'>) {
-		const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
-
-		if (!catalogItems) return;
-
-		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
-
-		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: getLocationsFeatureCollection(seriesLocations),
-			locationCount: seriesLocations.length,
-			chunkKeyById,
-			version,
-			...getMapLanguages(regionPrimary?.data._langCode),
-		});
-
-		const wordCount = seriesCatalogItems.find((item) => item.id === entry.id)?.wordCount;
-
-		return { catalogItems, mapData, wordCount };
-	};
-}
-
 export async function querySeriesIndex() {
 	const { entries: series } = await getSeriesCollection();
 
@@ -157,4 +106,55 @@ export async function querySeriesIndex() {
 		),
 		catalog.resolve,
 	);
+}
+
+// Generate geodata for series items; combines posts with multiple locations and individual locations
+async function createLocationsBySeriesFunction() {
+	const { entriesMap: locationsMap } = await getLocationsCollection();
+	const { entriesMap: postsMap } = await getPostsCollection();
+
+	const getLocationsByPosts = await createLocationsByPostsFunction();
+
+	return function getLocationsBySeries(
+		seriesItemIds: Array<string> | undefined,
+	): Array<CollectionEntry<'locations'>> {
+		if (!seriesItemIds || seriesItemIds.length === 0) return [];
+
+		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
+
+		for (const seriesItemId of seriesItemIds) {
+			const location = locationsMap.get(seriesItemId);
+
+			if (location) {
+				seriesLocationsMap.set(seriesItemId, location);
+				continue;
+			}
+
+			const post = postsMap.get(seriesItemId);
+
+			if (!post) throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
+
+			for (const seriesPostLocation of getLocationsByPosts(post)) {
+				seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
+			}
+		}
+
+		return [...seriesLocationsMap.values()];
+	};
+}
+
+// Filter the catalog for series items by ID
+async function createSeriesCatalogItemsFunction() {
+	const catalog = await getCatalog();
+
+	return function getSeriesCatalogItems(
+		ids: Array<string> | undefined,
+	): Array<CatalogItem> | undefined {
+		if (!ids || ids.length === 0) return;
+
+		return ids
+			.map((id) => catalog.getById(id))
+			.filter((entry) => !!entry)
+			.filter(hasFeaturedImage);
+	};
 }

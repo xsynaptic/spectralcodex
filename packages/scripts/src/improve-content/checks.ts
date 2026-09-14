@@ -1,15 +1,15 @@
 import type { CollectionEntry } from 'astro:content';
 
-type LocationEntry = CollectionEntry<'locations'>;
+export type CheckFn = (
+	entries: Array<LocationEntry>,
+	options: CheckOptions,
+) => Array<LocationEntry>;
 
 interface CheckOptions {
 	threshold: number;
 }
 
-export type CheckFn = (
-	entries: Array<LocationEntry>,
-	options: CheckOptions,
-) => Array<LocationEntry>;
+type LocationEntry = CollectionEntry<'locations'>;
 
 function hasMatchingLink(entry: LocationEntry, match: string): boolean {
 	const links = entry.data.links;

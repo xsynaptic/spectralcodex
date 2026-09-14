@@ -72,75 +72,6 @@ const TitleOverrideSchema = z
 
 type TitleOverride = z.infer<typeof TitleOverrideSchema>;
 
-function parseTitleOverride(collection: string, data: Record<string, unknown>): TitleOverride {
-	if (collection !== ContentCollectionsEnum.Locations) return undefined;
-
-	return TitleOverrideSchema.parse(data.override);
-}
-
-// `undefined` marks an entry that gets no OG image at all
-function resolveEntryTitle({
-	collection,
-	id,
-	data,
-	override,
-}: {
-	collection: string;
-	data: Record<string, unknown>;
-	id: string;
-	override: TitleOverride;
-}): string | undefined {
-	if (collection === ContentCollectionsEnum.Chronology) return getChronologyTitle(id);
-
-	const title = override?.title ?? z.string().optional().parse(data.title);
-
-	if (!title) return undefined;
-
-	// A resource without `showPage` has no page, so no OG image
-	if (collection === ContentCollectionsEnum.Resources && !data.showPage) return undefined;
-
-	return title;
-}
-
-function parseOptionalString(value: unknown) {
-	return z.string().optional().parse(value);
-}
-
-function getMultilingualTitles(data: Record<string, unknown>, override: TitleOverride) {
-	return {
-		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
-		titleJa: parseOptionalString(override?.title_ja ?? data.title_ja),
-		titleTh: parseOptionalString(override?.title_th ?? data.title_th),
-	};
-}
-
-// The one place an entry becomes a card, shared with the dev-only Inventory route
-export function toOpenGraphEntryItem({
-	entry,
-	collection,
-	regionParentMap,
-	chronologyImageIndex,
-}: {
-	chronologyImageIndex?: Map<string, string> | undefined;
-	collection: string;
-	entry: Pick<ContentEntry, 'data' | 'id'>;
-	regionParentMap?: RegionParentMap | undefined;
-}): OpenGraphEntryItem | undefined {
-	const id = getOpenGraphId(getPublicId(entry));
-	const override = parseTitleOverride(collection, entry.data);
-	const title = resolveEntryTitle({ collection, id, data: entry.data, override });
-
-	if (title === undefined) return undefined;
-
-	return {
-		collection,
-		id,
-		title: stripDiacritics(title),
-		...getMultilingualTitles(entry.data, override),
-		...getImageFeaturedData({ entry, collection, regionParentMap, chronologyImageIndex }),
-	};
-}
-
 // Resolution order: content entries, then static index entries, then synthesized chronology ids
 export function resolveEntry({
 	filename,
@@ -180,4 +111,73 @@ export function resolveEntry({
 	}
 
 	return undefined;
+}
+
+// The one place an entry becomes a card, shared with the dev-only Inventory route
+export function toOpenGraphEntryItem({
+	entry,
+	collection,
+	regionParentMap,
+	chronologyImageIndex,
+}: {
+	chronologyImageIndex?: Map<string, string> | undefined;
+	collection: string;
+	entry: Pick<ContentEntry, 'data' | 'id'>;
+	regionParentMap?: RegionParentMap | undefined;
+}): OpenGraphEntryItem | undefined {
+	const id = getOpenGraphId(getPublicId(entry));
+	const override = parseTitleOverride(collection, entry.data);
+	const title = resolveEntryTitle({ collection, id, data: entry.data, override });
+
+	if (title === undefined) return undefined;
+
+	return {
+		collection,
+		id,
+		title: stripDiacritics(title),
+		...getMultilingualTitles(entry.data, override),
+		...getImageFeaturedData({ entry, collection, regionParentMap, chronologyImageIndex }),
+	};
+}
+
+function getMultilingualTitles(data: Record<string, unknown>, override: TitleOverride) {
+	return {
+		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
+		titleJa: parseOptionalString(override?.title_ja ?? data.title_ja),
+		titleTh: parseOptionalString(override?.title_th ?? data.title_th),
+	};
+}
+
+function parseOptionalString(value: unknown) {
+	return z.string().optional().parse(value);
+}
+
+function parseTitleOverride(collection: string, data: Record<string, unknown>): TitleOverride {
+	if (collection !== ContentCollectionsEnum.Locations) return undefined;
+
+	return TitleOverrideSchema.parse(data.override);
+}
+
+// `undefined` marks an entry that gets no OG image at all
+function resolveEntryTitle({
+	collection,
+	id,
+	data,
+	override,
+}: {
+	collection: string;
+	data: Record<string, unknown>;
+	id: string;
+	override: TitleOverride;
+}): string | undefined {
+	if (collection === ContentCollectionsEnum.Chronology) return getChronologyTitle(id);
+
+	const title = override?.title ?? z.string().optional().parse(data.title);
+
+	if (!title) return undefined;
+
+	// A resource without `showPage` has no page, so no OG image
+	if (collection === ContentCollectionsEnum.Resources && !data.showPage) return undefined;
+
+	return title;
 }

@@ -12,13 +12,6 @@ import type { MapComponentProps } from '#types.ts';
 
 import { fetchTimeoutMs } from '#constants.ts';
 
-// This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
-function createFeatureMask(feature: Feature<MultiPolygon | Polygon>) {
-	const worldMap = bboxPolygon([-180, -85, 180, 85]);
-
-	return difference(featureCollection([worldMap, feature]));
-}
-
 export function useMapApiDivisionData({
 	apiDivisionUrl,
 	isDev,
@@ -74,4 +67,11 @@ export function useMapApiDivisionData({
 		refetchOnMount: false,
 		enabled: !!apiDivisionUrl,
 	});
+}
+
+// This inverts the polygon geometry to allow for styling of the area outside the polygon geometry
+function createFeatureMask(feature: Feature<MultiPolygon | Polygon>) {
+	const worldMap = bboxPolygon([-180, -85, 180, 85]);
+
+	return difference(featureCollection([worldMap, feature]));
 }

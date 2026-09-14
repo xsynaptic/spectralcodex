@@ -203,23 +203,23 @@ export const MapPopupItemSchema = z.codec(popupCompressedSchema, popupStandardSc
 	}),
 });
 
-// Compressed input types
-export type MapSourceItemCompressed = z.input<typeof MapSourceItemSchema>;
+export type MapPopupItem = z.output<typeof MapPopupItemSchema>;
 export type MapPopupItemCompressed = z.input<typeof MapPopupItemSchema>;
 
 // Standard output types
 export type MapSourceItem = z.output<typeof MapSourceItemSchema>;
-export type MapPopupItem = z.output<typeof MapPopupItemSchema>;
+// Compressed input types
+export type MapSourceItemCompressed = z.input<typeof MapSourceItemSchema>;
+
+export function encodeMapPopupData(
+	items: ReadonlyArray<MapPopupItem>,
+): Array<MapPopupItemCompressed> {
+	return items.map((item) => z.encode(MapPopupItemSchema, item));
+}
 
 // Encode a standard array to the compressed form at a serialization edge
 export function encodeMapSourceData(
 	items: ReadonlyArray<MapSourceItem>,
 ): Array<MapSourceItemCompressed> {
 	return items.map((item) => z.encode(MapSourceItemSchema, item));
-}
-
-export function encodeMapPopupData(
-	items: ReadonlyArray<MapPopupItem>,
-): Array<MapPopupItemCompressed> {
-	return items.map((item) => z.encode(MapPopupItemSchema, item));
 }

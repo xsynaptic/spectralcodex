@@ -4,30 +4,6 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
-function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<string> {
-	const imageFeatured = frontmatter.imageFeatured;
-
-	if (!imageFeatured) return [];
-
-	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
-
-	if (!parsed.success) return [];
-
-	const data = parsed.data;
-
-	if (typeof data === 'string') return [];
-
-	const links: Array<string> = [];
-
-	for (const item of data) {
-		if (typeof item === 'object' && typeof item.link === 'string') {
-			links.push(item.link);
-		}
-	}
-
-	return links;
-}
-
 export function validateImageFeaturedLinks(
 	entries: Array<ContentEntry>,
 	validTargets: Array<ContentEntry>,
@@ -59,4 +35,28 @@ export function validateImageFeaturedLinks(
 			fail: `Found ${unmatchedLinks.length.toString()} unmatched imageFeatured link(s)`,
 		},
 	);
+}
+
+function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<string> {
+	const imageFeatured = frontmatter.imageFeatured;
+
+	if (!imageFeatured) return [];
+
+	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
+
+	if (!parsed.success) return [];
+
+	const data = parsed.data;
+
+	if (typeof data === 'string') return [];
+
+	const links: Array<string> = [];
+
+	for (const item of data) {
+		if (typeof item === 'object' && typeof item.link === 'string') {
+			links.push(item.link);
+		}
+	}
+
+	return links;
 }

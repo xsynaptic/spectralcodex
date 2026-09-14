@@ -46,32 +46,20 @@ export const getMapThemeIndexById = pMemoize(async () => {
 	return themeIndexById;
 });
 
-// Drill into a coordinate position to the first [lng, lat] pair
-function getFirstLngLat(coordinates: unknown, featureId: string): [number, number] {
-	let current: unknown = coordinates;
-	while (Array.isArray(current) && Array.isArray(current[0])) {
-		current = current[0];
-	}
-	if (Array.isArray(current) && typeof current[0] === 'number' && typeof current[1] === 'number') {
-		return [current[0], current[1]];
-	}
-	// A feature without a numeric pair must fail the build rather than bin a chunk at null island
-	throw new Error(`No numeric coordinate pair found for map feature "${featureId}"`);
-}
+function buildChunks(
+	chunkIds: Map<string, Array<string>>,
+	popupById: ReadonlyMap<string, MapPopupItem>,
+): Map<string, Array<MapPopupItem>> {
+	const chunks = new Map<string, Array<MapPopupItem>>();
 
-// No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
-function buildLocationByFeatureId(
-	locations: Array<CollectionEntry<'locations'>>,
-): Map<string, CollectionEntry<'locations'>> {
-	const locationByFeatureId = new Map<string, CollectionEntry<'locations'>>();
-
-	for (const entry of locations) {
-		for (const featureId of getLocationFeatureIds(entry)) {
-			locationByFeatureId.set(featureId, entry);
-		}
+	for (const [chunkKey, ids] of chunkIds) {
+		chunks.set(
+			chunkKey,
+			ids.map((id) => popupById.get(id)).filter((popupItem) => popupItem !== undefined),
+		);
 	}
 
-	return locationByFeatureId;
+	return chunks;
 }
 
 function buildCoordinatesById(
@@ -89,6 +77,21 @@ function buildCoordinatesById(
 	return coordinatesById;
 }
 
+// No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
+function buildLocationByFeatureId(
+	locations: Array<CollectionEntry<'locations'>>,
+): Map<string, CollectionEntry<'locations'>> {
+	const locationByFeatureId = new Map<string, CollectionEntry<'locations'>>();
+
+	for (const entry of locations) {
+		for (const featureId of getLocationFeatureIds(entry)) {
+			locationByFeatureId.set(featureId, entry);
+		}
+	}
+
+	return locationByFeatureId;
+}
+
 function buildPopupBytesById(popupData: Array<MapPopupItem>): Map<string, number> {
 	const popupBytesById = new Map<string, number>();
 
@@ -102,20 +105,17 @@ function buildPopupBytesById(popupData: Array<MapPopupItem>): Map<string, number
 	return popupBytesById;
 }
 
-function buildChunks(
-	chunkIds: Map<string, Array<string>>,
-	popupById: ReadonlyMap<string, MapPopupItem>,
-): Map<string, Array<MapPopupItem>> {
-	const chunks = new Map<string, Array<MapPopupItem>>();
-
-	for (const [chunkKey, ids] of chunkIds) {
-		chunks.set(
-			chunkKey,
-			ids.map((id) => popupById.get(id)).filter((popupItem) => popupItem !== undefined),
-		);
+// Drill into a coordinate position to the first [lng, lat] pair
+function getFirstLngLat(coordinates: unknown, featureId: string): [number, number] {
+	let current: unknown = coordinates;
+	while (Array.isArray(current) && Array.isArray(current[0])) {
+		current = current[0];
 	}
-
-	return chunks;
+	if (Array.isArray(current) && typeof current[0] === 'number' && typeof current[1] === 'number') {
+		return [current[0], current[1]];
+	}
+	// A feature without a numeric pair must fail the build rather than bin a chunk at null island
+	throw new Error(`No numeric coordinate pair found for map feature "${featureId}"`);
 }
 
 // Unique, ascending membership indices for a set of content references

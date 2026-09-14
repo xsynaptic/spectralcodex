@@ -43,6 +43,16 @@ const { isFeed } = Astro.locals;
 
 const slotContents = await renderSlot(Astro.slots, 'default');
 
+function getAspectRatio(width: number, height: number) {
+	function greatestCommonDenominator(a: number, b: number): number {
+		return b === 0 ? a : greatestCommonDenominator(b, a % b);
+	}
+
+	const aspectRatioDivisor = greatestCommonDenominator(width, height);
+
+	return `${String(width / aspectRatioDivisor)} / ${String(height / aspectRatioDivisor)}`;
+}
+
 function getComparableText(input: string) {
 	return sanitizeImageAltAttribute(input)
 		.toLowerCase()
@@ -54,16 +64,6 @@ function getImageAlt(title: string) {
 	if (altProp !== undefined) return sanitizeImageAltAttribute(altProp);
 	if (slotContents && getComparableText(title) === getComparableText(slotContents)) return '';
 	return sanitizeImageAltAttribute(title);
-}
-
-function getAspectRatio(width: number, height: number) {
-	function greatestCommonDenominator(a: number, b: number): number {
-		return b === 0 ? a : greatestCommonDenominator(b, a % b);
-	}
-
-	const aspectRatioDivisor = greatestCommonDenominator(width, height);
-
-	return `${String(width / aspectRatioDivisor)} / ${String(height / aspectRatioDivisor)}`;
 }
 
 async function getImageProps(): Promise<{

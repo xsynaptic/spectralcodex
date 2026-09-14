@@ -11,28 +11,6 @@ interface LinkIdIssue {
 	location: string;
 }
 
-function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<string>) {
-	const body = entry.body;
-
-	if (!body) return [];
-
-	const location = entry.filePath ?? entry.id;
-
-	const issues: Array<LinkIdIssue> = [];
-	const tags = findComponentTags(body, ['Link']);
-
-	for (const tag of tags) {
-		const id = getTagProp(tag, 'id');
-
-		// A Link with no id is the mdx check's finding, not this one's
-		if (!id || validIds.has(id)) continue;
-
-		issues.push({ location, lineNumber: tag.lineNumber, id });
-	}
-
-	return issues;
-}
-
 export function collectLinkIdIssues(
 	entries: Array<ContentEntry>,
 	validTargets: Array<ContentEntry>,
@@ -74,4 +52,26 @@ export function validateLinkIds(
 		pass: 'Link IDs valid',
 		fail: `Found ${issueCount.toString()} broken link ID(s)`,
 	});
+}
+
+function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<string>) {
+	const body = entry.body;
+
+	if (!body) return [];
+
+	const location = entry.filePath ?? entry.id;
+
+	const issues: Array<LinkIdIssue> = [];
+	const tags = findComponentTags(body, ['Link']);
+
+	for (const tag of tags) {
+		const id = getTagProp(tag, 'id');
+
+		// A Link with no id is the mdx check's finding, not this one's
+		if (!id || validIds.has(id)) continue;
+
+		issues.push({ location, lineNumber: tag.lineNumber, id });
+	}
+
+	return issues;
 }

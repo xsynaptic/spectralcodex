@@ -19,56 +19,6 @@ interface SitemapLastmodOptions {
 
 const rootCollections = new Set(['locations', 'pages', 'posts']);
 
-function joinUrl(...parts: Array<string>): string {
-	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
-}
-
-function buildContentUrl(siteUrl: string, collection: string, id: string): string {
-	const collectionSegment = rootCollections.has(collection) ? '' : collection;
-
-	return joinUrl(siteUrl, collectionSegment, id, '/');
-}
-
-function resolvePaths(options: SitemapLastmodOptions) {
-	const contentPathRelative = options.contentPath ?? 'packages/content';
-
-	return {
-		contentPathRelative,
-		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
-		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
-	};
-}
-
-function resolveUrls(
-	entries: Array<ContentEntry>,
-	gitMap: Map<string, string>,
-	{ siteUrl, contentPathPrefix }: { contentPathPrefix: string; siteUrl: string },
-) {
-	const urls: Record<string, string> = {};
-
-	let resolvedCount = 0;
-	let missingDateCount = 0;
-
-	for (const entry of entries) {
-		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
-
-		const gitDate = gitMap.get(entry.filePath);
-
-		if (!gitDate) {
-			missingDateCount++;
-			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
-			continue;
-		}
-
-		const url = buildContentUrl(siteUrl, entry.collection, getPublicId(entry));
-
-		urls[url] = gitDate;
-		resolvedCount++;
-	}
-
-	return { urls, resolvedCount, missingDateCount };
-}
-
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
@@ -119,4 +69,54 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 	}
 
 	console.log(chalk.gray(`Output: ${outputPath}`));
+}
+
+function buildContentUrl(siteUrl: string, collection: string, id: string): string {
+	const collectionSegment = rootCollections.has(collection) ? '' : collection;
+
+	return joinUrl(siteUrl, collectionSegment, id, '/');
+}
+
+function joinUrl(...parts: Array<string>): string {
+	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
+}
+
+function resolvePaths(options: SitemapLastmodOptions) {
+	const contentPathRelative = options.contentPath ?? 'packages/content';
+
+	return {
+		contentPathRelative,
+		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
+		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
+	};
+}
+
+function resolveUrls(
+	entries: Array<ContentEntry>,
+	gitMap: Map<string, string>,
+	{ siteUrl, contentPathPrefix }: { contentPathPrefix: string; siteUrl: string },
+) {
+	const urls: Record<string, string> = {};
+
+	let resolvedCount = 0;
+	let missingDateCount = 0;
+
+	for (const entry of entries) {
+		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
+
+		const gitDate = gitMap.get(entry.filePath);
+
+		if (!gitDate) {
+			missingDateCount++;
+			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
+			continue;
+		}
+
+		const url = buildContentUrl(siteUrl, entry.collection, getPublicId(entry));
+
+		urls[url] = gitDate;
+		resolvedCount++;
+	}
+
+	return { urls, resolvedCount, missingDateCount };
 }

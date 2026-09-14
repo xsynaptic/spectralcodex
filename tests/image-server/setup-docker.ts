@@ -13,33 +13,6 @@ const healthUrl = 'http://localhost:3100/health';
 const maxWaitMs = 30_000;
 const pollIntervalMs = 500;
 
-async function didBecomeHealthy(url: string, maxWait: number): Promise<boolean> {
-	const start = Date.now();
-
-	while (Date.now() - start < maxWait) {
-		try {
-			const response = await fetch(url);
-			if (response.ok) {
-				return true;
-			}
-		} catch {
-			// Server not ready yet
-		}
-		await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
-	}
-
-	return false;
-}
-
-async function isDockerRunning(): Promise<boolean> {
-	try {
-		const response = await fetch(healthUrl);
-		return response.ok;
-	} catch {
-		return false;
-	}
-}
-
 export async function setup() {
 	// Fail if containers already running - tests need fresh containers with known config
 	if (await isDockerRunning()) {
@@ -116,5 +89,32 @@ export function teardown() {
 		console.log('[Test] Docker containers stopped');
 	} catch {
 		console.error('[Test] Failed to stop Docker containers');
+	}
+}
+
+async function didBecomeHealthy(url: string, maxWait: number): Promise<boolean> {
+	const start = Date.now();
+
+	while (Date.now() - start < maxWait) {
+		try {
+			const response = await fetch(url);
+			if (response.ok) {
+				return true;
+			}
+		} catch {
+			// Server not ready yet
+		}
+		await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+	}
+
+	return false;
+}
+
+async function isDockerRunning(): Promise<boolean> {
+	try {
+		const response = await fetch(healthUrl);
+		return response.ok;
+	} catch {
+		return false;
 	}
 }

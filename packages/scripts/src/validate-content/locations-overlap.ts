@@ -18,6 +18,41 @@ interface LocationOverlap {
 	idB: string;
 }
 
+export function validateLocationsOverlap(entries: Array<ContentEntry>, thresholdMeters: number) {
+	const { points, locationCount } = collectPoints(entries);
+	const overlaps = findOverlaps(points, thresholdMeters);
+
+	const scope = `checked ${String(locationCount)} locations, ${String(points.length)} points`;
+
+	if (overlaps.length === 0) {
+		return {
+			status: 'pass',
+			summary: `No overlapping locations found (${scope})`,
+			issues: [],
+		} satisfies ValidationResult;
+	}
+
+	return {
+		status: 'warn',
+		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,
+		issues: overlaps.map((overlap) => ({
+			message: `${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
+		})),
+	} satisfies ValidationResult;
+}
+
+function buildSpatialIndex(points: Array<IndexedPoint>) {
+	const index = new GeospatialIndex(points.length);
+
+	for (const point of points) {
+		index.add(point.lng, point.lat);
+	}
+
+	index.finish();
+
+	return index;
+}
+
 function collectPoints(entries: Array<ContentEntry>) {
 	const points: Array<IndexedPoint> = [];
 
@@ -40,18 +75,6 @@ function collectPoints(entries: Array<ContentEntry>) {
 	}
 
 	return { points, locationCount };
-}
-
-function buildSpatialIndex(points: Array<IndexedPoint>) {
-	const index = new GeospatialIndex(points.length);
-
-	for (const point of points) {
-		index.add(point.lng, point.lat);
-	}
-
-	index.finish();
-
-	return index;
 }
 
 function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
@@ -91,27 +114,4 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 	}
 
 	return overlaps.sort((overlapA, overlapB) => overlapA.distance - overlapB.distance);
-}
-
-export function validateLocationsOverlap(entries: Array<ContentEntry>, thresholdMeters: number) {
-	const { points, locationCount } = collectPoints(entries);
-	const overlaps = findOverlaps(points, thresholdMeters);
-
-	const scope = `checked ${String(locationCount)} locations, ${String(points.length)} points`;
-
-	if (overlaps.length === 0) {
-		return {
-			status: 'pass',
-			summary: `No overlapping locations found (${scope})`,
-			issues: [],
-		} satisfies ValidationResult;
-	}
-
-	return {
-		status: 'warn',
-		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,
-		issues: overlaps.map((overlap) => ({
-			message: `${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
-		})),
-	} satisfies ValidationResult;
 }

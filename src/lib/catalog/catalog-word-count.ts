@@ -15,22 +15,6 @@ interface WordCountCached {
 	hash: string;
 }
 
-// Only correct because MDX components add decoration, not text from outside sources
-function computeWordCount(body: string): number {
-	return R.pipe(
-		body,
-		(body) => stripMdxComponents(body, mdxComponents),
-		(body) => renderMarkdownInline(body),
-		stripTags,
-		countWords,
-	);
-}
-
-// `''` rather than `undefined` for a missing field, so cached content hashes stay stable
-function getDescription(entry: CollectionEntry<CollectionKey>): string | undefined {
-	return 'description' in entry.data ? entry.data.description : '';
-}
-
 export function createWordCountFunction({ cache }: { cache: Keyv }) {
 	return async function getWordCount(
 		entry: CollectionEntry<CollectionKey>,
@@ -64,4 +48,20 @@ export function createWordCountFunction({ cache }: { cache: Keyv }) {
 
 		return wordCount;
 	};
+}
+
+// Only correct because MDX components add decoration, not text from outside sources
+function computeWordCount(body: string): number {
+	return R.pipe(
+		body,
+		(body) => stripMdxComponents(body, mdxComponents),
+		(body) => renderMarkdownInline(body),
+		stripTags,
+		countWords,
+	);
+}
+
+// `''` rather than `undefined` for a missing field, so cached content hashes stay stable
+function getDescription(entry: CollectionEntry<CollectionKey>): string | undefined {
+	return 'description' in entry.data ? entry.data.description : '';
 }

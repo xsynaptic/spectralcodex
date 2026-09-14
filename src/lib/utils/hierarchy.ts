@@ -1,14 +1,3 @@
-/**
- * Generic, dependency-free hierarchy index over a flat node list (parent adjacency)
- * A single depth-first walk yields:
- * - adjacency indexes (parent/children/ancestors)
- * - nested-set numbering (ordinal + [left, right] interval + depth)
- */
-export interface HierarchyNode {
-	id: string;
-	parentId?: string;
-}
-
 export interface Hierarchy {
 	// Nearest-first, self-exclusive; last element is the root
 	ancestorsOf(id: string): ReadonlyArray<string>;
@@ -32,7 +21,88 @@ export interface Hierarchy {
 	siblingsOf(id: string): ReadonlyArray<string>;
 }
 
+/**
+ * Generic, dependency-free hierarchy index over a flat node list (parent adjacency)
+ * A single depth-first walk yields:
+ * - adjacency indexes (parent/children/ancestors)
+ * - nested-set numbering (ordinal + [left, right] interval + depth)
+ */
+export interface HierarchyNode {
+	id: string;
+	parentId?: string;
+}
+
 const byId = (idA: string, idB: string): number => idA.localeCompare(idB);
+
+export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
+	const idSet = new Set(nodes.map((node) => node.id));
+	const { parentById, childrenByParent, roots } = indexAdjacency(nodes, idSet);
+	const { ordinalById, intervalById, depthById, descendantsById } = numberNestedSets(
+		roots,
+		childrenByParent,
+	);
+
+	function ancestorsOf(id: string): Array<string> {
+		const ancestors: Array<string> = [];
+		const seen = new Set<string>([id]);
+		let current = parentById.get(id);
+
+		while (current !== undefined && !seen.has(current)) {
+			ancestors.push(current);
+			seen.add(current);
+			current = parentById.get(current);
+		}
+		return ancestors;
+	}
+
+	function siblingsOf(id: string): Array<string> {
+		const parent = parentById.get(id);
+		const group = parent === undefined ? roots : (childrenByParent.get(parent) ?? []);
+
+		return group.filter((siblingId) => siblingId !== id);
+	}
+
+	function isDescendantOf(id: string, ancestorId: string): boolean {
+		const interval = intervalById.get(ancestorId);
+		const ordinal = ordinalById.get(id);
+
+		if (!interval || ordinal === undefined) return false;
+		return ordinal >= interval[0] && ordinal <= interval[1];
+	}
+
+	function commonAncestorOf(ids: Array<string>): string | undefined {
+		const known = ids.filter((id) => idSet.has(id));
+		const first = known[0];
+
+		if (first === undefined) return undefined;
+
+		// Any common ancestor must span `first`, so it lies on its self-inclusive path; nearest-first wins
+		for (const candidate of [first, ...ancestorsOf(first)]) {
+			const interval = intervalById.get(candidate)!;
+			const isSpansAll = known.every((id) => {
+				const ordinal = ordinalById.get(id)!;
+				return ordinal >= interval[0] && ordinal <= interval[1];
+			});
+			if (isSpansAll) return candidate;
+		}
+		return undefined;
+	}
+
+	return {
+		roots,
+		has: (id) => idSet.has(id),
+		parentOf: (id) => parentById.get(id),
+		childrenOf: (id) => childrenByParent.get(id) ?? [],
+		siblingsOf,
+		ancestorsOf,
+		descendantsOf: (id) => descendantsById.get(id) ?? [],
+		isDescendantOf,
+		commonAncestorOf,
+		depthOf: (id) => depthById.get(id) ?? 0,
+		ordinalById,
+		intervalById,
+	};
+}
 
 // Only edges whose parent exists in the set; a missing, dangling, or self parent makes a root
 function indexAdjacency(nodes: Array<HierarchyNode>, idSet: ReadonlySet<string>) {
@@ -112,74 +182,4 @@ function numberNestedSets(
 	}
 
 	return { ordinalById, intervalById, depthById, descendantsById };
-}
-
-export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
-	const idSet = new Set(nodes.map((node) => node.id));
-	const { parentById, childrenByParent, roots } = indexAdjacency(nodes, idSet);
-	const { ordinalById, intervalById, depthById, descendantsById } = numberNestedSets(
-		roots,
-		childrenByParent,
-	);
-
-	function ancestorsOf(id: string): Array<string> {
-		const ancestors: Array<string> = [];
-		const seen = new Set<string>([id]);
-		let current = parentById.get(id);
-
-		while (current !== undefined && !seen.has(current)) {
-			ancestors.push(current);
-			seen.add(current);
-			current = parentById.get(current);
-		}
-		return ancestors;
-	}
-
-	function siblingsOf(id: string): Array<string> {
-		const parent = parentById.get(id);
-		const group = parent === undefined ? roots : (childrenByParent.get(parent) ?? []);
-
-		return group.filter((siblingId) => siblingId !== id);
-	}
-
-	function isDescendantOf(id: string, ancestorId: string): boolean {
-		const interval = intervalById.get(ancestorId);
-		const ordinal = ordinalById.get(id);
-
-		if (!interval || ordinal === undefined) return false;
-		return ordinal >= interval[0] && ordinal <= interval[1];
-	}
-
-	function commonAncestorOf(ids: Array<string>): string | undefined {
-		const known = ids.filter((id) => idSet.has(id));
-		const first = known[0];
-
-		if (first === undefined) return undefined;
-
-		// Any common ancestor must span `first`, so it lies on its self-inclusive path; nearest-first wins
-		for (const candidate of [first, ...ancestorsOf(first)]) {
-			const interval = intervalById.get(candidate)!;
-			const isSpansAll = known.every((id) => {
-				const ordinal = ordinalById.get(id)!;
-				return ordinal >= interval[0] && ordinal <= interval[1];
-			});
-			if (isSpansAll) return candidate;
-		}
-		return undefined;
-	}
-
-	return {
-		roots,
-		has: (id) => idSet.has(id),
-		parentOf: (id) => parentById.get(id),
-		childrenOf: (id) => childrenByParent.get(id) ?? [],
-		siblingsOf,
-		ancestorsOf,
-		descendantsOf: (id) => descendantsById.get(id) ?? [],
-		isDescendantOf,
-		commonAncestorOf,
-		depthOf: (id) => depthById.get(id) ?? 0,
-		ordinalById,
-		intervalById,
-	};
 }

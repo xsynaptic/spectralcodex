@@ -262,6 +262,8 @@ const translationStrings = {
 	[LanguageCodeEnum.Thai]: {},
 } as const satisfies TranslationsRecord<Record<string, string>>;
 
+type PluralValues = Record<string, number | string> & { langCode?: LanguageCode };
+
 // Get all possible translation keys across ALL languages
 type TranslationKey = {
 	[L in keyof typeof translationStrings]: keyof (typeof translationStrings)[L];
@@ -272,30 +274,7 @@ type TranslationKeyPlural<K extends string = TranslationKey> = K extends `${infe
 	? Base
 	: never;
 
-type PluralValues = Record<string, number | string> & { langCode?: LanguageCode };
-
 const pluralRulesCache = new Map<LanguageCode, Intl.PluralRules>();
-
-function getPluralCategory(count: number, langCode: LanguageCode) {
-	let pluralRules = pluralRulesCache.get(langCode);
-
-	if (!pluralRules) {
-		pluralRules = new Intl.PluralRules(langCode);
-		pluralRulesCache.set(langCode, pluralRules);
-	}
-
-	return pluralRules.select(count);
-}
-
-// Languages carrying only `.other` still resolve; English anchors the fallback
-function resolvePluralKey(key: TranslationKeyPlural, count: number, langCode: LanguageCode) {
-	const categoryKey = `${key}.${getPluralCategory(count, langCode)}`;
-	const hasCategoryKey = [langCode, defaultLanguage].some((code) =>
-		Object.hasOwn(translationStrings[code], categoryKey),
-	);
-
-	return (hasCategoryKey ? categoryKey : `${key}.other`) as TranslationKey;
-}
 
 export function getTranslations() {
 	function t(key: TranslationKey, langCode: LanguageCode = defaultLanguage) {
@@ -326,4 +305,25 @@ export function getTranslations() {
 	}
 
 	return Object.assign(t, { plural: tPlural });
+}
+
+function getPluralCategory(count: number, langCode: LanguageCode) {
+	let pluralRules = pluralRulesCache.get(langCode);
+
+	if (!pluralRules) {
+		pluralRules = new Intl.PluralRules(langCode);
+		pluralRulesCache.set(langCode, pluralRules);
+	}
+
+	return pluralRules.select(count);
+}
+
+// Languages carrying only `.other` still resolve; English anchors the fallback
+function resolvePluralKey(key: TranslationKeyPlural, count: number, langCode: LanguageCode) {
+	const categoryKey = `${key}.${getPluralCategory(count, langCode)}`;
+	const hasCategoryKey = [langCode, defaultLanguage].some((code) =>
+		Object.hasOwn(translationStrings[code], categoryKey),
+	);
+
+	return (hasCategoryKey ? categoryKey : `${key}.other`) as TranslationKey;
 }

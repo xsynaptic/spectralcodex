@@ -1,9 +1,6 @@
-// Structural shapes, so collection entries and plain test literals both satisfy them
-interface ResourceLike {
-	data: {
-		match?: Array<string> | string | undefined;
-	};
-	id: string;
+export interface ResourceAssociation {
+	locationIdsByResourceId: Map<string, Array<string>>;
+	postIdsByResourceId: Map<string, Array<string>>;
 }
 
 interface ContentLike {
@@ -14,36 +11,12 @@ interface ContentLike {
 	id: string;
 }
 
-export interface ResourceAssociation {
-	locationIdsByResourceId: Map<string, Array<string>>;
-	postIdsByResourceId: Map<string, Array<string>>;
-}
-
-export function isLinkUrlMatch(
-	linkUrl: string,
-	matchPattern: Array<string> | string | undefined,
-): boolean {
-	if (!matchPattern) return false;
-
-	if (typeof matchPattern === 'string') {
-		return linkUrl.includes(matchPattern);
-	}
-
-	return matchPattern.some((pattern) => linkUrl.includes(pattern));
-}
-
-// Normalized once per content entry; the predicate below reruns against every resource
-function getLinkUrls(links: ContentLike['data']['links']): Array<string> {
-	if (!links) return [];
-
-	return links.map((link) => (typeof link === 'string' ? link : link.url));
-}
-
-// Object-form sources are resources written inline; only string sources reference a resource entry
-function getSourceIds(sources: ContentLike['data']['sources']): Set<string> {
-	if (!sources) return new Set<string>();
-
-	return new Set(sources.filter((source) => typeof source === 'string'));
+// Structural shapes, so collection entries and plain test literals both satisfy them
+interface ResourceLike {
+	data: {
+		match?: Array<string> | string | undefined;
+	};
+	id: string;
 }
 
 // Entry identity across raw and enriched reads is not guaranteed; IDs resolve via entriesMap
@@ -87,4 +60,31 @@ export function buildResourceAssociation(
 	collectContentIds(posts, postIdsByResourceId);
 
 	return { locationIdsByResourceId, postIdsByResourceId };
+}
+
+export function isLinkUrlMatch(
+	linkUrl: string,
+	matchPattern: Array<string> | string | undefined,
+): boolean {
+	if (!matchPattern) return false;
+
+	if (typeof matchPattern === 'string') {
+		return linkUrl.includes(matchPattern);
+	}
+
+	return matchPattern.some((pattern) => linkUrl.includes(pattern));
+}
+
+// Normalized once per content entry; the predicate below reruns against every resource
+function getLinkUrls(links: ContentLike['data']['links']): Array<string> {
+	if (!links) return [];
+
+	return links.map((link) => (typeof link === 'string' ? link : link.url));
+}
+
+// Object-form sources are resources written inline; only string sources reference a resource entry
+function getSourceIds(sources: ContentLike['data']['sources']): Set<string> {
+	if (!sources) return new Set<string>();
+
+	return new Set(sources.filter((source) => typeof source === 'string'));
 }

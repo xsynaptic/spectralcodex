@@ -10,15 +10,6 @@ import {
 } from '#lib/collections/regions/regions-factory.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
-// Minimal fixtures; only the fields the factory reads, cast to the collection entry type
-function makeRegion(id: string, parent?: string): CollectionEntry<'regions'> {
-	return {
-		id,
-		collection: 'regions',
-		data: { title: id, ...(parent === undefined ? {} : { parent }) },
-	} as unknown as CollectionEntry<'regions'>;
-}
-
 function makeLocation(id: string, regionIds: Array<string>): CollectionEntry<'locations'> {
 	return {
 		id,
@@ -38,6 +29,15 @@ function makePost(id: string, regionIds?: Array<string>): CollectionEntry<'posts
 				: { regions: regionIds.map((regionId) => ({ id: regionId })) }),
 		},
 	} as unknown as CollectionEntry<'posts'>;
+}
+
+// Minimal fixtures; only the fields the factory reads, cast to the collection entry type
+function makeRegion(id: string, parent?: string): CollectionEntry<'regions'> {
+	return {
+		id,
+		collection: 'regions',
+		data: { title: id, ...(parent === undefined ? {} : { parent }) },
+	} as unknown as CollectionEntry<'regions'>;
 }
 
 // taiwan > north-taiwan > (keelung, taipei); tainan directly under taiwan

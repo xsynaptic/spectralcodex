@@ -11,12 +11,11 @@ interface DeployInfraOptions {
 	rootPath: string;
 }
 
-function requireEnv(name: string): string {
-	const value = process.env[name];
-	if (!value) {
-		throw new Error(`Missing required environment variable: ${name}`);
-	}
-	return value;
+interface InfraSyncTarget {
+	destination?: string;
+	excludes?: Array<string>;
+	extraFlags?: Array<string>;
+	source: string;
 }
 
 // Builds the single server-side .env consumed by deploy/docker-compose.yml (umami, image, cache-warmer)
@@ -52,11 +51,12 @@ function buildServerEnv(config: DeployConfig): string {
 	return lines.join('\n');
 }
 
-interface InfraSyncTarget {
-	destination?: string;
-	excludes?: Array<string>;
-	extraFlags?: Array<string>;
-	source: string;
+function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) {
+		throw new Error(`Missing required environment variable: ${name}`);
+	}
+	return value;
 }
 
 const infraSyncTargets: Array<InfraSyncTarget> = [
@@ -76,6 +76,35 @@ const infraSyncTargets: Array<InfraSyncTarget> = [
 		extraFlags: ['--mkpath', '--delete', '--delete-excluded'],
 	},
 ];
+
+export async function deployInfra(options: DeployInfraOptions): Promise<void> {
+	const { rootPath, dryRun = false } = options;
+
+	const config = loadDeployConfig();
+	const serverEnv = buildServerEnv(config);
+
+	const deployDir = path.join(rootPath, 'deploy');
+	const remotePath = config.remotePath;
+
+	console.log(chalk.blue('Deploying infrastructure...'));
+	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
+	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
+
+	const start = Date.now();
+
+	await syncInfraFiles({ config, deployDir, dryRun });
+
+	if (dryRun) {
+		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
+		console.log(chalk.yellow(`DRY RUN write ${remotePath}/.env`));
+		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+		return;
+	}
+
+	await updateRemoteServices(config, serverEnv);
+
+	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+}
 
 async function syncInfraFiles({
 	config,
@@ -136,33 +165,4 @@ async function updateRemoteServices(config: DeployConfig, serverEnv: string): Pr
 	} catch {
 		console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
 	}
-}
-
-export async function deployInfra(options: DeployInfraOptions): Promise<void> {
-	const { rootPath, dryRun = false } = options;
-
-	const config = loadDeployConfig();
-	const serverEnv = buildServerEnv(config);
-
-	const deployDir = path.join(rootPath, 'deploy');
-	const remotePath = config.remotePath;
-
-	console.log(chalk.blue('Deploying infrastructure...'));
-	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
-
-	const start = Date.now();
-
-	await syncInfraFiles({ config, deployDir, dryRun });
-
-	if (dryRun) {
-		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
-		console.log(chalk.yellow(`DRY RUN write ${remotePath}/.env`));
-		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
-		return;
-	}
-
-	await updateRemoteServices(config, serverEnv);
-
-	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
 }

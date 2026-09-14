@@ -7,13 +7,25 @@ interface ReferenceOptions {
 	skipCollections?: Array<string>;
 }
 
-function toEntryReference(
-	record: Record<string, unknown>,
-	field: string,
-): EntryReference | undefined {
-	if (typeof record.collection !== 'string' || typeof record.id !== 'string') return undefined;
+// Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
+// Checking the declared collection catches a `reference('regions')` that names a theme, which a global id lookup would accept
+export function collectReferenceIssues(
+	entries: Array<ContentEntry>,
+	{ skipCollections = [] }: ReferenceOptions = {},
+) {
+	const idsByCollection = getIdsByCollection(entries);
+	const skipped = new Set(skipCollections);
 
-	return { field, collection: record.collection, id: record.id };
+	return entries.flatMap((entry) => getEntryReferenceIssues(entry, idsByCollection, skipped));
+}
+
+export function validateReferences(entries: Array<ContentEntry>, options: ReferenceOptions = {}) {
+	const issues = collectReferenceIssues(entries, options);
+
+	return toReferenceValidationResult(issues, {
+		fail: `Found ${issues.length.toString()} broken reference(s)`,
+		pass: 'Entry references valid',
+	});
 }
 
 /**
@@ -43,19 +55,6 @@ function collectEntryReferences(value: unknown, field: string, references: Array
 	}
 }
 
-function getIdsByCollection(entries: Array<ContentEntry>) {
-	const idsByCollection = new Map<string, Set<string>>();
-
-	for (const entry of entries) {
-		const ids = idsByCollection.get(entry.collection) ?? new Set<string>();
-
-		ids.add(entry.id);
-		idsByCollection.set(entry.collection, ids);
-	}
-
-	return idsByCollection;
-}
-
 // A collection missing from the checked set is itself a fault, so a skip has to be named
 function getEntryReferenceIssues(
 	entry: ContentEntry,
@@ -78,23 +77,24 @@ function getEntryReferenceIssues(
 	return issues;
 }
 
-// Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
-// Checking the declared collection catches a `reference('regions')` that names a theme, which a global id lookup would accept
-export function collectReferenceIssues(
-	entries: Array<ContentEntry>,
-	{ skipCollections = [] }: ReferenceOptions = {},
-) {
-	const idsByCollection = getIdsByCollection(entries);
-	const skipped = new Set(skipCollections);
+function getIdsByCollection(entries: Array<ContentEntry>) {
+	const idsByCollection = new Map<string, Set<string>>();
 
-	return entries.flatMap((entry) => getEntryReferenceIssues(entry, idsByCollection, skipped));
+	for (const entry of entries) {
+		const ids = idsByCollection.get(entry.collection) ?? new Set<string>();
+
+		ids.add(entry.id);
+		idsByCollection.set(entry.collection, ids);
+	}
+
+	return idsByCollection;
 }
 
-export function validateReferences(entries: Array<ContentEntry>, options: ReferenceOptions = {}) {
-	const issues = collectReferenceIssues(entries, options);
+function toEntryReference(
+	record: Record<string, unknown>,
+	field: string,
+): EntryReference | undefined {
+	if (typeof record.collection !== 'string' || typeof record.id !== 'string') return undefined;
 
-	return toReferenceValidationResult(issues, {
-		fail: `Found ${issues.length.toString()} broken reference(s)`,
-		pass: 'Entry references valid',
-	});
+	return { field, collection: record.collection, id: record.id };
 }

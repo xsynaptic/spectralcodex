@@ -127,10 +127,20 @@ const themePriority = [
 	'taiwan-urban-exploration',
 ];
 
-function getTaiwanRegionKey(regionParent: string | undefined): string {
-	const parentKey = regionParent ? `taiwan/${regionParent}` : undefined;
-
-	return parentKey && Object.hasOwn(fallbackImageIds, parentKey) ? parentKey : 'taiwan';
+export function getFallbackImageId({
+	id,
+	collection,
+	category,
+	regions,
+	themes,
+}: {
+	category?: string | undefined;
+	collection: string;
+	id: string;
+	regions?: Array<string> | undefined;
+	themes?: Array<string> | undefined;
+}): string {
+	return resolveFallbackImageId(getFallbackKey({ collection, category, regions, themes }), id);
 }
 
 // Priority: collection → themes → region (ancestor/parent) → category → region (ancestor) → default
@@ -162,18 +172,8 @@ function getFallbackKey({
 	return 'default';
 }
 
-export function getFallbackImageId({
-	id,
-	collection,
-	category,
-	regions,
-	themes,
-}: {
-	category?: string | undefined;
-	collection: string;
-	id: string;
-	regions?: Array<string> | undefined;
-	themes?: Array<string> | undefined;
-}): string {
-	return resolveFallbackImageId(getFallbackKey({ collection, category, regions, themes }), id);
+function getTaiwanRegionKey(regionParent: string | undefined): string {
+	const parentKey = regionParent ? `taiwan/${regionParent}` : undefined;
+
+	return parentKey && Object.hasOwn(fallbackImageIds, parentKey) ? parentKey : 'taiwan';
 }

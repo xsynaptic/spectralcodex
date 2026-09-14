@@ -28,17 +28,6 @@ export const ChunkConfigProvider: FC<ChunkConfig & { children: ReactNode }> =
 		);
 	};
 
-function parseChunk(raw: unknown): Array<MapPopupItem> {
-	const result = MapPopupItemSchema.array().safeParse(raw);
-
-	if (!result.success) {
-		console.error('[Map] popup chunk parse error:', result.error);
-		throw new Error('[Map] Failed to parse popup chunk');
-	}
-
-	return result.data;
-}
-
 // Fetch and cache a popup chunk, keyed by URL so browsing warms chunks shared across maps
 // Disabled when no chunk key is in play (inline objectives/MDX popups)
 export function useChunkPopup(chunkKey: string | undefined) {
@@ -74,4 +63,15 @@ export function useChunkPopup(chunkKey: string | undefined) {
 		refetchOnWindowFocus: false,
 		refetchOnMount: false,
 	});
+}
+
+function parseChunk(raw: unknown): Array<MapPopupItem> {
+	const result = MapPopupItemSchema.array().safeParse(raw);
+
+	if (!result.success) {
+		console.error('[Map] popup chunk parse error:', result.error);
+		throw new Error('[Map] Failed to parse popup chunk');
+	}
+
+	return result.data;
 }

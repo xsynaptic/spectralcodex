@@ -8,19 +8,19 @@ import { hashShortLength, mdxComponents } from '#constants.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripFootnoteReferences, stripMdxComponents, textClipper } from '#lib/utils/text.ts';
 
-interface DescriptionRendered {
-	html: string;
-	text: string;
+export interface DescriptionEntry {
+	body?: string | undefined;
+	data: { description?: string | undefined };
+	id: string;
 }
 
 interface DescriptionCached extends DescriptionRendered {
 	hash: string;
 }
 
-export interface DescriptionEntry {
-	body?: string | undefined;
-	data: { description?: string | undefined };
-	id: string;
+interface DescriptionRendered {
+	html: string;
+	text: string;
 }
 
 // Buffered past wordCountFinal so orphan markdown syntax falls outside the clip boundary
@@ -32,28 +32,6 @@ const descriptionSchema = {
 	tagNames: ['em', 'strong', 'span'],
 	attributes: { span: ['className'] },
 };
-
-// Return the frontmatter description or derive a clipped excerpt from the body
-export function getDescription(
-	entry: {
-		body?: string | undefined;
-		data: { description?: string | undefined };
-	},
-	options: { wordCount?: number } = {},
-): string | undefined {
-	if (entry.data.description) {
-		return entry.data.description;
-	}
-	if (entry.body) {
-		return R.pipe(
-			entry.body,
-			(body) => stripMdxComponents(body, mdxComponents),
-			stripFootnoteReferences,
-			(text) => textClipper(text.trim(), { wordCount: options.wordCount ?? 100 }),
-		);
-	}
-	return undefined;
-}
 
 export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 	// Render and cache both HTML and plain-text forms of an entry's description in a single parse
@@ -92,4 +70,26 @@ export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 	}
 
 	return { getDescriptionRendered, getDescriptionRenderedText };
+}
+
+// Return the frontmatter description or derive a clipped excerpt from the body
+export function getDescription(
+	entry: {
+		body?: string | undefined;
+		data: { description?: string | undefined };
+	},
+	options: { wordCount?: number } = {},
+): string | undefined {
+	if (entry.data.description) {
+		return entry.data.description;
+	}
+	if (entry.body) {
+		return R.pipe(
+			entry.body,
+			(body) => stripMdxComponents(body, mdxComponents),
+			stripFootnoteReferences,
+			(text) => textClipper(text.trim(), { wordCount: options.wordCount ?? 100 }),
+		);
+	}
+	return undefined;
 }

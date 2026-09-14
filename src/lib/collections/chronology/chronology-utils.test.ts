@@ -113,12 +113,12 @@ describe('getChronologyActivityData', () => {
 	});
 });
 
-function makeMonthlyItem(overrides: Partial<ChronologyMonthlyItem>): ChronologyMonthlyItem {
-	return { highlights: undefined, ...overrides } as ChronologyMonthlyItem;
-}
-
 function makeChronologyEntry(imageFeatured: unknown) {
 	return { data: { imageFeatured } } as ChronologyMonthlyItem['chronologyEntry'];
+}
+
+function makeMonthlyItem(overrides: Partial<ChronologyMonthlyItem>): ChronologyMonthlyItem {
+	return { highlights: undefined, ...overrides } as ChronologyMonthlyItem;
 }
 
 describe('createChronologyImageFeaturedGroupFunction', () => {

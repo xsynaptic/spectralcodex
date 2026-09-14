@@ -17,23 +17,6 @@ import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
 
-export async function getPostSchema(
-	entry: CollectionEntry<'posts'>,
-	props: { imageUrl: string | undefined; url: string },
-): Promise<Array<Thing>> {
-	return [
-		buildArticleSchema({
-			title: entry.data.title,
-			description: await getDescriptionRenderedText(entry),
-			dateCreated: entry.data.dateCreated,
-			dateUpdated: entry.data.dateUpdated,
-			url: props.url,
-			imageUrl: props.imageUrl,
-		}),
-		buildAuthorSchema(),
-	];
-}
-
 // Data for a single post entry page: map data and backlinks
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
@@ -59,6 +42,23 @@ export async function createQueryPostsEntryFunction() {
 
 		return { mapData, backlinks };
 	};
+}
+
+export async function getPostSchema(
+	entry: CollectionEntry<'posts'>,
+	props: { imageUrl: string | undefined; url: string },
+): Promise<Array<Thing>> {
+	return [
+		buildArticleSchema({
+			title: entry.data.title,
+			description: await getDescriptionRenderedText(entry),
+			dateCreated: entry.data.dateCreated,
+			dateUpdated: entry.data.dateUpdated,
+			url: props.url,
+			imageUrl: props.imageUrl,
+		}),
+		buildAuthorSchema(),
+	];
 }
 
 export async function queryPostsIndex() {

@@ -42,33 +42,35 @@ interface ChronologyImageCandidate {
 	imageFeaturedId: string;
 }
 
-function parseChronologyDate(value: unknown): Date | undefined {
-	return value instanceof Date ? value : undefined;
-}
+// Maps each chronology period to its best content image; one image may represent both a year and a month
+export function buildChronologyImageIndex(entries: Array<ContentEntry>): Map<string, string> {
+	const candidates = new Map<string, ChronologyImageCandidate>();
 
-function getContentDate(value: unknown): Date | undefined {
-	if (!value || typeof value !== 'object' || !('date' in value)) return undefined;
+	function addCandidate(date: Date, candidate: ChronologyImageCandidate): void {
+		for (const key of getChronologyPeriodKeys(date)) {
+			const current = candidates.get(key);
 
-	return parseChronologyDate(value.date);
-}
-
-// dateRecorded entries are ContentDate objects or [start, end] tuples; pull the date from each
-function extractRecordedDates(value: unknown): Array<Date> {
-	if (!Array.isArray(value)) return [];
-
-	const dates: Array<Date> = [];
-
-	for (const entry of value) {
-		const contentDates = Array.isArray(entry) ? entry : [entry];
-
-		for (const contentDate of contentDates) {
-			const date = getContentDate(contentDate);
-
-			if (date) dates.push(date);
+			if (!current || isBetterChronologyCandidate(candidate, current)) {
+				candidates.set(key, candidate);
+			}
 		}
 	}
 
-	return dates;
+	for (const collectionName of chronologyImageCollections) {
+		for (const entry of entries) {
+			if (entry.collection !== collectionName) continue;
+
+			const entryCandidate = extractEntryCandidate(entry);
+
+			if (!entryCandidate) continue;
+
+			for (const { date, category } of extractDatedCategories(entry.data)) {
+				addCandidate(date, { ...entryCandidate, category });
+			}
+		}
+	}
+
+	return new Map([...candidates].map(([key, candidate]) => [key, candidate.imageFeaturedId]));
 }
 
 // Content dates are UTC instants; key periods in UTC so buckets match displayed dates
@@ -77,21 +79,6 @@ export function getChronologyPeriodKeys(date: Date): Array<string> {
 	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
 
 	return [year, `${year}-${month}`];
-}
-
-function isBetterChronologyCandidate(
-	next: ChronologyImageCandidate,
-	current: ChronologyImageCandidate,
-): boolean {
-	if (next.entryQuality !== current.entryQuality) {
-		return next.entryQuality > current.entryQuality;
-	}
-
-	if (chronologyCategoryRank[next.category] !== chronologyCategoryRank[current.category]) {
-		return chronologyCategoryRank[next.category] < chronologyCategoryRank[current.category];
-	}
-
-	return next.id < current.id;
 }
 
 function extractDatedCategories(
@@ -128,33 +115,46 @@ function extractEntryCandidate(
 	};
 }
 
-// Maps each chronology period to its best content image; one image may represent both a year and a month
-export function buildChronologyImageIndex(entries: Array<ContentEntry>): Map<string, string> {
-	const candidates = new Map<string, ChronologyImageCandidate>();
+// dateRecorded entries are ContentDate objects or [start, end] tuples; pull the date from each
+function extractRecordedDates(value: unknown): Array<Date> {
+	if (!Array.isArray(value)) return [];
 
-	function addCandidate(date: Date, candidate: ChronologyImageCandidate): void {
-		for (const key of getChronologyPeriodKeys(date)) {
-			const current = candidates.get(key);
+	const dates: Array<Date> = [];
 
-			if (!current || isBetterChronologyCandidate(candidate, current)) {
-				candidates.set(key, candidate);
-			}
+	for (const entry of value) {
+		const contentDates = Array.isArray(entry) ? entry : [entry];
+
+		for (const contentDate of contentDates) {
+			const date = getContentDate(contentDate);
+
+			if (date) dates.push(date);
 		}
 	}
 
-	for (const collectionName of chronologyImageCollections) {
-		for (const entry of entries) {
-			if (entry.collection !== collectionName) continue;
+	return dates;
+}
 
-			const entryCandidate = extractEntryCandidate(entry);
+function getContentDate(value: unknown): Date | undefined {
+	if (!value || typeof value !== 'object' || !('date' in value)) return undefined;
 
-			if (!entryCandidate) continue;
+	return parseChronologyDate(value.date);
+}
 
-			for (const { date, category } of extractDatedCategories(entry.data)) {
-				addCandidate(date, { ...entryCandidate, category });
-			}
-		}
+function isBetterChronologyCandidate(
+	next: ChronologyImageCandidate,
+	current: ChronologyImageCandidate,
+): boolean {
+	if (next.entryQuality !== current.entryQuality) {
+		return next.entryQuality > current.entryQuality;
 	}
 
-	return new Map([...candidates].map(([key, candidate]) => [key, candidate.imageFeaturedId]));
+	if (chronologyCategoryRank[next.category] !== chronologyCategoryRank[current.category]) {
+		return chronologyCategoryRank[next.category] < chronologyCategoryRank[current.category];
+	}
+
+	return next.id < current.id;
+}
+
+function parseChronologyDate(value: unknown): Date | undefined {
+	return value instanceof Date ? value : undefined;
 }

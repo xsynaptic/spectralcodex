@@ -20,32 +20,6 @@ import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
 
-// Get all ancestors of the specified region
-export async function createRegionAncestorsFunction() {
-	const getRegionsById = await createRegionsByIdsFunction();
-
-	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
-		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
-
-		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
-	};
-}
-
-// References are not the complete entry; they still need to be fetched from the collection
-export async function createRegionAncestorsByIdFunction() {
-	const { entriesMap } = await getRegionsCollection();
-	const getRegionAncestors = await createRegionAncestorsFunction();
-
-	return function getRegionAncestorsById(regionId: string) {
-		const region = entriesMap.get(regionId);
-
-		if (!region)
-			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
-
-		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
-	};
-}
-
 // Data for a single region entry page: catalog items, map data, and display options
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
@@ -119,6 +93,43 @@ export async function createQueryRegionsEntryFunction() {
 	};
 }
 
+// Related regions (children/siblings) filtered by content and sorted by content count
+export async function createQueryRegionsRelatedFunction() {
+	const getRegionsByIds = await createRegionsByIdsFunction();
+
+	return function queryRegionsRelated(ids: Array<string> | undefined, limit: number) {
+		return ids
+			? R.pipe(ids, getRegionsByIds, R.filter(hasEntries), R.sort(sortByEntryCount), R.take(limit))
+			: [];
+	};
+}
+
+// References are not the complete entry; they still need to be fetched from the collection
+export async function createRegionAncestorsByIdFunction() {
+	const { entriesMap } = await getRegionsCollection();
+	const getRegionAncestors = await createRegionAncestorsFunction();
+
+	return function getRegionAncestorsById(regionId: string) {
+		const region = entriesMap.get(regionId);
+
+		if (!region)
+			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
+
+		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
+	};
+}
+
+// Get all ancestors of the specified region
+export async function createRegionAncestorsFunction() {
+	const getRegionsById = await createRegionsByIdsFunction();
+
+	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
+		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
+
+		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
+	};
+}
+
 // Filtered and sorted ancestral regions for the regions index page
 export async function queryRegionsIndex() {
 	const { entries } = await getRegionsCollection();
@@ -131,15 +142,4 @@ export async function queryRegionsIndex() {
 		R.sort(sortByEntryCount),
 		catalog.resolve,
 	);
-}
-
-// Related regions (children/siblings) filtered by content and sorted by content count
-export async function createQueryRegionsRelatedFunction() {
-	const getRegionsByIds = await createRegionsByIdsFunction();
-
-	return function queryRegionsRelated(ids: Array<string> | undefined, limit: number) {
-		return ids
-			? R.pipe(ids, getRegionsByIds, R.filter(hasEntries), R.sort(sortByEntryCount), R.take(limit))
-			: [];
-	};
 }

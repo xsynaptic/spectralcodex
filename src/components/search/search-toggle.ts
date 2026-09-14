@@ -18,38 +18,6 @@ type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModal
 
 let isSearchAnalyticsRegistered = false;
 
-function getResultCount(result: unknown): number | undefined {
-	if (!result || typeof result !== 'object') return undefined;
-
-	const { results } = result as Partial<PagefindSearchResult>;
-
-	return Array.isArray(results) ? results.length : undefined;
-}
-
-function registerSearchAnalytics(instance: Instance) {
-	if (isSearchAnalyticsRegistered) return;
-
-	isSearchAnalyticsRegistered = true;
-
-	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-
-	instance.on('results', (result: unknown) => {
-		clearTimeout(debounceTimer);
-
-		const query = instance.searchTerm.replaceAll(/\s+/g, ' ').trim().slice(0, searchQueryMaxLength);
-
-		if (query.length < searchQueryMinLength) return;
-
-		const resultCount = getResultCount(result);
-		const queryWithCount =
-			resultCount === undefined ? query : `${query} (${resultCount.toString()})`;
-
-		debounceTimer = setTimeout(() => {
-			window.umami?.track('search-query', { query, queryWithCount });
-		}, searchQueryDebounceMs);
-	});
-}
-
 class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 	instance: Instance | null = null;
@@ -174,6 +142,38 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		this.#controller?.abort();
 		this.#controller = undefined;
 	}
+}
+
+function getResultCount(result: unknown): number | undefined {
+	if (!result || typeof result !== 'object') return undefined;
+
+	const { results } = result as Partial<PagefindSearchResult>;
+
+	return Array.isArray(results) ? results.length : undefined;
+}
+
+function registerSearchAnalytics(instance: Instance) {
+	if (isSearchAnalyticsRegistered) return;
+
+	isSearchAnalyticsRegistered = true;
+
+	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+	instance.on('results', (result: unknown) => {
+		clearTimeout(debounceTimer);
+
+		const query = instance.searchTerm.replaceAll(/\s+/g, ' ').trim().slice(0, searchQueryMaxLength);
+
+		if (query.length < searchQueryMinLength) return;
+
+		const resultCount = getResultCount(result);
+		const queryWithCount =
+			resultCount === undefined ? query : `${query} (${resultCount.toString()})`;
+
+		debounceTimer = setTimeout(() => {
+			window.umami?.track('search-query', { query, queryWithCount });
+		}, searchQueryDebounceMs);
+	});
 }
 
 if (!customElements.get('search-toggle')) {

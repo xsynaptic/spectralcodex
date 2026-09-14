@@ -11,27 +11,6 @@ const editorialCollections = new Set<CatalogCollectionKey>(['locations', 'posts'
 // Pre-migration originals; too small to hold up at hero scale
 const legacyImagePrefix = 'errata/';
 
-export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
-	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();
-}
-
-// Highest quality first, newest first on ties
-export function sortCatalogByEntryQuality(a: CatalogItem, b: CatalogItem): number {
-	return b.entryQuality - a.entryQuality || sortCatalogByDate(a, b);
-}
-
-export function hasFeaturedImage(item: CatalogItem): boolean {
-	return !!item.imageId;
-}
-
-export function hasHighResolutionHeroImage(item: CatalogItem): boolean {
-	return !!item.imageHeroId && !item.imageHeroId.startsWith(legacyImagePrefix);
-}
-
-export function isEditorialEntry(item: CatalogItem): boolean {
-	return editorialCollections.has(item.collection);
-}
-
 /**
  * Split an entry's related items into a featured set and a shuffled remainder.
  * Featured = items with a featured image, newest first. The remainder is everything
@@ -65,4 +44,25 @@ export function buildEntryCatalogItems(
 		catalogItems: catalogItemsAll.slice(0, limit),
 		catalogItemsCount: catalogItemsAll.length,
 	};
+}
+
+export function hasFeaturedImage(item: CatalogItem): boolean {
+	return !!item.imageId;
+}
+
+export function hasHighResolutionHeroImage(item: CatalogItem): boolean {
+	return !!item.imageHeroId && !item.imageHeroId.startsWith(legacyImagePrefix);
+}
+
+export function isEditorialEntry(item: CatalogItem): boolean {
+	return editorialCollections.has(item.collection);
+}
+
+export function sortCatalogByDate(a: CatalogItem, b: CatalogItem): number {
+	return (b.dateUpdated ?? b.dateCreated).valueOf() - (a.dateUpdated ?? a.dateCreated).valueOf();
+}
+
+// Highest quality first, newest first on ties
+export function sortCatalogByEntryQuality(a: CatalogItem, b: CatalogItem): number {
+	return b.entryQuality - a.entryQuality || sortCatalogByDate(a, b);
 }

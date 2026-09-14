@@ -4,19 +4,6 @@ import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 
-function makeFeature(id: string, coordinates: [number, number], isOutlier?: boolean) {
-	return {
-		type: 'Feature' as const,
-		id,
-		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
-		geometry: { type: 'Point' as const, coordinates },
-	};
-}
-
-function makeCollection(features: Array<ReturnType<typeof makeFeature>>): MapFeatureCollection {
-	return { type: 'FeatureCollection', features } as unknown as MapFeatureCollection;
-}
-
 function expectWithinBounds(
 	bounds: [number, number, number, number],
 	lng: number,
@@ -26,6 +13,19 @@ function expectWithinBounds(
 	expect(lat).toBeGreaterThanOrEqual(bounds[1]);
 	expect(lng).toBeLessThanOrEqual(bounds[2]);
 	expect(lat).toBeLessThanOrEqual(bounds[3]);
+}
+
+function makeCollection(features: Array<ReturnType<typeof makeFeature>>): MapFeatureCollection {
+	return { type: 'FeatureCollection', features } as unknown as MapFeatureCollection;
+}
+
+function makeFeature(id: string, coordinates: [number, number], isOutlier?: boolean) {
+	return {
+		type: 'Feature' as const,
+		id,
+		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
+		geometry: { type: 'Point' as const, coordinates },
+	};
 }
 
 describe('getMapBounds', () => {

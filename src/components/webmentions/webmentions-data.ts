@@ -27,47 +27,6 @@ interface WebmentionsSummary {
 	repostCount: number;
 }
 
-function isSelfAuthored(mention: Webmention) {
-	const authorUrl = mention.author?.url?.trim().toLowerCase().replace(/\/+$/, '');
-
-	return !!authorUrl && selfAuthorUrls.has(authorUrl);
-}
-
-// Origin and trailing slash vary between senders; the path alone is the identity
-function normalizePathname(input: string) {
-	const pathname = URL.canParse(input) ? new URL(input).pathname : input;
-
-	return pathname.replace(/\/+$/, '') || '/';
-}
-
-async function loadWebmentions() {
-	const filePath = path.join(process.cwd(), CONTENT_DATA_PATH, '..', 'data', 'webmentions.jsonl');
-
-	try {
-		const fileContents = await readFile(filePath, 'utf8');
-		const mentions: Array<Webmention> = [];
-
-		for (const line of fileContents.split('\n')) {
-			if (line.trim() === '') continue;
-
-			const result = WebmentionSchema.safeParse(JSON.parse(line));
-
-			if (result.success) mentions.push(result.data);
-		}
-
-		return mentions;
-	} catch (error) {
-		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
-
-		if (isNotFound) {
-			console.warn(`[Webmentions] Not found: ${filePath} (run pnpm webmentions to generate)`);
-			return [];
-		}
-
-		throw error;
-	}
-}
-
 async function createWebmentionsFunction() {
 	const mentions = await loadWebmentions();
 
@@ -143,10 +102,45 @@ function getSourceHostname(sourceUrl: string) {
 	return new URL(sourceUrl).hostname.replace(/^www\./, '');
 }
 
-function trimToUndefined(value: null | string | undefined): string | undefined {
-	const trimmed = value?.trim();
+function isSelfAuthored(mention: Webmention) {
+	const authorUrl = mention.author?.url?.trim().toLowerCase().replace(/\/+$/, '');
 
-	return trimmed === '' ? undefined : trimmed;
+	return !!authorUrl && selfAuthorUrls.has(authorUrl);
+}
+
+async function loadWebmentions() {
+	const filePath = path.join(process.cwd(), CONTENT_DATA_PATH, '..', 'data', 'webmentions.jsonl');
+
+	try {
+		const fileContents = await readFile(filePath, 'utf8');
+		const mentions: Array<Webmention> = [];
+
+		for (const line of fileContents.split('\n')) {
+			if (line.trim() === '') continue;
+
+			const result = WebmentionSchema.safeParse(JSON.parse(line));
+
+			if (result.success) mentions.push(result.data);
+		}
+
+		return mentions;
+	} catch (error) {
+		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
+
+		if (isNotFound) {
+			console.warn(`[Webmentions] Not found: ${filePath} (run pnpm webmentions to generate)`);
+			return [];
+		}
+
+		throw error;
+	}
+}
+
+// Origin and trailing slash vary between senders; the path alone is the identity
+function normalizePathname(input: string) {
+	const pathname = URL.canParse(input) ? new URL(input).pathname : input;
+
+	return pathname.replace(/\/+$/, '') || '/';
 }
 
 function toReply(mention: Webmention): undefined | WebmentionReply {
@@ -163,6 +157,12 @@ function toReply(mention: Webmention): undefined | WebmentionReply {
 		dateReceived: new Date(mention['wm-received']),
 		text: trimToUndefined(mention.content?.text),
 	};
+}
+
+function trimToUndefined(value: null | string | undefined): string | undefined {
+	const trimmed = value?.trim();
+
+	return trimmed === '' ? undefined : trimmed;
 }
 
 let webmentionsFunction: ReturnType<typeof createWebmentionsFunction> | undefined;

@@ -23,15 +23,6 @@ import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildEntryBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 
-function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, number] | undefined {
-	const geometry = entry.data.geometry;
-	const point = Array.isArray(geometry) ? geometry[0] : geometry;
-
-	if (!point) return undefined;
-
-	return [point.coordinates[0], point.coordinates[1]];
-}
-
 export async function getLocationSchemas(
 	entry: CollectionEntry<'locations'>,
 	props: { url: string },
@@ -62,19 +53,49 @@ export async function getLocationSchemas(
 	];
 }
 
+function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, number] | undefined {
+	const geometry = entry.data.geometry;
+	const point = Array.isArray(geometry) ? geometry[0] : geometry;
+
+	if (!point) return undefined;
+
+	return [point.coordinates[0], point.coordinates[1]];
+}
+
 const locationNearbyRadiusKmMin = 1;
 const locationNearbyRadiusKmMax = 3;
 const locationNearbyRadiusNeighborCount = 5;
 
-// Center the location map on the target, sizing the frame to neighbor density
-// Dense areas keep the minimum radius, remote ones widen toward the maximum
-function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
-	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
+// Resolve region, lang code, and multilingual title data for a location entry
+export async function createLocationEntryDisplayFunction() {
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
-	const index = Math.min(locationNearbyRadiusNeighborCount, nearby.length) - 1;
-	const neighborDistance = nearby[index]?.distance ?? locationNearbyRadiusKmMin;
+	return function getLocationEntryDisplay(entry: CollectionEntry<'locations'>) {
+		const regionPrimary = getFirstRegionByReference(entry.data.regions);
+		const regionLangCode = regionPrimary?.data._langCode;
 
-	return Math.min(Math.max(neighborDistance, locationNearbyRadiusKmMin), locationNearbyRadiusKmMax);
+		const titleResult = getMultilingualContent({
+			data: entry.data,
+			prop: 'title',
+			...(regionLangCode ? { langCode: regionLangCode } : {}),
+			...getLangCodeAdditional(regionPrimary),
+		});
+
+		const addressResult = getMultilingualContent({
+			data: entry.data,
+			prop: 'address',
+			...(regionLangCode ? { langCode: regionLangCode } : {}),
+		});
+
+		return {
+			regionPrimary,
+			regionLangCode,
+			titleMultilingual: titleResult?.primary,
+			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
+			addressBase: entry.data.address,
+			addressMultilingual: addressResult?.primary,
+		};
+	};
 }
 
 // Data for a single location entry page: map data, related posts, and backlinks
@@ -118,46 +139,6 @@ export async function createQueryLocationsEntryFunction() {
 	};
 }
 
-// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
-function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
-	const isTaiwan =
-		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
-
-	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
-}
-
-// Resolve region, lang code, and multilingual title data for a location entry
-export async function createLocationEntryDisplayFunction() {
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-
-	return function getLocationEntryDisplay(entry: CollectionEntry<'locations'>) {
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
-		const regionLangCode = regionPrimary?.data._langCode;
-
-		const titleResult = getMultilingualContent({
-			data: entry.data,
-			prop: 'title',
-			...(regionLangCode ? { langCode: regionLangCode } : {}),
-			...getLangCodeAdditional(regionPrimary),
-		});
-
-		const addressResult = getMultilingualContent({
-			data: entry.data,
-			prop: 'address',
-			...(regionLangCode ? { langCode: regionLangCode } : {}),
-		});
-
-		return {
-			regionPrimary,
-			regionLangCode,
-			titleMultilingual: titleResult?.primary,
-			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
-			addressBase: entry.data.address,
-			addressMultilingual: addressResult?.primary,
-		};
-	};
-}
-
 export async function queryLocationsIndex() {
 	const { entries } = await getLocationsCollection();
 
@@ -171,4 +152,23 @@ export async function queryLocationsIndex() {
 		catalog.resolve,
 		R.sort(sortCatalogByDate),
 	);
+}
+
+// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
+function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
+	const isTaiwan =
+		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
+
+	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
+}
+
+// Center the location map on the target, sizing the frame to neighbor density
+// Dense areas keep the minimum radius, remote ones widen toward the maximum
+function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
+	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
+
+	const index = Math.min(locationNearbyRadiusNeighborCount, nearby.length) - 1;
+	const neighborDistance = nearby[index]?.distance ?? locationNearbyRadiusKmMin;
+
+	return Math.min(Math.max(neighborDistance, locationNearbyRadiusKmMin), locationNearbyRadiusKmMax);
 }

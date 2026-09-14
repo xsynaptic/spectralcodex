@@ -31,6 +31,31 @@ const exampleEnvLines = [
 	'  IMAGE_SERVER_URL=https://example.com/_img',
 ];
 
+export function loadDeployConfig(): DeployConfig {
+	const env = readRequiredEnvVars();
+
+	return {
+		remoteHost: env.DEPLOY_REMOTE_HOST,
+		remotePath: env.DEPLOY_REMOTE_PATH,
+		sshKeyPath: process.env.DEPLOY_SSH_KEY_PATH ?? '',
+		sitePath: env.DEPLOY_SITE_PATH,
+		siteUrl: env.PROD_SERVER_URL,
+		mediaPath: env.DEPLOY_MEDIA_PATH,
+		imageServerUrl: env.IMAGE_SERVER_URL,
+	};
+}
+
+export function printDeployConfig(config: DeployConfig) {
+	console.log(chalk.blue('Deploy Configuration:'));
+	console.log(chalk.gray(`  Remote:      ${config.remoteHost}`));
+	console.log(chalk.gray(`  Remote path: ${config.remotePath}`));
+	console.log(chalk.gray(`  Site path:   ${config.sitePath}`));
+	console.log(chalk.gray(`  Site URL:    ${config.siteUrl}`));
+	console.log(chalk.gray(`  Media path:  ${config.mediaPath}`));
+	console.log(chalk.gray(`  Image URL:   ${config.imageServerUrl}`));
+	console.log('');
+}
+
 function readRequiredEnvVars(): Record<RequiredEnvVar, string> {
 	const values = {} as Record<RequiredEnvVar, string>;
 	const missing: Array<string> = [];
@@ -57,29 +82,4 @@ function readRequiredEnvVars(): Record<RequiredEnvVar, string> {
 	}
 
 	throw new Error(message);
-}
-
-export function loadDeployConfig(): DeployConfig {
-	const env = readRequiredEnvVars();
-
-	return {
-		remoteHost: env.DEPLOY_REMOTE_HOST,
-		remotePath: env.DEPLOY_REMOTE_PATH,
-		sshKeyPath: process.env.DEPLOY_SSH_KEY_PATH ?? '',
-		sitePath: env.DEPLOY_SITE_PATH,
-		siteUrl: env.PROD_SERVER_URL,
-		mediaPath: env.DEPLOY_MEDIA_PATH,
-		imageServerUrl: env.IMAGE_SERVER_URL,
-	};
-}
-
-export function printDeployConfig(config: DeployConfig) {
-	console.log(chalk.blue('Deploy Configuration:'));
-	console.log(chalk.gray(`  Remote:      ${config.remoteHost}`));
-	console.log(chalk.gray(`  Remote path: ${config.remotePath}`));
-	console.log(chalk.gray(`  Site path:   ${config.sitePath}`));
-	console.log(chalk.gray(`  Site URL:    ${config.siteUrl}`));
-	console.log(chalk.gray(`  Media path:  ${config.mediaPath}`));
-	console.log(chalk.gray(`  Image URL:   ${config.imageServerUrl}`));
-	console.log('');
 }

@@ -34,6 +34,124 @@ CREATE TABLE IF NOT EXISTS entry_digests (
 
 let db: Database.Database;
 
+export interface UrlByContentRow {
+	check_count: number;
+	content_id: string;
+	last_http_status: null | number;
+	redirect_url: null | string;
+	url: string;
+}
+
+interface LinkCheckStats {
+	blocked: number;
+	error: number;
+	healthy: number;
+	missing: number;
+	pending: number;
+	redirect: number;
+	total: number;
+}
+
+export function closeDatabase(): void {
+	db.close();
+}
+
+export function getEntryDigest(contentId: string): string | undefined {
+	const row = db.prepare('SELECT digest FROM entry_digests WHERE content_id = ?').get(contentId) as
+		undefined | { digest: string };
+
+	return row?.digest;
+}
+
+export function getStats(): LinkCheckStats {
+	const rows = db
+		.prepare('SELECT status, COUNT(*) as count FROM urls GROUP BY status')
+		.all() as Array<{ count: number; status: string }>;
+
+	const stats: LinkCheckStats = {
+		total: 0,
+		healthy: 0,
+		redirect: 0,
+		missing: 0,
+		blocked: 0,
+		error: 0,
+		pending: 0,
+	};
+
+	for (const row of rows) {
+		if (Object.hasOwn(stats, row.status)) {
+			stats[row.status as keyof Omit<LinkCheckStats, 'total'>] = row.count;
+		}
+
+		stats.total += row.count;
+	}
+
+	return stats;
+}
+
+export function getUrlsByStatusGroupedByContent(
+	status: UrlStatus,
+): Map<string, Array<UrlByContentRow>> {
+	const rows = db
+		.prepare(
+			`SELECT s.content_id, u.url, u.redirect_url, u.last_http_status, u.check_count
+       FROM urls u
+       JOIN url_sources s ON s.url_id = u.id
+       WHERE u.status = ?
+       ORDER BY s.content_id, u.url`,
+		)
+		.all(status) as Array<UrlByContentRow>;
+
+	const grouped = new Map<string, Array<UrlByContentRow>>();
+
+	for (const row of rows) {
+		const existing = grouped.get(row.content_id);
+
+		if (existing) {
+			existing.push(row);
+		} else {
+			grouped.set(row.content_id, [row]);
+		}
+	}
+
+	return grouped;
+}
+
+export function getUrlsToCheck(options: {
+	maxMissing: number;
+	recheck?: boolean;
+	recheckAll?: boolean;
+	recheckStatuses?: Array<UrlStatus>;
+}): Array<UrlRow> {
+	if (options.recheckAll) {
+		return db.prepare('SELECT * FROM urls ORDER BY id').all() as Array<UrlRow>;
+	}
+
+	if (options.recheck) {
+		const statuses = options.recheckStatuses ?? [
+			UrlStatusEnum.Pending,
+			UrlStatusEnum.Missing,
+			UrlStatusEnum.Blocked,
+			UrlStatusEnum.Error,
+		];
+		const placeholders = statuses.map(() => '?').join(', ');
+
+		return db
+			.prepare(`SELECT * FROM urls WHERE status IN (${placeholders}) ORDER BY id`)
+			.all(...statuses) as Array<UrlRow>;
+	}
+
+	return db
+		.prepare(
+			`SELECT * FROM urls
+       WHERE status = '${UrlStatusEnum.Pending}'
+          OR (status IN ('${UrlStatusEnum.Missing}', '${UrlStatusEnum.Blocked}', '${UrlStatusEnum.Error}') AND check_count < ?)
+          OR (status = '${UrlStatusEnum.Healthy}' AND updated_at < datetime('now', '-${String(healthyMaxAgeDays)} days'))
+       ORDER BY id`,
+		)
+		.all(options.maxMissing) as Array<UrlRow>;
+}
+
 export function openDatabase(dbPath: string): void {
 	const dir = path.dirname(dbPath);
 
@@ -48,28 +166,28 @@ export function openDatabase(dbPath: string): void {
 	db.exec(schema);
 }
 
-export function closeDatabase(): void {
-	db.close();
-}
-
-export function getEntryDigest(contentId: string): string | undefined {
-	const row = db.prepare('SELECT digest FROM entry_digests WHERE content_id = ?').get(contentId) as
-		undefined | { digest: string };
-
-	return row?.digest;
-}
-
-export function upsertUrl(url: string): number {
+export function recordCheckResult(
+	urlId: number,
+	result: {
+		httpStatus: number | undefined;
+		redirectUrl: string | undefined;
+		status: UrlStatus;
+	},
+): void {
 	const now = new Date().toISOString();
+	const incrementStatuses: ReadonlyArray<UrlStatus> = [
+		UrlStatusEnum.Missing,
+		UrlStatusEnum.Error,
+		UrlStatusEnum.Blocked,
+	];
+	const shouldIncrementCount = incrementStatuses.includes(result.status);
+	const checkCount = shouldIncrementCount ? 'check_count + 1' : '0';
 
 	db.prepare(
-		`INSERT INTO urls (url, created_at, updated_at) VALUES (?, ?, ?)
-     ON CONFLICT(url) DO NOTHING`,
-	).run(url, now, now);
-
-	const row = db.prepare('SELECT id FROM urls WHERE url = ?').get(url) as { id: number };
-
-	return row.id;
+		`UPDATE urls
+     SET status = ?, last_http_status = ?, redirect_url = ?, check_count = ${checkCount}, updated_at = ?
+     WHERE id = ?`,
+	).run(result.status, result.httpStatus, result.redirectUrl, now, urlId);
 }
 
 export function syncUrlSources(
@@ -125,133 +243,15 @@ export function syncUrlSources(
 	return sync();
 }
 
-export function getUrlsToCheck(options: {
-	maxMissing: number;
-	recheck?: boolean;
-	recheckAll?: boolean;
-	recheckStatuses?: Array<UrlStatus>;
-}): Array<UrlRow> {
-	if (options.recheckAll) {
-		return db.prepare('SELECT * FROM urls ORDER BY id').all() as Array<UrlRow>;
-	}
-
-	if (options.recheck) {
-		const statuses = options.recheckStatuses ?? [
-			UrlStatusEnum.Pending,
-			UrlStatusEnum.Missing,
-			UrlStatusEnum.Blocked,
-			UrlStatusEnum.Error,
-		];
-		const placeholders = statuses.map(() => '?').join(', ');
-
-		return db
-			.prepare(`SELECT * FROM urls WHERE status IN (${placeholders}) ORDER BY id`)
-			.all(...statuses) as Array<UrlRow>;
-	}
-
-	return db
-		.prepare(
-			`SELECT * FROM urls
-       WHERE status = '${UrlStatusEnum.Pending}'
-          OR (status IN ('${UrlStatusEnum.Missing}', '${UrlStatusEnum.Blocked}', '${UrlStatusEnum.Error}') AND check_count < ?)
-          OR (status = '${UrlStatusEnum.Healthy}' AND updated_at < datetime('now', '-${String(healthyMaxAgeDays)} days'))
-       ORDER BY id`,
-		)
-		.all(options.maxMissing) as Array<UrlRow>;
-}
-
-export function recordCheckResult(
-	urlId: number,
-	result: {
-		httpStatus: number | undefined;
-		redirectUrl: string | undefined;
-		status: UrlStatus;
-	},
-): void {
+export function upsertUrl(url: string): number {
 	const now = new Date().toISOString();
-	const incrementStatuses: ReadonlyArray<UrlStatus> = [
-		UrlStatusEnum.Missing,
-		UrlStatusEnum.Error,
-		UrlStatusEnum.Blocked,
-	];
-	const shouldIncrementCount = incrementStatuses.includes(result.status);
-	const checkCount = shouldIncrementCount ? 'check_count + 1' : '0';
 
 	db.prepare(
-		`UPDATE urls
-     SET status = ?, last_http_status = ?, redirect_url = ?, check_count = ${checkCount}, updated_at = ?
-     WHERE id = ?`,
-	).run(result.status, result.httpStatus, result.redirectUrl, now, urlId);
-}
+		`INSERT INTO urls (url, created_at, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT(url) DO NOTHING`,
+	).run(url, now, now);
 
-export interface UrlByContentRow {
-	check_count: number;
-	content_id: string;
-	last_http_status: null | number;
-	redirect_url: null | string;
-	url: string;
-}
+	const row = db.prepare('SELECT id FROM urls WHERE url = ?').get(url) as { id: number };
 
-export function getUrlsByStatusGroupedByContent(
-	status: UrlStatus,
-): Map<string, Array<UrlByContentRow>> {
-	const rows = db
-		.prepare(
-			`SELECT s.content_id, u.url, u.redirect_url, u.last_http_status, u.check_count
-       FROM urls u
-       JOIN url_sources s ON s.url_id = u.id
-       WHERE u.status = ?
-       ORDER BY s.content_id, u.url`,
-		)
-		.all(status) as Array<UrlByContentRow>;
-
-	const grouped = new Map<string, Array<UrlByContentRow>>();
-
-	for (const row of rows) {
-		const existing = grouped.get(row.content_id);
-
-		if (existing) {
-			existing.push(row);
-		} else {
-			grouped.set(row.content_id, [row]);
-		}
-	}
-
-	return grouped;
-}
-
-interface LinkCheckStats {
-	blocked: number;
-	error: number;
-	healthy: number;
-	missing: number;
-	pending: number;
-	redirect: number;
-	total: number;
-}
-
-export function getStats(): LinkCheckStats {
-	const rows = db
-		.prepare('SELECT status, COUNT(*) as count FROM urls GROUP BY status')
-		.all() as Array<{ count: number; status: string }>;
-
-	const stats: LinkCheckStats = {
-		total: 0,
-		healthy: 0,
-		redirect: 0,
-		missing: 0,
-		blocked: 0,
-		error: 0,
-		pending: 0,
-	};
-
-	for (const row of rows) {
-		if (Object.hasOwn(stats, row.status)) {
-			stats[row.status as keyof Omit<LinkCheckStats, 'total'>] = row.count;
-		}
-
-		stats.total += row.count;
-	}
-
-	return stats;
+	return row.id;
 }

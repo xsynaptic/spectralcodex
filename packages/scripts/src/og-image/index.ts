@@ -41,6 +41,34 @@ const { values } = parseArgs({
 	},
 });
 
+function exitOnUnresolvedEntries(unresolved: Array<string>) {
+	if (unresolved.length === 0) return;
+
+	console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
+
+	for (const filename of unresolved) {
+		console.log(chalk.red(`✗ ${filename}`));
+	}
+	console.log(
+		chalk.red(
+			`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
+		),
+	);
+	process.exit(1);
+}
+
+async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
+	const imagePath = path.join(rootPath, values['media-path'], imageId);
+
+	try {
+		const stats = await fs.stat(imagePath);
+
+		return stats.mtimeMs;
+	} catch {
+		return undefined;
+	}
+}
+
 // Resolve the readable source image path from the media path
 async function getSourceImagePath(imageId: string): Promise<string | undefined> {
 	const imagePath = path.join(rootPath, values['media-path'], imageId);
@@ -54,16 +82,14 @@ async function getSourceImagePath(imageId: string): Promise<string | undefined> 
 	}
 }
 
-async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
-	const imagePath = path.join(rootPath, values['media-path'], imageId);
+async function loadRenderer() {
+	console.log(chalk.blue('Loading fonts...'));
 
-	try {
-		const stats = await fs.stat(imagePath);
+	const fonts = await loadOpenGraphFonts();
 
-		return stats.mtimeMs;
-	} catch {
-		return undefined;
-	}
+	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
+
+	return createRenderer({ fonts });
 }
 
 function logSummary(counts: {
@@ -83,32 +109,6 @@ function logSummary(counts: {
 	if (counts.errors > 0) {
 		console.log(chalk.red(`Errors: ${String(counts.errors)}`));
 	}
-}
-
-function exitOnUnresolvedEntries(unresolved: Array<string>) {
-	if (unresolved.length === 0) return;
-
-	console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
-
-	for (const filename of unresolved) {
-		console.log(chalk.red(`✗ ${filename}`));
-	}
-	console.log(
-		chalk.red(
-			`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
-		),
-	);
-	process.exit(1);
-}
-
-async function loadRenderer() {
-	console.log(chalk.blue('Loading fonts...'));
-
-	const fonts = await loadOpenGraphFonts();
-
-	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
-
-	return createRenderer({ fonts });
 }
 
 async function main() {

@@ -7,8 +7,6 @@ export const UrlStatusEnum = {
 	Error: 'error',
 } as const satisfies Record<string, string>;
 
-export type UrlStatus = (typeof UrlStatusEnum)[keyof typeof UrlStatusEnum];
-
 export interface UrlRow {
 	check_count: number;
 	created_at: string;
@@ -19,3 +17,5 @@ export interface UrlRow {
 	updated_at: string;
 	url: string;
 }
+
+export type UrlStatus = (typeof UrlStatusEnum)[keyof typeof UrlStatusEnum];

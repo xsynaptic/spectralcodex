@@ -19,6 +19,8 @@ import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 import { stripFootnotes } from '#lib/utils/text.ts';
 
+type RenderMdx = Awaited<ReturnType<typeof createRenderMdxFunction>>;
+
 /**
  * Use Astro's Container API to render MDX content
  * TODO: because there is only one container all rendering is serial; can we run multiple containers in parallel?
@@ -38,8 +40,6 @@ async function createRenderMdxFunction() {
 		return await container.renderToString(Content, options);
 	};
 }
-
-type RenderMdx = Awaited<ReturnType<typeof createRenderMdxFunction>>;
 
 const feedSanitizeSchema = {
 	...defaultSchema,

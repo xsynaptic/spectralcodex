@@ -7,33 +7,6 @@ import path from 'node:path';
 import type { RegionMetadata } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-/**
- * Derive regionPathIds (ancestor chain) from filePath
- * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
- * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
- */
-function getRegionPathIds(filePath: string, id: string): Array<string> {
-	const collectionMarker = 'collections/regions/';
-	const index = filePath.indexOf(collectionMarker);
-
-	if (index === -1) return [id];
-
-	const relativePath = filePath.slice(index + collectionMarker.length);
-	const ext = path.extname(relativePath);
-	const pathWithoutExt = relativePath.replace(ext, '');
-	const parts = pathWithoutExt.split('/');
-
-	// Start with self then add ancestors from immediate parent to root
-	const regionPathIds: Array<string> = [id];
-
-	for (let i = parts.length - 2; i >= 0; i--) {
-		const part = parts[i];
-		if (part) regionPathIds.push(part);
-	}
-
-	return regionPathIds;
-}
-
 export function parseRegionData(entries: Array<ContentEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
@@ -89,4 +62,31 @@ export function resolveBoundingBox(
 		if (bbox) return bbox;
 	}
 	return undefined;
+}
+
+/**
+ * Derive regionPathIds (ancestor chain) from filePath
+ * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
+ * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
+ */
+function getRegionPathIds(filePath: string, id: string): Array<string> {
+	const collectionMarker = 'collections/regions/';
+	const index = filePath.indexOf(collectionMarker);
+
+	if (index === -1) return [id];
+
+	const relativePath = filePath.slice(index + collectionMarker.length);
+	const ext = path.extname(relativePath);
+	const pathWithoutExt = relativePath.replace(ext, '');
+	const parts = pathWithoutExt.split('/');
+
+	// Start with self then add ancestors from immediate parent to root
+	const regionPathIds: Array<string> = [id];
+
+	for (let i = parts.length - 2; i >= 0; i--) {
+		const part = parts[i];
+		if (part) regionPathIds.push(part);
+	}
+
+	return regionPathIds;
 }

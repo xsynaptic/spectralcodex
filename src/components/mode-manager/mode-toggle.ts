@@ -2,10 +2,6 @@ import type { ModeChangedEvent, ModeSystemType } from '#components/mode-manager/
 
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
-function getOppositeMode(resolvedMode: string | undefined): ModeSystemType {
-	return resolvedMode === ModeTypeEnum.Dark ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-}
-
 class ModeToggle extends HTMLElement {
 	#lastClickTime = 0;
 
@@ -54,6 +50,10 @@ class ModeToggle extends HTMLElement {
 		this.removeEventListener('click', this.#handleClick);
 		document.removeEventListener('mode-changed', this.#handleModeChanged);
 	}
+}
+
+function getOppositeMode(resolvedMode: string | undefined): ModeSystemType {
+	return resolvedMode === ModeTypeEnum.Dark ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
 }
 
 if (!customElements.get('mode-toggle')) {

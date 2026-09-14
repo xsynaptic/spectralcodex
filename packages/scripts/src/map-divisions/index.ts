@@ -78,36 +78,6 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 	return processingNeeds;
 }
 
-// A single Overture query serves every region sharing a selection bbox
-function groupNeedsBySelectionBBox(
-	processingNeeds: Array<RegionProcessingNeeds>,
-	regionsById: Map<string, RegionMetadata>,
-) {
-	const needsBySelectionBBox = new Map<string, Array<RegionProcessingNeeds>>();
-
-	for (const needs of processingNeeds) {
-		const selectionBBox = resolveBoundingBox(needs.region, regionsById, 'divisionSelectionBBox');
-
-		if (!selectionBBox) {
-			console.warn(
-				chalk.yellow(`No selection bbox found for ${chalk.cyan(needs.region.id)} or its ancestors`),
-			);
-			continue;
-		}
-
-		const bboxKey = JSON.stringify(selectionBBox);
-		const group = needsBySelectionBBox.get(bboxKey);
-
-		if (group) {
-			group.push(needs);
-		} else {
-			needsBySelectionBBox.set(bboxKey, [needs]);
-		}
-	}
-
-	return needsBySelectionBBox;
-}
-
 async function didProcessRegion({
 	needs,
 	divisionsById,
@@ -166,6 +136,94 @@ async function didProcessRegion({
 	console.log(chalk.green(`✓ Successfully processed ${chalk.cyan(region.id)}`));
 
 	return true;
+}
+
+// A single Overture query serves every region sharing a selection bbox
+function groupNeedsBySelectionBBox(
+	processingNeeds: Array<RegionProcessingNeeds>,
+	regionsById: Map<string, RegionMetadata>,
+) {
+	const needsBySelectionBBox = new Map<string, Array<RegionProcessingNeeds>>();
+
+	for (const needs of processingNeeds) {
+		const selectionBBox = resolveBoundingBox(needs.region, regionsById, 'divisionSelectionBBox');
+
+		if (!selectionBBox) {
+			console.warn(
+				chalk.yellow(`No selection bbox found for ${chalk.cyan(needs.region.id)} or its ancestors`),
+			);
+			continue;
+		}
+
+		const bboxKey = JSON.stringify(selectionBBox);
+		const group = needsBySelectionBBox.get(bboxKey);
+
+		if (group) {
+			group.push(needs);
+		} else {
+			needsBySelectionBBox.set(bboxKey, [needs]);
+		}
+	}
+
+	return needsBySelectionBBox;
+}
+
+async function mapDivisions() {
+	const overtureUrl = await resolveLatestRelease();
+
+	console.log(
+		chalk.blue(`Fetching administrative divisions from Overture Maps: ${chalk.cyan(overtureUrl)}`),
+	);
+
+	try {
+		const regionEntries = await withAstroContent((content) =>
+			getCollectionEntries(content, ['regions']),
+		);
+
+		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
+
+		if (regionsWithDivisionIds.length === 0) {
+			console.log(chalk.yellow('No regions with division IDs found.'));
+			return;
+		}
+
+		// Build lookup map from ALL regions (including those without divisionIds)
+		// This enables hierarchical bbox resolution from parent regions
+		const regionsById = new Map(allRegions.map((region) => [region.id, region]));
+
+		// Initialize DuckDB connection
+		const connection = await initializeDuckDB();
+
+		const totalCount = regionsWithDivisionIds.length;
+
+		// Process only regions with division IDs
+		const successCount = await processRegions({
+			db: connection,
+			regions: regionsWithDivisionIds,
+			regionsById,
+			overtureUrl,
+		});
+
+		connection.disconnectSync();
+
+		console.log(chalk.magenta(`\n=== Summary ===`));
+		console.log(
+			chalk.green(
+				`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`,
+			),
+		);
+		console.log(chalk.blue(`Output directory: ${chalk.cyan(values['output-path'])}`));
+
+		if (successCount === totalCount) {
+			console.log(chalk.green('🎉 All regions processed successfully!'));
+		} else {
+			console.log(chalk.yellow('⚠️  Some regions failed to process. Check the logs above.'));
+			process.exit(1);
+		}
+	} catch (error) {
+		console.error(chalk.red('❌ Script failed:'), error);
+		process.exit(1);
+	}
 }
 
 async function processBBoxGroup({
@@ -265,64 +323,6 @@ async function processRegions({
 	}
 
 	return successCount;
-}
-
-async function mapDivisions() {
-	const overtureUrl = await resolveLatestRelease();
-
-	console.log(
-		chalk.blue(`Fetching administrative divisions from Overture Maps: ${chalk.cyan(overtureUrl)}`),
-	);
-
-	try {
-		const regionEntries = await withAstroContent((content) =>
-			getCollectionEntries(content, ['regions']),
-		);
-
-		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
-
-		if (regionsWithDivisionIds.length === 0) {
-			console.log(chalk.yellow('No regions with division IDs found.'));
-			return;
-		}
-
-		// Build lookup map from ALL regions (including those without divisionIds)
-		// This enables hierarchical bbox resolution from parent regions
-		const regionsById = new Map(allRegions.map((region) => [region.id, region]));
-
-		// Initialize DuckDB connection
-		const connection = await initializeDuckDB();
-
-		const totalCount = regionsWithDivisionIds.length;
-
-		// Process only regions with division IDs
-		const successCount = await processRegions({
-			db: connection,
-			regions: regionsWithDivisionIds,
-			regionsById,
-			overtureUrl,
-		});
-
-		connection.disconnectSync();
-
-		console.log(chalk.magenta(`\n=== Summary ===`));
-		console.log(
-			chalk.green(
-				`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`,
-			),
-		);
-		console.log(chalk.blue(`Output directory: ${chalk.cyan(values['output-path'])}`));
-
-		if (successCount === totalCount) {
-			console.log(chalk.green('🎉 All regions processed successfully!'));
-		} else {
-			console.log(chalk.yellow('⚠️  Some regions failed to process. Check the logs above.'));
-			process.exit(1);
-		}
-	} catch (error) {
-		console.error(chalk.red('❌ Script failed:'), error);
-		process.exit(1);
-	}
 }
 
 // Run the script

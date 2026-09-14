@@ -2,16 +2,16 @@
 // Requests must traverse Cloudflare to populate the edge
 import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 
+interface PurgeResult {
+	errors?: Array<{ message: string }>;
+	success: boolean;
+}
+
 interface WarmResult {
 	error?: string;
 	ms: number;
 	status: number;
 	url: string;
-}
-
-interface PurgeResult {
-	errors?: Array<{ message: string }>;
-	success: boolean;
 }
 
 const shouldSkipPurge = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
@@ -62,19 +62,315 @@ const imageRegex = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]
 // Only the imagor host is warmed incrementally; its URLs are immutable and survive the purge
 const imageHost = new URL(imageServerUrl).host;
 
+interface JmapIdentityList {
+	list: Array<{ email: string; id: string }>;
+}
+
+type JmapInvocation = [name: string, args: unknown, callId: string];
+
+interface JmapMailboxQuery {
+	ids: Array<string>;
+}
+
+interface JmapSession {
+	apiUrl: string;
+	primaryAccounts: Record<string, string>;
+}
+
+interface JmapSetResult {
+	created?: Record<string, { id: string }>;
+	notCreated?: Record<string, unknown>;
+}
+
+interface MapUrlsResult {
+	skipReason?: string;
+	urls: Array<string>;
+}
+
+interface PersistWarmedImagesOptions {
+	failures: Array<WarmResult>;
+	referenced: ReadonlySet<string>;
+	seen: ReadonlySet<string>;
+	warmed: Array<string>;
+}
+
+interface RunReport {
+	failures: Array<WarmResult>;
+	notes: Array<string>;
+	phases: Array<[string, Stats]>;
+	retriedCount: number;
+	seconds: string;
+	totalUrls: number;
+}
+
 interface ScrapeTargets {
 	assets: Set<string>;
 	images: Set<string>;
 }
 
-function requireEnv(name: string): string {
-	const value = process.env[name];
-	if (!value) throw new Error(`Missing required env var: ${name}`);
-	return value;
+interface Stats {
+	counts: Map<string, number>;
+	failures: Array<WarmResult>;
+	total: number;
+}
+
+interface WarmAllOptions {
+	collect?: ScrapeTargets;
+	concurrency?: number;
+}
+
+interface WarmRun {
+	notes: Array<string>;
+	phases: Array<[string, Stats]>;
+	warmPhase: (label: string, urls: Iterable<string>, options?: WarmAllOptions) => Promise<Stats>;
+}
+
+function* chain<Item>(...iterables: Array<Iterable<Item>>): Generator<Item> {
+	for (const iterable of iterables) yield* iterable;
+}
+
+function createWarmRun(): WarmRun {
+	const phases: Array<[string, Stats]> = [];
+	const notes: Array<string> = [];
+
+	async function warmPhase(
+		label: string,
+		urls: Iterable<string>,
+		options?: WarmAllOptions,
+	): Promise<Stats> {
+		const stats = await warmAll(urls, options);
+		report(label, stats);
+		phases.push([label, stats]);
+		return stats;
+	}
+
+	return { phases, notes, warmPhase };
+}
+
+function extractLocations(xml: string): Array<string> {
+	const locations: Array<string> = [];
+	for (const match of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+		if (match[1]) locations.push(match[1]);
+	}
+	return locations;
+}
+
+function failureLine(result: WarmResult): string {
+	const key = result.status === 0 ? 'ERR' : String(result.status);
+	return `  ${key} ${result.url}${result.error ? ` (${result.error})` : ''}`;
+}
+
+async function fetchText(url: string): Promise<string> {
+	const response = await fetch(url, {
+		headers: requestHeaders,
+		signal: AbortSignal.timeout(timeoutMs),
+	});
+	if (!response.ok) throw new Error(`HTTP ${String(response.status)} for ${url}`);
+	return response.text();
+}
+
+function getFailureLines(failures: Array<WarmResult>): Array<string> {
+	if (failures.length === 0) return [];
+
+	const lines = ['', ...failures.slice(0, maxAlertFailures).map(failureLine)];
+
+	if (failures.length > maxAlertFailures) {
+		lines.push(`  (+${String(failures.length - maxAlertFailures)} more)`);
+	}
+
+	return lines;
+}
+
+// A skipped manifest silently unwarms /api/map/*, so the reason must reach the run report
+async function getMapUrls(): Promise<MapUrlsResult> {
+	try {
+		const paths = JSON.parse(
+			await fetchText(`${siteUrl}/api/map/map-manifest.json`),
+		) as Array<string>;
+		return { urls: paths.map((path) => new URL(path, siteUrl).href) };
+	} catch (error) {
+		const skipReason = messageOf(error);
+		console.log(`Skipping map URLs: ${skipReason}`);
+		return { urls: [], skipReason };
+	}
+}
+
+function getReportBody(run: RunReport): string {
+	const { phases, failures, notes, retriedCount, totalUrls, seconds } = run;
+
+	const retryNote =
+		retriedCount > 0
+			? ` (${String(retriedCount)} retried, ${String(retriedCount - failures.length)} recovered)`
+			: '';
+
+	return [
+		failures.length > 0
+			? `${String(failures.length)} of ${String(totalUrls)} URLs failed to warm${retryNote}`
+			: `All ${String(totalUrls)} URLs warmed${retryNote}`,
+		'',
+		...phases.map(([label, stats]) => summarize(label, stats)),
+		...notes,
+		...getFailureLines(failures),
+		'',
+		`Duration: ${seconds}s`,
+	].join('\n');
+}
+
+function getReportSubject({ failures, notes, totalUrls, seconds }: RunReport): string {
+	if (failures.length > 0) return `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
+	if (notes.length > 0) return '[SpectralCodex] cache warm: completed with warnings';
+
+	return `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
+}
+
+async function getSitemapUrls(): Promise<Array<string>> {
+	const sitemaps = extractLocations(await fetchText(`${siteUrl}/sitemap-index.xml`));
+	const urls: Array<string> = [];
+	for (const sitemap of sitemaps) urls.push(...extractLocations(await fetchText(sitemap)));
+	return urls;
+}
+
+function getWarmedImages(): { note?: string; seen: Set<string> } {
+	if (shouldWarmAll) {
+		return {
+			seen: new Set(),
+			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
+		};
+	}
+	try {
+		const contents = readFileSync(imageStateFile, 'utf8');
+		return { seen: new Set(contents.split('\n').filter(Boolean)) };
+	} catch (error) {
+		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
+		if (!isMissing) throw error;
+		return {
+			seen: new Set(),
+			note: 'Image state missing: cold start, every referenced image is new',
+		};
+	}
+}
+
+// Notes (like a skipped map manifest) force the digest even on a clean run
+function isReportWorthSending({ failures, notes }: RunReport): boolean {
+	return shouldAlertAlways || notes.length > 0 || failures.length >= alertMinFailures;
+}
+
+async function jmapCall(
+	apiUrl: string,
+	methodCalls: Array<JmapInvocation>,
+): Promise<Array<JmapInvocation>> {
+	const result = (await jmapRequest(
+		apiUrl,
+		JSON.stringify({ using: [jmapMailUrn, jmapSubmissionUrn], methodCalls }),
+	)) as { methodResponses: Array<JmapInvocation> };
+	return result.methodResponses;
+}
+
+async function jmapRequest(url: string, body?: string): Promise<unknown> {
+	const init: RequestInit = {
+		headers: {
+			Authorization: `Bearer ${jmapApiToken}`,
+			'Content-Type': 'application/json',
+		},
+		signal: AbortSignal.timeout(timeoutMs),
+	};
+	if (body !== undefined) {
+		init.method = 'POST';
+		init.body = body;
+	}
+	const response = await fetch(url, init);
+	if (!response.ok) throw new Error(`JMAP HTTP ${String(response.status)} for ${url}`);
+	return response.json();
+}
+
+function jmapResult(responses: Array<JmapInvocation>, callId: string): unknown {
+	const match = responses.find((invocation) => invocation[2] === callId);
+	if (!match) throw new Error(`JMAP response missing call ${callId}`);
+	if (match[0] === 'error') throw new Error(`JMAP method error: ${JSON.stringify(match[1])}`);
+	return match[1];
+}
+
+async function main(): Promise<void> {
+	// A newer deploy sends SIGTERM to supersede this run; exit cleanly, not as a SIGKILL crash
+	process.on('SIGTERM', () => {
+		console.log('Superseded by a newer deploy; exiting');
+		process.exit(0);
+	});
+
+	const start = Date.now();
+	const run = createWarmRun();
+
+	// Read before warming so an unreadable volume fails fast rather than after the page phase
+	const { seen, note } = getWarmedImages();
+
+	if (note !== undefined) {
+		console.log(note);
+		run.notes.push(note);
+	}
+
+	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
+	else await purge();
+
+	const targets = await warmPages(run);
+	await warmAssets(run, targets);
+
+	// Runs last so every scraped body has contributed to the image set
+	const newImages = await warmNewImages(run, targets.images, seen);
+
+	// totalUrls is fixed first so retried URLs are not double-counted
+	const totalUrls = run.phases.reduce((total, [, stats]) => total + stats.total, 0);
+	const firstFailures = run.phases.flatMap(([, stats]) => stats.failures);
+	const failures = await retryFailures(run, firstFailures);
+
+	const stateNote = persistWarmedImages({
+		referenced: targets.images,
+		seen,
+		warmed: newImages,
+		failures,
+	});
+
+	if (stateNote !== undefined) run.notes.push(stateNote);
+
+	const seconds = ((Date.now() - start) / 1000).toFixed(1);
+	console.log(`Done in ${seconds}s`);
+
+	await sendRunReport({
+		phases: run.phases,
+		failures,
+		notes: run.notes,
+		retriedCount: firstFailures.length,
+		totalUrls,
+		seconds,
+	});
 }
 
 function messageOf(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
+}
+
+function persistWarmedImages({
+	referenced,
+	seen,
+	warmed,
+	failures,
+}: PersistWarmedImagesOptions): string | undefined {
+	const failedUrls = new Set(failures.map((failure) => failure.url));
+	const nextSeen = referenced.intersection(seen);
+
+	for (const url of warmed) {
+		if (!failedUrls.has(url)) nextSeen.add(url);
+	}
+
+	try {
+		saveWarmedImages(nextSeen);
+		console.log(`Image state: ${String(nextSeen.size)} URLs recorded`);
+		return undefined;
+	} catch (error) {
+		const message = `Image state save failed: ${messageOf(error)}`;
+
+		console.error(message);
+		return message;
+	}
 }
 
 // Shared iterator across N runners; next() is synchronous so concurrent runners don't race
@@ -91,27 +387,6 @@ async function pool<Item>(
 		}
 	}
 	await Promise.all(Array.from({ length: concurrency }, run));
-}
-
-function* chain<Item>(...iterables: Array<Iterable<Item>>): Generator<Item> {
-	for (const iterable of iterables) yield* iterable;
-}
-
-async function fetchText(url: string): Promise<string> {
-	const response = await fetch(url, {
-		headers: requestHeaders,
-		signal: AbortSignal.timeout(timeoutMs),
-	});
-	if (!response.ok) throw new Error(`HTTP ${String(response.status)} for ${url}`);
-	return response.text();
-}
-
-function extractLocations(xml: string): Array<string> {
-	const locations: Array<string> = [];
-	for (const match of xml.matchAll(/<loc>([^<]+)<\/loc>/g)) {
-		if (match[1]) locations.push(match[1]);
-	}
-	return locations;
 }
 
 async function purge(): Promise<void> {
@@ -144,72 +419,6 @@ async function purge(): Promise<void> {
 	console.log('Cache purged');
 }
 
-async function getSitemapUrls(): Promise<Array<string>> {
-	const sitemaps = extractLocations(await fetchText(`${siteUrl}/sitemap-index.xml`));
-	const urls: Array<string> = [];
-	for (const sitemap of sitemaps) urls.push(...extractLocations(await fetchText(sitemap)));
-	return urls;
-}
-
-interface MapUrlsResult {
-	skipReason?: string;
-	urls: Array<string>;
-}
-
-// A skipped manifest silently unwarms /api/map/*, so the reason must reach the run report
-async function getMapUrls(): Promise<MapUrlsResult> {
-	try {
-		const paths = JSON.parse(
-			await fetchText(`${siteUrl}/api/map/map-manifest.json`),
-		) as Array<string>;
-		return { urls: paths.map((path) => new URL(path, siteUrl).href) };
-	} catch (error) {
-		const skipReason = messageOf(error);
-		console.log(`Skipping map URLs: ${skipReason}`);
-		return { urls: [], skipReason };
-	}
-}
-
-// .href yields a fresh string, unpinning the source HTML that V8 would otherwise retain via a match slice
-function scrape(text: string, targets: ScrapeTargets): void {
-	for (const match of text.matchAll(imageRegex)) {
-		// canParse guards odd matches from throwing
-		if (!match[0] || !URL.canParse(match[0])) continue;
-		const url = new URL(match[0]);
-		if (url.host === imageHost) targets.images.add(url.href);
-	}
-	for (const match of text.matchAll(assetRegex)) {
-		if (match[0]) targets.assets.add(new URL(match[0], siteUrl).href);
-	}
-}
-
-async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
-	const start = Date.now();
-	try {
-		const response = await fetch(url, {
-			headers: requestHeaders,
-			redirect: 'manual',
-			signal: AbortSignal.timeout(timeoutMs),
-		});
-		const contentType = response.headers.get('content-type') ?? '';
-		const isScrapable = contentType.includes('text/html') || contentType.includes('text/css');
-		if (collect && isScrapable && response.ok) {
-			scrape(await response.text(), collect);
-		} else {
-			await response.arrayBuffer();
-		}
-		return { url, status: response.status, ms: Date.now() - start };
-	} catch (error) {
-		return { url, status: 0, ms: Date.now() - start, error: messageOf(error) };
-	}
-}
-
-interface Stats {
-	counts: Map<string, number>;
-	failures: Array<WarmResult>;
-	total: number;
-}
-
 function record(stats: Stats, result: WarmResult): void {
 	stats.total++;
 
@@ -223,61 +432,30 @@ function record(stats: Stats, result: WarmResult): void {
 	if (!isRedirect && result.status !== 200) stats.failures.push(result);
 }
 
-function failureLine(result: WarmResult): string {
-	const key = result.status === 0 ? 'ERR' : String(result.status);
-	return `  ${key} ${result.url}${result.error ? ` (${result.error})` : ''}`;
-}
-
-interface WarmAllOptions {
-	collect?: ScrapeTargets;
-	concurrency?: number;
-}
-
-async function warmAll(urls: Iterable<string>, options: WarmAllOptions = {}): Promise<Stats> {
-	const stats: Stats = { total: 0, counts: new Map(), failures: [] };
-	await pool(urls, options.concurrency ?? defaultConcurrency, async (url) => {
-		record(stats, await warm(url, options.collect));
-	});
-	return stats;
-}
-
-function summarize(label: string, stats: Stats): string {
-	const summary = [...stats.counts]
-		.sort((first, second) => second[1] - first[1])
-		.map(([key, count]) => {
-			if (key === '200') return `${String(count)} ok`;
-			if (key === 'ERR') return `${String(count)} network error`;
-			const status = Number(key);
-			if (status >= 300 && status < 400) return `${String(count)} redirected (HTTP ${key})`;
-			return `${String(count)} HTTP ${key}`;
-		})
-		.join(', ');
-	return `${label}: ${String(stats.total)} URLs (${summary})`;
-}
-
 function report(label: string, stats: Stats): void {
 	console.log(summarize(label, stats));
 	if (stats.failures.length > 0) console.log(stats.failures.map(failureLine).join('\n'));
 }
 
-function getWarmedImages(): { note?: string; seen: Set<string> } {
-	if (shouldWarmAll) {
-		return {
-			seen: new Set(),
-			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
-		};
-	}
-	try {
-		const contents = readFileSync(imageStateFile, 'utf8');
-		return { seen: new Set(contents.split('\n').filter(Boolean)) };
-	} catch (error) {
-		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
-		if (!isMissing) throw error;
-		return {
-			seen: new Set(),
-			note: 'Image state missing: cold start, every referenced image is new',
-		};
-	}
+function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`Missing required env var: ${name}`);
+	return value;
+}
+
+// One retry over everything that failed; most failures are transient origin pressure
+async function retryFailures(
+	run: WarmRun,
+	failures: Array<WarmResult>,
+): Promise<Array<WarmResult>> {
+	if (failures.length === 0) return failures;
+
+	console.log(`Retrying ${String(failures.length)} failed URLs...`);
+	const retryStats = await run.warmPhase(
+		'Retry',
+		failures.map((failure) => failure.url),
+	);
+	return retryStats.failures;
 }
 
 // Temp file sits in the same directory so the rename is atomic
@@ -287,91 +465,17 @@ function saveWarmedImages(urls: Set<string>): void {
 	renameSync(temporaryFile, imageStateFile);
 }
 
-interface PersistWarmedImagesOptions {
-	failures: Array<WarmResult>;
-	referenced: ReadonlySet<string>;
-	seen: ReadonlySet<string>;
-	warmed: Array<string>;
-}
-
-function persistWarmedImages({
-	referenced,
-	seen,
-	warmed,
-	failures,
-}: PersistWarmedImagesOptions): string | undefined {
-	const failedUrls = new Set(failures.map((failure) => failure.url));
-	const nextSeen = referenced.intersection(seen);
-
-	for (const url of warmed) {
-		if (!failedUrls.has(url)) nextSeen.add(url);
+// .href yields a fresh string, unpinning the source HTML that V8 would otherwise retain via a match slice
+function scrape(text: string, targets: ScrapeTargets): void {
+	for (const match of text.matchAll(imageRegex)) {
+		// canParse guards odd matches from throwing
+		if (!match[0] || !URL.canParse(match[0])) continue;
+		const url = new URL(match[0]);
+		if (url.host === imageHost) targets.images.add(url.href);
 	}
-
-	try {
-		saveWarmedImages(nextSeen);
-		console.log(`Image state: ${String(nextSeen.size)} URLs recorded`);
-		return undefined;
-	} catch (error) {
-		const message = `Image state save failed: ${messageOf(error)}`;
-
-		console.error(message);
-		return message;
+	for (const match of text.matchAll(assetRegex)) {
+		if (match[0]) targets.assets.add(new URL(match[0], siteUrl).href);
 	}
-}
-
-interface JmapSession {
-	apiUrl: string;
-	primaryAccounts: Record<string, string>;
-}
-
-type JmapInvocation = [name: string, args: unknown, callId: string];
-
-interface JmapIdentityList {
-	list: Array<{ email: string; id: string }>;
-}
-
-interface JmapMailboxQuery {
-	ids: Array<string>;
-}
-
-interface JmapSetResult {
-	created?: Record<string, { id: string }>;
-	notCreated?: Record<string, unknown>;
-}
-
-async function jmapRequest(url: string, body?: string): Promise<unknown> {
-	const init: RequestInit = {
-		headers: {
-			Authorization: `Bearer ${jmapApiToken}`,
-			'Content-Type': 'application/json',
-		},
-		signal: AbortSignal.timeout(timeoutMs),
-	};
-	if (body !== undefined) {
-		init.method = 'POST';
-		init.body = body;
-	}
-	const response = await fetch(url, init);
-	if (!response.ok) throw new Error(`JMAP HTTP ${String(response.status)} for ${url}`);
-	return response.json();
-}
-
-async function jmapCall(
-	apiUrl: string,
-	methodCalls: Array<JmapInvocation>,
-): Promise<Array<JmapInvocation>> {
-	const result = (await jmapRequest(
-		apiUrl,
-		JSON.stringify({ using: [jmapMailUrn, jmapSubmissionUrn], methodCalls }),
-	)) as { methodResponses: Array<JmapInvocation> };
-	return result.methodResponses;
-}
-
-function jmapResult(responses: Array<JmapInvocation>, callId: string): unknown {
-	const match = responses.find((invocation) => invocation[2] === callId);
-	if (!match) throw new Error(`JMAP response missing call ${callId}`);
-	if (match[0] === 'error') throw new Error(`JMAP method error: ${JSON.stringify(match[1])}`);
-	return match[1];
 }
 
 // Log-only on error; a broken alert must never crash or re-trigger the run
@@ -432,60 +536,6 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 	}
 }
 
-interface RunReport {
-	failures: Array<WarmResult>;
-	notes: Array<string>;
-	phases: Array<[string, Stats]>;
-	retriedCount: number;
-	seconds: string;
-	totalUrls: number;
-}
-
-// Notes (like a skipped map manifest) force the digest even on a clean run
-function isReportWorthSending({ failures, notes }: RunReport): boolean {
-	return shouldAlertAlways || notes.length > 0 || failures.length >= alertMinFailures;
-}
-
-function getReportSubject({ failures, notes, totalUrls, seconds }: RunReport): string {
-	if (failures.length > 0) return `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
-	if (notes.length > 0) return '[SpectralCodex] cache warm: completed with warnings';
-
-	return `[SpectralCodex] cache warm ok: ${String(totalUrls)} URLs in ${seconds}s`;
-}
-
-function getFailureLines(failures: Array<WarmResult>): Array<string> {
-	if (failures.length === 0) return [];
-
-	const lines = ['', ...failures.slice(0, maxAlertFailures).map(failureLine)];
-
-	if (failures.length > maxAlertFailures) {
-		lines.push(`  (+${String(failures.length - maxAlertFailures)} more)`);
-	}
-
-	return lines;
-}
-
-function getReportBody(run: RunReport): string {
-	const { phases, failures, notes, retriedCount, totalUrls, seconds } = run;
-
-	const retryNote =
-		retriedCount > 0
-			? ` (${String(retriedCount)} retried, ${String(retriedCount - failures.length)} recovered)`
-			: '';
-
-	return [
-		failures.length > 0
-			? `${String(failures.length)} of ${String(totalUrls)} URLs failed to warm${retryNote}`
-			: `All ${String(totalUrls)} URLs warmed${retryNote}`,
-		'',
-		...phases.map(([label, stats]) => summarize(label, stats)),
-		...notes,
-		...getFailureLines(failures),
-		'',
-		`Duration: ${seconds}s`,
-	].join('\n');
-}
-
 async function sendRunReport(run: RunReport): Promise<void> {
 	if (run.failures.length > 0) process.exitCode = 2;
 	if (!isReportWorthSending(run)) return;
@@ -493,42 +543,47 @@ async function sendRunReport(run: RunReport): Promise<void> {
 	await sendAlert(getReportSubject(run), getReportBody(run));
 }
 
-interface WarmRun {
-	notes: Array<string>;
-	phases: Array<[string, Stats]>;
-	warmPhase: (label: string, urls: Iterable<string>, options?: WarmAllOptions) => Promise<Stats>;
+function summarize(label: string, stats: Stats): string {
+	const summary = [...stats.counts]
+		.sort((first, second) => second[1] - first[1])
+		.map(([key, count]) => {
+			if (key === '200') return `${String(count)} ok`;
+			if (key === 'ERR') return `${String(count)} network error`;
+			const status = Number(key);
+			if (status >= 300 && status < 400) return `${String(count)} redirected (HTTP ${key})`;
+			return `${String(count)} HTTP ${key}`;
+		})
+		.join(', ');
+	return `${label}: ${String(stats.total)} URLs (${summary})`;
 }
 
-function createWarmRun(): WarmRun {
-	const phases: Array<[string, Stats]> = [];
-	const notes: Array<string> = [];
-
-	async function warmPhase(
-		label: string,
-		urls: Iterable<string>,
-		options?: WarmAllOptions,
-	): Promise<Stats> {
-		const stats = await warmAll(urls, options);
-		report(label, stats);
-		phases.push([label, stats]);
-		return stats;
+async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
+	const start = Date.now();
+	try {
+		const response = await fetch(url, {
+			headers: requestHeaders,
+			redirect: 'manual',
+			signal: AbortSignal.timeout(timeoutMs),
+		});
+		const contentType = response.headers.get('content-type') ?? '';
+		const isScrapable = contentType.includes('text/html') || contentType.includes('text/css');
+		if (collect && isScrapable && response.ok) {
+			scrape(await response.text(), collect);
+		} else {
+			await response.arrayBuffer();
+		}
+		return { url, status: response.status, ms: Date.now() - start };
+	} catch (error) {
+		return { url, status: 0, ms: Date.now() - start, error: messageOf(error) };
 	}
-
-	return { phases, notes, warmPhase };
 }
 
-async function warmPages(run: WarmRun): Promise<ScrapeTargets> {
-	let pages = await getSitemapUrls();
-	if (warmLimit !== undefined) {
-		pages = pages.slice(0, warmLimit);
-		console.log(`WARM_LIMIT set: capping to ${String(warmLimit)} pages`);
-	}
-	console.log(
-		`Warming ${String(pages.length)} pages (concurrency ${String(defaultConcurrency)})...`,
-	);
-	const targets: ScrapeTargets = { assets: new Set(), images: new Set() };
-	await run.warmPhase('Pages', pages, { collect: targets });
-	return targets;
+async function warmAll(urls: Iterable<string>, options: WarmAllOptions = {}): Promise<Stats> {
+	const stats: Stats = { total: 0, counts: new Map(), failures: [] };
+	await pool(urls, options.concurrency ?? defaultConcurrency, async (url) => {
+		record(stats, await warm(url, options.collect));
+	});
+	return stats;
 }
 
 async function warmAssets(run: WarmRun, targets: ScrapeTargets): Promise<void> {
@@ -563,73 +618,18 @@ async function warmNewImages(
 	return newImages;
 }
 
-// One retry over everything that failed; most failures are transient origin pressure
-async function retryFailures(
-	run: WarmRun,
-	failures: Array<WarmResult>,
-): Promise<Array<WarmResult>> {
-	if (failures.length === 0) return failures;
-
-	console.log(`Retrying ${String(failures.length)} failed URLs...`);
-	const retryStats = await run.warmPhase(
-		'Retry',
-		failures.map((failure) => failure.url),
-	);
-	return retryStats.failures;
-}
-
-async function main(): Promise<void> {
-	// A newer deploy sends SIGTERM to supersede this run; exit cleanly, not as a SIGKILL crash
-	process.on('SIGTERM', () => {
-		console.log('Superseded by a newer deploy; exiting');
-		process.exit(0);
-	});
-
-	const start = Date.now();
-	const run = createWarmRun();
-
-	// Read before warming so an unreadable volume fails fast rather than after the page phase
-	const { seen, note } = getWarmedImages();
-
-	if (note !== undefined) {
-		console.log(note);
-		run.notes.push(note);
+async function warmPages(run: WarmRun): Promise<ScrapeTargets> {
+	let pages = await getSitemapUrls();
+	if (warmLimit !== undefined) {
+		pages = pages.slice(0, warmLimit);
+		console.log(`WARM_LIMIT set: capping to ${String(warmLimit)} pages`);
 	}
-
-	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
-	else await purge();
-
-	const targets = await warmPages(run);
-	await warmAssets(run, targets);
-
-	// Runs last so every scraped body has contributed to the image set
-	const newImages = await warmNewImages(run, targets.images, seen);
-
-	// totalUrls is fixed first so retried URLs are not double-counted
-	const totalUrls = run.phases.reduce((total, [, stats]) => total + stats.total, 0);
-	const firstFailures = run.phases.flatMap(([, stats]) => stats.failures);
-	const failures = await retryFailures(run, firstFailures);
-
-	const stateNote = persistWarmedImages({
-		referenced: targets.images,
-		seen,
-		warmed: newImages,
-		failures,
-	});
-
-	if (stateNote !== undefined) run.notes.push(stateNote);
-
-	const seconds = ((Date.now() - start) / 1000).toFixed(1);
-	console.log(`Done in ${seconds}s`);
-
-	await sendRunReport({
-		phases: run.phases,
-		failures,
-		notes: run.notes,
-		retriedCount: firstFailures.length,
-		totalUrls,
-		seconds,
-	});
+	console.log(
+		`Warming ${String(pages.length)} pages (concurrency ${String(defaultConcurrency)})...`,
+	);
+	const targets: ScrapeTargets = { assets: new Set(), images: new Set() };
+	await run.warmPhase('Pages', pages, { collect: targets });
+	return targets;
 }
 
 try {

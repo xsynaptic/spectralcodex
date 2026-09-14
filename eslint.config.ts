@@ -51,7 +51,6 @@ export default getConfig(
 		{
 			rules: {
 				'perfectionist/sort-classes': 'off',
-				'perfectionist/sort-modules': 'off',
 				'perfectionist/sort-objects': 'off',
 			},
 		},

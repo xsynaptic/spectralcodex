@@ -20,6 +20,17 @@ const configFilenames = [
 	'astro.config.mts',
 ];
 
+// The subset of an entry that consumers read; every `CollectionEntry` satisfies it
+export interface ContentEntry {
+	body?: string | undefined;
+	collection: string;
+	data: Record<string, unknown>;
+	// Astro widens this to `string | number`; file-based collections only ever write a string
+	digest?: number | string | undefined;
+	filePath?: string | undefined;
+	id: string;
+}
+
 // The Astro project root, which need not be the workspace root
 export function findAstroRoot(startDir = process.cwd()) {
 	let current = path.resolve(startDir);
@@ -35,15 +46,20 @@ export function findAstroRoot(startDir = process.cwd()) {
 	throw new Error(`Could not locate an Astro config above ${startDir}`);
 }
 
-// The subset of an entry that consumers read; every `CollectionEntry` satisfies it
-export interface ContentEntry {
-	body?: string | undefined;
-	collection: string;
-	data: Record<string, unknown>;
-	// Astro widens this to `string | number`; file-based collections only ever write a string
-	digest?: number | string | undefined;
-	filePath?: string | undefined;
-	id: string;
+export async function getCollectionEntries<C extends CollectionKey>(
+	{ getCollection }: AstroContent,
+	collections: Array<C>,
+) {
+	const entries = await Promise.all(collections.map((collection) => getCollection(collection)));
+	const flattened = entries.flat();
+
+	if (flattened.length === 0) {
+		throw new Error(
+			`No entries found in: ${collections.join(', ')}. Run \`astro sync\` to write the content store.`,
+		);
+	}
+
+	return flattened;
 }
 
 export async function withAstroContent<T>(callback: (content: AstroContent) => Promise<T>) {
@@ -72,20 +88,4 @@ export async function withAstroContent<T>(callback: (content: AstroContent) => P
 		// The process hangs on the open server otherwise
 		await server.close();
 	}
-}
-
-export async function getCollectionEntries<C extends CollectionKey>(
-	{ getCollection }: AstroContent,
-	collections: Array<C>,
-) {
-	const entries = await Promise.all(collections.map((collection) => getCollection(collection)));
-	const flattened = entries.flat();
-
-	if (flattened.length === 0) {
-		throw new Error(
-			`No entries found in: ${collections.join(', ')}. Run \`astro sync\` to write the content store.`,
-		);
-	}
-
-	return flattened;
 }

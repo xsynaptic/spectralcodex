@@ -4,21 +4,15 @@ import type { ChunkInputItem } from '#lib/map/map-chunks.ts';
 
 import { assignChunks } from '#lib/map/map-chunks.ts';
 
-function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): ChunkInputItem {
-	return { id, lng, lat, popupBytes };
-}
-
-// Mirror of the packer's byte accounting: brackets + items + comma separators
-function payloadBytes(items: Array<ChunkInputItem>): number {
-	const sum = items.reduce((total, item) => total + item.popupBytes, 0);
-	return 2 + sum + Math.max(0, items.length - 1);
-}
-
 function itemsForChunk(
 	ids: Array<string>,
 	byId: Map<string, ChunkInputItem>,
 ): Array<ChunkInputItem> {
 	return ids.map((id) => byId.get(id)!);
+}
+
+function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): ChunkInputItem {
+	return { id, lng, lat, popupBytes };
 }
 
 // Spread-out point set whose ids are permuted by seed, so different seeds feed the same
@@ -28,6 +22,12 @@ function makeSeededItems(seed: number): Array<ChunkInputItem> {
 		const id = `q${String((index * 7 + seed) % 30)}`;
 		return makeItem(id, [-150 + index * 10, -60 + ((index * 13) % 120)], 80);
 	});
+}
+
+// Mirror of the packer's byte accounting: brackets + items + comma separators
+function payloadBytes(items: Array<ChunkInputItem>): number {
+	const sum = items.reduce((total, item) => total + item.popupBytes, 0);
+	return 2 + sum + Math.max(0, items.length - 1);
 }
 
 describe('assignChunks', () => {

@@ -10,13 +10,13 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
-interface Props {
-	locations: Array<CollectionEntry<'locations'>>;
-}
-
 interface Column {
 	abbreviation?: string;
 	label: string;
+}
+
+interface Props {
+	locations: Array<CollectionEntry<'locations'>>;
 }
 
 const { locations } = Astro.props;

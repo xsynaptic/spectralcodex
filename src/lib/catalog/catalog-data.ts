@@ -24,32 +24,9 @@ import { getContentPath } from '#lib/utils/routing.ts';
 
 let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
 
-function getWordCount(entry: CollectionEntry<CollectionKey>) {
-	if (!wordCountFunction) {
-		wordCountFunction = createWordCountFunction({
-			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
-		});
-	}
-	return wordCountFunction(entry);
-}
-
 type CatalogEntry = CollectionEntry<CatalogCollectionKey>;
 
 type RegionPrimaryIdFunction = Awaited<ReturnType<typeof getRegionPrimaryIdFunction>>;
-
-// Find the common ancestor of a set of regions so there's only one in the catalog
-async function getRegionPrimaryIdFunction() {
-	const { regionsTree } = await getRegionsCollection();
-
-	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
-		if (regions && regions.length > 0) {
-			return regions.length > 1
-				? regionsTree.commonAncestorOf(regions.map(({ id }) => id))
-				: regions.at(0)?.id;
-		}
-		return;
-	};
-}
 
 // Counts only; check-links owns the URL-capturing twin and the two agree on every entry
 // Escaped parens truncate a match without splitting it, so a truncated URL cannot skew the count
@@ -65,24 +42,31 @@ function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
 	return linksExternalCount;
 }
 
+// Find the common ancestor of a set of regions so there's only one in the catalog
+async function getRegionPrimaryIdFunction() {
+	const { regionsTree } = await getRegionsCollection();
+
+	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
+		if (regions && regions.length > 0) {
+			return regions.length > 1
+				? regionsTree.commonAncestorOf(regions.map(({ id }) => id))
+				: regions.at(0)?.id;
+		}
+		return;
+	};
+}
+
+function getWordCount(entry: CollectionEntry<CollectionKey>) {
+	if (!wordCountFunction) {
+		wordCountFunction = createWordCountFunction({
+			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
+		});
+	}
+	return wordCountFunction(entry);
+}
+
 // Content backlinks; discovered from the <Link id="..."> MDX component in body content
 const backlinkLinkPattern = /<Link id="([^"]+)"/g;
-
-function generateContentBacklinksFromMdxComponents(
-	entry: CollectionEntry<CollectionKey>,
-	catalogItemsById: Map<string, CatalogItem>,
-) {
-	if (!entry.body?.includes('<Link ')) return;
-
-	for (const [, backlinkId] of entry.body.matchAll(backlinkLinkPattern)) {
-		// Skip self-links and invalid backlinks
-		if (!backlinkId || backlinkId === entry.id) continue;
-
-		const backlinkSet = catalogItemsById.get(backlinkId)?.backlinks;
-
-		if (backlinkSet) backlinkSet.add(entry.id);
-	}
-}
 
 function aggregateSeriesWordCounts(
 	series: Array<CollectionEntry<'series'>>,
@@ -100,36 +84,6 @@ function aggregateSeriesWordCounts(
 			Number,
 		);
 	}
-}
-
-async function createCatalogItem(
-	entry: CatalogEntry,
-	getRegionPrimaryId: RegionPrimaryIdFunction,
-): Promise<CatalogItem> {
-	const { data } = entry;
-
-	const imageFeatured = 'imageFeatured' in data ? data.imageFeatured : undefined;
-
-	return {
-		collection: entry.collection,
-		id: entry.id,
-		title: data.title,
-		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
-		description: getDescription(entry),
-		url: getContentPath(entry.collection, getPublicId(entry)),
-		imageId: getImageFeaturedId({ imageFeatured }),
-		imageHeroId: getImageHeroId({ imageFeatured }),
-		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),
-		locationCount: '_locationCount' in data ? data._locationCount : undefined,
-		postCount: '_postCount' in data ? data._postCount : undefined,
-		wordCount: await getWordCount(entry),
-		linksExternalCount: getLinksExternalCount(entry),
-		backlinks: new Set<string>(), // Populated by the backlink pass
-		dateCreated: data.dateCreated,
-		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
-		dateRecorded: 'dateRecorded' in data ? data.dateRecorded : undefined,
-		entryQuality: data.entryQuality,
-	};
 }
 
 // This function does all the heavy lifting and should only run once
@@ -182,16 +136,62 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	return [...catalogItemsById.values()];
 }
 
-let catalogInstance: Promise<Catalog> | undefined;
+async function createCatalogItem(
+	entry: CatalogEntry,
+	getRegionPrimaryId: RegionPrimaryIdFunction,
+): Promise<CatalogItem> {
+	const { data } = entry;
 
-async function loadCatalog(): Promise<Catalog> {
-	const items = await buildCatalogItems();
-	return createCatalog(items);
+	const imageFeatured = 'imageFeatured' in data ? data.imageFeatured : undefined;
+
+	return {
+		collection: entry.collection,
+		id: entry.id,
+		title: data.title,
+		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
+		description: getDescription(entry),
+		url: getContentPath(entry.collection, getPublicId(entry)),
+		imageId: getImageFeaturedId({ imageFeatured }),
+		imageHeroId: getImageHeroId({ imageFeatured }),
+		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),
+		locationCount: '_locationCount' in data ? data._locationCount : undefined,
+		postCount: '_postCount' in data ? data._postCount : undefined,
+		wordCount: await getWordCount(entry),
+		linksExternalCount: getLinksExternalCount(entry),
+		backlinks: new Set<string>(), // Populated by the backlink pass
+		dateCreated: data.dateCreated,
+		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
+		dateRecorded: 'dateRecorded' in data ? data.dateRecorded : undefined,
+		entryQuality: data.entryQuality,
+	};
 }
+
+function generateContentBacklinksFromMdxComponents(
+	entry: CollectionEntry<CollectionKey>,
+	catalogItemsById: Map<string, CatalogItem>,
+) {
+	if (!entry.body?.includes('<Link ')) return;
+
+	for (const [, backlinkId] of entry.body.matchAll(backlinkLinkPattern)) {
+		// Skip self-links and invalid backlinks
+		if (!backlinkId || backlinkId === entry.id) continue;
+
+		const backlinkSet = catalogItemsById.get(backlinkId)?.backlinks;
+
+		if (backlinkSet) backlinkSet.add(entry.id);
+	}
+}
+
+let catalogInstance: Promise<Catalog> | undefined;
 
 export async function getCatalog(): Promise<Catalog> {
 	if (!catalogInstance) {
 		catalogInstance = loadCatalog();
 	}
 	return catalogInstance;
+}
+
+async function loadCatalog(): Promise<Catalog> {
+	const items = await buildCatalogItems();
+	return createCatalog(items);
 }

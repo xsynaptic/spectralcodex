@@ -19,6 +19,8 @@ const blockedStatusCodes = new Set([403, 429]);
 // The server blocks HEAD (403) or does not allow it (405); retry with GET
 const headRetryStatusCodes = new Set([403, 405]);
 
+type CheckOutcome = Omit<CheckResult, 'urlId'>;
+
 interface CheckResult {
 	errorMessage: string | undefined;
 	httpStatus: number | undefined;
@@ -27,15 +29,24 @@ interface CheckResult {
 	urlId: number;
 }
 
-type CheckOutcome = Omit<CheckResult, 'urlId'>;
+// Redirects are handled manually so the real 301/302 status code survives
+export async function checkUrl(row: UrlRow): Promise<CheckResult> {
+	try {
+		const response = await fetchStatus(row.url);
 
-function fetchWithTimeout(url: string, method: string): Promise<Response> {
-	return fetch(url, {
-		method,
-		headers: requestHeaders,
-		redirect: 'manual',
-		signal: AbortSignal.timeout(timeoutMs),
-	});
+		// Status and headers are all we read; cancel the body so undici releases the connection
+		void response.body?.cancel();
+
+		return { urlId: row.id, ...getOutcome(response, row.url) };
+	} catch (error) {
+		return {
+			urlId: row.id,
+			httpStatus: undefined,
+			status: UrlStatusEnum.Error,
+			redirectUrl: undefined,
+			errorMessage: error instanceof Error ? error.message : String(error),
+		};
+	}
 }
 
 async function fetchStatus(url: string): Promise<Response> {
@@ -48,15 +59,13 @@ async function fetchStatus(url: string): Promise<Response> {
 	return fetchWithTimeout(url, 'GET');
 }
 
-function getRedirectOutcome(response: Response, url: string): CheckOutcome {
-	const location = response.headers.get('location');
-
-	return {
-		httpStatus: response.status,
-		status: UrlStatusEnum.Redirect,
-		redirectUrl: location ? new URL(location, url).href : undefined,
-		errorMessage: undefined,
-	};
+function fetchWithTimeout(url: string, method: string): Promise<Response> {
+	return fetch(url, {
+		method,
+		headers: requestHeaders,
+		redirect: 'manual',
+		signal: AbortSignal.timeout(timeoutMs),
+	});
 }
 
 function getOutcome(response: Response, url: string): CheckOutcome {
@@ -87,22 +96,13 @@ function getOutcome(response: Response, url: string): CheckOutcome {
 	};
 }
 
-// Redirects are handled manually so the real 301/302 status code survives
-export async function checkUrl(row: UrlRow): Promise<CheckResult> {
-	try {
-		const response = await fetchStatus(row.url);
+function getRedirectOutcome(response: Response, url: string): CheckOutcome {
+	const location = response.headers.get('location');
 
-		// Status and headers are all we read; cancel the body so undici releases the connection
-		void response.body?.cancel();
-
-		return { urlId: row.id, ...getOutcome(response, row.url) };
-	} catch (error) {
-		return {
-			urlId: row.id,
-			httpStatus: undefined,
-			status: UrlStatusEnum.Error,
-			redirectUrl: undefined,
-			errorMessage: error instanceof Error ? error.message : String(error),
-		};
-	}
+	return {
+		httpStatus: response.status,
+		status: UrlStatusEnum.Redirect,
+		redirectUrl: location ? new URL(location, url).href : undefined,
+		errorMessage: undefined,
+	};
 }

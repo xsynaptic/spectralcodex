@@ -4,6 +4,9 @@ import type { CollectionKey } from 'astro:content';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
+// Caption fields always resolve from a real item, so id/url are present (unlike a title-only caption)
+export type CatalogCaption = Pick<CatalogItem, 'id' | 'title' | 'titleMultilingual' | 'url'>;
+
 export type CatalogCollectionKey = Extract<
 	CollectionKey,
 	'locations' | 'pages' | 'posts' | 'regions' | 'series' | 'themes'
@@ -30,9 +33,6 @@ export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionK
 	url: string;
 	wordCount: number | undefined;
 }
-
-// Caption fields always resolve from a real item, so id/url are present (unlike a title-only caption)
-export type CatalogCaption = Pick<CatalogItem, 'id' | 'title' | 'titleMultilingual' | 'url'>;
 
 // Image featured data is sometimes displayed with a caption; title-only captions carry no id/url
 export type ImageFeaturedCaption = Partial<Pick<CatalogItem, 'id' | 'url'>> &

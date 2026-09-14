@@ -28,57 +28,6 @@ function areMarkersEqual(previous: TargetMarker, next: TargetMarker): boolean {
 	);
 }
 
-// Handles status-specific colors as well as a cluster fallback
-function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
-	const status = feature.properties.status as LocationStatus | undefined;
-
-	if (status) {
-		const record = LocationStatusRecords[status];
-
-		return isDark ? record.colorDark : record.color;
-	}
-	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
-}
-
-function toPointMarker(
-	feature: MapGeoJSONFeature,
-	id: string,
-	isDark: boolean,
-): TargetMarker | undefined {
-	if (feature.geometry.type !== 'Point') return undefined;
-
-	const [longitude, latitude] = feature.geometry.coordinates as [number, number];
-
-	return { id, longitude, latitude, color: getMarkerColor(feature, isDark) };
-}
-
-function collectPointMarkers(
-	map: MapRef,
-	targetIds: Array<string>,
-	isDark: boolean,
-): Array<TargetMarker> {
-	if (!map.getLayer(MapLayerIdEnum.Points)) return [];
-
-	const points = map.queryRenderedFeatures(undefined, {
-		layers: [MapLayerIdEnum.Points],
-		filter: ['in', ['get', 'id'], ['literal', targetIds]],
-	});
-
-	const markers: Array<TargetMarker> = [];
-
-	for (const feature of points) {
-		const pointId = typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
-
-		if (!pointId) continue;
-
-		const marker = toPointMarker(feature, pointId, isDark);
-
-		if (marker) markers.push(marker);
-	}
-
-	return markers;
-}
-
 function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> {
 	if (!map.getLayer(MapLayerIdEnum.Clusters)) return [];
 
@@ -108,6 +57,57 @@ function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> 
 	}
 
 	return markers;
+}
+
+function collectPointMarkers(
+	map: MapRef,
+	targetIds: Array<string>,
+	isDark: boolean,
+): Array<TargetMarker> {
+	if (!map.getLayer(MapLayerIdEnum.Points)) return [];
+
+	const points = map.queryRenderedFeatures(undefined, {
+		layers: [MapLayerIdEnum.Points],
+		filter: ['in', ['get', 'id'], ['literal', targetIds]],
+	});
+
+	const markers: Array<TargetMarker> = [];
+
+	for (const feature of points) {
+		const pointId = typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
+
+		if (!pointId) continue;
+
+		const marker = toPointMarker(feature, pointId, isDark);
+
+		if (marker) markers.push(marker);
+	}
+
+	return markers;
+}
+
+// Handles status-specific colors as well as a cluster fallback
+function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
+	const status = feature.properties.status as LocationStatus | undefined;
+
+	if (status) {
+		const record = LocationStatusRecords[status];
+
+		return isDark ? record.colorDark : record.color;
+	}
+	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+}
+
+function toPointMarker(
+	feature: MapGeoJSONFeature,
+	id: string,
+	isDark: boolean,
+): TargetMarker | undefined {
+	if (feature.geometry.type !== 'Point') return undefined;
+
+	const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+
+	return { id, longitude, latitude, color: getMarkerColor(feature, isDark) };
 }
 
 function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {

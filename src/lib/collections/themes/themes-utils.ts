@@ -20,28 +20,6 @@ import {
 
 export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
 
-// Get posts that have a term
-async function createPostsByThemeFunction() {
-	const getPostsByIds = await createPostsByIdsFunction();
-
-	return function getPostsByTheme(
-		entry: CollectionEntry<'themes'>,
-	): Array<CollectionEntry<'posts'>> {
-		return getPostsByIds(entry.data._posts ?? []);
-	};
-}
-
-// Get locations that have a term
-async function createLocationsByThemeFunction() {
-	const getLocationsByIds = await createLocationsByIdsFunction();
-
-	return function getLocationsByTheme(
-		entry: CollectionEntry<'themes'>,
-	): Array<CollectionEntry<'locations'>> {
-		return getLocationsByIds(entry.data._locations ?? []);
-	};
-}
-
 // Data for a single theme entry page: catalog items, map data, and related themes
 export async function createQueryThemesEntryFunction() {
 	const { entries: themes } = await getThemesCollection();
@@ -125,4 +103,26 @@ export async function queryThemesIndex() {
 		R.sort(sortByEntryCount),
 		catalog.resolve,
 	);
+}
+
+// Get locations that have a term
+async function createLocationsByThemeFunction() {
+	const getLocationsByIds = await createLocationsByIdsFunction();
+
+	return function getLocationsByTheme(
+		entry: CollectionEntry<'themes'>,
+	): Array<CollectionEntry<'locations'>> {
+		return getLocationsByIds(entry.data._locations ?? []);
+	};
+}
+
+// Get posts that have a term
+async function createPostsByThemeFunction() {
+	const getPostsByIds = await createPostsByIdsFunction();
+
+	return function getPostsByTheme(
+		entry: CollectionEntry<'themes'>,
+	): Array<CollectionEntry<'posts'>> {
+		return getPostsByIds(entry.data._posts ?? []);
+	};
 }

@@ -6,15 +6,6 @@ import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
-function getCatalogCounts(data: Array<CatalogItem> | undefined) {
-	return {
-		itemCount: formatNumber({ number: data?.length ?? 0 }),
-		wordCount: formatNumber({
-			number: data?.reduce((previous, { wordCount }) => previous + (wordCount ?? 0), 0) ?? 0,
-		}),
-	};
-}
-
 export async function getCatalogStats() {
 	const catalog = await getCatalog();
 
@@ -55,5 +46,14 @@ export async function getCatalogStats() {
 		total: {
 			...getCatalogCounts(catalogItems),
 		},
+	};
+}
+
+function getCatalogCounts(data: Array<CatalogItem> | undefined) {
+	return {
+		itemCount: formatNumber({ number: data?.length ?? 0 }),
+		wordCount: formatNumber({
+			number: data?.reduce((previous, { wordCount }) => previous + (wordCount ?? 0), 0) ?? 0,
+		}),
 	};
 }

@@ -46,39 +46,6 @@ const collectionsPath = process.env.CONTENT_DATA_PATH ?? 'packages/content-demo/
 const outputDirectory = path.join(rootPath, collectionsPath, '..', 'data');
 const outputPath = path.join(outputDirectory, 'webmentions.jsonl');
 
-async function readExistingMentions() {
-	const mentions = new Map<number, Webmention>();
-
-	if (!(await isExistingFile(outputPath))) return mentions;
-
-	const fileContents = await readFile(outputPath, 'utf8');
-
-	for (const line of fileContents.split('\n')) {
-		if (line.trim() === '') continue;
-
-		const result = parseMention(line);
-
-		if (!result) {
-			console.warn(chalk.yellow(`Discarding unreadable line in ${outputPath}`));
-			continue;
-		}
-
-		mentions.set(result['wm-id'], result);
-	}
-
-	return mentions;
-}
-
-function parseMention(line: string) {
-	try {
-		const result = WebmentionSchema.safeParse(JSON.parse(line));
-
-		return result.success ? result.data : undefined;
-	} catch {
-		return;
-	}
-}
-
 async function fetchMentionsPage({ page, sinceId }: { page: number; sinceId: number | undefined }) {
 	const url = new URL(apiUrl);
 
@@ -105,6 +72,49 @@ async function fetchMentionsPage({ page, sinceId }: { page: number; sinceId: num
 	return body.children ?? [];
 }
 
+function getMaxMentionId(mentions: Map<number, Webmention>) {
+	let maxId: number | undefined;
+
+	for (const mentionId of mentions.keys()) {
+		if (maxId === undefined || mentionId > maxId) maxId = mentionId;
+	}
+
+	return maxId;
+}
+
+function parseMention(line: string) {
+	try {
+		const result = WebmentionSchema.safeParse(JSON.parse(line));
+
+		return result.success ? result.data : undefined;
+	} catch {
+		return;
+	}
+}
+
+async function readExistingMentions() {
+	const mentions = new Map<number, Webmention>();
+
+	if (!(await isExistingFile(outputPath))) return mentions;
+
+	const fileContents = await readFile(outputPath, 'utf8');
+
+	for (const line of fileContents.split('\n')) {
+		if (line.trim() === '') continue;
+
+		const result = parseMention(line);
+
+		if (!result) {
+			console.warn(chalk.yellow(`Discarding unreadable line in ${outputPath}`));
+			continue;
+		}
+
+		mentions.set(result['wm-id'], result);
+	}
+
+	return mentions;
+}
+
 function sanitizeMention(mention: Webmention): Webmention {
 	const html = mention.content?.html;
 
@@ -114,16 +124,6 @@ function sanitizeMention(mention: Webmention): Webmention {
 		...mention,
 		content: { ...mention.content, html: sanitizeHtml(html, sanitizeOptions) },
 	};
-}
-
-function getMaxMentionId(mentions: Map<number, Webmention>) {
-	let maxId: number | undefined;
-
-	for (const mentionId of mentions.keys()) {
-		if (maxId === undefined || mentionId > maxId) maxId = mentionId;
-	}
-
-	return maxId;
 }
 
 const existingMentions = await readExistingMentions();

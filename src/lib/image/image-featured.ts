@@ -12,9 +12,73 @@ import type {
 	ImageFeaturedWithCaption,
 } from '#lib/catalog/catalog-types.ts';
 
-// Type guard for array items
-function isImageFeaturedObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
-	return typeof item === 'object' && 'id' in item;
+// Taxonomy policy: every featured image becomes a hero (regions, themes, series)
+export function getImageFeaturedGroup({
+	imageFeatured,
+	getCaption,
+}: {
+	getCaption: (id: string) => CatalogCaption | undefined;
+	imageFeatured: ImageFeatured | undefined;
+}): Array<ImageFeaturedWithCaption> | undefined {
+	if (!imageFeatured) return undefined;
+
+	// Normalize to array of objects
+	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = Array.isArray(imageFeatured)
+		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
+		: [{ id: imageFeatured }];
+
+	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, getCaption);
+}
+
+// Rather than accepting image featured items directly from frontmatter this handles catalog items
+export function getImageFeaturedGroupByCatalog({
+	items,
+	shuffle = false,
+	hero = false,
+}: {
+	hero?: boolean;
+	items: Array<CatalogItem> | undefined;
+	shuffle?: boolean;
+}): Array<ImageFeaturedWithCaption> | undefined {
+	if (!items || items.length === 0) return;
+
+	const itemsWithImages = items.flatMap((item) => {
+		const id = hero ? item.imageHeroId : item.imageId;
+
+		if (!id) return [];
+
+		return [
+			{
+				id,
+				title: item.title,
+				caption: {
+					id: item.id,
+					title: item.title,
+					titleMultilingual: item.titleMultilingual,
+					url: item.url,
+				},
+			},
+		];
+	});
+
+	return shuffle ? R.shuffle(itemsWithImages) : itemsWithImages;
+}
+
+// Post-like policy: heroes are opt-in via "hero: true" and authored order
+export function getImageFeaturedHeroGroup({
+	imageFeatured,
+	getCaption,
+}: {
+	getCaption: (id: string) => CatalogCaption | undefined;
+	imageFeatured: ImageFeatured | undefined;
+}): Array<ImageFeaturedWithCaption> | undefined {
+	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
+
+	const imageHeroObjectGroup = imageFeatured.filter(isImageHeroObject);
+
+	if (imageHeroObjectGroup.length === 0) return undefined;
+
+	return enrichImageFeaturedObjects(imageHeroObjectGroup, getCaption);
 }
 
 // Get the first image featured item from a set or array
@@ -35,10 +99,6 @@ export function getImageFeaturedId({
 	if (!items[0]) return;
 
 	return isImageFeaturedObject(items[0]) ? items[0].id : items[0];
-}
-
-function isImageHeroObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
-	return isImageFeaturedObject(item) && item.hero === true;
 }
 
 // The hero-flagged image is not necessarily the first featured image
@@ -77,71 +137,11 @@ function enrichImageFeaturedObjects(
 	});
 }
 
-// Taxonomy policy: every featured image becomes a hero (regions, themes, series)
-export function getImageFeaturedGroup({
-	imageFeatured,
-	getCaption,
-}: {
-	getCaption: (id: string) => CatalogCaption | undefined;
-	imageFeatured: ImageFeatured | undefined;
-}): Array<ImageFeaturedWithCaption> | undefined {
-	if (!imageFeatured) return undefined;
-
-	// Normalize to array of objects
-	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = Array.isArray(imageFeatured)
-		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
-		: [{ id: imageFeatured }];
-
-	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, getCaption);
+// Type guard for array items
+function isImageFeaturedObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
+	return typeof item === 'object' && 'id' in item;
 }
 
-// Post-like policy: heroes are opt-in via "hero: true" and authored order
-export function getImageFeaturedHeroGroup({
-	imageFeatured,
-	getCaption,
-}: {
-	getCaption: (id: string) => CatalogCaption | undefined;
-	imageFeatured: ImageFeatured | undefined;
-}): Array<ImageFeaturedWithCaption> | undefined {
-	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
-
-	const imageHeroObjectGroup = imageFeatured.filter(isImageHeroObject);
-
-	if (imageHeroObjectGroup.length === 0) return undefined;
-
-	return enrichImageFeaturedObjects(imageHeroObjectGroup, getCaption);
-}
-
-// Rather than accepting image featured items directly from frontmatter this handles catalog items
-export function getImageFeaturedGroupByCatalog({
-	items,
-	shuffle = false,
-	hero = false,
-}: {
-	hero?: boolean;
-	items: Array<CatalogItem> | undefined;
-	shuffle?: boolean;
-}): Array<ImageFeaturedWithCaption> | undefined {
-	if (!items || items.length === 0) return;
-
-	const itemsWithImages = items.flatMap((item) => {
-		const id = hero ? item.imageHeroId : item.imageId;
-
-		if (!id) return [];
-
-		return [
-			{
-				id,
-				title: item.title,
-				caption: {
-					id: item.id,
-					title: item.title,
-					titleMultilingual: item.titleMultilingual,
-					url: item.url,
-				},
-			},
-		];
-	});
-
-	return shuffle ? R.shuffle(itemsWithImages) : itemsWithImages;
+function isImageHeroObject(item: ImageFeaturedItem): item is ImageFeaturedObject {
+	return isImageFeaturedObject(item) && item.hero === true;
 }

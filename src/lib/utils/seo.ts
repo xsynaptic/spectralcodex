@@ -22,13 +22,6 @@ export function getSeoArticleProps({
 	};
 }
 
-export function getSeoImageProps({ id, alt }: { alt: string; id: string }) {
-	return {
-		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
-		alt,
-	};
-}
-
 export function getSeoHideSearch(shouldHide: boolean | undefined) {
 	return shouldHide
 		? {
@@ -36,4 +29,11 @@ export function getSeoHideSearch(shouldHide: boolean | undefined) {
 				noFollow: true,
 			}
 		: undefined;
+}
+
+export function getSeoImageProps({ id, alt }: { alt: string; id: string }) {
+	return {
+		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
+		alt,
+	};
 }

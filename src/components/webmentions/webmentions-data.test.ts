@@ -5,6 +5,15 @@ const { readFileMock } = vi.hoisted(() => ({ readFileMock: vi.fn() }));
 vi.mock('astro:env/server', () => ({ CONTENT_DATA_PATH: 'content' }));
 vi.mock('node:fs/promises', () => ({ readFile: readFileMock }));
 
+// Mentions load once per module instance; every test needs its own
+async function loadWebmentions(lines: Array<string>) {
+	readFileMock.mockResolvedValue(lines.join('\n'));
+
+	const { getWebmentionsFunction } = await import('#components/webmentions/webmentions-data.ts');
+
+	return getWebmentionsFunction();
+}
+
 function makeMention(fields: Record<string, unknown>) {
 	return JSON.stringify({
 		'wm-id': 1,
@@ -14,15 +23,6 @@ function makeMention(fields: Record<string, unknown>) {
 		'wm-property': 'like-of',
 		...fields,
 	});
-}
-
-// Mentions load once per module instance; every test needs its own
-async function loadWebmentions(lines: Array<string>) {
-	readFileMock.mockResolvedValue(lines.join('\n'));
-
-	const { getWebmentionsFunction } = await import('#components/webmentions/webmentions-data.ts');
-
-	return getWebmentionsFunction();
 }
 
 beforeEach(() => {

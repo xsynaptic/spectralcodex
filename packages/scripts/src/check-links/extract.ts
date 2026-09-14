@@ -21,14 +21,33 @@ const EntryDataSchema = z.object({
 	sources: SourceExtractSchema.array().optional(),
 });
 
-function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
-	return typeof link === 'string' ? link : link.url;
+// Extract all external URLs from a data store entry
+export function extractLinksFromEntry(entry: ContentEntry) {
+	const links: Array<{
+		url: string;
+	}> = Array.from(extractFrontmatterLinks(entry.data), (url) => ({ url }));
+
+	if (entry.body) {
+		for (const url of extractBodyLinks(entry.body)) {
+			links.push({ url });
+		}
+	}
+
+	return links;
 }
 
-function extractUrlsFromSource(source: z.infer<typeof SourceExtractSchema>): Array<string> {
-	if (typeof source === 'string' || !source.links) return [];
+// Extract markdown link URLs from a body string
+function extractBodyLinks(body: string): Array<string> {
+	const urls: Array<string> = [];
 
-	return source.links.map(extractUrlFromLink);
+	for (const match of body.matchAll(markdownLinkRegex)) {
+		if (match[1]) {
+			// Unescape markdown-escaped characters (e.g. \( \) in Wikipedia URLs)
+			urls.push(match[1].replaceAll('\\', ''));
+		}
+	}
+
+	return urls;
 }
 
 // Extract URLs from frontmatter fields: links, url, and sources
@@ -48,31 +67,12 @@ function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 	];
 }
 
-// Extract markdown link URLs from a body string
-function extractBodyLinks(body: string): Array<string> {
-	const urls: Array<string> = [];
-
-	for (const match of body.matchAll(markdownLinkRegex)) {
-		if (match[1]) {
-			// Unescape markdown-escaped characters (e.g. \( \) in Wikipedia URLs)
-			urls.push(match[1].replaceAll('\\', ''));
-		}
-	}
-
-	return urls;
+function extractUrlFromLink(link: z.infer<typeof LinkExtractSchema>): string {
+	return typeof link === 'string' ? link : link.url;
 }
 
-// Extract all external URLs from a data store entry
-export function extractLinksFromEntry(entry: ContentEntry) {
-	const links: Array<{
-		url: string;
-	}> = Array.from(extractFrontmatterLinks(entry.data), (url) => ({ url }));
+function extractUrlsFromSource(source: z.infer<typeof SourceExtractSchema>): Array<string> {
+	if (typeof source === 'string' || !source.links) return [];
 
-	if (entry.body) {
-		for (const url of extractBodyLinks(entry.body)) {
-			links.push({ url });
-		}
-	}
-
-	return links;
+	return source.links.map(extractUrlFromLink);
 }

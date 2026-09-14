@@ -22,49 +22,17 @@ const ratioTolerance = 0.01;
 // This folder also contains old photos yet to be redone
 const exemptPrefixes = ['errata/'];
 
-function getOrientation(value: number) {
-	if (value > 1) return 'landscape';
-	if (value < 1) return 'portrait';
-
-	return 'square';
-}
-
-function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number } {
-	let nearest: AllowedRatio = allowedRatios[0];
-	let smallestDelta = Math.abs(ratio - nearest.value);
-
-	for (const candidate of allowedRatios) {
-		const delta = Math.abs(ratio - candidate.value);
-
-		if (delta < smallestDelta) {
-			smallestDelta = delta;
-			nearest = candidate;
-		}
-	}
-
-	return { allowed: nearest, delta: smallestDelta };
-}
-
-interface ImageDimensions {
-	height: number;
-	ratio: number;
-	width: number;
-}
-
-function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
-	const { width, height } = entry.data;
-
-	if (typeof width !== 'number' || typeof height !== 'number') return undefined;
-	if (width <= 0 || height <= 0) return undefined;
-
-	return { width, height, ratio: width / height };
-}
-
 interface FlaggedImage {
 	delta: number;
 	height: number;
 	id: string;
 	nearest: string;
+	ratio: number;
+	width: number;
+}
+
+interface ImageDimensions {
+	height: number;
 	ratio: number;
 	width: number;
 }
@@ -120,19 +88,6 @@ export function collectAspectRatioIssues(entries: Array<ContentEntry>) {
 	return { flagged, checkedCount, exemptCount, tally: tallyRows };
 }
 
-function formatRatioTally(tally: Array<RatioTallyRow>) {
-	const rows = [...tally].sort((rowA, rowB) => rowB.count - rowA.count);
-
-	const countWidth = Math.max(...rows.map((row) => String(row.count).length));
-	const labelWidth = Math.max(...rows.map((row) => row.label.length));
-
-	return rows.map(
-		(row) =>
-			`   ${String(row.count).padStart(countWidth)}  ` +
-			`${row.label.padEnd(labelWidth)}  ${row.value.toFixed(3)}  ${row.orientation}`,
-	);
-}
-
 export function validateImageAspectRatios(
 	entries: Array<ContentEntry>,
 	{ showStats = false }: { showStats?: boolean } = {},
@@ -155,4 +110,49 @@ export function validateImageAspectRatios(
 		),
 		notes: showStats ? formatRatioTally(tally) : [],
 	};
+}
+
+function formatRatioTally(tally: Array<RatioTallyRow>) {
+	const rows = [...tally].sort((rowA, rowB) => rowB.count - rowA.count);
+
+	const countWidth = Math.max(...rows.map((row) => String(row.count).length));
+	const labelWidth = Math.max(...rows.map((row) => row.label.length));
+
+	return rows.map(
+		(row) =>
+			`   ${String(row.count).padStart(countWidth)}  ` +
+			`${row.label.padEnd(labelWidth)}  ${row.value.toFixed(3)}  ${row.orientation}`,
+	);
+}
+
+function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
+	const { width, height } = entry.data;
+
+	if (typeof width !== 'number' || typeof height !== 'number') return undefined;
+	if (width <= 0 || height <= 0) return undefined;
+
+	return { width, height, ratio: width / height };
+}
+
+function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number } {
+	let nearest: AllowedRatio = allowedRatios[0];
+	let smallestDelta = Math.abs(ratio - nearest.value);
+
+	for (const candidate of allowedRatios) {
+		const delta = Math.abs(ratio - candidate.value);
+
+		if (delta < smallestDelta) {
+			smallestDelta = delta;
+			nearest = candidate;
+		}
+	}
+
+	return { allowed: nearest, delta: smallestDelta };
+}
+
+function getOrientation(value: number) {
+	if (value > 1) return 'landscape';
+	if (value < 1) return 'portrait';
+
+	return 'square';
 }

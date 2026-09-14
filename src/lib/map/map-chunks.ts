@@ -19,43 +19,14 @@ export interface ChunkInputItem {
 	popupBytes: number;
 }
 
-interface ChunkAssignmentOptions {
-	capBytes?: number;
-}
-
 interface ChunkAssignment {
 	// Chunk keys in deterministic order, each mapped to the ids it holds
 	chunkIds: Map<string, Array<string>>;
 	chunkKeyById: Map<string, string>;
 }
 
-function clampCell(value: number, min: number, span: number): number {
-	const raw = Math.floor(((value - min) / span) * hilbertSide);
-	if (raw < 0) return 0;
-	if (raw >= hilbertSide) return hilbertSide - 1;
-	return raw;
-}
-
-// Standard xy2d: fold grid coords into a distance along the Hilbert curve
-function hilbertIndex(gridX: number, gridY: number): number {
-	let x = gridX;
-	let y = gridY;
-	let distance = 0;
-
-	for (let side = hilbertSide >> 1; side > 0; side >>= 1) {
-		const rx = (x & side) > 0 ? 1 : 0;
-		const ry = (y & side) > 0 ? 1 : 0;
-		distance += side * side * ((3 * rx) ^ ry);
-		if (ry === 0) {
-			if (rx === 1) {
-				x = side - 1 - x;
-				y = side - 1 - y;
-			}
-			[x, y] = [y, x];
-		}
-	}
-
-	return distance;
+interface ChunkAssignmentOptions {
+	capBytes?: number;
 }
 
 // Bin every item into a size-bounded chunk, ordered along the Hilbert curve so bins stay coherent
@@ -103,4 +74,33 @@ export function assignChunks(
 	closeBin();
 
 	return result;
+}
+
+function clampCell(value: number, min: number, span: number): number {
+	const raw = Math.floor(((value - min) / span) * hilbertSide);
+	if (raw < 0) return 0;
+	if (raw >= hilbertSide) return hilbertSide - 1;
+	return raw;
+}
+
+// Standard xy2d: fold grid coords into a distance along the Hilbert curve
+function hilbertIndex(gridX: number, gridY: number): number {
+	let x = gridX;
+	let y = gridY;
+	let distance = 0;
+
+	for (let side = hilbertSide >> 1; side > 0; side >>= 1) {
+		const rx = (x & side) > 0 ? 1 : 0;
+		const ry = (y & side) > 0 ? 1 : 0;
+		distance += side * side * ((3 * rx) ^ ry);
+		if (ry === 0) {
+			if (rx === 1) {
+				x = side - 1 - x;
+				y = side - 1 - y;
+			}
+			[x, y] = [y, x];
+		}
+	}
+
+	return distance;
 }

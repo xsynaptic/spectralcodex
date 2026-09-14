@@ -36,21 +36,40 @@ interface RawImage {
 	info: { height: number; width: number };
 }
 
-// Samples every 16th pixel; the result only picks a text treatment, so precision is not the point
-function zoneLuminance({ data, info }: RawImage, [start, end]: LuminanceZone): number {
-	const from = Math.floor(info.height * start) * info.width * 4;
-	const to = Math.floor(info.height * end) * info.width * 4;
+// Fonts and glyph outlines live on the renderer, so build one and reuse it for every card
+export function createRenderer({ fonts }: { fonts: Array<Font> }) {
+	// Read when a cache is first used, so this has to run before the first render
+	setGlyphCacheMaxBytes(glyphCacheBytes);
 
-	let total = 0;
-	let count = 0;
+	const renderer = new Renderer();
 
-	for (let index = from; index < to; index += 4 * 16) {
-		total +=
-			0.299 * (data[index] ?? 0) + 0.587 * (data[index + 1] ?? 0) + 0.114 * (data[index + 2] ?? 0);
-		count++;
-	}
+	return async function renderOpenGraphImage(
+		entry: OpenGraphMetadataItem,
+		image?: ProcessedImage,
+	): Promise<Uint8Array> {
+		return render(getOpenGraphElement(entry, image), {
+			format: 'jpeg',
+			fonts,
+			height: openGraphImageHeight,
+			quality: jpegQuality,
+			renderer,
+			width: openGraphImageWidth,
+		});
+	};
+}
 
-	return count > 0 ? Math.round(total / count) : 0;
+// Ranks candidates ahead of a render, reading the same zone at a thumbnail scale
+export async function probeLuminanceTop(imageInput: string): Promise<number> {
+	const width = 120;
+	const height = 64;
+
+	const image = await sharp(imageInput)
+		.resize({ fit: 'cover', height, position: 'top', width })
+		.ensureAlpha()
+		.raw()
+		.toBuffer({ resolveWithObject: true });
+
+	return zoneLuminance(image, luminanceZoneTop);
 }
 
 // Raw RGBA hands off to Takumi without an encode, and luminance reads the same buffer
@@ -83,38 +102,19 @@ export async function processImage({
 	};
 }
 
-// Ranks candidates ahead of a render, reading the same zone at a thumbnail scale
-export async function probeLuminanceTop(imageInput: string): Promise<number> {
-	const width = 120;
-	const height = 64;
+// Samples every 16th pixel; the result only picks a text treatment, so precision is not the point
+function zoneLuminance({ data, info }: RawImage, [start, end]: LuminanceZone): number {
+	const from = Math.floor(info.height * start) * info.width * 4;
+	const to = Math.floor(info.height * end) * info.width * 4;
 
-	const image = await sharp(imageInput)
-		.resize({ fit: 'cover', height, position: 'top', width })
-		.ensureAlpha()
-		.raw()
-		.toBuffer({ resolveWithObject: true });
+	let total = 0;
+	let count = 0;
 
-	return zoneLuminance(image, luminanceZoneTop);
-}
+	for (let index = from; index < to; index += 4 * 16) {
+		total +=
+			0.299 * (data[index] ?? 0) + 0.587 * (data[index + 1] ?? 0) + 0.114 * (data[index + 2] ?? 0);
+		count++;
+	}
 
-// Fonts and glyph outlines live on the renderer, so build one and reuse it for every card
-export function createRenderer({ fonts }: { fonts: Array<Font> }) {
-	// Read when a cache is first used, so this has to run before the first render
-	setGlyphCacheMaxBytes(glyphCacheBytes);
-
-	const renderer = new Renderer();
-
-	return async function renderOpenGraphImage(
-		entry: OpenGraphMetadataItem,
-		image?: ProcessedImage,
-	): Promise<Uint8Array> {
-		return render(getOpenGraphElement(entry, image), {
-			format: 'jpeg',
-			fonts,
-			height: openGraphImageHeight,
-			quality: jpegQuality,
-			renderer,
-			width: openGraphImageWidth,
-		});
-	};
+	return count > 0 ? Math.round(total / count) : 0;
 }

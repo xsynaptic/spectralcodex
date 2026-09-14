@@ -15,11 +15,6 @@ interface SshTarget {
 	sshKeyPath?: string;
 }
 
-// Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
-function getArchiveFlags({ archive = 'avz', quiet = false }: RsyncOptions) {
-	return quiet ? [`-${archive.replace('v', '')}`] : [`-${archive}`, '--progress'];
-}
-
 export function buildRsyncArgs(
 	source: Array<string> | string,
 	destination: string,
@@ -54,6 +49,15 @@ export async function rsyncTo(
 	return result.stdout;
 }
 
+// Like sshExec but captures and returns stdout
+export async function sshCapture(config: SshTarget, command: string): Promise<string> {
+	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+
+	const result = await $`ssh ${sshArgs} ${command}`;
+
+	return result.stdout;
+}
+
 // For dry-run, print the command instead of running it so a deploy preview shows remote actions
 export async function sshExec(
 	config: SshTarget,
@@ -81,11 +85,7 @@ export async function sshExecWithInput(
 	await $({ stdio: ['pipe', 'inherit', 'inherit'], input })`ssh ${sshArgs} ${command}`;
 }
 
-// Like sshExec but captures and returns stdout
-export async function sshCapture(config: SshTarget, command: string): Promise<string> {
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-
-	const result = await $`ssh ${sshArgs} ${command}`;
-
-	return result.stdout;
+// Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
+function getArchiveFlags({ archive = 'avz', quiet = false }: RsyncOptions) {
+	return quiet ? [`-${archive.replace('v', '')}`] : [`-${archive}`, '--progress'];
 }

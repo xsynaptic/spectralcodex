@@ -66,20 +66,20 @@ const defaultIgnorePatterns = [
 
 const ignorePatterns = [...defaultIgnorePatterns, ...(values.ignore ?? [])];
 
-function shouldIgnoreUrl(url: string): boolean {
-	return ignorePatterns.some((pattern) => url.includes(pattern));
-}
-
-function isHealthyStatus(status: UrlStatus): boolean {
-	return status === UrlStatusEnum.Healthy || status === UrlStatusEnum.Blocked;
-}
-
 function getDomain(url: string): string {
 	try {
 		return new URL(url).hostname;
 	} catch {
 		return 'unknown';
 	}
+}
+
+function isHealthyStatus(status: UrlStatus): boolean {
+	return status === UrlStatusEnum.Healthy || status === UrlStatusEnum.Blocked;
+}
+
+function shouldIgnoreUrl(url: string): boolean {
+	return ignorePatterns.some((pattern) => url.includes(pattern));
 }
 
 let isShuttingDown = false;

@@ -41,6 +41,43 @@ const reportSections: Array<ReportSection> = [
 	},
 ];
 
+export function printList(filter?: string): void {
+	const filterSet = filter ? new Set(filter.split(',')) : undefined;
+
+	for (const section of reportSections) {
+		if (filterSet && !filterSet.has(section.status)) continue;
+
+		printSection(section);
+	}
+
+	console.log('');
+}
+
+export function printSessionSummary(checked: number, healthy: number, issues: number): void {
+	console.log('');
+	console.log(
+		chalk.blue(
+			`Session: ${String(checked)} checked, ${chalk.green(`${String(healthy)} healthy`)}, ${chalk.red(`${String(issues)} issues`)}`,
+		),
+	);
+}
+
+export function printStatus(): void {
+	const { total, healthy, redirect, missing, blocked, error, pending } = getStats();
+
+	console.log('');
+	console.log(chalk.magenta('=== Link Check Status ==='));
+	console.log('');
+	console.log(`  Total URLs:  ${String(total)}`);
+	console.log(`  Healthy:     ${chalk.green(String(healthy))}`);
+	console.log(`  Redirected:  ${chalk.yellow(String(redirect))}`);
+	console.log(`  Missing:     ${chalk.magenta(String(missing))}`);
+	console.log(`  Blocked:     ${chalk.cyan(String(blocked))}`);
+	console.log(`  Error:       ${chalk.red(String(error))}`);
+	console.log(`  Pending:     ${chalk.gray(String(pending))}`);
+	console.log('');
+}
+
 function entryId(contentId: string): string {
 	// content_id is "collection/entry-id", we only need the entry ID
 	const slash = contentId.indexOf('/');
@@ -65,41 +102,4 @@ function printSection({ status, label, color, formatUrl }: ReportSection): void 
 			console.log(`    - ${formatUrl(row)}`);
 		}
 	}
-}
-
-export function printStatus(): void {
-	const { total, healthy, redirect, missing, blocked, error, pending } = getStats();
-
-	console.log('');
-	console.log(chalk.magenta('=== Link Check Status ==='));
-	console.log('');
-	console.log(`  Total URLs:  ${String(total)}`);
-	console.log(`  Healthy:     ${chalk.green(String(healthy))}`);
-	console.log(`  Redirected:  ${chalk.yellow(String(redirect))}`);
-	console.log(`  Missing:     ${chalk.magenta(String(missing))}`);
-	console.log(`  Blocked:     ${chalk.cyan(String(blocked))}`);
-	console.log(`  Error:       ${chalk.red(String(error))}`);
-	console.log(`  Pending:     ${chalk.gray(String(pending))}`);
-	console.log('');
-}
-
-export function printList(filter?: string): void {
-	const filterSet = filter ? new Set(filter.split(',')) : undefined;
-
-	for (const section of reportSections) {
-		if (filterSet && !filterSet.has(section.status)) continue;
-
-		printSection(section);
-	}
-
-	console.log('');
-}
-
-export function printSessionSummary(checked: number, healthy: number, issues: number): void {
-	console.log('');
-	console.log(
-		chalk.blue(
-			`Session: ${String(checked)} checked, ${chalk.green(`${String(healthy)} healthy`)}, ${chalk.red(`${String(issues)} issues`)}`,
-		),
-	);
 }

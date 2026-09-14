@@ -6,34 +6,13 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 import { collectMediaFiles } from '#shared/images.ts';
 
-export class MediaPathMissingError extends Error {}
-
 interface DeployMediaOptions {
 	dryRun?: boolean;
 	rootPath: string;
 	withDelete?: boolean;
 }
 
-async function isDirectory(targetPath: string): Promise<boolean> {
-	try {
-		const stats = await fs.stat(targetPath);
-
-		return stats.isDirectory();
-	} catch {
-		return false;
-	}
-}
-
-async function resolveMediaPath(rootPath: string): Promise<string> {
-	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
-	const mediaPath = path.join(rootPath, mediaPathRelative);
-
-	if (!(await isDirectory(mediaPath))) {
-		throw new MediaPathMissingError(`Media path not found: ${mediaPath}`);
-	}
-
-	return mediaPath;
-}
+export class MediaPathMissingError extends Error {}
 
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const { rootPath, dryRun = false, withDelete = false } = options;
@@ -75,4 +54,25 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+}
+
+async function isDirectory(targetPath: string): Promise<boolean> {
+	try {
+		const stats = await fs.stat(targetPath);
+
+		return stats.isDirectory();
+	} catch {
+		return false;
+	}
+}
+
+async function resolveMediaPath(rootPath: string): Promise<string> {
+	const mediaPathRelative = process.env.CONTENT_MEDIA_PATH ?? 'packages/content/media';
+	const mediaPath = path.join(rootPath, mediaPathRelative);
+
+	if (!(await isDirectory(mediaPath))) {
+		throw new MediaPathMissingError(`Media path not found: ${mediaPath}`);
+	}
+
+	return mediaPath;
 }

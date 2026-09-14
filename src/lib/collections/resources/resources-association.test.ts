@@ -2,15 +2,15 @@ import { describe, expect, test } from 'vitest';
 
 import { buildResourceAssociation } from '#lib/collections/resources/resources-association.ts';
 
-function makeResource(id: string, match?: Array<string> | string) {
-	return { id, data: { match } };
-}
-
 function makeContent(
 	id: string,
 	data: { links?: Array<string | { url: string }>; sources?: Array<object | string> } = {},
 ) {
 	return { id, data };
+}
+
+function makeResource(id: string, match?: Array<string> | string) {
+	return { id, data: { match } };
 }
 
 describe('buildResourceAssociation', () => {

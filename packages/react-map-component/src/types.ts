@@ -12,26 +12,12 @@ import type { MapProps } from 'react-map-gl/maplibre';
 import type { MapDarkModeOptions } from '#lib/dark-mode.tsx';
 import type { MapMessages } from '#lib/messages.tsx';
 
-export type MapInitialViewState = MapProps['initialViewState'];
-
-// Supported geometry for use with this component
-export type MapGeometry = LineString | Point | Polygon;
-
-export type MapSourceFeatureCollection = FeatureCollection<
-	MapGeometry,
-	MapSourceItem['properties']
->;
-
-/**
- * Per-map scope over the shared global directory; a big map keeps only the rows its scope selects
- * - region: keep points whose region ordinal falls inside the subtree interval
- * - theme: keep points carrying the theme index
- * - ids: keep the explicit, order-preserving feature-id list
- */
-export type MapScope =
-	| { ids: Array<string>; type: 'ids' }
-	| { index: number; type: 'theme' }
-	| { interval: [number, number]; type: 'region' };
+// Used within Astro to determine whether a map should be rendered
+export interface MapComponentData extends MapComponentProps {
+	featureCount: number;
+	hasGeodata: boolean;
+	prefetchUrls?: Array<string> | undefined;
+}
 
 // Map component props
 export interface MapComponentProps extends Partial<
@@ -68,9 +54,23 @@ export interface MapComponentProps extends Partial<
 	version?: string | undefined;
 }
 
-// Used within Astro to determine whether a map should be rendered
-export interface MapComponentData extends MapComponentProps {
-	featureCount: number;
-	hasGeodata: boolean;
-	prefetchUrls?: Array<string> | undefined;
-}
+// Supported geometry for use with this component
+export type MapGeometry = LineString | Point | Polygon;
+
+export type MapInitialViewState = MapProps['initialViewState'];
+
+/**
+ * Per-map scope over the shared global directory; a big map keeps only the rows its scope selects
+ * - region: keep points whose region ordinal falls inside the subtree interval
+ * - theme: keep points carrying the theme index
+ * - ids: keep the explicit, order-preserving feature-id list
+ */
+export type MapScope =
+	| { ids: Array<string>; type: 'ids' }
+	| { index: number; type: 'theme' }
+	| { interval: [number, number]; type: 'region' };
+
+export type MapSourceFeatureCollection = FeatureCollection<
+	MapGeometry,
+	MapSourceItem['properties']
+>;

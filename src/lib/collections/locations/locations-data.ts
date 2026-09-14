@@ -35,42 +35,6 @@ const getSignedImagePath = createSignedImagePathFunction({
 
 type GetThumbnailFunction = (imageId: string | undefined) => ImageThumbnail | undefined;
 
-function setEntryThumbnail(
-	entry: CollectionEntry<'locations'>,
-	getThumbnail: GetThumbnailFunction,
-) {
-	if (!entry.data.imageFeatured) return;
-
-	const thumbnail = getThumbnail(getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }));
-
-	if (thumbnail) {
-		entry.data._imageThumbnail = thumbnail;
-	}
-}
-
-function setGeometryThumbnails(
-	entry: CollectionEntry<'locations'>,
-	getThumbnail: GetThumbnailFunction,
-) {
-	if (!Array.isArray(entry.data.geometry)) return;
-
-	for (const geometry of entry.data.geometry) {
-		if (geometry.imageFeatured === null) {
-			// eslint-disable-next-line unicorn/no-null -- overrides the entry `imageFeatured` to render no thumbnail
-			geometry._imageThumbnail = null;
-			continue;
-		}
-
-		if (!geometry.imageFeatured) continue;
-
-		const thumbnail = getThumbnail(geometry.imageFeatured);
-
-		if (thumbnail) {
-			geometry._imageThumbnail = thumbnail;
-		}
-	}
-}
-
 async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
 	const getImageById = await getImageByIdFunction();
 
@@ -105,6 +69,42 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 
 	if (rendered) {
 		entry.data._descriptionHtml = rendered.html;
+	}
+}
+
+function setEntryThumbnail(
+	entry: CollectionEntry<'locations'>,
+	getThumbnail: GetThumbnailFunction,
+) {
+	if (!entry.data.imageFeatured) return;
+
+	const thumbnail = getThumbnail(getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }));
+
+	if (thumbnail) {
+		entry.data._imageThumbnail = thumbnail;
+	}
+}
+
+function setGeometryThumbnails(
+	entry: CollectionEntry<'locations'>,
+	getThumbnail: GetThumbnailFunction,
+) {
+	if (!Array.isArray(entry.data.geometry)) return;
+
+	for (const geometry of entry.data.geometry) {
+		if (geometry.imageFeatured === null) {
+			// eslint-disable-next-line unicorn/no-null -- overrides the entry `imageFeatured` to render no thumbnail
+			geometry._imageThumbnail = null;
+			continue;
+		}
+
+		if (!geometry.imageFeatured) continue;
+
+		const thumbnail = getThumbnail(geometry.imageFeatured);
+
+		if (thumbnail) {
+			geometry._imageThumbnail = thumbnail;
+		}
 	}
 }
 

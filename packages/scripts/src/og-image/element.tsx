@@ -11,6 +11,17 @@ const isShowSafeZoneOverlay = false as boolean;
 // Threshold at which to show inverted text
 const luminanceThreshold = 190;
 
+// Gradient text needs backgroundClip; a flat inverted fill is a plain color
+function fillStyles(isInverted: boolean, color: string, gradient: string) {
+	return isInverted
+		? { color }
+		: { backgroundClip: 'text' as const, backgroundImage: gradient, color: 'transparent' };
+}
+
+function isBrightBackground(luminance?: number): boolean {
+	return !!luminance && luminance >= luminanceThreshold;
+}
+
 // Safe zone (10% inset): 120px left/right, 63px top/bottom
 // Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
 function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
@@ -31,17 +42,6 @@ function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) 
 			/>
 		</>
 	);
-}
-
-function isBrightBackground(luminance?: number): boolean {
-	return !!luminance && luminance >= luminanceThreshold;
-}
-
-// Gradient text needs backgroundClip; a flat inverted fill is a plain color
-function fillStyles(isInverted: boolean, color: string, gradient: string) {
-	return isInverted
-		? { color }
-		: { backgroundClip: 'text' as const, backgroundImage: gradient, color: 'transparent' };
 }
 
 // Takumi floors the shadow blur radius and odd values lose their lower-right tail; keep every one even
@@ -104,91 +104,6 @@ const scriptStyles = {
 	},
 } as const;
 
-function resolveScript({
-	titleZh,
-	titleJa,
-	titleTh,
-}: {
-	titleJa?: string | undefined;
-	titleTh?: string | undefined;
-	titleZh?: string | undefined;
-}) {
-	if (titleZh) return { ...scriptStyles.zh, title: titleZh };
-	if (titleJa) return { ...scriptStyles.ja, title: titleJa };
-	if (titleTh) return { ...scriptStyles.th, title: titleTh };
-
-	return;
-}
-
-function TitleMultilingual({
-	luminance,
-	...titles
-}: {
-	luminance?: number | undefined;
-	titleJa?: string | undefined;
-	titleTh?: string | undefined;
-	titleZh?: string | undefined;
-}) {
-	const script = resolveScript(titles);
-
-	if (!script) return;
-
-	const { lang, title, ...scriptStyles } = script;
-	const isInverted = isBrightBackground(luminance);
-
-	return (
-		<div
-			lang={lang}
-			style={{
-				lineClamp: 1,
-				maxWidth: `${String(openGraphImageWidth)}px`,
-				padding: '0 100px', // Looser side margins for longer text
-				textOverflow: 'ellipsis',
-				textShadow: isInverted
-					? '0px 0px 4px rgb(220, 220, 225, 0.7)'
-					: '1px 1px 4px rgb(12, 12, 14, 0.6)',
-				...scriptStyles,
-				...fillStyles(
-					isInverted,
-					'rgb(12, 12, 14)',
-					'linear-gradient(to bottom, #fef9ec, #f4da93)',
-				),
-			}}
-		>
-			{title}
-		</div>
-	);
-}
-
-function Title({ title, luminance }: { luminance?: number | undefined; title: string }) {
-	const isInverted = isBrightBackground(luminance);
-
-	return (
-		<div
-			style={{
-				fontFamily: 'Lora',
-				fontSize: '40px',
-				fontWeight: 700,
-				lineClamp: 2,
-				lineHeight: 1.15,
-				maxWidth: `${String(openGraphImageWidth)}px`,
-				padding: '0 100px 60px', // Looser side margins for longer text
-				textOverflow: 'ellipsis',
-				textShadow: isInverted
-					? '0px 0px 6px rgb(240, 240, 245, 0.8)'
-					: '1px 1px 6px rgb(24, 24, 27, 0.4)',
-				...fillStyles(
-					isInverted,
-					'rgb(24, 24, 27)',
-					'linear-gradient(to bottom, #ffffff, #fef9ec)',
-				),
-			}}
-		>
-			{title}
-		</div>
-	);
-}
-
 export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: ProcessedImage) {
 	return (
 		<div
@@ -240,6 +155,91 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 				/>
 				<Title luminance={image?.luminanceBottom} title={entry.title} />
 			</div>
+		</div>
+	);
+}
+
+function resolveScript({
+	titleZh,
+	titleJa,
+	titleTh,
+}: {
+	titleJa?: string | undefined;
+	titleTh?: string | undefined;
+	titleZh?: string | undefined;
+}) {
+	if (titleZh) return { ...scriptStyles.zh, title: titleZh };
+	if (titleJa) return { ...scriptStyles.ja, title: titleJa };
+	if (titleTh) return { ...scriptStyles.th, title: titleTh };
+
+	return;
+}
+
+function Title({ title, luminance }: { luminance?: number | undefined; title: string }) {
+	const isInverted = isBrightBackground(luminance);
+
+	return (
+		<div
+			style={{
+				fontFamily: 'Lora',
+				fontSize: '40px',
+				fontWeight: 700,
+				lineClamp: 2,
+				lineHeight: 1.15,
+				maxWidth: `${String(openGraphImageWidth)}px`,
+				padding: '0 100px 60px', // Looser side margins for longer text
+				textOverflow: 'ellipsis',
+				textShadow: isInverted
+					? '0px 0px 6px rgb(240, 240, 245, 0.8)'
+					: '1px 1px 6px rgb(24, 24, 27, 0.4)',
+				...fillStyles(
+					isInverted,
+					'rgb(24, 24, 27)',
+					'linear-gradient(to bottom, #ffffff, #fef9ec)',
+				),
+			}}
+		>
+			{title}
+		</div>
+	);
+}
+
+function TitleMultilingual({
+	luminance,
+	...titles
+}: {
+	luminance?: number | undefined;
+	titleJa?: string | undefined;
+	titleTh?: string | undefined;
+	titleZh?: string | undefined;
+}) {
+	const script = resolveScript(titles);
+
+	if (!script) return;
+
+	const { lang, title, ...scriptStyles } = script;
+	const isInverted = isBrightBackground(luminance);
+
+	return (
+		<div
+			lang={lang}
+			style={{
+				lineClamp: 1,
+				maxWidth: `${String(openGraphImageWidth)}px`,
+				padding: '0 100px', // Looser side margins for longer text
+				textOverflow: 'ellipsis',
+				textShadow: isInverted
+					? '0px 0px 4px rgb(220, 220, 225, 0.7)'
+					: '1px 1px 4px rgb(12, 12, 14, 0.6)',
+				...scriptStyles,
+				...fillStyles(
+					isInverted,
+					'rgb(12, 12, 14)',
+					'linear-gradient(to bottom, #fef9ec, #f4da93)',
+				),
+			}}
+		>
+			{title}
 		</div>
 	);
 }

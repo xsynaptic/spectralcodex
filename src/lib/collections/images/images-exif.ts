@@ -27,39 +27,6 @@ export const ImageExifDataSchema = z.object({
 
 type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
 
-// Calculate EV using the formula EV = log2(N^2 / t)
-export function getImageExposureValue({
-	aperture,
-	shutterSpeed,
-}: {
-	aperture: string | undefined;
-	shutterSpeed: string | undefined;
-}) {
-	if (!aperture || !shutterSpeed) return;
-
-	let shutterTime: number;
-
-	if (shutterSpeed.includes('/')) {
-		const [numerator, denominator] = shutterSpeed.split('/').map(Number);
-
-		if (!numerator || !denominator) return;
-
-		shutterTime = numerator / denominator;
-	} else {
-		shutterTime = Number(shutterSpeed);
-	}
-
-	const exposureValue = Math.log2(Number(aperture) ** 2 / shutterTime);
-
-	return Number.isFinite(exposureValue) ? String(exposureValue) : undefined;
-}
-
-// Coerce an EXIF tag to a string, preserving absence as undefined
-// String(undefined) yields the literal "undefined", which would poison fallbacks
-function getTagString(value: boolean | null | number | string | undefined): string | undefined {
-	return value === undefined || value === null ? undefined : String(value);
-}
-
 // Extract a selection of EXIF data from the image
 export async function extractExifData(
 	filePathRelative: string,
@@ -92,4 +59,37 @@ export async function extractExifData(
 				}
 			: {}),
 	};
+}
+
+// Calculate EV using the formula EV = log2(N^2 / t)
+export function getImageExposureValue({
+	aperture,
+	shutterSpeed,
+}: {
+	aperture: string | undefined;
+	shutterSpeed: string | undefined;
+}) {
+	if (!aperture || !shutterSpeed) return;
+
+	let shutterTime: number;
+
+	if (shutterSpeed.includes('/')) {
+		const [numerator, denominator] = shutterSpeed.split('/').map(Number);
+
+		if (!numerator || !denominator) return;
+
+		shutterTime = numerator / denominator;
+	} else {
+		shutterTime = Number(shutterSpeed);
+	}
+
+	const exposureValue = Math.log2(Number(aperture) ** 2 / shutterTime);
+
+	return Number.isFinite(exposureValue) ? String(exposureValue) : undefined;
+}
+
+// Coerce an EXIF tag to a string, preserving absence as undefined
+// String(undefined) yields the literal "undefined", which would poison fallbacks
+function getTagString(value: boolean | null | number | string | undefined): string | undefined {
+	return value === undefined || value === null ? undefined : String(value);
 }

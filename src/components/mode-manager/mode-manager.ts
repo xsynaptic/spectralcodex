@@ -12,10 +12,6 @@ const validModes: ReadonlySet<string> = new Set([
 	ModeTypeEnum.Light,
 ]);
 
-function isModeValid(mode: string | undefined): mode is ModeGeneralType {
-	return mode !== undefined && validModes.has(mode);
-}
-
 class ModeManager extends HTMLElement {
 	#storageKey = 'color-mode';
 	#mediaMatcher: MediaQueryList | undefined;
@@ -88,6 +84,10 @@ class ModeManager extends HTMLElement {
 		if (!themeColor) return;
 		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
 	}
+}
+
+function isModeValid(mode: string | undefined): mode is ModeGeneralType {
+	return mode !== undefined && validModes.has(mode);
 }
 
 if (!customElements.get('mode-manager')) {

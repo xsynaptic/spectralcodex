@@ -96,6 +96,89 @@ const ModelsEnum = {
 // English-only but fast; truncates input after 512 tokens (roughly 2500 characters)
 const modelKey = 'mpnet' satisfies keyof typeof ModelsEnum;
 
+type FeatureExtractor = Awaited<ReturnType<typeof pipeline<'feature-extraction'>>>;
+
+interface SimilarContentIndex {
+	index: Index;
+	keyToEmbedding: Map<bigint, SimilarContentEmbedding>;
+}
+
+interface SimilarContentQueryOptions extends SimilarContentIndex {
+	candidateCount: number;
+	minScore: number;
+	resultCount: number;
+}
+
+// usearch needs numeric BigInt keys, so an embedding is addressed by its position in the array
+function buildSimilarContentIndex(
+	embeddings: Array<SimilarContentEmbedding>,
+	options: { candidateCount: number; dimensions: number },
+): SimilarContentIndex {
+	const index = new Index({
+		metric: MetricKind.Cos,
+		dimensions: options.dimensions,
+		connectivity: 16,
+		quantization: ScalarKind.F32,
+		expansion_add: 128,
+		expansion_search: options.candidateCount * 2, // 2x improves recall without significant slowdown
+		multi: false,
+	});
+	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
+
+	for (const [position, embedding] of embeddings.entries()) {
+		const key = BigInt(position);
+
+		keyToEmbedding.set(key, embedding);
+		index.add(key, new Float32Array(embedding.vector));
+	}
+
+	return { index, keyToEmbedding };
+}
+
+// Calculate similarities using usearch ANN index
+function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
+	const firstVector = embeddings[0]?.vector;
+
+	if (!firstVector) {
+		throw new Error('No embeddings to process');
+	}
+
+	const resultCount = Number(values['result-count']);
+	const minScore = Number(values['min-score']);
+
+	// Over-fetch candidates for re-ranking
+	// expansion_search must be >= candidateCount or usearch silently loses recall
+	const candidateCount = Math.max(resultCount * 3, 50);
+
+	const { index, keyToEmbedding } = buildSimilarContentIndex(embeddings, {
+		dimensions: firstVector.length,
+		candidateCount,
+	});
+
+	console.log(chalk.blue('Querying for similar content...'));
+
+	const queryStart = performance.now();
+	const result: SimilarContentResult = {};
+
+	for (const current of embeddings) {
+		result[current.id] = querySimilarItems(current, {
+			index,
+			keyToEmbedding,
+			candidateCount,
+			minScore,
+			resultCount,
+		});
+	}
+
+	console.log(
+		chalk.green(
+			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan((performance.now() - queryStart).toFixed(2))}ms`,
+		),
+	);
+
+	return result;
+}
+
 // Clean content for embedding using unified tools
 function cleanContent(body: string, data: Record<string, unknown>): string {
 	const title = typeof data.title === 'string' ? data.title : '';
@@ -105,12 +188,21 @@ function cleanContent(body: string, data: Record<string, unknown>): string {
 	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
 }
 
-// Cache is keyed by model and character limit so changing either invalidates it
-function getCacheNamespace(): string {
-	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
+function clearCache() {
+	const cacheDir = path.join(rootPath, values['cache-path']);
+	const cacheName = values['cache-name'];
+	const cacheFiles = readdirSync(cacheDir).filter(
+		(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
+	);
+	for (const file of cacheFiles) {
+		rmSync(path.join(cacheDir, file));
+	}
+	if (cacheFiles.length > 0) {
+		console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
+	} else {
+		console.log(chalk.green('🗑️  No cache files to clear'));
+	}
 }
-
-type FeatureExtractor = Awaited<ReturnType<typeof pipeline<'feature-extraction'>>>;
 
 async function createEmbedding(
 	embedder: FeatureExtractor,
@@ -189,41 +281,32 @@ async function generateEmbeddings(
 	return embeddings;
 }
 
-interface SimilarContentIndex {
-	index: Index;
-	keyToEmbedding: Map<bigint, SimilarContentEmbedding>;
+// Cache is keyed by model and character limit so changing either invalidates it
+function getCacheNamespace(): string {
+	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
 }
 
-// usearch needs numeric BigInt keys, so an embedding is addressed by its position in the array
-function buildSimilarContentIndex(
-	embeddings: Array<SimilarContentEmbedding>,
-	options: { candidateCount: number; dimensions: number },
-): SimilarContentIndex {
-	const index = new Index({
-		metric: MetricKind.Cos,
-		dimensions: options.dimensions,
-		connectivity: 16,
-		quantization: ScalarKind.F32,
-		expansion_add: 128,
-		expansion_search: options.candidateCount * 2, // 2x improves recall without significant slowdown
-		multi: false,
-	});
-	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
+async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
+	const collectionEntries = await withAstroContent((content) =>
+		getCollectionEntries(content, [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]),
+	);
 
-	for (const [position, embedding] of embeddings.entries()) {
-		const key = BigInt(position);
+	const entries: Array<EmbeddableEntry> = [];
 
-		keyToEmbedding.set(key, embedding);
-		index.add(key, new Float32Array(embedding.vector));
+	for (const entry of collectionEntries) {
+		if (!entry.digest) continue;
+
+		if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
+
+		entries.push({ ...entry, digest: String(entry.digest) });
 	}
 
-	return { index, keyToEmbedding };
-}
+	if (entries.length === 0) {
+		console.error(chalk.red('❌ No content found!'));
+		process.exit(1);
+	}
 
-interface SimilarContentQueryOptions extends SimilarContentIndex {
-	candidateCount: number;
-	minScore: number;
-	resultCount: number;
+	return entries;
 }
 
 function querySimilarItems(
@@ -260,89 +343,6 @@ function querySimilarItems(
 	candidates.sort((a, b) => b.score - a.score);
 
 	return candidates.filter((candidate) => candidate.score >= minScore).slice(0, resultCount);
-}
-
-// Calculate similarities using usearch ANN index
-function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
-	const firstVector = embeddings[0]?.vector;
-
-	if (!firstVector) {
-		throw new Error('No embeddings to process');
-	}
-
-	const resultCount = Number(values['result-count']);
-	const minScore = Number(values['min-score']);
-
-	// Over-fetch candidates for re-ranking
-	// expansion_search must be >= candidateCount or usearch silently loses recall
-	const candidateCount = Math.max(resultCount * 3, 50);
-
-	const { index, keyToEmbedding } = buildSimilarContentIndex(embeddings, {
-		dimensions: firstVector.length,
-		candidateCount,
-	});
-
-	console.log(chalk.blue('Querying for similar content...'));
-
-	const queryStart = performance.now();
-	const result: SimilarContentResult = {};
-
-	for (const current of embeddings) {
-		result[current.id] = querySimilarItems(current, {
-			index,
-			keyToEmbedding,
-			candidateCount,
-			minScore,
-			resultCount,
-		});
-	}
-
-	console.log(
-		chalk.green(
-			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan((performance.now() - queryStart).toFixed(2))}ms`,
-		),
-	);
-
-	return result;
-}
-
-async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
-	const collectionEntries = await withAstroContent((content) =>
-		getCollectionEntries(content, [ContentCollectionsEnum.Posts, ContentCollectionsEnum.Locations]),
-	);
-
-	const entries: Array<EmbeddableEntry> = [];
-
-	for (const entry of collectionEntries) {
-		if (!entry.digest) continue;
-
-		if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
-
-		entries.push({ ...entry, digest: String(entry.digest) });
-	}
-
-	if (entries.length === 0) {
-		console.error(chalk.red('❌ No content found!'));
-		process.exit(1);
-	}
-
-	return entries;
-}
-
-function clearCache() {
-	const cacheDir = path.join(rootPath, values['cache-path']);
-	const cacheName = values['cache-name'];
-	const cacheFiles = readdirSync(cacheDir).filter(
-		(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
-	);
-	for (const file of cacheFiles) {
-		rmSync(path.join(cacheDir, file));
-	}
-	if (cacheFiles.length > 0) {
-		console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
-	} else {
-		console.log(chalk.green('🗑️  No cache files to clear'));
-	}
 }
 
 async function similarContent() {

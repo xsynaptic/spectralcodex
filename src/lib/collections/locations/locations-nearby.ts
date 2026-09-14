@@ -17,47 +17,6 @@ interface LocationPoint {
 	status: string;
 }
 
-// Single Point geometries use their own coordinates; MultiPoint geometries use their centroid
-function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geometry']): Position {
-	if (Array.isArray(geometry)) {
-		return centroid({
-			type: GeometryTypeEnum.MultiPoint,
-			coordinates: geometry.map((point) => point.coordinates),
-		}).geometry.coordinates;
-	}
-	return geometry.coordinates;
-}
-
-// Extract coordinates from location entries; handles both single Point and MultiPoint geometries
-function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
-	pointsIndex: Array<LocationPoint>;
-	pointsMap: Map<string, LocationPoint>;
-} {
-	const pointsMap = new Map<string, LocationPoint>();
-	const pointsIndex: Array<LocationPoint> = [];
-
-	for (const entry of locations) {
-		const coordinates = getEntryCoordinates(entry.data.geometry);
-
-		const lng = coordinates[0];
-		const lat = coordinates[1];
-
-		if (lng === undefined || lat === undefined) continue;
-
-		const point: LocationPoint = {
-			id: entry.id,
-			lng,
-			lat,
-			status: entry.data.status,
-		};
-
-		pointsMap.set(entry.id, point);
-		pointsIndex.push(point);
-	}
-
-	return { pointsMap, pointsIndex };
-}
-
 /**
  * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
  * Post-query filtering handles status checks (vanished, etc.)
@@ -122,4 +81,45 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 			entry.data._nearby = nearby;
 		}
 	};
+}
+
+// Extract coordinates from location entries; handles both single Point and MultiPoint geometries
+function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
+	pointsIndex: Array<LocationPoint>;
+	pointsMap: Map<string, LocationPoint>;
+} {
+	const pointsMap = new Map<string, LocationPoint>();
+	const pointsIndex: Array<LocationPoint> = [];
+
+	for (const entry of locations) {
+		const coordinates = getEntryCoordinates(entry.data.geometry);
+
+		const lng = coordinates[0];
+		const lat = coordinates[1];
+
+		if (lng === undefined || lat === undefined) continue;
+
+		const point: LocationPoint = {
+			id: entry.id,
+			lng,
+			lat,
+			status: entry.data.status,
+		};
+
+		pointsMap.set(entry.id, point);
+		pointsIndex.push(point);
+	}
+
+	return { pointsMap, pointsIndex };
+}
+
+// Single Point geometries use their own coordinates; MultiPoint geometries use their centroid
+function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geometry']): Position {
+	if (Array.isArray(geometry)) {
+		return centroid({
+			type: GeometryTypeEnum.MultiPoint,
+			coordinates: geometry.map((point) => point.coordinates),
+		}).geometry.coordinates;
+	}
+	return geometry.coordinates;
 }

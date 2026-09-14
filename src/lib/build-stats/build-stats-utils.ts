@@ -4,14 +4,34 @@ import type { BuildRecord } from '#lib/build-stats/build-stats-loader.ts';
 
 import { millisecondsPerDay } from '#constants.ts';
 
+export interface BuildStatsAnnotation {
+	label: string;
+	time: number;
+}
+
 export interface BuildStatsPoint {
 	time: number;
 	value: number;
 }
 
-export interface BuildStatsAnnotation {
-	label: string;
-	time: number;
+export function formatBuildDuration(seconds: number): string {
+	const rounded = Math.round(seconds);
+
+	if (rounded < 60) return `${String(rounded)}s`;
+	if (rounded < 3600) return `${String(Math.floor(rounded / 60))}m ${String(rounded % 60)}s`;
+
+	// Minutes round before the hours are split off; rounding the leftover afterwards yields "1h 60m"
+	const minutes = Math.round(rounded / 60);
+
+	return `${String(Math.floor(minutes / 60))}h ${String(minutes % 60)}m`;
+}
+
+export function getBuildAnnotations(records: Array<BuildRecord>): Array<BuildStatsAnnotation> {
+	return records.flatMap((record) => {
+		const label = record.notes?.trim();
+
+		return label ? [{ time: new Date(record.timestamp).getTime(), label }] : [];
+	});
 }
 
 // Anchored on the newest record, not on today, so the window holds the same builds on any build date
@@ -26,10 +46,6 @@ export function getRecentBuildRecords(
 	const cutoff = new Date(last.timestamp).getTime() - daysLimit * millisecondsPerDay;
 
 	return records.filter((record) => new Date(record.timestamp).getTime() >= cutoff);
-}
-
-export function getUtcDayStart(time: number): number {
-	return Math.floor(time / millisecondsPerDay) * millisecondsPerDay;
 }
 
 export function getRollingMedian(
@@ -66,22 +82,6 @@ export function getRollingMedian(
 	return trend;
 }
 
-export function getBuildAnnotations(records: Array<BuildRecord>): Array<BuildStatsAnnotation> {
-	return records.flatMap((record) => {
-		const label = record.notes?.trim();
-
-		return label ? [{ time: new Date(record.timestamp).getTime(), label }] : [];
-	});
-}
-
-export function formatBuildDuration(seconds: number): string {
-	const rounded = Math.round(seconds);
-
-	if (rounded < 60) return `${String(rounded)}s`;
-	if (rounded < 3600) return `${String(Math.floor(rounded / 60))}m ${String(rounded % 60)}s`;
-
-	// Minutes round before the hours are split off; rounding the leftover afterwards yields "1h 60m"
-	const minutes = Math.round(rounded / 60);
-
-	return `${String(Math.floor(minutes / 60))}h ${String(minutes % 60)}m`;
+export function getUtcDayStart(time: number): number {
+	return Math.floor(time / millisecondsPerDay) * millisecondsPerDay;
 }

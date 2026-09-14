@@ -15,6 +15,14 @@ export function safelyCreateDirectory(dir: string) {
 // Cached at module load: scripts only ever run from one place per invocation
 let cachedWorkspaceRoot: string | undefined;
 
+export async function ensureSshKeychain() {
+	try {
+		await $`ssh-add --apple-load-keychain 2>/dev/null`;
+	} catch {
+		// Ignore - not on macOS or no keychain
+	}
+}
+
 export function findWorkspaceRoot(startDir: string = process.cwd()): string {
 	if (cachedWorkspaceRoot) return cachedWorkspaceRoot;
 
@@ -38,13 +46,5 @@ export async function isExistingFile(filePath: string) {
 		return true;
 	} catch {
 		return false;
-	}
-}
-
-export async function ensureSshKeychain() {
-	try {
-		await $`ssh-add --apple-load-keychain 2>/dev/null`;
-	} catch {
-		// Ignore - not on macOS or no keychain
 	}
 }

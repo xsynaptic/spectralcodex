@@ -36,26 +36,6 @@ const SimilarContentItemSchema = z
 	)
 	.optional();
 
-async function loadSimilarContentData() {
-	const filePath = path.join(CUSTOM_CACHE_PATH, 'similar-content.json');
-
-	try {
-		const similarContent = await loadJsonData(filePath);
-		const similarContentParsed = await SimilarContentItemSchema.parseAsync(similarContent);
-
-		return similarContentParsed;
-	} catch (error) {
-		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
-
-		if (isNotFound) {
-			console.warn(`[Similar] Not found: ${filePath} (run pnpm similar-content to generate)`);
-			return;
-		}
-
-		throw error;
-	}
-}
-
 async function createSimilarContentFunction() {
 	const similarContentData = await loadSimilarContentData();
 
@@ -87,6 +67,26 @@ async function createSimilarContentFunction() {
 			.filter((item) => (hasImageFeatured ? !!item.imageId : !item.imageId))
 			.slice(0, limit);
 	};
+}
+
+async function loadSimilarContentData() {
+	const filePath = path.join(CUSTOM_CACHE_PATH, 'similar-content.json');
+
+	try {
+		const similarContent = await loadJsonData(filePath);
+		const similarContentParsed = await SimilarContentItemSchema.parseAsync(similarContent);
+
+		return similarContentParsed;
+	} catch (error) {
+		const isNotFound = error instanceof Error && 'code' in error && error.code === 'ENOENT';
+
+		if (isNotFound) {
+			console.warn(`[Similar] Not found: ${filePath} (run pnpm similar-content to generate)`);
+			return;
+		}
+
+		throw error;
+	}
 }
 
 let similarContentFunction: ReturnType<typeof createSimilarContentFunction> | undefined;

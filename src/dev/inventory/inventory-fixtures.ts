@@ -37,27 +37,15 @@ import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 // Every URL on this page points back at the page itself; nothing here should navigate away
 export const sampleUrl = '/inventory/';
 
-function getSampleUrl(fragment: string) {
-	return `${sampleUrl}#${fragment}`;
-}
+// Division outlines are cached SVGs keyed by Region id, and not every Region has one
+export async function getSampleDivisionRegionId() {
+	const { entries } = await getRegionsCollection();
 
-// Themes and Regions promote all their Featured Images to Heroes, so they carry the longest groups
-async function getSampleFeaturedImageIds() {
-	const [themes, regions] = await Promise.all([getThemesCollection(), getRegionsCollection()]);
+	for (const entry of entries) {
+		if (await getRegionsDivisionSvgContent(entry.id)) return entry.id;
+	}
 
-	return [...themes.entries, ...regions.entries]
-		.map((entry) => ({
-			ids: Array.isArray(entry.data.imageFeatured)
-				? entry.data.imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
-				: [],
-			entryQuality: entry.data.entryQuality,
-		}))
-		.sort(
-			(candidateA, candidateB) =>
-				candidateB.ids.length - candidateA.ids.length ||
-				candidateB.entryQuality - candidateA.entryQuality,
-		)
-		.flatMap((candidate) => candidate.ids);
+	return;
 }
 
 // Images resolve their id against the Images collection, so a fixture cannot invent one
@@ -80,32 +68,6 @@ export async function getSampleImages() {
 		landscape: chosen.filter((entry) => entry.data.width >= entry.data.height).slice(0, 6),
 		portrait: chosen.find((entry) => entry.data.height > entry.data.width),
 	};
-}
-
-// A preview subtitle walks a Region's ancestors and throws on an id the collection does not hold
-// The deepest Region also gives `regions-list` the longest ancestor run to expand
-export async function getSampleRegions() {
-	const { entries } = await getRegionsCollection();
-
-	const nested = entries.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0);
-
-	const deepest = [...nested].sort(
-		(regionA, regionB) =>
-			(regionB.data._ancestors?.length ?? 0) - (regionA.data._ancestors?.length ?? 0),
-	)[0];
-
-	return { deepest, nested: nested.slice(0, 3) };
-}
-
-// Division outlines are cached SVGs keyed by Region id, and not every Region has one
-export async function getSampleDivisionRegionId() {
-	const { entries } = await getRegionsCollection();
-
-	for (const entry of entries) {
-		if (await getRegionsDivisionSvgContent(entry.id)) return entry.id;
-	}
-
-	return;
 }
 
 export async function getSampleLocations() {
@@ -136,6 +98,21 @@ export async function getSampleNearbyLocations() {
 	});
 }
 
+// A preview subtitle walks a Region's ancestors and throws on an id the collection does not hold
+// The deepest Region also gives `regions-list` the longest ancestor run to expand
+export async function getSampleRegions() {
+	const { entries } = await getRegionsCollection();
+
+	const nested = entries.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0);
+
+	const deepest = [...nested].sort(
+		(regionA, regionB) =>
+			(regionB.data._ancestors?.length ?? 0) - (regionA.data._ancestors?.length ?? 0),
+	)[0];
+
+	return { deepest, nested: nested.slice(0, 3) };
+}
+
 // `regions-related` renders a column per relation, so the sample needs both filled
 export async function getSampleRelatedRegion() {
 	const { entries } = await getRegionsCollection();
@@ -145,8 +122,58 @@ export async function getSampleRelatedRegion() {
 	);
 }
 
+// Themes and Regions promote all their Featured Images to Heroes, so they carry the longest groups
+async function getSampleFeaturedImageIds() {
+	const [themes, regions] = await Promise.all([getThemesCollection(), getRegionsCollection()]);
+
+	return [...themes.entries, ...regions.entries]
+		.map((entry) => ({
+			ids: Array.isArray(entry.data.imageFeatured)
+				? entry.data.imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
+				: [],
+			entryQuality: entry.data.entryQuality,
+		}))
+		.sort(
+			(candidateA, candidateB) =>
+				candidateB.ids.length - candidateA.ids.length ||
+				candidateB.entryQuality - candidateA.entryQuality,
+		)
+		.flatMap((candidate) => candidate.ids);
+}
+
+function getSampleUrl(fragment: string) {
+	return `${sampleUrl}#${fragment}`;
+}
+
 // Every designation at once; a Location carries one or two, and the record is the closed set
 export const sampleHeritage = LocationTwHeritageSchema.options satisfies Array<LocationTwHeritage>;
+
+export function createSampleImageProps(entry: CollectionEntry<'images'>) {
+	const aspectRatio = entry.data.width / entry.data.height;
+
+	return {
+		imageProps: {
+			src: entry.id,
+			breakpoints: getImageBreakpoints({ maxWidth: entry.data.width }),
+			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+			width: ImageSizeEnum.Medium,
+			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
+			alt: sanitizeImageAltAttribute(entry.data.title),
+			unstyled: true,
+		} satisfies ImageComponentProps,
+		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,
+	};
+}
+
+// Omitting `mapId` takes the MDX inline branch: the map draws without a chunk endpoint existing
+export async function createSampleMapData() {
+	const { entries } = await getLocationsCollection();
+
+	return getMapData({
+		featureCollection: getLocationsFeatureCollection(entries.slice(0, 40)),
+		version: undefined,
+	});
+}
 
 // All three notices stacked; a Location's own data can only ever trigger two of them at once
 export function createSampleNotices() {
@@ -165,12 +192,6 @@ export function createSampleNotices() {
 	}));
 }
 
-export async function getSampleThemes() {
-	const { entries } = await getThemesCollection();
-
-	return entries.slice(0, 4);
-}
-
 // Built from real entries so the flattened shape cannot drift from the Resource schema
 export async function getSampleResources() {
 	const { entries } = await getResourcesCollection();
@@ -185,31 +206,10 @@ export async function getSampleResources() {
 	};
 }
 
-// Omitting `mapId` takes the MDX inline branch: the map draws without a chunk endpoint existing
-export async function createSampleMapData() {
-	const { entries } = await getLocationsCollection();
+export async function getSampleThemes() {
+	const { entries } = await getThemesCollection();
 
-	return getMapData({
-		featureCollection: getLocationsFeatureCollection(entries.slice(0, 40)),
-		version: undefined,
-	});
-}
-
-export function createSampleImageProps(entry: CollectionEntry<'images'>) {
-	const aspectRatio = entry.data.width / entry.data.height;
-
-	return {
-		imageProps: {
-			src: entry.id,
-			breakpoints: getImageBreakpoints({ maxWidth: entry.data.width }),
-			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-			width: ImageSizeEnum.Medium,
-			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
-			alt: sanitizeImageAltAttribute(entry.data.title),
-			unstyled: true,
-		} satisfies ImageComponentProps,
-		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,
-	};
+	return entries.slice(0, 4);
 }
 
 export const samplePlaces = ['Chiayi', 'Xinying', 'Huwei', 'Beigang'];
@@ -291,28 +291,6 @@ export const sampleCitationMultilingual = {
 	title: '《嘉南平原糖業鐵道》',
 } satisfies Citation;
 
-function createCatalogItem(item: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'title'>) {
-	return {
-		backlinks: new Set<string>(),
-		collection: 'posts',
-		dateCreated: sampleDate,
-		dateRecorded: undefined,
-		dateUpdated: undefined,
-		description: undefined,
-		entryQuality: 3,
-		imageHeroId: undefined,
-		imageId: undefined,
-		linksExternalCount: 0,
-		locationCount: undefined,
-		postCount: undefined,
-		regionPrimaryId: undefined,
-		titleMultilingual: undefined,
-		url: getSampleUrl(item.id),
-		wordCount: 820,
-		...item,
-	} satisfies CatalogItem;
-}
-
 interface SampleCatalogOptions {
 	imageIds: Array<string>;
 	regionId: string | undefined;
@@ -386,6 +364,28 @@ export function createSamplePage({
 	};
 }
 
+function createCatalogItem(item: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'title'>) {
+	return {
+		backlinks: new Set<string>(),
+		collection: 'posts',
+		dateCreated: sampleDate,
+		dateRecorded: undefined,
+		dateUpdated: undefined,
+		description: undefined,
+		entryQuality: 3,
+		imageHeroId: undefined,
+		imageId: undefined,
+		linksExternalCount: 0,
+		locationCount: undefined,
+		postCount: undefined,
+		regionPrimaryId: undefined,
+		titleMultilingual: undefined,
+		url: getSampleUrl(item.id),
+		wordCount: 820,
+		...item,
+	} satisfies CatalogItem;
+}
+
 // The other half of each union: a Link and a Source written inline in frontmatter, with no Resource
 export const sampleLinkInline = {
 	title: 'Chiayi County cultural heritage register',
@@ -429,6 +429,17 @@ export const sampleChronologyYears = ['2019', '2021', '2023', '2024', '2025', '2
 
 export const sampleChronologyMonths = ['02', '05', '09', '11'];
 
+// The OG card is drawn by a batch script (`packages/scripts/src/og-image`), never by Astro
+// A key doubles as the route param, so `inventory-og-image.ts` resolves one back through this list
+interface OpenGraphCard {
+	entry: OpenGraphMetadataItem;
+	imagePath: string;
+}
+
+interface SampleOpenGraphCard extends OpenGraphCard {
+	key: string;
+}
+
 // Heavy-tailed counts spread over all four intensity bins; a flat ramp renders as a single shade
 export function createSampleActivityValues(year: string) {
 	const values: Record<string, number> = {};
@@ -463,17 +474,6 @@ export function createSampleDailyData(values: Record<string, number>) {
 	return dailyData;
 }
 
-// The OG card is drawn by a batch script (`packages/scripts/src/og-image`), never by Astro
-// A key doubles as the route param, so `inventory-og-image.ts` resolves one back through this list
-interface OpenGraphCard {
-	entry: OpenGraphMetadataItem;
-	imagePath: string;
-}
-
-interface SampleOpenGraphCard extends OpenGraphCard {
-	key: string;
-}
-
 const openGraphLuminanceSampleCount = 24;
 
 // A card is a plain metadata object, and a found one changes subject as content changes
@@ -501,10 +501,6 @@ const openGraphTitleSamples = [
 		titleTh: sampleTitleThai.value,
 	},
 ];
-
-function toOpenGraphCard(key: string, card: OpenGraphCard | undefined): Array<SampleOpenGraphCard> {
-	return card ? [{ key, ...card }] : [];
-}
 
 async function createSampleOpenGraphCards() {
 	const [posts, locations, images, sampleImages] = await Promise.all([
@@ -554,6 +550,10 @@ async function createSampleOpenGraphCards() {
 			candidates.find(({ entry }) => entry.isFallback),
 		),
 	];
+}
+
+function toOpenGraphCard(key: string, card: OpenGraphCard | undefined): Array<SampleOpenGraphCard> {
+	return card ? [{ key, ...card }] : [];
 }
 
 // The page renders one <img> per card and the route re-enters here for each, so sample once

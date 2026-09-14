@@ -19,75 +19,6 @@ interface ImagePlaceholderCached {
 	hash: string;
 }
 
-// Generate placeholder dimensions from aspect ratio and pixel budget
-function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
-	const height = Math.sqrt(pixelCount / aspectRatio);
-	const width = pixelCount / height;
-
-	return { width: Math.round(width), height: Math.round(height) };
-}
-
-async function readImageFile(path: string): Promise<Buffer | undefined> {
-	try {
-		return await fs.readFile(path);
-	} catch {
-		return undefined;
-	}
-}
-
-/**
- * Generate a placeholder data URL with specified aspect ratio
- * Sharp handles cropping via fit/position when aspect ratios don't match
- */
-async function generatePlaceholderDataUrl({
-	path,
-	aspectRatio,
-	fit = ImageFitOptionEnum.Cover,
-	position = 'center',
-	pixelCount = imagePlaceholderPixelCountLowQuality,
-}: {
-	aspectRatio: number;
-	fit?: ImageFitOption;
-	path: string;
-	pixelCount?: number;
-	position?: string;
-}): Promise<string | undefined> {
-	const imageBuffer = await readImageFile(path);
-
-	if (!imageBuffer) return;
-
-	const { width, height } = getPlaceholderDimensions(aspectRatio, pixelCount);
-
-	const placeholderBuffer = await sharp(imageBuffer, { failOn: 'error' })
-		.resize(width, height, { fit, position })
-		.toFormat('webp', { quality: 10 })
-		.modulate({ brightness: 1, saturation: 1.2 })
-		.toBuffer({ resolveWithObject: true });
-
-	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString('base64')}`;
-}
-
-async function getCachedPlaceholder(
-	cache: Keyv,
-	cacheKey: string,
-	contentHash: string,
-): Promise<string | undefined> {
-	const cached = await cache.get<ImagePlaceholderCached>(cacheKey);
-
-	return cached?.hash === contentHash ? cached.dataUrl : undefined;
-}
-
-// `stat` is authoritative; the collection's stored time covers a source that has since moved
-async function getImageMtime(path: string, storedTime: Date | undefined) {
-	try {
-		const stats = await fs.stat(path);
-
-		return stats.mtimeMs;
-	} catch {
-		return storedTime?.getTime();
-	}
-}
-
 /**
  * Get a placeholder for an image with specified aspect ratio
  * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality
@@ -149,6 +80,75 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 
 		return placeholder;
 	};
+}
+
+/**
+ * Generate a placeholder data URL with specified aspect ratio
+ * Sharp handles cropping via fit/position when aspect ratios don't match
+ */
+async function generatePlaceholderDataUrl({
+	path,
+	aspectRatio,
+	fit = ImageFitOptionEnum.Cover,
+	position = 'center',
+	pixelCount = imagePlaceholderPixelCountLowQuality,
+}: {
+	aspectRatio: number;
+	fit?: ImageFitOption;
+	path: string;
+	pixelCount?: number;
+	position?: string;
+}): Promise<string | undefined> {
+	const imageBuffer = await readImageFile(path);
+
+	if (!imageBuffer) return;
+
+	const { width, height } = getPlaceholderDimensions(aspectRatio, pixelCount);
+
+	const placeholderBuffer = await sharp(imageBuffer, { failOn: 'error' })
+		.resize(width, height, { fit, position })
+		.toFormat('webp', { quality: 10 })
+		.modulate({ brightness: 1, saturation: 1.2 })
+		.toBuffer({ resolveWithObject: true });
+
+	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString('base64')}`;
+}
+
+async function getCachedPlaceholder(
+	cache: Keyv,
+	cacheKey: string,
+	contentHash: string,
+): Promise<string | undefined> {
+	const cached = await cache.get<ImagePlaceholderCached>(cacheKey);
+
+	return cached?.hash === contentHash ? cached.dataUrl : undefined;
+}
+
+// `stat` is authoritative; the collection's stored time covers a source that has since moved
+async function getImageMtime(path: string, storedTime: Date | undefined) {
+	try {
+		const stats = await fs.stat(path);
+
+		return stats.mtimeMs;
+	} catch {
+		return storedTime?.getTime();
+	}
+}
+
+// Generate placeholder dimensions from aspect ratio and pixel budget
+function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
+	const height = Math.sqrt(pixelCount / aspectRatio);
+	const width = pixelCount / height;
+
+	return { width: Math.round(width), height: Math.round(height) };
+}
+
+async function readImageFile(path: string): Promise<Buffer | undefined> {
+	try {
+		return await fs.readFile(path);
+	} catch {
+		return undefined;
+	}
 }
 
 let imagePlaceholderFunction: ReturnType<typeof createImagePlaceholderFunction> | undefined;

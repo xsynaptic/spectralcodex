@@ -5,13 +5,6 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
 import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '#types.ts';
 
-export interface MapFilterState {
-	entryQuality: number;
-	objective: number;
-	rating: number;
-	status: ReadonlyArray<LocationStatus>;
-}
-
 export interface MapCanvasData {
 	filteredCount: number;
 	lineStringCollection: MapSourceFeatureCollection | undefined;
@@ -19,55 +12,11 @@ export interface MapCanvasData {
 	totalCount: number;
 }
 
-export function isLocationVisible(
-	properties: MapSourceItem['properties'],
-	filter: MapFilterState,
-): boolean {
-	if (filter.status.includes(properties.status)) return false;
-	if (properties.entryQuality < filter.entryQuality) return false;
-	if (properties.rating < filter.rating) return false;
-	return properties.objective === undefined || properties.objective >= filter.objective;
-}
-
-function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureCollection | undefined {
-	if (items.length === 0) return undefined;
-
-	return {
-		type: 'FeatureCollection',
-		features: items.map(({ geometry, properties }) => ({
-			type: 'Feature',
-			properties,
-			geometry: geometry as MapGeometry,
-		})),
-	};
-}
-
-// Restrict the shared directory to this map's rows before any visibility filtering
-function getScopedItems(
-	items: ReadonlyArray<MapSourceItem>,
-	scope: MapScope,
-): ReadonlyArray<MapSourceItem> {
-	switch (scope.type) {
-		case 'ids': {
-			const itemById = new Map(items.map((item) => [item.properties.id, item] as const));
-
-			return scope.ids.map((id) => itemById.get(id)).filter((item) => item !== undefined);
-		}
-		case 'region': {
-			const [left, right] = scope.interval;
-
-			return items.filter(
-				({ properties }) =>
-					properties.regionOrdinals?.some((ordinal) => ordinal >= left && ordinal <= right) ??
-					false,
-			);
-		}
-		case 'theme': {
-			return items.filter(
-				({ properties }) => properties.themeIndices?.includes(scope.index) ?? false,
-			);
-		}
-	}
+export interface MapFilterState {
+	entryQuality: number;
+	objective: number;
+	rating: number;
+	status: ReadonlyArray<LocationStatus>;
 }
 
 export function getMapCanvasData(
@@ -105,5 +54,56 @@ export function getMapCanvasData(
 		// Count only what is drawn
 		filteredCount: points.length + lineStrings.length,
 		totalCount: scopedItems.length,
+	};
+}
+
+export function isLocationVisible(
+	properties: MapSourceItem['properties'],
+	filter: MapFilterState,
+): boolean {
+	if (filter.status.includes(properties.status)) return false;
+	if (properties.entryQuality < filter.entryQuality) return false;
+	if (properties.rating < filter.rating) return false;
+	return properties.objective === undefined || properties.objective >= filter.objective;
+}
+
+// Restrict the shared directory to this map's rows before any visibility filtering
+function getScopedItems(
+	items: ReadonlyArray<MapSourceItem>,
+	scope: MapScope,
+): ReadonlyArray<MapSourceItem> {
+	switch (scope.type) {
+		case 'ids': {
+			const itemById = new Map(items.map((item) => [item.properties.id, item] as const));
+
+			return scope.ids.map((id) => itemById.get(id)).filter((item) => item !== undefined);
+		}
+		case 'region': {
+			const [left, right] = scope.interval;
+
+			return items.filter(
+				({ properties }) =>
+					properties.regionOrdinals?.some((ordinal) => ordinal >= left && ordinal <= right) ??
+					false,
+			);
+		}
+		case 'theme': {
+			return items.filter(
+				({ properties }) => properties.themeIndices?.includes(scope.index) ?? false,
+			);
+		}
+	}
+}
+
+function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureCollection | undefined {
+	if (items.length === 0) return undefined;
+
+	return {
+		type: 'FeatureCollection',
+		features: items.map(({ geometry, properties }) => ({
+			type: 'Feature',
+			properties,
+			geometry: geometry as MapGeometry,
+		})),
 	};
 }

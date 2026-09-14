@@ -1,3 +1,11 @@
+export interface OpenGraphContentEntry extends OpenGraphEntryItem {
+	digest: string;
+}
+
+export interface OpenGraphEntryItem extends OpenGraphMetadataItem {
+	imageFeaturedId: string;
+}
+
 export interface OpenGraphMetadataItem {
 	collection: string;
 	id: string;
@@ -6,12 +14,4 @@ export interface OpenGraphMetadataItem {
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
 	titleZh?: string | undefined;
-}
-
-export interface OpenGraphEntryItem extends OpenGraphMetadataItem {
-	imageFeaturedId: string;
-}
-
-export interface OpenGraphContentEntry extends OpenGraphEntryItem {
-	digest: string;
 }

@@ -41,6 +41,23 @@ const defaultPopupItem = {
 	popupCoordinates: new LngLat(0, 0),
 } satisfies MapPopupItemExtended;
 
+// Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
+function getGoogleMapsHref(value: string) {
+	if (value.includes('://')) return value;
+	if (value.includes('/')) return `https://${value}`;
+	return `https://maps.app.goo.gl/${value}`;
+}
+
+// Generate a standard Google Maps URL from a set of coordinates
+function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
+	const url = new URL('https://www.google.com/maps/search/');
+
+	url.searchParams.set('api', '1');
+	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
+
+	return url.href;
+}
+
 /**
  * Extract popup coordinates from geometry using type discrimination
  * - Point: use coordinates directly
@@ -85,29 +102,13 @@ function getPopupCoordinates({ geometry }: MapSourceItem): LngLat {
 	}
 }
 
-// Generate a standard Google Maps URL from a set of coordinates
-function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
-	const url = new URL('https://www.google.com/maps/search/');
-
-	url.searchParams.set('api', '1');
-	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
-
-	return url.href;
-}
-
-function getWikipediaHref(value: string) {
-	return value.includes('https://') ? value : `https://${value}`;
-}
-
-// Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
-function getGoogleMapsHref(value: string) {
-	if (value.includes('://')) return value;
-	if (value.includes('/')) return `https://${value}`;
-	return `https://maps.app.goo.gl/${value}`;
-}
-
 function getPopupImageSizes(isMobile: boolean): string {
 	return isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw';
+}
+
+// Display src is the first (smallest) srcSet candidate, stripped of its width descriptor
+function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
+	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
 }
 
 function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
@@ -117,9 +118,8 @@ function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
 		.join(', ');
 }
 
-// Display src is the first (smallest) srcSet candidate, stripped of its width descriptor
-function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
-	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
+function getWikipediaHref(value: string) {
+	return value.includes('https://') ? value : `https://${value}`;
 }
 
 // Preload a point's popup image once the pointer dwells over it, so it is cached before the popup opens
@@ -133,23 +133,6 @@ function findPopupImageSrcSet(
 	if (id.startsWith('cluster-')) return undefined;
 
 	return popupSource?.find((item) => item.id === id)?.image?.srcSet;
-}
-
-// Index by id so hover/selection lookups avoid an O(n) scan per render
-function useSourceDataIndex(): Map<string, MapSourceItem> {
-	const { data: sourceData } = useSourceDataQuery();
-
-	return useMemo(() => {
-		const index = new Map<string, MapSourceItem>();
-
-		if (sourceData) {
-			for (const item of sourceData) {
-				index.set(item.properties.id, item);
-			}
-		}
-
-		return index;
-	}, [sourceData]);
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
@@ -166,6 +149,46 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 	}, [value, delayMs]);
 
 	return debouncedValue;
+}
+
+// Popup data is incomplete; we assemble some props from source data, the rest from chunks fetched on demand
+function useMapCanvasPopup() {
+	const selectedId = useMapSelectedId();
+
+	const sourceDataIndex = useSourceDataIndex();
+	const inlinePopupQuery = usePopupDataQuery();
+	const inlinePopupData = inlinePopupQuery.data;
+
+	const selectedSourceItem = selectedId ? sourceDataIndex.get(selectedId) : undefined;
+
+	// A chunk key means the popup comes from a chunk; its absence means an inline popup (objectives/MDX)
+	const chunkKey = selectedSourceItem?.properties.chunkKey;
+	const chunkQuery = useChunkPopup(chunkKey);
+
+	const isLoading = (chunkKey ? chunkQuery : inlinePopupQuery).isLoading;
+
+	const popupItem = useMemo(() => {
+		if (!selectedId) return;
+
+		const popupSource = chunkKey ? chunkQuery.data : inlinePopupData;
+
+		return {
+			...defaultPopupItem,
+			// Seed the title from source data so a failed chunk fetch degrades to a title-only popup
+			...(selectedSourceItem ? { title: selectedSourceItem.properties.title } : {}),
+			...popupSource?.find((item) => item.id === selectedId),
+			...(selectedSourceItem
+				? {
+						precision: selectedSourceItem.properties.precision,
+						objective: selectedSourceItem.properties.objective,
+						popupCoordinates: getPopupCoordinates(selectedSourceItem),
+					}
+				: {}),
+		} satisfies MapPopupItemExtended;
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceDataIndex + selectedId
+	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceDataIndex]);
+
+	return { popupItem, isLoading };
 }
 
 function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
@@ -212,44 +235,21 @@ function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
 	}, [hoveredId, hoverChunkKey, inlinePopupData, hoverChunkData, imageServerUrl, isMobile]);
 }
 
-// Popup data is incomplete; we assemble some props from source data, the rest from chunks fetched on demand
-function useMapCanvasPopup() {
-	const selectedId = useMapSelectedId();
+// Index by id so hover/selection lookups avoid an O(n) scan per render
+function useSourceDataIndex(): Map<string, MapSourceItem> {
+	const { data: sourceData } = useSourceDataQuery();
 
-	const sourceDataIndex = useSourceDataIndex();
-	const inlinePopupQuery = usePopupDataQuery();
-	const inlinePopupData = inlinePopupQuery.data;
+	return useMemo(() => {
+		const index = new Map<string, MapSourceItem>();
 
-	const selectedSourceItem = selectedId ? sourceDataIndex.get(selectedId) : undefined;
+		if (sourceData) {
+			for (const item of sourceData) {
+				index.set(item.properties.id, item);
+			}
+		}
 
-	// A chunk key means the popup comes from a chunk; its absence means an inline popup (objectives/MDX)
-	const chunkKey = selectedSourceItem?.properties.chunkKey;
-	const chunkQuery = useChunkPopup(chunkKey);
-
-	const isLoading = (chunkKey ? chunkQuery : inlinePopupQuery).isLoading;
-
-	const popupItem = useMemo(() => {
-		if (!selectedId) return;
-
-		const popupSource = chunkKey ? chunkQuery.data : inlinePopupData;
-
-		return {
-			...defaultPopupItem,
-			// Seed the title from source data so a failed chunk fetch degrades to a title-only popup
-			...(selectedSourceItem ? { title: selectedSourceItem.properties.title } : {}),
-			...popupSource?.find((item) => item.id === selectedId),
-			...(selectedSourceItem
-				? {
-						precision: selectedSourceItem.properties.precision,
-						objective: selectedSourceItem.properties.objective,
-						popupCoordinates: getPopupCoordinates(selectedSourceItem),
-					}
-				: {}),
-		} satisfies MapPopupItemExtended;
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceDataIndex + selectedId
-	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceDataIndex]);
-
-	return { popupItem, isLoading };
+		return index;
+	}, [sourceData]);
 }
 
 const MapPopupFooter: FC<{

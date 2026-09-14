@@ -34,6 +34,6 @@ const MapFeaturePropertiesSchema = z.object({
 	image: ImageThumbnailSchema.optional(),
 });
 
-export type MapFeatureProperties = z.output<typeof MapFeaturePropertiesSchema>;
-
 export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProperties>;
+
+export type MapFeatureProperties = z.output<typeof MapFeaturePropertiesSchema>;

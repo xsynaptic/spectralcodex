@@ -2,9 +2,8 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
 import { MapLayerIdEnum } from '#source/source-config.ts';
 
-type MapCoordinates = [number, number];
-
-type MapCursor = 'grab' | 'pointer' | 'zoom-in';
+export type MapClickAction =
+	MapClearSelectionAction | MapCloseFilterAction | MapExpandClusterAction | MapSelectPointAction;
 
 export interface MapClickInput {
 	clusterId: unknown;
@@ -13,29 +12,6 @@ export interface MapClickInput {
 	layerId: string | undefined;
 	pointId: unknown;
 }
-
-interface MapClearSelectionAction {
-	kind: 'clear-selection';
-}
-
-interface MapCloseFilterAction {
-	kind: 'close-filter';
-}
-
-interface MapExpandClusterAction {
-	center: MapCoordinates;
-	clusterId: number | string;
-	kind: 'expand-cluster';
-}
-
-interface MapSelectPointAction {
-	center: MapCoordinates | undefined;
-	kind: 'select-point';
-	pointId: string;
-}
-
-export type MapClickAction =
-	MapClearSelectionAction | MapCloseFilterAction | MapExpandClusterAction | MapSelectPointAction;
 
 export interface MapHoverInput {
 	clusterId: unknown;
@@ -46,15 +22,6 @@ export interface MapHoverInput {
 	storeHoveredId: string | undefined;
 }
 
-interface MapFeatureStateChange {
-	featureId: number | string;
-	hover: boolean;
-}
-
-interface MapStoreHoveredIdUpdate {
-	hoveredId: string | undefined;
-}
-
 export interface MapHoverIntent {
 	cursor: MapCursor;
 	featureStateChanges: Array<MapFeatureStateChange>;
@@ -63,21 +30,37 @@ export interface MapHoverIntent {
 	storeHoveredIdUpdate: MapStoreHoveredIdUpdate | undefined;
 }
 
-function isMapCoordinates(input: unknown): input is MapCoordinates {
-	return (
-		!!input &&
-		Array.isArray(input) &&
-		input.length === 2 &&
-		typeof input[0] === 'number' &&
-		typeof input[1] === 'number'
-	);
+interface MapClearSelectionAction {
+	kind: 'clear-selection';
 }
 
-function getClusterId(input: unknown): number | string | undefined {
-	if (typeof input !== 'string' && typeof input !== 'number') return undefined;
-	if (!input) return undefined;
+interface MapCloseFilterAction {
+	kind: 'close-filter';
+}
 
-	return input;
+type MapCoordinates = [number, number];
+
+type MapCursor = 'grab' | 'pointer' | 'zoom-in';
+
+interface MapExpandClusterAction {
+	center: MapCoordinates;
+	clusterId: number | string;
+	kind: 'expand-cluster';
+}
+
+interface MapFeatureStateChange {
+	featureId: number | string;
+	hover: boolean;
+}
+
+interface MapSelectPointAction {
+	center: MapCoordinates | undefined;
+	kind: 'select-point';
+	pointId: string;
+}
+
+interface MapStoreHoveredIdUpdate {
+	hoveredId: string | undefined;
 }
 
 export function decideClickActions(input: MapClickInput): Array<MapClickAction> {
@@ -118,29 +101,6 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 	}
 }
 
-function getFeatureStateChanges(
-	previousId: number | string | undefined,
-	nextId: number | string | undefined,
-): Array<MapFeatureStateChange> {
-	if (previousId === nextId) return [];
-
-	const changes: Array<MapFeatureStateChange> = [];
-
-	if (previousId !== undefined) changes.push({ featureId: previousId, hover: false });
-	if (nextId !== undefined) changes.push({ featureId: nextId, hover: true });
-
-	return changes;
-}
-
-function getStoreHoveredIdUpdate(
-	storeHoveredId: string | undefined,
-	nextHoveredId: string | undefined,
-): MapStoreHoveredIdUpdate | undefined {
-	if (nextHoveredId === storeHoveredId) return undefined;
-
-	return { hoveredId: nextHoveredId };
-}
-
 export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 	const { layerId, featureId, pointId, clusterId, hoveredFeatureId, storeHoveredId } = input;
 
@@ -178,4 +138,44 @@ export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 			};
 		}
 	}
+}
+
+function getClusterId(input: unknown): number | string | undefined {
+	if (typeof input !== 'string' && typeof input !== 'number') return undefined;
+	if (!input) return undefined;
+
+	return input;
+}
+
+function getFeatureStateChanges(
+	previousId: number | string | undefined,
+	nextId: number | string | undefined,
+): Array<MapFeatureStateChange> {
+	if (previousId === nextId) return [];
+
+	const changes: Array<MapFeatureStateChange> = [];
+
+	if (previousId !== undefined) changes.push({ featureId: previousId, hover: false });
+	if (nextId !== undefined) changes.push({ featureId: nextId, hover: true });
+
+	return changes;
+}
+
+function getStoreHoveredIdUpdate(
+	storeHoveredId: string | undefined,
+	nextHoveredId: string | undefined,
+): MapStoreHoveredIdUpdate | undefined {
+	if (nextHoveredId === storeHoveredId) return undefined;
+
+	return { hoveredId: nextHoveredId };
+}
+
+function isMapCoordinates(input: unknown): input is MapCoordinates {
+	return (
+		!!input &&
+		Array.isArray(input) &&
+		input.length === 2 &&
+		typeof input[0] === 'number' &&
+		typeof input[1] === 'number'
+	);
 }

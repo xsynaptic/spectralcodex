@@ -14,23 +14,6 @@ import {
 	ImageSizeEnum,
 } from '#lib/image/image-types.ts';
 
-// A simple check for image orientation
-function getImageOrientation({
-	width,
-	height,
-}: {
-	height?: number | undefined;
-	width: number;
-}): ImageOrientation {
-	if (height === width) {
-		return ImageOrientationEnum.Square;
-	}
-	if (height && height > width) {
-		return ImageOrientationEnum.Portrait;
-	}
-	return ImageOrientationEnum.Landscape;
-}
-
 // Simple utility to remove any widths over the size of the original image
 // This also adds the original max width and returns only unique values
 // Without this it's easy to end up with a bunch of non-usable widths polluting the markup
@@ -123,4 +106,21 @@ export function getImageLayoutSizesProp(
 	if (!isPriority) sizes.unshift('auto');
 
 	return sizes.join(', ');
+}
+
+// A simple check for image orientation
+function getImageOrientation({
+	width,
+	height,
+}: {
+	height?: number | undefined;
+	width: number;
+}): ImageOrientation {
+	if (height === width) {
+		return ImageOrientationEnum.Square;
+	}
+	if (height && height > width) {
+		return ImageOrientationEnum.Portrait;
+	}
+	return ImageOrientationEnum.Landscape;
 }

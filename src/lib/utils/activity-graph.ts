@@ -1,6 +1,13 @@
 import { millisecondsPerDay } from '#constants.ts';
 import { getDayKey } from '#lib/utils/date.ts';
 
+export interface ActivityGraphData {
+	days: Array<ActivityGraphDay>;
+	monthLabels: Array<ActivityGraphMonthLabel>;
+	padCount: number;
+	weekCount: number;
+}
+
 interface ActivityGraphDay {
 	date: Date;
 	future: boolean;
@@ -13,30 +20,12 @@ interface ActivityGraphMonthLabel {
 	week: number;
 }
 
-export interface ActivityGraphData {
-	days: Array<ActivityGraphDay>;
-	monthLabels: Array<ActivityGraphMonthLabel>;
-	padCount: number;
-	weekCount: number;
-}
-
 interface BuildActivityGraphOptions {
 	// Days after this instant have no history yet; usually the build date
 	referenceDate: Date;
 	// Day key ('YYYY-MM-DD') to event count for the year
 	values: Record<string, number>;
 	year: string;
-}
-
-// Intensity bin 0-4 for one day; 0 = no events, 4 = the year's busiest day
-// Log scale: event counts are heavy-tailed, so a lone huge day would flatten every
-// busy-but-not-peak day to one shade under a linear scale; log keeps the texture
-export function getActivityLevel(count: number, max: number): number {
-	if (count <= 0 || max <= 0) return 0;
-
-	const level = Math.ceil((4 * Math.log(count + 1)) / Math.log(max + 1));
-
-	return Math.min(4, Math.max(1, level));
 }
 
 // Everything the graph needs to render one year: cells, month lines, and leading pad count
@@ -94,4 +83,15 @@ export function buildActivityGraph({
 	});
 
 	return { days, monthLabels, padCount, weekCount };
+}
+
+// Intensity bin 0-4 for one day; 0 = no events, 4 = the year's busiest day
+// Log scale: event counts are heavy-tailed, so a lone huge day would flatten every
+// busy-but-not-peak day to one shade under a linear scale; log keeps the texture
+export function getActivityLevel(count: number, max: number): number {
+	if (count <= 0 || max <= 0) return 0;
+
+	const level = Math.ceil((4 * Math.log(count + 1)) / Math.log(max + 1));
+
+	return Math.min(4, Math.max(1, level));
 }

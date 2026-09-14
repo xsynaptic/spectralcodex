@@ -9,24 +9,6 @@ interface MissingImageIssue {
 	location: string;
 }
 
-function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: ReadonlySet<string>) {
-	const issues: Array<MissingImageIssue> = [];
-
-	for (const entry of entries) {
-		const frontmatterIds = extractImageFeaturedIds(entry.data);
-		const mdxIds = entry.body ? extractMdxImageIds(entry.body) : [];
-		const imageIds = new Set([...frontmatterIds, ...mdxIds]);
-
-		for (const imageId of imageIds) {
-			if (mediaFiles.has(imageId)) continue;
-
-			issues.push({ location: entry.filePath ?? entry.id, imageId });
-		}
-	}
-
-	return issues;
-}
-
 export function validateImageReferences(entries: Array<ContentEntry>, mediaPath: string) {
 	const mediaFiles = collectMediaFiles(mediaPath);
 
@@ -47,4 +29,22 @@ export function validateImageReferences(entries: Array<ContentEntry>, mediaPath:
 			fail: `Found ${issues.length.toString()} missing image reference(s)`,
 		},
 	);
+}
+
+function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: ReadonlySet<string>) {
+	const issues: Array<MissingImageIssue> = [];
+
+	for (const entry of entries) {
+		const frontmatterIds = extractImageFeaturedIds(entry.data);
+		const mdxIds = entry.body ? extractMdxImageIds(entry.body) : [];
+		const imageIds = new Set([...frontmatterIds, ...mdxIds]);
+
+		for (const imageId of imageIds) {
+			if (mediaFiles.has(imageId)) continue;
+
+			issues.push({ location: entry.filePath ?? entry.id, imageId });
+		}
+	}
+
+	return issues;
 }

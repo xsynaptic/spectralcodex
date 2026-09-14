@@ -25,6 +25,58 @@ interface SvgOptions {
 	width?: number;
 }
 
+// Saves a GeoJSON FeatureCollection as an optimized SVG file
+export async function saveSvg({
+	geojsonData,
+	id,
+	outputDir,
+	options = {},
+}: {
+	geojsonData: DivisionFeatureCollection;
+	id: string;
+	options?: SvgOptions;
+	outputDir: string;
+}): Promise<void> {
+	safelyCreateDirectory(outputDir);
+
+	const filePath = path.join(outputDir, `${id}.svg`);
+
+	try {
+		const { svg: rawSvg, pointCount, tolerance } = generateSvg(geojsonData, options);
+
+		const optimized = optimize(rawSvg, {
+			path: filePath,
+			plugins: [
+				{
+					name: 'preset-default',
+					params: {
+						overrides: {
+							convertColors: false,
+						},
+					},
+				},
+				{
+					name: 'convertPathData',
+					params: {
+						floatPrecision: 1,
+					},
+				},
+			],
+		});
+
+		await fs.writeFile(filePath, optimized.data, 'utf8');
+
+		console.log(
+			chalk.gray(
+				`Saved SVG file to: ${chalk.cyan(filePath)} (${chalk.green(`${String(rawSvg.length)} → ${String(optimized.data.length)} bytes`)})  points: ${chalk.yellow(String(pointCount))}  tolerance: ${chalk.yellow(String(tolerance))}`,
+			),
+		);
+	} catch (error) {
+		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(id)}:`), error);
+		throw error;
+	}
+}
+
 /**
  * Generates an SVG string from a GeoJSON FeatureCollection using d3-geo
  * This approach references: https://css-irl.info/creating-static-svgs-from-geojson/
@@ -142,56 +194,4 @@ function generateSvg(
 </svg>`;
 
 	return { svg, pointCount, tolerance: adaptiveTolerance };
-}
-
-// Saves a GeoJSON FeatureCollection as an optimized SVG file
-export async function saveSvg({
-	geojsonData,
-	id,
-	outputDir,
-	options = {},
-}: {
-	geojsonData: DivisionFeatureCollection;
-	id: string;
-	options?: SvgOptions;
-	outputDir: string;
-}): Promise<void> {
-	safelyCreateDirectory(outputDir);
-
-	const filePath = path.join(outputDir, `${id}.svg`);
-
-	try {
-		const { svg: rawSvg, pointCount, tolerance } = generateSvg(geojsonData, options);
-
-		const optimized = optimize(rawSvg, {
-			path: filePath,
-			plugins: [
-				{
-					name: 'preset-default',
-					params: {
-						overrides: {
-							convertColors: false,
-						},
-					},
-				},
-				{
-					name: 'convertPathData',
-					params: {
-						floatPrecision: 1,
-					},
-				},
-			],
-		});
-
-		await fs.writeFile(filePath, optimized.data, 'utf8');
-
-		console.log(
-			chalk.gray(
-				`Saved SVG file to: ${chalk.cyan(filePath)} (${chalk.green(`${String(rawSvg.length)} → ${String(optimized.data.length)} bytes`)})  points: ${chalk.yellow(String(pointCount))}  tolerance: ${chalk.yellow(String(tolerance))}`,
-			),
-		);
-	} catch (error) {
-		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(id)}:`), error);
-		throw error;
-	}
 }

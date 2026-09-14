@@ -103,11 +103,6 @@ export const LocationStatusRecords = {
 	},
 } as const satisfies Record<LocationStatus, LocationStatusMetadata>;
 
-// MapLibre expects some style properties to have at least two items
-function isDoubleStringArray(array: Array<string>): array is [string, string, ...Array<string>] {
-	return array.every((item) => typeof item === 'string') && array.length >= 2;
-}
-
 function getColorMap(
 	styleRecord: typeof LocationStatusRecords,
 	prop: keyof (typeof LocationStatusRecords)[keyof typeof LocationStatusRecords],
@@ -121,6 +116,11 @@ function getColorMap(
 		return colorMap;
 	}
 	throw new Error(`Invalid color map: ${colorMap.join(', ')}`);
+}
+
+// MapLibre expects some style properties to have at least two items
+function isDoubleStringArray(array: Array<string>): array is [string, string, ...Array<string>] {
+	return array.every((item) => typeof item === 'string') && array.length >= 2;
 }
 
 // This creates an array of status and color values for use with clusters in MapLibre

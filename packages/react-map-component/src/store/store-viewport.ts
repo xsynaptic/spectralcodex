@@ -13,7 +13,47 @@ const SavedViewportSchema = z.object({
 	timestamp: z.number(),
 });
 
+interface InitialViewStateOptions {
+	bounds?: MapComponentProps['bounds'] | undefined;
+	center?: MapComponentProps['center'] | undefined;
+	mapId?: MapComponentProps['mapId'] | undefined;
+	maxBounds?: MapComponentProps['maxBounds'] | undefined;
+	zoom?: MapComponentProps['zoom'] | undefined;
+}
+
 type SavedViewport = Pick<z.infer<typeof SavedViewportSchema>, 'latitude' | 'longitude' | 'zoom'>;
+
+export function getInitialViewState({
+	bounds,
+	center,
+	mapId,
+	maxBounds,
+	zoom,
+}: InitialViewStateOptions): NonNullable<MapInitialViewState> {
+	const maxBoundsOption = maxBounds ? { maxBounds } : {};
+	const saved = readSavedViewport(mapId);
+
+	if (saved) return { ...maxBoundsOption, ...saved };
+
+	const viewState = { ...maxBoundsOption, fitBoundsOptions, zoom: zoom ?? defaultZoom };
+
+	if (bounds) return { ...viewState, bounds };
+
+	const [longitude, latitude] = center ?? [0, 0];
+
+	return { ...viewState, longitude, latitude };
+}
+
+export function writeSavedViewport(mapId: string, viewport: SavedViewport) {
+	try {
+		sessionStorage.setItem(
+			getViewportStorageKey(mapId),
+			JSON.stringify({ ...viewport, timestamp: Date.now() }),
+		);
+	} catch {
+		// Ignore quota errors
+	}
+}
 
 function getViewportStorageKey(mapId: string) {
 	return `map-vp:${mapId}`;
@@ -38,44 +78,4 @@ function readSavedViewport(mapId: string | undefined): SavedViewport | undefined
 		// Ignore parse errors or missing sessionStorage
 	}
 	return undefined;
-}
-
-export function writeSavedViewport(mapId: string, viewport: SavedViewport) {
-	try {
-		sessionStorage.setItem(
-			getViewportStorageKey(mapId),
-			JSON.stringify({ ...viewport, timestamp: Date.now() }),
-		);
-	} catch {
-		// Ignore quota errors
-	}
-}
-
-interface InitialViewStateOptions {
-	bounds?: MapComponentProps['bounds'] | undefined;
-	center?: MapComponentProps['center'] | undefined;
-	mapId?: MapComponentProps['mapId'] | undefined;
-	maxBounds?: MapComponentProps['maxBounds'] | undefined;
-	zoom?: MapComponentProps['zoom'] | undefined;
-}
-
-export function getInitialViewState({
-	bounds,
-	center,
-	mapId,
-	maxBounds,
-	zoom,
-}: InitialViewStateOptions): NonNullable<MapInitialViewState> {
-	const maxBoundsOption = maxBounds ? { maxBounds } : {};
-	const saved = readSavedViewport(mapId);
-
-	if (saved) return { ...maxBoundsOption, ...saved };
-
-	const viewState = { ...maxBoundsOption, fitBoundsOptions, zoom: zoom ?? defaultZoom };
-
-	if (bounds) return { ...viewState, bounds };
-
-	const [longitude, latitude] = center ?? [0, 0];
-
-	return { ...viewState, longitude, latitude };
 }

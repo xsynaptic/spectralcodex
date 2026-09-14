@@ -1,14 +1,3 @@
-function getScrollTarget(container: HTMLElement, isForward: boolean): number {
-	const itemWidth = container.querySelector('.carousel-item')?.clientWidth ?? container.clientWidth;
-	const maxScroll = container.scrollWidth - container.clientWidth;
-
-	if (isForward) {
-		return container.scrollLeft > maxScroll - itemWidth / 2 ? 0 : container.scrollLeft + itemWidth;
-	}
-
-	return container.scrollLeft < itemWidth / 2 ? maxScroll : container.scrollLeft - itemWidth;
-}
-
 // Carousel slider element; this requires a container and some navigation buttons to work properly
 class ImageCarousel extends HTMLElement {
 	#initialized = false;
@@ -120,6 +109,17 @@ class ImageCarousel extends HTMLElement {
 		this.#controller?.abort();
 		this.#controller = undefined;
 	}
+}
+
+function getScrollTarget(container: HTMLElement, isForward: boolean): number {
+	const itemWidth = container.querySelector('.carousel-item')?.clientWidth ?? container.clientWidth;
+	const maxScroll = container.scrollWidth - container.clientWidth;
+
+	if (isForward) {
+		return container.scrollLeft > maxScroll - itemWidth / 2 ? 0 : container.scrollLeft + itemWidth;
+	}
+
+	return container.scrollLeft < itemWidth / 2 ? maxScroll : container.scrollLeft - itemWidth;
 }
 
 if (!customElements.get('image-carousel')) {

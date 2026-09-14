@@ -52,56 +52,6 @@ const defaultMapDataProps = {
 	isDev: import.meta.env.DEV,
 } satisfies MapComponentData;
 
-function getTargetIds(featureCollection: MapFeatureCollection, targetId: string | undefined) {
-	if (!targetId) return;
-
-	return featureCollection.features
-		.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
-		.map(({ id }) => String(id));
-}
-
-function getInlineData(featureCollection: MapFeatureCollection) {
-	const sourceData = getLocationsMapSourceData(featureCollection);
-	const popupData = getLocationsMapPopupData(featureCollection);
-
-	return {
-		sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
-		popupData: popupData ? encodeMapPopupData(popupData) : undefined,
-		sourceDataKey: hashMapSourceData(sourceData),
-		popupDataKey: hashMapPopupData(popupData),
-	};
-}
-
-function getChunkedInlineData(
-	featureCollection: MapFeatureCollection,
-	chunkKeyById: Map<string, string> | undefined,
-) {
-	// Hash the un-stamped rows so inline keys match the equivalent API payload
-	const sourceData = getLocationsMapSourceData(featureCollection);
-	const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);
-
-	return {
-		sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
-		sourceDataKey: hashMapSourceData(sourceData),
-	};
-}
-
-function getDirectoryData(
-	featureCollection: MapFeatureCollection,
-	scope: MapScopeHint | undefined,
-	version: string | undefined,
-) {
-	const apiSourceUrl = getBasePath('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
-
-	// No membership hint resolves to this map's explicit, order-preserving id list
-	const resolvedScope: MapScope = scope ?? {
-		type: 'ids',
-		ids: featureCollection.features.map((feature) => String(feature.id)),
-	};
-
-	return { apiSourceUrl, scope: resolvedScope, prefetchUrls: [apiSourceUrl] };
-}
-
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
 	mapId,
@@ -237,4 +187,54 @@ export function getMapDataDedicated({
 		...mapBounds,
 		...props,
 	} satisfies MapComponentData;
+}
+
+function getChunkedInlineData(
+	featureCollection: MapFeatureCollection,
+	chunkKeyById: Map<string, string> | undefined,
+) {
+	// Hash the un-stamped rows so inline keys match the equivalent API payload
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	const inlineSourceData = getInlineSourceData(sourceData, chunkKeyById);
+
+	return {
+		sourceData: inlineSourceData ? encodeMapSourceData(inlineSourceData) : undefined,
+		sourceDataKey: hashMapSourceData(sourceData),
+	};
+}
+
+function getDirectoryData(
+	featureCollection: MapFeatureCollection,
+	scope: MapScopeHint | undefined,
+	version: string | undefined,
+) {
+	const apiSourceUrl = getBasePath('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
+
+	// No membership hint resolves to this map's explicit, order-preserving id list
+	const resolvedScope: MapScope = scope ?? {
+		type: 'ids',
+		ids: featureCollection.features.map((feature) => String(feature.id)),
+	};
+
+	return { apiSourceUrl, scope: resolvedScope, prefetchUrls: [apiSourceUrl] };
+}
+
+function getInlineData(featureCollection: MapFeatureCollection) {
+	const sourceData = getLocationsMapSourceData(featureCollection);
+	const popupData = getLocationsMapPopupData(featureCollection);
+
+	return {
+		sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
+		popupData: popupData ? encodeMapPopupData(popupData) : undefined,
+		sourceDataKey: hashMapSourceData(sourceData),
+		popupDataKey: hashMapPopupData(popupData),
+	};
+}
+
+function getTargetIds(featureCollection: MapFeatureCollection, targetId: string | undefined) {
+	if (!targetId) return;
+
+	return featureCollection.features
+		.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
+		.map(({ id }) => String(id));
 }

@@ -5,23 +5,6 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
-/**
- * Derive hierarchy from filePath
- * *e.g.* "packages/content/collections/locations/south-korea/busan/file.mdx"
- * → ["south-korea", "busan", "file"]
- */
-function getHierarchy(filePath: string, collection: string): Array<string> {
-	const collectionMarker = `collections/${collection}/`;
-	const idx = filePath.indexOf(collectionMarker);
-
-	if (idx === -1) return [];
-
-	const relativePath = filePath.slice(idx + collectionMarker.length);
-	const ext = path.extname(relativePath);
-
-	return relativePath.replace(ext, '').split('/');
-}
-
 interface LocationRegionIssue {
 	expectedRegion: string;
 	filename: string;
@@ -68,4 +51,21 @@ export function validateLocationsRegions(entries: Array<ContentEntry>) {
 			fail: `Found ${issues.length.toString()} region mismatch(es)`,
 		},
 	);
+}
+
+/**
+ * Derive hierarchy from filePath
+ * *e.g.* "packages/content/collections/locations/south-korea/busan/file.mdx"
+ * → ["south-korea", "busan", "file"]
+ */
+function getHierarchy(filePath: string, collection: string): Array<string> {
+	const collectionMarker = `collections/${collection}/`;
+	const idx = filePath.indexOf(collectionMarker);
+
+	if (idx === -1) return [];
+
+	const relativePath = filePath.slice(idx + collectionMarker.length);
+	const ext = path.extname(relativePath);
+
+	return relativePath.replace(ext, '').split('/');
 }

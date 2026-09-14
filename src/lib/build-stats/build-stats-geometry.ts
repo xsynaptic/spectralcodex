@@ -82,29 +82,10 @@ export interface AxisTick {
 	yearLabel: string | undefined;
 }
 
-export interface ValueTick {
-	label: string;
-	y: number;
-}
-
-// Wire format read back by the chart element: date first, then one entry per tooltip row
-export interface TooltipPoint {
-	values: Array<string>;
-	x: number;
-	y: number;
-}
-
-interface SeriesEndpoint {
-	cx: number;
-	cy: number;
-	label: string;
-}
-
-interface AnnotationMark {
-	label: string;
-	labelX: number;
-	labelY: number;
-	x: number;
+export interface BuildStatsGeometry {
+	axisTicks: Array<AxisTick>;
+	duration: DurationGeometry;
+	pages: PagesGeometry | undefined;
 }
 
 export interface DurationGeometry {
@@ -123,110 +104,29 @@ export interface PagesGeometry {
 	ticks: Array<ValueTick>;
 }
 
-export interface BuildStatsGeometry {
-	axisTicks: Array<AxisTick>;
-	duration: DurationGeometry;
-	pages: PagesGeometry | undefined;
+// Wire format read back by the chart element: date first, then one entry per tooltip row
+export interface TooltipPoint {
+	values: Array<string>;
+	x: number;
+	y: number;
 }
 
-// Sub-pixel precision is invisible on screen and costs tens of kilobytes of markup
-function round(value: number): number {
-	return Math.round(value * 10) / 10;
+export interface ValueTick {
+	label: string;
+	y: number;
 }
 
-// `undefined` lifts the pen, so a gap in the series breaks the line rather than bridging it
-function getPolylinePath(points: Array<undefined | { x: number; y: number }>): string {
-	let path = '';
-	let isPenDown = false;
-
-	for (const point of points) {
-		if (!point) {
-			isPenDown = false;
-			continue;
-		}
-
-		path += `${isPenDown ? 'L' : 'M'}${String(round(point.x))},${String(round(point.y))}`;
-		isPenDown = true;
-	}
-
-	return path;
+interface AnnotationMark {
+	label: string;
+	labelX: number;
+	labelY: number;
+	x: number;
 }
 
-function formatPageCount(value: number): string {
-	return formatNumber({ number: value });
-}
-
-function getPagesGeometry(
-	points: Array<BuildStatsPoint>,
-	getX: (time: number) => number,
-): PagesGeometry | undefined {
-	const first = points.at(0);
-	const last = points.at(-1);
-
-	if (!first || !last) return undefined;
-
-	const values = points.map((point) => point.value);
-	const scale = scaleLinear()
-		.domain([Math.min(...values), Math.max(...values)])
-		.range([pagesFrame.bottom, pagesFrame.top])
-		.nice(pagesTickCount);
-
-	const firstX = getX(first.time);
-	const lastX = getX(last.time);
-
-	const linePath = getPolylinePath(
-		points.map((point) => ({ x: getX(point.time), y: scale(point.value) })),
-	);
-
-	return {
-		ticks: scale.ticks(pagesTickCount).map((value) => ({
-			y: round(scale(value)),
-			label: formatPageCount(value),
-		})),
-		points: points.map((point) => ({
-			x: round(getX(point.time)),
-			y: round(scale(point.value)),
-			values: [
-				getDateDisplay(new Date(point.time), undefined, tooltipDateOptions),
-				formatPageCount(point.value),
-			],
-		})),
-		linePath,
-		// The baseline is flat, so the fill closes in two commands rather than retracing the series
-		areaPath: `${linePath}L${String(round(lastX))},${String(pagesFrame.bottom)}L${String(round(firstX))},${String(pagesFrame.bottom)}Z`,
-		end: { cx: round(lastX), cy: round(scale(last.value)), label: formatPageCount(last.value) },
-	};
-}
-
-function getAnnotationMarks(
-	annotations: Array<BuildStatsAnnotation>,
-	getX: (time: number) => number,
-): Array<AnnotationMark> {
-	const tierLastX = Array.from({ length: annotationTierCount }, () => -Infinity);
-	const marks: Array<AnnotationMark> = [];
-	const ordered = R.sortBy(annotations, (annotation) => annotation.time);
-
-	for (const annotation of ordered) {
-		const x = getX(annotation.time);
-		const tier = tierLastX.findIndex((lastX) => x - lastX >= annotationTierGap);
-
-		// Every tier is taken, so this label could only land on one already placed
-		if (tier === -1) continue;
-
-		tierLastX[tier] = x;
-
-		marks.push({
-			x: round(x),
-			// Hung left so the closing mark cannot run off the plot, clamped so the opening one cannot either
-			labelX: round(
-				Math.max(x - annotationLabelGap, buildStatsLayout.marginLeft + annotationTierGap),
-			),
-			labelY: durationFrame.top + 14 + tier * 17,
-			label: annotation.label,
-		});
-	}
-
-	return marks;
+interface SeriesEndpoint {
+	cx: number;
+	cy: number;
+	label: string;
 }
 
 export function getBuildStatsGeometry(
@@ -311,4 +211,104 @@ export function getBuildStatsGeometry(
 		},
 		pages: getPagesGeometry(pagePoints, getX),
 	};
+}
+
+function formatPageCount(value: number): string {
+	return formatNumber({ number: value });
+}
+
+function getAnnotationMarks(
+	annotations: Array<BuildStatsAnnotation>,
+	getX: (time: number) => number,
+): Array<AnnotationMark> {
+	const tierLastX = Array.from({ length: annotationTierCount }, () => -Infinity);
+	const marks: Array<AnnotationMark> = [];
+	const ordered = R.sortBy(annotations, (annotation) => annotation.time);
+
+	for (const annotation of ordered) {
+		const x = getX(annotation.time);
+		const tier = tierLastX.findIndex((lastX) => x - lastX >= annotationTierGap);
+
+		// Every tier is taken, so this label could only land on one already placed
+		if (tier === -1) continue;
+
+		tierLastX[tier] = x;
+
+		marks.push({
+			x: round(x),
+			// Hung left so the closing mark cannot run off the plot, clamped so the opening one cannot either
+			labelX: round(
+				Math.max(x - annotationLabelGap, buildStatsLayout.marginLeft + annotationTierGap),
+			),
+			labelY: durationFrame.top + 14 + tier * 17,
+			label: annotation.label,
+		});
+	}
+
+	return marks;
+}
+
+function getPagesGeometry(
+	points: Array<BuildStatsPoint>,
+	getX: (time: number) => number,
+): PagesGeometry | undefined {
+	const first = points.at(0);
+	const last = points.at(-1);
+
+	if (!first || !last) return undefined;
+
+	const values = points.map((point) => point.value);
+	const scale = scaleLinear()
+		.domain([Math.min(...values), Math.max(...values)])
+		.range([pagesFrame.bottom, pagesFrame.top])
+		.nice(pagesTickCount);
+
+	const firstX = getX(first.time);
+	const lastX = getX(last.time);
+
+	const linePath = getPolylinePath(
+		points.map((point) => ({ x: getX(point.time), y: scale(point.value) })),
+	);
+
+	return {
+		ticks: scale.ticks(pagesTickCount).map((value) => ({
+			y: round(scale(value)),
+			label: formatPageCount(value),
+		})),
+		points: points.map((point) => ({
+			x: round(getX(point.time)),
+			y: round(scale(point.value)),
+			values: [
+				getDateDisplay(new Date(point.time), undefined, tooltipDateOptions),
+				formatPageCount(point.value),
+			],
+		})),
+		linePath,
+		// The baseline is flat, so the fill closes in two commands rather than retracing the series
+		areaPath: `${linePath}L${String(round(lastX))},${String(pagesFrame.bottom)}L${String(round(firstX))},${String(pagesFrame.bottom)}Z`,
+		end: { cx: round(lastX), cy: round(scale(last.value)), label: formatPageCount(last.value) },
+	};
+}
+
+// `undefined` lifts the pen, so a gap in the series breaks the line rather than bridging it
+function getPolylinePath(points: Array<undefined | { x: number; y: number }>): string {
+	let path = '';
+	let isPenDown = false;
+
+	for (const point of points) {
+		if (!point) {
+			isPenDown = false;
+			continue;
+		}
+
+		path += `${isPenDown ? 'L' : 'M'}${String(round(point.x))},${String(round(point.y))}`;
+		isPenDown = true;
+	}
+
+	return path;
+}
+
+// Sub-pixel precision is invisible on screen and costs tens of kilobytes of markup
+function round(value: number): number {
+	return Math.round(value * 10) / 10;
 }

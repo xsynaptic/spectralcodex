@@ -30,6 +30,40 @@ type MapClickEvent = Parameters<NonNullable<MapCallbacks['onClick']>>[0];
 
 type MapClickFeature = NonNullable<MapClickEvent['features']>[number];
 
+function createGrabCursorHandler(
+	cursor: 'grab' | 'grabbing',
+): NonNullable<MapCallbacks['onMouseDown']> {
+	return ({ features, target: mapInstance }) => {
+		const feature = features?.[0];
+
+		if (feature?.layer.id !== undefined) return;
+
+		mapInstance.getCanvas().style.cursor = cursor;
+	};
+}
+
+async function expandCluster(
+	mapInstance: MapClickEvent['target'],
+	clusterId: number | string,
+	center: [number, number],
+) {
+	const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
+
+	if (!isMapGeojsonSource(featureSource)) return;
+
+	try {
+		const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
+
+		mapInstance.easeTo({
+			center,
+			duration: 200,
+			zoom,
+		});
+	} catch {
+		console.warn('[Map] Could not get cluster expansion zoom!');
+	}
+}
+
 function getClickInput(feature: MapClickFeature | undefined): MapClickInput {
 	const geometry = feature?.geometry;
 
@@ -57,42 +91,61 @@ function getHoverInput(
 	};
 }
 
-async function expandCluster(
-	mapInstance: MapClickEvent['target'],
-	clusterId: number | string,
-	center: [number, number],
-) {
-	const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
-
-	if (!isMapGeojsonSource(featureSource)) return;
-
-	try {
-		const zoom = await featureSource.getClusterExpansionZoom(Number(clusterId));
-
-		mapInstance.easeTo({
-			center,
-			duration: 200,
-			zoom,
-		});
-	} catch {
-		console.warn('[Map] Could not get cluster expansion zoom!');
-	}
-}
-
-function createGrabCursorHandler(
-	cursor: 'grab' | 'grabbing',
-): NonNullable<MapCallbacks['onMouseDown']> {
-	return ({ features, target: mapInstance }) => {
-		const feature = features?.[0];
-
-		if (feature?.layer.id !== undefined) return;
-
-		mapInstance.getCanvas().style.cursor = cursor;
-	};
-}
-
 const onMouseDown = createGrabCursorHandler('grabbing');
 const onMouseUp = createGrabCursorHandler('grab');
+
+export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
+	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+
+	const isInteractive = useIsMapCanvasInteractive();
+
+	const { setCanvasLoading } = useMapStoreActions();
+
+	const onClick = useClickHandler();
+	const throttledOnMouseMove = useThrottledMouseMoveHandler();
+	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
+
+	const onMoveEnd = useCallback(
+		(event: ViewStateChangeEvent) => {
+			if (!mapId) return;
+
+			writeSavedViewport(mapId, {
+				longitude: event.viewState.longitude,
+				latitude: event.viewState.latitude,
+				zoom: event.viewState.zoom,
+			});
+		},
+		[mapId],
+	);
+
+	return {
+		onLoad: (event: MapEvent) => {
+			setCanvasLoading(false);
+
+			// Initialize the position of the filter control on interactive maps
+			if (isInteractive) debouncedFilterControlSetup.call(event);
+		},
+		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
+		onError: ({ error }) => {
+			setCanvasLoading(false);
+			console.warn('[Map]', error.message);
+		},
+		...(isInteractive
+			? {
+					onResize: debouncedFilterControlSetup.call,
+					onClick,
+					onMouseDown,
+					onMouseUp,
+					onMoveEnd,
+					...(isSourceDataLoading
+						? {}
+						: {
+								onMouseMove: throttledOnMouseMove.call,
+							}),
+				}
+			: {}),
+	} satisfies MapCallbacks;
+}
 
 function useClickHandler() {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
@@ -156,6 +209,51 @@ function useClickHandler() {
 	);
 }
 
+function useDebouncedFilterControlSetup() {
+	const { setFilterPosition } = useMapStoreActions();
+
+	return useMemo(
+		() =>
+			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
+				(container) => {
+					if (!container) {
+						console.warn('[Map] Map instance not found!');
+						return;
+					}
+
+					const filterControl = container.querySelector<HTMLButtonElement>(`#${controlFilterId}`);
+
+					if (!filterControl) {
+						console.warn('[Map] Filter control not found!');
+						return;
+					}
+
+					const { x: containerX, y: containerY } = container.getBoundingClientRect();
+					const {
+						x: controlX,
+						y: controlY,
+						height: controlHeight,
+						width: controlWidth,
+					} = filterControl.getBoundingClientRect();
+
+					setFilterPosition({
+						x: controlX - containerX + controlWidth,
+						y: controlY - containerY + controlHeight / 2,
+					});
+				},
+				{
+					reducer: (_previousElement, ...args: Array<MapEvent>) => {
+						if (args.length === 0 || !args[0]) return;
+
+						return args[0].target.getContainer();
+					},
+					minQuietPeriodMs: 300,
+				},
+			),
+		[setFilterPosition],
+	);
+}
+
 function useThrottledMouseMoveHandler() {
 	const mapStoreInstance = useMapStoreInstance();
 
@@ -216,102 +314,4 @@ function useThrottledMouseMoveHandler() {
 			}),
 		[onMouseMove],
 	);
-}
-
-function useDebouncedFilterControlSetup() {
-	const { setFilterPosition } = useMapStoreActions();
-
-	return useMemo(
-		() =>
-			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
-				(container) => {
-					if (!container) {
-						console.warn('[Map] Map instance not found!');
-						return;
-					}
-
-					const filterControl = container.querySelector<HTMLButtonElement>(`#${controlFilterId}`);
-
-					if (!filterControl) {
-						console.warn('[Map] Filter control not found!');
-						return;
-					}
-
-					const { x: containerX, y: containerY } = container.getBoundingClientRect();
-					const {
-						x: controlX,
-						y: controlY,
-						height: controlHeight,
-						width: controlWidth,
-					} = filterControl.getBoundingClientRect();
-
-					setFilterPosition({
-						x: controlX - containerX + controlWidth,
-						y: controlY - containerY + controlHeight / 2,
-					});
-				},
-				{
-					reducer: (_previousElement, ...args: Array<MapEvent>) => {
-						if (args.length === 0 || !args[0]) return;
-
-						return args[0].target.getContainer();
-					},
-					minQuietPeriodMs: 300,
-				},
-			),
-		[setFilterPosition],
-	);
-}
-
-export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
-
-	const isInteractive = useIsMapCanvasInteractive();
-
-	const { setCanvasLoading } = useMapStoreActions();
-
-	const onClick = useClickHandler();
-	const throttledOnMouseMove = useThrottledMouseMoveHandler();
-	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
-
-	const onMoveEnd = useCallback(
-		(event: ViewStateChangeEvent) => {
-			if (!mapId) return;
-
-			writeSavedViewport(mapId, {
-				longitude: event.viewState.longitude,
-				latitude: event.viewState.latitude,
-				zoom: event.viewState.zoom,
-			});
-		},
-		[mapId],
-	);
-
-	return {
-		onLoad: (event: MapEvent) => {
-			setCanvasLoading(false);
-
-			// Initialize the position of the filter control on interactive maps
-			if (isInteractive) debouncedFilterControlSetup.call(event);
-		},
-		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
-		onError: ({ error }) => {
-			setCanvasLoading(false);
-			console.warn('[Map]', error.message);
-		},
-		...(isInteractive
-			? {
-					onResize: debouncedFilterControlSetup.call,
-					onClick,
-					onMouseDown,
-					onMouseUp,
-					onMoveEnd,
-					...(isSourceDataLoading
-						? {}
-						: {
-								onMouseMove: throttledOnMouseMove.call,
-							}),
-				}
-			: {}),
-	} satisfies MapCallbacks;
 }

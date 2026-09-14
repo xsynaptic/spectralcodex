@@ -7,6 +7,14 @@ import { createDescriptionRenderers } from '#lib/utils/description.ts';
 
 let descriptionRenderers: ReturnType<typeof createDescriptionRenderers> | undefined;
 
+export async function getDescriptionRendered(entry: DescriptionEntry) {
+	return getDescriptionRenderers().getDescriptionRendered(entry);
+}
+
+export async function getDescriptionRenderedText(entry: DescriptionEntry) {
+	return getDescriptionRenderers().getDescriptionRenderedText(entry);
+}
+
 function getDescriptionRenderers() {
 	if (!descriptionRenderers) {
 		descriptionRenderers = createDescriptionRenderers({
@@ -14,12 +22,4 @@ function getDescriptionRenderers() {
 		});
 	}
 	return descriptionRenderers;
-}
-
-export async function getDescriptionRendered(entry: DescriptionEntry) {
-	return getDescriptionRenderers().getDescriptionRendered(entry);
-}
-
-export async function getDescriptionRenderedText(entry: DescriptionEntry) {
-	return getDescriptionRenderers().getDescriptionRenderedText(entry);
 }
