@@ -2,9 +2,9 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 // eslint-disable-next-line unicorn/consistent-boolean-name -- the conventional name for this hook; call sites bind the result to an `is` variable
 export function useMediaQuery({
-	query,
 	above,
 	below,
+	query,
 }: {
 	above?: string;
 	below?: string;

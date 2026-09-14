@@ -131,14 +131,14 @@ function getOrCreateMonthData(chronologyDataMap: ChronologyDataMap, dateData: Ch
 		const monthName = getMonthName(dateData.date);
 
 		yearMap.set(dateData.month, {
+			created: new Set(),
 			id: `${dateData.year}/${dateData.month}`,
-			year: dateData.year,
 			month: dateData.month,
 			monthName,
 			title: `${monthName} ${dateData.year}`,
-			created: new Set(),
 			updated: new Set(),
 			visited: new Set(),
+			year: dateData.year,
 		});
 	}
 
@@ -244,7 +244,7 @@ function deduplicateCategories(
 		(item) => !updatedIds.has(item.id) && !createdIds.has(item.id),
 	);
 
-	return { updated, created: createdFiltered, visited: visitedFiltered };
+	return { created: createdFiltered, updated, visited: visitedFiltered };
 }
 
 function sortAndLimit(items: Array<CatalogItem>, limit?: number) {
@@ -305,8 +305,8 @@ export function createChronologyData(
 
 		// Aggregate the year's buckets once; reused by the yearly precedence map and the index view
 		const yearBuckets: ChronologyTierBuckets = {
-			updated: months.flatMap((month) => month.updated),
 			created: months.flatMap((month) => month.created),
+			updated: months.flatMap((month) => month.updated),
 			visited: months.flatMap((month) => month.visited),
 		};
 
@@ -320,14 +320,14 @@ export function createChronologyData(
 		if (!hasTierData(indexTier)) continue;
 
 		chronologyIndexData[year] = {
-			id: year,
-			year,
-			title: year,
 			highlights: selectIndexHighlights([
 				...indexTier.created,
 				...indexTier.updated,
 				...indexTier.visited,
 			]),
+			id: year,
+			title: year,
+			year,
 			...getBucketCounts(yearBuckets),
 			...indexTier,
 		};
@@ -339,16 +339,16 @@ export function createChronologyData(
 	const chronologyDailyData = buildChronologyDailyData(items);
 
 	return {
-		chronologyIndexData,
-		chronologyYearlyData,
-		chronologyMonthlyData: chronologyMonthlyData.filter((item) => yearHasView.has(item.year)),
-		chronologyYears,
-		chronologyMonths: Object.fromEntries(
-			Object.entries(chronologyMonths).filter(([year]) => yearHasView.has(year)),
-		),
 		chronologyDailyData: Object.fromEntries(
 			Object.entries(chronologyDailyData).filter(([year]) => yearHasView.has(year)),
 		),
+		chronologyIndexData,
+		chronologyMonthlyData: chronologyMonthlyData.filter((item) => yearHasView.has(item.year)),
+		chronologyMonths: Object.fromEntries(
+			Object.entries(chronologyMonths).filter(([year]) => yearHasView.has(year)),
+		),
+		chronologyYearlyData,
+		chronologyYears,
 	};
 }
 
@@ -407,8 +407,8 @@ function buildYearlyItems(
 			);
 
 		const tier: ChronologyTierBuckets = {
-			updated: takeWinners('updated'),
 			created: takeWinners('created'),
+			updated: takeWinners('updated'),
 			visited: takeWinners('visited'),
 		};
 
@@ -428,8 +428,8 @@ function buildYearlyItems(
 // Counts reflect the full bucket totals (before the entry quality floor and cap), unlike the tier lists
 function getBucketCounts(buckets: ChronologyTierBuckets) {
 	return {
-		updatedCount: buckets.updated.length,
 		createdCount: buckets.created.length,
+		updatedCount: buckets.updated.length,
 		visitedCount: buckets.visited.length,
 	};
 }
@@ -485,9 +485,9 @@ function projectChronologyTier(
 
 function toMonthBuckets(raw: ChronologyRawMonthData): ChronologyMonthBuckets {
 	return {
+		created: [...raw.created],
 		raw,
 		updated: [...raw.updated],
-		created: [...raw.created],
 		visited: [...raw.visited],
 	};
 }

@@ -38,12 +38,12 @@ export function assignChunks(
 
 	const ordered = items
 		.map((item) => ({
-			item,
 			hilbert: hilbertIndex(clampCell(item.lng, -180, 360), clampCell(90 - item.lat, 0, 180)),
+			item,
 		}))
 		.sort((a, b) => a.hilbert - b.hilbert || a.item.id.localeCompare(b.item.id));
 
-	const result: ChunkAssignment = { chunkKeyById: new Map(), chunkIds: new Map() };
+	const result: ChunkAssignment = { chunkIds: new Map(), chunkKeyById: new Map() };
 
 	let bin: Array<ChunkInputItem> = [];
 	let binBytes = 2; // Opening + closing brackets, for completeness

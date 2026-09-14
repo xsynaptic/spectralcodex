@@ -3,12 +3,12 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 
 const completeEnv = {
+	DEPLOY_MEDIA_PATH: '/mnt/media',
 	DEPLOY_REMOTE_HOST: 'deploy@host',
 	DEPLOY_REMOTE_PATH: '/opt/server',
 	DEPLOY_SITE_PATH: '/var/www/site',
-	PROD_SERVER_URL: 'https://example.com/',
-	DEPLOY_MEDIA_PATH: '/mnt/media',
 	IMAGE_SERVER_URL: 'https://example.com/_img',
+	PROD_SERVER_URL: 'https://example.com/',
 };
 
 function noop() {
@@ -31,13 +31,13 @@ describe('loadDeployConfig', () => {
 		stubEnv({ ...completeEnv, DEPLOY_SSH_KEY_PATH: undefined });
 
 		expect(loadDeployConfig()).toEqual({
+			imageServerUrl: 'https://example.com/_img',
+			mediaPath: '/mnt/media',
 			remoteHost: 'deploy@host',
 			remotePath: '/opt/server',
-			sshKeyPath: '',
 			sitePath: '/var/www/site',
 			siteUrl: 'https://example.com/',
-			mediaPath: '/mnt/media',
-			imageServerUrl: 'https://example.com/_img',
+			sshKeyPath: '',
 		});
 	});
 

@@ -21,16 +21,16 @@ export default {
 				'p-limit', // used in workspace scripts packages
 			],
 		},
-		'packages/content-demo': {
-			entry: ['.mdxlintrc.mjs'],
-			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
-		},
 		'packages/content': {
 			entry: ['global.d.ts'],
 			ignoreBinaries: ['check-content', 'content-schemas', 'fix-content', 'validate-content'],
 			ignoreDependencies: [
 				'mdxlint', // Enables knip's MDX plugin here (no `astro` devDep to do it)
 			],
+		},
+		'packages/content-demo': {
+			entry: ['.mdxlintrc.mjs'],
+			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
 		},
 		'packages/react-map-component': {
 			ignoreDependencies: ['astro'],

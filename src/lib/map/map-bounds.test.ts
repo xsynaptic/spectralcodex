@@ -16,15 +16,15 @@ function expectWithinBounds(
 }
 
 function makeCollection(features: Array<ReturnType<typeof makeFeature>>): MapFeatureCollection {
-	return { type: 'FeatureCollection', features } as unknown as MapFeatureCollection;
+	return { features, type: 'FeatureCollection' } as unknown as MapFeatureCollection;
 }
 
 function makeFeature(id: string, coordinates: [number, number], isOutlier?: boolean) {
 	return {
-		type: 'Feature' as const,
+		geometry: { coordinates, type: 'Point' as const },
 		id,
 		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
-		geometry: { type: 'Point' as const, coordinates },
+		type: 'Feature' as const,
 	};
 }
 
@@ -119,8 +119,8 @@ describe('getMapBounds', () => {
 
 	test('explicit buffers override the computed radius', () => {
 		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
 			boundsBuffer: 100,
+			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
 		});
 
 		// 100km at lat 25: lat pad lengthToDegrees(100)
@@ -169,15 +169,15 @@ describe('getMapBounds at world scale', () => {
 		];
 		const result = getMapBounds({
 			featureCollection: {
-				type: 'FeatureCollection',
 				features: [
 					{
-						type: 'Feature',
+						geometry: { coordinates: [ring], type: 'Polygon' },
 						id: 'area',
 						properties: { title: 'area' },
-						geometry: { type: 'Polygon', coordinates: [ring] },
+						type: 'Feature',
 					},
 				],
+				type: 'FeatureCollection',
 			} as unknown as MapFeatureCollection,
 		});
 

@@ -6,12 +6,12 @@ import { batchEntriesBySourceImage } from '#og-image/batch.ts';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {
-		id: 'entry',
 		collection: 'posts',
 		digest: 'digest',
-		title: 'Title',
+		id: 'entry',
 		imageFeaturedId: 'image/entry.jpg',
 		isFallback: false,
+		title: 'Title',
 		...overrides,
 	};
 }

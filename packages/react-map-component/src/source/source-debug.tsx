@@ -18,13 +18,9 @@ export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = funct
 		const [west, south, east, north] = bounds as [number, number, number, number];
 
 		return {
-			type: 'FeatureCollection',
 			features: [
 				{
-					type: 'Feature',
-					properties: {},
 					geometry: {
-						type: 'Polygon',
 						coordinates: [
 							[
 								[west, south],
@@ -34,9 +30,13 @@ export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = funct
 								[west, south], // Close the polygon
 							],
 						],
+						type: 'Polygon',
 					},
+					properties: {},
+					type: 'Feature',
 				},
 			],
+			type: 'FeatureCollection',
 		} satisfies FeatureCollection;
 	}, [bounds]);
 
@@ -44,13 +44,13 @@ export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = funct
 		() =>
 			({
 				id: 'debug',
-				source: 'debug',
-				type: 'line',
 				paint: {
 					'line-color': tailwindColors.red400,
-					'line-width': 1,
 					'line-opacity': 0.7,
+					'line-width': 1,
 				},
+				source: 'debug',
+				type: 'line',
 			}) satisfies LineLayerSpecification,
 		[],
 	);

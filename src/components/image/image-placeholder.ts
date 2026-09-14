@@ -31,11 +31,11 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 	const getImageById = await getImageByIdFunction();
 
 	return async function getImagePlaceholder({
-		imageId,
 		aspectRatio,
 		fit = ImageFitOptionEnum.Cover,
-		position = 'center',
 		highQuality = false,
+		imageId,
+		position = 'center',
 	}: ImagePlaceholderProps): Promise<string | undefined> {
 		const imageEntry = getImageById(imageId);
 
@@ -48,11 +48,11 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 
 		const cacheKey = hash({
 			data: {
-				imageId,
 				aspectRatio: normalizedRatio,
 				fit,
-				position,
 				highQuality,
+				imageId,
+				position,
 			},
 		});
 		const contentHash = hash({ mtime, version: 1 });
@@ -62,19 +62,19 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
 		if (cachedDataUrl) return cachedDataUrl;
 
 		const placeholder = await generatePlaceholderDataUrl({
-			path: imageEntry.data.path,
 			aspectRatio,
 			fit,
-			position,
+			path: imageEntry.data.path,
 			pixelCount: highQuality
 				? imagePlaceholderPixelCountHighQuality
 				: imagePlaceholderPixelCountLowQuality,
+			position,
 		});
 
 		if (placeholder) {
 			await cache.set(cacheKey, {
-				hash: contentHash,
 				dataUrl: placeholder,
+				hash: contentHash,
 			} satisfies ImagePlaceholderCached);
 		}
 
@@ -87,11 +87,11 @@ async function createImagePlaceholderFunction({ cache }: { cache: Keyv }) {
  * Sharp handles cropping via fit/position when aspect ratios don't match
  */
 async function generatePlaceholderDataUrl({
-	path,
 	aspectRatio,
 	fit = ImageFitOptionEnum.Cover,
-	position = 'center',
+	path,
 	pixelCount = imagePlaceholderPixelCountLowQuality,
+	position = 'center',
 }: {
 	aspectRatio: number;
 	fit?: ImageFitOption;
@@ -103,7 +103,7 @@ async function generatePlaceholderDataUrl({
 
 	if (!imageBuffer) return;
 
-	const { width, height } = getPlaceholderDimensions(aspectRatio, pixelCount);
+	const { height, width } = getPlaceholderDimensions(aspectRatio, pixelCount);
 
 	const placeholderBuffer = await sharp(imageBuffer, { failOn: 'error' })
 		.resize(width, height, { fit, position })
@@ -140,7 +140,7 @@ function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
 	const height = Math.sqrt(pixelCount / aspectRatio);
 	const width = pixelCount / height;
 
-	return { width: Math.round(width), height: Math.round(height) };
+	return { height: Math.round(height), width: Math.round(width) };
 }
 
 async function readImageFile(path: string): Promise<Buffer | undefined> {

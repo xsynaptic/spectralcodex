@@ -48,8 +48,8 @@ export function createRenderer({ fonts }: { fonts: Array<Font> }) {
 		image?: ProcessedImage,
 	): Promise<Uint8Array> {
 		return render(getOpenGraphElement(entry, image), {
-			format: 'jpeg',
 			fonts,
+			format: 'jpeg',
 			height: openGraphImageHeight,
 			quality: jpegQuality,
 			renderer,
@@ -96,9 +96,9 @@ export async function processImage({
 	return {
 		data,
 		height: info.height,
-		width: info.width,
-		luminanceTop: zoneLuminance({ data, info }, luminanceZoneTop),
 		luminanceBottom: zoneLuminance({ data, info }, luminanceZoneBottom),
+		luminanceTop: zoneLuminance({ data, info }, luminanceZoneTop),
+		width: info.width,
 	};
 }
 

@@ -20,7 +20,7 @@ test.describe('navigation', () => {
 		await nav.getByRole('link', { name: t('collection.regions.labelPlural') }).hover();
 
 		// Hover to reveal depth-2 submenu
-		const taiwanLink = nav.getByRole('link', { name: regionsName1, exact: true });
+		const taiwanLink = nav.getByRole('link', { exact: true, name: regionsName1 });
 		await expect(taiwanLink).toBeVisible();
 		await taiwanLink.hover();
 
@@ -45,7 +45,7 @@ test.describe('navigation', () => {
 
 		await regionsLink.hover();
 
-		const taiwanLink = nav.getByRole('link', { name: regionsName1, exact: true });
+		const taiwanLink = nav.getByRole('link', { exact: true, name: regionsName1 });
 
 		await expect(taiwanLink).toHaveClass(/anchor-active/);
 		await expect(taiwanLink).toHaveAttribute('aria-current', 'page');

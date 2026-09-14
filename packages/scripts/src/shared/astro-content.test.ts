@@ -12,7 +12,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-	rmSync(tempDir, { recursive: true, force: true });
+	rmSync(tempDir, { force: true, recursive: true });
 });
 
 function makeTree(configFilename: string | undefined, nested: string) {

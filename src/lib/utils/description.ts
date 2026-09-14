@@ -29,8 +29,8 @@ const wordCountFinal = 100;
 
 // Allow em/strong plus span so CJK wrapping survives in the rendered excerpt (shown in the map)
 const descriptionSchema = {
-	tagNames: ['em', 'strong', 'span'],
 	attributes: { span: ['className'] },
+	tagNames: ['em', 'strong', 'span'],
 };
 
 export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
@@ -44,7 +44,7 @@ export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 
 		// Key by entry ID so edits overwrite the old row; the hash validates cached content
 		// MDX component names participate so render-affecting code changes self-invalidate
-		const sourceHash = hash({ source, mdxComponents, version: 3 }).slice(0, hashShortLength);
+		const sourceHash = hash({ mdxComponents, source, version: 3 }).slice(0, hashShortLength);
 
 		const cached = await cache.get<DescriptionCached>(entry.id);
 

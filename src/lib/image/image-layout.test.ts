@@ -34,42 +34,42 @@ describe('getImageBreakpoints', () => {
 
 describe('getImageInferredWidth', () => {
 	test('a grouped image sizes by orientation, ignoring the layout entirely', () => {
-		const portrait = { width: 600, height: 900, context: ImageContextEnum.Grid };
+		const portrait = { context: ImageContextEnum.Grid, height: 900, width: 600 };
 
 		expect(getImageInferredWidth({ ...portrait, layout: ImageLayoutEnum.Full })).toStrictEqual(
 			getImageInferredWidth(portrait),
 		);
 		expect(getImageInferredWidth(portrait)).toStrictEqual({
-			width: ImageSizeEnum.Small,
 			height: ImageSizeEnum.Medium,
+			width: ImageSizeEnum.Small,
 		});
 	});
 
 	test('a grouped square is square, and a missing height reads as landscape', () => {
 		expect(
-			getImageInferredWidth({ width: 900, height: 900, context: ImageContextEnum.Carousel }),
-		).toStrictEqual({ width: ImageSizeEnum.Small, height: ImageSizeEnum.Small });
-		expect(getImageInferredWidth({ width: 900, context: ImageContextEnum.Carousel })).toStrictEqual(
-			{ width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small },
+			getImageInferredWidth({ context: ImageContextEnum.Carousel, height: 900, width: 900 }),
+		).toStrictEqual({ height: ImageSizeEnum.Small, width: ImageSizeEnum.Small });
+		expect(getImageInferredWidth({ context: ImageContextEnum.Carousel, width: 900 })).toStrictEqual(
+			{ height: ImageSizeEnum.Small, width: ImageSizeEnum.Medium },
 		);
 	});
 
 	test('a single image sizes by layout, ignoring its orientation', () => {
 		const wide = { layout: ImageLayoutEnum.Wide };
 
-		expect(getImageInferredWidth({ width: 600, height: 900, ...wide })).toStrictEqual(
-			getImageInferredWidth({ width: 3000, height: 1000, ...wide }),
+		expect(getImageInferredWidth({ height: 900, width: 600, ...wide })).toStrictEqual(
+			getImageInferredWidth({ height: 1000, width: 3000, ...wide }),
 		);
 		expect(getImageInferredWidth({ width: 600, ...wide })).toStrictEqual({
-			width: ImageSizeEnum.ExtraLarge,
 			height: ImageSizeEnum.Large,
+			width: ImageSizeEnum.ExtraLarge,
 		});
 	});
 
 	test('single is the default context, and an absent layout falls back to the content width', () => {
-		expect(getImageInferredWidth({ width: 600, height: 900 })).toStrictEqual({
-			width: ImageSizeEnum.Large,
+		expect(getImageInferredWidth({ height: 900, width: 600 })).toStrictEqual({
 			height: ImageSizeEnum.Medium,
+			width: ImageSizeEnum.Large,
 		});
 	});
 });

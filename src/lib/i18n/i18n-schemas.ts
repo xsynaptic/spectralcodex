@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { languageCodeOrder } from '#lib/i18n/i18n-types.ts';
 import { TitleSchema } from '#lib/schemas/index.ts';
 
 /**
@@ -24,7 +24,7 @@ export function createMultilingualSchemas<T extends string>(
 
 	const schemas: MultilingualSchemas = {} as MultilingualSchemas;
 
-	for (const languageCode of Object.values(LanguageCodeEnum)) {
+	for (const languageCode of languageCodeOrder) {
 		schemas[`${key}_${languageCode}`] = schema.optional();
 	}
 

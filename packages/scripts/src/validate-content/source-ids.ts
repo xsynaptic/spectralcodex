@@ -29,7 +29,7 @@ export function collectSourceIdIssues(
 			if (typeof source !== 'string') continue;
 
 			if (!validIds.has(source)) {
-				issues.push({ location: entry.filePath ?? entry.id, id: source });
+				issues.push({ id: source, location: entry.filePath ?? entry.id });
 			}
 		}
 	}
@@ -44,10 +44,10 @@ export function validateSourceIds(
 	const issues = collectSourceIdIssues(entries, resourceEntries);
 
 	return toValidationResult(
-		issues.map(({ location, id }) => ({ message: `${location}: unknown source ID "${id}"` })),
+		issues.map(({ id, location }) => ({ message: `${location}: unknown source ID "${id}"` })),
 		{
-			pass: 'Source IDs valid',
 			fail: `Found ${issues.length.toString()} broken source ID(s)`,
+			pass: 'Source IDs valid',
 		},
 	);
 }

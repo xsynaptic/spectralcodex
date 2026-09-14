@@ -40,15 +40,15 @@ const noticeKeys = [
 ];
 
 const noticeSeverities = {
-	'notice.vanished': NoticeBoxSeverityEnum.Info,
 	'notice.danger': NoticeBoxSeverityEnum.Warning,
 	'notice.quality': NoticeBoxSeverityEnum.Info,
+	'notice.vanished': NoticeBoxSeverityEnum.Info,
 } as const;
 
 const notices = noticeKeys.map((key) => ({
+	severity: noticeSeverities[key],
 	text: t(key),
 	textAlt: showChinese ? t(key, langCode) : undefined,
-	severity: noticeSeverities[key],
 }));
 ---
 

@@ -40,22 +40,22 @@ function printAvailableChecks(stream: 'stderr' | 'stdout') {
 	}
 }
 
-const { values, positionals } = parseArgs({
+const { positionals, values } = parseArgs({
+	allowPositionals: true,
 	args: process.argv.slice(2),
 	options: {
 		limit: {
 			type: 'string',
 		},
 		random: {
-			type: 'boolean',
 			default: false,
+			type: 'boolean',
 		},
 		threshold: {
-			type: 'string',
 			default: '100',
+			type: 'string',
 		},
 	},
-	allowPositionals: true,
 });
 
 const checkName = positionals[0];

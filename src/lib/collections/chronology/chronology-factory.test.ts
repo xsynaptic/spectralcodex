@@ -24,8 +24,8 @@ describe('createChronologyData', () => {
 	test('excludes the pages collection from every tier', () => {
 		const data = createChronologyData(
 			[
-				makeCatalogItem({ id: 'a-page', collection: 'pages', dateCreated: new Date(2024, 2, 10) }),
-				makeCatalogItem({ id: 'a-post', collection: 'posts', dateCreated: new Date(2024, 2, 10) }),
+				makeCatalogItem({ collection: 'pages', dateCreated: new Date(2024, 2, 10), id: 'a-page' }),
+				makeCatalogItem({ collection: 'posts', dateCreated: new Date(2024, 2, 10), id: 'a-post' }),
 			],
 			[],
 		);
@@ -43,18 +43,18 @@ describe('createChronologyData monthly tier', () => {
 			[
 				// Created and visited in the same month -> kept as created
 				makeCatalogItem({
-					id: 'created-and-visited',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 10),
 					dateRecorded: [{ date: new Date(2024, 2, 20), hasTime: false }],
+					id: 'created-and-visited',
 				}),
 				// Updated (from a different create month) and visited in the same month -> kept as updated
 				makeCatalogItem({
-					id: 'updated-and-visited',
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 5),
-					dateUpdated: new Date(2024, 2, 15),
 					dateRecorded: [{ date: new Date(2024, 2, 25), hasTime: false }],
+					dateUpdated: new Date(2024, 2, 15),
+					id: 'updated-and-visited',
 				}),
 			],
 			[],
@@ -70,9 +70,9 @@ describe('createChronologyData monthly tier', () => {
 	test('the monthly view is the complete record with no cap', () => {
 		const items = Array.from({ length: 50 }, (_, index) =>
 			makeCatalogItem({
-				id: `item-${String(index)}`,
 				collection: 'posts',
 				dateCreated: new Date(2024, 2, 10),
+				id: `item-${String(index)}`,
 			}),
 		);
 
@@ -89,17 +89,17 @@ describe('createChronologyData monthly tier', () => {
 		const data = createChronologyData(
 			[
 				makeCatalogItem({
-					id: 'aaa-no-image',
 					collection: 'posts',
 					dateCreated: new Date(2024, 2, 10),
 					entryQuality: 2,
+					id: 'aaa-no-image',
 				}),
 				makeCatalogItem({
-					id: 'zzz-with-image',
 					collection: 'posts',
-					imageId: 'img',
 					dateCreated: new Date(2024, 2, 11),
 					entryQuality: 2,
+					id: 'zzz-with-image',
+					imageId: 'img',
 				}),
 			],
 			[],
@@ -114,23 +114,23 @@ describe('createChronologyData monthly tier', () => {
 			[
 				// Candidate in 2024/01 (created) and 2024/02 (updated) -> highlight in only one
 				makeCatalogItem({
-					id: 'shared',
 					collection: 'posts',
-					imageId: 'img-shared',
 					dateCreated: new Date(2024, 0, 10),
 					dateUpdated: new Date(2024, 1, 15),
+					id: 'shared',
+					imageId: 'img-shared',
 				}),
 				makeCatalogItem({
-					id: 'jan-only',
 					collection: 'posts',
-					imageId: 'img-jan',
 					dateCreated: new Date(2024, 0, 11),
+					id: 'jan-only',
+					imageId: 'img-jan',
 				}),
 				makeCatalogItem({
-					id: 'feb-only',
 					collection: 'posts',
-					imageId: 'img-feb',
 					dateCreated: new Date(2024, 1, 16),
+					id: 'feb-only',
+					imageId: 'img-feb',
 				}),
 			],
 			[],
@@ -148,15 +148,15 @@ describe('createChronologyData yearly and index tiers', () => {
 			[
 				// Created in 2024/01, updated in 2024/02 -> shows under Feb/updated (updated > created)
 				makeCatalogItem({
-					id: 'shared',
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 10),
 					dateUpdated: new Date(2024, 1, 15),
+					id: 'shared',
 				}),
 				makeCatalogItem({
-					id: 'jan-only',
 					collection: 'posts',
 					dateCreated: new Date(2024, 0, 11),
+					id: 'jan-only',
 				}),
 			],
 			[],
@@ -175,10 +175,10 @@ describe('createChronologyData yearly and index tiers', () => {
 			// Quality 1 is in the complete monthly record but below the yearly floor, so 2019 gets no yearly view
 			[
 				makeCatalogItem({
-					id: 'low',
 					collection: 'posts',
 					dateCreated: new Date(2019, 2, 10),
 					entryQuality: 1,
+					id: 'low',
 				}),
 			],
 			[],
@@ -196,17 +196,17 @@ describe('createChronologyData yearly and index tiers', () => {
 				// Anchor populates 2023 in the data map before 2024 (oldest-first insertion order)
 				// Test fails unless the year loop deliberately iterates newest-first
 				makeCatalogItem({
-					id: 'anchor-2023',
 					collection: 'posts',
 					dateCreated: new Date(2023, 5, 9),
+					id: 'anchor-2023',
 				}),
 				// Index candidate in 2023 (created) and 2024 (updated) -> highlighted in the most recent year
 				makeCatalogItem({
-					id: 'shared',
 					collection: 'posts',
-					imageId: 'img-shared',
 					dateCreated: new Date(2023, 5, 10),
 					dateUpdated: new Date(2024, 5, 15),
+					id: 'shared',
+					imageId: 'img-shared',
 				}),
 			],
 			[],
@@ -220,10 +220,10 @@ describe('createChronologyData yearly and index tiers', () => {
 		const belowThreshold = createChronologyData(
 			[
 				makeCatalogItem({
-					id: 'q2',
 					collection: 'posts',
 					dateCreated: new Date(2024, 5, 10),
 					entryQuality: 2,
+					id: 'q2',
 				}),
 			],
 			[],
@@ -236,10 +236,10 @@ describe('createChronologyData yearly and index tiers', () => {
 		const atThreshold = createChronologyData(
 			[
 				makeCatalogItem({
-					id: 'q3',
 					collection: 'posts',
 					dateCreated: new Date(2024, 5, 10),
 					entryQuality: 3,
+					id: 'q3',
 				}),
 			],
 			[],
@@ -276,9 +276,9 @@ describe('buildChronologyDailyData', () => {
 	test('tallies a creation on its UTC day', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2024-03-10T12:00:00Z'),
+				id: 'a',
 			}),
 		]);
 
@@ -288,9 +288,9 @@ describe('buildChronologyDailyData', () => {
 	test('buckets a late-evening UTC instant on its UTC day, not the local one', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2024-05-31T20:00:00Z'),
+				id: 'a',
 			}),
 		]);
 
@@ -300,10 +300,10 @@ describe('buildChronologyDailyData', () => {
 	test('does not count an update made on the same UTC day as creation', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2024-03-10T02:00:00Z'),
 				dateUpdated: new Date('2024-03-10T20:00:00Z'),
+				id: 'a',
 			}),
 		]);
 
@@ -313,10 +313,10 @@ describe('buildChronologyDailyData', () => {
 	test('counts an update made on a different UTC day from creation', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2024-03-10T12:00:00Z'),
 				dateUpdated: new Date('2024-03-12T12:00:00Z'),
+				id: 'a',
 			}),
 		]);
 
@@ -327,7 +327,6 @@ describe('buildChronologyDailyData', () => {
 	test('expands a recorded range so every day start-to-end inclusive is visited', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2023-01-01T12:00:00Z'),
 				dateRecorded: [
@@ -336,6 +335,7 @@ describe('buildChronologyDailyData', () => {
 						{ date: new Date('2024-03-12T12:00:00Z'), hasTime: false },
 					],
 				],
+				id: 'a',
 			}),
 		]);
 
@@ -348,10 +348,10 @@ describe('buildChronologyDailyData', () => {
 	test('treats a single recorded date as one visited day', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a',
 				collection: 'posts',
 				dateCreated: new Date('2023-01-01T12:00:00Z'),
 				dateRecorded: [{ date: new Date('2024-03-15T12:00:00Z'), hasTime: false }],
+				id: 'a',
 			}),
 		]);
 
@@ -361,9 +361,9 @@ describe('buildChronologyDailyData', () => {
 	test('excludes the pages collection', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
-				id: 'a-page',
 				collection: 'pages',
 				dateCreated: new Date('2024-03-10T12:00:00Z'),
+				id: 'a-page',
 			}),
 		]);
 

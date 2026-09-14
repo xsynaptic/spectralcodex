@@ -21,10 +21,10 @@ const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
 const {
-	DEV_SERVER_URL = 'http://localhost:4321/',
-	PROD_SERVER_URL,
 	BUILD_ASSETS_PATH,
+	DEV_SERVER_URL = 'http://localhost:4321/',
 	IMAGE_SERVER_SECRET,
+	PROD_SERVER_URL,
 } = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -56,12 +56,12 @@ function getSitemapLastmod() {
  * @link https://astro.build/config
  */
 export default defineConfig({
-	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
-	trailingSlash: isProduction ? trailingSlash : 'ignore',
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
 	cacheDir: astroCacheDir,
+	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
+	trailingSlash: isProduction ? trailingSlash : 'ignore',
 	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
@@ -73,133 +73,95 @@ export default defineConfig({
 	env: {
 		schema: {
 			CONTENT_DATA_PATH: envField.string({
-				context: 'server',
 				access: 'public',
+				context: 'server',
 				default: 'packages/content-demo/collections',
 			}),
 			CONTENT_MEDIA_PATH: envField.string({
-				context: 'server',
 				access: 'public',
+				context: 'server',
 				default: 'packages/content-demo/media',
 			}),
 			CUSTOM_CACHE_PATH: envField.string({
-				context: 'server',
 				access: 'public',
-				optional: true,
+				context: 'server',
 				default: './.cache',
-			}),
-			MAP_PROTOMAPS_API_KEY: envField.string({
-				context: 'client',
-				access: 'public',
 				optional: true,
-			}),
-			UMAMI_DOMAIN: envField.string({ context: 'client', access: 'public', optional: true }),
-			UMAMI_ID: envField.string({ context: 'client', access: 'public', optional: true }),
-			IMAGE_SERVER_URL: envField.string({
-				context: 'server',
-				access: 'secret',
-				default: '/_img',
 			}),
 			IMAGE_SERVER_SECRET: envField.string({
-				context: 'server',
 				access: 'secret',
+				context: 'server',
 				default: imageServerSecretPlaceholder,
 			}),
 			IMAGE_SERVER_SIGNATURE_LENGTH: envField.number({
-				context: 'server',
 				access: 'public',
+				context: 'server',
 				default: 20,
 			}),
-			WEBMENTION_API_KEY: envField.string({
-				context: 'server',
+			IMAGE_SERVER_URL: envField.string({
 				access: 'secret',
+				context: 'server',
+				default: '/_img',
+			}),
+			MAP_PROTOMAPS_API_KEY: envField.string({
+				access: 'public',
+				context: 'client',
+				optional: true,
+			}),
+			UMAMI_DOMAIN: envField.string({ access: 'public', context: 'client', optional: true }),
+			UMAMI_ID: envField.string({ access: 'public', context: 'client', optional: true }),
+			WEBMENTION_API_KEY: envField.string({
+				access: 'secret',
+				context: 'server',
 				optional: true,
 			}),
 			WEBMENTION_DOMAIN: envField.string({
-				context: 'client',
 				access: 'public',
+				context: 'client',
 				optional: true,
 			}),
 			WEBMENTIONS_SHOW: envField.boolean({
-				context: 'server',
 				access: 'public',
+				context: 'server',
 				default: false,
 			}),
 		},
 	},
-	vite: {
-		define: {
-			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
-		},
-		plugins: [tailwindcss()],
-		css: {
-			lightningcss: {
-				// MapLibre's logo control never mounts and its data-URI rules are half of maplibre-gl.css
-				unusedSymbols: ['maplibregl-ctrl-logo'],
-			},
-		},
-		build: {
-			assetsInlineLimit: 1024,
-			rollupOptions: {
-				output: {
-					entryFileNames: 'js/a-[hash].js',
-					chunkFileNames: 'js/c-[hash].js',
-				},
-			},
-		},
-		server: {
-			watch: {
-				ignored: ['./*.md'],
-			},
-			proxy: {
-				'/_img': {
-					target: 'http://localhost:3100',
-					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/_img/, ''),
-				},
-			},
-		},
-		optimizeDeps: {
-			include: [
-				'@turf/center',
-				'@turf/centroid',
-				'@turf/distance',
-				'@turf/helpers',
-				'@turf/truncate',
-			],
-		},
+	experimental: {
+		contentIntellisense: true,
 	},
-	markdown: {
-		processor: satteri({
-			mdastPlugins: [
-				autoImport({
-					imports: [
-						{
-							'./src/components/mdx/build-stats.astro': [['default', 'BuildStats']],
-							'./src/components/mdx/email.astro': [['default', 'Email']],
-							'./src/components/mdx/hide.astro': [['default', 'Hide']],
-							'./src/components/mdx/img.astro': [['default', 'Img']],
-							'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
-							'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
-							'./src/components/mdx/link.astro': [['default', 'Link']],
-							'./src/components/mdx/map.astro': [['default', 'Map']],
-							'./src/components/mdx/more.astro': [['default', 'More']],
-							'./src/components/mdx/resource.astro': [['default', 'Resource']],
-						},
-					],
-				}),
-				imgGroupSatteriPlugin({
-					contexts: {
-						carousel: { disallowedAttributes: ['columns'], minImages: 2 },
-						grid: {},
-					},
-					defaultContext: 'grid',
-					layouts: ['default', 'wide', 'full'],
-				}),
-			],
-			hastPlugins: [wrapCjk({ value: 'cjk-text' }), trailingSlashPlugin({ trailingSlash })],
-		}),
-	},
+	fonts: [
+		{
+			cssVariable: '--font-commissioner',
+			fallbacks: [],
+			name: 'Commissioner',
+			optimizedFallbacks: false,
+			provider: fontProviders.fontsource(),
+			styles: ['normal'],
+			subsets: ['latin', 'vietnamese'],
+			weights: ['300 700'],
+		},
+		{
+			cssVariable: '--font-geologica',
+			fallbacks: [],
+			name: 'Geologica',
+			optimizedFallbacks: false,
+			provider: fontProviders.fontsource(),
+			styles: ['normal'],
+			subsets: ['latin', 'vietnamese'],
+			weights: ['300 700'],
+		},
+		{
+			cssVariable: '--font-lora',
+			fallbacks: [],
+			name: 'Lora',
+			optimizedFallbacks: false,
+			provider: fontProviders.fontsource(),
+			styles: ['normal', 'italic'],
+			subsets: ['latin', 'vietnamese'],
+			weights: ['300 700'],
+		},
+	],
 	integrations: [
 		react({
 			include: ['packages/react**/*'],
@@ -228,39 +190,77 @@ export default defineConfig({
 		buildLogger(),
 		devInventory(),
 	],
-	fonts: [
-		{
-			provider: fontProviders.fontsource(),
-			name: 'Commissioner',
-			cssVariable: '--font-commissioner',
-			weights: ['300 700'],
-			styles: ['normal'],
-			subsets: ['latin', 'vietnamese'],
-			fallbacks: [],
-			optimizedFallbacks: false,
+	markdown: {
+		processor: satteri({
+			hastPlugins: [wrapCjk({ value: 'cjk-text' }), trailingSlashPlugin({ trailingSlash })],
+			mdastPlugins: [
+				autoImport({
+					imports: [
+						{
+							'./src/components/mdx/build-stats.astro': [['default', 'BuildStats']],
+							'./src/components/mdx/email.astro': [['default', 'Email']],
+							'./src/components/mdx/hide.astro': [['default', 'Hide']],
+							'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
+							'./src/components/mdx/img.astro': [['default', 'Img']],
+							'./src/components/mdx/link.astro': [['default', 'Link']],
+							'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
+							'./src/components/mdx/map.astro': [['default', 'Map']],
+							'./src/components/mdx/more.astro': [['default', 'More']],
+							'./src/components/mdx/resource.astro': [['default', 'Resource']],
+						},
+					],
+				}),
+				imgGroupSatteriPlugin({
+					contexts: {
+						carousel: { disallowedAttributes: ['columns'], minImages: 2 },
+						grid: {},
+					},
+					defaultContext: 'grid',
+					layouts: ['default', 'wide', 'full'],
+				}),
+			],
+		}),
+	},
+	vite: {
+		build: {
+			assetsInlineLimit: 1024,
+			rollupOptions: {
+				output: {
+					chunkFileNames: 'js/c-[hash].js',
+					entryFileNames: 'js/a-[hash].js',
+				},
+			},
 		},
-		{
-			provider: fontProviders.fontsource(),
-			name: 'Geologica',
-			cssVariable: '--font-geologica',
-			weights: ['300 700'],
-			styles: ['normal'],
-			subsets: ['latin', 'vietnamese'],
-			fallbacks: [],
-			optimizedFallbacks: false,
+		css: {
+			lightningcss: {
+				// MapLibre's logo control never mounts and its data-URI rules are half of maplibre-gl.css
+				unusedSymbols: ['maplibregl-ctrl-logo'],
+			},
 		},
-		{
-			provider: fontProviders.fontsource(),
-			name: 'Lora',
-			cssVariable: '--font-lora',
-			weights: ['300 700'],
-			styles: ['normal', 'italic'],
-			subsets: ['latin', 'vietnamese'],
-			fallbacks: [],
-			optimizedFallbacks: false,
+		define: {
+			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
-	],
-	experimental: {
-		contentIntellisense: true,
+		optimizeDeps: {
+			include: [
+				'@turf/center',
+				'@turf/centroid',
+				'@turf/distance',
+				'@turf/helpers',
+				'@turf/truncate',
+			],
+		},
+		plugins: [tailwindcss()],
+		server: {
+			proxy: {
+				'/_img': {
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/_img/, ''),
+					target: 'http://localhost:3100',
+				},
+			},
+			watch: {
+				ignored: ['./*.md'],
+			},
+		},
 	},
 });

@@ -39,10 +39,10 @@ export async function createQuerySeriesEntryFunction() {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
+			chunkKeyById,
 			featureCollection: getLocationsFeatureCollection(seriesLocations),
 			locationCount: seriesLocations.length,
-			chunkKeyById,
+			mapId: `${entry.collection}/${entry.id}`,
 			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
@@ -84,7 +84,7 @@ export async function createSeriesByIdFunction() {
 
 			// This avoids returning series for a post or location with an identical ID
 			if (catalogItems?.some((item) => item.id === id && item.collection === collection)) {
-				results.push({ entry, catalogItems });
+				results.push({ catalogItems, entry });
 			}
 		}
 		return results;

@@ -19,30 +19,30 @@ const baseURL = getBaseURL();
 const isCI = !!process.env.CI;
 
 export default defineConfig({
-	testDir: './tests/e2e',
-	outputDir: './temp/playwright-results',
-	timeout: 15_000,
-	retries: isCI ? 3 : 0,
 	// Locally, bail early so a systemic failure surfaces fast instead of retrying every test
 	maxFailures: isCI ? 0 : 3,
-	reporter: 'list',
-	use: {
-		baseURL,
-		...devices['Desktop Chrome'],
-	},
+	outputDir: './temp/playwright-results',
 	projects: [
 		{
 			name: 'chromium',
 		},
 	],
+	reporter: 'list',
+	retries: isCI ? 3 : 0,
+	testDir: './tests/e2e',
+	timeout: 15_000,
+	use: {
+		baseURL,
+		...devices['Desktop Chrome'],
+	},
 	...(isProd
 		? {}
 		: {
 				webServer: {
 					command: `pnpm astro preview --port ${String(localPort)}`,
-					url: localURL,
-					reuseExistingServer: true,
 					env: { ASTRO_PREVIEW_BACKGROUND: '0' },
+					reuseExistingServer: true,
+					url: localURL,
 				},
 			}),
 });

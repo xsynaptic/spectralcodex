@@ -3,10 +3,10 @@ import path from 'node:path';
 import { z } from 'zod';
 
 const BuildRecordSchema = z.object({
-	timestamp: z.iso.datetime(),
 	durationSeconds: z.number().positive(),
 	notes: z.string().optional(),
 	pageCount: z.number().int().nonnegative().optional(),
+	timestamp: z.iso.datetime(),
 });
 
 export type BuildRecord = z.infer<typeof BuildRecordSchema>;

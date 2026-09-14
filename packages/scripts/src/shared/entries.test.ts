@@ -5,8 +5,8 @@ import { getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
 describe('toReferenceIds', () => {
 	test('extracts ids from reference objects', () => {
 		const references = [
-			{ id: 'ruins', collection: 'themes' },
-			{ id: 'temples', collection: 'themes' },
+			{ collection: 'themes', id: 'ruins' },
+			{ collection: 'themes', id: 'temples' },
 		];
 
 		expect(toReferenceIds(references)).toEqual(['ruins', 'temples']);

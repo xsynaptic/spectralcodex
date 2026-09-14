@@ -153,10 +153,10 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		const [lng, lat] = getFirstLngLat(coordinatesById.get(id), id);
 		const popupBytes = popupBytesById.get(id) ?? 0;
 
-		return { id, lng, lat, popupBytes };
+		return { id, lat, lng, popupBytes };
 	});
 
-	const { chunkKeyById, chunkIds } = assignChunks(chunkInputs);
+	const { chunkIds, chunkKeyById } = assignChunks(chunkInputs);
 
 	// Attach membership columns; omit empty arrays to save bytes
 	const directory = sourceData.map((sourceItem) => {
@@ -183,5 +183,5 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 
 	const chunks = buildChunks(chunkIds, popupById);
 
-	return { directory, chunks, chunkKeyById, version: hashMapDirectoryData(directory, chunks) };
+	return { chunkKeyById, chunks, directory, version: hashMapDirectoryData(directory, chunks) };
 });

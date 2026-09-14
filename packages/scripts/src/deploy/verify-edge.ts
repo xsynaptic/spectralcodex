@@ -26,7 +26,7 @@ export async function verifyEdge(): Promise<void> {
 	const failures: Array<string> = [];
 
 	function check(expectation: EdgeExpectation, response: Response) {
-		const { label, path, status, cacheControl } = expectation;
+		const { cacheControl, label, path, status } = expectation;
 
 		if (response.status !== status) {
 			failures.push(
@@ -49,10 +49,10 @@ export async function verifyEdge(): Promise<void> {
 
 	check(
 		{
+			cacheControl: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
 			label: 'document',
 			path: '/',
 			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400',
 		},
 		documentResponse,
 	);
@@ -66,10 +66,10 @@ export async function verifyEdge(): Promise<void> {
 
 		if (hashedAsset) {
 			expectations.push({
+				cacheControl: 'public, max-age=31536000, immutable',
 				label: 'hashed asset',
 				path: hashedAsset,
 				status: 200,
-				cacheControl: 'public, max-age=31536000, immutable',
 			});
 		} else {
 			failures.push('hashed asset (/_x/*): no hashed asset referenced by the document');
@@ -102,52 +102,52 @@ export async function verifyEdge(): Promise<void> {
 function getExpectations(token: string): Array<EdgeExpectation> {
 	return [
 		{
+			cacheControl: 'public, max-age=31536000',
 			label: 'static file',
 			path: '/favicon.svg',
 			status: 200,
-			cacheControl: 'public, max-age=31536000',
 		},
 		{
+			cacheControl: 'public, max-age=31536000, immutable',
 			label: 'map chunk',
 			path: '/api/map/map-directory.json',
 			status: 200,
-			cacheControl: 'public, max-age=31536000, immutable',
 		},
 		{
+			cacheControl: 'no-store',
 			label: 'map manifest',
 			path: '/api/map/map-manifest.json',
 			status: 200,
-			cacheControl: 'no-store',
 		},
 		{
+			cacheControl: 'private, no-store',
 			label: 'objectives gate',
 			path: '/objectives/',
 			status: 401,
-			cacheControl: 'private, no-store',
 		},
 		{
+			cacheControl: 'private, no-store',
 			label: 'objectives data gate',
 			path: '/api/map/objectives/s.json',
 			status: 401,
-			cacheControl: 'private, no-store',
 		},
 		{
+			cacheControl: 'public, max-age=3600, s-maxage=86400',
 			label: 'robots',
 			path: '/robots.txt',
 			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400',
 		},
 		{
+			cacheControl: 'public, max-age=3600, s-maxage=86400',
 			label: 'sitemap',
 			path: '/sitemap-index.xml',
 			status: 200,
-			cacheControl: 'public, max-age=3600, s-maxage=86400',
 		},
 		{
+			cacheControl: 'public, max-age=0, s-maxage=600',
 			label: 'not found',
 			path: `/edge-check-${token}/`,
 			status: 404,
-			cacheControl: 'public, max-age=0, s-maxage=600',
 		},
 	];
 }

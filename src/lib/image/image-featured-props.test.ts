@@ -9,10 +9,10 @@ vi.mock('#lib/collections/images/images-utils.ts', () => ({
 const { getImageFeaturedProps } = await import('#lib/image/image-featured-props.ts');
 
 const baseOptions = {
+	imageFormat: 'webp',
+	imageQuality: 80,
 	sizes: '100vw',
 	width: 1200,
-	imageQuality: 80,
-	imageFormat: 'webp',
 } as const;
 
 function mockImage(data: { title: string; width: number }) {
@@ -34,7 +34,7 @@ describe('getImageFeaturedProps', () => {
 	});
 
 	test('height follows the fixed 3:2 ratio the placeholder reserves', async () => {
-		mockImage({ width: 4000, title: 'Some image' });
+		mockImage({ title: 'Some image', width: 4000 });
 
 		const { imageProps, placeholderProps } = await getImageFeaturedProps({
 			...baseOptions,
@@ -47,7 +47,7 @@ describe('getImageFeaturedProps', () => {
 	});
 
 	test('the placeholder crops the way the image does, so the swap is seamless', async () => {
-		mockImage({ width: 4000, title: 'Some image' });
+		mockImage({ title: 'Some image', width: 4000 });
 
 		const { imageProps, placeholderProps } = await getImageFeaturedProps({
 			...baseOptions,
@@ -58,7 +58,7 @@ describe('getImageFeaturedProps', () => {
 	});
 
 	test('breakpoints stop at the original width, and custom widths override the defaults', async () => {
-		mockImage({ width: 700, title: 'Some image' });
+		mockImage({ title: 'Some image', width: 700 });
 
 		const { imageProps } = await getImageFeaturedProps({
 			...baseOptions,
@@ -77,7 +77,7 @@ describe('getImageFeaturedProps', () => {
 	});
 
 	test('alt text falls back to the image title, stripped of markup', async () => {
-		mockImage({ width: 4000, title: 'A <em>marked up</em>  title' });
+		mockImage({ title: 'A <em>marked up</em>  title', width: 4000 });
 
 		const { imageProps } = await getImageFeaturedProps({ ...baseOptions, imageId: 'some-image' });
 
@@ -85,19 +85,19 @@ describe('getImageFeaturedProps', () => {
 	});
 
 	test('a supplied alt wins over the image title', async () => {
-		mockImage({ width: 4000, title: 'Image title' });
+		mockImage({ title: 'Image title', width: 4000 });
 
 		const { imageProps } = await getImageFeaturedProps({
 			...baseOptions,
-			imageId: 'some-image',
 			alt: 'Caller alt',
+			imageId: 'some-image',
 		});
 
 		expect(imageProps?.alt).toBe('Caller alt');
 	});
 
 	test('priority reaches both the image and its placeholder, and is off by default', async () => {
-		mockImage({ width: 4000, title: 'Some image' });
+		mockImage({ title: 'Some image', width: 4000 });
 
 		const eager = await getImageFeaturedProps({
 			...baseOptions,

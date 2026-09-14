@@ -13,7 +13,7 @@ interface Props extends HTMLAttributes<'article'> {
 	imageId: string | undefined;
 }
 
-const { imageId, hideSearch, ...props } = Astro.props;
+const { hideSearch, imageId, ...props } = Astro.props;
 
 // Pagefind renders result thumbnails at 64×48 (4:3) via `--pf-image-width` / `--pf-image-height`
 const searchThumbnailWidth = 64;
@@ -29,24 +29,24 @@ async function getThumbnailUrls() {
 	if (!imageEntry) return;
 
 	const getImageUrl = createImageUrlFunction({
-		imageQuality: imageLowQualityValue,
 		imageFormat: imageLowQualityFormat,
-		serverUrl: IMAGE_SERVER_URL,
+		imageQuality: imageLowQualityValue,
 		serverSecret: IMAGE_SERVER_SECRET,
+		serverUrl: IMAGE_SERVER_URL,
 	});
 
 	const fit = ImageFitOptionEnum.Cover;
 
 	return {
 		url1x: getImageUrl(imageId, {
-			width: searchThumbnailWidth,
-			height: Math.round(searchThumbnailWidth / searchThumbnailAspectRatio),
 			fit,
+			height: Math.round(searchThumbnailWidth / searchThumbnailAspectRatio),
+			width: searchThumbnailWidth,
 		}),
 		url2x: getImageUrl(imageId, {
-			width: searchThumbnailWidth2x,
-			height: Math.round(searchThumbnailWidth2x / searchThumbnailAspectRatio),
 			fit,
+			height: Math.round(searchThumbnailWidth2x / searchThumbnailAspectRatio),
+			width: searchThumbnailWidth2x,
 		}),
 	};
 }

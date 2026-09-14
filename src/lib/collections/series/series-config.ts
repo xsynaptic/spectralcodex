@@ -17,22 +17,21 @@ export const series = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			description: z.string().optional(),
-			// Strings, not references, because we mix content here (posts and locations)
-			seriesItems: z.string().array().optional(),
-			dateCreated: DateSchema,
-			dateUpdated: DateSchema.optional(),
-			dateRecorded: DateRecordedSchema.optional(),
-			regions: reference('regions').array().optional(),
-			themes: reference('themes').array().optional(),
-			imageFeatured: ImageFeaturedSchema.optional(),
-			hideSearch: z.boolean().optional(),
-			entryQuality: NumericScaleSchema,
-			formerIds: z.string().array().optional(),
-			// Computed properties, for internal use only!
+			_entryCount: z.number().int().optional(),
 			_locationCount: z.number().int().optional(),
 			_postCount: z.number().int().optional(),
-			_entryCount: z.number().int().optional(),
+			dateCreated: DateSchema,
+			dateRecorded: DateRecordedSchema.optional(),
+			dateUpdated: DateSchema.optional(),
+			description: z.string().optional(),
+			entryQuality: NumericScaleSchema,
+			formerIds: z.string().array().optional(),
+			hideSearch: z.boolean().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
+			regions: reference('regions').array().optional(),
+			// Strings, not references, because we mix content here (posts and locations)
+			seriesItems: z.string().array().optional(),
+			themes: reference('themes').array().optional(),
 		})
 		.strict(),
 });

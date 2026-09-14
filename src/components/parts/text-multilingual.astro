@@ -14,10 +14,10 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 }>;
 
 const {
+	additional,
 	as: Tag = 'span',
 	class: className,
 	content,
-	additional,
 	parenthesis = false,
 	...props
 } = Astro.props;

@@ -12,15 +12,15 @@ import type { MapFilterState } from '#canvas/canvas-data-filter.ts';
 import { getMapCanvasData, isLocationVisible } from '#canvas/canvas-data-filter.ts';
 
 const passAll: MapFilterState = {
-	status: [],
 	entryQuality: 1,
-	rating: 1,
 	objective: 1,
+	rating: 1,
+	status: [],
 };
 
 const pointGeometry = {
-	type: GeometryTypeEnum.Point,
 	coordinates: [0, 0],
+	type: GeometryTypeEnum.Point,
 } satisfies MapSourceItem['geometry'];
 
 function makeItem(
@@ -28,32 +28,31 @@ function makeItem(
 	geometry: MapSourceItem['geometry'] = pointGeometry,
 ): MapSourceItem {
 	return {
+		geometry,
 		properties: {
-			id: 'location-id',
-			title: 'Location',
 			category: LocationCategoryEnum.Unknown,
-			status: LocationStatusEnum.Abandoned,
-			precision: 3,
 			entryQuality: 3,
-			rating: 3,
-			outlier: false,
 			hasImage: false,
+			id: 'location-id',
+			outlier: false,
+			precision: 3,
+			rating: 3,
+			status: LocationStatusEnum.Abandoned,
+			title: 'Location',
 			...properties,
 		},
-		geometry,
 	};
 }
 
 const lineGeometry = {
-	type: GeometryTypeEnum.LineString,
 	coordinates: [
 		[0, 0],
 		[1, 1],
 	],
+	type: GeometryTypeEnum.LineString,
 } satisfies MapSourceItem['geometry'];
 
 const polygonGeometry = {
-	type: GeometryTypeEnum.Polygon,
 	coordinates: [
 		[
 			[0, 0],
@@ -62,6 +61,7 @@ const polygonGeometry = {
 			[0, 0],
 		],
 	],
+	type: GeometryTypeEnum.Polygon,
 } satisfies MapSourceItem['geometry'];
 
 describe('isLocationVisible', () => {
@@ -124,9 +124,9 @@ describe('getMapCanvasData', () => {
 		const feature = getMapCanvasData([item], passAll).pointCollection?.features[0];
 
 		expect(feature).toEqual({
-			type: 'Feature',
-			properties: item.properties,
 			geometry: item.geometry,
+			properties: item.properties,
+			type: 'Feature',
 		});
 		expect(feature && 'id' in feature).toBe(false);
 	});
@@ -147,8 +147,8 @@ describe('getMapCanvasData scope', () => {
 
 	test('region scope keeps only points whose ordinal is inside the interval', () => {
 		const result = getMapCanvasData([inside, outside], passAll, {
-			type: 'region',
 			interval: [1, 10],
+			type: 'region',
 		});
 
 		expect(result.totalCount).toBe(1);
@@ -156,7 +156,7 @@ describe('getMapCanvasData scope', () => {
 	});
 
 	test('theme scope keeps only points carrying the theme index', () => {
-		const result = getMapCanvasData([inside, outside], passAll, { type: 'theme', index: 2 });
+		const result = getMapCanvasData([inside, outside], passAll, { index: 2, type: 'theme' });
 
 		expect(result.totalCount).toBe(1);
 		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
@@ -164,8 +164,8 @@ describe('getMapCanvasData scope', () => {
 
 	test('ids scope keeps only the listed ids', () => {
 		const result = getMapCanvasData([inside, outside], passAll, {
-			type: 'ids',
 			ids: ['outside'],
+			type: 'ids',
 		});
 
 		expect(result.totalCount).toBe(1);
@@ -174,8 +174,8 @@ describe('getMapCanvasData scope', () => {
 
 	test('ids scope preserves the list order', () => {
 		const result = getMapCanvasData([inside, outside], passAll, {
-			type: 'ids',
 			ids: ['outside', 'inside'],
+			type: 'ids',
 		});
 
 		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
@@ -187,7 +187,7 @@ describe('getMapCanvasData scope', () => {
 	test('points missing the relevant column are excluded by a scope', () => {
 		const bare = makeItem({ id: 'bare' });
 
-		const result = getMapCanvasData([bare], passAll, { type: 'region', interval: [1, 10] });
+		const result = getMapCanvasData([bare], passAll, { interval: [1, 10], type: 'region' });
 
 		expect(result.totalCount).toBe(0);
 	});

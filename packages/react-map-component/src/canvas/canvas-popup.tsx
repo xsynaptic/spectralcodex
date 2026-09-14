@@ -26,19 +26,19 @@ type MapPopupItemExtended = MapPopupItem & {
 };
 
 const defaultPopupItem = {
+	description: undefined,
+	googleMapsUrl: undefined,
 	id: 'default',
+	image: undefined,
+	objective: undefined,
+	popupCoordinates: new LngLat(0, 0),
+	precision: 1,
+	safety: undefined,
 	title: 'Untitled',
 	titleMultilingualLang: undefined,
 	titleMultilingualValue: undefined,
 	url: undefined,
-	description: undefined,
-	safety: undefined,
-	googleMapsUrl: undefined,
 	wikipediaUrl: undefined,
-	image: undefined,
-	precision: 1,
-	objective: undefined,
-	popupCoordinates: new LngLat(0, 0),
 } satisfies MapPopupItemExtended;
 
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
@@ -179,16 +179,16 @@ function useMapCanvasPopup() {
 			...popupSource?.find((item) => item.id === selectedId),
 			...(selectedSourceItem
 				? {
-						precision: selectedSourceItem.properties.precision,
 						objective: selectedSourceItem.properties.objective,
 						popupCoordinates: getPopupCoordinates(selectedSourceItem),
+						precision: selectedSourceItem.properties.precision,
 					}
 				: {}),
 		} satisfies MapPopupItemExtended;
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceDataIndex + selectedId
 	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceDataIndex]);
 
-	return { popupItem, isLoading };
+	return { isLoading, popupItem };
 }
 
 function useMapImagePreload({ imageServerUrl }: { imageServerUrl: string }) {
@@ -256,7 +256,7 @@ const MapPopupFooter: FC<{
 	googleMapsUrl: string | undefined;
 	popupCoordinates: LngLat;
 	wikipediaUrl: string | undefined;
-}> = function MapPopupFooter({ popupCoordinates, wikipediaUrl, googleMapsUrl }) {
+}> = function MapPopupFooter({ googleMapsUrl, popupCoordinates, wikipediaUrl }) {
 	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
 	const mapsUrl = googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
 	const messages = useMapMessages();
@@ -349,21 +349,21 @@ const MapPopupContent: FC<{
 	imageServerUrl: string;
 	isDev: boolean | undefined;
 	popupItem: MapPopupItemExtended;
-}> = function MapPopupContent({ popupItem, imageServerUrl, isDev }) {
+}> = function MapPopupContent({ imageServerUrl, isDev, popupItem }) {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 	const messages = useMapMessages();
 
 	const {
+		description,
+		image,
+		objective,
+		popupCoordinates,
+		precision,
 		title,
 		titleMultilingualLang,
 		titleMultilingualValue,
 		url,
-		description,
-		precision,
-		objective,
 		wikipediaUrl,
-		image,
-		popupCoordinates,
 	} = popupItem;
 
 	return (
@@ -414,21 +414,21 @@ const MapPopupContent: FC<{
 
 const popupPlacementMobile = {
 	anchor: 'top',
-	offset: 10,
 	maxWidth: `calc(min(300px, 80vw))`,
+	offset: 10,
 } as const;
 
 const popupPlacementDesktop = {
 	anchor: 'left',
-	offset: 16,
 	maxWidth: `calc(min(350px, 80vw))`,
+	offset: 16,
 } as const;
 
 export const MapPopup: FC<{
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
 }> = function MapPopup({ imageServerUrl = '', isDev }) {
-	const { popupItem, isLoading: isPopupDataLoading } = useMapCanvasPopup();
+	const { isLoading: isPopupDataLoading, popupItem } = useMapCanvasPopup();
 	const isPopupVisible = useIsMapPopupVisible();
 
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });

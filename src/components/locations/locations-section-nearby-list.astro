@@ -20,17 +20,17 @@ const { entry, limit = locationsNearbyCountLimit, ...props } = Astro.props;
 const { entriesMap: locationsMap } = await getLocationsCollection();
 
 const locations = (entry.data._nearby?.slice(0, limit) ?? []).flatMap(
-	({ locationId, distanceDisplay }) => {
+	({ distanceDisplay, locationId }) => {
 		const location = locationsMap.get(locationId);
 
 		if (!location) return [];
 
 		return [
 			{
-				url: getContentPath('locations', location.id),
+				distanceDisplay,
 				title: location.data.title,
 				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
-				distanceDisplay,
+				url: getContentPath('locations', location.id),
 			},
 		];
 	},

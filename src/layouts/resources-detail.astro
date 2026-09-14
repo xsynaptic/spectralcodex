@@ -29,12 +29,12 @@ const { entry, mapData, page } = Astro.props;
 
 // The header carries a short citation; the full one, with publishedDetails, lives in Sources
 const citation = formatCitation({
-	lang: LanguageCodeEnum.English,
-	title: entry.data.title,
 	authorNames: entry.data.authors?.map((author) => author.name),
-	publisher: entry.data.publisher,
+	lang: LanguageCodeEnum.English,
 	publishedDate: entry.data.publishedDate,
 	publishedDetails: undefined,
+	publisher: entry.data.publisher,
+	title: entry.data.title,
 });
 
 const citationLine = [citation.authors, citation.published]

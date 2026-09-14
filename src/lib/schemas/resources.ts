@@ -46,13 +46,13 @@ const ResourceAuthorSchema = z.object({
 export const ResourceSchema = z.object({
 	title: z.string(),
 	...titleMultilingualSchema,
+	authors: ResourceAuthorSchema.array().optional(),
 	description: z.string().optional(),
-	url: z.url().optional(),
+	publisher: z.string().optional(),
 	// Bibliographic kind; a subset of CSL 1.0.2 item types, so citation formatting can defer to CSL
 	// Anything on the web is a `webpage` at whatever granularity; its venue belongs in publishedContainer
 	resourceType: z.enum(['webpage', 'book', 'chapter', 'article', 'report', 'dataset', 'software']),
-	authors: ResourceAuthorSchema.array().optional(),
-	publisher: z.string().optional(),
+	url: z.url().optional(),
 	...publisherMultilingualSchema,
 	publishedContainer: z.string().optional(),
 	...publishedContainerMultilingualSchema,

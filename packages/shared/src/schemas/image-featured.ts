@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 const ImageFeaturedObjectSchema = z.object({
-	id: z.string(),
-	title: z.string().optional(),
-	link: z.string().optional(),
 	hero: z.boolean().optional(),
+	id: z.string(),
+	link: z.string().optional(),
+	title: z.string().optional(),
 });
 
 export type ImageFeaturedObject = z.infer<typeof ImageFeaturedObjectSchema>;

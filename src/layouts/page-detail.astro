@@ -38,8 +38,8 @@ const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'titl
 
 const catalog = await getCatalog();
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
-	imageFeatured: entry.data.imageFeatured,
 	getCaption: catalog.getCaption,
+	imageFeatured: entry.data.imageFeatured,
 });
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
@@ -51,12 +51,12 @@ const { Content } = await render(entry);
 <MainSite
 	hasHeroImage={hasHeroImage}
 	meta={{
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
-			id: entry.id,
 			alt: entry.data.title,
+			id: entry.id,
 		}),
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={schemas}

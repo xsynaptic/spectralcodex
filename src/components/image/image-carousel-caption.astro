@@ -52,7 +52,7 @@ const TitleElement = url ? Anchor : 'span';
 				set:html={t('content.meta.imageFeatured.label')}
 			/>
 			<TitleElement
-				{...(url ? { href: url, anchorColor: 'primary-bright' } : {})}
+				{...(url ? { anchorColor: 'primary-bright', href: url } : {})}
 				class:list={[
 					'truncate font-medium sm:font-semibold',
 					withTitle

@@ -23,7 +23,7 @@ const { counts, replies } = Astro.props;
 
 {counts.length > 0 ? (
 	<ListRow class="mb-2">
-		{counts.map(({ label, count }) => (
+		{counts.map(({ count, label }) => (
 			<DividedItem as="li" class="font-serif text-xs sm:text-sm" dividerWeight="thin">
 				{label}: {count}
 			</DividedItem>

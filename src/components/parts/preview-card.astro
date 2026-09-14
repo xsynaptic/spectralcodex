@@ -20,23 +20,23 @@ interface Props extends HTMLAttributes<'div'> {
 	titleAs?: 'h2' | 'h3' | undefined;
 }
 
-const { imageId, linkUrl, alt, showMicroformats = false, titleAs, ...props } = Astro.props;
+const { alt, imageId, linkUrl, showMicroformats = false, titleAs, ...props } = Astro.props;
 
 const TitleTag = titleAs ?? 'h3';
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
-	imageId,
 	alt,
+	imageFormat: imageLowQualityFormat,
+	imageId,
+	imageQuality: imageLowQualityValue,
+	sizes: `auto, (max-width: ${tailwindBreakpointSm}) 100vw, 425px`,
+	width: ImageSizeEnum.Medium,
 	widths: [
 		ImageSizeEnum.ExtraSmall,
 		ImageSizeEnum.Small,
 		ImageSizeEnum.Medium,
 		ImageSizeEnum.Large,
 	],
-	sizes: `auto, (max-width: ${tailwindBreakpointSm}) 100vw, 425px`,
-	width: ImageSizeEnum.Medium,
-	imageQuality: imageLowQualityValue,
-	imageFormat: imageLowQualityFormat,
 });
 
 const titleMultilingual = await renderSlot(Astro.slots, 'preview-title-multilingual');

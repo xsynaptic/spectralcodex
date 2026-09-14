@@ -9,20 +9,19 @@ import { ResourceSchema } from '#lib/schemas/resources.ts';
 export const resources = defineCollection({
 	loader: createEntryGlobLoader('resources'),
 	schema: ResourceSchema.extend({
-		title: TitleSchema,
-		subtitle: z.string().optional(), // TODO: note that this is currently unused
-		match: z.union([z.string(), z.array(z.string())]).optional(),
-		regions: reference('regions').array().optional(),
-		themes: reference('themes').array().optional(),
-		dateCreated: DateSchema,
-		dateUpdated: DateSchema.optional(),
-		imageFeatured: ImageFeaturedSchema.optional(),
-		showPage: z.boolean().optional(),
-		entryQuality: NumericScaleSchema,
-		formerIds: z.string().array().optional(),
-		// Computed properties, for internal use only!
+		_entryCount: z.number().optional(),
 		_locationCount: z.number().optional(),
 		_postCount: z.number().optional(),
-		_entryCount: z.number().optional(),
+		dateCreated: DateSchema,
+		dateUpdated: DateSchema.optional(),
+		entryQuality: NumericScaleSchema,
+		formerIds: z.string().array().optional(),
+		imageFeatured: ImageFeaturedSchema.optional(),
+		match: z.union([z.string(), z.array(z.string())]).optional(),
+		regions: reference('regions').array().optional(),
+		showPage: z.boolean().optional(),
+		subtitle: z.string().optional(), // TODO: note that this is currently unused
+		themes: reference('themes').array().optional(),
+		title: TitleSchema,
 	}).strict(),
 });

@@ -66,7 +66,7 @@ export async function withAstroContent<T>(callback: (content: AstroContent) => P
 	// An unrooted config resolves against `process.cwd()`, finds none, and reads every collection back empty
 	const root = findAstroRoot();
 
-	const configFn = getViteConfig({}, { root, logLevel: 'silent' });
+	const configFn = getViteConfig({}, { logLevel: 'silent', root });
 	const config =
 		typeof configFn === 'function'
 			? await configFn({ command: 'serve', mode: 'development' })
@@ -74,10 +74,10 @@ export async function withAstroContent<T>(callback: (content: AstroContent) => P
 
 	const server = await createServer({
 		...config,
-		logLevel: 'silent',
 		// Astro's config sets a `customLogger` that writes to stdout and ignores `logLevel`
 		customLogger: createLogger('silent'),
-		server: { middlewareMode: true, hmr: false, ws: false },
+		logLevel: 'silent',
+		server: { hmr: false, middlewareMode: true, ws: false },
 	});
 
 	try {

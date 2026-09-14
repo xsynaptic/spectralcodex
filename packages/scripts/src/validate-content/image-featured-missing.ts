@@ -12,8 +12,8 @@ export function validateImageFeaturedMissing(entries: Array<ContentEntry>) {
 	return toValidationResult(
 		files.map((file) => ({ message: `${file}: body has images but no imageFeatured` })),
 		{
-			pass: 'Entries with body images all set imageFeatured',
 			fail: `Found ${files.length.toString()} entries with body images but no imageFeatured`,
+			pass: 'Entries with body images all set imageFeatured',
 		},
 	);
 }

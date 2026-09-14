@@ -40,9 +40,9 @@ export function buildEntryCatalogItems(
 	);
 
 	return {
-		catalogItemsFiltered,
 		catalogItems: catalogItemsAll.slice(0, limit),
 		catalogItemsCount: catalogItemsAll.length,
+		catalogItemsFiltered,
 	};
 }
 

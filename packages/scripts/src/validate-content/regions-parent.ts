@@ -11,7 +11,7 @@ type RegionParentIssue =
 // A dangling parent silently detaches the region into its own root, corrupting ancestry, siblings, and cumulative counts
 // A cycle drops every member out of the hierarchy's root-driven walk, so subtrees silently vanish from rollups
 export function collectRegionsParentsIssues(entries: Array<ContentEntry>) {
-	const { parentById, issues } = collectParentEdges(entries);
+	const { issues, parentById } = collectParentEdges(entries);
 
 	return [...issues, ...collectCycleIssues(entries, parentById)];
 }
@@ -22,8 +22,8 @@ export function validateRegionsParents(entries: Array<ContentEntry>) {
 	return toValidationResult(
 		issues.map((issue) => ({ message: formatIssue(issue) })),
 		{
-			pass: `${entries.length.toString()} region parents valid`,
 			fail: `Found ${issues.length.toString()} region(s) with an invalid parent`,
+			pass: `${entries.length.toString()} region parents valid`,
 		},
 	);
 }
@@ -54,9 +54,9 @@ function collectCycleIssues(entries: Array<ContentEntry>, parentById: Map<string
 		reportedCycles.add(cycleKey);
 
 		issues.push({
+			chain: [...chain, entry.id],
 			location: entry.filePath ?? entry.id,
 			reason: 'cycle',
-			chain: [...chain, entry.id],
 		});
 	}
 
@@ -81,11 +81,11 @@ function collectParentEdges(entries: Array<ContentEntry>) {
 		} else if (regionIds.has(parent)) {
 			parentById.set(entry.id, parent);
 		} else {
-			issues.push({ location, reason: 'not-found', parent });
+			issues.push({ location, parent, reason: 'not-found' });
 		}
 	}
 
-	return { parentById, issues };
+	return { issues, parentById };
 }
 
 function formatIssue(issue: RegionParentIssue) {

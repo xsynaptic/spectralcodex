@@ -17,11 +17,11 @@ interface Props extends HTMLAttributes<'nav'> {
 }
 
 const {
-	class: className,
-	currentYear,
-	currentMonth,
-	chronologyYears,
 	chronologyMonths,
+	chronologyYears,
+	class: className,
+	currentMonth,
+	currentYear,
 	...props
 } = Astro.props;
 

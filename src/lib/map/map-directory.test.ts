@@ -14,8 +14,8 @@ function makePopupItem(id: string, title: string): MapPopupItem {
 
 function makeSourceItem(id: string): MapSourceItem {
 	return {
-		properties: { id, title: id, category: 'other', chunkKey: '0' },
-		geometry: { type: 'Point', coordinates: [100, 10] },
+		geometry: { coordinates: [100, 10], type: 'Point' },
+		properties: { category: 'other', chunkKey: '0', id, title: id },
 	} as unknown as MapSourceItem;
 }
 

@@ -20,24 +20,24 @@ interface FontVariant {
 
 const fontConfigs: Array<FontsourceConfig> = [
 	{
-		package: 'lora',
 		name: 'Lora',
-		variants: [{ weight: 700, style: 'normal', subset: 'latin' }],
+		package: 'lora',
+		variants: [{ style: 'normal', subset: 'latin', weight: 700 }],
 	},
 	{
-		package: 'noto-serif-tc',
 		name: 'Noto Serif TC',
-		variants: [{ weight: 700, style: 'normal', subset: 'chinese-traditional' }],
+		package: 'noto-serif-tc',
+		variants: [{ style: 'normal', subset: 'chinese-traditional', weight: 700 }],
 	},
 	{
-		package: 'noto-serif-thai',
 		name: 'Noto Serif Thai',
-		variants: [{ weight: 500, style: 'normal', subset: 'thai' }],
+		package: 'noto-serif-thai',
+		variants: [{ style: 'normal', subset: 'thai', weight: 500 }],
 	},
 	{
-		package: 'zen-antique',
 		name: 'Zen Antique',
-		variants: [{ weight: 400, style: 'normal', subset: 'japanese' }],
+		package: 'zen-antique',
+		variants: [{ style: 'normal', subset: 'japanese', weight: 400 }],
 	},
 ];
 

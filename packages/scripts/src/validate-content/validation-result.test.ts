@@ -4,20 +4,20 @@ import { reportValidationResult, toValidationResult } from '#validate-content/va
 
 describe('toValidationResult', () => {
 	test('passes with the pass summary when nothing is flagged', () => {
-		expect(toValidationResult([], { pass: 'all good', fail: 'Found 0 problem(s)' })).toEqual({
+		expect(toValidationResult([], { fail: 'Found 0 problem(s)', pass: 'all good' })).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'all good',
-			issues: [],
 		});
 	});
 
 	test('fails with the fail summary and keeps the issues', () => {
 		const issues = [{ message: 'a-post: broken' }];
 
-		expect(toValidationResult(issues, { pass: 'all good', fail: 'Found 1 problem(s)' })).toEqual({
+		expect(toValidationResult(issues, { fail: 'Found 1 problem(s)', pass: 'all good' })).toEqual({
+			issues,
 			status: 'fail',
 			summary: 'Found 1 problem(s)',
-			issues,
 		});
 	});
 });
@@ -39,10 +39,10 @@ describe('reportValidationResult', () => {
 
 	test('prints the pass summary, then any notes', () => {
 		reportValidationResult({
-			status: 'pass',
-			summary: '2 image aspect ratios valid',
 			issues: [],
 			notes: ['   2  3:2'],
+			status: 'pass',
+			summary: '2 image aspect ratios valid',
 		});
 
 		expect(lines).toEqual(['✓ 2 image aspect ratios valid', '   2  3:2']);
@@ -50,9 +50,9 @@ describe('reportValidationResult', () => {
 
 	test('prints issues above the summary, with details indented', () => {
 		reportValidationResult({
+			issues: [{ details: ['Line 3: broken link ID "missing"'], message: 'a-post.mdx' }],
 			status: 'fail',
 			summary: 'Found 1 broken link ID(s)',
-			issues: [{ message: 'a-post.mdx', details: ['Line 3: broken link ID "missing"'] }],
 		});
 
 		expect(lines).toEqual([
@@ -64,9 +64,9 @@ describe('reportValidationResult', () => {
 
 	test('marks advisory issues as warnings', () => {
 		reportValidationResult({
+			issues: [{ message: 'a: overlaps b (3.0m)' }],
 			status: 'warn',
 			summary: 'Found 1 overlap(s)',
-			issues: [{ message: 'a: overlaps b (3.0m)' }],
 		});
 
 		expect(lines).toEqual(['⚠️  a: overlaps b (3.0m)', '⚠️  Found 1 overlap(s)']);

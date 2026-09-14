@@ -10,10 +10,10 @@ Object.assign(process.env, loadEnv('test', process.cwd(), ''), {
 
 export default defineConfig({
 	test: {
-		include: ['tests/image-server/integration.test.ts'],
 		globalSetup: ['tests/image-server/setup-docker.ts'],
-		testTimeout: 10_000,
 		hookTimeout: 60_000,
+		include: ['tests/image-server/integration.test.ts'],
 		teardownTimeout: 30_000,
+		testTimeout: 10_000,
 	},
 });

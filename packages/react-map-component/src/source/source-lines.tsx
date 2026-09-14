@@ -21,11 +21,9 @@ function useMapSourceLinesStyle(): {
 		() =>
 			({
 				id: MapLayerIdEnum.LineString,
-				source: MapSourceIdEnum.LineStringCollection,
-				type: 'line',
 				layout: {
-					'line-join': 'round',
 					'line-cap': 'round',
+					'line-join': 'round',
 				},
 				paint: {
 					'line-color': [
@@ -50,6 +48,8 @@ function useMapSourceLinesStyle(): {
 						10,
 					],
 				},
+				source: MapSourceIdEnum.LineStringCollection,
+				type: 'line',
 			}) satisfies LineLayerSpecification,
 		[isDarkMode],
 	);

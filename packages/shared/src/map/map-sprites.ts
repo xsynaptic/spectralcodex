@@ -1,12 +1,12 @@
 // Define any icons used in the map component in this file
 // Note: the viewbox attribute needs to be copied in-line to wherever the sprite is being displayed
 export const MapSpritesEnum = {
-	Google: 'logos:google-maps',
-	Wikipedia: 'hugeicons:wikipedia',
+	Clusters: 'uil:expand-arrows-alt',
 	Copy: 'uil:copy',
 	Filters: 'uil:layer-group',
-	Search: 'uil:search',
-	Clusters: 'uil:expand-arrows-alt',
+	Google: 'logos:google-maps',
 	Rating: 'clarity:star-solid',
+	Search: 'uil:search',
 	Warning: 'clarity:warning-solid',
+	Wikipedia: 'hugeicons:wikipedia',
 } as const satisfies Record<string, string>;

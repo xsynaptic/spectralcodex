@@ -32,8 +32,8 @@ function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> 
 	if (!map.getLayer(MapLayerIdEnum.Clusters)) return [];
 
 	const clusters = map.queryRenderedFeatures(undefined, {
-		layers: [MapLayerIdEnum.Clusters],
 		filter: ['>', ['get', 'hasTarget'], 0],
+		layers: [MapLayerIdEnum.Clusters],
 	});
 
 	const markers: Array<TargetMarker> = [];
@@ -49,10 +49,10 @@ function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> 
 		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
 
 		markers.push({
-			id: `cluster-${String(clusterId)}`,
-			longitude,
-			latitude,
 			color,
+			id: `cluster-${String(clusterId)}`,
+			latitude,
+			longitude,
 		});
 	}
 
@@ -67,8 +67,8 @@ function collectPointMarkers(
 	if (!map.getLayer(MapLayerIdEnum.Points)) return [];
 
 	const points = map.queryRenderedFeatures(undefined, {
-		layers: [MapLayerIdEnum.Points],
 		filter: ['in', ['get', 'id'], ['literal', targetIds]],
+		layers: [MapLayerIdEnum.Points],
 	});
 
 	const markers: Array<TargetMarker> = [];
@@ -107,7 +107,7 @@ function toPointMarker(
 
 	const [longitude, latitude] = feature.geometry.coordinates as [number, number];
 
-	return { id, longitude, latitude, color: getMarkerColor(feature, isDark) };
+	return { color: getMarkerColor(feature, isDark), id, latitude, longitude };
 }
 
 function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
@@ -185,7 +185,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	return markers;
 }
 
-const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ longitude, latitude, color }) {
+const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ color, latitude, longitude }) {
 	return (
 		<Marker anchor="center" latitude={latitude} longitude={longitude}>
 			<div className="map-pulse-ring-frame">
@@ -209,8 +209,8 @@ function findPointMarker(map: MapRef, id: string, isDark: boolean): TargetMarker
 	if (!map.getLayer(MapLayerIdEnum.Points)) return undefined;
 
 	const [feature] = map.queryRenderedFeatures(undefined, {
-		layers: [MapLayerIdEnum.Points],
 		filter: ['==', ['get', 'id'], id],
+		layers: [MapLayerIdEnum.Points],
 	});
 
 	return feature ? toPointMarker(feature, id, isDark) : undefined;

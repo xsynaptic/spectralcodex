@@ -17,7 +17,7 @@ interface DeployOgOptions {
 }
 
 export async function deployOg(options: DeployOgOptions): Promise<void> {
-	const { rootPath, dryRun = false, ids = [] } = options;
+	const { dryRun = false, ids = [], rootPath } = options;
 
 	const config = loadDeployConfig();
 
@@ -42,9 +42,9 @@ export async function deployOg(options: DeployOgOptions): Promise<void> {
 			: [`${ogImagePath}/`];
 
 	await rsyncTo(sources, `${config.remoteHost}:${remoteOgPath}/`, {
+		archive: 'av',
 		config,
 		dryRun,
-		archive: 'av',
 		excludes: [openGraphManifestFile],
 		extraFlags: ['--checksum'],
 	});

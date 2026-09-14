@@ -18,23 +18,23 @@ interface Props extends ImageFeaturedWithCaption {
 }
 
 const {
-	class: className,
-	index,
-	id: imageId,
-	caption,
 	alt,
+	caption,
+	class: className,
+	id: imageId,
+	index,
 	showMicroformats = false,
 	withTitle = false,
 } = Astro.props;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
-	imageId,
 	alt,
+	imageFormat: imageHeroQualityFormat,
+	imageId,
+	imageQuality: imageHeroQualityValue,
+	priority: index === 0,
 	sizes: '100vw',
 	width: ImageSizeEnum.ExtraExtraLarge,
-	imageQuality: imageHeroQualityValue,
-	imageFormat: imageHeroQualityFormat,
-	priority: index === 0,
 });
 ---
 

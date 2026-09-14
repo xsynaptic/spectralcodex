@@ -16,17 +16,6 @@ export async function getCatalogStats() {
 	const { entries: images } = await getImagesCollection();
 
 	const stats = {
-		locations: {
-			...getCatalogCounts(catalogGroups.locations),
-			withImages: formatNumber({
-				number: catalogGroups.locations?.filter((item) => item.imageId).length ?? 0,
-			}),
-		},
-		pages: getCatalogCounts(catalogGroups.pages),
-		posts: getCatalogCounts(catalogGroups.posts),
-		regions: getCatalogCounts(catalogGroups.regions),
-		series: getCatalogCounts(catalogGroups.series),
-		themes: getCatalogCounts(catalogGroups.themes),
 		images: {
 			itemCount: formatNumber({ number: images.length }),
 		},
@@ -39,6 +28,17 @@ export async function getCatalogStats() {
 				),
 			}),
 		},
+		locations: {
+			...getCatalogCounts(catalogGroups.locations),
+			withImages: formatNumber({
+				number: catalogGroups.locations?.filter((item) => item.imageId).length ?? 0,
+			}),
+		},
+		pages: getCatalogCounts(catalogGroups.pages),
+		posts: getCatalogCounts(catalogGroups.posts),
+		regions: getCatalogCounts(catalogGroups.regions),
+		series: getCatalogCounts(catalogGroups.series),
+		themes: getCatalogCounts(catalogGroups.themes),
 	};
 
 	return {

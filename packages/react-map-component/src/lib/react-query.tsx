@@ -27,11 +27,11 @@ function createIdbPersister(idbValidKey: IDBValidKey = 'reactQuery') {
 		persistClient: async (client: PersistedClient) => {
 			await set(idbValidKey, client);
 		},
-		restoreClient: async () => {
-			return await get<PersistedClient>(idbValidKey);
-		},
 		removeClient: async () => {
 			await del(idbValidKey);
+		},
+		restoreClient: async () => {
+			return await get<PersistedClient>(idbValidKey);
 		},
 	} satisfies Persister;
 }
@@ -41,8 +41,8 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 		return new QueryClient({
 			defaultOptions: {
 				queries: {
-					staleTime: isDev ? 0 : millisecondsPerDay,
 					gcTime: isDev ? 0 : millisecondsPerDay,
+					staleTime: isDev ? 0 : millisecondsPerDay,
 				},
 			},
 		});
@@ -56,8 +56,6 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 		<PersistQueryClientProvider
 			client={queryClient}
 			persistOptions={{
-				persister: createIdbPersister('spectralcodex-map-data-cache'),
-				maxAge: millisecondsPerDay,
 				// Content changes are keyed by the query itself, not by the buster
 				buster: mapCacheSchemaVersion,
 				dehydrateOptions: {
@@ -65,6 +63,8 @@ export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps)
 					shouldDehydrateQuery: (query) =>
 						defaultShouldDehydrateQuery(query) && query.meta?.persist !== false,
 				},
+				maxAge: millisecondsPerDay,
+				persister: createIdbPersister('spectralcodex-map-data-cache'),
 			}}
 		>
 			{children}

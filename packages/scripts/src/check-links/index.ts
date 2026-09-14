@@ -23,12 +23,12 @@ import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts
 import { findWorkspaceRoot } from '#shared/utils.ts';
 
 const statusLabels: Record<UrlStatus, string> = {
-	[UrlStatusEnum.Pending]: chalk.gray('Pending'),
-	[UrlStatusEnum.Healthy]: chalk.green('Healthy'),
 	[UrlStatusEnum.Blocked]: chalk.cyan('Blocked'),
-	[UrlStatusEnum.Redirect]: chalk.yellow('Redirected'),
-	[UrlStatusEnum.Missing]: chalk.magenta('Missing'),
 	[UrlStatusEnum.Error]: chalk.red('Error'),
+	[UrlStatusEnum.Healthy]: chalk.green('Healthy'),
+	[UrlStatusEnum.Missing]: chalk.magenta('Missing'),
+	[UrlStatusEnum.Pending]: chalk.gray('Pending'),
+	[UrlStatusEnum.Redirect]: chalk.yellow('Redirected'),
 } as const;
 
 const rootPath = findWorkspaceRoot();
@@ -36,15 +36,15 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'db-path': { type: 'string', default: '.cache/check-links.db' },
-		recheck: { type: 'string' },
-		'recheck-all': { type: 'boolean', default: false },
+		concurrency: { default: '10', type: 'string' },
+		'db-path': { default: '.cache/check-links.db', type: 'string' },
+		'domain-limit': { default: '2', type: 'string' },
+		ignore: { multiple: true, type: 'string' },
 		list: { type: 'string' },
-		status: { type: 'boolean', default: false },
-		concurrency: { type: 'string', default: '10' },
-		'domain-limit': { type: 'string', default: '2' },
-		'max-missing': { type: 'string', default: '3' },
-		ignore: { type: 'string', multiple: true },
+		'max-missing': { default: '3', type: 'string' },
+		recheck: { type: 'string' },
+		'recheck-all': { default: false, type: 'boolean' },
+		status: { default: false, type: 'boolean' },
 	},
 });
 
@@ -122,7 +122,7 @@ async function syncLinks() {
 		const links = extractLinksFromEntry(entry).filter((link) => !shouldIgnoreUrl(link.url));
 
 		for (const link of links) {
-			extractedSources.push({ urlId: upsertUrl(link.url), contentId });
+			extractedSources.push({ contentId, urlId: upsertUrl(link.url) });
 		}
 	}
 
@@ -163,8 +163,8 @@ try {
 	const urlsToCheck = getUrlsToCheck({
 		recheck: values.recheck !== undefined,
 		...recheckFilter,
-		recheckAll: values['recheck-all'],
 		maxMissing,
+		recheckAll: values['recheck-all'],
 	});
 
 	if (urlsToCheck.length === 0) {
@@ -207,8 +207,8 @@ try {
 
 				recordCheckResult(result.urlId, {
 					httpStatus: result.httpStatus,
-					status: result.status,
 					redirectUrl: result.redirectUrl,
+					status: result.status,
 				});
 
 				checked++;

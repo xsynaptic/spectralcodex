@@ -11,8 +11,8 @@ export const WebmentionPropertyEnum = {
 
 const WebmentionAuthorSchema = z.looseObject({
 	name: z.string().nullable().optional(),
-	url: z.string().nullable().optional(),
 	photo: z.string().nullable().optional(),
+	url: z.string().nullable().optional(),
 });
 
 const WebmentionContentSchema = z.looseObject({
@@ -22,15 +22,15 @@ const WebmentionContentSchema = z.looseObject({
 
 // `published` is author-supplied and untrusted; ordering uses `wm-received`
 export const WebmentionSchema = z.looseObject({
+	author: WebmentionAuthorSchema.nullable().optional(),
+	content: WebmentionContentSchema.nullable().optional(),
+	published: z.string().nullable().optional(),
 	'wm-id': z.number(),
+	'wm-private': z.boolean().optional(),
+	'wm-property': z.enum(WebmentionPropertyEnum),
+	'wm-received': z.string(),
 	'wm-source': z.string(),
 	'wm-target': z.string(),
-	'wm-received': z.string(),
-	'wm-property': z.enum(WebmentionPropertyEnum),
-	'wm-private': z.boolean().optional(),
-	author: WebmentionAuthorSchema.nullable().optional(),
-	published: z.string().nullable().optional(),
-	content: WebmentionContentSchema.nullable().optional(),
 });
 
 export type Webmention = z.infer<typeof WebmentionSchema>;

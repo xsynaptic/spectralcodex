@@ -28,8 +28,8 @@ import { getContentPath } from '#lib/utils/routing.ts';
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedImagePath = createSignedImagePathFunction({
-	imageQuality: imageLowQualityValue,
 	imageFormat: imageLowQualityFormat,
+	imageQuality: imageLowQualityValue,
 	serverSecret: IMAGE_SERVER_SECRET,
 });
 
@@ -54,10 +54,10 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 
 async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	const locationMapDataHash = hash({
-		id: entry.id,
-		title: entry.data.title,
 		description: getDescription(entry),
+		id: entry.id,
 		links: entry.data.links,
+		title: entry.data.title,
 	}).slice(0, hashShortLength);
 
 	entry.data._uuid = locationMapDataHash;

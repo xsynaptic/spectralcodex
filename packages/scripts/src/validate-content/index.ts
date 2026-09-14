@@ -28,23 +28,23 @@ import { reportValidationResult } from '#validate-content/validation-result.ts';
 
 const rootPath = findWorkspaceRoot();
 
-const { values, positionals } = parseArgs({
+const { positionals, values } = parseArgs({
+	allowPositionals: true,
 	args: process.argv.slice(2),
 	options: {
 		'divisions-path': {
-			type: 'string',
 			default: './public/divisions',
+			type: 'string',
 		},
 		'media-path': {
-			type: 'string',
 			default: 'packages/content/media',
+			type: 'string',
 		},
 		threshold: {
-			type: 'string',
 			default: '10',
+			type: 'string',
 		},
 	},
-	allowPositionals: true,
 });
 
 const command = positionals[0];
@@ -72,33 +72,63 @@ const bodyContentEntries = entriesFrom('locations', 'posts');
 const resourceEntries = entriesFrom('resources');
 const locationEntries = entriesFrom('locations');
 
-// Keys are the CLI subcommands; declaration order is the order a full run reports in
+// Names are the CLI subcommands
 // Note: there is no need for a help command
-const validations = {
-	'entry-ids': () => validateEntryIds(allEntries),
+const validations = [
+	{ name: 'entry-ids', run: () => validateEntryIds(allEntries) },
 	// Images load separately; the images check resolves them against the media directory
-	references: () => validateReferences(allEntries, { skipCollections: ['images'] }),
-	mdx: () => validateMdxComponents(allEntries, rootPath),
-	'link-ids': () => validateLinkIds(allEntries, metadataEntries, rootPath),
-	'series-items': () => validateSeriesItems(entriesFrom('series'), metadataEntries),
-	'source-ids': () => validateSourceIds(allEntries, resourceEntries),
-	'frontmatter-links': () => validateFrontmatterLinks(allEntries, resourceEntries),
-	images: () => validateImageReferences(allEntries, path.join(rootPath, values['media-path'])),
-	'image-aspect-ratios': () => validateImageAspectRatios(imageEntries, { showStats: true }),
-	'image-featured-in-body': () => validateImageFeaturedInBody(bodyContentEntries),
-	'image-featured-links': () => validateImageFeaturedLinks(allEntries, metadataEntries),
-	'image-featured-missing': () => validateImageFeaturedMissing(bodyContentEntries),
-	'location-duplicates': () => validateLocationsDuplicates(locationEntries),
-	'location-regions': () => validateLocationsRegions(locationEntries),
-	'location-overlap': () => validateLocationsOverlap(locationEntries, Number(values.threshold)),
-	'region-parents': () => validateRegionsParents(entriesFrom('regions')),
-	'location-coordinates': () =>
-		validateLocationsCoordinates(locationEntries, path.join(rootPath, values['divisions-path'])),
-} satisfies Record<string, () => Promise<ValidationResult> | ValidationResult>;
+	{
+		name: 'references',
+		run: () => validateReferences(allEntries, { skipCollections: ['images'] }),
+	},
+	{ name: 'mdx', run: () => validateMdxComponents(allEntries, rootPath) },
+	{ name: 'link-ids', run: () => validateLinkIds(allEntries, metadataEntries, rootPath) },
+	{
+		name: 'series-items',
+		run: () => validateSeriesItems(entriesFrom('series'), metadataEntries),
+	},
+	{ name: 'source-ids', run: () => validateSourceIds(allEntries, resourceEntries) },
+	{
+		name: 'frontmatter-links',
+		run: () => validateFrontmatterLinks(allEntries, resourceEntries),
+	},
+	{
+		name: 'images',
+		run: () => validateImageReferences(allEntries, path.join(rootPath, values['media-path'])),
+	},
+	{
+		name: 'image-aspect-ratios',
+		run: () => validateImageAspectRatios(imageEntries, { showStats: true }),
+	},
+	{
+		name: 'image-featured-in-body',
+		run: () => validateImageFeaturedInBody(bodyContentEntries),
+	},
+	{
+		name: 'image-featured-links',
+		run: () => validateImageFeaturedLinks(allEntries, metadataEntries),
+	},
+	{
+		name: 'image-featured-missing',
+		run: () => validateImageFeaturedMissing(bodyContentEntries),
+	},
+	{ name: 'location-duplicates', run: () => validateLocationsDuplicates(locationEntries) },
+	{ name: 'location-regions', run: () => validateLocationsRegions(locationEntries) },
+	{
+		name: 'location-overlap',
+		run: () => validateLocationsOverlap(locationEntries, Number(values.threshold)),
+	},
+	{ name: 'region-parents', run: () => validateRegionsParents(entriesFrom('regions')) },
+	{
+		name: 'location-coordinates',
+		run: () =>
+			validateLocationsCoordinates(locationEntries, path.join(rootPath, values['divisions-path'])),
+	},
+] satisfies Array<{ name: string; run: () => Promise<ValidationResult> | ValidationResult }>;
 
 const selected = command
-	? Object.entries(validations).filter(([name]) => name === command)
-	: Object.entries(validations);
+	? validations.filter((validation) => validation.name === command)
+	: validations;
 
 if (command && selected.length === 0) {
 	console.log(chalk.red(`Unknown command: ${command}`));
@@ -107,8 +137,8 @@ if (command && selected.length === 0) {
 
 let hasFailure = false;
 
-for (const [, validate] of selected) {
-	const result = await validate();
+for (const validation of selected) {
+	const result = await validation.run();
 
 	reportValidationResult(result);
 

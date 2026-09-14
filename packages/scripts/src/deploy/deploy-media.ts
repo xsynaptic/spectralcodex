@@ -15,7 +15,7 @@ interface DeployMediaOptions {
 export class MediaPathMissingError extends Error {}
 
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
-	const { rootPath, dryRun = false, withDelete = false } = options;
+	const { dryRun = false, rootPath, withDelete = false } = options;
 
 	const config = loadDeployConfig();
 
@@ -46,11 +46,11 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const start = Date.now();
 
 	await rsyncTo(`${mediaPath}/`, `${config.remoteHost}:${remoteMediaPath}/`, {
+		archive: 'av',
 		config,
 		dryRun,
-		archive: 'av',
-		extraFlags: withDelete ? ['--partial', '--size-only', '--delete-after'] : ['--partial', '-c'],
 		excludes: ['.DS_Store', '*.tmp', '.gitkeep'],
+		extraFlags: withDelete ? ['--partial', '--size-only', '--delete-after'] : ['--partial', '-c'],
 	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));

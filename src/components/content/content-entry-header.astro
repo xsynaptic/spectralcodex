@@ -14,7 +14,7 @@ interface Props {
 	titleMultilingualAdditional?: Array<MultilingualContent> | undefined;
 }
 
-const { title, titleMultilingual, titleMultilingualAdditional, imageFeaturedGroup } = Astro.props;
+const { imageFeaturedGroup, title, titleMultilingual, titleMultilingualAdditional } = Astro.props;
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---

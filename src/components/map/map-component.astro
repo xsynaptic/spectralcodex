@@ -14,7 +14,7 @@ interface Props extends HTMLAttributes<'div'> {
 	mapComponentProps: MapComponentProps;
 }
 
-const { mapComponentProps, entryTitle, ...props } = Astro.props;
+const { entryTitle, mapComponentProps, ...props } = Astro.props;
 
 const t = getTranslations();
 

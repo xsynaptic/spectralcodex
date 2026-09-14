@@ -9,38 +9,38 @@ describe('validateImageFeaturedLinks', () => {
 	test('passes when every featured image link names a known entry', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-post',
 				data: { imageFeatured: [{ id: 'photo.jpg', link: 'existing-place' }] },
+				id: 'a-post',
 			}),
 		];
 
 		expect(validateImageFeaturedLinks(entries, validTargets)).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'Featured image links resolve to existing content',
-			issues: [],
 		});
 	});
 
 	test('flags a link to an unknown entry, naming the file', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-post',
-				filePath: 'posts/a-post.mdx',
 				data: { imageFeatured: [{ id: 'photo.jpg', link: 'missing-place' }] },
+				filePath: 'posts/a-post.mdx',
+				id: 'a-post',
 			}),
 		];
 
 		expect(validateImageFeaturedLinks(entries, validTargets)).toEqual({
+			issues: [{ message: 'posts/a-post.mdx: unmatched imageFeatured link "missing-place"' }],
 			status: 'fail',
 			summary: 'Found 1 unmatched imageFeatured link(s)',
-			issues: [{ message: 'posts/a-post.mdx: unmatched imageFeatured link "missing-place"' }],
 		});
 	});
 
 	test('ignores featured images without a link, in string and object form', () => {
 		const entries = [
-			makeEntry({ id: 'a', data: { imageFeatured: 'photo.jpg' } }),
-			makeEntry({ id: 'b', data: { imageFeatured: ['photo.jpg', { id: 'other.jpg' }] } }),
+			makeEntry({ data: { imageFeatured: 'photo.jpg' }, id: 'a' }),
+			makeEntry({ data: { imageFeatured: ['photo.jpg', { id: 'other.jpg' }] }, id: 'b' }),
 		];
 
 		expect(validateImageFeaturedLinks(entries, validTargets).status).toBe('pass');

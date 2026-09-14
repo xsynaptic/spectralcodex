@@ -38,15 +38,15 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'output-path': {
-			type: 'string',
-			short: 'o',
-			default: 'public/divisions',
-		},
 		'cache-path': {
-			type: 'string',
-			short: 'c',
 			default: './.cache/divisions',
+			short: 'c',
+			type: 'string',
+		},
+		'output-path': {
+			default: 'public/divisions',
+			short: 'o',
+			type: 'string',
 		},
 	},
 });
@@ -71,7 +71,7 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 		const isNeedsSvg = !(await isExistingFile(svgPath));
 
 		if (isNeedsFgb || isNeedsSvg) {
-			processingNeeds.push({ region, needsFgb: isNeedsFgb, needsSvg: isNeedsSvg });
+			processingNeeds.push({ needsFgb: isNeedsFgb, needsSvg: isNeedsSvg, region });
 		}
 	}
 
@@ -79,15 +79,15 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 }
 
 async function didProcessRegion({
-	needs,
 	divisionsById,
+	needs,
 	regionsById,
 }: {
 	divisionsById: Map<string, DivisionItem>;
 	needs: RegionProcessingNeeds;
 	regionsById: Map<string, RegionMetadata>;
 }) {
-	const { region, needsFgb, needsSvg } = needs;
+	const { needsFgb, needsSvg, region } = needs;
 
 	const divisionItems: Array<DivisionItem> = [];
 
@@ -126,8 +126,8 @@ async function didProcessRegion({
 		await saveSvg({
 			geojsonData: divisionFeatureCollection as DivisionFeatureCollection,
 			id: region.id,
-			outputDir: cachePath,
 			options: divisionClippingBBox ? { divisionClippingBBox } : {},
+			outputDir: cachePath,
 		});
 	} else {
 		console.log(chalk.gray(`  Skipping SVG (already exists): ${chalk.cyan(region.id)}`));
@@ -199,9 +199,9 @@ async function mapDivisions() {
 		// Process only regions with division IDs
 		const successCount = await processRegions({
 			db: connection,
+			overtureUrl,
 			regions: regionsWithDivisionIds,
 			regionsById,
-			overtureUrl,
 		});
 
 		connection.disconnectSync();
@@ -227,11 +227,11 @@ async function mapDivisions() {
 }
 
 async function processBBoxGroup({
-	db,
 	bboxNeeds,
-	selectionBBox,
-	regionsById,
+	db,
 	overtureUrl,
+	regionsById,
+	selectionBBox,
 }: {
 	bboxNeeds: Array<RegionProcessingNeeds>;
 	db: DuckDBConnection;
@@ -242,11 +242,11 @@ async function processBBoxGroup({
 	const divisionIds = new Set(bboxNeeds.flatMap(({ region }) => region.divisionIds));
 
 	const divisionsById = await fetchDivisionData({
+		cachePath,
 		db,
 		divisionIds,
-		selectionBBox,
-		cachePath,
 		overtureUrl,
+		selectionBBox,
 	});
 
 	let successCount = 0;
@@ -256,7 +256,7 @@ async function processBBoxGroup({
 
 		// One bad region should not abort the run
 		try {
-			if (await didProcessRegion({ needs, divisionsById, regionsById })) {
+			if (await didProcessRegion({ divisionsById, needs, regionsById })) {
 				successCount++;
 			}
 		} catch (error) {
@@ -269,9 +269,9 @@ async function processBBoxGroup({
 
 async function processRegions({
 	db,
+	overtureUrl,
 	regions,
 	regionsById,
-	overtureUrl,
 }: {
 	db: DuckDBConnection;
 	overtureUrl: string;
@@ -314,11 +314,11 @@ async function processRegions({
 		);
 
 		successCount += await processBBoxGroup({
-			db,
 			bboxNeeds,
-			selectionBBox,
-			regionsById,
+			db,
 			overtureUrl,
+			regionsById,
+			selectionBBox,
 		});
 	}
 

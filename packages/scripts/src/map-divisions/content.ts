@@ -30,8 +30,8 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 			: [];
 
 		regions.push({
-			id,
 			divisionIds,
+			id,
 			regionPathIds,
 			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
 			...(divisionClippingBBox ? { divisionClippingBBox } : {}),

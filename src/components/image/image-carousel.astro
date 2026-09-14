@@ -10,7 +10,7 @@ interface Props {
 	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 }
 
-const { imageFeaturedGroup, class: className } = Astro.props;
+const { class: className, imageFeaturedGroup } = Astro.props;
 
 const t = getTranslations();
 ---

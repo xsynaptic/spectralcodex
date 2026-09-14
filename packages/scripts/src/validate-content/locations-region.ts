@@ -28,7 +28,7 @@ export function collectLocationsRegionsIssues(entries: Array<ContentEntry>) {
 		const expectedRegion = hierarchy.at(-2) ?? 'unknown';
 
 		if (firstRegion !== expectedRegion) {
-			issues.push({ filename, expectedRegion, foundRegion: firstRegion, hierarchy });
+			issues.push({ expectedRegion, filename, foundRegion: firstRegion, hierarchy });
 		}
 	}
 
@@ -40,15 +40,15 @@ export function validateLocationsRegions(entries: Array<ContentEntry>) {
 
 	return toValidationResult(
 		issues.map((issue) => ({
-			message: issue.filename,
 			details: [
 				`Expected region: ${issue.expectedRegion}, Found: ${issue.foundRegion}`,
 				`Directory path: ${issue.hierarchy.join(' → ')}`,
 			],
+			message: issue.filename,
 		})),
 		{
-			pass: `${entries.length.toString()} location regions valid`,
 			fail: `Found ${issues.length.toString()} region mismatch(es)`,
+			pass: `${entries.length.toString()} location regions valid`,
 		},
 	);
 }

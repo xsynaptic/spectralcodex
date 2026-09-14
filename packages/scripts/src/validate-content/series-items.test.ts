@@ -5,40 +5,40 @@ import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 const validTargets = [
 	makeEntry({ id: 'a-location' }),
-	makeEntry({ id: 'a-post', collection: 'posts' }),
+	makeEntry({ collection: 'posts', id: 'a-post' }),
 ];
 
 describe('validateSeriesItems', () => {
 	test('passes when every item names a known entry across collections', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-series',
 				collection: 'series',
 				data: { seriesItems: ['a-location', 'a-post'] },
+				id: 'a-series',
 			}),
 		];
 
 		expect(validateSeriesItems(entries, validTargets)).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'Series items valid',
-			issues: [],
 		});
 	});
 
 	test('flags an unknown item, naming the file', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-series',
 				collection: 'series',
-				filePath: 'series/a-series.mdx',
 				data: { seriesItems: ['a-location', 'vanished'] },
+				filePath: 'series/a-series.mdx',
+				id: 'a-series',
 			}),
 		];
 
 		expect(validateSeriesItems(entries, validTargets)).toEqual({
+			issues: [{ message: 'series/a-series.mdx: unknown series item "vanished"' }],
 			status: 'fail',
 			summary: 'Found 1 unknown series item(s)',
-			issues: [{ message: 'series/a-series.mdx: unknown series item "vanished"' }],
 		});
 	});
 });

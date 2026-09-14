@@ -25,7 +25,7 @@ const t = getTranslations();
 
 {locations.length > 0 ? (
 	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
-		{locations.map(({ url, title, titleMultilingual, distanceDisplay }) => (
+		{locations.map(({ distanceDisplay, title, titleMultilingual, url }) => (
 			<ListColumnItem>
 				<Anchor href={url}>{title}</Anchor>
 				{titleMultilingual ? (

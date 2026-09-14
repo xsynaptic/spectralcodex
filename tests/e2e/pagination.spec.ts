@@ -74,7 +74,7 @@ test.describe('pagination select', () => {
 
 test.describe('pagination select on a coarse pointer', () => {
 	// A device descriptor cannot go in a describe; these are what make the pointer coarse
-	test.use({ viewport: { width: 393, height: 851 }, hasTouch: true, isMobile: true });
+	test.use({ hasTouch: true, isMobile: true, viewport: { height: 851, width: 393 } });
 
 	test('a pointer-driven change still waits for Go', async ({ page }) => {
 		await page.goto(paths.locationsIndex, { waitUntil: 'domcontentloaded' });

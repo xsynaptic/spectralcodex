@@ -64,36 +64,34 @@ const clusterRampDeep = [
 // Numeric labels for clusters
 function getClustersLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
 	return {
-		id: MapLayerIdEnum.ClustersLabel,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
 		filter: ['has', 'point_count'],
+		id: MapLayerIdEnum.ClustersLabel,
 		layout: {
+			'text-allow-overlap': true,
 			'text-field': '{point_count_abbreviated}',
 			'text-font': ['Noto Sans Medium'],
+			'text-ignore-placement': true,
 			'text-size': [
 				'case',
 				['==', ['concat', 'cluster-', ['get', 'cluster_id']], hoveredId ?? ''],
 				12,
 				10,
 			],
-			'text-allow-overlap': true,
-			'text-ignore-placement': true,
 		},
 		paint: {
 			'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
 			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
 			'text-halo-width': 1,
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
 	} satisfies SymbolLayerSpecification;
 }
 
 function getClustersLayerStyle(isDarkMode: boolean) {
 	return {
-		id: MapLayerIdEnum.Clusters,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'circle',
 		filter: ['has', 'point_count'],
+		id: MapLayerIdEnum.Clusters,
 		layout: {
 			// Sort clusters by point count, descending
 			'circle-sort-key': ['-', ['get', 'point_count']],
@@ -111,9 +109,11 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 				60,
 				['case', hoverStateExpression, 14, 12],
 			],
-			'circle-stroke-width': 1,
 			'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
+			'circle-stroke-width': 1,
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
 	} satisfies CircleLayerSpecification;
 }
 
@@ -121,14 +121,12 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 // TODO: this still needs to be implemented but we haven't yet come up with a good design
 function getPointsImageLayerStyle(spritesPrefix: string) {
 	return {
-		id: MapLayerIdEnum.PointsImage,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
 		filter: [
 			'all',
 			['!', ['has', 'point_count']], // Not a cluster
 			['boolean', ['get', 'hasImage']], // Has featured image
 		],
+		id: MapLayerIdEnum.PointsImage,
 		layout: {
 			'icon-image': ['concat', spritesPrefix, ':', 'diamond'],
 			'icon-size': [
@@ -150,27 +148,27 @@ function getPointsImageLayerStyle(spritesPrefix: string) {
 		paint: {
 			'icon-color': ['case', selectStateExpression, tailwindColors.red500, tailwindColors.red600],
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
 	} satisfies SymbolLayerSpecification;
 }
 
 // Text labels for individual points on hover
 function getPointsLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
 	return {
-		id: MapLayerIdEnum.PointsLabel,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
 		filter: [
 			'all',
 			['!', ['has', 'point_count']], // Not a cluster
 			['==', ['get', 'id'], hoveredId ?? ''], // Only when hovered; filters can't read feature-state
 		],
+		id: MapLayerIdEnum.PointsLabel,
 		layout: {
 			'text-field': ['get', 'title'],
 			'text-font': ['Noto Sans Medium'],
-			'text-size': 11,
 			'text-ignore-placement': true,
 			'text-justify': 'auto',
 			'text-max-width': 20,
+			'text-size': 11,
 			'text-variable-anchor': ['bottom', 'right'],
 			// We'd like to interpolate these values but there is a type issue with MapLibre
 			'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
@@ -180,16 +178,16 @@ function getPointsLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undef
 			'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
 			'text-halo-width': 1.2,
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
 	} satisfies SymbolLayerSpecification;
 }
 
 // Visual points for unfiltered (zoomed-in) points
 function getPointsLayerStyle(isDarkMode: boolean) {
 	return {
-		id: MapLayerIdEnum.Points,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'circle',
 		filter: ['!', ['has', 'point_count']],
+		id: MapLayerIdEnum.Points,
 		paint: {
 			'circle-color': [
 				'match',
@@ -212,14 +210,16 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 				18,
 				['case', selectStateExpression, 12, hoverStateExpression, 9, 8],
 			],
-			'circle-stroke-width': 1,
 			'circle-stroke-color': [
 				'match',
 				['string', ['get', 'status']],
 				...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
 				'gray',
 			],
+			'circle-stroke-width': 1,
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
 	} satisfies CircleLayerSpecification;
 }
 
@@ -227,10 +227,8 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 // Note: this has to be instantiated first to be underneath the main point
 function getPointsTargetLayerStyle(isDarkMode: boolean) {
 	return {
-		id: MapLayerIdEnum.PointsTarget,
-		source: MapSourceIdEnum.PointCollection,
-		type: 'circle',
 		filter: ['!', ['has', 'point_count']],
+		id: MapLayerIdEnum.PointsTarget,
 		paint: {
 			'circle-color': [
 				'match',
@@ -255,6 +253,8 @@ function getPointsTargetLayerStyle(isDarkMode: boolean) {
 				['case', selectStateExpression, 24, hoverStateExpression, 21, 20],
 			],
 		},
+		source: MapSourceIdEnum.PointCollection,
+		type: 'circle',
 	} satisfies CircleLayerSpecification;
 }
 
@@ -294,9 +294,9 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 		[MapLayerIdEnum.Clusters]: clustersLayerStyle,
 		[MapLayerIdEnum.ClustersLabel]: clustersLabelLayerStyle,
 		[MapLayerIdEnum.Points]: pointsLayerStyle,
-		[MapLayerIdEnum.PointsTarget]: pointsTargetLayerStyle,
 		[MapLayerIdEnum.PointsImage]: pointsImageLayerStyle,
 		[MapLayerIdEnum.PointsLabel]: pointsLabelLayerStyle,
+		[MapLayerIdEnum.PointsTarget]: pointsTargetLayerStyle,
 	};
 }
 
@@ -311,7 +311,7 @@ export const MapSourcePoints: FC<{
 	hasMapIcons: boolean;
 	interactive: boolean;
 	targetIds?: Array<string> | undefined;
-}> = memo(function MapPointLayerContents({ data, interactive, hasMapIcons, targetIds }) {
+}> = memo(function MapPointLayerContents({ data, hasMapIcons, interactive, targetIds }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
@@ -332,10 +332,10 @@ export const MapSourcePoints: FC<{
 
 		return {
 			cluster: interactive,
-			clusterRadius: 13, // How much space to provide for clusters; lower number = higher density
 			clusterMaxZoom: 14, // Max zoom to cluster points on
 			clusterMinPoints: 2, // Minimum number of points to cluster
 			clusterProperties,
+			clusterRadius: 13, // How much space to provide for clusters; lower number = higher density
 		};
 	}, [interactive, targetIds]);
 

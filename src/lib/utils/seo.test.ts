@@ -27,25 +27,25 @@ describe('getSeoArticleProps', () => {
 		const dateUpdated = new Date(Date.UTC(2021, 5, 2, 8));
 
 		expect(getSeoArticleProps({ dateCreated, dateUpdated })).toStrictEqual({
-			ogType: 'article',
 			article: {
-				publishedTime: '2020-01-01T12:30:00.000Z',
 				modifiedTime: '2021-06-02T08:00:00.000Z',
+				publishedTime: '2020-01-01T12:30:00.000Z',
 			},
+			ogType: 'article',
 		});
 	});
 });
 
 describe('getSeoImageProps', () => {
 	test('returns an absolute URL, since crawlers do not resolve relative card images', () => {
-		const { url } = getSeoImageProps({ id: 'some-post', alt: 'Some post' });
+		const { url } = getSeoImageProps({ alt: 'Some post', id: 'some-post' });
 
 		expect(url.startsWith(`${site}/`)).toBe(true);
 	});
 
 	test('flattens a nested id so the card path stays one segment deep', () => {
-		const nested = getSeoImageProps({ id: 'taiwan/taipei/some-location', alt: 'Alt' });
-		const flat = getSeoImageProps({ id: 'taiwan-taipei-some-location', alt: 'Alt' });
+		const nested = getSeoImageProps({ alt: 'Alt', id: 'taiwan/taipei/some-location' });
+		const flat = getSeoImageProps({ alt: 'Alt', id: 'taiwan-taipei-some-location' });
 
 		expect(nested.url).toBe(flat.url);
 	});
@@ -53,11 +53,11 @@ describe('getSeoImageProps', () => {
 	test('carries the deployment base path', () => {
 		vi.stubEnv('BASE_URL', '/preview/');
 
-		expect(getSeoImageProps({ id: 'some-post', alt: 'Alt' }).url).toContain('/preview/');
+		expect(getSeoImageProps({ alt: 'Alt', id: 'some-post' }).url).toContain('/preview/');
 	});
 
 	test('passes alt text through unchanged', () => {
-		expect(getSeoImageProps({ id: 'some-post', alt: 'A caption' }).alt).toBe('A caption');
+		expect(getSeoImageProps({ alt: 'A caption', id: 'some-post' }).alt).toBe('A caption');
 	});
 });
 
@@ -69,6 +69,6 @@ describe('getSeoHideSearch', () => {
 	});
 
 	test('hiding sets both directives, since noindex alone still passes link equity', () => {
-		expect(getSeoHideSearch(true)).toStrictEqual({ noIndex: true, noFollow: true });
+		expect(getSeoHideSearch(true)).toStrictEqual({ noFollow: true, noIndex: true });
 	});
 });

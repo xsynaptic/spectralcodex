@@ -18,11 +18,11 @@ function makeItems(
 ) {
 	return Array.from({ length: count }, (_, index) =>
 		makeCatalogItem({
-			id: `${collection}-${String(index)}`,
 			collection,
-			imageId: 'featured-image',
-			imageHeroId: 'hero-image',
 			dateCreated: new Date(2020, 0, index + 1),
+			id: `${collection}-${String(index)}`,
+			imageHeroId: 'hero-image',
+			imageId: 'featured-image',
 			...overrides,
 		}),
 	);
@@ -39,8 +39,8 @@ const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 describe('queryHomeData quality filter', () => {
 	test('the quality bar is inclusive, cutting only what sits below it', async () => {
 		const data = await queryWith([
-			makeCatalogItem({ id: 'at-bar', collection: 'posts', entryQuality: 3, imageId: 'i' }),
-			makeCatalogItem({ id: 'below-bar', collection: 'posts', entryQuality: 2, imageId: 'i' }),
+			makeCatalogItem({ collection: 'posts', entryQuality: 3, id: 'at-bar', imageId: 'i' }),
+			makeCatalogItem({ collection: 'posts', entryQuality: 2, id: 'below-bar', imageId: 'i' }),
 		]);
 
 		expect(ids(data.recentCatalogItems)).toStrictEqual(['at-bar']);
@@ -51,11 +51,11 @@ describe('queryHomeData featured items', () => {
 	test('a legacy hero is never featured, however good the entry', async () => {
 		const data = await queryWith([
 			makeCatalogItem({
-				id: 'legacy',
 				collection: 'posts',
 				entryQuality: 5,
-				imageId: 'featured-image',
+				id: 'legacy',
 				imageHeroId: 'errata/old-scan',
+				imageId: 'featured-image',
 			}),
 			...makeItems('locations', 1),
 		]);
@@ -82,17 +82,17 @@ describe('queryHomeData recent items', () => {
 	test('an updated entry outranks a newer one that was never revised', async () => {
 		const data = await queryWith([
 			makeCatalogItem({
-				id: 'created-later',
 				collection: 'posts',
-				imageId: 'i',
 				dateCreated: new Date(2024, 0, 1),
+				id: 'created-later',
+				imageId: 'i',
 			}),
 			makeCatalogItem({
-				id: 'updated-later',
 				collection: 'posts',
-				imageId: 'i',
 				dateCreated: new Date(2019, 0, 1),
 				dateUpdated: new Date(2025, 0, 1),
+				id: 'updated-later',
+				imageId: 'i',
 			}),
 		]);
 
@@ -125,11 +125,11 @@ describe('queryHomeData taxonomy items', () => {
 		const data = await queryWith([
 			...makeItems('series', 6, { entryQuality: 3 }),
 			makeCatalogItem({
-				id: 'best-series',
 				collection: 'series',
-				entryQuality: 5,
-				imageId: 'featured-image',
 				dateCreated: new Date(2010, 0, 1),
+				entryQuality: 5,
+				id: 'best-series',
+				imageId: 'featured-image',
 			}),
 			...makeItems('themes', 10, { entryQuality: 4 }),
 		]);

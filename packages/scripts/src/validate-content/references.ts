@@ -96,5 +96,5 @@ function toEntryReference(
 ): EntryReference | undefined {
 	if (typeof record.collection !== 'string' || typeof record.id !== 'string') return undefined;
 
-	return { field, collection: record.collection, id: record.id };
+	return { collection: record.collection, field, id: record.id };
 }

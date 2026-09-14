@@ -24,7 +24,7 @@ class CustomControl implements IControl {
 	#position: ControlPosition = 'top-left';
 	#redraw?: () => void;
 
-	constructor({ map, position, className, redraw }: CustomControlConfig) {
+	constructor({ className, map, position, redraw }: CustomControlConfig) {
 		this.#map = map;
 		this.#position = position;
 		if (className !== undefined) this.#className = className;
@@ -63,12 +63,12 @@ class CustomControl implements IControl {
 }
 
 export const CustomControlPortal = memo(function CustomControlPortal({
-	position,
-	className,
 	children,
+	className,
+	position,
 }: CustomControlProps) {
 	const customControl = useControl<CustomControl>(
-		({ map }) => new CustomControl({ map: map.getMap(), position, className }),
+		({ map }) => new CustomControl({ className, map: map.getMap(), position }),
 	);
 
 	const map = customControl.getMap();

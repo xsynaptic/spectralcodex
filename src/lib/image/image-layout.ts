@@ -37,10 +37,10 @@ export function getImageBreakpoints({
 }
 
 export function getImageInferredWidth({
-	width,
+	context = ImageContextEnum.Single,
 	height,
 	layout,
-	context = ImageContextEnum.Single,
+	width,
 }: {
 	context?: ImageContext | undefined;
 	height?: number | undefined;
@@ -49,15 +49,15 @@ export function getImageInferredWidth({
 }) {
 	// Images inside a group fill a cell or slide, so size them by orientation rather than layout
 	if (context !== ImageContextEnum.Single) {
-		switch (getImageOrientation({ width, height })) {
+		switch (getImageOrientation({ height, width })) {
 			case ImageOrientationEnum.Portrait: {
-				return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Medium };
+				return { height: ImageSizeEnum.Medium, width: ImageSizeEnum.Small };
 			}
 			case ImageOrientationEnum.Square: {
-				return { width: ImageSizeEnum.Small, height: ImageSizeEnum.Small };
+				return { height: ImageSizeEnum.Small, width: ImageSizeEnum.Small };
 			}
 			default: {
-				return { width: ImageSizeEnum.Medium, height: ImageSizeEnum.Small };
+				return { height: ImageSizeEnum.Small, width: ImageSizeEnum.Medium };
 			}
 		}
 	}
@@ -65,10 +65,10 @@ export function getImageInferredWidth({
 	switch (layout) {
 		case ImageLayoutEnum.Full:
 		case ImageLayoutEnum.Wide: {
-			return { width: ImageSizeEnum.ExtraLarge, height: ImageSizeEnum.Large };
+			return { height: ImageSizeEnum.Large, width: ImageSizeEnum.ExtraLarge };
 		}
 		default: {
-			return { width: ImageSizeEnum.Large, height: ImageSizeEnum.Medium };
+			return { height: ImageSizeEnum.Medium, width: ImageSizeEnum.Large };
 		}
 	}
 }
@@ -110,8 +110,8 @@ export function getImageLayoutSizesProp(
 
 // A simple check for image orientation
 function getImageOrientation({
-	width,
 	height,
+	width,
 }: {
 	height?: number | undefined;
 	width: number;

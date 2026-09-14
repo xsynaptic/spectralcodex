@@ -17,15 +17,15 @@ import { getDateDisplay } from '#lib/utils/date.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 export const buildStatsLayout = {
-	width: 900,
+	axisHeight: 40,
+	durationHeight: 250,
+	headingY: 13,
 	marginLeft: 48,
 	marginRight: 62,
-	headingY: 13,
-	top: 26,
-	durationHeight: 250,
-	pagesHeight: 130,
-	axisHeight: 40,
 	monthLabelOffset: 18,
+	pagesHeight: 130,
+	top: 26,
+	width: 900,
 	yearLabelOffset: 32,
 } as const;
 
@@ -33,15 +33,15 @@ const plotRight = buildStatsLayout.width - buildStatsLayout.marginRight;
 
 // Durations a reader already thinks in; log ticks are powers of ten, which mean nothing for time
 const durationTicks = [
-	{ seconds: 30, label: '30s' },
-	{ seconds: 60, label: '1m' },
-	{ seconds: 120, label: '2m' },
-	{ seconds: 300, label: '5m' },
-	{ seconds: 900, label: '15m' },
-	{ seconds: 1800, label: '30m' },
-	{ seconds: 3600, label: '1h' },
-	{ seconds: 7200, label: '2h' },
-	{ seconds: 14_400, label: '4h' },
+	{ label: '30s', seconds: 30 },
+	{ label: '1m', seconds: 60 },
+	{ label: '2m', seconds: 120 },
+	{ label: '5m', seconds: 300 },
+	{ label: '15m', seconds: 900 },
+	{ label: '30m', seconds: 1800 },
+	{ label: '1h', seconds: 3600 },
+	{ label: '2h', seconds: 7200 },
+	{ label: '4h', seconds: 14_400 },
 ];
 
 // Roughly the width of a label, so it doubles as the gap at which two of them would overlap
@@ -57,8 +57,8 @@ const pagesTickCount = 4;
 const tooltipDateOptions = {
 	day: 'numeric',
 	month: 'long',
-	year: 'numeric',
 	timeZone: 'UTC',
+	year: 'numeric',
 } as const satisfies Intl.DateTimeFormatOptions;
 
 export interface ChartFrame {
@@ -70,7 +70,7 @@ export interface ChartFrame {
 function getChartFrame(plotHeight: number): ChartFrame {
 	const bottom = buildStatsLayout.top + plotHeight;
 
-	return { top: buildStatsLayout.top, bottom, height: bottom + buildStatsLayout.axisHeight };
+	return { bottom, height: bottom + buildStatsLayout.axisHeight, top: buildStatsLayout.top };
 }
 
 export const durationFrame = getChartFrame(buildStatsLayout.durationHeight);
@@ -166,13 +166,13 @@ export function getBuildStatsGeometry(
 		const median = trendByDay.get(getUtcDayStart(time));
 
 		return {
-			x: round(getX(time)),
-			y: round(durationScale(record.durationSeconds)),
 			values: [
 				getDateDisplay(new Date(time), undefined, tooltipDateOptions),
 				formatBuildDuration(record.durationSeconds),
 				median === undefined ? '' : formatBuildDuration(median),
 			],
+			x: round(getX(time)),
+			y: round(durationScale(record.durationSeconds)),
 		};
 	});
 
@@ -184,22 +184,14 @@ export function getBuildStatsGeometry(
 
 	return {
 		axisTicks: utcMonth.range(new Date(domainStart), new Date(lastTime)).map((month, index) => ({
-			x: round(getX(month.getTime())),
 			label: month.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+			x: round(getX(month.getTime())),
 			// Anywhere but the opening tick and each January, the year is noise
 			yearLabel:
 				index === 0 || month.getUTCMonth() === 0 ? String(month.getUTCFullYear()) : undefined,
 		})),
 		duration: {
-			ticks: durationTicks
-				.filter((tick) => tick.seconds >= durationDomainMin && tick.seconds <= durationDomainMax)
-				.map((tick) => ({ y: round(durationScale(tick.seconds)), label: tick.label })),
-			points: durationPoints,
-			trendPath: getPolylinePath(
-				trend.map((point) =>
-					point === undefined ? undefined : { x: getX(point.time), y: durationScale(point.value) },
-				),
-			),
+			annotations: getAnnotationMarks(getBuildAnnotations(records), getX),
 			end: trendEnd
 				? {
 						cx: round(getX(trendEnd.time)),
@@ -207,7 +199,15 @@ export function getBuildStatsGeometry(
 						label: formatBuildDuration(trendEnd.value),
 					}
 				: undefined,
-			annotations: getAnnotationMarks(getBuildAnnotations(records), getX),
+			points: durationPoints,
+			ticks: durationTicks
+				.filter((tick) => tick.seconds >= durationDomainMin && tick.seconds <= durationDomainMax)
+				.map((tick) => ({ label: tick.label, y: round(durationScale(tick.seconds)) })),
+			trendPath: getPolylinePath(
+				trend.map((point) =>
+					point === undefined ? undefined : { x: getX(point.time), y: durationScale(point.value) },
+				),
+			),
 		},
 		pages: getPagesGeometry(pagePoints, getX),
 	};
@@ -235,13 +235,13 @@ function getAnnotationMarks(
 		tierLastX[tier] = x;
 
 		marks.push({
-			x: round(x),
+			label: annotation.label,
 			// Hung left so the closing mark cannot run off the plot, clamped so the opening one cannot either
 			labelX: round(
 				Math.max(x - annotationLabelGap, buildStatsLayout.marginLeft + annotationTierGap),
 			),
 			labelY: durationFrame.top + 14 + tier * 17,
-			label: annotation.label,
+			x: round(x),
 		});
 	}
 
@@ -271,22 +271,22 @@ function getPagesGeometry(
 	);
 
 	return {
-		ticks: scale.ticks(pagesTickCount).map((value) => ({
-			y: round(scale(value)),
-			label: formatPageCount(value),
-		})),
+		// The baseline is flat, so the fill closes in two commands rather than retracing the series
+		areaPath: `${linePath}L${String(round(lastX))},${String(pagesFrame.bottom)}L${String(round(firstX))},${String(pagesFrame.bottom)}Z`,
+		end: { cx: round(lastX), cy: round(scale(last.value)), label: formatPageCount(last.value) },
+		linePath,
 		points: points.map((point) => ({
-			x: round(getX(point.time)),
-			y: round(scale(point.value)),
 			values: [
 				getDateDisplay(new Date(point.time), undefined, tooltipDateOptions),
 				formatPageCount(point.value),
 			],
+			x: round(getX(point.time)),
+			y: round(scale(point.value)),
 		})),
-		linePath,
-		// The baseline is flat, so the fill closes in two commands rather than retracing the series
-		areaPath: `${linePath}L${String(round(lastX))},${String(pagesFrame.bottom)}L${String(round(firstX))},${String(pagesFrame.bottom)}Z`,
-		end: { cx: round(lastX), cy: round(scale(last.value)), label: formatPageCount(last.value) },
+		ticks: scale.ticks(pagesTickCount).map((value) => ({
+			label: formatPageCount(value),
+			y: round(scale(value)),
+		})),
 	};
 }
 

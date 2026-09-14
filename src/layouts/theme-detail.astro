@@ -29,7 +29,7 @@ interface Props {
 	relatedThemeIds: Array<string>;
 }
 
-const { entry, mapData, catalogItems, catalogItemsCount, backlinksCount, relatedThemeIds, page } =
+const { backlinksCount, catalogItems, catalogItemsCount, entry, mapData, page, relatedThemeIds } =
 	Astro.props;
 
 const regionIds = entry.data.regions?.map(({ id }) => id);

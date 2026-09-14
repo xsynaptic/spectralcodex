@@ -68,7 +68,7 @@ void startContainers();
 const astroBinPath = path.join(rootPath, 'node_modules', '.bin', 'astro');
 
 try {
-	await $({ stdio: 'inherit', cwd: rootPath })`${astroBinPath} dev`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`${astroBinPath} dev`;
 } catch {
 	// astro dev exited (Ctrl+C or crash); fall through to teardown
 }

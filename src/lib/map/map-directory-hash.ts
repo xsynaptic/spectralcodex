@@ -1,5 +1,6 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 
+import { mapCodecTables } from '@spectralcodex/map-codec';
 import { hash } from 'ohash';
 
 import { hashShortLength } from '#constants.ts';
@@ -9,5 +10,5 @@ export function hashMapDirectoryData(
 	directory: Array<MapSourceItem>,
 	chunks: Map<string, Array<MapPopupItem>>,
 ): string {
-	return hash({ directory, chunks: [...chunks] }).slice(0, hashShortLength);
+	return hash({ chunks: [...chunks], codec: mapCodecTables, directory }).slice(0, hashShortLength);
 }

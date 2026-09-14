@@ -25,8 +25,8 @@ export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 			message: `${file}: featured image(s) not in body: ${missingIds.join(', ')}`,
 		})),
 		{
-			pass: 'Featured images present in body content',
 			fail: `Found ${orphans.length.toString()} entries with featured images missing from body content`,
+			pass: 'Featured images present in body content',
 		},
 	);
 }

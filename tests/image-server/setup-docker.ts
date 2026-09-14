@@ -34,7 +34,6 @@ export async function setup() {
 			`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" up -d`,
 			{
 				cwd: projectRoot,
-				stdio: 'pipe',
 				env: {
 					...process.env,
 					// Absolute paths required for Docker
@@ -42,6 +41,7 @@ export async function setup() {
 					IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
 					IMAGE_SERVER_SECRET,
 				},
+				stdio: 'pipe',
 			},
 		);
 	} catch (error) {
@@ -79,12 +79,12 @@ export function teardown() {
 	try {
 		execSync(`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" down`, {
 			cwd: projectRoot,
-			stdio: 'pipe',
 			env: {
 				...process.env,
 				CONTENT_MEDIA_PATH: path.resolve(projectRoot, 'packages/content-demo/media'),
 				IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
 			},
+			stdio: 'pipe',
 		});
 		console.log('[Test] Docker containers stopped');
 	} catch {

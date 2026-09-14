@@ -35,13 +35,13 @@ export function loadDeployConfig(): DeployConfig {
 	const env = readRequiredEnvVars();
 
 	return {
+		imageServerUrl: env.IMAGE_SERVER_URL,
+		mediaPath: env.DEPLOY_MEDIA_PATH,
 		remoteHost: env.DEPLOY_REMOTE_HOST,
 		remotePath: env.DEPLOY_REMOTE_PATH,
-		sshKeyPath: process.env.DEPLOY_SSH_KEY_PATH ?? '',
 		sitePath: env.DEPLOY_SITE_PATH,
 		siteUrl: env.PROD_SERVER_URL,
-		mediaPath: env.DEPLOY_MEDIA_PATH,
-		imageServerUrl: env.IMAGE_SERVER_URL,
+		sshKeyPath: process.env.DEPLOY_SSH_KEY_PATH ?? '',
 	};
 }
 

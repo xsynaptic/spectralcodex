@@ -31,7 +31,7 @@ describe('image server integration', () => {
 	});
 
 	test('signed request returns image bytes', async () => {
-		const response = await fetch(signedUrl(testImage, { width: 450, format: 'jpg', quality: 85 }));
+		const response = await fetch(signedUrl(testImage, { format: 'jpg', quality: 85, width: 450 }));
 		expect(response.status).toBe(200);
 		expect(response.headers.get('content-type')).toMatch(/^image\//);
 	});
@@ -47,7 +47,7 @@ describe('image server integration', () => {
 	test('tampered signature is rejected', async () => {
 		const unsignedPath = generate(
 			testImage,
-			{ width: 450, quality: 85, format: 'jpg' },
+			{ format: 'jpg', quality: 85, width: 450 },
 			{ unsafe: false },
 		);
 		const response = await fetch(
@@ -58,14 +58,14 @@ describe('image server integration', () => {
 
 	test('missing image returns 404', async () => {
 		const response = await fetch(
-			signedUrl('does/not/exist.jpg', { width: 450, format: 'jpg', quality: 85 }),
+			signedUrl('does/not/exist.jpg', { format: 'jpg', quality: 85, width: 450 }),
 		);
 		expect(response.status).toBe(404);
 	});
 
 	test('second hit on same URL is a cache HIT', async () => {
 		// Use a unique width so this test does not collide with the first signed-request test
-		const url = signedUrl(testImage, { width: 612, format: 'webp', quality: 70 });
+		const url = signedUrl(testImage, { format: 'webp', quality: 70, width: 612 });
 		await fetch(url);
 		const response = await fetch(url);
 		expect(response.status).toBe(200);
@@ -74,7 +74,7 @@ describe('image server integration', () => {
 
 	test('format filter actually changes output content-type', async () => {
 		const webpResponse = await fetch(
-			signedUrl(testImage, { width: 451, format: 'webp', quality: 70 }),
+			signedUrl(testImage, { format: 'webp', quality: 70, width: 451 }),
 		);
 		expect(webpResponse.status).toBe(200);
 		expect(webpResponse.headers.get('content-type')).toBe('image/webp');
@@ -83,7 +83,7 @@ describe('image server integration', () => {
 	// A malformed op silently returns the unresized original, which every other test here would pass
 	test('requested width is honored in the output image', async () => {
 		const width = 375;
-		const response = await fetch(signedUrl(testImage, { width, format: 'jpg', quality: 85 }));
+		const response = await fetch(signedUrl(testImage, { format: 'jpg', quality: 85, width }));
 		expect(response.status).toBe(200);
 
 		const metadata = await sharp(Buffer.from(await response.arrayBuffer())).metadata();

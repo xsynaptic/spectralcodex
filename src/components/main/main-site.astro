@@ -36,7 +36,7 @@ interface Props {
 	schemas?: Array<Thing>;
 }
 
-const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
+const { hasHeroImage = false, isHomepage = false, meta, schemas } = Astro.props;
 
 const siteUrl = getSitePath();
 
@@ -68,7 +68,7 @@ const t = getTranslations();
 		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
-		<Font cssVariable="--font-lora" preload={[{ subset: 'latin', style: 'normal' }]} />
+		<Font cssVariable="--font-lora" preload={[{ style: 'normal', subset: 'latin' }]} />
 		<ModeManagerSetup />
 		<Meta {...meta} />
 		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (

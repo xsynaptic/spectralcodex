@@ -7,7 +7,7 @@ const resourceEntries = [makeEntry({ id: 'existing-resource' })];
 
 describe('collectSourceIdIssues', () => {
 	test('accepts a source id that names a known resource', () => {
-		const entries = [makeEntry({ id: 'a-location', data: { sources: ['existing-resource'] } })];
+		const entries = [makeEntry({ data: { sources: ['existing-resource'] }, id: 'a-location' })];
 
 		expect(collectSourceIdIssues(entries, resourceEntries)).toEqual([]);
 	});
@@ -15,22 +15,22 @@ describe('collectSourceIdIssues', () => {
 	test('flags a dangling source id with its location', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-location',
-				filePath: 'locations/a-location.mdx',
 				data: { sources: ['missing-resource'] },
+				filePath: 'locations/a-location.mdx',
+				id: 'a-location',
 			}),
 		];
 
 		expect(collectSourceIdIssues(entries, resourceEntries)).toEqual([
-			{ location: 'locations/a-location.mdx', id: 'missing-resource' },
+			{ id: 'missing-resource', location: 'locations/a-location.mdx' },
 		]);
 	});
 
 	test('skips inline sources, which have no resource entry to name', () => {
 		const entries = [
 			makeEntry({
+				data: { sources: [{ resourceType: 'report', title: 'An uncatalogued report' }] },
 				id: 'a-location',
-				data: { sources: [{ title: 'An uncatalogued report', resourceType: 'report' }] },
 			}),
 		];
 
@@ -40,10 +40,10 @@ describe('collectSourceIdIssues', () => {
 	test('collects every broken id across a mixed sources array', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-location',
 				data: {
 					sources: ['missing-one', { title: 'Inline' }, 'existing-resource', 'missing-two'],
 				},
+				id: 'a-location',
 			}),
 		];
 

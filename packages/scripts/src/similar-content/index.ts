@@ -22,41 +22,41 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'cache-path': {
-			type: 'string',
-			default: './.cache',
-		},
 		'cache-name': {
-			type: 'string',
 			default: 'similar-content-cache',
-		},
-		'output-path': {
 			type: 'string',
+		},
+		'cache-path': {
 			default: './.cache',
-		},
-		'output-name': {
 			type: 'string',
-			default: 'similar-content.json',
-		},
-		'progress-count': {
-			type: 'string',
-			default: '50',
 		},
 		'character-limit': {
-			type: 'string',
 			default: '2500',
-		},
-		'result-count': {
 			type: 'string',
-			default: '20',
-		},
-		'min-score': {
-			type: 'string',
-			default: '0.4',
 		},
 		'clear-cache': {
-			type: 'boolean',
 			default: false,
+			type: 'boolean',
+		},
+		'min-score': {
+			default: '0.4',
+			type: 'string',
+		},
+		'output-name': {
+			default: 'similar-content.json',
+			type: 'string',
+		},
+		'output-path': {
+			default: './.cache',
+			type: 'string',
+		},
+		'progress-count': {
+			default: '50',
+			type: 'string',
+		},
+		'result-count': {
+			default: '20',
+			type: 'string',
 		},
 	},
 });
@@ -86,11 +86,11 @@ type SimilarContentResult = Record<string, Array<SimilarContentItem>>;
  * Note 2: different models have different dimensionalities and input limitations
  */
 const ModelsEnum = {
+	bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
+	gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
 	'mini-lm': 'Xenova/all-MiniLM-L6-v2', // 384 dimensional
 	'mini-lm-v4': 'onnx-community/all-MiniLM-L6-v2-ONNX', // 384 dimensional, v4-optimized
 	mpnet: 'Xenova/all-mpnet-base-v2', // 768 dimensional
-	bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
-	gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
 } as const;
 
 // English-only but fast; truncates input after 512 tokens (roughly 2500 characters)
@@ -115,13 +115,13 @@ function buildSimilarContentIndex(
 	options: { candidateCount: number; dimensions: number },
 ): SimilarContentIndex {
 	const index = new Index({
-		metric: MetricKind.Cos,
-		dimensions: options.dimensions,
 		connectivity: 16,
-		quantization: ScalarKind.F32,
+		dimensions: options.dimensions,
 		expansion_add: 128,
 		expansion_search: options.candidateCount * 2, // 2x improves recall without significant slowdown
+		metric: MetricKind.Cos,
 		multi: false,
+		quantization: ScalarKind.F32,
 	});
 	const keyToEmbedding = new Map<bigint, SimilarContentEmbedding>();
 
@@ -151,8 +151,8 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 	const candidateCount = Math.max(resultCount * 3, 50);
 
 	const { index, keyToEmbedding } = buildSimilarContentIndex(embeddings, {
-		dimensions: firstVector.length,
 		candidateCount,
+		dimensions: firstVector.length,
 	});
 
 	console.log(chalk.blue('Querying for similar content...'));
@@ -162,9 +162,9 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 
 	for (const current of embeddings) {
 		result[current.id] = querySimilarItems(current, {
+			candidateCount,
 			index,
 			keyToEmbedding,
-			candidateCount,
 			minScore,
 			resultCount,
 		});
@@ -210,15 +210,15 @@ async function createEmbedding(
 	digest: string,
 ): Promise<SimilarContentEmbedding> {
 	const plainTextContent = cleanContent(entry.body ?? '', entry.data);
-	const output = await embedder(plainTextContent, { pooling: 'mean', normalize: true });
+	const output = await embedder(plainTextContent, { normalize: true, pooling: 'mean' });
 
 	return {
-		id: entry.id,
-		digest,
 		collection: entry.collection,
+		digest,
+		id: entry.id,
 		metadata: {
-			themes: toReferenceIds(entry.data.themes),
 			regions: toReferenceIds(entry.data.regions),
+			themes: toReferenceIds(entry.data.themes),
 		},
 		vector: [...output.data] as Array<number>,
 	};
@@ -313,9 +313,9 @@ function querySimilarItems(
 	current: SimilarContentEmbedding,
 	options: SimilarContentQueryOptions,
 ): Array<SimilarContentItem> {
-	const { index, keyToEmbedding, candidateCount, minScore, resultCount } = options;
+	const { candidateCount, index, keyToEmbedding, minScore, resultCount } = options;
 
-	const { keys, distances } = index.search(new Float32Array(current.vector), candidateCount, 0);
+	const { distances, keys } = index.search(new Float32Array(current.vector), candidateCount, 0);
 
 	const candidates: Array<SimilarContentItem> = [];
 
@@ -334,8 +334,8 @@ function querySimilarItems(
 		const score = Math.round((similarity + (1 - similarity) * boost) * 10_000) / 10_000;
 
 		candidates.push({
-			id: other.id,
 			collection: other.collection,
+			id: other.id,
 			score,
 		});
 	}

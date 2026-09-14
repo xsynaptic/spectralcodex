@@ -50,7 +50,7 @@ export async function createQueryThemesEntryFunction() {
 
 		const restCandidates = catalog.resolve([...locationsListed, ...postsFiltered]);
 
-		const { catalogItemsFiltered, catalogItems, catalogItemsCount } = buildEntryCatalogItems(
+		const { catalogItems, catalogItemsCount, catalogItemsFiltered } = buildEntryCatalogItems(
 			featuredCandidates,
 			restCandidates,
 		);
@@ -58,14 +58,14 @@ export async function createQueryThemesEntryFunction() {
 		const themeIndex = themeIndexById.get(entry.id);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
+			chunkKeyById,
 			featureCollection: entry.data.hideMap
 				? undefined
 				: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
-			chunkKeyById,
+			mapId: `${entry.collection}/${entry.id}`,
 			version,
-			...(themeIndex === undefined ? {} : { scope: { type: 'theme', index: themeIndex } }),
+			...(themeIndex === undefined ? {} : { scope: { index: themeIndex, type: 'theme' } }),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -80,12 +80,12 @@ export async function createQueryThemesEntryFunction() {
 		const backlinksCount = catalog.backlinksOf(entry.id).length;
 
 		return {
-			catalogItemsFiltered,
+			backlinksCount,
 			catalogItems,
 			catalogItemsCount,
+			catalogItemsFiltered,
 			mapData,
 			relatedThemeIds,
-			backlinksCount,
 		};
 	};
 }

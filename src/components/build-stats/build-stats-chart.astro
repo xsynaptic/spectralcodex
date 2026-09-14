@@ -19,9 +19,9 @@ interface Props {
 	valueTicks: Array<ValueTick>;
 }
 
-const { series, label, ariaLabel, frame, axisTicks, valueTicks, tooltipRows, points } = Astro.props;
+const { ariaLabel, axisTicks, frame, label, points, series, tooltipRows, valueTicks } = Astro.props;
 
-const { width, marginLeft, marginRight, headingY, monthLabelOffset, yearLabelOffset } =
+const { headingY, marginLeft, marginRight, monthLabelOffset, width, yearLabelOffset } =
 	buildStatsLayout;
 
 const plotRight = width - marginRight;

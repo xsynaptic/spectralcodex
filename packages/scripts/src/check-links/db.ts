@@ -69,13 +69,13 @@ export function getStats(): LinkCheckStats {
 		.all() as Array<{ count: number; status: string }>;
 
 	const stats: LinkCheckStats = {
-		total: 0,
-		healthy: 0,
-		redirect: 0,
-		missing: 0,
 		blocked: 0,
 		error: 0,
+		healthy: 0,
+		missing: 0,
 		pending: 0,
+		redirect: 0,
+		total: 0,
 	};
 
 	for (const row of rows) {

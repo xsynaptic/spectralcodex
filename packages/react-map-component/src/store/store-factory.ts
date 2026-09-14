@@ -60,20 +60,20 @@ interface MapDataState {
 }
 
 const defaultMapDataState = {
-	selectedId: undefined,
+	entryQualityFilter: 1,
+	filterPosition: undefined,
 	hoveredId: undefined,
-	isPopupVisible: true,
 	isCanvasInteractive: true,
 	isCanvasLoading: true,
-	filterPosition: undefined,
 	isFilterOpen: false,
-	statusFilter: [],
-	entryQualityFilter: 1,
-	ratingFilter: 1,
-	objectiveFilter: 1,
 	isObjectiveFilterEnabled: false,
+	isPopupVisible: true,
 	languages: ['en'],
+	objectiveFilter: 1,
+	ratingFilter: 1,
 	scope: undefined,
+	selectedId: undefined,
+	statusFilter: [],
 } satisfies MapDataState;
 
 export function createMapStore(initialState?: Partial<MapDataConfigurableState>) {
@@ -88,18 +88,8 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 		return {
 			...state,
 			actions: {
-				setSelectedId: (selectedId) => {
-					set({
-						selectedId,
-						isFilterOpen: false,
-						...(selectedId === undefined ? { isPopupVisible: true } : {}),
-					});
-				},
-				setPopupVisible: (isPopupVisible) => {
-					set({ isPopupVisible });
-				},
-				setHoveredId: (hoveredId) => {
-					set({ hoveredId });
+				hideAllStatusFilter: () => {
+					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
 				},
 				setCanvasInteractive: (isCanvasInteractive) => {
 					set({ isCanvasInteractive });
@@ -107,14 +97,42 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				setCanvasLoading: (isCanvasLoading) => {
 					set({ isCanvasLoading });
 				},
-				setFilterPosition: (filterPosition) => {
-					set({ filterPosition });
+				setEntryQualityFilter: (entryQualityFilter) => {
+					setAndClearSelection({ entryQualityFilter });
 				},
 				setFilterOpen: (isFilterOpen) => {
 					setAndClearSelection({ isFilterOpen });
 				},
+				setFilterPosition: (filterPosition) => {
+					set({ filterPosition });
+				},
+				setHoveredId: (hoveredId) => {
+					set({ hoveredId });
+				},
+				setLanguages: (languages) => {
+					set({ languages });
+				},
+				setObjectiveFilter: (objectiveFilter) => {
+					setAndClearSelection({ objectiveFilter });
+				},
+				setPopupVisible: (isPopupVisible) => {
+					set({ isPopupVisible });
+				},
+				setRatingFilter: (ratingFilter) => {
+					setAndClearSelection({ ratingFilter });
+				},
+				setSelectedId: (selectedId) => {
+					set({
+						isFilterOpen: false,
+						selectedId,
+						...(selectedId === undefined ? { isPopupVisible: true } : {}),
+					});
+				},
 				setStatusFilter: (statusFilter) => {
 					setAndClearSelection({ statusFilter });
+				},
+				showAllStatusFilter: () => {
+					setAndClearSelection({ statusFilter: [] });
 				},
 				toggleStatusFilter: (status) => {
 					const statusFilter = get().statusFilter;
@@ -124,24 +142,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 							? statusFilter.filter((statusFiltered) => statusFiltered !== status)
 							: [...statusFilter, status],
 					});
-				},
-				showAllStatusFilter: () => {
-					setAndClearSelection({ statusFilter: [] });
-				},
-				hideAllStatusFilter: () => {
-					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
-				},
-				setEntryQualityFilter: (entryQualityFilter) => {
-					setAndClearSelection({ entryQualityFilter });
-				},
-				setRatingFilter: (ratingFilter) => {
-					setAndClearSelection({ ratingFilter });
-				},
-				setObjectiveFilter: (objectiveFilter) => {
-					setAndClearSelection({ objectiveFilter });
-				},
-				setLanguages: (languages) => {
-					set({ languages });
 				},
 			},
 		};

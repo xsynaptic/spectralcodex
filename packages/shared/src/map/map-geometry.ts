@@ -1,20 +1,20 @@
 import { z } from 'zod';
 
 export const GeometryTypeEnum = {
-	Point: 'Point',
-	MultiPoint: 'MultiPoint',
 	LineString: 'LineString',
-	Polygon: 'Polygon',
+	MultiPoint: 'MultiPoint',
 	MultiPolygon: 'MultiPolygon',
+	Point: 'Point',
+	Polygon: 'Polygon',
 } as const;
 
 export const GeometryDivisionIdSchema = z.union([z.string(), z.string().array()]).nullable();
 
 export const GeometryBoundingBoxSchema = z.object({
-	lngMin: z.number(),
-	lngMax: z.number(),
-	latMin: z.number(),
 	latMax: z.number(),
+	latMin: z.number(),
+	lngMax: z.number(),
+	lngMin: z.number(),
 });
 
 export type GeometryBoundingBox = z.infer<typeof GeometryBoundingBoxSchema>;

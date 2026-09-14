@@ -54,10 +54,10 @@ async function createWebmentionsFunction() {
 		if (matched.length === 0) return undefined;
 
 		const summary: WebmentionsSummary = {
-			likeCount: 0,
-			repostCount: 0,
 			bookmarkCount: 0,
+			likeCount: 0,
 			replies: [],
+			repostCount: 0,
 		};
 
 		for (const mention of matched) {
@@ -150,11 +150,11 @@ function toReply(mention: Webmention): undefined | WebmentionReply {
 	if (!authorName) return undefined;
 
 	return {
-		id: mention['wm-id'],
 		authorName,
 		authorUrl: trimToUndefined(mention.author?.url),
-		sourceUrl: mention['wm-source'],
 		dateReceived: new Date(mention['wm-received']),
+		id: mention['wm-id'],
+		sourceUrl: mention['wm-source'],
 		text: trimToUndefined(mention.content?.text),
 	};
 }

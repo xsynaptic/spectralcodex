@@ -7,7 +7,7 @@ function makeEntry(
 	collection: string,
 	data: { formerIds?: Array<string>; override?: { id: string } } = {},
 ) {
-	return { id, collection, data };
+	return { collection, data, id };
 }
 
 describe('buildRedirectPairs', () => {

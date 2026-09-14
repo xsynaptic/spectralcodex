@@ -64,7 +64,7 @@ interface MapStoreHoveredIdUpdate {
 }
 
 export function decideClickActions(input: MapClickInput): Array<MapClickAction> {
-	const { layerId, geometryType, coordinates, pointId, clusterId } = input;
+	const { clusterId, coordinates, geometryType, layerId, pointId } = input;
 
 	if (!layerId || geometryType !== GeometryTypeEnum.Point) return [{ kind: 'clear-selection' }];
 
@@ -78,7 +78,7 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 
 			return [
 				{ kind: 'close-filter' },
-				{ kind: 'expand-cluster', clusterId: expansionClusterId, center: coordinates },
+				{ center: coordinates, clusterId: expansionClusterId, kind: 'expand-cluster' },
 			];
 		}
 		case MapLayerIdEnum.Points:
@@ -89,9 +89,9 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 			return [
 				{ kind: 'close-filter' },
 				{
+					center: isMapCoordinates(coordinates) ? coordinates : undefined,
 					kind: 'select-point',
 					pointId,
-					center: isMapCoordinates(coordinates) ? coordinates : undefined,
 				},
 			];
 		}
@@ -102,7 +102,7 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 }
 
 export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
-	const { layerId, featureId, pointId, clusterId, hoveredFeatureId, storeHoveredId } = input;
+	const { clusterId, featureId, hoveredFeatureId, layerId, pointId, storeHoveredId } = input;
 
 	switch (layerId) {
 		case MapLayerIdEnum.Clusters: {

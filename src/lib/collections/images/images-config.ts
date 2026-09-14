@@ -18,11 +18,11 @@ import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 
 const ImageMetadataSchema = ImageExifDataSchema.extend({
-	src: z.string(),
-	path: z.string(),
-	width: z.number(),
 	height: z.number(),
 	modifiedTime: z.date().optional(),
+	path: z.string(),
+	src: z.string(),
+	width: z.number(),
 });
 
 type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
@@ -35,15 +35,15 @@ const imageLoaderCache = createJsonlCache({
 
 // Schema shape versions the cached payload; bump rev for changes invisible to z.toJSONSchema (coercions, extraction logic)
 const extractionVersion = hash({
-	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
 	rev: 2,
+	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
 });
 
 // Env feeds the src transform; changes re-derive entries without re-running exiftool
 const derivationVersion = hash({
 	env: {
-		IMAGE_SERVER_URL,
 		IMAGE_SERVER_SECRET,
+		IMAGE_SERVER_URL,
 		imageHighQualityFormat,
 		imageHighQualityValue,
 	},
@@ -54,15 +54,15 @@ const derivationVersion = hash({
 async function getImageDimensions(imagePath: string) {
 	const metadata = await sharp(imagePath).metadata();
 
-	return { width: metadata.width, height: metadata.height };
+	return { height: metadata.height, width: metadata.width };
 }
 
 // Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
 const getImageUrl = createImageUrlFunction({
-	imageQuality: imageHighQualityValue,
 	imageFormat: imageHighQualityFormat,
-	serverUrl: IMAGE_SERVER_URL,
+	imageQuality: imageHighQualityValue,
 	serverSecret: IMAGE_SERVER_SECRET,
+	serverUrl: IMAGE_SERVER_URL,
 });
 
 // Replaces the loader-injected src (root-relative path) with the signed URL
@@ -79,19 +79,15 @@ let exiftool: ExifTool;
 
 export const images = defineCollection(
 	defineImageCollection({
-		base: CONTENT_MEDIA_PATH,
-		concurrency: 80,
-		extractionVersion,
-		derivationVersion,
-		showProgress: true,
-		cache: imageLoaderCache,
-		schema: ImageCollectionSchema,
-		beforeLoad: () => {
-			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
-		},
 		afterLoad: async () => {
 			await exiftool.end();
 		},
+		base: CONTENT_MEDIA_PATH,
+		beforeLoad: () => {
+			exiftool = new ExifTool({ ignoreZeroZeroLatLon: true, taskTimeoutMillis: 30_000 });
+		},
+		cache: imageLoaderCache,
+		concurrency: 80,
 		dataHandler: async ({ filePathRelative }) => {
 			const dimensions = await getImageDimensions(filePathRelative);
 			const exif = await extractExifData(filePathRelative, exiftool);
@@ -100,11 +96,11 @@ export const images = defineCollection(
 
 			// Intrinsic data only; env-dependent values would poison the cross-context cache
 			const defaultMetadata = {
-				path: filePathRelative,
-				width: ImageSizeEnum.Large,
-				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
-				title: '',
 				description: '',
+				height: Math.round(ImageSizeEnum.Large / defaultAspectRatio),
+				path: filePathRelative,
+				title: '',
+				width: ImageSizeEnum.Large,
 			};
 
 			// The loader injects src (root-relative path) and modifiedTime before parsing
@@ -114,5 +110,9 @@ export const images = defineCollection(
 				...exif,
 			} satisfies Omit<ImageMetadataInput, 'src'>;
 		},
+		derivationVersion,
+		extractionVersion,
+		schema: ImageCollectionSchema,
+		showProgress: true,
 	}),
 );

@@ -23,8 +23,8 @@ export async function createChronologyImageFeaturedGroupFunction() {
 	return function getChronologyImageFeaturedGroup(item: ChronologyMonthlyItem) {
 		return item.chronologyEntry?.data.imageFeatured
 			? getImageFeaturedGroup({
-					imageFeatured: item.chronologyEntry.data.imageFeatured,
 					getCaption: catalog.getCaption,
+					imageFeatured: item.chronologyEntry.data.imageFeatured,
 				})
 			: getImageFeaturedGroupByCatalog({ items: item.highlights });
 	};
@@ -45,7 +45,7 @@ export function getChronologyActivityData(dailyData: Record<string, ChronologyDa
 		totals.visited += counts.visited;
 	}
 
-	return { values, totals };
+	return { totals, values };
 }
 
 export function getChronologyYearPagination(

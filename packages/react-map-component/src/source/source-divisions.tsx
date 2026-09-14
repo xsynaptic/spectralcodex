@@ -17,12 +17,12 @@ function useMapSourceDivisionStyle() {
 		() =>
 			({
 				id: MapLayerIdEnum.DivisionMask,
-				source: MapSourceIdEnum.DivisionCollection,
-				type: 'fill',
 				paint: {
 					'fill-color': isDarkMode ? tailwindColors.zinc500 : tailwindColors.stone400,
 					'fill-opacity': isDarkMode ? 0.09 : 0.15,
 				},
+				source: MapSourceIdEnum.DivisionCollection,
+				type: 'fill',
 			}) satisfies FillLayerSpecification,
 		[isDarkMode],
 	);
@@ -31,14 +31,13 @@ function useMapSourceDivisionStyle() {
 		() =>
 			({
 				id: MapLayerIdEnum.DivisionOutline,
-				source: MapSourceIdEnum.DivisionCollection,
-				type: 'line',
 				layout: {
 					'line-cap': 'round',
 					'line-join': 'round',
 				},
 				paint: {
 					'line-color': isDarkMode ? tailwindColors.red500 : tailwindColors.red400,
+					'line-opacity': 0.7,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -50,8 +49,9 @@ function useMapSourceDivisionStyle() {
 						18,
 						2,
 					],
-					'line-opacity': 0.7,
 				},
+				source: MapSourceIdEnum.DivisionCollection,
+				type: 'line',
 			}) satisfies LineLayerSpecification,
 		[isDarkMode],
 	);
@@ -60,8 +60,6 @@ function useMapSourceDivisionStyle() {
 		() =>
 			({
 				id: MapLayerIdEnum.DivisionHalo,
-				source: MapSourceIdEnum.DivisionCollection,
-				type: 'line',
 				layout: {
 					'line-cap': 'round',
 					'line-join': 'round',
@@ -69,6 +67,7 @@ function useMapSourceDivisionStyle() {
 				paint: {
 					'line-blur': 5,
 					'line-color': isDarkMode ? tailwindColors.red600 : tailwindColors.red500,
+					'line-opacity': 0.2,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -82,16 +81,17 @@ function useMapSourceDivisionStyle() {
 						18,
 						4,
 					],
-					'line-opacity': 0.2,
 				},
+				source: MapSourceIdEnum.DivisionCollection,
+				type: 'line',
 			}) satisfies LineLayerSpecification,
 		[isDarkMode],
 	);
 
 	return {
+		[MapLayerIdEnum.DivisionHalo]: divisionHaloLayerStyle,
 		[MapLayerIdEnum.DivisionMask]: divisionMaskLayerStyle,
 		[MapLayerIdEnum.DivisionOutline]: divisionOutlineLayerStyle,
-		[MapLayerIdEnum.DivisionHalo]: divisionHaloLayerStyle,
 	};
 }
 

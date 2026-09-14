@@ -39,7 +39,7 @@ interface Props {
 	mapData: MapComponentData;
 }
 
-const { entry, mapData, backlinks } = Astro.props;
+const { backlinks, entry, mapData } = Astro.props;
 
 const t = getTranslations();
 
@@ -50,8 +50,8 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const catalog = await getCatalog();
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
-	imageFeatured: entry.data.imageFeatured,
 	getCaption: catalog.getCaption,
+	imageFeatured: entry.data.imageFeatured,
 });
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
@@ -59,15 +59,15 @@ const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length >
 
 const { Content } = await render(entry);
 
-const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
+const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
 ---
 
 <MainSite
 	hasHeroImage={hasHeroImage}
 	meta={{
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: seoImage,
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...getSeoArticleProps({
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
@@ -75,7 +75,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
-	schemas={await getPostSchema(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
+	schemas={await getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}

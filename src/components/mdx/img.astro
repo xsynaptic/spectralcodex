@@ -13,7 +13,7 @@ interface Props extends HTMLAttributes<'figure'> {
 	src: string;
 }
 
-const { src: imageId, showMetadata = true, ...props } = Astro.props;
+const { showMetadata = true, src: imageId, ...props } = Astro.props;
 ---
 
 {imageId ? (

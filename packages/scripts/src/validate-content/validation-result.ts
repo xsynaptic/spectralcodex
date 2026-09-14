@@ -24,10 +24,10 @@ export interface ValidationResult {
 }
 
 export function reportValidationResult({
-	status,
-	summary,
 	issues,
 	notes = [],
+	status,
+	summary,
 }: ValidationResult): void {
 	const color = status === 'fail' ? chalk.red : chalk.yellow;
 
@@ -63,9 +63,9 @@ export function toValidationResult(
 	issues: Array<ValidationIssue>,
 	summaries: { fail: string; pass: string },
 ): ValidationResult {
-	if (issues.length === 0) return { status: 'pass', summary: summaries.pass, issues: [] };
+	if (issues.length === 0) return { issues: [], status: 'pass', summary: summaries.pass };
 
-	return { status: 'fail', summary: summaries.fail, issues };
+	return { issues, status: 'fail', summary: summaries.fail };
 }
 
 function toIssueLines(issue: ValidationIssue, marker: string) {

@@ -12,14 +12,14 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'media-path': {
-			type: 'string',
-			default: 'packages/content/media',
-		},
 		ignore: {
-			type: 'string',
-			multiple: true,
 			default: [],
+			multiple: true,
+			type: 'string',
+		},
+		'media-path': {
+			default: 'packages/content/media',
+			type: 'string',
 		},
 	},
 });

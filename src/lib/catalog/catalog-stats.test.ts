@@ -29,15 +29,15 @@ describe('getCatalogStats', () => {
 		const stats = await statsFor([]);
 
 		expect(stats.posts).toStrictEqual({ itemCount: '0', wordCount: '0' });
-		expect(stats.locations).toStrictEqual({ itemCount: '0', wordCount: '0', withImages: '0' });
+		expect(stats.locations).toStrictEqual({ itemCount: '0', withImages: '0', wordCount: '0' });
 		expect(stats.total).toStrictEqual({ itemCount: '0', wordCount: '0' });
 	});
 
 	test('items are counted against their own collection', async () => {
 		const stats = await statsFor([
-			makeCatalogItem({ id: 'a', collection: 'posts' }),
-			makeCatalogItem({ id: 'b', collection: 'posts' }),
-			makeCatalogItem({ id: 'c', collection: 'themes' }),
+			makeCatalogItem({ collection: 'posts', id: 'a' }),
+			makeCatalogItem({ collection: 'posts', id: 'b' }),
+			makeCatalogItem({ collection: 'themes', id: 'c' }),
 		]);
 
 		expect(stats.posts.itemCount).toBe('2');
@@ -48,8 +48,8 @@ describe('getCatalogStats', () => {
 
 	test('an entry with no word count contributes zero instead of poisoning the sum', async () => {
 		const stats = await statsFor([
-			makeCatalogItem({ id: 'a', collection: 'posts', wordCount: 900 }),
-			makeCatalogItem({ id: 'b', collection: 'posts', wordCount: undefined }),
+			makeCatalogItem({ collection: 'posts', id: 'a', wordCount: 900 }),
+			makeCatalogItem({ collection: 'posts', id: 'b', wordCount: undefined }),
 		]);
 
 		expect(stats.posts.wordCount).toBe('900');
@@ -57,7 +57,7 @@ describe('getCatalogStats', () => {
 
 	test('large counts are thousands-separated for display', async () => {
 		const stats = await statsFor(
-			[makeCatalogItem({ id: 'a', collection: 'posts', wordCount: 12_345 })],
+			[makeCatalogItem({ collection: 'posts', id: 'a', wordCount: 12_345 })],
 			1234,
 		);
 
@@ -67,9 +67,9 @@ describe('getCatalogStats', () => {
 
 	test('only locations carrying a featured image count toward withImages', async () => {
 		const stats = await statsFor([
-			makeCatalogItem({ id: 'a', collection: 'locations', imageId: 'image-a' }),
-			makeCatalogItem({ id: 'b', collection: 'locations', imageId: undefined }),
-			makeCatalogItem({ id: 'c', collection: 'posts', imageId: 'image-c' }),
+			makeCatalogItem({ collection: 'locations', id: 'a', imageId: 'image-a' }),
+			makeCatalogItem({ collection: 'locations', id: 'b', imageId: undefined }),
+			makeCatalogItem({ collection: 'posts', id: 'c', imageId: 'image-c' }),
 		]);
 
 		expect(stats.locations.itemCount).toBe('2');
@@ -78,9 +78,9 @@ describe('getCatalogStats', () => {
 
 	test('outbound links are summed across every collection at once', async () => {
 		const stats = await statsFor([
-			makeCatalogItem({ id: 'a', collection: 'posts', linksExternalCount: 3 }),
-			makeCatalogItem({ id: 'b', collection: 'locations', linksExternalCount: 4 }),
-			makeCatalogItem({ id: 'c', collection: 'regions', linksExternalCount: undefined }),
+			makeCatalogItem({ collection: 'posts', id: 'a', linksExternalCount: 3 }),
+			makeCatalogItem({ collection: 'locations', id: 'b', linksExternalCount: 4 }),
+			makeCatalogItem({ collection: 'regions', id: 'c', linksExternalCount: undefined }),
 		]);
 
 		expect(stats.linksExternal.itemCount).toBe('7');
@@ -89,8 +89,8 @@ describe('getCatalogStats', () => {
 	test('the total covers catalog entries only, leaving images out', async () => {
 		const stats = await statsFor(
 			[
-				makeCatalogItem({ id: 'a', collection: 'posts', wordCount: 100 }),
-				makeCatalogItem({ id: 'b', collection: 'series', wordCount: 50 }),
+				makeCatalogItem({ collection: 'posts', id: 'a', wordCount: 100 }),
+				makeCatalogItem({ collection: 'series', id: 'b', wordCount: 50 }),
 			],
 			5,
 		);

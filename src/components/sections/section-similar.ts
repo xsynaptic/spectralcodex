@@ -28,8 +28,8 @@ const SimilarContentItemSchema = z
 		z.string(),
 		z
 			.object({
-				id: z.string(),
 				collection: z.string(),
+				id: z.string(),
 				score: z.number(), // Float
 			})
 			.array(),
@@ -43,10 +43,10 @@ async function createSimilarContentFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getSimilarContent({
+		hasImageFeatured = true,
 		id,
 		limit = 10,
 		threshold = 0.5,
-		hasImageFeatured = true,
 	}: {
 		hasImageFeatured?: boolean;
 		id: string;

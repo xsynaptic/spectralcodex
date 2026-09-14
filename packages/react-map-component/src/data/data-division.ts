@@ -18,7 +18,7 @@ export function useMapApiDivisionData({
 }: Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'>) {
 	// Errors must propagate so React Query retries instead of caching a permanent empty result
 	return useQuery<FeatureCollection<MultiPolygon | Polygon>>({
-		queryKey: ['division-data', apiDivisionUrl, isDev],
+		enabled: !!apiDivisionUrl,
 		queryFn: async () => {
 			if (!apiDivisionUrl) throw new Error('[Map] Division data query enabled without a URL');
 
@@ -59,13 +59,13 @@ export function useMapApiDivisionData({
 			}
 
 			return {
-				type: 'FeatureCollection',
 				features,
+				type: 'FeatureCollection',
 			} satisfies FeatureCollection<MultiPolygon | Polygon>;
 		},
-		refetchOnWindowFocus: false,
+		queryKey: ['division-data', apiDivisionUrl, isDev],
 		refetchOnMount: false,
-		enabled: !!apiDivisionUrl,
+		refetchOnWindowFocus: false,
 	});
 }
 

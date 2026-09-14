@@ -13,24 +13,24 @@ export function getRegionsOptions(depth: number): RegionsOption {
 		// Top-level regions (*i.e.* countries)
 		case 1: {
 			return {
-				termsRelatedLimit: 100,
 				termsChildrenLabel: t('collection.regions.depth.1.labelChildren'),
+				termsRelatedLimit: 100,
 				termsSiblingsLabel: t('collection.regions.depth.1.labelSiblings'),
 			};
 		}
 		// Second-level regions (*e.g.* states, provinces)
 		case 2: {
 			return {
-				termsRelatedLimit: 100,
 				termsChildrenLabel: t('collection.regions.depth.2.labelChildren'),
+				termsRelatedLimit: 100,
 				termsSiblingsLabel: t('collection.regions.depth.2.labelSiblings'),
 			};
 		}
 		// Everything else (*e.g.* districts, cities, towns, etc.)
 		default: {
 			return {
-				termsRelatedLimit: 100,
 				termsChildrenLabel: t('collection.regions.depth.3.labelChildren'),
+				termsRelatedLimit: 100,
 				termsSiblingsLabel: t('collection.regions.depth.3.labelSiblings'),
 			};
 		}

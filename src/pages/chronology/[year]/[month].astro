@@ -5,14 +5,14 @@ import ChronologyMonthly from '#layouts/chronology-monthly.astro';
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 
 export const getStaticPaths = (async () => {
-	const { chronologyMonthlyData, chronologyYears, chronologyMonths } = await getChronologyData();
+	const { chronologyMonthlyData, chronologyMonths, chronologyYears } = await getChronologyData();
 
 	return chronologyMonthlyData.map((chronologyMonthlyItem) => ({
-		params: { year: chronologyMonthlyItem.year, month: chronologyMonthlyItem.month },
+		params: { month: chronologyMonthlyItem.month, year: chronologyMonthlyItem.year },
 		props: {
 			chronologyMonthlyItem,
-			chronologyYears,
 			chronologyMonths: chronologyMonths[chronologyMonthlyItem.year],
+			chronologyYears,
 		},
 	}));
 }) satisfies GetStaticPaths;

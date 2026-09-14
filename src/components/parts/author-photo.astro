@@ -28,7 +28,7 @@ const imageEntry = getImageById(imageSrc);
 {imageEntry ? (
 	<ImagePlaceholder
 		class="relative overflow-hidden rounded-xs grayscale"
-		placeholderProps={{ imageId: imageSrc, aspectRatio: 1 }}
+		placeholderProps={{ aspectRatio: 1, imageId: imageSrc }}
 	>
 		<Image
 			alt={sanitizeImageAltAttribute(t('author.photo.alt'))}

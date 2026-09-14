@@ -13,15 +13,15 @@ export function validateImageAltTitles(imageEntries: Array<ContentEntry>) {
 
 	if (issues.length === 0) {
 		return {
+			issues,
 			status: 'pass',
 			summary: `${imageEntries.length.toString()} images carry an EXIF title`,
-			issues,
 		} satisfies ValidationResult;
 	}
 
 	return {
+		issues,
 		status: 'warn',
 		summary: `Found ${issues.length.toString()} of ${imageEntries.length.toString()} image(s) with an empty EXIF title`,
-		issues,
 	} satisfies ValidationResult;
 }

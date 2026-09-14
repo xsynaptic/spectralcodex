@@ -13,23 +13,23 @@ interface CitationFormatting {
 }
 
 const CitationFormattingMap = {
-	[LanguageCodeEnum.English]: {
-		authorsDelimiter: ' & ',
-		delimiter: ', ',
-		quoteStart: '',
-		quoteEnd: '',
-	},
 	[LanguageCodeEnum.ChineseTraditional]: {
 		authorsDelimiter: '，',
 		delimiter: '，',
-		quoteStart: '《',
 		quoteEnd: '》',
+		quoteStart: '《',
+	},
+	[LanguageCodeEnum.English]: {
+		authorsDelimiter: ' & ',
+		delimiter: ', ',
+		quoteEnd: '',
+		quoteStart: '',
 	},
 	[LanguageCodeEnum.Japanese]: {
 		authorsDelimiter: '、',
 		delimiter: '、',
-		quoteStart: '『',
 		quoteEnd: '』',
+		quoteStart: '『',
 	},
 } as const satisfies Record<string, CitationFormatting>;
 
@@ -59,23 +59,23 @@ interface CitationInput {
 
 export function buildSourceCitations(source: ResourceSource) {
 	return {
+		multilingual: buildMultilingualCitation(source),
+		primary: buildPrimaryCitation(source),
 		url:
 			'id' in source && 'showPage' in source
 				? getResourcePath(source.id, source.showPage)
 				: undefined,
-		primary: buildPrimaryCitation(source),
-		multilingual: buildMultilingualCitation(source),
 	};
 }
 
 // Publisher, date and details all share the language's delimiter, so they collapse into one run
 export function formatCitation({
-	lang,
-	title,
 	authorNames,
-	publisher,
+	lang,
 	publishedDate,
 	publishedDetails,
+	publisher,
+	title,
 }: CitationInput): Citation {
 	const formatting = CitationFormattingMap[lang];
 
@@ -85,10 +85,10 @@ export function formatCitation({
 	);
 
 	return {
-		delimiter: formatting.delimiter,
 		authors: names.length > 0 ? names.join(formatting.authorsDelimiter) : undefined,
-		title: `${formatting.quoteStart}${title}${formatting.quoteEnd}`,
+		delimiter: formatting.delimiter,
 		published: publishedParts.length > 0 ? publishedParts.join(formatting.delimiter) : undefined,
+		title: `${formatting.quoteStart}${title}${formatting.quoteEnd}`,
 	};
 }
 
@@ -108,12 +108,12 @@ function buildMultilingualCitation(source: ResourceSource) {
 	return {
 		lang: title.lang satisfies LanguageCode,
 		...formatCitation({
-			lang,
-			title: title.value,
 			authorNames: source.authors?.map((author) => author[`name_${lang}`]),
-			publisher: publisher?.value,
+			lang,
 			publishedDate: source.publishedDate,
 			publishedDetails: publishedDetails?.value,
+			publisher: publisher?.value,
+			title: title.value,
 		}),
 	};
 }
@@ -122,12 +122,12 @@ function buildPrimaryCitation(source: ResourceSource) {
 	if (!source.title) return;
 
 	return formatCitation({
-		lang: LanguageCodeEnum.English,
-		title: source.title,
 		authorNames: source.authors?.map((author) => author.name),
-		publisher: source.publisher,
+		lang: LanguageCodeEnum.English,
 		publishedDate: source.publishedDate,
 		publishedDetails: source.publishedDetails,
+		publisher: source.publisher,
+		title: source.title,
 	});
 }
 

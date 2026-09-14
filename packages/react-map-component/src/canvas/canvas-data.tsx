@@ -32,7 +32,7 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 		() =>
 			getMapCanvasData(
 				sourceData ?? emptyItems,
-				{ status, entryQuality, rating, objective },
+				{ entryQuality, objective, rating, status },
 				mapScope,
 			),
 		[sourceData, status, entryQuality, rating, objective, mapScope],

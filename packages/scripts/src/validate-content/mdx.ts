@@ -6,7 +6,7 @@ import { getBodyLineOffset } from '#validate-content/body-line-offset.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 // A required prop missing here throws while the component renders, naming only the page path
-const requiredProps: Record<string, string> = { Link: 'id', Img: 'src' };
+const requiredProps: Record<string, string> = { Img: 'src', Link: 'id' };
 
 const componentNames = Object.keys(requiredProps);
 
@@ -50,18 +50,18 @@ export function validateMdxComponents(entries: Array<ContentEntry>, rootPath: st
 		const lineOffset = getBodyLineOffset(entry, rootPath);
 
 		issues.push({
-			message: entry.filePath ?? entry.id,
 			details: componentIssues.flatMap((issue) => [
 				`Line ${(issue.lineNumber + lineOffset).toString()}: ${issue.message}`,
 				issue.context,
 			]),
+			message: entry.filePath ?? entry.id,
 		});
 
 		issueCount += componentIssues.length;
 	}
 
 	return toValidationResult(issues, {
-		pass: 'MDX components valid',
 		fail: `Found ${issueCount.toString()} invalid component(s)`,
+		pass: 'MDX components valid',
 	});
 }

@@ -47,9 +47,9 @@ const jmapMailUrn = 'urn:ietf:params:jmap:mail';
 const jmapSubmissionUrn = 'urn:ietf:params:jmap:submission';
 
 const requestHeaders: Record<string, string> = {
-	'User-Agent': 'SCXCacheWarmer/1.0 (+https://spectralcodex.com)',
 	// Request brotli so we warm the same compressed variant browsers receive
 	'Accept-Encoding': 'br, gzip',
+	'User-Agent': 'SCXCacheWarmer/1.0 (+https://spectralcodex.com)',
 };
 
 // Site-relative build assets (CSS, JS, fonts) under the custom assets dir
@@ -144,7 +144,7 @@ function createWarmRun(): WarmRun {
 		return stats;
 	}
 
-	return { phases, notes, warmPhase };
+	return { notes, phases, warmPhase };
 }
 
 function extractLocations(xml: string): Array<string> {
@@ -191,12 +191,12 @@ async function getMapUrls(): Promise<MapUrlsResult> {
 	} catch (error) {
 		const skipReason = messageOf(error);
 		console.log(`Skipping map URLs: ${skipReason}`);
-		return { urls: [], skipReason };
+		return { skipReason, urls: [] };
 	}
 }
 
 function getReportBody(run: RunReport): string {
-	const { phases, failures, notes, retriedCount, totalUrls, seconds } = run;
+	const { failures, notes, phases, retriedCount, seconds, totalUrls } = run;
 
 	const retryNote =
 		retriedCount > 0
@@ -216,7 +216,7 @@ function getReportBody(run: RunReport): string {
 	].join('\n');
 }
 
-function getReportSubject({ failures, notes, totalUrls, seconds }: RunReport): string {
+function getReportSubject({ failures, notes, seconds, totalUrls }: RunReport): string {
 	if (failures.length > 0) return `[SpectralCodex] cache warm: ${String(failures.length)} failed`;
 	if (notes.length > 0) return '[SpectralCodex] cache warm: completed with warnings';
 
@@ -233,8 +233,8 @@ async function getSitemapUrls(): Promise<Array<string>> {
 function getWarmedImages(): { note?: string; seen: Set<string> } {
 	if (shouldWarmAll) {
 		return {
-			seen: new Set(),
 			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
+			seen: new Set(),
 		};
 	}
 	try {
@@ -244,8 +244,8 @@ function getWarmedImages(): { note?: string; seen: Set<string> } {
 		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
 		if (!isMissing) throw error;
 		return {
-			seen: new Set(),
 			note: 'Image state missing: cold start, every referenced image is new',
+			seen: new Set(),
 		};
 	}
 }
@@ -261,7 +261,7 @@ async function jmapCall(
 ): Promise<Array<JmapInvocation>> {
 	const result = (await jmapRequest(
 		apiUrl,
-		JSON.stringify({ using: [jmapMailUrn, jmapSubmissionUrn], methodCalls }),
+		JSON.stringify({ methodCalls, using: [jmapMailUrn, jmapSubmissionUrn] }),
 	)) as { methodResponses: Array<JmapInvocation> };
 	return result.methodResponses;
 }
@@ -301,7 +301,7 @@ async function main(): Promise<void> {
 	const run = createWarmRun();
 
 	// Read before warming so an unreadable volume fails fast rather than after the page phase
-	const { seen, note } = getWarmedImages();
+	const { note, seen } = getWarmedImages();
 
 	if (note !== undefined) {
 		console.log(note);
@@ -323,10 +323,10 @@ async function main(): Promise<void> {
 	const failures = await retryFailures(run, firstFailures);
 
 	const stateNote = persistWarmedImages({
+		failures,
 		referenced: targets.images,
 		seen,
 		warmed: newImages,
-		failures,
 	});
 
 	if (stateNote !== undefined) run.notes.push(stateNote);
@@ -335,12 +335,12 @@ async function main(): Promise<void> {
 	console.log(`Done in ${seconds}s`);
 
 	await sendRunReport({
-		phases: run.phases,
 		failures,
 		notes: run.notes,
+		phases: run.phases,
 		retriedCount: firstFailures.length,
-		totalUrls,
 		seconds,
+		totalUrls,
 	});
 }
 
@@ -349,10 +349,10 @@ function messageOf(error: unknown): string {
 }
 
 function persistWarmedImages({
+	failures,
 	referenced,
 	seen,
 	warmed,
-	failures,
 }: PersistWarmedImagesOptions): string | undefined {
 	const failedUrls = new Set(failures.map((failure) => failure.url));
 	const nextSeen = referenced.intersection(seen);
@@ -397,12 +397,12 @@ async function purge(): Promise<void> {
 	const response = await fetch(
 		`https://api.cloudflare.com/client/v4/zones/${cloudflareZoneId}/purge_cache`,
 		{
-			method: 'POST',
+			body: JSON.stringify({ hosts: [host] }),
 			headers: {
 				Authorization: `Bearer ${cloudflareApiToken}`,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ hosts: [host] }),
+			method: 'POST',
 			signal: AbortSignal.timeout(timeoutMs),
 		},
 	);
@@ -410,7 +410,7 @@ async function purge(): Promise<void> {
 	try {
 		result = (await response.json()) as PurgeResult;
 	} catch {
-		result = { success: false, errors: [{ message: 'unparseable response' }] };
+		result = { errors: [{ message: 'unparseable response' }], success: false };
 	}
 	if (!response.ok || !result.success) {
 		const messages = (result.errors ?? []).map((entry) => entry.message).join(', ');
@@ -504,13 +504,13 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 					accountId,
 					create: {
 						alert: {
-							mailboxIds: { [draftsMailboxId]: true },
-							keywords: { $draft: true },
-							from: [{ name: 'Spectral Codex Cache Warmer Bot', email: alertEmailFrom }],
-							to: [{ email: alertEmailTo }],
-							subject,
 							bodyValues: { body: { value: text } },
+							from: [{ email: alertEmailFrom, name: 'Spectral Codex Cache Warmer Bot' }],
+							keywords: { $draft: true },
+							mailboxIds: { [draftsMailboxId]: true },
+							subject,
 							textBody: [{ partId: 'body', type: 'text/plain' }],
+							to: [{ email: alertEmailTo }],
 						},
 					},
 				},
@@ -520,8 +520,8 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 				'EmailSubmission/set',
 				{
 					accountId,
-					onSuccessDestroyEmail: ['#submit'],
 					create: { submit: { emailId: '#alert', identityId: identity.id } },
+					onSuccessDestroyEmail: ['#submit'],
 				},
 				'submit',
 			],
@@ -572,14 +572,14 @@ async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
 		} else {
 			await response.arrayBuffer();
 		}
-		return { url, status: response.status, ms: Date.now() - start };
+		return { ms: Date.now() - start, status: response.status, url };
 	} catch (error) {
-		return { url, status: 0, ms: Date.now() - start, error: messageOf(error) };
+		return { error: messageOf(error), ms: Date.now() - start, status: 0, url };
 	}
 }
 
 async function warmAll(urls: Iterable<string>, options: WarmAllOptions = {}): Promise<Stats> {
-	const stats: Stats = { total: 0, counts: new Map(), failures: [] };
+	const stats: Stats = { counts: new Map(), failures: [], total: 0 };
 	await pool(urls, options.concurrency ?? defaultConcurrency, async (url) => {
 		record(stats, await warm(url, options.collect));
 	});

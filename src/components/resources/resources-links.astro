@@ -22,7 +22,7 @@ const t = getTranslations();
 {links.length > 0 ? (
 	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
 		{links.map((link) => {
-			const { url, title, titleMultilingual, resourceUrl } = buildResourceLink(link);
+			const { resourceUrl, title, titleMultilingual, url } = buildResourceLink(link);
 
 			return (
 				<ListColumnItem>

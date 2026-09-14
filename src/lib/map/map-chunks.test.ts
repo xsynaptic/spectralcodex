@@ -12,7 +12,7 @@ function itemsForChunk(
 }
 
 function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): ChunkInputItem {
-	return { id, lng, lat, popupBytes };
+	return { id, lat, lng, popupBytes };
 }
 
 // Spread-out point set whose ids are permuted by seed, so different seeds feed the same
@@ -34,7 +34,7 @@ describe('assignChunks', () => {
 	test('keeps everything in one bin when under the cap', () => {
 		const items = [makeItem('a', [121, 25]), makeItem('b', [-73, 45])];
 
-		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 1000 });
+		const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes: 1000 });
 
 		expect([...chunkIds.keys()]).toEqual(['0']);
 		expect(chunkKeyById.get('a')).toBe('0');
@@ -50,7 +50,7 @@ describe('assignChunks', () => {
 			return item;
 		});
 
-		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 250 });
+		const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes: 250 });
 
 		expect(chunkKeyById.size).toBe(40);
 		let seen = 0;
@@ -68,7 +68,7 @@ describe('assignChunks', () => {
 			makeItem('small-2', [102, 12], 40),
 		];
 
-		const { chunkKeyById, chunkIds } = assignChunks(items, { capBytes: 100 });
+		const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes: 100 });
 
 		const hugeKey = chunkKeyById.get('huge')!;
 		expect(chunkIds.get(hugeKey)).toEqual(['huge']);

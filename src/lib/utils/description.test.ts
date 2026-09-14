@@ -15,8 +15,8 @@ describe('createDescriptionRenderers', () => {
 		const { getDescriptionRendered } = setup();
 
 		const rendered = await getDescriptionRendered({
-			id: 'alpha',
 			data: { description: 'A *thoroughly* ordinary place.' },
+			id: 'alpha',
 		});
 
 		expect(rendered?.html).toBe('A <em>thoroughly</em> ordinary place.');
@@ -25,7 +25,7 @@ describe('createDescriptionRenderers', () => {
 
 	test('serves a repeat call from the cache', async () => {
 		const { getDescriptionRendered, setSpy } = setup();
-		const entry = { id: 'alpha', data: { description: 'A place.' } };
+		const entry = { data: { description: 'A place.' }, id: 'alpha' };
 
 		const first = await getDescriptionRendered(entry);
 		const second = await getDescriptionRendered(entry);
@@ -37,11 +37,11 @@ describe('createDescriptionRenderers', () => {
 	test('changed source invalidates the cached entry', async () => {
 		const { getDescriptionRendered, setSpy } = setup();
 
-		await getDescriptionRendered({ id: 'alpha', data: { description: 'A place.' } });
+		await getDescriptionRendered({ data: { description: 'A place.' }, id: 'alpha' });
 
 		const second = await getDescriptionRendered({
-			id: 'alpha',
 			data: { description: 'Another place.' },
+			id: 'alpha',
 		});
 
 		expect(second?.text).toBe('Another place.');

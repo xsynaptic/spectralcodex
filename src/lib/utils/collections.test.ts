@@ -14,9 +14,9 @@ async function importCollections() {
 // Minimal fixtures; only the fields the factory reads, cast to the collection entry type
 function makePost(id: string): CollectionEntry<'posts'> {
 	return {
-		id,
 		collection: 'posts',
 		data: { title: id },
+		id,
 	} as unknown as CollectionEntry<'posts'>;
 }
 
@@ -101,14 +101,14 @@ describe('createCollectionData', () => {
 
 		const getPostsCollection = createCollectionData({
 			collection: 'posts',
+			extend: (entries) => ({
+				flagSeenByExtend: (entries[0]?.data as undefined | { _flag?: string })?._flag,
+			}),
 			mutate: (entries) => {
 				for (const entry of entries) {
 					Object.assign(entry.data, { _flag: 'mutated' });
 				}
 			},
-			extend: (entries) => ({
-				flagSeenByExtend: (entries[0]?.data as undefined | { _flag?: string })?._flag,
-			}),
 		});
 
 		const result = await getPostsCollection();

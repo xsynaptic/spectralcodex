@@ -11,11 +11,11 @@ const entryPattern = '**/[^_]*.(md|mdx)';
 export function createEntryGlobLoader(collection: string, options: EntryGlobLoaderOptions = {}) {
 	const base = `./${CONTENT_DATA_PATH}/${collection}`;
 
-	if (!options.flatIds) return glob({ pattern: entryPattern, base });
+	if (!options.flatIds) return glob({ base, pattern: entryPattern });
 
 	return glob({
-		pattern: entryPattern,
 		base,
 		generateId: ({ entry }) => entry.replace(/^.*\//, '').replace(/\.(md|mdx)$/, ''),
+		pattern: entryPattern,
 	});
 }

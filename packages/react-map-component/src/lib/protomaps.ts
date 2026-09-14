@@ -12,8 +12,8 @@ import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { useMapLanguages } from '#store/store.ts';
 
 export function useProtomaps({
-	protomapsApiKey,
 	baseMapTheme,
+	protomapsApiKey,
 	spritesId,
 	spritesUrl,
 }: Pick<
@@ -32,8 +32,15 @@ export function useProtomaps({
 		() =>
 			protomapsApiKey
 				? {
-						version: 8,
 						glyphs: `https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf`,
+						layers: layers('protomaps', flavor, { lang: languages.at(0) ?? 'en' }),
+						sources: {
+							protomaps: {
+								attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
+								type: 'vector',
+								url: `https://api.protomaps.com/tiles/v4.json?key=${protomapsApiKey}`,
+							},
+						},
 						sprite: [
 							{
 								id: 'default',
@@ -41,19 +48,12 @@ export function useProtomaps({
 							},
 							...(spritesUrl ? [{ id: spritesId ?? 'custom', url: spritesUrl }] : []),
 						],
-						sources: {
-							protomaps: {
-								type: 'vector',
-								url: `https://api.protomaps.com/tiles/v4.json?key=${protomapsApiKey}`,
-								attribution: `<a href="https://protomaps.com" target="_blank">Protomaps</a> | <a href="https://openstreetmap.org" target="_blank">OpenStreetMap</a>`,
-							},
-						},
-						layers: layers('protomaps', flavor, { lang: languages.at(0) ?? 'en' }),
+						version: 8,
 					}
 				: {
-						version: 8,
-						sources: {},
 						layers: [],
+						sources: {},
+						version: 8,
 					},
 		[flavor, isDarkMode, protomapsApiKey, spritesId, spritesUrl, languages],
 	) satisfies StyleSpecification;

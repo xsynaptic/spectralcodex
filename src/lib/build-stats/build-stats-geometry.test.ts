@@ -17,8 +17,8 @@ function buildGeometry(records: Array<BuildRecord>) {
 
 function buildRecord(dayOffset: number, durationSeconds: number, rest: Partial<BuildRecord> = {}) {
 	return {
-		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
 		durationSeconds,
+		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
 		...rest,
 	} satisfies BuildRecord;
 }

@@ -22,22 +22,22 @@ export function createSqliteStore({ filePath }: { filePath: string }) {
 	const existsStatement = database.prepare('SELECT 1 FROM cache WHERE key = ?');
 
 	return {
+		clear() {
+			database.exec('DELETE FROM cache');
+		},
+		delete(key: string) {
+			return deletionStatement.run(key).changes > 0;
+		},
 		get(key: string) {
 			const row = selectStatement.get(key) as undefined | { value: string };
 
 			return row?.value;
 		},
-		set(key: string, value: string) {
-			upsertStatement.run(key, value);
-		},
-		delete(key: string) {
-			return deletionStatement.run(key).changes > 0;
-		},
-		clear() {
-			database.exec('DELETE FROM cache');
-		},
 		has(key: string) {
 			return existsStatement.get(key) !== undefined;
+		},
+		set(key: string, value: string) {
+			upsertStatement.run(key, value);
 		},
 	};
 }
@@ -45,5 +45,5 @@ export function createSqliteStore({ filePath }: { filePath: string }) {
 export function getSqliteCacheInstance(cachePath: string, namespace: string) {
 	const store = createSqliteStore({ filePath: path.join(cachePath, `${namespace}.sqlite`) });
 
-	return new Keyv({ store, namespace });
+	return new Keyv({ namespace, store });
 }

@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ site }) => {
 
 	// Content manifest includes relative URLs so we need to normalize output before filtering
 	const entries = [...catalog.all()]
-		.map(({ url, title }) => ({ url: new URL(url, site).pathname, title }))
+		.map(({ title, url }) => ({ title, url: new URL(url, site).pathname }))
 		.filter(({ url }) => isIndexableUrlPath(url));
 
 	return Response.json(entries, {

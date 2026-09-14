@@ -14,8 +14,8 @@ import type {
 
 // Taxonomy policy: every featured image becomes a hero (regions, themes, series)
 export function getImageFeaturedGroup({
-	imageFeatured,
 	getCaption,
+	imageFeatured,
 }: {
 	getCaption: (id: string) => CatalogCaption | undefined;
 	imageFeatured: ImageFeatured | undefined;
@@ -32,9 +32,9 @@ export function getImageFeaturedGroup({
 
 // Rather than accepting image featured items directly from frontmatter this handles catalog items
 export function getImageFeaturedGroupByCatalog({
+	hero = false,
 	items,
 	shuffle = false,
-	hero = false,
 }: {
 	hero?: boolean;
 	items: Array<CatalogItem> | undefined;
@@ -49,14 +49,14 @@ export function getImageFeaturedGroupByCatalog({
 
 		return [
 			{
-				id,
-				title: item.title,
 				caption: {
 					id: item.id,
 					title: item.title,
 					titleMultilingual: item.titleMultilingual,
 					url: item.url,
 				},
+				id,
+				title: item.title,
 			},
 		];
 	});
@@ -66,8 +66,8 @@ export function getImageFeaturedGroupByCatalog({
 
 // Post-like policy: heroes are opt-in via "hero: true" and authored order
 export function getImageFeaturedHeroGroup({
-	imageFeatured,
 	getCaption,
+	imageFeatured,
 }: {
 	getCaption: (id: string) => CatalogCaption | undefined;
 	imageFeatured: ImageFeatured | undefined;

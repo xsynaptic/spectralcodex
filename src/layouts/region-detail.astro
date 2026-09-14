@@ -32,7 +32,7 @@ interface Props {
 	regionsOption?: RegionsOption;
 }
 
-const { page, mapData, entry, catalogItems, catalogItemsCount, backlinksCount, regionsOption } =
+const { backlinksCount, catalogItems, catalogItemsCount, entry, mapData, page, regionsOption } =
 	Astro.props;
 
 const getRegionAncestors = await createRegionAncestorsFunction();

@@ -10,7 +10,7 @@ interface DeployCaddyOptions {
 }
 
 export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
-	const { rootPath, dryRun = false } = options;
+	const { dryRun = false, rootPath } = options;
 
 	const config = loadDeployConfig();
 

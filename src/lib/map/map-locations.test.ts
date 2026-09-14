@@ -10,29 +10,29 @@ function makeLocation(
 	data: Record<string, unknown> & { title: string },
 ): CollectionEntry<'locations'> {
 	return {
-		id,
 		collection: 'locations',
 		data: {
 			category: 'temple',
-			status: 'operational',
-			precision: 4,
 			entryQuality: 3,
+			precision: 4,
 			rating: 3,
+			status: 'operational',
 			...data,
 		},
+		id,
 	} as unknown as CollectionEntry<'locations'>;
 }
 
 function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {
-	return { type: 'Point', coordinates: [longitude, latitude], ...extra };
+	return { coordinates: [longitude, latitude], type: 'Point', ...extra };
 }
 
 describe('getLocationFeatureIds', () => {
 	test('uses the map uuid for a single-geometry location', () => {
 		const entry = makeLocation('longshan-temple', {
-			title: 'Longshan Temple',
 			_uuid: 'abc123',
 			geometry: makePoint(121.5, 25),
+			title: 'Longshan Temple',
 		});
 
 		expect(getLocationFeatureIds(entry)).toEqual(['abc123']);
@@ -40,8 +40,8 @@ describe('getLocationFeatureIds', () => {
 
 	test('falls back to the entry id when no uuid was stamped', () => {
 		const entry = makeLocation('longshan-temple', {
-			title: 'Longshan Temple',
 			geometry: makePoint(121.5, 25),
+			title: 'Longshan Temple',
 		});
 
 		expect(getLocationFeatureIds(entry)).toEqual(['longshan-temple']);
@@ -49,9 +49,9 @@ describe('getLocationFeatureIds', () => {
 
 	test('suffixes each point of a multi-geometry location', () => {
 		const entry = makeLocation('bopiliao', {
-			title: 'Bopiliao',
 			_uuid: 'abc123',
 			geometry: [makePoint(121.5, 25), makePoint(121.51, 25.01), makePoint(121.52, 25.02)],
+			title: 'Bopiliao',
 		});
 
 		expect(getLocationFeatureIds(entry)).toEqual(['abc123-0', 'abc123-1', 'abc123-2']);
@@ -59,9 +59,9 @@ describe('getLocationFeatureIds', () => {
 
 	test('does not suffix a geometry array of one', () => {
 		const entry = makeLocation('bopiliao', {
-			title: 'Bopiliao',
 			_uuid: 'abc123',
 			geometry: [makePoint(121.5, 25)],
+			title: 'Bopiliao',
 		});
 
 		expect(getLocationFeatureIds(entry)).toEqual(['abc123']);
@@ -77,24 +77,24 @@ describe('getLocationsFeatureCollection', () => {
 	test('builds one feature per single-geometry location', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('longshan-temple', {
-				title: 'Longshan Temple',
 				_uuid: 'abc123',
 				geometry: makePoint(121.5, 25),
+				title: 'Longshan Temple',
 			}),
 		]);
 
 		expect(result?.features).toHaveLength(1);
 		expect(result?.features[0]?.id).toBe('abc123');
-		expect(result?.features[0]?.geometry).toEqual({ type: 'Point', coordinates: [121.5, 25] });
+		expect(result?.features[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
 		expect(result?.features[0]?.properties.title).toBe('Longshan Temple');
 	});
 
 	test('builds one feature per point and suffixes point titles', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('bopiliao', {
-				title: 'Bopiliao',
 				_uuid: 'abc123',
 				geometry: [makePoint(121.5, 25, { title: 'North Block' }), makePoint(121.51, 25.01)],
+				title: 'Bopiliao',
 			}),
 		]);
 
@@ -106,9 +106,9 @@ describe('getLocationsFeatureCollection', () => {
 	test('joins entry and point multilingual titles', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('bopiliao', {
+				geometry: [makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' })],
 				title: 'Bopiliao',
 				title_zh: '剝皮寮',
-				geometry: [makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' })],
 			}),
 		]);
 
@@ -119,13 +119,13 @@ describe('getLocationsFeatureCollection', () => {
 	test('hideSensitiveLocations filters hidden locations, and false keeps them', () => {
 		const locations = [
 			makeLocation('sensitive-site', {
-				title: 'Sensitive Site',
-				hideLocation: true,
 				geometry: makePoint(121.5, 25),
+				hideLocation: true,
+				title: 'Sensitive Site',
 			}),
 			makeLocation('longshan-temple', {
-				title: 'Longshan Temple',
 				geometry: makePoint(121.49, 25.03),
+				title: 'Longshan Temple',
 			}),
 		];
 
@@ -139,9 +139,9 @@ describe('getLocationsFeatureCollection', () => {
 
 	test('reuses the same feature objects when a location is mapped again', () => {
 		const entry = makeLocation('longshan-temple', {
-			title: 'Longshan Temple',
 			_uuid: 'abc123',
 			geometry: makePoint(121.5, 25),
+			title: 'Longshan Temple',
 		});
 
 		const first = getLocationsFeatureCollection([entry]);
@@ -155,11 +155,11 @@ describe('getLocationsFeatureCollection properties', () => {
 	test('reduces urls to relative paths and strips url scheme from external links', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('longshan-temple', {
-				title: 'Longshan Temple',
-				_url: 'https://spectralcodex.com/locations/longshan-temple/',
 				_googleMapsUrl: 'https://maps.app.goo.gl/xYz123',
+				_url: 'https://spectralcodex.com/locations/longshan-temple/',
 				_wikipediaUrl: 'https://en.wikipedia.org/wiki/Longshan_Temple',
 				geometry: makePoint(121.5, 25),
+				title: 'Longshan Temple',
 			}),
 		]);
 
@@ -173,9 +173,9 @@ describe('getLocationsFeatureCollection properties', () => {
 	test('lets a point override entry-level properties', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('bopiliao', {
-				title: 'Bopiliao',
 				_descriptionHtml: '<p>Entry description</p>',
 				geometry: [makePoint(121.5, 25, { description: 'Point description', precision: 2 })],
+				title: 'Bopiliao',
 			}),
 		]);
 
@@ -187,17 +187,17 @@ describe('getLocationsFeatureCollection properties', () => {
 	});
 
 	test('omits the image when a point nulls the entry thumbnail', () => {
-		const thumbnail = { srcSet: 'thumb.avif 100w', src: 'thumb.avif', width: 100, height: 100 };
+		const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
 
 		const result = getLocationsFeatureCollection([
 			makeLocation('bopiliao', {
-				title: 'Bopiliao',
 				_imageThumbnail: thumbnail,
 				geometry: [
 					makePoint(121.5, 25),
 					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
 					makePoint(121.51, 25.01, { _imageThumbnail: null }),
 				],
+				title: 'Bopiliao',
 			}),
 		]);
 

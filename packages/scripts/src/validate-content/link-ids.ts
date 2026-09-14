@@ -38,19 +38,19 @@ export function validateLinkIds(
 		const lineOffset = getBodyLineOffset(entry, rootPath);
 
 		issues.push({
-			message: entry.filePath ?? entry.id,
 			details: entryIssues.map(
 				(issue) =>
 					`Line ${(issue.lineNumber + lineOffset).toString()}: broken link ID "${issue.id}"`,
 			),
+			message: entry.filePath ?? entry.id,
 		});
 
 		issueCount += entryIssues.length;
 	}
 
 	return toValidationResult(issues, {
-		pass: 'Link IDs valid',
 		fail: `Found ${issueCount.toString()} broken link ID(s)`,
+		pass: 'Link IDs valid',
 	});
 }
 
@@ -70,7 +70,7 @@ function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<str
 		// A Link with no id is the mdx check's finding, not this one's
 		if (!id || validIds.has(id)) continue;
 
-		issues.push({ location, lineNumber: tag.lineNumber, id });
+		issues.push({ id, lineNumber: tag.lineNumber, location });
 	}
 
 	return issues;

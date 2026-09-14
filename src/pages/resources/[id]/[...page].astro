@@ -19,9 +19,9 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 		results.push(
 			...paginate(catalogItems, {
+				pageSize: 20,
 				params: { id: entry.id },
 				props: { entry, mapData },
-				pageSize: 20,
 			}),
 		);
 	}

@@ -21,10 +21,10 @@ interface RedirectPair {
 
 // Collections where page URL = /{collection}/{id}/; all others are flat at /{id}/
 const collectionPrefixes: Record<string, string | undefined> = {
-	themes: 'themes',
-	series: 'series',
 	regions: 'regions',
 	resources: 'resources',
+	series: 'series',
+	themes: 'themes',
 };
 
 // Entries are walked in the order given, so an earlier collection claims a shared path first

@@ -27,7 +27,7 @@ describe('createMapStore', () => {
 
 	test('filter changes clear the active selection', () => {
 		const store = createMapStore();
-		const { setSelectedId, toggleStatusFilter, setEntryQualityFilter, setFilterOpen } =
+		const { setEntryQualityFilter, setFilterOpen, setSelectedId, toggleStatusFilter } =
 			store.getState().actions;
 
 		setSelectedId('location-1');
@@ -45,7 +45,7 @@ describe('createMapStore', () => {
 
 	test('clearing the selection restores popup visibility', () => {
 		const store = createMapStore();
-		const { setSelectedId, setPopupVisible } = store.getState().actions;
+		const { setPopupVisible, setSelectedId } = store.getState().actions;
 
 		setSelectedId('location-1');
 		setPopupVisible(false);

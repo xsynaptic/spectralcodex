@@ -16,7 +16,7 @@ interface Props extends HTMLAttributes<'div'> {
 	layout?: ImageLayout;
 }
 
-const { layout, context, columns: columnsProp, imageCount: imageCountProp, ...props } = Astro.props;
+const { columns: columnsProp, context, imageCount: imageCountProp, layout, ...props } = Astro.props;
 
 // This conditional controls whether slot contents are just passed through
 const { isFeed } = Astro.locals;

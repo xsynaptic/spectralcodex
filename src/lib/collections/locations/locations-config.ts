@@ -25,31 +25,40 @@ export const locations = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			description: z.string().optional(),
-			mood: z.enum(['light', 'neutral', 'dark']).default('neutral'),
-			category: z.enum(LocationCategoryEnum),
-			status: z.enum(LocationStatusEnum),
-			heritage: LocationTwHeritageSchema.optional(),
-			regions: reference('regions').array().min(1),
-			themes: reference('themes').array().optional(),
-			links: LinkSchema.array().optional(),
-			sources: SourceSchema.array().optional(),
-			notes: z.string().optional(),
 			address: z.string().optional(),
+			category: z.enum(LocationCategoryEnum),
+			description: z.string().optional(),
+			heritage: LocationTwHeritageSchema.optional(),
+			links: LinkSchema.array().optional(),
+			mood: z.enum(['light', 'neutral', 'dark']).default('neutral'),
+			notes: z.string().optional(),
+			regions: reference('regions').array().min(1),
+			sources: SourceSchema.array().optional(),
+			status: z.enum(LocationStatusEnum),
+			themes: reference('themes').array().optional(),
 			...createMultilingualSchemas('address'),
-			precision: NumericScaleSchema,
-			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
+			_descriptionHtml: z.string().optional(),
+			_googleMapsUrl: z.url().optional(),
+			_imageThumbnail: ImageThumbnailSchema.optional(),
+			_nearby: LocationsNearbyItemSchema.array().optional(),
+			_postCount: z.number().int().optional(),
+			_posts: z.string().array().optional(),
+			_url: z.url().optional(),
+			_uuid: z.string().optional(),
+			_wikipediaUrl: z.url().optional(),
 			dateCreated: DateSchema,
-			dateUpdated: DateSchema.optional(),
 			dateRecorded: DateRecordedSchema.optional(),
-			imageFeatured: ImageFeaturedSchema.optional(),
-			rating: NumericScaleSchema,
-			safety: NumericScaleSchema.optional(),
+			dateUpdated: DateSchema.optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
-			hideLocation: z.boolean().optional(), // Do not show this location on any map
+			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
 			hideIndex: z.boolean().optional(), // Exclude from index/listing surfaces; page remains accessible
-			skipCoordinateCheck: z.boolean().optional(), // Bypass region/coordinate validation
+			hideLocation: z.boolean().optional(), // Do not show this location on any map
+			hideSearch: z.boolean().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
+			incomplete: z.boolean().optional(), // Only for personal reference
+			objective: NumericScaleSchema.optional(), // Only for personal reference
+			outlier: z.boolean().optional(), // Do not use this location to calculate bounding boxes
 			// Override some properties for sensitive sites
 			override: z
 				.object({
@@ -59,21 +68,10 @@ export const locations = defineCollection({
 					regions: reference('regions').array().optional(),
 				})
 				.optional(),
-			outlier: z.boolean().optional(), // Do not use this location to calculate bounding boxes
-			objective: NumericScaleSchema.optional(), // Only for personal reference
-			incomplete: z.boolean().optional(), // Only for personal reference
-			hideSearch: z.boolean().optional(),
-			// Computed properties, for internal use only!
-			_nearby: LocationsNearbyItemSchema.array().optional(),
-			_posts: z.string().array().optional(),
-			_postCount: z.number().int().optional(),
-			// Map properties, for internal use only!
-			_uuid: z.string().optional(),
-			_descriptionHtml: z.string().optional(),
-			_imageThumbnail: ImageThumbnailSchema.optional(),
-			_url: z.url().optional(),
-			_googleMapsUrl: z.url().optional(),
-			_wikipediaUrl: z.url().optional(),
+			precision: NumericScaleSchema,
+			rating: NumericScaleSchema,
+			safety: NumericScaleSchema.optional(),
+			skipCoordinateCheck: z.boolean().optional(), // Bypass region/coordinate validation
 		})
 		.strict(),
 });

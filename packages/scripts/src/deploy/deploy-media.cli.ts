@@ -7,15 +7,15 @@ import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'dry-run': { type: 'boolean', default: false },
-		delete: { type: 'boolean', default: false },
+		delete: { default: false, type: 'boolean' },
+		'dry-run': { default: false, type: 'boolean' },
 	},
 });
 
 await ensureSshKeychain();
 
 await deployMedia({
-	rootPath: findWorkspaceRoot(),
 	dryRun: values['dry-run'],
+	rootPath: findWorkspaceRoot(),
 	withDelete: values.delete,
 });

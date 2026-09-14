@@ -87,7 +87,7 @@ describe('getChronologyActivityData', () => {
 	});
 
 	test('totals accumulate across days while values stay per day', () => {
-		const { values, totals } = getChronologyActivityData({
+		const { totals, values } = getChronologyActivityData({
 			'2024-01-01': { created: 1, updated: 0, visited: 2 },
 			'2024-01-02': { created: 3, updated: 4, visited: 0 },
 		});
@@ -107,8 +107,8 @@ describe('getChronologyActivityData', () => {
 
 	test('an empty month yields zero totals rather than NaN', () => {
 		expect(getChronologyActivityData({})).toStrictEqual({
-			values: {},
 			totals: { created: 0, updated: 0, visited: 0 },
+			values: {},
 		});
 	});
 });
@@ -123,14 +123,14 @@ function makeMonthlyItem(overrides: Partial<ChronologyMonthlyItem>): ChronologyM
 
 describe('createChronologyImageFeaturedGroupFunction', () => {
 	const highlight = makeCatalogItem({
-		id: 'some-location',
 		collection: 'locations',
-		title: 'Some Location',
+		id: 'some-location',
 		imageId: 'highlight-image',
+		title: 'Some Location',
 	});
 
 	getCatalogMock.mockResolvedValue(
-		createCatalog([highlight, makeCatalogItem({ id: 'linked-post', collection: 'posts' })]),
+		createCatalog([highlight, makeCatalogItem({ collection: 'posts', id: 'linked-post' })]),
 	);
 
 	test('a curated image wins over the highlights it would otherwise derive', async () => {
@@ -164,7 +164,7 @@ describe('createChronologyImageFeaturedGroupFunction', () => {
 		const group = getGroup(
 			makeMonthlyItem({
 				chronologyEntry: makeChronologyEntry(undefined),
-				highlights: [highlight, makeCatalogItem({ id: 'no-image', collection: 'posts' })],
+				highlights: [highlight, makeCatalogItem({ collection: 'posts', id: 'no-image' })],
 			}),
 		);
 

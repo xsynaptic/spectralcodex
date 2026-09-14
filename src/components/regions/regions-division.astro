@@ -7,7 +7,7 @@ interface Props extends HTMLAttributes<'div'> {
 	entryId: string;
 }
 
-const { entryId, class: className, ...props } = Astro.props;
+const { class: className, entryId, ...props } = Astro.props;
 
 // Construct path to the SVG file
 const svgContent = await getRegionsDivisionSvgContent(entryId);

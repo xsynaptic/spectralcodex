@@ -39,24 +39,24 @@ describe('extractExifData', () => {
 		const exif = await extractExifData(
 			'image.jpg',
 			makeExiftool({
-				Title: 'Temple gate',
 				FNumber: 8,
-				ShutterSpeed: '2',
-				ISO: 100,
-				LensModel: 'XF23mmF2',
 				GPSLatitude: 25.03,
 				GPSLongitude: 121.56,
+				ISO: 100,
+				LensModel: 'XF23mmF2',
+				ShutterSpeed: '2',
+				Title: 'Temple gate',
 			}),
 		);
 
 		expect(exif).toMatchObject({
-			title: 'Temple gate',
-			description: '',
 			aperture: '8',
+			description: '',
+			exposureValue: '5',
+			geometry: { coordinates: [121.56, 25.03], type: GeometryTypeEnum.Point },
 			iso: '100',
 			lens: 'XF23mmF2',
-			exposureValue: '5',
-			geometry: { type: GeometryTypeEnum.Point, coordinates: [121.56, 25.03] },
+			title: 'Temple gate',
 		});
 	});
 

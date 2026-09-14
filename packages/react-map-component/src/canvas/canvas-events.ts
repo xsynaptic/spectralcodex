@@ -68,11 +68,11 @@ function getClickInput(feature: MapClickFeature | undefined): MapClickInput {
 	const geometry = feature?.geometry;
 
 	return {
-		layerId: feature?.layer.id,
-		geometryType: geometry?.type,
-		coordinates: geometry?.type === GeometryTypeEnum.Point ? geometry.coordinates : undefined,
-		pointId: feature?.properties.id,
 		clusterId: feature?.properties.cluster_id,
+		coordinates: geometry?.type === GeometryTypeEnum.Point ? geometry.coordinates : undefined,
+		geometryType: geometry?.type,
+		layerId: feature?.layer.id,
+		pointId: feature?.properties.id,
 	};
 }
 
@@ -82,11 +82,11 @@ function getHoverInput(
 	storeHoveredId: string | undefined,
 ): MapHoverInput {
 	return {
-		layerId: feature?.layer.id,
-		featureId: feature?.id,
-		pointId: feature?.properties.id,
 		clusterId: feature?.properties.cluster_id,
+		featureId: feature?.id,
 		hoveredFeatureId,
+		layerId: feature?.layer.id,
+		pointId: feature?.properties.id,
 		storeHoveredId,
 	};
 }
@@ -110,8 +110,8 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			if (!mapId) return;
 
 			writeSavedViewport(mapId, {
-				longitude: event.viewState.longitude,
 				latitude: event.viewState.latitude,
+				longitude: event.viewState.longitude,
 				zoom: event.viewState.zoom,
 			});
 		},
@@ -119,24 +119,24 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	);
 
 	return {
+		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
+		onError: ({ error }) => {
+			setCanvasLoading(false);
+			console.warn('[Map]', error.message);
+		},
 		onLoad: (event: MapEvent) => {
 			setCanvasLoading(false);
 
 			// Initialize the position of the filter control on interactive maps
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
-		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
-		onError: ({ error }) => {
-			setCanvasLoading(false);
-			console.warn('[Map]', error.message);
-		},
 		...(isInteractive
 			? {
-					onResize: debouncedFilterControlSetup.call,
 					onClick,
 					onMouseDown,
 					onMouseUp,
 					onMoveEnd,
+					onResize: debouncedFilterControlSetup.call,
 					...(isSourceDataLoading
 						? {}
 						: {
@@ -150,7 +150,7 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 function useClickHandler() {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
-	const { setSelectedId, setPopupVisible, setHoveredId, setFilterOpen } = useMapStoreActions();
+	const { setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } = useMapStoreActions();
 
 	const selectPoint = useCallback(
 		(
@@ -173,7 +173,7 @@ function useClickHandler() {
 			mapInstance.easeTo({
 				center,
 				duration: 150,
-				padding: isMobile ? { bottom: 180, right: 0 } : { right: 180, bottom: 0 },
+				padding: isMobile ? { bottom: 180, right: 0 } : { bottom: 0, right: 180 },
 			});
 		},
 		[isMobile, setSelectedId, setHoveredId, setPopupVisible],
@@ -230,10 +230,10 @@ function useDebouncedFilterControlSetup() {
 
 					const { x: containerX, y: containerY } = container.getBoundingClientRect();
 					const {
-						x: controlX,
-						y: controlY,
 						height: controlHeight,
 						width: controlWidth,
+						x: controlX,
+						y: controlY,
 					} = filterControl.getBoundingClientRect();
 
 					setFilterPosition({
@@ -242,12 +242,12 @@ function useDebouncedFilterControlSetup() {
 					});
 				},
 				{
+					minQuietPeriodMs: 300,
 					reducer: (_previousElement, ...args: Array<MapEvent>) => {
 						if (args.length === 0 || !args[0]) return;
 
 						return args[0].target.getContainer();
 					},
-					minQuietPeriodMs: 300,
 				},
 			),
 		[setFilterPosition],
@@ -286,7 +286,7 @@ function useThrottledMouseMoveHandler() {
 
 			for (const { featureId, hover } of intent.featureStateChanges) {
 				mapInstance.setFeatureState(
-					{ source: MapSourceIdEnum.PointCollection, id: featureId },
+					{ id: featureId, source: MapSourceIdEnum.PointCollection },
 					{ hover },
 				);
 			}
@@ -304,12 +304,12 @@ function useThrottledMouseMoveHandler() {
 	return useMemo(
 		() =>
 			R.funnel(onMouseMove, {
+				minGapMs: 20,
 				reducer: (_, ...args: Array<MapLayerMouseEvent>) => {
 					if (args.length === 0 || !args[0]) return;
 
 					return args[0];
 				},
-				minGapMs: 20,
 				triggerAt: 'both',
 			}),
 		[onMouseMove],

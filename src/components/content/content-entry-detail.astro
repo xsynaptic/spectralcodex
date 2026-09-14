@@ -24,15 +24,15 @@ interface Props {
 	prefetchUrls: Array<string> | undefined;
 }
 
-const { entry, page, breadcrumbRegions, prefetchUrls, hideSearch } = Astro.props;
+const { breadcrumbRegions, entry, hideSearch, page, prefetchUrls } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const catalog = await getCatalog();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
-	imageFeatured: entry.data.imageFeatured,
 	getCaption: catalog.getCaption,
+	imageFeatured: entry.data.imageFeatured,
 });
 
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
@@ -43,21 +43,21 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 <MainSite
 	hasHeroImage={hasHeroImage}
 	meta={{
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
-			id: entry.id,
 			alt: entry.data.title,
+			id: entry.id,
 		}),
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...getSeoHideSearch(hideSearch),
 		prefetchUrls,
 	}}
 	schemas={[
 		buildEntryBreadcrumbSchema({
 			collection: entry.collection,
+			regions: breadcrumbRegions,
 			title: entry.data.title,
 			url: Astro.url.toString(),
-			regions: breadcrumbRegions,
 		}),
 	]}
 >

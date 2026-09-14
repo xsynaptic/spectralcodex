@@ -19,8 +19,8 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'dry-run': { type: 'boolean', default: false },
-		'skip-build': { type: 'boolean', default: false },
+		'dry-run': { default: false, type: 'boolean' },
+		'skip-build': { default: false, type: 'boolean' },
 	},
 });
 
@@ -42,29 +42,29 @@ async function build() {
 		return;
 	}
 	console.log(chalk.blue('Building...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro build`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm astro build`;
 }
 
 async function caddy() {
-	await deployCaddy({ rootPath, dryRun: isDryRun });
+	await deployCaddy({ dryRun: isDryRun, rootPath });
 }
 
 async function generateOpenGraph() {
 	console.log(chalk.blue('Generating OpenGraph images...'));
 	await $({
-		stdio: 'inherit',
 		cwd: rootPath,
+		stdio: 'inherit',
 	})`pnpm og-image --dist-path=${distPath}`;
 }
 
 async function generateRedirects() {
 	console.log(chalk.blue('Generating redirects...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm generate-redirects`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm generate-redirects`;
 }
 
 async function media() {
 	try {
-		await deployMedia({ rootPath, dryRun: isDryRun });
+		await deployMedia({ dryRun: isDryRun, rootPath });
 	} catch (error) {
 		if (error instanceof MediaPathMissingError) {
 			console.log(chalk.yellow('Media path not found, skipping'));
@@ -77,33 +77,33 @@ async function media() {
 async function similar() {
 	console.log(chalk.blue('Generating similar content...'));
 	await $({
-		stdio: 'inherit',
 		cwd: rootPath,
+		stdio: 'inherit',
 	})`pnpm similar-content`;
 }
 
 // Content scripts read the store `astro sync` writes, so it has to run first
 async function sync() {
 	console.log(chalk.blue('Syncing content...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm astro sync --mode production`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm astro sync --mode production`;
 }
 
 async function test() {
 	console.log(chalk.blue('Running E2E smoke tests...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm test-e2e`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm test-e2e`;
 }
 
 async function transfer() {
-	await deployApp({ rootPath, dryRun: isDryRun });
+	await deployApp({ dryRun: isDryRun, rootPath });
 }
 
 async function transferOpenGraph() {
-	await deployOg({ rootPath, dryRun: isDryRun });
+	await deployOg({ dryRun: isDryRun, rootPath });
 }
 
 async function validate() {
 	console.log(chalk.blue('Validating content...'));
-	await $({ stdio: 'inherit', cwd: rootPath })`pnpm -F @spectralcodex/scripts validate-content`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm -F @spectralcodex/scripts validate-content`;
 }
 
 // A webmention.io outage must not block a deploy; the build falls back to the committed data
@@ -116,8 +116,8 @@ async function webmentions() {
 	console.log(chalk.blue('Fetching webmentions...'));
 	try {
 		await $({
-			stdio: 'inherit',
 			cwd: rootPath,
+			stdio: 'inherit',
 		})`pnpm webmentions`;
 	} catch {
 		console.log(chalk.yellow('Webmention fetch failed, continuing with existing data'));

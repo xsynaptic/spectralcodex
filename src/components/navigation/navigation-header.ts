@@ -34,7 +34,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 		.sort(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => ({
-			...getNavigationItemData({ entry, collection: 'regions' }),
+			...getNavigationItemData({ collection: 'regions', entry }),
 			...(entry.data._children && maxDepth > 1
 				? {
 						children: getRegionsByIds(entry.data._children)
@@ -42,14 +42,14 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 							.sort(sortByEntryCount)
 							.slice(0, 15)
 							.map((entry) => ({
-								...getNavigationItemData({ entry, collection: 'regions' }),
+								...getNavigationItemData({ collection: 'regions', entry }),
 								...(entry.data._children && maxDepth > 2
 									? {
 											children: getRegionsByIds(entry.data._children)
 												.filter(filterNavigationItemEntryCount(3))
 												.sort(sortByEntryCount)
 												.slice(0, 8)
-												.map((entry) => getNavigationItemData({ entry, collection: 'regions' })),
+												.map((entry) => getNavigationItemData({ collection: 'regions', entry })),
 										}
 									: {}),
 							})),
@@ -62,14 +62,14 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 		.filter(filterNavigationItemEntryCount(1))
 		.sort(sortByEntryCount)
 		.slice(0, 12)
-		.map((entry) => getNavigationItemData({ entry, collection: 'series' }));
+		.map((entry) => getNavigationItemData({ collection: 'series', entry }));
 
 	const themesMenu = themes
 		.filter((entry) => entry.data.entryQuality >= 2)
 		.filter(filterNavigationItemEntryCount(1))
 		.sort(sortByEntryCount)
 		.slice(0, 12)
-		.map((entry) => getNavigationItemData({ entry, collection: 'themes' }));
+		.map((entry) => getNavigationItemData({ collection: 'themes', entry }));
 
 	const chronologyData = await getChronologyData();
 
@@ -83,27 +83,27 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('locations'),
 		},
 		{
+			children: regionsMenu,
 			title: 'Regions',
 			url: getSitePath('regions'),
-			children: regionsMenu,
 		},
 		{
+			children: seriesMenu,
 			title: t('collection.series.labelPlural'),
 			url: getSitePath('series'),
-			children: seriesMenu,
 		},
 		{
+			children: themesMenu,
 			title: t('collection.themes.labelPlural'),
 			url: getSitePath('themes'),
-			children: themesMenu,
 		},
 		{
-			title: t('navigation.chronology.label'),
-			url: getSitePath('chronology'),
 			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
 				title: year,
 				url: getSitePath('chronology', year),
 			})),
+			title: t('navigation.chronology.label'),
+			url: getSitePath('chronology'),
 		},
 		{
 			title: t('navigation.about.label'),
@@ -128,8 +128,8 @@ function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
 }
 
 function getNavigationItemData({
-	entry,
 	collection,
+	entry,
 }: {
 	collection: 'regions' | 'series' | 'themes';
 	entry: CollectionEntry<'regions' | 'series' | 'themes'>;

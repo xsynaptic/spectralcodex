@@ -2,14 +2,14 @@
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
 const WashColorEnum = {
-	Primary: 'primary',
-	PrimaryBright: 'primary-bright',
-	PrimaryFeatured: 'primary-featured',
-	Highlight: 'highlight',
-	HighlightBright: 'highlight-bright',
 	Accent: 'accent',
 	AccentBright: 'accent-bright',
 	AccentFeatured: 'accent-featured',
+	Highlight: 'highlight',
+	HighlightBright: 'highlight-bright',
+	Primary: 'primary',
+	PrimaryBright: 'primary-bright',
+	PrimaryFeatured: 'primary-featured',
 } as const;
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
@@ -23,8 +23,8 @@ type WashColor = (typeof WashColorEnum)[keyof typeof WashColorEnum];
 const {
 	as: Tag = 'div',
 	class: className,
-	washColor = WashColorEnum.Primary,
 	showDarkMode = true,
+	washColor = WashColorEnum.Primary,
 	...props
 } = Astro.props;
 ---

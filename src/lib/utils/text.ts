@@ -7,8 +7,8 @@ import { markdownToHtml } from 'satteri';
 const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 
 export function formatNumber({
-	number,
 	locales,
+	number,
 	options,
 }: {
 	locales?: Intl.LocalesArgument | undefined;
@@ -73,11 +73,11 @@ export function textClipper(
 
 const namedHtmlEntities: Record<string, string> = {
 	amp: '&',
-	lt: '<',
-	gt: '>',
-	quot: '"',
 	apos: "'",
+	gt: '>',
+	lt: '<',
 	nbsp: ' ',
+	quot: '"',
 };
 
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"

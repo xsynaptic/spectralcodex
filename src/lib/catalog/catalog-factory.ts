@@ -32,9 +32,9 @@ export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {
 		if (!item) return undefined;
 
 		return {
+			id: item.id,
 			title: item.title,
 			titleMultilingual: item.titleMultilingual,
-			id: item.id,
 			url: item.url,
 		};
 	}
@@ -59,7 +59,7 @@ export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {
 	function resolve<T extends CatalogCollectionKey = CatalogCollectionKey>(
 		entries: Array<CollectionEntry<T>>,
 	): Array<CatalogItem<T>> {
-		return entries.map(({ id, collection }) => {
+		return entries.map(({ collection, id }) => {
 			const item = itemsById.get(id);
 
 			if (!item) {
@@ -81,5 +81,5 @@ export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {
 		return items;
 	}
 
-	return { getById, getCaption, backlinksOf, resolve, byCollection, all };
+	return { all, backlinksOf, byCollection, getById, getCaption, resolve };
 }

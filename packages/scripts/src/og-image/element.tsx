@@ -26,19 +26,19 @@ function isBrightBackground(luminance?: number): boolean {
 // Safe zone rectangle: (120, 63) to (1080, 567) → 960 × 504 px
 function SafeZoneOverlay({ opacity = '0.5' }: { opacity?: string | undefined }) {
 	const overlayStyle = {
-		position: 'absolute' as const,
 		background: `rgb(255, 0, 0, ${opacity})`,
+		position: 'absolute' as const,
 	};
 
 	return (
 		<>
-			<div style={{ ...overlayStyle, top: '0px', left: '0px', width: '1200px', height: '63px' }} />
+			<div style={{ ...overlayStyle, height: '63px', left: '0px', top: '0px', width: '1200px' }} />
 			<div
-				style={{ ...overlayStyle, bottom: '0px', left: '0px', width: '1200px', height: '63px' }}
+				style={{ ...overlayStyle, bottom: '0px', height: '63px', left: '0px', width: '1200px' }}
 			/>
-			<div style={{ ...overlayStyle, top: '63px', left: '0px', width: '120px', height: '504px' }} />
+			<div style={{ ...overlayStyle, height: '504px', left: '0px', top: '63px', width: '120px' }} />
 			<div
-				style={{ ...overlayStyle, top: '63px', left: '1080px', width: '120px', height: '504px' }}
+				style={{ ...overlayStyle, height: '504px', left: '1080px', top: '63px', width: '120px' }}
 			/>
 		</>
 	);
@@ -56,22 +56,22 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 	return (
 		<div
 			style={{
-				display: 'flex',
-				justifyContent: 'center',
-				position: 'absolute',
-				top: '60px',
-				left: '0px',
-				width: '100%',
 				color: isInverted ? 'rgb(24, 24, 27)' : '#ffffff',
+				display: 'flex',
 				fontFamily: 'Lora',
 				fontSize: '26px',
 				fontWeight: 700,
+				justifyContent: 'center',
+				left: '0px',
 				letterSpacing,
 				lineHeight: 1.25,
 				paddingLeft: letterSpacing, // Account for letter spacing; this re-centers the text
+				position: 'absolute',
 				textShadow: isInverted
 					? '0px 0px 4px rgb(220, 220, 225, 0.8)'
 					: '0px 0px 4px rgb(12, 12, 14, 0.8)',
+				top: '60px',
+				width: '100%',
 			}}
 		>
 			{brandLabel}
@@ -81,26 +81,26 @@ function TitleSite({ luminance }: { luminance?: number | undefined }) {
 
 // Each script gets its own face and optical size; `lang` also drives Han unification
 const scriptStyles = {
-	zh: {
-		lang: 'zh-Hant',
-		fontFamily: 'Noto Serif TC',
-		fontSize: '48px',
-		fontWeight: 700,
-		lineHeight: 1.25,
-	},
 	ja: {
-		lang: 'ja',
 		fontFamily: 'Zen Antique',
 		fontSize: '48px',
 		fontWeight: 400,
+		lang: 'ja',
 		lineHeight: 1.25,
 	},
 	th: {
-		lang: 'th',
 		fontFamily: 'Noto Serif Thai',
 		fontSize: '40px',
 		fontWeight: 500,
+		lang: 'th',
 		lineHeight: 1,
+	},
+	zh: {
+		fontFamily: 'Noto Serif TC',
+		fontSize: '48px',
+		fontWeight: 700,
+		lang: 'zh-Hant',
+		lineHeight: 1.25,
 	},
 } as const;
 
@@ -110,8 +110,8 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 			style={{
 				background: '#18181b',
 				display: 'flex',
-				width: `${String(openGraphImageWidth)}px`,
 				height: `${String(openGraphImageHeight)}px`,
+				width: `${String(openGraphImageWidth)}px`,
 			}}
 		>
 			{image ? (
@@ -125,24 +125,24 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 			{/* Gradient overlay */}
 			<div
 				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
 					background:
 						'linear-gradient(to bottom, rgb(24, 24, 27, 0) 75%, rgb(24, 24, 27, 0.4) 88%, rgb(12, 12, 14, 0.6) 100%)',
+					height: '100%',
+					left: 0,
+					position: 'absolute',
+					top: 0,
+					width: '100%',
 				}}
 			/>
 			{isShowSafeZoneOverlay ? <SafeZoneOverlay /> : undefined}
 			<div
 				style={{
+					alignItems: 'center',
 					display: 'flex',
 					flexDirection: 'column',
-					alignItems: 'center',
+					height: '100%',
 					justifyContent: 'flex-end',
 					textAlign: 'center',
-					height: '100%',
 					width: '100%',
 				}}
 			>
@@ -160,9 +160,9 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 }
 
 function resolveScript({
-	titleZh,
 	titleJa,
 	titleTh,
+	titleZh,
 }: {
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
@@ -175,7 +175,7 @@ function resolveScript({
 	return;
 }
 
-function Title({ title, luminance }: { luminance?: number | undefined; title: string }) {
+function Title({ luminance, title }: { luminance?: number | undefined; title: string }) {
 	const isInverted = isBrightBackground(luminance);
 
 	return (

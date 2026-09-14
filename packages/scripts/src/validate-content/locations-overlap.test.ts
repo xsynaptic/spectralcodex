@@ -5,7 +5,7 @@ import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 // About 0.00001 degrees of latitude is 1.1m at this latitude
 function makePoint(id: string, lat: number, lng = 121.5) {
-	return makeEntry({ id, data: { geometry: { coordinates: [lng, lat] } } });
+	return makeEntry({ data: { geometry: { coordinates: [lng, lat] } }, id });
 }
 
 describe('validateLocationsOverlap', () => {
@@ -13,9 +13,9 @@ describe('validateLocationsOverlap', () => {
 		const entries = [makePoint('a', 25.05), makePoint('b', 25.055)];
 
 		expect(validateLocationsOverlap(entries, 10)).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'No overlapping locations found (checked 2 locations, 2 points)',
-			issues: [],
 		});
 	});
 
@@ -32,17 +32,17 @@ describe('validateLocationsOverlap', () => {
 	test('never reports a location against its own points', () => {
 		const entries = [
 			makeEntry({
-				id: 'complex',
 				data: {
 					geometry: [{ coordinates: [121.5, 25.05] }, { coordinates: [121.5, 25.05001] }],
 				},
+				id: 'complex',
 			}),
 		];
 
 		expect(validateLocationsOverlap(entries, 10)).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'No overlapping locations found (checked 1 locations, 2 points)',
-			issues: [],
 		});
 	});
 });

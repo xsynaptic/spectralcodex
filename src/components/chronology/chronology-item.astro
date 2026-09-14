@@ -13,7 +13,7 @@ interface Props {
 	url?: string | undefined;
 }
 
-const { title, items, count, showItemCount = false, url, class: className, ...props } = Astro.props;
+const { class: className, count, items, showItemCount = false, title, url, ...props } = Astro.props;
 
 const itemCountLabel =
 	showItemCount && items.length >= 10 ? ` (${String(items.length)})` : undefined;

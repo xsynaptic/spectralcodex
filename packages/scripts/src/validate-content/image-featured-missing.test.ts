@@ -6,19 +6,19 @@ import { makeEntry } from '#validate-content/validate-test-utils.ts';
 describe('validateImageFeaturedMissing', () => {
 	test('flags entries whose body renders an Img without imageFeatured', () => {
 		const entries = [
-			makeEntry({ id: 'a-post', filePath: 'posts/a-post.mdx', body: '<Img src="one.jpg" />' }),
+			makeEntry({ body: '<Img src="one.jpg" />', filePath: 'posts/a-post.mdx', id: 'a-post' }),
 			makeEntry({
-				id: 'featured',
-				data: { imageFeatured: 'one.jpg' },
 				body: '<Img src="one.jpg" />',
+				data: { imageFeatured: 'one.jpg' },
+				id: 'featured',
 			}),
-			makeEntry({ id: 'prose-only', body: 'Prose only.' }),
+			makeEntry({ body: 'Prose only.', id: 'prose-only' }),
 		];
 
 		expect(validateImageFeaturedMissing(entries)).toEqual({
+			issues: [{ message: 'posts/a-post.mdx: body has images but no imageFeatured' }],
 			status: 'fail',
 			summary: 'Found 1 entries with body images but no imageFeatured',
-			issues: [{ message: 'posts/a-post.mdx: body has images but no imageFeatured' }],
 		});
 	});
 });

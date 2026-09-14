@@ -14,16 +14,16 @@ export const pages = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			description: z.string().optional(),
-			regions: reference('regions').array().optional(),
-			themes: reference('themes').array().optional(),
-			links: LinkSchema.array().optional(),
 			dateCreated: DateSchema,
 			dateUpdated: DateSchema.optional(),
-			imageFeatured: ImageFeaturedSchema.optional(),
+			description: z.string().optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			hideSearch: z.boolean().optional(),
+			imageFeatured: ImageFeaturedSchema.optional(),
+			links: LinkSchema.array().optional(),
+			regions: reference('regions').array().optional(),
+			themes: reference('themes').array().optional(),
 		})
 		.strict(),
 });

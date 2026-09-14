@@ -29,13 +29,13 @@ const description = t('collection.locations.description');
 
 <MainSite
 	meta={{
-		title,
 		description,
 		image: getSeoImageProps({
-			id: 'index-locations',
 			alt: title,
+			id: 'index-locations',
 		}),
 		noIndex: page.currentPage > 1,
+		title,
 	}}
 >
 	<ContentHeader>

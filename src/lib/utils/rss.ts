@@ -57,10 +57,10 @@ function sanitizeFeedContent(contentHtml: string, shouldExcludeFootnotes: boolea
 }
 
 const generateFeedItem = async ({
+	debug,
 	entry,
 	renderMdx,
 	shouldExcludeFootnotes,
-	debug,
 }: {
 	debug: boolean;
 	entry: CollectionEntry<'locations' | 'posts'>;
@@ -84,10 +84,10 @@ const generateFeedItem = async ({
 	const pubDate = entry.data.dateUpdated ?? entry.data.dateCreated;
 
 	const feedItem = {
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		link: getContentPath(entry.collection, getPublicId(entry)),
 		// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
 		pubDate: new Date(pubDate.getTime() - siteTimezoneOffsetHours * millisecondsPerHour),
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...(description ? { description } : {}),
 		...(contentSanitized ? { content: contentSanitized } : {}),
 	} satisfies RSSFeedItem;
@@ -102,9 +102,9 @@ const generateFeedItem = async ({
 };
 
 export async function generateFeedItems({
+	debug,
 	itemCount,
 	shouldExcludeFootnotes,
-	debug,
 }: {
 	debug: boolean;
 	itemCount: number;
@@ -126,7 +126,7 @@ export async function generateFeedItems({
 			(items) =>
 				Promise.all(
 					items.map((item) =>
-						generateFeedItem({ entry: item, renderMdx, shouldExcludeFootnotes, debug }),
+						generateFeedItem({ debug, entry: item, renderMdx, shouldExcludeFootnotes }),
 					),
 				),
 		),

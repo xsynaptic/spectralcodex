@@ -14,8 +14,8 @@ import { useIsMapCanvasInteractive } from '#store/store.ts';
 const isDebug = false as boolean;
 
 const emptyFeatureCollection: FeatureCollection<never, never> = {
-	type: 'FeatureCollection',
 	features: [],
+	type: 'FeatureCollection',
 };
 
 export const MapSource: FC<
@@ -23,10 +23,10 @@ export const MapSource: FC<
 		bounds: MapComponentProps['bounds'] | undefined;
 		hasMapIcons: boolean;
 	}
-> = function MapSource({ apiDivisionUrl, hasMapIcons, bounds, isDev, targetIds }) {
+> = function MapSource({ apiDivisionUrl, bounds, hasMapIcons, isDev, targetIds }) {
 	const isInteractive = useIsMapCanvasInteractive();
 
-	const { pointCollection, lineStringCollection } = useMapCanvasData();
+	const { lineStringCollection, pointCollection } = useMapCanvasData();
 	const { data: divisionData } = useMapApiDivisionData({ apiDivisionUrl, isDev });
 
 	/**

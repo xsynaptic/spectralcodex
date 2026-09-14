@@ -24,7 +24,7 @@ interface Props {
 	chronologyYears: Array<string>;
 }
 
-const { chronologyMonthlyData, chronologyYear, chronologyYears, chronologyDailyData } = Astro.props;
+const { chronologyDailyData, chronologyMonthlyData, chronologyYear, chronologyYears } = Astro.props;
 
 const getChronologyImageFeaturedGroup = await createChronologyImageFeaturedGroupFunction();
 
@@ -35,12 +35,12 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 
 <MainSite
 	meta={{
-		title,
 		description: formatStringTemplate(t('chronology.yearly.description'), { date: chronologyYear }),
 		image: getSeoImageProps({
-			id: chronologyYear,
 			alt: title,
+			id: chronologyYear,
 		}),
+		title,
 		...getSeoHideSearch(true),
 	}}
 >

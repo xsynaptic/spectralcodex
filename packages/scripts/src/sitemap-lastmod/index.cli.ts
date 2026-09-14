@@ -9,8 +9,8 @@ import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'content-path': { type: 'string', default: 'packages/content' },
-		'output-path': { type: 'string', default: sitemapLastmodPath },
+		'content-path': { default: 'packages/content', type: 'string' },
+		'output-path': { default: sitemapLastmodPath, type: 'string' },
 		'site-url': { type: 'string' },
 	},
 });
@@ -23,8 +23,8 @@ if (!siteUrl) {
 }
 
 await generateSitemapLastmod({
-	rootPath: findWorkspaceRoot(),
-	siteUrl,
 	contentPath: values['content-path'],
 	outputPath: values['output-path'],
+	rootPath: findWorkspaceRoot(),
+	siteUrl,
 });

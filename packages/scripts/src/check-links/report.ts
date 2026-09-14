@@ -15,29 +15,29 @@ interface ReportSection {
 
 const reportSections: Array<ReportSection> = [
 	{
-		status: UrlStatusEnum.Redirect,
-		label: 'Redirected',
 		color: chalk.yellow,
 		formatUrl: (row) => `${row.url} -> ${row.redirect_url ?? 'unknown'}`,
+		label: 'Redirected',
+		status: UrlStatusEnum.Redirect,
 	},
 	{
-		status: UrlStatusEnum.Missing,
-		label: 'Missing',
 		color: chalk.magenta,
 		formatUrl: (row) => `${row.url} ${chalk.gray(`[${String(row.check_count)}x]`)}`,
+		label: 'Missing',
+		status: UrlStatusEnum.Missing,
 	},
 	{
-		status: UrlStatusEnum.Blocked,
-		label: 'Blocked; needs manual verification',
 		color: chalk.cyan,
 		formatUrl: (row) =>
 			`${row.url} ${chalk.gray(`[HTTP ${String(row.last_http_status ?? '?')}, ${String(row.check_count)}x]`)}`,
+		label: 'Blocked; needs manual verification',
+		status: UrlStatusEnum.Blocked,
 	},
 	{
-		status: UrlStatusEnum.Error,
-		label: 'Error',
 		color: chalk.red,
 		formatUrl: (row) => row.url,
+		label: 'Error',
+		status: UrlStatusEnum.Error,
 	},
 ];
 
@@ -63,7 +63,7 @@ export function printSessionSummary(checked: number, healthy: number, issues: nu
 }
 
 export function printStatus(): void {
-	const { total, healthy, redirect, missing, blocked, error, pending } = getStats();
+	const { blocked, error, healthy, missing, pending, redirect, total } = getStats();
 
 	console.log('');
 	console.log(chalk.magenta('=== Link Check Status ==='));
@@ -87,7 +87,7 @@ function entryId(contentId: string): string {
 	return contentId.slice(slash + 1);
 }
 
-function printSection({ status, label, color, formatUrl }: ReportSection): void {
+function printSection({ color, formatUrl, label, status }: ReportSection): void {
 	const grouped = getUrlsByStatusGroupedByContent(status);
 
 	if (grouped.size === 0) return;

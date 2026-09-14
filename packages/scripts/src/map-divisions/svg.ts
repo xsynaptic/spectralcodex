@@ -29,8 +29,8 @@ interface SvgOptions {
 export async function saveSvg({
 	geojsonData,
 	id,
-	outputDir,
 	options = {},
+	outputDir,
 }: {
 	geojsonData: DivisionFeatureCollection;
 	id: string;
@@ -42,7 +42,7 @@ export async function saveSvg({
 	const filePath = path.join(outputDir, `${id}.svg`);
 
 	try {
-		const { svg: rawSvg, pointCount, tolerance } = generateSvg(geojsonData, options);
+		const { pointCount, svg: rawSvg, tolerance } = generateSvg(geojsonData, options);
 
 		const optimized = optimize(rawSvg, {
 			path: filePath,
@@ -90,11 +90,11 @@ function generateSvg(
 	tolerance: number;
 } {
 	const {
-		tolerance = 0.0002,
-		highQuality = true,
-		width = 800,
-		height = 800,
 		divisionClippingBBox,
+		height = 800,
+		highQuality = true,
+		tolerance = 0.0002,
+		width = 800,
 	} = options;
 
 	// Clip to bounding box if provided
@@ -160,8 +160,8 @@ function generateSvg(
 			: tolerance;
 
 	const simplified = simplify(corrected, {
-		tolerance: adaptiveTolerance,
 		highQuality,
+		tolerance: adaptiveTolerance,
 	});
 
 	// Create a projection that fits the geometry to the viewport
@@ -193,5 +193,5 @@ function generateSvg(
   <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;
 
-	return { svg, pointCount, tolerance: adaptiveTolerance };
+	return { pointCount, svg, tolerance: adaptiveTolerance };
 }

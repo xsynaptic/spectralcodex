@@ -7,39 +7,39 @@ const t = getTranslations();
 
 export const navigationFooterItems = [
 	{
+		rel: 'me',
 		title: t('navigation.threads.label'),
 		url: 'https://www.threads.com/@synapticx',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.bluesky.label'),
 		url: 'https://bsky.app/profile/spectralcodex.com',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.facebook.label'),
 		url: 'https://www.facebook.com/SpectralCodex/',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.instagram.label'),
 		url: 'https://www.instagram.com/spectralcodex',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.mastodon.label'),
 		url: 'https://indieweb.social/@SpectralCodex',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.flickr.label'),
 		url: 'https://www.flickr.com/photos/spectralcodex/',
-		rel: 'me',
 	},
 	{
+		rel: 'me',
 		title: t('navigation.patreon.label'),
 		url: 'https://www.patreon.com/spectralcodex',
-		rel: 'me',
 	},
 	{
 		title: t('navigation.terms.label'),

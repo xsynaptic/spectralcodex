@@ -15,93 +15,106 @@ export interface LocationStatusMetadata {
 }
 
 export const LocationStatusRecords = {
-	[LocationStatusEnum.Active]: {
-		title: 'Active',
-		title_zh: '經營中',
-		description: 'In business, typically for something close to its original purpose.',
-		color: tailwindColors.emerald500,
-		stroke: tailwindColors.emerald600,
-		colorDark: tailwindColors.emerald400,
-		strokeDark: tailwindColors.emerald500,
-	},
-	[LocationStatusEnum.Public]: {
-		title: 'Public',
-		title_zh: '公有',
-		description:
-			'Open to the public as an attraction of some kind, or otherwise appreciable from the surrounding area.',
-		color: tailwindColors.green500,
-		stroke: tailwindColors.green600,
-		colorDark: tailwindColors.green500,
-		strokeDark: tailwindColors.green600,
-	},
-	[LocationStatusEnum.Converted]: {
-		title: 'Converted',
-		title_zh: '改建',
-		description:
-			'The structure is intact but it has been converted for some other use than originally intended.',
-		color: tailwindColors.yellow400,
-		stroke: tailwindColors.yellow500,
-		colorDark: tailwindColors.yellow400,
-		strokeDark: tailwindColors.yellow500,
-	},
-	[LocationStatusEnum.Private]: {
-		title: 'Private',
-		title_zh: '私有',
-		description:
-			'Private sites that are either still occupied, patrolled, or otherwise inaccessible.',
-		color: tailwindColors.amber400,
-		stroke: tailwindColors.amber500,
-		colorDark: tailwindColors.amber500,
-		strokeDark: tailwindColors.amber600,
-	},
-	[LocationStatusEnum.Idle]: {
-		title: 'Idle',
-		title_zh: '閒置',
-		description:
-			'Closed but not necessarily abandoned, or recognized for its heritage value but awaiting restoration.',
-		color: tailwindColors.orange400,
-		stroke: tailwindColors.orange500,
-		colorDark: tailwindColors.orange500,
-		strokeDark: tailwindColors.orange600,
-	},
 	[LocationStatusEnum.Abandoned]: {
+		color: tailwindColors.red500,
+		colorDark: tailwindColors.red500,
+		description: 'Abandoned to the elements, with or without security to prevent entry.',
+		stroke: tailwindColors.red600,
+		strokeDark: tailwindColors.red600,
 		title: 'Abandoned',
 		title_zh: '廢墟',
-		description: 'Abandoned to the elements, with or without security to prevent entry.',
-		color: tailwindColors.red500,
-		stroke: tailwindColors.red600,
-		colorDark: tailwindColors.red500,
-		strokeDark: tailwindColors.red600,
+	},
+	[LocationStatusEnum.Active]: {
+		color: tailwindColors.emerald500,
+		colorDark: tailwindColors.emerald400,
+		description: 'In business, typically for something close to its original purpose.',
+		stroke: tailwindColors.emerald600,
+		strokeDark: tailwindColors.emerald500,
+		title: 'Active',
+		title_zh: '經營中',
+	},
+	[LocationStatusEnum.Converted]: {
+		color: tailwindColors.yellow400,
+		colorDark: tailwindColors.yellow400,
+		description:
+			'The structure is intact but it has been converted for some other use than originally intended.',
+		stroke: tailwindColors.yellow500,
+		strokeDark: tailwindColors.yellow500,
+		title: 'Converted',
+		title_zh: '改建',
+	},
+	[LocationStatusEnum.Idle]: {
+		color: tailwindColors.orange400,
+		colorDark: tailwindColors.orange500,
+		description:
+			'Closed but not necessarily abandoned, or recognized for its heritage value but awaiting restoration.',
+		stroke: tailwindColors.orange500,
+		strokeDark: tailwindColors.orange600,
+		title: 'Idle',
+		title_zh: '閒置',
+	},
+	[LocationStatusEnum.Private]: {
+		color: tailwindColors.amber400,
+		colorDark: tailwindColors.amber500,
+		description:
+			'Private sites that are either still occupied, patrolled, or otherwise inaccessible.',
+		stroke: tailwindColors.amber500,
+		strokeDark: tailwindColors.amber600,
+		title: 'Private',
+		title_zh: '私有',
+	},
+	[LocationStatusEnum.Public]: {
+		color: tailwindColors.green500,
+		colorDark: tailwindColors.green500,
+		description:
+			'Open to the public as an attraction of some kind, or otherwise appreciable from the surrounding area.',
+		stroke: tailwindColors.green600,
+		strokeDark: tailwindColors.green600,
+		title: 'Public',
+		title_zh: '公有',
 	},
 	[LocationStatusEnum.Remnants]: {
-		title: 'Remnants',
-		title_zh: '遺跡',
+		color: tailwindColors.red700,
+		colorDark: tailwindColors.red600,
 		description:
 			'Mostly dismantled or transformed beyond recognition but some traces remain, though they may be minor.',
-		color: tailwindColors.red700,
 		stroke: tailwindColors.red800,
-		colorDark: tailwindColors.red600,
 		strokeDark: tailwindColors.red700,
-	},
-	[LocationStatusEnum.Vanished]: {
-		title: 'Vanished',
-		title_zh: '已消失',
-		description: 'Vanished into the mists of time.',
-		color: tailwindColors.zinc600,
-		stroke: tailwindColors.zinc200,
-		colorDark: tailwindColors.zinc600,
-		strokeDark: tailwindColors.zinc200,
+		title: 'Remnants',
+		title_zh: '遺跡',
 	},
 	[LocationStatusEnum.Unknown]: {
+		color: tailwindColors.zinc800,
+		colorDark: tailwindColors.zinc800,
+		description: 'The status of this location is unknown.',
+		stroke: tailwindColors.zinc400,
+		strokeDark: tailwindColors.zinc400,
 		title: 'Unknown',
 		title_zh: '不明',
-		description: 'The status of this location is unknown.',
-		color: tailwindColors.zinc800,
-		stroke: tailwindColors.zinc400,
-		colorDark: tailwindColors.zinc800,
-		strokeDark: tailwindColors.zinc400,
+	},
+	[LocationStatusEnum.Vanished]: {
+		color: tailwindColors.zinc600,
+		colorDark: tailwindColors.zinc600,
+		description: 'Vanished into the mists of time.',
+		stroke: tailwindColors.zinc200,
+		strokeDark: tailwindColors.zinc200,
+		title: 'Vanished',
+		title_zh: '已消失',
 	},
 } as const satisfies Record<LocationStatus, LocationStatusMetadata>;
+
+// Filter panel order; the record above is lookup only
+export const locationStatusOrder: ReadonlyArray<LocationStatus> = [
+	LocationStatusEnum.Active,
+	LocationStatusEnum.Public,
+	LocationStatusEnum.Converted,
+	LocationStatusEnum.Private,
+	LocationStatusEnum.Idle,
+	LocationStatusEnum.Abandoned,
+	LocationStatusEnum.Remnants,
+	LocationStatusEnum.Vanished,
+	LocationStatusEnum.Unknown,
+];
 
 function getColorMap(
 	styleRecord: typeof LocationStatusRecords,

@@ -16,8 +16,8 @@ const defaultDarkValue = 'dark';
 const DarkModeContext = createContext(false);
 
 export function DarkModeProvider({
-	darkMode,
 	children,
+	darkMode,
 }: PropsWithChildren<{ darkMode?: MapDarkModeOptions | undefined }>) {
 	const attributeName = darkMode?.attributeName ?? defaultAttributeName;
 	const eventName = darkMode?.eventName ?? defaultEventName;

@@ -19,7 +19,7 @@ const getSeriesById = await createSeriesByIdFunction();
 const seriesData = getSeriesById({ collection: entry.collection, id: entry.id });
 ---
 
-{seriesData.map(async ({ entry: seriesEntry, catalogItems }) => {
+{seriesData.map(async ({ catalogItems, entry: seriesEntry }) => {
 	const { Content } = await render(seriesEntry);
 
 	return catalogItems.length > 0 ? (

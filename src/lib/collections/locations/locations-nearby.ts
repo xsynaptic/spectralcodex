@@ -22,7 +22,7 @@ interface LocationPoint {
  * Post-query filtering handles status checks (vanished, etc.)
  */
 export function createGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
-	const { pointsMap, pointsIndex } = extractPoints(locations);
+	const { pointsIndex, pointsMap } = extractPoints(locations);
 
 	// Build spatial index from all points (no pre-filtering)
 	const index = new GeospatialIndex(pointsIndex.length);
@@ -58,9 +58,9 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 
 			if (dist > 0) {
 				nearby.push({
-					locationId: point.id,
 					distance: dist,
 					distanceDisplay: dist.toFixed(2),
+					locationId: point.id,
 				});
 			}
 
@@ -101,8 +101,8 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 
 		const point: LocationPoint = {
 			id: entry.id,
-			lng,
 			lat,
+			lng,
 			status: entry.data.status,
 		};
 
@@ -110,15 +110,15 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 		pointsIndex.push(point);
 	}
 
-	return { pointsMap, pointsIndex };
+	return { pointsIndex, pointsMap };
 }
 
 // Single Point geometries use their own coordinates; MultiPoint geometries use their centroid
 function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geometry']): Position {
 	if (Array.isArray(geometry)) {
 		return centroid({
-			type: GeometryTypeEnum.MultiPoint,
 			coordinates: geometry.map((point) => point.coordinates),
+			type: GeometryTypeEnum.MultiPoint,
 		}).geometry.coordinates;
 	}
 	return geometry.coordinates;

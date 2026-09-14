@@ -11,51 +11,54 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 
 // Single source of truth, consumed by the media-orphans and og-image scripts
 export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = {
-	// Collections
+	'alishan-forest-railway': 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg',
+	canada: 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg',
+	china: 'v/fallback-china-1.jpg',
 	chronology: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
+	default: [
+		'v/v-random-1.jpg',
+		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
+		'2018/huadong-valley-ride-2018-3-35.jpg',
+		'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
+	],
+	homepage: '2018/huadong-valley-ride-2018-3-35.jpg',
+	'hong-kong': 'v/fallback-hong-kong-1.jpg',
+	japan: 'v/fallback-japan-1.jpg',
 	locations: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
+	malaysia: 'v/fallback-malaysia-1.jpg',
+	philippines: 'v/fallback-philippines-1.jpg',
 	regions: 'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-1.jpg',
 	resources: [
 		'2018/suhua-highway-road-trip-2018-19.jpg',
 		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
 		'taiwan/taichung/wufeng/wufeng-beigou-forbidden-city-vault-4.jpg',
 	],
-
-	// Themes
-	'thailand-theaters': [
-		'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg',
-		'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg',
+	'south-korea': 'v/fallback-south-korea-1.jpg',
+	taiwan: '2018/huadong-valley-ride-2018-3-35.jpg',
+	'taiwan-ghost-island': 'taiwan/chiayi/minxiong/minxiong-liu-mansion-6.jpg',
+	'taiwan-japanese-colonial-era': [
+		'v/fallback-taiwan-japanese-colonial-era-1.jpg',
+		'taiwan/yunlin/douliu/douliu-taiping-old-street-6.jpg',
 	],
+	'taiwan-military-villages': 'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg',
+	'taiwan-police-history': 'taiwan/tainan/dongshan/dongshan-niurouqi-police-station-2.jpg',
+	'taiwan-qing-dynasty-era': 'v/fallback-taiwan-qing-dynasty-era-1.jpg',
+	'taiwan-railways': 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg',
+	'taiwan-sanheyuan': 'taiwan/taipei/daan/daan-yifang-old-house-1.jpg',
+	'taiwan-shinto-shrines': 'taiwan/tainan/danei/danei-elementary-school-shinto-shrine-1.jpg',
+	'taiwan-temple-culture': 'v/fallback-taiwan-temple-culture-1.jpg',
 	'taiwan-theaters': [
 		'taiwan/tainan/nanxi/nanxi-huazhou-theater-5.jpg',
 		'taiwan/taitung/chishang/chishang-wuzhou-theater-1.jpg',
 		'taiwan/yunlin/baozhong/baozhong-zicheng-theater-13.jpg',
 		'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
 	],
-	'taiwan-shinto-shrines': 'taiwan/tainan/danei/danei-elementary-school-shinto-shrine-1.jpg',
-	'taiwan-railways': 'taiwan/miaoli/zaoqiao/zaoqiao-station-1.jpg',
-	'taiwan-military-villages': 'taiwan/tainan/rende/tainan-second-air-force-new-village-3.jpg',
-	'taiwan-police-history': 'taiwan/tainan/dongshan/dongshan-niurouqi-police-station-2.jpg',
-	'taiwan-sanheyuan': 'taiwan/taipei/daan/daan-yifang-old-house-1.jpg',
-	'taiwan-ghost-island': 'taiwan/chiayi/minxiong/minxiong-liu-mansion-6.jpg',
-	'taiwan-waterworks': 'taiwan/chiayi/chiayi-east/chiayi-shuiyuan-water-meter-room-1.jpg',
-	'alishan-forest-railway': 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg',
-	'taiwan-temple-culture': 'v/fallback-taiwan-temple-culture-1.jpg',
-	'taiwan-japanese-colonial-era': [
-		'v/fallback-taiwan-japanese-colonial-era-1.jpg',
-		'taiwan/yunlin/douliu/douliu-taiping-old-street-6.jpg',
-	],
-	'taiwan-qing-dynasty-era': 'v/fallback-taiwan-qing-dynasty-era-1.jpg',
 	'taiwan-urban-exploration': [
 		'taiwan/taipei/xinyi/xinyi-stanton-club-14.jpg',
 		'taiwan/changhua/changhua-city/changhua-bus-terminal-3.jpg',
 		'taiwan/nantou/shuili/shuili-beipu-post-office-4.jpg',
 	],
-
-	// Categories
-	temple: 'taiwan/tainan/zuozhen/zuozhen-laojun-temple-1.jpg',
-
-	// Regions
+	'taiwan-waterworks': 'taiwan/chiayi/chiayi-east/chiayi-shuiyuan-water-meter-room-1.jpg',
 	'taiwan/changhua': 'taiwan/changhua/changhua-city/changhua-confucius-temple-1.jpg',
 	'taiwan/chiayi': 'taiwan/chiayi/chiayi-east/chiayi-sun-shooting-tower-1.jpg',
 	'taiwan/hsinchu': 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg',
@@ -79,26 +82,14 @@ export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = 
 		'2018/suhua-highway-road-trip-2018-21.jpg',
 	],
 	'taiwan/yunlin': 'taiwan/yunlin/xiluo/xiluo-bridge-4.jpg',
-	taiwan: '2018/huadong-valley-ride-2018-3-35.jpg',
-	canada: 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg',
-	china: 'v/fallback-china-1.jpg',
-	'hong-kong': 'v/fallback-hong-kong-1.jpg',
-	japan: 'v/fallback-japan-1.jpg',
-	malaysia: 'v/fallback-malaysia-1.jpg',
-	philippines: 'v/fallback-philippines-1.jpg',
-	'south-korea': 'v/fallback-south-korea-1.jpg',
+	temple: 'taiwan/tainan/zuozhen/zuozhen-laojun-temple-1.jpg',
 	thailand: 'v/fallback-thailand-1.jpg',
+	'thailand-theaters': [
+		'thailand/bangkok/khlong-san/bangkok-hawaii-cinema-2.jpg',
+		'thailand/bangkok/thon-buri/bangkok-dao-khanong-cinema-3.jpg',
+	],
 	usa: 'v/fallback-usa-1.jpg',
 	vietnam: 'v/fallback-vietnam-1.jpg',
-
-	// Specials
-	homepage: '2018/huadong-valley-ride-2018-3-35.jpg',
-	default: [
-		'v/v-random-1.jpg',
-		'taiwan/taichung/qingshui/qingshui-taichung-port-jiande-container-yard-5.jpg',
-		'2018/huadong-valley-ride-2018-3-35.jpg',
-		'taiwan/yunlin/mailiao/mailiao-jincheng-theater-8.jpg',
-	],
 };
 
 export function resolveFallbackImageId(key: string, id: string): string {
@@ -128,9 +119,9 @@ const themePriority = [
 ];
 
 export function getFallbackImageId({
-	id,
-	collection,
 	category,
+	collection,
+	id,
 	regions,
 	themes,
 }: {
@@ -140,13 +131,13 @@ export function getFallbackImageId({
 	regions?: Array<string> | undefined;
 	themes?: Array<string> | undefined;
 }): string {
-	return resolveFallbackImageId(getFallbackKey({ collection, category, regions, themes }), id);
+	return resolveFallbackImageId(getFallbackKey({ category, collection, regions, themes }), id);
 }
 
 // Priority: collection → themes → region (ancestor/parent) → category → region (ancestor) → default
 function getFallbackKey({
-	collection,
 	category,
+	collection,
 	regions,
 	themes,
 }: {

@@ -12,8 +12,8 @@ describe('collectDuplicateIdIssues', () => {
 
 	test('flags the same ID claimed by two entries', () => {
 		const entries = [
-			makeEntry({ id: 'taipei', filePath: 'regions/taipei.mdx' }),
-			makeEntry({ id: 'taipei', filePath: 'themes/taipei.mdx' }),
+			makeEntry({ filePath: 'regions/taipei.mdx', id: 'taipei' }),
+			makeEntry({ filePath: 'themes/taipei.mdx', id: 'taipei' }),
 		];
 
 		expect(collectDuplicateIdIssues(entries)).toEqual([
@@ -23,7 +23,7 @@ describe('collectDuplicateIdIssues', () => {
 
 	test('flags an override ID that collides with another entry', () => {
 		const entries = [
-			makeEntry({ id: 'secret-place', data: { override: { id: 'taipei' } } }),
+			makeEntry({ data: { override: { id: 'taipei' } }, id: 'secret-place' }),
 			makeEntry({ id: 'taipei' }),
 		];
 
@@ -33,14 +33,14 @@ describe('collectDuplicateIdIssues', () => {
 	});
 
 	test('an override does not collide with the entry it belongs to', () => {
-		const entries = [makeEntry({ id: 'taipei', data: { override: { id: 'taipei' } } })];
+		const entries = [makeEntry({ data: { override: { id: 'taipei' } }, id: 'taipei' })];
 
 		expect(collectDuplicateIdIssues(entries)).toEqual([]);
 	});
 
 	test('an entry with an override still claims its own ID', () => {
 		const entries = [
-			makeEntry({ id: 'taipei', data: { override: { id: 'somewhere-else' } } }),
+			makeEntry({ data: { override: { id: 'somewhere-else' } }, id: 'taipei' }),
 			makeEntry({ id: 'taipei' }),
 		];
 

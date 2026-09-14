@@ -11,12 +11,12 @@ import { resolveEntry, resolveOgRegions } from '#og-image/content.ts';
 
 function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
 	return {
-		id: 'entry',
 		collection: 'posts',
 		digest: 'digest',
-		title: 'Title',
+		id: 'entry',
 		imageFeaturedId: 'image/entry.jpg',
 		isFallback: false,
+		title: 'Title',
 		...overrides,
 	};
 }
@@ -26,15 +26,15 @@ function ogImageMeta(url: string) {
 }
 
 describe('resolveEntry', () => {
-	const contentEntry = makeOgEntry({ id: 'a-post', collection: 'posts' });
-	const indexEntry = makeOgEntry({ id: 'index-posts', collection: 'index', isFallback: true });
+	const contentEntry = makeOgEntry({ collection: 'posts', id: 'a-post' });
+	const indexEntry = makeOgEntry({ collection: 'index', id: 'index-posts', isFallback: true });
 
 	const contentEntries = new Map([[contentEntry.id, contentEntry]]);
 	const indexEntries = new Map([[indexEntry.id, indexEntry]]);
 	const chronologyImageIndex = new Map([['2020', 'chronology/2020-derived.jpg']]);
 
 	function resolve(filename: string) {
-		return resolveEntry({ filename, contentEntries, indexEntries, chronologyImageIndex });
+		return resolveEntry({ chronologyImageIndex, contentEntries, filename, indexEntries });
 	}
 
 	test('content entries win first', () => {
@@ -50,22 +50,22 @@ describe('resolveEntry', () => {
 
 		expect(
 			resolveEntry({
-				filename: '2020',
-				contentEntries: withYear,
-				indexEntries,
 				chronologyImageIndex,
+				contentEntries: withYear,
+				filename: '2020',
+				indexEntries,
 			}),
 		).toBe(contentEntry);
 	});
 
 	test('synthesizes a YYYY chronology entry with its derived image', () => {
 		expect(resolve('2020')).toEqual({
-			id: '2020',
 			collection: ContentCollectionsEnum.Chronology,
 			digest: 'chronology-2020',
-			title: 'Chronology: 2020',
+			id: '2020',
 			imageFeaturedId: 'chronology/2020-derived.jpg',
 			isFallback: false,
+			title: 'Chronology: 2020',
 		});
 	});
 
@@ -73,11 +73,11 @@ describe('resolveEntry', () => {
 		const result = resolve('2019-03');
 
 		expect(result).toMatchObject({
-			id: '2019-03',
 			collection: ContentCollectionsEnum.Chronology,
 			digest: 'chronology-2019-03',
-			title: 'Chronology: March 2019',
+			id: '2019-03',
 			isFallback: true,
+			title: 'Chronology: March 2019',
 		});
 		expect(result?.imageFeaturedId.length).toBeGreaterThan(0);
 	});
@@ -91,7 +91,7 @@ describe('resolveEntry', () => {
 });
 
 function makeRegionRefs(ids: Array<string>) {
-	return ids.map((id) => ({ id, collection: ContentCollectionsEnum.Regions }));
+	return ids.map((id) => ({ collection: ContentCollectionsEnum.Regions, id }));
 }
 
 describe('resolveOgRegions', () => {
@@ -102,8 +102,8 @@ describe('resolveOgRegions', () => {
 	test('override regions win over raw regions', () => {
 		expect(
 			resolveOgRegions({
-				regions: makeRegionRefs(['taipei']),
 				override: { regions: makeRegionRefs(['taiwan']) },
+				regions: makeRegionRefs(['taipei']),
 			}),
 		).toEqual(['taiwan']);
 	});
@@ -111,8 +111,8 @@ describe('resolveOgRegions', () => {
 	test('an override without regions falls back to raw regions', () => {
 		expect(
 			resolveOgRegions({
-				regions: makeRegionRefs(['taipei']),
 				override: { title: 'Sanitized Title' },
+				regions: makeRegionRefs(['taipei']),
 			}),
 		).toEqual(['taipei']);
 	});
@@ -120,8 +120,8 @@ describe('resolveOgRegions', () => {
 	test('an empty override regions array falls back to raw regions', () => {
 		expect(
 			resolveOgRegions({
-				regions: makeRegionRefs(['taipei']),
 				override: { regions: [] },
+				regions: makeRegionRefs(['taipei']),
 			}),
 		).toEqual(['taipei']);
 	});
@@ -139,7 +139,7 @@ describe('extractBuiltFilenames', () => {
 	});
 
 	afterEach(() => {
-		rmSync(distPath, { recursive: true, force: true });
+		rmSync(distPath, { force: true, recursive: true });
 	});
 
 	function writeHtml(relPath: string, body: string) {

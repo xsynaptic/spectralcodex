@@ -7,10 +7,10 @@ import { IMAGE_SERVER_SIGNATURE_LENGTH } from 'astro:env/server';
 import { signImageServerPath } from '#lib/image/image-sign.ts';
 
 export function createImageUrlFunction({
-	imageQuality,
 	imageFormat,
-	serverUrl,
+	imageQuality,
 	serverSecret,
+	serverUrl,
 }: {
 	imageFormat: ImageFormat;
 	imageQuality: number;
@@ -18,8 +18,8 @@ export function createImageUrlFunction({
 	serverUrl: string;
 }) {
 	const getSignedImagePath = createSignedImagePathFunction({
-		imageQuality,
 		imageFormat,
+		imageQuality,
 		serverSecret,
 	});
 
@@ -29,8 +29,8 @@ export function createImageUrlFunction({
 }
 
 export function createSignedImagePathFunction({
-	imageQuality,
 	imageFormat,
+	imageQuality,
 	serverSecret,
 	signatureLength = IMAGE_SERVER_SIGNATURE_LENGTH,
 }: {
@@ -44,8 +44,8 @@ export function createSignedImagePathFunction({
 			src,
 			{
 				...operations,
-				quality: imageQuality,
 				format: imageFormat,
+				quality: imageQuality,
 			},
 			{ unsafe: false },
 		);

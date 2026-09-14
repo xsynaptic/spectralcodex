@@ -18,7 +18,6 @@ export { resolveLocationRegions } from '#lib/collections/regions/regions-factory
 
 export const getRegionsCollection = createCollectionData({
 	collection: 'regions',
-	label: 'Regions',
 	async extend(entries) {
 		const extendStart = performance.now();
 
@@ -37,6 +36,7 @@ export const getRegionsCollection = createCollectionData({
 
 		return { regionsTree };
 	},
+	label: 'Regions',
 });
 
 // Transform an array of strings into collection entries

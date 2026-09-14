@@ -16,8 +16,8 @@ interface Props extends HTMLAttributes<'div'> {
 
 const {
 	class: className,
-	locations: locationIds,
 	languages,
+	locations: locationIds,
 	showHidden = false,
 	...props
 } = Astro.props;
@@ -30,15 +30,15 @@ const getLocationsByReference = await createLocationsByIdsFunction();
 // API endpoint is undefined because geodata *must* be inlined with this method
 // We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, ...mapComponentProps } = getMapData({
-	mapId: undefined,
-	// Inline maps ship their popups in the props and never fetch a chunk
-	version: undefined,
 	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
 		getLocationsFeatureCollection(locations, {
 			...(showHidden ? { hideSensitiveLocations: false } : {}),
 		}),
 	),
 	languages,
+	mapId: undefined,
+	// Inline maps ship their popups in the props and never fetch a chunk
+	version: undefined,
 });
 ---
 

@@ -9,7 +9,7 @@ interface Props {
 	total: number;
 }
 
-const { index, total, separator = ', ', penultimate = 'and ', final = '.' } = Astro.props;
+const { final = '.', index, penultimate = 'and ', separator = ', ', total } = Astro.props;
 
 const content = await renderSlot(Astro.slots, 'default');
 

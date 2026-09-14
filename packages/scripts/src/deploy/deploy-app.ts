@@ -12,7 +12,7 @@ interface DeployAppOptions {
 }
 
 export async function deployApp(options: DeployAppOptions): Promise<void> {
-	const { rootPath, dryRun = false, skipDelete = false } = options;
+	const { dryRun = false, rootPath, skipDelete = false } = options;
 
 	const config = loadDeployConfig();
 

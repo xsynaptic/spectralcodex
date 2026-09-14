@@ -22,14 +22,14 @@ interface ImageFeaturedPropsOptions {
 }
 
 export async function getImageFeaturedProps({
-	imageId,
 	alt,
-	widths,
+	imageFormat,
+	imageId,
+	imageQuality,
+	priority = false,
 	sizes,
 	width,
-	imageQuality,
-	imageFormat,
-	priority = false,
+	widths,
 }: ImageFeaturedPropsOptions) {
 	const getImageById = await getImageByIdFunction();
 
@@ -39,26 +39,26 @@ export async function getImageFeaturedProps({
 
 	return {
 		imageProps: {
-			src: imageId,
+			alt: sanitizeImageAltAttribute(alt ?? imageEntry.data.title),
 			breakpoints: getImageBreakpoints({
 				maxWidth: imageEntry.data.width,
 				...(widths ? { widths } : {}),
 			}),
-			sizes,
-			width,
 			height: Math.round(width / aspectRatio),
-			alt: sanitizeImageAltAttribute(alt ?? imageEntry.data.title),
-			unstyled: true,
-			operations: { fit },
-			imageQuality,
 			imageFormat,
+			imageQuality,
+			operations: { fit },
 			priority,
+			sizes,
+			src: imageId,
+			unstyled: true,
+			width,
 		} satisfies ImageComponentProps,
 		placeholderProps: {
-			imageId,
 			aspectRatio,
 			fit,
 			highQuality: priority,
+			imageId,
 		} satisfies ImagePlaceholderProps,
 	};
 }

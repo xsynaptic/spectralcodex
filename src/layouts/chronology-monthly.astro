@@ -24,7 +24,7 @@ interface Props {
 	chronologyYears: Array<string>;
 }
 
-const { chronologyMonthlyItem, chronologyYears, chronologyMonths } = Astro.props;
+const { chronologyMonthlyItem, chronologyMonths, chronologyYears } = Astro.props;
 
 const getChronologyImageFeaturedGroup = await createChronologyImageFeaturedGroupFunction();
 
@@ -44,9 +44,9 @@ const title = formatStringTemplate(t('chronology.monthly.title'), {
 
 // List lengths, not stored counts; those precede deduplication and would disagree with the lists below
 const activityLabels = [
-	{ label: t('chronology.updated.label'), count: chronologyMonthlyItem.updated.length },
-	{ label: t('chronology.created.label'), count: chronologyMonthlyItem.created.length },
-	{ label: t('chronology.visited.label'), count: chronologyMonthlyItem.visited.length },
+	{ count: chronologyMonthlyItem.updated.length, label: t('chronology.updated.label') },
+	{ count: chronologyMonthlyItem.created.length, label: t('chronology.created.label') },
+	{ count: chronologyMonthlyItem.visited.length, label: t('chronology.visited.label') },
 ]
 	.filter((activity) => activity.count > 0)
 	.map((activity) => `${formatNumber({ number: activity.count })} ${activity.label}`);
@@ -55,14 +55,14 @@ const activityLabels = [
 <MainSite
 	hasHeroImage={hasHeroImage}
 	meta={{
-		title,
 		description: formatStringTemplate(t('chronology.monthly.description'), {
 			date: chronologyMonthlyItem.title,
 		}),
 		image: getSeoImageProps({
-			id: chronologyMonthlyItem.id,
 			alt: title,
+			id: chronologyMonthlyItem.id,
 		}),
+		title,
 		...getSeoHideSearch(true),
 	}}
 >

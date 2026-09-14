@@ -14,26 +14,26 @@ export function getSeoArticleProps({
 	const modifiedTime = dateUpdated?.toISOString();
 
 	return {
-		ogType: 'article' as const,
 		article: {
 			publishedTime,
 			...(modifiedTime ? { modifiedTime } : {}),
 		},
+		ogType: 'article' as const,
 	};
 }
 
 export function getSeoHideSearch(shouldHide: boolean | undefined) {
 	return shouldHide
 		? {
-				noIndex: true,
 				noFollow: true,
+				noIndex: true,
 			}
 		: undefined;
 }
 
-export function getSeoImageProps({ id, alt }: { alt: string; id: string }) {
+export function getSeoImageProps({ alt, id }: { alt: string; id: string }) {
 	return {
-		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
 		alt,
+		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
 	};
 }

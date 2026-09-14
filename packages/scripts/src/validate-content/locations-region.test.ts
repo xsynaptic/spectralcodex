@@ -5,8 +5,8 @@ import { makeEntry, makeRegionRefs } from '#validate-content/validate-test-utils
 
 function makeLocation(id: string, regionIds: Array<string>, filePath?: string) {
 	return makeEntry({
-		id,
 		data: { regions: makeRegionRefs(regionIds) },
+		id,
 		...(filePath ? { filePath } : {}),
 	});
 }
@@ -25,8 +25,8 @@ describe('collectLocationsRegionsIssues', () => {
 
 		expect(collectLocationsRegionsIssues(entries)).toEqual([
 			{
-				filename: 'some-place.mdx',
 				expectedRegion: 'taipei',
+				filename: 'some-place.mdx',
 				foundRegion: 'tainan',
 				hierarchy: ['taiwan', 'taipei', 'some-place'],
 			},
@@ -34,7 +34,7 @@ describe('collectLocationsRegionsIssues', () => {
 	});
 
 	test('skips an entry without a regions field', () => {
-		const entries = [makeEntry({ id: 'some-place', filePath: taipeiPath })];
+		const entries = [makeEntry({ filePath: taipeiPath, id: 'some-place' })];
 
 		expect(collectLocationsRegionsIssues(entries)).toEqual([]);
 	});
@@ -44,8 +44,8 @@ describe('collectLocationsRegionsIssues', () => {
 
 		expect(collectLocationsRegionsIssues(entries)).toEqual([
 			{
-				filename: 'some-place',
 				expectedRegion: 'unknown',
+				filename: 'some-place',
 				foundRegion: 'taipei',
 				hierarchy: [],
 			},

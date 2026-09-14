@@ -1,6 +1,6 @@
 import type { LanguageCode, MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+import { LanguageCodeEnum, languageCodeOrder } from '#lib/i18n/i18n-types.ts';
 
 const cjkLanguages: ReadonlySet<LanguageCode> = new Set([
 	LanguageCodeEnum.ChineseSimplified,
@@ -52,7 +52,7 @@ export function getMultilingualContent({
 			)
 		: undefined;
 
-	return additional ? { primary, additional } : { primary };
+	return additional ? { additional, primary } : { primary };
 }
 
 export function isCjkLanguage(lang: LanguageCode): boolean {
@@ -61,15 +61,14 @@ export function isCjkLanguage(lang: LanguageCode): boolean {
 
 function getAllMultilingualContent({
 	data,
-	prop,
 	langCode,
+	prop,
 }: MultilingualContentOptions): Array<MultilingualContent> | undefined {
 	if (!data) return;
 
-	const allCodes = Object.values(LanguageCodeEnum) as Array<LanguageCode>;
 	const languages = langCode
-		? [langCode, ...allCodes.filter((code) => code !== langCode)]
-		: allCodes;
+		? [langCode, ...languageCodeOrder.filter((code) => code !== langCode)]
+		: languageCodeOrder;
 
 	const multilingualContent: Array<MultilingualContent> = [];
 

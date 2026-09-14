@@ -82,17 +82,17 @@ export async function getSampleNearbyLocations() {
 
 	const entry = entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
 
-	return (entry?.data._nearby?.slice(0, 5) ?? []).flatMap(({ locationId, distanceDisplay }) => {
+	return (entry?.data._nearby?.slice(0, 5) ?? []).flatMap(({ distanceDisplay, locationId }) => {
 		const location = entriesMap.get(locationId);
 
 		if (!location) return [];
 
 		return [
 			{
-				url: getSampleUrl('locations-nearby-list'),
+				distanceDisplay,
 				title: location.data.title,
 				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
-				distanceDisplay,
+				url: getSampleUrl('locations-nearby-list'),
 			},
 		];
 	});
@@ -128,10 +128,10 @@ async function getSampleFeaturedImageIds() {
 
 	return [...themes.entries, ...regions.entries]
 		.map((entry) => ({
+			entryQuality: entry.data.entryQuality,
 			ids: Array.isArray(entry.data.imageFeatured)
 				? entry.data.imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
 				: [],
-			entryQuality: entry.data.entryQuality,
 		}))
 		.sort(
 			(candidateA, candidateB) =>
@@ -153,13 +153,13 @@ export function createSampleImageProps(entry: CollectionEntry<'images'>) {
 
 	return {
 		imageProps: {
-			src: entry.id,
-			breakpoints: getImageBreakpoints({ maxWidth: entry.data.width }),
-			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-			width: ImageSizeEnum.Medium,
-			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
 			alt: sanitizeImageAltAttribute(entry.data.title),
+			breakpoints: getImageBreakpoints({ maxWidth: entry.data.width }),
+			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
+			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+			src: entry.id,
 			unstyled: true,
+			width: ImageSizeEnum.Medium,
 		} satisfies ImageComponentProps,
 		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,
 	};
@@ -180,15 +180,15 @@ export function createSampleNotices() {
 	const t = getTranslations();
 
 	const severities = {
-		'notice.vanished': NoticeBoxSeverityEnum.Info,
 		'notice.danger': NoticeBoxSeverityEnum.Warning,
 		'notice.quality': NoticeBoxSeverityEnum.Info,
+		'notice.vanished': NoticeBoxSeverityEnum.Info,
 	} as const;
 
 	return (['notice.vanished', 'notice.danger', 'notice.quality'] as const).map((key) => ({
+		severity: severities[key],
 		text: t(key),
 		textAlt: t(key, LanguageCodeEnum.ChineseTraditional),
-		severity: severities[key],
 	}));
 }
 
@@ -223,13 +223,13 @@ const sampleCaptions = [
 
 export function createSampleImageFeaturedGroup(entries: Array<CollectionEntry<'images'>>) {
 	return entries.map((entry, index) => ({
-		hero: true,
-		id: entry.id,
 		caption: {
 			title: sampleCaptions[index] ?? entry.data.title,
 			titleMultilingual: index === 0 ? sampleTitleChinese : undefined,
 			url: getSampleUrl('image-hero'),
 		},
+		hero: true,
+		id: entry.id,
 	})) satisfies Array<ImageFeaturedWithCaption>;
 }
 
@@ -337,8 +337,8 @@ export function createSampleCatalogItems({ imageIds, regionId }: SampleCatalogOp
 }
 
 export function createSamplePage({
-	items,
 	currentPage,
+	items,
 	lastPage,
 }: {
 	currentPage: number;
@@ -393,34 +393,34 @@ export const sampleLinkInline = {
 } satisfies ResourceLink;
 
 export const sampleSourceInline = {
-	title: 'Narrow Gauge in the Tropics',
-	resourceType: 'book',
 	authors: [{ name: 'Huang Mei-ling' }],
-	publisher: 'Taiwan Railway Press',
 	publishedDate: '2009',
+	publisher: 'Taiwan Railway Press',
+	resourceType: 'book',
+	title: 'Narrow Gauge in the Tropics',
 } satisfies ResourceSource;
 
 export const sampleWebmentionCounts = [
-	{ label: 'Likes', count: 34 },
-	{ label: 'Reposts', count: 7 },
-	{ label: 'Bookmarks', count: 3 },
+	{ count: 34, label: 'Likes' },
+	{ count: 7, label: 'Reposts' },
+	{ count: 3, label: 'Bookmarks' },
 ];
 
 export const sampleWebmentionReplies = [
 	{
-		id: 1,
 		authorName: 'A reader with a linked profile',
 		authorUrl: sampleUrl,
-		sourceUrl: sampleUrl,
 		dateReceived: new Date('2026-07-14T08:12:00Z'),
+		id: 1,
+		sourceUrl: sampleUrl,
 		text: 'A reply long enough to reach the forty-word clip: the sugar railways ran on a gauge narrow enough that the sheds still standing at Huwei read as models rather than as workshops, which is exactly what makes them worth the detour when the light is low and the doors are open to anyone who asks.',
 	},
 	{
-		id: 2,
 		authorName: 'A reader with no profile URL',
 		authorUrl: undefined,
-		sourceUrl: sampleUrl,
 		dateReceived: new Date('2026-06-30T19:40:00Z'),
+		id: 2,
+		sourceUrl: sampleUrl,
 		text: undefined,
 	},
 ] satisfies Array<WebmentionReply>;
@@ -535,9 +535,9 @@ async function createSampleOpenGraphCards() {
 
 	const titleCards = titleImage
 		? openGraphTitleSamples.map(({ key, ...title }) => ({
-				key,
-				imagePath: path.resolve(titleImage.data.path),
 				entry: { collection: 'inventory', id: key, isFallback: false, ...title },
+				imagePath: path.resolve(titleImage.data.path),
+				key,
 			}))
 		: [];
 

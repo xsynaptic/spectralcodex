@@ -7,7 +7,7 @@ interface Props extends HTMLAttributes<'script'> {
 	umamiId: string;
 }
 
-const { umamiDomain, umamiId, isViewTransitionsEnabled, ...props } = Astro.props;
+const { isViewTransitionsEnabled, umamiDomain, umamiId, ...props } = Astro.props;
 ---
 
 <script

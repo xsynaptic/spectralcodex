@@ -61,8 +61,8 @@ describe('buildRsyncArgs', () => {
 	test('keeps a destructive flag ahead of dry-run, and dry-run ahead of the source', () => {
 		const args = buildRsyncArgs('dist/', 'host:/path', {
 			config: makeConfig(),
-			extraFlags: ['--delete-after'],
 			dryRun: true,
+			extraFlags: ['--delete-after'],
 		});
 
 		expect(args).toEqual([

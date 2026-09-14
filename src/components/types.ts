@@ -37,10 +37,10 @@ interface MetaImageProps {
 }
 
 export const NoticeBoxSeverityEnum = {
+	Error: 'error',
 	Info: 'info',
 	Success: 'success',
 	Warning: 'warning',
-	Error: 'error',
 } as const;
 
 export type NoticeBoxSeverity = (typeof NoticeBoxSeverityEnum)[keyof typeof NoticeBoxSeverityEnum];

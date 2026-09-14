@@ -7,7 +7,7 @@ export function makeEntry(
 }
 
 export function makeRefs(collection: string, ids: Array<string>) {
-	return ids.map((id) => ({ id, collection }));
+	return ids.map((id) => ({ collection, id }));
 }
 
 // Regions are stored as references; toReferenceIds transforms them back to ids

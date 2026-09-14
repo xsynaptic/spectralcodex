@@ -16,8 +16,8 @@ export function validateFrontmatterLinks(
 	return toValidationResult(
 		issues.map(({ location, url }) => ({ message: `${location}: unmatched link "${url}"` })),
 		{
-			pass: 'All shortform frontmatter links match existing resources',
 			fail: `Found ${issues.length.toString()} unmatched frontmatter link(s)`,
+			pass: 'All shortform frontmatter links match existing resources',
 		},
 	);
 }

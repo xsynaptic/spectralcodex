@@ -9,21 +9,21 @@ interface Props {
 	year: string;
 }
 
-const { year, values, ariaLabel } = Astro.props;
+const { ariaLabel, values, year } = Astro.props;
 
 const t = getTranslations();
 
 const { days, monthLabels, padCount, weekCount } = buildActivityGraph({
-	year,
-	values,
 	referenceDate: new Date(),
+	values,
+	year,
 });
 
 const tooltipDateOptions = {
-	month: 'long',
 	day: 'numeric',
-	year: 'numeric',
+	month: 'long',
 	timeZone: 'UTC',
+	year: 'numeric',
 } as const satisfies Intl.DateTimeFormatOptions;
 
 function getDayTitle(value: number, date: Date): string {

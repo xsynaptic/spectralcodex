@@ -6,14 +6,14 @@ import { describe, expect, test, vi } from 'vitest';
 import { createWordCountFunction } from '#lib/catalog/catalog-word-count.ts';
 
 function buildEntry(id: string, body: string) {
-	return { id, body, collection: 'posts', data: {} } as unknown as CollectionEntry<CollectionKey>;
+	return { body, collection: 'posts', data: {}, id } as unknown as CollectionEntry<CollectionKey>;
 }
 
 function setup() {
 	const cache = new Keyv();
 	const setSpy = vi.spyOn(cache, 'set');
 
-	return { setSpy, getWordCount: createWordCountFunction({ cache }) };
+	return { getWordCount: createWordCountFunction({ cache }), setSpy };
 }
 
 describe('createWordCountFunction', () => {

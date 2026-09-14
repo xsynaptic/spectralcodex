@@ -6,7 +6,7 @@ import type { LocationTwHeritage } from '#lib/collections/locations/locations-sc
 export function getLocationHeritage(
 	entry: CollectionEntry<'locations'>,
 ): Array<LocationTwHeritage> {
-	const { heritage, geometry } = entry.data;
+	const { geometry, heritage } = entry.data;
 	const points = Array.isArray(geometry) ? geometry : [geometry];
 	const values = [
 		...(heritage ? [heritage] : []),

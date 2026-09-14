@@ -11,11 +11,15 @@ import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 
 type Props = ImageFeaturedWithCaption;
 
-const { id: imageId, title: alt = '', caption } = Astro.props;
+const { caption, id: imageId, title: alt = '' } = Astro.props;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
-	imageId,
 	alt,
+	imageFormat: imageHighQualityFormat,
+	imageId,
+	imageQuality: imageHighQualityValue,
+	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+	width: ImageSizeEnum.Large,
 	widths: [
 		ImageSizeEnum.ExtraSmall,
 		ImageSizeEnum.Small,
@@ -23,10 +27,6 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 		ImageSizeEnum.Large,
 		ImageSizeEnum.ExtraLarge,
 	],
-	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-	width: ImageSizeEnum.Large,
-	imageQuality: imageHighQualityValue,
-	imageFormat: imageHighQualityFormat,
 });
 ---
 

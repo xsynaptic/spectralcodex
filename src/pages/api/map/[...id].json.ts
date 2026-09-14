@@ -13,7 +13,7 @@ import { MapApiDataEnum } from '#lib/map/map-types.ts';
 
 // Shared map delivery: one global point directory plus demand-fetched popup chunks
 export const getStaticPaths = (async () => {
-	const { directory, chunks, version } = await getMapDirectoryData();
+	const { chunks, directory, version } = await getMapDirectoryData();
 
 	const objectiveLocations = await getObjectiveLocations();
 	const objectivesCollection = getLocationsFeatureCollection(objectiveLocations, {

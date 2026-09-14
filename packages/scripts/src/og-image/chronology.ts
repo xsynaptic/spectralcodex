@@ -64,7 +64,7 @@ export function buildChronologyImageIndex(entries: Array<ContentEntry>): Map<str
 
 			if (!entryCandidate) continue;
 
-			for (const { date, category } of extractDatedCategories(entry.data)) {
+			for (const { category, date } of extractDatedCategories(entry.data)) {
 				addCandidate(date, { ...entryCandidate, category });
 			}
 		}
@@ -88,14 +88,14 @@ function extractDatedCategories(
 
 	const dateCreated = parseChronologyDate(data.dateCreated);
 
-	if (dateCreated) dated.push({ date: dateCreated, category: 'created' });
+	if (dateCreated) dated.push({ category: 'created', date: dateCreated });
 
 	const dateUpdated = parseChronologyDate(data.dateUpdated);
 
-	if (dateUpdated) dated.push({ date: dateUpdated, category: 'updated' });
+	if (dateUpdated) dated.push({ category: 'updated', date: dateUpdated });
 
 	for (const date of extractRecordedDates(data.dateRecorded)) {
-		dated.push({ date, category: 'visited' });
+		dated.push({ category: 'visited', date });
 	}
 
 	return dated;
@@ -109,9 +109,9 @@ function extractEntryCandidate(
 	if (!imageFeaturedId) return undefined;
 
 	return {
-		imageFeaturedId,
 		entryQuality: z.number().optional().parse(entry.data.entryQuality) ?? 0,
 		id: getPublicId(entry),
+		imageFeaturedId,
 	};
 }
 

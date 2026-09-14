@@ -33,13 +33,13 @@ const t = getTranslations();
 
 const contentStats = await getCatalogStats();
 
-const { featuredCatalogItems, recentCatalogItems, themesCatalogItems, seriesCatalogItems } =
+const { featuredCatalogItems, recentCatalogItems, seriesCatalogItems, themesCatalogItems } =
 	Astro.props;
 
 const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
+	hero: true,
 	items: featuredCatalogItems,
 	shuffle: true,
-	hero: true,
 });
 
 const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
@@ -50,8 +50,8 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	isHomepage={true}
 	meta={{
 		image: getSeoImageProps({
-			id: 'index-homepage',
 			alt: t('site.title'),
+			id: 'index-homepage',
 		}),
 	}}
 	schemas={[buildWebSiteSchema(), buildAuthorSchema()]}
@@ -76,13 +76,13 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			<Fragment
 				set:html={renderMarkdownInline(
 					formatStringTemplate(t('home.overview'), {
+						imagesCount: contentStats.images.itemCount,
+						linksExternalCount: contentStats.linksExternal.itemCount,
 						locationsCount: contentStats.locations.itemCount,
 						locationsWithImagesCount: contentStats.locations.withImages,
 						postsCount: contentStats.posts.itemCount,
 						regionsCount: contentStats.regions.itemCount,
 						themesCount: contentStats.themes.itemCount,
-						imagesCount: contentStats.images.itemCount,
-						linksExternalCount: contentStats.linksExternal.itemCount,
 						totalWordCount: contentStats.total.wordCount,
 					}),
 				)}

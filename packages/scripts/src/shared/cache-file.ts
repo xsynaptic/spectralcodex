@@ -4,12 +4,12 @@ import path from 'node:path';
 
 export function getFileCacheInstance(cachePath: string, namespace: string): Keyv {
 	return new Keyv({
-		store: new KeyvFile({
-			filename: path.join(cachePath, `${namespace}.json`),
-			writeDelay: 100,
-			serialize: JSON.stringify,
-			deserialize: (val): unknown => JSON.parse(val.toString()),
-		}),
 		namespace,
+		store: new KeyvFile({
+			deserialize: (val): unknown => JSON.parse(val.toString()),
+			filename: path.join(cachePath, `${namespace}.json`),
+			serialize: JSON.stringify,
+			writeDelay: 100,
+		}),
 	});
 }

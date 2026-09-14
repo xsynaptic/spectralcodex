@@ -30,7 +30,7 @@ export function getBuildAnnotations(records: Array<BuildRecord>): Array<BuildSta
 	return records.flatMap((record) => {
 		const label = record.notes?.trim();
 
-		return label ? [{ time: new Date(record.timestamp).getTime(), label }] : [];
+		return label ? [{ label, time: new Date(record.timestamp).getTime() }] : [];
 	});
 }
 

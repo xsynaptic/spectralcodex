@@ -46,30 +46,30 @@ const MapCanvasContainer: FC<
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
+	apiChunkBaseUrl,
 	apiDivisionUrl,
+	apiPopupUrl,
 	baseMapTheme,
 	bounds,
-	maxBounds,
 	center,
 	hash,
-	zoom,
-	style,
-	protomapsApiKey,
-	mapId,
 	imageServerUrl,
-	spritesUrl,
-	spritesId,
-	apiPopupUrl,
+	isDev,
+	mapId,
+	maxBounds,
 	popupData,
 	popupDataKey,
-	apiChunkBaseUrl,
+	protomapsApiKey,
+	spritesId,
+	spritesUrl,
+	style,
 	targetIds,
 	version,
-	isDev,
+	zoom,
 }) {
 	const protomapsStyleSpec = useProtomaps({
-		protomapsApiKey,
 		baseMapTheme,
+		protomapsApiKey,
 		spritesId,
 		spritesUrl,
 	});
@@ -130,15 +130,15 @@ const MapCanvasContainer: FC<
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 	const {
-		interactive,
-		isObjectiveFilterEnabled,
 		apiSourceUrl,
+		interactive,
+		isDev,
+		isObjectiveFilterEnabled,
+		languages,
+		scope,
 		sourceData,
 		sourceDataKey,
-		scope,
-		languages,
 		version,
-		isDev,
 	} = props;
 
 	return (

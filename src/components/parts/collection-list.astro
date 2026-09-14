@@ -25,13 +25,13 @@ const description = t(`collection.${collection}.description`);
 
 <MainSite
 	meta={{
-		title,
 		description,
 		image: getSeoImageProps({
-			id: `index-${collection}`,
 			alt: title,
+			id: `index-${collection}`,
 		}),
 		noIndex: page.currentPage > 1,
+		title,
 	}}
 >
 	<ContentHeader>

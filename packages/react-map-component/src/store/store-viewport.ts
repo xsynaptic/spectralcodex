@@ -4,13 +4,13 @@ import type { MapComponentProps, MapInitialViewState } from '#types.ts';
 
 const staleTimeMs = 30 * 60 * 1000;
 const defaultZoom = 12;
-const fitBoundsOptions = { padding: { top: 20, bottom: 20, left: 50, right: 50 } };
+const fitBoundsOptions = { padding: { bottom: 20, left: 50, right: 50, top: 20 } };
 
 const SavedViewportSchema = z.object({
-	longitude: z.number(),
 	latitude: z.number(),
-	zoom: z.number(),
+	longitude: z.number(),
 	timestamp: z.number(),
+	zoom: z.number(),
 });
 
 interface InitialViewStateOptions {
@@ -41,7 +41,7 @@ export function getInitialViewState({
 
 	const [longitude, latitude] = center ?? [0, 0];
 
-	return { ...viewState, longitude, latitude };
+	return { ...viewState, latitude, longitude };
 }
 
 export function writeSavedViewport(mapId: string, viewport: SavedViewport) {

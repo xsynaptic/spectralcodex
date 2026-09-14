@@ -26,12 +26,12 @@ const title = t('chronology.index.title');
 
 <MainSite
 	meta={{
-		title,
 		description: t('chronology.index.description'),
 		image: getSeoImageProps({
-			id: 'index-chronology',
 			alt: title,
+			id: 'index-chronology',
 		}),
+		title,
 		...getSeoHideSearch(true),
 	}}
 >

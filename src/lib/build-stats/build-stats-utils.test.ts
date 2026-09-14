@@ -14,8 +14,8 @@ const dayZero = Date.UTC(2026, 0, 1);
 
 function buildRecord(dayOffset: number, durationSeconds: number, rest: Partial<BuildRecord> = {}) {
 	return {
-		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
 		durationSeconds,
+		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
 		...rest,
 	} satisfies BuildRecord;
 }
@@ -66,7 +66,7 @@ test('getBuildAnnotations takes a note as a label and ignores whitespace', () =>
 		buildRecord(2, 100),
 	]);
 
-	expect(annotations).toStrictEqual([{ time: dayZero + millisecondsPerDay, label: 'Astro 7' }]);
+	expect(annotations).toStrictEqual([{ label: 'Astro 7', time: dayZero + millisecondsPerDay }]);
 });
 
 describe('formatBuildDuration', () => {

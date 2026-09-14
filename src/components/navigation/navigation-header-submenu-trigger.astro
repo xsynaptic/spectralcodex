@@ -13,7 +13,7 @@ interface Props {
 	item: NavigationItem;
 }
 
-const { item, hasChildren } = Astro.props;
+const { hasChildren, item } = Astro.props;
 
 const triggerType = getNavigationItemTriggerType(item);
 const isCurrent = isCurrentNavigationItem(item, Astro.url.pathname);

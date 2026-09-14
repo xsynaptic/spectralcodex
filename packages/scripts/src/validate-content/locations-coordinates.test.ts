@@ -12,8 +12,8 @@ const tainanCoordinates: [number, number] = [120.2027, 22.9917];
 
 function makeLocation(id: string, regionIds: Array<string>, coordinates: [number, number]) {
 	return makeEntry({
+		data: { geometry: { coordinates }, regions: makeRegionRefs(regionIds) },
 		id,
-		data: { regions: makeRegionRefs(regionIds), geometry: { coordinates } },
 	});
 }
 
@@ -37,11 +37,11 @@ describe('validateLocationsCoordinates', () => {
 	test('checks every geometry when an array is provided', async () => {
 		const entries = [
 			makeEntry({
-				id: 'multi-point',
 				data: {
-					regions: makeRegionRefs(['taipei']),
 					geometry: [{ coordinates: taipeiCoordinates }, { coordinates: tainanCoordinates }],
+					regions: makeRegionRefs(['taipei']),
 				},
+				id: 'multi-point',
 			}),
 		];
 
@@ -53,12 +53,12 @@ describe('validateLocationsCoordinates', () => {
 	test('skips entries flagged with skipCoordinateCheck and fails when nothing was checked', async () => {
 		const entries = [
 			makeEntry({
-				id: 'skipped',
 				data: {
-					skipCoordinateCheck: true,
-					regions: makeRegionRefs(['taipei']),
 					geometry: { coordinates: tainanCoordinates },
+					regions: makeRegionRefs(['taipei']),
+					skipCoordinateCheck: true,
 				},
+				id: 'skipped',
 			}),
 		];
 

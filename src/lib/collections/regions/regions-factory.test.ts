@@ -12,15 +12,14 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
 function makeLocation(id: string, regionIds: Array<string>): CollectionEntry<'locations'> {
 	return {
-		id,
 		collection: 'locations',
-		data: { title: id, regions: regionIds.map((regionId) => ({ id: regionId })) },
+		data: { regions: regionIds.map((regionId) => ({ id: regionId })), title: id },
+		id,
 	} as unknown as CollectionEntry<'locations'>;
 }
 
 function makePost(id: string, regionIds?: Array<string>): CollectionEntry<'posts'> {
 	return {
-		id,
 		collection: 'posts',
 		data: {
 			title: id,
@@ -28,15 +27,16 @@ function makePost(id: string, regionIds?: Array<string>): CollectionEntry<'posts
 				? {}
 				: { regions: regionIds.map((regionId) => ({ id: regionId })) }),
 		},
+		id,
 	} as unknown as CollectionEntry<'posts'>;
 }
 
 // Minimal fixtures; only the fields the factory reads, cast to the collection entry type
 function makeRegion(id: string, parent?: string): CollectionEntry<'regions'> {
 	return {
-		id,
 		collection: 'regions',
 		data: { title: id, ...(parent === undefined ? {} : { parent }) },
+		id,
 	} as unknown as CollectionEntry<'regions'>;
 }
 

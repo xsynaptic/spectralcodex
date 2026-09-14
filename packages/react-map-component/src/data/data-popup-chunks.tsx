@@ -15,14 +15,14 @@ interface ChunkConfig {
 
 const ChunkConfigContext = createContext<ChunkConfig>({
 	chunkUrlBase: undefined,
-	version: undefined,
 	isDev: undefined,
+	version: undefined,
 });
 
 export const ChunkConfigProvider: FC<ChunkConfig & { children: ReactNode }> =
-	function ChunkConfigProvider({ chunkUrlBase, version, isDev, children }) {
+	function ChunkConfigProvider({ children, chunkUrlBase, isDev, version }) {
 		return (
-			<ChunkConfigContext.Provider value={{ chunkUrlBase, version, isDev }}>
+			<ChunkConfigContext.Provider value={{ chunkUrlBase, isDev, version }}>
 				{children}
 			</ChunkConfigContext.Provider>
 		);
@@ -31,7 +31,7 @@ export const ChunkConfigProvider: FC<ChunkConfig & { children: ReactNode }> =
 // Fetch and cache a popup chunk, keyed by URL so browsing warms chunks shared across maps
 // Disabled when no chunk key is in play (inline objectives/MDX popups)
 export function useChunkPopup(chunkKey: string | undefined) {
-	const { chunkUrlBase, version, isDev } = useContext(ChunkConfigContext);
+	const { chunkUrlBase, isDev, version } = useContext(ChunkConfigContext);
 
 	const url =
 		chunkKey && chunkUrlBase
@@ -39,7 +39,7 @@ export function useChunkPopup(chunkKey: string | undefined) {
 			: undefined;
 
 	return useQuery<Array<MapPopupItem>>({
-		queryKey: ['popup-chunk', url, isDev],
+		enabled: !!url,
 		queryFn: async () => {
 			// Guarded by `enabled`, so a URL is always present when this runs
 			if (!url) throw new Error('[Map] Popup chunk requested without a URL');
@@ -57,11 +57,11 @@ export function useChunkPopup(chunkKey: string | undefined) {
 
 			return parseChunk(raw);
 		},
-		enabled: !!url,
+		queryKey: ['popup-chunk', url, isDev],
+		refetchOnMount: false,
+		refetchOnWindowFocus: false,
 		// A retired-chunk 404 after a deploy is deterministic; fail fast to the title-only fallback
 		retry: 1,
-		refetchOnWindowFocus: false,
-		refetchOnMount: false,
 	});
 }
 

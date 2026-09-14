@@ -60,25 +60,25 @@ function requireEnv(name: string): string {
 }
 
 const infraSyncTargets: Array<InfraSyncTarget> = [
-	{ source: 'docker-compose.yml', extraFlags: ['--mkpath'] },
+	{ extraFlags: ['--mkpath'], source: 'docker-compose.yml' },
 	{ source: 'nginx.conf.template' },
-	{ source: 'caddy/', destination: 'caddy/', extraFlags: ['--mkpath', '--delete'] },
-	{ source: 'certs/', destination: 'certs/', extraFlags: ['--mkpath'] },
+	{ destination: 'caddy/', extraFlags: ['--mkpath', '--delete'], source: 'caddy/' },
+	{ destination: 'certs/', extraFlags: ['--mkpath'], source: 'certs/' },
 	{
-		source: 'umami-db-backup/',
 		destination: 'umami-db-backup/',
 		extraFlags: ['--mkpath', '--delete'],
+		source: 'umami-db-backup/',
 	},
 	{
-		source: 'cache-warmer/',
 		destination: 'cache-warmer/',
 		excludes: ['node_modules'],
 		extraFlags: ['--mkpath', '--delete', '--delete-excluded'],
+		source: 'cache-warmer/',
 	},
 ];
 
 export async function deployInfra(options: DeployInfraOptions): Promise<void> {
-	const { rootPath, dryRun = false } = options;
+	const { dryRun = false, rootPath } = options;
 
 	const config = loadDeployConfig();
 	const serverEnv = buildServerEnv(config);
@@ -115,7 +115,7 @@ async function syncInfraFiles({
 	deployDir: string;
 	dryRun: boolean;
 }): Promise<void> {
-	for (const { source, destination = '', ...rsyncFlags } of infraSyncTargets) {
+	for (const { destination = '', source, ...rsyncFlags } of infraSyncTargets) {
 		await rsyncTo(
 			`${deployDir}/${source}`,
 			`${config.remoteHost}:${config.remotePath}/${destination}`,

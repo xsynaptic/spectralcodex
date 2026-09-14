@@ -8,22 +8,22 @@ import { MapLayerIdEnum } from '#source/source-config.ts';
 
 function makeClickInput(input: Partial<MapClickInput> = {}): MapClickInput {
 	return {
-		layerId: MapLayerIdEnum.Points,
-		geometryType: GeometryTypeEnum.Point,
-		coordinates: [100, 15],
-		pointId: 'location-id',
 		clusterId: undefined,
+		coordinates: [100, 15],
+		geometryType: GeometryTypeEnum.Point,
+		layerId: MapLayerIdEnum.Points,
+		pointId: 'location-id',
 		...input,
 	};
 }
 
 function makeHoverInput(input: Partial<MapHoverInput> = {}): MapHoverInput {
 	return {
-		layerId: MapLayerIdEnum.Points,
-		featureId: 'location-id',
-		pointId: 'location-id',
 		clusterId: undefined,
+		featureId: 'location-id',
 		hoveredFeatureId: undefined,
+		layerId: MapLayerIdEnum.Points,
+		pointId: 'location-id',
 		storeHoveredId: undefined,
 		...input,
 	};
@@ -33,11 +33,11 @@ describe('decideClickActions', () => {
 	test('clears the selection when nothing was clicked', () => {
 		expect(
 			decideClickActions({
-				layerId: undefined,
-				geometryType: undefined,
-				coordinates: undefined,
-				pointId: undefined,
 				clusterId: undefined,
+				coordinates: undefined,
+				geometryType: undefined,
+				layerId: undefined,
+				pointId: undefined,
 			}),
 		).toEqual([{ kind: 'clear-selection' }]);
 	});
@@ -46,8 +46,8 @@ describe('decideClickActions', () => {
 		expect(
 			decideClickActions(
 				makeClickInput({
-					layerId: MapLayerIdEnum.Polygon,
 					geometryType: GeometryTypeEnum.Polygon,
+					layerId: MapLayerIdEnum.Polygon,
 				}),
 			),
 		).toEqual([{ kind: 'clear-selection' }]);
@@ -57,35 +57,35 @@ describe('decideClickActions', () => {
 		expect(
 			decideClickActions(
 				makeClickInput({
-					layerId: MapLayerIdEnum.Clusters,
 					clusterId: 42,
 					coordinates: [100, 15],
+					layerId: MapLayerIdEnum.Clusters,
 				}),
 			),
 		).toEqual([
 			{ kind: 'close-filter' },
-			{ kind: 'expand-cluster', clusterId: 42, center: [100, 15] },
+			{ center: [100, 15], clusterId: 42, kind: 'expand-cluster' },
 		]);
 	});
 
 	test('expands a cluster identified by a string id', () => {
 		expect(
-			decideClickActions(makeClickInput({ layerId: MapLayerIdEnum.Clusters, clusterId: '42' })),
+			decideClickActions(makeClickInput({ clusterId: '42', layerId: MapLayerIdEnum.Clusters })),
 		).toEqual([
 			{ kind: 'close-filter' },
-			{ kind: 'expand-cluster', clusterId: '42', center: [100, 15] },
+			{ center: [100, 15], clusterId: '42', kind: 'expand-cluster' },
 		]);
 	});
 
 	test('treats a zero cluster id as absent', () => {
 		expect(
-			decideClickActions(makeClickInput({ layerId: MapLayerIdEnum.Clusters, clusterId: 0 })),
+			decideClickActions(makeClickInput({ clusterId: 0, layerId: MapLayerIdEnum.Clusters })),
 		).toEqual([{ kind: 'close-filter' }]);
 	});
 
 	test('closes the filter only when a cluster has no usable id', () => {
 		expect(
-			decideClickActions(makeClickInput({ layerId: MapLayerIdEnum.Clusters, clusterId: {} })),
+			decideClickActions(makeClickInput({ clusterId: {}, layerId: MapLayerIdEnum.Clusters })),
 		).toEqual([{ kind: 'close-filter' }]);
 	});
 
@@ -93,9 +93,9 @@ describe('decideClickActions', () => {
 		expect(
 			decideClickActions(
 				makeClickInput({
-					layerId: MapLayerIdEnum.Clusters,
 					clusterId: 42,
 					coordinates: [100],
+					layerId: MapLayerIdEnum.Clusters,
 				}),
 			),
 		).toEqual([{ kind: 'close-filter' }]);
@@ -106,7 +106,7 @@ describe('decideClickActions', () => {
 		(layerId) => {
 			expect(decideClickActions(makeClickInput({ layerId }))).toEqual([
 				{ kind: 'close-filter' },
-				{ kind: 'select-point', pointId: 'location-id', center: [100, 15] },
+				{ center: [100, 15], kind: 'select-point', pointId: 'location-id' },
 			]);
 		},
 	);
@@ -114,7 +114,7 @@ describe('decideClickActions', () => {
 	test('selects a point without a center when coordinates are malformed', () => {
 		expect(decideClickActions(makeClickInput({ coordinates: ['100', 15] }))).toEqual([
 			{ kind: 'close-filter' },
-			{ kind: 'select-point', pointId: 'location-id', center: undefined },
+			{ center: undefined, kind: 'select-point', pointId: 'location-id' },
 		]);
 	});
 
@@ -183,9 +183,9 @@ describe('decideHoverIntent over a feature', () => {
 		expect(
 			decideHoverIntent(
 				makeHoverInput({
-					layerId: MapLayerIdEnum.Clusters,
-					featureId: 42,
 					clusterId: 42,
+					featureId: 42,
+					layerId: MapLayerIdEnum.Clusters,
 				}),
 			),
 		).toEqual({
@@ -200,9 +200,9 @@ describe('decideHoverIntent over a feature', () => {
 		expect(
 			decideHoverIntent(
 				makeHoverInput({
-					layerId: MapLayerIdEnum.Clusters,
-					featureId: 42,
 					clusterId: '42',
+					featureId: 42,
+					layerId: MapLayerIdEnum.Clusters,
 					storeHoveredId: 'stale-id',
 				}),
 			),
@@ -220,10 +220,10 @@ describe('decideHoverIntent clearing hover', () => {
 		expect(
 			decideHoverIntent(
 				makeHoverInput({
-					layerId: undefined,
 					featureId: undefined,
-					pointId: undefined,
 					hoveredFeatureId: 'location-id',
+					layerId: undefined,
+					pointId: undefined,
 					storeHoveredId: 'location-id',
 				}),
 			),
@@ -239,10 +239,10 @@ describe('decideHoverIntent clearing hover', () => {
 		expect(
 			decideHoverIntent(
 				makeHoverInput({
-					layerId: MapLayerIdEnum.Polygon,
 					featureId: undefined,
-					pointId: undefined,
 					hoveredFeatureId: 'location-id',
+					layerId: MapLayerIdEnum.Polygon,
+					pointId: undefined,
 					storeHoveredId: 'location-id',
 				}),
 			),
@@ -257,7 +257,7 @@ describe('decideHoverIntent clearing hover', () => {
 	test('writes nothing when the cursor is over empty canvas and hover is already clear', () => {
 		expect(
 			decideHoverIntent(
-				makeHoverInput({ layerId: undefined, featureId: undefined, pointId: undefined }),
+				makeHoverInput({ featureId: undefined, layerId: undefined, pointId: undefined }),
 			),
 		).toEqual({
 			cursor: 'grab',

@@ -78,11 +78,11 @@ const getAboutUrl = () => getAbsoluteUrl(getSitePath('/about'));
 
 // @id scheme: long form for singletons, short fragment for per-page entities
 const ids = {
-	website: () => `${getSiteUrl()}#/schema.org/${SchemaTypeEnum.WebSite}`,
-	person: () => `${getAboutUrl()}#/schema.org/${SchemaTypeEnum.Person}`,
 	article: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#article`,
 	breadcrumb: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#breadcrumb`,
+	person: () => `${getAboutUrl()}#/schema.org/${SchemaTypeEnum.Person}`,
 	place: (pageUrl: string) => `${getAbsoluteUrl(pageUrl)}#place`,
+	website: () => `${getSiteUrl()}#/schema.org/${SchemaTypeEnum.WebSite}`,
 };
 
 export function buildArticleSchema(props: {
@@ -94,8 +94,8 @@ export function buildArticleSchema(props: {
 	url: string;
 }): Article {
 	return {
-		'@type': SchemaTypeEnum.Article,
 		'@id': ids.article(props.url),
+		'@type': SchemaTypeEnum.Article,
 		headline: props.title,
 		...(props.description ? { description: props.description } : {}),
 		...(props.imageUrl ? { image: props.imageUrl } : {}),
@@ -109,8 +109,8 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 	const t = getTranslations();
 
 	return {
-		'@type': SchemaTypeEnum.Person,
 		'@id': ids.person(),
+		'@type': SchemaTypeEnum.Person,
 		name: t('author.name'),
 		url: getAboutUrl(),
 		...(options?.sameAs && options.sameAs.length > 0 ? { sameAs: options.sameAs } : {}),
@@ -147,8 +147,8 @@ export function buildPlaceSchema(props: {
 	url: string;
 }): Place {
 	return {
-		'@type': SchemaTypeEnum.Place,
 		'@id': ids.place(props.url),
+		'@type': SchemaTypeEnum.Place,
 		name: props.title,
 		...(props.description ? { description: props.description } : {}),
 		url: getAbsoluteUrl(props.url),
@@ -168,12 +168,12 @@ export function buildWebSiteSchema(): WebSite {
 	const t = getTranslations();
 
 	return {
-		'@type': SchemaTypeEnum.WebSite,
 		'@id': ids.website(),
-		url: getSiteUrl(),
+		'@type': SchemaTypeEnum.WebSite,
+		description: t('site.description'),
 		name: t('site.title'),
 		publisher: { '@id': ids.person() },
-		description: t('site.description'),
+		url: getSiteUrl(),
 	};
 }
 
@@ -198,12 +198,12 @@ function buildBreadcrumbSchema(
 	pageUrl: string,
 ): BreadcrumbList {
 	return {
-		'@type': SchemaTypeEnum.BreadcrumbList,
 		'@id': ids.breadcrumb(pageUrl),
+		'@type': SchemaTypeEnum.BreadcrumbList,
 		itemListElement: items.map((item, index) => ({
 			'@type': SchemaTypeEnum.ListItem,
-			position: index + 1,
 			name: item.name,
+			position: index + 1,
 			...(item.url ? { item: getAbsoluteUrl(item.url) } : {}),
 		})),
 	};

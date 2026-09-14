@@ -7,15 +7,15 @@ import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'dry-run': { type: 'boolean', default: false },
-		'skip-delete': { type: 'boolean', default: false },
+		'dry-run': { default: false, type: 'boolean' },
+		'skip-delete': { default: false, type: 'boolean' },
 	},
 });
 
 await ensureSshKeychain();
 
 await deployApp({
-	rootPath: findWorkspaceRoot(),
 	dryRun: values['dry-run'],
+	rootPath: findWorkspaceRoot(),
 	skipDelete: values['skip-delete'],
 });

@@ -22,14 +22,14 @@ const rootCollections = new Set(['locations', 'pages', 'posts']);
 export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
 	console.log(chalk.magenta('=== Sitemap lastmod ==='));
 
-	const { contentPathRelative, contentPathAbs, outputPath } = resolvePaths(options);
+	const { contentPathAbs, contentPathRelative, outputPath } = resolvePaths(options);
 
 	console.log(chalk.blue('Reading git log...'));
 
 	const gitMap = await getGitFileDates({
 		cwd: contentPathAbs,
-		pathspec: 'collections/',
 		keyPrefix: contentPathRelative,
+		pathspec: 'collections/',
 	});
 
 	console.log(chalk.blue('Loading content...'));
@@ -48,9 +48,9 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 		]),
 	);
 
-	const { urls, resolvedCount, missingDateCount } = resolveUrls(entries, gitMap, {
-		siteUrl: options.siteUrl,
+	const { missingDateCount, resolvedCount, urls } = resolveUrls(entries, gitMap, {
 		contentPathPrefix: `${contentPathRelative}/collections/`,
+		siteUrl: options.siteUrl,
 	});
 
 	safelyCreateDirectory(path.dirname(outputPath));
@@ -85,8 +85,8 @@ function resolvePaths(options: SitemapLastmodOptions) {
 	const contentPathRelative = options.contentPath ?? 'packages/content';
 
 	return {
-		contentPathRelative,
 		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
+		contentPathRelative,
 		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
 	};
 }
@@ -94,7 +94,7 @@ function resolvePaths(options: SitemapLastmodOptions) {
 function resolveUrls(
 	entries: Array<ContentEntry>,
 	gitMap: Map<string, string>,
-	{ siteUrl, contentPathPrefix }: { contentPathPrefix: string; siteUrl: string },
+	{ contentPathPrefix, siteUrl }: { contentPathPrefix: string; siteUrl: string },
 ) {
 	const urls: Record<string, string> = {};
 
@@ -118,5 +118,5 @@ function resolveUrls(
 		resolvedCount++;
 	}
 
-	return { urls, resolvedCount, missingDateCount };
+	return { missingDateCount, resolvedCount, urls };
 }

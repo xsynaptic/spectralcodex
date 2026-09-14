@@ -22,10 +22,10 @@ export function resolveOgRegions(data: Record<string, unknown>): Array<string> {
 }
 
 function getImageFeaturedData({
-	entry,
-	collection,
-	regionParentMap,
 	chronologyImageIndex,
+	collection,
+	entry,
+	regionParentMap,
 }: {
 	chronologyImageIndex?: Map<string, string> | undefined;
 	collection: string;
@@ -44,9 +44,9 @@ function getImageFeaturedData({
 
 	return {
 		imageFeaturedId: getFallbackImageId({
-			id: entry.id,
-			collection,
 			category: z.string().optional().parse(entry.data.category),
+			collection,
+			id: entry.id,
 			regions: regionParentMap
 				? getRegionParentsById(
 						collection === ContentCollectionsEnum.Regions
@@ -64,9 +64,9 @@ function getImageFeaturedData({
 const TitleOverrideSchema = z
 	.object({
 		title: z.string().optional(),
-		title_zh: z.string().optional(),
 		title_ja: z.string().optional(),
 		title_th: z.string().optional(),
+		title_zh: z.string().optional(),
 	})
 	.optional();
 
@@ -74,10 +74,10 @@ type TitleOverride = z.infer<typeof TitleOverrideSchema>;
 
 // Resolution order: content entries, then static index entries, then synthesized chronology ids
 export function resolveEntry({
-	filename,
-	contentEntries,
-	indexEntries,
 	chronologyImageIndex,
+	contentEntries,
+	filename,
+	indexEntries,
 }: {
 	chronologyImageIndex: Map<string, string>;
 	contentEntries: Map<string, OpenGraphContentEntry>;
@@ -96,17 +96,17 @@ export function resolveEntry({
 		const derivedImageId = chronologyImageIndex.get(filename);
 
 		return {
-			id: filename,
 			collection: ContentCollectionsEnum.Chronology,
 			digest: `chronology-${filename}`,
-			title: getChronologyTitle(filename),
+			id: filename,
 			imageFeaturedId:
 				derivedImageId ??
 				getFallbackImageId({
-					id: filename,
 					collection: ContentCollectionsEnum.Chronology,
+					id: filename,
 				}),
 			isFallback: !derivedImageId,
+			title: getChronologyTitle(filename),
 		};
 	}
 
@@ -115,10 +115,10 @@ export function resolveEntry({
 
 // The one place an entry becomes a card, shared with the dev-only Inventory route
 export function toOpenGraphEntryItem({
-	entry,
-	collection,
-	regionParentMap,
 	chronologyImageIndex,
+	collection,
+	entry,
+	regionParentMap,
 }: {
 	chronologyImageIndex?: Map<string, string> | undefined;
 	collection: string;
@@ -127,7 +127,7 @@ export function toOpenGraphEntryItem({
 }): OpenGraphEntryItem | undefined {
 	const id = getOpenGraphId(getPublicId(entry));
 	const override = parseTitleOverride(collection, entry.data);
-	const title = resolveEntryTitle({ collection, id, data: entry.data, override });
+	const title = resolveEntryTitle({ collection, data: entry.data, id, override });
 
 	if (title === undefined) return undefined;
 
@@ -136,15 +136,15 @@ export function toOpenGraphEntryItem({
 		id,
 		title: stripDiacritics(title),
 		...getMultilingualTitles(entry.data, override),
-		...getImageFeaturedData({ entry, collection, regionParentMap, chronologyImageIndex }),
+		...getImageFeaturedData({ chronologyImageIndex, collection, entry, regionParentMap }),
 	};
 }
 
 function getMultilingualTitles(data: Record<string, unknown>, override: TitleOverride) {
 	return {
-		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
 		titleJa: parseOptionalString(override?.title_ja ?? data.title_ja),
 		titleTh: parseOptionalString(override?.title_th ?? data.title_th),
+		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
 	};
 }
 
@@ -161,8 +161,8 @@ function parseTitleOverride(collection: string, data: Record<string, unknown>): 
 // `undefined` marks an entry that gets no OG image at all
 function resolveEntryTitle({
 	collection,
-	id,
 	data,
+	id,
 	override,
 }: {
 	collection: string;

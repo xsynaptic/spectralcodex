@@ -13,11 +13,11 @@ export const getStaticPaths = (async () => {
 	const queryLocationsEntry = await createQueryLocationsEntryFunction();
 
 	return entries.map((entry) => {
-		const { mapData, catalogItems, backlinks } = queryLocationsEntry(entry);
+		const { backlinks, catalogItems, mapData } = queryLocationsEntry(entry);
 
 		return {
 			params: { location: getPublicId(entry) },
-			props: { entry, mapData, catalogItems, backlinks },
+			props: { backlinks, catalogItems, entry, mapData },
 		};
 	});
 }) satisfies GetStaticPaths;

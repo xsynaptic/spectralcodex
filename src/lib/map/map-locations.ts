@@ -3,6 +3,7 @@ import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 import type { Feature, FeatureCollection, Position } from 'geojson';
 
+import { mapCodecTables } from '@spectralcodex/map-codec';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
@@ -53,24 +54,24 @@ function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	switch (geometryType) {
 		case GeometryTypeEnum.LineString: {
 			return {
-				type: geometryType,
 				coordinates: geometry.coordinates.map((position) =>
 					getMapGeometryCoordinatesOptimized(position, featureId),
 				),
+				type: geometryType,
 			};
 		}
 		case GeometryTypeEnum.Point: {
 			return {
-				type: geometryType,
 				coordinates: getMapGeometryCoordinatesOptimized(geometry.coordinates, featureId),
+				type: geometryType,
 			};
 		}
 		case GeometryTypeEnum.Polygon: {
 			return {
-				type: geometryType,
 				coordinates: geometry.coordinates.map((ring) =>
 					ring.map((position) => getMapGeometryCoordinatesOptimized(position, featureId)),
 				),
+				type: geometryType,
 			};
 		}
 		default: {
@@ -122,14 +123,14 @@ export function getLocationsMapPopupData(
 			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 
 			return {
+				description: feature.properties.description,
+				googleMapsUrl: feature.properties.googleMapsUrl,
 				id: featureId,
+				safety: feature.properties.safety,
 				title: stripDiacritics(feature.properties.title),
 				titleMultilingualLang: feature.properties.titleMultilingualLang,
 				titleMultilingualValue: feature.properties.titleMultilingualValue,
 				url: feature.properties.url,
-				description: feature.properties.description,
-				safety: feature.properties.safety,
-				googleMapsUrl: feature.properties.googleMapsUrl,
 				wikipediaUrl: feature.properties.wikipediaUrl,
 				...(feature.properties.image === undefined
 					? {}
@@ -153,14 +154,15 @@ export function getLocationsMapSourceData(
 				: feature.properties.title;
 
 			return {
+				geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
 				properties: {
-					id: featureId,
-					title: stripDiacritics(title),
 					category: feature.properties.category,
-					status: feature.properties.status,
-					precision: feature.properties.precision,
 					entryQuality: feature.properties.entryQuality,
+					id: featureId,
+					precision: feature.properties.precision,
 					rating: feature.properties.rating,
+					status: feature.properties.status,
+					title: stripDiacritics(title),
 					...(feature.properties.objective === undefined
 						? {}
 						: { objective: feature.properties.objective }),
@@ -169,19 +171,18 @@ export function getLocationsMapSourceData(
 						: { outlier: feature.properties.outlier }),
 					hasImage: feature.properties.image !== undefined,
 				},
-				geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
 			} satisfies MapSourceItem;
 		})
 		.sort((a, b) => a.properties.id.localeCompare(b.properties.id));
 }
 
 export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
-	return hash(popupData).slice(0, hashShortLength);
+	return hash([mapCodecTables, popupData]).slice(0, hashShortLength);
 }
 
 // Endpoint URLs and inline cache keys derive from these hashes
 export function hashMapSourceData(sourceData: Array<MapSourceItem> | undefined) {
-	return hash(sourceData).slice(0, hashShortLength);
+	return hash([mapCodecTables, sourceData]).slice(0, hashShortLength);
 }
 
 function buildLocationFeatures(
@@ -202,17 +203,17 @@ function buildLocationFeatures(
 	const entryProperties = getEntryFeatureProperties(entry);
 
 	const features = geometryArray.map((geometry, index) => ({
-		type: 'Feature' as const,
+		geometry: {
+			coordinates: geometry.coordinates,
+			type: GeometryTypeEnum.Point,
+		},
 		id: featureIds[index] ?? entry.id,
 		properties: {
 			...entryProperties,
 			...getFeatureTitleProperties(entry, geometry, entryTitleMultilingual),
 			...getGeometryFeatureProperties(entry, geometry),
 		},
-		geometry: {
-			type: GeometryTypeEnum.Point,
-			coordinates: geometry.coordinates,
-		},
+		type: 'Feature' as const,
 	}));
 
 	locationFeaturesCache.set(entry, features);
@@ -222,13 +223,13 @@ function buildLocationFeatures(
 
 function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
 	return {
-		url: getRelativePath(entry.data._url),
-		wikipediaUrl: getShortenedUrl(entry.data._wikipediaUrl),
 		entryQuality: entry.data.entryQuality,
-		rating: entry.data.rating,
 		objective: entry.data.objective,
 		outlier: entry.data.outlier,
+		rating: entry.data.rating,
 		safety: entry.data.safety,
+		url: getRelativePath(entry.data._url),
+		wikipediaUrl: getShortenedUrl(entry.data._wikipediaUrl),
 	};
 }
 
@@ -256,14 +257,14 @@ function getGeometryFeatureProperties(
 	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
 
 	return {
-		description: geometry.description ?? entry.data._descriptionHtml,
 		category: geometry.category ?? entry.data.category,
-		status: geometry.status ?? entry.data.status,
-		precision: geometry.precision ?? entry.data.precision,
+		description: geometry.description ?? entry.data._descriptionHtml,
 		googleMapsUrl: getShortenedUrl(
 			geometry.googleMapsUrl ?? entry.data._googleMapsUrl,
 			googleMapsHostPrefix,
 		),
+		precision: geometry.precision ?? entry.data.precision,
+		status: geometry.status ?? entry.data.status,
 		...(image === null ? {} : { image }),
 	};
 }

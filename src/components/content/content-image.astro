@@ -29,10 +29,10 @@ interface Props extends HTMLAttributes<'figure'> {
 }
 
 const {
-	imageId,
 	alt: altProp,
-	layout = ImageLayoutEnum.Default,
 	context = ImageContextEnum.Single,
+	imageId,
+	layout = ImageLayoutEnum.Default,
 	priority = false,
 	showMetadata = false,
 	...props
@@ -78,51 +78,51 @@ async function getImageProps(): Promise<{
 
 	if (!imageEntry)
 		return {
+			aspectRatioString: undefined,
 			imageEntry: undefined,
 			imageProps: undefined,
 			placeholderProps: undefined,
-			aspectRatioString: undefined,
 		};
 
 	const { width } = getImageInferredWidth({
-		width: imageEntry.data.width,
+		context,
 		height: imageEntry.data.height,
 		layout,
-		context,
+		width: imageEntry.data.width,
 	});
 	const feedWidth =
 		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
 	const primaryWidth = isFeed ? feedWidth : width;
 
 	return {
+		aspectRatioString: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
 		imageEntry,
 		imageProps: {
-			src: imageId,
 			breakpoints: getImageBreakpoints({ maxWidth: imageEntry.data.width }),
 			sizes: getImageLayoutSizesProp(layout, priority, context),
+			src: imageId,
 			width: primaryWidth,
 			...(isFeed
 				? {
 						// Unpic drops width/height for constrained and fullWidth layouts; feeds need them to reserve space
-						layout: 'fixed' as const,
 						height: Math.round((primaryWidth * imageEntry.data.height) / imageEntry.data.width),
+						layout: 'fixed' as const,
 					}
 				: {}),
-			unstyled: true,
-			imageQuality: imageHighQualityValue,
 			imageFormat: imageHighQualityFormat,
+			imageQuality: imageHighQualityValue,
+			unstyled: true,
 			...(priority ? { priority: true } : {}),
 			alt: getImageAlt(imageEntry.data.title),
 		},
 		placeholderProps: {
-			imageId,
 			aspectRatio: imageEntry.data.width / imageEntry.data.height,
+			imageId,
 		},
-		aspectRatioString: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
 	};
 }
 
-const { imageEntry, imageProps, placeholderProps, aspectRatioString } = await getImageProps();
+const { aspectRatioString, imageEntry, imageProps, placeholderProps } = await getImageProps();
 
 const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 

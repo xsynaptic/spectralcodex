@@ -31,11 +31,11 @@ export async function getObjectiveMapData() {
 
 	// Dedicated source/popup endpoints keep hidden points off the shared directory
 	return getMapDataDedicated({
-		mapId: 'objectives',
 		featureCollection: getLocationsFeatureCollection(objectiveLocations, {
 			hideSensitiveLocations: false,
 		}),
 		isObjectiveFilterEnabled: true,
+		mapId: 'objectives',
 	});
 }
 
@@ -48,21 +48,6 @@ export async function getTheaterLocations() {
 	);
 
 	return {
-		theaterLocationsLowPrecision: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision === 1),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsRoughPrecision: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision === 2),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsUnknownStatus: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision >= 3 && data.status === LocationStatusEnum.Unknown),
-			R.sort(sortLocationsByLatitude),
-		),
 		theaterLocationsJapanese: R.pipe(
 			theaterLocations,
 			R.filter(
@@ -74,9 +59,9 @@ export async function getTheaterLocations() {
 			),
 			R.sort(sortLocationsByLatitude),
 		),
-		theaterLocationsObjectivesTop: R.pipe(
+		theaterLocationsLowPrecision: R.pipe(
 			theaterLocations,
-			R.filter(({ data }) => data.objective !== undefined && data.objective >= 4),
+			R.filter(({ data }) => data.precision === 1),
 			R.sort(sortLocationsByLatitude),
 		),
 		theaterLocationsObjectivesAll: R.pipe(
@@ -84,6 +69,21 @@ export async function getTheaterLocations() {
 			R.filter(
 				({ data }) => data.objective !== undefined && data.objective > 1 && data.objective < 4,
 			),
+			R.sort(sortLocationsByLatitude),
+		),
+		theaterLocationsObjectivesTop: R.pipe(
+			theaterLocations,
+			R.filter(({ data }) => data.objective !== undefined && data.objective >= 4),
+			R.sort(sortLocationsByLatitude),
+		),
+		theaterLocationsRoughPrecision: R.pipe(
+			theaterLocations,
+			R.filter(({ data }) => data.precision === 2),
+			R.sort(sortLocationsByLatitude),
+		),
+		theaterLocationsUnknownStatus: R.pipe(
+			theaterLocations,
+			R.filter(({ data }) => data.precision >= 3 && data.status === LocationStatusEnum.Unknown),
 			R.sort(sortLocationsByLatitude),
 		),
 	};

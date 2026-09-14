@@ -65,7 +65,7 @@ export function collectAspectRatioIssues(entries: Array<ContentEntry>) {
 
 		checkedCount += 1;
 
-		const { width, height, ratio } = dimensions;
+		const { height, ratio, width } = dimensions;
 		const { allowed, delta } = getNearestRatio(ratio);
 
 		if (delta <= ratioTolerance) {
@@ -73,26 +73,26 @@ export function collectAspectRatioIssues(entries: Array<ContentEntry>) {
 			continue;
 		}
 
-		flagged.push({ id: entry.id, width, height, ratio, nearest: allowed.label, delta });
+		flagged.push({ delta, height, id: entry.id, nearest: allowed.label, ratio, width });
 	}
 
 	flagged.sort((a, b) => a.id.localeCompare(b.id));
 
 	const tallyRows = allowedRatios.map((allowed) => ({
-		label: allowed.label,
-		value: allowed.value,
-		orientation: getOrientation(allowed.value),
 		count: tally.get(allowed.label) ?? 0,
+		label: allowed.label,
+		orientation: getOrientation(allowed.value),
+		value: allowed.value,
 	})) satisfies Array<RatioTallyRow>;
 
-	return { flagged, checkedCount, exemptCount, tally: tallyRows };
+	return { checkedCount, exemptCount, flagged, tally: tallyRows };
 }
 
 export function validateImageAspectRatios(
 	entries: Array<ContentEntry>,
 	{ showStats = false }: { showStats?: boolean } = {},
 ) {
-	const { flagged, checkedCount, exemptCount, tally } = collectAspectRatioIssues(entries);
+	const { checkedCount, exemptCount, flagged, tally } = collectAspectRatioIssues(entries);
 
 	const exemptNote = exemptCount > 0 ? ` (${exemptCount.toString()} exempt)` : '';
 
@@ -104,8 +104,8 @@ export function validateImageAspectRatios(
 					`(ratio ${item.ratio.toFixed(3)}, nearest ${item.nearest} off by ${item.delta.toFixed(3)})`,
 			})),
 			{
-				pass: `${checkedCount.toString()} image aspect ratios valid${exemptNote}`,
 				fail: `Found ${flagged.length.toString()} of ${checkedCount.toString()} image(s) with non-standard aspect ratios${exemptNote}`,
+				pass: `${checkedCount.toString()} image aspect ratios valid${exemptNote}`,
 			},
 		),
 		notes: showStats ? formatRatioTally(tally) : [],
@@ -126,12 +126,12 @@ function formatRatioTally(tally: Array<RatioTallyRow>) {
 }
 
 function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
-	const { width, height } = entry.data;
+	const { height, width } = entry.data;
 
 	if (typeof width !== 'number' || typeof height !== 'number') return undefined;
 	if (width <= 0 || height <= 0) return undefined;
 
-	return { width, height, ratio: width / height };
+	return { height, ratio: width / height, width };
 }
 
 function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number } {

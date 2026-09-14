@@ -31,9 +31,9 @@ interface BuildActivityGraphOptions {
 // Everything the graph needs to render one year: cells, month lines, and leading pad count
 // A flat chronological day list; the CSS grid flows it into weeks
 export function buildActivityGraph({
-	year,
-	values,
 	referenceDate,
+	values,
+	year,
 }: BuildActivityGraphOptions): ActivityGraphData {
 	const yearNumber = Number(year);
 	const yearStart = Date.UTC(yearNumber, 0, 1);
@@ -56,7 +56,7 @@ export function buildActivityGraph({
 		// Future days can't set the scale; it should reflect actual past activity
 		if (!isFuture && value > max) max = value;
 
-		days.push({ date, value, level: 0, future: isFuture });
+		days.push({ date, future: isFuture, level: 0, value });
 	}
 
 	for (const day of days) {

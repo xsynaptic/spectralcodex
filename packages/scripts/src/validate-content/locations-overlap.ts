@@ -19,25 +19,25 @@ interface LocationOverlap {
 }
 
 export function validateLocationsOverlap(entries: Array<ContentEntry>, thresholdMeters: number) {
-	const { points, locationCount } = collectPoints(entries);
+	const { locationCount, points } = collectPoints(entries);
 	const overlaps = findOverlaps(points, thresholdMeters);
 
 	const scope = `checked ${String(locationCount)} locations, ${String(points.length)} points`;
 
 	if (overlaps.length === 0) {
 		return {
+			issues: [],
 			status: 'pass',
 			summary: `No overlapping locations found (${scope})`,
-			issues: [],
 		} satisfies ValidationResult;
 	}
 
 	return {
-		status: 'warn',
-		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,
 		issues: overlaps.map((overlap) => ({
 			message: `${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
 		})),
+		status: 'warn',
+		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,
 	} satisfies ValidationResult;
 }
 
@@ -70,11 +70,11 @@ function collectPoints(entries: Array<ContentEntry>) {
 			: [geometry.data.coordinates];
 
 		for (const [lng, lat] of coordinates) {
-			points.push({ locationId: entry.id, lng, lat });
+			points.push({ lat, lng, locationId: entry.id });
 		}
 	}
 
-	return { points, locationCount };
+	return { locationCount, points };
 }
 
 function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
@@ -105,9 +105,9 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 
 			if (distanceMeters < thresholdMeters) {
 				overlaps.push({
+					distance: distanceMeters,
 					idA: point.locationId,
 					idB: nearby.locationId,
-					distance: distanceMeters,
 				});
 			}
 		}

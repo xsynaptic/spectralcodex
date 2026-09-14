@@ -9,7 +9,7 @@ const validTargets = [makeEntry({ id: 'existing-post' })];
 
 describe('collectLinkIdIssues', () => {
 	test('accepts links that resolve to a known entry', () => {
-		const entries = [makeEntry({ id: 'a-post', body: '<Link id="existing-post">text</Link>' })];
+		const entries = [makeEntry({ body: '<Link id="existing-post">text</Link>', id: 'a-post' })];
 
 		expect(collectLinkIdIssues(entries, validTargets)).toEqual([]);
 	});
@@ -17,14 +17,14 @@ describe('collectLinkIdIssues', () => {
 	test('flags a dangling link id with its location and line number', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-post',
-				filePath: 'posts/a-post.mdx',
 				body: 'intro\n\n<Link id="missing-post">text</Link>',
+				filePath: 'posts/a-post.mdx',
+				id: 'a-post',
 			}),
 		];
 
 		expect(collectLinkIdIssues(entries, validTargets)).toEqual([
-			{ location: 'posts/a-post.mdx', lineNumber: 3, id: 'missing-post' },
+			{ id: 'missing-post', lineNumber: 3, location: 'posts/a-post.mdx' },
 		]);
 	});
 
@@ -34,20 +34,20 @@ describe('collectLinkIdIssues', () => {
 			'<Link id="existing-post" />',
 			'<Link id="missing-two" />',
 		].join('\n');
-		const issues = collectLinkIdIssues([makeEntry({ id: 'a-post', body })], validTargets);
+		const issues = collectLinkIdIssues([makeEntry({ body, id: 'a-post' })], validTargets);
 
 		expect(issues.map((issue) => issue.id)).toEqual(['missing-one', 'missing-two']);
 		expect(issues.map((issue) => issue.lineNumber)).toEqual([1, 3]);
 	});
 
 	test('skips entries whose body contains no Link component', () => {
-		const entries = [makeEntry({ id: 'a-post', body: 'plain prose' }), makeEntry({ id: 'b-post' })];
+		const entries = [makeEntry({ body: 'plain prose', id: 'a-post' }), makeEntry({ id: 'b-post' })];
 
 		expect(collectLinkIdIssues(entries, validTargets)).toEqual([]);
 	});
 
 	test('reads a single-quoted id', () => {
-		const entries = [makeEntry({ id: 'a-post', body: "<Link id='missing-post' />" })];
+		const entries = [makeEntry({ body: "<Link id='missing-post' />", id: 'a-post' })];
 
 		expect(collectLinkIdIssues(entries, validTargets).map((issue) => issue.id)).toEqual([
 			'missing-post',
@@ -55,7 +55,7 @@ describe('collectLinkIdIssues', () => {
 	});
 
 	test('does not read a `data-id` prop as a link id', () => {
-		const entries = [makeEntry({ id: 'a-post', body: '<Link data-id="missing-post">text</Link>' })];
+		const entries = [makeEntry({ body: '<Link data-id="missing-post">text</Link>', id: 'a-post' })];
 
 		expect(collectLinkIdIssues(entries, validTargets)).toEqual([]);
 	});
@@ -64,12 +64,12 @@ describe('collectLinkIdIssues', () => {
 describe('validateLinkIds', () => {
 	test('groups every broken link in one entry under a single issue', () => {
 		const body = ['<Link id="missing-one" />', '<Link id="missing-two" />'].join('\n');
-		const result = validateLinkIds([makeEntry({ id: 'a-post', body })], validTargets, rootPath);
+		const result = validateLinkIds([makeEntry({ body, id: 'a-post' })], validTargets, rootPath);
 
 		expect(result.issues).toEqual([
 			{
-				message: 'a-post',
 				details: ['Line 1: broken link ID "missing-one"', 'Line 2: broken link ID "missing-two"'],
+				message: 'a-post',
 			},
 		]);
 	});
@@ -83,7 +83,7 @@ describe('validateLinkIds', () => {
 			'<Link id="a-missing-target">a dangling id</Link>',
 			'',
 		].join('\n');
-		const entries = [makeEntry({ id: 'a-post', filePath: 'fixtures/offset-sample.mdx', body })];
+		const entries = [makeEntry({ body, filePath: 'fixtures/offset-sample.mdx', id: 'a-post' })];
 
 		const result = validateLinkIds(entries, validTargets, rootPath);
 

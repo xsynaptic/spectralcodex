@@ -23,13 +23,13 @@ export const MapSelectionFeatureState: FC = function MapSelectionFeatureState() 
 
 		if (previousId !== undefined) {
 			map.setFeatureState(
-				{ source: MapSourceIdEnum.PointCollection, id: previousId },
+				{ id: previousId, source: MapSourceIdEnum.PointCollection },
 				{ select: false },
 			);
 		}
 		if (selectedId !== undefined) {
 			map.setFeatureState(
-				{ source: MapSourceIdEnum.PointCollection, id: selectedId },
+				{ id: selectedId, source: MapSourceIdEnum.PointCollection },
 				{ select: true },
 			);
 		}

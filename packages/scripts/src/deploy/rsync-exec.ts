@@ -20,7 +20,7 @@ export function buildRsyncArgs(
 	destination: string,
 	options: RsyncOptions,
 ): Array<string> {
-	const { config, dryRun = false, extraFlags = [], excludes = [] } = options;
+	const { config, dryRun = false, excludes = [], extraFlags = [] } = options;
 
 	return [
 		...getArchiveFlags(options),
@@ -82,7 +82,7 @@ export async function sshExecWithInput(
 ): Promise<void> {
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
-	await $({ stdio: ['pipe', 'inherit', 'inherit'], input })`ssh ${sshArgs} ${command}`;
+	await $({ input, stdio: ['pipe', 'inherit', 'inherit'] })`ssh ${sshArgs} ${command}`;
 }
 
 // Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success

@@ -31,9 +31,9 @@ const webmentions = getWebmentions?.(pathnames);
 
 const counts = webmentions
 	? [
-			{ label: t('webmentions.likes'), count: webmentions.likeCount },
-			{ label: t('webmentions.reposts'), count: webmentions.repostCount },
-			{ label: t('webmentions.bookmarks'), count: webmentions.bookmarkCount },
+			{ count: webmentions.likeCount, label: t('webmentions.likes') },
+			{ count: webmentions.repostCount, label: t('webmentions.reposts') },
+			{ count: webmentions.bookmarkCount, label: t('webmentions.bookmarks') },
 		].filter(({ count }) => count > 0)
 	: [];
 ---

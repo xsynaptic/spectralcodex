@@ -42,8 +42,8 @@ export function createWordCountFunction({ cache }: { cache: Keyv }) {
 		const wordCount = source ? computeWordCount(source) : 0;
 
 		await cache.set(entry.id, {
-			hash: contentHash,
 			count: wordCount,
+			hash: contentHash,
 		} satisfies WordCountCached);
 
 		return wordCount;

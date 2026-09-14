@@ -7,40 +7,40 @@ describe('validateImageFeaturedInBody', () => {
 	test('passes when every featured image appears as an Img in the body', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-post',
-				data: { imageFeatured: ['one.jpg', { id: 'two.jpg', hero: true }] },
 				body: '<Img src="one.jpg" />\n\nProse.\n\n<Img src="two.jpg">Caption</Img>',
+				data: { imageFeatured: ['one.jpg', { hero: true, id: 'two.jpg' }] },
+				id: 'a-post',
 			}),
 		];
 
 		expect(validateImageFeaturedInBody(entries)).toEqual({
+			issues: [],
 			status: 'pass',
 			summary: 'Featured images present in body content',
-			issues: [],
 		});
 	});
 
 	test('flags the featured images the body never renders', () => {
 		const entries = [
 			makeEntry({
-				id: 'a-post',
-				filePath: 'posts/a-post.mdx',
-				data: { imageFeatured: ['one.jpg', 'two.jpg'] },
 				body: '<Img src="one.jpg" />',
+				data: { imageFeatured: ['one.jpg', 'two.jpg'] },
+				filePath: 'posts/a-post.mdx',
+				id: 'a-post',
 			}),
 		];
 
 		expect(validateImageFeaturedInBody(entries)).toEqual({
+			issues: [{ message: 'posts/a-post.mdx: featured image(s) not in body: two.jpg' }],
 			status: 'fail',
 			summary: 'Found 1 entries with featured images missing from body content',
-			issues: [{ message: 'posts/a-post.mdx: featured image(s) not in body: two.jpg' }],
 		});
 	});
 
 	test('skips entries with no body or no featured images', () => {
 		const entries = [
-			makeEntry({ id: 'no-body', data: { imageFeatured: 'one.jpg' } }),
-			makeEntry({ id: 'no-featured', body: 'Prose only.' }),
+			makeEntry({ data: { imageFeatured: 'one.jpg' }, id: 'no-body' }),
+			makeEntry({ body: 'Prose only.', id: 'no-featured' }),
 		];
 
 		expect(validateImageFeaturedInBody(entries).status).toBe('pass');

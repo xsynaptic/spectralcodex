@@ -38,25 +38,25 @@ describe('buildActivityGraph', () => {
 	const referenceDate = new Date('2099-01-01T00:00:00Z');
 
 	test('emits one cell per day of the year', () => {
-		const graph = buildActivityGraph({ year: '2023', values: {}, referenceDate });
+		const graph = buildActivityGraph({ referenceDate, values: {}, year: '2023' });
 
 		expect(graph.days).toHaveLength(365);
 	});
 
 	test('emits a cell for every day of a leap year', () => {
-		const graph = buildActivityGraph({ year: '2024', values: {}, referenceDate });
+		const graph = buildActivityGraph({ referenceDate, values: {}, year: '2024' });
 
 		expect(graph.days).toHaveLength(366);
 	});
 
 	test('pads to the weekday of January 1 (Sunday-start)', () => {
 		// 2023-01-01 is a Sunday -> no pad; 2024-01-01 is a Monday -> one pad
-		expect(buildActivityGraph({ year: '2023', values: {}, referenceDate }).padCount).toBe(0);
-		expect(buildActivityGraph({ year: '2024', values: {}, referenceDate }).padCount).toBe(1);
+		expect(buildActivityGraph({ referenceDate, values: {}, year: '2023' }).padCount).toBe(0);
+		expect(buildActivityGraph({ referenceDate, values: {}, year: '2024' }).padCount).toBe(1);
 	});
 
 	test('places each month label at the week where it begins', () => {
-		const graph = buildActivityGraph({ year: '2023', values: {}, referenceDate });
+		const graph = buildActivityGraph({ referenceDate, values: {}, year: '2023' });
 
 		const january = graph.monthLabels[0];
 		const december = graph.monthLabels[11];
@@ -67,9 +67,9 @@ describe('buildActivityGraph', () => {
 
 	test('levels a day relative to the busiest day of the year', () => {
 		const graph = buildActivityGraph({
-			year: '2023',
-			values: { '2023-03-10': 4, '2023-03-11': 1 },
 			referenceDate,
+			values: { '2023-03-10': 4, '2023-03-11': 1 },
+			year: '2023',
 		});
 
 		const busiest = graph.days.find((day) => day.value === 4);
@@ -82,10 +82,10 @@ describe('buildActivityGraph', () => {
 
 	test('marks days after the reference date as future with no level', () => {
 		const graph = buildActivityGraph({
-			year: '2023',
+			referenceDate: new Date('2023-06-15T00:00:00Z'),
 			// A recorded value on a future day must not light up
 			values: { '2023-07-01': 5 },
-			referenceDate: new Date('2023-06-15T00:00:00Z'),
+			year: '2023',
 		});
 
 		const futureDay = graph.days.find((day) => day.date.getUTCMonth() === 6);

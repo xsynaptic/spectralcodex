@@ -23,10 +23,10 @@ export async function validateLocationsCoordinates(
 	divisionsPath: string,
 ) {
 	const {
-		mismatches,
-		mismatchCount,
-		missingFgbCount,
 		checkedCount,
+		mismatchCount,
+		mismatches,
+		missingFgbCount,
 		missingRegions,
 		unloadableRegions,
 	} = await collectCoordinateFindings(entries, divisionsPath);
@@ -38,19 +38,19 @@ export async function validateLocationsCoordinates(
 
 	if (checkedCount === 0) {
 		return {
-			status: 'fail',
-			summary: 'No locations could be checked',
 			issues: [],
 			notes,
+			status: 'fail',
+			summary: 'No locations could be checked',
 		} satisfies ValidationResult;
 	}
 
 	if (mismatchCount === 0) {
 		return {
-			status: 'pass',
-			summary: `${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
 			issues: [],
 			notes,
+			status: 'pass',
+			summary: `${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
 		} satisfies ValidationResult;
 	}
 
@@ -59,13 +59,13 @@ export async function validateLocationsCoordinates(
 	);
 
 	return {
-		status: 'fail',
-		summary: `Found ${mismatchCount.toString()} coordinate mismatch(es)`,
 		issues: mismatches.map((message) => ({ message })),
 		notes:
 			sortedMissingRegions.length > 0
 				? [...notes, `Missing FGB regions: ${sortedMissingRegions.join(', ')}`]
 				: notes,
+		status: 'fail',
+		summary: `Found ${mismatchCount.toString()} coordinate mismatch(es)`,
 	} satisfies ValidationResult;
 }
 
@@ -105,10 +105,10 @@ async function collectCoordinateFindings(entries: Array<ContentEntry>, divisions
 	}
 
 	return {
-		mismatches,
-		mismatchCount,
-		missingFgbCount,
 		checkedCount,
+		mismatchCount,
+		mismatches,
+		missingFgbCount,
 		missingRegions,
 		unloadableRegions,
 	};
@@ -152,7 +152,7 @@ async function collectRegionFeatures(
 		features.push(...regionFeatures);
 	}
 
-	return { validRegions, features };
+	return { features, validRegions };
 }
 
 // A missing FGB file disqualifies that region for the whole run

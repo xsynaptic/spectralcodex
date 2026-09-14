@@ -8,7 +8,7 @@ import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
-		'dry-run': { type: 'boolean', default: false },
+		'dry-run': { default: false, type: 'boolean' },
 	},
 });
 
@@ -17,8 +17,8 @@ const isDryRun = values['dry-run'];
 await ensureSshKeychain();
 
 await deployCaddy({
-	rootPath: findWorkspaceRoot(),
 	dryRun: isDryRun,
+	rootPath: findWorkspaceRoot(),
 });
 
 if (!isDryRun) await verifyEdge();

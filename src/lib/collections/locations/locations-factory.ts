@@ -43,8 +43,8 @@ export function createGenerateLocationPostDataFunction(posts: Array<CollectionEn
  * We pass this data via the API so URLs can be signed at build time
  */
 const imageThumbnailOptions = {
-	width: 350,
 	aspectRatio: 3 / 2,
+	width: 350,
 	widths: [350, 700],
 };
 
@@ -58,7 +58,7 @@ export function getLocationThumbnailProps(
 
 	const buildCandidate = (candidateWidth: number) => {
 		const height = Math.round(candidateWidth / aspectRatio);
-		const path = getSignedImagePath(imageSrc, { width: candidateWidth, height, fit });
+		const path = getSignedImagePath(imageSrc, { fit, height, width: candidateWidth });
 		return `${path} ${String(candidateWidth)}w`;
 	};
 

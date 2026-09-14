@@ -30,27 +30,28 @@ export default getConfig(
 		{
 			rules: {
 				complexity: ['warn', { max: 8, variant: 'modified' }],
-				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
-				'max-depth': ['warn', 3],
-				'max-params': ['warn', 3],
-				'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
-				'max-statements': ['warn', 25],
 				// The expanded form reads more clearly than ??=, ||=, and &&=
 				'logical-assignment-operators': ['error', 'never'],
-				// Conflicts with Remeda's sort function
-				'unicorn/no-array-sort': 'off',
+				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
+				'max-depth': ['warn', 3],
+				'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
+				'max-params': ['warn', 3],
+				'max-statements': ['warn', 25],
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
 				'unicorn/consistent-compound-words': 'off',
+				// Conflicts with Remeda's sort function
+				'unicorn/no-array-sort': 'off',
 				// Refactor-heavy: wants nested loops extracted into functions
 				'unicorn/no-break-in-nested-loop': 'off',
 				// False positives: map glyph URLs, i18n tokens, and shell format strings use literal braces
 				'unicorn/no-incorrect-template-string-interpolation': 'off',
 			},
 		},
-		// Off pending a reviewed pass; these can change evaluation or iteration order
+		// Sort keys within each translation section instead of flattening the sections into one list
 		{
+			files: ['src/lib/i18n/**/*.ts'],
 			rules: {
-				'perfectionist/sort-objects': 'off',
+				'perfectionist/sort-objects': ['error', { partitionByComment: true, type: 'natural' }],
 			},
 		},
 		// Ambient declarations mirror third-party signatures

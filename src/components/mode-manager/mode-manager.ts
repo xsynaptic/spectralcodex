@@ -64,8 +64,8 @@ class ModeManager extends HTMLElement {
 				new CustomEvent('mode-changed', {
 					detail: {
 						mode,
-						systemMode: this.#systemMode,
 						resolvedMode,
+						systemMode: this.#systemMode,
 					},
 				}) satisfies ModeChangedEvent,
 			);

@@ -49,10 +49,10 @@ export function getMapCanvasData(
 	}
 
 	return {
-		pointCollection: toFeatureCollection(points),
-		lineStringCollection: toFeatureCollection(lineStrings),
 		// Count only what is drawn
 		filteredCount: points.length + lineStrings.length,
+		lineStringCollection: toFeatureCollection(lineStrings),
+		pointCollection: toFeatureCollection(points),
 		totalCount: scopedItems.length,
 	};
 }
@@ -99,11 +99,11 @@ function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureColle
 	if (items.length === 0) return undefined;
 
 	return {
-		type: 'FeatureCollection',
 		features: items.map(({ geometry, properties }) => ({
-			type: 'Feature',
-			properties,
 			geometry: geometry as MapGeometry,
+			properties,
+			type: 'Feature',
 		})),
+		type: 'FeatureCollection',
 	};
 }

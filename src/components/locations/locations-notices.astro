@@ -11,7 +11,7 @@ interface Props {
 const { notices } = Astro.props;
 ---
 
-{notices.map(({ text, textAlt, severity }) => (
+{notices.map(({ severity, text, textAlt }) => (
 	<NoticeBox severity={severity}>
 		<Fragment set:html={renderMarkdownInline(text)} />
 		{textAlt ? <Fragment set:html={renderMarkdownInline(textAlt)} /> : undefined}

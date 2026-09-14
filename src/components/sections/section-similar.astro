@@ -15,7 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
 	threshold?: number;
 }
 
-const { entry, showPreviews, limit = 10, threshold = 0.5, ...props } = Astro.props;
+const { entry, limit = 10, showPreviews, threshold = 0.5, ...props } = Astro.props;
 
 const getSimilarContent = await getSimilarContentFunction();
 

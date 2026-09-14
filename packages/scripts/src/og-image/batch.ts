@@ -22,9 +22,9 @@ export function batchEntriesBySourceImage(
 		}
 
 		batches.set(batchKey, {
+			entries: [entry],
 			imageId: entry.imageFeaturedId,
 			isFallback: entry.isFallback,
-			entries: [entry],
 		});
 	}
 

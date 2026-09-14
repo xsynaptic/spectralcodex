@@ -7,55 +7,55 @@ describe('collectRegionsParentsIssues', () => {
 	test('accepts valid parents and entries without a parent', () => {
 		const entries = [
 			makeEntry({ id: 'taiwan' }),
-			makeEntry({ id: 'taipei', data: { parent: 'taiwan' } }),
+			makeEntry({ data: { parent: 'taiwan' }, id: 'taipei' }),
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([]);
 	});
 
 	test('flags a parent that references a missing region', () => {
-		const entries = [makeEntry({ id: 'taipei', data: { parent: 'atlantis' } })];
+		const entries = [makeEntry({ data: { parent: 'atlantis' }, id: 'taipei' })];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([
-			{ location: 'taipei', reason: 'not-found', parent: 'atlantis' },
+			{ location: 'taipei', parent: 'atlantis', reason: 'not-found' },
 		]);
 	});
 
 	test('flags a region that references itself', () => {
-		const entries = [makeEntry({ id: 'taipei', data: { parent: 'taipei' } })];
+		const entries = [makeEntry({ data: { parent: 'taipei' }, id: 'taipei' })];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([{ location: 'taipei', reason: 'self' }]);
 	});
 
 	test('flags a two-node parent cycle once with the chain spelled out', () => {
 		const entries = [
-			makeEntry({ id: 'yin', data: { parent: 'yang' } }),
-			makeEntry({ id: 'yang', data: { parent: 'yin' } }),
+			makeEntry({ data: { parent: 'yang' }, id: 'yin' }),
+			makeEntry({ data: { parent: 'yin' }, id: 'yang' }),
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([
-			{ location: 'yin', reason: 'cycle', chain: ['yin', 'yang', 'yin'] },
+			{ chain: ['yin', 'yang', 'yin'], location: 'yin', reason: 'cycle' },
 		]);
 	});
 
 	test('flags a longer cycle once and skips chains that merely lead into it', () => {
 		const entries = [
-			makeEntry({ id: 'one', data: { parent: 'two' } }),
-			makeEntry({ id: 'two', data: { parent: 'three' } }),
-			makeEntry({ id: 'three', data: { parent: 'one' } }),
-			makeEntry({ id: 'outsider', data: { parent: 'one' } }),
+			makeEntry({ data: { parent: 'two' }, id: 'one' }),
+			makeEntry({ data: { parent: 'three' }, id: 'two' }),
+			makeEntry({ data: { parent: 'one' }, id: 'three' }),
+			makeEntry({ data: { parent: 'one' }, id: 'outsider' }),
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([
-			{ location: 'one', reason: 'cycle', chain: ['one', 'two', 'three', 'one'] },
+			{ chain: ['one', 'two', 'three', 'one'], location: 'one', reason: 'cycle' },
 		]);
 	});
 
 	test('does not report a valid deep chain as a cycle', () => {
 		const entries = [
 			makeEntry({ id: 'taiwan' }),
-			makeEntry({ id: 'taipei', data: { parent: 'taiwan' } }),
-			makeEntry({ id: 'datong', data: { parent: 'taipei' } }),
+			makeEntry({ data: { parent: 'taiwan' }, id: 'taipei' }),
+			makeEntry({ data: { parent: 'taipei' }, id: 'datong' }),
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([]);

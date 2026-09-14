@@ -41,31 +41,31 @@ function getInlineSourceData(
 }
 
 const defaultMapDataProps = {
-	hasGeodata: false,
-	apiSourceUrl: undefined,
 	apiPopupUrl: undefined,
-	sourceData: undefined,
-	popupData: undefined,
+	apiSourceUrl: undefined,
 	featureCount: 0,
+	hasGeodata: false,
 	imageServerUrl: IMAGE_SERVER_URL,
-	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 	isDev: import.meta.env.DEV,
+	popupData: undefined,
+	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
+	sourceData: undefined,
 } satisfies MapComponentData;
 
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
-	mapId,
-	featureCollection,
-	targetId,
 	boundsBuffer,
 	boundsBufferPercentage,
+	boundsFeatureCollection,
+	chunkKeyById,
+	featureCollection,
 	limitsBuffer,
 	limitsBufferPercentage,
 	locationCount,
+	mapId,
 	scope,
-	chunkKeyById,
+	targetId,
 	version,
-	boundsFeatureCollection,
 	...props
 }: MapDataBoundsProps &
 	Omit<
@@ -93,12 +93,12 @@ export function getMapData({
 		version: string | undefined;
 	}) {
 	const mapBounds = getMapBounds({
-		featureCollection: boundsFeatureCollection ?? featureCollection,
-		limitsFeatureCollection: featureCollection,
 		boundsBuffer,
 		boundsBufferPercentage,
+		featureCollection: boundsFeatureCollection ?? featureCollection,
 		limitsBuffer,
 		limitsBufferPercentage,
+		limitsFeatureCollection: featureCollection,
 		targetId,
 	});
 
@@ -113,8 +113,8 @@ export function getMapData({
 
 	const baseData = {
 		...defaultMapDataProps,
-		hasGeodata: true,
 		featureCount,
+		hasGeodata: true,
 		...mapBounds,
 		...props,
 		targetIds: getTargetIds(featureCollection, targetId),
@@ -151,8 +151,8 @@ export function getMapData({
 
 // Dedicated per-map source/popup endpoints; objectives uses this to keep hidden points off the shared directory
 export function getMapDataDedicated({
-	mapId,
 	featureCollection,
+	mapId,
 	...props
 }: Pick<MapComponentProps, 'isObjectiveFilterEnabled'> & {
 	featureCollection: MapFeatureCollection | undefined;
@@ -178,12 +178,12 @@ export function getMapDataDedicated({
 
 	return {
 		...defaultMapDataProps,
+		apiPopupUrl,
+		apiSourceUrl,
+		featureCount: featureCollection.features.length,
 		hasGeodata: true,
 		mapId,
-		apiSourceUrl,
-		apiPopupUrl,
 		prefetchUrls: [apiSourceUrl, apiPopupUrl],
-		featureCount: featureCollection.features.length,
 		...mapBounds,
 		...props,
 	} satisfies MapComponentData;
@@ -212,11 +212,11 @@ function getDirectoryData(
 
 	// No membership hint resolves to this map's explicit, order-preserving id list
 	const resolvedScope: MapScope = scope ?? {
-		type: 'ids',
 		ids: featureCollection.features.map((feature) => String(feature.id)),
+		type: 'ids',
 	};
 
-	return { apiSourceUrl, scope: resolvedScope, prefetchUrls: [apiSourceUrl] };
+	return { apiSourceUrl, prefetchUrls: [apiSourceUrl], scope: resolvedScope };
 }
 
 function getInlineData(featureCollection: MapFeatureCollection) {
@@ -224,10 +224,10 @@ function getInlineData(featureCollection: MapFeatureCollection) {
 	const popupData = getLocationsMapPopupData(featureCollection);
 
 	return {
-		sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
 		popupData: popupData ? encodeMapPopupData(popupData) : undefined,
-		sourceDataKey: hashMapSourceData(sourceData),
 		popupDataKey: hashMapPopupData(popupData),
+		sourceData: sourceData ? encodeMapSourceData(sourceData) : undefined,
+		sourceDataKey: hashMapSourceData(sourceData),
 	};
 }
 

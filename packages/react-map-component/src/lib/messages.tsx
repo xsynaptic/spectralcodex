@@ -21,27 +21,27 @@ export interface MapMessages {
 }
 
 const defaultMapMessages: MapMessages = {
-	showAll: 'Show All',
+	copyCoordinatesLabel: 'Copy coordinates',
+	filterMenuAriaLabel: 'Filter Menu',
+	googleMapsAriaLabel: 'Google Maps',
 	hideAll: 'Hide All',
 	point: 'Point',
 	points: 'Points',
-	precisionWarning: 'Coordinates for this point are imprecise!',
-	precisionError: 'Coordinates for this point are only a guess!',
-	filterMenuAriaLabel: 'Filter Menu',
-	ratingFilterAriaLabel: 'Minimum rating',
-	copyCoordinatesLabel: 'Copy coordinates',
-	wikipediaAriaLabel: 'Wikipedia',
-	googleMapsAriaLabel: 'Google Maps',
 	popupDescriptionAriaLabel: 'Description',
+	precisionError: 'Coordinates for this point are only a guess!',
+	precisionWarning: 'Coordinates for this point are imprecise!',
+	ratingFilterAriaLabel: 'Minimum rating',
 	searchAriaLabel: 'Search',
 	searchPlaceholder: 'Search text or coordinates...',
+	showAll: 'Show All',
+	wikipediaAriaLabel: 'Wikipedia',
 };
 
 const MapMessagesContext = createContext<MapMessages>(defaultMapMessages);
 
 export function MapMessagesProvider({
-	messages,
 	children,
+	messages,
 }: PropsWithChildren<{ messages?: Partial<MapMessages> | undefined }>) {
 	const value = useMemo<MapMessages>(() => ({ ...defaultMapMessages, ...messages }), [messages]);
 

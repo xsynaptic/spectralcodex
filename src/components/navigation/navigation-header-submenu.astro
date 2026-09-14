@@ -17,7 +17,7 @@ interface Props extends HTMLAttributes<'ul'> {
 	navigationItems: Array<NavigationItem>;
 }
 
-const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...props } = Astro.props;
+const { ariaLabel, depth, isFirstNavigationItem = true, navigationItems, ...props } = Astro.props;
 ---
 
 <ul

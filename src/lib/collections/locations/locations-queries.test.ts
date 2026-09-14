@@ -4,15 +4,15 @@ import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 const {
-	getLocationsCollectionMock,
-	getRegionsByIdsMock,
-	getMapDataDedicatedMock,
 	getFeatureCollectionMock,
+	getLocationsCollectionMock,
+	getMapDataDedicatedMock,
+	getRegionsByIdsMock,
 } = vi.hoisted(() => ({
-	getLocationsCollectionMock: vi.fn(),
-	getRegionsByIdsMock: vi.fn(),
-	getMapDataDedicatedMock: vi.fn(),
 	getFeatureCollectionMock: vi.fn(),
+	getLocationsCollectionMock: vi.fn(),
+	getMapDataDedicatedMock: vi.fn(),
+	getRegionsByIdsMock: vi.fn(),
 }));
 
 vi.mock('#lib/collections/locations/locations-data.ts', () => ({
@@ -34,16 +34,16 @@ function makeLocation(
 	data: Record<string, unknown> = {},
 ): CollectionEntry<'locations'> {
 	return {
-		id,
 		collection: 'locations',
 		data: {
-			title: id,
+			geometry: { coordinates: [121, 25], type: 'Point' },
 			precision: 4,
-			status: LocationStatusEnum.Active,
 			regions: [{ id: 'taipei' }],
-			geometry: { type: 'Point', coordinates: [121, 25] },
+			status: LocationStatusEnum.Active,
+			title: id,
 			...data,
 		},
+		id,
 	} as unknown as CollectionEntry<'locations'>;
 }
 
@@ -58,7 +58,7 @@ const colonial = { id: 'taiwan-japanese-colonial-era' };
 
 beforeEach(() => {
 	getRegionsByIdsMock.mockImplementation((regionIds: Array<string>) =>
-		regionIds.map((id) => ({ id, data: { _ancestors: id === 'taipei' ? ['taiwan'] : undefined } })),
+		regionIds.map((id) => ({ data: { _ancestors: id === 'taipei' ? ['taiwan'] : undefined }, id })),
 	);
 });
 
@@ -101,7 +101,7 @@ describe('getObjectiveLocations', () => {
 describe('getObjectiveMapData', () => {
 	test('the dedicated endpoint keeps sensitive points and filters by objective', async () => {
 		setLocations([makeLocation('rated', { objective: 3 })]);
-		getFeatureCollectionMock.mockReturnValue({ type: 'FeatureCollection', features: [] });
+		getFeatureCollectionMock.mockReturnValue({ features: [], type: 'FeatureCollection' });
 
 		await getObjectiveMapData();
 
@@ -109,7 +109,7 @@ describe('getObjectiveMapData', () => {
 			hideSensitiveLocations: false,
 		});
 		expect(getMapDataDedicatedMock).toHaveBeenCalledWith(
-			expect.objectContaining({ mapId: 'objectives', isObjectiveFilterEnabled: true }),
+			expect.objectContaining({ isObjectiveFilterEnabled: true, mapId: 'objectives' }),
 		);
 	});
 });
@@ -117,8 +117,8 @@ describe('getObjectiveMapData', () => {
 describe('getTheaterLocations', () => {
 	test('every bucket is scoped to the theaters theme', async () => {
 		setLocations([
-			makeLocation('theater', { themes: [theaters], precision: 1 }),
-			makeLocation('other', { themes: [{ id: 'temples' }], precision: 1 }),
+			makeLocation('theater', { precision: 1, themes: [theaters] }),
+			makeLocation('other', { precision: 1, themes: [{ id: 'temples' }] }),
 			makeLocation('untagged', { precision: 1 }),
 		]);
 
@@ -129,16 +129,16 @@ describe('getTheaterLocations', () => {
 
 	test('precision buckets are exclusive, and unknown status only applies to placed locations', async () => {
 		setLocations([
-			makeLocation('rough', { themes: [theaters], precision: 2 }),
+			makeLocation('rough', { precision: 2, themes: [theaters] }),
 			makeLocation('placed-unknown', {
-				themes: [theaters],
 				precision: 3,
 				status: LocationStatusEnum.Unknown,
+				themes: [theaters],
 			}),
 			makeLocation('vague-unknown', {
-				themes: [theaters],
 				precision: 2,
 				status: LocationStatusEnum.Unknown,
+				themes: [theaters],
 			}),
 		]);
 
@@ -152,10 +152,10 @@ describe('getTheaterLocations', () => {
 		setLocations([
 			makeLocation('extant', { themes: [theaters, colonial] }),
 			makeLocation('vanished', {
-				themes: [theaters, colonial],
 				status: LocationStatusEnum.Vanished,
+				themes: [theaters, colonial],
 			}),
-			makeLocation('unknown', { themes: [theaters, colonial], status: LocationStatusEnum.Unknown }),
+			makeLocation('unknown', { status: LocationStatusEnum.Unknown, themes: [theaters, colonial] }),
 			makeLocation('post-war', { themes: [theaters] }),
 		]);
 
@@ -166,9 +166,9 @@ describe('getTheaterLocations', () => {
 
 	test('objective lists split at four, and an objective of one falls in neither', async () => {
 		setLocations([
-			makeLocation('top', { themes: [theaters], objective: 4 }),
-			makeLocation('middle', { themes: [theaters], objective: 3 }),
-			makeLocation('lowest', { themes: [theaters], objective: 1 }),
+			makeLocation('top', { objective: 4, themes: [theaters] }),
+			makeLocation('middle', { objective: 3, themes: [theaters] }),
+			makeLocation('lowest', { objective: 1, themes: [theaters] }),
 			makeLocation('none', { themes: [theaters] }),
 		]);
 
@@ -180,14 +180,14 @@ describe('getTheaterLocations', () => {
 
 	test('each bucket runs north to south, taking a multi-point location at its northernmost', async () => {
 		setLocations([
-			makeLocation('south', { themes: [theaters], precision: 1 }),
+			makeLocation('south', { precision: 1, themes: [theaters] }),
 			makeLocation('north', {
-				themes: [theaters],
-				precision: 1,
 				geometry: [
-					{ type: 'Point', coordinates: [121, 24] },
-					{ type: 'Point', coordinates: [121, 26] },
+					{ coordinates: [121, 24], type: 'Point' },
+					{ coordinates: [121, 26], type: 'Point' },
 				],
+				precision: 1,
+				themes: [theaters],
 			}),
 		]);
 

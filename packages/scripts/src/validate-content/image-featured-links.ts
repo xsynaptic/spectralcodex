@@ -31,8 +31,8 @@ export function validateImageFeaturedLinks(
 			message: `${file}: unmatched imageFeatured link "${link}"`,
 		})),
 		{
-			pass: 'Featured image links resolve to existing content',
 			fail: `Found ${unmatchedLinks.length.toString()} unmatched imageFeatured link(s)`,
+			pass: 'Featured image links resolve to existing content',
 		},
 	);
 }

@@ -6,11 +6,11 @@ function makeContent(
 	id: string,
 	data: { links?: Array<string | { url: string }>; sources?: Array<object | string> } = {},
 ) {
-	return { id, data };
+	return { data, id };
 }
 
 function makeResource(id: string, match?: Array<string> | string) {
-	return { id, data: { match } };
+	return { data: { match }, id };
 }
 
 describe('buildResourceAssociation', () => {
@@ -63,7 +63,7 @@ describe('buildResourceAssociation', () => {
 			[makeResource('taiwan-in-time')],
 			[
 				makeContent('some-place', {
-					sources: [{ title: 'Taiwan in Time', resourceType: 'article' }],
+					sources: [{ resourceType: 'article', title: 'Taiwan in Time' }],
 				}),
 			],
 			[],

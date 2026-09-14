@@ -38,8 +38,8 @@ export function validateLocationsDuplicates(entries: Array<ContentEntry>) {
 	}
 
 	return toValidationResult(issues, {
-		pass: `No duplicates found (checked ${String(entries.length)} locations)`,
 		fail: `Found ${String(issues.length)} duplicate(s)`,
+		pass: `No duplicates found (checked ${String(entries.length)} locations)`,
 	});
 }
 

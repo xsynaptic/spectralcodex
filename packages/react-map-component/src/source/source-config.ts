@@ -1,23 +1,23 @@
 export const MapLayerIdEnum = {
 	Clusters: 'clusters',
 	ClustersLabel: 'clusters-label',
-	Points: 'points',
-	PointsTarget: 'points-target',
-	PointsImage: 'points-image',
-	PointsLabel: 'points-label',
-	LineString: 'line-string',
-	Polygon: 'polygon',
-	PolygonOutline: 'polygon-outline',
+	DivisionHalo: 'division-halo',
 	DivisionMask: 'division-mask',
 	DivisionOutline: 'division-outline',
-	DivisionHalo: 'division-halo',
+	LineString: 'line-string',
+	Points: 'points',
+	PointsImage: 'points-image',
+	PointsLabel: 'points-label',
+	PointsTarget: 'points-target',
+	Polygon: 'polygon',
+	PolygonOutline: 'polygon-outline',
 } as const satisfies Record<string, string>;
 
 export const MapSourceIdEnum = {
-	PointCollection: 'pointCollection',
-	LineStringCollection: 'lineStringCollection',
-	PolygonCollection: 'polygonCollection',
 	DivisionCollection: 'divisionCollection',
+	LineStringCollection: 'lineStringCollection',
+	PointCollection: 'pointCollection',
+	PolygonCollection: 'polygonCollection',
 } as const;
 
 // Layers react-map-gl hit-tests for pointer events; PointsImage is conditional and ignored when absent

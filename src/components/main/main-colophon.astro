@@ -31,8 +31,8 @@ const t = getTranslations();
 	<DividedItem dividerColor="muted">
 		<span>
 			{formatStringTemplate(t('site.footer.copyright.label'), {
-				year: siteYearFounded,
 				currentYear,
+				year: siteYearFounded,
 			})}{' '}
 			<Anchor anchorColor="accent" href={siteUrl}>
 				{t('site.title')}

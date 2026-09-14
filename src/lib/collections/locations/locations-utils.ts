@@ -40,15 +40,15 @@ export async function getLocationSchemas(
 	return [
 		buildEntryBreadcrumbSchema({
 			collection: 'locations',
+			regions: regionAncestors,
 			title: entry.data.title,
 			url: props.url,
-			regions: regionAncestors,
 		}),
 		buildPlaceSchema({
-			title: entry.data.title,
-			description: await getDescriptionRenderedText(entry),
-			url: props.url,
 			coordinates: getFirstCoordinates(entry),
+			description: await getDescriptionRenderedText(entry),
+			title: entry.data.title,
+			url: props.url,
 		}),
 	];
 }
@@ -88,12 +88,12 @@ export async function createLocationEntryDisplayFunction() {
 		});
 
 		return {
-			regionPrimary,
-			regionLangCode,
-			titleMultilingual: titleResult?.primary,
-			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
 			addressBase: entry.data.address,
 			addressMultilingual: addressResult?.primary,
+			regionLangCode,
+			regionPrimary,
+			titleMultilingual: titleResult?.primary,
+			titleMultilingualAdditional: titleResult?.additional ? [titleResult.additional] : undefined,
 		};
 	};
 }
@@ -115,14 +115,14 @@ export async function createQueryLocationsEntryFunction() {
 		const mapLocations = getLocationsByIds([entry.id, ...nearbyIds]);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
-			featureCollection: getLocationsFeatureCollection(mapLocations),
-			boundsFeatureCollection: getLocationsFeatureCollection([entry]),
-			locationCount: mapLocations.length,
-			chunkKeyById,
-			version,
-			targetId: entry.data._uuid ?? entry.id,
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
+			boundsFeatureCollection: getLocationsFeatureCollection([entry]),
+			chunkKeyById,
+			featureCollection: getLocationsFeatureCollection(mapLocations),
+			locationCount: mapLocations.length,
+			mapId: `${entry.collection}/${entry.id}`,
+			targetId: entry.data._uuid ?? entry.id,
+			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -135,7 +135,7 @@ export async function createQueryLocationsEntryFunction() {
 
 		const backlinks = catalog.backlinksOf(entry.id).filter(isEditorialEntry);
 
-		return { mapData, catalogItems, backlinks };
+		return { backlinks, catalogItems, mapData };
 	};
 }
 

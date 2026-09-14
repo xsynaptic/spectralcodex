@@ -12,11 +12,11 @@ describe('buildSourceCitations', () => {
 	test('joins authors, title and publication details with the English delimiter', () => {
 		const { primary } = buildSourceCitations(
 			makeSource({
-				title: 'Outcasts of Empire',
 				authors: [{ name: 'Paul D. Barclay' }],
-				publisher: 'University of California Press',
 				publishedDate: '2017',
 				publishedDetails: 'Oakland, California',
+				publisher: 'University of California Press',
+				title: 'Outcasts of Empire',
 			}),
 		);
 
@@ -27,7 +27,7 @@ describe('buildSourceCitations', () => {
 
 	test('joins multiple authors with an ampersand', () => {
 		const { primary } = buildSourceCitations(
-			makeSource({ title: 'A Title', authors: [{ name: 'One' }, { name: 'Two' }] }),
+			makeSource({ authors: [{ name: 'One' }, { name: 'Two' }], title: 'A Title' }),
 		);
 
 		expect(primary?.authors).toBe('One & Two');
@@ -36,12 +36,12 @@ describe('buildSourceCitations', () => {
 	test('quotes a Chinese title and switches to full-width punctuation', () => {
 		const { multilingual } = buildSourceCitations(
 			makeSource({
-				title: 'A Brief History of Movie Theaters in Mailiao',
-				title_zh: '麥寮地區戲院小史',
 				authors: [{ name: 'Li Yuanjie', name_zh: '李元傑' }],
-				publisher_zh: '雲林縣政府',
 				publishedDate: '2018-04',
 				publishedDetails_zh: '第59輯',
+				publisher_zh: '雲林縣政府',
+				title: 'A Brief History of Movie Theaters in Mailiao',
+				title_zh: '麥寮地區戲院小史',
 			}),
 		);
 
@@ -53,7 +53,7 @@ describe('buildSourceCitations', () => {
 
 	test('quotes a Japanese title with corner brackets', () => {
 		const { multilingual } = buildSourceCitations(
-			makeSource({ title: 'A Title', title_ja: '日本語', authors: [{ name_ja: '著者' }] }),
+			makeSource({ authors: [{ name_ja: '著者' }], title: 'A Title', title_ja: '日本語' }),
 		);
 
 		expect(multilingual?.lang).toBe('ja');
@@ -74,7 +74,7 @@ describe('buildSourceCitations', () => {
 	// Regression: the delimiter was previously dropped when no publisher accompanied the details
 	test('delimits published details that arrive without a publisher', () => {
 		const { multilingual } = buildSourceCitations(
-			makeSource({ title: 'A Title', title_zh: '書', publishedDetails_zh: '第59輯' }),
+			makeSource({ publishedDetails_zh: '第59輯', title: 'A Title', title_zh: '書' }),
 		);
 
 		expect(multilingual?.published).toBe('第59輯');
@@ -84,7 +84,7 @@ describe('buildSourceCitations', () => {
 	// Regression: an empty array previously rendered a leading delimiter
 	test('omits authors entirely when the list is empty', () => {
 		const { primary } = buildSourceCitations(
-			makeSource({ title: 'A Title', authors: [], publisher: 'A Publisher' }),
+			makeSource({ authors: [], publisher: 'A Publisher', title: 'A Title' }),
 		);
 
 		expect(primary?.authors).toBeUndefined();
@@ -93,7 +93,7 @@ describe('buildSourceCitations', () => {
 
 	test('omits authors when none carry a name in the citation language', () => {
 		const { multilingual } = buildSourceCitations(
-			makeSource({ title: 'A Title', title_zh: '書', authors: [{ name: 'No Chinese Name' }] }),
+			makeSource({ authors: [{ name: 'No Chinese Name' }], title: 'A Title', title_zh: '書' }),
 		);
 
 		expect(multilingual?.authors).toBeUndefined();

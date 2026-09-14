@@ -25,8 +25,8 @@ interface MapDataQueryConfig<TSchema extends z.ZodType> {
 
 export function createMapDataQuery<TSchema extends z.ZodType>({
 	name,
-	schema,
 	optional = false,
+	schema,
 }: MapDataQueryConfig<TSchema>) {
 	type TParsed = z.output<TSchema>;
 	type TInput = z.input<TSchema>;
@@ -60,10 +60,9 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 			throw new Error(`[Map] ${name} query used outside its provider`);
 		}
 
-		const { apiUrl, data, dataKey, version, isDev } = config;
+		const { apiUrl, data, dataKey, isDev, version } = config;
 
 		return useQuery<Array<TParsed> | undefined>({
-			queryKey: [name, apiUrl, dataKey ?? (data ? 'inline' : false), version, isDev],
 			// Inline data ships in the HTML; skip IndexedDB persistence
 			meta: { persist: !data },
 			queryFn: async () => {
@@ -84,19 +83,20 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 
 				throw new Error(`[Map] Either ${name} or its API URL must be provided`);
 			},
-			refetchOnWindowFocus: false,
+			queryKey: [name, apiUrl, dataKey ?? (data ? 'inline' : false), version, isDev],
 			refetchOnMount: false,
+			refetchOnWindowFocus: false,
 			...(optional ? { enabled: !!apiUrl || !!data } : {}),
 		});
 	};
 
 	const DataProvider: FC<MapDataProviderProps<TInput>> = function DataProvider({
 		apiUrl,
+		children,
 		data,
 		dataKey,
-		version,
 		isDev,
-		children,
+		version,
 	}) {
 		// Keyless inline data would collide across maps sharing this query name
 		if (data && dataKey === undefined && isDev) {
@@ -104,7 +104,7 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 		}
 
 		const config = useMemo(
-			() => ({ apiUrl, data, dataKey, version, isDev }),
+			() => ({ apiUrl, data, dataKey, isDev, version }),
 			[apiUrl, data, dataKey, version, isDev],
 		);
 

@@ -29,13 +29,13 @@ const columns: Array<Column> = [
 	{ label: 'Title' },
 	{ label: 'Region' },
 	{ label: 'Status' },
-	{ label: 'Precision', abbreviation: 'P' },
+	{ abbreviation: 'P', label: 'Precision' },
 ];
 
 const caption = t('collection.locations.labelPlural');
 
 // Keyboard users need a tab stop to scroll a clipped table; the lint rule cannot see a scroll region
-const scrollRegionProps = { role: 'region' as const, tabindex: 0, 'aria-label': caption };
+const scrollRegionProps = { 'aria-label': caption, role: 'region' as const, tabindex: 0 };
 ---
 
 {locations.length > 0 ? (

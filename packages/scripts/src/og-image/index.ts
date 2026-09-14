@@ -22,21 +22,21 @@ const rootPath = findWorkspaceRoot();
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
+		'clear-cache': {
+			default: false,
+			type: 'boolean',
+		},
 		'dist-path': {
-			type: 'string',
 			default: './dist',
+			type: 'string',
 		},
 		'media-path': {
-			type: 'string',
 			default: 'packages/content/media',
+			type: 'string',
 		},
 		'output-path': {
-			type: 'string',
 			default: openGraphOutputPath,
-		},
-		'clear-cache': {
-			type: 'boolean',
-			default: false,
+			type: 'string',
 		},
 	},
 });
@@ -139,7 +139,7 @@ async function main() {
 	const decodeLimit = pLimit(10);
 	const renderLimit = pLimit(16);
 
-	const counts = { generated: 0, skipped: 0, errors: 0 };
+	const counts = { errors: 0, generated: 0, skipped: 0 };
 
 	async function selectStaleEntries(batch: ImageBatch) {
 		const imageModifiedTime = await getImageModifiedTime(batch.imageId);

@@ -12,7 +12,8 @@ export function buildResourceLink(link: ResourceLink) {
 	const platform = 'id' in link ? undefined : getLinkPlatform(link.url);
 
 	return {
-		url: link.url,
+		resourceUrl:
+			'id' in link && 'showPage' in link ? getResourcePath(link.id, link.showPage) : undefined,
 		title: platform
 			? formatStringTemplate(t('section.links.platform.label'), {
 					platform,
@@ -20,7 +21,6 @@ export function buildResourceLink(link: ResourceLink) {
 				})
 			: link.title,
 		titleMultilingual: getMultilingualContent({ data: link, prop: 'title' })?.primary,
-		resourceUrl:
-			'id' in link && 'showPage' in link ? getResourcePath(link.id, link.showPage) : undefined,
+		url: link.url,
 	};
 }

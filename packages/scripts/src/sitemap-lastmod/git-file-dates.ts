@@ -18,7 +18,7 @@ const dateLineMarker = '\u{1}';
 
 // Keys are paths as git prints them, relative to the repo root (not `cwd`); use `keyPrefix` to rebase them
 export async function getGitFileDates(options: GitFileDatesOptions): Promise<Map<string, string>> {
-	const { cwd, pathspec, keyPrefix } = options;
+	const { cwd, keyPrefix, pathspec } = options;
 	const dateFormat = options.date === 'author' ? '%aI' : '%cI';
 
 	await warnOrThrowOnShallow(cwd, options.onShallow ?? 'throw');

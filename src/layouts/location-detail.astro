@@ -51,16 +51,16 @@ interface Props {
 	mapData: MapComponentData;
 }
 
-const { entry, mapData, catalogItems, backlinks } = Astro.props;
+const { backlinks, catalogItems, entry, mapData } = Astro.props;
 
 const getLocationEntryDisplay = await createLocationEntryDisplayFunction();
 const {
-	regionPrimary,
-	regionLangCode,
-	titleMultilingual,
-	titleMultilingualAdditional,
 	addressBase,
 	addressMultilingual,
+	regionLangCode,
+	regionPrimary,
+	titleMultilingual,
+	titleMultilingualAdditional,
 } = getLocationEntryDisplay(entry);
 
 const themeIds = entry.data.themes?.map(({ id }) => id);
@@ -71,8 +71,8 @@ const imageFeaturedId = getImageFeaturedId({
 	imageFeatured: entry.data.imageFeatured,
 });
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
-	imageFeatured: entry.data.imageFeatured,
 	getCaption: catalog.getCaption,
+	imageFeatured: entry.data.imageFeatured,
 });
 
 const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
@@ -85,12 +85,12 @@ const t = getTranslations();
 <MainSite
 	hasHeroImage={hasHeroImage}
 	meta={{
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
-			id: getPublicId(entry),
 			alt: entry.data.title,
+			id: getPublicId(entry),
 		}),
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}

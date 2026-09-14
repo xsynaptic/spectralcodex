@@ -11,8 +11,8 @@ export const MapStoreContext = createContext<ReturnType<typeof createMapStore> |
 );
 
 export const MapStoreProvider = ({
-	initialState,
 	children,
+	initialState,
 }: {
 	children: ReactNode;
 	initialState?: Partial<MapDataConfigurableState>;

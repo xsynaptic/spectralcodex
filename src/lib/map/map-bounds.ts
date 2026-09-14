@@ -35,12 +35,12 @@ interface BboxBufferOptions {
 // By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
 // But these values can be overridden on a case-by-case basis
 export function getMapBounds({
-	featureCollection: featureCollectionRaw,
-	limitsFeatureCollection: limitsFeatureCollectionRaw,
 	boundsBuffer,
 	boundsBufferPercentage = 10,
+	featureCollection: featureCollectionRaw,
 	limitsBuffer,
 	limitsBufferPercentage = 100,
+	limitsFeatureCollection: limitsFeatureCollectionRaw,
 	targetId,
 }: MapDataBoundsProps):
 	| undefined
@@ -60,21 +60,21 @@ export function getMapBounds({
 		: featureCollection;
 
 	const bounds = getBufferedBbox(featureCollection, {
-		explicitBuffer: boundsBuffer,
 		bufferPercentage: boundsBufferPercentage,
+		explicitBuffer: boundsBuffer,
 		minBuffer: mapBoundsBufferMin,
 	});
 	const maxBounds = getBufferedBbox(limitsFeatureCollection, {
-		explicitBuffer: limitsBuffer,
 		bufferPercentage: limitsBufferPercentage,
+		explicitBuffer: limitsBuffer,
 		minBuffer: mapLimitsBufferMin,
 	});
 
 	if (!bounds || !maxBounds) return;
 
 	return {
-		center: getMapCenter(featureCollection, targetId),
 		bounds,
+		center: getMapCenter(featureCollection, targetId),
 		maxBounds,
 	};
 }
@@ -88,7 +88,7 @@ function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureC
 
 function getBufferedBbox(
 	featureCollection: MapFeatureCollection,
-	{ explicitBuffer, bufferPercentage, minBuffer }: BboxBufferOptions,
+	{ bufferPercentage, explicitBuffer, minBuffer }: BboxBufferOptions,
 ): [number, number, number, number] | undefined {
 	if (featureCollection.features.length === 0) return undefined;
 
@@ -154,8 +154,8 @@ function getNaturalBounds(
 	featureCollection: MapFeatureCollection,
 ): [number, number, number, number] {
 	const [[west, south], [east, north]] = geoBounds({
-		type: 'MultiPoint',
 		coordinates: getVertices(featureCollection),
+		type: 'MultiPoint',
 	});
 
 	return [west, south, west > east ? east + 360 : east, north];

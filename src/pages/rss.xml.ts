@@ -24,9 +24,9 @@ export async function GET(context: APIContext): Promise<Response> {
 	if (isFeedDebug) console.log(`[RSS] Initializing feed...`);
 
 	const items = await generateFeedItems({
+		debug: isFeedDebug,
 		itemCount: feedItemCount,
 		shouldExcludeFootnotes: isFeedExcludeFootnotes,
-		debug: isFeedDebug,
 	});
 
 	const t = getTranslations();
@@ -35,22 +35,22 @@ export async function GET(context: APIContext): Promise<Response> {
 	const lastBuildDate = items[0]?.pubDate;
 
 	const copyright = `${formatStringTemplate(t('site.footer.copyright.label'), {
-		year: siteYearFounded,
 		currentYear: new Date().getFullYear(),
+		year: siteYearFounded,
 	})} ${t('site.title')}`;
 
 	const rssFeed = rss({
-		xmlns: { atom: 'http://www.w3.org/2005/Atom' },
 		customData: [
 			'<language>en-us</language>',
 			`<atom:link href="${getAbsoluteUrl(getBasePath('rss.xml'))}" rel="self" type="application/rss+xml"/>`,
 			...(lastBuildDate ? [`<lastBuildDate>${lastBuildDate.toUTCString()}</lastBuildDate>`] : []),
 			`<copyright>${copyright}</copyright>`,
 		].join(''),
-		title: t('site.title'),
 		description: t('site.description'),
-		site: context.site ?? '',
 		items,
+		site: context.site ?? '',
+		title: t('site.title'),
+		xmlns: { atom: 'http://www.w3.org/2005/Atom' },
 	});
 
 	if (isFeedDebug) {

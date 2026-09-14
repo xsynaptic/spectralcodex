@@ -4,17 +4,17 @@ import { collectAspectRatioIssues } from '#validate-content/image-aspect-ratios.
 import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 function makeImage(id: string, width: number, height: number) {
-	return makeEntry({ id, data: { width, height } });
+	return makeEntry({ data: { height, width }, id });
 }
 
 describe('collectAspectRatioIssues', () => {
 	test.each([
-		{ label: '4:3', width: 1600, height: 1200 },
-		{ label: '3:4', width: 1200, height: 1600 },
-		{ label: '3:2', width: 1800, height: 1200 },
-		{ label: '2:3', width: 1200, height: 1800 },
-		{ label: '1:1', width: 1200, height: 1200 },
-	])('accepts the canonical $label ratio', ({ label, width, height }) => {
+		{ height: 1200, label: '4:3', width: 1600 },
+		{ height: 1600, label: '3:4', width: 1200 },
+		{ height: 1200, label: '3:2', width: 1800 },
+		{ height: 1800, label: '2:3', width: 1200 },
+		{ height: 1200, label: '1:1', width: 1200 },
+	])('accepts the canonical $label ratio', ({ height, label, width }) => {
 		const result = collectAspectRatioIssues([makeImage(`photo-${label}`, width, height)]);
 
 		expect(result.flagged).toEqual([]);
@@ -50,7 +50,7 @@ describe('collectAspectRatioIssues', () => {
 	test('skips entries with missing or non-positive dimensions', () => {
 		const result = collectAspectRatioIssues([
 			makeEntry({ id: 'no-dimensions' }),
-			makeEntry({ id: 'zero-width', data: { width: 0, height: 900 } }),
+			makeEntry({ data: { height: 900, width: 0 }, id: 'zero-width' }),
 		]);
 
 		expect(result.flagged).toEqual([]);
@@ -67,7 +67,7 @@ describe('collectAspectRatioIssues', () => {
 
 		const counts = Object.fromEntries(result.tally.map((row) => [row.label, row.count]));
 
-		expect(counts).toMatchObject({ '3:2': 2, '1:1': 1, '4:3': 0 });
+		expect(counts).toMatchObject({ '1:1': 1, '3:2': 2, '4:3': 0 });
 		expect(result.flagged).toHaveLength(1);
 	});
 });

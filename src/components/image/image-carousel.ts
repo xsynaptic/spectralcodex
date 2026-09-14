@@ -74,7 +74,7 @@ class ImageCarousel extends HTMLElement {
 		const left = getScrollTarget(container, button.dataset.carouselNav === 'next');
 		const isReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-		container.scrollTo({ left, behavior: isReducedMotion ? 'instant' : 'smooth' });
+		container.scrollTo({ behavior: isReducedMotion ? 'instant' : 'smooth', left });
 
 		// Without scrollend only button presses can announce
 		if (!('onscrollend' in window) && container.clientWidth > 0) {

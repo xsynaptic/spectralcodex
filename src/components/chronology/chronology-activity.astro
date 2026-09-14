@@ -12,17 +12,17 @@ interface Props {
 	year: string;
 }
 
-const { year, dailyData } = Astro.props;
+const { dailyData, year } = Astro.props;
 
 const t = getTranslations();
 
-const { values, totals } = getChronologyActivityData(dailyData);
+const { totals, values } = getChronologyActivityData(dailyData);
 
 const ariaLabel = formatStringTemplate(t('chronology.activity.aria'), {
-	year,
 	created: formatNumber({ number: totals.created }),
 	updated: formatNumber({ number: totals.updated }),
 	visited: formatNumber({ number: totals.visited }),
+	year,
 });
 ---
 

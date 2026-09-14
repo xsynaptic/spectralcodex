@@ -22,7 +22,7 @@ describe('textClipper', () => {
 	});
 
 	test('supports a custom trailer', () => {
-		expect(textClipper('one two three four', { wordCount: 2, trailer: '…' })).toBe('one two…');
+		expect(textClipper('one two three four', { trailer: '…', wordCount: 2 })).toBe('one two…');
 	});
 
 	test('clips pure CJK text without spaces', () => {

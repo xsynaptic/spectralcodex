@@ -56,10 +56,10 @@ export async function createQueryResourcesEntryFunction() {
 		);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
+			chunkKeyById,
 			featureCollection: getLocationsFeatureCollection(locationsFiltered),
 			locationCount: locationsFiltered.length,
-			chunkKeyById,
+			mapId: `${entry.collection}/${entry.id}`,
 			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});

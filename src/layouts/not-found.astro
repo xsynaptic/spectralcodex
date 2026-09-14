@@ -16,12 +16,12 @@ const description = t('notFound.description');
 
 <MainSite
 	meta={{
-		title,
 		description,
 		image: getSeoImageProps({
-			id: 'index-not-found',
 			alt: title,
+			id: 'index-not-found',
 		}),
+		title,
 		...getSeoHideSearch(true),
 	}}
 >

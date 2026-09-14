@@ -48,12 +48,12 @@ export function validateEntryIds(entries: Array<ContentEntry>) {
 
 	return toValidationResult(
 		issues.map(({ id, locations }) => ({
-			message: `duplicate entry ID "${id}"`,
 			details: locations,
+			message: `duplicate entry ID "${id}"`,
 		})),
 		{
-			pass: `${entries.length.toString()} entry IDs unique`,
 			fail: `Found ${issues.length.toString()} duplicate entry ID(s)`,
+			pass: `${entries.length.toString()} entry IDs unique`,
 		},
 	);
 }

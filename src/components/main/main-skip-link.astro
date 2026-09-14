@@ -11,7 +11,7 @@ interface Props extends HTMLAttributes<'div'> {
 	target?: string | undefined;
 }
 
-const { class: className, parentClass, target = '#main-content', label, ...props } = Astro.props;
+const { class: className, label, parentClass, target = '#main-content', ...props } = Astro.props;
 ---
 
 <div class:list={['skip-link', parentClass]} {...props}>

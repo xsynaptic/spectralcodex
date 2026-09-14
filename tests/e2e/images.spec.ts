@@ -18,7 +18,7 @@ async function getSelectedWidth(img: Locator): Promise<number> {
 }
 
 test.describe('images - desktop (1280x720)', () => {
-	test.use({ viewport: { width: 1280, height: 720 } });
+	test.use({ viewport: { height: 720, width: 1280 } });
 
 	test('hero selects an optimized width', async ({ page }) => {
 		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
@@ -38,7 +38,7 @@ test.describe('images - desktop (1280x720)', () => {
 });
 
 test.describe('images - mobile (390x844)', () => {
-	test.use({ viewport: { width: 390, height: 844 } });
+	test.use({ viewport: { height: 844, width: 390 } });
 
 	test('hero selects a smaller width than desktop', async ({ page }) => {
 		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });

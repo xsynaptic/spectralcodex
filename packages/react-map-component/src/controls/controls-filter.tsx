@@ -12,7 +12,7 @@ import { controlFilterId } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { LocationStatusRecords } from '#lib/location-status.ts';
+import { locationStatusOrder, LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
 	useHasMapChineseLabels,
@@ -28,15 +28,15 @@ import {
 
 // Bilingual secondary labels; kept local pending the deferred map-portability work
 const chineseShowHideLabels = {
-	showAll: '顯示全部',
 	hideAll: '隱藏全部',
+	showAll: '顯示全部',
 } as const;
 
 const MapFilterMenuItem: FC<
 	PropsWithChildren<{
 		isActive?: boolean;
 	}>
-> = function MapFilterMenuItem({ isActive, children }) {
+> = function MapFilterMenuItem({ children, isActive }) {
 	return (
 		<li
 			className={
@@ -52,7 +52,7 @@ const MapFilterStatusMenuItem: FC<{
 	data: LocationStatusMetadata;
 	isFiltered: boolean;
 	status: LocationStatus;
-}> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
+}> = memo(function MapFilterStatusMenuItem({ data, isFiltered, status }) {
 	const isDarkMode = useIsDarkMode();
 
 	const isShowChinese = useHasMapChineseLabels();
@@ -110,7 +110,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 	PropsWithChildren<{
 		onClick: () => void;
 	}>
-> = memo(function MapFilterStatusShowHideMenuItem({ onClick, children }) {
+> = memo(function MapFilterStatusShowHideMenuItem({ children, onClick }) {
 	return (
 		<MapFilterMenuItem>
 			<button className="map-filter-button" onClick={onClick}>
@@ -234,7 +234,7 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
 	id: string;
-}> = function MapControlsFilterMenu({ id, filterPopupOffset = 8 }) {
+}> = function MapControlsFilterMenu({ filterPopupOffset = 8, id }) {
 	const filterPosition = useMapFilterPosition();
 	const isFilterOpen = useIsMapFilterOpen();
 	const statusFilter = useMapStatusFilter();
@@ -251,9 +251,9 @@ const MapControlsFilterMenu: FC<{
 			<div className="maplibregl-popup-tip"></div>
 			<div className="maplibregl-popup-content">
 				<ul className="map-filter-menu-list">
-					{R.entries(LocationStatusRecords).map(([status, data]) => (
+					{locationStatusOrder.map((status) => (
 						<MapFilterStatusMenuItem
-							data={data}
+							data={LocationStatusRecords[status]}
 							isFiltered={statusFilter.includes(status)}
 							key={status}
 							status={status}

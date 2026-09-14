@@ -7,32 +7,32 @@ import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 const severityLabelKeys = {
+	[NoticeBoxSeverityEnum.Error]: 'notice.severity.error',
 	[NoticeBoxSeverityEnum.Info]: 'notice.severity.info',
 	[NoticeBoxSeverityEnum.Success]: 'notice.severity.success',
 	[NoticeBoxSeverityEnum.Warning]: 'notice.severity.warning',
-	[NoticeBoxSeverityEnum.Error]: 'notice.severity.error',
 } as const;
 
 const severityContainerClasses = {
+	[NoticeBoxSeverityEnum.Error]:
+		'border-orange-300 bg-orange-100 text-orange-700 dark:border-orange-600 dark:bg-orange-700 dark:text-orange-200',
 	[NoticeBoxSeverityEnum.Info]:
 		'border-primary-300 bg-primary-200 text-primary-600 dark:border-primary-900 dark:bg-primary-600 dark:text-primary-200',
 	[NoticeBoxSeverityEnum.Success]:
 		'border-green-300 bg-green-100 text-green-600 dark:border-green-900 dark:bg-green-600 dark:text-green-200',
 	[NoticeBoxSeverityEnum.Warning]:
 		'border-highlight-300 bg-highlight-100 text-highlight-700 dark:border-highlight-600 dark:bg-highlight-700 dark:text-highlight-200',
-	[NoticeBoxSeverityEnum.Error]:
-		'border-orange-300 bg-orange-100 text-orange-700 dark:border-orange-600 dark:bg-orange-700 dark:text-orange-200',
 } as const;
 
 const severityIconClasses = {
+	[NoticeBoxSeverityEnum.Error]:
+		'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300',
 	[NoticeBoxSeverityEnum.Info]:
 		'border-primary-300 bg-primary-100 text-primary-500 dark:border-primary-600 dark:bg-primary-600 dark:text-primary-300',
 	[NoticeBoxSeverityEnum.Success]:
 		'border-green-200 bg-green-50 text-green-500 dark:border-green-600 dark:bg-green-600 dark:text-green-300',
 	[NoticeBoxSeverityEnum.Warning]:
 		'border-highlight-200 bg-highlight-50 text-highlight-500 dark:border-highlight-600 dark:bg-highlight-600 dark:text-highlight-300',
-	[NoticeBoxSeverityEnum.Error]:
-		'border-orange-200 bg-orange-50 text-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:text-orange-300',
 } as const;
 
 interface Props extends HTMLAttributes<'div'> {
@@ -40,7 +40,7 @@ interface Props extends HTMLAttributes<'div'> {
 	showIcon?: boolean;
 }
 
-const { severity, class: className, showIcon = true, role = 'note', ...props } = Astro.props;
+const { class: className, role = 'note', severity, showIcon = true, ...props } = Astro.props;
 
 // Glyphs from iconamoon information-circle, check-circle-1, attention-circle, and close-circle-1 (duotone)
 const iconSize = 20;

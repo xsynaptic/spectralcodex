@@ -30,17 +30,17 @@ export async function createQueryPostsEntryFunction() {
 		const postLocations = getLocationsByPosts(entry);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
+			chunkKeyById,
 			featureCollection: getLocationsFeatureCollection(postLocations),
 			locationCount: postLocations.length,
-			chunkKeyById,
+			mapId: `${entry.collection}/${entry.id}`,
 			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
 		const backlinks = catalog.backlinksOf(entry.id).filter(isEditorialEntry);
 
-		return { mapData, backlinks };
+		return { backlinks, mapData };
 	};
 }
 
@@ -50,12 +50,12 @@ export async function getPostSchema(
 ): Promise<Array<Thing>> {
 	return [
 		buildArticleSchema({
-			title: entry.data.title,
-			description: await getDescriptionRenderedText(entry),
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
-			url: props.url,
+			description: await getDescriptionRenderedText(entry),
 			imageUrl: props.imageUrl,
+			title: entry.data.title,
+			url: props.url,
 		}),
 		buildAuthorSchema(),
 	];

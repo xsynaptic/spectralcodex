@@ -1,7 +1,7 @@
 export const DatePresetEnum = {
-	Short: 'short',
-	Medium: 'medium',
 	Long: 'long',
+	Medium: 'medium',
+	Short: 'short',
 } as const;
 
 export type DatePreset = (typeof DatePresetEnum)[keyof typeof DatePresetEnum];
@@ -21,7 +21,7 @@ interface ContentDate {
 export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRange> {
 	return entries
 		.map((entry): DateRange =>
-			Array.isArray(entry) ? { start: entry[0], end: entry[1] } : { start: entry },
+			Array.isArray(entry) ? { end: entry[1], start: entry[0] } : { start: entry },
 		)
 		.sort((a, b) => a.start.date.valueOf() - b.start.date.valueOf());
 }
@@ -37,12 +37,12 @@ export function getDayKey(date: Date): string {
 const ordinalRules = new Intl.PluralRules('en-US', { type: 'ordinal' });
 
 const ordinalSuffixes: Record<Intl.LDMLPluralRule, string> = {
-	zero: 'th',
-	one: 'st',
-	two: 'nd',
 	few: 'rd',
 	many: 'th',
+	one: 'st',
 	other: 'th',
+	two: 'nd',
+	zero: 'th',
 };
 
 interface CollectionEntryWithStandardDates {

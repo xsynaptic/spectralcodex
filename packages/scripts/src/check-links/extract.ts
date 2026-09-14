@@ -17,8 +17,8 @@ const SourceExtractSchema = z.union([
 
 const EntryDataSchema = z.object({
 	links: LinkExtractSchema.array().optional(),
-	url: z.string().optional(),
 	sources: SourceExtractSchema.array().optional(),
+	url: z.string().optional(),
 });
 
 // Extract all external URLs from a data store entry
@@ -58,7 +58,7 @@ function extractFrontmatterLinks(data: Record<string, unknown>): Array<string> {
 		return [];
 	}
 
-	const { links, url, sources } = result.data;
+	const { links, sources, url } = result.data;
 
 	return [
 		...(links?.map(extractUrlFromLink) ?? []),

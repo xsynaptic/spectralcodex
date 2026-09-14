@@ -145,24 +145,24 @@ async function createCatalogItem(
 	const imageFeatured = 'imageFeatured' in data ? data.imageFeatured : undefined;
 
 	return {
+		backlinks: new Set<string>(), // Populated by the backlink pass
 		collection: entry.collection,
-		id: entry.id,
-		title: data.title,
-		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
+		dateCreated: data.dateCreated,
+		dateRecorded: 'dateRecorded' in data ? data.dateRecorded : undefined,
+		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
 		description: getDescription(entry),
-		url: getContentPath(entry.collection, getPublicId(entry)),
-		imageId: getImageFeaturedId({ imageFeatured }),
+		entryQuality: data.entryQuality,
+		id: entry.id,
 		imageHeroId: getImageHeroId({ imageFeatured }),
-		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),
+		imageId: getImageFeaturedId({ imageFeatured }),
+		linksExternalCount: getLinksExternalCount(entry),
 		locationCount: '_locationCount' in data ? data._locationCount : undefined,
 		postCount: '_postCount' in data ? data._postCount : undefined,
+		regionPrimaryId: getRegionPrimaryId('regions' in data ? data.regions : undefined),
+		title: data.title,
+		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
+		url: getContentPath(entry.collection, getPublicId(entry)),
 		wordCount: await getWordCount(entry),
-		linksExternalCount: getLinksExternalCount(entry),
-		backlinks: new Set<string>(), // Populated by the backlink pass
-		dateCreated: data.dateCreated,
-		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
-		dateRecorded: 'dateRecorded' in data ? data.dateRecorded : undefined,
-		entryQuality: data.entryQuality,
 	};
 }
 

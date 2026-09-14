@@ -11,15 +11,15 @@ import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 type Props = MetaProps;
 
 const {
-	title: contentTitle,
+	article,
 	description: contentDescription,
-	ogType,
 	image,
 	imageAlt,
-	article,
-	prefetchUrls,
-	noIndex,
 	noFollow,
+	noIndex,
+	ogType,
+	prefetchUrls,
+	title: contentTitle,
 } = Astro.props;
 
 const t = getTranslations();
@@ -34,10 +34,10 @@ const titleDisplay =
 
 const openGraphImage = image?.url
 	? {
-			url: new URL(image.url, Astro.site).href,
-			height: openGraphImageHeight,
-			width: openGraphImageWidth,
 			alt: sanitizeImageAltAttribute(image.alt ?? imageAlt ?? description),
+			height: openGraphImageHeight,
+			url: new URL(image.url, Astro.site).href,
+			width: openGraphImageWidth,
 		}
 	: undefined;
 
@@ -46,25 +46,25 @@ const socialProps = openGraphImage
 	? {
 			openGraph: {
 				basic: {
+					image: openGraphImage.url,
 					title: titleDisplay,
 					type: ogType ?? 'website',
-					image: openGraphImage.url,
 				},
+				image: openGraphImage,
 				optional: {
 					description,
 					locale: 'en_US',
 					siteName: siteTitle,
 				},
-				image: openGraphImage,
 				...(ogType === 'article' && article !== undefined ? { article } : {}),
 			},
 			twitter: {
 				card: 'summary_large_image' as const,
-				site: openGraphTwitterUsername,
-				title: contentTitle ?? siteTitle,
 				description,
 				image: openGraphImage.url,
 				imageAlt: openGraphImage.alt,
+				site: openGraphTwitterUsername,
+				title: contentTitle ?? siteTitle,
 			},
 		}
 	: {};
@@ -77,10 +77,10 @@ const socialProps = openGraphImage
 	extend={{
 		...(prefetchUrls?.length
 			? {
-					link: prefetchUrls.map((prefetchUrl) => ({ rel: 'prefetch', href: prefetchUrl })),
+					link: prefetchUrls.map((prefetchUrl) => ({ href: prefetchUrl, rel: 'prefetch' })),
 				}
 			: {}),
-		meta: [{ name: 'generator', content: Astro.generator }],
+		meta: [{ content: Astro.generator, name: 'generator' }],
 	}}
 	nofollow={noFollow ?? false}
 	noindex={noIndex ?? false}

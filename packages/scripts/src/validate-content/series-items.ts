@@ -20,15 +20,15 @@ export function validateSeriesItems(
 		if (!seriesItems) continue;
 
 		for (const id of seriesItems) {
-			if (!validIds.has(id)) issues.push({ location: entry.filePath ?? entry.id, id });
+			if (!validIds.has(id)) issues.push({ id, location: entry.filePath ?? entry.id });
 		}
 	}
 
 	return toValidationResult(
-		issues.map(({ location, id }) => ({ message: `${location}: unknown series item "${id}"` })),
+		issues.map(({ id, location }) => ({ message: `${location}: unknown series item "${id}"` })),
 		{
-			pass: 'Series items valid',
 			fail: `Found ${issues.length.toString()} unknown series item(s)`,
+			pass: 'Series items valid',
 		},
 	);
 }

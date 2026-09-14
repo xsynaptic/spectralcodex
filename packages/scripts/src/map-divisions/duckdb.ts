@@ -16,11 +16,11 @@ interface DivisionRow {
 }
 
 export async function fetchDivisionData({
+	cachePath,
 	db,
 	divisionIds,
-	selectionBBox,
-	cachePath,
 	overtureUrl,
+	selectionBBox,
 }: {
 	cachePath: string;
 	db: DuckDBConnection;
@@ -201,8 +201,8 @@ async function runDivisionQuery(db: DuckDBConnection, query: string): Promise<Ar
 			for (const row of result.getChunk(index).getRows()) {
 				rows.push({
 					areaId: row[0] as string,
-					parentDivisionId: row[1] as string,
 					geometryGeojson: row[2] as string,
+					parentDivisionId: row[1] as string,
 				});
 			}
 		}

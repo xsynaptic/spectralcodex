@@ -1,10 +1,10 @@
 export const UrlStatusEnum = {
-	Pending: 'pending',
-	Healthy: 'healthy',
 	Blocked: 'blocked',
-	Redirect: 'redirect',
-	Missing: 'missing',
 	Error: 'error',
+	Healthy: 'healthy',
+	Missing: 'missing',
+	Pending: 'pending',
+	Redirect: 'redirect',
 } as const satisfies Record<string, string>;
 
 export interface UrlRow {

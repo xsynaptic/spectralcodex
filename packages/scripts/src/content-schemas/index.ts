@@ -12,8 +12,8 @@ const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'output-path': {
-			type: 'string',
 			default: 'content',
+			type: 'string',
 		},
 	},
 });

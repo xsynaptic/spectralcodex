@@ -14,19 +14,19 @@ export function validateImageReferences(entries: Array<ContentEntry>, mediaPath:
 
 	if (mediaFiles.size === 0) {
 		return {
+			issues: [],
 			status: 'warn',
 			summary: `No image files found in ${mediaPath}`,
-			issues: [],
 		} satisfies ValidationResult;
 	}
 
 	const issues = collectMissingImageIssues(entries, mediaFiles);
 
 	return toValidationResult(
-		issues.map(({ location, imageId }) => ({ message: `${location}: missing image "${imageId}"` })),
+		issues.map(({ imageId, location }) => ({ message: `${location}: missing image "${imageId}"` })),
 		{
-			pass: `${mediaFiles.size.toString()} image references valid`,
 			fail: `Found ${issues.length.toString()} missing image reference(s)`,
+			pass: `${mediaFiles.size.toString()} image references valid`,
 		},
 	);
 }
@@ -42,7 +42,7 @@ function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: Rea
 		for (const imageId of imageIds) {
 			if (mediaFiles.has(imageId)) continue;
 
-			issues.push({ location: entry.filePath ?? entry.id, imageId });
+			issues.push({ imageId, location: entry.filePath ?? entry.id });
 		}
 	}
 

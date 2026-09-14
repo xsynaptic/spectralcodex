@@ -15,16 +15,16 @@ export type ImageFitOption = (typeof ImageFitOptionEnum)[keyof typeof ImageFitOp
 
 export const ImageLayoutEnum = {
 	Default: 'default',
-	Wide: 'wide',
 	Full: 'full',
+	Wide: 'wide',
 } as const;
 
 export type ImageLayout = (typeof ImageLayoutEnum)[keyof typeof ImageLayoutEnum];
 
 export const ImageContextEnum = {
-	Single: 'single',
-	Grid: 'grid',
 	Carousel: 'carousel',
+	Grid: 'grid',
+	Single: 'single',
 } as const;
 
 export type ImageContext = (typeof ImageContextEnum)[keyof typeof ImageContextEnum];
@@ -38,13 +38,13 @@ export const ImageOrientationEnum = {
 export type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
 
 export const ImageSizeEnum = {
-	ExtraSmall: 450,
-	Small: 600,
-	Medium: 900,
-	Large: 1200,
-	ExtraLarge: 1800,
-	ExtraExtraLarge: 2400,
 	ExtraExtraExtraLarge: 3600,
+	ExtraExtraLarge: 2400,
+	ExtraLarge: 1800,
+	ExtraSmall: 450,
+	Large: 1200,
+	Medium: 900,
+	Small: 600,
 } as const;
 
 export type ImageComponentProps = HTMLAttributes<'img'> &

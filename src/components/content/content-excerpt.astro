@@ -40,7 +40,11 @@ const hasExcerpt = excerptSplit.length > 1;
 const hasExcerptImage = excerptContent?.includes('<img') ?? false;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
+	imageFormat: imageHighQualityFormat,
 	imageId: hasExcerptImage ? undefined : imageId,
+	imageQuality: imageHighQualityValue,
+	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
+	width: ImageSizeEnum.Large,
 	widths: [
 		ImageSizeEnum.ExtraSmall,
 		ImageSizeEnum.Small,
@@ -48,10 +52,6 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 		ImageSizeEnum.Large,
 		ImageSizeEnum.ExtraLarge,
 	],
-	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-	width: ImageSizeEnum.Large,
-	imageQuality: imageHighQualityValue,
-	imageFormat: imageHighQualityFormat,
 });
 
 const t = getTranslations();

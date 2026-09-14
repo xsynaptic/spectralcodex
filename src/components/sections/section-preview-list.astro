@@ -13,7 +13,7 @@ interface Props extends HTMLAttributes<'div'> {
 	items: Array<CatalogItem>;
 }
 
-const { items, count, ...props } = Astro.props;
+const { count, items, ...props } = Astro.props;
 
 const t = getTranslations();
 ---

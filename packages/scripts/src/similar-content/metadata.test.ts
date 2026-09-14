@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';
 
 function makeEmbedding(themes: Array<string>, regions: Array<string>) {
-	return { metadata: { themes, regions } };
+	return { metadata: { regions, themes } };
 }
 
 describe('calculateMetadataBoost', () => {

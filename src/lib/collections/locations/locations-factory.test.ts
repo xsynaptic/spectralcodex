@@ -11,15 +11,14 @@ import {
 
 function makeLocation(id: string): CollectionEntry<'locations'> {
 	return {
-		id,
 		collection: 'locations',
 		data: { title: id },
+		id,
 	} as unknown as CollectionEntry<'locations'>;
 }
 
 function makePost(id: string, locationIds?: Array<string>): CollectionEntry<'posts'> {
 	return {
-		id,
 		collection: 'posts',
 		data: {
 			title: id,
@@ -27,6 +26,7 @@ function makePost(id: string, locationIds?: Array<string>): CollectionEntry<'pos
 				? {}
 				: { locations: locationIds.map((locationId) => ({ id: locationId })) }),
 		},
+		id,
 	} as unknown as CollectionEntry<'posts'>;
 }
 

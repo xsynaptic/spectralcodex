@@ -12,7 +12,7 @@ interface Props extends HTMLAttributes<'address'> {
 	content?: MultilingualContent | undefined;
 }
 
-const { address, content, class: className, ...props } = Astro.props;
+const { address, class: className, content, ...props } = Astro.props;
 
 const parts: Array<MultilingualContent> = [];
 

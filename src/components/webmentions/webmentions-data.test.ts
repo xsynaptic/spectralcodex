@@ -17,10 +17,10 @@ async function loadWebmentions(lines: Array<string>) {
 function makeMention(fields: Record<string, unknown>) {
 	return JSON.stringify({
 		'wm-id': 1,
+		'wm-property': 'like-of',
+		'wm-received': '2026-01-01T00:00:00.000Z',
 		'wm-source': 'https://reader.example/reply',
 		'wm-target': 'https://spectralcodex.com/some-post/',
-		'wm-received': '2026-01-01T00:00:00.000Z',
-		'wm-property': 'like-of',
 		...fields,
 	});
 }
@@ -46,12 +46,12 @@ describe('getWebmentionsFunction', () => {
 	test('drops replies backfed from our own accounts', async () => {
 		const getWebmentions = await loadWebmentions([
 			makeMention({
-				'wm-property': 'in-reply-to',
 				author: { name: 'Spectral Codex', url: 'https://BSKY.app/profile/spectralcodex.com/' },
+				'wm-property': 'in-reply-to',
 			}),
 			makeMention({
-				'wm-property': 'in-reply-to',
 				author: { name: 'A Reader', url: 'https://reader.example/' },
+				'wm-property': 'in-reply-to',
 			}),
 		]);
 

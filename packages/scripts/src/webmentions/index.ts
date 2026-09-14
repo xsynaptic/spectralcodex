@@ -16,9 +16,9 @@ const perPage = 1000;
 
 // Markup is stored clean so a future rich renderer needs no refetch
 const sanitizeOptions = {
-	allowedTags: ['a', 'b', 'blockquote', 'br', 'code', 'em', 'i', 'p', 'pre', 'strong'],
 	allowedAttributes: { a: ['href'] },
 	allowedSchemes: ['http', 'https', 'mailto'],
+	allowedTags: ['a', 'b', 'blockquote', 'br', 'code', 'em', 'i', 'p', 'pre', 'strong'],
 } satisfies sanitizeHtml.IOptions;
 
 // The feature is env-gated, so absent credentials are a clean skip rather than a failure
@@ -59,7 +59,7 @@ async function fetchMentionsPage({ page, sinceId }: { page: number; sinceId: num
 	if (sinceId !== undefined) url.searchParams.set('since_id', String(sinceId));
 
 	const response = await fetch(url, {
-		headers: { 'User-Agent': userAgent, Accept: 'application/json' },
+		headers: { Accept: 'application/json', 'User-Agent': userAgent },
 		signal: AbortSignal.timeout(timeoutMs),
 	});
 

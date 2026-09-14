@@ -6,23 +6,23 @@ import { z } from 'zod';
 import { PositionSchema } from '#lib/schemas/geometry.ts';
 
 export const ImageExifDataSchema = z.object({
-	title: z.string(),
-	description: z.string(),
-	dateCreated: z.coerce.date().optional(),
+	aperture: z.string().optional(),
 	brand: z.string().optional(),
 	camera: z.string().optional(),
-	lens: z.string().optional(),
-	aperture: z.string().optional(),
-	shutterSpeed: z.string().optional(),
-	focalLength: z.string().optional(),
-	iso: z.string().optional(),
+	dateCreated: z.coerce.date().optional(),
+	description: z.string(),
 	exposureValue: z.string().optional(),
+	focalLength: z.string().optional(),
 	geometry: z
 		.object({
-			type: z.literal(GeometryTypeEnum.Point),
 			coordinates: PositionSchema,
+			type: z.literal(GeometryTypeEnum.Point),
 		})
 		.optional(),
+	iso: z.string().optional(),
+	lens: z.string().optional(),
+	shutterSpeed: z.string().optional(),
+	title: z.string(),
 });
 
 type ImageExifDataInput = z.input<typeof ImageExifDataSchema>;
@@ -39,22 +39,22 @@ export async function extractExifData(
 	const shutterSpeed = getTagString(tags.ShutterSpeed);
 
 	return {
-		title: getTagString(tags.Title) ?? '',
-		description: getTagString(tags.Description) ?? '',
-		dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
+		aperture,
 		brand: getTagString(tags.Make),
 		camera: getTagString(tags.Model),
-		lens: tags.LensID ?? getTagString(tags.LensModel),
-		aperture,
-		shutterSpeed,
+		dateCreated: dateCreated ? new Date(dateCreated).toISOString() : undefined,
+		description: getTagString(tags.Description) ?? '',
+		exposureValue: getImageExposureValue({ aperture, shutterSpeed }),
 		focalLength: getTagString(tags.FocalLength),
 		iso: getTagString(tags.ISO),
-		exposureValue: getImageExposureValue({ aperture, shutterSpeed }),
+		lens: tags.LensID ?? getTagString(tags.LensModel),
+		shutterSpeed,
+		title: getTagString(tags.Title) ?? '',
 		...(tags.GPSLatitude && tags.GPSLongitude
 			? {
 					geometry: {
-						type: GeometryTypeEnum.Point,
 						coordinates: [Number(tags.GPSLongitude), Number(tags.GPSLatitude)],
+						type: GeometryTypeEnum.Point,
 					},
 				}
 			: {}),

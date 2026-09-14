@@ -16,7 +16,7 @@ const { class: className, items } = Astro.props;
 
 {items.length > 0 ? (
 	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
-		{items.map(({ url, title, titleMultilingual }) => (
+		{items.map(({ title, titleMultilingual, url }) => (
 			<ListColumnItem>
 				<Anchor href={url}>{title}</Anchor>
 				{titleMultilingual ? (

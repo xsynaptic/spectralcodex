@@ -54,7 +54,7 @@ export async function createQueryRegionsEntryFunction() {
 			catalog.resolve,
 		);
 
-		const { catalogItemsFiltered, catalogItems, catalogItemsCount } = buildEntryCatalogItems(
+		const { catalogItems, catalogItemsCount, catalogItemsFiltered } = buildEntryCatalogItems(
 			featuredCandidates,
 			restCandidates,
 		);
@@ -64,14 +64,14 @@ export async function createQueryRegionsEntryFunction() {
 		const regionInterval = regionsTree.intervalById.get(entry.id);
 
 		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
+			chunkKeyById,
 			featureCollection: shouldShowRegionMap
 				? getLocationsFeatureCollection(entryLocations)
 				: undefined,
 			locationCount: entryLocations.length,
-			chunkKeyById,
+			mapId: `${entry.collection}/${entry.id}`,
 			version,
-			...(regionInterval ? { scope: { type: 'region', interval: regionInterval } } : {}),
+			...(regionInterval ? { scope: { interval: regionInterval, type: 'region' } } : {}),
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {
@@ -83,12 +83,12 @@ export async function createQueryRegionsEntryFunction() {
 		const backlinksCount = catalog.backlinksOf(entry.id).length;
 
 		return {
-			catalogItemsFiltered,
+			backlinksCount,
 			catalogItems,
 			catalogItemsCount,
+			catalogItemsFiltered,
 			mapData,
 			regionsOption,
-			backlinksCount,
 		};
 	};
 }
