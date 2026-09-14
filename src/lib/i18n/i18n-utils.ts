@@ -3,8 +3,8 @@ import type { LanguageCode, MultilingualContent } from '#lib/i18n/i18n-types.ts'
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
 const cjkLanguages: ReadonlySet<LanguageCode> = new Set([
-	LanguageCodeEnum.ChineseTraditional,
 	LanguageCodeEnum.ChineseSimplified,
+	LanguageCodeEnum.ChineseTraditional,
 	LanguageCodeEnum.Japanese,
 	LanguageCodeEnum.Korean,
 ]);

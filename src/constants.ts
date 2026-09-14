@@ -31,11 +31,11 @@ export const mapDivisionsDataPath = 'divisions';
 
 // Root regions (self or ancestor) whose pages display maps; content policy, edit deliberately
 export const mapDisplayRegionIds = new Set([
-	'taiwan',
+	'canada',
 	'hong-kong',
+	'taiwan',
 	'thailand',
 	'vietnam',
-	'canada',
 ]);
 
 export const mdxComponents = [

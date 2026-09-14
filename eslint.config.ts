@@ -51,10 +51,8 @@ export default getConfig(
 		{
 			rules: {
 				'perfectionist/sort-classes': 'off',
-				'perfectionist/sort-maps': 'off',
 				'perfectionist/sort-modules': 'off',
 				'perfectionist/sort-objects': 'off',
-				'perfectionist/sort-sets': 'off',
 				'perfectionist/sort-switch-case': 'off',
 			},
 		},

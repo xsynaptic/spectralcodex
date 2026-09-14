@@ -28,8 +28,8 @@ describe('toReferenceIds', () => {
 describe('getRegionParentsById', () => {
 	const parentMap = new Map([
 		['asia', undefined],
-		['taiwan', 'asia'],
 		['taipei', 'taiwan'],
+		['taiwan', 'asia'],
 	]);
 
 	test('returns the chain from root down to the region itself', () => {

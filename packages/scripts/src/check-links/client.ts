@@ -16,8 +16,8 @@ const requestHeaders: Record<string, string> = {
 // 429 = rate limited (definitely exists, we're just hitting too fast)
 const blockedStatusCodes = new Set([403, 429]);
 
-// HEAD is not allowed (405) or the server blocks it (403); retry with GET
-const headRetryStatusCodes = new Set([405, 403]);
+// The server blocks HEAD (403) or does not allow it (405); retry with GET
+const headRetryStatusCodes = new Set([403, 405]);
 
 interface CheckResult {
 	errorMessage: string | undefined;

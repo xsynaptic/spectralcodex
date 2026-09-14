@@ -28,7 +28,7 @@ export function getNavigationItemTriggerType(item: NavigationItem) {
 	return 'span';
 }
 
-const multilingualRegions = new Set(['taiwan', 'hong-kong']);
+const multilingualRegions = new Set(['hong-kong', 'taiwan']);
 
 export function shouldShowNavigationItemMultilingual(item: NavigationItem, depth: number): boolean {
 	if (!item.titleMultilingual) return false;
