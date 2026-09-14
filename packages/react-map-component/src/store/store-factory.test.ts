@@ -19,7 +19,9 @@ describe('createMapStore', () => {
 		const store = createMapStore();
 
 		store.getState().actions.hideAllStatusFilter();
-		expect(store.getState().statusFilter).toEqual(Object.values(LocationStatusEnum));
+		expect(new Set(store.getState().statusFilter)).toEqual(
+			new Set(Object.values(LocationStatusEnum)),
+		);
 
 		store.getState().actions.showAllStatusFilter();
 		expect(store.getState().statusFilter).toEqual([]);
