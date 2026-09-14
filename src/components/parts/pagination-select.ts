@@ -2,13 +2,34 @@ import { navigate } from 'astro:transitions/client';
 
 // Navigation commits on `change` only for a pointer-driven pick on a fine pointer, otherwise via Go or Enter
 class PaginationSelect extends HTMLElement {
-	#initialized = false;
 	#abortController: AbortController | undefined;
+	#currentUrl = '';
 	#form: HTMLFormElement | undefined;
+	#initialized = false;
+	#isPointerDriven = false;
 	#select: HTMLSelectElement | undefined;
 	#submit: HTMLButtonElement | undefined;
-	#currentUrl = '';
-	#isPointerDriven = false;
+
+	connectedCallback() {
+		if (!this.#initialized) {
+			this.#enhance();
+			this.#initialized = true;
+		}
+
+		if (!this.#form || !this.#select) return;
+
+		this.#abortController = new AbortController();
+		const { signal } = this.#abortController;
+
+		this.#form.addEventListener('submit', this.#handleSubmit, { signal });
+		this.#select.addEventListener('change', this.#handleChange, { signal });
+		this.#select.addEventListener('pointerdown', this.#handlePointerDown, { signal });
+		this.#select.addEventListener('keydown', this.#handleKeyDown, { signal });
+	}
+
+	disconnectedCallback() {
+		this.#abortController?.abort();
+	}
 
 	#enhance() {
 		const form = this.querySelector<HTMLFormElement>('[data-pagination-form]');
@@ -33,6 +54,35 @@ class PaginationSelect extends HTMLElement {
 		this.#submit = form.querySelector<HTMLButtonElement>('[data-pagination-submit]') ?? undefined;
 		this.#syncSubmit();
 	}
+
+	#handleChange = () => {
+		// A coarse-pointer picker is easy to mis-tap, so touch commits through Go
+		// Firefox changes a closed select on arrow keys and wheel, so keyboard changes never navigate
+		const shouldNavigate = this.#isPointerDriven && !matchMedia('(pointer: coarse)').matches;
+
+		this.#isPointerDriven = false;
+
+		// Syncing here would flash Go while the navigation resolves
+		if (shouldNavigate) {
+			this.#navigateToSelectedOption();
+			return;
+		}
+
+		this.#syncSubmit();
+	};
+
+	#handleKeyDown = () => {
+		this.#isPointerDriven = false;
+	};
+
+	#handlePointerDown = () => {
+		this.#isPointerDriven = true;
+	};
+
+	#handleSubmit = (event: SubmitEvent) => {
+		event.preventDefault();
+		this.#navigateToSelectedOption();
+	};
 
 	// Pin a width floor to the longest label so picking an option never resizes the control
 	// The 0.5ch buffer absorbs per-glyph width variance and font slack, so exact measurement isn't needed
@@ -69,12 +119,6 @@ class PaginationSelect extends HTMLElement {
 		}
 	}
 
-	#syncSubmit() {
-		if (!this.#submit || !this.#select) return;
-
-		this.#submit.toggleAttribute('data-visible', this.#select.value !== this.#currentUrl);
-	}
-
 	#navigateToSelectedOption() {
 		if (!this.#select) return;
 
@@ -87,54 +131,10 @@ class PaginationSelect extends HTMLElement {
 		void navigate(url);
 	}
 
-	#handlePointerDown = () => {
-		this.#isPointerDriven = true;
-	};
+	#syncSubmit() {
+		if (!this.#submit || !this.#select) return;
 
-	#handleKeyDown = () => {
-		this.#isPointerDriven = false;
-	};
-
-	#handleChange = () => {
-		// A coarse-pointer picker is easy to mis-tap, so touch commits through Go
-		// Firefox changes a closed select on arrow keys and wheel, so keyboard changes never navigate
-		const shouldNavigate = this.#isPointerDriven && !matchMedia('(pointer: coarse)').matches;
-
-		this.#isPointerDriven = false;
-
-		// Syncing here would flash Go while the navigation resolves
-		if (shouldNavigate) {
-			this.#navigateToSelectedOption();
-			return;
-		}
-
-		this.#syncSubmit();
-	};
-
-	#handleSubmit = (event: SubmitEvent) => {
-		event.preventDefault();
-		this.#navigateToSelectedOption();
-	};
-
-	connectedCallback() {
-		if (!this.#initialized) {
-			this.#enhance();
-			this.#initialized = true;
-		}
-
-		if (!this.#form || !this.#select) return;
-
-		this.#abortController = new AbortController();
-		const { signal } = this.#abortController;
-
-		this.#form.addEventListener('submit', this.#handleSubmit, { signal });
-		this.#select.addEventListener('change', this.#handleChange, { signal });
-		this.#select.addEventListener('pointerdown', this.#handlePointerDown, { signal });
-		this.#select.addEventListener('keydown', this.#handleKeyDown, { signal });
-	}
-
-	disconnectedCallback() {
-		this.#abortController?.abort();
+		this.#submit.toggleAttribute('data-visible', this.#select.value !== this.#currentUrl);
 	}
 }
 

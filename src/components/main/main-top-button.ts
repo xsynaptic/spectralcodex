@@ -9,12 +9,12 @@ const minPageFraction = 0.2;
 const desktopMediaQuery = '(min-width: 640px)';
 
 class TopButton extends HTMLElement {
+	#animationFrameId: number | undefined;
 	#controller: AbortController | undefined;
 	#desktopQuery: MediaQueryList | undefined;
 	#lastScrollY = 0;
 	#scrollAccumulator = 0;
 	#scrollController: AbortController | undefined;
-	#animationFrameId: number | undefined;
 
 	connectedCallback() {
 		this.#controller = new AbortController();
@@ -34,16 +34,6 @@ class TopButton extends HTMLElement {
 		this.#controller = undefined;
 		this.#detachScroll();
 	}
-
-	// No scroll work on viewports where the button is hidden
-	#handleViewportChange = () => {
-		if (this.#desktopQuery?.matches) {
-			this.#detachScroll();
-			this.#setHidden(true);
-		} else {
-			this.#attachScroll();
-		}
-	};
 
 	#attachScroll() {
 		if (this.#scrollController) return;
@@ -68,10 +58,35 @@ class TopButton extends HTMLElement {
 		}
 	}
 
+	#handleClick = () => {
+		const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		window.scrollTo({ top: 0, behavior: isReducedMotion ? 'instant' : 'smooth' });
+
+		// Land keyboard and screen reader users at the top, matching the skip link target
+		const target = document.querySelector('#main-content');
+
+		if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+	};
+
 	#handleScroll = () => {
 		if (this.#animationFrameId !== undefined) return;
 		this.#animationFrameId = requestAnimationFrame(this.#update);
 	};
+
+	// No scroll work on viewports where the button is hidden
+	#handleViewportChange = () => {
+		if (this.#desktopQuery?.matches) {
+			this.#detachScroll();
+			this.#setHidden(true);
+		} else {
+			this.#attachScroll();
+		}
+	};
+
+	#setHidden(isHidden: boolean) {
+		if (this.inert === isHidden) return;
+		this.inert = isHidden;
+	}
 
 	#update = () => {
 		this.#animationFrameId = undefined;
@@ -99,21 +114,6 @@ class TopButton extends HTMLElement {
 			this.#setHidden(false);
 			this.#scrollAccumulator = 0;
 		}
-	};
-
-	#setHidden(isHidden: boolean) {
-		if (this.inert === isHidden) return;
-		this.inert = isHidden;
-	}
-
-	#handleClick = () => {
-		const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		window.scrollTo({ top: 0, behavior: isReducedMotion ? 'instant' : 'smooth' });
-
-		// Land keyboard and screen reader users at the top, matching the skip link target
-		const target = document.querySelector('#main-content');
-
-		if (target instanceof HTMLElement) target.focus({ preventScroll: true });
 	};
 }
 

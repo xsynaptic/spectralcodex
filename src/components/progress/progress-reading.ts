@@ -1,18 +1,45 @@
 const animationDuration = 300;
 
 class ProgressReading extends HTMLElement {
+	#fadeOutTimer: number | undefined;
+	#frame: number | undefined;
 	#observer: IntersectionObserver | undefined;
 	#scrollController: AbortController | undefined;
 	#target: Element | undefined;
-	#frame: number | undefined;
-	#fadeOutTimer: number | undefined;
 
-	#setProgress(value: number) {
-		this.style.setProperty('--progress-bar', String(value));
+	connectedCallback() {
+		const selector = this.getAttribute('target') ?? '[data-reading-frame]';
+
+		this.#target = document.querySelector(selector) ?? undefined;
+
+		if (!this.#target) return;
+
+		this.#observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						this.#trackScroll();
+					} else {
+						this.#untrackScroll();
+					}
+				}
+			},
+			{ threshold: 0 },
+		);
+
+		this.#observer.observe(this.#target);
 	}
 
-	#setOpacity(value: number) {
-		this.style.setProperty('opacity', String(value));
+	disconnectedCallback() {
+		this.#observer?.disconnect();
+		this.#observer = undefined;
+		this.#untrackScroll();
+		this.#clearFadeOut();
+
+		if (this.#frame !== undefined) {
+			cancelAnimationFrame(this.#frame);
+			this.#frame = undefined;
+		}
 	}
 
 	#clearFadeOut() {
@@ -20,6 +47,19 @@ class ProgressReading extends HTMLElement {
 
 		clearTimeout(this.#fadeOutTimer);
 		this.#fadeOutTimer = undefined;
+	}
+
+	#onScroll = () => {
+		if (this.#frame !== undefined) return;
+		this.#frame = requestAnimationFrame(this.#updateProgress);
+	};
+
+	#setOpacity(value: number) {
+		this.style.setProperty('opacity', String(value));
+	}
+
+	#setProgress(value: number) {
+		this.style.setProperty('--progress-bar', String(value));
 	}
 
 	#trackScroll() {
@@ -64,46 +104,6 @@ class ProgressReading extends HTMLElement {
 			this.#setOpacity(0);
 		}, animationDuration / 2);
 	};
-
-	#onScroll = () => {
-		if (this.#frame !== undefined) return;
-		this.#frame = requestAnimationFrame(this.#updateProgress);
-	};
-
-	connectedCallback() {
-		const selector = this.getAttribute('target') ?? '[data-reading-frame]';
-
-		this.#target = document.querySelector(selector) ?? undefined;
-
-		if (!this.#target) return;
-
-		this.#observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) {
-						this.#trackScroll();
-					} else {
-						this.#untrackScroll();
-					}
-				}
-			},
-			{ threshold: 0 },
-		);
-
-		this.#observer.observe(this.#target);
-	}
-
-	disconnectedCallback() {
-		this.#observer?.disconnect();
-		this.#observer = undefined;
-		this.#untrackScroll();
-		this.#clearFadeOut();
-
-		if (this.#frame !== undefined) {
-			cancelAnimationFrame(this.#frame);
-			this.#frame = undefined;
-		}
-	}
 }
 
 if (!customElements.get('progress-reading')) {

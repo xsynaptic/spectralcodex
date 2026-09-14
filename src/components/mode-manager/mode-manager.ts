@@ -13,15 +13,10 @@ const validModes: ReadonlySet<string> = new Set([
 ]);
 
 class ModeManager extends HTMLElement {
-	#storageKey = 'color-mode';
 	#mediaMatcher: MediaQueryList | undefined;
-	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
 	#storage: Storage | undefined;
-
-	#handleMediaChange = (event: MediaQueryListEvent) => {
-		this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-		this.#applyMode(this.getMode());
-	};
+	#storageKey = 'color-mode';
+	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
 
 	connectedCallback() {
 		this.#storageKey = this.getAttribute('storage-key') ?? this.#storageKey;
@@ -84,6 +79,11 @@ class ModeManager extends HTMLElement {
 		if (!themeColor) return;
 		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
 	}
+
+	#handleMediaChange = (event: MediaQueryListEvent) => {
+		this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
+		this.#applyMode(this.getMode());
+	};
 }
 
 function isModeValid(mode: string | undefined): mode is ModeGeneralType {

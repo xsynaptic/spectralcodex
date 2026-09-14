@@ -5,25 +5,18 @@ import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 class ModeToggle extends HTMLElement {
 	#lastClickTime = 0;
 
-	#updateLabel(resolvedMode: string | undefined) {
-		const label =
-			getOppositeMode(resolvedMode) === ModeTypeEnum.Dark
-				? this.dataset.labelDark
-				: this.dataset.labelLight;
+	connectedCallback() {
+		this.addEventListener('click', this.#handleClick);
+		document.addEventListener('mode-changed', this.#handleModeChanged);
 
-		if (!label) return;
-
-		const button = this.querySelector('button');
-
-		if (!button) return;
-
-		button.setAttribute('aria-label', label);
-		button.title = label;
+		// The manager may have announced its mode before this listener existed
+		this.#updateLabel(document.documentElement.dataset.mode);
 	}
 
-	#handleModeChanged = (event: Event) => {
-		this.#updateLabel((event as ModeChangedEvent).detail.resolvedMode);
-	};
+	disconnectedCallback() {
+		this.removeEventListener('click', this.#handleClick);
+		document.removeEventListener('mode-changed', this.#handleModeChanged);
+	}
 
 	#handleClick = () => {
 		const now = Date.now();
@@ -38,17 +31,24 @@ class ModeToggle extends HTMLElement {
 			?.setMode(getOppositeMode(document.documentElement.dataset.mode));
 	};
 
-	connectedCallback() {
-		this.addEventListener('click', this.#handleClick);
-		document.addEventListener('mode-changed', this.#handleModeChanged);
+	#handleModeChanged = (event: Event) => {
+		this.#updateLabel((event as ModeChangedEvent).detail.resolvedMode);
+	};
 
-		// The manager may have announced its mode before this listener existed
-		this.#updateLabel(document.documentElement.dataset.mode);
-	}
+	#updateLabel(resolvedMode: string | undefined) {
+		const label =
+			getOppositeMode(resolvedMode) === ModeTypeEnum.Dark
+				? this.dataset.labelDark
+				: this.dataset.labelLight;
 
-	disconnectedCallback() {
-		this.removeEventListener('click', this.#handleClick);
-		document.removeEventListener('mode-changed', this.#handleModeChanged);
+		if (!label) return;
+
+		const button = this.querySelector('button');
+
+		if (!button) return;
+
+		button.setAttribute('aria-label', label);
+		button.title = label;
 	}
 }
 

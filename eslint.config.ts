@@ -50,7 +50,6 @@ export default getConfig(
 		// Off pending a reviewed pass; these can change evaluation or iteration order
 		{
 			rules: {
-				'perfectionist/sort-classes': 'off',
 				'perfectionist/sort-objects': 'off',
 			},
 		},

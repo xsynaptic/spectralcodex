@@ -1,19 +1,24 @@
 const animationDuration = 300;
 
 class ProgressLoading extends HTMLElement {
-	#progress = 0.2;
-	#isLoading = false;
-	#trickleInterval: number | undefined;
-	#thresholdTimeout: number | undefined;
 	#fadeTimeout: number | undefined;
+	#isLoading = false;
+	#progress = 0.2;
 	#resetTimeout: number | undefined;
+	#thresholdTimeout: number | undefined;
+	#trickleInterval: number | undefined;
 
-	#setProgress(value: number) {
-		this.style.setProperty('--progress-bar', String(value));
+	connectedCallback() {
+		document.addEventListener('astro:before-preparation', this.#handlePreparation);
+		document.addEventListener('astro:before-swap', this.#handleSwap);
 	}
 
-	#setOpacity(value: number) {
-		this.style.setProperty('opacity', String(value));
+	disconnectedCallback() {
+		document.removeEventListener('astro:before-preparation', this.#handlePreparation);
+		document.removeEventListener('astro:before-swap', this.#handleSwap);
+
+		// Fires mid-swap on browsers without moveBefore; the fade and reset must outlive it or the bar sticks at full
+		this.#clearLoadTimers();
 	}
 
 	#clearLoadTimers() {
@@ -65,17 +70,12 @@ class ProgressLoading extends HTMLElement {
 		}, animationDuration * 2);
 	};
 
-	connectedCallback() {
-		document.addEventListener('astro:before-preparation', this.#handlePreparation);
-		document.addEventListener('astro:before-swap', this.#handleSwap);
+	#setOpacity(value: number) {
+		this.style.setProperty('opacity', String(value));
 	}
 
-	disconnectedCallback() {
-		document.removeEventListener('astro:before-preparation', this.#handlePreparation);
-		document.removeEventListener('astro:before-swap', this.#handleSwap);
-
-		// Fires mid-swap on browsers without moveBefore; the fade and reset must outlive it or the bar sticks at full
-		this.#clearLoadTimers();
+	#setProgress(value: number) {
+		this.style.setProperty('--progress-bar', String(value));
 	}
 }
 
