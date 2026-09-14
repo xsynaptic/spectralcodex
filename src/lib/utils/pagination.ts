@@ -41,13 +41,18 @@ export function getPagination(page: Page) {
 
 	if (url.prev) {
 		pagination.previous = {
+			ariaLabel: t('pagination.previousPage'),
 			label: t('pagination.previous'),
 			url: getPathWithTrailingSlash(url.prev),
 		};
 	}
 
 	if (url.next) {
-		pagination.next = { label: t('pagination.next'), url: getPathWithTrailingSlash(url.next) };
+		pagination.next = {
+			ariaLabel: t('pagination.nextPage'),
+			label: t('pagination.next'),
+			url: getPathWithTrailingSlash(url.next),
+		};
 	}
 
 	return pagination;

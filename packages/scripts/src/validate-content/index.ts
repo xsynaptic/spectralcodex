@@ -76,7 +76,8 @@ const locationEntries = entriesFrom('locations');
 // Note: there is no need for a help command
 const validations = {
 	'entry-ids': () => validateEntryIds(allEntries),
-	references: () => validateReferences(allEntries),
+	// Images load separately; the images check resolves them against the media directory
+	references: () => validateReferences(allEntries, { skipCollections: ['images'] }),
 	mdx: () => validateMdxComponents(allEntries, rootPath),
 	'link-ids': () => validateLinkIds(allEntries, metadataEntries, rootPath),
 	'series-items': () => validateSeriesItems(entriesFrom('series'), metadataEntries),

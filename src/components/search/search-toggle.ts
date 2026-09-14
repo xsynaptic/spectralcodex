@@ -158,7 +158,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
 
 		this.instance.registerShortcut(
-			{ label: isMac ? '⌘K' : 'Ctrl+K', description: 'open search' },
+			{ label: isMac ? '⌘K' : 'Ctrl+K', description: this.dataset.shortcutDescription ?? '' },
 			this,
 		);
 

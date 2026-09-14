@@ -151,7 +151,9 @@ const translationStrings = {
 
 		// Pagination
 		'pagination.next': 'Next',
+		'pagination.nextPage': 'Next page',
 		'pagination.previous': 'Previous',
+		'pagination.previousPage': 'Previous page',
 
 		// Parts
 		'parts.textSeparatedList.more': '{count} more',
@@ -214,6 +216,7 @@ const translationStrings = {
 		'site.mode.toggle.dark.label': 'Switch to dark mode',
 		'site.mode.toggle.light.label': 'Switch to light mode',
 		'site.search.placeholder': 'Search...',
+		'site.search.shortcut.description': 'open search',
 		'site.search.toggle.label': 'Open search',
 		'site.search.toggle.title': 'Search',
 		'site.pagination.label': 'Pagination',

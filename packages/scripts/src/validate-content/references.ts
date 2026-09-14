@@ -1,15 +1,10 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { EntryReference, ReferenceIssue } from '#validate-content/validation-result.ts';
 
-import { toValidationResult } from '#validate-content/validation-result.ts';
+import { toReferenceValidationResult } from '#validate-content/validation-result.ts';
 
-interface EntryReference {
-	collection: string;
-	field: string;
-	id: string;
-}
-
-interface ReferenceIssue extends EntryReference {
-	location: string;
+interface ReferenceOptions {
+	skipCollections?: Array<string>;
 }
 
 function toEntryReference(
@@ -61,7 +56,12 @@ function getIdsByCollection(entries: Array<ContentEntry>) {
 	return idsByCollection;
 }
 
-function getEntryReferenceIssues(entry: ContentEntry, idsByCollection: Map<string, Set<string>>) {
+// A collection missing from the checked set is itself a fault, so a skip has to be named
+function getEntryReferenceIssues(
+	entry: ContentEntry,
+	idsByCollection: Map<string, Set<string>>,
+	skipCollections: Set<string>,
+) {
 	const references: Array<EntryReference> = [];
 
 	collectEntryReferences(entry.data, '', references);
@@ -69,10 +69,8 @@ function getEntryReferenceIssues(entry: ContentEntry, idsByCollection: Map<strin
 	const issues: Array<ReferenceIssue> = [];
 
 	for (const reference of references) {
-		const ids = idsByCollection.get(reference.collection);
-
-		// References into collections outside this check's scope are left alone
-		if (!ids || ids.has(reference.id)) continue;
+		if (skipCollections.has(reference.collection)) continue;
+		if (idsByCollection.get(reference.collection)?.has(reference.id)) continue;
 
 		issues.push({ location: entry.filePath ?? entry.id, ...reference });
 	}
@@ -82,22 +80,21 @@ function getEntryReferenceIssues(entry: ContentEntry, idsByCollection: Map<strin
 
 // Astro 7.2.1 checks references itself but only logs, leaving a broken reference to ship
 // Checking the declared collection catches a `reference('regions')` that names a theme, which a global id lookup would accept
-export function collectReferenceIssues(entries: Array<ContentEntry>) {
+export function collectReferenceIssues(
+	entries: Array<ContentEntry>,
+	{ skipCollections = [] }: ReferenceOptions = {},
+) {
 	const idsByCollection = getIdsByCollection(entries);
+	const skipped = new Set(skipCollections);
 
-	return entries.flatMap((entry) => getEntryReferenceIssues(entry, idsByCollection));
+	return entries.flatMap((entry) => getEntryReferenceIssues(entry, idsByCollection, skipped));
 }
 
-export function validateReferences(entries: Array<ContentEntry>) {
-	const issues = collectReferenceIssues(entries);
+export function validateReferences(entries: Array<ContentEntry>, options: ReferenceOptions = {}) {
+	const issues = collectReferenceIssues(entries, options);
 
-	return toValidationResult(
-		issues.map(({ location, field, collection, id }) => ({
-			message: `${location}: ${field} references "${id}", missing from "${collection}"`,
-		})),
-		{
-			pass: 'Entry references valid',
-			fail: `Found ${issues.length.toString()} broken reference(s)`,
-		},
-	);
+	return toReferenceValidationResult(issues, {
+		fail: `Found ${issues.length.toString()} broken reference(s)`,
+		pass: 'Entry references valid',
+	});
 }

@@ -1,19 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import type { DeployConfig } from '#deploy/deploy-config.ts';
-
 import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
 
 function makeConfig(sshKeyPath?: string) {
 	return {
 		remoteHost: 'deploy@host',
-		remotePath: '/opt/server',
-		sitePath: '/var/www/site',
-		siteUrl: 'https://example.com/',
-		mediaPath: '/mnt/media',
-		imageServerUrl: 'https://example.com/_img',
 		...(sshKeyPath === undefined ? {} : { sshKeyPath }),
-	} satisfies DeployConfig;
+	};
 }
 
 describe('buildRsyncArgs', () => {
@@ -39,6 +32,12 @@ describe('buildRsyncArgs', () => {
 
 	test('treats an empty ssh key path as absent', () => {
 		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('') })).not.toContain('-e');
+	});
+
+	test('drops verbosity and progress when quiet, keeping compression', () => {
+		expect(
+			buildRsyncArgs('host:/path/', 'backups/', { config: makeConfig(), quiet: true }),
+		).toEqual(['-az', 'host:/path/', 'backups/']);
 	});
 
 	test('emits excludes in order, ahead of extra flags', () => {

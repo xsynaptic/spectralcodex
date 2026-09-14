@@ -50,7 +50,8 @@
 	}
 
 	.pagination-arrow {
-		transition: transform 100ms var(--default-transition-timing-function) allow-discrete;
+		transition: transform 100ms var(--default-transition-timing-function);
+		transition-behavior: allow-discrete;
 	}
 
 	.pagination-control:open ~ .pagination-arrow {
@@ -73,7 +74,7 @@
 		border-radius: var(--radius-sm);
 		box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
 
-		@media (width >= 768px) {
+		@media (width >= 48rem) {
 			max-height: 300px;
 		}
 	}

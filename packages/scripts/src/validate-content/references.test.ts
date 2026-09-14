@@ -71,9 +71,27 @@ describe('collectReferenceIssues', () => {
 		]);
 	});
 
-	test('ignores references into collections outside the checked set', () => {
+	test('flags a reference into a collection outside the checked set', () => {
 		const entries = makeEntries([
 			makeEntry({ id: 'some-place', data: { images: makeRefs('images', ['missing.jpg']) } }),
+		]);
+
+		expect(collectReferenceIssues(entries)).toEqual([
+			{ location: 'some-place', field: 'images[0]', collection: 'images', id: 'missing.jpg' },
+		]);
+	});
+
+	test('ignores references into a skipped collection', () => {
+		const entries = makeEntries([
+			makeEntry({ id: 'some-place', data: { images: makeRefs('images', ['missing.jpg']) } }),
+		]);
+
+		expect(collectReferenceIssues(entries, { skipCollections: ['images'] })).toEqual([]);
+	});
+
+	test('ignores an object carrying an id but no collection', () => {
+		const entries = makeEntries([
+			makeEntry({ id: 'some-place', data: { override: { id: 'anonymous-place' } } }),
 		]);
 
 		expect(collectReferenceIssues(entries)).toEqual([]);

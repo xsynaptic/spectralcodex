@@ -1,24 +1,34 @@
 import chalk from 'chalk';
 import { $ } from 'zx';
 
-import type { DeployConfig } from '#deploy/deploy-config.ts';
-
 interface RsyncOptions {
 	archive?: 'av' | 'avz';
-	config: DeployConfig;
+	config: SshTarget;
 	dryRun?: boolean;
 	excludes?: Array<string>;
 	extraFlags?: Array<string>;
+	quiet?: boolean;
+}
+
+interface SshTarget {
+	remoteHost: string;
+	sshKeyPath?: string;
+}
+
+// Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
+function getArchiveFlags({ archive = 'avz', quiet = false }: RsyncOptions) {
+	return quiet ? [`-${archive.replace('v', '')}`] : [`-${archive}`, '--progress'];
 }
 
 export function buildRsyncArgs(
 	source: Array<string> | string,
 	destination: string,
-	{ config, dryRun = false, archive = 'avz', extraFlags = [], excludes = [] }: RsyncOptions,
+	options: RsyncOptions,
 ): Array<string> {
+	const { config, dryRun = false, extraFlags = [], excludes = [] } = options;
+
 	return [
-		`-${archive}`,
-		'--progress',
+		...getArchiveFlags(options),
 		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
 		...excludes.map((pattern) => `--exclude=${pattern}`),
 		...extraFlags,
@@ -32,13 +42,21 @@ export async function rsyncTo(
 	source: Array<string> | string,
 	destination: string,
 	options: RsyncOptions,
-): Promise<void> {
-	await $({ stdio: 'inherit' })`rsync ${buildRsyncArgs(source, destination, options)}`;
+): Promise<string> {
+	const command = $({
+		stdio: ['inherit', 'pipe', 'inherit'],
+	})`rsync ${buildRsyncArgs(source, destination, options)}`;
+
+	command.pipe(process.stdout);
+
+	const result = await command;
+
+	return result.stdout;
 }
 
 // For dry-run, print the command instead of running it so a deploy preview shows remote actions
 export async function sshExec(
-	config: DeployConfig,
+	config: SshTarget,
 	command: string,
 	{ dryRun = false }: { dryRun?: boolean } = {},
 ): Promise<void> {
@@ -54,7 +72,7 @@ export async function sshExec(
 
 // Feed the payload over stdin so secrets never appear on the remote command line (visible in `ps`)
 export async function sshExecWithInput(
-	config: DeployConfig,
+	config: SshTarget,
 	command: string,
 	input: string,
 ): Promise<void> {
@@ -64,7 +82,7 @@ export async function sshExecWithInput(
 }
 
 // Like sshExec but captures and returns stdout
-export async function sshCapture(config: DeployConfig, command: string): Promise<string> {
+export async function sshCapture(config: SshTarget, command: string): Promise<string> {
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
 	const result = await $`ssh ${sshArgs} ${command}`;

@@ -23,7 +23,20 @@ const entries = await withAstroContent((content) =>
 	]),
 );
 
-const redirects = buildRedirectPairs(entries);
+const { collisions, pairs: redirects, skipped } = buildRedirectPairs(entries);
+
+// Writing the file anyway would ship a rule that takes a live page off the site
+if (collisions.length > 0) {
+	for (const collision of collisions) {
+		console.error(chalk.red(`✗ former id collision: ${collision}`));
+	}
+
+	process.exit(1);
+}
+
+for (const note of skipped) {
+	console.log(chalk.yellow(`⚠️  skipped ${note}`));
+}
 
 if (redirects.length === 0) {
 	console.log(chalk.yellow('No formerIds found, writing empty redirect file'));
