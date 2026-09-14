@@ -15,7 +15,7 @@ import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
 interface ChronologyRawMonthData extends Pick<
 	ChronologyMonthlyItem,
-	'id' | 'year' | 'month' | 'monthName' | 'title'
+	'id' | 'month' | 'monthName' | 'title' | 'year'
 > {
 	created: Set<CatalogItem>;
 	updated: Set<CatalogItem>;
@@ -31,12 +31,12 @@ interface ChronologyDateData {
 }
 
 interface ChronologyData {
+	chronologyDailyData: ChronologyDailyData;
 	chronologyIndexData: ChronologyIndexData;
 	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
+	chronologyMonths: Record<string, Array<string>>;
 	chronologyYearlyData: Record<string, Array<ChronologyMonthlyItem>>;
 	chronologyYears: Array<string>;
-	chronologyMonths: Record<string, Array<string>>;
-	chronologyDailyData: ChronologyDailyData;
 }
 
 // Content dates are UTC instants; bucket in UTC so chronology membership matches displayed dates
@@ -219,8 +219,8 @@ function buildChronologyDataMap(items: ReadonlyArray<CatalogItem>): ChronologyDa
 
 // The three categories, as either raw buckets or the projected (filtered, capped, deduped) tier result
 interface ChronologyTierBuckets {
-	updated: Array<CatalogItem>;
 	created: Array<CatalogItem>;
+	updated: Array<CatalogItem>;
 	visited: Array<CatalogItem>;
 }
 

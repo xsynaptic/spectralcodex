@@ -25,8 +25,8 @@ function getNavigationItemData({
 	entry,
 	collection,
 }: {
-	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
 	collection: 'regions' | 'series' | 'themes';
+	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
 }) {
 	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
 

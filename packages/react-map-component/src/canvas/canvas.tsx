@@ -42,7 +42,7 @@ const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ l
 };
 
 const MapCanvasContainer: FC<
-	Omit<MapComponentProps, 'geodata' | 'isObjectiveFilterEnabled' | 'apiSourceUrl'> & {
+	Omit<MapComponentProps, 'apiSourceUrl' | 'geodata' | 'isObjectiveFilterEnabled'> & {
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
@@ -86,27 +86,27 @@ const MapCanvasContainer: FC<
 
 	return (
 		<ReactMapGlMap
-			initialViewState={initialViewState}
-			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
-			styleDiffing={false}
+			attributionControl={false}
+			fadeDuration={0}
 			hash={hash ?? false}
+			initialViewState={initialViewState}
 			interactive={isCanvasInteractive}
 			interactiveLayerIds={[...mapInteractiveLayerIds]}
+			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
 			maxZoom={19}
 			minZoom={4}
-			fadeDuration={0}
 			renderWorldCopies={isBeyondAntimeridian(bounds) || isBeyondAntimeridian(maxBounds)}
-			attributionControl={false}
 			style={{ height: 'auto', ...style }}
+			styleDiffing={false}
 			{...canvasEvents}
 		>
-			<ChunkConfigProvider chunkUrlBase={apiChunkBaseUrl} version={version} isDev={isDev}>
+			<ChunkConfigProvider chunkUrlBase={apiChunkBaseUrl} isDev={isDev} version={version}>
 				<PopupDataContextProvider
 					apiUrl={apiPopupUrl}
 					data={popupData}
 					dataKey={popupDataKey}
-					version={version}
 					isDev={isDev}
+					version={version}
 				>
 					<MapControls />
 					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
@@ -114,8 +114,8 @@ const MapCanvasContainer: FC<
 			</ChunkConfigProvider>
 			<MapSource
 				apiDivisionUrl={apiDivisionUrl}
-				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
 				bounds={bounds}
+				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
 				isDev={isDev}
 				targetIds={targetIds}
 			/>
@@ -146,8 +146,8 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 			apiUrl={apiSourceUrl}
 			data={sourceData}
 			dataKey={sourceDataKey}
-			version={version}
 			isDev={isDev}
+			version={version}
 		>
 			<MapStoreProvider
 				initialState={{

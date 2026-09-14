@@ -1,4 +1,4 @@
-import { around as getPointsAround, distance as getDistance } from 'geokdbush';
+import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
@@ -7,15 +7,15 @@ import type { ValidationResult } from '#validate-content/validation-result.ts';
 import { LocationGeometrySchema } from '#shared/geometry.ts';
 
 interface IndexedPoint {
-	locationId: string;
-	lng: number;
 	lat: number;
+	lng: number;
+	locationId: string;
 }
 
 interface LocationOverlap {
+	distance: number;
 	idA: string;
 	idB: string;
-	distance: number;
 }
 
 function collectPoints(entries: Array<ContentEntry>) {

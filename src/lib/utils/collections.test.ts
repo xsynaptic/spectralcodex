@@ -107,7 +107,7 @@ describe('createCollectionData', () => {
 				}
 			},
 			extend: (entries) => ({
-				flagSeenByExtend: (entries[0]?.data as { _flag?: string } | undefined)?._flag,
+				flagSeenByExtend: (entries[0]?.data as undefined | { _flag?: string })?._flag,
 			}),
 		});
 

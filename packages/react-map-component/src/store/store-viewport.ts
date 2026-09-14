@@ -13,7 +13,7 @@ const SavedViewportSchema = z.object({
 	timestamp: z.number(),
 });
 
-type SavedViewport = Pick<z.infer<typeof SavedViewportSchema>, 'longitude' | 'latitude' | 'zoom'>;
+type SavedViewport = Pick<z.infer<typeof SavedViewportSchema>, 'latitude' | 'longitude' | 'zoom'>;
 
 function getViewportStorageKey(mapId: string) {
 	return `map-vp:${mapId}`;

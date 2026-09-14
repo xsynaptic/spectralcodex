@@ -269,7 +269,7 @@ type TranslationKeyPlural<K extends string = TranslationKey> = K extends `${infe
 	? Base
 	: never;
 
-type PluralValues = Record<string, string | number> & { langCode?: LanguageCode };
+type PluralValues = Record<string, number | string> & { langCode?: LanguageCode };
 
 const pluralRulesCache = new Map<LanguageCode, Intl.PluralRules>();
 

@@ -11,8 +11,8 @@ import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
 interface WordCountCached {
-	hash: string;
 	count: number;
+	hash: string;
 }
 
 // Only correct because MDX components add decoration, not text from outside sources

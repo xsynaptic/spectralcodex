@@ -62,9 +62,9 @@ const tooltipDateOptions = {
 } as const satisfies Intl.DateTimeFormatOptions;
 
 export interface ChartFrame {
-	top: number;
 	bottom: number;
 	height: number;
+	top: number;
 }
 
 function getChartFrame(plotHeight: number): ChartFrame {
@@ -77,21 +77,21 @@ export const durationFrame = getChartFrame(buildStatsLayout.durationHeight);
 export const pagesFrame = getChartFrame(buildStatsLayout.pagesHeight);
 
 export interface AxisTick {
-	x: number;
 	label: string;
+	x: number;
 	yearLabel: string | undefined;
 }
 
 export interface ValueTick {
-	y: number;
 	label: string;
+	y: number;
 }
 
 // Wire format read back by the chart element: date first, then one entry per tooltip row
 export interface TooltipPoint {
+	values: Array<string>;
 	x: number;
 	y: number;
-	values: Array<string>;
 }
 
 interface SeriesEndpoint {
@@ -101,26 +101,26 @@ interface SeriesEndpoint {
 }
 
 interface AnnotationMark {
-	x: number;
+	label: string;
 	labelX: number;
 	labelY: number;
-	label: string;
+	x: number;
 }
 
 export interface DurationGeometry {
-	ticks: Array<ValueTick>;
-	points: Array<TooltipPoint>;
-	trendPath: string;
-	end: SeriesEndpoint | undefined;
 	annotations: Array<AnnotationMark>;
+	end: SeriesEndpoint | undefined;
+	points: Array<TooltipPoint>;
+	ticks: Array<ValueTick>;
+	trendPath: string;
 }
 
 export interface PagesGeometry {
-	ticks: Array<ValueTick>;
-	points: Array<TooltipPoint>;
-	linePath: string;
 	areaPath: string;
 	end: SeriesEndpoint;
+	linePath: string;
+	points: Array<TooltipPoint>;
+	ticks: Array<ValueTick>;
 }
 
 export interface BuildStatsGeometry {
@@ -135,7 +135,7 @@ function round(value: number): number {
 }
 
 // `undefined` lifts the pen, so a gap in the series breaks the line rather than bridging it
-function getPolylinePath(points: Array<{ x: number; y: number } | undefined>): string {
+function getPolylinePath(points: Array<undefined | { x: number; y: number }>): string {
 	let path = '';
 	let isPenDown = false;
 

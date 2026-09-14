@@ -42,9 +42,9 @@ export function buildEntryCatalogItems(
 	rest: ReadonlyArray<CatalogItem>,
 	limit = relatedCatalogItemsLimit,
 ): {
-	catalogItemsFiltered: Array<CatalogItem>;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
+	catalogItemsFiltered: Array<CatalogItem>;
 } {
 	const catalogItemsFiltered = R.pipe(
 		featured,

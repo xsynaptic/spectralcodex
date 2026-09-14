@@ -11,10 +11,10 @@ import { safelyCreateDirectory } from '#shared/utils.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {
-	rootPath: string;
-	siteUrl: string;
 	contentPath?: string;
 	outputPath?: string;
+	rootPath: string;
+	siteUrl: string;
 }
 
 const rootCollections = new Set(['locations', 'pages', 'posts']);
@@ -42,7 +42,7 @@ function resolvePaths(options: SitemapLastmodOptions) {
 function resolveUrls(
 	entries: Array<ContentEntry>,
 	gitMap: Map<string, string>,
-	{ siteUrl, contentPathPrefix }: { siteUrl: string; contentPathPrefix: string },
+	{ siteUrl, contentPathPrefix }: { contentPathPrefix: string; siteUrl: string },
 ) {
 	const urls: Record<string, string> = {};
 

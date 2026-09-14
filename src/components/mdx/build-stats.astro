@@ -20,10 +20,10 @@ const geometry = getBuildStatsGeometry(await getBuildRecords(), { daysLimit, tre
 
 {geometry ? (
 	<Fragment>
-		<link rel="stylesheet" href={buildStatsCssUrl} />
-		<BuildStatsDuration geometry={geometry.duration} axisTicks={geometry.axisTicks} />
+		<link href={buildStatsCssUrl} rel="stylesheet" />
+		<BuildStatsDuration axisTicks={geometry.axisTicks} geometry={geometry.duration} />
 		{geometry.pages ? (
-			<BuildStatsPages geometry={geometry.pages} axisTicks={geometry.axisTicks} />
+			<BuildStatsPages axisTicks={geometry.axisTicks} geometry={geometry.pages} />
 		) : undefined}
 	</Fragment>
 ) : (

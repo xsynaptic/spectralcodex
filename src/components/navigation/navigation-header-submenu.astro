@@ -11,16 +11,17 @@ import {
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props extends HTMLAttributes<'ul'> {
-	navigationItems: Array<NavigationItem>;
+	ariaLabel?: string;
 	depth: number;
 	isFirstNavigationItem?: boolean;
-	ariaLabel?: string;
+	navigationItems: Array<NavigationItem>;
 }
 
 const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...props } = Astro.props;
 ---
 
 <ul
+	aria-label={ariaLabel}
 	class:list={[
 		'nav-sub-menu',
 		depth === 1 ? 'nav-sub-menu-d1' : undefined,
@@ -28,7 +29,6 @@ const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...prop
 		depth > 2 ? 'nav-sub-menu-d3' : undefined,
 		!isFirstNavigationItem && depth > 1 ? 'sm:rounded-tr-md' : undefined,
 	]}
-	aria-label={ariaLabel}
 	{...props}
 >
 	{navigationItems.map((item, index) => {
@@ -37,7 +37,7 @@ const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...prop
 
 		return (
 			<li class="nav-sub-item">
-				<NavigationHeaderSubmenuTrigger item={item} hasChildren={hasChildren}>
+				<NavigationHeaderSubmenuTrigger hasChildren={hasChildren} item={item}>
 					<Fragment set:html={item.title} />
 					{shouldShowNavigationItemMultilingual(item, depth) ? (
 						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
@@ -45,10 +45,10 @@ const { navigationItems, depth, isFirstNavigationItem = true, ariaLabel, ...prop
 				</NavigationHeaderSubmenuTrigger>
 				{hasChildren ? (
 					<Astro.self
-						navigationItems={children}
+						ariaLabel={getNavigationItemAriaLabel(item)}
 						depth={depth + 1}
 						isFirstNavigationItem={isFirstNavigationItem && index === 0}
-						ariaLabel={getNavigationItemAriaLabel(item)}
+						navigationItems={children}
 					/>
 				) : undefined}
 			</li>

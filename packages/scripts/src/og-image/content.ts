@@ -27,10 +27,10 @@ function getImageFeaturedData({
 	regionParentMap,
 	chronologyImageIndex,
 }: {
-	entry: Pick<ContentEntry, 'data' | 'id'>;
-	collection: string;
-	regionParentMap?: RegionParentMap | undefined;
 	chronologyImageIndex?: Map<string, string> | undefined;
+	collection: string;
+	entry: Pick<ContentEntry, 'data' | 'id'>;
+	regionParentMap?: RegionParentMap | undefined;
 }): { imageFeaturedId: string; isFallback: boolean } {
 	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
 
@@ -86,8 +86,8 @@ function resolveEntryTitle({
 	override,
 }: {
 	collection: string;
-	id: string;
 	data: Record<string, unknown>;
+	id: string;
 	override: TitleOverride;
 }): string | undefined {
 	if (collection === ContentCollectionsEnum.Chronology) return getChronologyTitle(id);
@@ -121,10 +121,10 @@ export function toOpenGraphEntryItem({
 	regionParentMap,
 	chronologyImageIndex,
 }: {
-	entry: Pick<ContentEntry, 'data' | 'id'>;
-	collection: string;
-	regionParentMap?: RegionParentMap | undefined;
 	chronologyImageIndex?: Map<string, string> | undefined;
+	collection: string;
+	entry: Pick<ContentEntry, 'data' | 'id'>;
+	regionParentMap?: RegionParentMap | undefined;
 }): OpenGraphEntryItem | undefined {
 	const id = getOpenGraphId(getPublicId(entry));
 	const override = parseTitleOverride(collection, entry.data);
@@ -148,10 +148,10 @@ export function resolveEntry({
 	indexEntries,
 	chronologyImageIndex,
 }: {
-	filename: string;
-	contentEntries: Map<string, OpenGraphContentEntry>;
-	indexEntries: Map<string, OpenGraphContentEntry>;
 	chronologyImageIndex: Map<string, string>;
+	contentEntries: Map<string, OpenGraphContentEntry>;
+	filename: string;
+	indexEntries: Map<string, OpenGraphContentEntry>;
 }): OpenGraphContentEntry | undefined {
 	const fromContent = contentEntries.get(filename);
 

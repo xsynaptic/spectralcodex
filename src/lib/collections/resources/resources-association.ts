@@ -1,17 +1,17 @@
 // Structural shapes, so collection entries and plain test literals both satisfy them
 interface ResourceLike {
-	id: string;
 	data: {
-		match?: string | Array<string> | undefined;
+		match?: Array<string> | string | undefined;
 	};
+	id: string;
 }
 
 interface ContentLike {
-	id: string;
 	data: {
 		links?: Array<string | { url: string }> | undefined;
-		sources?: Array<string | object> | undefined;
+		sources?: Array<object | string> | undefined;
 	};
+	id: string;
 }
 
 export interface ResourceAssociation {
@@ -21,7 +21,7 @@ export interface ResourceAssociation {
 
 export function isLinkUrlMatch(
 	linkUrl: string,
-	matchPattern: string | Array<string> | undefined,
+	matchPattern: Array<string> | string | undefined,
 ): boolean {
 	if (!matchPattern) return false;
 

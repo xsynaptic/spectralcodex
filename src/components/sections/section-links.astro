@@ -20,6 +20,6 @@ const links = getResolveResourceLinks(entry) ?? [];
 const t = getTranslations();
 ---
 
-<ContentSection sectionTitle={t('section.links')} data-pagefind-ignore data-nosnippet {...props}>
+<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.links')} {...props}>
 	<ResourcesLinks links={links} />
 </ContentSection>

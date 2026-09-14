@@ -9,7 +9,7 @@ interface FrontmatterLinkIssue {
 
 function getResourcePatterns(resourceEntries: Array<ContentEntry>) {
 	return resourceEntries.flatMap((entry) => {
-		const match = entry.data.match as string | Array<string> | undefined;
+		const match = entry.data.match as Array<string> | string | undefined;
 
 		if (match === undefined) return [];
 

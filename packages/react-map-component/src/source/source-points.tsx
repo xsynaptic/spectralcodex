@@ -262,9 +262,9 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
 	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
 	[MapLayerIdEnum.Points]: CircleLayerSpecification;
-	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
 	[MapLayerIdEnum.PointsImage]: SymbolLayerSpecification;
 	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
+	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
 } {
 	const isDarkMode = useIsDarkMode();
 	const hoveredId = useMapHoveredId();
@@ -308,8 +308,8 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
  */
 export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
-	interactive: boolean;
 	hasMapIcons: boolean;
+	interactive: boolean;
 	targetIds?: Array<string> | undefined;
 }> = memo(function MapPointLayerContents({ data, interactive, hasMapIcons, targetIds }) {
 	const pointsStyle = useMapSourcePointsStyle();
@@ -342,10 +342,10 @@ export const MapSourcePoints: FC<{
 	// Note: Layer components need to be immediate children of Source components; do not use React.Fragment here
 	return (
 		<Source
-			id={MapSourceIdEnum.PointCollection}
-			type="geojson"
 			data={data}
+			id={MapSourceIdEnum.PointCollection}
 			promoteId="id"
+			type="geojson"
 			{...clusterConfig}
 		>
 			{interactive ? (

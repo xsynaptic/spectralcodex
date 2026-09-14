@@ -8,8 +8,8 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
-	year: string;
 	dailyData: Record<string, ChronologyDailyCounts>;
+	year: string;
 }
 
 const { year, dailyData } = Astro.props;
@@ -31,7 +31,7 @@ const ariaLabel = formatStringTemplate(t('chronology.activity.aria'), {
 		<h2 class="mb-1 border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
 			{t('chronology.activity.label')}
 		</h2>
-		<ActivityGraph year={year} values={values} ariaLabel={ariaLabel}>
+		<ActivityGraph ariaLabel={ariaLabel} values={values} year={year}>
 			<div class="flex flex-wrap gap-x-1">
 				<DividedItem>
 					{`${formatNumber({ number: totals.created })} ${t('chronology.created.label')}`}

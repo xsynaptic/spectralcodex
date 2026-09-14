@@ -4,20 +4,20 @@ import { createContext, useContext, useMemo } from 'react';
 
 // Host-overridable UI strings; plain strings so they survive Astro island-prop serialization
 export interface MapMessages {
-	showAll: string;
+	copyCoordinatesLabel: string;
+	filterMenuAriaLabel: string;
+	googleMapsAriaLabel: string;
 	hideAll: string;
 	point: string;
 	points: string;
-	precisionWarning: string;
-	precisionError: string;
-	filterMenuAriaLabel: string;
-	ratingFilterAriaLabel: string;
-	copyCoordinatesLabel: string;
-	wikipediaAriaLabel: string;
-	googleMapsAriaLabel: string;
 	popupDescriptionAriaLabel: string;
+	precisionError: string;
+	precisionWarning: string;
+	ratingFilterAriaLabel: string;
 	searchAriaLabel: string;
 	searchPlaceholder: string;
+	showAll: string;
+	wikipediaAriaLabel: string;
 }
 
 const defaultMapMessages: MapMessages = {

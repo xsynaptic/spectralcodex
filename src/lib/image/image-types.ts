@@ -48,15 +48,15 @@ export const ImageSizeEnum = {
 } as const;
 
 export interface ImagePlaceholderProps {
-	imageId: string;
 	aspectRatio: number;
 	fit?: ImageFitOption;
-	position?: string;
 	highQuality?: boolean;
+	imageId: string;
+	position?: string;
 }
 
 export type ImageComponentProps = HTMLAttributes<'img'> &
 	Omit<UnpicBaseImageProps<ImagorOperations, ImagorOptions, CoreImageAttributes>, 'transformer'> & {
-		imageQuality?: number;
 		imageFormat?: ImageFormat;
+		imageQuality?: number;
 	};

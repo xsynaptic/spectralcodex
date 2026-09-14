@@ -45,10 +45,10 @@ import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
+	backlinks: Array<CatalogItem> | undefined;
+	catalogItems: Array<CatalogItem>;
 	entry: CollectionEntry<'locations'>;
 	mapData: MapComponentData;
-	catalogItems: Array<CatalogItem>;
-	backlinks: Array<CatalogItem> | undefined;
 }
 
 const { entry, mapData, catalogItems, backlinks } = Astro.props;
@@ -83,6 +83,7 @@ const t = getTranslations();
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
 	meta={{
 		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
@@ -93,18 +94,17 @@ const t = getTranslations();
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
-	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}
-		imageId={imageFeaturedId}
 		hideSearch={entry.data.hideSearch}
+		imageId={imageFeaturedId}
 	>
 		<ContentEntryHeader
+			imageFeaturedGroup={imageFeaturedHeroGroup}
 			title={entry.data.title}
 			titleMultilingual={titleMultilingual}
 			titleMultilingualAdditional={titleMultilingualAdditional}
-			imageFeaturedGroup={imageFeaturedHeroGroup}
 		>
 			<Fragment slot="header-subtitle">
 				<DividedItem>
@@ -120,8 +120,8 @@ const t = getTranslations();
 		</ContentEntryHeader>
 		{!hasContent && !hasHeroImage && imageFeaturedId ? (
 			<ContentImage
-				imageId={imageFeaturedId}
 				alt={entry.data.title}
+				imageId={imageFeaturedId}
 				priority={true}
 				showMetadata={true}
 			/>
@@ -133,7 +133,7 @@ const t = getTranslations();
 		/>
 		<SectionNotices entry={entry} langCode={regionLangCode} />
 		{hideLocation ? undefined : (
-			<SectionMap mapData={mapData} entryTitle={entry.data.title}>
+			<SectionMap entryTitle={entry.data.title} mapData={mapData}>
 				<LocationsAddress address={addressBase} content={addressMultilingual} />
 			</SectionMap>
 		)}
@@ -148,8 +148,8 @@ const t = getTranslations();
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionWebmentions entry={entry} />
 		<SectionNearbyList entry={entry} limit={12} />
-		<SectionPreviews sectionTitle={t('section.content.locations')} items={catalogItems} />
-		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
+		<SectionPreviews items={catalogItems} sectionTitle={t('section.content.locations')} />
+		<SectionSimilar entry={entry} limit={8} showPreviews={true} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>
 </MainSite>

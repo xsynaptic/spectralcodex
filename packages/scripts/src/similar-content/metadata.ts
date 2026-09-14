@@ -1,6 +1,6 @@
 export interface SimilarContentMetadata {
-	themes: Array<string>;
 	regions: Array<string>;
+	themes: Array<string>;
 }
 
 const boostTheme = 0.15; // weight per shared theme

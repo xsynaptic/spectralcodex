@@ -20,11 +20,11 @@ const blockedStatusCodes = new Set([403, 429]);
 const headRetryStatusCodes = new Set([405, 403]);
 
 interface CheckResult {
-	urlId: number;
-	httpStatus: number | undefined;
-	status: UrlStatus;
-	redirectUrl: string | undefined;
 	errorMessage: string | undefined;
+	httpStatus: number | undefined;
+	redirectUrl: string | undefined;
+	status: UrlStatus;
+	urlId: number;
 }
 
 type CheckOutcome = Omit<CheckResult, 'urlId'>;

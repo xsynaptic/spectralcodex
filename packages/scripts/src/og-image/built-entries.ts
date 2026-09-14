@@ -14,7 +14,7 @@ import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts
 
 // Keyed by the OG image filename Astro emits
 function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
-	const indexes: Array<{ suffix: string; title: string; isFallback?: boolean }> = [
+	const indexes: Array<{ isFallback?: boolean; suffix: string; title: string }> = [
 		{ suffix: ContentCollectionsEnum.Chronology, title: 'Chronology', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Locations, title: 'Locations', isFallback: true },
 		{ suffix: ContentCollectionsEnum.Posts, title: 'Posts', isFallback: true },
@@ -53,8 +53,8 @@ function buildRegionParentMap(entries: Array<ContentEntry>): RegionParentMap {
 
 // Keyed by the OG image filename, same as the index entries
 async function buildContentEntries(): Promise<{
-	entries: Map<string, OpenGraphContentEntry>;
 	chronologyImageIndex: Map<string, string>;
+	entries: Map<string, OpenGraphContentEntry>;
 }> {
 	const collections = Object.values(ContentCollectionsEnum);
 

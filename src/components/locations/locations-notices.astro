@@ -5,7 +5,7 @@ import NoticeBox from '#components/parts/notice-box.astro';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
-	notices: Array<{ text: string; textAlt: string | undefined; severity: NoticeBoxSeverity }>;
+	notices: Array<{ severity: NoticeBoxSeverity; text: string; textAlt: string | undefined }>;
 }
 
 const { notices } = Astro.props;

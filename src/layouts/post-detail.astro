@@ -34,9 +34,9 @@ import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
+	backlinks: Array<CatalogItem> | undefined;
 	entry: CollectionEntry<'posts'>;
 	mapData: MapComponentData;
-	backlinks: Array<CatalogItem> | undefined;
 }
 
 const { entry, mapData, backlinks } = Astro.props;
@@ -63,6 +63,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
 	meta={{
 		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
@@ -75,17 +76,16 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		prefetchUrls: mapData.prefetchUrls,
 	}}
 	schemas={await getPostSchema(entry, { url: Astro.url.toString(), imageUrl: seoImage.url })}
-	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}
-		imageId={imageFeaturedId}
 		hideSearch={entry.data.hideSearch}
+		imageId={imageFeaturedId}
 	>
 		<ContentEntryHeader
+			imageFeaturedGroup={imageFeaturedHeroGroup}
 			title={entry.data.title}
 			titleMultilingual={titleMultilingual}
-			imageFeaturedGroup={imageFeaturedHeroGroup}
 		>
 			<Fragment slot="header-subtitle">
 				<DividedItem>
@@ -94,10 +94,10 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
 			</Fragment>
 		</ContentEntryHeader>
-		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
+		<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
 			<Content />
 		</Prose>
-		<SectionMap mapData={mapData} entryTitle={entry.data.title} />
+		<SectionMap entryTitle={entry.data.title} mapData={mapData} />
 		<SectionLinks entry={entry} />
 		<SectionSources entry={entry} />
 		<SectionThemes themeIds={themeIds} />
@@ -105,7 +105,7 @@ const seoImage = getSeoImageProps({ id: entry.id, alt: entry.data.title });
 		<SectionSeries entry={entry} />
 		<SectionBacklinks backlinks={backlinks} />
 		<SectionWebmentions entry={entry} />
-		<SectionSimilar entry={entry} showPreviews={true} limit={8} />
+		<SectionSimilar entry={entry} limit={8} showPreviews={true} />
 		<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 		<SectionAuthor showAuthor={false} />
 	</ContentArticle>

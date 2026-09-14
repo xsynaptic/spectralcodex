@@ -4,9 +4,9 @@ import { buildActivityGraph } from '#lib/utils/activity-graph.ts';
 import { getDateDisplay } from '#lib/utils/date.ts';
 
 interface Props {
-	year: string;
-	values: Record<string, number>;
 	ariaLabel: string;
+	values: Record<string, number>;
+	year: string;
 }
 
 const { year, values, ariaLabel } = Astro.props;
@@ -38,10 +38,10 @@ const hasCaption = Astro.slots.has('default');
 <figure class="activity-graph">
 	<div class="activity-scroll">
 		<div
-			class="activity-plot"
-			style={`--ag-weeks:${String(weekCount)}`}
-			role="img"
 			aria-label={ariaLabel}
+			class="activity-plot"
+			role="img"
+			style={`--ag-weeks:${String(weekCount)}`}
 		>
 			<div class="activity-months">
 				{monthLabels.map((monthLabel) => (
@@ -52,15 +52,15 @@ const hasCaption = Astro.slots.has('default');
 			</div>
 			<div class="activity-grid">
 				{Array.from({ length: padCount }, () => (
-					<span class="activity-pad" aria-hidden="true" />
+					<span aria-hidden="true" class="activity-pad" />
 				))}
 				{days.map((day) => (
 					<span
-						class="activity-cell"
-						data-level={String(day.level)}
-						data-future={day.future ? true : undefined}
-						title={day.future ? undefined : getDayTitle(day.value, day.date)}
 						aria-hidden="true"
+						class="activity-cell"
+						data-future={day.future ? true : undefined}
+						data-level={String(day.level)}
+						title={day.future ? undefined : getDayTitle(day.value, day.date)}
 					/>
 				))}
 			</div>

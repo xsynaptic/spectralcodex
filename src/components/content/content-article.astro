@@ -9,8 +9,8 @@ import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 interface Props extends HTMLAttributes<'article'> {
-	imageId: string | undefined;
 	hideSearch?: boolean | undefined;
+	imageId: string | undefined;
 }
 
 const { imageId, hideSearch, ...props } = Astro.props;
@@ -58,10 +58,10 @@ const thumbnails = await getThumbnailUrls();
 	<slot />
 	{thumbnails ? (
 		<>
-			<meta data-pagefind-meta="image[content]" content={thumbnails.url1x} />
-			<meta data-pagefind-meta="image_2x[content]" content={thumbnails.url2x} />
+			<meta content={thumbnails.url1x} data-pagefind-meta="image[content]" />
+			<meta content={thumbnails.url2x} data-pagefind-meta="image_2x[content]" />
 		</>
 	) : (
-		<meta data-pagefind-meta="image[content]" content="" />
+		<meta content="" data-pagefind-meta="image[content]" />
 	)}
 </article>

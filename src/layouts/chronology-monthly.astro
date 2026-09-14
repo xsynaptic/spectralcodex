@@ -20,8 +20,8 @@ import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	chronologyMonthlyItem: ChronologyMonthlyItem;
-	chronologyYears: Array<string>;
 	chronologyMonths?: Array<string> | undefined;
+	chronologyYears: Array<string>;
 }
 
 const { chronologyMonthlyItem, chronologyYears, chronologyMonths } = Astro.props;
@@ -53,6 +53,7 @@ const activityLabels = [
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
 	meta={{
 		title,
 		description: formatStringTemplate(t('chronology.monthly.description'), {
@@ -64,9 +65,8 @@ const activityLabels = [
 		}),
 		...getSeoHideSearch(true),
 	}}
-	hasHeroImage={hasHeroImage}
 >
-	<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup} alt={title}>
+	<ImageHero alt={title} class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
 		<ContentHeader hasHeroImage={hasHeroImage}>
 			<Fragment slot="header-title">{title}</Fragment>
 			<Fragment slot="header-subtitle">
@@ -78,13 +78,13 @@ const activityLabels = [
 	</ImageHero>
 	<ContentSection marginSmall={true}>
 		<ChronologyNavigation
-			class="border-b border-primary-300 pb-4 dark:border-primary-700"
-			currentYear={chronologyMonthlyItem.year}
-			currentMonth={chronologyMonthlyItem.month}
-			chronologyYears={chronologyYears}
 			chronologyMonths={chronologyMonths}
+			chronologyYears={chronologyYears}
+			class="border-b border-primary-300 pb-4 dark:border-primary-700"
+			currentMonth={chronologyMonthlyItem.month}
+			currentYear={chronologyMonthlyItem.year}
 		>
-			<Anchor href={getSitePath('chronology')} anchorColor="accent">
+			<Anchor anchorColor="accent" href={getSitePath('chronology')}>
 				{t('chronology.index.label')}
 			</Anchor>
 		</ChronologyNavigation>
@@ -96,19 +96,19 @@ const activityLabels = [
 	) : undefined}
 	<ContentSection class="flex flex-col gap-2">
 		<ChronologyItem
-			title={t('chronology.updated.label')}
 			items={chronologyMonthlyItem.updated}
 			showItemCount={true}
+			title={t('chronology.updated.label')}
 		/>
 		<ChronologyItem
-			title={t('chronology.created.label')}
 			items={chronologyMonthlyItem.created}
 			showItemCount={true}
+			title={t('chronology.created.label')}
 		/>
 		<ChronologyItem
-			title={t('chronology.visited.label')}
 			items={chronologyMonthlyItem.visited}
 			showItemCount={true}
+			title={t('chronology.visited.label')}
 		/>
 	</ContentSection>
 </MainSite>

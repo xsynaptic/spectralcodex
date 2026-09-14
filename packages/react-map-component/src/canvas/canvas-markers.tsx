@@ -13,10 +13,10 @@ import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
 
 interface TargetMarker {
-	id: string;
-	longitude: number;
-	latitude: number;
 	color: string;
+	id: string;
+	latitude: number;
+	longitude: number;
 }
 
 function areMarkersEqual(previous: TargetMarker, next: TargetMarker): boolean {
@@ -161,7 +161,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 		}
 
 		// Position refresh only; revealing after a zoom is moveend's job
-		function onSourceData(event: { sourceId: string; isSourceLoaded: boolean }) {
+		function onSourceData(event: { isSourceLoaded: boolean; sourceId: string }) {
 			if (event.sourceId === MapSourceIdEnum.PointCollection && event.isSourceLoaded) {
 				refreshMarkers();
 			}
@@ -187,7 +187,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 
 const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ longitude, latitude, color }) {
 	return (
-		<Marker longitude={longitude} latitude={latitude} anchor="center">
+		<Marker anchor="center" latitude={latitude} longitude={longitude}>
 			<div className="map-pulse-ring-frame">
 				<span className="map-pulse-ring" style={{ borderColor: color }} />
 			</div>

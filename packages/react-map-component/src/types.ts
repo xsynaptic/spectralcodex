@@ -1,8 +1,8 @@
 import type { Flavor } from '@protomaps/basemaps';
 import type {
 	MapPopupItemCompressed,
-	MapSourceItemCompressed,
 	MapSourceItem,
+	MapSourceItemCompressed,
 } from '@spectralcodex/map-codec';
 import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
@@ -15,7 +15,7 @@ import type { MapMessages } from '#lib/messages.tsx';
 export type MapInitialViewState = MapProps['initialViewState'];
 
 // Supported geometry for use with this component
-export type MapGeometry = Point | LineString | Polygon;
+export type MapGeometry = LineString | Point | Polygon;
 
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
@@ -29,48 +29,48 @@ export type MapSourceFeatureCollection = FeatureCollection<
  * - ids: keep the explicit, order-preserving feature-id list
  */
 export type MapScope =
-	| { type: 'region'; interval: [number, number] }
-	| { type: 'theme'; index: number }
-	| { type: 'ids'; ids: Array<string> };
+	| { ids: Array<string>; type: 'ids' }
+	| { index: number; type: 'theme' }
+	| { interval: [number, number]; type: 'region' };
 
 // Map component props
 export interface MapComponentProps extends Partial<
-	Pick<MapOptions, 'bounds' | 'maxBounds' | 'zoom' | 'interactive' | 'hash'>
+	Pick<MapOptions, 'bounds' | 'hash' | 'interactive' | 'maxBounds' | 'zoom'>
 > {
-	mapId?: string | undefined;
-	apiSourceUrl?: string | undefined;
-	apiPopupUrl?: string | undefined;
-	apiDivisionUrl?: string | undefined;
-	imageServerUrl?: string | undefined;
-	sourceData?: Array<MapSourceItemCompressed> | undefined;
-	popupData?: Array<MapPopupItemCompressed> | undefined;
-	// Big maps fetch the shared directory and keep only the rows their scope selects
-	scope?: MapScope | undefined;
 	// Base URL for demand-fetched popup chunks (e.g. `/api/map/`); paired with version
 	apiChunkBaseUrl?: string | undefined;
-	// Per-map content hashes that cache-key inline source/popup datasets
-	sourceDataKey?: string | undefined;
-	popupDataKey?: string | undefined;
+	apiDivisionUrl?: string | undefined;
+	apiPopupUrl?: string | undefined;
+	apiSourceUrl?: string | undefined;
 	baseMapTheme?: Flavor | undefined;
 	center?: [number, number];
-	isObjectiveFilterEnabled?: boolean | undefined;
-	languages?: Array<string> | undefined;
-	protomapsApiKey?: string | undefined;
-	spritesId?: string | undefined;
-	spritesUrl?: string | undefined;
-	targetIds?: Array<string> | undefined;
-	style?: CSSProperties | undefined;
-	version?: string | undefined;
-	isDev?: boolean | undefined;
-	// Host-overridable UI strings; merged over English defaults
-	messages?: Partial<MapMessages> | undefined;
 	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
 	darkMode?: MapDarkModeOptions | undefined;
+	imageServerUrl?: string | undefined;
+	isDev?: boolean | undefined;
+	isObjectiveFilterEnabled?: boolean | undefined;
+	languages?: Array<string> | undefined;
+	mapId?: string | undefined;
+	// Host-overridable UI strings; merged over English defaults
+	messages?: Partial<MapMessages> | undefined;
+	popupData?: Array<MapPopupItemCompressed> | undefined;
+	popupDataKey?: string | undefined;
+	protomapsApiKey?: string | undefined;
+	// Big maps fetch the shared directory and keep only the rows their scope selects
+	scope?: MapScope | undefined;
+	sourceData?: Array<MapSourceItemCompressed> | undefined;
+	// Per-map content hashes that cache-key inline source/popup datasets
+	sourceDataKey?: string | undefined;
+	spritesId?: string | undefined;
+	spritesUrl?: string | undefined;
+	style?: CSSProperties | undefined;
+	targetIds?: Array<string> | undefined;
+	version?: string | undefined;
 }
 
 // Used within Astro to determine whether a map should be rendered
 export interface MapComponentData extends MapComponentProps {
-	hasGeodata: boolean;
 	featureCount: number;
+	hasGeodata: boolean;
 	prefetchUrls?: Array<string> | undefined;
 }

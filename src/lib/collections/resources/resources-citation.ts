@@ -8,8 +8,8 @@ import { getResourcePath } from '#lib/utils/routing.ts';
 interface CitationFormatting {
 	authorsDelimiter: string;
 	delimiter: string;
-	quoteStart: string;
 	quoteEnd: string;
+	quoteStart: string;
 }
 
 const CitationFormattingMap = {
@@ -42,19 +42,19 @@ const citationLanguagesMultilingual = [
 ] as const;
 
 export interface Citation {
-	delimiter: string;
 	authors: string | undefined;
-	title: string;
+	delimiter: string;
 	published: string | undefined;
+	title: string;
 }
 
 interface CitationInput {
-	lang: CitationLanguage;
-	title: string;
 	authorNames: Array<string | undefined> | undefined;
-	publisher: string | undefined;
+	lang: CitationLanguage;
 	publishedDate: string | undefined;
 	publishedDetails: string | undefined;
+	publisher: string | undefined;
+	title: string;
 }
 
 // Publisher, date and details all share the language's delimiter, so they collapse into one run

@@ -8,19 +8,19 @@ import { fetchTimeoutMs } from '#constants.ts';
 
 interface MapDataQueryConfig<TSchema extends z.ZodType> {
 	name: string;
-	schema: TSchema;
 	// Optional sources stay disabled until a URL or inline data is provided
 	optional?: boolean;
+	schema: TSchema;
 }
 
 interface MapDataProviderProps<TInput> {
 	apiUrl: string | undefined;
+	children: ReactNode;
 	data: Array<TInput> | undefined;
 	// Per-map content hash that cache-keys the inline dataset
 	dataKey: string | undefined;
-	version: string | undefined;
 	isDev: boolean | undefined;
-	children: ReactNode;
+	version: string | undefined;
 }
 
 export function createMapDataQuery<TSchema extends z.ZodType>({
@@ -36,8 +36,8 @@ export function createMapDataQuery<TSchema extends z.ZodType>({
 		apiUrl: string | undefined;
 		data: Array<TInput> | undefined;
 		dataKey: string | undefined;
-		version: string | undefined;
 		isDev: boolean | undefined;
+		version: string | undefined;
 	}
 
 	function parse(raw: unknown) {

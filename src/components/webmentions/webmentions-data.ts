@@ -12,19 +12,19 @@ const selfAuthorUrls = new Set([
 ]);
 
 export interface WebmentionReply {
-	id: number;
 	authorName: string;
 	authorUrl: string | undefined;
-	sourceUrl: string;
 	dateReceived: Date;
+	id: number;
+	sourceUrl: string;
 	text: string | undefined;
 }
 
 interface WebmentionsSummary {
-	likeCount: number;
-	repostCount: number;
 	bookmarkCount: number;
+	likeCount: number;
 	replies: Array<WebmentionReply>;
+	repostCount: number;
 }
 
 function isSelfAuthored(mention: Webmention) {
@@ -87,7 +87,7 @@ async function createWebmentionsFunction() {
 		mentionsByPathname.set(pathname, [mention]);
 	}
 
-	return function getWebmentions(pathnames: Array<string>): WebmentionsSummary | undefined {
+	return function getWebmentions(pathnames: Array<string>): undefined | WebmentionsSummary {
 		const matched = pathnames.flatMap(
 			(pathname) => mentionsByPathname.get(normalizePathname(pathname)) ?? [],
 		);
@@ -143,13 +143,13 @@ function getSourceHostname(sourceUrl: string) {
 	return new URL(sourceUrl).hostname.replace(/^www\./, '');
 }
 
-function trimToUndefined(value: string | null | undefined): string | undefined {
+function trimToUndefined(value: null | string | undefined): string | undefined {
 	const trimmed = value?.trim();
 
 	return trimmed === '' ? undefined : trimmed;
 }
 
-function toReply(mention: Webmention): WebmentionReply | undefined {
+function toReply(mention: Webmention): undefined | WebmentionReply {
 	const authorName =
 		trimToUndefined(mention.author?.name) ?? getSourceHostname(mention['wm-source']);
 

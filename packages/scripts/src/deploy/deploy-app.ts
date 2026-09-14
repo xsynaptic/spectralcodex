@@ -6,8 +6,8 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 
 interface DeployAppOptions {
-	rootPath: string;
 	dryRun?: boolean;
+	rootPath: string;
 	skipDelete?: boolean;
 }
 

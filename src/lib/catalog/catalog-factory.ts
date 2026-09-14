@@ -9,14 +9,14 @@ import type {
 import { sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 
 export interface Catalog {
+	all: () => ReadonlyArray<CatalogItem>;
+	backlinksOf: (id: string) => Array<CatalogItem>;
+	byCollection: (...collections: Array<CatalogCollectionKey>) => Array<CatalogItem>;
 	getById: (id: string) => CatalogItem | undefined;
 	getCaption: (id: string) => CatalogCaption | undefined;
-	backlinksOf: (id: string) => Array<CatalogItem>;
 	resolve: <T extends CatalogCollectionKey = CatalogCollectionKey>(
 		entries: Array<CollectionEntry<T>>,
 	) => Array<CatalogItem<T>>;
-	byCollection: (...collections: Array<CatalogCollectionKey>) => Array<CatalogItem>;
-	all: () => ReadonlyArray<CatalogItem>;
 }
 
 export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {

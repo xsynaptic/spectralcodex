@@ -8,8 +8,8 @@ import { DatePresetEnum, getDateDisplay } from '#lib/utils/date.ts';
 interface Props extends HTMLAttributes<'time'> {
 	date: Date;
 	dateEnd?: Date | undefined;
-	datePreset?: DatePreset;
 	dateOptions?: Intl.DateTimeFormatOptions | undefined;
+	datePreset?: DatePreset;
 }
 
 const datePresets = {

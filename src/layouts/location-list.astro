@@ -46,8 +46,8 @@ const description = t('collection.locations.description');
 	</ContentHeader>
 	<ContentSection>
 		<Fragment
-			slot="section-description"
 			set:html={page.currentPage === 1 ? renderMarkdownInline(description) : undefined}
+			slot="section-description"
 		/>
 		<PreviewGrid
 			items={page.data}

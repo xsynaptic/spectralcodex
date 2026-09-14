@@ -12,10 +12,10 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getPagination } from '#lib/utils/pagination.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	sectionTitle?: string;
 	items?: Array<CatalogItem>;
 	page?: Page<CatalogItem>;
 	previewOptions?: PreviewOptions | undefined;
+	sectionTitle?: string;
 	showMicroformats?: boolean | undefined;
 }
 
@@ -38,9 +38,9 @@ const t = getTranslations();
 ---
 
 <ContentSection
-	sectionTitle={sectionTitle ?? t('section.content')}
-	data-pagefind-ignore
 	data-nosnippet
+	data-pagefind-ignore
+	sectionTitle={sectionTitle ?? t('section.content')}
 	{...props}
 >
 	{page ? (

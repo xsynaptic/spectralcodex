@@ -18,7 +18,7 @@ export function useProtomaps({
 	spritesUrl,
 }: Pick<
 	MapComponentProps,
-	'protomapsApiKey' | 'baseMapTheme' | 'spritesId' | 'spritesUrl' | 'isDev'
+	'baseMapTheme' | 'isDev' | 'protomapsApiKey' | 'spritesId' | 'spritesUrl'
 >) {
 	const isDarkMode = useIsDarkMode();
 

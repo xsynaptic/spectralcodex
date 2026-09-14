@@ -10,10 +10,10 @@ import { renderSlot } from '#lib/utils/astro.ts';
 
 // `context` and `imageCount` are both injected by the satteri-img-group plugin
 interface Props extends HTMLAttributes<'div'> {
-	layout?: ImageLayout;
-	context?: ImageContext;
 	columns?: number | string;
+	context?: ImageContext;
 	imageCount?: number | string;
+	layout?: ImageLayout;
 }
 
 const { layout, context, columns: columnsProp, imageCount: imageCountProp, ...props } = Astro.props;
@@ -66,11 +66,11 @@ const t = getTranslations();
 {renderMode === 'feed' ? <Fragment set:html={slotContents} /> : undefined}
 {renderMode === 'carousel' ? (
 	<image-carousel
-		class:list={['img-group prose-escape carousel-group', layoutClass]}
-		role="group"
-		aria-roledescription="carousel"
 		aria-label={t('collection.images.labelPlural')}
+		aria-roledescription="carousel"
+		class:list={['img-group prose-escape carousel-group', layoutClass]}
 		data-slide-label={t('carousel.slide.label')}
+		role="group"
 		{...props}
 	>
 		<div class="img-group-viewport">

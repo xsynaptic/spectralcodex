@@ -7,9 +7,9 @@ import TextParenthesis from '#components/parts/text-parenthesis.astro';
 import { isCjkLanguage } from '#lib/i18n/i18n-utils.ts';
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
+	additional?: Array<MultilingualContent> | undefined;
 	as: Tag;
 	content?: MultilingualContent | undefined;
-	additional?: Array<MultilingualContent> | undefined;
 	parenthesis?: boolean | undefined;
 }>;
 
@@ -28,8 +28,8 @@ const {
 		{' '}
 		<TextParenthesis as={Tag} class={className}>
 			<Tag
-				lang={content.lang}
 				class:list={[isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
+				lang={content.lang}
 				{...props}
 				set:html={content.value.trim()}
 			/>
@@ -39,8 +39,8 @@ const {
 {content && !parenthesis ? (
 	<>
 		<Tag
-			lang={content.lang}
 			class:list={[className, isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
+			lang={content.lang}
 			{...props}
 			set:html={content.value.trim()}
 		/>
@@ -48,8 +48,8 @@ const {
 			<>
 				{'／'}
 				<Tag
-					lang={item.lang}
 					class:list={[className, isCjkLanguage(item.lang) ? 'cjk-text' : undefined]}
+					lang={item.lang}
 					{...props}
 					set:html={item.value.trim()}
 				/>

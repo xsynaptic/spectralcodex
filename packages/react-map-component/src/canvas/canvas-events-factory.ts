@@ -7,11 +7,11 @@ type MapCoordinates = [number, number];
 type MapCursor = 'grab' | 'pointer' | 'zoom-in';
 
 export interface MapClickInput {
-	layerId: string | undefined;
-	geometryType: string | undefined;
-	coordinates: unknown;
-	pointId: unknown;
 	clusterId: unknown;
+	coordinates: unknown;
+	geometryType: string | undefined;
+	layerId: string | undefined;
+	pointId: unknown;
 }
 
 interface MapClearSelectionAction {
@@ -23,31 +23,31 @@ interface MapCloseFilterAction {
 }
 
 interface MapExpandClusterAction {
-	kind: 'expand-cluster';
-	clusterId: string | number;
 	center: MapCoordinates;
+	clusterId: number | string;
+	kind: 'expand-cluster';
 }
 
 interface MapSelectPointAction {
+	center: MapCoordinates | undefined;
 	kind: 'select-point';
 	pointId: string;
-	center: MapCoordinates | undefined;
 }
 
 export type MapClickAction =
 	MapClearSelectionAction | MapCloseFilterAction | MapExpandClusterAction | MapSelectPointAction;
 
 export interface MapHoverInput {
-	layerId: string | undefined;
-	featureId: string | number | undefined;
-	pointId: unknown;
 	clusterId: unknown;
-	hoveredFeatureId: string | number | undefined;
+	featureId: number | string | undefined;
+	hoveredFeatureId: number | string | undefined;
+	layerId: string | undefined;
+	pointId: unknown;
 	storeHoveredId: string | undefined;
 }
 
 interface MapFeatureStateChange {
-	featureId: string | number;
+	featureId: number | string;
 	hover: boolean;
 }
 
@@ -58,7 +58,7 @@ interface MapStoreHoveredIdUpdate {
 export interface MapHoverIntent {
 	cursor: MapCursor;
 	featureStateChanges: Array<MapFeatureStateChange>;
-	hoveredFeatureId: string | number | undefined;
+	hoveredFeatureId: number | string | undefined;
 	// `undefined` means no store write
 	storeHoveredIdUpdate: MapStoreHoveredIdUpdate | undefined;
 }
@@ -73,7 +73,7 @@ function isMapCoordinates(input: unknown): input is MapCoordinates {
 	);
 }
 
-function getClusterId(input: unknown): string | number | undefined {
+function getClusterId(input: unknown): number | string | undefined {
 	if (typeof input !== 'string' && typeof input !== 'number') return undefined;
 	if (!input) return undefined;
 
@@ -119,8 +119,8 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 }
 
 function getFeatureStateChanges(
-	previousId: string | number | undefined,
-	nextId: string | number | undefined,
+	previousId: number | string | undefined,
+	nextId: number | string | undefined,
 ): Array<MapFeatureStateChange> {
 	if (previousId === nextId) return [];
 

@@ -24,31 +24,31 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 	return (
 		<CustomControlPortal position={position}>
 			<div className="maplibregl-ctrl-search map-search">
-				<label htmlFor="search-control-input" className="map-sr-only">
+				<label className="map-sr-only" htmlFor="search-control-input">
 					{messages.searchAriaLabel}
 				</label>
 				<input
-					type="search"
-					id="search-control-input"
 					className="map-search-input"
+					id="search-control-input"
 					placeholder={messages.searchPlaceholder}
 					required={true}
+					type="search"
 				/>
 				<button
-					id={controlSearchId}
+					aria-label={messages.searchAriaLabel}
 					className="map-search-button"
 					disabled={isLoading}
+					id={controlSearchId}
 					onClick={() => {
 						if (!isLoading) console.log('search');
 					}}
-					aria-label={messages.searchAriaLabel}
 				>
 					<span className="map-ctrl-icon-frame">
 						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							className="map-ctrl-icon"
 							aria-hidden="true"
+							className="map-ctrl-icon"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
 						>
 							<use href={`#${MapSpritesEnum.Search}`}></use>
 						</svg>

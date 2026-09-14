@@ -66,9 +66,9 @@ const readMoreHtml = title
 	<header class:list={['content-column', description ? undefined : 'mb-2']}>
 		<h2 class="mb-1 text-2xl font-bold lg:text-3xl">
 			<Anchor
-				href={entryUrl}
 				anchorColor="title"
 				class:list={[MicroformatClassNames.Url, MicroformatClassNames.Name]}
+				href={entryUrl}
 			>
 				<Fragment set:html={title} />
 			</Anchor>

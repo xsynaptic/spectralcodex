@@ -8,7 +8,7 @@ const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 
 export function textClipper(
 	input: string,
-	options: { wordCount: number; trailer?: string | undefined },
+	options: { trailer?: string | undefined; wordCount: number },
 ): string {
 	let wordIndex = 0;
 
@@ -41,8 +41,8 @@ export function formatNumber({
 	locales,
 	options,
 }: {
-	number: string | number;
 	locales?: Intl.LocalesArgument | undefined;
+	number: number | string;
 	options?: Intl.NumberFormatOptions | undefined;
 }) {
 	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
@@ -96,7 +96,7 @@ export function sanitizeImageAltAttribute(input: string): string {
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"
 export function formatStringTemplate(
 	template: string,
-	values: Record<string, string | number> = {},
+	values: Record<string, number | string> = {},
 ): string {
 	return template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
 }

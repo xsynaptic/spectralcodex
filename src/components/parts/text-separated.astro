@@ -2,11 +2,11 @@
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props {
-	index: number;
-	total: number;
-	separator?: string | undefined;
-	penultimate?: string | undefined;
 	final?: string | undefined;
+	index: number;
+	penultimate?: string | undefined;
+	separator?: string | undefined;
+	total: number;
 }
 
 const { index, total, separator = ', ', penultimate = 'and ', final = '.' } = Astro.props;

@@ -15,8 +15,8 @@ interface Props {
 }
 
 interface Column {
-	label: string;
 	abbreviation?: string;
+	label: string;
 }
 
 const { locations } = Astro.props;
@@ -59,7 +59,7 @@ const scrollRegionProps = { role: 'region' as const, tabindex: 0, 'aria-label': 
 						>
 							{column.abbreviation ? (
 								<>
-									<abbr class="no-underline" title={column.label} aria-hidden="true">
+									<abbr aria-hidden="true" class="no-underline" title={column.label}>
 										{column.abbreviation}
 									</abbr>
 									<span class="sr-only">{column.label}</span>

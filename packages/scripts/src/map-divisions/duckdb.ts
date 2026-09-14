@@ -78,8 +78,8 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 
 interface DivisionRow {
 	areaId: string;
-	parentDivisionId: string;
 	geometryGeojson: string;
+	parentDivisionId: string;
 }
 
 async function readCachedDivisions(divisionIds: Set<string>, cachePath: string) {
@@ -159,11 +159,11 @@ export async function fetchDivisionData({
 	cachePath,
 	overtureUrl,
 }: {
+	cachePath: string;
 	db: DuckDBConnection;
 	divisionIds: Set<string>;
-	selectionBBox: GeometryBoundingBox;
-	cachePath: string;
 	overtureUrl: string;
+	selectionBBox: GeometryBoundingBox;
 }): Promise<Map<string, DivisionItem>> {
 	console.log(
 		chalk.blue(

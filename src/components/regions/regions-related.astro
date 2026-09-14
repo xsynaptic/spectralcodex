@@ -31,8 +31,8 @@ const t = getTranslations();
 {regionChildren.length > 0 || regionSiblings.length > 0 ? (
 	<div
 		class="content-column mb-4 flex flex-col items-start gap-4 sm:flex-row lg:gap-6"
-		data-pagefind-ignore
 		data-nosnippet
+		data-pagefind-ignore
 	>
 		{regionChildren.length > 0 ? (
 			<div class="flex-1">
@@ -44,7 +44,7 @@ const t = getTranslations();
 				>
 					<slot name="regions-children-title">{t('terms.related.children.label')}</slot>
 				</h2>
-				<RegionsList terms={regionChildren} showTitleMultilingual={depth >= showTitleAltDepth} />
+				<RegionsList showTitleMultilingual={depth >= showTitleAltDepth} terms={regionChildren} />
 			</div>
 		) : undefined}
 		{regionSiblings.length > 0 ? (
@@ -57,7 +57,7 @@ const t = getTranslations();
 				>
 					<slot name="regions-siblings-title">{t('terms.related.siblings.label')}</slot>
 				</h2>
-				<RegionsList terms={regionSiblings} showTitleMultilingual={depth >= showTitleAltDepth} />
+				<RegionsList showTitleMultilingual={depth >= showTitleAltDepth} terms={regionSiblings} />
 			</div>
 		) : undefined}
 	</div>

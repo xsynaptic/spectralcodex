@@ -11,8 +11,8 @@ const { title } = Astro.props;
 ---
 
 <a
-	href={Astro.url.toString()}
 	class:list={[MicroformatClassNames.Name, MicroformatClassNames.Url]}
+	href={Astro.url.toString()}
 	rel="bookmark"
 >
 	{stripDiacritics(title)}

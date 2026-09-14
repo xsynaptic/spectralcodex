@@ -7,8 +7,8 @@ import ListColumn from '#components/parts/list-column.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props {
-	items: Array<CatalogItem>;
 	class?: string | undefined;
+	items: Array<CatalogItem>;
 }
 
 const { class: className, items } = Astro.props;

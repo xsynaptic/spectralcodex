@@ -7,13 +7,13 @@ import { createPortal } from 'react-dom';
 import { useControl } from 'react-map-gl/maplibre';
 
 interface CustomControlConfig {
+	className?: string | undefined;
 	map: MapInstance;
 	position: ControlPosition;
-	className?: string | undefined;
 	redraw?: () => void; // Optional; use this if the control needs to be redrawn when the map is moved
 }
 
-type CustomControlProps = Pick<CustomControlConfig, 'position' | 'className'> & {
+type CustomControlProps = Pick<CustomControlConfig, 'className' | 'position'> & {
 	children: ReactElement;
 };
 

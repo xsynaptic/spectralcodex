@@ -71,8 +71,8 @@ const socialProps = openGraphImage
 ---
 
 <SEO
-	title={titleDisplay}
 	description={description}
+	title={titleDisplay}
 	{...socialProps}
 	extend={{
 		...(prefetchUrls?.length
@@ -82,7 +82,7 @@ const socialProps = openGraphImage
 			: {}),
 		meta: [{ name: 'generator', content: Astro.generator }],
 	}}
-	noindex={noIndex ?? false}
 	nofollow={noFollow ?? false}
+	noindex={noIndex ?? false}
 	robotsExtras="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
 />

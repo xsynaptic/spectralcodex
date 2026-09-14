@@ -13,11 +13,11 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {
-	terms: Array<CollectionEntry<'regions'>> | undefined;
 	dividerContent?: DividerContent;
 	showMicroformats?: boolean;
 	showSingleRegionAncestors?: boolean;
 	showTitleMultilingual?: boolean;
+	terms: Array<CollectionEntry<'regions'>> | undefined;
 }
 
 const {
@@ -50,9 +50,9 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 			return (
 				<DividedItem
 					as="li"
-					dividerContent={dividerContent}
 					class:list={[showMicroformats ? MicroformatClassNames.Category : undefined]}
 					data-pagefind-filter="region"
+					dividerContent={dividerContent}
 				>
 					{entry.data.title ? (
 						<Anchor href={getContentPath(entry.collection, entry.id)}>
@@ -61,8 +61,8 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 					) : undefined}
 					{titleMultilingual ? (
 						<TextMultilingual
-							content={titleMultilingual}
 							class="text-primary-600 dark:text-primary-400"
+							content={titleMultilingual}
 							parenthesis={true}
 						/>
 					) : undefined}

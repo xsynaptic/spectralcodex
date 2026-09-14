@@ -11,9 +11,9 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 
 interface DeployOgOptions {
-	rootPath: string;
 	dryRun?: boolean;
 	ids?: Array<string>;
+	rootPath: string;
 }
 
 export async function deployOg(options: DeployOgOptions): Promise<void> {

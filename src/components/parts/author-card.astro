@@ -18,9 +18,9 @@ const t = getTranslations();
 	<div class="text-xs">
 		<span class={MicroformatClassNames.Role}>{t('author.role')}</span>,{' '}
 		<Anchor
+			anchorColor="primary"
 			class:list={['italic', MicroformatClassNames.Card, MicroformatClassNames.Organization]}
 			href={getSitePath()}
-			anchorColor="primary"
 		>
 			{t('site.title')}
 		</Anchor>

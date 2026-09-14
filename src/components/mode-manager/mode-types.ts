@@ -6,10 +6,10 @@ export const ModeTypeEnum = {
 
 export type ModeGeneralType = (typeof ModeTypeEnum)[keyof typeof ModeTypeEnum];
 
-export type ModeSystemType = Extract<ModeGeneralType, 'light' | 'dark'>;
+export type ModeSystemType = Extract<ModeGeneralType, 'dark' | 'light'>;
 
 export type ModeChangedEvent = CustomEvent<{
 	mode: ModeGeneralType;
-	systemMode: ModeSystemType;
 	resolvedMode: ModeSystemType;
+	systemMode: ModeSystemType;
 }>;

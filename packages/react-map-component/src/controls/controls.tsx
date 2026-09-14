@@ -20,8 +20,8 @@ export const MapControls: FC = function MapControls() {
 
 	return (
 		<>
-			<ScaleControl position="bottom-left" maxWidth={120} />
-			<AttributionControl position="bottom-right" compact={true} />
+			<ScaleControl maxWidth={120} position="bottom-left" />
+			<AttributionControl compact={true} position="bottom-right" />
 			{isCanvasInteractive ? (
 				<>
 					<FullscreenControl position="top-left" />

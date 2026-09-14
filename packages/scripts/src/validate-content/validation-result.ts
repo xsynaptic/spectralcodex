@@ -1,21 +1,21 @@
 import chalk from 'chalk';
 
 export interface ValidationIssue {
-	message: string;
 	details?: Array<string>;
+	message: string;
 }
 
 // `warn` findings are printed but do not fail the run
 export interface ValidationResult {
-	status: 'fail' | 'pass' | 'warn';
-	summary: string;
 	issues: Array<ValidationIssue>;
 	notes?: Array<string>;
+	status: 'fail' | 'pass' | 'warn';
+	summary: string;
 }
 
 export function toValidationResult(
 	issues: Array<ValidationIssue>,
-	summaries: { pass: string; fail: string },
+	summaries: { fail: string; pass: string },
 ): ValidationResult {
 	if (issues.length === 0) return { status: 'pass', summary: summaries.pass, issues: [] };
 

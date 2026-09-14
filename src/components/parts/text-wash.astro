@@ -16,8 +16,8 @@ type WashColor = (typeof WashColorEnum)[keyof typeof WashColorEnum];
 
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 	as: Tag;
-	washColor?: WashColor;
 	showDarkMode?: boolean | undefined;
+	washColor?: WashColor;
 }>;
 
 const {

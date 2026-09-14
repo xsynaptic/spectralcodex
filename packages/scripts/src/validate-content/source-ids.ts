@@ -3,8 +3,8 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface SourceIdIssue {
-	location: string;
 	id: string;
+	location: string;
 }
 
 // Longform sources (inline objects) describe a resource with no entry of its own and are skipped
@@ -21,7 +21,7 @@ export function collectSourceIdIssues(
 	const issues: Array<SourceIdIssue> = [];
 
 	for (const entry of entries) {
-		const sources = entry.data.sources as Array<string | object> | undefined;
+		const sources = entry.data.sources as Array<object | string> | undefined;
 
 		if (!sources) continue;
 

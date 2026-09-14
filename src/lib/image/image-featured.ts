@@ -82,8 +82,8 @@ export function getImageFeaturedGroup({
 	imageFeatured,
 	getCaption,
 }: {
-	imageFeatured: ImageFeatured | undefined;
 	getCaption: (id: string) => CatalogCaption | undefined;
+	imageFeatured: ImageFeatured | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
@@ -100,8 +100,8 @@ export function getImageFeaturedHeroGroup({
 	imageFeatured,
 	getCaption,
 }: {
-	imageFeatured: ImageFeatured | undefined;
 	getCaption: (id: string) => CatalogCaption | undefined;
+	imageFeatured: ImageFeatured | undefined;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured || !Array.isArray(imageFeatured)) return undefined;
 
@@ -118,9 +118,9 @@ export function getImageFeaturedGroupByCatalog({
 	shuffle = false,
 	hero = false,
 }: {
+	hero?: boolean;
 	items: Array<CatalogItem> | undefined;
 	shuffle?: boolean;
-	hero?: boolean;
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!items || items.length === 0) return;
 

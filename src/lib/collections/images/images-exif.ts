@@ -56,7 +56,7 @@ export function getImageExposureValue({
 
 // Coerce an EXIF tag to a string, preserving absence as undefined
 // String(undefined) yields the literal "undefined", which would poison fallbacks
-function getTagString(value: string | number | boolean | null | undefined): string | undefined {
+function getTagString(value: boolean | null | number | string | undefined): string | undefined {
 	return value === undefined || value === null ? undefined : String(value);
 }
 

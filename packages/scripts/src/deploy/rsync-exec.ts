@@ -4,15 +4,15 @@ import { $ } from 'zx';
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
 interface RsyncOptions {
+	archive?: 'av' | 'avz';
 	config: DeployConfig;
 	dryRun?: boolean;
-	archive?: 'av' | 'avz';
-	extraFlags?: Array<string>;
 	excludes?: Array<string>;
+	extraFlags?: Array<string>;
 }
 
 export function buildRsyncArgs(
-	source: string | Array<string>,
+	source: Array<string> | string,
 	destination: string,
 	{ config, dryRun = false, archive = 'avz', extraFlags = [], excludes = [] }: RsyncOptions,
 ): Array<string> {
@@ -29,7 +29,7 @@ export function buildRsyncArgs(
 }
 
 export async function rsyncTo(
-	source: string | Array<string>,
+	source: Array<string> | string,
 	destination: string,
 	options: RsyncOptions,
 ): Promise<void> {

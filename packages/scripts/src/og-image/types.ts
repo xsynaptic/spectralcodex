@@ -1,11 +1,11 @@
 export interface OpenGraphMetadataItem {
 	collection: string;
 	id: string;
+	isFallback: boolean;
 	title: string;
-	titleZh?: string | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
-	isFallback: boolean;
+	titleZh?: string | undefined;
 }
 
 export interface OpenGraphEntryItem extends OpenGraphMetadataItem {

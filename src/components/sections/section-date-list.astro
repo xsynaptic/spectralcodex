@@ -26,15 +26,15 @@ const timeOptions = {
 ---
 
 {dateRanges.length > 0 ? (
-	<ContentSection sectionTitle={sectionTitle} data-pagefind-ignore data-nosnippet {...props}>
+	<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={sectionTitle} {...props}>
 		<ListColumn class="font-serif text-xs sm:text-sm">
 			{dateRanges.map((range) => (
 				<ListColumnItem>
 					<DateDisplay
 						date={range.start.date}
 						dateEnd={range.end?.date}
-						datePreset={DatePresetEnum.Medium}
 						dateOptions={range.start.hasTime || range.end?.hasTime ? timeOptions : undefined}
+						datePreset={DatePresetEnum.Medium}
 					/>
 				</ListColumnItem>
 			))}

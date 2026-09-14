@@ -11,14 +11,14 @@ const aspectRatio = 3 / 2;
 const fit = ImageFitOptionEnum.Cover;
 
 interface ImageFeaturedPropsOptions {
-	imageId: string | undefined;
 	alt?: string;
-	widths?: Array<number>;
+	imageFormat: ImageFormat;
+	imageId: string | undefined;
+	imageQuality: number;
+	priority?: boolean;
 	sizes: string;
 	width: number;
-	imageQuality: number;
-	imageFormat: ImageFormat;
-	priority?: boolean;
+	widths?: Array<number>;
 }
 
 export async function getImageFeaturedProps({

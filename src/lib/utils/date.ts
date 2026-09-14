@@ -19,11 +19,11 @@ interface ContentDate {
 	hasTime: boolean;
 }
 
-export type DateRecordedEntry = ContentDate | [ContentDate, ContentDate];
+export type DateRecordedEntry = [ContentDate, ContentDate] | ContentDate;
 
 export interface DateRange {
-	start: ContentDate;
 	end?: ContentDate;
+	start: ContentDate;
 }
 
 export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRange> {

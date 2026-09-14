@@ -19,7 +19,7 @@ const t = getTranslations();
 ---
 
 <site-navigation>
-	<nav class="nav-menu" aria-label={t('site.navigation.header.label')} data-nosnippet {...props}>
+	<nav aria-label={t('site.navigation.header.label')} class="nav-menu" data-nosnippet {...props}>
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{navigationItems.map((item) => {
 				const children = item.children ?? [];
@@ -27,12 +27,12 @@ const t = getTranslations();
 
 				return (
 					<li class="nav-item">
-						<NavigationHeaderTrigger item={item} hasChildren={hasChildren} />
+						<NavigationHeaderTrigger hasChildren={hasChildren} item={item} />
 						{hasChildren ? (
 							<NavigationHeaderSubmenu
-								navigationItems={children}
-								depth={1}
 								ariaLabel={getNavigationItemAriaLabel(item)}
+								depth={1}
+								navigationItems={children}
 							/>
 						) : undefined}
 					</li>

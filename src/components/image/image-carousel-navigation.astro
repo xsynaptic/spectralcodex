@@ -5,48 +5,48 @@ const t = getTranslations();
 ---
 
 <button
-	type="button"
+	aria-label={t('carousel.nav.previous')}
 	class:list={['carousel-nav carousel-nav-prev z-image-navigation']}
 	data-carousel-nav="prev"
-	aria-label={t('carousel.nav.previous')}
+	type="button"
 >
 	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
+		aria-hidden="true"
 		height="24"
 		viewBox="0 0 24 24"
-		aria-hidden="true"
+		width="24"
+		xmlns="http://www.w3.org/2000/svg"
 	>
 		<path
+			d="m15 18l-6-6l6-6"
 			fill="none"
 			stroke="currentColor"
 			stroke-linecap="round"
 			stroke-linejoin="round"
 			stroke-width="3"
-			d="m15 18l-6-6l6-6"
 		></path>
 	</svg>
 </button>
 <button
-	type="button"
+	aria-label={t('carousel.nav.next')}
 	class:list={['carousel-nav carousel-nav-next z-image-navigation']}
 	data-carousel-nav="next"
-	aria-label={t('carousel.nav.next')}
+	type="button"
 >
 	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
+		aria-hidden="true"
 		height="24"
 		viewBox="0 0 24 24"
-		aria-hidden="true"
+		width="24"
+		xmlns="http://www.w3.org/2000/svg"
 	>
 		<path
+			d="m9 18l6-6l-6-6"
 			fill="none"
 			stroke="currentColor"
 			stroke-linecap="round"
 			stroke-linejoin="round"
 			stroke-width="3"
-			d="m9 18l6-6l-6-6"
 		></path>
 	</svg>
 </button>

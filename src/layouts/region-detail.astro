@@ -23,12 +23,12 @@ import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 
 interface Props {
-	entry: CollectionEntry<'regions'>;
-	page: Page<CatalogItem>;
-	mapData: MapComponentData;
+	backlinksCount: number;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
-	backlinksCount: number;
+	entry: CollectionEntry<'regions'>;
+	mapData: MapComponentData;
+	page: Page<CatalogItem>;
 	regionsOption?: RegionsOption;
 }
 
@@ -39,11 +39,11 @@ const getRegionAncestors = await createRegionAncestorsFunction();
 ---
 
 <ContentEntryDetail
-	entry={entry}
-	page={page}
 	breadcrumbRegions={getRegionAncestors(entry).slice(1).toReversed()}
-	prefetchUrls={mapData.prefetchUrls}
+	entry={entry}
 	hideSearch={entry.data.hideSearch}
+	page={page}
+	prefetchUrls={mapData.prefetchUrls}
 >
 	<Fragment slot="header-subtitle">
 		<DividedItem>
@@ -54,7 +54,7 @@ const getRegionAncestors = await createRegionAncestorsFunction();
 				<RegionsBreadcrumbs entry={entry} />
 			</DividedItem>
 		) : undefined}
-		<ContentEntryCounts entryCount={entry.data._entryCount ?? 0} backlinksCount={backlinksCount} />
+		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 	</Fragment>
 	<ContentProse entry={entry} />
 	<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
@@ -65,13 +65,13 @@ const getRegionAncestors = await createRegionAncestorsFunction();
 			<Fragment slot="regions-siblings-title">{regionsOption.termsSiblingsLabel}</Fragment>
 		) : undefined}
 	</RegionsRelated>
-	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
+	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionWebmentions entry={entry} />
 	<SectionPreviews page={page} showMicroformats={true} />
 	{page.currentPage === 1 && catalogItems.length > 0 ? (
-		<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
+		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
 	<RegionsDivision entryId={entry.id} />
 </ContentEntryDetail>

@@ -10,8 +10,8 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	mapComponentProps: MapComponentProps;
 	entryTitle?: string | undefined;
+	mapComponentProps: MapComponentProps;
 }
 
 const { mapComponentProps, entryTitle, ...props } = Astro.props;
@@ -22,29 +22,29 @@ const t = getTranslations();
 const zIndex = 10;
 ---
 
-<link rel="stylesheet" href={mapCssUrl} />
+<link href={mapCssUrl} rel="stylesheet" />
 <MapComponentSprites />
 <div
+	aria-label={
+		entryTitle ? formatStringTemplate(t('section.map.label'), { title: entryTitle }) : undefined
+	}
 	class:list={[
 		'bg-fallback',
 		'relative flex h-full max-h-screen min-h-[min(600px,100vh)] overflow-hidden shadow-sm sm:rounded-xs lg:rounded-md',
 		'shadow-primary-300 dark:shadow-primary-900',
 	]}
 	role={entryTitle ? 'group' : undefined}
-	aria-label={
-		entryTitle ? formatStringTemplate(t('section.map.label'), { title: entryTitle }) : undefined
-	}
 	{...props}
 	data-pagefind-ignore
 >
-	<ReactMapComponent {...mapComponentProps} style={{ zIndex: zIndex + 1 }} client:visible />
+	<ReactMapComponent {...mapComponentProps} client:visible style={{ zIndex: zIndex + 1 }} />
 	<div
 		class:list={[
 			'map-loading absolute flex h-full w-full justify-center',
 			'text-primary-700 dark:text-highlight-400',
 		]}
-		style={{ zIndex }}
 		role="status"
+		style={{ zIndex }}
 	>
 		<span class="map-loading-label sr-only">{t('section.map.loading')}</span>
 		<div class="loading-animation w-1/5"></div>

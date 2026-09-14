@@ -109,9 +109,9 @@ function resolveScript({
 	titleJa,
 	titleTh,
 }: {
-	titleZh?: string | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
+	titleZh?: string | undefined;
 }) {
 	if (titleZh) return { ...scriptStyles.zh, title: titleZh };
 	if (titleJa) return { ...scriptStyles.ja, title: titleJa };
@@ -124,10 +124,10 @@ function TitleMultilingual({
 	luminance,
 	...titles
 }: {
-	titleZh?: string | undefined;
+	luminance?: number | undefined;
 	titleJa?: string | undefined;
 	titleTh?: string | undefined;
-	luminance?: number | undefined;
+	titleZh?: string | undefined;
 }) {
 	const script = resolveScript(titles);
 
@@ -138,6 +138,7 @@ function TitleMultilingual({
 
 	return (
 		<div
+			lang={lang}
 			style={{
 				lineClamp: 1,
 				maxWidth: `${String(openGraphImageWidth)}px`,
@@ -153,14 +154,13 @@ function TitleMultilingual({
 					'linear-gradient(to bottom, #fef9ec, #f4da93)',
 				),
 			}}
-			lang={lang}
 		>
 			{title}
 		</div>
 	);
 }
 
-function Title({ title, luminance }: { title: string; luminance?: number | undefined }) {
+function Title({ title, luminance }: { luminance?: number | undefined; title: string }) {
 	const isInverted = isBrightBackground(luminance);
 
 	return (
@@ -203,8 +203,8 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 				<Bitmap
 					data={image.data}
 					height={image.height}
-					width={image.width}
 					style={{ position: 'absolute' }}
+					width={image.width}
 				/>
 			) : undefined}
 			{/* Gradient overlay */}
@@ -233,12 +233,12 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 			>
 				{isShowBranding ? <TitleSite luminance={image?.luminanceTop} /> : undefined}
 				<TitleMultilingual
-					titleZh={entry.titleZh}
+					luminance={image?.luminanceBottom}
 					titleJa={entry.titleJa}
 					titleTh={entry.titleTh}
-					luminance={image?.luminanceBottom}
+					titleZh={entry.titleZh}
 				/>
-				<Title title={entry.title} luminance={image?.luminanceBottom} />
+				<Title luminance={image?.luminanceBottom} title={entry.title} />
 			</div>
 		</div>
 	);

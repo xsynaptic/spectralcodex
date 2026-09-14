@@ -30,10 +30,10 @@ import { getBasePath, getSitePath } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {
-	meta?: MetaProps;
-	schemas?: Array<Thing>;
 	hasHeroImage?: boolean;
 	isHomepage?: boolean;
+	meta?: MetaProps;
+	schemas?: Array<Thing>;
 }
 
 const { hasHeroImage = false, meta, schemas, isHomepage = false } = Astro.props;
@@ -47,23 +47,23 @@ const t = getTranslations();
 <html lang="en-US">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<meta name="color-scheme" content="light dark" />
-		<meta name="theme-color" content="#f4f4f5" />
+		<meta content="width=device-width,initial-scale=1" name="viewport" />
+		<meta content="light dark" name="color-scheme" />
+		<meta content="#f4f4f5" name="theme-color" />
 		<link
-			rel="icon"
-			type="image/svg+xml"
 			href={getBasePath('favicon.svg')}
 			media="(prefers-color-scheme: light)"
-		/>
-		<link
 			rel="icon"
 			type="image/svg+xml"
+		/>
+		<link
 			href={getBasePath('favicon.svg')}
 			media="(prefers-color-scheme: dark)"
+			rel="icon"
+			type="image/svg+xml"
 		/>
 		{IMAGE_SERVER_URL.startsWith('http') ? (
-			<link rel="preconnect" href={IMAGE_SERVER_URL} crossorigin />
+			<link crossorigin href={IMAGE_SERVER_URL} rel="preconnect" />
 		) : undefined}
 		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
@@ -72,10 +72,10 @@ const t = getTranslations();
 		<ModeManagerSetup />
 		<Meta {...meta} />
 		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
-			<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} isViewTransitionsEnabled={true} />
+			<Analytics isViewTransitionsEnabled={true} umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} />
 		) : undefined}
 		<ClientRouter />
-		<meta name="build-version" content={import.meta.env.BUILD_VERSION} />
+		<meta content={import.meta.env.BUILD_VERSION} name="build-version" />
 		<script is:inline>
 			(() => {
 				const version = document.querySelector('meta[name="build-version"]')?.content;
@@ -87,14 +87,14 @@ const t = getTranslations();
 			})();
 		</script>
 		<link
-			rel="alternate"
-			type="application/rss+xml"
-			title={t('site.title')}
 			href={getBasePath('rss.xml')}
+			rel="alternate"
+			title={t('site.title')}
+			type="application/rss+xml"
 		/>
-		<link rel="sitemap" href={getBasePath('sitemap-index.xml')} />
+		<link href={getBasePath('sitemap-index.xml')} rel="sitemap" />
 		{WEBMENTION_DOMAIN ? (
-			<link rel="webmention" href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} />
+			<link href={`https://webmention.io/${WEBMENTION_DOMAIN}/webmention`} rel="webmention" />
 		) : undefined}
 	</head>
 	<body
@@ -133,17 +133,17 @@ const t = getTranslations();
 					'rounded-br-sm px-4 py-1 uppercase',
 					'bg-primary-50 text-accent-500 hover:text-accent-400 focus-visible:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300',
 				]}
+				label={t('site.skip.label')}
 				parentClass="z-skip-link"
 				target="#main-content"
-				label={t('site.skip.label')}
 			/>
 			<div class="content-column flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1">
 				{isHomepage ? (
 					<h1 class="flex grow items-center gap-1">
 						<Anchor
-							href={siteUrl}
-							class="text-xl font-semibold md:text-2xl lg:text-3xl"
 							anchorColor="primary"
+							class="text-xl font-semibold md:text-2xl lg:text-3xl"
+							href={siteUrl}
 						>
 							{t('site.title')}
 						</Anchor>
@@ -151,9 +151,9 @@ const t = getTranslations();
 				) : (
 					<div class="flex grow items-center gap-1">
 						<Anchor
-							href={siteUrl}
-							class="text-xl font-semibold md:text-2xl lg:text-3xl"
 							anchorColor="primary"
+							class="text-xl font-semibold md:text-2xl lg:text-3xl"
+							href={siteUrl}
 						>
 							{t('site.title')}
 						</Anchor>

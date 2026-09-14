@@ -24,8 +24,8 @@ const t = getTranslations();
 
 {termAncestors.length > 1 ? (
 	<nav
-		class="inline sm:flex"
 		aria-label={t('site.breadcrumbs.label')}
+		class="inline sm:flex"
 		data-pagefind-ignore
 		{...props}
 	>
@@ -39,8 +39,8 @@ const t = getTranslations();
 							<span aria-current="page">{termAncestor.data.title}</span>
 						) : (
 							<Anchor
-								href={getContentPath('regions', termAncestor.id)}
 								anchorColor="accent"
+								href={getContentPath('regions', termAncestor.id)}
 								{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
 							>
 								{termAncestor.data.title}

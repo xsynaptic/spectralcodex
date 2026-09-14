@@ -15,7 +15,7 @@ const baseOptions = {
 	imageFormat: 'webp',
 } as const;
 
-function mockImage(data: { width: number; title: string }) {
+function mockImage(data: { title: string; width: number }) {
 	getImageByIdMock.mockReturnValue({ data });
 }
 

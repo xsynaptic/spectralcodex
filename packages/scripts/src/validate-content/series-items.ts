@@ -12,7 +12,7 @@ export function validateSeriesItems(
 ) {
 	const validIds = new Set(validTargets.map((entry) => entry.id));
 
-	const issues: Array<{ location: string; id: string }> = [];
+	const issues: Array<{ id: string; location: string }> = [];
 
 	for (const entry of entries) {
 		const seriesItems = entry.data.seriesItems as Array<string> | undefined;

@@ -9,13 +9,13 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
+	class?: string | undefined;
 	locations: Array<{
-		url: string;
+		distanceDisplay: string;
 		title: string;
 		titleMultilingual: MultilingualContent | undefined;
-		distanceDisplay: string;
+		url: string;
 	}>;
-	class?: string | undefined;
 }
 
 const { class: className, locations } = Astro.props;

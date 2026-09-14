@@ -37,7 +37,7 @@ type CollectionMutateFunction<K extends CollectionKey> = (
 type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
 	entries: Array<CollectionEntry<K>>,
 	entriesMap: Map<string, CollectionEntry<K>>,
-) => Promise<A> | A;
+) => A | Promise<A>;
 
 // Factory for memoized, enriched collection data
 // mutate() stamps computed `_` fields onto entry.data in place; extend() derives collection-level artifacts
@@ -45,11 +45,11 @@ type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
 // A bypass that observes a computed field depends on which wrapper ran first; that order is not guaranteed
 export function createCollectionData<K extends CollectionKey, A extends object = object>(config: {
 	collection: K;
+	extend?: CollectionExtendFunction<K, A>;
 	label?: string;
 	mutate?: CollectionMutateFunction<K>;
-	extend?: CollectionExtendFunction<K, A>;
 }) {
-	const getData = pMemoize(async (): Promise<CollectionResult<K> & A> => {
+	const getData = pMemoize(async (): Promise<A & CollectionResult<K>> => {
 		const startTime = performance.now();
 
 		const entries = await getCollection(config.collection);
@@ -73,7 +73,7 @@ export function createCollectionData<K extends CollectionKey, A extends object =
 
 	// In dev the content store can load empty if Astro's data-store module fails to parse
 	// Memoizing that empty result would strand it for the whole session; evict empties to allow for recovery
-	return async function (): Promise<CollectionResult<K> & A> {
+	return async function (): Promise<A & CollectionResult<K>> {
 		const result = await getData();
 
 		if (import.meta.env.DEV && result.entries.length === 0) {

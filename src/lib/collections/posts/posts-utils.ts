@@ -19,7 +19,7 @@ import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured
 
 export async function getPostSchema(
 	entry: CollectionEntry<'posts'>,
-	props: { url: string; imageUrl: string | undefined },
+	props: { imageUrl: string | undefined; url: string },
 ): Promise<Array<Thing>> {
 	return [
 		buildArticleSchema({

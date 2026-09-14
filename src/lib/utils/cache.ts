@@ -23,7 +23,7 @@ export function createSqliteStore({ filePath }: { filePath: string }) {
 
 	return {
 		get(key: string) {
-			const row = selectStatement.get(key) as { value: string } | undefined;
+			const row = selectStatement.get(key) as undefined | { value: string };
 
 			return row?.value;
 		},

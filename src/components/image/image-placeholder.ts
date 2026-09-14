@@ -15,8 +15,8 @@ const imagePlaceholderPixelCountHighQuality = 1600;
 const imagePlaceholderPixelCountLowQuality = 250;
 
 interface ImagePlaceholderCached {
-	hash: string;
 	dataUrl: string;
+	hash: string;
 }
 
 // Generate placeholder dimensions from aspect ratio and pixel budget
@@ -46,11 +46,11 @@ async function generatePlaceholderDataUrl({
 	position = 'center',
 	pixelCount = imagePlaceholderPixelCountLowQuality,
 }: {
-	path: string;
 	aspectRatio: number;
 	fit?: ImageFitOption;
-	position?: string;
+	path: string;
 	pixelCount?: number;
+	position?: string;
 }): Promise<string | undefined> {
 	const imageBuffer = await readImageFile(path);
 

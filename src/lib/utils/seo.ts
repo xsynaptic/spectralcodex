@@ -22,7 +22,7 @@ export function getSeoArticleProps({
 	};
 }
 
-export function getSeoImageProps({ id, alt }: { id: string; alt: string }) {
+export function getSeoImageProps({ id, alt }: { alt: string; id: string }) {
 	return {
 		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
 		alt,

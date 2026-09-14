@@ -9,8 +9,8 @@ import { fetchTimeoutMs } from '#constants.ts';
 
 interface ChunkConfig {
 	chunkUrlBase: string | undefined;
-	version: string | undefined;
 	isDev: boolean | undefined;
+	version: string | undefined;
 }
 
 const ChunkConfigContext = createContext<ChunkConfig>({

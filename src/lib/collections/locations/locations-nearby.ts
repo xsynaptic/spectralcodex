@@ -3,7 +3,7 @@ import type { Position } from 'geojson';
 
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { centroid } from '@turf/centroid';
-import { around as getPointsAround, distance as getDistance } from 'geokdbush';
+import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
 import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
@@ -12,8 +12,8 @@ import { locationsNearbyCountLimit, locationsNearbyDistanceLimit } from '#consta
 
 interface LocationPoint {
 	id: string;
-	lng: number;
 	lat: number;
+	lng: number;
 	status: string;
 }
 
@@ -30,8 +30,8 @@ function getEntryCoordinates(geometry: CollectionEntry<'locations'>['data']['geo
 
 // Extract coordinates from location entries; handles both single Point and MultiPoint geometries
 function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
-	pointsMap: Map<string, LocationPoint>;
 	pointsIndex: Array<LocationPoint>;
+	pointsMap: Map<string, LocationPoint>;
 } {
 	const pointsMap = new Map<string, LocationPoint>();
 	const pointsIndex: Array<LocationPoint> = [];

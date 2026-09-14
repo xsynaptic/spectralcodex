@@ -13,16 +13,16 @@ import type { DivisionFeatureCollection, DivisionGeometry } from '#map-divisions
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
 interface SvgOptions {
-	// Tolerance for geometry simplification (lower = more detail)
-	tolerance?: number;
-	// Whether to use high-quality simplification (slower but better results)
-	highQuality?: boolean;
-	// Width of the SVG viewport
-	width?: number;
-	// Height of the SVG viewport
-	height?: number;
 	// Optional bounding box to clip geometry
 	divisionClippingBBox?: GeometryBoundingBox;
+	// Height of the SVG viewport
+	height?: number;
+	// Whether to use high-quality simplification (slower but better results)
+	highQuality?: boolean;
+	// Tolerance for geometry simplification (lower = more detail)
+	tolerance?: number;
+	// Width of the SVG viewport
+	width?: number;
 }
 
 /**
@@ -33,8 +33,8 @@ function generateSvg(
 	geojsonData: DivisionFeatureCollection,
 	options: SvgOptions = {},
 ): {
-	svg: string;
 	pointCount: number;
+	svg: string;
 	tolerance: number;
 } {
 	const {
@@ -153,8 +153,8 @@ export async function saveSvg({
 }: {
 	geojsonData: DivisionFeatureCollection;
 	id: string;
-	outputDir: string;
 	options?: SvgOptions;
+	outputDir: string;
 }): Promise<void> {
 	safelyCreateDirectory(outputDir);
 

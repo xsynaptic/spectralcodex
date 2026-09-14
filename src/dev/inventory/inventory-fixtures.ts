@@ -363,8 +363,8 @@ export function createSamplePage({
 	currentPage,
 	lastPage,
 }: {
-	items: Array<CatalogItem>;
 	currentPage: number;
+	items: Array<CatalogItem>;
 	lastPage: number;
 }): Page<CatalogItem> {
 	return {

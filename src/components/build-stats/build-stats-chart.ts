@@ -1,9 +1,9 @@
 const tooltipEdgeGap = 8;
 
 interface TooltipPoint {
+	values: Array<string>;
 	x: number;
 	y: number;
-	values: Array<string>;
 }
 
 // Progressive enhancement: without this the plot still reads, direct-labelled at its endpoint

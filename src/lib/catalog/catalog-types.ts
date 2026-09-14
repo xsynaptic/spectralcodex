@@ -11,32 +11,32 @@ export type CatalogCollectionKey = Extract<
 
 // This is a subset of common properties of different content collections
 export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionKey> {
+	backlinks: Set<string>;
 	collection: T;
+	dateCreated: Date;
+	dateRecorded: Array<DateRecordedEntry> | undefined;
+	dateUpdated: Date | undefined;
+	description: string | undefined;
+	entryQuality: number;
 	id: string;
+	imageHeroId: string | undefined;
+	imageId: string | undefined;
+	linksExternalCount: number | undefined;
+	locationCount: number | undefined;
+	postCount: number | undefined;
+	regionPrimaryId: string | undefined;
 	title: string;
 	titleMultilingual: MultilingualContent | undefined;
-	description: string | undefined;
 	url: string;
-	imageId: string | undefined;
-	imageHeroId: string | undefined;
-	regionPrimaryId: string | undefined;
-	postCount: number | undefined;
-	locationCount: number | undefined;
-	linksExternalCount: number | undefined;
 	wordCount: number | undefined;
-	backlinks: Set<string>;
-	dateCreated: Date;
-	dateUpdated: Date | undefined;
-	dateRecorded: Array<DateRecordedEntry> | undefined;
-	entryQuality: number;
 }
 
 // Caption fields always resolve from a real item, so id/url are present (unlike a title-only caption)
-export type CatalogCaption = Pick<CatalogItem, 'title' | 'titleMultilingual' | 'id' | 'url'>;
+export type CatalogCaption = Pick<CatalogItem, 'id' | 'title' | 'titleMultilingual' | 'url'>;
 
 // Image featured data is sometimes displayed with a caption; title-only captions carry no id/url
-export type ImageFeaturedCaption = Pick<CatalogItem, 'title' | 'titleMultilingual'> &
-	Partial<Pick<CatalogItem, 'id' | 'url'>>;
+export type ImageFeaturedCaption = Partial<Pick<CatalogItem, 'id' | 'url'>> &
+	Pick<CatalogItem, 'title' | 'titleMultilingual'>;
 
 export type ImageFeaturedWithCaption = ImageFeaturedObject & {
 	caption?: ImageFeaturedCaption | undefined;

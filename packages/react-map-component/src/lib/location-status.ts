@@ -5,13 +5,13 @@ import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { tailwindColors } from '#lib/tailwind-colors.ts';
 
 export interface LocationStatusMetadata {
+	color: string;
+	colorDark: string;
+	description: string;
+	stroke: string;
+	strokeDark: string;
 	title: string;
 	title_zh: string;
-	description: string;
-	color: string;
-	stroke: string;
-	colorDark: string;
-	strokeDark: string;
 }
 
 export const LocationStatusRecords = {

@@ -25,7 +25,7 @@ import { getBasePath } from '#lib/utils/routing.ts';
 
 // Region and theme maps pass a membership hint; other big maps fall back to an id list
 type MapScopeHint =
-	{ type: 'region'; interval: [number, number] } | { type: 'theme'; index: number };
+	{ index: number; type: 'theme' } | { interval: [number, number]; type: 'region' };
 
 // Stamp each inline source row with its shared popup-chunk key so hover/click can fetch the chunk
 function getInlineSourceData(
@@ -117,30 +117,30 @@ export function getMapData({
 	version,
 	boundsFeatureCollection,
 	...props
-}: Omit<
-	MapComponentProps,
-	| 'bounds'
-	| 'maxBounds'
-	| 'center'
-	| 'apiSourceUrl'
-	| 'apiPopupUrl'
-	| 'protomapsApiKey'
-	| 'scope'
-	| 'apiChunkBaseUrl'
-	| 'sourceData'
-	| 'popupData'
-	| 'sourceDataKey'
-	| 'popupDataKey'
-	| 'version'
-> &
-	MapDataBoundsProps & {
-		locationCount?: number | undefined;
-		scope?: MapScopeHint | undefined;
-		chunkKeyById?: Map<string, string> | undefined;
-		// Not optional, so a new call site cannot skip the cache version by accident
-		version: string | undefined;
+}: MapDataBoundsProps &
+	Omit<
+		MapComponentProps,
+		| 'apiChunkBaseUrl'
+		| 'apiPopupUrl'
+		| 'apiSourceUrl'
+		| 'bounds'
+		| 'center'
+		| 'maxBounds'
+		| 'popupData'
+		| 'popupDataKey'
+		| 'protomapsApiKey'
+		| 'scope'
+		| 'sourceData'
+		| 'sourceDataKey'
+		| 'version'
+	> & {
 		// Frame from a different set than the inlined data (e.g. center on the target while inlining its neighbors)
 		boundsFeatureCollection?: MapFeatureCollection | undefined;
+		chunkKeyById?: Map<string, string> | undefined;
+		locationCount?: number | undefined;
+		scope?: MapScopeHint | undefined;
+		// Not optional, so a new call site cannot skip the cache version by accident
+		version: string | undefined;
 	}) {
 	const mapBounds = getMapBounds({
 		featureCollection: boundsFeatureCollection ?? featureCollection,
@@ -204,10 +204,10 @@ export function getMapDataDedicated({
 	mapId,
 	featureCollection,
 	...props
-}: {
-	mapId: string;
+}: Pick<MapComponentProps, 'isObjectiveFilterEnabled'> & {
 	featureCollection: MapFeatureCollection | undefined;
-} & Pick<MapComponentProps, 'isObjectiveFilterEnabled'>): MapComponentData {
+	mapId: string;
+}): MapComponentData {
 	const mapBounds = getMapBounds({ featureCollection });
 
 	if (!featureCollection || !mapBounds) {

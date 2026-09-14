@@ -1,8 +1,8 @@
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 export interface RegionsOption {
-	termsRelatedLimit?: number;
 	termsChildrenLabel?: string;
+	termsRelatedLimit?: number;
 	termsSiblingsLabel?: string;
 }
 

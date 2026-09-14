@@ -13,9 +13,9 @@ import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'div'> {
+	alt: string;
 	imageId?: string | undefined;
 	linkUrl: string;
-	alt: string;
 	showMicroformats?: boolean | undefined;
 	titleAs?: 'h2' | 'h3' | undefined;
 }
@@ -50,7 +50,7 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 >
 	{imageProps ? (
 		<ImagePlaceholder placeholderProps={placeholderProps}>
-			<a href={linkUrl} aria-hidden="true" tabindex="-1">
+			<a aria-hidden="true" href={linkUrl} tabindex="-1">
 				<Image
 					class:list={[showMicroformats ? MicroformatClassNames.Photo : undefined]}
 					{...imageProps}
@@ -62,12 +62,12 @@ const description = await renderSlot(Astro.slots, 'preview-description');
 	)}
 	<TitleTag class="card-title">
 		<Anchor
-			href={linkUrl}
 			anchorColor="title"
 			class:list={[
 				'card-title-link',
 				showMicroformats ? [MicroformatClassNames.Url, MicroformatClassNames.Name] : undefined,
 			]}
+			href={linkUrl}
 		>
 			<slot name="preview-title" />
 		</Anchor>

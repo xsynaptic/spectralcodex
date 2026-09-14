@@ -7,8 +7,8 @@ import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
 import { getMapCanvasData } from '#canvas/canvas-data-filter.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
-	useMapObjectiveFilter,
 	useMapEntryQualityFilter,
+	useMapObjectiveFilter,
 	useMapRatingFilter,
 	useMapScope,
 	useMapStatusFilter,

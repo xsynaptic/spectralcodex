@@ -16,7 +16,7 @@ const { href, isCurrent } = Astro.props;
 			<slot />
 		</span>
 	) : (
-		<Anchor href={href} anchorColor="highlight">
+		<Anchor anchorColor="highlight" href={href}>
 			<slot />
 		</Anchor>
 	)}

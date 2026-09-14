@@ -1,13 +1,13 @@
 import chalk from 'chalk';
 
 export interface DeployConfig {
+	imageServerUrl: string;
+	mediaPath: string;
 	remoteHost: string;
 	remotePath: string;
-	sshKeyPath?: string;
 	sitePath: string;
 	siteUrl: string;
-	mediaPath: string;
-	imageServerUrl: string;
+	sshKeyPath?: string;
 }
 
 const requiredEnvVars = [

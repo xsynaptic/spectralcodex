@@ -9,9 +9,9 @@ const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ---
 
 <progress-reading
+	aria-hidden="true"
 	class:list={['progress-bar', className]}
 	style={{ height, ...style }}
-	aria-hidden="true"
 	{...props}
 ></progress-reading>
 

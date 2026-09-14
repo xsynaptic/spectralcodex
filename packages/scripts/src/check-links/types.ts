@@ -10,12 +10,12 @@ export const UrlStatusEnum = {
 export type UrlStatus = (typeof UrlStatusEnum)[keyof typeof UrlStatusEnum];
 
 export interface UrlRow {
-	id: number;
-	url: string;
-	status: UrlStatus;
-	last_http_status: number | null;
-	redirect_url: string | null;
 	check_count: number;
 	created_at: string;
+	id: number;
+	last_http_status: null | number;
+	redirect_url: null | string;
+	status: UrlStatus;
 	updated_at: string;
+	url: string;
 }

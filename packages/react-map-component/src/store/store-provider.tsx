@@ -14,8 +14,8 @@ export const MapStoreProvider = ({
 	initialState,
 	children,
 }: {
-	initialState?: Partial<MapDataConfigurableState>;
 	children: ReactNode;
+	initialState?: Partial<MapDataConfigurableState>;
 }) => {
 	const [mapStore] = useState(() => createMapStore(initialState));
 

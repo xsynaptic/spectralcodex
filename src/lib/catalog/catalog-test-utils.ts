@@ -2,7 +2,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 // Shared CatalogItem factory for unit tests; pass only the fields a test cares about
 export function makeCatalogItem(
-	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'id' | 'collection'>,
+	overrides: Partial<CatalogItem> & Pick<CatalogItem, 'collection' | 'id'>,
 ): CatalogItem {
 	return {
 		title: overrides.id,

@@ -62,10 +62,10 @@ const generateFeedItem = async ({
 	shouldExcludeFootnotes,
 	debug,
 }: {
+	debug: boolean;
 	entry: CollectionEntry<'locations' | 'posts'>;
 	renderMdx: RenderMdx;
 	shouldExcludeFootnotes: boolean;
-	debug: boolean;
 }) => {
 	const startTime = performance.now();
 
@@ -106,9 +106,9 @@ export async function generateFeedItems({
 	shouldExcludeFootnotes,
 	debug,
 }: {
+	debug: boolean;
 	itemCount: number;
 	shouldExcludeFootnotes: boolean;
-	debug: boolean;
 }) {
 	const renderMdx = await createRenderMdxFunction();
 

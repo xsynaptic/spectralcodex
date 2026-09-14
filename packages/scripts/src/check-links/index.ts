@@ -101,7 +101,7 @@ async function syncLinks() {
 		getCollectionEntries(content, [...linkCollections]),
 	);
 
-	const extractedSources: Array<{ urlId: number; contentId: string }> = [];
+	const extractedSources: Array<{ contentId: string; urlId: number }> = [];
 	const extractedEntries = new Set<string>();
 	const allEntryDigests: Array<{ contentId: string; digest: string }> = [];
 	let skipped = 0;

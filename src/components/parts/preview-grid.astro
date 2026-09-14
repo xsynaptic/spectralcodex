@@ -41,9 +41,9 @@ function getRegions(item: CatalogItem) {
 	<Grid class:list={[className, showMicroformats ? MicroformatClassNames.Feed : undefined]}>
 		{items.map((item) => (
 			<PreviewCard
+				alt={item.title}
 				imageId={item.imageId}
 				linkUrl={item.url}
-				alt={item.title}
 				showMicroformats={showMicroformats}
 				titleAs={titleAs}
 			>

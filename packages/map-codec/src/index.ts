@@ -1,4 +1,3 @@
-export { MapDataKeysCompressed } from '#map-data-keys.ts';
 export {
 	encodeMapPopupData,
 	encodeMapSourceData,
@@ -6,8 +5,9 @@ export {
 	MapSourceItemSchema,
 } from '#codec.ts';
 export type {
-	MapPopupItemCompressed,
 	MapPopupItem,
-	MapSourceItemCompressed,
+	MapPopupItemCompressed,
 	MapSourceItem,
+	MapSourceItemCompressed,
 } from '#codec.ts';
+export { MapDataKeysCompressed } from '#map-data-keys.ts';

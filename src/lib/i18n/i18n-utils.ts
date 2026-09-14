@@ -22,8 +22,8 @@ export function getMapLanguages(langCode: string | undefined) {
 
 interface MultilingualContentOptions {
 	data: Record<string, unknown> | undefined;
-	prop: string;
 	langCode?: LanguageCode;
+	prop: string;
 }
 
 function getAllMultilingualContent({
@@ -59,11 +59,11 @@ export function getMultilingualContent({
 	langCodeAdditional,
 	...options
 }: MultilingualContentOptions & { langCodeAdditional?: LanguageCode }):
+	| undefined
 	| {
-			primary: MultilingualContent;
 			additional?: MultilingualContent;
-	  }
-	| undefined {
+			primary: MultilingualContent;
+	  } {
 	const multilingualContent = getAllMultilingualContent(options);
 
 	if (!multilingualContent) return;

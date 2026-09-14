@@ -20,22 +20,22 @@ const t = getTranslations();
 <div class="meta-overlay" data-pagefind-ignore {...props}>
 	<details class="meta-details">
 		<summary
-			class="meta-show"
 			aria-label={
 				entry.data.title
 					? formatStringTemplate(t('collection.images.metadata.label'), { title: entry.data.title })
 					: t('collection.images.metadata.title')
 			}
+			class="meta-show"
 			data-umami-event="image-metadata-open"
 			data-umami-event-image={entry.id}
 		>
 			<span class="meta-show-icon">
-				<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
+				<svg aria-hidden="true" class="meta-svg" height="24" viewBox="0 0 24 24" width="24">
 					<use href="#icon:eye-open"></use>
 				</svg>
 			</span>
 			<span class="meta-close-icon">
-				<svg width="24" height="24" viewBox="0 0 24 24" class="meta-svg" aria-hidden="true">
+				<svg aria-hidden="true" class="meta-svg" height="24" viewBox="0 0 24 24" width="24">
 					<use href="#icon:eye-closed"></use>
 				</svg>
 			</span>

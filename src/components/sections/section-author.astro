@@ -21,23 +21,23 @@ const t = getTranslations();
 ---
 
 <ContentSection
-	sectionTitle={t('section.author')}
 	class:list={[
 		showAuthor ? undefined : 'sr-only',
 		MicroformatClassNames.Card,
 		MicroformatClassNames.Author,
 		className,
 	]}
-	data-pagefind-ignore
 	data-nosnippet
+	data-pagefind-ignore
+	sectionTitle={t('section.author')}
 	{...(showAuthor ? {} : { inert: true })}
 	{...props}
 >
 	<div class="flex items-start gap-4">
 		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
 			<AuthorPhoto
-				sizes="auto, (max-width: 640px) 150px, 150px"
 				operations={{ fit: ImageFitOptionEnum.Cover }}
+				sizes="auto, (max-width: 640px) 150px, 150px"
 			/>
 			<AuthorCard />
 		</CardFrame>

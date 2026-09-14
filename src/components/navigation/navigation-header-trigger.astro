@@ -9,8 +9,8 @@ import {
 import Anchor from '#components/parts/anchor.astro';
 
 interface Props {
-	item: NavigationItem;
 	hasChildren: boolean;
+	item: NavigationItem;
 }
 
 const { item, hasChildren } = Astro.props;
@@ -26,9 +26,9 @@ const triggerClasses = [
 <div class="nav-item-trigger">
 	{triggerType === 'anchor' ? (
 		<Anchor
+			anchorColor="accent"
 			class:list={triggerClasses}
 			href={item.url}
-			anchorColor="accent"
 			{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
 			{...(item.rel ? { rel: item.rel } : undefined)}
 		>
@@ -37,14 +37,14 @@ const triggerClasses = [
 	) : undefined}
 	{triggerType === 'button' ? (
 		<button
-			type="button"
 			class:list={['anchor-base anchor-accent', ...triggerClasses]}
 			set:html={item.title}
+			type="button"
 		/>
 	) : undefined}
 	{triggerType === 'span' ? <span class:list={triggerClasses} set:html={item.title} /> : undefined}
 	{hasChildren ? (
-		<svg width="24" height="24" viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+		<svg aria-hidden="true" class="nav-icon" height="24" viewBox="0 0 24 24" width="24">
 			<use href="#icon:chevron-down" />
 		</svg>
 	) : undefined}

@@ -5,12 +5,12 @@ import PreviewList from '#components/parts/preview-list.astro';
 import Prose from '#components/parts/prose.astro';
 
 interface Props {
-	title: string;
-	items: Array<CatalogItem>;
-	count?: number | undefined;
-	showItemCount?: boolean | undefined;
-	url?: string | undefined;
 	class?: string | undefined;
+	count?: number | undefined;
+	items: Array<CatalogItem>;
+	showItemCount?: boolean | undefined;
+	title: string;
+	url?: string | undefined;
 }
 
 const { title, items, count, showItemCount = false, url, class: className, ...props } = Astro.props;
@@ -25,6 +25,6 @@ const itemCountLabel =
 			{title}
 			{itemCountLabel}
 		</span>
-		: <PreviewList items={items} count={count} url={url} />
+		: <PreviewList count={count} items={items} url={url} />
 	</Prose>
 ) : undefined}

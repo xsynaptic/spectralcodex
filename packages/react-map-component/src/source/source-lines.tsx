@@ -65,7 +65,7 @@ export const MapSourceLines: FC<{
 	const linesStyle = useMapSourceLinesStyle();
 
 	return (
-		<Source id={MapSourceIdEnum.LineStringCollection} type="geojson" data={data} generateId={true}>
+		<Source data={data} generateId={true} id={MapSourceIdEnum.LineStringCollection} type="geojson">
 			<Layer key={MapLayerIdEnum.LineString} {...linesStyle[MapLayerIdEnum.LineString]} />
 		</Source>
 	);

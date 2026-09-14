@@ -3,9 +3,9 @@ import { getDayKey } from '#lib/utils/date.ts';
 
 interface ActivityGraphDay {
 	date: Date;
-	value: number;
-	level: number;
 	future: boolean;
+	level: number;
+	value: number;
 }
 
 interface ActivityGraphMonthLabel {
@@ -21,11 +21,11 @@ export interface ActivityGraphData {
 }
 
 interface BuildActivityGraphOptions {
-	year: string;
-	// Day key ('YYYY-MM-DD') to event count for the year
-	values: Record<string, number>;
 	// Days after this instant have no history yet; usually the build date
 	referenceDate: Date;
+	// Day key ('YYYY-MM-DD') to event count for the year
+	values: Record<string, number>;
+	year: string;
 }
 
 // Intensity bin 0-4 for one day; 0 = no events, 4 = the year's busiest day

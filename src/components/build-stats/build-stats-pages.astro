@@ -6,8 +6,8 @@ import { pagesFrame } from '#lib/build-stats/build-stats-geometry.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
-	geometry: PagesGeometry;
 	axisTicks: Array<AxisTick>;
+	geometry: PagesGeometry;
 }
 
 const { geometry, axisTicks } = Astro.props;
@@ -18,14 +18,14 @@ const tooltipRows = [{ label: t('buildStats.tooltip.pages'), series: 'pages' }];
 ---
 
 <BuildStatsChart
-	series="pages"
-	label={t('buildStats.chart.pages.label')}
 	ariaLabel={t('buildStats.chart.pages.aria')}
-	frame={pagesFrame}
 	axisTicks={axisTicks}
-	valueTicks={geometry.ticks}
-	tooltipRows={tooltipRows}
+	frame={pagesFrame}
+	label={t('buildStats.chart.pages.label')}
 	points={geometry.points}
+	series="pages"
+	tooltipRows={tooltipRows}
+	valueTicks={geometry.ticks}
 >
 	<path class="stats-area stats-series-pages" d={geometry.areaPath}></path>
 	<path class="stats-line stats-series-pages" d={geometry.linePath}></path>

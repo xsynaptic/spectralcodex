@@ -100,7 +100,7 @@ export const MapSourceDivisions: FC<{ data: FeatureCollection }> = memo(
 		const divisionStyle = useMapSourceDivisionStyle();
 
 		return (
-			<Source id={MapSourceIdEnum.DivisionCollection} type="geojson" data={data} generateId={true}>
+			<Source data={data} generateId={true} id={MapSourceIdEnum.DivisionCollection} type="geojson">
 				<Layer key={MapLayerIdEnum.DivisionMask} {...divisionStyle[MapLayerIdEnum.DivisionMask]} />
 				<Layer key={MapLayerIdEnum.DivisionHalo} {...divisionStyle[MapLayerIdEnum.DivisionHalo]} />
 				<Layer

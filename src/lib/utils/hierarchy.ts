@@ -10,26 +10,26 @@ export interface HierarchyNode {
 }
 
 export interface Hierarchy {
-	roots: ReadonlyArray<string>;
-	has(id: string): boolean;
-	parentOf(id: string): string | undefined;
-	// Direct children, id-sorted, [] if none
-	childrenOf(id: string): ReadonlyArray<string>;
-	// Same-parent minus self, id-sorted
-	siblingsOf(id: string): ReadonlyArray<string>;
 	// Nearest-first, self-exclusive; last element is the root
 	ancestorsOf(id: string): ReadonlyArray<string>;
-	// Preorder, self-exclusive
-	descendantsOf(id: string): ReadonlyArray<string>;
-	// Interval containment; self-inclusive (a node is within its own interval)
-	isDescendantOf(id: string, ancestorId: string): boolean;
+	// Direct children, id-sorted, [] if none
+	childrenOf(id: string): ReadonlyArray<string>;
 	// Deepest node whose subtree spans every id (self-inclusive); undefined if they share no root
 	commonAncestorOf(ids: Array<string>): string | undefined;
 	depthOf(id: string): number;
-	// Preorder ordinal per node; region membership on a map reads this
-	ordinalById: ReadonlyMap<string, number>;
+	// Preorder, self-exclusive
+	descendantsOf(id: string): ReadonlyArray<string>;
+	has(id: string): boolean;
 	// Containment interval per node; a region map filters with its own interval
 	intervalById: ReadonlyMap<string, [number, number]>;
+	// Interval containment; self-inclusive (a node is within its own interval)
+	isDescendantOf(id: string, ancestorId: string): boolean;
+	// Preorder ordinal per node; region membership on a map reads this
+	ordinalById: ReadonlyMap<string, number>;
+	parentOf(id: string): string | undefined;
+	roots: ReadonlyArray<string>;
+	// Same-parent minus self, id-sorted
+	siblingsOf(id: string): ReadonlyArray<string>;
 }
 
 const byId = (idA: string, idB: string): number => idA.localeCompare(idB);

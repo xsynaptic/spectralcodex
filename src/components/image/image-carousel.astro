@@ -6,8 +6,8 @@ import ImageCarouselNavigation from '#components/image/image-carousel-navigation
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
-	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 	class?: string | undefined;
+	imageFeaturedGroup?: Array<ImageFeaturedWithCaption> | undefined;
 }
 
 const { imageFeaturedGroup, class: className } = Astro.props;
@@ -17,16 +17,16 @@ const t = getTranslations();
 
 {imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
 	<image-carousel
+		aria-label={t('collection.images.labelPlural')}
+		aria-roledescription={t('carousel.roledescription')}
 		class:list={[
 			'carousel-group',
 			'relative block max-w-content overflow-hidden sm:rounded-xs',
 			className,
 		]}
-		role="group"
-		aria-roledescription={t('carousel.roledescription')}
-		aria-label={t('collection.images.labelPlural')}
 		data-slide-label={t('carousel.slide.label')}
 		data-slide-roledescription={t('carousel.slide.roledescription')}
+		role="group"
 	>
 		<div class="carousel-container">
 			{imageFeaturedGroup.map((imageFeaturedGroupItem) => (

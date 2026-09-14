@@ -37,13 +37,13 @@ export function findAstroRoot(startDir = process.cwd()) {
 
 // The subset of an entry that consumers read; every `CollectionEntry` satisfies it
 export interface ContentEntry {
-	id: string;
+	body?: string | undefined;
 	collection: string;
 	data: Record<string, unknown>;
-	body?: string | undefined;
-	filePath?: string | undefined;
 	// Astro widens this to `string | number`; file-based collections only ever write a string
-	digest?: string | number | undefined;
+	digest?: number | string | undefined;
+	filePath?: string | undefined;
+	id: string;
 }
 
 export async function withAstroContent<T>(callback: (content: AstroContent) => Promise<T>) {

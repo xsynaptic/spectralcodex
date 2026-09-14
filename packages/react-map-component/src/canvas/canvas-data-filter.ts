@@ -6,16 +6,16 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import type { MapGeometry, MapScope, MapSourceFeatureCollection } from '#types.ts';
 
 export interface MapFilterState {
-	status: ReadonlyArray<LocationStatus>;
 	entryQuality: number;
-	rating: number;
 	objective: number;
+	rating: number;
+	status: ReadonlyArray<LocationStatus>;
 }
 
 export interface MapCanvasData {
-	pointCollection: MapSourceFeatureCollection | undefined;
-	lineStringCollection: MapSourceFeatureCollection | undefined;
 	filteredCount: number;
+	lineStringCollection: MapSourceFeatureCollection | undefined;
+	pointCollection: MapSourceFeatureCollection | undefined;
 	totalCount: number;
 }
 

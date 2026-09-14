@@ -7,8 +7,8 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
 
 interface DeployInfraOptions {
-	rootPath: string;
 	dryRun?: boolean;
+	rootPath: string;
 }
 
 function requireEnv(name: string): string {
@@ -53,10 +53,10 @@ function buildServerEnv(config: DeployConfig): string {
 }
 
 interface InfraSyncTarget {
-	source: string;
 	destination?: string;
-	extraFlags?: Array<string>;
 	excludes?: Array<string>;
+	extraFlags?: Array<string>;
+	source: string;
 }
 
 const infraSyncTargets: Array<InfraSyncTarget> = [

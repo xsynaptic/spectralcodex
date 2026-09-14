@@ -40,8 +40,8 @@ export const MapSource: FC<
 			<MapSourceLines data={lineStringCollection ?? emptyFeatureCollection} />
 			<MapSourcePoints
 				data={pointCollection ?? emptyFeatureCollection}
-				interactive={isInteractive}
 				hasMapIcons={hasMapIcons}
+				interactive={isInteractive}
 				targetIds={targetIds}
 			/>
 			{isDebug && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}

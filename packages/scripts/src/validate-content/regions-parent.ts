@@ -3,8 +3,8 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 type RegionParentIssue =
-	| { location: string; reason: 'cycle'; chain: Array<string> }
-	| { location: string; reason: 'not-found'; parent: string }
+	| { chain: Array<string>; location: string; reason: 'cycle' }
+	| { location: string; parent: string; reason: 'not-found' }
 	| { location: string; reason: 'self' };
 
 function formatIssue(issue: RegionParentIssue) {

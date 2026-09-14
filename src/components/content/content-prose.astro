@@ -23,7 +23,7 @@ const description = Content ? undefined : entry.data.description;
 ---
 
 {Content ? (
-	<Prose showBlocks={true} class:list={['pb-8', className]} data-pagefind-weight="2" {...props}>
+	<Prose class:list={['pb-8', className]} data-pagefind-weight="2" showBlocks={true} {...props}>
 		<Content />
 	</Prose>
 ) : undefined}

@@ -6,11 +6,11 @@ import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 import ContentImage from '#components/content/content-image.astro';
 
 interface Props extends HTMLAttributes<'figure'> {
-	src: string;
 	alt?: string;
-	layout?: ImageLayout;
 	context?: ImageContext;
+	layout?: ImageLayout;
 	showMetadata?: boolean;
+	src: string;
 }
 
 const { src: imageId, showMetadata = true, ...props } = Astro.props;

@@ -33,13 +33,13 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 	{titleMultilingual ? (
 		<TextWash
 			as="div"
-			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 			class:list={[
 				'title-ml -ml-0.5 pb-1 text-base leading-snug font-medium',
 				hasHeroImage
 					? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
 					: 'text-lg md:text-xl lg:text-2xl',
 			]}
+			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 			{...(titleMultilingualText
 				? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
 				: undefined)}
@@ -54,13 +54,13 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 	>
 		<TextWash
 			as="h1"
-			washColor={hasHeroImage ? 'primary-featured' : 'primary'}
 			class:list={[
 				'-ml-0.5 pb-2 font-display text-2xl leading-[1.125] font-semibold',
 				hasHeroImage
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
 			]}
+			washColor={hasHeroImage ? 'primary-featured' : 'primary'}
 		>
 			{title ? <Fragment set:html={title} /> : undefined}
 		</TextWash>

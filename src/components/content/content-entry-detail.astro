@@ -17,11 +17,11 @@ import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
-	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
-	page: Page;
 	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
-	prefetchUrls: Array<string> | undefined;
+	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
 	hideSearch?: boolean | undefined;
+	page: Page;
+	prefetchUrls: Array<string> | undefined;
 }
 
 const { entry, page, breadcrumbRegions, prefetchUrls, hideSearch } = Astro.props;
@@ -41,6 +41,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
 	meta={{
 		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
@@ -59,10 +60,9 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			regions: breadcrumbRegions,
 		}),
 	]}
-	hasHeroImage={hasHeroImage}
 >
-	<ContentArticle imageId={imageFeaturedId} hideSearch={!!hideSearch || page.currentPage !== 1}>
-		<ImageHero class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup} alt={entry.data.title}>
+	<ContentArticle hideSearch={!!hideSearch || page.currentPage !== 1} imageId={imageFeaturedId}>
+		<ImageHero alt={entry.data.title} class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">

@@ -18,6 +18,6 @@ const heritage = getLocationHeritage(entry);
 const t = getTranslations();
 ---
 
-<ContentSection sectionTitle={t('section.heritage')} data-pagefind-ignore data-nosnippet {...props}>
+<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.heritage')} {...props}>
 	<LocationsHeritageList heritage={heritage} />
 </ContentSection>

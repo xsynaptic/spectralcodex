@@ -44,7 +44,7 @@ function getClickInput(feature: MapClickFeature | undefined): MapClickInput {
 
 function getHoverInput(
 	feature: MapGeoJSONFeature | undefined,
-	hoveredFeatureId: string | number | undefined,
+	hoveredFeatureId: number | string | undefined,
 	storeHoveredId: string | undefined,
 ): MapHoverInput {
 	return {
@@ -59,7 +59,7 @@ function getHoverInput(
 
 async function expandCluster(
 	mapInstance: MapClickEvent['target'],
-	clusterId: string | number,
+	clusterId: number | string,
 	center: [number, number],
 ) {
 	const featureSource = mapInstance.getSource(MapSourceIdEnum.PointCollection);
@@ -162,7 +162,7 @@ function useThrottledMouseMoveHandler() {
 	const { setHoveredId } = useMapStoreActions();
 
 	// Kept in a ref, not the store, so hover updates never trigger a React render
-	const hoveredFeatureIdRef = useRef<string | number | undefined>(undefined);
+	const hoveredFeatureIdRef = useRef<number | string | undefined>(undefined);
 
 	const onMouseMove = useCallback(
 		(event: MapLayerMouseEvent | undefined) => {

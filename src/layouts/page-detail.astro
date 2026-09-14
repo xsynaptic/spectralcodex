@@ -49,6 +49,7 @@ const { Content } = await render(entry);
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
 	meta={{
 		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		description: await getDescriptionRenderedText(entry),
@@ -59,23 +60,22 @@ const { Content } = await render(entry);
 		...getSeoHideSearch(entry.data.hideSearch),
 	}}
 	schemas={schemas}
-	hasHeroImage={hasHeroImage}
 >
 	<ContentArticle
 		class={MicroformatClassNames.Entry}
-		imageId={imageFeaturedId}
 		hideSearch={entry.data.hideSearch}
+		imageId={imageFeaturedId}
 	>
 		<ContentEntryHeader
+			imageFeaturedGroup={imageFeaturedHeroGroup}
 			title={entry.data.title}
 			titleMultilingual={titleMultilingual}
-			imageFeaturedGroup={imageFeaturedHeroGroup}
 		>
 			<Fragment slot="header-subtitle">
 				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
 			</Fragment>
 		</ContentEntryHeader>
-		<Prose class:list={['e-content', 'pb-4']} showBlocks={true} data-reading-frame>
+		<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
 			<Content />
 		</Prose>
 		<SectionAuthor showAuthor={false} />

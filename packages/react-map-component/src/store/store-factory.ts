@@ -8,54 +8,54 @@ import type { MapScope } from '#types.ts';
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 
 interface MapDataState {
-	selectedId: string | undefined;
+	entryQualityFilter: number;
+	filterPosition: DOMCoordinates | undefined;
 	hoveredId: string | undefined;
-	isPopupVisible: boolean;
 	isCanvasInteractive: boolean;
 	isCanvasLoading: boolean;
-	filterPosition: DOMCoordinates | undefined;
 	isFilterOpen: boolean;
-	statusFilter: Array<LocationStatus>;
-	entryQualityFilter: number;
-	ratingFilter: number;
-	objectiveFilter: number;
 	isObjectiveFilterEnabled: boolean;
+	isPopupVisible: boolean;
 	languages: Array<string>;
+	objectiveFilter: number;
+	ratingFilter: number;
 	scope: MapScope | undefined;
+	selectedId: string | undefined;
+	statusFilter: Array<LocationStatus>;
 }
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
-	| 'selectedId'
+	| 'entryQualityFilter'
 	| 'hoveredId'
 	| 'isCanvasInteractive'
 	| 'isFilterOpen'
-	| 'statusFilter'
-	| 'entryQualityFilter'
-	| 'ratingFilter'
-	| 'objectiveFilter'
 	| 'isObjectiveFilterEnabled'
 	| 'languages'
+	| 'objectiveFilter'
+	| 'ratingFilter'
 	| 'scope'
+	| 'selectedId'
+	| 'statusFilter'
 >;
 
 export interface MapDataStore extends MapDataState {
 	actions: {
-		setSelectedId: (selectedId: string | undefined) => void;
-		setPopupVisible: (isPopupVisible: boolean) => void;
-		setHoveredId: (hoveredId: string | undefined) => void;
+		hideAllStatusFilter: () => void;
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
-		setFilterPosition: (filterPosition: DOMCoordinates) => void;
-		setFilterOpen: (isFilterOpen: boolean) => void;
-		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
-		toggleStatusFilter: (status: LocationStatus) => void;
-		showAllStatusFilter: () => void;
-		hideAllStatusFilter: () => void;
 		setEntryQualityFilter: (entryQualityFilter: number) => void;
-		setRatingFilter: (ratingFilter: number) => void;
-		setObjectiveFilter: (objectiveFilter: number) => void;
+		setFilterOpen: (isFilterOpen: boolean) => void;
+		setFilterPosition: (filterPosition: DOMCoordinates) => void;
+		setHoveredId: (hoveredId: string | undefined) => void;
 		setLanguages: (languages: Array<string>) => void;
+		setObjectiveFilter: (objectiveFilter: number) => void;
+		setPopupVisible: (isPopupVisible: boolean) => void;
+		setRatingFilter: (ratingFilter: number) => void;
+		setSelectedId: (selectedId: string | undefined) => void;
+		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
+		showAllStatusFilter: () => void;
+		toggleStatusFilter: (status: LocationStatus) => void;
 	};
 }
 

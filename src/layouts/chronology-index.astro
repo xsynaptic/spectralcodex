@@ -52,25 +52,25 @@ const title = t('chronology.index.title');
 				<div class="content-column-fill mb-8">
 					<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 						<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-							<Anchor href={getSitePath('chronology', year)} anchorColor="primary">
+							<Anchor anchorColor="primary" href={getSitePath('chronology', year)}>
 								{year}
 							</Anchor>
 						</h2>
 						<div class="flex flex-col gap-2">
 							<ChronologyItem
-								title={t('chronology.updated.label')}
-								items={monthlyData.updated}
 								count={monthlyData.updatedCount}
+								items={monthlyData.updated}
+								title={t('chronology.updated.label')}
 							/>
 							<ChronologyItem
-								title={t('chronology.created.label')}
-								items={monthlyData.created}
 								count={monthlyData.createdCount}
+								items={monthlyData.created}
+								title={t('chronology.created.label')}
 							/>
 							<ChronologyItem
-								title={t('chronology.visited.label')}
-								items={monthlyData.visited}
 								count={monthlyData.visitedCount}
+								items={monthlyData.visited}
+								title={t('chronology.visited.label')}
 							/>
 						</div>
 					</div>

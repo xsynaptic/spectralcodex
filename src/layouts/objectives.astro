@@ -21,7 +21,7 @@ const description = 'Points in the database that still require visitation and do
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>
 	<ContentSection>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(description)} />
+		<Fragment set:html={renderMarkdownInline(description)} slot="section-description" />
 	</ContentSection>
 	<SectionMap mapData={mapData} />
 </MainSite>

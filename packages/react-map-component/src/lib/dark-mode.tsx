@@ -5,8 +5,8 @@ import { createContext, useCallback, useContext, useSyncExternalStore } from 're
 // Serializable dark-mode adapter; a function couldn't survive Astro island-prop serialization
 export interface MapDarkModeOptions {
 	attributeName?: string | undefined;
-	eventName?: string | undefined;
 	darkValue?: string | undefined;
+	eventName?: string | undefined;
 }
 
 const defaultAttributeName = 'data-mode';

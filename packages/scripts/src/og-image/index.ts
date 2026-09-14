@@ -67,10 +67,10 @@ async function getImageModifiedTime(imageId: string): Promise<number | undefined
 }
 
 function logSummary(counts: {
-	generated: number;
-	skipped: number;
-	pruned: number;
 	errors: number;
+	generated: number;
+	pruned: number;
+	skipped: number;
 }) {
 	console.log(chalk.magenta(`\n=== Summary ===`));
 	console.log(chalk.green(`Generated: ${String(counts.generated)} images`));

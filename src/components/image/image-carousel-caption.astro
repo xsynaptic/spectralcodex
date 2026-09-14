@@ -64,8 +64,8 @@ const TitleElement = url ? Anchor : 'span';
 			</TitleElement>
 			{titleMultilingual ? (
 				<TextMultilingual
-					content={titleMultilingual}
 					class:list={[withTitle ? 'block shrink-0 sm:hidden md:block' : undefined]}
+					content={titleMultilingual}
 					parenthesis={true}
 				/>
 			) : undefined}

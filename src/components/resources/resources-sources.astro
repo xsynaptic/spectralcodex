@@ -7,8 +7,8 @@ import ListColumn from '#components/parts/list-column.astro';
 import { buildSourceCitations } from '#lib/collections/resources/resources-citation.ts';
 
 interface Props {
-	sources: Array<ResourceSource>;
 	class?: string | undefined;
+	sources: Array<ResourceSource>;
 }
 
 const { class: className, sources } = Astro.props;
@@ -21,9 +21,9 @@ const { class: className, sources } = Astro.props;
 
 			return (
 				<ListColumnItem class="flex flex-col items-start gap-1 font-serif">
-					{primary ? <CitationLine citation={primary} url={url} titleClass="italic" /> : undefined}
+					{primary ? <CitationLine citation={primary} titleClass="italic" url={url} /> : undefined}
 					{multilingual ? (
-						<CitationLine citation={multilingual} url={url} lang={multilingual.lang} />
+						<CitationLine citation={multilingual} lang={multilingual.lang} url={url} />
 					) : undefined}
 				</ListColumnItem>
 			);

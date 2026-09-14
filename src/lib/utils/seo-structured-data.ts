@@ -20,49 +20,49 @@ interface IdReference {
 
 interface Article extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['Article'];
-	headline: string;
-	description?: string;
-	image?: string;
-	datePublished: string;
-	dateModified?: string;
 	author: IdReference;
+	dateModified?: string;
+	datePublished: string;
+	description?: string;
+	headline: string;
+	image?: string;
 }
 
 interface BreadcrumbList extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['BreadcrumbList'];
 	itemListElement: Array<{
 		'@type': 'ListItem';
-		position: number;
-		name: string;
 		item?: string;
+		name: string;
+		position: number;
 	}>;
 }
 
 interface Person extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['Person'];
 	name: string;
-	url: string;
 	sameAs?: ReadonlyArray<string>;
+	url: string;
 }
 
 interface Place extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['Place'];
-	name: string;
 	description?: string;
-	url: string;
 	geo?: {
 		'@type': (typeof SchemaTypeEnum)['GeoCoordinates'];
 		latitude: number;
 		longitude: number;
 	};
+	name: string;
+	url: string;
 }
 
 interface WebSite extends IdReference {
 	'@type': (typeof SchemaTypeEnum)['WebSite'];
-	url: string;
+	description: string;
 	name: string;
 	publisher: IdReference;
-	description: string;
+	url: string;
 }
 
 export type Thing = Article | BreadcrumbList | Person | Place | WebSite;
@@ -111,12 +111,12 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 }
 
 export function buildArticleSchema(props: {
-	title: string;
-	description: string | undefined;
 	dateCreated: Date;
 	dateUpdated: Date | undefined;
-	url: string;
+	description: string | undefined;
 	imageUrl: string | undefined;
+	title: string;
+	url: string;
 }): Article {
 	return {
 		'@type': SchemaTypeEnum.Article,
@@ -149,9 +149,9 @@ function buildBreadcrumbSchema(
 // `regions` must be ordered root first; breadcrumb positions follow array order
 export function buildEntryBreadcrumbSchema(props: {
 	collection: 'locations' | 'regions' | 'resources' | 'series' | 'themes';
+	regions?: ReadonlyArray<CollectionEntry<'regions'>> | undefined;
 	title: string;
 	url: string;
-	regions?: ReadonlyArray<CollectionEntry<'regions'>> | undefined;
 }): BreadcrumbList {
 	const t = getTranslations();
 
@@ -170,10 +170,10 @@ export function buildEntryBreadcrumbSchema(props: {
 }
 
 export function buildPlaceSchema(props: {
-	title: string;
-	description: string | undefined;
-	url: string;
 	coordinates: [number, number] | undefined;
+	description: string | undefined;
+	title: string;
+	url: string;
 }): Place {
 	return {
 		'@type': SchemaTypeEnum.Place,

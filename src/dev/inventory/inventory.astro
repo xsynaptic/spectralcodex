@@ -76,27 +76,27 @@ import {
 	getSampleLocations,
 	getSampleNearbyLocations,
 	getSampleOpenGraphCards,
-	getSampleRelatedRegion,
 	getSampleRegions,
+	getSampleRelatedRegion,
 	getSampleResources,
 	getSampleThemes,
 	sampleChronologyMonths,
 	sampleChronologyYears,
-	sampleLinkInline,
-	samplePlaces,
 	sampleCitation,
-	sampleHeritage,
 	sampleCitationMultilingual,
 	sampleDate,
 	sampleDateEnd,
 	sampleDatesRecorded,
 	sampleDateUpdated,
+	sampleHeritage,
+	sampleLinkInline,
+	samplePlaces,
+	sampleSourceInline,
 	sampleTitleChinese,
 	sampleTitleChineseSimplified,
 	sampleTitleJapanese,
 	sampleTitleKorean,
 	sampleTitleThai,
-	sampleSourceInline,
 	sampleTitleVietnamese,
 	sampleUrl,
 	sampleWebmentionCounts,
@@ -584,8 +584,8 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					</div>
 					<div>
 						<TextMultilingual
-							content={sampleTitleChinese}
 							additional={[sampleTitleChineseSimplified, sampleTitleJapanese]}
+							content={sampleTitleChinese}
 						/>
 					</div>
 					<div class="flex flex-wrap gap-x-6 gap-y-1">
@@ -974,8 +974,8 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<PreviewGrid
 						items={sampleItems}
 						showCollection={true}
-						showDescription={true}
 						showDate={true}
+						showDescription={true}
 						showLocations={true}
 						showRegion={true}
 						showTitleMultilingual={true}

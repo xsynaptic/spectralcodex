@@ -35,11 +35,11 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 	<pagination-select class="block" data-nosnippet data-pagefind-ignore>
 		<nav
 			aria-label={label}
-			hidden={isEmptyWithoutScript}
 			class:list={[
 				'flex flex-wrap items-center justify-between gap-4 text-base font-medium tabular-nums select-none md:text-sm',
 				className,
 			]}
+			hidden={isEmptyWithoutScript}
 			{...props}
 		>
 			<div class="flex items-center">
@@ -48,35 +48,35 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 						{counter}
 					</span>
 				) : undefined}
-				<form class="flex items-center gap-2" hidden={true} data-pagination-form>
+				<form class="flex items-center gap-2" data-pagination-form hidden={true}>
 					<span class="relative inline-flex items-center">
 						<select
-							class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
 							aria-label={selectLabel}
 							autocomplete="off"
-							name="page"
+							class="pagination-control overflow-hidden rounded-sm border border-primary-300 bg-transparent py-2 pr-6 pl-2 text-ellipsis whitespace-nowrap tabular-nums transition-colors ease-linear hover:border-primary-400 focus-visible:border-primary-400 md:py-1 dark:border-primary-600 dark:bg-primary-900 dark:hover:border-primary-500 dark:focus-visible:border-primary-500"
 							data-pagination-control
+							name="page"
 						>
 							{hasCurrent ? undefined : (
-								<option value="" selected={true} disabled={true} hidden={true}>
+								<option disabled={true} hidden={true} selected={true} value="">
 									{placeholder ?? selectLabel}
 								</option>
 							)}
 							{options.map((option) => (
 								<option
-									value={option.url}
-									selected={option.isCurrent}
 									data-current={option.isCurrent ? '' : undefined}
+									selected={option.isCurrent}
+									value={option.url}
 								>
 									{option.label}
 								</option>
 							))}
 						</select>
 						<span
-							class="pagination-arrow pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
 							aria-hidden="true"
+							class="pagination-arrow pointer-events-none absolute flex items-center text-accent-400 dark:text-accent-400"
 						>
-							<svg height="16" width="16" viewBox="0 0 24 24">
+							<svg height="16" viewBox="0 0 24 24" width="16">
 								<use href="#icon:chevron-down" />
 							</svg>
 						</span>
@@ -86,8 +86,8 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 					) : undefined}
 					<button
 						class="pagination-button cursor-pointer rounded px-2 py-2 font-medium text-accent-500 hover:text-accent-300 focus-visible:text-accent-300 md:py-1 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
-						type="submit"
 						data-pagination-submit
+						type="submit"
 					>
 						{submitLabel}
 					</button>

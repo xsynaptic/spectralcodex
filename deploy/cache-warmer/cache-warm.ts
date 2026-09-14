@@ -3,15 +3,15 @@
 import { readFileSync, renameSync, writeFileSync } from 'node:fs';
 
 interface WarmResult {
-	url: string;
-	status: number;
-	ms: number;
 	error?: string;
+	ms: number;
+	status: number;
+	url: string;
 }
 
 interface PurgeResult {
-	success: boolean;
 	errors?: Array<{ message: string }>;
+	success: boolean;
 }
 
 const shouldSkipPurge = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
@@ -152,8 +152,8 @@ async function getSitemapUrls(): Promise<Array<string>> {
 }
 
 interface MapUrlsResult {
-	urls: Array<string>;
 	skipReason?: string;
+	urls: Array<string>;
 }
 
 // A skipped manifest silently unwarms /api/map/*, so the reason must reach the run report
@@ -205,9 +205,9 @@ async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
 }
 
 interface Stats {
-	total: number;
 	counts: Map<string, number>;
 	failures: Array<WarmResult>;
+	total: number;
 }
 
 function record(stats: Stats, result: WarmResult): void {
@@ -260,7 +260,7 @@ function report(label: string, stats: Stats): void {
 	if (stats.failures.length > 0) console.log(stats.failures.map(failureLine).join('\n'));
 }
 
-function getWarmedImages(): { seen: Set<string>; note?: string } {
+function getWarmedImages(): { note?: string; seen: Set<string> } {
 	if (shouldWarmAll) {
 		return {
 			seen: new Set(),
@@ -288,10 +288,10 @@ function saveWarmedImages(urls: Set<string>): void {
 }
 
 interface PersistWarmedImagesOptions {
+	failures: Array<WarmResult>;
 	referenced: ReadonlySet<string>;
 	seen: ReadonlySet<string>;
 	warmed: Array<string>;
-	failures: Array<WarmResult>;
 }
 
 function persistWarmedImages({
@@ -327,7 +327,7 @@ interface JmapSession {
 type JmapInvocation = [name: string, args: unknown, callId: string];
 
 interface JmapIdentityList {
-	list: Array<{ id: string; email: string }>;
+	list: Array<{ email: string; id: string }>;
 }
 
 interface JmapMailboxQuery {
@@ -433,12 +433,12 @@ async function sendAlert(subject: string, text: string): Promise<void> {
 }
 
 interface RunReport {
-	phases: Array<[string, Stats]>;
 	failures: Array<WarmResult>;
 	notes: Array<string>;
+	phases: Array<[string, Stats]>;
 	retriedCount: number;
-	totalUrls: number;
 	seconds: string;
+	totalUrls: number;
 }
 
 // Notes (like a skipped map manifest) force the digest even on a clean run
@@ -494,8 +494,8 @@ async function sendRunReport(run: RunReport): Promise<void> {
 }
 
 interface WarmRun {
-	phases: Array<[string, Stats]>;
 	notes: Array<string>;
+	phases: Array<[string, Stats]>;
 	warmPhase: (label: string, urls: Iterable<string>, options?: WarmAllOptions) => Promise<Stats>;
 }
 

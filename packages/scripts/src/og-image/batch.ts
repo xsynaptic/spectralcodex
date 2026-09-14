@@ -1,9 +1,9 @@
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 
 export interface ImageBatch {
+	entries: Array<OpenGraphContentEntry>;
 	imageId: string;
 	isFallback: boolean;
-	entries: Array<OpenGraphContentEntry>;
 }
 
 // One decode serves every entry sharing a source image; the fallback blur makes a separate draw

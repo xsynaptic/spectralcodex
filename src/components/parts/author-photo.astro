@@ -31,11 +31,11 @@ const imageEntry = getImageById(imageSrc);
 		placeholderProps={{ imageId: imageSrc, aspectRatio: 1 }}
 	>
 		<Image
-			class:list={['aspect-square', MicroformatClassNames.Photo]}
-			src={imageSrc}
-			breakpoints={getImageBreakpoints({ maxWidth: ImageSizeEnum.Large })}
-			sizes={sizes}
 			alt={sanitizeImageAltAttribute(t('author.photo.alt'))}
+			breakpoints={getImageBreakpoints({ maxWidth: ImageSizeEnum.Large })}
+			class:list={['aspect-square', MicroformatClassNames.Photo]}
+			sizes={sizes}
+			src={imageSrc}
 			unstyled={true}
 			{...props}
 		/>

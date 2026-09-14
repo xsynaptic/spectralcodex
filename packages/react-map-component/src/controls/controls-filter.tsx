@@ -15,13 +15,13 @@ import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
-	useIsMapCanvasLoading,
 	useHasMapChineseLabels,
+	useIsMapCanvasLoading,
 	useIsMapFilterOpen,
+	useIsMapObjectiveFilterEnabled,
 	useMapFilterPosition,
 	useMapObjectiveFilter,
 	useMapRatingFilter,
-	useIsMapObjectiveFilterEnabled,
 	useMapStatusFilter,
 	useMapStoreActions,
 } from '#store/store.ts';
@@ -49,9 +49,9 @@ const MapFilterMenuItem: FC<
 };
 
 const MapFilterStatusMenuItem: FC<{
-	status: LocationStatus;
-	isFiltered: boolean;
 	data: LocationStatusMetadata;
+	isFiltered: boolean;
+	status: LocationStatus;
 }> = memo(function MapFilterStatusMenuItem({ status, isFiltered, data }) {
 	const isDarkMode = useIsDarkMode();
 
@@ -62,12 +62,12 @@ const MapFilterStatusMenuItem: FC<{
 	return (
 		<MapFilterMenuItem isActive={isFiltered}>
 			<button
-				type="button"
-				className="map-filter-button"
 				aria-pressed={!isFiltered}
+				className="map-filter-button"
 				onClick={() => {
 					toggleStatusFilter(status);
 				}}
+				type="button"
 			>
 				<span
 					className="map-filter-swatch"
@@ -172,13 +172,12 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 			<span className="map-filter-rating">
 				{R.range(1, 6).map((value) => (
 					<button
-						key={`rating-${String(value)}`}
-						type="button"
+						aria-label={`${messages.ratingFilterAriaLabel} ${String(value)}`}
+						aria-pressed={ratingFilterValue === value}
 						className={
 							ratingFilterValue >= value ? 'map-filter-star-filled' : 'map-filter-star-empty'
 						}
-						aria-pressed={ratingFilterValue === value}
-						aria-label={`${messages.ratingFilterAriaLabel} ${String(value)}`}
+						key={`rating-${String(value)}`}
 						onClick={() => {
 							if (ratingFilterValue === value) {
 								setRatingFilter(1);
@@ -186,12 +185,13 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 								setRatingFilter(value);
 							}
 						}}
+						type="button"
 					>
 						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 36 36"
-							className="map-filter-star-icon"
 							aria-hidden="true"
+							className="map-filter-star-icon"
+							viewBox="0 0 36 36"
+							xmlns="http://www.w3.org/2000/svg"
 						>
 							<use href={`#${MapSpritesEnum.Rating}`}></use>
 						</svg>
@@ -211,17 +211,17 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 			<div className="map-filter-objective-row">
 				{[1, 2, 3, 4, 5].map((value) => (
 					<button
-						key={`objective-${String(value)}`}
-						type="button"
 						aria-pressed={objectiveFilter === value}
 						className={
 							objectiveFilter === value
 								? 'map-filter-objective-button map-filter-objective-button-active'
 								: 'map-filter-objective-button'
 						}
+						key={`objective-${String(value)}`}
 						onClick={() => {
 							setObjectiveFilter(value);
 						}}
+						type="button"
 					>
 						{value}
 					</button>
@@ -232,8 +232,8 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 };
 
 const MapControlsFilterMenu: FC<{
-	id: string;
 	filterPopupOffset?: number;
+	id: string;
 }> = function MapControlsFilterMenu({ id, filterPopupOffset = 8 }) {
 	const filterPosition = useMapFilterPosition();
 	const isFilterOpen = useIsMapFilterOpen();
@@ -242,8 +242,8 @@ const MapControlsFilterMenu: FC<{
 
 	return isFilterOpen && filterPosition ? (
 		<div
-			id={id}
 			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
+			id={id}
 			style={{
 				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
 			}}
@@ -253,10 +253,10 @@ const MapControlsFilterMenu: FC<{
 				<ul className="map-filter-menu-list">
 					{R.entries(LocationStatusRecords).map(([status, data]) => (
 						<MapFilterStatusMenuItem
-							key={status}
-							status={status}
 							data={data}
 							isFiltered={statusFilter.includes(status)}
+							key={status}
+							status={status}
 						/>
 					))}
 					<MapFilterStatusShowHideMenu />
@@ -310,29 +310,29 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 		<>
 			<CustomControlPortal position={position}>
 				<button
-					ref={buttonRef}
-					id={controlFilterId}
-					type="button"
+					aria-controls={panelId}
+					aria-expanded={isFilterOpen}
+					aria-label={messages.filterMenuAriaLabel}
 					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
+					id={controlFilterId}
 					onClick={() => {
 						if (!isLoading) setFilterOpen(!isFilterOpen);
 					}}
-					aria-label={messages.filterMenuAriaLabel}
-					aria-expanded={isFilterOpen}
-					aria-controls={panelId}
+					ref={buttonRef}
+					type="button"
 					{...(isFilterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="map-ctrl-icon-frame">
 						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
+							aria-hidden="true"
 							className="map-ctrl-icon"
 							style={{
 								...(isFilterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
 								...(isLoading ? { opacity: '0.6' } : {}),
 							}}
-							aria-hidden="true"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
 						>
 							<use href={`#${MapSpritesEnum.Filters}`}></use>
 						</svg>

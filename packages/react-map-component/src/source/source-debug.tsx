@@ -58,7 +58,7 @@ export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = funct
 	if (!debugData) return;
 
 	return (
-		<Source id={'debug'} type="geojson" data={debugData}>
+		<Source data={debugData} id={'debug'} type="geojson">
 			<Layer {...debugLayerStyle} />
 		</Source>
 	);

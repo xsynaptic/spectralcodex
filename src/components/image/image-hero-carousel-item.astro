@@ -10,9 +10,9 @@ import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
 import { ImageSizeEnum } from '#lib/image/image-types.ts';
 
 interface Props extends ImageFeaturedWithCaption {
+	alt: string;
 	class?: string | undefined;
 	index: number;
-	alt: string;
 	showMicroformats?: boolean | undefined;
 	withTitle?: boolean | undefined;
 }

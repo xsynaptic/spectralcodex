@@ -12,8 +12,8 @@ export function createSignedImagePathFunction({
 	serverSecret,
 	signatureLength = IMAGE_SERVER_SIGNATURE_LENGTH,
 }: {
-	imageQuality: number;
 	imageFormat: ImageFormat;
+	imageQuality: number;
 	serverSecret: string;
 	signatureLength?: number;
 }) {
@@ -38,10 +38,10 @@ export function createImageUrlFunction({
 	serverUrl,
 	serverSecret,
 }: {
-	imageQuality: number;
 	imageFormat: ImageFormat;
-	serverUrl: string;
+	imageQuality: number;
 	serverSecret: string;
+	serverUrl: string;
 }) {
 	const getSignedImagePath = createSignedImagePathFunction({
 		imageQuality,

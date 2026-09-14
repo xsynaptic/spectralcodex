@@ -40,9 +40,9 @@ const counts = webmentions
 
 {webmentions ? (
 	<ContentSection
-		sectionTitle={t('section.webmentions')}
-		data-pagefind-ignore
 		data-nosnippet
+		data-pagefind-ignore
+		sectionTitle={t('section.webmentions')}
 		{...props}
 	>
 		<WebmentionsList counts={counts} replies={webmentions.replies} />

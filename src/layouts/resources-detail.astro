@@ -64,7 +64,7 @@ const t = getTranslations();
 		{citationLine ? <DividedItem>{citationLine}</DividedItem> : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
+	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
 	<SectionLinks entry={entry} />
 	<SectionRegions regionIds={regionIds} />
 	<SectionThemes themeIds={themeIds} />

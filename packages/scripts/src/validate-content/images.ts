@@ -5,8 +5,8 @@ import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface MissingImageIssue {
-	location: string;
 	imageId: string;
+	location: string;
 }
 
 function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: ReadonlySet<string>) {

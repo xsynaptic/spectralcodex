@@ -23,7 +23,7 @@ const { heritage } = Astro.props;
 			})?.primary;
 
 			return (
-				<DividedItem as="li" dividerWeight="thin" class="font-serif text-sm">
+				<DividedItem as="li" class="font-serif text-sm" dividerWeight="thin">
 					{LocationTwHeritageRecords[key].title}
 					{titleMultilingual ? (
 						<TextMultilingual content={titleMultilingual} parenthesis={true} />

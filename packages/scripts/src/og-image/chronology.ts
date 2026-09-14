@@ -36,10 +36,10 @@ const chronologyCategoryRank = { created: 0, updated: 1, visited: 2 } as const;
 type ChronologyCategory = keyof typeof chronologyCategoryRank;
 
 interface ChronologyImageCandidate {
-	imageFeaturedId: string;
-	entryQuality: number;
 	category: ChronologyCategory;
+	entryQuality: number;
 	id: string;
+	imageFeaturedId: string;
 }
 
 function parseChronologyDate(value: unknown): Date | undefined {
@@ -96,8 +96,8 @@ function isBetterChronologyCandidate(
 
 function extractDatedCategories(
 	data: ContentEntry['data'],
-): Array<{ date: Date; category: ChronologyCategory }> {
-	const dated: Array<{ date: Date; category: ChronologyCategory }> = [];
+): Array<{ category: ChronologyCategory; date: Date }> {
+	const dated: Array<{ category: ChronologyCategory; date: Date }> = [];
 
 	const dateCreated = parseChronologyDate(data.dateCreated);
 

@@ -30,7 +30,7 @@ function formatEntryLine(entry: CollectionEntry<'locations'>): string {
 	return title ? `${formattedPath} ${chalk.dim('-')} ${title}` : formattedPath;
 }
 
-function printAvailableChecks(stream: 'stdout' | 'stderr') {
+function printAvailableChecks(stream: 'stderr' | 'stdout') {
 	const log = stream === 'stdout' ? console.log : console.error;
 
 	log(chalk.bold('Available checks:'));

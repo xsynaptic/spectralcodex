@@ -11,19 +11,19 @@ import Image from '#components/parts/image.astro';
 import { imageHighQualityFormat, imageHighQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
 import {
-	getImageLayoutSizesProp,
 	getImageBreakpoints,
 	getImageInferredWidth,
+	getImageLayoutSizesProp,
 } from '#lib/image/image-layout.ts';
 import { ImageContextEnum, ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeImageAltAttribute, sanitizeImageCaption } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'figure'> {
-	imageId: string;
 	alt?: string;
-	layout?: ImageLayout;
 	context?: ImageContext;
+	imageId: string;
+	layout?: ImageLayout;
 	priority?: boolean;
 	showMetadata?: boolean;
 }
@@ -67,10 +67,10 @@ function getAspectRatio(width: number, height: number) {
 }
 
 async function getImageProps(): Promise<{
+	aspectRatioString: string | undefined;
 	imageEntry: CollectionEntry<'images'> | undefined;
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
-	aspectRatioString: string | undefined;
 }> {
 	const getImageById = await getImageByIdFunction();
 

@@ -9,8 +9,8 @@ import { getMapData } from '#lib/map/map-data.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	locations: Array<string>;
 	languages?: Array<string> | undefined; // For controlling interface language
+	locations: Array<string>;
 	showHidden?: boolean;
 }
 

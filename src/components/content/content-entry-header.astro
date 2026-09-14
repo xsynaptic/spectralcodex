@@ -8,10 +8,10 @@ import ImageHero from '#components/image/image-hero.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props {
+	imageFeaturedGroup: Array<ImageFeaturedWithCaption> | undefined;
 	title: string;
 	titleMultilingual: MultilingualContent | undefined;
 	titleMultilingualAdditional?: Array<MultilingualContent> | undefined;
-	imageFeaturedGroup: Array<ImageFeaturedWithCaption> | undefined;
 }
 
 const { title, titleMultilingual, titleMultilingualAdditional, imageFeaturedGroup } = Astro.props;
@@ -20,9 +20,9 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <ImageHero
+	alt={title}
 	class="sm:mb-4"
 	imageFeaturedGroup={imageFeaturedGroup}
-	alt={title}
 	showMicroformats={true}
 >
 	<ContentHeader hasHeroImage={hasHeroImage}>
@@ -30,7 +30,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			<ContentTitlePermalink title={title} />
 		</Fragment>
 		<Fragment slot="header-title-multilingual">
-			<TextMultilingual content={titleMultilingual} additional={titleMultilingualAdditional} />
+			<TextMultilingual additional={titleMultilingualAdditional} content={titleMultilingual} />
 		</Fragment>
 		<Fragment slot="header-subtitle">
 			<slot name="header-subtitle" />

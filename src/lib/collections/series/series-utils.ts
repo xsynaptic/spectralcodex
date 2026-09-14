@@ -82,8 +82,8 @@ export async function createSeriesByIdFunction() {
 		collection: Extract<CollectionKey, 'locations' | 'posts'>;
 		id: string;
 	}): Array<{
-		entry: CollectionEntry<'series'>;
 		catalogItems: Array<CatalogItem>;
+		entry: CollectionEntry<'series'>;
 	}> {
 		// Note: a post or location may be in more than one series!
 		const entries = series.filter((entry: CollectionEntry<'series'>) =>
@@ -91,8 +91,8 @@ export async function createSeriesByIdFunction() {
 		);
 
 		const results: Array<{
-			entry: CollectionEntry<'series'>;
 			catalogItems: Array<CatalogItem>;
+			entry: CollectionEntry<'series'>;
 		}> = [];
 
 		for (const entry of entries) {

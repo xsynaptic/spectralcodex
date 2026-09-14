@@ -6,9 +6,9 @@ import type { HTMLAttributes } from 'astro/types';
  * @link https://github.com/incluud/accessible-astro-components
  */
 interface Props extends HTMLAttributes<'div'> {
+	label: string;
 	parentClass?: string | undefined;
 	target?: string | undefined;
-	label: string;
 }
 
 const { class: className, parentClass, target = '#main-content', label, ...props } = Astro.props;
@@ -16,11 +16,11 @@ const { class: className, parentClass, target = '#main-content', label, ...props
 
 <div class:list={['skip-link', parentClass]} {...props}>
 	<a
-		href={target}
 		class:list={[
 			'absolute hover:outline-2 hover:outline-current focus-visible:outline-2 focus-visible:outline-current',
 			className,
 		]}
+		href={target}
 	>
 		{label}
 	</a>

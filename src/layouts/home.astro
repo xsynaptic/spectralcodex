@@ -25,8 +25,8 @@ import { formatStringTemplate } from '#lib/utils/text.ts';
 interface Props {
 	featuredCatalogItems: Array<CatalogItem>;
 	recentCatalogItems: Array<CatalogItem>;
-	themesCatalogItems: Array<CatalogItem>;
 	seriesCatalogItems: Array<CatalogItem>;
+	themesCatalogItems: Array<CatalogItem>;
 }
 
 const t = getTranslations();
@@ -46,6 +46,8 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <MainSite
+	hasHeroImage={hasHeroImage}
+	isHomepage={true}
 	meta={{
 		image: getSeoImageProps({
 			id: 'index-homepage',
@@ -53,11 +55,9 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		}),
 	}}
 	schemas={[buildWebSiteSchema(), buildAuthorSchema()]}
-	hasHeroImage={hasHeroImage}
-	isHomepage={true}
 >
 	{hasHeroImage ? (
-		<ImageHero imageFeaturedGroup={imageFeaturedGroup} alt={t('site.title')} withTitle={false} />
+		<ImageHero alt={t('site.title')} imageFeaturedGroup={imageFeaturedGroup} withTitle={false} />
 	) : undefined}
 	<ContentSection class="mt-4" {...(hasHeroImage ? { id: 'main-content', tabindex: -1 } : {})}>
 		<CardFrame
@@ -101,11 +101,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title">
-			<Anchor href={getSitePath('themes')} anchorColor="primary">
+			<Anchor anchorColor="primary" href={getSitePath('themes')}>
 				{t('collection.themes.labelPlural')}
 			</Anchor>
 		</Fragment>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.themes'))} />
+		<Fragment set:html={renderMarkdownInline(t('home.themes'))} slot="section-description" />
 		<PreviewGrid
 			items={themesCatalogItems}
 			showLocations={true}
@@ -115,11 +115,11 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	</ContentSection>
 	<ContentSection>
 		<Fragment slot="section-title">
-			<Anchor href={getSitePath('series')} anchorColor="primary">
+			<Anchor anchorColor="primary" href={getSitePath('series')}>
 				{t('collection.series.labelPlural')}
 			</Anchor>
 		</Fragment>
-		<Fragment slot="section-description" set:html={renderMarkdownInline(t('home.series'))} />
+		<Fragment set:html={renderMarkdownInline(t('home.series'))} slot="section-description" />
 		<PreviewGrid items={seriesCatalogItems} showLocations={true} showPosts={true} />
 	</ContentSection>
 	<SectionWebmentions entry={undefined} />

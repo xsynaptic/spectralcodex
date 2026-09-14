@@ -10,7 +10,7 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 }
 
 // Single source of truth, consumed by the media-orphans and og-image scripts
-export const fallbackImageIds: Record<string, string | ReadonlyArray<string>> = {
+export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = {
 	// Collections
 	chronology: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
 	locations: 'taiwan/yunlin/xiluo/xiluo-theater-21.jpg',
@@ -140,8 +140,8 @@ function getFallbackKey({
 	regions,
 	themes,
 }: {
-	collection: string;
 	category: string | undefined;
+	collection: string;
 	regions: Array<string> | undefined;
 	themes: Array<string> | undefined;
 }): string {
@@ -169,9 +169,9 @@ export function getFallbackImageId({
 	regions,
 	themes,
 }: {
-	id: string;
-	collection: string;
 	category?: string | undefined;
+	collection: string;
+	id: string;
 	regions?: Array<string> | undefined;
 	themes?: Array<string> | undefined;
 }): string {

@@ -16,11 +16,11 @@ const t = getTranslations();
 ---
 
 <nav
+	aria-label={t('site.colophon.label')}
 	class:list={[
 		'flex flex-wrap gap-x-0 gap-y-2 text-xs sm:gap-x-1',
 		'text-primary-500 dark:text-primary-400',
 	]}
-	aria-label={t('site.colophon.label')}
 >
 	<DividedItem dividerColor="muted">
 		<span class="text-primary-400 dark:text-primary-500">※</span>
@@ -34,7 +34,7 @@ const t = getTranslations();
 				year: siteYearFounded,
 				currentYear,
 			})}{' '}
-			<Anchor href={siteUrl} anchorColor="accent">
+			<Anchor anchorColor="accent" href={siteUrl}>
 				{t('site.title')}
 			</Anchor>
 		</span>
@@ -42,42 +42,42 @@ const t = getTranslations();
 	<DividedItem dividerColor="muted">
 		<span>
 			{t('site.footer.powered.label')}{' '}
-			<Anchor href="https://astro.build" anchorColor="accent">
+			<Anchor anchorColor="accent" href="https://astro.build">
 				Astro
 			</Anchor>
 		</span>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<Anchor href={getSitePath('build-stats')} anchorColor="accent">
+		<Anchor anchorColor="accent" href={getSitePath('build-stats')}>
 			{t('site.footer.buildStats.label')}
 		</Anchor>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
-		<Anchor href="https://github.com/xsynaptic/spectralcodex" anchorColor="accent">
+		<Anchor anchorColor="accent" href="https://github.com/xsynaptic/spectralcodex">
 			{t('site.footer.sourceCode.label')}
 		</Anchor>
 	</DividedItem>
 	<DividedItem dividerColor="muted">
 		<Anchor
-			class:list={['colophon-rss-link']}
-			href={getBasePath('rss.xml')}
 			anchorColor="accent"
-			rel="feed"
+			class:list={['colophon-rss-link']}
 			data-astro-prefetch="false"
+			href={getBasePath('rss.xml')}
+			rel="feed"
 		>
 			<span>{t('site.footer.feed.label')}</span>
 			<div class="colophon-rss-icon">
 				<svg
-					xmlns="http://www.w3.org/2000/svg"
+					aria-hidden="true"
 					class:list={['transition-colors duration-300']}
-					width="1em"
 					height="1em"
 					viewBox="0 0 24 24"
-					aria-hidden="true"
+					width="1em"
+					xmlns="http://www.w3.org/2000/svg"
 				>
 					<path
-						fill="currentColor"
 						d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2.5 12A1.5 1.5 0 0 0 6 16.5A1.5 1.5 0 0 0 7.5 18A1.5 1.5 0 0 0 9 16.5A1.5 1.5 0 0 0 7.5 15M6 10v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8m0-4v2a10 10 0 0 1 10 10h2A12 12 0 0 0 6 6"
+						fill="currentColor"
 					></path>
 				</svg>
 			</div>

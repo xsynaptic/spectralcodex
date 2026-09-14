@@ -32,9 +32,9 @@ const t = getTranslations();
 
 <ContentEntryDetail
 	entry={entry}
+	hideSearch={entry.data.hideSearch}
 	page={page}
 	prefetchUrls={mapData.prefetchUrls}
-	hideSearch={entry.data.hideSearch}
 >
 	<Fragment slot="header-subtitle">
 		<DividedItem>
@@ -52,7 +52,7 @@ const t = getTranslations();
 		) : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
+	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
 	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 	<SectionWebmentions entry={entry} />
 	<SectionPreviews page={page} showMicroformats={true} />

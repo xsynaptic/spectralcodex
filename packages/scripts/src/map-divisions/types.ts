@@ -2,14 +2,14 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 export interface RegionMetadata {
-	id: string;
-	divisionIds: Array<string>;
-	regionPathIds: Array<string>;
-	divisionSelectionBBox?: GeometryBoundingBox;
 	divisionClippingBBox?: GeometryBoundingBox;
+	divisionIds: Array<string>;
+	divisionSelectionBBox?: GeometryBoundingBox;
+	id: string;
+	regionPathIds: Array<string>;
 }
 
-export type DivisionGeometry = Polygon | MultiPolygon;
+export type DivisionGeometry = MultiPolygon | Polygon;
 
 export type DivisionFeatureCollection = FeatureCollection<DivisionGeometry>;
 

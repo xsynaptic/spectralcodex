@@ -3,10 +3,10 @@ import chalk from 'chalk';
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 
 interface EdgeExpectation {
+	cacheControl: string;
 	label: string;
 	path: string;
 	status: number;
-	cacheControl: string;
 }
 
 // Node's fetch has no default timeout, so a hung connection would stall the deploy indefinitely

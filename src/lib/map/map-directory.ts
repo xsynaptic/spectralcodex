@@ -24,12 +24,12 @@ import {
 } from '#lib/map/map-locations.ts';
 
 interface MapDirectoryData {
-	// One row per non-hidden feature: standard source shape plus region ordinals, theme indices, chunk key
-	directory: Array<MapSourceItem>;
-	// Popup entries grouped by chunk key, each array sorted by id
-	chunks: Map<string, Array<MapPopupItem>>;
 	// Every feature id → its popup chunk key; small inline maps stamp this onto their points
 	chunkKeyById: Map<string, string>;
+	// Popup entries grouped by chunk key, each array sorted by id
+	chunks: Map<string, Array<MapPopupItem>>;
+	// One row per non-hidden feature: standard source shape plus region ordinals, theme indices, chunk key
+	directory: Array<MapSourceItem>;
 	// Cache key for the directory and chunk endpoints, which Caddy serves as immutable
 	version: string;
 }

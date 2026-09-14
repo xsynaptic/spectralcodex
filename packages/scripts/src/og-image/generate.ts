@@ -24,11 +24,11 @@ const luminanceZoneBottom: LuminanceZone = [0.7, 0.9];
 export interface ProcessedImage {
 	data: Buffer;
 	height: number;
-	width: number;
-	// Mean perceived luminance of the top zone, 0-255
-	luminanceTop: number;
 	// Mean perceived luminance of the bottom zone, 0-255
 	luminanceBottom: number;
+	// Mean perceived luminance of the top zone, 0-255
+	luminanceTop: number;
+	width: number;
 }
 
 interface RawImage {

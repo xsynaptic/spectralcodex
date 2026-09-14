@@ -9,9 +9,9 @@ import {
 } from '#constants.ts';
 import {
 	ImageContextEnum,
+	ImageLayoutEnum,
 	ImageOrientationEnum,
 	ImageSizeEnum,
-	ImageLayoutEnum,
 } from '#lib/image/image-types.ts';
 
 // A simple check for image orientation
@@ -19,8 +19,8 @@ function getImageOrientation({
 	width,
 	height,
 }: {
-	width: number;
 	height?: number | undefined;
+	width: number;
 }): ImageOrientation {
 	if (height === width) {
 		return ImageOrientationEnum.Square;
@@ -59,10 +59,10 @@ export function getImageInferredWidth({
 	layout,
 	context = ImageContextEnum.Single,
 }: {
-	width: number;
+	context?: ImageContext | undefined;
 	height?: number | undefined;
 	layout?: ImageLayout | undefined;
-	context?: ImageContext | undefined;
+	width: number;
 }) {
 	// Images inside a group fill a cell or slide, so size them by orientation rather than layout
 	if (context !== ImageContextEnum.Single) {

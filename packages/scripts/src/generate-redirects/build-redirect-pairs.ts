@@ -7,9 +7,9 @@ interface RedirectPair {
 }
 
 interface RedirectableEntry {
-	id: string;
 	collection: string;
 	data: { formerIds?: Array<string> | undefined };
+	id: string;
 }
 
 // Collections where page URL = /{collection}/{id}/; all others are flat at /{id}/

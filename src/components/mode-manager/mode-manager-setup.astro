@@ -8,7 +8,7 @@
 			// localStorage unavailable
 		}
 
-		let mode = ['auto', 'light', 'dark'].includes(stored) ? stored : 'auto';
+		let mode = ['auto', 'dark', 'light'].includes(stored) ? stored : 'auto';
 
 		if (mode === 'auto') {
 			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';

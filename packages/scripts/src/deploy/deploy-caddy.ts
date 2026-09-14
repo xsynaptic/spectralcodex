@@ -5,8 +5,8 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshExec } from '#deploy/rsync-exec.ts';
 
 interface DeployCaddyOptions {
-	rootPath: string;
 	dryRun?: boolean;
+	rootPath: string;
 }
 
 export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {

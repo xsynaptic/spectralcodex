@@ -3,8 +3,8 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface EntryReference {
-	field: string;
 	collection: string;
+	field: string;
 	id: string;
 }
 

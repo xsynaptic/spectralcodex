@@ -14,7 +14,7 @@ import { textClipper } from '#lib/utils/text.ts';
 const textWordLimit = 40;
 
 interface Props {
-	counts: Array<{ label: string; count: number }>;
+	counts: Array<{ count: number; label: string }>;
 	replies: Array<WebmentionReply>;
 }
 
@@ -24,7 +24,7 @@ const { counts, replies } = Astro.props;
 {counts.length > 0 ? (
 	<ListRow class="mb-2">
 		{counts.map(({ label, count }) => (
-			<DividedItem as="li" dividerWeight="thin" class="font-serif text-xs sm:text-sm">
+			<DividedItem as="li" class="font-serif text-xs sm:text-sm" dividerWeight="thin">
 				{label}: {count}
 			</DividedItem>
 		))}
@@ -45,7 +45,7 @@ const { counts, replies } = Astro.props;
 						)}
 					</DividedItem>
 					<DividedItem as="li" dividerWeight="thin">
-						<Anchor href={reply.sourceUrl} rel="nofollow ugc" anchorColor="primary">
+						<Anchor anchorColor="primary" href={reply.sourceUrl} rel="nofollow ugc">
 							<DateDisplay date={reply.dateReceived} datePreset={DatePresetEnum.Medium} />
 						</Anchor>
 					</DividedItem>

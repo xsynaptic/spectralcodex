@@ -10,8 +10,8 @@ import { buildResourceLink } from '#components/resources/resources-links.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
-	links: Array<ResourceLink>;
 	class?: string | undefined;
+	links: Array<ResourceLink>;
 }
 
 const { class: className, links } = Astro.props;

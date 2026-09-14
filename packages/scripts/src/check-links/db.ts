@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import { existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
-import type { UrlStatus, UrlRow } from '#check-links/types.ts';
+import type { UrlRow, UrlStatus } from '#check-links/types.ts';
 
 import { UrlStatusEnum } from '#check-links/types.ts';
 
@@ -54,7 +54,7 @@ export function closeDatabase(): void {
 
 export function getEntryDigest(contentId: string): string | undefined {
 	const row = db.prepare('SELECT digest FROM entry_digests WHERE content_id = ?').get(contentId) as
-		{ digest: string } | undefined;
+		undefined | { digest: string };
 
 	return row?.digest;
 }
@@ -73,7 +73,7 @@ export function upsertUrl(url: string): number {
 }
 
 export function syncUrlSources(
-	extractedSources: Array<{ urlId: number; contentId: string }>,
+	extractedSources: Array<{ contentId: string; urlId: number }>,
 	extractedEntries: Set<string>,
 	allEntryDigests: Array<{ contentId: string; digest: string }>,
 ): number {
@@ -126,10 +126,10 @@ export function syncUrlSources(
 }
 
 export function getUrlsToCheck(options: {
-	recheck?: boolean;
-	recheckStatuses?: Array<UrlStatus>;
-	recheckAll?: boolean;
 	maxMissing: number;
+	recheck?: boolean;
+	recheckAll?: boolean;
+	recheckStatuses?: Array<UrlStatus>;
 }): Array<UrlRow> {
 	if (options.recheckAll) {
 		return db.prepare('SELECT * FROM urls ORDER BY id').all() as Array<UrlRow>;
@@ -164,8 +164,8 @@ export function recordCheckResult(
 	urlId: number,
 	result: {
 		httpStatus: number | undefined;
-		status: UrlStatus;
 		redirectUrl: string | undefined;
+		status: UrlStatus;
 	},
 ): void {
 	const now = new Date().toISOString();
@@ -185,11 +185,11 @@ export function recordCheckResult(
 }
 
 export interface UrlByContentRow {
-	content_id: string;
-	url: string;
-	redirect_url: string | null;
-	last_http_status: number | null;
 	check_count: number;
+	content_id: string;
+	last_http_status: null | number;
+	redirect_url: null | string;
+	url: string;
 }
 
 export function getUrlsByStatusGroupedByContent(
@@ -221,19 +221,19 @@ export function getUrlsByStatusGroupedByContent(
 }
 
 interface LinkCheckStats {
-	total: number;
-	healthy: number;
-	redirect: number;
-	missing: number;
 	blocked: number;
 	error: number;
+	healthy: number;
+	missing: number;
 	pending: number;
+	redirect: number;
+	total: number;
 }
 
 export function getStats(): LinkCheckStats {
 	const rows = db
 		.prepare('SELECT status, COUNT(*) as count FROM urls GROUP BY status')
-		.all() as Array<{ status: string; count: number }>;
+		.all() as Array<{ count: number; status: string }>;
 
 	const stats: LinkCheckStats = {
 		total: 0,

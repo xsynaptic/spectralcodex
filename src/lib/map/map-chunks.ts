@@ -14,8 +14,8 @@ const hilbertSide = 2 ** hilbertOrder;
 
 export interface ChunkInputItem {
 	id: string;
-	lng: number;
 	lat: number;
+	lng: number;
 	popupBytes: number;
 }
 
@@ -24,9 +24,9 @@ interface ChunkAssignmentOptions {
 }
 
 interface ChunkAssignment {
-	chunkKeyById: Map<string, string>;
 	// Chunk keys in deterministic order, each mapped to the ids it holds
 	chunkIds: Map<string, Array<string>>;
+	chunkKeyById: Map<string, string>;
 }
 
 function clampCell(value: number, min: number, span: number): number {

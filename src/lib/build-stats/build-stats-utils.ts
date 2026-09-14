@@ -10,8 +10,8 @@ export interface BuildStatsPoint {
 }
 
 export interface BuildStatsAnnotation {
-	time: number;
 	label: string;
+	time: number;
 }
 
 // Anchored on the newest record, not on today, so the window holds the same builds on any build date

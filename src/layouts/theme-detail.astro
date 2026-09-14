@@ -20,13 +20,13 @@ import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 
 interface Props {
-	entry: CollectionEntry<'themes'>;
-	mapData: MapComponentData;
+	backlinksCount: number;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
-	backlinksCount: number;
-	relatedThemeIds: Array<string>;
+	entry: CollectionEntry<'themes'>;
+	mapData: MapComponentData;
 	page: Page<CatalogItem>;
+	relatedThemeIds: Array<string>;
 }
 
 const { entry, mapData, catalogItems, catalogItemsCount, backlinksCount, relatedThemeIds, page } =
@@ -39,18 +39,18 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
 <ContentEntryDetail
 	entry={entry}
+	hideSearch={entry.data.hideSearch}
 	page={page}
 	prefetchUrls={mapData.prefetchUrls}
-	hideSearch={entry.data.hideSearch}
 >
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
 		</DividedItem>
-		<ContentEntryCounts entryCount={entry.data._entryCount ?? 0} backlinksCount={backlinksCount} />
+		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap mapData={mapData} entryTitle={entry.data.title} />
+	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionRegions regionIds={regionIds} />
@@ -58,6 +58,6 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 	<SectionWebmentions entry={entry} />
 	<SectionPreviews page={page} showMicroformats={true} />
 	{page.currentPage === 1 && catalogItems.length > 0 ? (
-		<SectionPreviewList items={catalogItems} count={catalogItemsCount} />
+		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
 </ContentEntryDetail>

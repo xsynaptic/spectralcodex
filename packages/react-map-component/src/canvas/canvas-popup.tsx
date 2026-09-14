@@ -13,16 +13,16 @@ import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
-	useMapHoveredId,
 	useIsMapPopupVisible,
+	useMapHoveredId,
 	useMapSelectedId,
 	useMapStoreActions,
 } from '#store/store.ts';
 
 type MapPopupItemExtended = MapPopupItem & {
-	precision: number;
 	objective: number | undefined;
 	popupCoordinates: LngLat;
+	precision: number;
 };
 
 const defaultPopupItem = {
@@ -253,9 +253,9 @@ function useMapCanvasPopup() {
 }
 
 const MapPopupFooter: FC<{
+	googleMapsUrl: string | undefined;
 	popupCoordinates: LngLat;
 	wikipediaUrl: string | undefined;
-	googleMapsUrl: string | undefined;
 }> = function MapPopupFooter({ popupCoordinates, wikipediaUrl, googleMapsUrl }) {
 	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
 	const mapsUrl = googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
@@ -264,19 +264,19 @@ const MapPopupFooter: FC<{
 	return (
 		<div className="map-popup-footer">
 			<button
-				type="button"
 				className="map-popup-coord"
 				onClick={() => {
 					void navigator.clipboard.writeText(coordinatesString);
 				}}
+				type="button"
 			>
 				<span className="map-popup-coord-text">{coordinatesString}</span>
 				<span className="map-sr-only">{messages.copyCoordinatesLabel}</span>
 				<svg
-					xmlns="http://www.w3.org/2000/svg"
+					aria-hidden="true"
 					className="map-popup-copy-icon"
 					viewBox="0 0 24 24"
-					aria-hidden="true"
+					xmlns="http://www.w3.org/2000/svg"
 				>
 					<use href={`#${MapSpritesEnum.Copy}`}></use>
 				</svg>
@@ -284,32 +284,32 @@ const MapPopupFooter: FC<{
 			<div className="map-popup-links">
 				{wikipediaUrl ? (
 					<a
-						href={getWikipediaHref(wikipediaUrl)}
-						target="_blank"
-						rel="noopener noreferrer"
 						aria-label={messages.wikipediaAriaLabel}
+						href={getWikipediaHref(wikipediaUrl)}
+						rel="noopener noreferrer"
+						target="_blank"
 					>
 						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							className="map-popup-link-icon map-popup-link-icon-wiki"
 							aria-hidden="true"
+							className="map-popup-link-icon map-popup-link-icon-wiki"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
 						>
 							<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
 						</svg>
 					</a>
 				) : undefined}
 				<a
-					href={getGoogleMapsHref(mapsUrl)}
-					target="_blank"
-					rel="noopener noreferrer"
 					aria-label={messages.googleMapsAriaLabel}
+					href={getGoogleMapsHref(mapsUrl)}
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 256 367"
-						className="map-popup-link-icon"
 						aria-hidden="true"
+						className="map-popup-link-icon"
+						viewBox="0 0 256 367"
+						xmlns="http://www.w3.org/2000/svg"
 					>
 						<use href={`#${MapSpritesEnum.Google}`}></use>
 					</svg>
@@ -327,9 +327,9 @@ const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision(
 	return (
 		<div className="map-popup-precision">
 			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 36 36"
 				className="map-popup-warning-icon"
+				viewBox="0 0 36 36"
+				xmlns="http://www.w3.org/2000/svg"
 			>
 				<use href={`#${MapSpritesEnum.Warning}`}></use>
 			</svg>
@@ -346,9 +346,9 @@ const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 	};
 
 const MapPopupContent: FC<{
-	popupItem: MapPopupItemExtended;
 	imageServerUrl: string;
 	isDev: boolean | undefined;
+	popupItem: MapPopupItemExtended;
 }> = function MapPopupContent({ popupItem, imageServerUrl, isDev }) {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 	const messages = useMapMessages();
@@ -371,12 +371,12 @@ const MapPopupContent: FC<{
 			{image?.srcSet ? (
 				<div>
 					<img
+						alt={title}
 						className="map-popup-image"
+						loading="eager"
+						sizes={getPopupImageSizes(isMobile)}
 						src={getPopupImageSrc(image.srcSet, imageServerUrl)}
 						srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
-						sizes={getPopupImageSizes(isMobile)}
-						loading="eager"
-						alt={title}
 					/>
 				</div>
 			) : undefined}
@@ -395,17 +395,17 @@ const MapPopupContent: FC<{
 				<MapPopupPrecision precision={precision} />
 				{description ? (
 					<div
-						className="map-popup-description"
-						role="region"
 						aria-label={messages.popupDescriptionAriaLabel}
-						tabIndex={0}
+						className="map-popup-description"
 						dangerouslySetInnerHTML={{ __html: description }}
+						role="region"
+						tabIndex={0}
 					/>
 				) : undefined}
 				<MapPopupFooter
+					googleMapsUrl={popupItem.googleMapsUrl}
 					popupCoordinates={popupCoordinates}
 					wikipediaUrl={wikipediaUrl}
-					googleMapsUrl={popupItem.googleMapsUrl}
 				/>
 			</div>
 		</>
@@ -450,8 +450,8 @@ export const MapPopup: FC<{
 	// Note: `closeOnClick` must be false to better control popup display with custom events
 	return (
 		<Popup
-			longitude={popupItem.popupCoordinates.lng}
 			latitude={popupItem.popupCoordinates.lat}
+			longitude={popupItem.popupCoordinates.lng}
 			{...popupPlacement}
 			closeOnClick={false}
 			onClose={onClose}
@@ -464,10 +464,10 @@ export const MapPopup: FC<{
 				<div style={{ opacity: isPopupDataLoading ? 0 : 1 }}>
 					{isPopupDataLoading ? undefined : (
 						<MapPopupContent
-							key={popupItem.id}
-							popupItem={popupItem}
 							imageServerUrl={imageServerUrl}
 							isDev={isDev}
+							key={popupItem.id}
+							popupItem={popupItem}
 						/>
 					)}
 				</div>

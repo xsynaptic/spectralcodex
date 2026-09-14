@@ -80,7 +80,7 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 export function resolveBoundingBox(
 	region: RegionMetadata,
 	regionsById: Map<string, RegionMetadata>,
-	bboxField: 'divisionSelectionBBox' | 'divisionClippingBBox',
+	bboxField: 'divisionClippingBBox' | 'divisionSelectionBBox',
 ): GeometryBoundingBox | undefined {
 	for (const ancestorId of region.regionPathIds) {
 		const ancestor = regionsById.get(ancestorId);

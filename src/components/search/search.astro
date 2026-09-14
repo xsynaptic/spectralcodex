@@ -45,19 +45,19 @@ const t = getTranslations();
 	{...props}
 >
 	<button
-		class="text-primary-700 dark:text-primary-300"
-		aria-label={t('site.search.toggle.label')}
-		title={t('site.search.toggle.title')}
-		aria-haspopup="dialog"
 		aria-expanded="false"
+		aria-haspopup="dialog"
+		aria-label={t('site.search.toggle.label')}
+		class="text-primary-700 dark:text-primary-300"
 		data-umami-event="search-open"
+		title={t('site.search.toggle.title')}
 	>
 		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
+			aria-hidden="true"
 			height="24"
 			viewBox="0 0 24 24"
-			aria-hidden="true"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
 		>
 			<g
 				fill="none"
@@ -78,7 +78,7 @@ const t = getTranslations();
 	</pagefind-modal-header>
 	<pagefind-modal-body>
 		<pagefind-summary></pagefind-summary>
-		<pagefind-results max-sub-results="3" show-images={true} set:html={pagefindResultTemplate} />
+		<pagefind-results max-sub-results="3" set:html={pagefindResultTemplate} show-images={true} />
 	</pagefind-modal-body>
 	<pagefind-modal-footer>
 		<pagefind-keyboard-hints></pagefind-keyboard-hints>

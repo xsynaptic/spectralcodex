@@ -65,16 +65,16 @@ const { values } = parseArgs({
 type EmbeddableEntry = ContentEntry & { digest: string };
 
 interface SimilarContentEmbedding {
-	id: string;
-	digest: string;
 	collection: string;
-	vector: Array<number>;
+	digest: string;
+	id: string;
 	metadata: SimilarContentMetadata;
+	vector: Array<number>;
 }
 
 interface SimilarContentItem {
-	id: string;
 	collection: string;
+	id: string;
 	score: number;
 }
 
@@ -197,7 +197,7 @@ interface SimilarContentIndex {
 // usearch needs numeric BigInt keys, so an embedding is addressed by its position in the array
 function buildSimilarContentIndex(
 	embeddings: Array<SimilarContentEmbedding>,
-	options: { dimensions: number; candidateCount: number },
+	options: { candidateCount: number; dimensions: number },
 ): SimilarContentIndex {
 	const index = new Index({
 		metric: MetricKind.Cos,

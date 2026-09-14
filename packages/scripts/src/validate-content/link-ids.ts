@@ -6,9 +6,9 @@ import { getBodyLineOffset } from '#validate-content/body-line-offset.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface LinkIdIssue {
-	location: string;
-	lineNumber: number;
 	id: string;
+	lineNumber: number;
+	location: string;
 }
 
 function collectEntryLinkIdIssues(entry: ContentEntry, validIds: ReadonlySet<string>) {

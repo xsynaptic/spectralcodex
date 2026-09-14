@@ -55,9 +55,9 @@ const cachePath = path.join(rootPath, values['cache-path']);
 const outputPath = path.join(rootPath, values['output-path']);
 
 interface RegionProcessingNeeds {
-	region: RegionMetadata;
 	needsFgb: boolean;
 	needsSvg: boolean;
+	region: RegionMetadata;
 }
 
 async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
@@ -113,8 +113,8 @@ async function didProcessRegion({
 	divisionsById,
 	regionsById,
 }: {
-	needs: RegionProcessingNeeds;
 	divisionsById: Map<string, DivisionItem>;
+	needs: RegionProcessingNeeds;
 	regionsById: Map<string, RegionMetadata>;
 }) {
 	const { region, needsFgb, needsSvg } = needs;
@@ -175,11 +175,11 @@ async function processBBoxGroup({
 	regionsById,
 	overtureUrl,
 }: {
-	db: DuckDBConnection;
 	bboxNeeds: Array<RegionProcessingNeeds>;
-	selectionBBox: GeometryBoundingBox;
-	regionsById: Map<string, RegionMetadata>;
+	db: DuckDBConnection;
 	overtureUrl: string;
+	regionsById: Map<string, RegionMetadata>;
+	selectionBBox: GeometryBoundingBox;
 }) {
 	const divisionIds = new Set(bboxNeeds.flatMap(({ region }) => region.divisionIds));
 
@@ -216,9 +216,9 @@ async function processRegions({
 	overtureUrl,
 }: {
 	db: DuckDBConnection;
+	overtureUrl: string;
 	regions: Array<RegionMetadata>;
 	regionsById: Map<string, RegionMetadata>;
-	overtureUrl: string;
 }) {
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
 

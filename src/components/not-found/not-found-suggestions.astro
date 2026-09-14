@@ -5,13 +5,13 @@ const t = getTranslations();
 ---
 
 <path-suggestions
-	src="/content-manifest.json"
+	aria-live="polite"
 	link-class="anchor-base anchor-accent"
 	link-data-astro-history="replace"
-	aria-live="polite"
+	src="/content-manifest.json"
 >
 	<p class="suggestions-heading">{t('notFound.suggestions')}</p>
-	<div class="suggestions-loading text-primary-700 dark:text-highlight-400" aria-hidden="true">
+	<div aria-hidden="true" class="suggestions-loading text-primary-700 dark:text-highlight-400">
 		<div class="loading-animation w-6"></div>
 	</div>
 </path-suggestions>

@@ -68,10 +68,10 @@ async function createSimilarContentFunction() {
 		threshold = 0.5,
 		hasImageFeatured = true,
 	}: {
+		hasImageFeatured?: boolean;
 		id: string;
 		limit?: number | undefined;
 		threshold?: number;
-		hasImageFeatured?: boolean;
 	}): Array<CatalogItem> {
 		if (!similarContentData) return [];
 

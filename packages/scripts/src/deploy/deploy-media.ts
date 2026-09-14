@@ -9,8 +9,8 @@ import { collectMediaFiles } from '#shared/images.ts';
 export class MediaPathMissingError extends Error {}
 
 interface DeployMediaOptions {
-	rootPath: string;
 	dryRun?: boolean;
+	rootPath: string;
 	withDelete?: boolean;
 }
 

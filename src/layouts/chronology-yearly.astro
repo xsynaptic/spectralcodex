@@ -18,10 +18,10 @@ import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
+	chronologyDailyData: Record<string, ChronologyDailyCounts>;
 	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
 	chronologyYear: string;
 	chronologyYears: Array<string>;
-	chronologyDailyData: Record<string, ChronologyDailyCounts>;
 }
 
 const { chronologyMonthlyData, chronologyYear, chronologyYears, chronologyDailyData } = Astro.props;
@@ -47,8 +47,8 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 		<Fragment slot="header-subtitle">
-			<ChronologyNavigation currentYear={chronologyYear} chronologyYears={chronologyYears}>
-				<Anchor href={getSitePath('chronology')} anchorColor="accent">
+			<ChronologyNavigation chronologyYears={chronologyYears} currentYear={chronologyYear}>
+				<Anchor anchorColor="accent" href={getSitePath('chronology')}>
 					{t('chronology.index.label')}
 				</Anchor>
 			</ChronologyNavigation>
@@ -64,27 +64,27 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 				<div class="content-column-fill mb-8">
 					<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
 						<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-							<Anchor href={monthlyUrl} anchorColor="highlight">
+							<Anchor anchorColor="highlight" href={monthlyUrl}>
 								{monthlyData.monthName}
 							</Anchor>
 						</h2>
 						<div class="flex flex-col gap-2">
 							<ChronologyItem
-								title={t('chronology.updated.label')}
-								items={monthlyData.updated}
 								count={monthlyData.updatedCount}
+								items={monthlyData.updated}
+								title={t('chronology.updated.label')}
 								url={monthlyUrl}
 							/>
 							<ChronologyItem
-								title={t('chronology.created.label')}
-								items={monthlyData.created}
 								count={monthlyData.createdCount}
+								items={monthlyData.created}
+								title={t('chronology.created.label')}
 								url={monthlyUrl}
 							/>
 							<ChronologyItem
-								title={t('chronology.visited.label')}
-								items={monthlyData.visited}
 								count={monthlyData.visitedCount}
+								items={monthlyData.visited}
+								title={t('chronology.visited.label')}
 								url={monthlyUrl}
 							/>
 						</div>
@@ -95,5 +95,5 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 				</div>
 			);
 		})}
-	<ChronologyActivity year={chronologyYear} dailyData={chronologyDailyData} />
+	<ChronologyActivity dailyData={chronologyDailyData} year={chronologyYear} />
 </MainSite>

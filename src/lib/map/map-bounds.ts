@@ -11,12 +11,12 @@ import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
 export interface MapDataBoundsProps {
-	featureCollection: MapFeatureCollection | undefined;
-	limitsFeatureCollection?: MapFeatureCollection | undefined; // Optional: used by individual location maps
 	boundsBuffer?: number | undefined;
 	boundsBufferPercentage?: number | undefined;
+	featureCollection: MapFeatureCollection | undefined;
 	limitsBuffer?: number | undefined;
 	limitsBufferPercentage?: number | undefined;
+	limitsFeatureCollection?: MapFeatureCollection | undefined; // Optional: used by individual location maps
 	targetId?: string | undefined; // Optional: use for centering on a specific point
 }
 
@@ -52,8 +52,8 @@ function getNaturalBounds(
 }
 
 interface BboxBufferOptions {
-	explicitBuffer: number | undefined;
 	bufferPercentage: number;
+	explicitBuffer: number | undefined;
 	minBuffer: number;
 }
 
@@ -133,12 +133,12 @@ export function getMapBounds({
 	limitsBufferPercentage = 100,
 	targetId,
 }: MapDataBoundsProps):
+	| undefined
 	| {
-			center: [number, number];
 			bounds: [number, number, number, number];
+			center: [number, number];
 			maxBounds: [number, number, number, number];
-	  }
-	| undefined {
+	  } {
 	if (!featureCollectionRaw) return;
 
 	const featureCollection = filterMapOutliers(featureCollectionRaw);

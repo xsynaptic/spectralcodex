@@ -46,9 +46,9 @@ function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number 
 }
 
 interface ImageDimensions {
-	width: number;
 	height: number;
 	ratio: number;
+	width: number;
 }
 
 function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
@@ -61,19 +61,19 @@ function getImageDimensions(entry: ContentEntry): ImageDimensions | undefined {
 }
 
 interface FlaggedImage {
-	id: string;
-	width: number;
-	height: number;
-	ratio: number;
-	nearest: string;
 	delta: number;
+	height: number;
+	id: string;
+	nearest: string;
+	ratio: number;
+	width: number;
 }
 
 interface RatioTallyRow {
-	label: string;
-	value: number;
-	orientation: string;
 	count: number;
+	label: string;
+	orientation: string;
+	value: number;
 }
 
 export function collectAspectRatioIssues(entries: Array<ContentEntry>) {

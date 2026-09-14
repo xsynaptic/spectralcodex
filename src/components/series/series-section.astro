@@ -19,7 +19,7 @@ const { items, seriesTitle, url, ...props } = Astro.props;
 const t = getTranslations();
 ---
 
-<ContentSection data-pagefind-ignore data-nosnippet {...props}>
+<ContentSection data-nosnippet data-pagefind-ignore {...props}>
 	<Fragment slot="section-title">
 		{t('collection.series.labelPlural')}: <a href={url}>{seriesTitle}</a>
 	</Fragment>

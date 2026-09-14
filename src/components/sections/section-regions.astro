@@ -20,15 +20,15 @@ const t = getTranslations();
 ---
 
 <ContentSection
-	sectionTitle={t('collection.regions.labelPlural')}
-	data-pagefind-ignore
 	data-nosnippet
+	data-pagefind-ignore
+	sectionTitle={t('collection.regions.labelPlural')}
 	{...props}
 >
 	<RegionsList
-		terms={regions}
 		dividerContent="chevron"
 		showMicroformats={true}
 		showSingleRegionAncestors={true}
+		terms={regions}
 	/>
 </ContentSection>

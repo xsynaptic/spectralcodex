@@ -1,5 +1,5 @@
 interface LinkPlatform {
-	match: string | Array<string>;
+	match: Array<string> | string;
 	title: string;
 	title_zh?: string | undefined;
 }

@@ -18,9 +18,9 @@ interface DescriptionCached extends DescriptionRendered {
 }
 
 export interface DescriptionEntry {
-	id: string;
-	data: { description?: string | undefined };
 	body?: string | undefined;
+	data: { description?: string | undefined };
+	id: string;
 }
 
 // Buffered past wordCountFinal so orphan markdown syntax falls outside the clip boundary
@@ -36,8 +36,8 @@ const descriptionSchema = {
 // Return the frontmatter description or derive a clipped excerpt from the body
 export function getDescription(
 	entry: {
-		data: { description?: string | undefined };
 		body?: string | undefined;
+		data: { description?: string | undefined };
 	},
 	options: { wordCount?: number } = {},
 ): string | undefined {

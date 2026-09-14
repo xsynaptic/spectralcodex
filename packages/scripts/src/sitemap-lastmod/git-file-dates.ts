@@ -3,14 +3,14 @@ import { $ } from 'zx';
 interface GitFileDatesOptions {
 	// Directory to run git in (repo root or a subdirectory)
 	cwd: string;
-	// Limit the log to these paths (git pathspec)
-	pathspec?: string | Array<string>;
+	// Commit timestamp to record (default: committer)
+	date?: 'author' | 'committer';
 	// Prepended to each key, to rebase paths onto a common root
 	keyPrefix?: string;
-	// Commit timestamp to record (default: committer)
-	date?: 'committer' | 'author';
 	// Behaviour on a shallow clone, where dates would be wrong (default: throw)
-	onShallow?: 'throw' | 'warn' | 'ignore';
+	onShallow?: 'ignore' | 'throw' | 'warn';
+	// Limit the log to these paths (git pathspec)
+	pathspec?: Array<string> | string;
 }
 
 // Prefixes each date line so it can't be confused with a file path
@@ -22,7 +22,7 @@ async function isShallowRepository(cwd: string): Promise<boolean> {
 	return result.stdout.trim() === 'true';
 }
 
-async function warnOrThrowOnShallow(cwd: string, onShallow: 'throw' | 'warn' | 'ignore') {
+async function warnOrThrowOnShallow(cwd: string, onShallow: 'ignore' | 'throw' | 'warn') {
 	if (onShallow === 'ignore' || !(await isShallowRepository(cwd))) return;
 
 	const message =
@@ -33,7 +33,7 @@ async function warnOrThrowOnShallow(cwd: string, onShallow: 'throw' | 'warn' | '
 	console.warn(message);
 }
 
-function toPathspecArgs(pathspec: string | Array<string> | undefined): Array<string> {
+function toPathspecArgs(pathspec: Array<string> | string | undefined): Array<string> {
 	if (pathspec === undefined) return [];
 
 	return Array.isArray(pathspec) ? pathspec : [pathspec];

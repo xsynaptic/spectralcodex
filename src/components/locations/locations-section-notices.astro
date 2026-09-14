@@ -14,7 +14,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
-	langCode?: Extract<LanguageCode, 'zh' | 'zh-Hans' | 'ja' | 'ko'> | undefined;
+	langCode?: Extract<LanguageCode, 'ja' | 'ko' | 'zh' | 'zh-Hans'> | undefined;
 }
 
 const { entry, langCode, ...props } = Astro.props;
@@ -53,7 +53,7 @@ const notices = noticeKeys.map((key) => ({
 ---
 
 {shouldShowDangerNotice || shouldShowVanishedNotice ? (
-	<ContentSection class="flex flex-col gap-2" {...props} data-pagefind-ignore data-nosnippet>
+	<ContentSection class="flex flex-col gap-2" {...props} data-nosnippet data-pagefind-ignore>
 		<LocationsNotices notices={notices} />
 	</ContentSection>
 ) : undefined}

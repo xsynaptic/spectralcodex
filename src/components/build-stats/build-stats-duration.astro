@@ -6,8 +6,8 @@ import { durationFrame } from '#lib/build-stats/build-stats-geometry.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props {
-	geometry: DurationGeometry;
 	axisTicks: Array<AxisTick>;
+	geometry: DurationGeometry;
 }
 
 const { geometry, axisTicks } = Astro.props;
@@ -21,29 +21,29 @@ const tooltipRows = [
 ---
 
 <BuildStatsChart
-	series="duration"
-	label={t('buildStats.chart.duration.label')}
 	ariaLabel={t('buildStats.chart.duration.aria')}
-	frame={durationFrame}
 	axisTicks={axisTicks}
-	valueTicks={geometry.ticks}
-	tooltipRows={tooltipRows}
+	frame={durationFrame}
+	label={t('buildStats.chart.duration.label')}
 	points={geometry.points}
+	series="duration"
+	tooltipRows={tooltipRows}
+	valueTicks={geometry.ticks}
 >
 	{geometry.annotations.map((annotation) => (
 		<Fragment>
 			<line
 				class="stats-annotation"
 				x1={annotation.x}
-				y1={durationFrame.top}
 				x2={annotation.x}
+				y1={durationFrame.top}
 				y2={durationFrame.bottom}
 			/>
 			<text
 				class="stats-annotation-label"
+				text-anchor="end"
 				x={annotation.labelX}
 				y={annotation.labelY}
-				text-anchor="end"
 			>
 				{annotation.label}
 			</text>

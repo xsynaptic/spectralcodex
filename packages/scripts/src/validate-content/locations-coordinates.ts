@@ -14,7 +14,7 @@ import { LocationGeometrySchema } from '#shared/geometry.ts';
 async function loadRegionGeometry(
 	regionId: string,
 	divisionsPath: string,
-): Promise<Array<Feature<Polygon | MultiPolygon>>> {
+): Promise<Array<Feature<MultiPolygon | Polygon>>> {
 	const fgbPath = path.join(divisionsPath, `${regionId}.fgb`);
 
 	try {
@@ -29,11 +29,11 @@ async function loadRegionGeometry(
 		});
 
 		const featuresIterator = geojson.deserialize(stream);
-		const features: Array<Feature<Polygon | MultiPolygon>> = [];
+		const features: Array<Feature<MultiPolygon | Polygon>> = [];
 
 		for await (const feature of featuresIterator) {
 			if (['MultiPolygon', 'Polygon'].includes(feature.geometry.type)) {
-				features.push(feature as Feature<Polygon | MultiPolygon>);
+				features.push(feature as Feature<MultiPolygon | Polygon>);
 			}
 		}
 		return features;
@@ -47,7 +47,7 @@ async function loadRegionGeometry(
 
 function isPointInRegion(
 	coordinates: [number, number],
-	regionFeatures: Array<Feature<Polygon | MultiPolygon>>,
+	regionFeatures: Array<Feature<MultiPolygon | Polygon>>,
 ): boolean {
 	const testPoint = point(coordinates);
 
@@ -62,7 +62,7 @@ function isPointInRegion(
 
 // A missing FGB file disqualifies that region for the whole run
 function createRegionGeometryLoader(divisionsPath: string) {
-	const cache = new Map<string, Array<Feature<Polygon | MultiPolygon>>>();
+	const cache = new Map<string, Array<Feature<MultiPolygon | Polygon>>>();
 	const missingRegions = new Set<string>();
 	const unloadableRegions: Array<string> = [];
 
@@ -91,11 +91,11 @@ function createRegionGeometryLoader(divisionsPath: string) {
 	return { getRegionFeatures, missingRegions, unloadableRegions };
 }
 
-type RegionFeatures = Array<Feature<Polygon | MultiPolygon>>;
+type RegionFeatures = Array<Feature<MultiPolygon | Polygon>>;
 
 interface RegionCoverage {
-	validRegions: Array<string>;
 	features: RegionFeatures;
+	validRegions: Array<string>;
 }
 
 function getEntryGeometries(entry: ContentEntry) {

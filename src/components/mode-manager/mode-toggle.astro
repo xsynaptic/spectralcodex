@@ -14,25 +14,25 @@ const t = getTranslations();
 	class:list={[
 		'flex cursor-pointer items-center justify-center rounded-full opacity-60 transition-opacity focus-within:opacity-100 hover:opacity-100',
 	]}
-	transition:persist
 	data-label-dark={t('site.mode.toggle.dark.label')}
 	data-label-light={t('site.mode.toggle.light.label')}
+	transition:persist
 	{...props}
 >
 	<button
-		type="button"
-		class="text-primary-700 dark:text-primary-300"
 		aria-label={t('site.mode.toggle.dark.label')}
-		title={t('site.mode.toggle.dark.label')}
+		class="text-primary-700 dark:text-primary-300"
 		data-umami-event="mode-toggle"
+		title={t('site.mode.toggle.dark.label')}
+		type="button"
 	>
 		<svg
+			aria-hidden="true"
 			class="block dark:hidden"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
 			height="24"
 			viewBox="0 0 24 24"
-			aria-hidden="true"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
 		>
 			<g
 				fill="none"
@@ -46,20 +46,20 @@ const t = getTranslations();
 			</g>
 		</svg>
 		<svg
+			aria-hidden="true"
 			class="hidden dark:block"
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
 			height="24"
 			viewBox="0 0 24 24"
-			aria-hidden="true"
+			width="24"
+			xmlns="http://www.w3.org/2000/svg"
 		>
 			<path
+				d="M12 3a6 6 0 0 0 9 9a9 9 0 1 1-9-9"
 				fill="none"
 				stroke="currentColor"
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				stroke-width="2"
-				d="M12 3a6 6 0 0 0 9 9a9 9 0 1 1-9-9"
 			></path>
 		</svg>
 	</button>

@@ -10,10 +10,10 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'nav'> {
-	currentYear?: string | undefined;
-	currentMonth?: string | undefined;
-	chronologyYears: Array<string>;
 	chronologyMonths?: Array<string> | undefined;
+	chronologyYears: Array<string>;
+	currentMonth?: string | undefined;
+	currentYear?: string | undefined;
 }
 
 const {
@@ -37,11 +37,11 @@ function getMonthName(month: string) {
 ---
 
 <nav
+	aria-label={t('chronology.index.title')}
 	class:list={[
 		'flex w-full flex-col gap-2 text-sm text-primary-500 dark:text-primary-400',
 		className,
 	]}
-	aria-label={t('chronology.index.title')}
 	{...props}
 >
 	<PaginationSelect pagination={yearPagination}>
@@ -50,7 +50,7 @@ function getMonthName(month: string) {
 	{currentYear && currentMonth && months.length > 0 ? (
 		<div class="flex gap-1">
 			<DividedItem class="shrink-0" dividerContent="chevron">
-				<Anchor href={getSitePath('chronology', currentYear)} anchorColor="highlight">
+				<Anchor anchorColor="highlight" href={getSitePath('chronology', currentYear)}>
 					{currentYear}
 				</Anchor>
 			</DividedItem>

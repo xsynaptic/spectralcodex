@@ -68,8 +68,8 @@ export function getChronologyYearPagination(
 
 // Adapt per-category daily counts to the generic activity graph: summed values plus year totals
 export function getChronologyActivityData(dailyData: Record<string, ChronologyDailyCounts>): {
-	values: Record<string, number>;
 	totals: ChronologyDailyCounts;
+	values: Record<string, number>;
 } {
 	const values: Record<string, number> = {};
 	const totals: ChronologyDailyCounts = { created: 0, updated: 0, visited: 0 };

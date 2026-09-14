@@ -10,8 +10,8 @@ import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {
-	terms: Array<CollectionEntry<'themes'>> | undefined;
 	class?: string | undefined;
+	terms: Array<CollectionEntry<'themes'>> | undefined;
 }
 
 const { class: className, terms } = Astro.props;
@@ -28,9 +28,9 @@ const { class: className, terms } = Astro.props;
 			return (
 				<DividedItem
 					as="li"
-					dividerWeight="thin"
 					class:list={['font-serif text-sm', MicroformatClassNames.Category]}
 					data-pagefind-filter="theme"
+					dividerWeight="thin"
 				>
 					{entry.data.title ? (
 						<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>

@@ -7,10 +7,10 @@ import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
 
 interface ReportSection {
-	status: UrlStatus;
-	label: string;
 	color: (text: string) => string;
 	formatUrl: (row: UrlByContentRow) => string;
+	label: string;
+	status: UrlStatus;
 }
 
 const reportSections: Array<ReportSection> = [

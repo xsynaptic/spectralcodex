@@ -23,8 +23,8 @@ function getHierarchy(filePath: string, collection: string): Array<string> {
 }
 
 interface LocationRegionIssue {
-	filename: string;
 	expectedRegion: string;
+	filename: string;
 	foundRegion: string;
 	hierarchy: Array<string>;
 }
