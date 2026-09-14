@@ -177,20 +177,30 @@ class SiteNavigation extends HTMLElement {
 		const isRootLevel = this.#isRootLevel(li);
 
 		switch (event.key) {
-			case 'ArrowRight': {
-				this.#handleArrowRight(event, li, isRootLevel);
-				break;
-			}
-			case 'ArrowLeft': {
-				this.#handleArrowLeft(event, li, isRootLevel);
+			case ' ':
+			case 'Enter': {
+				this.#handleActivate(event, li);
 				break;
 			}
 			case 'ArrowDown': {
 				this.#handleArrowDown(event, li, isRootLevel);
 				break;
 			}
+			case 'ArrowLeft': {
+				this.#handleArrowLeft(event, li, isRootLevel);
+				break;
+			}
+			case 'ArrowRight': {
+				this.#handleArrowRight(event, li, isRootLevel);
+				break;
+			}
 			case 'ArrowUp': {
 				this.#handleArrowUp(event, li, isRootLevel);
+				break;
+			}
+			case 'End': {
+				event.preventDefault();
+				this.#focusEdgeItem(li, 'last');
 				break;
 			}
 			case 'Escape': {
@@ -198,19 +208,9 @@ class SiteNavigation extends HTMLElement {
 				this.#closeAndFocusTrigger(li);
 				break;
 			}
-			case 'Enter':
-			case ' ': {
-				this.#handleActivate(event, li);
-				break;
-			}
 			case 'Home': {
 				event.preventDefault();
 				this.#focusEdgeItem(li, 'first');
-				break;
-			}
-			case 'End': {
-				event.preventDefault();
-				this.#focusEdgeItem(li, 'last');
 				break;
 			}
 		}

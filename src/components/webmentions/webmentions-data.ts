@@ -103,23 +103,23 @@ async function createWebmentionsFunction() {
 
 		for (const mention of matched) {
 			switch (mention['wm-property']) {
-				case WebmentionPropertyEnum.Like: {
-					summary.likeCount += 1;
-					break;
-				}
-				case WebmentionPropertyEnum.Repost: {
-					summary.repostCount += 1;
-					break;
-				}
 				case WebmentionPropertyEnum.Bookmark: {
 					summary.bookmarkCount += 1;
 					break;
 				}
-				case WebmentionPropertyEnum.Reply:
-				case WebmentionPropertyEnum.Mention: {
+				case WebmentionPropertyEnum.Like: {
+					summary.likeCount += 1;
+					break;
+				}
+				case WebmentionPropertyEnum.Mention:
+				case WebmentionPropertyEnum.Reply: {
 					const reply = toReply(mention);
 
 					if (reply) summary.replies.push(reply);
+					break;
+				}
+				case WebmentionPropertyEnum.Repost: {
+					summary.repostCount += 1;
 					break;
 				}
 				default: {

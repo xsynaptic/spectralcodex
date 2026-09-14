@@ -53,7 +53,6 @@ export default getConfig(
 				'perfectionist/sort-classes': 'off',
 				'perfectionist/sort-modules': 'off',
 				'perfectionist/sort-objects': 'off',
-				'perfectionist/sort-switch-case': 'off',
 			},
 		},
 		// Ambient declarations mirror third-party signatures

@@ -80,8 +80,8 @@ export function getImageInferredWidth({
 	}
 
 	switch (layout) {
-		case ImageLayoutEnum.Wide:
-		case ImageLayoutEnum.Full: {
+		case ImageLayoutEnum.Full:
+		case ImageLayoutEnum.Wide: {
 			return { width: ImageSizeEnum.ExtraLarge, height: ImageSizeEnum.Large };
 		}
 		default: {
@@ -100,12 +100,12 @@ export function getImageLayoutSizesProp(
 	// Grouped images defer their width to the container, so they only get the `auto` hint below
 	if (context === ImageContextEnum.Single) {
 		switch (layout) {
-			case ImageLayoutEnum.Wide: {
-				sizes = [`calc(100vw - ${tailwindContentPaddingMd})`];
-				break;
-			}
 			case ImageLayoutEnum.Full: {
 				sizes = ['100vw'];
+				break;
+			}
+			case ImageLayoutEnum.Wide: {
+				sizes = [`calc(100vw - ${tailwindContentPaddingMd})`];
 				break;
 			}
 			default: {

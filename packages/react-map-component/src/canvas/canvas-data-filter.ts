@@ -48,6 +48,11 @@ function getScopedItems(
 	scope: MapScope,
 ): ReadonlyArray<MapSourceItem> {
 	switch (scope.type) {
+		case 'ids': {
+			const itemById = new Map(items.map((item) => [item.properties.id, item] as const));
+
+			return scope.ids.map((id) => itemById.get(id)).filter((item) => item !== undefined);
+		}
 		case 'region': {
 			const [left, right] = scope.interval;
 
@@ -61,11 +66,6 @@ function getScopedItems(
 			return items.filter(
 				({ properties }) => properties.themeIndices?.includes(scope.index) ?? false,
 			);
-		}
-		case 'ids': {
-			const itemById = new Map(items.map((item) => [item.properties.id, item] as const));
-
-			return scope.ids.map((id) => itemById.get(id)).filter((item) => item !== undefined);
 		}
 	}
 }
@@ -84,12 +84,12 @@ export function getMapCanvasData(
 		if (!isLocationVisible(item.properties, filter)) continue;
 
 		switch (item.geometry.type) {
-			case GeometryTypeEnum.Point: {
-				points.push(item);
-				break;
-			}
 			case GeometryTypeEnum.LineString: {
 				lineStrings.push(item);
+				break;
+			}
+			case GeometryTypeEnum.Point: {
+				points.push(item);
 				break;
 			}
 			// Polygons are not rendered anywhere yet; no collection is built for them

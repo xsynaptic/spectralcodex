@@ -49,18 +49,18 @@ const defaultPopupItem = {
  */
 function getPopupCoordinates({ geometry }: MapSourceItem): LngLat {
 	switch (geometry.type) {
-		case GeometryTypeEnum.Point: {
-			const [lng, lat] = geometry.coordinates as [number, number];
-
-			return new LngLat(lng, lat);
-		}
-
 		case GeometryTypeEnum.LineString: {
 			const coordinates = geometry.coordinates as Array<[number, number]>;
 
 			if (!coordinates[0]) return new LngLat(0, 0);
 
 			const [lng, lat] = coordinates[0];
+
+			return new LngLat(lng, lat);
+		}
+
+		case GeometryTypeEnum.Point: {
+			const [lng, lat] = geometry.coordinates as [number, number];
 
 			return new LngLat(lng, lat);
 		}

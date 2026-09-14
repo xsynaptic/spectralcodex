@@ -99,8 +99,8 @@ export function decideClickActions(input: MapClickInput): Array<MapClickAction> 
 			];
 		}
 		case MapLayerIdEnum.Points:
-		case MapLayerIdEnum.PointsTarget:
-		case MapLayerIdEnum.PointsImage: {
+		case MapLayerIdEnum.PointsImage:
+		case MapLayerIdEnum.PointsTarget: {
 			if (typeof pointId !== 'string') return [{ kind: 'close-filter' }];
 
 			return [
@@ -157,8 +157,8 @@ export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 			};
 		}
 		case MapLayerIdEnum.Points:
-		case MapLayerIdEnum.PointsTarget:
-		case MapLayerIdEnum.PointsImage: {
+		case MapLayerIdEnum.PointsImage:
+		case MapLayerIdEnum.PointsTarget: {
 			return {
 				cursor: 'pointer',
 				featureStateChanges: getFeatureStateChanges(hoveredFeatureId, featureId),

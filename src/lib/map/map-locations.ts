@@ -39,18 +39,18 @@ function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
 	const geometryType = geometry.type;
 
 	switch (geometryType) {
-		case GeometryTypeEnum.Point: {
-			return {
-				type: geometryType,
-				coordinates: getMapGeometryCoordinatesOptimized(geometry.coordinates, featureId),
-			};
-		}
 		case GeometryTypeEnum.LineString: {
 			return {
 				type: geometryType,
 				coordinates: geometry.coordinates.map((position) =>
 					getMapGeometryCoordinatesOptimized(position, featureId),
 				),
+			};
+		}
+		case GeometryTypeEnum.Point: {
+			return {
+				type: geometryType,
+				coordinates: getMapGeometryCoordinatesOptimized(geometry.coordinates, featureId),
 			};
 		}
 		case GeometryTypeEnum.Polygon: {
