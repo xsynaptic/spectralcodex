@@ -161,7 +161,6 @@ export default defineConfig({
 		},
 		optimizeDeps: {
 			include: [
-				'@turf/bbox',
 				'@turf/center',
 				'@turf/centroid',
 				'@turf/distance',
