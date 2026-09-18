@@ -22,7 +22,7 @@ $.verbose = false;
 
 function log(message: string) {
 	console.log(
-		`${chalk.gray(new Date().toLocaleTimeString('en-US', { hour12: false }))} ${chalk.cyan('[dev-server]')} ${message}`,
+		`${chalk.gray(new Date().toLocaleTimeString('en', { hour12: false }))} ${chalk.cyan('[dev-server]')} ${message}`,
 	);
 }
 

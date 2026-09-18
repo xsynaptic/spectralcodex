@@ -184,7 +184,7 @@ export function getBuildStatsGeometry(
 
 	return {
 		axisTicks: utcMonth.range(new Date(domainStart), new Date(lastTime)).map((month, index) => ({
-			label: month.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }),
+			label: month.toLocaleDateString('en', { month: 'short', timeZone: 'UTC' }),
 			x: round(getX(month.getTime())),
 			// Anywhere but the opening tick and each January, the year is noise
 			yearLabel:

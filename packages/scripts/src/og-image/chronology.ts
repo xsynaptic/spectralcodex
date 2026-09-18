@@ -9,7 +9,7 @@ import { extractImageFeaturedIds } from '#shared/images.ts';
 /**
  * Chronology title format: "Chronology: March 2024" or "Chronology: 2024"
  */
-const monthFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
+const monthFormatter = new Intl.DateTimeFormat('en', { month: 'long' });
 
 export function getChronologyTitle(id: string): string {
 	const year = Number(id.split('-', 1)[0]);

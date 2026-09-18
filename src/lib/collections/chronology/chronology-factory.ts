@@ -98,7 +98,7 @@ export function getDateData(date: Date): ChronologyDateData {
 }
 
 export function getMonthName(date: Date): string {
-	return date.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });
+	return date.toLocaleDateString('en', { month: 'long', timeZone: 'UTC' });
 }
 
 // Every UTC day covered by a recorded range, start to end inclusive

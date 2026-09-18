@@ -74,7 +74,7 @@ export function buildActivityGraph({
 		const dayIndex = Math.round((firstOfMonth - yearStart) / millisecondsPerDay);
 
 		return {
-			name: new Date(firstOfMonth).toLocaleDateString('en-US', {
+			name: new Date(firstOfMonth).toLocaleDateString('en', {
 				month: 'short',
 				timeZone: 'UTC',
 			}),
