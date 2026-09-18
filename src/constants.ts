@@ -11,6 +11,9 @@ export const imageLowQualityFormat = 'webp' as const;
 export const imageHeroQualityFormat = 'webp' as const;
 export const imageHighQualityFormat = 'jpg' as const;
 
+// Download links reuse the largest srcset render at or under this width; never a new render
+export const imageDownloadWidthMax = 3600;
+
 // Region and theme subtitles only show a connection count once it means something
 export const backlinksDisplayCountMinimum = 3;
 

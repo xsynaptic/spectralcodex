@@ -28,6 +28,7 @@ const translationStrings = {
 		'collection.images.metadata.aperture.label': 'Aperture',
 		'collection.images.metadata.cameraModel.label': 'Camera',
 		'collection.images.metadata.dateCreated.label': 'Date Captured',
+		'collection.images.metadata.download.label': 'Download',
 		'collection.images.metadata.ev.label': 'EV',
 		'collection.images.metadata.exposureValue.label': 'Exposure Value',
 		'collection.images.metadata.focalLength.label': 'Focal Length',
@@ -35,7 +36,6 @@ const translationStrings = {
 		'collection.images.metadata.label': 'Image Metadata: {title}',
 		'collection.images.metadata.lensModel.label': 'Lens',
 		'collection.images.metadata.shutterSpeed.label': 'Shutter Speed',
-		'collection.images.metadata.sourceDimensions.label': 'Original Size',
 		'collection.images.metadata.title': 'Image Metadata',
 
 		// Locations

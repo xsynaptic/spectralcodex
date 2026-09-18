@@ -72,10 +72,16 @@
 		color: inherit;
 	}
 
-	/* Halo in the page background colour, so a link stays legible over a busy hero */
 	& :where(a) {
-		font-weight: var(--font-weight-medium);
 		color: light-dark(var(--color-accent-500), var(--color-accent-300));
+		transition:
+			color 150ms ease-in,
+			text-decoration-color 150ms ease-in;
+	}
+
+	/* Halo in the page background colour, so a link stays legible over a busy hero; `anchor-plain` opts out */
+	& :where(a:not(.anchor-plain)) {
+		font-weight: var(--font-weight-medium);
 		text-decoration-line: underline;
 		text-decoration-color: light-dark(var(--color-accent-200), var(--color-accent-500));
 		text-underline-offset: 2px;
@@ -84,9 +90,6 @@
 			-1px 1px 0 var(--color-body-bg),
 			2px 0 1px var(--color-body-bg),
 			-2px 0 1px var(--color-body-bg);
-		transition:
-			color 150ms ease-in,
-			text-decoration-color 150ms ease-in;
 	}
 
 	& :where(a):focus-visible {

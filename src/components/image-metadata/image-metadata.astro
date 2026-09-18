@@ -2,9 +2,18 @@
 import type { HTMLAttributes } from 'astro/types';
 import type { CollectionEntry } from 'astro:content';
 
+import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
+
 import ImageMetadataItem from '#components/image-metadata/image-metadata-item.astro';
 import DateDisplay from '#components/parts/date-display.astro';
+import {
+	imageDownloadWidthMax,
+	imageHighQualityFormat,
+	imageHighQualityValue,
+} from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageBreakpoints } from '#lib/image/image-layout.ts';
+import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -15,6 +24,23 @@ interface Props extends HTMLAttributes<'div'> {
 const { entry, ...props } = Astro.props;
 
 const t = getTranslations();
+
+// Mirrors the srcset params in `content-image.astro` so the link hits an existing render and cache entry
+const downloadBreakpoints = getImageBreakpoints({
+	maxWidth: Math.min(entry.data.width, imageDownloadWidthMax),
+});
+const downloadWidth = downloadBreakpoints.length > 0 ? Math.max(...downloadBreakpoints) : undefined;
+const downloadHeight = downloadWidth
+	? Math.round((downloadWidth * entry.data.height) / entry.data.width)
+	: undefined;
+
+const getImageUrl = createImageUrlFunction({
+	imageFormat: imageHighQualityFormat,
+	imageQuality: imageHighQualityValue,
+	serverSecret: IMAGE_SERVER_SECRET,
+	serverUrl: IMAGE_SERVER_URL,
+});
+const downloadUrl = downloadWidth ? getImageUrl(entry.id, { width: downloadWidth }) : undefined;
 ---
 
 <div class="meta-overlay" data-pagefind-ignore {...props}>
@@ -103,11 +129,20 @@ const t = getTranslations();
 				</ImageMetadataItem>
 				<ImageMetadataItem class="meta-span-2">
 					<Fragment slot="image-metadata-item-title">
-						{t('collection.images.metadata.sourceDimensions.label')}
+						{t('collection.images.metadata.download.label')}
 					</Fragment>
-					<Fragment
-						set:html={`${String(entry.data.width)}&#8202;&#215;&#8202;${String(entry.data.height)}`}
-					/>
+					{downloadUrl && downloadHeight ? (
+						<a
+							class="anchor-plain"
+							data-umami-event="image-download"
+							data-umami-event-image={entry.id}
+							href={downloadUrl}
+						>
+							<Fragment
+								set:html={`${String(downloadWidth)}&#8202;&#215;&#8202;${String(downloadHeight)}`}
+							/>
+						</a>
+					) : undefined}
 				</ImageMetadataItem>
 			</dl>
 		</div>
