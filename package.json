@@ -44,7 +44,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.3.2",
+		"astro": "^7.3.3",
 		"keyv": "^5.6.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
@@ -53,8 +53,8 @@
 		"@astrojs/check": "^0.9.10",
 		"@astrojs/markdown-satteri": "^0.4.1",
 		"@astrojs/mdx": "^8.0.1",
-		"@astrojs/node": "^11.1.5",
-		"@astrojs/react": "^6.0.5",
+		"@astrojs/node": "^11.1.6",
+		"@astrojs/react": "^6.0.6",
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"@pagefind/component-ui": "^1.5.2",
@@ -64,7 +64,7 @@
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.102.8",
+		"@tanstack/eslint-plugin-query": "^5.103.0",
 		"@turf/center": "^7.4.0",
 		"@turf/centroid": "^7.4.0",
 		"@turf/distance": "^7.4.0",
@@ -99,20 +99,20 @@
 		"eslint": "^10.10.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"exiftool-vendored": "^38.0.1",
-		"fallow": "^3.25.0",
+		"exiftool-vendored": "^38.1.0",
+		"fallow": "^3.26.0",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.12.0",
 		"kdbush": "^4.1.0",
 		"knip": "^6.35.1",
-		"lefthook": "^2.1.12",
+		"lefthook": "^2.1.14",
 		"ohash": "^2.0.12",
 		"p-limit": "^7.3.2",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^1.0.0",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"remeda": "^2.48.0",
+		"remeda": "^2.50.0",
 		"satteri": "^0.10.5",
 		"sharp": "^0.35.4",
 		"stylelint": "^17.15.0",
@@ -122,7 +122,7 @@
 		"unpic": "^4.2.2",
 		"vite": "^8.3.0",
 		"vitest": "^4.1.11",
-		"zod": "^4.6.2"
+		"zod": "^4.6.5"
 	},
 	"packageManager": "pnpm@12.3.4"
 }
