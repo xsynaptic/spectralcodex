@@ -2,7 +2,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
 
 const t = getTranslations();
 
@@ -10,74 +10,72 @@ function getPageOptionLabel(pageNumber: number): string {
 	return formatStringTemplate(t('site.pagination.pageNumber.label'), { page: pageNumber });
 }
 
-test.describe('pagination select', () => {
-	// Going back to page 1 also covers the base path resolving with no /1/ suffix
-	test('a change without pointer intent waits for Go', async ({ page }) => {
-		await page.goto(paths.locationsIndexPage2, { waitUntil: 'domcontentloaded' });
+// Going back to page 1 also covers the base path resolving with no /1/ suffix
+test('a change without pointer intent waits for Go', async ({ page }) => {
+	await visit(page, paths.locationsIndexPage2);
 
-		const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
-		const goButton = page.getByRole('button', { name: t('site.pagination.select.submit') });
+	const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
+	const goButton = page.getByRole('button', { name: t('site.pagination.select.submit') });
 
-		await expect(select).toBeVisible();
-		await select.selectOption({ label: getPageOptionLabel(1) });
+	await expect(select).toBeVisible();
+	await select.selectOption({ label: getPageOptionLabel(1) });
 
-		await expect(page).toHaveURL(paths.locationsIndexPage2);
+	await expect(page).toHaveURL(paths.locationsIndexPage2);
 
-		// Assert against baseURL so a cross-origin jump fails here
-		await goButton.click();
-		await expect(page).toHaveURL(paths.locationsIndex);
-	});
-
-	test('a pointer-driven change navigates immediately', async ({ page }) => {
-		await page.goto(paths.locationsIndex, { waitUntil: 'domcontentloaded' });
-
-		const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
-
-		// dispatchEvent waits only for attachment; a visible form means the listener is bound
-		await expect(select).toBeVisible();
-
-		// Stands in for opening the picker, which Playwright cannot drive on a native select
-		await select.dispatchEvent('pointerdown');
-		await select.selectOption({ label: getPageOptionLabel(2) });
-
-		await expect(page).toHaveURL(paths.locationsIndexPage2);
-	});
-
-	test('a pointer-driven year pick on the Chronology index navigates to that year', async ({
-		page,
-	}) => {
-		await page.goto(paths.chronologyIndex, { waitUntil: 'domcontentloaded' });
-
-		const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
-
-		await expect(select).toBeVisible();
-		await select.dispatchEvent('pointerdown');
-		await select.selectOption({ value: paths.chronologyYear });
-
-		await expect(page).toHaveURL(paths.chronologyYear);
-	});
-
-	test('a pointer-driven pick of its own year on a Chronology month navigates to that year', async ({
-		page,
-	}) => {
-		await page.goto(paths.chronologyMonth, { waitUntil: 'domcontentloaded' });
-
-		const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
-
-		await expect(select).toBeVisible();
-		await select.dispatchEvent('pointerdown');
-		await select.selectOption({ value: paths.chronologyYear });
-
-		await expect(page).toHaveURL(paths.chronologyYear);
-	});
+	// Assert against baseURL so a cross-origin jump fails here
+	await goButton.click();
+	await expect(page).toHaveURL(paths.locationsIndex);
 });
 
-test.describe('pagination select on a coarse pointer', () => {
+test('a pointer-driven change navigates immediately', async ({ page }) => {
+	await visit(page, paths.locationsIndex);
+
+	const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
+
+	// dispatchEvent waits only for attachment; a visible form means the listener is bound
+	await expect(select).toBeVisible();
+
+	// Stands in for opening the picker, which Playwright cannot drive on a native select
+	await select.dispatchEvent('pointerdown');
+	await select.selectOption({ label: getPageOptionLabel(2) });
+
+	await expect(page).toHaveURL(paths.locationsIndexPage2);
+});
+
+test('a pointer-driven year pick on the Chronology index navigates to that year', async ({
+	page,
+}) => {
+	await visit(page, paths.chronologyIndex);
+
+	const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
+
+	await expect(select).toBeVisible();
+	await select.dispatchEvent('pointerdown');
+	await select.selectOption({ value: paths.chronologyYear });
+
+	await expect(page).toHaveURL(paths.chronologyYear);
+});
+
+test('a pointer-driven pick of its own year on a Chronology month navigates to that year', async ({
+	page,
+}) => {
+	await visit(page, paths.chronologyMonth);
+
+	const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
+
+	await expect(select).toBeVisible();
+	await select.dispatchEvent('pointerdown');
+	await select.selectOption({ value: paths.chronologyYear });
+
+	await expect(page).toHaveURL(paths.chronologyYear);
+});
+
+test.describe('on a coarse pointer', () => {
 	// A device descriptor cannot go in a describe; these are what make the pointer coarse
 	test.use({ hasTouch: true, isMobile: true, viewport: { height: 851, width: 393 } });
 
 	test('a pointer-driven change still waits for Go', async ({ page }) => {
-		await page.goto(paths.locationsIndex, { waitUntil: 'domcontentloaded' });
+		await visit(page, paths.locationsIndex);
 
 		const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
 		const goButton = page.getByRole('button', { name: t('site.pagination.select.submit') });

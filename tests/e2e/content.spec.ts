@@ -1,30 +1,31 @@
 import type { Page } from '@playwright/test';
 
-import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
 
-async function expectDetailPageRenders(page: Page, path: string) {
-	await page.goto(path, { waitUntil: 'domcontentloaded' });
+const bodyLengthMinimum = 50;
+
+async function expectEntryRenders(page: Page, path: string): Promise<void> {
+	await visit(page, path);
 
 	const heading = page.getByRole('heading', { level: 1 });
+
 	await expect(heading).toBeVisible();
 	await expect(heading).not.toBeEmpty();
-
 	await expect(page.locator('time.dt-published').first()).toBeVisible();
 
 	const body = page.locator('article p').first();
+
 	await expect(body).toBeVisible();
 
 	const bodyText = await body.innerText();
-	expect(bodyText.trim().length).toBeGreaterThan(50);
+
+	expect(bodyText.trim().length).toBeGreaterThan(bodyLengthMinimum);
 }
 
-test.describe('detail pages', () => {
-	test('post renders', async ({ page }) => {
-		await expectDetailPageRenders(page, paths.postDetail);
-	});
+test('a Post renders', async ({ page, site }) => {
+	await expectEntryRenders(page, site.postDetail);
+});
 
-	test('location renders', async ({ page }) => {
-		await expectDetailPageRenders(page, paths.locationDetail);
-	});
+test('a Location renders', async ({ page, site }) => {
+	await expectEntryRenders(page, site.locationDetail);
 });

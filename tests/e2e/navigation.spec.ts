@@ -1,53 +1,46 @@
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
 
 const t = getTranslations();
 
-const regionsName1 = 'Taiwan';
-const regionsName2 = 'Tainan';
+const regionAncestorTitle = 'Taiwan';
+const regionTitle = 'Tainan';
 
-test.describe('navigation', () => {
-	test('Regions', async ({ page }) => {
-		await page.goto('/', { waitUntil: 'domcontentloaded' });
+test('a submenu reveals on hover, two levels deep', async ({ page }) => {
+	await visit(page, '/');
 
-		const nav = page.getByRole('navigation', {
-			name: t('site.navigation.header.label'),
-		});
+	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
 
-		// Hover to reveal depth-1 submenu
-		await nav.getByRole('link', { name: t('collection.regions.labelPlural') }).hover();
+	await nav.getByRole('link', { name: t('collection.regions.labelPlural') }).hover();
 
-		// Hover to reveal depth-2 submenu
-		const taiwanLink = nav.getByRole('link', { exact: true, name: regionsName1 });
-		await expect(taiwanLink).toBeVisible();
-		await taiwanLink.hover();
+	const ancestorLink = nav.getByRole('link', { exact: true, name: regionAncestorTitle });
 
-		const tainanLink = nav.getByRole('link', {
-			name: new RegExp(String.raw`^${regionsName2} \(`),
-		});
-		await expect(tainanLink).toBeVisible();
-		await expect(tainanLink).toHaveAttribute('href', paths.regionDetail);
+	await expect(ancestorLink).toBeVisible();
+	await ancestorLink.hover();
+
+	const regionLink = nav.getByRole('link', {
+		name: new RegExp(String.raw`^${regionTitle} \(`),
 	});
 
-	test('Current page', async ({ page }) => {
-		await page.goto(paths.regionDetailAncestor, { waitUntil: 'domcontentloaded' });
+	await expect(regionLink).toBeVisible();
+	await expect(regionLink).toHaveAttribute('href', paths.regionDetail);
+});
 
-		const nav = page.getByRole('navigation', {
-			name: t('site.navigation.header.label'),
-		});
+test('the current page is the only one marked', async ({ page }) => {
+	await visit(page, paths.regionDetailAncestor);
 
-		const regionsLink = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
+	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
+	const regionsLink = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
 
-		await expect(regionsLink).toHaveClass(/anchor-active/);
-		await expect(regionsLink).not.toHaveAttribute('aria-current');
+	await expect(regionsLink).toHaveClass(/anchor-active/);
+	await expect(regionsLink).not.toHaveAttribute('aria-current');
 
-		await regionsLink.hover();
+	await regionsLink.hover();
 
-		const taiwanLink = nav.getByRole('link', { exact: true, name: regionsName1 });
+	const ancestorLink = nav.getByRole('link', { exact: true, name: regionAncestorTitle });
 
-		await expect(taiwanLink).toHaveClass(/anchor-active/);
-		await expect(taiwanLink).toHaveAttribute('aria-current', 'page');
-	});
+	await expect(ancestorLink).toHaveClass(/anchor-active/);
+	await expect(ancestorLink).toHaveAttribute('aria-current', 'page');
 });

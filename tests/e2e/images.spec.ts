@@ -1,58 +1,62 @@
-import type { Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
-import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
+
+const heroWidthMaximum = 1800;
+const contentWidthMaximum = 1400;
+const mobileWidthMaximum = 600;
+
+function getContentImage(page: Page): Locator {
+	return page.locator('.e-content img').first();
+}
+
+function getHeroImage(page: Page): Locator {
+	return page.locator('img[fetchpriority="high"]').first();
+}
 
 // currentSrc reflects the browser's per-viewport selection without fetching bytes; stays hermetic
-async function getSelectedWidth(img: Locator): Promise<number> {
-	await img.scrollIntoViewIfNeeded();
+async function getSelectedWidth(image: Locator): Promise<number> {
+	await image.scrollIntoViewIfNeeded();
 	await expect
-		.poll(() => img.evaluate((element: HTMLImageElement) => element.currentSrc))
+		.poll(() => image.evaluate((element: HTMLImageElement) => element.currentSrc))
 		.not.toBe('');
 
-	const currentSrc = await img.evaluate((element: HTMLImageElement) => element.currentSrc);
+	const currentSrc = await image.evaluate((element: HTMLImageElement) => element.currentSrc);
 	const width = Number(/\/(\d+)x\d+\//.exec(currentSrc)?.[1]);
+
 	if (!Number.isFinite(width)) throw new Error(`No width segment in currentSrc: ${currentSrc}`);
 
 	return width;
 }
 
-test.describe('images - desktop (1280x720)', () => {
+test.describe('on a desktop viewport', () => {
 	test.use({ viewport: { height: 720, width: 1280 } });
 
-	test('hero selects an optimized width', async ({ page }) => {
-		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
+	test('the hero selects an optimized width', async ({ page, site }) => {
+		await visit(page, site.postDetail);
 
-		const width = await getSelectedWidth(page.locator('img').first());
-
-		expect(width).toBeLessThanOrEqual(1800);
+		expect(await getSelectedWidth(getHeroImage(page))).toBeLessThanOrEqual(heroWidthMaximum);
 	});
 
-	test('first content image selects an optimized width', async ({ page }) => {
-		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
+	test('the first content image selects an optimized width', async ({ page, site }) => {
+		await visit(page, site.postDetail);
 
-		const width = await getSelectedWidth(page.locator('article img, main img').nth(1));
-
-		expect(width).toBeLessThanOrEqual(1400);
+		expect(await getSelectedWidth(getContentImage(page))).toBeLessThanOrEqual(contentWidthMaximum);
 	});
 });
 
-test.describe('images - mobile (390x844)', () => {
+test.describe('on a phone viewport', () => {
 	test.use({ viewport: { height: 844, width: 390 } });
 
-	test('hero selects a smaller width than desktop', async ({ page }) => {
-		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
+	test('the hero selects a smaller width', async ({ page, site }) => {
+		await visit(page, site.postDetail);
 
-		const width = await getSelectedWidth(page.locator('img').first());
-
-		expect(width).toBeLessThanOrEqual(600);
+		expect(await getSelectedWidth(getHeroImage(page))).toBeLessThanOrEqual(mobileWidthMaximum);
 	});
 
-	test('first content image selects a smaller width than desktop', async ({ page }) => {
-		await page.goto(paths.postDetail, { waitUntil: 'domcontentloaded' });
+	test('the first content image selects a smaller width', async ({ page, site }) => {
+		await visit(page, site.postDetail);
 
-		const width = await getSelectedWidth(page.locator('article img, main img').nth(1));
-
-		expect(width).toBeLessThanOrEqual(600);
+		expect(await getSelectedWidth(getContentImage(page))).toBeLessThanOrEqual(mobileWidthMaximum);
 	});
 });

@@ -1,23 +1,26 @@
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
 import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
 
-test.describe('collection pages', () => {
-	test('/locations/ loads with content', async ({ page }) => {
-		const response = await page.goto(paths.locationsIndex, { waitUntil: 'domcontentloaded' });
+const t = getTranslations();
 
-		expect(response?.status()).toBe(200);
-		await expect(page.locator('main')).toBeVisible();
-		await expect(page.locator('main a').first()).toBeVisible();
-	});
+test('a Collection index loads with content', async ({ page }) => {
+	const response = await visit(page, paths.locationsIndex);
 
-	test('/locations/2/ is reachable from pagination', async ({ page }) => {
-		await page.goto(paths.locationsIndex, { waitUntil: 'domcontentloaded' });
+	expect(response?.status()).toBe(200);
+	await expect(page.locator('main')).toBeVisible();
+	await expect(page.locator('main a').first()).toBeVisible();
+});
 
-		const nextPageLink = page.getByRole('link', { name: 'Next' });
-		await expect(nextPageLink).toBeVisible();
-		await expect(nextPageLink).toHaveAttribute('href', paths.locationsIndexPage2);
+test('the Next link reaches page two', async ({ page }) => {
+	await visit(page, paths.locationsIndex);
 
-		const response = await page.goto(paths.locationsIndexPage2, { waitUntil: 'domcontentloaded' });
-		expect(response?.status()).toBe(200);
-	});
+	const nextPageLink = page.getByRole('link', { name: t('pagination.next') });
+
+	await expect(nextPageLink).toHaveAttribute('href', paths.locationsIndexPage2);
+
+	await nextPageLink.click();
+	await expect(page).toHaveURL(paths.locationsIndexPage2);
+	await expect(page.locator('main a').first()).toBeVisible();
 });

@@ -1,14 +1,10 @@
-import { paths } from './constants.ts';
-import { expect, test } from './fixtures.ts';
+import { expect, test, visit } from './fixtures.ts';
 
-test.describe('map', () => {
-	test('map loads on Taipei 101 location page', async ({ page }) => {
-		await page.goto(paths.locationDetail, { waitUntil: 'domcontentloaded' });
+test('the map loads on a Location', async ({ page, site }) => {
+	await visit(page, site.locationDetail);
 
-		// MapLibre GL creates a canvas element when it hydrates via client:visible
-		const canvas = page.locator('canvas.maplibregl-canvas');
+	// The island is server-rendered; the canvas only follows once client:visible hydrates it
+	await page.locator('astro-island[component-export="ReactMapComponent"]').scrollIntoViewIfNeeded();
 
-		await canvas.scrollIntoViewIfNeeded();
-		await expect(canvas).toBeVisible({ timeout: 10_000 });
-	});
+	await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
 });
