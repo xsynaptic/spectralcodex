@@ -2,25 +2,15 @@ import { describe, expect, test } from 'vitest';
 
 import type { BuildRecord } from '#lib/build-stats/build-stats-loader.ts';
 
-import { millisecondsPerDay } from '#constants.ts';
 import {
 	buildStatsLayout,
 	durationFrame,
 	getBuildStatsGeometry,
 } from '#lib/build-stats/build-stats-geometry.ts';
-
-const dayZero = Date.UTC(2026, 0, 1);
+import { buildRecord } from '#lib/build-stats/build-stats-test-utils.ts';
 
 function buildGeometry(records: Array<BuildRecord>) {
 	return getBuildStatsGeometry(records, { daysLimit: Infinity, trendWindowDays: 14 });
-}
-
-function buildRecord(dayOffset: number, durationSeconds: number, rest: Partial<BuildRecord> = {}) {
-	return {
-		durationSeconds,
-		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
-		...rest,
-	} satisfies BuildRecord;
 }
 
 describe('getBuildStatsGeometry', () => {

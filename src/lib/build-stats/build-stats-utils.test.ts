@@ -1,24 +1,13 @@
 import { describe, expect, test } from 'vitest';
 
-import type { BuildRecord } from '#lib/build-stats/build-stats-loader.ts';
-
 import { millisecondsPerDay } from '#constants.ts';
+import { buildRecord, dayZero } from '#lib/build-stats/build-stats-test-utils.ts';
 import {
 	formatBuildDuration,
 	getBuildAnnotations,
 	getRecentBuildRecords,
 	getRollingMedian,
 } from '#lib/build-stats/build-stats-utils.ts';
-
-const dayZero = Date.UTC(2026, 0, 1);
-
-function buildRecord(dayOffset: number, durationSeconds: number, rest: Partial<BuildRecord> = {}) {
-	return {
-		durationSeconds,
-		timestamp: new Date(dayZero + dayOffset * millisecondsPerDay).toISOString(),
-		...rest,
-	} satisfies BuildRecord;
-}
 
 // The window hangs off the newest record, so it holds the same builds on any later build date
 test('getRecentBuildRecords keeps the records inside the window ending at the newest one', () => {

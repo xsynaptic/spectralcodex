@@ -65,6 +65,8 @@
 		],
 	},
 	"duplicates": { "minTokens": 70 },
+	// On-demand semantic pass; the 0.80 default is mostly shared idiom, not shared logic
+	"similarCode": { "threshold": 0.9 },
 	"boundaries": {
 		"zones": [
 			{ "name": "packages", "patterns": ["packages/**"] },

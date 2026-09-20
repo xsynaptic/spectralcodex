@@ -1,20 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
-import type { OpenGraphContentEntry } from '#og-image/types.ts';
-
 import { batchEntriesBySourceImage } from '#og-image/batch.ts';
-
-function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
-	return {
-		collection: 'posts',
-		digest: 'digest',
-		id: 'entry',
-		imageFeaturedId: 'image/entry.jpg',
-		isFallback: false,
-		title: 'Title',
-		...overrides,
-	};
-}
+import { makeOgEntry } from '#og-image/og-image-test-utils.ts';
 
 describe('batchEntriesBySourceImage', () => {
 	test('separates fallback entries sharing a source image, because only those get blurred', () => {

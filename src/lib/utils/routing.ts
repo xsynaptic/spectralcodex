@@ -1,9 +1,6 @@
 import type { CollectionKey } from 'astro:content';
 
-// Drop-in replacement for the url-join package
-function joinUrl(...parts: Array<string>): string {
-	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
-}
+import { joinUrl } from '@spectralcodex/shared/routing';
 
 export const getBasePath = (...routeParts: Array<string>): string =>
 	joinUrl(import.meta.env.BASE_URL, ...routeParts);

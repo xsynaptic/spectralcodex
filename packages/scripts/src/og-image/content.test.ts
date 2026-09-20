@@ -4,22 +4,9 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import type { OpenGraphContentEntry } from '#og-image/types.ts';
-
 import { extractBuiltFilenames } from '#og-image/built-entries.ts';
 import { resolveEntry, resolveOgRegions } from '#og-image/content.ts';
-
-function makeOgEntry(overrides: Partial<OpenGraphContentEntry> = {}): OpenGraphContentEntry {
-	return {
-		collection: 'posts',
-		digest: 'digest',
-		id: 'entry',
-		imageFeaturedId: 'image/entry.jpg',
-		isFallback: false,
-		title: 'Title',
-		...overrides,
-	};
-}
+import { makeOgEntry } from '#og-image/og-image-test-utils.ts';
 
 function ogImageMeta(url: string) {
 	return `<meta property="og:image" content="${url}" />`;

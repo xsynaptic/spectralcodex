@@ -1,5 +1,6 @@
 import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
 import { getPublicId } from '@spectralcodex/shared/entries';
+import { joinUrl } from '@spectralcodex/shared/routing';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -75,10 +76,6 @@ function buildContentUrl(siteUrl: string, collection: string, id: string): strin
 	const collectionSegment = rootCollections.has(collection) ? '' : collection;
 
 	return joinUrl(siteUrl, collectionSegment, id, '/');
-}
-
-function joinUrl(...parts: Array<string>): string {
-	return parts.join('/').replaceAll(/(?<!:)\/\/+/g, '/');
 }
 
 function resolvePaths(options: SitemapLastmodOptions) {
