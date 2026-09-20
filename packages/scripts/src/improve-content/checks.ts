@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { getLinkUrls, isLinkUrlMatch } from '@spectralcodex/shared/links';
+
 export type CheckFn = (
 	entries: Array<LocationEntry>,
 	options: CheckOptions,
@@ -10,14 +12,6 @@ interface CheckOptions {
 }
 
 type LocationEntry = CollectionEntry<'locations'>;
-
-function hasMatchingLink(entry: LocationEntry, match: string): boolean {
-	const links = entry.data.links;
-
-	if (!links) return false;
-
-	return links.some((link) => (typeof link === 'string' ? link : link.url).includes(match));
-}
 
 export const checks: Record<string, CheckFn> = {
 	'bump-quality': (entries) =>
@@ -33,7 +27,8 @@ export const checks: Record<string, CheckFn> = {
 	'find-stubs-wiki': (entries, { threshold }) =>
 		entries.filter(
 			(entry) =>
-				(entry.body ?? '').trim().length < threshold && hasMatchingLink(entry, 'wikipedia.org'),
+				(entry.body ?? '').trim().length < threshold &&
+				getLinkUrls(entry.data.links).some((linkUrl) => isLinkUrlMatch(linkUrl, 'wikipedia.org')),
 		),
 	'theme-missing': (entries) => entries.filter((entry) => !entry.data.themes?.length),
 };

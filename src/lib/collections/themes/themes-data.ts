@@ -1,6 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import { collectHiddenLocationIds } from '#lib/utils/content-policy.ts';
 
 // Direct membership only; unlike regions, themes do not roll up their children
 function mapByTheme(
@@ -30,9 +31,13 @@ export const getThemesCollection = createCollectionData({
 		const locationsByThemeMap = mapByTheme(locations);
 		const postsByThemeMap = mapByTheme(posts);
 
+		const hiddenLocationIds = collectHiddenLocationIds(locations);
+
 		for (const entry of entries) {
 			entry.data._locations = locationsByThemeMap.get(entry.id) ?? [];
-			entry.data._locationCount = entry.data._locations.length;
+			entry.data._locationCount = entry.data._locations.filter(
+				(id) => !hiddenLocationIds.has(id),
+			).length;
 			entry.data._posts = postsByThemeMap.get(entry.id) ?? [];
 			entry.data._postCount = entry.data._posts.length;
 			entry.data._entryCount = entry.data._locationCount + entry.data._postCount;

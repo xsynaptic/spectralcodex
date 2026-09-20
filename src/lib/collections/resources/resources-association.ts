@@ -1,3 +1,7 @@
+import type { ContentLink } from '@spectralcodex/shared/links';
+
+import { getLinkUrls, isLinkUrlMatch } from '@spectralcodex/shared/links';
+
 export interface ResourceAssociation {
 	locationIdsByResourceId: Map<string, Array<string>>;
 	postIdsByResourceId: Map<string, Array<string>>;
@@ -5,7 +9,7 @@ export interface ResourceAssociation {
 
 interface ContentLike {
 	data: {
-		links?: Array<string | { url: string }> | undefined;
+		links?: Array<ContentLink> | undefined;
 		sources?: Array<object | string> | undefined;
 	};
 	id: string;
@@ -60,26 +64,6 @@ export function buildResourceAssociation(
 	collectContentIds(posts, postIdsByResourceId);
 
 	return { locationIdsByResourceId, postIdsByResourceId };
-}
-
-export function isLinkUrlMatch(
-	linkUrl: string,
-	matchPattern: Array<string> | string | undefined,
-): boolean {
-	if (!matchPattern) return false;
-
-	if (typeof matchPattern === 'string') {
-		return linkUrl.includes(matchPattern);
-	}
-
-	return matchPattern.some((pattern) => linkUrl.includes(pattern));
-}
-
-// Normalized once per content entry; the predicate below reruns against every resource
-function getLinkUrls(links: ContentLike['data']['links']): Array<string> {
-	if (!links) return [];
-
-	return links.map((link) => (typeof link === 'string' ? link : link.url));
 }
 
 // Object-form sources are resources written inline; only string sources reference a resource entry
