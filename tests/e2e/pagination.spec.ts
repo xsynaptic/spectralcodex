@@ -1,8 +1,7 @@
+import { paths } from '#e2e/constants.ts';
+import { expect, test, visit } from '#e2e/test.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
-
-import { paths } from './constants.ts';
-import { expect, test, visit } from './fixtures.ts';
 
 const t = getTranslations();
 

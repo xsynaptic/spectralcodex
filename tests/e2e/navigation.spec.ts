@@ -1,7 +1,6 @@
+import { paths } from '#e2e/constants.ts';
+import { expect, test, visit } from '#e2e/test.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-
-import { paths } from './constants.ts';
-import { expect, test, visit } from './fixtures.ts';
 
 const t = getTranslations();
 
@@ -43,4 +42,25 @@ test('the current page is the only one marked', async ({ page }) => {
 
 	await expect(ancestorLink).toHaveClass(/anchor-active/);
 	await expect(ancestorLink).toHaveAttribute('aria-current', 'page');
+});
+
+test('a header link navigates client-side and the chrome survives the swap', async ({ page }) => {
+	await visit(page, paths.postsIndex);
+
+	// A window property dies with its document, where a `load` count races the URL assertion on a slow host
+	await page.evaluate(() => Object.assign(window, { survivesSwap: true }));
+
+	await page
+		.getByRole('navigation', { name: t('site.navigation.header.label') })
+		.getByRole('link', { exact: true, name: t('collection.locations.labelPlural') })
+		.click();
+
+	await expect(page).toHaveURL(paths.locationsIndex);
+	expect(
+		await page.evaluate(() => 'survivesSwap' in window),
+		'the swap reloaded the document',
+	).toBe(true);
+
+	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
+	await expect(page.locator('pagefind-input input')).toBeVisible();
 });

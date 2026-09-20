@@ -30,9 +30,11 @@
 		"media-orphans": "pnpm -F @spectralcodex/scripts media-orphans",
 		"og-image": "pnpm -F @spectralcodex/scripts og-image",
 		"similar-content": "pnpm -F @spectralcodex/scripts similar-content",
+		"stryker": "stryker run",
+		"stryker-file": "stryker run --reporters clear-text --mutate",
 		"test": "vitest",
-		"test-e2e": "playwright test",
-		"test-e2e-prod": "TEST_ENV=prod node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
+		"test-e2e-smoke": "playwright test",
+		"test-e2e-smoke-prod": "TEST_ENV=prod playwright test",
 		"test-image-server": "vitest run --config vitest.integration.config.ts",
 		"validate-content": "astro sync && pnpm -F @spectralcodex/scripts validate-content",
 		"validate-image-alt": "astro sync && pnpm -F @spectralcodex/scripts validate-image-alt",
@@ -41,6 +43,7 @@
 	"type": "module",
 	"license": "MIT",
 	"imports": {
+		"#e2e/*": "./tests/e2e/*",
 		"#*": "./src/*"
 	},
 	"dependencies": {
@@ -63,6 +66,8 @@
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
+		"@stryker-mutator/core": "^10.0.0",
+		"@stryker-mutator/vitest-runner": "^10.0.0",
 		"@tailwindcss/vite": "^4.3.3",
 		"@tanstack/eslint-plugin-query": "^5.103.1",
 		"@turf/center": "^7.4.0",

@@ -34,6 +34,20 @@ describe('buildResourceAssociation', () => {
 		expect(association.locationIdsByResourceId.get('heritage-bureau')).toEqual(['some-place']);
 	});
 
+	test('one matching link among several is enough', () => {
+		const association = buildResourceAssociation(
+			[makeResource('taipei-times', 'taipeitimes.com')],
+			[
+				makeContent('some-place', {
+					links: ['https://other.example.org/', 'https://www.taipeitimes.com/News/feat/12345'],
+				}),
+			],
+			[],
+		);
+
+		expect(association.locationIdsByResourceId.get('taipei-times')).toEqual(['some-place']);
+	});
+
 	test('associates an object-form link by its url', () => {
 		const association = buildResourceAssociation(
 			[makeResource('taipei-times', 'taipeitimes.com')],
@@ -57,7 +71,9 @@ describe('buildResourceAssociation', () => {
 
 		expect(association.locationIdsByResourceId.get('taiwan-in-time')).toEqual(['some-place']);
 	});
+});
 
+describe('buildResourceAssociation grouping', () => {
 	test('ignores object-form sources', () => {
 		const association = buildResourceAssociation(
 			[makeResource('taiwan-in-time')],

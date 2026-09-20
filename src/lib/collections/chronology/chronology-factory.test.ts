@@ -108,6 +108,192 @@ describe('createChronologyData monthly tier', () => {
 		// Alphabetically 'aaa' precedes 'zzz', but the image-bearing entry is boosted ahead within q2
 		expect(ids(monthlyItem(data, '2024/03').created)).toEqual(['zzz-with-image', 'aaa-no-image']);
 	});
+});
+
+describe('createChronologyData monthly buckets', () => {
+	test('an update in the same month as creation does not double count', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 10),
+					dateUpdated: new Date(2024, 2, 20),
+					id: 'same-month',
+				}),
+			],
+			[],
+		);
+
+		const march = monthlyItem(data, '2024/03');
+
+		expect(ids(march.created)).toEqual(['same-month']);
+		expect(march.updated).toEqual([]);
+		expect(march.updatedCount).toBe(0);
+	});
+
+	test('an update in a later year counts as updated in that year', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 10, 10),
+					dateUpdated: new Date(2024, 0, 15),
+					id: 'carried-over',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(monthlyItem(data, '2024/01').updated)).toEqual(['carried-over']);
+		expect(ids(monthlyItem(data, '2023/11').created)).toEqual(['carried-over']);
+	});
+
+	test('a recorded history lands once per year, on the latest date in that year', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2019, 5, 10),
+					dateRecorded: [
+						{ date: new Date(2024, 2, 10), hasTime: false },
+						{ date: new Date(2024, 6, 20), hasTime: false },
+						{ date: new Date(2023, 8, 5), hasTime: false },
+					],
+					id: 'revisited',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(monthlyItem(data, '2024/07').visited)).toEqual(['revisited']);
+		expect(ids(monthlyItem(data, '2023/09').visited)).toEqual(['revisited']);
+		// The losing visit creates no month at all, rather than an empty one
+		expect(data.chronologyMonthlyData.some((item) => item.id === '2024/03')).toBe(false);
+	});
+});
+
+describe('createChronologyData monthly highlights', () => {
+	test('a highlight needs both a featured image and quality >= 2', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 10),
+					entryQuality: 2,
+					id: 'q2-image',
+					imageId: 'img-a',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 11),
+					entryQuality: 1,
+					id: 'q1-image',
+					imageId: 'img-b',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 12),
+					entryQuality: 3,
+					id: 'q3-no-image',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(monthlyItem(data, '2024/03').highlights ?? [])).toEqual(['q2-image']);
+	});
+});
+
+describe('createChronologyData monthly ordering', () => {
+	test('a month lists entries by quality, then featured image, then title', () => {
+		const data = createChronologyData(
+			[
+				// Listed first and identical to 'a-q2' but for the title, so only the title sort orders them
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 9),
+					entryQuality: 2,
+					id: 'z-q2',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 10),
+					entryQuality: 2,
+					id: 'a-q2',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 11),
+					entryQuality: 3,
+					id: 'z-q3',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 12),
+					entryQuality: 2,
+					id: 'b-q2-image',
+					imageId: 'img',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(monthlyItem(data, '2024/03').created)).toEqual([
+			'z-q3',
+			'b-q2-image',
+			'a-q2',
+			'z-q2',
+		]);
+	});
+
+	test('highlights run highest quality first, then by title', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 3, 10),
+					entryQuality: 2,
+					id: 'a-q2',
+					imageId: 'img-a',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 3, 11),
+					entryQuality: 3,
+					id: 'z-q3',
+					imageId: 'img-z',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 3, 12),
+					entryQuality: 3,
+					id: 'b-q3',
+					imageId: 'img-b',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(monthlyItem(data, '2024/04').highlights ?? [])).toEqual(['b-q3', 'z-q3', 'a-q2']);
+	});
+});
+
+describe('createChronologyData monthly highlight dedup', () => {
+	test('a month with no candidate carries no highlights at all', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 4, 10),
+					entryQuality: 2,
+					id: 'no-image',
+				}),
+			],
+			[],
+		);
+
+		expect(monthlyItem(data, '2024/05').highlights).toBeUndefined();
+	});
 
 	test('monthly highlights do not repeat within a year', () => {
 		const data = createChronologyData(
@@ -180,14 +366,187 @@ describe('createChronologyData yearly and index tiers', () => {
 					entryQuality: 1,
 					id: 'low',
 				}),
+				makeCatalogItem({ collection: 'posts', dateCreated: new Date(2024, 2, 10), id: 'kept' }),
 			],
 			[],
 		);
 
 		expect(data.chronologyYearlyData['2019']).toBeUndefined();
-		// So it must not leave behind month items or a month list that would generate orphan pages
+		// A year with no view generates no pages, so anything keyed to it would orphan
 		expect(data.chronologyMonthlyData.some((item) => item.year === '2019')).toBe(false);
 		expect(data.chronologyMonths['2019']).toBeUndefined();
+		expect(data.chronologyDailyData['2019']).toBeUndefined();
+
+		expect(data.chronologyMonthlyData.some((item) => item.year === '2024')).toBe(true);
+		expect(data.chronologyMonths['2024']).toEqual(['03']);
+		expect(data.chronologyDailyData['2024']).toBeDefined();
+	});
+
+	test('the yearly view reuses the monthly highlights', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 10),
+					id: 'featured',
+					imageId: 'img',
+				}),
+			],
+			[],
+		);
+
+		const march = (data.chronologyYearlyData['2024'] ?? []).find((month) => month.month === '03');
+
+		expect(ids(march?.highlights ?? [])).toEqual(['featured']);
+		expect(ids(monthlyItem(data, '2024/03').highlights ?? [])).toEqual(['featured']);
+	});
+
+	test('years run newest first', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({ collection: 'posts', dateCreated: new Date(2020, 5, 10), id: 'a' }),
+				makeCatalogItem({ collection: 'posts', dateCreated: new Date(2024, 5, 10), id: 'b' }),
+				makeCatalogItem({ collection: 'posts', dateCreated: new Date(2022, 5, 10), id: 'c' }),
+			],
+			[],
+		);
+
+		expect(data.chronologyYears).toEqual(['2024', '2022', '2020']);
+	});
+});
+
+describe('createChronologyData index tier', () => {
+	test('an entry created, updated, and visited in one year appears once, under updated', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 0, 10),
+					dateRecorded: [{ date: new Date(2024, 2, 20), hasTime: false }],
+					dateUpdated: new Date(2024, 1, 15),
+					id: 'everywhere',
+				}),
+			],
+			[],
+		);
+
+		const index = data.chronologyIndexData['2024'];
+
+		expect(ids(index?.updated ?? [])).toEqual(['everywhere']);
+		expect(index?.created).toEqual([]);
+		expect(index?.visited).toEqual([]);
+		// Counts are the full bucket totals, taken before the dedup
+		expect(index).toMatchObject({ createdCount: 1, updatedCount: 1, visitedCount: 1 });
+	});
+
+	test('an entry only visited in a year still earns a yearly slot', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2022, 5, 10),
+					dateRecorded: [{ date: new Date(2024, 6, 20), hasTime: false }],
+					id: 'revisited',
+				}),
+			],
+			[],
+		);
+
+		const july = (data.chronologyYearlyData['2024'] ?? []).find((month) => month.month === '07');
+
+		expect(ids(july?.visited ?? [])).toEqual(['revisited']);
+	});
+
+	test('the yearly floor of quality 2 holds in every category', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 2, 10),
+					entryQuality: 2,
+					id: 'q2-created',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 2, 11),
+					dateRecorded: [{ date: new Date(2024, 2, 12), hasTime: false }],
+					entryQuality: 1,
+					id: 'q1-visited',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 2, 13),
+					dateUpdated: new Date(2024, 2, 14),
+					entryQuality: 1,
+					id: 'q1-updated',
+				}),
+			],
+			[],
+		);
+
+		const march = (data.chronologyYearlyData['2024'] ?? []).find((month) => month.month === '03');
+
+		expect(ids(march?.created ?? [])).toEqual(['q2-created']);
+		expect(march?.visited).toEqual([]);
+		expect(march?.updated).toEqual([]);
+	});
+});
+
+describe('createChronologyData index limits', () => {
+	test('the index tier caps each category at twenty', () => {
+		const items = Array.from({ length: 25 }, (_, index) =>
+			makeCatalogItem({
+				collection: 'posts',
+				dateCreated: new Date(2024, 2, 10),
+				id: `item-${String(index).padStart(2, '0')}`,
+			}),
+		);
+
+		const data = createChronologyData(items, []);
+
+		expect(data.chronologyIndexData['2024']?.created).toHaveLength(20);
+		expect(data.chronologyIndexData['2024']?.createdCount).toBe(25);
+	});
+
+	test('the index tier requires quality >= 3 of updated and visited too', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 0, 10),
+					dateUpdated: new Date(2024, 1, 15),
+					entryQuality: 3,
+					id: 'u3',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 0, 11),
+					dateUpdated: new Date(2024, 1, 16),
+					entryQuality: 2,
+					id: 'u2',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 0, 12),
+					dateRecorded: [{ date: new Date(2024, 2, 20), hasTime: false }],
+					entryQuality: 3,
+					id: 'v3',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 0, 13),
+					dateRecorded: [{ date: new Date(2024, 2, 21), hasTime: false }],
+					entryQuality: 2,
+					id: 'v2',
+				}),
+			],
+			[],
+		);
+
+		const index = data.chronologyIndexData['2024'];
+
+		expect(ids(index?.updated ?? [])).toEqual(['u3']);
+		expect(ids(index?.visited ?? [])).toEqual(['v3']);
 	});
 
 	test('an index highlight shared across years goes to the most recent year', () => {
@@ -356,6 +715,23 @@ describe('buildChronologyDailyData', () => {
 		]);
 
 		expect(daily['2024']?.['2024-03-15']).toEqual({ created: 0, updated: 0, visited: 1 });
+	});
+
+	test('counts accumulate across entries sharing a UTC day', () => {
+		const daily = buildChronologyDailyData([
+			makeCatalogItem({
+				collection: 'posts',
+				dateCreated: new Date('2024-03-10T02:00:00Z'),
+				id: 'a',
+			}),
+			makeCatalogItem({
+				collection: 'posts',
+				dateCreated: new Date('2024-03-10T20:00:00Z'),
+				id: 'b',
+			}),
+		]);
+
+		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 2, updated: 0, visited: 0 });
 	});
 
 	test('excludes the pages collection', () => {

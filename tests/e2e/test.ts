@@ -2,10 +2,10 @@ import type { Page, Response } from '@playwright/test';
 
 import { test as base, expect } from '@playwright/test';
 
-import type { SitePaths } from './site-paths.ts';
+import type { SitePaths } from '#e2e/site-paths.ts';
 
-import { getBaseUrl } from './constants.ts';
-import { getSitePaths } from './site-paths.ts';
+import { getBaseUrl } from '#e2e/constants.ts';
+import { getSitePaths } from '#e2e/site-paths.ts';
 
 export { expect } from '@playwright/test';
 
@@ -15,12 +15,15 @@ interface ConsoleGuard {
 
 const allowedHost = new URL(getBaseUrl()).host;
 
+// Cloudflare edge-injects a beacon the off-host route answers empty; Chromium fails its SRI check, WebKit its MIME check
+const blockedResourcePattern = /static\.cloudflareinsights\.com/;
+
 export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>({
 	// Automatic so no spec can forget it; it costs a page, so request-only specs use the base test
 	consoleGuard: [
 		async ({ page }, use) => {
 			const errors: Array<string> = [];
-			const allowed: Array<RegExp> = [];
+			const allowed: Array<RegExp> = [blockedResourcePattern];
 
 			page.on('console', (message) => {
 				if (message.type() === 'error') errors.push(message.text());

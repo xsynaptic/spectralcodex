@@ -48,6 +48,62 @@ describe('getBuildStatsGeometry', () => {
 		expect(geometry?.pages?.end.cx).toBe(buildStatsLayout.width - buildStatsLayout.marginRight);
 	});
 
+	test('a gap wider than the trend window lifts the pen', () => {
+		// 14-day window, so days 8 to 22 have no build within half a window either side
+		const gapped = buildGeometry([buildRecord(0, 100), buildRecord(30, 100)])?.duration.trendPath;
+		const continuous = buildGeometry([buildRecord(0, 100), buildRecord(3, 100)])?.duration
+			.trendPath;
+
+		expect(gapped?.match(/M/g)).toHaveLength(2);
+		expect(continuous?.match(/M/g)).toHaveLength(1);
+
+		// One vertex per UTC day, days 0 to 3 inclusive, opened by a move and joined by lines
+		expect(continuous?.startsWith('M')).toBe(true);
+		expect(continuous?.match(/L/g)).toHaveLength(3);
+	});
+
+	test('the year is labelled on the opening tick and each January, nowhere else', () => {
+		// March 2026 to February 2027, so the opening tick is not itself a January
+		const ticks = buildGeometry([buildRecord(63, 100), buildRecord(397, 100)])?.axisTicks ?? [];
+
+		expect(
+			ticks
+				.filter((tick) => tick.yearLabel !== undefined)
+				.map((tick) => `${tick.label} ${String(tick.yearLabel)}`),
+		).toStrictEqual(['Apr 2026', 'Jan 2027']);
+		expect(ticks.length).toBeGreaterThan(2);
+	});
+
+	test('an annotation is dropped once every tier is taken', () => {
+		// Four notes within four days of a 400-day span sit far closer than the label gap
+		const marks =
+			buildGeometry([
+				buildRecord(0, 100, { notes: 'First' }),
+				buildRecord(1, 100, { notes: 'Second' }),
+				buildRecord(2, 100, { notes: 'Third' }),
+				buildRecord(3, 100, { notes: 'Fourth' }),
+				buildRecord(400, 100),
+			])?.duration.annotations ?? [];
+
+		expect(marks.map((mark) => mark.label)).toStrictEqual(['First', 'Second', 'Third']);
+		expect(marks[0]!.labelY).toBeLessThan(marks[1]!.labelY);
+		expect(marks[1]!.labelY).toBeLessThan(marks[2]!.labelY);
+	});
+
+	test('duration ticks are only those inside the padded domain', () => {
+		const narrow = buildGeometry([buildRecord(0, 100), buildRecord(1, 200)])?.duration.ticks ?? [];
+		const wide = buildGeometry([buildRecord(0, 60), buildRecord(1, 3600)])?.duration.ticks ?? [];
+
+		// 100/1.08 to 200*1.08 admits 2m alone; 60/1.08 to 3600*1.08 admits everything between
+		expect(narrow.map((tick) => tick.label)).toStrictEqual(['2m']);
+		expect(wide.map((tick) => tick.label)).toStrictEqual(['1m', '2m', '5m', '15m', '30m', '1h']);
+
+		for (const tick of [...narrow, ...wide]) {
+			expect(tick.y).toBeGreaterThanOrEqual(durationFrame.top);
+			expect(tick.y).toBeLessThanOrEqual(durationFrame.bottom);
+		}
+	});
+
 	// Regression: labels used to hang to the right, running the closing one off the plot
 	test('annotation labels stay inside the plot at either edge', () => {
 		const marks =

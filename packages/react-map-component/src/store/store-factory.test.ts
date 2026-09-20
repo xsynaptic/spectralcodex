@@ -45,6 +45,52 @@ describe('createMapStore', () => {
 		expect(store.getState().selectedId).toBeUndefined();
 	});
 
+	test('toggling one status leaves the others in the exclude-list', () => {
+		const store = createMapStore();
+		const { toggleStatusFilter } = store.getState().actions;
+
+		toggleStatusFilter(LocationStatusEnum.Abandoned);
+		toggleStatusFilter(LocationStatusEnum.Vanished);
+		toggleStatusFilter(LocationStatusEnum.Abandoned);
+
+		expect(store.getState().statusFilter).toEqual([LocationStatusEnum.Vanished]);
+	});
+
+	test('a filter setter stores its value, not only the cleared selection', () => {
+		const store = createMapStore();
+		const { setEntryQualityFilter, setFilterOpen, setObjectiveFilter, setRatingFilter } =
+			store.getState().actions;
+
+		setEntryQualityFilter(3);
+		setObjectiveFilter(4);
+		setRatingFilter(5);
+		setFilterOpen(true);
+
+		expect(store.getState()).toMatchObject({
+			entryQualityFilter: 3,
+			isFilterOpen: true,
+			objectiveFilter: 4,
+			ratingFilter: 5,
+		});
+	});
+
+	test('selecting closes the filter panel and leaves popup visibility alone', () => {
+		const store = createMapStore();
+		const { setFilterOpen, setPopupVisible, setSelectedId } = store.getState().actions;
+
+		setFilterOpen(true);
+		setPopupVisible(false);
+		expect(store.getState().isPopupVisible).toBe(false);
+
+		setSelectedId('location-1');
+
+		expect(store.getState()).toMatchObject({
+			isFilterOpen: false,
+			isPopupVisible: false,
+			selectedId: 'location-1',
+		});
+	});
+
 	test('clearing the selection restores popup visibility', () => {
 		const store = createMapStore();
 		const { setPopupVisible, setSelectedId } = store.getState().actions;

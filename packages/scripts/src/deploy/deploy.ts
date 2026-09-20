@@ -21,11 +21,13 @@ const { values } = parseArgs({
 	options: {
 		'dry-run': { default: false, type: 'boolean' },
 		'skip-build': { default: false, type: 'boolean' },
+		'skip-smoke': { default: false, type: 'boolean' },
 	},
 });
 
 const isDryRun = values['dry-run'];
 const isSkipBuild = values['skip-build'];
+const isSkipSmoke = values['skip-smoke'];
 
 // Load and validate deploy configuration
 const config = loadDeployConfig();
@@ -89,8 +91,12 @@ async function sync() {
 }
 
 async function test() {
+	if (isSkipSmoke) {
+		console.log(chalk.yellow('Skipping smoke suite'));
+		return;
+	}
 	console.log(chalk.blue('Running E2E smoke tests...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm test-e2e`;
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm test-e2e-smoke`;
 }
 
 async function transfer() {

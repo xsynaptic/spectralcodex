@@ -65,6 +65,37 @@ describe('buildActivityGraph', () => {
 		expect(december?.name).toBe('Dec');
 	});
 
+	test('counts the weeks the grid needs, pads included', () => {
+		// 2023 starts on a Sunday: 365 days over 53 week columns; 2024 adds a pad cell
+		expect(buildActivityGraph({ referenceDate, values: {}, year: '2023' }).weekCount).toBe(53);
+		expect(buildActivityGraph({ referenceDate, values: {}, year: '2024' }).weekCount).toBe(53);
+	});
+
+	test('a later month label sits at its own week line', () => {
+		const graph = buildActivityGraph({ referenceDate, values: {}, year: '2023' });
+
+		// 2023-12-01 is day 334 of a year with no pad, so it opens week 48
+		expect(graph.monthLabels[11]).toMatchObject({ name: 'Dec', week: 48 });
+	});
+
+	test('the reference day is not future, and future days take no level', () => {
+		const graph = buildActivityGraph({
+			referenceDate: new Date('2023-06-15T12:00:00Z'),
+			values: { '2023-01-05': 5, '2023-06-20': 100 },
+			year: '2023',
+		});
+
+		const dayFor = (iso: string) =>
+			graph.days.find((day) => day.date.toISOString().startsWith(iso))!;
+
+		expect(dayFor('2023-06-15').future).toBe(false);
+		expect(dayFor('2023-06-16').future).toBe(true);
+
+		// The future day holds the year's biggest count, so it would set the scale if it were eligible
+		expect(dayFor('2023-06-20')).toMatchObject({ level: 0, value: 100 });
+		expect(dayFor('2023-01-05').level).toBe(4);
+	});
+
 	test('levels a day relative to the busiest day of the year', () => {
 		const graph = buildActivityGraph({
 			referenceDate,

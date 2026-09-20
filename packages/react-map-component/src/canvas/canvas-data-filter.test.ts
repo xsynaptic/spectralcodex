@@ -94,6 +94,22 @@ describe('isLocationVisible', () => {
 			isLocationVisible(makeItem({ objective: 2 }).properties, { ...passAll, objective: 3 }),
 		).toBe(false);
 	});
+
+	test('every threshold is an inclusive minimum', () => {
+		const atThreshold: MapFilterState = { entryQuality: 3, objective: 3, rating: 3, status: [] };
+		const onTheLine = { entryQuality: 3, objective: 3, rating: 3 };
+
+		expect(isLocationVisible(makeItem(onTheLine).properties, atThreshold)).toBe(true);
+		expect(
+			isLocationVisible(makeItem({ ...onTheLine, entryQuality: 2 }).properties, atThreshold),
+		).toBe(false);
+		expect(isLocationVisible(makeItem({ ...onTheLine, rating: 2 }).properties, atThreshold)).toBe(
+			false,
+		);
+		expect(
+			isLocationVisible(makeItem({ ...onTheLine, objective: 2 }).properties, atThreshold),
+		).toBe(false);
+	});
 });
 
 describe('getMapCanvasData', () => {
@@ -129,6 +145,16 @@ describe('getMapCanvasData', () => {
 			type: 'Feature',
 		});
 		expect(feature && 'id' in feature).toBe(false);
+	});
+
+	test('a hidden item is neither drawn nor counted as filtered', () => {
+		const result = getMapCanvasData([makeItem({ entryQuality: 1 }), makeItem()], {
+			...passAll,
+			entryQuality: 3,
+		});
+
+		expect(result.filteredCount).toBe(1);
+		expect(result.totalCount).toBe(2); // totalCount is the scoped total, before visibility
 	});
 
 	test('empty input yields undefined collections and zero counts', () => {
@@ -184,12 +210,49 @@ describe('getMapCanvasData scope', () => {
 		]);
 	});
 
+	test('region scope is inclusive at both ends of the interval', () => {
+		const items = [
+			makeItem({ id: 'below-left', regionOrdinals: [3] }),
+			makeItem({ id: 'at-left', regionOrdinals: [4] }),
+			makeItem({ id: 'at-right', regionOrdinals: [10] }),
+			makeItem({ id: 'above-right', regionOrdinals: [11] }),
+		];
+
+		const result = getMapCanvasData(items, passAll, { interval: [4, 10], type: 'region' });
+
+		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
+			'at-left',
+			'at-right',
+		]);
+	});
+
+	test('an item in several regions is kept when any one ordinal is inside', () => {
+		const item = makeItem({ id: 'multi', regionOrdinals: [99, 5] });
+
+		const result = getMapCanvasData([item], passAll, { interval: [1, 10], type: 'region' });
+
+		expect(result.totalCount).toBe(1);
+	});
+
+	test('ids scope drops ids missing from the index', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			ids: ['inside', 'nope'],
+			type: 'ids',
+		});
+
+		expect(result.totalCount).toBe(1);
+		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
+			'inside',
+		]);
+	});
+
 	test('points missing the relevant column are excluded by a scope', () => {
 		const bare = makeItem({ id: 'bare' });
 
-		const result = getMapCanvasData([bare], passAll, { interval: [1, 10], type: 'region' });
-
-		expect(result.totalCount).toBe(0);
+		expect(
+			getMapCanvasData([bare], passAll, { interval: [1, 10], type: 'region' }).totalCount,
+		).toBe(0);
+		expect(getMapCanvasData([bare], passAll, { index: 2, type: 'theme' }).totalCount).toBe(0);
 	});
 
 	test('no scope leaves every point in scope', () => {

@@ -29,6 +29,31 @@ describe('validateLocationsOverlap', () => {
 		expect(result.issues[0]?.message).toMatch(/^a: overlaps b \(5\.\dm\)$/);
 	});
 
+	test('reports every distinct pair, nearest first', () => {
+		const entries = [
+			makePoint('a', 25.05),
+			makePoint('b', 25.05005), // about 5.5m from 'a'
+			makePoint('c', 25.06),
+			makePoint('d', 25.06002), // about 2.2m from 'c', and a kilometre from the others
+		];
+
+		const result = validateLocationsOverlap(entries, 10);
+
+		expect(result.issues.map((issue) => issue.message)).toEqual([
+			expect.stringMatching(/^c: overlaps d \(2\.\dm\)$/),
+			expect.stringMatching(/^a: overlaps b \(5\.\dm\)$/),
+		]);
+		expect(result.summary).toBe('Found 2 overlap(s) (checked 4 locations, 4 points)');
+	});
+
+	test('an entry with no usable geometry is left out of the count', () => {
+		const entries = [makeEntry({ data: {}, id: 'no-geometry' }), makePoint('a', 25.05)];
+
+		expect(validateLocationsOverlap(entries, 10).summary).toBe(
+			'No overlapping locations found (checked 1 locations, 1 points)',
+		);
+	});
+
 	test('never reports a location against its own points', () => {
 		const entries = [
 			makeEntry({

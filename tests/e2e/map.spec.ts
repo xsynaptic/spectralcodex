@@ -1,4 +1,4 @@
-import { expect, test, visit } from './fixtures.ts';
+import { expect, test, visit } from '#e2e/test.ts';
 
 test('the map loads on a Location', async ({ page, site }) => {
 	await visit(page, site.locationDetail);

@@ -64,7 +64,7 @@ Full deployment pipeline:
 5. `sitemap-lastmod` - stamp sitemap timestamps
 6. `astro build` - build site
 7. `og-image` - generate OG images
-8. `test-e2e` - smoke tests
+8. `test-e2e-smoke` - smoke tests
 9. `deploy-media` - sync media to remote
 10. `deploy-app` - transfer built app
 11. `deploy-og` - transfer OG images

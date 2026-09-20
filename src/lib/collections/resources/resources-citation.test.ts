@@ -82,6 +82,9 @@ describe('buildSourceCitations', () => {
 	});
 
 	// Regression: an empty array previously rendered a leading delimiter
+});
+
+describe('buildSourceCitations omissions', () => {
 	test('omits authors entirely when the list is empty', () => {
 		const { primary } = buildSourceCitations(
 			makeSource({ authors: [], publisher: 'A Publisher', title: 'A Title' }),
@@ -89,6 +92,20 @@ describe('buildSourceCitations', () => {
 
 		expect(primary?.authors).toBeUndefined();
 		expect(primary?.published).toBe('A Publisher');
+	});
+
+	test('a bare title carries neither an authors run nor a published run', () => {
+		const { primary } = buildSourceCitations(makeSource({ title: 'A Title' }));
+
+		expect(primary?.title).toBe('A Title');
+		expect(primary?.authors).toBeUndefined();
+		expect(primary?.published).toBeUndefined();
+	});
+
+	test('a publisher in a citation language with no title yields no multilingual citation', () => {
+		const { multilingual } = buildSourceCitations(makeSource({ publisher_zh: '出版社' }));
+
+		expect(multilingual).toBeUndefined();
 	});
 
 	test('omits authors when none carry a name in the citation language', () => {

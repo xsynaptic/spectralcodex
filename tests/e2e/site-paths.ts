@@ -1,6 +1,6 @@
 import type { APIRequestContext } from '@playwright/test';
 
-import { contentManifestPath, paths } from './constants.ts';
+import { contentManifestPath, paths } from '#e2e/constants.ts';
 
 export interface SitePaths {
 	locationDetail: string;

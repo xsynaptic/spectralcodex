@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { expect, test, visit } from './fixtures.ts';
+import { expect, test, visit } from '#e2e/test.ts';
 
 const bodyLengthMinimum = 50;
 

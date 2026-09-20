@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import {
 	createRegionsTree,
@@ -82,9 +82,10 @@ describe('populateRegionsHierarchy', () => {
 		expect(taiwan.data._children).toEqual(['north-taiwan', 'tainan']);
 		expect(northTaiwan.data._siblings).toEqual(['tainan']);
 		expect(taipei.data._siblings).toEqual(['keelung']);
-		// Leaf with no children and root with no ancestors remain undefined, not []
+		// Empty groups remain undefined, not []
 		expect(taipei.data._children).toBeUndefined();
 		expect(taiwan.data._ancestors).toBeUndefined();
+		expect(taiwan.data._siblings).toBeUndefined();
 	});
 });
 
@@ -98,6 +99,24 @@ describe('populateRegionsLangCode', () => {
 		const taipei = regions.find((entry) => entry.id === 'taipei')!;
 
 		expect(taipei.data._langCode).toBe(LanguageCodeEnum.ChineseTraditional);
+	});
+
+	test('a deep descendant takes the root language, not an intermediate ancestor', () => {
+		const regions = [
+			makeRegion('taiwan'),
+			makeRegion('north-taiwan', 'taiwan'),
+			makeRegion('taipei', 'north-taiwan'),
+			makeRegion('daan', 'taipei'),
+		];
+
+		populateRegionsHierarchy(regions, createRegionsTree(regions));
+		populateRegionsLangCode(regions);
+
+		const daan = regions.find((entry) => entry.id === 'daan')!;
+
+		// Only 'taiwan' carries a language; an ancestor one step in would answer undefined
+		expect(daan.data._ancestors).toEqual(['taipei', 'north-taiwan', 'taiwan']);
+		expect(daan.data._langCode).toBe(LanguageCodeEnum.ChineseTraditional);
 	});
 
 	test('roots use their own id; unmapped roots get no code', () => {
@@ -156,5 +175,94 @@ describe('populateRegionsContent', () => {
 
 		expect(taiwan.data._entryCount).toBe(2);
 		expect(tainan.data._entryCount).toBe(0);
+	});
+});
+
+// `contentPolicy` reads `import.meta.env.DEV` once at module load, so the policy-gated paths are
+// only reachable through a fresh import, as `content-policy.test.ts` does
+async function loadFactory(isDev: boolean) {
+	vi.stubEnv('DEV', isDev);
+	vi.resetModules();
+
+	return import('#lib/collections/regions/regions-factory.ts');
+}
+
+function makeOverrideLocation(
+	id: string,
+	regionIds: Array<string>,
+	overrideRegionIds: Array<string>,
+) {
+	return {
+		collection: 'locations',
+		data: {
+			override: { regions: overrideRegionIds.map((regionId) => ({ id: regionId })) },
+			regions: regionIds.map((regionId) => ({ id: regionId })),
+			title: id,
+		},
+		id,
+	} as unknown as CollectionEntry<'locations'>;
+}
+
+function makeSensitiveLocation(id: string, regionIds: Array<string>) {
+	return {
+		collection: 'locations',
+		data: {
+			hideLocation: true,
+			regions: regionIds.map((regionId) => ({ id: regionId })),
+			title: id,
+		},
+		id,
+	} as unknown as CollectionEntry<'locations'>;
+}
+
+afterEach(() => {
+	vi.unstubAllEnvs();
+	vi.resetModules();
+});
+
+async function taipeiCountsFor(isDev: boolean) {
+	const { createRegionsTree, populateRegionsContent } = await loadFactory(isDev);
+	const regions = makeRegionsFixture();
+
+	populateRegionsContent({
+		entries: regions,
+		locations: [makeLocation('temple', ['taipei']), makeSensitiveLocation('bunker', ['taipei'])],
+		posts: [],
+		regionsTree: createRegionsTree(regions),
+	});
+
+	return regions.find((entry) => entry.id === 'taipei')!.data;
+}
+
+describe('populateRegionsContent under the production content policy', () => {
+	test('a sensitive location is gathered but not counted', async () => {
+		const taipei = await taipeiCountsFor(false);
+
+		expect(taipei._locations).toEqual(['temple', 'bunker']);
+		expect(taipei._locationCount).toBe(1);
+		expect(taipei._entryCount).toBe(1);
+	});
+
+	test('in development it counts like any other location', async () => {
+		const taipei = await taipeiCountsFor(true);
+
+		expect(taipei._locations).toEqual(['temple', 'bunker']);
+		expect(taipei._locationCount).toBe(2);
+	});
+});
+
+const overriddenLocation = () => makeOverrideLocation('temple', ['taipei'], ['tainan']);
+
+describe('resolveLocationRegions under the production content policy', () => {
+	test('an override replaces the authored regions', async () => {
+		const { resolveLocationRegions } = await loadFactory(false);
+
+		expect(resolveLocationRegions(overriddenLocation())).toEqual([{ id: 'tainan' }]);
+	});
+
+	test('in development the authored regions stand', async () => {
+		const { resolveLocationRegions } = await loadFactory(true);
+
+		expect(resolveLocationRegions(overriddenLocation())).toEqual([{ id: 'taipei' }]);
 	});
 });

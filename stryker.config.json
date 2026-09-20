@@ -1,0 +1,43 @@
+{
+	"$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+	"packageManager": "pnpm",
+	"testRunner": "vitest",
+	"plugins": ["@stryker-mutator/vitest-runner"],
+	"coverageAnalysis": "perTest",
+	"ignoreStatic": true,
+	"mutate": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"packages/map-codec/src/**/*.ts",
+		"packages/react-map-component/src/**/*.ts",
+		"packages/react-map-component/src/**/*.tsx",
+		"packages/scripts/src/**/*.ts",
+		"packages/shared/src/**/*.ts",
+		"!**/*.test.ts",
+		"!**/*-test-utils.ts",
+		"!**/*.test.tsx",
+		"!**/*.d.ts",
+		"!src/dev/**",
+		"!packages/scripts/src/validate-content/fixtures/**"
+	],
+	"ignorePatterns": [
+		"**",
+		"!package.json",
+		"!pnpm-workspace.yaml",
+		"!tsconfig.json",
+		"!vitest.config.ts",
+		"!src/**",
+		"!tests/image-server/**",
+		"!packages/map-codec/**",
+		"!packages/react-map-component/**",
+		"!packages/scripts/**",
+		"!packages/shared/**",
+		"packages/*/dist/**",
+		"packages/*/node_modules/**"
+	],
+	"tempDirName": ".cache/stryker-tmp",
+	"reporters": ["progress", "clear-text", "html", "json"],
+	"clearTextReporter": { "allowColor": false, "maxTestsToLog": 2 },
+	"htmlReporter": { "fileName": ".cache/stryker/mutation-report.html" },
+	"jsonReporter": { "fileName": ".cache/stryker/mutation-report.json" }
+}

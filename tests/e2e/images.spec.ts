@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { expect, test, visit } from './fixtures.ts';
+import { expect, test, visit } from '#e2e/test.ts';
 
 const heroWidthMaximum = 1800;
 const contentWidthMaximum = 1400;

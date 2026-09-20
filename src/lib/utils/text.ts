@@ -18,6 +18,33 @@ export function formatNumber({
 	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
 }
 
+// Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"
+export function formatStringTemplate(
+	template: string,
+	values: Record<string, number | string> = {},
+): string {
+	return template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
+}
+
+// Typographic refinement for short text: smart quotes, en/em dashes, ellipses
+// This negates the need for a full-blown unified pipeline for titles and such
+export function refineTypography(input: string): string {
+	let value = input;
+	// Dashes: --- to em, -- to en (longest first)
+	value = value.replaceAll('---', '—').replaceAll('--', '–');
+	value = value.replaceAll('...', '…');
+	// Double quotes: opening after start/space/bracket/dash, otherwise closing
+	value = value.replaceAll(/(^|[\s([{<–—])"/g, '$1“').replaceAll('"', '”');
+	// Single quotes: opening in the same positions, otherwise apostrophe or closing
+	value = value.replaceAll(/(^|[\s([{<–—])'/g, '$1‘').replaceAll("'", '’');
+	return value;
+}
+
+// Plain text only; Astro escapes attributes itself, so encoding here would double-escape
+export function sanitizeImageAltAttribute(input: string): string {
+	return decodeHtmlEntities(stripTags(input)).replaceAll(/\s+/g, ' ').trim();
+}
+
 // Sanitize image captions before returning them for display
 export function sanitizeImageCaption(input: string): string {
 	return input.replaceAll('<p>', '').replaceAll('</p>', '');
@@ -71,48 +98,11 @@ export function textClipper(
 	return input;
 }
 
-const namedHtmlEntities: Record<string, string> = {
-	amp: '&',
-	apos: "'",
-	gt: '>',
-	lt: '<',
-	nbsp: ' ',
-	quot: '"',
-};
-
-// Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"
-export function formatStringTemplate(
-	template: string,
-	values: Record<string, number | string> = {},
-): string {
-	return template.replaceAll(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ''));
-}
-
-// Typographic refinement for short text: smart quotes, en/em dashes, ellipses
-// This negates the need for a full-blown unified pipeline for titles and such
-export function refineTypography(input: string): string {
-	let value = input;
-	// Dashes: --- to em, -- to en (longest first)
-	value = value.replaceAll('---', '—').replaceAll('--', '–');
-	value = value.replaceAll('...', '…');
-	// Double quotes: opening after start/space/bracket/dash, otherwise closing
-	value = value.replaceAll(/(^|[\s([{<–—])"/g, '$1“').replaceAll('"', '”');
-	// Single quotes: opening in the same positions, otherwise apostrophe or closing
-	value = value.replaceAll(/(^|[\s([{<–—])'/g, '$1‘').replaceAll("'", '’');
-	return value;
-}
-
-// Plain text only; Astro escapes attributes itself, so encoding here would double-escape
-export function sanitizeImageAltAttribute(input: string): string {
-	return decodeHtmlEntities(stripTags(input)).replaceAll(/\s+/g, ' ').trim();
-}
-
+// `stripTags` round-trips through rehype, which re-emits every character reference in hex
 function decodeHtmlEntities(input: string): string {
-	return input.replaceAll(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, code: string) => {
-		if (/^#x/i.test(code)) return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
-		if (code.startsWith('#')) return String.fromCodePoint(Number(code.slice(1)));
-		return namedHtmlEntities[code.toLowerCase()] ?? entity;
-	});
+	return input.replaceAll(/&#x([\da-f]+);/gi, (_, code: string) =>
+		String.fromCodePoint(Number.parseInt(code, 16)),
+	);
 }
 
 // Render a short markdown string (descriptions, notices, teasers) to inline HTML

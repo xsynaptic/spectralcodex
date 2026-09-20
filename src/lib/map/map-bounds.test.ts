@@ -15,7 +15,9 @@ function expectWithinBounds(
 	expect(lat).toBeLessThanOrEqual(bounds[3]);
 }
 
-function makeCollection(features: Array<ReturnType<typeof makeFeature>>): MapFeatureCollection {
+function makeCollection(
+	features: Array<ReturnType<typeof makeFeature> | ReturnType<typeof makeLineFeature>>,
+): MapFeatureCollection {
 	return { features, type: 'FeatureCollection' } as unknown as MapFeatureCollection;
 }
 
@@ -28,6 +30,15 @@ function makeFeature(id: string, coordinates: [number, number], isOutlier?: bool
 	};
 }
 
+function makeLineFeature(id: string, coordinates: Array<[number, number]>) {
+	return {
+		geometry: { coordinates, type: 'LineString' as const },
+		id,
+		properties: { title: id },
+		type: 'Feature' as const,
+	};
+}
+
 describe('getMapBounds', () => {
 	test('returns undefined for missing, empty, or all-outlier input', () => {
 		expect(getMapBounds({ featureCollection: undefined })).toBeUndefined();
@@ -35,6 +46,28 @@ describe('getMapBounds', () => {
 		expect(
 			getMapBounds({ featureCollection: makeCollection([makeFeature('far', [150, 50], true)]) }),
 		).toBeUndefined();
+	});
+
+	test('a line contributes every vertex, not just its ends', () => {
+		const result = getMapBounds({
+			featureCollection: makeCollection([
+				makeLineFeature('route', [
+					[121.5, 25],
+					[121.9, 25.4],
+					[121.6, 25.1],
+				]),
+			]),
+		});
+
+		expect(result).toBeDefined();
+
+		for (const [lng, lat] of [
+			[121.5, 25],
+			[121.9, 25.4],
+			[121.6, 25.1],
+		]) {
+			expectWithinBounds(result!.bounds, lng!, lat!);
+		}
 	});
 
 	test('single point: bounds pad by the 1km minimum, limits by the 10km minimum', () => {
