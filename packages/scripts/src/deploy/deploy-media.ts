@@ -14,6 +14,9 @@ interface DeployMediaOptions {
 
 export class MediaPathMissingError extends Error {}
 
+// An interrupted run would otherwise leave a truncated image
+const partialFlags = ['--partial', '--partial-dir=.rsync-partial'];
+
 export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 	const { dryRun = false, rootPath, withDelete = false } = options;
 
@@ -50,7 +53,7 @@ export async function deployMedia(options: DeployMediaOptions): Promise<void> {
 		config,
 		dryRun,
 		excludes: ['.DS_Store', '*.tmp', '.gitkeep'],
-		extraFlags: withDelete ? ['--partial', '--size-only', '--delete-after'] : ['--partial', '-c'],
+		extraFlags: withDelete ? [...partialFlags, '--size-only', '--delete-after'] : partialFlags,
 	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));

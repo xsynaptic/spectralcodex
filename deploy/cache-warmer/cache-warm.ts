@@ -24,7 +24,7 @@ const warmLimit = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : unde
 const shouldWarmAll = process.env.WARM_ALL === '1' || process.env.WARM_ALL === 'true';
 
 // New image URLs trigger vips transforms; keep below the page rate so imagor's cpu cap serves traffic
-const imageConcurrency = 4;
+const imageConcurrency = 2;
 
 // Persisted across runs in a Docker volume; the container filesystem is otherwise read-only
 const imageStateFile = '/state/warmed-images.txt';
