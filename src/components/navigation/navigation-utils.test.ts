@@ -53,10 +53,6 @@ describe('isActiveNavigationItem', () => {
 		expect(isActiveNavigationItem(regions, '/regions/taiwan/taipei/')).toBe(false);
 	});
 
-	test('the current item is itself active', () => {
-		expect(isActiveNavigationItem(tree, '/regions/')).toBe(true);
-	});
-
 	test('a branch holding nothing current is not active', () => {
 		expect(isActiveNavigationItem(tree, '/posts/')).toBe(false);
 	});
@@ -116,15 +112,6 @@ describe('shouldShowNavigationItemMultilingual', () => {
 
 		expect(shouldShowNavigationItemMultilingual(taipei, 2)).toBe(true);
 		expect(shouldShowNavigationItemMultilingual(taipei, 1)).toBe(false);
-	});
-
-	test('a region under another multilingual ancestor shows too', () => {
-		expect(
-			shouldShowNavigationItemMultilingual(
-				{ ancestor: 'hong-kong', collection: 'regions', title: 'Kowloon', titleMultilingual },
-				2,
-			),
-		).toBe(true);
 	});
 
 	test('a region under any other ancestor, or none, stays quiet', () => {

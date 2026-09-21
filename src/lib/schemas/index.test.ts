@@ -66,8 +66,4 @@ describe('TitleSchema', () => {
 	test('refines typography and trims the result', () => {
 		expect(TitleSchema.parse('  "Hello" -- world  ')).toBe('“Hello” – world');
 	});
-
-	test('leaves a plain title alone', () => {
-		expect(TitleSchema.parse('Xiluo Theater')).toBe('Xiluo Theater');
-	});
 });

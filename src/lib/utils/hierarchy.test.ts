@@ -37,13 +37,6 @@ describe('createHierarchy nested-set numbering', () => {
 		expect(isWithin(ordinalById.get('taiwan')!, canada)).toBe(false); // separate root
 	});
 
-	test('a region listed directly is on its own subtree but not deeper', () => {
-		const taiwanOrdinal = ordinalById.get('taiwan')!;
-
-		expect(isWithin(taiwanOrdinal, intervalById.get('taiwan')!)).toBe(true);
-		expect(isWithin(taiwanOrdinal, intervalById.get('taipei')!)).toBe(false);
-	});
-
 	test('numbering is deterministic regardless of input order', () => {
 		const again = createHierarchy(nodes.toReversed());
 

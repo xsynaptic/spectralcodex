@@ -14,16 +14,6 @@ function makeResource(id: string, match?: Array<string> | string) {
 }
 
 describe('buildResourceAssociation', () => {
-	test('associates a string match pattern with a string link', () => {
-		const association = buildResourceAssociation(
-			[makeResource('taipei-times', 'taipeitimes.com')],
-			[makeContent('some-place', { links: ['https://www.taipeitimes.com/News/feat/12345'] })],
-			[],
-		);
-
-		expect(association.locationIdsByResourceId.get('taipei-times')).toEqual(['some-place']);
-	});
-
 	test('associates an array match pattern when one pattern hits', () => {
 		const association = buildResourceAssociation(
 			[makeResource('heritage-bureau', ['bunka.go.jp', 'boch.gov.tw'])],

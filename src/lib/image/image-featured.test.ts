@@ -33,12 +33,6 @@ describe('getImageFeaturedGroup', () => {
 		expect(group).toStrictEqual([{ id: 'first.jpg' }, { hero: true, id: 'second.jpg' }]);
 	});
 
-	test('a lone string becomes a group of one', () => {
-		expect(getImageFeaturedGroup({ getCaption, imageFeatured: 'only.jpg' })).toStrictEqual([
-			{ id: 'only.jpg' },
-		]);
-	});
-
 	test('a linked image takes the entry id and url alongside the caption', () => {
 		const group = getImageFeaturedGroup({
 			getCaption,

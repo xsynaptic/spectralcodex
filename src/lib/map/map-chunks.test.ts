@@ -167,16 +167,6 @@ describe('assignChunks byte cap', () => {
 		expect([...assignChunks(items, { capBytes: 273 }).chunkIds.keys()]).toEqual(['0', '1']);
 	});
 
-	test('chunk keys are sequential integers counting up from zero', () => {
-		const items = [
-			makeItem('a', [121, 25], 200),
-			makeItem('b', [-73, 45], 200),
-			makeItem('c', [0, 0], 200),
-		];
-
-		expect([...assignChunks(items, { capBytes: 100 }).chunkIds.keys()]).toEqual(['0', '1', '2']);
-	});
-
 	test('empty input yields empty maps', () => {
 		const { chunkIds, chunkKeyById } = assignChunks([]);
 

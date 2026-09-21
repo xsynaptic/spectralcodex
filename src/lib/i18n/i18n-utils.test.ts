@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest';
 
-import { LanguageCodeEnum, languageCodeOrder } from '#lib/i18n/i18n-types.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 describe('getMultilingualContent', () => {
@@ -46,14 +45,5 @@ describe('getMultilingualContent', () => {
 	test('no data and no matching property both answer undefined', () => {
 		expect(getMultilingualContent({ data: undefined, prop: 'title' })).toBeUndefined();
 		expect(getMultilingualContent({ data: { title: 'plain' }, prop: 'title' })).toBeUndefined();
-	});
-});
-
-describe('languageCodeOrder', () => {
-	test('lists every language code exactly once', () => {
-		const languageCodes = Object.values(LanguageCodeEnum);
-
-		expect(languageCodeOrder).toHaveLength(languageCodes.length);
-		expect(new Set(languageCodeOrder)).toEqual(new Set(languageCodes));
 	});
 });

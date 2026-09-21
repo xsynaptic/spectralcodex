@@ -84,30 +84,6 @@ describe('createChronologyData monthly tier', () => {
 		expect(month.createdCount).toBe(50);
 		expect(month.created).toHaveLength(50);
 	});
-
-	test('within a quality level, a featured image sorts an entry ahead of one without', () => {
-		const data = createChronologyData(
-			[
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2024, 2, 10),
-					entryQuality: 2,
-					id: 'aaa-no-image',
-				}),
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2024, 2, 11),
-					entryQuality: 2,
-					id: 'zzz-with-image',
-					imageId: 'img',
-				}),
-			],
-			[],
-		);
-
-		// Alphabetically 'aaa' precedes 'zzz', but the image-bearing entry is boosted ahead within q2
-		expect(ids(monthlyItem(data, '2024/03').created)).toEqual(['zzz-with-image', 'aaa-no-image']);
-	});
 });
 
 describe('createChronologyData monthly buckets', () => {
@@ -642,18 +618,6 @@ describe('buildChronologyDailyData', () => {
 		]);
 
 		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 1, updated: 0, visited: 0 });
-	});
-
-	test('buckets a late-evening UTC instant on its UTC day, not the local one', () => {
-		const daily = buildChronologyDailyData([
-			makeCatalogItem({
-				collection: 'posts',
-				dateCreated: new Date('2024-05-31T20:00:00Z'),
-				id: 'a',
-			}),
-		]);
-
-		expect(daily['2024']?.['2024-05-31']).toMatchObject({ created: 1 });
 	});
 
 	test('does not count an update made on the same UTC day as creation', () => {

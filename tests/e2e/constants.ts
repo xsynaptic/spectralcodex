@@ -5,7 +5,7 @@ export const localUrl = `http://localhost:${String(localPort)}`;
 export const isProd = process.env.TEST_ENV === 'prod';
 
 // Must match `PROD_SERVER_URL` in `.env`, which the deploy config reads as its site URL
-const prodUrl = 'https://spectralcodex.com';
+const prodUrl = 'https://spectralcodex.com/';
 
 export const contentManifestPath = '/content-manifest.json';
 

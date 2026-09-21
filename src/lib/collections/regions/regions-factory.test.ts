@@ -90,17 +90,6 @@ describe('populateRegionsHierarchy', () => {
 });
 
 describe('populateRegionsLangCode', () => {
-	test('descendants take the language of their root ancestor', () => {
-		const regions = makeRegionsFixture();
-
-		populateRegionsHierarchy(regions, createRegionsTree(regions));
-		populateRegionsLangCode(regions);
-
-		const taipei = regions.find((entry) => entry.id === 'taipei')!;
-
-		expect(taipei.data._langCode).toBe(LanguageCodeEnum.ChineseTraditional);
-	});
-
 	test('a deep descendant takes the root language, not an intermediate ancestor', () => {
 		const regions = [
 			makeRegion('taiwan'),

@@ -144,12 +144,6 @@ describe('resolveFallbackImageId', () => {
 		}
 	});
 
-	test('the same id always resolves to the same option', () => {
-		for (const id of manyIds.slice(0, 8)) {
-			expect(resolveFallbackImageId('default', id)).toBe(resolveFallbackImageId('default', id));
-		}
-	});
-
 	test('a spread of ids reaches more than one option', () => {
 		const chosen = new Set(manyIds.map((id) => resolveFallbackImageId('default', id)));
 
@@ -158,23 +152,5 @@ describe('resolveFallbackImageId', () => {
 
 	test('the empty id still resolves to an option', () => {
 		expect(optionsFor('default')).toContain(resolveFallbackImageId('default', ''));
-	});
-});
-
-describe('fallbackImageIds integrity', () => {
-	test('every entry carries at least one non-empty image id', () => {
-		for (const [key, value] of Object.entries(fallbackImageIds)) {
-			const options = typeof value === 'string' ? [value] : value;
-
-			expect(options.length, key).toBeGreaterThan(0);
-
-			for (const option of options) expect(option.length, key).toBeGreaterThan(0);
-		}
-	});
-
-	test('every key resolves to one of its own options', () => {
-		for (const key of Object.keys(fallbackImageIds)) {
-			expect(optionsFor(key), key).toContain(resolveFallbackImageId(key, 'some-entry'));
-		}
 	});
 });

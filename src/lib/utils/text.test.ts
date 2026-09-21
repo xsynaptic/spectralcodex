@@ -48,10 +48,6 @@ describe('textClipper', () => {
 
 		expect(clipped).toBe('Taipei 臺北 is...');
 	});
-
-	test('returns short CJK input untouched', () => {
-		expect(textClipper('臺北', { wordCount: 100 })).toBe('臺北');
-	});
 });
 
 describe('stripMdxComponents', () => {

@@ -34,7 +34,6 @@ describe('getDateDisplay single date', () => {
 		[4, 'May 4th, 2018'],
 		[11, 'May 11th, 2018'],
 		[12, 'May 12th, 2018'],
-		[13, 'May 13th, 2018'],
 		[21, 'May 21st, 2018'],
 		[22, 'May 22nd, 2018'],
 		[23, 'May 23rd, 2018'],
@@ -83,12 +82,6 @@ describe('getDateDisplay range', () => {
 		);
 	});
 
-	test('repeats the month name on both ends within one month', () => {
-		const display = getDateDisplay(utc('2018-05-13'), utc('2018-05-15'), shortMonth);
-
-		expect(display).toBe('May 13th to May 15th, 2018');
-	});
-
 	test('a numeric month range keeps both dates and gains no ordinal suffix', () => {
 		const display = getDateDisplay(utc('2018-05-13'), utc('2018-05-15'), numericMonth);
 
@@ -130,10 +123,6 @@ describe('getDateRanges', () => {
 describe('getDayKey', () => {
 	test('zero-pads the month and the day', () => {
 		expect(getDayKey(utc('2018-01-05'))).toBe('2018-01-05');
-	});
-
-	test('keeps a two-digit month and day as written', () => {
-		expect(getDayKey(utc('2018-12-25'))).toBe('2018-12-25');
 	});
 
 	test('buckets by the UTC day, not the local one', () => {

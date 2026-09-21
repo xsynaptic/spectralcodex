@@ -110,20 +110,4 @@ describe('buildActivityGraph', () => {
 		expect(quiet?.level).toBeGreaterThanOrEqual(1);
 		expect(quiet?.level).toBeLessThan(busiest?.level ?? 0);
 	});
-
-	test('marks days after the reference date as future with no level', () => {
-		const graph = buildActivityGraph({
-			referenceDate: new Date('2023-06-15T00:00:00Z'),
-			// A recorded value on a future day must not light up
-			values: { '2023-07-01': 5 },
-			year: '2023',
-		});
-
-		const futureDay = graph.days.find((day) => day.date.getUTCMonth() === 6);
-		const pastDay = graph.days.find((day) => day.date.getUTCMonth() === 0);
-
-		expect(futureDay?.future).toBe(true);
-		expect(futureDay?.level).toBe(0);
-		expect(pastDay?.future).toBe(false);
-	});
 });

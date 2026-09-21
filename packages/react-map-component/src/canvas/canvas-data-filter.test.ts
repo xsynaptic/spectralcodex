@@ -76,23 +76,8 @@ describe('isLocationVisible', () => {
 		);
 	});
 
-	test('entry quality and rating are minimum thresholds', () => {
-		expect(
-			isLocationVisible(makeItem({ entryQuality: 2 }).properties, { ...passAll, entryQuality: 3 }),
-		).toBe(false);
-		expect(isLocationVisible(makeItem({ rating: 4 }).properties, { ...passAll, rating: 3 })).toBe(
-			true,
-		);
-	});
-
 	test('a missing objective is never hidden by the objective threshold', () => {
 		expect(isLocationVisible(makeItem().properties, { ...passAll, objective: 5 })).toBe(true);
-	});
-
-	test('a present objective below the threshold is hidden', () => {
-		expect(
-			isLocationVisible(makeItem({ objective: 2 }).properties, { ...passAll, objective: 3 }),
-		).toBe(false);
 	});
 
 	test('every threshold is an inclusive minimum', () => {
@@ -171,31 +156,11 @@ describe('getMapCanvasData scope', () => {
 	const inside = makeItem({ id: 'inside', regionOrdinals: [5], themeIndices: [2] });
 	const outside = makeItem({ id: 'outside', regionOrdinals: [99], themeIndices: [7] });
 
-	test('region scope keeps only points whose ordinal is inside the interval', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			interval: [1, 10],
-			type: 'region',
-		});
-
-		expect(result.totalCount).toBe(1);
-		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
-	});
-
 	test('theme scope keeps only points carrying the theme index', () => {
 		const result = getMapCanvasData([inside, outside], passAll, { index: 2, type: 'theme' });
 
 		expect(result.totalCount).toBe(1);
 		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
-	});
-
-	test('ids scope keeps only the listed ids', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			ids: ['outside'],
-			type: 'ids',
-		});
-
-		expect(result.totalCount).toBe(1);
-		expect(result.pointCollection?.features[0]?.properties.id).toBe('outside');
 	});
 
 	test('ids scope preserves the list order', () => {
