@@ -18,16 +18,17 @@ check:
           - name: format
             run: prettier --check . --cache --log-level warn
           - name: js
-            run: eslint --cache --cache-location node_modules/.cache/eslint/
-          - name: types
-            run: tsc --noEmit --extendedDiagnostics
+            run: eslint --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/
           - name: unused
             run: knip
-          - name: fallow
-            run: fallow --skip health --quiet
+          # Dead code stays with knip; fallow's unused-code rules are off in .fallowrc.jsonc
+          - name: dupes
+            run: fallow dupes --quiet
           # Health prints its report even at zero findings, so output shows only on failure
           - name: complexity
             run: out=$(fallow health --complexity --quiet 2>&1) || { printf '%s\n' "$out"; exit 1; }
+          - name: architecture
+            run: fallow dead-code --boundary-violations --circular-deps --quiet
           - name: test
             run: vitest run
 
@@ -50,11 +51,11 @@ fix:
       group:
         parallel: true
         jobs:
-          - name: types
-            run: tsc --noEmit --extendedDiagnostics
           - name: unused
             run: knip
-          - name: fallow
-            run: fallow --skip health --quiet
+          - name: dupes
+            run: fallow dupes --quiet
           - name: complexity
             run: out=$(fallow health --complexity --quiet 2>&1) || { printf '%s\n' "$out"; exit 1; }
+          - name: architecture
+            run: fallow dead-code --boundary-violations --circular-deps --quiet

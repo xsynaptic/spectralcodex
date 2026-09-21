@@ -1,21 +1,24 @@
 {
-	"entry": ["deploy/cache-warmer/cache-warm.ts", "src/dev/inventory/inventory-og-image.ts"],
-	"dynamicallyLoaded": ["packages/content-demo/collections/**/*.mdx"],
 	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**"],
-	"ignoreDependencies": [
-		"@xsynaptic/stylelint-config",
-		"eslint-plugin-jsx-a11y",
-		"@fontsource/lora",
-		"@fontsource/noto-serif-tc",
-		"@fontsource/noto-serif-thai",
-		"@fontsource/zen-antique",
-		"mdxlint",
-		"@xsynaptic/remark-prose-rules",
-	],
-	"ignoreDependencyOverrides": [
-		{ "package": "fallow-type-aware", "source": "pnpm-workspace.yaml" },
-	],
-	"rules": { "dev-dependencies-in-production": "off" },
+	"rules": {
+		// Dead code and dependency hygiene belong to knip
+		"unused-files": "off",
+		"unused-exports": "off",
+		"unused-types": "off",
+		"unused-enum-members": "off",
+		"unused-class-members": "off",
+		"unused-dependencies": "off",
+		"unused-dev-dependencies": "off",
+		"unused-optional-dependencies": "off",
+		"unlisted-dependencies": "off",
+		"unresolved-imports": "off",
+		"duplicate-exports": "off",
+		"type-only-dependencies": "off",
+		"test-only-dependencies": "off",
+		"dev-dependencies-in-production": "off",
+		"unused-dependency-overrides": "off",
+		"misconfigured-dependency-overrides": "off",
+	},
 	"health": {
 		// Zero disables CRAP; without Istanbul data fallow estimates coverage from the module graph
 		"maxCrap": 0,
