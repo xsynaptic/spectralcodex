@@ -54,10 +54,12 @@ class BuildStatsChart extends HTMLElement {
 		for (const point of this.#points) {
 			const distance = Math.abs(point.x - x);
 
-			if (distance < nearestDistance) {
-				nearestDistance = distance;
-				nearest = point;
+			if (!(distance < nearestDistance)) {
+				continue;
 			}
+
+			nearestDistance = distance;
+			nearest = point;
 		}
 
 		return nearest;

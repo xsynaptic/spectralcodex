@@ -141,10 +141,12 @@ function getNearestRatio(ratio: number): { allowed: AllowedRatio; delta: number 
 	for (const candidate of allowedRatios) {
 		const delta = Math.abs(ratio - candidate.value);
 
-		if (delta < smallestDelta) {
-			smallestDelta = delta;
-			nearest = candidate;
+		if (!(delta < smallestDelta)) {
+			continue;
 		}
+
+		smallestDelta = delta;
+		nearest = candidate;
 	}
 
 	return { allowed: nearest, delta: smallestDelta };

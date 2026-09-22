@@ -130,7 +130,7 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 				[MapDataKeysCompressed.GeometryType]:
 					MapDataGeometryTypeNumericMapping[geometry[MapDataKeys.GeometryType]],
 			},
-			[MapDataKeysCompressed.HasImage]: properties[MapDataKeys.HasImage] ? true : undefined,
+			[MapDataKeysCompressed.HasImage]: properties[MapDataKeys.HasImage] || undefined,
 			[MapDataKeysCompressed.Id]: properties[MapDataKeys.Id],
 			[MapDataKeysCompressed.Objective]: properties[MapDataKeys.Objective],
 			[MapDataKeysCompressed.Outlier]: properties[MapDataKeys.Outlier],

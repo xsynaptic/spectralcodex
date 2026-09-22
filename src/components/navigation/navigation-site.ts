@@ -406,10 +406,12 @@ class SiteNavigation extends HTMLElement {
 
 			const trigger = this.#getTrigger(li);
 
-			if (trigger) {
-				trigger.setAttribute('aria-expanded', 'false');
-				trigger.setAttribute('aria-controls', id);
+			if (!trigger) {
+				continue;
 			}
+
+			trigger.setAttribute('aria-expanded', 'false');
+			trigger.setAttribute('aria-controls', id);
 		}
 	}
 

@@ -93,13 +93,15 @@ function hilbertIndex(gridX: number, gridY: number): number {
 		const rx = (x & side) > 0 ? 1 : 0;
 		const ry = (y & side) > 0 ? 1 : 0;
 		distance += side * side * ((3 * rx) ^ ry);
-		if (ry === 0) {
-			if (rx === 1) {
-				x = side - 1 - x;
-				y = side - 1 - y;
-			}
-			[x, y] = [y, x];
+		if (ry !== 0) {
+			continue;
 		}
+
+		if (rx === 1) {
+			x = side - 1 - x;
+			y = side - 1 - y;
+		}
+		[x, y] = [y, x];
 	}
 
 	return distance;
