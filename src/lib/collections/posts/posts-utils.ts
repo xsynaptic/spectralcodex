@@ -15,7 +15,11 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { buildArticleSchema, buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
+import {
+	buildArticleSchema,
+	buildAuthorSchema,
+	buildEntryBreadcrumbSchema,
+} from '#lib/utils/seo-structured-data.ts';
 
 // Data for a single post entry page: map data and backlinks
 export async function createQueryPostsEntryFunction() {
@@ -49,6 +53,11 @@ export async function getPostSchema(
 	props: { imageUrl: string | undefined; url: string },
 ): Promise<Array<Thing>> {
 	return [
+		buildEntryBreadcrumbSchema({
+			collection: 'posts',
+			title: entry.data.title,
+			url: props.url,
+		}),
 		buildArticleSchema({
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,

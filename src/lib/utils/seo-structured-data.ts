@@ -119,7 +119,7 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 
 // `regions` must be ordered root first; breadcrumb positions follow array order
 export function buildEntryBreadcrumbSchema(props: {
-	collection: 'locations' | 'regions' | 'resources' | 'series' | 'themes';
+	collection: 'locations' | 'posts' | 'regions' | 'resources' | 'series' | 'themes';
 	regions?: ReadonlyArray<CollectionEntry<'regions'>> | undefined;
 	title: string;
 	url: string;
