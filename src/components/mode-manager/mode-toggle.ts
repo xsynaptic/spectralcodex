@@ -1,6 +1,5 @@
+// Type-only import keeps this script import-free so Astro inlines it
 import type { ModeChangedEvent, ModeSystemType } from '#components/mode-manager/mode-types.ts';
-
-import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
 class ModeToggle extends HTMLElement {
 	#lastClickTime = 0;
@@ -37,9 +36,7 @@ class ModeToggle extends HTMLElement {
 
 	#updateLabel(resolvedMode: string | undefined) {
 		const label =
-			getOppositeMode(resolvedMode) === ModeTypeEnum.Dark
-				? this.dataset.labelDark
-				: this.dataset.labelLight;
+			getOppositeMode(resolvedMode) === 'dark' ? this.dataset.labelDark : this.dataset.labelLight;
 
 		if (!label) return;
 
@@ -53,7 +50,7 @@ class ModeToggle extends HTMLElement {
 }
 
 function getOppositeMode(resolvedMode: string | undefined): ModeSystemType {
-	return resolvedMode === ModeTypeEnum.Dark ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
+	return resolvedMode === 'dark' ? 'light' : 'dark';
 }
 
 if (!customElements.get('mode-toggle')) {
