@@ -5,8 +5,6 @@ import type {
 	PagefindSearchResult,
 } from '@pagefind/component-ui';
 
-import { getInstanceManager } from '@pagefind/component-ui';
-
 const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent);
 
 const searchQueryDebounceMs = 1500;
@@ -37,23 +35,8 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		// Static props in markup; only the OS-dependent keyboard hint has to be set client-side
 		this.buttonEl?.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K');
 
-		const instanceName = this.getAttribute('instance') ?? 'default';
-
-		this.instance = getInstanceManager().getInstance(instanceName);
-
-		registerSearchAnalytics(this.instance);
-
-		// Pagefind exposes no deregisterUtility so each navigation's fresh trigger would pile up
-		// The astro:before-swap handler in search.astro clears the registry to bound it; keep these two in sync
-		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
-
-		this.instance.registerShortcut(
-			{ description: this.dataset.shortcutDescription ?? '', label: isMac ? '⌘K' : 'Ctrl+K' },
-			this,
-		);
-
-		this.addEventListener('pointerenter', this.#preloadPagefindCss, { once: true, signal });
-		this.addEventListener('focusin', this.#preloadPagefindCss, { once: true, signal });
+		this.addEventListener('pointerenter', this.#preloadPagefind, { once: true, signal });
+		this.addEventListener('focusin', this.#preloadPagefind, { once: true, signal });
 
 		this.addEventListener('click', this.#handleClickEvent, { signal });
 		document.addEventListener('keydown', this.#handleKeydown, { signal });
@@ -61,6 +44,8 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 
 	disconnectedCallback() {
 		this.instance?.deregisterAllShortcuts(this);
+		// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
+		this.instance = null;
 		this.#controller?.abort();
 		this.#controller = undefined;
 	}
@@ -113,9 +98,29 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		return this.#cssReady;
 	};
 
-	// Await the stylesheet so the modal never opens unstyled
+	// Importing defines the <pagefind-*> elements, which upgrade and register themselves before this resolves
+	#ensurePagefindRegistered = async (): Promise<void> => {
+		const { getInstanceManager } = await import('@pagefind/component-ui');
+
+		if (this.instance || !this.#controller) return;
+
+		this.instance = getInstanceManager().getInstance(this.getAttribute('instance') ?? 'default');
+
+		registerSearchAnalytics(this.instance);
+
+		// Pagefind exposes no deregisterUtility so each navigation's fresh trigger would pile up
+		// The astro:before-swap handler in search.astro clears the registry to bound it; keep these two in sync
+		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
+
+		this.instance.registerShortcut(
+			{ description: this.dataset.shortcutDescription ?? '', label: isMac ? '⌘K' : 'Ctrl+K' },
+			this,
+		);
+	};
+
+	// Await the stylesheet and registration so the modal never opens unstyled or unregistered
 	#handleClick = async () => {
-		await this.#ensurePagefindCss();
+		await Promise.all([this.#ensurePagefindCss(), this.#ensurePagefindRegistered()]);
 		const [modal] = (this.instance?.getUtilities('modal') ?? []) as Array<PagefindModal>;
 		modal?.open();
 	};
@@ -139,8 +144,9 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		void this.#handleClick();
 	};
 
-	#preloadPagefindCss = () => {
+	#preloadPagefind = () => {
 		void this.#ensurePagefindCss();
+		void this.#ensurePagefindRegistered();
 	};
 }
 
