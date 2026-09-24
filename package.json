@@ -47,17 +47,17 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.3.3",
+		"astro": "^7.3.4",
 		"keyv": "^5.6.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@astrojs/markdown-satteri": "^0.4.1",
-		"@astrojs/mdx": "^8.0.1",
+		"@astrojs/markdown-satteri": "^0.4.2",
+		"@astrojs/mdx": "^8.0.2",
 		"@astrojs/node": "^11.1.6",
-		"@astrojs/react": "^6.0.6",
+		"@astrojs/react": "^7.0.0",
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"@pagefind/component-ui": "^1.5.2",
@@ -69,7 +69,7 @@
 		"@stryker-mutator/core": "^10.0.0",
 		"@stryker-mutator/vitest-runner": "^10.0.0",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.103.1",
+		"@tanstack/eslint-plugin-query": "^5.103.2",
 		"@turf/center": "^7.4.0",
 		"@turf/centroid": "^7.4.0",
 		"@turf/distance": "^7.4.0",
