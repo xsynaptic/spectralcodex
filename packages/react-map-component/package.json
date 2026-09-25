@@ -22,7 +22,7 @@
 		"@turf/helpers": "^7.4.0",
 		"flatgeobuf": "^4.4.0",
 		"idb-keyval": "^6.3.0",
-		"maplibre-gl": "^6.10.0",
+		"maplibre-gl": "^6.11.0",
 		"pmtiles": "^4.5.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
@@ -35,6 +35,6 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"astro": "^7.3.4"
+		"astro": "^7.3.5"
 	}
 }

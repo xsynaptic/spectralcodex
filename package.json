@@ -47,7 +47,7 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.3.4",
+		"astro": "^7.3.5",
 		"keyv": "^5.6.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
@@ -105,7 +105,7 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^38.1.0",
-		"fallow": "^3.27.0",
+		"fallow": "^3.28.0",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.12.0",
 		"kdbush": "^4.1.0",
@@ -114,7 +114,7 @@
 		"ohash": "^2.0.12",
 		"p-limit": "^7.3.3",
 		"p-memoize": "^8.0.0",
-		"prettier": "^3.9.8",
+		"prettier": "^3.9.9",
 		"prettier-plugin-astro": "^1.0.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"remeda": "^2.50.0",
