@@ -45,7 +45,7 @@ export async function verifyEdge(): Promise<void> {
 		console.log(chalk.gray(`  ok  ${label}: ${path}`));
 	}
 
-	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET');
+	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET', 'document (/)');
 
 	check(
 		{
@@ -79,7 +79,11 @@ export async function verifyEdge(): Promise<void> {
 	const results = await Promise.all(
 		expectations.map(async (expectation) => ({
 			expectation,
-			response: await request(`${baseUrl}${expectation.path}?${cacheBust}`, 'HEAD'),
+			response: await request(
+				`${baseUrl}${expectation.path}?${cacheBust}`,
+				'HEAD',
+				`${expectation.label} (${expectation.path})`,
+			),
 		})),
 	);
 
@@ -97,6 +101,15 @@ export async function verifyEdge(): Promise<void> {
 	}
 
 	console.log(chalk.green('Edge verification passed'));
+}
+
+function fetchWithTimeout(url: string, method: 'GET' | 'HEAD') {
+	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
+	return fetch(url, {
+		method,
+		redirect: 'manual',
+		signal: AbortSignal.timeout(requestTimeoutMs),
+	});
 }
 
 function getExpectations(token: string): Array<EdgeExpectation> {
@@ -152,11 +165,18 @@ function getExpectations(token: string): Array<EdgeExpectation> {
 	];
 }
 
-function request(url: string, method: 'GET' | 'HEAD') {
-	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
-	return fetch(url, {
-		method,
-		redirect: 'manual',
-		signal: AbortSignal.timeout(requestTimeoutMs),
-	});
+async function request(url: string, method: 'GET' | 'HEAD', label: string) {
+	try {
+		return await fetchWithTimeout(url, method);
+	} catch (error) {
+		if (!(error instanceof DOMException && error.name === 'TimeoutError')) throw error;
+	}
+
+	try {
+		return await fetchWithTimeout(url, method);
+	} catch (error) {
+		throw new Error(`${label}: no response within ${String(requestTimeoutMs)}ms after a retry`, {
+			cause: error,
+		});
+	}
 }

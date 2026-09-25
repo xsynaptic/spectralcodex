@@ -64,11 +64,11 @@ export function useProtomaps({
 		addProtocol('pmtiles', (request) => {
 			return new Promise((resolve, reject) => {
 				protocol.tile(request, (err: unknown, data: unknown) => {
-					if (err) {
+					if (err || typeof data !== 'object' || data === null) {
 						reject(new Error('PMTiles not loaded!'));
-					} else {
-						resolve({ data });
+						return;
 					}
+					resolve({ data });
 				});
 			});
 		});
