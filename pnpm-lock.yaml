@@ -221,7 +221,7 @@ importers:
         version: 1.1.0(astro@7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       '@xsynaptic/astro-image-loader':
         specifier: ^1.2.0
-        version: 1.2.0(astro@7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@38.1.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.6.5)
+        version: 1.2.0(astro@7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@38.1.1)(sharp@0.35.4(@types/node@25.9.2))(zod@4.6.5)
       '@xsynaptic/eslint-config':
         specifier: ^6.4.0
         version: 6.4.0(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@typescript-eslint/parser@8.70.0(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -280,8 +280,8 @@ importers:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)
       exiftool-vendored:
-        specifier: ^38.1.0
-        version: 38.1.0
+        specifier: ^38.1.1
+        version: 38.1.1
       fallow:
         specifier: ^3.28.0
         version: 3.28.0
@@ -295,8 +295,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       knip:
-        specifier: ^6.37.0
-        version: 6.37.0
+        specifier: ^6.38.0
+        version: 6.38.0
       lefthook:
         specifier: ^2.1.14
         version: 2.1.14
@@ -418,8 +418,8 @@ importers:
         specifier: ^6.3.0
         version: 6.3.0
       maplibre-gl:
-        specifier: ^6.11.0
-        version: 6.11.0
+        specifier: ^6.11.1
+        version: 6.11.1
       pmtiles:
         specifier: ^4.5.0
         version: 4.5.0
@@ -431,7 +431,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       react-map-gl:
         specifier: ^8.1.3
-        version: 8.1.3(maplibre-gl@6.11.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       remeda:
         specifier: ^2.50.0
         version: 2.50.0
@@ -3630,8 +3630,8 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
-  batch-cluster@19.2.0:
-    resolution: {integrity: sha512-mvozaN/7TYxl+lmXDYH+HocCcRMvW25QmghrJux2y93o+NhHPQ4wir0nBS1p8oTlinjc/l5LaNX+VFxNISrqgQ==}
+  batch-cluster@19.3.1:
+    resolution: {integrity: sha512-XmAaVzSrFl4yLALFbHFwHB1vsCz6nWo3qsMv+9Fy62d5BZVHPk1rqr5h3c6n1wift3uf+Fc8aIAPgB3OZn6qFQ==}
     engines: {node: '>=22'}
 
   bcp-47@2.1.0:
@@ -4302,8 +4302,8 @@ packages:
     os: ['!win32']
     hasBin: true
 
-  exiftool-vendored@38.1.0:
-    resolution: {integrity: sha512-LIERqM/Qb0oqJlSswLFKWsxGVH81skp7omsX2BPKA/dEzfLP5syNO5KL7k5UlMCf+m0jqEXrKTQr/xV5vScPow==}
+  exiftool-vendored@38.1.1:
+    resolution: {integrity: sha512-cX2xkahyNqOLZD2/DD4PY0d6DeL2V8M+OArX/8O/RN4bGkEEzKjoBUFewDsaT9vImJ8S84gtiLiv702j7N3ofA==}
     engines: {node: '>=22'}
 
   expect-type@1.3.0:
@@ -5055,8 +5055,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.37.0:
-    resolution: {integrity: sha512-NKCYuoGKJ+o2AuoCuV1mDvfMYnSSWfDXqxwmzxeHyd8fftjNRl8TBUg3fbSrtJjhm7Vj6sc1PX3WZnZhECs9EQ==}
+  knip@6.38.0:
+    resolution: {integrity: sha512-umytiMCaZf02MV9SOO1FEDgbDf6h20VZk3ruJE0kh52kkGjYZFRUAXHJWYoLhvhoHGINO/7GXVJmQ2vxTBvl6A==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -5328,8 +5328,8 @@ packages:
   magicast@0.5.3:
     resolution: {integrity: sha512-pVKE4UdSQ7DvHzivsCIFx2BJn1mHG6KsyrFcaxFx6tONdneEuThrDx0Cj3AMg58KyN4pzYT+LHOotxDQDjNvkw==}
 
-  maplibre-gl@6.11.0:
-    resolution: {integrity: sha512-BWf1V0eKEK7NpIyjVSFrTWjF2CE9zhVvS0JLvyAS19lR0HnHtvPFRS5M9QVJeLcoMT1WyCU0Sm9vj53BBxtWYg==}
+  maplibre-gl@6.11.1:
+    resolution: {integrity: sha512-PaWLwfxWs6EddrPEsncrnPAyHNN0vm7KpQtoPWN1AQimJ7qwY/7GrwBeI+cB+YlSrw5sCyVKc2ZAbTwJ4MHUdA==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   markdown-extensions@2.0.0:
@@ -8867,17 +8867,17 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@napi-rs/wasm-runtime@1.2.3(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
-    dependencies:
-      '@emnapi/core': 1.11.2
-      '@emnapi/runtime': 1.11.2
-      '@tybys/wasm-util': 0.10.3
-    optional: true
-
   '@napi-rs/wasm-runtime@1.2.3(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)':
     dependencies:
       '@emnapi/core': 1.11.3
       '@emnapi/runtime': 1.11.3
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
+  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)':
+    dependencies:
+      '@emnapi/core': 1.11.2
+      '@emnapi/runtime': 1.11.2
       '@tybys/wasm-util': 0.10.3
     optional: true
 
@@ -9069,7 +9069,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.11.2
       '@emnapi/runtime': 1.11.2
-      '@napi-rs/wasm-runtime': 1.2.3(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
+      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.2)
     optional: true
 
   '@oxc-resolver/binding-win32-arm64-msvc@11.24.2':
@@ -10828,13 +10828,13 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.11.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@maplibre/maplibre-gl-style-spec': 19.3.3
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
     optionalDependencies:
-      maplibre-gl: 6.11.0
+      maplibre-gl: 6.11.1
 
   '@vitejs/plugin-react@6.1.1(vite@8.3.0(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
     dependencies:
@@ -10943,7 +10943,7 @@ snapshots:
       astro: 7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       zod: 4.6.5
 
-  '@xsynaptic/astro-image-loader@1.2.0(astro@7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@38.1.0)(sharp@0.35.4(@types/node@25.9.2))(zod@4.6.5)':
+  '@xsynaptic/astro-image-loader@1.2.0(astro@7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@38.1.1)(sharp@0.35.4(@types/node@25.9.2))(zod@4.6.5)':
     dependencies:
       astro: 7.3.5(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       p-limit: 7.3.3
@@ -10951,7 +10951,7 @@ snapshots:
       tinyglobby: 0.2.17
       zod: 4.6.5
     optionalDependencies:
-      exiftool-vendored: 38.1.0
+      exiftool-vendored: 38.1.1
       sharp: 0.35.4(@types/node@25.9.2)
 
   '@xsynaptic/eslint-config@6.4.0(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@typescript-eslint/parser@8.70.0(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
@@ -11323,7 +11323,7 @@ snapshots:
 
   baseline-browser-mapping@2.11.20: {}
 
-  batch-cluster@19.2.0: {}
+  batch-cluster@19.3.1: {}
 
   bcp-47@2.1.0:
     dependencies:
@@ -12139,11 +12139,11 @@ snapshots:
   exiftool-vendored.pl@13.59.2:
     optional: true
 
-  exiftool-vendored@38.1.0:
+  exiftool-vendored@38.1.1:
     dependencies:
       '@photostructure/tz-lookup': 11.7.0
       '@types/luxon': 3.7.5
-      batch-cluster: 19.2.0
+      batch-cluster: 19.3.1
       he: 1.2.0
       luxon: 3.7.2
     optionalDependencies:
@@ -12978,7 +12978,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.37.0:
+  knip@6.38.0:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.7)
       formatly: 0.7.0
@@ -13200,7 +13200,7 @@ snapshots:
       '@babel/types': 7.29.7
       source-map-js: 1.2.1
 
-  maplibre-gl@6.11.0:
+  maplibre-gl@6.11.1:
     dependencies:
       '@mapbox/point-geometry': 1.1.0
       '@mapbox/tiny-sdf': 2.2.0
@@ -14300,14 +14300,14 @@ snapshots:
       react: 19.3.0
       scheduler: 0.28.0
 
-  react-map-gl@8.1.3(maplibre-gl@6.11.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  react-map-gl@8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@vis.gl/react-mapbox': 8.1.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.11.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
     optionalDependencies:
-      maplibre-gl: 6.11.0
+      maplibre-gl: 6.11.1
 
   react@19.3.0: {}
 
