@@ -3,7 +3,7 @@ import type { Feature } from 'geojson';
 
 import { bboxClip, coordAll, featureCollection, rewind, simplify } from '@turf/turf';
 import chalk from 'chalk';
-import { geoIdentity, geoPath } from 'd3-geo';
+import { geoAzimuthalEqualArea, geoCentroid, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { optimize } from 'svgo';
@@ -142,38 +142,39 @@ function generateSvg(
 		);
 	}
 
-	// Ensure polygons follow the right-hand rule (exterior rings counterclockwise, holes clockwise)
-	// This prevents rendering issues where polygons might appear inverted or not render at all
-	const corrected = rewind(clippedFeatureCollection, {
-		reverse: false,
-	}) as DivisionFeatureCollection;
-
 	// Scale simplification tolerance based on geometry complexity
 	// Complex boundaries get progressively more aggressive simplification (up to 5x)
 	const pointThreshold = 5000;
 	const maxToleranceMultiplier = 5;
 
-	const pointCount = coordAll(corrected).length;
+	const pointCount = coordAll(clippedFeatureCollection).length;
 	const adaptiveTolerance =
 		pointCount > pointThreshold
 			? tolerance * Math.min(maxToleranceMultiplier, pointCount / pointThreshold)
 			: tolerance;
 
-	const simplified = simplify(corrected, {
+	const simplified = simplify(clippedFeatureCollection, {
 		highQuality,
 		tolerance: adaptiveTolerance,
 	});
 
-	// Create a projection that fits the geometry to the viewport
-	// geoIdentity is a "flat" projection that just scales and translates
-	// reflectY(true) flips the Y-axis so north is up (SVG Y increases downward)
-	const projection = geoIdentity().reflectY(true).fitSize([width, height], simplified);
+	// d3 spherical projections expect clockwise exterior rings, the reverse of RFC 7946
+	// Rewind after simplifying, which can collapse islets into slivers with flipped winding
+	const corrected = rewind(simplified, {
+		reverse: true,
+	}) as DivisionFeatureCollection;
+
+	// Azimuthal equal-area centred on the region keeps shapes true at any latitude
+	const [centroidLng, centroidLat] = geoCentroid(corrected);
+	const projection = geoAzimuthalEqualArea()
+		.rotate([-centroidLng, -centroidLat])
+		.fitSize([width, height], corrected);
 
 	// Create a path generator
 	const pathGenerator = geoPath(projection);
 
 	// Calculate actual bounds of the geometry with buffer for strokes
-	const bounds = pathGenerator.bounds(simplified);
+	const bounds = pathGenerator.bounds(corrected);
 	const [[x0, y0], [x1, y1]] = bounds;
 	const buffer = 10; // 10px buffer to prevent stroke clipping
 	const viewBoxX = x0 - buffer;
@@ -182,7 +183,7 @@ function generateSvg(
 	const viewBoxHeight = y1 - y0 + buffer * 2;
 
 	// Generate path data for all features
-	const pathData = simplified.features
+	const pathData = corrected.features
 		.map((feature) => pathGenerator(feature))
 		.filter((path): path is string => path !== null)
 		.join(' ');
