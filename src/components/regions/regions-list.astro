@@ -28,11 +28,12 @@ const {
 	terms,
 } = Astro.props;
 
-// Optionally expand the list of regions to include ancestors
+// Optionally expand a single region into its ancestor run, general to specific like a breadcrumb trail
 async function getRegions() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 
-	const ancestors = terms?.length === 1 && terms[0] ? getRegionAncestors(terms[0]) : undefined;
+	const ancestors =
+		terms?.length === 1 && terms[0] ? getRegionAncestors(terms[0]).toReversed() : undefined;
 
 	return ancestors ?? terms;
 }
