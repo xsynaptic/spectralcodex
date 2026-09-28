@@ -1,4 +1,4 @@
-import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
+import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
 import { Bitmap } from 'takumi-js/helpers/jsx';
 
 import type { ProcessedImage } from '#og-image/generate.ts';

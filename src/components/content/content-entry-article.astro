@@ -1,0 +1,70 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+import { getPublicId } from '@spectralcodex/shared/entries';
+
+import type { MetaProps } from '#components/types.ts';
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+import type { Thing } from '#lib/utils/seo-structured-data.ts';
+
+import ContentArticle from '#components/content/content-article.astro';
+import ContentDate from '#components/content/content-date.astro';
+import ContentEntryHeader from '#components/content/content-entry-header.astro';
+import MainSite from '#components/main/main-site.astro';
+import SectionAuthor from '#components/sections/section-author.astro';
+import { MicroformatClassNames } from '#components/types.ts';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
+import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
+import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
+
+interface Props {
+	entry: CollectionEntry<'locations' | 'pages' | 'posts'>;
+	meta?: MetaProps;
+	schemas: Array<Thing>;
+	titleMultilingual: MultilingualContent | undefined;
+	titleMultilingualAdditional?: Array<MultilingualContent> | undefined;
+}
+
+const { entry, meta, schemas, titleMultilingual, titleMultilingualAdditional } = Astro.props;
+
+const catalog = await getCatalog();
+const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
+	getCaption: catalog.getCaption,
+	imageFeatured: entry.data.imageFeatured,
+});
+const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
+
+const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
+---
+
+<MainSite
+	hasHeroImage={hasHeroImage}
+	meta={{
+		description: await getDescriptionRenderedText(entry),
+		image: getSeoImageProps({
+			alt: entry.data.title,
+			id: getPublicId(entry),
+		}),
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
+		...meta,
+	}}
+	schemas={schemas}
+>
+	<ContentArticle class={MicroformatClassNames.Entry} imageId={imageFeaturedId}>
+		<ContentEntryHeader
+			imageFeaturedGroup={imageFeaturedHeroGroup}
+			title={entry.data.title}
+			titleMultilingual={titleMultilingual}
+			titleMultilingualAdditional={titleMultilingualAdditional}
+		>
+			<Fragment slot="header-subtitle">
+				<slot name="header-subtitle" />
+				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
+			</Fragment>
+		</ContentEntryHeader>
+		<slot />
+		<SectionAuthor showAuthor={false} />
+	</ContentArticle>
+</MainSite>

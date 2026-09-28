@@ -22,15 +22,6 @@ export function getSeoArticleProps({
 	};
 }
 
-export function getSeoHideSearch(shouldHide: boolean | undefined) {
-	return shouldHide
-		? {
-				noFollow: true,
-				noIndex: true,
-			}
-		: undefined;
-}
-
 export function getSeoImageProps({ alt, id }: { alt: string; id: string }) {
 	return {
 		alt,

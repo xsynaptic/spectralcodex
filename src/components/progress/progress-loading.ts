@@ -1,3 +1,5 @@
+import { setProgressBarOpacity, setProgressBarValue } from '#components/progress/progress-bar.ts';
+
 const animationDuration = 300;
 
 class ProgressLoading extends HTMLElement {
@@ -38,13 +40,13 @@ class ProgressLoading extends HTMLElement {
 
 		this.#isLoading = true;
 		this.#progress = 0;
-		this.#setProgress(0);
+		setProgressBarValue(this, 0);
 		this.#thresholdTimeout = window.setTimeout(() => {
 			this.#thresholdTimeout = undefined;
-			this.#setOpacity(1);
+			setProgressBarOpacity(this, 1);
 			this.#trickleInterval = window.setInterval(() => {
 				this.#progress += Math.random() * 0.03;
-				this.#setProgress(this.#progress);
+				setProgressBarValue(this, this.#progress);
 			}, animationDuration);
 		}, 200);
 	};
@@ -56,34 +58,24 @@ class ProgressLoading extends HTMLElement {
 		this.#clearLoadTimers();
 
 		this.#progress = 1;
-		this.#setProgress(1);
+		setProgressBarValue(this, 1);
 
 		this.#fadeTimeout = window.setTimeout(() => {
 			this.#fadeTimeout = undefined;
-			this.#setOpacity(0);
+			setProgressBarOpacity(this, 0);
 		}, animationDuration / 2);
 
 		this.#resetTimeout = window.setTimeout(() => {
 			this.#resetTimeout = undefined;
 			this.#progress = 0.2;
-			this.#setProgress(0.2);
+			setProgressBarValue(this, 0.2);
 		}, animationDuration * 2);
 	};
-
-	#setOpacity(value: number) {
-		this.style.setProperty('opacity', String(value));
-	}
-
-	#setProgress(value: number) {
-		this.style.setProperty('--progress-bar', String(value));
-	}
 }
 
 if (!customElements.get('progress-loading')) {
 	customElements.define('progress-loading', ProgressLoading);
 }
-
-export {};
 
 declare global {
 	interface HTMLElementTagNameMap {

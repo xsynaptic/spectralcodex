@@ -57,19 +57,8 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 				: {}),
 		}));
 
-	const seriesMenu = series
-		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterNavigationItemEntryCount(1))
-		.sort(sortByEntryCount)
-		.slice(0, 12)
-		.map((entry) => getNavigationItemData({ collection: 'series', entry }));
-
-	const themesMenu = themes
-		.filter((entry) => entry.data.entryQuality >= 2)
-		.filter(filterNavigationItemEntryCount(1))
-		.sort(sortByEntryCount)
-		.slice(0, 12)
-		.map((entry) => getNavigationItemData({ collection: 'themes', entry }));
+	const seriesMenu = getNavigationCollectionMenu({ collection: 'series', entries: series });
+	const themesMenu = getNavigationCollectionMenu({ collection: 'themes', entries: themes });
 
 	const chronologyData = await getChronologyData();
 
@@ -125,6 +114,21 @@ function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
 
 	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
 		(entry.data._entryCount ?? 0) >= minEntryCount;
+}
+
+function getNavigationCollectionMenu({
+	collection,
+	entries,
+}: {
+	collection: 'series' | 'themes';
+	entries: Array<CollectionEntry<'series' | 'themes'>>;
+}) {
+	return entries
+		.filter((entry) => entry.data.entryQuality >= 2)
+		.filter(filterNavigationItemEntryCount(1))
+		.sort(sortByEntryCount)
+		.slice(0, 12)
+		.map((entry) => getNavigationItemData({ collection, entry }));
 }
 
 function getNavigationItemData({

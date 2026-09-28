@@ -1,4 +1,4 @@
-import { openGraphBasePath } from '@spectralcodex/shared/constants';
+import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
 import chalk from 'chalk';
 import path from 'node:path';
 

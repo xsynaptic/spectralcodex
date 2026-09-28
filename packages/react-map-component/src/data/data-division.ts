@@ -30,17 +30,8 @@ export function useMapApiDivisionData({
 			if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)}`);
 			const arrayBuffer = await response.arrayBuffer();
 
-			// Convert ArrayBuffer to ReadableStream for FlatGeobuf
-			const uint8Array = new Uint8Array(arrayBuffer);
-			const stream = new ReadableStream({
-				start(controller) {
-					controller.enqueue(uint8Array);
-					controller.close();
-				},
-			});
-
 			// Deserialize FlatGeobuf to GeoJSON features
-			const featuresIterator = geojson.deserialize(stream);
+			const featuresIterator = geojson.deserialize(new Uint8Array(arrayBuffer));
 			const features: Array<Feature<MultiPolygon | Polygon>> = [];
 
 			for await (const feature of featuresIterator) {

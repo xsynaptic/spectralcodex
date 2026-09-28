@@ -3,7 +3,7 @@ import {
 	openGraphImageHeight,
 	openGraphImageWidth,
 	openGraphManifestFile,
-} from '@spectralcodex/shared/constants';
+} from '@spectralcodex/shared/open-graph';
 import { createHash } from 'node:crypto';
 import { existsSync, promises as fs, readFileSync } from 'node:fs';
 import path from 'node:path';

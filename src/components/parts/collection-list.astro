@@ -11,7 +11,7 @@ import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
-	collection: 'regions' | 'resources' | 'series' | 'themes';
+	collection: 'locations' | 'regions' | 'resources' | 'series' | 'themes';
 	page: Page;
 }
 
@@ -30,12 +30,14 @@ const description = t(`collection.${collection}.description`);
 			alt: title,
 			id: `index-${collection}`,
 		}),
-		noIndex: page.currentPage > 1,
 		title,
 	}}
 >
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
+		<Fragment slot="header-subtitle">
+			<slot name="header-subtitle" />
+		</Fragment>
 	</ContentHeader>
 	<ContentSection>
 		<Fragment

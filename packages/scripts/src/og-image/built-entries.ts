@@ -1,5 +1,5 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
-import { openGraphBasePath } from '@spectralcodex/shared/constants';
+import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 

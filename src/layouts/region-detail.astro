@@ -41,8 +41,6 @@ const getRegionAncestors = await createRegionAncestorsFunction();
 <ContentEntryDetail
 	breadcrumbRegions={getRegionAncestors(entry).slice(1).toReversed()}
 	entry={entry}
-	hideSearch={entry.data.hideSearch}
-	page={page}
 	prefetchUrls={mapData.prefetchUrls}
 >
 	<Fragment slot="header-subtitle">

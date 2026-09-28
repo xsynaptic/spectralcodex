@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 const site = 'https://spectralcodex.com';
 
@@ -58,17 +58,5 @@ describe('getSeoImageProps', () => {
 
 	test('passes alt text through unchanged', () => {
 		expect(getSeoImageProps({ alt: 'A caption', id: 'some-post' }).alt).toBe('A caption');
-	});
-});
-
-describe('getSeoHideSearch', () => {
-	test('yields nothing to spread unless hiding is asked for', () => {
-		expect(getSeoHideSearch(false)).toBeUndefined();
-		expect(getSeoHideSearch(undefined)).toBeUndefined();
-		expect({ ...getSeoHideSearch(false) }).toStrictEqual({});
-	});
-
-	test('hiding sets both directives, since noindex alone still passes link equity', () => {
-		expect(getSeoHideSearch(true)).toStrictEqual({ noFollow: true, noIndex: true });
 	});
 });

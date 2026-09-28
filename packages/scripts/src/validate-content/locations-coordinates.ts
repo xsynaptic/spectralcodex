@@ -217,16 +217,8 @@ async function loadRegionGeometry(
 
 	try {
 		const buffer = await fs.readFile(fgbPath);
-		const uint8Array = new Uint8Array(buffer);
 
-		const stream = new ReadableStream<Uint8Array>({
-			start(controller) {
-				controller.enqueue(uint8Array);
-				controller.close();
-			},
-		});
-
-		const featuresIterator = geojson.deserialize(stream);
+		const featuresIterator = geojson.deserialize(buffer);
 		const features: Array<Feature<MultiPolygon | Polygon>> = [];
 
 		for await (const feature of featuresIterator) {

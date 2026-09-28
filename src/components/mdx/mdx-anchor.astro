@@ -1,0 +1,13 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import { renderSlot } from '#lib/utils/astro.ts';
+
+type Props = HTMLAttributes<'a'>;
+
+const { href, ...props } = Astro.props;
+
+const content = await renderSlot(Astro.slots, 'default');
+---
+
+{href ? <a href={href} {...props} set:html={content} /> : <Fragment set:html={content} />}

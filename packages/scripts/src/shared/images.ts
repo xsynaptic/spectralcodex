@@ -34,15 +34,9 @@ export function collectMediaFiles(
 }
 
 export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
-	const imageFeatured = frontmatter.imageFeatured;
+	const data = parseImageFeatured(frontmatter);
 
-	if (!imageFeatured) return [];
-
-	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
-
-	if (!parsed.success) return [];
-
-	const data = parsed.data;
+	if (!data) return [];
 
 	if (typeof data === 'string') return [data];
 
@@ -53,4 +47,16 @@ export function extractMdxImageIds(content: string): Array<string> {
 	return findComponentTags(content, ['Img'])
 		.map((tag) => getTagProp(tag, 'src'))
 		.filter((src) => src !== undefined);
+}
+
+export function parseImageFeatured(frontmatter: Record<string, unknown>) {
+	const imageFeatured = frontmatter.imageFeatured;
+
+	if (!imageFeatured) return;
+
+	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
+
+	if (!parsed.success) return;
+
+	return parsed.data;
 }

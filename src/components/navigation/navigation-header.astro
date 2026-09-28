@@ -27,7 +27,9 @@ const t = getTranslations();
 
 				return (
 					<li class="nav-item">
-						<NavigationHeaderTrigger hasChildren={hasChildren} item={item} />
+						<NavigationHeaderTrigger hasChildren={hasChildren} item={item} variant="item">
+							<Fragment set:html={item.title} />
+						</NavigationHeaderTrigger>
 						{hasChildren ? (
 							<NavigationHeaderSubmenu
 								ariaLabel={getNavigationItemAriaLabel(item)}

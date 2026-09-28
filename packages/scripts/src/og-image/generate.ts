@@ -1,6 +1,6 @@
 import type { Font } from 'takumi-js';
 
-import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/constants';
+import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
 import sharp from 'sharp';
 import { render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';

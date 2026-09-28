@@ -1,4 +1,5 @@
 ---
+// fallow-ignore-file code-duplication -- Ends with the same section sequence as region-detail; the frontmatter overlap with resources-detail is adjacent one-liners
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
@@ -37,12 +38,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 ---
 
-<ContentEntryDetail
-	entry={entry}
-	hideSearch={entry.data.hideSearch}
-	page={page}
-	prefetchUrls={mapData.prefetchUrls}
->
+<ContentEntryDetail entry={entry} prefetchUrls={mapData.prefetchUrls}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />

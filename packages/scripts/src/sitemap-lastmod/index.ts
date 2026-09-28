@@ -1,6 +1,8 @@
-import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
+import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
+
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { joinUrl } from '@spectralcodex/shared/routing';
+import { sitemapLastmodPath } from '@spectralcodex/shared/sitemap';
 import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -59,7 +61,7 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 	const payload = {
 		generatedAt: new Date().toISOString(),
 		urls,
-	};
+	} satisfies SitemapLastmod;
 
 	writeFileSync(outputPath, JSON.stringify(payload, undefined, 2));
 

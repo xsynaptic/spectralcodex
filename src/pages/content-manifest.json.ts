@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { isIndexableUrlPath } from '@spectralcodex/shared/sitemap';
+import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 
@@ -13,7 +13,7 @@ export const GET: APIRoute = async ({ site }) => {
 	// Content manifest includes relative URLs so we need to normalize output before filtering
 	const entries = [...catalog.all()]
 		.map(({ title, url }) => ({ title, url: new URL(url, site).pathname }))
-		.filter(({ url }) => isIndexableUrlPath(url));
+		.filter(({ url }) => getUrlPathIndexing(url).index);
 
 	return Response.json(entries, {
 		headers: { 'Content-Type': 'application/json' },

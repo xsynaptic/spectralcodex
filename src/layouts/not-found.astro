@@ -4,7 +4,6 @@ import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import NotFoundSuggestions from '#components/not-found/not-found-suggestions.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSeoHideSearch } from '#lib/utils/seo.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
@@ -21,8 +20,9 @@ const description = t('notFound.description');
 			alt: title,
 			id: 'index-not-found',
 		}),
+		noFollow: true,
+		noIndex: true,
 		title,
-		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>

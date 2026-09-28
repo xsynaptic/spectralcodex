@@ -4,7 +4,8 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
-import { isIndexableUrlPath, readSitemapLastmod } from '@spectralcodex/shared/sitemap';
+import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
+import { readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
@@ -168,7 +169,7 @@ export default defineConfig({
 		}),
 		mdx(),
 		sitemap({
-			filter: (page) => isIndexableUrlPath(new URL(page).pathname),
+			filter: (page) => getUrlPathIndexing(new URL(page).pathname).index,
 			serialize: (item) => {
 				const sitemapLastmod = getSitemapLastmod();
 

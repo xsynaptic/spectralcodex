@@ -30,12 +30,7 @@ const entryCount = entry.data._entryCount ?? 0;
 const t = getTranslations();
 ---
 
-<ContentEntryDetail
-	entry={entry}
-	hideSearch={entry.data.hideSearch}
-	page={page}
-	prefetchUrls={mapData.prefetchUrls}
->
+<ContentEntryDetail entry={entry} prefetchUrls={mapData.prefetchUrls}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />

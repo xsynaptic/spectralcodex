@@ -1,16 +1,14 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import MdxAnchor from '#components/mdx/mdx-anchor.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends Omit<HTMLAttributes<'a'>, 'id'> {
 	id: string | undefined;
 }
 
 const { id, ...props } = Astro.props;
-
-const content = await renderSlot(Astro.slots, 'default');
 
 const pathname = Astro.url.pathname;
 
@@ -22,8 +20,6 @@ const catalog = await getCatalog();
 const catalogItem = catalog.getById(id);
 ---
 
-{catalogItem?.url ? (
-	<a href={catalogItem.url} {...props} set:html={content} />
-) : (
-	<Fragment set:html={content} />
-)}
+<MdxAnchor href={catalogItem?.url} {...props}>
+	<slot />
+</MdxAnchor>

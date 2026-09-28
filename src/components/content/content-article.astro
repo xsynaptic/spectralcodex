@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
 import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
@@ -9,11 +10,12 @@ import { createImageUrlFunction } from '#lib/image/image-server.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 interface Props extends HTMLAttributes<'article'> {
-	hideSearch?: boolean | undefined;
 	imageId: string | undefined;
 }
 
-const { hideSearch, imageId, ...props } = Astro.props;
+const { imageId, ...props } = Astro.props;
+
+const { index } = getUrlPathIndexing(Astro.url.pathname);
 
 // Pagefind renders result thumbnails at 64×48 (4:3) via `--pf-image-width` / `--pf-image-height`
 const searchThumbnailWidth = 64;
@@ -54,7 +56,7 @@ async function getThumbnailUrls() {
 const thumbnails = await getThumbnailUrls();
 ---
 
-<article {...props} {...(hideSearch ? {} : { 'data-pagefind-body': '' })}>
+<article {...props} {...(index ? { 'data-pagefind-body': '' } : {})}>
 	<slot />
 	{thumbnails ? (
 		<>

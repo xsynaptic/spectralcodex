@@ -1,3 +1,5 @@
+import { setProgressBarOpacity, setProgressBarValue } from '#components/progress/progress-bar.ts';
+
 const animationDuration = 300;
 
 class ProgressReading extends HTMLElement {
@@ -54,14 +56,6 @@ class ProgressReading extends HTMLElement {
 		this.#frame = requestAnimationFrame(this.#updateProgress);
 	};
 
-	#setOpacity(value: number) {
-		this.style.setProperty('opacity', String(value));
-	}
-
-	#setProgress(value: number) {
-		this.style.setProperty('--progress-bar', String(value));
-	}
-
 	#trackScroll() {
 		if (this.#scrollController) return;
 
@@ -88,12 +82,12 @@ class ProgressReading extends HTMLElement {
 		const scrollable = Math.max(1, rect.height - window.innerHeight);
 		const progress = Math.min(Math.max(0, -rect.top / scrollable), 1);
 
-		this.#setProgress(progress);
+		setProgressBarValue(this, progress);
 
 		// One fade per arrival at the end; scrolling back up cancels it before it lands
 		if (progress < 1) {
 			this.#clearFadeOut();
-			this.#setOpacity(1);
+			setProgressBarOpacity(this, 1);
 			return;
 		}
 
@@ -101,7 +95,7 @@ class ProgressReading extends HTMLElement {
 
 		this.#fadeOutTimer = window.setTimeout(() => {
 			this.#fadeOutTimer = undefined;
-			this.#setOpacity(0);
+			setProgressBarOpacity(this, 0);
 		}, animationDuration / 2);
 	};
 }
@@ -109,8 +103,6 @@ class ProgressReading extends HTMLElement {
 if (!customElements.get('progress-reading')) {
 	customElements.define('progress-reading', ProgressReading);
 }
-
-export {};
 
 declare global {
 	interface HTMLElementTagNameMap {

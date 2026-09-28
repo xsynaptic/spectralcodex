@@ -1,8 +1,8 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import MdxAnchor from '#components/mdx/mdx-anchor.astro';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
-import { renderSlot } from '#lib/utils/astro.ts';
 import { getResourcePath } from '#lib/utils/routing.ts';
 
 interface Props extends Omit<HTMLAttributes<'a'>, 'id'> {
@@ -10,8 +10,6 @@ interface Props extends Omit<HTMLAttributes<'a'>, 'id'> {
 }
 
 const { id, ...props } = Astro.props;
-
-const content = await renderSlot(Astro.slots, 'default');
 
 const pathname = Astro.url.pathname;
 
@@ -29,4 +27,6 @@ if (!resource && import.meta.env.DEV) {
 const href = resource ? getResourcePath(resource.id, resource.data.showPage) : undefined;
 ---
 
-{href ? <a href={href} {...props} set:html={content} /> : <Fragment set:html={content} />}
+<MdxAnchor href={href} {...props}>
+	<slot />
+</MdxAnchor>

@@ -1,4 +1,5 @@
 ---
+import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID, WEBMENTION_DOMAIN } from 'astro:env/client';
 
@@ -38,6 +39,8 @@ interface Props {
 
 const { hasHeroImage = false, isHomepage = false, meta, schemas } = Astro.props;
 
+const indexing = getUrlPathIndexing(Astro.url.pathname);
+
 const siteUrl = getSitePath();
 
 const t = getTranslations();
@@ -70,7 +73,11 @@ const t = getTranslations();
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-lora" preload={[{ style: 'normal', subset: 'latin' }]} />
 		<ModeManagerSetup />
-		<Meta {...meta} />
+		<Meta
+			{...meta}
+			noFollow={!!meta?.noFollow || !indexing.follow}
+			noIndex={!!meta?.noIndex || !indexing.index}
+		/>
 		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
 			<Analytics isViewTransitionsEnabled={true} umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} />
 		) : undefined}

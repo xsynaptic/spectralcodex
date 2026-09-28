@@ -26,7 +26,6 @@ export const series = defineCollection({
 			description: z.string().optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
-			hideSearch: z.boolean().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			regions: reference('regions').array().optional(),
 			// Strings, not references, because we mix content here (posts and locations)

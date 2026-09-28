@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { openGraphOutputPath } from '@spectralcodex/shared/constants';
+import { openGraphOutputPath } from '@spectralcodex/shared/open-graph';
 import chalk from 'chalk';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';

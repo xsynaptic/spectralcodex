@@ -3,7 +3,7 @@ import {
 	openGraphImageFormat,
 	openGraphManifestFile,
 	openGraphOutputPath,
-} from '@spectralcodex/shared/constants';
+} from '@spectralcodex/shared/open-graph';
 import chalk from 'chalk';
 import path from 'node:path';
 

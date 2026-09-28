@@ -39,6 +39,8 @@ export default getConfig(
 				'max-statements': ['warn', 25],
 				// `WebSite` etc. intentionally mirror schema.org's canonical type names
 				'unicorn/consistent-compound-words': 'off',
+				// Conflicts with the core rule above
+				'unicorn/logical-assignment-operators': 'off',
 				// Conflicts with Remeda's sort function
 				'unicorn/no-array-sort': 'off',
 				// Refactor-heavy: wants nested loops extracted into functions
@@ -113,6 +115,8 @@ export default getConfig(
 				},
 			},
 			rules: {
+				// typescript-eslint turns this off for TS files, and without it the globals above bind nothing
+				'no-undef': 'error',
 				// This conflicts with how some client-side code is handled
 				'unicorn/prefer-global-this': 'off',
 			},

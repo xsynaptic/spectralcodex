@@ -6,14 +6,10 @@ import { render } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import ContentArticle from '#components/content/content-article.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
-import ContentDate from '#components/content/content-date.astro';
-import ContentEntryHeader from '#components/content/content-entry-header.astro';
-import MainSite from '#components/main/main-site.astro';
+import ContentEntryArticle from '#components/content/content-entry-article.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import Prose from '#components/parts/prose.astro';
-import SectionAuthor from '#components/sections/section-author.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
 import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionLinks from '#components/sections/section-links.astro';
@@ -24,14 +20,10 @@ import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { MicroformatClassNames } from '#components/types.ts';
-import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getSeoArticleProps, getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
@@ -43,70 +35,45 @@ const { backlinks, entry, mapData } = Astro.props;
 
 const t = getTranslations();
 
+// fallow-ignore-next-line code-duplication -- Reference-to-id one-liners that only line up with resources-detail by adjacency
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
-
-const catalog = await getCatalog();
-const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
-	getCaption: catalog.getCaption,
-	imageFeatured: entry.data.imageFeatured,
-});
-const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
-
-const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
 
 const { Content } = await render(entry);
 
 const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
 ---
 
-<MainSite
-	hasHeroImage={hasHeroImage}
+<ContentEntryArticle
+	entry={entry}
 	meta={{
-		description: await getDescriptionRenderedText(entry),
-		image: seoImage,
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 		...getSeoArticleProps({
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
 		}),
-		...getSeoHideSearch(entry.data.hideSearch),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
 	schemas={await getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
+	titleMultilingual={titleMultilingual}
 >
-	<ContentArticle
-		class={MicroformatClassNames.Entry}
-		hideSearch={entry.data.hideSearch}
-		imageId={imageFeaturedId}
-	>
-		<ContentEntryHeader
-			imageFeaturedGroup={imageFeaturedHeroGroup}
-			title={entry.data.title}
-			titleMultilingual={titleMultilingual}
-		>
-			<Fragment slot="header-subtitle">
-				<DividedItem>
-					<ContentCollectionLink collection="posts" />
-				</DividedItem>
-				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
-			</Fragment>
-		</ContentEntryHeader>
-		<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
-			<Content />
-		</Prose>
-		<SectionMap entryTitle={entry.data.title} mapData={mapData} />
-		<SectionLinks entry={entry} />
-		<SectionSources entry={entry} />
-		<SectionThemes themeIds={themeIds} />
-		<SectionRegions regionIds={regionIds} />
-		<SectionSeries entry={entry} />
-		<SectionBacklinks backlinks={backlinks} />
-		<SectionWebmentions entry={entry} />
-		<SectionSimilar entry={entry} limit={8} showPreviews={true} />
-		<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
-		<SectionAuthor showAuthor={false} />
-	</ContentArticle>
-</MainSite>
+	<Fragment slot="header-subtitle">
+		<DividedItem>
+			<ContentCollectionLink collection="posts" />
+		</DividedItem>
+	</Fragment>
+	<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
+		<Content />
+	</Prose>
+	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
+	<SectionLinks entry={entry} />
+	<SectionSources entry={entry} />
+	<SectionThemes themeIds={themeIds} />
+	<SectionRegions regionIds={regionIds} />
+	<SectionSeries entry={entry} />
+	<SectionBacklinks backlinks={backlinks} />
+	<SectionWebmentions entry={entry} />
+	<SectionSimilar entry={entry} limit={8} showPreviews={true} />
+	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
+</ContentEntryArticle>

@@ -3,20 +3,11 @@ import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
 
-import ContentArticle from '#components/content/content-article.astro';
-import ContentDate from '#components/content/content-date.astro';
-import ContentEntryHeader from '#components/content/content-entry-header.astro';
-import MainSite from '#components/main/main-site.astro';
+import ContentEntryArticle from '#components/content/content-entry-article.astro';
 import { navigationFooterItems } from '#components/navigation/navigation-footer.ts';
 import Prose from '#components/parts/prose.astro';
-import SectionAuthor from '#components/sections/section-author.astro';
-import { MicroformatClassNames } from '#components/types.ts';
-import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { buildAuthorSchema } from '#lib/utils/seo-structured-data.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	entry: CollectionEntry<'pages'>;
@@ -36,48 +27,11 @@ const schemas =
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
-const catalog = await getCatalog();
-const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
-	getCaption: catalog.getCaption,
-	imageFeatured: entry.data.imageFeatured,
-});
-const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
-
-const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length > 0;
-
 const { Content } = await render(entry);
 ---
 
-<MainSite
-	hasHeroImage={hasHeroImage}
-	meta={{
-		description: await getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			alt: entry.data.title,
-			id: entry.id,
-		}),
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
-		...getSeoHideSearch(entry.data.hideSearch),
-	}}
-	schemas={schemas}
->
-	<ContentArticle
-		class={MicroformatClassNames.Entry}
-		hideSearch={entry.data.hideSearch}
-		imageId={imageFeaturedId}
-	>
-		<ContentEntryHeader
-			imageFeaturedGroup={imageFeaturedHeroGroup}
-			title={entry.data.title}
-			titleMultilingual={titleMultilingual}
-		>
-			<Fragment slot="header-subtitle">
-				<ContentDate dateCreated={entry.data.dateCreated} dateUpdated={entry.data.dateUpdated} />
-			</Fragment>
-		</ContentEntryHeader>
-		<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
-			<Content />
-		</Prose>
-		<SectionAuthor showAuthor={false} />
-	</ContentArticle>
-</MainSite>
+<ContentEntryArticle entry={entry} schemas={schemas} titleMultilingual={titleMultilingual}>
+	<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
+		<Content />
+	</Prose>
+</ContentEntryArticle>

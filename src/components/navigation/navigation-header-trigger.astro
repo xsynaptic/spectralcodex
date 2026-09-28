@@ -8,22 +8,39 @@ import {
 } from '#components/navigation/navigation-utils.ts';
 import Anchor from '#components/parts/anchor.astro';
 
+const triggerVariants = {
+	item: {
+		icon: 'nav-icon',
+		iconHref: '#icon:chevron-down',
+		link: 'nav-item-link',
+		trigger: 'nav-item-trigger',
+	},
+	submenu: {
+		icon: 'nav-sub-icon',
+		iconHref: '#icon:chevron-right',
+		link: 'nav-sub-link',
+		trigger: 'nav-sub-trigger',
+	},
+} as const;
+
 interface Props {
 	hasChildren: boolean;
 	item: NavigationItem;
+	variant: keyof typeof triggerVariants;
 }
 
-const { hasChildren, item } = Astro.props;
+const { hasChildren, item, variant } = Astro.props;
 
+const variantClasses = triggerVariants[variant];
 const triggerType = getNavigationItemTriggerType(item);
 const isCurrent = isCurrentNavigationItem(item, Astro.url.pathname);
 const triggerClasses = [
-	'nav-item-link',
+	variantClasses.link,
 	isActiveNavigationItem(item, Astro.url.pathname) ? 'anchor-active' : undefined,
 ];
 ---
 
-<div class="nav-item-trigger">
+<div class={variantClasses.trigger}>
 	{triggerType === 'anchor' ? (
 		<Anchor
 			anchorColor="accent"
@@ -32,20 +49,22 @@ const triggerClasses = [
 			{...(isCurrent ? { 'aria-current': 'page' as const } : undefined)}
 			{...(item.rel ? { rel: item.rel } : undefined)}
 		>
-			<Fragment set:html={item.title} />
+			<slot />
 		</Anchor>
 	) : undefined}
 	{triggerType === 'button' ? (
-		<button
-			class:list={['anchor-base anchor-accent', ...triggerClasses]}
-			set:html={item.title}
-			type="button"
-		/>
+		<button class:list={['anchor-base anchor-accent', ...triggerClasses]} type="button">
+			<slot />
+		</button>
 	) : undefined}
-	{triggerType === 'span' ? <span class:list={triggerClasses} set:html={item.title} /> : undefined}
+	{triggerType === 'span' ? (
+		<span class:list={triggerClasses}>
+			<slot />
+		</span>
+	) : undefined}
 	{hasChildren ? (
-		<svg aria-hidden="true" class="nav-icon" height="24" viewBox="0 0 24 24" width="24">
-			<use href="#icon:chevron-down" />
+		<svg aria-hidden="true" class={variantClasses.icon} height="24" viewBox="0 0 24 24" width="24">
+			<use href={variantClasses.iconHref} />
 		</svg>
 	) : undefined}
 </div>

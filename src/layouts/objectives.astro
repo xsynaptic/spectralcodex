@@ -5,7 +5,6 @@ import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
 import MainSite from '#components/main/main-site.astro';
 import SectionMap from '#components/sections/section-map.astro';
-import { getSeoHideSearch } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 type Props = MapComponentData;
@@ -16,7 +15,7 @@ const title = 'Objectives';
 const description = 'Points in the database that still require visitation and documentation.';
 ---
 
-<MainSite meta={{ description, title, ...getSeoHideSearch(true) }}>
+<MainSite meta={{ description, title }}>
 	<ContentHeader>
 		<Fragment slot="header-title">{title}</Fragment>
 	</ContentHeader>

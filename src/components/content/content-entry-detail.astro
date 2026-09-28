@@ -1,5 +1,4 @@
 ---
-import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
@@ -14,17 +13,15 @@ import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
 	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
-	hideSearch?: boolean | undefined;
-	page: Page;
 	prefetchUrls: Array<string> | undefined;
 }
 
-const { breadcrumbRegions, entry, hideSearch, page, prefetchUrls } = Astro.props;
+const { breadcrumbRegions, entry, prefetchUrls } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -48,9 +45,8 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			alt: entry.data.title,
 			id: entry.id,
 		}),
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
-		...getSeoHideSearch(hideSearch),
 		prefetchUrls,
+		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 	}}
 	schemas={[
 		buildEntryBreadcrumbSchema({
@@ -61,7 +57,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 		}),
 	]}
 >
-	<ContentArticle hideSearch={!!hideSearch || page.currentPage !== 1} imageId={imageFeaturedId}>
+	<ContentArticle imageId={imageFeaturedId}>
 		<ImageHero alt={entry.data.title} class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>
 			<ContentHeader hasHeroImage={hasHeroImage}>
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>

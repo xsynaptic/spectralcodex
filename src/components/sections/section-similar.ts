@@ -1,6 +1,7 @@
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import process from 'node:process';
 import { z } from 'zod';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';

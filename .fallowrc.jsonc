@@ -67,7 +67,11 @@
 			},
 		],
 	},
-	"duplicates": { "minTokens": 70 },
+	"duplicates": {
+		"minTokens": 50,
+		// A threshold of zero means no limit; this fails on any clone group
+		"threshold": 0.01,
+	},
 	// On-demand semantic pass; the 0.80 default is mostly shared idiom, not shared logic
 	"similarCode": { "threshold": 0.9 },
 	"boundaries": {

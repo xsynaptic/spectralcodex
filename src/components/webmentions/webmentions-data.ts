@@ -4,6 +4,7 @@ import { WebmentionPropertyEnum, WebmentionSchema } from '@spectralcodex/shared/
 import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import process from 'node:process';
 
 // Bridgy backfeeds our own thread continuations as replies; they are not third-party commentary
 const selfAuthorUrls = new Set([

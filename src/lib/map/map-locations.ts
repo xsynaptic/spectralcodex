@@ -120,7 +120,7 @@ export function getLocationsMapPopupData(
 
 	return featureCollection.features
 		.map((feature, index) => {
-			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
+			const featureId = getFeatureId(feature, index);
 
 			return {
 				description: feature.properties.description,
@@ -148,7 +148,7 @@ export function getLocationsMapSourceData(
 
 	return featureCollection.features
 		.map((feature, index) => {
-			const featureId = typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
+			const featureId = getFeatureId(feature, index);
 			const title = feature.properties.titleMultilingualValue
 				? `${feature.properties.title} (${feature.properties.titleMultilingualValue})`
 				: feature.properties.title;
@@ -231,6 +231,11 @@ function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
 		url: getRelativePath(entry.data._url),
 		wikipediaUrl: getShortenedUrl(entry.data._wikipediaUrl),
 	};
+}
+
+// Popup and source data join on this id, so both must derive it the same way
+function getFeatureId(feature: Pick<Feature, 'id'>, index: number) {
+	return typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 }
 
 function getFeatureTitleProperties(

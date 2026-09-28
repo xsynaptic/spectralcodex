@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'astro/types';
 
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
-import NavigationHeaderSubmenuTrigger from '#components/navigation/navigation-header-submenu-trigger.astro';
+import NavigationHeaderTrigger from '#components/navigation/navigation-header-trigger.astro';
 import {
 	getNavigationItemAriaLabel,
 	shouldShowNavigationItemMultilingual,
@@ -37,12 +37,12 @@ const { ariaLabel, depth, isFirstNavigationItem = true, navigationItems, ...prop
 
 		return (
 			<li class="nav-sub-item">
-				<NavigationHeaderSubmenuTrigger hasChildren={hasChildren} item={item}>
+				<NavigationHeaderTrigger hasChildren={hasChildren} item={item} variant="submenu">
 					<Fragment set:html={item.title} />
 					{shouldShowNavigationItemMultilingual(item, depth) ? (
 						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
 					) : undefined}
-				</NavigationHeaderSubmenuTrigger>
+				</NavigationHeaderTrigger>
 				{hasChildren ? (
 					<Astro.self
 						ariaLabel={getNavigationItemAriaLabel(item)}

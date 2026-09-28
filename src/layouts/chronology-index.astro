@@ -10,7 +10,7 @@ import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	chronologyIndexData: ChronologyIndexData;
@@ -32,7 +32,6 @@ const title = t('chronology.index.title');
 			id: 'index-chronology',
 		}),
 		title,
-		...getSeoHideSearch(true),
 	}}
 >
 	<ContentHeader>

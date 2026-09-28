@@ -19,7 +19,6 @@ export const pages = defineCollection({
 			description: z.string().optional(),
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
-			hideSearch: z.boolean().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			links: LinkSchema.array().optional(),
 			regions: reference('regions').array().optional(),

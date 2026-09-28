@@ -1,7 +1,6 @@
-import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-
 import type { ContentEntry } from '#shared/astro-content.ts';
 
+import { parseImageFeatured } from '#shared/images.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedLinks(
@@ -38,17 +37,9 @@ export function validateImageFeaturedLinks(
 }
 
 function extractImageFeaturedLinks(frontmatter: Record<string, unknown>): Array<string> {
-	const imageFeatured = frontmatter.imageFeatured;
+	const data = parseImageFeatured(frontmatter);
 
-	if (!imageFeatured) return [];
-
-	const parsed = ImageFeaturedSchema.safeParse(imageFeatured);
-
-	if (!parsed.success) return [];
-
-	const data = parsed.data;
-
-	if (typeof data === 'string') return [];
+	if (!data || typeof data === 'string') return [];
 
 	const links: Array<string> = [];
 

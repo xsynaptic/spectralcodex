@@ -1,4 +1,5 @@
 import type Keyv from 'keyv';
+import type { Buffer } from 'node:buffer';
 
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';

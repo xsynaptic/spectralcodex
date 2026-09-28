@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { sitemapLastmodPath } from '@spectralcodex/shared/constants';
+import { sitemapLastmodPath } from '@spectralcodex/shared/sitemap';
 import chalk from 'chalk';
 import { parseArgs } from 'node:util';
 

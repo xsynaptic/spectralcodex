@@ -15,7 +15,7 @@ import Prose from '#components/parts/prose.astro';
 import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
-import { getSeoHideSearch, getSeoImageProps } from '#lib/utils/seo.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
@@ -63,7 +63,6 @@ const activityLabels = [
 			id: chronologyMonthlyItem.id,
 		}),
 		title,
-		...getSeoHideSearch(true),
 	}}
 >
 	<ImageHero alt={title} class="sm:mb-4" imageFeaturedGroup={imageFeaturedGroup}>

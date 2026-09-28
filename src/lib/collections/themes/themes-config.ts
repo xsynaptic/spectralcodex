@@ -24,7 +24,6 @@ export const themes = defineCollection({
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			hideMap: z.boolean().optional(),
-			hideSearch: z.boolean().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			links: LinkSchema.array().optional(),
 			regions: reference('regions').array().optional(),

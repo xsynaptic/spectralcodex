@@ -54,7 +54,6 @@ export const locations = defineCollection({
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
 			hideIndex: z.boolean().optional(), // Exclude from index/listing surfaces; page remains accessible
 			hideLocation: z.boolean().optional(), // Do not show this location on any map
-			hideSearch: z.boolean().optional(),
 			imageFeatured: ImageFeaturedSchema.optional(),
 			incomplete: z.boolean().optional(), // Only for personal reference
 			objective: NumericScaleSchema.optional(), // Only for personal reference
