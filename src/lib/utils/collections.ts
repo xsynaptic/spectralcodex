@@ -74,8 +74,7 @@ export function createCollectionData<K extends CollectionKey, A extends object =
 	};
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- generic lets Remeda's data-last R.filter preserve the element type instead of widening it
-export function hasEntries<T extends CollectionEntryWithEntryCount>(entry: T) {
+export function hasEntries(entry: CollectionEntryWithEntryCount) {
 	return (entry.data._entryCount ?? 0) > 0;
 }
 

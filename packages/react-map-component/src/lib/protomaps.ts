@@ -32,7 +32,7 @@ export function useProtomaps({
 		() =>
 			protomapsApiKey
 				? {
-						glyphs: `https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf`,
+						glyphs: 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
 						layers: layers('protomaps', flavor, { lang: languages.at(0) ?? 'en' }),
 						sources: {
 							protomaps: {

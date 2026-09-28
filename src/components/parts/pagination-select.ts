@@ -142,9 +142,6 @@ if (!customElements.get('pagination-select')) {
 	customElements.define('pagination-select', PaginationSelect);
 }
 
-// eslint-disable-next-line unicorn/require-module-specifiers -- required without another export, which we don't need
-export {};
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'pagination-select': PaginationSelect;

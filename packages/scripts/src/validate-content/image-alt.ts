@@ -9,7 +9,7 @@ export function validateImageAltTitles(imageEntries: Array<ContentEntry>) {
 			return typeof title !== 'string' || title.trim() === '';
 		})
 		.map((imageEntry) => ({ message: `${imageEntry.id}: empty EXIF title` }))
-		.sort((issueA, issueB) => issueA.message.localeCompare(issueB.message));
+		.toSorted((issueA, issueB) => issueA.message.localeCompare(issueB.message));
 
 	if (issues.length === 0) {
 		return {

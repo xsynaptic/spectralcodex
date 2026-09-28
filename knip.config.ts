@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- the @ts-nocheck below is deliberate; see its own reason
-// @ts-nocheck -- KnipConfig is very expensive and we only need this when modifying the config
 import type { KnipConfig } from 'knip';
 
 export default {
@@ -11,14 +9,10 @@ export default {
 				'src/components/mdx/*.astro',
 				'src/dev/inventory/inventory.astro',
 				'src/dev/inventory/inventory-og-image.ts',
-			],
-			ignore: [
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported
 			],
-			ignoreBinaries: ['ssh-add'],
 			ignoreDependencies: [
 				'eslint-plugin-jsx-a11y', // peer of eslint-plugin-astro's flat/jsx-a11y-strict config; referenced by string, not import
-				'p-limit', // used in workspace scripts packages
 			],
 		},
 		'packages/content': {
@@ -32,10 +26,8 @@ export default {
 			entry: ['.mdxlintrc.mjs'],
 			ignoreBinaries: ['check-content-demo', 'fix-content-demo'],
 		},
-		'packages/react-map-component': {
-			ignoreDependencies: ['astro'],
-		},
 		'packages/scripts': {
+			ignoreBinaries: ['ssh-add'],
 			ignoreDependencies: [
 				'@fontsource/.+', // loaded dynamically via require.resolve in og-image
 			],

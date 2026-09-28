@@ -112,7 +112,6 @@
 		"knip": "^6.38.0",
 		"lefthook": "^2.1.14",
 		"ohash": "^2.0.12",
-		"p-limit": "^7.3.3",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.9",
 		"prettier-plugin-astro": "^1.1.0",

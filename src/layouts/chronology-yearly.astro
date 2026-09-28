@@ -53,7 +53,7 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 		</Fragment>
 	</ContentHeader>
 	{chronologyMonthlyData
-		.sort((a, b) => Number(a.month) - Number(b.month))
+		.toSorted((a, b) => Number(a.month) - Number(b.month))
 		.map((monthlyData) => {
 			const imageFeaturedGroup = getChronologyImageFeaturedGroup(monthlyData);
 			const monthlyUrl = getSitePath('chronology', monthlyData.year, monthlyData.month);

@@ -143,13 +143,16 @@ describe('sortByDateReverseChronological', () => {
 		const older = entry('2018-01-01');
 		const newer = entry('2020-01-01');
 
-		expect([older, newer].sort(sortByDateReverseChronological)).toStrictEqual([newer, older]);
+		expect([older, newer].toSorted(sortByDateReverseChronological)).toStrictEqual([newer, older]);
 	});
 
 	test('dateUpdated wins over dateCreated when present', () => {
 		const revived = entry('2010-01-01', '2024-01-01');
 		const recent = entry('2020-01-01');
 
-		expect([recent, revived].sort(sortByDateReverseChronological)).toStrictEqual([revived, recent]);
+		expect([recent, revived].toSorted(sortByDateReverseChronological)).toStrictEqual([
+			revived,
+			recent,
+		]);
 	});
 });

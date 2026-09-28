@@ -54,7 +54,7 @@ export async function validateLocationsCoordinates(
 		} satisfies ValidationResult;
 	}
 
-	const sortedMissingRegions = [...missingRegions].sort((regionA, regionB) =>
+	const sortedMissingRegions = [...missingRegions].toSorted((regionA, regionB) =>
 		regionA.localeCompare(regionB),
 	);
 

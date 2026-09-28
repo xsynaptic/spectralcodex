@@ -94,7 +94,7 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 
 			// Canonical pair key, so A-B and B-A are reported once
 			const pairKey = [point.locationId, nearby.locationId]
-				.sort((idA, idB) => idA.localeCompare(idB))
+				.toSorted((idA, idB) => idA.localeCompare(idB))
 				.join('|');
 
 			if (seenPairs.has(pairKey)) continue;
@@ -113,5 +113,5 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 		}
 	}
 
-	return overlaps.sort((overlapA, overlapB) => overlapA.distance - overlapB.distance);
+	return overlaps.toSorted((overlapA, overlapB) => overlapA.distance - overlapB.distance);
 }

@@ -545,7 +545,7 @@ async function sendRunReport(run: RunReport): Promise<void> {
 
 function summarize(label: string, stats: Stats): string {
 	const summary = [...stats.counts]
-		.sort((first, second) => second[1] - first[1])
+		.toSorted((first, second) => second[1] - first[1])
 		.map(([key, count]) => {
 			if (key === '200') return `${String(count)} ok`;
 			if (key === 'ERR') return `${String(count)} network error`;

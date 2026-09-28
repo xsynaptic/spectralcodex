@@ -15,7 +15,7 @@ const { themeIds, ...props } = Astro.props;
 
 const getThemesByIds = await createThemesByIdsFunction();
 
-const themes = themeIds ? getThemesByIds(themeIds).sort(sortByEntryCount) : undefined;
+const themes = themeIds ? getThemesByIds(themeIds).toSorted(sortByEntryCount) : undefined;
 
 const t = getTranslations();
 ---

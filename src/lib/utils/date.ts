@@ -23,7 +23,7 @@ export function getDateRanges(entries: Array<DateRecordedEntry>): Array<DateRang
 		.map((entry): DateRange =>
 			Array.isArray(entry) ? { end: entry[1], start: entry[0] } : { start: entry },
 		)
-		.sort((a, b) => a.start.date.valueOf() - b.start.date.valueOf());
+		.toSorted((a, b) => a.start.date.valueOf() - b.start.date.valueOf());
 }
 
 // UTC 'YYYY-MM-DD' key; content dates are UTC instants, so bucket by day in UTC

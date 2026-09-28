@@ -185,8 +185,7 @@ function useMapCanvasPopup() {
 					}
 				: {}),
 		} satisfies MapPopupItemExtended;
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- selectedSourceItem derives from sourceDataIndex + selectedId
-	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, sourceDataIndex]);
+	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, selectedSourceItem]);
 
 	return { isLoading, popupItem };
 }

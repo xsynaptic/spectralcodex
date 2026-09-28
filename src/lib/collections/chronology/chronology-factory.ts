@@ -192,7 +192,7 @@ function addRecordedVisits(chronologyDataMap: ChronologyDataMap, item: CatalogIt
 	const yearsRecorded = new Set<string>();
 	const recordedDates = getDateRanges(item.dateRecorded)
 		.map((range) => range.start.date)
-		.sort((a, b) => b.getTime() - a.getTime());
+		.toSorted((a, b) => b.getTime() - a.getTime());
 
 	for (const recordedDate of recordedDates) {
 		const recordedDateData = getDateData(recordedDate);
@@ -285,7 +285,9 @@ export function createChronologyData(
 	// Iterate newest-first so the most recent year keeps a featured image shared across years
 	const selectIndexHighlights = createHighlightSelector();
 
-	const yearEntries = [...chronologyDataMap].sort(([yearA], [yearB]) => yearB.localeCompare(yearA));
+	const yearEntries = [...chronologyDataMap].toSorted(([yearA], [yearB]) =>
+		yearB.localeCompare(yearA),
+	);
 
 	for (const [year, yearlyData] of yearEntries) {
 		const months = [...yearlyData.values()].map(toMonthBuckets);
@@ -333,7 +335,7 @@ export function createChronologyData(
 		};
 	}
 
-	const chronologyYears = Object.keys(chronologyYearlyData).sort((a, b) => b.localeCompare(a));
+	const chronologyYears = Object.keys(chronologyYearlyData).toSorted((a, b) => b.localeCompare(a));
 	const yearHasView = new Set(chronologyYears);
 
 	const chronologyDailyData = buildChronologyDailyData(items);

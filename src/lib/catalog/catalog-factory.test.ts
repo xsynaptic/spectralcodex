@@ -62,7 +62,7 @@ describe('comparators', () => {
 	});
 
 	test('sortCatalogByDate is newest first, preferring dateUpdated over dateCreated', () => {
-		expect(ids([older, newer, updatedRecently].sort(sortCatalogByDate))).toEqual([
+		expect(ids([older, newer, updatedRecently].toSorted(sortCatalogByDate))).toEqual([
 			'updated-recently',
 			'newer',
 			'older',
@@ -70,7 +70,7 @@ describe('comparators', () => {
 	});
 
 	test('sortCatalogByEntryQuality is highest quality first, newest on ties', () => {
-		expect(ids([lowNew, highOld, highNew].sort(sortCatalogByEntryQuality))).toEqual([
+		expect(ids([lowNew, highOld, highNew].toSorted(sortCatalogByEntryQuality))).toEqual([
 			'high-new',
 			'high-old',
 			'low-new',

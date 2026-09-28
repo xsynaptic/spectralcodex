@@ -39,7 +39,7 @@ const title = t('chronology.index.title');
 		</Fragment>
 	</ContentHeader>
 	{Object.entries(chronologyIndexData)
-		.sort(([yearA], [yearB]) => yearB.localeCompare(yearA))
+		.toSorted(([yearA], [yearB]) => yearB.localeCompare(yearA))
 		.map(([year, monthlyData]) => {
 			const imageFeaturedGroup = getImageFeaturedGroupByCatalog({
 				items: monthlyData.highlights,

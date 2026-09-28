@@ -3,6 +3,7 @@ import type { ESLint } from 'eslint';
 import tanstackQueryPlugin from '@tanstack/eslint-plugin-query';
 import {
 	getAstroConfig,
+	getBrowserConfig,
 	getConfig,
 	getWebComponentConfig,
 	restrictedSyntaxDefaults,
@@ -29,24 +30,12 @@ export default getConfig(
 		},
 		{
 			rules: {
-				complexity: ['warn', { max: 8, variant: 'modified' }],
-				// The expanded form reads more clearly than ??=, ||=, and &&=
+				// The shared config sets this before unicorn's recommended preset, which switches it back off
 				'logical-assignment-operators': ['error', 'never'],
-				// Catches genuinely tangled control flow; unlike `complexity` it ignores JSX ternaries
-				'max-depth': ['warn', 3],
-				'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
-				'max-params': ['warn', 3],
-				'max-statements': ['warn', 25],
-				// `WebSite` etc. intentionally mirror schema.org's canonical type names
-				'unicorn/consistent-compound-words': 'off',
-				// Conflicts with the core rule above
-				'unicorn/logical-assignment-operators': 'off',
-				// Conflicts with Remeda's sort function
-				'unicorn/no-array-sort': 'off',
+				// The shared config turns this off for a Remeda `R.sort` conflict the rule no longer has
+				'unicorn/no-array-sort': 'error',
 				// Refactor-heavy: wants nested loops extracted into functions
 				'unicorn/no-break-in-nested-loop': 'off',
-				// False positives: map glyph URLs, i18n tokens, and shell format strings use literal braces
-				'unicorn/no-incorrect-template-string-interpolation': 'off',
 			},
 		},
 		// Sort keys within each translation section instead of flattening the sections into one list
@@ -54,6 +43,8 @@ export default getConfig(
 			files: ['src/lib/i18n/**/*.ts'],
 			rules: {
 				'perfectionist/sort-objects': ['error', { partitionByComment: true, type: 'natural' }],
+				// Translation strings use literal `{token}` placeholders
+				'unicorn/no-incorrect-template-string-interpolation': 'off',
 			},
 		},
 		// Ambient declarations mirror third-party signatures
@@ -105,22 +96,7 @@ export default getConfig(
 				'react-hooks/use-memo': 'warn',
 			},
 		},
-		// These files run in the browser and might need the browser globals
-		{
-			files: ['src/components/**/*'],
-			languageOptions: {
-				globals: {
-					...Object.fromEntries(Object.keys(globals.node).map((key) => [key, 'off'])),
-					...globals.browser,
-				},
-			},
-			rules: {
-				// typescript-eslint turns this off for TS files, and without it the globals above bind nothing
-				'no-undef': 'error',
-				// This conflicts with how some client-side code is handled
-				'unicorn/prefer-global-this': 'off',
-			},
-		},
+		getBrowserConfig(['src/components/**/*']),
 		{
 			files: ['tests/e2e/**/*', 'playwright.config.ts'],
 			languageOptions: {

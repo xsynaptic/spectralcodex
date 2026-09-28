@@ -62,7 +62,7 @@ export async function getSampleImages() {
 	const chosen =
 		featured.length >= 6
 			? featured
-			: [...entries].sort((entryA, entryB) => entryA.id.localeCompare(entryB.id));
+			: [...entries].toSorted((entryA, entryB) => entryA.id.localeCompare(entryB.id));
 
 	return {
 		landscape: chosen.filter((entry) => entry.data.width >= entry.data.height).slice(0, 6),
@@ -96,7 +96,7 @@ export async function getSampleRegions() {
 
 	const nested = entries.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0);
 
-	const deepest = [...nested].sort(
+	const deepest = [...nested].toSorted(
 		(regionA, regionB) =>
 			(regionB.data._ancestors?.length ?? 0) - (regionA.data._ancestors?.length ?? 0),
 	)[0];
@@ -124,7 +124,7 @@ async function getSampleFeaturedImageIds() {
 				? entry.data.imageFeatured.map((item) => (typeof item === 'string' ? item : item.id))
 				: [],
 		}))
-		.sort(
+		.toSorted(
 			(candidateA, candidateB) =>
 				candidateB.ids.length - candidateA.ids.length ||
 				candidateB.entryQuality - candidateA.entryQuality,

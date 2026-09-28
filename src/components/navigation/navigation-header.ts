@@ -31,7 +31,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 	const regionsMenu = regions
 		.filter((entry) => entry.data.parent === undefined)
 		.filter(filterNavigationItemEntryCount(1))
-		.sort(sortByEntryCount)
+		.toSorted(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => ({
 			...getNavigationItemData({ collection: 'regions', entry }),
@@ -39,7 +39,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 				? {
 						children: getRegionsByIds(entry.data._children)
 							.filter(filterNavigationItemEntryCount(2))
-							.sort(sortByEntryCount)
+							.toSorted(sortByEntryCount)
 							.slice(0, 15)
 							.map((entry) => ({
 								...getNavigationItemData({ collection: 'regions', entry }),
@@ -47,7 +47,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 									? {
 											children: getRegionsByIds(entry.data._children)
 												.filter(filterNavigationItemEntryCount(3))
-												.sort(sortByEntryCount)
+												.toSorted(sortByEntryCount)
 												.slice(0, 8)
 												.map((entry) => getNavigationItemData({ collection: 'regions', entry })),
 										}
@@ -126,7 +126,7 @@ function getNavigationCollectionMenu({
 	return entries
 		.filter((entry) => entry.data.entryQuality >= 2)
 		.filter(filterNavigationItemEntryCount(1))
-		.sort(sortByEntryCount)
+		.toSorted(sortByEntryCount)
 		.slice(0, 12)
 		.map((entry) => getNavigationItemData({ collection, entry }));
 }

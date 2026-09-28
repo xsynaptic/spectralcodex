@@ -41,7 +41,7 @@ export function assignChunks(
 			hilbert: hilbertIndex(clampCell(item.lng, -180, 360), clampCell(90 - item.lat, 0, 180)),
 			item,
 		}))
-		.sort((a, b) => a.hilbert - b.hilbert || a.item.id.localeCompare(b.item.id));
+		.toSorted((a, b) => a.hilbert - b.hilbert || a.item.id.localeCompare(b.item.id));
 
 	const result: ChunkAssignment = { chunkIds: new Map(), chunkKeyById: new Map() };
 
@@ -53,7 +53,7 @@ export function assignChunks(
 		if (bin.length === 0) return;
 
 		const key = String(nextKey++);
-		const ids = bin.map((entry) => entry.id).sort((a, b) => a.localeCompare(b));
+		const ids = bin.map((entry) => entry.id).toSorted((a, b) => a.localeCompare(b));
 
 		result.chunkIds.set(key, ids);
 		for (const entry of bin) {

@@ -101,7 +101,7 @@ describe('assignChunks', () => {
 
 	test('is deterministic regardless of input order', () => {
 		const byId = (result: ReturnType<typeof assignChunks>) =>
-			[...result.chunkKeyById].sort((a, b) => a[0].localeCompare(b[0]));
+			[...result.chunkKeyById].toSorted((a, b) => a[0].localeCompare(b[0]));
 
 		const forward = assignChunks(makeSeededItems(0), { capBytes: 300 });
 		const shuffled = assignChunks(makeSeededItems(0).toReversed(), { capBytes: 300 });

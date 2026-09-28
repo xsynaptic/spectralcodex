@@ -160,7 +160,7 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 		};
 
 		const compressed = z.encode(MapSourceItemSchema, standard);
-		const keys = Object.keys(compressed).sort(byCodePoint);
+		const keys = Object.keys(compressed).toSorted(byCodePoint);
 
 		expect(keys).toEqual(
 			[
@@ -172,7 +172,7 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 				MapDataKeysCompressed.EntryQuality,
 				MapDataKeysCompressed.Rating,
 				MapDataKeysCompressed.Geometry,
-			].sort(byCodePoint),
+			].toSorted(byCodePoint),
 		);
 	});
 });

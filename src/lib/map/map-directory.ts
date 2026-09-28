@@ -38,7 +38,7 @@ interface MapDirectoryData {
 export const getMapThemeIndexById = pMemoize(async () => {
 	const { entries: themes } = await getThemesCollection();
 	const themeIndexById = new Map<string, number>();
-	const sortedThemeIds = themes.map((entry) => entry.id).sort((a, b) => a.localeCompare(b));
+	const sortedThemeIds = themes.map((entry) => entry.id).toSorted((a, b) => a.localeCompare(b));
 
 	for (const [index, id] of sortedThemeIds.entries()) {
 		themeIndexById.set(id, index);

@@ -53,7 +53,7 @@ export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {
 			if (backlink) backlinks.push(backlink);
 		}
 
-		return backlinks.sort(sortCatalogByDate);
+		return backlinks.toSorted(sortCatalogByDate);
 	}
 
 	function resolve<T extends CatalogCollectionKey = CatalogCollectionKey>(

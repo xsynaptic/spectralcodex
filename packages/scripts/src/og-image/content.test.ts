@@ -150,7 +150,7 @@ describe('extractBuiltFilenames', () => {
 				ogImageMeta('https://example.com/og/other.jpg'),
 		);
 
-		expect([...extractBuiltFilenames(distPath)].sort((a, b) => a.localeCompare(b))).toEqual([
+		expect([...extractBuiltFilenames(distPath)].toSorted((a, b) => a.localeCompare(b))).toEqual([
 			'other',
 			'shared',
 		]);

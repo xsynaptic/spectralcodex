@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- react and react-map-gl APIs use null throughout this control wrapper */
 import type { ReactElement } from 'react';
 import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
 
@@ -19,8 +18,8 @@ type CustomControlProps = Pick<CustomControlConfig, 'className' | 'position'> & 
 
 class CustomControl implements IControl {
 	#className = 'maplibregl-ctrl maplibregl-ctrl-group';
-	#container: HTMLElement | null = null;
-	#map: MapInstance | null = null;
+	#container: HTMLElement | undefined;
+	#map: MapInstance | undefined;
 	#position: ControlPosition = 'top-left';
 	#redraw?: () => void;
 
@@ -55,10 +54,10 @@ class CustomControl implements IControl {
 	}
 
 	onRemove() {
-		if (this.#map === null || this.#container === null) return;
+		if (this.#map === undefined || this.#container === undefined) return;
 		this.#container.remove();
 		if (this.#redraw !== undefined) this.#map.off('move', this.#redraw);
-		this.#map = null;
+		this.#map = undefined;
 	}
 }
 
@@ -74,7 +73,7 @@ export const CustomControlPortal = memo(function CustomControlPortal({
 	const map = customControl.getMap();
 	const element = customControl.getElement();
 
-	if (map === null || element === null) return;
+	if (map === undefined || element === undefined) return;
 
 	// Note: the original implementation passed `{ map }` as a prop in the second argument of `cloneElement`
 	// But since we're not making use of it I have removed it, as it renders to the DOM

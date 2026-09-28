@@ -169,7 +169,7 @@ for (;;) {
 	page += 1;
 }
 
-const sortedMentions = [...mergedMentions.values()].sort(
+const sortedMentions = [...mergedMentions.values()].toSorted(
 	(mentionA, mentionB) => mentionA['wm-id'] - mentionB['wm-id'],
 );
 
@@ -192,7 +192,7 @@ console.log(chalk.green(`Wrote ${String(sortedMentions.length)} webmentions → 
 console.log(chalk.gray(`  New this run:  ${String(addedCount)}`));
 console.log(chalk.gray(`  Targets:       ${String(targets.size)}`));
 
-const sortedCounts = [...propertyCounts].sort(([propertyA], [propertyB]) =>
+const sortedCounts = [...propertyCounts].toSorted(([propertyA], [propertyB]) =>
 	propertyA.localeCompare(propertyB),
 );
 

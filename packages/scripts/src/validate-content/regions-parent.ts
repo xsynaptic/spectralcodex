@@ -47,7 +47,7 @@ function collectCycleIssues(entries: Array<ContentEntry>, parentById: Map<string
 		// Chains that merely lead into a cycle are skipped; the cycle members report it
 		if (current !== entry.id) continue;
 
-		const cycleKey = [...chain].sort((idA, idB) => idA.localeCompare(idB)).join('|');
+		const cycleKey = [...chain].toSorted((idA, idB) => idA.localeCompare(idB)).join('|');
 
 		if (reportedCycles.has(cycleKey)) continue;
 

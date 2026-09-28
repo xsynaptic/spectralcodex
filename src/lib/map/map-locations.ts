@@ -295,6 +295,6 @@ function mapFeaturesById<T>(
 
 	return featureCollection.features
 		.map((feature, index) => ({ feature, featureId: getFeatureId(feature, index) }))
-		.sort((a, b) => a.featureId.localeCompare(b.featureId))
+		.toSorted((a, b) => a.featureId.localeCompare(b.featureId))
 		.map(({ feature, featureId }) => transform(feature, featureId));
 }

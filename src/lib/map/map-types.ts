@@ -1,11 +1,8 @@
 import type { MapGeometry } from '@spectralcodex/react-map-component';
+import type { LocationCategoryEnum, LocationStatus } from '@spectralcodex/shared/map';
 import type { FeatureCollection } from 'geojson';
 
-import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
-import { z } from 'zod';
-
-import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
-import { NumericScaleSchema } from '#lib/schemas/index.ts';
+import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
 // Route params for `/api/map/[...id].json`
 export const MapApiDataEnum = {
@@ -13,27 +10,23 @@ export const MapApiDataEnum = {
 	Source: 's',
 } as const;
 
-// Reserved for future runtime validation of map API payloads
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Needed for type generation
-const MapFeaturePropertiesSchema = z.object({
-	category: z.enum(LocationCategoryEnum),
-	description: z.string().optional(),
-	entryQuality: NumericScaleSchema,
-	googleMapsUrl: z.url().optional(),
-	image: ImageThumbnailSchema.optional(),
-	objective: NumericScaleSchema.optional(),
-	outlier: z.boolean().optional(),
-	precision: NumericScaleSchema,
-	rating: NumericScaleSchema,
-	safety: NumericScaleSchema.optional(),
-	status: z.enum(LocationStatusEnum),
-	title: z.string(),
-	titleMultilingualLang: z.string().optional(),
-	titleMultilingualValue: z.string().optional(),
-	url: z.string().optional(),
-	wikipediaUrl: z.url().optional(),
-});
-
 export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProperties>;
 
-export type MapFeatureProperties = z.output<typeof MapFeaturePropertiesSchema>;
+export interface MapFeatureProperties {
+	category: (typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum];
+	description?: string | undefined;
+	entryQuality: number;
+	googleMapsUrl?: string | undefined;
+	image?: ImageThumbnail | undefined;
+	objective?: number | undefined;
+	outlier?: boolean | undefined;
+	precision: number;
+	rating: number;
+	safety?: number | undefined;
+	status: LocationStatus;
+	title: string;
+	titleMultilingualLang?: string | undefined;
+	titleMultilingualValue?: string | undefined;
+	url?: string | undefined;
+	wikipediaUrl?: string | undefined;
+}

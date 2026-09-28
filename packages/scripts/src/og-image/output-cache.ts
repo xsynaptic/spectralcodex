@@ -59,7 +59,7 @@ export async function createOutputCache(directory: string) {
 		},
 
 		async save(): Promise<void> {
-			const sorted = [...keys].sort(([first], [second]) => first.localeCompare(second));
+			const sorted = [...keys].toSorted(([first], [second]) => first.localeCompare(second));
 
 			await fs.writeFile(
 				manifestPath,

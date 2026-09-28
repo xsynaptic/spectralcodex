@@ -113,7 +113,7 @@ export function validateImageAspectRatios(
 }
 
 function formatRatioTally(tally: Array<RatioTallyRow>) {
-	const rows = [...tally].sort((rowA, rowB) => rowB.count - rowA.count);
+	const rows = [...tally].toSorted((rowA, rowB) => rowB.count - rowA.count);
 
 	const countWidth = Math.max(...rows.map((row) => String(row.count).length));
 	const labelWidth = Math.max(...rows.map((row) => row.label.length));
