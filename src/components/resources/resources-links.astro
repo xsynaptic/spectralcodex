@@ -30,9 +30,7 @@ const t = getTranslations();
 						<>
 							<DividedItem>
 								<Anchor href={url}>{title}</Anchor>
-								{titleMultilingual ? (
-									<TextMultilingual content={titleMultilingual} parenthesis={true} />
-								) : undefined}
+								<TextMultilingual content={titleMultilingual} parenthesis={true} />
 							</DividedItem>
 							<DividedItem>
 								<Anchor class="italic" href={resourceUrl}>
@@ -43,9 +41,7 @@ const t = getTranslations();
 					) : (
 						<>
 							<Anchor href={url}>{title}</Anchor>
-							{titleMultilingual ? (
-								<TextMultilingual content={titleMultilingual} parenthesis={true} />
-							) : undefined}
+							<TextMultilingual content={titleMultilingual} parenthesis={true} />
 						</>
 					)}
 				</ListColumnItem>

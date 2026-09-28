@@ -9,6 +9,12 @@ const dockerComposeFile = path.resolve(
 	projectRoot,
 	'packages/scripts/src/dev-server/docker-compose.yml',
 );
+const dockerComposeCommand = `docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}"`;
+// Absolute paths required for Docker
+const dockerComposePaths = {
+	CONTENT_MEDIA_PATH_HOST: path.resolve(projectRoot, 'packages/content-demo/media'),
+	IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
+};
 const healthUrl = 'http://localhost:3100/health';
 const maxWaitMs = 30_000;
 const pollIntervalMs = 500;
@@ -30,20 +36,11 @@ export async function setup() {
 	// Start containers in detached mode
 	// Note: --project-directory is required because docker-compose.yml uses relative paths
 	try {
-		execSync(
-			`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" up -d`,
-			{
-				cwd: projectRoot,
-				env: {
-					...process.env,
-					// Absolute paths required for Docker
-					CONTENT_MEDIA_PATH: path.resolve(projectRoot, 'packages/content-demo/media'),
-					IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
-					IMAGE_SERVER_SECRET,
-				},
-				stdio: 'pipe',
-			},
-		);
+		execSync(`${dockerComposeCommand} up -d`, {
+			cwd: projectRoot,
+			env: { ...process.env, ...dockerComposePaths, IMAGE_SERVER_SECRET },
+			stdio: 'pipe',
+		});
 	} catch (error) {
 		console.error('[Test] Failed to start Docker containers');
 		throw error;
@@ -55,13 +52,10 @@ export async function setup() {
 
 	if (!isHealthy) {
 		try {
-			const logs = execSync(
-				`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" logs --tail=50`,
-				{
-					cwd: projectRoot,
-					encoding: 'utf8',
-				},
-			);
+			const logs = execSync(`${dockerComposeCommand} logs --tail=50`, {
+				cwd: projectRoot,
+				encoding: 'utf8',
+			});
 			console.error('[Test] Container logs:\n', logs);
 		} catch {
 			// Ignore log errors
@@ -77,13 +71,9 @@ export function teardown() {
 	console.log('[Test] Stopping Docker containers...');
 
 	try {
-		execSync(`docker compose -f "${dockerComposeFile}" --project-directory "${projectRoot}" down`, {
+		execSync(`${dockerComposeCommand} down`, {
 			cwd: projectRoot,
-			env: {
-				...process.env,
-				CONTENT_MEDIA_PATH: path.resolve(projectRoot, 'packages/content-demo/media'),
-				IMAGE_SERVER_NGINX_CONFIG: path.resolve(projectRoot, 'deploy/nginx.conf.template'),
-			},
+			env: { ...process.env, ...dockerComposePaths },
 			stdio: 'pipe',
 		});
 		console.log('[Test] Docker containers stopped');

@@ -36,28 +36,19 @@ function getCountText() {
 }
 
 const countText = getCountText();
+
+const listItems = countText ? [...items, countText] : items;
 ---
 
-{countText
-	? [...items, countText].map((item, index) => (
-			<TextSeparated index={index} total={items.length + 1} {...props}>
-				{item.url ? (
-					<>
-						<Anchor href={item.url}>{item.title}</Anchor>
-						{item.titleMultilingual ? (
-							<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-						) : undefined}
-					</>
-				) : (
-					item.title
-				)}
-			</TextSeparated>
-		))
-	: items.map((item, index) => (
-			<TextSeparated index={index} total={items.length} {...props}>
+{listItems.map((item, index) => (
+	<TextSeparated index={index} total={listItems.length} {...props}>
+		{item.url ? (
+			<>
 				<Anchor href={item.url}>{item.title}</Anchor>
-				{item.titleMultilingual ? (
-					<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
-				) : undefined}
-			</TextSeparated>
-		))}
+				<TextMultilingual content={item.titleMultilingual} parenthesis={true} />
+			</>
+		) : (
+			item.title
+		)}
+	</TextSeparated>
+))}

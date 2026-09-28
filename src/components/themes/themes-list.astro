@@ -35,9 +35,7 @@ const { class: className, terms } = Astro.props;
 					{entry.data.title ? (
 						<Anchor href={getContentPath(entry.collection, entry.id)}>{entry.data.title}</Anchor>
 					) : undefined}
-					{titleMultilingual ? (
-						<TextMultilingual content={titleMultilingual} parenthesis={true} />
-					) : undefined}
+					<TextMultilingual content={titleMultilingual} parenthesis={true} />
 				</DividedItem>
 			);
 		})}

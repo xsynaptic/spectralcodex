@@ -26,14 +26,6 @@
 /* Bleeds past the page padding so a scrolled plot runs off the edge rather than ending at a hard crop */
 .stats-frame {
 	margin-inline-end: calc(var(--spacing) * -4);
-	overflow-x: auto;
-	overscroll-behavior-x: contain;
-	scrollbar-color: light-dark(
-			color-mix(in srgb, var(--color-primary-400) 40%, transparent),
-			color-mix(in srgb, var(--color-primary-500) 45%, transparent)
-		)
-		transparent;
-	scrollbar-width: thin;
 
 	@media (width >= 48rem) {
 		margin-inline-end: calc(var(--spacing) * -8);

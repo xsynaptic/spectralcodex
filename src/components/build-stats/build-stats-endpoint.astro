@@ -1,0 +1,23 @@
+---
+import type { ComponentProps } from 'astro/types';
+
+import type BuildStatsChart from '#components/build-stats/build-stats-chart.astro';
+import type { PagesGeometry } from '#lib/build-stats/build-stats-geometry.ts';
+
+interface Props {
+	end: PagesGeometry['end'];
+	series: ComponentProps<typeof BuildStatsChart>['series'];
+}
+
+const { end, series } = Astro.props;
+---
+
+<circle
+	class:list={['stats-endpoint', `stats-series-${series}`]}
+	cx={end.cx}
+	cy={end.cy}
+	r="4"
+></circle>
+<text class="stats-endpoint-label" x={end.cx + 9} y={end.cy + 4}>
+	{end.label}
+</text>

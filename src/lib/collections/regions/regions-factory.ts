@@ -4,7 +4,11 @@ import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
-import { collectHiddenLocationIds, contentPolicy } from '#lib/utils/content-policy.ts';
+import {
+	collectHiddenLocationIds,
+	contentPolicy,
+	populateContentCounts,
+} from '#lib/utils/content-policy.ts';
 import { createHierarchy } from '#lib/utils/hierarchy.ts';
 
 /**
@@ -48,13 +52,11 @@ export function populateRegionsContent({
 	for (const entry of entries) {
 		const regionIds = [entry.id, ...regionsTree.descendantsOf(entry.id)];
 
-		entry.data._locations = collectByRegion(regionIds, locationsByRegionMap);
-		entry.data._locationCount = entry.data._locations.filter(
-			(id) => !hiddenLocationIds.has(id),
-		).length;
-		entry.data._posts = collectByRegion(regionIds, postsByRegionMap);
-		entry.data._postCount = entry.data._posts.length;
-		entry.data._entryCount = entry.data._locationCount + entry.data._postCount;
+		populateContentCounts(entry.data, {
+			hiddenLocationIds,
+			locations: collectByRegion(regionIds, locationsByRegionMap),
+			posts: collectByRegion(regionIds, postsByRegionMap),
+		});
 	}
 }
 

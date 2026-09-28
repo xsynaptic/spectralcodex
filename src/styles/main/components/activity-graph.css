@@ -4,18 +4,6 @@
 	--ag-gap: 2px;
 }
 
-/* A flourish, so on narrow screens the plot scrolls horizontally rather than reflowing */
-.activity-scroll {
-	overflow-x: auto;
-	overscroll-behavior-x: contain;
-	scrollbar-color: light-dark(
-			color-mix(in srgb, var(--color-primary-400) 40%, transparent),
-			color-mix(in srgb, var(--color-primary-500) 45%, transparent)
-		)
-		transparent;
-	scrollbar-width: thin;
-}
-
 .activity-plot {
 	display: flex;
 	flex-direction: column;

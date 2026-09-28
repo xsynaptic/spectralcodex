@@ -36,7 +36,7 @@ const hasCaption = Astro.slots.has('default');
 ---
 
 <figure class="activity-graph">
-	<div class="activity-scroll">
+	<div class="overflow-x-auto overscroll-x-contain scrollbar-subtle">
 		<div
 			aria-label={ariaLabel}
 			class="activity-plot"

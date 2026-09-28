@@ -19,9 +19,7 @@ const { class: className, items } = Astro.props;
 		{items.map(({ title, titleMultilingual, url }) => (
 			<ListColumnItem>
 				<Anchor href={url}>{title}</Anchor>
-				{titleMultilingual ? (
-					<TextMultilingual content={titleMultilingual} parenthesis={true} />
-				) : undefined}
+				<TextMultilingual content={titleMultilingual} parenthesis={true} />
 			</ListColumnItem>
 		))}
 	</ListColumn>

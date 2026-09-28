@@ -2,6 +2,7 @@
 import type { AxisTick, DurationGeometry } from '#lib/build-stats/build-stats-geometry.ts';
 
 import BuildStatsChart from '#components/build-stats/build-stats-chart.astro';
+import BuildStatsEndpoint from '#components/build-stats/build-stats-endpoint.astro';
 import { durationFrame } from '#lib/build-stats/build-stats-geometry.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -57,15 +58,7 @@ const tooltipRows = [
 	<path class="stats-line stats-series-duration" d={geometry.trendPath}></path>
 	{geometry.end ? (
 		<Fragment>
-			<circle
-				class="stats-endpoint stats-series-duration"
-				cx={geometry.end.cx}
-				cy={geometry.end.cy}
-				r="4"
-			/>
-			<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
-				{geometry.end.label}
-			</text>
+			<BuildStatsEndpoint end={geometry.end} series="duration" />
 			<text class="stats-note" x={geometry.end.cx + 9} y={geometry.end.cy + 18}>
 				{t('buildStats.trend.label')}
 			</text>

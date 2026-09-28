@@ -68,7 +68,7 @@
 		],
 	},
 	"duplicates": {
-		"minTokens": 50,
+		"minTokens": 40,
 		// A threshold of zero means no limit; this fails on any clone group
 		"threshold": 0.01,
 	},

@@ -5,10 +5,8 @@ import type { CollectionEntry } from 'astro:content';
 import ContentSection from '#components/content/content-section.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
 import { locationsNearbyCountLimit } from '#constants.ts';
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getLocationsNearbyList } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
@@ -17,24 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { entry, limit = locationsNearbyCountLimit, ...props } = Astro.props;
 
-const { entriesMap: locationsMap } = await getLocationsCollection();
-
-const locations = (entry.data._nearby?.slice(0, limit) ?? []).flatMap(
-	({ distanceDisplay, locationId }) => {
-		const location = locationsMap.get(locationId);
-
-		if (!location) return [];
-
-		return [
-			{
-				distanceDisplay,
-				title: location.data.title,
-				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
-				url: getContentPath('locations', location.id),
-			},
-		];
-	},
-);
+const locations = await getLocationsNearbyList(entry, limit);
 
 const t = getTranslations();
 ---

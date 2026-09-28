@@ -21,6 +21,7 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { getContentPath } from '#lib/utils/routing.ts';
 import { buildEntryBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 
 export async function getLocationSchemas(
@@ -137,6 +138,25 @@ export async function createQueryLocationsEntryFunction() {
 
 		return { backlinks, catalogItems, mapData };
 	};
+}
+
+export async function getLocationsNearbyList(entry: CollectionEntry<'locations'>, limit: number) {
+	const { entriesMap } = await getLocationsCollection();
+
+	return (entry.data._nearby?.slice(0, limit) ?? []).flatMap(({ distanceDisplay, locationId }) => {
+		const location = entriesMap.get(locationId);
+
+		if (!location) return [];
+
+		return [
+			{
+				distanceDisplay,
+				title: location.data.title,
+				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
+				url: getContentPath('locations', location.id),
+			},
+		];
+	});
 }
 
 export async function queryLocationsIndex() {

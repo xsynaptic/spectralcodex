@@ -1,0 +1,57 @@
+---
+import type { ComponentProps } from 'astro/types';
+
+import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
+import type { ChronologyYearSummary } from '#lib/collections/chronology/chronology-types.ts';
+
+import ChronologyItem from '#components/chronology/chronology-item.astro';
+import ImageCarousel from '#components/image/image-carousel.astro';
+import Anchor from '#components/parts/anchor.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	anchorColor: ComponentProps<typeof Anchor>['anchorColor'];
+	href: string;
+	imageFeaturedGroup: Array<ImageFeaturedWithCaption> | undefined;
+	summary: ChronologyYearSummary;
+	title: string;
+	url?: string | undefined;
+}
+
+const { anchorColor, href, imageFeaturedGroup, summary, title, url } = Astro.props;
+
+const t = getTranslations();
+---
+
+<div class="content-column-fill mb-8">
+	<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
+		<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
+			<Anchor anchorColor={anchorColor} href={href}>
+				{title}
+			</Anchor>
+		</h2>
+		<div class="flex flex-col gap-2">
+			<ChronologyItem
+				count={summary.updatedCount}
+				items={summary.updated}
+				title={t('chronology.updated.label')}
+				url={url}
+			/>
+			<ChronologyItem
+				count={summary.createdCount}
+				items={summary.created}
+				title={t('chronology.created.label')}
+				url={url}
+			/>
+			<ChronologyItem
+				count={summary.visitedCount}
+				items={summary.visited}
+				title={t('chronology.visited.label')}
+				url={url}
+			/>
+		</div>
+	</div>
+	{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
+		<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
+	) : undefined}
+</div>

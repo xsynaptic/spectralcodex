@@ -92,3 +92,12 @@
 	background-position: center;
 	background-size: cover;
 }
+
+@utility scrollbar-subtle {
+	scrollbar-color: light-dark(
+			color-mix(in srgb, var(--color-primary-400) 40%, transparent),
+			color-mix(in srgb, var(--color-primary-500) 45%, transparent)
+		)
+		transparent;
+	scrollbar-width: thin;
+}

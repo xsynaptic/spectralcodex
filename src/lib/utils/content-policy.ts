@@ -18,3 +18,26 @@ export function collectHiddenLocationIds(
 
 	return new Set(locations.filter(({ data }) => data.hideLocation).map(({ id }) => id));
 }
+
+interface EntryCountData {
+	_entryCount?: number | undefined;
+	_locationCount?: number | undefined;
+	_locations?: Array<string> | undefined;
+	_postCount?: number | undefined;
+	_posts?: Array<string> | undefined;
+}
+
+export function populateContentCounts(
+	data: EntryCountData,
+	{
+		hiddenLocationIds,
+		locations,
+		posts,
+	}: { hiddenLocationIds: Set<string>; locations: Array<string>; posts: Array<string> },
+) {
+	data._locations = locations;
+	data._locationCount = locations.filter((id) => !hiddenLocationIds.has(id)).length;
+	data._posts = posts;
+	data._postCount = posts.length;
+	data._entryCount = data._locationCount + data._postCount;
+}

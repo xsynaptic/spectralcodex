@@ -116,64 +116,53 @@ export function getLocationsFeatureCollection(
 export function getLocationsMapPopupData(
 	featureCollection: MapFeatureCollection | undefined,
 ): Array<MapPopupItem> | undefined {
-	if (!featureCollection || featureCollection.features.length === 0) return;
-
-	return featureCollection.features
-		.map((feature, index) => {
-			const featureId = getFeatureId(feature, index);
-
-			return {
-				description: feature.properties.description,
-				googleMapsUrl: feature.properties.googleMapsUrl,
-				id: featureId,
-				safety: feature.properties.safety,
-				title: stripDiacritics(feature.properties.title),
-				titleMultilingualLang: feature.properties.titleMultilingualLang,
-				titleMultilingualValue: feature.properties.titleMultilingualValue,
-				url: feature.properties.url,
-				wikipediaUrl: feature.properties.wikipediaUrl,
-				...(feature.properties.image === undefined
-					? {}
-					: { image: { srcSet: feature.properties.image.srcSet } }),
-			} satisfies MapPopupItem;
-		})
-		.sort((a, b) => a.id.localeCompare(b.id));
+	return mapFeaturesById(featureCollection, (feature, featureId) => {
+		return {
+			description: feature.properties.description,
+			googleMapsUrl: feature.properties.googleMapsUrl,
+			id: featureId,
+			safety: feature.properties.safety,
+			title: stripDiacritics(feature.properties.title),
+			titleMultilingualLang: feature.properties.titleMultilingualLang,
+			titleMultilingualValue: feature.properties.titleMultilingualValue,
+			url: feature.properties.url,
+			wikipediaUrl: feature.properties.wikipediaUrl,
+			...(feature.properties.image === undefined
+				? {}
+				: { image: { srcSet: feature.properties.image.srcSet } }),
+		} satisfies MapPopupItem;
+	});
 }
 
 // Encoded to the compressed form at serialization edges
 export function getLocationsMapSourceData(
 	featureCollection: MapFeatureCollection | undefined,
 ): Array<MapSourceItem> | undefined {
-	if (!featureCollection || featureCollection.features.length === 0) return;
+	return mapFeaturesById(featureCollection, (feature, featureId) => {
+		const title = feature.properties.titleMultilingualValue
+			? `${feature.properties.title} (${feature.properties.titleMultilingualValue})`
+			: feature.properties.title;
 
-	return featureCollection.features
-		.map((feature, index) => {
-			const featureId = getFeatureId(feature, index);
-			const title = feature.properties.titleMultilingualValue
-				? `${feature.properties.title} (${feature.properties.titleMultilingualValue})`
-				: feature.properties.title;
-
-			return {
-				geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
-				properties: {
-					category: feature.properties.category,
-					entryQuality: feature.properties.entryQuality,
-					id: featureId,
-					precision: feature.properties.precision,
-					rating: feature.properties.rating,
-					status: feature.properties.status,
-					title: stripDiacritics(title),
-					...(feature.properties.objective === undefined
-						? {}
-						: { objective: feature.properties.objective }),
-					...(feature.properties.outlier === undefined
-						? {}
-						: { outlier: feature.properties.outlier }),
-					hasImage: feature.properties.image !== undefined,
-				},
-			} satisfies MapSourceItem;
-		})
-		.sort((a, b) => a.properties.id.localeCompare(b.properties.id));
+		return {
+			geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
+			properties: {
+				category: feature.properties.category,
+				entryQuality: feature.properties.entryQuality,
+				id: featureId,
+				precision: feature.properties.precision,
+				rating: feature.properties.rating,
+				status: feature.properties.status,
+				title: stripDiacritics(title),
+				...(feature.properties.objective === undefined
+					? {}
+					: { objective: feature.properties.objective }),
+				...(feature.properties.outlier === undefined
+					? {}
+					: { outlier: feature.properties.outlier }),
+				hasImage: feature.properties.image !== undefined,
+			},
+		} satisfies MapSourceItem;
+	});
 }
 
 export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
@@ -296,4 +285,16 @@ function getShortenedUrl(url: string | undefined, hostPrefix?: string): string |
 	return hostPrefix && withoutScheme.startsWith(hostPrefix)
 		? withoutScheme.slice(hostPrefix.length)
 		: withoutScheme;
+}
+
+function mapFeaturesById<T>(
+	featureCollection: MapFeatureCollection | undefined,
+	transform: (feature: MapFeatureCollection['features'][number], featureId: string) => T,
+): Array<T> | undefined {
+	if (!featureCollection || featureCollection.features.length === 0) return;
+
+	return featureCollection.features
+		.map((feature, index) => ({ feature, featureId: getFeatureId(feature, index) }))
+		.sort((a, b) => a.featureId.localeCompare(b.featureId))
+		.map(({ feature, featureId }) => transform(feature, featureId));
 }

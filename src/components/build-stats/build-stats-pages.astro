@@ -2,6 +2,7 @@
 import type { AxisTick, PagesGeometry } from '#lib/build-stats/build-stats-geometry.ts';
 
 import BuildStatsChart from '#components/build-stats/build-stats-chart.astro';
+import BuildStatsEndpoint from '#components/build-stats/build-stats-endpoint.astro';
 import { pagesFrame } from '#lib/build-stats/build-stats-geometry.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -29,13 +30,5 @@ const tooltipRows = [{ label: t('buildStats.tooltip.pages'), series: 'pages' }];
 >
 	<path class="stats-area stats-series-pages" d={geometry.areaPath}></path>
 	<path class="stats-line stats-series-pages" d={geometry.linePath}></path>
-	<circle
-		class="stats-endpoint stats-series-pages"
-		cx={geometry.end.cx}
-		cy={geometry.end.cy}
-		r="4"
-	></circle>
-	<text class="stats-endpoint-label" x={geometry.end.cx + 9} y={geometry.end.cy + 4}>
-		{geometry.end.label}
-	</text>
+	<BuildStatsEndpoint end={geometry.end} series="pages" />
 </BuildStatsChart>

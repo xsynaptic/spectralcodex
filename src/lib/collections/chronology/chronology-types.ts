@@ -20,7 +20,7 @@ export interface ChronologyMonthlyItem extends ChronologyYearSummary {
 
 // Fields shared by both chronology views
 // A year summary (index view) carries exactly these; a monthly item adds the month-specific fields below
-interface ChronologyYearSummary {
+export interface ChronologyYearSummary {
 	created: Array<CatalogItem>;
 	createdCount: number;
 	highlights: Array<CatalogItem> | undefined;

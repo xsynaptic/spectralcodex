@@ -20,13 +20,13 @@ import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
+import { getLocationsNearbyList } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
 import { getMapData } from '#lib/map/map-data.ts';
@@ -78,24 +78,15 @@ export async function getSampleLocations() {
 
 // Distances come from the build-time neighbour pass, so the sample needs a Location that has one
 export async function getSampleNearbyLocations() {
-	const { entries, entriesMap } = await getLocationsCollection();
+	const { entries } = await getLocationsCollection();
 
 	const entry = entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
 
-	return (entry?.data._nearby?.slice(0, 5) ?? []).flatMap(({ distanceDisplay, locationId }) => {
-		const location = entriesMap.get(locationId);
+	if (!entry) return [];
 
-		if (!location) return [];
+	const locations = await getLocationsNearbyList(entry, 5);
 
-		return [
-			{
-				distanceDisplay,
-				title: location.data.title,
-				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
-				url: getSampleUrl('locations-nearby-list'),
-			},
-		];
-	});
+	return locations.map((location) => ({ ...location, url: getSampleUrl('locations-nearby-list') }));
 }
 
 // A preview subtitle walks a Region's ancestors and throws on an id the collection does not hold

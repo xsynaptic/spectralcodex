@@ -21,6 +21,8 @@ const {
 	parenthesis = false,
 	...props
 } = Astro.props;
+
+const segments = content && !parenthesis ? [content, ...(additional ?? [])] : [];
 ---
 
 {content && parenthesis ? (
@@ -36,24 +38,14 @@ const {
 		</TextParenthesis>
 	</>
 ) : undefined}
-{content && !parenthesis ? (
+{segments.map((segment, index) => (
 	<>
+		{index > 0 ? '／' : undefined}
 		<Tag
-			class:list={[className, isCjkLanguage(content.lang) ? 'cjk-text' : undefined]}
-			lang={content.lang}
+			class:list={[className, isCjkLanguage(segment.lang) ? 'cjk-text' : undefined]}
+			lang={segment.lang}
 			{...props}
-			set:html={content.value.trim()}
+			set:html={segment.value.trim()}
 		/>
-		{additional?.map((item) => (
-			<>
-				{'／'}
-				<Tag
-					class:list={[className, isCjkLanguage(item.lang) ? 'cjk-text' : undefined]}
-					lang={item.lang}
-					{...props}
-					set:html={item.value.trim()}
-				/>
-			</>
-		))}
 	</>
-) : undefined}
+))}

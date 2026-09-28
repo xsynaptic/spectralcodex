@@ -1,12 +1,10 @@
 ---
 import type { ChronologyIndexData } from '#lib/collections/chronology/chronology-types.ts';
 
-import ChronologyItem from '#components/chronology/chronology-item.astro';
 import ChronologyNavigation from '#components/chronology/chronology-navigation.astro';
+import ChronologyPeriod from '#components/chronology/chronology-period.astro';
 import ContentHeader from '#components/content/content-header.astro';
-import ImageCarousel from '#components/image/image-carousel.astro';
 import MainSite from '#components/main/main-site.astro';
-import Anchor from '#components/parts/anchor.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
@@ -48,35 +46,13 @@ const title = t('chronology.index.title');
 			});
 
 			return (
-				<div class="content-column-fill mb-8">
-					<div class="flex flex-col gap-2 px-4 text-sm text-primary-700 sm:px-0 dark:text-primary-400">
-						<h2 class="border-b border-primary-200 pb-1 text-sm font-semibold uppercase dark:border-primary-700">
-							<Anchor anchorColor="primary" href={getSitePath('chronology', year)}>
-								{year}
-							</Anchor>
-						</h2>
-						<div class="flex flex-col gap-2">
-							<ChronologyItem
-								count={monthlyData.updatedCount}
-								items={monthlyData.updated}
-								title={t('chronology.updated.label')}
-							/>
-							<ChronologyItem
-								count={monthlyData.createdCount}
-								items={monthlyData.created}
-								title={t('chronology.created.label')}
-							/>
-							<ChronologyItem
-								count={monthlyData.visitedCount}
-								items={monthlyData.visited}
-								title={t('chronology.visited.label')}
-							/>
-						</div>
-					</div>
-					{imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
-						<ImageCarousel class="mt-4" imageFeaturedGroup={imageFeaturedGroup} />
-					) : undefined}
-				</div>
+				<ChronologyPeriod
+					anchorColor="primary"
+					href={getSitePath('chronology', year)}
+					imageFeaturedGroup={imageFeaturedGroup}
+					summary={monthlyData}
+					title={year}
+				/>
 			);
 		})}
 </MainSite>
