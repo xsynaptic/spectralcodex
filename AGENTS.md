@@ -2,7 +2,7 @@
 
 Spectral Codex is a long-form, photo-heavy digital garden: an Astro SSG monorepo (using pnpm workspaces) with React (stateful and complex) and standard web components (light interactivity) rendering mixed-script content (Latin, CJK, Vietnamese, Thai) via MDX. The root is the app (`src/`); `packages/*` hold content, shared utilities, the map island, build integrations, and scripts. Reuse from `src/lib` before adding utilities.
 
-Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, etc.) is defined in `.claude/context.md`. Read it before naming anything or writing user-facing copy.
+Project vocabulary (Entry, Location, Region, Theme, Chronology, Catalog, etc.) is defined in `.claude/glossary.md`. Read it before naming anything or writing user-facing copy.
 
 Avoid adding anything to this file unless it is something important agents wouldn't already infer from the codebase.
 
