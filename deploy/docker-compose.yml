@@ -221,7 +221,7 @@ services:
     volumes:
       - ${DEPLOY_MEDIA_PATH}/media:/media:ro
     environment:
-      - IMAGOR_SECRET=${IMAGE_SERVER_SECRET}
+      - IMAGOR_SECRET=${IMAGE_SERVER_SECRET:?IMAGE_SERVER_SECRET must be set}
       - IMAGOR_SIGNER_TYPE=sha256
       - IMAGOR_SIGNER_TRUNCATE=${IMAGE_SERVER_SIGNATURE_LENGTH:-20}
       - VIPS_STRIP_METADATA=1
