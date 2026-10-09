@@ -14,12 +14,7 @@ import { useMapLanguages } from '#store/store.ts';
 export function useProtomaps({
 	baseMapTheme,
 	protomapsApiKey,
-	spritesId,
-	spritesUrl,
-}: Pick<
-	MapComponentProps,
-	'baseMapTheme' | 'isDev' | 'protomapsApiKey' | 'spritesId' | 'spritesUrl'
->) {
+}: Pick<MapComponentProps, 'baseMapTheme' | 'isDev' | 'protomapsApiKey'>) {
 	const isDarkMode = useIsDarkMode();
 
 	const languages = useMapLanguages();
@@ -46,7 +41,6 @@ export function useProtomaps({
 								id: 'default',
 								url: `https://protomaps.github.io/basemaps-assets/sprites/v4/${isDarkMode ? 'dark' : 'light'}`,
 							},
-							...(spritesUrl ? [{ id: spritesId ?? 'custom', url: spritesUrl }] : []),
 						],
 						version: 8,
 					}
@@ -55,7 +49,7 @@ export function useProtomaps({
 						sources: {},
 						version: 8,
 					},
-		[flavor, isDarkMode, protomapsApiKey, spritesId, spritesUrl, languages],
+		[flavor, isDarkMode, protomapsApiKey, languages],
 	) satisfies StyleSpecification;
 
 	useEffect(function loadProtomapsProtocol() {

@@ -60,8 +60,6 @@ const MapCanvasContainer: FC<
 	popupData,
 	popupDataKey,
 	protomapsApiKey,
-	spritesId,
-	spritesUrl,
 	style,
 	targetIds,
 	version,
@@ -70,8 +68,6 @@ const MapCanvasContainer: FC<
 	const protomapsStyleSpec = useProtomaps({
 		baseMapTheme,
 		protomapsApiKey,
-		spritesId,
-		spritesUrl,
 	});
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();

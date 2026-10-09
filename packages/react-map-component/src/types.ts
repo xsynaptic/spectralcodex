@@ -47,8 +47,6 @@ export interface MapComponentProps extends Partial<
 	sourceData?: Array<MapSourceItemCompressed> | undefined;
 	// Per-map content hashes that cache-key inline source/popup datasets
 	sourceDataKey?: string | undefined;
-	spritesId?: string | undefined;
-	spritesUrl?: string | undefined;
 	style?: CSSProperties | undefined;
 	targetIds?: Array<string> | undefined;
 	version?: string | undefined;
