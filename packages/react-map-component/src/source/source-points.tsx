@@ -12,6 +12,7 @@ import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import {
 	statusColorArray,
 	statusColorDarkArray,
+	statusHighlightColorArray,
 	statusStrokeColorArray,
 	statusStrokeColorDarkArray,
 } from '#lib/location-status.ts';
@@ -117,40 +118,41 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 	} satisfies CircleLayerSpecification;
 }
 
-// Featured image overlay for points with images
-// TODO: this still needs to be implemented but we haven't yet come up with a good design
-function getPointsImageLayerStyle(spritesPrefix: string) {
+// Inner dot marking points with a featured image; every radius is 3/8 of its Points layer counterpart
+function getPointsImageLayerStyle() {
 	return {
 		filter: [
 			'all',
 			['!', ['has', 'point_count']], // Not a cluster
-			['boolean', ['get', 'hasImage']], // Has featured image
+			['boolean', ['get', 'hasImage'], false], // Has featured image
 		],
 		id: MapLayerIdEnum.PointsImage,
-		layout: {
-			'icon-image': ['concat', spritesPrefix, ':', 'diamond'],
-			'icon-size': [
+		paint: {
+			'circle-color': [
+				'match',
+				['string', ['get', 'status']],
+				...statusHighlightColorArray,
+				'white',
+			],
+			'circle-radius': [
 				'interpolate',
 				['linear'],
 				['zoom'],
 				0, // Zoom level followed by radius (repeated)
-				0.5,
+				['case', selectStateExpression, 1.875, hoverStateExpression, 1.125, 0.75],
 				8,
-				0.5,
+				['case', selectStateExpression, 2.25, hoverStateExpression, 1.875, 1.5],
 				12,
-				0.5,
+				['case', selectStateExpression, 3, hoverStateExpression, 2.25, 1.875],
 				15,
-				0.5,
+				['case', selectStateExpression, 3.75, hoverStateExpression, 3, 2.625],
 				18,
-				0.5,
+				['case', selectStateExpression, 4.5, hoverStateExpression, 3.375, 3],
 			],
 		},
-		paint: {
-			'icon-color': ['case', selectStateExpression, tailwindColors.red500, tailwindColors.red600],
-		},
 		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
-	} satisfies SymbolLayerSpecification;
+		type: 'circle',
+	} satisfies CircleLayerSpecification;
 }
 
 // Text labels for individual points on hover
@@ -258,11 +260,11 @@ function getPointsTargetLayerStyle(isDarkMode: boolean) {
 	} satisfies CircleLayerSpecification;
 }
 
-function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
+function useMapSourcePointsStyle(): {
 	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
 	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
 	[MapLayerIdEnum.Points]: CircleLayerSpecification;
-	[MapLayerIdEnum.PointsImage]: SymbolLayerSpecification;
+	[MapLayerIdEnum.PointsImage]: CircleLayerSpecification;
 	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
 	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
 } {
@@ -280,10 +282,7 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
 
 	const pointsTargetLayerStyle = useMemo(() => getPointsTargetLayerStyle(isDarkMode), [isDarkMode]);
 
-	const pointsImageLayerStyle = useMemo(
-		() => getPointsImageLayerStyle(spritesPrefix),
-		[spritesPrefix],
-	);
+	const pointsImageLayerStyle = useMemo(() => getPointsImageLayerStyle(), []);
 
 	const pointsLabelLayerStyle = useMemo(
 		() => getPointsLabelLayerStyle(isDarkMode, hoveredId),
@@ -308,10 +307,9 @@ function useMapSourcePointsStyle(spritesPrefix = 'custom'): {
  */
 export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
-	hasMapIcons: boolean;
 	interactive: boolean;
 	targetIds?: Array<string> | undefined;
-}> = memo(function MapPointLayerContents({ data, hasMapIcons, interactive, targetIds }) {
+}> = memo(function MapPointLayerContents({ data, interactive, targetIds }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
@@ -356,10 +354,8 @@ export const MapSourcePoints: FC<{
 			) : undefined}
 			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
 			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
+			<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
 			<Layer key={MapLayerIdEnum.PointsLabel} {...pointsStyle[MapLayerIdEnum.PointsLabel]} />
-			{hasMapIcons ? (
-				<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
-			) : undefined}
 		</Source>
 	);
 });
