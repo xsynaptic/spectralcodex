@@ -33,6 +33,15 @@
 	--pf-mark: var(--color-primary-300);
 }
 
+/* The import resets both hosts to `display: block`, which would make them items of the header's flex row; search.css holds the same rules until this sheet loads */
+pagefind-config {
+	display: none;
+}
+
+pagefind-modal {
+	display: contents;
+}
+
 /*
  * Pagefind 1.5.0 fix
  * `all: initial` on custom elements breaks font inheritance for child buttons
