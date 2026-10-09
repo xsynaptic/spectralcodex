@@ -117,10 +117,9 @@ export const locationStatusOrder: ReadonlyArray<LocationStatus> = [
 ];
 
 function getColorMap(
-	styleRecord: typeof LocationStatusRecords,
 	prop: keyof (typeof LocationStatusRecords)[keyof typeof LocationStatusRecords],
 ) {
-	const colorMap = Object.entries(styleRecord).flatMap(([status, values]) => [
+	const colorMap = Object.entries(LocationStatusRecords).flatMap(([status, values]) => [
 		status,
 		values[prop],
 	]);
@@ -137,7 +136,7 @@ function isDoubleStringArray(array: Array<string>): array is [string, string, ..
 }
 
 // This creates an array of status and color values for use with clusters in MapLibre
-export const statusColorArray = getColorMap(LocationStatusRecords, 'color');
-export const statusColorDarkArray = getColorMap(LocationStatusRecords, 'colorDark');
-export const statusStrokeColorArray = getColorMap(LocationStatusRecords, 'stroke');
-export const statusStrokeColorDarkArray = getColorMap(LocationStatusRecords, 'strokeDark');
+export const statusColorArray = getColorMap('color');
+export const statusColorDarkArray = getColorMap('colorDark');
+export const statusStrokeColorArray = getColorMap('stroke');
+export const statusStrokeColorDarkArray = getColorMap('strokeDark');

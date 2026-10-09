@@ -115,7 +115,6 @@ const MapCanvasContainer: FC<
 			<MapSource
 				apiDivisionUrl={apiDivisionUrl}
 				bounds={bounds}
-				hasMapIcons={spritesId !== undefined && spritesUrl !== undefined}
 				isDev={isDev}
 				targetIds={targetIds}
 			/>

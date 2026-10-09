@@ -24,7 +24,7 @@ async function getSelectedWidth(image: Locator): Promise<number> {
 	const currentSrc = await image.evaluate((element: HTMLImageElement) => element.currentSrc);
 	const width = Number(/\/(\d+)x\d+\//.exec(currentSrc)?.[1]);
 
-	if (!Number.isFinite(width)) throw new Error(`No width segment in currentSrc: ${currentSrc}`);
+	if (!Number.isFinite(width)) throw new TypeError(`No width segment in currentSrc: ${currentSrc}`);
 
 	return width;
 }

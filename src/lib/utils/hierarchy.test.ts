@@ -17,8 +17,7 @@ const isWithin = (ordinal: number, interval: readonly [number, number]): boolean
 	ordinal >= interval[0] && ordinal <= interval[1];
 
 describe('createHierarchy nested-set numbering', () => {
-	const tree = createHierarchy(nodes);
-	const { intervalById, ordinalById } = tree;
+	const { intervalById, ordinalById } = createHierarchy(nodes);
 
 	test('an ancestor interval contains all its descendant ordinals', () => {
 		const taiwan = intervalById.get('taiwan')!;

@@ -20,7 +20,7 @@ export const MapSourceIdEnum = {
 	PolygonCollection: 'polygonCollection',
 } as const;
 
-// Layers react-map-gl hit-tests for pointer events; PointsImage is conditional and ignored when absent
+// Layers react-map-gl hit-tests for pointer events
 export const mapInteractiveLayerIds = [
 	MapLayerIdEnum.Clusters,
 	MapLayerIdEnum.PointsTarget,
@@ -28,7 +28,7 @@ export const mapInteractiveLayerIds = [
 	MapLayerIdEnum.PointsImage,
 ] as const;
 
-// Always-rendered layers safe for the onMouseMove guard and query; PointsImage is conditional so it is excluded
+// Layers for the onMouseMove guard and query; PointsImage always sits inside a Points hit so it is left out
 export const mapQueryableLayerIds = [
 	MapLayerIdEnum.Clusters,
 	MapLayerIdEnum.Points,
