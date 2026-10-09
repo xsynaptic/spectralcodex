@@ -31,12 +31,12 @@
 		"webmentions": "tsx --env-file-if-exists=../../.env ./src/webmentions/index.ts"
 	},
 	"devDependencies": {
-		"@duckdb/node-api": "1.5.5-r.4",
+		"@duckdb/node-api": "1.5.6-r.1",
 		"@fontsource/lora": "^5.3.0",
 		"@fontsource/noto-serif-tc": "^5.3.0",
 		"@fontsource/noto-serif-thai": "^5.3.0",
 		"@fontsource/zen-antique": "^5.3.0",
-		"@huggingface/transformers": "^4.3.0",
+		"@huggingface/transformers": "^4.3.1",
 		"@spectralcodex/shared": "workspace:*",
 		"@turf/helpers": "^7.4.0",
 		"@turf/turf": "^7.4.0",
@@ -45,7 +45,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/sanitize-html": "^2.16.2",
 		"@xsynaptic/unified-tools": "^5.1.3",
-		"astro": "^7.3.6",
+		"astro": "^7.3.8",
 		"better-sqlite3": "^13.0.3",
 		"chalk": "^6.0.1",
 		"d3-geo": "^3.1.1",
@@ -61,7 +61,7 @@
 		"svgo": "^4.1.0",
 		"takumi-js": "^2.14.0",
 		"tsx": "^4.23.15",
-		"usearch": "^2.26.3",
+		"usearch": "^2.26.4",
 		"vitest": "^4.1.11",
 		"zod": "^4.6.5",
 		"zx": "^8.8.5"
