@@ -5,9 +5,14 @@
 	line-height: calc(24 / 14);
 }
 
+/* Grouped figures take their bottom margin from the group instead */
+.figure-frame:not(.img-group *) {
+	@apply md:mb-4;
+}
+
 /* Default layout; grouped figures take their width from the group instead */
 .figure-frame:not(.figure-wide, .figure-full, .img-group *) {
-	@apply content-column-fill md:mb-4;
+	@apply content-column-fill;
 }
 
 .figure-frame.figure-wide {

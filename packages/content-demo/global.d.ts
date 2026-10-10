@@ -15,7 +15,7 @@ declare global {
 		ImgGroup: (props: {
 			children: React.ReactNode;
 			columns?: number | string;
-			display?: 'carousel' | 'grid';
+			context?: 'carousel' | 'grid';
 			layout?: 'full' | 'wide';
 		}) => React.JSX.Element;
 		Link: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;

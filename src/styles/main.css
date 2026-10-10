@@ -15,9 +15,15 @@
 @source inline('sr-only');
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
-@custom-variant pane-md (@container pane (width >= 48rem));
-@custom-variant pane-lg (@container pane (width >= 64rem));
-@custom-variant pane-xl (@container pane (width >= 80rem));
+
+/*
+ * Atlas mode works because everything above medium is mapped to container queries
+ * Only the `sm` breakpoint remains on Tailwind defaults
+ * The pane is never narrower than 40rem, so both readings would always agree
+ */
+@custom-variant md (@container pane (width >= 48rem));
+@custom-variant lg (@container pane (width >= 64rem));
+@custom-variant xl (@container pane (width >= 80rem));
 
 @import './main/parts/theme.css';
 @import './main/parts/utilities.css';
