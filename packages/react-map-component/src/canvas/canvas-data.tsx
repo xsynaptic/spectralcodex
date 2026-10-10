@@ -4,7 +4,8 @@ import { createContext, useContext, useMemo } from 'react';
 
 import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
 
-import { getMapCanvasData } from '#canvas/canvas-data-filter.ts';
+import { getHiddenTargetIds, getMapCanvasData } from '#canvas/canvas-data-filter.ts';
+import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
 	useMapEntryQualityFilter,
@@ -27,15 +28,27 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
 	const mapScope = useMapScope();
+	const targetIds = useMapTargetIds();
+
+	const filter = useMemo(
+		() => ({ entryQuality, objective, rating, status }),
+		[entryQuality, objective, rating, status],
+	);
+
+	// A string, so a new Target the filter does not hide leaves the collections and their clusters untouched
+	const pinnedKey = useMemo(
+		() => getHiddenTargetIds(sourceData ?? emptyItems, targetIds, filter).join(' '),
+		[sourceData, targetIds, filter],
+	);
 
 	const canvasData = useMemo(
 		() =>
 			getMapCanvasData(
 				sourceData ?? emptyItems,
-				{ entryQuality, objective, rating, status },
+				pinnedKey ? { ...filter, pinnedIds: pinnedKey.split(' ') } : filter,
 				mapScope,
 			),
-		[sourceData, status, entryQuality, rating, objective, mapScope],
+		[sourceData, filter, mapScope, pinnedKey],
 	);
 
 	return <CanvasDataContext.Provider value={canvasData}>{children}</CanvasDataContext.Provider>;

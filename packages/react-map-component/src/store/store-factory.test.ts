@@ -91,6 +91,16 @@ describe('createMapStore', () => {
 		});
 	});
 
+	test('clearing the selection leaves the filter panel open', () => {
+		const store = createMapStore();
+		const { setFilterOpen, setSelectedId } = store.getState().actions;
+
+		setFilterOpen(true);
+		setSelectedId(undefined);
+
+		expect(store.getState().isFilterOpen).toBe(true);
+	});
+
 	test('clearing the selection restores popup visibility', () => {
 		const store = createMapStore();
 		const { setPopupVisible, setSelectedId } = store.getState().actions;

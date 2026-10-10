@@ -17,13 +17,19 @@
 	display: none;
 }
 
-@media (width >= 64rem) {
+/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
+@media (width >= theme(--breakpoint-lg)) {
 	.atlas-open {
 		display: flex;
 	}
 
-	:root[data-atlas][data-atlas-page='location'] {
-		--atlas-pane-width: clamp(40rem, var(--atlas-pane-size, 45rem), 100vw - 20rem);
+	:root[data-atlas][data-atlas-page='pane'] {
+		/* Percent resolves where the property is used, against a box without the scrollbar gutter that `100vw` counts */
+		--atlas-pane-width: clamp(
+			var(--atlas-pane-min),
+			var(--atlas-pane-size, var(--atlas-pane-default)),
+			100% - var(--atlas-map-min)
+		);
 
 		.main-pane {
 			position: relative;
@@ -107,6 +113,9 @@
 		}
 
 		.atlas-divider-control {
+			--atlas-control-active: light-dark(var(--color-primary-800), var(--color-primary-100));
+			--atlas-control-active-bg: light-dark(var(--color-primary-200), var(--color-primary-700));
+
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -141,8 +150,8 @@
 			}
 
 			&:focus-visible {
-				color: light-dark(var(--color-primary-800), var(--color-primary-100));
-				background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+				color: var(--atlas-control-active);
+				background-color: var(--atlas-control-active-bg);
 
 				& svg {
 					translate: var(--atlas-control-nudge);
@@ -151,8 +160,8 @@
 
 			@media (hover: hover) {
 				&:hover {
-					color: light-dark(var(--color-primary-800), var(--color-primary-100));
-					background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+					color: var(--atlas-control-active);
+					background-color: var(--atlas-control-active-bg);
 
 					& svg {
 						translate: var(--atlas-control-nudge);

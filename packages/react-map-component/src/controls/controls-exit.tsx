@@ -4,13 +4,6 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 
-// Serializable adapter for a host that closes the map
-// A function couldn't survive Astro island-prop serialization
-export interface MapExitControlOptions {
-	// Dispatched on `document` when the control is pressed
-	eventName: string;
-}
-
 export const ExitControl: FC<{
 	eventName: string;
 	position: ControlPosition;

@@ -9,7 +9,11 @@ import { describe, expect, test } from 'vitest';
 
 import type { MapFilterState } from '#canvas/canvas-data-filter.ts';
 
-import { getMapCanvasData, isLocationVisible } from '#canvas/canvas-data-filter.ts';
+import {
+	getHiddenTargetIds,
+	getMapCanvasData,
+	isLocationVisible,
+} from '#canvas/canvas-data-filter.ts';
 
 const passAll: MapFilterState = {
 	entryQuality: 1,
@@ -142,6 +146,27 @@ describe('getMapCanvasData', () => {
 		expect(result.totalCount).toBe(2); // totalCount is the scoped total, before visibility
 	});
 
+	test('a pinned item is drawn whatever the filter hides', () => {
+		const result = getMapCanvasData(
+			[makeItem({ entryQuality: 1, id: 'target' }), makeItem({ entryQuality: 1, id: 'other' })],
+			{ ...passAll, entryQuality: 3, pinnedIds: ['target'] },
+		);
+
+		expect(result.pointCollection?.features.map(({ properties }) => properties.id)).toEqual([
+			'target',
+		]);
+	});
+
+	test('a pinned item outside the scope stays out', () => {
+		const result = getMapCanvasData(
+			[makeItem({ id: 'target', themeIndices: [1] })],
+			{ ...passAll, pinnedIds: ['target'] },
+			{ index: 2, type: 'theme' },
+		);
+
+		expect(result.pointCollection).toBeUndefined();
+	});
+
 	test('empty input yields undefined collections and zero counts', () => {
 		const result = getMapCanvasData([], passAll);
 
@@ -149,6 +174,22 @@ describe('getMapCanvasData', () => {
 		expect(result.lineStringCollection).toBeUndefined();
 		expect(result.filteredCount).toBe(0);
 		expect(result.totalCount).toBe(0);
+	});
+});
+
+describe('getHiddenTargetIds', () => {
+	const items = [
+		makeItem({ entryQuality: 1, id: 'hidden' }),
+		makeItem({ entryQuality: 5, id: 'visible' }),
+	];
+	const filter = { ...passAll, entryQuality: 3 };
+
+	test('only Targets the filter hides are returned', () => {
+		expect(getHiddenTargetIds(items, ['hidden', 'visible'], filter)).toEqual(['hidden']);
+	});
+
+	test('a hidden item that is no Target is left to the filter', () => {
+		expect(getHiddenTargetIds(items, ['visible'], filter)).toEqual([]);
 	});
 });
 

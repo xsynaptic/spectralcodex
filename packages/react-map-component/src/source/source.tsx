@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import type { MapComponentProps } from '#types.ts';
 
 import { useMapCanvasData } from '#canvas/canvas-data.tsx';
+import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
 import { useMapApiDivisionData } from '#data/data-division.ts';
 import { MapSourceDebug } from '#source/source-debug.tsx';
 import { MapSourceDivisions } from '#source/source-divisions.tsx';
@@ -19,11 +20,12 @@ const emptyFeatureCollection: FeatureCollection<never, never> = {
 };
 
 export const MapSource: FC<
-	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev' | 'targetIds'> & {
+	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'> & {
 		bounds: MapComponentProps['bounds'] | undefined;
 	}
-> = function MapSource({ apiDivisionUrl, bounds, isDev, targetIds }) {
+> = function MapSource({ apiDivisionUrl, bounds, isDev }) {
 	const isInteractive = useIsMapCanvasInteractive();
+	const targetIds = useMapTargetIds();
 
 	const { lineStringCollection, pointCollection } = useMapCanvasData();
 	const { data: divisionData } = useMapApiDivisionData({ apiDivisionUrl, isDev });

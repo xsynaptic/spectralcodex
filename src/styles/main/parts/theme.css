@@ -84,6 +84,13 @@
 	--color-alternate-950: #172e05;
 }
 
+/* Atlas split; atlas.css clamps the pane between them and atlas-pane.ts reads them from computed style */
+@theme {
+	--atlas-pane-min: 40rem;
+	--atlas-map-min: 20rem;
+	--atlas-pane-default: 45rem;
+}
+
 /* Stacking order; image chrome sits under the header so the site chrome overlaps a hero */
 @theme {
 	--z-index-image: 10;

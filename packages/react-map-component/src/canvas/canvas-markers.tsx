@@ -6,7 +6,7 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { useEffect, useMemo, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
-import { useMapCanvasData } from '#canvas/canvas-data.tsx';
+import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { LocationStatusRecords } from '#lib/location-status.ts';
 import { tailwindColors } from '#lib/tailwind-colors.ts';
@@ -209,16 +209,17 @@ export const MapSyncedTargetMarkers: FC<{
 	targetIds: Array<string>;
 }> = function MapSyncedTargetMarkers({ targetIds }) {
 	const isDark = useIsDarkMode();
-	const { pointCollection } = useMapCanvasData();
+	// Unfiltered, as the camera fit is; a Target hidden by a filter keeps its ring
+	const { data: sourceData } = useSourceDataQuery();
 
 	const markers = useMemo(() => {
 		const results: Array<TargetMarker> = [];
 
-		if (!pointCollection || targetIds.length === 0) return results;
+		if (!sourceData || targetIds.length === 0) return results;
 
 		const targetIdSet = new Set(targetIds);
 
-		for (const { geometry, properties } of pointCollection.features) {
+		for (const { geometry, properties } of sourceData) {
 			if (geometry.type !== 'Point' || !targetIdSet.has(properties.id)) continue;
 
 			const [longitude, latitude] = geometry.coordinates as [number, number];
@@ -233,7 +234,7 @@ export const MapSyncedTargetMarkers: FC<{
 		}
 
 		return results;
-	}, [pointCollection, targetIds, isDark]);
+	}, [sourceData, targetIds, isDark]);
 
 	return markers.map((marker) => <MapPulseRing key={marker.id} {...marker} />);
 };

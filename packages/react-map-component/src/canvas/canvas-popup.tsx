@@ -6,8 +6,10 @@ import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
+import type { MapTrackDetail } from '#types.ts';
+
 import { useFeatureOpenDispatch } from '#canvas/canvas-feature-open.ts';
-import { mediaQueryMobile } from '#constants.ts';
+import { mapTrackEventName, mediaQueryMobile } from '#constants.ts';
 import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
@@ -266,7 +268,11 @@ function usePopupOpenTracking({
 
 		if (!url) return;
 
-		globalThis.window.umami?.track('map-popup-open', { location: url });
+		document.dispatchEvent(
+			new CustomEvent<MapTrackDetail>(mapTrackEventName, {
+				detail: { data: { location: url }, name: 'map-popup-open' },
+			}),
+		);
 	}, [id, isEnabled, isLoading, mapStoreInstance, setClickedId, url]);
 }
 
@@ -539,10 +545,3 @@ export const MapPopup: FC<{
 		/>
 	);
 };
-
-// Mirrors the declaration in the app's `src/components/search/search-toggle.ts`
-declare global {
-	interface Window {
-		umami?: { track: (eventName: string, eventData?: Record<string, unknown>) => void };
-	}
-}

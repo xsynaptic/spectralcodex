@@ -40,7 +40,7 @@ const t = getTranslations();
 <!doctype html>
 <html
 	data-atlas-page={atlas?.page}
-	data-atlas-targets={atlas?.page === 'location' ? atlas.targetIds.join(' ') : undefined}
+	data-atlas-view={atlas?.page === 'pane' ? JSON.stringify(atlas.view) : undefined}
 	lang="en"
 >
 	<head>

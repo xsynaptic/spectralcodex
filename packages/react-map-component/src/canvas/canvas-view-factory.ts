@@ -1,19 +1,43 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import { z } from 'zod';
 
-// Serializable adapter for Targets that change after mount; a persisted island never receives new props
-export interface MapTargetSyncOptions {
-	// Read from the document root as a space-separated list of feature ids
-	attributeName: string;
-	// Dispatched on `document` whenever the attribute or the map container's width may have changed
-	eventName: string;
-}
+import type { MapView } from '#types.ts';
 
 type Position = [longitude: number, latitude: number];
 
-export function parseTargetIds(value: string): Array<string> {
-	return value.split(/\s+/).filter((id) => id.length > 0);
+const PositionSchema = z.tuple([z.number(), z.number()]);
+
+const MapViewSchema = z.object({
+	apiDivisionUrl: z.string().exactOptional(),
+	bounds: z
+		.union([
+			z.tuple([z.number(), z.number(), z.number(), z.number()]),
+			z.tuple([PositionSchema, PositionSchema]),
+		])
+		.exactOptional(),
+	scope: z
+		.discriminatedUnion('type', [
+			z.object({ ids: z.array(z.string()), type: z.literal('ids') }),
+			z.object({ index: z.number(), type: z.literal('theme') }),
+			z.object({ interval: z.tuple([z.number(), z.number()]), type: z.literal('region') }),
+		])
+		.exactOptional(),
+	targetIds: z.array(z.string()).exactOptional(),
+}) satisfies z.ZodType<MapView>;
+
+// A page that sets no view, or a malformed one, leaves the map as it is
+export function parseMapView(value: string | undefined, isDev = false): MapView {
+	if (!value) return {};
+
+	try {
+		return MapViewSchema.parse(JSON.parse(value));
+	} catch (error) {
+		if (isDev) console.warn('[Map] Malformed host view:', error);
+
+		return {};
+	}
 }
 
 export function getTargetPositions(

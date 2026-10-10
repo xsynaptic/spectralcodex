@@ -1,22 +1,18 @@
 import { useEffect } from 'react';
 
+import type { MapHostOptions } from '#types.ts';
+
 import { useMediaQuery } from '#lib/media-query.ts';
 
 export interface MapFeatureOpenDetail {
 	url: string;
 }
 
-export interface MapFeatureOpenOptions {
-	// Dispatched on `document` as a `CustomEvent<MapFeatureOpenDetail>` once the selected Feature's url is known
-	eventName: string;
-	// Popups stay wherever this does not match
-	mediaQuery: string;
-}
+// Popups stay wherever the host's query does not match
+export function useFeatureOpenEventName(host: MapHostOptions | undefined) {
+	const isMatch = useMediaQuery({ query: host?.featureOpenMediaQuery ?? 'not all' });
 
-export function useFeatureOpenEventName(featureOpen: MapFeatureOpenOptions | undefined) {
-	const isMatch = useMediaQuery({ query: featureOpen?.mediaQuery ?? 'not all' });
-
-	return isMatch ? featureOpen?.eventName : undefined;
+	return isMatch ? host?.featureOpenEventName : undefined;
 }
 
 export function useFeatureOpenDispatch(eventName: string | undefined, url: string | undefined) {

@@ -1,18 +1,16 @@
-// Mirrored by the `clamp()` on `--atlas-pane-width` in atlas.css, which covers restore and viewport resizes
-const paneMinRem = 40;
-const mapMinRem = 20;
 const keyStepRem = 2;
 
+// The same lengths atlas.css clamps `--atlas-pane-width` between, which covers restore and viewport resizes
 export interface AtlasPaneLimits {
+	mapMin: number;
+	paneMin: number;
 	rootFontSize: number;
 	viewportWidth: number;
 }
 
-export function getPaneWidthRange({ rootFontSize, viewportWidth }: AtlasPaneLimits) {
-	const min = paneMinRem * rootFontSize;
-
+export function getPaneWidthRange({ mapMin, paneMin, viewportWidth }: AtlasPaneLimits) {
 	// Content styles follow viewport breakpoints, so the pane keeps its minimum when both cannot fit
-	return { max: Math.max(min, viewportWidth - mapMinRem * rootFontSize), min };
+	return { max: Math.max(paneMin, viewportWidth - mapMin), min: paneMin };
 }
 
 export function clampPaneWidth(width: number, limits: AtlasPaneLimits) {

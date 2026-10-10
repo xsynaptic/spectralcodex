@@ -15,6 +15,8 @@ export interface MapCanvasData {
 export interface MapFilterState {
 	entryQuality: number;
 	objective: number;
+	// Shown whatever the rest of the filter says
+	pinnedIds?: ReadonlyArray<string>;
 	rating: number;
 	status: ReadonlyArray<LocationStatus>;
 }
@@ -61,10 +63,28 @@ export function isLocationVisible(
 	properties: MapSourceItem['properties'],
 	filter: MapFilterState,
 ): boolean {
+	if (filter.pinnedIds?.includes(properties.id)) return true;
 	if (filter.status.includes(properties.status)) return false;
 	if (properties.entryQuality < filter.entryQuality) return false;
 	if (properties.rating < filter.rating) return false;
 	return properties.objective === undefined || properties.objective >= filter.objective;
+}
+
+// A Target is the subject of its page, so a filter never hides it; these are the ones to pin
+export function getHiddenTargetIds(
+	items: ReadonlyArray<MapSourceItem>,
+	targetIds: ReadonlyArray<string>,
+	filter: MapFilterState,
+): Array<string> {
+	if (targetIds.length === 0) return [];
+
+	const targetIdSet = new Set(targetIds);
+
+	return items
+		.filter(
+			({ properties }) => targetIdSet.has(properties.id) && !isLocationVisible(properties, filter),
+		)
+		.map(({ properties }) => properties.id);
 }
 
 // Restrict the shared directory to this map's rows before any visibility filtering

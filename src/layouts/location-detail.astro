@@ -70,7 +70,7 @@ const t = getTranslations();
 ---
 
 <ContentEntryArticle
-	atlas={isAtlasPage ? { page: 'location', targetIds: atlasTargetIds } : undefined}
+	atlas={isAtlasPage ? { page: 'pane', view: { targetIds: atlasTargetIds } } : undefined}
 	entry={entry}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}

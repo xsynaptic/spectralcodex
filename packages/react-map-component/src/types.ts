@@ -9,9 +9,6 @@ import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
 
-import type { MapFeatureOpenOptions } from '#canvas/canvas-feature-open.ts';
-import type { MapTargetSyncOptions } from '#canvas/canvas-targets-factory.ts';
-import type { MapExitControlOptions } from '#controls/controls-exit.tsx';
 import type { MapDarkModeOptions } from '#lib/dark-mode.tsx';
 import type { MapMessages } from '#lib/messages.tsx';
 
@@ -34,10 +31,8 @@ export interface MapComponentProps extends Partial<
 	center?: [number, number];
 	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
 	darkMode?: MapDarkModeOptions | undefined;
-	// Replaces the fullscreen control with a close button the host answers
-	exitControl?: MapExitControlOptions | undefined;
-	// Hands a selected Feature's page to the host, which shows it in place of the popup
-	featureOpen?: MapFeatureOpenOptions | undefined;
+	// A host application drives this map through the document; the exit control replaces fullscreen
+	host?: MapHostOptions | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
 	isObjectiveFilterEnabled?: boolean | undefined;
@@ -55,12 +50,24 @@ export interface MapComponentProps extends Partial<
 	sourceDataKey?: string | undefined;
 	style?: CSSProperties | undefined;
 	targetIds?: Array<string> | undefined;
-	// Reads Targets from the host document instead of `targetIds`, so they can change after mount
-	targetSync?: MapTargetSyncOptions | undefined;
 	version?: string | undefined;
 }
 
 export type MapGeometry = LineString | Point | Polygon;
+
+// Serializable; a persisted island never receives new props and a function cannot cross island serialization
+export interface MapHostOptions {
+	// Dispatched on `document` when the exit control is pressed
+	exitEventName: string;
+	// Dispatched on `document` as a `CustomEvent<MapFeatureOpenDetail>` once a selected Feature's url is known
+	featureOpenEventName: string;
+	// While this matches a click hands the Feature to the host in place of its popup
+	featureOpenMediaQuery: string;
+	// Dispatched on `document` whenever the view or the map container's width may have changed
+	syncEventName: string;
+	// Root attribute holding a `MapView` as JSON
+	viewAttribute: string;
+}
 
 export type MapInitialViewState = MapProps['initialViewState'];
 
@@ -74,6 +81,14 @@ export type MapScope =
 	| { ids: Array<string>; type: 'ids' }
 	| { index: number; type: 'theme' }
 	| { interval: [number, number]; type: 'region' };
+
+export interface MapTrackDetail {
+	data?: Record<string, unknown>;
+	name: string;
+}
+
+// What the host's current page asks the map to show, under the map's own prop names
+export type MapView = Pick<MapComponentProps, 'apiDivisionUrl' | 'bounds' | 'scope' | 'targetIds'>;
 
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,

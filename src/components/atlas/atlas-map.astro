@@ -2,11 +2,13 @@
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
+import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive-factory.ts';
+
 import AtlasDivider from '#components/atlas/atlas-divider.astro';
 import MapLoading from '#components/map/map-loading.astro';
 import {
 	atlasExitEventName,
-	atlasNavigateEventName,
+	atlasFeatureOpenEventName,
 	atlasPaneMediaQuery,
 	atlasPersistName,
 	atlasSyncEventName,
@@ -17,6 +19,8 @@ import { getAtlasMapData } from '#lib/map/map-atlas.ts';
 const { featureCount, hasGeodata, prefetchUrls, ...mapComponentProps } = await getAtlasMapData();
 
 const t = getTranslations();
+
+const directiveOptions: AtlasDirectiveOptions = { css: mapCssUrl, mediaQuery: atlasPaneMediaQuery };
 
 // Local to the map's own stacking context; the React component needs a number, not a class
 const zIndex = 10;
@@ -33,12 +37,16 @@ const zIndex = 10;
 		>
 			<ReactMapComponent
 				{...mapComponentProps}
-				client:atlas={mapCssUrl}
-				exitControl={{ eventName: atlasExitEventName }}
-				featureOpen={{ eventName: atlasNavigateEventName, mediaQuery: atlasPaneMediaQuery }}
+				client:atlas={JSON.stringify(directiveOptions)}
+				host={{
+					exitEventName: atlasExitEventName,
+					featureOpenEventName: atlasFeatureOpenEventName,
+					featureOpenMediaQuery: atlasPaneMediaQuery,
+					syncEventName: atlasSyncEventName,
+					viewAttribute: 'data-atlas-view',
+				}}
 				messages={{ exitAriaLabel: t('atlas.exit.label') }}
 				style={{ zIndex: zIndex + 1 }}
-				targetSync={{ attributeName: 'data-atlas-targets', eventName: atlasSyncEventName }}
 			/>
 			<MapLoading zIndex={zIndex} />
 		</div>

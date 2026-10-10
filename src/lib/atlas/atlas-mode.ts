@@ -4,51 +4,61 @@ import { navigate } from 'astro:transitions/client';
 
 import {
 	atlasExitEventName,
+	atlasFeatureOpenEventName,
 	atlasFlagStorageKey,
-	atlasHeroSelector,
-	atlasHeroSizesTemplate,
-	atlasNavigateEventName,
-	atlasPaneSizeDefault,
+	atlasPaneMediaQuery,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasPersistName,
 	atlasSyncEventName,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
+import { getPaneTokens } from '#lib/atlas/atlas-pane.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 const returnStorageKey = 'scx-atlas-return';
 
+const heroSelector = 'img[data-hero-image]';
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
 
 function dispatchSync() {
 	document.dispatchEvent(new Event(atlasSyncEventName));
 }
 
-function updateHeroSizes() {
-	const root = document.documentElement;
-	const isSplit = 'atlas' in root.dataset && root.dataset.atlasPage === 'location';
-	const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty) || atlasPaneSizeDefault;
+// The clamp atlas.css puts on the pane, behind the same media condition
+function getSplitHeroSizes(root: HTMLElement) {
+	if (!('atlas' in root.dataset) || root.dataset.atlasPage !== 'pane') return;
 
-	for (const heroImage of document.querySelectorAll<HTMLImageElement>(atlasHeroSelector)) {
+	const { mapMinRem, paneDefaultRem, paneMinRem } = getPaneTokens();
+	const paneSize =
+		root.style.getPropertyValue(atlasPaneSizeProperty) || `${String(paneDefaultRem)}rem`;
+
+	return `${atlasPaneMediaQuery} clamp(${String(paneMinRem)}rem, ${paneSize}, 100vw - ${String(mapMinRem)}rem), 100vw`;
+}
+
+function updateHeroSizes(target: Document = document) {
+	const sizes = getSplitHeroSizes(target.documentElement);
+
+	for (const heroImage of target.querySelectorAll<HTMLImageElement>(heroSelector)) {
 		if (heroImage.dataset.sizes === undefined) heroImage.dataset.sizes = heroImage.sizes;
 
-		heroImage.sizes = isSplit
-			? atlasHeroSizesTemplate.replace('[size]', () => paneSize)
-			: heroImage.dataset.sizes;
+		heroImage.sizes = sizes ?? heroImage.dataset.sizes;
 	}
 }
 
-function setFlag(isEnabled: boolean) {
-	document.documentElement.toggleAttribute('data-atlas', isEnabled);
-
+function storeFlag(isEnabled: boolean) {
 	try {
 		if (isEnabled) sessionStorage.setItem(atlasFlagStorageKey, '1');
 		else sessionStorage.removeItem(atlasFlagStorageKey);
 	} catch {
 		// sessionStorage unavailable
 	}
+}
 
+function setFlag(isEnabled: boolean) {
+	document.documentElement.toggleAttribute('data-atlas', isEnabled);
+
+	storeFlag(isEnabled);
 	updateHeroSizes();
 	dispatchSync();
 }
@@ -62,8 +72,28 @@ function getReturnPath() {
 	}
 }
 
-export function openAtlas() {
+function openAtlas() {
 	setFlag(true);
+}
+
+export function closeAtlas() {
+	setFlag(false);
+
+	// In the split, clearing the flag has already turned the pane back into the regular page
+	if (document.documentElement.dataset.atlasPage !== 'map') return;
+
+	const action = getAtlasExitAction({
+		canGoBack: 'navigation' in globalThis && navigation.canGoBack,
+		homePath: getSitePath(),
+		returnPath: getReturnPath(),
+	});
+
+	if (action.type === 'back') {
+		history.back();
+		return;
+	}
+
+	void navigate(action.path, { history: 'replace' });
 }
 
 // atlas.css clamps the request into `--atlas-pane-width`; the pane's rendered width is the settled value
@@ -81,27 +111,9 @@ export function requestPaneWidth(width: number) {
 
 // Called once by the setup script on every page; bundled scripts do not run again after a swap
 export function startAtlasMode() {
-	document.addEventListener(atlasExitEventName, () => {
-		setFlag(false);
+	document.addEventListener(atlasExitEventName, closeAtlas);
 
-		// In the split the sync event has already turned the Location back into the regular page
-		if (document.documentElement.dataset.atlasPage !== 'map') return;
-
-		const action = getAtlasExitAction({
-			canGoBack: 'navigation' in globalThis && navigation.canGoBack,
-			homePath: getSitePath(),
-			returnPath: getReturnPath(),
-		});
-
-		if (action.type === 'back') {
-			history.back();
-			return;
-		}
-
-		void navigate(action.path, { history: 'replace' });
-	});
-
-	document.addEventListener(atlasNavigateEventName, (event) => {
+	document.addEventListener(atlasFeatureOpenEventName, (event) => {
 		if (!(event instanceof CustomEvent)) return;
 
 		const { url } = event.detail as MapFeatureOpenDetail;
@@ -112,13 +124,32 @@ export function startAtlasMode() {
 		void navigate(url);
 	});
 
-	// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
+	document.addEventListener('click', (event) => {
+		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-open]')) return;
+
+		openAtlas();
+	});
+
+	// The swap copies the incoming root's attributes and inline style verbatim, so mode state is stamped here
 	document.addEventListener('astro:before-swap', (event) => {
-		const { atlasPage } = document.documentElement.dataset;
+		const root = document.documentElement;
+		const incomingRoot = event.newDocument.documentElement;
+		const isMap = incomingRoot.dataset.atlasPage === 'map';
+		const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty);
 
-		// Root attributes are the incoming page's by the time the transition is styled
-		if (atlasPage) event.newDocument.documentElement.dataset.atlasFrom = atlasPage;
+		// Visiting the full-screen map turns the mode on
+		if (isMap) storeFlag(true);
 
+		incomingRoot.toggleAttribute('data-atlas', isMap || 'atlas' in root.dataset);
+
+		if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
+
+		// The stylesheet reads where a navigation came from once the root is the incoming page's
+		if (root.dataset.atlasPage) incomingRoot.dataset.atlasFrom = root.dataset.atlasPage;
+
+		updateHeroSizes(event.newDocument);
+
+		// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
 		if (!document.querySelector(shellSelector)) return;
 		if (event.newDocument.querySelector(shellSelector)) return;
 

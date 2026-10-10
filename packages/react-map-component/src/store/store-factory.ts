@@ -129,10 +129,10 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 					setAndClearSelection({ ratingFilter });
 				},
 				setSelectedId: (selectedId) => {
+					// A selection takes the filter panel's place; clearing one leaves the panel as it is
 					set({
-						isFilterOpen: false,
 						selectedId,
-						...(selectedId === undefined ? { isPopupVisible: true } : {}),
+						...(selectedId === undefined ? { isPopupVisible: true } : { isFilterOpen: false }),
 					});
 				},
 				setStatusFilter: (statusFilter) => {

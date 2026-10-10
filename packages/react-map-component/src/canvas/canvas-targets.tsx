@@ -1,10 +1,9 @@
 import type { FC } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import type { MapTargetSyncOptions } from '#canvas/canvas-targets-factory.ts';
 import type { MapComponentProps } from '#types.ts';
 
 import {
@@ -12,24 +11,14 @@ import {
 	MapSyncedTargetMarkers,
 	MapTargetMarkers,
 } from '#canvas/canvas-markers.tsx';
-import {
-	getTargetBounds,
-	getTargetPositions,
-	getTargetZoom,
-	parseTargetIds,
-} from '#canvas/canvas-targets-factory.ts';
+import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
+import { getTargetBounds, getTargetPositions, getTargetZoom } from '#canvas/canvas-view-factory.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useDocumentAttribute, useDocumentEventValue } from '#lib/document-attribute.ts';
+import { useDocumentEventValue } from '#lib/document-attribute.ts';
 import { useMapStoreActions } from '#store/store.ts';
 
 const fitDuration = 450;
 const fitPadding = 50;
-
-function useSyncedTargetIds({ attributeName, eventName }: MapTargetSyncOptions): Array<string> {
-	const value = useDocumentAttribute(attributeName, eventName) ?? '';
-
-	return useMemo(() => parseTargetIds(value), [value]);
-}
 
 // The last popup leaves its padding on the transform, so zoom would turn around an off-centre point
 // The camera moves onto the screen centre as the padding goes, so nothing shifts
@@ -93,12 +82,11 @@ function useTargetFit(targetIds: Array<string>, eventName: string) {
 	return settledKey === key;
 }
 
-const MapSyncedTargets: FC<{ targetSync: MapTargetSyncOptions }> = function MapSyncedTargets({
-	targetSync,
-}) {
-	const targetIds = useSyncedTargetIds(targetSync);
-
-	const isSettled = useTargetFit(targetIds, targetSync.eventName);
+const MapSyncedTargets: FC<{
+	syncEventName: string;
+	targetIds: Array<string>;
+}> = function MapSyncedTargets({ syncEventName, targetIds }) {
+	const isSettled = useTargetFit(targetIds, syncEventName);
 
 	return (
 		<>
@@ -108,14 +96,15 @@ const MapSyncedTargets: FC<{ targetSync: MapTargetSyncOptions }> = function MapS
 	);
 };
 
-export const MapTargets: FC<Pick<MapComponentProps, 'targetIds' | 'targetSync'>> =
-	function MapTargets({ targetIds, targetSync }) {
-		if (targetSync) return <MapSyncedTargets targetSync={targetSync} />;
+export const MapTargets: FC<Pick<MapComponentProps, 'host'>> = function MapTargets({ host }) {
+	const targetIds = useMapTargetIds();
 
-		return (
-			<>
-				{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
-				<MapSelectedMarker targetIds={targetIds} />
-			</>
-		);
-	};
+	if (host) return <MapSyncedTargets syncEventName={host.syncEventName} targetIds={targetIds} />;
+
+	return (
+		<>
+			<MapTargetMarkers targetIds={targetIds} />
+			<MapSelectedMarker targetIds={targetIds} />
+		</>
+	);
+};

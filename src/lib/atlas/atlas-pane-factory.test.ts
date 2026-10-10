@@ -6,22 +6,15 @@ import {
 	getPaneWidthRange,
 } from '#lib/atlas/atlas-pane-factory.ts';
 
-const limits = { rootFontSize: 16, viewportWidth: 1600 };
+const limits = { mapMin: 320, paneMin: 640, rootFontSize: 16, viewportWidth: 1600 };
 
 describe('getPaneWidthRange', () => {
 	test('the pane spans from its own minimum to what leaves the map its minimum', () => {
 		expect(getPaneWidthRange(limits)).toEqual({ max: 1280, min: 640 });
 	});
 
-	test('limits scale with the root font size', () => {
-		expect(getPaneWidthRange({ rootFontSize: 20, viewportWidth: 1600 })).toEqual({
-			max: 1200,
-			min: 800,
-		});
-	});
-
 	test('the pane minimum wins when the viewport cannot hold both', () => {
-		expect(getPaneWidthRange({ rootFontSize: 16, viewportWidth: 900 })).toEqual({
+		expect(getPaneWidthRange({ ...limits, viewportWidth: 900 })).toEqual({
 			max: 640,
 			min: 640,
 		});
@@ -39,7 +32,7 @@ describe('clampPaneWidth', () => {
 	});
 
 	test('a width stored on a wider viewport shrinks to fit a narrower one', () => {
-		expect(clampPaneWidth(1280, { rootFontSize: 16, viewportWidth: 1100 })).toBe(780);
+		expect(clampPaneWidth(1280, { ...limits, viewportWidth: 1100 })).toBe(780);
 	});
 });
 

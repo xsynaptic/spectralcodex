@@ -1,20 +1,11 @@
-import { atlasExitEventName, atlasSyncEventName } from '#lib/atlas/atlas-constants.ts';
-import { requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
+import { atlasSyncEventName } from '#lib/atlas/atlas-constants.ts';
+import { closeAtlas, requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
 import {
 	clampPaneWidth,
 	getPaneWidthForKey,
 	getPaneWidthRange,
 } from '#lib/atlas/atlas-pane-factory.ts';
-
-function getLimits() {
-	const root = document.documentElement;
-
-	return {
-		rootFontSize: Number(getComputedStyle(root).fontSize.replace('px', '')),
-		// Excludes the scrollbar, as the pane's right edge does
-		viewportWidth: root.clientWidth,
-	};
-}
+import { getPaneLimits } from '#lib/atlas/atlas-pane.ts';
 
 // The host carries the position, so the controls beside the handle follow a drag
 class AtlasDivider extends HTMLElement {
@@ -58,11 +49,11 @@ class AtlasDivider extends HTMLElement {
 	#handleClick = (event: MouseEvent) => {
 		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-expand]')) return;
 
-		document.dispatchEvent(new Event(atlasExitEventName));
+		closeAtlas();
 	};
 
 	#handleKeyDown = (event: KeyboardEvent) => {
-		const width = getPaneWidthForKey(event.key, this.#getPaneWidth(), getLimits());
+		const width = getPaneWidthForKey(event.key, this.#getPaneWidth(), getPaneLimits());
 
 		if (width === undefined) return;
 
@@ -84,7 +75,7 @@ class AtlasDivider extends HTMLElement {
 	#handlePointerMove = (event: PointerEvent) => {
 		if (!this.#handle?.hasPointerCapture(event.pointerId)) return;
 
-		const limits = getLimits();
+		const limits = getPaneLimits();
 
 		this.#dragWidth = clampPaneWidth(limits.viewportWidth - event.clientX, limits);
 		this.style.right = `${String(this.#dragWidth)}px`;
@@ -109,7 +100,7 @@ class AtlasDivider extends HTMLElement {
 	}
 
 	#updateValue = () => {
-		const { max, min } = getPaneWidthRange(getLimits());
+		const { max, min } = getPaneWidthRange(getPaneLimits());
 
 		this.#handle?.setAttribute('aria-valuemin', String(Math.round(min)));
 		this.#handle?.setAttribute('aria-valuemax', String(Math.round(max)));

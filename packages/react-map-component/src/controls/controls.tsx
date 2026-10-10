@@ -18,9 +18,7 @@ import { useIsMapCanvasInteractive } from '#store/store.ts';
 
 const isFeatureSearchControl = false as boolean;
 
-export const MapControls: FC<Pick<MapComponentProps, 'exitControl'>> = function MapControls({
-	exitControl,
-}) {
+export const MapControls: FC<Pick<MapComponentProps, 'host'>> = function MapControls({ host }) {
 	const isCanvasInteractive = useIsMapCanvasInteractive();
 
 	return (
@@ -29,8 +27,8 @@ export const MapControls: FC<Pick<MapComponentProps, 'exitControl'>> = function 
 			<AttributionControl compact={true} position="bottom-right" />
 			{isCanvasInteractive ? (
 				<>
-					{exitControl ? (
-						<ExitControl eventName={exitControl.eventName} position="top-left" />
+					{host ? (
+						<ExitControl eventName={host.exitEventName} position="top-left" />
 					) : (
 						<FullscreenControl position="top-left" />
 					)}
