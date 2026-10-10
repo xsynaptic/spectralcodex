@@ -13,6 +13,7 @@ import * as R from 'remeda';
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
 
 import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
+import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
 import { controlFilterId, mediaQueryMobile } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
@@ -157,6 +158,7 @@ function useClickHandler(isPopupEnabled: boolean) {
 
 	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
 		useMapStoreActions();
+	const targetIds = useMapTargetIds();
 
 	const selectPoint = useCallback(
 		(
@@ -168,7 +170,8 @@ function useClickHandler(isPopupEnabled: boolean) {
 			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			if (!center || !isPopupEnabled) return;
+			// Popups are off in atlas mode, except for a Point of the Location already open
+			if (!center || !(isPopupEnabled || targetIds.includes(pointId))) return;
 
 			setPopupVisible(false);
 
@@ -185,7 +188,15 @@ function useClickHandler(isPopupEnabled: boolean) {
 					: { bottom: 0, left: 0, right: 180, top: 0 },
 			});
 		},
-		[isMobile, isPopupEnabled, setSelectedId, setClickedId, setHoveredId, setPopupVisible],
+		[
+			isMobile,
+			isPopupEnabled,
+			setSelectedId,
+			setClickedId,
+			setHoveredId,
+			setPopupVisible,
+			targetIds,
+		],
 	);
 
 	return useCallback<NonNullable<MapCallbacks['onClick']>>(

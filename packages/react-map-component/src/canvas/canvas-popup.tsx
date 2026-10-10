@@ -9,6 +9,7 @@ import { Popup } from 'react-map-gl/maplibre';
 import type { MapTrackDetail } from '#types.ts';
 
 import { useFeatureOpenDispatch } from '#canvas/canvas-feature-open.ts';
+import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
 import { mapTrackEventName, mediaQueryMobile } from '#constants.ts';
 import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
@@ -526,6 +527,7 @@ export const MapPopup: FC<{
 	isDev?: boolean | undefined;
 }> = function MapPopup({ featureOpenEventName, imageServerUrl = '', isDev }) {
 	const { isLoading, popupItem } = useMapCanvasPopup();
+	const targetIds = useMapTargetIds();
 
 	useMapImagePreload({ imageServerUrl, isEnabled: !featureOpenEventName });
 	useFeatureOpenDispatch(featureOpenEventName, popupItem?.url);
@@ -534,7 +536,10 @@ export const MapPopup: FC<{
 	if (!popupItem) return;
 
 	// A Feature with no page of its own still gets its popup
-	if (featureOpenEventName && (isLoading || popupItem.url)) return;
+	// So does a Point of the Location already open, since clicking it has nowhere to navigate
+	if (featureOpenEventName && !targetIds.includes(popupItem.id) && (isLoading || popupItem.url)) {
+		return;
+	}
 
 	return (
 		<MapPopupFrame
