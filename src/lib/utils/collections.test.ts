@@ -61,6 +61,7 @@ describe('createCollectionData', () => {
 		expect(getCollectionMock).toHaveBeenCalledTimes(1);
 	});
 
+	// A failure after an Astro upgrade means getCollection started cloning entries, which silently breaks in-place enrichment
 	test('keys entriesMap by id and shares entry objects with mutate', async () => {
 		const { createCollectionData } = await importCollections();
 

@@ -19,6 +19,7 @@ check:
             run: prettier --check . --cache --log-level warn
           - name: js
             run: eslint --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/
+          # Uncached on purpose; a stale knip cache once reported a live devDependency as unused
           - name: unused
             run: knip
           # Dead code stays with knip; fallow's unused-code rules are off in .fallowrc.jsonc
@@ -47,6 +48,7 @@ fix:
             run: eslint --fix --cache --cache-location node_modules/.cache/eslint/
     - name: astro
       run: astro check
+    # `fallow fix` stays unwired; it strips unused exports and would unexport work in progress
     - name: verify
       group:
         parallel: true

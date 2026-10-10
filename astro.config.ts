@@ -226,6 +226,7 @@ export default defineConfig({
 	},
 	vite: {
 		build: {
+			// Inlines only the smallest client scripts; anything larger stays a separate file for cache granularity
 			assetsInlineLimit: 1024,
 			rollupOptions: {
 				output: {
