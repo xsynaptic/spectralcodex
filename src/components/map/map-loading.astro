@@ -1,0 +1,23 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	zIndex: number;
+}
+
+const { zIndex } = Astro.props;
+
+const t = getTranslations();
+---
+
+<div
+	class:list={[
+		'map-loading absolute flex h-full w-full justify-center',
+		'text-primary-700 dark:text-highlight-400',
+	]}
+	role="status"
+	style={{ zIndex }}
+>
+	<span class="map-loading-label sr-only">{t('section.map.loading')}</span>
+	<div class="loading-animation w-1/5"></div>
+</div>

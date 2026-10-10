@@ -7,6 +7,8 @@ export type DividerContent = 'chevron' | 'dot' | 'slash';
 
 export type DividerWeight = 'thin';
 
+export type AtlasPageProps = { page: 'location'; targetIds: Array<string> } | { page: 'map' };
+
 // Meta component types
 export interface MetaProps {
 	article?: {
@@ -24,6 +26,7 @@ export interface MetaProps {
 	noIndex?: boolean;
 	ogType?: 'article' | 'website' | undefined;
 	prefetchUrls?: Array<string> | undefined;
+	preloadUrls?: Array<string> | undefined;
 	title?: string | undefined;
 }
 

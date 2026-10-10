@@ -1,0 +1,124 @@
+.atlas-shell {
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-index-header);
+
+	/* Hidden rather than removed so the live canvas keeps its size and state */
+	visibility: hidden;
+}
+
+:root[data-atlas-page='map'] .atlas-shell {
+	visibility: visible;
+}
+
+.atlas-divider {
+	display: none;
+}
+
+.atlas-open {
+	display: flex;
+}
+
+@media (width >= 64rem) {
+	:root[data-atlas][data-atlas-page='location'] {
+		--atlas-pane-width: clamp(40rem, var(--atlas-pane-size, 45rem), 100vw - 20rem);
+
+		.main-pane {
+			position: relative;
+			width: var(--atlas-pane-width);
+			margin-left: auto;
+		}
+
+		.progress-bar {
+			right: 0;
+			left: auto;
+			width: var(--atlas-pane-width);
+		}
+
+		.atlas-shell {
+			right: var(--atlas-pane-width);
+			visibility: visible;
+		}
+
+		.atlas-divider {
+			position: fixed;
+			inset-block: 0;
+			right: var(--atlas-pane-width);
+			z-index: var(--z-index-divider);
+			display: block;
+			width: 0.75rem;
+			translate: 50%;
+		}
+
+		.atlas-divider-handle {
+			position: relative;
+			height: 100%;
+			touch-action: none;
+			cursor: col-resize;
+
+			&::before,
+			&::after {
+				position: absolute;
+				inset-block: 0;
+				left: 50%;
+				content: '';
+				translate: -50%;
+			}
+
+			&::before {
+				width: 1px;
+				background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+			}
+
+			&::after {
+				width: 3px;
+				background-color: light-dark(var(--color-primary-400), var(--color-primary-500));
+				border-radius: 3px;
+				opacity: 0;
+				transition: opacity 200ms ease-out;
+			}
+
+			&:is(:focus-visible, [data-dragging])::after {
+				opacity: 1;
+			}
+
+			@media (hover: hover) {
+				&:hover::after {
+					opacity: 1;
+				}
+			}
+		}
+
+		.atlas-divider-close {
+			position: absolute;
+			top: 0.75rem;
+			right: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 1.5rem;
+			height: 2.5rem;
+			color: light-dark(var(--color-primary-500), var(--color-primary-400));
+			background-color: var(--color-body-bg);
+			border: 1px solid light-dark(var(--color-primary-200), var(--color-primary-700));
+			border-right: 0;
+			border-radius: var(--radius-md) 0 0 var(--radius-md);
+			transition: color var(--default-transition-duration) linear;
+
+			&:focus-visible {
+				color: light-dark(var(--color-primary-800), var(--color-primary-100));
+			}
+
+			@media (hover: hover) {
+				&:hover {
+					color: light-dark(var(--color-primary-800), var(--color-primary-100));
+				}
+			}
+		}
+
+		.atlas-open,
+		.atlas-inline-map {
+			display: none;
+		}
+	}
+}

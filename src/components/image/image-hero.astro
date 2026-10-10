@@ -42,7 +42,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 	>
 		<div
 			class:list={[
-				'pointer-events-none top-0 right-0 left-0 z-image-shadow block h-0 w-full text-transparent select-none sm:absolute sm:h-image-shadow-sm md:h-image-shadow-md lg:h-image-shadow-lg',
+				'pointer-events-none top-0 right-0 left-0 z-image-shadow block h-0 w-full text-transparent select-none sm:absolute sm:h-image-shadow-sm pane-md:h-image-shadow-md pane-lg:h-image-shadow-lg',
 				'sm:bg-gradient-a',
 			]}
 		/>
@@ -84,7 +84,7 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 			class:list={[
 				'pointer-events-none right-0 bottom-0 left-0 z-image-shadow block h-0 w-full select-none sm:absolute',
 				withTitle
-					? 'sm:min-h-image-shadow-md md:h-image-shadow-lg lg:h-image-shadow-xl'
+					? 'sm:min-h-image-shadow-md pane-md:h-image-shadow-lg pane-lg:h-image-shadow-xl'
 					: 'sm:min-h-image-gradient',
 				'sm:bg-gradient-b',
 			]}

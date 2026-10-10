@@ -170,6 +170,14 @@ const translationStrings = {
 		'carousel.slide.label': '{current} of {total}',
 		'carousel.slide.roledescription': 'slide',
 
+		// Atlas
+		'atlas.close.label': 'Close Location',
+		'atlas.description': 'A full-screen map of every Location in Taiwan.',
+		'atlas.divider.label': 'Resize map and content',
+		'atlas.exit.label': 'Leave atlas',
+		'atlas.open.label': 'Open in atlas',
+		'atlas.title': 'Atlas',
+
 		// Objectives
 		'objectives.description':
 			'This is a custom map tracking points in the geospatial database that still require verification and documentation. It is not intended for external consumption.',

@@ -15,6 +15,9 @@
 @source inline('sr-only');
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+@custom-variant pane-md (@container pane (width >= 48rem));
+@custom-variant pane-lg (@container pane (width >= 64rem));
+@custom-variant pane-xl (@container pane (width >= 80rem));
 
 @import './main/parts/theme.css';
 @import './main/parts/utilities.css';
@@ -23,6 +26,7 @@
 @import './main/parts/base.css' layer(base);
 @import './main/components/activity-graph.css' layer(components);
 @import './main/components/anchor.css' layer(components);
+@import './main/components/atlas.css' layer(components);
 @import './main/components/carousel.css' layer(components);
 @import './main/components/chrome.css' layer(components);
 @import './main/components/colophon.css' layer(components);

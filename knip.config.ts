@@ -9,6 +9,7 @@ export default {
 				'src/components/mdx/*.astro',
 				'src/dev/inventory/inventory.astro',
 				'src/dev/inventory/inventory-og-image.ts',
+				'src/lib/atlas/atlas-directive.ts', // Client directive entrypoint; registered by path, not imported
 				'deploy/cache-warmer/cache-warm.ts', // Docker container entrypoint, not imported
 			],
 			ignoreDependencies: [

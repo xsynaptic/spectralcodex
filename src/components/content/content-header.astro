@@ -36,8 +36,8 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			class:list={[
 				'title-ml -ml-0.5 pb-1 text-base leading-snug font-medium',
 				hasHeroImage
-					? 'text-lg sm:-mb-1 sm:drop-shadow-xs md:text-xl lg:text-2xl'
-					: 'text-lg md:text-xl lg:text-2xl',
+					? 'text-lg sm:-mb-1 sm:drop-shadow-xs pane-md:text-xl pane-lg:text-2xl'
+					: 'text-lg pane-md:text-xl pane-lg:text-2xl',
 			]}
 			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 			{...(titleMultilingualText
@@ -57,8 +57,8 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			class:list={[
 				'-ml-0.5 pb-2 font-display text-2xl leading-[1.125] font-semibold',
 				hasHeroImage
-					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
-					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
+					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm pane-md:text-4xl pane-lg:text-5xl'
+					: 'mb-0 sm:-mb-2 pane-md:text-3xl pane-lg:text-4xl',
 			]}
 			washColor={hasHeroImage ? 'primary-featured' : 'primary'}
 		>
@@ -75,7 +75,11 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			]}
 			data-pagefind-ignore
 		>
-			{subtitle ? <Fragment set:html={subtitle} /> : undefined}
+			{subtitle ? (
+				<div class="contents">
+					<Fragment set:html={subtitle} />
+				</div>
+			) : undefined}
 			{caption ? (
 				<div class="flex flex-1 flex-nowrap items-end justify-end gap-1">
 					<Fragment set:html={caption} />

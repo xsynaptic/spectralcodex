@@ -46,10 +46,11 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	>
 		<Image
 			class:list={[
-				'z-image max-h-screen min-h-100 w-full text-sm text-transparent xl:min-h-screen',
-				'aspect-3/2 sm:aspect-5/4 md:aspect-3/2 lg:aspect-video xl:aspect-auto',
+				'z-image max-h-screen min-h-100 w-full text-sm text-transparent pane-xl:min-h-screen',
+				'aspect-3/2 pane-lg:aspect-video pane-xl:aspect-auto',
 				showMicroformats ? MicroformatClassNames.Photo : undefined,
 			]}
+			data-hero-image
 			{...imageProps}
 		/>
 		{caption ? (

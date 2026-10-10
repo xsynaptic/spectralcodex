@@ -1,0 +1,72 @@
+---
+import {
+	atlasFlagStorageKey,
+	atlasHeroSelector,
+	atlasHeroSizesTemplate,
+	atlasPaneSizeDefault,
+	atlasPaneSizeProperty,
+	atlasPaneStorageKey,
+} from '#lib/atlas/atlas-constants.ts';
+---
+
+<script
+	define:vars={{
+		flagStorageKey: atlasFlagStorageKey,
+		heroSelector: atlasHeroSelector,
+		heroSizesTemplate: atlasHeroSizesTemplate,
+		paneSizeDefault: atlasPaneSizeDefault,
+		paneSizeProperty: atlasPaneSizeProperty,
+		paneStorageKey: atlasPaneStorageKey,
+	}}
+	is:inline
+>
+	const root = document.documentElement;
+
+	// ClientRouter replaces the attributes on `<html>` at every swap, inline style included
+	const applyAtlasFlag = () => {
+		let isEnabled = root.dataset.atlasPage === 'map';
+
+		try {
+			if (isEnabled) sessionStorage.setItem(flagStorageKey, '1');
+			else isEnabled = sessionStorage.getItem(flagStorageKey) === '1';
+		} catch {
+			// sessionStorage unavailable
+		}
+
+		if (isEnabled) root.dataset.atlas = '';
+
+		let paneSize;
+
+		try {
+			paneSize = Number(localStorage.getItem(paneStorageKey));
+		} catch {
+			// localStorage unavailable
+		}
+
+		if (Number.isFinite(paneSize) && paneSize > 0) {
+			root.style.setProperty(paneSizeProperty, `${paneSize}px`);
+		}
+	};
+
+	const sizeAtlasHero = (event) => {
+		if (!('atlas' in root.dataset)) return;
+		if (event.newDocument.documentElement.dataset.atlasPage !== 'location') return;
+
+		const paneSize = root.style.getPropertyValue(paneSizeProperty) || paneSizeDefault;
+
+		for (const heroImage of event.newDocument.querySelectorAll(heroSelector)) {
+			heroImage.dataset.sizes = heroImage.sizes;
+			heroImage.sizes = heroSizesTemplate.replace('[size]', () => paneSize);
+		}
+	};
+
+	applyAtlasFlag();
+	document.addEventListener('astro:before-swap', sizeAtlasHero);
+	document.addEventListener('astro:after-swap', applyAtlasFlag);
+</script>
+
+<script>
+	import { startAtlasMode } from '#lib/atlas/atlas-mode.ts';
+
+	startAtlasMode();
+</script>

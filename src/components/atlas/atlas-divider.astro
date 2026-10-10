@@ -1,0 +1,31 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
+
+const t = getTranslations();
+---
+
+<atlas-divider class="atlas-divider">
+	<div
+		aria-label={t('atlas.divider.label')}
+		aria-orientation="vertical"
+		class="atlas-divider-handle"
+		role="separator"
+	></div>
+	<a
+		aria-label={t('atlas.close.label')}
+		class="atlas-divider-close"
+		data-astro-prefetch="false"
+		data-umami-event="atlas-close"
+		href={getSitePath('atlas')}
+		title={t('atlas.close.label')}
+	>
+		<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
+			<use href="#icon:chevron-right"></use>
+		</svg>
+	</a>
+</atlas-divider>
+
+<script>
+	import '#components/atlas/atlas-divider.ts';
+</script>
