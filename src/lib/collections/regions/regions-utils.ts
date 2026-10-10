@@ -13,6 +13,7 @@ import {
 } from '#lib/collections/regions/regions-data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
+import { getAtlasRegionView } from '#lib/map/map-atlas.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -71,7 +72,7 @@ export async function createQueryRegionsEntryFunction() {
 			locationCount: entryLocations.length,
 			mapId: `${entry.collection}/${entry.id}`,
 			version,
-			...(regionInterval ? { scope: { interval: regionInterval, type: 'region' } } : {}),
+			...(regionInterval ? { mapFeaturesRule: { interval: regionInterval, type: 'region' } } : {}),
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {
@@ -83,6 +84,7 @@ export async function createQueryRegionsEntryFunction() {
 		const backlinksCount = catalog.backlinksOf(entry.id).length;
 
 		return {
+			atlasView: getAtlasRegionView(entry.id, mapData, regionsTree.intervalById),
 			backlinksCount,
 			catalogItems,
 			catalogItemsCount,

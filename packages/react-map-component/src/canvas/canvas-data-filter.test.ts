@@ -8,6 +8,7 @@ import {
 import { describe, expect, test } from 'vitest';
 
 import type { MapFilterState } from '#canvas/canvas-data-filter.ts';
+import type { MapFeaturesRule } from '#types.ts';
 
 import {
 	getHiddenTargetIds,
@@ -143,7 +144,7 @@ describe('getMapCanvasData', () => {
 		});
 
 		expect(result.filteredCount).toBe(1);
-		expect(result.totalCount).toBe(2); // totalCount is the scoped total, before visibility
+		expect(result.totalCount).toBe(2); // totalCount is the map features total, before visibility
 	});
 
 	test('a pinned item is drawn whatever the filter hides', () => {
@@ -157,11 +158,11 @@ describe('getMapCanvasData', () => {
 		]);
 	});
 
-	test('a pinned item outside the scope stays out', () => {
+	test('a pinned item outside the map features stays out', () => {
 		const result = getMapCanvasData(
 			[makeItem({ id: 'target', themeIndices: [1] })],
 			{ ...passAll, pinnedIds: ['target'] },
-			{ index: 2, type: 'theme' },
+			{ mapFeaturesRule: { index: 2, type: 'theme' } },
 		);
 
 		expect(result.pointCollection).toBeUndefined();
@@ -193,21 +194,22 @@ describe('getHiddenTargetIds', () => {
 	});
 });
 
-describe('getMapCanvasData scope', () => {
+describe('getMapCanvasData map features', () => {
 	const inside = makeItem({ id: 'inside', regionOrdinals: [5], themeIndices: [2] });
 	const outside = makeItem({ id: 'outside', regionOrdinals: [99], themeIndices: [7] });
 
-	test('theme scope keeps only points carrying the theme index', () => {
-		const result = getMapCanvasData([inside, outside], passAll, { index: 2, type: 'theme' });
+	test('theme rule keeps only points carrying the theme index', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			mapFeaturesRule: { index: 2, type: 'theme' },
+		});
 
 		expect(result.totalCount).toBe(1);
 		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
 	});
 
-	test('ids scope preserves the list order', () => {
+	test('ids rule preserves the list order', () => {
 		const result = getMapCanvasData([inside, outside], passAll, {
-			ids: ['outside', 'inside'],
-			type: 'ids',
+			mapFeaturesRule: { ids: ['outside', 'inside'], type: 'ids' },
 		});
 
 		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
@@ -216,7 +218,7 @@ describe('getMapCanvasData scope', () => {
 		]);
 	});
 
-	test('region scope is inclusive at both ends of the interval', () => {
+	test('region rule is inclusive at both ends of the interval', () => {
 		const items = [
 			makeItem({ id: 'below-left', regionOrdinals: [3] }),
 			makeItem({ id: 'at-left', regionOrdinals: [4] }),
@@ -224,7 +226,9 @@ describe('getMapCanvasData scope', () => {
 			makeItem({ id: 'above-right', regionOrdinals: [11] }),
 		];
 
-		const result = getMapCanvasData(items, passAll, { interval: [4, 10], type: 'region' });
+		const result = getMapCanvasData(items, passAll, {
+			mapFeaturesRule: { interval: [4, 10], type: 'region' },
+		});
 
 		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
 			'at-left',
@@ -235,15 +239,16 @@ describe('getMapCanvasData scope', () => {
 	test('an item in several regions is kept when any one ordinal is inside', () => {
 		const item = makeItem({ id: 'multi', regionOrdinals: [99, 5] });
 
-		const result = getMapCanvasData([item], passAll, { interval: [1, 10], type: 'region' });
+		const result = getMapCanvasData([item], passAll, {
+			mapFeaturesRule: { interval: [1, 10], type: 'region' },
+		});
 
 		expect(result.totalCount).toBe(1);
 	});
 
-	test('ids scope drops ids missing from the index', () => {
+	test('ids rule drops ids missing from the index', () => {
 		const result = getMapCanvasData([inside, outside], passAll, {
-			ids: ['inside', 'nope'],
-			type: 'ids',
+			mapFeaturesRule: { ids: ['inside', 'nope'], type: 'ids' },
 		});
 
 		expect(result.totalCount).toBe(1);
@@ -252,18 +257,89 @@ describe('getMapCanvasData scope', () => {
 		]);
 	});
 
-	test('points missing the relevant column are excluded by a scope', () => {
+	test('points missing the relevant column are excluded by a rule', () => {
 		const bare = makeItem({ id: 'bare' });
 
 		expect(
-			getMapCanvasData([bare], passAll, { interval: [1, 10], type: 'region' }).totalCount,
+			getMapCanvasData([bare], passAll, { mapFeaturesRule: { interval: [1, 10], type: 'region' } })
+				.totalCount,
 		).toBe(0);
-		expect(getMapCanvasData([bare], passAll, { index: 2, type: 'theme' }).totalCount).toBe(0);
+		expect(
+			getMapCanvasData([bare], passAll, { mapFeaturesRule: { index: 2, type: 'theme' } })
+				.totalCount,
+		).toBe(0);
 	});
 
-	test('no scope leaves every point in scope', () => {
+	test('no rule keeps every point', () => {
 		const result = getMapCanvasData([inside, outside], passAll);
 
 		expect(result.totalCount).toBe(2);
+	});
+});
+
+describe('getMapCanvasData page features', () => {
+	const inside = makeItem({ id: 'inside', regionOrdinals: [5] });
+	const outside = makeItem({ id: 'outside', regionOrdinals: [99] });
+	const outsideLine = makeItem({ id: 'outside-line', regionOrdinals: [99] }, lineGeometry);
+
+	const mapFeaturesRule: MapFeaturesRule = { interval: [1, 100], type: 'region' };
+	const pageFeaturesRule: MapFeaturesRule = { interval: [4, 10], type: 'region' };
+
+	test('items outside the page features stay on the map, marked', () => {
+		const result = getMapCanvasData([inside, outside, outsideLine], passAll, {
+			mapFeaturesRule,
+			pageFeaturesRule,
+		});
+
+		expect(result.totalCount).toBe(3);
+		expect(result.filteredCount).toBe(3);
+		expect(
+			result.pointCollection?.features.map(({ properties }) => properties.isOtherFeature),
+		).toEqual([undefined, true]);
+		expect(result.lineStringCollection?.features[0]?.properties.isOtherFeature).toBe(true);
+	});
+
+	test('a marked item is a copy; the cached source item is never marked', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			mapFeaturesRule,
+			pageFeaturesRule,
+		});
+		const [insideFeature, outsideFeature] = result.pointCollection?.features ?? [];
+
+		expect(insideFeature?.properties).toBe(inside.properties);
+		expect(outsideFeature?.properties).not.toBe(outside.properties);
+		expect('isOtherFeature' in outside.properties).toBe(false);
+	});
+
+	test('map features still remove; page features only mark what is left', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			mapFeaturesRule: { interval: [1, 10], type: 'region' },
+			pageFeaturesRule,
+		});
+
+		expect(result.pointCollection?.features.map(({ properties }) => properties.id)).toEqual([
+			'inside',
+		]);
+	});
+
+	test('page features covering the whole map mark nothing', () => {
+		const result = getMapCanvasData([inside, outside], passAll, {
+			mapFeaturesRule,
+			pageFeaturesRule: mapFeaturesRule,
+		});
+
+		expect(
+			result.pointCollection?.features.some(({ properties }) => properties.isOtherFeature),
+		).toBe(false);
+	});
+
+	test('a filter hides an other feature like any item', () => {
+		const result = getMapCanvasData(
+			[inside, outside],
+			{ ...passAll, status: [LocationStatusEnum.Abandoned] },
+			{ mapFeaturesRule, pageFeaturesRule },
+		);
+
+		expect(result.filteredCount).toBe(0);
 	});
 });

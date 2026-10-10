@@ -9,7 +9,7 @@ import { Popup } from 'react-map-gl/maplibre';
 import type { MapTrackDetail } from '#types.ts';
 
 import { useFeatureOpenDispatch } from '#canvas/canvas-feature-open.ts';
-import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
+import { useMapTargetIds } from '#canvas/canvas-view.tsx';
 import { mapTrackEventName, mediaQueryMobile } from '#constants.ts';
 import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';

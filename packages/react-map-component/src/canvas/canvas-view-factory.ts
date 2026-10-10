@@ -17,7 +17,7 @@ const MapViewSchema = z.object({
 			z.tuple([PositionSchema, PositionSchema]),
 		])
 		.exactOptional(),
-	scope: z
+	pageFeaturesRule: z
 		.discriminatedUnion('type', [
 			z.object({ ids: z.array(z.string()), type: z.literal('ids') }),
 			z.object({ index: z.number(), type: z.literal('theme') }),
@@ -110,12 +110,14 @@ export function getTargetZoom(zoom: number, fitZoom: number) {
 
 const fitDurationBase = 450;
 const fitDurationPerZoomLevel = 200;
+const fitDurationPerScreen = 250;
 const fitDurationMax = 1800;
 
-// Tiles cannot keep up with a long zoom at the base duration
-export function getTargetDuration(zoom: number, targetZoom: number) {
+export function getTargetDuration(zoomLevels: number, screens: number) {
 	return Math.min(
 		fitDurationMax,
-		fitDurationBase + Math.abs(targetZoom - zoom) * fitDurationPerZoomLevel,
+		fitDurationBase +
+			Math.abs(zoomLevels) * fitDurationPerZoomLevel +
+			screens * fitDurationPerScreen,
 	);
 }

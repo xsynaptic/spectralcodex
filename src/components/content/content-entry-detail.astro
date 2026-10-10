@@ -3,6 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
+import type { AtlasPageProps } from '#components/types.ts';
+
 import ContentArticle from '#components/content/content-article.astro';
 import ContentHeader from '#components/content/content-header.astro';
 import ImageHero from '#components/image/image-hero.astro';
@@ -16,12 +18,13 @@ import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
+	atlas?: AtlasPageProps | undefined;
 	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
 	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
 	prefetchUrls: Array<string> | undefined;
 }
 
-const { breadcrumbRegions, entry, prefetchUrls } = Astro.props;
+const { atlas, breadcrumbRegions, entry, prefetchUrls } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -38,6 +41,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 ---
 
 <MainSite
+	atlas={atlas}
 	hasHeroImage={hasHeroImage}
 	meta={{
 		description: await getDescriptionRenderedText(entry),
@@ -63,6 +67,9 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 				<Fragment slot="header-title">{stripDiacritics(entry.data.title)}</Fragment>
 				<Fragment slot="header-title-multilingual">
 					<TextMultilingual content={titleMultilingual} />
+				</Fragment>
+				<Fragment slot="header-caption">
+					<slot name="header-caption" />
 				</Fragment>
 				<Fragment slot="header-subtitle">
 					<slot name="header-subtitle" />

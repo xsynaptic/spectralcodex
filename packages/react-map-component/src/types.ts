@@ -37,14 +37,13 @@ export interface MapComponentProps extends Partial<
 	isDev?: boolean | undefined;
 	isObjectiveFilterEnabled?: boolean | undefined;
 	languages?: Array<string> | undefined;
+	mapFeaturesRule?: MapFeaturesRule | undefined;
 	mapId?: string | undefined;
 	// Host-overridable UI strings; merged over English defaults
 	messages?: Partial<MapMessages> | undefined;
 	popupData?: Array<MapPopupItemCompressed> | undefined;
 	popupDataKey?: string | undefined;
 	protomapsApiKey?: string | undefined;
-	// Big maps fetch the shared directory and keep only the rows their scope selects
-	scope?: MapScope | undefined;
 	sourceData?: Array<MapSourceItemCompressed> | undefined;
 	// Per-map content hashes that cache-key inline source/popup datasets
 	sourceDataKey?: string | undefined;
@@ -72,12 +71,12 @@ export interface MapHostOptions {
 export type MapInitialViewState = MapProps['initialViewState'];
 
 /**
- * Per-map scope over the shared global directory; a big map keeps only the rows its scope selects
+ * Selects Features from the shared global directory
  * - region: keep points whose region ordinal falls inside the subtree interval
  * - theme: keep points carrying the theme index
  * - ids: keep the explicit, order-preserving feature-id list
  */
-export type MapScope =
+export type MapFeaturesRule =
 	| { ids: Array<string>; type: 'ids' }
 	| { index: number; type: 'theme' }
 	| { interval: [number, number]; type: 'region' };
@@ -87,10 +86,16 @@ export interface MapTrackDetail {
 	name: string;
 }
 
-// What the host's current page asks the map to show, under the map's own prop names
-export type MapView = Pick<MapComponentProps, 'apiDivisionUrl' | 'bounds' | 'scope' | 'targetIds'>;
+export interface MapView extends Pick<
+	MapComponentProps,
+	'apiDivisionUrl' | 'bounds' | 'targetIds'
+> {
+	pageFeaturesRule?: MapFeaturesRule | undefined;
+}
+
+export type MapCanvasItem = MapSourceItem & { properties: { isOtherFeature?: true } };
 
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
-	MapSourceItem['properties']
+	MapCanvasItem['properties']
 >;

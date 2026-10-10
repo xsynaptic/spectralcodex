@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import type { MapComponentProps } from '#types.ts';
 
 import { useMapCanvasData } from '#canvas/canvas-data.tsx';
-import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
+import { useMapView } from '#canvas/canvas-view.tsx';
 import { useMapApiDivisionData } from '#data/data-division.ts';
 import { MapSourceDebug } from '#source/source-debug.tsx';
 import { MapSourceDivisions } from '#source/source-divisions.tsx';
@@ -20,15 +20,18 @@ const emptyFeatureCollection: FeatureCollection<never, never> = {
 };
 
 export const MapSource: FC<
-	Pick<MapComponentProps, 'apiDivisionUrl' | 'isDev'> & {
+	Pick<MapComponentProps, 'apiDivisionUrl' | 'host' | 'isDev'> & {
 		bounds: MapComponentProps['bounds'] | undefined;
 	}
-> = function MapSource({ apiDivisionUrl, bounds, isDev }) {
+> = function MapSource({ apiDivisionUrl, bounds, host, isDev }) {
 	const isInteractive = useIsMapCanvasInteractive();
-	const targetIds = useMapTargetIds();
+	const view = useMapView();
 
 	const { lineStringCollection, pointCollection } = useMapCanvasData();
-	const { data: divisionData } = useMapApiDivisionData({ apiDivisionUrl, isDev });
+	const { data: divisionData } = useMapApiDivisionData({
+		apiDivisionUrl: host ? view.apiDivisionUrl : apiDivisionUrl,
+		isDev,
+	});
 
 	/**
 	 * Conditional rendering of layers leads to non-deterministic output
@@ -37,12 +40,12 @@ export const MapSource: FC<
 	 */
 	return (
 		<>
-			<MapSourceDivisions data={divisionData ?? emptyFeatureCollection} />
+			<MapSourceDivisions data={divisionData} />
 			<MapSourceLines data={lineStringCollection ?? emptyFeatureCollection} />
 			<MapSourcePoints
 				data={pointCollection ?? emptyFeatureCollection}
 				interactive={isInteractive}
-				targetIds={targetIds}
+				targetIds={host ? undefined : view.targetIds}
 			/>
 			{isDebug && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
 		</>

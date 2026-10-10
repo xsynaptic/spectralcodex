@@ -51,7 +51,7 @@ export const useMapObjectiveFilter = () => useMapDataStore((state) => state.obje
 export const useIsMapObjectiveFilterEnabled = () =>
 	useMapDataStore((state) => state.isObjectiveFilterEnabled);
 
-export const useMapScope = () => useMapDataStore((state) => state.scope);
+export const useMapFeaturesRule = () => useMapDataStore((state) => state.mapFeaturesRule);
 
 // Map language settings
 export const useMapLanguages = () => useMapDataStore((state) => state.languages);

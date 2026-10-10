@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapScope } from '#types.ts';
+import type { MapFeaturesRule } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
@@ -13,9 +13,9 @@ export type MapDataConfigurableState = Pick<
 	| 'isFilterOpen'
 	| 'isObjectiveFilterEnabled'
 	| 'languages'
+	| 'mapFeaturesRule'
 	| 'objectiveFilter'
 	| 'ratingFilter'
-	| 'scope'
 	| 'selectedId'
 	| 'statusFilter'
 >;
@@ -55,9 +55,9 @@ interface MapDataState {
 	isObjectiveFilterEnabled: boolean;
 	isPopupVisible: boolean;
 	languages: Array<string>;
+	mapFeaturesRule: MapFeaturesRule | undefined;
 	objectiveFilter: number;
 	ratingFilter: number;
-	scope: MapScope | undefined;
 	selectedId: string | undefined;
 	statusFilter: Array<LocationStatus>;
 }
@@ -73,9 +73,9 @@ const defaultMapDataState = {
 	isObjectiveFilterEnabled: false,
 	isPopupVisible: true,
 	languages: ['en'],
+	mapFeaturesRule: undefined,
 	objectiveFilter: 1,
 	ratingFilter: 1,
-	scope: undefined,
 	selectedId: undefined,
 	statusFilter: [],
 } satisfies MapDataState;

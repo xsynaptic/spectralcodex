@@ -39,11 +39,11 @@ describe('parseMapView', () => {
 		});
 	});
 
-	test('a Region view carries its Scope, bounds and Division', () => {
+	test('a Region view carries its page features, bounds and Division', () => {
 		const view = {
 			apiDivisionUrl: '/api/divisions/tainan.fgb',
 			bounds: [120, 22.8, 120.7, 23.5],
-			scope: { interval: [12, 48], type: 'region' },
+			pageFeaturesRule: { interval: [12, 48], type: 'region' },
 		};
 
 		expect(parseMapView(JSON.stringify(view))).toEqual(view);
@@ -61,7 +61,9 @@ describe('parseMapView', () => {
 
 	test('one malformed field voids the whole view', () => {
 		expect(parseMapView('{"targetIds":"theater"}')).toEqual({});
-		expect(parseMapView('{"targetIds":["theater"],"scope":{"type":"region"}}')).toEqual({});
+		expect(parseMapView('{"targetIds":["theater"],"pageFeaturesRule":{"type":"region"}}')).toEqual(
+			{},
+		);
 	});
 });
 
@@ -119,16 +121,22 @@ describe('getTargetZoom', () => {
 });
 
 describe('getTargetDuration', () => {
-	test('a move at the same zoom takes the base duration', () => {
-		expect(getTargetDuration(14, 14)).toBe(450);
+	test('a move that goes nowhere takes the base duration', () => {
+		expect(getTargetDuration(0, 0)).toBe(450);
 	});
 
 	test('each zoom level travelled adds time, in either direction', () => {
-		expect(getTargetDuration(12, 15)).toBe(1050);
-		expect(getTargetDuration(17, 14)).toBe(1050);
+		expect(getTargetDuration(3, 0)).toBe(1050);
+		expect(getTargetDuration(-3, 0)).toBe(1050);
 	});
 
-	test('a zoom from far out is capped', () => {
-		expect(getTargetDuration(7, 15)).toBe(1800);
+	test('each map width panned adds time on top of the zoom', () => {
+		expect(getTargetDuration(0, 2)).toBe(950);
+		expect(getTargetDuration(1, 2)).toBe(1150);
+	});
+
+	test('a long zoom or a long pan is capped', () => {
+		expect(getTargetDuration(8, 0)).toBe(1800);
+		expect(getTargetDuration(0, 40)).toBe(1800);
 	});
 });

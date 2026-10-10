@@ -13,8 +13,8 @@ import { useFeatureOpenEventName } from '#canvas/canvas-feature-open.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
-import { MapTargetIdsProvider } from '#canvas/canvas-target-ids.tsx';
 import { MapTargets } from '#canvas/canvas-targets.tsx';
+import { MapViewProvider } from '#canvas/canvas-view.tsx';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
@@ -116,7 +116,7 @@ const MapCanvasContainer: FC<
 					/>
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
-			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} isDev={isDev} />
+			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} host={host} isDev={isDev} />
 			<MapTargets host={host} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
@@ -133,7 +133,7 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 		isDev,
 		isObjectiveFilterEnabled,
 		languages,
-		scope,
+		mapFeaturesRule,
 		sourceData,
 		sourceDataKey,
 		targetIds,
@@ -153,14 +153,14 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(isObjectiveFilterEnabled ? { isObjectiveFilterEnabled: true } : {}),
 					...(interactive === false ? { isCanvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),
-					...(scope ? { scope } : {}),
+					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
 				}}
 			>
-				<MapTargetIdsProvider host={host} isDev={isDev} targetIds={targetIds}>
+				<MapViewProvider host={host} isDev={isDev} targetIds={targetIds}>
 					<CanvasDataProvider>
 						<MapCanvasContainer {...props} />
 					</CanvasDataProvider>
-				</MapTargetIdsProvider>
+				</MapViewProvider>
 			</MapStoreProvider>
 		</SourceDataContextProvider>
 	);

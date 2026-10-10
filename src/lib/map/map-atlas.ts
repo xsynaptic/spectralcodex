@@ -1,4 +1,4 @@
-import type { MapComponentData } from '@spectralcodex/react-map-component';
+import type { MapComponentData, MapView } from '@spectralcodex/react-map-component';
 
 import pMemoize from 'p-memoize';
 
@@ -16,6 +16,25 @@ export const getAtlasLocationIds = pMemoize(async () => {
 
 	return new Set(entriesMap.get(atlasRegionId)?.data._locations);
 });
+
+export function getAtlasRegionView(
+	regionId: string,
+	mapData: MapComponentData,
+	intervalById: ReadonlyMap<string, [number, number]>,
+): MapView | undefined {
+	const atlasInterval = intervalById.get(atlasRegionId);
+	const interval = intervalById.get(regionId);
+
+	if (!atlasInterval || !interval || !mapData.hasGeodata) return;
+	if (interval[0] < atlasInterval[0] || interval[1] > atlasInterval[1]) return;
+
+	return {
+		// `mapData.mapFeaturesRule` is absent on a Region small enough to inline its rows
+		pageFeaturesRule: { interval, type: 'region' },
+		...(mapData.bounds ? { bounds: mapData.bounds } : {}),
+		...(mapData.apiDivisionUrl ? { apiDivisionUrl: mapData.apiDivisionUrl } : {}),
+	};
+}
 
 // Memoized; every page renders the atlas island in its shell
 export const getAtlasMapData = pMemoize(async (): Promise<MapComponentData> => {
@@ -38,7 +57,7 @@ export const getAtlasMapData = pMemoize(async (): Promise<MapComponentData> => {
 		locationCount: locations.length,
 		mapId: 'atlas',
 		version,
-		...(regionInterval ? { scope: { interval: regionInterval, type: 'region' } } : {}),
+		...(regionInterval ? { mapFeaturesRule: { interval: regionInterval, type: 'region' } } : {}),
 		...getMapLanguages(region.data._langCode),
 	});
 });

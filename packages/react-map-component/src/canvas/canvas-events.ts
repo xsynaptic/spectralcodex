@@ -13,7 +13,7 @@ import * as R from 'remeda';
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
 
 import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
-import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
+import { useMapTargetIds } from '#canvas/canvas-view.tsx';
 import { controlFilterId, mediaQueryMobile } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';

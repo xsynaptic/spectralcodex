@@ -2,7 +2,7 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type {
 	MapComponentData,
 	MapComponentProps,
-	MapScope,
+	MapFeaturesRule,
 } from '@spectralcodex/react-map-component';
 
 import { encodeMapPopupData, encodeMapSourceData } from '@spectralcodex/map-codec';
@@ -24,7 +24,7 @@ import { MapApiDataEnum } from '#lib/map/map-types.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
 
 // Region and theme maps pass a membership hint; other big maps fall back to an id list
-type MapScopeHint =
+type MapFeaturesRuleHint =
 	{ index: number; type: 'theme' } | { interval: [number, number]; type: 'region' };
 
 // Stamp each inline source row with its shared popup-chunk key so hover/click can fetch the chunk
@@ -62,8 +62,8 @@ export function getMapData({
 	limitsBuffer,
 	limitsBufferPercentage,
 	locationCount,
+	mapFeaturesRule,
 	mapId,
-	scope,
 	targetId,
 	version,
 	...props
@@ -75,11 +75,11 @@ export function getMapData({
 		| 'apiSourceUrl'
 		| 'bounds'
 		| 'center'
+		| 'mapFeaturesRule'
 		| 'maxBounds'
 		| 'popupData'
 		| 'popupDataKey'
 		| 'protomapsApiKey'
-		| 'scope'
 		| 'sourceData'
 		| 'sourceDataKey'
 		| 'version'
@@ -88,7 +88,7 @@ export function getMapData({
 		boundsFeatureCollection?: MapFeatureCollection | undefined;
 		chunkKeyById?: Map<string, string> | undefined;
 		locationCount?: number | undefined;
-		scope?: MapScopeHint | undefined;
+		mapFeaturesRule?: MapFeaturesRuleHint | undefined;
 		// Not optional, so a new call site cannot skip the cache version by accident
 		version: string | undefined;
 	}) {
@@ -139,11 +139,10 @@ export function getMapData({
 		} satisfies MapComponentData;
 	}
 
-	// Big maps fetch the shared directory and keep only the rows their scope selects
 	return {
 		...baseData,
 		mapId,
-		...getDirectoryData(featureCollection, scope, version),
+		...getDirectoryData(featureCollection, mapFeaturesRule, version),
 		apiChunkBaseUrl,
 		version,
 	} satisfies MapComponentData;
@@ -205,18 +204,18 @@ function getChunkedInlineData(
 
 function getDirectoryData(
 	featureCollection: MapFeatureCollection,
-	scope: MapScopeHint | undefined,
+	mapFeaturesRule: MapFeaturesRuleHint | undefined,
 	version: string | undefined,
 ) {
 	const apiSourceUrl = getBasePath('api/map', `map-directory.json?v=${version ?? 'unknown'}`);
 
 	// No membership hint resolves to this map's explicit, order-preserving id list
-	const resolvedScope: MapScope = scope ?? {
+	const resolvedRule: MapFeaturesRule = mapFeaturesRule ?? {
 		ids: featureCollection.features.map((feature) => String(feature.id)),
 		type: 'ids',
 	};
 
-	return { apiSourceUrl, prefetchUrls: [apiSourceUrl], scope: resolvedScope };
+	return { apiSourceUrl, mapFeaturesRule: resolvedRule, prefetchUrls: [apiSourceUrl] };
 }
 
 function getInlineData(featureCollection: MapFeatureCollection) {

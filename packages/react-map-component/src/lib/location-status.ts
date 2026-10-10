@@ -8,9 +8,9 @@ export interface LocationStatusMetadata {
 	color: string;
 	colorDark: string;
 	description: string;
-	highlight: string;
 	stroke: string;
 	strokeDark: string;
+	tint: string;
 	title: string;
 	title_zh: string;
 }
@@ -20,9 +20,9 @@ export const LocationStatusRecords = {
 		color: tailwindColors.red500,
 		colorDark: tailwindColors.red500,
 		description: 'Abandoned to the elements, with or without security to prevent entry.',
-		highlight: tailwindColors.red100,
 		stroke: tailwindColors.red600,
 		strokeDark: tailwindColors.red600,
+		tint: tailwindColors.red100,
 		title: 'Abandoned',
 		title_zh: '廢墟',
 	},
@@ -30,9 +30,9 @@ export const LocationStatusRecords = {
 		color: tailwindColors.emerald500,
 		colorDark: tailwindColors.emerald400,
 		description: 'In business, typically for something close to its original purpose.',
-		highlight: tailwindColors.emerald100,
 		stroke: tailwindColors.emerald600,
 		strokeDark: tailwindColors.emerald500,
+		tint: tailwindColors.emerald100,
 		title: 'Active',
 		title_zh: '經營中',
 	},
@@ -41,9 +41,9 @@ export const LocationStatusRecords = {
 		colorDark: tailwindColors.yellow400,
 		description:
 			'The structure is intact but it has been converted for some other use than originally intended.',
-		highlight: tailwindColors.yellow100,
 		stroke: tailwindColors.yellow500,
 		strokeDark: tailwindColors.yellow500,
+		tint: tailwindColors.yellow100,
 		title: 'Converted',
 		title_zh: '改建',
 	},
@@ -52,9 +52,9 @@ export const LocationStatusRecords = {
 		colorDark: tailwindColors.orange500,
 		description:
 			'Closed but not necessarily abandoned, or recognized for its heritage value but awaiting restoration.',
-		highlight: tailwindColors.orange100,
 		stroke: tailwindColors.orange500,
 		strokeDark: tailwindColors.orange600,
+		tint: tailwindColors.orange100,
 		title: 'Idle',
 		title_zh: '閒置',
 	},
@@ -63,9 +63,9 @@ export const LocationStatusRecords = {
 		colorDark: tailwindColors.amber500,
 		description:
 			'Private sites that are either still occupied, patrolled, or otherwise inaccessible.',
-		highlight: tailwindColors.amber100,
 		stroke: tailwindColors.amber500,
 		strokeDark: tailwindColors.amber600,
+		tint: tailwindColors.amber100,
 		title: 'Private',
 		title_zh: '私有',
 	},
@@ -74,9 +74,9 @@ export const LocationStatusRecords = {
 		colorDark: tailwindColors.green500,
 		description:
 			'Open to the public as an attraction of some kind, or otherwise appreciable from the surrounding area.',
-		highlight: tailwindColors.green100,
 		stroke: tailwindColors.green600,
 		strokeDark: tailwindColors.green600,
+		tint: tailwindColors.green100,
 		title: 'Public',
 		title_zh: '公有',
 	},
@@ -85,9 +85,9 @@ export const LocationStatusRecords = {
 		colorDark: tailwindColors.red600,
 		description:
 			'Mostly dismantled or transformed beyond recognition but some traces remain, though they may be minor.',
-		highlight: tailwindColors.red100,
 		stroke: tailwindColors.red800,
 		strokeDark: tailwindColors.red700,
+		tint: tailwindColors.red100,
 		title: 'Remnants',
 		title_zh: '遺跡',
 	},
@@ -95,9 +95,9 @@ export const LocationStatusRecords = {
 		color: tailwindColors.zinc800,
 		colorDark: tailwindColors.zinc800,
 		description: 'The status of this location is unknown.',
-		highlight: tailwindColors.zinc100,
 		stroke: tailwindColors.zinc400,
 		strokeDark: tailwindColors.zinc400,
+		tint: tailwindColors.zinc100,
 		title: 'Unknown',
 		title_zh: '不明',
 	},
@@ -105,9 +105,9 @@ export const LocationStatusRecords = {
 		color: tailwindColors.zinc600,
 		colorDark: tailwindColors.zinc600,
 		description: 'Vanished into the mists of time.',
-		highlight: tailwindColors.zinc100,
 		stroke: tailwindColors.zinc200,
 		strokeDark: tailwindColors.zinc200,
+		tint: tailwindColors.zinc100,
 		title: 'Vanished',
 		title_zh: '已消失',
 	},
@@ -148,6 +148,6 @@ function isDoubleStringArray(array: Array<string>): array is [string, string, ..
 // This creates an array of status and color values for use with clusters in MapLibre
 export const statusColorArray = getColorMap('color');
 export const statusColorDarkArray = getColorMap('colorDark');
-export const statusHighlightColorArray = getColorMap('highlight');
+export const statusTintColorArray = getColorMap('tint');
 export const statusStrokeColorArray = getColorMap('stroke');
 export const statusStrokeColorDarkArray = getColorMap('strokeDark');
