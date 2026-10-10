@@ -13,7 +13,7 @@ import type { MapDataBoundsProps } from '#lib/map/map-bounds.ts';
 import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { mapSourceInlineLimit } from '#constants.ts';
-import { getMapBounds } from '#lib/map/map-bounds.ts';
+import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
 import {
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
@@ -235,6 +235,6 @@ function getTargetIds(featureCollection: MapFeatureCollection, targetId: string 
 	if (!targetId) return;
 
 	return featureCollection.features
-		.filter(({ id }) => id === targetId || String(id).startsWith(`${targetId}-`))
+		.filter(({ id }) => isTargetFeature(id, targetId))
 		.map(({ id }) => String(id));
 }

@@ -48,6 +48,22 @@ describe('getMapBounds', () => {
 		).toBeUndefined();
 	});
 
+	test('an outlier that is the target still frames its own map', () => {
+		const result = getMapBounds({
+			featureCollection: makeCollection([makeFeature('far', [150, 50], true)]),
+			limitsFeatureCollection: makeCollection([
+				makeFeature('far', [150, 50], true),
+				makeFeature('other', [10, 10], true),
+			]),
+			targetId: 'far',
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.center).toEqual([150, 50]);
+		expectWithinBounds(result!.maxBounds, 150, 50);
+		expect(result!.maxBounds[0]).toBeGreaterThan(10);
+	});
+
 	test('a line contributes every vertex, not just its ends', () => {
 		const result = getMapBounds({
 			featureCollection: makeCollection([

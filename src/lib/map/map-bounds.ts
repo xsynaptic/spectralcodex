@@ -51,12 +51,12 @@ export function getMapBounds({
 	  } {
 	if (!featureCollectionRaw) return;
 
-	const featureCollection = filterMapOutliers(featureCollectionRaw);
+	const featureCollection = filterMapOutliers(featureCollectionRaw, targetId);
 
 	if (featureCollection.features.length === 0) return;
 
 	const limitsFeatureCollection = limitsFeatureCollectionRaw
-		? filterMapOutliers(limitsFeatureCollectionRaw)
+		? filterMapOutliers(limitsFeatureCollectionRaw, targetId)
 		: featureCollection;
 
 	const bounds = getBufferedBbox(featureCollection, {
@@ -79,10 +79,22 @@ export function getMapBounds({
 	};
 }
 
-function filterMapOutliers(featureCollection: MapFeatureCollection): MapFeatureCollection {
+export function isTargetFeature(id: number | string | undefined, targetId: string | undefined) {
+	if (!targetId) return false;
+
+	return id === targetId || String(id).startsWith(`${targetId}-`);
+}
+
+// Handle outliers having their own maps
+function filterMapOutliers(
+	featureCollection: MapFeatureCollection,
+	targetId: string | undefined,
+): MapFeatureCollection {
 	return {
 		...featureCollection,
-		features: featureCollection.features.filter((item) => item.properties.outlier !== true),
+		features: featureCollection.features.filter(
+			(item) => item.properties.outlier !== true || isTargetFeature(item.id, targetId),
+		),
 	} satisfies MapFeatureCollection;
 }
 
