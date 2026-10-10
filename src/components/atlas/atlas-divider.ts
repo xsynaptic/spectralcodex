@@ -9,6 +9,7 @@ import { getPaneLimits } from '#lib/atlas/atlas-pane.ts';
 
 // The host carries the position, so the controls beside the handle follow a drag
 class AtlasDivider extends HTMLElement {
+	#dragOrigin = 0;
 	#dragWidth: number | undefined;
 	#handle: HTMLElement | undefined;
 
@@ -68,6 +69,7 @@ class AtlasDivider extends HTMLElement {
 		event.preventDefault();
 		this.#handle.setPointerCapture(event.pointerId);
 		this.#handle.dataset.dragging = '';
+		this.#dragOrigin = this.#getPaneWidth();
 		this.#handle.focus();
 	};
 
@@ -77,8 +79,13 @@ class AtlasDivider extends HTMLElement {
 
 		const limits = getPaneLimits();
 
-		this.#dragWidth = clampPaneWidth(limits.viewportWidth - event.clientX, limits);
+		// Whole pixels keep the dragged hairline and the dashed edge on the same grid
+		this.#dragWidth = Math.round(clampPaneWidth(limits.viewportWidth - event.clientX, limits));
 		this.style.right = `${String(this.#dragWidth)}px`;
+		this.style.setProperty(
+			'--atlas-drag-offset',
+			`${String(this.#dragWidth - this.#dragOrigin)}px`,
+		);
 	};
 
 	#handlePointerUp = (event: PointerEvent) => {
@@ -87,6 +94,7 @@ class AtlasDivider extends HTMLElement {
 		this.#handle.releasePointerCapture(event.pointerId);
 		delete this.#handle.dataset.dragging;
 		this.style.removeProperty('right');
+		this.style.removeProperty('--atlas-drag-offset');
 
 		if (this.#dragWidth === undefined) return;
 

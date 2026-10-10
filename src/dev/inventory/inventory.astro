@@ -62,6 +62,7 @@ import SeriesSection from '#components/series/series-section.astro';
 import ThemesList from '#components/themes/themes-list.astro';
 import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import WebmentionsList from '#components/webmentions/webmentions-list.astro';
+import InventoryAtlasDivider from '#dev/inventory/inventory-atlas-divider.astro';
 import {
 	createSampleActivityValues,
 	createSampleCatalogItems,
@@ -1257,6 +1258,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<p class={captionClass}>No Division SVG in the cache, so there is no outline to draw.</p>
 				)}
 			</Specimen>
+			<InventoryAtlasDivider />
 		</Section>
 		<Section
 			note="Cards are drawn by a batch script rather than by Astro; the route behind this section renders that same template on demand."

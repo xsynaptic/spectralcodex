@@ -17,6 +17,169 @@
 	display: none;
 }
 
+/* The offset is the dragged pane width less the current one */
+.atlas-divider-preview {
+	--atlas-preview-ink: light-dark(
+		color-mix(in srgb, var(--color-primary-900) 20%, transparent),
+		color-mix(in srgb, var(--color-primary-50) 20%, transparent)
+	);
+
+	position: absolute;
+	inset-block: 0;
+	left: calc(50% + min(0px, var(--atlas-drag-offset, 0px)));
+	width: max(var(--atlas-drag-offset, 0px), -1 * var(--atlas-drag-offset, 0px));
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		-45deg,
+		var(--atlas-preview-ink) 0 1px,
+		transparent 1px 7px
+	);
+	opacity: 0;
+
+	/* The handle follows the preview in the divider, so its band paints over the blur */
+	backdrop-filter: blur(6px);
+	transition: opacity 120ms ease-out;
+
+	&::after {
+		position: absolute;
+		inset-block: 0;
+		left: max(0px, var(--atlas-drag-offset, 0px));
+		content: '';
+		border-left: 1px dashed light-dark(var(--color-primary-500), var(--color-primary-400));
+		translate: -50%;
+	}
+}
+
+.atlas-divider-handle {
+	--atlas-divider-active: light-dark(var(--color-accent-500), var(--color-accent-400));
+
+	position: relative;
+	height: 100%;
+	touch-action: none;
+	cursor: col-resize;
+	outline: none;
+
+	&::before,
+	&::after {
+		position: absolute;
+		inset-block: 0;
+		content: '';
+	}
+
+	&::before {
+		left: 50%;
+		width: 1px;
+		background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+		translate: -50%;
+		transition: background-color 150ms ease-out;
+	}
+
+	&::after {
+		inset-inline: 0;
+		background-color: color-mix(in srgb, var(--atlas-divider-active) 30%, transparent);
+		opacity: 0;
+		transition: opacity 150ms ease-out;
+	}
+
+	&:is(:focus-visible, [data-dragging]) {
+		&::before {
+			background-color: var(--atlas-divider-active);
+		}
+
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			&::before {
+				background-color: var(--atlas-divider-active);
+			}
+
+			&::after {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.atlas-divider-controls {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	display: flex;
+	width: 2.75rem;
+	height: 2.75rem;
+	background-color: var(--color-body-bg);
+	border: 1px solid light-dark(var(--color-primary-300), var(--color-primary-600));
+	border-radius: 50%;
+	translate: -50% -50%;
+	transition: opacity 150ms ease-out;
+
+	/* One ring for the disc; a ring per half would trace a half circle */
+	&:has(:focus-visible) {
+		outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
+		outline-offset: 2px;
+	}
+}
+
+.atlas-divider-control {
+	--atlas-control-active: light-dark(var(--color-primary-800), var(--color-primary-100));
+	--atlas-control-active-bg: light-dark(var(--color-primary-200), var(--color-primary-700));
+
+	display: flex;
+	flex: 1;
+	align-items: center;
+	justify-content: center;
+	color: light-dark(var(--color-primary-500), var(--color-primary-400));
+	cursor: pointer;
+	outline: none;
+	transition:
+		color 150ms ease-out,
+		background-color 150ms ease-out;
+
+	/* Thickens the sprite's filled chevron */
+	& svg {
+		stroke: currentcolor;
+		stroke-width: 0.75;
+		stroke-linejoin: round;
+	}
+
+	/* A half circle's visual centre sits nearer its flat edge */
+	&:first-child {
+		padding-left: 3px;
+		border-radius: 1.375rem 0 0 1.375rem;
+	}
+
+	&:last-child {
+		padding-right: 3px;
+		border-radius: 0 1.375rem 1.375rem 0;
+	}
+
+	&:focus-visible {
+		color: var(--atlas-control-active);
+		background-color: var(--atlas-control-active-bg);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			color: var(--atlas-control-active);
+			background-color: var(--atlas-control-active-bg);
+		}
+	}
+}
+
+.atlas-divider:has([data-dragging]) {
+	.atlas-divider-preview {
+		opacity: 1;
+	}
+
+	.atlas-divider-controls {
+		opacity: 0;
+	}
+}
+
 /* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
 @media (width >= theme(--breakpoint-lg)) {
 	.atlas-open {
@@ -35,9 +198,6 @@
 			position: relative;
 			width: var(--atlas-pane-width);
 			margin-left: auto;
-
-			/* Its transition snapshot slides over the map, so it cannot borrow the body's */
-			background-color: var(--color-body-bg);
 			view-transition-name: atlas-pane;
 		}
 
@@ -63,113 +223,6 @@
 			translate: 50%;
 		}
 
-		.atlas-divider-handle {
-			position: relative;
-			height: 100%;
-			touch-action: none;
-			cursor: col-resize;
-
-			&::before,
-			&::after {
-				position: absolute;
-				inset-block: 0;
-				left: 50%;
-				content: '';
-				translate: -50%;
-			}
-
-			&::before {
-				width: 1px;
-				background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
-			}
-
-			&::after {
-				width: 3px;
-				background-color: light-dark(var(--color-primary-400), var(--color-primary-500));
-				border-radius: 3px;
-				opacity: 0;
-				transition: opacity 200ms ease-out;
-			}
-
-			&:is(:focus-visible, [data-dragging])::after {
-				opacity: 1;
-			}
-
-			@media (hover: hover) {
-				&:hover::after {
-					opacity: 1;
-				}
-			}
-		}
-
-		.atlas-divider-controls {
-			position: absolute;
-			top: 0.75rem;
-			left: 50%;
-			display: flex;
-			border-radius: 50%;
-			box-shadow: var(--shadow-sm);
-			translate: -50%;
-		}
-
-		.atlas-divider-control {
-			--atlas-control-active: light-dark(var(--color-primary-800), var(--color-primary-100));
-			--atlas-control-active-bg: light-dark(var(--color-primary-200), var(--color-primary-700));
-
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 1.375rem;
-			height: 2.75rem;
-			color: light-dark(var(--color-primary-500), var(--color-primary-400));
-			cursor: pointer;
-			background-color: var(--color-body-bg);
-			border: 1px solid light-dark(var(--color-primary-300), var(--color-primary-600));
-			transition:
-				color 150ms ease-out,
-				background-color 150ms ease-out;
-
-			& svg {
-				transition: translate 150ms ease-out;
-			}
-
-			/* A half circle's visual centre sits nearer its flat edge */
-			&:first-child {
-				padding-left: 2px;
-				border-right: 0;
-				border-radius: 1.375rem 0 0 1.375rem;
-
-				--atlas-control-nudge: -2px;
-			}
-
-			&:last-child {
-				padding-right: 2px;
-				border-radius: 0 1.375rem 1.375rem 0;
-
-				--atlas-control-nudge: 2px;
-			}
-
-			&:focus-visible {
-				color: var(--atlas-control-active);
-				background-color: var(--atlas-control-active-bg);
-
-				& svg {
-					translate: var(--atlas-control-nudge);
-				}
-			}
-
-			@media (hover: hover) {
-				&:hover {
-					color: var(--atlas-control-active);
-					background-color: var(--atlas-control-active-bg);
-
-					& svg {
-						translate: var(--atlas-control-nudge);
-					}
-				}
-			}
-		}
-
 		.atlas-open,
 		.atlas-inline-map {
 			display: none;
@@ -178,23 +231,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	/* The pane slides over the map, which follows it in the document */
-	::view-transition-group(atlas-pane) {
-		z-index: 1;
-	}
-
-	/* Keeps the map's moving edge under the pane's */
-	::view-transition-group(atlas-map) {
-		animation-duration: 150ms;
-		animation-timing-function: ease-out;
-	}
-
-	/* The same live map before and after: cropped as its width changes, and no crossfade to ghost the old camera */
+	/* The same live map before and after: no crossfade to ghost the old camera */
 	::view-transition-old(atlas-map),
 	::view-transition-new(atlas-map) {
-		height: 100%;
-		object-fit: none;
-		object-position: left;
 		mix-blend-mode: normal;
 		animation-name: none;
 	}
@@ -208,36 +247,32 @@
 		animation-name: -ua-view-transition-fade-out;
 	}
 
-	/* Slides only between the full-screen map and the split, where the layout beside the moving side holds still */
-	:root[data-atlas-from='map'] {
-		&::view-transition-old(atlas-map):only-child {
-			animation: atlas-exit-left 220ms ease-out both;
-		}
+	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
+	/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
+	@media (width >= theme(--breakpoint-lg)) {
+		:root[data-atlas]:is(
+				[data-atlas-page='pane']:not([data-atlas-from='pane']),
+				[data-atlas-from='pane']:not([data-atlas-page='pane'])
+			) {
+			&::view-transition-group(*),
+			&::view-transition-new(*) {
+				animation: none;
+			}
 
-		&::view-transition-new(atlas-pane):only-child {
-			animation: atlas-enter-right 150ms ease-out both;
+			&::view-transition-old(*) {
+				display: none;
+			}
 		}
 	}
 
-	:root[data-atlas-page='map']::view-transition-old(atlas-pane):only-child {
-		animation: atlas-exit-right 150ms ease-out both;
+	/* Leaving the full-screen map for a page without one resizes nothing, so the map slides away */
+	:root[data-atlas-from='map']::view-transition-old(atlas-map):only-child {
+		animation: atlas-exit-left 150ms ease-out both;
 	}
 }
 
 @keyframes atlas-exit-left {
 	to {
 		translate: -100%;
-	}
-}
-
-@keyframes atlas-enter-right {
-	from {
-		translate: 100%;
-	}
-}
-
-@keyframes atlas-exit-right {
-	to {
-		translate: 100%;
 	}
 }
