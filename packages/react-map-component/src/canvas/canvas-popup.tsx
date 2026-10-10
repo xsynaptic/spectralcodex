@@ -1,7 +1,7 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { FC } from 'react';
 
-import { GeometryTypeEnum, MapSpritesEnum } from '@spectralcodex/shared/map';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
@@ -11,6 +11,7 @@ import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
+import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
 	useIsMapPopupVisible,
@@ -277,7 +278,7 @@ const MapPopupFooter: FC<{
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<use href={`#${MapSpritesEnum.Copy}`}></use>
+					<MapIconCopy />
 				</svg>
 			</button>
 			<div className="map-popup-links">
@@ -294,7 +295,7 @@ const MapPopupFooter: FC<{
 							viewBox="0 0 24 24"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<use href={`#${MapSpritesEnum.Wikipedia}`}></use>
+							<MapIconWikipedia />
 						</svg>
 					</a>
 				) : undefined}
@@ -310,7 +311,7 @@ const MapPopupFooter: FC<{
 						viewBox="0 0 256 367"
 						xmlns="http://www.w3.org/2000/svg"
 					>
-						<use href={`#${MapSpritesEnum.Google}`}></use>
+						<MapIconGoogle />
 					</svg>
 				</a>
 			</div>
@@ -330,7 +331,7 @@ const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision(
 				viewBox="0 0 36 36"
 				xmlns="http://www.w3.org/2000/svg"
 			>
-				<use href={`#${MapSpritesEnum.Warning}`}></use>
+				<MapIconWarning />
 			</svg>
 			<span className="map-popup-warning-text">
 				{precision === 2 ? messages.precisionWarning : messages.precisionError}

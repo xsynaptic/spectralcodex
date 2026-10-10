@@ -1,12 +1,11 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { MapSpritesEnum } from '@spectralcodex/shared/map';
-
 import { controlSearchId } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
+import { MapIconSearch } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useIsMapCanvasLoading } from '#store/store.ts';
 
@@ -50,7 +49,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 							viewBox="0 0 24 24"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<use href={`#${MapSpritesEnum.Search}`}></use>
+							<MapIconSearch />
 						</svg>
 					</span>
 				</button>

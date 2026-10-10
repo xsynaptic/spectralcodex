@@ -2,7 +2,6 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { MapSpritesEnum } from '@spectralcodex/shared/map';
 import { memo, useEffect, useId, useRef } from 'react';
 import * as R from 'remeda';
 
@@ -12,6 +11,7 @@ import { controlFilterId } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { locationStatusOrder, LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
@@ -193,7 +193,7 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 							viewBox="0 0 36 36"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<use href={`#${MapSpritesEnum.Rating}`}></use>
+							<MapIconRating />
 						</svg>
 					</button>
 				))}
@@ -334,7 +334,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							viewBox="0 0 24 24"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<use href={`#${MapSpritesEnum.Filters}`}></use>
+							<MapIconFilters />
 						</svg>
 					</span>
 				</button>
