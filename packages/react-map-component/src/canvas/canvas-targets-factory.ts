@@ -51,7 +51,9 @@ const targetZoomDefault = 15;
 const targetZoomMax = 17;
 const targetZoomMin = 12;
 
-export function getTargetCamera(positions: ReadonlyArray<Position>, zoom: number) {
+export function getTargetBounds(
+	positions: ReadonlyArray<Position>,
+): [southwest: Position, northeast: Position] | undefined {
 	const [first, ...rest] = positions;
 
 	if (!first) return;
@@ -66,18 +68,18 @@ export function getTargetCamera(positions: ReadonlyArray<Position>, zoom: number
 		north = Math.max(north, latitude);
 	}
 
-	if (west === east && south === north) {
-		return {
-			center: first,
-			type: 'center',
-			zoom: zoom < targetZoomMin ? targetZoomDefault : Math.min(zoom, targetZoomMax),
-		} as const;
-	}
-
-	const bounds: [Position, Position] = [
+	return [
 		[west, south],
 		[east, north],
 	];
+}
 
-	return { bounds, maxZoom: targetZoomMax, type: 'bounds' } as const;
+// `fitZoom` is the closest zoom that still shows every position
+export function getTargetZoom(zoom: number, fitZoom: number) {
+	const limit = Math.min(fitZoom, targetZoomMax);
+
+	if (zoom > limit) return limit;
+	if (zoom < targetZoomMin) return Math.min(limit, targetZoomDefault);
+
+	return zoom;
 }

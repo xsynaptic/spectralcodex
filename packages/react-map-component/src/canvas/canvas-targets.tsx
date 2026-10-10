@@ -13,8 +13,9 @@ import {
 	MapTargetMarkers,
 } from '#canvas/canvas-markers.tsx';
 import {
-	getTargetCamera,
+	getTargetBounds,
 	getTargetPositions,
+	getTargetZoom,
 	parseTargetIds,
 } from '#canvas/canvas-targets-factory.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
@@ -72,25 +73,20 @@ function useTargetFit(targetIds: Array<string>, eventName: string) {
 		map.resize();
 		clearPadding(map);
 
-		const camera = getTargetCamera(getTargetPositions(sourceData, targetIds), map.getZoom());
+		const bounds = getTargetBounds(getTargetPositions(sourceData, targetIds));
+		const fit = bounds ? map.cameraForBounds(bounds, { padding: fitPadding }) : undefined;
 
-		if (!camera) return;
+		if (!fit?.center || fit.zoom === undefined) return;
 
 		// Attached first; under reduced motion `moveend` fires inside the call
 		void map.once('moveend', () => {
 			setSettledKey(key);
 		});
 
-		if (camera.type === 'center') {
-			map.easeTo({ center: camera.center, duration: fitDuration, zoom: camera.zoom });
-			return;
-		}
-
-		map.fitBounds(camera.bounds, {
+		map.easeTo({
+			center: fit.center,
 			duration: fitDuration,
-			linear: true,
-			maxZoom: camera.maxZoom,
-			padding: fitPadding,
+			zoom: getTargetZoom(map.getZoom(), fit.zoom),
 		});
 	}, [key, map, setSelectedId, sourceData, targetIds]);
 

@@ -4,8 +4,9 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import {
-	getTargetCamera,
+	getTargetBounds,
 	getTargetPositions,
+	getTargetZoom,
 	parseTargetIds,
 } from '#canvas/canvas-targets-factory.ts';
 
@@ -54,52 +55,41 @@ describe('getTargetPositions', () => {
 	});
 });
 
-describe('getTargetCamera', () => {
-	test('no positions yields no camera', () => {
-		expect(getTargetCamera([], 14)).toBeUndefined();
-	});
-
-	test('a single point keeps a zoom inside the range', () => {
-		expect(getTargetCamera([[121.8, 24.6]], 14)).toEqual({
-			center: [121.8, 24.6],
-			type: 'center',
-			zoom: 14,
-		});
-	});
-
-	test('a single point pulls in from far out and back from too close', () => {
-		expect(getTargetCamera([[121.8, 24.6]], 8)).toMatchObject({ zoom: 15 });
-		expect(getTargetCamera([[121.8, 24.6]], 19)).toMatchObject({ zoom: 17 });
+describe('getTargetBounds', () => {
+	test('no positions yields no bounds', () => {
+		expect(getTargetBounds([])).toBeUndefined();
 	});
 
 	test('several positions yield the box around all of them', () => {
 		expect(
-			getTargetCamera(
-				[
-					[121.8, 24.6],
-					[121, 25],
-					[122, 24],
-				],
-				14,
-			),
-		).toMatchObject({
-			bounds: [
-				[121, 24],
-				[122, 25],
-			],
-			type: 'bounds',
-		});
+			getTargetBounds([
+				[121.8, 24.6],
+				[121, 25],
+				[122, 24],
+			]),
+		).toEqual([
+			[121, 24],
+			[122, 25],
+		]);
+	});
+});
+
+describe('getTargetZoom', () => {
+	test('a zoom that already shows everything is kept', () => {
+		expect(getTargetZoom(13, 16)).toBe(13);
 	});
 
-	test('coincident positions are centred, not fitted to an empty box', () => {
-		expect(
-			getTargetCamera(
-				[
-					[121.8, 24.6],
-					[121.8, 24.6],
-				],
-				14,
-			),
-		).toMatchObject({ type: 'center' });
+	test('a zoom too close to show everything pulls back to the fit', () => {
+		expect(getTargetZoom(16, 13.5)).toBe(13.5);
+		expect(getTargetZoom(11, 10)).toBe(10);
+	});
+
+	test('a far-out zoom pulls in, never past the fit', () => {
+		expect(getTargetZoom(8, 19)).toBe(15);
+		expect(getTargetZoom(8, 10)).toBe(10);
+	});
+
+	test('a single point, which fits at any zoom, stops at the maximum', () => {
+		expect(getTargetZoom(19, 22)).toBe(17);
 	});
 });
