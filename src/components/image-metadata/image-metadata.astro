@@ -43,8 +43,12 @@ const getImageUrl = createImageUrlFunction({
 const downloadUrl = downloadWidth ? getImageUrl(entry.id, { width: downloadWidth }) : undefined;
 ---
 
+<script>
+	import '#components/image-metadata/image-metadata.ts';
+</script>
+
 <div class="meta-overlay" data-pagefind-ignore {...props}>
-	<details class="meta-details">
+	<details class="meta-details" data-meta-image={entry.id}>
 		<summary
 			aria-label={
 				entry.data.title
@@ -52,8 +56,6 @@ const downloadUrl = downloadWidth ? getImageUrl(entry.id, { width: downloadWidth
 					: t('collection.images.metadata.title')
 			}
 			class="meta-show"
-			data-umami-event="image-metadata-open"
-			data-umami-event-image={entry.id}
 		>
 			<span class="meta-show-icon">
 				<svg aria-hidden="true" class="meta-svg" height="24" viewBox="0 0 24 24" width="24">
