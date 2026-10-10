@@ -25,6 +25,7 @@ export interface MapDataStore extends MapDataState {
 		hideAllStatusFilter: () => void;
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
+		setClickedId: (clickedId: string | undefined) => void;
 		setEntryQualityFilter: (entryQualityFilter: number) => void;
 		setFilterOpen: (isFilterOpen: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
@@ -43,6 +44,8 @@ export interface MapDataStore extends MapDataState {
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 
 interface MapDataState {
+	// Set by a user's click only, so programmatic selections stay out of analytics
+	clickedId: string | undefined;
 	entryQualityFilter: number;
 	filterPosition: DOMCoordinates | undefined;
 	hoveredId: string | undefined;
@@ -60,6 +63,7 @@ interface MapDataState {
 }
 
 const defaultMapDataState = {
+	clickedId: undefined,
 	entryQualityFilter: 1,
 	filterPosition: undefined,
 	hoveredId: undefined,
@@ -96,6 +100,9 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setCanvasLoading: (isCanvasLoading) => {
 					set({ isCanvasLoading });
+				},
+				setClickedId: (clickedId) => {
+					set({ clickedId });
 				},
 				setEntryQualityFilter: (entryQualityFilter) => {
 					setAndClearSelection({ entryQualityFilter });

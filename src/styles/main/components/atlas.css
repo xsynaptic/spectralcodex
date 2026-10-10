@@ -9,17 +9,19 @@
 
 :root[data-atlas-page='map'] .atlas-shell {
 	visibility: visible;
+	view-transition-name: atlas-map;
 }
 
-.atlas-divider {
+.atlas-divider,
+.atlas-open {
 	display: none;
 }
 
-.atlas-open {
-	display: flex;
-}
-
 @media (width >= 64rem) {
+	.atlas-open {
+		display: flex;
+	}
+
 	:root[data-atlas][data-atlas-page='location'] {
 		--atlas-pane-width: clamp(40rem, var(--atlas-pane-size, 45rem), 100vw - 20rem);
 
@@ -27,6 +29,10 @@
 			position: relative;
 			width: var(--atlas-pane-width);
 			margin-left: auto;
+
+			/* Its transition snapshot slides over the map, so it cannot borrow the body's */
+			background-color: var(--color-body-bg);
+			view-transition-name: atlas-pane;
 		}
 
 		.progress-bar {
@@ -38,6 +44,7 @@
 		.atlas-shell {
 			right: var(--atlas-pane-width);
 			visibility: visible;
+			view-transition-name: atlas-map;
 		}
 
 		.atlas-divider {
@@ -89,29 +96,67 @@
 			}
 		}
 
-		.atlas-divider-close {
+		.atlas-divider-controls {
 			position: absolute;
 			top: 0.75rem;
-			right: 50%;
+			left: 50%;
+			display: flex;
+			border-radius: 50%;
+			box-shadow: var(--shadow-sm);
+			translate: -50%;
+		}
+
+		.atlas-divider-control {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			width: 1.5rem;
-			height: 2.5rem;
+			width: 1.375rem;
+			height: 2.75rem;
 			color: light-dark(var(--color-primary-500), var(--color-primary-400));
+			cursor: pointer;
 			background-color: var(--color-body-bg);
-			border: 1px solid light-dark(var(--color-primary-200), var(--color-primary-700));
-			border-right: 0;
-			border-radius: var(--radius-md) 0 0 var(--radius-md);
-			transition: color var(--default-transition-duration) linear;
+			border: 1px solid light-dark(var(--color-primary-300), var(--color-primary-600));
+			transition:
+				color 150ms ease-out,
+				background-color 150ms ease-out;
+
+			& svg {
+				transition: translate 150ms ease-out;
+			}
+
+			/* A half circle's visual centre sits nearer its flat edge */
+			&:first-child {
+				padding-left: 2px;
+				border-right: 0;
+				border-radius: 1.375rem 0 0 1.375rem;
+
+				--atlas-control-nudge: -2px;
+			}
+
+			&:last-child {
+				padding-right: 2px;
+				border-radius: 0 1.375rem 1.375rem 0;
+
+				--atlas-control-nudge: 2px;
+			}
 
 			&:focus-visible {
 				color: light-dark(var(--color-primary-800), var(--color-primary-100));
+				background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+
+				& svg {
+					translate: var(--atlas-control-nudge);
+				}
 			}
 
 			@media (hover: hover) {
 				&:hover {
 					color: light-dark(var(--color-primary-800), var(--color-primary-100));
+					background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+
+					& svg {
+						translate: var(--atlas-control-nudge);
+					}
 				}
 			}
 		}
@@ -120,5 +165,70 @@
 		.atlas-inline-map {
 			display: none;
 		}
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	/* The pane slides over the map, which follows it in the document */
+	::view-transition-group(atlas-pane) {
+		z-index: 1;
+	}
+
+	/* Keeps the map's moving edge under the pane's */
+	::view-transition-group(atlas-map) {
+		animation-duration: 150ms;
+		animation-timing-function: ease-out;
+	}
+
+	/* The same live map before and after: cropped as its width changes, and no crossfade to ghost the old camera */
+	::view-transition-old(atlas-map),
+	::view-transition-new(atlas-map) {
+		height: 100%;
+		object-fit: none;
+		object-position: left;
+		mix-blend-mode: normal;
+		animation-name: none;
+	}
+
+	/* `:only-child` matches a side entering or leaving, which gets the default fade back */
+	::view-transition-new(atlas-map):only-child {
+		animation-name: -ua-view-transition-fade-in;
+	}
+
+	::view-transition-old(atlas-map):only-child {
+		animation-name: -ua-view-transition-fade-out;
+	}
+
+	/* Slides only between the full-screen map and the split, where the layout beside the moving side holds still */
+	:root[data-atlas-from='map'] {
+		&::view-transition-old(atlas-map):only-child {
+			animation: atlas-exit-left 220ms ease-out both;
+		}
+
+		&::view-transition-new(atlas-pane):only-child {
+			animation: atlas-enter-right 150ms ease-out both;
+		}
+	}
+
+	:root[data-atlas-page='map']::view-transition-old(atlas-pane):only-child {
+		animation: atlas-exit-right 150ms ease-out both;
+	}
+}
+
+@keyframes atlas-exit-left {
+	to {
+		translate: -100%;
+	}
+}
+
+@keyframes atlas-enter-right {
+	from {
+		translate: 100%;
+	}
+}
+
+@keyframes atlas-exit-right {
+	to {
+		translate: 100%;
 	}
 }

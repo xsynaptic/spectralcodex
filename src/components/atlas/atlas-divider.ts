@@ -1,4 +1,4 @@
-import { atlasSyncEventName } from '#lib/atlas/atlas-constants.ts';
+import { atlasExitEventName, atlasSyncEventName } from '#lib/atlas/atlas-constants.ts';
 import { requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
 import {
 	clampPaneWidth,
@@ -16,7 +16,7 @@ function getLimits() {
 	};
 }
 
-// The host carries the position, so the close tab beside the handle follows a drag
+// The host carries the position, so the controls beside the handle follow a drag
 class AtlasDivider extends HTMLElement {
 	#dragWidth: number | undefined;
 	#handle: HTMLElement | undefined;
@@ -32,6 +32,7 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.addEventListener('pointerup', this.#handlePointerUp);
 		this.#handle?.addEventListener('pointercancel', this.#handlePointerUp);
 		this.#handle?.addEventListener('keydown', this.#handleKeyDown);
+		this.addEventListener('click', this.#handleClick);
 		window.addEventListener('resize', this.#updateValue);
 		document.addEventListener(atlasSyncEventName, this.#updateValue);
 
@@ -44,6 +45,7 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.removeEventListener('pointerup', this.#handlePointerUp);
 		this.#handle?.removeEventListener('pointercancel', this.#handlePointerUp);
 		this.#handle?.removeEventListener('keydown', this.#handleKeyDown);
+		this.removeEventListener('click', this.#handleClick);
 		window.removeEventListener('resize', this.#updateValue);
 		document.removeEventListener(atlasSyncEventName, this.#updateValue);
 	}
@@ -52,6 +54,12 @@ class AtlasDivider extends HTMLElement {
 	#getPaneWidth() {
 		return document.querySelector('.main-pane')?.getBoundingClientRect().width ?? 0;
 	}
+
+	#handleClick = (event: MouseEvent) => {
+		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-expand]')) return;
+
+		document.dispatchEvent(new Event(atlasExitEventName));
+	};
 
 	#handleKeyDown = (event: KeyboardEvent) => {
 		const width = getPaneWidthForKey(event.key, this.#getPaneWidth(), getLimits());

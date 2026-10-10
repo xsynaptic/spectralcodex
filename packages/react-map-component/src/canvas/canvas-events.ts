@@ -155,7 +155,8 @@ export function useMapCanvasEvents({
 function useClickHandler(isPopupEnabled: boolean) {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
-	const { setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } = useMapStoreActions();
+	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
+		useMapStoreActions();
 
 	const selectPoint = useCallback(
 		(
@@ -164,6 +165,7 @@ function useClickHandler(isPopupEnabled: boolean) {
 			center: [number, number] | undefined,
 		) => {
 			setSelectedId(pointId);
+			setClickedId(pointId);
 			setHoveredId(undefined);
 
 			if (!center || !isPopupEnabled) return;
@@ -183,7 +185,7 @@ function useClickHandler(isPopupEnabled: boolean) {
 					: { bottom: 0, left: 0, right: 180, top: 0 },
 			});
 		},
-		[isMobile, isPopupEnabled, setSelectedId, setHoveredId, setPopupVisible],
+		[isMobile, isPopupEnabled, setSelectedId, setClickedId, setHoveredId, setPopupVisible],
 	);
 
 	return useCallback<NonNullable<MapCallbacks['onClick']>>(

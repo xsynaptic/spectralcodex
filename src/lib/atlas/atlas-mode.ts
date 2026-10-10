@@ -8,7 +8,6 @@ import {
 	atlasHeroSelector,
 	atlasHeroSizesTemplate,
 	atlasNavigateEventName,
-	atlasPaneMediaQuery,
 	atlasPaneSizeDefault,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
@@ -63,13 +62,8 @@ function getReturnPath() {
 	}
 }
 
-// False below the pane breakpoint, where there is no split and the caller's link to the full-screen map navigates
 export function openAtlas() {
-	if (!matchMedia(atlasPaneMediaQuery).matches) return false;
-
 	setFlag(true);
-
-	return true;
 }
 
 // atlas.css clamps the request into `--atlas-pane-width`; the pane's rendered width is the settled value
@@ -120,6 +114,11 @@ export function startAtlasMode() {
 
 	// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
 	document.addEventListener('astro:before-swap', (event) => {
+		const { atlasPage } = document.documentElement.dataset;
+
+		// Root attributes are the incoming page's by the time the transition is styled
+		if (atlasPage) event.newDocument.documentElement.dataset.atlasFrom = atlasPage;
+
 		if (!document.querySelector(shellSelector)) return;
 		if (event.newDocument.querySelector(shellSelector)) return;
 

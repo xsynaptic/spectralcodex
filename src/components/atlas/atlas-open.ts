@@ -10,7 +10,8 @@ class AtlasOpen extends HTMLElement {
 	}
 
 	#handleClick = (event: MouseEvent) => {
-		if (openAtlas()) event.preventDefault();
+		event.preventDefault();
+		openAtlas();
 	};
 }
 

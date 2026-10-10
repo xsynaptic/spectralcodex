@@ -19,6 +19,7 @@ import {
 	useMapHoveredId,
 	useMapSelectedId,
 	useMapStoreActions,
+	useMapStoreInstance,
 } from '#store/store.ts';
 
 type MapPopupItemExtended = MapPopupItem & {
@@ -241,6 +242,34 @@ function useMapImagePreload({
 	]);
 }
 
+// A point id is a content hash, so analytics takes the location's url, known only once popup data lands
+function usePopupOpenTracking({
+	isEnabled,
+	isLoading,
+	popupItem,
+}: {
+	isEnabled: boolean;
+	isLoading: boolean;
+	popupItem: MapPopupItemExtended | undefined;
+}) {
+	const mapStoreInstance = useMapStoreInstance();
+	const { setClickedId } = useMapStoreActions();
+
+	const id = popupItem?.id;
+	const url = popupItem?.url;
+
+	useEffect(() => {
+		if (!isEnabled || isLoading || !id) return;
+		if (mapStoreInstance.getState().clickedId !== id) return;
+
+		setClickedId(undefined);
+
+		if (!url) return;
+
+		globalThis.window.umami?.track('map-popup-open', { location: url });
+	}, [id, isEnabled, isLoading, mapStoreInstance, setClickedId, url]);
+}
+
 // Index by id so hover/selection lookups avoid an O(n) scan per render
 function useSourceDataIndex(): Map<string, MapSourceItem> {
 	const { data: sourceData } = useSourceDataQuery();
@@ -348,7 +377,13 @@ const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision(
 
 const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 	function MapPopupTitleText({ title, url }) {
-		return url ? <a href={url}>{title}</a> : <span>{title}</span>;
+		return url ? (
+			<a data-umami-event="map-popup-visit" data-umami-event-location={url} href={url}>
+				{title}
+			</a>
+		) : (
+			<span>{title}</span>
+		);
 	};
 
 const MapPopupContent: FC<{
@@ -488,6 +523,7 @@ export const MapPopup: FC<{
 
 	useMapImagePreload({ imageServerUrl, isEnabled: !featureOpenEventName });
 	useFeatureOpenDispatch(featureOpenEventName, popupItem?.url);
+	usePopupOpenTracking({ isEnabled: !featureOpenEventName, isLoading, popupItem });
 
 	if (!popupItem) return;
 
@@ -503,3 +539,10 @@ export const MapPopup: FC<{
 		/>
 	);
 };
+
+// Mirrors the declaration in the app's `src/components/search/search-toggle.ts`
+declare global {
+	interface Window {
+		umami?: { track: (eventName: string, eventData?: Record<string, unknown>) => void };
+	}
+}

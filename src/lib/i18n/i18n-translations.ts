@@ -109,6 +109,7 @@ const translationStrings = {
 		'section.map.label': 'Map of {title}',
 		'section.map.loading': 'Loading map',
 		'section.similar': 'Similar Content',
+		'section.similar.more': 'Show more',
 		'section.sources': 'Sources',
 		'section.webmentions': 'Webmentions',
 
@@ -171,10 +172,11 @@ const translationStrings = {
 		'carousel.slide.roledescription': 'slide',
 
 		// Atlas
-		'atlas.close.label': 'Close Location',
+		'atlas.close.label': 'Expand map',
 		'atlas.description': 'A full-screen map of every Location in Taiwan.',
 		'atlas.divider.label': 'Resize map and content',
 		'atlas.exit.label': 'Leave atlas',
+		'atlas.expand.label': 'Expand content',
 		'atlas.open.label': 'Open in atlas',
 		'atlas.title': 'Atlas',
 
