@@ -8,6 +8,9 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
+import type { MapComponentProps } from '#types.ts';
+
+import { ExitControl } from '#controls/controls-exit.tsx';
 import { FilterControl } from '#controls/controls-filter.tsx';
 import { MetricsControl } from '#controls/controls-metrics.tsx';
 import { SearchControl } from '#controls/controls-search.tsx';
@@ -15,7 +18,9 @@ import { useIsMapCanvasInteractive } from '#store/store.ts';
 
 const isFeatureSearchControl = false as boolean;
 
-export const MapControls: FC = function MapControls() {
+export const MapControls: FC<Pick<MapComponentProps, 'exitControl'>> = function MapControls({
+	exitControl,
+}) {
 	const isCanvasInteractive = useIsMapCanvasInteractive();
 
 	return (
@@ -24,7 +29,11 @@ export const MapControls: FC = function MapControls() {
 			<AttributionControl compact={true} position="bottom-right" />
 			{isCanvasInteractive ? (
 				<>
-					<FullscreenControl position="top-left" />
+					{exitControl ? (
+						<ExitControl eventName={exitControl.eventName} position="top-left" />
+					) : (
+						<FullscreenControl position="top-left" />
+					)}
 					<GeolocateControl
 						position="top-left"
 						positionOptions={{ enableHighAccuracy: true }}

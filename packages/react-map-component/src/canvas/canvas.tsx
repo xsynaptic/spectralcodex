@@ -9,10 +9,11 @@ import type { MapComponentProps } from '#types.ts';
 import '#canvas/canvas-worker.ts';
 import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
+import { useFeatureOpenEventName } from '#canvas/canvas-feature-open.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
-import { MapSelectedMarker, MapTargetMarkers } from '#canvas/canvas-markers.tsx';
 import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
+import { MapTargets } from '#canvas/canvas-targets.tsx';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
@@ -52,6 +53,8 @@ const MapCanvasContainer: FC<
 	baseMapTheme,
 	bounds,
 	center,
+	exitControl,
+	featureOpen,
 	hash,
 	imageServerUrl,
 	isDev,
@@ -62,6 +65,7 @@ const MapCanvasContainer: FC<
 	protomapsApiKey,
 	style,
 	targetIds,
+	targetSync,
 	version,
 	zoom,
 }) {
@@ -72,7 +76,9 @@ const MapCanvasContainer: FC<
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
-	const canvasEvents = useMapCanvasEvents({ mapId });
+	const featureOpenEventName = useFeatureOpenEventName(featureOpen);
+
+	const canvasEvents = useMapCanvasEvents({ isPopupEnabled: !featureOpenEventName, mapId });
 	const isCanvasInteractive = useIsMapCanvasInteractive();
 	const isCanvasLoading = useIsMapCanvasLoading();
 
@@ -104,8 +110,12 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 					version={version}
 				>
-					<MapControls />
-					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
+					<MapControls exitControl={exitControl} />
+					<MapPopup
+						featureOpenEventName={featureOpenEventName}
+						imageServerUrl={imageServerUrl}
+						isDev={isDev}
+					/>
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
 			<MapSource
@@ -114,8 +124,7 @@ const MapCanvasContainer: FC<
 				isDev={isDev}
 				targetIds={targetIds}
 			/>
-			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
-			<MapSelectedMarker targetIds={targetIds} />
+			<MapTargets targetIds={targetIds} targetSync={targetSync} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
 			<MapCanvasLoading loading={isCanvasLoading || isSourceDataLoading} />

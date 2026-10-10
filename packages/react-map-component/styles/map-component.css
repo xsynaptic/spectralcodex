@@ -520,6 +520,11 @@ button.maplibregl-popup-close-button {
 	box-shadow: none;
 }
 
+/* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
+[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact-show {
+	visibility: inherit;
+}
+
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-scale,
 .maplibregl-ctrl-metrics {
