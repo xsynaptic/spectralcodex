@@ -17,6 +17,7 @@ export default getConfig(
 	[
 		{
 			ignores: [
+				'.claude/**/*',
 				'node_modules/**/*',
 				'**/.astro/**/*',
 				'**/.cache/**/*',
