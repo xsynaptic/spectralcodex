@@ -21,11 +21,11 @@ const t = getTranslations();
 	></div>
 	<div class="atlas-divider-controls">
 		<button
-			aria-label={t('atlas.expand.label')}
+			aria-label={t('atlas.expand.content.label')}
 			class="atlas-divider-control"
 			data-atlas-expand
 			data-umami-event="atlas-expand-content"
-			title={t('atlas.expand.label')}
+			title={t('atlas.expand.content.label')}
 			type="button"
 		>
 			<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
@@ -33,12 +33,12 @@ const t = getTranslations();
 			</svg>
 		</button>
 		<a
-			aria-label={t('atlas.close.label')}
+			aria-label={t('atlas.expand.map.label')}
 			class="atlas-divider-control"
 			data-astro-prefetch="false"
 			data-umami-event="atlas-expand-map"
 			href={getSitePath('atlas')}
-			title={t('atlas.close.label')}
+			title={t('atlas.expand.map.label')}
 		>
 			<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
 				<use href="#icon:chevron-right"></use>

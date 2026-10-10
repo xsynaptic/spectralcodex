@@ -107,3 +107,15 @@ export function getTargetZoom(zoom: number, fitZoom: number) {
 
 	return zoom;
 }
+
+const fitDurationBase = 450;
+const fitDurationPerZoomLevel = 200;
+const fitDurationMax = 1800;
+
+// Tiles cannot keep up with a long zoom at the base duration
+export function getTargetDuration(zoom: number, targetZoom: number) {
+	return Math.min(
+		fitDurationMax,
+		fitDurationBase + Math.abs(targetZoom - zoom) * fitDurationPerZoomLevel,
+	);
+}

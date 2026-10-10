@@ -5,6 +5,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
 	getTargetBounds,
+	getTargetDuration,
 	getTargetPositions,
 	getTargetZoom,
 	parseMapView,
@@ -114,5 +115,20 @@ describe('getTargetZoom', () => {
 
 	test('a single point, which fits at any zoom, stops at the maximum', () => {
 		expect(getTargetZoom(19, 22)).toBe(17);
+	});
+});
+
+describe('getTargetDuration', () => {
+	test('a move at the same zoom takes the base duration', () => {
+		expect(getTargetDuration(14, 14)).toBe(450);
+	});
+
+	test('each zoom level travelled adds time, in either direction', () => {
+		expect(getTargetDuration(12, 15)).toBe(1050);
+		expect(getTargetDuration(17, 14)).toBe(1050);
+	});
+
+	test('a zoom from far out is capped', () => {
+		expect(getTargetDuration(7, 15)).toBe(1800);
 	});
 });

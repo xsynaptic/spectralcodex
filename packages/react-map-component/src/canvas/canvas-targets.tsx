@@ -12,12 +12,16 @@ import {
 	MapTargetMarkers,
 } from '#canvas/canvas-markers.tsx';
 import { useMapTargetIds } from '#canvas/canvas-target-ids.tsx';
-import { getTargetBounds, getTargetPositions, getTargetZoom } from '#canvas/canvas-view-factory.ts';
+import {
+	getTargetBounds,
+	getTargetDuration,
+	getTargetPositions,
+	getTargetZoom,
+} from '#canvas/canvas-view-factory.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useDocumentEventValue } from '#lib/document-attribute.ts';
 import { useMapStoreActions } from '#store/store.ts';
 
-const fitDuration = 450;
 const fitPadding = 50;
 
 // The last popup leaves its padding on the transform, so zoom would turn around an off-centre point
@@ -31,6 +35,11 @@ function clearPadding(map: MapRef) {
 		center: map.unproject([container.clientWidth / 2, container.clientHeight / 2]),
 		padding: { bottom: 0, left: 0, right: 0, top: 0 },
 	});
+}
+
+// The first fit lands as the map appears; easing there reads as lag
+function getFitDuration(isFirstFit: boolean, zoom: number, targetZoom: number) {
+	return isFirstFit ? 0 : getTargetDuration(zoom, targetZoom);
 }
 
 // True once the camera has settled on the current Targets
@@ -53,6 +62,8 @@ function useTargetFit(targetIds: Array<string>, eventName: string) {
 	useEffect(() => {
 		if (!map || !sourceData || handledKeyRef.current === key) return;
 
+		const isFirstFit = handledKeyRef.current === undefined;
+
 		handledKeyRef.current = key;
 		setSelectedId(undefined);
 
@@ -72,10 +83,13 @@ function useTargetFit(targetIds: Array<string>, eventName: string) {
 			setSettledKey(key);
 		});
 
+		const zoom = map.getZoom();
+		const targetZoom = getTargetZoom(zoom, fit.zoom);
+
 		map.easeTo({
 			center: fit.center,
-			duration: fitDuration,
-			zoom: getTargetZoom(map.getZoom(), fit.zoom),
+			duration: getFitDuration(isFirstFit, zoom, targetZoom),
+			zoom: targetZoom,
 		});
 	}, [key, map, setSelectedId, sourceData, targetIds]);
 
