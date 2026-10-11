@@ -531,6 +531,21 @@ button.maplibregl-popup-close-button {
 	user-select: none;
 }
 
+.maplibregl-ctrl-filter {
+	position: relative;
+}
+
+.map-filter-indicator {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 7px;
+	height: 7px;
+	pointer-events: none;
+	background-color: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	border-radius: 50%;
+}
+
 .map-ctrl-icon-frame {
 	display: flex;
 	align-items: center;

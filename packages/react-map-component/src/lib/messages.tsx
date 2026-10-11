@@ -6,6 +6,7 @@ import { createContext, useContext, useMemo } from 'react';
 export interface MapMessages {
 	copyCoordinatesLabel: string;
 	exitAriaLabel: string;
+	filterMenuActiveAriaLabel: string;
 	filterMenuAriaLabel: string;
 	googleMapsAriaLabel: string;
 	hideAll: string;
@@ -24,6 +25,7 @@ export interface MapMessages {
 const defaultMapMessages: MapMessages = {
 	copyCoordinatesLabel: 'Copy coordinates',
 	exitAriaLabel: 'Close map',
+	filterMenuActiveAriaLabel: 'Filter Menu, filters active',
 	filterMenuAriaLabel: 'Filter Menu',
 	googleMapsAriaLabel: 'Google Maps',
 	hideAll: 'Hide All',
