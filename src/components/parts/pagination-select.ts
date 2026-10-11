@@ -1,4 +1,10 @@
+import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
 import { navigate } from 'astro:transitions/client';
+
+function scrollToPaginationTarget() {
+	document.querySelector('[data-pagination-target]')?.scrollIntoView();
+}
 
 // Navigation commits on `change` only for a pointer-driven pick on a fine pointer, otherwise via Go or Enter
 class PaginationSelect extends HTMLElement {
@@ -21,6 +27,7 @@ class PaginationSelect extends HTMLElement {
 		this.#abortController = new AbortController();
 		const { signal } = this.#abortController;
 
+		document.addEventListener('astro:before-swap', this.#handleBeforeSwap, { signal });
 		this.#form.addEventListener('submit', this.#handleSubmit, { signal });
 		this.#select.addEventListener('change', this.#handleChange, { signal });
 		this.#select.addEventListener('pointerdown', this.#handlePointerDown, { signal });
@@ -54,6 +61,12 @@ class PaginationSelect extends HTMLElement {
 		this.#submit = form.querySelector<HTMLButtonElement>('[data-pagination-submit]') ?? undefined;
 		this.#syncSubmit();
 	}
+
+	#handleBeforeSwap = (event: TransitionBeforeSwapEvent) => {
+		if (!event.sourceElement || !this.contains(event.sourceElement)) return;
+
+		document.addEventListener('astro:after-swap', scrollToPaginationTarget, { once: true });
+	};
 
 	#handleChange = () => {
 		// A coarse-pointer picker is easy to mis-tap, so touch commits through Go
@@ -128,7 +141,7 @@ class PaginationSelect extends HTMLElement {
 		if (url === '' || url === this.#currentUrl) return;
 
 		// Using the navigate function (not location.assign) for compatibility with Astro's view transitions
-		void navigate(url);
+		void navigate(url, { sourceElement: this });
 	}
 
 	#syncSubmit() {
