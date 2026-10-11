@@ -6,6 +6,7 @@ import pMemoize from 'p-memoize';
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { createLocationsBySeriesFunction } from '#lib/collections/series/series-utils.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 import { getMapData } from '#lib/map/map-data.ts';
@@ -97,7 +98,37 @@ async function getAtlasThemeView(
 	};
 }
 
-type AtlasEntry = CollectionEntry<'locations' | 'regions' | 'themes'>;
+async function getAtlasSeriesView(
+	entry: CollectionEntry<'series'>,
+	mapData: MapComponentData,
+): Promise<MapView | undefined> {
+	if (!mapData.hasGeodata) return;
+
+	const atlasLocationIds = await getAtlasLocationIds();
+	const getLocationsBySeries = await createLocationsBySeriesFunction();
+
+	const locations = getLocationsBySeries(entry.data.seriesItems).filter(({ id }) =>
+		atlasLocationIds.has(id),
+	);
+	const featureCollection = getLocationsFeatureCollection(locations);
+	const bounds = getMapBounds({ featureCollection });
+
+	if (!featureCollection || !bounds) return;
+
+	return {
+		scope: {
+			bounds: bounds.bounds,
+			rule: {
+				ids: featureCollection.features.flatMap(({ id }) => (typeof id === 'string' ? [id] : [])),
+				type: 'ids',
+			},
+			title: entry.data.title,
+			url: getContentPath(entry.collection, entry.id),
+		},
+	};
+}
+
+type AtlasEntry = CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
 
 async function getAtlasView(entry: AtlasEntry, mapData: MapComponentData) {
 	switch (entry.collection) {
@@ -106,6 +137,9 @@ async function getAtlasView(entry: AtlasEntry, mapData: MapComponentData) {
 		}
 		case 'regions': {
 			return getAtlasRegionView(entry, mapData);
+		}
+		case 'series': {
+			return getAtlasSeriesView(entry, mapData);
 		}
 		case 'themes': {
 			return getAtlasThemeView(entry, mapData);

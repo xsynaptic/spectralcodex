@@ -14,6 +14,7 @@ import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
@@ -28,9 +29,11 @@ const { entry, mapData, page, wordCount } = Astro.props;
 const entryCount = entry.data._entryCount ?? 0;
 
 const t = getTranslations();
+
+const atlas = await getAtlasPage(entry, mapData);
 ---
 
-<ContentEntryDetail entry={entry} prefetchUrls={mapData.prefetchUrls}>
+<ContentEntryDetail atlas={atlas} entry={entry} prefetchUrls={mapData.prefetchUrls}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
@@ -47,7 +50,12 @@ const t = getTranslations();
 		) : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
+	<SectionMap
+		class="atlas-inline-map"
+		entryTitle={entry.data.title}
+		mapData={mapData}
+		showAtlasOpen={!!atlas}
+	/>
 	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 	<SectionWebmentions entry={entry} />
 	<SectionPreviews page={page} showMicroformats={true} />

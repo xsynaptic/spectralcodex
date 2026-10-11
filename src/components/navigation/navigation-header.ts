@@ -5,6 +5,7 @@ import pMemoize from 'p-memoize';
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
+import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import {
 	createRegionsByIdsFunction,
 	getRegionsCollection,
@@ -18,6 +19,9 @@ import { getSitePath } from '#lib/utils/routing.ts';
 
 // Increase this to 3 to show subregions in the header navigation
 const maxDepth = 2 as number;
+
+// Pages missing from the content source (the demo content has none of these) are skipped
+const aboutMenuPageIds = ['faq', 'links', 'tech-stack', 'style-guide', 'camera-history', 'privacy'];
 
 const t = getTranslations();
 
@@ -62,6 +66,14 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 
 	const chronologyData = await getChronologyData();
 
+	const { entriesMap: pagesMap } = await getPagesCollection();
+
+	const aboutMenu = aboutMenuPageIds.flatMap((id) => {
+		const entry = pagesMap.get(id);
+
+		return entry ? [{ title: entry.data.title, url: getSitePath(entry.id) }] : [];
+	});
+
 	return [
 		{
 			title: t('collection.posts.labelPlural'),
@@ -99,6 +111,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('atlas'),
 		},
 		{
+			children: aboutMenu,
 			title: t('navigation.about.label'),
 			url: getSitePath('about'),
 		},

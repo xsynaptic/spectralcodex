@@ -9,7 +9,7 @@ const t = getTranslations();
 const atlasPath = '/atlas/';
 const probeLimit = 8;
 
-// Region and Theme pages also link to Posts, which have no split
+// A page may also link to Posts, which have no split
 async function getPaneLink(request: APIRequestContext, urls: Array<string>) {
 	for (const url of urls.slice(0, probeLimit)) {
 		const response = await request.get(url);
@@ -80,47 +80,54 @@ test('one map carries a reader through the split, the full-screen atlas and back
 	await expect(shell).toBeHidden();
 });
 
-test('a Theme scopes the map until the reader clears it', async ({ page, request }) => {
-	await visit(page, paths.themeDetail);
+const scopePages = [
+	['Theme', paths.themeDetail],
+	['Series', paths.seriesDetail],
+] as const;
 
-	const shell = page.locator('.atlas-shell');
-	const scopeName = shell.locator('.map-scope-name');
-	const metrics = shell.locator('.maplibregl-ctrl-metrics');
-	const heading = await page.locator('h1').textContent();
-	const title = heading?.trim() ?? '';
+for (const [label, path] of scopePages) {
+	test(`a ${label} scopes the map until the reader clears it`, async ({ page, request }) => {
+		await visit(page, path);
 
-	await page.locator('.atlas-inline-map .maplibregl-ctrl-enter').click();
-	await expect(scopeName).toHaveText(title, { timeout: 10_000 });
+		const shell = page.locator('.atlas-shell');
+		const scopeName = shell.locator('.map-scope-name');
+		const metrics = shell.locator('.maplibregl-ctrl-metrics');
+		const heading = await page.locator('h1').textContent();
+		const title = heading?.trim() ?? '';
 
-	const scopedMetrics = (await metrics.textContent()) ?? '';
+		await page.locator('.atlas-inline-map .maplibregl-ctrl-enter').click();
+		await expect(scopeName).toHaveText(title, { timeout: 10_000 });
 
-	const urls = await page
-		.locator('main a[href]')
-		.evaluateAll((anchors) =>
-			anchors
-				.map((anchor) => anchor.getAttribute('href') ?? '')
-				.filter((href) => /^\/[^/]+\/$/.test(href)),
-		);
-	const paneUrl = await getPaneLink(request, [...new Set(urls)]);
+		const scopedMetrics = (await metrics.textContent()) ?? '';
 
-	await page.locator(`main a[href="${paneUrl}"]`).first().click();
-	await page.waitForURL(`**${paneUrl}`);
+		const urls = await page
+			.locator('main a[href]')
+			.evaluateAll((anchors) =>
+				anchors
+					.map((anchor) => anchor.getAttribute('href') ?? '')
+					.filter((href) => /^\/[^/]+\/$/.test(href)),
+			);
+		const paneUrl = await getPaneLink(request, [...new Set(urls)]);
 
-	await expect(scopeName).toHaveText(title);
-	await expect(metrics).toHaveText(scopedMetrics);
-	await expect(shell.locator('.map-pulse-ring').first()).toBeVisible();
+		await page.locator(`main a[href="${paneUrl}"]`).first().click();
+		await page.waitForURL(`**${paneUrl}`);
 
-	await shell.locator('.map-scope-clear').click();
+		await expect(scopeName).toHaveText(title);
+		await expect(metrics).toHaveText(scopedMetrics);
+		await expect(shell.locator('.map-pulse-ring').first()).toBeVisible();
 
-	await expect(scopeName).toBeHidden();
-	await expect(metrics).not.toHaveText(scopedMetrics);
+		await shell.locator('.map-scope-clear').click();
 
-	await page.goBack();
-	await page.waitForURL(`**${paths.themeDetail}`);
+		await expect(scopeName).toBeHidden();
+		await expect(metrics).not.toHaveText(scopedMetrics);
 
-	// Going back counts as a new visit to the Theme page, so its Scope is set again
-	await expect(scopeName).toHaveText(title);
-});
+		await page.goBack();
+		await page.waitForURL(`**${path}`);
+
+		// Going back counts as a new visit to the page, so its Scope is set again
+		await expect(scopeName).toHaveText(title);
+	});
+}
 
 test.describe('on a wide viewport', () => {
 	test.use({ viewport: { height: 900, width: 1440 } });

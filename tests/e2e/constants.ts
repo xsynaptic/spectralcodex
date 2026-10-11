@@ -17,6 +17,7 @@ export const paths = {
 	postsIndex: '/posts/',
 	regionDetail: '/regions/tainan/',
 	regionDetailAncestor: '/regions/taiwan/',
+	seriesDetail: '/series/huadong-valley-ride-2018/',
 	themeDetail: '/themes/taiwan-japanese-colonial-era/',
 } as const;
 

@@ -109,7 +109,7 @@ export async function querySeriesIndex() {
 }
 
 // Generate geodata for series items; combines posts with multiple locations and individual locations
-async function createLocationsBySeriesFunction() {
+export async function createLocationsBySeriesFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 	const { entriesMap: postsMap } = await getPostsCollection();
 

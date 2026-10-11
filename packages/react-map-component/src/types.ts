@@ -89,7 +89,6 @@ export interface MapScope extends Pick<MapComponentProps, 'apiDivisionUrl' | 'bo
 	url: string;
 }
 
-// A Location page sets `targetIds`, a Region or Theme page sets `scope`, any other page sets neither
 export interface MapView extends Pick<MapComponentProps, 'targetIds'> {
 	scope?: MapScope | undefined;
 }
