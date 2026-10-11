@@ -98,7 +98,7 @@
 	}
 }
 
-.divided-item::after {
+.divided-item::before {
 	color: light-dark(
 		var(--divider-color, var(--color-primary-400)),
 		var(--divider-color-dark, var(--color-primary-500))
@@ -108,12 +108,12 @@
 
 /* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
 @media (width < 40rem) {
-	.divided-item::after {
+	.divided-item::before {
 		margin-inline: var(--divider-space, calc(var(--spacing) * 1));
 	}
 }
 
-.divided-item:last-child::after {
+.divided-item:first-child::before {
 	content: none;
 }
 
@@ -121,7 +121,7 @@
 	--divider-glyph: var(--content-chevron);
 }
 
-.divided-chevron::after {
+.divided-chevron::before {
 	translate: 0 -1px;
 }
 
@@ -129,7 +129,7 @@
 	--divider-glyph: var(--content-dot);
 }
 
-.divided-thin::after {
+.divided-thin::before {
 	font-weight: var(--font-weight-light);
 }
 
@@ -139,7 +139,7 @@
 }
 
 @media (width >= 40rem) {
-	.divided-hero .divided-item::after {
+	.divided-hero .divided-item::before {
 		color: var(--color-primary-300);
 		opacity: 0.8;
 	}
