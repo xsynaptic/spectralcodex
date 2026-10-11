@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
 
+import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
@@ -11,7 +12,8 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 
-export type AtlasPageProps = { page: 'map' } | { page: 'pane'; view: MapView };
+export type AtlasPageProps =
+	{ page: typeof atlasPage.map } | { page: typeof atlasPage.pane; view: MapView };
 
 const atlasRegionId = 'taiwan';
 
@@ -77,7 +79,7 @@ export async function getAtlasPage(
 ): Promise<AtlasPageProps | undefined> {
 	const view = await getAtlasView(entry, mapData);
 
-	return view ? { page: 'pane', view } : undefined;
+	return view ? { page: atlasPage.pane, view } : undefined;
 }
 
 // Memoized; every atlas page renders the island in its shell

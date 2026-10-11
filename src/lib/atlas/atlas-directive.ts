@@ -1,8 +1,12 @@
 import type { ClientDirective } from 'astro';
 
-import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive-factory.ts';
+import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
 
-import { shouldHydrateAtlas } from '#lib/atlas/atlas-directive-factory.ts';
+// Serialized into the `client:atlas` value; a directive takes one string
+export interface AtlasDirectiveOptions {
+	css: string;
+	mediaQuery: string;
+}
 
 // Astro runs a directive again each time a persisted island reconnects, which is every swap
 const startedIslands = new WeakSet<HTMLElement>();
@@ -43,13 +47,13 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	const observer = new MutationObserver(hydrateWhenVisible);
 
 	function hydrateWhenVisible() {
-		const isVisible = shouldHydrateAtlas({
+		const layout = getAtlasLayout({
 			hasFlag: Object.hasOwn(root.dataset, 'atlas'),
 			isPaneMatch: paneQuery.matches,
 			page: root.dataset.atlasPage,
 		});
 
-		if (!isVisible) return;
+		if (layout === 'regular') return;
 
 		observer.disconnect();
 		paneQuery.removeEventListener('change', hydrateWhenVisible);

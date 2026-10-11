@@ -3,6 +3,9 @@ export const atlasPaneStorageKey = 'scx-atlas-pane-width';
 
 export const atlasPersistName = 'atlas-map';
 
+// Values of `data-atlas-page` on the root; atlas.css writes the same two
+export const atlasPage = { map: 'map', pane: 'pane' } as const;
+
 // Requested pane width in pixels; atlas.css clamps it into `--atlas-pane-width`
 export const atlasPaneSizeProperty = '--atlas-pane-size';
 

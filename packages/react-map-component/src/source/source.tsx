@@ -20,16 +20,16 @@ const emptyFeatureCollection: FeatureCollection<never, never> = {
 };
 
 export const MapSource: FC<
-	Pick<MapComponentProps, 'apiDivisionUrl' | 'host' | 'isDev'> & {
+	Pick<MapComponentProps, 'host' | 'isDev'> & {
 		bounds: MapComponentProps['bounds'] | undefined;
 	}
-> = function MapSource({ apiDivisionUrl, bounds, host, isDev }) {
+> = function MapSource({ bounds, host, isDev }) {
 	const isInteractive = useIsMapCanvasInteractive();
 	const view = useMapView();
 
 	const { lineStringCollection, pointCollection } = useMapCanvasData();
 	const { data: divisionData } = useMapApiDivisionData({
-		apiDivisionUrl: host ? view.apiDivisionUrl : apiDivisionUrl,
+		apiDivisionUrl: view.apiDivisionUrl,
 		isDev,
 	});
 

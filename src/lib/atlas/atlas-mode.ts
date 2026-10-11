@@ -7,12 +7,14 @@ import { navigate } from 'astro:transitions/client';
 
 import {
 	atlasFlagStorageKey,
+	atlasPage,
 	atlasPaneMediaQuery,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasPersistName,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
+import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
 import { getPaneImageSizes } from '#lib/atlas/atlas-pane-factory.ts';
 import { getPaneTokens } from '#lib/atlas/atlas-pane.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
@@ -27,8 +29,16 @@ function dispatchSync() {
 	document.dispatchEvent(new Event(mapSyncEventName));
 }
 
+function getLayout(root: HTMLElement) {
+	return getAtlasLayout({
+		hasFlag: 'atlas' in root.dataset,
+		isPaneMatch: matchMedia(atlasPaneMediaQuery).matches,
+		page: root.dataset.atlasPage,
+	});
+}
+
 function getSplitHeroSizes(root: HTMLElement) {
-	if (!('atlas' in root.dataset) || root.dataset.atlasPage !== 'pane') return;
+	if (getLayout(root) !== 'split') return;
 
 	const { mapMinRem, paneDefaultRem, paneMinRem } = getPaneTokens();
 	const paneSize =
@@ -49,11 +59,7 @@ function updateHeroSizes(target: Document = document) {
 
 // Following an outbound link in the same tab unloads the map; internal links swap into the pane
 function updateExternalLinks() {
-	const root = document.documentElement;
-	const isSplit =
-		'atlas' in root.dataset &&
-		root.dataset.atlasPage === 'pane' &&
-		matchMedia(atlasPaneMediaQuery).matches;
+	const isSplit = getLayout(document.documentElement) === 'split';
 
 	for (const anchor of document.querySelectorAll<HTMLAnchorElement>(paneAnchorSelector)) {
 		if (anchor.origin === location.origin || !anchor.protocol.startsWith('http')) continue;
@@ -61,6 +67,11 @@ function updateExternalLinks() {
 		if (isSplit) anchor.target = '_blank';
 		else anchor.removeAttribute('target');
 	}
+}
+
+function updateSplit() {
+	updateHeroSizes();
+	updateExternalLinks();
 }
 
 function storeFlag(isEnabled: boolean) {
@@ -76,8 +87,7 @@ function setFlag(isEnabled: boolean) {
 	document.documentElement.toggleAttribute('data-atlas', isEnabled);
 
 	storeFlag(isEnabled);
-	updateHeroSizes();
-	updateExternalLinks();
+	updateSplit();
 	dispatchSync();
 }
 
@@ -98,7 +108,7 @@ export function closeAtlas() {
 	setFlag(false);
 
 	// In the split, clearing the flag has already turned the pane back into the regular page
-	if (document.documentElement.dataset.atlasPage !== 'map') return;
+	if (document.documentElement.dataset.atlasPage !== atlasPage.map) return;
 
 	const action = getAtlasExitAction({
 		canGoBack: 'navigation' in globalThis && navigation.canGoBack,
@@ -141,7 +151,7 @@ export function startAtlasMode() {
 		void navigate(url);
 	});
 
-	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateExternalLinks);
+	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateSplit);
 
 	document.addEventListener('click', (event) => {
 		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-open]')) return;
@@ -153,7 +163,7 @@ export function startAtlasMode() {
 	document.addEventListener('astro:before-swap', (event) => {
 		const root = document.documentElement;
 		const incomingRoot = event.newDocument.documentElement;
-		const isMap = incomingRoot.dataset.atlasPage === 'map';
+		const isMap = incomingRoot.dataset.atlasPage === atlasPage.map;
 		const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty);
 
 		// Visiting the full-screen map turns the mode on
@@ -179,7 +189,7 @@ export function startAtlasMode() {
 	});
 
 	document.addEventListener('astro:page-load', () => {
-		if (document.documentElement.dataset.atlasPage !== 'map') {
+		if (document.documentElement.dataset.atlasPage !== atlasPage.map) {
 			try {
 				sessionStorage.setItem(returnStorageKey, location.pathname + location.search);
 			} catch {

@@ -124,6 +124,7 @@ function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 		{ isFallback: true, suffix: ContentCollectionsEnum.Resources, title: 'Resources' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Series, title: 'Series' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Themes, title: 'Themes' },
+		{ suffix: 'atlas', title: 'Atlas' },
 		{ suffix: 'homepage', title: '' }, // No duplicate branding
 		{ isFallback: true, suffix: 'not-found', title: '404: Not Found' },
 	];

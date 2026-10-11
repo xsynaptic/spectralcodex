@@ -170,7 +170,7 @@ function useClickHandler(isPopupEnabled: boolean) {
 			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			// Popups are off in atlas mode, except for a Point of the Location already open
+			// Popups are off on a hosted map, except for a Point of the Location already open
 			if (!center || !(isPopupEnabled || targetIds.includes(pointId))) return;
 
 			setPopupVisible(false);

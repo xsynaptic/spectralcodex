@@ -1,7 +1,9 @@
 ---
 import Document from '#components/main/main-document.astro';
+import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getAtlasMapData } from '#lib/map/map-atlas.ts';
+import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 const { prefetchUrls } = await getAtlasMapData();
 
@@ -9,9 +11,10 @@ const t = getTranslations();
 ---
 
 <Document
-	atlas={{ page: 'map' }}
+	atlas={{ page: atlasPage.map }}
 	meta={{
 		description: t('atlas.description'),
+		image: getSeoImageProps({ alt: t('atlas.title'), id: 'index-atlas' }),
 		preloadUrls: prefetchUrls,
 		title: t('atlas.title'),
 	}}

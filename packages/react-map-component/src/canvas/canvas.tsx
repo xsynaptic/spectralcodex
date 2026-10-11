@@ -49,7 +49,6 @@ const MapCanvasContainer: FC<
 	}
 > = function MapCanvasContainer({
 	apiChunkBaseUrl,
-	apiDivisionUrl,
 	apiPopupUrl,
 	baseMapTheme,
 	bounds,
@@ -116,7 +115,7 @@ const MapCanvasContainer: FC<
 					/>
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
-			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} host={host} isDev={isDev} />
+			<MapSource bounds={bounds} host={host} isDev={isDev} />
 			<MapTargets host={host} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
@@ -127,6 +126,7 @@ const MapCanvasContainer: FC<
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 	const {
+		apiDivisionUrl,
 		apiSourceUrl,
 		host,
 		interactive,
@@ -156,7 +156,12 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
 				}}
 			>
-				<MapViewProvider host={host} isDev={isDev} targetIds={targetIds}>
+				<MapViewProvider
+					apiDivisionUrl={apiDivisionUrl}
+					host={host}
+					isDev={isDev}
+					targetIds={targetIds}
+				>
 					<CanvasDataProvider>
 						<MapCanvasContainer {...props} />
 					</CanvasDataProvider>

@@ -1,6 +1,7 @@
 ---
 import {
 	atlasFlagStorageKey,
+	atlasPage,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
@@ -9,6 +10,7 @@ import {
 <script
 	define:vars={{
 		flagStorageKey: atlasFlagStorageKey,
+		mapPage: atlasPage.map,
 		paneSizeProperty: atlasPaneSizeProperty,
 		paneStorageKey: atlasPaneStorageKey,
 	}}
@@ -17,7 +19,7 @@ import {
 	// Cold load only; atlas-mode.ts stamps every later document before its swap
 	const root = document.documentElement;
 
-	let isEnabled = root.dataset.atlasPage === 'map';
+	let isEnabled = root.dataset.atlasPage === mapPage;
 
 	try {
 		if (isEnabled) sessionStorage.setItem(flagStorageKey, '1');

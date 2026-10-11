@@ -30,11 +30,14 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 		return <MapViewContext.Provider value={view}>{children}</MapViewContext.Provider>;
 	};
 
-// A hosted map reads its view from the host, so it changes after mount; any other map has Targets only, from the prop
+// A hosted map reads its view from the host, so it changes after mount; any other map takes it from props
 export const MapViewProvider: FC<
-	PropsWithChildren<Pick<MapComponentProps, 'host' | 'isDev' | 'targetIds'>>
-> = function MapViewProvider({ children, host, isDev, targetIds }) {
-	const view = useMemo(() => ({ targetIds: targetIds ?? emptyTargetIds }), [targetIds]);
+	PropsWithChildren<Pick<MapComponentProps, 'apiDivisionUrl' | 'host' | 'isDev' | 'targetIds'>>
+> = function MapViewProvider({ apiDivisionUrl, children, host, isDev, targetIds }) {
+	const view = useMemo(
+		() => ({ apiDivisionUrl, targetIds: targetIds ?? emptyTargetIds }),
+		[apiDivisionUrl, targetIds],
+	);
 
 	if (host) {
 		return <HostViewProvider isDev={isDev}>{children}</HostViewProvider>;
