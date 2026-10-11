@@ -35,8 +35,8 @@ class ModeToggle extends HTMLElement {
 	};
 
 	#updateLabel(resolvedMode: string | undefined) {
-		const label =
-			getOppositeMode(resolvedMode) === 'dark' ? this.dataset.labelDark : this.dataset.labelLight;
+		const nextMode = getOppositeMode(resolvedMode);
+		const label = nextMode === 'dark' ? this.dataset.labelDark : this.dataset.labelLight;
 
 		if (!label) return;
 
@@ -46,6 +46,7 @@ class ModeToggle extends HTMLElement {
 
 		button.setAttribute('aria-label', label);
 		button.title = label;
+		button.dataset.umamiEventMode = nextMode;
 	}
 }
 

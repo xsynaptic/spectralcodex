@@ -20,6 +20,7 @@ interface Props extends HTMLAttributes<'div'> {
 }
 
 const {
+	class: className,
 	items,
 	page,
 	previewOptions,
@@ -38,8 +39,10 @@ const t = getTranslations();
 ---
 
 <ContentSection
+	class:list={['scroll-mt-4', className]}
 	data-nosnippet
 	data-pagefind-ignore
+	data-pagination-target={page ? '' : undefined}
 	sectionTitle={sectionTitle ?? t('section.content')}
 	{...props}
 >

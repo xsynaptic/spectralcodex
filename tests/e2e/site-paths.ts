@@ -4,6 +4,7 @@ import { contentManifestPath, paths } from '#e2e/constants.ts';
 
 export interface SitePaths {
 	locationDetail: string;
+	locationTitle: string;
 	postDetail: string;
 	postTitle: string;
 }
@@ -51,7 +52,12 @@ async function discover(request: APIRequestContext): Promise<SitePaths> {
 		titles,
 	});
 
-	return { locationDetail: location.url, postDetail: post.url, postTitle: post.title };
+	return {
+		locationDetail: location.url,
+		locationTitle: location.title,
+		postDetail: post.url,
+		postTitle: post.title,
+	};
 }
 
 // Both collections' detail routes sit at the root, so the JSON-LD type is what tells them apart

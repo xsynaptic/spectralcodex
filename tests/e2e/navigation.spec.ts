@@ -27,6 +27,32 @@ test('a submenu reveals on hover, two levels deep', async ({ page }) => {
 	await expect(regionLink).toHaveAttribute('href', paths.regionDetail);
 });
 
+test('the keyboard opens a submenu and Escape hands focus back to its trigger', async ({
+	page,
+}) => {
+	await visit(page, '/');
+
+	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
+	const trigger = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
+
+	// The element announces the collapsed state once it is listening for keys
+	await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+	await trigger.focus();
+	await page.keyboard.press('ArrowDown');
+
+	const submenu = nav.locator(`[id="${(await trigger.getAttribute('aria-controls')) ?? ''}"]`);
+
+	await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+	await expect(submenu.getByRole('link').first()).toBeFocused();
+
+	await page.keyboard.press('Escape');
+
+	await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+	await expect(trigger).toBeFocused();
+	await expect(submenu).toBeHidden();
+});
+
 test('the current page is the only one marked', async ({ page }) => {
 	await visit(page, paths.regionDetailAncestor);
 
@@ -44,23 +70,27 @@ test('the current page is the only one marked', async ({ page }) => {
 	await expect(ancestorLink).toHaveAttribute('aria-current', 'page');
 });
 
-test('a header link navigates client-side and the chrome survives the swap', async ({ page }) => {
-	await visit(page, paths.postsIndex);
+test(
+	'a header link navigates client-side and the chrome survives the swap',
+	{ tag: '@smoke' },
+	async ({ page }) => {
+		await visit(page, paths.postsIndex);
 
-	// A window property dies with its document, where a `load` count races the URL assertion on a slow host
-	await page.evaluate(() => Object.assign(window, { survivesSwap: true }));
+		// A window property dies with its document, where a `load` count races the URL assertion on a slow host
+		await page.evaluate(() => Object.assign(window, { survivesSwap: true }));
 
-	await page
-		.getByRole('navigation', { name: t('site.navigation.header.label') })
-		.getByRole('link', { exact: true, name: t('collection.locations.labelPlural') })
-		.click();
+		await page
+			.getByRole('navigation', { name: t('site.navigation.header.label') })
+			.getByRole('link', { exact: true, name: t('collection.locations.labelPlural') })
+			.click();
 
-	await expect(page).toHaveURL(paths.locationsIndex);
-	expect(
-		await page.evaluate(() => 'survivesSwap' in window),
-		'the swap reloaded the document',
-	).toBe(true);
+		await expect(page).toHaveURL(paths.locationsIndex);
+		expect(
+			await page.evaluate(() => 'survivesSwap' in window),
+			'the swap reloaded the document',
+		).toBe(true);
 
-	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
-	await expect(page.locator('pagefind-input input')).toBeVisible();
-});
+		await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
+		await expect(page.locator('pagefind-input input')).toBeVisible();
+	},
+);

@@ -20,6 +20,8 @@ export const MapSourceIdEnum = {
 	PolygonCollection: 'polygonCollection',
 } as const;
 
+export const otherFeatureOpacity = 0.5;
+
 // Layers react-map-gl hit-tests for pointer events
 export const mapInteractiveLayerIds = [
 	MapLayerIdEnum.Clusters,

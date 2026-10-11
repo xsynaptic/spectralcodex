@@ -1,16 +1,12 @@
-import type { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
+import type { AsyncStorage, PersistedQuery } from '@tanstack/query-persist-client-core';
 import type { PropsWithChildren } from 'react';
 
-import {
-	defaultShouldDehydrateQuery,
-	QueryClient,
-	QueryClientProvider,
-} from '@tanstack/react-query';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { del, get, set } from 'idb-keyval';
+import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { del, entries, get, set } from 'idb-keyval';
 import { useState } from 'react';
 
-import { mapCacheSchemaVersion } from '#constants.ts';
+import { mapCacheSchemaVersion, mapCacheStorageKeyPrefix } from '#constants.ts';
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
@@ -18,56 +14,73 @@ interface ReactQueryProviderProps extends PropsWithChildren {
 	isDev?: boolean | undefined;
 }
 
-/**
- * Creates an Indexed DB persister
- * @see https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
- */
-function createIdbPersister(idbValidKey: IDBValidKey = 'reactQuery') {
-	return {
-		persistClient: async (client: PersistedClient) => {
-			await set(idbValidKey, client);
+// Without this a storage error fails the query instead of letting it fetch
+async function ignoreFailure<TResult>(operation: Promise<TResult>) {
+	try {
+		return await operation;
+	} catch {
+		return;
+	}
+}
+
+const mapCacheStorage = {
+	entries: async () => (await ignoreFailure(entries<string, PersistedQuery>())) ?? [],
+	getItem: (key: string) => ignoreFailure(get<PersistedQuery>(key)),
+	removeItem: (key: string) => ignoreFailure(del(key)),
+	setItem: (key: string, value: PersistedQuery) => ignoreFailure(set(key, value)),
+} satisfies AsyncStorage<PersistedQuery>;
+
+let browserQueryClient: QueryClient | undefined;
+
+function createQueryClient(isDev: boolean | undefined) {
+	const lifetime = isDev ? 0 : millisecondsPerDay;
+
+	return new QueryClient({
+		defaultOptions: { queries: { gcTime: lifetime, staleTime: lifetime } },
+	});
+}
+
+function createPersistedQueryClient() {
+	const persister = experimental_createQueryPersister<PersistedQuery>({
+		buster: mapCacheSchemaVersion,
+		deserialize: (persistedQuery) => persistedQuery,
+		filters: { predicate: (query) => query.meta?.persist !== false },
+		maxAge: millisecondsPerDay,
+		prefix: mapCacheStorageKeyPrefix,
+		refetchOnRestore: false,
+		serialize: (persistedQuery) => persistedQuery,
+		storage: mapCacheStorage,
+	});
+
+	// Old content hashes are never requested again, so nothing else removes them
+	const scheduleIdle = 'requestIdleCallback' in globalThis ? requestIdleCallback : setTimeout;
+
+	scheduleIdle(() => void persister.persisterGc());
+
+	return new QueryClient({
+		defaultOptions: {
+			queries: {
+				gcTime: millisecondsPerDay,
+				// The cache is restored inside the fetch, which is paused offline by default
+				networkMode: 'offlineFirst',
+				persister: persister.persisterFn,
+				staleTime: millisecondsPerDay,
+			},
 		},
-		removeClient: async () => {
-			await del(idbValidKey);
-		},
-		restoreClient: async () => {
-			return await get<PersistedClient>(idbValidKey);
-		},
-	} satisfies Persister;
+	});
+}
+
+function getQueryClient(isDev: boolean | undefined) {
+	// On the server a shared client would keep a query for every page built
+	if (isDev || typeof window === 'undefined') return createQueryClient(isDev);
+
+	if (!browserQueryClient) browserQueryClient = createPersistedQueryClient();
+
+	return browserQueryClient;
 }
 
 export const ReactQueryProvider = ({ children, isDev }: ReactQueryProviderProps) => {
-	const [queryClient] = useState(() => {
-		return new QueryClient({
-			defaultOptions: {
-				queries: {
-					gcTime: isDev ? 0 : millisecondsPerDay,
-					staleTime: isDev ? 0 : millisecondsPerDay,
-				},
-			},
-		});
-	});
+	const [queryClient] = useState(() => getQueryClient(isDev));
 
-	if (isDev) {
-		return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-	}
-
-	return (
-		<PersistQueryClientProvider
-			client={queryClient}
-			persistOptions={{
-				// Content changes are keyed by the query itself, not by the buster
-				buster: mapCacheSchemaVersion,
-				dehydrateOptions: {
-					// Queries opting out via meta (inline data shipped in the HTML) skip IndexedDB
-					shouldDehydrateQuery: (query) =>
-						defaultShouldDehydrateQuery(query) && query.meta?.persist !== false,
-				},
-				maxAge: millisecondsPerDay,
-				persister: createIdbPersister('spectralcodex-map-data-cache'),
-			}}
-		>
-			{children}
-		</PersistQueryClientProvider>
-	);
+	return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };

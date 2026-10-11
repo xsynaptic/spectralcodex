@@ -1,0 +1,67 @@
+---
+import SkipLink from '#components/main/main-skip-link.astro';
+import ModeToggle from '#components/mode-manager/mode-toggle.astro';
+import NavigationHeader from '#components/navigation/navigation-header.astro';
+import Anchor from '#components/parts/anchor.astro';
+import Search from '#components/search/search.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
+
+interface Props {
+	hasHeroImage: boolean;
+	isHomepage: boolean;
+}
+
+const { hasHeroImage, isHomepage } = Astro.props;
+
+const siteUrl = getSitePath();
+
+const t = getTranslations();
+---
+
+<header
+	class:list={[
+		'z-header transition-colors',
+		hasHeroImage
+			? 'bg-header-fade sm:absolute sm:top-0 sm:right-0 sm:left-0'
+			: 'bg-primary-100 dark:bg-primary-800',
+	]}
+>
+	<SkipLink
+		class:list={[
+			'rounded-br-sm px-4 py-1 uppercase',
+			'bg-primary-50 text-accent-500 hover:text-accent-400 focus-visible:text-accent-400 dark:bg-primary-800 dark:text-accent-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300',
+		]}
+		label={t('site.skip.label')}
+		parentClass="z-skip-link"
+		target="#main-content"
+	/>
+	<div class="content-column flex flex-wrap items-center justify-between gap-x-2 gap-y-2 pt-2 sm:pb-1">
+		{isHomepage ? (
+			<h1 class="flex grow items-center gap-1">
+				<Anchor
+					anchorColor="primary"
+					class="text-xl font-semibold md:text-2xl lg:text-3xl"
+					href={siteUrl}
+				>
+					{t('site.title')}
+				</Anchor>
+			</h1>
+		) : (
+			<div class="flex grow items-center gap-1">
+				<Anchor
+					anchorColor="primary"
+					class="text-xl font-semibold md:text-2xl lg:text-3xl"
+					href={siteUrl}
+				>
+					{t('site.title')}
+				</Anchor>
+			</div>
+		)}
+		<ModeToggle />
+		<Search />
+	</div>
+	<div class="content-column-fill w-full overflow-x-clip">
+		<NavigationHeader hasHeroImage={hasHeroImage} />
+	</div>
+</header>

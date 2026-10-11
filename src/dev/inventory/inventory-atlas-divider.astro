@@ -1,0 +1,46 @@
+---
+import AtlasDivider from '#components/atlas/atlas-divider.astro';
+import Specimen from '#dev/inventory/inventory-specimen.astro';
+
+const frameClass =
+	'relative grid h-48 grid-cols-2 overflow-hidden rounded-xs border border-primary-300 dark:border-primary-700';
+const mapClass = 'bg-primary-200 dark:bg-primary-700';
+const dividerClass = 'absolute inset-y-0 left-1/2 block w-3 -translate-x-1/2';
+---
+
+<Specimen
+	name="atlas-divider"
+	note="The left side stands in for the map. Hover or tab to the line in the first frame; the second is held mid-drag, the line pulled left of the dashed edge. Dragging, keys and clicks are switched off here, since the real element resizes the pane."
+	source="components/atlas/atlas-divider.astro"
+>
+	<div class="grid gap-5 sm:grid-cols-2" data-divider-demo>
+		<div class={frameClass}>
+			<div class={mapClass}></div>
+			<AtlasDivider class={dividerClass} />
+		</div>
+		<div class:list={[frameClass, '[--atlas-drag-offset:5rem]']} data-divider-demo-drag>
+			<div class={mapClass}></div>
+			<AtlasDivider class={dividerClass} />
+		</div>
+	</div>
+</Specimen>
+
+<script>
+	const demo = document.querySelector('[data-divider-demo]');
+
+	// Capture keeps the element's own listeners from resizing the pane or leaving atlas mode
+	for (const type of ['pointerdown', 'keydown', 'click']) {
+		demo?.addEventListener(
+			type,
+			(event) => {
+				event.stopPropagation();
+				if (type === 'click') event.preventDefault();
+			},
+			{ capture: true },
+		);
+	}
+
+	demo
+		?.querySelector<HTMLElement>(':scope [data-divider-demo-drag] [role="separator"]')
+		?.setAttribute('data-dragging', '');
+</script>

@@ -71,7 +71,7 @@ export async function createQueryRegionsEntryFunction() {
 			locationCount: entryLocations.length,
 			mapId: `${entry.collection}/${entry.id}`,
 			version,
-			...(regionInterval ? { scope: { interval: regionInterval, type: 'region' } } : {}),
+			...(regionInterval ? { mapFeaturesRule: { interval: regionInterval, type: 'region' } } : {}),
 			...getMapLanguages(entry.data._langCode),
 			...(entry.data.divisionId && !entry.data.hideDivision
 				? {

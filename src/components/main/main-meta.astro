@@ -19,6 +19,7 @@ const {
 	noIndex,
 	ogType,
 	prefetchUrls,
+	preloadUrls,
 	title: contentTitle,
 } = Astro.props;
 
@@ -75,11 +76,15 @@ const socialProps = openGraphImage
 	title={titleDisplay}
 	{...socialProps}
 	extend={{
-		...(prefetchUrls?.length
-			? {
-					link: prefetchUrls.map((prefetchUrl) => ({ href: prefetchUrl, rel: 'prefetch' })),
-				}
-			: {}),
+		link: [
+			...(prefetchUrls ?? []).map((prefetchUrl) => ({ href: prefetchUrl, rel: 'prefetch' })),
+			...(preloadUrls ?? []).map((preloadUrl) => ({
+				as: 'fetch',
+				crossorigin: 'anonymous',
+				href: preloadUrl,
+				rel: 'preload',
+			})),
+		],
 		meta: [{ content: Astro.generator, name: 'generator' }],
 	}}
 	nofollow={noFollow ?? false}

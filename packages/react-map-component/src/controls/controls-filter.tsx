@@ -15,6 +15,7 @@ import { MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { locationStatusOrder, LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import {
+	useHasMapActiveFilter,
 	useHasMapChineseLabels,
 	useIsMapCanvasLoading,
 	useIsMapFilterOpen,
@@ -273,6 +274,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 }) {
 	const isCanvasLoading = useIsMapCanvasLoading();
 	const isFilterOpen = useIsMapFilterOpen();
+	const hasActiveFilter = useHasMapActiveFilter();
 	const messages = useMapMessages();
 
 	const { setFilterOpen } = useMapStoreActions();
@@ -312,7 +314,9 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 				<button
 					aria-controls={panelId}
 					aria-expanded={isFilterOpen}
-					aria-label={messages.filterMenuAriaLabel}
+					aria-label={
+						hasActiveFilter ? messages.filterMenuActiveAriaLabel : messages.filterMenuAriaLabel
+					}
 					className="maplibregl-ctrl-filter"
 					disabled={isLoading}
 					id={controlFilterId}
@@ -337,6 +341,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							<MapIconFilters />
 						</svg>
 					</span>
+					{hasActiveFilter ? <span className="map-filter-indicator"></span> : undefined}
 				</button>
 			</CustomControlPortal>
 			<MapControlsFilterMenu id={panelId} />

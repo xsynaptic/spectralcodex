@@ -18,6 +18,14 @@ const subtitle = await renderSlot(Astro.slots, 'header-subtitle');
 const caption = await renderSlot(Astro.slots, 'header-caption');
 
 const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).trim() : undefined;
+const titleMultilingualMeta = titleMultilingualText
+	? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
+	: undefined;
+
+const skipLinkTarget = hasHeroImage ? { id: 'main-content', tabindex: -1 } : undefined;
+
+const titleCaption = hasHeroImage ? caption : undefined;
+const subtitleCaption = hasHeroImage ? undefined : caption;
 ---
 
 <div
@@ -40,22 +48,24 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 					: 'text-lg md:text-xl lg:text-2xl',
 			]}
 			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
-			{...(titleMultilingualText
-				? { 'data-pagefind-meta': `title_ml:${titleMultilingualText}` }
-				: undefined)}
+			{...titleMultilingualMeta}
 			data-pagefind-ignore
 		>
 			<Fragment set:html={titleMultilingual} />
 		</TextWash>
 	) : undefined}
 	<div
-		class="bg-clip-padding pb-0 sm:pb-2"
-		{...(hasHeroImage ? { id: 'main-content', tabindex: -1 } : {})}
+		class:list={[
+			'bg-clip-padding pb-0 sm:pb-2',
+			titleCaption ? 'flex items-baseline-last justify-between gap-4' : undefined,
+		]}
+		{...skipLinkTarget}
 	>
 		<TextWash
 			as="h1"
 			class:list={[
 				'-ml-0.5 pb-2 font-display text-2xl leading-[1.125] font-semibold',
+				titleCaption ? 'flex-1' : undefined,
 				hasHeroImage
 					? '-mb-1 sm:-mb-3 sm:text-3xl sm:drop-shadow-sm md:text-4xl lg:text-5xl'
 					: 'mb-0 sm:-mb-2 md:text-3xl lg:text-4xl',
@@ -64,8 +74,13 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 		>
 			{title ? <Fragment set:html={title} /> : undefined}
 		</TextWash>
+		{titleCaption ? (
+			<div class="divided-hero contents text-sm">
+				<Fragment set:html={titleCaption} />
+			</div>
+		) : undefined}
 	</div>
-	{subtitle || caption ? (
+	{subtitle || subtitleCaption ? (
 		<div
 			class:list={[
 				'items-start gap-1 pb-2 text-sm sm:flex sm:flex-wrap',
@@ -75,10 +90,14 @@ const titleMultilingualText = titleMultilingual ? stripTags(titleMultilingual).t
 			]}
 			data-pagefind-ignore
 		>
-			{subtitle ? <Fragment set:html={subtitle} /> : undefined}
-			{caption ? (
+			{subtitle ? (
+				<div class="contents">
+					<Fragment set:html={subtitle} />
+				</div>
+			) : undefined}
+			{subtitleCaption ? (
 				<div class="flex flex-1 flex-nowrap items-end justify-end gap-1">
-					<Fragment set:html={caption} />
+					<Fragment set:html={subtitleCaption} />
 				</div>
 			) : undefined}
 		</div>

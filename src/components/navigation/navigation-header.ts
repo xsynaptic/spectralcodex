@@ -95,6 +95,10 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('chronology'),
 		},
 		{
+			title: t('atlas.title'),
+			url: getSitePath('atlas'),
+		},
+		{
 			title: t('navigation.about.label'),
 			url: getSitePath('about'),
 		},

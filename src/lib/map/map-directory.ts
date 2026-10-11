@@ -34,7 +34,7 @@ interface MapDirectoryData {
 	version: string;
 }
 
-// Memoized theme → index map; theme maps read their own index to build a scope
+// Memoized theme → index map; theme maps read their own index to build a rule
 export const getMapThemeIndexById = pMemoize(async () => {
 	const { entries: themes } = await getThemesCollection();
 	const themeIndexById = new Map<string, number>();

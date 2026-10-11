@@ -23,6 +23,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - Dynamic route files must be lowercase: `[...id].astro`, not `[...ID].astro`.
 - Do not import from the main Astro app (`src/`) into anything under `packages/**` (the Vite/Rolldown build breaks on it). Duplicate the needed types locally in the package and leave a comment naming the source. Keep the duplication minimal.
 - We prefer conditional rendering without abusing logical operators: `{condition ? <Element /> : undefined}`, never `{condition && <Element />}`.
+- Client storage keys (localStorage, sessionStorage, IndexedDB) take the `scx-` prefix in kebab-case and live in a constants file, never as a literal at the call site; a pre-paint inline script receives them through `define:vars`.
 - A component file takes its directory as a name prefix (`navigation/navigation-header.astro`); a custom element name is chosen for readability instead (`navigation-site.ts` defines `<site-navigation>`), so the two need not match.
 
 ## Styling
@@ -34,6 +35,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - A hook class carries only what the stylesheet targets and shares a descriptive prefix or short-form representing the target. Avoid Microformat prefixes (`p-`, `h-`, `u-`, `dt-`, `e-`).
 - Colour in a stylesheet is `light-dark()`; a non-colour dark swap is `[data-mode='dark'] &`; a utility is `dark:` where dark mode is used.
 - Stylesheets read tokens as `var(--…)`; `@apply` where it replaces a media query or composes a project `@utility`.
+- `md:`, `lg:` and `xl:` measure the atlas pane, not the viewport (redefined in `main.css`), so content lays out the same in the split as on a regular page that wide; a stylesheet writes `@container pane (width >= …)` for those steps. `sm:` and `@media (width >= 40rem)` stay on the viewport, since the pane is never narrower than 40rem.
 - Stacking order is `--z-index-*` applied as `z-*` utilities or `var()`.
 - Every `hover:` on a focusable element has its `focus-visible:` twin where relevant. A stylesheet `:hover` sits under `@media (hover: hover)`, as Tailwind's `hover:` does; its `:focus-visible` partner stays outside it.
 

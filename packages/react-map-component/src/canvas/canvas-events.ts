@@ -13,6 +13,7 @@ import * as R from 'remeda';
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
 
 import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
+import { useMapTargetIds } from '#canvas/canvas-view.tsx';
 import { controlFilterId, mediaQueryMobile } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
@@ -94,14 +95,20 @@ function getHoverInput(
 const onMouseDown = createGrabCursorHandler('grabbing');
 const onMouseUp = createGrabCursorHandler('grab');
 
-export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
+export function useMapCanvasEvents({
+	isPopupEnabled,
+	mapId,
+}: {
+	isPopupEnabled: boolean;
+	mapId: string | undefined;
+}) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const isInteractive = useIsMapCanvasInteractive();
 
 	const { setCanvasLoading } = useMapStoreActions();
 
-	const onClick = useClickHandler();
+	const onClick = useClickHandler(isPopupEnabled);
 	const throttledOnMouseMove = useThrottledMouseMoveHandler();
 	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
 
@@ -127,7 +134,6 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		onLoad: (event: MapEvent) => {
 			setCanvasLoading(false);
 
-			// Initialize the position of the filter control on interactive maps
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
 		...(isInteractive
@@ -147,10 +153,12 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	} satisfies MapCallbacks;
 }
 
-function useClickHandler() {
+function useClickHandler(isPopupEnabled: boolean) {
 	const isMobile = useMediaQuery({ below: mediaQueryMobile });
 
-	const { setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } = useMapStoreActions();
+	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
+		useMapStoreActions();
+	const targetIds = useMapTargetIds();
 
 	const selectPoint = useCallback(
 		(
@@ -159,9 +167,11 @@ function useClickHandler() {
 			center: [number, number] | undefined,
 		) => {
 			setSelectedId(pointId);
+			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			if (!center) return;
+			// Popups are off on a hosted map, except for a Point of the Location already open
+			if (!center || !(isPopupEnabled || targetIds.includes(pointId))) return;
 
 			setPopupVisible(false);
 
@@ -173,10 +183,20 @@ function useClickHandler() {
 			mapInstance.easeTo({
 				center,
 				duration: 150,
-				padding: isMobile ? { bottom: 180, right: 0 } : { bottom: 0, right: 180 },
+				padding: isMobile
+					? { bottom: 180, left: 0, right: 0, top: 0 }
+					: { bottom: 0, left: 0, right: 180, top: 0 },
 			});
 		},
-		[isMobile, setSelectedId, setHoveredId, setPopupVisible],
+		[
+			isMobile,
+			isPopupEnabled,
+			setSelectedId,
+			setClickedId,
+			setHoveredId,
+			setPopupVisible,
+			targetIds,
+		],
 	);
 
 	return useCallback<NonNullable<MapCallbacks['onClick']>>(
@@ -277,7 +297,6 @@ function useThrottledMouseMoveHandler() {
 				layers: [...mapQueryableLayerIds],
 			});
 
-			// Note: this only queries the first matching feature, but that is sufficient
 			const feature = renderedFeatures[0];
 
 			const intent = decideHoverIntent(

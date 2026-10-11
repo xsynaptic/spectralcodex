@@ -17,6 +17,7 @@ import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
 import devInventory from '#dev/inventory/inventory-integration.ts';
+import atlas from '#lib/atlas/atlas-integration.ts';
 
 const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
 
@@ -188,6 +189,7 @@ export default defineConfig({
 				],
 			},
 		}),
+		atlas(),
 		buildLogger(),
 		devInventory(),
 	],
@@ -224,6 +226,7 @@ export default defineConfig({
 	},
 	vite: {
 		build: {
+			// Inlines only the smallest client scripts; anything larger stays a separate file for cache granularity
 			assetsInlineLimit: 1024,
 			rollupOptions: {
 				output: {
@@ -260,7 +263,7 @@ export default defineConfig({
 				},
 			},
 			watch: {
-				ignored: ['./*.md'],
+				ignored: ['./*.md', '**/temp/**'],
 			},
 		},
 	},

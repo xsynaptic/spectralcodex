@@ -25,6 +25,7 @@ function makeTree(configFilename: string | undefined, nested: string) {
 	return nestedDir;
 }
 
+// `withAstroContent` has no direct test; vitest runs from the Astro root, which masks the unrooted-config failure
 describe('findAstroRoot', () => {
 	test('walks up from a nested package to the directory holding the config', () => {
 		const nestedDir = makeTree('astro.config.ts', 'packages/scripts');

@@ -6,7 +6,7 @@ const chunkKey = MapDataKeysCompressed.ChunkKey;
 
 type MapApiItem = Record<string, unknown>;
 
-test.describe('map data API', () => {
+test.describe('map data API', { tag: '@smoke' }, () => {
 	test('global directory is built and every row carries a chunk key', async ({ request }) => {
 		const response = await request.get('/api/map/map-directory.json');
 

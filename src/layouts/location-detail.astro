@@ -30,6 +30,7 @@ import {
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
+import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 
@@ -60,10 +61,13 @@ const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeat
 
 const hideLocation = entry.data.hideLocation && contentPolicy.hideSensitiveLocations;
 
+const atlas = await getAtlasPage(entry, mapData);
+
 const t = getTranslations();
 ---
 
 <ContentEntryArticle
+	atlas={atlas}
 	entry={entry}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
@@ -94,7 +98,12 @@ const t = getTranslations();
 	/>
 	<SectionNotices entry={entry} langCode={regionLangCode} />
 	{hideLocation ? undefined : (
-		<SectionMap entryTitle={entry.data.title} mapData={mapData}>
+		<SectionMap
+			class="atlas-inline-map"
+			entryTitle={entry.data.title}
+			mapData={mapData}
+			showAtlasOpen={!!atlas}
+		>
 			<LocationsAddress address={addressBase} content={addressMultilingual} />
 		</SectionMap>
 	)}
@@ -110,5 +119,5 @@ const t = getTranslations();
 	<SectionWebmentions entry={entry} />
 	<SectionNearbyList entry={entry} limit={12} />
 	<SectionPreviews items={catalogItems} sectionTitle={t('section.content.locations')} />
-	<SectionSimilar entry={entry} limit={8} showPreviews={true} />
+	<SectionSimilar entry={entry} limit={12} showPreviews={true} />
 </ContentEntryArticle>

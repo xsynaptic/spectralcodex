@@ -70,8 +70,10 @@ const t = getTranslations();
 	</DividedItem>
 ) : undefined}
 {showDate ? (
-	<DateDisplay
-		class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
-		date={item.dateUpdated ?? item.dateCreated}
-	/>
+	<DividedItem>
+		<DateDisplay
+			class:list={[showMicroformats ? MicroformatClassNames.DatePublished : undefined]}
+			date={item.dateUpdated ?? item.dateCreated}
+		/>
+	</DividedItem>
 ) : undefined}

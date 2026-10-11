@@ -1,6 +1,8 @@
 import type { PropsWithChildren } from 'react';
 
-import { createContext, useCallback, useContext, useSyncExternalStore } from 'react';
+import { createContext, useContext } from 'react';
+
+import { useDocumentAttribute } from '#lib/document-attribute.ts';
 
 // Serializable dark-mode adapter; a function couldn't survive Astro island-prop serialization
 export interface MapDarkModeOptions {
@@ -23,32 +25,11 @@ export function DarkModeProvider({
 	const eventName = darkMode?.eventName ?? defaultEventName;
 	const darkValue = darkMode?.darkValue ?? defaultDarkValue;
 
-	const subscribe = useCallback(
-		(callback: () => void) => {
-			document.addEventListener(eventName, callback);
-
-			return () => {
-				document.removeEventListener(eventName, callback);
-			};
-		},
-		[eventName],
-	);
-
-	const getSnapshot = useCallback(
-		() => document.documentElement.getAttribute(attributeName) === darkValue,
-		[attributeName, darkValue],
-	);
-
-	const isDarkMode = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+	const isDarkMode = useDocumentAttribute(attributeName, eventName) === darkValue;
 
 	return <DarkModeContext.Provider value={isDarkMode}>{children}</DarkModeContext.Provider>;
 }
 
 export function useIsDarkMode() {
 	return useContext(DarkModeContext);
-}
-
-// eslint-disable-next-line unicorn/consistent-boolean-name -- named for its useSyncExternalStore slot, not for what it returns
-function getServerSnapshot() {
-	return false;
 }

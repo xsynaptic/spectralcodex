@@ -9,10 +9,12 @@ import type { MapComponentProps } from '#types.ts';
 import '#canvas/canvas-worker.ts';
 import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
+import { useFeatureOpenEventName } from '#canvas/canvas-feature-open.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
-import { MapSelectedMarker, MapTargetMarkers } from '#canvas/canvas-markers.tsx';
 import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
+import { MapTargets } from '#canvas/canvas-targets.tsx';
+import { MapViewProvider } from '#canvas/canvas-view.tsx';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
@@ -47,12 +49,13 @@ const MapCanvasContainer: FC<
 	}
 > = function MapCanvasContainer({
 	apiChunkBaseUrl,
-	apiDivisionUrl,
 	apiPopupUrl,
 	baseMapTheme,
 	bounds,
 	center,
+	enterMediaQuery,
 	hash,
+	host,
 	imageServerUrl,
 	isDev,
 	mapId,
@@ -61,7 +64,6 @@ const MapCanvasContainer: FC<
 	popupDataKey,
 	protomapsApiKey,
 	style,
-	targetIds,
 	version,
 	zoom,
 }) {
@@ -72,7 +74,9 @@ const MapCanvasContainer: FC<
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
-	const canvasEvents = useMapCanvasEvents({ mapId });
+	const featureOpenEventName = useFeatureOpenEventName(host);
+
+	const canvasEvents = useMapCanvasEvents({ isPopupEnabled: !featureOpenEventName, mapId });
 	const isCanvasInteractive = useIsMapCanvasInteractive();
 	const isCanvasLoading = useIsMapCanvasLoading();
 
@@ -104,18 +108,16 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 					version={version}
 				>
-					<MapControls />
-					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
+					<MapControls enterMediaQuery={enterMediaQuery} host={host} />
+					<MapPopup
+						featureOpenEventName={featureOpenEventName}
+						imageServerUrl={imageServerUrl}
+						isDev={isDev}
+					/>
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
-			<MapSource
-				apiDivisionUrl={apiDivisionUrl}
-				bounds={bounds}
-				isDev={isDev}
-				targetIds={targetIds}
-			/>
-			{targetIds ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
-			<MapSelectedMarker targetIds={targetIds} />
+			<MapSource bounds={bounds} host={host} isDev={isDev} />
+			<MapTargets host={host} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
 			<MapCanvasLoading loading={isCanvasLoading || isSourceDataLoading} />
@@ -125,14 +127,17 @@ const MapCanvasContainer: FC<
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 	const {
+		apiDivisionUrl,
 		apiSourceUrl,
+		host,
 		interactive,
 		isDev,
 		isObjectiveFilterEnabled,
 		languages,
-		scope,
+		mapFeaturesRule,
 		sourceData,
 		sourceDataKey,
+		targetIds,
 		version,
 	} = props;
 
@@ -149,12 +154,19 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(isObjectiveFilterEnabled ? { isObjectiveFilterEnabled: true } : {}),
 					...(interactive === false ? { isCanvasInteractive: false } : {}),
 					...(languages ? { languages } : {}),
-					...(scope ? { scope } : {}),
+					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
 				}}
 			>
-				<CanvasDataProvider>
-					<MapCanvasContainer {...props} />
-				</CanvasDataProvider>
+				<MapViewProvider
+					apiDivisionUrl={apiDivisionUrl}
+					host={host}
+					isDev={isDev}
+					targetIds={targetIds}
+				>
+					<CanvasDataProvider>
+						<MapCanvasContainer {...props} />
+					</CanvasDataProvider>
+				</MapViewProvider>
 			</MapStoreProvider>
 		</SourceDataContextProvider>
 	);

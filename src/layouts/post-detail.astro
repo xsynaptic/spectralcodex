@@ -74,6 +74,6 @@ const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
 	<SectionSeries entry={entry} />
 	<SectionBacklinks backlinks={backlinks} />
 	<SectionWebmentions entry={entry} />
-	<SectionSimilar entry={entry} limit={8} showPreviews={true} />
+	<SectionSimilar entry={entry} limit={12} showPreviews={true} />
 	<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 </ContentEntryArticle>

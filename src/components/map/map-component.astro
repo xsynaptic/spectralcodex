@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'astro/types';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
+import MapLoading from '#components/map/map-loading.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -36,15 +37,5 @@ const zIndex = 10;
 	data-pagefind-ignore
 >
 	<ReactMapComponent {...mapComponentProps} client:visible style={{ zIndex: zIndex + 1 }} />
-	<div
-		class:list={[
-			'map-loading absolute flex h-full w-full justify-center',
-			'text-primary-700 dark:text-highlight-400',
-		]}
-		role="status"
-		style={{ zIndex }}
-	>
-		<span class="map-loading-label sr-only">{t('section.map.loading')}</span>
-		<div class="loading-animation w-1/5"></div>
-	</div>
+	<MapLoading zIndex={zIndex} />
 </div>

@@ -1,5 +1,4 @@
 // 2026Q1: TypeScript doesn't deal well with Astro files exporting types and interfaces
-
 // Values map onto divided-* classes in text.css
 export type DividerColor = 'default' | 'muted';
 
@@ -24,6 +23,7 @@ export interface MetaProps {
 	noIndex?: boolean;
 	ogType?: 'article' | 'website' | undefined;
 	prefetchUrls?: Array<string> | undefined;
+	preloadUrls?: Array<string> | undefined;
 	title?: string | undefined;
 }
 

@@ -1,0 +1,47 @@
+---
+import { ReactMapComponent } from '@spectralcodex/react-map-component';
+import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
+
+import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive.ts';
+
+import AtlasDivider from '#components/atlas/atlas-divider.astro';
+import MapLoading from '#components/map/map-loading.astro';
+import { atlasPaneMediaQuery, atlasPersistName, atlasRootId } from '#lib/atlas/atlas-constants.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getAtlasMapData } from '#lib/map/map-atlas.ts';
+
+const { featureCount, hasGeodata, prefetchUrls, ...mapComponentProps } = await getAtlasMapData();
+
+const t = getTranslations();
+
+const directiveOptions: AtlasDirectiveOptions = { css: mapCssUrl, mediaQuery: atlasPaneMediaQuery };
+
+// Local to the map's own stacking context; the React component needs a number, not a class
+const zIndex = 10;
+---
+
+{hasGeodata ? (
+	<>
+		<div
+			aria-label={t('atlas.title')}
+			class="atlas-shell bg-fallback flex overflow-hidden"
+			data-pagefind-ignore
+			role="group"
+			tabindex="-1"
+			transition:persist={atlasPersistName}
+		>
+			<ReactMapComponent
+				{...mapComponentProps}
+				client:atlas={JSON.stringify(directiveOptions)}
+				host={{ featureOpenMediaQuery: atlasPaneMediaQuery, fullscreenContainerId: atlasRootId }}
+				messages={{
+					exitAriaLabel: t('atlas.close.label'),
+					expandAriaLabel: t('atlas.expand.label'),
+				}}
+				style={{ zIndex: zIndex + 1 }}
+			/>
+			<MapLoading zIndex={zIndex} />
+		</div>
+		<AtlasDivider />
+	</>
+) : undefined}

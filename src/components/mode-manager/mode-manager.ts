@@ -4,6 +4,7 @@ import type {
 	ModeSystemType,
 } from '#components/mode-manager/mode-types.ts';
 
+import { modeStorageKey } from '#components/mode-manager/mode-constants.ts';
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 
 const validModes: ReadonlySet<string> = new Set([
@@ -14,26 +15,25 @@ const validModes: ReadonlySet<string> = new Set([
 
 class ModeManager extends HTMLElement {
 	#mediaMatcher: MediaQueryList | undefined;
-	#storage: Storage | undefined;
-	#storageKey = 'color-mode';
+	#mode: ModeGeneralType = ModeTypeEnum.Auto;
 	#systemMode: ModeSystemType = ModeTypeEnum.Dark;
 
 	connectedCallback() {
-		this.#storageKey = this.getAttribute('storage-key') ?? this.#storageKey;
-
-		try {
-			this.#storage = localStorage;
-		} catch {
-			// Fail silently
-		}
-
 		this.#mediaMatcher = matchMedia(`(prefers-color-scheme: ${ModeTypeEnum.Light})`);
 		this.#systemMode = this.#mediaMatcher.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
 		this.#mediaMatcher.addEventListener('change', this.#handleMediaChange);
 
-		const stored = this.#storage?.getItem(this.#storageKey);
-		const mode = stored && isModeValid(stored) ? stored : ModeTypeEnum.Auto;
-		this.#applyMode(mode);
+		let stored: string | undefined;
+
+		try {
+			stored = localStorage.getItem(modeStorageKey) ?? undefined;
+		} catch {
+			// localStorage unavailable
+		}
+
+		if (isModeValid(stored)) this.#mode = stored;
+
+		this.#applyMode(this.#mode);
 	}
 
 	disconnectedCallback() {
@@ -41,14 +41,20 @@ class ModeManager extends HTMLElement {
 	}
 
 	getMode(): ModeGeneralType {
-		const stored = this.#storage?.getItem(this.#storageKey);
-		return stored && isModeValid(stored) ? stored : ModeTypeEnum.Auto;
+		return this.#mode;
 	}
 
 	setMode(mode: ModeGeneralType) {
 		if (!isModeValid(mode)) return;
-		this.#storage?.setItem(this.#storageKey, mode);
+
+		this.#mode = mode;
 		this.#applyMode(mode);
+
+		try {
+			localStorage.setItem(modeStorageKey, mode);
+		} catch {
+			// The mode still applies when the write fails
+		}
 	}
 
 	#applyMode(mode: ModeGeneralType) {
@@ -82,7 +88,7 @@ class ModeManager extends HTMLElement {
 
 	#handleMediaChange = (event: MediaQueryListEvent) => {
 		this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
-		this.#applyMode(this.getMode());
+		this.#applyMode(this.#mode);
 	};
 }
 

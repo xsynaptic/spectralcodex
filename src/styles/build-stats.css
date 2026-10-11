@@ -27,7 +27,7 @@
 .stats-frame {
 	margin-inline-end: calc(var(--spacing) * -4);
 
-	@media (width >= 48rem) {
+	@container pane (width >= 48rem) {
 		margin-inline-end: calc(var(--spacing) * -8);
 	}
 }

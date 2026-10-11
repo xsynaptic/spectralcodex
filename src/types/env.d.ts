@@ -11,3 +11,7 @@ declare namespace App {
 		isFeed?: boolean;
 	}
 }
+
+interface Window {
+	umami?: { track: (eventName: string, eventData?: Record<string, unknown>) => void };
+}

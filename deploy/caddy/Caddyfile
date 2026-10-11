@@ -21,6 +21,7 @@ spectralcodex.com {
 	file_server
 	encode gzip
 
+	# Scoped to 404: basic_auth fails as a Caddy error, and an unscoped block serves /404.html as a publicly cacheable 401
 	handle_errors 404 {
 		rewrite * /404.html
 		header Cache-Control "public, max-age=0, s-maxage=600"
@@ -83,6 +84,7 @@ spectralcodex.com {
 	header @html Cache-Control "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400"
 	header @html No-Vary-Search `params=("utm_source" "utm_medium" "utm_campaign" "utm_content" "utm_term" "utm_id" "gclid" "fbclid" "mc_cid" "mc_eid"), key-order`
 
+	# Half of the gate lives in Cloudflare cache rules; see .claude/docs/deploy-operations.md
 	@gated path /objectives /objectives/* /api/map/objectives/*
 	import spectralcodex-auth.conf
 	header @gated Cache-Control "private, no-store"

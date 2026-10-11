@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapScope } from '#types.ts';
+import type { MapFeaturesRule } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
@@ -13,9 +13,9 @@ export type MapDataConfigurableState = Pick<
 	| 'isFilterOpen'
 	| 'isObjectiveFilterEnabled'
 	| 'languages'
+	| 'mapFeaturesRule'
 	| 'objectiveFilter'
 	| 'ratingFilter'
-	| 'scope'
 	| 'selectedId'
 	| 'statusFilter'
 >;
@@ -25,6 +25,7 @@ export interface MapDataStore extends MapDataState {
 		hideAllStatusFilter: () => void;
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
+		setClickedId: (clickedId: string | undefined) => void;
 		setEntryQualityFilter: (entryQualityFilter: number) => void;
 		setFilterOpen: (isFilterOpen: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
@@ -43,6 +44,8 @@ export interface MapDataStore extends MapDataState {
 type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 
 interface MapDataState {
+	// Set by a user's click only, so programmatic selections stay out of analytics
+	clickedId: string | undefined;
 	entryQualityFilter: number;
 	filterPosition: DOMCoordinates | undefined;
 	hoveredId: string | undefined;
@@ -52,14 +55,15 @@ interface MapDataState {
 	isObjectiveFilterEnabled: boolean;
 	isPopupVisible: boolean;
 	languages: Array<string>;
+	mapFeaturesRule: MapFeaturesRule | undefined;
 	objectiveFilter: number;
 	ratingFilter: number;
-	scope: MapScope | undefined;
 	selectedId: string | undefined;
 	statusFilter: Array<LocationStatus>;
 }
 
 const defaultMapDataState = {
+	clickedId: undefined,
 	entryQualityFilter: 1,
 	filterPosition: undefined,
 	hoveredId: undefined,
@@ -69,12 +73,27 @@ const defaultMapDataState = {
 	isObjectiveFilterEnabled: false,
 	isPopupVisible: true,
 	languages: ['en'],
+	mapFeaturesRule: undefined,
 	objectiveFilter: 1,
 	ratingFilter: 1,
-	scope: undefined,
 	selectedId: undefined,
 	statusFilter: [],
 } satisfies MapDataState;
+
+// `entryQualityFilter` has no control, so it never leaves its default
+export function hasActiveFilter({
+	isObjectiveFilterEnabled,
+	objectiveFilter,
+	ratingFilter,
+	statusFilter,
+}: Pick<
+	MapDataState,
+	'isObjectiveFilterEnabled' | 'objectiveFilter' | 'ratingFilter' | 'statusFilter'
+>) {
+	if (statusFilter.length > 0 || ratingFilter > 1) return true;
+
+	return isObjectiveFilterEnabled && objectiveFilter > 1;
+}
 
 export function createMapStore(initialState?: Partial<MapDataConfigurableState>) {
 	const state: MapDataState = { ...defaultMapDataState, ...initialState };
@@ -96,6 +115,9 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setCanvasLoading: (isCanvasLoading) => {
 					set({ isCanvasLoading });
+				},
+				setClickedId: (clickedId) => {
+					set({ clickedId });
 				},
 				setEntryQualityFilter: (entryQualityFilter) => {
 					setAndClearSelection({ entryQualityFilter });
@@ -122,10 +144,10 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 					setAndClearSelection({ ratingFilter });
 				},
 				setSelectedId: (selectedId) => {
+					// A selection takes the filter panel's place; clearing one leaves the panel as it is
 					set({
-						isFilterOpen: false,
 						selectedId,
-						...(selectedId === undefined ? { isPopupVisible: true } : {}),
+						...(selectedId === undefined ? { isPopupVisible: true } : { isFilterOpen: false }),
 					});
 				},
 				setStatusFilter: (statusFilter) => {

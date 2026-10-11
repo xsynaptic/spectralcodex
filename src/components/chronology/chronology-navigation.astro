@@ -49,12 +49,14 @@ function getMonthName(month: string) {
 	</PaginationSelect>
 	{currentYear && currentMonth && months.length > 0 ? (
 		<div class="flex gap-1">
-			<DividedItem class="shrink-0" dividerContent="chevron">
-				<Anchor anchorColor="highlight" href={getSitePath('chronology', currentYear)}>
-					{currentYear}
-				</Anchor>
-			</DividedItem>
-			<ul class="flex flex-wrap gap-1">
+			<Anchor
+				anchorColor="highlight"
+				class="shrink-0"
+				href={getSitePath('chronology', currentYear)}
+			>
+				{currentYear}
+			</Anchor>
+			<DividedItem as="ul" class="flex flex-wrap gap-1" dividerContent="chevron">
 				{months.map((month) => (
 					<ChronologyNavigationItem
 						href={getSitePath('chronology', currentYear, month)}
@@ -63,7 +65,7 @@ function getMonthName(month: string) {
 						{getMonthName(month)}
 					</ChronologyNavigationItem>
 				))}
-			</ul>
+			</DividedItem>
 		</div>
 	) : undefined}
 </nav>

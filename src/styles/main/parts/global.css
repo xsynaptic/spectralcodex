@@ -1,3 +1,4 @@
+/* !important is load-bearing for a bare .cjk-text with no lang (pagefind results), which any unlayered descendant rule outranks */
 .cjk-text,
 html:not([lang^='zh']) [lang^='zh'],
 html:not([lang^='ja']) [lang^='ja'],

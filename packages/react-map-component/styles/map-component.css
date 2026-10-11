@@ -520,10 +520,30 @@ button.maplibregl-popup-close-button {
 	box-shadow: none;
 }
 
+/* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
+[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact-show {
+	visibility: inherit;
+}
+
 .maplibregl-ctrl-attrib,
 .maplibregl-ctrl-scale,
 .maplibregl-ctrl-metrics {
 	user-select: none;
+}
+
+.maplibregl-ctrl-filter {
+	position: relative;
+}
+
+.map-filter-indicator {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 7px;
+	height: 7px;
+	pointer-events: none;
+	background-color: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	border-radius: 50%;
 }
 
 .map-ctrl-icon-frame {

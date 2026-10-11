@@ -2,15 +2,42 @@ import type { FeatureCollection } from 'geojson';
 import type { FC } from 'react';
 import type { FillLayerSpecification, LineLayerSpecification } from 'react-map-gl/maplibre';
 
-import { memo } from 'react';
-import { useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { tailwindColors } from '#lib/tailwind-colors.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
-function useMapSourceDivisionStyle() {
+const emptyFeatureCollection: FeatureCollection<never, never> = {
+	features: [],
+	type: 'FeatureCollection',
+};
+
+const fadeTransition = { delay: 0, duration: 150 };
+
+function useDivisionFade(data: FeatureCollection | undefined) {
+	const [shownData, setShownData] = useState<FeatureCollection | undefined>();
+
+	useEffect(() => {
+		if (shownData === data) return;
+
+		const timeout = setTimeout(
+			() => {
+				setShownData(data);
+			},
+			shownData ? fadeTransition.duration : 0,
+		);
+
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, [data, shownData]);
+
+	return { isVisible: shownData === data && data !== undefined, shownData };
+}
+
+function useMapSourceDivisionStyle(isVisible: boolean) {
 	const isDarkMode = useIsDarkMode();
 
 	const divisionMaskLayerStyle = useMemo(
@@ -19,12 +46,13 @@ function useMapSourceDivisionStyle() {
 				id: MapLayerIdEnum.DivisionMask,
 				paint: {
 					'fill-color': isDarkMode ? tailwindColors.zinc500 : tailwindColors.stone400,
-					'fill-opacity': isDarkMode ? 0.09 : 0.15,
+					'fill-opacity': isVisible ? (isDarkMode ? 0.09 : 0.15) : 0,
+					'fill-opacity-transition': fadeTransition,
 				},
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'fill',
 			}) satisfies FillLayerSpecification,
-		[isDarkMode],
+		[isDarkMode, isVisible],
 	);
 
 	const divisionOutlineLayerStyle = useMemo(
@@ -37,7 +65,8 @@ function useMapSourceDivisionStyle() {
 				},
 				paint: {
 					'line-color': isDarkMode ? tailwindColors.red500 : tailwindColors.red400,
-					'line-opacity': 0.7,
+					'line-opacity': isVisible ? 0.7 : 0,
+					'line-opacity-transition': fadeTransition,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -53,7 +82,7 @@ function useMapSourceDivisionStyle() {
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'line',
 			}) satisfies LineLayerSpecification,
-		[isDarkMode],
+		[isDarkMode, isVisible],
 	);
 
 	const divisionHaloLayerStyle = useMemo(
@@ -67,7 +96,8 @@ function useMapSourceDivisionStyle() {
 				paint: {
 					'line-blur': 5,
 					'line-color': isDarkMode ? tailwindColors.red600 : tailwindColors.red500,
-					'line-opacity': 0.2,
+					'line-opacity': isVisible ? 0.2 : 0,
+					'line-opacity-transition': fadeTransition,
 					'line-width': [
 						'interpolate',
 						['linear'],
@@ -85,7 +115,7 @@ function useMapSourceDivisionStyle() {
 				source: MapSourceIdEnum.DivisionCollection,
 				type: 'line',
 			}) satisfies LineLayerSpecification,
-		[isDarkMode],
+		[isDarkMode, isVisible],
 	);
 
 	return {
@@ -95,12 +125,18 @@ function useMapSourceDivisionStyle() {
 	};
 }
 
-export const MapSourceDivisions: FC<{ data: FeatureCollection }> = memo(
+export const MapSourceDivisions: FC<{ data: FeatureCollection | undefined }> = memo(
 	function MapDivisionSourceLayers({ data }) {
-		const divisionStyle = useMapSourceDivisionStyle();
+		const { isVisible, shownData } = useDivisionFade(data);
+		const divisionStyle = useMapSourceDivisionStyle(isVisible);
 
 		return (
-			<Source data={data} generateId={true} id={MapSourceIdEnum.DivisionCollection} type="geojson">
+			<Source
+				data={shownData ?? emptyFeatureCollection}
+				generateId={true}
+				id={MapSourceIdEnum.DivisionCollection}
+				type="geojson"
+			>
 				<Layer key={MapLayerIdEnum.DivisionMask} {...divisionStyle[MapLayerIdEnum.DivisionMask]} />
 				<Layer key={MapLayerIdEnum.DivisionHalo} {...divisionStyle[MapLayerIdEnum.DivisionHalo]} />
 				<Layer

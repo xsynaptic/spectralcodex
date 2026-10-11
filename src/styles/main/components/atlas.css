@@ -1,0 +1,201 @@
+.atlas-shell {
+	position: fixed;
+	inset: 0;
+	z-index: var(--z-index-header);
+
+	/* Hidden rather than removed so the live canvas keeps its size and state */
+	visibility: hidden;
+	outline: none;
+}
+
+:root[data-atlas-page='map'] .atlas-shell {
+	visibility: visible;
+	view-transition-name: atlas-map;
+}
+
+.atlas-divider {
+	display: none;
+}
+
+/* The offset is the dragged pane width less the current one */
+.atlas-divider-preview {
+	--atlas-preview-ink: light-dark(
+		color-mix(in srgb, var(--color-primary-900) 20%, transparent),
+		color-mix(in srgb, var(--color-primary-50) 20%, transparent)
+	);
+
+	position: absolute;
+	inset-block: 0;
+	left: calc(50% + min(0px, var(--atlas-drag-offset, 0px)));
+	width: max(var(--atlas-drag-offset, 0px), -1 * var(--atlas-drag-offset, 0px));
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		-45deg,
+		var(--atlas-preview-ink) 0 1px,
+		transparent 1px 7px
+	);
+	opacity: 0;
+
+	/* The handle follows the preview in the divider, so its band paints over the blur */
+	backdrop-filter: blur(6px);
+	transition: opacity 120ms ease-out;
+
+	&::after {
+		position: absolute;
+		inset-block: 0;
+		left: max(0px, var(--atlas-drag-offset, 0px));
+		content: '';
+		border-left: 1px dashed light-dark(var(--color-primary-500), var(--color-primary-400));
+		translate: -50%;
+	}
+}
+
+.atlas-divider-handle {
+	--atlas-divider-active: light-dark(var(--color-accent-500), var(--color-accent-400));
+
+	position: relative;
+	height: 100%;
+	touch-action: none;
+	cursor: col-resize;
+	outline: none;
+
+	&::before,
+	&::after {
+		position: absolute;
+		inset-block: 0;
+		content: '';
+	}
+
+	&::before {
+		left: 50%;
+		width: 1px;
+		background-color: transparent;
+		translate: -50%;
+		transition: background-color 150ms ease-out;
+	}
+
+	&::after {
+		inset-inline: 0;
+		background-color: color-mix(in srgb, var(--atlas-divider-active) 30%, transparent);
+		opacity: 0;
+		transition: opacity 150ms ease-out;
+	}
+
+	&:is(:focus-visible, [data-dragging]) {
+		&::before {
+			background-color: var(--atlas-divider-active);
+		}
+
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			&::before {
+				background-color: var(--atlas-divider-active);
+			}
+
+			&::after {
+				opacity: 1;
+			}
+		}
+	}
+}
+
+.atlas-divider:has([data-dragging]) .atlas-divider-preview {
+	opacity: 1;
+}
+
+/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
+@media (width >= theme(--breakpoint-lg)) {
+	:root[data-atlas][data-atlas-page='pane'] {
+		/* Percent resolves where the property is used, against a box without the scrollbar gutter that `100vw` counts */
+		--atlas-pane-width: clamp(
+			var(--atlas-pane-min),
+			var(--atlas-pane-size, var(--atlas-pane-default)),
+			100% - var(--atlas-map-min)
+		);
+
+		.main-pane {
+			position: relative;
+			width: var(--atlas-pane-width);
+			margin-left: auto;
+			view-transition-name: atlas-pane;
+		}
+
+		.progress-bar {
+			right: 0;
+			left: auto;
+			width: var(--atlas-pane-width);
+		}
+
+		.atlas-shell {
+			right: var(--atlas-pane-width);
+			visibility: visible;
+			view-transition-name: atlas-map;
+		}
+
+		.atlas-divider {
+			position: fixed;
+			inset-block: 0;
+			right: var(--atlas-pane-width);
+			z-index: var(--z-index-divider);
+			display: block;
+			width: 0.75rem;
+			translate: 50%;
+		}
+
+		.atlas-inline-map {
+			display: none;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	/* The same live map before and after: no crossfade to ghost the old camera */
+	::view-transition-old(atlas-map),
+	::view-transition-new(atlas-map) {
+		mix-blend-mode: normal;
+		animation-name: none;
+	}
+
+	/* `:only-child` matches a side entering or leaving, which gets the default fade back */
+	::view-transition-new(atlas-map):only-child {
+		animation-name: -ua-view-transition-fade-in;
+	}
+
+	::view-transition-old(atlas-map):only-child {
+		animation-name: -ua-view-transition-fade-out;
+	}
+
+	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
+	/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
+	@media (width >= theme(--breakpoint-lg)) {
+		:root[data-atlas]:is(
+				[data-atlas-page='pane']:not([data-atlas-from='pane']),
+				[data-atlas-from='pane']:not([data-atlas-page='pane'])
+			) {
+			&::view-transition-group(*),
+			&::view-transition-new(*) {
+				animation: none;
+			}
+
+			&::view-transition-old(*) {
+				display: none;
+			}
+		}
+	}
+
+	/* Leaving the full-screen map for a page without one resizes nothing, so the map slides away */
+	:root[data-atlas-from='map']::view-transition-old(atlas-map):only-child {
+		animation: atlas-exit-left 150ms ease-out both;
+	}
+}
+
+@keyframes atlas-exit-left {
+	to {
+		translate: -100%;
+	}
+}

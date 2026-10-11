@@ -63,6 +63,7 @@ interface MapStoreHoveredIdUpdate {
 	hoveredId: string | undefined;
 }
 
+// Order matters: close-filter clears the selection, so it must precede select-point or the popup never opens
 export function decideClickActions(input: MapClickInput): Array<MapClickAction> {
 	const { clusterId, coordinates, geometryType, layerId, pointId } = input;
 

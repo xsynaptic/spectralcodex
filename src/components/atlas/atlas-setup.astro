@@ -1,0 +1,50 @@
+---
+import {
+	atlasFlagStorageKey,
+	atlasPage,
+	atlasPaneSizeProperty,
+	atlasPaneStorageKey,
+} from '#lib/atlas/atlas-constants.ts';
+---
+
+<script
+	define:vars={{
+		flagStorageKey: atlasFlagStorageKey,
+		mapPage: atlasPage.map,
+		paneSizeProperty: atlasPaneSizeProperty,
+		paneStorageKey: atlasPaneStorageKey,
+	}}
+	is:inline
+>
+	// Cold load only; atlas-mode.ts stamps every later document before its swap
+	const root = document.documentElement;
+
+	let isEnabled = root.dataset.atlasPage === mapPage;
+
+	try {
+		if (isEnabled) sessionStorage.setItem(flagStorageKey, '1');
+		else isEnabled = sessionStorage.getItem(flagStorageKey) === '1';
+	} catch {
+		// sessionStorage unavailable
+	}
+
+	if (isEnabled) root.dataset.atlas = '';
+
+	let paneSize;
+
+	try {
+		paneSize = Number(localStorage.getItem(paneStorageKey));
+	} catch {
+		// localStorage unavailable
+	}
+
+	if (Number.isFinite(paneSize) && paneSize > 0) {
+		root.style.setProperty(paneSizeProperty, `${paneSize}px`);
+	}
+</script>
+
+<script>
+	import { startAtlasMode } from '#lib/atlas/atlas-mode.ts';
+
+	startAtlasMode();
+</script>

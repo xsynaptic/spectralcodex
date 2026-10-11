@@ -65,7 +65,9 @@ export async function createQueryThemesEntryFunction() {
 			locationCount: locationsFiltered.length,
 			mapId: `${entry.collection}/${entry.id}`,
 			version,
-			...(themeIndex === undefined ? {} : { scope: { index: themeIndex, type: 'theme' } }),
+			...(themeIndex === undefined
+				? {}
+				: { mapFeaturesRule: { index: themeIndex, type: 'theme' } }),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

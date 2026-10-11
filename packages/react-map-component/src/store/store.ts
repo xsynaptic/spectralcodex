@@ -3,6 +3,7 @@ import { useStore } from 'zustand';
 
 import type { MapDataStore } from '#store/store-factory.ts';
 
+import { hasActiveFilter } from '#store/store-factory.ts';
 import { MapStoreContext } from '#store/store-provider.tsx';
 
 const useMapDataStore = <T>(selector: (state: MapDataStore) => T): T => {
@@ -51,7 +52,9 @@ export const useMapObjectiveFilter = () => useMapDataStore((state) => state.obje
 export const useIsMapObjectiveFilterEnabled = () =>
 	useMapDataStore((state) => state.isObjectiveFilterEnabled);
 
-export const useMapScope = () => useMapDataStore((state) => state.scope);
+export const useHasMapActiveFilter = () => useMapDataStore(hasActiveFilter);
+
+export const useMapFeaturesRule = () => useMapDataStore((state) => state.mapFeaturesRule);
 
 // Map language settings
 export const useMapLanguages = () => useMapDataStore((state) => state.languages);

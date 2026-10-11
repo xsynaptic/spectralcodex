@@ -19,7 +19,6 @@ export interface MapComponentData extends MapComponentProps {
 	prefetchUrls?: Array<string> | undefined;
 }
 
-// Map component props
 export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'bounds' | 'hash' | 'interactive' | 'maxBounds' | 'zoom'>
 > {
@@ -32,18 +31,19 @@ export interface MapComponentProps extends Partial<
 	center?: [number, number];
 	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
 	darkMode?: MapDarkModeOptions | undefined;
+	enterMediaQuery?: string | undefined;
+	host?: MapHostOptions | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
 	isObjectiveFilterEnabled?: boolean | undefined;
 	languages?: Array<string> | undefined;
+	mapFeaturesRule?: MapFeaturesRule | undefined;
 	mapId?: string | undefined;
 	// Host-overridable UI strings; merged over English defaults
 	messages?: Partial<MapMessages> | undefined;
 	popupData?: Array<MapPopupItemCompressed> | undefined;
 	popupDataKey?: string | undefined;
 	protomapsApiKey?: string | undefined;
-	// Big maps fetch the shared directory and keep only the rows their scope selects
-	scope?: MapScope | undefined;
 	sourceData?: Array<MapSourceItemCompressed> | undefined;
 	// Per-map content hashes that cache-key inline source/popup datasets
 	sourceDataKey?: string | undefined;
@@ -52,23 +52,47 @@ export interface MapComponentProps extends Partial<
 	version?: string | undefined;
 }
 
-// Supported geometry for use with this component
 export type MapGeometry = LineString | Point | Polygon;
+
+// Serializable; a persisted island never receives new props and a function cannot cross island serialization
+export interface MapHostOptions {
+	// While this matches a click hands the Feature to the host in place of its popup
+	featureOpenMediaQuery: string;
+	fullscreenContainerId: string;
+}
 
 export type MapInitialViewState = MapProps['initialViewState'];
 
 /**
- * Per-map scope over the shared global directory; a big map keeps only the rows its scope selects
+ * Selects Features from the shared global directory
  * - region: keep points whose region ordinal falls inside the subtree interval
  * - theme: keep points carrying the theme index
  * - ids: keep the explicit, order-preserving feature-id list
  */
-export type MapScope =
+export type MapFeaturesRule =
 	| { ids: Array<string>; type: 'ids' }
 	| { index: number; type: 'theme' }
 	| { interval: [number, number]; type: 'region' };
 
+export interface MapFeatureOpenDetail {
+	url: string;
+}
+
+export interface MapTrackDetail {
+	data?: Record<string, unknown>;
+	name: string;
+}
+
+export interface MapView extends Pick<
+	MapComponentProps,
+	'apiDivisionUrl' | 'bounds' | 'targetIds'
+> {
+	pageFeaturesRule?: MapFeaturesRule | undefined;
+}
+
+export type MapCanvasItem = MapSourceItem & { properties: { isOtherFeature?: true } };
+
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
-	MapSourceItem['properties']
+	MapCanvasItem['properties']
 >;

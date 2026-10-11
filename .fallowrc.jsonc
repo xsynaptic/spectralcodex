@@ -23,6 +23,7 @@
 		// Zero disables CRAP; without Istanbul data fallow estimates coverage from the module graph
 		"maxCrap": 0,
 		"ignore": ["src/dev/**"],
+		// Cognitive ceilings sit at the measured score plus 2; re-measure on a deliberate change, never raise one to clear a failure
 		"thresholdOverrides": [
 			{
 				"files": ["src/components/content/content-section.astro"],

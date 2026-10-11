@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
 
-import { cloneElement, memo } from 'react';
+import { cloneElement, memo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useControl } from 'react-map-gl/maplibre';
 
@@ -69,6 +69,12 @@ export const CustomControlPortal = memo(function CustomControlPortal({
 	const customControl = useControl<CustomControl>(
 		({ map }) => new CustomControl({ className, map: map.getMap(), position }),
 	);
+
+	const [, setIsAdded] = useState(false);
+
+	useEffect(() => {
+		setIsAdded(true);
+	}, []);
 
 	const map = customControl.getMap();
 	const element = customControl.getElement();

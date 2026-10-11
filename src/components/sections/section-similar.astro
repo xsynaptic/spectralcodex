@@ -13,9 +13,17 @@ interface Props extends HTMLAttributes<'div'> {
 	limit?: number | undefined;
 	showPreviews?: boolean | undefined;
 	threshold?: number;
+	visibleCount?: number;
 }
 
-const { entry, limit = 10, showPreviews, threshold = 0.5, ...props } = Astro.props;
+const {
+	entry,
+	limit = 10,
+	showPreviews,
+	threshold = 0.5,
+	visibleCount = 4,
+	...props
+} = Astro.props;
 
 const getSimilarContent = await getSimilarContentFunction();
 
@@ -25,18 +33,43 @@ const similarContentItems = getSimilarContent({
 	threshold,
 });
 
+// An odd count leaves a hole in the two-column grid above the summary
+const visibleItems = similarContentItems.slice(0, visibleCount);
+const moreItems = similarContentItems.slice(visibleCount);
+
 const t = getTranslations();
 ---
 
 <ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.similar')} {...props}>
 	{showPreviews ? (
 		<PreviewGrid
-			items={similarContentItems}
+			items={visibleItems}
 			showDate={true}
 			showRegion={true}
 			showTitleMultilingual={true}
 		/>
 	) : (
-		<PreviewColumn items={similarContentItems} />
+		<PreviewColumn items={visibleItems} />
 	)}
+	{moreItems.length > 0 ? (
+		<details class="group">
+			<summary
+				class="similar-more mt-3 flex cursor-pointer list-none items-center gap-3 py-2 text-sm font-medium text-primary-600 transition-colors duration-75 ease-linear group-open:hidden hover:text-accent-500 focus-visible:text-accent-500 dark:text-primary-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
+				data-umami-event="similar-show-more"
+			>
+				{t('section.similar.more')}
+			</summary>
+			{showPreviews ? (
+				<PreviewGrid
+					class="mt-5 md:mt-2 lg:mt-5"
+					items={moreItems}
+					showDate={true}
+					showRegion={true}
+					showTitleMultilingual={true}
+				/>
+			) : (
+				<PreviewColumn items={moreItems} />
+			)}
+		</details>
+	) : undefined}
 </ContentSection>

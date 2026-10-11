@@ -4,13 +4,14 @@ import { createContext, useContext, useMemo } from 'react';
 
 import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
 
-import { getMapCanvasData } from '#canvas/canvas-data-filter.ts';
+import { getHiddenTargetIds, getMapCanvasData } from '#canvas/canvas-data-filter.ts';
+import { useMapView } from '#canvas/canvas-view.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
 	useMapEntryQualityFilter,
+	useMapFeaturesRule,
 	useMapObjectiveFilter,
 	useMapRatingFilter,
-	useMapScope,
 	useMapStatusFilter,
 } from '#store/store.ts';
 
@@ -26,16 +27,28 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const entryQuality = useMapEntryQualityFilter();
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
-	const mapScope = useMapScope();
+	const mapFeaturesRule = useMapFeaturesRule();
+	const { pageFeaturesRule, targetIds } = useMapView();
+
+	const filter = useMemo(
+		() => ({ entryQuality, objective, rating, status }),
+		[entryQuality, objective, rating, status],
+	);
+
+	// A string, so a new Target the filter does not hide leaves the collections and their clusters untouched
+	const pinnedKey = useMemo(
+		() => getHiddenTargetIds(sourceData ?? emptyItems, targetIds, filter).join(' '),
+		[sourceData, targetIds, filter],
+	);
 
 	const canvasData = useMemo(
 		() =>
 			getMapCanvasData(
 				sourceData ?? emptyItems,
-				{ entryQuality, objective, rating, status },
-				mapScope,
+				pinnedKey ? { ...filter, pinnedIds: pinnedKey.split(' ') } : filter,
+				{ mapFeaturesRule, pageFeaturesRule },
 			),
-		[sourceData, status, entryQuality, rating, objective, mapScope],
+		[sourceData, filter, pageFeaturesRule, mapFeaturesRule, pinnedKey],
 	);
 
 	return <CanvasDataContext.Provider value={canvasData}>{children}</CanvasDataContext.Provider>;

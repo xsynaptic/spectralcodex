@@ -4,8 +4,6 @@ import { getBaseUrl, isProd, localPort, localUrl } from '#e2e/constants.ts';
 
 export default defineConfig({
 	fullyParallel: true,
-	// Bail early so a systemic failure surfaces fast
-	maxFailures: 3,
 	outputDir: './temp/playwright-results',
 	projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],

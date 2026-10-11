@@ -109,6 +109,7 @@ const translationStrings = {
 		'section.map.label': 'Map of {title}',
 		'section.map.loading': 'Loading map',
 		'section.similar': 'Similar Content',
+		'section.similar.more': 'Show more',
 		'section.sources': 'Sources',
 		'section.webmentions': 'Webmentions',
 
@@ -169,6 +170,18 @@ const translationStrings = {
 		'carousel.roledescription': 'carousel',
 		'carousel.slide.label': '{current} of {total}',
 		'carousel.slide.roledescription': 'slide',
+
+		// Atlas
+		'atlas.close.label': 'Close atlas',
+		'atlas.description': 'A full-screen map of every location in the database.',
+		'atlas.divider.label': 'Resize map and content',
+		'atlas.expand.label': 'Expand map',
+		'atlas.intro':
+			'Every location in the database on one map. Select a marker to read about the place beside the map, or browse the same places as lists.',
+		'atlas.noscript':
+			'The atlas needs JavaScript to draw the map. Browse the same places as lists instead.',
+		'atlas.open.label': 'Open in atlas',
+		'atlas.title': 'Atlas',
 
 		// Objectives
 		'objectives.description':

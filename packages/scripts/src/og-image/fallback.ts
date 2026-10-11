@@ -12,6 +12,7 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 // Single source of truth, consumed by the media-orphans and og-image scripts
 export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = {
 	'alishan-forest-railway': 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg',
+	atlas: 'taiwan/kaohsiung/kaohsiung-1.jpg',
 	canada: 'canada/british-columbia/alberni-clayoquot/ucluelet-shorepine-bog-trail-7.jpg',
 	china: 'v/fallback-china-1.jpg',
 	chronology: 'taiwan/keelung/renai/keelung-renwu-road-pedestrian-bridge-2.jpg',
@@ -61,7 +62,7 @@ export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = 
 	'taiwan-waterworks': 'taiwan/chiayi/chiayi-east/chiayi-shuiyuan-water-meter-room-1.jpg',
 	'taiwan/changhua': 'taiwan/changhua/changhua-city/changhua-confucius-temple-1.jpg',
 	'taiwan/chiayi': 'taiwan/chiayi/chiayi-east/chiayi-sun-shooting-tower-1.jpg',
-	'taiwan/hsinchu': 'taiwan/hsinchu/hsinchu-city/hsinchu-city-god-temple-1.jpg',
+	'taiwan/hsinchu': 'taiwan/hsinchu/hsinchu-north/hsinchu-city-god-temple-1.jpg',
 	'taiwan/hualien': [
 		'2018/huadong-valley-ride-2018-3-35.jpg',
 		'2018/huadong-valley-ride-2018-4-16.jpg',

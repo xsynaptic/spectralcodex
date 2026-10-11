@@ -5,13 +5,12 @@ export const localUrl = `http://localhost:${String(localPort)}`;
 export const isProd = process.env.TEST_ENV === 'prod';
 
 // Must match `PROD_SERVER_URL` in `.env`, which the deploy config reads as its site URL
-const prodUrl = 'https://spectralcodex.com/';
+export const prodUrl = 'https://spectralcodex.com/';
 
 export const contentManifestPath = '/content-manifest.json';
 
 export const paths = {
 	chronologyIndex: '/chronology/',
-	chronologyMonth: '/chronology/2019/02/',
 	chronologyYear: '/chronology/2019/',
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
