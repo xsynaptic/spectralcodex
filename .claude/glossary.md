@@ -82,13 +82,23 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
-**Page Features**: The Features the page in the atlas pane is about, such as a Region's subtree. _Avoid_: scope, highlight.
+**Map Features**: The Features a map holds, selected from the Map Directory. _Avoid_: scope.
+
+**Page Features**: The Features the page in the Pane is about, such as a Region's subtree. _Avoid_: scope, highlight.
+
+**Other Features**: The Map Features outside the Page Features, drawn subdued. _Avoid_: background, inactive.
 
 **Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
 
 **Popup Data**: The richer per-Feature payload shown only once a reader opens a Feature (title, description, thumbnail, outbound links). _Avoid_: detail, tooltip, card.
 
 **Chunk**: A geographically contiguous bundle of Popup Data, fetched on demand so a map never loads every popup up front. _Avoid_: tile, batch, page, shard.
+
+**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read. _Avoid_: explorer, map mode, map view.
+
+**Split**: The Atlas layout with the map on the left and a page on the right. _Avoid_: two-pane, side-by-side.
+
+**Pane**: The side of the Split that holds the page. _Avoid_: sidebar, panel, drawer.
 
 **Target**: A Feature a map is asked to open or centre on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
 
