@@ -22,10 +22,10 @@ async function expectEntryRenders(page: Page, path: string): Promise<void> {
 	expect(bodyText.trim().length).toBeGreaterThan(bodyLengthMinimum);
 }
 
-test('a Post renders', async ({ page, site }) => {
+test('a Post renders', { tag: '@smoke' }, async ({ page, site }) => {
 	await expectEntryRenders(page, site.postDetail);
 });
 
-test('a Location renders', async ({ page, site }) => {
+test('a Location renders', { tag: '@smoke' }, async ({ page, site }) => {
 	await expectEntryRenders(page, site.locationDetail);
 });

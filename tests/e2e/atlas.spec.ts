@@ -22,7 +22,7 @@ async function expectSameCanvas(canvas: Locator) {
 	expect(await canvas.evaluate((element) => 'isKept' in element)).toBe(true);
 }
 
-test('the atlas loads from a direct visit', async ({ page }) => {
+test('the atlas loads from a direct visit', { tag: '@smoke' }, async ({ page }) => {
 	await visit(page, atlasPath);
 
 	await expect(page.locator('.atlas-shell canvas.maplibregl-canvas')).toBeVisible({

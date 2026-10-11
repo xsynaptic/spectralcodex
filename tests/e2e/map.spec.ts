@@ -1,6 +1,6 @@
 import { expect, test, visit } from '#e2e/test.ts';
 
-test('the map loads on a Location', async ({ page, site }) => {
+test('the map loads on a Location', { tag: '@smoke' }, async ({ page, site }) => {
 	await visit(page, site.locationDetail);
 
 	// The island is server-rendered; the canvas only follows once client:visible hydrates it

@@ -3,7 +3,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 const t = getTranslations();
 
-test('Pagefind returns a known Entry first', async ({ page, site }) => {
+test('Pagefind returns a known Entry first', { tag: '@smoke' }, async ({ page, site }) => {
 	await visit(page, '/');
 
 	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
