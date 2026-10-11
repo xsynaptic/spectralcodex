@@ -115,37 +115,16 @@ describe('getObjectiveMapData', () => {
 });
 
 describe('getTheaterLocations', () => {
-	test('every bucket is scoped to the theaters theme', async () => {
+	test('the list is scoped to the theaters theme', async () => {
 		setLocations([
-			makeLocation('theater', { precision: 1, themes: [theaters] }),
-			makeLocation('other', { precision: 1, themes: [{ id: 'temples' }] }),
-			makeLocation('untagged', { precision: 1 }),
+			makeLocation('theater', { themes: [theaters, colonial] }),
+			makeLocation('other', { themes: [{ id: 'temples' }, colonial] }),
+			makeLocation('untagged'),
 		]);
 
 		const data = await getTheaterLocations();
 
-		expect(ids(data.theaterLocationsLowPrecision)).toStrictEqual(['theater']);
-	});
-
-	test('precision buckets are exclusive, and unknown status only applies to placed locations', async () => {
-		setLocations([
-			makeLocation('rough', { precision: 2, themes: [theaters] }),
-			makeLocation('placed-unknown', {
-				precision: 3,
-				status: LocationStatusEnum.Unknown,
-				themes: [theaters],
-			}),
-			makeLocation('vague-unknown', {
-				precision: 2,
-				status: LocationStatusEnum.Unknown,
-				themes: [theaters],
-			}),
-		]);
-
-		const data = await getTheaterLocations();
-
-		expect(ids(data.theaterLocationsRoughPrecision)).toStrictEqual(['rough', 'vague-unknown']);
-		expect(ids(data.theaterLocationsUnknownStatus)).toStrictEqual(['placed-unknown']);
+		expect(ids(data.theaterLocationsJapanese)).toStrictEqual(['theater']);
 	});
 
 	test('the colonial-era list drops what no longer stands or cannot be found', async () => {
@@ -164,35 +143,20 @@ describe('getTheaterLocations', () => {
 		expect(ids(data.theaterLocationsJapanese)).toStrictEqual(['extant']);
 	});
 
-	test('objective lists split at four, and an objective of one falls in neither', async () => {
+	test('the list runs north to south, taking a multi-point location at its northernmost', async () => {
 		setLocations([
-			makeLocation('top', { objective: 4, themes: [theaters] }),
-			makeLocation('middle', { objective: 3, themes: [theaters] }),
-			makeLocation('lowest', { objective: 1, themes: [theaters] }),
-			makeLocation('none', { themes: [theaters] }),
-		]);
-
-		const data = await getTheaterLocations();
-
-		expect(ids(data.theaterLocationsObjectivesTop)).toStrictEqual(['top']);
-		expect(ids(data.theaterLocationsObjectivesAll)).toStrictEqual(['middle']);
-	});
-
-	test('each bucket runs north to south, taking a multi-point location at its northernmost', async () => {
-		setLocations([
-			makeLocation('south', { precision: 1, themes: [theaters] }),
+			makeLocation('south', { themes: [theaters, colonial] }),
 			makeLocation('north', {
 				geometry: [
 					{ coordinates: [121, 24], type: 'Point' },
 					{ coordinates: [121, 26], type: 'Point' },
 				],
-				precision: 1,
-				themes: [theaters],
+				themes: [theaters, colonial],
 			}),
 		]);
 
 		const data = await getTheaterLocations();
 
-		expect(ids(data.theaterLocationsLowPrecision)).toStrictEqual(['north', 'south']);
+		expect(ids(data.theaterLocationsJapanese)).toStrictEqual(['north', 'south']);
 	});
 });

@@ -59,32 +59,5 @@ export async function getTheaterLocations() {
 			),
 			R.sort(sortLocationsByLatitude),
 		),
-		theaterLocationsLowPrecision: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision === 1),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsObjectivesAll: R.pipe(
-			theaterLocations,
-			R.filter(
-				({ data }) => data.objective !== undefined && data.objective > 1 && data.objective < 4,
-			),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsObjectivesTop: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.objective !== undefined && data.objective >= 4),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsRoughPrecision: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision === 2),
-			R.sort(sortLocationsByLatitude),
-		),
-		theaterLocationsUnknownStatus: R.pipe(
-			theaterLocations,
-			R.filter(({ data }) => data.precision >= 3 && data.status === LocationStatusEnum.Unknown),
-			R.sort(sortLocationsByLatitude),
-		),
 	};
 }
