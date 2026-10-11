@@ -3,12 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
-import type {
-	MapCanvasItem,
-	MapFeaturesRule,
-	MapGeometry,
-	MapSourceFeatureCollection,
-} from '#types.ts';
+import type { MapFeaturesRule, MapGeometry, MapSourceFeatureCollection } from '#types.ts';
 
 export interface MapCanvasData {
 	filteredCount: number;
@@ -19,7 +14,7 @@ export interface MapCanvasData {
 
 export interface MapCanvasRules {
 	mapFeaturesRule?: MapFeaturesRule | undefined;
-	pageFeaturesRule?: MapFeaturesRule | undefined;
+	scopeRule?: MapFeaturesRule | undefined;
 }
 
 export interface MapFilterState {
@@ -34,26 +29,24 @@ export interface MapFilterState {
 export function getMapCanvasData(
 	items: ReadonlyArray<MapSourceItem>,
 	filter: MapFilterState,
-	{ mapFeaturesRule, pageFeaturesRule }: MapCanvasRules = {},
+	{ mapFeaturesRule, scopeRule }: MapCanvasRules = {},
 ): MapCanvasData {
 	const mapItems = mapFeaturesRule ? getRuleItems(items, mapFeaturesRule) : items;
-	const isInPageFeatures = pageFeaturesRule ? createRuleTest(pageFeaturesRule) : undefined;
+	const scopeItems = scopeRule ? getRuleItems(mapItems, scopeRule) : mapItems;
 
-	const points: Array<MapCanvasItem> = [];
-	const lineStrings: Array<MapCanvasItem> = [];
+	const points: Array<MapSourceItem> = [];
+	const lineStrings: Array<MapSourceItem> = [];
 
-	for (const item of mapItems) {
+	for (const item of scopeItems) {
 		if (!isLocationVisible(item.properties, filter)) continue;
-
-		const canvasItem = markOtherFeature(item, isInPageFeatures);
 
 		switch (item.geometry.type) {
 			case GeometryTypeEnum.LineString: {
-				lineStrings.push(canvasItem);
+				lineStrings.push(item);
 				break;
 			}
 			case GeometryTypeEnum.Point: {
-				points.push(canvasItem);
+				points.push(item);
 				break;
 			}
 			// Polygons are not rendered anywhere yet; no collection is built for them
@@ -68,7 +61,7 @@ export function getMapCanvasData(
 		filteredCount: points.length + lineStrings.length,
 		lineStringCollection: toFeatureCollection(lineStrings),
 		pointCollection: toFeatureCollection(points),
-		totalCount: mapItems.length,
+		totalCount: scopeItems.length,
 	};
 }
 
@@ -100,17 +93,7 @@ export function getHiddenTargetIds(
 		.map(({ properties }) => properties.id);
 }
 
-// Source items are cached and shared, so a marked item is a copy
-function markOtherFeature(
-	item: MapSourceItem,
-	isInPageFeatures: ((properties: MapSourceItem['properties']) => boolean) | undefined,
-): MapCanvasItem {
-	if (!isInPageFeatures || isInPageFeatures(item.properties)) return item;
-
-	return { ...item, properties: { ...item.properties, isOtherFeature: true } };
-}
-
-function createRuleTest(
+export function createRuleTest(
 	rule: MapFeaturesRule,
 ): (properties: MapSourceItem['properties']) => boolean {
 	switch (rule.type) {
@@ -131,7 +114,6 @@ function createRuleTest(
 	}
 }
 
-// Restrict the shared directory to this map's rows before any visibility filtering
 function getRuleItems(
 	items: ReadonlyArray<MapSourceItem>,
 	rule: MapFeaturesRule,
@@ -148,7 +130,7 @@ function getRuleItems(
 	return items.filter(({ properties }) => isInRule(properties));
 }
 
-function toFeatureCollection(items: Array<MapCanvasItem>): MapSourceFeatureCollection | undefined {
+function toFeatureCollection(items: Array<MapSourceItem>): MapSourceFeatureCollection | undefined {
 	if (items.length === 0) return undefined;
 
 	return {

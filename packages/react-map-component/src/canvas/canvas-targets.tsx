@@ -6,7 +6,7 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps, MapView } from '#types.ts';
+import type { MapComponentProps, MapScope } from '#types.ts';
 
 import {
 	MapSelectedMarker,
@@ -27,8 +27,14 @@ import { useMapStoreActions } from '#store/store.ts';
 
 const fitPadding = 50;
 
-// The last popup leaves its padding on the transform, so zoom would turn around an off-centre point
-// The camera moves onto the screen centre as the padding goes, so nothing shifts
+interface MapFitView {
+	bounds?: MapComponentProps['bounds'] | undefined;
+	scope?: MapScope | undefined;
+	targetIds: Array<string>;
+}
+
+// The last popup leaves its padding on the transform, so zoom would turn around an off-center point
+// The camera moves onto the screen center as the padding goes, so nothing shifts
 function clearPadding(map: MapRef) {
 	if (Object.values(map.getPadding()).every((side) => side === 0)) return;
 
@@ -51,14 +57,10 @@ function getScreensTo(map: MapRef, center: LngLatLike) {
 	);
 }
 
-// Targets win; a view with bounds and no Targets fits those
-function getViewFit(
-	map: MapRef,
-	sourceData: ReadonlyArray<MapSourceItem>,
-	view: Pick<MapView, 'bounds' | 'targetIds'>,
-) {
-	const targetBounds = getTargetBounds(getTargetPositions(sourceData, view.targetIds ?? []));
-	const bounds = targetBounds ?? view.bounds;
+function getViewFit(map: MapRef, sourceData: ReadonlyArray<MapSourceItem>, view: MapFitView) {
+	const targetBounds = getTargetBounds(getTargetPositions(sourceData, view.targetIds));
+	// A Scope the user cleared is not fitted again when the map resizes
+	const bounds = targetBounds ?? (view.scope ? view.bounds : undefined);
 	const fit = bounds ? map.cameraForBounds(bounds, { padding: fitPadding }) : undefined;
 
 	if (!fit?.center || fit.zoom === undefined) return;
@@ -74,7 +76,7 @@ function getViewFit(
 }
 
 // True once the camera has settled on the current Targets, or on the view's bounds when it has none
-function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>) {
+function useTargetFit(view: MapFitView) {
 	const { current: map } = useMap();
 	const { data: sourceData } = useSourceDataQuery();
 	const { setFilterOpen, setSelectedId } = useMapStoreActions();
@@ -84,7 +86,7 @@ function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>) {
 	// The host resizes the container as chrome beside the map comes and goes
 	const width = useDocumentEventValue(mapSyncEventName, getWidth, 0);
 
-	const key = `${view.targetIds?.join(' ') ?? ''} ${JSON.stringify(view.bounds)} ${String(width)}`;
+	const key = `${view.targetIds.join(' ')} ${JSON.stringify(view.bounds)} ${String(width)}`;
 
 	// Filters and re-renders must not re-run the fit for a Target already handled
 	const handledKeyRef = useRef<string | undefined>(undefined);

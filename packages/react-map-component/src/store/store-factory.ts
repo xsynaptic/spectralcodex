@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapFeaturesRule } from '#types.ts';
+import type { MapFeaturesRule, MapScope } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
@@ -22,6 +22,7 @@ export type MapDataConfigurableState = Pick<
 
 export interface MapDataStore extends MapDataState {
 	actions: {
+		clearScope: () => void;
 		hideAllStatusFilter: () => void;
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
@@ -34,6 +35,7 @@ export interface MapDataStore extends MapDataState {
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
 		setRatingFilter: (ratingFilter: number) => void;
+		setScope: (scope: MapScope | undefined, scopeViewKey: string | undefined) => void;
 		setSelectedId: (selectedId: string | undefined) => void;
 		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
 		showAllStatusFilter: () => void;
@@ -58,6 +60,9 @@ interface MapDataState {
 	mapFeaturesRule: MapFeaturesRule | undefined;
 	objectiveFilter: number;
 	ratingFilter: number;
+	scope: MapScope | undefined;
+	// The `data-map-view` string the Scope was last computed from
+	scopeViewKey: string | undefined;
 	selectedId: string | undefined;
 	statusFilter: Array<LocationStatus>;
 }
@@ -76,6 +81,8 @@ const defaultMapDataState = {
 	mapFeaturesRule: undefined,
 	objectiveFilter: 1,
 	ratingFilter: 1,
+	scope: undefined,
+	scopeViewKey: undefined,
 	selectedId: undefined,
 	statusFilter: [],
 } satisfies MapDataState;
@@ -107,6 +114,9 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 		return {
 			...state,
 			actions: {
+				clearScope: () => {
+					set({ scope: undefined });
+				},
 				hideAllStatusFilter: () => {
 					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
 				},
@@ -142,6 +152,9 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setRatingFilter: (ratingFilter) => {
 					setAndClearSelection({ ratingFilter });
+				},
+				setScope: (scope, scopeViewKey) => {
+					set({ scope, scopeViewKey });
 				},
 				setSelectedId: (selectedId) => {
 					// A selection takes the filter panel's place; clearing one leaves the panel as it is

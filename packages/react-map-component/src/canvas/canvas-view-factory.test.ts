@@ -39,11 +39,15 @@ describe('parseMapView', () => {
 		});
 	});
 
-	test('a Region view carries its page features, bounds and Division', () => {
+	test('a Region view carries a Scope with its rule, bounds and Division', () => {
 		const view = {
-			apiDivisionUrl: '/api/divisions/tainan.fgb',
-			bounds: [120, 22.8, 120.7, 23.5],
-			pageFeaturesRule: { interval: [12, 48], type: 'region' },
+			scope: {
+				apiDivisionUrl: '/api/divisions/tainan.fgb',
+				bounds: [120, 22.8, 120.7, 23.5],
+				rule: { interval: [12, 48], type: 'region' },
+				title: 'Tainan',
+				url: '/regions/tainan/',
+			},
 		};
 
 		expect(parseMapView(JSON.stringify(view))).toEqual(view);
@@ -61,9 +65,11 @@ describe('parseMapView', () => {
 
 	test('one malformed field voids the whole view', () => {
 		expect(parseMapView('{"targetIds":"theater"}')).toEqual({});
-		expect(parseMapView('{"targetIds":["theater"],"pageFeaturesRule":{"type":"region"}}')).toEqual(
-			{},
-		);
+		expect(
+			parseMapView(
+				'{"targetIds":["theater"],"scope":{"rule":{"type":"region"},"title":"Tainan","url":"/regions/tainan/"}}',
+			),
+		).toEqual({});
 	});
 });
 

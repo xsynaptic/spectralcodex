@@ -503,6 +503,73 @@ button.maplibregl-popup-close-button {
 	}
 }
 
+/** Scope bar; positioned by hand, as MapLibre has no top-center control slot, and white in dark mode like MapLibre's own controls */
+.map-scope-bar {
+	position: absolute;
+	inset-inline: 3rem;
+	top: 10px;
+	z-index: 2;
+	display: flex;
+	width: fit-content;
+
+	/* A long name is one unbreakable line, so the insets alone do not keep it clear of the controls on the right */
+	max-width: calc(100% - 6rem);
+	margin-inline: auto;
+	font-family: var(--map-font-display);
+	font-size: 0.75rem;
+	color: var(--map-color-neutral-700);
+	background-color: #fff;
+	border-radius: var(--map-radius-sm);
+	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+}
+
+.map-scope-name,
+.map-scope-clear {
+	height: 29px;
+	color: inherit;
+	cursor: pointer;
+	user-select: none;
+	background-color: transparent;
+	border-radius: inherit;
+}
+
+.map-scope-name {
+	min-width: 0;
+	padding-inline: 0.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 29px;
+	white-space: nowrap;
+	text-decoration: none;
+	border-start-end-radius: 0;
+	border-end-end-radius: 0;
+}
+
+.map-scope-clear {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 29px;
+	padding: 0;
+	border: 0;
+	border-inline-start: 1px solid var(--map-color-neutral-300);
+	border-start-start-radius: 0;
+	border-end-start-radius: 0;
+}
+
+.map-scope-name:focus-visible,
+.map-scope-clear:focus-visible {
+	background-color: rgb(0 0 0 / 5%);
+}
+
+@media (hover: hover) {
+	.map-scope-name:hover,
+	.map-scope-clear:hover {
+		background-color: rgb(0 0 0 / 5%);
+	}
+}
+
 /* Rounded end buttons stand in for clipping the group, which would cut off the focus ring */
 .maplibregl-ctrl-group button:first-child {
 	border-start-start-radius: inherit;

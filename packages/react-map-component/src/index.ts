@@ -6,6 +6,7 @@ export type {
 	MapFeaturesRule,
 	MapGeometry,
 	MapHostOptions,
+	MapScope,
 	MapTrackDetail,
 	MapView,
 } from '#types.ts';

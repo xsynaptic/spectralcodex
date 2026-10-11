@@ -19,6 +19,7 @@ import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
+import { getAtlasPage } from '#lib/map/map-atlas.ts';
 
 interface Props {
 	backlinksCount: number;
@@ -36,9 +37,11 @@ const { backlinksCount, catalogItems, catalogItemsCount, entry, mapData, page, r
 const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
+
+const atlas = await getAtlasPage(entry, mapData);
 ---
 
-<ContentEntryDetail entry={entry} prefetchUrls={mapData.prefetchUrls}>
+<ContentEntryDetail atlas={atlas} entry={entry} prefetchUrls={mapData.prefetchUrls}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
@@ -46,7 +49,12 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 	</Fragment>
 	<ContentProse entry={entry} />
-	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
+	<SectionMap
+		class="atlas-inline-map"
+		entryTitle={entry.data.title}
+		mapData={mapData}
+		showAtlasOpen={!!atlas}
+	/>
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionRegions regionIds={regionIds} />

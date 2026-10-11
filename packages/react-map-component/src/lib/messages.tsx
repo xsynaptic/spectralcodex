@@ -18,6 +18,8 @@ export interface MapMessages {
 	precisionError: string;
 	precisionWarning: string;
 	ratingFilterAriaLabel: string;
+	scopeAriaLabel: string;
+	scopeClearAriaLabel: string;
 	searchAriaLabel: string;
 	searchPlaceholder: string;
 	showAll: string;
@@ -39,6 +41,8 @@ const defaultMapMessages: MapMessages = {
 	precisionError: 'Coordinates for this point are only a guess!',
 	precisionWarning: 'Coordinates for this point are imprecise!',
 	ratingFilterAriaLabel: 'Minimum rating',
+	scopeAriaLabel: 'Showing only',
+	scopeClearAriaLabel: 'Show all points',
 	searchAriaLabel: 'Search',
 	searchPlaceholder: 'Search text or coordinates...',
 	showAll: 'Show All',

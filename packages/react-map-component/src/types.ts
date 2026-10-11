@@ -83,16 +83,18 @@ export interface MapTrackDetail {
 	name: string;
 }
 
-export interface MapView extends Pick<
-	MapComponentProps,
-	'apiDivisionUrl' | 'bounds' | 'targetIds'
-> {
-	pageFeaturesRule?: MapFeaturesRule | undefined;
+export interface MapScope extends Pick<MapComponentProps, 'apiDivisionUrl' | 'bounds'> {
+	rule: MapFeaturesRule;
+	title: string;
+	url: string;
 }
 
-export type MapCanvasItem = MapSourceItem & { properties: { isOtherFeature?: true } };
+// A Location page sets `targetIds`, a Region or Theme page sets `scope`, any other page sets neither
+export interface MapView extends Pick<MapComponentProps, 'targetIds'> {
+	scope?: MapScope | undefined;
+}
 
 export type MapSourceFeatureCollection = FeatureCollection<
 	MapGeometry,
-	MapCanvasItem['properties']
+	MapSourceItem['properties']
 >;

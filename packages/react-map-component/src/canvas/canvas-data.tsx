@@ -28,7 +28,8 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
 	const mapFeaturesRule = useMapFeaturesRule();
-	const { pageFeaturesRule, targetIds } = useMapView();
+	const { scope, targetIds } = useMapView();
+	const scopeRule = scope?.rule;
 
 	const filter = useMemo(
 		() => ({ entryQuality, objective, rating, status }),
@@ -46,9 +47,9 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 			getMapCanvasData(
 				sourceData ?? emptyItems,
 				pinnedKey ? { ...filter, pinnedIds: pinnedKey.split(' ') } : filter,
-				{ mapFeaturesRule, pageFeaturesRule },
+				{ mapFeaturesRule, scopeRule },
 			),
-		[sourceData, filter, pageFeaturesRule, mapFeaturesRule, pinnedKey],
+		[sourceData, filter, scopeRule, mapFeaturesRule, pinnedKey],
 	);
 
 	return <CanvasDataContext.Provider value={canvasData}>{children}</CanvasDataContext.Provider>;

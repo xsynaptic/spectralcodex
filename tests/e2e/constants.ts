@@ -17,6 +17,7 @@ export const paths = {
 	postsIndex: '/posts/',
 	regionDetail: '/regions/tainan/',
 	regionDetailAncestor: '/regions/taiwan/',
+	themeDetail: '/themes/taiwan-japanese-colonial-era/',
 } as const;
 
 export function getBaseUrl(): string {

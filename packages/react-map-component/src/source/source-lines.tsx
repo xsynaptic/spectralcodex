@@ -9,7 +9,7 @@ import type { MapSourceFeatureCollection } from '#types.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { statusColorArray, statusColorDarkArray } from '#lib/location-status.ts';
-import { MapLayerIdEnum, MapSourceIdEnum, otherFeatureOpacity } from '#source/source-config.ts';
+import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
 function useMapSourceLinesStyle(): {
 	[MapLayerIdEnum.LineString]: LineLayerSpecification;
@@ -31,12 +31,6 @@ function useMapSourceLinesStyle(): {
 						['string', ['get', 'status']],
 						...(isDarkMode ? statusColorDarkArray : statusColorArray),
 						'gray',
-					],
-					'line-opacity': [
-						'case',
-						['boolean', ['get', 'isOtherFeature'], false],
-						otherFeatureOpacity,
-						1,
 					],
 					'line-width': [
 						'interpolate',

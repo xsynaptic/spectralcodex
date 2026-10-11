@@ -17,7 +17,7 @@ import {
 	statusTintColorArray,
 } from '#lib/location-status.ts';
 import { tailwindColors } from '#lib/tailwind-colors.ts';
-import { MapLayerIdEnum, MapSourceIdEnum, otherFeatureOpacity } from '#source/source-config.ts';
+import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapHoveredId } from '#store/store.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
@@ -32,32 +32,6 @@ const selectStateExpression = [
 	'boolean',
 	['feature-state', 'select'],
 	false,
-] satisfies ExpressionSpecification;
-
-// Hover or selection restores full strength
-const pointOpacityExpression = [
-	'case',
-	['any', hoverStateExpression, selectStateExpression],
-	1,
-	['boolean', ['get', 'isOtherFeature'], false],
-	otherFeatureOpacity,
-	1,
-] satisfies ExpressionSpecification;
-
-// A mixed cluster draws at full strength
-const otherFeatureClusterExpression = [
-	'==',
-	['get', 'otherFeatureCount'],
-	['get', 'point_count'],
-] satisfies ExpressionSpecification;
-
-const clusterOpacityExpression = [
-	'case',
-	hoverStateExpression,
-	1,
-	otherFeatureClusterExpression,
-	otherFeatureOpacity,
-	1,
 ] satisfies ExpressionSpecification;
 
 const clusterRampBright = [
@@ -109,7 +83,6 @@ function getClustersLabelLayerStyle(isDarkMode: boolean, hoveredId: string | und
 			'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
 			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
 			'text-halo-width': 1,
-			'text-opacity': clusterOpacityExpression,
 		},
 		source: MapSourceIdEnum.PointCollection,
 		type: 'symbol',
@@ -121,16 +94,11 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 		filter: ['has', 'point_count'],
 		id: MapLayerIdEnum.Clusters,
 		layout: {
-			// Sort clusters by point count, descending; clusters of other features sit beneath the rest
-			'circle-sort-key': [
-				'-',
-				['case', otherFeatureClusterExpression, -100_000, 0],
-				['get', 'point_count'],
-			],
+			// Sort clusters by point count, descending
+			'circle-sort-key': ['-', ['get', 'point_count']],
 		},
 		paint: {
 			'circle-color': isDarkMode ? clusterRampDeep : clusterRampBright,
-			'circle-opacity': clusterOpacityExpression,
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -143,7 +111,6 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 				['case', hoverStateExpression, 14, 12],
 			],
 			'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
-			'circle-stroke-opacity': clusterOpacityExpression,
 			'circle-stroke-width': 1,
 		},
 		source: MapSourceIdEnum.PointCollection,
@@ -162,7 +129,6 @@ function getPointsImageLayerStyle() {
 		id: MapLayerIdEnum.PointsImage,
 		paint: {
 			'circle-color': ['match', ['string', ['get', 'status']], ...statusTintColorArray, 'white'],
-			'circle-opacity': pointOpacityExpression,
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -219,10 +185,6 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['!', ['has', 'point_count']],
 		id: MapLayerIdEnum.Points,
-		layout: {
-			// Translucent circles stack, so other features never draw over a point at full strength
-			'circle-sort-key': ['case', ['boolean', ['get', 'isOtherFeature'], false], 0, 1],
-		},
 		paint: {
 			'circle-color': [
 				'match',
@@ -230,7 +192,6 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 				...(isDarkMode ? statusColorDarkArray : statusColorArray),
 				'gray',
 			],
-			'circle-opacity': pointOpacityExpression,
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -252,7 +213,6 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 				...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
 				'gray',
 			],
-			'circle-stroke-opacity': pointOpacityExpression,
 			'circle-stroke-width': 1,
 		},
 		source: MapSourceIdEnum.PointCollection,
@@ -355,12 +315,6 @@ export const MapSourcePoints: FC<{
 				['+', ['case', ['==', ['get', 'status'], status], 1, 0]],
 			]),
 		);
-
-		// Always 0 when the host sets no page features
-		clusterProperties.otherFeatureCount = [
-			'+',
-			['case', ['boolean', ['get', 'isOtherFeature'], false], 1, 0],
-		];
 
 		if (targetIds && targetIds.length > 0) {
 			clusterProperties.hasTarget = [

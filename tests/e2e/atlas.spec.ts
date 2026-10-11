@@ -9,7 +9,7 @@ const t = getTranslations();
 const atlasPath = '/atlas/';
 const probeLimit = 8;
 
-// Region pages also link to Posts, which have no split
+// Region and Theme pages also link to Posts, which have no split
 async function getPaneLink(request: APIRequestContext, urls: Array<string>) {
 	for (const url of urls.slice(0, probeLimit)) {
 		const response = await request.get(url);
@@ -18,7 +18,7 @@ async function getPaneLink(request: APIRequestContext, urls: Array<string>) {
 		if (html.includes('data-atlas-page="pane"')) return url;
 	}
 
-	throw new Error(`No atlas page among the first ${String(probeLimit)} links on the Region`);
+	throw new Error(`No atlas page among the first ${String(probeLimit)} links on the page`);
 }
 
 async function expectSameCanvas(canvas: Locator) {
@@ -78,6 +78,48 @@ test('one map carries a reader through the split, the full-screen atlas and back
 
 	await expect(root).not.toHaveAttribute('data-atlas');
 	await expect(shell).toBeHidden();
+});
+
+test('a Theme scopes the map until the reader clears it', async ({ page, request }) => {
+	await visit(page, paths.themeDetail);
+
+	const shell = page.locator('.atlas-shell');
+	const scopeName = shell.locator('.map-scope-name');
+	const metrics = shell.locator('.maplibregl-ctrl-metrics');
+	const heading = await page.locator('h1').textContent();
+	const title = heading?.trim() ?? '';
+
+	await page.locator('.atlas-inline-map .maplibregl-ctrl-enter').click();
+	await expect(scopeName).toHaveText(title, { timeout: 10_000 });
+
+	const scopedMetrics = (await metrics.textContent()) ?? '';
+
+	const urls = await page
+		.locator('main a[href]')
+		.evaluateAll((anchors) =>
+			anchors
+				.map((anchor) => anchor.getAttribute('href') ?? '')
+				.filter((href) => /^\/[^/]+\/$/.test(href)),
+		);
+	const paneUrl = await getPaneLink(request, [...new Set(urls)]);
+
+	await page.locator(`main a[href="${paneUrl}"]`).first().click();
+	await page.waitForURL(`**${paneUrl}`);
+
+	await expect(scopeName).toHaveText(title);
+	await expect(metrics).toHaveText(scopedMetrics);
+	await expect(shell.locator('.map-pulse-ring').first()).toBeVisible();
+
+	await shell.locator('.map-scope-clear').click();
+
+	await expect(scopeName).toBeHidden();
+	await expect(metrics).not.toHaveText(scopedMetrics);
+
+	await page.goBack();
+	await page.waitForURL(`**${paths.themeDetail}`);
+
+	// Going back counts as a new visit to the Theme page, so its Scope is set again
+	await expect(scopeName).toHaveText(title);
 });
 
 test.describe('on a wide viewport', () => {

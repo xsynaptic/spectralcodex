@@ -13,6 +13,7 @@ import { useFeatureOpenEventName } from '#canvas/canvas-feature-open.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
+import { MapScopeBar } from '#canvas/canvas-scope-bar.tsx';
 import { MapTargets } from '#canvas/canvas-targets.tsx';
 import { MapViewProvider } from '#canvas/canvas-view.tsx';
 import { MapControls } from '#controls/controls.tsx';
@@ -49,6 +50,7 @@ const MapCanvasContainer: FC<
 	}
 > = function MapCanvasContainer({
 	apiChunkBaseUrl,
+	apiDivisionUrl,
 	apiPopupUrl,
 	baseMapTheme,
 	bounds,
@@ -116,7 +118,8 @@ const MapCanvasContainer: FC<
 					/>
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
-			<MapSource bounds={bounds} host={host} isDev={isDev} />
+			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} host={host} isDev={isDev} />
+			{host ? <MapScopeBar /> : undefined}
 			<MapTargets host={host} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
@@ -127,7 +130,6 @@ const MapCanvasContainer: FC<
 
 export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 	const {
-		apiDivisionUrl,
 		apiSourceUrl,
 		host,
 		interactive,
@@ -157,12 +159,7 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
 				}}
 			>
-				<MapViewProvider
-					apiDivisionUrl={apiDivisionUrl}
-					host={host}
-					isDev={isDev}
-					targetIds={targetIds}
-				>
+				<MapViewProvider host={host} isDev={isDev} targetIds={targetIds}>
 					<CanvasDataProvider>
 						<MapCanvasContainer {...props} />
 					</CanvasDataProvider>

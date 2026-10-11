@@ -82,11 +82,11 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
-**Map Features**: The Features a map holds, selected from the Map Directory. _Avoid_: scope.
+**Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
-**Page Features**: The Features the page in the Pane is about, such as a Region's subtree. _Avoid_: scope, highlight.
+**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region or Theme sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it, or the user, clears it. A map has at most one, and Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
 
-**Other Features**: The Map Features outside the Page Features, drawn subdued. _Avoid_: background, inactive.
+**Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Filter; a page never does. _Avoid_: scope, facet.
 
 **Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
 
@@ -100,7 +100,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Pane**: The side of the Split that holds the page. _Avoid_: sidebar, panel, drawer.
 
-**Target**: A Feature a map is asked to open or centre on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
+**Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
 
 ### Imagery
 
