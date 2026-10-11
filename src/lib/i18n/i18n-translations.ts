@@ -172,11 +172,10 @@ const translationStrings = {
 		'carousel.slide.roledescription': 'slide',
 
 		// Atlas
-		'atlas.close.label': 'Close Atlas',
+		'atlas.close.label': 'Close atlas',
 		'atlas.description': 'A full-screen map of every Location in Taiwan.',
 		'atlas.divider.label': 'Resize map and content',
-		'atlas.expand.content.label': 'Expand content',
-		'atlas.expand.map.label': 'Expand map',
+		'atlas.expand.label': 'Expand map',
 		'atlas.open.label': 'Open in atlas',
 		'atlas.title': 'Atlas',
 

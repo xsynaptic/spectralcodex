@@ -1,6 +1,5 @@
 ---
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getSitePath } from '#lib/utils/routing.ts';
 
 interface Props {
 	class?: string | undefined;
@@ -19,32 +18,6 @@ const t = getTranslations();
 		class="atlas-divider-handle"
 		role="separator"
 	></div>
-	<div class="atlas-divider-controls">
-		<button
-			aria-label={t('atlas.expand.content.label')}
-			class="atlas-divider-control"
-			data-atlas-expand
-			data-umami-event="atlas-expand-content"
-			title={t('atlas.expand.content.label')}
-			type="button"
-		>
-			<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
-				<use href="#icon:chevron-left"></use>
-			</svg>
-		</button>
-		<a
-			aria-label={t('atlas.expand.map.label')}
-			class="atlas-divider-control"
-			data-astro-prefetch="false"
-			data-umami-event="atlas-expand-map"
-			href={getSitePath('atlas')}
-			title={t('atlas.expand.map.label')}
-		>
-			<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
-				<use href="#icon:chevron-right"></use>
-			</svg>
-		</a>
-	</div>
 </atlas-divider>
 
 <script>

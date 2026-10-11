@@ -12,43 +12,8 @@
 	view-transition-name: atlas-map;
 }
 
-.atlas-divider,
-.atlas-open {
+.atlas-divider {
 	display: none;
-}
-
-/* Mirrors MapLibre's control group, the same in both modes; its own stylesheet loads only with the island */
-.atlas-close {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	display: flex;
-	gap: 0.25rem;
-	align-items: center;
-	justify-content: center;
-	min-width: 29px;
-	height: 29px;
-	padding-inline: 0.5rem 0.375rem;
-	font-size: var(--text-xs);
-	font-weight: 600;
-	line-height: 1;
-	color: #333;
-	cursor: pointer;
-	background-color: #fff;
-	border-radius: 4px;
-	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
-	transition: background-color 150ms ease-out;
-
-	&:focus-visible {
-		outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
-		background-color: #f2f2f2;
-	}
-
-	@media (hover: hover) {
-		&:hover {
-			background-color: #f2f2f2;
-		}
-	}
 }
 
 /* The offset is the dragged pane width less the current one */
@@ -103,7 +68,7 @@
 	&::before {
 		left: 50%;
 		width: 1px;
-		background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
+		background-color: transparent;
 		translate: -50%;
 		transition: background-color 150ms ease-out;
 	}
@@ -138,106 +103,12 @@
 	}
 }
 
-.atlas-divider-controls {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	display: flex;
-	width: 2.75rem;
-	height: 2.75rem;
-	background-color: var(--color-body-bg);
-	border: 1px solid light-dark(var(--color-primary-300), var(--color-primary-600));
-	border-radius: 50%;
-	translate: -50% -50%;
-	transition: opacity 400ms ease-out;
-
-	/* A touch screen has no hover to reveal it */
-	@media (hover: hover) {
-		opacity: 0;
-	}
-
-	/* One ring for the disc; a ring per half would trace a half circle */
-	&:has(:focus-visible) {
-		outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
-		outline-offset: 2px;
-	}
-}
-
-/* In fast, out slow; the dragging rule below still wins */
-.atlas-divider:has(:focus-visible) .atlas-divider-controls {
+.atlas-divider:has([data-dragging]) .atlas-divider-preview {
 	opacity: 1;
-	transition-duration: 100ms;
-}
-
-@media (hover: hover) {
-	.atlas-divider:hover .atlas-divider-controls {
-		opacity: 1;
-		transition-duration: 100ms;
-	}
-}
-
-.atlas-divider-control {
-	--atlas-control-active: light-dark(var(--color-primary-800), var(--color-primary-100));
-	--atlas-control-active-bg: light-dark(var(--color-primary-200), var(--color-primary-700));
-
-	display: flex;
-	flex: 1;
-	align-items: center;
-	justify-content: center;
-	color: light-dark(var(--color-primary-500), var(--color-primary-400));
-	cursor: pointer;
-	outline: none;
-	transition:
-		color 150ms ease-out,
-		background-color 150ms ease-out;
-
-	/* Thickens the sprite's filled chevron */
-	& svg {
-		stroke: currentcolor;
-		stroke-width: 0.75;
-		stroke-linejoin: round;
-	}
-
-	/* A half circle's visual centre sits nearer its flat edge */
-	&:first-child {
-		padding-left: 3px;
-		border-radius: 1.375rem 0 0 1.375rem;
-	}
-
-	&:last-child {
-		padding-right: 3px;
-		border-radius: 0 1.375rem 1.375rem 0;
-	}
-
-	&:focus-visible {
-		color: var(--atlas-control-active);
-		background-color: var(--atlas-control-active-bg);
-	}
-
-	@media (hover: hover) {
-		&:hover {
-			color: var(--atlas-control-active);
-			background-color: var(--atlas-control-active-bg);
-		}
-	}
-}
-
-.atlas-divider:has([data-dragging]) {
-	.atlas-divider-preview {
-		opacity: 1;
-	}
-
-	.atlas-divider-controls {
-		opacity: 0;
-	}
 }
 
 /* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
 @media (width >= theme(--breakpoint-lg)) {
-	.atlas-open {
-		display: flex;
-	}
-
 	:root[data-atlas][data-atlas-page='pane'] {
 		/* Percent resolves where the property is used, against a box without the scrollbar gutter that `100vw` counts */
 		--atlas-pane-width: clamp(
@@ -275,14 +146,8 @@
 			translate: 50%;
 		}
 
-		.atlas-open,
-		.atlas-inline-map,
-		.atlas-close-label {
+		.atlas-inline-map {
 			display: none;
-		}
-
-		.atlas-close {
-			padding-inline: 0;
 		}
 	}
 }

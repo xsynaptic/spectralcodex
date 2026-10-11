@@ -6,7 +6,6 @@ import type { CollectionEntry } from 'astro:content';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type { RegionsOption } from '#lib/collections/regions/regions-options.ts';
 
-import AtlasOpen from '#components/atlas/atlas-open.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryCounts from '#components/content/content-entry-counts.astro';
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
@@ -59,7 +58,6 @@ const atlas = await getAtlasPage(entry, mapData);
 		) : undefined}
 		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 	</Fragment>
-	<Fragment slot="header-caption">{atlas ? <AtlasOpen /> : undefined}</Fragment>
 	<ContentProse entry={entry} />
 	<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 		{regionsOption?.termsChildrenLabel ? (
@@ -69,7 +67,12 @@ const atlas = await getAtlasPage(entry, mapData);
 			<Fragment slot="regions-siblings-title">{regionsOption.termsSiblingsLabel}</Fragment>
 		) : undefined}
 	</RegionsRelated>
-	<SectionMap class="atlas-inline-map" entryTitle={entry.data.title} mapData={mapData} />
+	<SectionMap
+		class="atlas-inline-map"
+		entryTitle={entry.data.title}
+		mapData={mapData}
+		showAtlasOpen={!!atlas}
+	/>
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionWebmentions entry={entry} />

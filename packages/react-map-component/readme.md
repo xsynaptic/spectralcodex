@@ -14,7 +14,7 @@ Built on [react-map-gl](https://visgl.github.io/react-map-gl/) with [Protomaps](
 
 **Dynamic styling**: MapLibre layer specifications are generated via hooks that interpolate style properties based on zoom level, selection state, and dark mode. Expressions use feature properties to drive data-driven styling for status colors, cluster sizing, and hover effects.
 
-**Host bridge**: A host page can drive a persistent map through the document instead of props. The map reads its current view (targets, highlighted features, bounds, division outline) from a JSON attribute on the root element, validated with Zod, and re-reads it on a sync event; feature clicks are dispatched back as a DOM event for the host to handle. This keeps a single map instance alive across Astro view transitions, where a persisted island never receives new props.
+**Host bridge**: A host page can drive a persistent map through the document instead of props. The map reads its current view (targets, highlighted features, bounds, division outline) from a JSON attribute on the root element, validated with Zod, and re-reads it on a sync event; feature clicks and the exit control are dispatched back as DOM events for the host to handle. This keeps a single map instance alive across Astro view transitions, where a persisted island never receives new props.
 
 **Camera transitions**: When the view changes the camera eases to the new targets, with duration scaled by zoom change and distance travelled. The current zoom is kept when it already frames them, and target markers are drawn once the move settles.
 

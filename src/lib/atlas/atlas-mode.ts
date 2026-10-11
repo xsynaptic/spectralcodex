@@ -1,4 +1,7 @@
 import {
+	mapEnterEventName,
+	mapExitEventName,
+	mapExpandEventName,
 	mapFeatureOpenEventName,
 	mapSyncEventName,
 } from '@spectralcodex/react-map-component/constants';
@@ -99,10 +102,13 @@ function getReturnPath() {
 }
 
 function openAtlas() {
+	// The split hides the in-body map, which would go on holding the screen
+	if (document.fullscreenElement) void document.exitFullscreen();
+
 	setFlag(true);
 }
 
-export function closeAtlas() {
+function closeAtlas() {
 	setFlag(false);
 
 	// In the split, clearing the flag has already turned the pane back into the regular page
@@ -148,11 +154,10 @@ export function startAtlasMode() {
 
 	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateSplit);
 
-	document.addEventListener('click', (event) => {
-		if (!(event.target instanceof Element)) return;
-
-		if (event.target.closest('[data-atlas-open]')) openAtlas();
-		if (event.target.closest('[data-atlas-close]')) closeAtlas();
+	document.addEventListener(mapEnterEventName, openAtlas);
+	document.addEventListener(mapExitEventName, closeAtlas);
+	document.addEventListener(mapExpandEventName, () => {
+		void navigate(getSitePath('atlas'));
 	});
 
 	// The swap copies the incoming root's attributes and inline style verbatim, so mode state is stamped here

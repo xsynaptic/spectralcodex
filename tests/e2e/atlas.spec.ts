@@ -67,7 +67,7 @@ test('one map carries a reader through the split, the full-screen atlas and back
 	await expect(canvas).toBeVisible();
 	await expectSameCanvas(canvas);
 
-	await page.locator(`.atlas-divider a[href="${atlasPath}"]`).click();
+	await shell.locator('.maplibregl-ctrl-expand').click();
 	await page.waitForURL(`**${atlasPath}`);
 
 	await expect(canvas).toBeVisible();

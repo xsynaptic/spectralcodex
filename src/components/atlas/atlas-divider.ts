@@ -1,6 +1,6 @@
 import { mapSyncEventName } from '@spectralcodex/react-map-component/constants';
 
-import { closeAtlas, requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
+import { requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
 import {
 	clampPaneWidth,
 	getPaneWidthForKey,
@@ -8,7 +8,6 @@ import {
 } from '#lib/atlas/atlas-pane-factory.ts';
 import { getPaneLimits, getPaneWidth } from '#lib/atlas/atlas-pane.ts';
 
-// The host carries the position, so the controls beside the handle follow a drag
 class AtlasDivider extends HTMLElement {
 	#dragOrigin = 0;
 	#dragWidth: number | undefined;
@@ -25,7 +24,6 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.addEventListener('pointerup', this.#handlePointerUp);
 		this.#handle?.addEventListener('pointercancel', this.#handlePointerUp);
 		this.#handle?.addEventListener('keydown', this.#handleKeyDown);
-		this.addEventListener('click', this.#handleClick);
 		window.addEventListener('resize', this.#updateValue);
 		document.addEventListener(mapSyncEventName, this.#updateValue);
 
@@ -38,16 +36,9 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.removeEventListener('pointerup', this.#handlePointerUp);
 		this.#handle?.removeEventListener('pointercancel', this.#handlePointerUp);
 		this.#handle?.removeEventListener('keydown', this.#handleKeyDown);
-		this.removeEventListener('click', this.#handleClick);
 		window.removeEventListener('resize', this.#updateValue);
 		document.removeEventListener(mapSyncEventName, this.#updateValue);
 	}
-
-	#handleClick = (event: MouseEvent) => {
-		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-expand]')) return;
-
-		closeAtlas();
-	};
 
 	#handleKeyDown = (event: KeyboardEvent) => {
 		const width = getPaneWidthForKey(event.key, getPaneWidth(), getPaneLimits());

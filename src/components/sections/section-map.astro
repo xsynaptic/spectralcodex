@@ -4,16 +4,19 @@ import type { HTMLAttributes } from 'astro/types';
 
 import ContentSection from '#components/content/content-section.astro';
 import MapComponent from '#components/map/map-component.astro';
+import { atlasPaneMediaQuery } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entryTitle?: string | undefined;
 	mapData: MapComponentData;
+	showAtlasOpen?: boolean | undefined;
 }
 
 const {
 	entryTitle,
 	mapData: { hasGeodata, ...mapComponentProps },
+	showAtlasOpen = false,
 	...props
 } = Astro.props;
 
@@ -28,7 +31,18 @@ const t = getTranslations();
 		sectionTitle={t('section.map')}
 		{...props}
 	>
-		<MapComponent entryTitle={entryTitle} mapComponentProps={mapComponentProps} />
+		<MapComponent
+			entryTitle={entryTitle}
+			mapComponentProps={{
+				...mapComponentProps,
+				...(showAtlasOpen
+					? {
+							enterMediaQuery: atlasPaneMediaQuery,
+							messages: { enterAriaLabel: t('atlas.open.label') },
+						}
+					: {}),
+			}}
+		/>
 		<slot />
 	</ContentSection>
 ) : undefined}

@@ -53,6 +53,7 @@ const MapCanvasContainer: FC<
 	baseMapTheme,
 	bounds,
 	center,
+	enterMediaQuery,
 	hash,
 	host,
 	imageServerUrl,
@@ -107,7 +108,7 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 					version={version}
 				>
-					<MapControls host={host} />
+					<MapControls enterMediaQuery={enterMediaQuery} host={host} />
 					<MapPopup
 						featureOpenEventName={featureOpenEventName}
 						imageServerUrl={imageServerUrl}

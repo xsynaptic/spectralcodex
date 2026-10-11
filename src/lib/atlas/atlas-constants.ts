@@ -4,7 +4,6 @@ export const atlasReturnStorageKey = 'scx-atlas-return';
 
 export const atlasPersistName = 'atlas-map';
 
-// On the root element, so fullscreen from the atlas map takes the pane with it
 export const atlasRootId = 'atlas-root';
 
 // Values of `data-atlas-page` on the root; atlas.css writes the same two

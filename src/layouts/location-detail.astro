@@ -4,7 +4,6 @@ import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
-import AtlasOpen from '#components/atlas/atlas-open.astro';
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryArticle from '#components/content/content-entry-article.astro';
 import ContentImage from '#components/content/content-image.astro';
@@ -84,7 +83,6 @@ const t = getTranslations();
 			</DividedItem>
 		) : undefined}
 	</Fragment>
-	<Fragment slot="header-caption">{atlas ? <AtlasOpen /> : undefined}</Fragment>
 	{!hasContent && !hasHeroImage && imageFeaturedId ? (
 		<ContentImage
 			alt={entry.data.title}
@@ -100,7 +98,12 @@ const t = getTranslations();
 	/>
 	<SectionNotices entry={entry} langCode={regionLangCode} />
 	{hideLocation ? undefined : (
-		<SectionMap class="atlas-inline-map" entryTitle={entry.data.title} mapData={mapData}>
+		<SectionMap
+			class="atlas-inline-map"
+			entryTitle={entry.data.title}
+			mapData={mapData}
+			showAtlasOpen={!!atlas}
+		>
 			<LocationsAddress address={addressBase} content={addressMultilingual} />
 		</SectionMap>
 	)}
