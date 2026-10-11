@@ -20,20 +20,18 @@ interface Props extends HTMLAttributes<'ul'> {
 const { ariaLabel, depth, isFirstNavigationItem = true, navigationItems, ...props } = Astro.props;
 
 const hasNestedMenu = navigationItems.some((item) => (item.children ?? []).length > 0);
+
+const submenuClasses = [
+	'nav-sub-menu',
+	depth === 1 ? 'nav-sub-menu-d1' : undefined,
+	depth === 1 && !hasNestedMenu ? 'sm:rounded-br-md' : undefined,
+	depth === 2 ? 'nav-sub-menu-d2' : undefined,
+	depth > 2 ? 'nav-sub-menu-d3' : undefined,
+	!isFirstNavigationItem && depth > 1 ? 'sm:rounded-tr-md' : undefined,
+];
 ---
 
-<ul
-	aria-label={ariaLabel}
-	class:list={[
-		'nav-sub-menu',
-		depth === 1 ? 'nav-sub-menu-d1' : undefined,
-		depth === 1 && !hasNestedMenu ? 'sm:rounded-br-md' : undefined,
-		depth === 2 ? 'nav-sub-menu-d2' : undefined,
-		depth > 2 ? 'nav-sub-menu-d3' : undefined,
-		!isFirstNavigationItem && depth > 1 ? 'sm:rounded-tr-md' : undefined,
-	]}
-	{...props}
->
+<ul aria-label={ariaLabel} class:list={submenuClasses} {...props}>
 	{navigationItems.map((item, index) => {
 		const children = item.children ?? [];
 		const hasChildren = children.length > 0;

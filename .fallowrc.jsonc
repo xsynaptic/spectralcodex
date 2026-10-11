@@ -44,12 +44,6 @@
 				"reason": "Flat optional slots and class switches",
 			},
 			{
-				"files": ["src/components/navigation/navigation-header-submenu.astro"],
-				"functions": ["<template>"],
-				"maxCognitive": 18,
-				"reason": "Class switches per link",
-			},
-			{
 				"files": ["packages/react-map-component/src/canvas/canvas.tsx"],
 				"functions": ["MapCanvasContainer"],
 				"maxCognitive": 28,
