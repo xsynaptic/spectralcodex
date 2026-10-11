@@ -106,6 +106,8 @@ function openAtlas() {
 
 	setFlag(true);
 	window.scrollTo({ behavior: 'instant', top: 0 });
+
+	document.querySelector<HTMLElement>(shellSelector)?.focus();
 }
 
 function closeAtlas() {

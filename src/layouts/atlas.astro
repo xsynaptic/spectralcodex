@@ -3,6 +3,7 @@ import Document from '#components/main/main-document.astro';
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getAtlasMapData } from '#lib/map/map-atlas.ts';
+import { getSitePath } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 const { prefetchUrls } = await getAtlasMapData();
@@ -19,7 +20,23 @@ const t = getTranslations();
 		title: t('atlas.title'),
 	}}
 >
-	<main>
-		<h1 class="sr-only">{t('atlas.title')}</h1>
+	<main class="sr-only">
+		<h1>{t('atlas.title')}</h1>
+		<p>{t('atlas.intro')}</p>
+		<ul>
+			<li>
+				<a href={getSitePath('regions')}>{t('collection.regions.labelPlural')}</a>
+			</li>
+			<li>
+				<a href={getSitePath('locations')}>{t('collection.locations.labelPlural')}</a>
+			</li>
+		</ul>
 	</main>
+	<noscript>
+		<div class="z-divider fixed inset-0 grid place-content-center gap-2 bg-(--color-body-bg) p-4 text-center">
+			<p>{t('atlas.noscript')}</p>
+			<a href={getSitePath('regions')}>{t('collection.regions.labelPlural')}</a>
+			<a href={getSitePath('locations')}>{t('collection.locations.labelPlural')}</a>
+		</div>
+	</noscript>
 </Document>

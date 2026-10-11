@@ -5,6 +5,7 @@
 
 	/* Hidden rather than removed so the live canvas keeps its size and state */
 	visibility: hidden;
+	outline: none;
 }
 
 :root[data-atlas-page='map'] .atlas-shell {
