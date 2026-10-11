@@ -116,7 +116,12 @@ async function buildContentEntries(): Promise<{
 }
 // Keyed by the OG image filename Astro emits
 function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
-	const indexes: Array<{ isFallback?: boolean; suffix: string; title: string }> = [
+	const indexes: Array<{
+		isFallback?: boolean;
+		suffix: string;
+		title: string;
+		titleZh?: string;
+	}> = [
 		{ isFallback: true, suffix: ContentCollectionsEnum.Chronology, title: 'Chronology' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Locations, title: 'Locations' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Posts, title: 'Posts' },
@@ -124,23 +129,24 @@ function buildIndexEntries(): Map<string, OpenGraphContentEntry> {
 		{ isFallback: true, suffix: ContentCollectionsEnum.Resources, title: 'Resources' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Series, title: 'Series' },
 		{ isFallback: true, suffix: ContentCollectionsEnum.Themes, title: 'Themes' },
-		{ suffix: 'atlas', title: 'Atlas' },
+		{ suffix: 'atlas', title: 'Atlas', titleZh: '地圖集' },
 		{ suffix: 'homepage', title: '' }, // No duplicate branding
 		{ isFallback: true, suffix: 'not-found', title: '404: Not Found' },
 	];
 
 	const entries = new Map<string, OpenGraphContentEntry>();
 
-	for (const { isFallback, suffix, title } of indexes) {
+	for (const { isFallback, suffix, title, titleZh } of indexes) {
 		const id = `index-${suffix}`;
 
 		entries.set(id, {
 			collection: 'index',
-			digest: id,
+			digest: [id, title, titleZh].join(':'),
 			id,
 			imageFeaturedId: resolveFallbackImageId(suffix, id),
 			isFallback: isFallback ?? false,
 			title,
+			titleZh,
 		});
 	}
 

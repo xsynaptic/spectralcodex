@@ -173,11 +173,12 @@ const translationStrings = {
 
 		// Atlas
 		'atlas.close.label': 'Close atlas',
-		'atlas.description': 'A full-screen map of every location in the database.',
+		'atlas.description':
+			'An interactive map of historic, unusual, and neglected locations with extensive field notes and photos. Best explored on a desktop computer.',
 		'atlas.divider.label': 'Resize map and content',
 		'atlas.expand.label': 'Expand map',
 		'atlas.intro':
-			'Every location in the database on one map. Select a marker to read about the place beside the map, or browse the same places as lists.',
+			'Spectral Codex is a travel journal, photography portfolio, and geospatial database curated by Alexander Synaptic. The atlas is an interactive map of every location from the database. Browse on a desktop computer to see content next to the map.',
 		'atlas.noscript':
 			'The atlas needs JavaScript to draw the map. Browse the same places as lists instead.',
 		'atlas.open.label': 'Open in atlas',
@@ -265,6 +266,9 @@ const translationStrings = {
 	},
 	[LanguageCodeEnum.ChineseSimplified]: {},
 	[LanguageCodeEnum.ChineseTraditional]: {
+		'atlas.intro':
+			'Spectral Codex 是 Alexander Synaptic 策劃的旅行日誌、攝影作品集與地理空間資料庫。地圖集是一張互動式地圖，涵蓋資料庫中的所有地點。使用電腦瀏覽時，可在地圖旁閱讀內容。',
+		'atlas.title': '地圖集',
 		'notice.danger': `**警告**：此處已廢棄或長期無人管理，可能存在潛在危險。造訪時請務必提高警覺，並做好相關安全防護措施。`,
 		'notice.quality': `**說明**：本條目僅提供基礎資訊，內容可能過時、未經查證，甚至有誤。建議進一步查閱相關資料，以確認資訊的正確性。`,
 		'notice.vanished': `**提醒**：此地點已消失，本文僅供參考用途。`,
