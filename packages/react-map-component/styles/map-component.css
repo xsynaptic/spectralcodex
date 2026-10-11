@@ -537,8 +537,8 @@ button.maplibregl-popup-close-button {
 
 .map-filter-indicator {
 	position: absolute;
-	top: 3px;
-	right: 3px;
+	top: 2px;
+	right: 2px;
 	width: 7px;
 	height: 7px;
 	pointer-events: none;
