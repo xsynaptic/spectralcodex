@@ -72,7 +72,6 @@ export const CustomControlPortal = memo(function CustomControlPortal({
 
 	const [, setIsAdded] = useState(false);
 
-	// `useControl` adds the control in an effect, so its element exists only after the first render
 	useEffect(() => {
 		setIsAdded(true);
 	}, []);

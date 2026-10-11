@@ -102,10 +102,10 @@ function getReturnPath() {
 }
 
 function openAtlas() {
-	// The split hides the in-body map, which would go on holding the screen
 	if (document.fullscreenElement) void document.exitFullscreen();
 
 	setFlag(true);
+	window.scrollTo({ behavior: 'instant', top: 0 });
 }
 
 function closeAtlas() {

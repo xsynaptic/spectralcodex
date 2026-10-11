@@ -1,11 +1,14 @@
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import type { MapTrackDetail } from '#types.ts';
+
 import {
 	mapEnterEventName,
 	mapExitEventName,
 	mapExpandEventName,
 	mapSyncEventName,
+	mapTrackEventName,
 	mapViewAttribute,
 } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
@@ -23,6 +26,7 @@ const HostControl: FC<
 			className: string;
 			eventName: string;
 			label: string;
+			trackName: string;
 			viewBox?: string | undefined;
 		}
 	>
@@ -32,6 +36,7 @@ const HostControl: FC<
 	eventName,
 	label,
 	position,
+	trackName,
 	viewBox = '0 0 24 24',
 }) {
 	return (
@@ -41,6 +46,9 @@ const HostControl: FC<
 				className={className}
 				onClick={() => {
 					document.dispatchEvent(new Event(eventName));
+					document.dispatchEvent(
+						new CustomEvent<MapTrackDetail>(mapTrackEventName, { detail: { name: trackName } }),
+					);
 				}}
 				title={label}
 				type="button"
@@ -69,6 +77,7 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 			eventName={mapExitEventName}
 			label={messages.exitAriaLabel}
 			position={position}
+			trackName="map-exit"
 		>
 			<path
 				d="M7 7l10 10M17 7L7 17"
@@ -83,7 +92,6 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 
 export const ExpandControl: FC<HostControlProps> = function ExpandControl({ position }) {
 	const messages = useMapMessages();
-	// Only a page shown beside the map sets a view
 	const view = useDocumentAttribute(mapViewAttribute, mapSyncEventName);
 
 	if (!view) return;
@@ -94,6 +102,7 @@ export const ExpandControl: FC<HostControlProps> = function ExpandControl({ posi
 			eventName={mapExpandEventName}
 			label={messages.expandAriaLabel}
 			position={position}
+			trackName="map-expand"
 		>
 			<path
 				d="M6 7l5 5-5 5M13 7l5 5-5 5"
@@ -122,6 +131,7 @@ export const EnterControl: FC<HostControlProps & { mediaQuery: string }> = funct
 			eventName={mapEnterEventName}
 			label={messages.enterAriaLabel}
 			position={position}
+			trackName="map-enter"
 			viewBox="0 0 56 56"
 		>
 			<path
