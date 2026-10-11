@@ -13,6 +13,9 @@ const validModes: ReadonlySet<string> = new Set([
 	ModeTypeEnum.Light,
 ]);
 
+// Reading the token forces a style recalculation of the whole document, on every swap without this
+const themeColors = new Map<ModeSystemType, string>();
+
 class ModeManager extends HTMLElement {
 	#mediaMatcher: MediaQueryList | undefined;
 	#mode: ModeGeneralType = ModeTypeEnum.Auto;
@@ -63,7 +66,7 @@ class ModeManager extends HTMLElement {
 		document.documentElement.dataset.mode = resolvedMode;
 		document.documentElement.style.colorScheme = resolvedMode;
 
-		this.#applyThemeColor();
+		this.#applyThemeColor(resolvedMode);
 
 		queueMicrotask(() => {
 			document.dispatchEvent(
@@ -78,11 +81,12 @@ class ModeManager extends HTMLElement {
 		});
 	}
 
-	#applyThemeColor() {
-		const themeColor = getComputedStyle(document.documentElement)
-			.getPropertyValue('--color-body-bg')
-			.trim();
+	#applyThemeColor(resolvedMode: ModeSystemType) {
+		const themeColor = themeColors.get(resolvedMode) ?? readThemeColor();
+
 		if (!themeColor) return;
+
+		themeColors.set(resolvedMode, themeColor);
 		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor);
 	}
 
@@ -90,6 +94,10 @@ class ModeManager extends HTMLElement {
 		this.#systemMode = event.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
 		this.#applyMode(this.#mode);
 	};
+}
+
+function readThemeColor() {
+	return getComputedStyle(document.documentElement).getPropertyValue('--color-body-bg').trim();
 }
 
 function isModeValid(mode: string | undefined): mode is ModeGeneralType {
