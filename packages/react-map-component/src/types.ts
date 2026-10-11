@@ -31,7 +31,6 @@ export interface MapComponentProps extends Partial<
 	center?: [number, number];
 	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
 	darkMode?: MapDarkModeOptions | undefined;
-	// A host application drives this map through the document; the exit control replaces fullscreen
 	host?: MapHostOptions | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
@@ -58,6 +57,8 @@ export type MapGeometry = LineString | Point | Polygon;
 export interface MapHostOptions {
 	// While this matches a click hands the Feature to the host in place of its popup
 	featureOpenMediaQuery: string;
+	// Fullscreen takes this element in place of the map, so chrome the host keeps beside it comes along
+	fullscreenContainerId: string;
 }
 
 export type MapInitialViewState = MapProps['initialViewState'];

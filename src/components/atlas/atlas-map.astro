@@ -6,7 +6,7 @@ import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive.ts';
 
 import AtlasDivider from '#components/atlas/atlas-divider.astro';
 import MapLoading from '#components/map/map-loading.astro';
-import { atlasPaneMediaQuery, atlasPersistName } from '#lib/atlas/atlas-constants.ts';
+import { atlasPaneMediaQuery, atlasPersistName, atlasRootId } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getAtlasMapData } from '#lib/map/map-atlas.ts';
 
@@ -32,11 +32,30 @@ const zIndex = 10;
 			<ReactMapComponent
 				{...mapComponentProps}
 				client:atlas={JSON.stringify(directiveOptions)}
-				host={{ featureOpenMediaQuery: atlasPaneMediaQuery }}
-				messages={{ exitAriaLabel: t('atlas.exit.label') }}
+				host={{ featureOpenMediaQuery: atlasPaneMediaQuery, fullscreenContainerId: atlasRootId }}
 				style={{ zIndex: zIndex + 1 }}
 			/>
 			<MapLoading zIndex={zIndex} />
+			<button
+				aria-label={t('atlas.close.label')}
+				class="atlas-close"
+				data-atlas-close
+				data-umami-event="atlas-close"
+				style={`z-index: ${String(zIndex + 2)}`}
+				title={t('atlas.close.label')}
+				type="button"
+			>
+				<span class="atlas-close-label">{t('atlas.close.label')}</span>
+				<svg aria-hidden="true" height="16" viewBox="0 0 24 24" width="16">
+					<path
+						d="M7 7l10 10M17 7L7 17"
+						fill="none"
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-width="3"
+					></path>
+				</svg>
+			</button>
 		</div>
 		<AtlasDivider />
 	</>

@@ -1,5 +1,4 @@
 import {
-	mapExitEventName,
 	mapFeatureOpenEventName,
 	mapSyncEventName,
 } from '@spectralcodex/react-map-component/constants';
@@ -138,9 +137,6 @@ export function requestPaneWidth(width: number) {
 
 // Called once by the setup script on every page; bundled scripts do not run again after a swap
 export function startAtlasMode() {
-	// The island's channel only; app code calls `closeAtlas()`
-	document.addEventListener(mapExitEventName, closeAtlas);
-
 	document.addEventListener(mapFeatureOpenEventName, (event) => {
 		const { url } = event.detail;
 
@@ -153,9 +149,10 @@ export function startAtlasMode() {
 	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateSplit);
 
 	document.addEventListener('click', (event) => {
-		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-open]')) return;
+		if (!(event.target instanceof Element)) return;
 
-		openAtlas();
+		if (event.target.closest('[data-atlas-open]')) openAtlas();
+		if (event.target.closest('[data-atlas-close]')) closeAtlas();
 	});
 
 	// The swap copies the incoming root's attributes and inline style verbatim, so mode state is stamped here

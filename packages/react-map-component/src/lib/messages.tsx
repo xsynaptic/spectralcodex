@@ -5,7 +5,6 @@ import { createContext, useContext, useMemo } from 'react';
 // Host-overridable UI strings; plain strings so they survive Astro island-prop serialization
 export interface MapMessages {
 	copyCoordinatesLabel: string;
-	exitAriaLabel: string;
 	filterMenuActiveAriaLabel: string;
 	filterMenuAriaLabel: string;
 	googleMapsAriaLabel: string;
@@ -24,7 +23,6 @@ export interface MapMessages {
 
 const defaultMapMessages: MapMessages = {
 	copyCoordinatesLabel: 'Copy coordinates',
-	exitAriaLabel: 'Close map',
 	filterMenuActiveAriaLabel: 'Filter Menu, filters active',
 	filterMenuAriaLabel: 'Filter Menu',
 	googleMapsAriaLabel: 'Google Maps',

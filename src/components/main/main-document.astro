@@ -22,7 +22,7 @@ import ModeManagerSetup from '#components/mode-manager/mode-manager-setup.astro'
 import ModeManager from '#components/mode-manager/mode-manager.astro';
 import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
-import { atlasPage } from '#lib/atlas/atlas-constants.ts';
+import { atlasPage, atlasRootId } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
@@ -44,7 +44,7 @@ const t = getTranslations();
 ---
 
 <!doctype html>
-<html data-atlas-page={atlas?.page} lang="en" {...mapViewProps}>
+<html data-atlas-page={atlas?.page} id={atlasRootId} lang="en" {...mapViewProps}>
 	<head>
 		<meta charset="utf-8" />
 		<meta content="width=device-width,initial-scale=1" name="viewport" />

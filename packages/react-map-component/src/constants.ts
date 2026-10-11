@@ -11,14 +11,12 @@ export const mapViewportStorageKeyPrefix = 'scx-map-viewport:';
 // Dispatched on `document` as a `CustomEvent<MapTrackDetail>`; the host forwards it to its analytics
 export const mapTrackEventName = 'map:track';
 
-export const mapExitEventName = 'map:exit';
 export const mapFeatureOpenEventName = 'map:feature-open';
 export const mapSyncEventName = 'map:sync';
 export const mapViewAttribute = 'data-map-view';
 
 declare global {
 	interface DocumentEventMap {
-		[mapExitEventName]: Event;
 		[mapFeatureOpenEventName]: CustomEvent<MapFeatureOpenDetail>;
 		[mapSyncEventName]: Event;
 	}

@@ -17,6 +17,40 @@
 	display: none;
 }
 
+/* Mirrors MapLibre's control group, the same in both modes; its own stylesheet loads only with the island */
+.atlas-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	justify-content: center;
+	min-width: 29px;
+	height: 29px;
+	padding-inline: 0.5rem 0.375rem;
+	font-size: var(--text-xs);
+	font-weight: 600;
+	line-height: 1;
+	color: #333;
+	cursor: pointer;
+	background-color: #fff;
+	border-radius: 4px;
+	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+	transition: background-color 150ms ease-out;
+
+	&:focus-visible {
+		outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
+		background-color: #f2f2f2;
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: #f2f2f2;
+		}
+	}
+}
+
 /* The offset is the dragged pane width less the current one */
 .atlas-divider-preview {
 	--atlas-preview-ink: light-dark(
@@ -115,12 +149,30 @@
 	border: 1px solid light-dark(var(--color-primary-300), var(--color-primary-600));
 	border-radius: 50%;
 	translate: -50% -50%;
-	transition: opacity 150ms ease-out;
+	transition: opacity 400ms ease-out;
+
+	/* A touch screen has no hover to reveal it */
+	@media (hover: hover) {
+		opacity: 0;
+	}
 
 	/* One ring for the disc; a ring per half would trace a half circle */
 	&:has(:focus-visible) {
 		outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
 		outline-offset: 2px;
+	}
+}
+
+/* In fast, out slow; the dragging rule below still wins */
+.atlas-divider:has(:focus-visible) .atlas-divider-controls {
+	opacity: 1;
+	transition-duration: 100ms;
+}
+
+@media (hover: hover) {
+	.atlas-divider:hover .atlas-divider-controls {
+		opacity: 1;
+		transition-duration: 100ms;
 	}
 }
 
@@ -224,8 +276,13 @@
 		}
 
 		.atlas-open,
-		.atlas-inline-map {
+		.atlas-inline-map,
+		.atlas-close-label {
 			display: none;
+		}
+
+		.atlas-close {
+			padding-inline: 0;
 		}
 	}
 }

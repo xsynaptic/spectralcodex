@@ -10,8 +10,6 @@ import {
 
 import type { MapComponentProps } from '#types.ts';
 
-import { mapExitEventName } from '#constants.ts';
-import { ExitControl } from '#controls/controls-exit.tsx';
 import { FilterControl } from '#controls/controls-filter.tsx';
 import { MetricsControl } from '#controls/controls-metrics.tsx';
 import { SearchControl } from '#controls/controls-search.tsx';
@@ -28,11 +26,10 @@ export const MapControls: FC<Pick<MapComponentProps, 'host'>> = function MapCont
 			<AttributionControl compact={true} position="bottom-right" />
 			{isCanvasInteractive ? (
 				<>
-					{host ? (
-						<ExitControl eventName={mapExitEventName} position="top-left" />
-					) : (
-						<FullscreenControl position="top-left" />
-					)}
+					<FullscreenControl
+						position="top-left"
+						{...(host ? { containerId: host.fullscreenContainerId } : {})}
+					/>
 					<GeolocateControl
 						position="top-left"
 						positionOptions={{ enableHighAccuracy: true }}
