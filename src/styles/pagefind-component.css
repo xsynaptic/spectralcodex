@@ -42,6 +42,10 @@ pagefind-modal {
 	display: contents;
 }
 
+pagefind-modal:not(:defined) {
+	display: none;
+}
+
 /*
  * Pagefind 1.5.0 fix
  * `all: initial` on custom elements breaks font inheritance for child buttons
