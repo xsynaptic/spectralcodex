@@ -25,18 +25,26 @@ const t = getTranslations();
 		<p>{t('atlas.intro')}</p>
 		<ul>
 			<li>
-				<a href={getSitePath('regions')}>{t('collection.regions.labelPlural')}</a>
+				<a class="anchor-base anchor-accent" href={getSitePath('regions')}>
+					{t('collection.regions.labelPlural')}
+				</a>
 			</li>
 			<li>
-				<a href={getSitePath('locations')}>{t('collection.locations.labelPlural')}</a>
+				<a class="anchor-base anchor-accent" href={getSitePath('locations')}>
+					{t('collection.locations.labelPlural')}
+				</a>
 			</li>
 		</ul>
 	</main>
 	<noscript>
 		<div class="z-divider fixed inset-0 grid place-content-center gap-2 bg-(--color-body-bg) p-4 text-center">
 			<p>{t('atlas.noscript')}</p>
-			<a href={getSitePath('regions')}>{t('collection.regions.labelPlural')}</a>
-			<a href={getSitePath('locations')}>{t('collection.locations.labelPlural')}</a>
+			<a class="anchor-base anchor-accent" href={getSitePath('regions')}>
+				{t('collection.regions.labelPlural')}
+			</a>
+			<a class="anchor-base anchor-accent" href={getSitePath('locations')}>
+				{t('collection.locations.labelPlural')}
+			</a>
 		</div>
 	</noscript>
 </Document>
