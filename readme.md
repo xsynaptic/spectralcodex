@@ -49,6 +49,11 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Custom filter controls for adjusting what points are visible on the map
 - Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
 - Persistent storage of map data via IndexedDB, keyed by build version so a deploy invalidates client-cached payloads instead of serving stale points
+- Atlas mode: a full-screen map at `/atlas` that splits on desktop into the map and a reading pane; click a point and its page loads beside the map
+- A single MapLibre instance persisted across view transitions, so map position and filters survive navigation
+- Atlas mode is a client-side layout of the existing static pages, not a second set of routes; breakpoints from `md` up are container queries on the pane, so pages lay out the same way in the split
+- Custom client directive (`client:atlas`) that defers loading MapLibre and its stylesheet until atlas mode is enabled
+- Draggable, keyboard-accessible divider between map and pane, with the chosen width saved to localStorage
 - Distance-based discovery via nearby locations, powered by [kdbush](https://github.com/mourner/kdbush) spatial indexing for fast nearest-neighbor queries
 
 ### Search & Discovery
@@ -67,8 +72,8 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ### User Experience
 
-- Native web components for interactive elements (dark mode toggle, reading progress, loading bar, navigation menu, image carousels, pagination, search toggle, back-to-top button)
-- [Build history charts](http://spectralcodoex.com/build-stats): SVG rendered at build time from a JSONL log, with log-scaled durations, a rolling median, and page counts on a second track
+- Native web components for interactive elements (dark mode toggle, reading progress, loading bar, navigation menu, image carousels, pagination, search toggle, back-to-top button, atlas divider)
+- [Build history charts](https://spectralcodex.com/build-stats): SVG rendered at build time from a JSONL log, with log-scaled durations, a rolling median, and page counts on a second track
 - Dark/light mode toggle with system preference detection and localStorage persistence
 - Custom CJK character handling and language-specific styling
 - Self-hosted variable fonts via Astro's fonts API
