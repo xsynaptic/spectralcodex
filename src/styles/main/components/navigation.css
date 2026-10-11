@@ -9,11 +9,15 @@
 }
 
 .nav-ul {
-	@apply gap-x-4 md:gap-x-2;
+	@apply gap-x-4 sm:gap-x-2;
 
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
+
+	@media (width >= 40rem) {
+		flex-wrap: nowrap;
+	}
 }
 
 .nav-ul.nav-no-hero {
@@ -189,6 +193,13 @@
 
 [data-open] > .nav-item-trigger > .nav-icon {
 	transform: scaleY(-1);
+}
+
+.nav-item:last-child > .nav-sub-menu-d1 {
+	@media (width >= 40rem) {
+		right: -0.5rem;
+		left: auto;
+	}
 }
 
 /* Submenus still open on hover and focus before the element upgrades or if its script fails */

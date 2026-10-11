@@ -20,8 +20,7 @@ import { getSitePath } from '#lib/utils/routing.ts';
 // Increase this to 3 to show subregions in the header navigation
 const maxDepth = 2 as number;
 
-// Pages missing from the content source (the demo content has none of these) are skipped
-const aboutMenuPageIds = ['faq', 'links', 'tech-stack', 'style-guide', 'camera-history', 'privacy'];
+const aboutMenuPageIds = ['faq', 'tech-stack', 'links', 'privacy', 'contact'];
 
 const t = getTranslations();
 
