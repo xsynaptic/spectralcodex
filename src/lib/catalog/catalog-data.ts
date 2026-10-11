@@ -1,5 +1,6 @@
 import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
 
+import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
@@ -18,7 +19,6 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
-import { getSqliteCacheInstance } from '#lib/utils/cache.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
@@ -59,7 +59,7 @@ async function getRegionPrimaryIdFunction() {
 function getWordCount(entry: CollectionEntry<CollectionKey>) {
 	if (!wordCountFunction) {
 		wordCountFunction = createWordCountFunction({
-			cache: getSqliteCacheInstance(CUSTOM_CACHE_PATH, 'word-counts'),
+			cache: createSqliteCache(CUSTOM_CACHE_PATH, 'word-counts'),
 		});
 	}
 	return wordCountFunction(entry);
@@ -119,7 +119,7 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 			);
 		}
 
-		catalogItemsById.set(entry.id, await createCatalogItem(entry, getRegionPrimaryId));
+		catalogItemsById.set(entry.id, createCatalogItem(entry, getRegionPrimaryId));
 	}
 
 	// Now run through everything again and generate backlinks from <Link> components
@@ -136,10 +136,10 @@ async function buildCatalogItems(): Promise<Array<CatalogItem>> {
 	return [...catalogItemsById.values()];
 }
 
-async function createCatalogItem(
+function createCatalogItem(
 	entry: CatalogEntry,
 	getRegionPrimaryId: RegionPrimaryIdFunction,
-): Promise<CatalogItem> {
+): CatalogItem {
 	const { data } = entry;
 
 	const imageFeatured = 'imageFeatured' in data ? data.imageFeatured : undefined;
@@ -162,7 +162,7 @@ async function createCatalogItem(
 		title: data.title,
 		titleMultilingual: getMultilingualContent({ data, prop: 'title' })?.primary,
 		url: getContentPath(entry.collection, getPublicId(entry)),
-		wordCount: await getWordCount(entry),
+		wordCount: getWordCount(entry),
 	};
 }
 

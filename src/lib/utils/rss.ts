@@ -79,7 +79,7 @@ const generateFeedItem = async ({
 
 	const contentSanitized = sanitizeFeedContent(contentHtml, shouldExcludeFootnotes);
 
-	const description = await getDescriptionRenderedText(entry);
+	const description = getDescriptionRenderedText(entry);
 
 	const pubDate = entry.data.dateUpdated ?? entry.data.dateCreated;
 

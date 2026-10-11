@@ -1,20 +1,28 @@
-import Keyv from 'keyv';
+import { createSqliteCache } from '@spectralcodex/shared/cache';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { describe, expect, test, vi } from 'vitest';
+
+import type { DescriptionRendered } from '#lib/utils/description.ts';
 
 import { createDescriptionRenderers, getDescription } from '#lib/utils/description.ts';
 
 function setup() {
-	const cache = new Keyv();
+	const cache = createSqliteCache<DescriptionRendered>(
+		mkdtempSync(path.join(tmpdir(), 'description-cache-')),
+		'description-rendered',
+	);
 	const setSpy = vi.spyOn(cache, 'set');
 
 	return { setSpy, ...createDescriptionRenderers({ cache }) };
 }
 
 describe('createDescriptionRenderers', () => {
-	test('keeps inline emphasis in html and strips it from text', async () => {
+	test('keeps inline emphasis in html and strips it from text', () => {
 		const { getDescriptionRendered } = setup();
 
-		const rendered = await getDescriptionRendered({
+		const rendered = getDescriptionRendered({
 			data: { description: 'A *thoroughly* ordinary place.' },
 			id: 'alpha',
 		});
@@ -23,21 +31,21 @@ describe('createDescriptionRenderers', () => {
 		expect(rendered?.text).toBe('A thoroughly ordinary place.');
 	});
 
-	test('serves a repeat call from the cache', async () => {
+	test('serves a repeat call from the cache', () => {
 		const { getDescriptionRendered, setSpy } = setup();
 		const entry = { data: { description: 'A place.' }, id: 'alpha' };
 
-		const first = await getDescriptionRendered(entry);
-		const second = await getDescriptionRendered(entry);
+		const first = getDescriptionRendered(entry);
+		const second = getDescriptionRendered(entry);
 
 		expect(second).toEqual(first);
 		expect(setSpy).toHaveBeenCalledTimes(1);
 	});
 
-	test('collapses whitespace runs in the plain-text form', async () => {
+	test('collapses whitespace runs in the plain-text form', () => {
 		const { getDescriptionRendered } = setup();
 
-		const rendered = await getDescriptionRendered({
+		const rendered = getDescriptionRendered({
 			data: { description: 'A  thoroughly   ordinary place.' },
 			id: 'alpha',
 		});
@@ -45,19 +53,19 @@ describe('createDescriptionRenderers', () => {
 		expect(rendered?.text).toBe('A thoroughly ordinary place.');
 	});
 
-	test('an entry with neither a description nor a body renders nothing', async () => {
+	test('an entry with neither a description nor a body renders nothing', () => {
 		const { getDescriptionRendered, setSpy } = setup();
 
-		expect(await getDescriptionRendered({ data: {}, id: 'alpha' })).toBeUndefined();
+		expect(getDescriptionRendered({ data: {}, id: 'alpha' })).toBeUndefined();
 		expect(setSpy).not.toHaveBeenCalled();
 	});
 
-	test('changed source invalidates the cached entry', async () => {
+	test('changed source invalidates the cached entry', () => {
 		const { getDescriptionRendered, setSpy } = setup();
 
-		await getDescriptionRendered({ data: { description: 'A place.' }, id: 'alpha' });
+		getDescriptionRendered({ data: { description: 'A place.' }, id: 'alpha' });
 
-		const second = await getDescriptionRendered({
+		const second = getDescriptionRendered({
 			data: { description: 'Another place.' },
 			id: 'alpha',
 		});

@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
+import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
@@ -12,7 +13,6 @@ import type { ContentEntry } from '#shared/astro-content.ts';
 import type { SimilarContentMetadata } from '#similar-content/metadata.ts';
 
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { getFileCacheInstance } from '#shared/cache-file.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';
@@ -66,10 +66,9 @@ type EmbeddableEntry = ContentEntry & { digest: string };
 
 interface SimilarContentEmbedding {
 	collection: string;
-	digest: string;
 	id: string;
 	metadata: SimilarContentMetadata;
-	vector: Array<number>;
+	vector: Float32Array;
 }
 
 interface SimilarContentItem {
@@ -129,7 +128,7 @@ function buildSimilarContentIndex(
 		const key = BigInt(position);
 
 		keyToEmbedding.set(key, embedding);
-		index.add(key, new Float32Array(embedding.vector));
+		index.add(key, embedding.vector);
 	}
 
 	return { index, keyToEmbedding };
@@ -191,9 +190,7 @@ function cleanContent(body: string, data: Record<string, unknown>): string {
 function clearCache() {
 	const cacheDir = path.join(rootPath, values['cache-path']);
 	const cacheName = values['cache-name'];
-	const cacheFiles = readdirSync(cacheDir).filter(
-		(file) => file.startsWith(`${cacheName}-`) && file.endsWith('.json'),
-	);
+	const cacheFiles = readdirSync(cacheDir).filter((file) => file.startsWith(`${cacheName}-`));
 	for (const file of cacheFiles) {
 		rmSync(path.join(cacheDir, file));
 	}
@@ -204,24 +201,25 @@ function clearCache() {
 	}
 }
 
-async function createEmbedding(
-	embedder: FeatureExtractor,
-	entry: EmbeddableEntry,
-	digest: string,
-): Promise<SimilarContentEmbedding> {
+async function createVector(embedder: FeatureExtractor, entry: EmbeddableEntry) {
 	const plainTextContent = cleanContent(entry.body ?? '', entry.data);
 	const output = await embedder(plainTextContent, { normalize: true, pooling: 'mean' });
 
-	return {
-		collection: entry.collection,
-		digest,
-		id: entry.id,
-		metadata: {
-			regions: toReferenceIds(entry.data.regions),
-			themes: toReferenceIds(entry.data.themes),
-		},
-		vector: [...output.data] as Array<number>,
-	};
+	return output.data as Float32Array;
+}
+
+// A pooled `Buffer` is not 4-byte aligned, so the bytes are copied rather than viewed
+function decodeVector(encoded: string) {
+	const bytes = Buffer.from(encoded, 'base64');
+	const vector = new Float32Array(bytes.byteLength / Float32Array.BYTES_PER_ELEMENT);
+
+	new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength).set(bytes);
+
+	return vector;
+}
+
+function encodeVector(vector: Float32Array) {
+	return Buffer.from(vector.buffer, vector.byteOffset, vector.byteLength).toString('base64');
 }
 
 // Generate embeddings for all content entries
@@ -230,7 +228,7 @@ async function generateEmbeddings(
 ): Promise<Array<SimilarContentEmbedding>> {
 	const cachePath = path.join(rootPath, values['cache-path']);
 	const cacheNamespace = getCacheNamespace();
-	const cache = getFileCacheInstance(cachePath, cacheNamespace);
+	const cache = createSqliteCache<string>(cachePath, cacheNamespace);
 
 	const modelId = ModelsEnum[modelKey];
 	const embedder = await pipeline('feature-extraction', modelId, { dtype: 'fp32' });
@@ -246,19 +244,27 @@ async function generateEmbeddings(
 		if (!entry.digest) continue;
 
 		try {
-			const cachedEmbedding = await cache.get<SimilarContentEmbedding>(entry.id);
+			const cachedVector = cache.get(entry.id, entry.digest);
+			const vector = cachedVector
+				? decodeVector(cachedVector)
+				: await createVector(embedder, entry);
 
-			if (cachedEmbedding?.digest === entry.digest) {
-				embeddings.push(cachedEmbedding);
+			if (cachedVector) {
 				cacheHits++;
 			} else {
-				const embedding = await createEmbedding(embedder, entry, entry.digest);
-
-				embeddings.push(embedding);
-
-				await cache.set(entry.id, embedding);
+				cache.set(entry.id, entry.digest, encodeVector(vector));
 				generated++;
 			}
+
+			embeddings.push({
+				collection: entry.collection,
+				id: entry.id,
+				metadata: {
+					regions: toReferenceIds(entry.data.regions),
+					themes: toReferenceIds(entry.data.themes),
+				},
+				vector,
+			});
 
 			if ((index + 1) % Number(values['progress-count']) === 0) {
 				console.log(
@@ -315,7 +321,7 @@ function querySimilarItems(
 ): Array<SimilarContentItem> {
 	const { candidateCount, index, keyToEmbedding, minScore, resultCount } = options;
 
-	const { distances, keys } = index.search(new Float32Array(current.vector), candidateCount, 0);
+	const { distances, keys } = index.search(current.vector, candidateCount, 0);
 
 	const candidates: Array<SimilarContentItem> = [];
 

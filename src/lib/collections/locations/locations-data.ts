@@ -52,7 +52,7 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 	}
 }
 
-async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
+function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	const locationMapDataHash = hash({
 		description: getDescription(entry),
 		id: entry.id,
@@ -65,7 +65,7 @@ async function generateLocationMapData(entry: CollectionEntry<'locations'>) {
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
 
-	const rendered = await getDescriptionRendered(entry);
+	const rendered = getDescriptionRendered(entry);
 
 	if (rendered) {
 		entry.data._descriptionHtml = rendered.html;
@@ -136,7 +136,7 @@ export const getLocationsCollection = createCollectionData({
 
 		for (const entry of entries) {
 			generateLocationPostData(entry);
-			await generateLocationMapData(entry);
+			generateLocationMapData(entry);
 			generateNearbyItems(entry);
 		}
 

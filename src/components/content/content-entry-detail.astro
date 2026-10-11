@@ -44,7 +44,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	atlas={atlas}
 	hasHeroImage={hasHeroImage}
 	meta={{
-		description: await getDescriptionRenderedText(entry),
+		description: getDescriptionRenderedText(entry),
 		image: getSeoImageProps({
 			alt: entry.data.title,
 			id: entry.id,

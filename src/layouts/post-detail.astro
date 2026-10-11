@@ -59,7 +59,7 @@ const atlas = await getAtlasPage(entry, mapData);
 		}),
 		prefetchUrls: mapData.prefetchUrls,
 	}}
-	schemas={await getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
+	schemas={getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
 >
 	<Fragment slot="header-subtitle">

@@ -48,10 +48,10 @@ export async function createQueryPostsEntryFunction() {
 	};
 }
 
-export async function getPostSchema(
+export function getPostSchema(
 	entry: CollectionEntry<'posts'>,
 	props: { imageUrl: string | undefined; url: string },
-): Promise<Array<Thing>> {
+): Array<Thing> {
 	return [
 		buildEntryBreadcrumbSchema({
 			collection: 'posts',
@@ -61,7 +61,7 @@ export async function getPostSchema(
 		buildArticleSchema({
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
-			description: await getDescriptionRenderedText(entry),
+			description: getDescriptionRenderedText(entry),
 			imageUrl: props.imageUrl,
 			title: entry.data.title,
 			url: props.url,

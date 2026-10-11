@@ -53,8 +53,6 @@
 		"flatgeobuf": "^4.5.0",
 		"geokdbush": "^2.1.0",
 		"kdbush": "^4.1.0",
-		"keyv": "^5.6.0",
-		"keyv-file": "^5.3.5",
 		"p-limit": "^7.3.3",
 		"remeda": "^2.51.0",
 		"sanitize-html": "^2.18.0",

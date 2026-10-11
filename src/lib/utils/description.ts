@@ -1,4 +1,4 @@
-import type Keyv from 'keyv';
+import type { Cache } from '@spectralcodex/shared/cache';
 
 import { sanitizeHtml, stripTags } from '@xsynaptic/unified-tools';
 import { hash } from 'ohash';
@@ -14,11 +14,7 @@ export interface DescriptionEntry {
 	id: string;
 }
 
-interface DescriptionCached extends DescriptionRendered {
-	hash: string;
-}
-
-interface DescriptionRendered {
+export interface DescriptionRendered {
 	html: string;
 	text: string;
 }
@@ -33,11 +29,9 @@ const descriptionSchema = {
 	tagNames: ['em', 'strong', 'span'],
 };
 
-export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
+export function createDescriptionRenderers({ cache }: { cache: Cache<DescriptionRendered> }) {
 	// Render and cache both HTML and plain-text forms of an entry's description in a single parse
-	async function getDescriptionRendered(
-		entry: DescriptionEntry,
-	): Promise<DescriptionRendered | undefined> {
+	function getDescriptionRendered(entry: DescriptionEntry): DescriptionRendered | undefined {
 		const source = getDescription(entry, { wordCount: wordCountBuffer });
 
 		if (!source) return undefined;
@@ -46,9 +40,9 @@ export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 		// MDX component names participate so render-affecting code changes self-invalidate
 		const sourceHash = hash({ mdxComponents, source, version: 3 }).slice(0, hashShortLength);
 
-		const cached = await cache.get<DescriptionCached>(entry.id);
+		const cached = cache.get(entry.id, sourceHash);
 
-		if (cached?.hash === sourceHash) return { html: cached.html, text: cached.text };
+		if (cached) return cached;
 
 		const rawHtml = renderMarkdownInline(source);
 
@@ -58,15 +52,13 @@ export function createDescriptionRenderers({ cache }: { cache: Keyv }) {
 
 		const rendered: DescriptionRendered = { html, text };
 
-		await cache.set(entry.id, { hash: sourceHash, ...rendered } satisfies DescriptionCached);
+		cache.set(entry.id, sourceHash, rendered);
 
 		return rendered;
 	}
 
-	async function getDescriptionRenderedText(entry: DescriptionEntry): Promise<string | undefined> {
-		const rendered = await getDescriptionRendered(entry);
-
-		return rendered?.text;
+	function getDescriptionRenderedText(entry: DescriptionEntry) {
+		return getDescriptionRendered(entry)?.text;
 	}
 
 	return { getDescriptionRendered, getDescriptionRenderedText };

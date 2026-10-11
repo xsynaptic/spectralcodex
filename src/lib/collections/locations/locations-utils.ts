@@ -47,7 +47,7 @@ export async function getLocationSchemas(
 		}),
 		buildPlaceSchema({
 			coordinates: getFirstCoordinates(entry),
-			description: await getDescriptionRenderedText(entry),
+			description: getDescriptionRenderedText(entry),
 			title: entry.data.title,
 			url: props.url,
 		}),

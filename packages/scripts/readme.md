@@ -8,7 +8,7 @@ Internal tooling for [Spectral Codex](https://spectralcodex.com) content process
 
 Generates semantic similarity scores between content entries using transformer-based embeddings.
 
-Processes MDX content into embeddings via [Transformers.js](https://huggingface.co/docs/transformers.js), combining cosine similarity with metadata-based scoring boosts (shared themes/regions). Results cached with content digest hashes via Keyv to skip regeneration for unchanged files.
+Processes MDX content into embeddings via [Transformers.js](https://huggingface.co/docs/transformers.js), combining cosine similarity with metadata-based scoring boosts (shared themes/regions). Embeddings are cached in SQLite and validated against each entry's content digest, so unchanged files skip regeneration.
 
 Output: JSON mapping of content IDs to ranked similar items.
 
@@ -35,7 +35,7 @@ Copies generated Astro content collection schemas from `.astro/collections` to t
 
 ### `og-image`
 
-Advanced OG image generator using [Takumi](https://takumi.kane.tw) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Sharp decodes each source photo once per batch and hands Takumi raw pixels; output freshness is tracked per entry via Keyv.
+Advanced OG image generator using [Takumi](https://takumi.kane.tw) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Sharp decodes each source photo once per batch and hands Takumi raw pixels; output freshness is tracked per entry in a JSON manifest.
 
 ## Map Data
 

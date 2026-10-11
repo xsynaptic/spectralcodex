@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.26.0",
+	"version": "7.27.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "lefthook run check",
@@ -49,7 +49,6 @@
 	},
 	"dependencies": {
 		"astro": "^7.3.8",
-		"keyv": "^5.6.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},
@@ -106,16 +105,16 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^39.0.1",
-		"fallow": "^3.32.0",
+		"fallow": "^3.33.0",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.13.0",
 		"kdbush": "^4.1.0",
-		"knip": "^6.40.0",
-		"lefthook": "^2.2.0",
+		"knip": "^6.41.0",
+		"lefthook": "^2.2.1",
 		"ohash": "^2.0.12",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.9",
-		"prettier-plugin-astro": "^1.1.0",
+		"prettier-plugin-astro": "^1.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"remeda": "^2.51.0",
 		"satteri": "^0.10.5",
@@ -125,7 +124,7 @@
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
-		"vite": "^8.3.3",
+		"vite": "^8.3.4",
 		"vitest": "^4.1.11",
 		"zod": "^4.6.5"
 	},
