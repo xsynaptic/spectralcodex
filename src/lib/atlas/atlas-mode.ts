@@ -20,6 +20,7 @@ import { getSitePath } from '#lib/utils/routing.ts';
 const returnStorageKey = 'scx-atlas-return';
 
 const heroSelector = 'img[data-hero-image]';
+const paneAnchorSelector = '.main-pane a[href]';
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
 
 function dispatchSync() {
@@ -46,6 +47,22 @@ function updateHeroSizes(target: Document = document) {
 	}
 }
 
+// Following an outbound link in the same tab unloads the map; internal links swap into the pane
+function updateExternalLinks() {
+	const root = document.documentElement;
+	const isSplit =
+		'atlas' in root.dataset &&
+		root.dataset.atlasPage === 'pane' &&
+		matchMedia(atlasPaneMediaQuery).matches;
+
+	for (const anchor of document.querySelectorAll<HTMLAnchorElement>(paneAnchorSelector)) {
+		if (anchor.origin === location.origin || !anchor.protocol.startsWith('http')) continue;
+
+		if (isSplit) anchor.target = '_blank';
+		else anchor.removeAttribute('target');
+	}
+}
+
 function storeFlag(isEnabled: boolean) {
 	try {
 		if (isEnabled) sessionStorage.setItem(atlasFlagStorageKey, '1');
@@ -60,6 +77,7 @@ function setFlag(isEnabled: boolean) {
 
 	storeFlag(isEnabled);
 	updateHeroSizes();
+	updateExternalLinks();
 	dispatchSync();
 }
 
@@ -123,6 +141,8 @@ export function startAtlasMode() {
 		void navigate(url);
 	});
 
+	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateExternalLinks);
+
 	document.addEventListener('click', (event) => {
 		if (!(event.target instanceof Element) || !event.target.closest('[data-atlas-open]')) return;
 
@@ -167,6 +187,7 @@ export function startAtlasMode() {
 			}
 		}
 
+		updateExternalLinks();
 		dispatchSync();
 	});
 }
