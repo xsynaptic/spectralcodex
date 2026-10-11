@@ -2,6 +2,9 @@ import type { APIRequestContext, Locator } from '@playwright/test';
 
 import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const t = getTranslations();
 
 const atlasPath = '/atlas/';
 const probeLimit = 8;
@@ -40,7 +43,7 @@ test('one map carries a reader through the split, the full-screen atlas and back
 	const shell = page.locator('.atlas-shell');
 	const canvas = shell.locator('canvas.maplibregl-canvas');
 
-	await page.locator('[data-atlas-open]').click();
+	await page.locator('.atlas-inline-map .maplibregl-ctrl-enter').click();
 	await expect(canvas).toBeVisible({ timeout: 10_000 });
 
 	// A rebuilt map would get a new canvas without this flag
@@ -75,4 +78,31 @@ test('one map carries a reader through the split, the full-screen atlas and back
 
 	await expect(root).not.toHaveAttribute('data-atlas');
 	await expect(shell).toBeHidden();
+});
+
+test.describe('on a wide viewport', () => {
+	test.use({ viewport: { height: 900, width: 1440 } });
+
+	test('the split survives a reload at the width the reader set', async ({ page }) => {
+		await visit(page, paths.regionDetail);
+
+		const root = page.locator('html');
+		const separator = page.getByRole('separator', { name: t('atlas.divider.label') });
+
+		await page.locator('.atlas-inline-map .maplibregl-ctrl-enter').click();
+		await expect(separator).toBeVisible();
+
+		const openedWidth = await separator.getAttribute('aria-valuenow');
+
+		await separator.press('ArrowLeft');
+		await separator.press('ArrowLeft');
+		await expect(separator).not.toHaveAttribute('aria-valuenow', openedWidth ?? '');
+
+		const chosenWidth = (await separator.getAttribute('aria-valuenow')) ?? '';
+
+		await page.reload({ waitUntil: 'domcontentloaded' });
+
+		await expect(root).toHaveAttribute('data-atlas');
+		await expect(separator).toHaveAttribute('aria-valuenow', chosenWidth);
+	});
 });

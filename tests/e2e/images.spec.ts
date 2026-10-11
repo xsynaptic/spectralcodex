@@ -32,15 +32,10 @@ async function getSelectedWidth(image: Locator): Promise<number> {
 test.describe('on a desktop viewport', () => {
 	test.use({ viewport: { height: 720, width: 1280 } });
 
-	test('the hero selects an optimized width', async ({ page, site }) => {
+	test('the hero and the first content image select optimized widths', async ({ page, site }) => {
 		await visit(page, site.postDetail);
 
 		expect(await getSelectedWidth(getHeroImage(page))).toBeLessThanOrEqual(heroWidthMaximum);
-	});
-
-	test('the first content image selects an optimized width', async ({ page, site }) => {
-		await visit(page, site.postDetail);
-
 		expect(await getSelectedWidth(getContentImage(page))).toBeLessThanOrEqual(contentWidthMaximum);
 	});
 });
@@ -48,15 +43,10 @@ test.describe('on a desktop viewport', () => {
 test.describe('on a phone viewport', () => {
 	test.use({ viewport: { height: 844, width: 390 } });
 
-	test('the hero selects a smaller width', async ({ page, site }) => {
+	test('the hero and the first content image select smaller widths', async ({ page, site }) => {
 		await visit(page, site.postDetail);
 
 		expect(await getSelectedWidth(getHeroImage(page))).toBeLessThanOrEqual(mobileWidthMaximum);
-	});
-
-	test('the first content image selects a smaller width', async ({ page, site }) => {
-		await visit(page, site.postDetail);
-
 		expect(await getSelectedWidth(getContentImage(page))).toBeLessThanOrEqual(mobileWidthMaximum);
 	});
 });

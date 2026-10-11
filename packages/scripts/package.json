@@ -4,6 +4,7 @@
 	"description": "Scripts for Spectral Codex",
 	"type": "module",
 	"exports": {
+		"./astro-content": "./src/shared/astro-content.ts",
 		"./og-image": "./src/og-image/inventory-exports.ts"
 	},
 	"imports": {

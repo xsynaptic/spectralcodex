@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { prodUrl } from '#e2e/constants.ts';
+
 test.describe('sitemap', { tag: '@smoke' }, () => {
 	test('index references the url sitemap', async ({ request }) => {
 		const response = await request.get('/sitemap-index.xml');
@@ -22,5 +24,11 @@ test.describe('sitemap', { tag: '@smoke' }, () => {
 		const urls = body.match(/<url>[\s\S]*?<\/url>/g) ?? [];
 
 		expect(urls.length).toBeGreaterThan(5000);
+
+		const offHost = [...body.matchAll(/<loc>([^<]*)<\/loc>/g)]
+			.map(([, location = '']) => location)
+			.filter((location) => !location.startsWith(prodUrl));
+
+		expect(offHost.slice(0, 5), 'sitemap URLs off the production host').toEqual([]);
 	});
 });

@@ -263,7 +263,7 @@ export default defineConfig({
 				},
 			},
 			watch: {
-				ignored: ['./*.md'],
+				ignored: ['./*.md', '**/temp/**'],
 			},
 		},
 	},

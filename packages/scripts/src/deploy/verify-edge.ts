@@ -74,6 +74,8 @@ export async function verifyEdge(): Promise<void> {
 		} else {
 			failures.push('hashed asset (/_x/*): no hashed asset referenced by the document');
 		}
+
+		failures.push(...(await getLiveImageFailures(html, config.siteUrl)));
 	}
 
 	const results = await Promise.all(
@@ -163,6 +165,28 @@ function getExpectations(token: string): Array<EdgeExpectation> {
 			status: 404,
 		},
 	];
+}
+
+// The image host is another origin with its own cache policy, so this checks only that a signed URL still resolves
+async function getLiveImageFailures(html: string, siteUrl: string) {
+	const srcset = /<img\b[^>]*\bfetchpriority="high"[^>]*\bsrcset="([^"]+)"/.exec(html)?.[1];
+	const candidate = srcset?.trim().split(/\s+/, 1)[0];
+
+	if (!candidate) return ['live image: no hero image srcset in the document'];
+
+	const imageUrl = new URL(candidate, siteUrl).href;
+	const response = await request(imageUrl, 'GET', 'live image');
+	const contentType = response.headers.get('content-type') ?? '(absent)';
+
+	if (response.status !== 200 || !contentType.startsWith('image/')) {
+		return [
+			`live image (${imageUrl}): expected status 200 and an image type, got ${String(response.status)} and "${contentType}"`,
+		];
+	}
+
+	console.log(chalk.gray(`  ok  live image: ${imageUrl}`));
+
+	return [];
 }
 
 async function request(url: string, method: 'GET' | 'HEAD', label: string) {
