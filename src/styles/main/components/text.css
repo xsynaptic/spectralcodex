@@ -103,7 +103,7 @@
 		var(--divider-color, var(--color-primary-400)),
 		var(--divider-color-dark, var(--color-primary-500))
 	);
-	content: var(--divider-glyph, var(--content-slash));
+	content: var(--content-slash);
 }
 
 /* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
@@ -117,16 +117,14 @@
 	content: none;
 }
 
-.divided-chevron {
-	--divider-glyph: var(--content-chevron);
-}
-
+/* Glyph set on the pseudo-element; a custom property would inherit into nested items */
 .divided-chevron::before {
+	content: var(--content-chevron);
 	translate: 0 -1px;
 }
 
-.divided-dot {
-	--divider-glyph: var(--content-dot);
+.divided-dot::before {
+	content: var(--content-dot);
 }
 
 .divided-thin::before {
