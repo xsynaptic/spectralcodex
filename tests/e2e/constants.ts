@@ -14,6 +14,7 @@ export const paths = {
 	chronologyYear: '/chronology/2019/',
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
+	postDetail: '/huadong-valley-ride-2018-hualien-city/',
 	postsIndex: '/posts/',
 	regionDetail: '/regions/tainan/',
 	regionDetailAncestor: '/regions/taiwan/',

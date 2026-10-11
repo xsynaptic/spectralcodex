@@ -9,16 +9,18 @@ const t = getTranslations();
 const atlasPath = '/atlas/';
 const probeLimit = 8;
 
-// A page may also link to Posts, which have no split
-async function getPaneLink(request: APIRequestContext, urls: Array<string>) {
+// A page may also link to Posts, which set a Scope of their own or have no split
+async function getLocationLink(request: APIRequestContext, urls: Array<string>) {
 	for (const url of urls.slice(0, probeLimit)) {
 		const response = await request.get(url);
 		const html = await response.text();
 
-		if (html.includes('data-atlas-page="pane"')) return url;
+		if (html.includes('data-map-view="{&quot;targetIds')) return url;
 	}
 
-	throw new Error(`No atlas page among the first ${String(probeLimit)} links on the page`);
+	throw new Error(
+		`No Location in the atlas among the first ${String(probeLimit)} links on the page`,
+	);
 }
 
 async function expectSameCanvas(canvas: Locator) {
@@ -58,7 +60,7 @@ test('one map carries a reader through the split, the full-screen atlas and back
 				.map((anchor) => anchor.getAttribute('href') ?? '')
 				.filter((href) => /^\/[^/]+\/$/.test(href)),
 		);
-	const paneUrl = await getPaneLink(request, [...new Set(urls)]);
+	const paneUrl = await getLocationLink(request, [...new Set(urls)]);
 
 	await page.locator(`main a[href="${paneUrl}"]`).first().click();
 	await page.waitForURL(`**${paneUrl}`);
@@ -83,6 +85,7 @@ test('one map carries a reader through the split, the full-screen atlas and back
 const scopePages = [
 	['Theme', paths.themeDetail],
 	['Series', paths.seriesDetail],
+	['Post', paths.postDetail],
 ] as const;
 
 for (const [label, path] of scopePages) {
@@ -107,7 +110,7 @@ for (const [label, path] of scopePages) {
 					.map((anchor) => anchor.getAttribute('href') ?? '')
 					.filter((href) => /^\/[^/]+\/$/.test(href)),
 			);
-		const paneUrl = await getPaneLink(request, [...new Set(urls)]);
+		const paneUrl = await getLocationLink(request, [...new Set(urls)]);
 
 		await page.locator(`main a[href="${paneUrl}"]`).first().click();
 		await page.waitForURL(`**${paneUrl}`);

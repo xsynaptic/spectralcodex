@@ -84,7 +84,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
-**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme or Series sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it, or the user, clears it. A map has at most one, and Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
+**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it, or the user, clears it. A map has at most one, and Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
 
 **Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Filter; a page never does. _Avoid_: scope, facet.
 

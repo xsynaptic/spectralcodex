@@ -1,4 +1,5 @@
 ---
+// fallow-ignore-file code-duplication -- Same run of sections as region-detail, same id one-liners as resources-detail
 import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
@@ -23,6 +24,7 @@ import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
@@ -35,7 +37,6 @@ const { backlinks, entry, mapData } = Astro.props;
 
 const t = getTranslations();
 
-// fallow-ignore-next-line code-duplication -- Reference-to-id one-liners that only line up with resources-detail by adjacency
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const regionIds = entry.data.regions?.map(({ id }) => id);
@@ -44,9 +45,12 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 const { Content } = await render(entry);
 
 const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
+
+const atlas = await getAtlasPage(entry, mapData);
 ---
 
 <ContentEntryArticle
+	atlas={atlas}
 	entry={entry}
 	meta={{
 		...getSeoArticleProps({
@@ -66,7 +70,12 @@ const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
 	<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
 		<Content />
 	</Prose>
-	<SectionMap entryTitle={entry.data.title} mapData={mapData} />
+	<SectionMap
+		class="atlas-inline-map"
+		entryTitle={entry.data.title}
+		mapData={mapData}
+		showAtlasOpen={!!atlas}
+	/>
 	<SectionLinks entry={entry} />
 	<SectionSources entry={entry} />
 	<SectionThemes themeIds={themeIds} />

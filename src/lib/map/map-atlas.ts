@@ -4,7 +4,10 @@ import type { CollectionEntry } from 'astro:content';
 import pMemoize from 'p-memoize';
 
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
-import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
+import {
+	createLocationsByIdsFunction,
+	createLocationsByPostsFunction,
+} from '#lib/collections/locations/locations-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { createLocationsBySeriesFunction } from '#lib/collections/series/series-utils.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
@@ -98,19 +101,15 @@ async function getAtlasThemeView(
 	};
 }
 
-async function getAtlasSeriesView(
-	entry: CollectionEntry<'series'>,
-	mapData: MapComponentData,
+async function getAtlasLocationsView(
+	entry: CollectionEntry<'posts' | 'series'>,
+	locations: Array<CollectionEntry<'locations'>>,
 ): Promise<MapView | undefined> {
-	if (!mapData.hasGeodata) return;
-
 	const atlasLocationIds = await getAtlasLocationIds();
-	const getLocationsBySeries = await createLocationsBySeriesFunction();
 
-	const locations = getLocationsBySeries(entry.data.seriesItems).filter(({ id }) =>
-		atlasLocationIds.has(id),
+	const featureCollection = getLocationsFeatureCollection(
+		locations.filter(({ id }) => atlasLocationIds.has(id)),
 	);
-	const featureCollection = getLocationsFeatureCollection(locations);
 	const bounds = getMapBounds({ featureCollection });
 
 	if (!featureCollection || !bounds) return;
@@ -128,12 +127,31 @@ async function getAtlasSeriesView(
 	};
 }
 
-type AtlasEntry = CollectionEntry<'locations' | 'regions' | 'series' | 'themes'>;
+async function getAtlasPostView(entry: CollectionEntry<'posts'>, mapData: MapComponentData) {
+	if (!mapData.hasGeodata) return;
+
+	const getLocationsByPosts = await createLocationsByPostsFunction();
+
+	return getAtlasLocationsView(entry, getLocationsByPosts(entry));
+}
+
+async function getAtlasSeriesView(entry: CollectionEntry<'series'>, mapData: MapComponentData) {
+	if (!mapData.hasGeodata) return;
+
+	const getLocationsBySeries = await createLocationsBySeriesFunction();
+
+	return getAtlasLocationsView(entry, getLocationsBySeries(entry.data.seriesItems));
+}
+
+type AtlasEntry = CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'>;
 
 async function getAtlasView(entry: AtlasEntry, mapData: MapComponentData) {
 	switch (entry.collection) {
 		case 'locations': {
 			return getAtlasLocationView(entry, mapData);
+		}
+		case 'posts': {
+			return getAtlasPostView(entry, mapData);
 		}
 		case 'regions': {
 			return getAtlasRegionView(entry, mapData);
