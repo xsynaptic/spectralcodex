@@ -1,26 +1,32 @@
-<script is:inline>
-	{
-		let stored;
+---
+import { modeStorageKey } from '#components/mode-manager/mode-constants.ts';
+import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
+---
 
-		try {
-			stored = localStorage.getItem('scx-mode');
-		} catch {
-			// localStorage unavailable
-		}
+<script
+	define:vars={{ storageKey: modeStorageKey, validModes: Object.values(ModeTypeEnum) }}
+	is:inline
+>
+	let stored;
 
-		let mode = ['auto', 'dark', 'light'].includes(stored) ? stored : 'auto';
-
-		if (mode === 'auto') {
-			mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-		}
-
-		document.documentElement.dataset.mode = mode;
-		document.documentElement.style.colorScheme = mode;
-
-		const themeColor = getComputedStyle(document.documentElement)
-			.getPropertyValue('--color-body-bg')
-			.trim();
-		const meta = document.querySelector('meta[name="theme-color"]');
-		if (meta && themeColor) meta.setAttribute('content', themeColor);
+	try {
+		stored = localStorage.getItem(storageKey);
+	} catch {
+		// localStorage unavailable
 	}
+
+	let mode = validModes.includes(stored) ? stored : 'auto';
+
+	if (mode === 'auto') {
+		mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+	}
+
+	document.documentElement.dataset.mode = mode;
+	document.documentElement.style.colorScheme = mode;
+
+	const themeColor = getComputedStyle(document.documentElement)
+		.getPropertyValue('--color-body-bg')
+		.trim();
+	const meta = document.querySelector('meta[name="theme-color"]');
+	if (meta && themeColor) meta.setAttribute('content', themeColor);
 </script>

@@ -23,6 +23,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - Dynamic route files must be lowercase: `[...id].astro`, not `[...ID].astro`.
 - Do not import from the main Astro app (`src/`) into anything under `packages/**` (the Vite/Rolldown build breaks on it). Duplicate the needed types locally in the package and leave a comment naming the source. Keep the duplication minimal.
 - We prefer conditional rendering without abusing logical operators: `{condition ? <Element /> : undefined}`, never `{condition && <Element />}`.
+- Client storage keys (localStorage, sessionStorage, IndexedDB) take the `scx-` prefix in kebab-case and live in a constants file, never as a literal at the call site; a pre-paint inline script receives them through `define:vars`.
 - A component file takes its directory as a name prefix (`navigation/navigation-header.astro`); a custom element name is chosen for readability instead (`navigation-site.ts` defines `<site-navigation>`), so the two need not match.
 
 ## Styling

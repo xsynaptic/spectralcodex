@@ -1,5 +1,6 @@
 export const atlasFlagStorageKey = 'scx-atlas';
 export const atlasPaneStorageKey = 'scx-atlas-pane-width';
+export const atlasReturnStorageKey = 'scx-atlas-return';
 
 export const atlasPersistName = 'atlas-map';
 

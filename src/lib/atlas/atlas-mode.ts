@@ -12,14 +12,13 @@ import {
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasPersistName,
+	atlasReturnStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
 import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
 import { getPaneImageSizes } from '#lib/atlas/atlas-pane-factory.ts';
 import { getPaneTokens } from '#lib/atlas/atlas-pane.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
-
-const returnStorageKey = 'scx-atlas-return';
 
 const heroSelector = 'img[data-hero-image]';
 const paneAnchorSelector = '.main-pane a[href]';
@@ -93,7 +92,7 @@ function setFlag(isEnabled: boolean) {
 
 function getReturnPath() {
 	try {
-		return sessionStorage.getItem(returnStorageKey) ?? undefined;
+		return sessionStorage.getItem(atlasReturnStorageKey) ?? undefined;
 	} catch {
 		// sessionStorage unavailable
 		return;
@@ -191,7 +190,7 @@ export function startAtlasMode() {
 	document.addEventListener('astro:page-load', () => {
 		if (document.documentElement.dataset.atlasPage !== atlasPage.map) {
 			try {
-				sessionStorage.setItem(returnStorageKey, location.pathname + location.search);
+				sessionStorage.setItem(atlasReturnStorageKey, location.pathname + location.search);
 			} catch {
 				// sessionStorage unavailable
 			}

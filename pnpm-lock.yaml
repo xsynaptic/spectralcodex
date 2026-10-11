@@ -393,12 +393,12 @@ importers:
       '@spectralcodex/shared':
         specifier: workspace:*
         version: link:../shared
+      '@tanstack/query-persist-client-core':
+        specifier: ^5.104.1
+        version: 5.104.1
       '@tanstack/react-query':
         specifier: ^5.104.1
         version: 5.104.1(react@19.3.0)
-      '@tanstack/react-query-persist-client':
-        specifier: ^5.104.1
-        version: 5.104.1(@tanstack/react-query@5.104.1(react@19.3.0))(react@19.3.0)
       '@turf/bbox-polygon':
         specifier: ^7.4.0
         version: 7.4.0
@@ -2734,12 +2734,6 @@ packages:
 
   '@tanstack/query-persist-client-core@5.104.1':
     resolution: {integrity: sha512-ONiadXqe56iNrw6RESqKILpTIVG9ZMI/DageTQnrBDt/nZ6WiP4G13iIiMwJEsiO12gQ3Gychx8tcFIPw4k25g==}
-
-  '@tanstack/react-query-persist-client@5.104.1':
-    resolution: {integrity: sha512-kU3YaqjkwEUzUUfPF0JVg56d6gJKWHaFVqOlQztwc4C2IT0P5sv/23orrSoQqjxKaUe6Ejw5IIQtA/G12uNmow==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.104.1
-      react: ^18 || ^19
 
   '@tanstack/react-query@5.104.1':
     resolution: {integrity: sha512-Zz70EgjahNI7aCz8BZxM3vUGU44ycxEAzMuCUjLeA7SVhhOkg3ZgPjPJPvHjs6Rmky/dtmnu1WzjGHNHmhCoZQ==}
@@ -9581,12 +9575,6 @@ snapshots:
   '@tanstack/query-persist-client-core@5.104.1':
     dependencies:
       '@tanstack/query-core': 5.104.1
-
-  '@tanstack/react-query-persist-client@5.104.1(@tanstack/react-query@5.104.1(react@19.3.0))(react@19.3.0)':
-    dependencies:
-      '@tanstack/query-persist-client-core': 5.104.1
-      '@tanstack/react-query': 5.104.1(react@19.3.0)
-      react: 19.3.0
 
   '@tanstack/react-query@5.104.1(react@19.3.0)':
     dependencies:

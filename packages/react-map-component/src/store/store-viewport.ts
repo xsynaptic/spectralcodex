@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { MapComponentProps, MapInitialViewState } from '#types.ts';
 
+import { mapViewportStorageKeyPrefix } from '#constants.ts';
+
 const staleTimeMs = 30 * 60 * 1000;
 const defaultZoom = 12;
 const fitBoundsOptions = { padding: { bottom: 20, left: 50, right: 50, top: 20 } };
@@ -56,7 +58,7 @@ export function writeSavedViewport(mapId: string, viewport: SavedViewport) {
 }
 
 function getViewportStorageKey(mapId: string) {
-	return `map-vp:${mapId}`;
+	return `${mapViewportStorageKeyPrefix}${mapId}`;
 }
 
 function readSavedViewport(mapId: string | undefined): SavedViewport | undefined {
