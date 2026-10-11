@@ -47,6 +47,7 @@
 @import './main/components/preview-card.css' layer(components);
 @import './main/components/prose.css' layer(components);
 @import './main/components/search.css' layer(components);
+@import './main/components/similar.css' layer(components);
 @import './main/components/text.css' layer(components);
 
 /* The package stylesheet is unlayered, so a layered override would lose to it */

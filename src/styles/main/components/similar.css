@@ -1,0 +1,12 @@
+/* Similar section disclosure; hooks: .similar-more */
+.similar-more::-webkit-details-marker {
+	display: none;
+}
+
+.similar-more::before,
+.similar-more::after {
+	flex: 1;
+	height: 1px;
+	content: '';
+	background-color: light-dark(var(--color-primary-300), var(--color-primary-700));
+}
