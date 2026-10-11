@@ -20,6 +20,7 @@ interface Props extends HTMLAttributes<'div'> {
 }
 
 const {
+	class: className,
 	items,
 	page,
 	previewOptions,
@@ -34,12 +35,17 @@ const defaultPreviewOptions: PreviewOptions = {
 	showTitleMultilingual: true,
 };
 
+// The client router scrolls a new page to the top unless its URL carries a fragment
+const paginationFragment = 'content';
+
 const t = getTranslations();
 ---
 
 <ContentSection
+	class:list={['scroll-mt-4', className]}
 	data-nosnippet
 	data-pagefind-ignore
+	id={page ? paginationFragment : undefined}
 	sectionTitle={sectionTitle ?? t('section.content')}
 	{...props}
 >
@@ -51,7 +57,7 @@ const t = getTranslations();
 				{...defaultPreviewOptions}
 				{...previewOptions}
 			/>
-			<PaginationSelect class="mt-4 md:mt-8" pagination={getPagination(page)} />
+			<PaginationSelect class="mt-4 md:mt-8" pagination={getPagination(page, paginationFragment)} />
 		</>
 	) : undefined}
 	{items ? (

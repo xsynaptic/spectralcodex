@@ -50,4 +50,16 @@ describe.each([
 		).toStrictEqual(['/locations/2/']);
 		expect(pagination.previous?.url).toBe('/locations/');
 	});
+
+	test('a fragment follows the trailing slash on every link', () => {
+		const pagination = getPagination(makePage(2, 3, trailingSlash), 'content');
+
+		expect(pagination.options.map((option) => option.url)).toStrictEqual([
+			'/locations/#content',
+			'/locations/2/#content',
+			'/locations/3/#content',
+		]);
+		expect(pagination.previous?.url).toBe('/locations/#content');
+		expect(pagination.next?.url).toBe('/locations/3/#content');
+	});
 });

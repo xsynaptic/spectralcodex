@@ -7,12 +7,13 @@ import { getPathWithTrailingSlash } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 // Astro appends the trailing slash only under `trailingSlash: 'always'`, and dev runs `'ignore'`
-export function getPagination(page: Page) {
+export function getPagination(page: Page, fragment?: string) {
 	const { currentPage, lastPage, url } = page;
 
 	const t = getTranslations();
 
 	const basePath = url.first ?? url.current;
+	const suffix = fragment ? `#${fragment}` : '';
 
 	const options = Array.from({ length: lastPage }, (_, index) => {
 		const pageNumber = index + 1;
@@ -21,9 +22,9 @@ export function getPagination(page: Page) {
 			isCurrent: pageNumber === currentPage,
 			label: formatStringTemplate(t('site.pagination.pageNumber.label'), { page: pageNumber }),
 			url:
-				pageNumber === 1
+				(pageNumber === 1
 					? getPathWithTrailingSlash(basePath)
-					: getPathWithTrailingSlash(basePath, String(pageNumber)),
+					: getPathWithTrailingSlash(basePath, String(pageNumber))) + suffix,
 		};
 	});
 
@@ -43,7 +44,7 @@ export function getPagination(page: Page) {
 		pagination.previous = {
 			ariaLabel: t('pagination.previousPage'),
 			label: t('pagination.previous'),
-			url: getPathWithTrailingSlash(url.prev),
+			url: getPathWithTrailingSlash(url.prev) + suffix,
 		};
 	}
 
@@ -51,7 +52,7 @@ export function getPagination(page: Page) {
 		pagination.next = {
 			ariaLabel: t('pagination.nextPage'),
 			label: t('pagination.next'),
-			url: getPathWithTrailingSlash(url.next),
+			url: getPathWithTrailingSlash(url.next) + suffix,
 		};
 	}
 
