@@ -1,7 +1,7 @@
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import { createMapStore } from '#store/store-factory.ts';
+import { createMapStore, hasActiveFilter } from '#store/store-factory.ts';
 
 describe('createMapStore', () => {
 	test('toggleStatusFilter adds an absent status and removes a present one', () => {
@@ -110,5 +110,51 @@ describe('createMapStore', () => {
 
 		setSelectedId(undefined);
 		expect(store.getState().isPopupVisible).toBe(true);
+	});
+});
+
+describe('hasActiveFilter', () => {
+	test('a new store has no active filter', () => {
+		expect(hasActiveFilter(createMapStore().getState())).toBe(false);
+	});
+
+	test('one hidden status is an active filter, and showing all clears it', () => {
+		const store = createMapStore();
+		const { showAllStatusFilter, toggleStatusFilter } = store.getState().actions;
+
+		toggleStatusFilter(LocationStatusEnum.Abandoned);
+		expect(hasActiveFilter(store.getState())).toBe(true);
+
+		showAllStatusFilter();
+		expect(hasActiveFilter(store.getState())).toBe(false);
+	});
+
+	test('a minimum rating above 1 is an active filter that showing all leaves in place', () => {
+		const store = createMapStore();
+		const { setRatingFilter, showAllStatusFilter } = store.getState().actions;
+
+		setRatingFilter(2);
+		showAllStatusFilter();
+
+		expect(hasActiveFilter(store.getState())).toBe(true);
+	});
+
+	test('an objective above 1 counts only where the objective filter is enabled', () => {
+		const disabledStore = createMapStore();
+		const enabledStore = createMapStore({ isObjectiveFilterEnabled: true });
+
+		disabledStore.getState().actions.setObjectiveFilter(3);
+		enabledStore.getState().actions.setObjectiveFilter(3);
+
+		expect(hasActiveFilter(disabledStore.getState())).toBe(false);
+		expect(hasActiveFilter(enabledStore.getState())).toBe(true);
+	});
+
+	test('the entry quality filter is not counted', () => {
+		const store = createMapStore();
+
+		store.getState().actions.setEntryQualityFilter(3);
+
+		expect(hasActiveFilter(store.getState())).toBe(false);
 	});
 });

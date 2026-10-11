@@ -31,7 +31,7 @@ import {
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
-import { getAtlasLocationIds } from '#lib/map/map-atlas.ts';
+import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 
@@ -62,15 +62,13 @@ const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeat
 
 const hideLocation = entry.data.hideLocation && contentPolicy.hideSensitiveLocations;
 
-const atlasLocationIds = await getAtlasLocationIds();
-const isAtlasPage = !hideLocation && mapData.hasGeodata && atlasLocationIds.has(entry.id);
-const atlasTargetIds = mapData.targetIds ?? [];
+const atlas = await getAtlasPage(entry, mapData);
 
 const t = getTranslations();
 ---
 
 <ContentEntryArticle
-	atlas={isAtlasPage ? { page: 'pane', view: { targetIds: atlasTargetIds } } : undefined}
+	atlas={atlas}
 	entry={entry}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
@@ -86,7 +84,7 @@ const t = getTranslations();
 			</DividedItem>
 		) : undefined}
 	</Fragment>
-	<Fragment slot="header-caption">{isAtlasPage ? <AtlasOpen /> : undefined}</Fragment>
+	<Fragment slot="header-caption">{atlas ? <AtlasOpen /> : undefined}</Fragment>
 	{!hasContent && !hasHeroImage && imageFeaturedId ? (
 		<ContentImage
 			alt={entry.data.title}

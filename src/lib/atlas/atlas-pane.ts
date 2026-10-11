@@ -25,6 +25,11 @@ export function getPaneTokens() {
 	return paneTokens;
 }
 
+// The pane's rendered width is the value CSS settled on
+export function getPaneWidth() {
+	return document.querySelector('.main-pane')?.getBoundingClientRect().width ?? 0;
+}
+
 export function getPaneLimits(): AtlasPaneLimits {
 	const root = document.documentElement;
 	const rootFontSize = Number(getComputedStyle(root).fontSize.replace('px', ''));

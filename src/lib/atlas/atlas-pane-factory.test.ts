@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
 	clampPaneWidth,
+	getPaneImageSizes,
 	getPaneWidthForKey,
 	getPaneWidthRange,
 } from '#lib/atlas/atlas-pane-factory.ts';
@@ -18,6 +19,19 @@ describe('getPaneWidthRange', () => {
 			max: 640,
 			min: 640,
 		});
+	});
+});
+
+describe('getPaneImageSizes', () => {
+	test('an image fills the clamped pane inside the media condition and the viewport outside it', () => {
+		expect(
+			getPaneImageSizes({
+				mapMinRem: 20,
+				mediaQuery: '(width >= 64rem)',
+				paneMinRem: 40,
+				paneSize: '812px',
+			}),
+		).toBe('(width >= 64rem) clamp(40rem, 812px, 100vw - 20rem), 100vw');
 	});
 });
 

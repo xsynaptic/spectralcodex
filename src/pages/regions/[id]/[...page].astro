@@ -14,7 +14,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 	for (const entry of entries) {
 		const {
-			atlasView,
 			backlinksCount,
 			catalogItems,
 			catalogItemsCount,
@@ -28,7 +27,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 				pageSize: 20,
 				params: { id: entry.id },
 				props: {
-					atlasView,
 					backlinksCount,
 					catalogItems,
 					catalogItemsCount,

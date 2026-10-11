@@ -1,18 +1,19 @@
-import type { MapFeatureOpenDetail } from '@spectralcodex/react-map-component';
-
+import {
+	mapExitEventName,
+	mapFeatureOpenEventName,
+	mapSyncEventName,
+} from '@spectralcodex/react-map-component/constants';
 import { navigate } from 'astro:transitions/client';
 
 import {
-	atlasExitEventName,
-	atlasFeatureOpenEventName,
 	atlasFlagStorageKey,
 	atlasPaneMediaQuery,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasPersistName,
-	atlasSyncEventName,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
+import { getPaneImageSizes } from '#lib/atlas/atlas-pane-factory.ts';
 import { getPaneTokens } from '#lib/atlas/atlas-pane.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
@@ -22,10 +23,9 @@ const heroSelector = 'img[data-hero-image]';
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
 
 function dispatchSync() {
-	document.dispatchEvent(new Event(atlasSyncEventName));
+	document.dispatchEvent(new Event(mapSyncEventName));
 }
 
-// The clamp atlas.css puts on the pane, behind the same media condition
 function getSplitHeroSizes(root: HTMLElement) {
 	if (!('atlas' in root.dataset) || root.dataset.atlasPage !== 'pane') return;
 
@@ -33,7 +33,7 @@ function getSplitHeroSizes(root: HTMLElement) {
 	const paneSize =
 		root.style.getPropertyValue(atlasPaneSizeProperty) || `${String(paneDefaultRem)}rem`;
 
-	return `${atlasPaneMediaQuery} clamp(${String(paneMinRem)}rem, ${paneSize}, 100vw - ${String(mapMinRem)}rem), 100vw`;
+	return getPaneImageSizes({ mapMinRem, mediaQuery: atlasPaneMediaQuery, paneMinRem, paneSize });
 }
 
 function updateHeroSizes(target: Document = document) {
@@ -111,12 +111,11 @@ export function requestPaneWidth(width: number) {
 
 // Called once by the setup script on every page; bundled scripts do not run again after a swap
 export function startAtlasMode() {
-	document.addEventListener(atlasExitEventName, closeAtlas);
+	// The island's channel only; app code calls `closeAtlas()`
+	document.addEventListener(mapExitEventName, closeAtlas);
 
-	document.addEventListener(atlasFeatureOpenEventName, (event) => {
-		if (!(event instanceof CustomEvent)) return;
-
-		const { url } = event.detail as MapFeatureOpenDetail;
+	document.addEventListener(mapFeatureOpenEventName, (event) => {
+		const { url } = event.detail;
 
 		// Another Point of the Location already in the pane
 		if (url === location.pathname) return;

@@ -80,6 +80,21 @@ const defaultMapDataState = {
 	statusFilter: [],
 } satisfies MapDataState;
 
+// `entryQualityFilter` has no control, so it never leaves its default
+export function hasActiveFilter({
+	isObjectiveFilterEnabled,
+	objectiveFilter,
+	ratingFilter,
+	statusFilter,
+}: Pick<
+	MapDataState,
+	'isObjectiveFilterEnabled' | 'objectiveFilter' | 'ratingFilter' | 'statusFilter'
+>) {
+	if (statusFilter.length > 0 || ratingFilter > 1) return true;
+
+	return isObjectiveFilterEnabled && objectiveFilter > 1;
+}
+
 export function createMapStore(initialState?: Partial<MapDataConfigurableState>) {
 	const state: MapDataState = { ...defaultMapDataState, ...initialState };
 

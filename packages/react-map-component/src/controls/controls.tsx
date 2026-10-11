@@ -10,6 +10,7 @@ import {
 
 import type { MapComponentProps } from '#types.ts';
 
+import { mapExitEventName } from '#constants.ts';
 import { ExitControl } from '#controls/controls-exit.tsx';
 import { FilterControl } from '#controls/controls-filter.tsx';
 import { MetricsControl } from '#controls/controls-metrics.tsx';
@@ -28,7 +29,7 @@ export const MapControls: FC<Pick<MapComponentProps, 'host'>> = function MapCont
 			{isCanvasInteractive ? (
 				<>
 					{host ? (
-						<ExitControl eventName={host.exitEventName} position="top-left" />
+						<ExitControl eventName={mapExitEventName} position="top-left" />
 					) : (
 						<FullscreenControl position="top-left" />
 					)}

@@ -56,16 +56,8 @@ export type MapGeometry = LineString | Point | Polygon;
 
 // Serializable; a persisted island never receives new props and a function cannot cross island serialization
 export interface MapHostOptions {
-	// Dispatched on `document` when the exit control is pressed
-	exitEventName: string;
-	// Dispatched on `document` as a `CustomEvent<MapFeatureOpenDetail>` once a selected Feature's url is known
-	featureOpenEventName: string;
 	// While this matches a click hands the Feature to the host in place of its popup
 	featureOpenMediaQuery: string;
-	// Dispatched on `document` whenever the view or the map container's width may have changed
-	syncEventName: string;
-	// Root attribute holding a `MapView` as JSON
-	viewAttribute: string;
 }
 
 export type MapInitialViewState = MapProps['initialViewState'];
@@ -80,6 +72,10 @@ export type MapFeaturesRule =
 	| { ids: Array<string>; type: 'ids' }
 	| { index: number; type: 'theme' }
 	| { interval: [number, number]; type: 'region' };
+
+export interface MapFeatureOpenDetail {
+	url: string;
+}
 
 export interface MapTrackDetail {
 	data?: Record<string, unknown>;

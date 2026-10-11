@@ -13,6 +13,21 @@ export function getPaneWidthRange({ mapMin, paneMin, viewportWidth }: AtlasPaneL
 	return { max: Math.max(paneMin, viewportWidth - mapMin), min: paneMin };
 }
 
+// The clamp atlas.css puts on the pane, spelled out because `sizes` cannot read custom properties
+export function getPaneImageSizes({
+	mapMinRem,
+	mediaQuery,
+	paneMinRem,
+	paneSize,
+}: {
+	mapMinRem: number;
+	mediaQuery: string;
+	paneMinRem: number;
+	paneSize: string;
+}) {
+	return `${mediaQuery} clamp(${String(paneMinRem)}rem, ${paneSize}, 100vw - ${String(mapMinRem)}rem), 100vw`;
+}
+
 export function clampPaneWidth(width: number, limits: AtlasPaneLimits) {
 	const { max, min } = getPaneWidthRange(limits);
 

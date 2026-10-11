@@ -1,4 +1,5 @@
 import type { MapComponentData, MapView } from '@spectralcodex/react-map-component';
+import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
 
@@ -8,20 +9,40 @@ import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapData } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { contentPolicy } from '#lib/utils/content-policy.ts';
+
+export type AtlasPageProps = { page: 'map' } | { page: 'pane'; view: MapView };
 
 const atlasRegionId = 'taiwan';
 
-export const getAtlasLocationIds = pMemoize(async () => {
+const getAtlasLocationIds = pMemoize(async () => {
 	const { entriesMap } = await getRegionsCollection();
 
 	return new Set(entriesMap.get(atlasRegionId)?.data._locations);
 });
 
-export function getAtlasRegionView(
+async function getAtlasLocationView(
+	entry: CollectionEntry<'locations'>,
+	mapData: MapComponentData,
+) {
+	if (entry.data.hideLocation && contentPolicy.hideSensitiveLocations) return;
+	if (!mapData.hasGeodata) return;
+
+	const atlasLocationIds = await getAtlasLocationIds();
+
+	if (!atlasLocationIds.has(entry.id)) return;
+
+	return { targetIds: mapData.targetIds ?? [] };
+}
+
+async function getAtlasRegionView(
 	regionId: string,
 	mapData: MapComponentData,
-	intervalById: ReadonlyMap<string, [number, number]>,
-): MapView | undefined {
+): Promise<MapView | undefined> {
+	const {
+		regionsTree: { intervalById },
+	} = await getRegionsCollection();
+
 	const atlasInterval = intervalById.get(atlasRegionId);
 	const interval = intervalById.get(regionId);
 
@@ -36,7 +57,30 @@ export function getAtlasRegionView(
 	};
 }
 
-// Memoized; every page renders the atlas island in its shell
+async function getAtlasView(
+	entry: CollectionEntry<'locations' | 'regions'>,
+	mapData: MapComponentData,
+) {
+	switch (entry.collection) {
+		case 'locations': {
+			return getAtlasLocationView(entry, mapData);
+		}
+		case 'regions': {
+			return getAtlasRegionView(entry.id, mapData);
+		}
+	}
+}
+
+export async function getAtlasPage(
+	entry: CollectionEntry<'locations' | 'regions'>,
+	mapData: MapComponentData,
+): Promise<AtlasPageProps | undefined> {
+	const view = await getAtlasView(entry, mapData);
+
+	return view ? { page: 'pane', view } : undefined;
+}
+
+// Memoized; every atlas page renders the island in its shell
 export const getAtlasMapData = pMemoize(async (): Promise<MapComponentData> => {
 	const { entriesMap, regionsTree } = await getRegionsCollection();
 	const getLocationsByIds = await createLocationsByIdsFunction();

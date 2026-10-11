@@ -80,9 +80,9 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point. _Avoid_: marker, pin, item.
 
-**Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site and narrowed by a Scope. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
+**Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
-**Scope**: The rule a given map applies to the Map Directory to keep only the Features it should show, expressed as a Region subtree, a Theme, or an explicit list. _Avoid_: filter, query, selection.
+**Page Features**: The Features the page in the atlas pane is about, such as a Region's subtree. _Avoid_: scope, highlight.
 
 **Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
 

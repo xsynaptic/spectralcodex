@@ -6,13 +6,7 @@ import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive-factory.t
 
 import AtlasDivider from '#components/atlas/atlas-divider.astro';
 import MapLoading from '#components/map/map-loading.astro';
-import {
-	atlasExitEventName,
-	atlasFeatureOpenEventName,
-	atlasPaneMediaQuery,
-	atlasPersistName,
-	atlasSyncEventName,
-} from '#lib/atlas/atlas-constants.ts';
+import { atlasPaneMediaQuery, atlasPersistName } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getAtlasMapData } from '#lib/map/map-atlas.ts';
 
@@ -38,13 +32,7 @@ const zIndex = 10;
 			<ReactMapComponent
 				{...mapComponentProps}
 				client:atlas={JSON.stringify(directiveOptions)}
-				host={{
-					exitEventName: atlasExitEventName,
-					featureOpenEventName: atlasFeatureOpenEventName,
-					featureOpenMediaQuery: atlasPaneMediaQuery,
-					syncEventName: atlasSyncEventName,
-					viewAttribute: 'data-atlas-view',
-				}}
+				host={{ featureOpenMediaQuery: atlasPaneMediaQuery }}
 				messages={{ exitAriaLabel: t('atlas.exit.label') }}
 				style={{ zIndex: zIndex + 1 }}
 			/>

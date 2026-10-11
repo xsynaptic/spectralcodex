@@ -1,11 +1,12 @@
-import { atlasSyncEventName } from '#lib/atlas/atlas-constants.ts';
+import { mapSyncEventName } from '@spectralcodex/react-map-component/constants';
+
 import { closeAtlas, requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
 import {
 	clampPaneWidth,
 	getPaneWidthForKey,
 	getPaneWidthRange,
 } from '#lib/atlas/atlas-pane-factory.ts';
-import { getPaneLimits } from '#lib/atlas/atlas-pane.ts';
+import { getPaneLimits, getPaneWidth } from '#lib/atlas/atlas-pane.ts';
 
 // The host carries the position, so the controls beside the handle follow a drag
 class AtlasDivider extends HTMLElement {
@@ -26,7 +27,7 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.addEventListener('keydown', this.#handleKeyDown);
 		this.addEventListener('click', this.#handleClick);
 		window.addEventListener('resize', this.#updateValue);
-		document.addEventListener(atlasSyncEventName, this.#updateValue);
+		document.addEventListener(mapSyncEventName, this.#updateValue);
 
 		this.#updateValue();
 	}
@@ -39,12 +40,7 @@ class AtlasDivider extends HTMLElement {
 		this.#handle?.removeEventListener('keydown', this.#handleKeyDown);
 		this.removeEventListener('click', this.#handleClick);
 		window.removeEventListener('resize', this.#updateValue);
-		document.removeEventListener(atlasSyncEventName, this.#updateValue);
-	}
-
-	// The pane's rendered width is the value CSS settled on
-	#getPaneWidth() {
-		return document.querySelector('.main-pane')?.getBoundingClientRect().width ?? 0;
+		document.removeEventListener(mapSyncEventName, this.#updateValue);
 	}
 
 	#handleClick = (event: MouseEvent) => {
@@ -54,7 +50,7 @@ class AtlasDivider extends HTMLElement {
 	};
 
 	#handleKeyDown = (event: KeyboardEvent) => {
-		const width = getPaneWidthForKey(event.key, this.#getPaneWidth(), getPaneLimits());
+		const width = getPaneWidthForKey(event.key, getPaneWidth(), getPaneLimits());
 
 		if (width === undefined) return;
 
@@ -69,7 +65,7 @@ class AtlasDivider extends HTMLElement {
 		event.preventDefault();
 		this.#handle.setPointerCapture(event.pointerId);
 		this.#handle.dataset.dragging = '';
-		this.#dragOrigin = this.#getPaneWidth();
+		this.#dragOrigin = getPaneWidth();
 		this.#handle.focus();
 	};
 
@@ -112,7 +108,7 @@ class AtlasDivider extends HTMLElement {
 
 		this.#handle?.setAttribute('aria-valuemin', String(Math.round(min)));
 		this.#handle?.setAttribute('aria-valuemax', String(Math.round(max)));
-		this.#handle?.setAttribute('aria-valuenow', String(Math.round(this.#getPaneWidth())));
+		this.#handle?.setAttribute('aria-valuenow', String(Math.round(getPaneWidth())));
 	};
 }
 

@@ -1,14 +1,10 @@
 // 2026Q1: TypeScript doesn't deal well with Astro files exporting types and interfaces
-import type { MapView } from '@spectralcodex/react-map-component';
-
 // Values map onto divided-* classes in text.css
 export type DividerColor = 'default' | 'muted';
 
 export type DividerContent = 'chevron' | 'dot' | 'slash';
 
 export type DividerWeight = 'thin';
-
-export type AtlasPageProps = { page: 'map' } | { page: 'pane'; view: MapView };
 
 // Meta component types
 export interface MetaProps {

@@ -20,6 +20,7 @@ import {
 	getTargetZoom,
 } from '#canvas/canvas-view-factory.ts';
 import { useMapView } from '#canvas/canvas-view.tsx';
+import { mapSyncEventName } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useDocumentEventValue } from '#lib/document-attribute.ts';
 import { useMapStoreActions } from '#store/store.ts';
@@ -73,7 +74,7 @@ function getViewFit(
 }
 
 // True once the camera has settled on the current Targets, or on the view's bounds when it has none
-function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>, eventName: string) {
+function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>) {
 	const { current: map } = useMap();
 	const { data: sourceData } = useSourceDataQuery();
 	const { setFilterOpen, setSelectedId } = useMapStoreActions();
@@ -81,7 +82,7 @@ function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>, eventName: st
 	const getWidth = useCallback(() => map?.getContainer().clientWidth ?? 0, [map]);
 
 	// The host resizes the container as chrome beside the map comes and goes
-	const width = useDocumentEventValue(eventName, getWidth, 0);
+	const width = useDocumentEventValue(mapSyncEventName, getWidth, 0);
 
 	const key = `${view.targetIds?.join(' ') ?? ''} ${JSON.stringify(view.bounds)} ${String(width)}`;
 
@@ -124,12 +125,10 @@ function useTargetFit(view: Pick<MapView, 'bounds' | 'targetIds'>, eventName: st
 	return settledKey === key;
 }
 
-const MapSyncedTargets: FC<{
-	syncEventName: string;
-}> = function MapSyncedTargets({ syncEventName }) {
+const MapSyncedTargets: FC = function MapSyncedTargets() {
 	const view = useMapView();
 	const { targetIds } = view;
-	const isSettled = useTargetFit(view, syncEventName);
+	const isSettled = useTargetFit(view);
 
 	return (
 		<>
@@ -142,7 +141,7 @@ const MapSyncedTargets: FC<{
 export const MapTargets: FC<Pick<MapComponentProps, 'host'>> = function MapTargets({ host }) {
 	const { targetIds } = useMapView();
 
-	if (host) return <MapSyncedTargets syncEventName={host.syncEventName} />;
+	if (host) return <MapSyncedTargets />;
 
 	return (
 		<>
