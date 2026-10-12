@@ -2,11 +2,12 @@ import type { AsyncStorage, PersistedQuery } from '@tanstack/query-persist-clien
 import type { PropsWithChildren } from 'react';
 
 import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { del, entries, get, set } from 'idb-keyval';
 import { useState } from 'react';
 
 import { mapCacheSchemaVersion, mapCacheStorageKeyPrefix } from '#constants.ts';
+import { trackMapErrorOnce } from '#lib/track.ts';
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
@@ -67,6 +68,11 @@ function createPersistedQueryClient() {
 				staleTime: millisecondsPerDay,
 			},
 		},
+		queryCache: new QueryCache({
+			onError: (_error, query) => {
+				trackMapErrorOnce(String(query.queryKey[0]));
+			},
+		}),
 	});
 }
 

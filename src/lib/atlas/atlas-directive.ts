@@ -1,4 +1,7 @@
+import type { MapTrackDetail } from '@spectralcodex/react-map-component';
 import type { ClientDirective } from 'astro';
+
+import { mapTrackEventName } from '@spectralcodex/react-map-component/constants';
 
 import { isAtlasMapShown } from '#lib/atlas/atlas-layout-factory.ts';
 
@@ -37,9 +40,19 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	}
 
 	async function hydrate() {
-		const [hydrateIsland] = await Promise.all([load(), loadStylesheet()]);
+		try {
+			const [hydrateIsland] = await Promise.all([load(), loadStylesheet()]);
 
-		await hydrateIsland();
+			await hydrateIsland();
+		} catch (error) {
+			document.dispatchEvent(
+				new CustomEvent<MapTrackDetail>(mapTrackEventName, {
+					detail: { data: { kind: 'hydrate' }, name: 'map-error' },
+				}),
+			);
+
+			throw error;
+		}
 	}
 
 	const observer = new MutationObserver(hydrateWhenVisible);

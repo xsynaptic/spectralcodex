@@ -68,7 +68,7 @@ class AtlasSheetHandle extends HTMLElement {
 	#handleClick = (event: MouseEvent) => {
 		const isKeyboard = event.detail === 0;
 
-		if (isKeyboard) void moveSheet(!isSheetDown());
+		if (isKeyboard) this.#toggle();
 	};
 
 	#handlePointerDown = (event: PointerEvent) => {
@@ -100,7 +100,8 @@ class AtlasSheetHandle extends HTMLElement {
 
 		this.#pointerId = undefined;
 
-		void moveSheet(isToggled ? !isDown : isDown);
+		if (isToggled) this.#toggle();
+		else void moveSheet(isDown);
 	};
 
 	#handlePointerMove = (event: PointerEvent) => {
@@ -117,6 +118,14 @@ class AtlasSheetHandle extends HTMLElement {
 
 		this.#pane.style.translate = `0 ${String(offsetPx)}px`;
 	};
+
+	#toggle() {
+		const isDown = !isSheetDown();
+
+		window.umami?.track('map-sheet-toggle', { down: isDown });
+
+		void moveSheet(isDown);
+	}
 }
 
 if (!customElements.get('atlas-sheet-handle')) {

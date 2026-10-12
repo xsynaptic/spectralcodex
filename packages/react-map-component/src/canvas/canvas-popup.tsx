@@ -6,17 +6,16 @@ import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import type { MapTrackDetail } from '#types.ts';
-
 import { useFeatureOpenDispatch } from '#canvas/canvas-feature-open.ts';
 import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { mapTrackEventName, mediaQueryMobile } from '#constants.ts';
+import { mediaQueryMobile } from '#constants.ts';
 import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
 import { useMapMessages } from '#lib/messages.tsx';
+import { trackMap } from '#lib/track.ts';
 import {
 	useIsMapPopupVisible,
 	useMapHoveredId,
@@ -269,11 +268,7 @@ function usePopupOpenTracking({
 
 		if (!url) return;
 
-		document.dispatchEvent(
-			new CustomEvent<MapTrackDetail>(mapTrackEventName, {
-				detail: { data: { location: url }, name: 'map-popup-open' },
-			}),
-		);
+		trackMap({ data: { location: url }, name: 'map-popup-open' });
 	}, [id, isEnabled, isLoading, mapStoreInstance, setClickedId, url]);
 }
 

@@ -6,6 +6,7 @@ import { useMapView } from '#canvas/canvas-view.tsx';
 import { mapFeatureOpenEventName } from '#constants.ts';
 import { MapIconAdd, MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
+import { trackMap } from '#lib/track.ts';
 import { useMapStoreActions } from '#store/store.ts';
 
 export const MapScopeBar: FC = function MapScopeBar() {
@@ -51,6 +52,7 @@ export const MapScopeBar: FC = function MapScopeBar() {
 				className="map-scope-toggle"
 				onClick={() => {
 					setScopeEnabled(!isEnabled);
+					trackMap({ data: { enabled: !isEnabled }, name: 'map-scope-toggle' });
 				}}
 				title={toggleLabel}
 				type="button"

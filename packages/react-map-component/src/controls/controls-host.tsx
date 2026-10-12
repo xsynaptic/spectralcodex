@@ -1,20 +1,18 @@
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import type { MapTrackDetail } from '#types.ts';
-
 import {
 	mapEnterEventName,
 	mapExitEventName,
 	mapExpandEventName,
 	mapSyncEventName,
-	mapTrackEventName,
 	mapViewAttribute,
 } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useDocumentAttribute } from '#lib/document-attribute.ts';
 import { MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
+import { trackMap } from '#lib/track.ts';
 
 interface HostControlProps {
 	position: ControlPosition;
@@ -46,9 +44,7 @@ const HostControl: FC<
 				className={className}
 				onClick={() => {
 					document.dispatchEvent(new Event(eventName));
-					document.dispatchEvent(
-						new CustomEvent<MapTrackDetail>(mapTrackEventName, { detail: { name: trackName } }),
-					);
+					trackMap({ name: trackName });
 				}}
 				title={label}
 				type="button"

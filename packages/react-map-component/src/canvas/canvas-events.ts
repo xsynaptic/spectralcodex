@@ -17,6 +17,7 @@ import { useMapTargetIds } from '#canvas/canvas-view.tsx';
 import { controlFilterId, mediaQueryMobile } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMediaQuery } from '#lib/media-query.ts';
+import { trackMap, trackMapErrorOnce } from '#lib/track.ts';
 import { mapQueryableLayerIds, MapSourceIdEnum } from '#source/source-config.ts';
 import { writeSavedViewport } from '#store/store-viewport.ts';
 import {
@@ -129,10 +130,12 @@ export function useMapCanvasEvents({
 		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
 		onError: ({ error }) => {
 			setCanvasLoading(false);
+			trackMapErrorOnce('canvas');
 			console.warn('[Map]', error.message);
 		},
 		onLoad: (event: MapEvent) => {
 			setCanvasLoading(false);
+			trackMap({ name: 'map-load' });
 
 			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
