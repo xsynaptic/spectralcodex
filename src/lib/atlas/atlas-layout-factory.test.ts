@@ -13,8 +13,8 @@ describe('getAtlasLayout', () => {
 		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: true, page: 'map' })).toBe('map');
 	});
 
-	test('a pane page too narrow for the split stays regular', () => {
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: false, page: 'pane' })).toBe('regular');
+	test('a pane page too narrow for the split covers the map as a sheet', () => {
+		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: false, page: 'pane' })).toBe('sheet');
 	});
 
 	test('a pane page splits once the split fits', () => {

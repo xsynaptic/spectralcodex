@@ -341,7 +341,10 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 							<MapIconFilters />
 						</svg>
 					</span>
-					{hasActiveFilter ? <span className="map-filter-indicator"></span> : undefined}
+					<span
+						className="map-filter-indicator"
+						data-active={hasActiveFilter ? '' : undefined}
+					></span>
 				</button>
 			</CustomControlPortal>
 			<MapControlsFilterMenu id={panelId} />

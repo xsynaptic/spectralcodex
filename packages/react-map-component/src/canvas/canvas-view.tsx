@@ -9,14 +9,20 @@ import { mapSyncEventName, mapViewAttribute } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useDocumentAttribute } from '#lib/document-attribute.ts';
 import { reduceMapScope } from '#store/store-scope.ts';
-import { useMapScopeViewKey, useMapStoreActions, useMapStoreScope } from '#store/store.ts';
+import {
+	useIsMapScopeEnabled,
+	useMapScopeViewKey,
+	useMapStoreActions,
+	useMapStoreScope,
+} from '#store/store.ts';
 
 const emptyTargetIds: Array<string> = [];
 
 interface MapViewContextValue {
-	// From the page's own view, not the Scope in force, so clearing the Scope does not re-run the camera fit
+	// From the page's own view, not the Scope in force, so turning the Scope off does not re-run the camera fit
 	bounds?: MapComponentProps['bounds'] | undefined;
 	scope?: MapScope | undefined;
+	scopeHeld?: MapScope | undefined;
 	targetIds: Array<string>;
 }
 
@@ -28,25 +34,35 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 		const { data: sourceData } = useSourceDataQuery();
 
 		const storeScope = useMapStoreScope();
+		const isStoreScopeEnabled = useIsMapScopeEnabled();
 		const scopeViewKey = useMapScopeViewKey();
 		const { setScope } = useMapStoreActions();
 
 		const view = useMemo(() => parseMapView(viewKey, isDev), [viewKey, isDev]);
 
 		// Computed in render; from the effect below, one frame would draw the new page with the previous Scope
-		const { isSettled, scope } = useMemo(
+		const { isScopeEnabled, isSettled, scope } = useMemo(
 			() =>
-				reduceMapScope({ scope: storeScope, viewKey: scopeViewKey }, { view, viewKey }, sourceData),
-			[scopeViewKey, sourceData, storeScope, view, viewKey],
+				reduceMapScope(
+					{ isScopeEnabled: isStoreScopeEnabled, scope: storeScope, viewKey: scopeViewKey },
+					{ view, viewKey },
+					sourceData,
+				),
+			[isStoreScopeEnabled, scopeViewKey, sourceData, storeScope, view, viewKey],
 		);
 
 		useEffect(() => {
-			if (isSettled && scopeViewKey !== viewKey) setScope(scope, viewKey);
-		}, [isSettled, scope, scopeViewKey, setScope, viewKey]);
+			if (isSettled && scopeViewKey !== viewKey) setScope(scope, isScopeEnabled, viewKey);
+		}, [isScopeEnabled, isSettled, scope, scopeViewKey, setScope, viewKey]);
 
 		const context = useMemo(
-			() => ({ bounds: view.scope?.bounds, scope, targetIds: view.targetIds ?? emptyTargetIds }),
-			[scope, view],
+			() => ({
+				bounds: view.scope?.bounds,
+				scope: isScopeEnabled ? scope : undefined,
+				scopeHeld: scope,
+				targetIds: view.targetIds ?? emptyTargetIds,
+			}),
+			[isScopeEnabled, scope, view],
 		);
 
 		return <MapViewContext.Provider value={context}>{children}</MapViewContext.Provider>;

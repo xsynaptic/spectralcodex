@@ -3,7 +3,6 @@ import {
 	mapExitEventName,
 	mapExpandEventName,
 	mapFeatureOpenEventName,
-	mapSyncEventName,
 } from '@spectralcodex/react-map-component/constants';
 import { navigate } from 'astro:transitions/client';
 
@@ -11,6 +10,7 @@ import {
 	atlasFlagStorageKey,
 	atlasPage,
 	atlasPaneMediaQuery,
+	atlasPaneSelector,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasPersistName,
@@ -20,15 +20,13 @@ import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
 import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
 import { getPaneImageSizes } from '#lib/atlas/atlas-pane-factory.ts';
 import { getPaneTokens } from '#lib/atlas/atlas-pane.ts';
+import { isSheetDown, moveSheet, setSheetDown } from '#lib/atlas/atlas-sheet.ts';
+import { dispatchSync } from '#lib/atlas/atlas-sync.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 const heroSelector = 'img[data-hero-image]';
-const paneAnchorSelector = '.main-pane a[href]';
+const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
-
-function dispatchSync() {
-	document.dispatchEvent(new Event(mapSyncEventName));
-}
 
 function getLayout(root: HTMLElement) {
 	return getAtlasLayout({
@@ -105,32 +103,49 @@ function openAtlas() {
 	if (document.fullscreenElement) void document.exitFullscreen();
 
 	setFlag(true);
-	window.scrollTo({ behavior: 'instant', top: 0 });
 
-	document.querySelector<HTMLElement>(shellSelector)?.focus();
+	document.querySelector<HTMLElement>(shellSelector)?.focus({ preventScroll: true });
+
+	if (!matchMedia(atlasPaneMediaQuery).matches) {
+		void moveSheet(true);
+		return;
+	}
+
+	window.scrollTo({ behavior: 'instant', top: 0 });
 }
 
-function closeAtlas() {
-	setFlag(false);
-
-	// In the split, clearing the flag has already turned the pane back into the regular page
-	if (document.documentElement.dataset.atlasPage !== atlasPage.map) return;
-
-	const action = getAtlasExitAction({
-		canGoBack: 'navigation' in globalThis && navigation.canGoBack,
-		homePath: getSitePath(),
-		returnPath: getReturnPath(),
-	});
-
+function runExitAction(action: ReturnType<typeof getAtlasExitAction>) {
 	if (action.type === 'back') {
 		history.back();
 		return;
 	}
 
-	void navigate(action.path, { history: 'replace' });
+	void navigate(action.path, { history: action.type });
 }
 
-// atlas.css clamps the request into `--atlas-pane-width`; the pane's rendered width is the settled value
+async function closeAtlas() {
+	if (isSheetDown()) await moveSheet(false);
+
+	setFlag(false);
+
+	// In the split, clearing the flag has already turned the pane back into the regular page
+	if (document.documentElement.dataset.atlasPage !== atlasPage.map) return;
+
+	runExitAction(
+		getAtlasExitAction({
+			canGoBack: 'navigation' in globalThis && navigation.canGoBack,
+			homePath: getSitePath(),
+			returnPath: getReturnPath(),
+		}),
+	);
+}
+
+async function clearFromWhenFinished(transition: ViewTransition) {
+	await transition.finished;
+
+	delete document.documentElement.dataset.atlasFrom;
+}
+
 export function requestPaneWidth(width: number) {
 	document.documentElement.style.setProperty(atlasPaneSizeProperty, `${String(width)}px`);
 
@@ -148,16 +163,26 @@ export function startAtlasMode() {
 	document.addEventListener(mapFeatureOpenEventName, (event) => {
 		const { url } = event.detail;
 
-		// Another Point of the Location already in the pane
-		if (url === location.pathname) return;
+		if (url === location.pathname) {
+			if (!event.cancelable || !isSheetDown()) return;
+
+			event.preventDefault();
+			void moveSheet(false);
+			return;
+		}
 
 		void navigate(url);
 	});
 
-	matchMedia(atlasPaneMediaQuery).addEventListener('change', updateSplit);
+	matchMedia(atlasPaneMediaQuery).addEventListener('change', () => {
+		setSheetDown(false);
+		updateSplit();
+	});
 
 	document.addEventListener(mapEnterEventName, openAtlas);
-	document.addEventListener(mapExitEventName, closeAtlas);
+	document.addEventListener(mapExitEventName, () => {
+		void closeAtlas();
+	});
 	document.addEventListener(mapExpandEventName, () => {
 		void navigate(getSitePath('atlas'));
 	});
@@ -169,17 +194,19 @@ export function startAtlasMode() {
 		const isMap = incomingRoot.dataset.atlasPage === atlasPage.map;
 		const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty);
 
-		// Visiting the full-screen map turns the mode on
 		if (isMap) storeFlag(true);
 
 		incomingRoot.toggleAttribute('data-atlas', isMap || 'atlas' in root.dataset);
 
 		if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
 
-		// The stylesheet reads where a navigation came from once the root is the incoming page's
-		if (root.dataset.atlasPage) incomingRoot.dataset.atlasFrom = root.dataset.atlasPage;
+		const from = isSheetDown() ? atlasPage.map : root.dataset.atlasPage;
+
+		if (from) incomingRoot.dataset.atlasFrom = from;
 
 		updateHeroSizes(event.newDocument);
+
+		void clearFromWhenFinished(event.viewTransition);
 
 		// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
 		if (!document.querySelector(shellSelector)) return;

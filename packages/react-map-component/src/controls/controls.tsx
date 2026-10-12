@@ -18,8 +18,8 @@ import { useIsMapCanvasInteractive } from '#store/store.ts';
 
 const isFeatureSearchControl = false as boolean;
 
-export const MapControls: FC<Pick<MapComponentProps, 'enterMediaQuery' | 'host'>> =
-	function MapControls({ enterMediaQuery, host }) {
+export const MapControls: FC<Pick<MapComponentProps, 'hasEnterControl' | 'host'>> =
+	function MapControls({ hasEnterControl, host }) {
 		const isCanvasInteractive = useIsMapCanvasInteractive();
 
 		return (
@@ -41,9 +41,7 @@ export const MapControls: FC<Pick<MapComponentProps, 'enterMediaQuery' | 'host'>
 						<FilterControl position="top-left" />
 						{host ? <ExitControl position="top-right" /> : undefined}
 						{host ? <ExpandControl position="top-right" /> : undefined}
-						{enterMediaQuery ? (
-							<EnterControl mediaQuery={enterMediaQuery} position="top-right" />
-						) : undefined}
+						{hasEnterControl ? <EnterControl position="top-right" /> : undefined}
 						{isFeatureSearchControl ? <SearchControl position="top-right" /> : undefined}
 						<MetricsControl position="bottom-left" />
 					</>

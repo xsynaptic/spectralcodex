@@ -524,7 +524,7 @@ button.maplibregl-popup-close-button {
 }
 
 .map-scope-name,
-.map-scope-clear {
+.map-scope-toggle {
 	height: 29px;
 	color: inherit;
 	cursor: pointer;
@@ -543,9 +543,14 @@ button.maplibregl-popup-close-button {
 	text-decoration: none;
 	border-start-end-radius: 0;
 	border-end-end-radius: 0;
+	transition: color 150ms ease-out;
+
+	:where(.map-scope-bar:not([data-active])) & {
+		color: var(--map-color-neutral-400);
+	}
 }
 
-.map-scope-clear {
+.map-scope-toggle {
 	display: flex;
 	flex-shrink: 0;
 	align-items: center;
@@ -559,13 +564,13 @@ button.maplibregl-popup-close-button {
 }
 
 .map-scope-name:focus-visible,
-.map-scope-clear:focus-visible {
+.map-scope-toggle:focus-visible {
 	background-color: rgb(0 0 0 / 5%);
 }
 
 @media (hover: hover) {
 	.map-scope-name:hover,
-	.map-scope-clear:hover {
+	.map-scope-toggle:hover {
 		background-color: rgb(0 0 0 / 5%);
 	}
 }
@@ -611,6 +616,16 @@ button.maplibregl-popup-close-button {
 	pointer-events: none;
 	background-color: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
 	border-radius: 50%;
+	opacity: 0;
+	scale: 0.4;
+	transition:
+		opacity 150ms ease-out,
+		scale 150ms ease-out;
+
+	&[data-active] {
+		opacity: 1;
+		scale: 1;
+	}
 }
 
 .map-ctrl-icon-frame {

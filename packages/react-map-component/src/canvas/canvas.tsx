@@ -9,13 +9,13 @@ import type { MapComponentProps } from '#types.ts';
 import '#canvas/canvas-worker.ts';
 import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
-import { useFeatureOpenEventName } from '#canvas/canvas-feature-open.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
 import { MapScopeBar } from '#canvas/canvas-scope-bar.tsx';
 import { MapTargets } from '#canvas/canvas-targets.tsx';
 import { MapViewProvider } from '#canvas/canvas-view.tsx';
+import { mapFeatureOpenEventName } from '#constants.ts';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
@@ -55,7 +55,7 @@ const MapCanvasContainer: FC<
 	baseMapTheme,
 	bounds,
 	center,
-	enterMediaQuery,
+	hasEnterControl,
 	hash,
 	host,
 	imageServerUrl,
@@ -76,7 +76,7 @@ const MapCanvasContainer: FC<
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
-	const featureOpenEventName = useFeatureOpenEventName(host);
+	const featureOpenEventName = host ? mapFeatureOpenEventName : undefined;
 
 	const canvasEvents = useMapCanvasEvents({ isPopupEnabled: !featureOpenEventName, mapId });
 	const isCanvasInteractive = useIsMapCanvasInteractive();
@@ -110,7 +110,7 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 					version={version}
 				>
-					<MapControls enterMediaQuery={enterMediaQuery} host={host} />
+					<MapControls hasEnterControl={hasEnterControl} host={host} />
 					<MapPopup
 						featureOpenEventName={featureOpenEventName}
 						imageServerUrl={imageServerUrl}

@@ -13,7 +13,8 @@
 	view-transition-name: atlas-map;
 }
 
-.atlas-divider {
+.atlas-divider,
+.atlas-sheet-handle {
 	display: none;
 }
 
@@ -108,8 +109,7 @@
 	opacity: 1;
 }
 
-/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
-@media (width >= theme(--breakpoint-lg)) {
+@media (width >= 64rem) {
 	:root[data-atlas][data-atlas-page='pane'] {
 		/* Percent resolves where the property is used, against a box without the scrollbar gutter that `100vw` counts */
 		--atlas-pane-width: clamp(
@@ -153,6 +153,103 @@
 	}
 }
 
+@media (width < 64rem) {
+	:root[data-atlas][data-atlas-page='pane'] {
+		--atlas-sheet-handle-size: 1.5rem;
+		--atlas-sheet-handle-reach: 0.5rem;
+		--atlas-sheet-rest: calc(100dvh - var(--atlas-sheet-handle-size));
+
+		.atlas-shell {
+			visibility: visible;
+			padding-bottom: var(--atlas-sheet-handle-size);
+		}
+
+		.atlas-shell .maplibregl-ctrl:has(> .maplibregl-ctrl-expand) {
+			display: none;
+		}
+
+		.main-pane {
+			position: relative;
+			z-index: var(--z-index-sheet);
+			background-color: var(--color-body-bg);
+		}
+
+		/* Named only to slide in over the map; between sheets the page crossfades whole, as any page does */
+		&:is([data-atlas-from='map'], [data-atlas-sheet='down']) .atlas-shell {
+			view-transition-name: atlas-map;
+		}
+
+		&[data-atlas-from='map'] .main-pane {
+			view-transition-name: atlas-pane;
+		}
+
+		.atlas-sheet-handle {
+			position: sticky;
+			top: -1px;
+			z-index: var(--z-index-sheet-handle);
+			display: block;
+			height: var(--atlas-sheet-handle-size);
+			margin-bottom: calc(-1 * var(--atlas-sheet-handle-size));
+			transition: background-color 150ms ease-out;
+		}
+
+		.atlas-sheet-handle button::after {
+			position: absolute;
+			inset: 0 0 calc(-1 * var(--atlas-sheet-handle-reach));
+			content: '';
+		}
+
+		&[data-atlas-sheet='down'] .atlas-sheet-handle button::after {
+			inset-block: calc(-1 * var(--atlas-sheet-handle-reach)) 0;
+		}
+
+		.main-pane > header {
+			padding-top: var(--atlas-sheet-handle-size);
+		}
+
+		.atlas-sheet-handle[data-stuck],
+		&[data-atlas-sheet='down'] .atlas-sheet-handle,
+		.main-pane[data-grabbing] > .atlas-sheet-handle {
+			background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
+		}
+
+		&[data-atlas-sheet='down'] .main-pane {
+			translate: 0 var(--atlas-sheet-rest);
+
+			&:not([data-grabbing]) {
+				--atlas-sheet-clip-reach: var(--atlas-sheet-handle-reach);
+
+				background-color: transparent;
+
+				> :not(.atlas-sheet-handle) {
+					visibility: hidden;
+				}
+			}
+		}
+
+		/* Firefox's scroll anchoring follows a translated pane and scrolls the document under it */
+		&:is([data-atlas-sheet='down'], :has(.main-pane[data-grabbing])) {
+			overflow: clip;
+			overflow-anchor: none;
+
+			.main-pane {
+				clip-path: inset(
+					calc(var(--atlas-sheet-fold, 0px) - var(--atlas-sheet-clip-reach, 0px)) 0 0 0
+				);
+			}
+
+			.atlas-sheet-handle {
+				top: 0;
+			}
+
+			.progress-bar,
+			top-button {
+				visibility: hidden;
+			}
+		}
+	}
+}
+
 @media (prefers-reduced-motion: no-preference) {
 	/* The same live map before and after: no crossfade to ghost the old camera */
 	::view-transition-old(atlas-map),
@@ -171,8 +268,7 @@
 	}
 
 	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
-	/* stylelint-disable-next-line media-query-no-invalid -- Tailwind resolves `theme()` at build time */
-	@media (width >= theme(--breakpoint-lg)) {
+	@media (width >= 64rem) {
 		:root[data-atlas]:is(
 				[data-atlas-page='pane']:not([data-atlas-from='pane']),
 				[data-atlas-from='pane']:not([data-atlas-page='pane'])
@@ -188,9 +284,23 @@
 		}
 	}
 
+	@media (width < 64rem) {
+		:root[data-atlas][data-atlas-page='pane'][data-atlas-from='map']::view-transition-new(
+				atlas-pane
+			) {
+			animation: atlas-sheet-enter 250ms ease-out both;
+		}
+	}
+
 	/* Leaving the full-screen map for a page without one resizes nothing, so the map slides away */
 	:root[data-atlas-from='map']::view-transition-old(atlas-map):only-child {
 		animation: atlas-exit-left 150ms ease-out both;
+	}
+}
+
+@keyframes atlas-sheet-enter {
+	from {
+		translate: 0 100vh;
 	}
 }
 

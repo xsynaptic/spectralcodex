@@ -1,5 +1,7 @@
 import type { AtlasPaneLimits } from '#lib/atlas/atlas-pane-factory.ts';
 
+import { atlasPaneSelector } from '#lib/atlas/atlas-constants.ts';
+
 function readPaneTokens() {
 	const style = getComputedStyle(document.documentElement);
 
@@ -25,9 +27,8 @@ export function getPaneTokens() {
 	return paneTokens;
 }
 
-// The pane's rendered width is the value CSS settled on
 export function getPaneWidth() {
-	return document.querySelector('.main-pane')?.getBoundingClientRect().width ?? 0;
+	return document.querySelector(atlasPaneSelector)?.getBoundingClientRect().width ?? 0;
 }
 
 export function getPaneLimits(): AtlasPaneLimits {

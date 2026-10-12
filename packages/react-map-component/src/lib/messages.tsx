@@ -20,6 +20,8 @@ export interface MapMessages {
 	ratingFilterAriaLabel: string;
 	scopeAriaLabel: string;
 	scopeClearAriaLabel: string;
+	scopeOffAriaLabel: string;
+	scopeRestoreAriaLabel: string;
 	searchAriaLabel: string;
 	searchPlaceholder: string;
 	showAll: string;
@@ -43,6 +45,8 @@ const defaultMapMessages: MapMessages = {
 	ratingFilterAriaLabel: 'Minimum rating',
 	scopeAriaLabel: 'Showing only',
 	scopeClearAriaLabel: 'Show all points',
+	scopeOffAriaLabel: 'Showing all points, not only',
+	scopeRestoreAriaLabel: 'Show only these points',
 	searchAriaLabel: 'Search',
 	searchPlaceholder: 'Search text or coordinates...',
 	showAll: 'Show All',

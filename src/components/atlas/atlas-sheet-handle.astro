@@ -1,0 +1,24 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+const t = getTranslations();
+---
+
+<atlas-sheet-handle
+	class="atlas-sheet-handle"
+	data-label-lower={t('atlas.sheet.close.label')}
+	data-label-raise={t('atlas.sheet.open.label')}
+>
+	<button
+		aria-expanded="true"
+		aria-label={t('atlas.sheet.close.label')}
+		class="grid h-full w-full cursor-grab touch-none place-items-center -outline-offset-2"
+		type="button"
+	>
+		<span class="h-1 w-10 rounded-full bg-primary-300 dark:bg-primary-600"></span>
+	</button>
+</atlas-sheet-handle>
+
+<script>
+	import '#components/atlas/atlas-sheet-handle.ts';
+</script>

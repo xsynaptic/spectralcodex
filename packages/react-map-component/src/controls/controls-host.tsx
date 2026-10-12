@@ -13,7 +13,7 @@ import {
 } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useDocumentAttribute } from '#lib/document-attribute.ts';
-import { useMediaQuery } from '#lib/media-query.ts';
+import { MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 
 interface HostControlProps {
@@ -79,13 +79,7 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 			position={position}
 			trackName="map-exit"
 		>
-			<path
-				d="M7 7l10 10M17 7L7 17"
-				fill="none"
-				stroke="currentColor"
-				strokeLinecap="round"
-				strokeWidth="3"
-			/>
+			<MapIconClose />
 		</HostControl>
 	);
 };
@@ -116,14 +110,8 @@ export const ExpandControl: FC<HostControlProps> = function ExpandControl({ posi
 	);
 };
 
-export const EnterControl: FC<HostControlProps & { mediaQuery: string }> = function EnterControl({
-	mediaQuery,
-	position,
-}) {
+export const EnterControl: FC<HostControlProps> = function EnterControl({ position }) {
 	const messages = useMapMessages();
-	const isMatch = useMediaQuery({ query: mediaQuery });
-
-	if (!isMatch) return;
 
 	return (
 		<HostControl

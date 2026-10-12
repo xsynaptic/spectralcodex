@@ -1,11 +1,10 @@
 import type { ClientDirective } from 'astro';
 
-import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
+import { isAtlasMapShown } from '#lib/atlas/atlas-layout-factory.ts';
 
 // Serialized into the `client:atlas` value; a directive takes one string
 export interface AtlasDirectiveOptions {
 	css: string;
-	mediaQuery: string;
 }
 
 // Astro runs a directive again each time a persisted island reconnects, which is every swap
@@ -18,8 +17,7 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	startedIslands.add(element);
 
 	const root = document.documentElement;
-	const { css, mediaQuery } = JSON.parse(options.value) as AtlasDirectiveOptions;
-	const paneQuery = matchMedia(mediaQuery);
+	const { css } = JSON.parse(options.value) as AtlasDirectiveOptions;
 
 	function loadStylesheet() {
 		return new Promise<void>((resolve) => {
@@ -47,21 +45,18 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	const observer = new MutationObserver(hydrateWhenVisible);
 
 	function hydrateWhenVisible() {
-		const layout = getAtlasLayout({
+		const isShown = isAtlasMapShown({
 			hasFlag: Object.hasOwn(root.dataset, 'atlas'),
-			isPaneMatch: paneQuery.matches,
 			page: root.dataset.atlasPage,
 		});
 
-		if (layout === 'regular') return;
+		if (!isShown) return;
 
 		observer.disconnect();
-		paneQuery.removeEventListener('change', hydrateWhenVisible);
 		void hydrate();
 	}
 
 	observer.observe(root, { attributeFilter: ['data-atlas', 'data-atlas-page'], attributes: true });
-	paneQuery.addEventListener('change', hydrateWhenVisible);
 
 	hydrateWhenVisible();
 };

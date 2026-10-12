@@ -22,7 +22,6 @@ export type MapDataConfigurableState = Pick<
 
 export interface MapDataStore extends MapDataState {
 	actions: {
-		clearScope: () => void;
 		hideAllStatusFilter: () => void;
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
@@ -35,7 +34,12 @@ export interface MapDataStore extends MapDataState {
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
 		setRatingFilter: (ratingFilter: number) => void;
-		setScope: (scope: MapScope | undefined, scopeViewKey: string | undefined) => void;
+		setScope: (
+			scope: MapScope | undefined,
+			isScopeEnabled: boolean,
+			scopeViewKey: string | undefined,
+		) => void;
+		setScopeEnabled: (isScopeEnabled: boolean) => void;
 		setSelectedId: (selectedId: string | undefined) => void;
 		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
 		showAllStatusFilter: () => void;
@@ -56,6 +60,7 @@ interface MapDataState {
 	isFilterOpen: boolean;
 	isObjectiveFilterEnabled: boolean;
 	isPopupVisible: boolean;
+	isScopeEnabled: boolean;
 	languages: Array<string>;
 	mapFeaturesRule: MapFeaturesRule | undefined;
 	objectiveFilter: number;
@@ -77,6 +82,7 @@ const defaultMapDataState = {
 	isFilterOpen: false,
 	isObjectiveFilterEnabled: false,
 	isPopupVisible: true,
+	isScopeEnabled: true,
 	languages: ['en'],
 	mapFeaturesRule: undefined,
 	objectiveFilter: 1,
@@ -114,9 +120,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 		return {
 			...state,
 			actions: {
-				clearScope: () => {
-					set({ scope: undefined });
-				},
 				hideAllStatusFilter: () => {
 					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
 				},
@@ -153,8 +156,11 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				setRatingFilter: (ratingFilter) => {
 					setAndClearSelection({ ratingFilter });
 				},
-				setScope: (scope, scopeViewKey) => {
-					set({ scope, scopeViewKey });
+				setScope: (scope, isScopeEnabled, scopeViewKey) => {
+					set({ isScopeEnabled, scope, scopeViewKey });
+				},
+				setScopeEnabled: (isScopeEnabled) => {
+					set({ isScopeEnabled });
 				},
 				setSelectedId: (selectedId) => {
 					// A selection takes the filter panel's place; clearing one leaves the panel as it is

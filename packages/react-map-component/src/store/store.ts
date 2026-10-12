@@ -59,6 +59,8 @@ export const useMapFeaturesRule = () => useMapDataStore((state) => state.mapFeat
 // Scope
 export const useMapStoreScope = () => useMapDataStore((state) => state.scope);
 
+export const useIsMapScopeEnabled = () => useMapDataStore((state) => state.isScopeEnabled);
+
 export const useMapScopeViewKey = () => useMapDataStore((state) => state.scopeViewKey);
 
 // Map language settings

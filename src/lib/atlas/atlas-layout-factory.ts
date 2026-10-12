@@ -6,12 +6,13 @@ export interface AtlasLayoutState {
 	page: string | undefined;
 }
 
-// `/atlas` shows the map at every width; beside a pane it shows only where the pane query matches
-// On any other page a persisted shell stays hidden
-export function getAtlasLayout({ hasFlag, isPaneMatch, page }: AtlasLayoutState) {
-	if (!hasFlag) return 'regular';
-	if (page === atlasPage.map) return 'map';
-	if (isPaneMatch && page === atlasPage.pane) return 'split';
+export function isAtlasMapShown({ hasFlag, page }: Pick<AtlasLayoutState, 'hasFlag' | 'page'>) {
+	return hasFlag && (page === atlasPage.map || page === atlasPage.pane);
+}
 
-	return 'regular';
+export function getAtlasLayout({ hasFlag, isPaneMatch, page }: AtlasLayoutState) {
+	if (!isAtlasMapShown({ hasFlag, page })) return 'regular';
+	if (page === atlasPage.map) return 'map';
+
+	return isPaneMatch ? 'split' : 'sheet';
 }

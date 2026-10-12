@@ -43,29 +43,36 @@ function getViewKey(view: MapView) {
 	return view === noView ? undefined : JSON.stringify(view);
 }
 
-const clear = 'clear';
+const off = 'off';
+const on = 'on';
 
-// Applies each view twice, as a `map:sync` on the same page does; `clear` stands for the X on the Scope bar
-function browse(steps: Array<MapView | typeof clear>) {
-	let state: MapScopeState = { scope: undefined, viewKey: undefined };
+// Applies each view twice, as a `map:sync` on the same page does; `off` and `on` stand for the toggle on the Scope bar
+function browseHeld(steps: Array<MapView | typeof off | typeof on>) {
+	let state: MapScopeState = { isScopeEnabled: true, scope: undefined, viewKey: undefined };
 
 	for (const step of steps) {
-		if (step === clear) {
-			state = { ...state, scope: undefined };
+		if (step === off || step === on) {
+			state = { ...state, isScopeEnabled: step === on };
 			continue;
 		}
 
 		const viewKey = getViewKey(step);
 
 		for (const sync of [1, 2]) {
-			const result = reduceMapScope(state, { view: step, viewKey }, items);
+			const { isSettled, ...result } = reduceMapScope(state, { view: step, viewKey }, items);
 
-			expect(result.isSettled, `sync ${String(sync)}`).toBe(true);
-			state = { scope: result.scope, viewKey };
+			expect(isSettled, `sync ${String(sync)}`).toBe(true);
+			state = { ...result, viewKey };
 		}
 	}
 
-	return state.scope;
+	return { isScopeEnabled: state.isScopeEnabled, scope: state.scope };
+}
+
+function browse(steps: Parameters<typeof browseHeld>[0]) {
+	const { isScopeEnabled, scope } = browseHeld(steps);
+
+	return isScopeEnabled ? scope : undefined;
 }
 
 describe('reduceMapScope', () => {
@@ -97,16 +104,33 @@ describe('reduceMapScope', () => {
 	});
 
 	// Passing the same view again stands for a `map:sync` on that page, not a new visit
-	test('a cleared Scope stays cleared on the page that set it and on a member Location', () => {
-		expect(browse([{ scope: theme }, clear, { scope: theme }])).toBeUndefined();
-		expect(browse([{ scope: theme }, clear, locationView('theater')])).toBeUndefined();
+	test('a Scope turned off stays off on the page that set it and on a member Location', () => {
+		expect(browse([{ scope: theme }, off, { scope: theme }])).toBeUndefined();
+		expect(browse([{ scope: theme }, off, locationView('theater')])).toBeUndefined();
 	});
 
-	test('a cleared Scope is set again by the next visit to its page', () => {
-		expect(browse([{ scope: theme }, clear, locationView('theater'), { scope: theme }])).toBe(
-			theme,
-		);
-		expect(browse([{ scope: theme }, clear, noView, { scope: theme }])).toBe(theme);
+	test('a Scope turned off is held through any Location, so it can be turned on again', () => {
+		const held = { isScopeEnabled: false, scope: theme };
+
+		expect(browseHeld([{ scope: theme }, off, locationView('theater')])).toEqual(held);
+		expect(browseHeld([{ scope: theme }, off, locationView('temple')])).toEqual(held);
+		expect(browseHeld([{ scope: theme }, off, locationView('unmapped'), noView])).toEqual(held);
+		expect(browse([{ scope: theme }, off, locationView('temple'), on])).toBe(theme);
+	});
+
+	test('a Scope turned on again is cleared by the next Location outside it', () => {
+		expect(
+			browseHeld([{ scope: theme }, off, locationView('temple'), on, locationView('mine')]),
+		).toEqual({ isScopeEnabled: true, scope: undefined });
+	});
+
+	test('a Scope turned off is set again by the next visit to its page', () => {
+		expect(browse([{ scope: theme }, off, locationView('theater'), { scope: theme }])).toBe(theme);
+		expect(browse([{ scope: theme }, off, noView, { scope: theme }])).toBe(theme);
+	});
+
+	test('a page that sets a Scope replaces one turned off, and its own is on', () => {
+		expect(browse([{ scope: theme }, off, { scope: region }])).toBe(region);
 	});
 
 	test('a page with no view leaves the Scope untouched', () => {
@@ -115,12 +139,20 @@ describe('reduceMapScope', () => {
 	});
 
 	test('a Location view before source data waits, then decides once the data lands', () => {
-		const state = { scope: region, viewKey: getViewKey({ scope: region }) };
+		const state = { isScopeEnabled: true, scope: region, viewKey: getViewKey({ scope: region }) };
 		const view = locationView('mine');
 		const page = { view, viewKey: getViewKey(view) };
 
-		expect(reduceMapScope(state, page, undefined)).toEqual({ isSettled: false, scope: region });
-		expect(reduceMapScope(state, page, items)).toEqual({ isSettled: true, scope: undefined });
+		expect(reduceMapScope(state, page, undefined)).toEqual({
+			isScopeEnabled: true,
+			isSettled: false,
+			scope: region,
+		});
+		expect(reduceMapScope(state, page, items)).toEqual({
+			isScopeEnabled: true,
+			isSettled: true,
+			scope: undefined,
+		});
 	});
 
 	test('a view that sets a Scope, or finds none in force, never waits on source data', () => {
@@ -128,17 +160,17 @@ describe('reduceMapScope', () => {
 
 		expect(
 			reduceMapScope(
-				{ scope: theme, viewKey: 'theme' },
+				{ isScopeEnabled: true, scope: theme, viewKey: 'theme' },
 				{ view: { scope: region }, viewKey: 'region' },
 				undefined,
 			),
-		).toEqual({ isSettled: true, scope: region });
+		).toEqual({ isScopeEnabled: true, isSettled: true, scope: region });
 		expect(
 			reduceMapScope(
-				{ scope: undefined, viewKey: 'theme' },
+				{ isScopeEnabled: true, scope: undefined, viewKey: 'theme' },
 				{ view, viewKey: getViewKey(view) },
 				undefined,
 			),
-		).toEqual({ isSettled: true, scope: undefined });
+		).toEqual({ isScopeEnabled: true, isSettled: true, scope: undefined });
 	});
 });

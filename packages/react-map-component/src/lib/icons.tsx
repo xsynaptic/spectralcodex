@@ -1,5 +1,29 @@
 import type { FC } from 'react';
 
+export const MapIconAdd: FC = function MapIconAdd() {
+	return (
+		<path
+			d="M12 5v14M5 12h14"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeWidth="3"
+		/>
+	);
+};
+
+export const MapIconClose: FC = function MapIconClose() {
+	return (
+		<path
+			d="M7 7l10 10M17 7L7 17"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeWidth="3"
+		/>
+	);
+};
+
 export const MapIconCopy: FC = function MapIconCopy() {
 	return (
 		<path

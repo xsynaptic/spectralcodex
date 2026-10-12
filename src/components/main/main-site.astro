@@ -3,6 +3,7 @@ import type { MetaProps } from '#components/types.ts';
 import type { AtlasPageProps } from '#lib/map/map-atlas.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
+import AtlasSheetHandle from '#components/atlas/atlas-sheet-handle.astro';
 import Colophon from '#components/main/main-colophon.astro';
 import Document from '#components/main/main-document.astro';
 import Header from '#components/main/main-header.astro';
@@ -22,6 +23,7 @@ const { atlas, hasHeroImage = false, isHomepage = false, meta, schemas } = Astro
 
 <Document atlas={atlas} meta={meta} schemas={schemas}>
 	<div class="main-pane @container/pane flex min-h-screen flex-col">
+		{atlas ? <AtlasSheetHandle /> : undefined}
 		<Header hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
 		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content', tabindex: -1 })}>
 			<slot />

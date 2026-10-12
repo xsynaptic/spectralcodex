@@ -31,7 +31,7 @@ export interface MapComponentProps extends Partial<
 	center?: [number, number];
 	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
 	darkMode?: MapDarkModeOptions | undefined;
-	enterMediaQuery?: string | undefined;
+	hasEnterControl?: boolean | undefined;
 	host?: MapHostOptions | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
@@ -56,8 +56,6 @@ export type MapGeometry = LineString | Point | Polygon;
 
 // Serializable; a persisted island never receives new props and a function cannot cross island serialization
 export interface MapHostOptions {
-	// While this matches a click hands the Feature to the host in place of its popup
-	featureOpenMediaQuery: string;
 	fullscreenContainerId: string;
 }
 
