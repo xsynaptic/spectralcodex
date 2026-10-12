@@ -562,6 +562,10 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		await expect(page.locator('h1')).toBeVisible();
 		expect(new URL(page.url()).pathname).toBe(locationUrl);
 	});
+});
+
+test.describe('a Region sheet on a phone viewport', () => {
+	test.use({ viewport });
 
 	test('a Region sheet sets the Scope, and the bar raises the sheet and turns it off', async ({
 		page,
