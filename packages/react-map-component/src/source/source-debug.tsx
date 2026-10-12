@@ -2,12 +2,11 @@ import type { FeatureCollection } from 'geojson';
 import type { FC } from 'react';
 import type { LineLayerSpecification } from 'react-map-gl/maplibre';
 
+import { tailwindColors } from '@spectralcodex/shared/map';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
-
-import { tailwindColors } from '#lib/tailwind-colors.ts';
 
 export const MapSourceDebug: FC<{ bounds: MapComponentProps['bounds'] }> = function MapSourceDebug({
 	bounds,

@@ -1,18 +1,16 @@
-import type { LocationStatus } from '@spectralcodex/shared/map';
+import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/shared/map';
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 import { memo, useEffect, useId, useRef } from 'react';
 import * as R from 'remeda';
-
-import type { LocationStatusMetadata } from '#lib/location-status.ts';
 
 import { controlFilterId } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { MapIconFilters, MapIconRating } from '#lib/icons.tsx';
-import { locationStatusOrder, LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
 import {

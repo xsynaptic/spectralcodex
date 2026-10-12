@@ -3,13 +3,12 @@ import type { MapGeoJSONFeature } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 
+import { LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map';
 import { useEffect, useMemo, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { LocationStatusRecords } from '#lib/location-status.ts';
-import { tailwindColors } from '#lib/tailwind-colors.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
 

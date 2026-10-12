@@ -1,8 +1,7 @@
-import type { LocationStatus } from '@spectralcodex/shared/map';
+import type { LocationStatus } from '#map/map-locations.ts';
 
-import { LocationStatusEnum } from '@spectralcodex/shared/map';
-
-import { tailwindColors } from '#lib/tailwind-colors.ts';
+import { LocationStatusEnum } from '#map/map-locations.ts';
+import { tailwindColors } from '#map/tailwind-colors.ts';
 
 export interface LocationStatusMetadata {
 	color: string;

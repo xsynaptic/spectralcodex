@@ -2,11 +2,11 @@ import type { FeatureCollection } from 'geojson';
 import type { FC } from 'react';
 import type { FillLayerSpecification, LineLayerSpecification } from 'react-map-gl/maplibre';
 
+import { tailwindColors } from '@spectralcodex/shared/map';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { tailwindColors } from '#lib/tailwind-colors.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
 const emptyFeatureCollection: FeatureCollection<never, never> = {

@@ -1,7 +1,7 @@
-import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import { locationStatusOrder } from '#lib/location-status.ts';
+import { locationStatusOrder } from '#map/location-status.ts';
+import { LocationStatusEnum } from '#map/map-locations.ts';
 
 describe('locationStatusOrder', () => {
 	test('lists every location status exactly once', () => {

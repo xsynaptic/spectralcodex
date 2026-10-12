@@ -2,21 +2,21 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
-import { LocationStatusEnum } from '@spectralcodex/shared/map';
+import {
+	LocationStatusEnum,
+	statusColorArray,
+	statusColorDarkArray,
+	statusStrokeColorArray,
+	statusStrokeColorDarkArray,
+	statusTintColorArray,
+	tailwindColors,
+} from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapSourceFeatureCollection } from '#types.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import {
-	statusColorArray,
-	statusColorDarkArray,
-	statusStrokeColorArray,
-	statusStrokeColorDarkArray,
-	statusTintColorArray,
-} from '#lib/location-status.ts';
-import { tailwindColors } from '#lib/tailwind-colors.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapHoveredId } from '#store/store.ts';
 

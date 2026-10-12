@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import type { LineLayerSpecification } from 'react-map-gl/maplibre';
 
+import { statusColorArray, statusColorDarkArray } from '@spectralcodex/shared/map';
 import { memo } from 'react';
 import { useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
@@ -8,7 +9,6 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapSourceFeatureCollection } from '#types.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { statusColorArray, statusColorDarkArray } from '#lib/location-status.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
 function useMapSourceLinesStyle(): {
