@@ -18,7 +18,9 @@ www.spectralcodex.com {
 spectralcodex.com {
 	import spectralcodex-tls
 	root * /var/www/spectralcodex
-	file_server
+	file_server {
+		precompressed br
+	}
 	encode gzip
 
 	# Scoped to 404: basic_auth fails as a Caddy error, and an unscoped block serves /404.html as a publicly cacheable 401
