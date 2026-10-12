@@ -21,12 +21,16 @@ const emptyTargetIds: Array<string> = [];
 interface MapViewContextValue {
 	// From the page's own view, not the Scope in force, so turning the Scope off does not re-run the camera fit
 	bounds?: MapComponentProps['bounds'] | undefined;
+	hasView: boolean;
 	scope?: MapScope | undefined;
 	scopeHeld?: MapScope | undefined;
 	targetIds: Array<string>;
 }
 
-const MapViewContext = createContext<MapViewContextValue>({ targetIds: emptyTargetIds });
+const MapViewContext = createContext<MapViewContextValue>({
+	hasView: false,
+	targetIds: emptyTargetIds,
+});
 
 const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 	function HostViewProvider({ children, isDev }) {
@@ -58,11 +62,12 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 		const context = useMemo(
 			() => ({
 				bounds: view.scope?.bounds,
+				hasView: viewKey !== undefined,
 				scope: isScopeEnabled ? scope : undefined,
 				scopeHeld: scope,
 				targetIds: view.targetIds ?? emptyTargetIds,
 			}),
-			[isScopeEnabled, scope, view],
+			[isScopeEnabled, scope, view, viewKey],
 		);
 
 		return <MapViewContext.Provider value={context}>{children}</MapViewContext.Provider>;
@@ -72,7 +77,10 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 export const MapViewProvider: FC<
 	PropsWithChildren<Pick<MapComponentProps, 'host' | 'isDev' | 'targetIds'>>
 > = function MapViewProvider({ children, host, isDev, targetIds }) {
-	const view = useMemo(() => ({ targetIds: targetIds ?? emptyTargetIds }), [targetIds]);
+	const view = useMemo(
+		() => ({ hasView: true, targetIds: targetIds ?? emptyTargetIds }),
+		[targetIds],
+	);
 
 	if (host) {
 		return <HostViewProvider isDev={isDev}>{children}</HostViewProvider>;

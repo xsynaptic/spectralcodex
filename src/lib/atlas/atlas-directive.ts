@@ -1,9 +1,8 @@
-import type { MapTrackDetail } from '@spectralcodex/react-map-component';
 import type { ClientDirective } from 'astro';
 
-import { mapTrackEventName } from '@spectralcodex/react-map-component/constants';
+import { trackMap } from '@spectralcodex/react-map-component/track';
 
-import { isAtlasMapShown } from '#lib/atlas/atlas-layout-factory.ts';
+import { readAtlasLayout } from '#lib/atlas/atlas-layout.ts';
 
 // Serialized into the `client:atlas` value; a directive takes one string
 export interface AtlasDirectiveOptions {
@@ -45,11 +44,7 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 
 			await hydrateIsland();
 		} catch (error) {
-			document.dispatchEvent(
-				new CustomEvent<MapTrackDetail>(mapTrackEventName, {
-					detail: { data: { kind: 'hydrate' }, name: 'map-error' },
-				}),
-			);
+			trackMap({ data: { kind: 'hydrate' }, name: 'map-error' });
 
 			throw error;
 		}
@@ -58,12 +53,7 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	const observer = new MutationObserver(hydrateWhenVisible);
 
 	function hydrateWhenVisible() {
-		const isShown = isAtlasMapShown({
-			hasFlag: Object.hasOwn(root.dataset, 'atlas'),
-			page: root.dataset.atlasPage,
-		});
-
-		if (!isShown) return;
+		if (readAtlasLayout() === 'regular') return;
 
 		observer.disconnect();
 		void hydrate();

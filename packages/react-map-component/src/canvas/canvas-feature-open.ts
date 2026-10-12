@@ -1,11 +1,47 @@
 import { useEffect } from 'react';
 
+import type { getSelectionOutcome } from '#canvas/canvas-events-factory.ts';
 import type { MapFeatureOpenDetail } from '#types.ts';
 
-export function useFeatureOpenDispatch(eventName: string | undefined, url: string | undefined) {
-	useEffect(() => {
-		if (!eventName || !url) return;
+import { getSettledClick } from '#canvas/canvas-events-factory.ts';
+import { mapFeatureOpenEventName } from '#constants.ts';
+import { useTrackMap } from '#lib/track-context.tsx';
+import { useMapClickedId, useMapStoreActions } from '#store/store.ts';
 
-		document.dispatchEvent(new CustomEvent<MapFeatureOpenDetail>(eventName, { detail: { url } }));
-	}, [eventName, url]);
+// Point ids are content hashes, so analytics reports the location's URL, which is only known once popup data has loaded
+export function useSettledClick({
+	id,
+	isHosted,
+	isLoading,
+	outcome,
+	url,
+}: {
+	id: string | undefined;
+	isHosted: boolean;
+	isLoading: boolean;
+	outcome: ReturnType<typeof getSelectionOutcome> | undefined;
+	url: string | undefined;
+}) {
+	const clickedId = useMapClickedId();
+	const { setClickedId } = useMapStoreActions();
+	const trackMap = useTrackMap();
+
+	useEffect(() => {
+		const settledClick = getSettledClick({ clickedId, isLoading, outcome, selectedId: id });
+
+		if (!settledClick) return;
+
+		setClickedId(undefined);
+
+		if (!url) return;
+
+		if (settledClick === 'open') {
+			document.dispatchEvent(
+				new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, { detail: { url } }),
+			);
+			return;
+		}
+
+		if (!isHosted) trackMap({ data: { location: url }, name: 'map-popup-open' });
+	}, [clickedId, id, isHosted, isLoading, outcome, setClickedId, trackMap, url]);
 }

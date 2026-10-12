@@ -1,12 +1,11 @@
 import { mapSyncEventName } from '@spectralcodex/react-map-component/constants';
 
-import { requestPaneWidth } from '#lib/atlas/atlas-mode.ts';
 import {
 	clampPaneWidth,
 	getPaneWidthForKey,
 	getPaneWidthRange,
 } from '#lib/atlas/atlas-pane-factory.ts';
-import { getPaneLimits, getPaneWidth } from '#lib/atlas/atlas-pane.ts';
+import { getPaneLimits, getPaneWidth, requestPaneWidth } from '#lib/atlas/atlas-pane.ts';
 
 class AtlasDivider extends HTMLElement {
 	#dragOrigin = 0;

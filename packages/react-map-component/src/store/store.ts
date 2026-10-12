@@ -26,6 +26,8 @@ export function useMapStoreInstance() {
 // Feature state
 export const useMapSelectedId = () => useMapDataStore((state) => state.selectedId);
 
+export const useMapClickedId = () => useMapDataStore((state) => state.clickedId);
+
 export const useIsMapPopupVisible = () => useMapDataStore((state) => state.isPopupVisible);
 
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
@@ -42,8 +44,6 @@ export const useIsMapFilterOpen = () => useMapDataStore((state) => state.isFilte
 export const useMapFilterPosition = () => useMapDataStore((state) => state.filterPosition);
 
 export const useMapStatusFilter = () => useMapDataStore((state) => state.statusFilter);
-
-export const useMapEntryQualityFilter = () => useMapDataStore((state) => state.entryQualityFilter);
 
 export const useMapRatingFilter = () => useMapDataStore((state) => state.ratingFilter);
 

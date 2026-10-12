@@ -29,7 +29,7 @@ describe('createMapStore', () => {
 
 	test('filter changes clear the active selection', () => {
 		const store = createMapStore();
-		const { setEntryQualityFilter, setFilterOpen, setSelectedId, toggleStatusFilter } =
+		const { setFilterOpen, setRatingFilter, setSelectedId, toggleStatusFilter } =
 			store.getState().actions;
 
 		setSelectedId('location-1');
@@ -37,7 +37,7 @@ describe('createMapStore', () => {
 		expect(store.getState().selectedId).toBeUndefined();
 
 		setSelectedId('location-2');
-		setEntryQualityFilter(3);
+		setRatingFilter(3);
 		expect(store.getState().selectedId).toBeUndefined();
 
 		setSelectedId('location-3');
@@ -58,16 +58,13 @@ describe('createMapStore', () => {
 
 	test('a filter setter stores its value, not only the cleared selection', () => {
 		const store = createMapStore();
-		const { setEntryQualityFilter, setFilterOpen, setObjectiveFilter, setRatingFilter } =
-			store.getState().actions;
+		const { setFilterOpen, setObjectiveFilter, setRatingFilter } = store.getState().actions;
 
-		setEntryQualityFilter(3);
 		setObjectiveFilter(4);
 		setRatingFilter(5);
 		setFilterOpen(true);
 
 		expect(store.getState()).toMatchObject({
-			entryQualityFilter: 3,
 			isFilterOpen: true,
 			objectiveFilter: 4,
 			ratingFilter: 5,
@@ -99,6 +96,21 @@ describe('createMapStore', () => {
 		setSelectedId(undefined);
 
 		expect(store.getState().isFilterOpen).toBe(true);
+	});
+
+	test('a click does not outlive the selection it made', () => {
+		const store = createMapStore();
+		const { setClickedId, setRatingFilter, setSelectedId } = store.getState().actions;
+
+		setSelectedId('location-1');
+		setClickedId('location-1');
+		setSelectedId(undefined);
+		expect(store.getState().clickedId).toBeUndefined();
+
+		setSelectedId('location-2');
+		setClickedId('location-2');
+		setRatingFilter(3);
+		expect(store.getState().clickedId).toBeUndefined();
 	});
 
 	test('clearing the selection restores popup visibility', () => {
@@ -148,13 +160,5 @@ describe('hasActiveFilter', () => {
 
 		expect(hasActiveFilter(disabledStore.getState())).toBe(false);
 		expect(hasActiveFilter(enabledStore.getState())).toBe(true);
-	});
-
-	test('the entry quality filter is not counted', () => {
-		const store = createMapStore();
-
-		store.getState().actions.setEntryQualityFilter(3);
-
-		expect(hasActiveFilter(store.getState())).toBe(false);
 	});
 });

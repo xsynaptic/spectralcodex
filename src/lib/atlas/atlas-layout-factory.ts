@@ -6,7 +6,7 @@ export interface AtlasLayoutState {
 	page: string | undefined;
 }
 
-export function isAtlasMapShown({ hasFlag, page }: Pick<AtlasLayoutState, 'hasFlag' | 'page'>) {
+function isAtlasMapShown({ hasFlag, page }: Pick<AtlasLayoutState, 'hasFlag' | 'page'>) {
 	return hasFlag && (page === atlasPage.map || page === atlasPage.pane);
 }
 

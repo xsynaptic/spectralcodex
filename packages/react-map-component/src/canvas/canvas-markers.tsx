@@ -160,11 +160,17 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			setVisible(true);
 		}
 
+		let refreshFrame: number | undefined;
+
 		// Position refresh only; revealing after a zoom is moveend's job
 		function onSourceData(event: { isSourceLoaded: boolean; sourceId: string }) {
-			if (event.sourceId === MapSourceIdEnum.PointCollection && event.isSourceLoaded) {
+			if (event.sourceId !== MapSourceIdEnum.PointCollection || !event.isSourceLoaded) return;
+			if (refreshFrame !== undefined) return;
+
+			refreshFrame = requestAnimationFrame(() => {
+				refreshFrame = undefined;
 				refreshMarkers();
-			}
+			});
 		}
 
 		map.on('zoomstart', hideMarkers);
@@ -177,6 +183,8 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			map.off('zoomstart', hideMarkers);
 			map.off('moveend', showMarkers);
 			map.off('sourcedata', onSourceData);
+
+			if (refreshFrame !== undefined) cancelAnimationFrame(refreshFrame);
 		};
 	}, [map, targetIds, isDark]);
 

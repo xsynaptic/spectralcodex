@@ -1,24 +1,28 @@
-import { atlasPaneSelector } from '#lib/atlas/atlas-constants.ts';
-import { grabSheet, isSheetDown, moveSheet } from '#lib/atlas/atlas-sheet.ts';
+import { trackMap } from '@spectralcodex/react-map-component/track';
 
-const moveViewportShare = 0.2;
+import { atlasSheetAttribute } from '#lib/atlas/atlas-constants.ts';
+import { getSheetRelease } from '#lib/atlas/atlas-sheet-factory.ts';
+import { grabSheet, isSheetDown, isSheetGrabbed, moveSheet } from '#lib/atlas/atlas-sheet.ts';
+
 const tapTolerancePx = 4;
+
+function trackSheetToggle(isDown: boolean) {
+	trackMap({ data: { down: isDown }, name: 'map-sheet-toggle' });
+}
 
 class AtlasSheetHandle extends HTMLElement {
 	#controller: AbortController | undefined;
+	#drag: ReturnType<typeof grabSheet>;
 	#fromX = 0;
 	#fromY = 0;
 	#isDragged = false;
-	#pane: HTMLElement | undefined;
 	#pointerId: number | undefined;
-	#restPx = 0;
 	#travelPx = 0;
 
 	connectedCallback() {
 		const button = this.querySelector('button');
-		const pane = this.closest<HTMLElement>(atlasPaneSelector);
 
-		if (!button || !pane) return;
+		if (!button) return;
 
 		this.#controller = new AbortController();
 
@@ -26,7 +30,7 @@ class AtlasSheetHandle extends HTMLElement {
 
 		const stuckObserver = new IntersectionObserver(
 			([entry]) => {
-				if (!entry || 'grabbing' in pane.dataset || isSheetDown()) return;
+				if (!entry || isSheetGrabbed() || isSheetDown()) return;
 
 				this.toggleAttribute('data-stuck', entry.intersectionRatio < 1);
 			},
@@ -45,7 +49,7 @@ class AtlasSheetHandle extends HTMLElement {
 		const stateObserver = new MutationObserver(updateButton);
 
 		stuckObserver.observe(this);
-		stateObserver.observe(document.documentElement, { attributeFilter: ['data-atlas-sheet'] });
+		stateObserver.observe(document.documentElement, { attributeFilter: [atlasSheetAttribute] });
 		signal.addEventListener('abort', () => {
 			stuckObserver.disconnect();
 			stateObserver.disconnect();
@@ -75,16 +79,14 @@ class AtlasSheetHandle extends HTMLElement {
 		if (this.#pointerId !== undefined || event.button !== 0) return;
 		if (!(event.currentTarget instanceof Element)) return;
 
-		const restPx = isSheetDown() ? this.getBoundingClientRect().top : 0;
-		const pane = grabSheet();
+		const drag = grabSheet();
 
-		if (!pane) return;
+		if (!drag) return;
 
-		this.#pane = pane;
+		this.#drag = drag;
 		this.#pointerId = event.pointerId;
 		this.#fromX = event.clientX;
 		this.#fromY = event.clientY;
-		this.#restPx = restPx;
 		this.#travelPx = 0;
 		this.#isDragged = false;
 
@@ -94,35 +96,37 @@ class AtlasSheetHandle extends HTMLElement {
 	#handlePointerEnd = (event: PointerEvent) => {
 		if (event.pointerId !== this.#pointerId) return;
 
-		const isPast = this.#travelPx >= window.innerHeight * moveViewportShare;
-		const isToggled = event.type === 'pointerup' && (isPast || !this.#isDragged);
-		const isDown = isSheetDown();
+		const isToggled =
+			getSheetRelease({
+				eventType: event.type,
+				isDragged: this.#isDragged,
+				travelPx: this.#travelPx,
+				viewportHeight: window.innerHeight,
+			}) === 'toggle';
+		const isDown = isSheetDown() !== isToggled;
 
+		const isReleased = this.#drag?.release(isDown) ?? false;
+
+		if (isToggled && isReleased) trackSheetToggle(isDown);
+
+		this.#drag = undefined;
 		this.#pointerId = undefined;
-
-		if (isToggled) this.#toggle();
-		else void moveSheet(isDown);
 	};
 
 	#handlePointerMove = (event: PointerEvent) => {
-		if (event.pointerId !== this.#pointerId || !this.#pane) return;
-
-		const maxPx = this.#restPx || Infinity;
-		const offsetPx = Math.min(maxPx, Math.max(0, this.#restPx + event.clientY - this.#fromY));
-
-		this.#travelPx = Math.abs(offsetPx - this.#restPx);
+		if (event.pointerId !== this.#pointerId || !this.#drag) return;
 
 		const pointerPx = Math.hypot(event.clientX - this.#fromX, event.clientY - this.#fromY);
 
 		if (pointerPx > tapTolerancePx) this.#isDragged = true;
 
-		this.#pane.style.translate = `0 ${String(offsetPx)}px`;
+		this.#travelPx = this.#drag.move(event.clientY - this.#fromY);
 	};
 
 	#toggle() {
 		const isDown = !isSheetDown();
 
-		window.umami?.track('map-sheet-toggle', { down: isDown });
+		trackSheetToggle(isDown);
 
 		void moveSheet(isDown);
 	}

@@ -76,9 +76,22 @@ export interface MapFeatureOpenDetail {
 	url: string;
 }
 
+export type MapTrackName =
+	| 'map-enter'
+	| 'map-error'
+	| 'map-exit'
+	| 'map-expand'
+	| 'map-filter-open'
+	| 'map-load'
+	| 'map-popup-open'
+	| 'map-popup-visit'
+	| 'map-scope-toggle'
+	| 'map-sheet-toggle';
+
 export interface MapTrackDetail {
 	data?: Record<string, unknown>;
-	name: string;
+	mapId?: string | undefined;
+	name: MapTrackName;
 }
 
 export interface MapScope extends Pick<MapComponentProps, 'apiDivisionUrl' | 'bounds'> {

@@ -36,4 +36,27 @@ export const MapSelectionFeatureState: FC = function MapSelectionFeatureState() 
 
 		selectedFeatureIdRef.current = selectedId;
 	}, [map, selectedId]);
+
+	// Toggling dark mode replaces the whole style (`styleDiffing` is off), which wipes feature-state
+	useEffect(() => {
+		if (!map || selectedId === undefined) return;
+
+		const target = { id: selectedId, source: MapSourceIdEnum.PointCollection };
+
+		const onStyleData = () => {
+			if (!map.getSource(target.source)) return;
+
+			const state = map.getFeatureState(target) as { select?: boolean };
+
+			if (state.select === true) return;
+
+			map.setFeatureState(target, { select: true });
+		};
+
+		map.on('styledata', onStyleData);
+
+		return () => {
+			map.off('styledata', onStyleData);
+		};
+	}, [map, selectedId]);
 };

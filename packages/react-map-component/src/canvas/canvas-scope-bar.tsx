@@ -6,13 +6,14 @@ import { useMapView } from '#canvas/canvas-view.tsx';
 import { mapFeatureOpenEventName } from '#constants.ts';
 import { MapIconAdd, MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
-import { trackMap } from '#lib/track.ts';
+import { useTrackMap } from '#lib/track-context.tsx';
 import { useMapStoreActions } from '#store/store.ts';
 
 export const MapScopeBar: FC = function MapScopeBar() {
 	const { scope, scopeHeld } = useMapView();
 	const { setScopeEnabled } = useMapStoreActions();
 	const messages = useMapMessages();
+	const trackMap = useTrackMap();
 
 	if (!scopeHeld) return;
 

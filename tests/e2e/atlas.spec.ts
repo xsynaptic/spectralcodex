@@ -317,6 +317,44 @@ test.describe('on a wide viewport', () => {
 		await expect(root).toHaveAttribute('data-atlas');
 		await expect(separator).toHaveAttribute('aria-valuenow', chosenWidth);
 	});
+
+	test("a click on the open Location's own Point is spent on its popup", async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request);
+		const shell = page.locator('.atlas-shell');
+
+		await visit(page, atlasPath);
+		await expect(shell.locator('canvas.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
+		await openFromMap(page, locationUrl);
+
+		const box = await shell.locator('.maplibregl-marker').first().boundingBox();
+
+		if (!box) throw new Error('The Target has no marker to click');
+
+		await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+		await expect(shell.locator('.maplibregl-popup .map-popup-title')).toBeVisible();
+
+		await page.evaluate((eventName) => {
+			const opened = { count: 0 };
+
+			document.addEventListener(eventName, () => {
+				opened.count += 1;
+			});
+			Object.assign(globalThis, { opened });
+		}, mapFeatureOpenEventName);
+
+		await page.locator(`.main-pane a[href="${paths.locationsIndex}"]`).first().click();
+		await page.waitForURL(`**${paths.locationsIndex}`);
+		await expect(shell).toBeHidden();
+		await page.waitForTimeout(500);
+
+		expect(
+			await page.evaluate(() => (globalThis as { opened?: { count: number } }).opened?.count),
+		).toBe(0);
+		expect(new URL(page.url()).pathname).toBe(paths.locationsIndex);
+	});
 });
 
 test.describe('a sheet on a phone viewport', () => {
@@ -404,6 +442,37 @@ test.describe('a sheet on a phone viewport', () => {
 			expect(new URL(page.url()).pathname).toBe(locationUrl);
 		},
 	);
+
+	test('a slide still running when the split takes over leaves no sheet behind', async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const pane = page.locator('.main-pane');
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await openSettledSheet(page, locationUrl);
+		await handle.press('Enter');
+
+		const slowedCount = await pane.evaluate((element) => {
+			const moves = element.getAnimations();
+
+			for (const move of moves) move.playbackRate = 0.05;
+
+			return moves.length;
+		});
+
+		expect(slowedCount).toBe(1);
+
+		await page.setViewportSize({ height: 800, width: 1280 });
+
+		await expect.poll(() => pane.evaluate((element) => element.getAnimations().length)).toBe(0);
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(pane).not.toHaveAttribute('data-grabbing');
+		expect(await pane.evaluate((element) => element.style.translate)).toBe('');
+		expect(await root.evaluate((element) => element.style.cssText)).not.toContain('sheet-fold');
+	});
 });
 
 test.describe('a sheet and its map on a phone viewport', () => {

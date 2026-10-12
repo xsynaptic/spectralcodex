@@ -14,6 +14,7 @@ import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { locationStatusOrder, LocationStatusRecords } from '#lib/location-status.ts';
 import { useMapMessages } from '#lib/messages.tsx';
+import { useTrackMap } from '#lib/track-context.tsx';
 import {
 	useHasMapActiveFilter,
 	useHasMapChineseLabels,
@@ -111,7 +112,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 	PropsWithChildren<{
 		onClick: () => void;
 	}>
-> = memo(function MapFilterStatusShowHideMenuItem({ children, onClick }) {
+> = function MapFilterStatusShowHideMenuItem({ children, onClick }) {
 	return (
 		<MapFilterMenuItem>
 			<button className="map-filter-button" onClick={onClick}>
@@ -120,7 +121,7 @@ const MapFilterStatusShowHideMenuItem: FC<
 			</button>
 		</MapFilterMenuItem>
 	);
-});
+};
 
 const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 	const isShowChinese = useHasMapChineseLabels();
@@ -276,6 +277,7 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 	const isFilterOpen = useIsMapFilterOpen();
 	const hasActiveFilter = useHasMapActiveFilter();
 	const messages = useMapMessages();
+	const trackMap = useTrackMap();
 
 	const { setFilterOpen } = useMapStoreActions();
 
@@ -321,11 +323,13 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					disabled={isLoading}
 					id={controlFilterId}
 					onClick={() => {
-						if (!isLoading) setFilterOpen(!isFilterOpen);
+						if (isLoading) return;
+						if (!isFilterOpen) trackMap({ name: 'map-filter-open' });
+
+						setFilterOpen(!isFilterOpen);
 					}}
 					ref={buttonRef}
 					type="button"
-					{...(isFilterOpen ? {} : { 'data-umami-event': 'map-filter-open' })}
 				>
 					<span className="map-ctrl-icon-frame">
 						<svg

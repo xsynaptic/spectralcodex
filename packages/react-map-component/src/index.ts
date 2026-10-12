@@ -8,5 +8,6 @@ export type {
 	MapHostOptions,
 	MapScope,
 	MapTrackDetail,
+	MapTrackName,
 	MapView,
 } from '#types.ts';

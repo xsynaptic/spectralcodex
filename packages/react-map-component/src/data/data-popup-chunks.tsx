@@ -3,7 +3,7 @@ import type { FC, ReactNode } from 'react';
 
 import { MapPopupItemSchema } from '@spectralcodex/map-codec';
 import { useQuery } from '@tanstack/react-query';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 
 import { fetchTimeoutMs } from '#constants.ts';
 
@@ -21,11 +21,9 @@ const ChunkConfigContext = createContext<ChunkConfig>({
 
 export const ChunkConfigProvider: FC<ChunkConfig & { children: ReactNode }> =
 	function ChunkConfigProvider({ children, chunkUrlBase, isDev, version }) {
-		return (
-			<ChunkConfigContext.Provider value={{ chunkUrlBase, isDev, version }}>
-				{children}
-			</ChunkConfigContext.Provider>
-		);
+		const value = useMemo(() => ({ chunkUrlBase, isDev, version }), [chunkUrlBase, isDev, version]);
+
+		return <ChunkConfigContext.Provider value={value}>{children}</ChunkConfigContext.Provider>;
 	};
 
 // Fetch and cache a popup chunk, keyed by URL so browsing warms chunks shared across maps

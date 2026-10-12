@@ -18,7 +18,6 @@ export interface MapCanvasRules {
 }
 
 export interface MapFilterState {
-	entryQuality: number;
 	objective: number;
 	// Shown whatever the rest of the filter says
 	pinnedIds?: ReadonlyArray<string>;
@@ -71,7 +70,6 @@ export function isLocationVisible(
 ): boolean {
 	if (filter.pinnedIds?.includes(properties.id)) return true;
 	if (filter.status.includes(properties.status)) return false;
-	if (properties.entryQuality < filter.entryQuality) return false;
 	if (properties.rating < filter.rating) return false;
 	return properties.objective === undefined || properties.objective >= filter.objective;
 }

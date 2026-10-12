@@ -7,7 +7,6 @@ import type { MapFeaturesRule, MapScope } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
-	| 'entryQualityFilter'
 	| 'hoveredId'
 	| 'isCanvasInteractive'
 	| 'isFilterOpen'
@@ -26,7 +25,6 @@ export interface MapDataStore extends MapDataState {
 		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
 		setClickedId: (clickedId: string | undefined) => void;
-		setEntryQualityFilter: (entryQualityFilter: number) => void;
 		setFilterOpen: (isFilterOpen: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
 		setHoveredId: (hoveredId: string | undefined) => void;
@@ -52,7 +50,6 @@ type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
 interface MapDataState {
 	// Set by a user's click only, so programmatic selections stay out of analytics
 	clickedId: string | undefined;
-	entryQualityFilter: number;
 	filterPosition: DOMCoordinates | undefined;
 	hoveredId: string | undefined;
 	isCanvasInteractive: boolean;
@@ -74,7 +71,6 @@ interface MapDataState {
 
 const defaultMapDataState = {
 	clickedId: undefined,
-	entryQualityFilter: 1,
 	filterPosition: undefined,
 	hoveredId: undefined,
 	isCanvasInteractive: true,
@@ -93,7 +89,6 @@ const defaultMapDataState = {
 	statusFilter: [],
 } satisfies MapDataState;
 
-// `entryQualityFilter` has no control, so it never leaves its default
 export function hasActiveFilter({
 	isObjectiveFilterEnabled,
 	objectiveFilter,
@@ -114,7 +109,7 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 	return createStore<MapDataStore>()((set, get) => {
 		// filter interactions clear the active selection so its popup doesn't linger
 		const setAndClearSelection = (partial: Partial<MapDataState>) => {
-			set({ selectedId: undefined, ...partial });
+			set({ clickedId: undefined, selectedId: undefined, ...partial });
 		};
 
 		return {
@@ -131,9 +126,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setClickedId: (clickedId) => {
 					set({ clickedId });
-				},
-				setEntryQualityFilter: (entryQualityFilter) => {
-					setAndClearSelection({ entryQualityFilter });
 				},
 				setFilterOpen: (isFilterOpen) => {
 					setAndClearSelection({ isFilterOpen });
@@ -166,7 +158,9 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 					// A selection takes the filter panel's place; clearing one leaves the panel as it is
 					set({
 						selectedId,
-						...(selectedId === undefined ? { isPopupVisible: true } : { isFilterOpen: false }),
+						...(selectedId === undefined
+							? { clickedId: undefined, isPopupVisible: true }
+							: { isFilterOpen: false }),
 					});
 				},
 				setStatusFilter: (statusFilter) => {

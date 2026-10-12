@@ -1,6 +1,6 @@
 import type { FC, PropsWithChildren } from 'react';
 
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useDeferredValue, useMemo } from 'react';
 
 import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
 
@@ -8,7 +8,6 @@ import { getHiddenTargetIds, getMapCanvasData } from '#canvas/canvas-data-filter
 import { useMapView } from '#canvas/canvas-view.tsx';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
-	useMapEntryQualityFilter,
 	useMapFeaturesRule,
 	useMapObjectiveFilter,
 	useMapRatingFilter,
@@ -24,16 +23,14 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const { data: sourceData } = useSourceDataQuery();
 
 	const status = useMapStatusFilter();
-	const entryQuality = useMapEntryQualityFilter();
 	const rating = useMapRatingFilter();
 	const objective = useMapObjectiveFilter();
 	const mapFeaturesRule = useMapFeaturesRule();
 	const { scope, targetIds } = useMapView();
 	const scopeRule = scope?.rule;
 
-	const filter = useMemo(
-		() => ({ entryQuality, objective, rating, status }),
-		[entryQuality, objective, rating, status],
+	const filter = useDeferredValue(
+		useMemo(() => ({ objective, rating, status }), [objective, rating, status]),
 	);
 
 	// A string, so a new Target the filter does not hide leaves the collections and their clusters untouched

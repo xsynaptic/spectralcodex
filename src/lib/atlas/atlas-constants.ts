@@ -18,3 +18,7 @@ export const atlasPaneSizeProperty = '--atlas-pane-size';
 export const atlasPaneMediaQuery = '(width >= 64rem)';
 
 export const atlasSheetFoldProperty = '--atlas-sheet-fold';
+
+export const atlasSheetAttribute = 'data-atlas-sheet';
+export const atlasSheetDown = 'down';
+export const atlasSheetGrabbingAttribute = 'data-grabbing';

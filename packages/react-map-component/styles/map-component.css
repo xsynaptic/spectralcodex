@@ -67,7 +67,7 @@ button.maplibregl-popup-close-button {
 	border-bottom-left-radius: 3px;
 	mix-blend-mode: difference;
 
-	@media (width <= 639px) {
+	.map-popup-narrow & {
 		width: 25px;
 		height: 25px;
 		font-size: 18px;

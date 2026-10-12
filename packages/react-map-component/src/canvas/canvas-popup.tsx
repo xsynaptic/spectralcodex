@@ -1,50 +1,30 @@
-import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
+import type { LngLat } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { LngLat } from 'maplibre-gl';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import { useFeatureOpenDispatch } from '#canvas/canvas-feature-open.ts';
-import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { mediaQueryMobile } from '#constants.ts';
-import { useChunkPopup } from '#data/data-popup-chunks.tsx';
-import { usePopupDataQuery } from '#data/data-popup.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
-import { useMediaQuery } from '#lib/media-query.ts';
-import { useMapMessages } from '#lib/messages.tsx';
-import { trackMap } from '#lib/track.ts';
+import type { MapPopupItemExtended } from '#canvas/canvas-popup-hooks.ts';
+
+import { getSelectionOutcome } from '#canvas/canvas-events-factory.ts';
+import { useSettledClick } from '#canvas/canvas-feature-open.ts';
+import { MapCanvasLoading } from '#canvas/canvas-loading.tsx';
 import {
-	useIsMapPopupVisible,
-	useMapHoveredId,
-	useMapSelectedId,
-	useMapStoreActions,
-	useMapStoreInstance,
-} from '#store/store.ts';
-
-type MapPopupItemExtended = MapPopupItem & {
-	objective: number | undefined;
-	popupCoordinates: LngLat;
-	precision: number;
-};
-
-const defaultPopupItem = {
-	description: undefined,
-	googleMapsUrl: undefined,
-	id: 'default',
-	image: undefined,
-	objective: undefined,
-	popupCoordinates: new LngLat(0, 0),
-	precision: 1,
-	safety: undefined,
-	title: 'Untitled',
-	titleMultilingualLang: undefined,
-	titleMultilingualValue: undefined,
-	url: undefined,
-	wikipediaUrl: undefined,
-} satisfies MapPopupItemExtended;
+	getPopupImageSizes,
+	getPopupImageSrc,
+	getPopupImageSrcSet,
+} from '#canvas/canvas-popup-factory.ts';
+import {
+	useMapCanvasPopup,
+	useMapImagePreload,
+	useMapPopupLayout,
+	useSourceDataIndex,
+} from '#canvas/canvas-popup-hooks.ts';
+import { useMapTargetIds } from '#canvas/canvas-view.tsx';
+import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
+import { useMapMessages } from '#lib/messages.tsx';
+import { useTrackMap } from '#lib/track-context.tsx';
+import { useIsMapPopupVisible, useMapStoreActions } from '#store/store.ts';
 
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
 function getGoogleMapsHref(value: string) {
@@ -62,231 +42,16 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	return url.href;
 }
 
-function getPopupCoordinates({ geometry }: MapSourceItem): LngLat {
-	switch (geometry.type) {
-		case GeometryTypeEnum.LineString: {
-			const coordinates = geometry.coordinates as Array<[number, number]>;
-
-			if (!coordinates[0]) return new LngLat(0, 0);
-
-			const [lng, lat] = coordinates[0];
-
-			return new LngLat(lng, lat);
-		}
-
-		case GeometryTypeEnum.Point: {
-			const [lng, lat] = geometry.coordinates as [number, number];
-
-			return new LngLat(lng, lat);
-		}
-
-		case GeometryTypeEnum.Polygon: {
-			const coordinates = geometry.coordinates as Array<Array<[number, number]>>;
-
-			if (!coordinates[0]) return new LngLat(0, 0);
-			if (!coordinates[0][0]) return new LngLat(0, 0);
-
-			const [lng, lat] = coordinates[0][0];
-
-			return new LngLat(lng, lat);
-		}
-
-		default: {
-			console.warn(`[Map] Unsupported geometry type for popup:`, geometry);
-
-			return new LngLat(0, 0);
-		}
-	}
-}
-
-function getPopupImageSizes(isMobile: boolean): string {
-	return isMobile ? '(min-width: 300px) 300px, 80vw' : '(min-width: 350px) 350px, 80vw';
-}
-
-// Display src is the first (smallest) srcSet candidate, stripped of its width descriptor
-function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
-	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
-}
-
-function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
-	return srcSet
-		.split(', ')
-		.map((entry) => `${imageServerUrl}${entry}`)
-		.join(', ');
-}
-
 function getWikipediaHref(value: string) {
 	return value.includes('https://') ? value : `https://${value}`;
 }
 
-// Preload a point's popup image once the pointer dwells over it, so it is cached before the popup opens
-const mapImagePreloadDelayMs = 100;
-
-function findPopupImageSrcSet(
-	popupSource: Array<MapPopupItem> | undefined,
-	id: string,
-): string | undefined {
-	// Clusters have no popup entry of their own
-	if (id.startsWith('cluster-')) return undefined;
-
-	return popupSource?.find((item) => item.id === id)?.image?.srcSet;
-}
-
-function useDebouncedValue<T>(value: T, delayMs: number): T {
-	const [debouncedValue, setDebouncedValue] = useState(value);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebouncedValue(value);
-		}, delayMs);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [value, delayMs]);
-
-	return debouncedValue;
-}
-
-// Popup data is incomplete; we assemble some props from source data, the rest from chunks fetched on demand
-function useMapCanvasPopup() {
-	const selectedId = useMapSelectedId();
-
-	const sourceDataIndex = useSourceDataIndex();
-	const inlinePopupQuery = usePopupDataQuery();
-	const inlinePopupData = inlinePopupQuery.data;
-
-	const selectedSourceItem = selectedId ? sourceDataIndex.get(selectedId) : undefined;
-
-	// A chunk key means the popup comes from a chunk; its absence means an inline popup (objectives/MDX)
-	const chunkKey = selectedSourceItem?.properties.chunkKey;
-	const chunkQuery = useChunkPopup(chunkKey);
-
-	const isLoading = (chunkKey ? chunkQuery : inlinePopupQuery).isLoading;
-
-	const popupItem = useMemo(() => {
-		if (!selectedId) return;
-
-		const popupSource = chunkKey ? chunkQuery.data : inlinePopupData;
-
-		return {
-			...defaultPopupItem,
-			// Seed the title from source data so a failed chunk fetch degrades to a title-only popup
-			...(selectedSourceItem ? { title: selectedSourceItem.properties.title } : {}),
-			...popupSource?.find((item) => item.id === selectedId),
-			...(selectedSourceItem
-				? {
-						objective: selectedSourceItem.properties.objective,
-						popupCoordinates: getPopupCoordinates(selectedSourceItem),
-						precision: selectedSourceItem.properties.precision,
-					}
-				: {}),
-		} satisfies MapPopupItemExtended;
-	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, selectedSourceItem]);
-
-	return { isLoading, popupItem };
-}
-
-function useMapImagePreload({
-	imageServerUrl,
-	isEnabled,
-}: {
-	imageServerUrl: string;
-	isEnabled: boolean;
-}) {
-	const hoveredId = useMapHoveredId();
-	const sourceDataIndex = useSourceDataIndex();
-	const { data: inlinePopupData } = usePopupDataQuery();
-	const isMobile = useMediaQuery({ below: mediaQueryMobile });
-
-	// Debounce so sweeping a dense cluster doesn't fire a chunk request per point crossed
-	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
-
-	const hoveredSourceItem = debouncedHoveredId
-		? sourceDataIndex.get(debouncedHoveredId)
-		: undefined;
-	const hoverChunkKey = hoveredSourceItem?.properties.chunkKey;
-	const { data: hoverChunkData } = useChunkPopup(hoverChunkKey);
-
-	const preloadedRef = useRef<Set<string>>(new Set());
-
-	useEffect(() => {
-		if (!isEnabled || !hoveredId || preloadedRef.current.has(hoveredId)) return;
-
-		const srcSet = findPopupImageSrcSet(
-			hoverChunkKey ? hoverChunkData : inlinePopupData,
-			hoveredId,
-		);
-
-		if (!srcSet) return;
-
-		const timer = setTimeout(() => {
-			preloadedRef.current.add(hoveredId);
-
-			// Setting srcset/sizes on a detached image runs the same responsive selection as the popup and warms the cache
-			const preloadImage = new Image();
-
-			preloadImage.sizes = getPopupImageSizes(isMobile);
-			preloadImage.srcset = getPopupImageSrcSet(srcSet, imageServerUrl);
-		}, mapImagePreloadDelayMs);
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [
-		hoveredId,
-		hoverChunkKey,
-		inlinePopupData,
-		hoverChunkData,
-		imageServerUrl,
-		isEnabled,
-		isMobile,
-	]);
-}
-
-// A point id is a content hash, so analytics takes the location's url, known only once popup data lands
-function usePopupOpenTracking({
-	isEnabled,
-	isLoading,
-	popupItem,
-}: {
-	isEnabled: boolean;
-	isLoading: boolean;
-	popupItem: MapPopupItemExtended | undefined;
-}) {
-	const mapStoreInstance = useMapStoreInstance();
-	const { setClickedId } = useMapStoreActions();
-
-	const id = popupItem?.id;
-	const url = popupItem?.url;
-
-	useEffect(() => {
-		if (!isEnabled || isLoading || !id) return;
-		if (mapStoreInstance.getState().clickedId !== id) return;
-
-		setClickedId(undefined);
-
-		if (!url) return;
-
-		trackMap({ data: { location: url }, name: 'map-popup-open' });
-	}, [id, isEnabled, isLoading, mapStoreInstance, setClickedId, url]);
-}
-
-// Index by id so hover/selection lookups avoid an O(n) scan per render
-function useSourceDataIndex(): Map<string, MapSourceItem> {
-	const { data: sourceData } = useSourceDataQuery();
-
-	return useMemo(() => {
-		const index = new Map<string, MapSourceItem>();
-
-		if (sourceData) {
-			for (const item of sourceData) {
-				index.set(item.properties.id, item);
-			}
-		}
-
-		return index;
-	}, [sourceData]);
+async function copyToClipboard(value: string) {
+	try {
+		await navigator.clipboard.writeText(value);
+	} catch {
+		console.warn('[Map] Could not copy coordinates!');
+	}
 }
 
 const MapPopupFooter: FC<{
@@ -303,7 +68,7 @@ const MapPopupFooter: FC<{
 			<button
 				className="map-popup-coord"
 				onClick={() => {
-					void navigator.clipboard.writeText(coordinatesString);
+					void copyToClipboard(coordinatesString);
 				}}
 				type="button"
 			>
@@ -379,8 +144,15 @@ const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision(
 
 const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 	function MapPopupTitleText({ title, url }) {
+		const trackMap = useTrackMap();
+
 		return url ? (
-			<a data-umami-event="map-popup-visit" data-umami-event-location={url} href={url}>
+			<a
+				href={url}
+				onClick={() => {
+					trackMap({ data: { location: url }, name: 'map-popup-visit' });
+				}}
+			>
 				{title}
 			</a>
 		) : (
@@ -393,7 +165,7 @@ const MapPopupContent: FC<{
 	isDev: boolean | undefined;
 	popupItem: MapPopupItemExtended;
 }> = function MapPopupContent({ imageServerUrl, isDev, popupItem }) {
-	const isMobile = useMediaQuery({ below: mediaQueryMobile });
+	const { maxWidthPx } = useMapPopupLayout();
 	const messages = useMapMessages();
 
 	const {
@@ -417,7 +189,7 @@ const MapPopupContent: FC<{
 						alt={title}
 						className="map-popup-image"
 						loading="eager"
-						sizes={getPopupImageSizes(isMobile)}
+						sizes={getPopupImageSizes(maxWidthPx)}
 						src={getPopupImageSrc(image.srcSet, imageServerUrl)}
 						srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
 					/>
@@ -455,17 +227,9 @@ const MapPopupContent: FC<{
 	);
 };
 
-const popupPlacementMobile = {
-	anchor: 'top',
-	maxWidth: `calc(min(300px, 80vw))`,
-	offset: 10,
-} as const;
+const popupPlacementNarrow = { anchor: 'top', offset: 10 } as const;
 
-const popupPlacementDesktop = {
-	anchor: 'left',
-	maxWidth: `calc(min(350px, 80vw))`,
-	offset: 16,
-} as const;
+const popupPlacementWide = { anchor: 'left', offset: 16 } as const;
 
 const MapPopupFrame: FC<{
 	imageServerUrl: string;
@@ -475,8 +239,8 @@ const MapPopupFrame: FC<{
 }> = function MapPopupFrame({ imageServerUrl, isDev, isLoading, popupItem }) {
 	const isPopupVisible = useIsMapPopupVisible();
 
-	const isMobile = useMediaQuery({ below: mediaQueryMobile });
-	const popupPlacement = isMobile ? popupPlacementMobile : popupPlacementDesktop;
+	const { isNarrow, maxWidthPx } = useMapPopupLayout();
+	const popupPlacement = isNarrow ? popupPlacementNarrow : popupPlacementWide;
 
 	const { setSelectedId } = useMapStoreActions();
 
@@ -493,7 +257,9 @@ const MapPopupFrame: FC<{
 			latitude={popupItem.popupCoordinates.lat}
 			longitude={popupItem.popupCoordinates.lng}
 			{...popupPlacement}
+			className={isNarrow ? 'map-popup-narrow' : ''}
 			closeOnClick={false}
+			maxWidth={`${String(maxWidthPx)}px`}
 			onClose={onClose}
 			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
 		>
@@ -517,31 +283,37 @@ const MapPopupFrame: FC<{
 };
 
 export const MapPopup: FC<{
-	featureOpenEventName?: string | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
-}> = function MapPopup({ featureOpenEventName, imageServerUrl = '', isDev }) {
-	const { isLoading, popupItem } = useMapCanvasPopup();
+	isHosted: boolean;
+}> = function MapPopup({ imageServerUrl = '', isDev, isHosted }) {
+	const sourceDataIndex = useSourceDataIndex();
+	const { isLoading, popupItem } = useMapCanvasPopup(sourceDataIndex);
 	const targetIds = useMapTargetIds();
 
-	useMapImagePreload({ imageServerUrl, isEnabled: !featureOpenEventName });
-	useFeatureOpenDispatch(featureOpenEventName, popupItem?.url);
-	usePopupOpenTracking({ isEnabled: !featureOpenEventName, isLoading, popupItem });
+	const outcome = popupItem
+		? getSelectionOutcome({
+				isHosted,
+				isLoading,
+				isTarget: targetIds.includes(popupItem.id),
+				url: popupItem.url,
+			})
+		: undefined;
 
-	if (!popupItem) return;
-
-	// A Feature with no page of its own still gets its popup
-	// So does a Point of the Location already open, since clicking it has nowhere to navigate
-	if (featureOpenEventName && !targetIds.includes(popupItem.id) && (isLoading || popupItem.url)) {
-		return;
-	}
+	useMapImagePreload({ imageServerUrl, isEnabled: !isHosted, sourceDataIndex });
+	useSettledClick({ id: popupItem?.id, isHosted, isLoading, outcome, url: popupItem?.url });
 
 	return (
-		<MapPopupFrame
-			imageServerUrl={imageServerUrl}
-			isDev={isDev}
-			isLoading={isLoading}
-			popupItem={popupItem}
-		/>
+		<>
+			{popupItem && outcome === 'popup' ? (
+				<MapPopupFrame
+					imageServerUrl={imageServerUrl}
+					isDev={isDev}
+					isLoading={isLoading}
+					popupItem={popupItem}
+				/>
+			) : undefined}
+			<MapCanvasLoading isSelectionPending={outcome === 'pending'} />
+		</>
 	);
 };

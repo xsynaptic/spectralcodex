@@ -6,6 +6,7 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./constants": "./src/constants.ts",
+		"./track": "./src/lib/track.ts",
 		"./styles/map-component.css": "./styles/map-component.css"
 	},
 	"imports": {

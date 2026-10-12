@@ -1,18 +1,14 @@
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import {
-	mapEnterEventName,
-	mapExitEventName,
-	mapExpandEventName,
-	mapSyncEventName,
-	mapViewAttribute,
-} from '#constants.ts';
+import type { MapTrackName } from '#types.ts';
+
+import { useMapView } from '#canvas/canvas-view.tsx';
+import { mapEnterEventName, mapExitEventName, mapExpandEventName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
-import { useDocumentAttribute } from '#lib/document-attribute.ts';
 import { MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
-import { trackMap } from '#lib/track.ts';
+import { useTrackMap } from '#lib/track-context.tsx';
 
 interface HostControlProps {
 	position: ControlPosition;
@@ -24,7 +20,7 @@ const HostControl: FC<
 			className: string;
 			eventName: string;
 			label: string;
-			trackName: string;
+			trackName: MapTrackName;
 			viewBox?: string | undefined;
 		}
 	>
@@ -37,6 +33,8 @@ const HostControl: FC<
 	trackName,
 	viewBox = '0 0 24 24',
 }) {
+	const trackMap = useTrackMap();
+
 	return (
 		<CustomControlPortal position={position}>
 			<button
@@ -82,9 +80,9 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 
 export const ExpandControl: FC<HostControlProps> = function ExpandControl({ position }) {
 	const messages = useMapMessages();
-	const view = useDocumentAttribute(mapViewAttribute, mapSyncEventName);
+	const { hasView } = useMapView();
 
-	if (!view) return;
+	if (!hasView) return;
 
 	return (
 		<HostControl

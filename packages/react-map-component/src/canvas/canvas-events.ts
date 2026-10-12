@@ -12,12 +12,17 @@ import * as R from 'remeda';
 
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
 
-import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
+import {
+	decideClickActions,
+	decideHoverIntent,
+	getSelectionOutcome,
+} from '#canvas/canvas-events-factory.ts';
+import { getPopupLayout } from '#canvas/canvas-popup-factory.ts';
 import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { controlFilterId, mediaQueryMobile } from '#constants.ts';
+import { controlFilterId } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useMediaQuery } from '#lib/media-query.ts';
-import { trackMap, trackMapErrorOnce } from '#lib/track.ts';
+import { useTrackMap } from '#lib/track-context.tsx';
+import { trackMapErrorOnce } from '#lib/track.ts';
 import { mapQueryableLayerIds, MapSourceIdEnum } from '#source/source-config.ts';
 import { writeSavedViewport } from '#store/store-viewport.ts';
 import {
@@ -97,10 +102,10 @@ const onMouseDown = createGrabCursorHandler('grabbing');
 const onMouseUp = createGrabCursorHandler('grab');
 
 export function useMapCanvasEvents({
-	isPopupEnabled,
+	isHosted,
 	mapId,
 }: {
-	isPopupEnabled: boolean;
+	isHosted: boolean;
 	mapId: string | undefined;
 }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
@@ -108,8 +113,9 @@ export function useMapCanvasEvents({
 	const isInteractive = useIsMapCanvasInteractive();
 
 	const { setCanvasLoading } = useMapStoreActions();
+	const trackMap = useTrackMap();
 
-	const onClick = useClickHandler(isPopupEnabled);
+	const onClick = useClickHandler(isHosted);
 	const throttledOnMouseMove = useThrottledMouseMoveHandler();
 	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
 
@@ -156,9 +162,7 @@ export function useMapCanvasEvents({
 	} satisfies MapCallbacks;
 }
 
-function useClickHandler(isPopupEnabled: boolean) {
-	const isMobile = useMediaQuery({ below: mediaQueryMobile });
-
+function useClickHandler(isHosted: boolean) {
 	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
 		useMapStoreActions();
 	const targetIds = useMapTargetIds();
@@ -173,8 +177,17 @@ function useClickHandler(isPopupEnabled: boolean) {
 			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			// Popups are off on a hosted map, except for a Point of the Location already open
-			if (!center || !(isPopupEnabled || targetIds.includes(pointId))) return;
+			const outcome = getSelectionOutcome({
+				isHosted,
+				isLoading: true,
+				isTarget: targetIds.includes(pointId),
+				url: undefined,
+			});
+
+			if (!center || outcome !== 'popup') return;
+
+			// Stopping a running ease fires its `moveend` now, so it can neither trigger the listener below nor undo the hide
+			mapInstance.stop();
 
 			setPopupVisible(false);
 
@@ -186,20 +199,12 @@ function useClickHandler(isPopupEnabled: boolean) {
 			mapInstance.easeTo({
 				center,
 				duration: 150,
-				padding: isMobile
+				padding: getPopupLayout(mapInstance.getContainer().clientWidth).isNarrow
 					? { bottom: 180, left: 0, right: 0, top: 0 }
 					: { bottom: 0, left: 0, right: 180, top: 0 },
 			});
 		},
-		[
-			isMobile,
-			isPopupEnabled,
-			setSelectedId,
-			setClickedId,
-			setHoveredId,
-			setPopupVisible,
-			targetIds,
-		],
+		[isHosted, setSelectedId, setClickedId, setHoveredId, setPopupVisible, targetIds],
 	);
 
 	return useCallback<NonNullable<MapCallbacks['onClick']>>(

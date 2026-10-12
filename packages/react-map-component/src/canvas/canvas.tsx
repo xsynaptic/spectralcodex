@@ -15,17 +15,16 @@ import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
 import { MapScopeBar } from '#canvas/canvas-scope-bar.tsx';
 import { MapTargets } from '#canvas/canvas-targets.tsx';
 import { MapViewProvider } from '#canvas/canvas-view.tsx';
-import { mapFeatureOpenEventName } from '#constants.ts';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
-import { SourceDataContextProvider, useSourceDataQuery } from '#data/data-source.tsx';
+import { SourceDataContextProvider } from '#data/data-source.tsx';
 import { useProtomaps } from '#lib/protomaps.ts';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store-provider.tsx';
 import { getInitialViewState } from '#store/store-viewport.ts';
-import { useIsMapCanvasInteractive, useIsMapCanvasLoading } from '#store/store.ts';
+import { useIsMapCanvasInteractive } from '#store/store.ts';
 
 // Features past the antimeridian only draw with world copies on
 function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
@@ -36,16 +35,8 @@ function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
 	return lngLatBounds.getWest() < -180 || lngLatBounds.getEast() > 180;
 }
 
-const MapCanvasLoading: FC<{ loading: boolean }> = function MapCanvasLoading({ loading }) {
-	return (
-		<div className="map-canvas-loading">
-			<div className="map-loading-animation" style={{ opacity: loading ? 1 : 0 }} />
-		</div>
-	);
-};
-
 const MapCanvasContainer: FC<
-	Omit<MapComponentProps, 'apiSourceUrl' | 'geodata' | 'isObjectiveFilterEnabled'> & {
+	Omit<MapComponentProps, 'apiSourceUrl' | 'isObjectiveFilterEnabled'> & {
 		style?: CSSProperties | undefined;
 	}
 > = function MapCanvasContainer({
@@ -74,13 +65,10 @@ const MapCanvasContainer: FC<
 		protomapsApiKey,
 	});
 
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+	const isHosted = host !== undefined;
 
-	const featureOpenEventName = host ? mapFeatureOpenEventName : undefined;
-
-	const canvasEvents = useMapCanvasEvents({ isPopupEnabled: !featureOpenEventName, mapId });
+	const canvasEvents = useMapCanvasEvents({ isHosted, mapId });
 	const isCanvasInteractive = useIsMapCanvasInteractive();
-	const isCanvasLoading = useIsMapCanvasLoading();
 
 	const [initialViewState] = useState(() =>
 		getInitialViewState({ bounds, center, mapId, maxBounds, zoom }),
@@ -111,11 +99,7 @@ const MapCanvasContainer: FC<
 					version={version}
 				>
 					<MapControls hasEnterControl={hasEnterControl} host={host} />
-					<MapPopup
-						featureOpenEventName={featureOpenEventName}
-						imageServerUrl={imageServerUrl}
-						isDev={isDev}
-					/>
+					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} isHosted={isHosted} />
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
 			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} host={host} isDev={isDev} />
@@ -123,7 +107,6 @@ const MapCanvasContainer: FC<
 			<MapTargets host={host} />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
-			<MapCanvasLoading loading={isCanvasLoading || isSourceDataLoading} />
 		</ReactMapGlMap>
 	);
 };

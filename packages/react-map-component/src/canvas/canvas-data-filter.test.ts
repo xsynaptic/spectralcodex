@@ -17,7 +17,6 @@ import {
 } from '#canvas/canvas-data-filter.ts';
 
 const passAll: MapFilterState = {
-	entryQuality: 1,
 	objective: 1,
 	rating: 1,
 	status: [],
@@ -86,13 +85,10 @@ describe('isLocationVisible', () => {
 	});
 
 	test('every threshold is an inclusive minimum', () => {
-		const atThreshold: MapFilterState = { entryQuality: 3, objective: 3, rating: 3, status: [] };
-		const onTheLine = { entryQuality: 3, objective: 3, rating: 3 };
+		const atThreshold: MapFilterState = { objective: 3, rating: 3, status: [] };
+		const onTheLine = { objective: 3, rating: 3 };
 
 		expect(isLocationVisible(makeItem(onTheLine).properties, atThreshold)).toBe(true);
-		expect(
-			isLocationVisible(makeItem({ ...onTheLine, entryQuality: 2 }).properties, atThreshold),
-		).toBe(false);
 		expect(isLocationVisible(makeItem({ ...onTheLine, rating: 2 }).properties, atThreshold)).toBe(
 			false,
 		);
@@ -138,9 +134,9 @@ describe('getMapCanvasData', () => {
 	});
 
 	test('a hidden item is neither drawn nor counted as filtered', () => {
-		const result = getMapCanvasData([makeItem({ entryQuality: 1 }), makeItem()], {
+		const result = getMapCanvasData([makeItem({ rating: 1 }), makeItem()], {
 			...passAll,
-			entryQuality: 3,
+			rating: 3,
 		});
 
 		expect(result.filteredCount).toBe(1);
@@ -149,8 +145,8 @@ describe('getMapCanvasData', () => {
 
 	test('a pinned item is drawn whatever the filter hides', () => {
 		const result = getMapCanvasData(
-			[makeItem({ entryQuality: 1, id: 'target' }), makeItem({ entryQuality: 1, id: 'other' })],
-			{ ...passAll, entryQuality: 3, pinnedIds: ['target'] },
+			[makeItem({ id: 'target', rating: 1 }), makeItem({ id: 'other', rating: 1 })],
+			{ ...passAll, pinnedIds: ['target'], rating: 3 },
 		);
 
 		expect(result.pointCollection?.features.map(({ properties }) => properties.id)).toEqual([
@@ -179,11 +175,8 @@ describe('getMapCanvasData', () => {
 });
 
 describe('getHiddenTargetIds', () => {
-	const items = [
-		makeItem({ entryQuality: 1, id: 'hidden' }),
-		makeItem({ entryQuality: 5, id: 'visible' }),
-	];
-	const filter = { ...passAll, entryQuality: 3 };
+	const items = [makeItem({ id: 'hidden', rating: 1 }), makeItem({ id: 'visible', rating: 5 })];
+	const filter = { ...passAll, rating: 3 };
 
 	test('only Targets the filter hides are returned', () => {
 		expect(getHiddenTargetIds(items, ['hidden', 'visible'], filter)).toEqual(['hidden']);
