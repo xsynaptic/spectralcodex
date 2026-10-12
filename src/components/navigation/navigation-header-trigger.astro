@@ -40,7 +40,7 @@ const triggerClasses = [
 ];
 ---
 
-<div class={variantClasses.trigger}>
+<div class:list={[variantClasses.trigger, hasChildren ? 'select-none' : undefined]}>
 	{triggerType === 'anchor' ? (
 		<Anchor
 			anchorColor="accent"
