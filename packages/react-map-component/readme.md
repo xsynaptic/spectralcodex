@@ -10,11 +10,11 @@ Built on [react-map-gl](https://visgl.github.io/react-map-gl/) with [Protomaps](
 
 **Streaming boundaries**: Administrative divisions are fetched as FlatGeobuf files and geometrically inverted using Turf.js to create "mask" layers that highlight regions by dimming everything outside their boundaries. FlatGeobuf's column-oriented format enables progressive decoding without loading entire datasets into memory.
 
-**State management**: [Zustand](https://zustand-demo.pmnd.rs/) store with [React Query](https://tanstack.com/query/latest) for async data fetching and IndexedDB persistence. Map filters (status, entry quality, rating, objective) trigger memoized GeoJSON reconstruction rather than mutating layer sources, preserving React's unidirectional data flow.
+**State management**: [Zustand](https://zustand-demo.pmnd.rs/) store with [React Query](https://tanstack.com/query/latest) for async data fetching and IndexedDB persistence. Map filters (status, rating, objective) trigger memoized GeoJSON reconstruction rather than mutating layer sources, preserving React's unidirectional data flow.
 
 **Dynamic styling**: MapLibre layer specifications are generated via hooks that interpolate style properties based on zoom level, selection state, and dark mode. Expressions use feature properties to drive data-driven styling for status colors, cluster sizing, and hover effects.
 
-**Host bridge**: A host page can drive a persistent map through the document instead of props. The map reads its current view (targets, highlighted features, bounds, division outline) from a JSON attribute on the root element, validated with Zod, and re-reads it on a sync event; feature clicks and the exit control are dispatched back as DOM events for the host to handle. This keeps a single map instance alive across Astro view transitions, where a persisted island never receives new props.
+**Host bridge**: A host page can drive a persistent map through the document instead of props. The map reads its current view (the targets to frame, and an optional scope limiting which features it shows) from a JSON attribute on the root element, validated with Zod, and re-reads it on a sync event; feature clicks, the controls that enter, expand, and leave the host's map layout, and analytics events are dispatched back as DOM events for the host to handle. This keeps a single map instance alive across Astro view transitions, where a persisted island never receives new props.
 
 **Camera transitions**: When the view changes the camera eases to the new targets, with duration scaled by zoom change and distance travelled. The current zoom is kept when it already frames them, and target markers are drawn once the move settles.
 

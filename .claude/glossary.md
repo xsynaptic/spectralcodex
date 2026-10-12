@@ -84,7 +84,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
-**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it, or the user, clears it. A map has at most one, and Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
+**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
 
 **Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Filter; a page never does. _Avoid_: scope, facet.
 
@@ -94,11 +94,13 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Chunk**: A geographically contiguous bundle of Popup Data, fetched on demand so a map never loads every popup up front. _Avoid_: tile, batch, page, shard.
 
-**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read. _Avoid_: explorer, map mode, map view.
+**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read, or behind it on a narrow screen. _Avoid_: explorer, map mode, map view.
 
 **Split**: The Atlas layout with the map on the left and a page on the right. _Avoid_: two-pane, side-by-side.
 
-**Pane**: The side of the Split that holds the page. _Avoid_: sidebar, panel, drawer.
+**Pane**: The part of the Atlas that holds the page: one side of the Split, or the surface that covers the map in the Sheet. _Avoid_: sidebar, panel, drawer.
+
+**Sheet**: The Atlas layout on a screen too narrow for the Split: the page covers the map, and the reader can lower it out of the way to reach the map, then raise it again without losing their place. _Avoid_: drawer, modal, overlay, bottom sheet.
 
 **Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
 

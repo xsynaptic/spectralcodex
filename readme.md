@@ -49,7 +49,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Custom filter controls for adjusting what points are visible on the map
 - Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
 - Persistent storage of map data via IndexedDB, keyed by build version so a deploy invalidates client-cached payloads instead of serving stale points
-- Atlas mode: a full-screen map at `/atlas` that splits on desktop into the map and a reading pane; click a point and its page loads beside the map
+- Atlas mode: a full-screen map at `/atlas` that splits on desktop into the map and a reading pane; click a point and its page loads beside the map. On a narrow screen the page becomes a sheet over the map that can be lowered out of the way
 - A single MapLibre instance persisted across view transitions, so map position and filters survive navigation
 - Atlas mode is a client-side layout of the existing static pages, not a second set of routes; breakpoints from `md` up are container queries on the pane, so pages lay out the same way in the split
 - Custom client directive (`client:atlas`) that defers loading MapLibre and its stylesheet until atlas mode is enabled
@@ -92,7 +92,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 ### Analytics
 
 - Self-hosted [Umami](https://umami.is/) site analytics monitoring web vitals performance metrics
-- Custom event tracking for search queries, map filter changes, dark mode toggling, and image metadata interactions
+- Custom event tracking for search queries, map and atlas interactions, dark mode toggling, and image metadata interactions
 
 ## Development
 

@@ -35,7 +35,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - A hook class carries only what the stylesheet targets and shares a descriptive prefix or short-form representing the target. Avoid Microformat prefixes (`p-`, `h-`, `u-`, `dt-`, `e-`).
 - Colour in a stylesheet is `light-dark()`; a non-colour dark swap is `[data-mode='dark'] &`; a utility is `dark:` where dark mode is used.
 - Stylesheets read tokens as `var(--…)`; `@apply` where it replaces a media query or composes a project `@utility`.
-- `md:`, `lg:` and `xl:` measure the atlas pane, not the viewport (redefined in `main.css`), so content lays out the same in the split as on a regular page that wide; a stylesheet writes `@container pane (width >= …)` for those steps. `sm:` and `@media (width >= 40rem)` stay on the viewport, since the pane is never narrower than 40rem.
+- `md:`, `lg:` and `xl:` measure the atlas pane, not the viewport (redefined in `main.css`), so content lays out the same in the split as on a regular page that wide; a stylesheet writes `@container pane (width >= …)` for those steps. `sm:` and `@media (width >= 40rem)` stay on the viewport, since the pane only differs from the viewport in the split, where it is at least 40rem wide.
 - Stacking order is `--z-index-*` applied as `z-*` utilities or `var()`.
 - Every `hover:` on a focusable element has its `focus-visible:` twin where relevant. A stylesheet `:hover` sits under `@media (hover: hover)`, as Tailwind's `hover:` does; its `:focus-visible` partner stays outside it.
 
