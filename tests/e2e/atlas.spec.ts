@@ -360,49 +360,50 @@ test.describe('a sheet on a phone viewport', () => {
 		await expectSameCanvas(canvas);
 	});
 
-	test('the sheet holds through a short drag and comes back where it was read', async ({
-		page,
-		request,
-	}) => {
-		const locationUrl = await getRegionLocation(request);
-		const root = page.locator('html');
-		const pane = page.locator('.main-pane');
-		const handle = page.locator('atlas-sheet-handle button');
+	test(
+		'the sheet holds through a short drag and comes back where it was read',
+		{ tag: '@firefox' },
+		async ({ page, request }) => {
+			const locationUrl = await getRegionLocation(request);
+			const root = page.locator('html');
+			const pane = page.locator('.main-pane');
+			const handle = page.locator('atlas-sheet-handle button');
 
-		await openSettledSheet(page, locationUrl);
-		await page.evaluate(() => {
-			window.scrollTo({ behavior: 'instant', top: 600 });
-		});
+			await openSettledSheet(page, locationUrl);
+			await page.evaluate(() => {
+				window.scrollTo({ behavior: 'instant', top: 600 });
+			});
 
-		await dragHandle(page, handle, viewport.height * 0.15);
+			await dragHandle(page, handle, viewport.height * 0.15);
 
-		await expect(pane).toHaveCSS('translate', 'none');
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+			await expect(pane).toHaveCSS('translate', 'none');
+			await expect(root).not.toHaveAttribute('data-atlas-sheet');
 
-		await dragHandle(page, handle, viewport.height * 0.3);
+			await dragHandle(page, handle, viewport.height * 0.3);
 
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
 
-		const scrollY = await getScrollY(page);
-		const box = await handle.boundingBox();
+			const scrollY = await getScrollY(page);
+			const box = await handle.boundingBox();
 
-		expect(scrollY).toBeGreaterThan(0);
-		expect((box?.y ?? 0) + (box?.height ?? 0)).toBe(viewport.height);
+			expect(scrollY).toBeGreaterThan(0);
+			expect((box?.y ?? 0) + (box?.height ?? 0)).toBe(viewport.height);
 
-		await page.mouse.wheel(0, 400);
-		await dragHandle(page, handle, viewport.height * -0.15);
+			await page.mouse.wheel(0, 400);
+			await dragHandle(page, handle, viewport.height * -0.15);
 
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
-		await expect(pane).not.toHaveAttribute('data-grabbing');
-		expect(await getScrollY(page)).toBe(scrollY);
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+			await expect(pane).not.toHaveAttribute('data-grabbing');
+			expect(await getScrollY(page)).toBe(scrollY);
 
-		await dragHandle(page, handle, viewport.height * -0.3);
+			await dragHandle(page, handle, viewport.height * -0.3);
 
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
-		await expect(pane).toHaveCSS('translate', 'none');
-		expect(await getScrollY(page)).toBe(scrollY);
-		expect(new URL(page.url()).pathname).toBe(locationUrl);
-	});
+			await expect(root).not.toHaveAttribute('data-atlas-sheet');
+			await expect(pane).toHaveCSS('translate', 'none');
+			expect(await getScrollY(page)).toBe(scrollY);
+			expect(new URL(page.url()).pathname).toBe(locationUrl);
+		},
+	);
 });
 
 test.describe('a sheet and its map on a phone viewport', () => {
@@ -511,7 +512,13 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		const canvas = page.locator('.atlas-shell canvas.maplibregl-canvas');
 		const handle = page.locator('atlas-sheet-handle button');
 
+		const inlineMap = page.locator('.atlas-inline-map');
+
 		await visit(page, paths.regionDetail);
+		await inlineMap.scrollIntoViewIfNeeded();
+
+		const inlineMapBox = await inlineMap.boundingBox();
+
 		await enterAtlas(page);
 
 		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
@@ -526,5 +533,6 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		await expect(root).not.toHaveAttribute('data-atlas-sheet');
 		await expect(page.locator('.main-pane')).toHaveCSS('translate', 'none');
 		expect(await getScrollY(page)).toBe(scrollY);
+		expect(await inlineMap.boundingBox()).toEqual(inlineMapBox);
 	});
 });
