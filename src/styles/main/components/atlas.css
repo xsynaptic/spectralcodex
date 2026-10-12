@@ -271,6 +271,14 @@
 		animation-name: -ua-view-transition-fade-out;
 	}
 
+	::view-transition-group(atlas-pane) {
+		animation: none;
+	}
+
+	::view-transition-old(atlas-pane) {
+		translate: 0 var(--atlas-pane-shift, 0);
+	}
+
 	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
 	@media (width >= 64rem) {
 		:root[data-atlas]:is(

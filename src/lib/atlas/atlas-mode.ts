@@ -11,6 +11,7 @@ import {
 	atlasPage,
 	atlasPaneMediaQuery,
 	atlasPaneSelector,
+	atlasPaneShiftProperty,
 	atlasPaneSizeProperty,
 	atlasPersistName,
 	atlasReturnStorageKey,
@@ -172,6 +173,7 @@ export function startAtlasMode() {
 		const incomingRoot = event.newDocument.documentElement;
 		const isMap = incomingRoot.dataset.atlasPage === atlasPage.map;
 		const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty);
+		const scrollBefore = window.scrollY;
 
 		if (isMap) storeFlag(true);
 
@@ -186,6 +188,17 @@ export function startAtlasMode() {
 		updateHeroSizes(event.newDocument);
 
 		void clearFromWhenFinished(event.viewTransition);
+
+		document.addEventListener(
+			'astro:after-swap',
+			() => {
+				document.documentElement.style.setProperty(
+					atlasPaneShiftProperty,
+					`${String(window.scrollY - scrollBefore)}px`,
+				);
+			},
+			{ once: true },
+		);
 
 		// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
 		if (!document.querySelector(shellSelector)) return;
