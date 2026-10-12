@@ -14,8 +14,6 @@ export const atlasPage = { map: 'map', pane: 'pane' } as const;
 // Requested pane width in pixels; atlas.css clamps it into `--atlas-pane-width`
 export const atlasPaneSizeProperty = '--atlas-pane-size';
 
-export const atlasPaneShiftProperty = '--atlas-pane-shift';
-
 // atlas.css writes the same `64rem` in its own queries
 export const atlasPaneMediaQuery = '(width >= 64rem)';
 

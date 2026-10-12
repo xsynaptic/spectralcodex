@@ -4,7 +4,7 @@ import type { MapFeatureOpenDetail } from '#types.ts';
 
 import { useMapView } from '#canvas/canvas-view.tsx';
 import { mapFeatureOpenEventName } from '#constants.ts';
-import { MapIconAdd, MapIconClose } from '#lib/icons.tsx';
+import { MapIconEye, MapIconEyeOff } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { useMapStoreActions } from '#store/store.ts';
@@ -65,7 +65,7 @@ export const MapScopeBar: FC = function MapScopeBar() {
 						viewBox="0 0 24 24"
 						xmlns="http://www.w3.org/2000/svg"
 					>
-						{isEnabled ? <MapIconClose /> : <MapIconAdd />}
+						{isEnabled ? <MapIconEye /> : <MapIconEyeOff />}
 					</svg>
 				</span>
 			</button>

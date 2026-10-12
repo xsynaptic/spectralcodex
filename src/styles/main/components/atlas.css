@@ -12,9 +12,13 @@
 	outline: none;
 }
 
-:root[data-atlas-page='map'] .atlas-shell {
-	visibility: visible;
-	view-transition-name: atlas-map;
+:root[data-atlas-page='map'] {
+	scrollbar-gutter: auto;
+
+	.atlas-shell {
+		visibility: visible;
+		view-transition-name: atlas-map;
+	}
 }
 
 .atlas-divider,
@@ -126,7 +130,6 @@
 			position: relative;
 			width: var(--atlas-pane-width);
 			margin-left: auto;
-			view-transition-name: atlas-pane;
 		}
 
 		.progress-bar {
@@ -151,7 +154,8 @@
 			translate: 50%;
 		}
 
-		.atlas-inline-map {
+		.atlas-inline-map,
+		.atlas-inline-nearby {
 			display: none;
 		}
 	}
@@ -269,14 +273,6 @@
 
 	::view-transition-old(atlas-map):only-child {
 		animation-name: -ua-view-transition-fade-out;
-	}
-
-	::view-transition-group(atlas-pane) {
-		animation: none;
-	}
-
-	::view-transition-old(atlas-pane) {
-		translate: 0 var(--atlas-pane-shift, 0);
 	}
 
 	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
