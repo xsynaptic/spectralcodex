@@ -57,6 +57,7 @@ class AtlasSheetHandle extends HTMLElement {
 
 		updateButton();
 
+		document.addEventListener('dragstart', this.#handleDragStart, { signal });
 		button.addEventListener('click', this.#handleClick, { signal });
 		button.addEventListener('pointercancel', this.#handlePointerEnd, { signal });
 		button.addEventListener('pointerdown', this.#handlePointerDown, { signal });
@@ -73,6 +74,10 @@ class AtlasSheetHandle extends HTMLElement {
 		const isKeyboard = event.detail === 0;
 
 		if (isKeyboard) this.#toggle();
+	};
+
+	#handleDragStart = (event: DragEvent) => {
+		if (this.#pointerId !== undefined) event.preventDefault();
 	};
 
 	#handlePointerDown = (event: PointerEvent) => {

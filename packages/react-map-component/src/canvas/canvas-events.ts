@@ -11,6 +11,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
+import type { MapFeatureOpenDetail } from '#types.ts';
 
 import {
 	decideClickActions,
@@ -19,7 +20,7 @@ import {
 } from '#canvas/canvas-events-factory.ts';
 import { getPopupLayout } from '#canvas/canvas-popup-factory.ts';
 import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { controlFilterId } from '#constants.ts';
+import { controlFilterId, mapFeatureOpenEventName } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { trackMapErrorOnce } from '#lib/track.ts';
@@ -173,16 +174,26 @@ function useClickHandler(isHosted: boolean) {
 			pointId: string,
 			center: [number, number] | undefined,
 		) => {
+			const isTarget = targetIds.includes(pointId);
+
+			if (
+				isHosted &&
+				isTarget &&
+				!document.dispatchEvent(
+					new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, {
+						cancelable: true,
+						detail: { url: location.pathname },
+					}),
+				)
+			) {
+				return;
+			}
+
 			setSelectedId(pointId);
 			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			const outcome = getSelectionOutcome({
-				isHosted,
-				isLoading: true,
-				isTarget: targetIds.includes(pointId),
-				url: undefined,
-			});
+			const outcome = getSelectionOutcome({ isHosted, isLoading: true, isTarget, url: undefined });
 
 			if (!center || outcome !== 'popup') return;
 

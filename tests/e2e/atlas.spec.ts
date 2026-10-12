@@ -519,6 +519,31 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		await expectSameCanvas(canvas);
 	});
 
+	test("a tap on the open Location's own Point raises a lowered sheet", async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const shell = page.locator('.atlas-shell');
+
+		await openSheetFromMap(page, locationUrl);
+		await lowerSheet(page, page.locator('atlas-sheet-handle button'));
+
+		await expect(async () => {
+			const box = await shell.locator('.maplibregl-marker').first().boundingBox();
+
+			if (!box) throw new Error('The Target has no marker to tap');
+
+			await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+
+			await expect(shell.locator('.maplibregl-popup')).toHaveCount(0);
+			await expect(root).not.toHaveAttribute('data-atlas-sheet', { timeout: 1000 });
+		}).toPass();
+
+		expect(new URL(page.url()).pathname).toBe(locationUrl);
+	});
+
 	test('the X on the map leaves a regular page in place', async ({ page, request }) => {
 		const locationUrl = await getRegionLocation(request);
 		const root = page.locator('html');
