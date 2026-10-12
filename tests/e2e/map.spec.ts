@@ -27,7 +27,7 @@ test("a Location's own Point opens its popup", async ({ page, site }) => {
 
 	// A pointer cursor means the Point under the ring is drawn and takes a click
 	await expect(async () => {
-		await canvas.hover({ position: { x: 1, y: 1 } });
+		await page.mouse.move(0, 0);
 		await ownPoint.hover();
 
 		await expect(canvas).toHaveCSS('cursor', 'pointer', { timeout: 500 });

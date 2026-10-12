@@ -12,7 +12,7 @@ export default defineConfig({
 	timeout: 15_000,
 	use: {
 		baseURL: getBaseUrl(),
-		trace: 'retain-on-failure',
+		launchOptions: { args: ['--enable-gpu'] },
 	},
 	...(isProd
 		? {}

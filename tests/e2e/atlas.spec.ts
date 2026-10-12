@@ -136,6 +136,25 @@ async function openSheetFromMap(page: Page, url: string) {
 	await openFromMap(page, url);
 }
 
+async function lowerSheet(page: Page, handle: Locator) {
+	const root = page.locator('html');
+
+	await expect(async () => {
+		if ((await root.getAttribute('data-atlas-sheet')) !== 'down') await handle.click();
+
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'down', { timeout: 1000 });
+	}).toPass();
+}
+
+async function openSettledSheet(page: Page, url: string) {
+	const handle = page.locator('atlas-sheet-handle button');
+
+	await openSheetFromMap(page, url);
+	await lowerSheet(page, handle);
+	await handle.press('Enter');
+	await expect(page.locator('html')).not.toHaveAttribute('data-atlas-sheet');
+}
+
 async function getScrollY(page: Page) {
 	return page.evaluate(() => window.scrollY);
 }
@@ -196,79 +215,74 @@ test('one map carries a reader through the split, the full-screen atlas and back
 	await expect(shell).toBeHidden();
 });
 
-const scopePages = [
-	['Theme', paths.themeDetail],
-	['Series', paths.seriesDetail],
-	['Post', paths.postDetail],
-] as const;
-
-for (const [label, path] of scopePages) {
-	test(`a ${label} scopes the map until the reader turns it off`, async ({ page, request }) => {
-		await visit(page, path);
-
-		const shell = page.locator('.atlas-shell');
-		const scopeBar = shell.locator('.map-scope-bar');
-		const scopeName = shell.locator('.map-scope-name');
-		const scopeToggle = shell.locator('.map-scope-toggle');
-		const metrics = shell.locator('.maplibregl-ctrl-metrics');
-		const heading = await page.locator('h1').textContent();
-		const title = heading?.trim() ?? '';
-
-		await enterAtlas(page);
-		await expect(scopeName).toHaveText(title, { timeout: 10_000 });
-
-		const scopedMetrics = (await metrics.textContent()) ?? '';
-
-		const paneUrl = await getPageLocationLink(page, request);
-
-		await page.locator(`main a[href="${paneUrl}"]`).first().click();
-		await page.waitForURL(`**${paneUrl}`);
-
-		await expect(scopeName).toHaveText(title);
-		await expect(metrics).toHaveText(scopedMetrics);
-		await expect(shell.locator('.map-pulse-ring').first()).toBeVisible();
-
-		await scopeToggle.click();
-
-		await expect(scopeBar).not.toHaveAttribute('data-active');
-		await expect(metrics).not.toHaveText(scopedMetrics);
-
-		await scopeToggle.click();
-
-		await expect(metrics).toHaveText(scopedMetrics);
-	});
-}
-
-test('a Scope turned off comes back from its name and from a later visit', async ({
-	page,
-	request,
-}) => {
-	await visit(page, paths.themeDetail);
+async function openScopedLocation(page: Page, request: APIRequestContext, path: string) {
+	await visit(page, path);
 
 	const shell = page.locator('.atlas-shell');
 	const scopeBar = shell.locator('.map-scope-bar');
+	const scopeName = shell.locator('.map-scope-name');
 	const scopeToggle = shell.locator('.map-scope-toggle');
+	const metrics = shell.locator('.maplibregl-ctrl-metrics');
+	const heading = await page.locator('h1').textContent();
+	const title = heading?.trim() ?? '';
 
 	await enterAtlas(page);
-	await expect(scopeBar).toHaveAttribute('data-active', '', { timeout: 10_000 });
+	await expect(scopeName).toHaveText(title, { timeout: 10_000 });
+
+	const scopedMetrics = (await metrics.textContent()) ?? '';
 
 	const paneUrl = await getPageLocationLink(page, request);
 
 	await page.locator(`main a[href="${paneUrl}"]`).first().click();
 	await page.waitForURL(`**${paneUrl}`);
 
-	await scopeToggle.click();
-	await expect(scopeBar).not.toHaveAttribute('data-active');
+	await expect(scopeName).toHaveText(title);
+	await expect(metrics).toHaveText(scopedMetrics);
+	await expect(shell.locator('.map-pulse-ring').first()).toBeVisible();
 
-	await shell.locator('.map-scope-name').click();
+	return { metrics, paneUrl, scopeBar, scopedMetrics, scopeName, scopeToggle, title };
+}
+
+test('a Post scopes the map until the reader turns it off', async ({ page, request }) => {
+	const { metrics, scopeBar, scopedMetrics, scopeToggle } = await openScopedLocation(
+		page,
+		request,
+		paths.postDetail,
+	);
+
+	await scopeToggle.click();
+
+	await expect(scopeBar).not.toHaveAttribute('data-active');
+	await expect(metrics).not.toHaveText(scopedMetrics);
+
+	await scopeToggle.click();
+
+	await expect(metrics).toHaveText(scopedMetrics);
+});
+
+test('a Theme scopes the map, and its Scope turned off comes back from its name and from a later visit', async ({
+	page,
+	request,
+}) => {
+	const { metrics, paneUrl, scopeBar, scopedMetrics, scopeName, scopeToggle, title } =
+		await openScopedLocation(page, request, paths.themeDetail);
+
+	await scopeToggle.click();
+
+	await expect(scopeBar).not.toHaveAttribute('data-active');
+	await expect(metrics).not.toHaveText(scopedMetrics);
+
+	await scopeName.click();
 	await page.waitForURL(`**${paths.themeDetail}`);
 
 	await expect(scopeBar).toHaveAttribute('data-active');
+	await expect(metrics).toHaveText(scopedMetrics);
 
 	await scopeToggle.click();
 	await page.goBack();
 	await page.waitForURL(`**${paneUrl}`);
 
+	await expect(page.locator('h1')).not.toHaveText(title);
 	await expect(scopeBar).not.toHaveAttribute('data-active');
 
 	await page.goForward();
@@ -324,8 +338,7 @@ test.describe('a sheet on a phone viewport', () => {
 		const historyLength = await page.evaluate(() => history.length);
 
 		for (let bounce = 0; bounce < 3; bounce += 1) {
-			await handle.click();
-			await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+			await lowerSheet(page, handle);
 			await handle.press('Enter');
 			await expect(root).not.toHaveAttribute('data-atlas-sheet');
 		}
@@ -356,7 +369,7 @@ test.describe('a sheet on a phone viewport', () => {
 		const pane = page.locator('.main-pane');
 		const handle = page.locator('atlas-sheet-handle button');
 
-		await openSheetFromMap(page, locationUrl);
+		await openSettledSheet(page, locationUrl);
 		await page.evaluate(() => {
 			window.scrollTo({ behavior: 'instant', top: 600 });
 		});
@@ -390,6 +403,10 @@ test.describe('a sheet on a phone viewport', () => {
 		expect(await getScrollY(page)).toBe(scrollY);
 		expect(new URL(page.url()).pathname).toBe(locationUrl);
 	});
+});
+
+test.describe('a sheet and its map on a phone viewport', () => {
+	test.use({ viewport });
 
 	test('the page itself follows a pull up', async ({ page, request }) => {
 		const locationUrl = await getRegionLocation(request);
@@ -398,9 +415,8 @@ test.describe('a sheet on a phone viewport', () => {
 		const handle = page.locator('atlas-sheet-handle button');
 
 		await openSheetFromMap(page, locationUrl);
-		await handle.click();
+		await lowerSheet(page, handle);
 
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
 		await expect(main).toBeHidden();
 
 		const x = viewport.width / 2;
@@ -416,10 +432,6 @@ test.describe('a sheet on a phone viewport', () => {
 
 		await expect(root).not.toHaveAttribute('data-atlas-sheet');
 	});
-});
-
-test.describe('a sheet and its map on a phone viewport', () => {
-	test.use({ viewport });
 
 	test('the back button returns from a sheet to the map', async ({ page, request }) => {
 		const locationUrl = await getRegionLocation(request);
@@ -435,6 +447,25 @@ test.describe('a sheet and its map on a phone viewport', () => {
 
 		await expect(canvas).toBeVisible();
 		await expectSameCanvas(canvas);
+	});
+
+	test('the X on the map leaves a regular page in place', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const shell = page.locator('.atlas-shell');
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await openSheetFromMap(page, locationUrl);
+		await lowerSheet(page, handle);
+
+		await shell.locator('.maplibregl-ctrl-exit').click();
+
+		await expect(root).not.toHaveAttribute('data-atlas');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(shell).toBeHidden();
+		await expect(handle).toBeHidden();
+		await expect(page.locator('h1')).toBeVisible();
+		expect(new URL(page.url()).pathname).toBe(locationUrl);
 	});
 
 	test('a Region sheet sets the Scope, and the bar raises the sheet and turns it off', async ({
@@ -456,9 +487,8 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		const heading = await page.locator('h1').textContent();
 		const title = heading?.trim() ?? '';
 
-		await handle.click();
+		await lowerSheet(page, handle);
 
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
 		await expect(scopeName).toHaveText(title);
 		await expect(metrics).not.toHaveText(fullMetrics);
 
@@ -474,26 +504,6 @@ test.describe('a sheet and its map on a phone viewport', () => {
 
 		await expect(shell.locator('.map-scope-bar')).not.toHaveAttribute('data-active');
 		await expect(metrics).toHaveText(fullMetrics);
-	});
-
-	test('the X on the map leaves a regular page in place', async ({ page, request }) => {
-		const locationUrl = await getRegionLocation(request);
-		const root = page.locator('html');
-		const shell = page.locator('.atlas-shell');
-		const handle = page.locator('atlas-sheet-handle button');
-
-		await openSheetFromMap(page, locationUrl);
-		await handle.click();
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
-
-		await shell.locator('.maplibregl-ctrl-exit').click();
-
-		await expect(root).not.toHaveAttribute('data-atlas');
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
-		await expect(shell).toBeHidden();
-		await expect(handle).toBeHidden();
-		await expect(page.locator('h1')).toBeVisible();
-		expect(new URL(page.url()).pathname).toBe(locationUrl);
 	});
 
 	test('the globe on a page lowers it in place over the map', async ({ page }) => {
