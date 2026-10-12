@@ -8,6 +8,10 @@
 	outline: none;
 }
 
+.main-pane {
+	outline: none;
+}
+
 :root[data-atlas-page='map'] .atlas-shell {
 	visibility: visible;
 	view-transition-name: atlas-map;

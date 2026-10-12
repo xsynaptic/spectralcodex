@@ -26,6 +26,7 @@ import { getSitePath } from '#lib/utils/routing.ts';
 
 const heroSelector = 'img[data-hero-image]';
 const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
+const paneMainSelector = `${atlasPaneSelector} > main`;
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
 
 function getLayout(root: HTMLElement) {
@@ -82,8 +83,17 @@ function storeFlag(isEnabled: boolean) {
 	}
 }
 
+function getSheetMainTop() {
+	if (matchMedia(atlasPaneMediaQuery).matches) return 0;
+
+	return document.querySelector(paneMainSelector)?.getBoundingClientRect().top ?? 0;
+}
+
 function setFlag(isEnabled: boolean) {
+	const mainTop = getSheetMainTop();
+
 	document.documentElement.toggleAttribute('data-atlas', isEnabled);
+	window.scrollBy({ behavior: 'instant', top: getSheetMainTop() - mainTop });
 
 	storeFlag(isEnabled);
 	updateSplit();
@@ -126,10 +136,18 @@ function runExitAction(action: ReturnType<typeof getAtlasExitAction>) {
 async function closeAtlas() {
 	if (isSheetDown()) await moveSheet(false);
 
+	const hasShellFocus = document.querySelector(shellSelector)?.contains(document.activeElement);
+
 	setFlag(false);
 
 	// In the split, clearing the flag has already turned the pane back into the regular page
-	if (document.documentElement.dataset.atlasPage !== atlasPage.map) return;
+	if (document.documentElement.dataset.atlasPage !== atlasPage.map) {
+		if (hasShellFocus) {
+			document.querySelector<HTMLElement>(atlasPaneSelector)?.focus({ preventScroll: true });
+		}
+
+		return;
+	}
 
 	runExitAction(
 		getAtlasExitAction({

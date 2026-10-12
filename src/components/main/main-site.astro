@@ -22,7 +22,7 @@ const { atlas, hasHeroImage = false, isHomepage = false, meta, schemas } = Astro
 ---
 
 <Document atlas={atlas} meta={meta} schemas={schemas}>
-	<div class="main-pane @container/pane flex min-h-screen flex-col">
+	<div class="main-pane @container/pane flex min-h-screen flex-col" tabindex="-1">
 		{atlas ? <AtlasSheetHandle /> : undefined}
 		<Header hasHeroImage={hasHeroImage} isHomepage={isHomepage} />
 		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content', tabindex: -1 })}>
