@@ -1,0 +1,71 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { CollectionEntry } from 'astro:content';
+
+import ContentSection from '#components/content/content-section.astro';
+import LocationsHeritage from '#components/locations/locations-heritage.astro';
+import LocationsStatus from '#components/locations/locations-status.astro';
+import Anchor from '#components/parts/anchor.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import ListRow from '#components/parts/list-row.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getLocationPoints } from '#lib/collections/locations/locations-geometry.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props extends HTMLAttributes<'div'> {
+	entry: CollectionEntry<'locations'>;
+	showChinese?: boolean | undefined;
+}
+
+const { entry, showChinese, ...props } = Astro.props;
+
+const t = getTranslations();
+
+const points = getLocationPoints(entry)?.map((point) => ({
+	...point,
+	links: [
+		{ href: point.googleMapsUrl, label: t('locations.link.googleMaps') },
+		{ href: point.wikipediaUrl, label: t('locations.link.wikipedia') },
+	].filter((link) => link.href !== undefined),
+}));
+---
+
+{points ? (
+	<ContentSection sectionTitle={t('section.points')} {...props}>
+		<ListColumn class="gap-4 font-serif text-xs sm:text-sm">
+			{points.map((point) => (
+				<ListColumnItem>
+					{point.title ? (
+						<>
+							<span class="font-semibold">{point.title}</span>
+							<TextMultilingual content={point.titleMultilingual} parenthesis={true} />
+							<span class="text-primary-300 dark:text-primary-700">—</span>
+						</>
+					) : undefined}
+					<DividedItem as="span" dividerWeight="thin">
+						<LocationsStatus showChinese={showChinese} status={point.status} />
+					</DividedItem>
+					{point.heritage ? (
+						<DividedItem as="span" dividerWeight="thin">
+							<LocationsHeritage heritage={point.heritage} />
+						</DividedItem>
+					) : undefined}
+					{point.descriptionHtml ? (
+						<div class="basis-full" set:html={point.descriptionHtml} />
+					) : undefined}
+					{point.links.length > 0 ? (
+						<ListRow class="basis-full">
+							{point.links.map((link) => (
+								<DividedItem as="li" dividerWeight="thin">
+									<Anchor href={link.href}>{link.label}</Anchor>
+								</DividedItem>
+							))}
+						</ListRow>
+					) : undefined}
+				</ListColumnItem>
+			))}
+		</ListColumn>
+	</ContentSection>
+) : undefined}

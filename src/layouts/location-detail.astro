@@ -8,10 +8,10 @@ import ContentCollectionLink from '#components/content/content-collection-link.a
 import ContentEntryArticle from '#components/content/content-entry-article.astro';
 import ContentImage from '#components/content/content-image.astro';
 import ContentProse from '#components/content/content-prose.astro';
-import LocationsAddress from '#components/locations/locations-address.astro';
-import SectionHeritage from '#components/locations/locations-section-heritage.astro';
+import SectionDetails from '#components/locations/locations-section-details.astro';
 import SectionNearbyList from '#components/locations/locations-section-nearby-list.astro';
 import SectionNotices from '#components/locations/locations-section-notices.astro';
+import SectionPoints from '#components/locations/locations-section-points.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import RegionsBreadcrumbs from '#components/regions/regions-breadcrumbs.astro';
 import SectionBacklinks from '#components/sections/section-backlinks.astro';
@@ -61,6 +61,8 @@ const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeat
 
 const hideLocation = entry.data.hideLocation && contentPolicy.hideSensitiveLocations;
 
+const showChinese = regionLangCode?.startsWith('zh');
+
 const atlas = await getAtlasPage(entry, mapData);
 
 const t = getTranslations();
@@ -96,18 +98,23 @@ const t = getTranslations();
 		entry={entry}
 		{...(hasContent ? { 'data-reading-frame': '' } : {})}
 	/>
-	<SectionNotices entry={entry} langCode={regionLangCode} />
 	{hideLocation ? undefined : (
 		<SectionMap
 			class="atlas-inline-map"
 			entryTitle={entry.data.title}
 			mapData={mapData}
 			showAtlasOpen={!!atlas}
-		>
-			<LocationsAddress address={addressBase} content={addressMultilingual} />
-		</SectionMap>
+		/>
 	)}
-	<SectionHeritage entry={entry} />
+	<SectionNotices entry={entry} hideLocation={hideLocation} langCode={regionLangCode} />
+	{hideLocation ? undefined : <SectionPoints entry={entry} showChinese={showChinese} />}
+	<SectionDetails
+		address={addressBase}
+		addressMultilingual={addressMultilingual}
+		entry={entry}
+		hideLocation={hideLocation}
+		showChinese={showChinese}
+	/>
 	{hideLocation ? undefined : (
 		<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 	)}

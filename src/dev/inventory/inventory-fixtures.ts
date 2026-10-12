@@ -8,7 +8,6 @@ import path from 'node:path';
 import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
 import type { CatalogItem, ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 import type { ChronologyDailyCounts } from '#lib/collections/chronology/chronology-types.ts';
-import type { LocationTwHeritage } from '#lib/collections/locations/locations-schemas.ts';
 import type { Citation } from '#lib/collections/resources/resources-citation.ts';
 import type { ResourceLink, ResourceSource } from '#lib/collections/resources/resources-utils.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
@@ -16,16 +15,13 @@ import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/imag
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 import { getRegionsDivisionSvgContent } from '#components/regions/regions-division.ts';
-import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
 import { getLocationsNearbyList } from '#lib/collections/locations/locations-utils.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
@@ -136,9 +132,6 @@ function getSampleUrl(fragment: string) {
 	return `${sampleUrl}#${fragment}`;
 }
 
-// Every designation at once; a Location carries one or two, and the record is the closed set
-export const sampleHeritage = LocationTwHeritageSchema.options satisfies Array<LocationTwHeritage>;
-
 export function createSampleImageProps(entry: CollectionEntry<'images'>) {
 	const aspectRatio = entry.data.width / entry.data.height;
 
@@ -167,22 +160,6 @@ export async function createSampleMapData() {
 }
 
 // All three notices stacked; a Location's own data can only ever trigger two of them at once
-export function createSampleNotices() {
-	const t = getTranslations();
-
-	const severities = {
-		'notice.danger': NoticeBoxSeverityEnum.Warning,
-		'notice.quality': NoticeBoxSeverityEnum.Info,
-		'notice.vanished': NoticeBoxSeverityEnum.Info,
-	} as const;
-
-	return (['notice.vanished', 'notice.danger', 'notice.quality'] as const).map((key) => ({
-		severity: severities[key],
-		text: t(key),
-		textAlt: t(key, LanguageCodeEnum.ChineseTraditional),
-	}));
-}
-
 // Built from real entries so the flattened shape cannot drift from the Resource schema
 export async function getSampleResources() {
 	const { entries } = await getResourcesCollection();
@@ -557,3 +534,5 @@ export function getSampleOpenGraphCards() {
 
 	return sampleOpenGraphCards;
 }
+
+export { locationStatusOrder as sampleStatuses } from '@spectralcodex/shared/map';

@@ -45,7 +45,7 @@ export const PositionSchema = z.tuple([z.number(), z.number()]).transform((value
 	return getTruncatedLngLat(value) satisfies Position;
 });
 
-export const GeometryPointsSchema = z.object({
+export const GeometryPointsSchema = z.strictObject({
 	coordinates: PositionSchema,
 	title: TitleSchema.optional(),
 	...titleMultilingualSchema,
@@ -59,4 +59,5 @@ export const GeometryPointsSchema = z.object({
 	googleMapsUrl: z.url().optional(),
 	imageFeatured: z.string().nullable().optional(),
 	precision: NumericScaleSchema.optional(),
+	wikipediaUrl: z.url().optional(),
 });

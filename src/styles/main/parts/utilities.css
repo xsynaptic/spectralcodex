@@ -101,3 +101,12 @@
 		transparent;
 	scrollbar-width: thin;
 }
+
+@utility status-dot {
+	flex: none;
+	width: 0.625em;
+	height: 0.625em;
+	background-color: light-dark(var(--status-color), var(--status-color-dark));
+	border: 1px solid light-dark(var(--status-stroke), var(--status-stroke-dark));
+	border-radius: 50%;
+}

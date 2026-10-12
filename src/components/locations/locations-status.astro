@@ -1,0 +1,40 @@
+---
+import type { LocationStatus } from '@spectralcodex/shared/map';
+
+import { LocationStatusRecords } from '@spectralcodex/shared/map';
+
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+
+interface Props {
+	showChinese?: boolean | undefined;
+	status: LocationStatus;
+}
+
+const { showChinese = false, status } = Astro.props;
+
+const { color, colorDark, description, stroke, strokeDark, title, title_zh } =
+	LocationStatusRecords[status];
+---
+
+<span class="inline-flex items-center gap-1.5" title={description}>
+	<span>
+		{title}
+		{showChinese ? (
+			<TextMultilingual
+				content={{ lang: LanguageCodeEnum.ChineseTraditional, value: title_zh }}
+				parenthesis={true}
+			/>
+		) : undefined}
+	</span>
+	<span
+		aria-hidden="true"
+		class="status-dot"
+		style={{
+			'--status-color': color,
+			'--status-color-dark': colorDark,
+			'--status-stroke': stroke,
+			'--status-stroke-dark': strokeDark,
+		}}
+	></span>
+</span>

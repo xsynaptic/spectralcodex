@@ -1,0 +1,85 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import type { CollectionEntry } from 'astro:content';
+
+import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
+
+import ContentSection from '#components/content/content-section.astro';
+import LocationsCoordinates from '#components/locations/locations-coordinates.astro';
+import LocationsHeritage from '#components/locations/locations-heritage.astro';
+import LocationsStatus from '#components/locations/locations-status.astro';
+import DividedItem from '#components/parts/divided-item.astro';
+import ListColumnItem from '#components/parts/list-column-item.astro';
+import ListColumn from '#components/parts/list-column.astro';
+import TextMultilingual from '#components/parts/text-multilingual.astro';
+import { getLocationDetails } from '#lib/collections/locations/locations-geometry.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
+
+interface Props extends HTMLAttributes<'div'> {
+	address?: string | undefined;
+	addressMultilingual?: MultilingualContent | undefined;
+	entry: CollectionEntry<'locations'>;
+	hideLocation?: boolean | undefined;
+	showChinese?: boolean | undefined;
+}
+
+const {
+	address,
+	addressMultilingual,
+	entry,
+	hideLocation = false,
+	showChinese,
+	...props
+} = Astro.props;
+
+const details = getLocationDetails(entry);
+
+const status = hideLocation || details.coordinates ? details.status : undefined;
+const coordinates = hideLocation ? undefined : details.coordinates;
+
+const addressParts: Array<MultilingualContent> = [];
+
+if (!hideLocation && address !== undefined) {
+	addressParts.push({ lang: LanguageCodeEnum.English, value: address });
+}
+
+if (!hideLocation && addressMultilingual !== undefined) {
+	addressParts.push(addressMultilingual);
+}
+
+const t = getTranslations();
+---
+
+<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.details')} {...props}>
+	<ListColumn class="font-serif text-xs sm:text-sm">
+		{status ? (
+			<ListColumnItem label={t('locations.status.label')}>
+				<LocationsStatus showChinese={showChinese} status={status} />
+			</ListColumnItem>
+		) : undefined}
+		{details.heritage.length > 0 ? (
+			<ListColumnItem label={t('locations.heritage.label')}>
+				{details.heritage.map((heritage) => (
+					<DividedItem as="span" dividerWeight="thin">
+						<LocationsHeritage heritage={heritage} />
+					</DividedItem>
+				))}
+			</ListColumnItem>
+		) : undefined}
+		{addressParts.length > 0 ? (
+			<ListColumnItem class="tabular-nums" label={t('locations.address.label')}>
+				{addressParts.map((part) => (
+					<DividedItem as="span" dividerWeight="thin">
+						<TextMultilingual content={part} />
+					</DividedItem>
+				))}
+			</ListColumnItem>
+		) : undefined}
+		{coordinates ? (
+			<ListColumnItem label={t('locations.coordinates.label')}>
+				<LocationsCoordinates coordinates={coordinates} />
+			</ListColumnItem>
+		) : undefined}
+	</ListColumn>
+</ContentSection>

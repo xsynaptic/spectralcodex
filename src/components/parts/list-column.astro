@@ -1,14 +1,20 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
+import { renderSlot } from '#lib/utils/astro.ts';
+
 type Props<Tag extends Extract<HTMLTag, 'ol' | 'ul'> = Extract<HTMLTag, 'ol' | 'ul'>> =
 	Polymorphic<{
 		as: Tag;
 	}>;
 
 const { as: Tag = 'ul', class: className, ...props } = Astro.props;
+
+const children = await renderSlot(Astro.slots, 'default');
 ---
 
-<Tag class:list={['list-column', className]} {...props}>
-	<slot />
-</Tag>
+{children ? (
+	<Tag class:list={['list-column', className]} {...props}>
+		<Fragment set:html={children} />
+	</Tag>
+) : undefined}

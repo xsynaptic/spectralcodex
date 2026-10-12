@@ -40,6 +40,15 @@
 	--anchor-hover: light-dark(var(--color-highlight-300), var(--color-highlight-700));
 }
 
+.anchor-copy {
+	--anchor-color: currentcolor;
+	--anchor-hover: light-dark(var(--color-highlight-500), var(--color-highlight-400));
+}
+
+.anchor-copy:disabled {
+	pointer-events: none;
+}
+
 .anchor-title {
 	--anchor-color: light-dark(var(--color-primary-700), var(--color-primary-300));
 	--anchor-hover: light-dark(var(--color-accent-500), var(--color-accent-400));

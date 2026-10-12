@@ -100,7 +100,7 @@ const translationStrings = {
 		'section.content': 'Content',
 		'section.content.locations': 'Featured By',
 		'section.dateRecorded': 'Recorded On',
-		'section.heritage': 'Heritage Designation',
+		'section.details': 'Details',
 		'section.itemsList': 'More',
 		'section.links': 'Links',
 		'section.links.platform.label': '{platform}: {title}',
@@ -108,9 +108,11 @@ const translationStrings = {
 		'section.map': 'Map',
 		'section.map.label': 'Map of {title}',
 		'section.map.loading': 'Loading map',
+		'section.points': 'Points',
 		'section.similar': 'Similar Content',
 		'section.similar.more': 'Show more',
 		'section.sources': 'Sources',
+		'section.stats': 'Stats',
 		'section.webmentions': 'Webmentions',
 
 		// Webmentions
@@ -121,8 +123,14 @@ const translationStrings = {
 		'webmentions.reposts': 'Reposts',
 
 		// Locations
-		'locations.address.label': 'Address',
-		'locations.status.vanished': 'Vanished',
+		'locations.address.label': 'Address:',
+		'locations.coordinates.copy.done': 'Coordinates copied',
+		'locations.coordinates.copy.label': 'Copy coordinates',
+		'locations.coordinates.label': 'Coordinates:',
+		'locations.heritage.label': 'Heritage designation:',
+		'locations.link.googleMaps': 'Google Maps',
+		'locations.link.wikipedia': 'Wikipedia',
+		'locations.status.label': 'Status:',
 		'locations.unit.km': '{distance} km',
 
 		// Terms
@@ -204,6 +212,8 @@ const translationStrings = {
 
 		// Notices
 		'notice.danger': `**Warning**: this location is abandoned, hazardous, or otherwise neglected and may be unsafe and even dangerous! Exercise appropriate precautions when visiting.`,
+		'notice.precision.guess': `**Note**: the coordinates given for this location are only a guess.`,
+		'notice.precision.imprecise': `**Note**: the coordinates given for this location are imprecise.`,
 		'notice.quality': `**Note**: this entry contains only basic information and may be out of date, inaccurate, or even wrong. Additional research is strongly recommended.`,
 		'notice.severity.error': 'Error:',
 		'notice.severity.info': 'Info:',
@@ -272,6 +282,8 @@ const translationStrings = {
 			'Spectral Codex 是 Alexander Synaptic 策劃的旅行日誌、攝影作品集與地理空間資料庫。地圖集是一張互動式地圖，涵蓋資料庫中的所有地點。使用電腦瀏覽時，可在地圖旁閱讀內容。',
 		'atlas.title': '地圖集',
 		'notice.danger': `**警告**：此處已廢棄或長期無人管理，可能存在潛在危險。造訪時請務必提高警覺，並做好相關安全防護措施。`,
+		'notice.precision.guess': `**說明**：此地點的座標僅為推測。`,
+		'notice.precision.imprecise': `**說明**：此地點的座標並不精確。`,
 		'notice.quality': `**說明**：本條目僅提供基礎資訊，內容可能過時、未經查證，甚至有誤。建議進一步查閱相關資料，以確認資訊的正確性。`,
 		'notice.vanished': `**提醒**：此地點已消失，本文僅供參考用途。`,
 	},

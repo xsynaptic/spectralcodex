@@ -1,0 +1,46 @@
+---
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	coordinates: string;
+}
+
+const { coordinates } = Astro.props;
+
+const iconSize = 14;
+
+const t = getTranslations();
+---
+
+<copy-coordinates class="inline-flex">
+	<button
+		class="anchor-base anchor-copy group inline-flex items-center gap-1"
+		data-copy-button
+		disabled={true}
+		title={t('locations.coordinates.copy.label')}
+		type="button"
+	>
+		<span data-copy-value>{coordinates}</span>
+		<span class="sr-only">{t('locations.coordinates.copy.label')}</span>
+		<span class="opacity-60 group-disabled:hidden" data-copy-icon>
+			<svg aria-hidden="true" height={iconSize} viewBox="0 0 24 24" width={iconSize}>
+				<use href="#icon:copy"></use>
+			</svg>
+		</span>
+		<span class="text-green-600 dark:text-green-500" data-copy-icon-done hidden={true}>
+			<svg aria-hidden="true" height={iconSize} viewBox="0 0 24 24" width={iconSize}>
+				<use href="#icon:check"></use>
+			</svg>
+		</span>
+	</button>
+	<span
+		class="sr-only"
+		data-copy-message={t('locations.coordinates.copy.done')}
+		data-copy-status
+		role="status"
+	></span>
+</copy-coordinates>
+
+<script>
+	import '#components/locations/locations-coordinates.ts';
+</script>

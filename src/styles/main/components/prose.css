@@ -19,10 +19,6 @@
 		margin-top: 0;
 	}
 
-	& > :where(:last-child) {
-		margin-bottom: 0;
-	}
-
 	& :where(h1) {
 		margin-top: 0;
 		margin-bottom: calc(var(--spacing) * 3);
@@ -279,6 +275,11 @@
 		font-weight: var(--font-weight-light);
 		color: light-dark(var(--color-accent-300), var(--color-accent-400));
 		content: ']';
+	}
+
+	/* After the element rules, which share its specificity */
+	& > :where(:last-child) {
+		margin-bottom: 0;
 	}
 }
 

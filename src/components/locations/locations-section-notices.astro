@@ -14,10 +14,11 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
+	hideLocation?: boolean | undefined;
 	langCode?: Extract<LanguageCode, 'ja' | 'ko' | 'zh' | 'zh-Hans'> | undefined;
 }
 
-const { entry, langCode, ...props } = Astro.props;
+const { entry, hideLocation = false, langCode, ...props } = Astro.props;
 
 const shouldShowDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
@@ -29,6 +30,13 @@ const shouldShowDangerNotice = entry.data.safety
 
 const shouldShowVanishedNotice = entry.data.status === LocationStatusEnum.Vanished;
 
+const precision = hideLocation ? undefined : entry.data.precision;
+
+const shouldShowPrecisionNotice = precision !== undefined && precision <= 2;
+
+const shouldShowQualityNotice =
+	entry.data.entryQuality <= 1 && !shouldShowVanishedNotice && !shouldShowPrecisionNotice;
+
 const showChinese = langCode?.startsWith('zh');
 
 const t = getTranslations();
@@ -36,13 +44,17 @@ const t = getTranslations();
 const noticeKeys = [
 	...(shouldShowVanishedNotice ? (['notice.vanished'] as const) : []),
 	...(shouldShowDangerNotice && !shouldShowVanishedNotice ? (['notice.danger'] as const) : []),
-	...(entry.data.entryQuality <= 1 ? (['notice.quality'] as const) : []),
+	...(shouldShowQualityNotice ? (['notice.quality'] as const) : []),
+	...(precision === 2 ? (['notice.precision.imprecise'] as const) : []),
+	...(precision === 1 ? (['notice.precision.guess'] as const) : []),
 ];
 
 const noticeSeverities = {
 	'notice.danger': NoticeBoxSeverityEnum.Warning,
+	'notice.precision.guess': NoticeBoxSeverityEnum.Info,
+	'notice.precision.imprecise': NoticeBoxSeverityEnum.Info,
 	'notice.quality': NoticeBoxSeverityEnum.Info,
-	'notice.vanished': NoticeBoxSeverityEnum.Info,
+	'notice.vanished': NoticeBoxSeverityEnum.Warning,
 } as const;
 
 const notices = noticeKeys.map((key) => ({
@@ -52,7 +64,7 @@ const notices = noticeKeys.map((key) => ({
 }));
 ---
 
-{shouldShowDangerNotice || shouldShowVanishedNotice ? (
+{notices.length > 0 ? (
 	<ContentSection class="flex flex-col gap-2" {...props} data-nosnippet data-pagefind-ignore>
 		<LocationsNotices notices={notices} />
 	</ContentSection>

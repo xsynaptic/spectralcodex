@@ -14,10 +14,9 @@ import ImageMetadata from '#components/image-metadata/image-metadata.astro';
 import ImageCarousel from '#components/image/image-carousel.astro';
 import ImageHero from '#components/image/image-hero.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
-import LocationsAddress from '#components/locations/locations-address.astro';
-import LocationsHeritageList from '#components/locations/locations-heritage-list.astro';
+import LocationsCoordinates from '#components/locations/locations-coordinates.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
-import LocationsNotices from '#components/locations/locations-notices.astro';
+import LocationsStatus from '#components/locations/locations-status.astro';
 import LocationsTable from '#components/locations/locations-table.astro';
 import MainSite from '#components/main/main-site.astro';
 import MapComponent from '#components/map/map-component.astro';
@@ -70,7 +69,6 @@ import {
 	createSampleImageFeaturedGroup,
 	createSampleImageProps,
 	createSampleMapData,
-	createSampleNotices,
 	createSamplePage,
 	getSampleDivisionRegionId,
 	getSampleImages,
@@ -89,10 +87,10 @@ import {
 	sampleDateEnd,
 	sampleDatesRecorded,
 	sampleDateUpdated,
-	sampleHeritage,
 	sampleLinkInline,
 	samplePlaces,
 	sampleSourceInline,
+	sampleStatuses,
 	sampleTitleChinese,
 	sampleTitleChineseSimplified,
 	sampleTitleJapanese,
@@ -148,7 +146,6 @@ const samplePageMiddle = createSamplePage({ currentPage: 3, items: sampleItems, 
 const sampleYear = String(new Date().getUTCFullYear());
 const sampleActivityValues = createSampleActivityValues(sampleYear);
 const sampleDailyData = createSampleDailyData(sampleActivityValues);
-const sampleNotices = createSampleNotices();
 const sampleChronologyYear = sampleChronologyYears.at(-1) ?? sampleYear;
 const sampleChronologyMonth = sampleChronologyMonths[1];
 
@@ -372,7 +369,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="Background utilities"
-				note="Every swatch sits over the same image, because the three gradients only ever resolve against one. Hide it to read a fade on its own; the two opaque utilities cover it either way."
+				note="All swatches share one image; hide it to read a fade on its own."
 				source="styles/main/parts/utilities.css"
 			>
 				<div class="group flex flex-col gap-4">
@@ -422,7 +419,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="prose (default)"
-				note="Rendered from MDX through the real satteri pipeline. Carries <code>data-reading-frame</code>, so the reading bar tracks this block."
+				note="Rendered from MDX through the real pipeline; the reading bar tracks this block."
 				source="components/parts/prose.astro"
 			>
 				<Prose class="content-column" data-reading-frame>
@@ -444,7 +441,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="prose (showBlocks)"
-				note="Every direct child is pushed into <code>content-column</code>, so <code>prose-escape</code> breaks the measure."
+				note="Direct children sit in <code>content-column</code>; <code>prose-escape</code> breaks the measure."
 				source="components/parts/prose.astro"
 			>
 				<Prose showBlocks={true}>
@@ -699,7 +696,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="pagination-select"
-				note="Pages 1 of 1 (renders nothing) and 3 of 12, then years without and with a current year. Without JavaScript the counter and the previous/next links stand alone."
+				note="Pages 1 of 1 (renders nothing) and 3 of 12, then years without and with a current year."
 				source="components/parts/pagination-select.astro"
 			>
 				<div class="flex flex-col gap-4">
@@ -750,7 +747,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<Specimen
 						bleed={true}
 						name="content-image"
-						note="The caption doubles as the alt text when no <code>alt</code> is given; the portrait frame takes its ratio from the Image's own dimensions rather than snapping to 3:2."
+						note="The caption doubles as alt text; the portrait frame keeps the Image's own ratio."
 						source="components/content/content-image.astro"
 					>
 						<Prose showBlocks={true}>
@@ -829,7 +826,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<Specimen
 						bleed={true}
 						name="image-hero"
-						note="The header overlays from <code>sm</code> up and drops beneath below it. Narrow the window for both states."
+						note="The header overlays from <code>sm</code> up and drops beneath below it."
 						source="components/image/image-hero.astro"
 					>
 						<ImageHero
@@ -1016,10 +1013,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				</div>
 			</Specimen>
 		</Section>
-		<Section
-			note="Each resolves its own data, then hands the markup to the presentational component rendered here."
-			title="Sections"
-		>
+		<Section note="Containers that resolve their own data." title="Sections">
 			<Specimen
 				bleed={true}
 				name="section-preview-list"
@@ -1060,7 +1054,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="section-author"
-				note="Takes no Entry: a fixed photograph, the microformat, and the bio from the translations. Rendered <code>sr-only</code> unless <code>showAuthor</code> is set."
+				note="Rendered <code>sr-only</code> unless <code>showAuthor</code> is set."
 				source="components/sections/section-author.astro"
 			>
 				<SectionAuthor showAuthor={true} />
@@ -1098,7 +1092,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="section-map"
-				note="The one React island here; source and popup data are inlined, so it draws without a chunk endpoint."
+				note="The one React island here; its data is inlined."
 				source="components/map/map-component.astro"
 			>
 				{sampleMapData.hasGeodata ? (
@@ -1108,10 +1102,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				)}
 			</Specimen>
 		</Section>
-		<Section
-			note="Components tied to one collection: the Chronology, Locations, and Regions. Those resolving an Entry render a real one, found by predicate."
-			title="Domain"
-		>
+		<Section note="Components tied to one collection, rendered from real Entries." title="Domain">
 			<Specimen
 				name="chronology-navigation"
 				note="The year select, then months once a month is current; the slot carries the index link back out."
@@ -1134,7 +1125,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="chronology-item"
-				note="One line per activity kind; a count more than ten past the items becomes the linked “and N more”."
+				note="One line per activity kind; overflow becomes the linked “and N more”."
 				source="components/chronology/chronology-item.astro"
 			>
 				<div class="flex flex-col gap-2 text-sm text-primary-700 dark:text-primary-400">
@@ -1155,19 +1146,6 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/chronology/chronology-activity.astro"
 			>
 				<ChronologyActivity dailyData={sampleDailyData} year={sampleYear} />
-			</Specimen>
-			<Specimen
-				name="locations-address"
-				note="Renders nothing without either part; the ／ separator is full-width on purpose."
-				source="components/locations/locations-address.astro"
-			>
-				<div class="flex flex-col gap-2">
-					<LocationsAddress
-						address="No. 1, Zhongshan Road, Xinying District, Tainan"
-						content={{ lang: sampleTitleChinese.lang, value: '臺南市新營區中山路1號' }}
-					/>
-					<LocationsAddress address="No. 1, Zhongshan Road, Xinying District, Tainan" />
-				</div>
 			</Specimen>
 			<Specimen
 				name="locations-table"
@@ -1194,25 +1172,28 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				</div>
 			</Specimen>
 			<Specimen
-				name="locations-heritage-list"
-				note="Every designation in the schema at once; a Location carries one or two."
-				source="components/locations/locations-heritage-list.astro"
+				name="locations-status"
+				note="Every Status in Filter order, with the Chinese label; hover for the definition."
+				source="components/locations/locations-status.astro"
 			>
-				<LocationsHeritageList heritage={sampleHeritage} />
+				<div class="flex flex-col gap-1 font-serif text-sm">
+					{sampleStatuses.map((status) => (
+						<LocationsStatus showChinese={true} status={status} />
+					))}
+				</div>
 			</Specimen>
 			<Specimen
-				bleed={true}
-				name="locations-notices"
-				note="The only <code>notice-box</code> caller: danger raises a <code>warning</code>, vanished and low quality stay <code>info</code>. All three stack here; a Location's own data can trigger at most two."
-				source="components/locations/locations-notices.astro"
+				name="locations-coordinates"
+				note="<code>&lt;copy-coordinates&gt;</code>: one button, disabled until the script enables it."
+				source="components/locations/locations-coordinates.astro"
 			>
-				<div class="content-column flex flex-col gap-2">
-					<LocationsNotices notices={sampleNotices} />
+				<div class="font-serif text-sm">
+					<LocationsCoordinates coordinates="23.366957, 120.158968" />
 				</div>
 			</Specimen>
 			<Specimen
 				name="locations-nearby-list"
-				note="A real Location's neighbours; distances come from the build-time pass, so nothing here is invented."
+				note="A real Location's neighbours, with build-time distances."
 				source="components/locations/locations-nearby-list.astro"
 			>
 				{sampleNearbyLocations.length > 0 ? (
@@ -1223,7 +1204,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="regions-breadcrumbs"
-				note="The deepest Region's ancestor run. The current term is plain text unless <code>showCurrentLink</code> is set."
+				note="The current term is plain text unless <code>showCurrentLink</code> is set."
 				source="components/regions/regions-breadcrumbs.astro"
 			>
 				{sampleRegions.deepest ? (
@@ -1238,7 +1219,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			<Specimen
 				bleed={true}
 				name="regions-related"
-				note="A column per relation, each heading an overridable slot; alternate titles appear below the second level."
+				note="A column per relation; each heading is an overridable slot."
 				source="components/regions/regions-related.astro"
 			>
 				{sampleRelatedRegion ? (
@@ -1249,7 +1230,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<Specimen
 				name="regions-division"
-				note="The cached Division outline for a Region; decorative, so it sits behind content and is hidden from assistive tech."
+				note="The cached Division outline for a Region; decorative."
 				source="components/regions/regions-division.astro"
 			>
 				{sampleDivisionRegionId ? (
@@ -1260,10 +1241,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 			</Specimen>
 			<InventoryAtlasDivider />
 		</Section>
-		<Section
-			note="Cards are drawn by a batch script rather than by Astro; the route behind this section renders that same template on demand."
-			title="Open Graph"
-		>
+		<Section note="The batch script's card template, rendered on demand." title="Open Graph">
 			{openGraphSpecimens.map(({ key, missing, name, note }) => {
 				const card = sampleOpenGraphCards.find((item) => item.key === key);
 
