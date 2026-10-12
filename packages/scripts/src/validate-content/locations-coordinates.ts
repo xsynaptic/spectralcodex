@@ -1,7 +1,7 @@
 import type { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import { booleanPointInPolygon, point } from '@turf/turf';
-import { geojson } from 'flatgeobuf';
+import { deserialize } from 'flatgeobuf/geojson';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -218,7 +218,7 @@ async function loadRegionGeometry(
 	try {
 		const buffer = await fs.readFile(fgbPath);
 
-		const featuresIterator = geojson.deserialize(buffer);
+		const featuresIterator = deserialize(buffer);
 		const features: Array<Feature<MultiPolygon | Polygon>> = [];
 
 		for await (const feature of featuresIterator) {

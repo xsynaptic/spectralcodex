@@ -4,7 +4,7 @@ import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { bboxPolygon } from '@turf/bbox-polygon';
 import { difference } from '@turf/difference';
 import { featureCollection } from '@turf/helpers';
-import { geojson } from 'flatgeobuf';
+import { deserialize } from 'flatgeobuf/geojson';
 import * as R from 'remeda';
 
 export const worldBounds = [-180, -85, 180, 85] satisfies [number, number, number, number];
@@ -15,7 +15,7 @@ export function createFeatureMask(feature: Feature<MultiPolygon | Polygon>) {
 }
 
 export async function deserializeDivisionMasks(buffer: ArrayBuffer) {
-	const featuresIterator = geojson.deserialize(new Uint8Array(buffer));
+	const featuresIterator = deserialize(new Uint8Array(buffer));
 	const features: Array<Feature<MultiPolygon | Polygon>> = [];
 
 	for await (const feature of featuresIterator) {
