@@ -313,7 +313,7 @@ export const MapPopup: FC<{
 					popupItem={popupItem}
 				/>
 			) : undefined}
-			<MapCanvasLoading isSelectionPending={outcome === 'pending'} />
+			<MapCanvasLoading />
 		</>
 	);
 };

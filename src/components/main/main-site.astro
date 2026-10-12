@@ -28,10 +28,10 @@ const { atlas, hasHeroImage = false, isHomepage = false, meta, schemas } = Astro
 		<main class="flex-1" {...(hasHeroImage ? {} : { id: 'main-content', tabindex: -1 })}>
 			<slot />
 		</main>
-		<footer class="content-column mt-8 mb-8 w-full pt-4">
+		<footer class="content-column mt-8 mb-4 w-full pt-4 sm:mb-8">
 			<div
 				class:list={[
-					'border-t pt-4 pb-8',
+					'border-t pt-4 pb-4 sm:pb-8',
 					'border-primary-200 text-primary-400 dark:border-primary-700 dark:text-primary-700',
 				]}
 			>
