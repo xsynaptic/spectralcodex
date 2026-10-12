@@ -3,7 +3,6 @@ import type { CollectionEntry } from 'astro:content';
 
 import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
-import ListRow from '#components/parts/list-row.astro';
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
@@ -29,7 +28,7 @@ const t = getTranslations();
 		data-pagefind-ignore
 		{...props}
 	>
-		<ListRow as="ol" class="text-sm">
+		<ol class="inline text-sm sm:inline-flex sm:flex-wrap sm:items-start sm:gap-x-1 sm:gap-y-2">
 			{termAncestors.map((termAncestor) => {
 				const isCurrent = termAncestor.id === entry.id;
 
@@ -49,6 +48,6 @@ const t = getTranslations();
 					</DividedItem>
 				);
 			})}
-		</ListRow>
+		</ol>
 	</nav>
 ) : undefined}

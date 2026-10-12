@@ -14,12 +14,8 @@ const t = getTranslations();
 ---
 
 {entryCount > 0 ? (
-	<DividedItem class="hidden lg:inline-flex">
-		{t.plural('content.meta.entries.label', entryCount)}
-	</DividedItem>
+	<DividedItem>{t.plural('content.meta.entries.label', entryCount)}</DividedItem>
 ) : undefined}
 {backlinksCount >= backlinksDisplayCountMinimum ? (
-	<DividedItem class="hidden lg:inline-flex">
-		{t.plural('content.meta.backlinks.label', backlinksCount)}
-	</DividedItem>
+	<DividedItem>{t.plural('content.meta.backlinks.label', backlinksCount)}</DividedItem>
 ) : undefined}

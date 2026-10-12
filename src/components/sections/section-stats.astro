@@ -1,0 +1,22 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+import ContentEntryCounts from '#components/content/content-entry-counts.astro';
+import ContentSection from '#components/content/content-section.astro';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props extends HTMLAttributes<'div'> {
+	backlinksCount: number;
+	entryCount: number;
+}
+
+const { backlinksCount, entryCount, ...props } = Astro.props;
+
+const t = getTranslations();
+---
+
+<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.stats')} {...props}>
+	<div class="gap-x-1 font-serif text-xs sm:flex sm:flex-wrap sm:text-sm">
+		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entryCount} />
+	</div>
+</ContentSection>

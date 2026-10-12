@@ -90,6 +90,8 @@
 
 /* Glyph separator between inline items; avoids repetition in the divided-item component */
 .divided-item {
+	--divider-glyph: var(--content-slash);
+
 	display: inline;
 
 	@media (width >= 40rem) {
@@ -98,36 +100,34 @@
 	}
 }
 
-.divided-item::before {
+.divided-item:has(~ .divided-item)::after {
 	color: light-dark(
 		var(--divider-color, var(--color-primary-400)),
 		var(--divider-color-dark, var(--color-primary-500))
 	);
-	content: var(--content-slash);
+	content: var(--content-word-joiner) var(--divider-glyph) var(--content-zero-width-space);
 }
 
 /* Glyphs need spacing below sm breakpoint due to jsx whitespace handling */
 @media (width < 40rem) {
-	.divided-item::before {
+	.divided-item::after {
 		margin-inline: var(--divider-space, calc(var(--spacing) * 1));
 	}
 }
 
-.divided-item:first-child::before {
-	content: none;
+.divided-chevron {
+	--divider-glyph: var(--content-chevron);
 }
 
-/* Glyph set on the pseudo-element; a custom property would inherit into nested items */
-.divided-chevron::before {
-	content: var(--content-chevron);
+.divided-chevron::after {
 	translate: 0 -1px;
 }
 
-.divided-dot::before {
-	content: var(--content-dot);
+.divided-dot {
+	--divider-glyph: var(--content-dot);
 }
 
-.divided-thin::before {
+.divided-thin::after {
 	font-weight: var(--font-weight-light);
 }
 
@@ -137,7 +137,7 @@
 }
 
 @media (width >= 40rem) {
-	.divided-hero .divided-item::before {
+	.divided-hero .divided-item::after {
 		color: var(--color-primary-300);
 		opacity: 0.8;
 	}

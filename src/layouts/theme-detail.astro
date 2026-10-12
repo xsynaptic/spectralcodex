@@ -7,7 +7,6 @@ import type { CollectionEntry } from 'astro:content';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
-import ContentEntryCounts from '#components/content/content-entry-counts.astro';
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
 import ContentProse from '#components/content/content-prose.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -17,6 +16,7 @@ import SectionPreviewList from '#components/sections/section-preview-list.astro'
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SectionSources from '#components/sections/section-sources.astro';
+import SectionStats from '#components/sections/section-stats.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getAtlasPage } from '#lib/map/map-atlas.ts';
@@ -46,7 +46,6 @@ const atlas = await getAtlasPage(entry, mapData);
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
 		</DividedItem>
-		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 	</Fragment>
 	<ContentProse entry={entry} />
 	<SectionMap
@@ -64,4 +63,5 @@ const atlas = await getAtlasPage(entry, mapData);
 	{page.currentPage === 1 && catalogItems.length > 0 ? (
 		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
+	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
 </ContentEntryDetail>
