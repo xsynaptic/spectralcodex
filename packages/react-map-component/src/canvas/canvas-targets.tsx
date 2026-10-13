@@ -116,7 +116,7 @@ const MapSyncedTargets: FC = function MapSyncedTargets() {
 
 	return (
 		<>
-			{isSettled ? <MapTargetMarkers isHosted={true} targetIds={targetIds} /> : undefined}
+			{isSettled ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
 			<MapSelectedMarker targetIds={targetIds} />
 		</>
 	);
@@ -129,7 +129,7 @@ export const MapTargets: FC<Pick<MapComponentProps, 'host'>> = function MapTarge
 
 	return (
 		<>
-			<MapTargetMarkers isHosted={false} targetIds={targetIds} />
+			<MapTargetMarkers targetIds={targetIds} />
 			<MapSelectedMarker targetIds={targetIds} />
 		</>
 	);

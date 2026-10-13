@@ -44,37 +44,6 @@ function areMarkersEqual(previous: TargetMarker, next: TargetMarker): boolean {
 	);
 }
 
-function collectClusterMarkers(map: MapRef, color: string): Array<TargetMarker> {
-	if (!map.getLayer(MapLayerIdEnum.Clusters)) return [];
-
-	const clusters = map.queryRenderedFeatures(undefined, {
-		filter: ['>', ['get', 'hasTarget'], 0],
-		layers: [MapLayerIdEnum.Clusters],
-	});
-
-	const markers: Array<TargetMarker> = [];
-
-	for (const feature of clusters) {
-		if (feature.geometry.type !== 'Point') continue;
-
-		const clusterId =
-			typeof feature.properties.cluster_id === 'number' ? feature.properties.cluster_id : undefined;
-
-		if (clusterId === undefined) continue;
-
-		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
-
-		markers.push({
-			color,
-			id: `cluster-${String(clusterId)}`,
-			latitude,
-			longitude,
-		});
-	}
-
-	return markers;
-}
-
 function getRenderedClusters(map: MapRef): Array<RenderedCluster> {
 	const clusters = new Map<number, RenderedCluster>();
 	const features = map.queryRenderedFeatures(undefined, { layers: [MapLayerIdEnum.Clusters] });
@@ -216,7 +185,7 @@ function toPointMarker(
 	return { color: getMarkerColor(feature, isDark), id, latitude, longitude };
 }
 
-function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<TargetMarker> {
+function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 	const { current: map } = useMap();
 	const { data: sourceData } = useSourceDataQuery();
 
@@ -226,8 +195,8 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 	const [visible, setVisible] = useState(true);
 
 	const targetPoints = useMemo(
-		() => (isHosted && sourceData ? getTargetPoints(sourceData, targetIds) : []),
-		[isHosted, sourceData, targetIds],
+		() => (sourceData ? getTargetPoints(sourceData, targetIds) : []),
+		[sourceData, targetIds],
 	);
 
 	useEffect(() => {
@@ -256,15 +225,13 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 			const pointMarkers = collectPointMarkers(map, targetIds, isDark);
 			const pointIds = new Set(pointMarkers.map((marker) => marker.id));
 
-			const clusterMarkers = isHosted
-				? await collectLeafClusterMarkers({
-						color: clusterColor,
-						isCurrent: () => refreshIndex === refreshCount,
-						leafIds,
-						map,
-						targets: targetPoints.filter((target) => !pointIds.has(target.id)),
-					})
-				: collectClusterMarkers(map, clusterColor);
+			const clusterMarkers = await collectLeafClusterMarkers({
+				color: clusterColor,
+				isCurrent: () => refreshIndex === refreshCount,
+				leafIds,
+				map,
+				targets: targetPoints.filter((target) => !pointIds.has(target.id)),
+			});
 
 			if (refreshIndex !== refreshCount) return;
 
@@ -330,7 +297,7 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 
 			if (refreshFrame !== undefined) cancelAnimationFrame(refreshFrame);
 		};
-	}, [map, targetIds, targetPoints, isDark, isHosted]);
+	}, [map, targetIds, targetPoints, isDark]);
 
 	if (!visible) return [];
 
@@ -348,10 +315,9 @@ const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ color, latitude, 
 };
 
 export const MapTargetMarkers: FC<{
-	isHosted: boolean;
 	targetIds: Array<string>;
-}> = function MapTargetMarkers({ isHosted, targetIds }) {
-	const markers = useTargetMarkers(targetIds, isHosted);
+}> = function MapTargetMarkers({ targetIds }) {
+	const markers = useTargetMarkers(targetIds);
 
 	if (markers.length === 0) return;
 

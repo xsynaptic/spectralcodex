@@ -102,7 +102,7 @@ const MapCanvasContainer: FC<
 					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} isHosted={isHosted} />
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
-			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} host={host} isDev={isDev} />
+			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} isDev={isDev} />
 			{host ? <MapScopeBar /> : undefined}
 			<MapTargets host={host} />
 			<MapSelectionFeatureState />

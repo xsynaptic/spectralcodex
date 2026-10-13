@@ -259,8 +259,7 @@ function useMapSourcePointsStyle(): {
 export const MapSourcePoints: FC<{
 	data: MapSourceFeatureCollection;
 	interactive: boolean;
-	targetIds?: Array<string> | undefined;
-}> = memo(function MapPointLayerContents({ data, interactive, targetIds }) {
+}> = memo(function MapPointLayerContents({ data, interactive }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
@@ -272,13 +271,6 @@ export const MapSourcePoints: FC<{
 			]),
 		);
 
-		if (targetIds && targetIds.length > 0) {
-			clusterProperties.hasTarget = [
-				'+',
-				['case', ['in', ['get', 'id'], ['literal', targetIds]], 1, 0],
-			];
-		}
-
 		return {
 			cluster: interactive,
 			clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -286,7 +278,7 @@ export const MapSourcePoints: FC<{
 			clusterProperties,
 			clusterRadius: pointClusterRadius,
 		};
-	}, [interactive, targetIds]);
+	}, [interactive]);
 
 	// Note: Layer components need to be immediate children of Source components; do not use React.Fragment here
 	return (
