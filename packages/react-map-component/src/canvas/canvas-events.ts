@@ -18,21 +18,21 @@ import {
 	decideHoverIntent,
 	getSelectionOutcome,
 } from '#canvas/canvas-events-factory.ts';
-import { getPopupLayout } from '#canvas/canvas-popup-factory.ts';
-import { useMapTargetIds } from '#canvas/canvas-view.tsx';
+import { writeSavedViewport } from '#canvas/canvas-viewport.ts';
 import { controlFilterId } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapHost } from '#host/host-context.tsx';
 import { sendHostIntent } from '#host/host-intent.ts';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { trackMapErrorOnce } from '#lib/track.ts';
+import { getPopupLayout } from '#popup/popup-factory.ts';
 import { MapSourceIdEnum } from '#source/source-config.ts';
-import { writeSavedViewport } from '#store/store-viewport.ts';
 import {
 	useIsMapCanvasInteractive,
 	useMapStoreActions,
 	useMapStoreInstance,
 } from '#store/store.ts';
+import { useMapTargetIds } from '#view/view.tsx';
 
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 

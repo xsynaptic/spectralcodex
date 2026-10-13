@@ -2,7 +2,7 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 
 import type { MapFeaturesRule, MapScope, MapView } from '#types.ts';
 
-import { createRuleTest } from '#canvas/canvas-data-filter.ts';
+import { createRuleTest } from '#data/data-filter.ts';
 
 export interface MapScopeResult {
 	isScopeEnabled: boolean;

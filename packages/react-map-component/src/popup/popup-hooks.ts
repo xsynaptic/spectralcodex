@@ -5,15 +5,15 @@ import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
+import { useChunkPopup } from '#data/data-popup-chunks.tsx';
+import { usePopupDataQuery } from '#data/data-popup.tsx';
+import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
 	findPopupImageSrcSet,
 	getPopupImageSizes,
 	getPopupImageSrcSet,
 	getPopupLayout,
-} from '#canvas/canvas-popup-factory.ts';
-import { useChunkPopup } from '#data/data-popup-chunks.tsx';
-import { usePopupDataQuery } from '#data/data-popup.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
+} from '#popup/popup-factory.ts';
 import { useMapHoveredId, useMapSelectedId } from '#store/store.ts';
 
 export type MapPopupItemExtended = MapPopupItem & {

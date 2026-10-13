@@ -7,18 +7,18 @@ import { LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map
 import { useEffect, useMemo, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
-import type { TargetPoint } from '#canvas/canvas-markers-factory.ts';
+import type { TargetPoint } from '#targets/targets-markers-factory.ts';
 
+import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
+import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
 import {
 	findTargetClusters,
 	getClusterCandidates,
 	getClusterSearchRadius,
 	getTargetPoints,
-} from '#canvas/canvas-markers-factory.ts';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
-import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
+} from '#targets/targets-markers-factory.ts';
 
 interface RenderedCluster {
 	id: number;

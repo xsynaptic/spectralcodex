@@ -1,7 +1,7 @@
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
 
-import { getPopupLayout, getTargetPopupItem } from '#canvas/canvas-popup-factory.ts';
+import { getPopupLayout, getTargetPopupItem } from '#popup/popup-factory.ts';
 
 describe('getPopupLayout', () => {
 	test('a wide map gets the full popup beside the Point', () => {

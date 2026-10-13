@@ -4,7 +4,7 @@ import {
 	getInitialViewState,
 	readSavedViewport,
 	writeSavedViewport,
-} from '#store/store-viewport.ts';
+} from '#canvas/canvas-viewport.ts';
 
 const minuteMs = 60 * 1000;
 const savedAt = 1_000_000;

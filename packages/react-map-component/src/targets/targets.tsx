@@ -8,18 +8,18 @@ import { useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
 
-import { MapSelectedMarker, MapTargetMarkers } from '#canvas/canvas-markers.tsx';
+import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useMapHost } from '#host/host-context.tsx';
+import { useHostSyncValue } from '#host/host-view.ts';
+import { useMapStoreActions } from '#store/store.ts';
 import {
 	getTargetBounds,
 	getTargetDuration,
 	getTargetPositions,
 	getTargetZoom,
-} from '#canvas/canvas-view-factory.ts';
-import { useMapView } from '#canvas/canvas-view.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useMapHost } from '#host/host-context.tsx';
-import { useHostSyncValue } from '#host/host-view.ts';
-import { useMapStoreActions } from '#store/store.ts';
+} from '#targets/targets-fit-factory.ts';
+import { MapSelectedMarker, MapTargetMarkers } from '#targets/targets-markers.tsx';
+import { useMapView } from '#view/view.tsx';
 
 const fitPadding = 50;
 

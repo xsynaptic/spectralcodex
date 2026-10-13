@@ -2,10 +2,9 @@ import type { FC, PropsWithChildren } from 'react';
 
 import { createContext, useContext, useDeferredValue, useMemo } from 'react';
 
-import type { MapCanvasData } from '#canvas/canvas-data-filter.ts';
+import type { MapCanvasData } from '#data/data-filter.ts';
 
-import { getHiddenTargetIds, getMapCanvasData } from '#canvas/canvas-data-filter.ts';
-import { useMapView } from '#canvas/canvas-view.tsx';
+import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import {
 	useMapFeaturesRule,
@@ -13,6 +12,7 @@ import {
 	useMapRatingFilter,
 	useMapStatusFilter,
 } from '#store/store.ts';
+import { useMapView } from '#view/view.tsx';
 
 const emptyItems = [] as const;
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { findTargetClusters, getClusterCandidates } from '#canvas/canvas-markers-factory.ts';
+import { findTargetClusters, getClusterCandidates } from '#targets/targets-markers-factory.ts';
 
 describe('getClusterCandidates', () => {
 	const clusters = [

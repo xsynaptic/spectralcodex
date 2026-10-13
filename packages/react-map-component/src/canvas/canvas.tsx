@@ -10,22 +10,22 @@ import '#canvas/canvas-worker.ts';
 import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
-import { MapPopup } from '#canvas/canvas-popup.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
-import { MapScopeBar } from '#canvas/canvas-scope-bar.tsx';
-import { MapTargets } from '#canvas/canvas-targets.tsx';
-import { MapViewProvider } from '#canvas/canvas-view.tsx';
+import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
 import { SourceDataContextProvider } from '#data/data-source.tsx';
 import { MapHostProvider, useMapHost } from '#host/host-context.tsx';
 import { useProtomaps } from '#lib/protomaps.ts';
+import { MapPopup } from '#popup/popup.tsx';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store-provider.tsx';
-import { getInitialViewState } from '#store/store-viewport.ts';
 import { useIsMapCanvasInteractive } from '#store/store.ts';
+import { MapTargets } from '#targets/targets.tsx';
+import { MapScopeBar } from '#view/view-scope-bar.tsx';
+import { MapViewProvider } from '#view/view.tsx';
 
 // Features past the antimeridian only draw with world copies on
 function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {

@@ -4,29 +4,29 @@ import type { FC } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
-import type { MapPopupItemExtended } from '#canvas/canvas-popup-hooks.ts';
+import type { MapPopupItemExtended } from '#popup/popup-hooks.ts';
 
 import { getSelectionOutcome } from '#canvas/canvas-events-factory.ts';
 import { useSettledClick } from '#canvas/canvas-feature-open.ts';
 import { MapCanvasLoading } from '#canvas/canvas-loading.tsx';
+import { useMapHost } from '#host/host-context.tsx';
+import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
+import { useMapMessages } from '#lib/messages.tsx';
+import { useTrackMap } from '#lib/track-context.tsx';
 import {
 	getPopupImageSizes,
 	getPopupImageSrc,
 	getPopupImageSrcSet,
 	getTargetPopupItem,
-} from '#canvas/canvas-popup-factory.ts';
+} from '#popup/popup-factory.ts';
 import {
 	useMapCanvasPopup,
 	useMapImagePreload,
 	useMapPopupLayout,
 	useSourceDataIndex,
-} from '#canvas/canvas-popup-hooks.ts';
-import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { useMapHost } from '#host/host-context.tsx';
-import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
-import { useMapMessages } from '#lib/messages.tsx';
-import { useTrackMap } from '#lib/track-context.tsx';
+} from '#popup/popup-hooks.ts';
 import { useIsMapPopupVisible, useMapStoreActions } from '#store/store.ts';
+import { useMapTargetIds } from '#view/view.tsx';
 
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
 function getGoogleMapsHref(value: string) {

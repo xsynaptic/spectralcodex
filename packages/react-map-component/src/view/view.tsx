@@ -4,17 +4,17 @@ import { createContext, useContext, useEffect, useMemo } from 'react';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
 
-import { parseMapView } from '#canvas/canvas-view-factory.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapHost } from '#host/host-context.tsx';
 import { useHostViewKey } from '#host/host-view.ts';
-import { reduceMapScope } from '#store/store-scope.ts';
 import {
 	useIsMapScopeEnabled,
 	useMapScopeViewKey,
 	useMapStoreActions,
 	useMapStoreScope,
 } from '#store/store.ts';
+import { parseMapView } from '#view/view-factory.ts';
+import { reduceMapScope } from '#view/view-scope.ts';
 
 const emptyTargetIds: Array<string> = [];
 

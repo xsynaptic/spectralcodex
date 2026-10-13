@@ -7,14 +7,10 @@ import {
 } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapFilterState } from '#canvas/canvas-data-filter.ts';
+import type { MapFilterState } from '#data/data-filter.ts';
 import type { MapFeaturesRule } from '#types.ts';
 
-import {
-	getHiddenTargetIds,
-	getMapCanvasData,
-	isLocationVisible,
-} from '#canvas/canvas-data-filter.ts';
+import { getHiddenTargetIds, getMapCanvasData, isLocationVisible } from '#data/data-filter.ts';
 
 const passAll: MapFilterState = {
 	objective: 1,

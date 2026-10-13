@@ -2,10 +2,10 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 
 import { describe, expect, test } from 'vitest';
 
-import type { MapScopeState } from '#store/store-scope.ts';
 import type { MapScope, MapView } from '#types.ts';
+import type { MapScopeState } from '#view/view-scope.ts';
 
-import { reduceMapScope } from '#store/store-scope.ts';
+import { reduceMapScope } from '#view/view-scope.ts';
 
 function makeItem(properties: Partial<MapSourceItem['properties']>) {
 	return { properties } as MapSourceItem;
