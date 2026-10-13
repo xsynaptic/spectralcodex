@@ -2,7 +2,7 @@ import {
 	mapEnterEventName,
 	mapExitEventName,
 	mapExpandEventName,
-	mapFeatureOpenEventName,
+	mapIntentEventName,
 } from '#constants.ts';
 
 export type MapHostIntent = { hasPopup: boolean; kind: 'target' } | { kind: 'open'; url: string };
@@ -19,7 +19,7 @@ export type MapHostEventName = keyof typeof hostEventNames;
 // eslint-disable-next-line unicorn/consistent-boolean-name -- a command that reports its result, not a predicate
 export function sendHostIntent(intent: MapHostIntent) {
 	return !document.dispatchEvent(
-		new CustomEvent<MapHostIntent>(mapFeatureOpenEventName, { cancelable: true, detail: intent }),
+		new CustomEvent<MapHostIntent>(mapIntentEventName, { cancelable: true, detail: intent }),
 	);
 }
 

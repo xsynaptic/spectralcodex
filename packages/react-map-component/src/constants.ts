@@ -13,7 +13,7 @@ export const mapTrackEventName = 'map:track';
 export const mapEnterEventName = 'map:enter';
 export const mapExitEventName = 'map:exit';
 export const mapExpandEventName = 'map:expand';
-export const mapFeatureOpenEventName = 'map:feature-open';
+export const mapIntentEventName = 'map:intent';
 export const mapSyncEventName = 'map:sync';
 export const mapViewAttribute = 'data-map-view';
 
@@ -22,7 +22,7 @@ declare global {
 		[mapEnterEventName]: Event;
 		[mapExitEventName]: Event;
 		[mapExpandEventName]: Event;
-		[mapFeatureOpenEventName]: CustomEvent<MapHostIntent>;
+		[mapIntentEventName]: CustomEvent<MapHostIntent>;
 		[mapSyncEventName]: Event;
 	}
 }

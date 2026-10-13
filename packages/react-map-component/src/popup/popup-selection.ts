@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 
-import { getSelectionOutcome, getSettledClick } from '#canvas/canvas-events-factory.ts';
 import { useMapHost } from '#host/host-context.tsx';
 import { sendHostIntent } from '#host/host-intent.ts';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { useMapCanvasPopup } from '#popup/popup-hooks.ts';
+import { getSelectionOutcome, getSettledClick } from '#popup/popup-selection-factory.ts';
 import { useMapClickedId, useMapStoreActions } from '#store/store.ts';
 import { useMapTargetIds } from '#view/view.tsx';
 

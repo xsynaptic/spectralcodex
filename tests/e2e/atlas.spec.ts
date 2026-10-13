@@ -1,6 +1,6 @@
 import type { APIRequestContext, Locator, Page } from '@playwright/test';
 
-import { mapFeatureOpenEventName } from '@spectralcodex/react-map-component/constants';
+import { mapIntentEventName } from '@spectralcodex/react-map-component/constants';
 
 import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
@@ -86,7 +86,7 @@ async function openFromMap(page: Page, url: string) {
 				new CustomEvent(eventName, { detail: { kind: 'open', url: detailUrl } }),
 			);
 		},
-		[mapFeatureOpenEventName, url] as const,
+		[mapIntentEventName, url] as const,
 	);
 	await page.waitForURL(`**${url}`);
 }
@@ -370,7 +370,7 @@ test.describe('on a wide viewport', () => {
 				opened.count += 1;
 			});
 			Object.assign(globalThis, { opened });
-		}, mapFeatureOpenEventName);
+		}, mapIntentEventName);
 
 		await page.locator(`.main-pane a[href="${paths.locationsIndex}"]`).first().click();
 		await page.waitForURL(`**${paths.locationsIndex}`);

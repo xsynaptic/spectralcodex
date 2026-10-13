@@ -2,7 +2,7 @@ import {
 	mapEnterEventName,
 	mapExitEventName,
 	mapExpandEventName,
-	mapFeatureOpenEventName,
+	mapIntentEventName,
 } from '@spectralcodex/react-map-component/constants';
 import { navigate } from 'astro:transitions/client';
 
@@ -160,7 +160,7 @@ async function clearFromWhenFinished(transition: ViewTransition) {
 
 // Called once by the setup script on every page; bundled scripts do not run again after a swap
 export function startAtlasMode() {
-	document.addEventListener(mapFeatureOpenEventName, (event) => {
+	document.addEventListener(mapIntentEventName, (event) => {
 		const action = getAtlasOpenAction({
 			intent: event.detail,
 			pathname: location.pathname,
