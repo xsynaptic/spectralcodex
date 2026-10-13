@@ -1,11 +1,12 @@
 import type { FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import type { MapHostEventName } from '#host/host-intent.ts';
 import type { MapTrackName } from '#types.ts';
 
-import { useMapView } from '#canvas/canvas-view.tsx';
-import { mapEnterEventName, mapExitEventName, mapExpandEventName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
+import { sendHostEvent } from '#host/host-intent.ts';
+import { useHostViewKey } from '#host/host-view.ts';
 import { MapIconClose } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
@@ -18,7 +19,7 @@ const HostControl: FC<
 	PropsWithChildren<
 		HostControlProps & {
 			className: string;
-			eventName: string;
+			hostEvent: MapHostEventName;
 			label: string;
 			trackName: MapTrackName;
 			viewBox?: string | undefined;
@@ -27,7 +28,7 @@ const HostControl: FC<
 > = function HostControl({
 	children,
 	className,
-	eventName,
+	hostEvent,
 	label,
 	position,
 	trackName,
@@ -41,7 +42,7 @@ const HostControl: FC<
 				aria-label={label}
 				className={className}
 				onClick={() => {
-					document.dispatchEvent(new Event(eventName));
+					sendHostEvent(hostEvent);
 					trackMap({ name: trackName });
 				}}
 				title={label}
@@ -68,7 +69,7 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 	return (
 		<HostControl
 			className="maplibregl-ctrl-exit"
-			eventName={mapExitEventName}
+			hostEvent="exit"
 			label={messages.exitAriaLabel}
 			position={position}
 			trackName="map-exit"
@@ -80,14 +81,14 @@ export const ExitControl: FC<HostControlProps> = function ExitControl({ position
 
 export const ExpandControl: FC<HostControlProps> = function ExpandControl({ position }) {
 	const messages = useMapMessages();
-	const { hasView } = useMapView();
+	const viewKey = useHostViewKey();
 
-	if (!hasView) return;
+	if (viewKey === undefined) return;
 
 	return (
 		<HostControl
 			className="maplibregl-ctrl-expand"
-			eventName={mapExpandEventName}
+			hostEvent="expand"
 			label={messages.expandAriaLabel}
 			position={position}
 			trackName="map-expand"
@@ -110,7 +111,7 @@ export const EnterControl: FC<HostControlProps> = function EnterControl({ positi
 	return (
 		<HostControl
 			className="maplibregl-ctrl-enter"
-			eventName={mapEnterEventName}
+			hostEvent="enter"
 			label={messages.enterAriaLabel}
 			position={position}
 			trackName="map-enter"

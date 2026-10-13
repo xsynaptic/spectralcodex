@@ -19,6 +19,7 @@ import { MapControls } from '#controls/controls.tsx';
 import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
 import { PopupDataContextProvider } from '#data/data-popup.tsx';
 import { SourceDataContextProvider } from '#data/data-source.tsx';
+import { MapHostProvider, useMapHost } from '#host/host-context.tsx';
 import { useProtomaps } from '#lib/protomaps.ts';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
@@ -48,7 +49,6 @@ const MapCanvasContainer: FC<
 	center,
 	hasEnterControl,
 	hash,
-	host,
 	imageServerUrl,
 	isDev,
 	mapId,
@@ -65,9 +65,9 @@ const MapCanvasContainer: FC<
 		protomapsApiKey,
 	});
 
-	const isHosted = host !== undefined;
+	const host = useMapHost();
 
-	const canvasEvents = useMapCanvasEvents({ isHosted, mapId });
+	const canvasEvents = useMapCanvasEvents({ mapId });
 	const isCanvasInteractive = useIsMapCanvasInteractive();
 
 	const [initialViewState] = useState(() =>
@@ -98,13 +98,13 @@ const MapCanvasContainer: FC<
 					isDev={isDev}
 					version={version}
 				>
-					<MapControls hasEnterControl={hasEnterControl} host={host} />
-					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} isHosted={isHosted} />
+					<MapControls hasEnterControl={hasEnterControl} />
+					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
 			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} isDev={isDev} />
 			{host ? <MapScopeBar /> : undefined}
-			<MapTargets host={host} />
+			<MapTargets />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
 		</ReactMapGlMap>
@@ -142,11 +142,13 @@ export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
 					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
 				}}
 			>
-				<MapViewProvider host={host} isDev={isDev} targetIds={targetIds}>
-					<CanvasDataProvider>
-						<MapCanvasContainer {...props} />
-					</CanvasDataProvider>
-				</MapViewProvider>
+				<MapHostProvider host={host}>
+					<MapViewProvider isDev={isDev} targetIds={targetIds}>
+						<CanvasDataProvider>
+							<MapCanvasContainer {...props} />
+						</CanvasDataProvider>
+					</MapViewProvider>
+				</MapHostProvider>
 			</MapStoreProvider>
 		</SourceDataContextProvider>
 	);

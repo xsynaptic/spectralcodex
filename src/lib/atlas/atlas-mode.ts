@@ -17,6 +17,7 @@ import {
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
 import { readAtlasLayout } from '#lib/atlas/atlas-layout.ts';
+import { getAtlasOpenAction } from '#lib/atlas/atlas-open-factory.ts';
 import { updateHeroSizes } from '#lib/atlas/atlas-pane.ts';
 import { isSheetDown, moveSheet, resetSheet } from '#lib/atlas/atlas-sheet.ts';
 import { dispatchSync } from '#lib/atlas/atlas-sync.ts';
@@ -104,6 +105,26 @@ function runExitAction(action: ReturnType<typeof getAtlasExitAction>) {
 	void navigate(action.path, { history: action.type });
 }
 
+function runOpenAction(action: ReturnType<typeof getAtlasOpenAction>) {
+	switch (action.type) {
+		case 'navigate': {
+			void navigate(action.url);
+			break;
+		}
+		case 'none': {
+			break;
+		}
+		case 'raise': {
+			void moveSheet(false);
+			break;
+		}
+		case 'top': {
+			window.scrollTo({ top: 0 });
+			break;
+		}
+	}
+}
+
 async function closeAtlas() {
 	if (isSheetDown()) await moveSheet(false);
 
@@ -140,17 +161,16 @@ async function clearFromWhenFinished(transition: ViewTransition) {
 // Called once by the setup script on every page; bundled scripts do not run again after a swap
 export function startAtlasMode() {
 	document.addEventListener(mapFeatureOpenEventName, (event) => {
-		const { url } = event.detail;
+		const action = getAtlasOpenAction({
+			intent: event.detail,
+			pathname: location.pathname,
+			sheet: isSheetDown() ? 'down' : 'raised',
+		});
 
-		if (url === location.pathname) {
-			if (!event.cancelable || !isSheetDown()) return;
+		// Left uncancelled, the map spends the click on its own popup
+		if (action.type !== 'none') event.preventDefault();
 
-			event.preventDefault();
-			void moveSheet(false);
-			return;
-		}
-
-		void navigate(url);
+		runOpenAction(action);
 	});
 
 	matchMedia(atlasPaneMediaQuery).addEventListener('change', () => {

@@ -22,6 +22,7 @@ import {
 	useSourceDataIndex,
 } from '#canvas/canvas-popup-hooks.ts';
 import { useMapTargetIds } from '#canvas/canvas-view.tsx';
+import { useMapHost } from '#host/host-context.tsx';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
@@ -325,8 +326,8 @@ const MapImagePreload: FC<Parameters<typeof useMapImagePreload>[0]> = function M
 export const MapPopup: FC<{
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
-	isHosted: boolean;
-}> = function MapPopup({ imageServerUrl = '', isDev, isHosted }) {
+}> = function MapPopup({ imageServerUrl = '', isDev }) {
+	const isHosted = useMapHost() !== undefined;
 	const sourceDataIndex = useSourceDataIndex();
 	const { isLoading, popupItem } = useMapCanvasPopup(sourceDataIndex);
 	const targetIds = useMapTargetIds();
@@ -343,7 +344,7 @@ export const MapPopup: FC<{
 			})
 		: undefined;
 
-	useSettledClick({ id: popupItem?.id, isHosted, isLoading, outcome, url: popupItem?.url });
+	useSettledClick({ id: popupItem?.id, isLoading, outcome, url: popupItem?.url });
 
 	return (
 		<>

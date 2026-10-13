@@ -1,4 +1,4 @@
-import type { MapFeatureOpenDetail } from '#types.ts';
+import type { MapHostIntent } from '#host/host-intent.ts';
 
 export const controlFilterId = 'map-filter-control';
 export const controlSearchId = 'map-search-control';
@@ -22,7 +22,7 @@ declare global {
 		[mapEnterEventName]: Event;
 		[mapExitEventName]: Event;
 		[mapExpandEventName]: Event;
-		[mapFeatureOpenEventName]: CustomEvent<MapFeatureOpenDetail>;
+		[mapFeatureOpenEventName]: CustomEvent<MapHostIntent>;
 		[mapSyncEventName]: Event;
 	}
 }

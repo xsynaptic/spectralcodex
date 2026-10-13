@@ -5,9 +5,9 @@ import { createContext, useContext, useEffect, useMemo } from 'react';
 import type { MapComponentProps, MapScope } from '#types.ts';
 
 import { parseMapView } from '#canvas/canvas-view-factory.ts';
-import { mapSyncEventName, mapViewAttribute } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useDocumentAttribute } from '#lib/document-attribute.ts';
+import { useMapHost } from '#host/host-context.tsx';
+import { useHostViewKey } from '#host/host-view.ts';
 import { reduceMapScope } from '#store/store-scope.ts';
 import {
 	useIsMapScopeEnabled,
@@ -21,20 +21,16 @@ const emptyTargetIds: Array<string> = [];
 interface MapViewContextValue {
 	// From the page's own view, not the Scope in force, so turning the Scope off does not re-run the camera fit
 	bounds?: MapComponentProps['bounds'] | undefined;
-	hasView: boolean;
 	scope?: MapScope | undefined;
 	scopeHeld?: MapScope | undefined;
 	targetIds: Array<string>;
 }
 
-const MapViewContext = createContext<MapViewContextValue>({
-	hasView: false,
-	targetIds: emptyTargetIds,
-});
+const MapViewContext = createContext<MapViewContextValue>({ targetIds: emptyTargetIds });
 
 const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 	function HostViewProvider({ children, isDev }) {
-		const viewKey = useDocumentAttribute(mapViewAttribute, mapSyncEventName);
+		const viewKey = useHostViewKey();
 		const { data: sourceData } = useSourceDataQuery();
 
 		const storeScope = useMapStoreScope();
@@ -62,12 +58,11 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 		const context = useMemo(
 			() => ({
 				bounds: view.scope?.bounds,
-				hasView: viewKey !== undefined,
 				scope: isScopeEnabled ? scope : undefined,
 				scopeHeld: scope,
 				targetIds: view.targetIds ?? emptyTargetIds,
 			}),
-			[isScopeEnabled, scope, view, viewKey],
+			[isScopeEnabled, scope, view],
 		);
 
 		return <MapViewContext.Provider value={context}>{children}</MapViewContext.Provider>;
@@ -75,12 +70,10 @@ const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 
 // A hosted map reads its view from the host, so it changes after mount; any other map takes it from props
 export const MapViewProvider: FC<
-	PropsWithChildren<Pick<MapComponentProps, 'host' | 'isDev' | 'targetIds'>>
-> = function MapViewProvider({ children, host, isDev, targetIds }) {
-	const view = useMemo(
-		() => ({ hasView: true, targetIds: targetIds ?? emptyTargetIds }),
-		[targetIds],
-	);
+	PropsWithChildren<Pick<MapComponentProps, 'isDev' | 'targetIds'>>
+> = function MapViewProvider({ children, isDev, targetIds }) {
+	const host = useMapHost();
+	const view = useMemo(() => ({ targetIds: targetIds ?? emptyTargetIds }), [targetIds]);
 
 	if (host) {
 		return <HostViewProvider isDev={isDev}>{children}</HostViewProvider>;

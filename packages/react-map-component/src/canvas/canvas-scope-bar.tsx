@@ -1,9 +1,7 @@
 import type { FC, MouseEvent } from 'react';
 
-import type { MapFeatureOpenDetail } from '#types.ts';
-
 import { useMapView } from '#canvas/canvas-view.tsx';
-import { mapFeatureOpenEventName } from '#constants.ts';
+import { sendHostIntent } from '#host/host-intent.ts';
 import { MapIconEye, MapIconEyeOff } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
@@ -26,16 +24,7 @@ export const MapScopeBar: FC = function MapScopeBar() {
 
 		event.preventDefault();
 		setScopeEnabled(true);
-
-		const isOpened = !document.dispatchEvent(
-			new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, {
-				cancelable: true,
-				detail: { url },
-			}),
-		);
-
-		// Opening the page already in the Pane does nothing, so scroll to its top instead
-		if (!isOpened && url === location.pathname) window.scrollTo({ top: 0 });
+		sendHostIntent({ kind: 'open', url });
 	}
 
 	return (

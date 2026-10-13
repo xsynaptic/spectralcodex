@@ -16,9 +16,9 @@ import {
 	getTargetZoom,
 } from '#canvas/canvas-view-factory.ts';
 import { useMapView } from '#canvas/canvas-view.tsx';
-import { mapSyncEventName } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useDocumentEventValue } from '#lib/document-attribute.ts';
+import { useMapHost } from '#host/host-context.tsx';
+import { useHostSyncValue } from '#host/host-view.ts';
 import { useMapStoreActions } from '#store/store.ts';
 
 const fitPadding = 50;
@@ -67,7 +67,7 @@ function useTargetFit(view: MapFitView) {
 	const getWidth = useCallback(() => map?.getContainer().clientWidth ?? 0, [map]);
 
 	// The host resizes the container as chrome beside the map comes and goes
-	const width = useDocumentEventValue(mapSyncEventName, getWidth, 0);
+	const width = useHostSyncValue(getWidth, 0);
 
 	const key = `${view.targetIds.join(' ')} ${JSON.stringify(view.bounds)} ${String(width)}`;
 
@@ -122,7 +122,8 @@ const MapSyncedTargets: FC = function MapSyncedTargets() {
 	);
 };
 
-export const MapTargets: FC<Pick<MapComponentProps, 'host'>> = function MapTargets({ host }) {
+export const MapTargets: FC = function MapTargets() {
+	const host = useMapHost();
 	const { targetIds } = useMapView();
 
 	if (host) return <MapSyncedTargets />;

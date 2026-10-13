@@ -67,10 +67,6 @@ export type MapFeaturesRule =
 	| { index: number; type: 'theme' }
 	| { interval: [number, number]; type: 'region' };
 
-export interface MapFeatureOpenDetail {
-	url: string;
-}
-
 export type MapTrackName =
 	| 'map-enter'
 	| 'map-error'

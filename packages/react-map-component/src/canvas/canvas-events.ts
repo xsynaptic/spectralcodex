@@ -11,7 +11,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
-import type { MapFeatureOpenDetail, MapHoverFeature } from '#types.ts';
+import type { MapHoverFeature } from '#types.ts';
 
 import {
 	decideClickActions,
@@ -20,8 +20,10 @@ import {
 } from '#canvas/canvas-events-factory.ts';
 import { getPopupLayout } from '#canvas/canvas-popup-factory.ts';
 import { useMapTargetIds } from '#canvas/canvas-view.tsx';
-import { controlFilterId, mapFeatureOpenEventName } from '#constants.ts';
+import { controlFilterId } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useMapHost } from '#host/host-context.tsx';
+import { sendHostIntent } from '#host/host-intent.ts';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { trackMapErrorOnce } from '#lib/track.ts';
 import { MapSourceIdEnum } from '#source/source-config.ts';
@@ -110,16 +112,6 @@ interface MapHoverEvent {
 	mapInstance: MapLayerMouseEvent['target'];
 }
 
-// The page cancels this event when it raises a lowered Sheet instead
-function isTargetOpenCancelled() {
-	return !document.dispatchEvent(
-		new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, {
-			cancelable: true,
-			detail: { url: location.pathname },
-		}),
-	);
-}
-
 function easeToPopup(
 	mapInstance: MapClickEvent['target'],
 	center: [number, number] | undefined,
@@ -149,13 +141,7 @@ function easeToPopup(
 const onMouseDown = createGrabCursorHandler('grabbing');
 const onMouseUp = createGrabCursorHandler('grab');
 
-export function useMapCanvasEvents({
-	isHosted,
-	mapId,
-}: {
-	isHosted: boolean;
-	mapId: string | undefined;
-}) {
+export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const isInteractive = useIsMapCanvasInteractive();
@@ -163,7 +149,7 @@ export function useMapCanvasEvents({
 	const { setCanvasLoading } = useMapStoreActions();
 	const trackMap = useTrackMap();
 
-	const onClick = useClickHandler(isHosted);
+	const onClick = useClickHandler();
 	const throttledOnMouseMove = useThrottledMouseMoveHandler();
 	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
 
@@ -210,7 +196,8 @@ export function useMapCanvasEvents({
 	} satisfies MapCallbacks;
 }
 
-function useClickHandler(isHosted: boolean) {
+function useClickHandler() {
+	const isHosted = useMapHost() !== undefined;
 	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
 		useMapStoreActions();
 	const targetIds = useMapTargetIds();
@@ -223,7 +210,14 @@ function useClickHandler(isHosted: boolean) {
 		) => {
 			const isTarget = targetIds.includes(pointId);
 
-			if (isHosted && isTarget && isTargetOpenCancelled()) return;
+			// Sent before anything is selected, so a click the host takes leaves no selection
+			if (
+				isHosted &&
+				isTarget &&
+				sendHostIntent({ hasPopup: targetIds.length > 1, kind: 'target' })
+			) {
+				return;
+			}
 
 			const outcome = getSelectionOutcome({
 				isHosted,
@@ -233,10 +227,7 @@ function useClickHandler(isHosted: boolean) {
 				url: undefined,
 			});
 
-			if (outcome === 'none') {
-				if (isHosted) window.scrollTo({ top: 0 });
-				return;
-			}
+			if (outcome === 'none') return;
 
 			setSelectedId(pointId);
 			setClickedId(pointId);

@@ -82,7 +82,9 @@ async function getPageLocationLink(page: Page, request: APIRequestContext) {
 async function openFromMap(page: Page, url: string) {
 	await page.evaluate(
 		([eventName, detailUrl]) => {
-			document.dispatchEvent(new CustomEvent(eventName, { detail: { url: detailUrl } }));
+			document.dispatchEvent(
+				new CustomEvent(eventName, { detail: { kind: 'open', url: detailUrl } }),
+			);
 		},
 		[mapFeatureOpenEventName, url] as const,
 	);
