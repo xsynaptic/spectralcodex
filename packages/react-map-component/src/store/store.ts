@@ -32,6 +32,8 @@ export const useIsMapPopupVisible = () => useMapDataStore((state) => state.isPop
 
 export const useMapHoveredId = () => useMapDataStore((state) => state.hoveredId);
 
+export const useMapHoveredFeature = () => useMapDataStore((state) => state.hoveredFeature);
+
 // Map canvas state
 export const useIsMapCanvasInteractive = () =>
 	useMapDataStore((state) => state.isCanvasInteractive);

@@ -11,7 +11,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import * as R from 'remeda';
 
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
-import type { MapFeatureOpenDetail } from '#types.ts';
+import type { MapFeatureOpenDetail, MapHoverFeature } from '#types.ts';
 
 import {
 	decideClickActions,
@@ -24,7 +24,7 @@ import { controlFilterId, mapFeatureOpenEventName } from '#constants.ts';
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
 import { trackMapErrorOnce } from '#lib/track.ts';
-import { mapQueryableLayerIds, MapSourceIdEnum } from '#source/source-config.ts';
+import { MapSourceIdEnum } from '#source/source-config.ts';
 import { writeSavedViewport } from '#store/store-viewport.ts';
 import {
 	useIsMapCanvasInteractive,
@@ -97,6 +97,17 @@ function getHoverInput(
 		pointId: feature?.properties.id,
 		storeHoveredId,
 	};
+}
+
+function getHoverFeature(feature: MapGeoJSONFeature | undefined): MapHoverFeature | undefined {
+	if (feature?.geometry.type !== GeometryTypeEnum.Point) return;
+
+	return { geometry: feature.geometry, properties: { ...feature.properties }, type: 'Feature' };
+}
+
+interface MapHoverEvent {
+	feature: MapGeoJSONFeature | undefined;
+	mapInstance: MapLayerMouseEvent['target'];
 }
 
 // The page cancels this event when it raises a lowered Sheet instead
@@ -323,21 +334,10 @@ function useThrottledMouseMoveHandler() {
 	const hoveredFeatureIdRef = useRef<number | string | undefined>(undefined);
 
 	const onMouseMove = useCallback(
-		(event: MapLayerMouseEvent | undefined) => {
+		(event: MapHoverEvent | undefined) => {
 			if (!event) return;
 
-			const { point, target: mapInstance } = event;
-
-			// Ensure all queryable layers have been loaded by MapLibre
-			for (const layerId of mapQueryableLayerIds) {
-				if (!mapInstance.getLayer(layerId)) return;
-			}
-
-			const renderedFeatures = mapInstance.queryRenderedFeatures(point, {
-				layers: [...mapQueryableLayerIds],
-			});
-
-			const feature = renderedFeatures[0];
+			const { feature, mapInstance } = event;
 
 			const intent = decideHoverIntent(
 				getHoverInput(feature, hoveredFeatureIdRef.current, mapStoreInstance.getState().hoveredId),
@@ -353,7 +353,11 @@ function useThrottledMouseMoveHandler() {
 			hoveredFeatureIdRef.current = intent.hoveredFeatureId;
 
 			// Store hoveredId feeds the popup preload
-			if (intent.storeHoveredIdUpdate) setHoveredId(intent.storeHoveredIdUpdate.hoveredId);
+			if (intent.storeHoveredIdUpdate) {
+				const { hoveredId } = intent.storeHoveredIdUpdate;
+
+				setHoveredId(hoveredId, hoveredId ? getHoverFeature(feature) : undefined);
+			}
 
 			mapInstance.getCanvas().style.cursor = intent.cursor;
 		},
@@ -364,10 +368,10 @@ function useThrottledMouseMoveHandler() {
 		() =>
 			R.funnel(onMouseMove, {
 				minGapMs: 20,
-				reducer: (_, ...args: Array<MapLayerMouseEvent>) => {
+				reducer: (_, ...args: Array<MapLayerMouseEvent>): MapHoverEvent | undefined => {
 					if (args.length === 0 || !args[0]) return;
 
-					return args[0];
+					return { feature: args[0].features?.[0], mapInstance: args[0].target };
 				},
 				triggerAt: 'both',
 			}),

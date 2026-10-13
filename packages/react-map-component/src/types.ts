@@ -4,7 +4,7 @@ import type {
 	MapSourceItem,
 	MapSourceItemCompressed,
 } from '@spectralcodex/map-codec';
-import type { FeatureCollection, LineString, Point, Polygon } from 'geojson';
+import type { Feature, FeatureCollection, LineString, Point, Polygon } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
@@ -53,6 +53,8 @@ export interface MapComponentProps extends Partial<
 }
 
 export type MapGeometry = LineString | Point | Polygon;
+
+export type MapHoverFeature = Feature<Point>;
 
 // Serializable; a persisted island never receives new props and a function cannot cross island serialization
 export interface MapHostOptions {

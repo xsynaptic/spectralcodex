@@ -3,8 +3,7 @@ import type { StyleSpecification } from 'maplibre-gl';
 import { layers, namedFlavor } from '@protomaps/basemaps';
 import { addProtocol, removeProtocol } from 'maplibre-gl';
 import { Protocol } from 'pmtiles';
-import { useMemo } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { MapComponentProps } from '#types.ts';
 
@@ -14,7 +13,7 @@ import { useMapLanguages } from '#store/store.ts';
 export function useProtomaps({
 	baseMapTheme,
 	protomapsApiKey,
-}: Pick<MapComponentProps, 'baseMapTheme' | 'isDev' | 'protomapsApiKey'>) {
+}: Pick<MapComponentProps, 'baseMapTheme' | 'protomapsApiKey'>) {
 	const isDarkMode = useIsDarkMode();
 
 	const languages = useMapLanguages();

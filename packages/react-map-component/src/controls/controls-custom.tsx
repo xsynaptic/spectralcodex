@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react';
 import type { ControlPosition, IControl, MapInstance } from 'react-map-gl/maplibre';
 
-import { cloneElement } from 'react';
 import { createPortal } from 'react-dom';
 import { useControl } from 'react-map-gl/maplibre';
 
@@ -55,7 +54,5 @@ class CustomControl implements IControl {
 export function CustomControlPortal({ children, className, position }: CustomControlProps) {
 	const customControl = useControl<CustomControl>(() => new CustomControl({ className, position }));
 
-	// Note: the original implementation passed `{ map }` as a prop in the second argument of `cloneElement`
-	// But since we're not making use of it I have removed it, as it renders to the DOM
-	return createPortal(cloneElement(children), customControl.getElement());
+	return createPortal(children, customControl.getElement());
 }

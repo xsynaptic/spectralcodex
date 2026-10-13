@@ -1,6 +1,7 @@
 export const MapLayerIdEnum = {
 	Clusters: 'clusters',
 	ClustersLabel: 'clusters-label',
+	ClustersLabelHover: 'clusters-label-hover',
 	DivisionHalo: 'division-halo',
 	DivisionMask: 'division-mask',
 	DivisionOutline: 'division-outline',
@@ -15,6 +16,7 @@ export const MapLayerIdEnum = {
 
 export const MapSourceIdEnum = {
 	DivisionCollection: 'divisionCollection',
+	HoverCollection: 'hoverCollection',
 	LineStringCollection: 'lineStringCollection',
 	PointCollection: 'pointCollection',
 	PolygonCollection: 'polygonCollection',
@@ -26,13 +28,6 @@ export const mapInteractiveLayerIds = [
 	MapLayerIdEnum.PointsTarget,
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsImage,
-] as const;
-
-// Layers for the onMouseMove guard and query; PointsImage always sits inside a Points hit so it is left out
-export const mapQueryableLayerIds = [
-	MapLayerIdEnum.Clusters,
-	MapLayerIdEnum.Points,
-	MapLayerIdEnum.PointsTarget,
 ] as const;
 
 // How much space to provide for clusters; lower number = higher density

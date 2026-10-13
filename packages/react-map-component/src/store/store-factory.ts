@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapFeaturesRule, MapScope } from '#types.ts';
+import type { MapFeaturesRule, MapHoverFeature, MapScope } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
@@ -27,7 +27,7 @@ export interface MapDataStore extends MapDataState {
 		setClickedId: (clickedId: string | undefined) => void;
 		setFilterOpen: (isFilterOpen: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
-		setHoveredId: (hoveredId: string | undefined) => void;
+		setHoveredId: (hoveredId: string | undefined, hoveredFeature?: MapHoverFeature) => void;
 		setLanguages: (languages: Array<string>) => void;
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
@@ -51,6 +51,7 @@ interface MapDataState {
 	// Set by a user's click only, so programmatic selections stay out of analytics
 	clickedId: string | undefined;
 	filterPosition: DOMCoordinates | undefined;
+	hoveredFeature: MapHoverFeature | undefined;
 	hoveredId: string | undefined;
 	isCanvasInteractive: boolean;
 	isCanvasLoading: boolean;
@@ -72,6 +73,7 @@ interface MapDataState {
 const defaultMapDataState = {
 	clickedId: undefined,
 	filterPosition: undefined,
+	hoveredFeature: undefined,
 	hoveredId: undefined,
 	isCanvasInteractive: true,
 	isCanvasLoading: true,
@@ -133,8 +135,8 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				setFilterPosition: (filterPosition) => {
 					set({ filterPosition });
 				},
-				setHoveredId: (hoveredId) => {
-					set({ hoveredId });
+				setHoveredId: (hoveredId, hoveredFeature) => {
+					set({ hoveredFeature, hoveredId });
 				},
 				setLanguages: (languages) => {
 					set({ languages });

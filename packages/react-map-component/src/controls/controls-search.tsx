@@ -1,6 +1,8 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import { useId } from 'react';
+
 import { controlSearchId } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
@@ -14,6 +16,7 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 }) {
 	const isCanvasLoading = useIsMapCanvasLoading();
 	const messages = useMapMessages();
+	const inputId = useId();
 
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 	const { isLoading: isPopupDataLoading } = usePopupDataQuery();
@@ -23,12 +26,12 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 	return (
 		<CustomControlPortal position={position}>
 			<div className="maplibregl-ctrl-search map-search">
-				<label className="map-sr-only" htmlFor="search-control-input">
+				<label className="map-sr-only" htmlFor={inputId}>
 					{messages.searchAriaLabel}
 				</label>
 				<input
 					className="map-search-input"
-					id="search-control-input"
+					id={inputId}
 					placeholder={messages.searchPlaceholder}
 					required={true}
 					type="search"
@@ -38,9 +41,6 @@ export const SearchControl: FC<{ position: ControlPosition }> = function SearchC
 					className="map-search-button"
 					disabled={isLoading}
 					id={controlSearchId}
-					onClick={() => {
-						if (!isLoading) console.log('search');
-					}}
 				>
 					<span className="map-ctrl-icon-frame">
 						<svg

@@ -18,10 +18,8 @@ import type { MapSourceFeatureCollection } from '#types.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
 import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
-import { useMapHoveredId, useMapSelectedId } from '#store/store.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
-// feature-state is paint-only, so the label layers below still key off the store hoveredId
 const hoverStateExpression = [
 	'boolean',
 	['feature-state', 'hover'],
@@ -63,7 +61,7 @@ const clusterRampDeep = [
 ] satisfies ExpressionSpecification;
 
 // Numeric labels for clusters
-function getClustersLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
+function getClustersLabelLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['has', 'point_count'],
 		id: MapLayerIdEnum.ClustersLabel,
@@ -72,17 +70,13 @@ function getClustersLabelLayerStyle(isDarkMode: boolean, hoveredId: string | und
 			'text-field': '{point_count_abbreviated}',
 			'text-font': ['Noto Sans Medium'],
 			'text-ignore-placement': true,
-			'text-size': [
-				'case',
-				['==', ['concat', 'cluster-', ['get', 'cluster_id']], hoveredId ?? ''],
-				12,
-				10,
-			],
+			'text-size': 10,
 		},
 		paint: {
 			'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
 			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
 			'text-halo-width': 1,
+			'text-opacity': ['case', hoverStateExpression, 0, 1],
 		},
 		source: MapSourceIdEnum.PointCollection,
 		type: 'symbol',
@@ -148,36 +142,6 @@ function getPointsImageLayerStyle() {
 		source: MapSourceIdEnum.PointCollection,
 		type: 'circle',
 	} satisfies CircleLayerSpecification;
-}
-
-// Text labels for individual points on hover
-function getPointsLabelLayerStyle(isDarkMode: boolean, hoveredId: string | undefined) {
-	return {
-		filter: [
-			'all',
-			['!', ['has', 'point_count']], // Not a cluster
-			['==', ['get', 'id'], hoveredId ?? ''], // Only when hovered; filters can't read feature-state
-		],
-		id: MapLayerIdEnum.PointsLabel,
-		layout: {
-			'text-field': ['get', 'title'],
-			'text-font': ['Noto Sans Medium'],
-			'text-ignore-placement': true,
-			'text-justify': 'auto',
-			'text-max-width': 20,
-			'text-size': 11,
-			'text-variable-anchor': ['bottom', 'right'],
-			// We'd like to interpolate these values but there is a type issue with MapLibre
-			'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
-		},
-		paint: {
-			'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
-			'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
-			'text-halo-width': 1.2,
-		},
-		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
-	} satisfies SymbolLayerSpecification;
 }
 
 // Visual points for unfiltered (zoomed-in) points
@@ -260,21 +224,15 @@ function useMapSourcePointsStyle(): {
 	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
 	[MapLayerIdEnum.Points]: CircleLayerSpecification;
 	[MapLayerIdEnum.PointsImage]: CircleLayerSpecification;
-	[MapLayerIdEnum.PointsLabel]: SymbolLayerSpecification;
 	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
 } {
 	const isDarkMode = useIsDarkMode();
-	const hoveredId = useMapHoveredId();
-	const selectedId = useMapSelectedId();
-
-	// Hover labels are off while a popup is open; they would draw underneath it
-	const labelHoveredId = selectedId ? undefined : hoveredId;
 
 	const clustersLayerStyle = useMemo(() => getClustersLayerStyle(isDarkMode), [isDarkMode]);
 
 	const clustersLabelLayerStyle = useMemo(
-		() => getClustersLabelLayerStyle(isDarkMode, hoveredId),
-		[isDarkMode, hoveredId],
+		() => getClustersLabelLayerStyle(isDarkMode),
+		[isDarkMode],
 	);
 
 	const pointsLayerStyle = useMemo(() => getPointsLayerStyle(isDarkMode), [isDarkMode]);
@@ -283,17 +241,11 @@ function useMapSourcePointsStyle(): {
 
 	const pointsImageLayerStyle = useMemo(() => getPointsImageLayerStyle(), []);
 
-	const pointsLabelLayerStyle = useMemo(
-		() => getPointsLabelLayerStyle(isDarkMode, labelHoveredId),
-		[isDarkMode, labelHoveredId],
-	);
-
 	return {
 		[MapLayerIdEnum.Clusters]: clustersLayerStyle,
 		[MapLayerIdEnum.ClustersLabel]: clustersLabelLayerStyle,
 		[MapLayerIdEnum.Points]: pointsLayerStyle,
 		[MapLayerIdEnum.PointsImage]: pointsImageLayerStyle,
-		[MapLayerIdEnum.PointsLabel]: pointsLabelLayerStyle,
 		[MapLayerIdEnum.PointsTarget]: pointsTargetLayerStyle,
 	};
 }
@@ -354,7 +306,6 @@ export const MapSourcePoints: FC<{
 			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
 			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
 			<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
-			<Layer key={MapLayerIdEnum.PointsLabel} {...pointsStyle[MapLayerIdEnum.PointsLabel]} />
 		</Source>
 	);
 });

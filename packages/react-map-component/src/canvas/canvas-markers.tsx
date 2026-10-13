@@ -104,11 +104,13 @@ async function getLeafIds(source: GeoJSONSource, { id, pointCount }: RenderedClu
 async function collectLeafClusterMarkers({
 	color,
 	isCurrent,
+	leafIds,
 	map,
 	targets,
 }: {
 	color: string;
 	isCurrent: () => boolean;
+	leafIds: Map<number, Set<unknown>>;
 	map: MapRef;
 	targets: Array<TargetPoint>;
 }): Promise<Array<TargetMarker>> {
@@ -118,7 +120,6 @@ async function collectLeafClusterMarkers({
 
 	const renderedClusters = getRenderedClusters(map);
 	const searchRadius = getClusterSearchRadius(pointClusterRadius);
-	const leafIds = new Map<number, Set<unknown>>();
 	const markers = new Map<number, TargetMarker>();
 
 	let pending = targets.map(({ coordinates, id }) => ({
@@ -238,6 +239,7 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 		let refreshCount = 0;
 		// Rings hidden for a zoom come back with the first refresh that finishes after `moveend`
 		let isRevealing = false;
+		let leafIds = new Map<number, Set<unknown>>();
 
 		function hideMarkers() {
 			refreshCount += 1;
@@ -258,6 +260,7 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 				? await collectLeafClusterMarkers({
 						color: clusterColor,
 						isCurrent: () => refreshIndex === refreshCount,
+						leafIds,
 						map,
 						targets: targetPoints.filter((target) => !pointIds.has(target.id)),
 					})
@@ -297,9 +300,14 @@ function useTargetMarkers(targetIds: Array<string>, isHosted: boolean): Array<Ta
 		let refreshFrame: number | undefined;
 
 		// Position refresh only; revealing after a zoom is moveend's job
-		function onSourceData(event: { isSourceLoaded: boolean; sourceId: string }) {
-			if (event.sourceId !== MapSourceIdEnum.PointCollection || !event.isSourceLoaded) return;
-			if (refreshFrame !== undefined) return;
+		function onSourceData(event: {
+			isSourceLoaded: boolean;
+			sourceDataType?: string;
+			sourceId: string;
+		}) {
+			if (event.sourceId !== MapSourceIdEnum.PointCollection) return;
+			if (event.sourceDataType === 'content') leafIds = new Map();
+			if (refreshFrame !== undefined || !event.isSourceLoaded) return;
 
 			refreshFrame = requestAnimationFrame(() => {
 				refreshFrame = undefined;

@@ -314,6 +314,14 @@ const MapPopupFrame: FC<{
 	);
 };
 
+const MapImagePreload: FC<Parameters<typeof useMapImagePreload>[0]> = function MapImagePreload(
+	props,
+) {
+	useMapImagePreload(props);
+
+	return;
+};
+
 export const MapPopup: FC<{
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
@@ -335,7 +343,6 @@ export const MapPopup: FC<{
 			})
 		: undefined;
 
-	useMapImagePreload({ imageServerUrl, isEnabled: !isHosted, sourceDataIndex });
 	useSettledClick({ id: popupItem?.id, isHosted, isLoading, outcome, url: popupItem?.url });
 
 	return (
@@ -349,6 +356,11 @@ export const MapPopup: FC<{
 					popupItem={popupItem}
 				/>
 			) : undefined}
+			<MapImagePreload
+				imageServerUrl={imageServerUrl}
+				isEnabled={!isHosted}
+				sourceDataIndex={sourceDataIndex}
+			/>
 			<MapCanvasLoading />
 		</>
 	);
