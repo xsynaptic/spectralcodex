@@ -24,7 +24,6 @@ describe('MapSourceItemSchema decode', () => {
 	test('decompresses keys, inverts numeric enum codes, applies hasImage default', () => {
 		const result = MapSourceItemSchema.parse({
 			[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
-			[MapDataKeysCompressed.EntryQuality]: 4,
 			[MapDataKeysCompressed.Geometry]: {
 				[MapDataKeysCompressed.GeometryCoordinates]: [100, 13],
 				[MapDataKeysCompressed.GeometryType]:
@@ -45,7 +44,6 @@ describe('MapSourceItemSchema decode', () => {
 			},
 			properties: {
 				category: LocationCategoryEnum.Temple,
-				entryQuality: 4,
 				hasImage: false,
 				id: 'location-1',
 				objective: 2,
@@ -60,7 +58,6 @@ describe('MapSourceItemSchema decode', () => {
 	test('omits objective and outlier when absent', () => {
 		const result = MapSourceItemSchema.parse({
 			[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
-			[MapDataKeysCompressed.EntryQuality]: 4,
 			[MapDataKeysCompressed.Geometry]: {
 				[MapDataKeysCompressed.GeometryCoordinates]: [100, 13],
 				[MapDataKeysCompressed.GeometryType]:
@@ -107,7 +104,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 		properties: {
 			category: LocationCategoryEnum.Temple,
 			chunkKey: '0',
-			entryQuality: 4,
 			hasImage: true,
 			id: 'a',
 			objective: 2,
@@ -125,7 +121,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 		expect(z.encode(MapSourceItemSchema, standardFull)).toEqual({
 			[MapDataKeysCompressed.Category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
 			[MapDataKeysCompressed.ChunkKey]: '0',
-			[MapDataKeysCompressed.EntryQuality]: 4,
 			[MapDataKeysCompressed.Geometry]: {
 				[MapDataKeysCompressed.GeometryCoordinates]: [100, 13],
 				[MapDataKeysCompressed.GeometryType]:
@@ -149,7 +144,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
 			properties: {
 				category: LocationCategoryEnum.Temple,
-				entryQuality: 1,
 				hasImage: false,
 				id: 'b',
 				precision: 1,
@@ -169,7 +163,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 				MapDataKeysCompressed.Category,
 				MapDataKeysCompressed.Status,
 				MapDataKeysCompressed.Precision,
-				MapDataKeysCompressed.EntryQuality,
 				MapDataKeysCompressed.Rating,
 				MapDataKeysCompressed.Geometry,
 			].toSorted(byCodePoint),
@@ -190,7 +183,6 @@ describe('round trips', () => {
 			properties: {
 				category: LocationCategoryEnum.Temple,
 				chunkKey: '7',
-				entryQuality: 4,
 				hasImage: true,
 				id: 'a',
 				objective: 2,
@@ -213,7 +205,7 @@ describe('round trips', () => {
 			googleMapsUrl: 'maps.app.goo.gl/abc',
 			id: 'a',
 			image: { srcSet: '/a.jpg 1x' },
-			safety: 2,
+			own: 5,
 			title: 'A',
 			titleMultilingualLang: 'zh',
 			titleMultilingualValue: '寺',
@@ -222,5 +214,18 @@ describe('round trips', () => {
 		};
 
 		expect(MapPopupItemSchema.parse(z.encode(MapPopupItemSchema, standard))).toEqual(standard);
+	});
+
+	test('a popup item that marks nothing as its own serializes no own key', () => {
+		const standard: MapPopupItem = { id: 'a', title: 'A' };
+		const compressed = z.encode(MapPopupItemSchema, { ...standard, own: 0 });
+
+		expect(JSON.stringify(compressed)).toBe(
+			JSON.stringify({
+				[MapDataKeysCompressed.Id]: 'a',
+				[MapDataKeysCompressed.Title]: 'A',
+			}),
+		);
+		expect(MapPopupItemSchema.parse(compressed).own).toBeUndefined();
 	});
 });

@@ -35,7 +35,6 @@ function makeItem(
 		geometry,
 		properties: {
 			category: LocationCategoryEnum.Unknown,
-			entryQuality: 3,
 			hasImage: false,
 			id: 'location-id',
 			outlier: false,

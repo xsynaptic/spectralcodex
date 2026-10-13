@@ -1,7 +1,7 @@
-import type { LngLat } from 'maplibre-gl';
+import type { LngLat, Popup as MapLibrePopup } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemExtended } from '#canvas/canvas-popup-hooks.ts';
@@ -13,6 +13,7 @@ import {
 	getPopupImageSizes,
 	getPopupImageSrc,
 	getPopupImageSrcSet,
+	getTargetPopupItem,
 } from '#canvas/canvas-popup-factory.ts';
 import {
 	useMapCanvasPopup,
@@ -121,10 +122,12 @@ const MapPopupFooter: FC<{
 	);
 };
 
-const MapPopupPrecision: FC<{ precision: number }> = function MapPopupPrecision({ precision }) {
+const MapPopupPrecision: FC<{ precision: number | undefined }> = function MapPopupPrecision({
+	precision,
+}) {
 	const messages = useMapMessages();
 
-	if (precision > 2) return;
+	if (precision === undefined || precision > 2) return;
 
 	return (
 		<div className="map-popup-precision">
@@ -231,18 +234,46 @@ const popupPlacementNarrow = { anchor: 'top', offset: 10 } as const;
 
 const popupPlacementWide = { anchor: 'left', offset: 16 } as const;
 
+function getPopupPlacement(isNarrow: boolean, isTarget: boolean) {
+	const placement = isNarrow ? popupPlacementNarrow : popupPlacementWide;
+
+	// Without an anchor MapLibre opens the popup on whichever side has room
+	return isTarget ? { offset: placement.offset } : placement;
+}
+
 const MapPopupFrame: FC<{
 	imageServerUrl: string;
 	isDev: boolean | undefined;
 	isLoading: boolean;
+	isTarget: boolean;
 	popupItem: MapPopupItemExtended;
-}> = function MapPopupFrame({ imageServerUrl, isDev, isLoading, popupItem }) {
+}> = function MapPopupFrame({ imageServerUrl, isDev, isLoading, isTarget, popupItem }) {
 	const isPopupVisible = useIsMapPopupVisible();
 
 	const { isNarrow, maxWidthPx } = useMapPopupLayout();
-	const popupPlacement = isNarrow ? popupPlacementNarrow : popupPlacementWide;
+	const popupPlacement = getPopupPlacement(isNarrow, isTarget);
 
 	const { setSelectedId } = useMapStoreActions();
+
+	const popupRef = useRef<MapLibrePopup>(null);
+	const frameRef = useRef<HTMLDivElement>(null);
+
+	// MapLibre picks the side from the popup's size, so it has to pick again when the content loads and the size changes
+	useEffect(() => {
+		if (!isTarget || !frameRef.current) return;
+
+		const observer = new ResizeObserver(() => {
+			const popup = popupRef.current;
+
+			popup?.setLngLat(popup.getLngLat());
+		});
+
+		observer.observe(frameRef.current);
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [isTarget]);
 
 	const onClose = useCallback(
 		function onClose() {
@@ -261,9 +292,10 @@ const MapPopupFrame: FC<{
 			closeOnClick={false}
 			maxWidth={`${String(maxWidthPx)}px`}
 			onClose={onClose}
+			ref={popupRef}
 			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
 		>
-			<div className="map-popup-frame">
+			<div className="map-popup-frame" ref={frameRef}>
 				<div className="map-popup-loading">
 					<div className="map-loading-animation" style={{ opacity: isLoading ? 1 : 0 }} />
 				</div>
@@ -273,7 +305,7 @@ const MapPopupFrame: FC<{
 							imageServerUrl={imageServerUrl}
 							isDev={isDev}
 							key={popupItem.id}
-							popupItem={popupItem}
+							popupItem={isTarget ? getTargetPopupItem(popupItem) : popupItem}
 						/>
 					)}
 				</div>
@@ -291,11 +323,14 @@ export const MapPopup: FC<{
 	const { isLoading, popupItem } = useMapCanvasPopup(sourceDataIndex);
 	const targetIds = useMapTargetIds();
 
+	const isTarget = popupItem ? targetIds.includes(popupItem.id) : false;
+
 	const outcome = popupItem
 		? getSelectionOutcome({
 				isHosted,
 				isLoading,
-				isTarget: targetIds.includes(popupItem.id),
+				isTarget,
+				targetCount: targetIds.length,
 				url: popupItem.url,
 			})
 		: undefined;
@@ -310,6 +345,7 @@ export const MapPopup: FC<{
 					imageServerUrl={imageServerUrl}
 					isDev={isDev}
 					isLoading={isLoading}
+					isTarget={isTarget}
 					popupItem={popupItem}
 				/>
 			) : undefined}

@@ -34,3 +34,6 @@ export const mapQueryableLayerIds = [
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsTarget,
 ] as const;
+
+// How much space to provide for clusters; lower number = higher density
+export const pointClusterRadius = 13;

@@ -34,6 +34,7 @@ export interface MapSelectionInput {
 	isHosted: boolean;
 	isLoading: boolean;
 	isTarget: boolean;
+	targetCount: number;
 	url: string | undefined;
 }
 
@@ -148,8 +149,15 @@ export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 	}
 }
 
-export function getSelectionOutcome({ isHosted, isLoading, isTarget, url }: MapSelectionInput) {
-	if (!isHosted || isTarget) return 'popup';
+export function getSelectionOutcome({
+	isHosted,
+	isLoading,
+	isTarget,
+	targetCount,
+	url,
+}: MapSelectionInput) {
+	if (isTarget) return targetCount > 1 ? 'popup' : 'none';
+	if (!isHosted) return 'popup';
 	if (isLoading) return 'pending';
 
 	return url ? 'open' : 'popup';

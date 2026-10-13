@@ -3,7 +3,7 @@ import type { MapGeometry } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 import type { Feature, FeatureCollection, Position } from 'geojson';
 
-import { mapCodecTables } from '@spectralcodex/map-codec';
+import { mapCodecTables, MapPopupOwnField } from '@spectralcodex/map-codec';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { featureCollection } from '@turf/helpers';
@@ -121,7 +121,7 @@ export function getLocationsMapPopupData(
 			description: feature.properties.description,
 			googleMapsUrl: feature.properties.googleMapsUrl,
 			id: featureId,
-			safety: feature.properties.safety,
+			own: feature.properties.own,
 			title: stripDiacritics(feature.properties.title),
 			titleMultilingualLang: feature.properties.titleMultilingualLang,
 			titleMultilingualValue: feature.properties.titleMultilingualValue,
@@ -147,7 +147,6 @@ export function getLocationsMapSourceData(
 			geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
 			properties: {
 				category: feature.properties.category,
-				entryQuality: feature.properties.entryQuality,
 				id: featureId,
 				precision: feature.properties.precision,
 				rating: feature.properties.rating,
@@ -200,7 +199,7 @@ function buildLocationFeatures(
 		properties: {
 			...entryProperties,
 			...getFeatureTitleProperties(entry, geometry, entryTitleMultilingual),
-			...getGeometryFeatureProperties(entry, geometry),
+			...getGeometryFeatureProperties(entry, geometry, geometryArray.length > 1),
 		},
 		type: 'Feature' as const,
 	}));
@@ -212,13 +211,10 @@ function buildLocationFeatures(
 
 function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
 	return {
-		entryQuality: entry.data.entryQuality,
 		objective: entry.data.objective,
 		outlier: entry.data.outlier,
 		rating: entry.data.rating,
-		safety: entry.data.safety,
 		url: getRelativePath(entry.data._url),
-		wikipediaUrl: getShortenedUrl(entry.data._wikipediaUrl),
 	};
 }
 
@@ -246,6 +242,7 @@ function getFeatureTitleProperties(
 function getGeometryFeatureProperties(
 	entry: CollectionEntry<'locations'>,
 	geometry: LocationGeometry,
+	isMultiPoint: boolean,
 ) {
 	// Image thumbnails can be nulled by individual points
 	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
@@ -253,13 +250,27 @@ function getGeometryFeatureProperties(
 	return {
 		category: geometry.category ?? entry.data.category,
 		description: geometry.description ?? entry.data._descriptionHtml,
-		googleMapsUrl: getShortenedUrl(
-			geometry.googleMapsUrl ?? entry.data._googleMapsUrl,
-			googleMapsHostPrefix,
-		),
 		precision: geometry.precision ?? entry.data.precision,
 		status: geometry.status ?? entry.data.status,
+		...getGeometryLinkProperties(entry, geometry, isMultiPoint),
 		...(image === null ? {} : { image }),
+		...(isMultiPoint ? getOwnProperties(geometry) : {}),
+	};
+}
+
+function getGeometryLinkProperties(
+	entry: CollectionEntry<'locations'>,
+	geometry: LocationGeometry,
+	isMultiPoint: boolean,
+) {
+	// The Location's Google Maps link points at one place; with several Points each uses its own link or its coordinates
+	const googleMapsUrl = isMultiPoint
+		? geometry.googleMapsUrl
+		: (geometry.googleMapsUrl ?? entry.data._googleMapsUrl);
+
+	return {
+		googleMapsUrl: getShortenedUrl(googleMapsUrl, googleMapsHostPrefix),
+		wikipediaUrl: getShortenedUrl(geometry.wikipediaUrl ?? entry.data._wikipediaUrl),
 	};
 }
 
@@ -275,6 +286,16 @@ function getMultilingualTitleProperties(
 			? `${entryTitle.value}：${geometryTitle.value}`
 			: entryTitle.value,
 	};
+}
+
+function getOwnProperties(geometry: LocationGeometry) {
+	const own =
+		(geometry.description ? MapPopupOwnField.Description : 0) |
+		(geometry._imageThumbnail ? MapPopupOwnField.Image : 0) |
+		(geometry.wikipediaUrl ? MapPopupOwnField.Wikipedia : 0) |
+		(geometry.precision === undefined ? 0 : MapPopupOwnField.Precision);
+
+	return own === 0 ? {} : { own };
 }
 
 function getShortenedUrl(url: string | undefined, hostPrefix?: string): string | undefined {

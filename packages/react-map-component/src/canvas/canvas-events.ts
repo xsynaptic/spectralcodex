@@ -99,6 +99,42 @@ function getHoverInput(
 	};
 }
 
+// The page cancels this event when it raises a lowered Sheet instead
+function isTargetOpenCancelled() {
+	return !document.dispatchEvent(
+		new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, {
+			cancelable: true,
+			detail: { url: location.pathname },
+		}),
+	);
+}
+
+function easeToPopup(
+	mapInstance: MapClickEvent['target'],
+	center: [number, number] | undefined,
+	setPopupVisible: (isVisible: boolean) => void,
+) {
+	if (!center) return;
+
+	// Stopping a running ease fires its `moveend` now, so it can neither trigger the listener below nor undo the hide
+	mapInstance.stop();
+
+	setPopupVisible(false);
+
+	// Under reduced motion MapLibre zeroes the duration and fires `moveend` synchronously inside `easeTo`
+	void mapInstance.once('moveend', () => {
+		setPopupVisible(true);
+	});
+
+	mapInstance.easeTo({
+		center,
+		duration: 150,
+		padding: getPopupLayout(mapInstance.getContainer().clientWidth).isNarrow
+			? { bottom: 180, left: 0, right: 0, top: 0 }
+			: { bottom: 0, left: 0, right: 180, top: 0 },
+	});
+}
+
 const onMouseDown = createGrabCursorHandler('grabbing');
 const onMouseUp = createGrabCursorHandler('grab');
 
@@ -176,16 +212,18 @@ function useClickHandler(isHosted: boolean) {
 		) => {
 			const isTarget = targetIds.includes(pointId);
 
-			if (
-				isHosted &&
-				isTarget &&
-				!document.dispatchEvent(
-					new CustomEvent<MapFeatureOpenDetail>(mapFeatureOpenEventName, {
-						cancelable: true,
-						detail: { url: location.pathname },
-					}),
-				)
-			) {
+			if (isHosted && isTarget && isTargetOpenCancelled()) return;
+
+			const outcome = getSelectionOutcome({
+				isHosted,
+				isLoading: true,
+				isTarget,
+				targetCount: targetIds.length,
+				url: undefined,
+			});
+
+			if (outcome === 'none') {
+				if (isHosted) window.scrollTo({ top: 0 });
 				return;
 			}
 
@@ -193,27 +231,10 @@ function useClickHandler(isHosted: boolean) {
 			setClickedId(pointId);
 			setHoveredId(undefined);
 
-			const outcome = getSelectionOutcome({ isHosted, isLoading: true, isTarget, url: undefined });
+			// A Target's popup opens on whichever side has room, so the map stays where it is
+			if (outcome !== 'popup' || isTarget) return;
 
-			if (!center || outcome !== 'popup') return;
-
-			// Stopping a running ease fires its `moveend` now, so it can neither trigger the listener below nor undo the hide
-			mapInstance.stop();
-
-			setPopupVisible(false);
-
-			// Under reduced motion MapLibre zeroes the duration and fires `moveend` synchronously inside `easeTo`
-			void mapInstance.once('moveend', () => {
-				setPopupVisible(true);
-			});
-
-			mapInstance.easeTo({
-				center,
-				duration: 150,
-				padding: getPopupLayout(mapInstance.getContainer().clientWidth).isNarrow
-					? { bottom: 180, left: 0, right: 0, top: 0 }
-					: { bottom: 0, left: 0, right: 180, top: 0 },
-			});
+			easeToPopup(mapInstance, center, setPopupVisible);
 		},
 		[isHosted, setSelectedId, setClickedId, setHoveredId, setPopupVisible, targetIds],
 	);

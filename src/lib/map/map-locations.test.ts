@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
 
 import { getLocationFeatureIds, getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
@@ -13,7 +14,6 @@ function makeLocation(
 		collection: 'locations',
 		data: {
 			category: 'temple',
-			entryQuality: 3,
 			precision: 4,
 			rating: 3,
 			status: 'operational',
@@ -203,5 +203,81 @@ describe('getLocationsFeatureCollection properties', () => {
 
 		expect(result?.features[0]?.properties.image).toBe(thumbnail);
 		expect(result?.features[1]?.properties).not.toHaveProperty('image');
+	});
+
+	const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
+
+	test('marks what a Point of a multi-Point Location sets itself, and nothing it inherits', () => {
+		const result = getLocationsFeatureCollection([
+			makeLocation('bopiliao', {
+				_descriptionHtml: '<p>Entry description</p>',
+				_imageThumbnail: thumbnail,
+				_wikipediaUrl: 'https://en.wikipedia.org/wiki/Bopiliao',
+				geometry: [
+					makePoint(121.5, 25),
+					makePoint(121.51, 25.01, { description: 'Point description' }),
+					makePoint(121.52, 25.02, { _imageThumbnail: { ...thumbnail, src: 'own.avif' } }),
+					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
+					makePoint(121.53, 25.03, { _imageThumbnail: null }),
+					makePoint(121.54, 25.04, { precision: 4 }),
+					makePoint(121.55, 25.05, {
+						description: 'Point description',
+						wikipediaUrl: 'https://en.wikipedia.org/wiki/North_Block',
+					}),
+				],
+				title: 'Bopiliao',
+			}),
+		]);
+
+		const properties = result?.features.map((feature) => feature.properties) ?? [];
+
+		// Inherited fields stay on the Feature for the other maps
+		expect(properties[0]?.description).toBe('<p>Entry description</p>');
+		expect(properties[0]?.image).toBe(thumbnail);
+		// A Point that repeats the Location's Precision still counts as setting it
+		expect(properties.map((item) => item.own)).toEqual([
+			undefined,
+			MapPopupOwnField.Description,
+			MapPopupOwnField.Image,
+			undefined,
+			MapPopupOwnField.Precision,
+			MapPopupOwnField.Description | MapPopupOwnField.Wikipedia,
+		]);
+	});
+
+	test('marks nothing on a single-Point Location', () => {
+		const result = getLocationsFeatureCollection([
+			makeLocation('longshan-temple', {
+				geometry: makePoint(121.5, 25, { description: 'Point description', precision: 2 }),
+				title: 'Longshan Temple',
+			}),
+		]);
+
+		expect(result?.features[0]?.properties).not.toHaveProperty('own');
+	});
+
+	test("a Point of a multi-Point Location keeps its own links, and inherits the Location's Wikipedia link but never its Google Maps link", () => {
+		const result = getLocationsFeatureCollection([
+			makeLocation('bopiliao', {
+				_googleMapsUrl: 'https://maps.app.goo.gl/entryPin',
+				_wikipediaUrl: 'https://en.wikipedia.org/wiki/Bopiliao',
+				geometry: [
+					makePoint(121.5, 25),
+					makePoint(121.51, 25.01, {
+						googleMapsUrl: 'https://maps.app.goo.gl/pointPin',
+						wikipediaUrl: 'https://en.wikipedia.org/wiki/North_Block',
+					}),
+				],
+				title: 'Bopiliao',
+			}),
+		]);
+
+		const properties = result?.features.map((feature) => feature.properties) ?? [];
+
+		expect(properties.map((item) => item.googleMapsUrl)).toEqual([undefined, 'pointPin']);
+		expect(properties.map((item) => item.wikipediaUrl)).toEqual([
+			'en.wikipedia.org/wiki/Bopiliao',
+			'en.wikipedia.org/wiki/North_Block',
+		]);
 	});
 });

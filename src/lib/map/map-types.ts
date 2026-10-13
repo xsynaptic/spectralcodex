@@ -15,14 +15,13 @@ export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProp
 export interface MapFeatureProperties {
 	category: (typeof LocationCategoryEnum)[keyof typeof LocationCategoryEnum];
 	description?: string | undefined;
-	entryQuality: number;
 	googleMapsUrl?: string | undefined;
 	image?: ImageThumbnail | undefined;
 	objective?: number | undefined;
 	outlier?: boolean | undefined;
+	own?: number | undefined;
 	precision: number;
 	rating: number;
-	safety?: number | undefined;
 	status: LocationStatus;
 	title: string;
 	titleMultilingualLang?: string | undefined;

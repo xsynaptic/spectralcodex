@@ -19,7 +19,7 @@ import { useMapHoveredId, useMapSelectedId } from '#store/store.ts';
 export type MapPopupItemExtended = MapPopupItem & {
 	objective: number | undefined;
 	popupCoordinates: LngLat;
-	precision: number;
+	precision: number | undefined;
 };
 
 const defaultPopupItem = {
@@ -28,9 +28,9 @@ const defaultPopupItem = {
 	id: 'default',
 	image: undefined,
 	objective: undefined,
+	own: undefined,
 	popupCoordinates: new LngLat(0, 0),
 	precision: 1,
-	safety: undefined,
 	title: 'Untitled',
 	titleMultilingualLang: undefined,
 	titleMultilingualValue: undefined,

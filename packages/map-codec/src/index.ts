@@ -10,4 +10,4 @@ export type {
 	MapSourceItem,
 	MapSourceItemCompressed,
 } from '#codec.ts';
-export { mapCodecTables, MapDataKeysCompressed } from '#map-data-keys.ts';
+export { mapCodecTables, MapDataKeysCompressed, MapPopupOwnField } from '#map-data-keys.ts';

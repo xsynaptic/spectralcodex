@@ -15,13 +15,23 @@ const viewport = { height: 844, width: 390 };
 // The map reads what is under the pointer a frame or more after it moves
 const cursorSettleMs = 80;
 
+// The zoom control animates for 300ms; a click before it finishes zooms less than a full step
+const zoomSettleMs = 400;
+
+const locationViewPattern = /data-map-view="{&quot;targetIds/;
+const singlePointViewPattern = /data-map-view="{&quot;targetIds&quot;:\[&quot;[^&]+&quot;]}"/;
+
 // A page may also link to Posts, which set a Scope of their own or have no split
-async function getLocationLink(request: APIRequestContext, urls: Array<string>) {
+async function getLocationLink(
+	request: APIRequestContext,
+	urls: Array<string>,
+	viewPattern = locationViewPattern,
+) {
 	for (const url of urls.slice(0, probeLimit)) {
 		const response = await request.get(url);
 		const html = await response.text();
 
-		if (html.includes('data-map-view="{&quot;targetIds')) return url;
+		if (viewPattern.test(html)) return url;
 	}
 
 	throw new Error(
@@ -29,13 +39,32 @@ async function getLocationLink(request: APIRequestContext, urls: Array<string>) 
 	);
 }
 
-async function getRegionLocation(request: APIRequestContext) {
+async function getRegionLocation(request: APIRequestContext, viewPattern?: RegExp) {
 	const response = await request.get(paths.regionDetail);
 	const page = await response.text();
 	const html = page.slice(page.indexOf('<main'));
 	const urls = [...html.matchAll(/href="(\/[^/"]+\/)"/g)].map(([, url = '']) => url);
 
-	return getLocationLink(request, [...new Set(urls)]);
+	return getLocationLink(request, [...new Set(urls)], viewPattern);
+}
+
+async function openSplitFromMap(page: Page, url: string) {
+	const shell = page.locator('.atlas-shell');
+
+	await visit(page, atlasPath);
+	await expect(shell.locator('canvas.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
+	await openFromMap(page, url);
+
+	const marker = shell.locator('.maplibregl-marker').first();
+
+	// The Target markers mount once the camera has settled on them
+	await expect(marker).toBeVisible();
+
+	const box = await marker.boundingBox();
+
+	if (!box) throw new Error('The Target has no marker to click');
+
+	return { box, marker, shell };
 }
 
 async function getPageLocationLink(page: Page, request: APIRequestContext) {
@@ -318,23 +347,19 @@ test.describe('on a wide viewport', () => {
 		await expect(separator).toHaveAttribute('aria-valuenow', chosenWidth);
 	});
 
-	test("a click on the open Location's own Point is spent on its popup", async ({
+	test("a click on one of the open Location's Points is spent on its own popup, with the camera still", async ({
 		page,
-		request,
 	}) => {
-		const locationUrl = await getRegionLocation(request);
-		const shell = page.locator('.atlas-shell');
-
-		await visit(page, atlasPath);
-		await expect(shell.locator('canvas.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
-		await openFromMap(page, locationUrl);
-
-		const box = await shell.locator('.maplibregl-marker').first().boundingBox();
-
-		if (!box) throw new Error('The Target has no marker to click');
+		const { box, marker, shell } = await openSplitFromMap(page, paths.locationMultiPoint);
+		const popupTitle = shell.locator('.maplibregl-popup .map-popup-title');
 
 		await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-		await expect(shell.locator('.maplibregl-popup .map-popup-title')).toBeVisible();
+
+		await expect(popupTitle).toBeVisible();
+		await expect(popupTitle.locator('a')).toHaveCount(0);
+		// A pan would have started by now
+		await page.waitForTimeout(300);
+		expect(await marker.boundingBox()).toEqual(box);
 
 		await page.evaluate((eventName) => {
 			const opened = { count: 0 };
@@ -354,6 +379,41 @@ test.describe('on a wide viewport', () => {
 			await page.evaluate(() => (globalThis as { opened?: { count: number } }).opened?.count),
 		).toBe(0);
 		expect(new URL(page.url()).pathname).toBe(paths.locationsIndex);
+	});
+
+	test("the open Location's rings gather on its cluster as the map zooms out", async ({ page }) => {
+		const { shell } = await openSplitFromMap(page, paths.locationMultiPoint);
+		const rings = shell.locator('.maplibregl-marker');
+		const zoomOut = shell.locator('.maplibregl-ctrl-zoom-out');
+
+		expect(await rings.count()).toBeGreaterThan(1);
+
+		// Far enough out that every Point of the Location sits in one cluster
+		for (let step = 0; step < 7; step += 1) {
+			await zoomOut.click();
+			await page.waitForTimeout(zoomSettleMs);
+		}
+
+		await expect(rings).toHaveCount(1);
+	});
+
+	test('a click on the only Point of the open Location opens no popup and scrolls its page to the top', async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request, singlePointViewPattern);
+		const { box, shell } = await openSplitFromMap(page, locationUrl);
+
+		await page.evaluate(() => {
+			window.scrollTo({ behavior: 'instant', top: 400 });
+		});
+		expect(await getScrollY(page)).toBeGreaterThan(0);
+
+		await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+
+		await expect.poll(() => getScrollY(page)).toBe(0);
+		await expect(shell.locator('.maplibregl-popup')).toHaveCount(0);
+		expect(new URL(page.url()).pathname).toBe(locationUrl);
 	});
 });
 

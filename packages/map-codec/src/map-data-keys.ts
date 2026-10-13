@@ -8,7 +8,6 @@ export const MapDataKeys = {
 	Category: 'category',
 	ChunkKey: 'chunkKey',
 	Description: 'description',
-	EntryQuality: 'entryQuality',
 	Geometry: 'geometry',
 	GeometryCoordinates: 'coordinates',
 	GeometryType: 'type',
@@ -19,10 +18,10 @@ export const MapDataKeys = {
 	ImageSrcSet: 'srcSet',
 	Objective: 'objective',
 	Outlier: 'outlier',
+	Own: 'own',
 	Precision: 'precision',
 	Rating: 'rating',
 	RegionOrdinals: 'regionOrdinals',
-	Safety: 'safety',
 	Status: 'status',
 	ThemeIndices: 'themeIndices',
 	Title: 'title',
@@ -36,7 +35,6 @@ export const MapDataKeysCompressed = {
 	Category: 'c',
 	ChunkKey: 'k',
 	Description: 'd',
-	EntryQuality: 'q',
 	Geometry: 'g',
 	GeometryCoordinates: 'x',
 	GeometryType: 'j',
@@ -47,10 +45,10 @@ export const MapDataKeysCompressed = {
 	ImageSrcSet: 'y',
 	Objective: 'o',
 	Outlier: 'l',
+	Own: 'z',
 	Precision: 'p',
 	Rating: 'r',
 	RegionOrdinals: 'b',
-	Safety: 'f',
 	Status: 's',
 	ThemeIndices: 'h',
 	Title: 't',
@@ -59,6 +57,14 @@ export const MapDataKeysCompressed = {
 	Url: 'u',
 	WikipediaUrl: 'w',
 } as const satisfies Record<keyof typeof MapDataKeys, string>;
+
+// Flags for the fields a Point sets itself rather than inheriting from its Location
+export const MapPopupOwnField = {
+	Description: 1,
+	Image: 2,
+	Precision: 8,
+	Wikipedia: 4,
+} as const;
 
 export const MapDataGeometryTypeNumericMapping = {
 	[GeometryTypeEnum.LineString]: 2,

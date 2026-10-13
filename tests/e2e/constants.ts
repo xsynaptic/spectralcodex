@@ -12,6 +12,7 @@ export const contentManifestPath = '/content-manifest.json';
 export const paths = {
 	chronologyIndex: '/chronology/',
 	chronologyYear: '/chronology/2019/',
+	locationMultiPoint: '/budai-saltworks/',
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
 	postDetail: '/huadong-valley-ride-2018-hualien-city/',

@@ -46,7 +46,6 @@ const sourceCompressedSchema = z
 		[MapDataKeysCompressed.Category]: z.enum(LocationCategoryNumericMapping),
 		// Survives region/theme scoping of the shared index, for popup lookup
 		[MapDataKeysCompressed.ChunkKey]: z.string().optional(),
-		[MapDataKeysCompressed.EntryQuality]: z.number().int(),
 		[MapDataKeysCompressed.Geometry]: z.object({
 			[MapDataKeysCompressed.GeometryCoordinates]: coordinatesSchema,
 			[MapDataKeysCompressed.GeometryType]: z.enum(MapDataGeometryTypeNumericMapping),
@@ -74,7 +73,6 @@ const sourceStandardSchema = z.object({
 	properties: z.object({
 		[MapDataKeys.Category]: z.enum(LocationCategoryEnum),
 		[MapDataKeys.ChunkKey]: z.string().optional(),
-		[MapDataKeys.EntryQuality]: z.number().int(),
 		[MapDataKeys.HasImage]: z.boolean(),
 		[MapDataKeys.Id]: z.string(),
 		[MapDataKeys.Objective]: z.number().int().optional(),
@@ -102,7 +100,6 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 			[MapDataKeys.Category]:
 				categoryByCode[data[MapDataKeysCompressed.Category]] ?? LocationCategoryEnum.Unknown,
 			[MapDataKeys.ChunkKey]: data[MapDataKeysCompressed.ChunkKey],
-			[MapDataKeys.EntryQuality]: data[MapDataKeysCompressed.EntryQuality],
 			[MapDataKeys.HasImage]: data[MapDataKeysCompressed.HasImage] ?? false,
 			[MapDataKeys.Id]: data[MapDataKeysCompressed.Id],
 			[MapDataKeys.Objective]: data[MapDataKeysCompressed.Objective],
@@ -124,7 +121,6 @@ export const MapSourceItemSchema = z.codec(sourceCompressedSchema, sourceStandar
 			[MapDataKeysCompressed.Category]:
 				LocationCategoryNumericMapping[properties[MapDataKeys.Category]],
 			[MapDataKeysCompressed.ChunkKey]: properties[MapDataKeys.ChunkKey],
-			[MapDataKeysCompressed.EntryQuality]: properties[MapDataKeys.EntryQuality],
 			[MapDataKeysCompressed.Geometry]: {
 				[MapDataKeysCompressed.GeometryCoordinates]: geometry[MapDataKeys.GeometryCoordinates],
 				[MapDataKeysCompressed.GeometryType]:
@@ -151,7 +147,8 @@ const popupCompressedSchema = z
 		[MapDataKeysCompressed.GoogleMapsUrl]: z.string().optional(),
 		[MapDataKeysCompressed.Id]: z.string(),
 		[MapDataKeysCompressed.ImageSrcSet]: z.string().optional(),
-		[MapDataKeysCompressed.Safety]: z.number().int().optional(),
+		// `MapPopupOwnField` flags
+		[MapDataKeysCompressed.Own]: z.number().int().optional(),
 		[MapDataKeysCompressed.Title]: z.string(),
 		[MapDataKeysCompressed.TitleMultilingualLang]: z.string().optional(),
 		[MapDataKeysCompressed.TitleMultilingualValue]: z.string().optional(),
@@ -165,7 +162,7 @@ const popupStandardSchema = z.object({
 	[MapDataKeys.GoogleMapsUrl]: z.string().optional(),
 	[MapDataKeys.Id]: z.string(),
 	[MapDataKeys.Image]: z.object({ [MapDataKeys.ImageSrcSet]: z.string() }).optional(),
-	[MapDataKeys.Safety]: z.number().int().optional(),
+	[MapDataKeys.Own]: z.number().int().optional(),
 	[MapDataKeys.Title]: z.string(),
 	[MapDataKeys.TitleMultilingualLang]: z.string().optional(),
 	[MapDataKeys.TitleMultilingualValue]: z.string().optional(),
@@ -182,7 +179,7 @@ export const MapPopupItemSchema = z.codec(popupCompressedSchema, popupStandardSc
 			[MapDataKeys.GoogleMapsUrl]: data[MapDataKeysCompressed.GoogleMapsUrl],
 			[MapDataKeys.Id]: data[MapDataKeysCompressed.Id],
 			[MapDataKeys.Image]: srcSet ? { [MapDataKeys.ImageSrcSet]: srcSet } : undefined,
-			[MapDataKeys.Safety]: data[MapDataKeysCompressed.Safety],
+			[MapDataKeys.Own]: data[MapDataKeysCompressed.Own],
 			[MapDataKeys.Title]: data[MapDataKeysCompressed.Title],
 			[MapDataKeys.TitleMultilingualLang]: data[MapDataKeysCompressed.TitleMultilingualLang],
 			[MapDataKeys.TitleMultilingualValue]: data[MapDataKeysCompressed.TitleMultilingualValue],
@@ -195,7 +192,7 @@ export const MapPopupItemSchema = z.codec(popupCompressedSchema, popupStandardSc
 		[MapDataKeysCompressed.GoogleMapsUrl]: data[MapDataKeys.GoogleMapsUrl],
 		[MapDataKeysCompressed.Id]: data[MapDataKeys.Id],
 		[MapDataKeysCompressed.ImageSrcSet]: data[MapDataKeys.Image]?.[MapDataKeys.ImageSrcSet],
-		[MapDataKeysCompressed.Safety]: data[MapDataKeys.Safety],
+		[MapDataKeysCompressed.Own]: data[MapDataKeys.Own] || undefined,
 		[MapDataKeysCompressed.Title]: data[MapDataKeys.Title],
 		[MapDataKeysCompressed.TitleMultilingualLang]: data[MapDataKeys.TitleMultilingualLang],
 		[MapDataKeysCompressed.TitleMultilingualValue]: data[MapDataKeys.TitleMultilingualValue],

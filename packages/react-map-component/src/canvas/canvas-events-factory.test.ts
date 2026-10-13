@@ -282,6 +282,7 @@ describe('getSelectionOutcome', () => {
 		isHosted: true,
 		isLoading: false,
 		isTarget: false,
+		targetCount: 0,
 		url: '/some-location/',
 	};
 
@@ -304,11 +305,15 @@ describe('getSelectionOutcome', () => {
 		expect(getSelectionOutcome({ ...hosted, url: undefined })).toBe('popup');
 	});
 
-	test('a hosted Target gets its popup at once, loaded or not', () => {
-		expect(getSelectionOutcome({ ...hosted, isTarget: true })).toBe('popup');
-		expect(
-			getSelectionOutcome({ ...hosted, isLoading: true, isTarget: true, url: undefined }),
-		).toBe('popup');
+	test('a Target opens its own popup when the Location has several, and nothing when it is the only one', () => {
+		const target = { ...hosted, isTarget: true, targetCount: 2 };
+
+		expect(getSelectionOutcome(target)).toBe('popup');
+		expect(getSelectionOutcome({ ...target, isLoading: true, url: undefined })).toBe('popup');
+		expect(getSelectionOutcome({ ...target, isHosted: false })).toBe('popup');
+
+		expect(getSelectionOutcome({ ...target, targetCount: 1 })).toBe('none');
+		expect(getSelectionOutcome({ ...target, isHosted: false, targetCount: 1 })).toBe('none');
 	});
 });
 
@@ -340,7 +345,7 @@ describe('getSettledClick', () => {
 	});
 
 	test('a Target click is spent on its popup, so the same Point opens nothing once it stops being a Target', () => {
-		const selection = { isHosted: true, isLoading: false, url: '/some-location/' };
+		const selection = { isHosted: true, isLoading: false, targetCount: 2, url: '/some-location/' };
 		const asTarget = getSelectionOutcome({ ...selection, isTarget: true });
 		const afterPageChange = getSelectionOutcome({ ...selection, isTarget: false });
 

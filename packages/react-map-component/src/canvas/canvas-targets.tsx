@@ -8,11 +8,7 @@ import { useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
 
-import {
-	MapSelectedMarker,
-	MapSyncedTargetMarkers,
-	MapTargetMarkers,
-} from '#canvas/canvas-markers.tsx';
+import { MapSelectedMarker, MapTargetMarkers } from '#canvas/canvas-markers.tsx';
 import {
 	getTargetBounds,
 	getTargetDuration,
@@ -31,19 +27,6 @@ interface MapFitView {
 	bounds?: MapComponentProps['bounds'] | undefined;
 	scope?: MapScope | undefined;
 	targetIds: Array<string>;
-}
-
-// The last popup leaves its padding on the transform, so zoom would turn around an off-center point
-// The camera moves onto the screen center as the padding goes, so nothing shifts
-function clearPadding(map: MapRef) {
-	if (Object.values(map.getPadding()).every((side) => side === 0)) return;
-
-	const container = map.getContainer();
-
-	map.jumpTo({
-		center: map.unproject([container.clientWidth / 2, container.clientHeight / 2]),
-		padding: { bottom: 0, left: 0, right: 0, top: 0 },
-	});
 }
 
 // Pan distance to a position, in map widths at the current zoom
@@ -105,7 +88,6 @@ function useTargetFit(view: MapFitView) {
 		map.stop();
 		// MapLibre resizes from a throttled observer; until then the fit measures the old width
 		map.resize();
-		clearPadding(map);
 
 		const fit = getViewFit(map, sourceData, view);
 
@@ -134,7 +116,7 @@ const MapSyncedTargets: FC = function MapSyncedTargets() {
 
 	return (
 		<>
-			{isSettled ? <MapSyncedTargetMarkers targetIds={targetIds} /> : undefined}
+			{isSettled ? <MapTargetMarkers isHosted={true} targetIds={targetIds} /> : undefined}
 			<MapSelectedMarker targetIds={targetIds} />
 		</>
 	);
@@ -147,7 +129,7 @@ export const MapTargets: FC<Pick<MapComponentProps, 'host'>> = function MapTarge
 
 	return (
 		<>
-			<MapTargetMarkers targetIds={targetIds} />
+			<MapTargetMarkers isHosted={false} targetIds={targetIds} />
 			<MapSelectedMarker targetIds={targetIds} />
 		</>
 	);

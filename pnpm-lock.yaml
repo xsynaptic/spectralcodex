@@ -455,14 +455,14 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/noto-serif-tc':
-        specifier: ^5.3.0
-        version: 5.3.0
+        specifier: ^5.3.1
+        version: 5.3.1
       '@fontsource/noto-serif-thai':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource/zen-antique':
-        specifier: ^5.3.0
-        version: 5.3.0
+        specifier: ^5.3.1
+        version: 5.3.1
       '@huggingface/transformers':
         specifier: ^4.3.1
         version: 4.3.1(@types/node@25.9.2)
@@ -1548,14 +1548,14 @@ packages:
   '@fontsource/lora@5.3.0':
     resolution: {integrity: sha512-OK1g1z01rHVPqO5aw/FOIoDqc46KKYZdgL3NOLkxLWDk6QhDHhdr/h2BV1cke6gTvR1tzpDfdKyUkGsC+sQLeQ==}
 
-  '@fontsource/noto-serif-tc@5.3.0':
-    resolution: {integrity: sha512-6ZvCwAxmIV9axb7PMdLFMRv9h0MAKFpgHB54dngBAt/pGXBfcdXMCV9MBhqIqPV16szpR6FFrXYGuC9fcPFJIw==}
+  '@fontsource/noto-serif-tc@5.3.1':
+    resolution: {integrity: sha512-bX+7aXbMU9IyncD2v00P4E+aciwQl2e9F9qmHp3H3By+hQVh6bwa4rR2RD0QP/Vtt+9mwgjEPzsnEKb2oyIxog==}
 
   '@fontsource/noto-serif-thai@5.3.0':
     resolution: {integrity: sha512-BPE5PdY1NqA/aIvFhJz5Bgp/mL/ZS6eWJJXtpG+rlpK5sNXWcJilRBy2kdZfOZFamk5+r9lWFpq6cIRxWVMftQ==}
 
-  '@fontsource/zen-antique@5.3.0':
-    resolution: {integrity: sha512-G9iu1kgpr0MvBWVoR+DjoVMgK5zdVVeMQ+qdHJ42ec8Ag+574uWuykjMbOn9Nfq560swzixiTNdMlWoNzzyCAg==}
+  '@fontsource/zen-antique@5.3.1':
+    resolution: {integrity: sha512-68UYzLDdC6VYHCbCslae7Tq0No/iMNIE3CQy2bLbx2oK6kNM9PRYbDVJCf73HND1X0tbSh7NOk2cB+bGkBbgZQ==}
 
   '@huggingface/jinja@0.5.10':
     resolution: {integrity: sha512-SgS1D1bglQ94ceD4ZCL6eayUDy9uV1xuyk61OjgSxU5GJh7upqZCKII0JoTYMc6wWsg3JUgaPRX0ElQzXPk3Cw==}
@@ -8674,11 +8674,11 @@ snapshots:
 
   '@fontsource/lora@5.3.0': {}
 
-  '@fontsource/noto-serif-tc@5.3.0': {}
+  '@fontsource/noto-serif-tc@5.3.1': {}
 
   '@fontsource/noto-serif-thai@5.3.0': {}
 
-  '@fontsource/zen-antique@5.3.0': {}
+  '@fontsource/zen-antique@5.3.1': {}
 
   '@huggingface/jinja@0.5.10': {}
 

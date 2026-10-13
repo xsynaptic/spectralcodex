@@ -17,8 +17,8 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapSourceFeatureCollection } from '#types.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
-import { useMapHoveredId } from '#store/store.ts';
+import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
+import { useMapHoveredId, useMapSelectedId } from '#store/store.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 // feature-state is paint-only, so the label layers below still key off the store hoveredId
@@ -265,6 +265,10 @@ function useMapSourcePointsStyle(): {
 } {
 	const isDarkMode = useIsDarkMode();
 	const hoveredId = useMapHoveredId();
+	const selectedId = useMapSelectedId();
+
+	// Hover labels are off while a popup is open; they would draw underneath it
+	const labelHoveredId = selectedId ? undefined : hoveredId;
 
 	const clustersLayerStyle = useMemo(() => getClustersLayerStyle(isDarkMode), [isDarkMode]);
 
@@ -280,8 +284,8 @@ function useMapSourcePointsStyle(): {
 	const pointsImageLayerStyle = useMemo(() => getPointsImageLayerStyle(), []);
 
 	const pointsLabelLayerStyle = useMemo(
-		() => getPointsLabelLayerStyle(isDarkMode, hoveredId),
-		[isDarkMode, hoveredId],
+		() => getPointsLabelLayerStyle(isDarkMode, labelHoveredId),
+		[isDarkMode, labelHoveredId],
 	);
 
 	return {
@@ -328,7 +332,7 @@ export const MapSourcePoints: FC<{
 			clusterMaxZoom: 14, // Max zoom to cluster points on
 			clusterMinPoints: 2, // Minimum number of points to cluster
 			clusterProperties,
-			clusterRadius: 13, // How much space to provide for clusters; lower number = higher density
+			clusterRadius: pointClusterRadius,
 		};
 	}, [interactive, targetIds]);
 
