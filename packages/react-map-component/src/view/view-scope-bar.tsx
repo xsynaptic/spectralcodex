@@ -4,12 +4,10 @@ import { sendHostIntent } from '#host/host-intent.ts';
 import { MapIconEye, MapIconEyeOff } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
-import { useMapStoreActions } from '#store/store.ts';
 import { useMapView } from '#view/view.tsx';
 
 export const MapScopeBar: FC = function MapScopeBar() {
-	const { scope, scopeHeld } = useMapView();
-	const { setScopeEnabled } = useMapStoreActions();
+	const { scope, scopeHeld, setScopeEnabled } = useMapView();
 	const messages = useMapMessages();
 	const trackMap = useTrackMap();
 

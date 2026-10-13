@@ -3,7 +3,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapFeaturesRule, MapHoverFeature, MapScope } from '#types.ts';
+import type { MapFeaturesRule, MapHoverFeature } from '#types.ts';
 
 export type MapDataConfigurableState = Pick<
 	MapDataState,
@@ -30,12 +30,6 @@ export interface MapDataStore extends MapDataState {
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
 		setRatingFilter: (ratingFilter: number) => void;
-		setScope: (
-			scope: MapScope | undefined,
-			isScopeEnabled: boolean,
-			scopeViewKey: string | undefined,
-		) => void;
-		setScopeEnabled: (isScopeEnabled: boolean) => void;
 		setSelectedId: (selectedId: string | undefined) => void;
 		showAllStatusFilter: () => void;
 		toggleStatusFilter: (status: LocationStatus) => void;
@@ -55,14 +49,10 @@ interface MapDataState {
 	isFilterOpen: boolean;
 	isObjectiveFilterEnabled: boolean;
 	isPopupVisible: boolean;
-	isScopeEnabled: boolean;
 	languages: Array<string>;
 	mapFeaturesRule: MapFeaturesRule | undefined;
 	objectiveFilter: number;
 	ratingFilter: number;
-	scope: MapScope | undefined;
-	// The `data-map-view` string the Scope was last computed from
-	scopeViewKey: string | undefined;
 	selectedId: string | undefined;
 	statusFilter: Array<LocationStatus>;
 }
@@ -77,13 +67,10 @@ const defaultMapDataState = {
 	isFilterOpen: false,
 	isObjectiveFilterEnabled: false,
 	isPopupVisible: true,
-	isScopeEnabled: true,
 	languages: ['en'],
 	mapFeaturesRule: undefined,
 	objectiveFilter: 1,
 	ratingFilter: 1,
-	scope: undefined,
-	scopeViewKey: undefined,
 	selectedId: undefined,
 	statusFilter: [],
 } satisfies MapDataState;
@@ -140,12 +127,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setRatingFilter: (ratingFilter) => {
 					setAndClearSelection({ ratingFilter });
-				},
-				setScope: (scope, isScopeEnabled, scopeViewKey) => {
-					set({ isScopeEnabled, scope, scopeViewKey });
-				},
-				setScopeEnabled: (isScopeEnabled) => {
-					set({ isScopeEnabled });
 				},
 				setSelectedId: (selectedId) => {
 					// A selection takes the filter panel's place; clearing one leaves the panel as it is

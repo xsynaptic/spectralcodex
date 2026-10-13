@@ -1,18 +1,13 @@
 import type { FC, PropsWithChildren } from 'react';
 
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
+import type { MapScopeState } from '#view/view-scope.ts';
 
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapHost } from '#host/host-context.tsx';
 import { useHostViewKey } from '#host/host-view.ts';
-import {
-	useIsMapScopeEnabled,
-	useMapScopeViewKey,
-	useMapStoreActions,
-	useMapStoreScope,
-} from '#store/store.ts';
 import { parseMapView } from '#view/view-factory.ts';
 import { reduceMapScope } from '#view/view-scope.ts';
 
@@ -23,43 +18,52 @@ interface MapViewContextValue {
 	bounds?: MapComponentProps['bounds'] | undefined;
 	scope?: MapScope | undefined;
 	scopeHeld?: MapScope | undefined;
+	setScopeEnabled: (isScopeEnabled: boolean) => void;
 	targetIds: Array<string>;
 }
 
-const MapViewContext = createContext<MapViewContextValue>({ targetIds: emptyTargetIds });
+const initialScopeState: MapScopeState = {
+	isScopeEnabled: true,
+	scope: undefined,
+	viewKey: undefined,
+};
+
+const unhostedView: MapViewContextValue = {
+	setScopeEnabled: () => {
+		throw new Error('Only a hosted map holds a Scope!');
+	},
+	targetIds: emptyTargetIds,
+};
+
+const MapViewContext = createContext(unhostedView);
 
 const HostViewProvider: FC<PropsWithChildren<{ isDev: boolean | undefined }>> =
 	function HostViewProvider({ children, isDev }) {
 		const viewKey = useHostViewKey();
 		const { data: sourceData } = useSourceDataQuery();
 
-		const storeScope = useMapStoreScope();
-		const isStoreScopeEnabled = useIsMapScopeEnabled();
-		const scopeViewKey = useMapScopeViewKey();
-		const { setScope } = useMapStoreActions();
+		const [scopeState, setScopeState] = useState(initialScopeState);
 
 		const view = useMemo(() => parseMapView(viewKey, isDev), [viewKey, isDev]);
 
-		// Computed in render; from the effect below, one frame would draw the new page with the previous Scope
-		const { isScopeEnabled, isSettled, scope } = useMemo(
-			() =>
-				reduceMapScope(
-					{ isScopeEnabled: isStoreScopeEnabled, scope: storeScope, viewKey: scopeViewKey },
-					{ view, viewKey },
-					sourceData,
-				),
-			[isStoreScopeEnabled, scopeViewKey, sourceData, storeScope, view, viewKey],
+		const { isScopeEnabled, isSettled, scope } = reduceMapScope(
+			scopeState,
+			{ view, viewKey },
+			sourceData,
 		);
 
-		useEffect(() => {
-			if (isSettled && scopeViewKey !== viewKey) setScope(scope, isScopeEnabled, viewKey);
-		}, [isScopeEnabled, isSettled, scope, scopeViewKey, setScope, viewKey]);
+		if (isSettled && scopeState.viewKey !== viewKey) {
+			setScopeState({ isScopeEnabled, scope, viewKey });
+		}
 
 		const context = useMemo(
 			() => ({
 				bounds: view.scope?.bounds,
 				scope: isScopeEnabled ? scope : undefined,
 				scopeHeld: scope,
+				setScopeEnabled: (isScopeEnabled: boolean) => {
+					setScopeState((state) => ({ ...state, isScopeEnabled }));
+				},
 				targetIds: view.targetIds ?? emptyTargetIds,
 			}),
 			[isScopeEnabled, scope, view],
@@ -73,7 +77,10 @@ export const MapViewProvider: FC<
 	PropsWithChildren<Pick<MapComponentProps, 'isDev' | 'targetIds'>>
 > = function MapViewProvider({ children, isDev, targetIds }) {
 	const host = useMapHost();
-	const view = useMemo(() => ({ targetIds: targetIds ?? emptyTargetIds }), [targetIds]);
+	const view = useMemo(
+		() => (targetIds ? { ...unhostedView, targetIds } : unhostedView),
+		[targetIds],
+	);
 
 	if (host) {
 		return <HostViewProvider isDev={isDev}>{children}</HostViewProvider>;

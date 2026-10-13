@@ -58,13 +58,6 @@ export const useHasMapActiveFilter = () => useMapDataStore(hasActiveFilter);
 
 export const useMapFeaturesRule = () => useMapDataStore((state) => state.mapFeaturesRule);
 
-// Scope
-export const useMapStoreScope = () => useMapDataStore((state) => state.scope);
-
-export const useIsMapScopeEnabled = () => useMapDataStore((state) => state.isScopeEnabled);
-
-export const useMapScopeViewKey = () => useMapDataStore((state) => state.scopeViewKey);
-
 // Map language settings
 export const useMapLanguages = () => useMapDataStore((state) => state.languages);
 
