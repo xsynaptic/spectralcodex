@@ -1,9 +1,9 @@
 ---
-import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
@@ -13,8 +13,8 @@ import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
+import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {

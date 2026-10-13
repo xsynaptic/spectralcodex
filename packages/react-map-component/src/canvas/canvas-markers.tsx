@@ -10,6 +10,7 @@ import { Marker, useMap } from 'react-map-gl/maplibre';
 import type { TargetPoint } from '#canvas/canvas-markers-factory.ts';
 
 import {
+	findTargetClusters,
 	getClusterCandidates,
 	getClusterSearchRadius,
 	getTargetPoints,
@@ -89,50 +90,23 @@ async function collectLeafClusterMarkers({
 
 	const renderedClusters = getRenderedClusters(map);
 	const searchRadius = getClusterSearchRadius(pointClusterRadius);
-	const markers = new Map<number, TargetMarker>();
 
-	let pending = targets.map(({ coordinates, id }) => ({
-		candidates: getClusterCandidates(map.project(coordinates), renderedClusters, searchRadius),
-		id,
+	const clusters = await findTargetClusters({
+		getLeafIds: (cluster) => getLeafIds(source, cluster),
+		isCurrent,
+		leafIds,
+		pending: targets.map(({ coordinates, id }) => ({
+			candidates: getClusterCandidates(map.project(coordinates), renderedClusters, searchRadius),
+			id,
+		})),
+	});
+
+	return clusters.map((cluster) => ({
+		color,
+		id: `cluster-${String(cluster.id)}`,
+		latitude: cluster.latitude,
+		longitude: cluster.longitude,
 	}));
-
-	try {
-		// Check every Target's closest cluster in parallel, then move on to the next closest for any that were not in it
-		while (pending.length > 0 && isCurrent()) {
-			const round = new Map(
-				pending
-					.flatMap(({ candidates }) => candidates.slice(0, 1))
-					.filter((cluster) => !leafIds.has(cluster.id))
-					.map((cluster) => [cluster.id, cluster]),
-			);
-
-			await Promise.all(
-				[...round.values()].map(async (cluster) => {
-					leafIds.set(cluster.id, await getLeafIds(source, cluster));
-				}),
-			);
-
-			pending = pending.filter(({ candidates, id }) => {
-				const cluster = candidates.shift();
-
-				if (!cluster) return false;
-				if (!leafIds.get(cluster.id)?.has(id)) return true;
-
-				markers.set(cluster.id, {
-					color,
-					id: `cluster-${String(cluster.id)}`,
-					latitude: cluster.latitude,
-					longitude: cluster.longitude,
-				});
-
-				return false;
-			});
-		}
-	} catch {
-		// The clusters changed while we were asking; the next `sourcedata` refresh will try again
-	}
-
-	return [...markers.values()];
 }
 
 function collectPointMarkers(

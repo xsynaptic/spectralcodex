@@ -22,13 +22,11 @@ export type MapDataConfigurableState = Pick<
 export interface MapDataStore extends MapDataState {
 	actions: {
 		hideAllStatusFilter: () => void;
-		setCanvasInteractive: (isCanvasInteractive: boolean) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
 		setClickedId: (clickedId: string | undefined) => void;
 		setFilterOpen: (isFilterOpen: boolean) => void;
 		setFilterPosition: (filterPosition: DOMCoordinates) => void;
 		setHoveredId: (hoveredId: string | undefined, hoveredFeature?: MapHoverFeature) => void;
-		setLanguages: (languages: Array<string>) => void;
 		setObjectiveFilter: (objectiveFilter: number) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
 		setRatingFilter: (ratingFilter: number) => void;
@@ -39,7 +37,6 @@ export interface MapDataStore extends MapDataState {
 		) => void;
 		setScopeEnabled: (isScopeEnabled: boolean) => void;
 		setSelectedId: (selectedId: string | undefined) => void;
-		setStatusFilter: (statusFilter: Array<LocationStatus>) => void;
 		showAllStatusFilter: () => void;
 		toggleStatusFilter: (status: LocationStatus) => void;
 	};
@@ -120,9 +117,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				hideAllStatusFilter: () => {
 					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
 				},
-				setCanvasInteractive: (isCanvasInteractive) => {
-					set({ isCanvasInteractive });
-				},
 				setCanvasLoading: (isCanvasLoading) => {
 					set({ isCanvasLoading });
 				},
@@ -137,9 +131,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 				},
 				setHoveredId: (hoveredId, hoveredFeature) => {
 					set({ hoveredFeature, hoveredId });
-				},
-				setLanguages: (languages) => {
-					set({ languages });
 				},
 				setObjectiveFilter: (objectiveFilter) => {
 					setAndClearSelection({ objectiveFilter });
@@ -164,9 +155,6 @@ export function createMapStore(initialState?: Partial<MapDataConfigurableState>)
 							? { clickedId: undefined, isPopupVisible: true }
 							: { isFilterOpen: false }),
 					});
-				},
-				setStatusFilter: (statusFilter) => {
-					setAndClearSelection({ statusFilter });
 				},
 				showAllStatusFilter: () => {
 					setAndClearSelection({ statusFilter: [] });

@@ -7,10 +7,10 @@ import type { AtlasDirectiveOptions } from '#lib/atlas/atlas-directive.ts';
 import AtlasDivider from '#components/atlas/atlas-divider.astro';
 import MapLoading from '#components/map/map-loading.astro';
 import { atlasPersistName, atlasRootId } from '#lib/atlas/atlas-constants.ts';
+import { getAtlasMapData } from '#lib/atlas/atlas-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getAtlasMapData } from '#lib/map/map-atlas.ts';
 
-const { featureCount, hasGeodata, prefetchUrls, ...mapComponentProps } = await getAtlasMapData();
+const { hasGeodata, props: mapComponentProps } = await getAtlasMapData();
 
 const t = getTranslations();
 

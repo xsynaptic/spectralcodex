@@ -48,3 +48,50 @@ export function getTargetPoints(
 
 	return points;
 }
+
+export async function findTargetClusters<Cluster extends { id: number }>({
+	getLeafIds,
+	isCurrent,
+	leafIds,
+	pending,
+}: {
+	getLeafIds: (cluster: Cluster) => Promise<Set<unknown>>;
+	isCurrent: () => boolean;
+	leafIds: Map<number, Set<unknown>>;
+	pending: ReadonlyArray<{ candidates: ReadonlyArray<Cluster>; id: string }>;
+}): Promise<Array<Cluster>> {
+	const found = new Map<number, Cluster>();
+	let remaining = pending.map(({ candidates, id }) => ({ candidates: [...candidates], id }));
+
+	try {
+		while (remaining.length > 0 && isCurrent()) {
+			const round = new Map(
+				remaining
+					.flatMap(({ candidates }) => candidates.slice(0, 1))
+					.filter((cluster) => !leafIds.has(cluster.id))
+					.map((cluster) => [cluster.id, cluster]),
+			);
+
+			await Promise.all(
+				[...round.values()].map(async (cluster) => {
+					leafIds.set(cluster.id, await getLeafIds(cluster));
+				}),
+			);
+
+			remaining = remaining.filter(({ candidates, id }) => {
+				const cluster = candidates.shift();
+
+				if (!cluster) return false;
+				if (!leafIds.get(cluster.id)?.has(id)) return true;
+
+				found.set(cluster.id, cluster);
+
+				return false;
+			});
+		}
+	} catch {
+		// The clusters changed while we were asking; the caller's next refresh will try again
+	}
+
+	return [...found.values()];
+}

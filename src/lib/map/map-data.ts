@@ -1,16 +1,12 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
-import type {
-	MapComponentData,
-	MapComponentProps,
-	MapFeaturesRule,
-} from '@spectralcodex/react-map-component';
+import type { MapComponentProps, MapFeaturesRule } from '@spectralcodex/react-map-component';
 
 import { encodeMapPopupData, encodeMapSourceData } from '@spectralcodex/map-codec';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapDataBoundsProps } from '#lib/map/map-bounds.ts';
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
+import type { MapComponentData, MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { mapSourceInlineLimit } from '#constants.ts';
 import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
@@ -40,17 +36,15 @@ function getInlineSourceData(
 	});
 }
 
-const defaultMapDataProps = {
+const defaultMapComponentProps = {
 	apiPopupUrl: undefined,
 	apiSourceUrl: undefined,
-	featureCount: 0,
-	hasGeodata: false,
 	imageServerUrl: IMAGE_SERVER_URL,
 	isDev: import.meta.env.DEV,
 	popupData: undefined,
 	protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 	sourceData: undefined,
-} satisfies MapComponentData;
+} satisfies MapComponentProps;
 
 // Prepare most of the necessary props and data for the map component
 export function getMapData({
@@ -104,17 +98,16 @@ export function getMapData({
 
 	if (!featureCollection || !mapBounds) {
 		return {
-			...defaultMapDataProps,
-			...props,
+			featureCount: 0,
+			hasGeodata: false,
+			props: { ...defaultMapComponentProps, ...props },
 		} satisfies MapComponentData;
 	}
 
 	const featureCount = featureCollection.features.length;
 
-	const baseData = {
-		...defaultMapDataProps,
-		featureCount,
-		hasGeodata: true,
+	const baseProps = {
+		...defaultMapComponentProps,
 		...mapBounds,
 		...props,
 		targetIds: getTargetIds(featureCollection, targetId),
@@ -122,7 +115,11 @@ export function getMapData({
 
 	// MDX inline maps (no mapId): inline both source and popup, no chunks
 	if (!mapId) {
-		return { ...baseData, ...getInlineData(featureCollection) } satisfies MapComponentData;
+		return {
+			featureCount,
+			hasGeodata: true,
+			props: { ...baseProps, ...getInlineData(featureCollection) },
+		} satisfies MapComponentData;
 	}
 
 	// All other maps: popups come from the shared, demand-fetched chunks
@@ -131,20 +128,29 @@ export function getMapData({
 	// Small maps inline their points, each carrying its chunk key
 	if ((locationCount ?? featureCount) <= mapSourceInlineLimit) {
 		return {
-			...baseData,
-			mapId,
-			...getChunkedInlineData(featureCollection, chunkKeyById),
-			apiChunkBaseUrl,
-			version,
+			featureCount,
+			hasGeodata: true,
+			props: {
+				...baseProps,
+				mapId,
+				...getChunkedInlineData(featureCollection, chunkKeyById),
+				apiChunkBaseUrl,
+				version,
+			},
 		} satisfies MapComponentData;
 	}
 
-	return {
-		...baseData,
-		mapId,
-		...getDirectoryData(featureCollection, mapFeaturesRule, version),
-		apiChunkBaseUrl,
+	const { prefetchUrls, ...directoryProps } = getDirectoryData(
+		featureCollection,
+		mapFeaturesRule,
 		version,
+	);
+
+	return {
+		featureCount,
+		hasGeodata: true,
+		prefetchUrls,
+		props: { ...baseProps, mapId, ...directoryProps, apiChunkBaseUrl, version },
 	} satisfies MapComponentData;
 }
 
@@ -161,8 +167,9 @@ export function getMapDataDedicated({
 
 	if (!featureCollection || !mapBounds) {
 		return {
-			...defaultMapDataProps,
-			...props,
+			featureCount: 0,
+			hasGeodata: false,
+			props: { ...defaultMapComponentProps, ...props },
 		} satisfies MapComponentData;
 	}
 
@@ -176,15 +183,17 @@ export function getMapDataDedicated({
 	const apiPopupUrl = getBasePath('api/map', mapId, `${MapApiDataEnum.Popup}.json?v=${popupHash}`);
 
 	return {
-		...defaultMapDataProps,
-		apiPopupUrl,
-		apiSourceUrl,
 		featureCount: featureCollection.features.length,
 		hasGeodata: true,
-		mapId,
 		prefetchUrls: [apiSourceUrl, apiPopupUrl],
-		...mapBounds,
-		...props,
+		props: {
+			...defaultMapComponentProps,
+			apiPopupUrl,
+			apiSourceUrl,
+			mapId,
+			...mapBounds,
+			...props,
+		},
 	} satisfies MapComponentData;
 }
 

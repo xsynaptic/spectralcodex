@@ -1,8 +1,8 @@
 ---
-import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryArticle from '#components/content/content-entry-article.astro';
@@ -24,13 +24,13 @@ import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
+import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
 import {
 	createLocationEntryDisplayFunction,
 	getLocationSchemas,
 } from '#lib/collections/locations/locations-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
-import { getAtlasPage } from '#lib/map/map-atlas.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 

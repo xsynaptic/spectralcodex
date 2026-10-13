@@ -1,7 +1,9 @@
-import type { MapComponentData, MapView } from '@spectralcodex/react-map-component';
+import type { MapScope, MapView } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
+
+import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import {
@@ -29,18 +31,32 @@ const getAtlasLocationIds = pMemoize(async () => {
 	return new Set(entriesMap.get(atlasRegionId)?.data._locations);
 });
 
+type AtlasEntry = CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'>;
+
+function getAtlasScope(
+	entry: AtlasEntry,
+	rule: MapScope['rule'],
+	frame: Pick<MapScope, 'apiDivisionUrl' | 'bounds'>,
+) {
+	return {
+		...frame,
+		rule,
+		title: entry.data.title,
+		url: getContentPath(entry.collection, entry.id),
+	};
+}
+
 async function getAtlasLocationView(
 	entry: CollectionEntry<'locations'>,
 	mapData: MapComponentData,
 ) {
 	if (entry.data.hideLocation && contentPolicy.hideSensitiveLocations) return;
-	if (!mapData.hasGeodata) return;
 
 	const atlasLocationIds = await getAtlasLocationIds();
 
 	if (!atlasLocationIds.has(entry.id)) return;
 
-	return { targetIds: mapData.targetIds ?? [] };
+	return { targetIds: mapData.props.targetIds ?? [] };
 }
 
 async function getAtlasRegionView(
@@ -54,27 +70,22 @@ async function getAtlasRegionView(
 	const atlasInterval = intervalById.get(atlasRegionId);
 	const interval = intervalById.get(entry.id);
 
-	if (!atlasInterval || !interval || !mapData.hasGeodata) return;
+	if (!atlasInterval || !interval) return;
 	if (interval[0] < atlasInterval[0] || interval[1] > atlasInterval[1]) return;
 
+	const { apiDivisionUrl, bounds } = mapData.props;
+
 	return {
-		scope: {
-			// `mapData.mapFeaturesRule` is absent on a Region small enough to inline its rows
-			rule: { interval, type: 'region' },
-			title: entry.data.title,
-			url: getContentPath(entry.collection, entry.id),
-			...(mapData.bounds ? { bounds: mapData.bounds } : {}),
-			...(mapData.apiDivisionUrl ? { apiDivisionUrl: mapData.apiDivisionUrl } : {}),
-		},
+		// `mapData.props.mapFeaturesRule` is absent on a Region small enough to inline its rows
+		scope: getAtlasScope(
+			entry,
+			{ interval, type: 'region' },
+			{ ...(bounds ? { bounds } : {}), ...(apiDivisionUrl ? { apiDivisionUrl } : {}) },
+		),
 	};
 }
 
-async function getAtlasThemeView(
-	entry: CollectionEntry<'themes'>,
-	mapData: MapComponentData,
-): Promise<MapView | undefined> {
-	if (!mapData.hasGeodata) return;
-
+async function getAtlasThemeView(entry: CollectionEntry<'themes'>): Promise<MapView | undefined> {
 	const themeIndexById = await getMapThemeIndexById();
 	const themeIndex = themeIndexById.get(entry.id);
 
@@ -86,18 +97,13 @@ async function getAtlasThemeView(
 	const locations = getLocationsByIds(
 		(entry.data._locations ?? []).filter((id) => atlasLocationIds.has(id)),
 	);
-	// `mapData.bounds` would also cover the Theme's Locations outside Taiwan, which the atlas map does not show
+	// The page map's bounds would also cover the Theme's Locations outside Taiwan, which the atlas map does not show
 	const bounds = getMapBounds({ featureCollection: getLocationsFeatureCollection(locations) });
 
 	if (!bounds) return;
 
 	return {
-		scope: {
-			bounds: bounds.bounds,
-			rule: { index: themeIndex, type: 'theme' },
-			title: entry.data.title,
-			url: getContentPath(entry.collection, entry.id),
-		},
+		scope: getAtlasScope(entry, { index: themeIndex, type: 'theme' }, { bounds: bounds.bounds }),
 	};
 }
 
@@ -115,35 +121,28 @@ async function getAtlasLocationsView(
 	if (!featureCollection || !bounds) return;
 
 	return {
-		scope: {
-			bounds: bounds.bounds,
-			rule: {
+		scope: getAtlasScope(
+			entry,
+			{
 				ids: featureCollection.features.flatMap(({ id }) => (typeof id === 'string' ? [id] : [])),
 				type: 'ids',
 			},
-			title: entry.data.title,
-			url: getContentPath(entry.collection, entry.id),
-		},
+			{ bounds: bounds.bounds },
+		),
 	};
 }
 
-async function getAtlasPostView(entry: CollectionEntry<'posts'>, mapData: MapComponentData) {
-	if (!mapData.hasGeodata) return;
-
+async function getAtlasPostView(entry: CollectionEntry<'posts'>) {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 
 	return getAtlasLocationsView(entry, getLocationsByPosts(entry));
 }
 
-async function getAtlasSeriesView(entry: CollectionEntry<'series'>, mapData: MapComponentData) {
-	if (!mapData.hasGeodata) return;
-
+async function getAtlasSeriesView(entry: CollectionEntry<'series'>) {
 	const getLocationsBySeries = await createLocationsBySeriesFunction();
 
 	return getAtlasLocationsView(entry, getLocationsBySeries(entry.data.seriesItems));
 }
-
-type AtlasEntry = CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'>;
 
 async function getAtlasView(entry: AtlasEntry, mapData: MapComponentData) {
 	switch (entry.collection) {
@@ -151,16 +150,16 @@ async function getAtlasView(entry: AtlasEntry, mapData: MapComponentData) {
 			return getAtlasLocationView(entry, mapData);
 		}
 		case 'posts': {
-			return getAtlasPostView(entry, mapData);
+			return getAtlasPostView(entry);
 		}
 		case 'regions': {
 			return getAtlasRegionView(entry, mapData);
 		}
 		case 'series': {
-			return getAtlasSeriesView(entry, mapData);
+			return getAtlasSeriesView(entry);
 		}
 		case 'themes': {
-			return getAtlasThemeView(entry, mapData);
+			return getAtlasThemeView(entry);
 		}
 	}
 }
@@ -169,6 +168,8 @@ export async function getAtlasPage(
 	entry: AtlasEntry,
 	mapData: MapComponentData,
 ): Promise<AtlasPageProps | undefined> {
+	if (!mapData.hasGeodata) return;
+
 	const view = await getAtlasView(entry, mapData);
 
 	return view ? { page: atlasPage.pane, view } : undefined;

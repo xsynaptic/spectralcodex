@@ -1096,7 +1096,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				source="components/map/map-component.astro"
 			>
 				{sampleMapData.hasGeodata ? (
-					<MapComponent mapComponentProps={sampleMapData} />
+					<MapComponent mapComponentProps={sampleMapData.props} />
 				) : (
 					<p class={captionClass}>No Location carries geometry, so the map has nothing to draw.</p>
 				)}

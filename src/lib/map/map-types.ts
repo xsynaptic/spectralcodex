@@ -1,4 +1,4 @@
-import type { MapGeometry } from '@spectralcodex/react-map-component';
+import type { MapComponentProps, MapGeometry } from '@spectralcodex/react-map-component';
 import type { LocationCategoryEnum, LocationStatus } from '@spectralcodex/shared/map';
 import type { FeatureCollection } from 'geojson';
 
@@ -9,6 +9,13 @@ export const MapApiDataEnum = {
 	Popup: 'p',
 	Source: 's',
 } as const;
+
+export interface MapComponentData {
+	featureCount: number;
+	hasGeodata: boolean;
+	prefetchUrls?: Array<string> | undefined;
+	props: MapComponentProps;
+}
 
 export type MapFeatureCollection = FeatureCollection<MapGeometry, MapFeatureProperties>;
 

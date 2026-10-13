@@ -12,13 +12,6 @@ import type { MapProps } from 'react-map-gl/maplibre';
 import type { MapDarkModeOptions } from '#lib/dark-mode.tsx';
 import type { MapMessages } from '#lib/messages.tsx';
 
-// Used within Astro to determine whether a map should be rendered
-export interface MapComponentData extends MapComponentProps {
-	featureCount: number;
-	hasGeodata: boolean;
-	prefetchUrls?: Array<string> | undefined;
-}
-
 export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'bounds' | 'hash' | 'interactive' | 'maxBounds' | 'zoom'>
 > {

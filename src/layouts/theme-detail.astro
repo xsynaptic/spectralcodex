@@ -1,10 +1,10 @@
 ---
 // fallow-ignore-file code-duplication -- Ends with the same section sequence as region-detail; the frontmatter overlap with resources-detail is adjacent one-liners
-import type { MapComponentData } from '@spectralcodex/react-map-component';
 import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
@@ -19,7 +19,7 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionStats from '#components/sections/section-stats.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { getAtlasPage } from '#lib/map/map-atlas.ts';
+import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
 
 interface Props {
 	backlinksCount: number;

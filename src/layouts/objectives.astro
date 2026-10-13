@@ -1,5 +1,5 @@
 ---
-import type { MapComponentData } from '@spectralcodex/react-map-component';
+import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import ContentHeader from '#components/content/content-header.astro';
 import ContentSection from '#components/content/content-section.astro';
@@ -7,9 +7,11 @@ import MainSite from '#components/main/main-site.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
-type Props = MapComponentData;
+interface Props {
+	mapData: MapComponentData;
+}
 
-const mapData = Astro.props;
+const { mapData } = Astro.props;
 
 const title = 'Objectives';
 const description = 'Points in the database that still require visitation and documentation.';
