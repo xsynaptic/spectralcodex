@@ -10,6 +10,7 @@ import '#canvas/canvas-worker.ts';
 import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
+import { MapCanvasLoading } from '#canvas/canvas-loading.tsx';
 import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapControls } from '#controls/controls.tsx';
@@ -18,7 +19,7 @@ import { PopupDataContextProvider } from '#data/data-popup.tsx';
 import { SourceDataContextProvider } from '#data/data-source.tsx';
 import { MapHostProvider, useMapHost } from '#host/host-context.tsx';
 import { useProtomaps } from '#lib/protomaps.ts';
-import { MapPopup } from '#popup/popup.tsx';
+import { MapImagePreload, MapPopup } from '#popup/popup.tsx';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store-provider.tsx';
@@ -100,6 +101,8 @@ const MapCanvasContainer: FC<
 				>
 					<MapControls hasEnterControl={hasEnterControl} />
 					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
+					<MapImagePreload imageServerUrl={imageServerUrl} isEnabled={!host} />
+					<MapCanvasLoading />
 				</PopupDataContextProvider>
 			</ChunkConfigProvider>
 			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} isDev={isDev} />

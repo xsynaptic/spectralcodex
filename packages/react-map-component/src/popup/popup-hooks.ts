@@ -7,7 +7,7 @@ import { useMap } from 'react-map-gl/maplibre';
 
 import { useChunkPopup } from '#data/data-popup-chunks.tsx';
 import { usePopupDataQuery } from '#data/data-popup.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
+import { useSourceDataItem } from '#data/data-source.tsx';
 import {
 	findPopupImageSrcSet,
 	getPopupImageSizes,
@@ -94,13 +94,13 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 }
 
 // Source data carries only part of a popup; the rest comes from chunks fetched on demand
-export function useMapCanvasPopup(sourceDataIndex: Map<string, MapSourceItem>) {
+export function useMapCanvasPopup() {
 	const selectedId = useMapSelectedId();
 
 	const inlinePopupQuery = usePopupDataQuery();
 	const inlinePopupData = inlinePopupQuery.data;
 
-	const selectedSourceItem = selectedId ? sourceDataIndex.get(selectedId) : undefined;
+	const selectedSourceItem = useSourceDataItem(selectedId);
 
 	// Without a chunk key the popup data is inline (objectives, MDX)
 	const chunkKey = selectedSourceItem?.properties.chunkKey;
@@ -135,11 +135,9 @@ export function useMapCanvasPopup(sourceDataIndex: Map<string, MapSourceItem>) {
 export function useMapImagePreload({
 	imageServerUrl,
 	isEnabled,
-	sourceDataIndex,
 }: {
 	imageServerUrl: string;
 	isEnabled: boolean;
-	sourceDataIndex: Map<string, MapSourceItem>;
 }) {
 	const hoveredId = useMapHoveredId();
 	const { data: inlinePopupData } = usePopupDataQuery();
@@ -148,9 +146,7 @@ export function useMapImagePreload({
 	// Debounced so that sweeping across a dense area doesn't request a chunk for every point crossed
 	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
 
-	const hoveredSourceItem = debouncedHoveredId
-		? sourceDataIndex.get(debouncedHoveredId)
-		: undefined;
+	const hoveredSourceItem = useSourceDataItem(debouncedHoveredId);
 	const hoverChunkKey = hoveredSourceItem?.properties.chunkKey;
 	const { data: hoverChunkData } = useChunkPopup(hoverChunkKey);
 
@@ -182,22 +178,6 @@ export function useMapImagePreload({
 		isEnabled,
 		maxWidthPx,
 	]);
-}
-
-export function useSourceDataIndex(): Map<string, MapSourceItem> {
-	const { data: sourceData } = useSourceDataQuery();
-
-	return useMemo(() => {
-		const index = new Map<string, MapSourceItem>();
-
-		if (sourceData) {
-			for (const item of sourceData) {
-				index.set(item.properties.id, item);
-			}
-		}
-
-		return index;
-	}, [sourceData]);
 }
 
 export function useMapPopupLayout() {

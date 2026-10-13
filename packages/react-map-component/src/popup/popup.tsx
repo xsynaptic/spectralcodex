@@ -6,10 +6,6 @@ import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemExtended } from '#popup/popup-hooks.ts';
 
-import { getSelectionOutcome } from '#canvas/canvas-events-factory.ts';
-import { useSettledClick } from '#canvas/canvas-feature-open.ts';
-import { MapCanvasLoading } from '#canvas/canvas-loading.tsx';
-import { useMapHost } from '#host/host-context.tsx';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useMapMessages } from '#lib/messages.tsx';
 import { useTrackMap } from '#lib/track-context.tsx';
@@ -19,14 +15,9 @@ import {
 	getPopupImageSrcSet,
 	getTargetPopupItem,
 } from '#popup/popup-factory.ts';
-import {
-	useMapCanvasPopup,
-	useMapImagePreload,
-	useMapPopupLayout,
-	useSourceDataIndex,
-} from '#popup/popup-hooks.ts';
+import { useMapImagePreload, useMapPopupLayout } from '#popup/popup-hooks.ts';
+import { useMapSelection } from '#popup/popup-selection.ts';
 import { useIsMapPopupVisible, useMapStoreActions } from '#store/store.ts';
-import { useMapTargetIds } from '#view/view.tsx';
 
 // Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
 function getGoogleMapsHref(value: string) {
@@ -315,10 +306,11 @@ const MapPopupFrame: FC<{
 	);
 };
 
-const MapImagePreload: FC<Parameters<typeof useMapImagePreload>[0]> = function MapImagePreload(
-	props,
-) {
-	useMapImagePreload(props);
+export const MapImagePreload: FC<{
+	imageServerUrl?: string | undefined;
+	isEnabled: boolean;
+}> = function MapImagePreload({ imageServerUrl = '', isEnabled }) {
+	useMapImagePreload({ imageServerUrl, isEnabled });
 
 	return;
 };
@@ -327,42 +319,17 @@ export const MapPopup: FC<{
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
 }> = function MapPopup({ imageServerUrl = '', isDev }) {
-	const isHosted = useMapHost() !== undefined;
-	const sourceDataIndex = useSourceDataIndex();
-	const { isLoading, popupItem } = useMapCanvasPopup(sourceDataIndex);
-	const targetIds = useMapTargetIds();
+	const { isLoading, isTarget, popupItem } = useMapSelection();
 
-	const isTarget = popupItem ? targetIds.includes(popupItem.id) : false;
-
-	const outcome = popupItem
-		? getSelectionOutcome({
-				isHosted,
-				isLoading,
-				isTarget,
-				targetCount: targetIds.length,
-				url: popupItem.url,
-			})
-		: undefined;
-
-	useSettledClick({ id: popupItem?.id, isLoading, outcome, url: popupItem?.url });
+	if (!popupItem) return;
 
 	return (
-		<>
-			{popupItem && outcome === 'popup' ? (
-				<MapPopupFrame
-					imageServerUrl={imageServerUrl}
-					isDev={isDev}
-					isLoading={isLoading}
-					isTarget={isTarget}
-					popupItem={popupItem}
-				/>
-			) : undefined}
-			<MapImagePreload
-				imageServerUrl={imageServerUrl}
-				isEnabled={!isHosted}
-				sourceDataIndex={sourceDataIndex}
-			/>
-			<MapCanvasLoading />
-		</>
+		<MapPopupFrame
+			imageServerUrl={imageServerUrl}
+			isDev={isDev}
+			isLoading={isLoading}
+			isTarget={isTarget}
+			popupItem={popupItem}
+		/>
 	);
 };

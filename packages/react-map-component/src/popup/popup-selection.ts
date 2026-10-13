@@ -1,29 +1,34 @@
 import { useEffect } from 'react';
 
-import type { getSelectionOutcome } from '#canvas/canvas-events-factory.ts';
-
-import { getSettledClick } from '#canvas/canvas-events-factory.ts';
+import { getSelectionOutcome, getSettledClick } from '#canvas/canvas-events-factory.ts';
 import { useMapHost } from '#host/host-context.tsx';
 import { sendHostIntent } from '#host/host-intent.ts';
 import { useTrackMap } from '#lib/track-context.tsx';
+import { useMapCanvasPopup } from '#popup/popup-hooks.ts';
 import { useMapClickedId, useMapStoreActions } from '#store/store.ts';
+import { useMapTargetIds } from '#view/view.tsx';
 
-// Point ids are content hashes, so analytics reports the location's URL, which is only known once popup data has loaded
-export function useSettledClick({
-	id,
-	isLoading,
-	outcome,
-	url,
-}: {
-	id: string | undefined;
-	isLoading: boolean;
-	outcome: ReturnType<typeof getSelectionOutcome> | undefined;
-	url: string | undefined;
-}) {
+export function useMapSelection() {
 	const isHosted = useMapHost() !== undefined;
+	const { isLoading, popupItem } = useMapCanvasPopup();
+	const targetIds = useMapTargetIds();
 	const clickedId = useMapClickedId();
 	const { setClickedId } = useMapStoreActions();
 	const trackMap = useTrackMap();
+
+	const id = popupItem?.id;
+	const url = popupItem?.url;
+	const isTarget = popupItem !== undefined && targetIds.includes(popupItem.id);
+
+	const outcome = popupItem
+		? getSelectionOutcome({
+				isHosted,
+				isLoading,
+				isTarget,
+				targetCount: targetIds.length,
+				url,
+			})
+		: undefined;
 
 	useEffect(() => {
 		const settledClick = getSettledClick({ clickedId, isLoading, outcome, selectedId: id });
@@ -41,4 +46,6 @@ export function useSettledClick({
 
 		if (!isHosted) trackMap({ data: { location: url }, name: 'map-popup-open' });
 	}, [clickedId, id, isHosted, isLoading, outcome, setClickedId, trackMap, url]);
+
+	return { isLoading, isTarget, popupItem: outcome === 'popup' ? popupItem : undefined };
 }
