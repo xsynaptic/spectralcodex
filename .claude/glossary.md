@@ -78,15 +78,17 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 ### Maps
 
+Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outside the map package and the atlas plans; inside those, where nothing else could be meant, the bare word (Scope, Target) is the same term.
+
 **Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point. _Avoid_: marker, pin, item.
 
 **Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
 
 **Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
-**Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Filter is set by the user, a Scope by a page).
+**Map Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Map Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Map Filter is set by the user, a Map Scope by a page).
 
-**Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Filter; a page never does. _Avoid_: scope, facet.
+**Map Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Map Filter; a page never does. _Avoid_: scope, facet.
 
 **Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
 
@@ -94,7 +96,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Chunk**: A geographically contiguous bundle of Popup Data, fetched on demand so a map never loads every popup up front. _Avoid_: tile, batch, page, shard.
 
-**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read, or behind it on a narrow screen. _Avoid_: explorer, map mode, map view.
+**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read, or behind it on a narrow screen. _Avoid_: explorer, map mode.
 
 **Split**: The Atlas layout with the map on the left and a page on the right. _Avoid_: two-pane, side-by-side.
 
@@ -102,7 +104,9 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Sheet**: The Atlas layout on a screen too narrow for the Split: the page covers the map, and the reader can lower it out of the way to reach the map, then raise it again without losing their place. _Avoid_: drawer, modal, overlay, bottom sheet.
 
-**Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
+**Map Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
+
+**Map View**: What the page being read asks the Atlas map to show: its Map Targets, a Map Scope, or neither. Each page carries one, and the map reads it again on every navigation. _Avoid_: page state, map state, viewport (that is the camera).
 
 ### Imagery
 
